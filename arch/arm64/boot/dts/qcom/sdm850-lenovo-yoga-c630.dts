@@ -431,7 +431,7 @@
 };
 
 &ipa {
-	status = "disabled";
+	status = "okay";
 	modem-init;
 	memory-region = <&ipa_fw_mem>;
 };
