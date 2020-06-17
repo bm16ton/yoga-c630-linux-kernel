@@ -179,6 +179,8 @@ FIXES;
     SHUTDOWN;
         the system will crash on shutdown if connected to wireless AP add this service which disconnects wifi at start of shutdown, this kernels
         source directory 
+			sudo cp C630/usr/local/bin/disconnect-wifi.sh /usr/local/bin/disconnect-wifi.sh
+			sudo chmod +x /usr/local/bin/disconnect-wifi.sh
             sudo cp C630/etc/systemd/system/iw-disconnect.service /etc/systemd/system/iw-disconnect.service 
             sudo systemctl enable iw-disconnect.service 
         The system will crash on shutdown if firefox is running when starting shutdown, simply close firefox.
