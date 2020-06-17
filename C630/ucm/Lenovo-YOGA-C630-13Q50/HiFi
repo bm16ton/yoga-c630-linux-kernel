@@ -1,0 +1,136 @@
+# Use case configuration for LenovoYOGAC6301.
+# Author: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+
+SectionVerb {
+
+	EnableSequence [
+		cdev "hw:LenovoYOGAC6301"
+		cset "name='SLIM RX6 MUX' AIF1_PB"
+		cset "name='SLIM RX7 MUX' AIF1_PB"
+		cset "name='RX INT7_1 MIX1 INP0' RX6"
+		cset "name='RX INT8_1 MIX1 INP0' RX7"
+		## gain to  0dB
+		cset "name='SLIMBUS_0_RX Audio Mixer MultiMedia1' 1"
+		cset "name='MultiMedia2 Mixer SLIMBUS_0_TX' 1"
+		cset "name='AIF1_CAP Mixer SLIM TX0' 1"
+		cset "name='CDC_IF TX0 MUX' DEC0"
+		cset "name='AMIC MUX0' ADC2"
+		cset "name='ADC2 Volume' 12"
+	]
+
+	DisableSequence [
+                cdev "hw:LenovoYOGAC6301"
+		cset "name='SLIMBUS_0_RX Audio Mixer MultiMedia1' 0"
+		cset "name='SLIM RX6 MUX' ZERO"
+		cset "name='SLIM RX7 MUX' ZERO"
+		cset "name='RX INT7_1 MIX1 INP0' ZERO"
+		cset "name='RX INT8_1 MIX1 INP0' ZERO"
+		cset "name='MultiMedia2 Mixer SLIMBUS_0_TX' 0"
+		cset "name='AIF1_CAP Mixer SLIM TX0' 0"
+		cset "name='CDC_IF TX0 MUX' ZERO"
+		cset "name='AMIC MUX0' ZERO"
+	]
+
+	# ALSA PCM
+	Value {
+		# ALSA PCM device for HiFi
+		PlaybackPCM "hw:LenovoYOGAC6301,0"
+		CapturePCM "hw:LenovoYOGAC6301,1"
+	}
+}
+
+SectionDevice."Speakers" {
+	Comment "Speakers playback"
+
+	EnableSequence [
+		cdev "hw:LenovoYOGAC6301"
+		cset "name='COMP7 Switch' 1"
+		cset "name='COMP8 Switch' 1"
+		## Speakers		
+		cset "name='SpkrLeft COMP Switch' 1"
+		cset "name='SpkrLeft BOOST Switch' 1"
+		cset "name='SpkrLeft DAC Switch' 1"
+		cset "name='SpkrLeft VISENSE Switch' 0"
+		cset "name='SpkrRight COMP Switch' 1"
+		cset "name='SpkrRight BOOST Switch' 1"
+		cset "name='SpkrRight DAC Switch' 1"
+		cset "name='SpkrRight VISENSE Switch' 0"
+	]
+
+	DisableSequence [
+		cdev "hw:LenovoYOGAC6301"
+		cset "name='COMP7 Switch' 0"
+		cset "name='COMP8 Switch' 0"
+		cset "name='SLIMBUS_0_RX Audio Mixer MultiMedia1' 0"
+		cset "name='SpkrLeft DAC Switch' 0"
+		cset "name='SpkrLeft COMP Switch' 0"
+		cset "name='SpkrLeft BOOST Switch' 0"
+		cset "name='SpkrLeft VISENSE Switch' 0"
+		cset "name='SpkrRight DAC Switch' 0"
+		cset "name='SpkrRight COMP Switch' 0"
+		cset "name='SpkrRight BOOST Switch' 0"
+		cset "name='SpkrRight VISENSE Switch' 0"
+	]
+
+	Value {
+		PlaybackChannels "2"
+	}
+}
+
+SectionDevice."HeadPhones" {
+	Comment "HeadPhones playback"
+
+	EnableSequence [
+		cdev "hw:LenovoYOGAC6301"
+		cset "name='SLIM RX1 MUX' AIF1_PB"
+		cset "name='SLIM RX2 MUX' AIF1_PB"
+		cset "name='SLIM RX7 MUX' ZERO"
+		cset "name='SLIM RX6 MUX' ZERO"
+		cset "name='RX INT1_2 MUX' RX1"
+		cset "name='RX INT2_2 MUX' RX2"
+		cset "name='SLIMBUS_0_RX Audio Mixer MultiMedia1' 1"
+		cset "name='COMP1 Switch' 1"
+		cset "name='COMP2 Switch' 1"
+		cset "name='RX1 Digital Volume' 68"
+		cset "name='RX2 Digital Volume' 68"
+		cset "name='RX INT1 DEM MUX' CLSH_DSM_OUT"
+		cset "name='RX INT2 DEM MUX' CLSH_DSM_OUT"
+	]
+
+	DisableSequence [
+		cdev "hw:LenovoYOGAC6301"
+		cset "name='SLIM RX1 MUX' ZERO"
+		cset "name='SLIM RX2 MUX' ZERO"
+		cset "name='RX INT1_2 MUX' ZERO"
+		cset "name='RX INT2_2 MUX' ZERO"
+		cset "name='SLIMBUS_0_RX Audio Mixer MultiMedia1' 0"
+		cset "name='COMP1 Switch' 0"
+		cset "name='COMP2 Switch' 0"
+		cset "name='RX1 Digital Volume' 68"
+		cset "name='RX2 Digital Volume' 68"
+		cset "name='RX INT1 DEM MUX' ZERO"
+		cset "name='RX INT2 DEM MUX' ZERO"
+	]
+
+	Value {
+		PlaybackChannels "2"
+	}
+}
+
+SectionDevice."HeadsetMicroPhones" {
+	Comment "HeadPhones Microphone"
+
+	EnableSequence [
+		cdev "hw:LenovoYOGAC6301"
+		cset "name='ADC MUX0' AMIC"
+	]
+
+	DisableSequence [
+		cdev "hw:LenovoYOGAC6301"
+	]
+	
+	Value {
+		CaptureChannels "2"
+	}
+}
+

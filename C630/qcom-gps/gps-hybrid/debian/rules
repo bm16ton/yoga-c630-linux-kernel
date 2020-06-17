@@ -1,0 +1,233 @@
+#!/usr/bin/make -f
+
+#uncomment if debhelper should be verbose
+#export DH_VERBOSE=1
+
+DEBIAN_VERSION := $(strip $(shell dpkg-parsechangelog| awk '/Version/{print $$2}'))
+
+LIBGPS_SONAME := $(strip $(shell grep -E '^libgps_version_current' SConstruct | sed 's,.*=[^0-9]*\([0-9]*\).*,\1,'))
+
+
+LIBGPS_DEBIAN_FILE_SOURCES := $(strip $(shell ls -1 debian/*LIBGPSSONAME* ))
+LIBGPS_DEBIAN_FILE_TARGETS := $(strip $(shell echo $(LIBGPS_DEBIAN_FILE_SOURCES) | sed 's,LIBGPSSONAME,$(LIBGPS_SONAME),g'))
+
+#python versions
+PYTHONS := $(shell pyversions -vr)
+PYTHON_DEFAULT := $(strip $(shell pyversions -vd))
+
+#debhelper version and settings needed for udev
+DH_VERSION := $(shell dpkg -s debhelper | grep '^Version' | awk '{print $$2}')
+LSB_RELEASE := $(shell lsb_release -si)
+UDEV_BREAKS =
+
+ifeq (Debian,$(strip $(LSB_RELEASE))) ## debian ##
+ifeq (0, $(strip $(shell dpkg --compare-versions $(DH_VERSION) ge 7.3.15; echo $$?)))
+UDEV_BREAKS = 125
+endif
+else ## not debian ##
+ifeq (Ubuntu,$(strip $(LSB_RELEASE))) ## ubuntu ##
+ifeq (0, $(strip $(shell dpkg --compare-versions $(DH_VERSION) ge 7.0.17ubuntu2; echo $$?)))
+UDEV_BREAKS = 136-1
+endif
+endif ## ubuntu ##
+endif ## debian ##
+
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+SCONSOPTS = \
+	prefix=/usr \
+	systemd=yes \
+	nostrip=yes \
+	dbus_export=yes \
+	docdir=/usr/share/doc/gpsd \
+	libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
+	gpsd_user=gpsd \
+	gpsd_group=dialout \
+	qt_versioned=5
+
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	SCONSOPTS += debug=yes
+else
+	SCONSOPTS += debug=no
+endif
+
+#package names
+PACKAGE_GPSD := gpsd
+PACKAGE_CLIENTS := gpsd-clients
+PACKAGE_LIB := libgps$(LIB_soname)
+PACKAGE_QTLIB := libqgpsmm$(LIB_soname)
+PACKAGE_LIB_DEV := libgps-dev
+PACKAGE_QTLIB_DEV := libqgpsmm-dev
+PACKAGE_PY := python-gps
+PACKAGE_GPSDDBG := gpsd-dbg
+
+
+cflags := $(shell dpkg-buildflags --get CFLAGS)
+cppflags := $(shell dpkg-buildflags --get CPPFLAGS)
+cxxflags := $(shell dpkg-buildflags --get CXXFLAGS)
+ldflags := $(shell dpkg-buildflags --get LDFLAGS)
+
+SCONS_ENV := set -e ;\
+		export LDFLAGS="$(ldflags)" ;\
+		export CFLAGS="$(cflags)" ;\
+		export CXXFLAGS="$(cxxflags)" ;\
+		export CPPFLAGS="$(cppflags)";
+
+
+$(LIBGPS_DEBIAN_FILE_TARGETS): $(LIBGPS_DEBIAN_FILE_SOURCES)
+	for source in $(LIBGPS_DEBIAN_FILE_SOURCES); do \
+	    target=$$(echo "$$source" | sed 's,LIBGPSSONAME,$(LIBGPS_SONAME),g') ;\
+	    sed 's,LIBGPSSONAME,$(LIBGPS_SONAME),g' "$$source" > "$$target" ;\
+	done
+
+debian/control: debian/control.in
+		rm -f $@ 
+		sed 's,LIBGPSSONAME,$(LIBGPS_SONAME),g' $< > $@ 
+		if [ -d .git ]; then \
+			git add debian/control ;\
+			git commit -m 'Updating debian/control from debian/control.in' debian/control ;\
+		fi ;\
+
+SConstruct.deb_revision: SConstruct
+	if [ ! -f $@ ]; then \
+		cp $< $@ ;\
+		sed -i '/^revision=/s/%(.*)/%("$(DEBIAN_VERSION)",)/' $< ;\
+	fi
+	touch $@
+
+build-indep: build
+build-arch: build
+
+build: build-stamp build-static-stamp
+build-stamp: SConstruct.deb_revision
+	set -e; \
+	    for py in $(PYTHONS); do \
+	    	$(SCONS_ENV) python$${py} /usr/bin/scons $(SCONSOPTS); \
+	    done
+ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
+	# disable tests on hurd due to weird ipv6 errors
+	# http://deb.li/4C46AEAC.7040906@bzed.de
+ifeq (,$(findstring hurd,$(DEB_HOST_ARCH_OS)))
+	-$(SCONS_ENV) /usr/bin/scons check
+endif
+endif
+	# ensure the test tools are built
+	$(SCONS_ENV) python /usr/bin/scons $(SCONSOPTS) $(shell grep test_ debian/gpsd-dbg.install | grep -v '\.py' | awk '{print $$1}')
+	touch $@
+
+build-static-stamp: SConstruct.deb_revision
+	cp libgps_static.a libgps.a
+	touch $@
+
+clean: debian/control
+	dh_testdir
+	dh_testroot
+	set -e; \
+	    for py in $(PYTHONS); do \
+	    	$(SCONS_ENV) python$${py} /usr/bin/scons $(SCONSOPTS) --clean ; \
+	    done
+	$(SCONS_ENV) python /usr/bin/scons $(SCONSOPTS) sconsclean || true
+	# revert revision changes in SConstruct
+	if [ -f SConstruct.deb_revision ]; then \
+	    mv SConstruct.deb_revision SConstruct; \
+	fi
+	rm -rf \
+	    .sconf_temp \
+	    .scons-option-cache \
+	    .sconsign.dblite \
+	    gps/*.pyc \
+	    TROUBLESHOOTING \
+	    debian/buildinfo.gz \
+	    config.log \
+	    debian/shlibs.local \
+	    leapsecond.pyc \
+	    libgps.a \
+	    $(LIBGPS_DEBIAN_FILE_TARGETS)
+	dh_clean
+
+install: install-stamp
+install-stamp: build-stamp build-static-stamp $(LIBGPS_DEBIAN_FILE_TARGETS)
+	dh_testdir
+	dh_testroot
+	dh_prep
+	set -e ;\
+	    for py in $(PYTHONS); do \
+	    	$(SCONS_ENV) DESTDIR=`pwd`/debian/tmp python$${py} /usr/bin/scons install $(SCONSOPTS) ;\
+	    done
+	# install static lib
+	cp libgps.a debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)
+	cp INSTALL TROUBLESHOOTING
+	# install systemd files
+	mkdir -p debian/tmp/lib/systemd/system
+	cp systemd/* debian/tmp/lib/systemd/system
+	# fix various manpages
+	for i in cgps.1 gegps.1 lcdgps.1 xgps.1 xgpsspeed.1 gpxlogger.1; do \
+	    rm -f debian/tmp/usr/share/man/man1/$$i ;\
+	    ln -s gps.1 debian/tmp/usr/share/man/man1/$$i ;\
+	done
+	rm -f debian/tmp/usr/share/man/man3/libQgpsmm.3
+	ln -s libgpsmm.3.gz debian/tmp/usr/share/man/man3/libQgpsmm.3.gz
+	# install everything
+	dh_install --fail-missing
+	# remove rpaths
+	find debian -type f -exec file {} \; |\
+	    grep ELF |\
+	    grep 'dynamically linked' |\
+	    sed 's,:.*,,' |\
+	    xargs chrpath -d
+	touch $@
+
+
+install-indep: install
+install-arch: install
+
+binary: install-stamp
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs  NEWS
+	dh_installdocs 
+	dh_installman 
+	dh_installmenu 
+	dh_installsystemd -pgpsd --restart-after-upgrade gpsdctl@.service gpsd.socket
+	dh_installsystemd -pgpsd --no-enable --no-start gpsd.service
+	dh_installinit
+	dh_systemd_start -pgpsd --restart-after-upgrade
+	dh_installexamples 
+	chmod 755 debian/$(PACKAGE_PY)/usr/lib/python*/*-packages/gps/gps.py
+	dh_python2 -Ngpsd -Ngpsd-clients -Ngpsd-dbg
+	dh_python2 -pgpsd-dbg usr/lib/gpsd/debug
+	dh_python2 -pgpsd-clients usr/bin
+	dh_python2 -pgpsd lib/udev/
+	cp $(CURDIR)/gpsd.rules $(CURDIR)/debian/gpsd.udev
+	dh_installudev 
+	dh_link 
+	dh_strip --dbgsym-migration='gpsd-dbg (<< 3.16-4~)'
+	dh_buildinfo -p$(PACKAGE_GPSDDBG)
+	dh_compress 
+	dh_fixperms  -Xgpsd.hotplug
+	dh_lintian
+ifeq (,$(DEB_BUILD_OPTIONS))
+	dh_makeshlibs -Nlibqgpsmm$(LIBGPS_SONAME) -- -c4
+	dh_makeshlibs -plibqgpsmm$(LIBGPS_SONAME) -- -c1
+else
+	dh_makeshlibs
+endif
+	dh_shlibdeps 
+ifneq (,$(UDEV_BREAKS))
+	echo "gpsd:Breaks=udev (<< $(UDEV_BREAKS))" >> $(CURDIR)/debian/gpsd.substvars
+endif
+	dh_gencontrol 
+	dh_installdeb 
+	dh_md5sums 
+	dh_builddeb 
+
+
+binary-indep: binary
+binary-arch: binary
+
+.PHONY: binary binary-indep binary-arch \
+	install install-arch install-indep \
+	clean \
+	build debian/control

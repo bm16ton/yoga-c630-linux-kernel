@@ -1,0 +1,12 @@
+#!/usr/bin/dh-exec
+usr/sbin/*
+usr/share/man/man8/*
+lib/systemd/system/*
+[linux-any] usr/bin/ppscheck
+debian/usr.sbin.gpsd /etc/apparmor.d/
+usr/bin/gpsctl
+usr/share/man/man1/gpsctl.1
+usr/bin/ubxtool
+usr/share/man/man1/ubxtool.1
+usr/bin/ntpshmmon
+usr/share/man/man1/ntpshmmon.1

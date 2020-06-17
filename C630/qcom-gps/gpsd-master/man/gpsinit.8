@@ -1,0 +1,128 @@
+'\" t
+.\"     Title: gpsinit
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 18 Jan 2013
+.\"    Manual: GPSD Documentation
+.\"    Source: The GPSD Project
+.\"  Language: English
+.\"
+.TH "GPSINIT" "8" "18 Jan 2013" "The GPSD Project" "GPSD Documentation"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+gpsinit \- initialize CAN kernel modules for GPSD
+.SH "SYNOPSIS"
+.HP \w'\fBgpsinit\fR\ 'u
+\fBgpsinit\fR [\-n\ \fIcontrol\fR] [\-s\ \fIspeed\fR] \fImodule_name\fR [\fIinterface_name\fR]
+.HP \w'\fBgpsinit\fR\ 'u
+\fBgpsinit\fR \-h
+.HP \w'\fBgpsinit\fR\ 'u
+\fBgpsinit\fR \-v
+.SH "DESCRIPTION"
+.PP
+gpsinit
+initializes whatever kernel\-level modules are needed to enable special non\-serial hardware to communicate with a gpsd instance\&. Note: it will need root permissions to load modules and perform other special operations, such as changing kernel\-interface baudrates\&.
+.PP
+At present, all modes of this tool are concerned with setting up kernel\-level interfaces to hardware on a CAN (Control Area Network) speaking NMEA2000\&.
+.PP
+The program accepts the following options:
+.PP
+\-h
+.RS 4
+Display a brief help text\&.
+.RE
+.PP
+\-v
+.RS 4
+Display the version of
+gpsinit\&.
+.RE
+.PP
+\-n
+.RS 4
+Set the CAN network number\&. The default is 0\&.
+.RE
+.PP
+\-s
+.RS 4
+Set the baudrate to be used to communicate over the serial line to the CAN hardware\&. The default is 38400 baud\&.
+.RE
+.PP
+The parameter
+\fImodule_name\fR
+is mandatory\&. The socket CAN driver module
+\fImodule_name\fR\&.ko will be loaded\&.
+\fBgpsinit\fR
+recognize the following module names:
+.PP
+plx_pci, esd_usb2, vcan, slcan
+.RS 4
+The parameter
+\fIinterface_name\fR
+and
+\fI\-s \fR\fI\fIspeed\fR\fR
+can used here\&.
+.RE
+.PP
+beaglebone
+.RS 4
+The dcan module needed for the beaglebone is part of the Linux kernel, so no module is loaded in this case\&.
+.RE
+.PP
+The parameter
+\fIinterface_name\fR
+is needed for slcan hardware only\&. It gives the name of the serial device to which the SL CAN hardware is connected\&. The default is /dev/ttyUSB0\&.
+.SH "EXAMPLES"
+.PP
+\fBsudo gpsinit plx_pci\fR
+.RS 4
+Attempt to load the module plx_pci and initialize net 0 for the connection to a NMEA2000 network\&. It will set the baudrate to 250kBits\&.
+.RE
+.PP
+\fBsudo gpsinit \-n 1 plx_pci\fR
+.RS 4
+As above, but use net 1\&.
+.RE
+.PP
+\fBsudo gpsinit \-s 38400 slcan /dev/ttyUSB0\fR
+.RS 4
+Attempt to load the module slcan and talk to the hardware at 38400 baud connected to port /dev/ttyUSB0\&.
+.RE
+.PP
+\fBgpsinit \-h \fR
+.RS 4
+Display a brief help message\&.
+.RE
+.PP
+\fBgpsinit \-v \fR
+.RS 4
+Display the version of gpsinit\&.
+.RE
+.SH "SEE ALSO"
+.PP
+\fBgpsd\fR(8),
+\fBgps\fR(1),
+\fBlibgps\fR(3),
+\fBlibgpsmm\fR(3)\&.
+.SH "AUTHOR"
+.PP
+Reinhard Arlt
+<reinhard\&.arlt@t\-online\&.de>\&.
