@@ -10,15 +10,14 @@ This is for the qualcom aarch64 laptop YOGA C630, with this kernel and these dir
         camera
         battery meter (the estimated time remaining, is well, bad, but percentage updates correctly every couple of min at worst)
     UNTESTED BUT POSSIBLE
-        LTE cell modem (My understanding is it needs an actve sim and connection to tower with active data connection to present, i have no sim)
+        LTE cell modem (My understanding is it needs an actve sim and connection to tower with active data connection to present, i 	have no sim)
         DisplayPort over usb-c (I dont have a cable)
     DOESNT WORK
         Internal mic (which i believe is some sorta mic array with its own firmware "qcwdsp850.mbn"?)
-        Sensor Low Power Island  (im not sure if this includes the accelerometer or just temp etc firmware files qcslpi850.mbn qcslpi850_cls.mbn ive found no patches/dev?)
-        Venus video encoder/decoder (this works on sdm845 and the lead dev even emailed me back which was super awesome, like a rock star these guys are to me)
+        Sensor Low Power Island  (im not sure if this includes the accelerometer or just temp etc firmware files qcslpi850.mbn 				qcslpi850_cls.mbn ive found no patches/dev?)
+        Venus video encoder/decoder (this works on sdm845 and the lead dev even emailed me back which was super awesome, like a 			rock star these guys are to me)
 
-    ALL CREDIT GOES TO THE GODS AT LINARO, id list names but i dont know who everyone is and what they do. i was adding patches from at least a half dozen places
-    before finding Anderssons github page. That guy must be like the Gandolph of awesome programmers, so so many patches have come from him. i digress anyway;
+    ALL CREDIT GOES TO THE GODS AT LINARO, id list names but i dont know who everyone is and what they do. i was adding patches 		from at least a half dozen places before finding Anderssons github page. That guy must be like the Gandolph of awesome 			programmers, so so many patches have come from him. i digress anyway;
     This assumes you have already followed the directions from 
     https://github.com/aarch64-laptops/build
     and you have the four services installed (NEWEST POSSIBLE SOURCE REQUIRED) and you followed wifi link at
@@ -38,10 +37,9 @@ Booting the remote procs
         sudo find /mnt -name qcdxkmsuc850.mbn  (it may find multiple ls -la them and use the newest)
     INSTALL FIRMWARE;
         cp qcdxkmsuc850.mbn /lib/firmware/qcom/LENOVO/81JL
-    ipa_fws.elf; use pil-splitter.py found in this kernels C630 folder or https://github.com/remittor/qcom-mbn-tools/blob/master/pil-splitter.py
+    ipa_fws.elf; use pil-splitter.py found in this kernels C630 folder or                                                           		https://github.com/remittor/qcom-mbn-tools/blob/master/pil-splitter.py
         python2 pil-splitter.py ipa_fws.elf ipa_fws    then copy the resulting files to /lib/firmware
-    qcvss850.mbn is the firmware for venus enc/dec which currently doesnt work on c630. the venus mods link to mdt_loader which means it should
-    be able to load the "full" .mdt file. ive tried both split and full it loads without the metadata error but doesnt reset. eitherway;
+    qcvss850.mbn is the firmware for venus enc/dec which currently doesnt work on c630. the venus mods link to mdt_loader which 		means it should be able to load the "full" .mdt file. ive tried both split and full it loads without the metadata error but 		doesnt reset. eitherway;
     SINGLE FILE METHOD;
         mkdir /lib/firmware/qcom/venus-5.2
         cp qcvss850.mbn /lib/firmware/qcom/venus-5.2/venus.mdt
@@ -54,7 +52,7 @@ Booting the remote procs
         git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
         sudo cp linux-firmware/qcom/sdm845/*.jsn /lib/firmware/qcom/LENOVO/81JL/
     BLUETOOTH firmwares are in linux-firmware/qca/*
-    Now we want to add the required firmware files to the initrd but celliwig has saved the day with initramfs-tools hook that does this for us
+    Now we want to add the required firmware files to the initrd but celliwig has saved the day with initramfs-tools hook that does 	this for us
         wget https://github.com/Celliwig/Lenovo-Yoga-c630-packages/raw/master/initramfs-tools-firmware/initramfs-tools-firmware_0.1_all.deb
         sudo dpkg -i initramfs-tools-firmware_0.1_all.deb
         sudo update-initramfs -k $(uname -r) -c
@@ -65,8 +63,7 @@ qcom/LENOVO/81JL/qccdsp850.mbn
 qcom/LENOVO/81JL/qcadsp850.mbn
 
 INSTALLING KERNEL!!!!
-    The default hooks that deal with the .dts files are wrong. We have two options 1 patch the script for the c630 or manually make a 
-    dirctory and copying/renaming the dtb before every kernel install.
+    The default hooks that deal with the .dts files are wrong. We have two options 1 patch the script for the c630 or manually make 	a dirctory and copying/renaming the dtb before every kernel install.
     OPTION 1 PATCH;  # everything works automagically, the patch is in this kernels C630 folder its called functions.patch
         cd /usr/share/flash-kernel
         sudo patch -p1 < /path-to-patch/functions.patch
@@ -91,11 +88,10 @@ Audio;
     diff models require diff folder names
         sudo cp -R /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50 /usr/share/alsa/ucm2/Lenovo-YOGA-C63
         sudo cp /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50/Lenovo-YOGA-C630-13Q50.conf /usr/share/alsa/ucm2/Lenovo-YOGA-C63/Lenovo-YOGA-C63.conf
-    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, everytime i shutdown in panics reboots *FIXED, on reboot sound card comes
-    up and can be used after switching to headphones out then move volume bar then select speakers. To have sound on cold boot, first get sound working
+    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, everytime i shutdown in panics 		reboots *FIXED, on reboot sound card comes up and can be used after switching to headphones out then move volume bar then 		select speakers. To have sound on cold boot, first get sound working (if you cant get sound working u can try the 		  asound.state.head in C630/var/lib/alsa/ just cp it to /var/lib/alsa/alsa.state and skip the alsactl store step)
     then switch output to headphones.
         sudo alsactl store
-        sudo chmod +s /var/lib/alsa/alsa.state
+        sudo chattr +i /var/lib/alsa/alsa.state
     Now cold boot should present enabled soundcard just switch to headphones change volume and switch back to speakers
     OLDER UCM INSTALLS; use the old ucm files from here; #or this kernels C630 folder
         git clone https://github.com/andersson/alsa-lib.git
