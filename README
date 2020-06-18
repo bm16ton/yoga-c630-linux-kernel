@@ -1,4 +1,4 @@
-This is for the qualcom aarch64 laptop YOGA C630, with this kernel and these directions expect the following 
+This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these directions expect the following 
     WORKS;
         accelerated graphics
             panel
@@ -10,9 +10,9 @@ This is for the qualcom aarch64 laptop YOGA C630, with this kernel and these dir
         camera
         battery meter (the estimated time remaining, is well, bad, but percentage updates correctly every couple of min at worst)
     UNTESTED BUT POSSIBLE
-        LTE cell modem (My understanding is it needs an actve sim and connection to tower with active data connection to present, i 	have no sim)
-        DisplayPort over usb-c (I dont have a cable)
-    DOESNT WORK
+        LTE cell modem (My understanding is it needs an active sim and connection to tower with active data connection to present, i 	have no sim)
+        DisplayPort over usb-c (I don't have a cable)
+    DOESN'T WORK
         Internal mic (which i believe is some sorta mic array with its own firmware "qcwdsp850.mbn"?)
         Sensor Low Power Island  (im not sure if this includes the accelerometer or just temp etc firmware files qcslpi850.mbn 				qcslpi850_cls.mbn ive found no patches/dev?)
         Venus video encoder/decoder (this works on sdm845 and the lead dev even emailed me back which was super awesome, like a 			rock star these guys are to me)
@@ -63,7 +63,8 @@ qcom/LENOVO/81JL/qccdsp850.mbn
 qcom/LENOVO/81JL/qcadsp850.mbn
 
 INSTALLING KERNEL!!!!
-    The default hooks that deal with the .dts files are wrong. We have two options 1 patch the script for the c630 or manually make 	a dirctory and copying/renaming the dtb before every kernel install.
+	I have my own defconfig called 16ton_defconfig, just make 16ton_defconfig  to use my config (constantly changing and possibly experimental)
+    The default hooks that deal with the .dts files are wrong. We have two options 1 patch the script for the c630 or manually make 	a directory and copying/renaming the dtb before every kernel install.
     OPTION 1 PATCH;  # everything works automagically, the patch is in this kernels C630 folder its called functions.patch
         cd /usr/share/flash-kernel
         sudo patch -p1 < /path-to-patch/functions.patch
@@ -88,7 +89,7 @@ Audio;
     diff models require diff folder names
         sudo cp -R /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50 /usr/share/alsa/ucm2/Lenovo-YOGA-C63
         sudo cp /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50/Lenovo-YOGA-C630-13Q50.conf /usr/share/alsa/ucm2/Lenovo-YOGA-C63/Lenovo-YOGA-C63.conf
-    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, everytime i shutdown in panics 		reboots *FIXED, on reboot sound card comes up and can be used after switching to headphones out then move volume bar then 		select speakers. To have sound on cold boot, first get sound working (if you cant get sound working u can try the 		  asound.state.head in C630/var/lib/alsa/ just cp it to /var/lib/alsa/alsa.state and skip the alsactl store step)
+    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, every time i shutdown in panics 		reboots *FIXED, on reboot sound card comes up and can be used after switching to headphones out then move volume bar then 		select speakers. To have sound on cold boot, first get sound working (if you cant get sound working u can try the 		  asound.state.head in C630/var/lib/alsa/ just cp it to /var/lib/alsa/alsa.state and skip the alsactl store step)
     then switch output to headphones.
         sudo alsactl store
         sudo chattr +i /var/lib/alsa/alsa.state
@@ -170,6 +171,25 @@ MODEM
     to a tower and had data i would get a rmnet device that i could use ip to setup. something similiar to;
         ip link add link wwp0s20u5i2 name rmnet0 type rmnet mux_id 1
     and use something like qmicli or modemmanager to get it going? 
+
+USB PERIPHERAL
+	unfortunatly the usb type-c stuff isnt working but we can boot with a port in peripheral (just cant switch to host without reboot)
+	edit arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts and change;
+
+&usb_1_dwc3 {
+	dr_mode = "host";
+};
+
+to; 
+
+&usb_1_dwc3 {
+	dr_mode = "peripheral";
+};
+
+	you can just compile the dtb with make dtbs, now boot with the new dtb file and install umtp from;
+	https://github.com/viveris/uMTP-Responder
+	start with umtprd-ffs.sh
+	it requires the functionfs libcomposite kernel modules which i will add to the 16ton_defconfig
 
 FIXES;
     SHUTDOWN;
