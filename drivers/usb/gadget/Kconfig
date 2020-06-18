@@ -216,7 +216,8 @@ config USB_F_PRINTER
 config USB_F_TCM
 	tristate
 
-# this first set of drivers all depend on bulk-capable hardware.
+config USB_F_MTP
+	tristate# this first set of drivers all depend on bulk-capable hardware.
 
 config USB_CONFIGFS
 	tristate "USB Gadget functions configurable through configfs"
@@ -369,6 +370,12 @@ config USB_CONFIGFS_F_FS
 	  implemented in kernel space (for instance Ethernet, serial or
 	  mass storage) and other are implemented in user space.
 
+config USB_CONFIGFS_F_MTP
+	bool "MTP gadget"
+	depends on USB_CONFIGFS
+	select USB_F_MTP
+	help
+	  USB gadget MTP support
 config USB_CONFIGFS_F_UAC1
 	bool "Audio Class 1.0"
 	depends on USB_CONFIGFS
