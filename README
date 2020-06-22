@@ -10,14 +10,14 @@ This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these di
         camera
         battery meter (the estimated time remaining, is well, bad, but percentage updates correctly every couple of min at worst)
     UNTESTED BUT POSSIBLE
-        LTE cell modem (My understanding is it needs an active sim and connection to tower with active data connection to present, i 	have no sim)
+        LTE cell modem (My understanding is it needs an active sim and connection to tower with active data connection to present, i have no sim)
         DisplayPort over usb-c (I don't have a cable)
     DOESN'T WORK
         Internal mic (which i believe is some sorta mic array with its own firmware "qcwdsp850.mbn"?)
-        Sensor Low Power Island  (im not sure if this includes the accelerometer or just temp etc firmware files qcslpi850.mbn 				qcslpi850_cls.mbn ive found no patches/dev?)
-        Venus video encoder/decoder (this works on sdm845 and the lead dev even emailed me back which was super awesome, like a 			rock star these guys are to me)
+        Sensor Low Power Island  (im not sure if this includes the accelerometer or just temp etc firmware files qcslpi850.mbn 	qcslpi850_cls.mbn ive found no patches/dev?)
+        Venus video encoder/decoder (this works on sdm845 and the lead dev even emailed me back which was super awesome, like a rock star these guys are to me)
 
-    ALL CREDIT GOES TO THE GODS AT LINARO, id list names but i dont know who everyone is and what they do. i was adding patches 		from at least a half dozen places before finding Anderssons github page. That guy must be like the Gandolph of awesome 			programmers, so so many patches have come from him. i digress anyway;
+    ALL CREDIT GOES TO THE GODS AT LINARO, id list names but i dont know who everyone is and what they do. i was adding patches from at least a half dozen places before finding Anderssons github page. That guy must be like the Gandolph of awesome 	programmers, so so many patches have come from him. i digress anyway;
     This assumes you have already followed the directions from 
     https://github.com/aarch64-laptops/build
     and you have the four services installed (NEWEST POSSIBLE SOURCE REQUIRED) and you followed wifi link at
