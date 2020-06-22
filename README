@@ -22,7 +22,11 @@ This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these di
     https://github.com/aarch64-laptops/build
     and you have the four services installed (NEWEST POSSIBLE SOURCE REQUIRED) and you followed wifi link at
     https://github.com/aarch64-laptops/build/blob/master/misc/lenovo-yoga-c630/wifi/README.md
-   
+    and the gpu link
+    https://github.com/aarch64-laptops/build/blob/master/misc/lenovo-yoga-c630/gpu/README.md
+    and then HOPEFULLY followed the ubuntu system upgrade instructions at the bottom of the READE to buntu 20.04
+    newer versions of alsa and pulseaudio are required for ucm2 tho ucm did workand i believe didnt have the sync
+    issues if using =>5.7kernels   
 
 Booting the remote procs
     get the firmware from windows partition
@@ -61,6 +65,13 @@ qcom/LENOVO/81JL/qcdsp1v2850.mbn
 qcom/LENOVO/81JL/qcdsp2850.mbn
 qcom/LENOVO/81JL/qccdsp850.mbn
 qcom/LENOVO/81JL/qcadsp850.mbn
+
+GRUB;
+	Grub needs a few boot options added. edit /etc/default/grub find the line;
+		GRUB_CMDLINE_LINUX_DEFAULT="efi=novamap"
+	and replace with
+		GRUB_CMDLINE_LINUX_DEFAULT="efi=novamap pd_ignore_unused clk_ignore_unused"
+	sudo update-grub  (will update the new settings)
 
 INSTALLING KERNEL!!!!
 	I have my own defconfig called 16ton_defconfig, just make 16ton_defconfig  to use my config (constantly changing and possibly experimental)
@@ -142,6 +153,9 @@ UPGRADING MESA;
         cd mesa
         sudo apt-get build-dep mesa
         sudo dpkg-buildpackage -b
+NOTES;
+	With kernel 5.7 and the recently released mesa 20.1.1, things like mupen64 and dolphin now work! mupen64 at full 
+	frame rate once audio/video sync is disabled and dolphin is slw in certain areas probly just needs settings.
     
 
 VENUS DECODERS/ENCODERS 
@@ -207,3 +221,7 @@ FIXES;
     LOOSE ABILITY TO RUN su OR sudo (just stalls/sits)
         shutdown with systemctl it doesnt need privlidges
             systemctl poweroff
+
+NOTES;
+	If you do have a lock up or shutdown that fails/panics and reboots expect your next 3 boots to be wonky. Most likely 	     the wifi or sound wont work then on next boot again one or the other wont work. Sometimes everything will work on the 	   first or second boot but it still takes 3 to get normal. Not sure what causes this, if it was leaving hardware is a        	      strange state i thought maybe booting windows would set things correct but the one time i tried it didnt.
+
