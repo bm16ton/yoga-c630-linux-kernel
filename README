@@ -46,9 +46,11 @@ Booting the remote procs
         sudo find /mnt -name qcdxkmsuc850.mbn  (it may find multiple ls -la them and use the newest)
     INSTALL FIRMWARE;
         cp qcdxkmsuc850.mbn /lib/firmware/qcom/LENOVO/81JL
-    ipa_fws.elf; use pil-splitter.py found in this kernels C630 folder or https://github.com/remittor/qcom-mbn-tools/blob/master/pil-splitter.py
+    ipa_fws.elf; use pil-splitter.py found in this kernels C630 folder or 
+    https://github.com/remittor/qcom-mbn-tools/blob/master/pil-splitter.py
         python2 pil-splitter.py ipa_fws.elf ipa_fws    then copy the resulting files to /lib/firmware
-    qcvss850.mbn is the firmware for venus enc/dec which currently doesnt work on c630. the venus mods link to mdt_loader which means it should be able to load the "full" .mdt file. ive tried both split and full it loads without the metadata error but 		doesnt reset. eitherway;
+    qcvss850.mbn is the firmware for venus enc/dec which currently doesnt work on c630. the venus mods link to mdt_loader which 
+    means it should be able to load the "full" .mdt file. ive tried both split and full it loads without the metadata error but doesnt reset. eitherway;
     SINGLE FILE METHOD;
         mkdir /lib/firmware/qcom/venus-5.2
         cp qcvss850.mbn /lib/firmware/qcom/venus-5.2/venus.mdt
@@ -105,11 +107,13 @@ Audio;
     diff models require diff folder names
         sudo cp -R /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50 /usr/share/alsa/ucm2/Lenovo-YOGA-C63
         sudo cp /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50/Lenovo-YOGA-C630-13Q50.conf /usr/share/alsa/ucm2/Lenovo-YOGA-C63/Lenovo-YOGA-C63.conf
-    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, every time i shutdown in panics 		reboots *FIXED, on reboot sound card comes up and can be used after switching to headphones out then move volume bar then 		select speakers. To have sound on cold boot, first get sound working (if you cant get sound working u can try the 		  asound.state.head in C630/var/lib/alsa/ just cp it to /var/lib/alsa/alsa.state and skip the alsactl store step)
-    then switch output to headphones.
-        sudo alsactl store
-        sudo chattr +i /var/lib/alsa/alsa.state
-    Now cold boot should present enabled soundcard just switch to headphones change volume and switch back to speakers
+    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, every time i shutdown in panics 		
+    	reboots *FIXED, on reboot sound card comes up and can be used after switching to headphones out then move volume bar then 
+	select speakers. To have sound on cold boot, first get sound working (if you cant get sound working u can try the asound.state.head in C630/var/lib/alsa/ 
+	just cp it to /var/lib/alsa/alsa.state and skip the alsactl store step) then switch output to headphones.
+        	sudo alsactl store
+        	sudo chattr +i /var/lib/alsa/alsa.state
+    	Now cold boot should present enabled soundcard just switch to headphones change volume and switch back to speakers
     OLDER UCM INSTALLS; use the old ucm files from here; #or this kernels C630 folder
         git clone https://github.com/andersson/alsa-lib.git
         sudo cp -R alsa-lib/src/conf/ucm/LENOVO-81JL-LenovoYOGAC630_13Q50-LNVNB161216 /usr/share/alsa/ucm/
@@ -147,8 +151,8 @@ GPU
         sudo mount /dev/sda4 /mnt
         sudo find /mnt -name qcdxkmsuc850.mbn  (it may find multiple ls -la them and use the newest)
         sudo cp {path to qcdxkmsuc850.mbn /lib/firmware/qcom/
-    POSSIBLE ISSUES; the mesa packages had a bug where screens wouldnt redraw correctly especially text IE terminal-emulator, issue is fixed in master/20.1 but if using
-    older mesa's then apply these patches depending on version
+    POSSIBLE ISSUES; the mesa packages had a bug where screens wouldnt redraw correctly especially text IE terminal-emulator, issue 
+    is fixed in master/20.1 but if using older mesa's then apply these patches depending on version
     19.3 https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5192
     20.0 https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5190
     20.1 https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5190  
@@ -159,14 +163,14 @@ UPGRADING MESA;
         sudo apt-get build-dep mesa
         sudo dpkg-buildpackage -b
 NOTES;
-	With kernel 5.7 and the recently released mesa 20.1.1, things like mupen64 and dolphin now work! mupen64 at full 
-	frame rate once audio/video sync is disabled and dolphin is slw in certain areas probly just needs settings.
+     With kernel 5.7 and the recently released mesa 20.1.1, things like mupen64 and dolphin now work! mupen64 at full 
+     frame rate once audio/video sync is disabled and dolphin is slow in certain areas probly just needs correct settings.
     
 
 VENUS DECODERS/ENCODERS 
-find qcvss850.mbn on windows partition use pil_splitter.py 
-to split it into files then cp to firmware directory
-errors on init caint reset
+     find qcvss850.mbn on windows partition use pil_splitter.py 
+     to split it into files then cp to firmware directory
+     errors on init caint reset
 
 
 GPS
