@@ -1644,7 +1644,7 @@ bool ieee80211_chandef_to_operating_class(struct cfg80211_chan_def *chandef,
 	}
 
 	/* 5 GHz, channels 149..169 */
-	if (freq >= 5745 && freq <= 5845) {
+	if (freq >= 5745 && freq <= 5985) {
 		if (vht_opclass) {
 			*op_class = vht_opclass;
 		} else if (chandef->width == NL80211_CHAN_WIDTH_40) {
