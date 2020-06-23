@@ -2228,19 +2228,14 @@ static int grow_stripes(struct r5conf *conf, int num)
  * of the P and Q blocks.
  */
 static int scribble_alloc(struct raid5_percpu *percpu,
-			  int num, int cnt)
+			  int num, int cnt, gfp_t flags)
 {
 	size_t obj_size =
 		sizeof(struct page *) * (num+2) +
 		sizeof(addr_conv_t) * (num+2);
 	void *scribble;
 
-	/*
-	 * If here is in raid array suspend context, it is in memalloc noio
-	 * context as well, there is no potential recursive memory reclaim
-	 * I/Os with the GFP_KERNEL flag.
-	 */
-	scribble = kvmalloc_array(cnt, obj_size, GFP_KERNEL);
+	scribble = kvmalloc_array(cnt, obj_size, flags);
 	if (!scribble)
 		return -ENOMEM;
 
@@ -2272,7 +2267,8 @@ static int resize_chunks(struct r5conf *conf, int new_disks, int new_sectors)
 
 		percpu = per_cpu_ptr(conf->percpu, cpu);
 		err = scribble_alloc(percpu, new_disks,
-				     new_sectors / STRIPE_SECTORS);
+				     new_sectors / STRIPE_SECTORS,
+				     GFP_NOIO);
 		if (err)
 			break;
 	}
@@ -6763,7 +6759,8 @@ static int alloc_scratch_buffer(struct r5conf *conf, struct raid5_percpu *percpu
 			       conf->previous_raid_disks),
 			   max(conf->chunk_sectors,
 			       conf->prev_chunk_sectors)
-			   / STRIPE_SECTORS)) {
+			   / STRIPE_SECTORS,
+			   GFP_KERNEL)) {
 		free_scratch_buffer(conf, percpu);
 		return -ENOMEM;
 	}

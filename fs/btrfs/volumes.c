@@ -1042,8 +1042,6 @@ again:
 							&device->dev_state)) {
 			if (!test_bit(BTRFS_DEV_STATE_REPLACE_TGT,
 			     &device->dev_state) &&
-			    !test_bit(BTRFS_DEV_STATE_MISSING,
-				      &device->dev_state) &&
 			     (!latest_dev ||
 			      device->generation > latest_dev->generation)) {
 				latest_dev = device;
@@ -2665,18 +2663,8 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
 		ret = btrfs_commit_transaction(trans);
 	}
 
-	/*
-	 * Now that we have written a new super block to this device, check all
-	 * other fs_devices list if device_path alienates any other scanned
-	 * device.
-	 * We can ignore the return value as it typically returns -EINVAL and
-	 * only succeeds if the device was an alien.
-	 */
-	btrfs_forget_devices(device_path);
-
-	/* Update ctime/mtime for blkid or udev */
+	/* Update ctime/mtime for libblkid */
 	update_dev_time(device_path);
-
 	return ret;
 
 error_sysfs:

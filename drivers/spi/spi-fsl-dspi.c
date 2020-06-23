@@ -246,33 +246,13 @@ struct fsl_dspi {
 
 static void dspi_native_host_to_dev(struct fsl_dspi *dspi, u32 *txdata)
 {
-	switch (dspi->oper_word_size) {
-	case 1:
-		*txdata = *(u8 *)dspi->tx;
-		break;
-	case 2:
-		*txdata = *(u16 *)dspi->tx;
-		break;
-	case 4:
-		*txdata = *(u32 *)dspi->tx;
-		break;
-	}
+	memcpy(txdata, dspi->tx, dspi->oper_word_size);
 	dspi->tx += dspi->oper_word_size;
 }
 
 static void dspi_native_dev_to_host(struct fsl_dspi *dspi, u32 rxdata)
 {
-	switch (dspi->oper_word_size) {
-	case 1:
-		*(u8 *)dspi->rx = rxdata;
-		break;
-	case 2:
-		*(u16 *)dspi->rx = rxdata;
-		break;
-	case 4:
-		*(u32 *)dspi->rx = rxdata;
-		break;
-	}
+	memcpy(dspi->rx, &rxdata, dspi->oper_word_size);
 	dspi->rx += dspi->oper_word_size;
 }
 

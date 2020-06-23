@@ -273,8 +273,9 @@ static int exfat_parse_param(struct fs_context *fc, struct fs_parameter *param)
 		break;
 	case Opt_charset:
 		exfat_free_iocharset(sbi);
-		opts->iocharset = param->string;
-		param->string = NULL;
+		opts->iocharset = kstrdup(param->string, GFP_KERNEL);
+		if (!opts->iocharset)
+			return -ENOMEM;
 		break;
 	case Opt_errors:
 		opts->errors = result.uint_32;
@@ -629,12 +630,7 @@ static int exfat_get_tree(struct fs_context *fc)
 
 static void exfat_free(struct fs_context *fc)
 {
-	struct exfat_sb_info *sbi = fc->s_fs_info;
-
-	if (sbi) {
-		exfat_free_iocharset(sbi);
-		kfree(sbi);
-	}
+	kfree(fc->s_fs_info);
 }
 
 static const struct fs_context_operations exfat_context_ops = {

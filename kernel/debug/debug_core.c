@@ -532,7 +532,6 @@ static int kgdb_reenter_check(struct kgdb_state *ks)
 
 	if (exception_level > 1) {
 		dump_stack();
-		kgdb_io_module_registered = false;
 		panic("Recursive entry to debugger");
 	}
 
@@ -669,8 +668,6 @@ return_normal:
 	if (kgdb_skipexception(ks->ex_vector, ks->linux_regs))
 		goto kgdb_restore;
 
-	atomic_inc(&ignore_console_lock_warning);
-
 	/* Call the I/O driver's pre_exception routine */
 	if (dbg_io_ops->pre_exception)
 		dbg_io_ops->pre_exception();
@@ -742,8 +739,6 @@ cpu_master_loop:
 	/* Call the I/O driver's post_exception routine */
 	if (dbg_io_ops->post_exception)
 		dbg_io_ops->post_exception();
-
-	atomic_dec(&ignore_console_lock_warning);
 
 	if (!kgdb_single_step) {
 		raw_spin_unlock(&dbg_slave_lock);
