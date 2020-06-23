@@ -50,7 +50,8 @@ Booting the remote procs
     https://github.com/remittor/qcom-mbn-tools/blob/master/pil-splitter.py
         python2 pil-splitter.py ipa_fws.elf ipa_fws    then copy the resulting files to /lib/firmware
     qcvss850.mbn is the firmware for venus enc/dec which currently doesnt work on c630. the venus mods link to mdt_loader which 
-    means it should be able to load the "full" .mdt file. ive tried both split and full it loads without the metadata error but doesnt reset. eitherway;
+    means it should be able to load the "full" .mdt file. ive tried both split and full it loads without the metadata error 
+    but doesnt reset. eitherway;
     SINGLE FILE METHOD;
         mkdir /lib/firmware/qcom/venus-5.2
         cp qcvss850.mbn /lib/firmware/qcom/venus-5.2/venus.mdt
@@ -63,7 +64,7 @@ Booting the remote procs
         git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
         sudo cp linux-firmware/qcom/sdm845/*.jsn /lib/firmware/qcom/LENOVO/81JL/
     BLUETOOTH firmwares are in linux-firmware/qca/*
-    Now we want to add the required firmware files to the initrd but celliwig has saved the day with initramfs-tools hook that does 	this for us
+    Now we want to add the required firmware files to the initrd but celliwig saved the day with initramfs-tools hook that does this for us
         wget https://github.com/Celliwig/Lenovo-Yoga-c630-packages/raw/master/initramfs-tools-firmware/initramfs-tools-firmware_0.1_all.deb
         sudo dpkg -i initramfs-tools-firmware_0.1_all.deb
         sudo update-initramfs -k $(uname -r) -c
@@ -81,15 +82,16 @@ GRUB;
 	sudo update-grub  (will update the new settings)
 
 INSTALLING KERNEL!!!!
-	I have my own defconfig called 16ton_defconfig, just make 16ton_defconfig  to use my config (constantly changing and possibly experimental)
-    The default hooks that deal with the .dts files are wrong. We have two options 1 patch the script for the c630 or manually make 	a directory and copying/renaming the dtb before every kernel install.
+	I have my own defconfig called 16ton_defconfig, just make 16ton_defconfig  to use my config (constantly changing and 
+	possibly experimental) The default hooks that deal with the .dts files are wrong. We have two options 1 patch the script for the 
+	c630 or manually make 	a directory and copying/renaming the dtb before every kernel install.
     OPTION 1 PATCH;  # everything works automagically, the patch is in this kernels C630 folder its called functions.patch
         cd /usr/share/flash-kernel
         sudo patch -p1 < /path-to-patch/functions.patch
     OPTION 2 MANUAL; in this example we are installing linux-image-5.7.0-rc1_5.7.0-rc1-1_arm64.deb and we have sdm850-lenovo-yoga-c630.dtb
-    sudo mkdir /usr/lib/linux-image-5.7.0-rc1
-    sudo cp sdm850-lenovo-yoga-c630.dtb /usr/lib/linux-image-5.7.0-rc1/laptop-lenovo-yoga-c630.dtb
-    sudo dpkg -i linux-image-5.7.0-rc1_5.7.0-rc1-1_arm64.deb
+    	sudo mkdir /usr/lib/linux-image-5.7.0-rc1
+    	sudo cp sdm850-lenovo-yoga-c630.dtb /usr/lib/linux-image-5.7.0-rc1/laptop-lenovo-yoga-c630.dtb
+    	sudo dpkg -i linux-image-5.7.0-rc1_5.7.0-rc1-1_arm64.deb
     
 GRUB the bootloader requires a couple of options pd_ignore_unused clk_ignore_unused efi=novamap
         sudo pluma /etc/default/grub
@@ -107,9 +109,10 @@ Audio;
     diff models require diff folder names
         sudo cp -R /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50 /usr/share/alsa/ucm2/Lenovo-YOGA-C63
         sudo cp /usr/share/alsa/ucm2/Lenovo-YOGA-C630-13Q50/Lenovo-YOGA-C630-13Q50.conf /usr/share/alsa/ucm2/Lenovo-YOGA-C63/Lenovo-YOGA-C63.conf
-    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, every time i shutdown in panics 		
+    POSSIBLE ISSUES; My machine lists the sound card as disabled with dummy output on cold boot, every time i shutdown it panics 
     	reboots *FIXED, on reboot sound card comes up and can be used after switching to headphones out then move volume bar then 
-	select speakers. To have sound on cold boot, first get sound working (if you cant get sound working u can try the asound.state.head in C630/var/lib/alsa/ 
+	select speakers. To have sound on cold boot, first get sound working (if you cant get sound working u can try the 
+	asound.state.head in C630/var/lib/alsa/ 
 	just cp it to /var/lib/alsa/alsa.state and skip the alsactl store step) then switch output to headphones.
         	sudo alsactl store
         	sudo chattr +i /var/lib/alsa/alsa.state
@@ -185,13 +188,15 @@ GPS
             open another terminal
         sudo gpsdctl add pds://any
         sudo xgps
-    POSSIBLE ISSUES, may hafta repeat the process of starting/configuring gpsd a couple of times especially if in area with low gps signal.
+    POSSIBLE ISSUES, may hafta repeat the process of starting/configuring gpsd a couple of times especially if in area with 
+    low gps signal.
 
 MODEM
     edit dts file (already in this kernel) and add the firmware
-    find/download ipa_fws.elf from windows partition. use pil_splitter.py to split into files with prefix ipa_fws copy to firmware directory.
-    it now shows in dmesg that the modem is booted. I cannot test further because i believe if i had an active sim once the modem connected
-    to a tower and had data i would get a rmnet device that i could use ip to setup. something similiar to;
+    find/download ipa_fws.elf from windows partition. use pil_splitter.py to split into files with prefix ipa_fws copy to 
+    firmware directory.it now shows in dmesg that the modem is booted. I cannot test further because i believe if i had an 
+    active sim once the modem connected to a tower and had data i would get a rmnet device that i could use ip to setup. 
+    something similiar to;
         ip link add link wwp0s20u5i2 name rmnet0 type rmnet mux_id 1
     and use something like qmicli or modemmanager to get it going? 
 
@@ -216,15 +221,16 @@ to;
 
 FIXES;
     SHUTDOWN;
-        the system will crash on shutdown if connected to wireless AP add this service which disconnects wifi at start of shutdown, this kernels
-        source directory 
-			sudo cp C630/usr/local/bin/disconnect-wifi.sh /usr/local/bin/disconnect-wifi.sh
-			sudo chmod +x /usr/local/bin/disconnect-wifi.sh
+        the system will crash on shutdown if connected to wireless AP.
+	FIX; add this script/service which disconnects wifi at start of shutdown, in C630 directory 
+	    sudo cp C630/usr/local/bin/disconnect-wifi.sh /usr/local/bin/disconnect-wifi.sh
+	    sudo chmod +x /usr/local/bin/disconnect-wifi.sh
             sudo cp C630/etc/systemd/system/iw-disconnect.service /etc/systemd/system/iw-disconnect.service 
             sudo systemctl enable iw-disconnect.service 
         The system will crash on shutdown if firefox is running when starting shutdown, simply close firefox.
     USB;
-        sum devices that use too little power will not enumerate, my hack is to add a resistor if possible, or use a usb vol/amp meter in-line. 
+        sum devices that use too little power will not enumerate, my hack is to add a resistor if possible, 
+	or use a usb vol/amp meter in-line. 
     GTK SLOW WINDOW CREATION;
         The headphone/speakers fix script didnt catch do it manually and they will open fine. No idea the connection.
     LOOSE ABILITY TO RUN su OR sudo (just stalls/sits)
