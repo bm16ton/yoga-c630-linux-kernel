@@ -85,7 +85,7 @@ int ieee80211_channel_to_frequency(int chan, enum nl80211_band band)
 			return 2484;
 		else if (chan < 14)
 			return 2407 + chan * 5;
-		else if (chan > 14 && chan <= 65)
+		else if (chan > 14 && chan <= 29)
 			return 2407 + chan * 5;
 		break;
 	case NL80211_BAND_5GHZ:
