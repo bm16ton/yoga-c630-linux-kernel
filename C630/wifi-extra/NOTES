@@ -2,3 +2,4 @@ with extra wifi channels enabled on card in kernel (currently only ath9k and rtl
 
 Also a edited regdb needs to be installed crda/regdb
 
+UPDATE; the extra channels 15-25 seem to be working on the rtl88XXau driver. needs to be tested
