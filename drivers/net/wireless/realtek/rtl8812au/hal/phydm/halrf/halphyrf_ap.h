@@ -121,7 +121,7 @@ odm_txpowertracking_callback_thermal_meter_jaguar_series3(
 
 #define IS_CCK_RATE(_rate)				(ODM_MGN_1M == _rate || _rate == ODM_MGN_2M || _rate == ODM_MGN_5_5M || _rate == ODM_MGN_11M)
 
-#define ODM_TARGET_CHNL_NUM_2G_5G	59
+#define ODM_TARGET_CHNL_NUM_2G_5G	66
 
 
 void

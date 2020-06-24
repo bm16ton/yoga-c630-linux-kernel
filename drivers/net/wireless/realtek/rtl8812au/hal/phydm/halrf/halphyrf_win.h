@@ -106,7 +106,7 @@ odm_txpowertracking_callback_thermal_meter(
 
 
 
-#define ODM_TARGET_CHNL_NUM_2G_5G	59
+#define ODM_TARGET_CHNL_NUM_2G_5G	66
 
 
 void

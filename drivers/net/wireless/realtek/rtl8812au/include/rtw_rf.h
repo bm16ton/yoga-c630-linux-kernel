@@ -24,7 +24,7 @@
 #define NON_SHORT_SLOT_TIME				20
 
 #define CENTER_CH_2G_40M_NUM	9
-#define CENTER_CH_2G_NUM		14
+#define CENTER_CH_2G_NUM		25
 #define CENTER_CH_5G_20M_NUM	28	/* 20M center channels */
 #define CENTER_CH_5G_40M_NUM	14	/* 40M center channels */
 #define CENTER_CH_5G_80M_NUM	7	/* 80M center channels */
@@ -213,7 +213,7 @@ void rtw_rf_set_tx_gain_offset(_adapter *adapter, u8 path, s8 offset);
 void rtw_rf_apply_tx_gain_offset(_adapter *adapter, u8 ch);
 
 /* only check channel ranges */
-#define rtw_is_2g_ch(ch) (ch >= 1 && ch <= 14)
+#define rtw_is_2g_ch(ch) (ch >= 1 && ch <= 25)
 #define rtw_is_5g_ch(ch) ((ch) >= 36 && (ch) <= 177)
 #define rtw_is_same_band(a, b) \
 	((rtw_is_2g_ch(a) && rtw_is_2g_ch(b)) \
