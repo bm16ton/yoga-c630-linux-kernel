@@ -229,7 +229,7 @@ static const struct ieee80211_regdomain world_regdom = {
 		REG_RULE(2467-10, 2472+10, 20, 6, 30, 0),
 		/* IEEE 802.11 channel 14 - Only JP enables
 		 * this and for 802.11b only */
-		REG_RULE(2484-10, 2484+10, 20, 6, 30, 0),
+		REG_RULE(2484-10, 2552+10, 20, 6, 30, 0),
 		/* IEEE 802.11a, channel 36..48 */
 		REG_RULE(5180-10, 5260+10, 80, 6, 30, 0),
 
