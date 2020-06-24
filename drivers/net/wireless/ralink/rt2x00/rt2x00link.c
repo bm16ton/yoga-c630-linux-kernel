@@ -383,8 +383,6 @@ void rt2x00link_start_watchdog(struct rt2x00_dev *rt2x00dev)
 {
 	struct link *link = &rt2x00dev->link;
 
-	return;
-
 	if (test_bit(DEVICE_STATE_PRESENT, &rt2x00dev->flags) &&
 	    rt2x00dev->ops->lib->watchdog && !link->watchdog_disabled)
 		ieee80211_queue_delayed_work(rt2x00dev->hw,
@@ -397,18 +395,17 @@ void rt2x00link_stop_watchdog(struct rt2x00_dev *rt2x00dev)
 	cancel_delayed_work_sync(&rt2x00dev->link.watchdog_work);
 }
 
-/*
 static void rt2x00link_watchdog(struct work_struct *work)
 {
 	struct rt2x00_dev *rt2x00dev =
 	    container_of(work, struct rt2x00_dev, link.watchdog_work.work);
 	struct link *link = &rt2x00dev->link;
-*/
+
 	/*
 	 * When the radio is shutting down we should
 	 * immediately cease the watchdog monitoring.
 	 */
-/*	if (!test_bit(DEVICE_STATE_ENABLED_RADIO, &rt2x00dev->flags))
+	if (!test_bit(DEVICE_STATE_ENABLED_RADIO, &rt2x00dev->flags))
 		return;
 
 	rt2x00dev->ops->lib->watchdog(rt2x00dev);
@@ -418,12 +415,13 @@ static void rt2x00link_watchdog(struct work_struct *work)
 					     &link->watchdog_work,
 					     link->watchdog_interval);
 }
-*/
+
 void rt2x00link_register(struct rt2x00_dev *rt2x00dev)
 {
 	struct link *link = &rt2x00dev->link;
 
 	INIT_DELAYED_WORK(&link->work, rt2x00link_tuner);
+	INIT_DELAYED_WORK(&link->watchdog_work, rt2x00link_watchdog);
 
 	if (link->watchdog_interval == 0)
 		link->watchdog_interval = WATCHDOG_INTERVAL;
