@@ -962,7 +962,7 @@ static int ieee80211_chan_to_freq_us(u8 op_class, u8 chan)
 	case 12: /* channels 1..11 */
 	case 32: /* channels 1..7; 40 MHz */
 	case 33: /* channels 5..11; 40 MHz */
-		if (chan < 1 || chan > 11)
+		if (chan < 1 || chan > 25)
 			return -1;
 		return 2407 + 5 * chan;
 	case 1: /* channels 36,40,44,48 */
@@ -988,7 +988,7 @@ static int ieee80211_chan_to_freq_us(u8 op_class, u8 chan)
 			return -1;
 		return 5000 + 5 * chan;
 	case 5: /* channels 149,153,157,161,165 */
-		if (chan < 149 || chan > 165)
+		if (chan < 149 || chan > 173)
 			return -1;
 		return 5000 + 5 * chan;
 	case 34: /* 60 GHz band, channels 1..3 */
@@ -1026,7 +1026,7 @@ static int ieee80211_chan_to_freq_eu(u8 op_class, u8 chan)
 			return -1;
 		return 5000 + 5 * chan;
 	case 17: /* channels 149,153,157,161,165,169 */
-		if (chan < 149 || chan > 169)
+		if (chan < 149 || chan > 173)
 			return -1;
 		return 5000 + 5 * chan;
 	case 18: /* 60 GHz band, channels 1..4 */
@@ -1100,7 +1100,7 @@ static int ieee80211_chan_to_freq_cn(u8 op_class, u8 chan)
 		return 5000 + 5 * chan;
 	case 3: /* channels 149,153,157,161,165 */
 	case 6: /* channels 149,157; 40 MHz */
-		if (chan < 149 || chan > 165)
+		if (chan < 149 || chan > 173)
 			return -1;
 		return 5000 + 5 * chan;
 	}
@@ -1124,7 +1124,7 @@ static int ieee80211_chan_to_freq_global(u8 op_class, u8 chan)
 		return 2414 + 5 * chan;
 	case 83: /* channels 1..9; 40 MHz */
 	case 84: /* channels 5..13; 40 MHz */
-		if (chan < 1 || chan > 13)
+		if (chan < 14 || chan > 25)
 			return -1;
 		return 2407 + 5 * chan;
 	case 115: /* channels 36,40,44,48; indoor only */
@@ -1149,7 +1149,7 @@ static int ieee80211_chan_to_freq_global(u8 op_class, u8 chan)
 			return -1;
 		return 5000 + 5 * chan;
 	case 125: /* channels 149,153,157,161,165,169 */
-		if (chan < 149 || chan > 169)
+		if (chan < 149 || chan > 173)
 			return -1;
 		return 5000 + 5 * chan;
 	case 128: /* center freqs 42, 58, 106, 122, 138, 155; 80 MHz */
