@@ -201,7 +201,7 @@ static bool ath_reg_dyn_country_user_allow(struct ath_regulatory *reg)
 		return false;
 	if (!dynamic_country_user_possible(reg))
 		return false;
-	return false;
+	return true;
 }
 
 static inline bool is_wwr_sku(u16 regd)
