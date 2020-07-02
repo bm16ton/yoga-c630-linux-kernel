@@ -35,6 +35,7 @@ This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these di
 
 Booting the remote procs
     get the firmware from windows partition
+    UPDATE: the c630 folder in kernel source has my hacked up celliwig yoga_fw_extract.sh for all this stuff and more.
         wget https://raw.githubusercontent.com/Celliwig/Lenovo-Yoga-c630/master/yoga_fw_extract/yoga_fw_extract.sh
         chmod +x yoga_fw_extract.sh
         ./yoga_fw_extract.sh
@@ -102,6 +103,7 @@ GRUB the bootloader requires a couple of options pd_ignore_unused clk_ignore_unu
 
 Audio;
     get the ucm2 files from;
+    UPDATE: this could be newer https://github.com/Srinivas-Kandagatla/alsa-ucm-conf/tree/C630 
         https://git.linaro.org/people/srinivas.kandagatla/alsa-ucm-conf.git
         or this kernels C630 folder
     copy ucm2 files
