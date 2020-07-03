@@ -50,7 +50,7 @@ Booting the remote procs
     ipa_fws.elf; use pil-splitter.py found in this kernels C630 folder or 
     https://github.com/remittor/qcom-mbn-tools/blob/master/pil-splitter.py
         python2 pil-splitter.py ipa_fws.elf ipa_fws    then copy the resulting files to /lib/firmware
-    qcvss850.mbn is the firmware for venus enc/dec which currently doesnt work on c630. the venus mods link to mdt_loader which 
+    qcvss850.mbn is the firmware for venus enc/dec which currently doesnt work on c630.(UPDATE: VENUS WORKS NOW!) the venus mods link to mdt_loader which 
     means it should be able to load the "full" .mdt file. ive tried both split and full it loads without the metadata error 
     but doesnt reset. eitherway;
     SINGLE FILE METHOD;
@@ -174,6 +174,10 @@ NOTES;
     
 
 VENUS DECODERS/ENCODERS 
+UPDATE: Stanimir Varbanov emailed me patches that get venus working!! This guy is awesome! thanks Stan! 
+EXAMPLES;
+	ffplay -sync video -autoexit -vcodec h264_v4l2m2m -i simpsons.mp4
+	gst-launch-1.0 filesrc location=simpsons.mp4 ! qtdemux name=m m.video_0 ! h264parse ! v4l2h264dec capture-io-mode=dmabuf ! glimagesink
      find qcvss850.mbn on windows partition use pil_splitter.py 
      to split it into files then cp to firmware directory
      errors on init caint reset
