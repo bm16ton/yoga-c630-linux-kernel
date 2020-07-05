@@ -1,0 +1,91 @@
+From b255205cec59ef63ecefe3e927540507cf8284f3 Mon Sep 17 00:00:00 2001
+From: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+Date: Fri, 3 Jul 2020 05:09:33 +0300
+Subject: [PATCH 1/2] firmware: qcom_scm: Add memory protect virtual address
+ ranges
+
+This adds a new SCM memprotect command to set virtual address ranges.
+
+Signed-off-by: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+---
+ drivers/firmware/qcom_scm.c | 24 ++++++++++++++++++++++++
+ drivers/firmware/qcom_scm.h |  1 +
+ include/linux/qcom_scm.h    |  8 +++++++-
+ 3 files changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/firmware/qcom_scm.c b/drivers/firmware/qcom_scm.c
+index 0e7233a20f34..a73870255c2e 100644
+--- a/drivers/firmware/qcom_scm.c
++++ b/drivers/firmware/qcom_scm.c
+@@ -864,6 +864,30 @@ int qcom_scm_assign_mem(phys_addr_t mem_addr, size_t mem_sz,
+ }
+ EXPORT_SYMBOL(qcom_scm_assign_mem);
+ 
++int qcom_scm_mem_protect_video_var(u32 cp_start, u32 cp_size,
++				   u32 cp_nonpixel_start,
++				   u32 cp_nonpixel_size)
++{
++	int ret;
++	struct qcom_scm_desc desc = {
++		.svc = QCOM_SCM_SVC_MP,
++		.cmd = QCOM_SCM_MP_VIDEO_VAR,
++		.arginfo = QCOM_SCM_ARGS(4, QCOM_SCM_VAL, QCOM_SCM_VAL,
++					 QCOM_SCM_VAL, QCOM_SCM_VAL),
++		.args[0] = cp_start,
++		.args[1] = cp_size,
++		.args[2] = cp_nonpixel_start,
++		.args[3] = cp_nonpixel_size,
++		.owner = ARM_SMCCC_OWNER_SIP,
++	};
++	struct qcom_scm_res res;
++
++	ret = qcom_scm_call(__scm->dev, &desc, &res);
++
++	return ret ? : res.result[0];
++}
++EXPORT_SYMBOL(qcom_scm_mem_protect_video_var);
++
+ /**
+  * qcom_scm_ocmem_lock_available() - is OCMEM lock/unlock interface available
+  */
+diff --git a/drivers/firmware/qcom_scm.h b/drivers/firmware/qcom_scm.h
+index d9ed670da222..14da834ac593 100644
+--- a/drivers/firmware/qcom_scm.h
++++ b/drivers/firmware/qcom_scm.h
+@@ -97,6 +97,7 @@ extern int scm_legacy_call(struct device *dev, const struct qcom_scm_desc *desc,
+ #define QCOM_SCM_MP_RESTORE_SEC_CFG		0x02
+ #define QCOM_SCM_MP_IOMMU_SECURE_PTBL_SIZE	0x03
+ #define QCOM_SCM_MP_IOMMU_SECURE_PTBL_INIT	0x04
++#define QCOM_SCM_MP_VIDEO_VAR			0x08
+ #define QCOM_SCM_MP_ASSIGN			0x16
+ 
+ #define QCOM_SCM_SVC_OCMEM		0x0f
+diff --git a/include/linux/qcom_scm.h b/include/linux/qcom_scm.h
+index 3d6a24697761..ca39dabebb07 100644
+--- a/include/linux/qcom_scm.h
++++ b/include/linux/qcom_scm.h
+@@ -81,7 +81,9 @@ extern int qcom_scm_assign_mem(phys_addr_t mem_addr, size_t mem_sz,
+ 			       unsigned int *src,
+ 			       const struct qcom_scm_vmperm *newvm,
+ 			       unsigned int dest_cnt);
+-
++extern int qcom_scm_mem_protect_video_var(u32 cp_start, u32 cp_size,
++					  u32 cp_nonpixel_start,
++					  u32 cp_nonpixel_size);
+ extern bool qcom_scm_ocmem_lock_available(void);
+ extern int qcom_scm_ocmem_lock(enum qcom_scm_ocmem_client id, u32 offset,
+ 			       u32 size, u32 mode);
+@@ -131,6 +133,10 @@ static inline int qcom_scm_iommu_secure_ptbl_init(u64 addr, u32 size, u32 spare)
+ static inline int qcom_scm_assign_mem(phys_addr_t mem_addr, size_t mem_sz,
+ 		unsigned int *src, const struct qcom_scm_vmperm *newvm,
+ 		unsigned int dest_cnt) { return -ENODEV; }
++extern int qcom_scm_mem_protect_video_var(u32 cp_start, u32 cp_size,
++					  u32 cp_nonpixel_start,
++					  u32 cp_nonpixel_size)
++		{ return -ENODEV };
+ 
+ static inline bool qcom_scm_ocmem_lock_available(void) { return false; }
+ static inline int qcom_scm_ocmem_lock(enum qcom_scm_ocmem_client id, u32 offset,
+-- 
+2.17.1
+

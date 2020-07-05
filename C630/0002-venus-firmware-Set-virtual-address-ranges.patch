@@ -1,0 +1,86 @@
+From 20baf7b1e30127b6178398af2c65ab7b45e822e1 Mon Sep 17 00:00:00 2001
+From: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+Date: Fri, 3 Jul 2020 05:18:37 +0300
+Subject: [PATCH 2/2] venus: firmware: Set virtual address ranges
+
+In order to boot some of the new Venus firmware versions TZ call to set
+virtual address ranges is needed. Add virtual address ranges for CP and
+CP_NONPIX in resource structure and use them when loading and booting
+the firmware on remote processor.
+
+Signed-off-by: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+---
+ drivers/media/platform/qcom/venus/core.c     |  4 ++++
+ drivers/media/platform/qcom/venus/core.h     |  4 ++++
+ drivers/media/platform/qcom/venus/firmware.c | 18 +++++++++++++++++-
+ 3 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/qcom/venus/core.c
+index ec5d3d6e8172..88e1ad95790a 100644
+--- a/drivers/media/platform/qcom/venus/core.c
++++ b/drivers/media/platform/qcom/venus/core.c
+@@ -615,6 +615,10 @@ static const struct venus_resources sdm845_res_v2 = {
+ 	.vmem_size = 0,
+ 	.vmem_addr = 0,
+ 	.dma_mask = 0xe0000000 - 1,
++	.cp_start = 0,
++	.cp_size = 0x70800000,
++	.cp_nonpixel_start = 0x1000000,
++	.cp_nonpixel_size = 0x24800000,
+ 	.fwname = "qcom/venus-5.2/venus.mdt",
+ };
+ 
+diff --git a/drivers/media/platform/qcom/venus/core.h b/drivers/media/platform/qcom/venus/core.h
+index 1bc3485fd14b..de557cbfc56b 100644
+--- a/drivers/media/platform/qcom/venus/core.h
++++ b/drivers/media/platform/qcom/venus/core.h
+@@ -75,6 +75,10 @@ struct venus_resources {
+ 	unsigned int vmem_id;
+ 	u32 vmem_size;
+ 	u32 vmem_addr;
++	u32 cp_start;
++	u32 cp_size;
++	u32 cp_nonpixel_start;
++	u32 cp_nonpixel_size;
+ 	const char *fwname;
+ };
+ 
+diff --git a/drivers/media/platform/qcom/venus/firmware.c b/drivers/media/platform/qcom/venus/firmware.c
+index 8801a6a7543d..ac906ffc608f 100644
+--- a/drivers/media/platform/qcom/venus/firmware.c
++++ b/drivers/media/platform/qcom/venus/firmware.c
+@@ -181,6 +181,7 @@ static int venus_shutdown_no_tz(struct venus_core *core)
+ int venus_boot(struct venus_core *core)
+ {
+ 	struct device *dev = core->dev;
++	const struct venus_resources *res = core->res;
+ 	phys_addr_t mem_phys;
+ 	size_t mem_size;
+ 	int ret;
+@@ -200,7 +201,22 @@ int venus_boot(struct venus_core *core)
+ 	else
+ 		ret = venus_boot_no_tz(core, mem_phys, mem_size);
+ 
+-	return ret;
++	if (ret)
++		return ret;
++
++	if (core->use_tz && res->cp_size) {
++		ret = qcom_scm_mem_protect_video_var(res->cp_start,
++						     res->cp_size,
++						     res->cp_nonpixel_start,
++						     res->cp_nonpixel_size);
++		if (ret) {
++			dev_err(dev, "set virtual address ranges fail (%d)\n",
++				ret);
++			return ret;
++		}
++	}
++
++	return 0;
+ }
+ 
+ int venus_shutdown(struct venus_core *core)
+-- 
+2.17.1
+
