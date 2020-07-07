@@ -12,6 +12,8 @@
 #include <linux/pm.h>
 #include <linux/slab.h>
 #include <linux/thermal.h>
+#include "../thermal_hwmon.h"
+#include "../thermal_core.h"
 #include "tsens.h"
 
 static int tsens_get_temp(void *data, int *temp)
@@ -133,7 +135,10 @@ static int tsens_register(struct tsens_priv *priv)
 		if (priv->ops->enable)
 			priv->ops->enable(priv, i);
 	}
-
+	tzd->tzp->no_hwmon = false;
+    ret = thermal_add_hwmon_sysfs(tzd);
+    if (ret)
+    return ret;     
 	ret = tsens_register_irq(priv, "uplow", tsens_irq_thread);
 	if (ret < 0)
 		return ret;
@@ -143,6 +148,9 @@ static int tsens_register(struct tsens_priv *priv)
 					 tsens_critical_irq_thread);
 
 	return ret;
+	
+           
+                     
 }
 
 static int tsens_probe(struct platform_device *pdev)
@@ -154,6 +162,7 @@ static int tsens_probe(struct platform_device *pdev)
 	const struct tsens_plat_data *data;
 	const struct of_device_id *id;
 	u32 num_sensors;
+
 
 	if (pdev->dev.of_node)
 		dev = &pdev->dev;
