@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta name="Description" content="Naming and shaming GPS vendors for especially botched designs">
+   <meta name="Keywords" content="GPS, gpsd, shame">
+   <meta name="Author" content="Eric S. Raymond">
+   <meta name="Revised" content="9 April 2015">
+   <meta name="robots" content="index,follow">
+   <link rel="stylesheet" href="main.css" type="text/css">
+   <title>GPS Hall of Shame</title>
+</head>
+<body>
+
+<div id="Header">
+GPS Hall of Shame
+</div>
+
+<div id="Menu">
+    <img src="gpsd-logo-small.png" alt="Small gpsd Logo"><br>
+    <a href="index.html">Home</a><br>
+    <a href="index.html#news">News</a><br>
+    <a href="index.html#downloads">Downloads</a><br>
+    <a href="index.html#mailing-lists">Mailing lists</a><br>
+    <a href="index.html#documentation">Documentation</a><br>
+    <a href="faq.html">FAQ</a><br>
+    <a href="xgps-sample.html">Screenshots</a><br>
+    <a href="index.html#recipes">Recipes</a><br>
+    <a href="index.html#others">Other GPSDs</a><br>
+    <a href="hardware.html">Hardware</a><br>
+    <a href="for-vendors.html">For GPS Vendors</a><br>
+    <a href="wishlist.html">Wish List</a><br>
+    Hall of Shame<br>
+    <a href="troubleshooting.html">Troubleshooting Guide</a><br>
+    <a href="hacking.html">Hacker's Guide</a><br>
+    <a href="protocol-transition.html">Application Compatibility</a>
+    <a href="references.html">References</a><br>
+    <a href="history.html">History</a><br>
+    <a href="future.html">Future</a><br>
+
+    <div>&nbsp;</div>
+
+    <a href='http://www.catb.org/hacker-emblem/'><img
+    src='http://www.catb.org/hacker-emblem/glider.png'
+    alt='hacker emblem'></a><br>
+
+    <script type="text/javascript" src="https://www.openhub.net/p/3944/widgets/project_thin_badge.js"></script>
+
+    <hr>
+    <script type="text/javascript"><!--
+    google_ad_client = "pub-1458586455084261";
+    google_ad_width = 160;
+    google_ad_height = 600;
+    google_ad_format = "160x600_as";
+    google_ad_type = "text";
+    google_ad_channel = "";
+    //--></script>
+    <script type="text/javascript"
+      src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+    <hr>
+
+    <a href="http://validator.w3.org/check/referer"><img
+          src="http://www.w3.org/Icons/valid-html401"
+          alt="Valid HTML 4.01!" height="31" width="88"></a>
+</div>
+
+<div id="Content">
+
+<p>The GPS world is full of shoddy, poorly-documented designs.  All
+too many devices have behaviors that drive the harried maintainers of
+<code>gpsd</code> to shake their heads and mutter <q>What were they
+<em>thinking</em>?</q></p>
+
+<p>This page goes beyond the merely ordinary and commemorates the
+really <em>special</em> blunders &mdash; bugs and design errors so
+consummately brain-dead that the only possible responses are either
+rage or helpless laughter.</p>
+
+<p>By naming and shaming the vendors who perpetrated these egregious
+blunders, we hope to exert some pressure for higher quality standards
+in the future.</p>
+
+<p>Your contributions are welcome.  If you're describing a firmware
+bug, it's best if you can identify the firmware version or range of
+versions it applies to.</p>
+
+<h2>Implementation blunders</h2>
+
+<p>These are the screwups that lead us to wonder if the GPS chipset
+vendors ever actually test their hardware.</p>
+
+<ul>
+<li><p>The iTalk protocol  from Fastrax Inc. sometimes emits well-formed,
+checksummed binary packets in which the length is incorrect.  If you
+trust it and read the number of bytes it tells you to, you'll land in
+the middle of the next packet.</p></li>
+
+<li><p>Wintec has modified the firmware on the WBT200 (and probably the
+WBT100 as well) to disable iTalk support, thus making more room in the
+flash memory for logging. This wouldn't be a problem if they had also
+disabled the protocol switch command. Users attempting to switch their
+Wintec receivers to iTalk will find their receiver is left in limbo;
+not emitting iTalk, and unable to switch back to NMEA either. A hard
+reset by removing all power sources (including onboard battery backup)
+is the only way to get the receiver to communicate again.</p></li>
+
+<li><p>Some Garmin chips issue a bogus length field, too.  This from the
+outfit that likes to tout itself as the industry leader!</p></li>
+
+<li><p>The SiRF-IV chipset has a tendency to freeze when switched from
+binary to NMEA mode (powering it off unjams it).  This is some kind of
+race condition in the firmware that cannot be fixed by waiting on
+command ACKs; we have tried that.</p></li>
+</ul>
+
+<h2>Documentation blunders</h2>
+
+<p>The best evidence that the GPS industry is run by morons is the
+quality (or, rather, utter <em>lack</em> of quality) of their chipset
+documentation.  You would think they'd have figured out by now that
+good and readily available documentation, making it easy for others to
+interface to their hardware, will sell more hardware.  But no; most
+vendors make documentation difficult to get, and it tends to be both
+incomplete and vague when you get it.  A few vendors go above and
+beyond the normal stupidity...</p>
+
+<ul>
+<li><p>Some versions of the SiRF protocol manual, including 1.4, describe the
+data widths in the time portion of the Geodetic Navigation Information
+packet incorrectly.  If you trust them, you will extract garbage from
+good packets.</p></li>
+
+<li><p>The Garmin GPS chipset issues a number of important messages
+that Garmin has <em>explicitly refused</em> to document.</p></li>
+</ul>
+
+<h2>Design blunders</h2>
+
+<p>GPS chipset vendors love their proprietary binary protocols.  There
+is some excuse for this, given that the industry <q>standard</q> NMEA
+0183 grew by a series of kluges and accretions and would probably have
+turned out better if it had been designed by chimpanzees on crack
+&mdash; but you'd think the vendors would at least make sure that
+their binary protocols are a functional superset of NMEA.  But no; in
+the laugh-one-minute, puke-the-next world of GPS chipsets, it ain't
+so...</p>
+
+<ul>
+<li><p>SiRF binary mode delivers HDOP but not PDOP or VDOP.  SiRFs in
+NMEA mode deliver all three.</p></li>
+
+<li><p>EverMore NMEA delivers UTC time.  EverMore binary protocol delivers
+only GPS time, which has a time-varying offset from UTC &mdash; and no
+way to query the offset.</p></li>
+</ul>
+
+<hr>
+<script src="datestamp.js" type='text/javascript'></script>
+</div>
+</body>
+</html>

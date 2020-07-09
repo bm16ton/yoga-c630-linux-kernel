@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+export CRDA_PATH     = /lib/crda
+export V             = 1
+# prevent the build system from calling lsb_release
+export LSB_ID        = Debian/Ubuntu
+
+%:
+	dh ${@}
+
+override_dh_auto_build: ;
+
+override_dh_install:
+	make DESTDIR=debian/wireless-regdb install
+# crda will install public keys
+	rm -f debian/wireless-regdb/lib/crda/pubkeys/linville.key.pub.pem
+	rm -f debian/wireless-regdb/lib/crda/pubkeys/sforshee.key.pub.pem

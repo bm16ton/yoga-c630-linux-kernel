@@ -1,0 +1,58 @@
+#!/bin/bash
+set -e
+
+# tests can't run on travis.
+if [ "${TRAVIS}" = "true" ]; then
+    echo 'Running on travis-ci.org - no systemd available'
+    exit 0
+fi
+
+# More complex functional details are already checked in testregress at build
+# time, therefore this only makes sure service integration works as expected
+
+# socket should be enabled and active after install
+echo "Check socket being active"
+systemctl is-enabled gpsd.socket
+systemctl is-active gpsd.socket
+
+# service is activated indirect (via socket) and inactive after install
+echo "Check service being inactive"
+if systemctl is-active gpsd.service; then
+    echo 'gpsd.service should not be active'
+    exit 1
+fi
+if systemctl is-enabled gpsd.service; then
+    echo 'gpsd.service should not be enabled'
+    exit 1
+fi
+
+# service has to get up on the socket call to respond correctly
+# (not complex enough to use expect)
+(
+    sleep 10;
+    echo '?WATCH={"enable":true,"json":true}';
+    sleep 10;
+    echo '?WATCH={"enable":false}';
+    sleep 10;
+) | telnet localhost 2947 2>/dev/null | tee test.log
+# it is expected and ok to close telnet with "Connection closed by foreign
+# host." avoid stderr being an error in the test by redirecting telnet
+# stderr output
+
+echo "simplify test debug - full log"
+cat test.log
+
+# check for expected output in the log we gathered
+echo "Check log for version"
+grep '"class":"VERSION"' test.log
+echo "Check log for devices"
+grep '"class":"DEVICES"' test.log
+echo "Check log for enabled watch"
+grep '"class":"WATCH","enable":true' test.log
+echo "Check log for disabled watch"
+grep '"class":"WATCH","enable":false' test.log
+
+# now the service should be active
+echo "Check service being active now"
+systemctl is-active gpsd.service
+

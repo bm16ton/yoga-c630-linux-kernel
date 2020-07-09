@@ -1,0 +1,2 @@
+# dropped to avoid bad interaction with systemd integration
+rm_conffile /etc/init.d/gpsd 3.18.1-1~

@@ -1,0 +1,1212 @@
+#!/usr/bin/env python
+#
+'''
+Collect and plot latency-profiling data from a running gpsd.
+Requires gnuplot, but gnuplot can be on another host.
+'''
+
+# This file is Copyright (c) 2010 by the GPSD project
+# SPDX-License-Identifier: BSD-2-clause
+#
+# Updated to conform with RCC-219-00, RCC/IRIG Standard 261-00
+# "STANDARD REPORT FORMAT FOR GLOBAL POSITIONING SYSTEM (GPS) RECEIVERS AND
+#  SYSTEMS ACCURACY TESTS AND EVALUATIONS"
+#
+# TODO: put date from data on plot, not time of replot.
+# TODO: add lat/lon to polar plots
+#
+# This code runs compatibly under Python 2 and 3.x for x >= 2.
+# Preserve this property!
+from __future__ import absolute_import, print_function, division
+
+import copy
+import getopt
+import math
+import os
+import signal
+import socket
+import sys
+import time
+
+# pylint wants local modules last
+try:
+    import gps
+except ImportError as e:
+    sys.stderr.write(
+        "gpsprof: can't load Python gps libraries -- check PYTHONPATH.\n")
+    sys.stderr.write("%s\n" % e)
+    sys.exit(1)
+
+gps_version = '3.20'
+if gps.__version__ != gps_version:
+    sys.stderr.write("gpsprof: ERROR: need gps module version %s, got %s\n" %
+                     (gps_version, gps.__version__))
+    sys.exit(1)
+
+debug = False
+
+
+def dist_2d(a, b):
+    "calculate distance between a[x,y] and b[x,y]"
+
+    # x and y are orthogonal, probably lat/lon in meters
+    # ignore altitude change.
+    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+
+
+def dist_3d(a, b):
+    "calculate distance between a[x,y,z] and b[x,y,z]"
+    # x, y, and z are othogonal, probably ECEF, probably in meters
+    return math.sqrt((a[0] - b[0]) ** 2 +
+                     (a[1] - b[1]) ** 2 +
+                     (a[2] - b[2]) ** 2)
+
+
+def wgs84_to_ecef(wgs84):
+    "Convert wgs84 coordinates to ECEF ones"
+
+    # unpack args
+    (lat, lon, alt) = wgs84
+    # convert lat/lon/altitude in degrees and altitude in meters
+    # to ecef x, y, z in meters
+    # see
+    # http://www.mathworks.de/help/toolbox/aeroblks/llatoecefposition.html
+    lat = math.radians(lat)
+    lon = math.radians(lon)
+
+    rad = 6378137.0          # Radius of the Earth (in meters)
+    f = 1.0 / 298.257223563  # Flattening factor WGS84 Model
+    cosLat = math.cos(lat)
+    sinLat = math.sin(lat)
+    FF = (1.0 - f) ** 2
+    C = 1 / math.sqrt((cosLat ** 2) + (FF * sinLat ** 2))
+    S = C * FF
+
+    x = (rad * C + alt) * cosLat * math.cos(lon)
+    y = (rad * C + alt) * cosLat * math.sin(lon)
+    z = (rad * S + alt) * sinLat
+
+    return (x, y, z)
+
+
+class Baton(object):
+    "Ship progress indication to stderr."
+
+    def __init__(self, prompt, endmsg=None):
+        self.stream = sys.stderr
+        self.stream.write(prompt + "...")
+        if os.isatty(self.stream.fileno()):
+            self.stream.write(" \b")
+        self.stream.flush()
+        self.count = 0
+        self.endmsg = endmsg
+        self.time = time.time()
+
+    def twirl(self, ch=None):
+        "Twirl the baton"
+        if self.stream is None:
+            return
+        if ch:
+            self.stream.write(ch)
+        elif os.isatty(self.stream.fileno()):
+            self.stream.write("-/|\\"[self.count % 4])
+            self.stream.write("\b")
+        self.count = self.count + 1
+        self.stream.flush()
+        return
+
+    def end(self, msg=None):
+        "Write the end message"
+        if msg is None:
+            msg = self.endmsg
+        if self.stream:
+            self.stream.write("...(%2.2f sec) %s.\n"
+                              % (time.time() - self.time, msg))
+
+
+class stats(object):
+    "Class for 1D stats: min, max, mean, sigma, skewness, kurtosis"
+
+    def __init__(self):
+        self.min = 0.0
+        self.max = 0.0
+        self.mean = 0.0
+        self.median = 0.0
+        self.sigma = 0.0
+        self.skewness = 0.0
+        self.kurtosis = 0.0
+
+    def __str__(self):
+        "return a nice string, for debug"
+        return ("min %f, max %f, mean %f, median %f, sigma %f, skewedness %f, "
+                "kurtosis %f" %
+                (self.min, self.max, self.mean, self.median,
+                 self.sigma, self.skewness, self.kurtosis))
+
+    def min_max_mean(self, fixes, index):
+        "Find min, max, and mean of fixes[index]"
+
+        if not fixes:
+            return
+
+        # might be fast to go through list once?
+        if isinstance(fixes[0], tuple):
+            self.mean = (sum([x[index] for x in fixes]) / len(fixes))
+            self.min = min([x[index] for x in fixes])
+            self.max = max([x[index] for x in fixes])
+        else:
+            # must be float
+            self.mean = (sum([x for x in fixes]) / len(fixes))
+            self.min = min([x for x in fixes])
+            self.max = max([x for x in fixes])
+
+        return
+
+    def moments(self, fixes, index):
+        "Find and set the (sigma, skewness, kurtosis) of fixes[index]"
+
+        # The skewness of a random variable X is the third standardized
+        # moment and is a dimension-less ratio. ntpviz uses the Pearson's
+        # moment coefficient of skewness.  Wikipedia describes it
+        # best: "The qualitative interpretation of the skew is complicated
+        # and unintuitive."  A normal distribution has a skewness of zero.
+        self.skewness = float('nan')
+
+        # The kurtosis of a random variable X is the fourth standardized
+        # moment and is a dimension-less ratio.  Here we use the Pearson's
+        # moment coefficient of kurtosis.  A normal distribution has a
+        # kurtosis of three.  NIST describes a kurtosis over three as
+        # "heavy tailed" and one under three as "light tailed".
+        self.kurtosis = float('nan')
+
+        if not fixes:
+            return
+
+        m3 = 0.0
+        m4 = 0.0
+        if isinstance(fixes[0], tuple):
+            sum_squares = [(x[index] - self.mean) ** 2 for x in fixes]
+            sigma = math.sqrt(sum(sum_squares) / (len(fixes) - 1))
+            for fix in fixes:
+                m3 += pow(fix[index] - sigma, 3)
+                m4 += pow(fix[index] - sigma, 4)
+        else:
+            # must be float
+            sum_squares = [(x - self.mean) ** 2 for x in fixes]
+            sigma = math.sqrt(sum(sum_squares) / (len(fixes) - 1))
+            for fix in fixes:
+                m3 += pow(fix - sigma, 3)
+                m4 += pow(fix - sigma, 4)
+
+        self.sigma = sigma
+        if sigma > 0.0001:
+            self.skewness = m3 / (len(fixes) * pow(sigma, 3))
+            self.kurtosis = m4 / (len(fixes) * pow(sigma, 4))
+
+        return
+
+
+class plotter(object):
+    "Generic class for gathering and plotting sensor statistics."
+
+    def __init__(self):
+        self.device = None
+        self.fixes = []
+        self.in_replot = False
+        self.session = None
+        self.start_time = int(time.time())
+        self.watch = set(['TPV'])
+
+    def whatami(self):
+        "How do we identify this plotting run?"
+        desc = "%s, %s, " % \
+               (gps.misc.isotime(self.start_time),
+                self.device.get('driver', "unknown"))
+        if 'bps' in self.device:
+            desc += "%d %dN%d, cycle %.3gs" % \
+                (self.device['bps'], 9 - self.device['stopbits'],
+                 self.device['stopbits'], self.device['cycle'])
+        else:
+            desc += self.device['path']
+        if 'subtype' in self.device:
+            desc += "\\n%s" % self.device['subtype']
+
+        return desc
+
+    def collect(self, verb, log_fp=None):
+        "Collect data from the GPS."
+
+        try:
+            self.session = gps.gps(host=host, port=port, verbose=verb)
+        except socket.error:
+            sys.stderr.write("gpsprof: gpsd unreachable.\n")
+            sys.exit(1)
+        # Initialize
+        self.session.read()
+        if self.session.version is None:
+            sys.stderr.write("gpsprof: requires gpsd to speak new protocol.\n")
+            sys.exit(1)
+        # Set parameters
+        flags = gps.WATCH_ENABLE | gps.WATCH_JSON
+        if self.requires_time:
+            flags |= gps.WATCH_TIMING
+        if device:
+            flags |= gps.WATCH_DEVICE
+        try:
+            signal.signal(signal.SIGUSR1,
+                          lambda empty, unused: sys.stderr.write(
+                              "%d of %d (%d%%)..."
+                              % (wait - countdown, wait,
+                                 ((wait - countdown) * 100.0 / wait))))
+            signal.siginterrupt(signal.SIGUSR1, False)
+            self.session.stream(flags, device)
+            baton = Baton("gpsprof: %d looking for fix" % os.getpid(), "done")
+            countdown = wait
+            basetime = time.time()
+            while countdown > 0:
+                if self.session.read() == -1:
+                    sys.stderr.write("gpsprof: gpsd has vanished.\n")
+                    sys.exit(1)
+                baton.twirl()
+                if self.session.data["class"] == "ERROR":
+                    sys.stderr.write(" ERROR: %s.\n"
+                                     % self.session.data["message"])
+                    sys.exit(1)
+                if self.session.data["class"] == "DEVICES":
+                    if len(self.session.data["devices"]) != 1 and not device:
+                        sys.stderr.write("ERROR: multiple devices connected, "
+                                         "you must explicitly specify the "
+                                         "device.\n")
+                        sys.exit(1)
+                    for i in range(len(self.session.data["devices"])):
+                        self.device = copy.copy(
+                            self.session.data["devices"][i])
+                        if self.device['path'] == device:
+                            break
+                if self.session.data["class"] == "WATCH":
+                    if ((self.requires_time and
+                         not self.session.data.get("timing"))):
+                        sys.stderr.write("timing is not enabled.\n")
+                        sys.exit(1)
+                # Log before filtering - might be good for post-analysis.
+                if log_fp:
+                    log_fp.write(self.session.response)
+                # Ignore everything but what we're told to
+                if self.session.data["class"] not in self.watch:
+                    continue
+                # We can get some funky artifacts at start of self.session
+                # apparently due to RS232 buffering effects. Ignore
+                # them.
+                if ((threshold and
+                     time.time() - basetime < self.session.cycle * threshold)):
+                    continue
+                if self.session.fix.mode <= gps.MODE_NO_FIX:
+                    continue
+                if self.sample():
+                    if countdown == wait:
+                        sys.stderr.write("first fix in %.2fsec, gathering %d "
+                                         "samples..."
+                                         % (time.time() - basetime, wait))
+                    countdown -= 1
+            baton.end()
+        finally:
+            self.session.stream(gps.WATCH_DISABLE | gps.WATCH_TIMING)
+            signal.signal(signal.SIGUSR1, signal.SIG_DFL)
+
+    def replot(self, infp):
+        "Replot from a JSON log file."
+        self.in_replot = True
+        baton = Baton("gpsprof: replotting", "done")
+        self.session = gps.gps(host=None)
+        for line in infp:
+            baton.twirl()
+            self.session.unpack(line)
+            if self.session.data["class"] == "DEVICES":
+                self.device = copy.copy(self.session.data["devices"][0])
+            elif self.session.data["class"] not in self.watch:
+                continue
+            self.sample()
+        baton.end()
+
+    def dump(self):
+        "Dump the raw data for post-analysis."
+        return self.header() + self.data()
+
+
+class spaceplot(plotter):
+    "Spatial scattergram of fixes."
+    name = "space"
+    requires_time = False
+
+    def __init__(self):
+        "Initialize class spaceplot"
+
+        plotter.__init__(self)
+        self.centroid = None
+        self.centroid_ecef = None
+        self.recentered = []
+
+    def sample(self):
+        "Grab samples"
+
+        # Watch out for the NaN value from gps.py.
+        if (((self.in_replot or self.session.valid) and
+             self.session.data["class"] == "TPV")):
+            # get sat used count
+            sats_used = 0
+            for sat in self.session.satellites:
+                if sat.used:
+                    sats_used += 1
+
+            if 'altHAE' not in self.session.data:
+                self.session.data['altHAE'] = gps.NaN
+
+            self.fixes.append((self.session.data['lat'],
+                               self.session.data['lon'],
+                               self.session.data['altHAE'], sats_used))
+        return True
+
+    def header(self):
+        "Return header"
+        return "\n# Position uncertainty, %s\n" % self.whatami()
+
+    def postprocess(self):
+        "Postprocess the sample data"
+        return
+
+    def data(self):
+        "Format data for dump"
+        res = ""
+        for i in range(len(self.recentered)):
+            (lat, lon) = self.recentered[i][:2]
+            (raw1, raw2, alt) = self.fixes[i]
+            res += "%.9f\t%.9f\t%.9f\t%.9f\t%.9f\n" \
+                % (lat, lon, raw1, raw2, alt)
+        return res
+
+    def plot(self):
+        "Plot the data"
+        stat_lat = stats()
+        stat_lon = stats()
+        stat_alt = stats()
+        stat_used = stats()
+        # recentered stats
+        stat_lat_r = stats()
+        stat_lon_r = stats()
+        stat_alt_r = stats()
+
+        sats_used = []
+        for x in self.fixes:
+            # skip missing sats, if any, often missing at start
+            if x[3] != 0:
+                sats_used.append(x[3])
+
+        # calc sats used data: mean, min, max, sigma
+        stat_used.min_max_mean(sats_used, 0)
+        stat_used.moments(sats_used, 0)
+
+        # find min, max and mean of lat/lon
+        stat_lat.min_max_mean(self.fixes, 0)
+        stat_lon.min_max_mean(self.fixes, 1)
+
+        # centroid is just arithmetic avg of lat,lon
+        self.centroid = (stat_lat.mean, stat_lon.mean)
+
+        # Sort fixes by distance from centroid
+        # sorted to make getting CEP() easy
+        self.fixes.sort(key=lambda p: dist_2d(self.centroid, p[:2]))
+
+        # compute min/max as meters, ignoring altitude
+        # EarthDistance always returns a positve value
+        lat_min_o = -gps.EarthDistance((stat_lat.min, self.centroid[1]),
+                                       self.centroid[:2])
+        lat_max_o = gps.EarthDistance((stat_lat.max, self.centroid[1]),
+                                      self.centroid[:2])
+
+        lon_min_o = -gps.EarthDistance((self.centroid[0], stat_lon.min),
+                                       self.centroid[:2])
+        lon_max_o = gps.EarthDistance((self.centroid[0], stat_lon.max),
+                                      self.centroid[:2])
+
+        # Convert fixes to offsets from centroid in meters
+        self.recentered = [
+            gps.MeterOffset(fix[:2], self.centroid) for fix in self.fixes]
+
+        stat_lat_r.min_max_mean(self.recentered, 0)
+        stat_lon_r.min_max_mean(self.recentered, 1)
+        # compute sigma, skewness and kurtosis of lat/lon
+        stat_lat_r.moments(self.recentered, 0)
+        stat_lon_r.moments(self.recentered, 1)
+
+        # CEP(50) calculated per RCC 261-00, Section 3.1.1
+        calc_cep = 0.5887 * (stat_lat_r.sigma + stat_lon_r.sigma)
+
+        # 2DRMS calculated per RCC 261-00, Section 3.1.4
+        calc_2drms = 2 * math.sqrt(stat_lat_r.sigma ** 2 +
+                                   stat_lon_r.sigma ** 2)
+
+        # Compute measured CEP(50%)
+        # same as median distance from centroid, 50% closer, 50% further
+        cep_meters = gps.misc.EarthDistance(
+            self.centroid[:2], self.fixes[int(len(self.fixes) * 0.50)][:2])
+
+        # Compute measured CEP(95%)
+        # distance from centroid, 95% closer, 5% further
+        cep95_meters = gps.misc.EarthDistance(
+            self.centroid[:2], self.fixes[int(len(self.fixes) * 0.95)][:2])
+
+        # Compute measured CEP(99%)
+        # distance from centroid, 99% closer, 1% further
+        cep99_meters = gps.misc.EarthDistance(
+            self.centroid[:2], self.fixes[int(len(self.fixes) * 0.99)][:2])
+
+        # Compute CEP(100%)
+        # max distance from centroid, 100% closer, 0% further
+        cep100_meters = gps.misc.EarthDistance(
+            self.centroid[:2], self.fixes[len(self.fixes) - 1][:2])
+
+        # init altitude data
+        alt_ep = gps.NaN
+        alt_ep95 = gps.NaN
+        alt_ep99 = gps.NaN
+        dist_3d_max = 0.0
+        alt_fixes = []
+        alt_fixes_r = []
+        latlon_data = ""
+        alt_data = ""
+        # init calcualted hep, sep and mrse
+        calc_hep = gps.NaN
+        calc_sep = gps.NaN
+        calc_mrse = gps.NaN
+
+        # grab and format the fixes as gnuplot will use them
+        for i in range(len(self.recentered)):
+            # grab valid lat/lon data, recentered and raw
+            (lat, lon) = self.recentered[i][:2]
+            alt = self.fixes[i][2]
+            latlon_data += "%.9f\t%.9f\n" % (lat, lon)
+
+            if not math.isnan(alt):
+                # only keep good fixes
+                alt_fixes.append(alt)
+                # micro meters should be good enough
+                alt_data += "%.6f\n" % (alt)
+
+        if alt_fixes:
+            # got altitude data
+
+            # Convert fixes to offsets from avg in meters
+            alt_data_centered = ""
+
+            # find min, max and mean of altitude
+            stat_alt.min_max_mean(alt_fixes, 0)
+            for alt in alt_fixes:
+                alt_fixes_r.append(alt - stat_alt.mean)
+                alt_data_centered += "%.6f\n" % (alt - stat_alt.mean)
+
+            stat_alt_r.min_max_mean(alt_fixes_r, 0)
+            stat_alt_r.moments(alt_fixes_r, 0)
+
+            # centroid in ECEF
+            self.centroid_ecef = wgs84_to_ecef([stat_lat.mean,
+                                                stat_lon.mean,
+                                                stat_alt.mean])
+
+            # once more through the data, looking for 3D max
+            for fix_lla in self.fixes:
+                if not math.isnan(fix_lla[2]):
+                    fix_ecef = wgs84_to_ecef(fix_lla[:3])
+                    dist3d = dist_3d(self.centroid_ecef, fix_ecef)
+                    if dist_3d_max < dist3d:
+                        dist_3d_max = dist3d
+
+            # Sort fixes by distance from average altitude
+            alt_fixes_r.sort(key=lambda a: abs(a))
+            # so we can rank fixes for EPs
+            alt_ep = abs(alt_fixes_r[int(len(alt_fixes_r) * 0.50)])
+            alt_ep95 = abs(alt_fixes_r[int(len(alt_fixes_r) * 0.95)])
+            alt_ep99 = abs(alt_fixes_r[int(len(alt_fixes_r) * 0.99)])
+
+            # HEP(50) calculated per RCC 261-00, Section 3.1.2
+            calc_hep = 0.6745 * stat_alt_r.sigma
+
+            # SEP(50) calculated per RCC 261-00, Section 3.1.3 (3)
+            calc_sep = 0.51 * (stat_lat_r.sigma +
+                               stat_lon_r.sigma +
+                               stat_alt_r.sigma)
+
+            # MRSE calculated per RCC 261-00, Section 3.1.5
+            calc_mrse = math.sqrt(stat_lat_r.sigma ** 2 +
+                                  stat_lon_r.sigma ** 2 +
+                                  stat_alt_r.sigma ** 2)
+
+        fmt_lab11a = ('hep = %.3f meters\\n'
+                      'sep = %.3f meters\\n'
+                      'mrse = %.3f meters\\n'
+                      ) % (calc_hep, calc_sep, calc_mrse)
+
+        if self.centroid[0] < 0.0:
+            latstring = "%.9fS" % -self.centroid[0]
+        elif stat_lat.mean > 0.0:
+            latstring = "%.9fN" % self.centroid[0]
+        else:
+            latstring = "0.0"
+
+        if self.centroid[1] < 0.0:
+            lonstring = "%.9fW" % -self.centroid[1]
+        elif stat_lon.mean > 0.0:
+            lonstring = "%.9fE" % self.centroid[1]
+        else:
+            lonstring = "0.0"
+
+        # oh, this is fun, mixing gnuplot and python string formatting
+        # Grrr, python implements %s max width or precision incorrectly...
+        # and the old and new styles also disagree...
+        fmt = ('set xlabel "Meters east from %s"\n'
+               'set ylabel "Meters north from %s"\n'
+               'cep=%.9f\n'
+               'cep95=%.9f\n'
+               'cep99=%.9f\n'
+               ) % (lonstring, latstring,
+                    cep_meters, cep95_meters, cep99_meters)
+        fmt += ('set autoscale\n'
+                'set multiplot\n'
+                # plot to use 95% of width
+                # set x and y scales to same distance
+                'set size ratio -1 0.95,0.7\n'
+                # leave room at bottom for computed variables
+                'set origin 0.025,0.30\n'
+                'set format x "%.3f"\n'
+                'set format y "%.3f"\n'
+                'set key left at screen 0.6,0.30 vertical\n'
+                'set key noautotitle\n'
+                'set style line 2 pt 1\n'
+                'set style line 3 pt 2\n'
+                'set style line 5 pt 7 ps 1\n'
+                'set xtic rotate by -45\n'
+                'set border 15\n'
+                # now the CEP stuff
+                'set parametric\n'
+                'set trange [0:2*pi]\n'
+                'cx(t, r) = sin(t)*r\n'
+                'cy(t, r) = cos(t)*r\n'
+                'chlen = cep/20\n'
+                # what do the next two lines do??
+                'set arrow from -chlen,0 to chlen,0 nohead\n'
+                'set arrow from 0,-chlen to 0,chlen nohead\n')
+
+        fmt += ('set label 11 at screen 0.01, screen 0.30 '
+                '"RCC 261-00\\n'
+                'cep = %.3f meters\\n'
+                '2drms = %.3f meters\\n%s'
+                '2d max = %.3f meters\\n'
+                '3d max = %.3f meters"\n'
+                ) % (calc_cep, calc_2drms, fmt_lab11a, cep100_meters,
+                     dist_3d_max)
+
+        # row labels
+        fmt += ('set label 12 at screen 0.01, screen 0.12 '
+                '"RCC 261-00\\n'
+                '\\n'
+                'Lat\\n'
+                'Lon\\n'
+                'AltHAE\\n'
+                'Used"\n')
+
+        # mean
+        fmt += ('set label 13 at screen 0.06, screen 0.12 '
+                '"\\n'
+                '        mean\\n'
+                '%s\\n'
+                '%s\\n'
+                '%s\\n'
+                '%s"\n'
+                ) % ('{:>15}'.format(latstring),
+                     '{:>15}'.format(lonstring),
+                     '{:>15.3f}'.format(stat_alt.mean),
+                     '{:>15.1f}'.format(stat_used.mean))
+
+        fmt += ('set label 14 at screen 0.23, screen 0.12 '
+                '"\\n'
+                '        min        max      sigma              '
+                'skewness kurtosis\\n'
+                '%s %s %s meters %s %s\\n'
+                '%s %s %s meters %s %s\\n'
+                '%s %s %s meters %s %s\\n'
+                '%12d %12d %s sats"\n'
+                ) % ('{:>10.3f}'.format(lat_min_o),
+                     '{:>10.3f}'.format(lat_max_o),
+                     '{:>10.3f}'.format(stat_lat_r.sigma),
+                     '{:>10.1f}'.format(stat_lat_r.skewness),
+                     '{:>10.1f}'.format(stat_lat_r.kurtosis),
+                     '{:>10.3f}'.format(lon_min_o),
+                     '{:>10.3f}'.format(lon_max_o),
+                     '{:>10.3f}'.format(stat_lon_r.sigma),
+                     '{:>10.1f}'.format(stat_lon_r.skewness),
+                     '{:>10.1f}'.format(stat_lon_r.kurtosis),
+                     '{:>10.3f}'.format(stat_alt_r.min),
+                     '{:>10.3f}'.format(stat_alt_r.max),
+                     '{:>10.3f}'.format(stat_alt_r.sigma),
+                     '{:>10.1f}'.format(stat_alt_r.skewness),
+                     '{:>10.1f}'.format(stat_alt_r.kurtosis),
+                     stat_used.min,
+                     stat_used.max,
+                     '{:>10.1f}'.format(stat_used.sigma))
+
+        if debug:
+            fmt += ('set label 15 at screen 0.6, screen 0.12 '
+                    '"\\n'
+                    '      min\\n'
+                    '%s\\n'
+                    '%s\\n'
+                    '%s"\n'
+                    ) % ('{:>15.9f}'.format(stat_lat_r.min),
+                         '{:>15.9f}'.format(stat_lon_r.min),
+                         '{:>15.3f}'.format(stat_alt.min))
+
+            fmt += ('set label 16 at screen 0.75, screen 0.12 '
+                    '"\\n'
+                    '      max\\n'
+                    '%s\\n'
+                    '%s\\n'
+                    '%s"\n'
+                    ) % ('{:>15.9f}'.format(stat_lat_r.max),
+                         '{:>15.9f}'.format(stat_lon_r.max),
+                         '{:>15.3f}'.format(stat_alt.max))
+
+        if len(self.fixes) > 1000:
+            plot_style = 'dots'
+        else:
+            plot_style = 'points'
+
+        # got altitude data?
+        if not math.isnan(stat_alt.mean):
+            fmt += ('set ytics nomirror\n'
+                    'set y2tics\n'
+                    'set format y2 "%.3f"\n')
+            fmt += (('set y2label "AltHAE from %.3f meters"\n') %
+                    (stat_alt.mean))
+
+            # add ep(50)s
+
+            altitude_x = cep100_meters * 1.2
+            fmt += ('$EPData << EOD\n'
+                    '%.3f %.3f\n'
+                    '%.3f %.3f\n'
+                    'EOD\n'
+                    ) % (altitude_x, alt_ep,
+                         altitude_x, -alt_ep)
+
+            fmt += ('$EP95Data << EOD\n'
+                    '%.3f %.3f\n'
+                    '%.3f %.3f\n'
+                    'EOD\n'
+                    ) % (altitude_x, alt_ep95,
+                         altitude_x, -alt_ep95)
+
+            fmt += ('$EP99Data << EOD\n'
+                    '%.3f %.3f\n'
+                    '%.3f %.3f\n'
+                    'EOD\n'
+                    ) % (altitude_x, alt_ep99,
+                         altitude_x, -alt_ep99)
+
+        # setup now done, plot it!
+        fmt += ('plot "-" using 1:2 with %s ls 3 title "%d GPS fixes" '
+                ', cx(t,cep),cy(t,cep) ls 1 title "CEP (50%%) = %.3f meters"'
+                ', cx(t,cep95),cy(t,cep95) title "CEP (95%%) = %.3f meters"'
+                ', cx(t,cep99),cy(t,cep99) title "CEP (99%%) = %.3f meters"'
+                ) % (plot_style, len(self.fixes),
+                     cep_meters, cep95_meters, cep99_meters)
+
+        if not math.isnan(stat_alt.mean):
+            # add plot of altitude
+            fmt += (', "-" using ( %.3f ):( $1 - %.3f ) '
+                    'axes x1y2 with points ls 2 lc "green"'
+                    ' title " %d AltHAE fixes"'
+                    ) % (cep100_meters * 1.1, stat_alt.mean, len(alt_fixes))
+
+            # altitude EPs
+            fmt += (', $EPData using 1:2 '
+                    'axes x1y2 with points ls 5 lc "dark-green"'
+                    ' title " EP(50%%) = %.3f meters"'
+                    ) % (alt_ep)
+
+            fmt += (', $EP95Data using 1:2 '
+                    'axes x1y2 with points ls 5 lc "blue"'
+                    ' title " EP(95%%) = %.3f meters"'
+                    ) % (alt_ep95)
+
+            fmt += (', $EP99Data using 1:2 '
+                    'axes x1y2 with points ls 5 lc "red"'
+                    ' title " EP(99%%) = %.3f meters"'
+                    ) % (alt_ep99)
+
+        fmt += self.header() + latlon_data
+        if not math.isnan(stat_alt.mean):
+            # add altitude samples
+            fmt += 'e\n' + alt_data
+        return fmt
+
+
+class polarplot(plotter):
+    "Polar plot of signal strength"
+    name = "polar"
+    requires_time = False
+    seen_used = []          # count of seen and used in each SKY
+
+    def __init__(self):
+        plotter.__init__(self)
+        self.watch = set(['SKY'])
+
+    def sample(self):
+        "Grab samples"
+        if self.session.data["class"] == "SKY":
+            sats = self.session.data['satellites']
+            seen = 0
+            used = 0
+            for sat in sats:
+                seen += 1
+                # u'ss': 42, u'el': 15, u'PRN': 18, u'az': 80, u'used': True
+                if sat['used'] is True:
+                    used += 1
+                    if 'polarunused' == self.name:
+                        continue
+                if (('polarused' == self.name) and (sat['used'] is False)):
+                    continue
+                self.fixes.append((sat['PRN'], sat['ss'], sat['az'],
+                                  sat['el'], sat['used']))
+            self.seen_used.append((seen, used))
+
+        return True
+
+    def header(self):
+        "Return header"
+        return "# Polar plot of signal strengths, %s\n" % self.whatami()
+
+    def postprocess(self):
+        "Postprocess the sample data"
+        return
+
+    def data(self):
+        "Format data for dump"
+        res = ""
+        for (prn, ss, az, el, used) in self.fixes:
+            res += "%d\t%d\t%d\t%d\t%s\n" % (prn, ss, az, el, used)
+        return res
+
+    def plot(self):
+        "Format data for dump"
+
+        # calc SNR: mean, min, max, sigma
+        stat_ss = stats()
+        stat_ss.min_max_mean(self.fixes, 1)
+        stat_ss.moments(self.fixes, 1)
+
+        # calc sats seen data: mean, min, max, sigma
+        stat_seen = stats()
+        stat_seen.min_max_mean(self.seen_used, 0)
+        stat_seen.moments(self.seen_used, 0)
+
+        # calc sats used data: mean, min, max, sigma
+        stat_used = stats()
+        stat_used.min_max_mean(self.seen_used, 1)
+        stat_used.moments(self.seen_used, 1)
+
+        fmt = '''\
+unset border
+set polar
+set angles degrees # set gnuplot on degrees instead of radians
+
+set style line 10 lt 1 lc 0 lw 0.3 #redefine a new line style for the grid
+
+set grid polar 45 #set the grid to be displayed every 45 degrees
+set grid ls 10
+
+# x is angle, go from 0 to 360 degrees
+# y is radius, go from 90 at middle to 0 at edge
+set xrange [0:360]
+set rrange [90:0]  # 90 at center
+set yrange [-90:90]
+
+# set xtics axis #display the xtics on the axis instead of on the border
+# set ytics axis
+set xtics axis nomirror; set ytics axis nomirror
+
+# "remove" the tics so that only the y tics are displayed
+set xtics scale 0
+# set the xtics only go from 0 to 90 with increment of 30
+# but do not display anything. This has to be done otherwise the grid
+# will not be displayed correctly.
+set xtics ("" 90, "" 60, "" 30,)
+
+# make the ytics go from the center (0) to 360 with incrment of 90
+# set ytics 0, 45, 360
+set ytics scale 0
+
+# set the ytics only go from 0 to 90 with increment of 30
+# but do not display anything. This has to be done otherwise the grid
+# will not be displayed correctly.
+set ytics ("" 90, "" 60, "" 30,)
+
+set size square
+
+set key lmargin
+
+# this places a compass label on the outside
+set_label(x, text) = sprintf("set label '%s' at (93*cos(%f)), (93*sin(%f)) center", text, x, x)
+
+# here all labels are created
+# we compute North (0) at top, East (90) at right
+# bug gnuplot puts 0 at right, 90 at top
+eval set_label(0, "E")
+eval set_label(90, "N")
+eval set_label(180, "W")
+eval set_label(270, "S")
+
+set style line 11 pt 2 ps 2 #set the line style for the plot
+
+set style fill transparent solid 0.8 noborder
+
+# set rmargin then put colorbox in the margin.
+set lmargin at screen .08
+set rmargin at screen .85
+set cbrange [10:60]
+set palette defined (100 "blue", 200 "green", 300 "red")
+set colorbox user origin .92, .15 size .03, .6
+set label 10 at screen 0.89, screen 0.13 "SNR dBHz"
+'''
+
+        count = len(self.fixes)
+        fmt += '''\
+set label 11 at screen 0.01, screen 0.15 "%s plot, samples %d"
+set label 12 at screen 0.01, screen 0.10 "\\nSS\\nSeen\\nUsed"
+''' % (self.name, count)
+
+        fmt += '''\
+set label 13 at screen 0.11, screen 0.10 "min\\n%d\\n%d\\n%d" right
+''' % (stat_ss.min, stat_seen.min, stat_used.min)
+
+        fmt += '''\
+set label 14 at screen 0.21, screen 0.10 "max\\n%d\\n%d\\n%d" right
+''' % (stat_ss.max, stat_seen.max, stat_used.max)
+
+        fmt += '''\
+set label 15 at screen 0.31, screen 0.10 "mean\\n%.1f\\n%.1f\\n%.1f" right
+''' % (stat_ss.mean, stat_seen.mean, stat_used.mean)
+
+        fmt += '''\
+set label 16 at screen 0.41, screen 0.10 "sigma\\n%.1f\\n%.1f\\n%.1f" right
+''' % (stat_ss.sigma, stat_seen.sigma, stat_used.sigma)
+
+        fmt += '''\
+# and finally the plot
+# flip azimuth to plot north up, east right
+# plot "-" u (90 - $3):4 t "Sat" with points ls 11
+plot "-" u (90 - $3):4:(1):($2) t "Sat" w circles lc palette
+'''
+        # return fmt + self.header() + self.data()
+        return self.header() + fmt + self.data()
+
+
+class polarplotunused(polarplot):
+    "Polar plot of unused sats signal strength"
+    name = "polarunused"
+
+
+class polarplotused(polarplot):
+    "Polar plot of used sats signal strength"
+    name = "polarused"
+
+
+class timeplot(plotter):
+    "Time drift against PPS."
+    name = "time"
+    requires_time = True
+
+    def __init__(self):
+        plotter.__init__(self)
+        self.watch = set(['PPS'])
+
+    def sample(self):
+        "Grab samples"
+        if self.session.data["class"] == "PPS":
+            self.fixes.append((self.session.data['real_sec'],
+                               self.session.data['real_nsec'],
+                               self.session.data['clock_sec'],
+                               self.session.data['clock_nsec']))
+        return True
+
+    def header(self):
+        "Return header"
+        return "# Time drift against PPS, %s\n" % self.whatami()
+
+    def postprocess(self):
+        "Postprocess the sample data"
+        return
+
+    def data(self):
+        "Format data for dump"
+        res = ""
+        for (real_sec, real_nsec, clock_sec, clock_nsec) in self.fixes:
+            res += "%d\t%d\t%d\t%d\n" % (real_sec, real_nsec, clock_sec,
+                                         clock_nsec)
+        return res
+
+    def plot(self):
+        "Format data for dump"
+        fmt = '''\
+set autoscale
+set key below
+set ylabel "System clock delta from GPS time (nsec)"
+plot "-" using 0:((column(1)-column(3))*1e9 + (column(2)-column(4))) \
+ title "Delta" with impulses
+'''
+        return fmt + self.header() + self.data()
+
+
+class uninstrumented(plotter):
+    "Total times without instrumentation."
+    name = "uninstrumented"
+    requires_time = False
+
+    def __init__(self):
+        plotter.__init__(self)
+
+    def sample(self):
+        "Grab samples"
+        if self.session.fix.time:
+            seconds = time.time() - gps.misc.isotime(self.session.data.time)
+            self.fixes.append(seconds)
+            return True
+
+        return False
+
+    def header(self):
+        "Return header"
+        return "# Uninstrumented total latency, " + self.whatami() + "\n"
+
+    def postprocess(self):
+        "Postprocess the sample data"
+        return
+
+    def data(self):
+        "Format data for dump"
+        res = ""
+        for seconds in self.fixes:
+            res += "%2.6lf\n" % seconds
+        return res
+
+    def plot(self):
+        "Plot the data"
+
+        fmt = '''\
+set autoscale
+set key below
+set key title "Uninstrumented total latency"
+plot "-" using 0:1 title "Total time" with impulses
+'''
+        return fmt + self.header() + self.data()
+
+
+class instrumented(plotter):
+    "Latency as analyzed by instrumentation."
+    name = "instrumented"
+    requires_time = True
+
+    def __init__(self):
+        "Initialize class instrumented()"
+
+        plotter.__init__(self)
+
+    def sample(self):
+        "Grab the samples"
+
+        if 'rtime' in self.session.data:
+            self.fixes.append((gps.misc.isotime(self.session.data['time']),
+                               self.session.data["chars"],
+                               self.session.data['sats'],
+                               self.session.data['sor'],
+                               self.session.data['rtime'],
+                               time.time()))
+            return True
+
+        return False
+
+    def header(self):
+        "Return the header"
+        res = "# Analyzed latency, " + self.whatami() + "\n"
+        res += "#-- Fix time --  - Chars -  --   Latency  - RS232-  " \
+               "Analysis  - Recv -\n"
+        return res
+
+    def postprocess(self):
+        "Postprocess the sample data"
+        return
+
+    def data(self):
+        "Format data for dump"
+        res = ""
+        for (fix_time, chars, sats, start, xmit, recv) in self.fixes:
+            rs232_time = (chars * 10.0) / self.device['bps']
+            res += "%.3f  %9u  %2u  %.6f  %.6f  %.6f  %.6f\n" \
+                % (fix_time, chars, sats, start - fix_time,
+                   (start - fix_time) + rs232_time, xmit - fix_time,
+                   recv - fix_time)
+        return res
+
+    def plot(self):
+        "Do the plot"
+        legends = (
+            "Reception delta",
+            "Analysis time",
+            "RS232 time",
+            "Fix latency",
+        )
+        fmt = '''\
+set autoscale
+set key title "Analyzed latency"
+set key below
+plot \\\n'''
+        for (i, legend) in enumerate(legends):
+            j = len(legends) - i + 4
+            fmt += '    "-" using 0:%d title "%s" with impulses, \\\n' \
+                % (j, legend)
+        fmt = fmt[:-4] + "\n"
+        return fmt + self.header() + (self.data() + "e\n") * len(legends)
+
+
+formatters = (polarplot, polarplotunused, polarplotused, spaceplot, timeplot,
+              uninstrumented, instrumented)
+
+
+def usage():
+    "Print help, then exit"
+    sys.stderr.write('''\
+usage: gpsprof [OPTION]... [server[:port[:device]]]
+    [-D debuglevel]
+    [-d dumpfile]
+    [-f {%s}]
+    [-h]
+    [-l logfile]
+    [-m threshold]
+    [-n samplecount]
+    [-r]
+    [-s speed]
+    [-S subtitle]
+    [-T terminal]
+    [-t title]
+    [-V]
+
+''' % ("|".join([x.name for x in formatters])))
+    sys.exit(0)
+
+
+if __name__ == '__main__':
+    try:
+        (options, arguments) = getopt.getopt(sys.argv[1:],
+                                             "d:f:hl:m:n:rs:t:D:S:T:V")
+
+        plotmode = "space"
+        raw = False
+        title = None
+        subtitle = None
+        threshold = 0
+        wait = 100
+        verbose = 0
+        terminal = None
+        dumpfile = None
+        logfp = None
+        redo = False
+        for (switch, val) in options:
+            if switch == '-d':
+                dumpfile = val
+            elif switch == '-D':
+                # set debug level, 0 off, 1 medium, 2 high
+                verbose = int(val)
+            elif switch == '-f':
+                plotmode = val
+            elif switch == '-h':
+                # print help, then exit
+                usage()
+
+            elif switch == '-l':
+                logfp = open(val, "w")
+            elif switch == '-m':
+                threshold = int(val)
+            elif switch == '-n':
+                if val[-1] == 'h':
+                    wait = int(val[:-1]) * 360
+                else:
+                    wait = int(val)
+            elif switch == '-r':
+                redo = True
+            elif switch == '-t':
+                # replace title
+                title = val
+            elif switch == '-S':
+                # add sub title
+                subtitle = val
+            elif switch == '-T':
+                terminal = val
+            elif switch == '-V':
+                sys.stderr.write("gpsprof: Version %s\n" % gps_version)
+                sys.exit(0)
+
+        (host, port, device) = ("localhost", "2947", None)
+        if arguments:
+            args = arguments[0].split(":")
+            if len(args) >= 1:
+                host = args[0]
+            if len(args) >= 2:
+                port = args[1]
+            if len(args) >= 3:
+                device = args[2]
+
+        # Select the plotting mode
+        if plotmode:
+            for formatter in formatters:
+                if formatter.name == plotmode:
+                    plot = formatter()
+                    break
+            else:
+                sys.stderr.write("gpsprof: no such formatter.\n")
+                sys.exit(1)
+        # Get fix data from the GPS
+        if redo:
+            plot.replot(sys.stdin)
+        else:
+            plot.collect(verbose, logfp)
+        plot.postprocess()
+        # Save the timing data (only) for post-analysis if required.
+        if dumpfile:
+            with open(dumpfile, "w") as fp:
+                fp.write(plot.dump())
+        if logfp:
+            logfp.close()
+        # Ship the plot to standard output
+        if not title:
+            title = plot.whatami()
+            # escape " for gnuplot
+            title = title.replace('"', '\\"')
+        if subtitle:
+            title += '\\n' + subtitle
+        if terminal:
+            sys.stdout.write("set terminal %s truecolor enhanced size"
+                             " 800,950\n"
+                             % terminal)
+        # double quotes on title so \n is parsed by gnuplot
+        sys.stdout.write('set title noenhanced "%s\\n\\n"\n' % title)
+        sys.stdout.write(plot.plot())
+    except getopt.GetoptError as error:
+        print(error)
+        print("")
+        usage()
+        exit(1)
+    except KeyboardInterrupt:
+        pass
+
+# The following sets edit modes for GNU EMACS
+# Local Variables:
+# mode:python
+# End:

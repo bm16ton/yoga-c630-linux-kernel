@@ -1,0 +1,117 @@
+'\" t
+.\"     Title: gps2udp
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 01 Marc 2013
+.\"    Manual: GPSD Documentation
+.\"    Source: The GPSD Project
+.\"  Language: English
+.\"
+.TH "GPS2UDP" "1" "01 Marc 2013" "The GPSD Project" "GPSD Documentation"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+gps2udp \- feed the take from gpsd to one or more aggregation sites
+.SH "SYNOPSIS"
+.HP \w'\fBgps2udp\fR\ 'u
+\fBgps2udp\fR [\-h] [\-n] [\-j] [\-a] [\-u\ \fIhostname:udpport\fR] [\-c\ \fIcount\fR] [\-d\ \fI1|2\fR] [\-v] [\fIserver\fR [\fI:port\fR [\fI:device\fR]]]
+.SH "DESCRIPTION"
+.PP
+gps2udp
+is a tool to connect to
+gpsd
+and output the received sentences to one or many UDP host:port destinations\&. This makes the program useful for feeding AIS information from
+gpsd
+to aishub, marinetraffic, shipfinder,\&.\&.\&.
+.PP
+gps2udp
+does not require root privileges, and can be run concurrently with other tools connecting to the local
+gpsd
+without causing problems\&.
+.PP
+The output will consist of one or both of NMEA (\-n option) or JSON (\-j option)
+gpsd
+sentences\&. The output is sent to one or many destinations host through a UDP network socket (\-u host:port options) \&.
+.PP
+Optionally a server, TCP/IP port number and remote device can be given\&. If omitted,
+gps2udp
+connects to localhost on the default port (2947) and watches all devices opened by
+gpsd\&.
+.PP
+gps2udp
+may be run as a daemon (\-b option)\&.
+.PP
+gps2udp
+is designed to run smoothly in background; it reconnects automatically to
+gpsd
+whenever it is restarted\&. For debugging purporses, there is an option to exit gracefully after a given count of packets (\-c option)\&.
+.SH "OPTIONS"
+.PP
+\-h makes
+gps2udp
+print a usage message and exit\&.
+.PP
+\-n causes NMEA sentences to be output\&.
+.PP
+\-j causes JSON sentences to be output\&.
+.PP
+\-u host:port UDP destination for output sentenses (up to five destinations)\&.
+.PP
+\-a output only AIS messages\&.
+.PP
+\-b causes
+gps2udp
+to run as a daemon\&.
+.PP
+\-c [count] causes [count] sentences to be output\&.
+gps2udp
+will then exit gracefully\&.
+.PP
+\-d 1 prints sent packet on stdout\&.
+.PP
+\-d 2 prints unsent packet on stdout\&.
+.PP
+\-v prints the version, then exits\&.
+.SH "EXAMPLE"
+.PP
+With a running
+gpsd
+accessible on the network
+.PP
+\fBgps2udp \-d 1 \-n \-u data\&.aishub\&.net:2222 \fR
+will collect data from localhost:gpsd display them on stdout and send a copy to test aishub in NMEA format\&.
+.PP
+\fBgps2udp \-a \-n \-b \-u data\&.aishub\&.net:2222 \-u 5\&.9\&.207\&.224:5321 \-u 109\&.200\&.19\&.151:4001 fridu\&.net:2947\fR
+will collect data from a remote gpsd located on fridu\&.net host, will filter AIS messages and send them to 3 destination (aishub, marinetraffic, shipfinder) in NMEA format, command is running in background mode
+.SH "SEE ALSO"
+.PP
+\fBgpsd\fR(8),
+\fBgps\fR(1),
+\fBlibgps\fR(3),
+\fBlibgpsmm\fR(3),
+\fBgpsprof\fR(1),
+\fBgpsfake\fR(1),
+\fBgpsctl\fR(1),
+\fBgpscat\fR(1)\&.
+\fBgpsmon\fR(1)\&.
+.SH "AUTHOR"
+.PP
+Fulup Ar Foll
+<fulup@sinagot\&.net>\&.

@@ -1,0 +1,29 @@
+# This is not a real Debian control file
+# It's project metadata for the shipper tool
+
+Package: gpsd
+
+Description: A monitoring daemon for GPSes, AIS radios, and other nav sensors.
+ gpsd is a userland daemon acting as a translator between GPS and
+ AIS receivers and their clients. gpsd listens on port 2947 for clients
+ requesting position/time/velocity information.  The receivers are
+ expected to generate position information in a well-known format -- as
+ NMEA-0183 sentences, SiRF binary, Rockwell binary, Garmin binary
+ format, or other vendor binary protocols.  gpsd takes this
+ information from the GPS and translates it into JSON objects in a uniform
+ and well-documented format that easier for clients to understand.  The
+ distribution includes sample clients, application interface libraries,
+ and test/profiling tools.
+
+XBS-Destinations: savannah, freecode, mailto:@ANNOUNCE@
+
+XBS-Web-Directory: www
+
+Homepage: @WEBSITE@
+
+XBS-IRC-Channel: @IRCCHAN@
+
+XBS-Project-Tag-List: Communications, Scientific/Engineering, Geographical
+
+XBS-VC-Tag-Template: %(version)s
+
