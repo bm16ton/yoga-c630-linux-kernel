@@ -776,7 +776,6 @@ static const struct usb_device_id uss720_table[] = {
 	{ USB_DEVICE(0x06c6, 0x0100) },
 	{ USB_DEVICE(0x0729, 0x1284) },
 	{ USB_DEVICE(0x1293, 0x0002) },
-	{ USB_DEVICE(0x0711, 0x0302) },
 	{ }						/* Terminating entry */
 };
 
