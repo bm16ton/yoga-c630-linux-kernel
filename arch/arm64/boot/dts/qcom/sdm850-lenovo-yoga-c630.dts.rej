@@ -1,0 +1,15 @@
+--- arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
++++ arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
+@@ -489,12 +489,10 @@
+ &q6asmdai {
+ 	dai@0 {
+ 		reg = <0>;
+-		direction = <2>;
+ 	};
+ 
+ 	dai@1 {
+ 		reg = <1>;
+-		direction = <1>;
+ 	};
+ };
+ 
