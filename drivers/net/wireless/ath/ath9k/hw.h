@@ -73,7 +73,7 @@
 
 #define ATH9K_RSSI_BAD			-128
 
-#define ATH9K_NUM_CHANNELS	74
+#define ATH9K_NUM_CHANNELS	38
 
 /* Register read/write primitives */
 #define REG_WRITE(_ah, _reg, _val) \
@@ -427,6 +427,7 @@ enum ath9k_cal_flags {
 	TXIQCAL_DONE,
 	TXCLCAL_DONE,
 	SW_PKDET_DONE,
+	LONGCAL_PENDING,
 };
 
 struct ath9k_hw_cal_data {
@@ -833,6 +834,7 @@ struct ath_hw {
 
 	/* Calibration */
 	u32 supp_cals;
+	unsigned long cal_start_time;
 	struct ath9k_cal_list iq_caldata;
 	struct ath9k_cal_list adcgain_caldata;
 	struct ath9k_cal_list adcdc_caldata;

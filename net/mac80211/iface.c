@@ -62,8 +62,7 @@ bool __ieee80211_recalc_txpower(struct ieee80211_sub_if_data *sdata)
 	if (sdata->user_power_level != IEEE80211_UNSET_POWER_LEVEL)
 		power = min(power, sdata->user_power_level);
 
-	if (sdata->ap_power_level != IEEE80211_UNSET_POWER_LEVEL &&
-        sdata->vif.bss_conf.txpower_type != NL80211_TX_POWER_FIXED)
+	if (sdata->ap_power_level != IEEE80211_UNSET_POWER_LEVEL)
 		power = min(power, sdata->ap_power_level);
 
 	if (power != sdata->vif.bss_conf.txpower) {
@@ -644,6 +643,11 @@ int ieee80211_do_open(struct wireless_dev *wdev, bool coming_up)
 		} else if (sdata->vif.type == NL80211_IFTYPE_ADHOC) {
 			local->fif_probe_req++;
 		}
+
+		if (sdata->vif.probe_req_reg)
+			drv_config_iface_filter(local, sdata,
+						FIF_PROBE_REQ,
+						FIF_PROBE_REQ);
 
 		if (sdata->vif.type != NL80211_IFTYPE_P2P_DEVICE &&
 		    sdata->vif.type != NL80211_IFTYPE_NAN)

@@ -37,9 +37,10 @@
  * - 1.4.0 - softpin, MSM_RELOC_BO_DUMP, and GEM_INFO support to set/get
  *           GEM object's debug name
  * - 1.5.0 - Add SUBMITQUERY_QUERY ioctl
+ * - 1.6.0 - Syncobj support
  */
 #define MSM_VERSION_MAJOR	1
-#define MSM_VERSION_MINOR	5
+#define MSM_VERSION_MINOR	6
 #define MSM_VERSION_PATCHLEVEL	0
 
 static const struct drm_mode_config_funcs mode_config_funcs = {
@@ -98,33 +99,6 @@ struct clk *msm_clk_bulk_get_clock(struct clk_bulk_data *bulk, int count,
 
 
 	return NULL;
-}
-
-#include <linux/clk-provider.h>  /* hack to get __clk_is_enabled() */
-
-/* Check if any clk associated with the device is enabled, which would be
- * an indication that display was enabled by bootloader
- */
-bool msm_is_enabled(struct device *dev)
-{
-	struct clk_bulk_data *bulk;
-	int i, num_clks;
-	bool enabled = false;
-
-	num_clks = clk_bulk_get_all(dev, &bulk);
-	if (num_clks <= 0)
-		return false;
-
-	for (i = 0; i < num_clks; i++) {
-		if (__clk_is_enabled(bulk[i].clk)) {
-			enabled = true;
-			break;
-		}
-	}
-
-	clk_bulk_put_all(num_clks, bulk);
-
-	return enabled;
 }
 
 struct clk *msm_clk_get(struct platform_device *pdev, const char *name)
@@ -1029,7 +1003,8 @@ static struct drm_driver msm_driver = {
 	.driver_features    = DRIVER_GEM |
 				DRIVER_RENDER |
 				DRIVER_ATOMIC |
-				DRIVER_MODESET,
+				DRIVER_MODESET |
+				DRIVER_SYNCOBJ,
 	.open               = msm_open,
 	.postclose           = msm_postclose,
 	.lastclose          = drm_fb_helper_lastclose,

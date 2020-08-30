@@ -13,7 +13,6 @@
 #include "core_status.h"
 #include "dpcd_defs.h"
 
-#include "resource.h"
 #define DC_LOGGER \
 	link->ctx->logger
 
@@ -1103,10 +1102,6 @@ static inline enum link_training_result perform_link_training_int(
 	dpcd_pattern.v1_4.TRAINING_PATTERN_SET = DPCD_TRAINING_PATTERN_VIDEOIDLE;
 	dpcd_set_training_pattern(link, dpcd_pattern);
 
-	/* delay 5ms after notifying sink of idle pattern before switching output */
-	if (link->connector_signal != SIGNAL_TYPE_EDP)
-		msleep(5);
-
 	/* 4. mainlink output idle pattern*/
 	dp_set_hw_test_pattern(link, DP_TEST_PATTERN_VIDEO_MODE, NULL, 0);
 
@@ -1556,12 +1551,6 @@ bool perform_link_training_with_retries(
 	struct dc_link *link = stream->link;
 	enum dp_panel_mode panel_mode = dp_get_panel_mode(link);
 
-	/* We need to do this before the link training to ensure the idle pattern in SST
-	 * mode will be sent right after the link training
-	 */
-	link->link_enc->funcs->connect_dig_be_to_fe(link->link_enc,
-							pipe_ctx->stream_res.stream_enc->id, true);
-
 	for (j = 0; j < attempts; ++j) {
 
 		dp_enable_link_phy(
@@ -1577,6 +1566,12 @@ bool perform_link_training_with_retries(
 		}
 
 		dp_set_panel_mode(link, panel_mode);
+
+		/* We need to do this before the link training to ensure the idle pattern in SST
+		 * mode will be sent right after the link training
+		 */
+		link->link_enc->funcs->connect_dig_be_to_fe(link->link_enc,
+								pipe_ctx->stream_res.stream_enc->id, true);
 
 		if (link->aux_access_disabled) {
 			dc_link_dp_perform_link_training_skip_aux(link, link_setting);
@@ -1741,19 +1736,10 @@ bool dc_link_dp_sync_lt_end(struct dc_link *link, bool link_down)
 
 static struct dc_link_settings get_max_link_cap(struct dc_link *link)
 {
-	/* Set Default link settings */
-	struct dc_link_settings max_link_cap = {LANE_COUNT_FOUR, LINK_RATE_HIGH,
-			LINK_SPREAD_05_DOWNSPREAD_30KHZ, false, 0};
+	struct dc_link_settings max_link_cap = {0};
 
-	/* Higher link settings based on feature supported */
-	if (link->link_enc->features.flags.bits.IS_HBR2_CAPABLE)
-		max_link_cap.link_rate = LINK_RATE_HIGH2;
-
-	if (link->link_enc->features.flags.bits.IS_HBR3_CAPABLE)
-		max_link_cap.link_rate = LINK_RATE_HIGH3;
-
-	if (link->link_enc->funcs->get_max_link_cap)
-		link->link_enc->funcs->get_max_link_cap(link->link_enc, &max_link_cap);
+	/* get max link encoder capability */
+	link->link_enc->funcs->get_max_link_cap(link->link_enc, &max_link_cap);
 
 	/* Lower link settings based on sink's link cap */
 	if (link->reported_link_cap.lane_count < max_link_cap.lane_count)
@@ -2457,7 +2443,7 @@ static bool handle_hpd_irq_psr_sink(struct dc_link *link)
 {
 	union dpcd_psr_configuration psr_configuration;
 
-	if (!link->psr_feature_enabled)
+	if (!link->psr_settings.psr_feature_enabled)
 		return false;
 
 	dm_helpers_dp_read_dpcd(
@@ -2561,7 +2547,7 @@ static void dp_test_send_phy_test_pattern(struct dc_link *link)
 	/* get phy test pattern and pattern parameters from DP receiver */
 	core_link_read_dpcd(
 			link,
-			DP_TEST_PHY_PATTERN,
+			DP_PHY_TEST_PATTERN,
 			&dpcd_test_pattern.raw,
 			sizeof(dpcd_test_pattern));
 	core_link_read_dpcd(
@@ -4271,7 +4257,7 @@ void dpcd_set_source_specific_data(struct dc_link *link)
 {
 	const uint32_t post_oui_delay = 30; // 30ms
 	uint8_t dspc = 0;
-	enum dc_status ret = DC_ERROR_UNEXPECTED;
+	enum dc_status ret;
 
 	ret = core_link_read_dpcd(link, DP_DOWN_STREAM_PORT_COUNT, &dspc,
 				  sizeof(dspc));

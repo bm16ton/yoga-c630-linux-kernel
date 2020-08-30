@@ -1,5 +1,0 @@
-#!/bin/bash
-nmcli device disconnect wlan0
-# sleep 3
-exit 0
-
