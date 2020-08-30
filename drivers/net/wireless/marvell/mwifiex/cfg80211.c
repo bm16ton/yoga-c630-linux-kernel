@@ -612,6 +612,7 @@ int mwifiex_send_domain_info_cmd_fw(struct wiphy *wiphy)
 
 static void mwifiex_reg_apply_radar_flags(struct wiphy *wiphy)
 {
+
 	struct ieee80211_supported_band *sband;
 	struct ieee80211_channel *chan;
 	unsigned int i;
