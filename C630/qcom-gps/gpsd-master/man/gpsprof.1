@@ -1,0 +1,218 @@
+'\" t
+.\"     Title: gpsprof
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 30 May 2018
+.\"    Manual: GPSD Documentation
+.\"    Source: The GPSD Project
+.\"  Language: English
+.\"
+.TH "GPSPROF" "1" "30 May 2018" "The GPSD Project" "GPSD Documentation"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+gpsprof \- profile a GPS and gpsd, plotting latency information
+.SH "SYNOPSIS"
+.HP \w'\fBgpsprof\fR\ 'u
+\fBgpsprof\fR [\-D\ \fIdebuglevel\fR] [\-d\ \fIdumpfile\fR] [\-f\ \fIplot_type\fR] [\-h] [\-l\ \fIlogfile\fR] [\-m\ \fIthreshold\fR] [\-n\ \fIsamplecount\fR] [\-r] [\-S\ \fIsubtitle\fR] [\-T\ \fIterminal\fR] [\-t\ \fItitle\fR] [[server[:port[:device]]]]
+.SH "DESCRIPTION"
+.PP
+gpsprof
+performs accuracy, latency, skyview, and time drift profiling on a GPS\&. It emits to standard output a GNUPLOT program that draws one of several illustrative graphs\&. It can also be told to emit the raw profile data\&.
+.PP
+Information from the default spatial plot it provides can be useful for characterizing position accuracy of a GPS\&.
+.PP
+gpsprof
+uses instrumentation built into
+gpsd\&. It can read data from a local or remote running
+gpsd\&. Or it can read data from a saved logfile\&.
+.PP
+gpsprof
+is designed to be lightweight and use minimal host resources\&. No graphics subsystem needs to be installed on the host running
+gpsprof\&. Simply copy the resultant plot file to another host to be rendered with
+gnuplot\&.
+.SH "OPTIONS"
+.PP
+The \-f option sets the plot type\&. Currently the following plot types are defined:
+.PP
+space
+.RS 4
+Generate a scatterplot of fixes and plot probable error circles\&. This data is only meaningful if the GPS is held stationary while
+gpsprof
+is running\&. Various statistics about the fixes are listed at the bottom\&. This is the default plot type\&.
+.RE
+.PP
+polar
+.RS 4
+Generate a heat map of reported satellite Signal to Noise Ratio (SNR) using polar coordinates\&. A colored dot is plotted for each satellite seen by the GPS\&. The color of dot corresponds to the SNR of the satellite\&. The dots are plotted by azimuth and elevation\&. North, azimuth 0 degrees, is at the top of the plot\&. Directly overhead, elevation of 90 degrees, is plotted at the center\&. Useful for analyzing the quality of the skyview as seen by the GPS\&.
+.RE
+.PP
+polarunused
+.RS 4
+Similar to the polar plot, but only unused satellites are plotted\&. Useful for seeing which parts of the antenna skyview are obstructed, degraded, below the GPS elevation mask, or otherwise rejected\&.
+.RE
+.PP
+polarused
+.RS 4
+Similar to the polar plot, but only satellites used to compute fixs are plotted\&. Useful for seeing which parts of the antenna skyview are being used in fixes\&.
+.RE
+.PP
+time
+.RS 4
+Plot delta of system clock (NTP corrected time) against GPS time as reported in PPS messages\&. The X axis is sample time in seconds from the start of the plot\&. The Y axis is the system clock delta from GPS time\&. This plot only works if
+gpsd
+was built with the timing (latency timing support) configure option enabled\&.
+.RE
+.PP
+instrumented
+.RS 4
+Plot instrumented profile\&. Plots various components of the total latency between the GPS\*(Aqs fix time and when the client receives the fix\&. This plot only works if
+gpsd
+was built with the timing (latency timing support) configuration option enabled\&.
+.sp
+For purposes of the description, below, start\-of\-reporting\-cycle (SORC) is when a device\*(Aqs reporting cycle begins\&. This time is detected by watching to see when data availability follows a long enough amount of quiet time that we can be sure we\*(Aqve seen the gap at the end of the sensor\*(Aqs previous report\-transmission cycle\&. Detecting this gap requires a device running at 9600bps or faster\&.
+.sp
+Similarly, EORC is end\-of\-reporting\-cycle; when the daemon has seen the last sentence it needs in the reporting cycle and ready to ship a fix to the client\&.
+.sp
+The components of the instrumented plot are as follows:
+.PP
+Fix latency
+.RS 4
+Delta between GPS time and SORC\&.
+.RE
+.PP
+RS232 time
+.RS 4
+RS232 transmission time for data shipped during the cycle (computed from character volume and baud rate)\&.
+.RE
+.PP
+Analysis time
+.RS 4
+EORC, minus SORC, minus RS232 time\&. The amount of real time the daemon spent on computation rather than I/O\&.
+.RE
+.PP
+Reception time
+.RS 4
+Shipping time from the daemon to when it was received by
+gpsprof\&.
+.RE
+.sp
+Because of RS232 buffering effects, the profiler sometimes generates reports of ridiculously high latencies right at the beginning of a session\&. The \-m option lets you set a latency threshold, in multiples of the cycle time, above which reports are discarded\&.
+.RE
+.PP
+uninstrumented
+.RS 4
+Plot total latency without instrumentation\&. Useful mainly as a check that the instrumentation is not producing significant distortion\&. The X axis is sample time in seconds from the start of the plot\&. The Y axs is latency in seconds\&.It only plots times for reports that contain fixes; staircase\-like artifacts in the plot are created when elapsed time from reports without fixes is lumped in\&.
+.RE
+.PP
+The \-d option dumps the plot data, without attached gnuplot code, to a specified file for post\-analysis\&.
+.PP
+The \-D sets debug level\&.
+.PP
+The \-h option makes
+gpsprof
+print a usage message and exit\&.
+.PP
+The \-l option dumps the raw JSON reports collected from the device to a specified file\&.
+.PP
+The \-n option sets the number of packets to sample\&. The default is 100\&. Most GPS are configured to emit one fix per second, so 100 samples would then span 100 seconds\&.
+.PP
+The \-r option replots from a JSON logfile (such as \-l produces) on standard input\&. Both \-n and \-l options are ignored when this one is selected\&.
+.PP
+The \-S option sets a text string to be included in the plot as a subtitle\&. This will be below the title\&.
+.PP
+The \-t option sets a text string to be the plot title\&. This will replace the default title\&.
+.PP
+The \-T option generates a terminal type setting into the gnuplot code\&. Typical usage is "\-T png", or "\-T pngcairo" telling gnuplot to write a PNG file\&. Without this option gnuplot will call its X11 display code\&.
+.PP
+Different installations of
+gnuplot
+will support different terminal types\&. Different terminal types may work better for you than other ones\&. "\-T png" will generate PNG images\&. Use "\-T jpeg" to generate JPEG images\&. "\-T pngcairo" often works best, but is not supported by some distributions\&.
+.SH "SIGNALS"
+.PP
+Sending SIGUSR1 to a running instance causes it to write a completion message to standard error and resume processing\&. The first number in the startup message is the process ID to signal\&.
+.SH "EXAMPLES"
+.PP
+To display the graph, use
+\fBgnuplot\fR(1)\&. Thus, for example, to display the default spatial scatter plot, do this:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+gpsprof | gnuplot \-persist
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+To generate an image file:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+gpsprof \-T png | gnuplot > image\&.png
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+To generate a polar plot, and save the GPS data for further plots:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+gpsprof \-f polar \-T jpeg \-l polar\&.json | gnuplot > polar\&.png
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Then to make the matching polarused and polarunused plots and pngs from the just saved the GPS data:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+gpsprof \-f polarused \-T jpeg \-r < polar\&.json > polarused\&.plot
+gnuplot < polarused\&.plot > polarused\&.png
+gpsprof \-f polarunused \-T jpeg \-r < polar\&.json > polarunused\&.plot
+gnuplot < polarunused\&.plot  > polarunused\&.png
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SH "SEE ALSO"
+.PP
+\fBgpsd\fR(8),
+\fBgps\fR(1),
+\fBlibgps\fR(3),
+\fBlibgpsmm\fR(3),
+\fBgpsfake\fR(1),
+\fBgpsctl\fR(1),
+\fBgpscat\fR(1),
+\fBgnuplot\fR(1)\&.
+.SH "AUTHOR"
+.PP
+Eric S\&. Raymond
+<esr@thyrsus\&.com>\&.

@@ -1,0 +1,421 @@
+'\" t
+.\"     Title: ubxtool
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 26 Jun 2019
+.\"    Manual: GPSD Documentation
+.\"    Source: The GPSD Project
+.\"  Language: English
+.\"
+.TH "UBXTOOL" "1" "26 Jun 2019" "The GPSD Project" "GPSD Documentation"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+ubxtool \- u\-blox tool
+.SH "SYNOPSIS"
+.HP \w'\fBubxtool\fR\ 'u
+\fBubxtool\fR [\-?] [\-c\ \fIcommand\fR] [\-d\ \fIdisable\fR] [\-e\ \fIenable\fR] [\-f\ \fIfile/device\fR] [\-g\ \fIitem\fR] [\-h] [\-i\ \fIport\fR] [\-m\ \fImode\fR] [\-P\ \fIprotver\fR] [\-p\ \fIpreset\fR] [\-R\ \fIrawfile\fR] [\-r] [\-S\ \fIsetspeed\fR] [\-s\ \fIspeed\fR] [\-V] [\-v\ \fIverbosity\fR] [\-w\ \fIwait\fR] [\-x\ \fIitem\fR] [\-z\ \fIitem,val\fR] [[server[:port[:device]]]]
+.SH "DESCRIPTION"
+.PP
+ubxtool
+is a tool for u\-blox GPS\&. If you do not have a u\-blox GPS then can stop reading now\&.
+.PP
+This tool operates with your u\-blox GPS at a very low level\&. To understand
+ubxtool
+you must first be familiar with your u\-blox GPS and the documentation for the u\-blox binary protocol\&. The u\-blox protocol varies greatly depending on GPS model and firmware revision\&. Use the u\-blox documentation for your model and firmware\&.
+.PP
+ubxtool
+can decode common u\-blox binary messages, poll the GPS status, enable and disable GPS features, and send user generated commands to the GPS\&. It can read binary messages from a file\&. It can read and write directly through a serial device, or through a running gpsd instance\&.
+.SH "OPTIONS"
+.PP
+The program accepts the following options:
+.PP
+\-?
+.RS 4
+Makes
+ubxtool
+print a usage message and exit\&.
+.RE
+.PP
+\-c COMMAND
+.RS 4
+Send a command to the GPS\&. Accepts one parameter, COMMAND, a comma\-separated list of hexadecimal bytes specifying the class, the ID, and any needed payload\&. The header, length, and checksum are added automatically\&.
+.RE
+.PP
+\-d OPTION
+.RS 4
+Disable an option in the GPS\&. Accepts one parameter, OPTION, the option to disable\&.
+.PP
+BEIDOU
+.RS 4
+Disable use of the BeiDou (COMPASS) constellation\&.
+.RE
+.PP
+BINARY
+.RS 4
+Disable sending of the basic binary messages\&.
+.RE
+.PP
+ECEF
+.RS 4
+Disable sending of ECEF binary messages\&.
+.RE
+.PP
+GALILEO
+.RS 4
+Disable use of the GALILEO constellation\&.
+.RE
+.PP
+GLONASS
+.RS 4
+Disable use of the GLONASS constellation\&.
+.RE
+.PP
+GPS
+.RS 4
+Disable use of the GPS and QZSS constellations\&.
+.RE
+.PP
+NED
+.RS 4
+Disable sending of NED binary messages\&. UBX\-NAV\-VELNED and UBX\-NAV\-RELPOSNED\&.
+.RE
+.PP
+NMEA
+.RS 4
+Disable sending basic NMEA messages\&. The messages are GBS, GGA, GSA, GGL, GST, GSV, RMC, VTG, and ZDA\&.
+.RE
+.PP
+PPS
+.RS 4
+Disable TIMEPULSE 0\&.
+.RE
+.PP
+RAWX
+.RS 4
+Disable sending of the UBX\-RXM\-RAWX messages\&.
+.RE
+.PP
+SBAS
+.RS 4
+Disable use of the SBAS constellation\&.
+.RE
+.PP
+SFRBX
+.RS 4
+Disable use of the SFRBX messages\&.
+.RE
+.PP
+SURVEYIN
+.RS 4
+Disable survey\-in mode with TMODE2\&.
+.RE
+.PP
+TP
+.RS 4
+Disable sending UBX\-TIM\-TP\&.
+.RE
+.RE
+.PP
+\-e OPTION
+.RS 4
+Enable an option in the GPS\&. Accepts one parameter, OPTION, the option to enable\&. \-e accepts the same OPTIONs as \-d, except the action is to enable the option\&.
+.RE
+.PP
+\-f FILE
+.RS 4
+Connect to a file or device\&. Accepts one parameter, FILE, the file or device to open\&. Files are opened read\-only\&. Character devices are opened read/write, unless the \-r parameter is given\&. Requires the pyserial module\&.
+.RE
+.PP
+\-g ITEM
+.RS 4
+Get the value of ITEM name from the GPS (UBX\-CFG\-VALGET)\&. See the section on CONFIGURATION ITEMS
+.RE
+.PP
+\-h
+.RS 4
+Makes
+ubxtool
+print a usage message and exit\&.
+.RE
+.PP
+\-i port
+.RS 4
+Specifies port (interface) for port\-related commands\&.
+.RE
+.PP
+\-m mode
+.RS 4
+Sets optional mode parameter to a \-p PRESET command\&.
+.RE
+.PP
+\-P protver
+.RS 4
+Sets the protocol version to use for sending commands\&. Minimum 10 (ublox 5)\&. Maximum 29 (u\-blox 9)\&. Use "ubxtool \-p MON\-VER" to see the version your GPS supports\&.
+.RE
+.PP
+\-p PRESET
+.RS 4
+Send a preset command the GPS\&. Accepts one parameter, PRESET, the name of the command to send\&. Only the common PRESETS are shown here\&. To see the full list run "ubxtool \-h \-v 2"\&.
+.PP
+COLDBOOT
+.RS 4
+Coldboot the GPS (UBX\-CFG\-RST)\&.
+.RE
+.PP
+HOTBOOT
+.RS 4
+Hotboot the GPS (UBX\-CFG\-RST)\&.
+.RE
+.PP
+MODEL
+.RS 4
+Configure the Dynamic Platform Model\&. (UBX\-CFG\-NAV5)\&.
+.RE
+.PP
+PMS
+.RS 4
+Set power management settings (UBX\-CFG\-PMS)\&.
+.RE
+.PP
+RESET
+.RS 4
+Reset configuration to defaults (UBX\-CFG\-CFG)\&.
+.RE
+.PP
+SAVE
+.RS 4
+Save current configuration (UBX\-CFG\-CFG)\&.
+.RE
+.PP
+MON\-RESETODO
+.RS 4
+Reset the odometer (UBX\-MON\-RESETODO)\&.
+.RE
+.PP
+MON\-VER
+.RS 4
+Poll GPS version (UBX\-MON\-VER)\&.
+.RE
+.PP
+WARMBOOT
+.RS 4
+Warmboot the GPS (UBX\-CFG\-RST)\&.
+.RE
+.sp
+The PRESET parameters not shown above are all simple poll commands\&. They merely poll the GPS to respond with the associated message\&. For example "ubxtool \-p CFG\-GNSS" asks the GPS to respond with a UBX\-CFG\-GNSS message describing the current GNSS configuration\&. Increase the verbosity of the decode by adding the "\-v 2" or "\-v 3" options\&.
+.RE
+.PP
+\-R RAW
+.RS 4
+Save all raw serial data received from the GPS into the file RAW\&.
+.RE
+.PP
+\-r
+.RS 4
+Read only\&. Do not send anything to the GPS\&.
+.RE
+.PP
+\-S SPEED
+.RS 4
+Set the GPS serial port speed to SPEED bps\&.
+.RE
+.PP
+\-s SPEED
+.RS 4
+Set local serial port speed to SPEED bps\&. Default 9,600 bps\&.
+.RE
+.PP
+\-V
+.RS 4
+Print
+ubxtool
+version and exit\&.
+.RE
+.PP
+\-v VERBOSITY
+.RS 4
+Set verbosity level to VERBOSITY\&. Verbosity can be from 0 (very quiet), 2 (decode messages), to 4 (very noisy)\&. Default 1\&.
+.RE
+.PP
+\-w WAIT
+.RS 4
+Wait for WAIT seconds before exiting\&. Default 2 seconds\&.
+.RE
+.PP
+\-x ITEM
+.RS 4
+Delete the value of ITEM name from the GPS (UBX_CFG\-VALDEL)\&. Returning to the GPS default for that item\&. See the section on CONFIGURATION ITEMS
+.RE
+.PP
+\-z ITEM,VAL
+.RS 4
+Set the value of ITEM name to VAL in the GPS (UBX\-CFG\-VALSET)\&. See the section on CONFIGURATION ITEMS
+.RE
+.PP
+[server[:port[:device]]]
+.RS 4
+By default,
+ubxtool
+collects data from all compatible devices on localhost, using the default GPSD port 2947\&. An optional argument may specify a server to get data from\&. A colon\-separated suffix is taken as a port number\&. If there is a second colon\-separated suffix, that is taken as a specific device name to be watched\&. Further details on the
+\fBgps\fR(1)
+man page\&.
+.RE
+.SH "CONFIGURATION ITEMS"
+.PP
+Configuring u\-blox GPS with the traditional configuration messages is fraught with problems\&. Many configuration messages interact in odd ways\&. Something as simple as changing the serial port speed requires you to read the curent configuration using UBX\-CFG\-PRT for the proper port, merging in the change, the writing back the changed UBX\-CFG\-PRT message\&. Or just guessing at the current configuration and overwriting it all\&.
+.PP
+The u\-blox 9 series, protocol version 27+, tries, but does not completely succeed, to solve the problem with Configuration Items\&. If your GPS does not support protocol version 27+, then this section does not apply to you\&.
+.PP
+Most of the configuration variables in the GPS have been assigned a 32\-bit Key ID\&. Each Key ID has been assigned a Key Name\&. Over 600 Key Names are supported by ubxtool\&. To see them all do: "ubxtool \-h \-v 3"\&. Each Key references one specific value\&.
+.PP
+To get the value related to an item, use "\-g ITEM"\&.
+.PP
+To reset the value related to an item to it default value, use "\-x ITEM"\&.
+.PP
+To set an ITEM name to a value, use "\-z ITEM,VAL"\&.
+.PP
+See the EXAMPLES section for concrete examples\&.
+.SH "EXAMPLES"
+.PP
+Decode raw log file:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ubxtool \-r \-f ublox\-neo\-m8n\&.log
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Change GPS port speed of device on /dev/ttyAMA0 to 230,400 bps:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ubxtool \-S 230400 \-f /dev/ttyAMA0
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Watch entire GPS reset cycle, include $GPTXT messages:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ubxtool \-p COLDBOOT \-w 20 \-v 2
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Poll Enabled Constellations:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ubxtool \-p CFG\-GNSS
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Dump gpsd data from a remote server named x\&.example\&.com:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+ubxtool \-w 5 x\&.example\&.com
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.SS "Version 27+ examples"
+.PP
+The following examples require a GPS supporting protocol 27 or greater\&.
+.PP
+To check the current dynamic model, change it to 6 (AIR1, Airborne with <1g acceleration), revert to the default setting, and verify the faults was restored\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+$ ubxtool \-g CFG\-NAVSPG\-DYNMODEL
+[\&.\&.\&.]
+UBX\-CFG\-VALGET:
+ version 1 layer 0 reserved 0,0
+  layers (ram)
+    item CFG\-NAVSPG\-DYNMODEL/0x20110021 val 2
+[\&.\&.\&.]
+$ ubxtool \-z CFG\-NAVSPG\-DYNMODEL,6
+[\&.\&.\&.]
+UBX\-ACK\-ACK:
+ ACK to Class x6 (CFG) ID x8a (VALSET)
+[\&.\&.\&.]
+$ ubxtool \-g CFG\-NAVSPG\-DYNMODEL
+[\&.\&.\&.]
+UBX\-CFG\-VALGET:
+ version 1 layer 0 reserved 0,0
+  layers (ram)
+    item CFG\-NAVSPG\-DYNMODEL/0x20110021 val 6
+[\&.\&.\&.]
+$ ubxtool \-x CFG\-NAVSPG\-DYNMODEL
+[\&.\&.\&.]
+UBX\-ACK\-ACK:
+ ACK to Class x6 (CFG) ID x8c (VALDEL)
+[\&.\&.\&.]
+$ ubxtool \-g CFG\-NAVSPG\-DYNMODEL
+[\&.\&.\&.]
+UBX\-CFG\-VALGET:
+ version 1 layer 0 reserved 0,0
+  layers (ram)
+    item CFG\-NAVSPG\-DYNMODEL/0x20110021 val 6
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Notice that the current DYNMODEL stayed at 6 (AIR1)\&. The "\-x" only affects the saved setting, not the current setting\&. To change the current setting you must set it with "\-z"\&.
+.SH "ENVIRONMENT"
+.PP
+Options can be placed in the UBXOPTS environment variable\&. UBXOPTS is processed before the CLI options\&.
+.SH "SEE ALSO"
+.PP
+ubxtool
+is written to conform to the official u\-blox documentation for the u\-blox binary protocol\&.
+\m[blue]\fB\%https://www.u-blox.com/en/product-resources\fR\m[]
+.PP
+\fBcgps\fR(1),
+\fBgpscat\fR(1),
+\fBgpsctl\fR(1),
+\fBgpsfake\fR(1),
+\fBxgps\fR(1),
+\fBgpsd\fR(8),
+.SH "AUTHOR"
+.PP
+Gary E\&. Miller<gem@rellim\&.com>
