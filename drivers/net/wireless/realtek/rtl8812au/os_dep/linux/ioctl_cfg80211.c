@@ -68,7 +68,7 @@
 #define RTW_MAX_REMAIN_ON_CHANNEL_DURATION 5000 /* ms */
 #define RTW_MAX_NUM_PMKIDS 4
 
-#define RTW_CH_MAX_2G_CHANNEL               14      /* Max channel in 2G band */
+#define RTW_CH_MAX_2G_CHANNEL               25      /* Max channel in 2G band */
 
 #ifdef CONFIG_WAPI_SUPPORT
 
@@ -197,6 +197,18 @@ static struct ieee80211_channel rtw_2ghz_channels[MAX_CHANNEL_NUM_2G] = {
 	CHAN2G(12, 2467, 0),
 	CHAN2G(13, 2472, 0),
 	CHAN2G(14, 2484, 0),
+	CHAN2G(15, 2502, 0), 
+	CHAN2G(16, 2487, 0),
+	CHAN2G(17, 2492, 0), 
+	CHAN2G(18, 2497, 0), 
+	CHAN2G(19, 2502, 0), 
+	CHAN2G(20, 2507, 0), 
+	CHAN2G(21, 2512, 0), 
+	CHAN2G(22, 2517, 0), 
+	CHAN2G(23, 2522, 0), 
+	CHAN2G(24, 2527, 0), 
+	CHAN2G(25, 2532, 0), 
+
 };
 
 /* from center_ch_5g_20m */

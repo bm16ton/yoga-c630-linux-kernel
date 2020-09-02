@@ -34,7 +34,7 @@ static struct country_code_to_enum_rd allCountries[] = {
 
 /* 2G chan 01 - chan 11 */
 #define RTW_2GHZ_CH01_11	\
-	REG_RULE(2412-10, 2462+10, 40, 0, 20, 0)
+	REG_RULE(2312-10, 2752+10, 40, 0, 20, 0)
 
 /*
  *We enable active scan on these a case
@@ -43,33 +43,27 @@ static struct country_code_to_enum_rd allCountries[] = {
 
 /* 2G chan 12 - chan 13, PASSIV SCAN */
 #define RTW_2GHZ_CH12_13	\
-	REG_RULE(2467-10, 2472+10, 40, 0, 20,	\
-		 NL80211_RRF_PASSIVE_SCAN)
+	REG_RULE(2312-10, 2752+10, 40, 0, 20, 0)
 
 /* 2G chan 14, PASSIVS SCAN, NO OFDM (B only) */
 #define RTW_2GHZ_CH14	\
-	REG_RULE(2484-10, 2484+10, 40, 0, 20,	\
-		 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_OFDM)
+	REG_RULE(2484-10, 2752+10, 40, 0, 20, 0)
 
 /* 5G chan 36 - chan 64 */
 #define RTW_5GHZ_5150_5350	\
-	REG_RULE(5150-10, 5350+10, 80, 0, 30,	\
-	NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+	REG_RULE(4800-10, 6000+10, 80, 0, 30, 0)
 
 /* 5G chan 100 - chan 165 */
 #define RTW_5GHZ_5470_5850	\
-	REG_RULE(5470-10, 5850+10, 80, 0, 30, \
-	 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+	REG_RULE(4800-10, 6000+10, 80, 0, 30, 0)
 
 /* 5G chan 149 - chan 165 */
 #define RTW_5GHZ_5725_5850	\
-	REG_RULE(5725-10, 5850+10, 80, 0, 30, \
-		NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+	REG_RULE(4800-10, 6000+10, 80, 0, 30, 0)
 
 /* 5G chan 36 - chan 165 */
 #define RTW_5GHZ_5150_5850	\
-	REG_RULE(5150-10, 5850+10, 80, 0, 30,	\
-		 NL80211_RRF_PASSIVE_SCAN | NL80211_RRF_NO_IBSS)
+	REG_RULE(4800-10, 6000+10, 80, 0, 30, 0)
 
 static const struct ieee80211_regdomain rtw_regdom_rd = {
 	.n_reg_rules = 4,

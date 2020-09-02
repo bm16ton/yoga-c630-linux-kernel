@@ -103,7 +103,7 @@ void odm_txpowertracking_callback_thermal_meter(void *dm);
 void odm_txpowertracking_callback_thermal_meter(void *adapter);
 #endif
 
-#define ODM_TARGET_CHNL_NUM_2G_5G 59
+#define ODM_TARGET_CHNL_NUM_2G_5G 66
 
 void odm_reset_iqk_result(void *dm_void);
 u8 odm_get_right_chnl_place_for_iqk(u8 chnl);

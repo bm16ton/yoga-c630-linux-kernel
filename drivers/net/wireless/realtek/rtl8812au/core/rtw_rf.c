@@ -22,7 +22,7 @@ u8 center_ch_2g[CENTER_CH_2G_NUM] = {
 /* G01 */3, 4, 5,
 /* G02 */6, 7, 8,
 /* G03 */9, 10, 11,
-/* G04 */12, 13,
+/* G04 */12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
 /* G05 */14
 };
 
@@ -217,13 +217,13 @@ u8 rtw_get_scch_by_cch_offset(u8 cch, u8 bw, u8 offset)
 	}
 
 	/* 2.4G, 40MHz */
-	if (cch >= 3 && cch <= 11 && bw == CHANNEL_WIDTH_40) {
+	if (cch >= 3 && cch <= 25 && bw == CHANNEL_WIDTH_40) {
 		t_cch = (offset == HAL_PRIME_CHNL_OFFSET_UPPER) ? cch + 2 : cch - 2;
 		goto exit;
 	}
 
 	/* 5G, 160MHz */
-	if (cch >= 50 && cch <= 163 && bw == CHANNEL_WIDTH_160) {
+	if (cch >= 50 && cch <= 173 && bw == CHANNEL_WIDTH_160) {
 		t_cch = (offset == HAL_PRIME_CHNL_OFFSET_UPPER) ? cch + 8 : cch - 8;
 		goto exit;
 
@@ -353,7 +353,7 @@ u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group)
 	BAND_TYPE band = BAND_MAX;
 	s8 gp = -1, cck_gp = -1;
 
-	if (ch <= 14) {
+	if (ch <= 25) {
 		band = BAND_ON_2_4G;
 
 		if (1 <= ch && ch <= 2)
@@ -362,7 +362,7 @@ u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group)
 			gp = 1;
 		else if (6  <= ch && ch <= 8)
 			gp = 2;
-		else if (9  <= ch && ch <= 11)
+		else if (9  <= ch && ch <= 25)
 			gp = 3;
 		else if (12 <= ch && ch <= 14)
 			gp = 4;
@@ -436,10 +436,12 @@ int rtw_ch2freq(int chan)
 	* because we don't support it. simply judge from channel number
 	*/
 
-	if (chan >= 1 && chan <= 14) {
+	if (chan >= 1 && chan <= 29) {
 		if (chan == 14)
 			return 2484;
 		else if (chan < 14)
+			return 2407 + chan * 5;
+		else if (chan > 14 && chan <= 29)
 			return 2407 + chan * 5;
 	} else if (chan >= 36 && chan <= 177)
 		return 5000 + chan * 5;
@@ -453,6 +455,8 @@ int rtw_freq2ch(int freq)
 	if (freq == 2484)
 		return 14;
 	else if (freq < 2484)
+		return (freq - 2407) / 5;
+	else if (freq > 2484 && freq <= 2552)
 		return (freq - 2407) / 5;
 	else if (freq >= 4910 && freq <= 4980)
 		return (freq - 4000) / 5;
@@ -1190,7 +1194,7 @@ int rtw_ch_to_bb_gain_sel(int ch)
 {
 	int sel = -1;
 
-	if (ch >= 1 && ch <= 14)
+	if (ch >= 1 && ch <= 25)
 		sel = BB_GAIN_2G;
 #ifdef CONFIG_IEEE80211_BAND_5GHZ
 	else if (ch >= 36 && ch < 48)

@@ -3934,7 +3934,7 @@ exit:
 
 static sint fill_radiotap_hdr(_adapter *padapter, union recv_frame *precvframe, u8 *buf)
 {
-#define CHAN2FREQ(a) ((a < 14) ? (2407+5*a) : (5000+5*a))
+#define CHAN2FREQ(a) ((a < 25) ? (2407+5*a) : (5000+5*a))
 
 #if 0
 #define RTW_RX_RADIOTAP_PRESENT (\
