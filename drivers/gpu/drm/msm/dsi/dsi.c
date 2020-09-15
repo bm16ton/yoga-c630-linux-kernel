@@ -77,6 +77,7 @@ static struct msm_dsi *dsi_init(struct platform_device *pdev)
 
 	msm_dsi->id = -1;
 	msm_dsi->pdev = pdev;
+	msm_dsi->enabled_at_boot = msm_is_enabled(&pdev->dev);
 	platform_set_drvdata(pdev, msm_dsi);
 
 	/* Init dsi host */
@@ -91,6 +92,12 @@ static struct msm_dsi *dsi_init(struct platform_device *pdev)
 
 	/* Register to dsi manager */
 	ret = msm_dsi_manager_register(msm_dsi);
+	if (ret)
+		goto destroy_dsi;
+
+	msm_dsi_host_post_init(msm_dsi);
+
+	ret = msm_dsi_manager_setup_pll(msm_dsi);
 	if (ret)
 		goto destroy_dsi;
 
