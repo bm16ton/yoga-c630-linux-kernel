@@ -1,0 +1,57 @@
+--- a/drivers/gpu/drm/drm_client.c
++++ b/drivers/gpu/drm/drm_client.c
+@@ -483,6 +483,39 @@ void drm_client_framebuffer_delete(struct drm_client_buffer *buffer)
+ }
+ EXPORT_SYMBOL(drm_client_framebuffer_delete);
+ 
++/**
++ * drm_client_framebuffer_flush - Manually flush client framebuffer
++ * @buffer: DRM client buffer (can be NULL)
++ * @rect: Damage rectangle (if NULL flushes all)
++ *
++ * This calls &drm_framebuffer_funcs->dirty (if present) to flush buffer changes
++ * for drivers that need it.
++ *
++ * Returns:
++ * Zero on success or negative error code on failure.
++ */
++int drm_client_framebuffer_flush(struct drm_client_buffer *buffer, struct drm_rect *rect)
++{
++	if (!buffer || !buffer->fb || !buffer->fb->funcs->dirty)
++		return 0;
++
++	if (rect) {
++		struct drm_clip_rect clip = {
++			.x1 = rect->x1,
++			.y1 = rect->y1,
++			.x2 = rect->x2,
++			.y2 = rect->y2,
++		};
++
++		return buffer->fb->funcs->dirty(buffer->fb, buffer->client->file,
++						0, 0, &clip, 1);
++	}
++
++	return buffer->fb->funcs->dirty(buffer->fb, buffer->client->file,
++					0, 0, NULL, 0);
++}
++EXPORT_SYMBOL(drm_client_framebuffer_flush);
++
+ #ifdef CONFIG_DEBUG_FS
+ static int drm_client_debugfs_internal_clients(struct seq_file *m, void *data)
+ {
+diff --git a/include/drm/drm_client.h b/include/drm/drm_client.h
+index 96ebc7523aa0..9737dd7b147f 100644
+--- a/include/drm/drm_client.h
++++ b/include/drm/drm_client.h
+@@ -156,6 +156,7 @@ struct drm_client_buffer {
+ struct drm_client_buffer *
+ drm_client_framebuffer_create(struct drm_client_dev *client, u32 width, u32 height, u32 format);
+ void drm_client_framebuffer_delete(struct drm_client_buffer *buffer);
++int drm_client_framebuffer_flush(struct drm_client_buffer *buffer, struct drm_rect *rect);
+ void *drm_client_buffer_vmap(struct drm_client_buffer *buffer);
+ void drm_client_buffer_vunmap(struct drm_client_buffer *buffer);
+ 
+-- 
+2.23.0
+
