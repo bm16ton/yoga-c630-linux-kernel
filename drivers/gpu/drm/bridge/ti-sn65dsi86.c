@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (c) 2018, The Linux Foundation. All rights reserved.
- * datasheet: http://www.ti.com/lit/ds/symlink/sn65dsi86.pdf
+ * datasheet: https://www.ti.com/lit/ds/symlink/sn65dsi86.pdf
  */
 
+#include <linux/bits.h>
 #include <linux/clk.h>
 #include <linux/debugfs.h>
 #include <linux/gpio/consumer.h>
+#include <linux/gpio/driver.h>
 #include <linux/i2c.h>
 #include <linux/iopoll.h>
 #include <linux/module.h>
@@ -48,23 +50,25 @@
 #define SN_CHA_VERTICAL_BACK_PORCH_REG		0x36
 #define SN_CHA_HORIZONTAL_FRONT_PORCH_REG	0x38
 #define SN_CHA_VERTICAL_FRONT_PORCH_REG		0x3A
+#define SN_LN_ASSIGN_REG			0x59
+#define  LN_ASSIGN_WIDTH			2
 #define SN_ENH_FRAME_REG			0x5A
 #define  VSTREAM_ENABLE				BIT(3)
+#define  LN_POLRS_OFFSET			4
+#define  LN_POLRS_MASK				0xf0
 #define SN_DATA_FORMAT_REG			0x5B
 #define  BPP_18_RGB				BIT(0)
 #define SN_HPD_DISABLE_REG			0x5C
 #define  HPD_DISABLE				BIT(0)
-#define SN_GPIO_CTRL				0x5F
-#define  GPIO_CTRL_INPUT			0
-#define  GPIO_CTRL_OUTPUT			1
-#define  GPIO_CTRL_PWM				2
-#define  GPIO_CTRL_SYNC				2
-#define  GPIO_CTRL_SUSPEND			2
-#define  GPIO_CTRL_MASK				3
-#define  GPIO_CTRL_GPIO1_SHIFT			0
-#define  GPIO_CTRL_GPIO2_SHIFT			2
-#define  GPIO_CTRL_GPIO3_SHIFT			4
-#define  GPIO_CTRL_GPIO4_SHIFT			6
+#define SN_GPIO_IO_REG				0x5E
+#define  SN_GPIO_INPUT_SHIFT			4
+#define  SN_GPIO_OUTPUT_SHIFT			0
+#define SN_GPIO_CTRL_REG			0x5F
+#define  SN_GPIO_MUX_INPUT			0
+#define  SN_GPIO_MUX_OUTPUT			1
+#define  SN_GPIO_MUX_SPECIAL			2
+#define  SN_GPIO_MUX_MASK			0x3
+#define  SN_GPIO_MUX_SHIFT(gpio)		((gpio) * 2)
 #define SN_AUX_WDATA_REG(x)			(0x64 + (x))
 #define SN_AUX_ADDR_19_16_REG			0x74
 #define SN_AUX_ADDR_15_8_REG			0x75
@@ -83,13 +87,12 @@
 #define SN_ML_TX_MODE_REG			0x96
 #define  ML_TX_MAIN_LINK_OFF			0
 #define  ML_TX_NORMAL_MODE			BIT(0)
-#define SN_BACKLIGHT_SCALE_LOW			0xA1
-#define SN_BACKLIGHT_SCALE_HIGH			0xA2
-#define SN_BACKLIGHT_LOW			0xA3
-#define SN_BACKLIGHT_HIGH			0xA4
-#define SN_BACKLIGHT_PWM			0xA5
-#define  BL_PWM_ENABLE				BIT(1)
-#define  BL_PWM_INVERT				BIT(0)
+#define SN_PWM_PRE_DIV_REG			0xA0
+#define SN_BACKLIGHT_SCALE_REG			0xA1
+#define SN_BACKLIGHT_REG			0xA3
+#define SN_PWM_CTL_REG				0xA5
+#define  SN_PWM_ENABLE				BIT(1)
+#define  SN_PWM_INVERT				BIT(0)
 #define SN_AUX_CMD_STATUS_REG			0xF4
 #define  AUX_IRQ_STATUS_AUX_RPLY_TOUT		BIT(3)
 #define  AUX_IRQ_STATUS_AUX_SHORT		BIT(5)
@@ -106,6 +109,38 @@
 
 #define SN_REGULATOR_SUPPLY_NUM		4
 
+#define SN_MAX_DP_LANES			4
+#define SN_NUM_GPIOS			4
+#define SN_GPIO_PHYSICAL_OFFSET		1
+
+/**
+ * struct ti_sn_bridge - Platform data for ti-sn65dsi86 driver.
+ * @dev:          Pointer to our device.
+ * @regmap:       Regmap for accessing i2c.
+ * @aux:          Our aux channel.
+ * @bridge:       Our bridge.
+ * @connector:    Our connector.
+ * @debugfs:      Used for managing our debugfs.
+ * @host_node:    Remote DSI node.
+ * @dsi:          Our MIPI DSI source.
+ * @refclk:       Our reference clock.
+ * @panel:        Our panel.
+ * @enable_gpio:  The GPIO we toggle to enable the bridge.
+ * @supplies:     Data for bulk enabling/disabling our regulators.
+ * @dp_lanes:     Count of dp_lanes we're using.
+ * @ln_assign:    Value to program to the LN_ASSIGN register.
+ * @ln_polrs:     Value for the 4-bit LN_POLRS field of SN_ENH_FRAME_REG.
+ *
+ * @gchip:        If we expose our GPIOs, this is used.
+ * @gchip_output: A cache of whether we've set GPIOs to output.  This
+ *                serves double-duty of keeping track of the direction and
+ *                also keeping track of whether we've incremented the
+ *                pm_runtime reference count for this pin, which we do
+ *                whenever a pin is configured as an output.  This is a
+ *                bitmap so we can do atomic ops on it without an extra
+ *                lock so concurrent users of our 4 GPIOs don't stomp on
+ *                each other's read-modify-write.
+ */
 struct ti_sn_bridge {
 	struct device			*dev;
 	struct regmap			*regmap;
@@ -120,6 +155,13 @@ struct ti_sn_bridge {
 	struct gpio_desc		*enable_gpio;
 	struct regulator_bulk_data	supplies[SN_REGULATOR_SUPPLY_NUM];
 	int				dp_lanes;
+	u8				ln_assign;
+	u8				ln_polrs;
+
+#if defined(CONFIG_OF_GPIO)
+	struct gpio_chip		gchip;
+	DECLARE_BITMAP(gchip_output, SN_NUM_GPIOS);
+#endif
 	u32				brightness;
 	u32				max_brightness;
 };
@@ -140,13 +182,67 @@ static const struct regmap_config ti_sn_bridge_regmap_config = {
 	.cache_type = REGCACHE_NONE,
 };
 
-static int ti_sn_backlight_update(struct ti_sn_bridge *pdata);
+static void ti_sn_bridge_read_u16(struct ti_sn_bridge *pdata,
+				  unsigned int reg, u16 *val)
+{
+	unsigned int high;
+	unsigned int low;
+
+	regmap_read(pdata->regmap, reg, &low);
+	regmap_read(pdata->regmap, reg + 1, &high);
+
+	*val = high << 8 | low;
+}
 
 static void ti_sn_bridge_write_u16(struct ti_sn_bridge *pdata,
 				   unsigned int reg, u16 val)
 {
 	regmap_write(pdata->regmap, reg, val & 0xFF);
 	regmap_write(pdata->regmap, reg + 1, val >> 8);
+}
+
+static int ti_sn_backlight_update(struct ti_sn_bridge *pdata)
+{
+	unsigned int pre_div;
+
+	if (!pdata->max_brightness)
+		return 0;
+
+	/* Enable PWM on GPIO4 */
+	regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
+			   SN_GPIO_MUX_MASK << SN_GPIO_MUX_SHIFT(4 - 1),
+			   SN_GPIO_MUX_SPECIAL << SN_GPIO_MUX_SHIFT(4 - 1));
+
+	if (pdata->brightness) {
+		/* Set max brightness */
+		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_SCALE_REG, pdata->max_brightness);
+
+		/* Set brightness */
+		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_REG, pdata->brightness);
+
+		/*
+		 * The PWM frequency is derived from the refclk as:
+		 * PWM_FREQ = REFCLK_FREQ / (PWM_PRE_DIV * BACKLIGHT_SCALE + 1)
+		 *
+		 * A hand wavy estimate based on 12MHz refclk and 500Hz desired
+		 * PWM frequency gives us a pre_div resulting in a PWM
+		 * frequency of between 500 and 1600Hz, depending on the actual
+		 * refclk rate.
+		 *
+		 * One is added to avoid high BACKLIGHT_SCALE values to produce
+		 * a pre_div of 0 - which cancels out the large BACKLIGHT_SCALE
+		 * value.
+		 */
+		pre_div = 12000000 / (500 * pdata->max_brightness) + 1;
+		regmap_write(pdata->regmap, SN_PWM_PRE_DIV_REG, pre_div);
+
+		/* Enable PWM */
+		regmap_update_bits(pdata->regmap, SN_PWM_CTL_REG, SN_PWM_ENABLE, SN_PWM_ENABLE);
+	} else {
+		regmap_update_bits(pdata->regmap, SN_PWM_CTL_REG, SN_PWM_ENABLE, 0);
+	}
+
+	return 0;
 }
 
 static int __maybe_unused ti_sn_bridge_resume(struct device *dev)
@@ -181,6 +277,8 @@ static int __maybe_unused ti_sn_bridge_suspend(struct device *dev)
 
 static const struct dev_pm_ops ti_sn_bridge_pm_ops = {
 	SET_RUNTIME_PM_OPS(ti_sn_bridge_suspend, ti_sn_bridge_resume, NULL)
+	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
+				pm_runtime_force_resume)
 };
 
 static int status_show(struct seq_file *s, void *data)
@@ -303,12 +401,6 @@ static int ti_sn_bridge_attach(struct drm_bridge *bridge,
 	if (flags & DRM_BRIDGE_ATTACH_NO_CONNECTOR) {
 		DRM_ERROR("Fix bridge driver to make connector optional!");
 		return -EINVAL;
-	}
-
-	if (gpiod_get_value(pdata->enable_gpio)) {
-		pm_runtime_enable(pdata->dev);
-		ti_sn_bridge_resume(pdata->dev);
-		ti_sn_bridge_suspend(pdata->dev);
 	}
 
 	ret = drm_connector_init(bridge->dev, &pdata->connector,
@@ -479,7 +571,7 @@ static unsigned int ti_sn_bridge_get_bpp(struct ti_sn_bridge *pdata)
 		return 24;
 }
 
-/**
+/*
  * LUT index corresponds to register value and
  * LUT values corresponds to dp data rate supported
  * by the bridge in Mbps unit.
@@ -577,13 +669,13 @@ static void ti_sn_bridge_read_valid_rates(struct ti_sn_bridge *pdata,
 		DRM_DEV_ERROR(pdata->dev,
 			      "Unexpected max rate (%#x); assuming 5.4 GHz\n",
 			      (int)dpcd_val);
-		/* fall through */
+		fallthrough;
 	case DP_LINK_BW_5_4:
 		rate_valid[7] = 1;
-		/* fall through */
+		fallthrough;
 	case DP_LINK_BW_2_7:
 		rate_valid[4] = 1;
-		/* fall through */
+		fallthrough;
 	case DP_LINK_BW_1_62:
 		rate_valid[1] = 1;
 		break;
@@ -694,25 +786,19 @@ static void ti_sn_bridge_enable(struct drm_bridge *bridge)
 	int dp_rate_idx;
 	unsigned int val;
 	int ret = -EINVAL;
+	int max_dp_lanes;
 
-	/*
-	 * Run with the maximum number of lanes that the DP sink supports.
-	 *
-	 * Depending use cases, we might want to revisit this later because:
-	 * - It's plausible that someone may have run fewer lines to the
-	 *   sink than the sink actually supports, assuming that the lines
-	 *   will just be driven at a higher rate.
-	 * - The DP spec seems to indicate that it's more important to minimize
-	 *   the number of lanes than the link rate.
-	 *
-	 * If we do revisit, it would be important to measure the power impact.
-	 */
-	pdata->dp_lanes = ti_sn_get_max_lanes(pdata);
+	max_dp_lanes = ti_sn_get_max_lanes(pdata);
+	pdata->dp_lanes = min(pdata->dp_lanes, max_dp_lanes);
 
 	/* DSI_A lane config */
-	val = CHA_DSI_LANES(4 - pdata->dsi->lanes);
+	val = CHA_DSI_LANES(SN_MAX_DP_LANES - pdata->dsi->lanes);
 	regmap_update_bits(pdata->regmap, SN_DSI_LANES_REG,
 			   CHA_DSI_LANES_MASK, val);
+
+	regmap_write(pdata->regmap, SN_LN_ASSIGN_REG, pdata->ln_assign);
+	regmap_update_bits(pdata->regmap, SN_ENH_FRAME_REG, LN_POLRS_MASK,
+			   pdata->ln_polrs << LN_POLRS_OFFSET);
 
 	/* set dsi clk frequency value */
 	ti_sn_bridge_set_dsi_rate(pdata);
@@ -908,33 +994,239 @@ static int ti_sn_bridge_parse_dsi_host(struct ti_sn_bridge *pdata)
 	return 0;
 }
 
-static int ti_sn_backlight_update(struct ti_sn_bridge *pdata)
+#if defined(CONFIG_OF_GPIO)
+
+static int tn_sn_bridge_of_xlate(struct gpio_chip *chip,
+				 const struct of_phandle_args *gpiospec,
+				 u32 *flags)
 {
-	if (!pdata->max_brightness)
-		return 0;
+	if (WARN_ON(gpiospec->args_count < chip->of_gpio_n_cells))
+		return -EINVAL;
 
-	/* Enable PWM on GPIO4 */
-	regmap_update_bits(pdata->regmap, SN_GPIO_CTRL,
-			   GPIO_CTRL_MASK << GPIO_CTRL_GPIO4_SHIFT,
-			   GPIO_CTRL_PWM << GPIO_CTRL_GPIO4_SHIFT);
+	if (gpiospec->args[0] > chip->ngpio || gpiospec->args[0] < 1)
+		return -EINVAL;
 
-	/* Set max brightness, high and low bytes */
-	ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_SCALE_LOW, pdata->max_brightness);
+	if (flags)
+		*flags = gpiospec->args[1];
 
-	if (pdata->brightness) {
-		/* Set brightness */
-		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_LOW, pdata->brightness);
+	return gpiospec->args[0] - SN_GPIO_PHYSICAL_OFFSET;
+}
 
-		/* Reduce the PWM frequency */
-		regmap_write(pdata->regmap, 0xa0, 75);
+static int ti_sn_bridge_gpio_get_direction(struct gpio_chip *chip,
+					   unsigned int offset)
+{
+	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
 
-		/* Enable PWM */
-		regmap_update_bits(pdata->regmap, SN_BACKLIGHT_PWM, BL_PWM_ENABLE, BL_PWM_ENABLE);
-	} else {
-		regmap_update_bits(pdata->regmap, SN_BACKLIGHT_PWM, BL_PWM_ENABLE, 0);
+	/*
+	 * We already have to keep track of the direction because we use
+	 * that to figure out whether we've powered the device.  We can
+	 * just return that rather than (maybe) powering up the device
+	 * to ask its direction.
+	 */
+	return test_bit(offset, pdata->gchip_output) ?
+		GPIO_LINE_DIRECTION_OUT : GPIO_LINE_DIRECTION_IN;
+}
+
+static int ti_sn_bridge_gpio_get(struct gpio_chip *chip, unsigned int offset)
+{
+	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
+	unsigned int val;
+	int ret;
+
+	/*
+	 * When the pin is an input we don't forcibly keep the bridge
+	 * powered--we just power it on to read the pin.  NOTE: part of
+	 * the reason this works is that the bridge defaults (when
+	 * powered back on) to all 4 GPIOs being configured as GPIO input.
+	 * Also note that if something else is keeping the chip powered the
+	 * pm_runtime functions are lightweight increments of a refcount.
+	 */
+	pm_runtime_get_sync(pdata->dev);
+	ret = regmap_read(pdata->regmap, SN_GPIO_IO_REG, &val);
+	pm_runtime_put(pdata->dev);
+
+	if (ret)
+		return ret;
+
+	return !!(val & BIT(SN_GPIO_INPUT_SHIFT + offset));
+}
+
+static void ti_sn_bridge_gpio_set(struct gpio_chip *chip, unsigned int offset,
+				  int val)
+{
+	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
+	int ret;
+
+	if (!test_bit(offset, pdata->gchip_output)) {
+		dev_err(pdata->dev, "Ignoring GPIO set while input\n");
+		return;
 	}
 
+	val &= 1;
+	ret = regmap_update_bits(pdata->regmap, SN_GPIO_IO_REG,
+				 BIT(SN_GPIO_OUTPUT_SHIFT + offset),
+				 val << (SN_GPIO_OUTPUT_SHIFT + offset));
+	if (ret)
+		dev_warn(pdata->dev,
+			 "Failed to set bridge GPIO %u: %d\n", offset, ret);
+}
+
+static int ti_sn_bridge_gpio_direction_input(struct gpio_chip *chip,
+					     unsigned int offset)
+{
+	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
+	int shift = SN_GPIO_MUX_SHIFT(offset);
+	int ret;
+
+	if (!test_and_clear_bit(offset, pdata->gchip_output))
+		return 0;
+
+	ret = regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
+				 SN_GPIO_MUX_MASK << shift,
+				 SN_GPIO_MUX_INPUT << shift);
+	if (ret) {
+		set_bit(offset, pdata->gchip_output);
+		return ret;
+	}
+
+	/*
+	 * NOTE: if nobody else is powering the device this may fully power
+	 * it off and when it comes back it will have lost all state, but
+	 * that's OK because the default is input and we're now an input.
+	 */
+	pm_runtime_put(pdata->dev);
+
 	return 0;
+}
+
+static int ti_sn_bridge_gpio_direction_output(struct gpio_chip *chip,
+					      unsigned int offset, int val)
+{
+	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
+	int shift = SN_GPIO_MUX_SHIFT(offset);
+	int ret;
+
+	if (test_and_set_bit(offset, pdata->gchip_output))
+		return 0;
+
+	pm_runtime_get_sync(pdata->dev);
+
+	/* Set value first to avoid glitching */
+	ti_sn_bridge_gpio_set(chip, offset, val);
+
+	/* Set direction */
+	ret = regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
+				 SN_GPIO_MUX_MASK << shift,
+				 SN_GPIO_MUX_OUTPUT << shift);
+	if (ret) {
+		clear_bit(offset, pdata->gchip_output);
+		pm_runtime_put(pdata->dev);
+	}
+
+	return ret;
+}
+
+static void ti_sn_bridge_gpio_free(struct gpio_chip *chip, unsigned int offset)
+{
+	/* We won't keep pm_runtime if we're input, so switch there on free */
+	ti_sn_bridge_gpio_direction_input(chip, offset);
+}
+
+static const char * const ti_sn_bridge_gpio_names[SN_NUM_GPIOS] = {
+	"GPIO1", "GPIO2", "GPIO3", "GPIO4"
+};
+
+static int ti_sn_setup_gpio_controller(struct ti_sn_bridge *pdata)
+{
+	int ngpio = SN_NUM_GPIOS;
+	int ret;
+
+	/* Only init if someone is going to use us as a GPIO controller */
+	if (!of_property_read_bool(pdata->dev->of_node, "gpio-controller"))
+		return 0;
+
+	/* If GPIO4 is used for backlight, reduce number of gpios */
+	if (pdata->max_brightness)
+		ngpio--;
+
+	pdata->gchip.label = dev_name(pdata->dev);
+	pdata->gchip.parent = pdata->dev;
+	pdata->gchip.owner = THIS_MODULE;
+	pdata->gchip.of_xlate = tn_sn_bridge_of_xlate;
+	pdata->gchip.of_gpio_n_cells = 2;
+	pdata->gchip.free = ti_sn_bridge_gpio_free;
+	pdata->gchip.get_direction = ti_sn_bridge_gpio_get_direction;
+	pdata->gchip.direction_input = ti_sn_bridge_gpio_direction_input;
+	pdata->gchip.direction_output = ti_sn_bridge_gpio_direction_output;
+	pdata->gchip.get = ti_sn_bridge_gpio_get;
+	pdata->gchip.set = ti_sn_bridge_gpio_set;
+	pdata->gchip.can_sleep = true;
+	pdata->gchip.names = ti_sn_bridge_gpio_names;
+	pdata->gchip.ngpio = ngpio;
+	pdata->gchip.base = -1;
+	ret = devm_gpiochip_add_data(pdata->dev, &pdata->gchip, pdata);
+	if (ret)
+		dev_err(pdata->dev, "can't add gpio chip\n");
+
+	return ret;
+}
+
+#else
+
+static inline int ti_sn_setup_gpio_controller(struct ti_sn_bridge *pdata)
+{
+	return 0;
+}
+
+#endif
+
+static void ti_sn_bridge_parse_lanes(struct ti_sn_bridge *pdata,
+				     struct device_node *np)
+{
+	u32 lane_assignments[SN_MAX_DP_LANES] = { 0, 1, 2, 3 };
+	u32 lane_polarities[SN_MAX_DP_LANES] = { };
+	struct device_node *endpoint;
+	u8 ln_assign = 0;
+	u8 ln_polrs = 0;
+	int dp_lanes;
+	int i;
+
+	/*
+	 * Read config from the device tree about lane remapping and lane
+	 * polarities.  These are optional and we assume identity map and
+	 * normal polarity if nothing is specified.  It's OK to specify just
+	 * data-lanes but not lane-polarities but not vice versa.
+	 *
+	 * Error checking is light (we just make sure we don't crash or
+	 * buffer overrun) and we assume dts is well formed and specifying
+	 * mappings that the hardware supports.
+	 */
+	endpoint = of_graph_get_endpoint_by_regs(np, 1, -1);
+	dp_lanes = of_property_count_u32_elems(endpoint, "data-lanes");
+	if (dp_lanes > 0 && dp_lanes <= SN_MAX_DP_LANES) {
+		of_property_read_u32_array(endpoint, "data-lanes",
+					   lane_assignments, dp_lanes);
+		of_property_read_u32_array(endpoint, "lane-polarities",
+					   lane_polarities, dp_lanes);
+	} else {
+		dp_lanes = SN_MAX_DP_LANES;
+	}
+	of_node_put(endpoint);
+
+	/*
+	 * Convert into register format.  Loop over all lanes even if
+	 * data-lanes had fewer elements so that we nicely initialize
+	 * the LN_ASSIGN register.
+	 */
+	for (i = SN_MAX_DP_LANES - 1; i >= 0; i--) {
+		ln_assign = ln_assign << LN_ASSIGN_WIDTH | lane_assignments[i];
+		ln_polrs = ln_polrs << 1 | lane_polarities[i];
+	}
+
+	/* Stash in our struct for when we power on */
+	pdata->dp_lanes = dp_lanes;
+	pdata->ln_assign = ln_assign;
+	pdata->ln_polrs = ln_polrs;
 }
 
 static int ti_sn_backlight_update_status(struct backlight_device *bl)
@@ -956,19 +1248,11 @@ static int ti_sn_backlight_update_status(struct backlight_device *bl)
 static int ti_sn_backlight_get_brightness(struct backlight_device *bl)
 {
 	struct ti_sn_bridge *pdata = bl_get_data(bl);
-	unsigned int high;
-	unsigned int low;
-	int ret;
+	u16 val;
 
-	ret = regmap_read(pdata->regmap, SN_BACKLIGHT_LOW, &low);
-	if (ret)
-		return ret;
+	ti_sn_bridge_read_u16(pdata, SN_BACKLIGHT_REG, &val);
 
-	ret = regmap_read(pdata->regmap, SN_BACKLIGHT_HIGH, &high);
-	if (ret)
-		return ret;
-
-	return high << 8 | low;
+	return val;
 }
 
 const struct backlight_ops ti_sn_backlight_ops = {
@@ -984,22 +1268,18 @@ static int ti_sn_backlight_init(struct ti_sn_bridge *pdata)
 	struct device_node *np = dev->of_node;
 	int ret;
 
-	ret = of_property_read_u32(np, "max-brightness", &pdata->max_brightness);
+	ret = of_property_read_u32(np, "ti,backlight-scale", &pdata->max_brightness);
 	if (ret == -EINVAL) {
-		DRM_ERROR("max-brightness omitted\n");
 		return 0;
-	}
-	else if (ret || pdata->max_brightness >= 0xffff) {
+	} else if (ret || pdata->max_brightness >= 0xffff) {
 		DRM_ERROR("invalid max-brightness\n");
 		return -EINVAL;
 	}
 
 	props.type = BACKLIGHT_RAW;
 	props.max_brightness = pdata->max_brightness;
-	props.brightness = pdata->max_brightness;
-	pdata->brightness = pdata->max_brightness;
 	bl = devm_backlight_device_register(dev, "sn65dsi86", dev, pdata,
-					     &ti_sn_backlight_ops, &props);
+					    &ti_sn_backlight_ops, &props);
 	if (IS_ERR(bl)) {
 		DRM_ERROR("failed to register backlight device\n");
 		return PTR_ERR(bl);
@@ -1043,12 +1323,14 @@ static int ti_sn_bridge_probe(struct i2c_client *client,
 	dev_set_drvdata(&client->dev, pdata);
 
 	pdata->enable_gpio = devm_gpiod_get(pdata->dev, "enable",
-					    GPIOD_ASIS);
+					    GPIOD_OUT_LOW);
 	if (IS_ERR(pdata->enable_gpio)) {
 		DRM_ERROR("failed to get enable gpio from DT\n");
 		ret = PTR_ERR(pdata->enable_gpio);
 		return ret;
 	}
+
+	ti_sn_bridge_parse_lanes(pdata, client->dev.of_node);
 
 	ret = ti_sn_bridge_parse_regulators(pdata);
 	if (ret) {
@@ -1069,12 +1351,18 @@ static int ti_sn_bridge_probe(struct i2c_client *client,
 	if (ret)
 		return ret;
 
-	ret = ti_sn_backlight_init(pdata);
-	if (ret)
-		return ret;
+	pm_runtime_enable(pdata->dev);
 
-	if (!gpiod_get_value(pdata->enable_gpio)) {
-		pm_runtime_enable(pdata->dev);
+	ret = ti_sn_backlight_init(pdata);
+	if (ret) {
+		pm_runtime_disable(pdata->dev);
+		return ret;
+	}
+
+	ret = ti_sn_setup_gpio_controller(pdata);
+	if (ret) {
+		pm_runtime_disable(pdata->dev);
+		return ret;
 	}
 
 	i2c_set_clientdata(client, pdata);

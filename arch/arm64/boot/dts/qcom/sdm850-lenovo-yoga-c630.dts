@@ -80,9 +80,12 @@
 		qcom,pmic-id = "a";
 
 		vdd-l2-l8-l17-supply = <&vreg_s3a_1p35>;
+		vdd-l4-l5-supply = <&vreg_s7a_1p025>;
 		vdd-l7-l12-l14-l15-supply = <&vreg_s5a_2p04>;
 
 		vreg_s2a_1p125: smps2 {
+			regulator-min-microvolt = <1100000>;
+			regulator-max-microvolt = <1100000>;
 		};
 
 		vreg_s3a_1p35: smps3 {
@@ -392,7 +395,7 @@
 		clocks = <&sn65dsi86_refclk>;
 		clock-names = "refclk";
 
-		max-brightness = <255>;
+		ti,backlight-scale = <255>;
 
 		ports {
 			#address-cells = <1>;
@@ -429,12 +432,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&i2c12_hid_active>;
 	};
-};
-
-&ipa {
-	status = "okay";
-	modem-init;
-	memory-region = <&ipa_fw_mem>;
 };
 
 &mdss {
