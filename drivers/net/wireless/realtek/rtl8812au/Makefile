@@ -180,7 +180,7 @@ endif
 
 ifeq ($(CONFIG_RTL8812A)_$(CONFIG_RTL8821A)_$(CONFIG_RTL8814A), y_y_n)
 
-EXTRA_CFLAGS += -DDRV_NAME=\"rtl88XXau\"
+EXTRA_CFLAGS += -DDRV_NAME=\"rtl8812au\"
 ifeq ($(CONFIG_USB_HCI), y)
 USER_MODULE_NAME = 88XXau
 endif
@@ -2234,11 +2234,11 @@ $(MODULE_NAME)-y += $(_PLATFORM_FILES)
 
 $(MODULE_NAME)-$(CONFIG_MP_INCLUDED) += core/rtw_mp.o
 
-obj-$(CONFIG_88XXAU) := $(MODULE_NAME).o
+obj-$(CONFIG_RTL8812AU) := $(MODULE_NAME).o
 
 else
 
-export CONFIG_88XXAU = m
+export CONFIG_RTL8812AU = m
 
 all: modules
 
