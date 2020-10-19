@@ -2494,7 +2494,42 @@ int ath10k_wmi_event_mgmt_tx_bundle_compl(struct ath10k *ar, struct sk_buff *skb
 
 	return 0;
 }
+/*
+static inline enum nl80211_band phy_mode_to_band(u32 phy_mode, u32 channel)
+{
+	enum nl80211_band band;
 
+	switch (phy_mode) {
+	case MODE_11A:
+	case MODE_11NA_HT20:
+	case MODE_11NA_HT40:
+	case MODE_11AC_VHT20:
+	case MODE_11AC_VHT40:
+	case MODE_11AC_VHT80:
+		band = NL80211_BAND_5GHZ;
+	break;
+	case MODE_11B:
+		/* Hardware can Rx CCK rates on 5GHz. In that case phy_mode is
+		 * set to MODE_11B.
+		 */
+/*		if (channel < 1 || channel > 14) {
+			band = NL80211_BAND_5GHZ;
+			break;
+		}
+	case MODE_11G:
+	case MODE_11GONLY:
+	case MODE_11NG_HT20:
+	case MODE_11NG_HT40:
+	case MODE_11AC_VHT20_2G:
+	case MODE_11AC_VHT40_2G:
+	case MODE_11AC_VHT80_2G:
+	default:
+		band = NL80211_BAND_2GHZ;
+	}
+
+	return band;
+}
+*/
 int ath10k_wmi_event_mgmt_rx(struct ath10k *ar, struct sk_buff *skb)
 {
 	struct wmi_mgmt_rx_ev_arg arg = {};
@@ -2551,13 +2586,15 @@ int ath10k_wmi_event_mgmt_rx(struct ath10k *ar, struct sk_buff *skb)
 	} else if (channel >= 36 && channel <= ATH10K_MAX_5G_CHAN) {
 		status->band = NL80211_BAND_5GHZ;
 	} else {
-		/* Shouldn't happen unless list of advertised channels to
-		 * mac80211 has been changed.
-		 */
+		// Shouldn't happen unless list of advertised channels to
+		// mac80211 has been changed.
+		//
 		WARN_ON_ONCE(1);
 		dev_kfree_skb(skb);
 		return 0;
 	}
+	
+//	status->band = phy_mode_to_band(phy_mode, channel);
 
 	if (phy_mode == MODE_11B && status->band == NL80211_BAND_5GHZ)
 		ath10k_dbg(ar, ATH10K_DBG_MGMT, "wmi mgmt rx 11b (CCK) on 5GHz\n");
