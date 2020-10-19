@@ -2070,7 +2070,7 @@ config FB_DPF
 	select FB_SYS_IMAGEBLIT
 	select FB_SYS_FOPS
 	select FB_DEFERRED_IO
-	---help---
+	help
 	  Currently only mini DPF's based on ax206 chipsets and the Samsung
 	  SPF-8(X) series are supported. the ax206 requires custom firmware
 	  https://github.com/dreamlayers/dpf-ax and both require userland
