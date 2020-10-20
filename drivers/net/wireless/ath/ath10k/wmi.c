@@ -2831,7 +2831,7 @@ void ath10k_wmi_event_chan_info(struct ath10k *ar, struct sk_buff *skb)
 	switch (ar->scan.state) {
 	case ATH10K_SCAN_IDLE:
 	case ATH10K_SCAN_STARTING:
-		ath10k_warn(ar, "received chan info event without a scan request, ignoring\n");
+//		ath10k_warn(ar, "received chan info event without a scan request, ignoring\n");
 		goto exit;
 	case ATH10K_SCAN_RUNNING:
 	case ATH10K_SCAN_ABORTING:
