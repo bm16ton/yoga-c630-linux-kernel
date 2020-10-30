@@ -9,11 +9,14 @@ This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these di
         touchpad/keyboard/touchscreen
         camera
         battery meter (the estimated time remaining, is well, bad, but percentage updates correctly every couple of min at worst)
-	Venus video encoder/decoder
+	    Venus video encoder/decoder
+	    CPU turbo/boost frequencies 
+	    
     UNTESTED BUT POSSIBLE
         LTE cell modem (My understanding is it needs an active sim and connection to tower with active data connection to present, 
-	i have no sim)
+	    i have no sim)
         DisplayPort over usb-c (I don't have a cable)
+        
     DOESN'T WORK
         LTE cell modem (My understanding is it needs more work, like context channels, possible changes to sum protocols and ip tools)
         Internal mic (which i believe is some sorta mic array with its own firmware "qcwdsp850.mbn"?)
@@ -147,7 +150,11 @@ Wifi;
     SAME OPTIONS THE FIRMWARE ALREADY HAS ENABLED
     POSSIBLE ISSUES; If your upgrading to kernel >=5.6 qrtr-ns service has been moved to the kernel but the lib from the service is still needed. The current version of qrt-ns looks at kernel version       disables itself if >=5.6, so if upgrading , upgrade qrtr-ns from https://github.com/andersson/qrtr
   
-  
+CPU boost/turbo
+    enabled in kernel by default in my kernel, make sure u use 16ton_defconfig or pick the correct thermal/cpufreq stuff,
+    enable in userland with a root "echo 1 > /sys/devices/system/cpu/cpufreq/boost" disable with "echo 0 > /sys/devices/system/cpu/cpufreq/boost"
+    id just add it to /etc/rc.local
+
 GPU
     Needs shaders which the celliwig app doesnt get. 
         wget http://releases.linaro.org/96boards/dragonboard845c/qualcomm/firmware/RB3_firmware_20190529180356-v4.zip
@@ -180,9 +187,7 @@ EXAMPLES;
 	gst-launch-1.0 filesrc location=simpsons.mp4 ! qtdemux name=m m.video_0 ! h264parse ! v4l2h264dec capture-io-mode=dmabuf ! glimagesink
      find qcvss850.mbn on windows partition use pil_splitter.py 
      to split it into files then cp to firmware directory
-     errors on init caint reset
-
-
+     
 GPS
     the gps in on remoteproc so we need the pds protocol luckily linaro added this to gpsd
         git clone https://git.linaro.org/landing-teams/working/qualcomm/pkg/gpsd.git
