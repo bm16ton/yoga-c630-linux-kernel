@@ -417,7 +417,8 @@ if [ ${COPY_ERR} -eq 0 ]; then
     wget http://releases.linaro.org/96boards/dragonboard845c/qualcomm/firmware/RB3_firmware_20190529180356-v2.zip
     echo "extracting files"
     unzip RB3_firmware_20190529180356-v2.zip &> /dev/null
-    cp RB3_firmware_20190529180356-v2/18-adreno-fw/a630_sqe.fw RB3_firmware_20190529180356-v2/18-adreno-fw/a630_gmu.bin ./
+    cp RB3_firmware_20190529180356-v2/18-adreno-fw/a630_gmu.bin ./
+    wget -O a630_sqe.fw https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qcom/a630_sqe.fw?id=f48fec44127f88ce83ea1bcaf5824de4146ca2f9
     echo "deleting download and folder of RB3_firmware"
     echo  ""
     rm -Rf RB3_firmware_20190529180356-v2 RB3_firmware_20190529180356-v2.zip
