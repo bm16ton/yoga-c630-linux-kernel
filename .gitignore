@@ -35,7 +35,6 @@
 *.mod.c
 *.o
 *.o.*
-*.patch
 *.s
 *.so
 *.so.dbg
