@@ -12,7 +12,7 @@
 #include "debug_htt_stats.h"
 #include "peer.h"
 
-static const char *htt_bp_umac_ring[HTT_SW_UMAC_RING_IDX_MAX] = {
+static const __maybe_unused char *htt_bp_umac_ring[HTT_SW_UMAC_RING_IDX_MAX] = {
 	"REO2SW1_RING",
 	"REO2SW2_RING",
 	"REO2SW3_RING",
@@ -33,7 +33,7 @@ static const char *htt_bp_umac_ring[HTT_SW_UMAC_RING_IDX_MAX] = {
 	"REO_STATUS_RING",
 };
 
-static const char *htt_bp_lmac_ring[HTT_SW_LMAC_RING_IDX_MAX] = {
+static const __maybe_unused char *htt_bp_lmac_ring[HTT_SW_LMAC_RING_IDX_MAX] = {
 	"FW2RXDMA_BUF_RING",
 	"FW2RXDMA_STATUS_RING",
 	"FW2RXDMA_LINK_RING",
