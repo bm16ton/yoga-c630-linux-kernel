@@ -975,12 +975,12 @@ static int tsens_register(struct tsens_priv *priv)
 		priv->sensor[i].tzd = tzd;
 		if (priv->ops->enable)
 			priv->ops->enable(priv, i);
-	
+
 	tzd->tzp->no_hwmon = false;
     ret = thermal_add_hwmon_sysfs(tzd);
     if (ret)
-    return ret;  
-           
+    return ret;
+
 	}
 
 	ret = tsens_register_irq(priv, "uplow", tsens_irq_thread);
