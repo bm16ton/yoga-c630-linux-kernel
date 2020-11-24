@@ -2030,10 +2030,9 @@ void ieee80211_xmit(struct ieee80211_sub_if_data *sdata,
 		}
 	}
 
-        // Don't overwrite QoS header in monitor mode
-        if (likely(info->control.vif->type != NL80211_IFTYPE_MONITOR)) {
+    if (likely(info->control.vif->type != NL80211_IFTYPE_MONITOR)) {
             ieee80211_set_qos_hdr(sdata, skb);
-        }
+    }
 	ieee80211_tx(sdata, sta, skb, false);
 }
 

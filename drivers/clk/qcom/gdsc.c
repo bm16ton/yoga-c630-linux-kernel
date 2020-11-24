@@ -358,11 +358,6 @@ static int gdsc_init(struct gdsc *sc)
 	if ((sc->flags & VOTABLE) && on)
 		gdsc_enable(&sc->pd);
 
-	if ((sc->flags & INHERIT_BL) && on) {
-		pr_debug("gdsc: %s is enabled from bootloader!\n", sc->pd.name);
-		sc->pd.flags |= GENPD_FLAG_INHERIT_BL;
-	}
-
 	/*
 	 * Make sure the retain bit is set if the GDSC is already on, otherwise
 	 * we end up turning off the GDSC and destroying all the register
@@ -370,6 +365,11 @@ static int gdsc_init(struct gdsc *sc)
 	 */
 	if ((sc->flags & RETAIN_FF_ENABLE) && on)
 		gdsc_retain_ff_on(sc);
+
+	if ((sc->flags & INHERIT_BL) && on) {
+		pr_debug("gdsc: %s is enabled from bootloader!\n", sc->pd.name);
+		sc->pd.flags |= GENPD_FLAG_INHERIT_BL;
+	}
 
 	/* If ALWAYS_ON GDSCs are not ON, turn them ON */
 	if (sc->flags & ALWAYS_ON) {

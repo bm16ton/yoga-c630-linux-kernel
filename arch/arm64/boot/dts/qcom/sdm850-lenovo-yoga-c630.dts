@@ -11,7 +11,7 @@
 #include <dt-bindings/regulator/qcom,rpmh-regulator.h>
 #include <dt-bindings/sound/qcom,q6afe.h>
 #include <dt-bindings/sound/qcom,q6asm.h>
-#include "sdm845.dtsi"
+#include "sdm850.dtsi"
 #include "pm8998.dtsi"
 
 / {
@@ -740,18 +740,4 @@
 	vdd-3.3-ch0-supply = <&vreg_l25a_3p3>;
 
 	qcom,snoc-host-cap-8bit-quirk;
-};
-
-&cpu4_opp_table {
-
-		cpu4_opp33: opp-2841600000 {
-    		opp-hz = /bits/ 64 <2841600000>;
-    		opp-peak-kBps = <7216000 25497600>;
-		};
-		
-		cpu4_opp34: opp-2956800000 {
-    		opp-hz = /bits/ 64 <2956800000>;
-    		opp-peak-kBps = <7216000 25497600>;
-            turbo-mode;
-        };
 };
