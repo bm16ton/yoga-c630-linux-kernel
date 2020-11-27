@@ -89,14 +89,19 @@ INSTALLING KERNEL!!!!
 	I have my own defconfig called 16ton_defconfig, just make 16ton_defconfig  to use my config (constantly changing and
 	possibly experimental) The default hooks that deal with the .dts files are wrong. We have two options 1 patch the script for the
 	c630 or manually make a directory and copying/renaming the dtb before every kernel install.
-    OPTION 1 PATCH;  # everything works automagically, the patch is in this kernels C630 folder its called functions.patch
-        cd /usr/share/flash-kernel
-        sudo patch -p1 < /path-to-patch/functions.patch
-    OPTION 2 MANUAL; in this example we are installing linux-image-5.7.0-rc1_5.7.0-rc1-1_arm64.deb and
-    we have sdm850-lenovo-yoga-c630.dtb
-    	sudo mkdir /usr/lib/linux-image-5.7.0-rc1
-    	sudo cp sdm850-lenovo-yoga-c630.dtb /usr/lib/linux-image-5.7.0-rc1/laptop-lenovo-yoga-c630.dtb
-    	sudo dpkg -i linux-image-5.7.0-rc1_5.7.0-rc1-1_arm64.deb
+    OUTDATED OPTION 1 PATCH;  # everything works automagically, the patch is in this kernels C630 folder its called functions.patch
+    OUTDATED     cd /usr/share/flash-kernel
+    OUTDATED     sudo patch -p1 < /path-to-patch/functions.patch
+    OUTDATED OPTION 2 MANUAL; in this example we are installing linux-image-5.7.0-rc1_5.7.0-rc1-1_arm64.deb and
+    OUTDATED we have sdm850-lenovo-yoga-c630.dtb
+    OUTDATED 	sudo mkdir /usr/lib/linux-image-5.7.0-rc1
+    OUTDATED 	sudo cp sdm850-lenovo-yoga-c630.dtb /usr/lib/linux-image-5.7.0-rc1/laptop-lenovo-yoga-c630.dtb
+    OUTDATED 	sudo dpkg -i linux-image-5.7.0-rc1_5.7.0-rc1-1_arm64.deb
+    UPDATE      Just install aarch64-laptops-support-ubuntu20.04.1_all.deb from the C630 folder
+                sudo dpkg -i aarch64-laptops-support-ubuntu20.04.1_all.deb
+                      If you used my patch before, restore the functions file by reinstalling flash-kernel
+                sudo apt-get reinstall flash-kernel
+
 
 GRUB the bootloader requires a couple of options pd_ignore_unused clk_ignore_unused efi=novamap
         sudo pluma /etc/default/grub
