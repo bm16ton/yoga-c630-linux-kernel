@@ -101,6 +101,27 @@ INSTALLING KERNEL!!!!
                 sudo dpkg -i aarch64-laptops-support-ubuntu20.04.1_all.deb
                       If you used my patch before, restore the functions file by reinstalling flash-kernel
                 sudo apt-get reinstall flash-kernel
+                If flash-kernel fails to install/configure simply edit
+                /var/lib/dpkg/info/flash-kernel.postinst
+                change the end
+
+                else
+	                flash-kernel
+
+                fi
+
+                to;
+
+                else
+	            #    flash-kernel
+                    ls > /dev/null
+                fi
+
+                then run sudo apt-get -f install now u can install aarch64-support
+                I changed the file back after flash-kernel installed but doubt need to
+
+
+
 
 
 GRUB the bootloader requires a couple of options pd_ignore_unused clk_ignore_unused efi=novamap
