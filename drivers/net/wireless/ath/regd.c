@@ -185,7 +185,7 @@ static bool dynamic_country_user_possible(struct ath_regulatory *reg)
 	case CTRY_JAPAN57:
 	case CTRY_JAPAN58:
 	case CTRY_JAPAN59:
-		return true;
+		return false;
 	}
 
 	return true;

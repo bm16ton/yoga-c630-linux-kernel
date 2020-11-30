@@ -1597,7 +1597,7 @@ static u32 ieee80211_handle_pwr_constr(struct ieee80211_sub_if_data *sdata,
 	int new_ap_level;
 	__le16 capab = mgmt->u.probe_resp.capab_info;
 
-		return 0;
+
 
 	if (country_ie &&
 	    (capab & cpu_to_le16(WLAN_CAPABILITY_SPECTRUM_MGMT) ||
@@ -1608,6 +1608,8 @@ static u32 ieee80211_handle_pwr_constr(struct ieee80211_sub_if_data *sdata,
 		pwr_level_80211h =
 			max_t(int, 0, chan_pwr);
 	}
+
+		return 0;
 
 	if (cisco_dtpc_ie) {
 		ieee80211_find_cisco_dtpc(
