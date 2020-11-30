@@ -185,7 +185,7 @@ static bool dynamic_country_user_possible(struct ath_regulatory *reg)
 	case CTRY_JAPAN57:
 	case CTRY_JAPAN58:
 	case CTRY_JAPAN59:
-		return false;
+		return true;
 	}
 
 	return true;
@@ -193,11 +193,11 @@ static bool dynamic_country_user_possible(struct ath_regulatory *reg)
 
 static bool ath_reg_dyn_country_user_allow(struct ath_regulatory *reg)
 {
+	if (ath_16ton)
+		return true;
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
 		return false;
 	if (!IS_ENABLED(CONFIG_ATH_REG_DYNAMIC_USER_REG_HINTS))
-		return false;
-	if (ath_16ton)
 		return false;
 	if (!dynamic_country_user_possible(reg))
 		return false;
@@ -355,8 +355,8 @@ ath_reg_apply_beaconing_flags(struct wiphy *wiphy,
 	struct ieee80211_channel *ch;
 	unsigned int i;
 
-	if (ath_16ton)
-		return;
+//	if (ath_16ton)
+//		return;
 
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
 		return;
@@ -673,8 +673,8 @@ ath_regd_init_wiphy(struct ath_regulatory *reg,
 
 	wiphy->reg_notifier = reg_notifier;
 
-	if (ath_16ton)
-		return 0;
+//	if (ath_16ton)
+//		return 0;
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
 		return 0;
 
