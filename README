@@ -195,6 +195,12 @@ Wifi;
         sudo ifconfig wlan0 up
         sudo systemctl start network-manager
 
+        IF YOU WANNA TRY MY WIFI PATCHES WITHOUT CHANGING YOUR INSTALLED CRDA BUILD MY KERNEL WITH CRDA BUILT IN (WIP not thuroughly tested)
+        EXAMPLE ON C630
+        make 16ton-crda_defconfig
+        cp C630/regulatory.db /lib/firmware
+        make -j8
+
 CPU boost/turbo
     enabled in kernel by default in my kernel, make sure u use 16ton_defconfig or pick the correct thermal/cpufreq stuff,
     enable in userland with a root "echo 1 > /sys/devices/system/cpu/cpufreq/boost" disable with "echo 0 > /sys/devices/system/cpu/cpufreq/boost"
