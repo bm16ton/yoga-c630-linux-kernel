@@ -8,14 +8,14 @@ This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these di
         usb
         touchpad/keyboard/touchscreen
         camera
-        battery meter (the estimated time remaining, is well, bad, but percentage updates correctly every couple of min at worst)
+        battery meter (UPDATE much better reporting now thanks to a patch found at steevs kernel)
 	    Venus video encoder/decoder
 	    CPU turbo/boost frequencies
 
     UNTESTED BUT POSSIBLE
         LTE cell modem (My understanding is it needs an active sim and connection to tower with active data connection to present,
 	    i have no sim)
-        DisplayPort over usb-c (I don't have a cable)
+        DisplayPort over usb-c (I don't have a cable, and we dont have a working usb type-c driver)
 
     DOESN'T WORK
         LTE cell modem (My understanding is it needs more work, like context channels, possible changes to sum protocols and ip tools)
@@ -32,13 +32,13 @@ This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these di
     https://github.com/aarch64-laptops/build/blob/master/misc/lenovo-yoga-c630/wifi/README.md
     and the gpu link
     https://github.com/aarch64-laptops/build/blob/master/misc/lenovo-yoga-c630/gpu/README.md
-    and then HOPEFULLY followed the ubuntu system upgrade instructions at the bottom of the READE to buntu 20.04
-    newer versions of alsa and pulseaudio are required for ucm2 tho ucm did workand i believe didnt have the sync
+    and then HOPEFULLY followed the ubuntu system upgrade instructions at the bottom of the README to ubuntu 20.04
+    newer versions of alsa and pulseaudio are required for ucm2 tho ucm did work and i believe didnt have the sync
     issues if using =>5.7kernels
 
 Booting the remote procs
     get the firmware from windows partition
-    UPDATE: the c630 folder in kernel source has my hacked up celliwig yoga_fw_extract.sh for all this stuff and more.
+    UPDATE: the c630/yoga_fw_extract.sh fil in kernel source has my hacked up celliwig yoga_fw_extract.sh for all this stuff and more.
         wget https://raw.githubusercontent.com/Celliwig/Lenovo-Yoga-c630/master/yoga_fw_extract/yoga_fw_extract.sh
         chmod +x yoga_fw_extract.sh
         ./yoga_fw_extract.sh
@@ -168,7 +168,6 @@ Audio;
     I also included my alsa.state files for both headphones (required) and speakers in C630 folder
 
 Wifi;
-    Altho missing from linaro's directions i believe a directory called /readwrite is required along with /readonly/firmware/images
     the wlanmdsp.mbn from newer linux-firmware package is better more stable then one on windows partition
     ISSUE     chan info event message "received chan info event without a scan request, ignoring"
     ISSUE     the firmware file from linux-firmware doesnt have single-chan-info-per-channel set
@@ -188,7 +187,7 @@ Wifi;
     SAME OPTIONS THE FIRMWARE ALREADY HAS ENABLED
     POSSIBLE ISSUES; If your upgrading to kernel >=5.6 qrtr-ns service has been moved to the kernel but the lib from the service is still needed. The current version of qrt-ns looks at kernel version
     disables itself if >=5.6, so if upgrading , upgrade qrtr-ns from https://github.com/andersson/qrtr
-    SCAN errors sum usrs have issues with network-monitors scanning, causing kernel errors and wifi crash. I cant reproduce but i have patched the official ubuntu source with the no-scan patch;
+    ISSUE SCAN errors sum usrs have issues with network-monitors scanning, causing kernel errors and wifi crash. I cant reproduce but i have patched the official ubuntu source with the no-scan patch;
     https://github.com/bm16ton/yoga-c630-network-manager     it has a working debian folder so simply
         git clone https://github.com/bm16ton/yoga-c630-network-manager
         cd yoga-c630-network-manager
@@ -265,12 +264,12 @@ NOTES;
 VENUS DECODERS/ENCODERS
 UPDATE: Stanimir Varbanov emailed me patches that get venus working!! This guy is awesome! thanks Stan!
 UPDATE2: Requires the firmware from windows partition the linux-firware files wont work, so after every linux-firmware upgrade/update
-UPDATE2: recopy the venus files.
+UPDATE2: recopy the venus files.find qcvss850.mbn on windows partition use pil_splitter.py directions above or use script
+UPDATE2: C630/venus-firmware-reinstall "sudo ./venus-firmware-reinstall" This script is just a dirty hackdown job of yoga_fw_extract.sh but works!
 EXAMPLES;
 	ffplay -sync video -autoexit -vcodec h264_v4l2m2m -i simpsons.mp4
 	gst-launch-1.0 filesrc location=simpsons.mp4 ! qtdemux name=m m.video_0 ! h264parse ! v4l2h264dec capture-io-mode=dmabuf ! glimagesink
-     find qcvss850.mbn on windows partition use pil_splitter.py
-     to split it into files then cp to firmware directory
+
 
 GPS
     the gps in on remoteproc so we need the pds protocol luckily linaro added this to gpsd
