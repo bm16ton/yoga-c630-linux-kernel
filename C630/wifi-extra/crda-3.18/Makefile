@@ -3,6 +3,9 @@
 REG_BIN?=/usr/lib/crda/regulatory.bin
 REG_GIT?=git://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git
 
+USE_OPENSSL=1
+RUNTIME_PUBKEY_ONLY=1
+
 PREFIX ?= /usr/
 MANDIR ?= $(PREFIX)/share/man/
 INCLUDE_DIR ?= $(PREFIX)/include/reglib/

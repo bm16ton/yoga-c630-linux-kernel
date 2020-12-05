@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import sys
 try:
@@ -120,7 +120,7 @@ static const struct key_params keys[] = {
     for n in xrange(n + 1):
         output.write('	KEYS(e_%d, n_%d),\n' % (n, n))
     output.write('};\n')
-    
+
 
 modes = {
     '--ssl': (print_ssl, print_ssl_keys),
