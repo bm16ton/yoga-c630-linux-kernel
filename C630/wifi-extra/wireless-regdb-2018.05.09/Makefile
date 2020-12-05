@@ -82,6 +82,7 @@ $(REGDB_PUBCERT): $(REGDB_PRIVKEY)
 	@echo "Generating certificate for $(REGDB_AUTHOR)..."
 	./gen-pubcert.sh $(REGDB_PRIVKEY) $(REGDB_PUBCERT)
 	@echo $(REGDB_PUBKEY) > .custom
+	@echo $(REGDB_PUBCERT) > .custom1
 
 
 $(REGDB_PRIVKEY):
@@ -121,6 +122,7 @@ install: regulatory.bin.5.gz regulatory.db.5.gz
 	install -m 755 -d $(DESTDIR)/$(FIRMWARE_PATH)
 	if [ -f .custom ]; then \
 		install -m 644 -t $(DESTDIR)/$(CRDA_KEY_PATH)/ $(shell cat .custom); \
+		install -m 644 -t $(DESTDIR)/$(CRDA_KEY_PATH)/ $(shell cat .custom1); \
 	fi
 	install -m 644 -t $(DESTDIR)/$(CRDA_KEY_PATH)/ $(REGDB_UPSTREAM_PUBKEY)
 	install -m 644 -t $(DESTDIR)/$(CRDA_PATH)/ regulatory.bin regulatory.db
