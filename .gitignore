@@ -71,8 +71,8 @@ modules.order
 # Debian directory (make deb-pkg)
 #
 /debian/
-/C630/wifi-extra/crda-3.18/debian/
-/C630/wifi-extra/wireless-regdb-2018.05.09/debian/
+/C630/wifi-extra/crda-3.18/debian/crda/
+/C630/wifi-extra/wireless-regdb-2018.05.09/debian/wireless-regdb/
 
 #
 # Snap directory (make snap-pkg)
