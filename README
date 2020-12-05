@@ -170,9 +170,21 @@ Audio;
 Wifi;
     Altho missing from linaro's directions i believe a directory called /readwrite is required along with /readonly/firmware/images
     the wlanmdsp.mbn from newer linux-firmware package is better more stable then one on windows partition
-    USELESS     if u get chan info event msgs this can supposedly fix that;
-    USELESS     git clone https://github.com/qca/qca-swiss-army-knife.git
-    USELESS     ./qca-swiss-army-knife/tools/scripts/ath10k/ath10k-fwencoder --modify --features=wowlan,mgmt-tx-by-reference,non-bmi,single-chan-info-per-channel  firmware-5.bin
+    ISSUE     chan info event message "received chan info event without a scan request, ignoring"
+    ISSUE     the firmware file from linux-firmware doesnt have single-chan-info-per-channel set
+    ISSUE     This will have to be done after every single linux-firmware package update/upgrade
+    UPDATE     the ath10k-fwencoder in C630/wifi-extra/ath10k-scripts/ath10k-fwencoder is pre-edited or
+    UPDATE     git clone https://github.com/qca/qca-swiss-army-knife.git
+    UPDATE     This version currently has a typo edit ath10k-fwencoder and change
+    UPDATE     'mgmt-tx-by-ref': ATH10K_FW_FEATURE_MGMT_TX_BY_REF,
+    UPDATE              to;
+    UPDATE     'mgmt-tx-by-reference': ATH10K_FW_FEATURE_MGMT_TX_BY_REF,
+    UPDATE              then;
+    UPDATE     cd qca-swiss-army-knife/tools/scripts/ath10k/
+    UPDATE     cp /lib/firmware/ath10k/WCN3990/hw1.0/firmware-5.bin ./
+    UPDATE     ./ath10k-fwencoder --modify --features=wowlan,mgmt-tx-by-reference,non-bmi,single-chan-info-per-channel  firmware-5.bin
+    UPDATE     cp firmware-5.bin /lib/firmware/ath10k/WCN3990/hw1.0/firmware-5.bin
+
     SAME OPTIONS THE FIRMWARE ALREADY HAS ENABLED
     POSSIBLE ISSUES; If your upgrading to kernel >=5.6 qrtr-ns service has been moved to the kernel but the lib from the service is still needed. The current version of qrt-ns looks at kernel version
     disables itself if >=5.6, so if upgrading , upgrade qrtr-ns from https://github.com/andersson/qrtr
@@ -195,7 +207,7 @@ Wifi;
         sudo ifconfig wlan0 up
         sudo systemctl start network-manager
 
-        IF YOU WANNA TRY MY WIFI PATCHES WITHOUT CHANGING YOUR INSTALLED CRDA BUILD MY KERNEL WITH CRDA BUILT IN (WIP not thuroughly tested)
+        IF YOU WANNA TRY MY WIFI PATCHES WITHOUT CHANGING YOUR INSTALLED CRDA BUILD MY KERNEL WITH CRDA BUILT IN
         EXAMPLE ON C630
         make 16ton-crda_defconfig
         cp C630/regulatory.db /lib/firmware
@@ -233,7 +245,7 @@ GPU
    NEW     sudo cp a630_gmu.bin a630_sqe.fw /lib/firmware/qcom/
         sudo mount /dev/sda4 /mnt
         sudo find /mnt -name qcdxkmsuc850.mbn  (it may find multiple ls -la them and use the newest)
-        sudo cp {path to qcdxkmsuc850.mbn /lib/firmware/qcom/
+        sudo cp {path to qcdxkmsuc850.mbn} /lib/firmware/qcom/
     POSSIBLE ISSUES; the mesa packages had a bug where screens wouldnt redraw correctly especially text IE terminal-emulator, issue
     is fixed in master/20.1 but if using older mesa's then apply these patches depending on version
     19.3 https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/5192
@@ -252,6 +264,8 @@ NOTES;
 
 VENUS DECODERS/ENCODERS
 UPDATE: Stanimir Varbanov emailed me patches that get venus working!! This guy is awesome! thanks Stan!
+UPDATE2: Requires the firmware from windows partition the linux-firware files wont work, so after every linux-firmware upgrade/update
+UPDATE2: recopy the venus files.
 EXAMPLES;
 	ffplay -sync video -autoexit -vcodec h264_v4l2m2m -i simpsons.mp4
 	gst-launch-1.0 filesrc location=simpsons.mp4 ! qtdemux name=m m.video_0 ! h264parse ! v4l2h264dec capture-io-mode=dmabuf ! glimagesink
@@ -277,6 +291,7 @@ TOUCHPAD
     After hundreds of hours of use my touchpad is wearing down. It now constantly does "Tap and Drag" and is always copying files and text
     accidently. The last ditch option is to turn this off. The official answer with dconf editor did not work for me but synclient did
          synclient TapAndDragGesture=0
+    UPDATE: I wrote an extremely simple gui for synclient found here https://github.com/bm16ton/syn-gui
 
 MODEM
     edit dts file (already in this kernel) and add the firmware
@@ -343,5 +358,10 @@ FIXES;
             systemctl poweroff
 
 NOTES;
-	If you do have a lock up or shutdown that fails/panics and reboots expect your next 3 boots to be wonky. Most likely 	     the wifi or sound wont work then on next boot again one or the other wont work. Sometimes everything will work on the 	   first or second boot but it still takes 3 to get normal. Not sure what causes this, if it was leaving hardware is a        	      strange state i thought maybe booting windows would set things correct but the one time i tried it didnt.
+	If you do have a lock up or shutdown that fails/panics and reboots expect your next 3 boots to be wonky. Most likely
+	the wifi or sound wont work then on next boot again one or the other wont work. Sometimes everything will work on the
+	first or second boot but it still takes 3 to get normal. Not sure what causes this, if it was leaving hardware is a
+	strange state i thought maybe booting windows would set things correct but the one time i tried it didnt.
+	Commonly with remoteproc/wifi/etc crashes sudo and su will stop working. Rather then a harsh shutdown
+	systemctl poweroff    will shutdown the machine without the need for sudo/su
 
