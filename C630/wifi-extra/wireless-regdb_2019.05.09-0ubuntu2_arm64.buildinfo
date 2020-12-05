@@ -4,14 +4,14 @@ Binary: wireless-regdb
 Architecture: all
 Version: 2019.05.09-0ubuntu2
 Checksums-Md5:
- 6f9e5af229620860cdcb52094b951e58 11104 wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ 3fbdadb9a6ee845a951263ff3000f078 11100 wireless-regdb_2019.05.09-0ubuntu2_all.deb
 Checksums-Sha1:
- 3453b4b8238f4d3700b3da9be87fdde45020d5ae 11104 wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ 1c6b332ef1bcda839e75b5726f25e8b9d0aa6252 11100 wireless-regdb_2019.05.09-0ubuntu2_all.deb
 Checksums-Sha256:
- d66806508358814ecb35c603b4338905ddd84dcd636f938eb3128df271511ece 11104 wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ 0c5e4c3320c6b9422ee20f43f1493f59d88a65f8d19fe8ca7a2546248c076df1 11100 wireless-regdb_2019.05.09-0ubuntu2_all.deb
 Build-Origin: Ubuntu
 Build-Architecture: arm64
-Build-Date: Fri, 04 Dec 2020 18:58:41 -0500
+Build-Date: Sat, 05 Dec 2020 02:28:16 -0500
 Build-Tainted-By:
  usr-local-has-configs
  usr-local-has-includes

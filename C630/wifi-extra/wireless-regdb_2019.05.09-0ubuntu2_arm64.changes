@@ -15,11 +15,11 @@ Changes:
  .
    * rebuild
 Checksums-Sha1:
- 3453b4b8238f4d3700b3da9be87fdde45020d5ae 11104 wireless-regdb_2019.05.09-0ubuntu2_all.deb
- 8d046c71d2ac5db84edb90dd3db53a779bbcf95d 5866 wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
+ 1c6b332ef1bcda839e75b5726f25e8b9d0aa6252 11100 wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ 57feef6b62cb070c5f8ca789065d044f76bb07bc 5866 wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
 Checksums-Sha256:
- d66806508358814ecb35c603b4338905ddd84dcd636f938eb3128df271511ece 11104 wireless-regdb_2019.05.09-0ubuntu2_all.deb
- 79417beda0ff408649ead7de037a921a2c07acbca3c2bbfbd49322b4c267014e 5866 wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
+ 0c5e4c3320c6b9422ee20f43f1493f59d88a65f8d19fe8ca7a2546248c076df1 11100 wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ bd81049ac2edf9b354d8f83db072bdc03aea6b8ff70ee1b3fd5c0a125f1f8922 5866 wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
 Files:
- 6f9e5af229620860cdcb52094b951e58 11104 net optional wireless-regdb_2019.05.09-0ubuntu2_all.deb
- 8c0ec97755803b335054ed40d4ee2581 5866 net optional wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
+ 3fbdadb9a6ee845a951263ff3000f078 11100 net optional wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ a466d433396a3b833e39a1864689e277 5866 net optional wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo

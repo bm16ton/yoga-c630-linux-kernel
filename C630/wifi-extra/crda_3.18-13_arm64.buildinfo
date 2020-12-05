@@ -5,16 +5,16 @@ Architecture: arm64
 Version: 3.18-13
 Checksums-Md5:
  501fbd546991a92aa4e7b9e004b7deea 43848 crda-dbgsym_3.18-13_arm64.deb
- 9afd1c72139a99900a410e7173548177 65280 crda_3.18-13_arm64.deb
+ 70eb4d93bf6dbd1a0daea472aac6edeb 65316 crda_3.18-13_arm64.deb
 Checksums-Sha1:
  9f313c7cb613fd86bc9d733365de27f23f97a421 43848 crda-dbgsym_3.18-13_arm64.deb
- 75a7050b616bcec470fe952510f60a70a4c36331 65280 crda_3.18-13_arm64.deb
+ 86e9538f174d7b94501d41a0df10f1bd11b938ef 65316 crda_3.18-13_arm64.deb
 Checksums-Sha256:
  c7a9e580202804efe01f4ce34aa0628e5b2f4113f7ca03cee8bba5e5483c5f52 43848 crda-dbgsym_3.18-13_arm64.deb
- c398a7352d6509d857a542165e01af3e5696b10f022b9e599d3b195abf490d84 65280 crda_3.18-13_arm64.deb
+ ff9e4ec11d7d166b3a1860a32db84c2ebf4813621d9be6dab36501b307cb0855 65316 crda_3.18-13_arm64.deb
 Build-Origin: Ubuntu
 Build-Architecture: arm64
-Build-Date: Fri, 04 Dec 2020 18:33:16 -0500
+Build-Date: Sat, 05 Dec 2020 02:34:23 -0500
 Build-Tainted-By:
  usr-local-has-configs
  usr-local-has-includes
