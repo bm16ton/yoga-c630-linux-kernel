@@ -1,0 +1,29 @@
+Format: 1.8
+Date: Mon, 07 Feb 2020 16:48:56 +0000
+Source: crda
+Binary: crda crda-dbgsym
+Architecture: arm64
+Version: 3.18-13
+Distribution: bionic
+Urgency: high
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Changed-By: Ben Maddocks <bm16ton@gmail.com>
+Description:
+ crda       - wireless Central Regulatory Domain Agent
+Changes:
+ crda (3.18-13) bionic; urgency=high
+ .
+   * poo
+Checksums-Sha1:
+ 9f313c7cb613fd86bc9d733365de27f23f97a421 43848 crda-dbgsym_3.18-13_arm64.deb
+ 10ec5a10ba3bbe0fb41bdf10a4e4d3f63fe2bdf0 6238 crda_3.18-13_arm64.buildinfo
+ 75a7050b616bcec470fe952510f60a70a4c36331 65280 crda_3.18-13_arm64.deb
+Checksums-Sha256:
+ c7a9e580202804efe01f4ce34aa0628e5b2f4113f7ca03cee8bba5e5483c5f52 43848 crda-dbgsym_3.18-13_arm64.deb
+ 4434e28176e6c7945548f18ac04bfad70ee049f04d41c0b54b673aee7646f4e6 6238 crda_3.18-13_arm64.buildinfo
+ c398a7352d6509d857a542165e01af3e5696b10f022b9e599d3b195abf490d84 65280 crda_3.18-13_arm64.deb
+Files:
+ 501fbd546991a92aa4e7b9e004b7deea 43848 debug optional crda-dbgsym_3.18-13_arm64.deb
+ fe04bb234b61e4738f205f89a22dfd68 6238 net optional crda_3.18-13_arm64.buildinfo
+ 9afd1c72139a99900a410e7173548177 65280 net optional crda_3.18-13_arm64.deb
+Original-Maintainer: Ben Hutchings <ben@decadent.org.uk>

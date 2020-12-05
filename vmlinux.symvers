@@ -10312,7 +10312,6 @@
 0x00000000	pinctrl_add_gpio_range	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	cryptd_free_ahash	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	eventfd_ctx_fileget	vmlinux	EXPORT_SYMBOL_GPL	
-0x00000000	verify_pkcs7_signature	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	xen_start_info	vmlinux	EXPORT_SYMBOL	
 0x00000000	rpc_pipe_generic_upcall	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	xprt_unregister_transport	vmlinux	EXPORT_SYMBOL_GPL	
