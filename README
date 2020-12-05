@@ -17,12 +17,16 @@ This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these di
 	    i have no sim)
         DisplayPort over usb-c (I don't have a cable, and we dont have a working usb type-c driver)
 
-    DOESN'T WORK
+    DOESN'T'T WORK
         LTE cell modem (My understanding is it needs more work, like context channels, possible changes to sum protocols and ip tools)
         Internal mic (which i believe is some sorta mic array with its own firmware "qcwdsp850.mbn"?)
         Sensor Low Power Island  (im not sure if this includes the accelerometer or just temp etc firmware files qcslpi850.mbn
 	qcslpi850_cls.mbn ive found no patches/dev?)
 
+    UPDATE: Big shout out to Steev , his kernel has become the defacto kernel for linaro, He keeps bringing in awesome
+    UPDATE: patches, he introduced me to pwcli where i found the ath10k patches for not waiting on dead device (gamechanger)
+    UPDATE: And on top of all that despite the extreme gap between our intelligence and skill he still gives me a hand.
+    UPDATE: Thank you Steev!! https://steev.net/tags/c630/   https://github.com/steev/
     ALL CREDIT GOES TO THE GODS AT LINARO, id list names but i dont know who everyone is and what they do. i was adding patches
     from at least a half dozen places before finding Anderssons github page. That guy must be like the Gandolph of awesome
     programmers, so so many patches have come from him. i digress anyway;
