@@ -8,10 +8,16 @@ export LSB_ID        = Debian/Ubuntu
 %:
 	dh ${@}
 
-override_dh_auto_build: ;
+override_dh_auto_build:
+	dh_auto_build
 
 override_dh_install:
 	make DESTDIR=debian/wireless-regdb install
 # crda will install public keys
-	rm -f debian/wireless-regdb/lib/crda/pubkeys/linville.key.pub.pem
+	rm -f debian/wireless-regdb/lib/crda/pubkeys/root.key.pub.pem
 	rm -f debian/wireless-regdb/lib/crda/pubkeys/sforshee.key.pub.pem
+
+override_dh_clean:
+	dh_clean $(REGDB_PUBKEY) $(REGDB_PUBCERT) .custom
+	echo cleaning
+	dh_clean regulatory.bin regulatory.db regulatory.db.p7s root.key.pub.pem root.x509.pem
