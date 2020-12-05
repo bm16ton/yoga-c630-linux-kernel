@@ -200,6 +200,22 @@ Wifi;
         make 16ton-crda_defconfig
         cp C630/regulatory.db /lib/firmware
         make -j8
+              THIS WILL ALLOW YOUR CARDS TXPOWER TO SKYROCKET TO 33DB FOR 2.4GHZ AND 30DB FOR 5GHZ i HIGHLY RECOMMEND SETTING IT TO SOMETHING SANE ON CONNECT
+              CREATE FILE /etc/network/if-up.d/wifi-txpower AND ADD OUR SCRIPT
+              sudo nano /etc/network/if-up.d/wifi-txpower
+                    ADD CONTENTS
+
+                #!/bin/bash
+
+                if [ "$IFACE" = wlan0 ]; then
+                iw wlan0 set txpower fixed 2200
+                #    iwconfig wlan0 power off
+                fi
+
+              UNCOMMENT "iwconfig wlan0 power off" TO DISABLE POWERSAVING ON CARD CONNECT/UP
+              THEN MAKE IT EXECUTABLE
+        sudo chmod +x /etc/network/if-up.d/wifi-txpower
+              REBOOT
 
 CPU boost/turbo
     enabled in kernel by default in my kernel, make sure u use 16ton_defconfig or pick the correct thermal/cpufreq stuff,
@@ -208,10 +224,13 @@ CPU boost/turbo
 
 GPU
     Needs shaders which the celliwig app doesnt get.
-        wget http://releases.linaro.org/96boards/dragonboard845c/qualcomm/firmware/RB3_firmware_20190529180356-v4.zip
-        unp RB3_firmware_20190529180356-v4.zip
-        sudo cp $(find ./RB3_firmware_20190529180356-v4 -name a630_sqe.fw) /lib/firmware/qcom/
-        sudo cp $(find ./RB3_firmware_20190529180356-v4 -name a630_gmu.fw) /lib/firmware/qcom/
+   OLD     wget http://releases.linaro.org/96boards/dragonboard845c/qualcomm/firmware/RB3_firmware_20190529180356-v4.zip
+   OLD     unp RB3_firmware_20190529180356-v4.zip
+   OLD     sudo cp $(find ./RB3_firmware_20190529180356-v4 -name a630_sqe.fw) /lib/firmware/qcom/
+   OLD     sudo cp $(find ./RB3_firmware_20190529180356-v4 -name a630_gmu.fw) /lib/firmware/qcom/
+   NEW     wget -O a630_gmu.bin https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qcom/a630_gmu.bin
+   NEW     wget -O a630_sqe.fw https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qcom/a630_sqe.fw
+   NEW     sudo cp a630_gmu.bin a630_sqe.fw /lib/firmware/qcom/
         sudo mount /dev/sda4 /mnt
         sudo find /mnt -name qcdxkmsuc850.mbn  (it may find multiple ls -la them and use the newest)
         sudo cp {path to qcdxkmsuc850.mbn /lib/firmware/qcom/

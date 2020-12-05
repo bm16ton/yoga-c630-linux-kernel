@@ -413,16 +413,18 @@ if [ ${COPY_ERR} -eq 0 ]; then
 	python2 pil-splitter.py LENOVO/81JL/ipa_fws.elf ipa_fws &> /dev/null
 	echo "splitting qcvss850.mbn"
     python2 pil-splitter.py LENOVO/81JL/qcvss850.mbn venus &> /dev/null
-    echo "retreiving RB3_firmware for files a630_sqe.fw and a630_gmu.fw"
-    wget http://releases.linaro.org/96boards/dragonboard845c/qualcomm/firmware/RB3_firmware_20190529180356-v2.zip
-    echo "extracting files"
-    unzip RB3_firmware_20190529180356-v2.zip &> /dev/null
-    cp RB3_firmware_20190529180356-v2/18-adreno-fw/a630_gmu.bin ./
-    wget -O a630_sqe.fw https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qcom/a630_sqe.fw?id=f48fec44127f88ce83ea1bcaf5824de4146ca2f9
-    echo "deleting download and folder of RB3_firmware"
-    echo  ""
-    rm -Rf RB3_firmware_20190529180356-v2 RB3_firmware_20190529180356-v2.zip
-    echo "grab sdm845 .jsn files"
+#    echo "retreiving RB3_firmware for files a630_sqe.fw and a630_gmu.fw"
+#    wget http://releases.linaro.org/96boards/dragonboard845c/qualcomm/firmware/RB3_firmware_20190529180356-v2.zip
+#    echo "extracting files"
+#    unzip RB3_firmware_20190529180356-v2.zip &> /dev/null
+#    cp RB3_firmware_20190529180356-v2/18-adreno-fw/a630_gmu.bin ./
+#    echo "Downloading a630_gmu.bin a630_sqe.fw from official linux-firmware git"
+#    wget -O a630_gmu.bin https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qcom/a630_gmu.bin
+#    wget -O a630_sqe.fw https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/qcom/a630_sqe.fw
+#    echo "deleting download and folder of RB3_firmware"
+#    echo  ""
+#    rm -Rf RB3_firmware_20190529180356-v2 RB3_firmware_20190529180356-v2.zip
+    echo "grab sdm845 .jsn files and a630_gmu.bin a630_sqe.fw from official linux-firmware git"
     git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
 
 ###################################################################################################################################################
@@ -438,17 +440,18 @@ if [ ${COPY_ERR} -eq 0 ]; then
 #	sudo cp -r "${PATH_FW_ATH10K}" "${PATH_LIBFW_ATH10K}" &> /dev/null
 #	done_failedexit $?
 #	sudo chown -R root:root "${PATH_LIBFW_ATH10K}"				# Reset ownership
-
+    sudo cp -R /lib/firmware/ath10k/WCN3990 /lib/firmware/ath10k/WCN3990.$(date +'%Y%m%dT%H%M%S')
+    sudo cp -R /lib/firmware/qcom /lib/firmware/qcom.$(date +'%Y%m%dT%H%M%S')
 	PATH_LIBFW_QCOM="/lib/firmware/qcom"
-	if [ -e "${PATH_LIBFW_QCOM}/LENOVO/81JL" ]; then
-		backup_or_delete "Qualcomm DSP" "${PATH_LIBFW_QCOM}/LENOVO/81JL" "${BKUP_DATETIME}"
-	fi
+#	if [ -e "${PATH_LIBFW_QCOM}/LENOVO/81JL" ]; then
+#		backup_or_delete "Qualcomm DSP" "${PATH_LIBFW_QCOM}/LENOVO/81JL" "${BKUP_DATETIME}"
+#	fi
 	echo -n "Copying new Qualcomm DSP firmware: "
 	sudo cp ./ipa_fws* /lib/firmware/
-	sudo cp a630_sqe.fw /lib/firmware/qcom/
-	sudo cp a630_gmu.bin /lib/firmware/qcom/
-	
-	sudo mkdir /lib/firmware/qcom/venus-5.2
+#	sudo cp a630_sqe.fw /lib/firmware/qcom/
+#	sudo cp a630_gmu.bin /lib/firmware/qcom/
+
+	sudo mkdir /lib/firmware/qcom/venus-5.2 2> /dev/null
 	sudo cp venus* /lib/firmware/qcom/venus-5.2/
 	sudo cp -r "LENOVO" "${PATH_LIBFW_QCOM}" &> /dev/null
 	sudo cp creating-board-2.bin/board-2.bin /lib/firmware/ath10k/WCN3990/hw1.0/
@@ -461,7 +464,10 @@ if [ ${COPY_ERR} -eq 0 ]; then
 	sudo cp linux-firmware/qcom/sdm845/*.jsn /lib/firmware/qcom/LENOVO/81JL/
 	sudo cp linux-firmware/ath10k/WCN3990/hw1.0/firmware-5.bin /lib/firmware/ath10k/WCN3990/hw1.0/firmware-5.bin
 	sudo cp linux-firmware/ath10k/WCN3990/hw1.0/wlanmdsp.mbn /lib/firmware/ath10k/WCN3990/hw1.0/wlanmdsp.mbn
+	sudo cp linux-firmware/qcom/a630_gmu.bin /lib/firmware/qcom/
+	sudo cp linux-firmware/qcom/a630_sqe.fw  /lib/firmware/qcom/
     rm -Rf linux-firmware
+    rm pil-splitter.py
 #	done_failedexit $?
 	sudo chown -R root:root "${PATH_LIBFW_QCOM}"				# Reset ownership
 fi
