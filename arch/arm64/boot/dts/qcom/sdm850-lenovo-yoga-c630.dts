@@ -74,20 +74,12 @@
 		compatible = "gpio-keys";
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&lid_pin_active>, <&mode_pin_active>;
+		pinctrl-0 = <&lid_pin_active>;
 
 		lid {
 			gpios = <&tlmm 124 GPIO_ACTIVE_HIGH>;
 			linux,input-type = <EV_SW>;
 			linux,code = <SW_LID>;
-			wakeup-source;
-			wakeup-event-action = <EV_ACT_DEASSERTED>;
-		};
-
-		mode {
-			gpios = <&tlmm 95 GPIO_ACTIVE_HIGH>;
-			linux,input-type = <EV_SW>;
-			linux,code = <SW_TABLET_MODE>;
 		};
 	};
 };
@@ -638,14 +630,6 @@
 
 	lid_pin_active: lid-pin {
 		pins = "gpio124";
-		function = "gpio";
-
-		input-enable;
-		bias-disable;
-	};
-
-	mode_pin_active: mode-pin {
-		pins = "gpio95";
 		function = "gpio";
 
 		input-enable;
