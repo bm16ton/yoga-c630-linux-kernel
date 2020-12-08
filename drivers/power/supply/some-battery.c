@@ -258,6 +258,15 @@ static int bat0_get_property(struct power_supply *psy,
 {
 	struct some_battery *battery = power_supply_get_drvdata(psy);
 	int rc = 0;
+    int state;
+
+    	state = battery->adapter_online;
+//	printk(KERN_NOTICE "curr-state %d\n", battery->adapter_online);
+//	printk(KERN_NOTICE "last-state %d\n", battery->last_state);
+	if (state != battery->last_state) {
+        power_supply_changed(psy);
+	}
+    battery->last_state = state;
 
 	if (some_battery_present(battery))
 		some_battery_update(battery);
@@ -353,15 +362,6 @@ static int adp_get_property(struct power_supply *psy,
 {
 	struct some_battery *battery = power_supply_get_drvdata(psy);
 	int rc = 0;
-    int state;
-
-    	state = battery->adapter_online;
-//	printk(KERN_NOTICE "curr-state %d\n", battery->adapter_online);
-//	printk(KERN_NOTICE "last-state %d\n", battery->last_state);
-	if (state != battery->last_state) {
-        power_supply_changed(psy);
-	}
-    battery->last_state = state;
 
 	some_battery_update(battery);
 
