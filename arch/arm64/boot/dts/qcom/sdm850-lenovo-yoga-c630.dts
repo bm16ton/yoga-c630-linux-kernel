@@ -85,10 +85,11 @@
 
 	gpio_keys_polled {
 		compatible = "gpio-keys-polled";
-		poll-interval = <100>;
+		poll-interval = <300>;
 
 		mode {
 		    label = "mode";
+		    debounce-interval = <300>;
 		    gpios = <&tlmm 95 0>;
 		    linux,input-type = <EV_SW>;
 		    linux,code = <SW_TABLET_MODE>;
