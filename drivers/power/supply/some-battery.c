@@ -55,6 +55,8 @@ struct some_battery {
 
 	int last_state;
 
+
+
 };
 
 static int some_battery_read(struct some_battery *battery, u8 arg0)
@@ -362,6 +364,15 @@ static int adp_get_property(struct power_supply *psy,
 {
 	struct some_battery *battery = power_supply_get_drvdata(psy);
 	int rc = 0;
+    int state;
+
+    	state = battery->adapter_online;
+//	printk(KERN_NOTICE "curr-state %d\n", battery->adapter_online);
+//	printk(KERN_NOTICE "last-state %d\n", battery->last_state);
+	if (state != battery->last_state) {
+        power_supply_changed(psy);
+	}
+    battery->last_state = state;
 
 	some_battery_update(battery);
 
