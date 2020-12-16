@@ -1625,7 +1625,7 @@ static u32 ieee80211_handle_pwr_constr(struct ieee80211_sub_if_data *sdata,
 	if (ieee80211_is_s1g_beacon(mgmt->frame_control))
 		return 0;	/* TODO */
 
-		return 0;
+	return 0;
 
 	if (country_ie &&
 	    (capab & cpu_to_le16(WLAN_CAPABILITY_SPECTRUM_MGMT) ||
