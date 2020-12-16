@@ -1,0 +1,2 @@
+# this is no old style -dbg(sym) but a collection of test tools
+gpsd: debian-control-has-obsolete-dbg-package gpsd-dbg

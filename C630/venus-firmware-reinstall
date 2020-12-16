@@ -1,0 +1,151 @@
+#!/bin/bash
+function done_failedexit {
+	if [ $1 -eq 0 ]; then
+		echo "Done"
+	else
+		echo "Failed"
+		exit
+	fi
+}
+function backup_or_delete {
+	local response
+	local name=$1
+	local dir=$2
+	local suffix=$3
+	read -r -p "Backup existing ${name} firmware (Y/n): " response
+	case "$response" in
+		[Nn])								# Delete directory
+			echo -n "Deleting old ${name} firmware: "
+			sudo rm -rf ${dir} &> /dev/null
+			done_failedexit $?
+			;;
+		*)								# Default: backup directory
+			echo -n "Moving ${dir} to ${dir}.${suffix}: "
+			sudo mv "${dir}" "${dir}.${suffix}" &> /dev/null
+			done_failedexit $?
+			;;
+	esac
+}
+
+WIN_PART=""									# Windows partition path
+# Try to automatically identify windows partition
+echo -e "${TXT_UNDERLINE}Getting Windows drivers...${TXT_NORMAL}"
+echo "Searching for Windows partition..."
+WIN_PART_LABEL="Windows"
+WIN_PART_TMP=`blkid -L "${WIN_PART_LABEL}"`
+if [ $? -eq 0 ]; then
+	echo "	Found Windows partition: ${WIN_PART_TMP}"
+	WIN_PART=${WIN_PART_TMP}
+else
+	echo "	Partition not found."
+	echo -n "Please enter the path of the Windows partition: "
+	read WIN_PART
+fi
+
+# Check if partition exists
+if [ ! -e ${WIN_PART} ]; then
+	echo "Error: Windows partition path does not exist: ${WIN_PART}"
+	exit
+fi
+
+WIN_MNT=""									# Windows mount path
+WIN_MNT_UNMNT=""								# Whether to umount windows mount
+# Check if it's already mounted
+echo -n "Checking if partition already mounted: "
+while read pmount
+do
+	if [[ "${pmount}" =~ "${WIN_PART} " ]]; then
+		WIN_MNT=`echo "${pmount}"|awk '{print $2}'`
+	fi
+done < /proc/mounts
+if [[ ${WIN_MNT} == "" ]]; then
+	echo "No"
+else
+	echo "${WIN_MNT}"
+fi
+
+# Windows partition not mounted, so mount
+if [[ $WIN_MNT == "" ]]; then
+	# Check if /mnt already in use
+	echo -n "Checking if /mnt in use: "
+	while read pmount
+	do
+		if [[ "${pmount}" =~ "/mnt " ]]; then
+			echo "Yes"
+			echo "	Either unmount /mnt, or manually mount Windows filesystem readonly and rerun."
+			exit
+		fi
+	done < /proc/mounts
+	echo "No"
+
+	# Mount windows partition
+	echo "Mounting Windows partition: ${WIN_PART}"
+	sudo mount -o ro -t ntfs ${WIN_PART} /mnt
+	if [ $? -eq 0 ]; then
+		WIN_MNT_UNMNT='/mnt'						# Flag that we need to umount /mnt
+	else
+		echo "	Error: Mount failed."
+		exit
+	fi
+fi
+
+# Check mounted readonly
+WIN_MNT_STS_RO=""
+echo -n "Checking Windows FS is read only: "
+while read pmount
+do
+	if [[ "${pmount}" =~ "${WIN_PART} " ]]; then
+		WIN_MNT_STS_RO=`echo "${pmount}"|awk '$4 ~ /^ro,/ {print "true"}; $4 ~ /^rw,/ {print "false"}'`
+	fi
+done < /proc/mounts
+echo "${WIN_MNT_STS_RO}"
+if [[ "${WIN_MNT_STS_RO}" != "true" ]]; then
+	echo "	Error: Windows filesystem not mounted read-only."
+	exit
+fi
+old="$(pwd)"
+mkdir /tmp/venus
+cd /tmp/venus
+CWD=`pwd`
+COPY_ERR=0
+# Create directory to copy windows files into
+PATH_WIN_DRV="${CWD}/Windows Drivers"
+if [ -e "${PATH_WIN_DRV}" ]; then
+	echo "Deleting existing copy of Windows drivers..."
+	rm -rf "${PATH_WIN_DRV}" &> /dev/null
+	done_failedexit $?
+fi
+echo -n "Creating directory for Windows drivers: "
+mkdir "${PATH_WIN_DRV}" &> /dev/null
+done_failedexit $?
+# Copying Window's driver file
+echo -n "Copying Window's driver files: "
+
+for VEN_FILE in `find /mnt/Windows/System32/DriverStore/FileRepository/ -name qcvss850.mbn`; do
+	VEN_PATH=`dirname "${VEN_FILE}"`
+	cp -a "${VEN_PATH}" "${PATH_WIN_DRV}" &> /dev/null
+	if [ $? -ne 0 ]; then
+		COPY_ERR=$((COPY_ERR+1))
+	fi
+done
+	#venus decoder
+	VEN_FILE_CUR=`find Windows\ Drivers/ -type f -name qcvss850.mbn -exec ls -t {} +|head -n1`
+	if [[ "${VEN_FILE_CUR}" == "" ]]; then
+		echo "Failed to find qcvss850.mbn."
+		exit
+	else
+		VEN_PATH=`dirname "${VEN_FILE_CUR}"`
+		mkdir venfirm 2> /dev/null
+		cp "$VEN_PATH/qcvss850.mbn" venfirm/
+	fi
+    cd venfirm
+	echo "Fetching pil-splitter: "
+	wget https://raw.githubusercontent.com/remittor/qcom-mbn-tools/master/pil-splitter.py
+	echo "splitting qcvss850.mbn"
+    python2 pil-splitter.py qcvss850.mbn venus
+    sudo mkdir -p /lib/firmware/qcom/venus-5.2 2> /dev/null
+	sudo cp venus* /lib/firmware/qcom/venus-5.2/
+	cd -
+	rm -Rf venfirm
+	rm -Rf 'Windows Drivers'
+    rm -Rf /tmp/venus

@@ -1,0 +1,7 @@
+#!/bin/bash                                                                                                           
+
+if [ "$IFACE" = wlan0 ]; then
+    iwconfig wlan0 txpower 20
+    # use this to check if script works:
+    # iwconfig <wlan_if> txpower 3
+fi
