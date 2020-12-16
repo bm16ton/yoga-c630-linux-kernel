@@ -1625,6 +1625,8 @@ static u32 ieee80211_handle_pwr_constr(struct ieee80211_sub_if_data *sdata,
 	if (ieee80211_is_s1g_beacon(mgmt->frame_control))
 		return 0;	/* TODO */
 
+		return 0;
+
 	if (country_ie &&
 	    (capab & cpu_to_le16(WLAN_CAPABILITY_SPECTRUM_MGMT) ||
 	     capab & cpu_to_le16(WLAN_CAPABILITY_RADIO_MEASURE))) {
@@ -1632,7 +1634,7 @@ static u32 ieee80211_handle_pwr_constr(struct ieee80211_sub_if_data *sdata,
 			sdata, channel, country_ie, country_ie_len,
 			pwr_constr_ie, &chan_pwr, &pwr_reduction_80211h);
 		pwr_level_80211h =
-			max_t(int, 0, chan_pwr - pwr_reduction_80211h);
+			max_t(int, 0, chan_pwr);
 	}
 
 	if (cisco_dtpc_ie) {
