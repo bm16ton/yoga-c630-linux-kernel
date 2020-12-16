@@ -636,6 +636,22 @@
 		bias-pull-down;
 		drive-strength = <2>;
 	};
+
+	lid_pin_active: lid-pin {
+		pins = "gpio124";
+		function = "gpio";
+
+		input-enable;
+		bias-disable;
+	};
+
+	mode_pin_active: mode-pin {
+		pins = "gpio95";
+		function = "gpio";
+
+		input-enable;
+		bias-disable;
+	};
 };
 
 &uart6 {
