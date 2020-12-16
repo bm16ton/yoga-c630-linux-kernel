@@ -4785,19 +4785,19 @@
 
 			trips {
 				cpu4_alert0: trip-point0 {
-					temperature = <90000>;
+					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu4_alert1: trip-point1 {
-					temperature = <95000>;
+					temperature = <90000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu4_crit: cpu_crit {
-					temperature = <110000>;
+					temperature = <100000>;
 					hysteresis = <1000>;
 					type = "critical";
 				};
@@ -4829,19 +4829,19 @@
 
 			trips {
 				cpu5_alert0: trip-point0 {
-					temperature = <90000>;
+					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu5_alert1: trip-point1 {
-					temperature = <95000>;
+					temperature = <90000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu5_crit: cpu_crit {
-					temperature = <110000>;
+					temperature = <100000>;
 					hysteresis = <1000>;
 					type = "critical";
 				};
@@ -4873,19 +4873,19 @@
 
 			trips {
 				cpu6_alert0: trip-point0 {
-					temperature = <90000>;
+					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu6_alert1: trip-point1 {
-					temperature = <95000>;
+					temperature = <90000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu6_crit: cpu_crit {
-					temperature = <110000>;
+					temperature = <100000>;
 					hysteresis = <1000>;
 					type = "critical";
 				};
@@ -4917,19 +4917,19 @@
 
 			trips {
 				cpu7_alert0: trip-point0 {
-					temperature = <90000>;
+					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu7_alert1: trip-point1 {
-					temperature = <95000>;
+					temperature = <90000>;
 					hysteresis = <2000>;
 					type = "passive";
 				};
 
 				cpu7_crit: cpu_crit {
-					temperature = <110000>;
+					temperature = <100000>;
 					hysteresis = <1000>;
 					type = "critical";
 				};
@@ -4976,12 +4976,12 @@
 
 			trips {
 				cluster0_alert0: trip-point0 {
-					temperature = <90000>;
+					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "hot";
 				};
 				cluster0_crit: cluster0_crit {
-					temperature = <110000>;
+					temperature = <100000>;
 					hysteresis = <2000>;
 					type = "critical";
 				};
@@ -4996,12 +4996,12 @@
 
 			trips {
 				cluster1_alert0: trip-point0 {
-					temperature = <90000>;
+					temperature = <85000>;
 					hysteresis = <2000>;
 					type = "hot";
 				};
 				cluster1_crit: cluster1_crit {
-					temperature = <110000>;
+					temperature = <100000>;
 					hysteresis = <2000>;
 					type = "critical";
 				};
