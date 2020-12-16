@@ -239,6 +239,9 @@ u32 hfi_parser(struct venus_core *core, struct venus_inst *inst, void *buf,
 
 	parser_init(inst, &codecs, &domain);
 
+	core->codecs_count = 0;
+	memset(core->caps, 0, sizeof(core->caps));
+
 	while (words_count) {
 		data = word + 1;
 
@@ -272,9 +275,6 @@ u32 hfi_parser(struct venus_core *core, struct venus_inst *inst, void *buf,
 		word++;
 		words_count--;
 	}
-
-	if (!core->max_sessions_supported)
-		core->max_sessions_supported = MAX_SESSIONS;
 
 	parser_fini(inst, codecs, domain);
 

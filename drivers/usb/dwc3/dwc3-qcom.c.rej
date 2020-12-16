@@ -1,0 +1,158 @@
+--- drivers/usb/dwc3/dwc3-qcom.c
++++ drivers/usb/dwc3/dwc3-qcom.c
+@@ -73,12 +64,9 @@ struct dwc3_qcom {
+ 
+ 	const struct dwc3_acpi_pdata *acpi_pdata;
+ 
+-	enum usb_device_speed   max_speed;
+ 	enum usb_dr_mode	mode;
+ 	bool			is_suspended;
+ 	bool			pm_suspended;
+-	struct icc_path		*usb_ddr_icc_path;
+-	struct icc_path		*apps_usb_icc_path;
+ };
+ 
+ static inline void dwc3_qcom_setbits(void __iomem *base, u32 offset, u32 val)
+@@ -193,99 +181,6 @@ static int dwc3_qcom_register_extcon(struct dwc3_qcom *qcom)
+ 	return 0;
+ }
+ 
+-/* Currently we only use bandwidth level, so just "enable" interconnects */
+-static int dwc3_qcom_interconnect_enable(struct dwc3_qcom *qcom)
+-{
+-	int ret;
+-
+-	if (qcom->max_speed >= USB_SPEED_SUPER)
+-		ret = icc_set_bw(qcom->usb_ddr_icc_path,
+-			USB_MEMORY_AVG_SS_BW, USB_MEMORY_PEAK_SS_BW);
+-	else
+-		ret = icc_set_bw(qcom->usb_ddr_icc_path,
+-			USB_MEMORY_AVG_HS_BW, USB_MEMORY_PEAK_HS_BW);
+-
+-	if (ret)
+-		return ret;
+-
+-	ret = icc_set_bw(qcom->apps_usb_icc_path,
+-		APPS_USB_AVG_BW, APPS_USB_PEAK_BW);
+-	if (ret)
+-		icc_set_bw(qcom->usb_ddr_icc_path, 0, 0);
+-
+-	return ret;
+-}
+-
+-/* To disable an interconnect, we just set its bandwidth to 0 */
+-static int dwc3_qcom_interconnect_disable(struct dwc3_qcom *qcom)
+-{
+-	int ret;
+-
+-	ret = icc_set_bw(qcom->usb_ddr_icc_path, 0, 0);
+-	if (ret)
+-		return ret;
+-
+-	ret = icc_set_bw(qcom->apps_usb_icc_path, 0, 0);
+-	if (ret)
+-		goto err_reenable_memory_path;
+-
+-	return 0;
+-
+-	/* Re-enable things in the event of an error */
+-err_reenable_memory_path:
+-	dwc3_qcom_interconnect_enable(qcom);
+-
+-	return ret;
+-}
+-
+-/**
+- * dwc3_qcom_interconnect_init() - Get interconnect path handles
+- * @qcom:			Pointer to the concerned usb core.
+- *
+- */
+-static int dwc3_qcom_interconnect_init(struct dwc3_qcom *qcom)
+-{
+-	struct device *dev = qcom->dev;
+-	int ret;
+-
+-	if (!device_is_bound(&qcom->dwc3->dev))
+-		return -EPROBE_DEFER;
+-
+-	qcom->usb_ddr_icc_path = of_icc_get(dev, "usb-ddr");
+-	if (IS_ERR(qcom->usb_ddr_icc_path)) {
+-		dev_err(dev, "Error: (%ld) failed getting usb-ddr path\n",
+-			PTR_ERR(qcom->usb_ddr_icc_path));
+-		return PTR_ERR(qcom->usb_ddr_icc_path);
+-	}
+-
+-	qcom->apps_usb_icc_path = of_icc_get(dev, "apps-usb");
+-	if (IS_ERR(qcom->apps_usb_icc_path)) {
+-		dev_err(dev, "Error: (%ld) failed getting apps-usb path\n",
+-				PTR_ERR(qcom->apps_usb_icc_path));
+-		return PTR_ERR(qcom->apps_usb_icc_path);
+-	}
+-
+-	ret = dwc3_qcom_interconnect_enable(qcom);
+-	if (ret) {
+-		dev_err(dev, "failed to enable interconnect %d\n", ret);
+-		return ret;
+-	}
+-
+-	return 0;
+-}
+-
+-/**
+- * dwc3_qcom_interconnect_exit() - Release interconnect path handles
+- * @qcom:			Pointer to the concerned usb core.
+- *
+- * This function is used to release interconnect path handle.
+- */
+-static void dwc3_qcom_interconnect_exit(struct dwc3_qcom *qcom)
+-{
+-	icc_put(qcom->usb_ddr_icc_path);
+-	icc_put(qcom->apps_usb_icc_path);
+-}
+-
+ static void dwc3_qcom_disable_interrupts(struct dwc3_qcom *qcom)
+ {
+ 	if (qcom->hs_phy_irq) {
+@@ -347,10 +242,6 @@ static int dwc3_qcom_suspend(struct dwc3_qcom *qcom)
+ 	for (i = qcom->num_clocks - 1; i >= 0; i--)
+ 		clk_disable_unprepare(qcom->clks[i]);
+ 
+-	ret = dwc3_qcom_interconnect_disable(qcom);
+-	if (ret)
+-		dev_warn(qcom->dev, "failed to disable interconnect %d\n", ret);
+-
+ 	qcom->is_suspended = true;
+ 	dwc3_qcom_enable_interrupts(qcom);
+ 
+@@ -376,10 +267,6 @@ static int dwc3_qcom_resume(struct dwc3_qcom *qcom)
+ 		}
+ 	}
+ 
+-	ret = dwc3_qcom_interconnect_enable(qcom);
+-	if (ret)
+-		dev_warn(qcom->dev, "failed to enable interconnect %d\n", ret);
+-
+ 	/* Clear existing events from PHY related to L2 in/out */
+ 	dwc3_qcom_setbits(qcom->qscratch_base, PWR_EVNT_IRQ_STAT_REG,
+ 			  PWR_EVNT_LPM_IN_L2_MASK | PWR_EVNT_LPM_OUT_L2_MASK);
+@@ -389,8 +276,6 @@ static int dwc3_qcom_resume(struct dwc3_qcom *qcom)
+ 	return 0;
+ }
+ 
+-
+-
+ static irqreturn_t qcom_dwc3_resume_irq(int irq, void *data)
+ {
+ 	struct dwc3_qcom *qcom = data;
+@@ -754,11 +639,6 @@ static int dwc3_qcom_probe(struct platform_device *pdev)
+ 		goto depopulate;
+ 	}
+ 
+-	qcom->max_speed = usb_get_maximum_speed(&qcom->dwc3->dev);
+-	ret = dwc3_qcom_interconnect_init(qcom);
+-	if (ret)
+-		goto depopulate;
+-
+ 	qcom->mode = usb_get_dr_mode(&qcom->dwc3->dev);
+ 
+ 	/* enable vbus override for device mode */

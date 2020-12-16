@@ -29,7 +29,6 @@
 #include "ar9003_mci.h"
 #include "ar9003_phy.h"
 #include "ath9k.h"
-#include "../reg.h"
 
 static bool ath9k_hw_set_reset_reg(struct ath_hw *ah, u32 type);
 
@@ -37,40 +36,6 @@ MODULE_AUTHOR("Atheros Communications");
 MODULE_DESCRIPTION("Support for Atheros 802.11n wireless LAN cards.");
 MODULE_SUPPORTED_DEVICE("Atheros 802.11n WLAN cards");
 MODULE_LICENSE("Dual BSD/GPL");
-
-u8 tx_power_man = 58; //manual power
-u8 cwmin_man = 7;
-u8 cwmax_man = 15;
-u8 aifs_man = 2;
-u8 cck_sifs_man = 10;
-u8 ofdm_sifs_man = 16;
-u8 slottime_man = 9;
-u8 thresh62_man = 28;
-
-module_param_named(txpower,tx_power_man,byte,0444);
-MODULE_PARM_DESC(txpower,"Manual TX power setting, default 58, max 63");
-
-module_param_named(cwmin,cwmin_man,byte,0444);
-MODULE_PARM_DESC(cwmin,"CWMIN setting, 0-255, default 7");
-
-module_param_named(cwmax,cwmax_man,byte,0444);
-MODULE_PARM_DESC(cwmax,"CWMAX setting, 0-255, default 15");
-
-module_param_named(aifs,aifs_man,byte,0444);
-MODULE_PARM_DESC(aifs,"AIFS setting, default 2");
-
-module_param_named(cck_sifs,cck_sifs_man,byte,0444);
-MODULE_PARM_DESC(cck_sifs,"CCK SIFS setting, default 10");
-
-module_param_named(ofdm_sifs,ofdm_sifs_man,byte,0444);
-MODULE_PARM_DESC(ofdm_sifs,"OFDM SIFS setting, default 16");
-
-module_param_named(slottime,slottime_man,byte,0444);
-MODULE_PARM_DESC(slottime,"Slottime setting, default 9");
-
-module_param_named(thresh62,thresh62_man,byte,0444);
-MODULE_PARM_DESC(thresh62,"CCA THRESH62 setting, default 28");
-
 
 static void ath9k_hw_set_clockrate(struct ath_hw *ah)
 {
@@ -507,7 +472,6 @@ static void ath9k_hw_init_defaults(struct ath_hw *ah)
 	ah->power_mode = ATH9K_PM_UNDEFINED;
 	ah->htc_reset_init = true;
 
-	/* ar9002 does not support TPC for the moment */
 	ah->tpc_enabled = false;
 
 	ah->ani_function = ATH9K_ANI_ALL;
@@ -1149,8 +1113,7 @@ void ath9k_hw_init_global_settings(struct ath_hw *ah)
 	}
 
 	/* As defined by IEEE 802.11-2007 17.3.8.6 */
-//	slottime += 3 * ah->coverage_class;
-	slottime = slottime_man;
+	slottime += 3 * ah->coverage_class;
 	acktimeout = slottime + sifstime + ack_offset;
 	ctstimeout = acktimeout;
 
@@ -1314,12 +1277,12 @@ static void ath9k_hw_set_operating_mode(struct ath_hw *ah, int opmode)
 			REG_SET_BIT(ah, AR_CFG, AR_CFG_AP_ADHOC_INDICATION);
 			break;
 		}
-		/* fall through */
+		fallthrough;
 	case NL80211_IFTYPE_OCB:
 	case NL80211_IFTYPE_MESH_POINT:
 	case NL80211_IFTYPE_AP:
 		set |= AR_STA_ID1_STA_AP;
-		/* fall through */
+		fallthrough;
 	case NL80211_IFTYPE_STATION:
 		REG_CLR_BIT(ah, AR_CFG, AR_CFG_AP_ADHOC_INDICATION);
 		break;
@@ -2330,7 +2293,7 @@ void ath9k_hw_beaconinit(struct ath_hw *ah, u32 next_beacon, u32 beacon_period)
 	case NL80211_IFTYPE_ADHOC:
 		REG_SET_BIT(ah, AR_TXCFG,
 			    AR_TXCFG_ADHOC_BEACON_ATIM_TX_POLICY);
-		/* fall through */
+		fallthrough;
 	case NL80211_IFTYPE_MESH_POINT:
 	case NL80211_IFTYPE_AP:
 		REG_WRITE(ah, AR_NEXT_TBTT_TIMER, next_beacon);
@@ -3000,7 +2963,7 @@ void ath9k_hw_apply_txpower(struct ath_hw *ah, struct ath9k_channel *chan,
 		return;
 
 	if (!test)
-		ctl = NO_CTL;
+		ctl = ath9k_regd_get_ctl(reg, chan);
 
 	channel = chan->chan;
 	chan_pwr = min_t(int, channel->max_power * 2, MAX_COMBINED_POWER);

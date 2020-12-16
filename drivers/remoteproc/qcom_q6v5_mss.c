@@ -186,6 +186,7 @@ struct q6v5 {
 	size_t total_dump_size;
 
 	phys_addr_t mba_phys;
+	void *mba_region;
 	size_t mba_size;
 	size_t dp_size;
 
@@ -407,7 +408,7 @@ static int q6v5_xfer_mem_ownership(struct q6v5 *qproc, int *current_perm,
 				   current_perm, next, perms);
 }
 
-static void q6v5_debug_policy_load(struct q6v5 *qproc, void *ptr)
+static void q6v5_debug_policy_load(struct q6v5 *qproc)
 {
 	const struct firmware *dp_fw;
 
@@ -415,7 +416,7 @@ static void q6v5_debug_policy_load(struct q6v5 *qproc, void *ptr)
 		return;
 
 	if (SZ_1M + dp_fw->size <= qproc->mba_size) {
-		memcpy(ptr + SZ_1M, dp_fw->data, dp_fw->size);
+		memcpy(qproc->mba_region + SZ_1M, dp_fw->data, dp_fw->size);
 		qproc->dp_size = dp_fw->size;
 	}
 
@@ -425,7 +426,6 @@ static void q6v5_debug_policy_load(struct q6v5 *qproc, void *ptr)
 static int q6v5_load(struct rproc *rproc, const struct firmware *fw)
 {
 	struct q6v5 *qproc = rproc->priv;
-	void *ptr;
 
 	/* MBA is restricted to a maximum size of 1M */
 	if (fw->size > qproc->mba_size || fw->size > SZ_1M) {
@@ -433,16 +433,8 @@ static int q6v5_load(struct rproc *rproc, const struct firmware *fw)
 		return -EINVAL;
 	}
 
-	ptr = memremap(qproc->mba_phys, qproc->mba_size, MEMREMAP_WC);
-	if (!ptr) {
-		dev_err(qproc->dev, "unable to map memory region: %pa+%zx\n",
-			&qproc->mba_phys, qproc->mba_size);
-		return -EBUSY;
-	}
-
-	memcpy(ptr, fw->data, fw->size);
-	q6v5_debug_policy_load(qproc, ptr);
-	memunmap(ptr);
+	memcpy(qproc->mba_region, fw->data, fw->size);
+	q6v5_debug_policy_load(qproc);
 
 	return 0;
 }
@@ -549,7 +541,6 @@ static void q6v5_dump_mba_logs(struct q6v5 *qproc)
 {
 	struct rproc *rproc = qproc->rproc;
 	void *data;
-	void *ptr;
 
 	if (!qproc->has_mba_logs)
 		return;
@@ -558,16 +549,12 @@ static void q6v5_dump_mba_logs(struct q6v5 *qproc)
 				    qproc->mba_size))
 		return;
 
-	ptr = memremap(qproc->mba_phys, qproc->mba_size, MEMREMAP_WC);
-	if (!ptr)
+	data = vmalloc(MBA_LOG_SIZE);
+	if (!data)
 		return;
 
-	data = vmalloc(MBA_LOG_SIZE);
-	if (data) {
-		memcpy(data, ptr, MBA_LOG_SIZE);
-		dev_coredumpv(&rproc->dev, data, MBA_LOG_SIZE, GFP_KERNEL);
-	}
-	memunmap(ptr);
+	memcpy(data, qproc->mba_region, MBA_LOG_SIZE);
+	dev_coredumpv(&rproc->dev, data, MBA_LOG_SIZE, GFP_KERNEL);
 }
 
 static int q6v5proc_reset(struct q6v5 *qproc)
@@ -947,6 +934,17 @@ static int q6v5_mba_load(struct q6v5 *qproc)
 		goto assert_reset;
 	}
 
+	/*
+	 * Some versions of the MBA firmware will upon boot wipe the MPSS region as well, so provide
+	 * the Q6 access to this region.
+	 */
+	ret = q6v5_xfer_mem_ownership(qproc, &qproc->mpss_perm, false, true,
+				      qproc->mpss_phys, qproc->mpss_size);
+	if (ret) {
+		dev_err(qproc->dev, "assigning Q6 access to mpss memory failed: %d\n", ret);
+		goto disable_active_clks;
+	}
+
 	/* Assign MBA image access in DDR to q6 */
 	ret = q6v5_xfer_mem_ownership(qproc, &qproc->mba_perm, false, true,
 				      qproc->mba_phys, qproc->mba_size);
@@ -1151,10 +1149,9 @@ static int q6v5_mpss_load(struct q6v5 *qproc)
 			max_addr = ALIGN(phdr->p_paddr + phdr->p_memsz, SZ_4K);
 	}
 
-	/**
+	/*
 	 * In case of a modem subsystem restart on secure devices, the modem
-	 * memory can be reclaimed only after MBA is loaded. For modem cold
-	 * boot this will be a nop
+	 * memory can be reclaimed only after MBA is loaded.
 	 */
 	q6v5_xfer_mem_ownership(qproc, &qproc->mpss_perm, true, false,
 				qproc->mpss_phys, qproc->mpss_size);
@@ -1185,7 +1182,7 @@ static int q6v5_mpss_load(struct q6v5 *qproc)
 			goto release_firmware;
 		}
 
-		ptr = memremap(qproc->mpss_phys + offset, phdr->p_memsz, MEMREMAP_WC);
+		ptr = ioremap_wc(qproc->mpss_phys + offset, phdr->p_memsz);
 		if (!ptr) {
 			dev_err(qproc->dev,
 				"unable to map memory region: %pa+%zx-%x\n",
@@ -1200,7 +1197,7 @@ static int q6v5_mpss_load(struct q6v5 *qproc)
 					"failed to load segment %d from truncated file %s\n",
 					i, fw_name);
 				ret = -EINVAL;
-				memunmap(ptr);
+				iounmap(ptr);
 				goto release_firmware;
 			}
 
@@ -1212,7 +1209,7 @@ static int q6v5_mpss_load(struct q6v5 *qproc)
 							ptr, phdr->p_filesz);
 			if (ret) {
 				dev_err(qproc->dev, "failed to load %s\n", fw_name);
-				memunmap(ptr);
+				iounmap(ptr);
 				goto release_firmware;
 			}
 
@@ -1223,7 +1220,7 @@ static int q6v5_mpss_load(struct q6v5 *qproc)
 			memset(ptr + phdr->p_filesz, 0,
 			       phdr->p_memsz - phdr->p_filesz);
 		}
-		memunmap(ptr);
+		iounmap(ptr);
 		size += phdr->p_memsz;
 
 		code_length = readl(qproc->rmb_base + RMB_PMI_CODE_LENGTH_REG);
@@ -1290,11 +1287,11 @@ static void qcom_q6v5_dump_segment(struct rproc *rproc,
 	}
 
 	if (!ret)
-		ptr = memremap(qproc->mpss_phys + offset + cp_offset, size, MEMREMAP_WC);
+		ptr = ioremap_wc(qproc->mpss_phys + offset + cp_offset, size);
 
 	if (ptr) {
 		memcpy(dest, ptr, size);
-		memunmap(ptr);
+		iounmap(ptr);
 	} else {
 		memset(dest, 0xff, size);
 	}
@@ -1361,7 +1358,7 @@ static int q6v5_stop(struct rproc *rproc)
 	struct q6v5 *qproc = (struct q6v5 *)rproc->priv;
 	int ret;
 
-	ret = qcom_q6v5_request_stop(&qproc->q6v5, qproc->sysmon);
+	ret = qcom_q6v5_request_stop(&qproc->q6v5);
 	if (ret == -ETIMEDOUT)
 		dev_err(qproc->dev, "timed out on wait\n");
 
@@ -1594,6 +1591,12 @@ static int q6v5_alloc_memory_region(struct q6v5 *qproc)
 
 	qproc->mba_phys = r.start;
 	qproc->mba_size = resource_size(&r);
+	qproc->mba_region = devm_ioremap_wc(qproc->dev, qproc->mba_phys, qproc->mba_size);
+	if (!qproc->mba_region) {
+		dev_err(qproc->dev, "unable to map memory region: %pa+%zx\n",
+			&r.start, qproc->mba_size);
+		return -EBUSY;
+	}
 
 	if (!child) {
 		node = of_parse_phandle(qproc->dev->of_node,

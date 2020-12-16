@@ -193,10 +193,8 @@ static int adsp_start(struct rproc *rproc)
 
 	dev_pm_genpd_set_performance_state(adsp->dev, INT_MAX);
 	ret = pm_runtime_get_sync(adsp->dev);
-	if (ret) {
-		pm_runtime_put_noidle(adsp->dev);
+	if (ret)
 		goto disable_xo_clk;
-	}
 
 	ret = clk_bulk_prepare_enable(adsp->num_clks, adsp->clks);
 	if (ret) {
@@ -266,7 +264,7 @@ static int adsp_stop(struct rproc *rproc)
 	int handover;
 	int ret;
 
-	ret = qcom_q6v5_request_stop(&adsp->q6v5, adsp->sysmon);
+	ret = qcom_q6v5_request_stop(&adsp->q6v5);
 	if (ret == -ETIMEDOUT)
 		dev_err(adsp->dev, "timed out on wait\n");
 

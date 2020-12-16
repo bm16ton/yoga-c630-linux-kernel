@@ -52,11 +52,6 @@ struct some_battery {
 	unsigned int voltage_now;
 
 	int rate_now;
-
-	int last_state;
-
-
-
 };
 
 static int some_battery_read(struct some_battery *battery, u8 arg0)
@@ -198,7 +193,7 @@ static int some_battery_update_status(struct some_battery *battery)
 
 	lsb = some_battery_read(battery, BAC0);
 	msb = some_battery_read(battery, BAC1);
-	battery->rate_now = sign_extend32((msb << 8) | lsb, 15) * battery->basc;
+	battery->rate_now = sign_extend32((msb << 8) | lsb, 16);
 
 	if (battery->unit_ma)
 		battery->rate_now = battery->rate_now * battery->voltage_now / 1000;
@@ -260,15 +255,6 @@ static int bat0_get_property(struct power_supply *psy,
 {
 	struct some_battery *battery = power_supply_get_drvdata(psy);
 	int rc = 0;
-    int state;
-
-    	state = battery->adapter_online;
-//	printk(KERN_NOTICE "curr-state %d\n", battery->adapter_online);
-//	printk(KERN_NOTICE "last-state %d\n", battery->last_state);
-	if (state != battery->last_state) {
-        power_supply_changed(psy);
-	}
-    battery->last_state = state;
 
 	if (some_battery_present(battery))
 		some_battery_update(battery);
@@ -293,16 +279,16 @@ static int bat0_get_property(struct power_supply *psy,
 		val->intval = battery->design_voltage;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
-		val->intval = battery->design_capacity * 100;
+		val->intval = battery->design_capacity;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_FULL:
-		val->intval = battery->full_charge_capacity * 100;
+		val->intval = battery->full_charge_capacity;
 		break;
 	case POWER_SUPPLY_PROP_CHARGE_NOW:
-		val->intval = battery->capacity_now * 100;
+		val->intval = battery->capacity_now;
 		break;
 	case POWER_SUPPLY_PROP_CURRENT_NOW:
-		val->intval = battery->rate_now * 100;
+		val->intval = battery->rate_now;
 		break;
 	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
 		val->intval = battery->voltage_now;
@@ -364,15 +350,6 @@ static int adp_get_property(struct power_supply *psy,
 {
 	struct some_battery *battery = power_supply_get_drvdata(psy);
 	int rc = 0;
-    int state;
-
-    	state = battery->adapter_online;
-//	printk(KERN_NOTICE "curr-state %d\n", battery->adapter_online);
-//	printk(KERN_NOTICE "last-state %d\n", battery->last_state);
-	if (state != battery->last_state) {
-        power_supply_changed(psy);
-	}
-    battery->last_state = state;
 
 	some_battery_update(battery);
 

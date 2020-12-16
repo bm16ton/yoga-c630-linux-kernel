@@ -64,11 +64,20 @@
 #define  SN_GPIO_INPUT_SHIFT			4
 #define  SN_GPIO_OUTPUT_SHIFT			0
 #define SN_GPIO_CTRL_REG			0x5F
+#define  GPIO_CTRL_INPUT			0
+#define  GPIO_CTRL_OUTPUT			1
+#define  GPIO_CTRL_PWM				2
+#define  GPIO_CTRL_SYNC				2
+#define  GPIO_CTRL_SUSPEND			2
+#define  GPIO_CTRL_MASK				3
 #define  SN_GPIO_MUX_INPUT			0
 #define  SN_GPIO_MUX_OUTPUT			1
 #define  SN_GPIO_MUX_SPECIAL			2
 #define  SN_GPIO_MUX_MASK			0x3
-#define  SN_GPIO_MUX_SHIFT(gpio)		((gpio) * 2)
+#define  GPIO_CTRL_GPIO1_SHIFT			0
+#define  GPIO_CTRL_GPIO2_SHIFT			2
+#define  GPIO_CTRL_GPIO3_SHIFT			4
+#define  GPIO_CTRL_GPIO4_SHIFT			6
 #define SN_AUX_WDATA_REG(x)			(0x64 + (x))
 #define SN_AUX_ADDR_19_16_REG			0x74
 #define SN_AUX_ADDR_15_8_REG			0x75
@@ -87,12 +96,13 @@
 #define SN_ML_TX_MODE_REG			0x96
 #define  ML_TX_MAIN_LINK_OFF			0
 #define  ML_TX_NORMAL_MODE			BIT(0)
-#define SN_PWM_PRE_DIV_REG			0xA0
-#define SN_BACKLIGHT_SCALE_REG			0xA1
-#define SN_BACKLIGHT_REG			0xA3
-#define SN_PWM_CTL_REG				0xA5
-#define  SN_PWM_ENABLE				BIT(1)
-#define  SN_PWM_INVERT				BIT(0)
+#define SN_BACKLIGHT_SCALE_LOW			0xA1
+#define SN_BACKLIGHT_SCALE_HIGH			0xA2
+#define SN_BACKLIGHT_LOW			0xA3
+#define SN_BACKLIGHT_HIGH			0xA4
+#define SN_BACKLIGHT_PWM			0xA5
+#define  BL_PWM_ENABLE				BIT(1)
+#define  BL_PWM_INVERT				BIT(0)
 #define SN_AUX_CMD_STATUS_REG			0xF4
 #define  AUX_IRQ_STATUS_AUX_RPLY_TOUT		BIT(3)
 #define  AUX_IRQ_STATUS_AUX_SHORT		BIT(5)
@@ -112,8 +122,6 @@
 #define SN_MAX_DP_LANES			4
 #define SN_NUM_GPIOS			4
 #define SN_GPIO_PHYSICAL_OFFSET		1
-
-#define SN_LINK_TRAINING_TRIES		10
 
 /**
  * struct ti_sn_bridge - Platform data for ti-sn65dsi86 driver.
@@ -157,6 +165,8 @@ struct ti_sn_bridge {
 	struct gpio_desc		*enable_gpio;
 	struct regulator_bulk_data	supplies[SN_REGULATOR_SUPPLY_NUM];
 	int				dp_lanes;
+	u32				brightness;
+	u32				max_brightness;
 	u8				ln_assign;
 	u8				ln_polrs;
 
@@ -164,8 +174,6 @@ struct ti_sn_bridge {
 	struct gpio_chip		gchip;
 	DECLARE_BITMAP(gchip_output, SN_NUM_GPIOS);
 #endif
-	u32				brightness;
-	u32				max_brightness;
 };
 
 static const struct regmap_range ti_sn_bridge_volatile_ranges[] = {
@@ -184,67 +192,13 @@ static const struct regmap_config ti_sn_bridge_regmap_config = {
 	.cache_type = REGCACHE_NONE,
 };
 
-static void ti_sn_bridge_read_u16(struct ti_sn_bridge *pdata,
-				  unsigned int reg, u16 *val)
-{
-	unsigned int high;
-	unsigned int low;
-
-	regmap_read(pdata->regmap, reg, &low);
-	regmap_read(pdata->regmap, reg + 1, &high);
-
-	*val = high << 8 | low;
-}
+static int ti_sn_backlight_update(struct ti_sn_bridge *pdata);
 
 static void ti_sn_bridge_write_u16(struct ti_sn_bridge *pdata,
 				   unsigned int reg, u16 val)
 {
 	regmap_write(pdata->regmap, reg, val & 0xFF);
 	regmap_write(pdata->regmap, reg + 1, val >> 8);
-}
-
-static int ti_sn_backlight_update(struct ti_sn_bridge *pdata)
-{
-	unsigned int pre_div;
-
-	if (!pdata->max_brightness)
-		return 0;
-
-	/* Enable PWM on GPIO4 */
-	regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
-			   SN_GPIO_MUX_MASK << SN_GPIO_MUX_SHIFT(4 - 1),
-			   SN_GPIO_MUX_SPECIAL << SN_GPIO_MUX_SHIFT(4 - 1));
-
-	if (pdata->brightness) {
-		/* Set max brightness */
-		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_SCALE_REG, pdata->max_brightness);
-
-		/* Set brightness */
-		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_REG, pdata->brightness);
-
-		/*
-		 * The PWM frequency is derived from the refclk as:
-		 * PWM_FREQ = REFCLK_FREQ / (PWM_PRE_DIV * BACKLIGHT_SCALE + 1)
-		 *
-		 * A hand wavy estimate based on 12MHz refclk and 500Hz desired
-		 * PWM frequency gives us a pre_div resulting in a PWM
-		 * frequency of between 500 and 1600Hz, depending on the actual
-		 * refclk rate.
-		 *
-		 * One is added to avoid high BACKLIGHT_SCALE values to produce
-		 * a pre_div of 0 - which cancels out the large BACKLIGHT_SCALE
-		 * value.
-		 */
-		pre_div = 12000000 / (500 * pdata->max_brightness) + 1;
-		regmap_write(pdata->regmap, SN_PWM_PRE_DIV_REG, pre_div);
-
-		/* Enable PWM */
-		regmap_update_bits(pdata->regmap, SN_PWM_CTL_REG, SN_PWM_ENABLE, SN_PWM_ENABLE);
-	} else {
-		regmap_update_bits(pdata->regmap, SN_PWM_CTL_REG, SN_PWM_ENABLE, 0);
-	}
-
-	return 0;
 }
 
 static int __maybe_unused ti_sn_bridge_resume(struct device *dev)
@@ -466,9 +420,6 @@ static int ti_sn_bridge_attach(struct drm_bridge *bridge,
 		goto err_dsi_attach;
 	}
 	pdata->dsi = dsi;
-
-	/* attach panel to bridge */
-	drm_panel_attach(pdata->panel, &pdata->connector);
 
 	return 0;
 
@@ -749,7 +700,6 @@ static int ti_sn_link_training(struct ti_sn_bridge *pdata, int dp_rate_idx,
 {
 	unsigned int val;
 	int ret;
-	int i;
 
 	/* set dp clk frequency value */
 	regmap_update_bits(pdata->regmap, SN_DATARATE_CONFIG_REG,
@@ -766,33 +716,18 @@ static int ti_sn_link_training(struct ti_sn_bridge *pdata, int dp_rate_idx,
 		goto exit;
 	}
 
-	/*
-	 * We'll try to link train several times.  As part of link training
-	 * the bridge chip will write DP_SET_POWER_D0 to DP_SET_POWER.  If
-	 * the panel isn't ready quite it might respond NAK here which means
-	 * we need to try again.
-	 */
-	for (i = 0; i < SN_LINK_TRAINING_TRIES; i++) {
-		/* Semi auto link training mode */
-		regmap_write(pdata->regmap, SN_ML_TX_MODE_REG, 0x0A);
-		ret = regmap_read_poll_timeout(pdata->regmap, SN_ML_TX_MODE_REG, val,
-					val == ML_TX_MAIN_LINK_OFF ||
-					val == ML_TX_NORMAL_MODE, 1000,
-					500 * 1000);
-		if (ret) {
-			*last_err_str = "Training complete polling failed";
-		} else if (val == ML_TX_MAIN_LINK_OFF) {
-			*last_err_str = "Link training failed, link is off";
-			ret = -EIO;
-			continue;
-		}
-
-		break;
+	/* Semi auto link training mode */
+	regmap_write(pdata->regmap, SN_ML_TX_MODE_REG, 0x0A);
+	ret = regmap_read_poll_timeout(pdata->regmap, SN_ML_TX_MODE_REG, val,
+				       val == ML_TX_MAIN_LINK_OFF ||
+				       val == ML_TX_NORMAL_MODE, 1000,
+				       500 * 1000);
+	if (ret) {
+		*last_err_str = "Training complete polling failed";
+	} else if (val == ML_TX_MAIN_LINK_OFF) {
+		*last_err_str = "Link training failed, link is off";
+		ret = -EIO;
 	}
-
-	/* If we saw quite a few retries, add a note about it */
-	if (!ret && i > SN_LINK_TRAINING_TRIES / 2)
-		DRM_DEV_INFO(pdata->dev, "Link training needed %d retries\n", i);
 
 exit:
 	/* Disable the PLL if we failed */
@@ -1099,7 +1034,7 @@ static int ti_sn_bridge_gpio_direction_input(struct gpio_chip *chip,
 					     unsigned int offset)
 {
 	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
-	int shift = SN_GPIO_MUX_SHIFT(offset);
+	int shift = offset * 2;
 	int ret;
 
 	if (!test_and_clear_bit(offset, pdata->gchip_output))
@@ -1127,7 +1062,7 @@ static int ti_sn_bridge_gpio_direction_output(struct gpio_chip *chip,
 					      unsigned int offset, int val)
 {
 	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
-	int shift = SN_GPIO_MUX_SHIFT(offset);
+	int shift = offset * 2;
 	int ret;
 
 	if (test_and_set_bit(offset, pdata->gchip_output))
@@ -1162,16 +1097,11 @@ static const char * const ti_sn_bridge_gpio_names[SN_NUM_GPIOS] = {
 
 static int ti_sn_setup_gpio_controller(struct ti_sn_bridge *pdata)
 {
-	int ngpio = SN_NUM_GPIOS;
 	int ret;
 
 	/* Only init if someone is going to use us as a GPIO controller */
 	if (!of_property_read_bool(pdata->dev->of_node, "gpio-controller"))
 		return 0;
-
-	/* If GPIO4 is used for backlight, reduce number of gpios */
-	if (pdata->max_brightness)
-		ngpio--;
 
 	pdata->gchip.label = dev_name(pdata->dev);
 	pdata->gchip.parent = pdata->dev;
@@ -1186,7 +1116,7 @@ static int ti_sn_setup_gpio_controller(struct ti_sn_bridge *pdata)
 	pdata->gchip.set = ti_sn_bridge_gpio_set;
 	pdata->gchip.can_sleep = true;
 	pdata->gchip.names = ti_sn_bridge_gpio_names;
-	pdata->gchip.ngpio = ngpio;
+	pdata->gchip.ngpio = SN_NUM_GPIOS;
 	pdata->gchip.base = -1;
 	ret = devm_gpiochip_add_data(pdata->dev, &pdata->gchip, pdata);
 	if (ret)
@@ -1253,6 +1183,35 @@ static void ti_sn_bridge_parse_lanes(struct ti_sn_bridge *pdata,
 	pdata->ln_polrs = ln_polrs;
 }
 
+static int ti_sn_backlight_update(struct ti_sn_bridge *pdata)
+{
+	if (!pdata->max_brightness)
+		return 0;
+
+	/* Enable PWM on GPIO4 */
+	regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
+			   GPIO_CTRL_MASK << GPIO_CTRL_GPIO4_SHIFT,
+			   GPIO_CTRL_PWM << GPIO_CTRL_GPIO4_SHIFT);
+
+	/* Set max brightness, high and low bytes */
+	ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_SCALE_LOW, pdata->max_brightness);
+
+	if (pdata->brightness) {
+		/* Set brightness */
+		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_LOW, pdata->brightness);
+
+		/* Reduce the PWM frequency */
+		regmap_write(pdata->regmap, 0xa0, 75);
+
+		/* Enable PWM */
+		regmap_update_bits(pdata->regmap, SN_BACKLIGHT_PWM, BL_PWM_ENABLE, BL_PWM_ENABLE);
+	} else {
+		regmap_update_bits(pdata->regmap, SN_BACKLIGHT_PWM, BL_PWM_ENABLE, 0);
+	}
+
+	return 0;
+}
+
 static int ti_sn_backlight_update_status(struct backlight_device *bl)
 {
 	struct ti_sn_bridge *pdata = bl_get_data(bl);
@@ -1272,11 +1231,19 @@ static int ti_sn_backlight_update_status(struct backlight_device *bl)
 static int ti_sn_backlight_get_brightness(struct backlight_device *bl)
 {
 	struct ti_sn_bridge *pdata = bl_get_data(bl);
-	u16 val;
+	unsigned int high;
+	unsigned int low;
+	int ret;
 
-	ti_sn_bridge_read_u16(pdata, SN_BACKLIGHT_REG, &val);
+	ret = regmap_read(pdata->regmap, SN_BACKLIGHT_LOW, &low);
+	if (ret)
+		return ret;
 
-	return val;
+	ret = regmap_read(pdata->regmap, SN_BACKLIGHT_HIGH, &high);
+	if (ret)
+		return ret;
+
+	return high << 8 | low;
 }
 
 const struct backlight_ops ti_sn_backlight_ops = {
@@ -1292,18 +1259,22 @@ static int ti_sn_backlight_init(struct ti_sn_bridge *pdata)
 	struct device_node *np = dev->of_node;
 	int ret;
 
-	ret = of_property_read_u32(np, "ti,backlight-scale", &pdata->max_brightness);
+	ret = of_property_read_u32(np, "max-brightness", &pdata->max_brightness);
 	if (ret == -EINVAL) {
+		DRM_ERROR("max-brightness omitted\n");
 		return 0;
-	} else if (ret || pdata->max_brightness >= 0xffff) {
+	}
+	else if (ret || pdata->max_brightness >= 0xffff) {
 		DRM_ERROR("invalid max-brightness\n");
 		return -EINVAL;
 	}
 
 	props.type = BACKLIGHT_RAW;
 	props.max_brightness = pdata->max_brightness;
+	props.brightness = pdata->max_brightness;
+	pdata->brightness = pdata->max_brightness;
 	bl = devm_backlight_device_register(dev, "sn65dsi86", dev, pdata,
-					    &ti_sn_backlight_ops, &props);
+					     &ti_sn_backlight_ops, &props);
 	if (IS_ERR(bl)) {
 		DRM_ERROR("failed to register backlight device\n");
 		return PTR_ERR(bl);
@@ -1375,14 +1346,12 @@ static int ti_sn_bridge_probe(struct i2c_client *client,
 	if (ret)
 		return ret;
 
+	ret = ti_sn_backlight_init(pdata);
+	if (ret)
+		return ret;
+
 	if (!gpiod_get_value(pdata->enable_gpio)) {
 		pm_runtime_enable(pdata->dev);
-	}
-
-	ret = ti_sn_backlight_init(pdata);
-	if (ret) {
-		pm_runtime_disable(pdata->dev);
-		return ret;
 	}
 
 	ret = ti_sn_setup_gpio_controller(pdata);

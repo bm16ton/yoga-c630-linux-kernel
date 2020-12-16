@@ -17,8 +17,6 @@
 #include <linux/regmap.h>
 #include <linux/slab.h>
 #include <linux/thermal.h>
-#include "../thermal_hwmon.h"
-#include "../thermal_core.h"
 #include "tsens.h"
 
 /**
@@ -975,12 +973,6 @@ static int tsens_register(struct tsens_priv *priv)
 		priv->sensor[i].tzd = tzd;
 		if (priv->ops->enable)
 			priv->ops->enable(priv, i);
-	
-	tzd->tzp->no_hwmon = false;
-    ret = thermal_add_hwmon_sysfs(tzd);
-    if (ret)
-    return ret;  
-           
 	}
 
 	ret = tsens_register_irq(priv, "uplow", tsens_irq_thread);

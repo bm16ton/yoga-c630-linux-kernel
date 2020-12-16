@@ -6,12 +6,7 @@
 
 #include "msm_drv.h"
 #include "msm_gem.h"
-
-int msm_purging;
-module_param_named(purging, msm_purging, int, 0444);
-MODULE_PARM_DESC(purging, "Enable purging bytes msg");
-
-EXPORT_SYMBOL(msm_purging);
+#include "msm_gpu_trace.h"
 
 static bool msm_gem_shrinker_lock(struct drm_device *dev, bool *unlock)
 {
@@ -93,13 +88,9 @@ msm_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
 		mutex_unlock(&dev->struct_mutex);
 
 	if (freed > 0)
-	if (msm_purging) {
-		pr_info_ratelimited("msm_gem_shrinker Purging %lu bytes\n", freed << PAGE_SHIFT);
-	return freed;
-	    }
-	    pr_info_once("msm_gem_shrinker Purging %lu bytes\n", freed << PAGE_SHIFT);
-	return freed;
+		trace_msm_gem_purge(freed << PAGE_SHIFT);
 
+	return freed;
 }
 
 static int
@@ -133,7 +124,7 @@ msm_gem_shrinker_vmap(struct notifier_block *nb, unsigned long event, void *ptr)
 	*(unsigned long *)ptr += unmapped;
 
 	if (unmapped > 0)
-		pr_info_ratelimited("Purging %u vmaps\n", unmapped);
+		trace_msm_gem_purge_vmaps(unmapped);
 
 	return NOTIFY_DONE;
 }

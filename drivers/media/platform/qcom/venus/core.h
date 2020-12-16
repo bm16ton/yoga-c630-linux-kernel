@@ -12,11 +12,19 @@
 #include <media/v4l2-ctrls.h>
 #include <media/v4l2-device.h>
 
+#include "dbgfs.h"
 #include "hfi.h"
+
+#define VDBGL	"VenusLow : "
+#define VDBGM	"VenusMed : "
+#define VDBGH	"VenusHigh: "
+#define VDBGFW	"VenusFW  : "
 
 #define VIDC_CLKS_NUM_MAX		4
 #define VIDC_VCODEC_CLKS_NUM_MAX	2
 #define VIDC_PMDOMAINS_NUM_MAX		3
+
+extern int venus_fw_debug;
 
 struct freq_tbl {
 	unsigned int load;
@@ -88,7 +96,6 @@ struct venus_format {
 #define MAX_CAP_ENTRIES		32
 #define MAX_ALLOC_MODE_ENTRIES	16
 #define MAX_CODEC_NUM		32
-#define MAX_SESSIONS		16
 
 struct raw_formats {
 	u32 buftype;
@@ -142,6 +149,7 @@ struct venus_caps {
  * @priv:	a private filed for HFI operations
  * @ops:		the core HFI operations
  * @work:	a delayed work for handling system fatal error
+ * @root:	debugfs root directory
  */
 struct venus_core {
 	void __iomem *base;
@@ -195,6 +203,7 @@ struct venus_core {
 	unsigned int codecs_count;
 	unsigned int core0_usage_count;
 	unsigned int core1_usage_count;
+	struct dentry *root;
 };
 
 struct vdec_controls {
@@ -211,6 +220,8 @@ struct venc_controls {
 	u32 bitrate;
 	u32 bitrate_peak;
 	u32 rc_enable;
+	u32 const_quality;
+	u32 frame_skip_mode;
 
 	u32 h264_i_period;
 	u32 h264_entropy_mode;
@@ -233,15 +244,17 @@ struct venc_controls {
 	u32 header_mode;
 
 	struct {
-		u32 mpeg4;
 		u32 h264;
-		u32 vpx;
+		u32 mpeg4;
 		u32 hevc;
+		u32 vp8;
+		u32 vp9;
 	} profile;
 	struct {
-		u32 mpeg4;
 		u32 h264;
+		u32 mpeg4;
 		u32 hevc;
+		u32 vp9;
 	} level;
 };
 
@@ -359,7 +372,6 @@ struct venus_inst {
 	unsigned int streamon_cap, streamon_out;
 	u32 width;
 	u32 height;
-	struct v4l2_rect crop;
 	u32 out_width;
 	u32 out_height;
 	u32 colorspace;
