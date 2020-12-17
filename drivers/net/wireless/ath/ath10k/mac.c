@@ -9290,7 +9290,7 @@ static const struct ieee80211_ops ath10k_ops = {
 	.center_freq		= (_freq), \
 	.flags			= (_flags), \
 	.max_antenna_gain	= 0, \
-	.max_power		= 30, \
+	.max_power		= 33, \
 }
 
 #define CHAN5G(_channel, _freq, _flags) { \
@@ -9299,7 +9299,7 @@ static const struct ieee80211_ops ath10k_ops = {
 	.center_freq		= (_freq), \
 	.flags			= (_flags), \
 	.max_antenna_gain	= 0, \
-	.max_power		= 30, \
+	.max_power		= 33, \
 }
 
 static const struct ieee80211_channel ath10k_2ghz_channels[] = {
