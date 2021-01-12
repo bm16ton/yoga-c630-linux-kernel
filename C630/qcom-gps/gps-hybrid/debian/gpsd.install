@@ -1,4 +1,0 @@
-usr/sbin/*
-usr/share/man/man8/*
-lib/systemd/system/*
-usr/bin/ppscheck
