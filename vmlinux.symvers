@@ -9145,6 +9145,7 @@
 0x00000000	seq_puts	vmlinux	EXPORT_SYMBOL	
 0x00000000	seq_putc	vmlinux	EXPORT_SYMBOL	
 0x00000000	super_setup_bdi_name	vmlinux	EXPORT_SYMBOL	
+0x00000000	down_read_interruptible	vmlinux	EXPORT_SYMBOL	
 0x00000000	snd_soc_component_set_pll	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	snd_pcm_hw_param_last	vmlinux	EXPORT_SYMBOL	
 0x00000000	usb_create_shared_hcd	vmlinux	EXPORT_SYMBOL_GPL	
