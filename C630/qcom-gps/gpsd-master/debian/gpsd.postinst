@@ -1,0 +1,27 @@
+#!/bin/bash
+# postinst script for gpsd
+
+set -e
+
+if [ "$1" = "configure" ] ; then
+
+    echo "Creating/updating gpsd user account..."
+    adduser --system --ingroup dialout --home /run/gpsd \
+            --gecos "GPSD system user" --shell /bin/false \
+            --quiet --disabled-password gpsd || {
+        # adduser failed. Why?
+        if getent passwd gpsd >/dev/null ; then
+            echo "Non-system user gpsd found. I will not overwrite a non-system" >&2
+            echo "user.  Remove the user and reinstall gpsd." >&2
+            exit 1
+        fi
+        # unknown adduser error, simply exit
+        exit 1
+    }
+
+
+fi
+
+#DEBHELPER#
+
+exit 0

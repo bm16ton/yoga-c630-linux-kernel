@@ -1,0 +1,155 @@
+#!/usr/bin/env python
+#
+# This file is Copyright (c) 2010 by the GPSD project
+# SPDX-License-Identifier: BSD-2-clause
+#
+# Display GPS output.  Hexify it if necessary.
+#
+
+# This code runs compatibly under Python 2 and 3.x for x >= 2.
+# Preserve this property!
+from __future__ import absolute_import, print_function, division
+
+import getopt
+import os
+import select
+import socket
+import sys
+import termios
+
+import curses.ascii
+
+import gps.packet as sniffer
+
+# The spec says 82, but some receivers (TN-200, GSW 2.3.2) output 86 characters
+# the Skyrtaq S2525F8 emits 100 chars
+NMEA_MAX = 102
+
+# Lowest debug level at which packet getter begins to emit messages, minus one
+BASELEVEL = sniffer.LOG_IO
+
+highhalf_latch = True
+
+
+def hexdump(st):
+    dmp = ""
+    for ch in bytearray(st):  # bytearray gets array of ints in Python 2 and 3
+        if curses.ascii.isprint(ch) or curses.ascii.isspace(ch):
+            dmp += chr(ch)
+        else:
+            dmp += "\\x%02x" % ch
+    return dmp
+
+debuglevel = 0
+
+
+def reporter(errlevel, msg):
+    if errlevel <= debuglevel:
+        sys.stdout.write(msg)
+
+
+def printusage():
+    sys.stderr.write("usage: gpscat [-s speed] [-p] [-t] [-D debuglevel] "
+                     "serial-port\n")
+
+if __name__ == '__main__':
+    try:
+        try:
+            (options, arguments) = getopt.getopt(sys.argv[1:], "hps:tD:V")
+        except getopt.GetoptError as msg:
+            print("gpscat: " + str(msg))
+            raise SystemExit(1)
+
+        speed = None
+        parity = None
+        stopbits = None
+        rawmode = True
+        typeflag = False
+        for (switch, val) in options:
+            if switch == '-p':
+                rawmode = False
+            elif switch == '-s':
+                if val[-2] in ('N', 'E', 'O'):
+                    parity = val[-2]
+                    stopbits = int(val[-1])
+                    val = val[:-2]
+                speed = int(val)
+            elif switch == '-t':
+                typeflag = True
+                rawmode = False
+            elif switch == '-D':
+                debuglevel = BASELEVEL + int(val)
+            elif switch == '-h':
+                printusage()
+                raise SystemExit(0)
+
+        if len(arguments) != 1:
+            printusage()
+            raise SystemExit(1)
+
+        if "rfcomm" in arguments[0]:     # Bluetooth special case
+            s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM,
+                              socket.BTPROTO_RFCOMM)
+            s.connect((arguments[0], 1))
+            tty = s.fileno()
+        else:                            # Ordinary device
+            tty = os.open(arguments[0], os.O_RDWR)
+
+        if speed is not None:
+            (iflag, oflag, cflag, lflag, ispeed, ospeed, cc) = \
+                termios.tcgetattr(tty)
+            try:
+                ispeed = ospeed = eval("termios.B%d" % speed)
+            except AttributeError:
+                sys.stderr.write("gpscat: unknown baud rate %d\n" % speed)
+                raise SystemExit(1)
+            if stopbits:
+                cflag &= ~termios.CSIZE
+                cflag |= (termios.CS8, termios.CS7)[stopbits - 1]
+            if parity:
+                if parity == 'N':
+                    iflag &= ~termios.PARENB
+                    iflag &= ~termios.INPCK
+                elif parity == 'O':
+                    iflag |= termios.INPCK
+                    cflag |= termios.PARENB
+                    cflag |= termios.PARODD
+                elif parity == 'E':
+                    iflag |= termios.INPCK
+                    cflag |= termios.PARENB
+                    cflag &= ~termios.PARODD
+            termios.tcsetattr(tty, termios.TCSANOW,
+                              [iflag, oflag, cflag, lflag, ispeed, ospeed, cc])
+
+        if not rawmode:
+            getter = sniffer.new()
+            sniffer.register_report(reporter)
+        seqno = 0
+        while True:
+            rlist, wlist, xlist = select.select([tty], [], [])
+            if rlist == [tty]:
+                if rawmode:
+                    buf = os.read(tty, NMEA_MAX)
+                    if not buf:
+                        break
+                    sys.stdout.write(hexdump(buf))
+                else:
+                    (length, ptype, packet, counter) = getter.get(tty)
+                    seqno += 1
+                    if length == 0:
+                        break
+                    if typeflag:
+                        sys.stdout.write(repr(ptype) + " (" + repr(length)
+                                         + "@" + repr(counter - length) + "): "
+                                         + hexdump(packet))
+                        sys.stdout.write("\n")
+                    else:
+                        sys.stdout.write(hexdump(packet) + "\n")
+    except KeyboardInterrupt:
+        if rawmode:
+            sys.stdout.write("\n")
+        raise SystemExit(0)
+
+# Local variables:
+# mode: python
+# end:

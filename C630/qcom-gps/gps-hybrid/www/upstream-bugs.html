@@ -1,0 +1,396 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="Author" content="Eric Raymond">
+  <meta name="Description" content="Links to Open User-Visible Problems in other software">
+  <meta name="Keywords" content="GPS, gpsd, bugs">
+   <meta name="Revised" content="9 April 2015">
+   <meta name="robots" content="index,follow">
+  <title>Bugs GPSD Exposes In Other Software</title>
+  <link rel="stylesheet" href="main.css" type="text/css">
+</head>
+<body>
+<div id="Header">Bugs GPSD Exposes In Other Software</div>
+<div id="Menu"> <img src="gpsd-logo-small.png" alt="Small gpsd Logo"><br>
+<a href="index.html">Home</a><br>
+<a href="index.html#news">News</a><br>
+<a href="index.html#downloads">Downloads</a><br>
+<a href="index.html#mailing-lists">Mailing lists</a><br>
+<a href="index.html#documentation">Documentation</a><br>
+<a href="faq.html">FAQ</a><br>
+<a href="xgps-sample.html">Screenshots</a><br>
+<a href="index.html#recipes">Recipes</a><br>
+<a href="index.html#others">Other GPSDs</a><br>
+<a href="hardware.html">Hardware</a><br>
+<a href="for-vendors.html">For GPS Vendors</a><br>
+<a href="wishlist.html">Wish List</a><br>
+<a href="hall-of-shame.html">Hall of Shame</a><br>
+<a href="troubleshooting.html">Troubleshooting Guide</a><br>
+<a href="hacking.html">Hacker's Guide</a><br>
+<a href="protocol-transition.html">Application Compatibility</a>
+<a href="references.html">References</a><br>
+<a href="history.html">History</a><br>
+<a href="future.html">Future</a><br>
+
+<div>&nbsp;</div>
+<a href="http://www.catb.org/hacker-emblem/"><img
+ src="http://www.catb.org/hacker-emblem/glider.png" alt="hacker emblem"></a><br>
+    <script type="text/javascript" src="https://www.openhub.net/p/3944/widgets/project_thin_badge.js"></script>
+
+<hr>
+
+<script type="text/javascript"><!--
+    google_ad_client = "pub-1458586455084261";
+    google_ad_width = 160;
+    google_ad_height = 600;
+    google_ad_format = "160x600_as";
+    google_ad_type = "text";
+    google_ad_channel = "";
+    //--></script>
+<script type="text/javascript"
+ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+<hr>
+<a href="http://validator.w3.org/check/referer"><img
+ src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"
+ height="31" width="88"></a>
+</div>
+<div id="Content">
+
+<p>This page used to be part of the to-do list in our source
+distribution, until we realized it would be useful for the rest of the
+Web to see these bug reports.  Where we can identify a responsible
+maintainer, we've tried to kick these upstream.</p>
+
+<h1>Links to Open User-Visible Problems</h1>
+
+<ul>
+<li><a href="#osx-pl2303">Unknown osx-pl2303 driver issues on Mac OS X</a></li>
+<li><a href="#tiocmwait">PPS fails: ioctl(TIOCMIWAIT) hangs after tcsetattr()</a></li>
+<li><a href="#pps-gpio">The pps-gpio driver only reports on one edge</a></li>
+<li><a href="#bluetooth">Firmware problems in some Bluetooth and USB devices can hang them</a></li>
+<li><a href="#pl2303">Linux pl2303 driver on openwrt 2.4 kernel can hang when device is read at unexpected speed</a></li>
+<li><a href="#pthread_create">pthread_create() fails to return when called in background</a></li>
+<li><a href="#shm_damage">NTPSHM clobbers altitude under 2.4 Linux</a></li>
+<li><a href="#udev">Linux kernel doesn't generate udev close events</a></li>
+</ul>
+
+<h1>Links to Open Toolchain Bugs</h1>
+
+<ul>
+<li><a href="#pyinstall">Defective Python installation in SuSE 10.3rc</a></li>
+<li><a href="#gcc421">Compiler optimizer bugs can produce error-modeling errors</a></li>
+<li><a href="#sconscxx">scons doesn't honor parse_flags in a Program() using C++</a></li>
+<li><a href="#mfence">Illegal-instruction errors near fence operations</a></li>
+<li><a href="#netbsd-curses">gpsmon won't build with the curses
+library on NetBSD 6</a></li>
+</ul>
+
+<h1>Links to Fixed Bugs</h1>
+
+<ul>
+<li><a href="#startup">Distro-dependent problems with gpsd startup</a></li>
+<li><a href="#pysocket">Python socket library barfs on IPV6 notation in the /etc/hosts file</a></li>
+<li><a href="#isgps">isgps.c triggers an optimizer bug in older gcc versions</a></li>
+<li><a href="#fc5_64bit">gpsd build may break on 64-bit systems running Fedora Core 5</a></li>
+<li><a href="#floats">Incorrect generation of floating-point code in embedded toolchains</a></li>
+</ul>
+
+<hr>
+
+<h1>Open User-Visible Problems</h1>
+
+<h2 id="osx-pl2303">Unknown osx-pl2303 driver issues on Mac OS X</h2>
+
+<p>The osx-pl2303 driver appears not to work, at least under 10.9.
+  Specifically, the combination of gpsd, OS X, osx-pl2303, and a
+  GR601-W usually fails.  With the official Prolific drivers, this
+  receiver works reliably.  The source code of this driver no longer
+  appears to be available.  While the facts so far do not prove that
+  the bug is in the osx-pl2303 driver, the evidence points that way,
+  and no one has dug in enough to figure out what's wrong. Therefore
+  we recommend against using the osx-pl2303 driver and consider it
+  unsupported</p>
+
+<p>Previously, there were problems with the osx-pl2303 driver that
+  caused select not to return even when input was available.  It is
+  not clear if the above issue is the same or not.</p>
+
+<h2 id="tiocmwait">PPS fails: ioctl(TIOCMIWAIT) hangs after tcsetattr()</h2>
+
+<p>Due to a kernel bug in some versions of Linux 2.6 (recent as of
+2011 - the bug was <a
+href="http://kerneltrap.org/mailarchive/linux-kernel/2010/11/13/4645043">referenced
+in 2010</a>) the tcsetattr() used in our autobauding hunt loop
+prevents any thread(s) currently suspended in ioctl(TIOCMIWAIT) for
+the same device from ever resuming. This interferes with PPS support</p>
+
+<p>This bug has apparently persisted in some 3.x kernels.</p>
+
+<p>The workaround is to use stty to pre-set the serial port to the right
+baud rate so tcsetattr is never called.</p>
+
+<h2 id="pps-gpio">The pps-gpio only reports on one edge</h2>
+
+<p>The pps-gpio driver only looks at the clear edge to determine the
+time of the PPS pulse.  Many GPS use the other edge, so the reported
+time may be offset by the PPS pulse width.</p>
+
+<p>Problem is present in Linux 3.19 and earlier.  The module authors
+have been notified</p>
+
+<h2 id="bluetooth">Firmware problems in some Bluetooth and USB devices can hang them</h2>
+
+<p>The baudrate-hunting code in <code>gpsd</code> tickles a serious
+firmware bug on some some Bluetooth devices; these are flagged on our
+<a href="hardware.html">Hardware</a> page.  This bug may render these
+GPSes catatonic.  The problem seems to be that buggy firmware inside
+these receivers doesn't necessarily keep the Bluetooth serial-port
+emulation and the GPS chip talking at the same baud rate. This problem
+is not unique to <code>gpsd</code> &mdash; Windows users are warned
+against using SiRFdemo's "Synchronize Protocol/Baud Rate" option on
+Bluetooth devices.</p>
+
+<p>If this happens, you can sometimes recover by repeatedly sending
+reset messages using <code>gpsctl</code>. Otherwise, power-cycling the
+GPS The only guaranteed fix is to drain the battery backing up the
+GPS's settings; in extreme cases, you may have to open the case and
+unsolder the backup battery so the chip forgets its configuration
+settings.</p>
+
+<p>To check whether you have this bug:</p>
+
+<ol>
+<li><p>Reset your GPS to a usable state.</p></li>
+
+<li><p>Launch gpsd with the Bluetooth device on the command line and
+the -b option to prevent autobauding.</p></li>
+
+<li><p>Observe it operating.</p></li>
+
+<li><p>Power down the device and terminate gpsd.</p></li>
+
+<li><p>Launch with -b again and see if it still works.</p></li>
+</ol>
+
+<p>If you find the device comes up on the last step, then you know
+that -b is an effective workaround and can finger bad Bluetooth
+firmware as the cause of the problem.</p>
+
+<p>A separate bug with less severe symptoms afflicts some USB devices.
+The probe strings <code>gpsd</code> sends in order to determine device
+type and subtype may be more than a device can handle, causing it to
+hang; power-cycling should fix this.  Newer versions of <code>gpsd</code>
+break up the probe writes into smaller pieces, interleaving them with
+the first few packet reads, so they are far less likely to trigger
+this bug.</p>
+
+<p>You can use the -b option of gpsd to prevent it from trying to
+reconfigure your GPS; this will avoid both problems.</p>
+
+<h2 id="pl2303">Linux pl2303 driver on openwrt 2.4 kernel can hang when device is read at unexpected speed</h2>
+
+<p>Michael R. Davis reports "If you read from the device at the wrong
+rate (e.g. cat /dev/xxx) it will lock up.  On openwrt it required a
+hard reboot." Details <a
+href='http://marc.info/?l=gpsd-dev&amp;m=115940539029940&amp;w=2'>here</a>. This
+bug was reported in 2006 with an old kernel version and may since have
+been fixed.</p>
+
+<h2 id="pthread_create">pthread_create() fails to return when called in background</h2>
+
+There is a call to pthread create in libgpsd_core.c::link_activate():
+
+<pre><code>
+    /*@i1@*/(void)pthread_create(&amp;pt,NULL,gpsd_ppsmonitor,(void *)session);
+</code></pre>
+
+<p>If this is called when gpsd is in the foreground then the thread is
+created fine and pthread_create() returns right away.  If this is
+called when gpsd is in the background then the thread is created fine,
+but it may return!  That freezes the main loop of gpsd. There is a <a
+href="http://marc.info/?l=gpsd-dev&amp;m=120124952704634&amp;w=2">workaround</a>,
+but the nature of the workaround only makes their bug more
+mysterious.</p>
+
+<h2 id="shm_damage">NTPSHM clobbers altitude under 2.4 Linux</h2>
+
+<p>We've had one report (in march 2009) of the NTPSHM feature
+clobbering altitude reports, on a Technologic TS-5500 board running a
+customized 2.4.34 kernel using a <code>gpsd</code> built with GCC 2.95.3.
+When NTPSHM was disabled, altitude was reported correctly.</p>
+
+<p>Shared memory was bug-plagued on older Linux kernels; one notorious
+symptom of this was that the emulation of System V IPC worked poorly,
+and we suspect our corruption bug is another symptom.  No such
+misbehavior has been reported from our NTPSHM-using developers under
+2.6.  It is also possible that this is due to some obscure bug in GCC
+or elsewhere in Technologic's cross-development toolchain.</p>
+
+<h2 id="udev">Linux kernel doesn't generate udev close events</h2>
+
+<p>One user has reported that the GPSD hotplug wrapper is not being
+invoked on unplug of a USB receiver, because the kernel never actually
+generates a remove event when closing an open serial device.
+Apparently this is a <a
+href="http://www.linuxquestions.org/questions/programming-9/udev-not-called-to-remove-open-usb-serial-device-585603/">well-known
+bug</a> that will <a href="http://lkml.indiana.edu/hypermail/linux/kernel/0907.2/01845.html">not be easily fixed</a>.</p>
+
+<h1>Open Toolchain Bugs</h1>
+
+<p><code>gpsd</code> is distressingly good at tickling bugs in
+development toolchains.  Most of these, thankfully, are non-issues
+if you keep your toolchain up to date.</p>
+
+<h2 id="pyinstall">Defective Python installation in SuSE 10.3rc</h2>
+
+<p>The Python 2.5 installed with SuSE 10.3rc is missing a needed
+Makefile.  This prevents the <code>gpsd</code> Python components from
+building correctly.</p>
+
+<h2 id="gcc421">Compiler optimizer bugs can produce error-modeling errors</h2>
+
+<p>The floating-point code in the daemon's error modeler (the logic
+that produces uncertainty estimates in the sensor doesn't supply them)
+is sensitive to optimizer bugs.  If the optimizer is flaky, different
+levels of operation can cause the speed calculation to either converge
+or blow up in FP operations; the effect is that when it is actually
+reported seems to vary randomly with level of optimization.</p>
+
+<p>Under GCC 4.2.1, -O2 diverges from what GCC 4.4.1 reports, causing
+regression-test failures. Dropping back to -O1 or going up to -O3
+restores behavior like GCC 4.4.1's.</p>
+
+<h2 id="scons_cpp">scons doesn't honor parse_flags in a Program() using C++</h2>
+
+<p>In building test_gpsmm, we should get libgps_dump_state() from the
+client library, but scons 1.2.0 has a bug; we can't get it to add
+-lgps to the link lime, apparently because it doesn't honor
+parse_flags on a Program() build of a C++ .cpp file.</p>
+
+<h2 id="mfence">Illegal-instruction errors near fence operations</h2>
+
+<p>The shared-memory export relies on being able to generate some
+fence instructions that are processor-specfic.  We have a report that
+under Ubuntu 10.04 running on a 32-bit Athlon processor the daemon
+dies with an illegal instruction error when attempting the fence
+operation.</p>
+
+<p>To work around this, disable the shared-memory export by building
+with "scons shm_export=no".</p>
+
+<h2 id="#netbsd-curses">gpsmon won't build with the curses library on NetBSD 6</h2>
+
+<p>The base NetBSD install (netBSD 6, anyway) includes curses, but
+it's an old version that lacks the "syncok" function used by gpsmon. A
+simple '-lcurses' is sufficient to make cgps work, but not gpsmon.</p>
+
+<p>It's possible to install a reasonably current ncurses on NetBSD as
+a package, but the package setup doesn't include pkg-config data, so
+the ability to use it doesn't get discovered automatically.</p>
+
+<p>It's possible to check the existence of the package with the
+NetBSD-specific "pkg_info -E", and then fake the options that one
+would expect to be supplied by pkg-config, but the resulting setup
+still doesn't build, for an as-yet-undetermined reason.</p>
+
+<h1>Fixed Problems</h1>
+
+<p>We document these here in case you're running on an older system.
+They will be removed as they become sufficiently ancient.</p>
+
+<h2 id="startup">Distro-dependent problems with gpsd startup</h2>
+
+<p>See <a href='http://bugs.gentoo.org/show_bug.cgi?id=132288'>this
+Gentoo bug</a>.  This shows up on other distributions as well, but
+not under Fedora Core.  The Gentoo problem can be fixed by creating a
+/var/run/usb directory; this fix may apply to other distributions as
+well.</p>
+
+<h2 id="pysocket">Python socket library barfs on IPV6 notation in the /etc/hosts file</h2>
+
+<p>Robert J.Berger &lt;rberger@ibd.com&gt; reports:
+Until I changed the line in /etc/hosts from:</p>
+
+<pre class='code'>
+::1    localhost.localdomain   localhost
+</pre>
+
+to:<br>
+
+<pre class='code'>
+127.0.0.1       localhost.localdomain   localhost
+</pre>
+
+<p>gps.py would fail when trying to open the socket connection to the gpsd:</p>
+
+<pre class='code'>
+   File "/usr/local/bin/spGps.py", line 198, in __init__
+     self.connect(host, port)
+   File "/usr/local/bin/spGps.py", line 237, in connect
+     raise socket.error, msg
+socket.error: (111, 'Connection refused')
+</pre>
+
+<p>and gpsprof would fail with:</p>
+
+<pre class='code'>
+# gpsprof | gnuplot -persist
+gpsprof: gpsd unreachable.
+</pre>
+
+<p>This is with Python 2.4.4 under Red Hat Linux, kernel version 2.6.18.
+This was filed upstream as Python bug 1603527 on their old tracker, and
+is no longer open on their new one.</p>
+
+<h2 id="isgps">isgps.c triggers an optimizer bug in older gcc versions</h2>
+
+<p>The isgps.c file confuses the gcc-3.4.[23] optimizer at -O2 level,
+making it generate incorrect code.  Removing -O2 from the
+compilation flags works around the problem.  Details are in the
+isgps.c source file.</p>
+
+<p>Compiling with --enable-max-devices=1 may trigger a gcc
+optimizer bug</p>
+
+<p>At gpsd revision level 3365, compiling with
+--enable-max-devices=1 has been observed to trigger an
+optimizer bug in gcc 4.1.0 20060304 (Red Hat 4.1.0-3).  The symptom is
+a for-loop termination condition not causing an exit, leading to a
+core dump.  Removing -O2 from the compilation flags works around the
+problem; upgrading to gcc 4.1.1 20060525 (Red Hat 4.1.1-1) solves it.
+Other reports indicate this bug was introduced sometime after gcc
+4.0.2 20051125 (Red Hat 4.0.2-8).</p>
+
+<h2 id="fc5_64bit">gpsd build may break on 64-bit systems running Fedora Core 5</h2>
+
+<p>The problem may be be caused by the old ld (binutils-2.15.92.0.2-18)
+being incompatible with gcc 4.1.0 on a 64-bit system. Updating to
+binutils 2.16.1 or later avoids it.</p>
+
+<h2 id="floats">Incorrect generation of floating-point code in embedded toolchains</h2>
+
+<p>One problem area is errors in generation of floating-point code.  A
+number of trouble reports have been received indicating erroneous
+results on embedded platforms, most notably ARM systems. These have
+all been traced back to the toolchain; when appropriate corrective
+action was taken, <code>gpsd</code> functioned correctly. Source code
+for a simple test program (<code>floattest.c</code>) is in the
+project repository; if <code>gpsd</code> seems to be producing
+incorrect output, please use this tool to validate your toolchain
+before filing a bug report.</p>
+
+<h2 id="macxlibs">Mac OS 10.5 X library packaging problem</h2>
+
+<p>Building <code>xgpsspeed</code> will fail under MacOS 10.5.6
+because the X SDK libraries and include files are not installed to the
+canonical places.  This was <a
+href="http://openradar.appspot.com/6498632">filed as a bug</a> with
+Apple and is reported fixed.</p>
+
+<hr>
+<script src="datestamp.js" type="text/javascript"></script>
+</div>
+</body>
+</html>

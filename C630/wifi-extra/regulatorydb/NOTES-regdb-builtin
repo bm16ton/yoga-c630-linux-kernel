@@ -1,0 +1,20 @@
+CHANGE sforshee TO YOUR USERNAME IN FOLLOWING FILES;
+
+Makefile:REGDB_UPSTREAM_PUBKEY ?= sforshee.key.pub.pem
+gen-pubcert.sh:		commonName = sforshee
+
+    EXAMPLE;
+    REGDB_UPSTREAM_PUBKEY ?= maddocks.key.pub.pem
+    commonName = maddocks
+
+IF CREATING DEB THEN POSSIBLE YOU HAFTA (untested if crda cp's more then sforshee)
+ADD A LINE LIKE sforshee BUT WITH YOUR USERNAME;
+
+debian/rules:	rm -f debian/wireless-regdb/lib/crda/pubkeys/sforshee.key.pub.pem
+
+    EXAMPLE;
+    rm -f debian/wireless-regdb/lib/crda/pubkeys/sforshee.key.pub.pem
+    rm -f debian/wireless-regdb/lib/crda/pubkeys/maddocks.key.pub.pem
+
+
+

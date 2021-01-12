@@ -1,0 +1,162 @@
+# Binaries
+gpsd
+rtcmdecode
+gpsmon
+gpsctl
+gpsdctl
+gpsdecode
+cgps
+lcdgps
+gpxlogger
+cgpxlogger
+gpspipe
+gps2udp
+ntpshmmon
+ppscheck
+*.exe
+# These are built from .in files
+jsongen.py
+maskaudit.py
+control
+upload
+gpsd.php
+valgrind-audit.py
+# Unit tests
+test_bits
+test_float
+test_geoid
+test_gpsmm
+test_json
+test_libgps
+test_matrix
+test_mkgmtime
+test_mktime
+test_packet
+test_qgpsmm
+test_timespec
+test_trig
+# Other generated files
+gpsd.rules
+gps.html
+gpscat.html
+gpsctl.html
+gpsd.html
+gpsd_json.html
+gpsdecode.html
+gpsfake.html
+gpsmon.html
+gpspipe.html
+gpsprof.html
+gps2udp.html
+gpxlogger.html
+ntpmon.html
+libgps.html
+libgpsd.html
+libgpsmm.html
+srec.html
+*.[1358]
+*.pyc
+*.pc
+*.sum
+*.i
+*.o
+*.obj
+*.os
+*.a
+*.lo
+*.la
+*.so
+*.so.[0-9.]*
+*.dylib
+*.dll
+*~
+*.swp
+*.egg-info
+*.gcno
+# Built sources
+gps_maskdump.c
+gpsd_maskdump.c
+gpsd_config.h.in
+gpsd_config.h
+packet_names.h
+revision.h
+timebase.h
+gpsd.spec
+MANIFEST
+.kdbgrc.*
+.project
+.cproject
+tags
+# Python files
+build
+gpscatc
+gpsfakec
+gpsprofc
+xgpsc
+xgpsspeedc
+devtools/ppstest
+# Developer sandbox directory for patches that haven't been applied yet
+patches
+# build/test logs from devtools/do-build
+BUILD.*
+CHECK.*
+# SCons cruft
+config.log
+.sconsign.dblite
+.sconf_temp
+.scons-option-cache
+stamp-python
+# Documentation
+www/AIVDM.html
+www/client-howto.html
+www/faq.html
+www/gps2udp.html
+www/gpscat.html
+www/gpsctl.html
+www/gpsdecode.html
+www/gpsd.html
+www/gpsd-time-service-howto.html
+www/gpsfake.html
+www/gps.html
+www/gpsinit.html
+www/gpsmon.html
+www/gpspipe.html
+www/gpsprof.html
+www/gps_report.cgi
+www/gpxlogger.html
+www/hacking.html
+www/hardware-head.html
+www/hardware.html
+www/index.html
+www/installation.html
+www/internals.html
+www/libgpsd.html
+www/libgps.html
+www/libgpsmm.html
+www/NMEA.html
+www/ntpshmmon.html
+www/performance/performance.html
+www/ppscheck.html
+www/protocol-evolution.html
+www/protocol-transition.html
+www/replacing-nmea.html
+www/srec.html
+www/time-service-intro.html
+www/.upload-stamp
+www/writing-a-driver.html
+doc/explanation.html
+www/pydoc
+# Controls for the flock tester
+devtools/.flocktest.ini
+# QT stuff
+libQgpsmm.prl
+libQgpsmm/binaries/*
+# C coverage-related files
+*.gcda
+# Python coverage-related files/directories
+.coverage*
+htmlcov/
+# misc files
+nohup.out
+*.bak
+tmp*
