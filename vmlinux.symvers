@@ -8456,6 +8456,7 @@
 0x00000000	cache_line_size	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	mr_mfc_seq_idx	vmlinux	EXPORT_SYMBOL	
 0x00000000	netdev_notice	vmlinux	EXPORT_SYMBOL	
+0x00000000	led_classdev_notify_brightness_hw_changed	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	cfi_merge_status	vmlinux	EXPORT_SYMBOL	
 0x00000000	mtd_lock_user_prot_reg	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	ata_pci_device_suspend	vmlinux	EXPORT_SYMBOL_GPL	
