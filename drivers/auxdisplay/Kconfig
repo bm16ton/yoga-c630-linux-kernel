@@ -27,6 +27,15 @@ config HD44780
 	  kernel and started at boot.
 	  If you don't understand what all this is about, say N.
 
+config HD44780I2C
+	tristate "HD44780_I2C Character LCD support"
+	depends on GPIOLIB || COMPILE_TEST
+	select CHARLCD
+	help
+	  Enable support for Character LCDs using a HD44780 controller.
+	  With i2c backpack driver found https://github.com/gorskima/hd44780-i2c
+	  If you don't understand what all this is about, say N.
+
 config KS0108
 	tristate "KS0108 LCD Controller"
 	depends on PARPORT_PC
