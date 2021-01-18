@@ -245,7 +245,7 @@ static void i2c_add_optional_devices(struct i2c_adapter *adapter)
 		strlcpy(i2c_info.type, opt_devices[i],
 			min(I2C_NAME_SIZE, (int)(at-opt_devices[i])));
 		i2c_info.addr = addr;
-		if (i2c_new_device(adapter, &i2c_info) != NULL)
+		if (i2c_new_client_device(adapter, &i2c_info) != NULL)
 			dev_info(&adapter->dev,
 				"device %s at address 0x%02x registered\n",
 				i2c_info.type, addr);
