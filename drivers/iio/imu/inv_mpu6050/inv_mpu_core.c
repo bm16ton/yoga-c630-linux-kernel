@@ -21,6 +21,11 @@
 #include "inv_mpu_iio.h"
 #include "inv_mpu_magn.h"
 
+int inv_mpu6050_noirq;
+module_param_named(noirq, inv_mpu6050_noirq, int, 0444);
+MODULE_PARM_DESC(noirq, "Disable IRQ hack for i2c-tiny-usb");
+
+EXPORT_SYMBOL(inv_mpu6050_noirq);
 /*
  * this is the gyro scale translated from dynamic range plus/minus
  * {250, 500, 1000, 2000} to rad/s
@@ -1448,7 +1453,8 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 	} else {
 		st->plat_data = *pdata;
 	}
-
+//16ton
+	if (!inv_mpu6050_noirq) {
 	desc = irq_get_irq_data(irq);
 	if (!desc) {
 		dev_err(dev, "Could not find IRQ %d\n", irq);
@@ -1473,7 +1479,8 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 			irq_type);
 		return -EINVAL;
 	}
-
+    }
+//16ton
 	st->vdd_supply = devm_regulator_get(dev, "vdd");
 	if (IS_ERR(st->vdd_supply))
 		return dev_err_probe(dev, PTR_ERR(st->vdd_supply),
@@ -1592,12 +1599,15 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 		dev_err(dev, "configure buffer fail %d\n", result);
 		return result;
 	}
+//16ton
+	if (!inv_mpu6050_noirq) {
 	result = inv_mpu6050_probe_trigger(indio_dev, irq_type);
 	if (result) {
 		dev_err(dev, "trigger probe fail %d\n", result);
 		return result;
 	}
-
+    }
+//16ton
 	result = devm_iio_device_register(dev, indio_dev);
 	if (result) {
 		dev_err(dev, "IIO register fail %d\n", result);
