@@ -55,8 +55,8 @@ static struct hd44780i2c_geometry hd44780i2c_geometry_8x1 = {
 };
 
 struct hd44780i2c_geometry *hd44780i2c_geometries[] = {
-	&hd44780i2c_geometry_16x2,
 	&hd44780i2c_geometry_20x4,
+	&hd44780i2c_geometry_16x2,
 	&hd44780i2c_geometry_8x1,
 	NULL
 };
