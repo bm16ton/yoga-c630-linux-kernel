@@ -61,7 +61,7 @@ modules.order
 /Module.markers
 /modules.builtin.modinfo
 /modules.nsdeps
-
+/vmlinux.symvers
 #
 # RPM spec file (make rpm-pkg)
 #

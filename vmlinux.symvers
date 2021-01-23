@@ -9775,7 +9775,6 @@
 0x00000000	icc_sync_state	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	iio_push_event	vmlinux	EXPORT_SYMBOL	
 0x00000000	efivar_entry_set_get_size	vmlinux	EXPORT_SYMBOL_GPL	
-0x00000000	i2c_new_device	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	device_for_each_child	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	nfs_reconfigure	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	vzalloc	vmlinux	EXPORT_SYMBOL	
