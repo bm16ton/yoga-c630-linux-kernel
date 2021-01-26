@@ -4,349 +4,205 @@
 #include <linux/device.h>
 #include <linux/i2c.h>
 #include <linux/delay.h>
+#include <linux/hwmon.h>
+#include <linux/hwmon-sysfs.h>
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
 #include <linux/slab.h>
 #include <linux/list.h>
+#include <linux/sysfs.h>
+#include <linux/slab.h>
+#include <linux/err.h>
+#include <linux/mutex.h>
 
-#include "hd44780i2c.h"
+#define CLASS_NAME	"argonfan"
+#define NAME		"argon-fan"
+#define ARGONFAN_CTL      0x00
 
-#define CLASS_NAME	"hd44780i2c"
-#define NAME		"hd44780-i2c"
-#define NUM_DEVICES	8
+static const unsigned short normal_i2c[] = { 0x1a, I2C_CLIENT_END };
 
-static struct class *hd44780i2c_class;
-static dev_t dev_no;
-/* We start with -1 so that first returned minor is 0 */
-static atomic_t next_minor = ATOMIC_INIT(-1);
 
-static LIST_HEAD(hd44780i2c_list);
-static DEFINE_SPINLOCK(hd44780i2c_list_lock);
 
-/* Device attributes */
-
-static ssize_t geometry_show(struct device *dev, struct device_attribute *attr,
-		char *buf)
-{
-	struct hd44780i2c *lcd;
-	struct hd44780i2c_geometry *geo;
-
-	lcd = dev_get_drvdata(dev);
-	geo = lcd->geometry;
-
-	return scnprintf(buf, PAGE_SIZE, "%dx%d\n", geo->cols, geo->rows);
-}
-
-static ssize_t geometry_store(struct device *dev,
-		struct device_attribute *attr, const char *buf, size_t count)
-{
-	struct hd44780i2c *lcd;
-	struct hd44780i2c_geometry *geo;
-	int cols = 0, rows = 0, i;
-
-	sscanf(buf, "%dx%d", &cols, &rows);
-
-	for (i = 0; hd44780i2c_geometries[i] != NULL; i++) {
-		geo = hd44780i2c_geometries[i];
-
-		if (geo->cols == cols && geo->rows == rows) {
-			lcd = dev_get_drvdata(dev);
-
-			mutex_lock(&lcd->lock);
-			hd44780i2c_set_geometry(lcd, geo);
-			mutex_unlock(&lcd->lock);
-
-			break;
-		}
-	}
-
-	return count;
-}
-static DEVICE_ATTR_RW(geometry);
-
-static ssize_t backlight_show(struct device *dev, struct device_attribute *attr,
-		char *buf)
-{
-	struct hd44780i2c *lcd = dev_get_drvdata(dev);
-
-	return scnprintf(buf, PAGE_SIZE, "%d\n", lcd->backlight);
-}
-
-static ssize_t backlight_store(struct device *dev,
-		struct device_attribute *attr, const char *buf, size_t count)
-{
-	struct hd44780i2c *lcd = dev_get_drvdata(dev);
-
-	mutex_lock(&lcd->lock);
-	hd44780i2c_set_backlight(lcd, buf[0] == '1');
-	mutex_unlock(&lcd->lock);
-
-	return count;
-}
-static DEVICE_ATTR_RW(backlight);
-
-static ssize_t cursor_blink_show(struct device *dev, struct device_attribute *attr,
-		char *buf)
-{
-	struct hd44780i2c *lcd = dev_get_drvdata(dev);
-
-	return scnprintf(buf, PAGE_SIZE, "%d\n", lcd->cursor_blink);
-}
-
-static ssize_t cursor_blink_store(struct device *dev,
-		struct device_attribute *attr, const char *buf, size_t count)
-{
-	struct hd44780i2c *lcd = dev_get_drvdata(dev);
-
-	mutex_lock(&lcd->lock);
-	hd44780i2c_set_cursor_blink(lcd, buf[0] == '1');
-	mutex_unlock(&lcd->lock);
-
-	return count;
-}
-static DEVICE_ATTR_RW(cursor_blink);
-
-static ssize_t cursor_display_show(struct device *dev, struct device_attribute *attr,
-		char *buf)
-{
-	struct hd44780i2c *lcd = dev_get_drvdata(dev);
-
-	return scnprintf(buf, PAGE_SIZE, "%d\n", lcd->cursor_display);
-}
-
-static ssize_t cursor_display_store(struct device *dev,
-		struct device_attribute *attr, const char *buf, size_t count)
-{
-	struct hd44780i2c *lcd = dev_get_drvdata(dev);
-
-	mutex_lock(&lcd->lock);
-	hd44780i2c_set_cursor_display(lcd, buf[0] == '1');
-	mutex_unlock(&lcd->lock);
-
-	return count;
-}
-static DEVICE_ATTR_RW(cursor_display);
-
-static struct attribute *hd44780i2c_device_attrs[] = {
-	&dev_attr_geometry.attr,
-	&dev_attr_backlight.attr,
-	&dev_attr_cursor_blink.attr,
-	&dev_attr_cursor_display.attr,
-	NULL
+static struct i2c_device_id argonfan_idtable[] = {
+      { "argonfan", 0 },
+      { }
 };
-ATTRIBUTE_GROUPS(hd44780i2c_device);
+MODULE_DEVICE_TABLE(i2c, argonfan_idtable);
 
-/* File operations */
-
-static int hd44780i2c_file_open(struct inode *inode, struct file *filp)
-{
-	filp->private_data = container_of(inode->i_cdev, struct hd44780i2c, cdev);
-	return 0;
-}
-
-static int hd44780i2c_file_release(struct inode *inode, struct file *filp)
-{
-	struct hd44780i2c *lcd = filp->private_data;
-	hd44780i2c_flush(lcd);
-	return 0;
-}
-
-static ssize_t hd44780i2c_file_write(struct file *filp, const char __user *buf, size_t count, loff_t *offp)
-{
-	struct hd44780i2c *lcd;
-	size_t n;
-
-	lcd = filp->private_data;
-	n = min(count, (size_t)BUF_SIZE);
-
-	// TODO: Consider using an interruptible lock
-	mutex_lock(&lcd->lock);
-
-	// TODO: Support partial writes during errors?
-	if (copy_from_user(lcd->buf, buf, n)) {
-		mutex_unlock(&lcd->lock);
-		return -EFAULT;
-	}
-
-	hd44780i2c_write(lcd, lcd->buf, n);
-
-	mutex_unlock(&lcd->lock);
-
-	return n;
-}
-
-static void hd44780i2c_init(struct hd44780i2c *lcd, struct hd44780i2c_geometry *geometry,
-		struct i2c_client *i2c_client)
-{
-	lcd->geometry = geometry;
-	lcd->i2c_client = i2c_client;
-	lcd->pos.row = 0;
-	lcd->pos.col = 0;
-	memset(lcd->esc_seq_buf.buf, 0, ESC_SEQ_BUF_SIZE);
-	lcd->esc_seq_buf.length = 0;
-	lcd->is_in_esc_seq = false;
-	lcd->backlight = true;
-	lcd->cursor_blink = true;
-	lcd->cursor_display = true;
-	mutex_init(&lcd->lock);
-}
-
-static struct file_operations fops = {
-	.open = hd44780i2c_file_open,
-	.release = hd44780i2c_file_release,
-	.write = hd44780i2c_file_write,
+struct argonfan_data {
+	struct i2c_client *client;
+	struct mutex update_lock;
+	u8 fan1_speed;
+//	u8 fan1_min;
+//	u8 fan1_max;
+	u8 fan1_input;
+	u8 fan1_target;
+    u8 fan1_label;
 };
 
-static int hd44780i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
+
+int argonfan_write_value(struct i2c_client *client, u8 reg, u8 value)
 {
-	dev_t devt;
-	struct hd44780i2c *lcd;
-	struct device *device;
-	int ret, minor;
-
-	minor = atomic_inc_return(&next_minor);
-	devt = MKDEV(MAJOR(dev_no), minor);
-
-	lcd = (struct hd44780i2c *)kmalloc(sizeof(struct hd44780i2c), GFP_KERNEL);
-	if (!lcd) {
-		return -ENOMEM;
-	}
-
-	hd44780i2c_init(lcd, hd44780i2c_geometries[0], client);
-
-	spin_lock(&hd44780i2c_list_lock);
-	list_add(&lcd->list, &hd44780i2c_list);
-	spin_unlock(&hd44780i2c_list_lock);
-
-	cdev_init(&lcd->cdev, &fops);
-	ret = cdev_add(&lcd->cdev, devt, 1);
-	if (ret) {
-		pr_warn("Can't add cdev\n");
-		goto exit;
-	}
-
-	device = device_create_with_groups(hd44780i2c_class, NULL, devt, NULL,
-		hd44780i2c_device_groups, "lcd%d", MINOR(devt));
-
-	if (IS_ERR(device)) {
-		ret = PTR_ERR(device);
-		pr_warn("Can't create device\n");
-		goto del_exit;
-	}
-
-	dev_set_drvdata(device, lcd);
-	lcd->device = device;
-
-	hd44780i2c_init_lcd(lcd);
-
-	hd44780i2c_print(lcd, "AliensMasturbate");
-//	hd44780i2c_print(lcd, device->kobj.name);
-	lcd->dirty = true;
-
-	return 0;
-
-del_exit:
-	cdev_del(&lcd->cdev);
-
-	spin_lock(&hd44780i2c_list_lock);
-	list_del(&lcd->list);
-	spin_unlock(&hd44780i2c_list_lock);
-exit:
-	kfree(lcd);
-
-	return ret;
+//      printk(KERN_INFO "setting fan to %d\n", value);
+      return i2c_smbus_write_byte_data(client, ARGONFAN_CTL, value);
 }
 
-static struct hd44780i2c * get_hd44780i2c_by_i2c_client(struct i2c_client *i2c_client)
+static ssize_t fan1_speed_show(struct device *dev, struct device_attribute *attr,
+		char *buf)
 {
-	struct hd44780i2c *lcd;
+	struct argonfan_data *data = dev_get_drvdata(dev);
 
-	spin_lock(&hd44780i2c_list_lock);
-	list_for_each_entry(lcd, &hd44780i2c_list, list) {
-		if (lcd->i2c_client->addr == i2c_client->addr) {
-			spin_unlock(&hd44780i2c_list_lock);
-			return lcd;
-		}
-	}
-	spin_unlock(&hd44780i2c_list_lock);
+    int ret2;
+    ret2 = data->fan1_speed;
 
-	return NULL;
+	return scnprintf(buf, PAGE_SIZE, "%d\n", ret2);
+}
+
+static ssize_t fan1_speed_store(struct device *dev, struct device_attribute *attr,
+			    const char *buf, size_t count)
+{
+	struct argonfan_data *data = dev_get_drvdata(dev);
+	struct i2c_client *client = data->client;
+	u8 value;
+	u8 ret2;
+	ret2 = kstrtou8(buf, 10, &value);
+    data->fan1_speed = value;
+
+	mutex_lock(&data->update_lock);
+
+//    printk(KERN_INFO "setting fan to %d\n", value);
+    argonfan_write_value(client, ARGONFAN_CTL, value);
+
+	mutex_unlock(&data->update_lock);
+	return count;
 }
 
 
-static int hd44780i2c_remove(struct i2c_client *client)
+static ssize_t fan1_input_show(struct device *dev, struct device_attribute *attr,
+		char *buf)
 {
-	struct hd44780i2c *lcd;
-	lcd = get_hd44780i2c_by_i2c_client(client);
-	device_destroy(hd44780i2c_class, lcd->device->devt);
-	cdev_del(&lcd->cdev);
+	struct argonfan_data *data = dev_get_drvdata(dev);
 
-	spin_lock(&hd44780i2c_list_lock);
-	list_del(&lcd->list);
-	spin_unlock(&hd44780i2c_list_lock);
+    int ret2;
+    ret2 = data->fan1_speed;
 
-	kfree(lcd);
-
-	return 0;
+	return scnprintf(buf, PAGE_SIZE, "%d\n", ret2);
 }
 
-static const struct i2c_device_id hd44780i2c_id[] = {
-	{ NAME, 0},
-	{ }
+static ssize_t fan1_target_show(struct device *dev, struct device_attribute *attr,
+		char *buf)
+{
+	struct argonfan_data *data = dev_get_drvdata(dev);
+
+    int ret2;
+    ret2 = data->fan1_speed;
+
+	return scnprintf(buf, PAGE_SIZE, "%d\n", ret2);
+}
+
+static ssize_t fan1_target_store(struct device *dev, struct device_attribute *attr,
+			    const char *buf, size_t count)
+{
+	struct argonfan_data *data = dev_get_drvdata(dev);
+	struct i2c_client *client = data->client;
+	u8 value;
+	u8 ret2;
+	ret2 = kstrtou8(buf, 10, &value);
+    data->fan1_speed = value;
+
+	mutex_lock(&data->update_lock);
+
+//    printk(KERN_INFO "setting fan to %d\n", value);
+    argonfan_write_value(client, ARGONFAN_CTL, value);
+
+	mutex_unlock(&data->update_lock);
+	return count;
+}
+
+static ssize_t fan1_label_show(struct device *dev, struct device_attribute *attr,
+		char *buf)
+{
+
+	return scnprintf(buf, PAGE_SIZE, "argonefan\n");
+}
+
+static DEVICE_ATTR_RW(fan1_speed);
+static DEVICE_ATTR_RO(fan1_input);
+static DEVICE_ATTR_RW(fan1_target);
+static DEVICE_ATTR_RO(fan1_label);
+
+static struct attribute *argonfan_attrs[] = {
+	&dev_attr_fan1_speed.attr,
+	&dev_attr_fan1_input.attr,
+	&dev_attr_fan1_target.attr,
+	&dev_attr_fan1_label.attr,
+    NULL
 };
 
-static struct i2c_driver hd44780i2c_driver = {
-	.driver = {
-		.name	= NAME,
-		.owner	= THIS_MODULE,
-	},
-	.probe = hd44780i2c_probe,
-	.remove = hd44780i2c_remove,
-	.id_table = hd44780i2c_id,
+ATTRIBUTE_GROUPS(argonfan);
+
+static int argonfan_remove(struct i2c_client *client)
+{
+
+	struct argonfan_data *data = i2c_get_clientdata(client);
+	mutex_lock(&data->update_lock);
+
+    argonfan_write_value(client, ARGONFAN_CTL, 0);
+
+	mutex_unlock(&data->update_lock);
+	return 0;
+}
+
+
+
+static int argonfan_probe(struct i2c_client *client,
+                     const struct i2c_device_id *id)
+{
+	struct device *dev = &client->dev;
+	struct argonfan_data *data;
+	struct device *hwmon_dev;
+	data = devm_kzalloc(dev, sizeof(struct argonfan_data), GFP_KERNEL);
+
+	i2c_set_clientdata(client, data);
+	data->client = client;
+
+	hwmon_dev = devm_hwmon_device_register_with_groups(dev, client->name,
+							   data,
+							   argonfan_groups);
+    mutex_lock(&data->update_lock);
+
+    argonfan_write_value(client, ARGONFAN_CTL, 0);
+//    i2c_smbus_write_byte_data(client, ARGONFAN_CTL, value);
+
+	mutex_unlock(&data->update_lock);
+	return PTR_ERR_OR_ZERO(hwmon_dev);
+    return 0;
+}
+
+static const struct of_device_id argonfan_of_match[] = {
+	{ .compatible = "argon,argonfan" },
+	{}
+};
+MODULE_DEVICE_TABLE(of, argonfan_of_match);
+
+static struct i2c_driver argonfan_driver = {
+	  .class		= I2C_CLASS_HWMON,
+      .driver = {
+              .name   = "argonfan",
+      },
+
+      .id_table       = argonfan_idtable,
+      .address_list   = normal_i2c,
+      .probe           = argonfan_probe,
+
+      .remove       = argonfan_remove, /* optional */
+
 };
 
-static int __init hd44780i2c_mod_init(void)
-{
-	int ret;
 
-	ret = alloc_chrdev_region(&dev_no, 0, NUM_DEVICES, NAME);
-	if (ret) {
-		pr_warn("Can't allocate chardev region");
-		return ret;
-	}
+module_i2c_driver(argonfan_driver);
 
-	hd44780i2c_class = class_create(THIS_MODULE, CLASS_NAME);
-	if (IS_ERR(hd44780i2c_class)) {
-		ret = PTR_ERR(hd44780i2c_class);
-		pr_warn("Can't create %s class\n", CLASS_NAME);
-		goto exit;
-	}
 
-	ret = i2c_add_driver(&hd44780i2c_driver);
-	if (ret) {
-		pr_warn("Can't register I2C driver %s\n", hd44780i2c_driver.driver.name);
-		goto destroy_exit;
-	}
-
-	return 0;
-
-destroy_exit:
-	class_destroy(hd44780i2c_class);
-exit:
-	unregister_chrdev_region(dev_no, NUM_DEVICES);
-
-	return ret;
-}
-module_init(hd44780i2c_mod_init);
-
-static void __exit hd44780i2c_mod_exit(void)
-{
-	i2c_del_driver(&hd44780i2c_driver);
-	class_destroy(hd44780i2c_class);
-	unregister_chrdev_region(dev_no, NUM_DEVICES);
-}
-module_exit(hd44780i2c_mod_exit);
-
-MODULE_DESCRIPTION("HD44780I2C I2C via PCF8574 driver");
-MODULE_AUTHOR("Mariusz Gorski <marius.gorski@gmail.com>");
+MODULE_AUTHOR("Ben Maddocks bm16ton@gmail");
+MODULE_DESCRIPTION("Driver for ArgonFan PiHat");
 MODULE_LICENSE("GPL");
