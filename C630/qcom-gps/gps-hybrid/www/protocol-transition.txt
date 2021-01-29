@@ -1,0 +1,450 @@
+= Moving to GPSD-NG: a Guide for Client Developers =
+:description: A Guide for Client Developers moving to GPSD-ND
+:keywords: time, GPSD, gpsd, guide, developers, client
+Eric S. Raymond <esr@thyrsus.com>
+v1.10, Febuary 2011
+
+This document is mastered in asciidoc format.  If you are reading it in HTML,
+you can find the original at the GPSD project website.
+
+== Why a new protocol? ==
+
+GPSD has moved to a new request/response protocol.  This move has been
+forced upon us because the old one ran out of namespace.  It was
+designed with case-insensitive single-character command/response
+codes. 25 of 26 ASCII alphabetics were already in use by 2006, and
+there have been functional challenges accumulating over the last three
+years that will require several more request/response codes - things
+like reporting AIS data, reporting raw pseudoranges, and reporting
+RTCM3.
+
+Yes, we could as a desperate expedient have pressed non-alphabetic
+printables into service - but the result would have looked like
+line noise and only delayed the day of reckoning.  Instead, we've
+written a new protocol that is upward-compatible with the old one
+in that you can mix old and new syntax.
+
+There were other problems as well. The old command set encouraged
+sloppy handling of data by supporting commands that return PVT and
+fix-quality information in atomized partial form, without timestamps.
+
+There was also no way to support returning more than single-line
+responses to a client. This was a problem for returning things like
+[RINEX] format, which we'd like to be able to do when a device can
+report pseudoranges.
+
+== The transition plan ==
+
+We need to shed the code complexity and overhead of maintaining both
+protocols at once. This will happen sooner than it otherwise might
+have because gpsd is in part targeted for SBCs and other constrained
+environments where shaving a few K off the runtime image can actually
+matter.  When it comes to keeping the codebase lean and mean, we try
+harder.
+
+The old-protocol support was removed from the daemon in 2.91.  Old
+protocol will be supported in the client-side library for somewhat
+longer, giving your applications a bridge period when they can speak
+both old and new protocol -- but the client-side support for old
+protocol will be removed when 3.0 ships.
+
+The 2.92 version, with the new protocol deployed, is be in Lucid
+Lynx, the Ubuntu LTS release of April 2010.
+
+If you follow our transition advice now, you will be able to talk to
+all old-protocol and new-protocol versions of the daemon until the 3.0
+shared client library is deployed, at which point your runtime will
+silently get smaller but you may no longer be able to use 2.x daemon
+versions any more.
+
+We're counting on binary-package dependencies to make the transition
+easier.  When you ship a release using the new interface library,
+specify the GPSD package at version >= 2.90 to get the new shared
+library; then, when the 3.0 interface library is deployed next year,
+you shouldn't have to do anything.
+
+We'll try to make the transition easy, but we cannot guarantee no
+problems. The sooner you start adapting your code, the less pain you
+are likely to experience.  The rest of this document will explain both
+theory and practice, and give you specific pointers on how to fix
+client code.
+
+== Virtue is rewarded ==
+
+Since 2004, the way you were *supposed* to be using gpsd was through
+one of the client libraries (in C or Python). If you have been doing
+it right, you have been telling gpsd to stream data at you with the
+'w' command, via application code probably looked something like this:
+
+-------------------------------------------------------------------
+
+   gpsdata = gps_open(source.server, source.port);
+
+   (void)gps_query(gpsdata, "w+x\n");
+
+   // This is in your application's main event loop somewhere.
+   // It polls gpsd for new data.
+   ... gps_poll(gpsdata) ...
+
+   gps_close()
+
+-------------------------------------------------------------------
+
+If you have been virtuous, you need only to make four small changes to
+your code.
+
+. Give gps_open() a third argument that is the address of a struct gps_data_t.
+(This interface changed to avoid malloc(3) and make it possible to write
+re-entrant client code.)
+
+. Replace the gps_query() call with:
+
+-------------------------------------------------------------------
+gps_stream(gpsdata, WATCH_ENABLE, NULL)
+-------------------------------------------------------------------
+
+This will tell whatever version of the client library your application
+dynamically links to emit what it should under the hood, either old
+or new protocol. Unless a target system carries a version of the
+libgps shared library different from the gpsd version, everything
+should work and continue to work through future updates.
+
+. Change gps_poll calls to gps_read calls.
+
+. If you have references to the 'satellites' member of the structure,
+those need to change them to 'satellites_visible'.
+
+There. You're probably done, unless you relied on some parts of
+struct gpsdata_t that application developers usually don't or issued
+unusual configuration commands. Here are the exceptions:
+
+* You issued other gps_query() or gps_send() commands, such as "J=1".
+  If so, you'll need to learn how to say them in the new API (the J
+  command itself is dead, and you can just remove it entirely). That
+  is not difficult, and this document will cover what you need to
+  know.
+
+* Your application code referenced struct gpsdata_t members that no
+  longer exist. This will be obvious because your compilation will
+  fail.  Later in this document you will learn how to fix these
+  problems.
+
+* You set a per-packet raw hook.  This feature is gone; code
+  can now just look at the response buffer directly.
+
+* You set a thread hook.  We have deleted the thread-hook portion of
+  the API; for discussion, see "Why threads are gone" below.
+
+You can probably ignore the rest of this document, unless
+either (a) you want to learn about gpsd's new capabilities so you
+can use them in creative ways, or (b) you want to caper with unholy glee
+as you contemplate the trials awaiting the non-virtuous.
+
+If you are non-virtuous -- that is, you rolled your own client-side
+interface -- you've had years of warning that this choice would
+fail to insulate you from protocol details and cost you pain in the
+future. That future is now.
+
+In the remainder of this document we will try to help you minimize the
+pain.  The main strategy for doing so is to *use libgps* (or its
+functional equivalents in languages other than C).  Scrap your
+hand-rolled interface code!  When you use libgps, compatibility issues
+become *our* problem to solve rather than *yours*.
+
+== Binary stability ==
+
+In the past, the GPSD project has not been very good about preserving
+stability of the binary structure layout for struct gpsdata_t between
+releases. There was a reason for this -- we were very focused
+on reducing memory footprint for SBCs and embedded devices, so we
+conditioned out various pieces of the strucure depending on what
+features were or were not compiled in.
+
+We're not going to do this any more. It has been pointed out to us
+that the friction costs of breaking shared-library compatibility are
+higher than we were reckoning. The new layout has no sections
+conditionalized; instead, we have moved a number of fields into
+a union. From 2.90 on, the structure layout will change rarely,
+only at major version bumps.
+
+== When the bough breaks ==
+
+Even virtuous clients have to worry about version skew. Supposing you
+have used libgps and not done anything exotic, you will still have
+problems if the client library you linked and the instance of gpsd it
+speaks to are using different protocols.
+
+The possible failure modes are pretty obvious.  Transitions are
+difficult.  We're essentially relying on the distribution integrators
+to ship libgps and gpsd updates at the same time, with sane
+package dependencies. If that goes smoothly, applications may
+not even notice the changes.  We can hope...
+
+== Why threads are gone ==
+
+We have deleted the two functions in the API that managed a
+library-internal thread hook.  Here's why:
+
+1. Actual use of it has been at best very rare and possibly nonexistent.
+
+2. Applications that want location handing to run in a thread are in
+   a better position to manage thread locks and mutexes themselves
+   than our client library can possibly be -- after all, the
+   application knows what all the other threads and mutex locks
+   are, and our library doesn't.
+
+3. We don't like to ship code we can't test, we didn't have a
+   regression test for the thread stuff, and writing one would
+   have been a painful expenditure of time better spent elsewhere.
+
+== On not doing things by halves ==
+
+At the same time that pressure has been building to redesign the
+protocol, we've been gaining experience in gpsd's application domain
+that has made us rethink some of the assumptions behind the old one.
+
+Since we knew we were going to have a forced compatibility break at the
+wire-protocol level anyway, we decided not to do things by halves.  One
+big break -- in the application model, struct gpsdata_t, and the
+wire protocol behind it -- is better than three or four spread out
+over a period of time.
+
+As a result, the new protocol is not an exact superset of the old one.
+It reflects a different way of carving up the behavior space in gpsd's
+application domain.  And the shape of struct gpsdata_t, the
+client-side interface structure, has changed in corresponding ways.
+
+Accordingly, there are three things a client developer will need to
+understand about the new protocol.  The first is theory: how its model
+of the gpsd application domain is different. The second is practice:
+how to issue new-style commands and interpret responses. The third, if
+you have relied on the structure in a way that now breaks your
+compile, is how that structure has changed.
+
+== How the theory has changed ==
+
+=== Channels are gone ===
+
+In old protocol, when you requested data from the daemon, it would
+search for a device supplying the kind of data you had told it you
+wanted (GPS, by default) and connect your listening channel to *that
+single device*. The association between channel and device was set
+when channel was first bound to device and implicit; reports weren't
+labeled with the device name. You could request a specific device if
+you wanted to.
+
+In the new protocol, channels are gone.  You tell gpsd to stream
+reports at you; thereafter, every time an attached GPS or other device
+generates a report, you'll get it.  There may be multiple devices
+reporting; each report will come labeled with the name of the
+originating device, and that name will be left in your client
+structure along with the rest of the new data.
+
+In both protocols, when you poll gpsd and get data the client library
+takes care of interpreting what comes up the wire from the daemon, and
+merges the resulting data into your client structure (struct
+gpsdata_t).
+
+The difference is that before, the API locked you to one device during
+the life of the session.  Now it potentially has to deal with a *set*
+of devices, treated symmetrically.
+
+There are multiple reasons this change is a good idea.  One is that it
+makes coping with devices being hotplugged in or out completely
+trivial from the client's point of view - it can just choose to ignore
+the fact that the device IDs in the reports have changed.  Also, the
+channel-management hair in the interface goes away. Also, it means
+that clients can treat identically the cases where (a) you have one
+device reporting different kinds of data (e.g. a marine navigation
+system reporting both GPS and AIS) and (b) you have several devices
+reporting different kinds of data.
+
+=== From lockstep to streaming ===
+
+A subtler change has to do with the difference between a lockstep
+or conversational interface and a streaming, stateless one.
+
+In the earliest versions of GPSD, clients requested various pieces of
+data by command. After each request, they would need to wait until a
+response came back.  Then, watcher mode was added.  By saying "w+",
+you could ask gpsd to stream GPS reports at you whenever it got them.
+
+In the new protocol, streaming is all there is.  Every report coming
+up from the daemon is tagged with its device and type.  Instead of
+issuing commands and then waiting for specific responses, clients
+should expect any kind of report at any time and merge it into
+client-local storage (libgps does this for you).
+
+This change is necessary to cope with devices that may send (for
+example) mixed GPS and AIS data. In the future, the stream from
+gpsd could include other kinds of data, such as the take from
+a digital compass, water-temperature sensors, or even aircraft
+transponders.
+
+=== Asynchronous-write handling ===
+
+The old client code had an assumption baked into it that gps_poll()
+can do one read call end expect the daemon to hand it an entire
+\n-terminated packet. 99.9% of the time this is true, but socket
+layers can do some remarkably perverse things.
+
+In 2.91 and later, what was gps_poll() and is now gps_read() behaves
+in a subtly different way.  Each call does exactly one read() call as
+before, but the incoming data is now buffered; the logic to interpret
+the buffer and empty it is called only when the read() contains a \n.
+When that happens, the validity flags include the PACKET_SET mask.
+
+== How the command set has changed ==
+
+If your code issues old-protocol commands 'A', 'D', 'E', 'M', 'P',
+'T', 'U', or 'V', it is a wretched hive of scum and villainy that
+probably hasn't changed since before the introduction of 'W' in
+2004-2005.  You are using the oldest single-shot commands and will
+have to rewrite your interface significantly, as the new protocol does
+not support equivalents.  Use libgps.
+
+If your code issues B, C, or N commands, they need to change to
+?DEVICE commands.  See the protocol reference for details.
+
+The 'F' command has no equivalent in 2.90; consider teaching your
+client to ignore fix updates when they don't have a specified "device"
+or "class" tag, respectively. In 2.91 and later versions, use the "device"
+option of the ?WATCH command for similar effect.
+
+The old 'G' command does not have an equivalent.  It would be possible
+to implement one, but we probably won't do it unless there is actual
+demand (and we don't expect any).
+
+The old 'I' command has no equivalent. You probably issued it as part
+of an initialization string, hoping that a subtype string would later
+show up in gps_id so you could post it somewhere.  In the new
+protocol, when a device sends back subtype information the daemon
+ships the client an object of class DEVICE with a device tag and
+subtype fields.  Watch for that and process appropriately.
+
+The old 'J' command is dead. gpsd now detects the end of the reporting
+cycle reliably and ships on that, buffering data during the individual
+reporting cycle.
+
+The old 'K' command is replaced by ?DEVICES.
+
+The old 'L' command is replaced by ?VERSION.  Note that the daemon now
+ships a version response to each client on connect, so it will
+probably never be necessary for you to issue a ?VERSION request.
+
+The old 'M' command has no equivalent.  Mode is reported in the TPV response.
+
+The old 'O' and 'Y' commands are gone.  Use ?WATCH and sample the
+stream instead.
+
+The old 'Q' command has no equivalent.  DOPs are reported in the SKY response.
+
+The 'S' command has no equivalent, because it is not well defined what
+value should be presented for binary protocols.
+
+The old 'R' command has been replaced by three optional attributes in
+?WATCH.  Include the WATCH_RARE, WATCH_RAW and/or WATCH_NMEA masks in
+the argument of gps_stream(), or set a raw hook before alling
+gps_stream().
+
+The old 'W' command has been replaced by ?WATCH. Call gps_stream()
+with whatever options you want to set.
+
+The old 'X' command is gone.  Instead, you will see an object of
+class DEVICE from the daemon whenever a device is opened or closed.
+
+The old 'Z' and '$' commands, used by the developers for profiling,
+have equivalents, which are presently considered unstable and thus
+are undocumented.
+
+== How the C API and gps_data_t structure has changed ==
+
+gps_open() now takes a third argument and is re-entrant - it's the
+old undocumented gps_open_r().
+
+The gps_query() entry point is gone.  With the new streaming-oriented
+wire protocol, it is extremely unwise to assume that the first
+transmission from the damon after a command is shipped to it will be
+the reponse to command.  If you must send explicit
+commands to the daemon, use gps_send() and handle the response in
+your main event-polling loop -- but beware, as using gps_send()
+ties your code to the GPSD wire protocol and is not recommended.
+
+gps_poll() is renamed gps_read().
+
+The client library's reporting structure, struct gpsdata_t, has a new
+substructure (struct devconfig_t) named "dev" that groups together
+information about the device that shipped the last update to the
+client.  The members of this structure replace several top-level
+struct gpsdata members in older versions.
+
+Most notably, the gps_device member has been replaced by dev.path.
+It is valid after every response with a device tag (DEVICE, TPV, SKY,
+AIS, RTCM2, RTCM3).
+
+The top-level gps_id member is replaced by dev.subtype.  This data
+should be considered valid only when DEVICEID_SET is on in the
+top-level set member.
+
+The dev members baudrate, parity, stopbits, cycle, mincycle, and
+driver_mode replace older top-level members.  They should be
+considered valid only when DEVICE_SET is on in the top-level set
+member.
+
+The top-level members ndevices and devicelist (used only on the client
+side) have been replaced by an array of struct devconfig_t structures.
+Data in this structure should be considered valid only when
+DEVICELIST_SET is on in the top-level set member.  Storage for
+pathnames is no longer dynamically allocated, but static; to save
+space, it lives in a union with several other substructures.
+
+The top-level member "satellites" has been changed to
+"satellites_visible". The ambiguity in that name had actually induced
+a bug or two.
+
+There is a new substructure, dop, which holds the
+dilution-of-precision factors that were previously individual members
+of the gpsdata structure. Two new DOPs, xdop and ydop, are available;
+these express dilution of precision in longitude and latitude,
+respectively.
+
+There is a gps_waiting() method analogous to the waiting() method in
+the Python class -- a way to check if input is waiting from the
+daemon. It blocks but takes a timeout value.
+
+The raw_hook member is gone.
+
+== C++  client library changes ==
+
+In API version 5, the C++ library defines a single object using RAII.
+There are no explicit open() and close() methods; instead, you initialize
+the object handing it a host and server, and the connection is shut down
+when the object is deleted or goes out of scope.
+
+== Python client library changes ==
+
+There is a new stream() method analogous to the gps_stream() call in
+the C library.  As in the C library, the query() method is gone, for
+the same reasons.  The gps_send() entry point, new in version 3 of the C API,
+has had a corresponding Python gps-class send() method all along.
+
+The pre-existing interface using the poll() method and self.valid is
+still available and should work compatibly with a daemon speaking
+JSON. One new feature has been added; after a VERSION response (which
+a JSON-speaking instance of gpsd should emit when a connection is
+opened) the version member of the session will be an object containing
+version information. However, data from the new responses (WATCH,
+VERSION, AIS, and TIMING in particular) will be available only through
+the self.data member.
+
+The preferred way to use the new gps class is as an iterator
+factory, like this:
+
+----------------------------------------------------------------------
+
+for report in gps(mode=WATCH_ENABLE):
+    process(report)
+
+----------------------------------------------------------------------
+
+See the Client HOWTO for a more detailed example.

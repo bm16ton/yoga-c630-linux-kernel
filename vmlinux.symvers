@@ -10890,7 +10890,6 @@
 0x00000000	snd_pcm_suspend_all	vmlinux	EXPORT_SYMBOL	
 0x00000000	iommu_dev_has_feature	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	misc_deregister	vmlinux	EXPORT_SYMBOL	
-0x00000000	xenbus_probe	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	apei_resources_fini	vmlinux	EXPORT_SYMBOL_GPL	
 0x00000000	acpi_match_device_ids	vmlinux	EXPORT_SYMBOL	
 0x00000000	xxh64_update	vmlinux	EXPORT_SYMBOL	

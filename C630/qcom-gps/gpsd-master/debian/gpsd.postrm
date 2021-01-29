@@ -1,0 +1,31 @@
+#! /bin/sh
+# postrm script for gpsd
+
+set -e
+
+case "$1" in
+    purge)
+	[ ! -f /etc/default/gpsd ] || rm /etc/default/gpsd
+
+        if [ -x "$(command -v deluser)" ]; then
+            deluser --quiet --system gpsd > /dev/null || true
+        else
+            echo >&2 "not removing gpsd system account because deluser command was not found"
+        fi
+
+        rm -rf /run/gpsd
+
+    ;;
+
+    remove|upgrade|failed-upgrade|disappear)
+    ;;
+
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+
+esac
+
+#DEBHELPER#
+
+exit 0

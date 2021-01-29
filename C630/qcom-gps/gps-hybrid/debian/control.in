@@ -1,0 +1,163 @@
+Source: gpsd
+Section: misc
+Priority: optional
+Maintainer: Anibal Limón <anibal.limon@linaro.org>
+Build-Depends: debhelper (>= 11),
+ po-debconf,
+ python3-all-dev (>= 2.6.6-3),
+ python3-all-dbg (>= 2.6.6-3),
+ python3-all-dev,
+ xsltproc, docbook-xsl, docbook-xml,
+ libncurses-dev,
+ libusb-1.0-0-dev,
+ libdbus-1-dev, libglib2.0-dev, libdbus-glib-1-dev, makedev,
+ libbluetooth-dev [linux-any],
+ qtbase5-dev,
+ lsb-release, bc,
+ dpkg-dev (>= 1.15.6),
+ scons (>= 3.0.1-2~),
+ dh-buildinfo,
+ dh-python,
+ dh-apparmor,
+ dh-exec,
+ pps-tools (>= 0.20120406+g0deb9c7e-2~) [linux-any],
+ pkg-config,
+ asciidoc
+Standards-Version: 4.2.1
+Homepage: http://www.catb.org/gpsd/
+Vcs-Browser: https://github.com/bzed/pkg-gpsd
+Vcs-Git: https://github.com/bzed/pkg-gpsd.git
+X-Python3-Version: >= 3.5
+
+Package: gpsd
+Architecture: any
+Depends: netbase | systemd-sysv, lsb-base (>= 3.2-13),
+ adduser (>= 3.34),
+ ${shlibs:Depends}, ${misc:Depends},
+ libgpsLIBGPSSONAME (= ${binary:Version}),
+ ${python3:Depends}, python3
+Recommends: udev [linux-any], gpsd-tools
+Breaks: ${gpsd:Breaks}, gpsd-tools (<< 3.20-10), gpsd-clients (<< 3.20-9)
+Replaces: gpsd-tools (<< 3.20-10), gpsd-clients (<< 3.20-9)
+Suggests: gpsd-clients, dbus, apparmor
+Conflicts: fso-gpsd
+Multi-Arch: foreign
+Description: Global Positioning System - daemon
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ With gpsd, multiple GPS client applications can share access to devices
+ without contention or loss of data. Also, gpsd responds to queries with a
+ format that is substantially easier to parse than the different standards
+ emitted by GPS devices.
+
+Package: gpsd-dbg
+Architecture: any
+Section: debug
+Suggests: gpsd-dbgsym
+Depends: ${shlibs:Depends}, ${misc:Depends}, python3, ${python3:Depends},
+ libgpsLIBGPSSONAME (= ${binary:Version}) | gpsd (= ${binary:Version}) | gpsd-clients (= ${binary:Version}) | python3-gps (= ${binary:Version})
+Description: Global Positioning System - debugging symbols
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ This package contains the python debug modules and some test tools
+ to the debug the behaviour of gpsd. Debug symbols are being shipped
+ in the dbgsym package.
+
+Package: gpsd-clients
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+ python3Suggests: gpsd
+Conflicts: gps
+Breaks: ${python:Breaks}
+Description: Global Positioning System - clients
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ This package contains auxiliary tools and example clients for monitoring and
+ testing gpsd.
+
+
+Package: python3-gps
+Architecture: any
+Section: python
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python3:Depends}
+Recommends: gpsd
+Provides: ${python3:Provides}
+Breaks: ${python3:Breaks}
+Description: Global Positioning System - Python 3 libraries
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ This package contains a Python interface to connect to gpsd, together with
+ a module providing a controlled testing environment. It also ships two tools
+ which utilize the interface: gpsprof for latency-profiling, and gpsfake to
+ simulate a GPS by playing back a logfile.
+
+Package: libgpsLIBGPSSONAME
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: gpsd
+Conflicts: fso-gpsd
+Pre-Depends: ${misc:Pre-Depends}
+Multi-Arch: same
+Description: Global Positioning System - library
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ This package provides libgps, a C service library for querying GPS
+ devices. It supports both a low-level interface, which communicates
+ directly with the device to which the GPS is connected, and a high-level
+ interface, which goes through gpsd and is intended for concurrent use by
+ several applications.
+
+Package: libgps-dev
+Architecture: any
+Section: libdevel
+Depends: libgpsLIBGPSSONAME (= ${binary:Version}), ${misc:Depends}, pkg-config
+Description: Global Positioning System - development files
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ This package contains the header and development files needed to build
+ programs and packages using libgps.
+
+Package: libqgpsmmLIBGPSSONAME
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Pre-Depends: ${misc:Pre-Depends}
+Multi-Arch: same
+Description: Global Positioning System - Qt wrapper for libgps
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ This package provides libQgpsmm, the Qt version of libgpsmm.
+ It is a wrapper over libgps, the service library for querying GPS
+ devices. libQgpsmm is available on all platforms which are supported
+ by Qt4.
+
+Package: libqgpsmm-dev
+Architecture: any
+Section: libdevel
+Depends: ${misc:Depends}, pkg-config,
+ libqgpsmmLIBGPSSONAME (= ${binary:Version}),
+ libgps-dev (= ${binary:Version})
+Description: Global Positioning System - Qt wrapper for libgps (development)
+ The gpsd service daemon can monitor one or more GPS devices connected to
+ a host computer, making all data on the location and movements of the
+ sensors available to be queried on TCP port 2947.
+ .
+ This package provides libQgpsmm, the Qt version of libgpsmm.
+ It is a wrapper over libgps, the service library for querying GPS
+ devices. libQgpsmm is available on all platforms which are supported
+ by Qt4.

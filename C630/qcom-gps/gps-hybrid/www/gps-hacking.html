@@ -1,0 +1,489 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta name="Author" content="Eric S. Raymond">
+   <meta name="Description" content="A gentle introduction to writing GPS-aware applications">
+   <meta name="Keywords" content="GPS, gpsd, hacking, applications">
+   <meta name="Revised" content="9 April 2015">
+   <meta name="robots" content="index,follow">
+   <link rel="stylesheet" href="main.css" type="text/css">
+   <title>ESR's Guide to Hacking With GPS</title>
+</head>
+<body>
+
+<div id="Header">ESR's Guide to Hacking With GPS</div>
+
+<div id="Menu">
+    <img src="gpsd-logo-small.png" alt="Small gpsd Logo"><br>
+    <a href="index.html">Home</a><br>
+    <a href="index.html#news">News</a><br>
+    <a href="index.html#downloads">Downloads</a><br>
+    <a href="index.html#mailing-lists">Mailing lists</a><br>
+    <a href="index.html#documentation">Documentation</a><br>
+    <a href="faq.html">FAQ</a><br>
+    <a href="xgps-sample.html">Screenshots</a><br>
+    <a href="index.html#recipes">Recipes</a><br>
+    <a href="index.html#others">Other GPSDs</a><br>
+    <a href="hardware.html">Hardware</a><br>
+    <a href="for-vendors.html">For GPS Vendors</a><br>
+    <a href="wishlist.html">Wish List</a><br>
+    <a href="hall-of-shame.html">Hall of Shame</a><br>
+    <a href="troubleshooting.html">Troubleshooting Guide</a><br>
+    <a href="hacking.html">Hacker's Guide</a><br>
+    <a href="protocol-transition.html">Application Compatibility</a>
+    <a href="references.html">References</a><br>
+    <a href="history.html">History</a><br>
+    <a href="future.html">Future</a><br>
+
+    <div>&nbsp;</div>
+
+    <a href='http://www.catb.org/hacker-emblem/'><img
+    src='http://www.catb.org/hacker-emblem/glider.png'
+    alt='hacker emblem'></a><br>
+
+    <script type="text/javascript" src="https://www.openhub.net/p/3944/widgets/project_thin_badge.js"></script>
+
+    <hr>
+    <script type="text/javascript"><!--
+    google_ad_client = "pub-1458586455084261";
+    google_ad_width = 160;
+    google_ad_height = 600;
+    google_ad_format = "160x600_as";
+    google_ad_type = "text";
+    google_ad_channel = "";
+    //--></script>
+    <script type="text/javascript"
+      src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+    <hr>
+
+    <a href="http://validator.w3.org/check/referer"><img
+          src="http://www.w3.org/Icons/valid-html401"
+          alt="Valid HTML 4.01!" height="31" width="88"></a>
+</div>
+
+<div id="Content">
+
+<p>This is a gentle introduction to writing GPS-aware applications
+&mdash; or, How I Stopped Worrying And Learned To Love Spherical
+Trigonometry. It will explain the capabilities and limitations of GPS
+hardware and the <code>gpsd</code> software that you need to know about when
+writing location-aware applications.</p>
+
+<p>We'll go from general to specific, beginning with an overview of how
+GPS works and ending with architectural suggestions about how to use
+<code>gpsd</code> to make your application location-aware.</p>
+
+<h1>How GPS Works</h1>
+
+<p>First, the basics of how GPS works.  It depends on the fact that
+satellite orbits can be modelled accurately.  A GPS receiver is a
+combination of a radio receiver and computer that receives timing
+signals and orbit information from GPS satellites, and in particular
+can compute exactly where each satellite will be at any given time
+with respect to the fixed Earth.  (For those of you who enjoy such
+details, what they actually predict is each satellite's position with
+respect to a coordinate system known as WGS84 which closely fits the
+mean sea level of Earth.)</p>
+
+<p>Although the term <strong>GPS</strong> properly refers only to the
+system operated by the United States Air Force (also
+called <strong>NAVSTAR</strong>, it is sometimes used loosely to refer
+to similar systems.  We use the accepted term <strong>Global
+Navigation Satellite System (GNSS)</strong> to refer to all
+satellite-based navigation systems.  The main systems other than GPS
+are GLONASS (Russia), Galileo (EU) and BeidDou (China).  Because
+the <strong>gpsd</strong> project originated when GPS was the
+overwhelmingly dominant paradigm, many parts of the documentation and
+code refer to GPS when GNSS is more accurate.  Our intent is to adjust
+the documentation and to leave the code alone because there is a real
+cost to changing code.</p>
+
+<p>This paragraph and much of the following text is specific to
+GPS/NAVSTAR, but the principles largely apply to other systems.
+
+There are presently about 30 dedicated Navstar satellites (full coverage
+can be achieved with 24), twenty thousand km (twelve thousand miles),
+up in high-inclination orbits, so that each one's trajectory wraps around
+the Earth like a ball of yarn as the planet spins beneath them.  The
+inclinations are tuned to guarantee that about twelve will be visible
+at any given time from anywhere on Earth (coverage falls off a little
+at high latitudes).</p>
+
+<p>You can look at a very nifty <a
+href="http://rhp.detmich.com/gps.html">simulation</a>
+of Navstar satellite orbits. (Requires Java, also includes
+GLONASS, the Russian military equivalent).</p>
+
+<p>Each satellite broadcasts identification pulses, each one including
+the clock time it was sent. A GPS receiver, picking up these
+pulses, and knowing the speed of light, can recover its
+4-dimensional location (Latitude, Longitude, Altitude, and Time).
+Ideally, you would need to solve four simultaneous equations with
+the four unknowns, so would need four visible satellites.  This
+is known as a <strong>3D</strong> fix.  Computing the GPS's exact
+position with respect to the satellites becomes a relatively
+simple if tedious exercise in spherical trigonometry (which,
+fortunately, the GPS's firmware does for you).
+Note that the GPS reciever does <b>not</b> need to know its own time
+or location to begin with.</p>
+
+<p>An excellent introduction is available at:
+<a href="http://electronics.howstuffworks.com/gadgets/travel/gps.htm">How GPS Receivers Work</a>, see page 4 in particular.
+
+<p>That's the theory.  In practice, the system has important limits.
+Anything, natural or artificial, that messes with the signal timings
+will degrade the accuracy of your position fix.  Until it was
+abolished by Presidential decree in 2000, the most important limit was
+artificial, the so-called 'Selective Availability' feature.  The
+satellites were programmed to introduce patterned timing jitter into
+the signals.  The U.S. military knew the pattern, but nobody else did
+(or, at least, nobody who was admitting it).</p>
+
+<p>In Sep 2007 the U.S. government announced that the future generation
+of GPS satellites, known as GPS III, will be without the SA feature.
+Doing this will make the policy decision of 2000 permanent.
+The important limits are on accuracy are now due to physics.
+One is a variable amount of signal lag produced as the GPS
+signals pass through the ionosphere and troposphere, which partly
+refracts radio waves.  This can be largely compensated for by a
+technique called "Differential GPS" (DGPS).  Ground-based reference
+stations are established in well-surveyed locations, and compare
+measured ranges (pseudoranges to be precise) with their calculated
+values.  These errors account for unknown propagation delays, clock
+errors, and any other unmodeled errors.  The reference stations can
+then tell nearby GPS receivers the required corrections, which are
+then applied to observed pseudoranges before computing a position.
+This information may be broadcast via radio (called "Ground Based
+Augmentation Systems"), or via satellites (called "Space Based
+Augmentation Systems").
+See <a href="#dgps">DGPS and friends</a> for details on how this
+works.</p>
+
+<p>In practice, the most important limit on accuracy is the actual
+visibility of satellites.  A timing signal has to be fairly strong and
+clear, with little noise or distortion, before a GPS can use it.  The
+frequencies GPS has to use in order to punch through the ionosphere
+with minimal attenuation (unlike conventional radio and TV signals)
+don't cope well with solid barriers.  Thus, GPS tends to work poorly
+if at all inside buildings.  Tall trees and tall buildings can mess it
+up, blocking line of sight to satellites that aren't nearly directly
+overhead.</p>
+
+<p>Accuracy also falls off a bit when you're in motion.  This isn't a
+physical effect, but mostly due to the fact that computation always
+takes a little time; by the time the GPS figures out where you are,
+you're not there any more.</p>
+
+<p>Another limit, implicit in the geometry, is that GPS is relatively
+poor at getting your precise altitude.  When you can get a signal lock
+on four satellites, a modern GPS will give you longitude and latitude
+within about 10 meters or yards, down to 2 with DGPS correction.  Vertical
+uncertainty will be much higher, as much as fifty meters.</p>
+
+<p>People who really <a
+href="http://www.wsrcc.com/wolfgang/gps/accuracy.html">obsess</a>
+about GPS accuracy quote it not as a single figure but as a
+probability-of-error: e.g., you're within 10 meters 95% of the
+time and 2 meters 50% of the time.</p>
+
+<h1 id='dgps'>DGPS and friends</h1>
+
+<p>DGPS requires out-of-band communication with a service
+providing GPS signal correction information to make the GPS
+positioning more accurate.  There are two ways of communicating
+this in real-time, GBAS and SBAS.  An example of GBAS is the National
+Differential GPS system (NDGPS) in the US, transmitting corrections
+around 300 kHz.   There are similar systems all over
+the worldwide, usually run by maritime navigation authorities. A
+disadvantage of these systems is that consumer GPSes do not
+listen on these frequencies, so this information is not really
+available to them.  Another example is the system being installed
+at airports worldwide, to enable precision landing.  Coverage for both
+these system types is between 30km and 40km.</p>
+
+<p>Examples of SBAS include WAAS (US), EGNOS (Europe), GAGAN (India),
+and MSAS and QZSS (Japan).  These systems are almost identical
+in their operation.  They provide DGPS corrections with
+in-band communication &mdash; geo-stationary satellites broadcasting
+GPS signal correction information on the same frequency and format as the
+GPS satellites.  The system makes GPSes more accurate,
+and adds integrity checks making it possible to detect when the
+GPS location is totally wrong.  Unlike GBAS, your GPS will generally
+use these systems automatically whenever it can see the satellites.</p>
+
+<p>SBAS data starts out as normal DGPS stations observing the
+errors.  That data gets processed and interpolated into a grid which
+models ionospheric and tropospheric delay over the SBAS coverage
+area.  The GPSes then interpolate into that grid to get an estimate of
+lag for their current position.  Accuracy will vary based on how
+close a GPS is to a DGPS station.
+</p>
+
+<p>SBAS systems have wider coverage areas than GBAS, but still
+not worldwide; as can be seen from the list above, each country
+has a system covering its area of interest.  See
+<a href="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/SBAS_Service_Areas.png/800px-SBAS_Service_Areas.png">SBAS Service Areas</a>.
+</p>
+
+<p>Note that DGPS improves accuracy in <b>both</b> position and time,
+the two are intrinsically related.
+
+<h1>How GPS Hardware Talks To Computers</h1>
+
+<p>From  a software designer's point of view, a GPS receiver is an
+oracle that tells you its location whenever it can get line-of-sight
+to four satellites.  Our next topic is how it gets that information
+to a computer in a form your application can use.</p>
+
+<p>Almost all GPSes are serial devices that use either RS-232C or USB
+to communicate with the host machine.  Most track a standard called
+NMEA 0183 which prescribes both electrical signal levels and a data
+encoding.  The protocol is bidirectional, but designed in the expectation
+that most of the traffic will be GPS-to-computer, with commands
+going in the computer-to-GPS direction rare.</p>
+
+<p>The modern trend in GPSes is away from RS232C and towards USB.  USB
+GPSes keep the NMEA data protocol but discard the NMEA link layer. Under
+Linux, USB GPSes use the usbserial module and look like serial ports.
+Part of <code>gpsd</code>'s job is to hide this stuff; applications don't have
+to be aware of NMEA or the link layer, they just query <code>gpsd</code> for
+information.</p>
+
+<h2>The good news about NMEA</h2>
+
+<p>The basic design of the NMEA data protocol is very simple. The GPS
+throws ASCII text lines called 'sentences', each beginning with a '$'
+and terminated by CR/LF, at the host machine.  Usually the host gets
+one update a second, but the GPS has the option of sending more
+frequently when it detects a change of position or velocity or status.
+The standard prescribes a serial encoding at 4800bps, 8 bits, one stop
+bit, no parity; although most consumers recievers use 9600bps.</p>
+
+<p>Here are some sample NMEA sentences:</p>
+
+<pre><code>
+$GPGGA,212734,4740.0569,N,12219.6612,W,1,08,74.00,73.9,M,638.000000,M,,*6D
+$GPRMC,212734,A,4740.0569,N,12219.6612,W,0.000000,0.000000,020403,18.936255,E*60
+$GPGSA,A,3,17,06,23,15,16,18,10,30,,,,,152.00,74.00,133.00*3F
+$GPGGA,212735,4740.0569,N,12219.6612,W,1,08,74.00,74.1,M,638.000000,M,,*63
+$GPRMC,212735,A,4740.0569,N,12219.6612,W,0.000000,0.000000,020403,18.936255,E*61
+</code></pre>
+
+<p>Each sentence consists of a comma-separated fields.  The first
+field is always a message type and the last a checksum that can be
+used to check for data corruption.  Interpreting NMEA sentences is not
+complicated.  Modulo a few glitches like 2-digit year numbers, the NMEA
+standard does a pretty good job of specifying a message set for GPSes
+that want to convey data to computers.</p>
+
+<p>More good news: you should never have to deal with this level
+&mdash; <code>gpsd</code>'s purpose is to insulate you from it.</p>
+
+<h2>The bad news about NMEA</h2>
+
+<p>That's the good news.  Now for the bad news, which comes in five
+pieces:</p>
+
+<p>First, the NMEA standard does <em>not</em> specify a command
+repertoire for the opposite direction.  Thus, functions like changing
+the GPS's update frequency or selecting the subset of sentences for it
+to send are often not supported at all, and when they are it's all by
+sentences that are vendor-specific.</p>
+
+<p>This used to be more of a problem than it is today.  Early GPSes
+tended to have elaborate facilities for accepting lists of waypoints
+and sending back course information to help you navigate to them.
+Modern high-end units still do, but the GPSes designed for connecting
+to computers are increasingly designed on the assumption that the host
+computer will do all the waypoint geometry itself and the GPSes only
+job is to deliver periodic position and velocity readings.  Thus, they
+tend to have no control codes at all.  This makes them laudably
+stupid.</p>
+
+<p>Second, vendors don't stick to the NMEA-prescribed 4800bps data
+rate.  This is understandable; 4800 is very slow by today's standards,
+and by boosting bits per second they can deliver information that's
+fresher by a few milliseconds (which might make a difference if, say,
+you're using a GPS-enabled autopilot to land an aircraft).  Some GPSes
+feature data rates upwards of 38400bps. However, this actually does
+little good unless the application polls the GPS at a rate faster than
+1Hz rather than waiting for it, as most GPS receivers cannot be told to
+ship updates faster than once per second &mdash; and the polling
+commands (when they exist at all) are proprietary. And the fact that
+GPSes don't have a single data rate graven in stone brings back all
+the well-known baud-mismatch configuration problems we thought we'd
+left behind in the 1980s.</p>
+
+<p>The third problem with NMEA is that it's not universal.  A
+decreasing but still significant percentage of GPSes use proprietary
+binary protocols.  For example, there was a GPS chipset called
+"Zodiac" made by Rockwell International, that used to be very widely
+OEMed by GPS makers.  It spoke NMEA, but had irritating limitations in
+that mode like not being able to accept DGPS corrections.  It
+preferred a tight-packed binary protocol.  There haven't been any new
+Zodiac-based designs in a few years, but a lot of Zodiac-based
+GPSes (like the DeLorme EarthMates made before they switched over to a
+SiRF chipset in 2003) are still around.</p>
+
+<p>2004's equivalent of the Zodiac is the SiRF-II chipset, which seems
+to be nearly ubiquitous in inexpensive GPS receivers.  It too speaks
+a binary protocol, but only if you ask it to; it's fully capable
+in NMEA mode. Which is where it boots up.  The idea seems to be
+that you can switch to binary to improve your bits-per-second
+in latency-critical applications.</p>
+
+<p>The fourth problem with NMEA is that it doesn't deliver all the
+information that the GPS has in one atomic message.  In particular,
+you can't get altitude (delivered in the GPGGA sentence only) and speed
+(delivered in GPRMC and GPVTG) at the same time.  This is annoying;
+ideally, you want your position/velocity/time oracle to deliver one
+observation tuple conveying all seven degrees of freedom (t, x, y, z,
+vx, vy, vz) and their error estimates.</p>
+
+<h2>Learning more about NMEA</h2>
+
+<p>The final irritation about NMEA is that it's expensive to buy a
+description.  The National Marine Electronics Association is a trade group of
+electronics dealers, and they want <a
+href='http://www.nmea.org/pub/0183/'>$250</a> for a copy of their
+standard.  Numerous Web sources have reverse-engineered or abstracted
+bits of it; the NMEA page piously warns that <q>In most cases they are
+very old versions or incorrect interpretations and should not be
+depended upon for accuracy,</q> then mutters darkly about copyright
+violations.</p>
+
+<p><a href='NMEA.txt'>Here</a> is the best compendium I know of.  I
+have never seen a copy of the official NMEA standard.  Fortunately, it
+isn't necessary for even <code>gpsd</code> developers to know most of
+it, since most modern GPS receivers only emit about a half-dozen of the
+eighty or so NMEA sentences.  RMC, GGA, GSA, GSV (and now possibly
+GBS) are all you are ever likely to need to know about.</p>
+
+<p>After you've read about those sentences, it can be instructive to
+run <code>gpsd</code> in a mode something like this:</p>
+
+<pre><code>
+./gpsd -N -n -D 2 /dev/ttyUSB0
+</code></pre>
+
+<p>Watching the output for thirty seconds or so will give you a good
+feel for what your GPS has to say, and how often it says it.</p>
+
+<h1>Locking and Loading</h1>
+
+<h2>Autonomous mode</h2>
+<p>
+If a GPS receiver has to figure out its postition without outside
+assistance, it is said to be in <dfn>autonomous mode</dfn>.
+</p>
+
+<p>The time required for a GPS to get a fix (Time To First Fix (TTFF))
+can vary from under 15 seconds up to just under 30 minutes (actually,
+29 plus calculation time).  The main factors affecting this latency are
+(a) whether it has an almanac available,
+(b) whether it has satellite ephemerides available, and
+(c) whether it has recent fix available.
+Of course the quality of signal at your location matters as well.</p>
+
+<p>If a GPS has not been on for several months, then it has no current
+almanac available.  It was to wait to download one before it can
+generate a fix.  This can take just under 15 mins.  This is sometimes
+called an <dfn>cold start</dfn>.</p>
+
+<p>While the almanac download takes 15 minutes, you have to be there for the
+start of it, otherwise you have to wait for the next cycle. So if you are
+unlucky and just miss the start of one, it could take just under 29 minutes
+to obtain, and on average closer to 22 min.</p>
+
+<p>If a GPS has not been on for a day (four to six hours) then it has
+a valid almanac but no valid satellite ephemerides, and must download at
+least four before it can generate an accurate fix.  This is sometimes
+called a <dfn>warm start</dfn>.  Each satellite has its own ephemeris
+that must be downloaded if a current copy is not fresh.
+</p>
+
+<p>GPSes store ephemerides is non-volatile memory, either internal
+flash storage or battery-backed SRAM.  Thus, a GPS does not need to
+have been on continuously to have ephemerides available, but it will
+consider old data to be invalid after a while.  In normal operation
+the GPS occasionally gets refreshes of ephemeris and almanac data
+from the satellites it's listening to.</p>
+
+<p>For both an cold start and a warm start, if the sat signal is
+momentarily lost, the process may have to restart and you'll get
+more delay.</p>
+
+<p>If a GPS has been on recently, in the current location, then this
+is sometimes called <dfn>hot start</dfn> and
+an accurate fix can be generated quite quickly.  This will usually be
+a few seconds for a modern GPS.</p>
+
+<h2>A-GPS mode</h2>
+<p>
+If the GPS receiver can download the almanac or ephemerides, it can proceed
+quickly to a <i>hot start</i>.  This is uncommon for GPSes that are
+connected to laptops, but is usual for GPS in mbile phones.
+<dfn>A-GPS</dfn> is variously expanded as Augmented, Assisted, or Aided.
+</p>
+
+<h1>GPSs and Power Management</h1>
+
+<p>Many GPSes are designed to power down or go to standby mode when
+DTR or its USB equivalent goes low (under Linux, this happens when you
+close the port).  An important category of exceptions is USB SiRF-II
+GPSes; these don't seem to power down on DTR low, but instead go
+to a low-power standby mode for the 8/10s of every second that they're
+not shipping packets.</p>
+
+<p>Powering down on DTR low can be a valuable power-saving measure if
+the GPS is (say) running off of laptop batteries in a navigation or
+wardriving system.  Thus, you don't want to keep your GPS device open
+when you don't actually need information from it.</p>
+
+<p>Unfortunately, this rule can collide with one of the persistent
+problems with GPSes &mdash; though they can update a previous fix
+quickly (in 0.1sec or less), they can take a long time to acquire a
+first fix when they power up.</p>
+
+<p>When a GPS receiver boots up, it has to suck radio waves for a
+while just to figure out what satellites might be available in line of
+sight.  The speed at which it can do this is inversely proportional to
+the number of GPS channels it can sample simultaneously.  Older one-
+or two-channel units could take several minutes at this.  In 2004,
+even low-end GPS receivers have twelve channels and can thus cock a
+separate ear for as many satellites as they're ever likely to see.
+Even so, it's not uncommon for them to take 30 or 40 seconds after a
+cold boot to get a fix.</p>
+
+<p>One of the things <code>gpsd</code> does for applications is handle this
+power-management issue.  When no clients are active, <code>gpsd</code> will
+automatically close the GPS device, re-opening it only when another
+client connects to the daemon.</p>
+
+<p>For more details on programming with <code>gpsd</code>, see the
+<a href="faq.html">FAQ</a>.</p>
+
+<h1>Where to learn more</h1>
+
+<dl>
+<dt><a href="http://34n118w.net/htmldir/GPS.html">How does GPS work?</a></dt>
+<dd>This is where the orbital simulation came from.</dd>
+
+<dt><a href='http://en.wikipedia.org/wiki/GPS'>Wikipedia on GPS</a></dt>
+<dd>Good introduction with much more on the history of the system.</dd>
+
+<dt><a href="http://www.ualberta.ca/~ckuethe/gps/">GPS Hackery</a></dt>
+<dd>Chris Kuethe's page has links to many interesting resources.</dd>
+
+<dt><a href='http://www.topology.org/soft/gps.html'>GPS interfaces and
+software</a></dt>
+<dd>Linux and open-source resources for working with GPSes.</dd>
+</dl>
+
+<hr>
+<script src="datestamp.js" type='text/javascript'></script>
+</div>
+</body>
+</html>

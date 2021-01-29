@@ -1,0 +1,25 @@
+Format: 1.8
+Date: Fri, 18 May 2018 12:07:58 -0500
+Source: wireless-regdb
+Binary: wireless-regdb
+Architecture: all
+Version: 2019.05.09-0ubuntu2
+Distribution: cosmic
+Urgency: medium
+Maintainer: Seth Forshee <seth.forshee@canonical.com>
+Changed-By: Seth Forshee <seth.forshee@canonical.com>
+Description:
+ wireless-regdb - wireless regulatory database
+Changes:
+ wireless-regdb (2019.05.09-0ubuntu2) cosmic; urgency=medium
+ .
+   * rebuild
+Checksums-Sha1:
+ 1c6b332ef1bcda839e75b5726f25e8b9d0aa6252 11100 wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ 57feef6b62cb070c5f8ca789065d044f76bb07bc 5866 wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
+Checksums-Sha256:
+ 0c5e4c3320c6b9422ee20f43f1493f59d88a65f8d19fe8ca7a2546248c076df1 11100 wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ bd81049ac2edf9b354d8f83db072bdc03aea6b8ff70ee1b3fd5c0a125f1f8922 5866 wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
+Files:
+ 3fbdadb9a6ee845a951263ff3000f078 11100 net optional wireless-regdb_2019.05.09-0ubuntu2_all.deb
+ a466d433396a3b833e39a1864689e277 5866 net optional wireless-regdb_2019.05.09-0ubuntu2_arm64.buildinfo
