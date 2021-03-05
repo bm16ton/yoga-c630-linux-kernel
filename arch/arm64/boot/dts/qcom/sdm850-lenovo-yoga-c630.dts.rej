@@ -1,0 +1,24 @@
+--- arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
++++ arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts
+@@ -272,9 +274,6 @@
+ 		hid-descr-addr = <0x1>;
+ 
+ 		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
+-
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&i2c3_hid_active>;
+ 	};
+ 
+ 	tsc2: hid@2c {
+@@ -283,11 +282,6 @@
+ 		hid-descr-addr = <0x20>;
+ 
+ 		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
+-
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&i2c3_hid_active>;
+-
+-		status = "disabled";
+ 	};
+ };
+ 
