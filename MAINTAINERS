@@ -18017,6 +18017,14 @@ L:	linux-usb@vger.kernel.org
 S:	Maintained
 F:	drivers/usb/misc/apple-mfi-fastcharge.c
 
+USB ARRI FPGA CONFIGURATION ADAPTER DRIVER
+M:	Anatolij Gustschin <agust@denx.de>
+L:	linux-usb@vger.kernel.org
+S:	Maintained
+F:	drivers/usb/misc/ft232h-intf.c
+F:	drivers/spi/spi-ftdi-mpsse.c
+F:	include/linux/usb/ft232h-intf.h
+
 USB AR5523 WIRELESS DRIVER
 M:	Pontus Fuchs <pontus.fuchs@gmail.com>
 L:	linux-wireless@vger.kernel.org

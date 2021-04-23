@@ -275,3 +275,12 @@ config USB_CHAOSKEY
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called chaoskey.
+
+config USB_FT232H_INTF
+	tristate "FTDI FT232H FPGA configuration interface driver"
+	help
+	  Enable driver support for the FT232H based USB-GPIO/SPI/FIFO
+	  interface adapter for FPGA configuration. Additional drivers
+	  such as spi-ftdi-mpsse, altera-ps-spi, ftdi-fifo-fpp and
+	  fpga-mgr must be enabled in order to use the functionality of
+	  the device.
