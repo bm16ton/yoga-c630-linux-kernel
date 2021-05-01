@@ -1198,6 +1198,30 @@ static int ft232h_intf_fpp_remove(struct usb_interface *intf)
  */
 #define SPI_INTF_DEVNAME	"ftdi-mpsse-spi"
 
+static struct spi_board_info ftdi_spi_bus_info[] = {
+    {
+    .modalias	= "w25q32",
+    .mode		= SPI_MODE_0,
+    .max_speed_hz	= 60000000,
+    .bus_num	= 0,
+    .chip_select	= 0, // TCK/SK at ADBUS0
+    },
+    {
+    .modalias	= "spidev",
+    .mode		= SPI_MODE_0 | SPI_LSB_FIRST | SPI_CS_HIGH,
+    .max_speed_hz	= 30000000,
+    .bus_num	= 0,
+    .chip_select	= 5, // GPIOH0 at ACBUS0
+    },
+   };
+
+static const struct mpsse_spi_platform_data ftdi_spi_bus_plat_data = {
+    .ops		= &ft232h_intf_ops,
+    .spi_info	= ftdi_spi_bus_info,
+    .spi_info_len	= ARRAY_SIZE(ftdi_spi_bus_info),
+};
+
+
 static struct spi_board_info fpga_cfg_spi_info[] = {
 	{
 	.modalias	= "fpga-passive-serial",
@@ -1326,6 +1350,12 @@ static int ft232h_intf_spi_remove(struct usb_interface *intf)
 	return 0;
 }
 
+static const struct ft232h_intf_info ftdi_spi_bus_intf_info = {
+    .probe  = ft232h_intf_spi_probe,
+    .remove  = ft232h_intf_spi_remove,
+    .plat_data  = &ftdi_spi_bus_plat_data,
+};
+
 static const struct ft232h_intf_info fpga_cfg_spi_intf_info = {
 	.probe  = ft232h_intf_spi_probe,
 	.remove  = ft232h_intf_spi_remove,
@@ -1432,13 +1462,15 @@ static void ft232h_intf_disconnect(struct usb_interface *intf)
 
 #define FTDI_VID			0x0403
 #define ARRI_FPP_INTF_PRODUCT_ID	0x7148
-#define ARRI_SPI_INTF_PRODUCT_ID	0x6010
+#define ARRI_SPI_INTF_PRODUCT_ID	0x7149
 
 static struct usb_device_id ft232h_intf_table[] = {
 	{ USB_DEVICE(FTDI_VID, ARRI_FPP_INTF_PRODUCT_ID),
 		.driver_info = (kernel_ulong_t)&fpga_cfg_fifo_intf_info },
 	{ USB_DEVICE(FTDI_VID, ARRI_SPI_INTF_PRODUCT_ID),
 		.driver_info = (kernel_ulong_t)&fpga_cfg_spi_intf_info },
+	{ USB_DEVICE(FTDI_VID, 0x6010),
+        .driver_info = (kernel_ulong_t)&ftdi_spi_bus_intf_info },
 	{}
 };
 MODULE_DEVICE_TABLE(usb, ft232h_intf_table);
