@@ -5147,7 +5147,6 @@
 0x00000000	LZ4_decompress_fast_usingDict	vmlinux	EXPORT_SYMBOL	
 0x00000000	utf8_to_utf32	vmlinux	EXPORT_SYMBOL	
 0x00000000	ipi_send_single	vmlinux	EXPORT_SYMBOL_GPL	
-0x00000000	ipv6_mc_check_icmpv6	vmlinux	EXPORT_SYMBOL	
 0x00000000	skb_vlan_pop	vmlinux	EXPORT_SYMBOL	
 0x00000000	phy_sfp_probe	vmlinux	EXPORT_SYMBOL	
 0x00000000	__pm_runtime_disable	vmlinux	EXPORT_SYMBOL_GPL	
