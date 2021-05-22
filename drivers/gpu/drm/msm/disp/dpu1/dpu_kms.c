@@ -1194,7 +1194,9 @@ static int __maybe_unused dpu_runtime_resume(struct device *dev)
 	WARN_ON(!(dpu_kms->num_paths));
 	/* Min vote of BW is required before turning on AXI clk */
 	for (i = 0; i < dpu_kms->num_paths; i++)
-		icc_set_bw(dpu_kms->path[i], 0, Bps_to_icc(MIN_IB_BW));
+		icc_set_bw(dpu_kms->path[i], 0,
+			dpu_kms->catalog->perf.min_dram_ib);
+//		icc_set_bw(dpu_kms->path[i], 0, Bps_to_icc(MIN_IB_BW));
 
 	rc = msm_dss_enable_clk(mp->clk_config, mp->num_clk, true);
 	if (rc) {
