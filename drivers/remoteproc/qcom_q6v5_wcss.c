@@ -95,7 +95,6 @@ struct q6v5_wcss {
 
 	struct qcom_rproc_glink glink_subdev;
 	struct qcom_rproc_ssr ssr_subdev;
-	struct qcom_sysmon *sysmon;
 };
 
 static int q6v5_wcss_reset(struct q6v5_wcss *wcss)
@@ -391,7 +390,7 @@ static int q6v5_wcss_stop(struct rproc *rproc)
 	int ret;
 
 	/* WCSS powerdown */
-	ret = qcom_q6v5_request_stop(&wcss->q6v5, wcss->sysmon);
+	ret = qcom_q6v5_request_stop(&wcss->q6v5, NULL);
 	if (ret == -ETIMEDOUT) {
 		dev_err(wcss->dev, "timed out on wait\n");
 		return ret;

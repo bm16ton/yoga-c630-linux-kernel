@@ -98,6 +98,16 @@
 #define ext_debug(ino, fmt, ...)	no_printk(fmt, ##__VA_ARGS__)
 #endif
 
+#define ASSERT(assert)						\
+do {									\
+	if (unlikely(!(assert))) {					\
+		printk(KERN_EMERG					\
+		       "Assertion failure in %s() at %s:%d: '%s'\n",	\
+		       __func__, __FILE__, __LINE__, #assert);		\
+		BUG();							\
+	}								\
+} while (0)
+
 /* data type for block offset of block group */
 typedef int ext4_grpblk_t;
 
@@ -1620,6 +1630,27 @@ struct ext4_sb_info {
 	errseq_t s_bdev_wb_err;
 	spinlock_t s_bdev_wb_lock;
 
+	/* Information about errors that happened during this mount */
+	spinlock_t s_error_lock;
+	int s_add_error_count;
+	int s_first_error_code;
+	__u32 s_first_error_line;
+	__u32 s_first_error_ino;
+	__u64 s_first_error_block;
+	const char *s_first_error_func;
+	time64_t s_first_error_time;
+	int s_last_error_code;
+	__u32 s_last_error_line;
+	__u32 s_last_error_ino;
+	__u64 s_last_error_block;
+	const char *s_last_error_func;
+	time64_t s_last_error_time;
+	/*
+	 * If we are in a context where we cannot update error information in
+	 * the on-disk superblock, we queue this work to do it.
+	 */
+	struct work_struct s_error_work;
+
 	/* Ext4 fast commit stuff */
 	atomic_t s_fc_subtid;
 	atomic_t s_fc_ineligible_updates;
@@ -1859,7 +1890,6 @@ static inline bool ext4_verity_in_progress(struct inode *inode)
 #define EXT4_GOOD_OLD_REV	0	/* The good old (original) format */
 #define EXT4_DYNAMIC_REV	1	/* V2 format w/ dynamic inode sizes */
 
-#define EXT4_CURRENT_REV	EXT4_GOOD_OLD_REV
 #define EXT4_MAX_SUPP_REV	EXT4_DYNAMIC_REV
 
 #define EXT4_GOOD_OLD_INODE_SIZE 128
@@ -2726,18 +2756,19 @@ extern int ext4fs_dirhash(const struct inode *dir, const char *name, int len,
 
 /* ialloc.c */
 extern int ext4_mark_inode_used(struct super_block *sb, int ino);
-extern struct inode *__ext4_new_inode(handle_t *, struct inode *, umode_t,
+extern struct inode *__ext4_new_inode(struct user_namespace *, handle_t *,
+				      struct inode *, umode_t,
 				      const struct qstr *qstr, __u32 goal,
 				      uid_t *owner, __u32 i_flags,
 				      int handle_type, unsigned int line_no,
 				      int nblocks);
 
-#define ext4_new_inode(handle, dir, mode, qstr, goal, owner, i_flags) \
-	__ext4_new_inode((handle), (dir), (mode), (qstr), (goal), (owner), \
-			 i_flags, 0, 0, 0)
-#define ext4_new_inode_start_handle(dir, mode, qstr, goal, owner, \
+#define ext4_new_inode(handle, dir, mode, qstr, goal, owner, i_flags)          \
+	__ext4_new_inode(&init_user_ns, (handle), (dir), (mode), (qstr),       \
+			 (goal), (owner), i_flags, 0, 0, 0)
+#define ext4_new_inode_start_handle(mnt_userns, dir, mode, qstr, goal, owner, \
 				    type, nblocks)		    \
-	__ext4_new_inode(NULL, (dir), (mode), (qstr), (goal), (owner), \
+	__ext4_new_inode((mnt_userns), NULL, (dir), (mode), (qstr), (goal), (owner), \
 			 0, (type), __LINE__, (nblocks))
 
 
@@ -2850,11 +2881,14 @@ extern struct inode *__ext4_iget(struct super_block *sb, unsigned long ino,
 	__ext4_iget((sb), (ino), (flags), __func__, __LINE__)
 
 extern int  ext4_write_inode(struct inode *, struct writeback_control *);
-extern int  ext4_setattr(struct dentry *, struct iattr *);
-extern int  ext4_getattr(const struct path *, struct kstat *, u32, unsigned int);
+extern int  ext4_setattr(struct user_namespace *, struct dentry *,
+			 struct iattr *);
+extern int  ext4_getattr(struct user_namespace *, const struct path *,
+			 struct kstat *, u32, unsigned int);
 extern void ext4_evict_inode(struct inode *);
 extern void ext4_clear_inode(struct inode *);
-extern int  ext4_file_getattr(const struct path *, struct kstat *, u32, unsigned int);
+extern int  ext4_file_getattr(struct user_namespace *, const struct path *,
+			      struct kstat *, u32, unsigned int);
 extern int  ext4_sync_inode(handle_t *, struct inode *);
 extern void ext4_dirty_inode(struct inode *, int);
 extern int ext4_change_inode_journal_flag(struct inode *, int);
@@ -2955,9 +2989,9 @@ extern void ext4_mark_group_bitmap_corrupted(struct super_block *sb,
 					     ext4_group_t block_group,
 					     unsigned int flags);
 
-extern __printf(6, 7)
-void __ext4_error(struct super_block *, const char *, unsigned int, int, __u64,
-		  const char *, ...);
+extern __printf(7, 8)
+void __ext4_error(struct super_block *, const char *, unsigned int, bool,
+		  int, __u64, const char *, ...);
 extern __printf(6, 7)
 void __ext4_error_inode(struct inode *, const char *, unsigned int,
 			ext4_fsblk_t, int, const char *, ...);
@@ -2966,9 +3000,6 @@ void __ext4_error_file(struct file *, const char *, unsigned int, ext4_fsblk_t,
 		     const char *, ...);
 extern void __ext4_std_error(struct super_block *, const char *,
 			     unsigned int, int);
-extern __printf(5, 6)
-void __ext4_abort(struct super_block *, const char *, unsigned int, int,
-		  const char *, ...);
 extern __printf(4, 5)
 void __ext4_warning(struct super_block *, const char *, unsigned int,
 		    const char *, ...);
@@ -2998,6 +3029,9 @@ void __ext4_grp_locked_error(const char *, unsigned int,
 #define EXT4_ERROR_FILE(file, block, fmt, a...)				\
 	ext4_error_file((file), __func__, __LINE__, (block), (fmt), ## a)
 
+#define ext4_abort(sb, err, fmt, a...)					\
+	__ext4_error((sb), __func__, __LINE__, true, (err), 0, (fmt), ## a)
+
 #ifdef CONFIG_PRINTK
 
 #define ext4_error_inode(inode, func, line, block, fmt, ...)		\
@@ -3008,11 +3042,11 @@ void __ext4_grp_locked_error(const char *, unsigned int,
 #define ext4_error_file(file, func, line, block, fmt, ...)		\
 	__ext4_error_file(file, func, line, block, fmt, ##__VA_ARGS__)
 #define ext4_error(sb, fmt, ...)					\
-	__ext4_error((sb), __func__, __LINE__, 0, 0, (fmt), ##__VA_ARGS__)
+	__ext4_error((sb), __func__, __LINE__, false, 0, 0, (fmt),	\
+		##__VA_ARGS__)
 #define ext4_error_err(sb, err, fmt, ...)				\
-	__ext4_error((sb), __func__, __LINE__, (err), 0, (fmt), ##__VA_ARGS__)
-#define ext4_abort(sb, err, fmt, ...)					\
-	__ext4_abort((sb), __func__, __LINE__, (err), (fmt), ##__VA_ARGS__)
+	__ext4_error((sb), __func__, __LINE__, false, (err), 0, (fmt),	\
+		##__VA_ARGS__)
 #define ext4_warning(sb, fmt, ...)					\
 	__ext4_warning(sb, __func__, __LINE__, fmt, ##__VA_ARGS__)
 #define ext4_warning_inode(inode, fmt, ...)				\
@@ -3045,17 +3079,12 @@ do {									\
 #define ext4_error(sb, fmt, ...)					\
 do {									\
 	no_printk(fmt, ##__VA_ARGS__);					\
-	__ext4_error(sb, "", 0, 0, 0, " ");				\
+	__ext4_error(sb, "", 0, false, 0, 0, " ");			\
 } while (0)
 #define ext4_error_err(sb, err, fmt, ...)				\
 do {									\
 	no_printk(fmt, ##__VA_ARGS__);					\
-	__ext4_error(sb, "", 0, err, 0, " ");				\
-} while (0)
-#define ext4_abort(sb, err, fmt, ...)					\
-do {									\
-	no_printk(fmt, ##__VA_ARGS__);					\
-	__ext4_abort(sb, "", 0, err, " ");				\
+	__ext4_error(sb, "", 0, false, err, 0, " ");			\
 } while (0)
 #define ext4_warning(sb, fmt, ...)					\
 do {									\
@@ -3364,6 +3393,21 @@ static inline void ext4_unlock_group(struct super_block *sb,
 	spin_unlock(ext4_group_lock_ptr(sb, group));
 }
 
+#ifdef CONFIG_QUOTA
+static inline bool ext4_quota_capable(struct super_block *sb)
+{
+	return (test_opt(sb, QUOTA) || ext4_has_feature_quota(sb));
+}
+
+static inline bool ext4_is_quota_journalled(struct super_block *sb)
+{
+	struct ext4_sb_info *sbi = EXT4_SB(sb);
+
+	return (ext4_has_feature_quota(sb) ||
+		sbi->s_qf_names[USRQUOTA] || sbi->s_qf_names[GRPQUOTA]);
+}
+#endif
+
 /*
  * Block validity checking
  */
@@ -3383,10 +3427,6 @@ static inline void ext4_unlock_group(struct super_block *sb,
 
 /* dir.c */
 extern const struct file_operations ext4_dir_operations;
-
-#ifdef CONFIG_UNICODE
-extern const struct dentry_operations ext4_dentry_ops;
-#endif
 
 /* file.c */
 extern const struct inode_operations ext4_file_inode_operations;
@@ -3616,7 +3656,6 @@ extern void ext4_io_submit(struct ext4_io_submit *io);
 extern int ext4_bio_write_page(struct ext4_io_submit *io,
 			       struct page *page,
 			       int len,
-			       struct writeback_control *wbc,
 			       bool keep_towrite);
 extern struct ext4_io_end_vec *ext4_alloc_io_end_vec(ext4_io_end_t *io_end);
 extern struct ext4_io_end_vec *ext4_last_io_end_vec(ext4_io_end_t *io_end);

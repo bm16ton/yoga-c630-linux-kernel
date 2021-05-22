@@ -29,6 +29,7 @@
 		compatible = "boe,nv133fhm-n61";
 		power-supply = <&vlcm_3v3>;
 		no-hpd;
+		backlight = <&backlight>;
 
 		ports {
 			port {
@@ -70,6 +71,12 @@
 
 		clock-frequency = <19200000>;
 	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&sn65dsi86 1000000>;
+		enable-gpios = <&tlmm 11 GPIO_ACTIVE_HIGH>;
+    };
 
 	gpio-keys {
 		compatible = "gpio-keys";
@@ -430,6 +437,9 @@
 		clocks = <&sn65dsi86_refclk>;
 		clock-names = "refclk";
 
+
+		#pwm-cells = <1>;
+		
 		max-brightness = <255>;
 
 		ports {

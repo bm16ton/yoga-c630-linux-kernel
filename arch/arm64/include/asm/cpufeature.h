@@ -63,6 +63,11 @@ struct arm64_ftr_bits {
 	s64		safe_val; /* safe value for FTR_EXACT features */
 };
 
+struct arm64_ftr_override {
+	u64		val;
+	u64		mask;
+};
+
 /*
  * @arm64_ftr_reg - Feature register
  * @strict_mask		Bits which should match across all CPUs for sanity.
@@ -74,6 +79,7 @@ struct arm64_ftr_reg {
 	u64				user_mask;
 	u64				sys_val;
 	u64				user_val;
+	struct arm64_ftr_override	*override;
 	const struct arm64_ftr_bits	*ftr_bits;
 };
 
@@ -600,6 +606,7 @@ void __init setup_cpu_features(void);
 void check_local_cpu_capabilities(void);
 
 u64 read_sanitised_ftr_reg(u32 id);
+u64 __read_sysreg_by_encoding(u32 sys_id);
 
 static inline bool cpu_supports_mixed_endian_el0(void)
 {
@@ -669,10 +676,16 @@ static __always_inline bool system_supports_fpsimd(void)
 	return !cpus_have_const_cap(ARM64_HAS_NO_FPSIMD);
 }
 
+static inline bool system_uses_hw_pan(void)
+{
+	return IS_ENABLED(CONFIG_ARM64_PAN) &&
+		cpus_have_const_cap(ARM64_HAS_PAN);
+}
+
 static inline bool system_uses_ttbr0_pan(void)
 {
 	return IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN) &&
-		!cpus_have_const_cap(ARM64_HAS_PAN);
+		!system_uses_hw_pan();
 }
 
 static __always_inline bool system_supports_sve(void)
@@ -697,6 +710,11 @@ static inline bool system_supports_generic_auth(void)
 {
 	return IS_ENABLED(CONFIG_ARM64_PTR_AUTH) &&
 		cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH);
+}
+
+static inline bool system_has_full_ptr_auth(void)
+{
+	return system_supports_address_auth() && system_supports_generic_auth();
 }
 
 static __always_inline bool system_uses_irq_prio_masking(void)
@@ -764,10 +782,25 @@ static inline bool cpu_has_hw_af(void)
 						ID_AA64MMFR1_HADBS_SHIFT);
 }
 
+static inline bool cpu_has_pan(void)
+{
+	u64 mmfr1 = read_cpuid(ID_AA64MMFR1_EL1);
+	return cpuid_feature_extract_unsigned_field(mmfr1,
+						    ID_AA64MMFR1_PAN_SHIFT);
+}
+
 #ifdef CONFIG_ARM64_AMU_EXTN
 /* Check whether the cpu supports the Activity Monitors Unit (AMU) */
 extern bool cpu_has_amu_feat(int cpu);
+#else
+static inline bool cpu_has_amu_feat(int cpu)
+{
+	return false;
+}
 #endif
+
+/* Get a cpu that supports the Activity Monitors Unit (AMU) */
+extern int get_cpu_with_amu_feat(void);
 
 static inline unsigned int get_vmid_bits(u64 mmfr1)
 {
@@ -784,6 +817,10 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
 	 */
 	return 8;
 }
+
+extern struct arm64_ftr_override id_aa64mmfr1_override;
+extern struct arm64_ftr_override id_aa64pfr1_override;
+extern struct arm64_ftr_override id_aa64isar1_override;
 
 u32 get_kvm_ipa_limit(void);
 void dump_cpu_features(void);

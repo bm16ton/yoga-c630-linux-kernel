@@ -72,6 +72,7 @@ struct rtrs_clt_con {
 	struct rtrs_iu		*rsp_ius;
 	u32			queue_size;
 	unsigned int		cpu;
+	struct mutex		con_mutex;
 	atomic_t		io_cnt;
 	int			cm_err;
 };
@@ -243,8 +244,7 @@ ssize_t rtrs_clt_reset_all_help(struct rtrs_clt_stats *stats,
 /* rtrs-clt-sysfs.c */
 
 int rtrs_clt_create_sysfs_root_files(struct rtrs_clt *clt);
-void rtrs_clt_destroy_sysfs_root_folders(struct rtrs_clt *clt);
-void rtrs_clt_destroy_sysfs_root_files(struct rtrs_clt *clt);
+void rtrs_clt_destroy_sysfs_root(struct rtrs_clt *clt);
 
 int rtrs_clt_create_sess_files(struct rtrs_clt_sess *sess);
 void rtrs_clt_destroy_sess_files(struct rtrs_clt_sess *sess,

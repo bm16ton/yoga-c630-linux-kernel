@@ -504,6 +504,8 @@ ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 	return ret;
 }
 
+EXPORT_SYMBOL(vfs_read);
+
 static ssize_t new_sync_write(struct file *filp, const char __user *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov = { .iov_base = (void __user *)buf, .iov_len = len };
@@ -613,6 +615,8 @@ ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_
 	file_end_write(file);
 	return ret;
 }
+
+EXPORT_SYMBOL(vfs_write);
 
 /* file_ppos returns &file->f_pos or NULL if file is stream */
 static inline loff_t *file_ppos(struct file *file)
@@ -1188,6 +1192,7 @@ static ssize_t do_sendfile(int out_fd, int in_fd, loff_t *ppos,
 {
 	struct fd in, out;
 	struct inode *in_inode, *out_inode;
+	struct pipe_inode_info *opipe;
 	loff_t pos;
 	loff_t out_pos;
 	ssize_t retval;
@@ -1228,9 +1233,6 @@ static ssize_t do_sendfile(int out_fd, int in_fd, loff_t *ppos,
 	in_inode = file_inode(in.file);
 	out_inode = file_inode(out.file);
 	out_pos = out.file->f_pos;
-	retval = rw_verify_area(WRITE, out.file, &out_pos, count);
-	if (retval < 0)
-		goto fput_out;
 
 	if (!max)
 		max = min(in_inode->i_sb->s_maxbytes, out_inode->i_sb->s_maxbytes);
@@ -1253,9 +1255,18 @@ static ssize_t do_sendfile(int out_fd, int in_fd, loff_t *ppos,
 	if (in.file->f_flags & O_NONBLOCK)
 		fl = SPLICE_F_NONBLOCK;
 #endif
-	file_start_write(out.file);
-	retval = do_splice_direct(in.file, &pos, out.file, &out_pos, count, fl);
-	file_end_write(out.file);
+	opipe = get_pipe_info(out.file, true);
+	if (!opipe) {
+		retval = rw_verify_area(WRITE, out.file, &out_pos, count);
+		if (retval < 0)
+			goto fput_out;
+		file_start_write(out.file);
+		retval = do_splice_direct(in.file, &pos, out.file, &out_pos,
+					  count, fl);
+		file_end_write(out.file);
+	} else {
+		retval = splice_file_to_pipe(in.file, opipe, &pos, count, fl);
+	}
 
 	if (retval > 0) {
 		add_rchar(current, retval);

@@ -974,7 +974,7 @@ static ssize_t pmbus_set_sensor(struct device *dev,
 	if (ret < 0)
 		rv = ret;
 	else
-		sensor->data = regval;
+		sensor->data = -ENODATA;
 	mutex_unlock(&data->update_lock);
 	return rv;
 }
@@ -1262,7 +1262,7 @@ static int pmbus_add_sensor_attrs_one(struct i2c_client *client,
 		 * which global bit is set) for this page is accessible.
 		 */
 		if (!ret && attr->gbit &&
-		    (!upper || (upper && data->has_status_word)) &&
+		    (!upper || data->has_status_word) &&
 		    pmbus_check_status_register(client, page)) {
 			ret = pmbus_add_boolean(data, name, "alarm", index,
 						NULL, NULL,
@@ -2204,9 +2204,11 @@ static int pmbus_init_common(struct i2c_client *client, struct pmbus_data *data,
 	}
 
 	/* Enable PEC if the controller supports it */
-	ret = i2c_smbus_read_byte_data(client, PMBUS_CAPABILITY);
-	if (ret >= 0 && (ret & PB_CAPABILITY_ERROR_CHECK))
-		client->flags |= I2C_CLIENT_PEC;
+	if (!(data->flags & PMBUS_NO_CAPABILITY)) {
+		ret = i2c_smbus_read_byte_data(client, PMBUS_CAPABILITY);
+		if (ret >= 0 && (ret & PB_CAPABILITY_ERROR_CHECK))
+			client->flags |= I2C_CLIENT_PEC;
+	}
 
 	/*
 	 * Check if the chip is write protected. If it is, we can not clear
@@ -2395,6 +2397,13 @@ static int pmbus_debugfs_set_pec(void *data, u64 val)
 DEFINE_DEBUGFS_ATTRIBUTE(pmbus_debugfs_ops_pec, pmbus_debugfs_get_pec,
 			 pmbus_debugfs_set_pec, "%llu\n");
 
+static void pmbus_remove_debugfs(void *data)
+{
+	struct dentry *entry = data;
+
+	debugfs_remove_recursive(entry);
+}
+
 static int pmbus_init_debugfs(struct i2c_client *client,
 			      struct pmbus_data *data)
 {
@@ -2530,7 +2539,8 @@ static int pmbus_init_debugfs(struct i2c_client *client,
 		}
 	}
 
-	return 0;
+	return devm_add_action_or_reset(data->dev,
+					pmbus_remove_debugfs, data->debugfs);
 }
 #else
 static int pmbus_init_debugfs(struct i2c_client *client,
@@ -2616,16 +2626,6 @@ int pmbus_do_probe(struct i2c_client *client, struct pmbus_driver_info *info)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(pmbus_do_probe);
-
-int pmbus_do_remove(struct i2c_client *client)
-{
-	struct pmbus_data *data = i2c_get_clientdata(client);
-
-	debugfs_remove_recursive(data->debugfs);
-
-	return 0;
-}
-EXPORT_SYMBOL_GPL(pmbus_do_remove);
 
 struct dentry *pmbus_get_debugfs_dir(struct i2c_client *client)
 {

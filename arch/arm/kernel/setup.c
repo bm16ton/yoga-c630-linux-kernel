@@ -59,6 +59,7 @@
 #include <asm/unwind.h>
 #include <asm/memblock.h>
 #include <asm/virt.h>
+#include <asm/kasan.h>
 
 #include "atags.h"
 
@@ -764,7 +765,7 @@ int __init arm_add_memory(u64 start, u64 size)
 #ifndef CONFIG_PHYS_ADDR_T_64BIT
 	if (aligned_start > ULONG_MAX) {
 		pr_crit("Ignoring memory at 0x%08llx outside 32-bit physical address space\n",
-			(long long)start);
+			start);
 		return -EINVAL;
 	}
 
@@ -1135,7 +1136,7 @@ void __init setup_arch(char **cmdline_p)
 	efi_init();
 	/*
 	 * Make sure the calculation for lowmem/highmem is set appropriately
-	 * before reserving/allocating any mmeory
+	 * before reserving/allocating any memory
 	 */
 	adjust_lowmem_bounds();
 	arm_memblock_init(mdesc);
@@ -1145,6 +1146,7 @@ void __init setup_arch(char **cmdline_p)
 	early_ioremap_reset();
 
 	paging_init(mdesc);
+	kasan_init();
 	request_standard_resources(mdesc);
 
 	if (mdesc->restart)

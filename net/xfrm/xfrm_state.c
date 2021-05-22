@@ -1020,7 +1020,8 @@ static void xfrm_state_look_at(struct xfrm_policy *pol, struct xfrm_state *x,
 		if ((x->sel.family &&
 		     (x->sel.family != family ||
 		      !xfrm_selector_match(&x->sel, fl, family))) ||
-		    !security_xfrm_state_pol_flow_match(x, pol, fl))
+		    !security_xfrm_state_pol_flow_match(x, pol,
+							&fl->u.__fl_common))
 			return;
 
 		if (!*best ||
@@ -1035,7 +1036,8 @@ static void xfrm_state_look_at(struct xfrm_policy *pol, struct xfrm_state *x,
 		if ((!x->sel.family ||
 		     (x->sel.family == family &&
 		      xfrm_selector_match(&x->sel, fl, family))) &&
-		    security_xfrm_state_pol_flow_match(x, pol, fl))
+		    security_xfrm_state_pol_flow_match(x, pol,
+						       &fl->u.__fl_common))
 			*error = -ESRCH;
 	}
 }
@@ -2663,7 +2665,8 @@ int __net_init xfrm_state_init(struct net *net)
 	net->xfrm.state_num = 0;
 	INIT_WORK(&net->xfrm.state_hash_work, xfrm_hash_resize);
 	spin_lock_init(&net->xfrm.xfrm_state_lock);
-	seqcount_init(&net->xfrm.xfrm_state_hash_generation);
+	seqcount_spinlock_init(&net->xfrm.xfrm_state_hash_generation,
+			       &net->xfrm.xfrm_state_lock);
 	return 0;
 
 out_byspi:

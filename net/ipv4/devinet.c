@@ -650,8 +650,7 @@ static int inet_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
 	struct in_device *in_dev;
 	struct ifaddrmsg *ifm;
 	struct in_ifaddr *ifa;
-
-	int err = -EINVAL;
+	int err;
 
 	ASSERT_RTNL();
 
@@ -881,7 +880,7 @@ static struct in_ifaddr *rtm_to_ifaddr(struct net *net, struct nlmsghdr *nlh,
 		ifa->ifa_broadcast = nla_get_in_addr(tb[IFA_BROADCAST]);
 
 	if (tb[IFA_LABEL])
-		nla_strlcpy(ifa->ifa_label, tb[IFA_LABEL], IFNAMSIZ);
+		nla_strscpy(ifa->ifa_label, tb[IFA_LABEL], IFNAMSIZ);
 	else
 		memcpy(ifa->ifa_label, dev->name, IFNAMSIZ);
 
@@ -1979,7 +1978,8 @@ static int inet_validate_link_af(const struct net_device *dev,
 	return 0;
 }
 
-static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla)
+static int inet_set_link_af(struct net_device *dev, const struct nlattr *nla,
+			    struct netlink_ext_ack *extack)
 {
 	struct in_device *in_dev = __in_dev_get_rcu(dev);
 	struct nlattr *a, *tb[IFLA_INET_MAX+1];

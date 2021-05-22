@@ -565,7 +565,7 @@ static int applesmc_init_index(struct applesmc_registers *s)
 static int applesmc_init_smcreg_try(void)
 {
 	struct applesmc_registers *s = &smcreg;
-	bool left_light_sensor = 0, right_light_sensor = 0;
+	bool left_light_sensor = false, right_light_sensor = false;
 	unsigned int count;
 	u8 tmp[1];
 	int ret;
@@ -1298,6 +1298,10 @@ static const struct dmi_system_id applesmc_whitelist[] __initconst = {
 	{ applesmc_dmi_match, "Apple iMac", {
 	  DMI_MATCH(DMI_BOARD_VENDOR, "Apple"),
 	  DMI_MATCH(DMI_PRODUCT_NAME, "iMac") },
+	},
+	{ applesmc_dmi_match, "Apple Xserve", {
+	  DMI_MATCH(DMI_BOARD_VENDOR, "Apple"),
+	  DMI_MATCH(DMI_PRODUCT_NAME, "Xserve") },
 	},
 	{ .ident = NULL }
 };

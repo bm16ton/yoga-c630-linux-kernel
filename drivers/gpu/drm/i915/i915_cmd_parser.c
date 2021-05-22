@@ -26,6 +26,7 @@
  */
 
 #include "gt/intel_engine.h"
+#include "gt/intel_gpu_commands.h"
 
 #include "i915_drv.h"
 #include "i915_memcpy.h"
@@ -1149,7 +1150,7 @@ static u32 *copy_batch(struct drm_i915_gem_object *dst_obj,
 	void *dst, *src;
 	int ret;
 
-	dst = i915_gem_object_pin_map(dst_obj, I915_MAP_FORCE_WB);
+	dst = i915_gem_object_pin_map(dst_obj, I915_MAP_WB);
 	if (IS_ERR(dst))
 		return dst;
 
@@ -1457,43 +1458,42 @@ int intel_engine_cmd_parser(struct intel_engine_cs *engine,
 	 * space. Parsing should be faster in some cases this way.
 	 */
 	batch_end = cmd + batch_length / sizeof(*batch_end);
-	do {
-		u32 length;
+	while (*cmd != MI_BATCH_BUFFER_END) {
+		u32 length = 1;
 
-		if (*cmd == MI_BATCH_BUFFER_END)
-			break;
+		if (*cmd != MI_NOOP) { /* MI_NOOP == 0 */
+			desc = find_cmd(engine, *cmd, desc, &default_desc);
+			if (!desc) {
+				DRM_DEBUG("CMD: Unrecognized command: 0x%08X\n", *cmd);
+				ret = -EINVAL;
+				break;
+			}
 
-		desc = find_cmd(engine, *cmd, desc, &default_desc);
-		if (!desc) {
-			DRM_DEBUG("CMD: Unrecognized command: 0x%08X\n", *cmd);
-			ret = -EINVAL;
-			break;
-		}
+			if (desc->flags & CMD_DESC_FIXED)
+				length = desc->length.fixed;
+			else
+				length = (*cmd & desc->length.mask) + LENGTH_BIAS;
 
-		if (desc->flags & CMD_DESC_FIXED)
-			length = desc->length.fixed;
-		else
-			length = (*cmd & desc->length.mask) + LENGTH_BIAS;
+			if ((batch_end - cmd) < length) {
+				DRM_DEBUG("CMD: Command length exceeds batch length: 0x%08X length=%u batchlen=%td\n",
+					  *cmd,
+					  length,
+					  batch_end - cmd);
+				ret = -EINVAL;
+				break;
+			}
 
-		if ((batch_end - cmd) < length) {
-			DRM_DEBUG("CMD: Command length exceeds batch length: 0x%08X length=%u batchlen=%td\n",
-				  *cmd,
-				  length,
-				  batch_end - cmd);
-			ret = -EINVAL;
-			break;
-		}
+			if (!check_cmd(engine, desc, cmd, length)) {
+				ret = -EACCES;
+				break;
+			}
 
-		if (!check_cmd(engine, desc, cmd, length)) {
-			ret = -EACCES;
-			break;
-		}
-
-		if (cmd_desc_is(desc, MI_BATCH_BUFFER_START)) {
-			ret = check_bbstart(cmd, offset, length, batch_length,
-					    batch_addr, shadow_addr,
-					    jump_whitelist);
-			break;
+			if (cmd_desc_is(desc, MI_BATCH_BUFFER_START)) {
+				ret = check_bbstart(cmd, offset, length, batch_length,
+						    batch_addr, shadow_addr,
+						    jump_whitelist);
+				break;
+			}
 		}
 
 		if (!IS_ERR_OR_NULL(jump_whitelist))
@@ -1506,7 +1506,7 @@ int intel_engine_cmd_parser(struct intel_engine_cs *engine,
 			ret = -EINVAL;
 			break;
 		}
-	} while (1);
+	}
 
 	if (trampoline) {
 		/*

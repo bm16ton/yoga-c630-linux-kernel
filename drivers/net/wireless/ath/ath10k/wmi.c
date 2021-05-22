@@ -21,13 +21,6 @@
 #include "hif.h"
 #include "txrx.h"
 
-int ath_chaninfo_error;
-module_param_named(chaninfo_error, ath_chaninfo_error, int, 0444);
-MODULE_PARM_DESC(chaninfo_error, "Enable received chan info event without a scan request, ignoring");
-
-EXPORT_SYMBOL(ath_chaninfo_error);
-
-
 #define ATH10K_WMI_BARRIER_ECHO_ID 0xBA991E9
 #define ATH10K_WMI_BARRIER_TIMEOUT_HZ (3 * HZ)
 #define ATH10K_WMI_DFS_CONF_TIMEOUT_HZ (HZ / 6)
@@ -1901,7 +1894,7 @@ static void ath10k_wmi_tx_beacons_iter(void *data, u8 *mac,
 static void ath10k_wmi_tx_beacons_nowait(struct ath10k *ar)
 {
 	ieee80211_iterate_active_interfaces_atomic(ar->hw,
-						   IEEE80211_IFACE_ITER_NORMAL,
+						   ATH10K_ITER_NORMAL_FLAGS,
 						   ath10k_wmi_tx_beacons_iter,
 						   NULL);
 }
@@ -1944,7 +1937,7 @@ int ath10k_wmi_cmd_send(struct ath10k *ar, struct sk_buff *skb, u32 cmd_id)
 	if (ret == -EAGAIN) {
 		ath10k_warn(ar, "wmi command %d timeout, restarting hardware\n",
 			    cmd_id);
-		queue_work(ar->workqueue, &ar->restart_work);
+		ath10k_core_start_recovery(ar);
 	}
 
 	return ret;
@@ -2601,7 +2594,7 @@ int ath10k_wmi_event_mgmt_rx(struct ath10k *ar, struct sk_buff *skb)
 		dev_kfree_skb(skb);
 		return 0;
 	}
-
+	
 //	status->band = phy_mode_to_band(phy_mode, channel);
 
 	if (phy_mode == MODE_11B && status->band == NL80211_BAND_5GHZ)
@@ -2840,11 +2833,7 @@ void ath10k_wmi_event_chan_info(struct ath10k *ar, struct sk_buff *skb)
 	case ATH10K_SCAN_IDLE:
 	case ATH10K_SCAN_STARTING:
 //		ath10k_warn(ar, "received chan info event without a scan request, ignoring\n");
-	if (ath_chaninfo_error) {
-		ath10k_warn(ar, "received chan info event without a scan request, ignoring\n");
- 		goto exit;
-	}
- 		goto exit;
+		goto exit;
 	case ATH10K_SCAN_RUNNING:
 	case ATH10K_SCAN_ABORTING:
 		break;
@@ -3545,7 +3534,7 @@ void ath10k_wmi_event_peer_sta_kickout(struct ath10k *ar, struct sk_buff *skb)
 		return;
 	}
 
-	ath10k_dbg(ar, ATH10K_DBG_WMI, "wmi event peer sta kickout %pM\n",
+	ath10k_dbg(ar, ATH10K_DBG_STA, "wmi event peer sta kickout %pM\n",
 		   arg.mac_addr);
 
 	rcu_read_lock();
@@ -7554,7 +7543,7 @@ ath10k_wmi_op_gen_set_sta_ps(struct ath10k *ar, u32 vdev_id,
 	cmd->param_id    = __cpu_to_le32(param_id);
 	cmd->param_value = __cpu_to_le32(value);
 
-	ath10k_dbg(ar, ATH10K_DBG_WMI,
+	ath10k_dbg(ar, ATH10K_DBG_STA,
 		   "wmi sta ps param vdev_id 0x%x param %d value %d\n",
 		   vdev_id, param_id, value);
 	return skb;
@@ -9599,7 +9588,7 @@ static int ath10k_wmi_mgmt_tx_clean_up_pending(int msdu_id, void *ptr,
 	struct sk_buff *msdu;
 
 	ath10k_dbg(ar, ATH10K_DBG_WMI,
-		   "force cleanup mgmt msdu_id %hu\n", msdu_id);
+		   "force cleanup mgmt msdu_id %u\n", msdu_id);
 
 	msdu = pkt_addr->vaddr;
 	dma_unmap_single(ar->dev, pkt_addr->paddr,

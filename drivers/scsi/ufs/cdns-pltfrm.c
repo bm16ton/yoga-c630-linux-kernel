@@ -221,8 +221,7 @@ static int cdns_ufs_init(struct ufs_hba *hba)
 		return -ENOMEM;
 	ufshcd_set_variant(hba, host);
 
-	if (hba->vops && hba->vops->phy_initialization)
-		status = hba->vops->phy_initialization(hba);
+	status = ufshcd_vops_phy_initialization(hba);
 
 	return status;
 }
@@ -320,6 +319,8 @@ static const struct dev_pm_ops cdns_ufs_dev_pm_ops = {
 	.runtime_suspend = ufshcd_pltfrm_runtime_suspend,
 	.runtime_resume  = ufshcd_pltfrm_runtime_resume,
 	.runtime_idle    = ufshcd_pltfrm_runtime_idle,
+	.prepare	 = ufshcd_suspend_prepare,
+	.complete	= ufshcd_resume_complete,
 };
 
 static struct platform_driver cdns_ufs_pltfrm_driver = {

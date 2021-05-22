@@ -62,9 +62,7 @@
  * Make a group from 'leader' to 'last', requiring that the events were not
  * already grouped to a different leader.
  */
-static int perf_evlist__regroup(struct evlist *evlist,
-				struct evsel *leader,
-				struct evsel *last)
+static int evlist__regroup(struct evlist *evlist, struct evsel *leader, struct evsel *last)
 {
 	struct evsel *evsel;
 	bool grp;
@@ -654,8 +652,7 @@ int auxtrace_record__read_finish(struct auxtrace_record *itr, int idx)
 		if (evsel->core.attr.type == itr->pmu->type) {
 			if (evsel->disabled)
 				return 0;
-			return perf_evlist__enable_event_idx(itr->evlist, evsel,
-							     idx);
+			return evlist__enable_event_idx(itr->evlist, evsel, idx);
 		}
 	}
 	return -EINVAL;
@@ -772,7 +769,7 @@ no_opt:
 			evsel->core.attr.aux_sample_size = term->val.aux_sample_size;
 			/* If possible, group with the AUX event */
 			if (aux_evsel && evsel->core.attr.aux_sample_size)
-				perf_evlist__regroup(evlist, aux_evsel, evsel);
+				evlist__regroup(evlist, aux_evsel, evsel);
 		}
 	}
 
@@ -785,6 +782,21 @@ no_opt:
 	}
 
 	return auxtrace_validate_aux_sample_size(evlist, opts);
+}
+
+void auxtrace_regroup_aux_output(struct evlist *evlist)
+{
+	struct evsel *evsel, *aux_evsel = NULL;
+	struct evsel_config_term *term;
+
+	evlist__for_each_entry(evlist, evsel) {
+		if (evsel__is_aux_event(evsel))
+			aux_evsel = evsel;
+		term = evsel__get_config_term(evsel, AUX_OUTPUT);
+		/* If possible, group with the AUX event */
+		if (term && aux_evsel)
+			evlist__regroup(evlist, aux_evsel, evsel);
+	}
 }
 
 struct auxtrace_record *__weak
@@ -1013,7 +1025,7 @@ struct auxtrace_queue *auxtrace_queues__sample_queue(struct auxtrace_queues *que
 	if (!id)
 		return NULL;
 
-	sid = perf_evlist__id2sid(session->evlist, id);
+	sid = evlist__id2sid(session->evlist, id);
 	if (!sid)
 		return NULL;
 
@@ -1043,7 +1055,7 @@ int auxtrace_queues__add_sample(struct auxtrace_queues *queues,
 	if (!id)
 		return -EINVAL;
 
-	sid = perf_evlist__id2sid(session->evlist, id);
+	sid = evlist__id2sid(session->evlist, id);
 	if (!sid)
 		return -ENOENT;
 
@@ -1078,7 +1090,7 @@ static int auxtrace_queue_data_cb(struct perf_session *session,
 	if (!qd->samples || event->header.type != PERF_RECORD_SAMPLE)
 		return 0;
 
-	err = perf_evlist__parse_sample(session->evlist, event, &sample);
+	err = evlist__parse_sample(session->evlist, event, &sample);
 	if (err)
 		return err;
 
@@ -1329,6 +1341,7 @@ void itrace_synth_opts__set_default(struct itrace_synth_opts *synth_opts,
 	synth_opts->flc = true;
 	synth_opts->llc = true;
 	synth_opts->tlb = true;
+	synth_opts->mem = true;
 	synth_opts->remote_access = true;
 
 	if (no_sample) {
@@ -1549,6 +1562,9 @@ int itrace_parse_synth_opts(const struct option *opt, const char *str,
 			break;
 		case 'a':
 			synth_opts->remote_access = true;
+			break;
+		case 'M':
+			synth_opts->mem = true;
 			break;
 		case 'q':
 			synth_opts->quick += 1;

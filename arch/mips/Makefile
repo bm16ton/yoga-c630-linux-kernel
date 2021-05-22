@@ -160,6 +160,7 @@ cflags-y += $(call as-option,-Wa$(comma)-mno-fix-loongson3-llsc,)
 #
 cflags-$(CONFIG_CPU_R3000)	+= -march=r3000
 cflags-$(CONFIG_CPU_TX39XX)	+= -march=r3900
+cflags-$(CONFIG_CPU_R4300)	+= -march=r4300 -Wa,--trap
 cflags-$(CONFIG_CPU_VR41XX)	+= -march=r4100 -Wa,--trap
 cflags-$(CONFIG_CPU_R4X00)	+= -march=r4600 -Wa,--trap
 cflags-$(CONFIG_CPU_TX49XX)	+= -march=r4600 -Wa,--trap
@@ -335,7 +336,6 @@ libs-$(CONFIG_MIPS_FP_SUPPORT) += arch/mips/math-emu/
 core-y += arch/mips/
 
 drivers-y			+= arch/mips/crypto/
-drivers-$(CONFIG_OPROFILE)	+= arch/mips/oprofile/
 
 # suspend and hibernation support
 drivers-$(CONFIG_PM)	+= arch/mips/power/
@@ -366,6 +366,7 @@ bootz-y			+= vmlinuz.srec
 ifeq ($(shell expr $(zload-y) \< 0xffffffff80000000 2> /dev/null), 0)
 bootz-y			+= uzImage.bin
 endif
+bootz-y			+= vmlinuz.itb
 
 #
 # Some machines like the Indy need 32-bit ELF binaries for booting purposes.
@@ -397,7 +398,7 @@ ifdef CONFIG_SYS_SUPPORTS_ZBOOT
 # boot/compressed
 $(bootz-y): $(vmlinux-32) FORCE
 	$(Q)$(MAKE) $(build)=arch/mips/boot/compressed \
-		$(bootvars-y) 32bit-bfd=$(32bit-bfd) $@
+		$(bootvars-y) 32bit-bfd=$(32bit-bfd) arch/mips/boot/$@
 else
 vmlinuz: FORCE
 	@echo '   CONFIG_SYS_SUPPORTS_ZBOOT is not enabled'

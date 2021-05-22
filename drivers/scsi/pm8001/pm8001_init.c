@@ -386,17 +386,17 @@ static int pm8001_alloc(struct pm8001_hba_info *pm8001_ha,
 	pm8001_ha->memoryMap.region[FORENSIC_MEM].element_size = 0x10000;
 	pm8001_ha->memoryMap.region[FORENSIC_MEM].alignment = 0x10000;
 	for (i = 0; i < pm8001_ha->max_memcnt; i++) {
+		struct mpi_mem *region = &pm8001_ha->memoryMap.region[i];
+
 		if (pm8001_mem_alloc(pm8001_ha->pdev,
-			&pm8001_ha->memoryMap.region[i].virt_ptr,
-			&pm8001_ha->memoryMap.region[i].phys_addr,
-			&pm8001_ha->memoryMap.region[i].phys_addr_hi,
-			&pm8001_ha->memoryMap.region[i].phys_addr_lo,
-			pm8001_ha->memoryMap.region[i].total_len,
-			pm8001_ha->memoryMap.region[i].alignment) != 0) {
-			pm8001_dbg(pm8001_ha, FAIL,
-				   "Mem%d alloc failed\n",
-				   i);
-				goto err_out;
+				     &region->virt_ptr,
+				     &region->phys_addr,
+				     &region->phys_addr_hi,
+				     &region->phys_addr_lo,
+				     region->total_len,
+				     region->alignment) != 0) {
+			pm8001_dbg(pm8001_ha, FAIL, "Mem%d alloc failed\n", i);
+			goto err_out;
 		}
 	}
 
@@ -423,7 +423,7 @@ err_out_shost:
 err_out_nodev:
 	for (i = 0; i < pm8001_ha->max_memcnt; i++) {
 		if (pm8001_ha->memoryMap.region[i].virt_ptr != NULL) {
-			pci_free_consistent(pm8001_ha->pdev,
+			dma_free_coherent(&pm8001_ha->pdev->dev,
 				(pm8001_ha->memoryMap.region[i].total_len +
 				pm8001_ha->memoryMap.region[i].alignment),
 				pm8001_ha->memoryMap.region[i].virt_ptr,
@@ -466,9 +466,12 @@ static int pm8001_ioremap(struct pm8001_hba_info *pm8001_ha)
 			pm8001_ha->io_mem[logicalBar].memvirtaddr =
 				ioremap(pm8001_ha->io_mem[logicalBar].membase,
 				pm8001_ha->io_mem[logicalBar].memsize);
-			pm8001_dbg(pm8001_ha, INIT,
-				   "PCI: bar %d, logicalBar %d\n",
+			if (!pm8001_ha->io_mem[logicalBar].memvirtaddr) {
+				pm8001_dbg(pm8001_ha, INIT,
+					"Failed to ioremap bar %d, logicalBar %d",
 				   bar, logicalBar);
+				return -ENOMEM;
+			}
 			pm8001_dbg(pm8001_ha, INIT,
 				   "base addr %llx virt_addr=%llx len=%d\n",
 				   (u64)pm8001_ha->io_mem[logicalBar].membase,
@@ -540,9 +543,11 @@ static struct pm8001_hba_info *pm8001_pci_alloc(struct pci_dev *pdev,
 			tasklet_init(&pm8001_ha->tasklet[j], pm8001_tasklet,
 				(unsigned long)&(pm8001_ha->irq_vector[j]));
 #endif
-	pm8001_ioremap(pm8001_ha);
+	if (pm8001_ioremap(pm8001_ha))
+		goto failed_pci_alloc;
 	if (!pm8001_alloc(pm8001_ha, ent))
 		return pm8001_ha;
+failed_pci_alloc:
 	pm8001_free(pm8001_ha);
 	return NULL;
 }
@@ -1184,7 +1189,7 @@ pm8001_init_ccb_tag(struct pm8001_hba_info *pm8001_ha, struct Scsi_Host *shost,
 		goto err_out;
 
 	/* Memory region for ccb_info*/
-	pm8001_ha->ccb_info = (struct pm8001_ccb_info *)
+	pm8001_ha->ccb_info =
 		kcalloc(ccb_count, sizeof(struct pm8001_ccb_info), GFP_KERNEL);
 	if (!pm8001_ha->ccb_info) {
 		pm8001_dbg(pm8001_ha, FAIL,
@@ -1192,12 +1197,13 @@ pm8001_init_ccb_tag(struct pm8001_hba_info *pm8001_ha, struct Scsi_Host *shost,
 		goto err_out_noccb;
 	}
 	for (i = 0; i < ccb_count; i++) {
-		pm8001_ha->ccb_info[i].buf_prd = pci_alloc_consistent(pdev,
+		pm8001_ha->ccb_info[i].buf_prd = dma_alloc_coherent(&pdev->dev,
 				sizeof(struct pm8001_prd) * PM8001_MAX_DMA_SG,
-				&pm8001_ha->ccb_info[i].ccb_dma_handle);
+				&pm8001_ha->ccb_info[i].ccb_dma_handle,
+				GFP_KERNEL);
 		if (!pm8001_ha->ccb_info[i].buf_prd) {
 			pm8001_dbg(pm8001_ha, FAIL,
-				   "pm80xx: ccb prd memory allocation error\n");
+				   "ccb prd memory allocation error\n");
 			goto err_out;
 		}
 		pm8001_ha->ccb_info[i].task = NULL;
@@ -1254,23 +1260,21 @@ static void pm8001_pci_remove(struct pci_dev *pdev)
 
 /**
  * pm8001_pci_suspend - power management suspend main entry point
- * @pdev: PCI device struct
- * @state: PM state change to (usually PCI_D3)
+ * @dev: Device struct
  *
  * Returns 0 success, anything else error.
  */
-static int pm8001_pci_suspend(struct pci_dev *pdev, pm_message_t state)
+static int __maybe_unused pm8001_pci_suspend(struct device *dev)
 {
+	struct pci_dev *pdev = to_pci_dev(dev);
 	struct sas_ha_struct *sha = pci_get_drvdata(pdev);
-	struct pm8001_hba_info *pm8001_ha;
+	struct pm8001_hba_info *pm8001_ha = sha->lldd_ha;
 	int  i, j;
-	u32 device_state;
-	pm8001_ha = sha->lldd_ha;
 	sas_suspend_ha(sha);
 	flush_workqueue(pm8001_wq);
 	scsi_block_requests(pm8001_ha->shost);
 	if (!pdev->pm_cap) {
-		dev_err(&pdev->dev, " PCI PM not supported\n");
+		dev_err(dev, " PCI PM not supported\n");
 		return -ENODEV;
 	}
 	PM8001_CHIP_DISP->interrupt_disable(pm8001_ha, 0xFF);
@@ -1293,24 +1297,21 @@ static int pm8001_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 		for (j = 0; j < PM8001_MAX_MSIX_VEC; j++)
 			tasklet_kill(&pm8001_ha->tasklet[j]);
 #endif
-	device_state = pci_choose_state(pdev, state);
-	pm8001_printk("pdev=0x%p, slot=%s, entering "
-		      "operating state [D%d]\n", pdev,
-		      pm8001_ha->name, device_state);
-	pci_save_state(pdev);
-	pci_disable_device(pdev);
-	pci_set_power_state(pdev, device_state);
+	pm8001_info(pm8001_ha, "pdev=0x%p, slot=%s, entering "
+		      "suspended state\n", pdev,
+		      pm8001_ha->name);
 	return 0;
 }
 
 /**
  * pm8001_pci_resume - power management resume main entry point
- * @pdev: PCI device struct
+ * @dev: Device struct
  *
  * Returns 0 success, anything else error.
  */
-static int pm8001_pci_resume(struct pci_dev *pdev)
+static int __maybe_unused pm8001_pci_resume(struct device *dev)
 {
+	struct pci_dev *pdev = to_pci_dev(dev);
 	struct sas_ha_struct *sha = pci_get_drvdata(pdev);
 	struct pm8001_hba_info *pm8001_ha;
 	int rc;
@@ -1320,20 +1321,9 @@ static int pm8001_pci_resume(struct pci_dev *pdev)
 	pm8001_ha = sha->lldd_ha;
 	device_state = pdev->current_state;
 
-	pm8001_printk("pdev=0x%p, slot=%s, resuming from previous "
-		"operating state [D%d]\n", pdev, pm8001_ha->name, device_state);
+	pm8001_info(pm8001_ha, "pdev=0x%p, slot=%s, resuming from previous operating state [D%d]\n",
+		      pdev, pm8001_ha->name, device_state);
 
-	pci_set_power_state(pdev, PCI_D0);
-	pci_enable_wake(pdev, PCI_D0, 0);
-	pci_restore_state(pdev);
-	rc = pci_enable_device(pdev);
-	if (rc) {
-		pm8001_printk("slot=%s Enable device failed during resume\n",
-			      pm8001_ha->name);
-		goto err_out_enable;
-	}
-
-	pci_set_master(pdev);
 	rc = pci_go_44(pdev);
 	if (rc)
 		goto err_out_disable;
@@ -1393,8 +1383,7 @@ static int pm8001_pci_resume(struct pci_dev *pdev)
 
 err_out_disable:
 	scsi_remove_host(pm8001_ha->shost);
-	pci_disable_device(pdev);
-err_out_enable:
+
 	return rc;
 }
 
@@ -1477,13 +1466,16 @@ static struct pci_device_id pm8001_pci_table[] = {
 	{} /* terminate list */
 };
 
+static SIMPLE_DEV_PM_OPS(pm8001_pci_pm_ops,
+			 pm8001_pci_suspend,
+			 pm8001_pci_resume);
+
 static struct pci_driver pm8001_pci_driver = {
 	.name		= DRV_NAME,
 	.id_table	= pm8001_pci_table,
 	.probe		= pm8001_pci_probe,
 	.remove		= pm8001_pci_remove,
-	.suspend	= pm8001_pci_suspend,
-	.resume		= pm8001_pci_resume,
+	.driver.pm	= &pm8001_pci_pm_ops,
 };
 
 /**

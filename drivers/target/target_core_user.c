@@ -584,14 +584,15 @@ static inline void tcmu_cmd_set_block_cnts(struct tcmu_cmd *cmd)
 }
 
 static int new_block_to_iov(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
-			    struct iovec **iov, int prev_dbi, int *remain)
+			    struct iovec **iov, int prev_dbi, int len)
 {
 	/* Get the next dbi */
 	int dbi = tcmu_cmd_get_dbi(cmd);
-	/* Do not add more than DATA_BLOCK_SIZE to iov */
-	int len = min_t(int, DATA_BLOCK_SIZE, *remain);
 
-	*remain -= len;
+	/* Do not add more than DATA_BLOCK_SIZE to iov */
+	if (len > DATA_BLOCK_SIZE)
+		len = DATA_BLOCK_SIZE;
+
 	/*
 	 * The following code will gather and map the blocks to the same iovec
 	 * when the blocks are all next to each other.
@@ -616,8 +617,8 @@ static void tcmu_setup_iovs(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
 	int dbi = -2;
 
 	/* We prepare the IOVs for DMA_FROM_DEVICE transfer direction */
-	while (data_length > 0)
-		dbi = new_block_to_iov(udev, cmd, iov, dbi, &data_length);
+	for (; data_length > 0; data_length -= DATA_BLOCK_SIZE)
+		dbi = new_block_to_iov(udev, cmd, iov, dbi, data_length);
 }
 
 static struct tcmu_cmd *tcmu_alloc_cmd(struct se_cmd *se_cmd)
@@ -686,67 +687,83 @@ static inline size_t head_to_end(size_t head, size_t size)
 
 #define UPDATE_HEAD(head, used, size) smp_store_release(&head, ((head % size) + used) % size)
 
+#define TCMU_SG_TO_DATA_AREA 1
+#define TCMU_DATA_AREA_TO_SG 2
+
+static inline void tcmu_copy_data(struct tcmu_dev *udev,
+				  struct tcmu_cmd *tcmu_cmd, uint32_t direction,
+				  struct scatterlist *sg, unsigned int sg_nents,
+				  struct iovec **iov, size_t data_len)
+{
+	/* start value of dbi + 1 must not be a valid dbi */
+	int dbi = -2;
+	size_t block_remaining, cp_len;
+	struct sg_mapping_iter sg_iter;
+	unsigned int sg_flags;
+	struct page *page;
+	void *data_page_start, *data_addr;
+
+	if (direction == TCMU_SG_TO_DATA_AREA)
+		sg_flags = SG_MITER_ATOMIC | SG_MITER_FROM_SG;
+	else
+		sg_flags = SG_MITER_ATOMIC | SG_MITER_TO_SG;
+	sg_miter_start(&sg_iter, sg, sg_nents, sg_flags);
+
+	while (data_len) {
+		if (direction == TCMU_SG_TO_DATA_AREA)
+			dbi = new_block_to_iov(udev, tcmu_cmd, iov, dbi,
+					       data_len);
+		else
+			dbi = tcmu_cmd_get_dbi(tcmu_cmd);
+		page = tcmu_get_block_page(udev, dbi);
+		if (direction == TCMU_DATA_AREA_TO_SG)
+			flush_dcache_page(page);
+		data_page_start = kmap_atomic(page);
+		block_remaining = DATA_BLOCK_SIZE;
+
+		while (block_remaining && data_len) {
+			if (!sg_miter_next(&sg_iter)) {
+				/* set length to 0 to abort outer loop */
+				data_len = 0;
+				pr_debug("tcmu_move_data: aborting data copy due to exhausted sg_list\n");
+				break;
+			}
+			cp_len = min3(sg_iter.length, block_remaining, data_len);
+
+			data_addr = data_page_start +
+				    DATA_BLOCK_SIZE - block_remaining;
+			if (direction == TCMU_SG_TO_DATA_AREA)
+				memcpy(data_addr, sg_iter.addr, cp_len);
+			else
+				memcpy(sg_iter.addr, data_addr, cp_len);
+
+			data_len -= cp_len;
+			block_remaining -= cp_len;
+			sg_iter.consumed = cp_len;
+		}
+		sg_miter_stop(&sg_iter);
+
+		kunmap_atomic(data_page_start);
+		if (direction == TCMU_SG_TO_DATA_AREA)
+			flush_dcache_page(page);
+	}
+}
+
 static void scatter_data_area(struct tcmu_dev *udev, struct tcmu_cmd *tcmu_cmd,
 			      struct iovec **iov)
 {
 	struct se_cmd *se_cmd = tcmu_cmd->se_cmd;
-	/* start value of dbi + 1 must not be a valid dbi */
-	int i, dbi = -2;
-	int block_remaining = 0;
-	int data_len = se_cmd->data_length;
-	void *from, *to = NULL;
-	size_t copy_bytes, offset;
-	struct scatterlist *sg;
-	struct page *page = NULL;
 
-	for_each_sg(se_cmd->t_data_sg, sg, se_cmd->t_data_nents, i) {
-		int sg_remaining = sg->length;
-		from = kmap_atomic(sg_page(sg)) + sg->offset;
-		while (sg_remaining > 0) {
-			if (block_remaining == 0) {
-				if (to) {
-					flush_dcache_page(page);
-					kunmap_atomic(to);
-				}
-
-				/* get next dbi and add to IOVs */
-				dbi = new_block_to_iov(udev, tcmu_cmd, iov, dbi,
-						       &data_len);
-				page = tcmu_get_block_page(udev, dbi);
-				to = kmap_atomic(page);
-				block_remaining = DATA_BLOCK_SIZE;
-			}
-
-			copy_bytes = min_t(size_t, sg_remaining,
-					block_remaining);
-			offset = DATA_BLOCK_SIZE - block_remaining;
-			memcpy(to + offset, from + sg->length - sg_remaining,
-			       copy_bytes);
-
-			sg_remaining -= copy_bytes;
-			block_remaining -= copy_bytes;
-		}
-		kunmap_atomic(from - sg->offset);
-	}
-
-	if (to) {
-		flush_dcache_page(page);
-		kunmap_atomic(to);
-	}
+	tcmu_copy_data(udev, tcmu_cmd, TCMU_SG_TO_DATA_AREA, se_cmd->t_data_sg,
+		       se_cmd->t_data_nents, iov, se_cmd->data_length);
 }
 
-static void gather_data_area(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
+static void gather_data_area(struct tcmu_dev *udev, struct tcmu_cmd *tcmu_cmd,
 			     bool bidi, uint32_t read_len)
 {
-	struct se_cmd *se_cmd = cmd->se_cmd;
-	int i, dbi;
-	int block_remaining = 0;
-	void *from = NULL, *to;
-	size_t copy_bytes, offset;
-	struct scatterlist *sg, *data_sg;
-	struct page *page;
+	struct se_cmd *se_cmd = tcmu_cmd->se_cmd;
+	struct scatterlist *data_sg;
 	unsigned int data_nents;
-	uint32_t count = 0;
 
 	if (!bidi) {
 		data_sg = se_cmd->t_data_sg;
@@ -757,46 +774,15 @@ static void gather_data_area(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
 		 * buffer blocks, and before gathering the Data-In buffer
 		 * the Data-Out buffer blocks should be skipped.
 		 */
-		count = cmd->dbi_cnt - cmd->dbi_bidi_cnt;
+		tcmu_cmd_set_dbi_cur(tcmu_cmd,
+				     tcmu_cmd->dbi_cnt - tcmu_cmd->dbi_bidi_cnt);
 
 		data_sg = se_cmd->t_bidi_data_sg;
 		data_nents = se_cmd->t_bidi_data_nents;
 	}
 
-	tcmu_cmd_set_dbi_cur(cmd, count);
-
-	for_each_sg(data_sg, sg, data_nents, i) {
-		int sg_remaining = sg->length;
-		to = kmap_atomic(sg_page(sg)) + sg->offset;
-		while (sg_remaining > 0 && read_len > 0) {
-			if (block_remaining == 0) {
-				if (from)
-					kunmap_atomic(from);
-
-				block_remaining = DATA_BLOCK_SIZE;
-				dbi = tcmu_cmd_get_dbi(cmd);
-				page = tcmu_get_block_page(udev, dbi);
-				from = kmap_atomic(page);
-				flush_dcache_page(page);
-			}
-			copy_bytes = min_t(size_t, sg_remaining,
-					block_remaining);
-			if (read_len < copy_bytes)
-				copy_bytes = read_len;
-			offset = DATA_BLOCK_SIZE - block_remaining;
-			memcpy(to + sg->length - sg_remaining, from + offset,
-					copy_bytes);
-
-			sg_remaining -= copy_bytes;
-			block_remaining -= copy_bytes;
-			read_len -= copy_bytes;
-		}
-		kunmap_atomic(to - sg->offset);
-		if (read_len == 0)
-			break;
-	}
-	if (from)
-		kunmap_atomic(from);
+	tcmu_copy_data(udev, tcmu_cmd, TCMU_DATA_AREA_TO_SG, data_sg,
+		       data_nents, NULL, read_len);
 }
 
 static inline size_t spc_bitmap_free(unsigned long *bitmap, uint32_t thresh)
@@ -1580,6 +1566,88 @@ static struct se_device *tcmu_alloc_device(struct se_hba *hba, const char *name)
 	return &udev->se_dev;
 }
 
+static void tcmu_dev_call_rcu(struct rcu_head *p)
+{
+	struct se_device *dev = container_of(p, struct se_device, rcu_head);
+	struct tcmu_dev *udev = TCMU_DEV(dev);
+
+	kfree(udev->uio_info.name);
+	kfree(udev->name);
+	kfree(udev);
+}
+
+static int tcmu_check_and_free_pending_cmd(struct tcmu_cmd *cmd)
+{
+	if (test_bit(TCMU_CMD_BIT_EXPIRED, &cmd->flags)) {
+		kmem_cache_free(tcmu_cmd_cache, cmd);
+		return 0;
+	}
+	return -EINVAL;
+}
+
+static void tcmu_blocks_release(struct radix_tree_root *blocks,
+				int start, int end)
+{
+	int i;
+	struct page *page;
+
+	for (i = start; i < end; i++) {
+		page = radix_tree_delete(blocks, i);
+		if (page) {
+			__free_page(page);
+			atomic_dec(&global_db_count);
+		}
+	}
+}
+
+static void tcmu_remove_all_queued_tmr(struct tcmu_dev *udev)
+{
+	struct tcmu_tmr *tmr, *tmp;
+
+	list_for_each_entry_safe(tmr, tmp, &udev->tmr_queue, queue_entry) {
+		list_del_init(&tmr->queue_entry);
+		kfree(tmr);
+	}
+}
+
+static void tcmu_dev_kref_release(struct kref *kref)
+{
+	struct tcmu_dev *udev = container_of(kref, struct tcmu_dev, kref);
+	struct se_device *dev = &udev->se_dev;
+	struct tcmu_cmd *cmd;
+	bool all_expired = true;
+	int i;
+
+	vfree(udev->mb_addr);
+	udev->mb_addr = NULL;
+
+	spin_lock_bh(&timed_out_udevs_lock);
+	if (!list_empty(&udev->timedout_entry))
+		list_del(&udev->timedout_entry);
+	spin_unlock_bh(&timed_out_udevs_lock);
+
+	/* Upper layer should drain all requests before calling this */
+	mutex_lock(&udev->cmdr_lock);
+	idr_for_each_entry(&udev->commands, cmd, i) {
+		if (tcmu_check_and_free_pending_cmd(cmd) != 0)
+			all_expired = false;
+	}
+	/* There can be left over TMR cmds. Remove them. */
+	tcmu_remove_all_queued_tmr(udev);
+	if (!list_empty(&udev->qfull_queue))
+		all_expired = false;
+	idr_destroy(&udev->commands);
+	WARN_ON(!all_expired);
+
+	tcmu_blocks_release(&udev->data_blocks, 0, udev->dbi_max + 1);
+	bitmap_free(udev->data_bitmap);
+	mutex_unlock(&udev->cmdr_lock);
+
+	pr_debug("dev_kref_release\n");
+
+	call_rcu(&dev->rcu_head, tcmu_dev_call_rcu);
+}
+
 static void run_qfull_queue(struct tcmu_dev *udev, bool fail)
 {
 	struct tcmu_cmd *tcmu_cmd, *tmp_cmd;
@@ -1692,6 +1760,25 @@ static struct page *tcmu_try_get_block_page(struct tcmu_dev *udev, uint32_t dbi)
 	return page;
 }
 
+static void tcmu_vma_open(struct vm_area_struct *vma)
+{
+	struct tcmu_dev *udev = vma->vm_private_data;
+
+	pr_debug("vma_open\n");
+
+	kref_get(&udev->kref);
+}
+
+static void tcmu_vma_close(struct vm_area_struct *vma)
+{
+	struct tcmu_dev *udev = vma->vm_private_data;
+
+	pr_debug("vma_close\n");
+
+	/* release ref from tcmu_vma_open */
+	kref_put(&udev->kref, tcmu_dev_kref_release);
+}
+
 static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
 {
 	struct tcmu_dev *udev = vmf->vma->vm_private_data;
@@ -1730,6 +1817,8 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
 }
 
 static const struct vm_operations_struct tcmu_vm_ops = {
+	.open = tcmu_vma_open,
+	.close = tcmu_vma_close,
 	.fault = tcmu_vma_fault,
 };
 
@@ -1746,6 +1835,8 @@ static int tcmu_mmap(struct uio_info *info, struct vm_area_struct *vma)
 	if (vma_pages(vma) != (udev->ring_size >> PAGE_SHIFT))
 		return -EINVAL;
 
+	tcmu_vma_open(vma);
+
 	return 0;
 }
 
@@ -1758,91 +1849,10 @@ static int tcmu_open(struct uio_info *info, struct inode *inode)
 		return -EBUSY;
 
 	udev->inode = inode;
-	kref_get(&udev->kref);
 
 	pr_debug("open\n");
 
 	return 0;
-}
-
-static void tcmu_dev_call_rcu(struct rcu_head *p)
-{
-	struct se_device *dev = container_of(p, struct se_device, rcu_head);
-	struct tcmu_dev *udev = TCMU_DEV(dev);
-
-	kfree(udev->uio_info.name);
-	kfree(udev->name);
-	kfree(udev);
-}
-
-static int tcmu_check_and_free_pending_cmd(struct tcmu_cmd *cmd)
-{
-	if (test_bit(TCMU_CMD_BIT_EXPIRED, &cmd->flags)) {
-		kmem_cache_free(tcmu_cmd_cache, cmd);
-		return 0;
-	}
-	return -EINVAL;
-}
-
-static void tcmu_blocks_release(struct radix_tree_root *blocks,
-				int start, int end)
-{
-	int i;
-	struct page *page;
-
-	for (i = start; i < end; i++) {
-		page = radix_tree_delete(blocks, i);
-		if (page) {
-			__free_page(page);
-			atomic_dec(&global_db_count);
-		}
-	}
-}
-
-static void tcmu_remove_all_queued_tmr(struct tcmu_dev *udev)
-{
-	struct tcmu_tmr *tmr, *tmp;
-
-	list_for_each_entry_safe(tmr, tmp, &udev->tmr_queue, queue_entry) {
-		list_del_init(&tmr->queue_entry);
-		kfree(tmr);
-	}
-}
-
-static void tcmu_dev_kref_release(struct kref *kref)
-{
-	struct tcmu_dev *udev = container_of(kref, struct tcmu_dev, kref);
-	struct se_device *dev = &udev->se_dev;
-	struct tcmu_cmd *cmd;
-	bool all_expired = true;
-	int i;
-
-	vfree(udev->mb_addr);
-	udev->mb_addr = NULL;
-
-	spin_lock_bh(&timed_out_udevs_lock);
-	if (!list_empty(&udev->timedout_entry))
-		list_del(&udev->timedout_entry);
-	spin_unlock_bh(&timed_out_udevs_lock);
-
-	/* Upper layer should drain all requests before calling this */
-	mutex_lock(&udev->cmdr_lock);
-	idr_for_each_entry(&udev->commands, cmd, i) {
-		if (tcmu_check_and_free_pending_cmd(cmd) != 0)
-			all_expired = false;
-	}
-	/* There can be left over TMR cmds. Remove them. */
-	tcmu_remove_all_queued_tmr(udev);
-	if (!list_empty(&udev->qfull_queue))
-		all_expired = false;
-	idr_destroy(&udev->commands);
-	WARN_ON(!all_expired);
-
-	tcmu_blocks_release(&udev->data_blocks, 0, udev->dbi_max + 1);
-	bitmap_free(udev->data_bitmap);
-	mutex_unlock(&udev->cmdr_lock);
-
-	call_rcu(&dev->rcu_head, tcmu_dev_call_rcu);
 }
 
 static int tcmu_release(struct uio_info *info, struct inode *inode)
@@ -1852,8 +1862,7 @@ static int tcmu_release(struct uio_info *info, struct inode *inode)
 	clear_bit(TCMU_DEV_BIT_OPEN, &udev->flags);
 
 	pr_debug("close\n");
-	/* release ref from open */
-	kref_put(&udev->kref, tcmu_dev_kref_release);
+
 	return 0;
 }
 

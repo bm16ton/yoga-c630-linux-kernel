@@ -14,6 +14,7 @@
 #include <linux/acpi.h>
 #include <linux/pm.h>
 #include <linux/pm_runtime.h>
+#include <linux/regulator/consumer.h>
 #include <linux/iio/iio.h>
 #include <linux/iio/sysfs.h>
 #include <linux/iio/buffer.h>
@@ -133,6 +134,7 @@ enum kx_acpi_type {
 };
 
 struct kxcjk1013_data {
+	struct regulator_bulk_data regulators[2];
 	struct i2c_client *client;
 	struct iio_trigger *dready_trig;
 	struct iio_trigger *motion_trig;
@@ -1105,19 +1107,15 @@ err:
 	return IRQ_HANDLED;
 }
 
-static int kxcjk1013_trig_try_reen(struct iio_trigger *trig)
+static void kxcjk1013_trig_reen(struct iio_trigger *trig)
 {
 	struct iio_dev *indio_dev = iio_trigger_get_drvdata(trig);
 	struct kxcjk1013_data *data = iio_priv(indio_dev);
 	int ret;
 
 	ret = i2c_smbus_read_byte_data(data->client, KXCJK1013_REG_INT_REL);
-	if (ret < 0) {
+	if (ret < 0)
 		dev_err(&data->client->dev, "Error reading reg_int_rel\n");
-		return ret;
-	}
-
-	return 0;
 }
 
 static int kxcjk1013_data_rdy_trigger_set_state(struct iio_trigger *trig,
@@ -1161,7 +1159,7 @@ static int kxcjk1013_data_rdy_trigger_set_state(struct iio_trigger *trig,
 
 static const struct iio_trigger_ops kxcjk1013_trigger_ops = {
 	.set_trigger_state = kxcjk1013_data_rdy_trigger_set_state,
-	.try_reenable = kxcjk1013_trig_try_reen,
+	.reenable = kxcjk1013_trig_reen,
 };
 
 static void kxcjk1013_report_motion_event(struct iio_dev *indio_dev)
@@ -1304,6 +1302,13 @@ static const char *kxcjk1013_match_acpi_device(struct device *dev,
 	return dev_name(dev);
 }
 
+static void kxcjk1013_disable_regulators(void *d)
+{
+	struct kxcjk1013_data *data = d;
+
+	regulator_bulk_disable(ARRAY_SIZE(data->regulators), data->regulators);
+}
+
 static int kxcjk1013_probe(struct i2c_client *client,
 			   const struct i2c_device_id *id)
 {
@@ -1333,6 +1338,29 @@ static int kxcjk1013_probe(struct i2c_client *client,
 		if (ret)
 			return ret;
 	}
+
+	data->regulators[0].supply = "vdd";
+	data->regulators[1].supply = "vddio";
+	ret = devm_regulator_bulk_get(&client->dev, ARRAY_SIZE(data->regulators),
+				      data->regulators);
+	if (ret)
+		return dev_err_probe(&client->dev, ret, "Failed to get regulators\n");
+
+	ret = regulator_bulk_enable(ARRAY_SIZE(data->regulators),
+				    data->regulators);
+	if (ret)
+		return ret;
+
+	ret = devm_add_action_or_reset(&client->dev, kxcjk1013_disable_regulators, data);
+	if (ret)
+		return ret;
+
+	/*
+	 * A typical delay of 10ms is required for powering up
+	 * according to the data sheets of supported chips.
+	 * Hence double that to play safe.
+	 */
+	msleep(20);
 
 	if (id) {
 		data->chipset = (enum kx_chipset)(id->driver_data);

@@ -1009,6 +1009,7 @@ static struct h5_vnd rtl_vnd = {
 #ifdef CONFIG_ACPI
 static const struct acpi_device_id h5_acpi_match[] = {
 #ifdef CONFIG_BT_HCIUART_RTL
+	{ "OBDA0623", (kernel_ulong_t)&rtl_vnd },
 	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
 #endif
 	{ },
@@ -1025,6 +1026,8 @@ static const struct of_device_id rtl_bluetooth_of_match[] = {
 	{ .compatible = "realtek,rtl8822cs-bt",
 	  .data = (const void *)&rtl_vnd },
 	{ .compatible = "realtek,rtl8723bs-bt",
+	  .data = (const void *)&rtl_vnd },
+	{ .compatible = "realtek,rtl8723ds-bt",
 	  .data = (const void *)&rtl_vnd },
 #endif
 	{ },

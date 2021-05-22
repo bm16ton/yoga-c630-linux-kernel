@@ -1,0 +1,21 @@
+--- drivers/scsi/ufs/ufshcd.c
++++ drivers/scsi/ufs/ufshcd.c
+@@ -5038,15 +5089,9 @@ ufshcd_transfer_rsp_status(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
+ 			 * UFS device needs urgent BKOPs.
+ 			 */
+ 			if (!hba->pm_op_in_progress &&
+-			    ufshcd_is_exception_event(lrbp->ucd_rsp_ptr) &&
+-			    schedule_work(&hba->eeh_work)) {
+-				/*
+-				 * Prevent suspend once eeh_work is scheduled
+-				 * to avoid deadlock between ufshcd_suspend
+-				 * and exception event handler.
+-				 */
+-				pm_runtime_get_noresume(hba->dev);
+-			}
++			    ufshcd_is_exception_event(lrbp->ucd_rsp_ptr))
++				/* Flushed in suspend */
++				schedule_work(&hba->eeh_work);
+ 			break;
+ 		case UPIU_TRANSACTION_REJECT_UPIU:
+ 			/* TODO: handle Reject UPIU Response */

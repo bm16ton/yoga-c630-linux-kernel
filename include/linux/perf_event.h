@@ -1001,7 +1001,7 @@ struct perf_sample_data {
 	struct perf_raw_record		*raw;
 	struct perf_branch_stack	*br_stack;
 	u64				period;
-	u64				weight;
+	union perf_sample_weight	weight;
 	u64				txn;
 	union  perf_mem_data_src	data_src;
 
@@ -1031,6 +1031,8 @@ struct perf_sample_data {
 
 	u64				phys_addr;
 	u64				cgroup;
+	u64				data_page_size;
+	u64				code_page_size;
 } ____cacheline_aligned;
 
 /* default value for data source */
@@ -1048,7 +1050,7 @@ static inline void perf_sample_data_init(struct perf_sample_data *data,
 	data->raw  = NULL;
 	data->br_stack = NULL;
 	data->period = period;
-	data->weight = 0;
+	data->weight.full = 0;
 	data->data_src.val = PERF_MEM_NA;
 	data->txn = 0;
 }
@@ -1587,5 +1589,9 @@ int perf_event_exit_cpu(unsigned int cpu);
 extern void __weak arch_perf_update_userpage(struct perf_event *event,
 					     struct perf_event_mmap_page *userpg,
 					     u64 now);
+
+#ifdef CONFIG_MMU
+extern __weak u64 arch_perf_get_page_size(struct mm_struct *mm, unsigned long addr);
+#endif
 
 #endif /* _LINUX_PERF_EVENT_H */

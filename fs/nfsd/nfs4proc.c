@@ -50,6 +50,11 @@
 #include "pnfs.h"
 #include "trace.h"
 
+static bool inter_copy_offload_enable;
+module_param(inter_copy_offload_enable, bool, 0644);
+MODULE_PARM_DESC(inter_copy_offload_enable,
+		 "Enable inter server to server copy offload. Default: false");
+
 #ifdef CONFIG_NFSD_V4_SECURITY_LABEL
 #include <linux/security.h>
 
@@ -257,8 +262,8 @@ do_open_lookup(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, stru
 		 * in NFSv4 as in v3 except EXCLUSIVE4_1.
 		 */
 		current->fs->umask = open->op_umask;
-		status = do_nfsd_create(rqstp, current_fh, open->op_fname.data,
-					open->op_fname.len, &open->op_iattr,
+		status = do_nfsd_create(rqstp, current_fh, open->op_fname,
+					open->op_fnamelen, &open->op_iattr,
 					*resfh, open->op_createmode,
 					(u32 *)open->op_verf.data,
 					&open->op_truncate, &open->op_created);
@@ -283,7 +288,7 @@ do_open_lookup(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, stru
 		 * a chance to an acquire a delegation if appropriate.
 		 */
 		status = nfsd_lookup(rqstp, current_fh,
-				     open->op_fname.data, open->op_fname.len, *resfh);
+				     open->op_fname, open->op_fnamelen, *resfh);
 	if (status)
 		goto out;
 	status = nfsd_check_obj_isreg(*resfh);
@@ -360,7 +365,7 @@ nfsd4_open(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 	bool reclaim = false;
 
 	dprintk("NFSD: nfsd4_open filename %.*s op_openowner %p\n",
-		(int)open->op_fname.len, open->op_fname.data,
+		(int)open->op_fnamelen, open->op_fname,
 		open->op_openowner);
 
 	/* This check required by spec. */
@@ -373,8 +378,7 @@ nfsd4_open(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 	 * Before RECLAIM_COMPLETE done, server should deny new lock
 	 */
 	if (nfsd4_has_session(cstate) &&
-	    !test_bit(NFSD4_CLIENT_RECLAIM_COMPLETE,
-		      &cstate->session->se_client->cl_flags) &&
+	    !test_bit(NFSD4_CLIENT_RECLAIM_COMPLETE, &cstate->clp->cl_flags) &&
 	    open->op_claim_type != NFS4_OPEN_CLAIM_PREVIOUS)
 		return nfserr_grace;
 
@@ -423,8 +427,7 @@ nfsd4_open(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 				goto out;
 			break;
 		case NFS4_OPEN_CLAIM_PREVIOUS:
-			status = nfs4_check_open_reclaim(&open->op_clientid,
-							 cstate, nn);
+			status = nfs4_check_open_reclaim(cstate->clp);
 			if (status)
 				goto out;
 			open->op_openowner->oo_flags |= NFS4_OO_CONFIRMED;
@@ -1023,8 +1026,8 @@ nfsd4_write(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 
 	write->wr_how_written = write->wr_stable_how;
 
-	nvecs = svc_fill_write_vector(rqstp, write->wr_pagelist,
-				      &write->wr_head, write->wr_buflen);
+	nvecs = svc_fill_write_vector(rqstp, write->wr_payload.pages,
+				      write->wr_payload.head, write->wr_buflen);
 	WARN_ON_ONCE(nvecs > ARRAY_SIZE(rqstp->rq_vec));
 
 	status = nfsd_vfs_write(rqstp, &cstate->current_fh, nf,
@@ -1883,7 +1886,7 @@ nfsd4_getdeviceinfo(struct svc_rqst *rqstp,
 	nfserr = nfs_ok;
 	if (gdp->gd_maxcount != 0) {
 		nfserr = ops->proc_getdeviceinfo(exp->ex_path.mnt->mnt_sb,
-				rqstp, cstate->session->se_client, gdp);
+				rqstp, cstate->clp, gdp);
 	}
 
 	gdp->gd_notify_types &= ops->notify_types;
@@ -2169,7 +2172,7 @@ nfsd4_proc_null(struct svc_rqst *rqstp)
 static inline void nfsd4_increment_op_stats(u32 opnum)
 {
 	if (opnum >= FIRST_NFS4_OP && opnum <= LAST_NFS4_OP)
-		nfsdstats.nfs4_opcount[opnum]++;
+		percpu_counter_inc(&nfsdstats.counter[NFSD_STATS_NFS4_OP(opnum)]);
 }
 
 static const struct nfsd4_operation nfsd4_ops[];
@@ -2272,7 +2275,7 @@ static void svcxdr_init_encode(struct svc_rqst *rqstp,
 	xdr->end = head->iov_base + PAGE_SIZE - rqstp->rq_auth_slack;
 	/* Tail and page_len should be zero at this point: */
 	buf->len = buf->head[0].iov_len;
-	xdr->scratch.iov_len = 0;
+	xdr_reset_scratch_buffer(xdr);
 	xdr->page_ptr = buf->pages - 1;
 	buf->buflen = PAGE_SIZE * (1 + rqstp->rq_page_end - buf->pages)
 		- rqstp->rq_auth_slack;
@@ -3278,7 +3281,7 @@ int nfsd4_max_reply(struct svc_rqst *rqstp, struct nfsd4_op *op)
 void warn_on_nonidempotent_op(struct nfsd4_op *op)
 {
 	if (OPDESC(op)->op_flags & OP_MODIFIES_SOMETHING) {
-		pr_err("unable to encode reply to nonidempotent op %d (%s)\n",
+		pr_err("unable to encode reply to nonidempotent op %u (%s)\n",
 			op->opnum, nfsd4_op_name(op->opnum));
 		WARN_ON_ONCE(1);
 	}
@@ -3291,18 +3294,16 @@ static const char *nfsd4_op_name(unsigned opnum)
 	return "unknown_operation";
 }
 
-#define nfsd4_voidres			nfsd4_voidargs
-struct nfsd4_voidargs { int dummy; };
-
 static const struct svc_procedure nfsd_procedures4[2] = {
 	[NFSPROC4_NULL] = {
 		.pc_func = nfsd4_proc_null,
-		.pc_decode = nfs4svc_decode_voidarg,
-		.pc_encode = nfs4svc_encode_voidres,
-		.pc_argsize = sizeof(struct nfsd4_voidargs),
-		.pc_ressize = sizeof(struct nfsd4_voidres),
+		.pc_decode = nfssvc_decode_voidarg,
+		.pc_encode = nfssvc_encode_voidres,
+		.pc_argsize = sizeof(struct nfsd_voidargs),
+		.pc_ressize = sizeof(struct nfsd_voidres),
 		.pc_cachetype = RC_NOCACHE,
 		.pc_xdrressize = 1,
+		.pc_name = "NULL",
 	},
 	[NFSPROC4_COMPOUND] = {
 		.pc_func = nfsd4_proc_compound,
@@ -3313,6 +3314,7 @@ static const struct svc_procedure nfsd_procedures4[2] = {
 		.pc_release = nfsd4_release_compoundargs,
 		.pc_cachetype = RC_NOCACHE,
 		.pc_xdrressize = NFSD_BUFSIZE/4,
+		.pc_name = "COMPOUND",
 	},
 };
 

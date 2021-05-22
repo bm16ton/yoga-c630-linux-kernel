@@ -47,7 +47,6 @@
 static bool swap_count_continued(struct swap_info_struct *, pgoff_t,
 				 unsigned char);
 static void free_swap_count_continuations(struct swap_info_struct *);
-static sector_t map_swap_entry(swp_entry_t, struct block_device**);
 
 DEFINE_SPINLOCK(swap_lock);
 static unsigned int nr_swapfiles;
@@ -988,8 +987,7 @@ static int swap_alloc_cluster(struct swap_info_struct *si, swp_entry_t *slot)
 {
 	unsigned long idx;
 	struct swap_cluster_info *ci;
-	unsigned long offset, i;
-	unsigned char *map;
+	unsigned long offset;
 
 	/*
 	 * Should not even be attempting cluster allocations when huge
@@ -1009,9 +1007,7 @@ static int swap_alloc_cluster(struct swap_info_struct *si, swp_entry_t *slot)
 	alloc_cluster(si, idx);
 	cluster_set_count_flag(ci, SWAPFILE_CLUSTER, CLUSTER_FLAG_HUGE);
 
-	map = si->swap_map + offset;
-	for (i = 0; i < SWAPFILE_CLUSTER; i++)
-		map[i] = SWAP_HAS_CACHE;
+	memset(si->swap_map + offset, SWAP_HAS_CACHE, SWAPFILE_CLUSTER);
 	unlock_cluster(ci);
 	swap_range_alloc(si, offset, SWAPFILE_CLUSTER);
 	*slot = swp_entry(si->type, offset);
@@ -1174,13 +1170,13 @@ static struct swap_info_struct *__swap_info_get(swp_entry_t entry)
 	return p;
 
 bad_offset:
-	pr_err("swap_info_get: %s%08lx\n", Bad_offset, entry.val);
+	pr_err("%s: %s%08lx\n", __func__, Bad_offset, entry.val);
 	goto out;
 bad_device:
-	pr_err("swap_info_get: %s%08lx\n", Unused_file, entry.val);
+	pr_err("%s: %s%08lx\n", __func__, Unused_file, entry.val);
 	goto out;
 bad_nofile:
-	pr_err("swap_info_get: %s%08lx\n", Bad_file, entry.val);
+	pr_err("%s: %s%08lx\n", __func__, Bad_file, entry.val);
 out:
 	return NULL;
 }
@@ -1197,7 +1193,7 @@ static struct swap_info_struct *_swap_info_get(swp_entry_t entry)
 	return p;
 
 bad_free:
-	pr_err("swap_info_get: %s%08lx\n", Unused_offset, entry.val);
+	pr_err("%s: %s%08lx\n", __func__, Unused_offset, entry.val);
 out:
 	return NULL;
 }
@@ -1866,12 +1862,13 @@ int find_first_swap(dev_t *device)
  */
 sector_t swapdev_block(int type, pgoff_t offset)
 {
-	struct block_device *bdev;
 	struct swap_info_struct *si = swap_type_to_swap_info(type);
+	struct swap_extent *se;
 
 	if (!si || !(si->flags & SWP_WRITEOK))
 		return 0;
-	return map_swap_entry(swp_entry(type, offset), &bdev);
+	se = offset_to_swap_extent(si, offset);
+	return se->start_block + (offset - se->start_page);
 }
 
 /*
@@ -1967,8 +1964,6 @@ static int unuse_pte_range(struct vm_area_struct *vma, pmd_t *pmd,
 	si = swap_info[type];
 	pte = pte_offset_map(pmd, addr);
 	do {
-		struct vm_fault vmf;
-
 		if (!is_swap_pte(*pte))
 			continue;
 
@@ -1984,9 +1979,12 @@ static int unuse_pte_range(struct vm_area_struct *vma, pmd_t *pmd,
 		swap_map = &si->swap_map[offset];
 		page = lookup_swap_cache(entry, vma, addr);
 		if (!page) {
-			vmf.vma = vma;
-			vmf.address = addr;
-			vmf.pmd = pmd;
+			struct vm_fault vmf = {
+				.vma = vma,
+				.address = addr,
+				.pmd = pmd,
+			};
+
 			page = swapin_readahead(entry, GFP_HIGHUSER_MOVABLE,
 						&vmf);
 		}
@@ -2295,36 +2293,6 @@ static void drain_mmlist(void)
 	list_for_each_safe(p, next, &init_mm.mmlist)
 		list_del_init(p);
 	spin_unlock(&mmlist_lock);
-}
-
-/*
- * Use this swapdev's extent info to locate the (PAGE_SIZE) block which
- * corresponds to page offset for the specified swap entry.
- * Note that the type of this function is sector_t, but it returns page offset
- * into the bdev, not sector offset.
- */
-static sector_t map_swap_entry(swp_entry_t entry, struct block_device **bdev)
-{
-	struct swap_info_struct *sis;
-	struct swap_extent *se;
-	pgoff_t offset;
-
-	sis = swp_swap_info(entry);
-	*bdev = sis->bdev;
-
-	offset = swp_offset(entry);
-	se = offset_to_swap_extent(sis, offset);
-	return se->start_block + (offset - se->start_page);
-}
-
-/*
- * Returns the page offset into bdev for the specified page's swap entry.
- */
-sector_t map_swap_page(struct page *page, struct block_device **bdev)
-{
-	swp_entry_t entry;
-	entry.val = page_private(page);
-	return map_swap_entry(entry, bdev);
 }
 
 /*
@@ -3459,11 +3427,11 @@ static int __swap_duplicate(swp_entry_t entry, unsigned char usage)
 	unsigned long offset;
 	unsigned char count;
 	unsigned char has_cache;
-	int err = -EINVAL;
+	int err;
 
 	p = get_swap_device(entry);
 	if (!p)
-		goto out;
+		return -EINVAL;
 
 	offset = swp_offset(entry);
 	ci = lock_cluster_or_swap_info(p, offset);
@@ -3510,7 +3478,6 @@ static int __swap_duplicate(swp_entry_t entry, unsigned char usage)
 
 unlock_out:
 	unlock_cluster_or_swap_info(p, ci);
-out:
 	if (p)
 		put_swap_device(p);
 	return err;
@@ -3627,7 +3594,7 @@ int add_swap_count_continuation(swp_entry_t entry, gfp_t gfp_mask)
 
 	ci = lock_cluster(si, offset);
 
-	count = si->swap_map[offset] & ~SWAP_HAS_CACHE;
+	count = swap_count(si->swap_map[offset]);
 
 	if ((count & ~COUNT_CONTINUED) != SWAP_MAP_MAX) {
 		/*

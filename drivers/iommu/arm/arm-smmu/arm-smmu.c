@@ -85,6 +85,11 @@ static inline void arm_smmu_rpm_put(struct arm_smmu_device *smmu)
 		pm_runtime_put_autosuspend(smmu->dev);
 }
 
+static struct arm_smmu_domain *to_smmu_domain(struct iommu_domain *dom)
+{
+	return container_of(dom, struct arm_smmu_domain, domain);
+}
+
 static struct platform_driver arm_smmu_driver;
 static struct iommu_ops arm_smmu_ops;
 
@@ -328,14 +333,6 @@ static void arm_smmu_tlb_inv_walk_s1(unsigned long iova, size_t size,
 	arm_smmu_tlb_sync_context(cookie);
 }
 
-static void arm_smmu_tlb_inv_leaf_s1(unsigned long iova, size_t size,
-				     size_t granule, void *cookie)
-{
-	arm_smmu_tlb_inv_range_s1(iova, size, granule, cookie,
-				  ARM_SMMU_CB_S1_TLBIVAL);
-	arm_smmu_tlb_sync_context(cookie);
-}
-
 static void arm_smmu_tlb_add_page_s1(struct iommu_iotlb_gather *gather,
 				     unsigned long iova, size_t granule,
 				     void *cookie)
@@ -352,14 +349,6 @@ static void arm_smmu_tlb_inv_walk_s2(unsigned long iova, size_t size,
 	arm_smmu_tlb_sync_context(cookie);
 }
 
-static void arm_smmu_tlb_inv_leaf_s2(unsigned long iova, size_t size,
-				     size_t granule, void *cookie)
-{
-	arm_smmu_tlb_inv_range_s2(iova, size, granule, cookie,
-				  ARM_SMMU_CB_S2_TLBIIPAS2L);
-	arm_smmu_tlb_sync_context(cookie);
-}
-
 static void arm_smmu_tlb_add_page_s2(struct iommu_iotlb_gather *gather,
 				     unsigned long iova, size_t granule,
 				     void *cookie)
@@ -368,8 +357,8 @@ static void arm_smmu_tlb_add_page_s2(struct iommu_iotlb_gather *gather,
 				  ARM_SMMU_CB_S2_TLBIIPAS2L);
 }
 
-static void arm_smmu_tlb_inv_any_s2_v1(unsigned long iova, size_t size,
-				       size_t granule, void *cookie)
+static void arm_smmu_tlb_inv_walk_s2_v1(unsigned long iova, size_t size,
+					size_t granule, void *cookie)
 {
 	arm_smmu_tlb_inv_context_s2(cookie);
 }
@@ -396,21 +385,18 @@ static void arm_smmu_tlb_add_page_s2_v1(struct iommu_iotlb_gather *gather,
 static const struct iommu_flush_ops arm_smmu_s1_tlb_ops = {
 	.tlb_flush_all	= arm_smmu_tlb_inv_context_s1,
 	.tlb_flush_walk	= arm_smmu_tlb_inv_walk_s1,
-	.tlb_flush_leaf	= arm_smmu_tlb_inv_leaf_s1,
 	.tlb_add_page	= arm_smmu_tlb_add_page_s1,
 };
 
 static const struct iommu_flush_ops arm_smmu_s2_tlb_ops_v2 = {
 	.tlb_flush_all	= arm_smmu_tlb_inv_context_s2,
 	.tlb_flush_walk	= arm_smmu_tlb_inv_walk_s2,
-	.tlb_flush_leaf	= arm_smmu_tlb_inv_leaf_s2,
 	.tlb_add_page	= arm_smmu_tlb_add_page_s2,
 };
 
 static const struct iommu_flush_ops arm_smmu_s2_tlb_ops_v1 = {
 	.tlb_flush_all	= arm_smmu_tlb_inv_context_s2,
-	.tlb_flush_walk	= arm_smmu_tlb_inv_any_s2_v1,
-	.tlb_flush_leaf	= arm_smmu_tlb_inv_any_s2_v1,
+	.tlb_flush_walk	= arm_smmu_tlb_inv_walk_s2_v1,
 	.tlb_add_page	= arm_smmu_tlb_add_page_s2_v1,
 };
 
@@ -606,31 +592,24 @@ void arm_smmu_write_context_bank(struct arm_smmu_device *smmu, int idx)
 
 	/* SCTLR */
 	reg = ARM_SMMU_SCTLR_CFIE | ARM_SMMU_SCTLR_CFRE | ARM_SMMU_SCTLR_AFE |
-	      ARM_SMMU_SCTLR_TRE;
-	if (cfg->m)
-		reg |= ARM_SMMU_SCTLR_M;
+	      ARM_SMMU_SCTLR_TRE | ARM_SMMU_SCTLR_M;
 	if (stage1)
 		reg |= ARM_SMMU_SCTLR_S1_ASIDPNE;
 	if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
 		reg |= ARM_SMMU_SCTLR_E;
 
-	reg |= cfg->sctlr_set;
-	reg &= ~cfg->sctlr_clr;
-
-	arm_smmu_cb_write(smmu, idx, ARM_SMMU_CB_SCTLR, reg);
+	if (smmu->impl && smmu->impl->write_sctlr)
+		smmu->impl->write_sctlr(smmu, idx, reg);
+	else
+		arm_smmu_cb_write(smmu, idx, ARM_SMMU_CB_SCTLR, reg);
 }
 
 static int arm_smmu_alloc_context_bank(struct arm_smmu_domain *smmu_domain,
 				       struct arm_smmu_device *smmu,
 				       struct device *dev, unsigned int start)
 {
-	struct iommu_domain *domain = &smmu_domain->domain;
-
 	if (smmu->impl && smmu->impl->alloc_context_bank)
 		return smmu->impl->alloc_context_bank(smmu_domain, smmu, dev, start);
-
-	if (domain->type == IOMMU_DOMAIN_IDENTITY)
-		return ARM_SMMU_CBNDX_BYPASS;
 
 	return __arm_smmu_alloc_bitmap(smmu->context_map, start, smmu->num_context_banks);
 }
@@ -647,13 +626,16 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
 	struct arm_smmu_cfg *cfg = &smmu_domain->cfg;
 	irqreturn_t (*context_fault)(int irq, void *dev);
-	struct arm_smmu_cfg new_cfg = *cfg;
-	enum arm_smmu_domain_stage new_stage = smmu_domain->stage;
-	const struct iommu_flush_ops *flush_ops;
 
 	mutex_lock(&smmu_domain->init_mutex);
 	if (smmu_domain->smmu)
 		goto out_unlock;
+
+	if (domain->type == IOMMU_DOMAIN_IDENTITY) {
+		smmu_domain->stage = ARM_SMMU_DOMAIN_BYPASS;
+		smmu_domain->smmu = smmu;
+		goto out_unlock;
+	}
 
 	/*
 	 * Mapping the requested stage onto what we support is surprisingly
@@ -674,9 +656,9 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 	 * Note that you can't actually request stage-2 mappings.
 	 */
 	if (!(smmu->features & ARM_SMMU_FEAT_TRANS_S1))
-		new_stage = ARM_SMMU_DOMAIN_S2;
+		smmu_domain->stage = ARM_SMMU_DOMAIN_S2;
 	if (!(smmu->features & ARM_SMMU_FEAT_TRANS_S2))
-		new_stage = ARM_SMMU_DOMAIN_S1;
+		smmu_domain->stage = ARM_SMMU_DOMAIN_S1;
 
 	/*
 	 * Choosing a suitable context format is even more fiddly. Until we
@@ -687,32 +669,32 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 	 * support to be a superset of AArch32 support...
 	 */
 	if (smmu->features & ARM_SMMU_FEAT_FMT_AARCH32_L)
-		new_cfg.fmt = ARM_SMMU_CTX_FMT_AARCH32_L;
+		cfg->fmt = ARM_SMMU_CTX_FMT_AARCH32_L;
 	if (IS_ENABLED(CONFIG_IOMMU_IO_PGTABLE_ARMV7S) &&
 	    !IS_ENABLED(CONFIG_64BIT) && !IS_ENABLED(CONFIG_ARM_LPAE) &&
 	    (smmu->features & ARM_SMMU_FEAT_FMT_AARCH32_S) &&
-	    (new_stage == ARM_SMMU_DOMAIN_S1))
-		new_cfg.fmt = ARM_SMMU_CTX_FMT_AARCH32_S;
-	if ((IS_ENABLED(CONFIG_64BIT) || new_cfg.fmt == ARM_SMMU_CTX_FMT_NONE) &&
+	    (smmu_domain->stage == ARM_SMMU_DOMAIN_S1))
+		cfg->fmt = ARM_SMMU_CTX_FMT_AARCH32_S;
+	if ((IS_ENABLED(CONFIG_64BIT) || cfg->fmt == ARM_SMMU_CTX_FMT_NONE) &&
 	    (smmu->features & (ARM_SMMU_FEAT_FMT_AARCH64_64K |
 			       ARM_SMMU_FEAT_FMT_AARCH64_16K |
 			       ARM_SMMU_FEAT_FMT_AARCH64_4K)))
-		new_cfg.fmt = ARM_SMMU_CTX_FMT_AARCH64;
+		cfg->fmt = ARM_SMMU_CTX_FMT_AARCH64;
 
-	if (new_cfg.fmt == ARM_SMMU_CTX_FMT_NONE) {
+	if (cfg->fmt == ARM_SMMU_CTX_FMT_NONE) {
 		ret = -EINVAL;
 		goto out_unlock;
 	}
 
-	switch (new_stage) {
+	switch (smmu_domain->stage) {
 	case ARM_SMMU_DOMAIN_S1:
-		new_cfg.cbar = CBAR_TYPE_S1_TRANS_S2_BYPASS;
+		cfg->cbar = CBAR_TYPE_S1_TRANS_S2_BYPASS;
 		start = smmu->num_s2_context_banks;
 		ias = smmu->va_size;
 		oas = smmu->ipa_size;
-		if (new_cfg.fmt == ARM_SMMU_CTX_FMT_AARCH64) {
+		if (cfg->fmt == ARM_SMMU_CTX_FMT_AARCH64) {
 			fmt = ARM_64_LPAE_S1;
-		} else if (new_cfg.fmt == ARM_SMMU_CTX_FMT_AARCH32_L) {
+		} else if (cfg->fmt == ARM_SMMU_CTX_FMT_AARCH32_L) {
 			fmt = ARM_32_LPAE_S1;
 			ias = min(ias, 32UL);
 			oas = min(oas, 40UL);
@@ -721,7 +703,7 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 			ias = min(ias, 32UL);
 			oas = min(oas, 32UL);
 		}
-		flush_ops = &arm_smmu_s1_tlb_ops;
+		smmu_domain->flush_ops = &arm_smmu_s1_tlb_ops;
 		break;
 	case ARM_SMMU_DOMAIN_NESTED:
 		/*
@@ -729,11 +711,11 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 		 * involved.
 		 */
 	case ARM_SMMU_DOMAIN_S2:
-		new_cfg.cbar = CBAR_TYPE_S2_TRANS;
+		cfg->cbar = CBAR_TYPE_S2_TRANS;
 		start = 0;
 		ias = smmu->ipa_size;
 		oas = smmu->pa_size;
-		if (new_cfg.fmt == ARM_SMMU_CTX_FMT_AARCH64) {
+		if (cfg->fmt == ARM_SMMU_CTX_FMT_AARCH64) {
 			fmt = ARM_64_LPAE_S2;
 		} else {
 			fmt = ARM_32_LPAE_S2;
@@ -741,9 +723,9 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 			oas = min(oas, 40UL);
 		}
 		if (smmu->version == ARM_SMMU_V2)
-			flush_ops = &arm_smmu_s2_tlb_ops_v2;
+			smmu_domain->flush_ops = &arm_smmu_s2_tlb_ops_v2;
 		else
-			flush_ops = &arm_smmu_s2_tlb_ops_v1;
+			smmu_domain->flush_ops = &arm_smmu_s2_tlb_ops_v1;
 		break;
 	default:
 		ret = -EINVAL;
@@ -753,16 +735,9 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 	ret = arm_smmu_alloc_context_bank(smmu_domain, smmu, dev, start);
 	if (ret < 0) {
 		goto out_unlock;
-	} else if (ret == ARM_SMMU_CBNDX_BYPASS) {
-		smmu_domain->stage = ARM_SMMU_DOMAIN_BYPASS;
-		smmu_domain->smmu = smmu;
-		goto out_unlock;
 	}
 
 	smmu_domain->smmu = smmu;
-	smmu_domain->cfg = new_cfg;
-	smmu_domain->stage = new_stage;
-	smmu_domain->flush_ops = flush_ops;
 
 	cfg->cbndx = ret;
 	if (smmu->version < ARM_SMMU_V2) {
@@ -792,8 +767,8 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 			goto out_clear_smmu;
 	}
 
-	if (smmu_domain->non_strict)
-		pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_NON_STRICT;
+	if (smmu_domain->pgtbl_cfg.quirks)
+		pgtbl_cfg.quirks |= smmu_domain->pgtbl_cfg.quirks;
 
 	pgtbl_ops = alloc_io_pgtable_ops(fmt, &pgtbl_cfg, smmu_domain);
 	if (!pgtbl_ops) {
@@ -812,10 +787,6 @@ static int arm_smmu_init_domain_context(struct iommu_domain *domain,
 	}
 
 	domain->geometry.force_aperture = true;
-
-	/* Enable translation for non-identity context banks */
-	if (domain->type != IOMMU_DOMAIN_IDENTITY)
-		cfg->m = true;
 
 	/* Initialise the context bank with our page table cfg */
 	arm_smmu_init_context_bank(smmu_domain, &pgtbl_cfg);
@@ -942,9 +913,16 @@ static void arm_smmu_write_smr(struct arm_smmu_device *smmu, int idx)
 static void arm_smmu_write_s2cr(struct arm_smmu_device *smmu, int idx)
 {
 	struct arm_smmu_s2cr *s2cr = smmu->s2crs + idx;
-	u32 reg = FIELD_PREP(ARM_SMMU_S2CR_TYPE, s2cr->type) |
-		  FIELD_PREP(ARM_SMMU_S2CR_CBNDX, s2cr->cbndx) |
-		  FIELD_PREP(ARM_SMMU_S2CR_PRIVCFG, s2cr->privcfg);
+	u32 reg;
+
+	if (smmu->impl && smmu->impl->write_s2cr) {
+		smmu->impl->write_s2cr(smmu, idx);
+		return;
+	}
+
+	reg = FIELD_PREP(ARM_SMMU_S2CR_TYPE, s2cr->type) |
+	      FIELD_PREP(ARM_SMMU_S2CR_CBNDX, s2cr->cbndx) |
+	      FIELD_PREP(ARM_SMMU_S2CR_PRIVCFG, s2cr->privcfg);
 
 	if (smmu->features & ARM_SMMU_FEAT_EXIDS && smmu->smrs &&
 	    smmu->smrs[idx].valid)
@@ -1514,15 +1492,24 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
 		case DOMAIN_ATTR_NESTING:
 			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
 			return 0;
+		case DOMAIN_ATTR_IO_PGTABLE_CFG: {
+			struct io_pgtable_domain_attr *pgtbl_cfg = data;
+			*pgtbl_cfg = smmu_domain->pgtbl_cfg;
+
+			return 0;
+		}
 		default:
 			return -ENODEV;
 		}
 		break;
 	case IOMMU_DOMAIN_DMA:
 		switch (attr) {
-		case DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE:
-			*(int *)data = smmu_domain->non_strict;
+		case DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE: {
+			bool non_strict = smmu_domain->pgtbl_cfg.quirks &
+					  IO_PGTABLE_QUIRK_NON_STRICT;
+			*(int *)data = non_strict;
 			return 0;
+		}
 		default:
 			return -ENODEV;
 		}
@@ -1554,6 +1541,17 @@ static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
 			else
 				smmu_domain->stage = ARM_SMMU_DOMAIN_S1;
 			break;
+		case DOMAIN_ATTR_IO_PGTABLE_CFG: {
+			struct io_pgtable_domain_attr *pgtbl_cfg = data;
+
+			if (smmu_domain->smmu) {
+				ret = -EPERM;
+				goto out_unlock;
+			}
+
+			smmu_domain->pgtbl_cfg = *pgtbl_cfg;
+			break;
+		}
 		default:
 			ret = -ENODEV;
 		}
@@ -1561,7 +1559,10 @@ static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
 	case IOMMU_DOMAIN_DMA:
 		switch (attr) {
 		case DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE:
-			smmu_domain->non_strict = *(int *)data;
+			if (*(int *)data)
+				smmu_domain->pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_NON_STRICT;
+			else
+				smmu_domain->pgtbl_cfg.quirks &= ~IO_PGTABLE_QUIRK_NON_STRICT;
 			break;
 		default:
 			ret = -ENODEV;
@@ -1924,31 +1925,6 @@ static int arm_smmu_device_cfg_probe(struct arm_smmu_device *smmu)
 	return 0;
 }
 
-struct iommu_domain *arm_smmu_alloc_identity_domain(struct arm_smmu_device *smmu)
-{
-	struct iommu_domain *identity;
-	int ret;
-
-	/* Create a IDENTITY domain to use for all inherited streams */
-	identity = arm_smmu_domain_alloc(IOMMU_DOMAIN_IDENTITY);
-	if (!identity) {
-		dev_err(smmu->dev, "failed to create identity domain\n");
-		return ERR_PTR(-ENOMEM);
-	}
-
-	identity->pgsize_bitmap = smmu->pgsize_bitmap;
-	identity->type = IOMMU_DOMAIN_IDENTITY;
-	identity->ops = &arm_smmu_ops;
-
-	ret = arm_smmu_init_domain_context(identity, smmu, NULL);
-	if (ret < 0) {
-		dev_err(smmu->dev, "failed to initialize identity domain: %d\n", ret);
-		return ERR_PTR(ret);
-	}
-
-	return identity;
-}
-
 struct arm_smmu_match_data {
 	enum arm_smmu_arch_version version;
 	enum arm_smmu_implementation model;
@@ -2207,12 +2183,6 @@ static int arm_smmu_device_probe(struct platform_device *pdev)
 	err = arm_smmu_device_cfg_probe(smmu);
 	if (err)
 		return err;
-
-	if (smmu->impl->inherit_mappings) {
-		err = smmu->impl->inherit_mappings(smmu);
-		if (err)
-			return err;
-	}
 
 	if (smmu->version == ARM_SMMU_V2) {
 		if (smmu->num_context_banks > smmu->num_context_irqs) {

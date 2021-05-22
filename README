@@ -1,3 +1,8 @@
+kernel version 5.12.x apparently needs newer a630_sqe.fw I deleted my windows install so not sure
+if it came downin updates but i grabbed from here;
+https://anduin.linuxfromscratch.org/sources/linux-firmware/qcom/
+seems to work fine for me so far
+
 This is for the qualcomm aarch64 laptop YOGA C630, with this kernel and these directions expect the following
     WORKS;
         accelerated graphics

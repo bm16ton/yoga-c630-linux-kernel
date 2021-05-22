@@ -89,7 +89,7 @@ config USB_CYTHERM
 	  Say Y here if you want to connect a Cypress USB thermometer
 	  device to your computer's USB port. This device is also known
 	  as the Cypress USB Starter kit or demo board. The Elektor
-	  magazine published a modified version of this device in issue 
+	  magazine published a modified version of this device in issue
 	  #291.
 
 	  To compile this driver as a module, choose M here: the
@@ -284,3 +284,12 @@ config USB_FT232H_INTF
 	  such as spi-ftdi-mpsse, altera-ps-spi, ftdi-fifo-fpp and
 	  fpga-mgr must be enabled in order to use the functionality of
 	  the device.
+
+config BRCM_USB_PINMAP
+	tristate "Broadcom pinmap driver support"
+	depends on (ARCH_BRCMSTB && PHY_BRCM_USB) || COMPILE_TEST
+	default ARCH_BRCMSTB && PHY_BRCM_USB
+	help
+	  This option enables support for remapping some USB external
+	  signals, which are typically on dedicated pins on the chip,
+	  to any gpio.

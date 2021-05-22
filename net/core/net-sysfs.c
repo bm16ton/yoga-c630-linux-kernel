@@ -538,6 +538,45 @@ static ssize_t phys_switch_id_show(struct device *dev,
 }
 static DEVICE_ATTR_RO(phys_switch_id);
 
+static ssize_t threaded_show(struct device *dev,
+			     struct device_attribute *attr, char *buf)
+{
+	struct net_device *netdev = to_net_dev(dev);
+	ssize_t ret = -EINVAL;
+
+	if (!rtnl_trylock())
+		return restart_syscall();
+
+	if (dev_isalive(netdev))
+		ret = sprintf(buf, fmt_dec, netdev->threaded);
+
+	rtnl_unlock();
+	return ret;
+}
+
+static int modify_napi_threaded(struct net_device *dev, unsigned long val)
+{
+	int ret;
+
+	if (list_empty(&dev->napi_list))
+		return -EOPNOTSUPP;
+
+	if (val != 0 && val != 1)
+		return -EOPNOTSUPP;
+
+	ret = dev_set_threaded(dev, val);
+
+	return ret;
+}
+
+static ssize_t threaded_store(struct device *dev,
+			      struct device_attribute *attr,
+			      const char *buf, size_t len)
+{
+	return netdev_store(dev, attr, buf, len, modify_napi_threaded);
+}
+static DEVICE_ATTR_RW(threaded);
+
 static struct attribute *net_class_attrs[] __ro_after_init = {
 	&dev_attr_netdev_group.attr,
 	&dev_attr_type.attr,
@@ -570,6 +609,7 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
 	&dev_attr_proto_down.attr,
 	&dev_attr_carrier_up_count.attr,
 	&dev_attr_carrier_down_count.attr,
+	&dev_attr_threaded.attr,
 	NULL,
 };
 ATTRIBUTE_GROUPS(net_class);
@@ -1027,7 +1067,7 @@ net_rx_queue_update_kobjects(struct net_device *dev, int old_num, int new_num)
 	while (--i >= new_num) {
 		struct kobject *kobj = &dev->_rx[i].kobj;
 
-		if (!refcount_read(&dev_net(dev)->count))
+		if (!refcount_read(&dev_net(dev)->ns.count))
 			kobj->uevent_suppress = 1;
 		if (dev->sysfs_rx_queue_group)
 			sysfs_remove_group(kobj, dev->sysfs_rx_queue_group);
@@ -1136,18 +1176,25 @@ static ssize_t traffic_class_show(struct netdev_queue *queue,
 				  char *buf)
 {
 	struct net_device *dev = queue->dev;
+	int num_tc, tc;
 	int index;
-	int tc;
 
 	if (!netif_is_multiqueue(dev))
 		return -ENOENT;
+
+	if (!rtnl_trylock())
+		return restart_syscall();
 
 	index = get_netdev_queue_index(queue);
 
 	/* If queue belongs to subordinate dev use its TC mapping */
 	dev = netdev_get_tx_queue(dev, index)->sb_dev ? : dev;
 
+	num_tc = dev->num_tc;
 	tc = netdev_txq_to_tc(dev, index);
+
+	rtnl_unlock();
+
 	if (tc < 0)
 		return -EINVAL;
 
@@ -1158,8 +1205,8 @@ static ssize_t traffic_class_show(struct netdev_queue *queue,
 	 * belongs to the root device it will be reported with just the
 	 * traffic class, so just "0" for TC 0 for example.
 	 */
-	return dev->num_tc < 0 ? sprintf(buf, "%d%d\n", tc, dev->num_tc) :
-				 sprintf(buf, "%d\n", tc);
+	return num_tc < 0 ? sprintf(buf, "%d%d\n", tc, num_tc) :
+			    sprintf(buf, "%d\n", tc);
 }
 
 #ifdef CONFIG_XPS
@@ -1646,7 +1693,7 @@ netdev_queue_update_kobjects(struct net_device *dev, int old_num, int new_num)
 	while (--i >= new_num) {
 		struct netdev_queue *queue = dev->_tx + i;
 
-		if (!refcount_read(&dev_net(dev)->count))
+		if (!refcount_read(&dev_net(dev)->ns.count))
 			queue->kobj.uevent_suppress = 1;
 #ifdef CONFIG_BQL
 		sysfs_remove_group(&queue->kobj, &dql_group);
@@ -1893,7 +1940,7 @@ void netdev_unregister_kobject(struct net_device *ndev)
 {
 	struct device *dev = &ndev->dev;
 
-	if (!refcount_read(&dev_net(ndev)->count))
+	if (!refcount_read(&dev_net(ndev)->ns.count))
 		dev_set_uevent_suppress(dev, 1);
 
 	kobject_get(&dev->kobj);

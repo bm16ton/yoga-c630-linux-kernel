@@ -11,13 +11,25 @@
 
 struct qcom_smmu {
 	struct arm_smmu_device smmu;
-	bool bypass_broken;
-	struct iommu_domain *identity;
+	bool bypass_quirk;
+	u8 bypass_cbndx;
 };
 
 static struct qcom_smmu *to_qcom_smmu(struct arm_smmu_device *smmu)
 {
 	return container_of(smmu, struct qcom_smmu, smmu);
+}
+
+static void qcom_adreno_smmu_write_sctlr(struct arm_smmu_device *smmu, int idx,
+		u32 reg)
+{
+	/*
+	 * On the GPU device we want to process subsequent transactions after a
+	 * fault to keep the GPU from hanging
+	 */
+	reg |= ARM_SMMU_SCTLR_HUPCF;
+
+	arm_smmu_cb_write(smmu, idx, ARM_SMMU_CB_SCTLR, reg);
 }
 
 #define QCOM_ADRENO_SMMU_GPU_SID 0
@@ -101,11 +113,7 @@ static int qcom_adreno_smmu_alloc_context_bank(struct arm_smmu_domain *smmu_doma
 					       struct arm_smmu_device *smmu,
 					       struct device *dev, int start)
 {
-	struct iommu_domain *domain = &smmu_domain->domain;
 	int count;
-
-	if (domain->type == IOMMU_DOMAIN_IDENTITY)
-		return ARM_SMMU_CBNDX_BYPASS;
 
 	/*
 	 * Assign context bank 0 to the GPU device so the GPU hardware can
@@ -141,12 +149,6 @@ static int qcom_adreno_smmu_init_context(struct arm_smmu_domain *smmu_domain,
 		pgtbl_cfg->quirks |= IO_PGTABLE_QUIRK_ARM_TTBR1;
 
 	/*
-	 * On the GPU device we want to process subsequent transactions after a
-	 * fault to keep the GPU from hanging
-	 */
-	smmu_domain->cfg.sctlr_set |= ARM_SMMU_SCTLR_HUPCF;
-
-	/*
 	 * Initialize private interface with GPU:
 	 */
 
@@ -164,44 +166,25 @@ static const struct of_device_id qcom_smmu_client_of_match[] __maybe_unused = {
 	{ .compatible = "qcom,mdss" },
 	{ .compatible = "qcom,sc7180-mdss" },
 	{ .compatible = "qcom,sc7180-mss-pil" },
+	{ .compatible = "qcom,sc8180x-mdss" },
 	{ .compatible = "qcom,sdm845-mdss" },
 	{ .compatible = "qcom,sdm845-mss-pil" },
 	{ }
 };
-
-static int qcom_smmu_alloc_context_bank(struct arm_smmu_domain *smmu_domain,
-					struct arm_smmu_device *smmu,
-					struct device *dev, int start)
-{
-	struct iommu_domain *domain = &smmu_domain->domain;
-	struct qcom_smmu *qsmmu = to_qcom_smmu(smmu);
-
-	/* Keep identity domains as bypass, unless bypass is broken */
-	if (domain->type == IOMMU_DOMAIN_IDENTITY && !qsmmu->bypass_broken)
-		return ARM_SMMU_CBNDX_BYPASS;
-
-	/*
-	 * The identity domain to emulate bypass is the only domain without a
-	 * dev, use the last context bank for this to avoid collisions with
-	 * active contexts during initialization.
-	 */
-	if (!dev)
-		start = smmu->num_context_banks - 1;
-
-	return __arm_smmu_alloc_bitmap(smmu->context_map, start, smmu->num_context_banks);
-}
 
 static int qcom_smmu_cfg_probe(struct arm_smmu_device *smmu)
 {
 	unsigned int last_s2cr = ARM_SMMU_GR0_S2CR(smmu->num_mapping_groups - 1);
 	struct qcom_smmu *qsmmu = to_qcom_smmu(smmu);
 	u32 reg;
+	u32 smr;
 	int i;
 
 	/*
-	 * With some firmware writes to S2CR of type FAULT are ignored, and
-	 * writing BYPASS will end up as FAULT in the register. Perform a write
-	 * to S2CR to detect if this is the case with the current firmware.
+	 * With some firmware versions writes to S2CR of type FAULT are
+	 * ignored, and writing BYPASS will end up written as FAULT in the
+	 * register. Perform a write to S2CR to detect if this is the case and
+	 * if so reserve a context bank to emulate bypass streams.
 	 */
 	reg = FIELD_PREP(ARM_SMMU_S2CR_TYPE, S2CR_TYPE_BYPASS) |
 	      FIELD_PREP(ARM_SMMU_S2CR_CBNDX, 0xff) |
@@ -209,38 +192,16 @@ static int qcom_smmu_cfg_probe(struct arm_smmu_device *smmu)
 	arm_smmu_gr0_write(smmu, last_s2cr, reg);
 	reg = arm_smmu_gr0_read(smmu, last_s2cr);
 	if (FIELD_GET(ARM_SMMU_S2CR_TYPE, reg) != S2CR_TYPE_BYPASS) {
-		qsmmu->bypass_broken = true;
+		qsmmu->bypass_quirk = true;
+		qsmmu->bypass_cbndx = smmu->num_context_banks - 1;
 
-		/*
-		 * With firmware ignoring writes of type FAULT, booting the
-		 * Linux kernel with disable_bypass disabled (i.e. "enable
-		 * bypass") the initialization during probe will leave mappings
-		 * in an inconsistent state. Avoid this by configuring all
-		 * S2CRs to BYPASS.
-		 */
-		for (i = 0; i < smmu->num_mapping_groups; i++) {
-			smmu->s2crs[i].type = S2CR_TYPE_BYPASS;
-			smmu->s2crs[i].privcfg = S2CR_PRIVCFG_DEFAULT;
-			smmu->s2crs[i].cbndx = 0xff;
-			smmu->s2crs[i].count = 0;
-		}
+		set_bit(qsmmu->bypass_cbndx, smmu->context_map);
+
+		arm_smmu_cb_write(smmu, qsmmu->bypass_cbndx, ARM_SMMU_CB_SCTLR, 0);
+
+		reg = FIELD_PREP(ARM_SMMU_CBAR_TYPE, CBAR_TYPE_S1_TRANS_S2_BYPASS);
+		arm_smmu_gr1_write(smmu, ARM_SMMU_GR1_CBAR(qsmmu->bypass_cbndx), reg);
 	}
-
-	return 0;
-}
-
-static int qcom_smmu_inherit_mappings(struct arm_smmu_device *smmu)
-{
-	struct qcom_smmu *qsmmu = to_qcom_smmu(smmu);
-	int cbndx;
-	u32 smr;
-	int i;
-
-	qsmmu->identity = arm_smmu_alloc_identity_domain(smmu);
-	if (IS_ERR(qsmmu->identity))
-		return PTR_ERR(qsmmu->identity);
-
-	cbndx = to_smmu_domain(qsmmu->identity)->cfg.cbndx;
 
 	for (i = 0; i < smmu->num_mapping_groups; i++) {
 		smr = arm_smmu_gr0_read(smmu, ARM_SMMU_GR0_SMR(i));
@@ -252,14 +213,48 @@ static int qcom_smmu_inherit_mappings(struct arm_smmu_device *smmu)
 			smmu->smrs[i].mask = FIELD_GET(ARM_SMMU_SMR_MASK, smr);
 			smmu->smrs[i].valid = true;
 
-			smmu->s2crs[i].type = S2CR_TYPE_TRANS;
+			smmu->s2crs[i].type = S2CR_TYPE_BYPASS;
 			smmu->s2crs[i].privcfg = S2CR_PRIVCFG_DEFAULT;
-			smmu->s2crs[i].cbndx = cbndx;
-			smmu->s2crs[i].count++;
+			smmu->s2crs[i].cbndx = 0xff;
 		}
 	}
 
 	return 0;
+}
+
+static void qcom_smmu_write_s2cr(struct arm_smmu_device *smmu, int idx)
+{
+	struct arm_smmu_s2cr *s2cr = smmu->s2crs + idx;
+	struct qcom_smmu *qsmmu = to_qcom_smmu(smmu);
+	u32 cbndx = s2cr->cbndx;
+	u32 type = s2cr->type;
+	u32 reg;
+
+	if (qsmmu->bypass_quirk) {
+		if (type == S2CR_TYPE_BYPASS) {
+			/*
+			 * Firmware with quirky S2CR handling will substitute
+			 * BYPASS writes with FAULT, so point the stream to the
+			 * reserved context bank and ask for translation on the
+			 * stream
+			 */
+			type = S2CR_TYPE_TRANS;
+			cbndx = qsmmu->bypass_cbndx;
+		} else if (type == S2CR_TYPE_FAULT) {
+			/*
+			 * Firmware with quirky S2CR handling will ignore FAULT
+			 * writes, so trick it to write FAULT by asking for a
+			 * BYPASS.
+			 */
+			type = S2CR_TYPE_BYPASS;
+			cbndx = 0xff;
+		}
+	}
+
+	reg = FIELD_PREP(ARM_SMMU_S2CR_TYPE, type) |
+	      FIELD_PREP(ARM_SMMU_S2CR_CBNDX, cbndx) |
+	      FIELD_PREP(ARM_SMMU_S2CR_PRIVCFG, s2cr->privcfg);
+	arm_smmu_gr0_write(smmu, ARM_SMMU_GR0_S2CR(idx), reg);
 }
 
 static int qcom_smmu_def_domain_type(struct device *dev)
@@ -300,11 +295,10 @@ static int qcom_smmu500_reset(struct arm_smmu_device *smmu)
 }
 
 static const struct arm_smmu_impl qcom_smmu_impl = {
-	.alloc_context_bank = qcom_smmu_alloc_context_bank,
 	.cfg_probe = qcom_smmu_cfg_probe,
 	.def_domain_type = qcom_smmu_def_domain_type,
 	.reset = qcom_smmu500_reset,
-	.inherit_mappings = qcom_smmu_inherit_mappings,
+	.write_s2cr = qcom_smmu_write_s2cr,
 };
 
 static const struct arm_smmu_impl qcom_adreno_smmu_impl = {
@@ -312,6 +306,7 @@ static const struct arm_smmu_impl qcom_adreno_smmu_impl = {
 	.def_domain_type = qcom_smmu_def_domain_type,
 	.reset = qcom_smmu500_reset,
 	.alloc_context_bank = qcom_adreno_smmu_alloc_context_bank,
+	.write_sctlr = qcom_adreno_smmu_write_sctlr,
 };
 
 static struct arm_smmu_device *qcom_smmu_create(struct arm_smmu_device *smmu,
@@ -323,24 +318,36 @@ static struct arm_smmu_device *qcom_smmu_create(struct arm_smmu_device *smmu,
 	if (!qcom_scm_is_available())
 		return ERR_PTR(-EPROBE_DEFER);
 
-	qsmmu = devm_kzalloc(smmu->dev, sizeof(*qsmmu), GFP_KERNEL);
+	qsmmu = devm_krealloc(smmu->dev, smmu, sizeof(*qsmmu), GFP_KERNEL);
 	if (!qsmmu)
 		return ERR_PTR(-ENOMEM);
 
-	qsmmu->smmu = *smmu;
-
 	qsmmu->smmu.impl = impl;
-	devm_kfree(smmu->dev, smmu);
 
 	return &qsmmu->smmu;
 }
 
+static const struct of_device_id __maybe_unused qcom_smmu_impl_of_match[] = {
+	{ .compatible = "qcom,msm8998-smmu-v2" },
+	{ .compatible = "qcom,sc7180-smmu-500" },
+	{ .compatible = "qcom,sc8180x-smmu-500" },
+	{ .compatible = "qcom,sdm630-smmu-v2" },
+	{ .compatible = "qcom,sdm845-smmu-500" },
+	{ .compatible = "qcom,sm8150-smmu-500" },
+	{ .compatible = "qcom,sm8250-smmu-500" },
+	{ .compatible = "qcom,sm8350-smmu-500" },
+	{ }
+};
+
 struct arm_smmu_device *qcom_smmu_impl_init(struct arm_smmu_device *smmu)
 {
-	return qcom_smmu_create(smmu, &qcom_smmu_impl);
-}
+	const struct device_node *np = smmu->dev->of_node;
 
-struct arm_smmu_device *qcom_adreno_smmu_impl_init(struct arm_smmu_device *smmu)
-{
-	return qcom_smmu_create(smmu, &qcom_adreno_smmu_impl);
+	if (of_match_node(qcom_smmu_impl_of_match, np))
+		return qcom_smmu_create(smmu, &qcom_smmu_impl);
+
+	if (of_device_is_compatible(np, "qcom,adreno-smmu"))
+		return qcom_smmu_create(smmu, &qcom_adreno_smmu_impl);
+
+	return smmu;
 }

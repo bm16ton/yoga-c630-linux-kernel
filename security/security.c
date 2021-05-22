@@ -65,6 +65,7 @@ const char *const lockdown_reasons[LOCKDOWN_CONFIDENTIALITY_MAX+1] = {
 	[LOCKDOWN_PERF] = "unsafe use of perf",
 	[LOCKDOWN_TRACEFS] = "use of tracefs",
 	[LOCKDOWN_XMON_RW] = "xmon read and write access",
+	[LOCKDOWN_XFRM_SECRET] = "xfrm SA secret",
 	[LOCKDOWN_CONFIDENTIALITY_MAX] = "confidentiality",
 };
 
@@ -1058,6 +1059,14 @@ out:
 }
 EXPORT_SYMBOL(security_inode_init_security);
 
+int security_inode_init_security_anon(struct inode *inode,
+				      const struct qstr *name,
+				      const struct inode *context_inode)
+{
+	return call_int_hook(inode_init_security_anon, 0, inode, name,
+			     context_inode);
+}
+
 int security_old_inode_init_security(struct inode *inode, struct inode *dir,
 				     const struct qstr *qstr, const char **name,
 				     void **value, size_t *len)
@@ -1279,7 +1288,8 @@ int security_inode_getattr(const struct path *path)
 	return call_int_hook(inode_getattr, 0, path);
 }
 
-int security_inode_setxattr(struct dentry *dentry, const char *name,
+int security_inode_setxattr(struct user_namespace *mnt_userns,
+			    struct dentry *dentry, const char *name,
 			    const void *value, size_t size, int flags)
 {
 	int ret;
@@ -1290,8 +1300,8 @@ int security_inode_setxattr(struct dentry *dentry, const char *name,
 	 * SELinux and Smack integrate the cap call,
 	 * so assume that all LSMs supplying this call do so.
 	 */
-	ret = call_int_hook(inode_setxattr, 1, dentry, name, value, size,
-				flags);
+	ret = call_int_hook(inode_setxattr, 1, mnt_userns, dentry, name, value,
+			    size, flags);
 
 	if (ret == 1)
 		ret = cap_inode_setxattr(dentry, name, value, size, flags);
@@ -1326,7 +1336,8 @@ int security_inode_listxattr(struct dentry *dentry)
 	return call_int_hook(inode_listxattr, 0, dentry);
 }
 
-int security_inode_removexattr(struct dentry *dentry, const char *name)
+int security_inode_removexattr(struct user_namespace *mnt_userns,
+			       struct dentry *dentry, const char *name)
 {
 	int ret;
 
@@ -1336,9 +1347,9 @@ int security_inode_removexattr(struct dentry *dentry, const char *name)
 	 * SELinux and Smack integrate the cap call,
 	 * so assume that all LSMs supplying this call do so.
 	 */
-	ret = call_int_hook(inode_removexattr, 1, dentry, name);
+	ret = call_int_hook(inode_removexattr, 1, mnt_userns, dentry, name);
 	if (ret == 1)
-		ret = cap_inode_removexattr(dentry, name);
+		ret = cap_inode_removexattr(mnt_userns, dentry, name);
 	if (ret)
 		return ret;
 	ret = ima_inode_removexattr(dentry, name);
@@ -1352,12 +1363,15 @@ int security_inode_need_killpriv(struct dentry *dentry)
 	return call_int_hook(inode_need_killpriv, 0, dentry);
 }
 
-int security_inode_killpriv(struct dentry *dentry)
+int security_inode_killpriv(struct user_namespace *mnt_userns,
+			    struct dentry *dentry)
 {
-	return call_int_hook(inode_killpriv, 0, dentry);
+	return call_int_hook(inode_killpriv, 0, mnt_userns, dentry);
 }
 
-int security_inode_getsecurity(struct inode *inode, const char *name, void **buffer, bool alloc)
+int security_inode_getsecurity(struct user_namespace *mnt_userns,
+			       struct inode *inode, const char *name,
+			       void **buffer, bool alloc)
 {
 	struct security_hook_list *hp;
 	int rc;
@@ -1368,7 +1382,7 @@ int security_inode_getsecurity(struct inode *inode, const char *name, void **buf
 	 * Only one module will provide an attribute with a given name.
 	 */
 	hlist_for_each_entry(hp, &security_hook_heads.inode_getsecurity, list) {
-		rc = hp->hook.inode_getsecurity(inode, name, buffer, alloc);
+		rc = hp->hook.inode_getsecurity(mnt_userns, inode, name, buffer, alloc);
 		if (rc != LSM_RET_DEFAULT(inode_getsecurity))
 			return rc;
 	}
@@ -2207,15 +2221,16 @@ void security_sk_clone(const struct sock *sk, struct sock *newsk)
 }
 EXPORT_SYMBOL(security_sk_clone);
 
-void security_sk_classify_flow(struct sock *sk, struct flowi *fl)
+void security_sk_classify_flow(struct sock *sk, struct flowi_common *flic)
 {
-	call_void_hook(sk_getsecid, sk, &fl->flowi_secid);
+	call_void_hook(sk_getsecid, sk, &flic->flowic_secid);
 }
 EXPORT_SYMBOL(security_sk_classify_flow);
 
-void security_req_classify_flow(const struct request_sock *req, struct flowi *fl)
+void security_req_classify_flow(const struct request_sock *req,
+				struct flowi_common *flic)
 {
-	call_void_hook(req_classify_flow, req, fl);
+	call_void_hook(req_classify_flow, req, flic);
 }
 EXPORT_SYMBOL(security_req_classify_flow);
 
@@ -2225,7 +2240,7 @@ void security_sock_graft(struct sock *sk, struct socket *parent)
 }
 EXPORT_SYMBOL(security_sock_graft);
 
-int security_inet_conn_request(struct sock *sk,
+int security_inet_conn_request(const struct sock *sk,
 			struct sk_buff *skb, struct request_sock *req)
 {
 	return call_int_hook(inet_conn_request, 0, sk, skb, req);
@@ -2407,7 +2422,7 @@ int security_xfrm_policy_lookup(struct xfrm_sec_ctx *ctx, u32 fl_secid, u8 dir)
 
 int security_xfrm_state_pol_flow_match(struct xfrm_state *x,
 				       struct xfrm_policy *xp,
-				       const struct flowi *fl)
+				       const struct flowi_common *flic)
 {
 	struct security_hook_list *hp;
 	int rc = LSM_RET_DEFAULT(xfrm_state_pol_flow_match);
@@ -2423,7 +2438,7 @@ int security_xfrm_state_pol_flow_match(struct xfrm_state *x,
 	 */
 	hlist_for_each_entry(hp, &security_hook_heads.xfrm_state_pol_flow_match,
 				list) {
-		rc = hp->hook.xfrm_state_pol_flow_match(x, xp, fl);
+		rc = hp->hook.xfrm_state_pol_flow_match(x, xp, flic);
 		break;
 	}
 	return rc;
@@ -2434,9 +2449,9 @@ int security_xfrm_decode_session(struct sk_buff *skb, u32 *secid)
 	return call_int_hook(xfrm_decode_session, 0, skb, secid, 1);
 }
 
-void security_skb_classify_flow(struct sk_buff *skb, struct flowi *fl)
+void security_skb_classify_flow(struct sk_buff *skb, struct flowi_common *flic)
 {
-	int rc = call_int_hook(xfrm_decode_session, 0, skb, &fl->flowi_secid,
+	int rc = call_int_hook(xfrm_decode_session, 0, skb, &flic->flowic_secid,
 				0);
 
 	BUG_ON(rc);

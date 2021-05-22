@@ -108,14 +108,9 @@ static void trace_hwlat_sample(struct hwlat_sample *sample)
 	struct trace_buffer *buffer = tr->array_buffer.buffer;
 	struct ring_buffer_event *event;
 	struct hwlat_entry *entry;
-	unsigned long flags;
-	int pc;
-
-	pc = preempt_count();
-	local_save_flags(flags);
 
 	event = trace_buffer_lock_reserve(buffer, TRACE_HWLAT, sizeof(*entry),
-					  flags, pc);
+					  tracing_gen_ctx());
 	if (!event)
 		return;
 	entry	= ring_buffer_event_data(event);
@@ -485,11 +480,11 @@ hwlat_width_write(struct file *filp, const char __user *ubuf,
  * @ppos: The current position in @file
  *
  * This function provides a write implementation for the "window" interface
- * to the hardware latency detetector. The window is the total time
+ * to the hardware latency detector. The window is the total time
  * in us that will be considered one sample period. Conceptually, windows
  * occur back-to-back and contain a sample width period during which
  * actual sampling occurs. Can be used to write a new total window size. It
- * is enfoced that any value written must be greater than the sample width
+ * is enforced that any value written must be greater than the sample width
  * size, or an error results.
  */
 static ssize_t

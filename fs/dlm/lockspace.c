@@ -404,12 +404,6 @@ static int threads_start(void)
 	return error;
 }
 
-static void threads_stop(void)
-{
-	dlm_scand_stop();
-	dlm_lowcomms_stop();
-}
-
 static int new_lockspace(const char *name, const char *cluster,
 			 uint32_t flags, int lvblen,
 			 const struct dlm_lockspace_ops *ops, void *ops_arg,
@@ -572,7 +566,7 @@ static int new_lockspace(const char *name, const char *cluster,
 	mutex_init(&ls->ls_requestqueue_mutex);
 	mutex_init(&ls->ls_clear_proc_locks);
 
-	ls->ls_recover_buf = kmalloc(dlm_config.ci_buffer_size, GFP_NOFS);
+	ls->ls_recover_buf = kmalloc(LOWCOMMS_MAX_TX_BUFFER_LEN, GFP_NOFS);
 	if (!ls->ls_recover_buf)
 		goto out_lkbidr;
 
@@ -702,8 +696,11 @@ int dlm_new_lockspace(const char *name, const char *cluster,
 		ls_count++;
 	if (error > 0)
 		error = 0;
-	if (!ls_count)
-		threads_stop();
+	if (!ls_count) {
+		dlm_scand_stop();
+		dlm_lowcomms_shutdown();
+		dlm_lowcomms_stop();
+	}
  out:
 	mutex_unlock(&ls_lock);
 	return error;
@@ -787,6 +784,11 @@ static int release_lockspace(struct dlm_ls *ls, int force)
 		do_uevent(ls, 0);
 
 	dlm_recoverd_stop(ls);
+
+	if (ls_count == 1) {
+		dlm_scand_stop();
+		dlm_lowcomms_shutdown();
+	}
 
 	dlm_callback_stop(ls);
 
@@ -880,7 +882,7 @@ int dlm_release_lockspace(void *lockspace, int force)
 	if (!error)
 		ls_count--;
 	if (!ls_count)
-		threads_stop();
+		dlm_lowcomms_stop();
 	mutex_unlock(&ls_lock);
 
 	return error;

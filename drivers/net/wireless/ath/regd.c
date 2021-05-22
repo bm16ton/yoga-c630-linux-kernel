@@ -376,6 +376,7 @@ ath_reg_apply_beaconing_flags(struct wiphy *wiphy,
 /**
  * ath_reg_apply_ir_flags()
  * @wiphy: the wiphy to use
+ * @reg: regulatory structure - used for country selection
  * @initiator: the regulatory hint initiator
  *
  * If no country IE has been received always enable passive scan
@@ -576,7 +577,7 @@ void ath_reg_notifier_apply(struct wiphy *wiphy,
 	/* Prevent broken CTLs from being applied */
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD) &&
 	    reg->regpair != common->reg_world_copy.regpair)
-		reg->regpair = ath_get_regpair(FCC3_FCCA);
+		reg->regpair = ath_get_regpair(WOR0_WORLD);
 }
 EXPORT_SYMBOL(ath_reg_notifier_apply);
 
@@ -715,7 +716,7 @@ static void ath_regd_sanitize(struct ath_regulatory *reg)
 	if (reg->current_rd != COUNTRY_ERD_FLAG)
 		return;
 	printk(KERN_DEBUG "ath: EEPROM regdomain sanitized\n");
-	reg->current_rd = 0x3A;
+	reg->current_rd = 0x64;
 }
 
 static int __ath_regd_init(struct ath_regulatory *reg)

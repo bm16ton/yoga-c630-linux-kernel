@@ -284,6 +284,7 @@ static void ib_device_check_mandatory(struct ib_device *device)
 		IB_MANDATORY_FUNC(poll_cq),
 		IB_MANDATORY_FUNC(req_notify_cq),
 		IB_MANDATORY_FUNC(get_dma_mr),
+		IB_MANDATORY_FUNC(reg_user_mr),
 		IB_MANDATORY_FUNC(dereg_mr),
 		IB_MANDATORY_FUNC(get_port_immutable)
 	};
@@ -569,6 +570,7 @@ static void rdma_init_coredev(struct ib_core_device *coredev,
 struct ib_device *_ib_alloc_device(size_t size)
 {
 	struct ib_device *device;
+	unsigned int i;
 
 	if (WARN_ON(size < sizeof(struct ib_device)))
 		return NULL;
@@ -600,6 +602,41 @@ struct ib_device *_ib_alloc_device(size_t size)
 	init_completion(&device->unreg_completion);
 	INIT_WORK(&device->unregistration_work, ib_unregister_work);
 
+	spin_lock_init(&device->cq_pools_lock);
+	for (i = 0; i < ARRAY_SIZE(device->cq_pools); i++)
+		INIT_LIST_HEAD(&device->cq_pools[i]);
+
+	device->uverbs_cmd_mask =
+		BIT_ULL(IB_USER_VERBS_CMD_ALLOC_MW) |
+		BIT_ULL(IB_USER_VERBS_CMD_ALLOC_PD) |
+		BIT_ULL(IB_USER_VERBS_CMD_ATTACH_MCAST) |
+		BIT_ULL(IB_USER_VERBS_CMD_CLOSE_XRCD) |
+		BIT_ULL(IB_USER_VERBS_CMD_CREATE_AH) |
+		BIT_ULL(IB_USER_VERBS_CMD_CREATE_COMP_CHANNEL) |
+		BIT_ULL(IB_USER_VERBS_CMD_CREATE_CQ) |
+		BIT_ULL(IB_USER_VERBS_CMD_CREATE_QP) |
+		BIT_ULL(IB_USER_VERBS_CMD_CREATE_SRQ) |
+		BIT_ULL(IB_USER_VERBS_CMD_CREATE_XSRQ) |
+		BIT_ULL(IB_USER_VERBS_CMD_DEALLOC_MW) |
+		BIT_ULL(IB_USER_VERBS_CMD_DEALLOC_PD) |
+		BIT_ULL(IB_USER_VERBS_CMD_DEREG_MR) |
+		BIT_ULL(IB_USER_VERBS_CMD_DESTROY_AH) |
+		BIT_ULL(IB_USER_VERBS_CMD_DESTROY_CQ) |
+		BIT_ULL(IB_USER_VERBS_CMD_DESTROY_QP) |
+		BIT_ULL(IB_USER_VERBS_CMD_DESTROY_SRQ) |
+		BIT_ULL(IB_USER_VERBS_CMD_DETACH_MCAST) |
+		BIT_ULL(IB_USER_VERBS_CMD_GET_CONTEXT) |
+		BIT_ULL(IB_USER_VERBS_CMD_MODIFY_QP) |
+		BIT_ULL(IB_USER_VERBS_CMD_MODIFY_SRQ) |
+		BIT_ULL(IB_USER_VERBS_CMD_OPEN_QP) |
+		BIT_ULL(IB_USER_VERBS_CMD_OPEN_XRCD) |
+		BIT_ULL(IB_USER_VERBS_CMD_QUERY_DEVICE) |
+		BIT_ULL(IB_USER_VERBS_CMD_QUERY_PORT) |
+		BIT_ULL(IB_USER_VERBS_CMD_QUERY_QP) |
+		BIT_ULL(IB_USER_VERBS_CMD_QUERY_SRQ) |
+		BIT_ULL(IB_USER_VERBS_CMD_REG_MR) |
+		BIT_ULL(IB_USER_VERBS_CMD_REREG_MR) |
+		BIT_ULL(IB_USER_VERBS_CMD_RESIZE_CQ);
 	return device;
 }
 EXPORT_SYMBOL(_ib_alloc_device);
@@ -810,6 +847,20 @@ static int setup_port_data(struct ib_device *device)
 	}
 	return 0;
 }
+
+/**
+ * ib_port_immutable_read() - Read rdma port's immutable data
+ * @dev: IB device
+ * @port: port number whose immutable data to read. It starts with index 1 and
+ *        valid upto including rdma_end_port().
+ */
+const struct ib_port_immutable*
+ib_port_immutable_read(struct ib_device *dev, unsigned int port)
+{
+	WARN_ON(!rdma_is_port_valid(dev, port));
+	return &dev->port_data[port].immutable;
+}
+EXPORT_SYMBOL(ib_port_immutable_read);
 
 void ib_get_device_fw_str(struct ib_device *dev, char *str)
 {
@@ -1230,7 +1281,7 @@ static void disable_device(struct ib_device *device)
 		remove_client_context(device, cid);
 	}
 
-	ib_cq_pool_destroy(device);
+	ib_cq_pool_cleanup(device);
 
 	/* Pairs with refcount_set in enable_device */
 	ib_device_put(device);
@@ -1274,8 +1325,6 @@ static int enable_device_and_get(struct ib_device *device)
 		if (ret)
 			goto out;
 	}
-
-	ib_cq_pool_init(device);
 
 	down_read(&clients_rwsem);
 	xa_for_each_marked (&clients, index, client, CLIENT_REGISTERED) {
@@ -1852,9 +1901,9 @@ static int __ib_get_client_nl_info(struct ib_device *ibdev,
 
 /**
  * ib_get_client_nl_info - Fetch the nl_info from a client
- * @device - IB device
- * @client_name - Name of the client
- * @res - Result of the query
+ * @ibdev: IB device
+ * @client_name: Name of the client
+ * @res: Result of the query
  */
 int ib_get_client_nl_info(struct ib_device *ibdev, const char *client_name,
 			  struct ib_client_nl_info *res)
@@ -2282,7 +2331,7 @@ void ib_enum_all_roce_netdevs(roce_netdev_filter filter,
 	up_read(&devices_rwsem);
 }
 
-/**
+/*
  * ib_enum_all_devs - enumerate all ib_devices
  * @cb: Callback to call for each found ib_device
  *
@@ -2565,6 +2614,7 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, create_qp);
 	SET_DEVICE_OP(dev_ops, create_rwq_ind_table);
 	SET_DEVICE_OP(dev_ops, create_srq);
+	SET_DEVICE_OP(dev_ops, create_user_ah);
 	SET_DEVICE_OP(dev_ops, create_wq);
 	SET_DEVICE_OP(dev_ops, dealloc_dm);
 	SET_DEVICE_OP(dev_ops, dealloc_driver);
@@ -2645,6 +2695,7 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, read_counters);
 	SET_DEVICE_OP(dev_ops, reg_dm_mr);
 	SET_DEVICE_OP(dev_ops, reg_user_mr);
+	SET_DEVICE_OP(dev_ops, reg_user_mr_dmabuf);
 	SET_DEVICE_OP(dev_ops, req_ncomp_notif);
 	SET_DEVICE_OP(dev_ops, req_notify_cq);
 	SET_DEVICE_OP(dev_ops, rereg_user_mr);

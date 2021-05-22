@@ -243,8 +243,6 @@ enum arm_smmu_cbar_type {
 #define TLB_LOOP_TIMEOUT		1000000	/* 1s! */
 #define TLB_SPIN_COUNT			10
 
-#define ARM_SMMU_CBNDX_BYPASS		0xffff
-
 /* Shared driver definitions */
 enum arm_smmu_arch_version {
 	ARM_SMMU_V1,
@@ -344,11 +342,8 @@ struct arm_smmu_cfg {
 		u16			asid;
 		u16			vmid;
 	};
-	u32				sctlr_set;    /* extra bits to set in SCTLR */
-	u32				sctlr_clr;    /* bits to mask in SCTLR */
 	enum arm_smmu_cbar_type		cbar;
 	enum arm_smmu_context_fmt	fmt;
-	bool				m;
 };
 #define ARM_SMMU_INVALID_IRPTNDX	0xff
 
@@ -369,19 +364,14 @@ enum arm_smmu_domain_stage {
 struct arm_smmu_domain {
 	struct arm_smmu_device		*smmu;
 	struct io_pgtable_ops		*pgtbl_ops;
+	struct io_pgtable_domain_attr	pgtbl_cfg;
 	const struct iommu_flush_ops	*flush_ops;
 	struct arm_smmu_cfg		cfg;
 	enum arm_smmu_domain_stage	stage;
-	bool				non_strict;
 	struct mutex			init_mutex; /* Protects smmu pointer */
 	spinlock_t			cb_lock; /* Serialises ATS1* ops and TLB syncs */
 	struct iommu_domain		domain;
 };
-
-static inline struct arm_smmu_domain *to_smmu_domain(struct iommu_domain *dom)
-{
-	return container_of(dom, struct arm_smmu_domain, domain);
-}
 
 struct arm_smmu_master_cfg {
 	struct arm_smmu_device		*smmu;
@@ -447,7 +437,8 @@ struct arm_smmu_impl {
 	int (*alloc_context_bank)(struct arm_smmu_domain *smmu_domain,
 				  struct arm_smmu_device *smmu,
 				  struct device *dev, int start);
-	int (*inherit_mappings)(struct arm_smmu_device *smmu);
+	void (*write_s2cr)(struct arm_smmu_device *smmu, int idx);
+	void (*write_sctlr)(struct arm_smmu_device *smmu, int idx, u32 reg);
 };
 
 #define INVALID_SMENDX			-1
@@ -532,11 +523,8 @@ static inline void arm_smmu_writeq(struct arm_smmu_device *smmu, int page,
 struct arm_smmu_device *arm_smmu_impl_init(struct arm_smmu_device *smmu);
 struct arm_smmu_device *nvidia_smmu_impl_init(struct arm_smmu_device *smmu);
 struct arm_smmu_device *qcom_smmu_impl_init(struct arm_smmu_device *smmu);
-struct arm_smmu_device *qcom_adreno_smmu_impl_init(struct arm_smmu_device *smmu);
 
 void arm_smmu_write_context_bank(struct arm_smmu_device *smmu, int idx);
 int arm_mmu500_reset(struct arm_smmu_device *smmu);
-
-struct iommu_domain *arm_smmu_alloc_identity_domain(struct arm_smmu_device *smmu);
 
 #endif /* _ARM_SMMU_H */

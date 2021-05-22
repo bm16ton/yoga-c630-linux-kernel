@@ -20,7 +20,6 @@
 #include <linux/slab.h>
 #include <linux/scatterlist.h>
 #include <linux/sizes.h>
-#include <linux/swiotlb.h>
 #include <linux/regulator/consumer.h>
 #include <linux/pm_runtime.h>
 #include <linux/of.h>
@@ -3996,10 +3995,10 @@ void __sdhci_read_caps(struct sdhci_host *host, const u16 *ver,
 	if (host->v4_mode)
 		sdhci_do_enable_v4_mode(host);
 
-	device_property_read_u64_array(mmc_dev(host->mmc),
-				       "sdhci-caps-mask", &dt_caps_mask, 1);
-	device_property_read_u64_array(mmc_dev(host->mmc),
-				       "sdhci-caps", &dt_caps, 1);
+	device_property_read_u64(mmc_dev(host->mmc),
+				 "sdhci-caps-mask", &dt_caps_mask);
+	device_property_read_u64(mmc_dev(host->mmc),
+				 "sdhci-caps", &dt_caps);
 
 	v = ver ? *ver : sdhci_readw(host, SDHCI_HOST_VERSION);
 	host->version = (v & SDHCI_SPEC_VER_MASK) >> SDHCI_SPEC_VER_SHIFT;
@@ -4584,12 +4583,8 @@ int sdhci_setup_host(struct sdhci_host *host)
 		mmc->max_segs = SDHCI_MAX_SEGS;
 	} else if (host->flags & SDHCI_USE_SDMA) {
 		mmc->max_segs = 1;
-		if (swiotlb_max_segment()) {
-			unsigned int max_req_size = (1 << IO_TLB_SHIFT) *
-						IO_TLB_SEGSIZE;
-			mmc->max_req_size = min(mmc->max_req_size,
-						max_req_size);
-		}
+		mmc->max_req_size = min_t(size_t, mmc->max_req_size,
+					  dma_max_mapping_size(mmc_dev(mmc)));
 	} else { /* PIO */
 		mmc->max_segs = SDHCI_MAX_SEGS;
 	}

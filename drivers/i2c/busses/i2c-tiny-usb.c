@@ -36,11 +36,6 @@ module_param(delay, ushort, 0);
 MODULE_PARM_DESC(delay, "bit delay in microseconds "
 		 "(default is 10us for 100kHz max)");
 
-#define MAX_OPTIONAL_I2C_DEVICES 8
-static char *opt_devices[MAX_OPTIONAL_I2C_DEVICES];
-module_param_array_named(devices, opt_devices, charp, NULL, 0);
-MODULE_PARM_DESC(devices, "devname1@adr1,devname2@adr2,... (e.g. ds1307@0x68)");
-
 static int usb_read(struct i2c_adapter *adapter, int cmd,
 		    int value, int index, void *data, int len);
 
@@ -220,42 +215,6 @@ static void i2c_tiny_usb_free(struct i2c_tiny_usb *dev)
 	kfree(dev);
 }
 
-static void i2c_add_optional_devices(struct i2c_adapter *adapter)
-{
-	int i;
-	struct i2c_board_info i2c_info;
-	uint addr;
-	const char *at;
-
-	for (i = 0; opt_devices[i]; ++i) {
-		at = strchr(opt_devices[i], '@');
-		if (at++ == NULL) {
-			dev_warn(&adapter->dev,
-				"address needed in device definition '%s'\n",
-				opt_devices[i]);
-			continue;
-		}
-		if (kstrtouint(at, 0, &addr) || addr >= I2C_CLIENT_END) {
-			dev_warn(&adapter->dev,
-				"wrong address in device definition '%s'\n",
-				opt_devices[i]);
-			continue;
-		}
-		memset(&i2c_info, 0, sizeof(struct i2c_board_info));
-		strlcpy(i2c_info.type, opt_devices[i],
-			min(I2C_NAME_SIZE, (int)(at-opt_devices[i])));
-		i2c_info.addr = addr;
-		if (i2c_new_client_device(adapter, &i2c_info) != NULL)
-			dev_info(&adapter->dev,
-				"device %s at address 0x%02x registered\n",
-				i2c_info.type, addr);
-		else
-			dev_warn(&adapter->dev,
-				"device %s at address 0x%02x not found\n",
-				i2c_info.type, addr);
-	}
-}
-
 static int i2c_tiny_usb_probe(struct usb_interface *interface,
 			      const struct usb_device_id *id)
 {
@@ -307,9 +266,6 @@ static int i2c_tiny_usb_probe(struct usb_interface *interface,
 
 	/* inform user about successful attachment to i2c layer */
 	dev_info(&dev->adapter.dev, "connected i2c-tiny-usb device\n");
-
-	/* add optional devices */
-	i2c_add_optional_devices(&dev->adapter);
 
 	return 0;
 

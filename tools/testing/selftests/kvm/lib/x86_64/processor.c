@@ -5,8 +5,6 @@
  * Copyright (C) 2018, Google LLC.
  */
 
-#define _GNU_SOURCE /* for program_invocation_name */
-
 #include "test_util.h"
 #include "kvm_util.h"
 #include "../kvm_util_internal.h"
@@ -672,6 +670,83 @@ struct kvm_cpuid2 *kvm_get_supported_cpuid(void)
 }
 
 /*
+ * KVM Get MSR
+ *
+ * Input Args:
+ *   msr_index - Index of MSR
+ *
+ * Output Args: None
+ *
+ * Return: On success, value of the MSR. On failure a TEST_ASSERT is produced.
+ *
+ * Get value of MSR for VCPU.
+ */
+uint64_t kvm_get_feature_msr(uint64_t msr_index)
+{
+	struct {
+		struct kvm_msrs header;
+		struct kvm_msr_entry entry;
+	} buffer = {};
+	int r, kvm_fd;
+
+	buffer.header.nmsrs = 1;
+	buffer.entry.index = msr_index;
+	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+	if (kvm_fd < 0)
+		exit(KSFT_SKIP);
+
+	r = ioctl(kvm_fd, KVM_GET_MSRS, &buffer.header);
+	TEST_ASSERT(r == 1, "KVM_GET_MSRS IOCTL failed,\n"
+		"  rc: %i errno: %i", r, errno);
+
+	close(kvm_fd);
+	return buffer.entry.data;
+}
+
+/*
+ * VM VCPU CPUID Set
+ *
+ * Input Args:
+ *   vm - Virtual Machine
+ *   vcpuid - VCPU id
+ *
+ * Output Args: None
+ *
+ * Return: KVM CPUID (KVM_GET_CPUID2)
+ *
+ * Set the VCPU's CPUID.
+ */
+struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid)
+{
+	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+	struct kvm_cpuid2 *cpuid;
+	int max_ent;
+	int rc = -1;
+
+	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+
+	cpuid = allocate_kvm_cpuid2();
+	max_ent = cpuid->nent;
+
+	for (cpuid->nent = 1; cpuid->nent <= max_ent; cpuid->nent++) {
+		rc = ioctl(vcpu->fd, KVM_GET_CPUID2, cpuid);
+		if (!rc)
+			break;
+
+		TEST_ASSERT(rc == -1 && errno == E2BIG,
+			    "KVM_GET_CPUID2 should either succeed or give E2BIG: %d %d",
+			    rc, errno);
+	}
+
+	TEST_ASSERT(rc == 0, "KVM_GET_CPUID2 failed, rc: %i errno: %i",
+		    rc, errno);
+
+	return cpuid;
+}
+
+
+
+/*
  * Locate a cpuid entry.
  *
  * Input Args:
@@ -729,36 +804,6 @@ void vcpu_set_cpuid(struct kvm_vm *vm,
 	TEST_ASSERT(rc == 0, "KVM_SET_CPUID2 failed, rc: %i errno: %i",
 		    rc, errno);
 
-}
-
-struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
-				 void *guest_code)
-{
-	struct kvm_vm *vm;
-	/*
-	 * For x86 the maximum page table size for a memory region
-	 * will be when only 4K pages are used.  In that case the
-	 * total extra size for page tables (for extra N pages) will
-	 * be: N/512+N/512^2+N/512^3+... which is definitely smaller
-	 * than N/512*2.
-	 */
-	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
-
-	/* Create VM */
-	vm = vm_create(VM_MODE_DEFAULT,
-		       DEFAULT_GUEST_PHY_PAGES + extra_pg_pages,
-		       O_RDWR);
-
-	/* Setup guest code */
-	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
-
-	/* Setup IRQ Chip */
-	vm_create_irqchip(vm);
-
-	/* Add the first vCPU. */
-	vm_vcpu_add_default(vm, vcpuid, guest_code);
-
-	return vm;
 }
 
 /*
@@ -1255,4 +1300,72 @@ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
 		     : "=a"(r)
 		     : "b"(a0), "c"(a1), "d"(a2), "S"(a3));
 	return r;
+}
+
+struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void)
+{
+	static struct kvm_cpuid2 *cpuid;
+	int ret;
+	int kvm_fd;
+
+	if (cpuid)
+		return cpuid;
+
+	cpuid = allocate_kvm_cpuid2();
+	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+	if (kvm_fd < 0)
+		exit(KSFT_SKIP);
+
+	ret = ioctl(kvm_fd, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
+	TEST_ASSERT(ret == 0, "KVM_GET_SUPPORTED_HV_CPUID failed %d %d\n",
+		    ret, errno);
+
+	close(kvm_fd);
+	return cpuid;
+}
+
+void vcpu_set_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid)
+{
+	static struct kvm_cpuid2 *cpuid_full;
+	struct kvm_cpuid2 *cpuid_sys, *cpuid_hv;
+	int i, nent = 0;
+
+	if (!cpuid_full) {
+		cpuid_sys = kvm_get_supported_cpuid();
+		cpuid_hv = kvm_get_supported_hv_cpuid();
+
+		cpuid_full = malloc(sizeof(*cpuid_full) +
+				    (cpuid_sys->nent + cpuid_hv->nent) *
+				    sizeof(struct kvm_cpuid_entry2));
+		if (!cpuid_full) {
+			perror("malloc");
+			abort();
+		}
+
+		/* Need to skip KVM CPUID leaves 0x400000xx */
+		for (i = 0; i < cpuid_sys->nent; i++) {
+			if (cpuid_sys->entries[i].function >= 0x40000000 &&
+			    cpuid_sys->entries[i].function < 0x40000100)
+				continue;
+			cpuid_full->entries[nent] = cpuid_sys->entries[i];
+			nent++;
+		}
+
+		memcpy(&cpuid_full->entries[nent], cpuid_hv->entries,
+		       cpuid_hv->nent * sizeof(struct kvm_cpuid_entry2));
+		cpuid_full->nent = nent + cpuid_hv->nent;
+	}
+
+	vcpu_set_cpuid(vm, vcpuid, cpuid_full);
+}
+
+struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vm *vm, uint32_t vcpuid)
+{
+	static struct kvm_cpuid2 *cpuid;
+
+	cpuid = allocate_kvm_cpuid2();
+
+	vcpu_ioctl(vm, vcpuid, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
+
+	return cpuid;
 }

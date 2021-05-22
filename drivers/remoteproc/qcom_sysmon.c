@@ -294,7 +294,7 @@ static void sysmon_ind_cb(struct qmi_handle *qmi, struct sockaddr_qrtr *sq,
 	complete(&sysmon->ind_comp);
 }
 
-static struct qmi_msg_handler qmi_indication_handler[] = {
+static const struct qmi_msg_handler qmi_indication_handler[] = {
 	{
 		.type = QMI_INDICATION,
 		.msg_id = SSCTL_SHUTDOWN_READY_IND,
@@ -506,6 +506,7 @@ static int sysmon_start(struct rproc_subdev *subdev)
 	blocking_notifier_call_chain(&sysmon_notifiers, 0, (void *)&event);
 	mutex_unlock(&sysmon->state_lock);
 
+	mutex_lock(&sysmon_lock);
 	list_for_each_entry(target, &sysmon_list, node) {
 		if (target == sysmon)
 			continue;
@@ -520,6 +521,7 @@ static int sysmon_start(struct rproc_subdev *subdev)
 			sysmon_send_event(sysmon, &event);
 		mutex_unlock(&target->state_lock);
 	}
+	mutex_unlock(&sysmon_lock);
 
 	return 0;
 }
@@ -531,7 +533,6 @@ static void sysmon_stop(struct rproc_subdev *subdev, bool crashed)
 		.subsys_name = sysmon->name,
 		.ssr_event = SSCTL_SSR_EVENT_BEFORE_SHUTDOWN
 	};
-	bool acked;
 
 	sysmon->shutdown_acked = false;
 
@@ -545,11 +546,9 @@ static void sysmon_stop(struct rproc_subdev *subdev, bool crashed)
 		return;
 
 	if (sysmon->ssctl_version)
-		acked = ssctl_request_shutdown(sysmon);
+		sysmon->shutdown_acked = ssctl_request_shutdown(sysmon);
 	else if (sysmon->ept)
-		acked = sysmon_request_shutdown(sysmon);
-
-	sysmon->shutdown_acked = acked;
+		sysmon->shutdown_acked = sysmon_request_shutdown(sysmon);
 }
 
 static void sysmon_unprepare(struct rproc_subdev *subdev)

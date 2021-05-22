@@ -10,6 +10,8 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 
+#define pr_fmt(fmt) "ACPI: PM: " fmt
+
 #include <linux/acpi.h>
 #include <linux/export.h>
 #include <linux/mutex.h>
@@ -19,9 +21,6 @@
 #include <linux/suspend.h>
 
 #include "internal.h"
-
-#define _COMPONENT	ACPI_POWER_COMPONENT
-ACPI_MODULE_NAME("device_pm");
 
 /**
  * acpi_power_state_string - String representation of ACPI device power state.
@@ -130,8 +129,8 @@ int acpi_device_get_power(struct acpi_device *device, int *state)
 	*state = result;
 
  out:
-	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Device [%s] power state is %s\n",
-			  device->pnp.bus_id, acpi_power_state_string(*state)));
+	dev_dbg(&device->dev, "Device power state is %s\n",
+		acpi_power_state_string(*state));
 
 	return 0;
 }
@@ -174,9 +173,8 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 
 	/* There is a special case for D0 addressed below. */
 	if (state > ACPI_STATE_D0 && state == device->power.state) {
-		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Device [%s] already in %s\n",
-				  device->pnp.bus_id,
-				  acpi_power_state_string(state)));
+		dev_dbg(&device->dev, "Device already in %s\n",
+			acpi_power_state_string(state));
 		return 0;
 	}
 
@@ -276,10 +274,8 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 			 acpi_power_state_string(target_state));
 	} else {
 		device->power.state = target_state;
-		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
-				  "Device [%s] transitioned to %s\n",
-				  device->pnp.bus_id,
-				  acpi_power_state_string(target_state)));
+		dev_dbg(&device->dev, "Power state changed to %s\n",
+			acpi_power_state_string(target_state));
 	}
 
 	return result;
@@ -757,16 +753,26 @@ static int __acpi_device_wakeup_enable(struct acpi_device *adev,
 
 	mutex_lock(&acpi_wakeup_lock);
 
-	if (wakeup->enable_count >= INT_MAX) {
-		acpi_handle_info(adev->handle, "Wakeup enable count out of bounds!\n");
-		goto out;
-	}
+	/*
+	 * If the device wakeup power is already enabled, disable it and enable
+	 * it again in case it depends on the configuration of subordinate
+	 * devices and the conditions have changed since it was enabled last
+	 * time.
+	 */
 	if (wakeup->enable_count > 0)
-		goto inc;
+		acpi_disable_wakeup_device_power(adev);
 
 	error = acpi_enable_wakeup_device_power(adev, target_state);
-	if (error)
+	if (error) {
+		if (wakeup->enable_count > 0) {
+			acpi_disable_gpe(wakeup->gpe_device, wakeup->gpe_number);
+			wakeup->enable_count = 0;
+		}
 		goto out;
+	}
+
+	if (wakeup->enable_count > 0)
+		goto inc;
 
 	status = acpi_enable_gpe(wakeup->gpe_device, wakeup->gpe_number);
 	if (ACPI_FAILURE(status)) {
@@ -779,7 +785,10 @@ static int __acpi_device_wakeup_enable(struct acpi_device *adev,
 			  (unsigned int)wakeup->gpe_number);
 
 inc:
-	wakeup->enable_count++;
+	if (wakeup->enable_count < INT_MAX)
+		wakeup->enable_count++;
+	else
+		acpi_handle_info(adev->handle, "Wakeup enable count out of bounds!\n");
 
 out:
 	mutex_unlock(&acpi_wakeup_lock);

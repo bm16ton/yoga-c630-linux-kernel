@@ -159,12 +159,6 @@ void rtrs_clt_put_permit(struct rtrs_clt *clt, struct rtrs_permit *permit)
 }
 EXPORT_SYMBOL(rtrs_clt_put_permit);
 
-void *rtrs_permit_to_pdu(struct rtrs_permit *permit)
-{
-	return permit + 1;
-}
-EXPORT_SYMBOL(rtrs_permit_to_pdu);
-
 /**
  * rtrs_permit_to_clt_con() - returns RDMA connection pointer by the permit
  * @sess: client session pointer
@@ -186,18 +180,18 @@ struct rtrs_clt_con *rtrs_permit_to_clt_con(struct rtrs_clt_sess *sess,
 }
 
 /**
- * __rtrs_clt_change_state() - change the session state through session state
+ * rtrs_clt_change_state() - change the session state through session state
  * machine.
  *
  * @sess: client session to change the state of.
  * @new_state: state to change to.
  *
- * returns true if successful, false if the requested state can not be set.
+ * returns true if sess's state is changed to new state, otherwise return false.
  *
  * Locks:
  * state_wq lock must be hold.
  */
-static bool __rtrs_clt_change_state(struct rtrs_clt_sess *sess,
+static bool rtrs_clt_change_state(struct rtrs_clt_sess *sess,
 				     enum rtrs_clt_state new_state)
 {
 	enum rtrs_clt_state old_state;
@@ -294,7 +288,7 @@ static bool rtrs_clt_change_state_from_to(struct rtrs_clt_sess *sess,
 
 	spin_lock_irq(&sess->state_wq.lock);
 	if (sess->state == old_state)
-		changed = __rtrs_clt_change_state(sess, new_state);
+		changed = rtrs_clt_change_state(sess, new_state);
 	spin_unlock_irq(&sess->state_wq.lock);
 
 	return changed;
@@ -1325,6 +1319,12 @@ out_err:
 
 static void free_permits(struct rtrs_clt *clt)
 {
+	if (clt->permits_map) {
+		size_t sz = clt->queue_depth;
+
+		wait_event(clt->permits_wait,
+			   find_first_bit(clt->permits_map, sz) >= sz);
+	}
 	kfree(clt->permits_map);
 	clt->permits_map = NULL;
 	kfree(clt->permits);
@@ -1360,19 +1360,12 @@ static bool rtrs_clt_change_state_get_old(struct rtrs_clt_sess *sess,
 	bool changed;
 
 	spin_lock_irq(&sess->state_wq.lock);
-	*old_state = sess->state;
-	changed = __rtrs_clt_change_state(sess, new_state);
+	if (old_state)
+		*old_state = sess->state;
+	changed = rtrs_clt_change_state(sess, new_state);
 	spin_unlock_irq(&sess->state_wq.lock);
 
 	return changed;
-}
-
-static bool rtrs_clt_change_state(struct rtrs_clt_sess *sess,
-				   enum rtrs_clt_state new_state)
-{
-	enum rtrs_clt_state old_state;
-
-	return rtrs_clt_change_state_get_old(sess, new_state, &old_state);
 }
 
 static void rtrs_clt_hb_err_handler(struct rtrs_con *c)
@@ -1499,6 +1492,7 @@ static int create_con(struct rtrs_clt_sess *sess, unsigned int cid)
 	con->c.cid = cid;
 	con->c.sess = &sess->s;
 	atomic_set(&con->io_cnt, 0);
+	mutex_init(&con->con_mutex);
 
 	sess->s.con[cid] = &con->c;
 
@@ -1510,6 +1504,7 @@ static void destroy_con(struct rtrs_clt_con *con)
 	struct rtrs_clt_sess *sess = to_clt_sess(con->c.sess);
 
 	sess->s.con[con->c.cid] = NULL;
+	mutex_destroy(&con->con_mutex);
 	kfree(con);
 }
 
@@ -1520,15 +1515,7 @@ static int create_con_cq_qp(struct rtrs_clt_con *con)
 	int err, cq_vector;
 	struct rtrs_msg_rkey_rsp *rsp;
 
-	/*
-	 * This function can fail, but still destroy_con_cq_qp() should
-	 * be called, this is because create_con_cq_qp() is called on cm
-	 * event path, thus caller/waiter never knows: have we failed before
-	 * create_con_cq_qp() or after.  To solve this dilemma without
-	 * creating any additional flags just allow destroy_con_cq_qp() be
-	 * called many times.
-	 */
-
+	lockdep_assert_held(&con->con_mutex);
 	if (con->c.cid == 0) {
 		/*
 		 * One completion for each receive and two for each send
@@ -1607,7 +1594,7 @@ static void destroy_con_cq_qp(struct rtrs_clt_con *con)
 	 * Be careful here: destroy_con_cq_qp() can be called even
 	 * create_con_cq_qp() failed, see comments there.
 	 */
-
+	lockdep_assert_held(&con->con_mutex);
 	rtrs_cq_qp_destroy(&con->c);
 	if (con->rsp_ius) {
 		rtrs_iu_free(con->rsp_ius, sess->s.dev->ib_dev, con->queue_size);
@@ -1638,7 +1625,9 @@ static int rtrs_rdma_addr_resolved(struct rtrs_clt_con *con)
 	struct rtrs_sess *s = con->c.sess;
 	int err;
 
+	mutex_lock(&con->con_mutex);
 	err = create_con_cq_qp(con);
+	mutex_unlock(&con->con_mutex);
 	if (err) {
 		rtrs_err(s, "create_con_cq_qp(), err: %d\n", err);
 		return err;
@@ -1807,7 +1796,7 @@ static int rtrs_rdma_conn_rejected(struct rtrs_clt_con *con,
 
 static void rtrs_clt_close_conns(struct rtrs_clt_sess *sess, bool wait)
 {
-	if (rtrs_clt_change_state(sess, RTRS_CLT_CLOSING))
+	if (rtrs_clt_change_state_get_old(sess, RTRS_CLT_CLOSING, NULL))
 		queue_work(rtrs_wq, &sess->close_work);
 	if (wait)
 		flush_work(&sess->close_work);
@@ -1856,19 +1845,21 @@ static int rtrs_clt_rdma_cm_handler(struct rdma_cm_id *cm_id,
 	case RDMA_CM_EVENT_REJECTED:
 		cm_err = rtrs_rdma_conn_rejected(con, ev);
 		break;
+	case RDMA_CM_EVENT_DISCONNECTED:
+		/* No message for disconnecting */
+		cm_err = -ECONNRESET;
+		break;
 	case RDMA_CM_EVENT_CONNECT_ERROR:
 	case RDMA_CM_EVENT_UNREACHABLE:
+	case RDMA_CM_EVENT_ADDR_CHANGE:
+	case RDMA_CM_EVENT_TIMEWAIT_EXIT:
 		rtrs_wrn(s, "CM error event %d\n", ev->event);
 		cm_err = -ECONNRESET;
 		break;
 	case RDMA_CM_EVENT_ADDR_ERROR:
 	case RDMA_CM_EVENT_ROUTE_ERROR:
+		rtrs_wrn(s, "CM error event %d\n", ev->event);
 		cm_err = -EHOSTUNREACH;
-		break;
-	case RDMA_CM_EVENT_DISCONNECTED:
-	case RDMA_CM_EVENT_ADDR_CHANGE:
-	case RDMA_CM_EVENT_TIMEWAIT_EXIT:
-		cm_err = -ECONNRESET;
 		break;
 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
 		/*
@@ -1954,8 +1945,9 @@ static int create_cm(struct rtrs_clt_con *con)
 
 errr:
 	stop_cm(con);
-	/* Is safe to call destroy if cq_qp is not inited */
+	mutex_lock(&con->con_mutex);
 	destroy_con_cq_qp(con);
+	mutex_unlock(&con->con_mutex);
 destroy_cm:
 	destroy_cm(con);
 
@@ -2062,7 +2054,9 @@ static void rtrs_clt_stop_and_destroy_conns(struct rtrs_clt_sess *sess)
 		if (!sess->s.con[cid])
 			break;
 		con = to_clt_con(sess->s.con[cid]);
+		mutex_lock(&con->con_mutex);
 		destroy_con_cq_qp(con);
+		mutex_unlock(&con->con_mutex);
 		destroy_cm(con);
 		destroy_con(con);
 	}
@@ -2169,8 +2163,7 @@ static void rtrs_clt_remove_path_from_arr(struct rtrs_clt_sess *sess)
 	mutex_unlock(&clt->paths_mutex);
 }
 
-static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess,
-				      struct rtrs_addr *addr)
+static void rtrs_clt_add_path_to_arr(struct rtrs_clt_sess *sess)
 {
 	struct rtrs_clt *clt = sess->clt;
 
@@ -2189,7 +2182,7 @@ static void rtrs_clt_close_work(struct work_struct *work)
 
 	cancel_delayed_work_sync(&sess->reconnect_dwork);
 	rtrs_clt_stop_and_destroy_conns(sess);
-	rtrs_clt_change_state(sess, RTRS_CLT_CLOSED);
+	rtrs_clt_change_state_get_old(sess, RTRS_CLT_CLOSED, NULL);
 }
 
 static int init_conns(struct rtrs_clt_sess *sess)
@@ -2229,7 +2222,10 @@ destroy:
 		struct rtrs_clt_con *con = to_clt_con(sess->s.con[cid]);
 
 		stop_cm(con);
+
+		mutex_lock(&con->con_mutex);
 		destroy_con_cq_qp(con);
+		mutex_unlock(&con->con_mutex);
 		destroy_cm(con);
 		destroy_con(con);
 	}
@@ -2238,7 +2234,7 @@ destroy:
 	 * doing rdma_resolve_addr(), switch to CONNECTION_ERR state
 	 * manually to keep reconnecting.
 	 */
-	rtrs_clt_change_state(sess, RTRS_CLT_CONNECTING_ERR);
+	rtrs_clt_change_state_get_old(sess, RTRS_CLT_CONNECTING_ERR, NULL);
 
 	return err;
 }
@@ -2255,7 +2251,7 @@ static void rtrs_clt_info_req_done(struct ib_cq *cq, struct ib_wc *wc)
 	if (unlikely(wc->status != IB_WC_SUCCESS)) {
 		rtrs_err(sess->clt, "Sess info request send failed: %s\n",
 			  ib_wc_status_msg(wc->status));
-		rtrs_clt_change_state(sess, RTRS_CLT_CONNECTING_ERR);
+		rtrs_clt_change_state_get_old(sess, RTRS_CLT_CONNECTING_ERR, NULL);
 		return;
 	}
 
@@ -2269,8 +2265,12 @@ static int process_info_rsp(struct rtrs_clt_sess *sess,
 	int i, sgi;
 
 	sg_cnt = le16_to_cpu(msg->sg_cnt);
-	if (unlikely(!sg_cnt))
+	if (unlikely(!sg_cnt || (sess->queue_depth % sg_cnt))) {
+		rtrs_err(sess->clt, "Incorrect sg_cnt %d, is not multiple\n",
+			  sg_cnt);
 		return -EINVAL;
+	}
+
 	/*
 	 * Check if IB immediate data size is enough to hold the mem_id and
 	 * the offset inside the memory chunk.
@@ -2281,11 +2281,6 @@ static int process_info_rsp(struct rtrs_clt_sess *sess,
 		rtrs_err(sess->clt,
 			  "RDMA immediate size (%db) not enough to encode %d buffers of size %dB\n",
 			  MAX_IMM_PAYL_BITS, sg_cnt, sess->chunk_size);
-		return -EINVAL;
-	}
-	if (unlikely(!sg_cnt || (sess->queue_depth % sg_cnt))) {
-		rtrs_err(sess->clt, "Incorrect sg_cnt %d, is not multiple\n",
-			  sg_cnt);
 		return -EINVAL;
 	}
 	total_len = 0;
@@ -2380,7 +2375,7 @@ static void rtrs_clt_info_rsp_done(struct ib_cq *cq, struct ib_wc *wc)
 out:
 	rtrs_clt_update_wc_stats(con);
 	rtrs_iu_free(iu, sess->s.dev->ib_dev, 1);
-	rtrs_clt_change_state(sess, state);
+	rtrs_clt_change_state_get_old(sess, state, NULL);
 }
 
 static int rtrs_send_sess_info(struct rtrs_clt_sess *sess)
@@ -2436,7 +2431,6 @@ static int rtrs_send_sess_info(struct rtrs_clt_sess *sess)
 			err = -ECONNRESET;
 		else
 			err = -ETIMEDOUT;
-		goto out;
 	}
 
 out:
@@ -2446,7 +2440,7 @@ out:
 		rtrs_iu_free(rx_iu, sess->s.dev->ib_dev, 1);
 	if (unlikely(err))
 		/* If we've never taken async path because of malloc problems */
-		rtrs_clt_change_state(sess, RTRS_CLT_CONNECTING_ERR);
+		rtrs_clt_change_state_get_old(sess, RTRS_CLT_CONNECTING_ERR, NULL);
 
 	return err;
 }
@@ -2503,7 +2497,7 @@ static void rtrs_clt_reconnect_work(struct work_struct *work)
 	/* Stop everything */
 	rtrs_clt_stop_and_destroy_conns(sess);
 	msleep(RTRS_RECONNECT_BACKOFF);
-	if (rtrs_clt_change_state(sess, RTRS_CLT_CONNECTING)) {
+	if (rtrs_clt_change_state_get_old(sess, RTRS_CLT_CONNECTING, NULL)) {
 		err = init_sess(sess);
 		if (err)
 			goto reconnect_again;
@@ -2512,7 +2506,7 @@ static void rtrs_clt_reconnect_work(struct work_struct *work)
 	return;
 
 reconnect_again:
-	if (rtrs_clt_change_state(sess, RTRS_CLT_RECONNECTING)) {
+	if (rtrs_clt_change_state_get_old(sess, RTRS_CLT_RECONNECTING, NULL)) {
 		sess->stats->reconnects.fail_cnt++;
 		delay_ms = clt->reconnect_delay_sec * 1000;
 		queue_delayed_work(rtrs_wq, &sess->reconnect_dwork,
@@ -2614,19 +2608,8 @@ err:
 	return ERR_PTR(err);
 }
 
-static void wait_for_inflight_permits(struct rtrs_clt *clt)
-{
-	if (clt->permits_map) {
-		size_t sz = clt->queue_depth;
-
-		wait_event(clt->permits_wait,
-			   find_first_bit(clt->permits_map, sz) >= sz);
-	}
-}
-
 static void free_clt(struct rtrs_clt *clt)
 {
-	wait_for_inflight_permits(clt);
 	free_permits(clt);
 	free_percpu(clt->pcpu_path);
 	mutex_destroy(&clt->paths_ev_mutex);
@@ -2716,8 +2699,7 @@ close_all_sess:
 		rtrs_clt_close_conns(sess, true);
 		kobject_put(&sess->kobj);
 	}
-	rtrs_clt_destroy_sysfs_root_files(clt);
-	rtrs_clt_destroy_sysfs_root_folders(clt);
+	rtrs_clt_destroy_sysfs_root(clt);
 	free_clt(clt);
 
 out:
@@ -2734,8 +2716,7 @@ void rtrs_clt_close(struct rtrs_clt *clt)
 	struct rtrs_clt_sess *sess, *tmp;
 
 	/* Firstly forbid sysfs access */
-	rtrs_clt_destroy_sysfs_root_files(clt);
-	rtrs_clt_destroy_sysfs_root_folders(clt);
+	rtrs_clt_destroy_sysfs_root(clt);
 
 	/* Now it is safe to iterate over all paths without locks */
 	list_for_each_entry_safe(sess, tmp, &clt->paths_list, s.entry) {
@@ -2944,7 +2925,7 @@ int rtrs_clt_create_path_from_sysfs(struct rtrs_clt *clt,
 	 * IO will never grab it.  Also it is very important to add
 	 * path before init, since init fires LINK_CONNECTED event.
 	 */
-	rtrs_clt_add_path_to_arr(sess, addr);
+	rtrs_clt_add_path_to_arr(sess);
 
 	err = init_sess(sess);
 	if (err)

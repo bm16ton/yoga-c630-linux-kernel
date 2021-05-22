@@ -1,1 +1,0 @@
-/home/maddocks/yoga-kernel-5.10/tools/spi/../../include/uapi/linux/spi/spidev.h

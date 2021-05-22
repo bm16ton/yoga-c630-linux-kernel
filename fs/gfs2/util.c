@@ -161,7 +161,7 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 				ret = 0;
 		}
 		if (!ret)
-			ret = gfs2_make_fs_ro(sdp);
+			gfs2_make_fs_ro(sdp);
 		gfs2_freeze_unlock(&freeze_gh);
 	}
 
@@ -182,7 +182,7 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 	gfs2_glock_dq(&sdp->sd_jinode_gh);
 	if (test_bit(SDF_FS_FROZEN, &sdp->sd_flags)) {
 		/* Make sure gfs2_unfreeze works if partially-frozen */
-		flush_workqueue(gfs2_freeze_wq);
+		flush_work(&sdp->sd_freeze_work);
 		atomic_set(&sdp->sd_freeze_state, SFS_FROZEN);
 		thaw_super(sdp->sd_vfs);
 	} else {

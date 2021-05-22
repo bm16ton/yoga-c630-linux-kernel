@@ -2035,12 +2035,8 @@ static int stm32f7_i2c_probe(struct platform_device *pdev)
 	}
 
 	irq_error = platform_get_irq(pdev, 1);
-	if (irq_error <= 0) {
-		if (irq_error != -EPROBE_DEFER)
-			dev_err(&pdev->dev, "Failed to get IRQ error: %d\n",
-				irq_error);
+	if (irq_error <= 0)
 		return irq_error ? : -ENOENT;
-	}
 
 	i2c_dev->wakeup_src = of_property_read_bool(pdev->dev.of_node,
 						    "wakeup-source");
@@ -2331,7 +2327,7 @@ static int stm32f7_i2c_suspend(struct device *dev)
 
 	i2c_mark_adapter_suspended(&i2c_dev->adap);
 
-	if (!device_may_wakeup(dev) && !dev->power.wakeup_path) {
+	if (!device_may_wakeup(dev) && !device_wakeup_path(dev)) {
 		ret = stm32f7_i2c_regs_backup(i2c_dev);
 		if (ret < 0) {
 			i2c_mark_adapter_resumed(&i2c_dev->adap);
@@ -2350,7 +2346,7 @@ static int stm32f7_i2c_resume(struct device *dev)
 	struct stm32f7_i2c_dev *i2c_dev = dev_get_drvdata(dev);
 	int ret;
 
-	if (!device_may_wakeup(dev) && !dev->power.wakeup_path) {
+	if (!device_may_wakeup(dev) && !device_wakeup_path(dev)) {
 		ret = pm_runtime_force_resume(dev);
 		if (ret < 0)
 			return ret;

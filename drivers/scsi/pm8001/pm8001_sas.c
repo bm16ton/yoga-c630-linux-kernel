@@ -208,7 +208,7 @@ int pm8001_phy_control(struct asd_sas_phy *sas_phy, enum phy_func func,
 				PHY_STATE_LINK_UP_SPCV) {
 				sas_phy_disconnected(&phy->sas_phy);
 				sas_notify_phy_event(&phy->sas_phy,
-					PHYE_LOSS_OF_SIGNAL);
+					PHYE_LOSS_OF_SIGNAL, GFP_KERNEL);
 				phy->phy_attached = 0;
 			}
 		} else {
@@ -216,7 +216,7 @@ int pm8001_phy_control(struct asd_sas_phy *sas_phy, enum phy_func func,
 				PHY_STATE_LINK_UP_SPC) {
 				sas_phy_disconnected(&phy->sas_phy);
 				sas_notify_phy_event(&phy->sas_phy,
-					PHYE_LOSS_OF_SIGNAL);
+					PHYE_LOSS_OF_SIGNAL, GFP_KERNEL);
 				phy->phy_attached = 0;
 			}
 		}
@@ -904,7 +904,7 @@ static int pm8001_issue_ssp_tmf(struct domain_device *dev,
 	if (!(dev->tproto & SAS_PROTOCOL_SSP))
 		return TMF_RESP_FUNC_ESUPP;
 
-	strncpy((u8 *)&ssp_task.LUN, lun, 8);
+	memcpy((u8 *)&ssp_task.LUN, lun, 8);
 	return pm8001_exec_internal_tmf_task(dev, &ssp_task, sizeof(ssp_task),
 		tmf);
 }
@@ -1180,15 +1180,24 @@ int pm8001_abort_task(struct sas_task *task)
 	int rc = TMF_RESP_FUNC_FAILED, ret;
 	u32 phy_id;
 	struct sas_task_slow slow_task;
+
 	if (unlikely(!task || !task->lldd_task || !task->dev))
 		return TMF_RESP_FUNC_FAILED;
+
 	dev = task->dev;
 	pm8001_dev = dev->lldd_dev;
 	pm8001_ha = pm8001_find_ha_by_dev(dev);
 	phy_id = pm8001_dev->attached_phy;
+
+	if (PM8001_CHIP_DISP->fatal_errors(pm8001_ha)) {
+		// If the controller is seeing fatal errors
+		// abort task will not get a response from the controller
+		return TMF_RESP_FUNC_FAILED;
+	}
+
 	ret = pm8001_find_tag(task, &tag);
 	if (ret == 0) {
-		pm8001_printk("no tag for task:%p\n", task);
+		pm8001_info(pm8001_ha, "no tag for task:%p\n", task);
 		return TMF_RESP_FUNC_FAILED;
 	}
 	spin_lock_irqsave(&task->task_state_lock, flags);
@@ -1310,7 +1319,7 @@ out:
 		task->slow_task = NULL;
 	spin_unlock_irqrestore(&task->task_state_lock, flags);
 	if (rc != TMF_RESP_FUNC_COMPLETE)
-		pm8001_printk("rc= %d\n", rc);
+		pm8001_info(pm8001_ha, "rc= %d\n", rc);
 	return rc;
 }
 
@@ -1341,4 +1350,3 @@ int pm8001_clear_task_set(struct domain_device *dev, u8 *lun)
 	tmf_task.tmf = TMF_CLEAR_TASK_SET;
 	return pm8001_issue_ssp_tmf(dev, lun, &tmf_task);
 }
-

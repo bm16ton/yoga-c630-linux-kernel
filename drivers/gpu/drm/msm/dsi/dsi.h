@@ -78,8 +78,6 @@ struct msm_dsi {
 	struct device *phy_dev;
 	bool phy_enabled;
 
-	bool enabled_at_boot;
-
 	/* the encoder we are hooked to (outside of dsi block) */
 	struct drm_encoder *encoder;
 
@@ -95,7 +93,6 @@ int msm_dsi_manager_cmd_xfer(int id, const struct mipi_dsi_msg *msg);
 bool msm_dsi_manager_cmd_xfer_trigger(int id, u32 dma_base, u32 len);
 void msm_dsi_manager_setup_encoder(int id);
 int msm_dsi_manager_register(struct msm_dsi *msm_dsi);
-int msm_dsi_manager_setup_pll(struct msm_dsi *msm_dsi);
 void msm_dsi_manager_unregister(struct msm_dsi *msm_dsi);
 bool msm_dsi_manager_validate_current_config(u8 id);
 
@@ -181,7 +178,6 @@ void msm_dsi_host_destroy(struct mipi_dsi_host *host);
 int msm_dsi_host_modeset_init(struct mipi_dsi_host *host,
 					struct drm_device *dev);
 int msm_dsi_host_init(struct msm_dsi *msm_dsi);
-void msm_dsi_host_post_init(struct msm_dsi *msm_dsi);
 int msm_dsi_runtime_suspend(struct device *dev);
 int msm_dsi_runtime_resume(struct device *dev);
 int dsi_link_clk_set_rate_6g(struct msm_dsi_host *msm_host);

@@ -15,11 +15,13 @@
 #define KUAP_CURRENT		(KUAP_CURRENT_READ | KUAP_CURRENT_WRITE)
 
 #ifdef CONFIG_PPC_BOOK3S_64
-#include <asm/book3s/64/kup-radix.h>
+#include <asm/book3s/64/kup.h>
 #endif
+
 #ifdef CONFIG_PPC_8xx
 #include <asm/nohash/32/kup-8xx.h>
 #endif
+
 #ifdef CONFIG_PPC_BOOK3S_32
 #include <asm/book3s/32/kup.h>
 #endif
@@ -42,9 +44,10 @@
 
 #else /* !__ASSEMBLY__ */
 
-#include <linux/pgtable.h>
+extern bool disable_kuep;
+extern bool disable_kuap;
 
-void setup_kup(void);
+#include <linux/pgtable.h>
 
 #ifdef CONFIG_PPC_KUEP
 void setup_kuep(bool disabled);
@@ -80,8 +83,15 @@ static inline void restore_user_access(unsigned long flags) { }
 #endif /* CONFIG_PPC_BOOK3S_64 */
 #endif /* CONFIG_PPC_KUAP */
 
+static __always_inline void setup_kup(void)
+{
+	setup_kuep(disable_kuep);
+	setup_kuap(disable_kuap);
+}
+
 static inline void allow_read_from_user(const void __user *from, unsigned long size)
 {
+	barrier_nospec();
 	allow_user_access(NULL, from, size, KUAP_READ);
 }
 
@@ -93,6 +103,7 @@ static inline void allow_write_to_user(void __user *to, unsigned long size)
 static inline void allow_read_write_user(void __user *to, const void __user *from,
 					 unsigned long size)
 {
+	barrier_nospec();
 	allow_user_access(to, from, size, KUAP_READ_WRITE);
 }
 

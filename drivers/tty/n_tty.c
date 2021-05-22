@@ -391,6 +391,7 @@ static inline int is_utf8_continuation(unsigned char c)
 /**
  *	is_continuation		-	multibyte check
  *	@c: byte to check
+ *	@tty: terminal device
  *
  *	Returns true if the utf8 character 'c' is a multibyte continuation
  *	character and the terminal is in unicode mode.
@@ -1663,6 +1664,7 @@ static void __receive_buf(struct tty_struct *tty, const unsigned char *cp,
  *	@cp: input chars
  *	@fp: flags for each char (if NULL, all chars are TTY_NORMAL)
  *	@count: number of input chars in @cp
+ *	@flow: enable flow control
  *
  *	Called by the terminal driver when a block of characters has
  *	been received. This function must be called from soft contexts
@@ -1887,8 +1889,10 @@ static void n_tty_close(struct tty_struct *tty)
 	if (tty->link)
 		n_tty_packet_mode_flush(tty);
 
+	down_write(&tty->termios_rwsem);
 	vfree(ldata);
 	tty->disc_data = NULL;
+	up_write(&tty->termios_rwsem);
 }
 
 /**
