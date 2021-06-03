@@ -1200,19 +1200,19 @@ static int ft232h_intf_fpp_remove(struct usb_interface *intf)
 
 static struct spi_board_info ftdi_spi_bus_info[] = {
     {
-    .modalias	= "w25q32",
+    .modalias	= "adc0834",
     .mode		= SPI_MODE_0,
-    .max_speed_hz	= 60000000,
+    .max_speed_hz	= 400000,    //60000000,
     .bus_num	= 0,
     .chip_select	= 0, // TCK/SK at ADBUS0
     },
-    {
+/*    {
     .modalias	= "spidev",
     .mode		= SPI_MODE_0 | SPI_LSB_FIRST | SPI_CS_HIGH,
     .max_speed_hz	= 30000000,
     .bus_num	= 0,
     .chip_select	= 5, // GPIOH0 at ACBUS0
-    },
+    },     */
    };
 
 static const struct mpsse_spi_platform_data ftdi_spi_bus_plat_data = {

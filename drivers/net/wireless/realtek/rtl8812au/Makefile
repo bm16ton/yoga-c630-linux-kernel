@@ -825,7 +825,7 @@ _HAL_INTFS_FILES +=	\
 			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_SUB_NAME)_led.o \
 			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_SUB_NAME)_xmit.o \
 			hal/$(RTL871X)/$(HCI_NAME)/rtl$(MODULE_SUB_NAME)_recv.o
-			
+
 ifeq ($(CONFIG_PCI_HCI), y)
 _HAL_INTFS_FILES += hal/$(RTL871X)/$(HCI_NAME)/$(HCI_NAME)_ops_linux.o
 else
@@ -1118,16 +1118,6 @@ endif
 
 ifeq ($(CONFIG_MP_VHT_HW_TX_MODE), y)
 EXTRA_CFLAGS += -DCONFIG_MP_VHT_HW_TX_MODE
-ifeq ($(CONFIG_PLATFORM_I386_PC), y)
-## For I386 X86 ToolChain use Hardware FLOATING
-EXTRA_CFLAGS += -mhard-float
-EXTRA_CFLAGS += -DMARK_KERNEL_PFU
-else
-## For ARM ToolChain use Hardware FLOATING
-# Raspbian kernel is with soft-float.
-# 'softfp' allows FP instructions, but no FP on function call interfaces
-EXTRA_CFLAGS += -mfloat-abi=softfp
-endif
 endif
 
 ifeq ($(CONFIG_APPEND_VENDOR_IE_ENABLE), y)
@@ -2132,6 +2122,14 @@ USER_MODULE_NAME := 8822bs
 endif
 endif
 
+endif
+
+ifeq ($(ARCH), i386)
+EXTRA_CFLAGS += -mhard-float
+EXTRA_CFLAGS += -DMARK_KERNEL_PFU
+else ifeq ($(ARCH), x86_64)
+EXTRA_CFLAGS += -mhard-float
+EXTRA_CFLAGS += -DMARK_KERNEL_PFU
 endif
 
 ########### CUSTOMER ################################

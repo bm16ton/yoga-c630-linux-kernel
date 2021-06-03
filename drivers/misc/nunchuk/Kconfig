@@ -1,0 +1,8 @@
+config NUNCHUK
+	tristate "Nunchuk support"
+	default n
+	help
+	  This driver provides support for the stupendous Nunchuk driver.
+
+	  To compile this driver as a module, choose M here. The module
+	  will be called nunchuk.

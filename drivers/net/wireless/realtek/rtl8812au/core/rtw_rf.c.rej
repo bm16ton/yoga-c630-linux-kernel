@@ -1,0 +1,17 @@
+--- core/rtw_rf.c
++++ core/rtw_rf.c
+@@ -436,11 +436,13 @@ int rtw_ch2freq(int chan)
+ 	* because we don't support it. simply judge from channel number
+ 	*/
+ 
+-	if (chan >= 1 && chan <= 14) {
++	if (chan >= 1 && chan <= 29) {
+ 		if (chan == 14)
+ 			return 2484;
+ 		else if (chan < 14)
+ 			return 2407 + chan * 5;
++		else if (chan > 14 && chan <= 29)
++			return 2407 + chan * 5;
+ 	} else if (chan >= 36 && chan <= 177)
+ 		return 5000 + chan * 5;
+ 

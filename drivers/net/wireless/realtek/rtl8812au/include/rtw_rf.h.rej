@@ -1,0 +1,11 @@
+--- include/rtw_rf.h
++++ include/rtw_rf.h
+@@ -24,7 +24,7 @@
+ #define NON_SHORT_SLOT_TIME				20
+ 
+ #define CENTER_CH_2G_40M_NUM	9
+-#define CENTER_CH_2G_NUM		14
++#define CENTER_CH_2G_NUM		25
+ #define CENTER_CH_5G_20M_NUM	28	/* 20M center channels */
+ #define CENTER_CH_5G_40M_NUM	14	/* 40M center channels */
+ #define CENTER_CH_5G_80M_NUM	7	/* 80M center channels */

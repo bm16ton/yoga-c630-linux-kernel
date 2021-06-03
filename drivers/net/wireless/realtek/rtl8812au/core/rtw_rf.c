@@ -51,6 +51,8 @@ u8 op_chs_of_cch_2g_40m[CENTER_CH_2G_40M_NUM][2] = {
 };
 
 u8 center_ch_5g_all[CENTER_CH_5G_ALL_NUM] = {
+	15, 16, 17, 18,
+	20, 24, 28, 32,
 /* G00 */36, 38, 40,
 	42,
 /* G01 */44, 46, 48,
@@ -58,6 +60,8 @@ u8 center_ch_5g_all[CENTER_CH_5G_ALL_NUM] = {
 /* G02 */52, 54, 56,
 	58,
 /* G03 */60, 62, 64,
+	68, 72, 76, 80,
+	84, 88, 92, 96,
 /* G04 */100, 102, 104,
 	106,
 /* G05 */108, 110, 112,
@@ -78,10 +82,14 @@ u8 center_ch_5g_all[CENTER_CH_5G_ALL_NUM] = {
 };
 
 u8 center_ch_5g_20m[CENTER_CH_5G_20M_NUM] = {
+	15, 16, 17, 18,
+	20, 24,	28, 32,
 /* G00 */36, 40,
 /* G01 */44, 48,
 /* G02 */52, 56,
 /* G03 */60, 64,
+	68, 72, 76, 80,
+	84, 88, 92, 96,
 /* G04 */100, 104,
 /* G05 */108, 112,
 /* G06 */116, 120,
@@ -111,6 +119,7 @@ u8 center_ch_5g_40m[CENTER_CH_5G_40M_NUM] = {
 /* G13 */175
 };
 
+#if 0
 u8 center_ch_5g_20m_40m[CENTER_CH_5G_20M_NUM + CENTER_CH_5G_40M_NUM] = {
 /* G00 */36, 38, 40,
 /* G01 */44, 46, 48,
@@ -127,6 +136,7 @@ u8 center_ch_5g_20m_40m[CENTER_CH_5G_20M_NUM + CENTER_CH_5G_40M_NUM] = {
 /* G12 */165, 167, 169,
 /* G13 */173, 175, 177
 };
+#endif
 
 u8 op_chs_of_cch_5g_40m[CENTER_CH_5G_40M_NUM][2] = {
 	{36, 40}, /* 38 */
@@ -376,15 +386,15 @@ u8 rtw_get_ch_group(u8 ch, u8 *group, u8 *cck_group)
 	} else {
 		band = BAND_ON_5G;
 
-		if (36 <= ch && ch <= 42)
+		if (15 <= ch && ch <= 42)
 			gp = 0;
 		else if (44   <= ch && ch <=  48)
 			gp = 1;
 		else if (50   <= ch && ch <=  58)
 			gp = 2;
-		else if (60   <= ch && ch <=  64)
+		else if (60   <= ch && ch <=  80)
 			gp = 3;
-		else if (100  <= ch && ch <= 106)
+		else if (82  <= ch && ch <= 106)
 			gp = 4;
 		else if (108  <= ch && ch <= 114)
 			gp = 5;
@@ -441,9 +451,9 @@ int rtw_ch2freq(int chan)
 			return 2484;
 		else if (chan < 14)
 			return 2407 + chan * 5;
-		else if (chan > 14 && chan <= 29)
+	else if (chan > 14 && chan <= 29)
 			return 2407 + chan * 5;
-	} else if (chan >= 36 && chan <= 177)
+	} else if (chan >= 29 && chan <= 177)
 		return 5000 + chan * 5;
 
 	return 0; /* not supported */
@@ -1229,7 +1239,7 @@ s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
 		kfree_offset = kfree_data->bb_gain[bb_gain_sel][path];
 		if (IS_HARDWARE_TYPE_8723D(padapter))
 			RTW_INFO("%s path:%s, ch:%u, bb_gain_sel:%d, kfree_offset:%d\n"
-				, __func__, (path == 0)?"S1":"S0", 
+				, __func__, (path == 0)?"S1":"S0",
 				ch, bb_gain_sel, kfree_offset);
 		else
 			RTW_INFO("%s path:%u, ch:%u, bb_gain_sel:%d, kfree_offset:%d\n"
@@ -1260,7 +1270,7 @@ void rtw_rf_set_tx_gain_offset(_adapter *adapter, u8 path, s8 offset)
 		target_path = path;
 		RTW_INFO("kfree gain_offset 0x55:0x%x ", rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff));
 	}
-	
+
 	switch (rtw_get_chip_type(adapter)) {
 #ifdef CONFIG_RTL8723D
 	case RTL8723D:
@@ -1315,7 +1325,7 @@ void rtw_rf_set_tx_gain_offset(_adapter *adapter, u8 path, s8 offset)
 		rtw_warn_on(1);
 		break;
 	}
-	
+
 	if (IS_HARDWARE_TYPE_8723D(adapter)) {
 		if (path == PPG_8723D_S1)
 			val32 = rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff);
