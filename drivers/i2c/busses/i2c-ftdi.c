@@ -578,9 +578,9 @@ static int ftdi_reset(struct ftdi_usb *ftdi)
 	if (ret < 0)
 		return ret;
 
-//	ret = ftdi_disable_special_characters(ftdi);
-//	if (ret < 0)
-//		return ret;
+	ret = ftdi_disable_special_characters(ftdi);
+	if (ret < 0)
+		return ret;
 
 	ret = ftdi_set_bit_mode(ftdi, FTDI_BIT_MODE_RESET);
 	if (ret < 0)
