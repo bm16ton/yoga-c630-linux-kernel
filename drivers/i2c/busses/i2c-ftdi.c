@@ -353,7 +353,7 @@ static const struct i2c_algorithm ftdi_usb_i2c_algo = {
 };
 
 static const struct usb_device_id ftdi_id_table[] = {
-	{ USB_DEVICE(0x0005, 0x0001) },
+	{ USB_DEVICE(0x0403, 0x6011) },
 	{ USB_DEVICE(0x0403, 0x6010) },
     { }
 };
