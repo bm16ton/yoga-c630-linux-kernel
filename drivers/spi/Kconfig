@@ -822,6 +822,12 @@ config SPI_SYNQUACER
 
 	  It also supports the new dual-bit and quad-bit SPI protocol.
 
+config SPI_TINY_USB
+	 tristate "STM32 based usb to SPI controller"
+	 help
+	 	A USB to SPI device, it requires an MCU with the spi-tiny-usb
+	 	firmware.Currently only sum stm32 devices supported
+
 config SPI_MXIC
 	tristate "Macronix MX25F0A SPI controller"
 	depends on SPI_MASTER
