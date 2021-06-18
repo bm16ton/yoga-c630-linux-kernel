@@ -618,8 +618,8 @@ static int ftdi_usb_probe(struct usb_interface *interface,
 	ftdi->udev = usb_get_dev(dev);
 	ftdi->interface = usb_get_intf(interface);
 	inf = ftdi->interface->cur_altsetting->desc.bInterfaceNumber;
-	if (inf == 1)  {
-		dev_info(&interface->dev, "Ignoring Interfac\n");
+	if (inf > 0) {
+		dev_info(&interface->dev, "Ignoring Interface\n");
 		return -ENODEV;
 		}
 
