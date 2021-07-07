@@ -11,7 +11,7 @@
 #include "mpsse.h"
 
 const int FTDI_IO_TIMEOUT = 5000;
-const unsigned FTDI_I2C_FREQ = 100000;
+const unsigned FTDI_I2C_FREQ = 400000;
 const size_t FTDI_IO_BUFFER_SIZE = 65536;
 //const u16 FTDI_BIT_MODE_RESET = 0x0000;
 //const u16 FTDI_BIT_MODE_MPSSE = 0x0200;
