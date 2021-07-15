@@ -1200,11 +1200,11 @@ static int ft232h_intf_fpp_remove(struct usb_interface *intf)
 
 static struct spi_board_info ftdi_spi_bus_info[] = {
     {
-    .modalias	= "serdev",
+    .modalias	= "spidev",
     .mode		= SPI_MODE_0,
     .max_speed_hz	= 30000000,
     .bus_num	= 0,
-    .chip_select	= 5, // TCK/SK at ADBUS0
+    .chip_select	= 0, // TCK/SK at ADBUS0
     },
     {
 //    .modalias	= "spidev",

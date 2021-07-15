@@ -682,7 +682,9 @@ static int wm5102_out_comp_coeff_put(struct snd_kcontrol *kcontrol,
 	struct arizona *arizona = dev_get_drvdata(component->dev->parent);
 
 	mutex_lock(&arizona->dac_comp_lock);
-	arizona->dac_comp_coeff = get_unaligned_be16(ucontrol->value.bytes.data);
+	memcpy(&arizona->dac_comp_coeff, ucontrol->value.bytes.data,
+	       sizeof(arizona->dac_comp_coeff));
+	arizona->dac_comp_coeff = be16_to_cpu(arizona->dac_comp_coeff);
 	mutex_unlock(&arizona->dac_comp_lock);
 
 	return 0;
@@ -1780,8 +1782,8 @@ static struct snd_soc_dai_driver wm5102_dai[] = {
 			 .formats = WM5102_FORMATS,
 		 },
 		.ops = &arizona_dai_ops,
-		.symmetric_rate = 1,
-		.symmetric_sample_bits = 1,
+		.symmetric_rates = 1,
+		.symmetric_samplebits = 1,
 	},
 	{
 		.name = "wm5102-aif2",
@@ -1802,8 +1804,8 @@ static struct snd_soc_dai_driver wm5102_dai[] = {
 			 .formats = WM5102_FORMATS,
 		 },
 		.ops = &arizona_dai_ops,
-		.symmetric_rate = 1,
-		.symmetric_sample_bits = 1,
+		.symmetric_rates = 1,
+		.symmetric_samplebits = 1,
 	},
 	{
 		.name = "wm5102-aif3",
@@ -1824,8 +1826,8 @@ static struct snd_soc_dai_driver wm5102_dai[] = {
 			 .formats = WM5102_FORMATS,
 		 },
 		.ops = &arizona_dai_ops,
-		.symmetric_rate = 1,
-		.symmetric_sample_bits = 1,
+		.symmetric_rates = 1,
+		.symmetric_samplebits = 1,
 	},
 	{
 		.name = "wm5102-slim1",

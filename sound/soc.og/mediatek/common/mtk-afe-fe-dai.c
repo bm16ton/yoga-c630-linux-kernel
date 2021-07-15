@@ -542,13 +542,8 @@ int mtk_memif_set_format(struct mtk_base_afe *afe,
 		break;
 	case SNDRV_PCM_FORMAT_S32_LE:
 	case SNDRV_PCM_FORMAT_U32_LE:
-		if (afe->memif_32bit_supported) {
-			hd_audio = 2;
-			hd_align = 0;
-		} else {
-			hd_audio = 1;
-			hd_align = 1;
-		}
+		hd_audio = 1;
+		hd_align = 1;
 		break;
 	case SNDRV_PCM_FORMAT_S24_LE:
 	case SNDRV_PCM_FORMAT_U24_LE:
@@ -561,10 +556,10 @@ int mtk_memif_set_format(struct mtk_base_afe *afe,
 	}
 
 	mtk_regmap_update_bits(afe->regmap, memif->data->hd_reg,
-			       0x3, hd_audio, memif->data->hd_shift);
+			       1, hd_audio, memif->data->hd_shift);
 
 	mtk_regmap_update_bits(afe->regmap, memif->data->hd_align_reg,
-			       0x1, hd_align, memif->data->hd_align_mshift);
+			       1, hd_align, memif->data->hd_align_mshift);
 
 	return 0;
 }

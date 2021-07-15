@@ -186,13 +186,6 @@ static const struct dmi_system_id rn_acp_quirk_table[] = {
 		}
 	},
 	{
-		/* Lenovo ThinkPad E14 Gen 2 */
-		.matches = {
-			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-			DMI_EXACT_MATCH(DMI_BOARD_NAME, "20T6CTO1WW"),
-		}
-	},
-	{
 		/* Lenovo ThinkPad X395 */
 		.matches = {
 			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
@@ -268,7 +261,7 @@ static int snd_rn_acp_probe(struct pci_dev *pci,
 		handle = ACPI_HANDLE(&pci->dev);
 		ret = acpi_evaluate_integer(handle, "_WOV", NULL, &dmic_status);
 		if (ACPI_FAILURE(ret)) {
-			ret = -ENODEV;
+			ret = -EINVAL;
 			goto de_init;
 		}
 		if (!dmic_status) {

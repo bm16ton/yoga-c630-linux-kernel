@@ -311,6 +311,7 @@ static int wl1273_startup(struct snd_pcm_substream *substream,
 		break;
 	default:
 		return -EINVAL;
+		break;
 	}
 
 	return 0;

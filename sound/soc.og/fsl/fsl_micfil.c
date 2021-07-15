@@ -381,7 +381,7 @@ static int fsl_micfil_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 	return ret;
 }
 
-static const struct snd_soc_dai_ops fsl_micfil_dai_ops = {
+static struct snd_soc_dai_ops fsl_micfil_dai_ops = {
 	.startup = fsl_micfil_startup,
 	.trigger = fsl_micfil_trigger,
 	.hw_params = fsl_micfil_hw_params,
@@ -637,6 +637,7 @@ static irqreturn_t micfil_err_isr(int irq, void *devid)
 static int fsl_micfil_probe(struct platform_device *pdev)
 {
 	struct device_node *np = pdev->dev.of_node;
+	const struct of_device_id *of_id;
 	struct fsl_micfil *micfil;
 	struct resource *res;
 	void __iomem *regs;
@@ -650,7 +651,11 @@ static int fsl_micfil_probe(struct platform_device *pdev)
 	micfil->pdev = pdev;
 	strncpy(micfil->name, np->name, sizeof(micfil->name) - 1);
 
-	micfil->soc = of_device_get_match_data(&pdev->dev);
+	of_id = of_match_device(fsl_micfil_dt_ids, &pdev->dev);
+	if (!of_id || !of_id->data)
+		return -EINVAL;
+
+	micfil->soc = of_id->data;
 
 	/* ipg_clk is used to control the registers
 	 * ipg_clk_app is used to operate the filter

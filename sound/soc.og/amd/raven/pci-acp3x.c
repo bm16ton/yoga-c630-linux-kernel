@@ -140,14 +140,21 @@ static int snd_acp3x_probe(struct pci_dev *pci,
 		goto release_regions;
 	}
 
-	irqflags = IRQF_SHARED;
+	/* check for msi interrupt support */
+	ret = pci_enable_msi(pci);
+	if (ret)
+		/* msi is not enabled */
+		irqflags = IRQF_SHARED;
+	else
+		/* msi is enabled */
+		irqflags = 0;
 
 	addr = pci_resource_start(pci, 0);
 	adata->acp3x_base = devm_ioremap(&pci->dev, addr,
 					pci_resource_len(pci, 0));
 	if (!adata->acp3x_base) {
 		ret = -ENOMEM;
-		goto release_regions;
+		goto disable_msi;
 	}
 	pci_set_master(pci);
 	pci_set_drvdata(pci, adata);
@@ -155,7 +162,7 @@ static int snd_acp3x_probe(struct pci_dev *pci,
 	adata->pme_en = rv_readl(adata->acp3x_base + mmACP_PME_EN);
 	ret = acp3x_init(adata);
 	if (ret)
-		goto release_regions;
+		goto disable_msi;
 
 	val = rv_readl(adata->acp3x_base + mmACP_I2S_PIN_CONFIG);
 	switch (val) {
@@ -228,8 +235,9 @@ static int snd_acp3x_probe(struct pci_dev *pci,
 		}
 		break;
 	default:
-		dev_info(&pci->dev, "ACP audio mode : %d\n", val);
-		break;
+		dev_err(&pci->dev, "Invalid ACP audio mode : %d\n", val);
+		ret = -ENODEV;
+		goto disable_msi;
 	}
 	pm_runtime_set_autosuspend_delay(&pci->dev, 2000);
 	pm_runtime_use_autosuspend(&pci->dev);
@@ -244,6 +252,8 @@ unregister_devs:
 de_init:
 	if (acp3x_deinit(adata->acp3x_base))
 		dev_err(&pci->dev, "ACP de-init failed\n");
+disable_msi:
+	pci_disable_msi(pci);
 release_regions:
 	pci_release_regions(pci);
 disable_pci:
@@ -302,6 +312,7 @@ static void snd_acp3x_remove(struct pci_dev *pci)
 		dev_err(&pci->dev, "ACP de-init failed\n");
 	pm_runtime_forbid(&pci->dev);
 	pm_runtime_get_noresume(&pci->dev);
+	pci_disable_msi(pci);
 	pci_release_regions(pci);
 	pci_disable_device(pci);
 }

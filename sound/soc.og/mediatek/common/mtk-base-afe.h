@@ -91,7 +91,6 @@ struct mtk_base_afe {
 	int memif_size;
 	struct mtk_base_afe_irq *irqs;
 	int irqs_size;
-	int memif_32bit_supported;
 
 	struct list_head sub_dais;
 	struct snd_soc_dai_driver *dai_drivers;

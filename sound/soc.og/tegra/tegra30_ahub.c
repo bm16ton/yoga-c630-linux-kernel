@@ -45,7 +45,8 @@ static int tegra30_ahub_runtime_suspend(struct device *dev)
 	regcache_cache_only(ahub->regmap_apbif, true);
 	regcache_cache_only(ahub->regmap_ahub, true);
 
-	clk_bulk_disable_unprepare(ahub->nclocks, ahub->clocks);
+	clk_disable_unprepare(ahub->clk_apbif);
+	clk_disable_unprepare(ahub->clk_d_audio);
 
 	return 0;
 }
@@ -65,39 +66,22 @@ static int tegra30_ahub_runtime_resume(struct device *dev)
 {
 	int ret;
 
-	ret = reset_control_assert(ahub->reset);
-	if (ret)
+	ret = clk_prepare_enable(ahub->clk_d_audio);
+	if (ret) {
+		dev_err(dev, "clk_enable d_audio failed: %d\n", ret);
 		return ret;
-
-	ret = clk_bulk_prepare_enable(ahub->nclocks, ahub->clocks);
-	if (ret)
+	}
+	ret = clk_prepare_enable(ahub->clk_apbif);
+	if (ret) {
+		dev_err(dev, "clk_enable apbif failed: %d\n", ret);
+		clk_disable(ahub->clk_d_audio);
 		return ret;
-
-	usleep_range(10, 100);
-
-	ret = reset_control_deassert(ahub->reset);
-	if (ret)
-		goto disable_clocks;
+	}
 
 	regcache_cache_only(ahub->regmap_apbif, false);
 	regcache_cache_only(ahub->regmap_ahub, false);
-	regcache_mark_dirty(ahub->regmap_apbif);
-	regcache_mark_dirty(ahub->regmap_ahub);
-
-	ret = regcache_sync(ahub->regmap_apbif);
-	if (ret)
-		goto disable_clocks;
-
-	ret = regcache_sync(ahub->regmap_ahub);
-	if (ret)
-		goto disable_clocks;
 
 	return 0;
-
-disable_clocks:
-	clk_bulk_disable_unprepare(ahub->nclocks, ahub->clocks);
-
-	return ret;
 }
 
 int tegra30_ahub_allocate_rx_fifo(enum tegra30_ahub_rxcif *rxcif,
@@ -353,8 +337,6 @@ static const struct {
 	const char *rst_name;
 	u32 mod_list_mask;
 } configlink_mods[] = {
-	{ "d_audio", MOD_LIST_MASK_TEGRA30_OR_LATER },
-	{ "apbif", MOD_LIST_MASK_TEGRA30_OR_LATER },
 	{ "i2s0", MOD_LIST_MASK_TEGRA30_OR_LATER },
 	{ "i2s1", MOD_LIST_MASK_TEGRA30_OR_LATER },
 	{ "i2s2", MOD_LIST_MASK_TEGRA30_OR_LATER },
@@ -544,6 +526,7 @@ static int tegra30_ahub_probe(struct platform_device *pdev)
 	/*
 	 * The AHUB hosts a register bus: the "configlink". For this to
 	 * operate correctly, all devices on this bus must be out of reset.
+	 * Ensure that here.
 	 */
 	for (i = 0; i < ARRAY_SIZE(configlink_mods); i++) {
 		if (!(configlink_mods[i].mod_list_mask &
@@ -559,8 +542,10 @@ static int tegra30_ahub_probe(struct platform_device *pdev)
 			return ret;
 		}
 
-		/* just check presence of the reset control in DT */
+		ret = reset_control_deassert(rst);
 		reset_control_put(rst);
+		if (ret)
+			return ret;
 	}
 
 	ahub = devm_kzalloc(&pdev->dev, sizeof(struct tegra30_ahub),
@@ -572,17 +557,18 @@ static int tegra30_ahub_probe(struct platform_device *pdev)
 	ahub->soc_data = soc_data;
 	ahub->dev = &pdev->dev;
 
-	ahub->clocks[ahub->nclocks++].id = "apbif";
-	ahub->clocks[ahub->nclocks++].id = "d_audio";
-
-	ret = devm_clk_bulk_get(&pdev->dev, ahub->nclocks, ahub->clocks);
-	if (ret)
+	ahub->clk_d_audio = devm_clk_get(&pdev->dev, "d_audio");
+	if (IS_ERR(ahub->clk_d_audio)) {
+		dev_err(&pdev->dev, "Can't retrieve ahub d_audio clock\n");
+		ret = PTR_ERR(ahub->clk_d_audio);
 		return ret;
+	}
 
-	ahub->reset = devm_reset_control_array_get_exclusive(&pdev->dev);
-	if (IS_ERR(ahub->reset)) {
-		dev_err(&pdev->dev, "Can't get resets: %pe\n", ahub->reset);
-		return PTR_ERR(ahub->reset);
+	ahub->clk_apbif = devm_clk_get(&pdev->dev, "apbif");
+	if (IS_ERR(ahub->clk_apbif)) {
+		dev_err(&pdev->dev, "Can't retrieve ahub apbif clock\n");
+		ret = PTR_ERR(ahub->clk_apbif);
+		return ret;
 	}
 
 	res0 = platform_get_resource(pdev, IORESOURCE_MEM, 0);

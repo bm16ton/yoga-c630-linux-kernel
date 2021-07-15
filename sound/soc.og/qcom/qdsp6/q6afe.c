@@ -1681,7 +1681,7 @@ int q6afe_unvote_lpass_core_hw(struct device *dev, uint32_t hw_block_id,
 EXPORT_SYMBOL(q6afe_unvote_lpass_core_hw);
 
 int q6afe_vote_lpass_core_hw(struct device *dev, uint32_t hw_block_id,
-			     const char *client_name, uint32_t *client_handle)
+			     char *client_name, uint32_t *client_handle)
 {
 	struct q6afe *afe = dev_get_drvdata(dev->parent);
 	struct afe_cmd_remote_lpass_core_hw_vote_request *vote_cfg;
@@ -1707,7 +1707,7 @@ int q6afe_vote_lpass_core_hw(struct device *dev, uint32_t hw_block_id,
 	pkt->hdr.token = hw_block_id;
 	pkt->hdr.opcode = AFE_CMD_REMOTE_LPASS_CORE_HW_VOTE_REQUEST;
 	vote_cfg->hw_block_id = hw_block_id;
-	strscpy(vote_cfg->client_name, client_name,
+	strlcpy(vote_cfg->client_name, client_name,
 			sizeof(vote_cfg->client_name));
 
 	ret = afe_apr_send_pkt(afe, pkt, NULL,
@@ -1740,7 +1740,14 @@ static int q6afe_probe(struct apr_device *adev)
 
 	dev_set_drvdata(dev, afe);
 
-	return devm_of_platform_populate(dev);
+	return of_platform_populate(dev->of_node, NULL, NULL, dev);
+}
+
+static int q6afe_remove(struct apr_device *adev)
+{
+	of_platform_depopulate(&adev->dev);
+
+	return 0;
 }
 
 #ifdef CONFIG_OF
@@ -1753,6 +1760,7 @@ MODULE_DEVICE_TABLE(of, q6afe_device_id);
 
 static struct apr_driver qcom_q6afe_driver = {
 	.probe = q6afe_probe,
+	.remove = q6afe_remove,
 	.callback = q6afe_callback,
 	.driver = {
 		.name = "qcom-q6afe",
