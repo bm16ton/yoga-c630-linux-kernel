@@ -236,7 +236,7 @@ int cfg80211_wext_freq(struct iw_freq *freq)
 		enum nl80211_band band = NL80211_BAND_2GHZ;
 		if (freq->m < 0)
 			return 0;
-		if (freq->m > 29)
+		if (freq->m > 14)
 			band = NL80211_BAND_5GHZ;
 		return ieee80211_channel_to_frequency(freq->m, band);
 	} else {

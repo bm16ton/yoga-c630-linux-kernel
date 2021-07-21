@@ -1,8 +1,0 @@
---- drivers/misc/Kconfig
-+++ drivers/misc/Kconfig
-@@ -537,4 +537,5 @@ source "drivers/misc/mic/Kconfig"
- source "drivers/misc/genwqe/Kconfig"
- source "drivers/misc/echo/Kconfig"
- source "drivers/misc/cxl/Kconfig"
-+source "drivers/misc/nunchuk/Kconfig"
- endmenu

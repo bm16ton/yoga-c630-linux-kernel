@@ -11,6 +11,16 @@ static unsigned int inv_scan_query_mpu6050(struct iio_dev *indio_dev)
 	struct inv_mpu6050_state  *st = iio_priv(indio_dev);
 	unsigned int mask;
 
+	/*
+	 * If the MPU6050 is just used as a trigger, then the scan mask
+	 * is not allocated so we simply enable the temperature channel
+	 * as a dummy and bail out.
+	 */
+	if (!indio_dev->active_scan_mask) {
+		st->chip_config.temp_fifo_enable = true;
+		return INV_MPU6050_SENSOR_TEMP;
+	}
+
 	st->chip_config.gyro_fifo_enable =
 		test_bit(INV_MPU6050_SCAN_GYRO_X,
 			 indio_dev->active_scan_mask) ||
@@ -132,10 +142,8 @@ int inv_mpu6050_prepare_fifo(struct inv_mpu6050_state *st, bool enable)
 		if (ret)
 			return ret;
 		/* enable interrupt */
-
 		ret = regmap_write(st->map, st->reg->int_enable,
 				   INV_MPU6050_BIT_DATA_RDY_EN);
-
 	} else {
 		ret = regmap_write(st->map, st->reg->int_enable, 0);
 		if (ret)

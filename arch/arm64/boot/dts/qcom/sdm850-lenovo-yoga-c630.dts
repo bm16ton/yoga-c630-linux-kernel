@@ -10,7 +10,6 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/gpio-keys.h>
 #include <dt-bindings/input/input.h>
-#include <dt-bindings/input/linux-event-codes.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator.h>
 #include <dt-bindings/sound/qcom,q6afe.h>
 #include <dt-bindings/sound/qcom,q6asm.h>
@@ -25,11 +24,30 @@
 		hsuart0 = &uart6;
 	};
 
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&lid_pin_active>, <&mode_pin_active>;
+
+		lid {
+			gpios = <&tlmm 124 GPIO_ACTIVE_HIGH>;
+			linux,input-type = <EV_SW>;
+			linux,code = <SW_LID>;
+			wakeup-source;
+			wakeup-event-action = <EV_ACT_DEASSERTED>;
+		};
+
+		mode {
+			gpios = <&tlmm 95 GPIO_ACTIVE_HIGH>;
+			linux,input-type = <EV_SW>;
+			linux,code = <SW_TABLET_MODE>;
+		};
+	};
+
 	panel {
 		compatible = "boe,nv133fhm-n61";
-		power-supply = <&vlcm_3v3>;
 		no-hpd;
-		backlight = <&backlight>;
 
 		ports {
 			port {
@@ -40,69 +58,11 @@
 		};
 	};
 
-	vlcm_3v3: vlcm-3v3-power {
-		compatible = "regulator-fixed";
-		regulator-name = "VLCM_3V3";
-
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-
-		gpio = <&tlmm 88 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-boot-on;
-	};
-
-	sw_edp_1p2: sw-edp-1p2-regulator {
-		compatible = "regulator-fixed";
-		regulator-name = "SW_EDP_1P2";
-
-		vin-supply = <&vreg_l2a_1p2>;
-		regulator-min-microvolt = <1200000>;
-		regulator-max-microvolt = <1200000>;
-
-		gpio = <&pm8998_gpio 9 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-boot-on;
-	};
-
 	sn65dsi86_refclk: sn65dsi86-refclk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 
 		clock-frequency = <19200000>;
-	};
-
-	backlight: backlight {
-		compatible = "pwm-backlight";
-		pwms = <&sn65dsi86 1000000>;
-		enable-gpios = <&tlmm 11 GPIO_ACTIVE_HIGH>;
-    };
-
-	gpio-keys {
-		compatible = "gpio-keys";
-		pinctrl-names = "default";
-		pinctrl-0 = <&lid_pin_active>;
-
-		lid {
-		    gpios = <&tlmm 124 GPIO_ACTIVE_HIGH>;
-		    linux,input-type = <EV_SW>;
-		    linux,code = <SW_LID>;
- 			wakeup-source;
- 			wakeup-event-action = <EV_ACT_DEASSERTED>;
-		};
-	};
-
-	gpio_keys_polled {
-		compatible = "gpio-keys-polled";
-		poll-interval = <300>;
-
-		mode {
-		    label = "mode";
-		    debounce-interval = <750>;
-		    gpios = <&tlmm 95 0>;
-		    linux,input-type = <EV_SW>;
-		    linux,code = <SW_TABLET_MODE>;
-		};
 	};
 };
 
@@ -117,12 +77,9 @@
 		qcom,pmic-id = "a";
 
 		vdd-l2-l8-l17-supply = <&vreg_s3a_1p35>;
-		vdd-l4-l5-supply = <&vreg_s7a_1p025>;
 		vdd-l7-l12-l14-l15-supply = <&vreg_s5a_2p04>;
 
 		vreg_s2a_1p125: smps2 {
-			regulator-min-microvolt = <1100000>;
-			regulator-max-microvolt = <1100000>;
 		};
 
 		vreg_s3a_1p35: smps3 {
@@ -144,9 +101,6 @@
 		};
 
 		vreg_s7a_1p025: smps7 {
-			regulator-min-microvolt = <1028000>;
-			regulator-max-microvolt = <1028000>;
-			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 		};
 
 		vdd_qusb_hs0:
@@ -171,7 +125,6 @@
 			regulator-min-microvolt = <880000>;
 			regulator-max-microvolt = <880000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-			regulator-boot-on;
 		};
 
 		vddpx_10:
@@ -240,7 +193,7 @@
 			regulator-min-microvolt = <1880000>;
 			regulator-max-microvolt = <1880000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-			regulator-boot-on;
+			regulator-always-on;
 		};
 
 		vreg_l15a_1p8: ldo15 {
@@ -309,7 +262,6 @@
 			regulator-min-microvolt = <1200000>;
 			regulator-max-microvolt = <1208000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-			regulator-boot-on;
 		};
 
 		vreg_l28a_3p0: ldo28 {
@@ -365,21 +317,15 @@
 &i2c1 {
 	status = "okay";
 	clock-frequency = <400000>;
-	/* Overwrite pinctrl-0 from sdm845.dtsi
-	pinctrl-0 = <&qup_i2c3_default &i2c3_hid_active>;
-	*/
-
-	battery@70 {
-		compatible = "some,battery";
-		reg = <0x70>;
-	};
 };
 
 &i2c3 {
 	status = "okay";
 	clock-frequency = <400000>;
+	/* Overwrite pinctrl-0 from sdm845.dtsi */
+	pinctrl-0 = <&qup_i2c3_default &i2c3_hid_active>;
 
-	hid@15 {
+	tsel: hid@15 {
 		compatible = "hid-over-i2c";
 		reg = <0x15>;
 		hid-descr-addr = <0x1>;
@@ -387,15 +333,12 @@
 		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
-	hid@2c {
+	tsc2: hid@2c {
 		compatible = "hid-over-i2c";
 		reg = <0x2c>;
 		hid-descr-addr = <0x20>;
 
 		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&i2c2_hid_active>;
 	};
 };
 
@@ -403,15 +346,15 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	hid@10 {
+	tsc1: hid@10 {
 		compatible = "hid-over-i2c";
 		reg = <0x10>;
 		hid-descr-addr = <0x1>;
 
-		interrupts-extended = <&tlmm 125 IRQ_TYPE_EDGE_FALLING>;
+		interrupts-extended = <&tlmm 125 IRQ_TYPE_LEVEL_LOW>;
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&i2c6_hid_active>;
+		pinctrl-0 = <&i2c5_hid_active>;
 	};
 };
 
@@ -423,24 +366,17 @@
 		compatible = "ti,sn65dsi86";
 		reg = <0x2c>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&edp_bridge_en>, <&edp_bridge_irq>;
-
-		interrupts-extended = <&tlmm 10 IRQ_TYPE_LEVEL_HIGH>;
+		pinctrl-0 = <&sn65dsi86_pin_active>;
 
 		enable-gpios = <&tlmm 96 GPIO_ACTIVE_HIGH>;
 
 		vpll-supply = <&vreg_l14a_1p88>;
 		vccio-supply = <&vreg_l14a_1p88>;
-		vcca-supply = <&sw_edp_1p2>;
-		vcc-supply = <&sw_edp_1p2>;
 
 		clocks = <&sn65dsi86_refclk>;
 		clock-names = "refclk";
 
-
-		#pwm-cells = <1>;
-		
-		max-brightness = <255>;
+		no-hpd;
 
 		ports {
 			#address-cells = <1>;
@@ -467,7 +403,7 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	hid@5c {
+	ecsh: hid@5c {
 		compatible = "hid-over-i2c";
 		reg = <0x5c>;
 		hid-descr-addr = <0x1>;
@@ -475,7 +411,7 @@
 		interrupts-extended = <&tlmm 92 IRQ_TYPE_LEVEL_LOW>;
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&i2c12_hid_active>;
+		pinctrl-0 = <&i2c11_hid_active>;
 	};
 };
 
@@ -489,6 +425,14 @@
 
 &mss_pil {
 	firmware-name = "qcom/LENOVO/81JL/qcdsp1v2850.mbn", "qcom/LENOVO/81JL/qcdsp2850.mbn";
+};
+
+&qup_i2c10_default {
+	pinconf {
+		pins = "gpio55", "gpio56";
+		drive-strength = <2>;
+		bias-disable;
+	};
 };
 
 &qup_i2c12_default {
@@ -516,14 +460,6 @@
 	rx {
 		pins = "gpio48";
 		bias-pull-up;
-	};
-};
-
-&qup_i2c10_default {
-	pinconf {
-		pins = "gpio55", "gpio56";
-		drive-strength = <2>;
-		bias-disable;
 	};
 };
 
@@ -605,19 +541,14 @@
 &tlmm {
 	gpio-reserved-ranges = <0 4>, <81 4>;
 
-	edp_bridge_en: edp-bridge-enable {
+	sn65dsi86_pin_active: sn65dsi86-enable {
 		pins = "gpio96";
 		drive-strength = <2>;
 		bias-disable;
 	};
 
-	edp_bridge_irq: edp-bridge-irq {
-		pins = "gpio10";
-		bias-pull-down;
-	};
-
-	i2c2_hid_active: i2c2-hid-active {
-		pins = <37>;
+	i2c3_hid_active: i2c2-hid-active {
+		pins = "gpio37";
 		function = "gpio";
 
 		input-enable;
@@ -625,8 +556,8 @@
 		drive-strength = <2>;
 	};
 
-	i2c6_hid_active: i2c6-hid-active {
-		pins = <125>;
+	i2c5_hid_active: i2c5-hid-active {
+		pins = "gpio125";
 		function = "gpio";
 
 		input-enable;
@@ -634,8 +565,8 @@
 		drive-strength = <2>;
 	};
 
-	i2c12_hid_active: i2c12-hid-active {
-		pins = <92>;
+	i2c11_hid_active: i2c11-hid-active {
+		pins = "gpio92";
 		function = "gpio";
 
 		input-enable;
@@ -644,7 +575,7 @@
 	};
 
 	wcd_intr_default: wcd_intr_default {
-		pins = <54>;
+		pins = "gpio54";
 		function = "gpio";
 
 		input-enable;

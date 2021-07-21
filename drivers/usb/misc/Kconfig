@@ -89,7 +89,7 @@ config USB_CYTHERM
 	  Say Y here if you want to connect a Cypress USB thermometer
 	  device to your computer's USB port. This device is also known
 	  as the Cypress USB Starter kit or demo board. The Elektor
-	  magazine published a modified version of this device in issue
+	  magazine published a modified version of this device in issue 
 	  #291.
 
 	  To compile this driver as a module, choose M here: the
@@ -275,14 +275,6 @@ config USB_CHAOSKEY
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called chaoskey.
-
-config USB_FT232H_INTF
-	tristate "FTDI FT232H SPI and platform data configuration interface driver"
-	help
-	  Enable driver support for the FT232H/ft2232H based USB-GPIO/SPI/FIFO
-	  interface adapter for SPI and FPGA configuration. Additional drivers
-	  such as spi-ftdi-mpsse, etc must be enabled in order to use the
-	  functionality of the device.
 
 config BRCM_USB_PINMAP
 	tristate "Broadcom pinmap driver support"

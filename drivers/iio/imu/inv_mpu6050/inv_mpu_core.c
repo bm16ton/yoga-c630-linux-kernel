@@ -21,17 +21,6 @@
 #include "inv_mpu_iio.h"
 #include "inv_mpu_magn.h"
 
-int inv_mpu6050_noirq;
-module_param_named(noirq, inv_mpu6050_noirq, int, 0444);
-MODULE_PARM_DESC(noirq, "Disable IRQ hack for i2c-tiny-usb");
-
-EXPORT_SYMBOL(inv_mpu6050_noirq);
-
-int inv_mpu6050_ftemp;
-module_param_named(ftemp, inv_mpu6050_ftemp, int, 0444);
-MODULE_PARM_DESC(ftemp, "Force temp sensor on hack");
-
-EXPORT_SYMBOL(inv_mpu6050_ftemp);
 /*
  * this is the gyro scale translated from dynamic range plus/minus
  * {250, 500, 1000, 2000} to rad/s
@@ -617,22 +606,16 @@ static int inv_mpu6050_read_channel_data(struct iio_dev *indio_dev,
 					      chan->channel2, val);
 		break;
 	case IIO_TEMP:
-// 16ton
 		/* temperature sensor work only with accel and/or gyro */
-	if (!inv_mpu6050_ftemp) {
 		if (!st->chip_config.accl_en && !st->chip_config.gyro_en) {
 			result = -EBUSY;
 			goto error_power_off;
 		}
-	}
-
 		if (!st->chip_config.temp_en) {
 			result = inv_mpu6050_switch_engine(st, true,
 					INV_MPU6050_SENSOR_TEMP);
-	if (!inv_mpu6050_ftemp) {
 			if (result)
 				goto error_power_off;
-    }
 			/* wait 1 period for first sample availability */
 			min_sleep_us = period_us;
 			max_sleep_us = period_us + period_us / 2;
@@ -1482,34 +1465,38 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 	} else {
 		st->plat_data = *pdata;
 	}
-//16ton
-	if (!inv_mpu6050_noirq) {
-	    desc = irq_get_irq_data(irq);
-	    if (!desc) {
-		dev_err(dev, "Could not find IRQ %d\n", irq);
-		return -EINVAL;
-	    }
 
-	    irq_type = irqd_get_trigger_type(desc);
-	    if (!irq_type)
-	    	irq_type = IRQF_TRIGGER_RISING;
-	    if (irq_type & IRQF_TRIGGER_RISING)	// rising or both-edge
-	    	st->irq_mask = INV_MPU6050_ACTIVE_HIGH;
-	    else if (irq_type == IRQF_TRIGGER_FALLING)
-	    	st->irq_mask = INV_MPU6050_ACTIVE_LOW;
-	    else if (irq_type == IRQF_TRIGGER_HIGH)
-	    	st->irq_mask = INV_MPU6050_ACTIVE_HIGH |
-	    		INV_MPU6050_LATCH_INT_EN;
-	    else if (irq_type == IRQF_TRIGGER_LOW)
-	    	st->irq_mask = INV_MPU6050_ACTIVE_LOW |
-	    		INV_MPU6050_LATCH_INT_EN;
-	    else {
-	    	dev_err(dev, "Invalid interrupt type 0x%x specified\n",
-	    		irq_type);
-	    	return -EINVAL;
-	  }
-    }
-//16ton
+	if (irq > 0) {
+		desc = irq_get_irq_data(irq);
+		if (!desc) {
+			dev_err(dev, "Could not find IRQ %d\n", irq);
+			return -EINVAL;
+		}
+
+		irq_type = irqd_get_trigger_type(desc);
+		if (!irq_type)
+			irq_type = IRQF_TRIGGER_RISING;
+	} else {
+		/* Doesn't really matter, use the default */
+		irq_type = IRQF_TRIGGER_RISING;
+	}
+
+	if (irq_type & IRQF_TRIGGER_RISING)	// rising or both-edge
+		st->irq_mask = INV_MPU6050_ACTIVE_HIGH;
+	else if (irq_type == IRQF_TRIGGER_FALLING)
+		st->irq_mask = INV_MPU6050_ACTIVE_LOW;
+	else if (irq_type == IRQF_TRIGGER_HIGH)
+		st->irq_mask = INV_MPU6050_ACTIVE_HIGH |
+			INV_MPU6050_LATCH_INT_EN;
+	else if (irq_type == IRQF_TRIGGER_LOW)
+		st->irq_mask = INV_MPU6050_ACTIVE_LOW |
+			INV_MPU6050_LATCH_INT_EN;
+	else {
+		dev_err(dev, "Invalid interrupt type 0x%x specified\n",
+			irq_type);
+		return -EINVAL;
+	}
+
 	st->vdd_supply = devm_regulator_get(dev, "vdd");
 	if (IS_ERR(st->vdd_supply))
 		return dev_err_probe(dev, PTR_ERR(st->vdd_supply),
@@ -1618,25 +1605,28 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 	}
 
 	indio_dev->info = &mpu_info;
-	indio_dev->modes = INDIO_BUFFER_TRIGGERED;
 
-	result = devm_iio_triggered_buffer_setup(dev, indio_dev,
-						 iio_pollfunc_store_time,
-						 inv_mpu6050_read_fifo,
-						 NULL);
-	if (result) {
-		dev_err(dev, "configure buffer fail %d\n", result);
-		return result;
+	if (irq > 0) {
+		/*
+		 * The driver currently only supports buffered capture with its
+		 * own trigger. So no IRQ, no trigger, no buffer
+		 */
+		result = devm_iio_triggered_buffer_setup(dev, indio_dev,
+							 iio_pollfunc_store_time,
+							 inv_mpu6050_read_fifo,
+							 NULL);
+		if (result) {
+			dev_err(dev, "configure buffer fail %d\n", result);
+			return result;
+		}
+
+		result = inv_mpu6050_probe_trigger(indio_dev, irq_type);
+		if (result) {
+			dev_err(dev, "trigger probe fail %d\n", result);
+			return result;
+		}
 	}
-//16ton
-	if (!inv_mpu6050_noirq) {
-	result = inv_mpu6050_probe_trigger(indio_dev, irq_type);
-	if (result) {
-		dev_err(dev, "trigger probe fail %d\n", result);
-		return result;
-	}
-    }
-//16ton
+
 	result = devm_iio_device_register(dev, indio_dev);
 	if (result) {
 		dev_err(dev, "IIO register fail %d\n", result);

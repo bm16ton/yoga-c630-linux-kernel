@@ -306,6 +306,7 @@ static int serial_resume(struct pcmcia_device *link)
 static int serial_probe(struct pcmcia_device *link)
 {
 	struct serial_info *info;
+	int ret;
 
 	dev_dbg(&link->dev, "serial_attach()\n");
 
@@ -320,7 +321,15 @@ static int serial_probe(struct pcmcia_device *link)
 	if (do_sound)
 		link->config_flags |= CONF_ENABLE_SPKR;
 
-	return serial_config(link);
+	ret = serial_config(link);
+	if (ret)
+		goto free_info;
+
+	return 0;
+
+free_info:
+	kfree(info);
+	return ret;
 }
 
 static void serial_detach(struct pcmcia_device *link)
@@ -456,11 +465,11 @@ static int simple_config(struct pcmcia_device *link)
 	 * its base address, then try to grab any standard serial port
 	 * address, and finally try to get any free port.
 	 */
-	if (!pcmcia_loop_config(link, simple_config_check_notpicky, NULL))
-		goto found_port;
-
-	dev_warn(&link->dev, "no usable port range found, giving up\n");
-	return -1;
+	ret = pcmcia_loop_config(link, simple_config_check_notpicky, NULL);
+	if (ret) {
+		dev_warn(&link->dev, "no usable port range found, giving up\n");
+		return ret;
+	}
 
 found_port:
 	if (info->multi && (info->manfid == MANFID_3COM))
@@ -474,7 +483,7 @@ found_port:
 
 	ret = pcmcia_enable_device(link);
 	if (ret != 0)
-		return -1;
+		return ret;
 	return setup_serial(link, info, link->resource[0]->start, link->irq);
 }
 

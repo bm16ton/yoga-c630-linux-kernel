@@ -35,8 +35,8 @@
 #define SCLP_VT220_MINOR		65
 #define SCLP_VT220_DRIVER_NAME		"sclp_vt220"
 #define SCLP_VT220_DEVICE_NAME		"ttysclp"
-#define SCLP_VT220_CONSOLE_NAME		"ttyS"
-#define SCLP_VT220_CONSOLE_INDEX	1	/* console=ttyS1 */
+#define SCLP_VT220_CONSOLE_NAME		"ttysclp"
+#define SCLP_VT220_CONSOLE_INDEX	0	/* console=ttysclp0 */
 
 /* Representation of a single write request */
 struct sclp_vt220_request {
@@ -61,13 +61,13 @@ static struct tty_driver *sclp_vt220_driver;
 static struct tty_port sclp_vt220_port;
 
 /* Lock to protect internal data from concurrent access */
-static spinlock_t sclp_vt220_lock;
+static DEFINE_SPINLOCK(sclp_vt220_lock);
 
 /* List of empty pages to be used as write request buffers */
-static struct list_head sclp_vt220_empty;
+static LIST_HEAD(sclp_vt220_empty);
 
 /* List of pending requests */
-static struct list_head sclp_vt220_outqueue;
+static LIST_HEAD(sclp_vt220_outqueue);
 
 /* Suspend mode flag */
 static int sclp_vt220_suspended;
@@ -693,9 +693,6 @@ static int __init __sclp_vt220_init(int num_pages)
 	sclp_vt220_init_count++;
 	if (sclp_vt220_init_count != 1)
 		return 0;
-	spin_lock_init(&sclp_vt220_lock);
-	INIT_LIST_HEAD(&sclp_vt220_empty);
-	INIT_LIST_HEAD(&sclp_vt220_outqueue);
 	timer_setup(&sclp_vt220_timer, sclp_vt220_timeout, 0);
 	tty_port_init(&sclp_vt220_port);
 	sclp_vt220_current_request = NULL;

@@ -155,7 +155,6 @@ static int pwm_imx1_probe(struct platform_device *pdev)
 
 	imx->chip.ops = &pwm_imx1_ops;
 	imx->chip.dev = &pdev->dev;
-	imx->chip.base = -1;
 	imx->chip.npwm = 1;
 
 	imx->mmio_base = devm_platform_ioremap_resource(pdev, 0);
@@ -168,8 +167,6 @@ static int pwm_imx1_probe(struct platform_device *pdev)
 static int pwm_imx1_remove(struct platform_device *pdev)
 {
 	struct pwm_imx1_chip *imx = platform_get_drvdata(pdev);
-
-	pwm_imx1_clk_disable_unprepare(&imx->chip);
 
 	return pwmchip_remove(&imx->chip);
 }

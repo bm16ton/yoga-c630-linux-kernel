@@ -92,6 +92,10 @@
 	};
 };
 
+&crc1 {
+	status = "okay";
+};
+
 &dac {
 	pinctrl-names = "default";
 	pinctrl-0 = <&dac_ch1_pins_a &dac_ch2_pins_a>;
@@ -119,7 +123,6 @@
 	max-speed = <100>;
 	phy-handle = <&phy0>;
 	st,eth-ref-clk-sel;
-	phy-reset-gpios = <&gpioh 3 GPIO_ACTIVE_LOW>;
 
 	mdio0 {
 		#address-cells = <1>;
@@ -128,6 +131,13 @@
 
 		phy0: ethernet-phy@1 {
 			reg = <1>;
+			/* LAN8710Ai */
+			compatible = "ethernet-phy-id0007.c0f0",
+				     "ethernet-phy-ieee802.3-c22";
+			clocks = <&rcc ETHCK_K>;
+			reset-gpios = <&gpioh 3 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <500>;
+			reset-deassert-us = <500>;
 			interrupt-parent = <&gpioi>;
 			interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
 		};
@@ -164,8 +174,68 @@
 	};
 };
 
+&gpioa {
+	gpio-line-names = "", "", "", "",
+			  "", "", "DHCOM-K", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&gpiob {
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "DHCOM-Q", "", "", "",
+			  "", "", "", "";
+};
+
 &gpioc {
+	gpio-line-names = "", "", "", "",
+			  "", "", "DHCOM-E", "",
+			  "", "", "", "",
+			  "", "", "", "";
 	status = "okay";
+};
+
+&gpiod {
+	gpio-line-names = "", "", "", "",
+			  "", "", "DHCOM-B", "",
+			  "", "", "", "DHCOM-F",
+			  "DHCOM-D", "", "", "";
+};
+
+&gpioe {
+	gpio-line-names = "", "", "", "",
+			  "", "", "DHCOM-P", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&gpiof {
+	gpio-line-names = "", "", "", "DHCOM-A",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&gpiog {
+	gpio-line-names = "DHCOM-C", "", "", "",
+			  "", "", "", "",
+			  "DHCOM-L", "", "", "",
+			  "", "", "", "";
+};
+
+&gpioh {
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "DHCOM-N",
+			  "DHCOM-J", "DHCOM-W", "DHCOM-V", "DHCOM-U",
+			  "DHCOM-T", "", "DHCOM-S", "";
+};
+
+&gpioi {
+	gpio-line-names = "DHCOM-G", "DHCOM-O", "DHCOM-H", "DHCOM-I",
+			  "DHCOM-R", "DHCOM-M", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
 };
 
 &i2c4 {

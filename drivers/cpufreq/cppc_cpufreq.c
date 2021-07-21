@@ -182,6 +182,16 @@ static int cppc_verify_policy(struct cpufreq_policy_data *policy)
 	return 0;
 }
 
+static void cppc_cpufreq_put_cpu_data(struct cpufreq_policy *policy)
+{
+	struct cppc_cpudata *cpu_data = policy->driver_data;
+
+	list_del(&cpu_data->node);
+	free_cpumask_var(cpu_data->shared_cpu_map);
+	kfree(cpu_data);
+	policy->driver_data = NULL;
+}
+
 static void cppc_cpufreq_stop_cpu(struct cpufreq_policy *policy)
 {
 	struct cppc_cpudata *cpu_data = policy->driver_data;
@@ -196,11 +206,7 @@ static void cppc_cpufreq_stop_cpu(struct cpufreq_policy *policy)
 		pr_debug("Err setting perf value:%d on CPU:%d. ret:%d\n",
 			 caps->lowest_perf, cpu, ret);
 
-	/* Remove CPU node from list and free driver data for policy */
-	free_cpumask_var(cpu_data->shared_cpu_map);
-	list_del(&cpu_data->node);
-	kfree(policy->driver_data);
-	policy->driver_data = NULL;
+	cppc_cpufreq_put_cpu_data(policy);
 }
 
 /*
@@ -216,26 +222,16 @@ static unsigned int cppc_cpufreq_get_transition_delay_us(unsigned int cpu)
 {
 	unsigned long implementor = read_cpuid_implementor();
 	unsigned long part_num = read_cpuid_part_number();
-	unsigned int delay_us = 0;
 
 	switch (implementor) {
 	case ARM_CPU_IMP_QCOM:
 		switch (part_num) {
 		case QCOM_CPU_PART_FALKOR_V1:
 		case QCOM_CPU_PART_FALKOR:
-			delay_us = 10000;
-			break;
-		default:
-			delay_us = cppc_get_transition_latency(cpu) / NSEC_PER_USEC;
-			break;
+			return 10000;
 		}
-		break;
-	default:
-		delay_us = cppc_get_transition_latency(cpu) / NSEC_PER_USEC;
-		break;
 	}
-
-	return delay_us;
+	return cppc_get_transition_latency(cpu) / NSEC_PER_USEC;
 }
 
 #else
@@ -340,7 +336,8 @@ static int cppc_cpufreq_cpu_init(struct cpufreq_policy *policy)
 	default:
 		pr_debug("Unsupported CPU co-ord type: %d\n",
 			 policy->shared_type);
-		return -EFAULT;
+		ret = -EFAULT;
+		goto out;
 	}
 
 	/*
@@ -355,10 +352,16 @@ static int cppc_cpufreq_cpu_init(struct cpufreq_policy *policy)
 	cpu_data->perf_ctrls.desired_perf =  caps->highest_perf;
 
 	ret = cppc_set_perf(cpu, &cpu_data->perf_ctrls);
-	if (ret)
+	if (ret) {
 		pr_debug("Err setting perf value:%d on CPU:%d. ret:%d\n",
 			 caps->highest_perf, cpu, ret);
+		goto out;
+	}
 
+	return 0;
+
+out:
+	cppc_cpufreq_put_cpu_data(policy);
 	return ret;
 }
 

@@ -652,7 +652,6 @@ out:
 
 #define PWR_MODE_STR_LEN	64
 static int exynos_ufs_post_pwr_mode(struct ufs_hba *hba,
-				struct ufs_pa_layer_attr *pwr_max,
 				struct ufs_pa_layer_attr *pwr_req)
 {
 	struct exynos_ufs *ufs = ufshcd_get_variant(hba);
@@ -1155,7 +1154,7 @@ static int exynos_ufs_pwr_change_notify(struct ufs_hba *hba,
 					      dev_req_params);
 		break;
 	case POST_CHANGE:
-		ret = exynos_ufs_post_pwr_mode(hba, NULL, dev_req_params);
+		ret = exynos_ufs_post_pwr_mode(hba, dev_req_params);
 		break;
 	}
 
@@ -1268,8 +1267,6 @@ static const struct dev_pm_ops exynos_ufs_pm_ops = {
 	.runtime_suspend = ufshcd_pltfrm_runtime_suspend,
 	.runtime_resume  = ufshcd_pltfrm_runtime_resume,
 	.runtime_idle    = ufshcd_pltfrm_runtime_idle,
-	.prepare	 = ufshcd_suspend_prepare,
-	.complete	= ufshcd_resume_complete,
 };
 
 static struct platform_driver exynos_ufs_pltform = {

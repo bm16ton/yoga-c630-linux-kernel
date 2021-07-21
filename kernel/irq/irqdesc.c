@@ -31,7 +31,7 @@ static int __init irq_affinity_setup(char *str)
 	cpulist_parse(str, irq_default_affinity);
 	/*
 	 * Set at least the boot cpu. We don't want to end up with
-	 * bugreports caused by random comandline masks
+	 * bugreports caused by random commandline masks
 	 */
 	cpumask_set_cpu(smp_processor_id(), irq_default_affinity);
 	return 1;
@@ -355,7 +355,7 @@ struct irq_desc *irq_to_desc(unsigned int irq)
 #ifdef CONFIG_KVM_BOOK3S_64_HV_MODULE
 EXPORT_SYMBOL_GPL(irq_to_desc);
 #endif
-EXPORT_SYMBOL_GPL(irq_to_desc);
+
 static void delete_irq_desc(unsigned int irq)
 {
 	radix_tree_delete(&irq_desc_tree, irq);
