@@ -337,6 +337,13 @@ config SPI_FSL_LPSPI
 	help
 	  This enables Freescale i.MX LPSPI controllers in master mode.
 
+config SPI_FTDI_MPSSE
+	tristate "FTDI MPSSE SPI controller"
+	depends on USB_FT232H_INTF || COMPILE_TEST
+	help
+	  FT232H supports SPI in MPSSE mode. This driver provides MPSSE
+	  SPI controller in master mode.
+
 config SPI_FSL_QUADSPI
 	tristate "Freescale QSPI controller"
 	depends on ARCH_MXC || SOC_LS1021A || ARCH_LAYERSCAPE || COMPILE_TEST
@@ -840,6 +847,12 @@ config SPI_SYNQUACER
 	  that use the de-facto standard SPI protocol.
 
 	  It also supports the new dual-bit and quad-bit SPI protocol.
+
+config SPI_TINY_USB
+	 tristate "STM32 based usb to SPI controller"
+	 help
+	 	A USB to SPI device, it requires an MCU with the spi-tiny-usb
+	 	firmware.Currently only sum stm32 devices supported
 
 config SPI_MXIC
 	tristate "Macronix MX25F0A SPI controller"
