@@ -83,12 +83,11 @@ struct dpu_hw_intr_ops {
 	/**
 	 * irq_idx_lookup - Lookup IRQ index on the HW interrupt type
 	 *                 Used for all irq related ops
-	 * @intr:		HW interrupt handle
 	 * @intr_type:		Interrupt type defined in dpu_intr_type
 	 * @instance_idx:	HW interrupt block instance
 	 * @return:		irq_idx or -EINVAL for lookup fail
 	 */
-	int (*irq_idx_lookup)(struct dpu_hw_intr *intr,
+	int (*irq_idx_lookup)(
 			enum dpu_intr_type intr_type,
 			u32 instance_idx);
 
@@ -180,7 +179,6 @@ struct dpu_hw_intr_ops {
  * @save_irq_status:  array of IRQ status reg storage created during init
  * @irq_idx_tbl_size: total number of irq_idx mapped in the hw_interrupts
  * @irq_lock:         spinlock for accessing IRQ resources
- * @obsolete_irq:      irq types that are obsolete for a particular target
  */
 struct dpu_hw_intr {
 	struct dpu_hw_blk_reg_map hw;
@@ -190,7 +188,6 @@ struct dpu_hw_intr {
 	u32 irq_idx_tbl_size;
 	spinlock_t irq_lock;
 	unsigned long irq_mask;
-	unsigned long obsolete_irq;
 };
 
 /**

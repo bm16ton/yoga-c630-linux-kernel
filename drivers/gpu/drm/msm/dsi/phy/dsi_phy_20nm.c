@@ -63,14 +63,13 @@ static void dsi_20nm_phy_regulator_ctrl(struct msm_dsi_phy *phy, bool enable)
 	dsi_phy_write(base + REG_DSI_20nm_PHY_REGULATOR_CTRL_0, 0x03);
 }
 
-static int dsi_20nm_phy_enable(struct msm_dsi_phy *phy,
+static int dsi_20nm_phy_enable(struct msm_dsi_phy *phy, int src_pll_id,
 				struct msm_dsi_phy_clk_request *clk_req)
 {
 	struct msm_dsi_dphy_timing *timing = &phy->timing;
 	int i;
 	void __iomem *base = phy->base;
 	u32 cfg_4[4] = {0x20, 0x40, 0x20, 0x00};
-	u32 val;
 
 	DBG("");
 
@@ -84,12 +83,9 @@ static int dsi_20nm_phy_enable(struct msm_dsi_phy *phy,
 
 	dsi_phy_write(base + REG_DSI_20nm_PHY_STRENGTH_0, 0xff);
 
-	val = dsi_phy_read(base + REG_DSI_20nm_PHY_GLBL_TEST_CTRL);
-	if (phy->id == DSI_1 && phy->usecase == MSM_DSI_PHY_STANDALONE)
-		val |= DSI_20nm_PHY_GLBL_TEST_CTRL_BITCLK_HS_SEL;
-	else
-		val &= ~DSI_20nm_PHY_GLBL_TEST_CTRL_BITCLK_HS_SEL;
-	dsi_phy_write(base + REG_DSI_20nm_PHY_GLBL_TEST_CTRL, val);
+	msm_dsi_phy_set_src_pll(phy, src_pll_id,
+				REG_DSI_20nm_PHY_GLBL_TEST_CTRL,
+				DSI_20nm_PHY_GLBL_TEST_CTRL_BITCLK_HS_SEL);
 
 	for (i = 0; i < 4; i++) {
 		dsi_phy_write(base + REG_DSI_20nm_PHY_LN_CFG_3(i),
@@ -129,7 +125,8 @@ static void dsi_20nm_phy_disable(struct msm_dsi_phy *phy)
 }
 
 const struct msm_dsi_phy_cfg dsi_phy_20nm_cfgs = {
-	.has_phy_regulator = true,
+	.type = MSM_DSI_PHY_20NM,
+	.src_pll_truthtable = { {false, true}, {false, true} },
 	.reg_cfg = {
 		.num = 2,
 		.regs = {
@@ -140,6 +137,7 @@ const struct msm_dsi_phy_cfg dsi_phy_20nm_cfgs = {
 	.ops = {
 		.enable = dsi_20nm_phy_enable,
 		.disable = dsi_20nm_phy_disable,
+		.init = msm_dsi_phy_init_common,
 	},
 	.io_start = { 0xfd998500, 0xfd9a0500 },
 	.num_dsi_phy = 2,

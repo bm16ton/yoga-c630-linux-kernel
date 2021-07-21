@@ -15,6 +15,9 @@
 #include <linux/slab.h>
 #include <linux/soc/qcom/mdt_loader.h>
 #include <soc/qcom/ocmem.h>
+
+#include <linux/io-pgtable.h>
+
 #include "adreno_gpu.h"
 #include "a6xx_gpu.h"
 #include "msm_gem.h"
@@ -269,9 +272,6 @@ int adreno_get_param(struct msm_gpu *gpu, uint32_t param, uint64_t *value)
 		return 0;
 	case MSM_PARAM_FAULTS:
 		*value = gpu->global_faults;
-		return 0;
-	case MSM_PARAM_SUSPENDS:
-		*value = gpu->suspend_count;
 		return 0;
 	default:
 		DBG("%s: invalid param: %u", gpu->name, param);
