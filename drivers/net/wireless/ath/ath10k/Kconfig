@@ -87,3 +87,4 @@ config ATH10K_DFS_CERTIFIED
 	help
 	This option enables DFS support for initiating radiation on
 	ath10k.
+

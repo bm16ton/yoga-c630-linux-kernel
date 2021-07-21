@@ -9414,9 +9414,24 @@ static const struct ieee80211_channel ath10k_2ghz_channels[] = {
 	CHAN2G(12, 2467, 0),
 	CHAN2G(13, 2472, 0),
 	CHAN2G(14, 2484, 0),
+//	CHAN2G(15, 2487, 0), /* Channel XX */
+//	CHAN2G(16, 2502, 0), /* Channel XX */
+//	CHAN2G(17, 2512, 0), /* Channel XX */
+//	CHAN2G(18, 2572, 0), /* Channel XX */
+//	CHAN2G(19, 2592, 0), /* Channel XX */
+//	CHAN2G(20, 2612, 0), /* Channel XX */
+//	CHAN2G(21, 2632, 0), /* Channel XX */
+//	CHAN2G(22, 2652, 0), /* Channel XX */
+//	CHAN2G(23, 2672, 0), /* Channel XX */
+//	CHAN2G(24, 2692, 0), /* Channel XX */
+//	CHAN2G(25, 2712, 0), /* Channel XX */
+//	CHAN2G(26, 2732, 0), /* Channel XX */
 };
 
 static const struct ieee80211_channel ath10k_5ghz_channels[] = {
+//	CHAN5G(84, 5420, 0),
+//	CHAN5G(88, 5440, 0),
+//	CHAN5G(92, 5460, 0),
 	CHAN5G(36, 5180, 0),
 	CHAN5G(40, 5200, 0),
 	CHAN5G(44, 5220, 0),
@@ -9444,6 +9459,16 @@ static const struct ieee80211_channel ath10k_5ghz_channels[] = {
 	CHAN5G(165, 5825, 0),
 	CHAN5G(169, 5845, 0),
 	CHAN5G(173, 5865, 0),
+	CHAN5G(177, 5885, 0),
+//	CHAN5G(181, 5905, 0),
+//	CHAN5G(185, 5925, 0),
+//	CHAN5G(189, 5945, 0),
+//	CHAN5G(193, 5965, 0),
+//	CHAN5G(197, 5985, 0),
+//	CHAN5G(68, 5340, 0),
+//	CHAN5G(72, 5360, 0),
+//	CHAN5G(76, 5380, 0),
+//	CHAN5G(80, 5400, 0),
 	/* If you add more, you may need to change ATH10K_MAX_5G_CHAN */
 	/* And you will definitely need to change ATH10K_NUM_CHANS in core.h */
 };
