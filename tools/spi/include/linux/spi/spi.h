@@ -1,1 +1,1 @@
-/home/maddocks/yoga-kernel/tools/spi/../../include/uapi/linux/spi/spi.h
+/home/maddocks/linux-5.13.4/tools/spi/../../include/uapi/linux/spi/spi.h

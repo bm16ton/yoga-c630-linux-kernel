@@ -123,7 +123,7 @@ static struct fb_var_screeninfo ax206fb_default __initdata = {
 };
 
 static struct fb_fix_screeninfo ax206fb_fix __initdata = {
-	.id =			"AX206 DPF Frame Buffer",
+	.id =			"AX206 DPF fbdev",
 	.type =			FB_TYPE_PACKED_PIXELS,
 	.visual =		FB_VISUAL_PSEUDOCOLOR,
 	.xpanstep =		1,
@@ -686,6 +686,8 @@ static void __exit ax206fb_exit(void)
 }
 
 module_exit(ax206fb_exit);
+
+//module_platform_driver_probe(ax206fb_driver, ax206fb_probe);
 
 MODULE_LICENSE("GPL");
 #endif /* MODULE */

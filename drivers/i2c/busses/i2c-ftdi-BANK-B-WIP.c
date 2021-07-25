@@ -43,7 +43,7 @@ static int ftdi_mpsse_write(
 	int ret;
 
 	ret = usb_bulk_msg(
-		ftdi->udev, usb_sndbulkpipe(ftdi->udev, 4),
+		ftdi->udev, usb_sndbulkpipe(ftdi->udev, 2),
 		/* data = */data,
 		/* len = */size,
 		/* actual_length = */&actual_length,
@@ -59,7 +59,7 @@ static int ftdi_mpsse_read(
 	int ret;
 
 	ret = usb_bulk_msg(
-		ftdi->udev, usb_rcvbulkpipe(ftdi->udev, 3),
+		ftdi->udev, usb_rcvbulkpipe(ftdi->udev, 1),
 		/* data = */data,
 		/* len = */size,
 		/* actual_length = */&actual_length,
@@ -462,7 +462,7 @@ static int ftdi_set_bit_mode(struct ftdi_usb *ftdi, u16 mode)
 	// I don't know the format I read them check that it's just 2 bytes and
 	// ignore the actual values.
 	ret = usb_bulk_msg(
-		ftdi->udev, usb_rcvbulkpipe(ftdi->udev, 3),
+		ftdi->udev, usb_rcvbulkpipe(ftdi->udev, 1),
 		/* data = */ftdi->buffer,
 		/* len = */ftdi->buffer_size,
 		/* actual_length = */&actual_length,
@@ -574,7 +574,7 @@ static int ftdi_reset(struct ftdi_usb *ftdi)
 
 	ret = usb_control_msg(
 		ftdi->udev, usb_sndctrlpipe(ftdi->udev, 0),
-		/* bRequest = */0x00,
+		/* bRequest = */0x09,
 		/* bRequestType = */0x40,
 		/* wValue = */0x0002,
 		/* wIndex =  */0x0002,
