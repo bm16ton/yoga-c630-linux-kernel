@@ -50,6 +50,7 @@
 #include <linux/i2c.h>
 #include <linux/gpio.h>
 #include <linux/irq.h>
+#include <linux/irqnr.h>
 #include <linux/kthread.h>
 
 /**

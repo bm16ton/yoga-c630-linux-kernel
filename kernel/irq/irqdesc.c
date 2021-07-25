@@ -355,6 +355,9 @@ struct irq_desc *irq_to_desc(unsigned int irq)
 #ifdef CONFIG_KVM_BOOK3S_64_HV_MODULE
 EXPORT_SYMBOL_GPL(irq_to_desc);
 #endif
+#ifdef CONFIG_I2C_CH341_MODULE
+EXPORT_SYMBOL_GPL(irq_to_desc);
+#endif
 
 static void delete_irq_desc(unsigned int irq)
 {
