@@ -12,6 +12,7 @@ obj-$(CONFIG_IMG_ASCII_LCD)	+= img-ascii-lcd.o
 obj-$(CONFIG_HD44780)		+= hd44780.o
 obj-$(CONFIG_HD44780I2C)	+= hd44780-i2c.o
 hd44780-i2c-y      := hd44780i2c.o hd44780i2c-dev.o
+obj-$(CONFIG_SSD1306)   += ssd1306.o
 obj-$(CONFIG_HT16K33)		+= ht16k33.o
 obj-$(CONFIG_PARPORT_PANEL)	+= panel.o
 obj-$(CONFIG_LCD2S)		+= lcd2s.o

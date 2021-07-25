@@ -110,6 +110,12 @@ config KS0108_DELAY
 	  If you compile this as a module, you can still override this
 	  value using the module parameters.
 
+config SSD1306
+	tristate "ssd1306 i2c char driver"
+	depends on GPIOLIB || COMPILE_TEST
+	help
+	  ssd1306 i2c char driver, creates /dev/ssd1306.
+
 config CFAG12864B
 	tristate "CFAG12864B LCD"
 	depends on X86
