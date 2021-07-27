@@ -43,6 +43,10 @@
 *.tab.[ch]
 *.tar
 *.xz
+*.wip
+*.og
+*.bk
+
 Module.symvers
 modules.builtin
 modules.order

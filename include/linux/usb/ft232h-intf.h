@@ -167,6 +167,7 @@ struct mpsse_spi_platform_data {
 	size_t spi_info_len;
 	struct dev_io_desc_data *io_data;
 	size_t io_data_len;
+//	int dc;
 };
 
 /*
