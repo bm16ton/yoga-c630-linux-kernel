@@ -813,7 +813,7 @@ static int ftdi_mpsse_gpio_get(struct gpio_chip *chip, unsigned int offset)
 
 	dev_dbg(chip->parent, "%s: offset %d\n", __func__, offset);
 
-	low = offset < 5 ? true : false;
+	low = offset < 5;
 
 	mutex_lock(&priv->ops_mutex);
 
@@ -1004,7 +1004,7 @@ static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 	priv->mpsse_gpio.parent = dev;
 	priv->mpsse_gpio.owner = THIS_MODULE;
 	priv->mpsse_gpio.base = -1;
-	priv->mpsse_gpio.ngpio = 13;
+	priv->mpsse_gpio.ngpio = FTDI_MPSSE_GPIOS;
 	priv->mpsse_gpio.can_sleep = true;
 	priv->mpsse_gpio.set = ftdi_mpsse_gpio_set;
 	priv->mpsse_gpio.get = ftdi_mpsse_gpio_get;
@@ -1198,13 +1198,27 @@ static int ft232h_intf_fpp_remove(struct usb_interface *intf)
  */
 #define SPI_INTF_DEVNAME	"ftdi-mpsse-spi"
 
+static struct dev_io_desc_data ftdi_spi_bus_dev_io[] = {
+	{ "dc", 2, GPIO_ACTIVE_HIGH },
+	{ "reset", 3, GPIO_ACTIVE_HIGH },
+};
+
+static const struct mpsse_spi_dev_data ftdi_spi_dev_data[] = {
+	{
+	.magic		= FTDI_MPSSE_IO_DESC_MAGIC,
+	.desc		= ftdi_spi_bus_dev_io,
+	.desc_len	= ARRAY_SIZE(ftdi_spi_bus_dev_io),
+	},
+};
+
 static struct spi_board_info ftdi_spi_bus_info[] = {
     {
-    .modalias	= "spidev",
+    .modalias	= "fb_ili9341",
     .mode		= SPI_MODE_0,
     .max_speed_hz	= 60000000,
     .bus_num	= 0,
     .chip_select	= 0, // TCK/SK at ADBUS0
+    .platform_data	= ftdi_spi_dev_data,
     },
  /*   {
 //    .modalias	= "spidev",
@@ -1216,7 +1230,7 @@ static struct spi_board_info ftdi_spi_bus_info[] = {
     .chip_select	= 5, // GPIOH0 at ACBUS0
     },
     */
-   };
+};
 
 static const struct mpsse_spi_platform_data ftdi_spi_bus_plat_data = {
     .ops		= &ft232h_intf_ops,
@@ -1245,8 +1259,6 @@ static const struct mpsse_spi_platform_data fpga_cfg_spi_plat_data = {
 	.ops		= &ft232h_intf_ops,
 	.spi_info	= fpga_cfg_spi_info,
 	.spi_info_len	= ARRAY_SIZE(fpga_cfg_spi_info),
-	.io_data	= fpga_cfg_spi_dev_io,
-	.io_data_len	= ARRAY_SIZE(fpga_cfg_spi_dev_io),
 };
 
 static struct platform_device *mpsse_dev_register(struct ft232h_intf_priv *priv,
@@ -1459,6 +1471,12 @@ static void ft232h_intf_disconnect(struct usb_interface *intf)
 	info = (struct ft232h_intf_info *)priv->usb_dev_id->driver_info;
 	if (info && info->remove)
 		info->remove(intf);
+
+	if (info->use_mpsse_gpio_ctrl)
+		gpiochip_remove(&priv->mpsse_gpio);
+
+	if (info->use_cbus_gpio_ctrl)
+		gpiochip_remove(&priv->cbus_gpio);
 
 	mutex_lock(&priv->io_mutex);
 	priv->intf = NULL;

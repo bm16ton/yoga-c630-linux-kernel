@@ -47,6 +47,9 @@
 #define FTDI_USB_READ_TIMEOUT	5000
 #define FTDI_USB_WRITE_TIMEOUT	5000
 
+/* Total number of MPSSE GPIOs: 4x GPIOL, 8x GPIOH, 1x CS on ADBUS3 */
+#define FTDI_MPSSE_GPIOS	13
+
 /* MPSSE bitbang modes (copied from libftdi) */
 enum ftdi_mpsse_mode {
 	BITMODE_RESET	= 0x00,	/* switch off bitbang mode */
@@ -150,6 +153,26 @@ struct fifo_fpp_mgr_platform_data {
 	int conf_done_num;
 };
 
+#define FTDI_MPSSE_IO_DESC_MAGIC	0x5345494F
+/*
+ * struct mpsse_spi_dev_data - MPSSE SPI device platform data
+ * @magic: Special # indicating that this is a I/O descriptor struct
+ * @io_data: Array with descriptors of used I/O pins
+ * @io_data_len: Length of io_data array
+ *
+ * MPSSE SPI slave specific platform data describing additional
+ * I/O pins (if any) of attached SPI slave. It is supposed to be
+ * passed via .platform_data of spi_board_info struct.
+ * To differentiate between MPSSE I/O descriptor data and other
+ * driver-specific platform data we use FTDI_MPSSE_IO_DESC_MAGIC
+ * in the header of this struct
+ */
+struct mpsse_spi_dev_data {
+	u32 magic;
+	struct dev_io_desc_data *desc;
+	size_t desc_len;
+};
+
 /*
  * struct mpsse_spi_platform_data - MPSSE SPI bus platform data
  * @ops: USB interface operations used in MPSSE SPI controller driver
@@ -165,8 +188,8 @@ struct mpsse_spi_platform_data {
 	const struct ft232h_intf_ops *ops;
 	struct spi_board_info *spi_info;
 	size_t spi_info_len;
-	struct dev_io_desc_data *io_data;
-	size_t io_data_len;
+//	struct dev_io_desc_data *io_data;
+//	size_t io_data_len;
 //	int dc;
 };
 
