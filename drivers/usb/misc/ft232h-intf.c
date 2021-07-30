@@ -138,7 +138,9 @@ struct ft232h_intf_priv {
 	struct platform_device		*spi_pdev;
 	struct gpiod_lookup_table	*lookup_fifo;
 	struct gpiod_lookup_table	*lookup_cs;
-
+	struct gpiod_lookup_table	*lookup_dc;
+	struct gpiod_lookup_table	*lookup_reset
+	;
 	struct gpio_chip	cbus_gpio;
 	const char		*cbus_gpio_names[4];
 	u8			cbus_pin_offsets[4];
@@ -990,12 +992,15 @@ static int ftdi_mpsse_cfg_bus_pins(struct usb_interface *intf,
 	return ret;
 }
 
+const char *gpio_names[] = { "CS", "GPIOL0", "dc", "reset", "GPIOL3" };
+
 static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 {
 	struct device *dev = &priv->intf->dev;
 	char **names, *label;
-	int i, ret;
-
+//	int i, ret;
+//16ton replaces commented line above
+	int ret;
 	label = devm_kasprintf(dev, GFP_KERNEL, "ftdi-mpsse-gpio.%d", priv->id);
 	if (!label)
 		return -ENOMEM;
@@ -1016,10 +1021,12 @@ static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 	if (!names)
 		return -ENOMEM;
 
+	names[3] = devm_kasprintf(dev, GFP_KERNEL, "mpsse.%d-RESET", priv->id);
+	names[2] = devm_kasprintf(dev, GFP_KERNEL, "mpsse.%d-DC", priv->id);
 	names[0] = devm_kasprintf(dev, GFP_KERNEL, "mpsse.%d-CS", priv->id);
 	if (!names[0])
 		return -ENOMEM;
-
+/*
 	for (i = 1; i < priv->mpsse_gpio.ngpio; i++) {
 		int offs;
 
@@ -1032,6 +1039,9 @@ static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 	}
 
 	priv->mpsse_gpio.names = (const char *const *)names;
+*/
+
+	priv->mpsse_gpio.names = gpio_names;
 
 	ret = ftdi_set_bitmode(priv->intf, 0x00, BITMODE_MPSSE);
 	if (ret < 0) {
@@ -1248,13 +1258,13 @@ static struct spi_board_info fpga_cfg_spi_info[] = {
 	.chip_select	= 0,
 	},
 };
-
+/*
 static struct dev_io_desc_data fpga_cfg_spi_dev_io[3] = {
 	{ "confd", 1, GPIO_ACTIVE_HIGH },
 	{ "nstat", 2, GPIO_ACTIVE_LOW },
 	{ "nconfig", 3, GPIO_ACTIVE_LOW },
 };
-
+*/
 static const struct mpsse_spi_platform_data fpga_cfg_spi_plat_data = {
 	.ops		= &ft232h_intf_ops,
 	.spi_info	= fpga_cfg_spi_info,
@@ -1320,7 +1330,11 @@ static struct platform_device *mpsse_dev_register(struct ft232h_intf_priv *priv,
 	}
 
 	priv->lookup_cs = lookup;
+	priv->lookup_dc = lookup;
+	priv->lookup_reset = lookup;
 	gpiod_add_lookup_table(priv->lookup_cs);
+	gpiod_add_lookup_table(priv->lookup_dc);
+	gpiod_add_lookup_table(priv->lookup_reset);
 
 	ret = platform_device_add(pdev);
 	if (ret < 0)

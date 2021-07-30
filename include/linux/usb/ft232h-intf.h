@@ -48,7 +48,7 @@
 #define FTDI_USB_WRITE_TIMEOUT	5000
 
 /* Total number of MPSSE GPIOs: 4x GPIOL, 8x GPIOH, 1x CS on ADBUS3 */
-#define FTDI_MPSSE_GPIOS	13
+#define FTDI_MPSSE_GPIOS	5
 
 /* MPSSE bitbang modes (copied from libftdi) */
 enum ftdi_mpsse_mode {
@@ -188,6 +188,9 @@ struct mpsse_spi_platform_data {
 	const struct ft232h_intf_ops *ops;
 	struct spi_board_info *spi_info;
 	size_t spi_info_len;
+	u32 magic;
+	struct dev_io_desc_data *desc;
+	size_t desc_len;
 //	struct dev_io_desc_data *io_data;
 //	size_t io_data_len;
 //	int dc;

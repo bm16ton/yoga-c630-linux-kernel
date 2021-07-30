@@ -22,6 +22,10 @@
 #include <linux/usb.h>
 #include <linux/usb/ft232h-intf.h>
 
+int spi_ftdi_mpsse_debug;
+module_param_named(debug, spi_ftdi_mpsse_debug, int, 0444);
+MODULE_PARM_DESC(debug, "Turn on tx/rx details");
+
 enum gpiol {
 	MPSSE_SK	= BIT(0),
 	MPSSE_DO	= BIT(1),
@@ -36,6 +40,8 @@ struct ftdi_spi {
 	const struct ft232h_intf_ops *iops;
 	struct gpiod_lookup_table *lookup[FTDI_MPSSE_GPIOS];
 	struct gpio_desc **cs_gpios;
+	struct gpio_desc **dc_gpios;
+	struct gpio_desc **reset_gpios;
 
 	u8 txrx_cmd;
 	u8 rx_cmd;
@@ -49,8 +55,10 @@ static void ftdi_spi_set_cs(struct spi_device *spi, bool enable)
 	struct ftdi_spi *priv = spi_controller_get_devdata(spi->master);
 	u16 cs = spi->chip_select;
 
+	if (spi_ftdi_mpsse_debug) {
 	dev_dbg(&priv->pdev->dev, "%s: CS %u, cs mode %d, val %d\n",
 		__func__, cs, (spi->mode & SPI_CS_HIGH), enable);
+	}
 
 	gpiod_set_raw_value_cansleep(priv->cs_gpios[cs], enable);
 }
@@ -138,9 +146,10 @@ static int ftdi_spi_tx_rx(struct ftdi_spi *priv, struct spi_device *spi,
 			dev_err(dev, "%s: xfer failed %d\n", __func__, ret);
 			goto fail;
 		}
+		if (spi_ftdi_mpsse_debug) {
 		dev_dbg(dev, "%s: WR %zu byte(s), TXRX CMD 0x%02x\n",
 			__func__, stride, priv->txrx_cmd);
-
+		}
 		rx_stride = min_t(size_t, stride, SZ_512);
 
 		ret = ops->read_data(priv->intf, priv->xfer_buf, rx_stride);
@@ -167,7 +176,9 @@ static int ftdi_spi_tx_rx(struct ftdi_spi *priv, struct spi_device *spi,
 
 		remaining -= stride;
 		tx_offs += stride;
+		if (spi_ftdi_mpsse_debug) {
 		dev_dbg(dev, "%s: WR remains %zu\n", __func__, remaining);
+		}
 	}
 
 	ret = 0;
@@ -224,8 +235,10 @@ static int ftdi_spi_tx(struct ftdi_spi *priv, struct spi_transfer *xfer)
 				__func__, ret);
 			goto err;
 		}
+		if (spi_ftdi_mpsse_debug) {
 		dev_dbg(&priv->pdev->dev, "%s: %zu byte(s) done\n",
 			__func__, stride);
+		}
 		remaining -= stride;
 		tx_offs += stride;
 	} while (remaining);
@@ -243,10 +256,10 @@ static int ftdi_spi_rx(struct ftdi_spi *priv, struct spi_transfer *xfer)
 	size_t remaining, stride;
 	int ret, tout = 10;
 	void *rx_offs;
-
+	if (spi_ftdi_mpsse_debug) {
 	dev_dbg(dev, "%s: CMD 0x%02x, len %u\n",
 		__func__, priv->rx_cmd, xfer->len);
-
+	}
 	priv->xfer_buf[0] = priv->rx_cmd;
 	priv->xfer_buf[1] = xfer->len - 1;
 	priv->xfer_buf[2] = (xfer->len - 1) >> 8;
@@ -279,8 +292,9 @@ static int ftdi_spi_rx(struct ftdi_spi *priv, struct spi_transfer *xfer)
 		}
 
 		memcpy(rx_offs, priv->xfer_buf, ret);
-
+		if (spi_ftdi_mpsse_debug) {
 		dev_dbg(dev, "%s: %d byte(s)\n", __func__, ret);
+		}
 		rx_offs += ret;
 		remaining -= ret;
 	} while (remaining);
@@ -306,7 +320,9 @@ static int ftdi_spi_transfer_one(struct spi_controller *ctlr,
 		u8 spi_mode = spi->mode & (SPI_CPOL | SPI_CPHA);
 		u8 pins = 0;
 
+		if (spi_ftdi_mpsse_debug) {
 		dev_dbg(dev, "%s: MODE 0x%x\n", __func__, spi->mode);
+		}
 
 		if (spi->mode & SPI_LSB_FIRST) {
 			switch (spi_mode) {
@@ -353,9 +369,10 @@ static int ftdi_spi_transfer_one(struct spi_controller *ctlr,
 		}
 		priv->last_mode = spi->mode;
 	}
-
+	if (spi_ftdi_mpsse_debug) {
 	dev_dbg(dev, "%s: mode 0x%x, CMD RX/TX 0x%x/0x%x\n",
 		__func__, spi->mode, priv->rx_cmd, priv->tx_cmd);
+	}
 
 	if (xfer->tx_buf && xfer->rx_buf)
 		ret = ftdi_spi_tx_rx(priv, spi, xfer);
@@ -364,6 +381,7 @@ static int ftdi_spi_transfer_one(struct spi_controller *ctlr,
 	else if (xfer->rx_buf)
 		ret = ftdi_spi_rx(priv, xfer);
 
+	if (spi_ftdi_mpsse_debug)
 	dev_dbg(dev, "%s: xfer ret %d\n", __func__, ret);
 
 	spi_finalize_current_transfer(ctlr);
@@ -442,6 +460,7 @@ static int ftdi_spi_init_io(struct spi_controller *master, unsigned int dev_idx)
 
 	cs = pd->spi_info[dev_idx].chip_select;
 
+
 	lookup->dev_id = devm_kasprintf(&pdev->dev, GFP_KERNEL, "spi%d.%d",
 					master->bus_num, cs);
 	if (!lookup->dev_id) {
@@ -481,7 +500,7 @@ static int ftdi_spi_probe(struct platform_device *pdev)
 	struct spi_controller *master;
 	struct ftdi_spi *priv;
 	struct gpio_desc *desc;
-	u16 num_cs, max_cs = 0;
+	u16 dc, reset, num_cs, max_cs = 0;
 	unsigned int i;
 	int ret;
 
@@ -544,6 +563,12 @@ static int ftdi_spi_probe(struct platform_device *pdev)
 		spi_controller_put(master);
 		return -ENOMEM;
 	}
+
+	priv->dc_gpios = devm_kcalloc(&master->dev, dc, sizeof(desc),
+				      GFP_KERNEL);
+
+	priv->reset_gpios = devm_kcalloc(&master->dev, reset, sizeof(desc),
+				      GFP_KERNEL);
 
 	for (i = 0; i < num_cs; i++) {
 		unsigned int idx = pd->spi_info[i].chip_select;
