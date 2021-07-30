@@ -359,13 +359,13 @@ static struct fbtft_device_display displays[] = {
 			.platform_data = &(struct fbtft_platform_data) {
 				.display = {
 					.buswidth = 8,
-					.backlight = 1,
+					.backlight = 0,
 				},
 				.bgr = true,
 				.gpios = (const struct fbtft_gpio []) {
-					{ "reset", 25 },
-					{ "dc", 24 },
-					{ "led", 18 },
+					{ "reset", 2 },
+					{ "dc", 3 },
+//					{ "led", 18 },
 					{},
 				},
 			}

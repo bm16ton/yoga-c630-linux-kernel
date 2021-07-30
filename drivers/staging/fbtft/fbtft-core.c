@@ -26,6 +26,8 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
+#include <linux/gpio/consumer.h>
+#include <linux/gpio/machine.h>
 
 #include "fbtft.h"
 #include "internal.h"
@@ -117,7 +119,9 @@ static unsigned long fbtft_request_gpios_match(struct fbtft_par *par,
 
 static int fbtft_request_gpios(struct fbtft_par *par)
 {
+	struct platform_device *pdev;
 	struct fbtft_platform_data *pdata = par->pdata;
+	struct device *dev = &pdev->dev;
 	const struct fbtft_gpio *gpio;
 	unsigned long flags;
 	int ret;
@@ -130,7 +134,12 @@ static int fbtft_request_gpios(struct fbtft_par *par)
 		flags = FBTFT_GPIO_NO_MATCH;
 		/* if driver provides match function, try it first,
 		 * if no match use our own
-		 */
+
+		par->gpio.reset = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
+		if (IS_ERR(par->gpio.reset)) {
+		ret = PTR_ERR(par->gpio.reset);
+		dev_warn(dev, "Failed to get reset gpio: %d\n");
+	}*/
 		if (par->fbtftops.request_gpios_match)
 			flags = par->fbtftops.request_gpios_match(par, gpio);
 		if (flags == FBTFT_GPIO_NO_MATCH)
@@ -155,7 +164,7 @@ static int fbtft_request_gpios(struct fbtft_par *par)
 
 	return 0;
 }
-
+/*
 #ifdef CONFIG_OF
 static int fbtft_request_one_gpio(struct fbtft_par *par,
 				  const char *name, int index, int *gpiop)
@@ -177,7 +186,7 @@ static int fbtft_request_one_gpio(struct fbtft_par *par,
 			return gpio;
 		}
 
-		/* active low translates to initially low */
+		// active low translates to initially low
 		flags = (of_flags & OF_GPIO_ACTIVE_LOW) ? GPIOF_OUT_INIT_LOW :
 							GPIOF_OUT_INIT_HIGH;
 		ret = devm_gpio_request_one(dev, gpio, flags,
@@ -241,7 +250,7 @@ static int fbtft_request_gpios_dt(struct fbtft_par *par)
 	return 0;
 }
 #endif
-
+*/
 #ifdef CONFIG_FB_BACKLIGHT
 static int fbtft_backlight_update_status(struct backlight_device *bd)
 {
@@ -678,7 +687,7 @@ struct fb_info *fbtft_framebuffer_alloc(struct fbtft_display *display,
 
 	/* defaults */
 	if (!fps)
-		fps = 20;
+		fps = 30;
 	if (!bpp)
 		bpp = 16;
 
@@ -771,7 +780,7 @@ struct fb_info *fbtft_framebuffer_alloc(struct fbtft_display *display,
 	fbdefio->deferred_io =     fbtft_deferred_io;
 	fb_deferred_io_init(info);
 
-	strncpy(info->fix.id, dev->driver->name, 16);
+	snprintf(info->fix.id, sizeof(info->fix.id), "%s", dev->driver->name);
 	info->fix.type =           FB_TYPE_PACKED_PIXELS;
 	info->fix.visual =         FB_VISUAL_TRUECOLOR;
 	info->fix.xpanstep =	   0;
@@ -1012,14 +1021,14 @@ int fbtft_unregister_framebuffer(struct fb_info *fb_info)
 	return 0;
 }
 EXPORT_SYMBOL(fbtft_unregister_framebuffer);
-
+/*
 #ifdef CONFIG_OF
-/**
- * fbtft_init_display_dt() - Device Tree init_display() function
- * @par: Driver data
- *
- * Return: 0 if successful, negative if error
- */
+//*
+// * fbtft_init_display_dt() - Device Tree init_display() function
+ //* @par: Driver data
+// *
+// * Return: 0 if successful, negative if error
+
 static int fbtft_init_display_dt(struct fbtft_par *par)
 {
 	struct device_node *node = par->info->device->of_node;
@@ -1038,7 +1047,7 @@ static int fbtft_init_display_dt(struct fbtft_par *par)
 
 	par->fbtftops.reset(par);
 	if (par->gpio.cs != -1)
-		gpio_set_value(par->gpio.cs, 0);  /* Activate chip */
+		gpio_set_value(par->gpio.cs, 0);  // Activate chip
 
 	while (p) {
 		if (val & FBTFT_OF_INIT_CMD) {
@@ -1054,7 +1063,7 @@ static int fbtft_init_display_dt(struct fbtft_par *par)
 				buf[i++] = val;
 				p = of_prop_next_u32(prop, p, &val);
 			}
-			/* make debug message */
+			// make debug message
 			fbtft_par_dbg(DEBUG_INIT_DISPLAY, par,
 				      "init: write_register:\n");
 			for (j = 0; j < i; j++)
@@ -1093,7 +1102,7 @@ static int fbtft_init_display_dt(struct fbtft_par *par)
 	return 0;
 }
 #endif
-
+*/
 /**
  * fbtft_init_display() - Generic init_display() function
  * @par: Driver data
@@ -1252,9 +1261,9 @@ static int fbtft_verify_gpios(struct fbtft_par *par)
 
 	return 0;
 }
-
+/*
 #ifdef CONFIG_OF
-/* returns 0 if the property is not present */
+// returns 0 if the property is not present
 static u32 fbtft_of_value(struct device_node *node, const char *propname)
 {
 	int ret;
@@ -1304,13 +1313,14 @@ static struct fbtft_platform_data *fbtft_probe_dt(struct device *dev)
 	return pdata;
 }
 #else
+
 static struct fbtft_platform_data *fbtft_probe_dt(struct device *dev)
 {
 	dev_err(dev, "Missing platform data\n");
 	return ERR_PTR(-EINVAL);
 }
 #endif
-
+*/
 /**
  * fbtft_probe_common() - Generic device probe() helper function
  * @display: Display properties
@@ -1341,9 +1351,11 @@ int fbtft_probe_common(struct fbtft_display *display,
 	if (unlikely(display->debug & DEBUG_DRIVER_INIT_FUNCTIONS))
 		dev_info(dev, "%s()\n", __func__);
 
+// 16ton
+
 	pdata = dev->platform_data;
 	if (!pdata) {
-		pdata = fbtft_probe_dt(dev);
+//		pdata = fbtft_probe_dt(dev);
 		if (IS_ERR(pdata))
 			return PTR_ERR(pdata);
 	}
