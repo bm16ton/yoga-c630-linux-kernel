@@ -46,6 +46,9 @@
 *.wip
 *.og
 *.bk
+*.moded
+*.wip2
+*.working
 
 Module.symvers
 modules.builtin
