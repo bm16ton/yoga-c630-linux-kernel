@@ -205,6 +205,19 @@ config JOYSTICK_TWIDJOY
 	  To compile this driver as a module, choose M here: the
 	  module will be called twidjoy.
 
+config JOYSTICK_WIICHUCK
+	tristate "Nintendo Wiimote Extension connector on i2c bus"
+	depends on I2C
+	select INPUT_POLLDEV
+	help
+	  Say Y here if you have a Nintendo Wiimote extension connector
+	  attached directly to an i2c bus, like the Sparcfun Wiichuck adapter
+	  board.  This driver supports both the Nunchuk and the Classic
+	  Controller extensions.
+
+	  To compile this driver as a module, choose M here: the
+	  modules will be called wiichuck.
+
 config JOYSTICK_ZHENHUA
 	tristate "5-byte Zhenhua RC transmitter"
 	select SERIO
