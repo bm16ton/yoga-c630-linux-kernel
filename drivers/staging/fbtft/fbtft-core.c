@@ -164,7 +164,7 @@ static int fbtft_request_gpios(struct fbtft_par *par)
 
 	return 0;
 }
-/*
+
 #ifdef CONFIG_OF
 static int fbtft_request_one_gpio(struct fbtft_par *par,
 				  const char *name, int index, int *gpiop)
@@ -250,7 +250,7 @@ static int fbtft_request_gpios_dt(struct fbtft_par *par)
 	return 0;
 }
 #endif
-*/
+
 #ifdef CONFIG_FB_BACKLIGHT
 static int fbtft_backlight_update_status(struct backlight_device *bd)
 {
@@ -1021,7 +1021,7 @@ int fbtft_unregister_framebuffer(struct fb_info *fb_info)
 	return 0;
 }
 EXPORT_SYMBOL(fbtft_unregister_framebuffer);
-/*
+
 #ifdef CONFIG_OF
 //*
 // * fbtft_init_display_dt() - Device Tree init_display() function
@@ -1102,7 +1102,7 @@ static int fbtft_init_display_dt(struct fbtft_par *par)
 	return 0;
 }
 #endif
-*/
+
 /**
  * fbtft_init_display() - Generic init_display() function
  * @par: Driver data
@@ -1261,7 +1261,7 @@ static int fbtft_verify_gpios(struct fbtft_par *par)
 
 	return 0;
 }
-/*
+
 #ifdef CONFIG_OF
 // returns 0 if the property is not present
 static u32 fbtft_of_value(struct device_node *node, const char *propname)
@@ -1320,7 +1320,7 @@ static struct fbtft_platform_data *fbtft_probe_dt(struct device *dev)
 	return ERR_PTR(-EINVAL);
 }
 #endif
-*/
+
 /**
  * fbtft_probe_common() - Generic device probe() helper function
  * @display: Display properties
@@ -1355,7 +1355,7 @@ int fbtft_probe_common(struct fbtft_display *display,
 
 	pdata = dev->platform_data;
 	if (!pdata) {
-//		pdata = fbtft_probe_dt(dev);
+		pdata = fbtft_probe_dt(dev);
 		if (IS_ERR(pdata))
 			return PTR_ERR(pdata);
 	}

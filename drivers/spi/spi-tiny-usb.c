@@ -353,9 +353,11 @@ static int spi_tiny_usb_probe(struct usb_interface *interface,
 
 
 	ret = usb_submit_urb(priv->urb, GFP_KERNEL);
-	if (ret)
+	if (ret) {
 	    dev_info(&interface->dev, "spi-tiny-usb priv urb gfp_kernel failedr\n");
-//		goto error2;
+// 16ton	goto error2;
+		goto error2;
+		};
 	dev_info(&interface->dev, "started USB interrupts handler\n");
 
 	// GPIOs

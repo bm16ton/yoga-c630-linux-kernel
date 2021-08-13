@@ -2517,8 +2517,8 @@ static inline enum nl80211_band phy_mode_to_band(u32 phy_mode, u32 channel)
 		band = NL80211_BAND_5GHZ;
 	break;
 	case MODE_11B:
-		/* Hardware can Rx CCK rates on 5GHz. In that case phy_mode is
-		 * set to MODE_11B.
+		// * Hardware can Rx CCK rates on 5GHz. In that case phy_mode is
+		// * set to MODE_11B.
 		 */
 /*		if (channel < 1 || channel > 14) {
 			band = NL80211_BAND_5GHZ;
