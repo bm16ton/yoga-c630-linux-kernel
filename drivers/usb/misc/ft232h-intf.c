@@ -1092,7 +1092,7 @@ static const struct ft232h_intf_ops ft232h_intf_ops = {
  */
 #define SPI_INTF_DEVNAME	"ftdi-mpsse-spi"
 
-static struct dev_io_desc_data ftdi_spi_bus_dev_io[2] = {
+static struct dev_io_desc_data ftdi_spi_bus_dev_io[] = {
 	{ "dc", 2, GPIO_ACTIVE_HIGH },
 	{ "reset", 3, GPIO_ACTIVE_HIGH },
 //	{ "irq", 4, GPIO_ACTIVE_HIGH },
@@ -1108,8 +1108,8 @@ static const struct mpsse_spi_dev_data ftdi_spi_dev_data[] = {
 
 static struct spi_board_info ftdi_spi_bus_info[] = {
     {
-    .modalias	= "fb_ili9341",
-//	.modalias	= "mcp2515",
+//    .modalias	= "yx240qv29",
+	.modalias	= "fb_ili9341",
     .mode		= SPI_MODE_0,
     .max_speed_hz	= 60000000,
     .bus_num	= 0,
