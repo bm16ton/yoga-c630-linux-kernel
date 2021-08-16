@@ -154,6 +154,7 @@ struct ft232h_intf_priv {
 	u8			gpiol_dir;
 	u8			gpioh_dir;
 	u8			tx_buf[4];
+
 };
 
 /* Device info struct used for device specific init. */
@@ -1127,11 +1128,22 @@ static struct spi_board_info ftdi_spi_bus_info[] = {
     },
     */
 };
+/*
+static struct dev_info_desc_data ftdi_spi_bus_dev_data[] = {
+	{
+	.buswidth    = 8,
+    .backlight = 0,
+    .bgr = true,
+    },
+};
+*/
 
 static const struct mpsse_spi_platform_data ftdi_spi_bus_plat_data = {
     .ops		= &ft232h_intf_ops,
     .spi_info	= ftdi_spi_bus_info,
     .spi_info_len	= ARRAY_SIZE(ftdi_spi_bus_info),
+    .data		= ftdi_spi_bus_dev_data,
+    .data_len   = ARRAY_SIZE(ftdi_spi_bus_dev_data),
 };
 
 
@@ -1164,6 +1176,7 @@ static struct platform_device *mpsse_dev_register(struct ft232h_intf_priv *priv,
 		dev_dbg(parent, "INFO: %s cs %d\n",
 			pd->spi_info[i].modalias, pd->spi_info[i].chip_select);
 	}
+
 
 	ret = platform_device_add_data(pdev, pd, sizeof(*pd));
 	if (ret)

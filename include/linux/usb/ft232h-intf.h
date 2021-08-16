@@ -174,6 +174,13 @@ struct mpsse_spi_dev_data {
 };
 
 /*
+struct dev_info_desc_data {
+	unsigned int buswidth;
+	unsigned int backlight;
+	unsigned int bgr;
+};
+*/
+/*
  * struct mpsse_spi_platform_data - MPSSE SPI bus platform data
  * @ops: USB interface operations used in MPSSE SPI controller driver
  * @spi_info: Array with spi_board_info structures of attached SPI slaves
@@ -191,6 +198,8 @@ struct mpsse_spi_platform_data {
 	u32 magic;
 	struct dev_io_desc_data *desc;
 	size_t desc_len;
+//	struct dev_info_desc_data *data;
+//	size_t data_len;
 //	struct dev_io_desc_data *io_data;
 //	size_t io_data_len;
 //	int dc;
