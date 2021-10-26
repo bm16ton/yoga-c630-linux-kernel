@@ -409,11 +409,13 @@ __cpu_device_create(struct device *parent, void *drvdata,
 		    const char *fmt, va_list args)
 {
 	struct device *dev = NULL;
-	int retval = -ENOMEM;
+	int retval = -ENODEV;
 
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-	if (!dev)
+	if (!dev) {
+		retval = -ENOMEM;
 		goto error;
+	}
 
 	device_initialize(dev);
 	dev->parent = parent;

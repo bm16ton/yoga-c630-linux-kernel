@@ -114,6 +114,7 @@ struct cyttsp {
 	struct device *dev;
 	int irq;
 	struct input_dev *input;
+	char phys[32];
 	const struct cyttsp_bus_ops *bus_ops;
 	struct cyttsp_bootloader_data bl_data;
 	struct cyttsp_sysinfo_data sysinfo_data;

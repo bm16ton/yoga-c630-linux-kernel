@@ -197,7 +197,7 @@ int p9_error_init(void)
 EXPORT_SYMBOL(p9_error_init);
 
 /**
- * p9_errstr2errno - convert error string to error number
+ * errstr2errno - convert error string to error number
  * @errstr: error string
  * @len: length of error string
  *

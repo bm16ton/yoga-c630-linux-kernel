@@ -6,7 +6,7 @@
  */
 
 #include <linux/linkage.h>
-#include <asm/alternative.h>
+#include <asm/alternative-asm.h>
 
 .macro read64 reg
 	movl %ebx, %eax

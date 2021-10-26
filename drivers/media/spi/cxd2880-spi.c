@@ -535,7 +535,7 @@ cxd2880_spi_probe(struct spi_device *spi)
 
 	dvb_spi->spi = spi;
 	mutex_init(&dvb_spi->spi_mutex);
-	spi_set_drvdata(spi, dvb_spi);
+	dev_set_drvdata(&spi->dev, dvb_spi);
 	config.spi = spi;
 	config.spi_mutex = &dvb_spi->spi_mutex;
 
@@ -632,7 +632,7 @@ cxd2880_spi_remove(struct spi_device *spi)
 		return -EINVAL;
 	}
 
-	dvb_spi = spi_get_drvdata(spi);
+	dvb_spi = dev_get_drvdata(&spi->dev);
 
 	if (!dvb_spi) {
 		pr_err("failed\n");

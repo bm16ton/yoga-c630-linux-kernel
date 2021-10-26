@@ -24,10 +24,12 @@
 
 static irqreturn_t isr_uh_routine(int irq, void *user_data)
 {
-	struct wilc *wilc = user_data;
+	struct net_device *dev = user_data;
+	struct wilc_vif *vif = netdev_priv(dev);
+	struct wilc *wilc = vif->wilc;
 
 	if (wilc->close) {
-		pr_err("Can't handle UH interrupt");
+		netdev_err(dev, "Can't handle UH interrupt\n");
 		return IRQ_HANDLED;
 	}
 	return IRQ_WAKE_THREAD;
@@ -35,10 +37,12 @@ static irqreturn_t isr_uh_routine(int irq, void *user_data)
 
 static irqreturn_t isr_bh_routine(int irq, void *userdata)
 {
-	struct wilc *wilc = userdata;
+	struct net_device *dev = userdata;
+	struct wilc_vif *vif = netdev_priv(userdata);
+	struct wilc *wilc = vif->wilc;
 
 	if (wilc->close) {
-		pr_err("Can't handle BH interrupt\n");
+		netdev_err(dev, "Can't handle BH interrupt\n");
 		return IRQ_HANDLED;
 	}
 
@@ -56,7 +60,7 @@ static int init_irq(struct net_device *dev)
 	ret = request_threaded_irq(wl->dev_irq_num, isr_uh_routine,
 				   isr_bh_routine,
 				   IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
-				   "WILC_IRQ", wl);
+				   "WILC_IRQ", dev);
 	if (ret) {
 		netdev_err(dev, "Failed to request IRQ [%d]\n", ret);
 		return ret;

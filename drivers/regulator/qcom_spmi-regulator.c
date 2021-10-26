@@ -5,7 +5,6 @@
 
 #include <linux/module.h>
 #include <linux/delay.h>
-#include <linux/devm-helpers.h>
 #include <linux/err.h>
 #include <linux/kernel.h>
 #include <linux/interrupt.h>
@@ -1523,12 +1522,10 @@ static const struct spmi_regulator_mapping supported_regulators[] = {
 	SPMI_VREG(ULT_LDO, N600_ST, 0, INF, ULT_LDO, ult_ldo, ult_nldo, 10000),
 	SPMI_VREG(ULT_LDO, N900_ST, 0, INF, ULT_LDO, ult_ldo, ult_nldo, 10000),
 	SPMI_VREG(ULT_LDO, N1200_ST, 0, INF, ULT_LDO, ult_ldo, ult_nldo, 10000),
-	SPMI_VREG(ULT_LDO, LV_P50,   0, INF, ULT_LDO, ult_ldo, ult_pldo, 10000),
 	SPMI_VREG(ULT_LDO, LV_P150,  0, INF, ULT_LDO, ult_ldo, ult_pldo, 10000),
 	SPMI_VREG(ULT_LDO, LV_P300,  0, INF, ULT_LDO, ult_ldo, ult_pldo, 10000),
 	SPMI_VREG(ULT_LDO, LV_P450,  0, INF, ULT_LDO, ult_ldo, ult_pldo, 10000),
 	SPMI_VREG(ULT_LDO, P600,     0, INF, ULT_LDO, ult_ldo, ult_pldo, 10000),
-	SPMI_VREG(ULT_LDO, P300,     0, INF, ULT_LDO, ult_ldo, ult_pldo, 10000),
 	SPMI_VREG(ULT_LDO, P150,     0, INF, ULT_LDO, ult_ldo, ult_pldo, 10000),
 	SPMI_VREG(ULT_LDO, P50,     0, INF, ULT_LDO, ult_ldo, ult_pldo, 5000),
 };
@@ -1845,10 +1842,7 @@ static int spmi_regulator_of_parse(struct device_node *node,
 			return ret;
 		}
 
-		ret = devm_delayed_work_autocancel(dev, &vreg->ocp_work,
-						   spmi_regulator_vs_ocp_work);
-		if (ret)
-			return ret;
+		INIT_DELAYED_WORK(&vreg->ocp_work, spmi_regulator_vs_ocp_work);
 	}
 
 	return 0;
@@ -2163,8 +2157,10 @@ static int qcom_spmi_regulator_probe(struct platform_device *pdev)
 		vreg->regmap = regmap;
 		if (reg->ocp) {
 			vreg->ocp_irq = platform_get_irq_byname(pdev, reg->ocp);
-			if (vreg->ocp_irq < 0)
-				return vreg->ocp_irq;
+			if (vreg->ocp_irq < 0) {
+				ret = vreg->ocp_irq;
+				goto err;
+			}
 		}
 		vreg->desc.id = -1;
 		vreg->desc.owner = THIS_MODULE;
@@ -2207,12 +2203,31 @@ static int qcom_spmi_regulator_probe(struct platform_device *pdev)
 		rdev = devm_regulator_register(dev, &vreg->desc, &config);
 		if (IS_ERR(rdev)) {
 			dev_err(dev, "failed to register %s\n", name);
-			return PTR_ERR(rdev);
+			ret = PTR_ERR(rdev);
+			goto err;
 		}
 
 		INIT_LIST_HEAD(&vreg->node);
 		list_add(&vreg->node, vreg_list);
 	}
+
+	return 0;
+
+err:
+	list_for_each_entry(vreg, vreg_list, node)
+		if (vreg->ocp_irq)
+			cancel_delayed_work_sync(&vreg->ocp_work);
+	return ret;
+}
+
+static int qcom_spmi_regulator_remove(struct platform_device *pdev)
+{
+	struct spmi_regulator *vreg;
+	struct list_head *vreg_list = platform_get_drvdata(pdev);
+
+	list_for_each_entry(vreg, vreg_list, node)
+		if (vreg->ocp_irq)
+			cancel_delayed_work_sync(&vreg->ocp_work);
 
 	return 0;
 }
@@ -2223,6 +2238,7 @@ static struct platform_driver qcom_spmi_regulator_driver = {
 		.of_match_table = qcom_spmi_regulator_match,
 	},
 	.probe		= qcom_spmi_regulator_probe,
+	.remove		= qcom_spmi_regulator_remove,
 };
 module_platform_driver(qcom_spmi_regulator_driver);
 

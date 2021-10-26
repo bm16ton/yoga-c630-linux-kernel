@@ -31,7 +31,6 @@
 #include <asm/kvm_book3s_asm.h>
 #include <asm/export.h>
 #include <asm/feature-fixups.h>
-#include <asm/interrupt.h>
 
 #include "head_32.h"
 
@@ -240,7 +239,7 @@ __secondary_hold_acknowledge:
 /* System reset */
 /* core99 pmac starts the seconary here by changing the vector, and
    putting it back to what it was (unknown_async_exception) when done.  */
-	EXCEPTION(INTERRUPT_SYSTEM_RESET, Reset, unknown_async_exception)
+	EXCEPTION(0x100, Reset, unknown_async_exception, EXC_XFER_STD)
 
 /* Machine check */
 /*
@@ -256,28 +255,40 @@ __secondary_hold_acknowledge:
  * pointer when we take an exception from supervisor mode.)
  *	-- paulus.
  */
-	START_EXCEPTION(INTERRUPT_MACHINE_CHECK, MachineCheck)
+	. = 0x200
+	DO_KVM  0x200
+MachineCheck:
 	EXCEPTION_PROLOG_0
 #ifdef CONFIG_PPC_CHRP
+#ifdef CONFIG_VMAP_STACK
 	mtspr	SPRN_SPRG_SCRATCH2,r1
 	mfspr	r1, SPRN_SPRG_THREAD
 	lwz	r1, RTAS_SP(r1)
 	cmpwi	cr1, r1, 0
 	bne	cr1, 7f
 	mfspr	r1, SPRN_SPRG_SCRATCH2
-#endif /* CONFIG_PPC_CHRP */
-	EXCEPTION_PROLOG_1
-7:	EXCEPTION_PROLOG_2 0x200 MachineCheck
-#ifdef CONFIG_PPC_CHRP
-	beq	cr1, 1f
-	twi	31, 0, 0
+#else
+	mfspr	r11, SPRN_SPRG_THREAD
+	lwz	r11, RTAS_SP(r11)
+	cmpwi	cr1, r11, 0
+	bne	cr1, 7f
 #endif
-1:	prepare_transfer_to_handler
-	bl	machine_check_exception
-	b	interrupt_return
+#endif /* CONFIG_PPC_CHRP */
+	EXCEPTION_PROLOG_1 for_rtas=1
+7:	EXCEPTION_PROLOG_2
+	addi	r3,r1,STACK_FRAME_OVERHEAD
+#ifdef CONFIG_PPC_CHRP
+	beq	cr1, machine_check_tramp
+	twi	31, 0, 0
+#else
+	b	machine_check_tramp
+#endif
 
 /* Data access exception. */
-	START_EXCEPTION(INTERRUPT_DATA_STORAGE, DataAccess)
+	. = 0x300
+	DO_KVM  0x300
+DataAccess:
+#ifdef CONFIG_VMAP_STACK
 #ifdef CONFIG_PPC_BOOK3S_604
 BEGIN_MMU_FTR_SECTION
 	mtspr	SPRN_SPRG_SCRATCH2,r10
@@ -298,20 +309,30 @@ ALT_MMU_FTR_SECTION_END_IFSET(MMU_FTR_HPTE_TABLE)
 #endif
 1:	EXCEPTION_PROLOG_0 handle_dar_dsisr=1
 	EXCEPTION_PROLOG_1
-	EXCEPTION_PROLOG_2 INTERRUPT_DATA_STORAGE DataAccess handle_dar_dsisr=1
-	prepare_transfer_to_handler
-	lwz	r5, _DSISR(r11)
-	andis.	r0, r5, DSISR_DABRMATCH@h
-	bne-	1f
-	bl	do_page_fault
-	b	interrupt_return
-1:	bl	do_break
-	REST_NVGPRS(r1)
-	b	interrupt_return
-
+	b	handle_page_fault_tramp_1
+#else	/* CONFIG_VMAP_STACK */
+	EXCEPTION_PROLOG handle_dar_dsisr=1
+	get_and_save_dar_dsisr_on_stack	r4, r5, r11
+#ifdef CONFIG_PPC_BOOK3S_604
+BEGIN_MMU_FTR_SECTION
+	andis.	r0, r5, (DSISR_BAD_FAULT_32S | DSISR_DABRMATCH)@h
+	bne	handle_page_fault_tramp_2	/* if not, try to put a PTE */
+	rlwinm	r3, r5, 32 - 15, 21, 21		/* DSISR_STORE -> _PAGE_RW */
+	bl	hash_page
+	b	handle_page_fault_tramp_1
+MMU_FTR_SECTION_ELSE
+#endif
+	b	handle_page_fault_tramp_2
+#ifdef CONFIG_PPC_BOOK3S_604
+ALT_MMU_FTR_SECTION_END_IFSET(MMU_FTR_HPTE_TABLE)
+#endif
+#endif	/* CONFIG_VMAP_STACK */
 
 /* Instruction access exception. */
-	START_EXCEPTION(INTERRUPT_INST_STORAGE, InstructionAccess)
+	. = 0x400
+	DO_KVM  0x400
+InstructionAccess:
+#ifdef CONFIG_VMAP_STACK
 	mtspr	SPRN_SPRG_SCRATCH0,r10
 	mtspr	SPRN_SPRG_SCRATCH1,r11
 	mfspr	r10, SPRN_SPRG_THREAD
@@ -331,35 +352,43 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_HPTE_TABLE)
 	andi.	r11, r11, MSR_PR
 
 	EXCEPTION_PROLOG_1
-	EXCEPTION_PROLOG_2 INTERRUPT_INST_STORAGE InstructionAccess
+	EXCEPTION_PROLOG_2
+#else	/* CONFIG_VMAP_STACK */
+	EXCEPTION_PROLOG
+	andis.	r0,r9,SRR1_ISI_NOPT@h	/* no pte found? */
+	beq	1f			/* if so, try to put a PTE */
+	li	r3,0			/* into the hash table */
+	mr	r4,r12			/* SRR0 is fault address */
+#ifdef CONFIG_PPC_BOOK3S_604
+BEGIN_MMU_FTR_SECTION
+	bl	hash_page
+END_MMU_FTR_SECTION_IFSET(MMU_FTR_HPTE_TABLE)
+#endif
+#endif	/* CONFIG_VMAP_STACK */
 	andis.	r5,r9,DSISR_SRR1_MATCH_32S@h /* Filter relevant SRR1 bits */
 	stw	r5, _DSISR(r11)
 	stw	r12, _DAR(r11)
-	prepare_transfer_to_handler
-	bl	do_page_fault
-	b	interrupt_return
+	EXC_XFER_LITE(0x400, handle_page_fault)
 
 /* External interrupt */
-	EXCEPTION(INTERRUPT_EXTERNAL, HardwareInterrupt, do_IRQ)
+	EXCEPTION(0x500, HardwareInterrupt, do_IRQ, EXC_XFER_LITE)
 
 /* Alignment exception */
-	START_EXCEPTION(INTERRUPT_ALIGNMENT, Alignment)
-	EXCEPTION_PROLOG INTERRUPT_ALIGNMENT Alignment handle_dar_dsisr=1
-	prepare_transfer_to_handler
-	bl	alignment_exception
-	REST_NVGPRS(r1)
-	b	interrupt_return
+	. = 0x600
+	DO_KVM  0x600
+Alignment:
+	EXCEPTION_PROLOG handle_dar_dsisr=1
+	save_dar_dsisr_on_stack r4, r5, r11
+	addi	r3,r1,STACK_FRAME_OVERHEAD
+	b	alignment_exception_tramp
 
 /* Program check exception */
-	START_EXCEPTION(INTERRUPT_PROGRAM, ProgramCheck)
-	EXCEPTION_PROLOG INTERRUPT_PROGRAM ProgramCheck
-	prepare_transfer_to_handler
-	bl	program_check_exception
-	REST_NVGPRS(r1)
-	b	interrupt_return
+	EXCEPTION(0x700, ProgramCheck, program_check_exception, EXC_XFER_STD)
 
 /* Floating-point unavailable */
-	START_EXCEPTION(0x800, FPUnavailable)
+	. = 0x800
+	DO_KVM  0x800
+FPUnavailable:
 #ifdef CONFIG_PPC_FPU
 BEGIN_FTR_SECTION
 /*
@@ -368,29 +397,30 @@ BEGIN_FTR_SECTION
  */
 	b 	ProgramCheck
 END_FTR_SECTION_IFSET(CPU_FTR_FPU_UNAVAILABLE)
-	EXCEPTION_PROLOG INTERRUPT_FP_UNAVAIL FPUnavailable
+	EXCEPTION_PROLOG
 	beq	1f
 	bl	load_up_fpu		/* if from user, just load it up */
 	b	fast_exception_return
-1:	prepare_transfer_to_handler
-	bl	kernel_fp_unavailable_exception
-	b	interrupt_return
+1:	addi	r3,r1,STACK_FRAME_OVERHEAD
+	EXC_XFER_LITE(0x800, kernel_fp_unavailable_exception)
 #else
 	b 	ProgramCheck
 #endif
 
 /* Decrementer */
-	EXCEPTION(INTERRUPT_DECREMENTER, Decrementer, timer_interrupt)
+	EXCEPTION(0x900, Decrementer, timer_interrupt, EXC_XFER_LITE)
 
-	EXCEPTION(0xa00, Trap_0a, unknown_exception)
-	EXCEPTION(0xb00, Trap_0b, unknown_exception)
+	EXCEPTION(0xa00, Trap_0a, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0xb00, Trap_0b, unknown_exception, EXC_XFER_STD)
 
 /* System call */
-	START_EXCEPTION(INTERRUPT_SYSCALL, SystemCall)
-	SYSCALL_ENTRY	INTERRUPT_SYSCALL
+	. = 0xc00
+	DO_KVM  0xc00
+SystemCall:
+	SYSCALL_ENTRY	0xc00
 
-	EXCEPTION(INTERRUPT_TRACE, SingleStep, single_step_exception)
-	EXCEPTION(0xe00, Trap_0e, unknown_exception)
+	EXCEPTION(0xd00, SingleStep, single_step_exception, EXC_XFER_STD)
+	EXCEPTION(0xe00, Trap_0e, unknown_exception, EXC_XFER_STD)
 
 /*
  * The Altivec unavailable trap is at 0x0f20.  Foo.
@@ -400,18 +430,19 @@ END_FTR_SECTION_IFSET(CPU_FTR_FPU_UNAVAILABLE)
  * non-altivec kernel running on a machine with altivec just
  * by executing an altivec instruction.
  */
-	START_EXCEPTION(INTERRUPT_PERFMON, PerformanceMonitorTrap)
+	. = 0xf00
+	DO_KVM  0xf00
 	b	PerformanceMonitor
 
-	START_EXCEPTION(INTERRUPT_ALTIVEC_UNAVAIL, AltiVecUnavailableTrap)
+	. = 0xf20
+	DO_KVM  0xf20
 	b	AltiVecUnavailable
 
-	__HEAD
 /*
  * Handle TLB miss for instruction on 603/603e.
  * Note: we get an alternate set of r0 - r3 to use automatically.
  */
-	. = INTERRUPT_INST_TLB_MISS_603
+	. = 0x1000
 InstructionTLBMiss:
 /*
  * r0:	scratch
@@ -477,7 +508,7 @@ InstructionAddressInvalid:
 /*
  * Handle TLB miss for DATA Load operation on 603/603e
  */
-	. = INTERRUPT_DATA_LOAD_TLB_MISS_603
+	. = 0x1100
 DataLoadTLBMiss:
 /*
  * r0:	scratch
@@ -555,7 +586,7 @@ DataAddressInvalid:
 /*
  * Handle TLB miss for DATA Store on 603/603e
  */
-	. = INTERRUPT_DATA_STORE_TLB_MISS_603
+	. = 0x1200
 DataStoreTLBMiss:
 /*
  * r0:	scratch
@@ -619,39 +650,57 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_NEED_DTLB_SW_LRU)
 #define TAUException	unknown_async_exception
 #endif
 
-	EXCEPTION(0x1300, Trap_13, instruction_breakpoint_exception)
-	EXCEPTION(0x1400, SMI, SMIException)
-	EXCEPTION(0x1500, Trap_15, unknown_exception)
-	EXCEPTION(0x1600, Trap_16, altivec_assist_exception)
-	EXCEPTION(0x1700, Trap_17, TAUException)
-	EXCEPTION(0x1800, Trap_18, unknown_exception)
-	EXCEPTION(0x1900, Trap_19, unknown_exception)
-	EXCEPTION(0x1a00, Trap_1a, unknown_exception)
-	EXCEPTION(0x1b00, Trap_1b, unknown_exception)
-	EXCEPTION(0x1c00, Trap_1c, unknown_exception)
-	EXCEPTION(0x1d00, Trap_1d, unknown_exception)
-	EXCEPTION(0x1e00, Trap_1e, unknown_exception)
-	EXCEPTION(0x1f00, Trap_1f, unknown_exception)
-	EXCEPTION(0x2000, RunMode, RunModeException)
-	EXCEPTION(0x2100, Trap_21, unknown_exception)
-	EXCEPTION(0x2200, Trap_22, unknown_exception)
-	EXCEPTION(0x2300, Trap_23, unknown_exception)
-	EXCEPTION(0x2400, Trap_24, unknown_exception)
-	EXCEPTION(0x2500, Trap_25, unknown_exception)
-	EXCEPTION(0x2600, Trap_26, unknown_exception)
-	EXCEPTION(0x2700, Trap_27, unknown_exception)
-	EXCEPTION(0x2800, Trap_28, unknown_exception)
-	EXCEPTION(0x2900, Trap_29, unknown_exception)
-	EXCEPTION(0x2a00, Trap_2a, unknown_exception)
-	EXCEPTION(0x2b00, Trap_2b, unknown_exception)
-	EXCEPTION(0x2c00, Trap_2c, unknown_exception)
-	EXCEPTION(0x2d00, Trap_2d, unknown_exception)
-	EXCEPTION(0x2e00, Trap_2e, unknown_exception)
-	EXCEPTION(0x2f00, Trap_2f, unknown_exception)
+	EXCEPTION(0x1300, Trap_13, instruction_breakpoint_exception, EXC_XFER_STD)
+	EXCEPTION(0x1400, SMI, SMIException, EXC_XFER_STD)
+	EXCEPTION(0x1500, Trap_15, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1600, Trap_16, altivec_assist_exception, EXC_XFER_STD)
+	EXCEPTION(0x1700, Trap_17, TAUException, EXC_XFER_STD)
+	EXCEPTION(0x1800, Trap_18, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1900, Trap_19, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1a00, Trap_1a, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1b00, Trap_1b, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1c00, Trap_1c, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1d00, Trap_1d, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1e00, Trap_1e, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1f00, Trap_1f, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2000, RunMode, RunModeException, EXC_XFER_STD)
+	EXCEPTION(0x2100, Trap_21, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2200, Trap_22, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2300, Trap_23, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2400, Trap_24, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2500, Trap_25, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2600, Trap_26, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2700, Trap_27, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2800, Trap_28, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2900, Trap_29, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2a00, Trap_2a, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2b00, Trap_2b, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2c00, Trap_2c, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2d00, Trap_2d, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2e00, Trap_2e, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x2f00, Trap_2f, unknown_exception, EXC_XFER_STD)
 
-	__HEAD
 	. = 0x3000
 
+machine_check_tramp:
+	EXC_XFER_STD(0x200, machine_check_exception)
+
+alignment_exception_tramp:
+	EXC_XFER_STD(0x600, alignment_exception)
+
+handle_page_fault_tramp_1:
+#ifdef CONFIG_VMAP_STACK
+	EXCEPTION_PROLOG_2 handle_dar_dsisr=1
+#endif
+	lwz	r5, _DSISR(r11)
+	/* fall through */
+handle_page_fault_tramp_2:
+	andis.	r0, r5, DSISR_DABRMATCH@h
+	bne-	1f
+	EXC_XFER_LITE(0x300, handle_page_fault)
+1:	EXC_XFER_STD(0x300, do_break)
+
+#ifdef CONFIG_VMAP_STACK
 #ifdef CONFIG_PPC_BOOK3S_604
 .macro save_regs_thread		thread
 	stw	r0, THR0(\thread)
@@ -726,31 +775,26 @@ fast_hash_page_return:
 	rfi
 #endif /* CONFIG_PPC_BOOK3S_604 */
 
-#ifdef CONFIG_VMAP_STACK
+stack_overflow:
 	vmap_stack_overflow_exception
 #endif
 
-	__HEAD
 AltiVecUnavailable:
-	EXCEPTION_PROLOG 0xf20 AltiVecUnavailable
+	EXCEPTION_PROLOG
 #ifdef CONFIG_ALTIVEC
 	beq	1f
 	bl	load_up_altivec		/* if from user, just load it up */
 	b	fast_exception_return
 #endif /* CONFIG_ALTIVEC */
-1:	prepare_transfer_to_handler
-	bl	altivec_unavailable_exception
-	b	interrupt_return
+1:	addi	r3,r1,STACK_FRAME_OVERHEAD
+	EXC_XFER_LITE(0xf20, altivec_unavailable_exception)
 
-	__HEAD
 PerformanceMonitor:
-	EXCEPTION_PROLOG 0xf00 PerformanceMonitor
-	prepare_transfer_to_handler
-	bl	performance_monitor_exception
-	b	interrupt_return
+	EXCEPTION_PROLOG
+	addi	r3,r1,STACK_FRAME_OVERHEAD
+	EXC_XFER_STD(0xf00, performance_monitor_exception)
 
 
-	__HEAD
 /*
  * This code is jumped to from the startup code to copy
  * the kernel image to physical address PHYSICAL_START.

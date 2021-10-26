@@ -25,6 +25,9 @@
 		i2c3 = &i2c3;
 		i2c4 = &i2c4;
 		i2c5 = &i2c5;
+		mmc0 = &sdmmc;
+		mmc1 = &sdio0;
+		mmc2 = &emmc;
 		serial0 = &uart0;
 		serial1 = &uart1;
 		serial2 = &uart2;
@@ -558,6 +561,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwm0_pin>;
 		clocks = <&cru PCLK_PWM1>;
+		clock-names = "pwm";
 		status = "disabled";
 	};
 
@@ -568,6 +572,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwm1_pin>;
 		clocks = <&cru PCLK_PWM1>;
+		clock-names = "pwm";
 		status = "disabled";
 	};
 
@@ -576,6 +581,7 @@
 		reg = <0x0 0xff680020 0x0 0x10>;
 		#pwm-cells = <3>;
 		clocks = <&cru PCLK_PWM1>;
+		clock-names = "pwm";
 		status = "disabled";
 	};
 
@@ -586,6 +592,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwm3_pin>;
 		clocks = <&cru PCLK_PWM1>;
+		clock-names = "pwm";
 		status = "disabled";
 	};
 
@@ -660,7 +667,7 @@
 		status = "disabled";
 	};
 
-	timer0: timer@ff810000 {
+	timer@ff810000 {
 		compatible = "rockchip,rk3368-timer", "rockchip,rk3288-timer";
 		reg = <0x0 0xff810000 0x0 0x20>;
 		interrupts = <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>;

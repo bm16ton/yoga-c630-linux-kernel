@@ -2,7 +2,7 @@
 
 config MODULES
 	bool "Enable loadable module support"
-	modules
+	option modules
 	default y
 
 choice

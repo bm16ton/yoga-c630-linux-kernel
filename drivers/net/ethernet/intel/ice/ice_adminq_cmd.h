@@ -877,18 +877,16 @@ struct ice_aqc_get_phy_caps {
 	__le16 param0;
 	/* 18.0 - Report qualified modules */
 #define ICE_AQC_GET_PHY_RQM		BIT(0)
-	/* 18.1 - 18.3 : Report mode
-	 * 000b - Report NVM capabilities
-	 * 001b - Report topology capabilities
-	 * 010b - Report SW configured
-	 * 100b - Report default capabilities
+	/* 18.1 - 18.2 : Report mode
+	 * 00b - Report NVM capabilities
+	 * 01b - Report topology capabilities
+	 * 10b - Report SW configured
 	 */
-#define ICE_AQC_REPORT_MODE_S			1
-#define ICE_AQC_REPORT_MODE_M			(7 << ICE_AQC_REPORT_MODE_S)
-#define ICE_AQC_REPORT_TOPO_CAP_NO_MEDIA	0
-#define ICE_AQC_REPORT_TOPO_CAP_MEDIA		BIT(1)
-#define ICE_AQC_REPORT_ACTIVE_CFG		BIT(2)
-#define ICE_AQC_REPORT_DFLT_CFG		BIT(3)
+#define ICE_AQC_REPORT_MODE_S		1
+#define ICE_AQC_REPORT_MODE_M		(3 << ICE_AQC_REPORT_MODE_S)
+#define ICE_AQC_REPORT_NVM_CAP		0
+#define ICE_AQC_REPORT_TOPO_CAP		BIT(1)
+#define ICE_AQC_REPORT_SW_CFG		BIT(2)
 	__le32 reserved1;
 	__le32 addr_high;
 	__le32 addr_low;
@@ -1409,7 +1407,8 @@ struct ice_aqc_nvm_comp_tbl {
 	u8 cvs[]; /* Component Version String */
 } __packed;
 
-/* Send to PF command (indirect 0x0801) ID is only used by PF
+/*
+ * Send to PF command (indirect 0x0801) ID is only used by PF
  *
  * Send to VF command (indirect 0x0802) ID is only used by PF
  *
@@ -1791,7 +1790,6 @@ struct ice_pkg_ver {
 };
 
 #define ICE_PKG_NAME_SIZE	32
-#define ICE_SEG_ID_SIZE		28
 #define ICE_SEG_NAME_SIZE	28
 
 struct ice_aqc_get_pkg_info {

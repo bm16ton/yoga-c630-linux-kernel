@@ -1200,13 +1200,14 @@ DEFINE_SHOW_ATTRIBUTE(isp116x_debug);
 
 static void create_debug_file(struct isp116x *isp116x)
 {
-	debugfs_create_file(hcd_name, S_IRUGO, usb_debug_root, isp116x,
-			    &isp116x_debug_fops);
+	isp116x->dentry = debugfs_create_file(hcd_name,
+					      S_IRUGO, NULL, isp116x,
+					      &isp116x_debug_fops);
 }
 
 static void remove_debug_file(struct isp116x *isp116x)
 {
-	debugfs_remove(debugfs_lookup(hcd_name, usb_debug_root));
+	debugfs_remove(isp116x->dentry);
 }
 
 #else

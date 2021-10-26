@@ -188,10 +188,4 @@ static inline u32 current_sid(void)
 	return tsec->sid;
 }
 
-static inline struct superblock_security_struct *selinux_superblock(
-					const struct super_block *superblock)
-{
-	return superblock->s_security + selinux_blob_sizes.lbs_superblock;
-}
-
 #endif /* _SELINUX_OBJSEC_H_ */

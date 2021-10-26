@@ -1309,7 +1309,7 @@ void btrfs_free_redirty_list(struct btrfs_transaction *trans)
 	spin_unlock(&trans->releasing_ebs_lock);
 }
 
-bool btrfs_use_zone_append(struct btrfs_inode *inode, u64 start)
+bool btrfs_use_zone_append(struct btrfs_inode *inode, struct extent_map *em)
 {
 	struct btrfs_fs_info *fs_info = inode->root->fs_info;
 	struct btrfs_block_group *cache;
@@ -1324,7 +1324,7 @@ bool btrfs_use_zone_append(struct btrfs_inode *inode, u64 start)
 	if (!is_data_inode(&inode->vfs_inode))
 		return false;
 
-	cache = btrfs_lookup_block_group(fs_info, start);
+	cache = btrfs_lookup_block_group(fs_info, em->block_start);
 	ASSERT(cache);
 	if (!cache)
 		return false;

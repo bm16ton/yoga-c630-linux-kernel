@@ -937,7 +937,18 @@ static struct mtd_blktrans_ops inftl_tr = {
 	.owner		= THIS_MODULE,
 };
 
-module_mtd_blktrans(inftl_tr);
+static int __init init_inftl(void)
+{
+	return register_mtd_blktrans(&inftl_tr);
+}
+
+static void __exit cleanup_inftl(void)
+{
+	deregister_mtd_blktrans(&inftl_tr);
+}
+
+module_init(init_inftl);
+module_exit(cleanup_inftl);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Greg Ungerer <gerg@snapgear.com>, David Woodhouse <dwmw2@infradead.org>, Fabrice Bellard <fabrice.bellard@netgem.com> et al.");

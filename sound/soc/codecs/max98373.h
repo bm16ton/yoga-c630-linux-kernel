@@ -195,9 +195,6 @@
 #define MAX98373_LIMITER_EN_SHIFT (0)
 
 /* MAX98373_R20FE_DEVICE_AUTO_RESTART_CFG */
-#define MAX98373_OVC_AUTORESTART_SHIFT (3)
-#define MAX98373_THERM_AUTORESTART_SHIFT (2)
-#define MAX98373_CMON_AUTORESTART_SHIFT (1)
 #define MAX98373_CLOCK_MON_SHIFT (0)
 
 /* MAX98373_R20FF_GLOBAL_SHDN */
@@ -205,11 +202,6 @@
 
 /* MAX98373_R2000_SW_RESET */
 #define MAX98373_SOFT_RESET (0x1 << 0)
-
-struct max98373_cache {
-	u32 reg;
-	u32 val;
-};
 
 struct max98373_priv {
 	struct regmap *regmap;
@@ -220,9 +212,6 @@ struct max98373_priv {
 	bool interleave_mode;
 	unsigned int ch_size;
 	bool tdm_mode;
-	/* cache for reading a valid fake feedback value */
-	struct max98373_cache *cache;
-	int cache_num;
 	/* variables to support soundwire */
 	struct sdw_slave *slave;
 	bool hw_init;

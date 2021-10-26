@@ -184,9 +184,7 @@ def add_common_opts(parser) -> None:
 			    help='Run all KUnit tests through allyesconfig',
 			    action='store_true')
 	parser.add_argument('--kunitconfig',
-			     help='Path to Kconfig fragment that enables KUnit tests.'
-			     ' If given a directory, (e.g. lib/kunit), "/.kunitconfig" '
-			     'will get  automatically appended.',
+			     help='Path to Kconfig fragment that enables KUnit tests',
 			     metavar='kunitconfig')
 
 def add_build_opts(parser) -> None:

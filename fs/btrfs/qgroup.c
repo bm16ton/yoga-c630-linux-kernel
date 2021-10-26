@@ -23,7 +23,6 @@
 #include "qgroup.h"
 #include "block-group.h"
 #include "sysfs.h"
-#include "tree-mod-log.h"
 
 /* TODO XXX FIXME
  *  - subvol delete -> delete when ref goes to 0? delete limits also?
@@ -1704,39 +1703,17 @@ int btrfs_qgroup_trace_extent_nolock(struct btrfs_fs_info *fs_info,
 	return 0;
 }
 
-int btrfs_qgroup_trace_extent_post(struct btrfs_trans_handle *trans,
+int btrfs_qgroup_trace_extent_post(struct btrfs_fs_info *fs_info,
 				   struct btrfs_qgroup_extent_record *qrecord)
 {
 	struct ulist *old_root;
 	u64 bytenr = qrecord->bytenr;
 	int ret;
 
-	/*
-	 * We are always called in a context where we are already holding a
-	 * transaction handle. Often we are called when adding a data delayed
-	 * reference from btrfs_truncate_inode_items() (truncating or unlinking),
-	 * in which case we will be holding a write lock on extent buffer from a
-	 * subvolume tree. In this case we can't allow btrfs_find_all_roots() to
-	 * acquire fs_info->commit_root_sem, because that is a higher level lock
-	 * that must be acquired before locking any extent buffers.
-	 *
-	 * So we want btrfs_find_all_roots() to not acquire the commit_root_sem
-	 * but we can't pass it a non-NULL transaction handle, because otherwise
-	 * it would not use commit roots and would lock extent buffers, causing
-	 * a deadlock if it ends up trying to read lock the same extent buffer
-	 * that was previously write locked at btrfs_truncate_inode_items().
-	 *
-	 * So pass a NULL transaction handle to btrfs_find_all_roots() and
-	 * explicitly tell it to not acquire the commit_root_sem - if we are
-	 * holding a transaction handle we don't need its protection.
-	 */
-	ASSERT(trans != NULL);
-
-	ret = btrfs_find_all_roots(NULL, trans->fs_info, bytenr, 0, &old_root,
-				   false, true);
+	ret = btrfs_find_all_roots(NULL, fs_info, bytenr, 0, &old_root, false);
 	if (ret < 0) {
-		trans->fs_info->qgroup_flags |= BTRFS_QGROUP_STATUS_FLAG_INCONSISTENT;
-		btrfs_warn(trans->fs_info,
+		fs_info->qgroup_flags |= BTRFS_QGROUP_STATUS_FLAG_INCONSISTENT;
+		btrfs_warn(fs_info,
 "error accounting new delayed refs extent (err code: %d), quota inconsistent",
 			ret);
 		return 0;
@@ -1780,7 +1757,7 @@ int btrfs_qgroup_trace_extent(struct btrfs_trans_handle *trans, u64 bytenr,
 		kfree(record);
 		return 0;
 	}
-	return btrfs_qgroup_trace_extent_post(trans, record);
+	return btrfs_qgroup_trace_extent_post(fs_info, record);
 }
 
 int btrfs_qgroup_trace_leaf_items(struct btrfs_trans_handle *trans,
@@ -2651,7 +2628,7 @@ int btrfs_qgroup_account_extents(struct btrfs_trans_handle *trans)
 				/* Search commit root to find old_roots */
 				ret = btrfs_find_all_roots(NULL, fs_info,
 						record->bytenr, 0,
-						&record->old_roots, false, false);
+						&record->old_roots, false);
 				if (ret < 0)
 					goto cleanup;
 			}
@@ -2662,12 +2639,12 @@ int btrfs_qgroup_account_extents(struct btrfs_trans_handle *trans)
 					record->data_rsv,
 					BTRFS_QGROUP_RSV_DATA);
 			/*
-			 * Use BTRFS_SEQ_LAST as time_seq to do special search,
-			 * which doesn't lock tree or delayed_refs and search
-			 * current root. It's safe inside commit_transaction().
+			 * Use SEQ_LAST as time_seq to do special search, which
+			 * doesn't lock tree or delayed_refs and search current
+			 * root. It's safe inside commit_transaction().
 			 */
 			ret = btrfs_find_all_roots(trans, fs_info,
-			   record->bytenr, BTRFS_SEQ_LAST, &new_roots, false, false);
+				record->bytenr, SEQ_LAST, &new_roots, false);
 			if (ret < 0)
 				goto cleanup;
 			if (qgroup_to_skip) {
@@ -3201,7 +3178,7 @@ static int qgroup_rescan_leaf(struct btrfs_trans_handle *trans,
 			num_bytes = found.offset;
 
 		ret = btrfs_find_all_roots(NULL, fs_info, found.objectid, 0,
-					   &roots, false, false);
+					   &roots, false);
 		if (ret < 0)
 			goto out;
 		/* For rescan, just pass old_roots as NULL */
@@ -3566,23 +3543,37 @@ static int try_flush_qgroup(struct btrfs_root *root)
 {
 	struct btrfs_trans_handle *trans;
 	int ret;
+	bool can_commit = true;
 
 	/*
-	 * Can't hold an open transaction or we run the risk of deadlocking,
-	 * and can't either be under the context of a send operation (where
-	 * current->journal_info is set to BTRFS_SEND_TRANS_STUB), as that
-	 * would result in a crash when starting a transaction and does not
-	 * make sense either (send is a read-only operation).
+	 * If current process holds a transaction, we shouldn't flush, as we
+	 * assume all space reservation happens before a transaction handle is
+	 * held.
+	 *
+	 * But there are cases like btrfs_delayed_item_reserve_metadata() where
+	 * we try to reserve space with one transction handle already held.
+	 * In that case we can't commit transaction, but at least try to end it
+	 * and hope the started data writes can free some space.
 	 */
-	ASSERT(current->journal_info == NULL);
-	if (WARN_ON(current->journal_info))
-		return 0;
+	if (current->journal_info &&
+	    current->journal_info != BTRFS_SEND_TRANS_STUB)
+		can_commit = false;
 
 	/*
 	 * We don't want to run flush again and again, so if there is a running
 	 * one, we won't try to start a new flush, but exit directly.
 	 */
 	if (test_and_set_bit(BTRFS_ROOT_QGROUP_FLUSHING, &root->state)) {
+		/*
+		 * We are already holding a transaction, thus we can block other
+		 * threads from flushing.  So exit right now. This increases
+		 * the chance of EDQUOT for heavy load and near limit cases.
+		 * But we can argue that if we're already near limit, EDQUOT is
+		 * unavoidable anyway.
+		 */
+		if (!can_commit)
+			return 0;
+
 		wait_event(root->qgroup_flush_wait,
 			!test_bit(BTRFS_ROOT_QGROUP_FLUSHING, &root->state));
 		return 0;
@@ -3599,7 +3590,10 @@ static int try_flush_qgroup(struct btrfs_root *root)
 		goto out;
 	}
 
-	ret = btrfs_commit_transaction(trans);
+	if (can_commit)
+		ret = btrfs_commit_transaction(trans);
+	else
+		ret = btrfs_end_transaction(trans);
 out:
 	clear_bit(BTRFS_ROOT_QGROUP_FLUSHING, &root->state);
 	wake_up(&root->qgroup_flush_wait);
@@ -3652,7 +3646,8 @@ cleanup:
 	qgroup_unreserve_range(inode, reserved, start, len);
 out:
 	if (new_reserved) {
-		extent_changeset_free(reserved);
+		extent_changeset_release(reserved);
+		kfree(reserved);
 		*reserved_ret = NULL;
 	}
 	return ret;

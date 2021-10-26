@@ -165,13 +165,13 @@ void __static_call_update(struct static_call_key *key, void *tramp, void *func)
 
 		stop = __stop_static_call_sites;
 
-		if (mod) {
 #ifdef CONFIG_MODULES
+		if (mod) {
 			stop = mod->static_call_sites +
 			       mod->num_static_call_sites;
 			init = mod->state == MODULE_STATE_COMING;
-#endif
 		}
+#endif
 
 		for (site = site_mod->sites;
 		     site < stop && static_call_key(site) == key; site++) {

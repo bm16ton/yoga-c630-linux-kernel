@@ -60,7 +60,6 @@
 #include <linux/prefetch.h>
 #include <linux/if_vlan.h>
 #include <linux/mpls.h>
-#include <linux/kcov.h>
 
 #include <net/protocol.h>
 #include <net/dst.h>
@@ -939,7 +938,6 @@ void __kfree_skb_defer(struct sk_buff *skb)
 
 void napi_skb_free_stolen_head(struct sk_buff *skb)
 {
-	nf_reset_ct(skb);
 	skb_dst_drop(skb);
 	skb_ext_put(skb);
 	napi_skb_cache_put(skb);
@@ -2504,32 +2502,9 @@ int skb_splice_bits(struct sk_buff *skb, struct sock *sk, unsigned int offset,
 }
 EXPORT_SYMBOL_GPL(skb_splice_bits);
 
-static int sendmsg_unlocked(struct sock *sk, struct msghdr *msg,
-			    struct kvec *vec, size_t num, size_t size)
-{
-	struct socket *sock = sk->sk_socket;
-
-	if (!sock)
-		return -EINVAL;
-	return kernel_sendmsg(sock, msg, vec, num, size);
-}
-
-static int sendpage_unlocked(struct sock *sk, struct page *page, int offset,
-			     size_t size, int flags)
-{
-	struct socket *sock = sk->sk_socket;
-
-	if (!sock)
-		return -EINVAL;
-	return kernel_sendpage(sock, page, offset, size, flags);
-}
-
-typedef int (*sendmsg_func)(struct sock *sk, struct msghdr *msg,
-			    struct kvec *vec, size_t num, size_t size);
-typedef int (*sendpage_func)(struct sock *sk, struct page *page, int offset,
-			     size_t size, int flags);
-static int __skb_send_sock(struct sock *sk, struct sk_buff *skb, int offset,
-			   int len, sendmsg_func sendmsg, sendpage_func sendpage)
+/* Send skb data on a socket. Socket must be locked. */
+int skb_send_sock_locked(struct sock *sk, struct sk_buff *skb, int offset,
+			 int len)
 {
 	unsigned int orig_len = len;
 	struct sk_buff *head = skb;
@@ -2549,8 +2524,7 @@ do_frag_list:
 		memset(&msg, 0, sizeof(msg));
 		msg.msg_flags = MSG_DONTWAIT;
 
-		ret = INDIRECT_CALL_2(sendmsg, kernel_sendmsg_locked,
-				      sendmsg_unlocked, sk, &msg, &kv, 1, slen);
+		ret = kernel_sendmsg_locked(sk, &msg, &kv, 1, slen);
 		if (ret <= 0)
 			goto error;
 
@@ -2581,11 +2555,9 @@ do_frag_list:
 		slen = min_t(size_t, len, skb_frag_size(frag) - offset);
 
 		while (slen) {
-			ret = INDIRECT_CALL_2(sendpage, kernel_sendpage_locked,
-					      sendpage_unlocked, sk,
-					      skb_frag_page(frag),
-					      skb_frag_off(frag) + offset,
-					      slen, MSG_DONTWAIT);
+			ret = kernel_sendpage_locked(sk, skb_frag_page(frag),
+						     skb_frag_off(frag) + offset,
+						     slen, MSG_DONTWAIT);
 			if (ret <= 0)
 				goto error;
 
@@ -2617,22 +2589,7 @@ out:
 error:
 	return orig_len == len ? ret : orig_len - len;
 }
-
-/* Send skb data on a socket. Socket must be locked. */
-int skb_send_sock_locked(struct sock *sk, struct sk_buff *skb, int offset,
-			 int len)
-{
-	return __skb_send_sock(sk, skb, offset, len, kernel_sendmsg_locked,
-			       kernel_sendpage_locked);
-}
 EXPORT_SYMBOL_GPL(skb_send_sock_locked);
-
-/* Send skb data on a socket. Socket must be unlocked. */
-int skb_send_sock(struct sock *sk, struct sk_buff *skb, int offset, int len)
-{
-	return __skb_send_sock(sk, skb, offset, len, sendmsg_unlocked,
-			       sendpage_unlocked);
-}
 
 /**
  *	skb_store_bits - store bits from kernel buffer to skb
@@ -3006,11 +2963,8 @@ skb_zerocopy_headlen(const struct sk_buff *from)
 
 	if (!from->head_frag ||
 	    skb_headlen(from) < L1_CACHE_BYTES ||
-	    skb_shinfo(from)->nr_frags >= MAX_SKB_FRAGS) {
+	    skb_shinfo(from)->nr_frags >= MAX_SKB_FRAGS)
 		hlen = skb_headlen(from);
-		if (!hlen)
-			hlen = from->len;
-	}
 
 	if (skb_has_frag_list(from))
 		hlen = from->len;

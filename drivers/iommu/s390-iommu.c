@@ -333,7 +333,9 @@ int zpci_init_iommu(struct zpci_dev *zdev)
 	if (rc)
 		goto out_err;
 
-	rc = iommu_device_register(&zdev->iommu_dev, &s390_iommu_ops, NULL);
+	iommu_device_set_ops(&zdev->iommu_dev, &s390_iommu_ops);
+
+	rc = iommu_device_register(&zdev->iommu_dev);
 	if (rc)
 		goto out_sysfs;
 

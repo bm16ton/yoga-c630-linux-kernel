@@ -217,6 +217,9 @@ struct bfa_vf_event_s {
 	u32        undefined;
 };
 
+struct bfa_fcs_s;
+struct bfa_fcs_fabric_s;
+
 /*
  * @todo : need to move to a global config file.
  * Maximum Rports supported per port (physical/logical).

@@ -52,4 +52,3 @@ static void __exit trace_tg_exit(void)
 
 module_init(trace_tg_init);
 module_exit(trace_tg_exit);
-MODULE_SOFTDEP("pre: nf_log_syslog");

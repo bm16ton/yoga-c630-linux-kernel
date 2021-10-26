@@ -153,6 +153,7 @@ static int nr_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype
 	int queued = 0;
 
 	nr = skb->data[18];
+	ns = skb->data[17];
 
 	switch (frametype) {
 	case NR_CONNREQ:

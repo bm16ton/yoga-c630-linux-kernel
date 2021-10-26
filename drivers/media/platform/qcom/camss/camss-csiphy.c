@@ -73,30 +73,6 @@ static const struct csiphy_format csiphy_formats_8x96[] = {
 	{ MEDIA_BUS_FMT_Y10_1X10, 10 },
 };
 
-static const struct csiphy_format csiphy_formats_sdm845[] = {
-	{ MEDIA_BUS_FMT_UYVY8_2X8, 8 },
-	{ MEDIA_BUS_FMT_VYUY8_2X8, 8 },
-	{ MEDIA_BUS_FMT_YUYV8_2X8, 8 },
-	{ MEDIA_BUS_FMT_YVYU8_2X8, 8 },
-	{ MEDIA_BUS_FMT_SBGGR8_1X8, 8 },
-	{ MEDIA_BUS_FMT_SGBRG8_1X8, 8 },
-	{ MEDIA_BUS_FMT_SGRBG8_1X8, 8 },
-	{ MEDIA_BUS_FMT_SRGGB8_1X8, 8 },
-	{ MEDIA_BUS_FMT_SBGGR10_1X10, 10 },
-	{ MEDIA_BUS_FMT_SGBRG10_1X10, 10 },
-	{ MEDIA_BUS_FMT_SGRBG10_1X10, 10 },
-	{ MEDIA_BUS_FMT_SRGGB10_1X10, 10 },
-	{ MEDIA_BUS_FMT_SBGGR12_1X12, 12 },
-	{ MEDIA_BUS_FMT_SGBRG12_1X12, 12 },
-	{ MEDIA_BUS_FMT_SGRBG12_1X12, 12 },
-	{ MEDIA_BUS_FMT_SRGGB12_1X12, 12 },
-	{ MEDIA_BUS_FMT_SBGGR14_1X14, 14 },
-	{ MEDIA_BUS_FMT_SGBRG14_1X14, 14 },
-	{ MEDIA_BUS_FMT_SGRBG14_1X14, 14 },
-	{ MEDIA_BUS_FMT_SRGGB14_1X14, 14 },
-	{ MEDIA_BUS_FMT_Y10_1X10, 10 },
-};
-
 /*
  * csiphy_get_bpp - map media bus format to bits per pixel
  * @formats: supported media bus formats array
@@ -126,23 +102,23 @@ static u8 csiphy_get_bpp(const struct csiphy_format *formats,
 static int csiphy_set_clock_rates(struct csiphy_device *csiphy)
 {
 	struct device *dev = csiphy->camss->dev;
-	s64 link_freq;
+	u32 pixel_clock;
 	int i, j;
 	int ret;
 
-	u8 bpp = csiphy_get_bpp(csiphy->formats, csiphy->nformats,
-				csiphy->fmt[MSM_CSIPHY_PAD_SINK].code);
-	u8 num_lanes = csiphy->cfg.csi2->lane_cfg.num_data;
-
-	link_freq = camss_get_link_freq(&csiphy->subdev.entity, bpp, num_lanes);
-	if (link_freq < 0)
-		link_freq  = 0;
+	ret = camss_get_pixel_clock(&csiphy->subdev.entity, &pixel_clock);
+	if (ret)
+		pixel_clock = 0;
 
 	for (i = 0; i < csiphy->nclocks; i++) {
 		struct camss_clock *clock = &csiphy->clock[i];
 
 		if (csiphy->rate_set[i]) {
-			u64 min_rate = link_freq / 4;
+			u8 bpp = csiphy_get_bpp(csiphy->formats,
+					csiphy->nformats,
+					csiphy->fmt[MSM_CSIPHY_PAD_SINK].code);
+			u8 num_lanes = csiphy->cfg.csi2->lane_cfg.num_data;
+			u64 min_rate = pixel_clock * bpp / (2 * num_lanes * 4);
 			long round_rate;
 
 			camss_add_clock_margin(&min_rate);
@@ -262,37 +238,37 @@ static u8 csiphy_get_lane_mask(struct csiphy_lanes_cfg *lane_cfg)
 static int csiphy_stream_on(struct csiphy_device *csiphy)
 {
 	struct csiphy_config *cfg = &csiphy->cfg;
-	s64 link_freq;
+	u32 pixel_clock;
 	u8 lane_mask = csiphy_get_lane_mask(&cfg->csi2->lane_cfg);
 	u8 bpp = csiphy_get_bpp(csiphy->formats, csiphy->nformats,
 				csiphy->fmt[MSM_CSIPHY_PAD_SINK].code);
-	u8 num_lanes = csiphy->cfg.csi2->lane_cfg.num_data;
 	u8 val;
+	int ret;
 
-	link_freq = camss_get_link_freq(&csiphy->subdev.entity, bpp, num_lanes);
-
-	if (link_freq < 0) {
+	ret = camss_get_pixel_clock(&csiphy->subdev.entity, &pixel_clock);
+	if (ret) {
 		dev_err(csiphy->camss->dev,
-			"Cannot get CSI2 transmitter's link frequency\n");
+			"Cannot get CSI2 transmitter's pixel clock\n");
+		return -EINVAL;
+	}
+	if (!pixel_clock) {
+		dev_err(csiphy->camss->dev,
+			"Got pixel clock == 0, cannot continue\n");
 		return -EINVAL;
 	}
 
-	if (csiphy->base_clk_mux) {
-		val = readl_relaxed(csiphy->base_clk_mux);
-		if (cfg->combo_mode && (lane_mask & 0x18) == 0x18) {
-			val &= ~0xf0;
-			val |= cfg->csid_id << 4;
-		} else {
-			val &= ~0xf;
-			val |= cfg->csid_id;
-		}
-		writel_relaxed(val, csiphy->base_clk_mux);
-
-		/* Enforce reg write ordering between clk mux & lane enabling */
-		wmb();
+	val = readl_relaxed(csiphy->base_clk_mux);
+	if (cfg->combo_mode && (lane_mask & 0x18) == 0x18) {
+		val &= ~0xf0;
+		val |= cfg->csid_id << 4;
+	} else {
+		val &= ~0xf;
+		val |= cfg->csid_id;
 	}
+	writel_relaxed(val, csiphy->base_clk_mux);
+	wmb();
 
-	csiphy->ops->lanes_enable(csiphy, cfg, link_freq, lane_mask);
+	csiphy->ops->lanes_enable(csiphy, cfg, pixel_clock, bpp, lane_mask);
 
 	return 0;
 }
@@ -581,10 +557,6 @@ int msm_csiphy_subdev_init(struct camss *camss,
 		csiphy->ops = &csiphy_ops_3ph_1_0;
 		csiphy->formats = csiphy_formats_8x96;
 		csiphy->nformats = ARRAY_SIZE(csiphy_formats_8x96);
-	} else if (camss->version == CAMSS_845) {
-		csiphy->ops = &csiphy_ops_3ph_1_0;
-		csiphy->formats = csiphy_formats_sdm845;
-		csiphy->nformats = ARRAY_SIZE(csiphy_formats_sdm845);
 	} else {
 		return -EINVAL;
 	}
@@ -593,18 +565,16 @@ int msm_csiphy_subdev_init(struct camss *camss,
 
 	r = platform_get_resource_byname(pdev, IORESOURCE_MEM, res->reg[0]);
 	csiphy->base = devm_ioremap_resource(dev, r);
-	if (IS_ERR(csiphy->base))
+	if (IS_ERR(csiphy->base)) {
+		dev_err(dev, "could not map memory\n");
 		return PTR_ERR(csiphy->base);
+	}
 
-	if (camss->version == CAMSS_8x16 ||
-	    camss->version == CAMSS_8x96) {
-		r = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-						 res->reg[1]);
-		csiphy->base_clk_mux = devm_ioremap_resource(dev, r);
-		if (IS_ERR(csiphy->base_clk_mux))
-			return PTR_ERR(csiphy->base_clk_mux);
-	} else {
-		csiphy->base_clk_mux = NULL;
+	r = platform_get_resource_byname(pdev, IORESOURCE_MEM, res->reg[1]);
+	csiphy->base_clk_mux = devm_ioremap_resource(dev, r);
+	if (IS_ERR(csiphy->base_clk_mux)) {
+		dev_err(dev, "could not map memory\n");
+		return PTR_ERR(csiphy->base_clk_mux);
 	}
 
 	/* Interrupt */

@@ -1193,7 +1193,7 @@ enum {
 };
 
 /*
- * definitions for CT reason code
+ * defintions for CT reason code
  */
 enum {
 	CT_RSN_INV_CMD		= 0x01,
@@ -1240,7 +1240,7 @@ enum {
 };
 
 /*
- * definitions for the explanation code for all servers
+ * defintions for the explanation code for all servers
  */
 enum {
 	CT_EXP_AUTH_EXCEPTION		= 0xF1,

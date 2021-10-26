@@ -544,10 +544,6 @@
 		ranges = <0x01000000 0x00 0x00000000 0x00 0x5f800000 0x0 0x00800000>,
 			 <0x02000000 0x00 0x50000000 0x00 0x50000000 0x0 0x08000000>,
 			 <0x42000000 0x40 0x00000000 0x40 0x00000000 0x1 0x00000000>;
-		/* Standard AXI Translation entries as programmed by EDK2 */
-		dma-ranges = <0x02000000 0x0 0x2c1c0000 0x0 0x2c1c0000 0x0 0x00040000>,
-			     <0x02000000 0x0 0x80000000 0x0 0x80000000 0x0 0x80000000>,
-			     <0x43000000 0x8 0x00000000 0x8 0x00000000 0x2 0x00000000>;
 		#interrupt-cells = <1>;
 		interrupt-map-mask = <0 0 0 7>;
 		interrupt-map = <0 0 0 1 &gic 0 GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>,
@@ -568,13 +564,13 @@
 		clocks {
 			compatible = "arm,scpi-clocks";
 
-			scpi_dvfs: clocks-0 {
+			scpi_dvfs: scpi-dvfs {
 				compatible = "arm,scpi-dvfs-clocks";
 				#clock-cells = <1>;
 				clock-indices = <0>, <1>, <2>;
 				clock-output-names = "atlclk", "aplclk","gpuclk";
 			};
-			scpi_clk: clocks-1 {
+			scpi_clk: scpi-clk {
 				compatible = "arm,scpi-variable-clocks";
 				#clock-cells = <1>;
 				clock-indices = <3>;
@@ -582,7 +578,7 @@
 			};
 		};
 
-		scpi_devpd: power-controller {
+		scpi_devpd: scpi-power-domains {
 			compatible = "arm,scpi-power-domains";
 			num-domains = <2>;
 			#power-domain-cells = <1>;
@@ -644,6 +640,7 @@
 		#iommu-cells = <1>;
 		#global-interrupts = <1>;
 		dma-coherent;
+		status = "disabled";
 	};
 
 	smmu_hdlcd1: iommu@7fb10000 {

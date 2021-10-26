@@ -16,7 +16,9 @@
 #include <linux/i2c.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
+#include <linux/gpio.h>
 #include <linux/regmap.h>
+#include <linux/of_gpio.h>
 #include <linux/bitops.h>
 
 #define SBS_CHARGER_REG_SPEC_INFO		0x11
@@ -187,14 +189,18 @@ static int sbs_probe(struct i2c_client *client,
 	 * to the battery.
 	 */
 	ret = regmap_read(chip->regmap, SBS_CHARGER_REG_STATUS, &val);
-	if (ret)
-		return dev_err_probe(&client->dev, ret, "Failed to get device status\n");
+	if (ret) {
+		dev_err(&client->dev, "Failed to get device status\n");
+		return ret;
+	}
 	chip->last_state = val;
 
-	chip->power_supply = devm_power_supply_register(&client->dev, &sbs_desc, &psy_cfg);
-	if (IS_ERR(chip->power_supply))
-		return dev_err_probe(&client->dev, PTR_ERR(chip->power_supply),
-				     "Failed to register power supply\n");
+	chip->power_supply = devm_power_supply_register(&client->dev, &sbs_desc,
+							&psy_cfg);
+	if (IS_ERR(chip->power_supply)) {
+		dev_err(&client->dev, "Failed to register power supply\n");
+		return PTR_ERR(chip->power_supply);
+	}
 
 	/*
 	 * The sbs-charger spec doesn't impose the use of an interrupt. So in
@@ -206,8 +212,10 @@ static int sbs_probe(struct i2c_client *client,
 					NULL, sbs_irq_thread,
 					IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
 					dev_name(&client->dev), chip);
-		if (ret)
-			return dev_err_probe(&client->dev, ret, "Failed to request irq\n");
+		if (ret) {
+			dev_err(&client->dev, "Failed to request irq, %d\n", ret);
+			return ret;
+		}
 	} else {
 		INIT_DELAYED_WORK(&chip->work, sbs_delayed_work);
 		schedule_delayed_work(&chip->work,

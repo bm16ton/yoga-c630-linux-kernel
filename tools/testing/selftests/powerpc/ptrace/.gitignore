@@ -14,4 +14,3 @@ perf-hwbreak
 core-pkey
 ptrace-pkey
 ptrace-syscall
-ptrace-perf-hwbreak

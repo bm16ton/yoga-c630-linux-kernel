@@ -713,8 +713,6 @@ static int usb_audio_probe(struct usb_interface *intf,
 		quirk = get_alias_quirk(dev, id);
 	if (quirk && quirk->ifnum >= 0 && ifnum != quirk->ifnum)
 		return -ENXIO;
-	if (quirk && quirk->ifnum == QUIRK_NODEV_INTERFACE)
-		return -ENODEV;
 
 	err = snd_usb_apply_boot_quirk(dev, intf, quirk, id);
 	if (err < 0)
@@ -907,7 +905,7 @@ static void usb_audio_disconnect(struct usb_interface *intf)
 		}
 	}
 
-	if (chip->quirk_type == QUIRK_SETUP_DISABLE_AUTOSUSPEND)
+	if (chip->quirk_type & QUIRK_SETUP_DISABLE_AUTOSUSPEND)
 		usb_enable_autosuspend(interface_to_usbdev(intf));
 
 	chip->num_interfaces--;

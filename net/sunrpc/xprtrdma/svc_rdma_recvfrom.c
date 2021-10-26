@@ -89,7 +89,8 @@
  * svc_rdma_recvfrom call returns.
  *
  * During the second svc_rdma_recvfrom call, RDMA Read sink pages
- * are transferred from the svc_rdma_recv_ctxt to the second svc_rqst.
+ * are transferred from the svc_rdma_recv_ctxt to the second svc_rqst
+ * (see rdma_read_complete() below).
  */
 
 #include <linux/slab.h>
@@ -105,6 +106,8 @@
 
 #include "xprt_rdma.h"
 #include <trace/events/rpcrdma.h>
+
+#define RPCDBG_FACILITY	RPCDBG_SVCXPRT
 
 static void svc_rdma_wc_receive(struct ib_cq *cq, struct ib_wc *wc);
 
@@ -227,6 +230,11 @@ out_empty:
 void svc_rdma_recv_ctxt_put(struct svcxprt_rdma *rdma,
 			    struct svc_rdma_recv_ctxt *ctxt)
 {
+	unsigned int i;
+
+	for (i = 0; i < ctxt->rc_page_count; i++)
+		put_page(ctxt->rc_pages[i]);
+
 	pcl_free(&ctxt->rc_call_pcl);
 	pcl_free(&ctxt->rc_read_pcl);
 	pcl_free(&ctxt->rc_write_pcl);
@@ -258,48 +266,33 @@ void svc_rdma_release_rqst(struct svc_rqst *rqstp)
 		svc_rdma_recv_ctxt_put(rdma, ctxt);
 }
 
-static bool svc_rdma_refresh_recvs(struct svcxprt_rdma *rdma,
-				   unsigned int wanted, bool temp)
+static int __svc_rdma_post_recv(struct svcxprt_rdma *rdma,
+				struct svc_rdma_recv_ctxt *ctxt)
 {
-	const struct ib_recv_wr *bad_wr = NULL;
-	struct svc_rdma_recv_ctxt *ctxt;
-	struct ib_recv_wr *recv_chain;
 	int ret;
 
-	if (test_bit(XPT_CLOSE, &rdma->sc_xprt.xpt_flags))
-		return false;
-
-	recv_chain = NULL;
-	while (wanted--) {
-		ctxt = svc_rdma_recv_ctxt_get(rdma);
-		if (!ctxt)
-			break;
-
-		trace_svcrdma_post_recv(ctxt);
-		ctxt->rc_temp = temp;
-		ctxt->rc_recv_wr.next = recv_chain;
-		recv_chain = &ctxt->rc_recv_wr;
-		rdma->sc_pending_recvs++;
-	}
-	if (!recv_chain)
-		return false;
-
-	ret = ib_post_recv(rdma->sc_qp, recv_chain, &bad_wr);
+	trace_svcrdma_post_recv(ctxt);
+	ret = ib_post_recv(rdma->sc_qp, &ctxt->rc_recv_wr, NULL);
 	if (ret)
-		goto err_free;
-	return true;
+		goto err_post;
+	return 0;
 
-err_free:
+err_post:
 	trace_svcrdma_rq_post_err(rdma, ret);
-	while (bad_wr) {
-		ctxt = container_of(bad_wr, struct svc_rdma_recv_ctxt,
-				    rc_recv_wr);
-		bad_wr = bad_wr->next;
-		svc_rdma_recv_ctxt_put(rdma, ctxt);
-	}
-	/* Since we're destroying the xprt, no need to reset
-	 * sc_pending_recvs. */
-	return false;
+	svc_rdma_recv_ctxt_put(rdma, ctxt);
+	return ret;
+}
+
+static int svc_rdma_post_recv(struct svcxprt_rdma *rdma)
+{
+	struct svc_rdma_recv_ctxt *ctxt;
+
+	if (test_bit(XPT_CLOSE, &rdma->sc_xprt.xpt_flags))
+		return 0;
+	ctxt = svc_rdma_recv_ctxt_get(rdma);
+	if (!ctxt)
+		return -ENOMEM;
+	return __svc_rdma_post_recv(rdma, ctxt);
 }
 
 /**
@@ -310,7 +303,20 @@ err_free:
  */
 bool svc_rdma_post_recvs(struct svcxprt_rdma *rdma)
 {
-	return svc_rdma_refresh_recvs(rdma, rdma->sc_max_requests, true);
+	struct svc_rdma_recv_ctxt *ctxt;
+	unsigned int i;
+	int ret;
+
+	for (i = 0; i < rdma->sc_max_requests; i++) {
+		ctxt = svc_rdma_recv_ctxt_get(rdma);
+		if (!ctxt)
+			return false;
+		ctxt->rc_temp = true;
+		ret = __svc_rdma_post_recv(rdma, ctxt);
+		if (ret)
+			return false;
+	}
+	return true;
 }
 
 /**
@@ -318,14 +324,14 @@ bool svc_rdma_post_recvs(struct svcxprt_rdma *rdma)
  * @cq: Completion Queue context
  * @wc: Work Completion object
  *
+ * NB: The svc_xprt/svcxprt_rdma is pinned whenever it's possible that
+ * the Receive completion handler could be running.
  */
 static void svc_rdma_wc_receive(struct ib_cq *cq, struct ib_wc *wc)
 {
 	struct svcxprt_rdma *rdma = cq->cq_context;
 	struct ib_cqe *cqe = wc->wr_cqe;
 	struct svc_rdma_recv_ctxt *ctxt;
-
-	rdma->sc_pending_recvs--;
 
 	/* WARNING: Only wc->wr_cqe and wc->status are reliable */
 	ctxt = container_of(cqe, struct svc_rdma_recv_ctxt, rc_cqe);
@@ -334,18 +340,8 @@ static void svc_rdma_wc_receive(struct ib_cq *cq, struct ib_wc *wc)
 	if (wc->status != IB_WC_SUCCESS)
 		goto flushed;
 
-	/* If receive posting fails, the connection is about to be
-	 * lost anyway. The server will not be able to send a reply
-	 * for this RPC, and the client will retransmit this RPC
-	 * anyway when it reconnects.
-	 *
-	 * Therefore we drop the Receive, even if status was SUCCESS
-	 * to reduce the likelihood of replayed requests once the
-	 * client reconnects.
-	 */
-	if (rdma->sc_pending_recvs < rdma->sc_max_requests)
-		if (!svc_rdma_refresh_recvs(rdma, rdma->sc_recv_batch, false))
-			goto flushed;
+	if (svc_rdma_post_recv(rdma))
+		goto post_err;
 
 	/* All wc fields are now known to be valid */
 	ctxt->rc_byte_len = wc->byte_len;
@@ -360,8 +356,10 @@ static void svc_rdma_wc_receive(struct ib_cq *cq, struct ib_wc *wc)
 	return;
 
 flushed:
+post_err:
 	svc_rdma_recv_ctxt_put(rdma, ctxt);
-	svc_xprt_deferred_close(&rdma->sc_xprt);
+	set_bit(XPT_CLOSE, &rdma->sc_xprt.xpt_flags);
+	svc_xprt_enqueue(&rdma->sc_xprt);
 }
 
 /**
@@ -373,6 +371,10 @@ void svc_rdma_flush_recv_queues(struct svcxprt_rdma *rdma)
 {
 	struct svc_rdma_recv_ctxt *ctxt;
 
+	while ((ctxt = svc_rdma_next_recv_ctxt(&rdma->sc_read_complete_q))) {
+		list_del(&ctxt->rc_list);
+		svc_rdma_recv_ctxt_put(rdma, ctxt);
+	}
 	while ((ctxt = svc_rdma_next_recv_ctxt(&rdma->sc_rq_dto_q))) {
 		list_del(&ctxt->rc_list);
 		svc_rdma_recv_ctxt_put(rdma, ctxt);
@@ -710,6 +712,35 @@ out_inval:
 	return -EINVAL;
 }
 
+static void rdma_read_complete(struct svc_rqst *rqstp,
+			       struct svc_rdma_recv_ctxt *head)
+{
+	int page_no;
+
+	/* Move Read chunk pages to rqstp so that they will be released
+	 * when svc_process is done with them.
+	 */
+	for (page_no = 0; page_no < head->rc_page_count; page_no++) {
+		put_page(rqstp->rq_pages[page_no]);
+		rqstp->rq_pages[page_no] = head->rc_pages[page_no];
+	}
+	head->rc_page_count = 0;
+
+	/* Point rq_arg.pages past header */
+	rqstp->rq_arg.pages = &rqstp->rq_pages[head->rc_hdr_count];
+	rqstp->rq_arg.page_len = head->rc_arg.page_len;
+
+	/* rq_respages starts after the last arg page */
+	rqstp->rq_respages = &rqstp->rq_pages[page_no];
+	rqstp->rq_next_page = rqstp->rq_respages + 1;
+
+	/* Rebuild rq_arg head and tail. */
+	rqstp->rq_arg.head[0] = head->rc_arg.head[0];
+	rqstp->rq_arg.tail[0] = head->rc_arg.tail[0];
+	rqstp->rq_arg.len = head->rc_arg.len;
+	rqstp->rq_arg.buflen = head->rc_arg.buflen;
+}
+
 static void svc_rdma_send_error(struct svcxprt_rdma *rdma,
 				struct svc_rdma_recv_ctxt *rctxt,
 				int status)
@@ -794,22 +825,25 @@ int svc_rdma_recvfrom(struct svc_rqst *rqstp)
 
 	rqstp->rq_xprt_ctxt = NULL;
 
-	ctxt = NULL;
 	spin_lock(&rdma_xprt->sc_rq_dto_lock);
-	ctxt = svc_rdma_next_recv_ctxt(&rdma_xprt->sc_rq_dto_q);
-	if (ctxt)
+	ctxt = svc_rdma_next_recv_ctxt(&rdma_xprt->sc_read_complete_q);
+	if (ctxt) {
 		list_del(&ctxt->rc_list);
-	else
+		spin_unlock(&rdma_xprt->sc_rq_dto_lock);
+		rdma_read_complete(rqstp, ctxt);
+		goto complete;
+	}
+	ctxt = svc_rdma_next_recv_ctxt(&rdma_xprt->sc_rq_dto_q);
+	if (!ctxt) {
 		/* No new incoming requests, terminate the loop */
 		clear_bit(XPT_DATA, &xprt->xpt_flags);
-	spin_unlock(&rdma_xprt->sc_rq_dto_lock);
-
-	/* Unblock the transport for the next receive */
-	svc_xprt_received(xprt);
-	if (!ctxt)
+		spin_unlock(&rdma_xprt->sc_rq_dto_lock);
 		return 0;
-
+	}
+	list_del(&ctxt->rc_list);
+	spin_unlock(&rdma_xprt->sc_rq_dto_lock);
 	percpu_counter_inc(&svcrdma_stat_recv);
+
 	ib_dma_sync_single_for_cpu(rdma_xprt->sc_pd->device,
 				   ctxt->rc_recv_sge.addr, ctxt->rc_byte_len,
 				   DMA_FROM_DEVICE);
@@ -834,16 +868,20 @@ int svc_rdma_recvfrom(struct svc_rqst *rqstp)
 	svc_rdma_get_inv_rkey(rdma_xprt, ctxt);
 
 	if (!pcl_is_empty(&ctxt->rc_read_pcl) ||
-	    !pcl_is_empty(&ctxt->rc_call_pcl)) {
-		ret = svc_rdma_process_read_list(rdma_xprt, rqstp, ctxt);
-		if (ret < 0)
-			goto out_readfail;
-	}
+	    !pcl_is_empty(&ctxt->rc_call_pcl))
+		goto out_readlist;
 
+complete:
 	rqstp->rq_xprt_ctxt = ctxt;
 	rqstp->rq_prot = IPPROTO_MAX;
 	svc_xprt_copy_addrs(rqstp, xprt);
 	return rqstp->rq_arg.len;
+
+out_readlist:
+	ret = svc_rdma_process_read_list(rdma_xprt, rqstp, ctxt);
+	if (ret < 0)
+		goto out_readfail;
+	return 0;
 
 out_err:
 	svc_rdma_send_error(rdma_xprt, ctxt, ret);

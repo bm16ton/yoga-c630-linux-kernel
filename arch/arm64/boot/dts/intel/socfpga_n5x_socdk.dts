@@ -23,6 +23,14 @@
 		/* We expect the bootloader to fill in the reg */
 		reg = <0 0 0 0>;
 	};
+
+	soc {
+		clocks {
+			osc1 {
+				clock-frequency = <25000000>;
+			};
+		};
+	};
 };
 
 &clkmgr {
@@ -34,10 +42,6 @@
 	cap-sd-highspeed;
 	broken-cd;
 	bus-width = <4>;
-};
-
-&osc1 {
-	clock-frequency = <25000000>;
 };
 
 &uart0 {

@@ -74,6 +74,7 @@ static struct acpi_driver acpi_hed_driver = {
 };
 module_acpi_driver(acpi_hed_driver);
 
+ACPI_MODULE_NAME("hed");
 MODULE_AUTHOR("Huang Ying");
 MODULE_DESCRIPTION("ACPI Hardware Error Device Driver");
 MODULE_LICENSE("GPL");

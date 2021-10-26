@@ -230,7 +230,6 @@ struct vivid_dev {
 	struct v4l2_ctrl		*string;
 	struct v4l2_ctrl		*bitmask;
 	struct v4l2_ctrl		*int_menu;
-	struct v4l2_ctrl		*ro_int32;
 	struct v4l2_ctrl		*test_pattern;
 	struct v4l2_ctrl		*colorspace;
 	struct v4l2_ctrl		*rgb_range_cap;

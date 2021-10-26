@@ -28,6 +28,9 @@
 #define ACPI_PROCESSOR_NOTIFY_POWER	0x81
 #define ACPI_PROCESSOR_NOTIFY_THROTTLING	0x82
 
+#define _COMPONENT		ACPI_PROCESSOR_COMPONENT
+ACPI_MODULE_NAME("processor_driver");
+
 MODULE_AUTHOR("Paul Diefenbaugh");
 MODULE_DESCRIPTION("ACPI Processor Driver");
 MODULE_LICENSE("GPL");
@@ -84,7 +87,8 @@ static void acpi_processor_notify(acpi_handle handle, u32 event, void *data)
 						  dev_name(&device->dev), event, 0);
 		break;
 	default:
-		acpi_handle_debug(handle, "Unsupported event [0x%x]\n", event);
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
+				  "Unsupported event [0x%x]\n", event));
 		break;
 	}
 

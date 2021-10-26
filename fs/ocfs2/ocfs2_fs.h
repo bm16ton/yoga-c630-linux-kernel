@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
-/*
+/* -*- mode: c; c-basic-offset: 8; -*-
+ * vim: noexpandtab sw=8 ts=8 sts=0:
+ *
  * ocfs2_fs.h
  *
  * On-disk structures for OCFS2.

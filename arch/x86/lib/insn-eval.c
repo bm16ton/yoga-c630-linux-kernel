@@ -232,7 +232,7 @@ static int resolve_default_seg(struct insn *insn, struct pt_regs *regs, int off)
  * resolve_seg_reg() - obtain segment register index
  * @insn:	Instruction with operands
  * @regs:	Register values as seen when entering kernel mode
- * @regoff:	Operand offset, in pt_regs, used to determine segment register
+ * @regoff:	Operand offset, in pt_regs, used to deterimine segment register
  *
  * Determine the segment register associated with the operands and, if
  * applicable, prefixes and the instruction pointed by @insn.
@@ -404,6 +404,10 @@ static short get_segment_selector(struct pt_regs *regs, int seg_reg_idx)
 	case INAT_SEG_REG_FS:
 		return (unsigned short)(regs->fs & 0xffff);
 	case INAT_SEG_REG_GS:
+		/*
+		 * GS may or may not be in regs as per CONFIG_X86_32_LAZY_GS.
+		 * The macro below takes care of both cases.
+		 */
 		return get_user_gs(regs);
 	case INAT_SEG_REG_IGNORE:
 	default:
@@ -513,7 +517,7 @@ static int get_reg_offset(struct insn *insn, struct pt_regs *regs,
  * @insn:	Instruction containing ModRM byte
  * @regs:	Register values as seen when entering kernel mode
  * @offs1:	Offset of the first operand register
- * @offs2:	Offset of the second operand register, if applicable
+ * @offs2:	Offset of the second opeand register, if applicable
  *
  * Obtain the offset, in pt_regs, of the registers indicated by the ModRM byte
  * in @insn. This function is to be used with 16-bit address encodings. The
@@ -572,7 +576,7 @@ static int get_reg_offset_16(struct insn *insn, struct pt_regs *regs,
 	 * If ModRM.mod is 0 and ModRM.rm is 110b, then we use displacement-
 	 * only addressing. This means that no registers are involved in
 	 * computing the effective address. Thus, ensure that the first
-	 * register offset is invalid. The second register offset is already
+	 * register offset is invalild. The second register offset is already
 	 * invalid under the aforementioned conditions.
 	 */
 	if ((X86_MODRM_MOD(insn->modrm.value) == 0) &&
@@ -924,11 +928,10 @@ static int get_seg_base_limit(struct insn *insn, struct pt_regs *regs,
 static int get_eff_addr_reg(struct insn *insn, struct pt_regs *regs,
 			    int *regoff, long *eff_addr)
 {
-	int ret;
+	insn_get_modrm(insn);
 
-	ret = insn_get_modrm(insn);
-	if (ret)
-		return ret;
+	if (!insn->modrm.nbytes)
+		return -EINVAL;
 
 	if (X86_MODRM_MOD(insn->modrm.value) != 3)
 		return -EINVAL;
@@ -974,14 +977,14 @@ static int get_eff_addr_modrm(struct insn *insn, struct pt_regs *regs,
 			      int *regoff, long *eff_addr)
 {
 	long tmp;
-	int ret;
 
 	if (insn->addr_bytes != 8 && insn->addr_bytes != 4)
 		return -EINVAL;
 
-	ret = insn_get_modrm(insn);
-	if (ret)
-		return ret;
+	insn_get_modrm(insn);
+
+	if (!insn->modrm.nbytes)
+		return -EINVAL;
 
 	if (X86_MODRM_MOD(insn->modrm.value) > 2)
 		return -EINVAL;
@@ -1103,21 +1106,18 @@ static int get_eff_addr_modrm_16(struct insn *insn, struct pt_regs *regs,
  * @base_offset will have a register, as an offset from the base of pt_regs,
  * that can be used to resolve the associated segment.
  *
- * Negative value on error.
+ * -EINVAL on error.
  */
 static int get_eff_addr_sib(struct insn *insn, struct pt_regs *regs,
 			    int *base_offset, long *eff_addr)
 {
 	long base, indx;
 	int indx_offset;
-	int ret;
 
 	if (insn->addr_bytes != 8 && insn->addr_bytes != 4)
 		return -EINVAL;
 
-	ret = insn_get_modrm(insn);
-	if (ret)
-		return ret;
+	insn_get_modrm(insn);
 
 	if (!insn->modrm.nbytes)
 		return -EINVAL;
@@ -1125,9 +1125,7 @@ static int get_eff_addr_sib(struct insn *insn, struct pt_regs *regs,
 	if (X86_MODRM_MOD(insn->modrm.value) > 2)
 		return -EINVAL;
 
-	ret = insn_get_sib(insn);
-	if (ret)
-		return ret;
+	insn_get_sib(insn);
 
 	if (!insn->sib.nbytes)
 		return -EINVAL;
@@ -1196,8 +1194,8 @@ static void __user *get_addr_ref_16(struct insn *insn, struct pt_regs *regs)
 	short eff_addr;
 	long tmp;
 
-	if (insn_get_displacement(insn))
-		goto out;
+	insn_get_modrm(insn);
+	insn_get_displacement(insn);
 
 	if (insn->addr_bytes != 2)
 		goto out;
@@ -1494,7 +1492,7 @@ int insn_fetch_from_user_inatomic(struct pt_regs *regs, unsigned char buf[MAX_IN
 }
 
 /**
- * insn_decode_from_regs() - Decode an instruction
+ * insn_decode() - Decode an instruction
  * @insn:	Structure to store decoded instruction
  * @regs:	Structure with register values as seen when entering kernel mode
  * @buf:	Buffer containing the instruction bytes
@@ -1507,8 +1505,8 @@ int insn_fetch_from_user_inatomic(struct pt_regs *regs, unsigned char buf[MAX_IN
  *
  * True if instruction was decoded, False otherwise.
  */
-bool insn_decode_from_regs(struct insn *insn, struct pt_regs *regs,
-			   unsigned char buf[MAX_INSN_SIZE], int buf_size)
+bool insn_decode(struct insn *insn, struct pt_regs *regs,
+		 unsigned char buf[MAX_INSN_SIZE], int buf_size)
 {
 	int seg_defs;
 
@@ -1531,9 +1529,7 @@ bool insn_decode_from_regs(struct insn *insn, struct pt_regs *regs,
 	insn->addr_bytes = INSN_CODE_SEG_ADDR_SZ(seg_defs);
 	insn->opnd_bytes = INSN_CODE_SEG_OPND_SZ(seg_defs);
 
-	if (insn_get_length(insn))
-		return false;
-
+	insn_get_length(insn);
 	if (buf_size < insn->length)
 		return false;
 

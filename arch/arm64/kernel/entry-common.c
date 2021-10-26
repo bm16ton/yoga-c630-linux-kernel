@@ -37,8 +37,6 @@ static void noinstr enter_from_kernel_mode(struct pt_regs *regs)
 	lockdep_hardirqs_off(CALLER_ADDR0);
 	rcu_irq_enter_check_tick();
 	trace_hardirqs_off_finish();
-
-	mte_check_tfsr_entry();
 }
 
 /*
@@ -48,8 +46,6 @@ static void noinstr enter_from_kernel_mode(struct pt_regs *regs)
 static void noinstr exit_to_kernel_mode(struct pt_regs *regs)
 {
 	lockdep_assert_irqs_disabled();
-
-	mte_check_tfsr_exit();
 
 	if (interrupts_enabled(regs)) {
 		if (regs->exit_rcu) {
@@ -289,8 +285,6 @@ asmlinkage void noinstr enter_from_user_mode(void)
 
 asmlinkage void noinstr exit_to_user_mode(void)
 {
-	mte_check_tfsr_exit();
-
 	trace_hardirqs_on_prepare();
 	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
 	user_enter_irqoff();

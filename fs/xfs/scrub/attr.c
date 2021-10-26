@@ -69,7 +69,8 @@ xchk_setup_xattr_buf(
 /* Set us up to scrub an inode's extended attributes. */
 int
 xchk_setup_xattr(
-	struct xfs_scrub	*sc)
+	struct xfs_scrub	*sc,
+	struct xfs_inode	*ip)
 {
 	int			error;
 
@@ -84,7 +85,7 @@ xchk_setup_xattr(
 			return error;
 	}
 
-	return xchk_setup_inode_contents(sc, 0);
+	return xchk_setup_inode_contents(sc, ip, 0);
 }
 
 /* Extended Attributes */

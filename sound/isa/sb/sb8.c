@@ -93,11 +93,7 @@ static int snd_sb8_probe(struct device *pdev, unsigned int dev)
 	acard = card->private_data;
 	card->private_free = snd_sb8_free;
 
-	/*
-	 * Block the 0x388 port to avoid PnP conflicts.
-	 * No need to check this value after request_region,
-	 * as we never do anything with it.
-	 */
+	/* block the 0x388 port to avoid PnP conflicts */
 	acard->fm_res = request_region(0x388, 4, "SoundBlaster FM");
 
 	if (port[dev] != SNDRV_AUTO_PORT) {

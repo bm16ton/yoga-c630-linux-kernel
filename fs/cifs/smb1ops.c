@@ -926,7 +926,9 @@ cifs_unix_dfs_readlink(const unsigned int xid, struct cifs_tcon *tcon,
 			  0);
 
 	if (!rc) {
-		*symlinkinfo = kstrdup(referral.node_name, GFP_KERNEL);
+		*symlinkinfo = kstrndup(referral.node_name,
+					strlen(referral.node_name),
+					GFP_KERNEL);
 		free_dfs_info_param(&referral);
 		if (!*symlinkinfo)
 			rc = -ENOMEM;
@@ -1025,7 +1027,7 @@ cifs_can_echo(struct TCP_Server_Info *server)
 static int
 cifs_make_node(unsigned int xid, struct inode *inode,
 	       struct dentry *dentry, struct cifs_tcon *tcon,
-	       const char *full_path, umode_t mode, dev_t dev)
+	       char *full_path, umode_t mode, dev_t dev)
 {
 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
 	struct inode *newinode = NULL;

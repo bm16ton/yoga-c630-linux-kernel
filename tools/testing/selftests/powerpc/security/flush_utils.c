@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <sys/utsname.h>
 #include "utils.h"
 #include "flush_utils.h"
 
@@ -33,18 +32,6 @@ void syscall_loop(char *p, unsigned long iterations,
 		for (unsigned long j = 0; j < zero_size; j += CACHELINE_SIZE)
 			load(p + j);
 		getppid();
-	}
-}
-
-void syscall_loop_uaccess(char *p, unsigned long iterations,
-			  unsigned long zero_size)
-{
-	struct utsname utsname;
-
-	for (unsigned long i = 0; i < iterations; i++) {
-		for (unsigned long j = 0; j < zero_size; j += CACHELINE_SIZE)
-			load(p + j);
-		uname(&utsname);
 	}
 }
 

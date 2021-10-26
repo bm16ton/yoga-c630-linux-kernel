@@ -1,17 +1,18 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-====================
-ACPI CA Debug Output
-====================
+=================
+ACPI Debug Output
+=================
 
-The ACPI CA can generate debug output.  This document describes how to use this
-facility.
+The ACPI CA, the Linux ACPI core, and some ACPI drivers can generate debug
+output.  This document describes how to use this facility.
 
 Compile-time configuration
 ==========================
 
-The ACPI CA debug output is globally enabled by CONFIG_ACPI_DEBUG.  If this
-config option is not set, the debug messages are not even built into the kernel.
+ACPI debug output is globally enabled by CONFIG_ACPI_DEBUG.  If this config
+option is turned off, the debug messages are not even built into the
+kernel.
 
 Boot- and run-time configuration
 ================================
@@ -26,16 +27,16 @@ debug_layer (component)
 =======================
 
 The "debug_layer" is a mask that selects components of interest, e.g., a
-specific part of the ACPI interpreter.  To build the debug_layer bitmask, look
-for the "#define _COMPONENT" in an ACPI source file.
+specific driver or part of the ACPI interpreter.  To build the debug_layer
+bitmask, look for the "#define _COMPONENT" in an ACPI source file.
 
 You can set the debug_layer mask at boot-time using the acpi.debug_layer
 command line argument, and you can change it after boot by writing values
 to /sys/module/acpi/parameters/debug_layer.
 
-The possible components are defined in include/acpi/acoutput.h.
-
-Reading /sys/module/acpi/parameters/debug_layer shows the supported mask values::
+The possible components are defined in include/acpi/acoutput.h and
+include/acpi/acpi_drivers.h.  Reading /sys/module/acpi/parameters/debug_layer
+shows the supported mask values, currently these::
 
     ACPI_UTILITIES                  0x00000001
     ACPI_HARDWARE                   0x00000002
@@ -51,6 +52,13 @@ Reading /sys/module/acpi/parameters/debug_layer shows the supported mask values:
     ACPI_CA_DISASSEMBLER            0x00000800
     ACPI_COMPILER                   0x00001000
     ACPI_TOOLS                      0x00002000
+    ACPI_SBS_COMPONENT              0x00100000
+    ACPI_FAN_COMPONENT              0x00200000
+    ACPI_PCI_COMPONENT              0x00400000
+    ACPI_CONTAINER_COMPONENT        0x01000000
+    ACPI_SYSTEM_COMPONENT           0x02000000
+    ACPI_MEMORY_DEVICE_COMPONENT    0x08000000
+    ACPI_PROCESSOR_COMPONENT        0x20000000
 
 debug_level
 ===========
@@ -118,6 +126,10 @@ Enable all AML "Debug" output (stores to the Debug object while interpreting
 AML) during boot::
 
     acpi.debug_layer=0xffffffff acpi.debug_level=0x2
+
+Enable PCI and PCI interrupt routing debug messages::
+
+    acpi.debug_layer=0x400000 acpi.debug_level=0x4
 
 Enable all ACPI hardware-related messages::
 

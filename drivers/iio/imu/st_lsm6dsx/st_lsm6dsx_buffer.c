@@ -739,17 +739,20 @@ static const struct iio_buffer_setup_ops st_lsm6dsx_buffer_ops = {
 
 int st_lsm6dsx_fifo_setup(struct st_lsm6dsx_hw *hw)
 {
-	int i, ret;
+	struct iio_buffer *buffer;
+	int i;
 
 	for (i = 0; i < ST_LSM6DSX_ID_MAX; i++) {
 		if (!hw->iio_devs[i])
 			continue;
 
-		ret = devm_iio_kfifo_buffer_setup(hw->dev, hw->iio_devs[i],
-						  INDIO_BUFFER_SOFTWARE,
-						  &st_lsm6dsx_buffer_ops);
-		if (ret)
-			return ret;
+		buffer = devm_iio_kfifo_allocate(hw->dev);
+		if (!buffer)
+			return -ENOMEM;
+
+		iio_device_attach_buffer(hw->iio_devs[i], buffer);
+		hw->iio_devs[i]->modes |= INDIO_BUFFER_SOFTWARE;
+		hw->iio_devs[i]->setup_ops = &st_lsm6dsx_buffer_ops;
 	}
 
 	return 0;

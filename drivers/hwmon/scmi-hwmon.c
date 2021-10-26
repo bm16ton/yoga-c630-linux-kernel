@@ -2,7 +2,7 @@
 /*
  * System Control and Management Interface(SCMI) based hwmon sensor driver
  *
- * Copyright (C) 2018-2021 ARM Ltd.
+ * Copyright (C) 2018 ARM Ltd.
  * Sudeep Holla <sudeep.holla@arm.com>
  */
 
@@ -13,10 +13,8 @@
 #include <linux/sysfs.h>
 #include <linux/thermal.h>
 
-static const struct scmi_sensor_proto_ops *sensor_ops;
-
 struct scmi_sensors {
-	const struct scmi_protocol_handle *ph;
+	const struct scmi_handle *handle;
 	const struct scmi_sensor_info **info[hwmon_max];
 };
 
@@ -71,9 +69,10 @@ static int scmi_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
 	u64 value;
 	const struct scmi_sensor_info *sensor;
 	struct scmi_sensors *scmi_sensors = dev_get_drvdata(dev);
+	const struct scmi_handle *h = scmi_sensors->handle;
 
 	sensor = *(scmi_sensors->info[type] + channel);
-	ret = sensor_ops->reading_get(scmi_sensors->ph, sensor->id, &value);
+	ret = h->sensor_ops->reading_get(h, sensor->id, &value);
 	if (ret)
 		return ret;
 
@@ -170,16 +169,11 @@ static int scmi_hwmon_probe(struct scmi_device *sdev)
 	struct hwmon_channel_info *scmi_hwmon_chan;
 	const struct hwmon_channel_info **ptr_scmi_ci;
 	const struct scmi_handle *handle = sdev->handle;
-	struct scmi_protocol_handle *ph;
 
-	if (!handle)
+	if (!handle || !handle->sensor_ops)
 		return -ENODEV;
 
-	sensor_ops = handle->devm_protocol_get(sdev, SCMI_PROTOCOL_SENSOR, &ph);
-	if (IS_ERR(sensor_ops))
-		return PTR_ERR(sensor_ops);
-
-	nr_sensors = sensor_ops->count_get(ph);
+	nr_sensors = handle->sensor_ops->count_get(handle);
 	if (!nr_sensors)
 		return -EIO;
 
@@ -187,10 +181,10 @@ static int scmi_hwmon_probe(struct scmi_device *sdev)
 	if (!scmi_sensors)
 		return -ENOMEM;
 
-	scmi_sensors->ph = ph;
+	scmi_sensors->handle = handle;
 
 	for (i = 0; i < nr_sensors; i++) {
-		sensor = sensor_ops->info_get(ph, i);
+		sensor = handle->sensor_ops->info_get(handle, i);
 		if (!sensor)
 			return -EINVAL;
 
@@ -242,7 +236,7 @@ static int scmi_hwmon_probe(struct scmi_device *sdev)
 	}
 
 	for (i = nr_sensors - 1; i >= 0 ; i--) {
-		sensor = sensor_ops->info_get(ph, i);
+		sensor = handle->sensor_ops->info_get(handle, i);
 		if (!sensor)
 			continue;
 

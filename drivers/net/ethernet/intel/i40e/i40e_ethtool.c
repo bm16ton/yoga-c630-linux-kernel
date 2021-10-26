@@ -212,7 +212,7 @@ static void __i40e_add_stat_strings(u8 **p, const struct i40e_stats stats[],
 }
 
 /**
- * i40e_add_stat_strings - copy stat strings into ethtool buffer
+ * 40e_add_stat_strings - copy stat strings into ethtool buffer
  * @p: ethtool supplied buffer
  * @stats: stat definitions array
  *
@@ -980,7 +980,7 @@ static void i40e_get_settings_link_up(struct i40e_hw *hw,
 	default:
 		/* if we got here and link is up something bad is afoot */
 		netdev_info(netdev,
-			    "WARNING: Link is up but PHY type 0x%x is not recognized, or incorrect cable is in use\n",
+			    "WARNING: Link is up but PHY type 0x%x is not recognized.\n",
 			    hw_link_info->phy_type);
 	}
 
@@ -2409,15 +2409,21 @@ static void i40e_get_priv_flag_strings(struct net_device *netdev, u8 *data)
 	struct i40e_netdev_priv *np = netdev_priv(netdev);
 	struct i40e_vsi *vsi = np->vsi;
 	struct i40e_pf *pf = vsi->back;
+	char *p = (char *)data;
 	unsigned int i;
-	u8 *p = data;
 
-	for (i = 0; i < I40E_PRIV_FLAGS_STR_LEN; i++)
-		ethtool_sprintf(&p, i40e_gstrings_priv_flags[i].flag_string);
+	for (i = 0; i < I40E_PRIV_FLAGS_STR_LEN; i++) {
+		snprintf(p, ETH_GSTRING_LEN, "%s",
+			 i40e_gstrings_priv_flags[i].flag_string);
+		p += ETH_GSTRING_LEN;
+	}
 	if (pf->hw.pf_id != 0)
 		return;
-	for (i = 0; i < I40E_GL_PRIV_FLAGS_STR_LEN; i++)
-		ethtool_sprintf(&p, i40e_gl_gstrings_priv_flags[i].flag_string);
+	for (i = 0; i < I40E_GL_PRIV_FLAGS_STR_LEN; i++) {
+		snprintf(p, ETH_GSTRING_LEN, "%s",
+			 i40e_gl_gstrings_priv_flags[i].flag_string);
+		p += ETH_GSTRING_LEN;
+	}
 }
 
 static void i40e_get_strings(struct net_device *netdev, u32 stringset,
@@ -5294,10 +5300,6 @@ flags_complete:
 					dev_warn(&pf->pdev->dev,
 						 "Device configuration forbids SW from starting the LLDP agent.\n");
 					return -EINVAL;
-				case I40E_AQ_RC_EAGAIN:
-					dev_warn(&pf->pdev->dev,
-						 "Stop FW LLDP agent command is still being processed, please try again in a second.\n");
-					return -EBUSY;
 				default:
 					dev_warn(&pf->pdev->dev,
 						 "Starting FW LLDP agent failed: error: %s, %s\n",

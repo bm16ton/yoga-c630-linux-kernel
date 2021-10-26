@@ -255,9 +255,9 @@ int zfcp_unit_remove(struct zfcp_port *port, u64 fcp_lun)
 		scsi_device_put(sdev);
 	}
 
-	device_unregister(&unit->dev);
+	put_device(&unit->dev);
 
-	put_device(&unit->dev); /* undo _zfcp_unit_find() */
+	device_unregister(&unit->dev);
 
 	return 0;
 }

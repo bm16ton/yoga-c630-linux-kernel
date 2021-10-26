@@ -131,6 +131,8 @@
 			ASSERT(false);\
 		} \
 	} while (0)
+#define ODM_dbg_enter() { DbgPrint("==> %s\n", __func__); }
+#define ODM_dbg_exit() { DbgPrint("<== %s\n", __func__); }
 #define ODM_dbg_trace(str) { DbgPrint("%s:%s\n", __func__, str); }
 
 #define ODM_PRINT_ADDR(pDM_Odm, comp, level, title_str, ptr)\
@@ -160,6 +162,6 @@
 	no_printk("%s %p", title_str, ptr)
 #endif
 
-void ODM_InitDebugSetting(struct dm_odm_t *pDM_Odm);
+void ODM_InitDebugSetting(PDM_ODM_T pDM_Odm);
 
 #endif	/*  __ODM_DBG_H__ */

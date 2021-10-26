@@ -209,6 +209,7 @@ static int iproc_pwmc_probe(struct platform_device *pdev)
 
 	ip->chip.dev = &pdev->dev;
 	ip->chip.ops = &iproc_pwm_ops;
+	ip->chip.base = -1;
 	ip->chip.npwm = 4;
 	ip->chip.of_xlate = of_pwm_xlate_with_flags;
 	ip->chip.of_pwm_n_cells = 3;
@@ -253,11 +254,9 @@ static int iproc_pwmc_remove(struct platform_device *pdev)
 {
 	struct iproc_pwmc *ip = platform_get_drvdata(pdev);
 
-	pwmchip_remove(&ip->chip);
-
 	clk_disable_unprepare(ip->clk);
 
-	return 0;
+	return pwmchip_remove(&ip->chip);
 }
 
 static const struct of_device_id bcm_iproc_pwmc_dt[] = {

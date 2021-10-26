@@ -701,6 +701,7 @@ static sense_reason_t
 spc_emulate_inquiry(struct se_cmd *cmd)
 {
 	struct se_device *dev = cmd->se_dev;
+	struct se_portal_group *tpg = cmd->se_lun->lun_tpg;
 	unsigned char *rbuf;
 	unsigned char *cdb = cmd->t_task_cdb;
 	unsigned char *buf;
@@ -714,7 +715,10 @@ spc_emulate_inquiry(struct se_cmd *cmd)
 		return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
 	}
 
-	buf[0] = dev->transport->get_device_type(dev);
+	if (dev == rcu_access_pointer(tpg->tpg_virt_lun0->lun_se_dev))
+		buf[0] = 0x3f; /* Not connected */
+	else
+		buf[0] = dev->transport->get_device_type(dev);
 
 	if (!(cdb[1] & 0x1)) {
 		if (cdb[2]) {

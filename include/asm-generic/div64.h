@@ -8,14 +8,12 @@
  * Optimization for constant divisors on 32-bit machines:
  * Copyright (C) 2006-2015 Nicolas Pitre
  *
- * The semantics of do_div() is, in C++ notation, observing that the name
- * is a function-like macro and the n parameter has the semantics of a C++
- * reference:
+ * The semantics of do_div() are:
  *
- * uint32_t do_div(uint64_t &n, uint32_t base)
+ * uint32_t do_div(uint64_t *n, uint32_t base)
  * {
- * 	uint32_t remainder = n % base;
- * 	n = n / base;
+ * 	uint32_t remainder = *n % base;
+ * 	*n = *n / base;
  * 	return remainder;
  * }
  *

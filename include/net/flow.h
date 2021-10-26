@@ -59,6 +59,7 @@ union flowi_uli {
 		__le16	sport;
 	} dnports;
 
+	__be32		spi;
 	__be32		gre_key;
 
 	struct {
@@ -89,6 +90,7 @@ struct flowi4 {
 #define fl4_dport		uli.ports.dport
 #define fl4_icmp_type		uli.icmpt.type
 #define fl4_icmp_code		uli.icmpt.code
+#define fl4_ipsec_spi		uli.spi
 #define fl4_mh_type		uli.mht.type
 #define fl4_gre_key		uli.gre_key
 } __attribute__((__aligned__(BITS_PER_LONG/8)));
@@ -148,6 +150,7 @@ struct flowi6 {
 #define fl6_dport		uli.ports.dport
 #define fl6_icmp_type		uli.icmpt.type
 #define fl6_icmp_code		uli.icmpt.code
+#define fl6_ipsec_spi		uli.spi
 #define fl6_mh_type		uli.mht.type
 #define fl6_gre_key		uli.gre_key
 	__u32			mp_hash;

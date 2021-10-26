@@ -1761,7 +1761,7 @@ static int xfrm_add_policy(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 	/* shouldn't excl be based on nlh flags??
 	 * Aha! this is anti-netlink really i.e  more pfkey derived
-	 * in netlink excl is a flag and you wouldn't need
+	 * in netlink excl is a flag and you wouldnt need
 	 * a type XFRM_MSG_UPDPOLICY - JHS */
 	excl = nlh->nlmsg_type == XFRM_MSG_NEWPOLICY;
 	err = xfrm_policy_insert(p->dir, xp, excl);
@@ -2811,16 +2811,6 @@ static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 	err = link->doit(skb, nlh, attrs);
 
-	/* We need to free skb allocated in xfrm_alloc_compat() before
-	 * returning from this function, because consume_skb() won't take
-	 * care of frag_list since netlink destructor sets
-	 * sbk->head to NULL. (see netlink_skb_destructor())
-	 */
-	if (skb_has_frag_list(skb)) {
-		kfree_skb(skb_shinfo(skb)->frag_list);
-		skb_shinfo(skb)->frag_list = NULL;
-	}
-
 err:
 	kvfree(nlh64);
 	return err;
@@ -3490,22 +3480,18 @@ static int __net_init xfrm_user_net_init(struct net *net)
 	return 0;
 }
 
-static void __net_exit xfrm_user_net_pre_exit(struct net *net)
-{
-	RCU_INIT_POINTER(net->xfrm.nlsk, NULL);
-}
-
 static void __net_exit xfrm_user_net_exit(struct list_head *net_exit_list)
 {
 	struct net *net;
-
+	list_for_each_entry(net, net_exit_list, exit_list)
+		RCU_INIT_POINTER(net->xfrm.nlsk, NULL);
+	synchronize_net();
 	list_for_each_entry(net, net_exit_list, exit_list)
 		netlink_kernel_release(net->xfrm.nlsk_stash);
 }
 
 static struct pernet_operations xfrm_user_net_ops = {
 	.init	    = xfrm_user_net_init,
-	.pre_exit   = xfrm_user_net_pre_exit,
 	.exit_batch = xfrm_user_net_exit,
 };
 

@@ -159,7 +159,7 @@ static int smk_bu_current(char *note, struct smack_known *oskp,
 static int smk_bu_task(struct task_struct *otp, int mode, int rc)
 {
 	struct task_smack *tsp = smack_cred(current_cred());
-	struct smack_known *smk_task = smk_of_task_struct_obj(otp);
+	struct smack_known *smk_task = smk_of_task_struct(otp);
 	char acc[SMK_NUM_ACCESS_TYPE + 1];
 
 	if (rc <= 0)
@@ -479,7 +479,7 @@ static int smack_ptrace_access_check(struct task_struct *ctp, unsigned int mode)
 {
 	struct smack_known *skp;
 
-	skp = smk_of_task_struct_obj(ctp);
+	skp = smk_of_task_struct(ctp);
 
 	return smk_ptrace_rule_check(current, skp, mode, __func__);
 }
@@ -535,7 +535,12 @@ static int smack_syslog(int typefrom_file)
  */
 static int smack_sb_alloc_security(struct super_block *sb)
 {
-	struct superblock_smack *sbsp = smack_superblock(sb);
+	struct superblock_smack *sbsp;
+
+	sbsp = kzalloc(sizeof(struct superblock_smack), GFP_KERNEL);
+
+	if (sbsp == NULL)
+		return -ENOMEM;
 
 	sbsp->smk_root = &smack_known_floor;
 	sbsp->smk_default = &smack_known_floor;
@@ -544,8 +549,20 @@ static int smack_sb_alloc_security(struct super_block *sb)
 	/*
 	 * SMK_SB_INITIALIZED will be zero from kzalloc.
 	 */
+	sb->s_security = sbsp;
 
 	return 0;
+}
+
+/**
+ * smack_sb_free_security - free a superblock blob
+ * @sb: the superblock getting the blob
+ *
+ */
+static void smack_sb_free_security(struct super_block *sb)
+{
+	kfree(sb->s_security);
+	sb->s_security = NULL;
 }
 
 struct smack_mnt_opts {
@@ -755,7 +772,7 @@ static int smack_set_mnt_opts(struct super_block *sb,
 {
 	struct dentry *root = sb->s_root;
 	struct inode *inode = d_backing_inode(root);
-	struct superblock_smack *sp = smack_superblock(sb);
+	struct superblock_smack *sp = sb->s_security;
 	struct inode_smack *isp;
 	struct smack_known *skp;
 	struct smack_mnt_opts *opts = mnt_opts;
@@ -854,7 +871,7 @@ static int smack_set_mnt_opts(struct super_block *sb,
  */
 static int smack_sb_statfs(struct dentry *dentry)
 {
-	struct superblock_smack *sbp = smack_superblock(dentry->d_sb);
+	struct superblock_smack *sbp = dentry->d_sb->s_security;
 	int rc;
 	struct smk_audit_info ad;
 
@@ -888,7 +905,7 @@ static int smack_bprm_creds_for_exec(struct linux_binprm *bprm)
 	if (isp->smk_task == NULL || isp->smk_task == bsp->smk_task)
 		return 0;
 
-	sbsp = smack_superblock(inode->i_sb);
+	sbsp = inode->i_sb->s_security;
 	if ((sbsp->smk_flags & SMK_SB_UNTRUSTED) &&
 	    isp->smk_task != sbsp->smk_root)
 		return 0;
@@ -1140,7 +1157,7 @@ static int smack_inode_rename(struct inode *old_inode,
  */
 static int smack_inode_permission(struct inode *inode, int mask)
 {
-	struct superblock_smack *sbsp = smack_superblock(inode->i_sb);
+	struct superblock_smack *sbsp = inode->i_sb->s_security;
 	struct smk_audit_info ad;
 	int no_block = mask & MAY_NOT_BLOCK;
 	int rc;
@@ -1383,7 +1400,7 @@ static int smack_inode_removexattr(struct user_namespace *mnt_userns,
 	 */
 	if (strcmp(name, XATTR_NAME_SMACK) == 0) {
 		struct super_block *sbp = dentry->d_sb;
-		struct superblock_smack *sbsp = smack_superblock(sbp);
+		struct superblock_smack *sbsp = sbp->s_security;
 
 		isp->smk_inode = sbsp->smk_default;
 	} else if (strcmp(name, XATTR_NAME_SMACKEXEC) == 0)
@@ -1653,7 +1670,7 @@ static int smack_mmap_file(struct file *file,
 	isp = smack_inode(file_inode(file));
 	if (isp->smk_mmap == NULL)
 		return 0;
-	sbsp = smack_superblock(file_inode(file)->i_sb);
+	sbsp = file_inode(file)->i_sb->s_security;
 	if (sbsp->smk_flags & SMK_SB_UNTRUSTED &&
 	    isp->smk_mmap != sbsp->smk_root)
 		return -EACCES;
@@ -2016,7 +2033,7 @@ static int smk_curacc_on_task(struct task_struct *p, int access,
 				const char *caller)
 {
 	struct smk_audit_info ad;
-	struct smack_known *skp = smk_of_task_struct_subj(p);
+	struct smack_known *skp = smk_of_task_struct(p);
 	int rc;
 
 	smk_ad_init(&ad, caller, LSM_AUDIT_DATA_TASK);
@@ -2061,29 +2078,15 @@ static int smack_task_getsid(struct task_struct *p)
 }
 
 /**
- * smack_task_getsecid_subj - get the subjective secid of the task
- * @p: the task
+ * smack_task_getsecid - get the secid of the task
+ * @p: the object task
  * @secid: where to put the result
  *
- * Sets the secid to contain a u32 version of the task's subjective smack label.
+ * Sets the secid to contain a u32 version of the smack label.
  */
-static void smack_task_getsecid_subj(struct task_struct *p, u32 *secid)
+static void smack_task_getsecid(struct task_struct *p, u32 *secid)
 {
-	struct smack_known *skp = smk_of_task_struct_subj(p);
-
-	*secid = skp->smk_secid;
-}
-
-/**
- * smack_task_getsecid_obj - get the objective secid of the task
- * @p: the task
- * @secid: where to put the result
- *
- * Sets the secid to contain a u32 version of the task's objective smack label.
- */
-static void smack_task_getsecid_obj(struct task_struct *p, u32 *secid)
-{
-	struct smack_known *skp = smk_of_task_struct_obj(p);
+	struct smack_known *skp = smk_of_task_struct(p);
 
 	*secid = skp->smk_secid;
 }
@@ -2171,7 +2174,7 @@ static int smack_task_kill(struct task_struct *p, struct kernel_siginfo *info,
 {
 	struct smk_audit_info ad;
 	struct smack_known *skp;
-	struct smack_known *tkp = smk_of_task_struct_obj(p);
+	struct smack_known *tkp = smk_of_task_struct(p);
 	int rc;
 
 	if (!sig)
@@ -2209,7 +2212,7 @@ static int smack_task_kill(struct task_struct *p, struct kernel_siginfo *info,
 static void smack_task_to_inode(struct task_struct *p, struct inode *inode)
 {
 	struct inode_smack *isp = smack_inode(inode);
-	struct smack_known *skp = smk_of_task_struct_obj(p);
+	struct smack_known *skp = smk_of_task_struct(p);
 
 	isp->smk_inode = skp;
 	isp->smk_flags |= SMK_INODE_INSTANT;
@@ -3282,7 +3285,7 @@ static void smack_d_instantiate(struct dentry *opt_dentry, struct inode *inode)
 		return;
 
 	sbp = inode->i_sb;
-	sbsp = smack_superblock(sbp);
+	sbsp = sbp->s_security;
 	/*
 	 * We're going to use the superblock default label
 	 * if there's no label on the file.
@@ -3480,7 +3483,7 @@ static void smack_d_instantiate(struct dentry *opt_dentry, struct inode *inode)
  */
 static int smack_getprocattr(struct task_struct *p, char *name, char **value)
 {
-	struct smack_known *skp = smk_of_task_struct_subj(p);
+	struct smack_known *skp = smk_of_task_struct(p);
 	char *cp;
 	int slen;
 
@@ -4697,7 +4700,6 @@ struct lsm_blob_sizes smack_blob_sizes __lsm_ro_after_init = {
 	.lbs_inode = sizeof(struct inode_smack),
 	.lbs_ipc = sizeof(struct smack_known *),
 	.lbs_msg_msg = sizeof(struct smack_known *),
-	.lbs_superblock = sizeof(struct superblock_smack),
 };
 
 static struct security_hook_list smack_hooks[] __lsm_ro_after_init = {
@@ -4709,6 +4711,7 @@ static struct security_hook_list smack_hooks[] __lsm_ro_after_init = {
 	LSM_HOOK_INIT(fs_context_parse_param, smack_fs_context_parse_param),
 
 	LSM_HOOK_INIT(sb_alloc_security, smack_sb_alloc_security),
+	LSM_HOOK_INIT(sb_free_security, smack_sb_free_security),
 	LSM_HOOK_INIT(sb_free_mnt_opts, smack_free_mnt_opts),
 	LSM_HOOK_INIT(sb_eat_lsm_opts, smack_sb_eat_lsm_opts),
 	LSM_HOOK_INIT(sb_statfs, smack_sb_statfs),
@@ -4756,8 +4759,7 @@ static struct security_hook_list smack_hooks[] __lsm_ro_after_init = {
 	LSM_HOOK_INIT(task_setpgid, smack_task_setpgid),
 	LSM_HOOK_INIT(task_getpgid, smack_task_getpgid),
 	LSM_HOOK_INIT(task_getsid, smack_task_getsid),
-	LSM_HOOK_INIT(task_getsecid_subj, smack_task_getsecid_subj),
-	LSM_HOOK_INIT(task_getsecid_obj, smack_task_getsecid_obj),
+	LSM_HOOK_INIT(task_getsecid, smack_task_getsecid),
 	LSM_HOOK_INIT(task_setnice, smack_task_setnice),
 	LSM_HOOK_INIT(task_setioprio, smack_task_setioprio),
 	LSM_HOOK_INIT(task_getioprio, smack_task_getioprio),

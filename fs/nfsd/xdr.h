@@ -94,7 +94,6 @@ struct nfsd_diropres  {
 struct nfsd_readlinkres {
 	__be32			status;
 	int			len;
-	struct page		*page;
 };
 
 struct nfsd_readres {
@@ -102,20 +101,17 @@ struct nfsd_readres {
 	struct svc_fh		fh;
 	unsigned long		count;
 	struct kstat		stat;
-	struct page		**pages;
 };
 
 struct nfsd_readdirres {
-	/* Components of the reply */
 	__be32			status;
 
 	int			count;
 
-	/* Used to encode the reply's entry list */
-	struct xdr_stream	xdr;
-	struct xdr_buf		dirlist;
 	struct readdir_cd	common;
-	unsigned int		cookie_offset;
+	__be32 *		buffer;
+	int			buflen;
+	__be32 *		offset;
 };
 
 struct nfsd_statfsres {
@@ -151,26 +147,23 @@ int nfssvc_decode_renameargs(struct svc_rqst *, __be32 *);
 int nfssvc_decode_linkargs(struct svc_rqst *, __be32 *);
 int nfssvc_decode_symlinkargs(struct svc_rqst *, __be32 *);
 int nfssvc_decode_readdirargs(struct svc_rqst *, __be32 *);
-int nfssvc_encode_statres(struct svc_rqst *, __be32 *);
-int nfssvc_encode_attrstatres(struct svc_rqst *, __be32 *);
+int nfssvc_encode_stat(struct svc_rqst *, __be32 *);
+int nfssvc_encode_attrstat(struct svc_rqst *, __be32 *);
 int nfssvc_encode_diropres(struct svc_rqst *, __be32 *);
 int nfssvc_encode_readlinkres(struct svc_rqst *, __be32 *);
 int nfssvc_encode_readres(struct svc_rqst *, __be32 *);
 int nfssvc_encode_statfsres(struct svc_rqst *, __be32 *);
 int nfssvc_encode_readdirres(struct svc_rqst *, __be32 *);
 
-void nfssvc_encode_nfscookie(struct nfsd_readdirres *resp, u32 offset);
-int nfssvc_encode_entry(void *data, const char *name, int namlen,
-			loff_t offset, u64 ino, unsigned int d_type);
+int nfssvc_encode_entry(void *, const char *name,
+			int namlen, loff_t offset, u64 ino, unsigned int);
 
 void nfssvc_release_attrstat(struct svc_rqst *rqstp);
 void nfssvc_release_diropres(struct svc_rqst *rqstp);
 void nfssvc_release_readres(struct svc_rqst *rqstp);
 
 /* Helper functions for NFSv2 ACL code */
+__be32 *nfs2svc_encode_fattr(struct svc_rqst *rqstp, __be32 *p, struct svc_fh *fhp, struct kstat *stat);
 bool svcxdr_decode_fhandle(struct xdr_stream *xdr, struct svc_fh *fhp);
-bool svcxdr_encode_stat(struct xdr_stream *xdr, __be32 status);
-bool svcxdr_encode_fattr(struct svc_rqst *rqstp, struct xdr_stream *xdr,
-			 const struct svc_fh *fhp, const struct kstat *stat);
 
 #endif /* LINUX_NFSD_H */

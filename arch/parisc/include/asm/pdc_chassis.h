@@ -365,3 +365,4 @@ void parisc_pdc_chassis_init(void);
 					 PDC_CHASSIS_EOM_SET		)
 
 #endif /* _PARISC_PDC_CHASSIS_H */
+/* vim: set ts=8 */

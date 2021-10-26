@@ -4,7 +4,7 @@ LIBNVDIMM: Non-Volatile Devices
 
 libnvdimm - kernel / libndctl - userspace helper library
 
-nvdimm@lists.linux.dev
+linux-nvdimm@lists.01.org
 
 Version 13
 

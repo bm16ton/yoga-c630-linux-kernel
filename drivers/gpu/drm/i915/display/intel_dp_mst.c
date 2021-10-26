@@ -39,7 +39,6 @@
 #include "intel_dp_mst.h"
 #include "intel_dpio_phy.h"
 #include "intel_hdcp.h"
-#include "skl_scaler.h"
 
 static int intel_dp_mst_compute_link_config(struct intel_encoder *encoder,
 					    struct intel_crtc_state *crtc_state,
@@ -177,7 +176,7 @@ intel_dp_mst_transcoder_mask(struct intel_atomic_state *state,
 	u8 transcoders = 0;
 	int i;
 
-	if (DISPLAY_VER(dev_priv) < 12)
+	if (INTEL_GEN(dev_priv) < 12)
 		return 0;
 
 	for_each_new_intel_connector_in_state(state, connector, conn_state, i) {
@@ -228,7 +227,7 @@ intel_dp_mst_atomic_master_trans_check(struct intel_connector *connector,
 	struct drm_connector_list_iter connector_list_iter;
 	struct intel_connector *connector_iter;
 
-	if (DISPLAY_VER(dev_priv) < 12)
+	if (INTEL_GEN(dev_priv) < 12)
 		return  0;
 
 	if (!intel_connector_needs_modeset(state, &connector->base))
@@ -390,7 +389,7 @@ static void intel_mst_post_disable_dp(struct intel_atomic_state *state,
 	intel_dp->active_mst_links--;
 	last_mst_stream = intel_dp->active_mst_links == 0;
 	drm_WARN_ON(&dev_priv->drm,
-		    DISPLAY_VER(dev_priv) >= 12 && last_mst_stream &&
+		    INTEL_GEN(dev_priv) >= 12 && last_mst_stream &&
 		    !intel_dp_mst_is_master_trans(old_crtc_state));
 
 	intel_crtc_vblank_off(old_crtc_state);
@@ -414,7 +413,7 @@ static void intel_mst_post_disable_dp(struct intel_atomic_state *state,
 
 	intel_ddi_disable_transcoder_func(old_crtc_state);
 
-	if (DISPLAY_VER(dev_priv) >= 9)
+	if (INTEL_GEN(dev_priv) >= 9)
 		skl_scaler_disable(old_crtc_state);
 	else
 		ilk_pfit_disable(old_crtc_state);
@@ -440,7 +439,7 @@ static void intel_mst_post_disable_dp(struct intel_atomic_state *state,
 	 * From older GENs spec: "Configure Transcoder Clock Select to direct
 	 * no clock to the transcoder"
 	 */
-	if (DISPLAY_VER(dev_priv) < 12 || !last_mst_stream)
+	if (INTEL_GEN(dev_priv) < 12 || !last_mst_stream)
 		intel_ddi_disable_pipe_clock(old_crtc_state);
 
 
@@ -488,7 +487,7 @@ static void intel_mst_pre_enable_dp(struct intel_atomic_state *state,
 	intel_mst->connector = connector;
 	first_mst_stream = intel_dp->active_mst_links == 0;
 	drm_WARN_ON(&dev_priv->drm,
-		    DISPLAY_VER(dev_priv) >= 12 && first_mst_stream &&
+		    INTEL_GEN(dev_priv) >= 12 && first_mst_stream &&
 		    !intel_dp_mst_is_master_trans(pipe_config));
 
 	drm_dbg_kms(&dev_priv->drm, "active links %d\n",
@@ -521,7 +520,7 @@ static void intel_mst_pre_enable_dp(struct intel_atomic_state *state,
 	 * first MST stream, so it's done on the DDI for the first stream and
 	 * here for the following ones.
 	 */
-	if (DISPLAY_VER(dev_priv) < 12 || !first_mst_stream)
+	if (INTEL_GEN(dev_priv) < 12 || !first_mst_stream)
 		intel_ddi_enable_pipe_clock(encoder, pipe_config);
 
 	intel_ddi_set_dp_msa(pipe_config, conn_state);
@@ -591,7 +590,7 @@ static void intel_dp_mst_enc_get_config(struct intel_encoder *encoder,
 	struct intel_dp_mst_encoder *intel_mst = enc_to_mst(encoder);
 	struct intel_digital_port *dig_port = intel_mst->primary;
 
-	dig_port->base.get_config(&dig_port->base, pipe_config);
+	intel_ddi_get_config(&dig_port->base, pipe_config);
 }
 
 static bool intel_dp_mst_initial_fastset_check(struct intel_encoder *encoder,
@@ -831,7 +830,7 @@ static struct drm_connector *intel_dp_add_mst_connector(struct drm_dp_mst_topolo
 	intel_attach_force_audio_property(connector);
 	intel_attach_broadcast_rgb_property(connector);
 
-	if (DISPLAY_VER(dev_priv) <= 12) {
+	if (INTEL_GEN(dev_priv) <= 12) {
 		ret = intel_dp_init_hdcp(dig_port, intel_connector);
 		if (ret)
 			drm_dbg_kms(&dev_priv->drm, "[%s:%d] HDCP MST init failed, skipping.\n",
@@ -945,10 +944,10 @@ intel_dp_mst_encoder_init(struct intel_digital_port *dig_port, int conn_base_id)
 	if (!HAS_DP_MST(i915) || intel_dp_is_edp(intel_dp))
 		return 0;
 
-	if (DISPLAY_VER(i915) < 12 && port == PORT_A)
+	if (INTEL_GEN(i915) < 12 && port == PORT_A)
 		return 0;
 
-	if (DISPLAY_VER(i915) < 11 && port == PORT_E)
+	if (INTEL_GEN(i915) < 11 && port == PORT_E)
 		return 0;
 
 	intel_dp->mst_mgr.cbs = &mst_cbs;

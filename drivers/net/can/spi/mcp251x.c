@@ -203,7 +203,7 @@
 
 #define TX_ECHO_SKB_MAX	1
 
-#define MCP251X_OST_DELAY_MS	(5)
+#define MCP251X_OST_DELAY_MS	(30)
 
 #define DEVICE_NAME "mcp251x"
 
@@ -276,7 +276,7 @@ static void mcp251x_clean(struct net_device *net)
 		net->stats.tx_errors++;
 	dev_kfree_skb(priv->tx_skb);
 	if (priv->tx_len)
-		can_free_echo_skb(priv->net, 0, NULL);
+		can_free_echo_skb(priv->net, 0);
 	priv->tx_skb = NULL;
 	priv->tx_len = 0;
 }

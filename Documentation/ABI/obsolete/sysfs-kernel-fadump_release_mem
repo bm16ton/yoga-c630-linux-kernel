@@ -1,4 +1,4 @@
-This ABI is renamed and moved to a new location /sys/kernel/fadump/release_mem.
+This ABI is renamed and moved to a new location /sys/kernel/fadump/release_mem.¬
 
 What:		/sys/kernel/fadump_release_mem
 Date:		Feb 2012

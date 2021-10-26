@@ -21,8 +21,7 @@
 #include <asm/unaligned.h>
 
 /**
- * uclogic_params_pen_inrange_to_str() - Convert a pen in-range reporting type
- *                                       to a string.
+ * Convert a pen in-range reporting type to a string.
  *
  * @inrange:	The in-range reporting type to convert.
  *
@@ -517,8 +516,7 @@ void uclogic_params_cleanup(struct uclogic_params *params)
 }
 
 /**
- * uclogic_params_get_desc() - Get a replacement report descriptor for a
- *                             tablet's interface.
+ * Get a replacement report descriptor for a tablet's interface.
  *
  * @params:	The parameters of a tablet interface to get report
  *		descriptor for. Cannot be NULL.
@@ -691,7 +689,7 @@ static void uclogic_params_init_with_pen_unused(struct uclogic_params *params)
 }
 
 /**
- * uclogic_params_huion_init() - initialize a Huion tablet interface and discover
+ * uclogic_params_init() - initialize a Huion tablet interface and discover
  * its parameters.
  *
  * @params:	Parameters to fill in (to be cleaned with

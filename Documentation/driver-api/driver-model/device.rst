@@ -63,14 +63,8 @@ Attributes are declared using a macro called DEVICE_ATTR::
 
 Example:::
 
-  static DEVICE_ATTR(type, 0444, type_show, NULL);
-  static DEVICE_ATTR(power, 0644, power_show, power_store);
-
-Helper macros are available for common values of mode, so the above examples
-can be simplified to:::
-
-  static DEVICE_ATTR_RO(type);
-  static DEVICE_ATTR_RW(power);
+  static DEVICE_ATTR(type, 0444, show_type, NULL);
+  static DEVICE_ATTR(power, 0644, show_power, store_power);
 
 This declares two structures of type struct device_attribute with respective
 names 'dev_attr_type' and 'dev_attr_power'. These two attributes can be
@@ -82,24 +76,19 @@ organized as follows into a group::
 	NULL,
   };
 
-  static struct attribute_group dev_group = {
+  static struct attribute_group dev_attr_group = {
 	.attrs = dev_attrs,
   };
 
-  static const struct attribute_group *dev_groups[] = {
-	&dev_group,
+  static const struct attribute_group *dev_attr_groups[] = {
+	&dev_attr_group,
 	NULL,
   };
-
-A helper macro is available for the common case of a single group, so the
-above two structures can be declared using:::
-
-  ATTRIBUTE_GROUPS(dev);
 
 This array of groups can then be associated with a device by setting the
 group pointer in struct device before device_register() is invoked::
 
-        dev->groups = dev_groups;
+        dev->groups = dev_attr_groups;
         device_register(dev);
 
 The device_register() function will use the 'groups' pointer to create the

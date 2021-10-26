@@ -1214,7 +1214,7 @@ static int branch_type(unsigned long from, unsigned long to, int abort)
 		/*
 		 * The LBR logs any address in the IP, even if the IP just
 		 * faulted. This means userspace can control the from address.
-		 * Ensure we don't blindly read any address by validating it is
+		 * Ensure we don't blindy read any address by validating it is
 		 * a known text address.
 		 */
 		if (kernel_text_address(from)) {
@@ -1240,7 +1240,8 @@ static int branch_type(unsigned long from, unsigned long to, int abort)
 	is64 = kernel_ip((unsigned long)addr) || any_64bit_mode(current_pt_regs());
 #endif
 	insn_init(&insn, addr, bytes_read, is64);
-	if (insn_get_opcode(&insn))
+	insn_get_opcode(&insn);
+	if (!insn.opcode.got)
 		return X86_BR_ABORT;
 
 	switch (insn.opcode.bytes[0]) {
@@ -1277,7 +1278,8 @@ static int branch_type(unsigned long from, unsigned long to, int abort)
 		ret = X86_BR_INT;
 		break;
 	case 0xe8: /* call near rel */
-		if (insn_get_immediate(&insn) || insn.immediate1.value == 0) {
+		insn_get_immediate(&insn);
+		if (insn.immediate1.value == 0) {
 			/* zero length call */
 			ret = X86_BR_ZERO_CALL;
 			break;
@@ -1293,9 +1295,7 @@ static int branch_type(unsigned long from, unsigned long to, int abort)
 		ret = X86_BR_JMP;
 		break;
 	case 0xff: /* call near absolute, call far absolute ind */
-		if (insn_get_modrm(&insn))
-			return X86_BR_ABORT;
-
+		insn_get_modrm(&insn);
 		ext = (insn.modrm.bytes[0] >> 3) & 0x7;
 		switch (ext) {
 		case 2: /* near ind call */

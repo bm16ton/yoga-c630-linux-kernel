@@ -56,6 +56,7 @@
 #include <linux/seq_file.h>
 #include <linux/string.h>
 #include <linux/types.h>
+#include <linux/version.h>
 
 /* Device specific zlib function definitions */
 #include "zip_device.h"

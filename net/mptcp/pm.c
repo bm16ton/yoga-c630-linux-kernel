@@ -14,7 +14,7 @@
 
 int mptcp_pm_announce_addr(struct mptcp_sock *msk,
 			   const struct mptcp_addr_info *addr,
-			   bool echo)
+			   bool echo, bool port)
 {
 	u8 add_addr = READ_ONCE(msk->pm.addr_signal);
 
@@ -33,36 +33,35 @@ int mptcp_pm_announce_addr(struct mptcp_sock *msk,
 		add_addr |= BIT(MPTCP_ADD_ADDR_ECHO);
 	if (addr->family == AF_INET6)
 		add_addr |= BIT(MPTCP_ADD_ADDR_IPV6);
-	if (addr->port)
+	if (port)
 		add_addr |= BIT(MPTCP_ADD_ADDR_PORT);
 	WRITE_ONCE(msk->pm.addr_signal, add_addr);
 	return 0;
 }
 
-int mptcp_pm_remove_addr(struct mptcp_sock *msk, const struct mptcp_rm_list *rm_list)
+int mptcp_pm_remove_addr(struct mptcp_sock *msk, u8 local_id)
 {
 	u8 rm_addr = READ_ONCE(msk->pm.addr_signal);
 
-	pr_debug("msk=%p, rm_list_nr=%d", msk, rm_list->nr);
+	pr_debug("msk=%p, local_id=%d", msk, local_id);
 
 	if (rm_addr) {
 		pr_warn("addr_signal error, rm_addr=%d", rm_addr);
 		return -EINVAL;
 	}
 
-	msk->pm.rm_list_tx = *rm_list;
+	msk->pm.rm_id = local_id;
 	rm_addr |= BIT(MPTCP_RM_ADDR_SIGNAL);
 	WRITE_ONCE(msk->pm.addr_signal, rm_addr);
-	mptcp_pm_nl_addr_send_ack(msk);
 	return 0;
 }
 
-int mptcp_pm_remove_subflow(struct mptcp_sock *msk, const struct mptcp_rm_list *rm_list)
+int mptcp_pm_remove_subflow(struct mptcp_sock *msk, u8 local_id)
 {
-	pr_debug("msk=%p, rm_list_nr=%d", msk, rm_list->nr);
+	pr_debug("msk=%p, local_id=%d", msk, local_id);
 
 	spin_lock_bh(&msk->pm.lock);
-	mptcp_pm_nl_rm_subflow_received(msk, rm_list);
+	mptcp_pm_nl_rm_subflow_received(msk, local_id);
 	spin_unlock_bh(&msk->pm.lock);
 	return 0;
 }
@@ -153,7 +152,8 @@ void mptcp_pm_connection_closed(struct mptcp_sock *msk)
 	pr_debug("msk=%p", msk);
 }
 
-void mptcp_pm_subflow_established(struct mptcp_sock *msk)
+void mptcp_pm_subflow_established(struct mptcp_sock *msk,
+				  struct mptcp_subflow_context *subflow)
 {
 	struct mptcp_pm_data *pm = &msk->pm;
 
@@ -188,26 +188,11 @@ void mptcp_pm_add_addr_received(struct mptcp_sock *msk,
 	spin_lock_bh(&pm->lock);
 
 	if (!READ_ONCE(pm->accept_addr)) {
-		mptcp_pm_announce_addr(msk, addr, true);
+		mptcp_pm_announce_addr(msk, addr, true, addr->port);
 		mptcp_pm_add_addr_send_ack(msk);
 	} else if (mptcp_pm_schedule_work(msk, MPTCP_PM_ADD_ADDR_RECEIVED)) {
 		pm->remote = *addr;
 	}
-
-	spin_unlock_bh(&pm->lock);
-}
-
-void mptcp_pm_add_addr_echoed(struct mptcp_sock *msk,
-			      struct mptcp_addr_info *addr)
-{
-	struct mptcp_pm_data *pm = &msk->pm;
-
-	pr_debug("msk=%p", msk);
-
-	spin_lock_bh(&pm->lock);
-
-	if (mptcp_lookup_anno_list_by_saddr(msk, addr) && READ_ONCE(pm->work_pending))
-		mptcp_pm_schedule_work(msk, MPTCP_PM_SUBFLOW_ESTABLISHED);
 
 	spin_unlock_bh(&pm->lock);
 }
@@ -220,20 +205,17 @@ void mptcp_pm_add_addr_send_ack(struct mptcp_sock *msk)
 	mptcp_pm_schedule_work(msk, MPTCP_PM_ADD_ADDR_SEND_ACK);
 }
 
-void mptcp_pm_rm_addr_received(struct mptcp_sock *msk,
-			       const struct mptcp_rm_list *rm_list)
+void mptcp_pm_rm_addr_received(struct mptcp_sock *msk, u8 rm_id)
 {
 	struct mptcp_pm_data *pm = &msk->pm;
-	u8 i;
 
-	pr_debug("msk=%p remote_ids_nr=%d", msk, rm_list->nr);
+	pr_debug("msk=%p remote_id=%d", msk, rm_id);
 
-	for (i = 0; i < rm_list->nr; i++)
-		mptcp_event_addr_removed(msk, rm_list->ids[i]);
+	mptcp_event_addr_removed(msk, rm_id);
 
 	spin_lock_bh(&pm->lock);
 	mptcp_pm_schedule_work(msk, MPTCP_PM_RM_ADDR_RECEIVED);
-	pm->rm_list_rx = *rm_list;
+	pm->rm_id = rm_id;
 	spin_unlock_bh(&pm->lock);
 }
 
@@ -276,9 +258,9 @@ out_unlock:
 }
 
 bool mptcp_pm_rm_addr_signal(struct mptcp_sock *msk, unsigned int remaining,
-			     struct mptcp_rm_list *rm_list)
+			     u8 *rm_id)
 {
-	int ret = false, len;
+	int ret = false;
 
 	spin_lock_bh(&msk->pm.lock);
 
@@ -286,15 +268,10 @@ bool mptcp_pm_rm_addr_signal(struct mptcp_sock *msk, unsigned int remaining,
 	if (!mptcp_pm_should_rm_signal(msk))
 		goto out_unlock;
 
-	len = mptcp_rm_addr_len(&msk->pm.rm_list_tx);
-	if (len < 0) {
-		WRITE_ONCE(msk->pm.addr_signal, 0);
-		goto out_unlock;
-	}
-	if (remaining < len)
+	if (remaining < TCPOLEN_MPTCP_RM_ADDR_BASE)
 		goto out_unlock;
 
-	*rm_list = msk->pm.rm_list_tx;
+	*rm_id = msk->pm.rm_id;
 	WRITE_ONCE(msk->pm.addr_signal, 0);
 	ret = true;
 
@@ -314,8 +291,7 @@ void mptcp_pm_data_init(struct mptcp_sock *msk)
 	msk->pm.add_addr_accepted = 0;
 	msk->pm.local_addr_used = 0;
 	msk->pm.subflows = 0;
-	msk->pm.rm_list_tx.nr = 0;
-	msk->pm.rm_list_rx.nr = 0;
+	msk->pm.rm_id = 0;
 	WRITE_ONCE(msk->pm.work_pending, false);
 	WRITE_ONCE(msk->pm.addr_signal, 0);
 	WRITE_ONCE(msk->pm.accept_addr, false);

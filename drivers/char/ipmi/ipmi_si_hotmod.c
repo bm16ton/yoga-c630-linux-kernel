@@ -17,8 +17,9 @@
 static int hotmod_handler(const char *val, const struct kernel_param *kp);
 
 module_param_call(hotmod, hotmod_handler, NULL, NULL, 0200);
-MODULE_PARM_DESC(hotmod,
-		 "Add and remove interfaces.  See Documentation/driver-api/ipmi.rst in the kernel sources for the gory details.");
+MODULE_PARM_DESC(hotmod, "Add and remove interfaces.  See"
+		 " Documentation/driver-api/ipmi.rst in the kernel sources for the"
+		 " gory details.");
 
 /*
  * Parms come in as <op1>[:op2[:op3...]].  ops are:
@@ -184,16 +185,24 @@ static atomic_t hotmod_nr;
 
 static int hotmod_handler(const char *val, const struct kernel_param *kp)
 {
+	char *str = kstrdup(val, GFP_KERNEL), *curr, *next;
 	int  rv;
 	struct ipmi_plat_data h;
-	char *str, *curr, *next;
+	unsigned int len;
+	int ival;
 
-	str = kstrdup(val, GFP_KERNEL);
 	if (!str)
 		return -ENOMEM;
 
 	/* Kill any trailing spaces, as we can get a "\n" from echo. */
-	for (curr = strstrip(str); curr; curr = next) {
+	len = strlen(str);
+	ival = len - 1;
+	while ((ival >= 0) && isspace(str[ival])) {
+		str[ival] = '\0';
+		ival--;
+	}
+
+	for (curr = str; curr; curr = next) {
 		enum hotmod_op op;
 
 		next = strchr(curr, ':');
@@ -222,10 +231,11 @@ static int hotmod_handler(const char *val, const struct kernel_param *kp)
 				if (strcmp(pdev->name, "hotmod-ipmi-si") == 0)
 					platform_device_unregister(pdev);
 			}
-			put_device(dev);
+			if (dev)
+				put_device(dev);
 		}
 	}
-	rv = strlen(val);
+	rv = len;
 out:
 	kfree(str);
 	return rv;

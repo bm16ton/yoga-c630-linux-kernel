@@ -33,8 +33,7 @@ static int check_usermem_access_fault(int mem_type, int mode, int mapping)
 	if (fd == -1)
 		return KSFT_FAIL;
 	for (i = 0; i < len; i++)
-		if (write(fd, &val, sizeof(val)) != sizeof(val))
-			return KSFT_FAIL;
+		write(fd, &val, sizeof(val));
 	lseek(fd, 0, 0);
 	ptr = mte_allocate_memory(len, mem_type, mapping, true);
 	if (check_allocated_memory(ptr, len, mem_type, true) != KSFT_PASS) {

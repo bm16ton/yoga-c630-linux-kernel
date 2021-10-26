@@ -396,10 +396,6 @@ void persistent_ram_zap(struct persistent_ram_zone *prz)
 	persistent_ram_update_header_ecc(prz);
 }
 
-#define MEM_TYPE_WCOMBINE	0
-#define MEM_TYPE_NONCACHED	1
-#define MEM_TYPE_NORMAL		2
-
 static void *persistent_ram_vmap(phys_addr_t start, size_t size,
 		unsigned int memtype)
 {
@@ -413,20 +409,10 @@ static void *persistent_ram_vmap(phys_addr_t start, size_t size,
 	page_start = start - offset_in_page(start);
 	page_count = DIV_ROUND_UP(size + offset_in_page(start), PAGE_SIZE);
 
-	switch (memtype) {
-	case MEM_TYPE_NORMAL:
-		prot = PAGE_KERNEL;
-		break;
-	case MEM_TYPE_NONCACHED:
+	if (memtype)
 		prot = pgprot_noncached(PAGE_KERNEL);
-		break;
-	case MEM_TYPE_WCOMBINE:
+	else
 		prot = pgprot_writecombine(PAGE_KERNEL);
-		break;
-	default:
-		pr_err("invalid mem_type=%d\n", memtype);
-		return NULL;
-	}
 
 	pages = kmalloc_array(page_count, sizeof(struct page *), GFP_KERNEL);
 	if (!pages) {

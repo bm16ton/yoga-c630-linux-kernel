@@ -1145,7 +1145,10 @@ struct tegra_smmu *tegra_smmu_probe(struct device *dev,
 	if (err)
 		return ERR_PTR(err);
 
-	err = iommu_device_register(&smmu->iommu, &tegra_smmu_ops, dev);
+	iommu_device_set_ops(&smmu->iommu, &tegra_smmu_ops);
+	iommu_device_set_fwnode(&smmu->iommu, dev->fwnode);
+
+	err = iommu_device_register(&smmu->iommu);
 	if (err)
 		goto remove_sysfs;
 

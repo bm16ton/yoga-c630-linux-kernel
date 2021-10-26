@@ -6,6 +6,7 @@
 #include <linux/zalloc.h>
 #include <linux/string.h>
 #include <linux/limits.h>
+#include <linux/string.h>
 #include <string.h>
 #include <sys/file.h>
 #include <signal.h>
@@ -23,6 +24,8 @@
 #include <sys/signalfd.h>
 #include <sys/wait.h>
 #include <poll.h>
+#include <sys/stat.h>
+#include <time.h>
 #include "builtin.h"
 #include "perf.h"
 #include "debug.h"

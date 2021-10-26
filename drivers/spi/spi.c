@@ -680,10 +680,11 @@ struct spi_device *spi_new_device(struct spi_controller *ctlr,
 	proxy->controller_data = chip->controller_data;
 	proxy->controller_state = NULL;
 
-	if (chip->swnode) {
-		status = device_add_software_node(&proxy->dev, chip->swnode);
+	if (chip->properties) {
+		status = device_add_properties(&proxy->dev, chip->properties);
 		if (status) {
-			dev_err(&ctlr->dev, "failed to add software node to '%s': %d\n",
+			dev_err(&ctlr->dev,
+				"failed to add properties to '%s': %d\n",
 				chip->modalias, status);
 			goto err_dev_put;
 		}
@@ -691,12 +692,14 @@ struct spi_device *spi_new_device(struct spi_controller *ctlr,
 
 	status = spi_add_device(proxy);
 	if (status < 0)
-		goto err_dev_put;
+		goto err_remove_props;
 
 	return proxy;
 
+err_remove_props:
+	if (chip->properties)
+		device_remove_properties(&proxy->dev);
 err_dev_put:
-	device_remove_software_node(&proxy->dev);
 	spi_dev_put(proxy);
 	return NULL;
 }
@@ -720,7 +723,6 @@ void spi_unregister_device(struct spi_device *spi)
 	}
 	if (ACPI_COMPANION(&spi->dev))
 		acpi_device_clear_enumerated(ACPI_COMPANION(&spi->dev));
-	device_remove_software_node(&spi->dev);
 	device_del(&spi->dev);
 	spi_cleanup(spi);
 	put_device(&spi->dev);
@@ -759,6 +761,7 @@ static void spi_match_controller_to_boardinfo(struct spi_controller *ctlr,
  *
  * The board info passed can safely be __initdata ... but be careful of
  * any embedded pointers (platform_data, etc), they're copied as-is.
+ * Device properties are deep-copied though.
  *
  * Return: zero on success, else a negative error code.
  */
@@ -778,6 +781,12 @@ int spi_register_board_info(struct spi_board_info const *info, unsigned n)
 		struct spi_controller *ctlr;
 
 		memcpy(&bi->board_info, info, sizeof(*info));
+		if (info->properties) {
+			bi->board_info.properties =
+					property_entries_dup(info->properties);
+			if (IS_ERR(bi->board_info.properties))
+				return PTR_ERR(bi->board_info.properties);
+		}
 
 		mutex_lock(&board_lock);
 		list_add_tail(&bi->list, &board_list);
@@ -794,7 +803,7 @@ int spi_register_board_info(struct spi_board_info const *info, unsigned n)
 
 static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
 {
-	bool activate = enable;
+	bool enable1 = enable;
 
 	/*
 	 * Avoid calling into the driver (or doing delays) if the chip select
@@ -809,7 +818,7 @@ static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
 
 	if (spi->cs_gpiod || gpio_is_valid(spi->cs_gpio) ||
 	    !spi->controller->set_cs_timing) {
-		if (activate)
+		if (enable1)
 			spi_delay_exec(&spi->controller->cs_setup, NULL);
 		else
 			spi_delay_exec(&spi->controller->cs_hold, NULL);
@@ -835,7 +844,7 @@ static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
 					gpiod_set_value_cansleep(spi->cs_gpiod, !enable);
 				else
 					/* Polarity handled by GPIO library */
-					gpiod_set_value_cansleep(spi->cs_gpiod, activate);
+					gpiod_set_value_cansleep(spi->cs_gpiod, enable1);
 			} else {
 				/*
 				 * invert the enable line, as active low is
@@ -854,7 +863,7 @@ static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
 
 	if (spi->cs_gpiod || gpio_is_valid(spi->cs_gpio) ||
 	    !spi->controller->set_cs_timing) {
-		if (!activate)
+		if (!enable1)
 			spi_delay_exec(&spi->controller->cs_inactive, NULL);
 	}
 }
@@ -2571,14 +2580,13 @@ static int spi_get_gpio_descs(struct spi_controller *ctlr)
 	unsigned int num_cs_gpios = 0;
 
 	nb = gpiod_count(dev, "cs");
-	if (nb < 0) {
-		/* No GPIOs at all is fine, else return the error */
-		if (nb == -ENOENT)
-			return 0;
-		return nb;
-	}
-
 	ctlr->num_chipselect = max_t(int, nb, ctlr->num_chipselect);
+
+	/* No GPIOs at all is fine, else return the error */
+	if (nb == 0 || nb == -ENOENT)
+		return 0;
+	else if (nb < 0)
+		return nb;
 
 	cs = devm_kcalloc(dev, ctlr->num_chipselect, sizeof(*cs),
 			  GFP_KERNEL);
@@ -2816,9 +2824,9 @@ free_bus_id:
 }
 EXPORT_SYMBOL_GPL(spi_register_controller);
 
-static void devm_spi_unregister(void *ctlr)
+static void devm_spi_unregister(struct device *dev, void *res)
 {
-	spi_unregister_controller(ctlr);
+	spi_unregister_controller(*(struct spi_controller **)res);
 }
 
 /**
@@ -2837,13 +2845,22 @@ static void devm_spi_unregister(void *ctlr)
 int devm_spi_register_controller(struct device *dev,
 				 struct spi_controller *ctlr)
 {
+	struct spi_controller **ptr;
 	int ret;
 
-	ret = spi_register_controller(ctlr);
-	if (ret)
-		return ret;
+	ptr = devres_alloc(devm_spi_unregister, sizeof(*ptr), GFP_KERNEL);
+	if (!ptr)
+		return -ENOMEM;
 
-	return devm_add_action_or_reset(dev, devm_spi_unregister, ctlr);
+	ret = spi_register_controller(ctlr);
+	if (!ret) {
+		*ptr = ctlr;
+		devres_add(dev, ptr);
+	} else {
+		devres_free(ptr);
+	}
+
+	return ret;
 }
 EXPORT_SYMBOL_GPL(devm_spi_register_controller);
 
@@ -3177,6 +3194,7 @@ struct spi_replaced_transfers *spi_replace_transfers(
 		/* clear cs_change and delay for all but the last */
 		if (i) {
 			xfer->cs_change = false;
+			xfer->delay_usecs = 0;
 			xfer->delay.value = 0;
 		}
 	}
@@ -3400,15 +3418,8 @@ int spi_setup(struct spi_device *spi)
 
 	mutex_lock(&spi->controller->io_mutex);
 
-	if (spi->controller->setup) {
+	if (spi->controller->setup)
 		status = spi->controller->setup(spi);
-		if (status) {
-			mutex_unlock(&spi->controller->io_mutex);
-			dev_err(&spi->controller->dev, "Failed to setup device: %d\n",
-				status);
-			return status;
-		}
-	}
 
 	if (spi->controller->auto_runtime_pm && spi->controller->set_cs) {
 		status = pm_runtime_get_sync(spi->controller->dev.parent);

@@ -122,11 +122,13 @@ static ssize_t hostaudio_write(struct file *file, const char __user *buffer,
 static __poll_t hostaudio_poll(struct file *file,
 				struct poll_table_struct *wait)
 {
+	__poll_t mask = 0;
+
 #ifdef DEBUG
 	printk(KERN_DEBUG "hostaudio: poll called (unimplemented)\n");
 #endif
 
-	return 0;
+	return mask;
 }
 
 static long hostaudio_ioctl(struct file *file,

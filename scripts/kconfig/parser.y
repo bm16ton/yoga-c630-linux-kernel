@@ -12,7 +12,6 @@
 #include <stdbool.h>
 
 #include "lkc.h"
-#include "internal.h"
 
 #define printd(mask, fmt...) if (cdebug & (mask)) printf(fmt)
 
@@ -29,7 +28,7 @@ static bool zconf_endtoken(const char *tokenname,
 
 struct symbol *symbol_hash[SYMBOL_HASHSIZE];
 
-struct menu *current_menu, *current_entry;
+static struct menu *current_menu, *current_entry;
 
 %}
 
@@ -46,6 +45,7 @@ struct menu *current_menu, *current_entry;
 %token <string> T_HELPTEXT
 %token <string> T_WORD
 %token <string> T_WORD_QUOTE
+%token T_ALLNOCONFIG_Y
 %token T_BOOL
 %token T_CHOICE
 %token T_CLOSE_PAREN
@@ -53,6 +53,7 @@ struct menu *current_menu, *current_entry;
 %token T_COMMENT
 %token T_CONFIG
 %token T_DEFAULT
+%token T_DEFCONFIG_LIST
 %token T_DEF_BOOL
 %token T_DEF_TRISTATE
 %token T_DEPENDS
@@ -70,6 +71,7 @@ struct menu *current_menu, *current_entry;
 %token T_MODULES
 %token T_ON
 %token T_OPEN_PAREN
+%token T_OPTION
 %token T_OPTIONAL
 %token T_PLUS_EQUAL
 %token T_PROMPT
@@ -216,12 +218,19 @@ config_option: T_RANGE symbol symbol if_expr T_EOL
 	printd(DEBUG_PARSE, "%s:%d:range\n", zconf_curname(), zconf_lineno());
 };
 
-config_option: T_MODULES T_EOL
+config_option: T_OPTION T_MODULES T_EOL
 {
-	if (modules_sym)
-		zconf_error("symbol '%s' redefines option 'modules' already defined by symbol '%s'",
-			    current_entry->sym->name, modules_sym->name);
-	modules_sym = current_entry->sym;
+	menu_add_option_modules();
+};
+
+config_option: T_OPTION T_DEFCONFIG_LIST T_EOL
+{
+	menu_add_option_defconfig_list();
+};
+
+config_option: T_OPTION T_ALLNOCONFIG_Y T_EOL
+{
+	menu_add_option_allnoconfig_y();
 };
 
 /* choice entry */
@@ -508,7 +517,7 @@ void conf_parse(const char *name)
 	}
 	if (yynerrs)
 		exit(1);
-	conf_set_changed(true);
+	sym_set_change_count(1);
 }
 
 static bool zconf_endtoken(const char *tokenname,
@@ -714,3 +723,5 @@ void zconfdump(FILE *out)
 		}
 	}
 }
+
+#include "menu.c"

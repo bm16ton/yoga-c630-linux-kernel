@@ -28,6 +28,7 @@
 
 #include <linux/pci.h>
 
+#include <drm/drm_debugfs.h>
 #include <drm/drm_device.h>
 #include <drm/drm_file.h>
 #include <drm/drm_gem_ttm_helper.h>
@@ -800,9 +801,11 @@ int radeon_mode_dumb_create(struct drm_file *file_priv,
 }
 
 #if defined(CONFIG_DEBUG_FS)
-static int radeon_debugfs_gem_info_show(struct seq_file *m, void *unused)
+static int radeon_debugfs_gem_info(struct seq_file *m, void *data)
 {
-	struct radeon_device *rdev = (struct radeon_device *)m->private;
+	struct drm_info_node *node = (struct drm_info_node *)m->private;
+	struct drm_device *dev = node->minor->dev;
+	struct radeon_device *rdev = dev->dev_private;
 	struct radeon_bo *rbo;
 	unsigned i = 0;
 
@@ -833,16 +836,15 @@ static int radeon_debugfs_gem_info_show(struct seq_file *m, void *unused)
 	return 0;
 }
 
-DEFINE_SHOW_ATTRIBUTE(radeon_debugfs_gem_info);
+static struct drm_info_list radeon_debugfs_gem_list[] = {
+	{"radeon_gem_info", &radeon_debugfs_gem_info, 0, NULL},
+};
 #endif
 
-void radeon_gem_debugfs_init(struct radeon_device *rdev)
+int radeon_gem_debugfs_init(struct radeon_device *rdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	struct dentry *root = rdev->ddev->primary->debugfs_root;
-
-	debugfs_create_file("radeon_gem_info", 0444, root, rdev,
-			    &radeon_debugfs_gem_info_fops);
-
+	return radeon_debugfs_add_files(rdev, radeon_debugfs_gem_list, 1);
 #endif
+	return 0;
 }

@@ -472,7 +472,7 @@ static int check_revision(struct aac_dev *dev, void __user *arg)
 
 
 /**
- * aac_send_raw_srb()
+ * aac_send_raw_scb
  *	@dev:	adapter is being processed
  *	@arg:	arguments to the send call
  */

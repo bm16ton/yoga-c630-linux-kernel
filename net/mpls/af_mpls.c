@@ -1019,6 +1019,7 @@ static int mpls_route_add(struct mpls_route_config *cfg,
 		goto errout;
 	}
 
+	err = -ENOMEM;
 	rt = mpls_rt_alloc(nhs, max_via_alen, max_labels);
 	if (IS_ERR(rt)) {
 		err = PTR_ERR(rt);

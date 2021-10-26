@@ -586,12 +586,14 @@ int gpiochip_add_data_with_key(struct gpio_chip *gc, void *data,
 	if (!gdev)
 		return -ENOMEM;
 	gdev->dev.bus = &gpio_bus_type;
-	gdev->dev.parent = gc->parent;
 	gdev->chip = gc;
 	gc->gpiodev = gdev;
+	if (gc->parent) {
+		gdev->dev.parent = gc->parent;
+		gdev->dev.of_node = gc->parent->of_node;
+	}
 
 	of_gpio_dev_init(gc, gdev);
-	acpi_gpio_dev_init(gc, gdev);
 
 	/*
 	 * Assign fwnode depending on the result of the previous calls,
@@ -1463,8 +1465,9 @@ static int gpiochip_add_irqchip(struct gpio_chip *gc,
 				struct lock_class_key *lock_key,
 				struct lock_class_key *request_key)
 {
-	struct fwnode_handle *fwnode = dev_fwnode(&gc->gpiodev->dev);
 	struct irq_chip *irqchip = gc->irq.chip;
+	const struct irq_domain_ops *ops = NULL;
+	struct device_node *np;
 	unsigned int type;
 	unsigned int i;
 
@@ -1476,6 +1479,7 @@ static int gpiochip_add_irqchip(struct gpio_chip *gc,
 		return -EINVAL;
 	}
 
+	np = gc->gpiodev->dev.of_node;
 	type = gc->irq.default_type;
 
 	/*
@@ -1483,9 +1487,15 @@ static int gpiochip_add_irqchip(struct gpio_chip *gc,
 	 * used to configure the interrupts, as you may end up with
 	 * conflicting triggers. Tell the user, and reset to NONE.
 	 */
-	if (WARN(fwnode && type != IRQ_TYPE_NONE,
-		 "%pfw: Ignoring %u default trigger\n", fwnode, type))
+	if (WARN(np && type != IRQ_TYPE_NONE,
+		 "%s: Ignoring %u default trigger\n", np->full_name, type))
 		type = IRQ_TYPE_NONE;
+
+	if (has_acpi_companion(gc->parent) && type != IRQ_TYPE_NONE) {
+		acpi_handle_warn(ACPI_HANDLE(gc->parent),
+				 "Ignoring %u default trigger\n", type);
+		type = IRQ_TYPE_NONE;
+	}
 
 	if (gc->to_irq)
 		chip_warn(gc, "to_irq is redefined in %s and you shouldn't rely on it\n", __func__);
@@ -1502,11 +1512,15 @@ static int gpiochip_add_irqchip(struct gpio_chip *gc,
 			return ret;
 	} else {
 		/* Some drivers provide custom irqdomain ops */
-		gc->irq.domain = irq_domain_create_simple(fwnode,
+		if (gc->irq.domain_ops)
+			ops = gc->irq.domain_ops;
+
+		if (!ops)
+			ops = &gpiochip_domain_ops;
+		gc->irq.domain = irq_domain_add_simple(np,
 			gc->ngpio,
 			gc->irq.first,
-			gc->irq.domain_ops ?: &gpiochip_domain_ops,
-			gc);
+			ops, gc);
 		if (!gc->irq.domain)
 			return -EINVAL;
 	}
@@ -2906,7 +2920,7 @@ void gpiod_set_raw_value(struct gpio_desc *desc, int value)
 {
 	VALIDATE_DESC_VOID(desc);
 	/* Should be using gpiod_set_raw_value_cansleep() */
-//16ton		WARN_ON(desc->gdev->chip->can_sleep);
+	WARN_ON(desc->gdev->chip->can_sleep);
 	gpiod_set_raw_value_commit(desc, value);
 }
 EXPORT_SYMBOL_GPL(gpiod_set_raw_value);
@@ -2947,7 +2961,7 @@ void gpiod_set_value(struct gpio_desc *desc, int value)
 {
 	VALIDATE_DESC_VOID(desc);
 	/* Should be using gpiod_set_value_cansleep() */
-//16ton		WARN_ON(desc->gdev->chip->can_sleep);
+	WARN_ON(desc->gdev->chip->can_sleep);
 	gpiod_set_value_nocheck(desc, value);
 }
 EXPORT_SYMBOL_GPL(gpiod_set_value);
@@ -3670,12 +3684,11 @@ EXPORT_SYMBOL_GPL(fwnode_gpiod_get_index);
  */
 int gpiod_count(struct device *dev, const char *con_id)
 {
-	const struct fwnode_handle *fwnode = dev ? dev_fwnode(dev) : NULL;
 	int count = -ENOENT;
 
-	if (is_of_node(fwnode))
+	if (IS_ENABLED(CONFIG_OF) && dev && dev->of_node)
 		count = of_gpio_get_count(dev, con_id);
-	else if (is_acpi_node(fwnode))
+	else if (IS_ENABLED(CONFIG_ACPI) && dev && ACPI_HANDLE(dev))
 		count = acpi_gpio_count(dev, con_id);
 
 	if (count < 0)
@@ -3813,17 +3826,18 @@ struct gpio_desc *__must_check gpiod_get_index(struct device *dev,
 	int ret;
 	/* Maybe we have a device name, maybe not */
 	const char *devname = dev ? dev_name(dev) : "?";
-	const struct fwnode_handle *fwnode = dev ? dev_fwnode(dev) : NULL;
 
 	dev_dbg(dev, "GPIO lookup for consumer %s\n", con_id);
 
-	/* Using device tree? */
-	if (is_of_node(fwnode)) {
-		dev_dbg(dev, "using device tree for GPIO lookup\n");
-		desc = of_find_gpio(dev, con_id, idx, &lookupflags);
-	} else if (is_acpi_node(fwnode)) {
-		dev_dbg(dev, "using ACPI for GPIO lookup\n");
-		desc = acpi_find_gpio(dev, con_id, idx, &flags, &lookupflags);
+	if (dev) {
+		/* Using device tree? */
+		if (IS_ENABLED(CONFIG_OF) && dev->of_node) {
+			dev_dbg(dev, "using device tree for GPIO lookup\n");
+			desc = of_find_gpio(dev, con_id, idx, &lookupflags);
+		} else if (ACPI_COMPANION(dev)) {
+			dev_dbg(dev, "using ACPI for GPIO lookup\n");
+			desc = acpi_find_gpio(dev, con_id, idx, &flags, &lookupflags);
+		}
 	}
 
 	/*
@@ -3907,6 +3921,9 @@ struct gpio_desc *fwnode_get_named_gpiod(struct fwnode_handle *fwnode,
 	struct gpio_desc *desc = ERR_PTR(-ENODEV);
 	int ret;
 
+	if (!fwnode)
+		return ERR_PTR(-EINVAL);
+
 	if (is_of_node(fwnode)) {
 		desc = gpiod_get_from_of_node(to_of_node(fwnode),
 					      propname, index,
@@ -3922,8 +3939,7 @@ struct gpio_desc *fwnode_get_named_gpiod(struct fwnode_handle *fwnode,
 
 		acpi_gpio_update_gpiod_flags(&dflags, &info);
 		acpi_gpio_update_gpiod_lookup_flags(&lflags, &info);
-	} else
-		return ERR_PTR(-EINVAL);
+	}
 
 	/* Currently only ACPI takes this path */
 	ret = gpiod_request(desc, label);
@@ -4204,13 +4220,11 @@ EXPORT_SYMBOL_GPL(gpiod_put_array);
 
 static int gpio_bus_match(struct device *dev, struct device_driver *drv)
 {
-	struct fwnode_handle *fwnode = dev_fwnode(dev);
-
 	/*
 	 * Only match if the fwnode doesn't already have a proper struct device
 	 * created for it.
 	 */
-	if (fwnode && fwnode->dev != dev)
+	if (dev->fwnode && dev->fwnode->dev != dev)
 		return 0;
 	return 1;
 }

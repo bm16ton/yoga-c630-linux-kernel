@@ -1218,8 +1218,7 @@ int cx23885_risc_buffer(struct pci_dev *pci, struct cx23885_riscmem *risc,
 		/ PAGE_SIZE + lines);
 	instructions += 5;
 	risc->size = instructions * 12;
-	risc->cpu = dma_alloc_coherent(&pci->dev, risc->size, &risc->dma,
-				       GFP_KERNEL);
+	risc->cpu = pci_alloc_consistent(pci, risc->size, &risc->dma);
 	if (risc->cpu == NULL)
 		return -ENOMEM;
 
@@ -1256,8 +1255,7 @@ int cx23885_risc_databuffer(struct pci_dev *pci,
 	instructions += 4;
 
 	risc->size = instructions * 12;
-	risc->cpu = dma_alloc_coherent(&pci->dev, risc->size, &risc->dma,
-				       GFP_KERNEL);
+	risc->cpu = pci_alloc_consistent(pci, risc->size, &risc->dma);
 	if (risc->cpu == NULL)
 		return -ENOMEM;
 
@@ -1295,8 +1293,7 @@ int cx23885_risc_vbibuffer(struct pci_dev *pci, struct cx23885_riscmem *risc,
 		/ PAGE_SIZE + lines);
 	instructions += 5;
 	risc->size = instructions * 12;
-	risc->cpu = dma_alloc_coherent(&pci->dev, risc->size, &risc->dma,
-				       GFP_KERNEL);
+	risc->cpu = pci_alloc_consistent(pci, risc->size, &risc->dma);
 	if (risc->cpu == NULL)
 		return -ENOMEM;
 	/* write risc instructions */
@@ -1325,7 +1322,7 @@ void cx23885_free_buffer(struct cx23885_dev *dev, struct cx23885_buffer *buf)
 {
 	struct cx23885_riscmem *risc = &buf->risc;
 
-	dma_free_coherent(&dev->pci->dev, risc->size, risc->cpu, risc->dma);
+	pci_free_consistent(dev->pci, risc->size, risc->cpu, risc->dma);
 }
 
 static void cx23885_tsport_reg_dump(struct cx23885_tsport *port)
@@ -2162,7 +2159,7 @@ static int cx23885_initdev(struct pci_dev *pci_dev,
 		(unsigned long long)pci_resource_start(pci_dev, 0));
 
 	pci_set_master(pci_dev);
-	err = dma_set_mask(&pci_dev->dev, 0xffffffff);
+	err = pci_set_dma_mask(pci_dev, 0xffffffff);
 	if (err) {
 		pr_err("%s/0: Oops: no 32bit PCI DMA ???\n", dev->name);
 		goto fail_ctrl;

@@ -3955,7 +3955,7 @@ static int vega10_read_sensor(struct pp_hwmgr *hwmgr, int idx,
 			*size = 8;
 		break;
 	default:
-		ret = -EOPNOTSUPP;
+		ret = -EINVAL;
 		break;
 	}
 

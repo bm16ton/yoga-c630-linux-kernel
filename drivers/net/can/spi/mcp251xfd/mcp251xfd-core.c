@@ -2,8 +2,8 @@
 //
 // mcp251xfd - Microchip MCP251xFD Family CAN controller driver
 //
-// Copyright (c) 2019, 2020, 2021 Pengutronix,
-//               Marc Kleine-Budde <kernel@pengutronix.de>
+// Copyright (c) 2019, 2020 Pengutronix,
+//                          Marc Kleine-Budde <kernel@pengutronix.de>
 //
 // Based on:
 //
@@ -16,6 +16,7 @@
 #include <linux/clk.h>
 #include <linux/device.h>
 #include <linux/module.h>
+#include <linux/netdevice.h>
 #include <linux/of.h>
 #include <linux/of_device.h>
 #include <linux/pm_runtime.h>
@@ -329,13 +330,10 @@ static void mcp251xfd_ring_init(struct mcp251xfd_priv *priv)
 	struct mcp251xfd_tx_ring *tx_ring;
 	struct mcp251xfd_rx_ring *rx_ring, *prev_rx_ring = NULL;
 	struct mcp251xfd_tx_obj *tx_obj;
-	struct spi_transfer *xfer;
 	u32 val;
 	u16 addr;
 	u8 len;
 	int i, j;
-
-	netdev_reset_queue(priv->ndev);
 
 	/* TEF */
 	tef_ring = priv->tef;
@@ -349,6 +347,8 @@ static void mcp251xfd_ring_init(struct mcp251xfd_priv *priv)
 					      addr, val, val);
 
 	for (j = 0; j < ARRAY_SIZE(tef_ring->uinc_xfer); j++) {
+		struct spi_transfer *xfer;
+
 		xfer = &tef_ring->uinc_xfer[j];
 		xfer->tx_buf = &tef_ring->uinc_buf;
 		xfer->len = len;
@@ -356,15 +356,6 @@ static void mcp251xfd_ring_init(struct mcp251xfd_priv *priv)
 		xfer->cs_change_delay.value = 0;
 		xfer->cs_change_delay.unit = SPI_DELAY_UNIT_NSECS;
 	}
-
-	/* "cs_change == 1" on the last transfer results in an active
-	 * chip select after the complete SPI message. This causes the
-	 * controller to interpret the next register access as
-	 * data. Set "cs_change" of the last transfer to "0" to
-	 * properly deactivate the chip select at the end of the
-	 * message.
-	 */
-	xfer->cs_change = 0;
 
 	/* TX */
 	tx_ring = priv->tx;
@@ -406,6 +397,8 @@ static void mcp251xfd_ring_init(struct mcp251xfd_priv *priv)
 						      addr, val, val);
 
 		for (j = 0; j < ARRAY_SIZE(rx_ring->uinc_xfer); j++) {
+			struct spi_transfer *xfer;
+
 			xfer = &rx_ring->uinc_xfer[j];
 			xfer->tx_buf = &rx_ring->uinc_buf;
 			xfer->len = len;
@@ -413,15 +406,6 @@ static void mcp251xfd_ring_init(struct mcp251xfd_priv *priv)
 			xfer->cs_change_delay.value = 0;
 			xfer->cs_change_delay.unit = SPI_DELAY_UNIT_NSECS;
 		}
-
-		/* "cs_change == 1" on the last transfer results in an
-		 * active chip select after the complete SPI
-		 * message. This causes the controller to interpret
-		 * the next register access as data. Set "cs_change"
-		 * of the last transfer to "0" to properly deactivate
-		 * the chip select at the end of the message.
-		 */
-		xfer->cs_change = 0;
 	}
 }
 
@@ -1113,7 +1097,6 @@ static int mcp251xfd_chip_start(struct mcp251xfd_priv *priv)
 	return 0;
 
  out_chip_stop:
-	mcp251xfd_dump(priv);
 	mcp251xfd_chip_stop(priv, CAN_STATE_STOPPED);
 
 	return err;
@@ -1264,12 +1247,10 @@ mcp251xfd_handle_tefif_recover(const struct mcp251xfd_priv *priv, const u32 seq)
 
 static int
 mcp251xfd_handle_tefif_one(struct mcp251xfd_priv *priv,
-			   const struct mcp251xfd_hw_tef_obj *hw_tef_obj,
-			   unsigned int *frame_len_ptr)
+			   const struct mcp251xfd_hw_tef_obj *hw_tef_obj)
 {
 	struct net_device_stats *stats = &priv->ndev->stats;
-	struct sk_buff *skb;
-	u32 seq, seq_masked, tef_tail_masked, tef_tail;
+	u32 seq, seq_masked, tef_tail_masked;
 
 	seq = FIELD_GET(MCP251XFD_OBJ_FLAGS_SEQ_MCP2518FD_MASK,
 			hw_tef_obj->flags);
@@ -1285,14 +1266,10 @@ mcp251xfd_handle_tefif_one(struct mcp251xfd_priv *priv,
 	if (seq_masked != tef_tail_masked)
 		return mcp251xfd_handle_tefif_recover(priv, seq);
 
-	tef_tail = mcp251xfd_get_tef_tail(priv);
-	skb = priv->can.echo_skb[tef_tail];
-	if (skb)
-		mcp251xfd_skb_set_timestamp(priv, skb, hw_tef_obj->ts);
 	stats->tx_bytes +=
 		can_rx_offload_get_echo_skb(&priv->offload,
-					    tef_tail, hw_tef_obj->ts,
-					    frame_len_ptr);
+					    mcp251xfd_get_tef_tail(priv),
+					    hw_tef_obj->ts, NULL);
 	stats->tx_packets++;
 	priv->tef->tail++;
 
@@ -1350,7 +1327,6 @@ mcp251xfd_tef_obj_read(const struct mcp251xfd_priv *priv,
 static int mcp251xfd_handle_tefif(struct mcp251xfd_priv *priv)
 {
 	struct mcp251xfd_hw_tef_obj hw_tef_obj[MCP251XFD_TX_OBJ_NUM_MAX];
-	unsigned int total_frame_len = 0;
 	u8 tef_tail, len, l;
 	int err, i;
 
@@ -1372,9 +1348,7 @@ static int mcp251xfd_handle_tefif(struct mcp251xfd_priv *priv)
 	}
 
 	for (i = 0; i < len; i++) {
-		unsigned int frame_len = 0;
-
-		err = mcp251xfd_handle_tefif_one(priv, &hw_tef_obj[i], &frame_len);
+		err = mcp251xfd_handle_tefif_one(priv, &hw_tef_obj[i]);
 		/* -EAGAIN means the Sequence Number in the TEF
 		 * doesn't match our tef_tail. This can happen if we
 		 * read the TEF objects too early. Leave loop let the
@@ -1384,8 +1358,6 @@ static int mcp251xfd_handle_tefif(struct mcp251xfd_priv *priv)
 			goto out_netif_wake_queue;
 		if (err)
 			return err;
-
-		total_frame_len += frame_len;
 	}
 
  out_netif_wake_queue:
@@ -1393,25 +1365,29 @@ static int mcp251xfd_handle_tefif(struct mcp251xfd_priv *priv)
 	if (len) {
 		struct mcp251xfd_tef_ring *ring = priv->tef;
 		struct mcp251xfd_tx_ring *tx_ring = priv->tx;
-		int offset;
+		struct spi_transfer *last_xfer;
 
 		/* Increment the TEF FIFO tail pointer 'len' times in
 		 * a single SPI message.
 		 *
 		 * Note:
-		 * Calculate offset, so that the SPI transfer ends on
-		 * the last message of the uinc_xfer array, which has
-		 * "cs_change == 0", to properly deactivate the chip
-		 * select.
+		 *
+		 * "cs_change == 1" on the last transfer results in an
+		 * active chip select after the complete SPI
+		 * message. This causes the controller to interpret
+		 * the next register access as data. Temporary set
+		 * "cs_change" of the last transfer to "0" to properly
+		 * deactivate the chip select at the end of the
+		 * message.
 		 */
-		offset = ARRAY_SIZE(ring->uinc_xfer) - len;
-		err = spi_sync_transfer(priv->spi,
-					ring->uinc_xfer + offset, len);
+		last_xfer = &ring->uinc_xfer[len - 1];
+		last_xfer->cs_change = 0;
+		err = spi_sync_transfer(priv->spi, ring->uinc_xfer, len);
+		last_xfer->cs_change = 1;
 		if (err)
 			return err;
 
 		tx_ring->tail += len;
-		netdev_completed_queue(priv->ndev, len, total_frame_len);
 
 		err = mcp251xfd_check_tef_tail(priv);
 		if (err)
@@ -1456,7 +1432,7 @@ mcp251xfd_rx_ring_update(const struct mcp251xfd_priv *priv,
 }
 
 static void
-mcp251xfd_hw_rx_obj_to_skb(struct mcp251xfd_priv *priv,
+mcp251xfd_hw_rx_obj_to_skb(const struct mcp251xfd_priv *priv,
 			   const struct mcp251xfd_hw_rx_obj_canfd *hw_rx_obj,
 			   struct sk_buff *skb)
 {
@@ -1499,8 +1475,6 @@ mcp251xfd_hw_rx_obj_to_skb(struct mcp251xfd_priv *priv,
 
 	if (!(hw_rx_obj->flags & MCP251XFD_OBJ_FLAGS_RTR))
 		memcpy(cfd->data, hw_rx_obj->data, cfd->len);
-
-	mcp251xfd_skb_set_timestamp(priv, skb, hw_rx_obj->ts);
 }
 
 static int
@@ -1561,7 +1535,7 @@ mcp251xfd_handle_rxif_ring(struct mcp251xfd_priv *priv,
 		return err;
 
 	while ((len = mcp251xfd_get_rx_linear_len(ring))) {
-		int offset;
+		struct spi_transfer *last_xfer;
 
 		rx_tail = mcp251xfd_get_rx_tail(ring);
 
@@ -1582,14 +1556,19 @@ mcp251xfd_handle_rxif_ring(struct mcp251xfd_priv *priv,
 		 * single SPI message.
 		 *
 		 * Note:
-		 * Calculate offset, so that the SPI transfer ends on
-		 * the last message of the uinc_xfer array, which has
-		 * "cs_change == 0", to properly deactivate the chip
-		 * select.
+		 *
+		 * "cs_change == 1" on the last transfer results in an
+		 * active chip select after the complete SPI
+		 * message. This causes the controller to interpret
+		 * the next register access as data. Temporary set
+		 * "cs_change" of the last transfer to "0" to properly
+		 * deactivate the chip select at the end of the
+		 * message.
 		 */
-		offset = ARRAY_SIZE(ring->uinc_xfer) - len;
-		err = spi_sync_transfer(priv->spi,
-					ring->uinc_xfer + offset, len);
+		last_xfer = &ring->uinc_xfer[len - 1];
+		last_xfer->cs_change = 0;
+		err = spi_sync_transfer(priv->spi, ring->uinc_xfer, len);
+		last_xfer->cs_change = 1;
 		if (err)
 			return err;
 
@@ -1613,22 +1592,23 @@ static int mcp251xfd_handle_rxif(struct mcp251xfd_priv *priv)
 	return 0;
 }
 
+static inline int mcp251xfd_get_timestamp(const struct mcp251xfd_priv *priv,
+					  u32 *timestamp)
+{
+	return regmap_read(priv->map_reg, MCP251XFD_REG_TBC, timestamp);
+}
+
 static struct sk_buff *
-mcp251xfd_alloc_can_err_skb(struct mcp251xfd_priv *priv,
+mcp251xfd_alloc_can_err_skb(const struct mcp251xfd_priv *priv,
 			    struct can_frame **cf, u32 *timestamp)
 {
-	struct sk_buff *skb;
 	int err;
 
 	err = mcp251xfd_get_timestamp(priv, timestamp);
 	if (err)
 		return NULL;
 
-	skb = alloc_can_err_skb(priv->ndev, cf);
-	if (skb)
-		mcp251xfd_skb_set_timestamp(priv, skb, *timestamp);
-
-	return skb;
+	return alloc_can_err_skb(priv->ndev, cf);
 }
 
 static int mcp251xfd_handle_rxovif(struct mcp251xfd_priv *priv)
@@ -1780,7 +1760,6 @@ static int mcp251xfd_handle_ivmif(struct mcp251xfd_priv *priv)
 	if (!cf)
 		return 0;
 
-	mcp251xfd_skb_set_timestamp(priv, skb, timestamp);
 	err = can_rx_offload_queue_sorted(&priv->offload, skb, timestamp);
 	if (err)
 		stats->rx_fifo_errors++;
@@ -2298,9 +2277,7 @@ static irqreturn_t mcp251xfd_irq(int irq, void *dev_id)
  out_fail:
 	netdev_err(priv->ndev, "IRQ handler returned %d (intf=0x%08x).\n",
 		   err, priv->regs_status.intf);
-	mcp251xfd_dump(priv);
 	mcp251xfd_chip_interrupts_disable(priv);
-	mcp251xfd_timestamp_stop(priv);
 
 	return handled;
 }
@@ -2456,7 +2433,6 @@ static netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
 	struct mcp251xfd_priv *priv = netdev_priv(ndev);
 	struct mcp251xfd_tx_ring *tx_ring = priv->tx;
 	struct mcp251xfd_tx_obj *tx_obj;
-	unsigned int frame_len;
 	u8 tx_head;
 	int err;
 
@@ -2475,10 +2451,7 @@ static netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
 	if (mcp251xfd_get_tx_free(tx_ring) == 0)
 		netif_stop_queue(ndev);
 
-	frame_len = can_skb_get_frame_len(skb);
-	err = can_put_echo_skb(skb, ndev, tx_head, frame_len);
-	if (!err)
-		netdev_sent_queue(priv->ndev, frame_len);
+	can_put_echo_skb(skb, ndev, tx_head, 0);
 
 	err = mcp251xfd_tx_obj_write(priv, tx_obj);
 	if (err)
@@ -2520,7 +2493,6 @@ static int mcp251xfd_open(struct net_device *ndev)
 	if (err)
 		goto out_transceiver_disable;
 
-	mcp251xfd_timestamp_init(priv);
 	can_rx_offload_enable(&priv->offload);
 
 	err = request_threaded_irq(spi->irq, NULL, mcp251xfd_irq,
@@ -2541,7 +2513,6 @@ static int mcp251xfd_open(struct net_device *ndev)
 	free_irq(spi->irq, priv);
  out_can_rx_offload_disable:
 	can_rx_offload_disable(&priv->offload);
-	mcp251xfd_timestamp_stop(priv);
  out_transceiver_disable:
 	mcp251xfd_transceiver_disable(priv);
  out_mcp251xfd_ring_free:
@@ -2563,7 +2534,6 @@ static int mcp251xfd_stop(struct net_device *ndev)
 	mcp251xfd_chip_interrupts_disable(priv);
 	free_irq(ndev->irq, priv);
 	can_rx_offload_disable(&priv->offload);
-	mcp251xfd_timestamp_stop(priv);
 	mcp251xfd_chip_stop(priv, CAN_STATE_STOPPED);
 	mcp251xfd_transceiver_disable(priv);
 	mcp251xfd_ring_free(priv);

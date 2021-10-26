@@ -29,13 +29,6 @@
 #include <asm/ptrace.h>
 #include <asm/export.h>
 #include <asm/code-patching-asm.h>
-#include <asm/interrupt.h>
-
-/*
- * Value for the bits that have fixed value in RPN entries.
- * Also used for tagging DAR for DTLBerror.
- */
-#define RPN_PATTERN	0x00f0
 
 #include "head_32.h"
 
@@ -48,6 +41,12 @@
 	cmpli	cr0, \scratch, PAGE_OFFSET@h
 #endif
 .endm
+
+/*
+ * Value for the bits that have fixed value in RPN entries.
+ * Also used for tagging DAR for DTLBerror.
+ */
+#define RPN_PATTERN	0x00f0
 
 #define PAGE_SHIFT_512K		19
 #define PAGE_SHIFT_8M		23
@@ -119,54 +118,56 @@ instruction_counter:
 #endif
 
 /* System reset */
-	EXCEPTION(INTERRUPT_SYSTEM_RESET, Reset, system_reset_exception)
+	EXCEPTION(0x100, Reset, system_reset_exception, EXC_XFER_STD)
 
 /* Machine check */
-	START_EXCEPTION(INTERRUPT_MACHINE_CHECK, MachineCheck)
-	EXCEPTION_PROLOG INTERRUPT_MACHINE_CHECK MachineCheck handle_dar_dsisr=1
-	prepare_transfer_to_handler
-	bl	machine_check_exception
-	b	interrupt_return
+	. = 0x200
+MachineCheck:
+	EXCEPTION_PROLOG handle_dar_dsisr=1
+	save_dar_dsisr_on_stack r4, r5, r11
+	li	r6, RPN_PATTERN
+	mtspr	SPRN_DAR, r6	/* Tag DAR, to be used in DTLB Error */
+	addi r3,r1,STACK_FRAME_OVERHEAD
+	EXC_XFER_STD(0x200, machine_check_exception)
 
 /* External interrupt */
-	EXCEPTION(INTERRUPT_EXTERNAL, HardwareInterrupt, do_IRQ)
+	EXCEPTION(0x500, HardwareInterrupt, do_IRQ, EXC_XFER_LITE)
 
 /* Alignment exception */
-	START_EXCEPTION(INTERRUPT_ALIGNMENT, Alignment)
-	EXCEPTION_PROLOG INTERRUPT_ALIGNMENT Alignment handle_dar_dsisr=1
-	prepare_transfer_to_handler
-	bl	alignment_exception
-	REST_NVGPRS(r1)
-	b	interrupt_return
+	. = 0x600
+Alignment:
+	EXCEPTION_PROLOG handle_dar_dsisr=1
+	save_dar_dsisr_on_stack r4, r5, r11
+	li	r6, RPN_PATTERN
+	mtspr	SPRN_DAR, r6	/* Tag DAR, to be used in DTLB Error */
+	addi	r3,r1,STACK_FRAME_OVERHEAD
+	b	.Lalignment_exception_ool
 
 /* Program check exception */
-	START_EXCEPTION(INTERRUPT_PROGRAM, ProgramCheck)
-	EXCEPTION_PROLOG INTERRUPT_PROGRAM ProgramCheck
-	prepare_transfer_to_handler
-	bl	program_check_exception
-	REST_NVGPRS(r1)
-	b	interrupt_return
+	EXCEPTION(0x700, ProgramCheck, program_check_exception, EXC_XFER_STD)
 
 /* Decrementer */
-	EXCEPTION(INTERRUPT_DECREMENTER, Decrementer, timer_interrupt)
+	EXCEPTION(0x900, Decrementer, timer_interrupt, EXC_XFER_LITE)
+
+	/* With VMAP_STACK there's not enough room for this at 0x600 */
+	. = 0xa00
+.Lalignment_exception_ool:
+	EXC_XFER_STD(0x600, alignment_exception)
 
 /* System call */
-	START_EXCEPTION(INTERRUPT_SYSCALL, SystemCall)
-	SYSCALL_ENTRY	INTERRUPT_SYSCALL
+	. = 0xc00
+SystemCall:
+	SYSCALL_ENTRY	0xc00
 
 /* Single step - not used on 601 */
-	EXCEPTION(INTERRUPT_TRACE, SingleStep, single_step_exception)
+	EXCEPTION(0xd00, SingleStep, single_step_exception, EXC_XFER_STD)
 
 /* On the MPC8xx, this is a software emulation interrupt.  It occurs
  * for all unimplemented and illegal instructions.
  */
-	START_EXCEPTION(INTERRUPT_SOFT_EMU_8xx, SoftEmu)
-	EXCEPTION_PROLOG INTERRUPT_SOFT_EMU_8xx SoftEmu
-	prepare_transfer_to_handler
-	bl	emulation_assist_interrupt
-	REST_NVGPRS(r1)
-	b	interrupt_return
+	EXCEPTION(0x1000, SoftEmu, emulation_assist_interrupt, EXC_XFER_STD)
 
+	. = 0x1100
 /*
  * For the MPC8xx, this is a software tablewalk to load the instruction
  * TLB.  The task switch loads the M_TWB register with the pointer to the first
@@ -188,7 +189,7 @@ instruction_counter:
 #define INVALIDATE_ADJACENT_PAGES_CPU15(addr, tmp)
 #endif
 
-	START_EXCEPTION(INTERRUPT_INST_TLB_MISS_8xx, InstructionTLBMiss)
+InstructionTLBMiss:
 	mtspr	SPRN_SPRG_SCRATCH2, r10
 	mtspr	SPRN_M_TW, r11
 
@@ -244,7 +245,8 @@ instruction_counter:
 	rfi
 #endif
 
-	START_EXCEPTION(INTERRUPT_DATA_TLB_MISS_8xx, DataStoreTLBMiss)
+	. = 0x1200
+DataStoreTLBMiss:
 	mtspr	SPRN_SPRG_SCRATCH2, r10
 	mtspr	SPRN_M_TW, r11
 	mfcr	r11
@@ -307,74 +309,83 @@ instruction_counter:
  * to many reasons, such as executing guarded memory or illegal instruction
  * addresses.  There is nothing to do but handle a big time error fault.
  */
-	START_EXCEPTION(INTERRUPT_INST_TLB_ERROR_8xx, InstructionTLBError)
-	/* 0x400 is InstructionAccess exception, needed by bad_page_fault() */
-	EXCEPTION_PROLOG INTERRUPT_INST_STORAGE InstructionTLBError
+	. = 0x1300
+InstructionTLBError:
+	EXCEPTION_PROLOG
 	andis.	r5,r9,DSISR_SRR1_MATCH_32S@h /* Filter relevant SRR1 bits */
 	andis.	r10,r9,SRR1_ISI_NOPT@h
 	beq+	.Litlbie
 	tlbie	r12
+	/* 0x400 is InstructionAccess exception, needed by bad_page_fault() */
 .Litlbie:
 	stw	r12, _DAR(r11)
 	stw	r5, _DSISR(r11)
-	prepare_transfer_to_handler
-	bl	do_page_fault
-	b	interrupt_return
+	EXC_XFER_LITE(0x400, handle_page_fault)
 
 /* This is the data TLB error on the MPC8xx.  This could be due to
  * many reasons, including a dirty update to a pte.  We bail out to
  * a higher level function that can handle it.
  */
-	START_EXCEPTION(INTERRUPT_DATA_TLB_ERROR_8xx, DataTLBError)
+	. = 0x1400
+DataTLBError:
 	EXCEPTION_PROLOG_0 handle_dar_dsisr=1
 	mfspr	r11, SPRN_DAR
 	cmpwi	cr1, r11, RPN_PATTERN
 	beq-	cr1, FixupDAR	/* must be a buggy dcbX, icbi insn. */
 DARFixed:/* Return from dcbx instruction bug workaround */
+#ifdef CONFIG_VMAP_STACK
+	li	r11, RPN_PATTERN
+	mtspr	SPRN_DAR, r11	/* Tag DAR, to be used in DTLB Error */
+#endif
 	EXCEPTION_PROLOG_1
-	/* 0x300 is DataAccess exception, needed by bad_page_fault() */
-	EXCEPTION_PROLOG_2 INTERRUPT_DATA_STORAGE DataTLBError handle_dar_dsisr=1
-	lwz	r4, _DAR(r11)
-	lwz	r5, _DSISR(r11)
+	EXCEPTION_PROLOG_2 handle_dar_dsisr=1
+	get_and_save_dar_dsisr_on_stack r4, r5, r11
 	andis.	r10,r5,DSISR_NOHPTE@h
 	beq+	.Ldtlbie
 	tlbie	r4
 .Ldtlbie:
-	prepare_transfer_to_handler
-	bl	do_page_fault
-	b	interrupt_return
-
-#ifdef CONFIG_VMAP_STACK
-	vmap_stack_overflow_exception
+#ifndef CONFIG_VMAP_STACK
+	li	r10,RPN_PATTERN
+	mtspr	SPRN_DAR,r10	/* Tag DAR, to be used in DTLB Error */
 #endif
+	/* 0x300 is DataAccess exception, needed by bad_page_fault() */
+	EXC_XFER_LITE(0x300, handle_page_fault)
+
+stack_overflow:
+	vmap_stack_overflow_exception
 
 /* On the MPC8xx, these next four traps are used for development
  * support of breakpoints and such.  Someday I will get around to
  * using them.
  */
-	START_EXCEPTION(INTERRUPT_DATA_BREAKPOINT_8xx, DataBreakpoint)
+do_databreakpoint:
+	EXCEPTION_PROLOG_1
+	EXCEPTION_PROLOG_2 handle_dar_dsisr=1
+	addi	r3,r1,STACK_FRAME_OVERHEAD
+	mfspr	r4,SPRN_BAR
+	stw	r4,_DAR(r11)
+#ifndef CONFIG_VMAP_STACK
+	mfspr	r5,SPRN_DSISR
+	stw	r5,_DSISR(r11)
+#endif
+	EXC_XFER_STD(0x1c00, do_break)
+
+	. = 0x1c00
+DataBreakpoint:
 	EXCEPTION_PROLOG_0 handle_dar_dsisr=1
 	mfspr	r11, SPRN_SRR0
 	cmplwi	cr1, r11, (.Ldtlbie - PAGE_OFFSET)@l
 	cmplwi	cr7, r11, (.Litlbie - PAGE_OFFSET)@l
 	cror	4*cr1+eq, 4*cr1+eq, 4*cr7+eq
-	bne	cr1, 1f
+	bne	cr1, do_databreakpoint
 	mtcr	r10
 	mfspr	r10, SPRN_SPRG_SCRATCH0
 	mfspr	r11, SPRN_SPRG_SCRATCH1
 	rfi
 
-1:	EXCEPTION_PROLOG_1
-	EXCEPTION_PROLOG_2 INTERRUPT_DATA_BREAKPOINT_8xx DataBreakpoint handle_dar_dsisr=1
-	mfspr	r4,SPRN_BAR
-	stw	r4,_DAR(r11)
-	prepare_transfer_to_handler
-	bl	do_break
-	REST_NVGPRS(r1)
-	b	interrupt_return
-
 #ifdef CONFIG_PERF_EVENTS
-	START_EXCEPTION(INTERRUPT_INST_BREAKPOINT_8xx, InstructionBreakpoint)
+	. = 0x1d00
+InstructionBreakpoint:
 	mtspr	SPRN_SPRG_SCRATCH0, r10
 	lwz	r10, (instruction_counter - PAGE_OFFSET)@l(0)
 	addi	r10, r10, -1
@@ -385,12 +396,11 @@ DARFixed:/* Return from dcbx instruction bug workaround */
 	mfspr	r10, SPRN_SPRG_SCRATCH0
 	rfi
 #else
-	EXCEPTION(INTERRUPT_INST_BREAKPOINT_8xx, Trap_1d, unknown_exception)
+	EXCEPTION(0x1d00, Trap_1d, unknown_exception, EXC_XFER_STD)
 #endif
-	EXCEPTION(0x1e00, Trap_1e, unknown_exception)
-	EXCEPTION(0x1f00, Trap_1f, unknown_exception)
+	EXCEPTION(0x1e00, Trap_1e, unknown_exception, EXC_XFER_STD)
+	EXCEPTION(0x1f00, Trap_1f, unknown_exception, EXC_XFER_STD)
 
-	__HEAD
 	. = 0x2000
 
 /* This is the procedure to calculate the data EA for buggy dcbx,dcbi instructions
@@ -500,10 +510,14 @@ FixupDAR:/* Entry point for dcbx workaround. */
 152:
 	mfdar	r11
 	mtctr	r11			/* restore ctr reg from DAR */
+#ifdef CONFIG_VMAP_STACK
 	mfspr	r11, SPRN_SPRG_THREAD
 	stw	r10, DAR(r11)
 	mfspr	r10, SPRN_DSISR
 	stw	r10, DSISR(r11)
+#else
+	mtdar	r10			/* save fault EA to DAR */
+#endif
 	mfspr	r10,SPRN_M_TW
 	b	DARFixed		/* Go back to normal TLB handling */
 
@@ -805,7 +819,7 @@ EXPORT_SYMBOL(empty_zero_page)
 swapper_pg_dir:
 	.space	PGD_TABLE_SIZE
 
-/* Room for two PTE table pointers, usually the kernel and current user
+/* Room for two PTE table poiners, usually the kernel and current user
  * pointer to their respective root page table (pgdir).
  */
 	.globl	abatron_pteptrs

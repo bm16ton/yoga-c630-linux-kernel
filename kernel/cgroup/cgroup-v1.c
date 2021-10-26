@@ -727,7 +727,7 @@ int cgroupstats_build(struct cgroupstats *stats, struct dentry *dentry)
 			stats->nr_stopped++;
 			break;
 		default:
-			if (tsk->in_iowait)
+			if (delayacct_is_task_waiting_on_io(tsk))
 				stats->nr_io_wait++;
 			break;
 		}
@@ -1007,7 +1007,7 @@ static int check_cgroupfs_options(struct fs_context *fc)
 	ctx->subsys_mask &= enabled;
 
 	/*
-	 * In absence of 'none', 'name=' and subsystem name options,
+	 * In absense of 'none', 'name=' or subsystem name options,
 	 * let's default to 'all'.
 	 */
 	if (!ctx->subsys_mask && !ctx->none && !ctx->name)
@@ -1225,7 +1225,9 @@ int cgroup1_get_tree(struct fs_context *fc)
 		ret = cgroup_do_get_tree(fc);
 
 	if (!ret && percpu_ref_is_dying(&ctx->root->cgrp.self.refcnt)) {
-		fc_drop_locked(fc);
+		struct super_block *sb = fc->root->d_sb;
+		dput(fc->root);
+		deactivate_locked_super(sb);
 		ret = 1;
 	}
 

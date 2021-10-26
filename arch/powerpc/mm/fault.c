@@ -32,8 +32,6 @@
 #include <linux/context_tracking.h>
 #include <linux/hugetlb.h>
 #include <linux/uaccess.h>
-#include <linux/kfence.h>
-#include <linux/pkeys.h>
 
 #include <asm/firmware.h>
 #include <asm/interrupt.h>
@@ -89,6 +87,7 @@ static noinline int bad_area(struct pt_regs *regs, unsigned long address)
 	return __bad_area(regs, address, SEGV_MAPERR);
 }
 
+#ifdef CONFIG_PPC_MEM_KEYS
 static noinline int bad_access_pkey(struct pt_regs *regs, unsigned long address,
 				    struct vm_area_struct *vma)
 {
@@ -128,6 +127,7 @@ static noinline int bad_access_pkey(struct pt_regs *regs, unsigned long address,
 
 	return 0;
 }
+#endif
 
 static noinline int bad_access(struct pt_regs *regs, unsigned long address)
 {
@@ -197,7 +197,7 @@ static int mm_fault_error(struct pt_regs *regs, unsigned long addr,
 static bool bad_kernel_fault(struct pt_regs *regs, unsigned long error_code,
 			     unsigned long address, bool is_write)
 {
-	int is_exec = TRAP(regs) == INTERRUPT_INST_STORAGE;
+	int is_exec = TRAP(regs) == 0x400;
 
 	if (is_exec) {
 		pr_crit_ratelimited("kernel tried to execute %s page (%lx) - exploit attempt? (uid: %d)\n",
@@ -232,6 +232,7 @@ static bool bad_kernel_fault(struct pt_regs *regs, unsigned long error_code,
 	return false;
 }
 
+#ifdef CONFIG_PPC_MEM_KEYS
 static bool access_pkey_error(bool is_write, bool is_exec, bool is_pkey,
 			      struct vm_area_struct *vma)
 {
@@ -245,6 +246,7 @@ static bool access_pkey_error(bool is_write, bool is_exec, bool is_pkey,
 
 	return false;
 }
+#endif
 
 static bool access_error(bool is_write, bool is_exec, struct vm_area_struct *vma)
 {
@@ -389,7 +391,7 @@ static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
 	struct vm_area_struct * vma;
 	struct mm_struct *mm = current->mm;
 	unsigned int flags = FAULT_FLAG_DEFAULT;
-	int is_exec = TRAP(regs) == INTERRUPT_INST_STORAGE;
+ 	int is_exec = TRAP(regs) == 0x400;
 	int is_user = user_mode(regs);
 	int is_write = page_fault_is_write(error_code);
 	vm_fault_t fault, major = 0;
@@ -414,12 +416,8 @@ static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
 	 * take a page fault to a kernel address or a page fault to a user
 	 * address outside of dedicated places
 	 */
-	if (unlikely(!is_user && bad_kernel_fault(regs, error_code, address, is_write))) {
-		if (kfence_handle_page_fault(address, is_write, regs))
-			return 0;
-
+	if (unlikely(!is_user && bad_kernel_fault(regs, error_code, address, is_write)))
 		return SIGSEGV;
-	}
 
 	/*
 	 * If we're in an interrupt, have no user context or are running
@@ -492,9 +490,11 @@ retry:
 			return bad_area(regs, address);
 	}
 
+#ifdef CONFIG_PPC_MEM_KEYS
 	if (unlikely(access_pkey_error(is_write, is_exec,
 				       (error_code & DSISR_KEYFAULT), vma)))
 		return bad_access_pkey(regs, address, vma);
+#endif /* CONFIG_PPC_MEM_KEYS */
 
 	if (unlikely(access_error(is_write, is_exec, vma)))
 		return bad_access(regs, address);
@@ -537,25 +537,39 @@ retry:
 }
 NOKPROBE_SYMBOL(___do_page_fault);
 
-static __always_inline void __do_page_fault(struct pt_regs *regs)
+static long __do_page_fault(struct pt_regs *regs)
 {
+	const struct exception_table_entry *entry;
 	long err;
 
 	err = ___do_page_fault(regs, regs->dar, regs->dsisr);
-	if (unlikely(err))
-		bad_page_fault(regs, err);
-}
+	if (likely(!err))
+		return err;
 
-DEFINE_INTERRUPT_HANDLER(do_page_fault)
+	entry = search_exception_tables(regs->nip);
+	if (likely(entry)) {
+		instruction_pointer_set(regs, extable_fixup(entry));
+		return 0;
+	} else if (IS_ENABLED(CONFIG_PPC_BOOK3S_64)) {
+		__bad_page_fault(regs, err);
+		return 0;
+	} else {
+		/* 32 and 64e handle the bad page fault in asm */
+		return err;
+	}
+}
+NOKPROBE_SYMBOL(__do_page_fault);
+
+DEFINE_INTERRUPT_HANDLER_RET(do_page_fault)
 {
-	__do_page_fault(regs);
+	return __do_page_fault(regs);
 }
 
 #ifdef CONFIG_PPC_BOOK3S_64
 /* Same as do_page_fault but interrupt entry has already run in do_hash_fault */
-void hash__do_page_fault(struct pt_regs *regs)
+long hash__do_page_fault(struct pt_regs *regs)
 {
-	__do_page_fault(regs);
+	return __do_page_fault(regs);
 }
 NOKPROBE_SYMBOL(hash__do_page_fault);
 #endif
@@ -565,27 +579,27 @@ NOKPROBE_SYMBOL(hash__do_page_fault);
  * It is called from the DSI and ISI handlers in head.S and from some
  * of the procedures in traps.c.
  */
-static void __bad_page_fault(struct pt_regs *regs, int sig)
+void __bad_page_fault(struct pt_regs *regs, int sig)
 {
 	int is_write = page_fault_is_write(regs->dsisr);
 
 	/* kernel has accessed a bad area */
 
 	switch (TRAP(regs)) {
-	case INTERRUPT_DATA_STORAGE:
-	case INTERRUPT_DATA_SEGMENT:
-	case INTERRUPT_H_DATA_STORAGE:
+	case 0x300:
+	case 0x380:
+	case 0xe00:
 		pr_alert("BUG: %s on %s at 0x%08lx\n",
 			 regs->dar < PAGE_SIZE ? "Kernel NULL pointer dereference" :
 			 "Unable to handle kernel data access",
 			 is_write ? "write" : "read", regs->dar);
 		break;
-	case INTERRUPT_INST_STORAGE:
-	case INTERRUPT_INST_SEGMENT:
+	case 0x400:
+	case 0x480:
 		pr_alert("BUG: Unable to handle kernel instruction fetch%s",
 			 regs->nip < PAGE_SIZE ? " (NULL pointer?)\n" : "\n");
 		break;
-	case INTERRUPT_ALIGNMENT:
+	case 0x600:
 		pr_alert("BUG: Unable to handle kernel unaligned access at 0x%08lx\n",
 			 regs->dar);
 		break;

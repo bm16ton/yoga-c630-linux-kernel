@@ -13,7 +13,9 @@
 
 #include <linux/types.h>
 
-#define FIELD_OFFSET(s, field)	((__kernel_ssize_t)&((s *)(0))->field)
+typedef	signed int sint;
+
+#define FIELD_OFFSET(s, field)	((__kernel_ssize_t)&((s*)(0))->field)
 
 #define SIZE_PTR __kernel_size_t
 #define SSIZE_PTR __kernel_ssize_t
@@ -187,7 +189,7 @@
 		); \
 }
 
-/*  Get the N-bytes alignent offset from the current length */
+/*  Get the N-bytes aligment offset from the current length */
 #define N_BYTE_ALIGMENT(__Value, __Aligment) ((__Aligment == 1) ? (__Value) : (((__Value + __Aligment - 1) / __Aligment) * __Aligment))
 
 #define TEST_FLAG(__Flag, __testFlag)		(((__Flag) & (__testFlag)) != 0)

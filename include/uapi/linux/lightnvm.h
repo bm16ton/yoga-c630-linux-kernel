@@ -22,6 +22,7 @@
 
 #ifdef __KERNEL__
 #include <linux/const.h>
+#include <linux/ioctl.h>
 #else /* __KERNEL__ */
 #include <stdio.h>
 #include <sys/ioctl.h>

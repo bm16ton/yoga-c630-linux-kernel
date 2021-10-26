@@ -45,11 +45,11 @@ enum mtk_jpeg_ctx_state {
 };
 
 /**
- * struct mtk_jpeg_variant - mtk jpeg driver variant
+ * mtk_jpeg_variant - mtk jpeg driver variant
  * @clks:			clock names
  * @num_clks:			numbers of clock
- * @formats:			jpeg driver's internal color format
- * @num_formats:		number of formats
+ * @format:			jpeg driver's internal color format
+ * @num_format:			number of format
  * @qops:			the callback of jpeg vb2_ops
  * @irq_handler:		jpeg irq handler callback
  * @hw_reset:			jpeg hardware reset callback
@@ -75,7 +75,7 @@ struct mtk_jpeg_variant {
 };
 
 /**
- * struct mtk_jpeg_dev - JPEG IP abstraction
+ * struct mt_jpeg - JPEG IP abstraction
  * @lock:		the mutex protecting this structure
  * @hw_lock:		spinlock protecting the hw device resource
  * @workqueue:		decode work queue
@@ -105,7 +105,7 @@ struct mtk_jpeg_dev {
 };
 
 /**
- * struct mtk_jpeg_fmt - driver's internal color format data
+ * struct jpeg_fmt - driver's internal color format data
  * @fourcc:	the fourcc code, 0 if not applicable
  * @hw_format:	hardware format value
  * @h_sample:	horizontal sample count of plane in 4 * 4 pixel image
@@ -127,7 +127,7 @@ struct mtk_jpeg_fmt {
 };
 
 /**
- * struct mtk_jpeg_q_data - parameters of one queue
+ * mtk_jpeg_q_data - parameters of one queue
  * @fmt:	  driver-specific format of this queue
  * @pix_mp:	  multiplanar format
  * @enc_crop_rect:	jpeg encoder crop information
@@ -139,7 +139,7 @@ struct mtk_jpeg_q_data {
 };
 
 /**
- * struct mtk_jpeg_ctx - the device context data
+ * mtk_jpeg_ctx - the device context data
  * @jpeg:		JPEG IP device for this context
  * @out_q:		source (output) queue information
  * @cap_q:		destination (capture) queue queue information

@@ -608,8 +608,8 @@ static int xennet_xdp_xmit(struct net_device *dev, int n,
 	struct netfront_info *np = netdev_priv(dev);
 	struct netfront_queue *queue = NULL;
 	unsigned long irq_flags;
-	int nxmit = 0;
-	int i;
+	int drops = 0;
+	int i, err;
 
 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
 		return -EINVAL;
@@ -622,13 +622,15 @@ static int xennet_xdp_xmit(struct net_device *dev, int n,
 
 		if (!xdpf)
 			continue;
-		if (xennet_xdp_xmit_one(dev, queue, xdpf))
-			break;
-		nxmit++;
+		err = xennet_xdp_xmit_one(dev, queue, xdpf);
+		if (err) {
+			xdp_return_frame_rx_napi(xdpf);
+			drops++;
+		}
 	}
 	spin_unlock_irqrestore(&queue->tx_lock, irq_flags);
 
-	return nxmit;
+	return n - drops;
 }
 
 
@@ -873,9 +875,7 @@ static u32 xennet_run_xdp(struct netfront_queue *queue, struct page *pdata,
 		get_page(pdata);
 		xdpf = xdp_convert_buff_to_frame(xdp);
 		err = xennet_xdp_xmit(queue->info->netdev, 1, &xdpf, 0);
-		if (unlikely(!err))
-			xdp_return_frame_rx_napi(xdpf);
-		else if (unlikely(err < 0))
+		if (unlikely(err < 0))
 			trace_xdp_exception(queue->info->netdev, prog, act);
 		break;
 	case XDP_REDIRECT:

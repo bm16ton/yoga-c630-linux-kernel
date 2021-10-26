@@ -10,7 +10,7 @@ struct imgu_device;
 #define IPU3_CSS_POOL_SIZE		4
 
 /**
- * struct imgu_css_map - store DMA mapping info for buffer
+ * imgu_css_map - store DMA mapping info for buffer
  *
  * @size:		size of the buffer in bytes.
  * @vaddr:		kernel virtual address.
@@ -24,7 +24,7 @@ struct imgu_css_map {
 };
 
 /**
- * struct imgu_css_pool - circular buffer pool definition
+ * imgu_css_pool - circular buffer pool definition
  *
  * @entry:		array with IPU3_CSS_POOL_SIZE elements.
  * @entry.param:	a &struct imgu_css_map for storing the mem mapping.

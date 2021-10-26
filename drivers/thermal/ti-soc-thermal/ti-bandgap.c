@@ -9,29 +9,30 @@
  *   Eduardo Valentin <eduardo.valentin@ti.com>
  */
 
-#include <linux/clk.h>
-#include <linux/cpu_pm.h>
-#include <linux/device.h>
-#include <linux/err.h>
-#include <linux/export.h>
-#include <linux/gpio/consumer.h>
-#include <linux/init.h>
-#include <linux/interrupt.h>
-#include <linux/io.h>
-#include <linux/iopoll.h>
-#include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/of.h>
-#include <linux/of_device.h>
-#include <linux/of_irq.h>
-#include <linux/of_platform.h>
+#include <linux/export.h>
+#include <linux/init.h>
+#include <linux/kernel.h>
+#include <linux/interrupt.h>
+#include <linux/clk.h>
+#include <linux/gpio/consumer.h>
 #include <linux/platform_device.h>
-#include <linux/pm.h>
-#include <linux/pm_runtime.h>
-#include <linux/reboot.h>
+#include <linux/err.h>
+#include <linux/types.h>
 #include <linux/spinlock.h>
 #include <linux/sys_soc.h>
-#include <linux/types.h>
+#include <linux/reboot.h>
+#include <linux/of_device.h>
+#include <linux/of_platform.h>
+#include <linux/of_irq.h>
+#include <linux/io.h>
+#include <linux/iopoll.h>
+#include <linux/cpu_pm.h>
+#include <linux/device.h>
+#include <linux/pm_runtime.h>
+#include <linux/pm.h>
+#include <linux/of.h>
+#include <linux/of_device.h>
 
 #include "ti-bandgap.h"
 
@@ -770,7 +771,7 @@ static int ti_bandgap_tshut_init(struct ti_bandgap *bgp,
 }
 
 /**
- * ti_bandgap_talert_init() - setup and initialize talert handling
+ * ti_bandgap_alert_init() - setup and initialize talert handling
  * @bgp: pointer to struct ti_bandgap
  * @pdev: pointer to device struct platform_device
  *
@@ -1142,9 +1143,13 @@ static int ti_bandgap_restore_ctxt(struct ti_bandgap *bgp)
 	for (i = 0; i < bgp->conf->sensor_count; i++) {
 		struct temp_sensor_registers *tsr;
 		struct temp_sensor_regval *rval;
+		u32 val = 0;
 
 		rval = &bgp->regval[i];
 		tsr = bgp->conf->sensors[i].registers;
+
+		if (TI_BANDGAP_HAS(bgp, COUNTER))
+			val = ti_bandgap_readl(bgp, tsr->bgap_counter);
 
 		if (TI_BANDGAP_HAS(bgp, TSHUT_CONFIG))
 			ti_bandgap_writel(bgp, rval->tshut_threshold,

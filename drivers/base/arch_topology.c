@@ -25,6 +25,7 @@
 static DEFINE_PER_CPU(struct scale_freq_data __rcu *, sft_data);
 static struct cpumask scale_freq_counters_mask;
 static bool scale_freq_invariant;
+static DEFINE_PER_CPU(u32, freq_factor) = 1;
 
 static bool supports_scale_freq_counters(const struct cpumask *cpus)
 {
@@ -149,6 +150,7 @@ void topology_set_freq_scale(const struct cpumask *cpus, unsigned long cur_freq,
 }
 
 DEFINE_PER_CPU(unsigned long, cpu_scale) = SCHED_CAPACITY_SCALE;
+EXPORT_PER_CPU_SYMBOL_GPL(cpu_scale);
 
 void topology_set_cpu_scale(unsigned int cpu, unsigned long capacity)
 {
@@ -157,14 +159,42 @@ void topology_set_cpu_scale(unsigned int cpu, unsigned long capacity)
 
 DEFINE_PER_CPU(unsigned long, thermal_pressure);
 
-void topology_set_thermal_pressure(const struct cpumask *cpus,
-			       unsigned long th_pressure)
+/**
+ * topology_thermal_pressure_update() - Update thermal pressure for CPUs
+ * @cpus	: The related CPUs which capacity has been reduced
+ * @capped_freq	: The maximum allowed frequency that CPUs can run at
+ *
+ * Update the value of thermal pressure for all @cpus in the mask. The
+ * cpumask should include all (online+offline) affected CPUs, to avoid
+ * operating on stale data when hot-plug is used for some CPUs. The
+ * @capped_freq must be less or equal to the max possible frequency and
+ * reflects the currently allowed max CPUs frequency due to thermal capping.
+ * The @capped_freq must be provided in kHz.
+ */
+void topology_thermal_pressure_update(const struct cpumask *cpus,
+				      unsigned long capped_freq)
 {
+	unsigned long max_capacity, capacity, th_pressure;
 	int cpu;
+
+	if (!cpus)
+		return;
+
+	cpu = cpumask_first(cpus);
+	max_capacity = arch_scale_cpu_capacity(cpu);
+
+	/* Convert to MHz scale which is used in 'freq_factor' */
+	capped_freq /= 1000;
+
+	capacity = capped_freq * max_capacity;
+	capacity /= per_cpu(freq_factor, cpu);
+
+	th_pressure = max_capacity - capacity;
 
 	for_each_cpu(cpu, cpus)
 		WRITE_ONCE(per_cpu(thermal_pressure, cpu), th_pressure);
 }
+EXPORT_SYMBOL_GPL(topology_thermal_pressure_update);
 
 static ssize_t cpu_capacity_show(struct device *dev,
 				 struct device_attribute *attr,
@@ -218,7 +248,6 @@ static void update_topology_flags_workfn(struct work_struct *work)
 	update_topology = 0;
 }
 
-static DEFINE_PER_CPU(u32, freq_factor) = 1;
 static u32 *raw_capacity;
 
 static int free_raw_capacity(void)

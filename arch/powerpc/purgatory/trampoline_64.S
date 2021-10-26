@@ -12,6 +12,7 @@
 #include <asm/asm-compat.h>
 #include <asm/crashdump-ppc64.h>
 
+	.machine ppc64
 	.balign 256
 	.globl purgatory_start
 purgatory_start:

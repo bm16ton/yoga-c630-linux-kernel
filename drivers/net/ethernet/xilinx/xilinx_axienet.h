@@ -376,8 +376,6 @@ struct axidma_bd {
 	struct sk_buff *skb;
 } __aligned(XAXIDMA_BD_MINIMUM_ALIGNMENT);
 
-#define XAE_NUM_MISC_CLOCKS 3
-
 /**
  * struct axienet_local - axienet private per device data
  * @ndev:	Pointer for net_device to which it will be attached.
@@ -387,8 +385,7 @@ struct axidma_bd {
  * @phylink_config: phylink configuration settings
  * @pcs_phy:	Reference to PCS/PMA PHY if used
  * @switch_x_sgmii: Whether switchable 1000BaseX/SGMII mode is enabled in the core
- * @axi_clk:	AXI4-Lite bus clock
- * @misc_clks:	Misc ethernet clocks (AXI4-Stream, Ref, MGT clocks)
+ * @clk:	Clock for AXI bus
  * @mii_bus:	Pointer to MII bus structure
  * @mii_clk_div: MII bus clock divider value
  * @regs_start: Resource start for axienet device addresses
@@ -437,8 +434,7 @@ struct axienet_local {
 
 	bool switch_x_sgmii;
 
-	struct clk *axi_clk;
-	struct clk_bulk_data misc_clks[XAE_NUM_MISC_CLOCKS];
+	struct clk *clk;
 
 	struct mii_bus *mii_bus;
 	u8 mii_clk_div;

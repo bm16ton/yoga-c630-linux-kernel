@@ -33,6 +33,7 @@
 #include <sched.h>
 #include <time.h>
 #include <stdarg.h>
+#include <sched.h>
 #include <pthread.h>
 #include <signal.h>
 #include <sys/prctl.h>

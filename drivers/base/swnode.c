@@ -12,10 +12,10 @@
 #include <linux/slab.h>
 
 struct swnode {
+	int id;
 	struct kobject kobj;
 	struct fwnode_handle fwnode;
 	const struct software_node *node;
-	int id;
 
 	/* hierarchy */
 	struct ida child_ids;
@@ -720,30 +720,19 @@ software_node_find_by_name(const struct software_node *parent, const char *name)
 }
 EXPORT_SYMBOL_GPL(software_node_find_by_name);
 
-static struct software_node *software_node_alloc(const struct property_entry *properties)
+static int
+software_node_register_properties(struct software_node *node,
+				  const struct property_entry *properties)
 {
 	struct property_entry *props;
-	struct software_node *node;
 
 	props = property_entries_dup(properties);
 	if (IS_ERR(props))
-		return ERR_CAST(props);
-
-	node = kzalloc(sizeof(*node), GFP_KERNEL);
-	if (!node) {
-		property_entries_free(props);
-		return ERR_PTR(-ENOMEM);
-	}
+		return PTR_ERR(props);
 
 	node->properties = props;
 
-	return node;
-}
-
-static void software_node_free(const struct software_node *node)
-{
-	property_entries_free(node->properties);
-	kfree(node);
+	return 0;
 }
 
 static void software_node_release(struct kobject *kobj)
@@ -757,9 +746,10 @@ static void software_node_release(struct kobject *kobj)
 		ida_simple_remove(&swnode_root_ids, swnode->id);
 	}
 
-	if (swnode->allocated)
-		software_node_free(swnode->node);
-
+	if (swnode->allocated) {
+		property_entries_free(swnode->node->properties);
+		kfree(swnode->node);
+	}
 	ida_destroy(&swnode->child_ids);
 	kfree(swnode);
 }
@@ -777,19 +767,22 @@ swnode_register(const struct software_node *node, struct swnode *parent,
 	int ret;
 
 	swnode = kzalloc(sizeof(*swnode), GFP_KERNEL);
-	if (!swnode)
-		return ERR_PTR(-ENOMEM);
+	if (!swnode) {
+		ret = -ENOMEM;
+		goto out_err;
+	}
 
 	ret = ida_simple_get(parent ? &parent->child_ids : &swnode_root_ids,
 			     0, 0, GFP_KERNEL);
 	if (ret < 0) {
 		kfree(swnode);
-		return ERR_PTR(ret);
+		goto out_err;
 	}
 
 	swnode->id = ret;
 	swnode->node = node;
 	swnode->parent = parent;
+	swnode->allocated = allocated;
 	swnode->kobj.kset = swnode_kset;
 	fwnode_init(&swnode->fwnode, &software_node_ops);
 
@@ -810,17 +803,16 @@ swnode_register(const struct software_node *node, struct swnode *parent,
 		return ERR_PTR(ret);
 	}
 
-	/*
-	 * Assign the flag only in the successful case, so
-	 * the above kobject_put() won't mess up with properties.
-	 */
-	swnode->allocated = allocated;
-
 	if (parent)
 		list_add_tail(&swnode->entry, &parent->children);
 
 	kobject_uevent(&swnode->kobj, KOBJ_ADD);
 	return &swnode->fwnode;
+
+out_err:
+	if (allocated)
+		property_entries_free(node->properties);
+	return ERR_PTR(ret);
 }
 
 /**
@@ -888,11 +880,7 @@ EXPORT_SYMBOL_GPL(software_node_unregister_nodes);
  * software_node_register_node_group - Register a group of software nodes
  * @node_group: NULL terminated array of software node pointers to be registered
  *
- * Register multiple software nodes at once. If any node in the array
- * has its .parent pointer set (which can only be to another software_node),
- * then its parent **must** have been registered before it is; either outside
- * of this function or by ordering the array such that parent comes before
- * child.
+ * Register multiple software nodes at once.
  */
 int software_node_register_node_group(const struct software_node **node_group)
 {
@@ -918,14 +906,10 @@ EXPORT_SYMBOL_GPL(software_node_register_node_group);
  * software_node_unregister_node_group - Unregister a group of software nodes
  * @node_group: NULL terminated array of software node pointers to be unregistered
  *
- * Unregister multiple software nodes at once. If parent pointers are set up
- * in any of the software nodes then the array **must** be ordered such that
- * parents come before their children.
- *
- * NOTE: If you are uncertain whether the array is ordered such that
- * parents will be unregistered before their children, it is wiser to
- * remove the nodes individually, in the correct order (child before
- * parent).
+ * Unregister multiple software nodes at once. The array will be unwound in
+ * reverse order (i.e. last entry first) and thus if any members of the array are
+ * children of another member then the children must appear later in the list such
+ * that they are unregistered first.
  */
 void software_node_unregister_node_group(
 		const struct software_node **node_group)
@@ -979,28 +963,31 @@ struct fwnode_handle *
 fwnode_create_software_node(const struct property_entry *properties,
 			    const struct fwnode_handle *parent)
 {
-	struct fwnode_handle *fwnode;
 	struct software_node *node;
-	struct swnode *p;
+	struct swnode *p = NULL;
+	int ret;
 
-	if (IS_ERR(parent))
-		return ERR_CAST(parent);
+	if (parent) {
+		if (IS_ERR(parent))
+			return ERR_CAST(parent);
+		if (!is_software_node(parent))
+			return ERR_PTR(-EINVAL);
+		p = to_swnode(parent);
+	}
 
-	p = to_swnode(parent);
-	if (parent && !p)
-		return ERR_PTR(-EINVAL);
+	node = kzalloc(sizeof(*node), GFP_KERNEL);
+	if (!node)
+		return ERR_PTR(-ENOMEM);
 
-	node = software_node_alloc(properties);
-	if (IS_ERR(node))
-		return ERR_CAST(node);
+	ret = software_node_register_properties(node, properties);
+	if (ret) {
+		kfree(node);
+		return ERR_PTR(ret);
+	}
 
 	node->parent = p ? p->node : NULL;
 
-	fwnode = swnode_register(node, p, 1);
-	if (IS_ERR(fwnode))
-		software_node_free(node);
-
-	return fwnode;
+	return swnode_register(node, p, 1);
 }
 EXPORT_SYMBOL_GPL(fwnode_create_software_node);
 

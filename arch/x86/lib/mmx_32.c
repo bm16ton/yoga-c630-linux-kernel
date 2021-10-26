@@ -14,7 +14,7 @@
  *	tested so far for any MMX solution figured.
  *
  *	22/09/2000 - Arjan van de Ven
- *		Improved for non-engineering-sample Athlons
+ *		Improved for non-egineering-sample Athlons
  *
  */
 #include <linux/hardirq.h>

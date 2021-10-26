@@ -361,12 +361,11 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
 
 	if (e) {
 		/*
-		 * Flush/passthrough requests are special and go directly to the
+		 * Flush requests are special and go directly to the
 		 * dispatch list. Don't include reserved tags in the
 		 * limiting, as it isn't useful.
 		 */
 		if (!op_is_flush(data->cmd_flags) &&
-		    !blk_op_is_passthrough(data->cmd_flags) &&
 		    e->type->ops.limit_depth &&
 		    !(data->flags & BLK_MQ_REQ_RESERVED))
 			e->type->ops.limit_depth(data->cmd_flags, data);
@@ -1279,15 +1278,10 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
 						  bool need_budget)
 {
 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-	int budget_token = -1;
 
-	if (need_budget) {
-		budget_token = blk_mq_get_dispatch_budget(rq->q);
-		if (budget_token < 0) {
-			blk_mq_put_driver_tag(rq);
-			return PREP_DISPATCH_NO_BUDGET;
-		}
-		blk_mq_set_rq_budget_token(rq, budget_token);
+	if (need_budget && !blk_mq_get_dispatch_budget(rq->q)) {
+		blk_mq_put_driver_tag(rq);
+		return PREP_DISPATCH_NO_BUDGET;
 	}
 
 	if (!blk_mq_get_driver_tag(rq)) {
@@ -1304,7 +1298,7 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
 			 * together during handling partial dispatch
 			 */
 			if (need_budget)
-				blk_mq_put_dispatch_budget(rq->q, budget_token);
+				blk_mq_put_dispatch_budget(rq->q);
 			return PREP_DISPATCH_NO_TAG;
 		}
 	}
@@ -1314,16 +1308,12 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
 
 /* release all allocated budgets before calling to blk_mq_dispatch_rq_list */
 static void blk_mq_release_budgets(struct request_queue *q,
-		struct list_head *list)
+		unsigned int nr_budgets)
 {
-	struct request *rq;
+	int i;
 
-	list_for_each_entry(rq, list, queuelist) {
-		int budget_token = blk_mq_get_rq_budget_token(rq);
-
-		if (budget_token >= 0)
-			blk_mq_put_dispatch_budget(q, budget_token);
-	}
+	for (i = 0; i < nr_budgets; i++)
+		blk_mq_put_dispatch_budget(q);
 }
 
 /*
@@ -1421,8 +1411,7 @@ out:
 			(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED);
 		bool no_budget_avail = prep == PREP_DISPATCH_NO_BUDGET;
 
-		if (nr_budgets)
-			blk_mq_release_budgets(q, list);
+		blk_mq_release_budgets(q, nr_budgets);
 
 		spin_lock(&hctx->lock);
 		list_splice_tail_init(list, &hctx->dispatch);
@@ -1907,8 +1896,7 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
 	spin_unlock(&ctx->lock);
 }
 
-static int plug_rq_cmp(void *priv, const struct list_head *a,
-		       const struct list_head *b)
+static int plug_rq_cmp(void *priv, struct list_head *a, struct list_head *b)
 {
 	struct request *rqa = container_of(a, struct request, queuelist);
 	struct request *rqb = container_of(b, struct request, queuelist);
@@ -2022,7 +2010,6 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
 {
 	struct request_queue *q = rq->q;
 	bool run_queue = true;
-	int budget_token;
 
 	/*
 	 * RCU or SRCU read lock is needed before checking quiesced flag.
@@ -2040,14 +2027,11 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
 	if (q->elevator && !bypass_insert)
 		goto insert;
 
-	budget_token = blk_mq_get_dispatch_budget(q);
-	if (budget_token < 0)
+	if (!blk_mq_get_dispatch_budget(q))
 		goto insert;
 
-	blk_mq_set_rq_budget_token(rq, budget_token);
-
 	if (!blk_mq_get_driver_tag(rq)) {
-		blk_mq_put_dispatch_budget(q, budget_token);
+		blk_mq_put_dispatch_budget(q);
 		goto insert;
 	}
 
@@ -2756,7 +2740,7 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
 		goto free_cpumask;
 
 	if (sbitmap_init_node(&hctx->ctx_map, nr_cpu_ids, ilog2(8),
-				gfp, node, false, false))
+				gfp, node))
 		goto free_ctxs;
 	hctx->nr_ctx = 0;
 

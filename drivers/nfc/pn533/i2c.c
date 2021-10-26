@@ -40,8 +40,11 @@ static int pn533_i2c_send_ack(struct pn533 *dev, gfp_t flags)
 	struct i2c_client *client = phy->i2c_dev;
 	static const u8 ack[6] = {0x00, 0x00, 0xff, 0x00, 0xff, 0x00};
 	/* spec 6.2.1.3:  Preamble, SoPC (2), ACK Code (2), Postamble */
+	int rc;
 
-	return i2c_master_send(client, ack, 6);
+	rc = i2c_master_send(client, ack, 6);
+
+	return rc;
 }
 
 static int pn533_i2c_send_frame(struct pn533 *dev,
@@ -196,7 +199,8 @@ static int pn533_i2c_probe(struct i2c_client *client,
 				&phy->i2c_dev->dev);
 
 	if (IS_ERR(priv)) {
-		return PTR_ERR(priv);
+		r = PTR_ERR(priv);
+		return r;
 	}
 
 	phy->priv = priv;

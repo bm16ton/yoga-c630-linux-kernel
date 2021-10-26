@@ -79,7 +79,7 @@ struct mem_vector {
 	u64 size;
 };
 
-#ifdef CONFIG_RANDOMIZE_BASE
+#if CONFIG_RANDOMIZE_BASE
 /* kaslr.c */
 void choose_random_location(unsigned long input,
 			    unsigned long input_size,
@@ -154,12 +154,6 @@ extern pteval_t __default_kernel_pte_mask;
 /* idt_64.c */
 extern gate_desc boot_idt[BOOT_IDT_ENTRIES];
 extern struct desc_ptr boot_idt_desc;
-
-#ifdef CONFIG_X86_64
-void cleanup_exception_handling(void);
-#else
-static inline void cleanup_exception_handling(void) { }
-#endif
 
 /* IDT Entry Points */
 void boot_page_fault(void);

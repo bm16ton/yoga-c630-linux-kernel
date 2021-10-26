@@ -102,6 +102,15 @@ static int idxd_device_schedule_fault_process(struct idxd_device *idxd,
 	return 0;
 }
 
+irqreturn_t idxd_irq_handler(int vec, void *data)
+{
+	struct idxd_irq_entry *irq_entry = data;
+	struct idxd_device *idxd = irq_entry->idxd;
+
+	idxd_mask_msix_vector(idxd, irq_entry->id);
+	return IRQ_WAKE_THREAD;
+}
+
 static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
 {
 	struct device *dev = &idxd->pdev->dev;
@@ -156,8 +165,11 @@ static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
 	}
 
 	if (cause & IDXD_INTC_PERFMON_OVFL) {
+		/*
+		 * Driver does not utilize perfmon counter overflow interrupt
+		 * yet.
+		 */
 		val |= IDXD_INTC_PERFMON_OVFL;
-		perfmon_counter_overflow(idxd);
 	}
 
 	val ^= cause;
@@ -190,8 +202,6 @@ static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
 			queue_work(idxd->wq, &idxd->work);
 		} else {
 			spin_lock_bh(&idxd->dev_lock);
-			idxd_wqs_quiesce(idxd);
-			idxd_wqs_unmap_portal(idxd);
 			idxd_device_wqs_clear_state(idxd);
 			dev_err(&idxd->pdev->dev,
 				"idxd halted, need %s.\n",
@@ -225,6 +235,7 @@ irqreturn_t idxd_misc_thread(int vec, void *data)
 			iowrite32(cause, idxd->reg_base + IDXD_INTCAUSE_OFFSET);
 	}
 
+	idxd_unmask_msix_vector(idxd, irq_entry->id);
 	return IRQ_HANDLED;
 }
 
@@ -243,6 +254,12 @@ static inline bool match_fault(struct idxd_desc *desc, u64 fault_addr)
 	}
 
 	return false;
+}
+
+static inline void complete_desc(struct idxd_desc *desc, enum idxd_complete_type reason)
+{
+	idxd_dma_complete_txd(desc, reason);
+	idxd_free_desc(desc->wq, desc);
 }
 
 static int irq_process_pending_llist(struct idxd_irq_entry *irq_entry,
@@ -266,16 +283,8 @@ static int irq_process_pending_llist(struct idxd_irq_entry *irq_entry,
 		reason = IDXD_COMPLETE_DEV_FAIL;
 
 	llist_for_each_entry_safe(desc, t, head, llnode) {
-		u8 status = desc->completion->status & DSA_COMP_STATUS_MASK;
-
-		if (status) {
-			if (unlikely(status == IDXD_COMP_DESC_ABORT)) {
-				complete_desc(desc, IDXD_COMPLETE_ABORT);
-				(*processed)++;
-				continue;
-			}
-
-			if (unlikely(status != DSA_COMP_SUCCESS))
+		if (desc->completion->status) {
+			if ((desc->completion->status & DSA_COMP_STATUS_MASK) != DSA_COMP_SUCCESS)
 				match_fault(desc, data);
 			complete_desc(desc, reason);
 			(*processed)++;
@@ -331,14 +340,7 @@ static int irq_process_work_list(struct idxd_irq_entry *irq_entry,
 	spin_unlock_irqrestore(&irq_entry->list_lock, flags);
 
 	list_for_each_entry(desc, &flist, list) {
-		u8 status = desc->completion->status & DSA_COMP_STATUS_MASK;
-
-		if (unlikely(status == IDXD_COMP_DESC_ABORT)) {
-			complete_desc(desc, IDXD_COMPLETE_ABORT);
-			continue;
-		}
-
-		if (unlikely(status != DSA_COMP_SUCCESS))
+		if ((desc->completion->status & DSA_COMP_STATUS_MASK) != DSA_COMP_SUCCESS)
 			match_fault(desc, data);
 		complete_desc(desc, reason);
 	}
@@ -390,6 +392,8 @@ irqreturn_t idxd_wq_thread(int irq, void *data)
 	int processed;
 
 	processed = idxd_desc_process(irq_entry);
+	idxd_unmask_msix_vector(irq_entry->idxd, irq_entry->id);
+
 	if (processed == 0)
 		return IRQ_NONE;
 

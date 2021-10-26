@@ -27,6 +27,7 @@
  *          Christian König
  */
 
+#include <drm/drm_debugfs.h>
 #include <drm/drm_file.h>
 
 #include "radeon.h"
@@ -40,7 +41,7 @@
  * produce command buffers which are send to the kernel and
  * put in IBs for execution by the requested ring.
  */
-static void radeon_debugfs_sa_init(struct radeon_device *rdev);
+static int radeon_debugfs_sa_init(struct radeon_device *rdev);
 
 /**
  * radeon_ib_get - request an IB (Indirect Buffer)
@@ -224,7 +225,9 @@ int radeon_ib_pool_init(struct radeon_device *rdev)
 	}
 
 	rdev->ib_pool_ready = true;
-	radeon_debugfs_sa_init(rdev);
+	if (radeon_debugfs_sa_init(rdev)) {
+		dev_err(rdev->dev, "failed to register debugfs file for SA\n");
+	}
 	return 0;
 }
 
@@ -292,9 +295,11 @@ int radeon_ib_ring_tests(struct radeon_device *rdev)
  */
 #if defined(CONFIG_DEBUG_FS)
 
-static int radeon_debugfs_sa_info_show(struct seq_file *m, void *unused)
+static int radeon_debugfs_sa_info(struct seq_file *m, void *data)
 {
-	struct radeon_device *rdev = (struct radeon_device *)m->private;
+	struct drm_info_node *node = (struct drm_info_node *) m->private;
+	struct drm_device *dev = node->minor->dev;
+	struct radeon_device *rdev = dev->dev_private;
 
 	radeon_sa_bo_dump_debug_info(&rdev->ring_tmp_bo, m);
 
@@ -302,16 +307,17 @@ static int radeon_debugfs_sa_info_show(struct seq_file *m, void *unused)
 
 }
 
-DEFINE_SHOW_ATTRIBUTE(radeon_debugfs_sa_info);
+static struct drm_info_list radeon_debugfs_sa_list[] = {
+	{"radeon_sa_info", &radeon_debugfs_sa_info, 0, NULL},
+};
 
 #endif
 
-static void radeon_debugfs_sa_init(struct radeon_device *rdev)
+static int radeon_debugfs_sa_init(struct radeon_device *rdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	struct dentry *root = rdev->ddev->primary->debugfs_root;
-
-	debugfs_create_file("radeon_sa_info", 0444, root, rdev,
-			    &radeon_debugfs_sa_info_fops);
+	return radeon_debugfs_add_files(rdev, radeon_debugfs_sa_list, 1);
+#else
+	return 0;
 #endif
 }

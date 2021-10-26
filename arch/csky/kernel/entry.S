@@ -9,6 +9,7 @@
 #include <asm/unistd.h>
 #include <asm/asm-offsets.h>
 #include <linux/threads.h>
+#include <asm/setup.h>
 #include <asm/page.h>
 #include <asm/thread_info.h>
 

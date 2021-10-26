@@ -112,8 +112,10 @@ struct nvm_dev_ops {
 
 #ifdef CONFIG_NVM
 
+#include <linux/blkdev.h>
 #include <linux/file.h>
 #include <linux/dmapool.h>
+#include <uapi/linux/lightnvm.h>
 
 enum {
 	/* HW Responsibilities */

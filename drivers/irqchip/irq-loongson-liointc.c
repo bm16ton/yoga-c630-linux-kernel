@@ -16,11 +16,10 @@
 #include <linux/smp.h>
 #include <linux/irqchip/chained_irq.h>
 
-#include <loongson.h>
+#include <boot_param.h>
 
 #define LIOINTC_CHIP_IRQ	32
 #define LIOINTC_NUM_PARENT 4
-#define LIOINTC_NUM_CORES	4
 
 #define LIOINTC_INTC_CHIP_START	0x20
 
@@ -43,7 +42,6 @@ struct liointc_handler_data {
 struct liointc_priv {
 	struct irq_chip_generic		*gc;
 	struct liointc_handler_data	handler[LIOINTC_NUM_PARENT];
-	void __iomem			*core_isr[LIOINTC_NUM_CORES];
 	u8				map_cache[LIOINTC_CHIP_IRQ];
 	bool				has_lpc_irq_errata;
 };
@@ -53,12 +51,11 @@ static void liointc_chained_handle_irq(struct irq_desc *desc)
 	struct liointc_handler_data *handler = irq_desc_get_handler_data(desc);
 	struct irq_chip *chip = irq_desc_get_chip(desc);
 	struct irq_chip_generic *gc = handler->priv->gc;
-	int core = get_ebase_cpunum() % LIOINTC_NUM_CORES;
 	u32 pending;
 
 	chained_irq_enter(chip, desc);
 
-	pending = readl(handler->priv->core_isr[core]);
+	pending = readl(gc->reg_base + LIOINTC_REG_INTC_STATUS);
 
 	if (!pending) {
 		/* Always blame LPC IRQ if we have that bug */
@@ -144,18 +141,6 @@ static void liointc_resume(struct irq_chip_generic *gc)
 }
 
 static const char * const parent_names[] = {"int0", "int1", "int2", "int3"};
-static const char * const core_reg_names[] = {"isr0", "isr1", "isr2", "isr3"};
-
-static void __iomem *liointc_get_reg_byname(struct device_node *node,
-						const char *name)
-{
-	int index = of_property_match_string(node, "reg-names", name);
-
-	if (index < 0)
-		return NULL;
-
-	return of_iomap(node, index);
-}
 
 static int __init liointc_of_init(struct device_node *node,
 				  struct device_node *parent)
@@ -174,28 +159,10 @@ static int __init liointc_of_init(struct device_node *node,
 	if (!priv)
 		return -ENOMEM;
 
-	if (of_device_is_compatible(node, "loongson,liointc-2.0")) {
-		base = liointc_get_reg_byname(node, "main");
-		if (!base) {
-			err = -ENODEV;
-			goto out_free_priv;
-		}
-
-		for (i = 0; i < LIOINTC_NUM_CORES; i++)
-			priv->core_isr[i] = liointc_get_reg_byname(node, core_reg_names[i]);
-		if (!priv->core_isr[0]) {
-			err = -ENODEV;
-			goto out_iounmap_base;
-		}
-	} else {
-		base = of_iomap(node, 0);
-		if (!base) {
-			err = -ENODEV;
-			goto out_free_priv;
-		}
-
-		for (i = 0; i < LIOINTC_NUM_CORES; i++)
-			priv->core_isr[i] = base + LIOINTC_REG_INTC_STATUS;
+	base = of_iomap(node, 0);
+	if (!base) {
+		err = -ENODEV;
+		goto out_free_priv;
 	}
 
 	for (i = 0; i < LIOINTC_NUM_PARENT; i++) {
@@ -205,7 +172,7 @@ static int __init liointc_of_init(struct device_node *node,
 	}
 	if (!have_parent) {
 		err = -ENODEV;
-		goto out_iounmap_isr;
+		goto out_iounmap;
 	}
 
 	sz = of_property_read_variable_u32_array(node,
@@ -216,7 +183,7 @@ static int __init liointc_of_init(struct device_node *node,
 	if (sz < 4) {
 		pr_err("loongson-liointc: No parent_int_map\n");
 		err = -ENODEV;
-		goto out_iounmap_isr;
+		goto out_iounmap;
 	}
 
 	for (i = 0; i < LIOINTC_NUM_PARENT; i++)
@@ -228,7 +195,7 @@ static int __init liointc_of_init(struct device_node *node,
 	if (!domain) {
 		pr_err("loongson-liointc: cannot add IRQ domain\n");
 		err = -EINVAL;
-		goto out_iounmap_isr;
+		goto out_iounmap;
 	}
 
 	err = irq_alloc_domain_generic_chips(domain, 32, 1,
@@ -293,13 +260,7 @@ static int __init liointc_of_init(struct device_node *node,
 
 out_free_domain:
 	irq_domain_remove(domain);
-out_iounmap_isr:
-	for (i = 0; i < LIOINTC_NUM_CORES; i++) {
-		if (!priv->core_isr[i])
-			continue;
-		iounmap(priv->core_isr[i]);
-	}
-out_iounmap_base:
+out_iounmap:
 	iounmap(base);
 out_free_priv:
 	kfree(priv);
@@ -309,4 +270,3 @@ out_free_priv:
 
 IRQCHIP_DECLARE(loongson_liointc_1_0, "loongson,liointc-1.0", liointc_of_init);
 IRQCHIP_DECLARE(loongson_liointc_1_0a, "loongson,liointc-1.0a", liointc_of_init);
-IRQCHIP_DECLARE(loongson_liointc_2_0, "loongson,liointc-2.0", liointc_of_init);

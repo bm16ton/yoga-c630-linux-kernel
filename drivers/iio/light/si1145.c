@@ -1247,6 +1247,7 @@ static int si1145_probe_trigger(struct iio_dev *indio_dev)
 	if (!trig)
 		return -ENOMEM;
 
+	trig->dev.parent = &client->dev;
 	trig->ops = &si1145_trigger_ops;
 	iio_trigger_set_drvdata(trig, indio_dev);
 

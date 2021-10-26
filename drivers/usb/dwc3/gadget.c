@@ -730,16 +730,8 @@ static int __dwc3_gadget_ep_enable(struct dwc3_ep *dep, unsigned int action)
 			 * All stream eps will reinitiate stream on NoStream
 			 * rejection until we can determine that the host can
 			 * prime after the first transfer.
-			 *
-			 * However, if the controller is capable of
-			 * TXF_FLUSH_BYPASS, then IN direction endpoints will
-			 * automatically restart the stream without the driver
-			 * initiation.
 			 */
-			if (!dep->direction ||
-			    !(dwc->hwparams.hwparams9 &
-			      DWC3_GHWPARAMS9_DEV_TXF_FLUSH_BYPASS))
-				dep->flags |= DWC3_EP_FORCE_RESTART_STREAM;
+			dep->flags |= DWC3_EP_FORCE_RESTART_STREAM;
 		}
 	}
 
@@ -1412,7 +1404,7 @@ static int __dwc3_gadget_kick_transfer(struct dwc3_ep *dep)
 		dwc3_stop_active_transfer(dep, true, true);
 
 		list_for_each_entry_safe(req, tmp, &dep->started_list, list)
-			dwc3_gadget_move_cancelled_request(req, DWC3_REQUEST_STATUS_DEQUEUED);
+			dwc3_gadget_move_cancelled_request(req);
 
 		/* If ep isn't started, then there's no end transfer pending */
 		if (!(dep->flags & DWC3_EP_END_TRANSFER_PENDING))
@@ -1741,33 +1733,11 @@ static void dwc3_gadget_ep_cleanup_cancelled_requests(struct dwc3_ep *dep)
 {
 	struct dwc3_request		*req;
 	struct dwc3_request		*tmp;
-	struct list_head		local;
-	struct dwc3			*dwc = dep->dwc;
 
-restart:
-	list_replace_init(&dep->cancelled_list, &local);
-
-	list_for_each_entry_safe(req, tmp, &local, list) {
+	list_for_each_entry_safe(req, tmp, &dep->cancelled_list, list) {
 		dwc3_gadget_ep_skip_trbs(dep, req);
-		switch (req->status) {
-		case DWC3_REQUEST_STATUS_DISCONNECTED:
-			dwc3_gadget_giveback(dep, req, -ESHUTDOWN);
-			break;
-		case DWC3_REQUEST_STATUS_DEQUEUED:
-			dwc3_gadget_giveback(dep, req, -ECONNRESET);
-			break;
-		case DWC3_REQUEST_STATUS_STALLED:
-			dwc3_gadget_giveback(dep, req, -EPIPE);
-			break;
-		default:
-			dev_err(dwc->dev, "request cancelled with wrong reason:%d\n", req->status);
-			dwc3_gadget_giveback(dep, req, -ECONNRESET);
-			break;
-		}
+		dwc3_gadget_giveback(dep, req, -ECONNRESET);
 	}
-
-	if (!list_empty(&dep->cancelled_list))
-		goto restart;
 }
 
 static int dwc3_gadget_ep_dequeue(struct usb_ep *ep,
@@ -1810,8 +1780,7 @@ static int dwc3_gadget_ep_dequeue(struct usb_ep *ep,
 			 * cancelled.
 			 */
 			list_for_each_entry_safe(r, t, &dep->started_list, list)
-				dwc3_gadget_move_cancelled_request(r,
-						DWC3_REQUEST_STATUS_DEQUEUED);
+				dwc3_gadget_move_cancelled_request(r);
 
 			dep->flags &= ~DWC3_EP_WAIT_TRANSFER_COMPLETE;
 
@@ -1883,7 +1852,7 @@ int __dwc3_gadget_ep_set_halt(struct dwc3_ep *dep, int value, int protocol)
 		dwc3_stop_active_transfer(dep, true, true);
 
 		list_for_each_entry_safe(req, tmp, &dep->started_list, list)
-			dwc3_gadget_move_cancelled_request(req, DWC3_REQUEST_STATUS_STALLED);
+			dwc3_gadget_move_cancelled_request(req);
 
 		if (dep->flags & DWC3_EP_END_TRANSFER_PENDING) {
 			dep->flags |= DWC3_EP_PENDING_CLEAR_STALL;
@@ -2150,6 +2119,9 @@ static void __dwc3_gadget_set_speed(struct dwc3 *dwc)
 		reg |= DWC3_DCFG_SUPERSPEED;
 	} else {
 		switch (speed) {
+		case USB_SPEED_LOW:
+			reg |= DWC3_DCFG_LOWSPEED;
+			break;
 		case USB_SPEED_FULL:
 			reg |= DWC3_DCFG_FULLSPEED;
 			break;
@@ -2257,17 +2229,6 @@ static int dwc3_gadget_pullup(struct usb_gadget *g, int is_on)
 	}
 
 	/*
-	 * Avoid issuing a runtime resume if the device is already in the
-	 * suspended state during gadget disconnect.  DWC3 gadget was already
-	 * halted/stopped during runtime suspend.
-	 */
-	if (!is_on) {
-		pm_runtime_barrier(dwc->dev);
-		if (pm_runtime_suspended(dwc->dev))
-			return 0;
-	}
-
-	/*
 	 * Check the return value for successful resume, or error.  For a
 	 * successful resume, the DWC3 runtime PM resume routine will handle
 	 * the run stop sequence, so avoid duplicate operations here.
@@ -2345,7 +2306,7 @@ static void dwc3_gadget_enable_irq(struct dwc3 *dwc)
 
 	/* On 2.30a and above this bit enables U3/L2-L1 Suspend Events */
 	if (!DWC3_VER_IS_PRIOR(DWC3, 230A))
-		reg |= DWC3_DEVTEN_U3L2L1SUSPEN;
+		reg |= DWC3_DEVTEN_EOPFEN;
 
 	dwc3_writel(dwc->regs, DWC3_DEVTEN, reg);
 }
@@ -2388,7 +2349,9 @@ static void dwc3_gadget_setup_nump(struct dwc3 *dwc)
 	u32 reg;
 
 	ram2_depth = DWC3_GHWPARAMS7_RAM2_DEPTH(dwc->hwparams.hwparams7);
-	mdwidth = dwc3_mdwidth(dwc);
+	mdwidth = DWC3_GHWPARAMS0_MDWIDTH(dwc->hwparams.hwparams0);
+	if (DWC3_IP_IS(DWC32))
+		mdwidth += DWC3_GHWPARAMS6_MDWIDTH(dwc->hwparams.hwparams6);
 
 	nump = ((ram2_depth * mdwidth / 8) - 24 - 16) / 1024;
 	nump = min_t(u32, nump, 16);
@@ -2433,17 +2396,6 @@ static int __dwc3_gadget_start(struct dwc3 *dwc)
 	dwc3_writel(dwc->regs, DWC3_GRXTHRCFG, reg);
 
 	dwc3_gadget_setup_nump(dwc);
-
-	/*
-	 * Currently the controller handles single stream only. So, Ignore
-	 * Packet Pending bit for stream selection and don't search for another
-	 * stream if the host sends Data Packet with PP=0 (for OUT direction) or
-	 * ACK with NumP=0 and PP=0 (for IN direction). This slightly improves
-	 * the stream performance.
-	 */
-	reg = dwc3_readl(dwc->regs, DWC3_DCFG);
-	reg |= DWC3_DCFG_IGNSTRMPP;
-	dwc3_writel(dwc->regs, DWC3_DCFG, reg);
 
 	/* Start with SuperSpeed Default */
 	dwc3_gadget_ep0_desc.wMaxPacketSize = cpu_to_le16(512);
@@ -2588,19 +2540,11 @@ static void dwc3_gadget_set_ssp_rate(struct usb_gadget *g,
 static int dwc3_gadget_vbus_draw(struct usb_gadget *g, unsigned int mA)
 {
 	struct dwc3		*dwc = gadget_to_dwc(g);
-	union power_supply_propval	val = {0};
-	int				ret;
 
 	if (dwc->usb2_phy)
 		return usb_phy_set_power(dwc->usb2_phy, mA);
 
-	if (!dwc->usb_psy)
-		return -EOPNOTSUPP;
-
-	val.intval = 1000 * mA;
-	ret = power_supply_set_property(dwc->usb_psy, POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT, &val);
-
-	return ret;
+	return 0;
 }
 
 static const struct usb_gadget_ops dwc3_gadget_ops = {
@@ -2636,10 +2580,12 @@ static int dwc3_gadget_init_control_endpoint(struct dwc3_ep *dep)
 static int dwc3_gadget_init_in_endpoint(struct dwc3_ep *dep)
 {
 	struct dwc3 *dwc = dep->dwc;
-	u32 mdwidth;
+	int mdwidth;
 	int size;
 
-	mdwidth = dwc3_mdwidth(dwc);
+	mdwidth = DWC3_MDWIDTH(dwc->hwparams.hwparams0);
+	if (DWC3_IP_IS(DWC32))
+		mdwidth += DWC3_GHWPARAMS6_MDWIDTH(dwc->hwparams.hwparams6);
 
 	/* MDWIDTH is represented in bits, we need it in bytes */
 	mdwidth /= 8;
@@ -2681,10 +2627,12 @@ static int dwc3_gadget_init_in_endpoint(struct dwc3_ep *dep)
 static int dwc3_gadget_init_out_endpoint(struct dwc3_ep *dep)
 {
 	struct dwc3 *dwc = dep->dwc;
-	u32 mdwidth;
+	int mdwidth;
 	int size;
 
-	mdwidth = dwc3_mdwidth(dwc);
+	mdwidth = DWC3_MDWIDTH(dwc->hwparams.hwparams0);
+	if (DWC3_IP_IS(DWC32))
+		mdwidth += DWC3_GHWPARAMS6_MDWIDTH(dwc->hwparams.hwparams6);
 
 	/* MDWIDTH is represented in bits, convert to bytes */
 	mdwidth /= 8;
@@ -2963,12 +2911,8 @@ static void dwc3_gadget_ep_cleanup_completed_requests(struct dwc3_ep *dep,
 {
 	struct dwc3_request	*req;
 	struct dwc3_request	*tmp;
-	struct list_head	local;
 
-restart:
-	list_replace_init(&dep->started_list, &local);
-
-	list_for_each_entry_safe(req, tmp, &local, list) {
+	list_for_each_entry_safe(req, tmp, &dep->started_list, list) {
 		int ret;
 
 		ret = dwc3_gadget_ep_cleanup_completed_request(dep, event,
@@ -2976,19 +2920,11 @@ restart:
 		if (ret)
 			break;
 	}
-
-	if (!list_empty(&dep->started_list))
-		goto restart;
 }
 
 static bool dwc3_gadget_ep_should_continue(struct dwc3_ep *dep)
 {
 	struct dwc3_request	*req;
-	struct dwc3		*dwc = dep->dwc;
-
-	if (!dep->endpoint.desc || !dwc->pullups_connected ||
-	    !dwc->connected)
-		return false;
 
 	if (!list_empty(&dep->pending_list))
 		return true;
@@ -3533,6 +3469,11 @@ static void dwc3_gadget_conndone_interrupt(struct dwc3 *dwc)
 		dwc->gadget->ep0->maxpacket = 64;
 		dwc->gadget->speed = USB_SPEED_FULL;
 		break;
+	case DWC3_DSTS_LOWSPEED:
+		dwc3_gadget_ep0_desc.wMaxPacketSize = cpu_to_le16(8);
+		dwc->gadget->ep0->maxpacket = 8;
+		dwc->gadget->speed = USB_SPEED_LOW;
+		break;
 	}
 
 	dwc->eps[1]->endpoint.maxpacket = dwc->gadget->ep0->maxpacket;
@@ -3774,7 +3715,7 @@ static void dwc3_gadget_interrupt(struct dwc3 *dwc,
 	case DWC3_DEVICE_EVENT_LINK_STATUS_CHANGE:
 		dwc3_gadget_linksts_change_interrupt(dwc, event->event_info);
 		break;
-	case DWC3_DEVICE_EVENT_SUSPEND:
+	case DWC3_DEVICE_EVENT_EOPF:
 		/* It changed to be suspend event for version 2.30a and above */
 		if (!DWC3_VER_IS_PRIOR(DWC3, 230A)) {
 			/*

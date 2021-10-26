@@ -155,11 +155,9 @@ void xprt_rdma_bc_destroy(struct rpc_xprt *xprt, unsigned int reqs)
 void xprt_rdma_bc_free_rqst(struct rpc_rqst *rqst)
 {
 	struct rpcrdma_req *req = rpcr_to_rdmar(rqst);
-	struct rpcrdma_rep *rep = req->rl_reply;
 	struct rpc_xprt *xprt = rqst->rq_xprt;
-	struct rpcrdma_xprt *r_xprt = rpcx_to_rdmax(xprt);
 
-	rpcrdma_rep_put(&r_xprt->rx_buf, rep);
+	rpcrdma_recv_buffer_put(req->rl_reply);
 	req->rl_reply = NULL;
 
 	spin_lock(&xprt->bc_pa_lock);

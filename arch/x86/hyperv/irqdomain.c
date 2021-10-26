@@ -63,10 +63,10 @@ static int hv_map_interrupt(union hv_device_id device_id, bool level,
 
 	local_irq_restore(flags);
 
-	if (!hv_result_success(status))
+	if ((status & HV_HYPERCALL_RESULT_MASK) != HV_STATUS_SUCCESS)
 		pr_err("%s: hypercall failed, status %lld\n", __func__, status);
 
-	return hv_result(status);
+	return status & HV_HYPERCALL_RESULT_MASK;
 }
 
 static int hv_unmap_interrupt(u64 id, struct hv_interrupt_entry *old_entry)
@@ -88,7 +88,7 @@ static int hv_unmap_interrupt(u64 id, struct hv_interrupt_entry *old_entry)
 	status = hv_do_hypercall(HVCALL_UNMAP_DEVICE_INTERRUPT, input, NULL);
 	local_irq_restore(flags);
 
-	return hv_result(status);
+	return status & HV_HYPERCALL_RESULT_MASK;
 }
 
 #ifdef CONFIG_PCI_MSI

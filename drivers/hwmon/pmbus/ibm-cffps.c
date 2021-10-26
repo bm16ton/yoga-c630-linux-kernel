@@ -625,4 +625,3 @@ module_i2c_driver(ibm_cffps_driver);
 MODULE_AUTHOR("Eddie James");
 MODULE_DESCRIPTION("PMBus driver for IBM Common Form Factor power supplies");
 MODULE_LICENSE("GPL");
-MODULE_IMPORT_NS(PMBUS);

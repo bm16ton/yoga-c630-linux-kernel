@@ -2332,10 +2332,8 @@ vchiq_use_internal(struct vchiq_state *state, struct vchiq_service *service,
 	int *entity_uc;
 	int local_uc;
 
-	if (!arm_state) {
-		ret = VCHIQ_ERROR;
+	if (!arm_state)
 		goto out;
-	}
 
 	vchiq_log_trace(vchiq_susp_log_level, "%s", __func__);
 
@@ -2391,10 +2389,8 @@ vchiq_release_internal(struct vchiq_state *state, struct vchiq_service *service)
 	char entity[16];
 	int *entity_uc;
 
-	if (!arm_state) {
-		ret = VCHIQ_ERROR;
+	if (!arm_state)
 		goto out;
-	}
 
 	vchiq_log_trace(vchiq_susp_log_level, "%s", __func__);
 
@@ -2738,7 +2734,7 @@ static int vchiq_probe(struct platform_device *pdev)
 		return -ENOENT;
 	}
 
-	drvdata->fw = devm_rpi_firmware_get(&pdev->dev, fw_node);
+	drvdata->fw = rpi_firmware_get(fw_node);
 	of_node_put(fw_node);
 	if (!drvdata->fw)
 		return -EPROBE_DEFER;

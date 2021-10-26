@@ -25,7 +25,6 @@
 #include <linux/pm_runtime.h>
 #include <linux/aer.h>
 #include <linux/prefetch.h>
-#include <linux/suspend.h>
 
 #include "e1000.h"
 
@@ -5993,7 +5992,7 @@ static void e1000_reset_task(struct work_struct *work)
 }
 
 /**
- * e1000e_get_stats64 - Get System Network Statistics
+ * e1000_get_stats64 - Get System Network Statistics
  * @netdev: network interface device structure
  * @stats: rtnl_link_stats64 pointer
  *
@@ -6166,7 +6165,7 @@ static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
 }
 
 /**
- * e1000e_hwtstamp_set - control hardware time stamping
+ * e1000e_hwtstamp_ioctl - control hardware time stamping
  * @netdev: network interface device structure
  * @ifr: interface request
  *
@@ -6824,7 +6823,7 @@ static void e1000e_disable_aspm(struct pci_dev *pdev, u16 state)
 }
 
 /**
- * e1000e_disable_aspm_locked - Disable ASPM states.
+ * e1000e_disable_aspm_locked   Disable ASPM states.
  * @pdev: pointer to PCI device struct
  * @state: bit-mask of ASPM states to disable
  *
@@ -6923,12 +6922,6 @@ static int __e1000_resume(struct pci_dev *pdev)
 		e1000e_get_hw_control(adapter);
 
 	return 0;
-}
-
-static __maybe_unused int e1000e_pm_prepare(struct device *dev)
-{
-	return pm_runtime_suspended(dev) &&
-		pm_suspend_via_firmware();
 }
 
 static __maybe_unused int e1000e_pm_suspend(struct device *dev)
@@ -7639,9 +7632,9 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	e1000_print_device_info(adapter);
 
-	dev_pm_set_driver_flags(&pdev->dev, DPM_FLAG_SMART_PREPARE);
+	dev_pm_set_driver_flags(&pdev->dev, DPM_FLAG_NO_DIRECT_COMPLETE);
 
-	if (pci_dev_run_wake(pdev) && hw->mac.type != e1000_pch_cnp)
+	if (pci_dev_run_wake(pdev) && hw->mac.type < e1000_pch_cnp)
 		pm_runtime_put_noidle(&pdev->dev);
 
 	return 0;
@@ -7664,7 +7657,6 @@ err_flashmap:
 err_ioremap:
 	free_netdev(netdev);
 err_alloc_etherdev:
-	pci_disable_pcie_error_reporting(pdev);
 	pci_release_mem_regions(pdev);
 err_pci_reg:
 err_dma:
@@ -7865,7 +7857,6 @@ MODULE_DEVICE_TABLE(pci, e1000_pci_tbl);
 
 static const struct dev_pm_ops e1000_pm_ops = {
 #ifdef CONFIG_PM_SLEEP
-	.prepare	= e1000e_pm_prepare,
 	.suspend	= e1000e_pm_suspend,
 	.resume		= e1000e_pm_resume,
 	.freeze		= e1000e_pm_freeze,

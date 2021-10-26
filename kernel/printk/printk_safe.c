@@ -16,7 +16,7 @@
 #include "internal.h"
 
 /*
- * In NMI and safe mode, printk() avoids taking locks. Instead,
+ * printk() could not take logbuf_lock in NMI context. Instead,
  * it uses an alternative implementation that temporary stores
  * the strings into a per-CPU buffer. The content of the buffer
  * is later flushed into the main ring buffer via IRQ work.
@@ -267,9 +267,17 @@ void printk_safe_flush(void)
 void printk_safe_flush_on_panic(void)
 {
 	/*
-	 * Make sure that we could access the safe buffers.
+	 * Make sure that we could access the main ring buffer.
 	 * Do not risk a double release when more CPUs are up.
 	 */
+	if (raw_spin_is_locked(&logbuf_lock)) {
+		if (num_online_cpus() > 1)
+			return;
+
+		debug_locks_off();
+		raw_spin_lock_init(&logbuf_lock);
+	}
+
 	if (raw_spin_is_locked(&safe_read_lock)) {
 		if (num_online_cpus() > 1)
 			return;
@@ -311,7 +319,9 @@ void noinstr printk_nmi_exit(void)
  * reordering.
  *
  * It has effect only when called in NMI context. Then printk()
- * will store the messages into the main logbuf directly.
+ * will try to store the messages into the main logbuf directly
+ * and use the per-CPU buffers only as a fallback when the lock
+ * is not available.
  */
 void printk_nmi_direct_enter(void)
 {
@@ -357,7 +367,7 @@ void __printk_safe_exit(void)
 	this_cpu_dec(printk_context);
 }
 
-asmlinkage int vprintk(const char *fmt, va_list args)
+__printf(1, 0) int vprintk_func(const char *fmt, va_list args)
 {
 #ifdef CONFIG_KGDB_KDB
 	/* Allow to pass printk() to kdb but avoid a recursion. */
@@ -366,21 +376,20 @@ asmlinkage int vprintk(const char *fmt, va_list args)
 #endif
 
 	/*
-	 * Use the main logbuf even in NMI. But avoid calling console
+	 * Try to use the main logbuf even in NMI. But avoid calling console
 	 * drivers that might have their own locks.
 	 */
-	if ((this_cpu_read(printk_context) & PRINTK_NMI_DIRECT_CONTEXT_MASK)) {
-		unsigned long flags;
+	if ((this_cpu_read(printk_context) & PRINTK_NMI_DIRECT_CONTEXT_MASK) &&
+	    raw_spin_trylock(&logbuf_lock)) {
 		int len;
 
-		printk_safe_enter_irqsave(flags);
 		len = vprintk_store(0, LOGLEVEL_DEFAULT, NULL, fmt, args);
-		printk_safe_exit_irqrestore(flags);
+		raw_spin_unlock(&logbuf_lock);
 		defer_console_output();
 		return len;
 	}
 
-	/* Use extra buffer in NMI. */
+	/* Use extra buffer in NMI when logbuf_lock is taken or in safe mode. */
 	if (this_cpu_read(printk_context) & PRINTK_NMI_CONTEXT_MASK)
 		return vprintk_nmi(fmt, args);
 
@@ -391,7 +400,6 @@ asmlinkage int vprintk(const char *fmt, va_list args)
 	/* No obstacles. */
 	return vprintk_default(fmt, args);
 }
-EXPORT_SYMBOL(vprintk);
 
 void __init printk_safe_init(void)
 {

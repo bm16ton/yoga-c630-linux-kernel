@@ -21,8 +21,6 @@ struct nf_flow_key {
 	struct flow_dissector_key_control		control;
 	struct flow_dissector_key_control		enc_control;
 	struct flow_dissector_key_basic			basic;
-	struct flow_dissector_key_vlan			vlan;
-	struct flow_dissector_key_vlan			cvlan;
 	union {
 		struct flow_dissector_key_ipv4_addrs	ipv4;
 		struct flow_dissector_key_ipv6_addrs	ipv6;
@@ -88,17 +86,8 @@ static inline bool nf_flowtable_hw_offload(struct nf_flowtable *flowtable)
 enum flow_offload_tuple_dir {
 	FLOW_OFFLOAD_DIR_ORIGINAL = IP_CT_DIR_ORIGINAL,
 	FLOW_OFFLOAD_DIR_REPLY = IP_CT_DIR_REPLY,
+	FLOW_OFFLOAD_DIR_MAX = IP_CT_DIR_MAX
 };
-#define FLOW_OFFLOAD_DIR_MAX	IP_CT_DIR_MAX
-
-enum flow_offload_xmit_type {
-	FLOW_OFFLOAD_XMIT_UNSPEC	= 0,
-	FLOW_OFFLOAD_XMIT_NEIGH,
-	FLOW_OFFLOAD_XMIT_XFRM,
-	FLOW_OFFLOAD_XMIT_DIRECT,
-};
-
-#define NF_FLOW_TABLE_ENCAP_MAX		2
 
 struct flow_offload_tuple {
 	union {
@@ -118,31 +107,15 @@ struct flow_offload_tuple {
 
 	u8				l3proto;
 	u8				l4proto;
-	struct {
-		u16			id;
-		__be16			proto;
-	} encap[NF_FLOW_TABLE_ENCAP_MAX];
 
 	/* All members above are keys for lookups, see flow_offload_hash(). */
 	struct { }			__hash;
 
-	u8				dir:2,
-					xmit_type:2,
-					encap_num:2,
-					in_vlan_ingress:2;
+	u8				dir;
+
 	u16				mtu;
-	union {
-		struct {
-			struct dst_entry *dst_cache;
-			u32		dst_cookie;
-		};
-		struct {
-			u32		ifidx;
-			u32		hw_ifidx;
-			u8		h_source[ETH_ALEN];
-			u8		h_dest[ETH_ALEN];
-		} out;
-	};
+
+	struct dst_entry		*dst_cache;
 };
 
 struct flow_offload_tuple_rhash {
@@ -184,23 +157,7 @@ static inline __s32 nf_flow_timeout_delta(unsigned int timeout)
 
 struct nf_flow_route {
 	struct {
-		struct dst_entry		*dst;
-		struct {
-			u32			ifindex;
-			struct {
-				u16		id;
-				__be16		proto;
-			} encap[NF_FLOW_TABLE_ENCAP_MAX];
-			u8			num_encaps:2,
-						ingress_vlans:2;
-		} in;
-		struct {
-			u32			ifindex;
-			u32			hw_ifindex;
-			u8			h_source[ETH_ALEN];
-			u8			h_dest[ETH_ALEN];
-		} out;
-		enum flow_offload_xmit_type	xmit_type;
+		struct dst_entry	*dst;
 	} tuple[FLOW_OFFLOAD_DIR_MAX];
 };
 
@@ -271,12 +228,12 @@ void nf_flow_table_free(struct nf_flowtable *flow_table);
 
 void flow_offload_teardown(struct flow_offload *flow);
 
-void nf_flow_snat_port(const struct flow_offload *flow,
-		       struct sk_buff *skb, unsigned int thoff,
-		       u8 protocol, enum flow_offload_tuple_dir dir);
-void nf_flow_dnat_port(const struct flow_offload *flow,
-		       struct sk_buff *skb, unsigned int thoff,
-		       u8 protocol, enum flow_offload_tuple_dir dir);
+int nf_flow_snat_port(const struct flow_offload *flow,
+		      struct sk_buff *skb, unsigned int thoff,
+		      u8 protocol, enum flow_offload_tuple_dir dir);
+int nf_flow_dnat_port(const struct flow_offload *flow,
+		      struct sk_buff *skb, unsigned int thoff,
+		      u8 protocol, enum flow_offload_tuple_dir dir);
 
 struct flow_ports {
 	__be16 source, dest;

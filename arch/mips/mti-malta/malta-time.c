@@ -66,6 +66,11 @@ static void __init estimate_frequencies(void)
 	int secs;
 	u64 giccount = 0, gicstart = 0;
 
+#if defined(CONFIG_KVM_GUEST) && CONFIG_KVM_GUEST_TIMER_FREQ
+	mips_hpt_frequency = CONFIG_KVM_GUEST_TIMER_FREQ * 1000000;
+	return;
+#endif
+
 	local_irq_save(flags);
 
 	if (mips_gic_present())

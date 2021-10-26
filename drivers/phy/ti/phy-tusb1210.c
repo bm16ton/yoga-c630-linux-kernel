@@ -7,16 +7,15 @@
  * Author: Heikki Krogerus <heikki.krogerus@linux.intel.com>
  */
 #include <linux/module.h>
-#include <linux/bitfield.h>
 #include <linux/ulpi/driver.h>
 #include <linux/ulpi/regs.h>
 #include <linux/gpio/consumer.h>
 #include <linux/phy/ulpi_phy.h>
 
 #define TUSB1210_VENDOR_SPECIFIC2		0x80
-#define TUSB1210_VENDOR_SPECIFIC2_IHSTX_MASK	GENMASK(3, 0)
-#define TUSB1210_VENDOR_SPECIFIC2_ZHSDRV_MASK	GENMASK(5, 4)
-#define TUSB1210_VENDOR_SPECIFIC2_DP_MASK	BIT(6)
+#define TUSB1210_VENDOR_SPECIFIC2_IHSTX_SHIFT	0
+#define TUSB1210_VENDOR_SPECIFIC2_ZHSDRV_SHIFT	4
+#define TUSB1210_VENDOR_SPECIFIC2_DP_SHIFT	6
 
 struct tusb1210 {
 	struct ulpi *ulpi;
@@ -119,22 +118,22 @@ static int tusb1210_probe(struct ulpi *ulpi)
 	 * diagram optimization and DP/DM swap.
 	 */
 
-	reg = ulpi_read(ulpi, TUSB1210_VENDOR_SPECIFIC2);
-
 	/* High speed output drive strength configuration */
-	if (!device_property_read_u8(&ulpi->dev, "ihstx", &val))
-		u8p_replace_bits(&reg, val, (u8)TUSB1210_VENDOR_SPECIFIC2_IHSTX_MASK);
+	device_property_read_u8(&ulpi->dev, "ihstx", &val);
+	reg = val << TUSB1210_VENDOR_SPECIFIC2_IHSTX_SHIFT;
 
 	/* High speed output impedance configuration */
-	if (!device_property_read_u8(&ulpi->dev, "zhsdrv", &val))
-		u8p_replace_bits(&reg, val, (u8)TUSB1210_VENDOR_SPECIFIC2_ZHSDRV_MASK);
+	device_property_read_u8(&ulpi->dev, "zhsdrv", &val);
+	reg |= val << TUSB1210_VENDOR_SPECIFIC2_ZHSDRV_SHIFT;
 
 	/* DP/DM swap control */
-	if (!device_property_read_u8(&ulpi->dev, "datapolarity", &val))
-		u8p_replace_bits(&reg, val, (u8)TUSB1210_VENDOR_SPECIFIC2_DP_MASK);
+	device_property_read_u8(&ulpi->dev, "datapolarity", &val);
+	reg |= val << TUSB1210_VENDOR_SPECIFIC2_DP_SHIFT;
 
-	ulpi_write(ulpi, TUSB1210_VENDOR_SPECIFIC2, reg);
-	tusb->vendor_specific2 = reg;
+	if (reg) {
+		ulpi_write(ulpi, TUSB1210_VENDOR_SPECIFIC2, reg);
+		tusb->vendor_specific2 = reg;
+	}
 
 	tusb->phy = ulpi_phy_create(ulpi, &phy_ops);
 	if (IS_ERR(tusb->phy))

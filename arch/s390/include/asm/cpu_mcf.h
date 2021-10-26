@@ -123,6 +123,4 @@ static inline int stccm_avail(void)
 	return test_facility(142);
 }
 
-size_t cpum_cf_ctrset_size(enum cpumf_ctr_set ctrset,
-			   struct cpumf_ctr_info *info);
 #endif /* _ASM_S390_CPU_MCF_H */

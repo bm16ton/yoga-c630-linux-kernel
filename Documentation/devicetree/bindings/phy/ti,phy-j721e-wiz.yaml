@@ -15,7 +15,6 @@ properties:
     enum:
       - ti,j721e-wiz-16g
       - ti,j721e-wiz-10g
-      - ti,am64-wiz-10g
 
   power-domains:
     maxItems: 1
@@ -41,9 +40,6 @@ properties:
     const: 1
 
   "#reset-cells":
-    const: 1
-
-  "#clock-cells":
     const: 1
 
   ranges: true
@@ -222,7 +218,7 @@ examples:
            };
 
            serdes@5000000 {
-                  compatible = "ti,sierra-phy-t0";
+                  compatible = "cdns,ti,sierra-phy-t0";
                   reg-names = "serdes";
                   reg = <0x5000000 0x10000>;
                   #address-cells = <1>;

@@ -24,7 +24,6 @@
 #include <linux/audit.h>
 #include <linux/user_namespace.h>
 #include <net/net_namespace.h>
-#include <net/netns/generic.h>
 
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter_arp.h>
@@ -39,10 +38,6 @@ MODULE_DESCRIPTION("{ip,ip6,arp,eb}_tables backend module");
 #define XT_PCPU_BLOCK_SIZE 4096
 #define XT_MAX_TABLE_SIZE	(512 * 1024 * 1024)
 
-struct xt_pernet {
-	struct list_head tables[NFPROTO_NUMPROTO];
-};
-
 struct compat_delta {
 	unsigned int offset; /* offset in kernel */
 	int delta; /* delta in 32bit user land */
@@ -52,7 +47,7 @@ struct xt_af {
 	struct mutex mutex;
 	struct list_head match;
 	struct list_head target;
-#ifdef CONFIG_NETFILTER_XTABLES_COMPAT
+#ifdef CONFIG_COMPAT
 	struct mutex compat_mutex;
 	struct compat_delta *compat_tab;
 	unsigned int number; /* number of slots in compat_tab[] */
@@ -60,8 +55,7 @@ struct xt_af {
 #endif
 };
 
-static unsigned int xt_pernet_id __read_mostly;
-static struct xt_af *xt __read_mostly;
+static struct xt_af *xt;
 
 static const char *const xt_prefix[NFPROTO_NUMPROTO] = {
 	[NFPROTO_UNSPEC] = "x",
@@ -647,7 +641,7 @@ static bool error_tg_ok(unsigned int usersize, unsigned int kernsize,
 	return usersize == kernsize && strnlen(msg, msglen) < msglen;
 }
 
-#ifdef CONFIG_NETFILTER_XTABLES_COMPAT
+#ifdef CONFIG_COMPAT
 int xt_compat_add_offset(u_int8_t af, unsigned int offset, int delta)
 {
 	struct xt_af *xp = &xt[af];
@@ -850,7 +844,7 @@ int xt_compat_check_entry_offsets(const void *base, const char *elems,
 				    __alignof__(struct compat_xt_entry_match));
 }
 EXPORT_SYMBOL(xt_compat_check_entry_offsets);
-#endif /* CONFIG_NETFILTER_XTABLES_COMPAT */
+#endif /* CONFIG_COMPAT */
 
 /**
  * xt_check_entry_offsets - validate arp/ip/ip6t_entry
@@ -868,7 +862,7 @@ EXPORT_SYMBOL(xt_compat_check_entry_offsets);
  * match structures are aligned, and that the last structure ends where
  * the target structure begins.
  *
- * Also see xt_compat_check_entry_offsets for CONFIG_NETFILTER_XTABLES_COMPAT version.
+ * Also see xt_compat_check_entry_offsets for CONFIG_COMPAT version.
  *
  * The arp/ip/ip6t_entry structure @base must have passed following tests:
  * - it must point to a valid memory location
@@ -1059,7 +1053,7 @@ void *xt_copy_counters(sockptr_t arg, unsigned int len,
 	void *mem;
 	u64 size;
 
-#ifdef CONFIG_NETFILTER_XTABLES_COMPAT
+#ifdef CONFIG_COMPAT
 	if (in_compat_syscall()) {
 		/* structures only differ in size due to alignment */
 		struct compat_xt_counters_info compat_tmp;
@@ -1106,7 +1100,7 @@ void *xt_copy_counters(sockptr_t arg, unsigned int len,
 }
 EXPORT_SYMBOL_GPL(xt_copy_counters);
 
-#ifdef CONFIG_NETFILTER_XTABLES_COMPAT
+#ifdef CONFIG_COMPAT
 int xt_compat_target_offset(const struct xt_target *target)
 {
 	u_int16_t csize = target->compatsize ? : target->targetsize;
@@ -1199,32 +1193,14 @@ void xt_free_table_info(struct xt_table_info *info)
 }
 EXPORT_SYMBOL(xt_free_table_info);
 
-struct xt_table *xt_find_table(struct net *net, u8 af, const char *name)
-{
-	struct xt_pernet *xt_net = net_generic(net, xt_pernet_id);
-	struct xt_table *t;
-
-	mutex_lock(&xt[af].mutex);
-	list_for_each_entry(t, &xt_net->tables[af], list) {
-		if (strcmp(t->name, name) == 0) {
-			mutex_unlock(&xt[af].mutex);
-			return t;
-		}
-	}
-	mutex_unlock(&xt[af].mutex);
-	return NULL;
-}
-EXPORT_SYMBOL(xt_find_table);
-
 /* Find table by name, grabs mutex & ref.  Returns ERR_PTR on error. */
 struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
 				    const char *name)
 {
-	struct xt_pernet *xt_net = net_generic(net, xt_pernet_id);
 	struct xt_table *t, *found = NULL;
 
 	mutex_lock(&xt[af].mutex);
-	list_for_each_entry(t, &xt_net->tables[af], list)
+	list_for_each_entry(t, &net->xt.tables[af], list)
 		if (strcmp(t->name, name) == 0 && try_module_get(t->me))
 			return t;
 
@@ -1232,8 +1208,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
 		goto out;
 
 	/* Table doesn't exist in this netns, re-try init */
-	xt_net = net_generic(&init_net, xt_pernet_id);
-	list_for_each_entry(t, &xt_net->tables[af], list) {
+	list_for_each_entry(t, &init_net.xt.tables[af], list) {
 		int err;
 
 		if (strcmp(t->name, name))
@@ -1256,9 +1231,8 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
 	if (!found)
 		goto out;
 
-	xt_net = net_generic(net, xt_pernet_id);
 	/* and once again: */
-	list_for_each_entry(t, &xt_net->tables[af], list)
+	list_for_each_entry(t, &net->xt.tables[af], list)
 		if (strcmp(t->name, name) == 0)
 			return t;
 
@@ -1293,7 +1267,7 @@ void xt_table_unlock(struct xt_table *table)
 }
 EXPORT_SYMBOL_GPL(xt_table_unlock);
 
-#ifdef CONFIG_NETFILTER_XTABLES_COMPAT
+#ifdef CONFIG_COMPAT
 void xt_compat_lock(u_int8_t af)
 {
 	mutex_lock(&xt[af].compat_mutex);
@@ -1443,10 +1417,9 @@ struct xt_table *xt_register_table(struct net *net,
 				   struct xt_table_info *bootstrap,
 				   struct xt_table_info *newinfo)
 {
-	struct xt_pernet *xt_net = net_generic(net, xt_pernet_id);
+	int ret;
 	struct xt_table_info *private;
 	struct xt_table *t, *table;
-	int ret;
 
 	/* Don't add one object to multiple lists. */
 	table = kmemdup(input_table, sizeof(struct xt_table), GFP_KERNEL);
@@ -1457,7 +1430,7 @@ struct xt_table *xt_register_table(struct net *net,
 
 	mutex_lock(&xt[table->af].mutex);
 	/* Don't autoload: we'd eat our tail... */
-	list_for_each_entry(t, &xt_net->tables[table->af], list) {
+	list_for_each_entry(t, &net->xt.tables[table->af], list) {
 		if (strcmp(t->name, table->name) == 0) {
 			ret = -EEXIST;
 			goto unlock;
@@ -1476,7 +1449,7 @@ struct xt_table *xt_register_table(struct net *net,
 	/* save number of initial entries */
 	private->initial_entries = private->number;
 
-	list_add(&table->list, &xt_net->tables[table->af]);
+	list_add(&table->list, &net->xt.tables[table->af]);
 	mutex_unlock(&xt[table->af].mutex);
 	return table;
 
@@ -1498,7 +1471,6 @@ void *xt_unregister_table(struct xt_table *table)
 	mutex_unlock(&xt[table->af].mutex);
 	audit_log_nfcfg(table->name, table->af, private->number,
 			AUDIT_XT_OP_UNREGISTER, GFP_KERNEL);
-	kfree(table->ops);
 	kfree(table);
 
 	return private;
@@ -1508,25 +1480,19 @@ EXPORT_SYMBOL_GPL(xt_unregister_table);
 #ifdef CONFIG_PROC_FS
 static void *xt_table_seq_start(struct seq_file *seq, loff_t *pos)
 {
-	u8 af = (unsigned long)PDE_DATA(file_inode(seq->file));
 	struct net *net = seq_file_net(seq);
-	struct xt_pernet *xt_net;
-
-	xt_net = net_generic(net, xt_pernet_id);
+	u_int8_t af = (unsigned long)PDE_DATA(file_inode(seq->file));
 
 	mutex_lock(&xt[af].mutex);
-	return seq_list_start(&xt_net->tables[af], *pos);
+	return seq_list_start(&net->xt.tables[af], *pos);
 }
 
 static void *xt_table_seq_next(struct seq_file *seq, void *v, loff_t *pos)
 {
-	u8 af = (unsigned long)PDE_DATA(file_inode(seq->file));
 	struct net *net = seq_file_net(seq);
-	struct xt_pernet *xt_net;
+	u_int8_t af = (unsigned long)PDE_DATA(file_inode(seq->file));
 
-	xt_net = net_generic(net, xt_pernet_id);
-
-	return seq_list_next(v, &xt_net->tables[af], pos);
+	return seq_list_next(v, &net->xt.tables[af], pos);
 }
 
 static void xt_table_seq_stop(struct seq_file *seq, void *v)
@@ -1892,28 +1858,24 @@ EXPORT_SYMBOL_GPL(xt_percpu_counter_free);
 
 static int __net_init xt_net_init(struct net *net)
 {
-	struct xt_pernet *xt_net = net_generic(net, xt_pernet_id);
 	int i;
 
 	for (i = 0; i < NFPROTO_NUMPROTO; i++)
-		INIT_LIST_HEAD(&xt_net->tables[i]);
+		INIT_LIST_HEAD(&net->xt.tables[i]);
 	return 0;
 }
 
 static void __net_exit xt_net_exit(struct net *net)
 {
-	struct xt_pernet *xt_net = net_generic(net, xt_pernet_id);
 	int i;
 
 	for (i = 0; i < NFPROTO_NUMPROTO; i++)
-		WARN_ON_ONCE(!list_empty(&xt_net->tables[i]));
+		WARN_ON_ONCE(!list_empty(&net->xt.tables[i]));
 }
 
 static struct pernet_operations xt_net_ops = {
 	.init = xt_net_init,
 	.exit = xt_net_exit,
-	.id   = &xt_pernet_id,
-	.size = sizeof(struct xt_pernet),
 };
 
 static int __init xt_init(void)
@@ -1931,7 +1893,7 @@ static int __init xt_init(void)
 
 	for (i = 0; i < NFPROTO_NUMPROTO; i++) {
 		mutex_init(&xt[i].mutex);
-#ifdef CONFIG_NETFILTER_XTABLES_COMPAT
+#ifdef CONFIG_COMPAT
 		mutex_init(&xt[i].compat_mutex);
 		xt[i].compat_tab = NULL;
 #endif

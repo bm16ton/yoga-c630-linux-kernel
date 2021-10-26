@@ -150,8 +150,7 @@ void mod_freesync_build_vrr_infopacket(struct mod_freesync *mod_freesync,
 		const struct mod_vrr_params *vrr,
 		enum vrr_packet_type packet_type,
 		enum color_transfer_func app_tf,
-		struct dc_info_packet *infopacket,
-		bool pack_sdp_v1_3);
+		struct dc_info_packet *infopacket);
 
 void mod_freesync_build_vrr_params(struct mod_freesync *mod_freesync,
 		const struct dc_stream_state *stream,
@@ -171,15 +170,10 @@ void mod_freesync_handle_v_update(struct mod_freesync *mod_freesync,
 unsigned long long mod_freesync_calc_nominal_field_rate(
 			const struct dc_stream_state *stream);
 
-unsigned long long mod_freesync_calc_field_rate_from_timing(
-		unsigned int vtotal, unsigned int htotal, unsigned int pix_clk);
-
 bool mod_freesync_is_valid_range(uint32_t min_refresh_cap_in_uhz,
 		uint32_t max_refresh_cap_in_uhz,
 		uint32_t nominal_field_rate_in_uhz);
 
-unsigned int mod_freesync_calc_v_total_from_refresh(
-		const struct dc_stream_state *stream,
-		unsigned int refresh_in_uhz);
+
 
 #endif

@@ -423,6 +423,13 @@ static void acpi_dev_get_irqresource(struct resource *res, u32 gsi,
 	}
 }
 
+static bool irq_is_legacy(struct acpi_resource_irq *irq)
+{
+	return irq->triggering == ACPI_EDGE_SENSITIVE &&
+		irq->polarity == ACPI_ACTIVE_HIGH &&
+		irq->shareable == ACPI_EXCLUSIVE;
+}
+
 /**
  * acpi_dev_resource_interrupt - Extract ACPI interrupt resource information.
  * @ares: Input ACPI resource object.
@@ -461,7 +468,7 @@ bool acpi_dev_resource_interrupt(struct acpi_resource *ares, int index,
 		}
 		acpi_dev_get_irqresource(res, irq->interrupts[index],
 					 irq->triggering, irq->polarity,
-					 irq->shareable, true);
+					 irq->shareable, irq_is_legacy(irq));
 		break;
 	case ACPI_RESOURCE_TYPE_EXTENDED_IRQ:
 		ext_irq = &ares->data.extended_irq;
@@ -596,7 +603,7 @@ static int __acpi_dev_get_resources(struct acpi_device *adev,
  * @preproc_data: Pointer passed to the caller's preprocessing routine.
  *
  * Evaluate the _CRS method for the given device node and process its output by
- * (1) executing the @preproc() routine provided by the caller, passing the
+ * (1) executing the @preproc() rountine provided by the caller, passing the
  * resource pointer and @preproc_data to it as arguments, for each ACPI resource
  * returned and (2) converting all of the returned ACPI resources into struct
  * resource objects if possible.  If the return value of @preproc() in step (1)

@@ -280,10 +280,6 @@ static const struct property_entry bq24190_props[] = {
 	{ }
 };
 
-static const struct software_node bq24190_node = {
-	.properties = bq24190_props,
-};
-
 static struct regulator_consumer_supply fusb302_consumer = {
 	.supply = "vbus",
 	/* Must match fusb302 dev_name in intel_cht_int33fe.c */
@@ -312,7 +308,7 @@ static int cht_wc_i2c_adap_i2c_probe(struct platform_device *pdev)
 		.type = "bq24190",
 		.addr = 0x6b,
 		.dev_name = "bq24190",
-		.swnode = &bq24190_node,
+		.properties = bq24190_props,
 		.platform_data = &bq24190_pdata,
 	};
 	int ret, reg, irq;

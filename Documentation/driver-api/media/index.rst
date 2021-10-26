@@ -28,8 +28,6 @@ Please see:
     :maxdepth: 5
     :numbered:
 
-    maintainer-entry-profile
-
     v4l2-core
     dtv-core
     rc-core

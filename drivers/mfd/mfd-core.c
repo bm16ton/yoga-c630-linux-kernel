@@ -65,7 +65,7 @@ static void mfd_acpi_add_device(const struct mfd_cell *cell,
 {
 	const struct mfd_cell_acpi_match *match = cell->acpi_match;
 	struct acpi_device *parent, *child;
-	struct acpi_device *adev = NULL;
+	struct acpi_device *adev;
 
 	parent = ACPI_COMPANION(pdev->dev.parent);
 	if (!parent)
@@ -77,9 +77,10 @@ static void mfd_acpi_add_device(const struct mfd_cell *cell,
 	 * _ADR or it will use the parent handle if is no ID is given.
 	 *
 	 * Note that use of _ADR is a grey area in the ACPI specification,
-	 * though at least Intel Galileo Gen 2 is using it to distinguish
-	 * the children devices.
+	 * though Intel Galileo Gen2 is using it to distinguish the children
+	 * devices.
 	 */
+	adev = parent;
 	if (match) {
 		if (match->pnpid) {
 			struct acpi_device_id ids[2] = {};
@@ -92,11 +93,22 @@ static void mfd_acpi_add_device(const struct mfd_cell *cell,
 				}
 			}
 		} else {
-			adev = acpi_find_child_device(parent, match->adr, false);
+			unsigned long long adr;
+			acpi_status status;
+
+			list_for_each_entry(child, &parent->children, node) {
+				status = acpi_evaluate_integer(child->handle,
+							       "_ADR", NULL,
+							       &adr);
+				if (ACPI_SUCCESS(status) && match->adr == adr) {
+					adev = child;
+					break;
+				}
+			}
 		}
 	}
 
-	ACPI_COMPANION_SET(&pdev->dev, adev ?: parent);
+	ACPI_COMPANION_SET(&pdev->dev, adev);
 }
 #else
 static inline void mfd_acpi_add_device(const struct mfd_cell *cell,
@@ -226,8 +238,8 @@ static int mfd_add_device(struct device *parent, int id,
 			goto fail_of_entry;
 	}
 
-	if (cell->swnode) {
-		ret = device_add_software_node(&pdev->dev, cell->swnode);
+	if (cell->properties) {
+		ret = platform_device_add_properties(pdev, cell->properties);
 		if (ret)
 			goto fail_of_entry;
 	}
@@ -266,18 +278,18 @@ static int mfd_add_device(struct device *parent, int id,
 			if (has_acpi_companion(&pdev->dev)) {
 				ret = acpi_check_resource_conflict(&res[r]);
 				if (ret)
-					goto fail_res_conflict;
+					goto fail_of_entry;
 			}
 		}
 	}
 
 	ret = platform_device_add_resources(pdev, res, cell->num_resources);
 	if (ret)
-		goto fail_res_conflict;
+		goto fail_of_entry;
 
 	ret = platform_device_add(pdev);
 	if (ret)
-		goto fail_res_conflict;
+		goto fail_of_entry;
 
 	if (cell->pm_runtime_no_callbacks)
 		pm_runtime_no_callbacks(&pdev->dev);
@@ -286,9 +298,6 @@ static int mfd_add_device(struct device *parent, int id,
 
 	return 0;
 
-fail_res_conflict:
-	if (cell->swnode)
-		device_remove_software_node(&pdev->dev);
 fail_of_entry:
 	list_for_each_entry_safe(of_entry, tmp, &mfd_of_node_list, list)
 		if (of_entry->dev == &pdev->dev) {
@@ -359,9 +368,6 @@ static int mfd_remove_devices_fn(struct device *dev, void *data)
 
 	if (level && cell->level > *level)
 		return 0;
-
-	if (cell->swnode)
-		device_remove_software_node(&pdev->dev);
 
 	regulator_bulk_unregister_supply_alias(dev, cell->parent_supplies,
 					       cell->num_parent_supplies);

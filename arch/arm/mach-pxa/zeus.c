@@ -433,14 +433,10 @@ static const struct property_entry mcp251x_properties[] = {
 	{}
 };
 
-static const struct software_node mcp251x_node = {
-	.properties = mcp251x_properties,
-};
-
 static struct spi_board_info zeus_spi_board_info[] = {
 	[0] = {
 		.modalias	= "mcp2515",
-		.swnode		= &mcp251x_node,
+		.properties	= mcp251x_properties,
 		.irq		= PXA_GPIO_TO_IRQ(ZEUS_CAN_GPIO),
 		.max_speed_hz	= 1*1000*1000,
 		.bus_num	= 3,

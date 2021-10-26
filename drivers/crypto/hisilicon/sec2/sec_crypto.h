@@ -64,6 +64,7 @@ enum sec_addr_type {
 };
 
 struct sec_sqe_type2 {
+
 	/*
 	 * mac_len: 0~4 bits
 	 * a_key_len: 5~10 bits
@@ -118,6 +119,7 @@ struct sec_sqe_type2 {
 
 	/* c_pad_len_field: 0~1 bits */
 	__le16 c_pad_len_field;
+
 
 	__le64 long_a_data_len;
 	__le64 a_ivin_addr;
@@ -209,6 +211,6 @@ struct sec_sqe {
 	struct sec_sqe_type2 type2;
 };
 
-int sec_register_to_crypto(struct hisi_qm *qm);
-void sec_unregister_from_crypto(struct hisi_qm *qm);
+int sec_register_to_crypto(void);
+void sec_unregister_from_crypto(void);
 #endif

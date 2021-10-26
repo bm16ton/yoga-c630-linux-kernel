@@ -32,6 +32,7 @@
 #include <linux/slab.h>
 #include <linux/seq_file.h>
 
+#include <drm/drm_debugfs.h>
 #include <drm/drm_device.h>
 #include <drm/drm_vblank.h>
 #include <drm/radeon_drm.h>
@@ -105,7 +106,7 @@ static const u32 crtc_offsets[2] =
 	AVIVO_D2CRTC_H_TOTAL - AVIVO_D1CRTC_H_TOTAL
 };
 
-static void r600_debugfs_mc_info_init(struct radeon_device *rdev);
+int r600_debugfs_mc_info_init(struct radeon_device *rdev);
 
 /* r600,rv610,rv630,rv620,rv635,rv670 */
 int r600_mc_wait_for_idle(struct radeon_device *rdev);
@@ -2569,7 +2570,6 @@ int r600_init_microcode(struct radeon_device *rdev)
 		pr_err("r600_cp: Bogus length %zu in firmware \"%s\"\n",
 		       rdev->me_fw->size, fw_name);
 		err = -EINVAL;
-		goto out;
 	}
 
 	snprintf(fw_name, sizeof(fw_name), "radeon/%s_rlc.bin", rlc_chip_name);
@@ -2580,7 +2580,6 @@ int r600_init_microcode(struct radeon_device *rdev)
 		pr_err("r600_rlc: Bogus length %zu in firmware \"%s\"\n",
 		       rdev->rlc_fw->size, fw_name);
 		err = -EINVAL;
-		goto out;
 	}
 
 	if ((rdev->family >= CHIP_RV770) && (rdev->family <= CHIP_HEMLOCK)) {
@@ -3252,7 +3251,9 @@ int r600_init(struct radeon_device *rdev)
 {
 	int r;
 
-	r600_debugfs_mc_info_init(rdev);
+	if (r600_debugfs_mc_info_init(rdev)) {
+		DRM_ERROR("Failed to register debugfs file for mc !\n");
+	}
 	/* Read BIOS */
 	if (!radeon_get_bios(rdev)) {
 		if (ASIC_IS_AVIVO(rdev))
@@ -4345,26 +4346,28 @@ restart_ih:
  */
 #if defined(CONFIG_DEBUG_FS)
 
-static int r600_debugfs_mc_info_show(struct seq_file *m, void *unused)
+static int r600_debugfs_mc_info(struct seq_file *m, void *data)
 {
-	struct radeon_device *rdev = (struct radeon_device *)m->private;
+	struct drm_info_node *node = (struct drm_info_node *) m->private;
+	struct drm_device *dev = node->minor->dev;
+	struct radeon_device *rdev = dev->dev_private;
 
 	DREG32_SYS(m, rdev, R_000E50_SRBM_STATUS);
 	DREG32_SYS(m, rdev, VM_L2_STATUS);
 	return 0;
 }
 
-DEFINE_SHOW_ATTRIBUTE(r600_debugfs_mc_info);
+static struct drm_info_list r600_mc_info_list[] = {
+	{"r600_mc_info", r600_debugfs_mc_info, 0, NULL},
+};
 #endif
 
-static void r600_debugfs_mc_info_init(struct radeon_device *rdev)
+int r600_debugfs_mc_info_init(struct radeon_device *rdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	struct dentry *root = rdev->ddev->primary->debugfs_root;
-
-	debugfs_create_file("r600_mc_info", 0444, root, rdev,
-			    &r600_debugfs_mc_info_fops);
-
+	return radeon_debugfs_add_files(rdev, r600_mc_info_list, ARRAY_SIZE(r600_mc_info_list));
+#else
+	return 0;
 #endif
 }
 

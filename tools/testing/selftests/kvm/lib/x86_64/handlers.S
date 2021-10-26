@@ -54,9 +54,9 @@ idt_handlers:
 	.align 8
 
 	/* Fetch current address and append it to idt_handlers. */
-666 :
+	current_handler = .
 .pushsection .rodata
-	.quad 666b
+.quad current_handler
 .popsection
 
 	.if ! \has_error

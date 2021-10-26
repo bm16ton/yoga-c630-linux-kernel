@@ -54,6 +54,7 @@ void __init mem_init(void)
 	memblock_free_all();
 	max_low_pfn = totalram_pages();
 	max_pfn = max_low_pfn;
+	mem_init_print_info(NULL);
 	kmalloc_ok = 1;
 }
 
@@ -72,7 +73,8 @@ static void __init one_page_table_init(pmd_t *pmd)
 
 		set_pmd(pmd, __pmd(_KERNPG_TABLE +
 					   (unsigned long) __pa(pte)));
-		BUG_ON(pte != pte_offset_kernel(pmd, 0));
+		if (pte != pte_offset_kernel(pmd, 0))
+			BUG();
 	}
 }
 

@@ -21,11 +21,10 @@
 #define DRIVER_AUTHOR   "NVIDIA Corporation"
 #define DRIVER_DESC     "VFIO based driver for Mediated device"
 
-static int vfio_mdev_open(struct vfio_device *core_vdev)
+static int vfio_mdev_open(void *device_data)
 {
-	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-	struct mdev_parent *parent = mdev->type->parent;
-
+	struct mdev_device *mdev = device_data;
+	struct mdev_parent *parent = mdev->parent;
 	int ret;
 
 	if (unlikely(!parent->ops->open))
@@ -41,10 +40,10 @@ static int vfio_mdev_open(struct vfio_device *core_vdev)
 	return ret;
 }
 
-static void vfio_mdev_release(struct vfio_device *core_vdev)
+static void vfio_mdev_release(void *device_data)
 {
-	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-	struct mdev_parent *parent = mdev->type->parent;
+	struct mdev_device *mdev = device_data;
+	struct mdev_parent *parent = mdev->parent;
 
 	if (likely(parent->ops->release))
 		parent->ops->release(mdev);
@@ -52,11 +51,11 @@ static void vfio_mdev_release(struct vfio_device *core_vdev)
 	module_put(THIS_MODULE);
 }
 
-static long vfio_mdev_unlocked_ioctl(struct vfio_device *core_vdev,
+static long vfio_mdev_unlocked_ioctl(void *device_data,
 				     unsigned int cmd, unsigned long arg)
 {
-	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-	struct mdev_parent *parent = mdev->type->parent;
+	struct mdev_device *mdev = device_data;
+	struct mdev_parent *parent = mdev->parent;
 
 	if (unlikely(!parent->ops->ioctl))
 		return -EINVAL;
@@ -64,11 +63,11 @@ static long vfio_mdev_unlocked_ioctl(struct vfio_device *core_vdev,
 	return parent->ops->ioctl(mdev, cmd, arg);
 }
 
-static ssize_t vfio_mdev_read(struct vfio_device *core_vdev, char __user *buf,
+static ssize_t vfio_mdev_read(void *device_data, char __user *buf,
 			      size_t count, loff_t *ppos)
 {
-	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-	struct mdev_parent *parent = mdev->type->parent;
+	struct mdev_device *mdev = device_data;
+	struct mdev_parent *parent = mdev->parent;
 
 	if (unlikely(!parent->ops->read))
 		return -EINVAL;
@@ -76,12 +75,11 @@ static ssize_t vfio_mdev_read(struct vfio_device *core_vdev, char __user *buf,
 	return parent->ops->read(mdev, buf, count, ppos);
 }
 
-static ssize_t vfio_mdev_write(struct vfio_device *core_vdev,
-			       const char __user *buf, size_t count,
-			       loff_t *ppos)
+static ssize_t vfio_mdev_write(void *device_data, const char __user *buf,
+			       size_t count, loff_t *ppos)
 {
-	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-	struct mdev_parent *parent = mdev->type->parent;
+	struct mdev_device *mdev = device_data;
+	struct mdev_parent *parent = mdev->parent;
 
 	if (unlikely(!parent->ops->write))
 		return -EINVAL;
@@ -89,11 +87,10 @@ static ssize_t vfio_mdev_write(struct vfio_device *core_vdev,
 	return parent->ops->write(mdev, buf, count, ppos);
 }
 
-static int vfio_mdev_mmap(struct vfio_device *core_vdev,
-			  struct vm_area_struct *vma)
+static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
 {
-	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-	struct mdev_parent *parent = mdev->type->parent;
+	struct mdev_device *mdev = device_data;
+	struct mdev_parent *parent = mdev->parent;
 
 	if (unlikely(!parent->ops->mmap))
 		return -EINVAL;
@@ -101,10 +98,10 @@ static int vfio_mdev_mmap(struct vfio_device *core_vdev,
 	return parent->ops->mmap(mdev, vma);
 }
 
-static void vfio_mdev_request(struct vfio_device *core_vdev, unsigned int count)
+static void vfio_mdev_request(void *device_data, unsigned int count)
 {
-	struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-	struct mdev_parent *parent = mdev->type->parent;
+	struct mdev_device *mdev = device_data;
+	struct mdev_parent *parent = mdev->parent;
 
 	if (parent->ops->request)
 		parent->ops->request(mdev, count);
@@ -124,46 +121,27 @@ static const struct vfio_device_ops vfio_mdev_dev_ops = {
 	.request	= vfio_mdev_request,
 };
 
-static int vfio_mdev_probe(struct mdev_device *mdev)
+static int vfio_mdev_probe(struct device *dev)
 {
-	struct vfio_device *vdev;
-	int ret;
+	struct mdev_device *mdev = to_mdev_device(dev);
 
-	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
-	if (!vdev)
-		return -ENOMEM;
-
-	vfio_init_group_dev(vdev, &mdev->dev, &vfio_mdev_dev_ops);
-	ret = vfio_register_group_dev(vdev);
-	if (ret) {
-		kfree(vdev);
-		return ret;
-	}
-	dev_set_drvdata(&mdev->dev, vdev);
-	return 0;
+	return vfio_add_group_dev(dev, &vfio_mdev_dev_ops, mdev);
 }
 
-static void vfio_mdev_remove(struct mdev_device *mdev)
+static void vfio_mdev_remove(struct device *dev)
 {
-	struct vfio_device *vdev = dev_get_drvdata(&mdev->dev);
-
-	vfio_unregister_group_dev(vdev);
-	kfree(vdev);
+	vfio_del_group_dev(dev);
 }
 
 static struct mdev_driver vfio_mdev_driver = {
-	.driver = {
-		.name = "vfio_mdev",
-		.owner = THIS_MODULE,
-		.mod_name = KBUILD_MODNAME,
-	},
+	.name	= "vfio_mdev",
 	.probe	= vfio_mdev_probe,
 	.remove	= vfio_mdev_remove,
 };
 
 static int __init vfio_mdev_init(void)
 {
-	return mdev_register_driver(&vfio_mdev_driver);
+	return mdev_register_driver(&vfio_mdev_driver, THIS_MODULE);
 }
 
 static void __exit vfio_mdev_exit(void)

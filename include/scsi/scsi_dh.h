@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Header file for SCSI device handler infrastructure.
+ * Header file for SCSI device handler infrastruture.
  *
  * Modified version of patches posted by Mike Christie <michaelc@cs.wisc.edu>
  *
@@ -52,8 +52,7 @@ struct scsi_device_handler {
 	/* Filled by the hardware handler */
 	struct module *module;
 	const char *name;
-	enum scsi_disposition (*check_sense)(struct scsi_device *,
-					     struct scsi_sense_hdr *);
+	int (*check_sense)(struct scsi_device *, struct scsi_sense_hdr *);
 	int (*attach)(struct scsi_device *);
 	void (*detach)(struct scsi_device *);
 	int (*activate)(struct scsi_device *, activate_complete, void *);

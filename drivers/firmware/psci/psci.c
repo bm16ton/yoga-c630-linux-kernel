@@ -23,7 +23,6 @@
 
 #include <asm/cpuidle.h>
 #include <asm/cputype.h>
-#include <asm/hypervisor.h>
 #include <asm/system_misc.h>
 #include <asm/smp_plat.h>
 #include <asm/suspend.h>
@@ -139,7 +138,7 @@ static int psci_to_linux_errno(int errno)
 		return -EINVAL;
 	case PSCI_RET_DENIED:
 		return -EPERM;
-	}
+	};
 
 	return -EINVAL;
 }
@@ -326,9 +325,8 @@ static int __init psci_features(u32 psci_func_id)
 static int psci_suspend_finisher(unsigned long state)
 {
 	u32 power_state = state;
-	phys_addr_t pa_cpu_resume = __pa_symbol(function_nocfi(cpu_resume));
 
-	return psci_ops.cpu_suspend(power_state, pa_cpu_resume);
+	return psci_ops.cpu_suspend(power_state, __pa_symbol(cpu_resume));
 }
 
 int psci_cpu_suspend_enter(u32 state)
@@ -346,10 +344,8 @@ int psci_cpu_suspend_enter(u32 state)
 
 static int psci_system_suspend(unsigned long unused)
 {
-	phys_addr_t pa_cpu_resume = __pa_symbol(function_nocfi(cpu_resume));
-
 	return invoke_psci_fn(PSCI_FN_NATIVE(1_0, SYSTEM_SUSPEND),
-			      pa_cpu_resume, 0, 0);
+			      __pa_symbol(cpu_resume), 0, 0);
 }
 
 static int psci_system_suspend_enter(suspend_state_t state)
@@ -502,7 +498,6 @@ static int __init psci_probe(void)
 		psci_init_cpu_suspend();
 		psci_init_system_suspend();
 		psci_init_system_reset2();
-		kvm_init_hyp_services();
 	}
 
 	return 0;

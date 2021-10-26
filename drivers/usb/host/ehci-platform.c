@@ -286,9 +286,6 @@ static int ehci_platform_probe(struct platform_device *dev)
 		if (of_property_read_bool(dev->dev.of_node, "big-endian"))
 			ehci->big_endian_mmio = ehci->big_endian_desc = 1;
 
-		if (of_property_read_bool(dev->dev.of_node, "spurious-oc"))
-			ehci->spurious_oc = 1;
-
 		if (of_property_read_bool(dev->dev.of_node,
 					  "needs-reset-on-resume"))
 			priv->reset_on_resume = true;
@@ -330,8 +327,6 @@ static int ehci_platform_probe(struct platform_device *dev)
 		hcd->has_tt = 1;
 	if (pdata->reset_on_resume)
 		priv->reset_on_resume = true;
-	if (pdata->spurious_oc)
-		ehci->spurious_oc = 1;
 
 #ifndef CONFIG_USB_EHCI_BIG_ENDIAN_MMIO
 	if (ehci->big_endian_mmio) {

@@ -440,9 +440,10 @@ static struct dentry *nilfs_get_parent(struct dentry *child)
 {
 	unsigned long ino;
 	struct inode *inode;
+	struct qstr dotdot = QSTR_INIT("..", 2);
 	struct nilfs_root *root;
 
-	ino = nilfs_inode_by_name(d_inode(child), &dotdot_name);
+	ino = nilfs_inode_by_name(d_inode(child), &dotdot);
 	if (!ino)
 		return ERR_PTR(-ENOENT);
 
@@ -551,8 +552,6 @@ const struct inode_operations nilfs_dir_inode_operations = {
 	.setattr	= nilfs_setattr,
 	.permission	= nilfs_permission,
 	.fiemap		= nilfs_fiemap,
-	.fileattr_get	= nilfs_fileattr_get,
-	.fileattr_set	= nilfs_fileattr_set,
 };
 
 const struct inode_operations nilfs_special_inode_operations = {

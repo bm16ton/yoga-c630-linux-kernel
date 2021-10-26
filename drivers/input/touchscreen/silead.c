@@ -522,7 +522,7 @@ static int silead_ts_probe(struct i2c_client *client,
 
 	silead_ts_read_props(client);
 
-	/* We must have the IRQ provided by DT or ACPI subsystem */
+	/* We must have the IRQ provided by DT or ACPI subsytem */
 	if (client->irq <= 0)
 		return -ENODEV;
 

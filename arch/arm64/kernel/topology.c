@@ -276,8 +276,8 @@ static int init_amu_fie_callback(struct notifier_block *nb, unsigned long val,
 	 * initialized AMU support and enabled invariance. The AMU counters will
 	 * keep on working just fine in the absence of the cpufreq driver, and
 	 * for the CPUs for which there are no counters available, the last set
-	 * value of arch_freq_scale will remain valid as that is the frequency
-	 * those CPUs are running at.
+	 * value of freq_scale will remain valid as that is the frequency those
+	 * CPUs are running at.
 	 */
 
 	return 0;

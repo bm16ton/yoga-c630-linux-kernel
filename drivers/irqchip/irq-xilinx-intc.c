@@ -210,7 +210,7 @@ static int __init xilinx_intc_of_init(struct device_node *intc,
 
 	/*
 	 * Disable all external interrupts until they are
-	 * explicitly requested.
+	 * explicity requested.
 	 */
 	xintc_write(irqc, IER, 0);
 

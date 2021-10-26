@@ -92,18 +92,6 @@ void usbnet_cdc_update_filter(struct usbnet *dev)
 }
 EXPORT_SYMBOL_GPL(usbnet_cdc_update_filter);
 
-/* We need to override usbnet_*_link_ksettings in bind() */
-static const struct ethtool_ops cdc_ether_ethtool_ops = {
-	.get_link		= usbnet_get_link,
-	.nway_reset		= usbnet_nway_reset,
-	.get_drvinfo		= usbnet_get_drvinfo,
-	.get_msglevel		= usbnet_get_msglevel,
-	.set_msglevel		= usbnet_set_msglevel,
-	.get_ts_info		= ethtool_op_get_ts_info,
-	.get_link_ksettings	= usbnet_get_link_ksettings_internal,
-	.set_link_ksettings	= NULL,
-};
-
 /* probes control interface, claims data interface, collects the bulk
  * endpoints, activates data interface (if needed), maybe sets MTU.
  * all pure cdc, except for certain firmware workarounds, and knowing
@@ -322,9 +310,6 @@ skip:
 		return -ENODEV;
 	}
 
-	/* override ethtool_ops */
-	dev->net->ethtool_ops = &cdc_ether_ethtool_ops;
-
 	return 0;
 
 bad_desc:
@@ -394,10 +379,12 @@ EXPORT_SYMBOL_GPL(usbnet_cdc_unbind);
  * (by Brad Hards) talked with, with more functionality.
  */
 
-static void speed_change(struct usbnet *dev, __le32 *speeds)
+static void dumpspeed(struct usbnet *dev, __le32 *speeds)
 {
-	dev->tx_speed = __le32_to_cpu(speeds[0]);
-	dev->rx_speed = __le32_to_cpu(speeds[1]);
+	netif_info(dev, timer, dev->net,
+		   "link speeds: %u kbps up, %u kbps down\n",
+		   __le32_to_cpu(speeds[0]) / 1000,
+		   __le32_to_cpu(speeds[1]) / 1000);
 }
 
 void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
@@ -409,7 +396,7 @@ void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
 
 	/* SPEED_CHANGE can get split into two 8-byte packets */
 	if (test_and_clear_bit(EVENT_STS_SPLIT, &dev->flags)) {
-		speed_change(dev, (__le32 *) urb->transfer_buffer);
+		dumpspeed(dev, (__le32 *) urb->transfer_buffer);
 		return;
 	}
 
@@ -426,7 +413,7 @@ void usbnet_cdc_status(struct usbnet *dev, struct urb *urb)
 		if (urb->actual_length != (sizeof(*event) + 8))
 			set_bit(EVENT_STS_SPLIT, &dev->flags);
 		else
-			speed_change(dev, (__le32 *) &event[1]);
+			dumpspeed(dev, (__le32 *) &event[1]);
 		break;
 	/* USB_CDC_NOTIFY_RESPONSE_AVAILABLE can happen too (e.g. RNDIS),
 	 * but there are no standard formats for the response data.

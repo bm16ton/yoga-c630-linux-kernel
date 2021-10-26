@@ -98,13 +98,15 @@ structure to represent a mediated device's driver::
 
      /*
       * struct mdev_driver [2] - Mediated device's driver
+      * @name: driver name
       * @probe: called when new device created
       * @remove: called when device removed
       * @driver: device driver structure
       */
      struct mdev_driver {
-	     int  (*probe)  (struct mdev_device *dev);
-	     void (*remove) (struct mdev_device *dev);
+	     const char *name;
+	     int  (*probe)  (struct device *dev);
+	     void (*remove) (struct device *dev);
 	     struct device_driver    driver;
      };
 
@@ -113,7 +115,8 @@ to register and unregister itself with the core driver:
 
 * Register::
 
-    extern int  mdev_register_driver(struct mdev_driver *drv);
+    extern int  mdev_register_driver(struct mdev_driver *drv,
+				   struct module *owner);
 
 * Unregister::
 

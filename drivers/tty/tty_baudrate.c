@@ -8,7 +8,6 @@
 #include <linux/termios.h>
 #include <linux/tty.h>
 #include <linux/export.h>
-#include "tty.h"
 
 
 /*

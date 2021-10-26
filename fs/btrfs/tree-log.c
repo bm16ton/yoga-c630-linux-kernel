@@ -4157,8 +4157,7 @@ static noinline int copy_items(struct btrfs_trans_handle *trans,
 	return ret;
 }
 
-static int extent_cmp(void *priv, const struct list_head *a,
-		      const struct list_head *b)
+static int extent_cmp(void *priv, struct list_head *a, struct list_head *b)
 {
 	struct extent_map *em1, *em2;
 
@@ -5515,29 +5514,16 @@ log_extents:
 		spin_lock(&inode->lock);
 		inode->logged_trans = trans->transid;
 		/*
-		 * Don't update last_log_commit if we logged that an inode exists.
-		 * We do this for two reasons:
-		 *
-		 * 1) We might have had buffered writes to this inode that were
-		 *    flushed and had their ordered extents completed in this
-		 *    transaction, but we did not previously log the inode with
-		 *    LOG_INODE_ALL. Later the inode was evicted and after that
-		 *    it was loaded again and this LOG_INODE_EXISTS log operation
-		 *    happened. We must make sure that if an explicit fsync against
-		 *    the inode is performed later, it logs the new extents, an
-		 *    updated inode item, etc, and syncs the log. The same logic
-		 *    applies to direct IO writes instead of buffered writes.
-		 *
-		 * 2) When we log the inode with LOG_INODE_EXISTS, its inode item
-		 *    is logged with an i_size of 0 or whatever value was logged
-		 *    before. If later the i_size of the inode is increased by a
-		 *    truncate operation, the log is synced through an fsync of
-		 *    some other inode and then finally an explicit fsync against
-		 *    this inode is made, we must make sure this fsync logs the
-		 *    inode with the new i_size, the hole between old i_size and
-		 *    the new i_size, and syncs the log.
+		 * Don't update last_log_commit if we logged that an inode exists
+		 * after it was loaded to memory (full_sync bit set).
+		 * This is to prevent data loss when we do a write to the inode,
+		 * then the inode gets evicted after all delalloc was flushed,
+		 * then we log it exists (due to a rename for example) and then
+		 * fsync it. This last fsync would do nothing (not logging the
+		 * extents previously written).
 		 */
-		if (inode_only != LOG_INODE_EXISTS)
+		if (inode_only != LOG_INODE_EXISTS ||
+		    !test_bit(BTRFS_INODE_NEEDS_FULL_SYNC, &inode->runtime_flags))
 			inode->last_log_commit = inode->last_sub_trans;
 		spin_unlock(&inode->lock);
 	}
@@ -6314,13 +6300,8 @@ again:
 		}
 
 		wc.replay_dest->log_root = log;
-		ret = btrfs_record_root_in_trans(trans, wc.replay_dest);
-		if (ret)
-			/* The loop needs to continue due to the root refs */
-			btrfs_handle_fs_error(fs_info, ret,
-				"failed to record the log root in transaction");
-		else
-			ret = walk_log_tree(trans, log, &wc);
+		btrfs_record_root_in_trans(trans, wc.replay_dest);
+		ret = walk_log_tree(trans, log, &wc);
 
 		if (!ret && wc.stage == LOG_WALK_REPLAY_ALL) {
 			ret = fixup_inode_link_counts(trans, wc.replay_dest,
@@ -6492,8 +6473,8 @@ void btrfs_log_new_name(struct btrfs_trans_handle *trans,
 	 * if this inode hasn't been logged and directory we're renaming it
 	 * from hasn't been logged, we don't need to log it
 	 */
-	if (!inode_logged(trans, inode) &&
-	    (!old_dir || !inode_logged(trans, old_dir)))
+	if (inode->logged_trans < trans->transid &&
+	    (!old_dir || old_dir->logged_trans < trans->transid))
 		return;
 
 	/*

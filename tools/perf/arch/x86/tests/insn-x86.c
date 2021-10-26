@@ -96,12 +96,13 @@ static int get_branch(const char *branch_str)
 static int test_data_item(struct test_data *dat, int x86_64)
 {
 	struct intel_pt_insn intel_pt_insn;
-	int op, branch, ret;
 	struct insn insn;
+	int op, branch;
 
-	ret = insn_decode(&insn, dat->data, MAX_INSN_SIZE,
-			  x86_64 ? INSN_MODE_64 : INSN_MODE_32);
-	if (ret < 0) {
+	insn_init(&insn, dat->data, MAX_INSN_SIZE, x86_64);
+	insn_get_length(&insn);
+
+	if (!insn_complete(&insn)) {
 		pr_debug("Failed to decode: %s\n", dat->asm_rep);
 		return -1;
 	}

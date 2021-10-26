@@ -69,7 +69,16 @@ static const char * const iommu_group_resv_type_string[] = {
 };
 
 #define IOMMU_CMD_LINE_DMA_API		BIT(0)
-#define IOMMU_CMD_LINE_STRICT		BIT(1)
+
+static void iommu_set_cmd_line_dma_api(void)
+{
+	iommu_cmd_line |= IOMMU_CMD_LINE_DMA_API;
+}
+
+static bool iommu_cmd_line_dma_api(void)
+{
+	return !!(iommu_cmd_line & IOMMU_CMD_LINE_DMA_API);
+}
 
 static int iommu_alloc_default_domain(struct iommu_group *group,
 				      struct device *dev);
@@ -121,7 +130,9 @@ static const char *iommu_domain_type_str(unsigned int t)
 
 static int __init iommu_subsys_init(void)
 {
-	if (!(iommu_cmd_line & IOMMU_CMD_LINE_DMA_API)) {
+	bool cmd_line = iommu_cmd_line_dma_api();
+
+	if (!cmd_line) {
 		if (IS_ENABLED(CONFIG_IOMMU_DEFAULT_PASSTHROUGH))
 			iommu_set_default_passthrough(false);
 		else
@@ -135,32 +146,14 @@ static int __init iommu_subsys_init(void)
 
 	pr_info("Default domain type: %s %s\n",
 		iommu_domain_type_str(iommu_def_domain_type),
-		(iommu_cmd_line & IOMMU_CMD_LINE_DMA_API) ?
-			"(set via kernel command line)" : "");
+		cmd_line ? "(set via kernel command line)" : "");
 
 	return 0;
 }
 subsys_initcall(iommu_subsys_init);
 
-/**
- * iommu_device_register() - Register an IOMMU hardware instance
- * @iommu: IOMMU handle for the instance
- * @ops:   IOMMU ops to associate with the instance
- * @hwdev: (optional) actual instance device, used for fwnode lookup
- *
- * Return: 0 on success, or an error.
- */
-int iommu_device_register(struct iommu_device *iommu,
-			  const struct iommu_ops *ops, struct device *hwdev)
+int iommu_device_register(struct iommu_device *iommu)
 {
-	/* We need to be able to take module references appropriately */
-	if (WARN_ON(is_module_address((unsigned long)ops) && !ops->owner))
-		return -EINVAL;
-
-	iommu->ops = ops;
-	if (hwdev)
-		iommu->fwnode = hwdev->fwnode;
-
 	spin_lock(&iommu_device_lock);
 	list_add_tail(&iommu->list, &iommu_device_list);
 	spin_unlock(&iommu_device_lock);
@@ -336,28 +329,9 @@ early_param("iommu.passthrough", iommu_set_def_domain_type);
 
 static int __init iommu_dma_setup(char *str)
 {
-	int ret = kstrtobool(str, &iommu_dma_strict);
-
-	if (!ret)
-		iommu_cmd_line |= IOMMU_CMD_LINE_STRICT;
-	return ret;
+	return kstrtobool(str, &iommu_dma_strict);
 }
 early_param("iommu.strict", iommu_dma_setup);
-
-void iommu_set_dma_strict(bool strict)
-{
-	if (strict || !(iommu_cmd_line & IOMMU_CMD_LINE_STRICT))
-		iommu_dma_strict = strict;
-}
-
-bool iommu_get_dma_strict(struct iommu_domain *domain)
-{
-	/* only allow lazy flushing for DMA domains */
-	if (domain->type == IOMMU_DOMAIN_DMA)
-		return iommu_dma_strict;
-	return true;
-}
-EXPORT_SYMBOL_GPL(iommu_get_dma_strict);
 
 static ssize_t iommu_group_attr_show(struct kobject *kobj,
 				     struct attribute *__attr, char *buf)
@@ -1537,6 +1511,14 @@ static int iommu_group_alloc_default_domain(struct bus_type *bus,
 	group->default_domain = dom;
 	if (!group->domain)
 		group->domain = dom;
+
+	if (!iommu_dma_strict) {
+		int attr = 1;
+		iommu_domain_set_attr(dom,
+				      DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE,
+				      &attr);
+	}
+
 	return 0;
 }
 
@@ -2628,6 +2610,17 @@ size_t iommu_map_sg_atomic(struct iommu_domain *domain, unsigned long iova,
 	return __iommu_map_sg(domain, iova, sg, nents, prot, GFP_ATOMIC);
 }
 
+int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
+			       phys_addr_t paddr, u64 size, int prot)
+{
+	if (unlikely(domain->ops->domain_window_enable == NULL))
+		return -ENODEV;
+
+	return domain->ops->domain_window_enable(domain, wnd_nr, paddr, size,
+						 prot);
+}
+EXPORT_SYMBOL_GPL(iommu_domain_window_enable);
+
 /**
  * report_iommu_fault() - report about an IOMMU fault to the IOMMU framework
  * @domain: the iommu domain where the fault has happened
@@ -2682,26 +2675,50 @@ static int __init iommu_init(void)
 }
 core_initcall(iommu_init);
 
-int iommu_enable_nesting(struct iommu_domain *domain)
+int iommu_domain_get_attr(struct iommu_domain *domain,
+			  enum iommu_attr attr, void *data)
 {
-	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-		return -EINVAL;
-	if (!domain->ops->enable_nesting)
-		return -EINVAL;
-	return domain->ops->enable_nesting(domain);
-}
-EXPORT_SYMBOL_GPL(iommu_enable_nesting);
+	struct iommu_domain_geometry *geometry;
+	bool *paging;
+	int ret = 0;
 
-int iommu_set_pgtable_quirks(struct iommu_domain *domain,
-		unsigned long quirk)
-{
-	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-		return -EINVAL;
-	if (!domain->ops->set_pgtable_quirks)
-		return -EINVAL;
-	return domain->ops->set_pgtable_quirks(domain, quirk);
+	switch (attr) {
+	case DOMAIN_ATTR_GEOMETRY:
+		geometry  = data;
+		*geometry = domain->geometry;
+
+		break;
+	case DOMAIN_ATTR_PAGING:
+		paging  = data;
+		*paging = (domain->pgsize_bitmap != 0UL);
+		break;
+	default:
+		if (!domain->ops->domain_get_attr)
+			return -EINVAL;
+
+		ret = domain->ops->domain_get_attr(domain, attr, data);
+	}
+
+	return ret;
 }
-EXPORT_SYMBOL_GPL(iommu_set_pgtable_quirks);
+EXPORT_SYMBOL_GPL(iommu_domain_get_attr);
+
+int iommu_domain_set_attr(struct iommu_domain *domain,
+			  enum iommu_attr attr, void *data)
+{
+	int ret = 0;
+
+	switch (attr) {
+	default:
+		if (domain->ops->domain_set_attr == NULL)
+			return -EINVAL;
+
+		ret = domain->ops->domain_set_attr(domain, attr, data);
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
 
 void iommu_get_resv_regions(struct device *dev, struct list_head *list)
 {
@@ -2760,14 +2777,16 @@ EXPORT_SYMBOL_GPL(iommu_alloc_resv_region);
 void iommu_set_default_passthrough(bool cmd_line)
 {
 	if (cmd_line)
-		iommu_cmd_line |= IOMMU_CMD_LINE_DMA_API;
+		iommu_set_cmd_line_dma_api();
+
 	iommu_def_domain_type = IOMMU_DOMAIN_IDENTITY;
 }
 
 void iommu_set_default_translated(bool cmd_line)
 {
 	if (cmd_line)
-		iommu_cmd_line |= IOMMU_CMD_LINE_DMA_API;
+		iommu_set_cmd_line_dma_api();
+
 	iommu_def_domain_type = IOMMU_DOMAIN_DMA;
 }
 

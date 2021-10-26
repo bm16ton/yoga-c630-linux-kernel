@@ -126,8 +126,7 @@ bpf_local_storage_lookup(struct bpf_local_storage *local_storage,
 			 struct bpf_local_storage_map *smap,
 			 bool cacheit_lockit);
 
-void bpf_local_storage_map_free(struct bpf_local_storage_map *smap,
-				int __percpu *busy_counter);
+void bpf_local_storage_map_free(struct bpf_local_storage_map *smap);
 
 int bpf_local_storage_map_check_btf(const struct bpf_map *map,
 				    const struct btf *btf,

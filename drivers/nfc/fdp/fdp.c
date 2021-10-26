@@ -176,7 +176,7 @@ static void fdp_nci_set_data_pkt_counter(struct nci_dev *ndev,
  *
  * The firmware will be analyzed and applied when we send NCI_OP_PROP_PATCH_CMD
  * command with NCI_PATCH_TYPE_EOT parameter. The device will send a
- * NFCC_PATCH_NTF packet and a NCI_OP_CORE_RESET_NTF packet.
+ * NFCC_PATCH_NTF packaet and a NCI_OP_CORE_RESET_NTF packet.
  */
 static int fdp_nci_send_patch(struct nci_dev *ndev, u8 conn_id, u8 type)
 {
@@ -236,12 +236,15 @@ static int fdp_nci_send_patch(struct nci_dev *ndev, u8 conn_id, u8 type)
 
 static int fdp_nci_open(struct nci_dev *ndev)
 {
+	int r;
 	struct fdp_nci_info *info = nci_get_drvdata(ndev);
 	struct device *dev = &info->phy->i2c_dev->dev;
 
 	dev_dbg(dev, "%s\n", __func__);
 
-	return info->phy_ops->enable(info->phy);
+	r = info->phy_ops->enable(info->phy);
+
+	return r;
 }
 
 static int fdp_nci_close(struct nci_dev *ndev)
@@ -344,7 +347,7 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 	int r = 0;
 
 	if (info->otp_version >= info->otp_patch_version)
-		return r;
+		goto out;
 
 	info->setup_patch_sent = 0;
 	info->setup_reset_ntf = 0;
@@ -353,17 +356,19 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 	/* Patch init request */
 	r = fdp_nci_patch_cmd(ndev, NCI_PATCH_TYPE_OTP);
 	if (r)
-		return r;
+		goto out;
 
 	/* Patch data connection creation */
 	conn_id = fdp_nci_create_conn(ndev);
-	if (conn_id < 0)
-		return conn_id;
+	if (conn_id < 0) {
+		r = conn_id;
+		goto out;
+	}
 
 	/* Send the patch over the data connection */
 	r = fdp_nci_send_patch(ndev, conn_id, NCI_PATCH_TYPE_OTP);
 	if (r)
-		return r;
+		goto out;
 
 	/* Wait for all the packets to be send over i2c */
 	wait_event_interruptible(info->setup_wq,
@@ -375,12 +380,13 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 	/* Close the data connection */
 	r = nci_core_conn_close(info->ndev, conn_id);
 	if (r)
-		return r;
+		goto out;
 
 	/* Patch finish message */
 	if (fdp_nci_patch_cmd(ndev, NCI_PATCH_TYPE_EOT)) {
 		nfc_err(dev, "OTP patch error 0x%x\n", r);
-		return -EINVAL;
+		r = -EINVAL;
+		goto out;
 	}
 
 	/* If the patch notification didn't arrive yet, wait for it */
@@ -390,7 +396,8 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 	r = info->setup_patch_status;
 	if (r) {
 		nfc_err(dev, "OTP patch error 0x%x\n", r);
-		return -EINVAL;
+		r = -EINVAL;
+		goto out;
 	}
 
 	/*
@@ -399,6 +406,7 @@ static int fdp_nci_patch_otp(struct nci_dev *ndev)
 	 */
 	wait_event_interruptible(info->setup_wq, info->setup_reset_ntf);
 
+out:
 	return r;
 }
 
@@ -410,7 +418,7 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 	int r = 0;
 
 	if (info->ram_version >= info->ram_patch_version)
-		return r;
+		goto out;
 
 	info->setup_patch_sent = 0;
 	info->setup_reset_ntf = 0;
@@ -419,17 +427,19 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 	/* Patch init request */
 	r = fdp_nci_patch_cmd(ndev, NCI_PATCH_TYPE_RAM);
 	if (r)
-		return r;
+		goto out;
 
 	/* Patch data connection creation */
 	conn_id = fdp_nci_create_conn(ndev);
-	if (conn_id < 0)
-		return conn_id;
+	if (conn_id < 0) {
+		r = conn_id;
+		goto out;
+	}
 
 	/* Send the patch over the data connection */
 	r = fdp_nci_send_patch(ndev, conn_id, NCI_PATCH_TYPE_RAM);
 	if (r)
-		return r;
+		goto out;
 
 	/* Wait for all the packets to be send over i2c */
 	wait_event_interruptible(info->setup_wq,
@@ -441,12 +451,13 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 	/* Close the data connection */
 	r = nci_core_conn_close(info->ndev, conn_id);
 	if (r)
-		return r;
+		goto out;
 
 	/* Patch finish message */
 	if (fdp_nci_patch_cmd(ndev, NCI_PATCH_TYPE_EOT)) {
 		nfc_err(dev, "RAM patch error 0x%x\n", r);
-		return -EINVAL;
+		r = -EINVAL;
+		goto out;
 	}
 
 	/* If the patch notification didn't arrive yet, wait for it */
@@ -456,7 +467,8 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 	r = info->setup_patch_status;
 	if (r) {
 		nfc_err(dev, "RAM patch error 0x%x\n", r);
-		return -EINVAL;
+		r = -EINVAL;
+		goto out;
 	}
 
 	/*
@@ -465,6 +477,7 @@ static int fdp_nci_patch_ram(struct nci_dev *ndev)
 	 */
 	wait_event_interruptible(info->setup_wq, info->setup_reset_ntf);
 
+out:
 	return r;
 }
 

@@ -81,10 +81,11 @@ static struct dentry *ext2_lookup(struct inode * dir, struct dentry *dentry, uns
 
 struct dentry *ext2_get_parent(struct dentry *child)
 {
+	struct qstr dotdot = QSTR_INIT("..", 2);
 	ino_t ino;
 	int res;
 
-	res = ext2_inode_by_name(d_inode(child), &dotdot_name, &ino);
+	res = ext2_inode_by_name(d_inode(child), &dotdot, &ino);
 	if (res)
 		return ERR_PTR(res);
 
@@ -280,21 +281,19 @@ static int ext2_unlink(struct inode * dir, struct dentry *dentry)
 	struct inode * inode = d_inode(dentry);
 	struct ext2_dir_entry_2 * de;
 	struct page * page;
-	void *page_addr;
 	int err;
 
 	err = dquot_initialize(dir);
 	if (err)
 		goto out;
 
-	de = ext2_find_entry(dir, &dentry->d_name, &page, &page_addr);
+	de = ext2_find_entry(dir, &dentry->d_name, &page);
 	if (IS_ERR(de)) {
 		err = PTR_ERR(de);
 		goto out;
 	}
 
-	err = ext2_delete_entry (de, page, page_addr);
-	ext2_put_page(page, page_addr);
+	err = ext2_delete_entry (de, page);
 	if (err)
 		goto out;
 
@@ -329,10 +328,8 @@ static int ext2_rename (struct user_namespace * mnt_userns,
 	struct inode * old_inode = d_inode(old_dentry);
 	struct inode * new_inode = d_inode(new_dentry);
 	struct page * dir_page = NULL;
-	void *dir_page_addr;
 	struct ext2_dir_entry_2 * dir_de = NULL;
 	struct page * old_page;
-	void *old_page_addr;
 	struct ext2_dir_entry_2 * old_de;
 	int err;
 
@@ -347,8 +344,7 @@ static int ext2_rename (struct user_namespace * mnt_userns,
 	if (err)
 		goto out;
 
-	old_de = ext2_find_entry(old_dir, &old_dentry->d_name, &old_page,
-				 &old_page_addr);
+	old_de = ext2_find_entry(old_dir, &old_dentry->d_name, &old_page);
 	if (IS_ERR(old_de)) {
 		err = PTR_ERR(old_de);
 		goto out;
@@ -356,13 +352,12 @@ static int ext2_rename (struct user_namespace * mnt_userns,
 
 	if (S_ISDIR(old_inode->i_mode)) {
 		err = -EIO;
-		dir_de = ext2_dotdot(old_inode, &dir_page, &dir_page_addr);
+		dir_de = ext2_dotdot(old_inode, &dir_page);
 		if (!dir_de)
 			goto out_old;
 	}
 
 	if (new_inode) {
-		void *page_addr;
 		struct page *new_page;
 		struct ext2_dir_entry_2 *new_de;
 
@@ -370,14 +365,12 @@ static int ext2_rename (struct user_namespace * mnt_userns,
 		if (dir_de && !ext2_empty_dir (new_inode))
 			goto out_dir;
 
-		new_de = ext2_find_entry(new_dir, &new_dentry->d_name,
-					 &new_page, &page_addr);
+		new_de = ext2_find_entry(new_dir, &new_dentry->d_name, &new_page);
 		if (IS_ERR(new_de)) {
 			err = PTR_ERR(new_de);
 			goto out_dir;
 		}
-		ext2_set_link(new_dir, new_de, new_page, page_addr, old_inode, 1);
-		ext2_put_page(new_page, page_addr);
+		ext2_set_link(new_dir, new_de, new_page, old_inode, 1);
 		new_inode->i_ctime = current_time(new_inode);
 		if (dir_de)
 			drop_nlink(new_inode);
@@ -397,25 +390,23 @@ static int ext2_rename (struct user_namespace * mnt_userns,
 	old_inode->i_ctime = current_time(old_inode);
 	mark_inode_dirty(old_inode);
 
-	ext2_delete_entry(old_de, old_page, old_page_addr);
+	ext2_delete_entry (old_de, old_page);
 
 	if (dir_de) {
 		if (old_dir != new_dir)
-			ext2_set_link(old_inode, dir_de, dir_page,
-				      dir_page_addr, new_dir, 0);
-
-		ext2_put_page(dir_page, dir_page_addr);
+			ext2_set_link(old_inode, dir_de, dir_page, new_dir, 0);
+		else
+			ext2_put_page(dir_page);
 		inode_dec_link_count(old_dir);
 	}
-
-	ext2_put_page(old_page, old_page_addr);
 	return 0;
+
 
 out_dir:
 	if (dir_de)
-		ext2_put_page(dir_page, dir_page_addr);
+		ext2_put_page(dir_page);
 out_old:
-	ext2_put_page(old_page, old_page_addr);
+	ext2_put_page(old_page);
 out:
 	return err;
 }
@@ -436,8 +427,6 @@ const struct inode_operations ext2_dir_inode_operations = {
 	.get_acl	= ext2_get_acl,
 	.set_acl	= ext2_set_acl,
 	.tmpfile	= ext2_tmpfile,
-	.fileattr_get	= ext2_fileattr_get,
-	.fileattr_set	= ext2_fileattr_set,
 };
 
 const struct inode_operations ext2_special_inode_operations = {

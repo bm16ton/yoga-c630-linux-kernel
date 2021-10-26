@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
- * Copyright (C) 2018-2021 Linaro Ltd.
+ * Copyright (C) 2018-2020 Linaro Ltd.
  */
 
 #include <linux/types.h>
@@ -22,7 +22,6 @@
 #include "ipa_clock.h"
 #include "ipa_data.h"
 #include "ipa_endpoint.h"
-#include "ipa_resource.h"
 #include "ipa_cmd.h"
 #include "ipa_reg.h"
 #include "ipa_mem.h"
@@ -67,7 +66,7 @@
  */
 
 /* The name of the GSI firmware file relative to /lib/firmware */
-#define IPA_FW_PATH_DEFAULT	"ipa_fws.mdt"
+#define IPA_FWS_PATH		"ipa_fws.mdt"
 #define IPA_PAS_ID		15
 
 /* Shift of 19.2 MHz timestamp to achieve lower resolution timestamps */
@@ -147,13 +146,13 @@ int ipa_setup(struct ipa *ipa)
 	if (ret)
 		goto err_endpoint_teardown;
 
-	ret = ipa_mem_setup(ipa);	/* No matching teardown required */
+	ret = ipa_mem_setup(ipa);
 	if (ret)
 		goto err_command_disable;
 
-	ret = ipa_table_setup(ipa);	/* No matching teardown required */
+	ret = ipa_table_setup(ipa);
 	if (ret)
-		goto err_command_disable;
+		goto err_mem_teardown;
 
 	/* Enable the exception handling endpoint, and tell the hardware
 	 * to use it by default.
@@ -161,7 +160,7 @@ int ipa_setup(struct ipa *ipa)
 	exception_endpoint = ipa->name_map[IPA_ENDPOINT_AP_LAN_RX];
 	ret = ipa_endpoint_enable_one(exception_endpoint);
 	if (ret)
-		goto err_command_disable;
+		goto err_table_teardown;
 
 	ipa_endpoint_default_route_set(ipa, exception_endpoint->endpoint_id);
 
@@ -179,6 +178,10 @@ int ipa_setup(struct ipa *ipa)
 err_default_route_clear:
 	ipa_endpoint_default_route_clear(ipa);
 	ipa_endpoint_disable_one(exception_endpoint);
+err_table_teardown:
+	ipa_table_teardown(ipa);
+err_mem_teardown:
+	ipa_mem_teardown(ipa);
 err_command_disable:
 	ipa_endpoint_disable_one(command_endpoint);
 err_endpoint_teardown:
@@ -207,6 +210,8 @@ static void ipa_teardown(struct ipa *ipa)
 	ipa_endpoint_default_route_clear(ipa);
 	exception_endpoint = ipa->name_map[IPA_ENDPOINT_AP_LAN_RX];
 	ipa_endpoint_disable_one(exception_endpoint);
+	ipa_table_teardown(ipa);
+	ipa_mem_teardown(ipa);
 	command_endpoint = ipa->name_map[IPA_ENDPOINT_AP_COMMAND_TX];
 	ipa_endpoint_disable_one(command_endpoint);
 	ipa_endpoint_teardown(ipa);
@@ -217,13 +222,13 @@ static void ipa_teardown(struct ipa *ipa)
 	gsi_teardown(&ipa->gsi);
 }
 
-/* Configure bus access behavior for IPA components */
+/* Configure QMB Core Master Port selection */
 static void ipa_hardware_config_comp(struct ipa *ipa)
 {
 	u32 val;
 
-	/* Nothing to configure prior to IPA v4.0 */
-	if (ipa->version < IPA_VERSION_4_0)
+	/* Nothing to configure for IPA v3.5.1 */
+	if (ipa->version == IPA_VERSION_3_5_1)
 		return;
 
 	val = ioread32(ipa->reg_virt + IPA_REG_COMP_CFG_OFFSET);
@@ -244,57 +249,54 @@ static void ipa_hardware_config_comp(struct ipa *ipa)
 	iowrite32(val, ipa->reg_virt + IPA_REG_COMP_CFG_OFFSET);
 }
 
-/* Configure DDR and (possibly) PCIe max read/write QSB values */
-static void
-ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
+/* Configure DDR and PCIe max read/write QSB values */
+static void ipa_hardware_config_qsb(struct ipa *ipa)
 {
-	const struct ipa_qsb_data *data0;
-	const struct ipa_qsb_data *data1;
+	enum ipa_version version = ipa->version;
+	u32 max0;
+	u32 max1;
 	u32 val;
 
-	/* assert(data->qsb_count > 0); */
-	/* assert(data->qsb_count < 3); */
-
-	/* QMB 0 represents DDR; QMB 1 (if present) represents PCIe */
-	data0 = &data->qsb_data[IPA_QSB_MASTER_DDR];
-	if (data->qsb_count > 1)
-		data1 = &data->qsb_data[IPA_QSB_MASTER_PCIE];
-
-	/* Max outstanding write accesses for QSB masters */
-	val = u32_encode_bits(data0->max_writes, GEN_QMB_0_MAX_WRITES_FMASK);
-	if (data->qsb_count > 1)
-		val |= u32_encode_bits(data1->max_writes,
-				       GEN_QMB_1_MAX_WRITES_FMASK);
+	/* QMB_0 represents DDR; QMB_1 represents PCIe */
+	val = u32_encode_bits(8, GEN_QMB_0_MAX_WRITES_FMASK);
+	switch (version) {
+	case IPA_VERSION_4_2:
+		max1 = 0;		/* PCIe not present */
+		break;
+	case IPA_VERSION_4_5:
+		max1 = 8;
+		break;
+	default:
+		max1 = 4;
+		break;
+	}
+	val |= u32_encode_bits(max1, GEN_QMB_1_MAX_WRITES_FMASK);
 	iowrite32(val, ipa->reg_virt + IPA_REG_QSB_MAX_WRITES_OFFSET);
 
-	/* Max outstanding read accesses for QSB masters */
-	val = u32_encode_bits(data0->max_reads, GEN_QMB_0_MAX_READS_FMASK);
-	if (ipa->version >= IPA_VERSION_4_0)
-		val |= u32_encode_bits(data0->max_reads_beats,
-				       GEN_QMB_0_MAX_READS_BEATS_FMASK);
-	if (data->qsb_count > 1) {
-		val |= u32_encode_bits(data1->max_reads,
-				       GEN_QMB_1_MAX_READS_FMASK);
-		if (ipa->version >= IPA_VERSION_4_0)
-			val |= u32_encode_bits(data1->max_reads_beats,
-					       GEN_QMB_1_MAX_READS_BEATS_FMASK);
+	max1 = 12;
+	switch (version) {
+	case IPA_VERSION_3_5_1:
+		max0 = 8;
+		break;
+	case IPA_VERSION_4_0:
+	case IPA_VERSION_4_1:
+		max0 = 12;
+		break;
+	case IPA_VERSION_4_2:
+		max0 = 12;
+		max1 = 0;		/* PCIe not present */
+		break;
+	case IPA_VERSION_4_5:
+		max0 = 0;		/* No limit (hardware maximum) */
+		break;
+	}
+	val = u32_encode_bits(max0, GEN_QMB_0_MAX_READS_FMASK);
+	val |= u32_encode_bits(max1, GEN_QMB_1_MAX_READS_FMASK);
+	if (version != IPA_VERSION_3_5_1) {
+		/* GEN_QMB_0_MAX_READS_BEATS is 0 */
+		/* GEN_QMB_1_MAX_READS_BEATS is 0 */
 	}
 	iowrite32(val, ipa->reg_virt + IPA_REG_QSB_MAX_READS_OFFSET);
-}
-
-/* The internal inactivity timer clock is used for the aggregation timer */
-#define TIMER_FREQUENCY	32000		/* 32 KHz inactivity timer clock */
-
-/* Compute the value to use in the COUNTER_CFG register AGGR_GRANULARITY
- * field to represent the given number of microseconds.  The value is one
- * less than the number of timer ticks in the requested period.  0 is not
- * a valid granularity value.
- */
-static u32 ipa_aggr_granularity_val(u32 usec)
-{
-	/* assert(usec != 0); */
-
-	return DIV_ROUND_CLOSEST(usec * TIMER_FREQUENCY, USEC_PER_SEC) - 1;
 }
 
 /* IPA uses unified Qtime starting at IPA v4.5, implementing various
@@ -383,22 +385,21 @@ static void ipa_hardware_dcd_deconfig(struct ipa *ipa)
 /**
  * ipa_hardware_config() - Primitive hardware initialization
  * @ipa:	IPA pointer
- * @data:	IPA configuration data
  */
-static void ipa_hardware_config(struct ipa *ipa, const struct ipa_data *data)
+static void ipa_hardware_config(struct ipa *ipa)
 {
 	enum ipa_version version = ipa->version;
 	u32 granularity;
 	u32 val;
 
-	/* IPA v4.5+ has no backward compatibility register */
+	/* IPA v4.5 has no backward compatibility register */
 	if (version < IPA_VERSION_4_5) {
-		val = data->backward_compat;
+		val = ipa_reg_bcr_val(version);
 		iowrite32(val, ipa->reg_virt + IPA_REG_BCR_OFFSET);
 	}
 
 	/* Implement some hardware workarounds */
-	if (version >= IPA_VERSION_4_0 && version < IPA_VERSION_4_5) {
+	if (version != IPA_VERSION_3_5_1 && version < IPA_VERSION_4_5) {
 		/* Enable open global clocks (not needed for IPA v4.5) */
 		val = GLOBAL_FMASK;
 		val |= GLOBAL_2X_CLK_FMASK;
@@ -413,7 +414,7 @@ static void ipa_hardware_config(struct ipa *ipa, const struct ipa_data *data)
 	ipa_hardware_config_comp(ipa);
 
 	/* Configure system bus limits */
-	ipa_hardware_config_qsb(ipa, data);
+	ipa_hardware_config_qsb(ipa);
 
 	if (version < IPA_VERSION_4_5) {
 		/* Configure aggregation timer granularity */
@@ -447,6 +448,151 @@ static void ipa_hardware_deconfig(struct ipa *ipa)
 	ipa_hardware_dcd_deconfig(ipa);
 }
 
+#ifdef IPA_VALIDATION
+
+static bool ipa_resource_limits_valid(struct ipa *ipa,
+				      const struct ipa_resource_data *data)
+{
+	u32 group_count;
+	u32 i;
+	u32 j;
+
+	/* We program at most 6 source or destination resource group limits */
+	BUILD_BUG_ON(IPA_RESOURCE_GROUP_SRC_MAX > 6);
+
+	group_count = ipa_resource_group_src_count(ipa->version);
+	if (!group_count || group_count > IPA_RESOURCE_GROUP_SRC_MAX)
+		return false;
+
+	/* Return an error if a non-zero resource limit is specified
+	 * for a resource group not supported by hardware.
+	 */
+	for (i = 0; i < data->resource_src_count; i++) {
+		const struct ipa_resource_src *resource;
+
+		resource = &data->resource_src[i];
+		for (j = group_count; j < IPA_RESOURCE_GROUP_SRC_MAX; j++)
+			if (resource->limits[j].min || resource->limits[j].max)
+				return false;
+	}
+
+	group_count = ipa_resource_group_dst_count(ipa->version);
+	if (!group_count || group_count > IPA_RESOURCE_GROUP_DST_MAX)
+		return false;
+
+	for (i = 0; i < data->resource_dst_count; i++) {
+		const struct ipa_resource_dst *resource;
+
+		resource = &data->resource_dst[i];
+		for (j = group_count; j < IPA_RESOURCE_GROUP_DST_MAX; j++)
+			if (resource->limits[j].min || resource->limits[j].max)
+				return false;
+	}
+
+	return true;
+}
+
+#else /* !IPA_VALIDATION */
+
+static bool ipa_resource_limits_valid(struct ipa *ipa,
+				      const struct ipa_resource_data *data)
+{
+	return true;
+}
+
+#endif /* !IPA_VALIDATION */
+
+static void
+ipa_resource_config_common(struct ipa *ipa, u32 offset,
+			   const struct ipa_resource_limits *xlimits,
+			   const struct ipa_resource_limits *ylimits)
+{
+	u32 val;
+
+	val = u32_encode_bits(xlimits->min, X_MIN_LIM_FMASK);
+	val |= u32_encode_bits(xlimits->max, X_MAX_LIM_FMASK);
+	if (ylimits) {
+		val |= u32_encode_bits(ylimits->min, Y_MIN_LIM_FMASK);
+		val |= u32_encode_bits(ylimits->max, Y_MAX_LIM_FMASK);
+	}
+
+	iowrite32(val, ipa->reg_virt + offset);
+}
+
+static void ipa_resource_config_src(struct ipa *ipa,
+				    const struct ipa_resource_src *resource)
+{
+	u32 group_count = ipa_resource_group_src_count(ipa->version);
+	const struct ipa_resource_limits *ylimits;
+	u32 offset;
+
+	offset = IPA_REG_SRC_RSRC_GRP_01_RSRC_TYPE_N_OFFSET(resource->type);
+	ylimits = group_count == 1 ? NULL : &resource->limits[1];
+	ipa_resource_config_common(ipa, offset, &resource->limits[0], ylimits);
+
+	if (group_count < 2)
+		return;
+
+	offset = IPA_REG_SRC_RSRC_GRP_23_RSRC_TYPE_N_OFFSET(resource->type);
+	ylimits = group_count == 3 ? NULL : &resource->limits[3];
+	ipa_resource_config_common(ipa, offset, &resource->limits[2], ylimits);
+
+	if (group_count < 4)
+		return;
+
+	offset = IPA_REG_SRC_RSRC_GRP_45_RSRC_TYPE_N_OFFSET(resource->type);
+	ylimits = group_count == 5 ? NULL : &resource->limits[5];
+	ipa_resource_config_common(ipa, offset, &resource->limits[4], ylimits);
+}
+
+static void ipa_resource_config_dst(struct ipa *ipa,
+				    const struct ipa_resource_dst *resource)
+{
+	u32 group_count = ipa_resource_group_dst_count(ipa->version);
+	const struct ipa_resource_limits *ylimits;
+	u32 offset;
+
+	offset = IPA_REG_DST_RSRC_GRP_01_RSRC_TYPE_N_OFFSET(resource->type);
+	ylimits = group_count == 1 ? NULL : &resource->limits[1];
+	ipa_resource_config_common(ipa, offset, &resource->limits[0], ylimits);
+
+	if (group_count < 2)
+		return;
+
+	offset = IPA_REG_DST_RSRC_GRP_23_RSRC_TYPE_N_OFFSET(resource->type);
+	ylimits = group_count == 3 ? NULL : &resource->limits[3];
+	ipa_resource_config_common(ipa, offset, &resource->limits[2], ylimits);
+
+	if (group_count < 4)
+		return;
+
+	offset = IPA_REG_DST_RSRC_GRP_45_RSRC_TYPE_N_OFFSET(resource->type);
+	ylimits = group_count == 5 ? NULL : &resource->limits[5];
+	ipa_resource_config_common(ipa, offset, &resource->limits[4], ylimits);
+}
+
+static int
+ipa_resource_config(struct ipa *ipa, const struct ipa_resource_data *data)
+{
+	u32 i;
+
+	if (!ipa_resource_limits_valid(ipa, data))
+		return -EINVAL;
+
+	for (i = 0; i < data->resource_src_count; i++)
+		ipa_resource_config_src(ipa, &data->resource_src[i]);
+
+	for (i = 0; i < data->resource_dst_count; i++)
+		ipa_resource_config_dst(ipa, &data->resource_dst[i]);
+
+	return 0;
+}
+
+static void ipa_resource_deconfig(struct ipa *ipa)
+{
+	/* Nothing to do */
+}
+
 /**
  * ipa_config() - Configure IPA hardware
  * @ipa:	IPA pointer
@@ -464,7 +610,7 @@ static int ipa_config(struct ipa *ipa, const struct ipa_data *data)
 	 */
 	ipa_clock_get(ipa);
 
-	ipa_hardware_config(ipa, data);
+	ipa_hardware_config(ipa);
 
 	ret = ipa_endpoint_config(ipa);
 	if (ret)
@@ -474,20 +620,23 @@ static int ipa_config(struct ipa *ipa, const struct ipa_data *data)
 	if (ret)
 		goto err_endpoint_deconfig;
 
-	ipa_table_config(ipa);		/* No deconfig required */
+	ipa_table_config(ipa);
 
-	/* Assign resource limitation to each group; no deconfig required */
+	/* Assign resource limitation to each group */
 	ret = ipa_resource_config(ipa, data->resource_data);
 	if (ret)
-		goto err_mem_deconfig;
+		goto err_table_deconfig;
 
 	ret = ipa_modem_config(ipa);
 	if (ret)
-		goto err_mem_deconfig;
+		goto err_resource_deconfig;
 
 	return 0;
 
-err_mem_deconfig:
+err_resource_deconfig:
+	ipa_resource_deconfig(ipa);
+err_table_deconfig:
+	ipa_table_deconfig(ipa);
 	ipa_mem_deconfig(ipa);
 err_endpoint_deconfig:
 	ipa_endpoint_deconfig(ipa);
@@ -505,6 +654,8 @@ err_hardware_deconfig:
 static void ipa_deconfig(struct ipa *ipa)
 {
 	ipa_modem_deconfig(ipa);
+	ipa_resource_deconfig(ipa);
+	ipa_table_deconfig(ipa);
 	ipa_mem_deconfig(ipa);
 	ipa_endpoint_deconfig(ipa);
 	ipa_hardware_deconfig(ipa);
@@ -517,7 +668,6 @@ static int ipa_firmware_load(struct device *dev)
 	struct device_node *node;
 	struct resource res;
 	phys_addr_t phys;
-	const char *path;
 	ssize_t size;
 	void *virt;
 	int ret;
@@ -536,17 +686,9 @@ static int ipa_firmware_load(struct device *dev)
 		return ret;
 	}
 
-	/* Use name from DTB if specified; use default for *any* error */
-	ret = of_property_read_string(dev->of_node, "firmware-name", &path);
+	ret = request_firmware(&fw, IPA_FWS_PATH, dev);
 	if (ret) {
-		dev_dbg(dev, "error %d getting \"firmware-name\" resource\n",
-			ret);
-		path = IPA_FW_PATH_DEFAULT;
-	}
-
-	ret = request_firmware(&fw, path, dev);
-	if (ret) {
-		dev_err(dev, "error %d requesting \"%s\"\n", ret, path);
+		dev_err(dev, "error %d requesting \"%s\"\n", ret, IPA_FWS_PATH);
 		return ret;
 	}
 
@@ -559,11 +701,13 @@ static int ipa_firmware_load(struct device *dev)
 		goto out_release_firmware;
 	}
 
-	ret = qcom_mdt_load(dev, fw, path, IPA_PAS_ID, virt, phys, size, NULL);
+	ret = qcom_mdt_load(dev, fw, IPA_FWS_PATH, IPA_PAS_ID,
+			    virt, phys, size, NULL);
 	if (ret)
-		dev_err(dev, "error %d loading \"%s\"\n", ret, path);
+		dev_err(dev, "error %d loading \"%s\"\n", ret, IPA_FWS_PATH);
 	else if ((ret = qcom_scm_pas_auth_and_reset(IPA_PAS_ID)))
-		dev_err(dev, "error %d authenticating \"%s\"\n", ret, path);
+		dev_err(dev, "error %d authenticating \"%s\"\n", ret,
+			IPA_FWS_PATH);
 
 	memunmap(virt);
 out_release_firmware:
@@ -575,23 +719,11 @@ out_release_firmware:
 static const struct of_device_id ipa_match[] = {
 	{
 		.compatible	= "qcom,sdm845-ipa",
-		.data		= &ipa_data_v3_5_1,
+		.data		= &ipa_data_sdm845,
 	},
 	{
 		.compatible	= "qcom,sc7180-ipa",
-		.data		= &ipa_data_v4_2,
-	},
-	{
-		.compatible	= "qcom,sdx55-ipa",
-		.data		= &ipa_data_v4_5,
-	},
-	{
-		.compatible	= "qcom,sm8350-ipa",
-		.data		= &ipa_data_v4_9,
-	},
-	{
-		.compatible	= "qcom,sc7280-ipa",
-		.data		= &ipa_data_v4_11,
+		.data		= &ipa_data_sc7180,
 	},
 	{ },
 };
@@ -604,14 +736,8 @@ MODULE_DEVICE_TABLE(of, ipa_match);
 static void ipa_validate_build(void)
 {
 #ifdef IPA_VALIDATE
-	/* At one time we assumed a 64-bit build, allowing some do_div()
-	 * calls to be replaced by simple division or modulo operations.
-	 * We currently only perform divide and modulo operations on u32,
-	 * u16, or size_t objects, and of those only size_t has any chance
-	 * of being a 64-bit value.  (It should be guaranteed 32 bits wide
-	 * on a 32-bit build, but there is no harm in verifying that.)
-	 */
-	BUILD_BUG_ON(!IS_ENABLED(CONFIG_64BIT) && sizeof(size_t) != 4);
+	/* We assume we're working on 64-bit hardware */
+	BUILD_BUG_ON(!IS_ENABLED(CONFIG_64BIT));
 
 	/* Code assumes the EE ID for the AP is 0 (zeroed structure field) */
 	BUILD_BUG_ON(GSI_EE_AP != 0);

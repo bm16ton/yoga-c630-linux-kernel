@@ -253,7 +253,6 @@ vmlinux-*
 vmlinux.aout
 vmlinux.bin.all
 vmlinux.lds
-vmlinux.map
 vmlinux.symvers
 vmlinuz
 voffset.h

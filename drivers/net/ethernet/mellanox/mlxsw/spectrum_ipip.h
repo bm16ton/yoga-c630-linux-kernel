@@ -40,8 +40,7 @@ struct mlxsw_sp_ipip_ops {
 	enum mlxsw_sp_l3proto ul_proto; /* Underlay. */
 
 	int (*nexthop_update)(struct mlxsw_sp *mlxsw_sp, u32 adj_index,
-			      struct mlxsw_sp_ipip_entry *ipip_entry,
-			      bool force, char *ratr_pl);
+			      struct mlxsw_sp_ipip_entry *ipip_entry);
 
 	bool (*can_offload)(const struct mlxsw_sp *mlxsw_sp,
 			    const struct net_device *ol_dev);

@@ -780,11 +780,13 @@ static void
 mptsas_add_device_component_starget(MPT_ADAPTER *ioc,
 	struct scsi_target *starget)
 {
+	VirtTarget	*vtarget;
 	struct sas_rphy	*rphy;
 	struct mptsas_phyinfo	*phy_info = NULL;
 	struct mptsas_enclosure	enclosure_info;
 
 	rphy = dev_to_rphy(starget->dev.parent);
+	vtarget = starget->hostdata;
 	phy_info = mptsas_find_phyinfo_by_sas_address(ioc,
 			rphy->identify.sas_address);
 	if (!phy_info)
@@ -3440,12 +3442,14 @@ mptsas_expander_event_add(MPT_ADAPTER *ioc,
 	__le64 sas_address;
 
 	port_info = kzalloc(sizeof(struct mptsas_portinfo), GFP_KERNEL);
-	BUG_ON(!port_info);
+	if (!port_info)
+		BUG();
 	port_info->num_phys = (expander_data->NumPhys) ?
 	    expander_data->NumPhys : 1;
 	port_info->phy_info = kcalloc(port_info->num_phys,
 	    sizeof(struct mptsas_phyinfo), GFP_KERNEL);
-	BUG_ON(!port_info->phy_info);
+	if (!port_info->phy_info)
+		BUG();
 	memcpy(&sas_address, &expander_data->SASAddress, sizeof(__le64));
 	for (i = 0; i < port_info->num_phys; i++) {
 		port_info->phy_info[i].portinfo = port_info;
@@ -3777,7 +3781,7 @@ mptsas_send_link_status_event(struct fw_event_work *fw_event)
 						printk(MYIOC_s_DEBUG_FMT
 						"SDEV OUTSTANDING CMDS"
 						"%d\n", ioc->name,
-						scsi_device_busy(sdev)));
+						atomic_read(&sdev->device_busy)));
 				}
 
 			}

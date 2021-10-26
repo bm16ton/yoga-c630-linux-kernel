@@ -186,12 +186,7 @@ static inline ssize_t ovl_do_getxattr(struct ovl_fs *ofs, struct dentry *dentry,
 				      size_t size)
 {
 	const char *name = ovl_xattr(ofs, ox);
-	int err = vfs_getxattr(&init_user_ns, dentry, name, value, size);
-	int len = (value && err > 0) ? err : 0;
-
-	pr_debug("getxattr(%pd2, \"%s\", \"%*pE\", %zu, 0) = %i\n",
-		 dentry, name, min(len, 48), value, size, err);
-	return err;
+	return vfs_getxattr(&init_user_ns, dentry, name, value, size);
 }
 
 static inline int ovl_do_setxattr(struct ovl_fs *ofs, struct dentry *dentry,
@@ -548,9 +543,8 @@ struct dentry *ovl_create_temp(struct dentry *workdir, struct ovl_cattr *attr);
 extern const struct file_operations ovl_file_operations;
 int __init ovl_aio_request_cache_init(void);
 void ovl_aio_request_cache_destroy(void);
-int ovl_fileattr_get(struct dentry *dentry, struct fileattr *fa);
-int ovl_fileattr_set(struct user_namespace *mnt_userns,
-		     struct dentry *dentry, struct fileattr *fa);
+long ovl_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
+long ovl_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
 
 /* copy_up.c */
 int ovl_copy_up(struct dentry *dentry);

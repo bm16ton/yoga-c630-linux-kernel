@@ -284,7 +284,7 @@ static struct channel *ppp_find_channel(struct ppp_net *pn, int unit);
 static int ppp_connect_channel(struct channel *pch, int unit);
 static int ppp_disconnect_channel(struct channel *pch);
 static void ppp_destroy_channel(struct channel *pch);
-static int unit_get(struct idr *p, void *ptr, int min);
+static int unit_get(struct idr *p, void *ptr);
 static int unit_set(struct idr *p, void *ptr, int n);
 static void unit_put(struct idr *p, int n);
 static void *unit_find(struct idr *p, int n);
@@ -1155,20 +1155,9 @@ static int ppp_unit_register(struct ppp *ppp, int unit, bool ifname_is_set)
 	mutex_lock(&pn->all_ppp_mutex);
 
 	if (unit < 0) {
-		ret = unit_get(&pn->units_idr, ppp, 0);
+		ret = unit_get(&pn->units_idr, ppp);
 		if (ret < 0)
 			goto err;
-		if (!ifname_is_set) {
-			while (1) {
-				snprintf(ppp->dev->name, IFNAMSIZ, "ppp%i", ret);
-				if (!__dev_get_by_name(ppp->ppp_net, ppp->dev->name))
-					break;
-				unit_put(&pn->units_idr, ret);
-				ret = unit_get(&pn->units_idr, ppp, ret + 1);
-				if (ret < 0)
-					goto err;
-			}
-		}
 	} else {
 		/* Caller asked for a specific unit number. Fail with -EEXIST
 		 * if unavailable. For backward compatibility, return -EEXIST
@@ -1571,34 +1560,12 @@ static void ppp_dev_priv_destructor(struct net_device *dev)
 		ppp_destroy_interface(ppp);
 }
 
-static int ppp_fill_forward_path(struct net_device_path_ctx *ctx,
-				 struct net_device_path *path)
-{
-	struct ppp *ppp = netdev_priv(ctx->dev);
-	struct ppp_channel *chan;
-	struct channel *pch;
-
-	if (ppp->flags & SC_MULTILINK)
-		return -EOPNOTSUPP;
-
-	if (list_empty(&ppp->channels))
-		return -ENODEV;
-
-	pch = list_first_entry(&ppp->channels, struct channel, clist);
-	chan = pch->chan;
-	if (!chan->ops->fill_forward_path)
-		return -EOPNOTSUPP;
-
-	return chan->ops->fill_forward_path(ctx, path, chan);
-}
-
 static const struct net_device_ops ppp_netdev_ops = {
 	.ndo_init	 = ppp_dev_init,
 	.ndo_uninit      = ppp_dev_uninit,
 	.ndo_start_xmit  = ppp_start_xmit,
 	.ndo_do_ioctl    = ppp_net_ioctl,
 	.ndo_get_stats64 = ppp_get_stats64,
-	.ndo_fill_forward_path = ppp_fill_forward_path,
 };
 
 static struct device_type ppp_type = {
@@ -3563,9 +3530,9 @@ static int unit_set(struct idr *p, void *ptr, int n)
 }
 
 /* get new free unit number and associate pointer with it */
-static int unit_get(struct idr *p, void *ptr, int min)
+static int unit_get(struct idr *p, void *ptr)
 {
-	return idr_alloc(p, ptr, min, 0, GFP_KERNEL);
+	return idr_alloc(p, ptr, 0, 0, GFP_KERNEL);
 }
 
 /* put unit number back to a pool */

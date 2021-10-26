@@ -1189,7 +1189,8 @@ static int tun_xdp_xmit(struct net_device *dev, int n,
 	struct tun_struct *tun = netdev_priv(dev);
 	struct tun_file *tfile;
 	u32 numqueues;
-	int nxmit = 0;
+	int drops = 0;
+	int cnt = n;
 	int i;
 
 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
@@ -1219,9 +1220,9 @@ resample:
 
 		if (__ptr_ring_produce(&tfile->tx_ring, frame)) {
 			atomic_long_inc(&dev->tx_dropped);
-			break;
+			xdp_return_frame_rx_napi(xdp);
+			drops++;
 		}
-		nxmit++;
 	}
 	spin_unlock(&tfile->tx_ring.producer_lock);
 
@@ -1229,21 +1230,17 @@ resample:
 		__tun_xdp_flush_tfile(tfile);
 
 	rcu_read_unlock();
-	return nxmit;
+	return cnt - drops;
 }
 
 static int tun_xdp_tx(struct net_device *dev, struct xdp_buff *xdp)
 {
 	struct xdp_frame *frame = xdp_convert_buff_to_frame(xdp);
-	int nxmit;
 
 	if (unlikely(!frame))
 		return -EOVERFLOW;
 
-	nxmit = tun_xdp_xmit(dev, 1, &frame, XDP_XMIT_FLUSH);
-	if (!nxmit)
-		xdp_return_frame_rx_napi(frame);
-	return nxmit;
+	return tun_xdp_xmit(dev, 1, &frame, XDP_XMIT_FLUSH);
 }
 
 static const struct net_device_ops tap_netdev_ops = {
@@ -3008,6 +3005,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
 		return open_related_ns(&net->ns, get_net_ns);
 	}
 
+	ret = 0;
 	rtnl_lock();
 
 	tun = tun_get(tfile);

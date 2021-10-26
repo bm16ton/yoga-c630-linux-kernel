@@ -41,6 +41,14 @@
 		/* We expect the bootloader to fill in the reg */
 		reg = <0 0 0 0>;
 	};
+
+	soc {
+		clocks {
+			osc1 {
+				clock-frequency = <25000000>;
+			};
+		};
+	};
 };
 
 &gpio1 {
@@ -84,10 +92,6 @@
 	bus-width = <4>;
 };
 
-&osc1 {
-	clock-frequency = <25000000>;
-};
-
 &uart0 {
 	status = "okay";
 };
@@ -113,7 +117,7 @@
 		m25p,fast-read;
 		cdns,page-size = <256>;
 		cdns,block-size = <16>;
-		cdns,read-delay = <2>;
+		cdns,read-delay = <1>;
 		cdns,tshsl-ns = <50>;
 		cdns,tsd2d-ns = <50>;
 		cdns,tchsh-ns = <4>;

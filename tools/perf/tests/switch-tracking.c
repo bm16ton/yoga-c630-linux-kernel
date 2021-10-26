@@ -18,7 +18,6 @@
 #include "record.h"
 #include "tests.h"
 #include "util/mmap.h"
-#include "pmu.h"
 
 static int spin_sleep(void)
 {
@@ -372,10 +371,7 @@ int test__switch_tracking(struct test *test __maybe_unused, int subtest __maybe_
 	cpu_clocks_evsel = evlist__last(evlist);
 
 	/* Second event */
-	if (perf_pmu__has_hybrid())
-		err = parse_events(evlist, "cpu_core/cycles/u", NULL);
-	else
-		err = parse_events(evlist, "cycles:u", NULL);
+	err = parse_events(evlist, "cycles:u", NULL);
 	if (err) {
 		pr_debug("Failed to parse event cycles:u\n");
 		goto out_err;

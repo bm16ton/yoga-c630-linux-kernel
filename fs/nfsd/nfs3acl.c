@@ -168,26 +168,22 @@ static int nfs3svc_decode_setaclargs(struct svc_rqst *rqstp, __be32 *p)
 /* GETACL */
 static int nfs3svc_encode_getaclres(struct svc_rqst *rqstp, __be32 *p)
 {
-	struct xdr_stream *xdr = &rqstp->rq_res_stream;
 	struct nfsd3_getaclres *resp = rqstp->rq_resp;
 	struct dentry *dentry = resp->fh.fh_dentry;
-	struct kvec *head = rqstp->rq_res.head;
-	struct inode *inode;
-	unsigned int base;
-	int n;
-	int w;
 
-	if (!svcxdr_encode_nfsstat3(xdr, resp->status))
-		return 0;
-	switch (resp->status) {
-	case nfs_ok:
-		inode = d_inode(dentry);
-		if (!svcxdr_encode_post_op_attr(rqstp, xdr, &resp->fh))
-			return 0;
-		if (xdr_stream_encode_u32(xdr, resp->mask) < 0)
-			return 0;
+	*p++ = resp->status;
+	p = nfs3svc_encode_post_op_attr(rqstp, p, &resp->fh);
+	if (resp->status == 0 && dentry && d_really_is_positive(dentry)) {
+		struct inode *inode = d_inode(dentry);
+		struct kvec *head = rqstp->rq_res.head;
+		unsigned int base;
+		int n;
+		int w;
 
-		base = (char *)xdr->p - (char *)head->iov_base;
+		*p++ = htonl(resp->mask);
+		if (!xdr_ressize_check(rqstp, p))
+			return 0;
+		base = (char *)p - (char *)head->iov_base;
 
 		rqstp->rq_res.page_len = w = nfsacl_size(
 			(resp->mask & NFS_ACL)   ? resp->acl_access  : NULL,
@@ -208,11 +204,9 @@ static int nfs3svc_encode_getaclres(struct svc_rqst *rqstp, __be32 *p)
 					  NFS_ACL_DEFAULT);
 		if (n <= 0)
 			return 0;
-		break;
-	default:
-		if (!svcxdr_encode_post_op_attr(rqstp, xdr, &resp->fh))
+	} else
+		if (!xdr_ressize_check(rqstp, p))
 			return 0;
-	}
 
 	return 1;
 }
@@ -220,11 +214,11 @@ static int nfs3svc_encode_getaclres(struct svc_rqst *rqstp, __be32 *p)
 /* SETACL */
 static int nfs3svc_encode_setaclres(struct svc_rqst *rqstp, __be32 *p)
 {
-	struct xdr_stream *xdr = &rqstp->rq_res_stream;
 	struct nfsd3_attrstat *resp = rqstp->rq_resp;
 
-	return svcxdr_encode_nfsstat3(xdr, resp->status) &&
-		svcxdr_encode_post_op_attr(rqstp, xdr, &resp->fh);
+	*p++ = resp->status;
+	p = nfs3svc_encode_post_op_attr(rqstp, p, &resp->fh);
+	return xdr_ressize_check(rqstp, p);
 }
 
 /*

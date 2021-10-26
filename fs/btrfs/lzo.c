@@ -118,7 +118,7 @@ int lzo_compress_pages(struct list_head *ws, struct address_space *mapping,
 	struct workspace *workspace = list_entry(ws, struct workspace, list);
 	int ret = 0;
 	char *data_in;
-	char *cpage_out, *sizes_ptr;
+	char *cpage_out;
 	int nr_pages = 0;
 	struct page *in_page = NULL;
 	struct page *out_page = NULL;
@@ -258,9 +258,10 @@ int lzo_compress_pages(struct list_head *ws, struct address_space *mapping,
 	}
 
 	/* store the size of all chunks of compressed data */
-	sizes_ptr = kmap_local_page(pages[0]);
-	write_compress_length(sizes_ptr, tot_out);
-	kunmap_local(sizes_ptr);
+	cpage_out = kmap(pages[0]);
+	write_compress_length(cpage_out, tot_out);
+
+	kunmap(pages[0]);
 
 	ret = 0;
 	*total_out = tot_out;

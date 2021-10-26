@@ -133,19 +133,10 @@ void snd_seq_device_load_drivers(void)
 	flush_work(&autoload_work);
 }
 EXPORT_SYMBOL(snd_seq_device_load_drivers);
-
-static inline void cancel_autoload_drivers(void)
-{
-	cancel_work_sync(&autoload_work);
-}
+#define cancel_autoload_drivers()	cancel_work_sync(&autoload_work)
 #else
-static inline void queue_autoload_drivers(void)
-{
-}
-
-static inline void cancel_autoload_drivers(void)
-{
-}
+#define queue_autoload_drivers() /* NOP */
+#define cancel_autoload_drivers() /* NOP */
 #endif
 
 /*

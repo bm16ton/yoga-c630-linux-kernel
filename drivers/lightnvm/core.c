@@ -1174,8 +1174,6 @@ int nvm_register(struct nvm_dev *dev)
 {
 	int ret, exp_pool_size;
 
-	pr_warn_once("lightnvm support is deprecated and will be removed in Linux 5.15.\n");
-
 	if (!dev->q || !dev->ops) {
 		kref_put(&dev->ref, nvm_free);
 		return -EINVAL;
@@ -1259,7 +1257,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
 
 	info = memdup_user(arg, sizeof(struct nvm_ioctl_info));
 	if (IS_ERR(info))
-		return PTR_ERR(info);
+		return -EFAULT;
 
 	info->version[0] = NVM_VERSION_MAJOR;
 	info->version[1] = NVM_VERSION_MINOR;

@@ -8,7 +8,7 @@ src := $(obj)
 PHONY := __clean
 __clean:
 
-include $(srctree)/scripts/Kbuild.include
+include scripts/Kbuild.include
 
 # The filename Kbuild has precedence over Makefile
 kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))

@@ -605,7 +605,7 @@ int __ceph_finish_cap_snap(struct ceph_inode_info *ci,
 	struct ceph_mds_client *mdsc = ceph_sb_to_mdsc(inode->i_sb);
 
 	BUG_ON(capsnap->writing);
-	capsnap->size = i_size_read(inode);
+	capsnap->size = inode->i_size;
 	capsnap->mtime = inode->i_mtime;
 	capsnap->atime = inode->i_atime;
 	capsnap->ctime = inode->i_ctime;

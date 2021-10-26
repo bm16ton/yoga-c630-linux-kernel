@@ -142,7 +142,6 @@ void do_syscall(struct pt_regs *regs)
 
 void noinstr __do_syscall(struct pt_regs *regs, int per_trap)
 {
-	add_random_kstack_offset();
 	enter_from_user_mode(regs);
 
 	memcpy(&regs->gprs[8], S390_lowcore.save_area_sync, 8 * sizeof(unsigned long));

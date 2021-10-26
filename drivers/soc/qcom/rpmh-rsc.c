@@ -195,6 +195,22 @@ static void write_tcs_reg_sync(const struct rsc_drv *drv, int reg, int tcs_id,
 }
 
 /**
+ * tcs_is_free() - Return if a TCS is totally free.
+ * @drv:    The RSC controller.
+ * @tcs_id: The global ID of this TCS.
+ *
+ * Returns true if nobody has claimed this TCS (by setting tcs_in_use).
+ *
+ * Context: Must be called with the drv->lock held.
+ *
+ * Return: true if the given TCS is free.
+ */
+static bool tcs_is_free(struct rsc_drv *drv, int tcs_id)
+{
+	return !test_bit(tcs_id, drv->tcs_in_use);
+}
+
+/**
  * tcs_invalidate() - Invalidate all TCSes of the given type (sleep or wake).
  * @drv:  The RSC controller.
  * @type: SLEEP_TCS or WAKE_TCS
@@ -392,10 +408,12 @@ static irqreturn_t tcs_tx_done(int irq, void *p)
 
 	irq_status = readl_relaxed(drv->tcs_base + RSC_DRV_IRQ_STATUS);
 
-	for_each_set_bit(i, &irq_status, BITS_PER_TYPE(u32)) {
+	for_each_set_bit(i, &irq_status, BITS_PER_LONG) {
 		req = get_req_from_tcs(drv, i);
-		if (WARN_ON(!req))
+		if (!req) {
+			WARN_ON(1);
 			goto skip;
+		}
 
 		err = 0;
 		for (j = 0; j < req->num_cmds; j++) {
@@ -502,7 +520,7 @@ static void __tcs_buffer_write(struct rsc_drv *drv, int tcs_id, int cmd_id,
  *
  * Return: 0 if nothing in flight or -EBUSY if we should try again later.
  *         The caller must re-enable interrupts between tries since that's
- *         the only way tcs_in_use will ever be updated and the only way
+ *         the only way tcs_is_free() will ever return true and the only way
  *         RSC_DRV_CMD_ENABLE will ever be cleared.
  */
 static int check_for_req_inflight(struct rsc_drv *drv, struct tcs_group *tcs,
@@ -510,14 +528,17 @@ static int check_for_req_inflight(struct rsc_drv *drv, struct tcs_group *tcs,
 {
 	unsigned long curr_enabled;
 	u32 addr;
-	int j, k;
-	int i = tcs->offset;
+	int i, j, k;
+	int tcs_id = tcs->offset;
 
-	for_each_set_bit_from(i, drv->tcs_in_use, tcs->offset + tcs->num_tcs) {
-		curr_enabled = read_tcs_reg(drv, RSC_DRV_CMD_ENABLE, i);
+	for (i = 0; i < tcs->num_tcs; i++, tcs_id++) {
+		if (tcs_is_free(drv, tcs_id))
+			continue;
+
+		curr_enabled = read_tcs_reg(drv, RSC_DRV_CMD_ENABLE, tcs_id);
 
 		for_each_set_bit(j, &curr_enabled, MAX_CMDS_PER_TCS) {
-			addr = read_tcs_cmd(drv, RSC_DRV_CMD_ADDR, i, j);
+			addr = read_tcs_cmd(drv, RSC_DRV_CMD_ADDR, tcs_id, j);
 			for (k = 0; k < msg->num_cmds; k++) {
 				if (addr == msg->cmds[k].addr)
 					return -EBUSY;
@@ -535,19 +556,18 @@ static int check_for_req_inflight(struct rsc_drv *drv, struct tcs_group *tcs,
  *
  * Must be called with the drv->lock held since that protects tcs_in_use.
  *
- * Return: The first tcs that's free or -EBUSY if all in use.
+ * Return: The first tcs that's free.
  */
 static int find_free_tcs(struct tcs_group *tcs)
 {
-	const struct rsc_drv *drv = tcs->drv;
-	unsigned long i;
-	unsigned long max = tcs->offset + tcs->num_tcs;
+	int i;
 
-	i = find_next_zero_bit(drv->tcs_in_use, max, tcs->offset);
-	if (i >= max)
-		return -EBUSY;
+	for (i = 0; i < tcs->num_tcs; i++) {
+		if (tcs_is_free(tcs->drv, tcs->offset + i))
+			return tcs->offset + i;
+	}
 
-	return i;
+	return -EBUSY;
 }
 
 /**
@@ -734,9 +754,8 @@ int rpmh_rsc_write_ctrl_data(struct rsc_drv *drv, const struct tcs_request *msg)
  */
 static bool rpmh_rsc_ctrlr_is_busy(struct rsc_drv *drv)
 {
-	unsigned long set;
-	const struct tcs_group *tcs = &drv->tcs[ACTIVE_TCS];
-	unsigned long max;
+	int m;
+	struct tcs_group *tcs = &drv->tcs[ACTIVE_TCS];
 
 	/*
 	 * If we made an active request on a RSC that does not have a
@@ -747,10 +766,12 @@ static bool rpmh_rsc_ctrlr_is_busy(struct rsc_drv *drv)
 	if (!tcs->num_tcs)
 		tcs = &drv->tcs[WAKE_TCS];
 
-	max = tcs->offset + tcs->num_tcs;
-	set = find_next_bit(drv->tcs_in_use, max, tcs->offset);
+	for (m = tcs->offset; m < tcs->offset + tcs->num_tcs; m++) {
+		if (!tcs_is_free(drv, m))
+			return true;
+	}
 
-	return set < max;
+	return false;
 }
 
 /**

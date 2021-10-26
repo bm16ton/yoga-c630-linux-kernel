@@ -254,13 +254,6 @@ struct software_node_ref_args {
 	u64 args[NR_FWNODE_REFERENCE_ARGS];
 };
 
-#define SOFTWARE_NODE_REFERENCE(_ref_, ...)			\
-(const struct software_node_ref_args) {				\
-	.node = _ref_,						\
-	.nargs = ARRAY_SIZE(((u64[]){ 0, ##__VA_ARGS__ })) - 1,	\
-	.args = { __VA_ARGS__ },				\
-}
-
 /**
  * struct property_entry - "Built-in" device property representation.
  * @name: Name of the property.
@@ -369,7 +362,11 @@ struct property_entry {
 	.name = _name_,							\
 	.length = sizeof(struct software_node_ref_args),		\
 	.type = DEV_PROP_REF,						\
-	{ .pointer = &SOFTWARE_NODE_REFERENCE(_ref_, ##__VA_ARGS__), },	\
+	{ .pointer = &(const struct software_node_ref_args) {		\
+		.node = _ref_,						\
+		.nargs = ARRAY_SIZE(((u64[]){ 0, ##__VA_ARGS__ })) - 1,	\
+		.args = { __VA_ARGS__ },				\
+	} },								\
 }
 
 struct property_entry *

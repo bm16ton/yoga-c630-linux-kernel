@@ -62,7 +62,6 @@ static void amdgpu_do_test_moves(struct amdgpu_device *adev)
 	bp.flags = 0;
 	bp.type = ttm_bo_type_kernel;
 	bp.resv = NULL;
-	bp.bo_ptr_size = sizeof(struct amdgpu_bo);
 
 	r = amdgpu_bo_create(adev, &bp, &vram_obj);
 	if (r) {

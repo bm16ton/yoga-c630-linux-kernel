@@ -9,12 +9,6 @@
 #include "disk-io.h"
 #include "block-group.h"
 
-/*
- * Block groups with more than this value (percents) of unusable space will be
- * scheduled for background reclaim.
- */
-#define BTRFS_DEFAULT_RECLAIM_THRESH		75
-
 struct btrfs_zoned_device_info {
 	/*
 	 * Number of zones, zone size and types of zones if bdev is a
@@ -53,7 +47,7 @@ void btrfs_calc_zone_unusable(struct btrfs_block_group *cache);
 void btrfs_redirty_list_add(struct btrfs_transaction *trans,
 			    struct extent_buffer *eb);
 void btrfs_free_redirty_list(struct btrfs_transaction *trans);
-bool btrfs_use_zone_append(struct btrfs_inode *inode, u64 start);
+bool btrfs_use_zone_append(struct btrfs_inode *inode, struct extent_map *em);
 void btrfs_record_physical_zoned(struct inode *inode, u64 file_offset,
 				 struct bio *bio);
 void btrfs_rewrite_logical_zoned(struct btrfs_ordered_extent *ordered);
@@ -152,7 +146,8 @@ static inline void btrfs_redirty_list_add(struct btrfs_transaction *trans,
 					  struct extent_buffer *eb) { }
 static inline void btrfs_free_redirty_list(struct btrfs_transaction *trans) { }
 
-static inline bool btrfs_use_zone_append(struct btrfs_inode *inode, u64 start)
+static inline bool btrfs_use_zone_append(struct btrfs_inode *inode,
+					 struct extent_map *em)
 {
 	return false;
 }

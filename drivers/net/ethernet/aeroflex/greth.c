@@ -1449,10 +1449,10 @@ static int greth_of_probe(struct platform_device *ofdev)
 			break;
 	}
 	if (i == 6) {
-		u8 addr[ETH_ALEN];
+		const u8 *addr;
 
-		err = of_get_mac_address(ofdev->dev.of_node, addr);
-		if (!err) {
+		addr = of_get_mac_address(ofdev->dev.of_node);
+		if (!IS_ERR(addr)) {
 			for (i = 0; i < 6; i++)
 				macaddr[i] = (unsigned int) addr[i];
 		} else {

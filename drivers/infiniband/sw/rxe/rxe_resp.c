@@ -816,8 +816,8 @@ static enum resp_states do_complete(struct rxe_qp *qp,
 	struct rxe_recv_wqe *wqe = qp->resp.wqe;
 	struct rxe_dev *rxe = to_rdev(qp->ibqp.device);
 
-	if (!wqe)
-		goto finish;
+	if (unlikely(!wqe))
+		return RESPST_CLEANUP;
 
 	memset(&cqe, 0, sizeof(cqe));
 
@@ -917,12 +917,12 @@ static enum resp_states do_complete(struct rxe_qp *qp,
 	if (rxe_cq_post(qp->rcq, &cqe, pkt ? bth_se(pkt) : 1))
 		return RESPST_ERR_CQ_OVERFLOW;
 
-finish:
-	if (unlikely(qp->resp.state == QP_STATE_ERROR))
+	if (qp->resp.state == QP_STATE_ERROR)
 		return RESPST_CHK_RESOURCE;
-	if (unlikely(!pkt))
+
+	if (!pkt)
 		return RESPST_DONE;
-	if (qp_type(qp) == IB_QPT_RC)
+	else if (qp_type(qp) == IB_QPT_RC)
 		return RESPST_ACKNOWLEDGE;
 	else
 		return RESPST_CLEANUP;
@@ -1054,8 +1054,10 @@ static enum resp_states duplicate_request(struct rxe_qp *qp,
 	if (pkt->mask & RXE_SEND_MASK ||
 	    pkt->mask & RXE_WRITE_MASK) {
 		/* SEND. Ack again and cleanup. C9-105. */
-		send_ack(qp, pkt, AETH_ACK_UNLIMITED, prev_psn);
-		return RESPST_CLEANUP;
+		if (bth_ack(pkt))
+			send_ack(qp, pkt, AETH_ACK_UNLIMITED, prev_psn);
+		rc = RESPST_CLEANUP;
+		goto out;
 	} else if (pkt->mask & RXE_READ_MASK) {
 		struct resp_res *res;
 

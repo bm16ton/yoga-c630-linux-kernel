@@ -19,15 +19,17 @@
 
 	gpio_keys {
 		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
 		autorepeat;
 
-		button-start {
+		button@20 {
 			label = "START";
 			linux,code = <31>;
 			gpios = <&gpio5 8 GPIO_ACTIVE_LOW>;
 		};
 
-		button-clean {
+		button@21 {
 			label = "CLEAN";
 			linux,code = <46>;
 			gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;

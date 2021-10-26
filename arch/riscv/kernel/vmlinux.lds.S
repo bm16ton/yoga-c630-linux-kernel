@@ -4,13 +4,7 @@
  * Copyright (C) 2017 SiFive
  */
 
-#ifdef CONFIG_XIP_KERNEL
-#include "vmlinux-xip.lds.S"
-#else
-
-#include <asm/pgtable.h>
-#define LOAD_OFFSET KERNEL_LINK_ADDR
-
+#define LOAD_OFFSET PAGE_OFFSET
 #include <asm/vmlinux.lds.h>
 #include <asm/page.h>
 #include <asm/cache.h>
@@ -96,13 +90,6 @@ SECTIONS
 	}
 
 	__init_data_end = .;
-
-	. = ALIGN(8);
-	.alternative : {
-		__alt_start = .;
-		*(.alternative)
-		__alt_end = .;
-	}
 	__init_end = .;
 
 	/* Start of data section */
@@ -145,4 +132,3 @@ SECTIONS
 
 	DISCARDS
 }
-#endif /* CONFIG_XIP_KERNEL */

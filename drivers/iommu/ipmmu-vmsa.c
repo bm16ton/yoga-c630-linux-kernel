@@ -1076,7 +1076,11 @@ static int ipmmu_probe(struct platform_device *pdev)
 		if (ret)
 			return ret;
 
-		ret = iommu_device_register(&mmu->iommu, &ipmmu_ops, &pdev->dev);
+		iommu_device_set_ops(&mmu->iommu, &ipmmu_ops);
+		iommu_device_set_fwnode(&mmu->iommu,
+					&pdev->dev.of_node->fwnode);
+
+		ret = iommu_device_register(&mmu->iommu);
 		if (ret)
 			return ret;
 

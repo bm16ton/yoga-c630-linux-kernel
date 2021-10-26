@@ -218,10 +218,9 @@ static int vfio_platform_call_reset(struct vfio_platform_device *vdev,
 	return -EINVAL;
 }
 
-static void vfio_platform_release(struct vfio_device *core_vdev)
+static void vfio_platform_release(void *device_data)
 {
-	struct vfio_platform_device *vdev =
-		container_of(core_vdev, struct vfio_platform_device, vdev);
+	struct vfio_platform_device *vdev = device_data;
 
 	mutex_lock(&driver_lock);
 
@@ -245,10 +244,9 @@ static void vfio_platform_release(struct vfio_device *core_vdev)
 	module_put(vdev->parent_module);
 }
 
-static int vfio_platform_open(struct vfio_device *core_vdev)
+static int vfio_platform_open(void *device_data)
 {
-	struct vfio_platform_device *vdev =
-		container_of(core_vdev, struct vfio_platform_device, vdev);
+	struct vfio_platform_device *vdev = device_data;
 	int ret;
 
 	if (!try_module_get(vdev->parent_module))
@@ -295,12 +293,10 @@ err_reg:
 	return ret;
 }
 
-static long vfio_platform_ioctl(struct vfio_device *core_vdev,
+static long vfio_platform_ioctl(void *device_data,
 				unsigned int cmd, unsigned long arg)
 {
-	struct vfio_platform_device *vdev =
-		container_of(core_vdev, struct vfio_platform_device, vdev);
-
+	struct vfio_platform_device *vdev = device_data;
 	unsigned long minsz;
 
 	if (cmd == VFIO_DEVICE_GET_INFO) {
@@ -459,11 +455,10 @@ err:
 	return -EFAULT;
 }
 
-static ssize_t vfio_platform_read(struct vfio_device *core_vdev,
-				  char __user *buf, size_t count, loff_t *ppos)
+static ssize_t vfio_platform_read(void *device_data, char __user *buf,
+				  size_t count, loff_t *ppos)
 {
-	struct vfio_platform_device *vdev =
-		container_of(core_vdev, struct vfio_platform_device, vdev);
+	struct vfio_platform_device *vdev = device_data;
 	unsigned int index = VFIO_PLATFORM_OFFSET_TO_INDEX(*ppos);
 	loff_t off = *ppos & VFIO_PLATFORM_OFFSET_MASK;
 
@@ -536,11 +531,10 @@ err:
 	return -EFAULT;
 }
 
-static ssize_t vfio_platform_write(struct vfio_device *core_vdev, const char __user *buf,
+static ssize_t vfio_platform_write(void *device_data, const char __user *buf,
 				   size_t count, loff_t *ppos)
 {
-	struct vfio_platform_device *vdev =
-		container_of(core_vdev, struct vfio_platform_device, vdev);
+	struct vfio_platform_device *vdev = device_data;
 	unsigned int index = VFIO_PLATFORM_OFFSET_TO_INDEX(*ppos);
 	loff_t off = *ppos & VFIO_PLATFORM_OFFSET_MASK;
 
@@ -579,10 +573,9 @@ static int vfio_platform_mmap_mmio(struct vfio_platform_region region,
 			       req_len, vma->vm_page_prot);
 }
 
-static int vfio_platform_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
+static int vfio_platform_mmap(void *device_data, struct vm_area_struct *vma)
 {
-	struct vfio_platform_device *vdev =
-		container_of(core_vdev, struct vfio_platform_device, vdev);
+	struct vfio_platform_device *vdev = device_data;
 	unsigned int index;
 
 	index = vma->vm_pgoff >> (VFIO_PLATFORM_OFFSET_SHIFT - PAGE_SHIFT);
@@ -666,7 +659,8 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
 	struct iommu_group *group;
 	int ret;
 
-	vfio_init_group_dev(&vdev->vdev, dev, &vfio_platform_ops);
+	if (!vdev)
+		return -EINVAL;
 
 	ret = vfio_platform_acpi_probe(vdev, dev);
 	if (ret)
@@ -691,13 +685,13 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
 		goto put_reset;
 	}
 
-	ret = vfio_register_group_dev(&vdev->vdev);
+	ret = vfio_add_group_dev(dev, &vfio_platform_ops, vdev);
 	if (ret)
 		goto put_iommu;
 
 	mutex_init(&vdev->igate);
 
-	pm_runtime_enable(dev);
+	pm_runtime_enable(vdev->device);
 	return 0;
 
 put_iommu:
@@ -708,13 +702,19 @@ put_reset:
 }
 EXPORT_SYMBOL_GPL(vfio_platform_probe_common);
 
-void vfio_platform_remove_common(struct vfio_platform_device *vdev)
+struct vfio_platform_device *vfio_platform_remove_common(struct device *dev)
 {
-	vfio_unregister_group_dev(&vdev->vdev);
+	struct vfio_platform_device *vdev;
 
-	pm_runtime_disable(vdev->device);
-	vfio_platform_put_reset(vdev);
-	vfio_iommu_group_put(vdev->vdev.dev->iommu_group, vdev->vdev.dev);
+	vdev = vfio_del_group_dev(dev);
+
+	if (vdev) {
+		pm_runtime_disable(vdev->device);
+		vfio_platform_put_reset(vdev);
+		vfio_iommu_group_put(dev->iommu_group, dev);
+	}
+
+	return vdev;
 }
 EXPORT_SYMBOL_GPL(vfio_platform_remove_common);
 

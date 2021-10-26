@@ -45,19 +45,19 @@ static bool encl_map_bin(const char *path, struct encl *encl)
 
 	fd = open(path, O_RDONLY);
 	if (fd == -1)  {
-		perror("enclave executable open()");
+		perror("open()");
 		return false;
 	}
 
 	ret = stat(path, &sb);
 	if (ret) {
-		perror("enclave executable stat()");
+		perror("stat()");
 		goto err;
 	}
 
 	bin = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (bin == MAP_FAILED) {
-		perror("enclave executable mmap()");
+		perror("mmap()");
 		goto err;
 	}
 
@@ -90,7 +90,8 @@ static bool encl_ioc_create(struct encl *encl)
 	ioc.src = (unsigned long)secs;
 	rc = ioctl(encl->fd, SGX_IOC_ENCLAVE_CREATE, &ioc);
 	if (rc) {
-		perror("SGX_IOC_ENCLAVE_CREATE failed");
+		fprintf(stderr, "SGX_IOC_ENCLAVE_CREATE failed: errno=%d\n",
+			errno);
 		munmap((void *)secs->base, encl->encl_size);
 		return false;
 	}
@@ -115,62 +116,31 @@ static bool encl_ioc_add_pages(struct encl *encl, struct encl_segment *seg)
 
 	rc = ioctl(encl->fd, SGX_IOC_ENCLAVE_ADD_PAGES, &ioc);
 	if (rc < 0) {
-		perror("SGX_IOC_ENCLAVE_ADD_PAGES failed");
+		fprintf(stderr, "SGX_IOC_ENCLAVE_ADD_PAGES failed: errno=%d.\n",
+			errno);
 		return false;
 	}
 
 	return true;
 }
 
-
-
 bool encl_load(const char *path, struct encl *encl)
 {
-	const char device_path[] = "/dev/sgx_enclave";
 	Elf64_Phdr *phdr_tbl;
 	off_t src_offset;
 	Elf64_Ehdr *ehdr;
-	struct stat sb;
-	void *ptr;
 	int i, j;
 	int ret;
-	int fd = -1;
 
 	memset(encl, 0, sizeof(*encl));
 
-	fd = open(device_path, O_RDWR);
-	if (fd < 0) {
-		perror("Unable to open /dev/sgx_enclave");
+	ret = open("/dev/sgx_enclave", O_RDWR);
+	if (ret < 0) {
+		fprintf(stderr, "Unable to open /dev/sgx_enclave\n");
 		goto err;
 	}
 
-	ret = stat(device_path, &sb);
-	if (ret) {
-		perror("device file stat()");
-		goto err;
-	}
-
-	ptr = mmap(NULL, PAGE_SIZE, PROT_READ, MAP_SHARED, fd, 0);
-	if (ptr == (void *)-1) {
-		perror("mmap for read");
-		goto err;
-	}
-	munmap(ptr, PAGE_SIZE);
-
-#define ERR_MSG \
-"mmap() succeeded for PROT_READ, but failed for PROT_EXEC.\n" \
-" Check that /dev does not have noexec set:\n" \
-" \tmount | grep \"/dev .*noexec\"\n" \
-" If so, remount it executable: mount -o remount,exec /dev\n\n"
-
-	ptr = mmap(NULL, PAGE_SIZE, PROT_EXEC, MAP_SHARED, fd, 0);
-	if (ptr == (void *)-1) {
-		fprintf(stderr, ERR_MSG);
-		goto err;
-	}
-	munmap(ptr, PAGE_SIZE);
-
-	encl->fd = fd;
+	encl->fd = ret;
 
 	if (!encl_map_bin(path, encl))
 		goto err;
@@ -247,8 +217,6 @@ bool encl_load(const char *path, struct encl *encl)
 	return true;
 
 err:
-	if (fd != -1)
-		close(fd);
 	encl_delete(encl);
 	return false;
 }
@@ -261,7 +229,7 @@ static bool encl_map_area(struct encl *encl)
 	area = mmap(NULL, encl_size * 2, PROT_NONE,
 		    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (area == MAP_FAILED) {
-		perror("reservation mmap()");
+		perror("mmap");
 		return false;
 	}
 
@@ -300,7 +268,8 @@ bool encl_build(struct encl *encl)
 	ioc.sigstruct = (uint64_t)&encl->sigstruct;
 	ret = ioctl(encl->fd, SGX_IOC_ENCLAVE_INIT, &ioc);
 	if (ret) {
-		perror("SGX_IOC_ENCLAVE_INIT failed");
+		fprintf(stderr, "SGX_IOC_ENCLAVE_INIT failed: errno=%d\n",
+			errno);
 		return false;
 	}
 

@@ -1196,7 +1196,10 @@ static int rk_iommu_probe(struct platform_device *pdev)
 	if (err)
 		goto err_put_group;
 
-	err = iommu_device_register(&iommu->iommu, &rk_iommu_ops, dev);
+	iommu_device_set_ops(&iommu->iommu, &rk_iommu_ops);
+	iommu_device_set_fwnode(&iommu->iommu, &dev->of_node->fwnode);
+
+	err = iommu_device_register(&iommu->iommu);
 	if (err)
 		goto err_remove_sysfs;
 

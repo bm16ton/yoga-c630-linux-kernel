@@ -336,7 +336,6 @@ static struct platform_driver vf610_pinctrl_driver = {
 	.driver = {
 		.name = "vf610-pinctrl",
 		.of_match_table = vf610_pinctrl_of_match,
-		.suppress_bind_attrs = true,
 	},
 	.probe = vf610_pinctrl_probe,
 };

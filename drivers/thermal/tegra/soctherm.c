@@ -2118,6 +2118,7 @@ static int tegra_soctherm_probe(struct platform_device *pdev)
 	struct tegra_soctherm *tegra;
 	struct thermal_zone_device *z;
 	struct tsensor_shared_calib shared_calib;
+	struct resource *res;
 	struct tegra_soctherm_soc *soc;
 	unsigned int i;
 	int err;
@@ -2139,20 +2140,26 @@ static int tegra_soctherm_probe(struct platform_device *pdev)
 
 	tegra->soc = soc;
 
-	tegra->regs = devm_platform_ioremap_resource_byname(pdev, "soctherm-reg");
+	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+					   "soctherm-reg");
+	tegra->regs = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(tegra->regs)) {
 		dev_err(&pdev->dev, "can't get soctherm registers");
 		return PTR_ERR(tegra->regs);
 	}
 
 	if (!tegra->soc->use_ccroc) {
-		tegra->clk_regs = devm_platform_ioremap_resource_byname(pdev, "car-reg");
+		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+						   "car-reg");
+		tegra->clk_regs = devm_ioremap_resource(&pdev->dev, res);
 		if (IS_ERR(tegra->clk_regs)) {
 			dev_err(&pdev->dev, "can't get car clk registers");
 			return PTR_ERR(tegra->clk_regs);
 		}
 	} else {
-		tegra->ccroc_regs = devm_platform_ioremap_resource_byname(pdev, "ccroc-reg");
+		res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+						   "ccroc-reg");
+		tegra->ccroc_regs = devm_ioremap_resource(&pdev->dev, res);
 		if (IS_ERR(tegra->ccroc_regs)) {
 			dev_err(&pdev->dev, "can't get ccroc registers");
 			return PTR_ERR(tegra->ccroc_regs);
@@ -2188,7 +2195,7 @@ static int tegra_soctherm_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* calculate tsensor calibration data */
+	/* calculate tsensor calibaration data */
 	for (i = 0; i < soc->num_tsensors; ++i) {
 		err = tegra_calc_tsensor_calib(&soc->tsensors[i],
 					       &shared_calib,

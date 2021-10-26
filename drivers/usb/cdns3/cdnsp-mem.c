@@ -686,7 +686,7 @@ static void cdnsp_free_priv_device(struct cdnsp_device *pdev)
 
 static int cdnsp_alloc_priv_device(struct cdnsp_device *pdev)
 {
-	int ret;
+	int ret = -ENOMEM;
 
 	ret = cdnsp_init_device_ctx(pdev);
 	if (ret)
@@ -1231,6 +1231,7 @@ int cdnsp_mem_init(struct cdnsp_device *pdev)
 	if (!pdev->dcbaa)
 		return -ENOMEM;
 
+	memset(pdev->dcbaa, 0, sizeof(*pdev->dcbaa));
 	pdev->dcbaa->dma = dma;
 
 	cdnsp_write_64(dma, &pdev->op_regs->dcbaa_ptr);

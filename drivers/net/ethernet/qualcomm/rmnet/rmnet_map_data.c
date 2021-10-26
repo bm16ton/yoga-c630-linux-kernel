@@ -197,16 +197,22 @@ rmnet_map_ipv4_ul_csum_header(void *iphdr,
 			      struct rmnet_map_ul_csum_header *ul_header,
 			      struct sk_buff *skb)
 {
-	struct iphdr *ip4h = iphdr;
-	u16 val;
+	struct iphdr *ip4h = (struct iphdr *)iphdr;
+	__be16 *hdr = (__be16 *)ul_header, offset;
 
-	val = MAP_CSUM_UL_ENABLED_FLAG;
+	offset = htons((__force u16)(skb_transport_header(skb) -
+				     (unsigned char *)iphdr));
+	ul_header->csum_start_offset = offset;
+	ul_header->csum_insert_offset = skb->csum_offset;
+	ul_header->csum_enabled = 1;
 	if (ip4h->protocol == IPPROTO_UDP)
-		val |= MAP_CSUM_UL_UDP_FLAG;
-	val |= skb->csum_offset & MAP_CSUM_UL_OFFSET_MASK;
+		ul_header->udp_ind = 1;
+	else
+		ul_header->udp_ind = 0;
 
-	ul_header->csum_start_offset = htons(skb_network_header_len(skb));
-	ul_header->csum_info = htons(val);
+	/* Changing remaining fields to network order */
+	hdr++;
+	*hdr = htons((__force u16)*hdr);
 
 	skb->ip_summed = CHECKSUM_NONE;
 
@@ -233,16 +239,23 @@ rmnet_map_ipv6_ul_csum_header(void *ip6hdr,
 			      struct rmnet_map_ul_csum_header *ul_header,
 			      struct sk_buff *skb)
 {
-	struct ipv6hdr *ip6h = ip6hdr;
-	u16 val;
+	struct ipv6hdr *ip6h = (struct ipv6hdr *)ip6hdr;
+	__be16 *hdr = (__be16 *)ul_header, offset;
 
-	val = MAP_CSUM_UL_ENABLED_FLAG;
+	offset = htons((__force u16)(skb_transport_header(skb) -
+				     (unsigned char *)ip6hdr));
+	ul_header->csum_start_offset = offset;
+	ul_header->csum_insert_offset = skb->csum_offset;
+	ul_header->csum_enabled = 1;
+
 	if (ip6h->nexthdr == IPPROTO_UDP)
-		val |= MAP_CSUM_UL_UDP_FLAG;
-	val |= skb->csum_offset & MAP_CSUM_UL_OFFSET_MASK;
+		ul_header->udp_ind = 1;
+	else
+		ul_header->udp_ind = 0;
 
-	ul_header->csum_start_offset = htons(skb_network_header_len(skb));
-	ul_header->csum_info = htons(val);
+	/* Changing remaining fields to network order */
+	hdr++;
+	*hdr = htons((__force u16)*hdr);
 
 	skb->ip_summed = CHECKSUM_NONE;
 
@@ -271,7 +284,6 @@ struct rmnet_map_header *rmnet_map_add_map_header(struct sk_buff *skb,
 		return map_header;
 	}
 
-	BUILD_BUG_ON(MAP_PAD_LEN_MASK < 3);
 	padding = ALIGN(map_datalen, 4) - map_datalen;
 
 	if (padding == 0)
@@ -285,8 +297,7 @@ struct rmnet_map_header *rmnet_map_add_map_header(struct sk_buff *skb,
 
 done:
 	map_header->pkt_len = htons(map_datalen + padding);
-	/* This is a data packet, so the CMD bit is 0 */
-	map_header->flags = padding & MAP_PAD_LEN_MASK;
+	map_header->pad_len = padding & 0x3F;
 
 	return map_header;
 }
@@ -308,7 +319,7 @@ struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
 		return NULL;
 
 	maph = (struct rmnet_map_header *)skb->data;
-	packet_len = ntohs(maph->pkt_len) + sizeof(*maph);
+	packet_len = ntohs(maph->pkt_len) + sizeof(struct rmnet_map_header);
 
 	if (port->data_format & RMNET_FLAGS_INGRESS_MAP_CKSUMV4)
 		packet_len += sizeof(struct rmnet_map_dl_csum_trailer);
@@ -317,7 +328,7 @@ struct sk_buff *rmnet_map_deaggregate(struct sk_buff *skb,
 		return NULL;
 
 	/* Some hardware can send us empty frames. Catch them */
-	if (!maph->pkt_len)
+	if (ntohs(maph->pkt_len) == 0)
 		return NULL;
 
 	skbn = alloc_skb(packet_len + RMNET_MAP_DEAGGR_SPACING, GFP_ATOMIC);
@@ -350,7 +361,7 @@ int rmnet_map_checksum_downlink_packet(struct sk_buff *skb, u16 len)
 
 	csum_trailer = (struct rmnet_map_dl_csum_trailer *)(skb->data + len);
 
-	if (!(csum_trailer->flags & MAP_CSUM_DL_VALID_FLAG)) {
+	if (!csum_trailer->valid) {
 		priv->stats.csum_valid_unset++;
 		return -EINVAL;
 	}
@@ -410,7 +421,10 @@ void rmnet_map_checksum_uplink_packet(struct sk_buff *skb,
 	}
 
 sw_csum:
-	memset(ul_header, 0, sizeof(*ul_header));
+	ul_header->csum_start_offset = 0;
+	ul_header->csum_insert_offset = 0;
+	ul_header->csum_enabled = 0;
+	ul_header->udp_ind = 0;
 
 	priv->stats.csum_sw++;
 }

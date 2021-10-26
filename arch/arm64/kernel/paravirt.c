@@ -18,7 +18,6 @@
 #include <linux/reboot.h>
 #include <linux/slab.h>
 #include <linux/types.h>
-#include <linux/static_call.h>
 
 #include <asm/paravirt.h>
 #include <asm/pvclock-abi.h>
@@ -27,12 +26,8 @@
 struct static_key paravirt_steal_enabled;
 struct static_key paravirt_steal_rq_enabled;
 
-static u64 native_steal_clock(int cpu)
-{
-	return 0;
-}
-
-DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
+struct paravirt_patch_template pv_ops;
+EXPORT_SYMBOL_GPL(pv_ops);
 
 struct pv_time_stolen_time_region {
 	struct pvclock_vcpu_stolen_time *kaddr;
@@ -50,7 +45,7 @@ static int __init parse_no_stealacc(char *arg)
 early_param("no-steal-acc", parse_no_stealacc);
 
 /* return stolen time in ns by asking the hypervisor */
-static u64 para_steal_clock(int cpu)
+static u64 pv_steal_clock(int cpu)
 {
 	struct pv_time_stolen_time_region *reg;
 
@@ -155,7 +150,7 @@ int __init pv_time_init(void)
 	if (ret)
 		return ret;
 
-	static_call_update(pv_steal_clock, para_steal_clock);
+	pv_ops.time.steal_clock = pv_steal_clock;
 
 	static_key_slow_inc(&paravirt_steal_enabled);
 	if (steal_acc)

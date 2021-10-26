@@ -235,6 +235,7 @@ static int __xen_pcibk_get_pcifront_dev(struct pci_dev *pcidev,
 					unsigned int *devfn)
 {
 	struct pci_dev_entry *entry;
+	struct pci_dev *dev = NULL;
 	struct vpci_dev_data *vpci_dev = pdev->pci_dev_data;
 	int found = 0, slot;
 
@@ -243,7 +244,11 @@ static int __xen_pcibk_get_pcifront_dev(struct pci_dev *pcidev,
 		list_for_each_entry(entry,
 			    &vpci_dev->dev_list[slot],
 			    list) {
-			if (entry->dev == pcidev) {
+			dev = entry->dev;
+			if (dev && dev->bus->number == pcidev->bus->number
+				&& pci_domain_nr(dev->bus) ==
+					pci_domain_nr(pcidev->bus)
+				&& dev->devfn == pcidev->devfn) {
 				found = 1;
 				*domain = 0;
 				*bus = 0;

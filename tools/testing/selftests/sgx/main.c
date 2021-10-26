@@ -15,7 +15,6 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/auxv.h>
 #include "defines.h"
 #include "main.h"
 #include "../kselftest.h"
@@ -28,6 +27,24 @@ struct vdso_symtab {
 	const char *elf_symstrtab;
 	Elf64_Word *elf_hashtab;
 };
+
+static void *vdso_get_base_addr(char *envp[])
+{
+	Elf64_auxv_t *auxv;
+	int i;
+
+	for (i = 0; envp[i]; i++)
+		;
+
+	auxv = (Elf64_auxv_t *)&envp[i + 1];
+
+	for (i = 0; auxv[i].a_type != AT_NULL; i++) {
+		if (auxv[i].a_type == AT_SYSINFO_EHDR)
+			return (void *)auxv[i].a_un.a_val;
+	}
+
+	return NULL;
+}
 
 static Elf64_Dyn *vdso_get_dyntab(void *addr)
 {
@@ -145,7 +162,7 @@ static int user_handler(long rdi, long rsi, long rdx, long ursp, long r8, long r
 	return 0;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[], char *envp[])
 {
 	struct sgx_enclave_run run;
 	struct vdso_symtab symtab;
@@ -178,7 +195,7 @@ int main(int argc, char *argv[])
 		addr = mmap((void *)encl.encl_base + seg->offset, seg->size,
 			    seg->prot, MAP_SHARED | MAP_FIXED, encl.fd, 0);
 		if (addr == MAP_FAILED) {
-			perror("mmap() segment failed");
+			fprintf(stderr, "mmap() failed, errno=%d.\n", errno);
 			exit(KSFT_FAIL);
 		}
 	}
@@ -186,8 +203,7 @@ int main(int argc, char *argv[])
 	memset(&run, 0, sizeof(run));
 	run.tcs = encl.encl_base;
 
-	/* Get vDSO base address */
-	addr = (void *)getauxval(AT_SYSINFO_EHDR);
+	addr = vdso_get_base_addr(envp);
 	if (!addr)
 		goto err;
 

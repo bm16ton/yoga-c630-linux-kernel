@@ -15,7 +15,6 @@
 
 static const struct scpsys_domain_data scpsys_domain_data_mt8167[] = {
 	[MT8167_POWER_DOMAIN_MM] = {
-		.name = "mm",
 		.sta_mask = PWR_STATUS_DISP,
 		.ctl_offs = SPM_DIS_PWR_CON,
 		.sram_pdn_bits = GENMASK(11, 8),
@@ -27,7 +26,6 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8167[] = {
 		.caps = MTK_SCPD_ACTIVE_WAKEUP,
 	},
 	[MT8167_POWER_DOMAIN_VDEC] = {
-		.name = "vdec",
 		.sta_mask = PWR_STATUS_VDEC,
 		.ctl_offs = SPM_VDE_PWR_CON,
 		.sram_pdn_bits = GENMASK(8, 8),
@@ -35,7 +33,6 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8167[] = {
 		.caps = MTK_SCPD_ACTIVE_WAKEUP,
 	},
 	[MT8167_POWER_DOMAIN_ISP] = {
-		.name = "isp",
 		.sta_mask = PWR_STATUS_ISP,
 		.ctl_offs = SPM_ISP_PWR_CON,
 		.sram_pdn_bits = GENMASK(11, 8),
@@ -43,7 +40,6 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8167[] = {
 		.caps = MTK_SCPD_ACTIVE_WAKEUP,
 	},
 	[MT8167_POWER_DOMAIN_MFG_ASYNC] = {
-		.name = "mfg_async",
 		.sta_mask = MT8167_PWR_STATUS_MFG_ASYNC,
 		.ctl_offs = SPM_MFG_ASYNC_PWR_CON,
 		.sram_pdn_bits = 0,
@@ -54,21 +50,18 @@ static const struct scpsys_domain_data scpsys_domain_data_mt8167[] = {
 		},
 	},
 	[MT8167_POWER_DOMAIN_MFG_2D] = {
-		.name = "mfg_2d",
 		.sta_mask = MT8167_PWR_STATUS_MFG_2D,
 		.ctl_offs = SPM_MFG_2D_PWR_CON,
 		.sram_pdn_bits = GENMASK(11, 8),
 		.sram_pdn_ack_bits = GENMASK(15, 12),
 	},
 	[MT8167_POWER_DOMAIN_MFG] = {
-		.name = "mfg",
 		.sta_mask = PWR_STATUS_MFG,
 		.ctl_offs = SPM_MFG_PWR_CON,
 		.sram_pdn_bits = GENMASK(11, 8),
 		.sram_pdn_ack_bits = GENMASK(15, 12),
 	},
 	[MT8167_POWER_DOMAIN_CONN] = {
-		.name = "conn",
 		.sta_mask = PWR_STATUS_CONN,
 		.ctl_offs = SPM_CONN_PWR_CON,
 		.sram_pdn_bits = GENMASK(8, 8),

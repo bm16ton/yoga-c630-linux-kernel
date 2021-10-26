@@ -6,6 +6,12 @@
 
 #define JUMP_LABEL_NOP_SIZE 5
 
+#ifdef CONFIG_X86_64
+# define STATIC_KEY_INIT_NOP P6_NOP5_ATOMIC
+#else
+# define STATIC_KEY_INIT_NOP GENERIC_NOP5_ATOMIC
+#endif
+
 #include <asm/asm.h>
 #include <asm/nops.h>
 
@@ -14,10 +20,10 @@
 #include <linux/stringify.h>
 #include <linux/types.h>
 
-static __always_inline bool arch_static_branch(struct static_key * const key, const bool branch)
+static __always_inline bool arch_static_branch(struct static_key *key, bool branch)
 {
 	asm_volatile_goto("1:"
-		".byte " __stringify(BYTES_NOP5) "\n\t"
+		".byte " __stringify(STATIC_KEY_INIT_NOP) "\n\t"
 		".pushsection __jump_table,  \"aw\" \n\t"
 		_ASM_ALIGN "\n\t"
 		".long 1b - ., %l[l_yes] - . \n\t"
@@ -30,7 +36,7 @@ l_yes:
 	return true;
 }
 
-static __always_inline bool arch_static_branch_jump(struct static_key * const key, const bool branch)
+static __always_inline bool arch_static_branch_jump(struct static_key *key, bool branch)
 {
 	asm_volatile_goto("1:"
 		".byte 0xe9\n\t .long %l[l_yes] - 2f\n\t"
@@ -57,7 +63,7 @@ l_yes:
 	.long		\target - .Lstatic_jump_after_\@
 .Lstatic_jump_after_\@:
 	.else
-	.byte		BYTES_NOP5
+	.byte		STATIC_KEY_INIT_NOP
 	.endif
 	.pushsection __jump_table, "aw"
 	_ASM_ALIGN
@@ -69,7 +75,7 @@ l_yes:
 .macro STATIC_JUMP_IF_FALSE target, key, def
 .Lstatic_jump_\@:
 	.if \def
-	.byte		BYTES_NOP5
+	.byte		STATIC_KEY_INIT_NOP
 	.else
 	/* Equivalent to "jmp.d32 \target" */
 	.byte		0xe9

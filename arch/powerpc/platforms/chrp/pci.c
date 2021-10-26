@@ -131,7 +131,8 @@ static struct pci_ops rtas_pci_ops =
 
 volatile struct Hydra __iomem *Hydra = NULL;
 
-static int __init hydra_init(void)
+int __init
+hydra_init(void)
 {
 	struct device_node *np;
 	struct resource r;

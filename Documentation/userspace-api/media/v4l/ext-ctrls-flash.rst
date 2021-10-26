@@ -63,7 +63,6 @@ Flash Control IDs
     presence of some faults. See V4L2_CID_FLASH_FAULT.
 
 
-.. tabularcolumns:: |p{5.7cm}|p{11.8cm}|
 
 .. flat-table::
     :header-rows:  0
@@ -74,16 +73,14 @@ Flash Control IDs
     * - ``V4L2_FLASH_LED_MODE_FLASH``
       - Flash mode.
     * - ``V4L2_FLASH_LED_MODE_TORCH``
-      - Torch mode.
-
-        See V4L2_CID_FLASH_TORCH_INTENSITY.
+      - Torch mode. See V4L2_CID_FLASH_TORCH_INTENSITY.
 
 
 
 ``V4L2_CID_FLASH_STROBE_SOURCE (menu)``
     Defines the source of the flash LED strobe.
 
-.. tabularcolumns:: |p{7.5cm}|p{7.5cm}|
+.. tabularcolumns:: |p{7.5cm}|p{10.0cm}|
 
 .. flat-table::
     :header-rows:  0

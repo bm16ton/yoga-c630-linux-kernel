@@ -291,6 +291,7 @@ static int twl_pwmled_probe(struct platform_device *pdev)
 	}
 
 	twl->chip.dev = &pdev->dev;
+	twl->chip.base = -1;
 
 	mutex_init(&twl->mutex);
 

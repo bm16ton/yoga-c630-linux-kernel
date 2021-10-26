@@ -333,7 +333,6 @@ struct getdatarate_parm {
 	u32 rsvd;
 
 };
-
 struct getdatarate_rsp {
 	u8 datarates[NumRates];
 };
@@ -378,7 +377,6 @@ struct	getphy_rsp {
 struct readBB_parm {
 	u8	offset;
 };
-
 struct readBB_rsp {
 	u8	value;
 };
@@ -386,7 +384,6 @@ struct readBB_rsp {
 struct readTSSI_parm {
 	u8	offset;
 };
-
 struct readTSSI_rsp {
 	u8	value;
 };
@@ -403,7 +400,6 @@ struct writePTM_parm {
 struct readRF_parm {
 	u8	offset;
 };
-
 struct readRF_rsp {
 	u32	value;
 };
@@ -502,7 +498,6 @@ struct settxagctbl_parm {
 struct gettxagctbl_parm {
 	u32 rsvd;
 };
-
 struct gettxagctbl_rsp {
 	u32	txagc[MAX_RATES_LENGTH];
 };
@@ -518,7 +513,6 @@ struct setssup_parm	{
 struct getssup_parm	{
 	u32 rsvd;
 };
-
 struct getssup_rsp	{
 	u8	ss_ForceUp[MAX_RATES_LENGTH];
 };
@@ -530,7 +524,6 @@ struct setssdlevel_parm	{
 struct getssdlevel_parm	{
 	u32 rsvd;
 };
-
 struct getssdlevel_rsp	{
 	u8	ss_DLevel[MAX_RATES_LENGTH];
 };
@@ -542,7 +535,6 @@ struct setssulevel_parm	{
 struct getssulevel_parm	{
 	u32 rsvd;
 };
-
 struct getssulevel_rsp	{
 	u8	ss_ULevel[MAX_RATES_LENGTH];
 };
@@ -593,7 +585,6 @@ struct setratable_parm {
 struct getratable_parm {
 	uint rsvd;
 };
-
 struct getratable_rsp {
 	u8 ss_ForceUp[NumRates];
 	u8 ss_ULevel[NumRates];
@@ -630,7 +621,6 @@ struct getbcnokcnt_rsp {
 struct getbcnerrcnt_parm {
 	unsigned int rsvd;
 };
-
 struct getbcnerrcnt_rsp {
 	unsigned long bcnerrcnt;
 };

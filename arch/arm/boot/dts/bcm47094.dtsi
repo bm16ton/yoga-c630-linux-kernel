@@ -11,7 +11,7 @@
 &pinctrl {
 	compatible = "brcm,bcm4709-pinmux";
 
-	pinmux_mdio: mdio-pins {
+	pinmux_mdio: mdio {
 		groups = "mdio_grp";
 		function = "mdio";
 	};

@@ -1554,7 +1554,7 @@ static void set_table_handlers(struct tables *tables)
 		 * Attempt to use the call path root from the call return
 		 * processor, if the call return processor is in use. Otherwise,
 		 * we allocate a new call path root. This prevents exporting
-		 * duplicate call path ids when both are in use simultaneously.
+		 * duplicate call path ids when both are in use simultaniously.
 		 */
 		if (tables->dbe.crp)
 			tables->dbe.cpr = tables->dbe.crp->cpr;

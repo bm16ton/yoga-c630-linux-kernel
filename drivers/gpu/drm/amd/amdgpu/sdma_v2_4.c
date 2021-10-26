@@ -876,10 +876,12 @@ static int sdma_v2_4_sw_init(void *handle)
 		ring->ring_obj = NULL;
 		ring->use_doorbell = false;
 		sprintf(ring->name, "sdma%d", i);
-		r = amdgpu_ring_init(adev, ring, 1024, &adev->sdma.trap_irq,
-				     (i == 0) ? AMDGPU_SDMA_IRQ_INSTANCE0 :
+		r = amdgpu_ring_init(adev, ring, 1024,
+				     &adev->sdma.trap_irq,
+				     (i == 0) ?
+				     AMDGPU_SDMA_IRQ_INSTANCE0 :
 				     AMDGPU_SDMA_IRQ_INSTANCE1,
-				     AMDGPU_RING_PRIO_DEFAULT, NULL);
+				     AMDGPU_RING_PRIO_DEFAULT);
 		if (r)
 			return r;
 	}

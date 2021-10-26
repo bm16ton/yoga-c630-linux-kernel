@@ -122,7 +122,6 @@ void ConfigItem::updateMenu(void)
 		goto set_prompt;
 	case P_COMMENT:
 		setIcon(promptColIdx, QIcon());
-		prompt = "*** " + prompt + " ***";
 		goto set_prompt;
 	default:
 		;

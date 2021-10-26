@@ -330,8 +330,6 @@ static void vmw_binding_drop(struct vmw_ctx_bindinfo *bi)
  *
  * @cbs: Pointer to the context binding state tracker.
  * @bi: Information about the binding to track.
- * @shader_slot: The shader slot of the binding.
- * @slot: The slot of the binding.
  *
  * Starts tracking the binding in the context binding
  * state structure @cbs.
@@ -369,7 +367,6 @@ void vmw_binding_add_uav_index(struct vmw_ctx_binding_state *cbs, uint32 slot,
  * vmw_binding_transfer: Transfer a context binding tracking entry.
  *
  * @cbs: Pointer to the persistent context binding state tracker.
- * @from: Staged binding info built during execbuf
  * @bi: Information about the binding to track.
  *
  */
@@ -487,8 +484,9 @@ void vmw_binding_res_list_scrub(struct list_head *head)
 /**
  * vmw_binding_state_commit - Commit staged binding info
  *
- * @to:   Staged binding info area to copy into to.
+ * @ctx: Pointer to context to commit the staged binding info to.
  * @from: Staged binding info built during execbuf.
+ * @scrubbed: Transfer only scrubbed bindings.
  *
  * Transfers binding info from a temporary structure
  * (typically used by execbuf) to the persistent
@@ -513,7 +511,7 @@ void vmw_binding_state_commit(struct vmw_ctx_binding_state *to,
 /**
  * vmw_binding_rebind_all - Rebind all scrubbed bindings of a context
  *
- * @cbs: Pointer to the context binding state tracker.
+ * @ctx: The context resource
  *
  * Walks through the context binding list and rebinds all scrubbed
  * resources.
@@ -791,7 +789,6 @@ static void vmw_collect_dirty_view_ids(struct vmw_ctx_binding_state *cbs,
  * vmw_binding_emit_set_sr - Issue delayed DX shader resource binding commands
  *
  * @cbs: Pointer to the context's struct vmw_ctx_binding_state
- * @shader_slot: The shader slot of the binding.
  */
 static int vmw_emit_set_sr(struct vmw_ctx_binding_state *cbs,
 			   int shader_slot)

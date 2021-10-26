@@ -61,7 +61,6 @@ struct mtk_drm_crtc {
 
 	/* lock for display hardware access */
 	struct mutex			hw_lock;
-	bool				config_updating;
 };
 
 struct mtk_crtc_state {
@@ -98,7 +97,7 @@ static void mtk_drm_crtc_finish_page_flip(struct mtk_drm_crtc *mtk_crtc)
 static void mtk_drm_finish_page_flip(struct mtk_drm_crtc *mtk_crtc)
 {
 	drm_crtc_handle_vblank(&mtk_crtc->base);
-	if (!mtk_crtc->config_updating && mtk_crtc->pending_needs_vblank) {
+	if (mtk_crtc->pending_needs_vblank) {
 		mtk_drm_crtc_finish_page_flip(mtk_crtc);
 		mtk_crtc->pending_needs_vblank = false;
 	}
@@ -426,8 +425,7 @@ static void mtk_crtc_ddp_config(struct drm_crtc *crtc,
 	}
 }
 
-static void mtk_drm_crtc_update_config(struct mtk_drm_crtc *mtk_crtc,
-				       bool needs_vblank)
+static void mtk_drm_crtc_hw_config(struct mtk_drm_crtc *mtk_crtc)
 {
 #if IS_REACHABLE(CONFIG_MTK_CMDQ)
 	struct cmdq_pkt *cmdq_handle;
@@ -438,10 +436,6 @@ static void mtk_drm_crtc_update_config(struct mtk_drm_crtc *mtk_crtc,
 	int i;
 
 	mutex_lock(&mtk_crtc->hw_lock);
-	mtk_crtc->config_updating = true;
-	if (needs_vblank)
-		mtk_crtc->pending_needs_vblank = true;
-
 	for (i = 0; i < mtk_crtc->layer_nr; i++) {
 		struct drm_plane *plane = &mtk_crtc->planes[i];
 		struct mtk_plane_state *plane_state;
@@ -478,7 +472,6 @@ static void mtk_drm_crtc_update_config(struct mtk_drm_crtc *mtk_crtc,
 		cmdq_pkt_flush_async(cmdq_handle, ddp_cmdq_cb, cmdq_handle);
 	}
 #endif
-	mtk_crtc->config_updating = false;
 	mutex_unlock(&mtk_crtc->hw_lock);
 }
 
@@ -529,7 +522,7 @@ int mtk_drm_crtc_plane_check(struct drm_crtc *crtc, struct drm_plane *plane,
 }
 
 void mtk_drm_crtc_async_update(struct drm_crtc *crtc, struct drm_plane *plane,
-			       struct drm_atomic_state *state)
+			       struct drm_plane_state *new_state)
 {
 	struct mtk_drm_crtc *mtk_crtc = to_mtk_crtc(crtc);
 	const struct drm_plane_helper_funcs *plane_helper_funcs =
@@ -538,8 +531,8 @@ void mtk_drm_crtc_async_update(struct drm_crtc *crtc, struct drm_plane *plane,
 	if (!mtk_crtc->enabled)
 		return;
 
-	plane_helper_funcs->atomic_update(plane, state);
-	mtk_drm_crtc_update_config(mtk_crtc, false);
+	plane_helper_funcs->atomic_update(plane, new_state);
+	mtk_drm_crtc_hw_config(mtk_crtc);
 }
 
 static void mtk_drm_crtc_atomic_enable(struct drm_crtc *crtc,
@@ -589,7 +582,7 @@ static void mtk_drm_crtc_atomic_disable(struct drm_crtc *crtc,
 	}
 	mtk_crtc->pending_planes = true;
 
-	mtk_drm_crtc_update_config(mtk_crtc, false);
+	mtk_drm_crtc_hw_config(mtk_crtc);
 	/* Wait for planes to be disabled */
 	drm_crtc_wait_one_vblank(crtc);
 
@@ -625,12 +618,14 @@ static void mtk_drm_crtc_atomic_flush(struct drm_crtc *crtc,
 	struct mtk_drm_crtc *mtk_crtc = to_mtk_crtc(crtc);
 	int i;
 
+	if (mtk_crtc->event)
+		mtk_crtc->pending_needs_vblank = true;
 	if (crtc->state->color_mgmt_changed)
 		for (i = 0; i < mtk_crtc->ddp_comp_nr; i++) {
 			mtk_ddp_gamma_set(mtk_crtc->ddp_comp[i], crtc->state);
 			mtk_ddp_ctm_set(mtk_crtc->ddp_comp[i], crtc->state);
 		}
-	mtk_drm_crtc_update_config(mtk_crtc, !!mtk_crtc->event);
+	mtk_drm_crtc_hw_config(mtk_crtc);
 }
 
 static const struct drm_crtc_funcs mtk_crtc_funcs = {

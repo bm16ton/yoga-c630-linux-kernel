@@ -726,56 +726,6 @@ static inline size_t fdb_nlmsg_size(void)
 		+ nla_total_size(sizeof(u8)); /* NFEA_ACTIVITY_NOTIFY */
 }
 
-static int br_fdb_replay_one(struct notifier_block *nb,
-			     struct net_bridge_fdb_entry *fdb,
-			     struct net_device *dev)
-{
-	struct switchdev_notifier_fdb_info item;
-	int err;
-
-	item.addr = fdb->key.addr.addr;
-	item.vid = fdb->key.vlan_id;
-	item.added_by_user = test_bit(BR_FDB_ADDED_BY_USER, &fdb->flags);
-	item.offloaded = test_bit(BR_FDB_OFFLOADED, &fdb->flags);
-	item.info.dev = dev;
-
-	err = nb->notifier_call(nb, SWITCHDEV_FDB_ADD_TO_DEVICE, &item);
-	return notifier_to_errno(err);
-}
-
-int br_fdb_replay(struct net_device *br_dev, struct net_device *dev,
-		  struct notifier_block *nb)
-{
-	struct net_bridge_fdb_entry *fdb;
-	struct net_bridge *br;
-	int err = 0;
-
-	if (!netif_is_bridge_master(br_dev) || !netif_is_bridge_port(dev))
-		return -EINVAL;
-
-	br = netdev_priv(br_dev);
-
-	rcu_read_lock();
-
-	hlist_for_each_entry_rcu(fdb, &br->fdb_list, fdb_node) {
-		struct net_bridge_port *dst = READ_ONCE(fdb->dst);
-		struct net_device *dst_dev;
-
-		dst_dev = dst ? dst->dev : br->dev;
-		if (dst_dev != br_dev && dst_dev != dev)
-			continue;
-
-		err = br_fdb_replay_one(nb, fdb, dst_dev);
-		if (err)
-			break;
-	}
-
-	rcu_read_unlock();
-
-	return err;
-}
-EXPORT_SYMBOL_GPL(br_fdb_replay);
-
 static void fdb_notify(struct net_bridge *br,
 		       const struct net_bridge_fdb_entry *fdb, int type,
 		       bool swdev_notify)
@@ -1001,8 +951,7 @@ static int fdb_add_entry(struct net_bridge *br, struct net_bridge_port *source,
 
 static int __br_fdb_add(struct ndmsg *ndm, struct net_bridge *br,
 			struct net_bridge_port *p, const unsigned char *addr,
-			u16 nlh_flags, u16 vid, struct nlattr *nfea_tb[],
-			struct netlink_ext_ack *extack)
+			u16 nlh_flags, u16 vid, struct nlattr *nfea_tb[])
 {
 	int err = 0;
 
@@ -1021,15 +970,7 @@ static int __br_fdb_add(struct ndmsg *ndm, struct net_bridge *br,
 		rcu_read_unlock();
 		local_bh_enable();
 	} else if (ndm->ndm_flags & NTF_EXT_LEARNED) {
-		if (!p && !(ndm->ndm_state & NUD_PERMANENT)) {
-			NL_SET_ERR_MSG_MOD(extack,
-					   "FDB entry towards bridge must be permanent");
-			return -EINVAL;
-		}
-
-		err = br_fdb_external_learn_add(br, p, addr, vid,
-						ndm->ndm_state & NUD_PERMANENT,
-						true);
+		err = br_fdb_external_learn_add(br, p, addr, vid, true);
 	} else {
 		spin_lock_bh(&br->hash_lock);
 		err = fdb_add_entry(br, p, addr, ndm, nlh_flags, vid, nfea_tb);
@@ -1101,11 +1042,9 @@ int br_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
 		}
 
 		/* VID was specified, so use it. */
-		err = __br_fdb_add(ndm, br, p, addr, nlh_flags, vid, nfea_tb,
-				   extack);
+		err = __br_fdb_add(ndm, br, p, addr, nlh_flags, vid, nfea_tb);
 	} else {
-		err = __br_fdb_add(ndm, br, p, addr, nlh_flags, 0, nfea_tb,
-				   extack);
+		err = __br_fdb_add(ndm, br, p, addr, nlh_flags, 0, nfea_tb);
 		if (err || !vg || !vg->num_vlans)
 			goto out;
 
@@ -1117,7 +1056,7 @@ int br_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
 			if (!br_vlan_should_use(v))
 				continue;
 			err = __br_fdb_add(ndm, br, p, addr, nlh_flags, v->vid,
-					   nfea_tb, extack);
+					   nfea_tb);
 			if (err)
 				goto out;
 		}
@@ -1257,7 +1196,7 @@ void br_fdb_unsync_static(struct net_bridge *br, struct net_bridge_port *p)
 }
 
 int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
-			      const unsigned char *addr, u16 vid, bool is_local,
+			      const unsigned char *addr, u16 vid,
 			      bool swdev_notify)
 {
 	struct net_bridge_fdb_entry *fdb;
@@ -1274,10 +1213,6 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
 
 		if (swdev_notify)
 			flags |= BIT(BR_FDB_ADDED_BY_USER);
-
-		if (is_local)
-			flags |= BIT(BR_FDB_LOCAL);
-
 		fdb = fdb_create(br, p, addr, vid, flags);
 		if (!fdb) {
 			err = -ENOMEM;
@@ -1303,9 +1238,6 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
 
 		if (swdev_notify)
 			set_bit(BR_FDB_ADDED_BY_USER, &fdb->flags);
-
-		if (is_local)
-			set_bit(BR_FDB_LOCAL, &fdb->flags);
 
 		if (modified)
 			fdb_notify(br, fdb, RTM_NEWNEIGH, swdev_notify);

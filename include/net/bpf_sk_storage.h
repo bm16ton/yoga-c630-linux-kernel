@@ -27,6 +27,7 @@ struct bpf_local_storage_elem;
 struct bpf_sk_storage_diag;
 struct sk_buff;
 struct nlattr;
+struct sock;
 
 #ifdef CONFIG_BPF_SYSCALL
 int bpf_sk_storage_clone(const struct sock *sk, struct sock *newsk);

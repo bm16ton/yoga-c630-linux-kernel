@@ -74,17 +74,13 @@ static const struct property_entry mcp251x_properties[] = {
 	{}
 };
 
-static const struct software_node mcp251x_node = {
-	.properties = mcp251x_properties,
-};
-
 static struct spi_board_info mcp251x_board_info[] = {
 	{
 		.modalias        = "mcp2515",
 		.max_speed_hz    = 6500000,
 		.bus_num         = 3,
 		.chip_select     = 0,
-		.swnode		 = &mcp251x_node,
+		.properties      = mcp251x_properties,
 		.controller_data = &mcp251x_chip_info1,
 		.irq             = PXA_GPIO_TO_IRQ(ICONTROL_MCP251x_nIRQ1)
 	},
@@ -93,7 +89,7 @@ static struct spi_board_info mcp251x_board_info[] = {
 		.max_speed_hz    = 6500000,
 		.bus_num         = 3,
 		.chip_select     = 1,
-		.swnode		 = &mcp251x_node,
+		.properties      = mcp251x_properties,
 		.controller_data = &mcp251x_chip_info2,
 		.irq             = PXA_GPIO_TO_IRQ(ICONTROL_MCP251x_nIRQ2)
 	},
@@ -102,7 +98,7 @@ static struct spi_board_info mcp251x_board_info[] = {
 		.max_speed_hz    = 6500000,
 		.bus_num         = 4,
 		.chip_select     = 0,
-		.swnode		 = &mcp251x_node,
+		.properties      = mcp251x_properties,
 		.controller_data = &mcp251x_chip_info3,
 		.irq             = PXA_GPIO_TO_IRQ(ICONTROL_MCP251x_nIRQ3)
 	},
@@ -111,7 +107,7 @@ static struct spi_board_info mcp251x_board_info[] = {
 		.max_speed_hz    = 6500000,
 		.bus_num         = 4,
 		.chip_select     = 1,
-		.swnode		 = &mcp251x_node,
+		.properties      = mcp251x_properties,
 		.controller_data = &mcp251x_chip_info4,
 		.irq             = PXA_GPIO_TO_IRQ(ICONTROL_MCP251x_nIRQ4)
 	}

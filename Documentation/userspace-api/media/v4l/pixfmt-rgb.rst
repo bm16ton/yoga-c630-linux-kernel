@@ -655,7 +655,12 @@ nomenclature that instead use the order of components as seen in a 24- or
 
 .. raw:: latex
 
-    \small
+    \begingroup
+    \tiny
+    \setlength{\tabcolsep}{2pt}
+
+.. tabularcolumns:: |p{2.8cm}|p{2.0cm}|p{2.0cm}|p{2.0cm}|p{2.0cm}|p{2.0cm}|p{2.0cm}|p{2.0cm}|
+
 
 .. flat-table:: RGB Formats With 8 Bits Per Component
     :header-rows:  1
@@ -760,7 +765,7 @@ nomenclature that instead use the order of components as seen in a 24- or
 
 .. raw:: latex
 
-    \normalsize
+    \endgroup
 
 
 Deprecated RGB Formats

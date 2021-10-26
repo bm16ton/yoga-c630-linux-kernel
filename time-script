@@ -1,4 +1,0 @@
-find ./* -print | while read filename; do
-    # do whatever you want with the file
-    touch -a -m -t 202108130522.09 "$filename"
-done

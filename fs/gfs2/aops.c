@@ -540,7 +540,10 @@ int gfs2_internal_read(struct gfs2_inode *ip, char *buf, loff_t *pos,
 
 /**
  * gfs2_readahead - Read a bunch of pages at once
- * @rac: Read-ahead control structure
+ * @file: The file to read from
+ * @mapping: Address space info
+ * @pages: List of pages to read
+ * @nr_pages: Number of pages to read
  *
  * Some notes:
  * 1. This is only for readahead, so we can simply ignore any things

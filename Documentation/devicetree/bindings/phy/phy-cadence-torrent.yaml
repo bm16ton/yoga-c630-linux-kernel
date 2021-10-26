@@ -28,27 +28,13 @@ properties:
   '#size-cells':
     const: 0
 
-  '#clock-cells':
-    const: 1
-
   clocks:
-    minItems: 1
-    maxItems: 2
+    maxItems: 1
     description:
-      PHY reference clock for 1 item. Must contain an entry in clock-names.
-      Optional Parent to enable output reference clock.
+      PHY reference clock. Must contain an entry in clock-names.
 
   clock-names:
-    minItems: 1
-    items:
-      - const: refclk
-      - const: phy_en_refclk
-
-  assigned-clocks:
-    maxItems: 3
-
-  assigned-clock-parents:
-    maxItems: 3
+    const: refclk
 
   reg:
     minItems: 1
@@ -118,7 +104,7 @@ patternProperties:
         description:
           Specifies the Spread Spectrum Clocking mode used. It can be NO_SSC,
           EXTERNAL_SSC or INTERNAL_SSC.
-          Refer include/dt-bindings/phy/phy-cadence.h for the constants to be used.
+          Refer include/dt-bindings/phy/phy-cadence-torrent.h for the constants to be used.
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2]
         default: 0
@@ -184,7 +170,7 @@ examples:
     };
   - |
     #include <dt-bindings/phy/phy.h>
-    #include <dt-bindings/phy/phy-cadence.h>
+    #include <dt-bindings/phy/phy-cadence-torrent.h>
 
     bus {
         #address-cells = <2>;

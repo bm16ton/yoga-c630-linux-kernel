@@ -80,8 +80,7 @@ struct vmw_relocation {
  * with a NOP.
  * @vmw_res_rel_cond_nop: Conditional NOP relocation. If the resource id after
  * validation is -1, the command is replaced with a NOP. Otherwise no action.
- * @vmw_res_rel_max: Last value in the enum - used for error checking
-*/
+ */
 enum vmw_resource_relocation_type {
 	vmw_res_rel_normal,
 	vmw_res_rel_nop,
@@ -123,11 +122,9 @@ struct vmw_ctx_validation_info {
 /**
  * struct vmw_cmd_entry - Describe a command for the verifier
  *
- * @func: Call-back to handle the command.
  * @user_allow: Whether allowed from the execbuf ioctl.
  * @gb_disable: Whether disabled if guest-backed objects are available.
  * @gb_enable: Whether enabled iff guest-backed objects are available.
- * @cmd_name: Name of the command.
  */
 struct vmw_cmd_entry {
 	int (*func) (struct vmw_private *, struct vmw_sw_context *,
@@ -206,7 +203,6 @@ static void vmw_bind_dx_query_mob(struct vmw_sw_context *sw_context)
  *
  * @dev_priv: Pointer to the device private:
  * @sw_context: The command submission context
- * @res: Pointer to the resource
  * @node: The validation node holding the context resource metadata
  */
 static int vmw_cmd_ctx_first_setup(struct vmw_private *dev_priv,
@@ -513,7 +509,7 @@ static int vmw_resource_context_res_add(struct vmw_private *dev_priv,
 /**
  * vmw_resource_relocation_add - Add a relocation to the relocation list
  *
- * @sw_context: Pointer to the software context.
+ * @list: Pointer to head of relocation list.
  * @res: The resource.
  * @offset: Offset into the command buffer currently being parsed where the id
  * that needs fixup is located. Granularity is one byte.
@@ -643,7 +639,7 @@ static int vmw_resources_reserve(struct vmw_sw_context *sw_context)
  * @converter: User-space visisble type specific information.
  * @id_loc: Pointer to the location in the command buffer currently being parsed
  * from where the user-space resource id handle is located.
- * @p_res: Pointer to pointer to resource validalidation node. Populated on
+ * @p_val: Pointer to pointer to resource validalidation node. Populated on
  * exit.
  */
 static int
@@ -1704,7 +1700,7 @@ static int vmw_cmd_check_define_gmrfb(struct vmw_private *dev_priv,
  *
  * @dev_priv: Pointer to a device private struct.
  * @sw_context: The software context being used for this batch.
- * @res: Pointer to the resource.
+ * @val_node: The validation node representing the resource.
  * @buf_id: Pointer to the user-space backup buffer handle in the command
  * stream.
  * @backup_offset: Offset of backup into MOB.
@@ -3755,7 +3751,7 @@ static int vmw_resize_cmd_bounce(struct vmw_sw_context *sw_context,
 	return 0;
 }
 
-/*
+/**
  * vmw_execbuf_fence_commands - create and submit a command stream fence
  *
  * Creates a fence object and submits a command stream marker.
@@ -3955,9 +3951,9 @@ static int vmw_execbuf_submit_cmdbuf(struct vmw_private *dev_priv,
  * On successful return, the function returns a pointer to the data in the
  * command buffer and *@header is set to non-NULL.
  *
- * @kernel_commands: If command buffers could not be used, the function will
- * return the value of @kernel_commands on function call. That value may be
- * NULL. In that case, the value of *@header will be set to NULL.
+ * If command buffers could not be used, the function will return the value of
+ * @kernel_commands on function call. That value may be NULL. In that case, the
+ * value of *@header will be set to NULL.
  *
  * If an error is encountered, the function will return a pointer error value.
  * If the function is interrupted by a signal while sleeping, it will return

@@ -6,9 +6,8 @@
  * Maxime Ripard <maxime.ripard@free-electrons.com>
  */
 
-#include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
-#include <drm/drm_gem_atomic_helper.h>
+#include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_plane_helper.h>
 
 #include "sun4i_backend.h"
@@ -64,10 +63,8 @@ static void sun4i_backend_layer_destroy_state(struct drm_plane *plane,
 }
 
 static void sun4i_backend_layer_atomic_disable(struct drm_plane *plane,
-					       struct drm_atomic_state *state)
+					       struct drm_plane_state *old_state)
 {
-	struct drm_plane_state *old_state = drm_atomic_get_old_plane_state(state,
-									   plane);
 	struct sun4i_layer_state *layer_state = state_to_sun4i_layer_state(old_state);
 	struct sun4i_layer *layer = plane_to_sun4i_layer(plane);
 	struct sun4i_backend *backend = layer->backend;
@@ -84,11 +81,9 @@ static void sun4i_backend_layer_atomic_disable(struct drm_plane *plane,
 }
 
 static void sun4i_backend_layer_atomic_update(struct drm_plane *plane,
-					      struct drm_atomic_state *state)
+					      struct drm_plane_state *old_state)
 {
-	struct drm_plane_state *new_state = drm_atomic_get_new_plane_state(state,
-									   plane);
-	struct sun4i_layer_state *layer_state = state_to_sun4i_layer_state(new_state);
+	struct sun4i_layer_state *layer_state = state_to_sun4i_layer_state(plane->state);
 	struct sun4i_layer *layer = plane_to_sun4i_layer(plane);
 	struct sun4i_backend *backend = layer->backend;
 	struct sun4i_frontend *frontend = backend->frontend;
@@ -127,7 +122,7 @@ static bool sun4i_layer_format_mod_supported(struct drm_plane *plane,
 }
 
 static const struct drm_plane_helper_funcs sun4i_backend_layer_helper_funcs = {
-	.prepare_fb	= drm_gem_plane_helper_prepare_fb,
+	.prepare_fb	= drm_gem_fb_prepare_fb,
 	.atomic_disable	= sun4i_backend_layer_atomic_disable,
 	.atomic_update	= sun4i_backend_layer_atomic_update,
 };

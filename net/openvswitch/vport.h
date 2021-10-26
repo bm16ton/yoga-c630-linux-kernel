@@ -20,7 +20,7 @@
 struct vport;
 struct vport_parms;
 
-/* The following definitions are for users of the vport subsystem: */
+/* The following definitions are for users of the vport subsytem: */
 
 int ovs_vport_init(void);
 void ovs_vport_exit(void);

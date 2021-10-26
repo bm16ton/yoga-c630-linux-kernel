@@ -1382,8 +1382,7 @@ static int mspro_block_resume(struct memstick_dev *card)
 
 	new_msb->card = card;
 	memstick_set_drvdata(card, new_msb);
-	rc = mspro_block_init_card(card);
-	if (rc)
+	if (mspro_block_init_card(card))
 		goto out_free;
 
 	for (cnt = 0; new_msb->attr_group.attrs[cnt]

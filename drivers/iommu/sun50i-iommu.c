@@ -968,7 +968,10 @@ static int sun50i_iommu_probe(struct platform_device *pdev)
 	if (ret)
 		goto err_free_group;
 
-	ret = iommu_device_register(&iommu->iommu, &sun50i_iommu_ops, &pdev->dev);
+	iommu_device_set_ops(&iommu->iommu, &sun50i_iommu_ops);
+	iommu_device_set_fwnode(&iommu->iommu, &pdev->dev.of_node->fwnode);
+
+	ret = iommu_device_register(&iommu->iommu);
 	if (ret)
 		goto err_remove_sysfs;
 

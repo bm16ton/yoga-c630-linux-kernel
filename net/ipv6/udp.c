@@ -502,14 +502,12 @@ static struct sock *__udp6_lib_err_encap(struct net *net,
 					 const struct ipv6hdr *hdr, int offset,
 					 struct udphdr *uh,
 					 struct udp_table *udptable,
-					 struct sock *sk,
 					 struct sk_buff *skb,
 					 struct inet6_skb_parm *opt,
 					 u8 type, u8 code, __be32 info)
 {
-	int (*lookup)(struct sock *sk, struct sk_buff *skb);
 	int network_offset, transport_offset;
-	struct udp_sock *up;
+	struct sock *sk;
 
 	network_offset = skb_network_offset(skb);
 	transport_offset = skb_transport_offset(skb);
@@ -520,28 +518,18 @@ static struct sock *__udp6_lib_err_encap(struct net *net,
 	/* Transport header needs to point to the UDP header */
 	skb_set_transport_header(skb, offset);
 
-	if (sk) {
-		up = udp_sk(sk);
-
-		lookup = READ_ONCE(up->encap_err_lookup);
-		if (lookup && lookup(sk, skb))
-			sk = NULL;
-
-		goto out;
-	}
-
 	sk = __udp6_lib_lookup(net, &hdr->daddr, uh->source,
 			       &hdr->saddr, uh->dest,
 			       inet6_iif(skb), 0, udptable, skb);
 	if (sk) {
-		up = udp_sk(sk);
+		int (*lookup)(struct sock *sk, struct sk_buff *skb);
+		struct udp_sock *up = udp_sk(sk);
 
 		lookup = READ_ONCE(up->encap_err_lookup);
 		if (!lookup || lookup(sk, skb))
 			sk = NULL;
 	}
 
-out:
 	if (!sk) {
 		sk = ERR_PTR(__udp6_lib_err_encap_no_sk(skb, opt, type, code,
 							offset, info));
@@ -570,17 +558,16 @@ int __udp6_lib_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
 
 	sk = __udp6_lib_lookup(net, daddr, uh->dest, saddr, uh->source,
 			       inet6_iif(skb), inet6_sdif(skb), udptable, NULL);
-
 	if (!sk || udp_sk(sk)->encap_type) {
 		/* No socket for error: try tunnels before discarding */
+		sk = ERR_PTR(-ENOENT);
 		if (static_branch_unlikely(&udpv6_encap_needed_key)) {
 			sk = __udp6_lib_err_encap(net, hdr, offset, uh,
-						  udptable, sk, skb,
+						  udptable, skb,
 						  opt, type, code, info);
 			if (!sk)
 				return 0;
-		} else
-			sk = ERR_PTR(-ENOENT);
+		}
 
 		if (IS_ERR(sk)) {
 			__ICMP6_INC_STATS(net, __in6_dev_get(skb->dev),
@@ -762,7 +749,6 @@ static int udpv6_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
 	skb_list_walk_safe(segs, skb, next) {
 		__skb_pull(skb, skb_transport_offset(skb));
 
-		udp_post_segment_fix_csum(skb);
 		ret = udpv6_queue_rcv_one_skb(sk, skb);
 		if (ret > 0)
 			ip6_protocol_deliver_rcu(dev_net(skb->dev), skb, ret,
@@ -1309,7 +1295,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 	int (*getfrag)(void *, char *, int, int, int, struct sk_buff *);
 
 	ipcm6_init(&ipc6);
-	ipc6.gso_size = READ_ONCE(up->gso_size);
+	ipc6.gso_size = up->gso_size;
 	ipc6.sockc.tsflags = sk->sk_tsflags;
 	ipc6.sockc.mark = sk->sk_mark;
 
@@ -1730,9 +1716,6 @@ struct proto udpv6_prot = {
 	.unhash			= udp_lib_unhash,
 	.rehash			= udp_v6_rehash,
 	.get_port		= udp_v6_get_port,
-#ifdef CONFIG_BPF_SYSCALL
-	.psock_update_sk_prot	= udp_bpf_update_proto,
-#endif
 	.memory_allocated	= &udp_memory_allocated,
 	.sysctl_mem		= sysctl_udp_mem,
 	.sysctl_wmem_offset     = offsetof(struct net, ipv4.sysctl_udp_wmem_min),

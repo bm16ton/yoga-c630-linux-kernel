@@ -37,12 +37,22 @@ static struct pwm_device *pwm_to_device(unsigned int pwm)
 	return radix_tree_lookup(&pwm_tree, pwm);
 }
 
-static int alloc_pwms(unsigned int count)
+static int alloc_pwms(int pwm, unsigned int count)
 {
+	unsigned int from = 0;
 	unsigned int start;
 
-	start = bitmap_find_next_zero_area(allocated_pwms, MAX_PWMS, 0,
+	if (pwm >= MAX_PWMS)
+		return -EINVAL;
+
+	if (pwm >= 0)
+		from = pwm;
+
+	start = bitmap_find_next_zero_area(allocated_pwms, MAX_PWMS, from,
 					   count, 0);
+
+	if (pwm >= 0 && start != pwm)
+		return -EEXIST;
 
 	if (start + count > MAX_PWMS)
 		return -ENOSPC;
@@ -250,14 +260,18 @@ static bool pwm_ops_check(const struct pwm_chip *chip)
 }
 
 /**
- * pwmchip_add() - register a new PWM chip
+ * pwmchip_add_with_polarity() - register a new PWM chip
  * @chip: the PWM chip to add
+ * @polarity: initial polarity of PWM channels
  *
- * Register a new PWM chip.
+ * Register a new PWM chip. If chip->base < 0 then a dynamically assigned base
+ * will be used. The initial polarity for all channels is specified by the
+ * @polarity parameter.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
-int pwmchip_add(struct pwm_chip *chip)
+int pwmchip_add_with_polarity(struct pwm_chip *chip,
+			      enum pwm_polarity polarity)
 {
 	struct pwm_device *pwm;
 	unsigned int i;
@@ -271,11 +285,9 @@ int pwmchip_add(struct pwm_chip *chip)
 
 	mutex_lock(&pwm_lock);
 
-	ret = alloc_pwms(chip->npwm);
+	ret = alloc_pwms(chip->base, chip->npwm);
 	if (ret < 0)
 		goto out;
-
-	chip->base = ret;
 
 	chip->pwms = kcalloc(chip->npwm, sizeof(*pwm), GFP_KERNEL);
 	if (!chip->pwms) {
@@ -283,12 +295,15 @@ int pwmchip_add(struct pwm_chip *chip)
 		goto out;
 	}
 
+	chip->base = ret;
+
 	for (i = 0; i < chip->npwm; i++) {
 		pwm = &chip->pwms[i];
 
 		pwm->chip = chip;
 		pwm->pwm = chip->base + i;
 		pwm->hwpwm = i;
+		pwm->state.polarity = polarity;
 
 		radix_tree_insert(&pwm_tree, pwm->pwm, pwm);
 	}
@@ -310,6 +325,21 @@ out:
 		pwmchip_sysfs_export(chip);
 
 	return ret;
+}
+EXPORT_SYMBOL_GPL(pwmchip_add_with_polarity);
+
+/**
+ * pwmchip_add() - register a new PWM chip
+ * @chip: the PWM chip to add
+ *
+ * Register a new PWM chip. If chip->base < 0 then a dynamically assigned base
+ * will be used. The initial polarity for all channels is normal.
+ *
+ * Returns: 0 on success or a negative error code on failure.
+ */
+int pwmchip_add(struct pwm_chip *chip)
+{
+	return pwmchip_add_with_polarity(chip, PWM_POLARITY_NORMAL);
 }
 EXPORT_SYMBOL_GPL(pwmchip_add);
 
@@ -577,7 +607,7 @@ int pwm_apply_state(struct pwm_device *pwm, const struct pwm_state *state)
 		 */
 		if (state->polarity != pwm->state.polarity) {
 			if (!chip->ops->set_polarity)
-				return -EINVAL;
+				return -ENOTSUPP;
 
 			/*
 			 * Changing the polarity of a running PWM is

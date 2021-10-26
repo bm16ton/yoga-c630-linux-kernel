@@ -394,12 +394,11 @@ static int stmmac_of_get_mac_mode(struct device_node *np)
  * set some private fields that will be used by the main at runtime.
  */
 struct plat_stmmacenet_data *
-stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+stmmac_probe_config_dt(struct platform_device *pdev, const char **mac)
 {
 	struct device_node *np = pdev->dev.of_node;
 	struct plat_stmmacenet_data *plat;
 	struct stmmac_dma_cfg *dma_cfg;
-	int phy_mode;
 	void *ret;
 	int rc;
 
@@ -407,19 +406,18 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
 	if (!plat)
 		return ERR_PTR(-ENOMEM);
 
-	rc = of_get_mac_address(np, mac);
-	if (rc) {
-		if (rc == -EPROBE_DEFER)
-			return ERR_PTR(rc);
+	*mac = of_get_mac_address(np);
+	if (IS_ERR(*mac)) {
+		if (PTR_ERR(*mac) == -EPROBE_DEFER)
+			return ERR_CAST(*mac);
 
-		eth_zero_addr(mac);
+		*mac = NULL;
 	}
 
-	phy_mode = device_get_phy_mode(&pdev->dev);
-	if (phy_mode < 0)
-		return ERR_PTR(phy_mode);
+	plat->phy_interface = device_get_phy_mode(&pdev->dev);
+	if (plat->phy_interface < 0)
+		return ERR_PTR(plat->phy_interface);
 
-	plat->phy_interface = phy_mode;
 	plat->interface = stmmac_of_get_mac_mode(np);
 	if (plat->interface < 0)
 		plat->interface = plat->phy_interface;
@@ -631,7 +629,7 @@ void stmmac_remove_config_dt(struct platform_device *pdev,
 }
 #else
 struct plat_stmmacenet_data *
-stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+stmmac_probe_config_dt(struct platform_device *pdev, const char **mac)
 {
 	return ERR_PTR(-EINVAL);
 }
@@ -708,6 +706,7 @@ int stmmac_pltfr_remove(struct platform_device *pdev)
 }
 EXPORT_SYMBOL_GPL(stmmac_pltfr_remove);
 
+#ifdef CONFIG_PM_SLEEP
 /**
  * stmmac_pltfr_suspend
  * @dev: device pointer
@@ -715,7 +714,7 @@ EXPORT_SYMBOL_GPL(stmmac_pltfr_remove);
  * call the main suspend function and then, if required, on some platform, it
  * can call an exit helper.
  */
-static int __maybe_unused stmmac_pltfr_suspend(struct device *dev)
+static int stmmac_pltfr_suspend(struct device *dev)
 {
 	int ret;
 	struct net_device *ndev = dev_get_drvdata(dev);
@@ -736,7 +735,7 @@ static int __maybe_unused stmmac_pltfr_suspend(struct device *dev)
  * the main resume function, on some platforms, it can call own init helper
  * if required.
  */
-static int __maybe_unused stmmac_pltfr_resume(struct device *dev)
+static int stmmac_pltfr_resume(struct device *dev)
 {
 	struct net_device *ndev = dev_get_drvdata(dev);
 	struct stmmac_priv *priv = netdev_priv(ndev);
@@ -747,29 +746,10 @@ static int __maybe_unused stmmac_pltfr_resume(struct device *dev)
 
 	return stmmac_resume(dev);
 }
+#endif /* CONFIG_PM_SLEEP */
 
-static int __maybe_unused stmmac_runtime_suspend(struct device *dev)
-{
-	struct net_device *ndev = dev_get_drvdata(dev);
-	struct stmmac_priv *priv = netdev_priv(ndev);
-
-	stmmac_bus_clks_config(priv, false);
-
-	return 0;
-}
-
-static int __maybe_unused stmmac_runtime_resume(struct device *dev)
-{
-	struct net_device *ndev = dev_get_drvdata(dev);
-	struct stmmac_priv *priv = netdev_priv(ndev);
-
-	return stmmac_bus_clks_config(priv, true);
-}
-
-const struct dev_pm_ops stmmac_pltfr_pm_ops = {
-	SET_SYSTEM_SLEEP_PM_OPS(stmmac_pltfr_suspend, stmmac_pltfr_resume)
-	SET_RUNTIME_PM_OPS(stmmac_runtime_suspend, stmmac_runtime_resume, NULL)
-};
+SIMPLE_DEV_PM_OPS(stmmac_pltfr_pm_ops, stmmac_pltfr_suspend,
+				       stmmac_pltfr_resume);
 EXPORT_SYMBOL_GPL(stmmac_pltfr_pm_ops);
 
 MODULE_DESCRIPTION("STMMAC 10/100/1000 Ethernet platform support");

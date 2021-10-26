@@ -41,7 +41,6 @@
 #include "security.h"
 #include "objsec.h"
 #include "conditional.h"
-#include "ima.h"
 
 enum sel_inos {
 	SEL_ROOT_INO = 2,
@@ -183,8 +182,6 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
 		selinux_status_update_setenforce(state, new_value);
 		if (!new_value)
 			call_blocking_lsm_notifier(LSM_POLICY_CHANGE, NULL);
-
-		selinux_ima_measure_state(state);
 	}
 	length = count;
 out:
@@ -761,9 +758,6 @@ static ssize_t sel_write_checkreqprot(struct file *file, const char __user *buf,
 
 	checkreqprot_set(fsi->state, (new_value ? 1 : 0));
 	length = count;
-
-	selinux_ima_measure_state(fsi->state);
-
 out:
 	kfree(page);
 	return length;

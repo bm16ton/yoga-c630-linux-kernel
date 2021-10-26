@@ -531,6 +531,7 @@ static int afe4403_probe(struct spi_device *spi)
 		iio_trigger_set_drvdata(afe->trig, indio_dev);
 
 		afe->trig->ops = &afe4403_trigger_ops;
+		afe->trig->dev.parent = afe->dev;
 
 		ret = iio_trigger_register(afe->trig);
 		if (ret) {

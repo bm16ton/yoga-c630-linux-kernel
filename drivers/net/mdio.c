@@ -83,7 +83,7 @@ int mdio_set_flag(const struct mdio_if_info *mdio,
 EXPORT_SYMBOL(mdio_set_flag);
 
 /**
- * mdio45_links_ok - is link status up/OK
+ * mdio_link_ok - is link status up/OK
  * @mdio: MDIO interface
  * @mmd_mask: Mask for MMDs to check
  *

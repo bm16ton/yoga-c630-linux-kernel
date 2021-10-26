@@ -49,6 +49,9 @@
 #include "ia_css_pipe_util.h"
 #include "ia_css_pipe_binarydesc.h"
 #include "ia_css_pipe_stagedesc.h"
+#ifndef ISP2401
+#include "ia_css_isys.h"
+#endif
 
 #include "tag.h"
 #include "assert_support.h"
@@ -1060,7 +1063,7 @@ sh_css_config_input_network(struct ia_css_stream *stream) {
 	ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE_PRIVATE,
 			    "sh_css_config_input_network() enter 0x%p:\n", stream);
 
-	if (stream->config.continuous)
+	if (stream->config.continuous == true)
 	{
 		if (stream->last_pipe->config.mode == IA_CSS_PIPE_MODE_CAPTURE) {
 			pipe = stream->last_pipe;
@@ -5623,7 +5626,7 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 		} else {
 			/* output from main binary is not yuv line. currently this is
 			 * possible only when bci is enabled on vfpp output */
-			assert(pipe->config.enable_vfpp_bci);
+			assert(pipe->config.enable_vfpp_bci == true);
 			ia_css_pipe_get_yuvscaler_binarydesc(pipe, &vf_pp_descr,
 							     &mycs->video_binary.vf_frame_info,
 							     pipe_vf_out_info, NULL, NULL);
@@ -8069,7 +8072,7 @@ create_host_regular_capture_pipeline(struct ia_css_pipe *pipe) {
 		struct ia_css_frame *tmp_out_frame = NULL;
 
 		for (i = 0; i < num_yuv_scaler; i++) {
-			if (is_output_stage[i])
+			if (is_output_stage[i] == true)
 				tmp_out_frame = out_frame;
 			else
 				tmp_out_frame = NULL;
@@ -8461,7 +8464,7 @@ sh_css_pipeline_add_acc_stage(struct ia_css_pipeline *pipeline,
 	/* In QoS case, load_extension already called, so skipping */
 	int	err = 0;
 
-	if (!fw->loaded)
+	if (fw->loaded == false)
 		err = acc_load_extension(fw);
 
 	ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE,
@@ -9698,8 +9701,8 @@ ia_css_stream_destroy(struct ia_css_stream *stream) {
 			assert(entry);
 			if (entry) {
 				/* get the SP thread id */
-				if (!ia_css_pipeline_get_sp_thread_id(
-					ia_css_pipe_get_pipe_num(entry), &sp_thread_id))
+				if (ia_css_pipeline_get_sp_thread_id(
+					ia_css_pipe_get_pipe_num(entry), &sp_thread_id) != true)
 					return -EINVAL;
 				/* get the target input terminal */
 				sp_pipeline_input_terminal =

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * SCSI device handler infrastructure.
+ * SCSI device handler infrastruture.
  *
  * Copyright IBM Corporation, 2007
  *      Authors:

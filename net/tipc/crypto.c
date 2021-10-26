@@ -317,7 +317,7 @@ static int tipc_aead_key_generate(struct tipc_aead_key *skey);
 
 #define tipc_aead_rcu_replace(rcu_ptr, ptr, lock)			\
 do {									\
-	struct tipc_aead *__tmp = rcu_dereference_protected((rcu_ptr),	\
+	typeof(rcu_ptr) __tmp = rcu_dereference_protected((rcu_ptr),	\
 						lockdep_is_held(lock));	\
 	rcu_assign_pointer((rcu_ptr), (ptr));				\
 	tipc_aead_put(__tmp);						\
@@ -798,7 +798,7 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
 	ehdr = (struct tipc_ehdr *)skb->data;
 	salt = aead->salt;
 	if (aead->mode == CLUSTER_KEY)
-		salt ^= __be32_to_cpu(ehdr->addr);
+		salt ^= ehdr->addr; /* __be32 */
 	else if (__dnode)
 		salt ^= tipc_node_get_addr(__dnode);
 	memcpy(iv, &salt, 4);
@@ -898,10 +898,16 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
 	if (unlikely(!aead))
 		return -ENOKEY;
 
-	nsg = skb_cow_data(skb, 0, &unused);
-	if (unlikely(nsg < 0)) {
-		pr_err("RX: skb_cow_data() returned %d\n", nsg);
-		return nsg;
+	/* Cow skb data if needed */
+	if (likely(!skb_cloned(skb) &&
+		   (!skb_is_nonlinear(skb) || !skb_has_frag_list(skb)))) {
+		nsg = 1 + skb_shinfo(skb)->nr_frags;
+	} else {
+		nsg = skb_cow_data(skb, 0, &unused);
+		if (unlikely(nsg < 0)) {
+			pr_err("RX: skb_cow_data() returned %d\n", nsg);
+			return nsg;
+		}
 	}
 
 	/* Allocate memory for the AEAD operation */
@@ -923,7 +929,7 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
 	ehdr = (struct tipc_ehdr *)skb->data;
 	salt = aead->salt;
 	if (aead->mode == CLUSTER_KEY)
-		salt ^= __be32_to_cpu(ehdr->addr);
+		salt ^= ehdr->addr; /* __be32 */
 	else if (ehdr->destined)
 		salt ^= tipc_own_addr(net);
 	memcpy(iv, &salt, 4);
@@ -1947,12 +1953,12 @@ static void tipc_crypto_rcv_complete(struct net *net, struct tipc_aead *aead,
 	}
 
 	if (unlikely(err)) {
-		tipc_aead_users_dec((struct tipc_aead __force __rcu *)aead, INT_MIN);
+		tipc_aead_users_dec(aead, INT_MIN);
 		goto free_skb;
 	}
 
 	/* Set the RX key's user */
-	tipc_aead_users_set((struct tipc_aead __force __rcu *)aead, 1);
+	tipc_aead_users_set(aead, 1);
 
 	/* Mark this point, RX works */
 	rx->timer1 = jiffies;

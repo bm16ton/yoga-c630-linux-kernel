@@ -13,13 +13,13 @@
 
 #ifdef CONFIG_DEBUG_FS
 void dw_edma_v0_debugfs_on(struct dw_edma_chip *chip);
-void dw_edma_v0_debugfs_off(struct dw_edma_chip *chip);
+void dw_edma_v0_debugfs_off(void);
 #else
 static inline void dw_edma_v0_debugfs_on(struct dw_edma_chip *chip)
 {
 }
 
-static inline void dw_edma_v0_debugfs_off(struct dw_edma_chip *chip)
+static inline void dw_edma_v0_debugfs_off(void)
 {
 }
 #endif /* CONFIG_DEBUG_FS */

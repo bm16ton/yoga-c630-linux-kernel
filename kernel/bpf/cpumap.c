@@ -27,7 +27,7 @@
 #include <linux/capability.h>
 #include <trace/events/xdp.h>
 
-#include <linux/netdevice.h>   /* netif_receive_skb_list */
+#include <linux/netdevice.h>   /* netif_receive_skb_core */
 #include <linux/etherdevice.h> /* eth_type_trans */
 
 /* General idea: XDP packets getting XDP redirected to another CPU,
@@ -252,12 +252,11 @@ static int cpu_map_kthread_run(void *data)
 	 */
 	while (!kthread_should_stop() || !__ptr_ring_empty(rcpu->queue)) {
 		struct xdp_cpumap_stats stats = {}; /* zero stats */
-		unsigned int kmem_alloc_drops = 0, sched = 0;
 		gfp_t gfp = __GFP_ZERO | GFP_ATOMIC;
+		unsigned int drops = 0, sched = 0;
 		void *frames[CPUMAP_BATCH];
 		void *skbs[CPUMAP_BATCH];
 		int i, n, m, nframes;
-		LIST_HEAD(list);
 
 		/* Release CPU reschedule checks */
 		if (__ptr_ring_empty(rcpu->queue)) {
@@ -298,7 +297,7 @@ static int cpu_map_kthread_run(void *data)
 			if (unlikely(m == 0)) {
 				for (i = 0; i < nframes; i++)
 					skbs[i] = NULL; /* effect: xdp_return_frame */
-				kmem_alloc_drops += nframes;
+				drops += nframes;
 			}
 		}
 
@@ -306,6 +305,7 @@ static int cpu_map_kthread_run(void *data)
 		for (i = 0; i < nframes; i++) {
 			struct xdp_frame *xdpf = frames[i];
 			struct sk_buff *skb = skbs[i];
+			int ret;
 
 			skb = __xdp_build_skb_from_frame(xdpf, skb,
 							 xdpf->dev_rx);
@@ -314,13 +314,13 @@ static int cpu_map_kthread_run(void *data)
 				continue;
 			}
 
-			list_add_tail(&skb->list, &list);
+			/* Inject into network stack */
+			ret = netif_receive_skb_core(skb);
+			if (ret == NET_RX_DROP)
+				drops++;
 		}
-		netif_receive_skb_list(&list);
-
 		/* Feedback loop via tracepoint */
-		trace_xdp_cpumap_kthread(rcpu->map_id, n, kmem_alloc_drops,
-					 sched, &stats);
+		trace_xdp_cpumap_kthread(rcpu->map_id, n, drops, sched, &stats);
 
 		local_bh_enable(); /* resched point, may call do_softirq() */
 	}
@@ -543,6 +543,7 @@ static void cpu_map_free(struct bpf_map *map)
 	 * complete.
 	 */
 
+	bpf_clear_redirect_map(map);
 	synchronize_rcu();
 
 	/* For cpu_map the remote CPUs can still be using the entries
@@ -562,7 +563,7 @@ static void cpu_map_free(struct bpf_map *map)
 	kfree(cmap);
 }
 
-static void *__cpu_map_lookup_elem(struct bpf_map *map, u32 key)
+struct bpf_cpu_map_entry *__cpu_map_lookup_elem(struct bpf_map *map, u32 key)
 {
 	struct bpf_cpu_map *cmap = container_of(map, struct bpf_cpu_map, map);
 	struct bpf_cpu_map_entry *rcpu;
@@ -599,11 +600,6 @@ static int cpu_map_get_next_key(struct bpf_map *map, void *key, void *next_key)
 	return 0;
 }
 
-static int cpu_map_redirect(struct bpf_map *map, u32 ifindex, u64 flags)
-{
-	return __bpf_xdp_redirect_map(map, ifindex, flags, __cpu_map_lookup_elem);
-}
-
 static int cpu_map_btf_id;
 const struct bpf_map_ops cpu_map_ops = {
 	.map_meta_equal		= bpf_map_meta_equal,
@@ -616,7 +612,6 @@ const struct bpf_map_ops cpu_map_ops = {
 	.map_check_btf		= map_check_no_btf,
 	.map_btf_name		= "bpf_cpu_map",
 	.map_btf_id		= &cpu_map_btf_id,
-	.map_redirect		= cpu_map_redirect,
 };
 
 static void bq_flush_to_queue(struct xdp_bulk_queue *bq)

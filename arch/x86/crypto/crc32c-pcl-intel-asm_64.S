@@ -53,7 +53,7 @@
 .endm
 
 .macro JMPTBL_ENTRY i
-.quad crc_\i
+.word crc_\i - crc_array
 .endm
 
 .macro JNC_LESS_THAN j
@@ -168,7 +168,10 @@ continue_block:
 	xor     crc2, crc2
 
 	## branch into array
-	mov	jump_table(,%rax,8), %bufp
+	lea	jump_table(%rip), %bufp
+	movzwq  (%bufp, %rax, 2), len
+	lea	crc_array(%rip), %bufp
+	lea     (%bufp, len, 1), %bufp
 	JMP_NOSPEC bufp
 
 	################################################################

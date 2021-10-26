@@ -12,15 +12,12 @@ maintainers:
 description: |
   Battery compatible with the smart battery system specifications
 
-allOf:
-  - $ref: power-supply.yaml#
-
 properties:
+
   compatible:
     oneOf:
       - items:
           - enum:
-              - ti,bq20z45
               - ti,bq20z65
               - ti,bq20z75
           - enum:
@@ -63,7 +60,7 @@ required:
   - compatible
   - reg
 
-unevaluatedProperties: false
+additionalProperties: false
 
 examples:
   - |

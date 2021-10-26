@@ -28,12 +28,11 @@
  *    searching it for one bits.
  *  - The optional "addr2", which is anded with "addr1" if present.
  */
-unsigned long _find_next_bit(const unsigned long *addr1,
+static inline unsigned long _find_next_bit(const unsigned long *addr1,
 		const unsigned long *addr2, unsigned long nbits,
-		unsigned long start, unsigned long invert, unsigned long le)
+		unsigned long start, unsigned long invert)
 {
-	unsigned long tmp, mask;
-	(void) le;
+	unsigned long tmp;
 
 	if (unlikely(start >= nbits))
 		return nbits;
@@ -44,19 +43,7 @@ unsigned long _find_next_bit(const unsigned long *addr1,
 	tmp ^= invert;
 
 	/* Handle 1st word. */
-	mask = BITMAP_FIRST_WORD_MASK(start);
-
-	/*
-	 * Due to the lack of swab() in tools, and the fact that it doesn't
-	 * need little-endian support, just comment it out
-	 */
-#if (0)
-	if (le)
-		mask = swab(mask);
-#endif
-
-	tmp &= mask;
-
+	tmp &= BITMAP_FIRST_WORD_MASK(start);
 	start = round_down(start, BITS_PER_LONG);
 
 	while (!tmp) {
@@ -70,12 +57,18 @@ unsigned long _find_next_bit(const unsigned long *addr1,
 		tmp ^= invert;
 	}
 
-#if (0)
-	if (le)
-		tmp = swab(tmp);
+	return min(start + __ffs(tmp), nbits);
+}
 #endif
 
-	return min(start + __ffs(tmp), nbits);
+#ifndef find_next_bit
+/*
+ * Find the next set bit in a memory region.
+ */
+unsigned long find_next_bit(const unsigned long *addr, unsigned long size,
+			    unsigned long offset)
+{
+	return _find_next_bit(addr, NULL, size, offset, 0UL);
 }
 #endif
 
@@ -83,7 +76,7 @@ unsigned long _find_next_bit(const unsigned long *addr1,
 /*
  * Find the first set bit in a memory region.
  */
-unsigned long _find_first_bit(const unsigned long *addr, unsigned long size)
+unsigned long find_first_bit(const unsigned long *addr, unsigned long size)
 {
 	unsigned long idx;
 
@@ -100,7 +93,7 @@ unsigned long _find_first_bit(const unsigned long *addr, unsigned long size)
 /*
  * Find the first cleared bit in a memory region.
  */
-unsigned long _find_first_zero_bit(const unsigned long *addr, unsigned long size)
+unsigned long find_first_zero_bit(const unsigned long *addr, unsigned long size)
 {
 	unsigned long idx;
 
@@ -110,5 +103,22 @@ unsigned long _find_first_zero_bit(const unsigned long *addr, unsigned long size
 	}
 
 	return size;
+}
+#endif
+
+#ifndef find_next_zero_bit
+unsigned long find_next_zero_bit(const unsigned long *addr, unsigned long size,
+				 unsigned long offset)
+{
+	return _find_next_bit(addr, NULL, size, offset, ~0UL);
+}
+#endif
+
+#ifndef find_next_and_bit
+unsigned long find_next_and_bit(const unsigned long *addr1,
+		const unsigned long *addr2, unsigned long size,
+		unsigned long offset)
+{
+	return _find_next_bit(addr1, addr2, size, offset, 0UL);
 }
 #endif

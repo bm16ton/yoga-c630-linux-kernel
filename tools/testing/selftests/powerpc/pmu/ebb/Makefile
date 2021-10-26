@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-include ../../../../../build/Build.include
+include ../../../../../../scripts/Kbuild.include
 
 noarg:
 	$(MAKE) -C ../../

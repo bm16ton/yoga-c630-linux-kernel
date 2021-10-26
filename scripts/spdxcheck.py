@@ -243,7 +243,7 @@ if __name__ == '__main__':
         # Initialize SPDX data
         spdx = read_spdxdata(repo)
 
-        # Initialize the parser
+        # Initilize the parser
         parser = id_parser(spdx)
 
     except SPDXException as se:

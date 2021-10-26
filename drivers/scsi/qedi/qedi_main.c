@@ -276,8 +276,10 @@ static int qedi_alloc_uio_rings(struct qedi_ctx *qedi)
 	}
 
 	udev = kzalloc(sizeof(*udev), GFP_KERNEL);
-	if (!udev)
+	if (!udev) {
+		rc = -ENOMEM;
 		goto err_udev;
+	}
 
 	udev->uio_dev = -1;
 

@@ -3829,9 +3829,14 @@ static char *ffs_prepare_buffer(const char __user *buf, size_t len)
 	if (!len)
 		return NULL;
 
-	data = memdup_user(buf, len);
-	if (IS_ERR(data))
-		return ERR_PTR(PTR_ERR(data));
+	data = kmalloc(len, GFP_KERNEL);
+	if (!data)
+		return ERR_PTR(-ENOMEM);
+
+	if (copy_from_user(data, buf, len)) {
+		kfree(data);
+		return ERR_PTR(-EFAULT);
+	}
 
 	pr_vdebug("Buffer from user space:\n");
 	ffs_dump_mem("", data, len);

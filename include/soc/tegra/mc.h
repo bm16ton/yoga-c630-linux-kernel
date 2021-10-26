@@ -7,7 +7,6 @@
 #define __SOC_TEGRA_MC_H__
 
 #include <linux/bits.h>
-#include <linux/debugfs.h>
 #include <linux/err.h>
 #include <linux/interconnect-provider.h>
 #include <linux/reset-controller.h>
@@ -176,8 +175,6 @@ struct tegra_mc_soc {
 	unsigned int num_resets;
 
 	const struct tegra_mc_icc_ops *icc_ops;
-
-	int (*init)(struct tegra_mc *mc);
 };
 
 struct tegra_mc {
@@ -199,10 +196,6 @@ struct tegra_mc {
 	struct icc_provider provider;
 
 	spinlock_t lock;
-
-	struct {
-		struct dentry *root;
-	} debugfs;
 };
 
 int tegra_mc_write_emem_configuration(struct tegra_mc *mc, unsigned long rate);

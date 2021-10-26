@@ -157,10 +157,9 @@ examples:
         i2c-scl-hz = <100000>;
 
         /* I2C device. */
-        eeprom@57 {
-            compatible = "atmel,24c01";
-            reg = <0x57 0x0 0x10>;
-            pagesize = <0x8>;
+        nunchuk: nunchuk@52 {
+            compatible = "nintendo,nunchuk";
+            reg = <0x52 0x0 0x10>;
         };
 
         /* I3C device with a static I2C address. */

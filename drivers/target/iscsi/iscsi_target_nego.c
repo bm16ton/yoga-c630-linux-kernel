@@ -28,6 +28,7 @@
 #include "iscsi_target_auth.h"
 
 #define MAX_LOGIN_PDUS  7
+#define TEXT_LEN	4096
 
 void convert_null_to_semi(char *buf, int len)
 {

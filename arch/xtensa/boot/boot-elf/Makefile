@@ -4,10 +4,15 @@
 # for more details.
 #
 
-OBJCOPY_ARGS := -O $(if $(CONFIG_CPU_BIG_ENDIAN),elf32-xtensa-be,elf32-xtensa-le)
+ifeq ($(BIG_ENDIAN),1)
+OBJCOPY_ARGS    := -O elf32-xtensa-be
+else
+OBJCOPY_ARGS    := -O elf32-xtensa-le
+endif
 
-CPPFLAGS_boot.lds += -P -C
-KBUILD_AFLAGS += -mtext-section-literals
+export OBJCOPY_ARGS
+export CPPFLAGS_boot.lds += -P -C
+export KBUILD_AFLAGS += -mtext-section-literals
 
 boot-y		:= bootstrap.o
 targets		+= $(boot-y) boot.lds

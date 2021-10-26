@@ -161,7 +161,6 @@ static const u32 ispif_formats_8x96[] = {
 static irqreturn_t ispif_isr_8x96(int irq, void *dev)
 {
 	struct ispif_device *ispif = dev;
-	struct camss *camss = ispif->camss;
 	u32 value0, value1, value2, value3, value4, value5;
 
 	value0 = readl_relaxed(ispif->base + ISPIF_VFE_m_IRQ_STATUS_0(0));
@@ -187,34 +186,34 @@ static irqreturn_t ispif_isr_8x96(int irq, void *dev)
 		complete(&ispif->reset_complete[1]);
 
 	if (unlikely(value0 & ISPIF_VFE_m_IRQ_STATUS_0_PIX0_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 pix0 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 pix0 overflow\n");
 
 	if (unlikely(value0 & ISPIF_VFE_m_IRQ_STATUS_0_RDI0_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 rdi0 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 rdi0 overflow\n");
 
 	if (unlikely(value1 & ISPIF_VFE_m_IRQ_STATUS_1_PIX1_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 pix1 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 pix1 overflow\n");
 
 	if (unlikely(value1 & ISPIF_VFE_m_IRQ_STATUS_1_RDI1_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 rdi1 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 rdi1 overflow\n");
 
 	if (unlikely(value2 & ISPIF_VFE_m_IRQ_STATUS_2_RDI2_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 rdi2 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 rdi2 overflow\n");
 
 	if (unlikely(value3 & ISPIF_VFE_m_IRQ_STATUS_0_PIX0_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE1 pix0 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE1 pix0 overflow\n");
 
 	if (unlikely(value3 & ISPIF_VFE_m_IRQ_STATUS_0_RDI0_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE1 rdi0 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE1 rdi0 overflow\n");
 
 	if (unlikely(value4 & ISPIF_VFE_m_IRQ_STATUS_1_PIX1_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE1 pix1 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE1 pix1 overflow\n");
 
 	if (unlikely(value4 & ISPIF_VFE_m_IRQ_STATUS_1_RDI1_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE1 rdi1 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE1 rdi1 overflow\n");
 
 	if (unlikely(value5 & ISPIF_VFE_m_IRQ_STATUS_2_RDI2_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE1 rdi2 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE1 rdi2 overflow\n");
 
 	return IRQ_HANDLED;
 }
@@ -229,7 +228,6 @@ static irqreturn_t ispif_isr_8x96(int irq, void *dev)
 static irqreturn_t ispif_isr_8x16(int irq, void *dev)
 {
 	struct ispif_device *ispif = dev;
-	struct camss *camss = ispif->camss;
 	u32 value0, value1, value2;
 
 	value0 = readl_relaxed(ispif->base + ISPIF_VFE_m_IRQ_STATUS_0(0));
@@ -246,32 +244,30 @@ static irqreturn_t ispif_isr_8x16(int irq, void *dev)
 		complete(&ispif->reset_complete[0]);
 
 	if (unlikely(value0 & ISPIF_VFE_m_IRQ_STATUS_0_PIX0_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 pix0 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 pix0 overflow\n");
 
 	if (unlikely(value0 & ISPIF_VFE_m_IRQ_STATUS_0_RDI0_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 rdi0 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 rdi0 overflow\n");
 
 	if (unlikely(value1 & ISPIF_VFE_m_IRQ_STATUS_1_PIX1_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 pix1 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 pix1 overflow\n");
 
 	if (unlikely(value1 & ISPIF_VFE_m_IRQ_STATUS_1_RDI1_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 rdi1 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 rdi1 overflow\n");
 
 	if (unlikely(value2 & ISPIF_VFE_m_IRQ_STATUS_2_RDI2_OVERFLOW))
-		dev_err_ratelimited(camss->dev, "VFE0 rdi2 overflow\n");
+		dev_err_ratelimited(to_device(ispif), "VFE0 rdi2 overflow\n");
 
 	return IRQ_HANDLED;
 }
 
 static int ispif_vfe_reset(struct ispif_device *ispif, u8 vfe_id)
 {
-	struct camss *camss = ispif->camss;
-
 	unsigned long time;
 	u32 val;
 
-	if (vfe_id > (camss->vfe_num - 1)) {
-		dev_err(camss->dev,
+	if (vfe_id > (to_camss(ispif)->vfe_num - 1)) {
+		dev_err(to_device(ispif),
 			"Error: asked reset for invalid VFE%d\n", vfe_id);
 		return -ENOENT;
 	}
@@ -304,7 +300,7 @@ static int ispif_vfe_reset(struct ispif_device *ispif, u8 vfe_id)
 	time = wait_for_completion_timeout(&ispif->reset_complete[vfe_id],
 		msecs_to_jiffies(ISPIF_RESET_TIMEOUT_MS));
 	if (!time) {
-		dev_err(camss->dev,
+		dev_err(to_device(ispif),
 			"ISPIF for VFE%d reset timeout\n", vfe_id);
 		return -EIO;
 	}
@@ -320,31 +316,30 @@ static int ispif_vfe_reset(struct ispif_device *ispif, u8 vfe_id)
  */
 static int ispif_reset(struct ispif_device *ispif, u8 vfe_id)
 {
-	struct camss *camss = ispif->camss;
 	int ret;
 
-	ret = camss_pm_domain_on(camss, PM_DOMAIN_VFE0);
+	ret = camss_pm_domain_on(to_camss(ispif), PM_DOMAIN_VFE0);
 	if (ret < 0)
 		return ret;
 
-	ret = camss_pm_domain_on(camss, PM_DOMAIN_VFE1);
+	ret = camss_pm_domain_on(to_camss(ispif), PM_DOMAIN_VFE1);
 	if (ret < 0)
 		return ret;
 
 	ret = camss_enable_clocks(ispif->nclocks_for_reset,
 				  ispif->clock_for_reset,
-				  camss->dev);
+				  to_device(ispif));
 	if (ret < 0)
 		return ret;
 
 	ret = ispif_vfe_reset(ispif, vfe_id);
 	if (ret)
-		dev_dbg(camss->dev, "ISPIF Reset failed\n");
+		dev_dbg(to_device(ispif), "ISPIF Reset failed\n");
 
 	camss_disable_clocks(ispif->nclocks_for_reset, ispif->clock_for_reset);
 
-	camss_pm_domain_off(camss, PM_DOMAIN_VFE0);
-	camss_pm_domain_off(camss, PM_DOMAIN_VFE1);
+	camss_pm_domain_off(to_camss(ispif), PM_DOMAIN_VFE0);
+	camss_pm_domain_off(to_camss(ispif), PM_DOMAIN_VFE1);
 
 	return ret;
 }
@@ -360,7 +355,7 @@ static int ispif_set_power(struct v4l2_subdev *sd, int on)
 {
 	struct ispif_line *line = v4l2_get_subdevdata(sd);
 	struct ispif_device *ispif = line->ispif;
-	struct device *dev = ispif->camss->dev;
+	struct device *dev = to_device(ispif);
 	int ret = 0;
 
 	mutex_lock(&ispif->power_lock);
@@ -510,7 +505,7 @@ static int ispif_validate_intf_status(struct ispif_device *ispif,
 	}
 
 	if ((val & 0xf) != 0xf) {
-		dev_err(ispif->camss->dev, "%s: ispif is busy: 0x%x\n",
+		dev_err(to_device(ispif), "%s: ispif is busy: 0x%x\n",
 			__func__, val);
 		ret = -EBUSY;
 	}
@@ -557,7 +552,7 @@ static int ispif_wait_for_stop(struct ispif_device *ispif,
 				 ISPIF_TIMEOUT_SLEEP_US,
 				 ISPIF_TIMEOUT_ALL_US);
 	if (ret < 0)
-		dev_err(ispif->camss->dev, "%s: ispif stop timeout\n",
+		dev_err(to_device(ispif), "%s: ispif stop timeout\n",
 			__func__);
 
 	return ret;
@@ -805,7 +800,6 @@ static int ispif_set_stream(struct v4l2_subdev *sd, int enable)
 {
 	struct ispif_line *line = v4l2_get_subdevdata(sd);
 	struct ispif_device *ispif = line->ispif;
-	struct camss *camss = ispif->camss;
 	enum ispif_intf intf = line->interface;
 	u8 csid = line->csid_id;
 	u8 vfe = line->vfe_id;
@@ -831,8 +825,8 @@ static int ispif_set_stream(struct v4l2_subdev *sd, int enable)
 		ispif_select_csid(ispif, intf, csid, vfe, 1);
 		ispif_select_cid(ispif, intf, cid, vfe, 1);
 		ispif_config_irq(ispif, intf, vfe, 1);
-		if (camss->version == CAMSS_8x96 ||
-		    camss->version == CAMSS_660)
+		if (to_camss(ispif)->version == CAMSS_8x96 ||
+		    to_camss(ispif)->version == CAMSS_660)
 			ispif_config_pack(ispif,
 					  line->fmt[MSM_ISPIF_PAD_SINK].code,
 					  intf, cid, vfe, 1);
@@ -849,8 +843,8 @@ static int ispif_set_stream(struct v4l2_subdev *sd, int enable)
 			return ret;
 
 		mutex_lock(&ispif->config_lock);
-		if (camss->version == CAMSS_8x96 ||
-		    camss->version == CAMSS_660)
+		if (to_camss(ispif)->version == CAMSS_8x96 ||
+		    to_camss(ispif)->version == CAMSS_660)
 			ispif_config_pack(ispif,
 					  line->fmt[MSM_ISPIF_PAD_SINK].code,
 					  intf, cid, vfe, 0);
@@ -1094,32 +1088,26 @@ static int ispif_init_formats(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
  *
  * Return 0 on success or a negative error code otherwise
  */
-int msm_ispif_subdev_init(struct camss *camss,
+int msm_ispif_subdev_init(struct ispif_device *ispif,
 			  const struct resources_ispif *res)
 {
-	struct device *dev = camss->dev;
-	struct ispif_device *ispif = camss->ispif;
+	struct device *dev = to_device(ispif);
 	struct platform_device *pdev = to_platform_device(dev);
 	struct resource *r;
 	int i;
 	int ret;
 
-	if (!camss->ispif)
-		return 0;
-
-	ispif->camss = camss;
-
 	/* Number of ISPIF lines - same as number of CSID hardware modules */
-	if (camss->version == CAMSS_8x16)
+	if (to_camss(ispif)->version == CAMSS_8x16)
 		ispif->line_num = 2;
-	else if (camss->version == CAMSS_8x96 ||
-		 camss->version == CAMSS_660)
+	else if (to_camss(ispif)->version == CAMSS_8x96 ||
+		 to_camss(ispif)->version == CAMSS_660)
 		ispif->line_num = 4;
 	else
 		return -EINVAL;
 
-	ispif->line = devm_kcalloc(dev, ispif->line_num,
-				   sizeof(*ispif->line), GFP_KERNEL);
+	ispif->line = devm_kcalloc(dev, ispif->line_num, sizeof(*ispif->line),
+				   GFP_KERNEL);
 	if (!ispif->line)
 		return -ENOMEM;
 
@@ -1127,12 +1115,12 @@ int msm_ispif_subdev_init(struct camss *camss,
 		ispif->line[i].ispif = ispif;
 		ispif->line[i].id = i;
 
-		if (camss->version == CAMSS_8x16) {
+		if (to_camss(ispif)->version == CAMSS_8x16) {
 			ispif->line[i].formats = ispif_formats_8x16;
 			ispif->line[i].nformats =
 					ARRAY_SIZE(ispif_formats_8x16);
-		} else if (camss->version == CAMSS_8x96 ||
-			   camss->version == CAMSS_660) {
+		} else if (to_camss(ispif)->version == CAMSS_8x96 ||
+			   to_camss(ispif)->version == CAMSS_660) {
 			ispif->line[i].formats = ispif_formats_8x96;
 			ispif->line[i].nformats =
 					ARRAY_SIZE(ispif_formats_8x96);
@@ -1145,13 +1133,17 @@ int msm_ispif_subdev_init(struct camss *camss,
 
 	r = platform_get_resource_byname(pdev, IORESOURCE_MEM, res->reg[0]);
 	ispif->base = devm_ioremap_resource(dev, r);
-	if (IS_ERR(ispif->base))
+	if (IS_ERR(ispif->base)) {
+		dev_err(dev, "could not map memory\n");
 		return PTR_ERR(ispif->base);
+	}
 
 	r = platform_get_resource_byname(pdev, IORESOURCE_MEM, res->reg[1]);
 	ispif->base_clk_mux = devm_ioremap_resource(dev, r);
-	if (IS_ERR(ispif->base_clk_mux))
+	if (IS_ERR(ispif->base_clk_mux)) {
+		dev_err(dev, "could not map memory\n");
 		return PTR_ERR(ispif->base_clk_mux);
+	}
 
 	/* Interrupt */
 
@@ -1165,16 +1157,15 @@ int msm_ispif_subdev_init(struct camss *camss,
 	ispif->irq = r->start;
 	snprintf(ispif->irq_name, sizeof(ispif->irq_name), "%s_%s",
 		 dev_name(dev), MSM_ISPIF_NAME);
-	if (camss->version == CAMSS_8x16)
+	if (to_camss(ispif)->version == CAMSS_8x16)
 		ret = devm_request_irq(dev, ispif->irq, ispif_isr_8x16,
 			       IRQF_TRIGGER_RISING, ispif->irq_name, ispif);
-	else if (camss->version == CAMSS_8x96 ||
-		 camss->version == CAMSS_660)
+	else if (to_camss(ispif)->version == CAMSS_8x96 ||
+		 to_camss(ispif)->version == CAMSS_660)
 		ret = devm_request_irq(dev, ispif->irq, ispif_isr_8x96,
 			       IRQF_TRIGGER_RISING, ispif->irq_name, ispif);
 	else
 		ret = -EINVAL;
-
 	if (ret < 0) {
 		dev_err(dev, "request_irq failed: %d\n", ret);
 		return ret;
@@ -1340,14 +1331,9 @@ static const struct media_entity_operations ispif_media_ops = {
 int msm_ispif_register_entities(struct ispif_device *ispif,
 				struct v4l2_device *v4l2_dev)
 {
-	struct camss *camss;
+	struct device *dev = to_device(ispif);
 	int ret;
 	int i;
-
-	if (!ispif)
-		return 0;
-
-	camss = ispif->camss;
 
 	for (i = 0; i < ispif->line_num; i++) {
 		struct v4l2_subdev *sd = &ispif->line[i].subdev;
@@ -1362,7 +1348,7 @@ int msm_ispif_register_entities(struct ispif_device *ispif,
 
 		ret = ispif_init_formats(sd, NULL);
 		if (ret < 0) {
-			dev_err(camss->dev, "Failed to init format: %d\n", ret);
+			dev_err(dev, "Failed to init format: %d\n", ret);
 			goto error;
 		}
 
@@ -1374,15 +1360,13 @@ int msm_ispif_register_entities(struct ispif_device *ispif,
 		ret = media_entity_pads_init(&sd->entity, MSM_ISPIF_PADS_NUM,
 					     pads);
 		if (ret < 0) {
-			dev_err(camss->dev, "Failed to init media entity: %d\n",
-				ret);
+			dev_err(dev, "Failed to init media entity: %d\n", ret);
 			goto error;
 		}
 
 		ret = v4l2_device_register_subdev(v4l2_dev, sd);
 		if (ret < 0) {
-			dev_err(camss->dev, "Failed to register subdev: %d\n",
-				ret);
+			dev_err(dev, "Failed to register subdev: %d\n", ret);
 			media_entity_cleanup(&sd->entity);
 			goto error;
 		}
@@ -1408,9 +1392,6 @@ error:
 void msm_ispif_unregister_entities(struct ispif_device *ispif)
 {
 	int i;
-
-	if (!ispif)
-		return;
 
 	mutex_destroy(&ispif->power_lock);
 	mutex_destroy(&ispif->config_lock);

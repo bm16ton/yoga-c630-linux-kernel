@@ -107,7 +107,7 @@ static unsigned long clk_boot_clk_recalc_rate(struct clk_hw *hwclk,
 					 unsigned long parent_rate)
 {
 	struct socfpga_pll *socfpgaclk = to_socfpga_clk(hwclk);
-	u32 div;
+	u32 div = 1;
 
 	div = ((readl(socfpgaclk->hw.reg) &
 		SWCTRLBTCLKSEL_MASK) >>
@@ -187,14 +187,13 @@ static const struct clk_ops clk_boot_ops = {
 	.prepare = clk_pll_prepare,
 };
 
-struct clk_hw *s10_register_pll(const struct stratix10_pll_clock *clks,
+struct clk *s10_register_pll(const struct stratix10_pll_clock *clks,
 			     void __iomem *reg)
 {
-	struct clk_hw *hw_clk;
+	struct clk *clk;
 	struct socfpga_pll *pll_clk;
 	struct clk_init_data init;
 	const char *name = clks->name;
-	int ret;
 
 	pll_clk = kzalloc(sizeof(*pll_clk), GFP_KERNEL);
 	if (WARN_ON(!pll_clk))
@@ -217,24 +216,21 @@ struct clk_hw *s10_register_pll(const struct stratix10_pll_clock *clks,
 
 	pll_clk->hw.bit_idx = SOCFPGA_PLL_POWER;
 
-	hw_clk = &pll_clk->hw.hw;
-
-	ret = clk_hw_register(NULL, hw_clk);
-	if (ret) {
+	clk = clk_register(NULL, &pll_clk->hw.hw);
+	if (WARN_ON(IS_ERR(clk))) {
 		kfree(pll_clk);
-		return ERR_PTR(ret);
+		return NULL;
 	}
-	return hw_clk;
+	return clk;
 }
 
-struct clk_hw *agilex_register_pll(const struct stratix10_pll_clock *clks,
+struct clk *agilex_register_pll(const struct stratix10_pll_clock *clks,
 				void __iomem *reg)
 {
-	struct clk_hw *hw_clk;
+	struct clk *clk;
 	struct socfpga_pll *pll_clk;
 	struct clk_init_data init;
 	const char *name = clks->name;
-	int ret;
 
 	pll_clk = kzalloc(sizeof(*pll_clk), GFP_KERNEL);
 	if (WARN_ON(!pll_clk))
@@ -256,24 +252,22 @@ struct clk_hw *agilex_register_pll(const struct stratix10_pll_clock *clks,
 	pll_clk->hw.hw.init = &init;
 
 	pll_clk->hw.bit_idx = SOCFPGA_PLL_POWER;
-	hw_clk = &pll_clk->hw.hw;
 
-	ret = clk_hw_register(NULL, hw_clk);
-	if (ret) {
+	clk = clk_register(NULL, &pll_clk->hw.hw);
+	if (WARN_ON(IS_ERR(clk))) {
 		kfree(pll_clk);
-		return ERR_PTR(ret);
+		return NULL;
 	}
-	return hw_clk;
+	return clk;
 }
 
-struct clk_hw *n5x_register_pll(const struct stratix10_pll_clock *clks,
+struct clk *n5x_register_pll(const struct stratix10_pll_clock *clks,
 			     void __iomem *reg)
 {
-	struct clk_hw *hw_clk;
+	struct clk *clk;
 	struct socfpga_pll *pll_clk;
 	struct clk_init_data init;
 	const char *name = clks->name;
-	int ret;
 
 	pll_clk = kzalloc(sizeof(*pll_clk), GFP_KERNEL);
 	if (WARN_ON(!pll_clk))
@@ -295,12 +289,11 @@ struct clk_hw *n5x_register_pll(const struct stratix10_pll_clock *clks,
 	pll_clk->hw.hw.init = &init;
 
 	pll_clk->hw.bit_idx = SOCFPGA_PLL_POWER;
-	hw_clk = &pll_clk->hw.hw;
 
-	ret = clk_hw_register(NULL, hw_clk);
-	if (ret) {
+	clk = clk_register(NULL, &pll_clk->hw.hw);
+	if (WARN_ON(IS_ERR(clk))) {
 		kfree(pll_clk);
-		return ERR_PTR(ret);
+		return NULL;
 	}
-	return hw_clk;
+	return clk;
 }

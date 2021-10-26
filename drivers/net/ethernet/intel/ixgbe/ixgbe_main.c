@@ -225,7 +225,7 @@ static s32 ixgbe_get_parent_bus_info(struct ixgbe_adapter *adapter)
 }
 
 /**
- * ixgbe_pcie_from_parent - Determine whether PCIe info should come from parent
+ * ixgbe_check_from_parent - Determine whether PCIe info should come from parent
  * @hw: hw specific details
  *
  * This function is used by probe to determine whether a device's PCI-Express
@@ -1825,8 +1825,7 @@ static void ixgbe_dma_sync_frag(struct ixgbe_ring *rx_ring,
 				struct sk_buff *skb)
 {
 	if (ring_uses_build_skb(rx_ring)) {
-		unsigned long mask = (unsigned long)ixgbe_rx_pg_size(rx_ring) - 1;
-		unsigned long offset = (unsigned long)(skb->data) & mask;
+		unsigned long offset = (unsigned long)(skb->data) & ~PAGE_MASK;
 
 		dma_sync_single_range_for_cpu(rx_ring->dev,
 					      IXGBE_CB(skb)->dma,
@@ -6159,7 +6158,7 @@ void ixgbe_down(struct ixgbe_adapter *adapter)
 }
 
 /**
- * ixgbe_set_eee_capable - helper function to determine EEE support on X550
+ * ixgbe_eee_capable - helper function to determine EEE support on X550
  * @adapter: board private structure
  */
 static void ixgbe_set_eee_capable(struct ixgbe_adapter *adapter)
@@ -10202,7 +10201,7 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
 {
 	struct ixgbe_adapter *adapter = netdev_priv(dev);
 	struct ixgbe_ring *ring;
-	int nxmit = 0;
+	int drops = 0;
 	int i;
 
 	if (unlikely(test_bit(__IXGBE_DOWN, &adapter->state)))
@@ -10226,15 +10225,16 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
 		int err;
 
 		err = ixgbe_xmit_xdp_ring(adapter, xdpf);
-		if (err != IXGBE_XDP_TX)
-			break;
-		nxmit++;
+		if (err != IXGBE_XDP_TX) {
+			xdp_return_frame_rx_napi(xdpf);
+			drops++;
+		}
 	}
 
 	if (unlikely(flags & XDP_XMIT_FLUSH))
 		ixgbe_xdp_ring_update_tail(ring);
 
-	return nxmit;
+	return n - drops;
 }
 
 static const struct net_device_ops ixgbe_netdev_ops = {
@@ -11070,7 +11070,6 @@ err_ioremap:
 	disable_dev = !test_and_set_bit(__IXGBE_DISABLED, &adapter->state);
 	free_netdev(netdev);
 err_alloc_etherdev:
-	pci_disable_pcie_error_reporting(pdev);
 	pci_release_mem_regions(pdev);
 err_pci_reg:
 err_dma:

@@ -1034,8 +1034,7 @@ static int pp_set_power_limit(void *handle, uint32_t limit)
 	return 0;
 }
 
-static int pp_get_power_limit(void *handle, uint32_t *limit,
-		uint32_t *max_limit, bool default_limit)
+static int pp_get_power_limit(void *handle, uint32_t *limit, bool default_limit)
 {
 	struct pp_hwmgr *hwmgr = handle;
 
@@ -1046,12 +1045,9 @@ static int pp_get_power_limit(void *handle, uint32_t *limit,
 
 	if (default_limit) {
 		*limit = hwmgr->default_power_limit;
-		if (max_limit) {
-			*max_limit = *limit;
-			if (hwmgr->od_enabled) {
-				*max_limit *= (100 + hwmgr->platform_descriptor.TDPODLimit);
-				*max_limit /= 100;
-			}
+		if (hwmgr->od_enabled) {
+			*limit *= (100 + hwmgr->platform_descriptor.TDPODLimit);
+			*limit /= 100;
 		}
 	}
 	else

@@ -74,7 +74,7 @@ enum dev_num {
 	UNKNOWN,
 };
 /**
- * struct alps_dev
+ * struct u1_data
  *
  * @input: pointer to the kernel input device
  * @input2: pointer to the kernel input2 device

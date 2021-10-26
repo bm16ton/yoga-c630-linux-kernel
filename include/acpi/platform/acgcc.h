@@ -61,7 +61,7 @@ typedef __builtin_va_list va_list;
 #endif
 
 /*
- * Explicitly mark intentional explicit fallthrough to silence
+ * Explictly mark intentional explicit fallthrough to silence
  * -Wimplicit-fallthrough in GCC 7.1+.
  */
 

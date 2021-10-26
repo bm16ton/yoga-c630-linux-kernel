@@ -425,39 +425,61 @@ static int kvmppc_core_check_requests_pr(struct kvm_vcpu *vcpu)
 }
 
 /************* MMU Notifiers *************/
-static bool do_kvm_unmap_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+static void do_kvm_unmap_hva(struct kvm *kvm, unsigned long start,
+			     unsigned long end)
 {
 	long i;
 	struct kvm_vcpu *vcpu;
+	struct kvm_memslots *slots;
+	struct kvm_memory_slot *memslot;
 
-	kvm_for_each_vcpu(i, vcpu, kvm)
-		kvmppc_mmu_pte_pflush(vcpu, range->start << PAGE_SHIFT,
-				      range->end << PAGE_SHIFT);
+	slots = kvm_memslots(kvm);
+	kvm_for_each_memslot(memslot, slots) {
+		unsigned long hva_start, hva_end;
+		gfn_t gfn, gfn_end;
 
-	return false;
+		hva_start = max(start, memslot->userspace_addr);
+		hva_end = min(end, memslot->userspace_addr +
+					(memslot->npages << PAGE_SHIFT));
+		if (hva_start >= hva_end)
+			continue;
+		/*
+		 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+		 * {gfn, gfn+1, ..., gfn_end-1}.
+		 */
+		gfn = hva_to_gfn_memslot(hva_start, memslot);
+		gfn_end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, memslot);
+		kvm_for_each_vcpu(i, vcpu, kvm)
+			kvmppc_mmu_pte_pflush(vcpu, gfn << PAGE_SHIFT,
+					      gfn_end << PAGE_SHIFT);
+	}
 }
 
-static bool kvm_unmap_gfn_range_pr(struct kvm *kvm, struct kvm_gfn_range *range)
+static int kvm_unmap_hva_range_pr(struct kvm *kvm, unsigned long start,
+				  unsigned long end)
 {
-	return do_kvm_unmap_gfn(kvm, range);
+	do_kvm_unmap_hva(kvm, start, end);
+
+	return 0;
 }
 
-static bool kvm_age_gfn_pr(struct kvm *kvm, struct kvm_gfn_range *range)
+static int kvm_age_hva_pr(struct kvm *kvm, unsigned long start,
+			  unsigned long end)
 {
 	/* XXX could be more clever ;) */
-	return false;
+	return 0;
 }
 
-static bool kvm_test_age_gfn_pr(struct kvm *kvm, struct kvm_gfn_range *range)
+static int kvm_test_age_hva_pr(struct kvm *kvm, unsigned long hva)
 {
 	/* XXX could be more clever ;) */
-	return false;
+	return 0;
 }
 
-static bool kvm_set_spte_gfn_pr(struct kvm *kvm, struct kvm_gfn_range *range)
+static void kvm_set_spte_hva_pr(struct kvm *kvm, unsigned long hva, pte_t pte)
 {
 	/* The page will get remapped properly on its next fault */
-	return do_kvm_unmap_gfn(kvm, range);
+	do_kvm_unmap_hva(kvm, hva, hva + PAGE_SIZE);
 }
 
 /*****************************************/
@@ -2057,10 +2079,10 @@ static struct kvmppc_ops kvm_ops_pr = {
 	.flush_memslot = kvmppc_core_flush_memslot_pr,
 	.prepare_memory_region = kvmppc_core_prepare_memory_region_pr,
 	.commit_memory_region = kvmppc_core_commit_memory_region_pr,
-	.unmap_gfn_range = kvm_unmap_gfn_range_pr,
-	.age_gfn  = kvm_age_gfn_pr,
-	.test_age_gfn = kvm_test_age_gfn_pr,
-	.set_spte_gfn = kvm_set_spte_gfn_pr,
+	.unmap_hva_range = kvm_unmap_hva_range_pr,
+	.age_hva  = kvm_age_hva_pr,
+	.test_age_hva = kvm_test_age_hva_pr,
+	.set_spte_hva = kvm_set_spte_hva_pr,
 	.free_memslot = kvmppc_core_free_memslot_pr,
 	.init_vm = kvmppc_core_init_vm_pr,
 	.destroy_vm = kvmppc_core_destroy_vm_pr,

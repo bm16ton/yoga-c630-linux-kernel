@@ -20,7 +20,6 @@ obj-y					+= allwinner/	\
 					   lantiq/	\
 					   marvell/	\
 					   mediatek/	\
-					   microchip/	\
 					   motorola/	\
 					   mscc/	\
 					   qualcomm/	\

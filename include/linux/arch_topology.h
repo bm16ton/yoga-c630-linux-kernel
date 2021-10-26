@@ -37,6 +37,7 @@ bool topology_scale_freq_invariant(void);
 enum scale_freq_source {
 	SCALE_FREQ_SOURCE_CPUFREQ = 0,
 	SCALE_FREQ_SOURCE_ARCH,
+	SCALE_FREQ_SOURCE_CPPC,
 };
 
 struct scale_freq_data {
@@ -55,8 +56,8 @@ static inline unsigned long topology_get_thermal_pressure(int cpu)
 	return per_cpu(thermal_pressure, cpu);
 }
 
-void topology_set_thermal_pressure(const struct cpumask *cpus,
-				   unsigned long th_pressure);
+void topology_thermal_pressure_update(const struct cpumask *cpus,
+				      unsigned long capped_freq);
 
 struct cpu_topology {
 	int thread_id;

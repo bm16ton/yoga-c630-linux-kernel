@@ -19,8 +19,6 @@
 #ifndef _TSC2007_H
 #define _TSC2007_H
 
-struct gpio_desc;
-
 #define TSC2007_MEASURE_TEMP0		(0x0 << 4)
 #define TSC2007_MEASURE_AUX		(0x2 << 4)
 #define TSC2007_MEASURE_TEMP1		(0x4 << 4)
@@ -71,7 +69,7 @@ struct tsc2007 {
 	int			fuzzy;
 	int			fuzzz;
 
-	struct gpio_desc	*gpiod;
+	unsigned int		gpio;
 	int			irq;
 
 	wait_queue_head_t	wait;

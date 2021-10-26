@@ -5,7 +5,6 @@
 #include <linux/errno.h>
 #include <linux/nospec.h>
 #include <linux/ptrace.h>
-#include <linux/randomize_kstack.h>
 #include <linux/syscalls.h>
 
 #include <asm/daifflags.h>
@@ -44,8 +43,6 @@ static void invoke_syscall(struct pt_regs *regs, unsigned int scno,
 {
 	long ret;
 
-	add_random_kstack_offset();
-
 	if (scno < sc_nr) {
 		syscall_fn_t syscall_fn;
 		syscall_fn = syscall_table[array_index_nospec(scno, sc_nr)];
@@ -54,20 +51,10 @@ static void invoke_syscall(struct pt_regs *regs, unsigned int scno,
 		ret = do_ni_syscall(regs, scno);
 	}
 
-	syscall_set_return_value(current, regs, 0, ret);
+	if (is_compat_task())
+		ret = lower_32_bits(ret);
 
-	/*
-	 * Ultimately, this value will get limited by KSTACK_OFFSET_MAX(),
-	 * but not enough for arm64 stack utilization comfort. To keep
-	 * reasonable stack head room, reduce the maximum offset to 9 bits.
-	 *
-	 * The actual entropy will be further reduced by the compiler when
-	 * applying stack alignment constraints: the AAPCS mandates a
-	 * 16-byte (i.e. 4-bit) aligned SP at function boundaries.
-	 *
-	 * The resulting 5 bits of entropy is seen in SP[8:4].
-	 */
-	choose_random_kstack_offset(get_random_int() & 0x1FF);
+	regs->regs[0] = ret;
 }
 
 static inline bool has_syscall_work(unsigned long flags)
@@ -112,7 +99,7 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
 		 * syscall. do_notify_resume() will send a signal to userspace
 		 * before the syscall is restarted.
 		 */
-		syscall_set_return_value(current, regs, -ERESTARTNOINTR, 0);
+		regs->regs[0] = -ERESTARTNOINTR;
 		return;
 	}
 
@@ -133,7 +120,7 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
 		 * anyway.
 		 */
 		if (scno == NO_SYSCALL)
-			syscall_set_return_value(current, regs, -ENOSYS, 0);
+			regs->regs[0] = -ENOSYS;
 		scno = syscall_trace_enter(regs);
 		if (scno == NO_SYSCALL)
 			goto trace_exit;

@@ -171,12 +171,9 @@ struct sa_tfm_ctx;
 #define SA_UNSAFE_DATA_SZ_MIN	240
 #define SA_UNSAFE_DATA_SZ_MAX	256
 
-struct sa_match_data;
-
 /**
  * struct sa_crypto_data - Crypto driver instance data
  * @base: Base address of the register space
- * @soc_data: Pointer to SoC specific data
  * @pdev: Platform device pointer
  * @sc_pool: security context pool
  * @dev: Device pointer
@@ -192,7 +189,6 @@ struct sa_match_data;
  */
 struct sa_crypto_data {
 	void __iomem *base;
-	const struct sa_match_data *match_data;
 	struct platform_device	*pdev;
 	struct dma_pool		*sc_pool;
 	struct device *dev;

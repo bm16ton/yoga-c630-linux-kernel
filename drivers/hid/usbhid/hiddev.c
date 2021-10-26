@@ -887,11 +887,11 @@ int hiddev_connect(struct hid_device *hid, unsigned int force)
 				break;
 
 		if (i == hid->maxcollection)
-			return -EINVAL;
+			return -1;
 	}
 
 	if (!(hiddev = kzalloc(sizeof(struct hiddev), GFP_KERNEL)))
-		return -ENOMEM;
+		return -1;
 
 	init_waitqueue_head(&hiddev->wait);
 	INIT_LIST_HEAD(&hiddev->list);
@@ -905,7 +905,7 @@ int hiddev_connect(struct hid_device *hid, unsigned int force)
 		hid_err(hid, "Not able to get a minor for this device\n");
 		hid->hiddev = NULL;
 		kfree(hiddev);
-		return retval;
+		return -1;
 	}
 
 	/*

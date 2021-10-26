@@ -20,9 +20,10 @@
 /* Set us up to scrub parents. */
 int
 xchk_setup_parent(
-	struct xfs_scrub	*sc)
+	struct xfs_scrub	*sc,
+	struct xfs_inode	*ip)
 {
-	return xchk_setup_inode_contents(sc, 0);
+	return xchk_setup_inode_contents(sc, ip, 0);
 }
 
 /* Parent pointers */
@@ -101,7 +102,7 @@ xchk_parent_count_parent_dentries(
 	 * scanned.
 	 */
 	bufsize = (size_t)min_t(loff_t, XFS_READDIR_BUFSIZE,
-			parent->i_disk_size);
+			parent->i_d.di_size);
 	oldpos = 0;
 	while (true) {
 		error = xfs_readdir(sc->tp, parent, &spc.dc, bufsize);

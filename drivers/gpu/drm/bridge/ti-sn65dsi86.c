@@ -4,6 +4,7 @@
  * datasheet: https://www.ti.com/lit/ds/symlink/sn65dsi86.pdf
  */
 
+#include <linux/atomic.h>
 #include <linux/bits.h>
 #include <linux/clk.h>
 #include <linux/debugfs.h>
@@ -14,6 +15,7 @@
 #include <linux/module.h>
 #include <linux/of_graph.h>
 #include <linux/pm_runtime.h>
+#include <linux/pwm.h>
 #include <linux/regmap.h>
 #include <linux/regulator/consumer.h>
 
@@ -63,9 +65,13 @@
 #define SN_HPD_DISABLE_REG			0x5C
 #define  HPD_DISABLE				BIT(0)
 #define SN_GPIO_IO_REG				0x5E
-#define  SN_GPIO_INPUT_SHIFT			4
-#define  SN_GPIO_OUTPUT_SHIFT			0
+#define  GPIO_INPUT_SHIFT			4
+#define  GPIO_OUTPUT_SHIFT			0
 #define SN_GPIO_CTRL_REG			0x5F
+#define  GPIO_MUX_INPUT			0
+#define  GPIO_MUX_OUTPUT			1
+#define  GPIO_MUX_SPECIAL			2
+#define  GPIO_MUX_MASK			0x3
 #define  SN_GPIO_MUX_INPUT			0
 #define  SN_GPIO_MUX_OUTPUT			1
 #define  SN_GPIO_MUX_SPECIAL			2
@@ -100,6 +106,11 @@
 #define SN_BACKLIGHT_PWM			0xA5
 #define  BL_PWM_ENABLE				BIT(1)
 #define  BL_PWM_INVERT				BIT(0)
+#define SN_PWM_PRE_DIV_REG			0xA0
+#define SN_BACKLIGHT_SCALE_REG			0xA1
+#define  BACKLIGHT_SCALE_MAX			0xFFFF
+#define SN_BACKLIGHT_REG			0xA3
+#define SN_PWM_EN_INV_REG			0xA5
 #define SN_AUX_CMD_STATUS_REG			0xF4
 #define  AUX_IRQ_STATUS_AUX_RPLY_TOUT		BIT(3)
 #define  AUX_IRQ_STATUS_AUX_SHORT		BIT(5)
@@ -121,6 +132,8 @@
 #define SN_GPIO_PHYSICAL_OFFSET		1
 
 #define SN_LINK_TRAINING_TRIES		10
+
+#define SN_PWM_GPIO			3
 
 /**
  * struct ti_sn_bridge - Platform data for ti-sn65dsi86 driver.
@@ -172,6 +185,12 @@ struct ti_sn_bridge {
 #if defined(CONFIG_OF_GPIO)
 	struct gpio_chip		gchip;
 	DECLARE_BITMAP(gchip_output, SN_NUM_GPIOS);
+#endif
+#if defined(CONFIG_PWM)
+	struct pwm_chip			pchip;
+	bool				pwm_enabled;
+	unsigned int			pwm_refclk;
+	atomic_t			pwm_pin_busy;
 #endif
 	u32				brightness;
 	u32				max_brightness;
@@ -377,18 +396,12 @@ static int ti_sn_bridge_attach(struct drm_bridge *bridge,
 		return -EINVAL;
 	}
 
-	ret = drm_dp_aux_register(&pdata->aux);
-	if (ret < 0) {
-		drm_err(bridge->dev, "Failed to register DP AUX channel: %d\n", ret);
-		return ret;
-	}
-
 	ret = drm_connector_init(bridge->dev, &pdata->connector,
 				 &ti_sn_bridge_connector_funcs,
 				 DRM_MODE_CONNECTOR_eDP);
 	if (ret) {
 		DRM_ERROR("Failed to initialize connector with drm\n");
-		goto err_conn_init;
+		return ret;
 	}
 
 	drm_connector_helper_add(&pdata->connector,
@@ -445,14 +458,7 @@ err_dsi_attach:
 	mipi_dsi_device_unregister(dsi);
 err_dsi_host:
 	drm_connector_cleanup(&pdata->connector);
-err_conn_init:
-	drm_dp_aux_unregister(&pdata->aux);
 	return ret;
-}
-
-static void ti_sn_bridge_detach(struct drm_bridge *bridge)
-{
-	drm_dp_aux_unregister(&bridge_to_ti_sn_bridge(bridge)->aux);
 }
 
 static void ti_sn_bridge_disable(struct drm_bridge *bridge)
@@ -527,6 +533,14 @@ static void ti_sn_bridge_set_refclk_freq(struct ti_sn_bridge *pdata)
 
 	regmap_update_bits(pdata->regmap, SN_DPPLL_SRC_REG, REFCLK_FREQ_MASK,
 			   REFCLK_FREQ(i));
+
+#if defined(CONFIG_PWM)
+	/*
+	 * The PWM refclk is based on the value written to SN_DPPLL_SRC_REG,
+	 * regardless of its actual sourcing.
+	 */
+	pdata->pwm_refclk = ti_sn_bridge_refclk_lut[i];
+#endif
 }
 
 static void ti_sn_bridge_set_dsi_rate(struct ti_sn_bridge *pdata)
@@ -891,7 +905,6 @@ static void ti_sn_bridge_post_disable(struct drm_bridge *bridge)
 
 static const struct drm_bridge_funcs ti_sn_bridge_funcs = {
 	.attach = ti_sn_bridge_attach,
-	.detach = ti_sn_bridge_detach,
 	.pre_enable = ti_sn_bridge_pre_enable,
 	.enable = ti_sn_bridge_enable,
 	.disable = ti_sn_bridge_disable,
@@ -1010,6 +1023,161 @@ static int ti_sn_bridge_parse_dsi_host(struct ti_sn_bridge *pdata)
 	return 0;
 }
 
+#if defined(CONFIG_PWM)
+static int ti_sn_pwm_pin_request(struct ti_sn_bridge *pdata)
+{
+	return atomic_xchg(&pdata->pwm_pin_busy, 1) ? -EBUSY : 0;
+}
+
+static void ti_sn_pwm_pin_release(struct ti_sn_bridge *pdata)
+{
+	atomic_set(&pdata->pwm_pin_busy, 0);
+}
+
+static struct ti_sn_bridge *
+pwm_chip_to_ti_sn_bridge(struct pwm_chip *chip)
+{
+	return container_of(chip, struct ti_sn_bridge, pchip);
+}
+
+static int ti_sn_pwm_request(struct pwm_chip *chip, struct pwm_device *pwm)
+{
+	struct ti_sn_bridge *pdata = pwm_chip_to_ti_sn_bridge(chip);
+
+	return ti_sn_pwm_pin_request(pdata);
+}
+
+static void ti_sn_pwm_free(struct pwm_chip *chip, struct pwm_device *pwm)
+{
+	struct ti_sn_bridge *pdata = pwm_chip_to_ti_sn_bridge(chip);
+
+	ti_sn_pwm_pin_release(pdata);
+}
+
+static int ti_sn_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
+			   const struct pwm_state *state)
+{
+	struct ti_sn_bridge *pdata = pwm_chip_to_ti_sn_bridge(chip);
+	unsigned int pwm_en_inv;
+	unsigned int backlight;
+	unsigned int pwm_freq;
+	unsigned int pre_div;
+	unsigned int scale;
+	int ret;
+
+	if (!pdata->pwm_enabled) {
+		ret = pm_runtime_get_sync(pdata->dev);
+		if (ret < 0)
+			return ret;
+
+		ret = regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
+					 SN_GPIO_MUX_MASK << (2 * SN_PWM_GPIO),
+					 SN_GPIO_MUX_SPECIAL << (2 * SN_PWM_GPIO));
+		if (ret) {
+			dev_err(pdata->dev, "failed to mux in PWM function\n");
+			goto out;
+		}
+	}
+
+	if (state->enabled) {
+		/*
+		 * Per the datasheet the PWM frequency is given by:
+		 *
+		 * PWM_FREQ = REFCLK_FREQ / (PWM_PRE_DIV * BACKLIGHT_SCALE + 1)
+		 *
+		 * In order to find the PWM_FREQ that best suits the requested
+		 * state->period, the PWM_PRE_DIV is calculated with the
+		 * maximum possible number of steps (BACKLIGHT_SCALE_MAX). The
+		 * actual BACKLIGHT_SCALE is then adjusted down to match the
+		 * requested period.
+		 *
+		 * The BACKLIGHT value is then calculated against the
+		 * BACKLIGHT_SCALE, based on the requested duty_cycle and
+		 * period.
+		 */
+		pwm_freq = NSEC_PER_SEC / state->period;
+		pre_div = DIV_ROUND_UP(pdata->pwm_refclk / pwm_freq - 1, BACKLIGHT_SCALE_MAX);
+		scale = (pdata->pwm_refclk / pwm_freq - 1) / pre_div;
+
+		backlight = scale * state->duty_cycle / state->period;
+
+		ret = regmap_write(pdata->regmap, SN_PWM_PRE_DIV_REG, pre_div);
+		if (ret) {
+			dev_err(pdata->dev, "failed to update PWM_PRE_DIV\n");
+			goto out;
+		}
+
+		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_SCALE_REG, scale);
+		ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_REG, backlight);
+	}
+
+	pwm_en_inv = FIELD_PREP(BIT(1), !!state->enabled) |
+		     FIELD_PREP(BIT(0), state->polarity == PWM_POLARITY_INVERSED);
+	ret = regmap_write(pdata->regmap, SN_PWM_EN_INV_REG, pwm_en_inv);
+	if (ret) {
+		dev_err(pdata->dev, "failed to update PWM_EN/PWM_INV\n");
+		goto out;
+	}
+
+	pdata->pwm_enabled = !!state->enabled;
+out:
+
+	if (!pdata->pwm_enabled)
+		pm_runtime_put_sync(pdata->dev);
+
+	return ret;
+}
+
+static const struct pwm_ops ti_sn_pwm_ops = {
+	.request = ti_sn_pwm_request,
+	.free = ti_sn_pwm_free,
+	.apply = ti_sn_pwm_apply,
+	.owner = THIS_MODULE,
+};
+
+static struct pwm_device *ti_sn_pwm_of_xlate(struct pwm_chip *pc,
+					     const struct of_phandle_args *args)
+{
+	struct pwm_device *pwm;
+
+	if (args->args_count != 1)
+		return ERR_PTR(-EINVAL);
+
+	pwm = pwm_request_from_chip(pc, 0, NULL);
+	if (IS_ERR(pwm))
+		return pwm;
+
+	pwm->args.period = args->args[0];
+
+	return pwm;
+}
+
+static int ti_sn_setup_pwmchip(struct ti_sn_bridge *pdata)
+{
+	pdata->pchip.dev = pdata->dev;
+	pdata->pchip.ops = &ti_sn_pwm_ops;
+	pdata->pchip.base = -1;
+	pdata->pchip.npwm = 1;
+	pdata->pchip.of_xlate = ti_sn_pwm_of_xlate;
+	pdata->pchip.of_pwm_n_cells = 1;
+
+	return pwmchip_add(&pdata->pchip);
+}
+
+static void ti_sn_remove_pwmchip(struct ti_sn_bridge *pdata)
+{
+	pwmchip_remove(&pdata->pchip);
+
+	if (pdata->pwm_enabled)
+		pm_runtime_put_sync(pdata->dev);
+}
+#else
+static int ti_sn_pwm_pin_request(struct ti_sn_bridge *pdata) { return 0; }
+static void ti_sn_pwm_pin_release(struct ti_sn_bridge *pdata) {}
+static int ti_sn_setup_pwmchip(struct ti_sn_bridge *pdata) { return 0; }
+static void ti_sn_remove_pwmchip(struct ti_sn_bridge *pdata) {}
+#endif
+
 #if defined(CONFIG_OF_GPIO)
 
 static int tn_sn_bridge_of_xlate(struct gpio_chip *chip,
@@ -1064,7 +1232,7 @@ static int ti_sn_bridge_gpio_get(struct gpio_chip *chip, unsigned int offset)
 	if (ret)
 		return ret;
 
-	return !!(val & BIT(SN_GPIO_INPUT_SHIFT + offset));
+	return !!(val & BIT(GPIO_INPUT_SHIFT + offset));
 }
 
 static void ti_sn_bridge_gpio_set(struct gpio_chip *chip, unsigned int offset,
@@ -1080,8 +1248,8 @@ static void ti_sn_bridge_gpio_set(struct gpio_chip *chip, unsigned int offset,
 
 	val &= 1;
 	ret = regmap_update_bits(pdata->regmap, SN_GPIO_IO_REG,
-				 BIT(SN_GPIO_OUTPUT_SHIFT + offset),
-				 val << (SN_GPIO_OUTPUT_SHIFT + offset));
+				 BIT(GPIO_OUTPUT_SHIFT + offset),
+				 val << (GPIO_OUTPUT_SHIFT + offset));
 	if (ret)
 		dev_warn(pdata->dev,
 			 "Failed to set bridge GPIO %u: %d\n", offset, ret);
@@ -1098,8 +1266,8 @@ static int ti_sn_bridge_gpio_direction_input(struct gpio_chip *chip,
 		return 0;
 
 	ret = regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
-				 SN_GPIO_MUX_MASK << shift,
-				 SN_GPIO_MUX_INPUT << shift);
+				 GPIO_MUX_MASK << shift,
+				 GPIO_MUX_INPUT << shift);
 	if (ret) {
 		set_bit(offset, pdata->gchip_output);
 		return ret;
@@ -1132,8 +1300,8 @@ static int ti_sn_bridge_gpio_direction_output(struct gpio_chip *chip,
 
 	/* Set direction */
 	ret = regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
-				 SN_GPIO_MUX_MASK << shift,
-				 SN_GPIO_MUX_OUTPUT << shift);
+				 GPIO_MUX_MASK << shift,
+				 GPIO_MUX_OUTPUT << shift);
 	if (ret) {
 		clear_bit(offset, pdata->gchip_output);
 		pm_runtime_put(pdata->dev);
@@ -1142,10 +1310,25 @@ static int ti_sn_bridge_gpio_direction_output(struct gpio_chip *chip,
 	return ret;
 }
 
+static int ti_sn_bridge_gpio_request(struct gpio_chip *chip, unsigned int offset)
+{
+	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
+
+	if (offset == SN_PWM_GPIO)
+		return ti_sn_pwm_pin_request(pdata);
+
+	return 0;
+}
+
 static void ti_sn_bridge_gpio_free(struct gpio_chip *chip, unsigned int offset)
 {
+	struct ti_sn_bridge *pdata = gpiochip_get_data(chip);
+
 	/* We won't keep pm_runtime if we're input, so switch there on free */
 	ti_sn_bridge_gpio_direction_input(chip, offset);
+
+	if (offset == SN_PWM_GPIO)
+		ti_sn_pwm_pin_release(pdata);
 }
 
 static const char * const ti_sn_bridge_gpio_names[SN_NUM_GPIOS] = {
@@ -1165,6 +1348,7 @@ static int ti_sn_setup_gpio_controller(struct ti_sn_bridge *pdata)
 	pdata->gchip.owner = THIS_MODULE;
 	pdata->gchip.of_xlate = tn_sn_bridge_of_xlate;
 	pdata->gchip.of_gpio_n_cells = 2;
+	pdata->gchip.request = ti_sn_bridge_gpio_request;
 	pdata->gchip.free = ti_sn_bridge_gpio_free;
 	pdata->gchip.get_direction = ti_sn_bridge_gpio_get_direction;
 	pdata->gchip.direction_input = ti_sn_bridge_gpio_direction_input;
@@ -1247,8 +1431,8 @@ static int ti_sn_backlight_update(struct ti_sn_bridge *pdata)
 
 	/* Enable PWM on GPIO4 */
 	regmap_update_bits(pdata->regmap, SN_GPIO_CTRL_REG,
-			   SN_GPIO_MUX_MASK << GPIO_MUX_GPIO4_SHIFT,
-			   SN_GPIO_MUX_SPECIAL << GPIO_MUX_GPIO4_SHIFT);
+			   GPIO_MUX_MASK << GPIO_MUX_GPIO4_SHIFT,
+			   GPIO_MUX_SPECIAL << GPIO_MUX_GPIO4_SHIFT);
 
 	/* Set max brightness, high and low bytes */
 	ti_sn_bridge_write_u16(pdata, SN_BACKLIGHT_SCALE_LOW, pdata->max_brightness);
@@ -1415,12 +1599,18 @@ static int ti_sn_bridge_probe(struct i2c_client *client,
 		return ret;
 	}
 
+	ret = ti_sn_setup_pwmchip(pdata);
+	if (ret)  {
+		pm_runtime_disable(pdata->dev);
+		return ret;
+	}
+
 	i2c_set_clientdata(client, pdata);
 
 	pdata->aux.name = "ti-sn65dsi86-aux";
 	pdata->aux.dev = pdata->dev;
 	pdata->aux.transfer = ti_sn_aux_transfer;
-	drm_dp_aux_init(&pdata->aux);
+	drm_dp_aux_register(&pdata->aux);
 
 	pdata->bridge.funcs = &ti_sn_bridge_funcs;
 	pdata->bridge.of_node = client->dev.of_node;
@@ -1452,6 +1642,8 @@ static int ti_sn_bridge_remove(struct i2c_client *client)
 	}
 
 	drm_bridge_remove(&pdata->bridge);
+
+	ti_sn_remove_pwmchip(pdata);
 
 	return 0;
 }

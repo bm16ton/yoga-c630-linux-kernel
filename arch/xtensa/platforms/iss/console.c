@@ -31,23 +31,48 @@
 #define SERIAL_MAX_NUM_LINES 1
 #define SERIAL_TIMER_VALUE (HZ / 10)
 
-static void rs_poll(struct timer_list *);
-
 static struct tty_driver *serial_driver;
 static struct tty_port serial_port;
-static DEFINE_TIMER(serial_timer, rs_poll);
+static struct timer_list serial_timer;
+
 static DEFINE_SPINLOCK(timer_lock);
+
+static char *serial_version = "0.1";
+static char *serial_name = "ISS serial driver";
+
+/*
+ * This routine is called whenever a serial port is opened.  It
+ * enables interrupts for a serial port, linking in its async structure into
+ * the IRQ chain.   It also performs the serial-specific
+ * initialization for the tty structure.
+ */
+
+static void rs_poll(struct timer_list *);
 
 static int rs_open(struct tty_struct *tty, struct file * filp)
 {
+	tty->port = &serial_port;
 	spin_lock_bh(&timer_lock);
-	if (tty->count == 1)
+	if (tty->count == 1) {
+		timer_setup(&serial_timer, rs_poll, 0);
 		mod_timer(&serial_timer, jiffies + SERIAL_TIMER_VALUE);
+	}
 	spin_unlock_bh(&timer_lock);
 
 	return 0;
 }
 
+
+/*
+ * ------------------------------------------------------------
+ * iss_serial_close()
+ *
+ * This routine is called when the serial port gets closed.  First, we
+ * wait for the last remaining data to be sent.  Then, we unlink its
+ * async structure from the interrupt chain if necessary, and we free
+ * that IRQ if nothing is left in the chain.
+ * ------------------------------------------------------------
+ */
 static void rs_close(struct tty_struct *tty, struct file * filp)
 {
 	spin_lock_bh(&timer_lock);
@@ -124,7 +149,7 @@ static void rs_wait_until_sent(struct tty_struct *tty, int timeout)
 
 static int rs_proc_show(struct seq_file *m, void *v)
 {
-	seq_printf(m, "serinfo:1.0 driver:0.1\n");
+	seq_printf(m, "serinfo:1.0 driver:%s\n", serial_version);
 	return 0;
 }
 
@@ -141,11 +166,13 @@ static const struct tty_operations serial_ops = {
 	.proc_show = rs_proc_show,
 };
 
-static int __init rs_init(void)
+int __init rs_init(void)
 {
 	tty_port_init(&serial_port);
 
 	serial_driver = alloc_tty_driver(SERIAL_MAX_NUM_LINES);
+
+	pr_info("%s %s\n", serial_name, serial_version);
 
 	/* Initialize the tty_driver structure */
 
@@ -171,7 +198,11 @@ static int __init rs_init(void)
 
 static __exit void rs_exit(void)
 {
-	tty_unregister_driver(serial_driver);
+	int error;
+
+	if ((error = tty_unregister_driver(serial_driver)))
+		pr_err("ISS_SERIAL: failed to unregister serial driver (%d)\n",
+		       error);
 	put_tty_driver(serial_driver);
 	tty_port_destroy(&serial_port);
 }

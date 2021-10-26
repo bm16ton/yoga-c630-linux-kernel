@@ -245,7 +245,6 @@ static const char * const iio_ev_info_text[] = {
 	[IIO_EV_INFO_PERIOD] = "period",
 	[IIO_EV_INFO_HIGH_PASS_FILTER_3DB] = "high_pass_filter_3db",
 	[IIO_EV_INFO_LOW_PASS_FILTER_3DB] = "low_pass_filter_3db",
-	[IIO_EV_INFO_TIMEOUT] = "timeout",
 };
 
 static enum iio_event_direction iio_ev_attr_dir(struct iio_dev_attr *attr)
@@ -298,7 +297,7 @@ static ssize_t iio_ev_state_show(struct device *dev,
 	if (val < 0)
 		return val;
 	else
-		return sysfs_emit(buf, "%d\n", val);
+		return sprintf(buf, "%d\n", val);
 }
 
 static ssize_t iio_ev_value_show(struct device *dev,
@@ -386,7 +385,6 @@ static int iio_device_add_event(struct iio_dev *indio_dev,
 
 		ret = __iio_add_chan_devattr(postfix, chan, show, store,
 			 (i << 16) | spec_index, shared_by, &indio_dev->dev,
-			 NULL,
 			&iio_dev_opaque->event_interface->dev_attr_list);
 		kfree(postfix);
 
@@ -546,10 +544,7 @@ int iio_device_register_eventset(struct iio_dev *indio_dev)
 	/* Add all elements from the list. */
 	list_for_each_entry(p, &ev_int->dev_attr_list, l)
 		ev_int->group.attrs[attrn++] = &p->dev_attr.attr;
-
-	ret = iio_device_register_sysfs_group(indio_dev, &ev_int->group);
-	if (ret)
-		goto error_free_setup_event_lines;
+	indio_dev->groups[indio_dev->groupcounter++] = &ev_int->group;
 
 	ev_int->ioctl_handler.ioctl = iio_event_ioctl;
 	iio_device_ioctl_handler_register(&iio_dev_opaque->indio_dev,

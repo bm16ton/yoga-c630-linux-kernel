@@ -479,10 +479,15 @@ static struct platform_device *gpio_mockup_pdevs[GPIO_MOCKUP_MAX_GC];
 
 static void gpio_mockup_unregister_pdevs(void)
 {
+	struct platform_device *pdev;
 	int i;
 
-	for (i = 0; i < GPIO_MOCKUP_MAX_GC; i++)
-		platform_device_unregister(gpio_mockup_pdevs[i]);
+	for (i = 0; i < GPIO_MOCKUP_MAX_GC; i++) {
+		pdev = gpio_mockup_pdevs[i];
+
+		if (pdev)
+			platform_device_unregister(pdev);
+	}
 }
 
 static __init char **gpio_mockup_make_line_names(const char *label,

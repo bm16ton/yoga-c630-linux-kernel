@@ -126,7 +126,7 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
 {
 	struct uacce_device *uacce;
 	struct uacce_queue *q;
-	int ret;
+	int ret = 0;
 
 	uacce = xa_load(&uacce_xa, iminor(inode));
 	if (!uacce)
@@ -385,33 +385,6 @@ static void uacce_release(struct device *dev)
 	kfree(uacce);
 }
 
-static unsigned int uacce_enable_sva(struct device *parent, unsigned int flags)
-{
-	if (!(flags & UACCE_DEV_SVA))
-		return flags;
-
-	flags &= ~UACCE_DEV_SVA;
-
-	if (iommu_dev_enable_feature(parent, IOMMU_DEV_FEAT_IOPF))
-		return flags;
-
-	if (iommu_dev_enable_feature(parent, IOMMU_DEV_FEAT_SVA)) {
-		iommu_dev_disable_feature(parent, IOMMU_DEV_FEAT_IOPF);
-		return flags;
-	}
-
-	return flags | UACCE_DEV_SVA;
-}
-
-static void uacce_disable_sva(struct uacce_device *uacce)
-{
-	if (!(uacce->flags & UACCE_DEV_SVA))
-		return;
-
-	iommu_dev_disable_feature(uacce->parent, IOMMU_DEV_FEAT_SVA);
-	iommu_dev_disable_feature(uacce->parent, IOMMU_DEV_FEAT_IOPF);
-}
-
 /**
  * uacce_alloc() - alloc an accelerator
  * @parent: pointer of uacce parent device
@@ -431,7 +404,11 @@ struct uacce_device *uacce_alloc(struct device *parent,
 	if (!uacce)
 		return ERR_PTR(-ENOMEM);
 
-	flags = uacce_enable_sva(parent, flags);
+	if (flags & UACCE_DEV_SVA) {
+		ret = iommu_dev_enable_feature(parent, IOMMU_DEV_FEAT_SVA);
+		if (ret)
+			flags &= ~UACCE_DEV_SVA;
+	}
 
 	uacce->parent = parent;
 	uacce->flags = flags;
@@ -455,7 +432,8 @@ struct uacce_device *uacce_alloc(struct device *parent,
 	return uacce;
 
 err_with_uacce:
-	uacce_disable_sva(uacce);
+	if (flags & UACCE_DEV_SVA)
+		iommu_dev_disable_feature(uacce->parent, IOMMU_DEV_FEAT_SVA);
 	kfree(uacce);
 	return ERR_PTR(ret);
 }
@@ -509,7 +487,8 @@ void uacce_remove(struct uacce_device *uacce)
 	mutex_unlock(&uacce->queues_lock);
 
 	/* disable sva now since no opened queues */
-	uacce_disable_sva(uacce);
+	if (uacce->flags & UACCE_DEV_SVA)
+		iommu_dev_disable_feature(uacce->parent, IOMMU_DEV_FEAT_SVA);
 
 	if (uacce->cdev)
 		cdev_device_del(uacce->cdev, &uacce->dev);

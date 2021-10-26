@@ -52,7 +52,6 @@ properties:
       - ti,bq27z561
       - ti,bq28z610
       - ti,bq34z100
-      - ti,bq78z100
 
   reg:
     maxItems: 1
@@ -66,7 +65,7 @@ properties:
        - charge-full-design-microamp-hours
        - voltage-min-design-microvolt
        Both or neither of the *-full-design-*-hours properties must be set.
-       See Documentation/devicetree/bindings/power/supply/battery.yaml
+       See Documentation/devicetree/bindings/power/supply/battery.txt
 
   power-supplies: true
 

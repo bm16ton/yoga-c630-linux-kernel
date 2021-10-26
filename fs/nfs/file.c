@@ -105,7 +105,7 @@ static int nfs_revalidate_file_size(struct inode *inode, struct file *filp)
 
 	if (filp->f_flags & O_DIRECT)
 		goto force_reval;
-	if (nfs_check_cache_invalid(inode, NFS_INO_INVALID_SIZE))
+	if (nfs_check_cache_invalid(inode, NFS_INO_REVAL_PAGECACHE))
 		goto force_reval;
 	return 0;
 force_reval:

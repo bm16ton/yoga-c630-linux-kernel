@@ -101,7 +101,7 @@ struct ib_umad_port {
 	struct ib_device      *ib_dev;
 	struct ib_umad_device *umad_dev;
 	int                    dev_num;
-	u32                     port_num;
+	u8                     port_num;
 };
 
 struct ib_umad_device {
@@ -165,8 +165,8 @@ static void ib_umad_dev_put(struct ib_umad_device *dev)
 
 static int hdr_size(struct ib_umad_file *file)
 {
-	return file->use_pkey_index ? sizeof(struct ib_user_mad_hdr) :
-				      sizeof(struct ib_user_mad_hdr_old);
+	return file->use_pkey_index ? sizeof (struct ib_user_mad_hdr) :
+		sizeof (struct ib_user_mad_hdr_old);
 }
 
 /* caller must hold file->mutex */
@@ -688,7 +688,8 @@ static int ib_umad_reg_agent(struct ib_umad_file *file, void __user *arg,
 	mutex_lock(&file->mutex);
 
 	if (!file->port->ib_dev) {
-		dev_notice(&file->port->dev, "%s: invalid device\n", __func__);
+		dev_notice(&file->port->dev,
+			   "ib_umad_reg_agent: invalid device\n");
 		ret = -EPIPE;
 		goto out;
 	}
@@ -700,7 +701,7 @@ static int ib_umad_reg_agent(struct ib_umad_file *file, void __user *arg,
 
 	if (ureq.qpn != 0 && ureq.qpn != 1) {
 		dev_notice(&file->port->dev,
-			   "%s: invalid QPN %d specified\n", __func__,
+			   "ib_umad_reg_agent: invalid QPN %d specified\n",
 			   ureq.qpn);
 		ret = -EINVAL;
 		goto out;
@@ -710,9 +711,9 @@ static int ib_umad_reg_agent(struct ib_umad_file *file, void __user *arg,
 		if (!__get_agent(file, agent_id))
 			goto found;
 
-	dev_notice(&file->port->dev, "%s: Max Agents (%u) reached\n", __func__,
+	dev_notice(&file->port->dev,
+		   "ib_umad_reg_agent: Max Agents (%u) reached\n",
 		   IB_UMAD_MAX_AGENTS);
-
 	ret = -ENOMEM;
 	goto out;
 
@@ -789,7 +790,8 @@ static int ib_umad_reg_agent2(struct ib_umad_file *file, void __user *arg)
 	mutex_lock(&file->mutex);
 
 	if (!file->port->ib_dev) {
-		dev_notice(&file->port->dev, "%s: invalid device\n", __func__);
+		dev_notice(&file->port->dev,
+			   "ib_umad_reg_agent2: invalid device\n");
 		ret = -EPIPE;
 		goto out;
 	}
@@ -800,16 +802,17 @@ static int ib_umad_reg_agent2(struct ib_umad_file *file, void __user *arg)
 	}
 
 	if (ureq.qpn != 0 && ureq.qpn != 1) {
-		dev_notice(&file->port->dev, "%s: invalid QPN %d specified\n",
-			   __func__, ureq.qpn);
+		dev_notice(&file->port->dev,
+			   "ib_umad_reg_agent2: invalid QPN %d specified\n",
+			   ureq.qpn);
 		ret = -EINVAL;
 		goto out;
 	}
 
 	if (ureq.flags & ~IB_USER_MAD_REG_FLAGS_CAP) {
 		dev_notice(&file->port->dev,
-			   "%s failed: invalid registration flags specified 0x%x; supported 0x%x\n",
-			   __func__, ureq.flags, IB_USER_MAD_REG_FLAGS_CAP);
+			   "ib_umad_reg_agent2 failed: invalid registration flags specified 0x%x; supported 0x%x\n",
+			   ureq.flags, IB_USER_MAD_REG_FLAGS_CAP);
 		ret = -EINVAL;
 
 		if (put_user((u32)IB_USER_MAD_REG_FLAGS_CAP,
@@ -824,7 +827,8 @@ static int ib_umad_reg_agent2(struct ib_umad_file *file, void __user *arg)
 		if (!__get_agent(file, agent_id))
 			goto found;
 
-	dev_notice(&file->port->dev, "%s: Max Agents (%u) reached\n", __func__,
+	dev_notice(&file->port->dev,
+		   "ib_umad_reg_agent2: Max Agents (%u) reached\n",
 		   IB_UMAD_MAX_AGENTS);
 	ret = -ENOMEM;
 	goto out;
@@ -836,7 +840,7 @@ found:
 		req.mgmt_class_version = ureq.mgmt_class_version;
 		if (ureq.oui & 0xff000000) {
 			dev_notice(&file->port->dev,
-				   "%s failed: oui invalid 0x%08x\n", __func__,
+				   "ib_umad_reg_agent2 failed: oui invalid 0x%08x\n",
 				   ureq.oui);
 			ret = -EINVAL;
 			goto out;
@@ -1141,7 +1145,7 @@ static const struct file_operations umad_sm_fops = {
 
 static struct ib_umad_port *get_port(struct ib_device *ibdev,
 				     struct ib_umad_device *umad_dev,
-				     u32 port)
+				     unsigned int port)
 {
 	if (!umad_dev)
 		return ERR_PTR(-EOPNOTSUPP);

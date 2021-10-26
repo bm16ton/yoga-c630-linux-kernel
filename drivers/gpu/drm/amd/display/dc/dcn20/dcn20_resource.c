@@ -2033,13 +2033,9 @@ int dcn20_populate_dml_pipes_from_context(
 		if (res_ctx->pipe_ctx[pipe_cnt].stream == res_ctx->pipe_ctx[i].stream)
 			continue;
 
-		if (dc->debug.disable_timing_sync ||
-			(!resource_are_streams_timing_synchronizable(
+		if (dc->debug.disable_timing_sync || !resource_are_streams_timing_synchronizable(
 				res_ctx->pipe_ctx[pipe_cnt].stream,
-				res_ctx->pipe_ctx[i].stream) &&
-			!resource_are_vblanks_synchronizable(
-				res_ctx->pipe_ctx[pipe_cnt].stream,
-				res_ctx->pipe_ctx[i].stream))) {
+				res_ctx->pipe_ctx[i].stream)) {
 			synchronized_vblank = false;
 			break;
 		}
@@ -2093,10 +2089,8 @@ int dcn20_populate_dml_pipes_from_context(
 				- timing->v_border_bottom;
 		pipes[pipe_cnt].pipe.dest.htotal = timing->h_total;
 		pipes[pipe_cnt].pipe.dest.vtotal = v_total;
-		pipes[pipe_cnt].pipe.dest.hactive =
-			timing->h_addressable + timing->h_border_left + timing->h_border_right;
-		pipes[pipe_cnt].pipe.dest.vactive =
-			timing->v_addressable + timing->v_border_top + timing->v_border_bottom;
+		pipes[pipe_cnt].pipe.dest.hactive = timing->h_addressable;
+		pipes[pipe_cnt].pipe.dest.vactive = timing->v_addressable;
 		pipes[pipe_cnt].pipe.dest.interlaced = timing->flags.INTERLACE;
 		pipes[pipe_cnt].pipe.dest.pixel_rate_mhz = timing->pix_clk_100hz/10000.0;
 		if (timing->timing_3d_format == TIMING_3D_FORMAT_HW_FRAME_PACKING)
@@ -2203,11 +2197,10 @@ int dcn20_populate_dml_pipes_from_context(
 			pipes[pipe_cnt].dout.output_bpp = (output_bpc * 3.0) / 2;
 			break;
 		case PIXEL_ENCODING_YCBCR422:
-			if (res_ctx->pipe_ctx[i].stream->timing.flags.DSC &&
-			    !res_ctx->pipe_ctx[i].stream->timing.dsc_cfg.ycbcr422_simple)
-				pipes[pipe_cnt].dout.output_format = dm_n422;
-			else
+			if (true) /* todo */
 				pipes[pipe_cnt].dout.output_format = dm_s422;
+			else
+				pipes[pipe_cnt].dout.output_format = dm_n422;
 			pipes[pipe_cnt].dout.output_bpp = output_bpc * 2;
 			break;
 		default:
@@ -2219,7 +2212,7 @@ int dcn20_populate_dml_pipes_from_context(
 			pipes[pipe_cnt].dout.output_bpp = res_ctx->pipe_ctx[i].stream->timing.dsc_cfg.bits_per_pixel / 16.0;
 
 		/* todo: default max for now, until there is logic reflecting this in dc*/
-		pipes[pipe_cnt].dout.dsc_input_bpc = 12;
+		pipes[pipe_cnt].dout.output_bpc = 12;
 		/*fill up the audio sample rate (unit in kHz)*/
 		get_audio_check(&res_ctx->pipe_ctx[i].stream->audio_info, &aud_check);
 		pipes[pipe_cnt].dout.max_audio_sample_rate = aud_check.max_audiosample_rate / 1000;
@@ -3706,8 +3699,6 @@ static bool dcn20_resource_construct(
 	dc->caps.dmdata_alloc_size = 2048;
 
 	dc->caps.max_slave_planes = 1;
-	dc->caps.max_slave_yuv_planes = 1;
-	dc->caps.max_slave_rgb_planes = 1;
 	dc->caps.post_blend_color_processing = true;
 	dc->caps.force_dp_tps4_for_cp2520 = true;
 	dc->caps.extended_aux_timeout_support = true;

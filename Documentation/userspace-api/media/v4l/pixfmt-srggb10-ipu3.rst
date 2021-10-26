@@ -9,9 +9,7 @@
 V4L2_PIX_FMT_IPU3_SBGGR10 ('ip3b'), V4L2_PIX_FMT_IPU3_SGBRG10 ('ip3g'), V4L2_PIX_FMT_IPU3_SGRBG10 ('ip3G'), V4L2_PIX_FMT_IPU3_SRGGB10 ('ip3r')
 **********************************************************************************************************************************************
 
-====================
 10-bit Bayer formats
-====================
 
 Description
 ===========
@@ -27,11 +25,7 @@ Below is an example of a small image in V4L2_PIX_FMT_IPU3_SBGGR10 format.
 **Byte Order.**
 Each cell is one byte.
 
-.. raw:: latex
-
-    \small
-
-.. tabularcolumns:: |p{0.8cm}|p{3.3cm}|p{3.3cm}|p{3.3cm}|p{3.3cm}|
+.. tabularcolumns:: |p{0.8cm}|p{4.0cm}|p{4.0cm}|p{4.0cm}|p{4.0cm}|
 
 .. flat-table::
 
@@ -339,7 +333,3 @@ Each cell is one byte.
       - R\ :sub:`0323high`
       - G\ :sub:`0324low`
       - G\ :sub:`0324high`\ (bits 1--0)
-
-.. raw:: latex
-
-    \normalsize

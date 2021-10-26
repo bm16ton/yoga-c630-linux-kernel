@@ -9,7 +9,6 @@
 
 #include <generated/compile.h>
 #include <linux/build-salt.h>
-#include <linux/elfnote-lto.h>
 #include <linux/export.h>
 #include <linux/uts.h>
 #include <linux/utsname.h>
@@ -46,4 +45,3 @@ const char linux_proc_banner[] =
 	" (" LINUX_COMPILER ") %s\n";
 
 BUILD_SALT;
-BUILD_LTO_INFO;

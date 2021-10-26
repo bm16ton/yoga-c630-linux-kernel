@@ -22,7 +22,6 @@ properties:
       - mediatek,mt7623-dpi
       - mediatek,mt8173-dpi
       - mediatek,mt8183-dpi
-      - mediatek,mt8192-dpi
 
   reg:
     maxItems: 1
@@ -51,10 +50,15 @@ properties:
       - const: sleep
 
   port:
-    $ref: /schemas/graph.yaml#/properties/port
+    type: object
     description:
-      Output port node. This port should be connected to the input port of an
-      attached HDMI or LVDS encoder chip.
+      Output port node with endpoint definitions as described in
+      Documentation/devicetree/bindings/graph.txt. This port should be connected
+      to the input port of an attached HDMI or LVDS encoder chip.
+
+    properties:
+      endpoint:
+        type: object
 
 required:
   - compatible

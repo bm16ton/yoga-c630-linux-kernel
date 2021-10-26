@@ -437,8 +437,7 @@ static int hidinput_get_battery_property(struct power_supply *psy,
 	return ret;
 }
 
-static int hidinput_setup_battery(struct hid_device *dev, unsigned report_type,
-				  struct hid_field *field, bool is_percentage)
+static int hidinput_setup_battery(struct hid_device *dev, unsigned report_type, struct hid_field *field)
 {
 	struct power_supply_desc *psy_desc;
 	struct power_supply_config psy_cfg = { .drv_data = dev, };
@@ -478,7 +477,7 @@ static int hidinput_setup_battery(struct hid_device *dev, unsigned report_type,
 	min = field->logical_minimum;
 	max = field->logical_maximum;
 
-	if (is_percentage || (quirks & HID_BATTERY_QUIRK_PERCENT)) {
+	if (quirks & HID_BATTERY_QUIRK_PERCENT) {
 		min = 0;
 		max = 100;
 	}
@@ -555,7 +554,7 @@ static void hidinput_update_battery(struct hid_device *dev, int value)
 }
 #else  /* !CONFIG_HID_BATTERY_STRENGTH */
 static int hidinput_setup_battery(struct hid_device *dev, unsigned report_type,
-				  struct hid_field *field, bool is_percentage)
+				  struct hid_field *field)
 {
 	return 0;
 }
@@ -809,7 +808,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 			break;
 
 		case 0x3b: /* Battery Strength */
-			hidinput_setup_battery(device, HID_INPUT_REPORT, field, false);
+			hidinput_setup_battery(device, HID_INPUT_REPORT, field);
 			usage->type = EV_PWR;
 			return;
 
@@ -1074,16 +1073,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 	case HID_UP_GENDEVCTRLS:
 		switch (usage->hid) {
 		case HID_DC_BATTERYSTRENGTH:
-			hidinput_setup_battery(device, HID_INPUT_REPORT, field, false);
-			usage->type = EV_PWR;
-			return;
-		}
-		goto unknown;
-
-	case HID_UP_BATTERY:
-		switch (usage->hid) {
-		case HID_BAT_ABSOLUTESTATEOFCHARGE:
-			hidinput_setup_battery(device, HID_INPUT_REPORT, field, true);
+			hidinput_setup_battery(device, HID_INPUT_REPORT, field);
 			usage->type = EV_PWR;
 			return;
 		}
@@ -1687,7 +1677,7 @@ static void report_features(struct hid_device *hid)
 				/* Verify if Battery Strength feature is available */
 				if (usage->hid == HID_DC_BATTERYSTRENGTH)
 					hidinput_setup_battery(hid, HID_FEATURE_REPORT,
-							       rep->field[i], false);
+							       rep->field[i]);
 
 				if (drv->feature_mapping)
 					drv->feature_mapping(hid, rep->field[i], usage);

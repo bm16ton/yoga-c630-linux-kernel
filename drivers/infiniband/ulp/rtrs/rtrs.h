@@ -58,13 +58,14 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
 				 size_t path_cnt, u16 port,
 				 size_t pdu_sz, u8 reconnect_delay_sec,
 				 u16 max_segments,
-				 s16 max_reconnect_attempts, u32 nr_poll_queues);
+				 size_t max_segment_size,
+				 s16 max_reconnect_attempts);
 
 void rtrs_clt_close(struct rtrs_clt *sess);
 
-enum wait_type {
+enum {
 	RTRS_PERMIT_NOWAIT = 0,
-	RTRS_PERMIT_WAIT   = 1
+	RTRS_PERMIT_WAIT   = 1,
 };
 
 /**
@@ -80,7 +81,7 @@ enum rtrs_clt_con_type {
 
 struct rtrs_permit *rtrs_clt_get_permit(struct rtrs_clt *sess,
 				    enum rtrs_clt_con_type con_type,
-				    enum wait_type wait);
+				    int wait);
 
 void rtrs_clt_put_permit(struct rtrs_clt *sess, struct rtrs_permit *permit);
 
@@ -102,7 +103,6 @@ int rtrs_clt_request(int dir, struct rtrs_clt_req_ops *ops,
 		     struct rtrs_clt *sess, struct rtrs_permit *permit,
 		     const struct kvec *vec, size_t nr, size_t len,
 		     struct scatterlist *sg, unsigned int sg_cnt);
-int rtrs_clt_rdma_cq_direct(struct rtrs_clt *clt, unsigned int index);
 
 /**
  * rtrs_attrs - RTRS session attributes
@@ -110,6 +110,8 @@ int rtrs_clt_rdma_cq_direct(struct rtrs_clt *clt, unsigned int index);
 struct rtrs_attrs {
 	u32		queue_depth;
 	u32		max_io_size;
+	u8		sessname[NAME_MAX];
+	struct kobject	*sess_kobj;
 };
 
 int rtrs_clt_query(struct rtrs_clt *sess, struct rtrs_attrs *attr);
@@ -136,6 +138,7 @@ struct rtrs_srv_ops {
 	 *			message for the data transfer will be sent to
 	 *			the client.
 
+	 *	@sess:		Session
 	 *	@priv:		Private data set by rtrs_srv_set_sess_priv()
 	 *	@id:		internal RTRS operation id
 	 *	@dir:		READ/WRITE
@@ -149,7 +152,7 @@ struct rtrs_srv_ops {
 	 *	@usr:		The extra user message sent by the client (%vec)
 	 *	@usrlen:	Size of the user message
 	 */
-	int (*rdma_ev)(void *priv,
+	int (*rdma_ev)(struct rtrs_srv *sess, void *priv,
 		       struct rtrs_srv_op *id, int dir,
 		       void *data, size_t datalen, const void *usr,
 		       size_t usrlen);
@@ -183,5 +186,4 @@ int rtrs_addr_to_sockaddr(const char *str, size_t len, u16 port,
 			  struct rtrs_addr *addr);
 
 int sockaddr_to_str(const struct sockaddr *addr, char *buf, size_t len);
-int rtrs_addr_to_str(const struct rtrs_addr *addr, char *buf, size_t len);
 #endif

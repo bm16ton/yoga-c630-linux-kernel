@@ -273,15 +273,25 @@ void proc_entry_rundown(struct proc_dir_entry *de)
 	spin_unlock(&de->pde_unload_lock);
 }
 
+static loff_t pde_lseek(struct proc_dir_entry *pde, struct file *file, loff_t offset, int whence)
+{
+	typeof_member(struct proc_ops, proc_lseek) lseek;
+
+	lseek = pde->proc_ops->proc_lseek;
+	if (!lseek)
+		lseek = default_llseek;
+	return lseek(file, offset, whence);
+}
+
 static loff_t proc_reg_llseek(struct file *file, loff_t offset, int whence)
 {
 	struct proc_dir_entry *pde = PDE(file_inode(file));
 	loff_t rv = -EINVAL;
 
 	if (pde_is_permanent(pde)) {
-		return pde->proc_ops->proc_lseek(file, offset, whence);
+		return pde_lseek(pde, file, offset, whence);
 	} else if (use_pde(pde)) {
-		rv = pde->proc_ops->proc_lseek(file, offset, whence);
+		rv = pde_lseek(pde, file, offset, whence);
 		unuse_pde(pde);
 	}
 	return rv;
@@ -483,6 +493,7 @@ proc_reg_get_unmapped_area(struct file *file, unsigned long orig_addr,
 
 static int proc_reg_open(struct inode *inode, struct file *file)
 {
+	struct proc_fs_info *fs_info = proc_sb_info(inode->i_sb);
 	struct proc_dir_entry *pde = PDE(inode);
 	int rv = 0;
 	typeof_member(struct proc_ops, proc_open) open;
@@ -495,6 +506,9 @@ static int proc_reg_open(struct inode *inode, struct file *file)
 			rv = open(inode, file);
 		return rv;
 	}
+
+	if (fs_info->pidonly == PROC_PIDONLY_ON)
+		return -ENOENT;
 
 	/*
 	 * Ensure that

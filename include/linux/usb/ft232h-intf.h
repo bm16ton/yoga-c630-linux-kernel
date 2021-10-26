@@ -39,6 +39,7 @@
 #define EN_3_PHASE		0x8C
 #define DIS_3_PHASE		0x8D
 #define DIS_ADAPTIVE		0x97
+#define EN_ADAPTIVE     0x96
 
 /* For EEPROM I/O mode */
 #define FTDI_MAX_EEPROM_SIZE	256
@@ -204,6 +205,9 @@ struct mpsse_spi_platform_data {
 //	size_t io_data_len;
 //	int dc;
 };
+
+
+
 
 /*
  * Value HIGH. rate is 12000000 / ((1 + value) * 2)

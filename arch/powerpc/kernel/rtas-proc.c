@@ -755,18 +755,11 @@ static int ppc_rtas_tone_volume_show(struct seq_file *m, void *v)
 	return 0;
 }
 
-/**
- * ppc_rtas_rmo_buf_show() - Describe RTAS-addressable region for user space.
- *
- * Base + size description of a range of RTAS-addressable memory set
- * aside for user space to use as work area(s) for certain RTAS
- * functions. User space accesses this region via /dev/mem. Apart from
- * security policies, the kernel does not arbitrate or serialize
- * access to this region, and user space must ensure that concurrent
- * users do not interfere with each other.
- */
+#define RMO_READ_BUF_MAX 30
+
+/* RTAS Userspace access */
 static int ppc_rtas_rmo_buf_show(struct seq_file *m, void *v)
 {
-	seq_printf(m, "%016lx %x\n", rtas_rmo_buf, RTAS_USER_REGION_SIZE);
+	seq_printf(m, "%016lx %x\n", rtas_rmo_buf, RTAS_RMOBUF_MAX);
 	return 0;
 }

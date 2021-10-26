@@ -29,7 +29,10 @@
 #define PAL_NUM_ACTIVE_PIXELS		(720)
 #define PAL_NUM_ACTIVE_LINES		(576)
 
-/* enum for different decoder input pin configuration */
+/**
+ * enum tvp514x_input - enum for different decoder input pin
+ *		configuration.
+ */
 enum tvp514x_input {
 	/*
 	 * CVBS input selection
@@ -66,7 +69,11 @@ enum tvp514x_input {
 	INPUT_INVALID
 };
 
-/* enum for output format supported. */
+/**
+ * enum tvp514x_output - enum for output format
+ *			supported.
+ *
+ */
 enum tvp514x_output {
 	OUTPUT_10BIT_422_EMBEDDED_SYNC = 0,
 	OUTPUT_20BIT_422_SEPERATE_SYNC,

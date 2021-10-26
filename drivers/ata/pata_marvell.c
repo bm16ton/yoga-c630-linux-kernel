@@ -110,7 +110,7 @@ static struct ata_port_operations marvell_ops = {
 /**
  *	marvell_init_one - Register Marvell ATA PCI device with kernel services
  *	@pdev: PCI device to register
- *	@id: PCI device ID
+ *	@ent: Entry in marvell_pci_tbl matching with @pdev
  *
  *	Called from kernel PCI layer.
  *

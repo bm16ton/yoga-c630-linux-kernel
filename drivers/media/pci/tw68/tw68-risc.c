@@ -151,8 +151,7 @@ int tw68_risc_buffer(struct pci_dev *pci,
 	instructions  = fields * (1 + (((bpl + padding) * lines) /
 			 PAGE_SIZE) + lines) + 4;
 	buf->size = instructions * 8;
-	buf->cpu = dma_alloc_coherent(&pci->dev, buf->size, &buf->dma,
-				      GFP_KERNEL);
+	buf->cpu = pci_alloc_consistent(pci, buf->size, &buf->dma);
 	if (buf->cpu == NULL)
 		return -ENOMEM;
 

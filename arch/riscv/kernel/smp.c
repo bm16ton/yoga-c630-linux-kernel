@@ -9,7 +9,6 @@
  */
 
 #include <linux/cpu.h>
-#include <linux/clockchips.h>
 #include <linux/interrupt.h>
 #include <linux/module.h>
 #include <linux/profile.h>
@@ -28,11 +27,10 @@ enum ipi_message_type {
 	IPI_CALL_FUNC,
 	IPI_CPU_STOP,
 	IPI_IRQ_WORK,
-	IPI_TIMER,
 	IPI_MAX
 };
 
-unsigned long __cpuid_to_hartid_map[NR_CPUS] __ro_after_init = {
+unsigned long __cpuid_to_hartid_map[NR_CPUS] = {
 	[0 ... NR_CPUS-1] = INVALID_HARTID
 };
 
@@ -87,9 +85,9 @@ static void ipi_stop(void)
 		wait_for_interrupt();
 }
 
-static const struct riscv_ipi_ops *ipi_ops __ro_after_init;
+static struct riscv_ipi_ops *ipi_ops;
 
-void riscv_set_ipi_ops(const struct riscv_ipi_ops *ops)
+void riscv_set_ipi_ops(struct riscv_ipi_ops *ops)
 {
 	ipi_ops = ops;
 }
@@ -178,12 +176,6 @@ void handle_IPI(struct pt_regs *regs)
 			irq_work_run();
 		}
 
-#ifdef CONFIG_GENERIC_CLOCKEVENTS_BROADCAST
-		if (ops & (1 << IPI_TIMER)) {
-			stats[IPI_TIMER]++;
-			tick_receive_broadcast();
-		}
-#endif
 		BUG_ON((ops >> IPI_MAX) != 0);
 
 		/* Order data access and bit testing. */
@@ -200,7 +192,6 @@ static const char * const ipi_names[] = {
 	[IPI_CALL_FUNC]		= "Function call interrupts",
 	[IPI_CPU_STOP]		= "CPU stop interrupts",
 	[IPI_IRQ_WORK]		= "IRQ work interrupts",
-	[IPI_TIMER]		= "Timer broadcast interrupts",
 };
 
 void show_ipi_stats(struct seq_file *p, int prec)
@@ -225,13 +216,6 @@ void arch_send_call_function_single_ipi(int cpu)
 {
 	send_ipi_single(cpu, IPI_CALL_FUNC);
 }
-
-#ifdef CONFIG_GENERIC_CLOCKEVENTS_BROADCAST
-void tick_broadcast(const struct cpumask *mask)
-{
-	send_ipi_mask(mask, IPI_TIMER);
-}
-#endif
 
 void smp_send_stop(void)
 {

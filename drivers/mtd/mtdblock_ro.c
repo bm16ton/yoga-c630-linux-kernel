@@ -67,7 +67,18 @@ static struct mtd_blktrans_ops mtdblock_tr = {
 	.owner		= THIS_MODULE,
 };
 
-module_mtd_blktrans(mtdblock_tr);
+static int __init mtdblock_init(void)
+{
+	return register_mtd_blktrans(&mtdblock_tr);
+}
+
+static void __exit mtdblock_exit(void)
+{
+	deregister_mtd_blktrans(&mtdblock_tr);
+}
+
+module_init(mtdblock_init);
+module_exit(mtdblock_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("David Woodhouse <dwmw2@infradead.org>");

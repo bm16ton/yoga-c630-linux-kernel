@@ -1659,19 +1659,19 @@ struct batadv_priv {
 	/** @tp_list: list of tp sessions */
 	struct hlist_head tp_list;
 
-	/** @orig_hash: hash table containing mesh participants (orig nodes) */
+	/** @tp_num: number of currently active tp sessions */
 	struct batadv_hashtable *orig_hash;
 
-	/** @forw_bat_list_lock: lock protecting forw_bat_list */
+	/** @orig_hash: hash table containing mesh participants (orig nodes) */
 	spinlock_t forw_bat_list_lock;
 
-	/** @forw_bcast_list_lock: lock protecting forw_bcast_list */
+	/** @forw_bat_list_lock: lock protecting forw_bat_list */
 	spinlock_t forw_bcast_list_lock;
 
-	/** @tp_list_lock: spinlock protecting @tp_list */
+	/** @forw_bcast_list_lock: lock protecting forw_bcast_list */
 	spinlock_t tp_list_lock;
 
-	/** @tp_num: number of currently active tp sessions */
+	/** @tp_list_lock: spinlock protecting @tp_list */
 	atomic_t tp_num;
 
 	/** @orig_work: work queue callback item for orig node purging */

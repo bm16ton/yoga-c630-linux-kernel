@@ -11,12 +11,12 @@ maintainers:
 
 properties:
   compatible:
-    const: upisemi,usd5182
+    const: upisemi,asd5182
 
   reg:
     maxItems: 1
 
-  upisemi,glass-coef:
+  upsemi,glass-coef:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
       glass attenuation factor - compensation factor of resolution 1000

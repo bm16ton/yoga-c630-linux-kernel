@@ -35,7 +35,7 @@ bool mlx5_lag_is_multipath(struct mlx5_core_dev *dev)
 }
 
 /**
- * mlx5_lag_set_port_affinity
+ * Set lag port affinity
  *
  * @ldev: lag device
  * @port:

@@ -9,7 +9,6 @@
  *	Bjorn Helgaas <bjorn.helgaas@hp.com>
  */
 
-#define pr_fmt(fmt) "ACPI: PCI: " fmt
 
 #include <linux/dmi.h>
 #include <linux/kernel.h>
@@ -22,6 +21,11 @@
 #include <linux/acpi.h>
 #include <linux/slab.h>
 #include <linux/interrupt.h>
+
+#define PREFIX "ACPI: "
+
+#define _COMPONENT		ACPI_PCI_COMPONENT
+ACPI_MODULE_NAME("pci_irq");
 
 struct acpi_prt_entry {
 	struct acpi_pci_id	id;
@@ -122,7 +126,7 @@ static void do_prt_fixups(struct acpi_prt_entry *entry,
 		    entry->pin == quirk->pin &&
 		    !strcmp(prt->source, quirk->source) &&
 		    strlen(prt->source) >= strlen(quirk->actual_source)) {
-			pr_warn("Firmware reports "
+			printk(KERN_WARNING PREFIX "firmware reports "
 				"%04x:%02x:%02x PCI INT %c connected to %s; "
 				"changing to %s\n",
 				entry->id.segment, entry->id.bus,
@@ -187,9 +191,12 @@ static int acpi_pci_irq_check_entry(acpi_handle handle, struct pci_dev *dev,
 	 * the IRQ value, which is hardwired to specific interrupt inputs on
 	 * the interrupt controller.
 	 */
-	pr_debug("%04x:%02x:%02x[%c] -> %s[%d]\n",
-		 entry->id.segment, entry->id.bus, entry->id.device,
-		 pin_name(entry->pin), prt->source, entry->index);
+
+	ACPI_DEBUG_PRINT_RAW((ACPI_DB_INFO,
+			      "      %04x:%02x:%02x[%c] -> %s[%d]\n",
+			      entry->id.segment, entry->id.bus,
+			      entry->id.device, pin_name(entry->pin),
+			      prt->source, entry->index));
 
 	*entry_ptr = entry;
 
@@ -300,7 +307,8 @@ static struct acpi_prt_entry *acpi_pci_irq_lookup(struct pci_dev *dev, int pin)
 #ifdef CONFIG_X86_IO_APIC
 		acpi_reroute_boot_interrupt(dev, entry);
 #endif /* CONFIG_X86_IO_APIC */
-		dev_dbg(&dev->dev, "Found [%c] _PRT entry\n", pin_name(pin));
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Found %s[%c] _PRT entry\n",
+				  pci_name(dev), pin_name(pin)));
 		return entry;
 	}
 
@@ -316,7 +324,9 @@ static struct acpi_prt_entry *acpi_pci_irq_lookup(struct pci_dev *dev, int pin)
 			/* PC card has the same IRQ as its cardbridge */
 			bridge_pin = bridge->pin;
 			if (!bridge_pin) {
-				dev_dbg(&bridge->dev, "No interrupt pin configured\n");
+				ACPI_DEBUG_PRINT((ACPI_DB_INFO,
+						  "No interrupt pin configured for device %s\n",
+						  pci_name(bridge)));
 				return NULL;
 			}
 			pin = bridge_pin;
@@ -324,8 +334,10 @@ static struct acpi_prt_entry *acpi_pci_irq_lookup(struct pci_dev *dev, int pin)
 
 		ret = acpi_pci_irq_find_prt_entry(bridge, pin, &entry);
 		if (!ret && entry) {
-			dev_dbg(&dev->dev, "Derived GSI INT %c from %s\n",
-				pin_name(orig_pin), pci_name(bridge));
+			ACPI_DEBUG_PRINT((ACPI_DB_INFO,
+					 "Derived GSI for %s INT %c from %s\n",
+					 pci_name(dev), pin_name(orig_pin),
+					 pci_name(bridge)));
 			return entry;
 		}
 
@@ -401,7 +413,9 @@ int acpi_pci_irq_enable(struct pci_dev *dev)
 
 	pin = dev->pin;
 	if (!pin) {
-		dev_dbg(&dev->dev, "No interrupt pin configured\n");
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
+				  "No interrupt pin configured for device %s\n",
+				  pci_name(dev)));
 		return 0;
 	}
 

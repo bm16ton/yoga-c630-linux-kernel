@@ -187,8 +187,7 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
 }
 
 /**
- * caam_rsa_count_leading_zeros - Count leading zeros, need it to strip,
- *                                from a given scatterlist
+ * Count leading zeros, need it to strip, from a given scatterlist
  *
  * @sgl   : scatterlist to count zeros from
  * @nbytes: number of zeros, in bytes, to strip

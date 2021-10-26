@@ -30,7 +30,10 @@
  * flat identity mapping.
  */
 SYM_CODE_START(__cpu_soft_restart)
-	mov_q	x12, INIT_SCTLR_EL1_MMU_OFF
+	/* Clear sctlr_el1 flags. */
+	mrs	x12, sctlr_el1
+	mov_q	x13, SCTLR_ELx_FLAGS
+	bic	x12, x12, x13
 	pre_disable_mmu_workaround
 	/*
 	 * either disable EL1&0 translation regime or disable EL2&0 translation

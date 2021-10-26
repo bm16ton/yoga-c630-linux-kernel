@@ -135,7 +135,7 @@ void dcn20_update_clocks_update_dentist(struct clk_mgr_internal *clk_mgr)
 
 	REG_UPDATE(DENTIST_DISPCLK_CNTL,
 			DENTIST_DISPCLK_WDIVIDER, dispclk_wdivider);
-	REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_CHG_DONE, 1, 50, 1000);
+//	REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_CHG_DONE, 1, 5, 100);
 	REG_UPDATE(DENTIST_DISPCLK_CNTL,
 			DENTIST_DPPCLK_WDIVIDER, dppclk_wdivider);
 	REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DPPCLK_CHG_DONE, 1, 5, 100);
@@ -361,7 +361,7 @@ void dcn2_read_clocks_from_hw_dentist(struct clk_mgr *clk_mgr_base)
 	REG_GET(DENTIST_DISPCLK_CNTL, DENTIST_DPPCLK_WDIVIDER, &dppclk_wdivider);
 
 	disp_divider = dentist_get_divider_from_did(dispclk_wdivider);
-	dpp_divider = dentist_get_divider_from_did(dppclk_wdivider);
+	dpp_divider = dentist_get_divider_from_did(dispclk_wdivider);
 
 	if (disp_divider && dpp_divider) {
 		/* Calculate the current DFS clock, in kHz.*/

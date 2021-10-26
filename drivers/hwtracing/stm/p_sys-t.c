@@ -92,7 +92,7 @@ static void sys_t_policy_node_init(void *priv)
 {
 	struct sys_t_policy_node *pn = priv;
 
-	uuid_gen(&pn->uuid);
+	generate_random_uuid(pn->uuid.b);
 }
 
 static int sys_t_output_open(void *priv, struct stm_output *output)
@@ -292,7 +292,6 @@ static ssize_t sys_t_write(struct stm_data *data, struct stm_output *output,
 	unsigned int m = output->master;
 	const unsigned char nil = 0;
 	u32 header = DATA_HEADER;
-	u8 uuid[UUID_SIZE];
 	ssize_t sz;
 
 	/* We require an existing policy node to proceed */
@@ -323,8 +322,7 @@ static ssize_t sys_t_write(struct stm_data *data, struct stm_output *output,
 		return sz;
 
 	/* GUID */
-	export_uuid(uuid, &op->node.uuid);
-	sz = stm_data_write(data, m, c, false, uuid, sizeof(op->node.uuid));
+	sz = stm_data_write(data, m, c, false, op->node.uuid.b, UUID_SIZE);
 	if (sz <= 0)
 		return sz;
 

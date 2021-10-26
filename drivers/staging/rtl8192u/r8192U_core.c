@@ -3416,6 +3416,7 @@ int rtl8192_down(struct net_device *dev)
 void rtl8192_commit(struct net_device *dev)
 {
 	struct r8192_priv *priv = ieee80211_priv(dev);
+	int reset_status = 0;
 
 	if (priv->up == 0)
 		return;
@@ -3427,7 +3428,7 @@ void rtl8192_commit(struct net_device *dev)
 	ieee80211_softmac_stop_protocol(priv->ieee80211);
 
 	rtl8192_rtx_disable(dev);
-	_rtl8192_up(dev);
+	reset_status = _rtl8192_up(dev);
 }
 
 static void rtl8192_restart(struct work_struct *work)

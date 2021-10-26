@@ -63,7 +63,10 @@ do {								\
 } while (0)
 
 /* Rotate right one 64 bit number as a 56 bit number */
-#define ror56_64(k, n) (k = (k >> n) | ((k & ((1 << n) - 1)) << (56 - n)))
+#define ror56_64(k, n)						\
+do {								\
+	k = (k >> n) | ((k & ((1 << n) - 1)) << (56 - n));	\
+} while (0)
 
 /*
  * Sboxes for Feistel network derived from

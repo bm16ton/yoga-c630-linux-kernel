@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /* Copyright (c) 2014-2018, The Linux Foundation. All rights reserved.
- * Copyright (C) 2018-2021 Linaro Ltd.
+ * Copyright (C) 2018-2020 Linaro Ltd.
  */
 
 #include <linux/errno.h>
@@ -213,18 +213,18 @@ int ipa_modem_start(struct ipa *ipa)
 		goto out_set_state;
 	}
 
+	ipa->name_map[IPA_ENDPOINT_AP_MODEM_TX]->netdev = netdev;
+	ipa->name_map[IPA_ENDPOINT_AP_MODEM_RX]->netdev = netdev;
+
 	SET_NETDEV_DEV(netdev, &ipa->pdev->dev);
 	priv = netdev_priv(netdev);
 	priv->ipa = ipa;
 
 	ret = register_netdev(netdev);
-	if (!ret) {
-		ipa->modem_netdev = netdev;
-		ipa->name_map[IPA_ENDPOINT_AP_MODEM_TX]->netdev = netdev;
-		ipa->name_map[IPA_ENDPOINT_AP_MODEM_RX]->netdev = netdev;
-	} else {
+	if (ret)
 		free_netdev(netdev);
-	}
+	else
+		ipa->modem_netdev = netdev;
 
 out_set_state:
 	if (ret)
@@ -240,6 +240,7 @@ int ipa_modem_stop(struct ipa *ipa)
 {
 	struct net_device *netdev = ipa->modem_netdev;
 	enum ipa_modem_state state;
+	int ret;
 
 	/* Only attempt to stop the modem if it's running */
 	state = atomic_cmpxchg(&ipa->modem_state, IPA_MODEM_STATE_RUNNING,
@@ -256,20 +257,27 @@ int ipa_modem_stop(struct ipa *ipa)
 	/* Prevent the modem from triggering a call to ipa_setup() */
 	ipa_smp2p_disable(ipa);
 
-	/* Stop the queue and disable the endpoints if it's open */
 	if (netdev) {
-		(void)ipa_stop(netdev);
-		ipa->name_map[IPA_ENDPOINT_AP_MODEM_RX]->netdev = NULL;
-		ipa->name_map[IPA_ENDPOINT_AP_MODEM_TX]->netdev = NULL;
+		/* Stop the queue and disable the endpoints if it's open */
+		ret = ipa_stop(netdev);
+		if (ret)
+			goto out_set_state;
+
 		ipa->modem_netdev = NULL;
 		unregister_netdev(netdev);
 		free_netdev(netdev);
+	} else {
+		ret = 0;
 	}
 
-	atomic_set(&ipa->modem_state, IPA_MODEM_STATE_STOPPED);
+out_set_state:
+	if (ret)
+		atomic_set(&ipa->modem_state, IPA_MODEM_STATE_RUNNING);
+	else
+		atomic_set(&ipa->modem_state, IPA_MODEM_STATE_STOPPED);
 	smp_mb__after_atomic();
 
-	return 0;
+	return ret;
 }
 
 /* Treat a "clean" modem stop the same as a crash */

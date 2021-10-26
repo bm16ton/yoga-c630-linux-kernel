@@ -16,7 +16,6 @@ Linux GPU Driver Developer's Guide
    vga-switcheroo
    vgaarbiter
    todo
-   rfc/index
 
 .. only::  subproject and html
 

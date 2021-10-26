@@ -260,7 +260,7 @@
 			};
 			partition@200000 {
 				label = "Linux";
-				reg = <0x200000 0xe00000>;
+				reg = <0x200000 0xd00000>;
 			};
 			partition@1000000 {
 				label = "Filesystem";
@@ -392,22 +392,14 @@
 	};
 };
 
-&cp0_utmi {
-	status = "okay";
-};
-
 &cp0_usb3_0 {
 	status = "okay";
 	usb-phy = <&cp0_usb3_0_phy0>;
-	phys = <&cp0_utmi0>;
-	phy-names = "utmi";
-	dr_mode = "host";
+	phy-names = "usb";
 };
 
 &cp0_usb3_1 {
 	status = "okay";
 	usb-phy = <&cp0_usb3_0_phy1>;
-	phys =  <&cp0_utmi1>;
-	phy-names = "utmi";
-	dr_mode = "host";
+	phy-names = "usb";
 };

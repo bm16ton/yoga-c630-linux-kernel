@@ -119,7 +119,9 @@ retry:
 			/* update inode in place
 			 * if both i_ino and i_mode didn't change */
 			if (CIFS_I(inode)->uniqueid == fattr->cf_uniqueid &&
-			    cifs_fattr_to_inode(inode, fattr) == 0) {
+			    (inode->i_mode & S_IFMT) ==
+			    (fattr->cf_mode & S_IFMT)) {
+				cifs_fattr_to_inode(inode, fattr);
 				dput(dentry);
 				return;
 			}
@@ -382,7 +384,7 @@ int get_symlink_reparse_path(char *full_path, struct cifs_sb_info *cifs_sb,
 
 static int
 initiate_cifs_search(const unsigned int xid, struct file *file,
-		     const char *full_path)
+		     char *full_path)
 {
 	__u16 search_flags;
 	int rc = 0;
@@ -702,7 +704,7 @@ static int cifs_save_resume_key(const char *current_entry,
  */
 static int
 find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
-		struct file *file, const char *full_path,
+		struct file *file, char *full_path,
 		char **current_entry, int *num_to_ret)
 {
 	__u16 search_flags;
@@ -940,14 +942,13 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
 	char *tmp_buf = NULL;
 	char *end_of_smb;
 	unsigned int max_len;
-	const char *full_path;
-	void *page = alloc_dentry_path();
+	char *full_path = NULL;
 
 	xid = get_xid();
 
-	full_path = build_path_from_dentry(file_dentry(file), page);
-	if (IS_ERR(full_path)) {
-		rc = PTR_ERR(full_path);
+	full_path = build_path_from_dentry(file_dentry(file));
+	if (full_path == NULL) {
+		rc = -ENOMEM;
 		goto rddir2_exit;
 	}
 
@@ -1042,7 +1043,7 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
 	kfree(tmp_buf);
 
 rddir2_exit:
-	free_dentry_path(page);
+	kfree(full_path);
 	free_xid(xid);
 	return rc;
 }

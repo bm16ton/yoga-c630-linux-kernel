@@ -14,7 +14,7 @@ struct gsi_trans;
 struct gsi_ring;
 struct gsi_channel;
 
-#define GSI_RING_ELEMENT_SIZE	16	/* bytes; must be a power of 2 */
+#define GSI_RING_ELEMENT_SIZE	16	/* bytes */
 
 /* Return the entry that follows one provided in a transaction pool */
 void *gsi_trans_pool_next(struct gsi_trans_pool *pool, void *element);
@@ -100,7 +100,7 @@ void gsi_channel_doorbell(struct gsi_channel *channel);
 /**
  * gsi_ring_virt() - Return virtual address for a ring entry
  * @ring:	Ring whose address is to be translated
- * @index:	Index (slot number) of entry
+ * @addr:	Index (slot number) of entry
  */
 void *gsi_ring_virt(struct gsi_ring *ring, u32 index);
 

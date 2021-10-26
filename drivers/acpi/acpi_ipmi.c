@@ -478,6 +478,7 @@ err_lock:
 	ipmi_dev_release(ipmi_device);
 err_ref:
 	put_device(smi_data.dev);
+	return;
 }
 
 static void ipmi_bmc_gone(int iface)

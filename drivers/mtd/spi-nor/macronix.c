@@ -11,7 +11,8 @@
 static int
 mx25l25635_post_bfpt_fixups(struct spi_nor *nor,
 			    const struct sfdp_parameter_header *bfpt_header,
-			    const struct sfdp_bfpt *bfpt)
+			    const struct sfdp_bfpt *bfpt,
+			    struct spi_nor_flash_parameter *params)
 {
 	/*
 	 * MX25L25635F supports 4B opcodes but MX25L25635E does not.

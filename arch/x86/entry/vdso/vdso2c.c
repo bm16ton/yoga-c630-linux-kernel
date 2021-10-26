@@ -218,7 +218,7 @@ int main(int argc, char **argv)
 
 	/*
 	 * Figure out the struct name.  If we're writing to a .so file,
-	 * generate raw output instead.
+	 * generate raw output insted.
 	 */
 	name = strdup(argv[3]);
 	namelen = strlen(name);

@@ -1332,8 +1332,6 @@ static int cfi_staa_suspend(struct mtd_info *mtd)
 			 * as the whole point is that nobody can do anything
 			 * with the chip now anyway.
 			 */
-			break;
-
 		case FL_PM_SUSPENDED:
 			break;
 

@@ -254,7 +254,6 @@ int qxl_garbage_collect(struct qxl_device *qdev)
 		}
 	}
 
-	wake_up_all(&qdev->release_event);
 	DRM_DEBUG_DRIVER("%d\n", i);
 
 	return i;

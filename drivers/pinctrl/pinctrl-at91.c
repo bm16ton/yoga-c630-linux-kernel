@@ -23,8 +23,6 @@
 /* Since we request GPIOs from ourself */
 #include <linux/pinctrl/consumer.h>
 
-#include <soc/at91/pm.h>
-
 #include "pinctrl-at91.h"
 #include "core.h"
 

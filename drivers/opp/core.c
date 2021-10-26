@@ -1846,9 +1846,6 @@ void dev_pm_opp_put_supported_hw(struct opp_table *opp_table)
 	if (unlikely(!opp_table))
 		return;
 
-	/* Make sure there are no concurrent readers while updating opp_table */
-	WARN_ON(!list_empty(&opp_table->opp_list));
-
 	kfree(opp_table->supported_hw);
 	opp_table->supported_hw = NULL;
 	opp_table->supported_hw_count = 0;
@@ -1933,9 +1930,6 @@ void dev_pm_opp_put_prop_name(struct opp_table *opp_table)
 {
 	if (unlikely(!opp_table))
 		return;
-
-	/* Make sure there are no concurrent readers while updating opp_table */
-	WARN_ON(!list_empty(&opp_table->opp_list));
 
 	kfree(opp_table->prop_name);
 	opp_table->prop_name = NULL;
@@ -2045,9 +2039,6 @@ void dev_pm_opp_put_regulators(struct opp_table *opp_table)
 
 	if (!opp_table->regulators)
 		goto put_opp_table;
-
-	/* Make sure there are no concurrent readers while updating opp_table */
-	WARN_ON(!list_empty(&opp_table->opp_list));
 
 	if (opp_table->enabled) {
 		for (i = opp_table->regulator_count - 1; i >= 0; i--)
@@ -2168,9 +2159,6 @@ void dev_pm_opp_put_clkname(struct opp_table *opp_table)
 	if (unlikely(!opp_table))
 		return;
 
-	/* Make sure there are no concurrent readers while updating opp_table */
-	WARN_ON(!list_empty(&opp_table->opp_list));
-
 	clk_put(opp_table->clk);
 	opp_table->clk = ERR_PTR(-EINVAL);
 
@@ -2269,9 +2257,6 @@ void dev_pm_opp_unregister_set_opp_helper(struct opp_table *opp_table)
 	if (unlikely(!opp_table))
 		return;
 
-	/* Make sure there are no concurrent readers while updating opp_table */
-	WARN_ON(!list_empty(&opp_table->opp_list));
-
 	opp_table->set_opp = NULL;
 
 	mutex_lock(&opp_table->lock);
@@ -2298,7 +2283,7 @@ static void devm_pm_opp_unregister_set_opp_helper(void *data)
  * Return: 0 on success and errorno otherwise.
  */
 int devm_pm_opp_register_set_opp_helper(struct device *dev,
-					int (*set_opp)(struct dev_pm_set_opp_data *data))
+				    int (*set_opp)(struct dev_pm_set_opp_data *data))
 {
 	struct opp_table *opp_table;
 
@@ -2307,7 +2292,7 @@ int devm_pm_opp_register_set_opp_helper(struct device *dev,
 		return PTR_ERR(opp_table);
 
 	return devm_add_action_or_reset(dev, devm_pm_opp_unregister_set_opp_helper,
-					opp_table);
+				       opp_table);
 }
 EXPORT_SYMBOL_GPL(devm_pm_opp_register_set_opp_helper);
 
@@ -2463,7 +2448,7 @@ static void devm_pm_opp_detach_genpd(void *data)
  * Return: 0 on success and errorno otherwise.
  */
 int devm_pm_opp_attach_genpd(struct device *dev, const char **names,
-			     struct device ***virt_devs)
+			 struct device ***virt_devs)
 {
 	struct opp_table *opp_table;
 
@@ -2472,7 +2457,7 @@ int devm_pm_opp_attach_genpd(struct device *dev, const char **names,
 		return PTR_ERR(opp_table);
 
 	return devm_add_action_or_reset(dev, devm_pm_opp_detach_genpd,
-					opp_table);
+				       opp_table);
 }
 EXPORT_SYMBOL_GPL(devm_pm_opp_attach_genpd);
 

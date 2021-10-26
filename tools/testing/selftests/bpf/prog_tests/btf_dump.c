@@ -77,7 +77,7 @@ static int test_btf_dump_case(int n, struct btf_dump_test_case *t)
 
 	snprintf(out_file, sizeof(out_file), "/tmp/%s.output.XXXXXX", t->file);
 	fd = mkstemp(out_file);
-	if (!ASSERT_GE(fd, 0, "create_tmp")) {
+	if (CHECK(fd < 0, "create_tmp", "failed to create file: %d\n", fd)) {
 		err = fd;
 		goto done;
 	}

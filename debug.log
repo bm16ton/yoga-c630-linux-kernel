@@ -1,0 +1,5 @@
+    INFO [                 usbq.pm]: Loading plugins: reload, proxy, pcap, decode, encode, lookfor, proxy, usbq_hooks
+    INFO [      usbq.plugins.proxy]: Device listen to 0.0.0.0:64240
+    INFO [      usbq.plugins.proxy]: Host send to 127.0.0.1:64241
+    INFO [       usbq.plugins.pcap]: Logging packets to PCAP file usb.pcap
+CRITICAL [                 usbq.pm]: Could not start plugin proxy (ProxyPlugin) with options {}

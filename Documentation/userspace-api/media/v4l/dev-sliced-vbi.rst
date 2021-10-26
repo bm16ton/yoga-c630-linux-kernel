@@ -108,7 +108,7 @@ struct v4l2_sliced_vbi_format
     \scriptsize
     \setlength{\tabcolsep}{2pt}
 
-.. tabularcolumns:: |p{.85cm}|p{3.3cm}|p{4.45cm}|p{4.45cm}|p{4.45cm}|
+.. tabularcolumns:: |p{.85cm}|p{3.3cm}|p{4.4cm}|p{4.4cm}|p{4.4cm}|
 
 .. cssclass:: longtable
 
@@ -213,9 +213,9 @@ Sliced VBI services
 
 .. raw:: latex
 
-    \footnotesize
+    \scriptsize
 
-.. tabularcolumns:: |p{4.2cm}|p{1.1cm}|p{2.1cm}|p{2.0cm}|p{6.5cm}|
+.. tabularcolumns:: |p{4.1cm}|p{1.1cm}|p{2.4cm}|p{2.0cm}|p{7.3cm}|
 
 .. flat-table::
     :header-rows:  1
@@ -253,7 +253,13 @@ Sliced VBI services
 
 	:ref:`en300294`
       - PAL/SECAM line 23
-      -  See :ref:`v4l2-sliced-wss-625-payload` below.
+      -
+
+	::
+
+	    Byte         0                 1
+		  msb         lsb  msb           lsb
+	     Bit  7 6 5 4 3 2 1 0  x x 13 12 11 10 9
     * - ``V4L2_SLICED_VBI_525``
       - 0x1000
       - :cspan:`2` Set of services applicable to 525 line systems.
@@ -276,21 +282,6 @@ format while i/o is in progress (between a
 :ref:`VIDIOC_STREAMOFF <VIDIOC_STREAMON>` call, and after the first
 :c:func:`read()` or :c:func:`write()` call).
 
-.. _v4l2-sliced-wss-625-payload:
-
-V4L2_SLICED_WSS_625 payload
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The payload for ``V4L2_SLICED_WSS_625`` is:
-
-           +-----+------------------+-----------------------+
-	   |Byte |        0         |           1           |
-           +-----+--------+---------+-----------+-----------+
-	   |     | msb    | lsb     | msb       | lsb       |
-           |     +-+-+-+--+--+-+-+--+--+-+--+---+---+--+-+--+
-	   | Bit |7|6|5|4 | 3|2|1|0 | x|x|13|12 | 11|10|9|8 |
-           +-----+-+-+-+--+--+-+-+--+--+-+--+---+---+--+-+--+
-
 Reading and writing sliced VBI data
 ===================================
 
@@ -307,7 +298,7 @@ struct :c:type:`v4l2_sliced_vbi_data` elements must be zero.
 struct v4l2_sliced_vbi_data
 ---------------------------
 
-.. tabularcolumns:: |p{1.2cm}|p{2.2cm}|p{13.9cm}|
+.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.7cm}|
 
 .. flat-table::
     :header-rows:  0
@@ -464,7 +455,7 @@ number).
 struct v4l2_mpeg_vbi_fmt_ivtv
 -----------------------------
 
-.. tabularcolumns:: |p{4.2cm}|p{2.0cm}|p{11.1cm}|
+.. tabularcolumns:: |p{1.0cm}|p{3.8cm}|p{1.0cm}|p{11.2cm}|
 
 .. flat-table::
     :header-rows:  0
@@ -499,7 +490,7 @@ struct v4l2_mpeg_vbi_fmt_ivtv
 Magic Constants for struct v4l2_mpeg_vbi_fmt_ivtv magic field
 -------------------------------------------------------------
 
-.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.5cm}|
+.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.7cm}|
 
 .. flat-table::
     :header-rows:  1
@@ -528,11 +519,7 @@ Magic Constants for struct v4l2_mpeg_vbi_fmt_ivtv magic field
 structs v4l2_mpeg_vbi_itv0 and v4l2_mpeg_vbi_ITV0
 -------------------------------------------------
 
-.. raw:: latex
-
-   \footnotesize
-
-.. tabularcolumns:: |p{4.6cm}|p{2.0cm}|p{10.7cm}|
+.. tabularcolumns:: |p{5.2cm}|p{2.4cm}|p{9.9cm}|
 
 .. flat-table::
     :header-rows:  0
@@ -573,16 +560,13 @@ structs v4l2_mpeg_vbi_itv0 and v4l2_mpeg_vbi_ITV0
 	one line of unspecified data that should be ignored by
 	applications.
 
-.. raw:: latex
-
-   \normalsize
 
 .. _v4l2-mpeg-vbi-itv0-1:
 
 struct v4l2_mpeg_vbi_ITV0
 -------------------------
 
-.. tabularcolumns:: |p{5.2cm}|p{2.4cm}|p{9.7cm}|
+.. tabularcolumns:: |p{5.2cm}|p{2.4cm}|p{9.9cm}|
 
 .. flat-table::
     :header-rows:  0
@@ -603,7 +587,7 @@ struct v4l2_mpeg_vbi_ITV0
 struct v4l2_mpeg_vbi_itv0_line
 ------------------------------
 
-.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.5cm}|
+.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.7cm}|
 
 .. flat-table::
     :header-rows:  0
@@ -625,7 +609,7 @@ struct v4l2_mpeg_vbi_itv0_line
 Line Identifiers for struct v4l2_mpeg_vbi_itv0_line id field
 ------------------------------------------------------------
 
-.. tabularcolumns:: |p{7.0cm}|p{1.8cm}|p{8.5cm}|
+.. tabularcolumns:: |p{7.0cm}|p{1.8cm}|p{8.7cm}|
 
 .. flat-table::
     :header-rows:  1

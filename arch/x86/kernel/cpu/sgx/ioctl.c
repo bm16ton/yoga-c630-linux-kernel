@@ -2,7 +2,6 @@
 /*  Copyright(c) 2016-20 Intel Corporation. */
 
 #include <asm/mman.h>
-#include <asm/sgx.h>
 #include <linux/mman.h>
 #include <linux/delay.h>
 #include <linux/file.h>
@@ -48,7 +47,7 @@ static void sgx_encl_shrink(struct sgx_encl *encl, struct sgx_va_page *va_page)
 	encl->page_cnt--;
 
 	if (va_page) {
-		sgx_encl_free_epc_page(va_page->epc_page);
+		sgx_free_epc_page(va_page->epc_page);
 		list_del(&va_page->list);
 		kfree(va_page);
 	}
@@ -118,7 +117,7 @@ static int sgx_encl_create(struct sgx_encl *encl, struct sgx_secs *secs)
 	return 0;
 
 err_out:
-	sgx_encl_free_epc_page(encl->secs.epc_page);
+	sgx_free_epc_page(encl->secs.epc_page);
 	encl->secs.epc_page = NULL;
 
 err_out_backing:
@@ -366,7 +365,7 @@ err_out_unlock:
 	mmap_read_unlock(current->mm);
 
 err_out_free:
-	sgx_encl_free_epc_page(epc_page);
+	sgx_free_epc_page(epc_page);
 	kfree(encl_page);
 
 	return ret;
@@ -496,7 +495,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
 			 void *token)
 {
 	u64 mrsigner[4];
-	int i, j;
+	int i, j, k;
 	void *addr;
 	int ret;
 
@@ -545,7 +544,8 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
 
 			preempt_disable();
 
-			sgx_update_lepubkeyhash(mrsigner);
+			for (k = 0; k < 4; k++)
+				wrmsrl(MSR_IA32_SGXLEPUBKEYHASH0 + k, mrsigner[k]);
 
 			ret = __einit(sigstruct, token, addr);
 
@@ -568,7 +568,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
 		}
 	}
 
-	if (encls_faulted(ret)) {
+	if (ret & ENCLS_FAULT_FLAG) {
 		if (encls_failed(ret))
 			ENCLS_WARN(ret, "EINIT");
 
@@ -604,6 +604,7 @@ static long sgx_ioc_enclave_init(struct sgx_encl *encl, void __user *arg)
 {
 	struct sgx_sigstruct *sigstruct;
 	struct sgx_enclave_init init_arg;
+	struct page *initp_page;
 	void *token;
 	int ret;
 
@@ -614,15 +615,11 @@ static long sgx_ioc_enclave_init(struct sgx_encl *encl, void __user *arg)
 	if (copy_from_user(&init_arg, arg, sizeof(init_arg)))
 		return -EFAULT;
 
-	/*
-	 * 'sigstruct' must be on a page boundary and 'token' on a 512 byte
-	 * boundary.  kmalloc() will give this alignment when allocating
-	 * PAGE_SIZE bytes.
-	 */
-	sigstruct = kmalloc(PAGE_SIZE, GFP_KERNEL);
-	if (!sigstruct)
+	initp_page = alloc_page(GFP_KERNEL);
+	if (!initp_page)
 		return -ENOMEM;
 
+	sigstruct = kmap(initp_page);
 	token = (void *)((unsigned long)sigstruct + PAGE_SIZE / 2);
 	memset(token, 0, SGX_LAUNCH_TOKEN_SIZE);
 
@@ -648,7 +645,8 @@ static long sgx_ioc_enclave_init(struct sgx_encl *encl, void __user *arg)
 	ret = sgx_encl_init(encl, sigstruct, token);
 
 out:
-	kfree(sigstruct);
+	kunmap(initp_page);
+	__free_page(initp_page);
 	return ret;
 }
 
@@ -667,11 +665,24 @@ out:
 static long sgx_ioc_enclave_provision(struct sgx_encl *encl, void __user *arg)
 {
 	struct sgx_enclave_provision params;
+	struct file *file;
 
 	if (copy_from_user(&params, arg, sizeof(params)))
 		return -EFAULT;
 
-	return sgx_set_attribute(&encl->attributes_mask, params.fd);
+	file = fget(params.fd);
+	if (!file)
+		return -EINVAL;
+
+	if (file->f_op != &sgx_provision_fops) {
+		fput(file);
+		return -EINVAL;
+	}
+
+	encl->attributes_mask |= SGX_ATTR_PROVISIONKEY;
+
+	fput(file);
+	return 0;
 }
 
 long sgx_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)

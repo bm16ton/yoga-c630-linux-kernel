@@ -5,8 +5,6 @@ TESTS = test-cpumap test-threadmap test-evlist test-evsel
 TESTS_SO := $(addsuffix -so,$(TESTS))
 TESTS_A  := $(addsuffix -a,$(TESTS))
 
-TEST_ARGS := $(if $(V),-v)
-
 # Set compile option CFLAGS
 ifdef EXTRA_CFLAGS
   CFLAGS := $(EXTRA_CFLAGS)
@@ -30,9 +28,9 @@ all: $(TESTS_A) $(TESTS_SO)
 
 run:
 	@echo "running static:"
-	@for i in $(TESTS_A); do ./$$i $(TEST_ARGS); done
+	@for i in $(TESTS_A); do ./$$i; done
 	@echo "running dynamic:"
-	@for i in $(TESTS_SO); do LD_LIBRARY_PATH=../ ./$$i $(TEST_ARGS); done
+	@for i in $(TESTS_SO); do LD_LIBRARY_PATH=../ ./$$i; done
 
 clean:
 	$(call QUIET_CLEAN, tests)$(RM) $(TESTS_A) $(TESTS_SO)

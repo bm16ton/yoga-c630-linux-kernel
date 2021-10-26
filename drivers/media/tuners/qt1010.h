@@ -16,11 +16,11 @@ struct qt1010_config {
 };
 
 /**
- * qt1010_attach() - Attach a qt1010 tuner to the supplied frontend structure
+ * Attach a qt1010 tuner to the supplied frontend structure.
  *
- * @fe:   frontend to attach to
- * @i2c:  i2c adapter to use
- * @cfg:  tuner hw based configuration
+ * @param fe   frontend to attach to
+ * @param i2c  i2c adapter to use
+ * @param cfg  tuner hw based configuration
  * @return fe  pointer on success, NULL on failure
  */
 #if IS_REACHABLE(CONFIG_MEDIA_TUNER_QT1010)

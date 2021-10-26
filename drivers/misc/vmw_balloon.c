@@ -346,6 +346,11 @@ struct vmballoon {
 	/* statistics */
 	struct vmballoon_stats *stats;
 
+#ifdef CONFIG_DEBUG_FS
+	/* debugfs file exporting statistics */
+	struct dentry *dbg_entry;
+#endif
+
 	/**
 	 * @b_dev_info: balloon device information descriptor.
 	 */
@@ -1704,14 +1709,14 @@ DEFINE_SHOW_ATTRIBUTE(vmballoon_debug);
 
 static void __init vmballoon_debugfs_init(struct vmballoon *b)
 {
-	debugfs_create_file("vmmemctl", S_IRUGO, NULL, b,
-			    &vmballoon_debug_fops);
+	b->dbg_entry = debugfs_create_file("vmmemctl", S_IRUGO, NULL, b,
+					   &vmballoon_debug_fops);
 }
 
 static void __exit vmballoon_debugfs_exit(struct vmballoon *b)
 {
 	static_key_disable(&balloon_stat_enabled.key);
-	debugfs_remove(debugfs_lookup("vmmemctl", NULL));
+	debugfs_remove(b->dbg_entry);
 	kfree(b->stats);
 	b->stats = NULL;
 }

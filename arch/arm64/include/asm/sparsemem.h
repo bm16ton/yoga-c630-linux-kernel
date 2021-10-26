@@ -5,6 +5,7 @@
 #ifndef __ASM_SPARSEMEM_H
 #define __ASM_SPARSEMEM_H
 
+#ifdef CONFIG_SPARSEMEM
 #define MAX_PHYSMEM_BITS	CONFIG_ARM64_PA_BITS
 
 /*
@@ -25,5 +26,7 @@
  */
 #define SECTION_SIZE_BITS 27
 #endif /* CONFIG_ARM64_64K_PAGES */
+
+#endif /* CONFIG_SPARSEMEM*/
 
 #endif

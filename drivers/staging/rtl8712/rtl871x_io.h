@@ -123,6 +123,7 @@ struct	intf_hdl {
 };
 
 struct reg_protocol_rd {
+
 #ifdef __LITTLE_ENDIAN
 	/* DW1 */
 	u32		NumOfTrans:4;

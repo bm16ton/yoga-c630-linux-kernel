@@ -26,7 +26,6 @@
 #include <linux/slab.h>
 #include <linux/power_supply.h>
 #include <linux/pm_runtime.h>
-#include <linux/suspend.h>
 #include <acpi/video.h>
 #include <acpi/actbl.h>
 
@@ -904,10 +903,10 @@ void amdgpu_acpi_fini(struct amdgpu_device *adev)
  */
 bool amdgpu_acpi_is_s0ix_supported(struct amdgpu_device *adev)
 {
-#if IS_ENABLED(CONFIG_AMD_PMC) && IS_ENABLED(CONFIG_PM_SLEEP)
+#if defined(CONFIG_AMD_PMC) || defined(CONFIG_AMD_PMC_MODULE)
 	if (acpi_gbl_FADT.flags & ACPI_FADT_LOW_POWER_S0) {
 		if (adev->flags & AMD_IS_APU)
-			return pm_suspend_target_state == PM_SUSPEND_TO_IDLE;
+			return true;
 	}
 #endif
 	return false;

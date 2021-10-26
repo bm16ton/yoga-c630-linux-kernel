@@ -387,7 +387,7 @@ ip6_tnl_dev_uninit(struct net_device *dev)
 }
 
 /**
- * ip6_tnl_parse_tlv_enc_lim - handle encapsulation limit option
+ * parse_tvl_tnl_enc_lim - handle encapsulation limit option
  *   @skb: received socket buffer
  *   @raw: the ICMPv6 error message data
  *

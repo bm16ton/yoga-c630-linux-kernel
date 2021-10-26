@@ -253,7 +253,7 @@ static unsigned long vmw_port_hb_in(struct rpc_channel *channel, char *reply,
  * vmw_send_msg: Sends a message to the host
  *
  * @channel: RPC channel
- * @msg: NULL terminated string
+ * @logmsg: NULL terminated string
  *
  * Returns: 0 on success
  */

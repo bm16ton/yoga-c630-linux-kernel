@@ -1350,7 +1350,6 @@ static int bytes_str_to_int(const char *str)
 		fallthrough;
 	case 'K':
 		result *= 1024;
-		break;
 	case '\0':
 		break;
 	default:

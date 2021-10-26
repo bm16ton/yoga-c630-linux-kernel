@@ -41,7 +41,7 @@ endif
 
 export LD_BFD
 
-ifdef cross_compiling
+ifneq ($(SUBARCH),$(UTS_MACHINE))
 	ifeq ($(CROSS_COMPILE),)
 		CC_SUFFIXES = linux linux-gnu unknown-linux-gnu
 		CROSS_COMPILE := $(call cc-cross-prefix, \

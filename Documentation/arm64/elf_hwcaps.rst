@@ -74,7 +74,7 @@ HWCAP_ASIMD
 
 HWCAP_EVTSTRM
     The generic timer is configured to generate events at a frequency of
-    approximately 10KHz.
+    approximately 100KHz.
 
 HWCAP_AES
     Functionality implied by ID_AA64ISAR0_EL1.AES == 0b0001.

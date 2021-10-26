@@ -37,7 +37,8 @@ xchk_quota_to_dqtype(
 /* Set us up to scrub a quota. */
 int
 xchk_setup_quota(
-	struct xfs_scrub	*sc)
+	struct xfs_scrub	*sc,
+	struct xfs_inode	*ip)
 {
 	xfs_dqtype_t		dqtype;
 	int			error;
@@ -52,7 +53,7 @@ xchk_setup_quota(
 	mutex_lock(&sc->mp->m_quotainfo->qi_quotaofflock);
 	if (!xfs_this_quota_on(sc->mp, dqtype))
 		return -ENOENT;
-	error = xchk_setup_fs(sc);
+	error = xchk_setup_fs(sc, ip);
 	if (error)
 		return error;
 	sc->ip = xfs_quota_inode(sc->mp, dqtype);
@@ -84,7 +85,7 @@ xchk_quota_item(
 	int			error = 0;
 
 	if (xchk_should_terminate(sc, &error))
-		return -ECANCELED;
+		return error;
 
 	/*
 	 * Except for the root dquot, the actual dquot we got must either have
@@ -161,7 +162,7 @@ xchk_quota_item(
 
 out:
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
-		return -ECANCELED;
+		return -EFSCORRUPTED;
 
 	return 0;
 }
@@ -237,8 +238,6 @@ xchk_quota(
 	error = xfs_qm_dqiterate(mp, dqtype, xchk_quota_item, &sqi);
 	sc->ilock_flags = XFS_ILOCK_EXCL;
 	xfs_ilock(sc->ip, sc->ilock_flags);
-	if (error == -ECANCELED)
-		error = 0;
 	if (!xchk_fblock_process_error(sc, XFS_DATA_FORK,
 			sqi.last_id * qi->qi_dqperchunk, &error))
 		goto out;

@@ -242,7 +242,6 @@ struct fimc_vid_buffer {
  * @addr:	image frame buffer DMA addresses
  * @dma_offset:	DMA offset in bytes
  * @fmt:	fimc color format pointer
- * @alpha:	alpha value
  */
 struct fimc_frame {
 	u32	f_width;
@@ -297,7 +296,6 @@ struct fimc_m2m_device {
  * @buf_index: index for managing the output DMA buffers
  * @frame_count: the frame counter for statistics
  * @reqbufs_count: the number of buffers requested in REQBUFS ioctl
- * @streaming: is streaming in progress?
  * @input: capture input type, grp_id of the attached subdev
  * @user_subdev_api: true if subdevs are not configured by the host driver
  */
@@ -402,7 +400,6 @@ struct fimc_ctx;
  * @pdata:	pointer to the device platform data
  * @sysreg:	pointer to the SYSREG regmap
  * @variant:	the IP variant information
- * @drv_data:	driver data
  * @id:		FIMC device index (0..FIMC_MAX_DEVS)
  * @clock:	clocks required for FIMC operation
  * @regs:	the mapped hardware registers
@@ -411,6 +408,7 @@ struct fimc_ctx;
  * @m2m:	memory-to-memory V4L2 device information
  * @vid_cap:	camera capture device information
  * @state:	flags used to synchronize m2m and capture mode operation
+ * @pipeline:	fimc video capture pipeline data structure
  */
 struct fimc_dev {
 	spinlock_t			slock;
@@ -455,12 +453,12 @@ struct fimc_ctrls {
 };
 
 /**
- * struct fimc_ctx - the device context data
+ * fimc_ctx - the device context data
  * @s_frame:		source frame properties
  * @d_frame:		destination frame properties
  * @out_order_1p:	output 1-plane YCBCR order
  * @out_order_2p:	output 2-plane YCBCR order
- * @in_order_1p:	input 1-plane YCBCR order
+ * @in_order_1p		input 1-plane YCBCR order
  * @in_order_2p:	input 2-plane YCBCR order
  * @in_path:		input mode (DMA or camera)
  * @out_path:		output mode (DMA or FIFO)
@@ -668,7 +666,6 @@ int fimc_capture_resume(struct fimc_dev *fimc);
 
 /**
  * fimc_active_queue_add - add buffer to the capture active buffers queue
- * @vid_cap:	camera capture device information
  * @buf: buffer to add to the active buffers list
  */
 static inline void fimc_active_queue_add(struct fimc_vid_cap *vid_cap,
@@ -680,7 +677,6 @@ static inline void fimc_active_queue_add(struct fimc_vid_cap *vid_cap,
 
 /**
  * fimc_active_queue_pop - pop buffer from the capture active buffers queue
- * @vid_cap:	camera capture device information
  *
  * The caller must assure the active_buf_q list is not empty.
  */
@@ -697,7 +693,6 @@ static inline struct fimc_vid_buffer *fimc_active_queue_pop(
 
 /**
  * fimc_pending_queue_add - add buffer to the capture pending buffers queue
- * @vid_cap:	camera capture device information
  * @buf: buffer to add to the pending buffers list
  */
 static inline void fimc_pending_queue_add(struct fimc_vid_cap *vid_cap,
@@ -708,7 +703,6 @@ static inline void fimc_pending_queue_add(struct fimc_vid_cap *vid_cap,
 
 /**
  * fimc_pending_queue_pop - pop buffer from the capture pending buffers queue
- * @vid_cap:	camera capture device information
  *
  * The caller must assure the pending_buf_q list is not empty.
  */

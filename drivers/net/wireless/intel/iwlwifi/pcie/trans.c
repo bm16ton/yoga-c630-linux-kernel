@@ -1604,11 +1604,6 @@ iwl_pcie_set_interrupt_capa(struct pci_dev *pdev,
 	} else {
 		trans_pcie->trans->num_rx_queues = num_irqs - 1;
 	}
-
-	IWL_DEBUG_INFO(trans,
-		       "MSI-X enabled with rx queues %d, vec mask 0x%x\n",
-		       trans_pcie->trans->num_rx_queues, trans_pcie->shared_vec_mask);
-
 	WARN_ON(trans_pcie->trans->num_rx_queues > IWL_MAX_RX_HW_QUEUES);
 
 	trans_pcie->alloc_vecs = num_irqs;
@@ -1978,16 +1973,12 @@ static void iwl_trans_pcie_removal_wk(struct work_struct *wk)
 	module_put(THIS_MODULE);
 }
 
-/*
- * This version doesn't disable BHs but rather assumes they're
- * already disabled.
- */
-bool __iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans)
+static bool iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans)
 {
 	int ret;
 	struct iwl_trans_pcie *trans_pcie = IWL_TRANS_GET_PCIE_TRANS(trans);
 
-	spin_lock(&trans_pcie->reg_lock);
+	spin_lock_bh(&trans_pcie->reg_lock);
 
 	if (trans_pcie->cmd_hold_nic_awake)
 		goto out;
@@ -2072,7 +2063,7 @@ bool __iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans)
 		}
 
 err:
-		spin_unlock(&trans_pcie->reg_lock);
+		spin_unlock_bh(&trans_pcie->reg_lock);
 		return false;
 	}
 
@@ -2083,20 +2074,6 @@ out:
 	 */
 	__release(&trans_pcie->reg_lock);
 	return true;
-}
-
-static bool iwl_trans_pcie_grab_nic_access(struct iwl_trans *trans)
-{
-	bool ret;
-
-	local_bh_disable();
-	ret = __iwl_trans_pcie_grab_nic_access(trans);
-	if (ret) {
-		/* keep BHs disabled until iwl_trans_pcie_release_nic_access */
-		return ret;
-	}
-	local_bh_enable();
-	return false;
 }
 
 static void iwl_trans_pcie_release_nic_access(struct iwl_trans *trans)

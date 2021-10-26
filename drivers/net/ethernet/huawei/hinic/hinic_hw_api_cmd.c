@@ -629,8 +629,10 @@ static int alloc_cmd_buf(struct hinic_api_cmd_chain *chain,
 
 	cmd_vaddr = dma_alloc_coherent(&pdev->dev, API_CMD_BUF_SIZE,
 				       &cmd_paddr, GFP_KERNEL);
-	if (!cmd_vaddr)
+	if (!cmd_vaddr) {
+		dev_err(&pdev->dev, "Failed to allocate API CMD DMA memory\n");
 		return -ENOMEM;
+	}
 
 	cell_ctxt = &chain->cell_ctxt[cell_idx];
 
@@ -677,8 +679,10 @@ static int api_cmd_create_cell(struct hinic_api_cmd_chain *chain,
 
 	node = dma_alloc_coherent(&pdev->dev, chain->cell_size, &node_paddr,
 				  GFP_KERNEL);
-	if (!node)
+	if (!node) {
+		dev_err(&pdev->dev, "Failed to allocate dma API CMD cell\n");
 		return -ENOMEM;
+	}
 
 	node->read.hw_wb_resp_paddr = 0;
 

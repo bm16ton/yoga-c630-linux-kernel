@@ -33,7 +33,7 @@ enum rapl_domain_reg_id {
 	RAPL_DOMAIN_REG_MAX,
 };
 
-struct rapl_domain;
+struct rapl_package;
 
 enum rapl_primitives {
 	ENERGY_COUNTER,

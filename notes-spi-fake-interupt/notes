@@ -1,0 +1,35 @@
+	struct gpio_irq_chip *girq;
+
+		struct irq_data *irqd;
+	struct gpio_chip *c = irq_data_get_irq_chip_data(irqd);
+
+	// //		irq = irq_find_mapping(priv->irq_sim_domain, offset);
+//		if (!irq)
+			/*
+			 * This is fine - it just means, nobody is listening
+			 * for interrupts on this line, otherwise
+			 * irq_create_mapping() would have been called from
+			 * the to_irq() callback.
+			 */
+//			goto set_value;
+/*
+		irq_type = irq_get_trigger_type(irq);
+
+		if ((value == 1 && (irq_type & IRQ_TYPE_EDGE_RISING)) ||
+		    (value == 0 && (irq_type & IRQ_TYPE_EDGE_FALLING))) {
+			ret = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING,
+						    true);
+*/
+//			if (ret)
+//				goto out;
+//		}
+
+
+	if (offset == 3) {
+		irq = irq_find_mapping(priv->irq_sim_domain, offset);
+		irq_type = irq_get_trigger_type(irq);
+		ret = irq_set_irqchip_state(irq, IRQ_TYPE_EDGE_FALLING,
+						    true);
+	}
+
+

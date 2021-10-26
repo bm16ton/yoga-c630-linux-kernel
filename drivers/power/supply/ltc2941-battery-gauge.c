@@ -8,7 +8,6 @@
  * Author: Auryn Verwegen
  * Author: Mike Looijmans
  */
-#include <linux/devm-helpers.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/of_device.h>
@@ -446,6 +445,15 @@ static enum power_supply_property ltc294x_properties[] = {
 	POWER_SUPPLY_PROP_CURRENT_NOW,
 };
 
+static int ltc294x_i2c_remove(struct i2c_client *client)
+{
+	struct ltc294x_info *info = i2c_get_clientdata(client);
+
+	cancel_delayed_work_sync(&info->work);
+	power_supply_unregister(info->supply);
+	return 0;
+}
+
 static int ltc294x_i2c_probe(struct i2c_client *client,
 	const struct i2c_device_id *id)
 {
@@ -539,10 +547,7 @@ static int ltc294x_i2c_probe(struct i2c_client *client,
 
 	psy_cfg.drv_data = info;
 
-	ret = devm_delayed_work_autocancel(&client->dev, &info->work,
-					   ltc294x_work);
-	if (ret)
-		return ret;
+	INIT_DELAYED_WORK(&info->work, ltc294x_work);
 
 	ret = ltc294x_reset(info, prescaler_exp);
 	if (ret < 0) {
@@ -550,8 +555,8 @@ static int ltc294x_i2c_probe(struct i2c_client *client,
 		return ret;
 	}
 
-	info->supply = devm_power_supply_register(&client->dev,
-						  &info->supply_desc, &psy_cfg);
+	info->supply = power_supply_register(&client->dev, &info->supply_desc,
+					     &psy_cfg);
 	if (IS_ERR(info->supply)) {
 		dev_err(&client->dev, "failed to register ltc2941\n");
 		return PTR_ERR(info->supply);
@@ -650,6 +655,7 @@ static struct i2c_driver ltc294x_driver = {
 		.pm	= LTC294X_PM_OPS,
 	},
 	.probe		= ltc294x_i2c_probe,
+	.remove		= ltc294x_i2c_remove,
 	.shutdown	= ltc294x_i2c_shutdown,
 	.id_table	= ltc294x_i2c_id,
 };

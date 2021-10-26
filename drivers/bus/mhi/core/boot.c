@@ -416,9 +416,9 @@ void mhi_fw_load_handler(struct mhi_controller *mhi_cntrl)
 		}
 	}
 
-	/* wait for ready on pass through or any other execution environment */
-	if (mhi_cntrl->ee != MHI_EE_EDL && mhi_cntrl->ee != MHI_EE_PBL)
-		goto fw_load_ready_state;
+	/* If device is in pass through, do reset to ready state transition */
+	if (mhi_cntrl->ee == MHI_EE_PTHRU)
+		goto fw_load_ee_pthru;
 
 	fw_name = (mhi_cntrl->ee == MHI_EE_EDL) ?
 		mhi_cntrl->edl_image : mhi_cntrl->fw_image;
@@ -460,10 +460,9 @@ void mhi_fw_load_handler(struct mhi_controller *mhi_cntrl)
 		goto error_fw_load;
 	}
 
-	/* Wait for ready since EDL image was loaded */
-	if (fw_name == mhi_cntrl->edl_image) {
+	if (mhi_cntrl->ee == MHI_EE_EDL) {
 		release_firmware(firmware);
-		goto fw_load_ready_state;
+		return;
 	}
 
 	write_lock_irq(&mhi_cntrl->pm_lock);
@@ -488,7 +487,7 @@ void mhi_fw_load_handler(struct mhi_controller *mhi_cntrl)
 
 	release_firmware(firmware);
 
-fw_load_ready_state:
+fw_load_ee_pthru:
 	/* Transitioning into MHI RESET->READY state */
 	ret = mhi_ready_state_transition(mhi_cntrl);
 	if (ret) {

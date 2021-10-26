@@ -59,27 +59,34 @@ static const struct ebt_table frame_filter = {
 };
 
 static unsigned int
-ebt_filter_hook(void *priv, struct sk_buff *skb,
-		const struct nf_hook_state *state)
+ebt_in_hook(void *priv, struct sk_buff *skb,
+	    const struct nf_hook_state *state)
 {
-	return ebt_do_table(skb, state, priv);
+	return ebt_do_table(skb, state, state->net->xt.frame_filter);
+}
+
+static unsigned int
+ebt_out_hook(void *priv, struct sk_buff *skb,
+	     const struct nf_hook_state *state)
+{
+	return ebt_do_table(skb, state, state->net->xt.frame_filter);
 }
 
 static const struct nf_hook_ops ebt_ops_filter[] = {
 	{
-		.hook		= ebt_filter_hook,
+		.hook		= ebt_in_hook,
 		.pf		= NFPROTO_BRIDGE,
 		.hooknum	= NF_BR_LOCAL_IN,
 		.priority	= NF_BR_PRI_FILTER_BRIDGED,
 	},
 	{
-		.hook		= ebt_filter_hook,
+		.hook		= ebt_in_hook,
 		.pf		= NFPROTO_BRIDGE,
 		.hooknum	= NF_BR_FORWARD,
 		.priority	= NF_BR_PRI_FILTER_BRIDGED,
 	},
 	{
-		.hook		= ebt_filter_hook,
+		.hook		= ebt_out_hook,
 		.pf		= NFPROTO_BRIDGE,
 		.hooknum	= NF_BR_LOCAL_OUT,
 		.priority	= NF_BR_PRI_FILTER_OTHER,
@@ -88,17 +95,18 @@ static const struct nf_hook_ops ebt_ops_filter[] = {
 
 static int __net_init frame_filter_net_init(struct net *net)
 {
-	return ebt_register_table(net, &frame_filter, ebt_ops_filter);
+	return ebt_register_table(net, &frame_filter, ebt_ops_filter,
+				  &net->xt.frame_filter);
 }
 
 static void __net_exit frame_filter_net_pre_exit(struct net *net)
 {
-	ebt_unregister_table_pre_exit(net, "filter");
+	ebt_unregister_table_pre_exit(net, "filter", ebt_ops_filter);
 }
 
 static void __net_exit frame_filter_net_exit(struct net *net)
 {
-	ebt_unregister_table(net, "filter");
+	ebt_unregister_table(net, net->xt.frame_filter);
 }
 
 static struct pernet_operations frame_filter_net_ops = {

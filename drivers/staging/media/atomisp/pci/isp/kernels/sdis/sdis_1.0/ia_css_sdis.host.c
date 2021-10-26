@@ -386,7 +386,8 @@ ia_css_isp_dvs_statistics_map_allocate(
 
 	return me;
 err:
-	kvfree(me);
+	if (me)
+		kvfree(me);
 	return NULL;
 }
 

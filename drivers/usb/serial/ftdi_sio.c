@@ -225,7 +225,6 @@ static const struct usb_device_id id_table_combined[] = {
 	{ USB_DEVICE(FTDI_VID, FTDI_MTXORB_6_PID) },
 	{ USB_DEVICE(FTDI_VID, FTDI_R2000KU_TRUE_RNG) },
 	{ USB_DEVICE(FTDI_VID, FTDI_VARDAAN_PID) },
-	{ USB_DEVICE(FTDI_VID, FTDI_AUTO_M3_OP_COM_V2_PID) },
 	{ USB_DEVICE(MTXORB_VID, MTXORB_FTDI_RANGE_0100_PID) },
 	{ USB_DEVICE(MTXORB_VID, MTXORB_FTDI_RANGE_0101_PID) },
 	{ USB_DEVICE(MTXORB_VID, MTXORB_FTDI_RANGE_0102_PID) },
@@ -1096,7 +1095,8 @@ static int  ftdi_tiocmset(struct tty_struct *tty,
 			unsigned int set, unsigned int clear);
 static int  ftdi_ioctl(struct tty_struct *tty,
 			unsigned int cmd, unsigned long arg);
-static void get_serial_info(struct tty_struct *tty, struct serial_struct *ss);
+static int get_serial_info(struct tty_struct *tty,
+				struct serial_struct *ss);
 static int set_serial_info(struct tty_struct *tty,
 				struct serial_struct *ss);
 static void ftdi_break_ctl(struct tty_struct *tty, int break_state);
@@ -1490,7 +1490,8 @@ static int read_latency_timer(struct usb_serial_port *port)
 	return 0;
 }
 
-static void get_serial_info(struct tty_struct *tty, struct serial_struct *ss)
+static int get_serial_info(struct tty_struct *tty,
+				struct serial_struct *ss)
 {
 	struct usb_serial_port *port = tty->driver_data;
 	struct ftdi_private *priv = usb_get_serial_port_data(port);
@@ -1498,34 +1499,49 @@ static void get_serial_info(struct tty_struct *tty, struct serial_struct *ss)
 	ss->flags = priv->flags;
 	ss->baud_base = priv->baud_base;
 	ss->custom_divisor = priv->custom_divisor;
+	return 0;
 }
 
-static int set_serial_info(struct tty_struct *tty, struct serial_struct *ss)
+static int set_serial_info(struct tty_struct *tty,
+	struct serial_struct *ss)
 {
 	struct usb_serial_port *port = tty->driver_data;
 	struct ftdi_private *priv = usb_get_serial_port_data(port);
-	int old_flags, old_divisor;
+	struct ftdi_private old_priv;
 
 	mutex_lock(&priv->cfg_lock);
+	old_priv = *priv;
+
+	/* Do error checking and permission checking */
 
 	if (!capable(CAP_SYS_ADMIN)) {
 		if ((ss->flags ^ priv->flags) & ~ASYNC_USR_MASK) {
 			mutex_unlock(&priv->cfg_lock);
 			return -EPERM;
 		}
+		priv->flags = ((priv->flags & ~ASYNC_USR_MASK) |
+			       (ss->flags & ASYNC_USR_MASK));
+		priv->custom_divisor = ss->custom_divisor;
+		goto check_and_exit;
 	}
 
-	old_flags = priv->flags;
-	old_divisor = priv->custom_divisor;
+	if (ss->baud_base != priv->baud_base) {
+		mutex_unlock(&priv->cfg_lock);
+		return -EINVAL;
+	}
 
-	priv->flags = ss->flags & ASYNC_FLAGS;
+	/* Make the changes - these are privileged changes! */
+
+	priv->flags = ((priv->flags & ~ASYNC_FLAGS) |
+					(ss->flags & ASYNC_FLAGS));
 	priv->custom_divisor = ss->custom_divisor;
 
+check_and_exit:
 	write_latency_timer(port);
 
-	if ((priv->flags ^ old_flags) & ASYNC_SPD_MASK ||
+	if ((priv->flags ^ old_priv.flags) & ASYNC_SPD_MASK ||
 			((priv->flags & ASYNC_SPD_MASK) == ASYNC_SPD_CUST &&
-			 priv->custom_divisor != old_divisor)) {
+			 priv->custom_divisor != old_priv.custom_divisor)) {
 
 		/* warn about deprecation unless clearing */
 		if (priv->flags & ASYNC_SPD_MASK)

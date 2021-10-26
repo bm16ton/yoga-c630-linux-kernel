@@ -1125,6 +1125,7 @@ static int max2175_g_frequency(struct v4l2_subdev *sd,
 			       struct v4l2_frequency *vf)
 {
 	struct max2175 *ctx = max2175_from_sd(sd);
+	int ret = 0;
 
 	if (vf->tuner != 0)
 		return -EINVAL;
@@ -1133,7 +1134,7 @@ static int max2175_g_frequency(struct v4l2_subdev *sd,
 	vf->type = V4L2_TUNER_RF;
 	vf->frequency = ctx->freq;
 
-	return 0;
+	return ret;
 }
 
 static int max2175_enum_freq_bands(struct v4l2_subdev *sd,

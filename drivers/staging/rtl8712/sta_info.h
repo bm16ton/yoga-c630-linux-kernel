@@ -36,6 +36,7 @@ struct wlan_acl_pool {
 };
 
 struct	stainfo_stats {
+
 	uint	rx_pkts;
 	uint	rx_bytes;
 	u64	tx_pkts;

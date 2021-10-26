@@ -639,9 +639,9 @@ static bool process_mem_region(struct mem_vector *region,
 
 		if (slot_area_index == MAX_SLOT_AREA) {
 			debug_putstr("Aborted e820/efi memmap scan (slot_areas full)!\n");
-			return true;
+			return 1;
 		}
-		return false;
+		return 0;
 	}
 
 #if defined(CONFIG_MEMORY_HOTREMOVE) && defined(CONFIG_ACPI)

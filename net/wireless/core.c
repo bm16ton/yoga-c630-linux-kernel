@@ -1105,15 +1105,14 @@ void wiphy_free(struct wiphy *wiphy)
 }
 EXPORT_SYMBOL(wiphy_free);
 
-void wiphy_rfkill_set_hw_state_reason(struct wiphy *wiphy, bool blocked,
-				      enum rfkill_hard_block_reasons reason)
+void wiphy_rfkill_set_hw_state(struct wiphy *wiphy, bool blocked)
 {
 	struct cfg80211_registered_device *rdev = wiphy_to_rdev(wiphy);
 
-	if (rfkill_set_hw_state_reason(rdev->rfkill, blocked, reason))
+	if (rfkill_set_hw_state(rdev->rfkill, blocked))
 		schedule_work(&rdev->rfkill_block);
 }
-EXPORT_SYMBOL(wiphy_rfkill_set_hw_state_reason);
+EXPORT_SYMBOL(wiphy_rfkill_set_hw_state);
 
 void cfg80211_cqm_config_free(struct wireless_dev *wdev)
 {

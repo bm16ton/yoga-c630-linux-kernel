@@ -19,6 +19,7 @@ struct scsi_device;
 struct scsi_host_cmd_pool;
 struct scsi_target;
 struct Scsi_Host;
+struct scsi_host_cmd_pool;
 struct scsi_transport_template;
 
 
@@ -29,15 +30,40 @@ struct scsi_transport_template;
 #define MODE_TARGET 0x02
 
 struct scsi_host_template {
-	/*
-	 * Put fields referenced in IO submission path together in
-	 * same cacheline
-	 */
+	struct module *module;
+	const char *name;
 
 	/*
-	 * Additional per-command data allocated for the driver.
+	 * The info function will return whatever useful information the
+	 * developer sees fit.  If not provided, then the name field will
+	 * be used instead.
+	 *
+	 * Status: OPTIONAL
 	 */
-	unsigned int cmd_size;
+	const char *(* info)(struct Scsi_Host *);
+
+	/*
+	 * Ioctl interface
+	 *
+	 * Status: OPTIONAL
+	 */
+	int (*ioctl)(struct scsi_device *dev, unsigned int cmd,
+		     void __user *arg);
+
+
+#ifdef CONFIG_COMPAT
+	/* 
+	 * Compat handler. Handle 32bit ABI.
+	 * When unknown ioctl is passed return -ENOIOCTLCMD.
+	 *
+	 * Status: OPTIONAL
+	 */
+	int (*compat_ioctl)(struct scsi_device *dev, unsigned int cmd,
+			    void __user *arg);
+#endif
+
+	int (*init_cmd_priv)(struct Scsi_Host *shost, struct scsi_cmnd *cmd);
+	int (*exit_cmd_priv)(struct Scsi_Host *shost, struct scsi_cmnd *cmd);
 
 	/*
 	 * The queuecommand function is used to queue up a scsi
@@ -84,41 +110,6 @@ struct scsi_host_template {
 	 * STATUS: OPTIONAL
 	 */
 	void (*commit_rqs)(struct Scsi_Host *, u16);
-
-	struct module *module;
-	const char *name;
-
-	/*
-	 * The info function will return whatever useful information the
-	 * developer sees fit.  If not provided, then the name field will
-	 * be used instead.
-	 *
-	 * Status: OPTIONAL
-	 */
-	const char *(*info)(struct Scsi_Host *);
-
-	/*
-	 * Ioctl interface
-	 *
-	 * Status: OPTIONAL
-	 */
-	int (*ioctl)(struct scsi_device *dev, unsigned int cmd,
-		     void __user *arg);
-
-
-#ifdef CONFIG_COMPAT
-	/*
-	 * Compat handler. Handle 32bit ABI.
-	 * When unknown ioctl is passed return -ENOIOCTLCMD.
-	 *
-	 * Status: OPTIONAL
-	 */
-	int (*compat_ioctl)(struct scsi_device *dev, unsigned int cmd,
-			    void __user *arg);
-#endif
-
-	int (*init_cmd_priv)(struct Scsi_Host *shost, struct scsi_cmnd *cmd);
-	int (*exit_cmd_priv)(struct Scsi_Host *shost, struct scsi_cmnd *cmd);
 
 	/*
 	 * This is an error handling strategy routine.  You don't need to
@@ -280,16 +271,6 @@ struct scsi_host_template {
 	int (* map_queues)(struct Scsi_Host *shost);
 
 	/*
-	 * SCSI interface of blk_poll - poll for IO completions.
-	 * Only applicable if SCSI LLD exposes multiple h/w queues.
-	 *
-	 * Return value: Number of completed entries found.
-	 *
-	 * Status: OPTIONAL
-	 */
-	int (* mq_poll)(struct Scsi_Host *shost, unsigned int queue_num);
-
-	/*
 	 * Check if scatterlists need to be padded for DMA draining.
 	 *
 	 * Status: OPTIONAL
@@ -444,6 +425,11 @@ struct scsi_host_template {
 	unsigned supported_mode:2;
 
 	/*
+	 * True if this host adapter uses unchecked DMA onto an ISA bus.
+	 */
+	unsigned unchecked_isa_dma:1;
+
+	/*
 	 * True for emulated SCSI host adapters (e.g. ATAPI).
 	 */
 	unsigned emulated:1;
@@ -498,6 +484,10 @@ struct scsi_host_template {
 	 */
 	u64 vendor_id;
 
+	/*
+	 * Additional per-command data allocated for the driver.
+	 */
+	unsigned int cmd_size;
 	struct scsi_host_cmd_pool *cmd_pool;
 
 	/* Delay for runtime autosuspend */
@@ -626,8 +616,8 @@ struct Scsi_Host {
 	 * the total queue depth is can_queue.
 	 */
 	unsigned nr_hw_queues;
-	unsigned nr_maps;
 	unsigned active_mode:2;
+	unsigned unchecked_isa_dma:1;
 
 	/*
 	 * Host has requested that no further requests come through for the

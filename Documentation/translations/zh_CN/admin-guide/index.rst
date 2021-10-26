@@ -13,13 +13,9 @@ Linux 内核用户和管理员指南
 
 这个初始部分包含总体信息，包括描述内核的README， 关于内核参数的文档等。
 
-.. toctree::
-   :maxdepth: 1
-
-   README
-
 Todolist:
 
+   README
    kernel-parameters
    devices
    sysctl/index
@@ -32,21 +28,16 @@ Todolist:
 
 下面的一组文档，针对的是试图跟踪问题和bug的用户。
 
-.. toctree::
-   :maxdepth: 1
+Todolist:
 
-   reporting-issues
+   reporting-bugs
    security-bugs
    bug-hunting
    bug-bisect
    tainted-kernels
-   init
-
-Todolist:
-
-   reporting-bugs
    ramoops
    dynamic-debug-howto
+   init
    kdump/index
    perf/index
 
@@ -65,7 +56,6 @@ Todolist:
 
    clearing-warn-once
    cpu-load
-   unicode
 
 Todolist:
 
@@ -121,6 +111,7 @@ Todolist:
    sysrq
    thunderbolt
    ufs
+   unicode
    vga-softcursor
    video-output
    xfs

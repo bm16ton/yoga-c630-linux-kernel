@@ -790,6 +790,7 @@ static int emac_probe(struct platform_device *pdev)
 	struct emac_board_info *db;
 	struct net_device *ndev;
 	int ret = 0;
+	const char *mac_addr;
 
 	ndev = alloc_etherdev(sizeof(struct emac_board_info));
 	if (!ndev) {
@@ -852,9 +853,12 @@ static int emac_probe(struct platform_device *pdev)
 	}
 
 	/* Read MAC-address from DT */
-	ret = of_get_mac_address(np, ndev->dev_addr);
-	if (ret) {
-		/* if the MAC address is invalid get a random one */
+	mac_addr = of_get_mac_address(np);
+	if (!IS_ERR(mac_addr))
+		ether_addr_copy(ndev->dev_addr, mac_addr);
+
+	/* Check if the MAC address is valid, if not get a random one */
+	if (!is_valid_ether_addr(ndev->dev_addr)) {
 		eth_hw_addr_random(ndev);
 		dev_warn(&pdev->dev, "using random MAC address %pM\n",
 			 ndev->dev_addr);

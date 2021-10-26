@@ -37,7 +37,7 @@ struct host1x_cdma_ops {
 	void (*start)(struct host1x_cdma *cdma);
 	void (*stop)(struct host1x_cdma *cdma);
 	void (*flush)(struct  host1x_cdma *cdma);
-	int (*timeout_init)(struct host1x_cdma *cdma);
+	int (*timeout_init)(struct host1x_cdma *cdma, unsigned int syncpt);
 	void (*timeout_destroy)(struct host1x_cdma *cdma);
 	void (*freeze)(struct host1x_cdma *cdma);
 	void (*resume)(struct host1x_cdma *cdma, u32 getptr);
@@ -101,12 +101,6 @@ struct host1x_info {
 	bool has_hypervisor; /* has hypervisor registers */
 	unsigned int num_sid_entries;
 	const struct host1x_sid_entry *sid_table;
-	/*
-	 * On T20-T148, the boot chain may setup DC to increment syncpoints
-	 * 26/27 on VBLANK. As such we cannot use these syncpoints until
-	 * the display driver disables VBLANK increments.
-	 */
-	bool reserve_vblank_syncpts;
 };
 
 struct host1x {
@@ -267,9 +261,10 @@ static inline void host1x_hw_cdma_flush(struct host1x *host,
 }
 
 static inline int host1x_hw_cdma_timeout_init(struct host1x *host,
-					      struct host1x_cdma *cdma)
+					      struct host1x_cdma *cdma,
+					      unsigned int syncpt)
 {
-	return host->cdma_op->timeout_init(cdma);
+	return host->cdma_op->timeout_init(cdma, syncpt);
 }
 
 static inline void host1x_hw_cdma_timeout_destroy(struct host1x *host,

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Accounting handling for netfilter. */
+/* Accouting handling for netfilter. */
 
 /*
  * (C) 2008 Krzysztof Piotr Oledzki <ole@ans.pl>

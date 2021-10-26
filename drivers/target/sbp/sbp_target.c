@@ -1218,9 +1218,11 @@ static void sbp_handle_command(struct sbp_target_request *req)
 
 	/* only used for printk until we do TMRs */
 	req->se_cmd.tag = req->orb_pointer;
-	target_submit_cmd(&req->se_cmd, sess->se_sess, req->cmd_buf,
-			  req->sense_buf, unpacked_lun, data_length,
-			  TCM_SIMPLE_TAG, data_dir, TARGET_SCF_ACK_KREF);
+	if (target_submit_cmd(&req->se_cmd, sess->se_sess, req->cmd_buf,
+			      req->sense_buf, unpacked_lun, data_length,
+			      TCM_SIMPLE_TAG, data_dir, TARGET_SCF_ACK_KREF))
+		goto err;
+
 	return;
 
 err:

@@ -8,7 +8,7 @@
 
 typedef struct {
 	int lock;
-} arch_spinlock_t;
+} __attribute__ ((aligned (4))) arch_spinlock_t;
 
 #define __ARCH_SPIN_LOCK_UNLOCKED { .lock = 0, }
 

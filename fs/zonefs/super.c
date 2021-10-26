@@ -1177,6 +1177,7 @@ static int zonefs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	struct super_block *sb = dentry->d_sb;
 	struct zonefs_sb_info *sbi = ZONEFS_SB(sb);
 	enum zonefs_ztype t;
+	u64 fsid;
 
 	buf->f_type = ZONEFS_MAGIC;
 	buf->f_bsize = sb->s_blocksize;
@@ -1199,7 +1200,9 @@ static int zonefs_statfs(struct dentry *dentry, struct kstatfs *buf)
 
 	spin_unlock(&sbi->s_lock);
 
-	buf->f_fsid = uuid_to_fsid(sbi->s_uuid.b);
+	fsid = le64_to_cpup((void *)sbi->s_uuid.b) ^
+		le64_to_cpup((void *)sbi->s_uuid.b + sizeof(u64));
+	buf->f_fsid = u64_to_fsid(fsid);
 
 	return 0;
 }

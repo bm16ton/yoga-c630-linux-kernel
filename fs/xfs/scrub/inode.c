@@ -28,7 +28,8 @@
  */
 int
 xchk_setup_inode(
-	struct xfs_scrub	*sc)
+	struct xfs_scrub	*sc,
+	struct xfs_inode	*ip)
 {
 	int			error;
 
@@ -36,7 +37,7 @@ xchk_setup_inode(
 	 * Try to get the inode.  If the verifiers fail, we try again
 	 * in raw mode.
 	 */
-	error = xchk_get_inode(sc);
+	error = xchk_get_inode(sc, ip);
 	switch (error) {
 	case 0:
 		break;

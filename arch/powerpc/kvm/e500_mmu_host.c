@@ -721,36 +721,45 @@ int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
 
 /************* MMU Notifiers *************/
 
-static bool kvm_e500_mmu_unmap_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+static int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
 {
+	trace_kvm_unmap_hva(hva);
+
 	/*
 	 * Flush all shadow tlb entries everywhere. This is slow, but
 	 * we are 100% sure that we catch the to be unmapped page
 	 */
-	return true;
+	kvm_flush_remote_tlbs(kvm);
+
+	return 0;
 }
 
-bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
+			unsigned flags)
 {
-	return kvm_e500_mmu_unmap_gfn(kvm, range);
+	/* kvm_unmap_hva flushes everything anyways */
+	kvm_unmap_hva(kvm, start);
+
+	return 0;
 }
 
-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
 {
 	/* XXX could be more clever ;) */
-	return false;
+	return 0;
 }
 
-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
 {
 	/* XXX could be more clever ;) */
-	return false;
+	return 0;
 }
 
-bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
 {
 	/* The page will get remapped properly on its next fault */
-	return kvm_e500_mmu_unmap_gfn(kvm, range);
+	kvm_unmap_hva(kvm, hva);
+	return 0;
 }
 
 /*****************************************/

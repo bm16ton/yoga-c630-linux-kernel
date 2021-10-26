@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/*
+/**
  * Microchip ENCX24J600 ethernet driver
  *
  * Copyright (C) 2015 Gridpoint
@@ -222,6 +222,7 @@ static int encx24j600_wait_for_autoneg(struct encx24j600_priv *priv)
 	unsigned long timeout = jiffies + msecs_to_jiffies(2000);
 	u16 phstat1;
 	u16 estat;
+	int ret = 0;
 
 	phstat1 = encx24j600_read_phy(priv, PHSTAT1);
 	while ((phstat1 & ANDONE) == 0) {
@@ -257,7 +258,7 @@ static int encx24j600_wait_for_autoneg(struct encx24j600_priv *priv)
 		encx24j600_write_reg(priv, MACLCON, 0x370f);
 	}
 
-	return 0;
+	return ret;
 }
 
 /* Access the PHY to determine link status */
@@ -1117,7 +1118,17 @@ static struct spi_driver encx24j600_spi_net_driver = {
 	.id_table	= encx24j600_spi_id_table,
 };
 
-module_spi_driver(encx24j600_spi_net_driver);
+static int __init encx24j600_init(void)
+{
+	return spi_register_driver(&encx24j600_spi_net_driver);
+}
+module_init(encx24j600_init);
+
+static void encx24j600_exit(void)
+{
+	spi_unregister_driver(&encx24j600_spi_net_driver);
+}
+module_exit(encx24j600_exit);
 
 MODULE_DESCRIPTION(DRV_NAME " ethernet driver");
 MODULE_AUTHOR("Jon Ringle <jringle@gridpoint.com>");

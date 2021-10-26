@@ -772,7 +772,7 @@ tcp_fastopen_blackhole_timeout_sec - INTEGER
 	initial value when the blackhole issue goes away.
 	0 to disable the blackhole detection.
 
-	By default, it is set to 0 (feature is disabled).
+	By default, it is set to 1hr.
 
 tcp_fastopen_key - list of comma separated 32-digit hexadecimal INTEGERs
 	The list consists of a primary key and an optional backup key. The
@@ -1073,9 +1073,7 @@ ip_local_reserved_ports - list of comma separated ranges
 
 	although this is redundant. However such a setting is useful
 	if later the port range is changed to a value that will
-	include the reserved ports. Also keep in mind, that overlapping
-	of these ranges may affect probability of selecting ephemeral
-	ports which are right after block of reserved ports.
+	include the reserved ports.
 
 	Default: Empty
 
@@ -1144,12 +1142,6 @@ icmp_echo_ignore_all - BOOLEAN
 	requests sent to it.
 
 	Default: 0
-
-icmp_echo_enable_probe - BOOLEAN
-        If set to one, then the kernel will respond to RFC 8335 PROBE
-        requests sent to it.
-
-        Default: 0
 
 icmp_echo_ignore_broadcasts - BOOLEAN
 	If set non-zero, then the kernel will ignore all ICMP ECHO and

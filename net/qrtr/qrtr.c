@@ -20,8 +20,6 @@
 /* auto-bind range */
 #define QRTR_MIN_EPH_SOCKET 0x4000
 #define QRTR_MAX_EPH_SOCKET 0x7fff
-#define QRTR_EPH_PORT_RANGE \
-		XA_LIMIT(QRTR_MIN_EPH_SOCKET, QRTR_MAX_EPH_SOCKET)
 
 /**
  * struct qrtr_hdr_v1 - (I|R)PCrouter packet header version 1
@@ -108,7 +106,8 @@ static LIST_HEAD(qrtr_all_nodes);
 static DEFINE_MUTEX(qrtr_node_lock);
 
 /* local port allocation management */
-static DEFINE_XARRAY_ALLOC(qrtr_ports);
+static DEFINE_IDR(qrtr_ports);
+static DEFINE_MUTEX(qrtr_port_lock);
 
 /**
  * struct qrtr_node - endpoint node
@@ -518,10 +517,8 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
 		if (!ipc)
 			goto err;
 
-		if (sock_queue_rcv_skb(&ipc->sk, skb)) {
-			qrtr_port_put(ipc);
+		if (sock_queue_rcv_skb(&ipc->sk, skb))
 			goto err;
-		}
 
 		qrtr_port_put(ipc);
 	}
@@ -659,7 +656,7 @@ static struct qrtr_sock *qrtr_port_lookup(int port)
 		port = 0;
 
 	rcu_read_lock();
-	ipc = xa_load(&qrtr_ports, port);
+	ipc = idr_find(&qrtr_ports, port);
 	if (ipc)
 		sock_hold(&ipc->sk);
 	rcu_read_unlock();
@@ -701,7 +698,9 @@ static void qrtr_port_remove(struct qrtr_sock *ipc)
 
 	__sock_put(&ipc->sk);
 
-	xa_erase(&qrtr_ports, port);
+	mutex_lock(&qrtr_port_lock);
+	idr_remove(&qrtr_ports, port);
+	mutex_unlock(&qrtr_port_lock);
 
 	/* Ensure that if qrtr_port_lookup() did enter the RCU read section we
 	 * wait for it to up increment the refcount */
@@ -720,20 +719,29 @@ static void qrtr_port_remove(struct qrtr_sock *ipc)
  */
 static int qrtr_port_assign(struct qrtr_sock *ipc, int *port)
 {
+	u32 min_port;
 	int rc;
 
+	mutex_lock(&qrtr_port_lock);
 	if (!*port) {
-		rc = xa_alloc(&qrtr_ports, port, ipc, QRTR_EPH_PORT_RANGE,
-				GFP_KERNEL);
+		min_port = QRTR_MIN_EPH_SOCKET;
+		rc = idr_alloc_u32(&qrtr_ports, ipc, &min_port, QRTR_MAX_EPH_SOCKET, GFP_ATOMIC);
+		if (!rc)
+			*port = min_port;
 	} else if (*port < QRTR_MIN_EPH_SOCKET && !capable(CAP_NET_ADMIN)) {
 		rc = -EACCES;
 	} else if (*port == QRTR_PORT_CTRL) {
-		rc = xa_insert(&qrtr_ports, 0, ipc, GFP_KERNEL);
+		min_port = 0;
+		rc = idr_alloc_u32(&qrtr_ports, ipc, &min_port, 0, GFP_ATOMIC);
 	} else {
-		rc = xa_insert(&qrtr_ports, *port, ipc, GFP_KERNEL);
+		min_port = *port;
+		rc = idr_alloc_u32(&qrtr_ports, ipc, &min_port, *port, GFP_ATOMIC);
+		if (!rc)
+			*port = min_port;
 	}
+	mutex_unlock(&qrtr_port_lock);
 
-	if (rc == -EBUSY)
+	if (rc == -ENOSPC)
 		return -EADDRINUSE;
 	else if (rc < 0)
 		return rc;
@@ -747,16 +755,20 @@ static int qrtr_port_assign(struct qrtr_sock *ipc, int *port)
 static void qrtr_reset_ports(void)
 {
 	struct qrtr_sock *ipc;
-	unsigned long index;
+	int id;
 
-	rcu_read_lock();
-	xa_for_each_start(&qrtr_ports, index, ipc, 1) {
+	mutex_lock(&qrtr_port_lock);
+	idr_for_each_entry(&qrtr_ports, ipc, id) {
+		/* Don't reset control port */
+		if (id == 0)
+			continue;
+
 		sock_hold(&ipc->sk);
 		ipc->sk.sk_err = ENETRESET;
 		ipc->sk.sk_error_report(&ipc->sk);
 		sock_put(&ipc->sk);
 	}
-	rcu_read_unlock();
+	mutex_unlock(&qrtr_port_lock);
 }
 
 /* Bind socket to address.
@@ -841,8 +853,6 @@ static int qrtr_local_enqueue(struct qrtr_node *node, struct sk_buff *skb,
 
 	ipc = qrtr_port_lookup(to->sq_port);
 	if (!ipc || &ipc->sk == skb->sk) { /* do not send to self */
-		if (ipc)
-			qrtr_port_put(ipc);
 		kfree_skb(skb);
 		return -ENODEV;
 	}

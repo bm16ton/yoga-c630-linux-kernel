@@ -35,12 +35,12 @@ static void pabort(const char *s)
 	abort();
 }
 
-static const char *device = "/dev/spidev16.0";
+static const char *device = "/dev/spidev1.1";
 static uint32_t mode;
 static uint8_t bits = 8;
 static char *input_file;
 static char *output_file;
-static uint32_t speed = 800000;
+static uint32_t speed = 500000;
 static uint16_t delay;
 static int verbose;
 static int transfer_size;

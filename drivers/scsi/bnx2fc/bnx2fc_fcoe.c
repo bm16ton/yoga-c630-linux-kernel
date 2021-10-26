@@ -1796,7 +1796,7 @@ static void bnx2fc_unbind_pcidev(struct bnx2fc_hba *hba)
 /**
  * bnx2fc_ulp_get_stats - cnic callback to populate FCoE stats
  *
- * @handle:    transport handle pointing to adapter structure
+ * @handle:    transport handle pointing to adapter struture
  */
 static int bnx2fc_ulp_get_stats(void *handle)
 {

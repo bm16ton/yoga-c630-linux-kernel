@@ -153,16 +153,16 @@ static int get_ucode_type(struct device *dev,
 }
 
 static int __write_ucode_base(struct otx2_cptpf_dev *cptpf, int eng,
-			      dma_addr_t dma_addr, int blkaddr)
+			      dma_addr_t dma_addr)
 {
 	return otx2_cpt_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
 				     CPT_AF_EXEX_UCODE_BASE(eng),
-				     (u64)dma_addr, blkaddr);
+				     (u64)dma_addr);
 }
 
-static int cptx_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp,
-			       struct otx2_cptpf_dev *cptpf, int blkaddr)
+static int cpt_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp, void *obj)
 {
+	struct otx2_cptpf_dev *cptpf = obj;
 	struct otx2_cpt_engs_rsvd *engs;
 	dma_addr_t dma_addr;
 	int i, bit, ret;
@@ -170,7 +170,7 @@ static int cptx_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp,
 	/* Set PF number for microcode fetches */
 	ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
 				    CPT_AF_PF_FUNC,
-				    cptpf->pf_id << RVU_PFVF_PF_SHIFT, blkaddr);
+				    cptpf->pf_id << RVU_PFVF_PF_SHIFT);
 	if (ret)
 		return ret;
 
@@ -187,8 +187,7 @@ static int cptx_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp,
 		 */
 		for_each_set_bit(bit, engs->bmap, eng_grp->g->engs_num)
 			if (!eng_grp->g->eng_ref_cnt[bit]) {
-				ret = __write_ucode_base(cptpf, bit, dma_addr,
-							 blkaddr);
+				ret = __write_ucode_base(cptpf, bit, dma_addr);
 				if (ret)
 					return ret;
 			}
@@ -196,32 +195,23 @@ static int cptx_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp,
 	return 0;
 }
 
-static int cpt_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp, void *obj)
+static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
+					void *obj)
 {
 	struct otx2_cptpf_dev *cptpf = obj;
-	int ret;
-
-	if (cptpf->has_cpt1) {
-		ret = cptx_set_ucode_base(eng_grp, cptpf, BLKADDR_CPT1);
-		if (ret)
-			return ret;
-	}
-	return cptx_set_ucode_base(eng_grp, cptpf, BLKADDR_CPT0);
-}
-
-static int cptx_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-					 struct otx2_cptpf_dev *cptpf,
-					 struct otx2_cpt_bitmap bmap,
-					 int blkaddr)
-{
+	struct otx2_cpt_bitmap bmap;
 	int i, timeout = 10;
 	int busy, ret;
 	u64 reg = 0;
 
+	bmap = get_cores_bmap(&cptpf->pdev->dev, eng_grp);
+	if (!bmap.size)
+		return -EINVAL;
+
 	/* Detach the cores from group */
 	for_each_set_bit(i, bmap.bits, bmap.size) {
 		ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
-					   CPT_AF_EXEX_CTL2(i), &reg, blkaddr);
+					   CPT_AF_EXEX_CTL2(i), &reg);
 		if (ret)
 			return ret;
 
@@ -231,8 +221,7 @@ static int cptx_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
 
 			ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox,
 						    cptpf->pdev,
-						    CPT_AF_EXEX_CTL2(i), reg,
-						    blkaddr);
+						    CPT_AF_EXEX_CTL2(i), reg);
 			if (ret)
 				return ret;
 		}
@@ -248,8 +237,7 @@ static int cptx_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
 		for_each_set_bit(i, bmap.bits, bmap.size) {
 			ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox,
 						   cptpf->pdev,
-						   CPT_AF_EXEX_STS(i), &reg,
-						   blkaddr);
+						   CPT_AF_EXEX_STS(i), &reg);
 			if (ret)
 				return ret;
 
@@ -265,8 +253,7 @@ static int cptx_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
 		if (!eng_grp->g->eng_ref_cnt[i]) {
 			ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox,
 						    cptpf->pdev,
-						    CPT_AF_EXEX_CTL(i), 0x0,
-						    blkaddr);
+						    CPT_AF_EXEX_CTL(i), 0x0);
 			if (ret)
 				return ret;
 		}
@@ -275,39 +262,22 @@ static int cptx_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
 	return 0;
 }
 
-static int cpt_detach_and_disable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-					void *obj)
+static int cpt_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
+				       void *obj)
 {
 	struct otx2_cptpf_dev *cptpf = obj;
 	struct otx2_cpt_bitmap bmap;
-	int ret;
+	u64 reg = 0;
+	int i, ret;
 
 	bmap = get_cores_bmap(&cptpf->pdev->dev, eng_grp);
 	if (!bmap.size)
 		return -EINVAL;
 
-	if (cptpf->has_cpt1) {
-		ret = cptx_detach_and_disable_cores(eng_grp, cptpf, bmap,
-						    BLKADDR_CPT1);
-		if (ret)
-			return ret;
-	}
-	return cptx_detach_and_disable_cores(eng_grp, cptpf, bmap,
-					     BLKADDR_CPT0);
-}
-
-static int cptx_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-					struct otx2_cptpf_dev *cptpf,
-					struct otx2_cpt_bitmap bmap,
-					int blkaddr)
-{
-	u64 reg = 0;
-	int i, ret;
-
 	/* Attach the cores to the group */
 	for_each_set_bit(i, bmap.bits, bmap.size) {
 		ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
-					   CPT_AF_EXEX_CTL2(i), &reg, blkaddr);
+					   CPT_AF_EXEX_CTL2(i), &reg);
 		if (ret)
 			return ret;
 
@@ -317,8 +287,7 @@ static int cptx_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
 
 			ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox,
 						    cptpf->pdev,
-						    CPT_AF_EXEX_CTL2(i), reg,
-						    blkaddr);
+						    CPT_AF_EXEX_CTL2(i), reg);
 			if (ret)
 				return ret;
 		}
@@ -326,33 +295,15 @@ static int cptx_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
 
 	/* Enable the cores */
 	for_each_set_bit(i, bmap.bits, bmap.size) {
-		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
-						CPT_AF_EXEX_CTL(i), 0x1,
-						blkaddr);
+		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox,
+						cptpf->pdev,
+						CPT_AF_EXEX_CTL(i), 0x1);
 		if (ret)
 			return ret;
 	}
-	return otx2_cpt_send_af_reg_requests(&cptpf->afpf_mbox, cptpf->pdev);
-}
+	ret = otx2_cpt_send_af_reg_requests(&cptpf->afpf_mbox, cptpf->pdev);
 
-static int cpt_attach_and_enable_cores(struct otx2_cpt_eng_grp_info *eng_grp,
-				       void *obj)
-{
-	struct otx2_cptpf_dev *cptpf = obj;
-	struct otx2_cpt_bitmap bmap;
-	int ret;
-
-	bmap = get_cores_bmap(&cptpf->pdev->dev, eng_grp);
-	if (!bmap.size)
-		return -EINVAL;
-
-	if (cptpf->has_cpt1) {
-		ret = cptx_attach_and_enable_cores(eng_grp, cptpf, bmap,
-						   BLKADDR_CPT1);
-		if (ret)
-			return ret;
-	}
-	return cptx_attach_and_enable_cores(eng_grp, cptpf, bmap, BLKADDR_CPT0);
+	return ret;
 }
 
 static int load_fw(struct device *dev, struct fw_info_t *fw_info,
@@ -1189,18 +1140,20 @@ release_fw:
 	return ret;
 }
 
-static int cptx_disable_all_cores(struct otx2_cptpf_dev *cptpf, int total_cores,
-				  int blkaddr)
+int otx2_cpt_disable_all_cores(struct otx2_cptpf_dev *cptpf)
 {
-	int timeout = 10, ret;
-	int i, busy;
-	u64 reg;
+	int i, ret, busy, total_cores;
+	int timeout = 10;
+	u64 reg = 0;
+
+	total_cores = cptpf->eng_grps.avail.max_se_cnt +
+		      cptpf->eng_grps.avail.max_ie_cnt +
+		      cptpf->eng_grps.avail.max_ae_cnt;
 
 	/* Disengage the cores from groups */
 	for (i = 0; i < total_cores; i++) {
 		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
-						CPT_AF_EXEX_CTL2(i), 0x0,
-						blkaddr);
+						CPT_AF_EXEX_CTL2(i), 0x0);
 		if (ret)
 			return ret;
 
@@ -1220,8 +1173,7 @@ static int cptx_disable_all_cores(struct otx2_cptpf_dev *cptpf, int total_cores,
 		for (i = 0; i < total_cores; i++) {
 			ret = otx2_cpt_read_af_reg(&cptpf->afpf_mbox,
 						   cptpf->pdev,
-						   CPT_AF_EXEX_STS(i), &reg,
-						   blkaddr);
+						   CPT_AF_EXEX_STS(i), &reg);
 			if (ret)
 				return ret;
 
@@ -1235,28 +1187,11 @@ static int cptx_disable_all_cores(struct otx2_cptpf_dev *cptpf, int total_cores,
 	/* Disable the cores */
 	for (i = 0; i < total_cores; i++) {
 		ret = otx2_cpt_add_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
-						CPT_AF_EXEX_CTL(i), 0x0,
-						blkaddr);
+						CPT_AF_EXEX_CTL(i), 0x0);
 		if (ret)
 			return ret;
 	}
 	return otx2_cpt_send_af_reg_requests(&cptpf->afpf_mbox, cptpf->pdev);
-}
-
-int otx2_cpt_disable_all_cores(struct otx2_cptpf_dev *cptpf)
-{
-	int total_cores, ret;
-
-	total_cores = cptpf->eng_grps.avail.max_se_cnt +
-		      cptpf->eng_grps.avail.max_ie_cnt +
-		      cptpf->eng_grps.avail.max_ae_cnt;
-
-	if (cptpf->has_cpt1) {
-		ret = cptx_disable_all_cores(cptpf, total_cores, BLKADDR_CPT1);
-		if (ret)
-			return ret;
-	}
-	return cptx_disable_all_cores(cptpf, total_cores, BLKADDR_CPT0);
 }
 
 void otx2_cpt_cleanup_eng_grps(struct pci_dev *pdev,
@@ -1419,7 +1354,6 @@ int otx2_cpt_discover_eng_capabilities(struct otx2_cptpf_dev *cptpf)
 	lfs->pdev = pdev;
 	lfs->reg_base = cptpf->reg_base;
 	lfs->mbox = &cptpf->afpf_mbox;
-	lfs->blkaddr = BLKADDR_CPT0;
 	ret = otx2_cptlf_init(&cptpf->lfs, OTX2_CPT_ALL_ENG_GRPS_MASK,
 			      OTX2_CPT_QUEUE_HI_PRIO, 1);
 	if (ret)

@@ -283,3 +283,4 @@ enum {									\
 
 /* }}}1 */
 #endif /* GENL_MAGIC_STRUCT_H */
+/* vim: set foldmethod=marker nofoldenable : */

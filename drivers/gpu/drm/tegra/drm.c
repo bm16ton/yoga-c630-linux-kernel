@@ -65,14 +65,11 @@ static void tegra_atomic_commit_tail(struct drm_atomic_state *old_state)
 	struct tegra_drm *tegra = drm->dev_private;
 
 	if (tegra->hub) {
-		bool fence_cookie = dma_fence_begin_signalling();
-
 		drm_atomic_helper_commit_modeset_disables(drm, old_state);
 		tegra_display_hub_atomic_commit(drm, old_state);
 		drm_atomic_helper_commit_planes(drm, old_state, 0);
 		drm_atomic_helper_commit_modeset_enables(drm, old_state);
 		drm_atomic_helper_commit_hw_done(old_state);
-		dma_fence_end_signalling(fence_cookie);
 		drm_atomic_helper_wait_for_vblanks(drm, old_state);
 		drm_atomic_helper_cleanup_planes(drm, old_state);
 	} else {
@@ -174,7 +171,7 @@ int tegra_drm_submit(struct tegra_drm_context *context,
 	struct drm_tegra_syncpt syncpt;
 	struct host1x *host1x = dev_get_drvdata(drm->dev->parent);
 	struct drm_gem_object **refs;
-	struct host1x_syncpt *sp = NULL;
+	struct host1x_syncpt *sp;
 	struct host1x_job *job;
 	unsigned int num_refs;
 	int err;
@@ -301,8 +298,8 @@ int tegra_drm_submit(struct tegra_drm_context *context,
 		goto fail;
 	}
 
-	/* Syncpoint ref will be dropped on job release. */
-	sp = host1x_syncpt_get_by_id(host1x, syncpt.id);
+	/* check whether syncpoint ID is valid */
+	sp = host1x_syncpt_get(host1x, syncpt.id);
 	if (!sp) {
 		err = -ENOENT;
 		goto fail;
@@ -311,7 +308,7 @@ int tegra_drm_submit(struct tegra_drm_context *context,
 	job->is_addr_reg = context->client->ops->is_addr_reg;
 	job->is_valid_class = context->client->ops->is_valid_class;
 	job->syncpt_incrs = syncpt.incrs;
-	job->syncpt = sp;
+	job->syncpt_id = syncpt.id;
 	job->timeout = 10000;
 
 	if (args->timeout && args->timeout < 10000)
@@ -383,7 +380,7 @@ static int tegra_syncpt_read(struct drm_device *drm, void *data,
 	struct drm_tegra_syncpt_read *args = data;
 	struct host1x_syncpt *sp;
 
-	sp = host1x_syncpt_get_by_id_noref(host, args->id);
+	sp = host1x_syncpt_get(host, args->id);
 	if (!sp)
 		return -EINVAL;
 
@@ -398,7 +395,7 @@ static int tegra_syncpt_incr(struct drm_device *drm, void *data,
 	struct drm_tegra_syncpt_incr *args = data;
 	struct host1x_syncpt *sp;
 
-	sp = host1x_syncpt_get_by_id_noref(host1x, args->id);
+	sp = host1x_syncpt_get(host1x, args->id);
 	if (!sp)
 		return -EINVAL;
 
@@ -412,7 +409,7 @@ static int tegra_syncpt_wait(struct drm_device *drm, void *data,
 	struct drm_tegra_syncpt_wait *args = data;
 	struct host1x_syncpt *sp;
 
-	sp = host1x_syncpt_get_by_id_noref(host1x, args->id);
+	sp = host1x_syncpt_get(host1x, args->id);
 	if (!sp)
 		return -EINVAL;
 
@@ -1121,8 +1118,9 @@ static int host1x_drm_probe(struct host1x_device *dev)
 
 	drm->mode_config.min_width = 0;
 	drm->mode_config.min_height = 0;
-	drm->mode_config.max_width = 0;
-	drm->mode_config.max_height = 0;
+
+	drm->mode_config.max_width = 4096;
+	drm->mode_config.max_height = 4096;
 
 	drm->mode_config.normalize_zpos = true;
 
@@ -1138,14 +1136,6 @@ static int host1x_drm_probe(struct host1x_device *dev)
 	err = host1x_device_init(dev);
 	if (err < 0)
 		goto fbdev;
-
-	/*
-	 * Now that all display controller have been initialized, the maximum
-	 * supported resolution is known and the bitmask for horizontal and
-	 * vertical bitfields can be computed.
-	 */
-	tegra->hmask = drm->mode_config.max_width - 1;
-	tegra->vmask = drm->mode_config.max_height - 1;
 
 	if (tegra->use_explicit_iommu) {
 		u64 carveout_start, carveout_end, gem_start, gem_end;

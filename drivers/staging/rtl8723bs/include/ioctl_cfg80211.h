@@ -7,6 +7,8 @@
 #ifndef __IOCTL_CFG80211_H__
 #define __IOCTL_CFG80211_H__
 
+#include <linux/version.h>
+
 struct rtw_wdev_invit_info {
 	u8 state; /* 0: req, 1:rep */
 	u8 peer_mac[ETH_ALEN];
@@ -65,7 +67,7 @@ struct rtw_wdev_priv {
 	struct adapter *padapter;
 
 	struct cfg80211_scan_request *scan_request;
-	spinlock_t scan_req_lock;
+	_lock scan_req_lock;
 
 	struct net_device *pmon_ndev;/* for monitor interface */
 	char ifname_mon[IFNAMSIZ + 1]; /* interface name for monitor interface */
@@ -104,7 +106,7 @@ void rtw_cfg80211_indicate_scan_done(struct adapter *adapter, bool aborted);
 void rtw_cfg80211_indicate_sta_assoc(struct adapter *padapter, u8 *pmgmt_frame, uint frame_len);
 void rtw_cfg80211_indicate_sta_disassoc(struct adapter *padapter, unsigned char *da, unsigned short reason);
 
-void rtw_cfg80211_rx_action(struct adapter *adapter, u8 *frame, uint frame_len, const char *msg);
+void rtw_cfg80211_rx_action(struct adapter *adapter, u8 *frame, uint frame_len, const char*msg);
 
 bool rtw_cfg80211_pwr_mgmt(struct adapter *adapter);
 

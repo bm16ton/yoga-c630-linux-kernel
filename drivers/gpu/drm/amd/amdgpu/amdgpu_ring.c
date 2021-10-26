@@ -164,8 +164,7 @@ void amdgpu_ring_undo(struct amdgpu_ring *ring)
  */
 int amdgpu_ring_init(struct amdgpu_device *adev, struct amdgpu_ring *ring,
 		     unsigned int max_dw, struct amdgpu_irq_src *irq_src,
-		     unsigned int irq_type, unsigned int hw_prio,
-		     atomic_t *sched_score)
+		     unsigned int irq_type, unsigned int hw_prio)
 {
 	int r;
 	int sched_hw_submission = amdgpu_sched_hw_submission;
@@ -190,8 +189,7 @@ int amdgpu_ring_init(struct amdgpu_device *adev, struct amdgpu_ring *ring,
 		ring->adev = adev;
 		ring->idx = adev->num_rings++;
 		adev->rings[ring->idx] = ring;
-		r = amdgpu_fence_driver_init_ring(ring, sched_hw_submission,
-						  sched_score);
+		r = amdgpu_fence_driver_init_ring(ring, sched_hw_submission);
 		if (r)
 			return r;
 	}

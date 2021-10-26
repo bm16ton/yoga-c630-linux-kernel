@@ -629,4 +629,3 @@ module_i2c_driver(ucd9000_driver);
 MODULE_AUTHOR("Guenter Roeck");
 MODULE_DESCRIPTION("PMBus driver for TI UCD90xxx");
 MODULE_LICENSE("GPL");
-MODULE_IMPORT_NS(PMBUS);

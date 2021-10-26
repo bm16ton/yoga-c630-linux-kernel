@@ -72,11 +72,7 @@ and radio devices supporting a set of related functions like video
 capturing, video overlay and VBI capturing. See :ref:`open` for an
 introduction.
 
-.. raw:: latex
-
-   \small
-
-.. tabularcolumns:: |p{5.3cm}|p{6.7cm}|p{5.3cm}|
+.. tabularcolumns:: |p{5.5cm}|p{6.5cm}|p{5.5cm}
 
 .. cssclass:: longtable
 
@@ -151,10 +147,6 @@ introduction.
     * - ``VID_TYPE_MJPEG_ENCODER``
       - ``-``
       - See above.
-
-.. raw:: latex
-
-   \normalsize
 
 The ``audios`` field was replaced by ``capabilities`` flag
 ``V4L2_CAP_AUDIO``, indicating *if* the device has any audio inputs or

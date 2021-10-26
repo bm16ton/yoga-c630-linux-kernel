@@ -1004,23 +1004,15 @@ static unsigned char dasd_eckd_path_access(void *conf_data, int conf_len)
 static void dasd_eckd_store_conf_data(struct dasd_device *device,
 				      struct dasd_conf_data *conf_data, int chp)
 {
-	struct dasd_eckd_private *private = device->private;
 	struct channel_path_desc_fmt0 *chp_desc;
 	struct subchannel_id sch_id;
-	void *cdp;
 
+	ccw_device_get_schid(device->cdev, &sch_id);
 	/*
 	 * path handling and read_conf allocate data
 	 * free it before replacing the pointer
-	 * also replace the old private->conf_data pointer
-	 * with the new one if this points to the same data
 	 */
-	cdp = device->path[chp].conf_data;
-	if (private->conf_data == cdp) {
-		private->conf_data = (void *)conf_data;
-		dasd_eckd_identify_conf_parts(private);
-	}
-	ccw_device_get_schid(device->cdev, &sch_id);
+	kfree(device->path[chp].conf_data);
 	device->path[chp].conf_data = conf_data;
 	device->path[chp].cssid = sch_id.cssid;
 	device->path[chp].ssid = sch_id.ssid;
@@ -1028,7 +1020,6 @@ static void dasd_eckd_store_conf_data(struct dasd_device *device,
 	if (chp_desc)
 		device->path[chp].chpid = chp_desc->chpid;
 	kfree(chp_desc);
-	kfree(cdp);
 }
 
 static void dasd_eckd_clear_conf_data(struct dasd_device *device)
@@ -6639,7 +6630,6 @@ static struct ccw_driver dasd_eckd_driver = {
 	.driver = {
 		.name	= "dasd-eckd",
 		.owner	= THIS_MODULE,
-		.dev_groups = dasd_dev_groups,
 	},
 	.ids	     = dasd_eckd_ids,
 	.probe	     = dasd_eckd_probe,

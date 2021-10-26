@@ -42,6 +42,7 @@ struct ftdi_spi {
 	struct gpio_desc **cs_gpios;
 	struct gpio_desc **dc_gpios;
 	struct gpio_desc **reset_gpios;
+	struct gpio_desc **interrupts_gpios;
 
 	u8 txrx_cmd;
 	u8 rx_cmd;
@@ -500,7 +501,7 @@ static int ftdi_spi_probe(struct platform_device *pdev)
 	struct spi_controller *master;
 	struct ftdi_spi *priv;
 	struct gpio_desc *desc;
-	u16 dc, reset, num_cs, max_cs = 0;
+	u16 dc, reset, interrupts, num_cs, max_cs = 0;
 	unsigned int i;
 	int ret;
 
@@ -551,7 +552,9 @@ static int ftdi_spi_probe(struct platform_device *pdev)
 			    SPI_CS_HIGH | SPI_LSB_FIRST;
 	master->num_chipselect = max_cs;
 	master->min_speed_hz = 450;
+//	master->min_speed_hz = 1000000;
 	master->max_speed_hz = 30000000;
+//	master->max_speed_hz = 25000000;
 	master->bits_per_word_mask = SPI_BPW_MASK(8);
 	master->set_cs = ftdi_spi_set_cs;
 	master->transfer_one = ftdi_spi_transfer_one;
@@ -569,6 +572,10 @@ static int ftdi_spi_probe(struct platform_device *pdev)
 
 	priv->reset_gpios = devm_kcalloc(&master->dev, reset, sizeof(desc),
 				      GFP_KERNEL);
+
+	priv->interrupts_gpios = devm_kcalloc(&master->dev, interrupts, sizeof(desc),
+				      GFP_KERNEL);
+
 
 	for (i = 0; i < num_cs; i++) {
 		unsigned int idx = pd->spi_info[i].chip_select;

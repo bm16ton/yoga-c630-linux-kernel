@@ -45,7 +45,6 @@
 #include <linux/swap.h>
 
 #include "amd_shared.h"
-#include "amdgpu.h"
 
 #define KFD_MAX_RING_ENTRY_SIZE	8
 
@@ -169,11 +168,6 @@ extern bool hws_gws_support;
 
 /* Queue preemption timeout in ms */
 extern int queue_preemption_timeout_ms;
-
-/*
- * Don't evict process queues on vm fault
- */
-extern int amdgpu_no_queue_eviction_on_vm_fault;
 
 /* Enable eviction debug messages */
 extern bool debug_evictions;
@@ -650,6 +644,12 @@ enum kfd_pdd_bound {
 
 /* Data that is per-process-per device. */
 struct kfd_process_device {
+	/*
+	 * List of all per-device data for a process.
+	 * Starts from kfd_process.per_device_data.
+	 */
+	struct list_head per_device_list;
+
 	/* The device that owns this data. */
 	struct kfd_dev *dev;
 
@@ -766,11 +766,10 @@ struct kfd_process {
 	u32 pasid;
 
 	/*
-	 * Array of kfd_process_device pointers,
+	 * List of kfd_process_device structures,
 	 * one for each device the process is using.
 	 */
-	struct kfd_process_device *pdds[MAX_GPU_INSTANCE];
-	uint32_t n_pdds;
+	struct list_head per_device_data;
 
 	struct process_queue_manager pqm;
 
@@ -868,6 +867,14 @@ void *kfd_process_device_translate_handle(struct kfd_process_device *p,
 void kfd_process_device_remove_obj_handle(struct kfd_process_device *pdd,
 					int handle);
 
+/* Process device data iterator */
+struct kfd_process_device *kfd_get_first_process_device_data(
+							struct kfd_process *p);
+struct kfd_process_device *kfd_get_next_process_device_data(
+						struct kfd_process *p,
+						struct kfd_process_device *pdd);
+bool kfd_has_process_device_data(struct kfd_process *p);
+
 /* PASIDs */
 int kfd_pasid_init(void);
 void kfd_pasid_exit(void);
@@ -936,10 +943,6 @@ bool interrupt_is_wanted(struct kfd_dev *dev,
 
 /* amdkfd Apertures */
 int kfd_init_apertures(struct kfd_process *process);
-
-void kfd_process_set_trap_handler(struct qcm_process_device *qpd,
-				  uint64_t tba_addr,
-				  uint64_t tma_addr);
 
 /* Queue Context Management */
 int init_queue(struct queue **q, const struct queue_properties *properties);

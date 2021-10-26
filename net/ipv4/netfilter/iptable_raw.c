@@ -41,7 +41,7 @@ static unsigned int
 iptable_raw_hook(void *priv, struct sk_buff *skb,
 		 const struct nf_hook_state *state)
 {
-	return ipt_do_table(skb, state, priv);
+	return ipt_do_table(skb, state, state->net->ipv4.iptable_raw);
 }
 
 static struct nf_hook_ops *rawtable_ops __read_mostly;
@@ -55,22 +55,31 @@ static int __net_init iptable_raw_table_init(struct net *net)
 	if (raw_before_defrag)
 		table = &packet_raw_before_defrag;
 
+	if (net->ipv4.iptable_raw)
+		return 0;
+
 	repl = ipt_alloc_initial_table(table);
 	if (repl == NULL)
 		return -ENOMEM;
-	ret = ipt_register_table(net, table, repl, rawtable_ops);
+	ret = ipt_register_table(net, table, repl, rawtable_ops,
+				 &net->ipv4.iptable_raw);
 	kfree(repl);
 	return ret;
 }
 
 static void __net_exit iptable_raw_net_pre_exit(struct net *net)
 {
-	ipt_unregister_table_pre_exit(net, "raw");
+	if (net->ipv4.iptable_raw)
+		ipt_unregister_table_pre_exit(net, net->ipv4.iptable_raw,
+					      rawtable_ops);
 }
 
 static void __net_exit iptable_raw_net_exit(struct net *net)
 {
-	ipt_unregister_table_exit(net, "raw");
+	if (!net->ipv4.iptable_raw)
+		return;
+	ipt_unregister_table_exit(net, net->ipv4.iptable_raw);
+	net->ipv4.iptable_raw = NULL;
 }
 
 static struct pernet_operations iptable_raw_net_ops = {

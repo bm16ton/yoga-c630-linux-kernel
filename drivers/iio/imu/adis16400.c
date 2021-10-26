@@ -504,6 +504,7 @@ static int adis16400_write_raw(struct iio_dev *indio_dev,
 	struct iio_chan_spec const *chan, int val, int val2, long info)
 {
 	struct adis16400_state *st = iio_priv(indio_dev);
+	struct mutex *slock = &st->adis.state_lock;
 	int ret, sps;
 
 	switch (info) {
@@ -516,18 +517,18 @@ static int adis16400_write_raw(struct iio_dev *indio_dev,
 		 * Need to cache values so we can update if the frequency
 		 * changes.
 		 */
-		adis_dev_lock(&st->adis);
+		mutex_lock(slock);
 		st->filt_int = val;
 		/* Work out update to current value */
 		sps = st->variant->get_freq(st);
 		if (sps < 0) {
-			adis_dev_unlock(&st->adis);
+			mutex_unlock(slock);
 			return sps;
 		}
 
 		ret = __adis16400_set_filter(indio_dev, sps,
 			val * 1000 + val2 / 1000);
-		adis_dev_unlock(&st->adis);
+		mutex_unlock(slock);
 		return ret;
 	case IIO_CHAN_INFO_SAMP_FREQ:
 		sps = val * 1000 + val2 / 1000;
@@ -535,9 +536,9 @@ static int adis16400_write_raw(struct iio_dev *indio_dev,
 		if (sps <= 0)
 			return -EINVAL;
 
-		adis_dev_lock(&st->adis);
+		mutex_lock(slock);
 		ret = st->variant->set_freq(st, sps);
-		adis_dev_unlock(&st->adis);
+		mutex_unlock(slock);
 		return ret;
 	default:
 		return -EINVAL;
@@ -548,6 +549,7 @@ static int adis16400_read_raw(struct iio_dev *indio_dev,
 	struct iio_chan_spec const *chan, int *val, int *val2, long info)
 {
 	struct adis16400_state *st = iio_priv(indio_dev);
+	struct mutex *slock = &st->adis.state_lock;
 	int16_t val16;
 	int ret;
 
@@ -603,17 +605,17 @@ static int adis16400_read_raw(struct iio_dev *indio_dev,
 		*val = st->variant->temp_offset;
 		return IIO_VAL_INT;
 	case IIO_CHAN_INFO_LOW_PASS_FILTER_3DB_FREQUENCY:
-		adis_dev_lock(&st->adis);
+		mutex_lock(slock);
 		/* Need both the number of taps and the sampling frequency */
 		ret = __adis_read_reg_16(&st->adis,
 						ADIS16400_SENS_AVG,
 						&val16);
 		if (ret) {
-			adis_dev_unlock(&st->adis);
+			mutex_unlock(slock);
 			return ret;
 		}
 		ret = st->variant->get_freq(st);
-		adis_dev_unlock(&st->adis);
+		mutex_unlock(slock);
 		if (ret)
 			return ret;
 		ret /= adis16400_3db_divisors[val16 & 0x07];
@@ -621,9 +623,9 @@ static int adis16400_read_raw(struct iio_dev *indio_dev,
 		*val2 = (ret % 1000) * 1000;
 		return IIO_VAL_INT_PLUS_MICRO;
 	case IIO_CHAN_INFO_SAMP_FREQ:
-		adis_dev_lock(&st->adis);
+		mutex_lock(slock);
 		ret = st->variant->get_freq(st);
-		adis_dev_unlock(&st->adis);
+		mutex_unlock(slock);
 		if (ret)
 			return ret;
 		*val = ret / 1000;

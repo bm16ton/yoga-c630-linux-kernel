@@ -22,8 +22,7 @@
 
 
 /**
- * mixart_wait_nice_for_register_value - wait for a value on a peudo register,
- * exit with a timeout
+ * wait for a value on a peudo register, exit with a timeout
  *
  * @mgr: pointer to miXart manager structure
  * @offset: unsigned pseudo_register base + offset of value

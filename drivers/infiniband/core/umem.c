@@ -47,17 +47,17 @@
 
 static void __ib_umem_release(struct ib_device *dev, struct ib_umem *umem, int dirty)
 {
-	bool make_dirty = umem->writable && dirty;
-	struct scatterlist *sg;
-	unsigned int i;
+	struct sg_page_iter sg_iter;
+	struct page *page;
 
 	if (umem->nmap > 0)
 		ib_dma_unmap_sg(dev, umem->sg_head.sgl, umem->sg_nents,
 				DMA_BIDIRECTIONAL);
 
-	for_each_sg(umem->sg_head.sgl, sg, umem->sg_nents, i)
-		unpin_user_page_range_dirty_lock(sg_page(sg),
-			DIV_ROUND_UP(sg->length, PAGE_SIZE), make_dirty);
+	for_each_sg_page(umem->sg_head.sgl, &sg_iter, umem->sg_nents, 0) {
+		page = sg_page_iter_page(&sg_iter);
+		unpin_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
+	}
 
 	sg_free_table(&umem->sg_head);
 }
@@ -99,6 +99,10 @@ unsigned long ib_umem_find_best_pgsz(struct ib_umem *umem,
 	 * from being returned.
 	 */
 	pgsz_bitmap &= GENMASK(BITS_PER_LONG - 1, PAGE_SHIFT);
+
+	/* At minimum, drivers must support PAGE_SIZE or smaller */
+	if (WARN_ON(!(pgsz_bitmap & GENMASK(PAGE_SHIFT, 0))))
+		return 0;
 
 	umem->iova = va = virt;
 	/* The best result is the smallest page size that results in the minimum
@@ -305,8 +309,8 @@ int ib_umem_copy_from(void *dst, struct ib_umem *umem, size_t offset,
 	int ret;
 
 	if (offset > umem->length || length > umem->length - offset) {
-		pr_err("%s not in range. offset: %zd umem length: %zd end: %zd\n",
-		       __func__, offset, umem->length, end);
+		pr_err("ib_umem_copy_from not in range. offset: %zd umem length: %zd end: %zd\n",
+		       offset, umem->length, end);
 		return -EINVAL;
 	}
 

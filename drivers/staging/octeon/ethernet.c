@@ -407,10 +407,14 @@ static int cvm_oct_common_set_mac_address(struct net_device *dev, void *addr)
 int cvm_oct_common_init(struct net_device *dev)
 {
 	struct octeon_ethernet *priv = netdev_priv(dev);
-	int ret;
+	const u8 *mac = NULL;
 
-	ret = of_get_mac_address(priv->of_node, dev->dev_addr);
-	if (ret)
+	if (priv->of_node)
+		mac = of_get_mac_address(priv->of_node);
+
+	if (!IS_ERR_OR_NULL(mac))
+		ether_addr_copy(dev->dev_addr, mac);
+	else
 		eth_hw_addr_random(dev);
 
 	/*
@@ -610,11 +614,14 @@ static const struct net_device_ops cvm_oct_pow_netdev_ops = {
 static struct device_node *cvm_oct_of_get_child
 				(const struct device_node *parent, int reg_val)
 {
-	struct device_node *node;
-	const __be32 *addr;
+	struct device_node *node = NULL;
 	int size;
+	const __be32 *addr;
 
-	for_each_child_of_node(parent, node) {
+	for (;;) {
+		node = of_get_next_child(parent, node);
+		if (!node)
+			break;
 		addr = of_get_property(node, "reg", &size);
 		if (addr && (be32_to_cpu(*addr) == reg_val))
 			break;

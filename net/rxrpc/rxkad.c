@@ -482,6 +482,7 @@ static int rxkad_verify_packet_1(struct rxrpc_call *call, struct sk_buff *skb,
 					     RXKADDATALEN);
 		goto protocol_error;
 	}
+	offset += sizeof(sechdr);
 	len -= sizeof(sechdr);
 
 	buf = ntohl(sechdr.data_size);
@@ -575,6 +576,7 @@ static int rxkad_verify_packet_2(struct rxrpc_call *call, struct sk_buff *skb,
 					     RXKADDATALEN);
 		goto protocol_error;
 	}
+	offset += sizeof(sechdr);
 	len -= sizeof(sechdr);
 
 	buf = ntohl(sechdr.data_size);

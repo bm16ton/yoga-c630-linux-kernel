@@ -46,9 +46,11 @@ properties:
 
 patternProperties:
   "^port@[0-9]$":
-    description: FIXME, Need to define what each port is.
-    $ref: audio-graph-port.yaml#
-    unevaluatedProperties: false
+    type: object
+    properties:
+      endpoint: true
+    required:
+      - endpoint
 
 additionalProperties: false
 

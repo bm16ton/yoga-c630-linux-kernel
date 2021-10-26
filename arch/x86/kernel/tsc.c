@@ -14,7 +14,6 @@
 #include <linux/percpu.h>
 #include <linux/timex.h>
 #include <linux/static_key.h>
-#include <linux/static_call.h>
 
 #include <asm/hpet.h>
 #include <asm/timer.h>
@@ -255,7 +254,7 @@ unsigned long long sched_clock(void)
 
 bool using_native_sched_clock(void)
 {
-	return static_call_query(pv_sched_clock) == native_sched_clock;
+	return pv_ops.time.sched_clock == native_sched_clock;
 }
 #else
 unsigned long long
@@ -740,7 +739,7 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 	 * 2) Reference counter. If available we use the HPET or the
 	 * PMTIMER as a reference to check the sanity of that value.
 	 * We use separate TSC readouts and check inside of the
-	 * reference read for any possible disturbance. We discard
+	 * reference read for any possible disturbance. We dicard
 	 * disturbed values here as well. We do that around the PIT
 	 * calibration delay loop as we have to wait for a certain
 	 * amount of time anyway.
@@ -1080,7 +1079,7 @@ static void tsc_resume(struct clocksource *cs)
  * very small window right after one CPU updated cycle_last under
  * xtime/vsyscall_gtod lock and the other CPU reads a TSC value which
  * is smaller than the cycle_last reference value due to a TSC which
- * is slightly behind. This delta is nowhere else observable, but in
+ * is slighty behind. This delta is nowhere else observable, but in
  * that case it results in a forward time jump in the range of hours
  * due to the unsigned delta calculation of the time keeping core
  * code, which is necessary to support wrapping clocksources like pm
@@ -1266,7 +1265,7 @@ EXPORT_SYMBOL(convert_art_to_tsc);
  *	corresponding clocksource
  *	@cycles:	System counter value
  *	@cs:		Clocksource corresponding to system counter value. Used
- *			by timekeeping code to verify comparability of two cycle
+ *			by timekeeping code to verify comparibility of two cycle
  *			values.
  */
 

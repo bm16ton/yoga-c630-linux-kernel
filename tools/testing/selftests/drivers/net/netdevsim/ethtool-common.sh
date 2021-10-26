@@ -24,11 +24,8 @@ function check {
     local code=$1
     local str=$2
     local exp_str=$3
-    local exp_fail=$4
 
-    [ -z "$exp_fail" ] && cop="-ne" || cop="-eq"
-
-    if [ $code $cop 0 ]; then
+    if [ $code -ne 0 ]; then
 	((num_errors++))
 	return
     fi

@@ -510,7 +510,7 @@ static int ipmi_ssif_thread(void *data)
 	return 0;
 }
 
-static void ssif_i2c_send(struct ssif_info *ssif_info,
+static int ssif_i2c_send(struct ssif_info *ssif_info,
 			ssif_i2c_done handler,
 			int read_write, int command,
 			unsigned char *data, unsigned int size)
@@ -522,6 +522,7 @@ static void ssif_i2c_send(struct ssif_info *ssif_info,
 	ssif_info->i2c_data = data;
 	ssif_info->i2c_size = size;
 	complete(&ssif_info->wake_thread);
+	return 0;
 }
 
 
@@ -530,12 +531,22 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 
 static void start_get(struct ssif_info *ssif_info)
 {
+	int rv;
+
 	ssif_info->rtc_us_timer = 0;
 	ssif_info->multi_pos = 0;
 
-	ssif_i2c_send(ssif_info, msg_done_handler, I2C_SMBUS_READ,
-		  SSIF_IPMI_RESPONSE,
-		  ssif_info->recv, I2C_SMBUS_BLOCK_DATA);
+	rv = ssif_i2c_send(ssif_info, msg_done_handler, I2C_SMBUS_READ,
+			  SSIF_IPMI_RESPONSE,
+			  ssif_info->recv, I2C_SMBUS_BLOCK_DATA);
+	if (rv < 0) {
+		/* request failed, just return the error. */
+		if (ssif_info->ssif_debug & SSIF_DEBUG_MSG)
+			dev_dbg(&ssif_info->client->dev,
+				"Error from i2c_non_blocking_op(5)\n");
+
+		msg_done_handler(ssif_info, -EIO, NULL, 0);
+	}
 }
 
 static void retry_timeout(struct timer_list *t)
@@ -609,6 +620,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 {
 	struct ipmi_smi_msg *msg;
 	unsigned long oflags, *flags;
+	int rv;
 
 	/*
 	 * We are single-threaded here, so no need for a lock until we
@@ -654,10 +666,17 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 		ssif_info->multi_len = len;
 		ssif_info->multi_pos = 1;
 
-		ssif_i2c_send(ssif_info, msg_done_handler, I2C_SMBUS_READ,
-			 SSIF_IPMI_MULTI_PART_RESPONSE_MIDDLE,
-			 ssif_info->recv, I2C_SMBUS_BLOCK_DATA);
-		return;
+		rv = ssif_i2c_send(ssif_info, msg_done_handler, I2C_SMBUS_READ,
+				  SSIF_IPMI_MULTI_PART_RESPONSE_MIDDLE,
+				  ssif_info->recv, I2C_SMBUS_BLOCK_DATA);
+		if (rv < 0) {
+			if (ssif_info->ssif_debug & SSIF_DEBUG_MSG)
+				dev_dbg(&ssif_info->client->dev,
+					"Error from i2c_non_blocking_op(1)\n");
+
+			result = -EIO;
+		} else
+			return;
 	} else if (ssif_info->multi_pos) {
 		/* Middle of multi-part read.  Start the next transaction. */
 		int i;
@@ -719,12 +738,19 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 
 			ssif_info->multi_pos++;
 
-			ssif_i2c_send(ssif_info, msg_done_handler,
-				  I2C_SMBUS_READ,
-				  SSIF_IPMI_MULTI_PART_RESPONSE_MIDDLE,
-				  ssif_info->recv,
-				  I2C_SMBUS_BLOCK_DATA);
-			return;
+			rv = ssif_i2c_send(ssif_info, msg_done_handler,
+					   I2C_SMBUS_READ,
+					   SSIF_IPMI_MULTI_PART_RESPONSE_MIDDLE,
+					   ssif_info->recv,
+					   I2C_SMBUS_BLOCK_DATA);
+			if (rv < 0) {
+				if (ssif_info->ssif_debug & SSIF_DEBUG_MSG)
+					dev_dbg(&ssif_info->client->dev,
+						"Error from ssif_i2c_send\n");
+
+				result = -EIO;
+			} else
+				return;
 		}
 	}
 
@@ -882,6 +908,8 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 static void msg_written_handler(struct ssif_info *ssif_info, int result,
 				unsigned char *data, unsigned int len)
 {
+	int rv;
+
 	/* We are single-threaded here, so no need for a lock. */
 	if (result < 0) {
 		ssif_info->retries_left--;
@@ -944,9 +972,18 @@ static void msg_written_handler(struct ssif_info *ssif_info, int result,
 			ssif_info->multi_data = NULL;
 		}
 
-		ssif_i2c_send(ssif_info, msg_written_handler,
-			  I2C_SMBUS_WRITE, cmd,
-			  data_to_send, I2C_SMBUS_BLOCK_DATA);
+		rv = ssif_i2c_send(ssif_info, msg_written_handler,
+				   I2C_SMBUS_WRITE, cmd,
+				   data_to_send, I2C_SMBUS_BLOCK_DATA);
+		if (rv < 0) {
+			/* request failed, just return the error. */
+			ssif_inc_stat(ssif_info, send_errors);
+
+			if (ssif_info->ssif_debug & SSIF_DEBUG_MSG)
+				dev_dbg(&ssif_info->client->dev,
+					"Error from i2c_non_blocking_op(3)\n");
+			msg_done_handler(ssif_info, -EIO, NULL, 0);
+		}
 	} else {
 		/* Ready to request the result. */
 		unsigned long oflags, *flags;
@@ -975,6 +1012,7 @@ static void msg_written_handler(struct ssif_info *ssif_info, int result,
 
 static int start_resend(struct ssif_info *ssif_info)
 {
+	int rv;
 	int command;
 
 	ssif_info->got_alert = false;
@@ -996,9 +1034,12 @@ static int start_resend(struct ssif_info *ssif_info)
 		ssif_info->data[0] = ssif_info->data_len;
 	}
 
-	ssif_i2c_send(ssif_info, msg_written_handler, I2C_SMBUS_WRITE,
-		   command, ssif_info->data, I2C_SMBUS_BLOCK_DATA);
-	return 0;
+	rv = ssif_i2c_send(ssif_info, msg_written_handler, I2C_SMBUS_WRITE,
+			  command, ssif_info->data, I2C_SMBUS_BLOCK_DATA);
+	if (rv && (ssif_info->ssif_debug & SSIF_DEBUG_MSG))
+		dev_dbg(&ssif_info->client->dev,
+			"Error from i2c_non_blocking_op(4)\n");
+	return rv;
 }
 
 static int start_send(struct ssif_info *ssif_info,

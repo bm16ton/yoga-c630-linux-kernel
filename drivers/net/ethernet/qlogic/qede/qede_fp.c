@@ -345,7 +345,7 @@ int qede_xdp_transmit(struct net_device *dev, int n_frames,
 	struct qede_tx_queue *xdp_tx;
 	struct xdp_frame *xdpf;
 	dma_addr_t mapping;
-	int i, nxmit = 0;
+	int i, drops = 0;
 	u16 xdp_prod;
 
 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
@@ -364,13 +364,18 @@ int qede_xdp_transmit(struct net_device *dev, int n_frames,
 
 		mapping = dma_map_single(dmadev, xdpf->data, xdpf->len,
 					 DMA_TO_DEVICE);
-		if (unlikely(dma_mapping_error(dmadev, mapping)))
-			break;
+		if (unlikely(dma_mapping_error(dmadev, mapping))) {
+			xdp_return_frame_rx_napi(xdpf);
+			drops++;
+
+			continue;
+		}
 
 		if (unlikely(qede_xdp_xmit(xdp_tx, mapping, 0, xdpf->len,
-					   NULL, xdpf)))
-			break;
-		nxmit++;
+					   NULL, xdpf))) {
+			xdp_return_frame_rx_napi(xdpf);
+			drops++;
+		}
 	}
 
 	if (flags & XDP_XMIT_FLUSH) {
@@ -382,7 +387,7 @@ int qede_xdp_transmit(struct net_device *dev, int n_frames,
 
 	spin_unlock(&xdp_tx->xdp_tx_lock);
 
-	return nxmit;
+	return n_frames - drops;
 }
 
 int qede_txq_has_work(struct qede_tx_queue *txq)
@@ -1209,9 +1214,12 @@ static int qede_rx_build_jumbo(struct qede_dev *edev,
 		dma_unmap_page(rxq->dev, bd->mapping,
 			       PAGE_SIZE, DMA_FROM_DEVICE);
 
-		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, bd->data,
-				rxq->rx_headroom, cur_size, PAGE_SIZE);
+		skb_fill_page_desc(skb, skb_shinfo(skb)->nr_frags++,
+				   bd->data, rxq->rx_headroom, cur_size);
 
+		skb->truesize += PAGE_SIZE;
+		skb->data_len += cur_size;
+		skb->len += cur_size;
 		pkt_len -= cur_size;
 	}
 

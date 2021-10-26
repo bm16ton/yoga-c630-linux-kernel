@@ -31,7 +31,6 @@ extern u32 *cpu_to_phys_id;
 extern bool coregroup_enabled;
 
 extern int cpu_to_chip_id(int cpu);
-extern int *chip_id_lookup_table;
 
 #ifdef CONFIG_SMP
 

@@ -56,7 +56,7 @@ To get and set the streaming parameters applications call the
 pointer to a struct :c:type:`v4l2_streamparm` which contains a
 union holding separate parameters for input and output devices.
 
-.. tabularcolumns:: |p{3.7cm}|p{3.5cm}|p{10.1cm}|
+.. tabularcolumns:: |p{3.5cm}|p{3.5cm}|p{3.5cm}|p{7.0cm}|
 
 .. c:type:: v4l2_streamparm
 
@@ -85,9 +85,10 @@ union holding separate parameters for input and output devices.
       - ``raw_data``\ [200]
       - A place holder for future extensions.
     * - }
+      -
 
 
-.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.5cm}|
+.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.7cm}|
 
 .. c:type:: v4l2_captureparm
 
@@ -146,7 +147,7 @@ union holding separate parameters for input and output devices.
 	the array to zero.
 
 
-.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.5cm}|
+.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.7cm}|
 
 .. c:type:: v4l2_outputparm
 
@@ -206,7 +207,7 @@ union holding separate parameters for input and output devices.
 	the array to zero.
 
 
-.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.5cm}|
+.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.7cm}|
 
 .. _parm-caps:
 
@@ -221,7 +222,7 @@ union holding separate parameters for input and output devices.
 	field.
 
 
-.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.5cm}|
+.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.7cm}|
 
 .. _parm-flags:
 

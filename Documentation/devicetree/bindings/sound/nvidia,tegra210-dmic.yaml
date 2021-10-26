@@ -16,6 +16,9 @@ maintainers:
   - Jon Hunter <jonathanh@nvidia.com>
   - Sameer Pujar <spujar@nvidia.com>
 
+allOf:
+  - $ref: audio-graph-port.yaml#
+
 properties:
   $nodename:
     pattern: "^dmic@[0-9a-f]*$"
@@ -57,18 +60,14 @@ properties:
       on the maximum available instances on a Tegra SoC.
 
   ports:
-    $ref: /schemas/graph.yaml#/properties/ports
+    type: object
     properties:
       port@0:
-        $ref: audio-graph-port.yaml#
-        unevaluatedProperties: false
         description: |
           DMIC ACIF (Audio Client Interface) port connected to the
           corresponding AHUB (Audio Hub) ACIF port.
 
       port@1:
-        $ref: audio-graph-port.yaml#
-        unevaluatedProperties: false
         description: |
           DMIC DAP (Digital Audio Port) interface which can be connected
           to external audio codec for capture.
@@ -81,7 +80,7 @@ required:
   - assigned-clocks
   - assigned-clock-parents
 
-additionalProperties: false
+unevaluatedProperties: false
 
 examples:
   - |

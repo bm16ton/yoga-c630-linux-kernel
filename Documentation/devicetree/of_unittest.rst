@@ -1,8 +1,8 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-=================================
-Open Firmware Devicetree Unittest
-=================================
+==================================
+Open Firmware Device Tree Unittest
+==================================
 
 Author: Gaurav Minocha <gaurav.minocha.os@gmail.com>
 

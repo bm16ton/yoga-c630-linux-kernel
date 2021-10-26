@@ -27,13 +27,13 @@ static int mock_object_init(struct intel_memory_region *mem,
 		return -E2BIG;
 
 	drm_gem_private_object_init(&i915->drm, &obj->base, size);
-	i915_gem_object_init(obj, &mock_region_obj_ops, &lock_class, flags);
+	i915_gem_object_init(obj, &mock_region_obj_ops, &lock_class);
 
 	obj->read_domains = I915_GEM_DOMAIN_CPU | I915_GEM_DOMAIN_GTT;
 
 	i915_gem_object_set_cache_coherency(obj, I915_CACHE_NONE);
 
-	i915_gem_object_init_memory_region(obj, mem);
+	i915_gem_object_init_memory_region(obj, mem, flags);
 
 	return 0;
 }

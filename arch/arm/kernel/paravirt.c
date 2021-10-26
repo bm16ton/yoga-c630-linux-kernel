@@ -9,15 +9,10 @@
 #include <linux/export.h>
 #include <linux/jump_label.h>
 #include <linux/types.h>
-#include <linux/static_call.h>
 #include <asm/paravirt.h>
 
 struct static_key paravirt_steal_enabled;
 struct static_key paravirt_steal_rq_enabled;
 
-static u64 native_steal_clock(int cpu)
-{
-	return 0;
-}
-
-DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
+struct paravirt_patch_template pv_ops;
+EXPORT_SYMBOL_GPL(pv_ops);

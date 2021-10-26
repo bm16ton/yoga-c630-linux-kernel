@@ -151,13 +151,12 @@ static inline bool in_vfork(struct task_struct *tsk)
  * Applies per-task gfp context to the given allocation flags.
  * PF_MEMALLOC_NOIO implies GFP_NOIO
  * PF_MEMALLOC_NOFS implies GFP_NOFS
- * PF_MEMALLOC_PIN  implies !GFP_MOVABLE
  */
 static inline gfp_t current_gfp_context(gfp_t flags)
 {
 	unsigned int pflags = READ_ONCE(current->flags);
 
-	if (unlikely(pflags & (PF_MEMALLOC_NOIO | PF_MEMALLOC_NOFS | PF_MEMALLOC_PIN))) {
+	if (unlikely(pflags & (PF_MEMALLOC_NOIO | PF_MEMALLOC_NOFS))) {
 		/*
 		 * NOIO implies both NOIO and NOFS and it is a weaker context
 		 * so always make sure it makes precedence
@@ -166,9 +165,6 @@ static inline gfp_t current_gfp_context(gfp_t flags)
 			flags &= ~(__GFP_IO | __GFP_FS);
 		else if (pflags & PF_MEMALLOC_NOFS)
 			flags &= ~__GFP_FS;
-
-		if (pflags & PF_MEMALLOC_PIN)
-			flags &= ~__GFP_MOVABLE;
 	}
 	return flags;
 }
@@ -275,18 +271,29 @@ static inline void memalloc_noreclaim_restore(unsigned int flags)
 	current->flags = (current->flags & ~PF_MEMALLOC) | flags;
 }
 
-static inline unsigned int memalloc_pin_save(void)
+#ifdef CONFIG_CMA
+static inline unsigned int memalloc_nocma_save(void)
 {
-	unsigned int flags = current->flags & PF_MEMALLOC_PIN;
+	unsigned int flags = current->flags & PF_MEMALLOC_NOCMA;
 
-	current->flags |= PF_MEMALLOC_PIN;
+	current->flags |= PF_MEMALLOC_NOCMA;
 	return flags;
 }
 
-static inline void memalloc_pin_restore(unsigned int flags)
+static inline void memalloc_nocma_restore(unsigned int flags)
 {
-	current->flags = (current->flags & ~PF_MEMALLOC_PIN) | flags;
+	current->flags = (current->flags & ~PF_MEMALLOC_NOCMA) | flags;
 }
+#else
+static inline unsigned int memalloc_nocma_save(void)
+{
+	return 0;
+}
+
+static inline void memalloc_nocma_restore(unsigned int flags)
+{
+}
+#endif
 
 #ifdef CONFIG_MEMCG
 DECLARE_PER_CPU(struct mem_cgroup *, int_active_memcg);

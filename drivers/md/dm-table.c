@@ -94,6 +94,24 @@ static int setup_btree_index(unsigned int l, struct dm_table *t)
 	return 0;
 }
 
+void *dm_vcalloc(unsigned long nmemb, unsigned long elem_size)
+{
+	unsigned long size;
+	void *addr;
+
+	/*
+	 * Check that we're not going to overflow.
+	 */
+	if (nmemb > (ULONG_MAX / elem_size))
+		return NULL;
+
+	size = nmemb * elem_size;
+	addr = vzalloc(size);
+
+	return addr;
+}
+EXPORT_SYMBOL(dm_vcalloc);
+
 /*
  * highs, and targets are managed as dynamic arrays during a
  * table load.
@@ -106,15 +124,15 @@ static int alloc_targets(struct dm_table *t, unsigned int num)
 	/*
 	 * Allocate both the target array and offset array at once.
 	 */
-	n_highs = kvcalloc(num, sizeof(struct dm_target) + sizeof(sector_t),
-			   GFP_KERNEL);
+	n_highs = (sector_t *) dm_vcalloc(num, sizeof(struct dm_target) +
+					  sizeof(sector_t));
 	if (!n_highs)
 		return -ENOMEM;
 
 	n_targets = (struct dm_target *) (n_highs + num);
 
 	memset(n_highs, -1, sizeof(*n_highs) * num);
-	kvfree(t->highs);
+	vfree(t->highs);
 
 	t->num_allocated = num;
 	t->highs = n_highs;
@@ -180,7 +198,7 @@ void dm_table_destroy(struct dm_table *t)
 
 	/* free the indexes */
 	if (t->depth >= 2)
-		kvfree(t->index[t->depth - 2]);
+		vfree(t->index[t->depth - 2]);
 
 	/* free the targets */
 	for (i = 0; i < t->num_targets; i++) {
@@ -192,7 +210,7 @@ void dm_table_destroy(struct dm_table *t)
 		dm_put_target_type(tgt->type);
 	}
 
-	kvfree(t->highs);
+	vfree(t->highs);
 
 	/* free the device list */
 	free_devices(&t->devices, t->md);
@@ -1059,7 +1077,7 @@ static int setup_indexes(struct dm_table *t)
 		total += t->counts[i];
 	}
 
-	indexes = kvcalloc(total, NODE_SIZE, GFP_KERNEL);
+	indexes = (sector_t *) dm_vcalloc(total, (unsigned long) NODE_SIZE);
 	if (!indexes)
 		return -ENOMEM;
 

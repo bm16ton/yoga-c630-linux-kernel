@@ -32,6 +32,7 @@
 
 #include <drm/drm.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_debugfs.h>
 #include <drm/drm_device.h>
 #include <drm/drm_file.h>
 #include <drm/radeon_drm.h>
@@ -82,7 +83,7 @@ void rv370_pcie_wreg(struct radeon_device *rdev, uint32_t reg, uint32_t v)
 /*
  * rv370,rv380 PCIE GART
  */
-static void rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev);
+static int rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev);
 
 void rv370_pcie_gart_tlb_flush(struct radeon_device *rdev)
 {
@@ -139,8 +140,9 @@ int rv370_pcie_gart_init(struct radeon_device *rdev)
 	r = radeon_gart_init(rdev);
 	if (r)
 		return r;
-	rv370_debugfs_pcie_gart_info_init(rdev);
-
+	r = rv370_debugfs_pcie_gart_info_init(rdev);
+	if (r)
+		DRM_ERROR("Failed to register debugfs file for PCIE gart !\n");
 	rdev->gart.table_size = rdev->gart.num_gpu_pages * 4;
 	rdev->asic->gart.tlb_flush = &rv370_pcie_gart_tlb_flush;
 	rdev->asic->gart.get_page_entry = &rv370_pcie_gart_get_page_entry;
@@ -588,9 +590,11 @@ int rv370_get_pcie_lanes(struct radeon_device *rdev)
 }
 
 #if defined(CONFIG_DEBUG_FS)
-static int rv370_debugfs_pcie_gart_info_show(struct seq_file *m, void *unused)
+static int rv370_debugfs_pcie_gart_info(struct seq_file *m, void *data)
 {
-	struct radeon_device *rdev = (struct radeon_device *)m->private;
+	struct drm_info_node *node = (struct drm_info_node *) m->private;
+	struct drm_device *dev = node->minor->dev;
+	struct radeon_device *rdev = dev->dev_private;
 	uint32_t tmp;
 
 	tmp = RREG32_PCIE(RADEON_PCIE_TX_GART_CNTL);
@@ -610,16 +614,17 @@ static int rv370_debugfs_pcie_gart_info_show(struct seq_file *m, void *unused)
 	return 0;
 }
 
-DEFINE_SHOW_ATTRIBUTE(rv370_debugfs_pcie_gart_info);
+static struct drm_info_list rv370_pcie_gart_info_list[] = {
+	{"rv370_pcie_gart_info", rv370_debugfs_pcie_gart_info, 0, NULL},
+};
 #endif
 
-static void rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev)
+static int rv370_debugfs_pcie_gart_info_init(struct radeon_device *rdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	struct dentry *root = rdev->ddev->primary->debugfs_root;
-
-	debugfs_create_file("rv370_pcie_gart_info", 0444, root, rdev,
-			    &rv370_debugfs_pcie_gart_info_fops);
+	return radeon_debugfs_add_files(rdev, rv370_pcie_gart_info_list, 1);
+#else
+	return 0;
 #endif
 }
 
@@ -1326,8 +1331,12 @@ void r300_set_reg_safe(struct radeon_device *rdev)
 void r300_mc_program(struct radeon_device *rdev)
 {
 	struct r100_mc_save save;
+	int r;
 
-	r100_debugfs_mc_info_init(rdev);
+	r = r100_debugfs_mc_info_init(rdev);
+	if (r) {
+		dev_err(rdev->dev, "Failed to create r100_mc debugfs file.\n");
+	}
 
 	/* Stops all mc clients */
 	r100_mc_stop(rdev, &save);

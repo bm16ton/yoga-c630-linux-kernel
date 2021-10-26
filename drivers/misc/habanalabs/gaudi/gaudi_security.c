@@ -9556,6 +9556,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC0_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC0_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC0_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC0_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC0_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC0_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC0_CFG_TPC_STALL & 0x7F) >> 2);
@@ -10010,6 +10011,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC1_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC1_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC1_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC1_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC1_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC1_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC1_CFG_TPC_STALL & 0x7F) >> 2);
@@ -10463,6 +10465,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC2_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC2_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC2_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC2_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC2_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC2_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC2_CFG_TPC_STALL & 0x7F) >> 2);
@@ -10916,6 +10919,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC3_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC3_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC3_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC3_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC3_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC3_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC3_CFG_TPC_STALL & 0x7F) >> 2);
@@ -11369,6 +11373,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC4_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC4_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC4_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC4_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC4_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC4_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC4_CFG_TPC_STALL & 0x7F) >> 2);
@@ -11822,6 +11827,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC5_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC5_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC5_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC5_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC5_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC5_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC5_CFG_TPC_STALL & 0x7F) >> 2);
@@ -12277,6 +12283,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC6_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC6_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC6_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC6_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC6_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC6_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC6_CFG_TPC_STALL & 0x7F) >> 2);
@@ -12732,6 +12739,7 @@ static void gaudi_init_tpc_protection_bits(struct hl_device *hdev)
 	mask = 1U << ((mmTPC7_CFG_PROT & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC7_CFG_VFLAGS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC7_CFG_SFLAGS & 0x7F) >> 2);
+	mask |= 1U << ((mmTPC7_CFG_STATUS & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC7_CFG_CFG_BASE_ADDRESS_HIGH & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC7_CFG_CFG_SUBTRACT_VALUE & 0x7F) >> 2);
 	mask |= 1U << ((mmTPC7_CFG_TPC_STALL & 0x7F) >> 2);

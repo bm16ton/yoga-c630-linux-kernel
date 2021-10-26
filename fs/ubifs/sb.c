@@ -53,9 +53,6 @@
 
 static int get_default_compressor(struct ubifs_info *c)
 {
-	if (ubifs_compr_present(c, UBIFS_COMPR_ZSTD))
-		return UBIFS_COMPR_ZSTD;
-
 	if (ubifs_compr_present(c, UBIFS_COMPR_LZO))
 		return UBIFS_COMPR_LZO;
 

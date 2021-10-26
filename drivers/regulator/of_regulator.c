@@ -422,11 +422,7 @@ device_node *regulator_of_get_init_node(struct device *dev,
 
 		if (!strcmp(desc->of_match, name)) {
 			of_node_put(search);
-			/*
-			 * 'of_node_get(child)' is already performed by the
-			 * for_each loop.
-			 */
-			return child;
+			return of_node_get(child);
 		}
 	}
 

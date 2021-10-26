@@ -1575,7 +1575,8 @@ ia_css_isp_3a_statistics_map_allocate(
 	return me;
 
 err:
-	kvfree(me);
+	if (me)
+		kvfree(me);
 	return NULL;
 }
 
@@ -3005,7 +3006,8 @@ ia_css_stream_isp_parameters_uninit(struct ia_css_stream *stream)
 	}
 
 	kvfree(params);
-	kvfree(per_frame_params);
+	if (per_frame_params)
+		kvfree(per_frame_params);
 	stream->isp_params_configs = NULL;
 	stream->per_frame_isp_params_configs = NULL;
 
@@ -4647,8 +4649,10 @@ ia_css_dvs2_6axis_config_allocate(const struct ia_css_stream *stream)
 	params = stream->isp_params_configs;
 
 	/* Backward compatibility by default consider pipe as Video*/
-	if (!params || !params->pipe_dvs_6axis_config[IA_CSS_PIPE_ID_VIDEO])
+	if (!params || (params &&
+			!params->pipe_dvs_6axis_config[IA_CSS_PIPE_ID_VIDEO])) {
 		goto err;
+	}
 
 	dvs_config = kvcalloc(1, sizeof(struct ia_css_dvs_6axis_config),
 			      GFP_KERNEL);

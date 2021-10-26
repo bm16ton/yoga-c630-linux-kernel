@@ -11,7 +11,7 @@ void arch_fetch_insn(struct perf_sample *sample,
 		     struct machine *machine)
 {
 	struct insn insn;
-	int len, ret;
+	int len;
 	bool is64bit = false;
 
 	if (!sample->ip)
@@ -19,9 +19,8 @@ void arch_fetch_insn(struct perf_sample *sample,
 	len = thread__memcpy(thread, machine, sample->insn, sample->ip, sizeof(sample->insn), &is64bit);
 	if (len <= 0)
 		return;
-
-	ret = insn_decode(&insn, sample->insn, len,
-			  is64bit ? INSN_MODE_64 : INSN_MODE_32);
-	if (ret >= 0 && insn.length <= len)
+	insn_init(&insn, sample->insn, len, is64bit);
+	insn_get_length(&insn);
+	if (insn_complete(&insn) && insn.length <= len)
 		sample->insn_len = insn.length;
 }

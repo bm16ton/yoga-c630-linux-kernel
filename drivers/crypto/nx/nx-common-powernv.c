@@ -932,10 +932,8 @@ static int __init nx_powernv_probe_vas(struct device_node *pn)
 			ret = find_nx_device_tree(dn, chip_id, vasid,
 				NX_CT_GZIP, "ibm,p9-nx-gzip", &ct_gzip);
 
-		if (ret) {
-			of_node_put(dn);
+		if (ret)
 			return ret;
-		}
 	}
 
 	if (!ct_842 || !ct_gzip) {

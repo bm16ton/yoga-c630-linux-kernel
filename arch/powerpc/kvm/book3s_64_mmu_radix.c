@@ -993,8 +993,8 @@ int kvmppc_book3s_radix_page_fault(struct kvm_vcpu *vcpu,
 }
 
 /* Called with kvm->mmu_lock held */
-void kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
-		     unsigned long gfn)
+int kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+		    unsigned long gfn)
 {
 	pte_t *ptep;
 	unsigned long gpa = gfn << PAGE_SHIFT;
@@ -1002,23 +1002,24 @@ void kvm_unmap_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
 
 	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE) {
 		uv_page_inval(kvm->arch.lpid, gpa, PAGE_SHIFT);
-		return;
+		return 0;
 	}
 
 	ptep = find_kvm_secondary_pte(kvm, gpa, &shift);
 	if (ptep && pte_present(*ptep))
 		kvmppc_unmap_pte(kvm, ptep, gpa, shift, memslot,
 				 kvm->arch.lpid);
+	return 0;
 }
 
 /* Called with kvm->mmu_lock held */
-bool kvm_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
-		   unsigned long gfn)
+int kvm_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+		  unsigned long gfn)
 {
 	pte_t *ptep;
 	unsigned long gpa = gfn << PAGE_SHIFT;
 	unsigned int shift;
-	bool ref = false;
+	int ref = 0;
 	unsigned long old, *rmapp;
 
 	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)
@@ -1034,27 +1035,26 @@ bool kvm_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
 		kvmhv_update_nest_rmap_rc_list(kvm, rmapp, _PAGE_ACCESSED, 0,
 					       old & PTE_RPN_MASK,
 					       1UL << shift);
-		ref = true;
+		ref = 1;
 	}
 	return ref;
 }
 
 /* Called with kvm->mmu_lock held */
-bool kvm_test_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
-			unsigned long gfn)
-
+int kvm_test_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+		       unsigned long gfn)
 {
 	pte_t *ptep;
 	unsigned long gpa = gfn << PAGE_SHIFT;
 	unsigned int shift;
-	bool ref = false;
+	int ref = 0;
 
 	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)
 		return ref;
 
 	ptep = find_kvm_secondary_pte(kvm, gpa, &shift);
 	if (ptep && pte_present(*ptep) && pte_young(*ptep))
-		ref = true;
+		ref = 1;
 	return ref;
 }
 

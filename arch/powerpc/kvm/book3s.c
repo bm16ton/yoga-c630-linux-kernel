@@ -834,24 +834,26 @@ void kvmppc_core_commit_memory_region(struct kvm *kvm,
 	kvm->arch.kvm_ops->commit_memory_region(kvm, mem, old, new, change);
 }
 
-bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
+			unsigned flags)
 {
-	return kvm->arch.kvm_ops->unmap_gfn_range(kvm, range);
+	return kvm->arch.kvm_ops->unmap_hva_range(kvm, start, end);
 }
 
-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
 {
-	return kvm->arch.kvm_ops->age_gfn(kvm, range);
+	return kvm->arch.kvm_ops->age_hva(kvm, start, end);
 }
 
-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
 {
-	return kvm->arch.kvm_ops->test_age_gfn(kvm, range);
+	return kvm->arch.kvm_ops->test_age_hva(kvm, hva);
 }
 
-bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
 {
-	return kvm->arch.kvm_ops->set_spte_gfn(kvm, range);
+	kvm->arch.kvm_ops->set_spte_hva(kvm, hva, pte);
+	return 0;
 }
 
 int kvmppc_core_init_vm(struct kvm *kvm)

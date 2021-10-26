@@ -18,7 +18,6 @@
 #include <linux/module.h>
 #include <linux/pci.h>
 #include <linux/ptp_clock_kernel.h>
-#include <linux/ptp_pch.h>
 #include <linux/slab.h>
 
 #define STATION_ADDR_LEN	20
@@ -37,8 +36,7 @@ enum pch_status {
 	PCH_FAILED,
 	PCH_UNSUPPORTED,
 };
-
-/*
+/**
  * struct pch_ts_regs - IEEE 1588 registers
  */
 struct pch_ts_regs {
@@ -104,8 +102,7 @@ struct pch_ts_regs {
 
 #define PCH_IEEE1588_ETH	(1 << 0)
 #define PCH_IEEE1588_CAN	(1 << 1)
-
-/*
+/**
  * struct pch_dev - Driver private data
  */
 struct pch_dev {
@@ -122,7 +119,7 @@ struct pch_dev {
 	spinlock_t register_lock;
 };
 
-/*
+/**
  * struct pch_params - 1588 module parameter
  */
 struct pch_params {
@@ -181,6 +178,17 @@ static inline void pch_block_reset(struct pch_dev *chip)
 	val = val & ~PCH_TSC_RESET;
 	iowrite32(val, (&chip->regs->control));
 }
+
+u32 pch_ch_control_read(struct pci_dev *pdev)
+{
+	struct pch_dev *chip = pci_get_drvdata(pdev);
+	u32 val;
+
+	val = ioread32(&chip->regs->ch_control);
+
+	return val;
+}
+EXPORT_SYMBOL(pch_ch_control_read);
 
 void pch_ch_control_write(struct pci_dev *pdev, u32 val)
 {
@@ -288,7 +296,6 @@ static void pch_reset(struct pch_dev *chip)
  *				    IEEE 1588 hardware when looking at PTP
  *				    traffic on the  ethernet interface
  * @addr:	dress which contain the column separated address to be used.
- * @pdev:	PCI device.
  */
 int pch_set_station_address(u8 *addr, struct pci_dev *pdev)
 {

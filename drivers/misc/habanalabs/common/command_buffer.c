@@ -181,7 +181,7 @@ static void cb_release(struct kref *ref)
 static struct hl_cb *hl_cb_alloc(struct hl_device *hdev, u32 cb_size,
 					int ctx_id, bool internal_cb)
 {
-	struct hl_cb *cb = NULL;
+	struct hl_cb *cb;
 	u32 cb_offset;
 	void *p;
 
@@ -193,10 +193,9 @@ static struct hl_cb *hl_cb_alloc(struct hl_device *hdev, u32 cb_size,
 	 * the kernel's copy. Hence, we must never sleep in this code section
 	 * and must use GFP_ATOMIC for all memory allocations.
 	 */
-	if (ctx_id == HL_KERNEL_ASID_ID && !hdev->disabled)
+	if (ctx_id == HL_KERNEL_ASID_ID)
 		cb = kzalloc(sizeof(*cb), GFP_ATOMIC);
-
-	if (!cb)
+	else
 		cb = kzalloc(sizeof(*cb), GFP_KERNEL);
 
 	if (!cb)
@@ -215,9 +214,6 @@ static struct hl_cb *hl_cb_alloc(struct hl_device *hdev, u32 cb_size,
 	} else if (ctx_id == HL_KERNEL_ASID_ID) {
 		p = hdev->asic_funcs->asic_dma_alloc_coherent(hdev, cb_size,
 						&cb->bus_address, GFP_ATOMIC);
-		if (!p)
-			p = hdev->asic_funcs->asic_dma_alloc_coherent(hdev,
-					cb_size, &cb->bus_address, GFP_KERNEL);
 	} else {
 		p = hdev->asic_funcs->asic_dma_alloc_coherent(hdev, cb_size,
 						&cb->bus_address,
@@ -314,8 +310,6 @@ int hl_cb_create(struct hl_device *hdev, struct hl_cb_mgr *mgr,
 
 	spin_lock(&mgr->cb_lock);
 	rc = idr_alloc(&mgr->cb_handles, cb, 1, 0, GFP_ATOMIC);
-	if (rc < 0)
-		rc = idr_alloc(&mgr->cb_handles, cb, 1, 0, GFP_KERNEL);
 	spin_unlock(&mgr->cb_lock);
 
 	if (rc < 0) {

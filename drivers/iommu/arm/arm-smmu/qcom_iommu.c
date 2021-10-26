@@ -847,7 +847,10 @@ static int qcom_iommu_device_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	ret = iommu_device_register(&qcom_iommu->iommu, &qcom_iommu_ops, dev);
+	iommu_device_set_ops(&qcom_iommu->iommu, &qcom_iommu_ops);
+	iommu_device_set_fwnode(&qcom_iommu->iommu, dev->fwnode);
+
+	ret = iommu_device_register(&qcom_iommu->iommu);
 	if (ret) {
 		dev_err(dev, "Failed to register iommu\n");
 		return ret;

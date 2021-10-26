@@ -21,11 +21,11 @@
 
 /* define the XP debug device structures to be used with dev_dbg() et al */
 
-static struct device_driver xp_dbg_name = {
+struct device_driver xp_dbg_name = {
 	.name = "xp"
 };
 
-static struct device xp_dbg_subname = {
+struct device xp_dbg_subname = {
 	.init_name = "",		/* set to "" */
 	.driver = &xp_dbg_name
 };

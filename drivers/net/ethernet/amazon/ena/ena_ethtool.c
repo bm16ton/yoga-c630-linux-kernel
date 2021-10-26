@@ -251,10 +251,10 @@ static void ena_queue_strings(struct ena_adapter *adapter, u8 **data)
 		for (j = 0; j < ENA_STATS_ARRAY_TX; j++) {
 			ena_stats = &ena_stats_tx_strings[j];
 
-			ethtool_sprintf(data,
-					"queue_%u_%s_%s", i,
-					is_xdp ? "xdp_tx" : "tx",
-					ena_stats->name);
+			snprintf(*data, ETH_GSTRING_LEN,
+				 "queue_%u_%s_%s", i,
+				 is_xdp ? "xdp_tx" : "tx", ena_stats->name);
+			(*data) += ETH_GSTRING_LEN;
 		}
 
 		if (!is_xdp) {
@@ -264,9 +264,9 @@ static void ena_queue_strings(struct ena_adapter *adapter, u8 **data)
 			for (j = 0; j < ENA_STATS_ARRAY_RX; j++) {
 				ena_stats = &ena_stats_rx_strings[j];
 
-				ethtool_sprintf(data,
-						"queue_%u_rx_%s", i,
-						ena_stats->name);
+				snprintf(*data, ETH_GSTRING_LEN,
+					 "queue_%u_rx_%s", i, ena_stats->name);
+				(*data) += ETH_GSTRING_LEN;
 			}
 		}
 	}
@@ -280,8 +280,9 @@ static void ena_com_dev_strings(u8 **data)
 	for (i = 0; i < ENA_STATS_ARRAY_ENA_COM; i++) {
 		ena_stats = &ena_stats_ena_com_strings[i];
 
-		ethtool_sprintf(data,
-				"ena_admin_q_%s", ena_stats->name);
+		snprintf(*data, ETH_GSTRING_LEN,
+			 "ena_admin_q_%s", ena_stats->name);
+		(*data) += ETH_GSTRING_LEN;
 	}
 }
 
@@ -294,13 +295,15 @@ static void ena_get_strings(struct ena_adapter *adapter,
 
 	for (i = 0; i < ENA_STATS_ARRAY_GLOBAL; i++) {
 		ena_stats = &ena_stats_global_strings[i];
-		ethtool_sprintf(&data, ena_stats->name);
+		memcpy(data, ena_stats->name, ETH_GSTRING_LEN);
+		data += ETH_GSTRING_LEN;
 	}
 
 	if (eni_stats_needed) {
 		for (i = 0; i < ENA_STATS_ARRAY_ENI(adapter); i++) {
 			ena_stats = &ena_stats_eni_strings[i];
-			ethtool_sprintf(&data, ena_stats->name);
+			memcpy(data, ena_stats->name, ETH_GSTRING_LEN);
+			data += ETH_GSTRING_LEN;
 		}
 	}
 

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 #include <linux/types.h>
+#include <linux/version.h>
 #include <linux/vmalloc.h>
 #include <linux/mm.h>
 #include <linux/clockchips.h>
@@ -92,9 +93,10 @@ int hv_call_deposit_pages(int node, u64 partition_id, u32 num_pages)
 	status = hv_do_rep_hypercall(HVCALL_DEPOSIT_MEMORY,
 				     page_count, 0, input_page, NULL);
 	local_irq_restore(flags);
-	if (!hv_result_success(status)) {
+
+	if ((status & HV_HYPERCALL_RESULT_MASK) != HV_STATUS_SUCCESS) {
 		pr_err("Failed to deposit pages: %lld\n", status);
-		ret = hv_result(status);
+		ret = status;
 		goto err_free_allocations;
 	}
 
@@ -120,7 +122,7 @@ int hv_call_add_logical_proc(int node, u32 lp_index, u32 apic_id)
 	struct hv_add_logical_processor_out *output;
 	u64 status;
 	unsigned long flags;
-	int ret = HV_STATUS_SUCCESS;
+	int ret = 0;
 	int pxm = node_to_pxm(node);
 
 	/*
@@ -146,11 +148,13 @@ int hv_call_add_logical_proc(int node, u32 lp_index, u32 apic_id)
 					 input, output);
 		local_irq_restore(flags);
 
-		if (hv_result(status) != HV_STATUS_INSUFFICIENT_MEMORY) {
-			if (!hv_result_success(status)) {
+		status &= HV_HYPERCALL_RESULT_MASK;
+
+		if (status != HV_STATUS_INSUFFICIENT_MEMORY) {
+			if (status != HV_STATUS_SUCCESS) {
 				pr_err("%s: cpu %u apic ID %u, %lld\n", __func__,
 				       lp_index, apic_id, status);
-				ret = hv_result(status);
+				ret = status;
 			}
 			break;
 		}
@@ -165,7 +169,7 @@ int hv_call_create_vp(int node, u64 partition_id, u32 vp_index, u32 flags)
 	struct hv_create_vp *input;
 	u64 status;
 	unsigned long irq_flags;
-	int ret = HV_STATUS_SUCCESS;
+	int ret = 0;
 	int pxm = node_to_pxm(node);
 
 	/* Root VPs don't seem to need pages deposited */
@@ -196,11 +200,13 @@ int hv_call_create_vp(int node, u64 partition_id, u32 vp_index, u32 flags)
 		status = hv_do_hypercall(HVCALL_CREATE_VP, input, NULL);
 		local_irq_restore(irq_flags);
 
-		if (hv_result(status) != HV_STATUS_INSUFFICIENT_MEMORY) {
-			if (!hv_result_success(status)) {
+		status &= HV_HYPERCALL_RESULT_MASK;
+
+		if (status != HV_STATUS_INSUFFICIENT_MEMORY) {
+			if (status != HV_STATUS_SUCCESS) {
 				pr_err("%s: vcpu %u, lp %u, %lld\n", __func__,
 				       vp_index, flags, status);
-				ret = hv_result(status);
+				ret = status;
 			}
 			break;
 		}

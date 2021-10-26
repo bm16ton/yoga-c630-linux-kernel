@@ -515,7 +515,7 @@ err_unprepare_mclk:
 	return ret;
 }
 
-static const struct of_device_id rk3328_codec_of_match[] __maybe_unused = {
+static const struct of_device_id rk3328_codec_of_match[] = {
 		{ .compatible = "rockchip,rk3328-codec", },
 		{},
 };

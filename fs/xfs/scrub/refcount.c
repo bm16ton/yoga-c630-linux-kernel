@@ -19,9 +19,10 @@
  */
 int
 xchk_setup_ag_refcountbt(
-	struct xfs_scrub	*sc)
+	struct xfs_scrub	*sc,
+	struct xfs_inode	*ip)
 {
-	return xchk_setup_ag_btree(sc, false);
+	return xchk_setup_ag_btree(sc, ip, false);
 }
 
 /* Reference count btree scrubber. */

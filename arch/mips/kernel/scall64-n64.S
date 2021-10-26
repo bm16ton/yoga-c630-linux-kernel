@@ -113,4 +113,5 @@ illegal_syscall:
 	.align	3
 	.type	sys_call_table, @object
 EXPORT(sys_call_table)
-#include <asm/syscall_table_n64.h>
+#include <asm/syscall_table_64_n64.h>
+#undef __SYSCALL

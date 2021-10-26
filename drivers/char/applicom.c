@@ -836,7 +836,7 @@ static long ac_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	Dummy = readb(apbs[IndexCard].RamIO + VERS);
 	kfree(adgl);
 	mutex_unlock(&ac_mutex);
-	return ret;
+	return 0;
 
 err:
 	if (warncount) {

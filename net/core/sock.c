@@ -1172,7 +1172,7 @@ set_sndbuf:
 			if (val < 0)
 				ret = -EINVAL;
 			else
-				WRITE_ONCE(sk->sk_ll_usec, val);
+				sk->sk_ll_usec = val;
 		}
 		break;
 	case SO_PREFER_BUSY_POLL:
@@ -3546,7 +3546,7 @@ int proto_register(struct proto *prot, int alloc_slab)
 	return ret;
 
 out_free_timewait_sock_slab:
-	if (alloc_slab)
+	if (alloc_slab && prot->twsk_prot)
 		tw_prot_cleanup(prot->twsk_prot);
 out_free_request_sock_slab:
 	if (alloc_slab) {

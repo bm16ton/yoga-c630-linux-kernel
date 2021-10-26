@@ -1948,4 +1948,15 @@ static struct pci_driver fealnx_driver = {
 	.remove		= fealnx_remove_one,
 };
 
-module_pci_driver(fealnx_driver);
+static int __init fealnx_init(void)
+{
+	return pci_register_driver(&fealnx_driver);
+}
+
+static void __exit fealnx_exit(void)
+{
+	pci_unregister_driver(&fealnx_driver);
+}
+
+module_init(fealnx_init);
+module_exit(fealnx_exit);

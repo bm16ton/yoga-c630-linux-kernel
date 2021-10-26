@@ -1056,7 +1056,19 @@ static struct mtd_blktrans_ops ftl_tr = {
 	.owner		= THIS_MODULE,
 };
 
-module_mtd_blktrans(ftl_tr);
+static int __init init_ftl(void)
+{
+	return register_mtd_blktrans(&ftl_tr);
+}
+
+static void __exit cleanup_ftl(void)
+{
+	deregister_mtd_blktrans(&ftl_tr);
+}
+
+module_init(init_ftl);
+module_exit(cleanup_ftl);
+
 
 MODULE_LICENSE("Dual MPL/GPL");
 MODULE_AUTHOR("David Hinds <dahinds@users.sourceforge.net>");

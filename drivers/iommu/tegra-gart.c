@@ -353,7 +353,10 @@ struct gart_device *tegra_gart_probe(struct device *dev, struct tegra_mc *mc)
 	if (err)
 		goto free_gart;
 
-	err = iommu_device_register(&gart->iommu, &gart_iommu_ops, dev);
+	iommu_device_set_ops(&gart->iommu, &gart_iommu_ops);
+	iommu_device_set_fwnode(&gart->iommu, dev->fwnode);
+
+	err = iommu_device_register(&gart->iommu);
 	if (err)
 		goto remove_sysfs;
 

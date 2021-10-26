@@ -7,6 +7,7 @@
 #include <linux/crash_dump.h>
 #include <linux/module.h>
 #include <linux/pci.h>
+#include <linux/version.h>
 #include <linux/device.h>
 #include <linux/netdevice.h>
 #include <linux/etherdevice.h>

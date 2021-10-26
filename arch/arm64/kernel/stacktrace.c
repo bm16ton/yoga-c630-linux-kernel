@@ -32,30 +32,6 @@
  *	add	sp, sp, #0x10
  */
 
-
-void start_backtrace(struct stackframe *frame, unsigned long fp,
-		     unsigned long pc)
-{
-	frame->fp = fp;
-	frame->pc = pc;
-#ifdef CONFIG_FUNCTION_GRAPH_TRACER
-	frame->graph = 0;
-#endif
-
-	/*
-	 * Prime the first unwind.
-	 *
-	 * In unwind_frame() we'll check that the FP points to a valid stack,
-	 * which can't be STACK_TYPE_UNKNOWN, and the first unwind will be
-	 * treated as a transition to whichever stack that happens to be. The
-	 * prev_fp value won't be used, but we set it to 0 such that it is
-	 * definitely not an accessible stack address.
-	 */
-	bitmap_zero(frame->stacks_done, __NR_STACK_TYPES);
-	frame->prev_fp = 0;
-	frame->prev_type = STACK_TYPE_UNKNOWN;
-}
-
 /*
  * Unwind from one frame record (A) to the next frame record (B).
  *
@@ -220,7 +196,7 @@ void show_stack(struct task_struct *tsk, unsigned long *sp, const char *loglvl)
 
 #ifdef CONFIG_STACKTRACE
 
-noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
+noinline void arch_stack_walk(stack_trace_consume_fn consume_entry,
 			      void *cookie, struct task_struct *task,
 			      struct pt_regs *regs)
 {

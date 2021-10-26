@@ -461,6 +461,7 @@ int reiserfs_in_journal(struct super_block *sb,
 			b_blocknr_t * next_zero_bit)
 {
 	struct reiserfs_journal *journal = SB_JOURNAL(sb);
+	struct reiserfs_journal_cnode *cn;
 	struct reiserfs_list_bitmap *jb;
 	int i;
 	unsigned long bl;
@@ -496,12 +497,13 @@ int reiserfs_in_journal(struct super_block *sb,
 	bl = bmap_nr * (sb->s_blocksize << 3) + bit_nr;
 	/* is it in any old transactions? */
 	if (search_all
-	    && (get_journal_hash_dev(sb, journal->j_list_hash_table, bl))) {
+	    && (cn =
+		get_journal_hash_dev(sb, journal->j_list_hash_table, bl))) {
 		return 1;
 	}
 
 	/* is it in the current transaction.  This should never happen */
-	if ((get_journal_hash_dev(sb, journal->j_hash_table, bl))) {
+	if ((cn = get_journal_hash_dev(sb, journal->j_hash_table, bl))) {
 		BUG();
 		return 1;
 	}

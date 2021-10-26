@@ -37,6 +37,31 @@ struct gpio_aggregator {
 static DEFINE_MUTEX(gpio_aggregator_lock);	/* protects idr */
 static DEFINE_IDR(gpio_aggregator_idr);
 
+static char *get_arg(char **args)
+{
+	char *start, *end;
+
+	start = skip_spaces(*args);
+	if (!*start)
+		return NULL;
+
+	if (*start == '"') {
+		/* Quoted arg */
+		end = strchr(++start, '"');
+		if (!end)
+			return ERR_PTR(-EINVAL);
+	} else {
+		/* Unquoted arg */
+		for (end = start; *end && !isspace(*end); end++) ;
+	}
+
+	if (*end)
+		*end++ = '\0';
+
+	*args = end;
+	return start;
+}
+
 static int aggr_add_gpio(struct gpio_aggregator *aggr, const char *key,
 			 int hwnum, unsigned int *n)
 {
@@ -58,8 +83,8 @@ static int aggr_add_gpio(struct gpio_aggregator *aggr, const char *key,
 
 static int aggr_parse(struct gpio_aggregator *aggr)
 {
-	char *args = skip_spaces(aggr->args);
 	char *name, *offsets, *p;
+	char *args = aggr->args;
 	unsigned long *bitmap;
 	unsigned int i, n = 0;
 	int error = 0;
@@ -68,9 +93,13 @@ static int aggr_parse(struct gpio_aggregator *aggr)
 	if (!bitmap)
 		return -ENOMEM;
 
-	args = next_arg(args, &name, &p);
-	while (*args) {
-		args = next_arg(args, &offsets, &p);
+	for (name = get_arg(&args), offsets = get_arg(&args); name;
+	     offsets = get_arg(&args)) {
+		if (IS_ERR(name)) {
+			pr_err("Cannot get GPIO specifier: %pe\n", name);
+			error = PTR_ERR(name);
+			goto free_bitmap;
+		}
 
 		p = get_options(offsets, 0, &error);
 		if (error == 0 || *p) {
@@ -96,7 +125,7 @@ static int aggr_parse(struct gpio_aggregator *aggr)
 				goto free_bitmap;
 		}
 
-		args = next_arg(args, &name, &p);
+		name = get_arg(&args);
 	}
 
 	if (!n) {

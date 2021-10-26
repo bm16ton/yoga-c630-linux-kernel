@@ -188,7 +188,7 @@ static int st_max_sg_segs = ST_MAX_SG;
 
 static int modes_defined;
 
-static int enlarge_buffer(struct st_buffer *, int);
+static int enlarge_buffer(struct st_buffer *, int, int);
 static void clear_buffer(struct st_buffer *);
 static void normalize_buffer(struct st_buffer *);
 static int append_to_buffer(const char __user *, struct st_buffer *, int);
@@ -1289,7 +1289,7 @@ static int st_open(struct inode *inode, struct file *filp)
 	}
 
 	/* See that we have at least a one page buffer available */
-	if (!enlarge_buffer(STp->buffer, PAGE_SIZE)) {
+	if (!enlarge_buffer(STp->buffer, PAGE_SIZE, STp->restr_dma)) {
 		st_printk(KERN_WARNING, STp,
 			  "Can't allocate one page tape buffer.\n");
 		retval = (-EOVERFLOW);
@@ -1586,7 +1586,7 @@ static int setup_buffering(struct scsi_tape *STp, const char __user *buf,
 		}
 
 		if (bufsize > STbp->buffer_size &&
-		    !enlarge_buffer(STbp, bufsize)) {
+		    !enlarge_buffer(STbp, bufsize, STp->restr_dma)) {
 			st_printk(KERN_WARNING, STp,
 				  "Can't allocate %d byte tape buffer.\n",
 				  bufsize);
@@ -3894,7 +3894,7 @@ static long st_compat_ioctl(struct file *file, unsigned int cmd_in, unsigned lon
 
 /* Try to allocate a new tape buffer. Calling function must not hold
    dev_arr_lock. */
-static struct st_buffer *new_tape_buffer(int max_sg)
+static struct st_buffer *new_tape_buffer(int need_dma, int max_sg)
 {
 	struct st_buffer *tb;
 
@@ -3905,6 +3905,7 @@ static struct st_buffer *new_tape_buffer(int max_sg)
 	}
 	tb->frp_segs = 0;
 	tb->use_sg = max_sg;
+	tb->dma = need_dma;
 	tb->buffer_size = 0;
 
 	tb->reserved_pages = kcalloc(max_sg, sizeof(struct page *),
@@ -3921,7 +3922,7 @@ static struct st_buffer *new_tape_buffer(int max_sg)
 /* Try to allocate enough space in the tape buffer */
 #define ST_MAX_ORDER 6
 
-static int enlarge_buffer(struct st_buffer * STbuffer, int new_size)
+static int enlarge_buffer(struct st_buffer * STbuffer, int new_size, int need_dma)
 {
 	int segs, max_segs, b_size, order, got;
 	gfp_t priority;
@@ -3935,6 +3936,8 @@ static int enlarge_buffer(struct st_buffer * STbuffer, int new_size)
 	max_segs = STbuffer->use_sg;
 
 	priority = GFP_KERNEL | __GFP_NOWARN;
+	if (need_dma)
+		priority |= GFP_DMA;
 
 	if (STbuffer->cleared)
 		priority |= __GFP_ZERO;
@@ -3954,7 +3957,7 @@ static int enlarge_buffer(struct st_buffer * STbuffer, int new_size)
 		if (order == ST_MAX_ORDER)
 			return 0;
 		normalize_buffer(STbuffer);
-		return enlarge_buffer(STbuffer, new_size);
+		return enlarge_buffer(STbuffer, new_size, need_dma);
 	}
 
 	for (segs = STbuffer->frp_segs, got = STbuffer->buffer_size;
@@ -4293,7 +4296,7 @@ static int st_probe(struct device *dev)
 	i = queue_max_segments(SDp->request_queue);
 	if (st_max_sg_segs < i)
 		i = st_max_sg_segs;
-	buffer = new_tape_buffer(i);
+	buffer = new_tape_buffer((SDp->host)->unchecked_isa_dma, i);
 	if (buffer == NULL) {
 		sdev_printk(KERN_ERR, SDp,
 			    "st: Can't allocate new tape buffer. "
@@ -4337,6 +4340,7 @@ static int st_probe(struct device *dev)
 	tpnt->dirty = 0;
 	tpnt->in_use = 0;
 	tpnt->drv_buffer = 1;	/* Try buffering if no mode sense */
+	tpnt->restr_dma = (SDp->host)->unchecked_isa_dma;
 	tpnt->use_pf = (SDp->scsi_level >= SCSI_2);
 	tpnt->density = 0;
 	tpnt->do_auto_lock = ST_AUTO_LOCK;
@@ -4354,7 +4358,7 @@ static int st_probe(struct device *dev)
 	tpnt->nbr_partitions = 0;
 	blk_queue_rq_timeout(tpnt->device->request_queue, ST_TIMEOUT);
 	tpnt->long_timeout = ST_LONG_TIMEOUT;
-	tpnt->try_dio = try_direct_io;
+	tpnt->try_dio = try_direct_io && !SDp->host->unchecked_isa_dma;
 
 	for (i = 0; i < ST_NBR_MODES; i++) {
 		STm = &(tpnt->modes[i]);

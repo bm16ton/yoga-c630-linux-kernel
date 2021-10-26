@@ -16,6 +16,7 @@ struct comm;
 struct ip_callchain;
 struct symbol;
 struct dso;
+struct comm;
 struct perf_sample;
 struct addr_location;
 struct call_path;

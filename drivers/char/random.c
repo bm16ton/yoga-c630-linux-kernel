@@ -500,6 +500,7 @@ struct entropy_store {
 	unsigned short add_ptr;
 	unsigned short input_rotate;
 	int entropy_count;
+	unsigned int initialized:1;
 	unsigned int last_data_init:1;
 	__u8 last_data[EXTRACT_SIZE];
 };
@@ -659,7 +660,7 @@ static void process_random_ready_list(void)
  */
 static void credit_entropy_bits(struct entropy_store *r, int nbits)
 {
-	int entropy_count, orig;
+	int entropy_count, orig, has_initialized = 0;
 	const int pool_size = r->poolinfo->poolfracbits;
 	int nfrac = nbits << ENTROPY_SHIFT;
 
@@ -716,14 +717,23 @@ retry:
 	if (cmpxchg(&r->entropy_count, orig, entropy_count) != orig)
 		goto retry;
 
+	if (has_initialized) {
+		r->initialized = 1;
+		kill_fasync(&fasync, SIGIO, POLL_IN);
+	}
+
 	trace_credit_entropy_bits(r->name, nbits,
 				  entropy_count >> ENTROPY_SHIFT, _RET_IP_);
 
 	if (r == &input_pool) {
 		int entropy_bits = entropy_count >> ENTROPY_SHIFT;
 
-		if (crng_init < 2 && entropy_bits >= 128)
+		if (crng_init < 2) {
+			if (entropy_bits < 128)
+				return;
 			crng_reseed(&primary_crng, r);
+			entropy_bits = ENTROPY_BITS(r);
+		}
 	}
 }
 
@@ -1362,7 +1372,8 @@ retry:
 }
 
 /*
- * This function does the actual extraction for extract_entropy.
+ * This function does the actual extraction for extract_entropy and
+ * extract_entropy_user.
  *
  * Note: we assume that .poolwords is a multiple of 16 words.
  */

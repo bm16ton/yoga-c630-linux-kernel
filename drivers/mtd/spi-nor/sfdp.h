@@ -107,6 +107,7 @@ struct sfdp_parameter_header {
 	u8		id_msb;
 };
 
-int spi_nor_parse_sfdp(struct spi_nor *nor);
+int spi_nor_parse_sfdp(struct spi_nor *nor,
+		       struct spi_nor_flash_parameter *params);
 
 #endif /* __LINUX_MTD_SFDP_H */

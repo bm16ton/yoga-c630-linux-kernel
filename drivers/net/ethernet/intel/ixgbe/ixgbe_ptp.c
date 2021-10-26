@@ -999,7 +999,6 @@ static int ixgbe_ptp_set_timestamp_mode(struct ixgbe_adapter *adapter,
 	switch (config->tx_type) {
 	case HWTSTAMP_TX_OFF:
 		tsync_tx_ctl = 0;
-		break;
 	case HWTSTAMP_TX_ON:
 		break;
 	default:

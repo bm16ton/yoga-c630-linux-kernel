@@ -7,7 +7,6 @@
 #include <linux/netdevice.h>
 #include <linux/usb.h>
 #include <linux/module.h>
-#include <linux/ethtool.h>
 
 #include <linux/can.h>
 #include <linux/can/dev.h>
@@ -774,10 +773,6 @@ static int pcan_usb_fd_encode_msg(struct peak_usb_device *dev,
 			tx_msg_flags |= PUCAN_MSG_RTR;
 	}
 
-	/* Single-Shot frame */
-	if (dev->can.ctrlmode & CAN_CTRLMODE_ONE_SHOT)
-		tx_msg_flags |= PUCAN_MSG_SINGLE_SHOT;
-
 	tx_msg->flags = cpu_to_le16(tx_msg_flags);
 	tx_msg->channel_dlc = PUCAN_MSG_CHANNEL_DLC(dev->ctrl_idx, dlc);
 	memcpy(tx_msg->d, cfd->data, cfd->len);
@@ -1011,31 +1006,6 @@ static void pcan_usb_fd_free(struct peak_usb_device *dev)
 	}
 }
 
-/* blink LED's */
-static int pcan_usb_fd_set_phys_id(struct net_device *netdev,
-				   enum ethtool_phys_id_state state)
-{
-	struct peak_usb_device *dev = netdev_priv(netdev);
-	int err = 0;
-
-	switch (state) {
-	case ETHTOOL_ID_ACTIVE:
-		err = pcan_usb_fd_set_can_led(dev, PCAN_UFD_LED_FAST);
-		break;
-	case ETHTOOL_ID_INACTIVE:
-		err = pcan_usb_fd_set_can_led(dev, PCAN_UFD_LED_DEF);
-		break;
-	default:
-		break;
-	}
-
-	return err;
-}
-
-static const struct ethtool_ops pcan_usb_fd_ethtool_ops = {
-	.set_phys_id = pcan_usb_fd_set_phys_id,
-};
-
 /* describes the PCAN-USB FD adapter */
 static const struct can_bittiming_const pcan_usb_fd_const = {
 	.name = "pcan_usb_fd",
@@ -1067,7 +1037,7 @@ const struct peak_usb_adapter pcan_usb_fd = {
 	.ctrl_count = PCAN_USBFD_CHANNEL_COUNT,
 	.ctrlmode_supported = CAN_CTRLMODE_FD |
 			CAN_CTRLMODE_3_SAMPLES | CAN_CTRLMODE_LISTENONLY |
-			CAN_CTRLMODE_ONE_SHOT | CAN_CTRLMODE_CC_LEN8_DLC,
+			CAN_CTRLMODE_CC_LEN8_DLC,
 	.clock = {
 		.freq = PCAN_UFD_CRYSTAL_HZ,
 	},
@@ -1077,10 +1047,9 @@ const struct peak_usb_adapter pcan_usb_fd = {
 	/* size of device private data */
 	.sizeof_dev_private = sizeof(struct pcan_usb_fd_device),
 
-	.ethtool_ops = &pcan_usb_fd_ethtool_ops,
-
 	/* timestamps usage */
 	.ts_used_bits = 32,
+	.ts_period = 1000000, /* calibration period in ts. */
 	.us_per_ts_scale = 1, /* us = (ts * scale) >> shift */
 	.us_per_ts_shift = 0,
 
@@ -1141,7 +1110,7 @@ const struct peak_usb_adapter pcan_usb_chip = {
 	.ctrl_count = PCAN_USBFD_CHANNEL_COUNT,
 	.ctrlmode_supported = CAN_CTRLMODE_FD |
 		CAN_CTRLMODE_3_SAMPLES | CAN_CTRLMODE_LISTENONLY |
-		CAN_CTRLMODE_ONE_SHOT | CAN_CTRLMODE_CC_LEN8_DLC,
+		CAN_CTRLMODE_CC_LEN8_DLC,
 	.clock = {
 		.freq = PCAN_UFD_CRYSTAL_HZ,
 	},
@@ -1151,10 +1120,9 @@ const struct peak_usb_adapter pcan_usb_chip = {
 	/* size of device private data */
 	.sizeof_dev_private = sizeof(struct pcan_usb_fd_device),
 
-	.ethtool_ops = &pcan_usb_fd_ethtool_ops,
-
 	/* timestamps usage */
 	.ts_used_bits = 32,
+	.ts_period = 1000000, /* calibration period in ts. */
 	.us_per_ts_scale = 1, /* us = (ts * scale) >> shift */
 	.us_per_ts_shift = 0,
 
@@ -1215,7 +1183,7 @@ const struct peak_usb_adapter pcan_usb_pro_fd = {
 	.ctrl_count = PCAN_USBPROFD_CHANNEL_COUNT,
 	.ctrlmode_supported = CAN_CTRLMODE_FD |
 			CAN_CTRLMODE_3_SAMPLES | CAN_CTRLMODE_LISTENONLY |
-			CAN_CTRLMODE_ONE_SHOT | CAN_CTRLMODE_CC_LEN8_DLC,
+			CAN_CTRLMODE_CC_LEN8_DLC,
 	.clock = {
 		.freq = PCAN_UFD_CRYSTAL_HZ,
 	},
@@ -1225,10 +1193,9 @@ const struct peak_usb_adapter pcan_usb_pro_fd = {
 	/* size of device private data */
 	.sizeof_dev_private = sizeof(struct pcan_usb_fd_device),
 
-	.ethtool_ops = &pcan_usb_fd_ethtool_ops,
-
 	/* timestamps usage */
 	.ts_used_bits = 32,
+	.ts_period = 1000000, /* calibration period in ts. */
 	.us_per_ts_scale = 1, /* us = (ts * scale) >> shift */
 	.us_per_ts_shift = 0,
 
@@ -1289,7 +1256,7 @@ const struct peak_usb_adapter pcan_usb_x6 = {
 	.ctrl_count = PCAN_USBPROFD_CHANNEL_COUNT,
 	.ctrlmode_supported = CAN_CTRLMODE_FD |
 			CAN_CTRLMODE_3_SAMPLES | CAN_CTRLMODE_LISTENONLY |
-			CAN_CTRLMODE_ONE_SHOT | CAN_CTRLMODE_CC_LEN8_DLC,
+			CAN_CTRLMODE_CC_LEN8_DLC,
 	.clock = {
 		.freq = PCAN_UFD_CRYSTAL_HZ,
 	},
@@ -1299,10 +1266,9 @@ const struct peak_usb_adapter pcan_usb_x6 = {
 	/* size of device private data */
 	.sizeof_dev_private = sizeof(struct pcan_usb_fd_device),
 
-	.ethtool_ops = &pcan_usb_fd_ethtool_ops,
-
 	/* timestamps usage */
 	.ts_used_bits = 32,
+	.ts_period = 1000000, /* calibration period in ts. */
 	.us_per_ts_scale = 1, /* us = (ts * scale) >> shift */
 	.us_per_ts_shift = 0,
 

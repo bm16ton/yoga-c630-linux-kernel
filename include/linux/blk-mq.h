@@ -306,21 +306,12 @@ struct blk_mq_ops {
 	 * reserved budget. Also we have to handle failure case
 	 * of .get_budget for avoiding I/O deadlock.
 	 */
-	int (*get_budget)(struct request_queue *);
+	bool (*get_budget)(struct request_queue *);
 
 	/**
 	 * @put_budget: Release the reserved budget.
 	 */
-	void (*put_budget)(struct request_queue *, int);
-
-	/**
-	 * @set_rq_budget_token: store rq's budget token
-	 */
-	void (*set_rq_budget_token)(struct request *, int);
-	/**
-	 * @get_rq_budget_token: retrieve rq's budget token
-	 */
-	int (*get_rq_budget_token)(struct request *);
+	void (*put_budget)(struct request_queue *);
 
 	/**
 	 * @timeout: Called on request timeout.

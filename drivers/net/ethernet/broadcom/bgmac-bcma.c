@@ -115,7 +115,7 @@ static int bgmac_probe(struct bcma_device *core)
 	struct ssb_sprom *sprom = &core->bus->sprom;
 	struct mii_bus *mii_bus;
 	struct bgmac *bgmac;
-	const u8 *mac;
+	const u8 *mac = NULL;
 	int err;
 
 	bgmac = bgmac_alloc(&core->dev);
@@ -128,10 +128,11 @@ static int bgmac_probe(struct bcma_device *core)
 
 	bcma_set_drvdata(core, bgmac);
 
-	err = of_get_mac_address(bgmac->dev->of_node, bgmac->net_dev->dev_addr);
+	if (bgmac->dev->of_node)
+		mac = of_get_mac_address(bgmac->dev->of_node);
 
 	/* If no MAC address assigned via device tree, check SPROM */
-	if (err) {
+	if (IS_ERR_OR_NULL(mac)) {
 		switch (core->core_unit) {
 		case 0:
 			mac = sprom->et0mac;
@@ -148,8 +149,9 @@ static int bgmac_probe(struct bcma_device *core)
 			err = -ENOTSUPP;
 			goto err;
 		}
-		ether_addr_copy(bgmac->net_dev->dev_addr, mac);
 	}
+
+	ether_addr_copy(bgmac->net_dev->dev_addr, mac);
 
 	/* On BCM4706 we need common core to access PHY */
 	if (core->id.id == BCMA_CORE_4706_MAC_GBIT &&

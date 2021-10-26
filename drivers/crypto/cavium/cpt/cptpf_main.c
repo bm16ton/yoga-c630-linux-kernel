@@ -10,6 +10,7 @@
 #include <linux/moduleparam.h>
 #include <linux/pci.h>
 #include <linux/printk.h>
+#include <linux/version.h>
 
 #include "cptpf.h"
 

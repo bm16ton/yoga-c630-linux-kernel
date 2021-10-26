@@ -538,8 +538,7 @@ static int regulator_mode_constrain(struct regulator_dev *rdev,
 
 	/* The modes are bitmasks, the most power hungry modes having
 	 * the lowest values. If the requested mode isn't supported
-	 * try higher modes.
-	 */
+	 * try higher modes. */
 	while (*mode) {
 		if (rdev->constraints->valid_modes_mask & *mode)
 			return 0;
@@ -932,8 +931,7 @@ static DEVICE_ATTR(bypass, 0444,
 		   regulator_bypass_show, NULL);
 
 /* Calculate the new optimum regulator operating mode based on the new total
- * consumer load. All locks held by caller
- */
+ * consumer load. All locks held by caller */
 static int drms_uA_update(struct regulator_dev *rdev)
 {
 	struct regulator *sibling;
@@ -1221,8 +1219,7 @@ static int machine_constraints_voltage(struct regulator_dev *rdev,
 		int	cmax = constraints->max_uV;
 
 		/* it's safe to autoconfigure fixed-voltage supplies
-		 * and the constraints are used by list_voltage.
-		 */
+		   and the constraints are used by list_voltage. */
 		if (count == 1 && !cmin) {
 			cmin = 1;
 			cmax = INT_MAX;
@@ -1448,8 +1445,6 @@ static int set_machine_constraints(struct regulator_dev *rdev)
 
 		if (rdev->constraints->always_on)
 			rdev->use_count++;
-	} else if (rdev->desc->off_on_delay) {
-		rdev->last_off = ktime_get();
 	}
 
 	print_constraints(rdev);
@@ -2494,15 +2489,29 @@ static int _regulator_do_enable(struct regulator_dev *rdev)
 
 	trace_regulator_enable(rdev_get_name(rdev));
 
-	if (rdev->desc->off_on_delay && rdev->last_off) {
+	if (rdev->desc->off_on_delay) {
 		/* if needed, keep a distance of off_on_delay from last time
 		 * this regulator was disabled.
 		 */
-		ktime_t end = ktime_add_us(rdev->last_off, rdev->desc->off_on_delay);
-		s64 remaining = ktime_us_delta(end, ktime_get());
+		unsigned long start_jiffy = jiffies;
+		unsigned long intended, max_delay, remaining;
 
-		if (remaining > 0)
-			_regulator_enable_delay(remaining);
+		max_delay = usecs_to_jiffies(rdev->desc->off_on_delay);
+		intended = rdev->last_off_jiffy + max_delay;
+
+		if (time_before(start_jiffy, intended)) {
+			/* calc remaining jiffies to deal with one-time
+			 * timer wrapping.
+			 * in case of multiple timer wrapping, either it can be
+			 * detected by out-of-range remaining, or it cannot be
+			 * detected and we get a penalty of
+			 * _regulator_enable_delay().
+			 */
+			remaining = intended - start_jiffy;
+			if (remaining <= max_delay)
+				_regulator_enable_delay(
+						jiffies_to_usecs(remaining));
+		}
 	}
 
 	if (rdev->ena_pin) {
@@ -2522,8 +2531,7 @@ static int _regulator_do_enable(struct regulator_dev *rdev)
 
 	/* Allow the regulator to ramp; it would be useful to extend
 	 * this for bulk operations so that the regulators can ramp
-	 * together.
-	 */
+	 * together.  */
 	trace_regulator_enable_delay(rdev_get_name(rdev));
 
 	/* If poll_enabled_time is set, poll upto the delay calculated
@@ -2648,10 +2656,7 @@ static int _regulator_enable(struct regulator *regulator)
 		goto err_disable_supply;
 
 	if (rdev->use_count == 0) {
-		/*
-		 * The regulator may already be enabled if it's not switchable
-		 * or was left on
-		 */
+		/* The regulator may on if it's not switchable or left on */
 		ret = _regulator_is_enabled(rdev);
 		if (ret == -EINVAL || ret == 0) {
 			if (!regulator_ops_is_valid(rdev,
@@ -2732,8 +2737,11 @@ static int _regulator_do_disable(struct regulator_dev *rdev)
 			return ret;
 	}
 
+	/* cares about last_off_jiffy only if off_on_delay is required by
+	 * device.
+	 */
 	if (rdev->desc->off_on_delay)
-		rdev->last_off = ktime_get();
+		rdev->last_off_jiffy = jiffies;
 
 	trace_regulator_disable_complete(rdev_get_name(rdev));
 
@@ -5335,12 +5343,10 @@ regulator_register(const struct regulator_desc *regulator_desc,
 	ret = set_machine_constraints(rdev);
 	if (ret == -EPROBE_DEFER) {
 		/* Regulator might be in bypass mode and so needs its supply
-		 * to set the constraints
-		 */
+		 * to set the constraints */
 		/* FIXME: this currently triggers a chicken-and-egg problem
 		 * when creating -SUPPLY symlink in sysfs to a regulator
-		 * that is just being created
-		 */
+		 * that is just being created */
 		rdev_dbg(rdev, "will resolve supply early: %s\n",
 			 rdev->supply_name);
 		ret = regulator_resolve_supply(rdev);
@@ -5899,8 +5905,7 @@ static int regulator_late_cleanup(struct device *dev, void *data)
 
 	if (have_full_constraints()) {
 		/* We log since this may kill the system if it goes
-		 * wrong.
-		 */
+		 * wrong. */
 		rdev_info(rdev, "disabling\n");
 		ret = _regulator_do_disable(rdev);
 		if (ret != 0)

@@ -166,7 +166,7 @@ static ssize_t s3c_hwmon_ch_show(struct device *dev,
 	ret *= cfg->mult;
 	ret = DIV_ROUND_CLOSEST(ret, cfg->div);
 
-	return sysfs_emit(buf, "%d\n", ret);
+	return snprintf(buf, PAGE_SIZE, "%d\n", ret);
 }
 
 /**
@@ -187,7 +187,7 @@ static ssize_t s3c_hwmon_label_show(struct device *dev,
 
 	cfg = pdata->in[sen_attr->index];
 
-	return sysfs_emit(buf, "%s\n", cfg->name);
+	return snprintf(buf, PAGE_SIZE, "%s\n", cfg->name);
 }
 
 /**

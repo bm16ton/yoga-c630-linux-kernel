@@ -151,9 +151,6 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
 		return ERR_PTR(-EINVAL);
 
 	if (ref) {
-		if (WARN_ON_ONCE(!ref->node_name || ref->path_consumed < 0))
-			return ERR_PTR(-EINVAL);
-
 		if (strlen(fullpath) - ref->path_consumed) {
 			prepath = fullpath + ref->path_consumed;
 			/* skip initial delimiter */
@@ -277,7 +274,7 @@ static struct vfsmount *cifs_dfs_do_mount(struct dentry *mntpt,
 	char *mountdata;
 	char *devname;
 
-	devname = kstrdup(fullpath, GFP_KERNEL);
+	devname = kstrndup(fullpath, strlen(fullpath), GFP_KERNEL);
 	if (!devname)
 		return ERR_PTR(-ENOMEM);
 
@@ -309,7 +306,6 @@ static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
 	struct cifs_sb_info *cifs_sb;
 	struct cifs_ses *ses;
 	struct cifs_tcon *tcon;
-	void *page;
 	char *full_path, *root_path;
 	unsigned int xid;
 	int rc;
@@ -332,13 +328,10 @@ static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
 		goto cdda_exit;
 	}
 
-	page = alloc_dentry_path();
 	/* always use tree name prefix */
-	full_path = build_path_from_dentry_optional_prefix(mntpt, page, true);
-	if (IS_ERR(full_path)) {
-		mnt = ERR_CAST(full_path);
-		goto free_full_path;
-	}
+	full_path = build_path_from_dentry_optional_prefix(mntpt, true);
+	if (full_path == NULL)
+		goto cdda_exit;
 
 	convert_delimiter(full_path, '\\');
 
@@ -396,7 +389,7 @@ static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
 free_root_path:
 	kfree(root_path);
 free_full_path:
-	free_dentry_path(page);
+	kfree(full_path);
 cdda_exit:
 	cifs_dbg(FYI, "leaving %s\n" , __func__);
 	return mnt;

@@ -247,7 +247,7 @@ static inline int rtas_fadump_gpr_index(u64 id)
 	return i;
 }
 
-static void rtas_fadump_set_regval(struct pt_regs *regs, u64 reg_id, u64 reg_val)
+void rtas_fadump_set_regval(struct pt_regs *regs, u64 reg_id, u64 reg_val)
 {
 	int i;
 

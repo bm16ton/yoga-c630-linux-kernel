@@ -63,6 +63,5 @@ extern void __noreturn cpu_die(void);
 extern void __cpu_die(unsigned int cpu);
 extern int __cpu_disable(void);
 extern void schedule_mcck_handler(void);
-void notrace smp_yield_cpu(int cpu);
 
 #endif /* __ASM_SMP_H */

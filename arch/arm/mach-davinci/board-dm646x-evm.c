@@ -362,10 +362,6 @@ static const struct property_entry eeprom_properties[] = {
 	PROPERTY_ENTRY_U32("pagesize", 64),
 	{ }
 };
-
-static const struct software_node eeprom_node = {
-	.properties = eeprom_properties,
-};
 #endif
 
 static u8 dm646x_iis_serializer_direction[] = {
@@ -434,7 +430,7 @@ static void evm_init_cpld(void)
 static struct i2c_board_info __initdata i2c_info[] =  {
 	{
 		I2C_BOARD_INFO("24c256", 0x50),
-		.swnode = &eeprom_node,
+		.properties  = eeprom_properties,
 	},
 	{
 		I2C_BOARD_INFO("pcf8574a", 0x38),

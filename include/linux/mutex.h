@@ -20,7 +20,6 @@
 #include <linux/osq_lock.h>
 #include <linux/debug_locks.h>
 
-struct ww_class;
 struct ww_acquire_ctx;
 
 /*
@@ -65,6 +64,9 @@ struct mutex {
 	struct lockdep_map	dep_map;
 #endif
 };
+
+struct ww_class;
+struct ww_acquire_ctx;
 
 struct ww_mutex {
 	struct mutex base;

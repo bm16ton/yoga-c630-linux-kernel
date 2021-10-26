@@ -10,6 +10,6 @@
 
 #define SPRN_PVR        0x11F   /* Processor Version Register */
 #define PVR_VER(pvr)    (((pvr) >>  16) & 0xFFFF) /* Version field */
-#define PVR_REV(pvr)    (((pvr) >>   0) & 0xFFFF) /* Revision field */
+#define PVR_REV(pvr)    (((pvr) >>   0) & 0xFFFF) /* Revison field */
 
 #endif /* __PERF_UTIL_HEADER_H */

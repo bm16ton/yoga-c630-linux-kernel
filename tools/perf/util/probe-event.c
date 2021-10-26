@@ -180,10 +180,8 @@ struct map *get_target_map(const char *target, struct nsinfo *nsi, bool user)
 		struct map *map;
 
 		map = dso__new_map(target);
-		if (map && map->dso) {
-			nsinfo__put(map->dso->nsinfo);
+		if (map && map->dso)
 			map->dso->nsinfo = nsinfo__get(nsi);
-		}
 		return map;
 	} else {
 		return kernel_get_module_map(target);
@@ -3230,7 +3228,7 @@ errout:
 	return err;
 }
 
-/* Concatenate two arrays */
+/* Concatinate two arrays */
 static void *memcat(void *a, size_t sz_a, void *b, size_t sz_b)
 {
 	void *ret;
@@ -3260,7 +3258,7 @@ concat_probe_trace_events(struct probe_trace_event **tevs, int *ntevs,
 	if (*ntevs + ntevs2 > probe_conf.max_probes)
 		ret = -E2BIG;
 	else {
-		/* Concatenate the array of probe_trace_event */
+		/* Concatinate the array of probe_trace_event */
 		new_tevs = memcat(*tevs, (*ntevs) * sizeof(**tevs),
 				  *tevs2, ntevs2 * sizeof(**tevs2));
 		if (!new_tevs)

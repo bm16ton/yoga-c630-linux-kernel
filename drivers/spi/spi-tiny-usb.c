@@ -49,7 +49,7 @@ struct spi_tiny_usb {
 	struct urb *urb;	/* urb for usb interrupt transfer */
 	char *urbBuffer;	/* urb incoming data buffer */
 	struct spi_master *master;	/* spi master related things */
-	struct spi_device *ili9341;	/* spi device related things */
+	struct spi_device *spidev;	/* spi device related things */
 	struct spi_board_info info;	/* board info for spidev module */
 	struct uio_info *uio;	/* Userspace IO for interrupt management */
 	struct gpio_chip gpio_chip;	/* gpio related things */
@@ -306,14 +306,14 @@ static int spi_tiny_usb_probe(struct usb_interface *interface,
 	if (ret)
 		goto error2;
 
-	strcpy(priv->info.modalias, "ili9341");
+	strcpy(priv->info.modalias, "spidev");
 	priv->info.max_speed_hz = 48 * 1000 * 1000 / 2;
 	priv->info.chip_select = 0;
 	priv->info.mode = SPI_MODE_0;
 
 	priv->info.controller_data = priv;
-	priv->ili9341 = spi_new_device(priv->master, &priv->info);
-	if (!priv->ili9341)
+	priv->spidev = spi_new_device(priv->master, &priv->info);
+	if (!priv->spidev)
 		goto error2;
 	dev_info(&interface->dev, "added new SPI device\n");
 

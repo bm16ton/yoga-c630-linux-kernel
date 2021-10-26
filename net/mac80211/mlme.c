@@ -1115,8 +1115,8 @@ void ieee80211_send_nullfunc(struct ieee80211_local *local,
 	ieee80211_tx_skb(sdata, skb);
 }
 
-void ieee80211_send_4addr_nullfunc(struct ieee80211_local *local,
-				   struct ieee80211_sub_if_data *sdata)
+static void ieee80211_send_4addr_nullfunc(struct ieee80211_local *local,
+					  struct ieee80211_sub_if_data *sdata)
 {
 	struct sk_buff *skb;
 	struct ieee80211_hdr *nullfunc;
@@ -4381,8 +4381,8 @@ static void ieee80211_sta_timer(struct timer_list *t)
 	ieee80211_queue_work(&sdata->local->hw, &sdata->work);
 }
 
-void ieee80211_sta_connection_lost(struct ieee80211_sub_if_data *sdata,
-				   u8 *bssid, u8 reason, bool tx)
+static void ieee80211_sta_connection_lost(struct ieee80211_sub_if_data *sdata,
+					  u8 *bssid, u8 reason, bool tx)
 {
 	u8 frame_buf[IEEE80211_DEAUTH_FRAME_LEN];
 

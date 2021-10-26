@@ -9,8 +9,6 @@
 #include <linux/usb/pd_vdo.h>
 
 #include "bus.h"
-#include "class.h"
-#include "mux.h"
 
 static inline int
 typec_altmode_set_mux(struct altmode *alt, unsigned long conf, void *data)

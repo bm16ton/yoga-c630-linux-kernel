@@ -10,7 +10,6 @@
 #include <linux/audit.h>
 #include <linux/slab.h>
 #include <linux/tty.h>
-#include "tty.h"
 
 struct tty_audit_buf {
 	struct mutex mutex;	/* Protects all data below */

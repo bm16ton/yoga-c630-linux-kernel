@@ -9,7 +9,6 @@
 
 #include <linux/mm_types.h>
 #include <asm/smp.h>
-#include <asm/errata_list.h>
 
 #ifdef CONFIG_MMU
 static inline void local_flush_tlb_all(void)
@@ -20,7 +19,7 @@ static inline void local_flush_tlb_all(void)
 /* Flush one page from local TLB */
 static inline void local_flush_tlb_page(unsigned long addr)
 {
-	ALT_FLUSH_TLB_PAGE(__asm__ __volatile__ ("sfence.vma %0" : : "r" (addr) : "memory"));
+	__asm__ __volatile__ ("sfence.vma %0" : : "r" (addr) : "memory");
 }
 #else /* CONFIG_MMU */
 #define local_flush_tlb_all()			do { } while (0)

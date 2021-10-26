@@ -64,13 +64,13 @@ static const char * const clk_name[] = {
 
 static u32 rsnd_adg_calculate_rbgx(unsigned long div)
 {
-	int i;
+	int i, ratio;
 
 	if (!div)
 		return 0;
 
 	for (i = 3; i >= 0; i--) {
-		int ratio = 2 << (i * 2);
+		ratio = 2 << (i * 2);
 		if (0 == (div % ratio))
 			return (u32)((i << 8) | ((div / ratio) - 1));
 	}
@@ -111,7 +111,7 @@ static void __rsnd_adg_get_timesel_ratio(struct rsnd_priv *priv,
 {
 	struct rsnd_adg *adg = rsnd_priv_to_adg(priv);
 	struct device *dev = rsnd_priv_to_dev(priv);
-	int sel;
+	int idx, sel, div, step;
 	unsigned int val, en;
 	unsigned int min, diff;
 	unsigned int sel_rate[] = {
@@ -126,9 +126,8 @@ static void __rsnd_adg_get_timesel_ratio(struct rsnd_priv *priv,
 	val = 0;
 	en = 0;
 	for (sel = 0; sel < ARRAY_SIZE(sel_rate); sel++) {
-		int idx = 0;
-		int step = 2;
-		int div;
+		idx = 0;
+		step = 2;
 
 		if (!sel_rate[sel])
 			continue;
@@ -365,27 +364,25 @@ void rsnd_adg_clk_control(struct rsnd_priv *priv, int enable)
 	struct rsnd_adg *adg = rsnd_priv_to_adg(priv);
 	struct device *dev = rsnd_priv_to_dev(priv);
 	struct clk *clk;
-	int i;
+	int i, ret;
 
 	for_each_rsnd_clk(clk, adg, i) {
+		ret = 0;
 		if (enable) {
-			int ret = clk_prepare_enable(clk);
+			ret = clk_prepare_enable(clk);
 
 			/*
 			 * We shouldn't use clk_get_rate() under
 			 * atomic context. Let's keep it when
 			 * rsnd_adg_clk_enable() was called
 			 */
-			adg->clk_rate[i] = 0;
-			if (ret < 0)
-				dev_warn(dev, "can't use clk %d\n", i);
-			else
-				adg->clk_rate[i] = clk_get_rate(clk);
+			adg->clk_rate[i] = clk_get_rate(adg->clk[i]);
 		} else {
-			if (adg->clk_rate[i])
-				clk_disable_unprepare(clk);
-			adg->clk_rate[i] = 0;
+			clk_disable_unprepare(clk);
 		}
+
+		if (ret < 0)
+			dev_warn(dev, "can't use clk %d\n", i);
 	}
 }
 
@@ -393,11 +390,11 @@ static void rsnd_adg_get_clkin(struct rsnd_priv *priv,
 			       struct rsnd_adg *adg)
 {
 	struct device *dev = rsnd_priv_to_dev(priv);
+	struct clk *clk;
 	int i;
 
 	for (i = 0; i < CLKMAX; i++) {
-		struct clk *clk = devm_clk_get(dev, clk_name[i]);
-
+		clk = devm_clk_get(dev, clk_name[i]);
 		adg->clk[i] = IS_ERR(clk) ? NULL : clk;
 	}
 }

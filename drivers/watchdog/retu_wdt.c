@@ -8,7 +8,6 @@
  * Rewritten by Aaro Koskinen.
  */
 
-#include <linux/devm-helpers.h>
 #include <linux/slab.h>
 #include <linux/errno.h>
 #include <linux/device.h>
@@ -128,12 +127,9 @@ static int retu_wdt_probe(struct platform_device *pdev)
 	wdev->rdev		= rdev;
 	wdev->dev		= &pdev->dev;
 
-	ret = devm_delayed_work_autocancel(&pdev->dev, &wdev->ping_work,
-					   retu_wdt_ping_work);
-	if (ret)
-		return ret;
+	INIT_DELAYED_WORK(&wdev->ping_work, retu_wdt_ping_work);
 
-	ret = devm_watchdog_register_device(&pdev->dev, retu_wdt);
+	ret = watchdog_register_device(retu_wdt);
 	if (ret < 0)
 		return ret;
 
@@ -142,11 +138,25 @@ static int retu_wdt_probe(struct platform_device *pdev)
 	else
 		retu_wdt_ping_enable(wdev);
 
+	platform_set_drvdata(pdev, retu_wdt);
+
+	return 0;
+}
+
+static int retu_wdt_remove(struct platform_device *pdev)
+{
+	struct watchdog_device *wdog = platform_get_drvdata(pdev);
+	struct retu_wdt_dev *wdev = watchdog_get_drvdata(wdog);
+
+	watchdog_unregister_device(wdog);
+	cancel_delayed_work_sync(&wdev->ping_work);
+
 	return 0;
 }
 
 static struct platform_driver retu_wdt_driver = {
 	.probe		= retu_wdt_probe,
+	.remove		= retu_wdt_remove,
 	.driver		= {
 		.name	= "retu-wdt",
 	},

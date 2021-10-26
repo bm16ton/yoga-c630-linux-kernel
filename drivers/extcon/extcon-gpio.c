@@ -9,7 +9,6 @@
  * (originally switch class is supported)
  */
 
-#include <linux/devm-helpers.h>
 #include <linux/extcon-provider.h>
 #include <linux/gpio/consumer.h>
 #include <linux/init.h>
@@ -113,9 +112,7 @@ static int gpio_extcon_probe(struct platform_device *pdev)
 	if (ret < 0)
 		return ret;
 
-	ret = devm_delayed_work_autocancel(dev, &data->work, gpio_extcon_work);
-	if (ret)
-		return ret;
+	INIT_DELAYED_WORK(&data->work, gpio_extcon_work);
 
 	/*
 	 * Request the interrupt of gpio to detect whether external connector
@@ -130,6 +127,15 @@ static int gpio_extcon_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, data);
 	/* Perform initial detection */
 	gpio_extcon_work(&data->work.work);
+
+	return 0;
+}
+
+static int gpio_extcon_remove(struct platform_device *pdev)
+{
+	struct gpio_extcon_data *data = platform_get_drvdata(pdev);
+
+	cancel_delayed_work_sync(&data->work);
 
 	return 0;
 }
@@ -152,6 +158,7 @@ static SIMPLE_DEV_PM_OPS(gpio_extcon_pm_ops, NULL, gpio_extcon_resume);
 
 static struct platform_driver gpio_extcon_driver = {
 	.probe		= gpio_extcon_probe,
+	.remove		= gpio_extcon_remove,
 	.driver		= {
 		.name	= "extcon-gpio",
 		.pm	= &gpio_extcon_pm_ops,

@@ -168,6 +168,7 @@ static int crystalcove_pwm_probe(struct platform_device *pdev)
 
 	pwm->chip.dev = &pdev->dev;
 	pwm->chip.ops = &crc_pwm_ops;
+	pwm->chip.base = -1;
 	pwm->chip.npwm = 1;
 
 	/* get the PMIC regmap */

@@ -91,9 +91,9 @@ static const struct regmap_config bd718xx_regmap_config = {
 	.cache_type = REGCACHE_RBTREE,
 };
 
-static int bd718xx_init_press_duration(struct regmap *regmap,
-				       struct device *dev)
+static int bd718xx_init_press_duration(struct bd718xx *bd718xx)
 {
+	struct device* dev = bd718xx->chip.dev;
 	u32 short_press_ms, long_press_ms;
 	u32 short_press_value, long_press_value;
 	int ret;
@@ -102,7 +102,8 @@ static int bd718xx_init_press_duration(struct regmap *regmap,
 				   &short_press_ms);
 	if (!ret) {
 		short_press_value = min(15u, (short_press_ms + 250) / 500);
-		ret = regmap_update_bits(regmap, BD718XX_REG_PWRONCONFIG0,
+		ret = regmap_update_bits(bd718xx->chip.regmap,
+					 BD718XX_REG_PWRONCONFIG0,
 					 BD718XX_PWRBTN_PRESS_DURATION_MASK,
 					 short_press_value);
 		if (ret) {
@@ -115,7 +116,8 @@ static int bd718xx_init_press_duration(struct regmap *regmap,
 				   &long_press_ms);
 	if (!ret) {
 		long_press_value = min(15u, (long_press_ms + 500) / 1000);
-		ret = regmap_update_bits(regmap, BD718XX_REG_PWRONCONFIG1,
+		ret = regmap_update_bits(bd718xx->chip.regmap,
+					 BD718XX_REG_PWRONCONFIG1,
 					 BD718XX_PWRBTN_PRESS_DURATION_MASK,
 					 long_press_value);
 		if (ret) {
@@ -130,8 +132,7 @@ static int bd718xx_init_press_duration(struct regmap *regmap,
 static int bd718xx_i2c_probe(struct i2c_client *i2c,
 			    const struct i2c_device_id *id)
 {
-	struct regmap *regmap;
-	struct regmap_irq_chip_data *irq_data;
+	struct bd718xx *bd718xx;
 	int ret;
 	unsigned int chip_type;
 	struct mfd_cell *mfd;
@@ -141,6 +142,13 @@ static int bd718xx_i2c_probe(struct i2c_client *i2c,
 		dev_err(&i2c->dev, "No IRQ configured\n");
 		return -EINVAL;
 	}
+
+	bd718xx = devm_kzalloc(&i2c->dev, sizeof(struct bd718xx), GFP_KERNEL);
+
+	if (!bd718xx)
+		return -ENOMEM;
+
+	bd718xx->chip_irq = i2c->irq;
 	chip_type = (unsigned int)(uintptr_t)
 		    of_device_get_match_data(&i2c->dev);
 	switch (chip_type) {
@@ -156,26 +164,29 @@ static int bd718xx_i2c_probe(struct i2c_client *i2c,
 		dev_err(&i2c->dev, "Unknown device type");
 		return -EINVAL;
 	}
+	bd718xx->chip.dev = &i2c->dev;
+	dev_set_drvdata(&i2c->dev, bd718xx);
 
-	regmap = devm_regmap_init_i2c(i2c, &bd718xx_regmap_config);
-	if (IS_ERR(regmap)) {
+	bd718xx->chip.regmap = devm_regmap_init_i2c(i2c,
+						    &bd718xx_regmap_config);
+	if (IS_ERR(bd718xx->chip.regmap)) {
 		dev_err(&i2c->dev, "regmap initialization failed\n");
-		return PTR_ERR(regmap);
+		return PTR_ERR(bd718xx->chip.regmap);
 	}
 
-	ret = devm_regmap_add_irq_chip(&i2c->dev, regmap, i2c->irq,
-				       IRQF_ONESHOT, 0, &bd718xx_irq_chip,
-				       &irq_data);
+	ret = devm_regmap_add_irq_chip(&i2c->dev, bd718xx->chip.regmap,
+				       bd718xx->chip_irq, IRQF_ONESHOT, 0,
+				       &bd718xx_irq_chip, &bd718xx->irq_data);
 	if (ret) {
 		dev_err(&i2c->dev, "Failed to add irq_chip\n");
 		return ret;
 	}
 
-	ret = bd718xx_init_press_duration(regmap, &i2c->dev);
+	ret = bd718xx_init_press_duration(bd718xx);
 	if (ret)
 		return ret;
 
-	ret = regmap_irq_get_virq(irq_data, BD718XX_INT_PWRBTN_S);
+	ret = regmap_irq_get_virq(bd718xx->irq_data, BD718XX_INT_PWRBTN_S);
 
 	if (ret < 0) {
 		dev_err(&i2c->dev, "Failed to get the IRQ\n");
@@ -184,9 +195,9 @@ static int bd718xx_i2c_probe(struct i2c_client *i2c,
 
 	button.irq = ret;
 
-	ret = devm_mfd_add_devices(&i2c->dev, PLATFORM_DEVID_AUTO,
+	ret = devm_mfd_add_devices(bd718xx->chip.dev, PLATFORM_DEVID_AUTO,
 				   mfd, cells, NULL, 0,
-				   regmap_irq_get_domain(irq_data));
+				   regmap_irq_get_domain(bd718xx->irq_data));
 	if (ret)
 		dev_err(&i2c->dev, "Failed to create subdevices\n");
 

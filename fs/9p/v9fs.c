@@ -583,7 +583,7 @@ static struct attribute *v9fs_attrs[] = {
 	NULL,
 };
 
-static const struct attribute_group v9fs_attr_group = {
+static struct attribute_group v9fs_attr_group = {
 	.attrs = v9fs_attrs,
 };
 

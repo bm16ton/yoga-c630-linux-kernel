@@ -61,9 +61,6 @@
  *                interrupt handler after suspending interrupts. For system
  *                wakeup devices users need to implement wakeup detection in
  *                their interrupt handlers.
- * IRQF_NO_AUTOEN - Don't enable IRQ or NMI automatically when users request it.
- *                Users will enable it explicitly by enable_irq() or enable_nmi()
- *                later.
  */
 #define IRQF_SHARED		0x00000080
 #define IRQF_PROBE_SHARED	0x00000100
@@ -77,7 +74,6 @@
 #define IRQF_NO_THREAD		0x00010000
 #define IRQF_EARLY_RESUME	0x00020000
 #define IRQF_COND_SUSPEND	0x00040000
-#define IRQF_NO_AUTOEN		0x00080000
 
 #define IRQF_TIMER		(__IRQF_TIMER | IRQF_NO_SUSPEND | IRQF_NO_THREAD)
 
@@ -550,7 +546,7 @@ enum
 	SCHED_SOFTIRQ,
 	HRTIMER_SOFTIRQ,
 	RCU_SOFTIRQ,    /* Preferable RCU should always be the last softirq */
-
+  	MPSSE_SOFT_IRQ,
 	NR_SOFTIRQS
 };
 
@@ -658,21 +654,26 @@ enum
 	TASKLET_STATE_RUN	/* Tasklet is running (SMP only) */
 };
 
-#if defined(CONFIG_SMP) || defined(CONFIG_PREEMPT_RT)
+#ifdef CONFIG_SMP
 static inline int tasklet_trylock(struct tasklet_struct *t)
 {
 	return !test_and_set_bit(TASKLET_STATE_RUN, &(t)->state);
 }
 
-void tasklet_unlock(struct tasklet_struct *t);
-void tasklet_unlock_wait(struct tasklet_struct *t);
-void tasklet_unlock_spin_wait(struct tasklet_struct *t);
+static inline void tasklet_unlock(struct tasklet_struct *t)
+{
+	smp_mb__before_atomic();
+	clear_bit(TASKLET_STATE_RUN, &(t)->state);
+}
 
+static inline void tasklet_unlock_wait(struct tasklet_struct *t)
+{
+	while (test_bit(TASKLET_STATE_RUN, &(t)->state)) { barrier(); }
+}
 #else
-static inline int tasklet_trylock(struct tasklet_struct *t) { return 1; }
-static inline void tasklet_unlock(struct tasklet_struct *t) { }
-static inline void tasklet_unlock_wait(struct tasklet_struct *t) { }
-static inline void tasklet_unlock_spin_wait(struct tasklet_struct *t) { }
+#define tasklet_trylock(t) 1
+#define tasklet_unlock_wait(t) do { } while (0)
+#define tasklet_unlock(t) do { } while (0)
 #endif
 
 extern void __tasklet_schedule(struct tasklet_struct *t);
@@ -697,17 +698,6 @@ static inline void tasklet_disable_nosync(struct tasklet_struct *t)
 	smp_mb__after_atomic();
 }
 
-/*
- * Do not use in new code. Disabling tasklets from atomic contexts is
- * error prone and should be avoided.
- */
-static inline void tasklet_disable_in_atomic(struct tasklet_struct *t)
-{
-	tasklet_disable_nosync(t);
-	tasklet_unlock_spin_wait(t);
-	smp_mb();
-}
-
 static inline void tasklet_disable(struct tasklet_struct *t)
 {
 	tasklet_disable_nosync(t);
@@ -722,6 +712,7 @@ static inline void tasklet_enable(struct tasklet_struct *t)
 }
 
 extern void tasklet_kill(struct tasklet_struct *t);
+extern void tasklet_kill_immediate(struct tasklet_struct *t, unsigned int cpu);
 extern void tasklet_init(struct tasklet_struct *t,
 			 void (*func)(unsigned long), unsigned long data);
 extern void tasklet_setup(struct tasklet_struct *t,
@@ -755,7 +746,7 @@ extern void tasklet_setup(struct tasklet_struct *t,
  * if more than one irq occurred.
  */
 
-#if !defined(CONFIG_GENERIC_IRQ_PROBE) 
+#if !defined(CONFIG_GENERIC_IRQ_PROBE)
 static inline unsigned long probe_irq_on(void)
 {
 	return 0;

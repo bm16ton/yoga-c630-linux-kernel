@@ -79,10 +79,28 @@ SYM_FUNC_START(__svm_vcpu_run)
 
 	/* Enter guest mode */
 	sti
+1:	vmload %_ASM_AX
+	jmp 3f
+2:	cmpb $0, kvm_rebooting
+	jne 3f
+	ud2
+	_ASM_EXTABLE(1b, 2b)
 
-1:	vmrun %_ASM_AX
+3:	vmrun %_ASM_AX
+	jmp 5f
+4:	cmpb $0, kvm_rebooting
+	jne 5f
+	ud2
+	_ASM_EXTABLE(3b, 4b)
 
-2:	cli
+5:	vmsave %_ASM_AX
+	jmp 7f
+6:	cmpb $0, kvm_rebooting
+	jne 7f
+	ud2
+	_ASM_EXTABLE(5b, 6b)
+7:
+	cli
 
 #ifdef CONFIG_RETPOLINE
 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
@@ -149,13 +167,6 @@ SYM_FUNC_START(__svm_vcpu_run)
 #endif
 	pop %_ASM_BP
 	ret
-
-3:	cmpb $0, kvm_rebooting
-	jne 2b
-	ud2
-
-	_ASM_EXTABLE(1b, 3b)
-
 SYM_FUNC_END(__svm_vcpu_run)
 
 /**
@@ -175,15 +186,18 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
 #endif
 	push %_ASM_BX
 
-	/* Move @vmcb to RAX. */
-	mov %_ASM_ARG1, %_ASM_AX
-
 	/* Enter guest mode */
+	mov %_ASM_ARG1, %_ASM_AX
 	sti
 
 1:	vmrun %_ASM_AX
+	jmp 3f
+2:	cmpb $0, kvm_rebooting
+	jne 3f
+	ud2
+	_ASM_EXTABLE(1b, 2b)
 
-2:	cli
+3:	cli
 
 #ifdef CONFIG_RETPOLINE
 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
@@ -203,11 +217,4 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
 #endif
 	pop %_ASM_BP
 	ret
-
-3:	cmpb $0, kvm_rebooting
-	jne 2b
-	ud2
-
-	_ASM_EXTABLE(1b, 3b)
-
 SYM_FUNC_END(__svm_sev_es_vcpu_run)

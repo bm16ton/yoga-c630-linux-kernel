@@ -34,15 +34,8 @@ interface. The CPU port is the switch port connected to an Ethernet MAC chip.
 The corresponding linux Ethernet interface is called the master interface.
 All other corresponding linux interfaces are called slave interfaces.
 
-The slave interfaces depend on the master interface being up in order for them
-to send or receive traffic. Prior to kernel v5.12, the state of the master
-interface had to be managed explicitly by the user. Starting with kernel v5.12,
-the behavior is as follows:
-
-- when a DSA slave interface is brought up, the master interface is
-  automatically brought up.
-- when the master interface is brought down, all DSA slave interfaces are
-  automatically brought down.
+The slave interfaces depend on the master interface. They can only brought up,
+when the master interface is up.
 
 In this documentation the following Ethernet interfaces are used:
 
@@ -85,76 +78,79 @@ The tagging based configuration is desired and supported by the majority of
 DSA switches. These switches are capable to tag incoming and outgoing traffic
 without using a VLAN based configuration.
 
-*single port*
-  .. code-block:: sh
+single port
+~~~~~~~~~~~
 
-    # configure each interface
-    ip addr add 192.0.2.1/30 dev lan1
-    ip addr add 192.0.2.5/30 dev lan2
-    ip addr add 192.0.2.9/30 dev lan3
+.. code-block:: sh
 
-    # For kernels earlier than v5.12, the master interface needs to be
-    # brought up manually before the slave ports.
-    ip link set eth0 up
+  # configure each interface
+  ip addr add 192.0.2.1/30 dev lan1
+  ip addr add 192.0.2.5/30 dev lan2
+  ip addr add 192.0.2.9/30 dev lan3
 
-    # bring up the slave interfaces
-    ip link set lan1 up
-    ip link set lan2 up
-    ip link set lan3 up
+  # The master interface needs to be brought up before the slave ports.
+  ip link set eth0 up
 
-*bridge*
-  .. code-block:: sh
+  # bring up the slave interfaces
+  ip link set lan1 up
+  ip link set lan2 up
+  ip link set lan3 up
 
-    # For kernels earlier than v5.12, the master interface needs to be
-    # brought up manually before the slave ports.
-    ip link set eth0 up
+bridge
+~~~~~~
 
-    # bring up the slave interfaces
-    ip link set lan1 up
-    ip link set lan2 up
-    ip link set lan3 up
+.. code-block:: sh
 
-    # create bridge
-    ip link add name br0 type bridge
+  # The master interface needs to be brought up before the slave ports.
+  ip link set eth0 up
 
-    # add ports to bridge
-    ip link set dev lan1 master br0
-    ip link set dev lan2 master br0
-    ip link set dev lan3 master br0
+  # bring up the slave interfaces
+  ip link set lan1 up
+  ip link set lan2 up
+  ip link set lan3 up
 
-    # configure the bridge
-    ip addr add 192.0.2.129/25 dev br0
+  # create bridge
+  ip link add name br0 type bridge
 
-    # bring up the bridge
-    ip link set dev br0 up
+  # add ports to bridge
+  ip link set dev lan1 master br0
+  ip link set dev lan2 master br0
+  ip link set dev lan3 master br0
 
-*gateway*
-  .. code-block:: sh
+  # configure the bridge
+  ip addr add 192.0.2.129/25 dev br0
 
-    # For kernels earlier than v5.12, the master interface needs to be
-    # brought up manually before the slave ports.
-    ip link set eth0 up
+  # bring up the bridge
+  ip link set dev br0 up
 
-    # bring up the slave interfaces
-    ip link set wan up
-    ip link set lan1 up
-    ip link set lan2 up
+gateway
+~~~~~~~
 
-    # configure the upstream port
-    ip addr add 192.0.2.1/30 dev wan
+.. code-block:: sh
 
-    # create bridge
-    ip link add name br0 type bridge
+  # The master interface needs to be brought up before the slave ports.
+  ip link set eth0 up
 
-    # add ports to bridge
-    ip link set dev lan1 master br0
-    ip link set dev lan2 master br0
+  # bring up the slave interfaces
+  ip link set wan up
+  ip link set lan1 up
+  ip link set lan2 up
 
-    # configure the bridge
-    ip addr add 192.0.2.129/25 dev br0
+  # configure the upstream port
+  ip addr add 192.0.2.1/30 dev wan
 
-    # bring up the bridge
-    ip link set dev br0 up
+  # create bridge
+  ip link add name br0 type bridge
+
+  # add ports to bridge
+  ip link set dev lan1 master br0
+  ip link set dev lan2 master br0
+
+  # configure the bridge
+  ip addr add 192.0.2.129/25 dev br0
+
+  # bring up the bridge
+  ip link set dev br0 up
 
 .. _dsa-vlan-configuration:
 
@@ -165,130 +161,132 @@ A minority of switches are not capable to use a taging protocol
 (DSA_TAG_PROTO_NONE). These switches can be configured by a VLAN based
 configuration.
 
-*single port*
-  The configuration can only be set up via VLAN tagging and bridge setup.
+single port
+~~~~~~~~~~~
+The configuration can only be set up via VLAN tagging and bridge setup.
 
-  .. code-block:: sh
+.. code-block:: sh
 
-    # tag traffic on CPU port
-    ip link add link eth0 name eth0.1 type vlan id 1
-    ip link add link eth0 name eth0.2 type vlan id 2
-    ip link add link eth0 name eth0.3 type vlan id 3
+  # tag traffic on CPU port
+  ip link add link eth0 name eth0.1 type vlan id 1
+  ip link add link eth0 name eth0.2 type vlan id 2
+  ip link add link eth0 name eth0.3 type vlan id 3
 
-    # For kernels earlier than v5.12, the master interface needs to be
-    # brought up manually before the slave ports.
-    ip link set eth0 up
-    ip link set eth0.1 up
-    ip link set eth0.2 up
-    ip link set eth0.3 up
+  # The master interface needs to be brought up before the slave ports.
+  ip link set eth0 up
+  ip link set eth0.1 up
+  ip link set eth0.2 up
+  ip link set eth0.3 up
 
-    # bring up the slave interfaces
-    ip link set lan1 up
-    ip link set lan2 up
-    ip link set lan3 up
+  # bring up the slave interfaces
+  ip link set lan1 up
+  ip link set lan2 up
+  ip link set lan3 up
 
-    # create bridge
-    ip link add name br0 type bridge
+  # create bridge
+  ip link add name br0 type bridge
 
-    # activate VLAN filtering
-    ip link set dev br0 type bridge vlan_filtering 1
+  # activate VLAN filtering
+  ip link set dev br0 type bridge vlan_filtering 1
 
-    # add ports to bridges
-    ip link set dev lan1 master br0
-    ip link set dev lan2 master br0
-    ip link set dev lan3 master br0
+  # add ports to bridges
+  ip link set dev lan1 master br0
+  ip link set dev lan2 master br0
+  ip link set dev lan3 master br0
 
-    # tag traffic on ports
-    bridge vlan add dev lan1 vid 1 pvid untagged
-    bridge vlan add dev lan2 vid 2 pvid untagged
-    bridge vlan add dev lan3 vid 3 pvid untagged
+  # tag traffic on ports
+  bridge vlan add dev lan1 vid 1 pvid untagged
+  bridge vlan add dev lan2 vid 2 pvid untagged
+  bridge vlan add dev lan3 vid 3 pvid untagged
 
-    # configure the VLANs
-    ip addr add 192.0.2.1/30 dev eth0.1
-    ip addr add 192.0.2.5/30 dev eth0.2
-    ip addr add 192.0.2.9/30 dev eth0.3
+  # configure the VLANs
+  ip addr add 192.0.2.1/30 dev eth0.1
+  ip addr add 192.0.2.5/30 dev eth0.2
+  ip addr add 192.0.2.9/30 dev eth0.3
 
-    # bring up the bridge devices
-    ip link set br0 up
+  # bring up the bridge devices
+  ip link set br0 up
 
 
-*bridge*
-  .. code-block:: sh
+bridge
+~~~~~~
 
-    # tag traffic on CPU port
-    ip link add link eth0 name eth0.1 type vlan id 1
+.. code-block:: sh
 
-    # For kernels earlier than v5.12, the master interface needs to be
-    # brought up manually before the slave ports.
-    ip link set eth0 up
-    ip link set eth0.1 up
+  # tag traffic on CPU port
+  ip link add link eth0 name eth0.1 type vlan id 1
 
-    # bring up the slave interfaces
-    ip link set lan1 up
-    ip link set lan2 up
-    ip link set lan3 up
+  # The master interface needs to be brought up before the slave ports.
+  ip link set eth0 up
+  ip link set eth0.1 up
 
-    # create bridge
-    ip link add name br0 type bridge
+  # bring up the slave interfaces
+  ip link set lan1 up
+  ip link set lan2 up
+  ip link set lan3 up
 
-    # activate VLAN filtering
-    ip link set dev br0 type bridge vlan_filtering 1
+  # create bridge
+  ip link add name br0 type bridge
 
-    # add ports to bridge
-    ip link set dev lan1 master br0
-    ip link set dev lan2 master br0
-    ip link set dev lan3 master br0
-    ip link set eth0.1 master br0
+  # activate VLAN filtering
+  ip link set dev br0 type bridge vlan_filtering 1
 
-    # tag traffic on ports
-    bridge vlan add dev lan1 vid 1 pvid untagged
-    bridge vlan add dev lan2 vid 1 pvid untagged
-    bridge vlan add dev lan3 vid 1 pvid untagged
+  # add ports to bridge
+  ip link set dev lan1 master br0
+  ip link set dev lan2 master br0
+  ip link set dev lan3 master br0
+  ip link set eth0.1 master br0
 
-    # configure the bridge
-    ip addr add 192.0.2.129/25 dev br0
+  # tag traffic on ports
+  bridge vlan add dev lan1 vid 1 pvid untagged
+  bridge vlan add dev lan2 vid 1 pvid untagged
+  bridge vlan add dev lan3 vid 1 pvid untagged
 
-    # bring up the bridge
-    ip link set dev br0 up
+  # configure the bridge
+  ip addr add 192.0.2.129/25 dev br0
 
-*gateway*
-  .. code-block:: sh
+  # bring up the bridge
+  ip link set dev br0 up
 
-    # tag traffic on CPU port
-    ip link add link eth0 name eth0.1 type vlan id 1
-    ip link add link eth0 name eth0.2 type vlan id 2
+gateway
+~~~~~~~
 
-    # For kernels earlier than v5.12, the master interface needs to be
-    # brought up manually before the slave ports.
-    ip link set eth0 up
-    ip link set eth0.1 up
-    ip link set eth0.2 up
+.. code-block:: sh
 
-    # bring up the slave interfaces
-    ip link set wan up
-    ip link set lan1 up
-    ip link set lan2 up
+  # tag traffic on CPU port
+  ip link add link eth0 name eth0.1 type vlan id 1
+  ip link add link eth0 name eth0.2 type vlan id 2
 
-    # create bridge
-    ip link add name br0 type bridge
+  # The master interface needs to be brought up before the slave ports.
+  ip link set eth0 up
+  ip link set eth0.1 up
+  ip link set eth0.2 up
 
-    # activate VLAN filtering
-    ip link set dev br0 type bridge vlan_filtering 1
+  # bring up the slave interfaces
+  ip link set wan up
+  ip link set lan1 up
+  ip link set lan2 up
 
-    # add ports to bridges
-    ip link set dev wan master br0
-    ip link set eth0.1 master br0
-    ip link set dev lan1 master br0
-    ip link set dev lan2 master br0
+  # create bridge
+  ip link add name br0 type bridge
 
-    # tag traffic on ports
-    bridge vlan add dev lan1 vid 1 pvid untagged
-    bridge vlan add dev lan2 vid 1 pvid untagged
-    bridge vlan add dev wan vid 2 pvid untagged
+  # activate VLAN filtering
+  ip link set dev br0 type bridge vlan_filtering 1
 
-    # configure the VLANs
-    ip addr add 192.0.2.1/30 dev eth0.2
-    ip addr add 192.0.2.129/25 dev br0
+  # add ports to bridges
+  ip link set dev wan master br0
+  ip link set eth0.1 master br0
+  ip link set dev lan1 master br0
+  ip link set dev lan2 master br0
 
-    # bring up the bridge devices
-    ip link set br0 up
+  # tag traffic on ports
+  bridge vlan add dev lan1 vid 1 pvid untagged
+  bridge vlan add dev lan2 vid 1 pvid untagged
+  bridge vlan add dev wan vid 2 pvid untagged
+
+  # configure the VLANs
+  ip addr add 192.0.2.1/30 dev eth0.2
+  ip addr add 192.0.2.129/25 dev br0
+
+  # bring up the bridge devices
+  ip link set br0 up

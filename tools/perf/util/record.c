@@ -157,15 +157,9 @@ static int get_max_rate(unsigned int *rate)
 static int record_opts__config_freq(struct record_opts *opts)
 {
 	bool user_freq = opts->user_freq != UINT_MAX;
-	bool user_interval = opts->user_interval != ULLONG_MAX;
 	unsigned int max_rate;
 
-	if (user_interval && user_freq) {
-		pr_err("cannot set frequency and period at the same time\n");
-		return -1;
-	}
-
-	if (user_interval)
+	if (opts->user_interval != ULLONG_MAX)
 		opts->default_interval = opts->user_interval;
 	if (user_freq)
 		opts->freq = opts->user_freq;

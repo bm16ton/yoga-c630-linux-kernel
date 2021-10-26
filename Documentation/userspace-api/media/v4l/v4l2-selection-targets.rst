@@ -12,13 +12,7 @@ of the two interfaces they are used.
 
 .. _v4l2-selection-targets-table:
 
-.. raw:: latex
-
-   \small
-
-.. tabularcolumns:: |p{6.2cm}|p{1.4cm}|p{7.3cm}|p{1.2cm}|p{0.8cm}|
-
-.. cssclass:: longtable
+.. tabularcolumns:: |p{6.0cm}|p{1.4cm}|p{7.4cm}|p{1.2cm}|p{1.4cm}|
 
 .. flat-table:: Selection target definitions
     :header-rows:  1
@@ -75,7 +69,3 @@ of the two interfaces they are used.
 	modified by hardware.
       - Yes
       - No
-
-.. raw:: latex
-
-   \normalsize

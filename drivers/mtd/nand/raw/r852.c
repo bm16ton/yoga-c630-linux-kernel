@@ -724,9 +724,10 @@ static irqreturn_t r852_irq(int irq, void *data)
 	struct r852_device *dev = (struct r852_device *)data;
 
 	uint8_t card_status, dma_status;
+	unsigned long flags;
 	irqreturn_t ret = IRQ_NONE;
 
-	spin_lock(&dev->irqlock);
+	spin_lock_irqsave(&dev->irqlock, flags);
 
 	/* handle card detection interrupts first */
 	card_status = r852_read_reg(dev, R852_CARD_IRQ_STA);
@@ -812,7 +813,7 @@ static irqreturn_t r852_irq(int irq, void *data)
 		dbg("strange card status = %x", card_status);
 
 out:
-	spin_unlock(&dev->irqlock);
+	spin_unlock_irqrestore(&dev->irqlock, flags);
 	return ret;
 }
 

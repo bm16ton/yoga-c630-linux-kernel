@@ -2,12 +2,11 @@
 /*
  * System Control and Management Interface (SCMI) Base Protocol
  *
- * Copyright (C) 2018-2021 ARM Ltd.
+ * Copyright (C) 2018 ARM Ltd.
  */
 
 #define pr_fmt(fmt) "SCMI Notifications BASE - " fmt
 
-#include <linux/module.h>
 #include <linux/scmi_protocol.h>
 
 #include "common.h"
@@ -51,30 +50,30 @@ struct scmi_base_error_notify_payld {
  * scmi_base_attributes_get() - gets the implementation details
  *	that are associated with the base protocol.
  *
- * @ph: SCMI protocol handle
+ * @handle: SCMI entity handle
  *
  * Return: 0 on success, else appropriate SCMI error.
  */
-static int scmi_base_attributes_get(const struct scmi_protocol_handle *ph)
+static int scmi_base_attributes_get(const struct scmi_handle *handle)
 {
 	int ret;
 	struct scmi_xfer *t;
 	struct scmi_msg_resp_base_attributes *attr_info;
-	struct scmi_revision_info *rev = ph->get_priv(ph);
+	struct scmi_revision_info *rev = handle->version;
 
-	ret = ph->xops->xfer_get_init(ph, PROTOCOL_ATTRIBUTES,
-				      0, sizeof(*attr_info), &t);
+	ret = scmi_xfer_get_init(handle, PROTOCOL_ATTRIBUTES,
+				 SCMI_PROTOCOL_BASE, 0, sizeof(*attr_info), &t);
 	if (ret)
 		return ret;
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 	if (!ret) {
 		attr_info = t->rx.buf;
 		rev->num_protocols = attr_info->num_protocols;
 		rev->num_agents = attr_info->num_agents;
 	}
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 
 	return ret;
 }
@@ -82,20 +81,19 @@ static int scmi_base_attributes_get(const struct scmi_protocol_handle *ph)
 /**
  * scmi_base_vendor_id_get() - gets vendor/subvendor identifier ASCII string.
  *
- * @ph: SCMI protocol handle
+ * @handle: SCMI entity handle
  * @sub_vendor: specify true if sub-vendor ID is needed
  *
  * Return: 0 on success, else appropriate SCMI error.
  */
 static int
-scmi_base_vendor_id_get(const struct scmi_protocol_handle *ph, bool sub_vendor)
+scmi_base_vendor_id_get(const struct scmi_handle *handle, bool sub_vendor)
 {
 	u8 cmd;
 	int ret, size;
 	char *vendor_id;
 	struct scmi_xfer *t;
-	struct scmi_revision_info *rev = ph->get_priv(ph);
-
+	struct scmi_revision_info *rev = handle->version;
 
 	if (sub_vendor) {
 		cmd = BASE_DISCOVER_SUB_VENDOR;
@@ -107,15 +105,15 @@ scmi_base_vendor_id_get(const struct scmi_protocol_handle *ph, bool sub_vendor)
 		size = ARRAY_SIZE(rev->vendor_id);
 	}
 
-	ret = ph->xops->xfer_get_init(ph, cmd, 0, size, &t);
+	ret = scmi_xfer_get_init(handle, cmd, SCMI_PROTOCOL_BASE, 0, size, &t);
 	if (ret)
 		return ret;
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 	if (!ret)
 		memcpy(vendor_id, t->rx.buf, size);
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 
 	return ret;
 }
@@ -125,30 +123,30 @@ scmi_base_vendor_id_get(const struct scmi_protocol_handle *ph, bool sub_vendor)
  *	implementation 32-bit version. The format of the version number is
  *	vendor-specific
  *
- * @ph: SCMI protocol handle
+ * @handle: SCMI entity handle
  *
  * Return: 0 on success, else appropriate SCMI error.
  */
 static int
-scmi_base_implementation_version_get(const struct scmi_protocol_handle *ph)
+scmi_base_implementation_version_get(const struct scmi_handle *handle)
 {
 	int ret;
 	__le32 *impl_ver;
 	struct scmi_xfer *t;
-	struct scmi_revision_info *rev = ph->get_priv(ph);
+	struct scmi_revision_info *rev = handle->version;
 
-	ret = ph->xops->xfer_get_init(ph, BASE_DISCOVER_IMPLEMENT_VERSION,
-				      0, sizeof(*impl_ver), &t);
+	ret = scmi_xfer_get_init(handle, BASE_DISCOVER_IMPLEMENT_VERSION,
+				 SCMI_PROTOCOL_BASE, 0, sizeof(*impl_ver), &t);
 	if (ret)
 		return ret;
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 	if (!ret) {
 		impl_ver = t->rx.buf;
 		rev->impl_ver = le32_to_cpu(*impl_ver);
 	}
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 
 	return ret;
 }
@@ -157,24 +155,23 @@ scmi_base_implementation_version_get(const struct scmi_protocol_handle *ph)
  * scmi_base_implementation_list_get() - gets the list of protocols it is
  *	OSPM is allowed to access
  *
- * @ph: SCMI protocol handle
+ * @handle: SCMI entity handle
  * @protocols_imp: pointer to hold the list of protocol identifiers
  *
  * Return: 0 on success, else appropriate SCMI error.
  */
-static int
-scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
-				  u8 *protocols_imp)
+static int scmi_base_implementation_list_get(const struct scmi_handle *handle,
+					     u8 *protocols_imp)
 {
 	u8 *list;
 	int ret, loop;
 	struct scmi_xfer *t;
 	__le32 *num_skip, *num_ret;
 	u32 tot_num_ret = 0, loop_num_ret;
-	struct device *dev = ph->dev;
+	struct device *dev = handle->dev;
 
-	ret = ph->xops->xfer_get_init(ph, BASE_DISCOVER_LIST_PROTOCOLS,
-				      sizeof(*num_skip), 0, &t);
+	ret = scmi_xfer_get_init(handle, BASE_DISCOVER_LIST_PROTOCOLS,
+				 SCMI_PROTOCOL_BASE, sizeof(*num_skip), 0, &t);
 	if (ret)
 		return ret;
 
@@ -186,7 +183,7 @@ scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
 		/* Set the number of protocols to be skipped/already read */
 		*num_skip = cpu_to_le32(tot_num_ret);
 
-		ret = ph->xops->do_xfer(ph, t);
+		ret = scmi_do_xfer(handle, t);
 		if (ret)
 			break;
 
@@ -201,10 +198,10 @@ scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
 
 		tot_num_ret += loop_num_ret;
 
-		ph->xops->reset_rx_to_maxsz(ph, t);
+		scmi_reset_rx_to_maxsz(handle, t);
 	} while (loop_num_ret);
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 
 	return ret;
 }
@@ -212,7 +209,7 @@ scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
 /**
  * scmi_base_discover_agent_get() - discover the name of an agent
  *
- * @ph: SCMI protocol handle
+ * @handle: SCMI entity handle
  * @id: Agent identifier
  * @name: Agent identifier ASCII string
  *
@@ -221,63 +218,63 @@ scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
  *
  * Return: 0 on success, else appropriate SCMI error.
  */
-static int scmi_base_discover_agent_get(const struct scmi_protocol_handle *ph,
+static int scmi_base_discover_agent_get(const struct scmi_handle *handle,
 					int id, char *name)
 {
 	int ret;
 	struct scmi_xfer *t;
 
-	ret = ph->xops->xfer_get_init(ph, BASE_DISCOVER_AGENT,
-				      sizeof(__le32), SCMI_MAX_STR_SIZE, &t);
+	ret = scmi_xfer_get_init(handle, BASE_DISCOVER_AGENT,
+				 SCMI_PROTOCOL_BASE, sizeof(__le32),
+				 SCMI_MAX_STR_SIZE, &t);
 	if (ret)
 		return ret;
 
 	put_unaligned_le32(id, t->tx.buf);
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 	if (!ret)
 		strlcpy(name, t->rx.buf, SCMI_MAX_STR_SIZE);
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 
 	return ret;
 }
 
-static int scmi_base_error_notify(const struct scmi_protocol_handle *ph,
-				  bool enable)
+static int scmi_base_error_notify(const struct scmi_handle *handle, bool enable)
 {
 	int ret;
 	u32 evt_cntl = enable ? BASE_TP_NOTIFY_ALL : 0;
 	struct scmi_xfer *t;
 	struct scmi_msg_base_error_notify *cfg;
 
-	ret = ph->xops->xfer_get_init(ph, BASE_NOTIFY_ERRORS,
-				      sizeof(*cfg), 0, &t);
+	ret = scmi_xfer_get_init(handle, BASE_NOTIFY_ERRORS,
+				 SCMI_PROTOCOL_BASE, sizeof(*cfg), 0, &t);
 	if (ret)
 		return ret;
 
 	cfg = t->tx.buf;
 	cfg->event_control = cpu_to_le32(evt_cntl);
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
-static int scmi_base_set_notify_enabled(const struct scmi_protocol_handle *ph,
+static int scmi_base_set_notify_enabled(const struct scmi_handle *handle,
 					u8 evt_id, u32 src_id, bool enable)
 {
 	int ret;
 
-	ret = scmi_base_error_notify(ph, enable);
+	ret = scmi_base_error_notify(handle, enable);
 	if (ret)
 		pr_debug("FAIL_ENABLED - evt[%X] ret:%d\n", evt_id, ret);
 
 	return ret;
 }
 
-static void *scmi_base_fill_custom_report(const struct scmi_protocol_handle *ph,
+static void *scmi_base_fill_custom_report(const struct scmi_handle *handle,
 					  u8 evt_id, ktime_t timestamp,
 					  const void *payld, size_t payld_sz,
 					  void *report, u32 *src_id)
@@ -321,24 +318,17 @@ static const struct scmi_event_ops base_event_ops = {
 	.fill_custom_report = scmi_base_fill_custom_report,
 };
 
-static const struct scmi_protocol_events base_protocol_events = {
-	.queue_sz = 4 * SCMI_PROTO_QUEUE_SZ,
-	.ops = &base_event_ops,
-	.evts = base_events,
-	.num_events = ARRAY_SIZE(base_events),
-	.num_sources = SCMI_BASE_NUM_SOURCES,
-};
-
-static int scmi_base_protocol_init(const struct scmi_protocol_handle *ph)
+int scmi_base_protocol_init(struct scmi_handle *h)
 {
 	int id, ret;
 	u8 *prot_imp;
 	u32 version;
 	char name[SCMI_MAX_STR_SIZE];
-	struct device *dev = ph->dev;
-	struct scmi_revision_info *rev = scmi_revision_area_get(ph);
+	const struct scmi_handle *handle = h;
+	struct device *dev = handle->dev;
+	struct scmi_revision_info *rev = handle->version;
 
-	ret = ph->xops->version_get(ph, &version);
+	ret = scmi_version_get(handle, SCMI_PROTOCOL_BASE, &version);
 	if (ret)
 		return ret;
 
@@ -348,15 +338,13 @@ static int scmi_base_protocol_init(const struct scmi_protocol_handle *ph)
 
 	rev->major_ver = PROTOCOL_REV_MAJOR(version),
 	rev->minor_ver = PROTOCOL_REV_MINOR(version);
-	ph->set_priv(ph, rev);
 
-	scmi_base_attributes_get(ph);
-	scmi_base_vendor_id_get(ph, false);
-	scmi_base_vendor_id_get(ph, true);
-	scmi_base_implementation_version_get(ph);
-	scmi_base_implementation_list_get(ph, prot_imp);
-
-	scmi_setup_protocol_implemented(ph, prot_imp);
+	scmi_base_attributes_get(handle);
+	scmi_base_vendor_id_get(handle, false);
+	scmi_base_vendor_id_get(handle, true);
+	scmi_base_implementation_version_get(handle);
+	scmi_base_implementation_list_get(handle, prot_imp);
+	scmi_setup_protocol_implemented(handle, prot_imp);
 
 	dev_info(dev, "SCMI Protocol v%d.%d '%s:%s' Firmware version 0x%x\n",
 		 rev->major_ver, rev->minor_ver, rev->vendor_id,
@@ -364,20 +352,16 @@ static int scmi_base_protocol_init(const struct scmi_protocol_handle *ph)
 	dev_dbg(dev, "Found %d protocol(s) %d agent(s)\n", rev->num_protocols,
 		rev->num_agents);
 
+	scmi_register_protocol_events(handle, SCMI_PROTOCOL_BASE,
+				      (4 * SCMI_PROTO_QUEUE_SZ),
+				      &base_event_ops, base_events,
+				      ARRAY_SIZE(base_events),
+				      SCMI_BASE_NUM_SOURCES);
+
 	for (id = 0; id < rev->num_agents; id++) {
-		scmi_base_discover_agent_get(ph, id, name);
+		scmi_base_discover_agent_get(handle, id, name);
 		dev_dbg(dev, "Agent %d: %s\n", id, name);
 	}
 
 	return 0;
 }
-
-static const struct scmi_protocol scmi_base = {
-	.id = SCMI_PROTOCOL_BASE,
-	.owner = NULL,
-	.instance_init = &scmi_base_protocol_init,
-	.ops = NULL,
-	.events = &base_protocol_events,
-};
-
-DEFINE_SCMI_PROTOCOL_REGISTER_UNREGISTER(base, scmi_base)

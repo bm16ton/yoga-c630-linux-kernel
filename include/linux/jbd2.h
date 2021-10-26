@@ -61,7 +61,7 @@ void __jbd2_debug(int level, const char *file, const char *func,
 #define jbd_debug(n, fmt, a...) \
 	__jbd2_debug((n), __FILE__, __func__, __LINE__, (fmt), ##a)
 #else
-#define jbd_debug(n, fmt, a...)  no_printk(fmt, ##a)
+#define jbd_debug(n, fmt, a...)    /**/
 #endif
 
 extern void *jbd2_alloc(size_t size, gfp_t flags);
@@ -594,22 +594,18 @@ struct transaction_s
 	 */
 	unsigned long		t_log_start;
 
-	/* 
-	 * Number of buffers on the t_buffers list [j_list_lock, no locks
-	 * needed for jbd2 thread]
-	 */
+	/* Number of buffers on the t_buffers list [j_list_lock] */
 	int			t_nr_buffers;
 
 	/*
 	 * Doubly-linked circular list of all buffers reserved but not yet
-	 * modified by this transaction [j_list_lock, no locks needed fo
-	 * jbd2 thread]
+	 * modified by this transaction [j_list_lock]
 	 */
 	struct journal_head	*t_reserved_list;
 
 	/*
 	 * Doubly-linked circular list of all metadata buffers owned by this
-	 * transaction [j_list_lock, no locks needed for jbd2 thread]
+	 * transaction [j_list_lock]
 	 */
 	struct journal_head	*t_buffers;
 
@@ -633,11 +629,9 @@ struct transaction_s
 	struct journal_head	*t_checkpoint_io_list;
 
 	/*
-	 * Doubly-linked circular list of metadata buffers being
-	 * shadowed by log IO.  The IO buffers on the iobuf list and
-	 * the shadow buffers on this list match each other one for
-	 * one at all times. [j_list_lock, no locks needed for jbd2
-	 * thread]
+	 * Doubly-linked circular list of metadata buffers being shadowed by log
+	 * IO.  The IO buffers on the iobuf list and the shadow buffers on this
+	 * list match each other one for one at all times. [j_list_lock]
 	 */
 	struct journal_head	*t_shadow_list;
 
@@ -774,8 +768,7 @@ enum passtype {PASS_SCAN, PASS_REVOKE, PASS_REPLAY};
 struct journal_s
 {
 	/**
-	 * @j_flags: General journaling state flags [j_state_lock,
-	 * no lock for quick racy checks]
+	 * @j_flags: General journaling state flags [j_state_lock]
 	 */
 	unsigned long		j_flags;
 
@@ -815,8 +808,7 @@ struct journal_s
 	/**
 	 * @j_barrier_count:
 	 *
-	 * Number of processes waiting to create a barrier lock [j_state_lock,
-	 * no lock for quick racy checks]
+	 * Number of processes waiting to create a barrier lock [j_state_lock]
 	 */
 	int			j_barrier_count;
 
@@ -829,8 +821,7 @@ struct journal_s
 	 * @j_running_transaction:
 	 *
 	 * Transactions: The current running transaction...
-	 * [j_state_lock, no lock for quick racy checks] [caller holding
-	 * open handle]
+	 * [j_state_lock] [caller holding open handle]
 	 */
 	transaction_t		*j_running_transaction;
 
@@ -1042,7 +1033,7 @@ struct journal_s
 	 * @j_commit_sequence:
 	 *
 	 * Sequence number of the most recently committed transaction
-	 * [j_state_lock, no lock for quick racy checks]
+	 * [j_state_lock].
 	 */
 	tid_t			j_commit_sequence;
 
@@ -1050,7 +1041,7 @@ struct journal_s
 	 * @j_commit_request:
 	 *
 	 * Sequence number of the most recent transaction wanting commit
-	 * [j_state_lock, no lock for quick racy checks]
+	 * [j_state_lock]
 	 */
 	tid_t			j_commit_request;
 

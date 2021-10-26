@@ -14,6 +14,7 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "../kselftest.h"
 #include "../kselftest_harness.h"

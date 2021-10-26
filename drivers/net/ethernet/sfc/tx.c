@@ -412,6 +412,14 @@ err:
 	return NETDEV_TX_OK;
 }
 
+static void efx_xdp_return_frames(int n,  struct xdp_frame **xdpfs)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+		xdp_return_frame_rx_napi(xdpfs[i]);
+}
+
 /* Transmit a packet from an XDP buffer
  *
  * Returns number of packets sent on success, error code otherwise.
@@ -484,7 +492,12 @@ int efx_xdp_tx_buffers(struct efx_nic *efx, int n, struct xdp_frame **xdpfs,
 	if (flush && i > 0)
 		efx_nic_push_buffers(tx_queue);
 
-	return i == 0 ? -EIO : i;
+	if (i == 0)
+		return -EIO;
+
+	efx_xdp_return_frames(n - i, xdpfs + i);
+
+	return i;
 }
 
 /* Initiate a packet transmission.  We use one channel per CPU

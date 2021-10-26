@@ -329,7 +329,7 @@ static int adis16480_set_freq(struct iio_dev *indio_dev, int val, int val2)
 	if (t == 0)
 		return -EINVAL;
 
-	adis_dev_lock(&st->adis);
+	mutex_lock(&st->adis.state_lock);
 	/*
 	 * When using PPS mode, the input clock needs to be scaled so that we have an IMU
 	 * sample rate between (optimally) 4000 and 4250. After this, we can use the
@@ -386,7 +386,7 @@ static int adis16480_set_freq(struct iio_dev *indio_dev, int val, int val2)
 
 	ret = __adis_write_reg_16(&st->adis, ADIS16480_REG_DEC_RATE, t);
 error:
-	adis_dev_unlock(&st->adis);
+	mutex_unlock(&st->adis.state_lock);
 	return ret;
 }
 
@@ -397,7 +397,7 @@ static int adis16480_get_freq(struct iio_dev *indio_dev, int *val, int *val2)
 	int ret;
 	unsigned int freq, sample_rate = st->clk_freq;
 
-	adis_dev_lock(&st->adis);
+	mutex_lock(&st->adis.state_lock);
 
 	if (st->clk_mode == ADIS16480_CLK_PPS) {
 		u16 sync_scale;
@@ -413,7 +413,7 @@ static int adis16480_get_freq(struct iio_dev *indio_dev, int *val, int *val2)
 	if (ret)
 		goto error;
 
-	adis_dev_unlock(&st->adis);
+	mutex_unlock(&st->adis.state_lock);
 
 	freq = DIV_ROUND_CLOSEST(sample_rate, (t + 1));
 
@@ -422,7 +422,7 @@ static int adis16480_get_freq(struct iio_dev *indio_dev, int *val, int *val2)
 
 	return IIO_VAL_INT_PLUS_MICRO;
 error:
-	adis_dev_unlock(&st->adis);
+	mutex_unlock(&st->adis.state_lock);
 	return ret;
 }
 
@@ -598,6 +598,7 @@ static int adis16480_set_filter_freq(struct iio_dev *indio_dev,
 	const struct iio_chan_spec *chan, unsigned int freq)
 {
 	struct adis16480 *st = iio_priv(indio_dev);
+	struct mutex *slock = &st->adis.state_lock;
 	unsigned int enable_mask, offset, reg;
 	unsigned int diff, best_diff;
 	unsigned int i, best_freq;
@@ -608,7 +609,7 @@ static int adis16480_set_filter_freq(struct iio_dev *indio_dev,
 	offset = ad16480_filter_data[chan->scan_index][1];
 	enable_mask = BIT(offset + 2);
 
-	adis_dev_lock(&st->adis);
+	mutex_lock(slock);
 
 	ret = __adis_read_reg_16(&st->adis, reg, &val);
 	if (ret)
@@ -636,7 +637,7 @@ static int adis16480_set_filter_freq(struct iio_dev *indio_dev,
 
 	ret = __adis_write_reg_16(&st->adis, reg, val);
 out_unlock:
-	adis_dev_unlock(&st->adis);
+	mutex_unlock(slock);
 
 	return ret;
 }

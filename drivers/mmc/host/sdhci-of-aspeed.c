@@ -181,7 +181,7 @@ aspeed_sdhci_configure_phase(struct sdhci_host *host, unsigned long rate)
 	struct aspeed_sdhci *sdhci;
 	struct device *dev;
 
-	dev = mmc_dev(host->mmc);
+	dev = host->mmc->parent;
 	sdhci = sdhci_pltfm_priv(sdhci_priv(host));
 
 	if (!sdhci->phase_desc)

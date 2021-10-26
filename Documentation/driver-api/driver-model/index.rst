@@ -7,6 +7,7 @@ Driver Model
 
    binding
    bus
+   class
    design-patterns
    device
    devres

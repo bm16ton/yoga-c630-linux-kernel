@@ -68,8 +68,7 @@ void test_test_ima(void)
 		goto close_prog;
 
 	snprintf(cmd, sizeof(cmd), "./ima_setup.sh setup %s", measured_dir);
-	err = system(cmd);
-	if (CHECK(err, "failed to run command", "%s, errno = %d\n", cmd, errno))
+	if (CHECK_FAIL(system(cmd)))
 		goto close_clean;
 
 	err = run_measured_process(measured_dir, &skel->bss->monitored_pid);
@@ -82,8 +81,7 @@ void test_test_ima(void)
 
 close_clean:
 	snprintf(cmd, sizeof(cmd), "./ima_setup.sh cleanup %s", measured_dir);
-	err = system(cmd);
-	CHECK(err, "failed to run command", "%s, errno = %d\n", cmd, errno);
+	CHECK_FAIL(system(cmd));
 close_prog:
 	ima__destroy(skel);
 }

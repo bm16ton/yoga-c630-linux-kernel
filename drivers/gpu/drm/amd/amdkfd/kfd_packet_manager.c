@@ -242,7 +242,6 @@ int pm_init(struct packet_manager *pm, struct device_queue_manager *dqm)
 	case CHIP_RAVEN:
 	case CHIP_RENOIR:
 	case CHIP_ARCTURUS:
-	case CHIP_ALDEBARAN:
 	case CHIP_NAVI10:
 	case CHIP_NAVI12:
 	case CHIP_NAVI14:

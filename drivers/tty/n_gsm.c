@@ -50,7 +50,6 @@
 #include <linux/netdevice.h>
 #include <linux/etherdevice.h>
 #include <linux/gsmmux.h>
-#include "tty.h"
 
 static int debug;
 module_param(debug, int, 0600);
@@ -267,7 +266,7 @@ struct gsm_mux {
 
 #define MAX_MUX		4			/* 256 minors */
 static struct gsm_mux *gsm_mux[MAX_MUX];	/* GSM muxes */
-static DEFINE_SPINLOCK(gsm_mux_lock);
+static spinlock_t gsm_mux_lock;
 
 static struct tty_driver *gsm_tty_driver;
 
@@ -2427,24 +2426,27 @@ static void gsmld_receive_buf(struct tty_struct *tty, const unsigned char *cp,
 			      char *fp, int count)
 {
 	struct gsm_mux *gsm = tty->disc_data;
+	const unsigned char *dp;
+	char *f;
+	int i;
 	char flags = TTY_NORMAL;
 
 	if (debug & 4)
 		print_hex_dump_bytes("gsmld_receive: ", DUMP_PREFIX_OFFSET,
 				     cp, count);
 
-	for (; count; count--, cp++) {
-		if (fp)
-			flags = *fp++;
+	for (i = count, dp = cp, f = fp; i; i--, dp++) {
+		if (f)
+			flags = *f++;
 		switch (flags) {
 		case TTY_NORMAL:
-			gsm->receive(gsm, *cp);
+			gsm->receive(gsm, *dp);
 			break;
 		case TTY_OVERRUN:
 		case TTY_BREAK:
 		case TTY_PARITY:
 		case TTY_FRAME:
-			gsm_error(gsm, *cp, flags);
+			gsm_error(gsm, *dp, flags);
 			break;
 		default:
 			WARN_ONCE(1, "%s: unknown flag %d\n",
@@ -2857,6 +2859,7 @@ static int gsm_create_network(struct gsm_dlci *dlci, struct gsm_netconfig *nc)
 /* Line discipline for real tty */
 static struct tty_ldisc_ops tty_ldisc_packet = {
 	.owner		 = THIS_MODULE,
+	.magic           = TTY_LDISC_MAGIC,
 	.name            = "n_gsm",
 	.open            = gsmld_open,
 	.close           = gsmld_close,
@@ -3059,7 +3062,7 @@ static int gsmtty_write_room(struct tty_struct *tty)
 {
 	struct gsm_dlci *dlci = tty->driver_data;
 	if (dlci->state == DLCI_CLOSED)
-		return 0;
+		return -EINVAL;
 	return TX_SIZE - kfifo_len(&dlci->fifo);
 }
 
@@ -3067,7 +3070,7 @@ static int gsmtty_chars_in_buffer(struct tty_struct *tty)
 {
 	struct gsm_dlci *dlci = tty->driver_data;
 	if (dlci->state == DLCI_CLOSED)
-		return 0;
+		return -EINVAL;
 	return kfifo_len(&dlci->fifo);
 }
 
@@ -3267,6 +3270,8 @@ static int __init gsm_init(void)
 	/* Fixme */
 	gsm_tty_driver->init_termios.c_lflag &= ~ECHO;
 	tty_set_operations(gsm_tty_driver, &gsmtty_ops);
+
+	spin_lock_init(&gsm_mux_lock);
 
 	if (tty_register_driver(gsm_tty_driver)) {
 		put_tty_driver(gsm_tty_driver);

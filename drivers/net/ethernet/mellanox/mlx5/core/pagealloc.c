@@ -61,7 +61,7 @@ struct fw_page {
 	u32			function;
 	unsigned long		bitmask;
 	struct list_head	list;
-	unsigned int free_count;
+	unsigned		free_count;
 };
 
 enum {

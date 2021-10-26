@@ -9,13 +9,10 @@
 
 #include <test_maps.h>
 
-static int nr_cpus;
-
 static void map_batch_update(int map_fd, __u32 max_entries, int *keys,
-			     __s64 *values, bool is_pcpu)
+			     int *values)
 {
-	int i, j, err;
-	int cpu_offset = 0;
+	int i, err;
 	DECLARE_LIBBPF_OPTS(bpf_map_batch_opts, opts,
 		.elem_flags = 0,
 		.flags = 0,
@@ -23,41 +20,22 @@ static void map_batch_update(int map_fd, __u32 max_entries, int *keys,
 
 	for (i = 0; i < max_entries; i++) {
 		keys[i] = i;
-		if (is_pcpu) {
-			cpu_offset = i * nr_cpus;
-			for (j = 0; j < nr_cpus; j++)
-				(values + cpu_offset)[j] = i + 1 + j;
-		} else {
-			values[i] = i + 1;
-		}
+		values[i] = i + 1;
 	}
 
 	err = bpf_map_update_batch(map_fd, keys, values, &max_entries, &opts);
 	CHECK(err, "bpf_map_update_batch()", "error:%s\n", strerror(errno));
 }
 
-static void map_batch_verify(int *visited, __u32 max_entries, int *keys,
-			     __s64 *values, bool is_pcpu)
+static void map_batch_verify(int *visited, __u32 max_entries,
+			     int *keys, int *values)
 {
-	int i, j;
-	int cpu_offset = 0;
+	int i;
 
 	memset(visited, 0, max_entries * sizeof(*visited));
 	for (i = 0; i < max_entries; i++) {
-		if (is_pcpu) {
-			cpu_offset = i * nr_cpus;
-			for (j = 0; j < nr_cpus; j++) {
-				__s64 value = (values + cpu_offset)[j];
-				CHECK(keys[i] + j + 1 != value,
-				      "key/value checking",
-				      "error: i %d j %d key %d value %lld\n", i,
-				      j, keys[i], value);
-			}
-		} else {
-			CHECK(keys[i] + 1 != values[i], "key/value checking",
-			      "error: i %d key %d value %lld\n", i, keys[i],
-			      values[i]);
-		}
+		CHECK(keys[i] + 1 != values[i], "key/value checking",
+		      "error: i %d key %d value %d\n", i, keys[i], values[i]);
 		visited[i] = 1;
 	}
 	for (i = 0; i < max_entries; i++) {
@@ -66,21 +44,20 @@ static void map_batch_verify(int *visited, __u32 max_entries, int *keys,
 	}
 }
 
-static void __test_map_lookup_and_update_batch(bool is_pcpu)
+void test_array_map_batch_ops(void)
 {
 	struct bpf_create_map_attr xattr = {
 		.name = "array_map",
-		.map_type = is_pcpu ? BPF_MAP_TYPE_PERCPU_ARRAY :
-				      BPF_MAP_TYPE_ARRAY,
+		.map_type = BPF_MAP_TYPE_ARRAY,
 		.key_size = sizeof(int),
-		.value_size = sizeof(__s64),
+		.value_size = sizeof(int),
 	};
-	int map_fd, *keys, *visited;
+	int map_fd, *keys, *values, *visited;
 	__u32 count, total, total_success;
 	const __u32 max_entries = 10;
+	bool nospace_err;
 	__u64 batch = 0;
-	int err, step, value_size;
-	void *values;
+	int err, step;
 	DECLARE_LIBBPF_OPTS(bpf_map_batch_opts, opts,
 		.elem_flags = 0,
 		.flags = 0,
@@ -91,35 +68,35 @@ static void __test_map_lookup_and_update_batch(bool is_pcpu)
 	CHECK(map_fd == -1,
 	      "bpf_create_map_xattr()", "error:%s\n", strerror(errno));
 
-	value_size = sizeof(__s64);
-	if (is_pcpu)
-		value_size *= nr_cpus;
-
-	keys = calloc(max_entries, sizeof(*keys));
-	values = calloc(max_entries, value_size);
-	visited = calloc(max_entries, sizeof(*visited));
+	keys = malloc(max_entries * sizeof(int));
+	values = malloc(max_entries * sizeof(int));
+	visited = malloc(max_entries * sizeof(int));
 	CHECK(!keys || !values || !visited, "malloc()", "error:%s\n",
 	      strerror(errno));
+
+	/* populate elements to the map */
+	map_batch_update(map_fd, max_entries, keys, values);
 
 	/* test 1: lookup in a loop with various steps. */
 	total_success = 0;
 	for (step = 1; step < max_entries; step++) {
-		map_batch_update(map_fd, max_entries, keys, values, is_pcpu);
-		map_batch_verify(visited, max_entries, keys, values, is_pcpu);
+		map_batch_update(map_fd, max_entries, keys, values);
+		map_batch_verify(visited, max_entries, keys, values);
 		memset(keys, 0, max_entries * sizeof(*keys));
-		memset(values, 0, max_entries * value_size);
+		memset(values, 0, max_entries * sizeof(*values));
 		batch = 0;
 		total = 0;
 		/* iteratively lookup/delete elements with 'step'
 		 * elements each.
 		 */
 		count = step;
+		nospace_err = false;
 		while (true) {
 			err = bpf_map_lookup_batch(map_fd,
-						   total ? &batch : NULL,
-						   &batch, keys + total,
-						   values + total * value_size,
-						   &count, &opts);
+						total ? &batch : NULL, &batch,
+						keys + total,
+						values + total,
+						&count, &opts);
 
 			CHECK((err && errno != ENOENT), "lookup with steps",
 			      "error: %s\n", strerror(errno));
@@ -130,10 +107,13 @@ static void __test_map_lookup_and_update_batch(bool is_pcpu)
 
 		}
 
+		if (nospace_err == true)
+			continue;
+
 		CHECK(total != max_entries, "lookup with steps",
 		      "total = %u, max_entries = %u\n", total, max_entries);
 
-		map_batch_verify(visited, max_entries, keys, values, is_pcpu);
+		map_batch_verify(visited, max_entries, keys, values);
 
 		total_success++;
 	}
@@ -141,30 +121,9 @@ static void __test_map_lookup_and_update_batch(bool is_pcpu)
 	CHECK(total_success == 0, "check total_success",
 	      "unexpected failure\n");
 
+	printf("%s:PASS\n", __func__);
+
 	free(keys);
 	free(values);
 	free(visited);
-}
-
-static void array_map_batch_ops(void)
-{
-	__test_map_lookup_and_update_batch(false);
-	printf("test_%s:PASS\n", __func__);
-}
-
-static void array_percpu_map_batch_ops(void)
-{
-	__test_map_lookup_and_update_batch(true);
-	printf("test_%s:PASS\n", __func__);
-}
-
-void test_array_map_batch_ops(void)
-{
-	nr_cpus = libbpf_num_possible_cpus();
-
-	CHECK(nr_cpus < 0, "nr_cpus checking",
-	      "error: get possible cpus failed");
-
-	array_map_batch_ops();
-	array_percpu_map_batch_ops();
 }

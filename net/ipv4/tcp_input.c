@@ -2917,7 +2917,7 @@ static void tcp_fastretrans_alert(struct sock *sk, const u32 prior_snd_una,
 	/* D. Check state exit conditions. State can be terminated
 	 *    when high_seq is ACKed. */
 	if (icsk->icsk_ca_state == TCP_CA_Open) {
-		WARN_ON(tp->retrans_out != 0 && !tp->syn_data);
+		WARN_ON(tp->retrans_out != 0);
 		tp->retrans_stamp = 0;
 	} else if (!before(tp->snd_una, tp->high_seq)) {
 		switch (icsk->icsk_ca_state) {
@@ -4247,9 +4247,6 @@ void tcp_reset(struct sock *sk, struct sk_buff *skb)
 {
 	trace_tcp_receive_reset(sk);
 
-	/* mptcp can't tell us to ignore reset pkts,
-	 * so just ignore the return value of mptcp_incoming_options().
-	 */
 	if (sk_is_mptcp(sk))
 		mptcp_incoming_options(sk, skb);
 
@@ -4944,13 +4941,8 @@ static void tcp_data_queue(struct sock *sk, struct sk_buff *skb)
 	bool fragstolen;
 	int eaten;
 
-	/* If a subflow has been reset, the packet should not continue
-	 * to be processed, drop the packet.
-	 */
-	if (sk_is_mptcp(sk) && !mptcp_incoming_options(sk, skb)) {
-		__kfree_skb(skb);
-		return;
-	}
+	if (sk_is_mptcp(sk))
+		mptcp_incoming_options(sk, skb);
 
 	if (TCP_SKB_CB(skb)->seq == TCP_SKB_CB(skb)->end_seq) {
 		__kfree_skb(skb);
@@ -5929,8 +5921,8 @@ void tcp_init_transfer(struct sock *sk, int bpf_op, struct sk_buff *skb)
 		tp->snd_cwnd = tcp_init_cwnd(tp, __sk_dst_get(sk));
 	tp->snd_cwnd_stamp = tcp_jiffies32;
 
+	icsk->icsk_ca_initialized = 0;
 	bpf_skops_established(sk, bpf_op, skb);
-	/* Initialize congestion control unless BPF initialized it already: */
 	if (!icsk->icsk_ca_initialized)
 		tcp_init_congestion_control(sk);
 	tcp_init_buffer_space(sk);
@@ -6009,9 +6001,11 @@ static bool tcp_rcv_fastopen_synack(struct sock *sk, struct sk_buff *synack,
 			tp->fastopen_client_fail = TFO_SYN_RETRANSMITTED;
 		else
 			tp->fastopen_client_fail = TFO_DATA_NOT_ACKED;
-		skb_rbtree_walk_from(data)
-			 tcp_mark_skb_lost(sk, data);
-		tcp_xmit_retransmit_queue(sk);
+		skb_rbtree_walk_from(data) {
+			if (__tcp_retransmit_skb(sk, data, 1))
+				break;
+		}
+		tcp_rearm_rto(sk);
 		NET_INC_STATS(sock_net(sk),
 				LINUX_MIB_TCPFASTOPENACTIVEFAIL);
 		return true;
@@ -6530,11 +6524,8 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
 	case TCP_CLOSING:
 	case TCP_LAST_ACK:
 		if (!before(TCP_SKB_CB(skb)->seq, tp->rcv_nxt)) {
-			/* If a subflow has been reset, the packet should not
-			 * continue to be processed, drop the packet.
-			 */
-			if (sk_is_mptcp(sk) && !mptcp_incoming_options(sk, skb))
-				goto discard;
+			if (sk_is_mptcp(sk))
+				mptcp_incoming_options(sk, skb);
 			break;
 		}
 		fallthrough;

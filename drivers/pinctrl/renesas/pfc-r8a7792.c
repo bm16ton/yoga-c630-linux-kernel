@@ -8,6 +8,7 @@
 
 #include <linux/kernel.h>
 
+#include "core.h"
 #include "sh_pfc.h"
 
 #define CPU_ALL_GP(fn, sfx)						\

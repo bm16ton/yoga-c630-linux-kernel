@@ -267,6 +267,19 @@ static void hns_xgmac_set_pausefrm_mac_addr(void *mac_drv, char *mac_addr)
 }
 
 /**
+ *hns_xgmac_set_rx_ignore_pause_frames - set rx pause param about xgmac
+ *@mac_drv: mac driver
+ *@enable:enable rx pause param
+ */
+static void hns_xgmac_set_rx_ignore_pause_frames(void *mac_drv, u32 enable)
+{
+	struct mac_driver *drv = (struct mac_driver *)mac_drv;
+
+	dsaf_set_dev_bit(drv, XGMAC_MAC_PAUSE_CTRL_REG,
+			 XGMAC_PAUSE_CTL_RX_B, !!enable);
+}
+
+/**
  *hns_xgmac_set_tx_auto_pause_frames - set tx pause param about xgmac
  *@mac_drv: mac driver
  *@enable:enable tx pause param
@@ -482,7 +495,7 @@ static void hns_xgmac_get_link_status(void *mac_drv, u32 *link_stat)
  */
 static void hns_xgmac_get_regs(void *mac_drv, void *data)
 {
-	u32 i;
+	u32 i = 0;
 	struct mac_driver *drv = (struct mac_driver *)mac_drv;
 	u32 *regs = data;
 	u64 qtmp;
@@ -745,14 +758,16 @@ static void hns_xgmac_get_stats(void *mac_drv, u64 *data)
  */
 static void hns_xgmac_get_strings(u32 stringset, u8 *data)
 {
-	u8 *buff = data;
+	char *buff = (char *)data;
 	u32 i;
 
 	if (stringset != ETH_SS_STATS)
 		return;
 
-	for (i = 0; i < ARRAY_SIZE(g_xgmac_stats_string); i++)
-		ethtool_sprintf(&buff, g_xgmac_stats_string[i].desc);
+	for (i = 0; i < ARRAY_SIZE(g_xgmac_stats_string); i++) {
+		snprintf(buff, ETH_GSTRING_LEN, g_xgmac_stats_string[i].desc);
+		buff = buff + ETH_GSTRING_LEN;
+	}
 }
 
 /**
@@ -799,6 +814,9 @@ void *hns_xgmac_config(struct hns_mac_cb *mac_cb, struct mac_params *mac_param)
 	mac_drv->set_an_mode = NULL;
 	mac_drv->config_loopback = NULL;
 	mac_drv->config_pad_and_crc = hns_xgmac_config_pad_and_crc;
+	mac_drv->config_half_duplex = NULL;
+	mac_drv->set_rx_ignore_pause_frames =
+		hns_xgmac_set_rx_ignore_pause_frames;
 	mac_drv->mac_free = hns_xgmac_free;
 	mac_drv->adjust_link = NULL;
 	mac_drv->set_tx_auto_pause_frames = hns_xgmac_set_tx_auto_pause_frames;

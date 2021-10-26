@@ -37,5 +37,3 @@ util/units.c
 util/affinity.c
 util/rwsem.c
 util/hashmap.c
-util/pmu-hybrid.c
-util/fncache.c

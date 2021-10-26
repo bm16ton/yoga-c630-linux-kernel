@@ -83,7 +83,7 @@ struct pcmcia_dynid {
 };
 
 /**
- * new_id_store() - add a new PCMCIA device ID to this driver and re-probe devices
+ * pcmcia_store_new_id - add a new PCMCIA device ID to this driver and re-probe devices
  * @driver: target device driver
  * @buf: buffer for scanning device ID data
  * @count: input size
@@ -371,6 +371,9 @@ static int pcmcia_device_remove(struct device *dev)
 		pcmcia_card_remove(p_dev->socket, p_dev);
 
 	/* detach the "instance" */
+	if (!p_drv)
+		return 0;
+
 	if (p_drv->remove)
 		p_drv->remove(p_dev);
 
@@ -386,7 +389,7 @@ static int pcmcia_device_remove(struct device *dev)
 				 "pcmcia: driver %s did not release window properly\n",
 				 p_drv->name);
 
-	/* references from pcmcia_device_probe */
+	/* references from pcmcia_probe_device */
 	pcmcia_put_dev(p_dev);
 	module_put(p_drv->owner);
 

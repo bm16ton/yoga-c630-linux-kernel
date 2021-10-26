@@ -56,7 +56,7 @@ static BLOCKING_NOTIFIER_HEAD(wf_client_list);
 static int wf_client_count;
 static unsigned int wf_overtemp;
 static unsigned int wf_overtemp_counter;
-static struct task_struct *wf_thread;
+struct task_struct *wf_thread;
 
 static struct platform_device wf_platform_device = {
 	.name	= "windfarm",

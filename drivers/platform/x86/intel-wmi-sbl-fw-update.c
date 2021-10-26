@@ -117,9 +117,10 @@ static int intel_wmi_sbl_fw_update_probe(struct wmi_device *wdev,
 	return 0;
 }
 
-static void intel_wmi_sbl_fw_update_remove(struct wmi_device *wdev)
+static int intel_wmi_sbl_fw_update_remove(struct wmi_device *wdev)
 {
 	dev_info(&wdev->dev, "Slim Bootloader signaling driver removed\n");
+	return 0;
 }
 
 static const struct wmi_device_id intel_wmi_sbl_id_table[] = {

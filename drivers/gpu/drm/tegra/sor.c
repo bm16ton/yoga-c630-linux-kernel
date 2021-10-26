@@ -3745,8 +3745,12 @@ static int tegra_sor_probe(struct platform_device *pdev)
 		if (!sor->aux)
 			return -EPROBE_DEFER;
 
-		if (get_device(sor->aux->dev))
-			sor->output.ddc = &sor->aux->ddc;
+		if (get_device(&sor->aux->ddc.dev)) {
+			if (try_module_get(sor->aux->ddc.owner))
+				sor->output.ddc = &sor->aux->ddc;
+			else
+				put_device(&sor->aux->ddc.dev);
+		}
 	}
 
 	if (!sor->aux) {
@@ -3774,13 +3778,12 @@ static int tegra_sor_probe(struct platform_device *pdev)
 
 	err = tegra_sor_parse_dt(sor);
 	if (err < 0)
-		goto put_aux;
+		return err;
 
 	err = tegra_output_probe(&sor->output);
-	if (err < 0) {
-		dev_err_probe(&pdev->dev, err, "failed to probe output\n");
-		goto put_aux;
-	}
+	if (err < 0)
+		return dev_err_probe(&pdev->dev, err,
+				     "failed to probe output\n");
 
 	if (sor->ops && sor->ops->probe) {
 		err = sor->ops->probe(sor);
@@ -3967,14 +3970,7 @@ uninit:
 	host1x_client_exit(&sor->client);
 	pm_runtime_disable(&pdev->dev);
 remove:
-	if (sor->aux)
-		sor->output.ddc = NULL;
-
 	tegra_output_remove(&sor->output);
-put_aux:
-	if (sor->aux)
-		put_device(sor->aux->dev);
-
 	return err;
 }
 
@@ -3991,11 +3987,6 @@ static int tegra_sor_remove(struct platform_device *pdev)
 	}
 
 	pm_runtime_disable(&pdev->dev);
-
-	if (sor->aux) {
-		put_device(sor->aux->dev);
-		sor->output.ddc = NULL;
-	}
 
 	tegra_output_remove(&sor->output);
 

@@ -190,7 +190,7 @@ static int dvb_ca_en50221_write_data(struct dvb_ca_private *ca, int slot,
 				     u8 *ebuf, int ecount);
 
 /**
- * findstr - Safely find needle in haystack.
+ * Safely find needle in haystack.
  *
  * @haystack: Buffer to look in.
  * @hlen: Number of bytes in haystack.
@@ -1006,7 +1006,7 @@ EXPORT_SYMBOL(dvb_ca_en50221_frda_irq);
 /* EN50221 thread functions */
 
 /**
- * dvb_ca_en50221_thread_wakeup - Wake up the DVB CA thread
+ * Wake up the DVB CA thread
  *
  * @ca: CA instance.
  */
@@ -1020,7 +1020,7 @@ static void dvb_ca_en50221_thread_wakeup(struct dvb_ca_private *ca)
 }
 
 /**
- * dvb_ca_en50221_thread_update_delay - Update the delay used by the thread.
+ * Update the delay used by the thread.
  *
  * @ca: CA instance.
  */
@@ -1078,7 +1078,7 @@ static void dvb_ca_en50221_thread_update_delay(struct dvb_ca_private *ca)
 }
 
 /**
- * dvb_ca_en50221_poll_cam_gone - Poll if the CAM is gone.
+ * Poll if the CAM is gone.
  *
  * @ca: CA instance.
  * @slot: Slot to process.
@@ -1109,8 +1109,7 @@ static int dvb_ca_en50221_poll_cam_gone(struct dvb_ca_private *ca, int slot)
 }
 
 /**
- * dvb_ca_en50221_thread_state_machine - Thread state machine for one CA slot
- *	to perform the data transfer.
+ * Thread state machine for one CA slot to perform the data transfer.
  *
  * @ca: CA instance.
  * @slot: Slot to process.
@@ -1325,13 +1324,12 @@ static int dvb_ca_en50221_thread(void *data)
 /* EN50221 IO interface functions */
 
 /**
- * dvb_ca_en50221_io_do_ioctl - Real ioctl implementation.
+ * Real ioctl implementation.
+ * NOTE: CA_SEND_MSG/CA_GET_MSG ioctls have userspace buffers passed to them.
  *
  * @file: File concerned.
  * @cmd: IOCTL command.
  * @parg: Associated argument.
- *
- * NOTE: CA_SEND_MSG/CA_GET_MSG ioctls have userspace buffers passed to them.
  *
  * return: 0 on success, <0 on error.
  */
@@ -1410,7 +1408,7 @@ out_unlock:
 }
 
 /**
- * dvb_ca_en50221_io_ioctl - Wrapper for ioctl implementation.
+ * Wrapper for ioctl implementation.
  *
  * @file: File concerned.
  * @cmd: IOCTL command.
@@ -1425,7 +1423,7 @@ static long dvb_ca_en50221_io_ioctl(struct file *file,
 }
 
 /**
- * dvb_ca_en50221_io_write - Implementation of write() syscall.
+ * Implementation of write() syscall.
  *
  * @file: File structure.
  * @buf: Source buffer.
@@ -1581,7 +1579,7 @@ nextslot:
 }
 
 /**
- * dvb_ca_en50221_io_read - Implementation of read() syscall.
+ * Implementation of read() syscall.
  *
  * @file: File structure.
  * @buf: Destination buffer.
@@ -1692,7 +1690,7 @@ exit:
 }
 
 /**
- * dvb_ca_en50221_io_open - Implementation of file open syscall.
+ * Implementation of file open syscall.
  *
  * @inode: Inode concerned.
  * @file: File concerned.
@@ -1742,7 +1740,7 @@ static int dvb_ca_en50221_io_open(struct inode *inode, struct file *file)
 }
 
 /**
- * dvb_ca_en50221_io_release - Implementation of file close syscall.
+ * Implementation of file close syscall.
  *
  * @inode: Inode concerned.
  * @file: File concerned.
@@ -1771,7 +1769,7 @@ static int dvb_ca_en50221_io_release(struct inode *inode, struct file *file)
 }
 
 /**
- * dvb_ca_en50221_io_poll - Implementation of poll() syscall.
+ * Implementation of poll() syscall.
  *
  * @file: File concerned.
  * @wait: poll wait table.
@@ -1829,7 +1827,7 @@ static const struct dvb_device dvbdev_ca = {
 /* Initialisation/shutdown functions */
 
 /**
- * dvb_ca_en50221_init - Initialise a new DVB CA EN50221 interface device.
+ * Initialise a new DVB CA EN50221 interface device.
  *
  * @dvb_adapter: DVB adapter to attach the new CA device to.
  * @pubca: The dvb_ca instance.
@@ -1921,7 +1919,7 @@ exit:
 EXPORT_SYMBOL(dvb_ca_en50221_init);
 
 /**
- * dvb_ca_en50221_release - Release a DVB CA EN50221 interface device.
+ * Release a DVB CA EN50221 interface device.
  *
  * @pubca: The associated dvb_ca instance.
  */

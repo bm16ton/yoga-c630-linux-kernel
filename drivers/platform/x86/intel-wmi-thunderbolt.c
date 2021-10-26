@@ -66,10 +66,11 @@ static int intel_wmi_thunderbolt_probe(struct wmi_device *wdev,
 	return ret;
 }
 
-static void intel_wmi_thunderbolt_remove(struct wmi_device *wdev)
+static int intel_wmi_thunderbolt_remove(struct wmi_device *wdev)
 {
 	sysfs_remove_group(&wdev->dev.kobj, &tbt_attribute_group);
 	kobject_uevent(&wdev->dev.kobj, KOBJ_CHANGE);
+	return 0;
 }
 
 static const struct wmi_device_id intel_wmi_thunderbolt_id_table[] = {

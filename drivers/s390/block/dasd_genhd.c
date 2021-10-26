@@ -146,11 +146,12 @@ void dasd_destroy_partitions(struct dasd_block *block)
 	block->bdev = NULL;
 
 	mutex_lock(&bdev->bd_mutex);
-	bdev_disk_changed(bdev, true);
+	blk_drop_partitions(bdev);
 	mutex_unlock(&bdev->bd_mutex);
 
 	/* Matching blkdev_put to the blkdev_get in dasd_scan_partitions. */
 	blkdev_put(bdev, FMODE_READ);
+	set_capacity(block->gdp, 0);
 }
 
 int dasd_gendisk_init(void)

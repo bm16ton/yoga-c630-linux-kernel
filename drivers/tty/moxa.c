@@ -1118,7 +1118,9 @@ static void __exit moxa_exit(void)
 
 	del_timer_sync(&moxaTimer);
 
-	tty_unregister_driver(moxaDriver);
+	if (tty_unregister_driver(moxaDriver))
+		printk(KERN_ERR "Couldn't unregister MOXA Intellio family "
+				"serial driver\n");
 	put_tty_driver(moxaDriver);
 }
 
@@ -2054,6 +2056,11 @@ static int moxa_set_serial_info(struct tty_struct *tty,
 		return -EINVAL;
 	if (!info)
 		return -ENODEV;
+
+	if (ss->irq != 0 || ss->port != 0 ||
+			ss->custom_divisor != 0 ||
+			ss->baud_base != 921600)
+		return -EPERM;
 
 	close_delay = msecs_to_jiffies(ss->close_delay * 10);
 

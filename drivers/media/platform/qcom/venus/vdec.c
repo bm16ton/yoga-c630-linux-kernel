@@ -515,10 +515,7 @@ vdec_decoder_cmd(struct file *file, void *fh, struct v4l2_decoder_cmd *cmd)
 
 		fdata.buffer_type = HFI_BUFFER_INPUT;
 		fdata.flags |= HFI_BUFFERFLAG_EOS;
-		if (IS_V6(inst->core))
-			fdata.device_addr = 0;
-		else
-			fdata.device_addr = 0xdeadb000;
+		fdata.device_addr = 0xdeadb000;
 
 		ret = hfi_session_process_buf(inst, &fdata);
 
@@ -623,7 +620,7 @@ static int vdec_set_properties(struct venus_inst *inst)
 {
 	struct vdec_controls *ctr = &inst->controls.dec;
 	struct hfi_enable en = { .enable = 1 };
-	u32 ptype, decode_order, conceal;
+	u32 ptype;
 	int ret;
 
 	if (ctr->post_loop_deb_mode) {
@@ -632,23 +629,6 @@ static int vdec_set_properties(struct venus_inst *inst)
 		if (ret)
 			return ret;
 	}
-
-	if (ctr->display_delay_enable && ctr->display_delay == 0) {
-		ptype = HFI_PROPERTY_PARAM_VDEC_OUTPUT_ORDER;
-		decode_order = HFI_OUTPUT_ORDER_DECODE;
-		ret = hfi_session_set_property(inst, ptype, &decode_order);
-		if (ret)
-			return ret;
-	}
-
-	ptype = HFI_PROPERTY_PARAM_VDEC_CONCEAL_COLOR;
-	conceal = ctr->conceal_color & 0xffff;
-	conceal |= ((ctr->conceal_color >> 16) & 0xffff) << 10;
-	conceal |= ((ctr->conceal_color >> 32) & 0xffff) << 20;
-
-	ret = hfi_session_set_property(inst, ptype, &conceal);
-	if (ret)
-		return ret;
 
 	return 0;
 }
@@ -667,7 +647,7 @@ static int vdec_output_conf(struct venus_inst *inst)
 	u32 ptype;
 	int ret;
 
-	ret = venus_helper_set_work_mode(inst);
+	ret = venus_helper_set_work_mode(inst, VIDC_WORK_MODE_2);
 	if (ret)
 		return ret;
 
@@ -682,8 +662,8 @@ static int vdec_output_conf(struct venus_inst *inst)
 	if (width > 1920 && height > ALIGN(1080, 32))
 		ubwc = true;
 
-	/* For Venus v4/v6 UBWC format is mandatory */
-	if (IS_V4(core) || IS_V6(core))
+	/* For Venus v4 UBWC format is mandatory */
+	if (IS_V4(core))
 		ubwc = true;
 
 	ret = venus_helper_get_out_fmts(inst, inst->fmt_cap->pixfmt, &out_fmt,
@@ -718,10 +698,6 @@ static int vdec_output_conf(struct venus_inst *inst)
 	if (ret)
 		return ret;
 
-	ret = venus_helper_set_format_constraints(inst);
-	if (ret)
-		return ret;
-
 	if (inst->dpb_fmt) {
 		ret = venus_helper_set_multistream(inst, false, true);
 		if (ret)
@@ -738,7 +714,7 @@ static int vdec_output_conf(struct venus_inst *inst)
 			return ret;
 	}
 
-	if (IS_V3(core) || IS_V4(core) || IS_V6(core)) {
+	if (IS_V3(core) || IS_V4(core)) {
 		ret = venus_helper_get_bufreq(inst, HFI_BUFFER_OUTPUT, &bufreq);
 		if (ret)
 			return ret;

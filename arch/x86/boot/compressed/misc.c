@@ -172,7 +172,7 @@ void __puthex(unsigned long value)
 	}
 }
 
-#ifdef CONFIG_X86_NEED_RELOCS
+#if CONFIG_X86_NEED_RELOCS
 static void handle_relocations(void *output, unsigned long output_len,
 			       unsigned long virt_addr)
 {
@@ -430,6 +430,8 @@ asmlinkage __visible void *extract_kernel(void *rmode, memptr heap,
 		error("Destination address too large");
 #endif
 #ifndef CONFIG_RELOCATABLE
+	if ((unsigned long)output != LOAD_PHYSICAL_ADDR)
+		error("Destination address does not match LOAD_PHYSICAL_ADDR");
 	if (virt_addr != LOAD_PHYSICAL_ADDR)
 		error("Destination virtual address changed when not relocatable");
 #endif
@@ -441,8 +443,11 @@ asmlinkage __visible void *extract_kernel(void *rmode, memptr heap,
 	handle_relocations(output, output_len, virt_addr);
 	debug_putstr("done.\nBooting the kernel.\n");
 
-	/* Disable exception handling before booting the kernel */
-	cleanup_exception_handling();
+	/*
+	 * Flush GHCB from cache and map it encrypted again when running as
+	 * SEV-ES guest.
+	 */
+	sev_es_shutdown_ghcb();
 
 	return output;
 }

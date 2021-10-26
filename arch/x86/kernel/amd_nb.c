@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Shared support code for AMD K8 northbridges and derivatives.
+ * Shared support code for AMD K8 northbridges and derivates.
  * Copyright 2006 Andi Kleen, SUSE Labs.
  */
 

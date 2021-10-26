@@ -655,7 +655,7 @@ static __u8 *kye_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 }
 
 /**
- * kye_tablet_enable() - Enable fully-functional tablet mode by setting a special feature report.
+ * Enable fully-functional tablet mode by setting a special feature report.
  *
  * @hdev:	HID device
  *

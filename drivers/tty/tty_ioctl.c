@@ -21,7 +21,6 @@
 #include <linux/bitops.h>
 #include <linux/mutex.h>
 #include <linux/compat.h>
-#include "tty.h"
 
 #include <asm/io.h>
 #include <linux/uaccess.h>
@@ -58,7 +57,8 @@ int tty_chars_in_buffer(struct tty_struct *tty)
 {
 	if (tty->ops->chars_in_buffer)
 		return tty->ops->chars_in_buffer(tty);
-	return 0;
+	else
+		return 0;
 }
 EXPORT_SYMBOL(tty_chars_in_buffer);
 

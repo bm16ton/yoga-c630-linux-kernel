@@ -514,7 +514,7 @@ xfs_attr_list_ilocked(
 		return 0;
 	if (dp->i_afp->if_format == XFS_DINODE_FMT_LOCAL)
 		return xfs_attr_shortform_list(context);
-	if (xfs_attr_is_leaf(dp))
+	if (xfs_bmap_one_block(dp, XFS_ATTR_FORK))
 		return xfs_attr_leaf_list(context);
 	return xfs_attr_node_list(context);
 }

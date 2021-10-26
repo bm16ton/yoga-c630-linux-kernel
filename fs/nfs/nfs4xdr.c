@@ -144,17 +144,7 @@ static int decode_layoutget(struct xdr_stream *xdr, struct rpc_rqst *req,
  * layout types will be returned.
  */
 #define decode_fsinfo_maxsz	(op_decode_hdr_maxsz + \
-				 nfs4_fattr_bitmap_maxsz + 1 + \
-				 1 /* lease time */ + \
-				 2 /* max filesize */ + \
-				 2 /* max read */ + \
-				 2 /* max write */ + \
-				 nfstime4_maxsz /* time delta */ + \
-				 5 /* fs layout types */ + \
-				 1 /* layout blksize */ + \
-				 1 /* clone blksize */ + \
-				 1 /* change attr type */ + \
-				 1 /* xattr support */)
+				 nfs4_fattr_bitmap_maxsz + 4 + 8 + 5)
 #define encode_renew_maxsz	(op_encode_hdr_maxsz + 3)
 #define decode_renew_maxsz	(op_decode_hdr_maxsz)
 #define encode_setclientid_maxsz \
@@ -3210,7 +3200,9 @@ out_status:
 	*nfs_retval = nfs4_stat_to_errno(nfserr);
 	return true;
 out_bad_operation:
-	trace_nfs4_xdr_bad_operation(xdr, opnum, expected);
+	dprintk("nfs: Server returned operation"
+		" %d but we issued a request for %d\n",
+			opnum, expected);
 	*nfs_retval = -EREMOTEIO;
 	return false;
 out_overflow:
@@ -3495,11 +3487,8 @@ static int decode_attr_filehandle(struct xdr_stream *xdr, uint32_t *bitmap, stru
 		if (unlikely(!p))
 			return -EIO;
 		len = be32_to_cpup(p);
-		if (len > NFS4_FHSIZE || len == 0) {
-			trace_nfs4_xdr_bad_filehandle(xdr, OP_READDIR,
-						      NFS4ERR_BADHANDLE);
-			return -EREMOTEIO;
-		}
+		if (len > NFS4_FHSIZE)
+			return -EIO;
 		p = xdr_inline_decode(xdr, len);
 		if (unlikely(!p))
 			return -EIO;
@@ -4848,32 +4837,6 @@ static int decode_attr_clone_blksize(struct xdr_stream *xdr, uint32_t *bitmap,
 	return 0;
 }
 
-static int decode_attr_change_attr_type(struct xdr_stream *xdr,
-					uint32_t *bitmap,
-					enum nfs4_change_attr_type *res)
-{
-	u32 tmp = NFS4_CHANGE_TYPE_IS_UNDEFINED;
-
-	dprintk("%s: bitmap is %x\n", __func__, bitmap[2]);
-	if (bitmap[2] & FATTR4_WORD2_CHANGE_ATTR_TYPE) {
-		if (xdr_stream_decode_u32(xdr, &tmp))
-			return -EIO;
-		bitmap[2] &= ~FATTR4_WORD2_CHANGE_ATTR_TYPE;
-	}
-
-	switch(tmp) {
-	case NFS4_CHANGE_TYPE_IS_MONOTONIC_INCR:
-	case NFS4_CHANGE_TYPE_IS_VERSION_COUNTER:
-	case NFS4_CHANGE_TYPE_IS_VERSION_COUNTER_NOPNFS:
-	case NFS4_CHANGE_TYPE_IS_TIME_METADATA:
-		*res = tmp;
-		break;
-	default:
-		*res = NFS4_CHANGE_TYPE_IS_UNDEFINED;
-	}
-	return 0;
-}
-
 static int decode_fsinfo(struct xdr_stream *xdr, struct nfs_fsinfo *fsinfo)
 {
 	unsigned int savep;
@@ -4922,11 +4885,6 @@ static int decode_fsinfo(struct xdr_stream *xdr, struct nfs_fsinfo *fsinfo)
 	if (status)
 		goto xdr_error;
 
-	status = decode_attr_change_attr_type(xdr, bitmap,
-					      &fsinfo->change_attr_type);
-	if (status)
-		goto xdr_error;
-
 	status = decode_attr_xattrsupport(xdr, bitmap,
 					  &fsinfo->xattr_support);
 	if (status)
@@ -4955,10 +4913,8 @@ static int decode_getfh(struct xdr_stream *xdr, struct nfs_fh *fh)
 	if (unlikely(!p))
 		return -EIO;
 	len = be32_to_cpup(p);
-	if (len > NFS4_FHSIZE || len == 0) {
-		trace_nfs4_xdr_bad_filehandle(xdr, OP_GETFH, NFS4ERR_BADHANDLE);
-		return -EREMOTEIO;
-	}
+	if (len > NFS4_FHSIZE)
+		return -EIO;
 	fh->size = len;
 	p = xdr_inline_decode(xdr, len);
 	if (unlikely(!p))
@@ -7673,3 +7629,9 @@ const struct rpc_version nfs_version4 = {
 	.procs			= nfs4_procedures,
 	.counts			= nfs_version4_counts,
 };
+
+/*
+ * Local variables:
+ *  c-basic-offset: 8
+ * End:
+ */

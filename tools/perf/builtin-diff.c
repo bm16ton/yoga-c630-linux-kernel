@@ -1796,7 +1796,7 @@ static int ui_init(void)
 	data__for_each_file(i, d) {
 
 		/*
-		 * Baseline or compute related columns:
+		 * Baseline or compute realted columns:
 		 *
 		 *   PERF_HPP_DIFF__BASELINE
 		 *   PERF_HPP_DIFF__DELTA

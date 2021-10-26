@@ -225,7 +225,7 @@ record_exception(struct pt_regs *regs, int eflag)
 int
 do_mathemu(struct pt_regs *regs)
 {
-	void *op0 = NULL, *op1 = NULL, *op2 = NULL, *op3 = NULL;
+	void *op0 = 0, *op1 = 0, *op2 = 0, *op3 = 0;
 	unsigned long pc = regs->nip;
 	signed short sdisp;
 	u32 insn = 0;
@@ -234,7 +234,7 @@ do_mathemu(struct pt_regs *regs)
 	int type = 0;
 	int eflag, trap;
 
-	if (get_user(insn, (u32 __user *)pc))
+	if (get_user(insn, (u32 *)pc))
 		return -EFAULT;
 
 	switch (insn >> 26) {

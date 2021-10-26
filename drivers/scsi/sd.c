@@ -1533,7 +1533,7 @@ static int sd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
 }
 
 /**
- *	sd_ioctl_common - process an ioctl
+ *	sd_ioctl - process an ioctl
  *	@bdev: target block device
  *	@mode: FMODE_* mask
  *	@cmd: ioctl command number
@@ -1637,7 +1637,6 @@ static unsigned int sd_check_events(struct gendisk *disk, unsigned int clearing)
 	struct scsi_disk *sdkp = scsi_disk_get(disk);
 	struct scsi_device *sdp;
 	int retval;
-	bool disk_changed;
 
 	if (!sdkp)
 		return 0;
@@ -1695,10 +1694,10 @@ out:
 	 *	Medium present state has changed in either direction.
 	 *	Device has indicated UNIT_ATTENTION.
 	 */
-	disk_changed = sdp->changed;
+	retval = sdp->changed ? DISK_EVENT_MEDIA_CHANGE : 0;
 	sdp->changed = 0;
 	scsi_disk_put(sdkp);
-	return disk_changed ? DISK_EVENT_MEDIA_CHANGE : 0;
+	return retval;
 }
 
 static int sd_sync_cache(struct scsi_disk *sdkp, struct scsi_sense_hdr *sshdr)

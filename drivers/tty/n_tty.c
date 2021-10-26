@@ -49,7 +49,6 @@
 #include <linux/module.h>
 #include <linux/ratelimit.h>
 #include <linux/vmalloc.h>
-#include "tty.h"
 
 /*
  * Until this number of characters is queued in the xmit buffer, select will
@@ -2489,7 +2488,7 @@ static int n_tty_ioctl(struct tty_struct *tty, struct file *file,
 }
 
 static struct tty_ldisc_ops n_tty_ops = {
-	.owner		 = THIS_MODULE,
+	.magic           = TTY_LDISC_MAGIC,
 	.name            = "n_tty",
 	.open            = n_tty_open,
 	.close           = n_tty_close,

@@ -84,10 +84,10 @@ static unsigned long rockchip_cpuclk_recalc_rate(struct clk_hw *hw,
 {
 	struct rockchip_cpuclk *cpuclk = to_rockchip_cpuclk_hw(hw);
 	const struct rockchip_cpuclk_reg_data *reg_data = cpuclk->reg_data;
-	u32 clksel0 = readl_relaxed(cpuclk->reg_base + reg_data->core_reg[0]);
+	u32 clksel0 = readl_relaxed(cpuclk->reg_base + reg_data->core_reg);
 
-	clksel0 >>= reg_data->div_core_shift[0];
-	clksel0 &= reg_data->div_core_mask[0];
+	clksel0 >>= reg_data->div_core_shift;
+	clksel0 &= reg_data->div_core_mask;
 	return parent_rate / (clksel0 + 1);
 }
 
@@ -120,7 +120,6 @@ static int rockchip_cpuclk_pre_rate_change(struct rockchip_cpuclk *cpuclk,
 	const struct rockchip_cpuclk_rate_table *rate;
 	unsigned long alt_prate, alt_div;
 	unsigned long flags;
-	int i = 0;
 
 	/* check validity of the new rate */
 	rate = rockchip_get_cpuclk_settings(cpuclk, ndata->new_rate);
@@ -143,10 +142,10 @@ static int rockchip_cpuclk_pre_rate_change(struct rockchip_cpuclk *cpuclk,
 	if (alt_prate > ndata->old_rate) {
 		/* calculate dividers */
 		alt_div =  DIV_ROUND_UP(alt_prate, ndata->old_rate) - 1;
-		if (alt_div > reg_data->div_core_mask[0]) {
+		if (alt_div > reg_data->div_core_mask) {
 			pr_warn("%s: limiting alt-divider %lu to %d\n",
-				__func__, alt_div, reg_data->div_core_mask[0]);
-			alt_div = reg_data->div_core_mask[0];
+				__func__, alt_div, reg_data->div_core_mask);
+			alt_div = reg_data->div_core_mask;
 		}
 
 		/*
@@ -159,17 +158,19 @@ static int rockchip_cpuclk_pre_rate_change(struct rockchip_cpuclk *cpuclk,
 		pr_debug("%s: setting div %lu as alt-rate %lu > old-rate %lu\n",
 			 __func__, alt_div, alt_prate, ndata->old_rate);
 
-		for (i = 0; i < reg_data->num_cores; i++) {
-			writel(HIWORD_UPDATE(alt_div, reg_data->div_core_mask[i],
-					     reg_data->div_core_shift[i]),
-			       cpuclk->reg_base + reg_data->core_reg[i]);
-		}
+		writel(HIWORD_UPDATE(alt_div, reg_data->div_core_mask,
+					      reg_data->div_core_shift) |
+		       HIWORD_UPDATE(reg_data->mux_core_alt,
+				     reg_data->mux_core_mask,
+				     reg_data->mux_core_shift),
+		       cpuclk->reg_base + reg_data->core_reg);
+	} else {
+		/* select alternate parent */
+		writel(HIWORD_UPDATE(reg_data->mux_core_alt,
+				     reg_data->mux_core_mask,
+				     reg_data->mux_core_shift),
+		       cpuclk->reg_base + reg_data->core_reg);
 	}
-	/* select alternate parent */
-	writel(HIWORD_UPDATE(reg_data->mux_core_alt,
-			     reg_data->mux_core_mask,
-			     reg_data->mux_core_shift),
-	       cpuclk->reg_base + reg_data->core_reg[0]);
 
 	spin_unlock_irqrestore(cpuclk->lock, flags);
 	return 0;
@@ -181,7 +182,6 @@ static int rockchip_cpuclk_post_rate_change(struct rockchip_cpuclk *cpuclk,
 	const struct rockchip_cpuclk_reg_data *reg_data = cpuclk->reg_data;
 	const struct rockchip_cpuclk_rate_table *rate;
 	unsigned long flags;
-	int i = 0;
 
 	rate = rockchip_get_cpuclk_settings(cpuclk, ndata->new_rate);
 	if (!rate) {
@@ -202,17 +202,12 @@ static int rockchip_cpuclk_post_rate_change(struct rockchip_cpuclk *cpuclk,
 	 * primary parent by the extra dividers that were needed for the alt.
 	 */
 
-	writel(HIWORD_UPDATE(reg_data->mux_core_main,
-			     reg_data->mux_core_mask,
-			     reg_data->mux_core_shift),
-	       cpuclk->reg_base + reg_data->core_reg[0]);
-
-	/* remove dividers */
-	for (i = 0; i < reg_data->num_cores; i++) {
-		writel(HIWORD_UPDATE(0, reg_data->div_core_mask[i],
-				     reg_data->div_core_shift[i]),
-		       cpuclk->reg_base + reg_data->core_reg[i]);
-	}
+	writel(HIWORD_UPDATE(0, reg_data->div_core_mask,
+				reg_data->div_core_shift) |
+	       HIWORD_UPDATE(reg_data->mux_core_main,
+				reg_data->mux_core_mask,
+				reg_data->mux_core_shift),
+	       cpuclk->reg_base + reg_data->core_reg);
 
 	if (ndata->old_rate > ndata->new_rate)
 		rockchip_cpuclk_set_dividers(cpuclk, rate);

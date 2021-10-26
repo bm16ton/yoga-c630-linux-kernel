@@ -68,8 +68,6 @@ struct bpf_reg_state {
 			unsigned long raw1;
 			unsigned long raw2;
 		} raw;
-
-		u32 subprogno; /* for PTR_TO_FUNC */
 	};
 	/* For PTR_TO_PACKET, used to find other pointers with the same variable
 	 * offset, so they can share range knowledge.
@@ -206,7 +204,6 @@ struct bpf_func_state {
 	int acquired_refs;
 	struct bpf_reference_state *refs;
 	int allocated_stack;
-	bool in_callback_fn;
 	struct bpf_stack_state *stack;
 };
 
@@ -215,13 +212,6 @@ struct bpf_idx_pair {
 	u32 idx;
 };
 
-struct bpf_id_pair {
-	u32 old;
-	u32 cur;
-};
-
-/* Maximum number of register states that can exist at once */
-#define BPF_ID_MAP_SIZE (MAX_BPF_REG + MAX_BPF_STACK / BPF_REG_SIZE)
 #define MAX_CALL_FRAMES 8
 struct bpf_verifier_state {
 	/* call stack tracking */
@@ -340,8 +330,8 @@ struct bpf_insn_aux_data {
 	};
 	u64 map_key_state; /* constant (32 bit) key tracking for maps */
 	int ctx_field_size; /* the ctx field size for load insn, maybe 0 */
+	int sanitize_stack_off; /* stack slot to be cleared */
 	u32 seen; /* this insn was processed by the verifier at env->pass_cnt */
-	bool sanitize_stack_spill; /* subject to Spectre v4 sanitation */
 	bool zext_dst; /* this insn zero extends dst reg */
 	u8 alu_state; /* used in combination with alu_limit */
 
@@ -414,7 +404,6 @@ struct bpf_verifier_env {
 	u32 used_map_cnt;		/* number of used maps */
 	u32 used_btf_cnt;		/* number of used BTF objects */
 	u32 id_gen;			/* used to generate unique reg IDs */
-	bool explore_alu_limits;
 	bool allow_ptr_leaks;
 	bool allow_uninit_stack;
 	bool allow_ptr_to_map_access;
@@ -426,7 +415,6 @@ struct bpf_verifier_env {
 	const struct bpf_line_info *prev_linfo;
 	struct bpf_verifier_log log;
 	struct bpf_subprog_info subprog_info[BPF_MAX_SUBPROGS + 1];
-	struct bpf_id_pair idmap_scratch[BPF_ID_MAP_SIZE];
 	struct {
 		int *insn_state;
 		int *insn_stack;
@@ -495,15 +483,6 @@ static inline u64 bpf_trampoline_compute_key(const struct bpf_prog *tgt_prog,
 		return ((u64)tgt_prog->aux->id << 32) | btf_id;
 	else
 		return ((u64)btf_obj_id(btf) << 32) | 0x80000000 | btf_id;
-}
-
-/* unpack the IDs from the key as constructed above */
-static inline void bpf_trampoline_unpack_key(u64 key, u32 *obj_id, u32 *btf_id)
-{
-	if (obj_id)
-		*obj_id = key >> 32;
-	if (btf_id)
-		*btf_id = key & 0x7FFFFFFF;
 }
 
 int bpf_check_attach_target(struct bpf_verifier_log *log,

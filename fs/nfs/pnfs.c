@@ -2411,7 +2411,9 @@ pnfs_layout_process(struct nfs4_layoutget *lgp)
 			.iomode = IOMODE_ANY,
 			.length = NFS4_MAX_UINT64,
 		};
-		pnfs_mark_matching_lsegs_return(lo, &free_me, &range, 0);
+		pnfs_set_plh_return_info(lo, IOMODE_ANY, 0);
+		pnfs_mark_matching_lsegs_return(lo, &lo->plh_return_segs,
+						&range, 0);
 		goto out_forget;
 	} else {
 		/* We have a completely new layout */
@@ -2677,7 +2679,7 @@ EXPORT_SYMBOL_GPL(pnfs_generic_pg_check_range);
 void
 pnfs_generic_pg_init_read(struct nfs_pageio_descriptor *pgio, struct nfs_page *req)
 {
-	u64 rd_size;
+	u64 rd_size = req->wb_bytes;
 
 	pnfs_generic_pg_check_layout(pgio);
 	pnfs_generic_pg_check_range(pgio, req);

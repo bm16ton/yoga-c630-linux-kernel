@@ -90,12 +90,6 @@ static struct palmas_gpadc_info palmas_gpadc_info[] = {
  *			3: 800 uA
  * @extended_delay:	enable the gpadc extended delay mode
  * @auto_conversion_period:	define the auto_conversion_period
- * @lock:	Lock to protect the device state during a potential concurrent
- *		read access from userspace. Reading a raw value requires a sequence
- *		of register writes, then a wait for a completion callback,
- *		and finally a register read, during which userspace could issue
- *		another read request. This lock protects a read access from
- *		ocurring before another one has finished.
  *
  * This is the palmas_gpadc structure to store run-time information
  * and pointers for this driver instance.
@@ -116,7 +110,6 @@ struct palmas_gpadc {
 	bool				wakeup1_enable;
 	bool				wakeup2_enable;
 	int				auto_conversion_period;
-	struct mutex			lock;
 };
 
 /*
@@ -395,7 +388,7 @@ static int palmas_gpadc_read_raw(struct iio_dev *indio_dev,
 	if (adc_chan > PALMAS_ADC_CH_MAX)
 		return -EINVAL;
 
-	mutex_lock(&adc->lock);
+	mutex_lock(&indio_dev->mlock);
 
 	switch (mask) {
 	case IIO_CHAN_INFO_RAW:
@@ -421,12 +414,12 @@ static int palmas_gpadc_read_raw(struct iio_dev *indio_dev,
 		goto out;
 	}
 
-	mutex_unlock(&adc->lock);
+	mutex_unlock(&indio_dev->mlock);
 	return ret;
 
 out:
 	palmas_gpadc_read_done(adc, adc_chan);
-	mutex_unlock(&adc->lock);
+	mutex_unlock(&indio_dev->mlock);
 
 	return ret;
 }
@@ -523,11 +516,8 @@ static int palmas_gpadc_probe(struct platform_device *pdev)
 	adc->dev = &pdev->dev;
 	adc->palmas = dev_get_drvdata(pdev->dev.parent);
 	adc->adc_info = palmas_gpadc_info;
-
-	mutex_init(&adc->lock);
-
 	init_completion(&adc->conv_completion);
-	platform_set_drvdata(pdev, indio_dev);
+	dev_set_drvdata(&pdev->dev, indio_dev);
 
 	adc->auto_conversion_period = gpadc_pdata->auto_conversion_period_ms;
 	adc->irq = palmas_irq_get_virq(adc->palmas, PALMAS_GPADC_EOC_SW_IRQ);

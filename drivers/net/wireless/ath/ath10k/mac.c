@@ -4727,8 +4727,6 @@ out:
 /* Must not be called with conf_mutex held as workers can use that also. */
 void ath10k_drain_tx(struct ath10k *ar)
 {
-	lockdep_assert_not_held(&ar->conf_mutex);
-
 	/* make sure rcu-protected mac80211 tx path itself is drained */
 	synchronize_net();
 
@@ -9458,8 +9456,8 @@ static const struct ieee80211_channel ath10k_5ghz_channels[] = {
 	CHAN5G(161, 5805, 0),
 	CHAN5G(165, 5825, 0),
 	CHAN5G(169, 5845, 0),
-//	CHAN5G(173, 5865, 0),
-//	CHAN5G(177, 5885, 0),
+	CHAN5G(173, 5865, 0),
+	CHAN5G(177, 5885, 0),
 //	CHAN5G(181, 5905, 0),
 //	CHAN5G(185, 5925, 0),
 //	CHAN5G(189, 5945, 0),

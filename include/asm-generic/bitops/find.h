@@ -2,13 +2,6 @@
 #ifndef _ASM_GENERIC_BITOPS_FIND_H_
 #define _ASM_GENERIC_BITOPS_FIND_H_
 
-extern unsigned long _find_next_bit(const unsigned long *addr1,
-		const unsigned long *addr2, unsigned long nbits,
-		unsigned long start, unsigned long invert, unsigned long le);
-extern unsigned long _find_first_bit(const unsigned long *addr, unsigned long size);
-extern unsigned long _find_first_zero_bit(const unsigned long *addr, unsigned long size);
-extern unsigned long _find_last_bit(const unsigned long *addr, unsigned long size);
-
 #ifndef find_next_bit
 /**
  * find_next_bit - find the next set bit in a memory region
@@ -19,22 +12,8 @@ extern unsigned long _find_last_bit(const unsigned long *addr, unsigned long siz
  * Returns the bit number for the next set bit
  * If no bits are set, returns @size.
  */
-static inline
-unsigned long find_next_bit(const unsigned long *addr, unsigned long size,
-			    unsigned long offset)
-{
-	if (small_const_nbits(size)) {
-		unsigned long val;
-
-		if (unlikely(offset >= size))
-			return size;
-
-		val = *addr & GENMASK(size - 1, offset);
-		return val ? __ffs(val) : size;
-	}
-
-	return _find_next_bit(addr, NULL, size, offset, 0UL, 0);
-}
+extern unsigned long find_next_bit(const unsigned long *addr, unsigned long
+		size, unsigned long offset);
 #endif
 
 #ifndef find_next_and_bit
@@ -48,23 +27,9 @@ unsigned long find_next_bit(const unsigned long *addr, unsigned long size,
  * Returns the bit number for the next set bit
  * If no bits are set, returns @size.
  */
-static inline
-unsigned long find_next_and_bit(const unsigned long *addr1,
+extern unsigned long find_next_and_bit(const unsigned long *addr1,
 		const unsigned long *addr2, unsigned long size,
-		unsigned long offset)
-{
-	if (small_const_nbits(size)) {
-		unsigned long val;
-
-		if (unlikely(offset >= size))
-			return size;
-
-		val = *addr1 & *addr2 & GENMASK(size - 1, offset);
-		return val ? __ffs(val) : size;
-	}
-
-	return _find_next_bit(addr1, addr2, size, offset, 0UL, 0);
-}
+		unsigned long offset);
 #endif
 
 #ifndef find_next_zero_bit
@@ -77,22 +42,8 @@ unsigned long find_next_and_bit(const unsigned long *addr1,
  * Returns the bit number of the next zero bit
  * If no bits are zero, returns @size.
  */
-static inline
-unsigned long find_next_zero_bit(const unsigned long *addr, unsigned long size,
-				 unsigned long offset)
-{
-	if (small_const_nbits(size)) {
-		unsigned long val;
-
-		if (unlikely(offset >= size))
-			return size;
-
-		val = *addr | ~GENMASK(size - 1, offset);
-		return val == ~0UL ? size : ffz(val);
-	}
-
-	return _find_next_bit(addr, NULL, size, offset, ~0UL, 0);
-}
+extern unsigned long find_next_zero_bit(const unsigned long *addr, unsigned
+		long size, unsigned long offset);
 #endif
 
 #ifdef CONFIG_GENERIC_FIND_FIRST_BIT
@@ -105,17 +56,8 @@ unsigned long find_next_zero_bit(const unsigned long *addr, unsigned long size,
  * Returns the bit number of the first set bit.
  * If no bits are set, returns @size.
  */
-static inline
-unsigned long find_first_bit(const unsigned long *addr, unsigned long size)
-{
-	if (small_const_nbits(size)) {
-		unsigned long val = *addr & GENMASK(size - 1, 0);
-
-		return val ? __ffs(val) : size;
-	}
-
-	return _find_first_bit(addr, size);
-}
+extern unsigned long find_first_bit(const unsigned long *addr,
+				    unsigned long size);
 
 /**
  * find_first_zero_bit - find the first cleared bit in a memory region
@@ -125,17 +67,8 @@ unsigned long find_first_bit(const unsigned long *addr, unsigned long size)
  * Returns the bit number of the first cleared bit.
  * If no bits are zero, returns @size.
  */
-static inline
-unsigned long find_first_zero_bit(const unsigned long *addr, unsigned long size)
-{
-	if (small_const_nbits(size)) {
-		unsigned long val = *addr | ~GENMASK(size - 1, 0);
-
-		return val == ~0UL ? size : ffz(val);
-	}
-
-	return _find_first_zero_bit(addr, size);
-}
+extern unsigned long find_first_zero_bit(const unsigned long *addr,
+					 unsigned long size);
 #else /* CONFIG_GENERIC_FIND_FIRST_BIT */
 
 #ifndef find_first_bit
@@ -146,27 +79,6 @@ unsigned long find_first_zero_bit(const unsigned long *addr, unsigned long size)
 #endif
 
 #endif /* CONFIG_GENERIC_FIND_FIRST_BIT */
-
-#ifndef find_last_bit
-/**
- * find_last_bit - find the last set bit in a memory region
- * @addr: The address to start the search at
- * @size: The number of bits to search
- *
- * Returns the bit number of the last set bit, or size.
- */
-static inline
-unsigned long find_last_bit(const unsigned long *addr, unsigned long size)
-{
-	if (small_const_nbits(size)) {
-		unsigned long val = *addr & GENMASK(size - 1, 0);
-
-		return val ? __fls(val) : size;
-	}
-
-	return _find_last_bit(addr, size);
-}
-#endif
 
 /**
  * find_next_clump8 - find next 8-bit clump with set bits in a memory region

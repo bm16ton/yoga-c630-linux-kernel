@@ -193,6 +193,7 @@ static int spear_pwm_probe(struct platform_device *pdev)
 
 	pc->chip.dev = &pdev->dev;
 	pc->chip.ops = &spear_pwm_ops;
+	pc->chip.base = -1;
 	pc->chip.npwm = NUM_PWM;
 
 	ret = clk_prepare(pc->clk);

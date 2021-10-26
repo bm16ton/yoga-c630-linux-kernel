@@ -783,7 +783,6 @@ early_initcall(pfault_irq_init);
 #endif /* CONFIG_PFAULT */
 
 #if IS_ENABLED(CONFIG_PGSTE)
-
 void do_secure_storage_access(struct pt_regs *regs)
 {
 	unsigned long addr = regs->int_parm_long & __FAIL_ADDR_MASK;
@@ -886,4 +885,19 @@ void do_secure_storage_violation(struct pt_regs *regs)
 	send_sig(SIGSEGV, current, 0);
 }
 
-#endif /* CONFIG_PGSTE */
+#else
+void do_secure_storage_access(struct pt_regs *regs)
+{
+	default_trap_handler(regs);
+}
+
+void do_non_secure_storage_access(struct pt_regs *regs)
+{
+	default_trap_handler(regs);
+}
+
+void do_secure_storage_violation(struct pt_regs *regs)
+{
+	default_trap_handler(regs);
+}
+#endif

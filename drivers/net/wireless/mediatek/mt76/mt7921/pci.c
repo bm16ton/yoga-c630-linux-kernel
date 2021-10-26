@@ -13,7 +13,7 @@
 #include "../trace.h"
 
 static const struct pci_device_id mt7921_pci_device_table[] = {
-	{ PCI_DEVICE(PCI_VENDOR_ID_MEDIATEK, 0x7961) },
+	{ PCI_DEVICE(0x14c3, 0x7961) },
 	{ },
 };
 
@@ -61,18 +61,6 @@ static void mt7921_irq_tasklet(unsigned long data)
 	if (intr & MT_INT_TX_DONE_MCU)
 		mask |= MT_INT_TX_DONE_MCU;
 
-	if (intr & MT_INT_MCU_CMD) {
-		u32 intr_sw;
-
-		intr_sw = mt76_rr(dev, MT_MCU_CMD);
-		/* ack MCU2HOST_SW_INT_STA */
-		mt76_wr(dev, MT_MCU_CMD, intr_sw);
-		if (intr_sw & MT_MCU_CMD_WAKE_RX_PCIE) {
-			mask |= MT_INT_RX_DONE_DATA;
-			intr |= MT_INT_RX_DONE_DATA;
-		}
-	}
-
 	mt76_set_irq_mask(&dev->mt76, MT_WFDMA0_HOST_INT_ENA, mask, 0);
 
 	if (intr & MT_INT_TX_DONE_ALL)
@@ -99,7 +87,6 @@ static int mt7921_pci_probe(struct pci_dev *pdev,
 		.survey_flags = SURVEY_INFO_TIME_TX |
 				SURVEY_INFO_TIME_RX |
 				SURVEY_INFO_TIME_BSS_RX,
-		.token_size = MT7921_TOKEN_SIZE,
 		.tx_prepare_skb = mt7921_tx_prepare_skb,
 		.tx_complete_skb = mt7921_tx_complete_skb,
 		.rx_skb = mt7921_queue_rx_skb,
@@ -188,27 +175,19 @@ static int mt7921_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 {
 	struct mt76_dev *mdev = pci_get_drvdata(pdev);
 	struct mt7921_dev *dev = container_of(mdev, struct mt7921_dev, mt76);
-	struct mt76_connac_pm *pm = &dev->pm;
 	bool hif_suspend;
 	int i, err;
 
-	pm->suspended = true;
-	cancel_delayed_work_sync(&pm->ps_work);
-	cancel_work_sync(&pm->wake_work);
-
-	err = mt7921_mcu_drv_pmctrl(dev);
+	err = mt76_connac_pm_wake(&dev->mphy, &dev->pm);
 	if (err < 0)
-		goto restore_suspend;
+		return err;
 
 	hif_suspend = !test_bit(MT76_STATE_SUSPEND, &dev->mphy.state);
 	if (hif_suspend) {
 		err = mt76_connac_mcu_set_hif_suspend(mdev, true);
 		if (err)
-			goto restore_suspend;
+			return err;
 	}
-
-	if (!pm->enable)
-		mt76_connac_mcu_set_deep_sleep(&dev->mt76, true);
 
 	napi_disable(&mdev->tx_napi);
 	mt76_worker_disable(&mdev->tx_worker);
@@ -236,29 +215,22 @@ static int mt7921_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 
 	err = mt7921_mcu_fw_pmctrl(dev);
 	if (err)
-		goto restore_napi;
+		goto restore;
 
 	pci_save_state(pdev);
 	err = pci_set_power_state(pdev, pci_choose_state(pdev, state));
 	if (err)
-		goto restore_napi;
+		goto restore;
 
 	return 0;
 
-restore_napi:
+restore:
 	mt76_for_each_q_rx(mdev, i) {
 		napi_enable(&mdev->napi[i]);
 	}
 	napi_enable(&mdev->tx_napi);
-
-	if (!pm->enable)
-		mt76_connac_mcu_set_deep_sleep(&dev->mt76, false);
-
 	if (hif_suspend)
 		mt76_connac_mcu_set_hif_suspend(mdev, false);
-
-restore_suspend:
-	pm->suspended = false;
 
 	return err;
 }
@@ -269,7 +241,6 @@ static int mt7921_pci_resume(struct pci_dev *pdev)
 	struct mt7921_dev *dev = container_of(mdev, struct mt7921_dev, mt76);
 	int i, err;
 
-	dev->pm.suspended = false;
 	err = pci_set_power_state(pdev, PCI_D0);
 	if (err)
 		return err;
@@ -280,13 +251,10 @@ static int mt7921_pci_resume(struct pci_dev *pdev)
 	if (err < 0)
 		return err;
 
-	mt7921_wpdma_reinit_cond(dev);
-
 	/* enable interrupt */
 	mt76_wr(dev, MT_PCIE_MAC_INT_ENABLE, 0xff);
 	mt7921_irq_enable(dev, MT_INT_RX_DONE_ALL | MT_INT_TX_DONE_ALL |
 			  MT_INT_MCU_CMD);
-	mt76_set(dev, MT_MCU2HOST_SW_INT_ENA, MT_MCU_CMD_WAKE_RX_PCIE);
 
 	/* put dma enabled */
 	mt76_set(dev, MT_WFDMA0_GLO_CFG,
@@ -299,9 +267,6 @@ static int mt7921_pci_resume(struct pci_dev *pdev)
 	}
 	napi_enable(&mdev->tx_napi);
 	napi_schedule(&mdev->tx_napi);
-
-	if (!dev->pm.enable)
-		mt76_connac_mcu_set_deep_sleep(&dev->mt76, false);
 
 	if (!test_bit(MT76_STATE_SUSPEND, &dev->mphy.state))
 		err = mt76_connac_mcu_set_hif_suspend(mdev, false);

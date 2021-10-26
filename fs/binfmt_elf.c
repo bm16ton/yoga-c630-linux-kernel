@@ -2267,7 +2267,8 @@ static int elf_core_dump(struct coredump_params *cprm)
 		goto end_coredump;
 
 	/* Align to page */
-	dump_skip_to(cprm, dataoff);
+	if (!dump_skip(cprm, dataoff - cprm->pos))
+		goto end_coredump;
 
 	for (i = 0; i < vma_count; i++) {
 		struct core_vma_metadata *meta = vma_meta + i;
@@ -2275,6 +2276,7 @@ static int elf_core_dump(struct coredump_params *cprm)
 		if (!dump_user_range(cprm, meta->start, meta->dump_size))
 			goto end_coredump;
 	}
+	dump_truncate(cprm);
 
 	if (!elf_core_write_extra_data(cprm))
 		goto end_coredump;

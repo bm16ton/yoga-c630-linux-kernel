@@ -680,10 +680,13 @@ qtnf_connect(struct wiphy *wiphy, struct net_device *dev,
 		eth_zero_addr(vif->bssid);
 
 	ret = qtnf_cmd_send_connect(vif, sme);
-	if (ret)
+	if (ret) {
 		pr_err("VIF%u.%u: failed to connect\n",
 		       vif->mac->macid, vif->vifid);
+		goto out;
+	}
 
+out:
 	return ret;
 }
 
@@ -699,10 +702,13 @@ qtnf_external_auth(struct wiphy *wiphy, struct net_device *dev,
 		pr_warn("unexpected bssid: %pM", auth->bssid);
 
 	ret = qtnf_cmd_send_external_auth(vif, auth);
-	if (ret)
+	if (ret) {
 		pr_err("VIF%u.%u: failed to report external auth\n",
 		       vif->mac->macid, vif->vifid);
+		goto out;
+	}
 
+out:
 	return ret;
 }
 
@@ -721,7 +727,8 @@ qtnf_disconnect(struct wiphy *wiphy, struct net_device *dev,
 	}
 
 	if (vif->wdev.iftype != NL80211_IFTYPE_STATION) {
-		return -EOPNOTSUPP;
+		ret = -EOPNOTSUPP;
+		goto out;
 	}
 
 	ret = qtnf_cmd_send_disconnect(vif, reason_code);
@@ -735,6 +742,7 @@ qtnf_disconnect(struct wiphy *wiphy, struct net_device *dev,
 				      NULL, 0, true, GFP_KERNEL);
 	}
 
+out:
 	return ret;
 }
 
@@ -927,10 +935,13 @@ static int qtnf_update_owe_info(struct wiphy *wiphy, struct net_device *dev,
 		return -EOPNOTSUPP;
 
 	ret = qtnf_cmd_send_update_owe(vif, owe_info);
-	if (ret)
+	if (ret) {
 		pr_err("VIF%u.%u: failed to update owe info\n",
 		       vif->mac->macid, vif->vifid);
+		goto out;
+	}
 
+out:
 	return ret;
 }
 
@@ -976,14 +987,18 @@ static int qtnf_resume(struct wiphy *wiphy)
 	vif = qtnf_mac_get_base_vif(mac);
 	if (!vif) {
 		pr_err("MAC%u: primary VIF is not configured\n", mac->macid);
-		return -EFAULT;
+		ret = -EFAULT;
+		goto exit;
 	}
 
 	ret = qtnf_cmd_send_wowlan_set(vif, NULL);
-	if (ret)
+	if (ret) {
 		pr_err("MAC%u: failed to reset WoWLAN triggers\n",
 		       mac->macid);
+		goto exit;
+	}
 
+exit:
 	return ret;
 }
 

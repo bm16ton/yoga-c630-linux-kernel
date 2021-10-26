@@ -1828,18 +1828,6 @@ out:
 	return ret;
 }
 
-__printf(2, 3) void ethtool_sprintf(u8 **data, const char *fmt, ...)
-{
-	va_list args;
-
-	va_start(args, fmt);
-	vsnprintf(*data, ETH_GSTRING_LEN, fmt, args);
-	va_end(args);
-
-	*data += ETH_GSTRING_LEN;
-}
-EXPORT_SYMBOL(ethtool_sprintf);
-
 static int ethtool_phys_id(struct net_device *dev, void __user *useraddr)
 {
 	struct ethtool_value id;
@@ -2188,8 +2176,8 @@ static int ethtool_get_ts_info(struct net_device *dev, void __user *useraddr)
 	return 0;
 }
 
-int ethtool_get_module_info_call(struct net_device *dev,
-				 struct ethtool_modinfo *modinfo)
+static int __ethtool_get_module_info(struct net_device *dev,
+				     struct ethtool_modinfo *modinfo)
 {
 	const struct ethtool_ops *ops = dev->ethtool_ops;
 	struct phy_device *phydev = dev->phydev;
@@ -2215,7 +2203,7 @@ static int ethtool_get_module_info(struct net_device *dev,
 	if (copy_from_user(&modinfo, useraddr, sizeof(modinfo)))
 		return -EFAULT;
 
-	ret = ethtool_get_module_info_call(dev, &modinfo);
+	ret = __ethtool_get_module_info(dev, &modinfo);
 	if (ret)
 		return ret;
 
@@ -2225,8 +2213,8 @@ static int ethtool_get_module_info(struct net_device *dev,
 	return 0;
 }
 
-int ethtool_get_module_eeprom_call(struct net_device *dev,
-				   struct ethtool_eeprom *ee, u8 *data)
+static int __ethtool_get_module_eeprom(struct net_device *dev,
+				       struct ethtool_eeprom *ee, u8 *data)
 {
 	const struct ethtool_ops *ops = dev->ethtool_ops;
 	struct phy_device *phydev = dev->phydev;
@@ -2249,12 +2237,12 @@ static int ethtool_get_module_eeprom(struct net_device *dev,
 	int ret;
 	struct ethtool_modinfo modinfo;
 
-	ret = ethtool_get_module_info_call(dev, &modinfo);
+	ret = __ethtool_get_module_info(dev, &modinfo);
 	if (ret)
 		return ret;
 
 	return ethtool_get_any_eeprom(dev, useraddr,
-				      ethtool_get_module_eeprom_call,
+				      __ethtool_get_module_eeprom,
 				      modinfo.eeprom_len);
 }
 
@@ -2552,9 +2540,6 @@ static int ethtool_get_fecparam(struct net_device *dev, void __user *useraddr)
 	if (rc)
 		return rc;
 
-	if (WARN_ON_ONCE(fecparam.reserved))
-		fecparam.reserved = 0;
-
 	if (copy_to_user(useraddr, &fecparam, sizeof(fecparam)))
 		return -EFAULT;
 	return 0;
@@ -2569,12 +2554,6 @@ static int ethtool_set_fecparam(struct net_device *dev, void __user *useraddr)
 
 	if (copy_from_user(&fecparam, useraddr, sizeof(fecparam)))
 		return -EFAULT;
-
-	if (!fecparam.fec || fecparam.fec & ETHTOOL_FEC_NONE)
-		return -EINVAL;
-
-	fecparam.active_fec = 0;
-	fecparam.reserved = 0;
 
 	return dev->ethtool_ops->set_fecparam(dev, &fecparam);
 }

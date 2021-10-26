@@ -1029,12 +1029,7 @@ void qlt_free_session_done(struct work_struct *work)
 			}
 			msleep(100);
 			cnt++;
-			/*
-			 * Driver timeout is set to 22 Sec, update count value to loop
-			 * long enough for log-out to complete before advancing. Otherwise,
-			 * straddling logout can interfere with re-login attempt.
-			 */
-			if (cnt > 230)
+			if (cnt > 200)
 				break;
 		}
 
@@ -6466,7 +6461,7 @@ static void qlt_lport_dump(struct scsi_qla_host *vha, u64 wwpn,
 }
 
 /**
- * qlt_lport_register - register lport with external module
+ * qla_tgt_lport_register - register lport with external module
  *
  * @target_lport_ptr: pointer for tcm_qla2xxx specific lport data
  * @phys_wwpn: physical port WWPN
@@ -6542,7 +6537,7 @@ int qlt_lport_register(void *target_lport_ptr, u64 phys_wwpn,
 EXPORT_SYMBOL(qlt_lport_register);
 
 /**
- * qlt_lport_deregister - Degister lport
+ * qla_tgt_lport_deregister - Degister lport
  *
  * @vha:  Registered scsi_qla_host pointer
  */

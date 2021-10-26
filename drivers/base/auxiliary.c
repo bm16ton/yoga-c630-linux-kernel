@@ -231,8 +231,6 @@ EXPORT_SYMBOL_GPL(auxiliary_find_device);
 int __auxiliary_driver_register(struct auxiliary_driver *auxdrv,
 				struct module *owner, const char *modname)
 {
-	int ret;
-
 	if (WARN_ON(!auxdrv->probe) || WARN_ON(!auxdrv->id_table))
 		return -EINVAL;
 
@@ -248,11 +246,7 @@ int __auxiliary_driver_register(struct auxiliary_driver *auxdrv,
 	auxdrv->driver.bus = &auxiliary_bus_type;
 	auxdrv->driver.mod_name = modname;
 
-	ret = driver_register(&auxdrv->driver);
-	if (ret)
-		kfree(auxdrv->driver.name);
-
-	return ret;
+	return driver_register(&auxdrv->driver);
 }
 EXPORT_SYMBOL_GPL(__auxiliary_driver_register);
 
@@ -271,3 +265,8 @@ void __init auxiliary_bus_init(void)
 {
 	WARN_ON(bus_register(&auxiliary_bus_type));
 }
+
+MODULE_LICENSE("GPL v2");
+MODULE_DESCRIPTION("Auxiliary Bus");
+MODULE_AUTHOR("David Ertman <david.m.ertman@intel.com>");
+MODULE_AUTHOR("Kiran Patil <kiran.patil@intel.com>");

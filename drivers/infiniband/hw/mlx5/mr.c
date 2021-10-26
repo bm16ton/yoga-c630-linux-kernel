@@ -42,7 +42,6 @@
 #include <rdma/ib_umem.h>
 #include <rdma/ib_umem_odp.h>
 #include <rdma/ib_verbs.h>
-#include "dm.h"
 #include "mlx5_ib.h"
 
 /*
@@ -120,6 +119,8 @@ mlx5_ib_create_mkey_cb(struct mlx5_ib_dev *dev,
 				create_mkey_callback, context);
 }
 
+static void clean_mr(struct mlx5_ib_dev *dev, struct mlx5_ib_mr *mr);
+static void dereg_mr(struct mlx5_ib_dev *dev, struct mlx5_ib_mr *mr);
 static int mr_cache_max_order(struct mlx5_ib_dev *dev);
 static void queue_adjust_cache_locked(struct mlx5_cache_ent *ent);
 
@@ -530,8 +531,8 @@ static void __cache_work_func(struct mlx5_cache_ent *ent)
 		 */
 		spin_unlock_irq(&ent->lock);
 		need_delay = need_resched() || someone_adding(cache) ||
-			     !time_after(jiffies,
-					 READ_ONCE(cache->last_add) + 300 * HZ);
+			     time_after(jiffies,
+					READ_ONCE(cache->last_add) + 300 * HZ);
 		spin_lock_irq(&ent->lock);
 		if (ent->disabled)
 			goto out;
@@ -626,9 +627,29 @@ static struct mlx5_ib_mr *get_cache_mr(struct mlx5_cache_ent *req_ent)
 	return NULL;
 }
 
-static void mlx5_mr_cache_free(struct mlx5_ib_dev *dev, struct mlx5_ib_mr *mr)
+static void detach_mr_from_cache(struct mlx5_ib_mr *mr)
 {
 	struct mlx5_cache_ent *ent = mr->cache_ent;
+
+	mr->cache_ent = NULL;
+	spin_lock_irq(&ent->lock);
+	ent->total_mrs--;
+	spin_unlock_irq(&ent->lock);
+}
+
+void mlx5_mr_cache_free(struct mlx5_ib_dev *dev, struct mlx5_ib_mr *mr)
+{
+	struct mlx5_cache_ent *ent = mr->cache_ent;
+
+	if (!ent)
+		return;
+
+	if (mlx5_mr_cache_invalidate(mr)) {
+		detach_mr_from_cache(mr);
+		destroy_mkey(dev, mr);
+		kfree(mr);
+		return;
+	}
 
 	spin_lock_irq(&ent->lock);
 	list_add_tail(&mr->list, &ent->head);
@@ -1005,7 +1026,7 @@ static void *mlx5_ib_alloc_xlt(size_t *nents, size_t ent_size, gfp_t gfp_mask)
 	 */
 	might_sleep();
 
-	gfp_mask |= __GFP_ZERO | __GFP_NORETRY;
+	gfp_mask |= __GFP_ZERO;
 
 	/*
 	 * If the system already has a suitable high order page then just use
@@ -1482,7 +1503,7 @@ static struct ib_mr *create_real_mr(struct ib_pd *pd, struct ib_umem *umem,
 		 */
 		err = mlx5_ib_update_mr_pas(mr, MLX5_IB_UPD_XLT_ENABLE);
 		if (err) {
-			mlx5_ib_dereg_mr(&mr->ibmr, NULL);
+			dereg_mr(dev, mr);
 			return ERR_PTR(err);
 		}
 	}
@@ -1501,9 +1522,6 @@ static struct ib_mr *create_user_odp_mr(struct ib_pd *pd, u64 start, u64 length,
 	if (!IS_ENABLED(CONFIG_INFINIBAND_ON_DEMAND_PAGING))
 		return ERR_PTR(-EOPNOTSUPP);
 
-	err = mlx5r_odp_create_eq(dev, &dev->odp_pf_eq);
-	if (err)
-		return ERR_PTR(err);
 	if (!start && length == U64_MAX) {
 		if (iova != 0)
 			return ERR_PTR(-EINVAL);
@@ -1542,7 +1560,7 @@ static struct ib_mr *create_user_odp_mr(struct ib_pd *pd, u64 start, u64 length,
 	return &mr->ibmr;
 
 err_dereg_mr:
-	mlx5_ib_dereg_mr(&mr->ibmr, NULL);
+	dereg_mr(dev, mr);
 	return ERR_PTR(err);
 }
 
@@ -1639,19 +1657,19 @@ struct ib_mr *mlx5_ib_reg_user_mr_dmabuf(struct ib_pd *pd, u64 offset,
 	return &mr->ibmr;
 
 err_dereg_mr:
-	mlx5_ib_dereg_mr(&mr->ibmr, NULL);
+	dereg_mr(dev, mr);
 	return ERR_PTR(err);
 }
 
 /**
- * revoke_mr - Fence all DMA on the MR
+ * mlx5_mr_cache_invalidate - Fence all DMA on the MR
  * @mr: The MR to fence
  *
  * Upon return the NIC will not be doing any DMA to the pages under the MR,
- * and any DMA in progress will be completed. Failure of this function
+ * and any DMA inprogress will be completed. Failure of this function
  * indicates the HW has failed catastrophically.
  */
-static int revoke_mr(struct mlx5_ib_mr *mr)
+int mlx5_mr_cache_invalidate(struct mlx5_ib_mr *mr)
 {
 	struct mlx5_umr_wr umrwr = {};
 
@@ -1745,7 +1763,7 @@ static int umr_rereg_pas(struct mlx5_ib_mr *mr, struct ib_pd *pd,
 	 * with it. This ensure the change is atomic relative to any use of the
 	 * MR.
 	 */
-	err = revoke_mr(mr);
+	err = mlx5_mr_cache_invalidate(mr);
 	if (err)
 		return err;
 
@@ -1824,7 +1842,7 @@ struct ib_mr *mlx5_ib_rereg_user_mr(struct ib_mr *ib_mr, int flags, u64 start,
 		 * Only one active MR can refer to a umem at one time, revoke
 		 * the old MR before assigning the umem to the new one.
 		 */
-		err = revoke_mr(mr);
+		err = mlx5_mr_cache_invalidate(mr);
 		if (err)
 			return ERR_PTR(err);
 		umem = mr->umem;
@@ -1911,7 +1929,7 @@ err:
 static void
 mlx5_free_priv_descs(struct mlx5_ib_mr *mr)
 {
-	if (!mr->umem && mr->descs) {
+	if (mr->descs) {
 		struct ib_device *device = mr->ibmr.device;
 		int size = mr->max_descs * mr->desc_size;
 		struct mlx5_ib_dev *dev = to_mdev(device);
@@ -1923,82 +1941,69 @@ mlx5_free_priv_descs(struct mlx5_ib_mr *mr)
 	}
 }
 
-int mlx5_ib_dereg_mr(struct ib_mr *ibmr, struct ib_udata *udata)
+static void clean_mr(struct mlx5_ib_dev *dev, struct mlx5_ib_mr *mr)
 {
-	struct mlx5_ib_mr *mr = to_mmr(ibmr);
-	struct mlx5_ib_dev *dev = to_mdev(ibmr->device);
-	int rc;
-
-	/*
-	 * Any async use of the mr must hold the refcount, once the refcount
-	 * goes to zero no other thread, such as ODP page faults, prefetch, any
-	 * UMR activity, etc can touch the mkey. Thus it is safe to destroy it.
-	 */
-	if (IS_ENABLED(CONFIG_INFINIBAND_ON_DEMAND_PAGING) &&
-	    refcount_read(&mr->mmkey.usecount) != 0 &&
-	    xa_erase(&mr_to_mdev(mr)->odp_mkeys, mlx5_base_mkey(mr->mmkey.key)))
-		mlx5r_deref_wait_odp_mkey(&mr->mmkey);
-
-	if (ibmr->type == IB_MR_TYPE_INTEGRITY) {
-		xa_cmpxchg(&dev->sig_mrs, mlx5_base_mkey(mr->mmkey.key),
-			   mr->sig, NULL, GFP_KERNEL);
-
-		if (mr->mtt_mr) {
-			rc = mlx5_ib_dereg_mr(&mr->mtt_mr->ibmr, NULL);
-			if (rc)
-				return rc;
-			mr->mtt_mr = NULL;
-		}
-		if (mr->klm_mr) {
-			rc = mlx5_ib_dereg_mr(&mr->klm_mr->ibmr, NULL);
-			if (rc)
-				return rc;
-			mr->klm_mr = NULL;
-		}
-
+	if (mr->sig) {
 		if (mlx5_core_destroy_psv(dev->mdev,
 					  mr->sig->psv_memory.psv_idx))
 			mlx5_ib_warn(dev, "failed to destroy mem psv %d\n",
 				     mr->sig->psv_memory.psv_idx);
-		if (mlx5_core_destroy_psv(dev->mdev, mr->sig->psv_wire.psv_idx))
+		if (mlx5_core_destroy_psv(dev->mdev,
+					  mr->sig->psv_wire.psv_idx))
 			mlx5_ib_warn(dev, "failed to destroy wire psv %d\n",
 				     mr->sig->psv_wire.psv_idx);
+		xa_erase(&dev->sig_mrs, mlx5_base_mkey(mr->mmkey.key));
 		kfree(mr->sig);
 		mr->sig = NULL;
 	}
 
-	/* Stop DMA */
-	if (mr->cache_ent) {
-		if (revoke_mr(mr)) {
-			spin_lock_irq(&mr->cache_ent->lock);
-			mr->cache_ent->total_mrs--;
-			spin_unlock_irq(&mr->cache_ent->lock);
-			mr->cache_ent = NULL;
-		}
-	}
 	if (!mr->cache_ent) {
-		rc = destroy_mkey(to_mdev(mr->ibmr.device), mr);
-		if (rc)
-			return rc;
-	}
-
-	if (mr->umem) {
-		bool is_odp = is_odp_mr(mr);
-
-		if (!is_odp)
-			atomic_sub(ib_umem_num_pages(mr->umem),
-				   &dev->mdev->priv.reg_pages);
-		ib_umem_release(mr->umem);
-		if (is_odp)
-			mlx5_ib_free_odp_mr(mr);
-	}
-
-	if (mr->cache_ent) {
-		mlx5_mr_cache_free(dev, mr);
-	} else {
+		destroy_mkey(dev, mr);
 		mlx5_free_priv_descs(mr);
-		kfree(mr);
 	}
+}
+
+static void dereg_mr(struct mlx5_ib_dev *dev, struct mlx5_ib_mr *mr)
+{
+	struct ib_umem *umem = mr->umem;
+
+	/* Stop all DMA */
+	if (is_odp_mr(mr))
+		mlx5_ib_fence_odp_mr(mr);
+	else if (is_dmabuf_mr(mr))
+		mlx5_ib_fence_dmabuf_mr(mr);
+	else
+		clean_mr(dev, mr);
+
+	if (umem) {
+		if (!is_odp_mr(mr))
+			atomic_sub(ib_umem_num_pages(umem),
+				   &dev->mdev->priv.reg_pages);
+		ib_umem_release(umem);
+	}
+
+	if (mr->cache_ent)
+		mlx5_mr_cache_free(dev, mr);
+	else
+		kfree(mr);
+}
+
+int mlx5_ib_dereg_mr(struct ib_mr *ibmr, struct ib_udata *udata)
+{
+	struct mlx5_ib_mr *mmr = to_mmr(ibmr);
+
+	if (ibmr->type == IB_MR_TYPE_INTEGRITY) {
+		dereg_mr(to_mdev(mmr->mtt_mr->ibmr.device), mmr->mtt_mr);
+		dereg_mr(to_mdev(mmr->klm_mr->ibmr.device), mmr->klm_mr);
+	}
+
+	if (is_odp_mr(mmr) && to_ib_umem_odp(mmr->umem)->is_implicit_odp) {
+		mlx5_ib_free_implicit_mr(mmr);
+		return 0;
+	}
+
+	dereg_mr(to_mdev(ibmr->device), mmr);
+
 	return 0;
 }
 
@@ -2170,10 +2175,10 @@ err_free_descs:
 	destroy_mkey(dev, mr);
 	mlx5_free_priv_descs(mr);
 err_free_mtt_mr:
-	mlx5_ib_dereg_mr(&mr->mtt_mr->ibmr, NULL);
+	dereg_mr(to_mdev(mr->mtt_mr->ibmr.device), mr->mtt_mr);
 	mr->mtt_mr = NULL;
 err_free_klm_mr:
-	mlx5_ib_dereg_mr(&mr->klm_mr->ibmr, NULL);
+	dereg_mr(to_mdev(mr->klm_mr->ibmr.device), mr->klm_mr);
 	mr->klm_mr = NULL;
 err_destroy_psv:
 	if (mlx5_core_destroy_psv(dev->mdev, mr->sig->psv_memory.psv_idx))

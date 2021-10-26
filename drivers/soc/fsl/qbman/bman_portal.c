@@ -160,7 +160,7 @@ static int bman_portal_probe(struct platform_device *pdev)
 		__bman_portals_probed = 1;
 		/* unassigned portal, skip init */
 		spin_unlock(&bman_lock);
-		goto check_cleanup;
+		return 0;
 	}
 
 	cpumask_set_cpu(cpu, &portal_cpus);
@@ -176,7 +176,6 @@ static int bman_portal_probe(struct platform_device *pdev)
 	if (!cpu_online(cpu))
 		bman_offline_cpu(cpu);
 
-check_cleanup:
 	if (__bman_portals_probed == 1 && bman_requires_cleanup()) {
 		/*
 		 * BMan wasn't reset prior to boot (Kexec for example)

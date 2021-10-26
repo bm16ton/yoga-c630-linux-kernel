@@ -49,12 +49,11 @@ enum rvin_csi_id {
 };
 
 /**
- * enum rvin_dma_state - DMA states
- * @STOPPED:   No operation in progress
- * @STARTING:  Capture starting up
- * @RUNNING:   Operation in progress have buffers
- * @STOPPING:  Stopping operation
- * @SUSPENDED: Capture is suspended
+ * STOPPED   - No operation in progress
+ * STARTING  - Capture starting up
+ * RUNNING   - Operation in progress have buffers
+ * STOPPING  - Stopping operation
+ * SUSPENDED - Capture is suspended
  */
 enum rvin_dma_state {
 	STOPPED = 0,
@@ -71,9 +70,9 @@ enum rvin_dma_state {
  * to capture SEQ_TB/BT it's needed to capture to the same vb2
  * buffer twice so the type of buffer needs to be kept.
  *
- * @FULL: One capture fills the whole vb2 buffer
- * @HALF_TOP: One capture fills the top half of the vb2 buffer
- * @HALF_BOTTOM: One capture fills the bottom half of the vb2 buffer
+ * FULL - One capture fills the whole vb2 buffer
+ * HALF_TOP - One capture fills the top half of the vb2 buffer
+ * HALF_BOTTOM - One capture fills the bottom half of the vb2 buffer
  */
 enum rvin_buffer_type {
 	FULL,
@@ -192,7 +191,7 @@ struct rvin_info {
  * @state:		keeps track of operation state
  *
  * @is_csi:		flag to mark the VIN as using a CSI-2 subdevice
- * @chsel:		Cached value of the current CSI-2 channel selection
+ * @chsel		Cached value of the current CSI-2 channel selection
  *
  * @mbus_code:		media bus format code
  * @format:		active V4L2 pixel format

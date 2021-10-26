@@ -176,8 +176,7 @@ static int rtrs_srv_create_once_sysfs_root_folders(struct rtrs_srv_sess *sess)
 	err = device_add(&srv->dev);
 	if (err) {
 		pr_err("device_add(): %d\n", err);
-		put_device(&srv->dev);
-		goto unlock;
+		goto put;
 	}
 	srv->kobj_paths = kobject_create_and_add("paths", &srv->dev.kobj);
 	if (!srv->kobj_paths) {
@@ -189,6 +188,10 @@ static int rtrs_srv_create_once_sysfs_root_folders(struct rtrs_srv_sess *sess)
 	}
 	dev_set_uevent_suppress(&srv->dev, false);
 	kobject_uevent(&srv->dev.kobj, KOBJ_ADD);
+	goto unlock;
+
+put:
+	put_device(&srv->dev);
 unlock:
 	mutex_unlock(&srv->paths_mutex);
 
@@ -260,13 +263,14 @@ int rtrs_srv_create_sess_files(struct rtrs_srv_sess *sess)
 	struct rtrs_srv *srv = sess->srv;
 	struct rtrs_sess *s = &sess->s;
 	char str[NAME_MAX];
-	int err;
-	struct rtrs_addr path = {
-		.src = &sess->s.dst_addr,
-		.dst = &sess->s.src_addr,
-	};
+	int err, cnt;
 
-	rtrs_addr_to_str(&path, str, sizeof(str));
+	cnt = sockaddr_to_str((struct sockaddr *)&sess->s.dst_addr,
+			      str, sizeof(str));
+	cnt += scnprintf(str + cnt, sizeof(str) - cnt, "@");
+	sockaddr_to_str((struct sockaddr *)&sess->s.src_addr,
+			str + cnt, sizeof(str) - cnt);
+
 	err = rtrs_srv_create_once_sysfs_root_folders(sess);
 	if (err)
 		return err;

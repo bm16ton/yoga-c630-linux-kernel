@@ -285,8 +285,6 @@ static struct map {
 	{ "imx8_ddr", "imx8_ddr" },
 	{ "L3PMC", "amd_l3" },
 	{ "DFPMC", "amd_df" },
-	{ "cpu_core", "cpu_core" },
-	{ "cpu_atom", "cpu_atom" },
 	{}
 };
 
@@ -1123,10 +1121,8 @@ static int process_one_file(const char *fpath, const struct stat *sb,
 			mapfile = strdup(fpath);
 			return 0;
 		}
-		if (is_json_file(bname))
-			pr_debug("%s: ArchStd json is preprocessed %s\n", prog, fpath);
-		else
-			pr_info("%s: Ignoring file %s\n", prog, fpath);
+
+		pr_info("%s: Ignoring file %s\n", prog, fpath);
 		return 0;
 	}
 
@@ -1153,7 +1149,7 @@ static int process_one_file(const char *fpath, const struct stat *sb,
 	 * and directory tree could result in build failure due to table
 	 * names not being found.
 	 *
-	 * At least for now, be strict with processing JSON file names.
+	 * Atleast for now, be strict with processing JSON file names.
 	 * i.e. if JSON file name cannot be mapped to C-style table name,
 	 * fail.
 	 */

@@ -2524,6 +2524,7 @@ static int ov8865_g_frame_interval(struct v4l2_subdev *subdev,
 {
 	struct ov8865_sensor *sensor = ov8865_subdev_sensor(subdev);
 	const struct ov8865_mode *mode;
+	int ret = 0;
 
 	mutex_lock(&sensor->mutex);
 
@@ -2532,7 +2533,7 @@ static int ov8865_g_frame_interval(struct v4l2_subdev *subdev,
 
 	mutex_unlock(&sensor->mutex);
 
-	return 0;
+	return ret;
 }
 
 static const struct v4l2_subdev_video_ops ov8865_subdev_video_ops = {
@@ -2904,7 +2905,7 @@ static int ov8865_probe(struct i2c_client *client)
 
 	/* V4L2 subdev register */
 
-	ret = v4l2_async_register_subdev_sensor(subdev);
+	ret = v4l2_async_register_subdev_sensor_common(subdev);
 	if (ret)
 		goto error_pm;
 

@@ -363,8 +363,9 @@ static void vc4_atomic_commit_tail(struct drm_atomic_state *state)
 	for_each_old_crtc_in_state(state, crtc, old_crtc_state, i) {
 		struct vc4_crtc_state *vc4_crtc_state =
 			to_vc4_crtc_state(old_crtc_state);
+		struct drm_crtc_commit *commit;
 		unsigned int channel = vc4_crtc_state->assigned_channel;
-		int ret;
+		unsigned long done;
 
 		if (channel == VC4_HVS_CHANNEL_DISABLED)
 			continue;
@@ -372,9 +373,17 @@ static void vc4_atomic_commit_tail(struct drm_atomic_state *state)
 		if (!old_hvs_state->fifo_state[channel].in_use)
 			continue;
 
-		ret = drm_crtc_commit_wait(old_hvs_state->fifo_state[channel].pending_commit);
-		if (ret)
-			drm_err(dev, "Timed out waiting for commit\n");
+		commit = old_hvs_state->fifo_state[i].pending_commit;
+		if (!commit)
+			continue;
+
+		done = wait_for_completion_timeout(&commit->hw_done, 10 * HZ);
+		if (!done)
+			drm_err(dev, "Timed out waiting for hw_done\n");
+
+		done = wait_for_completion_timeout(&commit->flip_done, 10 * HZ);
+		if (!done)
+			drm_err(dev, "Timed out waiting for flip_done\n");
 	}
 
 	drm_atomic_helper_commit_modeset_disables(dev, state);

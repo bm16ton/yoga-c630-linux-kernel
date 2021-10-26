@@ -121,11 +121,9 @@ static s32 ixgbevf_reset_hw_vf(struct ixgbe_hw *hw)
 }
 
 /**
- * ixgbevf_hv_reset_hw_vf - reset via Hyper-V
- * @hw: pointer to private hardware struct
- *
  * Hyper-V variant; the VF/PF communication is through the PCI
  * config space.
+ * @hw: pointer to private hardware struct
  */
 static s32 ixgbevf_hv_reset_hw_vf(struct ixgbe_hw *hw)
 {
@@ -515,11 +513,9 @@ static s32 ixgbevf_update_mc_addr_list_vf(struct ixgbe_hw *hw,
 }
 
 /**
- * ixgbevf_hv_update_mc_addr_list_vf - stub
+ * Hyper-V variant - just a stub.
  * @hw: unused
  * @netdev: unused
- *
- * Hyper-V variant - just a stub.
  */
 static s32 ixgbevf_hv_update_mc_addr_list_vf(struct ixgbe_hw *hw,
 					     struct net_device *netdev)
@@ -568,11 +564,9 @@ static s32 ixgbevf_update_xcast_mode(struct ixgbe_hw *hw, int xcast_mode)
 }
 
 /**
- * ixgbevf_hv_update_xcast_mode - stub
+ * Hyper-V variant - just a stub.
  * @hw: unused
  * @xcast_mode: unused
- *
- * Hyper-V variant - just a stub.
  */
 static s32 ixgbevf_hv_update_xcast_mode(struct ixgbe_hw *hw, int xcast_mode)
 {
@@ -614,7 +608,7 @@ mbx_err:
 }
 
 /**
- * ixgbevf_hv_set_vfta_vf - * Hyper-V variant - just a stub.
+ * Hyper-V variant - just a stub.
  * @hw: unused
  * @vlan: unused
  * @vind: unused
@@ -732,13 +726,11 @@ out:
 }
 
 /**
- * ixgbevf_hv_check_mac_link_vf - check link
+ * Hyper-V variant; there is no mailbox communication.
  * @hw: pointer to private hardware struct
  * @speed: pointer to link speed
  * @link_up: true is link is up, false otherwise
  * @autoneg_wait_to_complete: unused
- *
- * Hyper-V variant; there is no mailbox communication.
  */
 static s32 ixgbevf_hv_check_mac_link_vf(struct ixgbe_hw *hw,
 					ixgbe_link_speed *speed,

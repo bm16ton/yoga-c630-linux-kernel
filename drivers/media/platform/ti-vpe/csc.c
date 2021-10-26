@@ -267,8 +267,10 @@ struct csc_data *csc_create(struct platform_device *pdev, const char *res_name)
 	}
 
 	csc->base = devm_ioremap_resource(&pdev->dev, csc->res);
-	if (IS_ERR(csc->base))
+	if (IS_ERR(csc->base)) {
+		dev_err(&pdev->dev, "failed to ioremap\n");
 		return ERR_CAST(csc->base);
+	}
 
 	return csc;
 }

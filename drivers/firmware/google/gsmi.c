@@ -136,16 +136,12 @@ MODULE_PARM_DESC(spincount,
 	"The number of loop iterations to use when using the spin handshake.");
 
 /*
- * Some older platforms with Apollo Lake chipsets do not support S0ix logging
- * in their GSMI handlers, and behaved poorly when resuming via power button
- * press if the logging was attempted. Updated firmware with proper behavior
- * has long since shipped, removing the need for this opt-in parameter. It
- * now exists as an opt-out parameter for folks defiantly running old
- * firmware, or unforeseen circumstances. After the change from opt-in to
- * opt-out has baked sufficiently, this parameter should probably be removed
- * entirely.
+ * Platforms might not support S0ix logging in their GSMI handlers. In order to
+ * avoid any side-effects of generating an SMI for S0ix logging, use the S0ix
+ * related GSMI commands only for those platforms that explicitly enable this
+ * option.
  */
-static bool s0ix_logging_enable = true;
+static bool s0ix_logging_enable;
 module_param(s0ix_logging_enable, bool, 0600);
 
 static struct gsmi_buf *gsmi_buf_alloc(void)

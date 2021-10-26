@@ -9,7 +9,6 @@
 
 #include <linux/cpu.h>
 #include <linux/stacktrace.h>
-#include <linux/tracehook.h>
 #include "core.h"
 #include "patch.h"
 #include "transition.h"
@@ -370,7 +369,9 @@ static void klp_send_signals(void)
 			 * Send fake signal to all non-kthread tasks which are
 			 * still not migrated.
 			 */
-			set_notify_signal(task);
+			spin_lock_irq(&task->sighand->siglock);
+			signal_wake_up(task, 0);
+			spin_unlock_irq(&task->sighand->siglock);
 		}
 	}
 	read_unlock(&tasklist_lock);

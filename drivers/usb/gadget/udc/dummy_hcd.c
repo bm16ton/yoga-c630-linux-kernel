@@ -1873,7 +1873,7 @@ restart:
 		/* handle control requests */
 		if (ep == &dum->ep[0] && ep->setup_stage) {
 			struct usb_ctrlrequest		setup;
-			int				value;
+			int				value = 1;
 
 			setup = *(struct usb_ctrlrequest *) urb->setup_packet;
 			/* paranoia, in case of stale queued data */

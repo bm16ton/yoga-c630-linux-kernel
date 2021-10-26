@@ -273,8 +273,7 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf)
 		pfvf->rx_chan_cnt = 1;
 		pfvf->tx_chan_cnt = 1;
 		rvu_npc_install_promisc_entry(rvu, pcifunc, nixlf,
-					      pfvf->rx_chan_base,
-					      pfvf->rx_chan_cnt, false);
+					      pfvf->rx_chan_base, false);
 		break;
 	}
 
@@ -3089,8 +3088,7 @@ int rvu_mbox_handler_nix_set_rx_mode(struct rvu *rvu, struct nix_rx_mode *req,
 		rvu_npc_disable_promisc_entry(rvu, pcifunc, nixlf);
 	else
 		rvu_npc_install_promisc_entry(rvu, pcifunc, nixlf,
-					      pfvf->rx_chan_base,
-					      pfvf->rx_chan_cnt, allmulti);
+					      pfvf->rx_chan_base, allmulti);
 	return 0;
 }
 
@@ -3587,6 +3585,7 @@ static void rvu_nix_block_freemem(struct rvu *rvu, int blkaddr,
 		vlan = &nix_hw->txvlan;
 		kfree(vlan->rsrc.bmap);
 		mutex_destroy(&vlan->rsrc_lock);
+		devm_kfree(rvu->dev, vlan->entry2pfvf_map);
 
 		mcast = &nix_hw->mcast;
 		qmem_free(rvu->dev, mcast->mce_ctx);
@@ -3636,7 +3635,9 @@ int rvu_mbox_handler_nix_lf_stop_rx(struct rvu *rvu, struct msg_req *req,
 	if (err)
 		return err;
 
-	rvu_npc_disable_mcam_entries(rvu, pcifunc, nixlf);
+	rvu_npc_disable_default_entries(rvu, pcifunc, nixlf);
+
+	npc_mcam_disable_flows(rvu, pcifunc);
 
 	return rvu_cgx_start_stop_io(rvu, pcifunc, false);
 }

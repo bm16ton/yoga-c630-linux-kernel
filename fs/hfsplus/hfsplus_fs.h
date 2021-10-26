@@ -345,6 +345,17 @@ static inline unsigned short hfsplus_min_io_size(struct super_block *sb)
 #define hfs_part_find hfsplus_part_find
 
 /*
+ * definitions for ext2 flag ioctls (linux really needs a generic
+ * interface for this).
+ */
+
+/* ext2 ioctls (EXT2_IOC_GETFLAGS and EXT2_IOC_SETFLAGS) to support
+ * chattr/lsattr */
+#define HFSPLUS_IOC_EXT2_GETFLAGS	FS_IOC_GETFLAGS
+#define HFSPLUS_IOC_EXT2_SETFLAGS	FS_IOC_SETFLAGS
+
+
+/*
  * hfs+-specific ioctl for making the filesystem bootable
  */
 #define HFSPLUS_IOC_BLESS _IO('h', 0x80)
@@ -482,9 +493,6 @@ int hfsplus_getattr(struct user_namespace *mnt_userns, const struct path *path,
 		    unsigned int query_flags);
 int hfsplus_file_fsync(struct file *file, loff_t start, loff_t end,
 		       int datasync);
-int hfsplus_fileattr_get(struct dentry *dentry, struct fileattr *fa);
-int hfsplus_fileattr_set(struct user_namespace *mnt_userns,
-			 struct dentry *dentry, struct fileattr *fa);
 
 /* ioctl.c */
 long hfsplus_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);

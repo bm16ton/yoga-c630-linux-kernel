@@ -167,7 +167,7 @@ static int ipu_csc_scaler_enum_fmt(struct file *file, void *fh,
 	int ret;
 
 	ret = imx_media_enum_pixel_formats(&fourcc, f->index,
-					   PIXFMT_SEL_YUV_RGB, 0);
+					   PIXFMT_SEL_YUV_RGB);
 	if (ret)
 		return ret;
 

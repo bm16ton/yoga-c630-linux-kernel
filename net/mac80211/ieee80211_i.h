@@ -1647,8 +1647,6 @@ void ieee80211_mgd_conn_tx_status(struct ieee80211_sub_if_data *sdata,
 void ieee80211_mgd_quiesce(struct ieee80211_sub_if_data *sdata);
 void ieee80211_sta_restart(struct ieee80211_sub_if_data *sdata);
 void ieee80211_sta_handle_tspec_ac_params(struct ieee80211_sub_if_data *sdata);
-void ieee80211_sta_connection_lost(struct ieee80211_sub_if_data *sdata,
-				   u8 *bssid, u8 reason, bool tx);
 
 /* IBSS code */
 void ieee80211_ibss_notify_scan_completed(struct ieee80211_local *local);
@@ -2045,8 +2043,6 @@ void ieee80211_dynamic_ps_timer(struct timer_list *t);
 void ieee80211_send_nullfunc(struct ieee80211_local *local,
 			     struct ieee80211_sub_if_data *sdata,
 			     bool powersave);
-void ieee80211_send_4addr_nullfunc(struct ieee80211_local *local,
-				   struct ieee80211_sub_if_data *sdata);
 void ieee80211_sta_tx_notify(struct ieee80211_sub_if_data *sdata,
 			     struct ieee80211_hdr *hdr, bool ack, u16 tx_time);
 

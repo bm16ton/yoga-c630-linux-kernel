@@ -174,6 +174,11 @@ static inline u8 shpc_readb(struct controller *ctrl, int reg)
 	return readb(ctrl->creg + reg);
 }
 
+static inline void shpc_writeb(struct controller *ctrl, int reg, u8 val)
+{
+	writeb(val, ctrl->creg + reg);
+}
+
 static inline u16 shpc_readw(struct controller *ctrl, int reg)
 {
 	return readw(ctrl->creg + reg);

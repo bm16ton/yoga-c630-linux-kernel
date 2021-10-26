@@ -26,6 +26,8 @@
 #define XO15_EBOOK_HID			"XO15EBK"
 #define XO15_EBOOK_DEVICE_NAME		"EBook Switch"
 
+ACPI_MODULE_NAME(MODULE_NAME);
+
 MODULE_DESCRIPTION("OLPC XO-1.5 ebook switch driver");
 MODULE_LICENSE("GPL");
 
@@ -64,8 +66,8 @@ static void ebook_switch_notify(struct acpi_device *device, u32 event)
 		ebook_send_state(device);
 		break;
 	default:
-		acpi_handle_debug(device->handle,
-				  "Unsupported event [0x%x]\n", event);
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
+				  "Unsupported event [0x%x]\n", event));
 		break;
 	}
 }

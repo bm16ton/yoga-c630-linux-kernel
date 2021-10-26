@@ -174,13 +174,14 @@ out:
 	return ret;
 }
 
-static void dell_wmi_descriptor_remove(struct wmi_device *wdev)
+static int dell_wmi_descriptor_remove(struct wmi_device *wdev)
 {
 	struct descriptor_priv *priv = dev_get_drvdata(&wdev->dev);
 
 	mutex_lock(&list_mutex);
 	list_del(&priv->list);
 	mutex_unlock(&list_mutex);
+	return 0;
 }
 
 static const struct wmi_device_id dell_wmi_descriptor_id_table[] = {
@@ -200,6 +201,6 @@ static struct wmi_driver dell_wmi_descriptor_driver = {
 module_wmi_driver(dell_wmi_descriptor_driver);
 
 MODULE_DEVICE_TABLE(wmi, dell_wmi_descriptor_id_table);
-MODULE_AUTHOR("Mario Limonciello <mario.limonciello@outlook.com>");
+MODULE_AUTHOR("Mario Limonciello <mario.limonciello@dell.com>");
 MODULE_DESCRIPTION("Dell WMI descriptor driver");
 MODULE_LICENSE("GPL");

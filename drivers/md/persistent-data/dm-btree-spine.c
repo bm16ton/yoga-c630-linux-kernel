@@ -30,6 +30,8 @@ static void node_prepare_for_write(struct dm_block_validator *v,
 	h->csum = cpu_to_le32(dm_bm_checksum(&h->flags,
 					     block_size - sizeof(__le32),
 					     BTREE_CSUM_XOR));
+
+	BUG_ON(node_check(v, b, 4096));
 }
 
 static int node_check(struct dm_block_validator *v,
@@ -181,13 +183,15 @@ void init_shadow_spine(struct shadow_spine *s, struct dm_btree_info *info)
 	s->count = 0;
 }
 
-void exit_shadow_spine(struct shadow_spine *s)
+int exit_shadow_spine(struct shadow_spine *s)
 {
-	int i;
+	int r = 0, i;
 
 	for (i = 0; i < s->count; i++) {
 		unlock_block(s->info, s->nodes[i]);
 	}
+
+	return r;
 }
 
 int shadow_step(struct shadow_spine *s, dm_block_t b,

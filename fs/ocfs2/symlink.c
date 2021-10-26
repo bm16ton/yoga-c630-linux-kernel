@@ -1,4 +1,6 @@
-/*
+/* -*- mode: c; c-basic-offset: 8; -*-
+ * vim: noexpandtab sw=8 ts=8 sts=0:
+ *
  *  linux/cluster/ssi/cfs/symlink.c
  *
  *	This program is free software; you can redistribute it and/or

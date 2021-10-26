@@ -797,7 +797,18 @@ static struct mtd_blktrans_ops nftl_tr = {
 	.owner		= THIS_MODULE,
 };
 
-module_mtd_blktrans(nftl_tr);
+static int __init init_nftl(void)
+{
+	return register_mtd_blktrans(&nftl_tr);
+}
+
+static void __exit cleanup_nftl(void)
+{
+	deregister_mtd_blktrans(&nftl_tr);
+}
+
+module_init(init_nftl);
+module_exit(cleanup_nftl);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("David Woodhouse <dwmw2@infradead.org>, Fabrice Bellard <fabrice.bellard@netgem.com> et al.");

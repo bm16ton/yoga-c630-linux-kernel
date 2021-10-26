@@ -69,11 +69,9 @@ void *memset(void *v_src, int c, __kernel_size_t n)
 		case 1:
 			*src++ = c;
 			--n;
-			fallthrough;
 		case 2:
 			*src++ = c;
 			--n;
-			fallthrough;
 		case 3:
 			*src++ = c;
 			--n;

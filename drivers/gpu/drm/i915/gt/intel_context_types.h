@@ -1,5 +1,6 @@
-/* SPDX-License-Identifier: MIT */
 /*
+ * SPDX-License-Identifier: MIT
+ *
  * Copyright © 2019 Intel Corporation
  */
 
@@ -95,10 +96,6 @@ struct intel_context {
 #define CONTEXT_BANNED			6
 #define CONTEXT_FORCE_SINGLE_SUBMISSION	7
 #define CONTEXT_NOPREEMPT		8
-
-	struct {
-		u64 timeout_us;
-	} watchdog;
 
 	u32 *lrc_reg_state;
 	union {

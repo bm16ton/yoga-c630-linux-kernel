@@ -373,10 +373,6 @@ struct regulator_desc {
 	unsigned int pull_down_reg;
 	unsigned int pull_down_mask;
 	unsigned int pull_down_val_on;
-	unsigned int ramp_reg;
-	unsigned int ramp_mask;
-	const unsigned int *ramp_delay_table;
-	unsigned int n_ramp_values;
 
 	unsigned int enable_time;
 
@@ -476,7 +472,7 @@ struct regulator_dev {
 	unsigned int is_switch:1;
 
 	/* time when this regulator was disabled last time */
-	ktime_t last_off;
+	unsigned long last_off_jiffy;
 };
 
 struct regulator_dev *
@@ -539,7 +535,6 @@ int regulator_set_current_limit_regmap(struct regulator_dev *rdev,
 				       int min_uA, int max_uA);
 int regulator_get_current_limit_regmap(struct regulator_dev *rdev);
 void *regulator_get_init_drvdata(struct regulator_init_data *reg_init_data);
-int regulator_set_ramp_delay_regmap(struct regulator_dev *rdev, int ramp_delay);
 
 /*
  * Helper functions intended to be used by regulator drivers prior registering
@@ -548,6 +543,4 @@ int regulator_set_ramp_delay_regmap(struct regulator_dev *rdev, int ramp_delay);
 int regulator_desc_list_voltage_linear_range(const struct regulator_desc *desc,
 					     unsigned int selector);
 
-int regulator_desc_list_voltage_linear(const struct regulator_desc *desc,
-				       unsigned int selector);
 #endif

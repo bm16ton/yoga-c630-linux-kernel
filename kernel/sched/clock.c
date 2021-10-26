@@ -41,7 +41,7 @@
  * Otherwise it tries to create a semi stable clock from a mixture of other
  * clocks, including:
  *
- *  - GTOD (clock monotonic)
+ *  - GTOD (clock monotomic)
  *  - sched_clock()
  *  - explicit idle events
  *

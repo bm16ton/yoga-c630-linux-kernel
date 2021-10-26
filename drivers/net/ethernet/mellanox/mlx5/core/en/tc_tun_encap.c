@@ -2,7 +2,6 @@
 /* Copyright (c) 2021 Mellanox Technologies. */
 
 #include <net/fib_notifier.h>
-#include <net/nexthop.h>
 #include "tc_tun_encap.h"
 #include "en_tc.h"
 #include "tc_tun.h"

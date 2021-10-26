@@ -18,7 +18,8 @@ enum xchk_type {
 
 struct xchk_meta_ops {
 	/* Acquire whatever resources are needed for the operation. */
-	int		(*setup)(struct xfs_scrub *sc);
+	int		(*setup)(struct xfs_scrub *,
+				 struct xfs_inode *);
 
 	/* Examine metadata for errors. */
 	int		(*scrub)(struct xfs_scrub *);
@@ -58,18 +59,7 @@ struct xfs_scrub {
 	struct xfs_scrub_metadata	*sm;
 	const struct xchk_meta_ops	*ops;
 	struct xfs_trans		*tp;
-
-	/* File that scrub was called with. */
-	struct file			*file;
-
-	/*
-	 * File that is undergoing the scrub operation.  This can differ from
-	 * the file that scrub was called with if we're checking file-based fs
-	 * metadata (e.g. rt bitmaps) or if we're doing a scrub-by-handle for
-	 * something that can't be opened directly (e.g. symlinks).
-	 */
 	struct xfs_inode		*ip;
-
 	void				*buf;
 	uint				ilock_flags;
 

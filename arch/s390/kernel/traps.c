@@ -17,7 +17,6 @@
 #include "asm/ptrace.h"
 #include <linux/kprobes.h>
 #include <linux/kdebug.h>
-#include <linux/randomize_kstack.h>
 #include <linux/extable.h>
 #include <linux/ptrace.h>
 #include <linux/sched.h>
@@ -80,7 +79,7 @@ void do_per_trap(struct pt_regs *regs)
 }
 NOKPROBE_SYMBOL(do_per_trap);
 
-static void default_trap_handler(struct pt_regs *regs)
+void default_trap_handler(struct pt_regs *regs)
 {
 	if (user_mode(regs)) {
 		report_user_fault(regs, SIGSEGV, 0);
@@ -90,7 +89,7 @@ static void default_trap_handler(struct pt_regs *regs)
 }
 
 #define DO_ERROR_INFO(name, signr, sicode, str) \
-static void name(struct pt_regs *regs)		\
+void name(struct pt_regs *regs)			\
 {						\
 	do_trap(regs, signr, sicode, str);	\
 }
@@ -142,13 +141,13 @@ static inline void do_fp_trap(struct pt_regs *regs, __u32 fpc)
 	do_trap(regs, SIGFPE, si_code, "floating point exception");
 }
 
-static void translation_exception(struct pt_regs *regs)
+void translation_exception(struct pt_regs *regs)
 {
 	/* May never happen. */
 	panic("Translation exception");
 }
 
-static void illegal_op(struct pt_regs *regs)
+void illegal_op(struct pt_regs *regs)
 {
         __u8 opcode[6];
 	__u16 __user *location;
@@ -190,7 +189,7 @@ NOKPROBE_SYMBOL(illegal_op);
 DO_ERROR_INFO(specification_exception, SIGILL, ILL_ILLOPN,
 	      "specification exception");
 
-static void vector_exception(struct pt_regs *regs)
+void vector_exception(struct pt_regs *regs)
 {
 	int si_code, vic;
 
@@ -224,7 +223,7 @@ static void vector_exception(struct pt_regs *regs)
 	do_trap(regs, SIGFPE, si_code, "vector exception");
 }
 
-static void data_exception(struct pt_regs *regs)
+void data_exception(struct pt_regs *regs)
 {
 	save_fpu_regs();
 	if (current->thread.fpu.fpc & FPC_DXC_MASK)
@@ -233,7 +232,7 @@ static void data_exception(struct pt_regs *regs)
 		do_trap(regs, SIGILL, ILL_ILLOPN, "data exception");
 }
 
-static void space_switch_exception(struct pt_regs *regs)
+void space_switch_exception(struct pt_regs *regs)
 {
 	/* Set user psw back to home space mode. */
 	if (user_mode(regs))
@@ -242,7 +241,7 @@ static void space_switch_exception(struct pt_regs *regs)
 	do_trap(regs, SIGILL, ILL_PRVOPC, "space switch event");
 }
 
-static void monitor_event_exception(struct pt_regs *regs)
+void monitor_event_exception(struct pt_regs *regs)
 {
 	const struct exception_table_entry *fixup;
 
@@ -277,8 +276,6 @@ static void __init test_monitor_call(void)
 {
 	int val = 1;
 
-	if (!IS_ENABLED(CONFIG_BUG))
-		return;
 	asm volatile(
 		"	mc	0,0\n"
 		"0:	xgr	%0,%0\n"
@@ -296,15 +293,12 @@ void __init trap_init(void)
 	test_monitor_call();
 }
 
-static void (*pgm_check_table[128])(struct pt_regs *regs);
-
 void noinstr __do_pgm_check(struct pt_regs *regs)
 {
 	unsigned long last_break = S390_lowcore.breaking_event_addr;
 	unsigned int trapnr, syscall_redirect = 0;
 	irqentry_state_t state;
 
-	add_random_kstack_offset();
 	regs->int_code = *(u32 *)&S390_lowcore.pgm_ilc;
 	regs->int_parm_long = S390_lowcore.trans_exc_code;
 
@@ -359,61 +353,3 @@ out:
 		exit_to_user_mode();
 	}
 }
-
-/*
- * The program check table contains exactly 128 (0x00-0x7f) entries. Each
- * line defines the function to be called corresponding to the program check
- * interruption code.
- */
-static void (*pgm_check_table[128])(struct pt_regs *regs) = {
-	[0x00]		= default_trap_handler,
-	[0x01]		= illegal_op,
-	[0x02]		= privileged_op,
-	[0x03]		= execute_exception,
-	[0x04]		= do_protection_exception,
-	[0x05]		= addressing_exception,
-	[0x06]		= specification_exception,
-	[0x07]		= data_exception,
-	[0x08]		= overflow_exception,
-	[0x09]		= divide_exception,
-	[0x0a]		= overflow_exception,
-	[0x0b]		= divide_exception,
-	[0x0c]		= hfp_overflow_exception,
-	[0x0d]		= hfp_underflow_exception,
-	[0x0e]		= hfp_significance_exception,
-	[0x0f]		= hfp_divide_exception,
-	[0x10]		= do_dat_exception,
-	[0x11]		= do_dat_exception,
-	[0x12]		= translation_exception,
-	[0x13]		= special_op_exception,
-	[0x14]		= default_trap_handler,
-	[0x15]		= operand_exception,
-	[0x16]		= default_trap_handler,
-	[0x17]		= default_trap_handler,
-	[0x18]		= transaction_exception,
-	[0x19]		= default_trap_handler,
-	[0x1a]		= default_trap_handler,
-	[0x1b]		= vector_exception,
-	[0x1c]		= space_switch_exception,
-	[0x1d]		= hfp_sqrt_exception,
-	[0x1e ... 0x37] = default_trap_handler,
-	[0x38]		= do_dat_exception,
-	[0x39]		= do_dat_exception,
-	[0x3a]		= do_dat_exception,
-	[0x3b]		= do_dat_exception,
-	[0x3c]		= default_trap_handler,
-	[0x3d]		= do_secure_storage_access,
-	[0x3e]		= do_non_secure_storage_access,
-	[0x3f]		= do_secure_storage_violation,
-	[0x40]		= monitor_event_exception,
-	[0x41 ... 0x7f] = default_trap_handler,
-};
-
-#define COND_TRAP(x) asm(			\
-	".weak " __stringify(x) "\n\t"		\
-	".set  " __stringify(x) ","		\
-	__stringify(default_trap_handler))
-
-COND_TRAP(do_secure_storage_access);
-COND_TRAP(do_non_secure_storage_access);
-COND_TRAP(do_secure_storage_violation);

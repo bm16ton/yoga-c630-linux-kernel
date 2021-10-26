@@ -10,8 +10,6 @@
 	model = "Cirrus Logic EP7209";
 	compatible = "cirrus,ep7209";
 
-	chosen { };
-
 	aliases {
 		gpio0 = &porta;
 		gpio1 = &portb;
@@ -110,7 +108,6 @@
 			compatible = "cirrus,ep7209-fb";
 			reg = <0x800002c0 0xd44>, <0x60000000 0xc000>;
 			clocks = <&clks CLPS711X_CLK_BUS>;
-			syscon = <&syscon1>;
 			status = "disabled";
 		};
 
@@ -135,7 +132,7 @@
 			#pwm-cells = <1>;
 		};
 
-		uart1: serial@80000480 {
+		uart1: uart@80000480 {
 			compatible = "cirrus,ep7209-uart";
 			reg = <0x80000480 0x80>;
 			interrupts = <12 13>;
@@ -150,7 +147,6 @@
 			reg = <0x80000500 0x4>;
 			interrupts = <15>;
 			clocks = <&clks CLPS711X_CLK_SPI>;
-			syscon = <&syscon3>;
 			status = "disabled";
 		};
 
@@ -159,7 +155,7 @@
 			reg = <0x80001100 0x80>;
 		};
 
-		uart2: serial@80001480 {
+		uart2: uart@80001480 {
 			compatible = "cirrus,ep7209-uart";
 			reg = <0x80001480 0x80>;
 			interrupts = <28 29>;
@@ -174,7 +170,6 @@
 			clocks = <&clks CLPS711X_CLK_PLL>;
 			clock-names = "pll";
 			interrupts = <32>;
-			syscon = <&syscon3>;
 			status = "disabled";
 		};
 
@@ -184,17 +179,8 @@
 		};
 	};
 
-	keypad: keypad {
-		compatible = "cirrus,ep7209-keypad";
-		interrupt-parent = <&intc>;
-		interrupts = <16>;
-		syscon = <&syscon1>;
-		status = "disabled";
-	};
-
 	mctrl: mctrl {
 		compatible = "cirrus,ep7209-mctrl-gpio";
-		gpio,syscon-dev = <&syscon1 0 0>;
 		gpio-controller;
 		#gpio-cells = <2>;
 	};

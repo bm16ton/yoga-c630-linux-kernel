@@ -793,7 +793,7 @@ core_initcall(e820__register_nvs_regions);
 #endif
 
 /*
- * Allocate the requested number of bytes with the requested alignment
+ * Allocate the requested number of bytes with the requsted alignment
  * and return (the physical address) to the caller. Also register this
  * range in the 'kexec' E820 table as a reserved range.
  *

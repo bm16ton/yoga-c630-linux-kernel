@@ -326,7 +326,6 @@ static const char *ibmvfc_get_cmd_error(u16 status, u16 error)
 
 /**
  * ibmvfc_get_err_result - Find the scsi status to return for the fcp response
- * @vhost:      ibmvfc host struct
  * @vfc_cmd:	ibmvfc command struct
  *
  * Return value:
@@ -651,6 +650,8 @@ static void ibmvfc_reinit_host(struct ibmvfc_host *vhost)
 /**
  * ibmvfc_del_tgt - Schedule cleanup and removal of the target
  * @tgt:		ibmvfc target struct
+ * @job_step:	job step to perform
+ *
  **/
 static void ibmvfc_del_tgt(struct ibmvfc_target *tgt)
 {
@@ -767,8 +768,6 @@ static int ibmvfc_send_crq_init_complete(struct ibmvfc_host *vhost)
 /**
  * ibmvfc_init_event_pool - Allocates and initializes the event pool for a host
  * @vhost:	ibmvfc host who owns the event pool
- * @queue:      ibmvfc queue struct
- * @size:       pool size
  *
  * Returns zero on success.
  **/
@@ -804,13 +803,6 @@ static int ibmvfc_init_event_pool(struct ibmvfc_host *vhost,
 	for (i = 0; i < size; ++i) {
 		struct ibmvfc_event *evt = &pool->events[i];
 
-		/*
-		 * evt->active states
-		 *  1 = in flight
-		 *  0 = being completed
-		 * -1 = free/freed
-		 */
-		atomic_set(&evt->active, -1);
 		atomic_set(&evt->free, 1);
 		evt->crq.valid = 0x80;
 		evt->crq.ioba = cpu_to_be64(pool->iu_token + (sizeof(*evt->xfer_iu) * i));
@@ -828,7 +820,6 @@ static int ibmvfc_init_event_pool(struct ibmvfc_host *vhost,
 /**
  * ibmvfc_free_event_pool - Frees memory of the event pool of a host
  * @vhost:	ibmvfc host who owns the event pool
- * @queue:      ibmvfc queue struct
  *
  **/
 static void ibmvfc_free_event_pool(struct ibmvfc_host *vhost,
@@ -1021,7 +1012,6 @@ static void ibmvfc_free_event(struct ibmvfc_event *evt)
 
 	BUG_ON(!ibmvfc_valid_event(pool, evt));
 	BUG_ON(atomic_inc_return(&evt->free) != 1);
-	BUG_ON(atomic_dec_and_test(&evt->active));
 
 	spin_lock_irqsave(&evt->queue->l_lock, flags);
 	list_add_tail(&evt->queue_list, &evt->queue->free);
@@ -1077,12 +1067,6 @@ static void ibmvfc_complete_purge(struct list_head *purge_list)
  **/
 static void ibmvfc_fail_request(struct ibmvfc_event *evt, int error_code)
 {
-	/*
-	 * Anything we are failing should still be active. Otherwise, it
-	 * implies we already got a response for the command and are doing
-	 * something bad like double completing it.
-	 */
-	BUG_ON(!atomic_dec_and_test(&evt->active));
 	if (evt->cmnd) {
 		evt->cmnd->result = (error_code << 16);
 		evt->done = ibmvfc_scsi_eh_done;
@@ -1430,7 +1414,6 @@ static int ibmvfc_issue_fc_host_lip(struct Scsi_Host *shost)
 
 /**
  * ibmvfc_gather_partition_info - Gather info about the LPAR
- * @vhost:      ibmvfc host struct
  *
  * Return value:
  *	none
@@ -1501,7 +1484,7 @@ static void ibmvfc_set_login_info(struct ibmvfc_host *vhost)
 
 /**
  * ibmvfc_get_event - Gets the next free event in pool
- * @queue:      ibmvfc queue struct
+ * @vhost:	ibmvfc host struct
  *
  * Returns a free event from the pool.
  **/
@@ -1648,7 +1631,7 @@ static int ibmvfc_map_sg_data(struct scsi_cmnd *scmd,
 
 /**
  * ibmvfc_timeout - Internal command timeout handler
- * @t:	struct ibmvfc_event that timed out
+ * @evt:	struct ibmvfc_event that timed out
  *
  * Called when an internally generated command times out
  **/
@@ -1734,7 +1717,6 @@ static int ibmvfc_send_event(struct ibmvfc_event *evt,
 
 		evt->done(evt);
 	} else {
-		atomic_set(&evt->active, 1);
 		spin_unlock_irqrestore(&evt->queue->l_lock, flags);
 		ibmvfc_trc_start(evt);
 	}
@@ -1910,8 +1892,8 @@ static struct ibmvfc_cmd *ibmvfc_init_vfc_cmd(struct ibmvfc_event *evt, struct s
 
 /**
  * ibmvfc_queuecommand - The queuecommand function of the scsi template
- * @shost:	scsi host struct
  * @cmnd:	struct scsi_cmnd to be executed
+ * @done:	Callback function to be called when cmnd is completed
  *
  * Returns:
  *	0 on success / other on failure
@@ -2342,7 +2324,7 @@ static int ibmvfc_reset_device(struct scsi_device *sdev, int type, char *desc)
 /**
  * ibmvfc_match_rport - Match function for specified remote port
  * @evt:	ibmvfc event struct
- * @rport:	device to match
+ * @device:	device to match (rport)
  *
  * Returns:
  *	1 if event matches rport / 0 if event does not match rport
@@ -3194,9 +3176,8 @@ static void ibmvfc_handle_async(struct ibmvfc_async_crq *crq,
  * ibmvfc_handle_crq - Handles and frees received events in the CRQ
  * @crq:	Command/Response queue
  * @vhost:	ibmvfc host struct
- * @evt_doneq:	Event done queue
  *
-**/
+ **/
 static void ibmvfc_handle_crq(struct ibmvfc_crq *crq, struct ibmvfc_host *vhost,
 			      struct list_head *evt_doneq)
 {
@@ -3263,7 +3244,7 @@ static void ibmvfc_handle_crq(struct ibmvfc_crq *crq, struct ibmvfc_host *vhost,
 		return;
 	}
 
-	if (unlikely(atomic_dec_if_positive(&evt->active))) {
+	if (unlikely(atomic_read(&evt->free))) {
 		dev_err(vhost->dev, "Received duplicate correlation_token 0x%08llx!\n",
 			crq->ioba);
 		return;
@@ -3377,6 +3358,7 @@ static int ibmvfc_slave_configure(struct scsi_device *sdev)
  * ibmvfc_change_queue_depth - Change the device's queue depth
  * @sdev:	scsi device struct
  * @qdepth:	depth to set
+ * @reason:	calling context
  *
  * Return value:
  * 	actual depth set
@@ -3448,7 +3430,6 @@ static ssize_t ibmvfc_show_host_capabilities(struct device *dev,
 /**
  * ibmvfc_show_log_level - Show the adapter's error logging level
  * @dev:	class device struct
- * @attr:	unused
  * @buf:	buffer
  *
  * Return value:
@@ -3471,9 +3452,7 @@ static ssize_t ibmvfc_show_log_level(struct device *dev,
 /**
  * ibmvfc_store_log_level - Change the adapter's error logging level
  * @dev:	class device struct
- * @attr:	unused
  * @buf:	buffer
- * @count:      buffer size
  *
  * Return value:
  * 	number of bytes printed to buffer
@@ -3551,7 +3530,7 @@ static ssize_t ibmvfc_read_trace(struct file *filp, struct kobject *kobj,
 				 struct bin_attribute *bin_attr,
 				 char *buf, loff_t off, size_t count)
 {
-	struct device *dev = kobj_to_dev(kobj);
+	struct device *dev = container_of(kobj, struct device, kobj);
 	struct Scsi_Host *shost = class_to_shost(dev);
 	struct ibmvfc_host *vhost = shost_priv(shost);
 	unsigned long flags = 0;
@@ -3790,7 +3769,7 @@ static void ibmvfc_handle_scrq(struct ibmvfc_crq *crq, struct ibmvfc_host *vhost
 		return;
 	}
 
-	if (unlikely(atomic_dec_if_positive(&evt->active))) {
+	if (unlikely(atomic_read(&evt->free))) {
 		dev_err(vhost->dev, "Received duplicate correlation_token 0x%08llx!\n",
 			crq->ioba);
 		return;
@@ -4183,7 +4162,6 @@ static void ibmvfc_tgt_implicit_logout_done(struct ibmvfc_event *evt)
 /**
  * __ibmvfc_tgt_get_implicit_logout_evt - Allocate and init an event for implicit logout
  * @tgt:		ibmvfc target struct
- * @done:		Routine to call when the event is responded to
  *
  * Returns:
  *	Allocated and initialized ibmvfc_event struct
@@ -4500,7 +4478,7 @@ static void ibmvfc_tgt_adisc_cancel_done(struct ibmvfc_event *evt)
 
 /**
  * ibmvfc_adisc_timeout - Handle an ADISC timeout
- * @t:		ibmvfc target struct
+ * @tgt:		ibmvfc target struct
  *
  * If an ADISC times out, send a cancel. If the cancel times
  * out, reset the CRQ. When the ADISC comes back as cancelled,
@@ -4703,7 +4681,7 @@ static void ibmvfc_tgt_query_target(struct ibmvfc_target *tgt)
 /**
  * ibmvfc_alloc_target - Allocate and initialize an ibmvfc target
  * @vhost:		ibmvfc host struct
- * @target:		Holds SCSI ID to allocate target forand the WWPN
+ * @scsi_id:	SCSI ID to allocate target for
  *
  * Returns:
  *	0 on success / other on failure
@@ -5133,7 +5111,7 @@ static void ibmvfc_npiv_login(struct ibmvfc_host *vhost)
 
 /**
  * ibmvfc_npiv_logout_done - Completion handler for NPIV Logout
- * @evt:		ibmvfc event struct
+ * @vhost:		ibmvfc host struct
  *
  **/
 static void ibmvfc_npiv_logout_done(struct ibmvfc_event *evt)

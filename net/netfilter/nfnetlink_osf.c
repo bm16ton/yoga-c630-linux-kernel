@@ -294,9 +294,10 @@ static const struct nla_policy nfnl_osf_policy[OSF_ATTR_MAX + 1] = {
 	[OSF_ATTR_FINGER]	= { .len = sizeof(struct nf_osf_user_finger) },
 };
 
-static int nfnl_osf_add_callback(struct sk_buff *skb,
-				 const struct nfnl_info *info,
-				 const struct nlattr * const osf_attrs[])
+static int nfnl_osf_add_callback(struct net *net, struct sock *ctnl,
+				 struct sk_buff *skb, const struct nlmsghdr *nlh,
+				 const struct nlattr * const osf_attrs[],
+				 struct netlink_ext_ack *extack)
 {
 	struct nf_osf_user_finger *f;
 	struct nf_osf_finger *kf = NULL, *sf;
@@ -308,7 +309,7 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
 	if (!osf_attrs[OSF_ATTR_FINGER])
 		return -EINVAL;
 
-	if (!(info->nlh->nlmsg_flags & NLM_F_CREATE))
+	if (!(nlh->nlmsg_flags & NLM_F_CREATE))
 		return -EINVAL;
 
 	f = nla_data(osf_attrs[OSF_ATTR_FINGER]);
@@ -326,7 +327,7 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
 		kfree(kf);
 		kf = NULL;
 
-		if (info->nlh->nlmsg_flags & NLM_F_EXCL)
+		if (nlh->nlmsg_flags & NLM_F_EXCL)
 			err = -EEXIST;
 		break;
 	}
@@ -340,9 +341,11 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
 	return err;
 }
 
-static int nfnl_osf_remove_callback(struct sk_buff *skb,
-				    const struct nfnl_info *info,
-				    const struct nlattr * const osf_attrs[])
+static int nfnl_osf_remove_callback(struct net *net, struct sock *ctnl,
+				    struct sk_buff *skb,
+				    const struct nlmsghdr *nlh,
+				    const struct nlattr * const osf_attrs[],
+				    struct netlink_ext_ack *extack)
 {
 	struct nf_osf_user_finger *f;
 	struct nf_osf_finger *sf;
@@ -376,13 +379,11 @@ static int nfnl_osf_remove_callback(struct sk_buff *skb,
 static const struct nfnl_callback nfnl_osf_callbacks[OSF_MSG_MAX] = {
 	[OSF_MSG_ADD]	= {
 		.call		= nfnl_osf_add_callback,
-		.type		= NFNL_CB_MUTEX,
 		.attr_count	= OSF_ATTR_MAX,
 		.policy		= nfnl_osf_policy,
 	},
 	[OSF_MSG_REMOVE]	= {
 		.call		= nfnl_osf_remove_callback,
-		.type		= NFNL_CB_MUTEX,
 		.attr_count	= OSF_ATTR_MAX,
 		.policy		= nfnl_osf_policy,
 	},

@@ -278,8 +278,6 @@ struct hellcreek {
 	struct mutex reg_lock;	/* Switch IP register lock */
 	struct mutex vlan_lock;	/* VLAN bitmaps lock */
 	struct mutex ptp_lock;	/* PTP IP register lock */
-	struct devlink_region *vlan_region;
-	struct devlink_region *fdb_region;
 	void __iomem *base;
 	void __iomem *ptp_base;
 	u16 swcfg;		/* swcfg shadow */
@@ -304,11 +302,6 @@ struct hellcreek {
 enum hellcreek_devlink_resource_id {
 	HELLCREEK_DEVLINK_PARAM_ID_VLAN_TABLE,
 	HELLCREEK_DEVLINK_PARAM_ID_FDB_TABLE,
-};
-
-struct hellcreek_devlink_vlan_entry {
-	u16 vid;
-	u16 member;
 };
 
 #endif /* _HELLCREEK_H_ */

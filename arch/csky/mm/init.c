@@ -107,6 +107,7 @@ void __init mem_init(void)
 			free_highmem_page(page);
 	}
 #endif
+	mem_init_print_info(NULL);
 }
 
 void free_initmem(void)

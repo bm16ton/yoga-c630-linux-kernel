@@ -160,7 +160,7 @@ static struct intel_quirk intel_quirks[] = {
 
 void intel_init_quirks(struct drm_i915_private *i915)
 {
-	struct pci_dev *d = to_pci_dev(i915->drm.dev);
+	struct pci_dev *d = i915->drm.pdev;
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(intel_quirks); i++) {

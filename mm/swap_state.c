@@ -132,6 +132,7 @@ int add_to_swap_cache(struct page *page, swp_entry_t entry,
 			xas_store(&xas, page);
 			xas_next(&xas);
 		}
+		address_space->nrexceptional -= nr_shadows;
 		address_space->nrpages += nr;
 		__mod_node_page_state(page_pgdat(page), NR_FILE_PAGES, nr);
 		__mod_lruvec_page_state(page, NR_SWAPCACHE, nr);
@@ -171,6 +172,8 @@ void __delete_from_swap_cache(struct page *page,
 		xas_next(&xas);
 	}
 	ClearPageSwapCache(page);
+	if (shadow)
+		address_space->nrexceptional += nr;
 	address_space->nrpages -= nr;
 	__mod_node_page_state(page_pgdat(page), NR_FILE_PAGES, -nr);
 	__mod_lruvec_page_state(page, NR_SWAPCACHE, -nr);
@@ -272,6 +275,7 @@ void clear_shadow_from_swap_cache(int type, unsigned long begin,
 			xas_store(&xas, NULL);
 			nr_shadows++;
 		}
+		address_space->nrexceptional -= nr_shadows;
 		xa_unlock_irq(&address_space->i_pages);
 
 		/* search the next swapcache until we meet end */
@@ -493,14 +497,16 @@ struct page *__read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 	__SetPageLocked(page);
 	__SetPageSwapBacked(page);
 
-	if (mem_cgroup_swapin_charge_page(page, NULL, gfp_mask, entry))
-		goto fail_unlock;
-
 	/* May fail (-ENOMEM) if XArray node allocation failed. */
-	if (add_to_swap_cache(page, entry, gfp_mask & GFP_RECLAIM_MASK, &shadow))
+	if (add_to_swap_cache(page, entry, gfp_mask & GFP_RECLAIM_MASK, &shadow)) {
+		put_swap_page(page, entry);
 		goto fail_unlock;
+	}
 
-	mem_cgroup_swapin_uncharge_swap(entry);
+	if (mem_cgroup_charge(page, NULL, gfp_mask)) {
+		delete_from_swap_cache(page);
+		goto fail_unlock;
+	}
 
 	if (shadow)
 		workingset_refault(page, shadow);
@@ -511,7 +517,6 @@ struct page *__read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 	return page;
 
 fail_unlock:
-	put_swap_page(page, entry);
 	unlock_page(page);
 	put_page(page);
 	return NULL;
@@ -792,7 +797,7 @@ static void swap_ra_info(struct vm_fault *vmf,
  *
  * Returns the struct page for entry and addr, after queueing swapin.
  *
- * Primitive swap readahead code. We simply read in a few pages whose
+ * Primitive swap readahead code. We simply read in a few pages whoes
  * virtual addresses are around the fault address in the same vma.
  *
  * Caller must hold read mmap_lock if vmf->vma is not NULL.

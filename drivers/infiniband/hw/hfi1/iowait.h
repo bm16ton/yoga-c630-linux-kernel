@@ -321,7 +321,7 @@ static inline void iowait_drain_wakeup(struct iowait *wait)
 /**
  * iowait_get_txhead() - get packet off of iowait list
  *
- * @wait: iowait_work structure
+ * @wait iowait_work struture
  */
 static inline struct sdma_txreq *iowait_get_txhead(struct iowait_work *wait)
 {

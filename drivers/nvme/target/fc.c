@@ -1021,75 +1021,60 @@ nvmet_fc_free_hostport(struct nvmet_fc_hostport *hostport)
 }
 
 static struct nvmet_fc_hostport *
-nvmet_fc_match_hostport(struct nvmet_fc_tgtport *tgtport, void *hosthandle)
-{
-	struct nvmet_fc_hostport *host;
-
-	lockdep_assert_held(&tgtport->lock);
-
-	list_for_each_entry(host, &tgtport->host_list, host_list) {
-		if (host->hosthandle == hosthandle && !host->invalid) {
-			if (nvmet_fc_hostport_get(host))
-				return (host);
-		}
-	}
-
-	return NULL;
-}
-
-static struct nvmet_fc_hostport *
 nvmet_fc_alloc_hostport(struct nvmet_fc_tgtport *tgtport, void *hosthandle)
 {
-	struct nvmet_fc_hostport *newhost, *match = NULL;
+	struct nvmet_fc_hostport *newhost, *host, *match = NULL;
 	unsigned long flags;
 
 	/* if LLDD not implemented, leave as NULL */
 	if (!hosthandle)
 		return NULL;
 
-	/*
-	 * take reference for what will be the newly allocated hostport if
-	 * we end up using a new allocation
-	 */
+	/* take reference for what will be the newly allocated hostport */
 	if (!nvmet_fc_tgtport_get(tgtport))
 		return ERR_PTR(-EINVAL);
 
-	spin_lock_irqsave(&tgtport->lock, flags);
-	match = nvmet_fc_match_hostport(tgtport, hosthandle);
-	spin_unlock_irqrestore(&tgtport->lock, flags);
-
-	if (match) {
-		/* no new allocation - release reference */
-		nvmet_fc_tgtport_put(tgtport);
-		return match;
-	}
-
 	newhost = kzalloc(sizeof(*newhost), GFP_KERNEL);
 	if (!newhost) {
-		/* no new allocation - release reference */
+		spin_lock_irqsave(&tgtport->lock, flags);
+		list_for_each_entry(host, &tgtport->host_list, host_list) {
+			if (host->hosthandle == hosthandle && !host->invalid) {
+				if (nvmet_fc_hostport_get(host)) {
+					match = host;
+					break;
+				}
+			}
+		}
+		spin_unlock_irqrestore(&tgtport->lock, flags);
+		/* no allocation - release reference */
 		nvmet_fc_tgtport_put(tgtport);
-		return ERR_PTR(-ENOMEM);
+		return (match) ? match : ERR_PTR(-ENOMEM);
 	}
+
+	newhost->tgtport = tgtport;
+	newhost->hosthandle = hosthandle;
+	INIT_LIST_HEAD(&newhost->host_list);
+	kref_init(&newhost->ref);
 
 	spin_lock_irqsave(&tgtport->lock, flags);
-	match = nvmet_fc_match_hostport(tgtport, hosthandle);
-	if (match) {
-		/* new allocation not needed */
-		kfree(newhost);
-		newhost = match;
-		/* no new allocation - release reference */
-		nvmet_fc_tgtport_put(tgtport);
-	} else {
-		newhost->tgtport = tgtport;
-		newhost->hosthandle = hosthandle;
-		INIT_LIST_HEAD(&newhost->host_list);
-		kref_init(&newhost->ref);
-
-		list_add_tail(&newhost->host_list, &tgtport->host_list);
+	list_for_each_entry(host, &tgtport->host_list, host_list) {
+		if (host->hosthandle == hosthandle && !host->invalid) {
+			if (nvmet_fc_hostport_get(host)) {
+				match = host;
+				break;
+			}
+		}
 	}
+	if (match) {
+		kfree(newhost);
+		newhost = NULL;
+		/* releasing allocation - release reference */
+		nvmet_fc_tgtport_put(tgtport);
+	} else
+		list_add_tail(&newhost->host_list, &tgtport->host_list);
 	spin_unlock_irqrestore(&tgtport->lock, flags);
 
-	return newhost;
+	return (match) ? match : newhost;
 }
 
 static void
@@ -2011,7 +1996,6 @@ nvmet_fc_handle_ls_rqst_work(struct work_struct *work)
  *
  * @target_port: pointer to the (registered) target port the LS was
  *              received on.
- * @hosthandle: pointer to the host specific data, gets stored in iod.
  * @lsrsp:      pointer to a lsrsp structure to be used to reference
  *              the exchange corresponding to the LS.
  * @lsreqbuf:   pointer to the buffer containing the LS Request

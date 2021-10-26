@@ -83,7 +83,11 @@ static __always_inline u64 __arch_get_hw_counter(s32 clock_mode,
 	 */
 	isb();
 	asm volatile("mrs %0, cntvct_el0" : "=r" (res) :: "memory");
-	arch_counter_enforce_ordering(res);
+	/*
+	 * This isb() is required to prevent that the seq lock is
+	 * speculated.#
+	 */
+	isb();
 
 	return res;
 }
@@ -96,7 +100,7 @@ const struct vdso_data *__arch_get_vdso_data(void)
 
 #ifdef CONFIG_TIME_NS
 static __always_inline
-const struct vdso_data *__arch_get_timens_vdso_data(const struct vdso_data *vd)
+const struct vdso_data *__arch_get_timens_vdso_data(void)
 {
 	return _timens_data;
 }

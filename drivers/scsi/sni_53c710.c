@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+/* -*- mode: c; c-basic-offset: 8 -*- */
 
 /* SNI RM driver
  *

@@ -45,7 +45,7 @@ int can_put_echo_skb(struct sk_buff *skb, struct net_device *dev,
 	BUG_ON(idx >= priv->echo_skb_max);
 
 	/* check flag whether this packet has to be looped back */
-	if (!(dev->flags & IFF_ECHO) ||
+	if (!(dev->flags & IFF_ECHO) || skb->pkt_type != PACKET_LOOPBACK ||
 	    (skb->protocol != htons(ETH_P_CAN) &&
 	     skb->protocol != htons(ETH_P_CANFD))) {
 		kfree_skb(skb);
@@ -58,6 +58,7 @@ int can_put_echo_skb(struct sk_buff *skb, struct net_device *dev,
 			return -ENOMEM;
 
 		/* make settings for echo to reduce code in irq context */
+		skb->pkt_type = PACKET_BROADCAST;
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
 		skb->dev = dev;
 
@@ -110,13 +111,6 @@ __can_get_echo_skb(struct net_device *dev, unsigned int idx, u8 *len_ptr,
 
 		priv->echo_skb[idx] = NULL;
 
-		if (skb->pkt_type == PACKET_LOOPBACK) {
-			skb->pkt_type = PACKET_BROADCAST;
-		} else {
-			dev_consume_skb_any(skb);
-			return NULL;
-		}
-
 		return skb;
 	}
 
@@ -153,8 +147,7 @@ EXPORT_SYMBOL_GPL(can_get_echo_skb);
  *
  * The function is typically called when TX failed.
  */
-void can_free_echo_skb(struct net_device *dev, unsigned int idx,
-		       unsigned int *frame_len_ptr)
+void can_free_echo_skb(struct net_device *dev, unsigned int idx)
 {
 	struct can_priv *priv = netdev_priv(dev);
 
@@ -165,13 +158,7 @@ void can_free_echo_skb(struct net_device *dev, unsigned int idx,
 	}
 
 	if (priv->echo_skb[idx]) {
-		struct sk_buff *skb = priv->echo_skb[idx];
-		struct can_skb_priv *can_skb_priv = can_skb_prv(skb);
-
-		if (frame_len_ptr)
-			*frame_len_ptr = can_skb_priv->frame_len;
-
-		dev_kfree_skb_any(skb);
+		dev_kfree_skb_any(priv->echo_skb[idx]);
 		priv->echo_skb[idx] = NULL;
 	}
 }
@@ -183,11 +170,8 @@ struct sk_buff *alloc_can_skb(struct net_device *dev, struct can_frame **cf)
 
 	skb = netdev_alloc_skb(dev, sizeof(struct can_skb_priv) +
 			       sizeof(struct can_frame));
-	if (unlikely(!skb)) {
-		*cf = NULL;
-
+	if (unlikely(!skb))
 		return NULL;
-	}
 
 	skb->protocol = htons(ETH_P_CAN);
 	skb->pkt_type = PACKET_BROADCAST;
@@ -214,11 +198,8 @@ struct sk_buff *alloc_canfd_skb(struct net_device *dev,
 
 	skb = netdev_alloc_skb(dev, sizeof(struct can_skb_priv) +
 			       sizeof(struct canfd_frame));
-	if (unlikely(!skb)) {
-		*cfd = NULL;
-
+	if (unlikely(!skb))
 		return NULL;
-	}
 
 	skb->protocol = htons(ETH_P_CANFD);
 	skb->pkt_type = PACKET_BROADCAST;

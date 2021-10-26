@@ -74,12 +74,20 @@ END_FTR_SECTION_IFSET(CPU_FTR_CAN_NAP)
 
 /*
  * Return from NAP/DOZE mode, restore some CPU specific registers,
- * r2 containing address of current.
- * r11 points to the exception frame.
+ * r2 containing physical address of current.
+ * r11 points to the exception frame (physical address).
  * We have to preserve r10.
  */
 _GLOBAL(power_save_ppc32_restore)
 	lwz	r9,_LINK(r11)		/* interrupted in e500_idle */
 	stw	r9,_NIP(r11)		/* make it do a blr */
-	blr
+
+#ifdef CONFIG_SMP
+	lwz	r11,TASK_CPU(r2)		/* get cpu number * 4 */
+	slwi	r11,r11,2
+#else
+	li	r11,0
+#endif
+
+	b	transfer_to_handler_cont
 _ASM_NOKPROBE_SYMBOL(power_save_ppc32_restore)

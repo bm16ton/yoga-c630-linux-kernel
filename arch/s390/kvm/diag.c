@@ -150,19 +150,6 @@ static int __diag_time_slice_end(struct kvm_vcpu *vcpu)
 	return 0;
 }
 
-static int forward_cnt;
-static unsigned long cur_slice;
-
-static int diag9c_forwarding_overrun(void)
-{
-	/* Reset the count on a new slice */
-	if (time_after(jiffies, cur_slice)) {
-		cur_slice = jiffies;
-		forward_cnt = diag9c_forwarding_hz / HZ;
-	}
-	return forward_cnt-- <= 0 ? 1 : 0;
-}
-
 static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
 {
 	struct kvm_vcpu *tcpu;
@@ -180,21 +167,9 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
 	if (!tcpu)
 		goto no_yield;
 
-	/* target guest VCPU already running */
-	if (READ_ONCE(tcpu->cpu) >= 0) {
-		if (!diag9c_forwarding_hz || diag9c_forwarding_overrun())
-			goto no_yield;
-
-		/* target host CPU already running */
-		if (!vcpu_is_preempted(tcpu->cpu))
-			goto no_yield;
-		smp_yield_cpu(tcpu->cpu);
-		VCPU_EVENT(vcpu, 5,
-			   "diag time slice end directed to %d: yield forwarded",
-			   tid);
-		vcpu->stat.diagnose_9c_forward++;
-		return 0;
-	}
+	/* target already running */
+	if (READ_ONCE(tcpu->cpu) >= 0)
+		goto no_yield;
 
 	if (kvm_vcpu_yield_to(tcpu) <= 0)
 		goto no_yield;

@@ -71,11 +71,9 @@ the ``mbus_code`` field is handled differently:
    formats shall not depend on the active configuration of the video device
    or device pipeline.
 
+.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.7cm}|
+
 .. c:type:: v4l2_fmtdesc
-
-.. cssclass:: longtable
-
-.. tabularcolumns:: |p{4.4cm}|p{4.4cm}|p{8.5cm}|
 
 .. flat-table:: struct v4l2_fmtdesc
     :header-rows:  0
@@ -137,9 +135,7 @@ the ``mbus_code`` field is handled differently:
 	zero.
 
 
-.. tabularcolumns:: |p{8.4cm}|p{1.8cm}|p{7.1cm}|
-
-.. cssclass:: longtable
+.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.7cm}|
 
 .. _fmtdesc-flags:
 

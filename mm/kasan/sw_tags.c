@@ -121,14 +121,10 @@ bool kasan_check_range(unsigned long addr, size_t size, bool write,
 bool kasan_byte_accessible(const void *addr)
 {
 	u8 tag = get_tag(addr);
-	void *untagged_addr = kasan_reset_tag(addr);
-	u8 shadow_byte;
+	u8 shadow_byte = READ_ONCE(*(u8 *)kasan_mem_to_shadow(kasan_reset_tag(addr)));
 
-	if (untagged_addr < kasan_shadow_to_mem((void *)KASAN_SHADOW_START))
-		return false;
-
-	shadow_byte = READ_ONCE(*(u8 *)kasan_mem_to_shadow(untagged_addr));
-	return tag == KASAN_TAG_KERNEL || tag == shadow_byte;
+	return (shadow_byte != KASAN_TAG_INVALID) &&
+		(tag == KASAN_TAG_KERNEL || tag == shadow_byte);
 }
 
 #define DEFINE_HWASAN_LOAD_STORE(size)					\
@@ -163,7 +159,7 @@ EXPORT_SYMBOL(__hwasan_storeN_noabort);
 
 void __hwasan_tag_memory(unsigned long addr, u8 tag, unsigned long size)
 {
-	kasan_poison((void *)addr, size, tag, false);
+	kasan_poison((void *)addr, size, tag);
 }
 EXPORT_SYMBOL(__hwasan_tag_memory);
 

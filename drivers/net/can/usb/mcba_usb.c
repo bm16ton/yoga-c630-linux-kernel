@@ -366,7 +366,7 @@ static netdev_tx_t mcba_usb_start_xmit(struct sk_buff *skb,
 	return NETDEV_TX_OK;
 
 xmit_failed:
-	can_free_echo_skb(priv->netdev, ctx->ndx, NULL);
+	can_free_echo_skb(priv->netdev, ctx->ndx);
 	mcba_usb_free_ctx(ctx);
 	dev_kfree_skb(skb);
 	stats->tx_dropped++;
@@ -652,8 +652,6 @@ static int mcba_usb_start(struct mcba_priv *priv)
 			err = -ENOMEM;
 			break;
 		}
-
-		urb->transfer_dma = buf_dma;
 
 		usb_fill_bulk_urb(urb, priv->udev,
 				  usb_rcvbulkpipe(priv->udev, MCBA_USB_EP_IN),

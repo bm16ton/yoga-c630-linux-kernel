@@ -11,9 +11,9 @@ const volatile __u64 min_us = 0;
 const volatile pid_t targ_pid = 0;
 
 struct {
-	__uint(type, BPF_MAP_TYPE_TASK_STORAGE);
-	__uint(map_flags, BPF_F_NO_PREALLOC);
-	__type(key, int);
+	__uint(type, BPF_MAP_TYPE_HASH);
+	__uint(max_entries, 10240);
+	__type(key, u32);
 	__type(value, u64);
 } start SEC(".maps");
 
@@ -25,20 +25,15 @@ struct {
 
 /* record enqueue timestamp */
 __always_inline
-static int trace_enqueue(struct task_struct *t)
+static int trace_enqueue(u32 tgid, u32 pid)
 {
-	u32 pid = t->pid;
-	u64 *ptr;
+	u64 ts;
 
 	if (!pid || (targ_pid && targ_pid != pid))
 		return 0;
 
-	ptr = bpf_task_storage_get(&start, t, 0,
-				   BPF_LOCAL_STORAGE_GET_F_CREATE);
-	if (!ptr)
-		return 0;
-
-	*ptr = bpf_ktime_get_ns();
+	ts = bpf_ktime_get_ns();
+	bpf_map_update_elem(&start, &pid, &ts, 0);
 	return 0;
 }
 
@@ -48,7 +43,7 @@ int handle__sched_wakeup(u64 *ctx)
 	/* TP_PROTO(struct task_struct *p) */
 	struct task_struct *p = (void *)ctx[0];
 
-	return trace_enqueue(p);
+	return trace_enqueue(p->tgid, p->pid);
 }
 
 SEC("tp_btf/sched_wakeup_new")
@@ -57,7 +52,7 @@ int handle__sched_wakeup_new(u64 *ctx)
 	/* TP_PROTO(struct task_struct *p) */
 	struct task_struct *p = (void *)ctx[0];
 
-	return trace_enqueue(p);
+	return trace_enqueue(p->tgid, p->pid);
 }
 
 SEC("tp_btf/sched_switch")
@@ -75,16 +70,12 @@ int handle__sched_switch(u64 *ctx)
 
 	/* ivcsw: treat like an enqueue event and store timestamp */
 	if (prev->state == TASK_RUNNING)
-		trace_enqueue(prev);
+		trace_enqueue(prev->tgid, prev->pid);
 
 	pid = next->pid;
 
-	/* For pid mismatch, save a bpf_task_storage_get */
-	if (!pid || (targ_pid && targ_pid != pid))
-		return 0;
-
 	/* fetch timestamp and calculate delta */
-	tsp = bpf_task_storage_get(&start, next, 0, 0);
+	tsp = bpf_map_lookup_elem(&start, &pid);
 	if (!tsp)
 		return 0;   /* missed enqueue */
 
@@ -100,7 +91,7 @@ int handle__sched_switch(u64 *ctx)
 	bpf_perf_event_output(ctx, &events, BPF_F_CURRENT_CPU,
 			      &event, sizeof(event));
 
-	bpf_task_storage_delete(&start, next);
+	bpf_map_delete_elem(&start, &pid);
 	return 0;
 }
 

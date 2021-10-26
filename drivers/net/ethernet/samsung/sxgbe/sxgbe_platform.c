@@ -25,7 +25,8 @@
 
 #ifdef CONFIG_OF
 static int sxgbe_probe_config_dt(struct platform_device *pdev,
-				 struct sxgbe_plat_data *plat)
+				 struct sxgbe_plat_data *plat,
+				 const char **mac)
 {
 	struct device_node *np = pdev->dev.of_node;
 	struct sxgbe_dma_cfg *dma_cfg;
@@ -34,6 +35,7 @@ static int sxgbe_probe_config_dt(struct platform_device *pdev,
 	if (!np)
 		return -ENODEV;
 
+	*mac = of_get_mac_address(np);
 	err = of_get_phy_mode(np, &plat->interface);
 	if (err && err != -ENODEV)
 		return err;
@@ -61,7 +63,8 @@ static int sxgbe_probe_config_dt(struct platform_device *pdev,
 }
 #else
 static int sxgbe_probe_config_dt(struct platform_device *pdev,
-				 struct sxgbe_plat_data *plat)
+				 struct sxgbe_plat_data *plat,
+				 const char **mac)
 {
 	return -ENOSYS;
 }
@@ -82,6 +85,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
 	void __iomem *addr;
 	struct sxgbe_priv_data *priv = NULL;
 	struct sxgbe_plat_data *plat_dat = NULL;
+	const char *mac = NULL;
 	struct net_device *ndev = platform_get_drvdata(pdev);
 	struct device_node *node = dev->of_node;
 
@@ -97,7 +101,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
 		if (!plat_dat)
 			return  -ENOMEM;
 
-		ret = sxgbe_probe_config_dt(pdev, plat_dat);
+		ret = sxgbe_probe_config_dt(pdev, plat_dat, &mac);
 		if (ret) {
 			pr_err("%s: main dt probe failed\n", __func__);
 			return ret;
@@ -118,7 +122,8 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
 	}
 
 	/* Get MAC address if available (DT) */
-	of_get_mac_address(node, priv->dev->dev_addr);
+	if (!IS_ERR_OR_NULL(mac))
+		ether_addr_copy(priv->dev->dev_addr, mac);
 
 	/* Get the TX/RX IRQ numbers */
 	for (i = 0, chan = 1; i < SXGBE_TX_QUEUES; i++) {

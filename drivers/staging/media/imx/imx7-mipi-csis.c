@@ -24,7 +24,6 @@
 #include <linux/reset.h>
 #include <linux/spinlock.h>
 
-#include <media/v4l2-common.h>
 #include <media/v4l2-device.h>
 #include <media/v4l2-fwnode.h>
 #include <media/v4l2-mc.h>
@@ -63,107 +62,77 @@
 #define MIPI_CSIS_CLK_CTRL_WCLK_SRC		BIT(0)
 
 /* CSIS Interrupt mask */
-#define MIPI_CSIS_INT_MSK			0x10
-#define MIPI_CSIS_INT_MSK_EVEN_BEFORE		BIT(31)
-#define MIPI_CSIS_INT_MSK_EVEN_AFTER		BIT(30)
-#define MIPI_CSIS_INT_MSK_ODD_BEFORE		BIT(29)
-#define MIPI_CSIS_INT_MSK_ODD_AFTER		BIT(28)
-#define MIPI_CSIS_INT_MSK_FRAME_START		BIT(24)
-#define MIPI_CSIS_INT_MSK_FRAME_END		BIT(20)
-#define MIPI_CSIS_INT_MSK_ERR_SOT_HS		BIT(16)
-#define MIPI_CSIS_INT_MSK_ERR_LOST_FS		BIT(12)
-#define MIPI_CSIS_INT_MSK_ERR_LOST_FE		BIT(8)
-#define MIPI_CSIS_INT_MSK_ERR_OVER		BIT(4)
-#define MIPI_CSIS_INT_MSK_ERR_WRONG_CFG		BIT(3)
-#define MIPI_CSIS_INT_MSK_ERR_ECC		BIT(2)
-#define MIPI_CSIS_INT_MSK_ERR_CRC		BIT(1)
-#define MIPI_CSIS_INT_MSK_ERR_UNKNOWN		BIT(0)
+#define MIPI_CSIS_INTMSK			0x10
+#define MIPI_CSIS_INTMSK_EVEN_BEFORE		BIT(31)
+#define MIPI_CSIS_INTMSK_EVEN_AFTER		BIT(30)
+#define MIPI_CSIS_INTMSK_ODD_BEFORE		BIT(29)
+#define MIPI_CSIS_INTMSK_ODD_AFTER		BIT(28)
+#define MIPI_CSIS_INTMSK_FRAME_START		BIT(24)
+#define MIPI_CSIS_INTMSK_FRAME_END		BIT(20)
+#define MIPI_CSIS_INTMSK_ERR_SOT_HS		BIT(16)
+#define MIPI_CSIS_INTMSK_ERR_LOST_FS		BIT(12)
+#define MIPI_CSIS_INTMSK_ERR_LOST_FE		BIT(8)
+#define MIPI_CSIS_INTMSK_ERR_OVER		BIT(4)
+#define MIPI_CSIS_INTMSK_ERR_WRONG_CFG		BIT(3)
+#define MIPI_CSIS_INTMSK_ERR_ECC		BIT(2)
+#define MIPI_CSIS_INTMSK_ERR_CRC		BIT(1)
+#define MIPI_CSIS_INTMSK_ERR_UNKNOWN		BIT(0)
 
 /* CSIS Interrupt source */
-#define MIPI_CSIS_INT_SRC			0x14
-#define MIPI_CSIS_INT_SRC_EVEN_BEFORE		BIT(31)
-#define MIPI_CSIS_INT_SRC_EVEN_AFTER		BIT(30)
-#define MIPI_CSIS_INT_SRC_EVEN			BIT(30)
-#define MIPI_CSIS_INT_SRC_ODD_BEFORE		BIT(29)
-#define MIPI_CSIS_INT_SRC_ODD_AFTER		BIT(28)
-#define MIPI_CSIS_INT_SRC_ODD			(0x3 << 28)
-#define MIPI_CSIS_INT_SRC_NON_IMAGE_DATA	(0xf << 28)
-#define MIPI_CSIS_INT_SRC_FRAME_START		BIT(24)
-#define MIPI_CSIS_INT_SRC_FRAME_END		BIT(20)
-#define MIPI_CSIS_INT_SRC_ERR_SOT_HS		BIT(16)
-#define MIPI_CSIS_INT_SRC_ERR_LOST_FS		BIT(12)
-#define MIPI_CSIS_INT_SRC_ERR_LOST_FE		BIT(8)
-#define MIPI_CSIS_INT_SRC_ERR_OVER		BIT(4)
-#define MIPI_CSIS_INT_SRC_ERR_WRONG_CFG		BIT(3)
-#define MIPI_CSIS_INT_SRC_ERR_ECC		BIT(2)
-#define MIPI_CSIS_INT_SRC_ERR_CRC		BIT(1)
-#define MIPI_CSIS_INT_SRC_ERR_UNKNOWN		BIT(0)
-#define MIPI_CSIS_INT_SRC_ERRORS		0xfffff
+#define MIPI_CSIS_INTSRC			0x14
+#define MIPI_CSIS_INTSRC_EVEN_BEFORE		BIT(31)
+#define MIPI_CSIS_INTSRC_EVEN_AFTER		BIT(30)
+#define MIPI_CSIS_INTSRC_EVEN			BIT(30)
+#define MIPI_CSIS_INTSRC_ODD_BEFORE		BIT(29)
+#define MIPI_CSIS_INTSRC_ODD_AFTER		BIT(28)
+#define MIPI_CSIS_INTSRC_ODD			(0x3 << 28)
+#define MIPI_CSIS_INTSRC_NON_IMAGE_DATA		(0xf << 28)
+#define MIPI_CSIS_INTSRC_FRAME_START		BIT(24)
+#define MIPI_CSIS_INTSRC_FRAME_END		BIT(20)
+#define MIPI_CSIS_INTSRC_ERR_SOT_HS		BIT(16)
+#define MIPI_CSIS_INTSRC_ERR_LOST_FS		BIT(12)
+#define MIPI_CSIS_INTSRC_ERR_LOST_FE		BIT(8)
+#define MIPI_CSIS_INTSRC_ERR_OVER		BIT(4)
+#define MIPI_CSIS_INTSRC_ERR_WRONG_CFG		BIT(3)
+#define MIPI_CSIS_INTSRC_ERR_ECC		BIT(2)
+#define MIPI_CSIS_INTSRC_ERR_CRC		BIT(1)
+#define MIPI_CSIS_INTSRC_ERR_UNKNOWN		BIT(0)
+#define MIPI_CSIS_INTSRC_ERRORS			0xfffff
 
 /* D-PHY status control */
-#define MIPI_CSIS_DPHY_STATUS			0x20
-#define MIPI_CSIS_DPHY_STATUS_ULPS_DAT		BIT(8)
-#define MIPI_CSIS_DPHY_STATUS_STOPSTATE_DAT	BIT(4)
-#define MIPI_CSIS_DPHY_STATUS_ULPS_CLK		BIT(1)
-#define MIPI_CSIS_DPHY_STATUS_STOPSTATE_CLK	BIT(0)
+#define MIPI_CSIS_DPHYSTATUS			0x20
+#define MIPI_CSIS_DPHYSTATUS_ULPS_DAT		BIT(8)
+#define MIPI_CSIS_DPHYSTATUS_STOPSTATE_DAT	BIT(4)
+#define MIPI_CSIS_DPHYSTATUS_ULPS_CLK		BIT(1)
+#define MIPI_CSIS_DPHYSTATUS_STOPSTATE_CLK	BIT(0)
 
 /* D-PHY common control */
-#define MIPI_CSIS_DPHY_CMN_CTRL			0x24
-#define MIPI_CSIS_DPHY_CMN_CTRL_HSSETTLE(n)	((n) << 24)
-#define MIPI_CSIS_DPHY_CMN_CTRL_HSSETTLE_MASK	GENMASK(31, 24)
-#define MIPI_CSIS_DPHY_CMN_CTRL_CLKSETTLE(n)	((n) << 22)
-#define MIPI_CSIS_DPHY_CMN_CTRL_CLKSETTLE_MASK	GENMASK(23, 22)
-#define MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_CLK	BIT(6)
-#define MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_DAT	BIT(5)
-#define MIPI_CSIS_DPHY_CMN_CTRL_ENABLE_DAT	BIT(1)
-#define MIPI_CSIS_DPHY_CMN_CTRL_ENABLE_CLK	BIT(0)
-#define MIPI_CSIS_DPHY_CMN_CTRL_ENABLE		(0x1f << 0)
+#define MIPI_CSIS_DPHYCTRL			0x24
+#define MIPI_CSIS_DPHYCTRL_HSS_MASK		(0xff << 24)
+#define MIPI_CSIS_DPHYCTRL_HSS_OFFSET		24
+#define MIPI_CSIS_DPHYCTRL_SCLKS_MASK		(0x3 << 22)
+#define MIPI_CSIS_DPHYCTRL_SCLKS_OFFSET		22
+#define MIPI_CSIS_DPHYCTRL_DPDN_SWAP_CLK	BIT(6)
+#define MIPI_CSIS_DPHYCTRL_DPDN_SWAP_DAT	BIT(5)
+#define MIPI_CSIS_DPHYCTRL_ENABLE_DAT		BIT(1)
+#define MIPI_CSIS_DPHYCTRL_ENABLE_CLK		BIT(0)
+#define MIPI_CSIS_DPHYCTRL_ENABLE		(0x1f << 0)
 
 /* D-PHY Master and Slave Control register Low */
-#define MIPI_CSIS_DPHY_BCTRL_L			0x30
-#define MIPI_CSIS_DPHY_BCTRL_L_USER_DATA_PATTERN_LOW(n)		(((n) & 3U) << 30)
-#define MIPI_CSIS_DPHY_BCTRL_L_BIAS_REF_VOLT_715MV		(0 << 28)
-#define MIPI_CSIS_DPHY_BCTRL_L_BIAS_REF_VOLT_724MV		(1 << 28)
-#define MIPI_CSIS_DPHY_BCTRL_L_BIAS_REF_VOLT_733MV		(2 << 28)
-#define MIPI_CSIS_DPHY_BCTRL_L_BIAS_REF_VOLT_706MV		(3 << 28)
-#define MIPI_CSIS_DPHY_BCTRL_L_BGR_CHOPPER_FREQ_3MHZ		(0 << 27)
-#define MIPI_CSIS_DPHY_BCTRL_L_BGR_CHOPPER_FREQ_1_5MHZ		(1 << 27)
-#define MIPI_CSIS_DPHY_BCTRL_L_VREG12_EXTPWR_EN_CTL		BIT(26)
-#define MIPI_CSIS_DPHY_BCTRL_L_REG_12P_LVL_CTL_1_2V		(0 << 24)
-#define MIPI_CSIS_DPHY_BCTRL_L_REG_12P_LVL_CTL_1_23V		(1 << 24)
-#define MIPI_CSIS_DPHY_BCTRL_L_REG_12P_LVL_CTL_1_17V		(2 << 24)
-#define MIPI_CSIS_DPHY_BCTRL_L_REG_12P_LVL_CTL_1_26V		(3 << 24)
-#define MIPI_CSIS_DPHY_BCTRL_L_REG_1P2_LVL_SEL			BIT(23)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_HYS_LVL_80MV		(0 << 21)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_HYS_LVL_100MV		(1 << 21)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_HYS_LVL_120MV		(2 << 21)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_HYS_LVL_140MV		(3 << 21)
-#define MIPI_CSIS_DPHY_BCTRL_L_VREF_SRC_SEL			BIT(20)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_VREF_LVL_715MV		(0 << 18)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_VREF_LVL_743MV		(1 << 18)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_VREF_LVL_650MV		(2 << 18)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_VREF_LVL_682MV		(3 << 18)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_RX_PULSE_REJECT		BIT(17)
-#define MIPI_CSIS_DPHY_BCTRL_L_MSTRCLK_LP_SLEW_RATE_DOWN_0	(0 << 15)
-#define MIPI_CSIS_DPHY_BCTRL_L_MSTRCLK_LP_SLEW_RATE_DOWN_15P	(1 << 15)
-#define MIPI_CSIS_DPHY_BCTRL_L_MSTRCLK_LP_SLEW_RATE_DOWN_30P	(3 << 15)
-#define MIPI_CSIS_DPHY_BCTRL_L_MSTRCLK_LP_SLEW_RATE_UP		BIT(14)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_CD_HYS_60MV			(0 << 13)
-#define MIPI_CSIS_DPHY_BCTRL_L_LP_CD_HYS_70MV			(1 << 13)
-#define MIPI_CSIS_DPHY_BCTRL_L_BGR_CHOPPER_EN			BIT(12)
-#define MIPI_CSIS_DPHY_BCTRL_L_ERRCONTENTION_LP_EN		BIT(11)
-#define MIPI_CSIS_DPHY_BCTRL_L_TXTRIGGER_CLK_EN			BIT(10)
-#define MIPI_CSIS_DPHY_BCTRL_L_B_DPHYCTRL(n)			(((n) * 25 / 1000000) << 0)
-
+#define MIPI_CSIS_DPHYBCTRL_L			0x30
 /* D-PHY Master and Slave Control register High */
-#define MIPI_CSIS_DPHY_BCTRL_H			0x34
+#define MIPI_CSIS_DPHYBCTRL_H			0x34
 /* D-PHY Slave Control register Low */
-#define MIPI_CSIS_DPHY_SCTRL_L			0x38
+#define MIPI_CSIS_DPHYSCTRL_L			0x38
 /* D-PHY Slave Control register High */
-#define MIPI_CSIS_DPHY_SCTRL_H			0x3c
+#define MIPI_CSIS_DPHYSCTRL_H			0x3c
 
 /* ISP Configuration register */
-#define MIPI_CSIS_ISP_CONFIG_CH(n)		(0x40 + (n) * 0x10)
+#define MIPI_CSIS_ISPCONFIG_CH0			0x40
+#define MIPI_CSIS_ISPCONFIG_CH1			0x50
+#define MIPI_CSIS_ISPCONFIG_CH2			0x60
+#define MIPI_CSIS_ISPCONFIG_CH3			0x70
+
 #define MIPI_CSIS_ISPCFG_MEM_FULL_GAP_MSK	(0xff << 24)
 #define MIPI_CSIS_ISPCFG_MEM_FULL_GAP(x)	((x) << 24)
 #define MIPI_CSIS_ISPCFG_DOUBLE_CMPNT		BIT(12)
@@ -173,28 +142,28 @@
 #define MIPI_CSIS_ISPCFG_FMT_RAW10		(0x2b << 2)
 #define MIPI_CSIS_ISPCFG_FMT_RAW12		(0x2c << 2)
 #define MIPI_CSIS_ISPCFG_FMT_RAW14		(0x2d << 2)
+
 /* User defined formats, x = 1...4 */
 #define MIPI_CSIS_ISPCFG_FMT_USER(x)		((0x30 + (x) - 1) << 2)
 #define MIPI_CSIS_ISPCFG_FMT_MASK		(0x3f << 2)
 
 /* ISP Image Resolution register */
-#define MIPI_CSIS_ISP_RESOL_CH(n)		(0x44 + (n) * 0x10)
+#define MIPI_CSIS_ISPRESOL_CH0			0x44
+#define MIPI_CSIS_ISPRESOL_CH1			0x54
+#define MIPI_CSIS_ISPRESOL_CH2			0x64
+#define MIPI_CSIS_ISPRESOL_CH3			0x74
 #define CSIS_MAX_PIX_WIDTH			0xffff
 #define CSIS_MAX_PIX_HEIGHT			0xffff
 
 /* ISP SYNC register */
-#define MIPI_CSIS_ISP_SYNC_CH(n)		(0x48 + (n) * 0x10)
-#define MIPI_CSIS_ISP_SYNC_HSYNC_LINTV_OFFSET	18
-#define MIPI_CSIS_ISP_SYNC_VSYNC_SINTV_OFFSET	12
-#define MIPI_CSIS_ISP_SYNC_VSYNC_EINTV_OFFSET	0
+#define MIPI_CSIS_ISPSYNC_CH0			0x48
+#define MIPI_CSIS_ISPSYNC_CH1			0x58
+#define MIPI_CSIS_ISPSYNC_CH2			0x68
+#define MIPI_CSIS_ISPSYNC_CH3			0x78
 
-/* ISP shadow registers */
-#define MIPI_CSIS_SDW_CONFIG_CH(n)		(0x80 + (n) * 0x10)
-#define MIPI_CSIS_SDW_RESOL_CH(n)		(0x84 + (n) * 0x10)
-#define MIPI_CSIS_SDW_SYNC_CH(n)		(0x88 + (n) * 0x10)
-
-/* Debug control register */
-#define MIPI_CSIS_DBG_CTRL			0xc0
+#define MIPI_CSIS_ISPSYNC_HSYNC_LINTV_OFFSET	18
+#define MIPI_CSIS_ISPSYNC_VSYNC_SINTV_OFFSET	12
+#define MIPI_CSIS_ISPSYNC_VSYNC_EINTV_OFFSET	0
 
 /* Non-image packet data buffers */
 #define MIPI_CSIS_PKTDATA_ODD			0x2000
@@ -217,37 +186,27 @@ struct mipi_csis_event {
 
 static const struct mipi_csis_event mipi_csis_events[] = {
 	/* Errors */
-	{ MIPI_CSIS_INT_SRC_ERR_SOT_HS,		"SOT Error" },
-	{ MIPI_CSIS_INT_SRC_ERR_LOST_FS,	"Lost Frame Start Error" },
-	{ MIPI_CSIS_INT_SRC_ERR_LOST_FE,	"Lost Frame End Error" },
-	{ MIPI_CSIS_INT_SRC_ERR_OVER,		"FIFO Overflow Error" },
-	{ MIPI_CSIS_INT_SRC_ERR_WRONG_CFG,	"Wrong Configuration Error" },
-	{ MIPI_CSIS_INT_SRC_ERR_ECC,		"ECC Error" },
-	{ MIPI_CSIS_INT_SRC_ERR_CRC,		"CRC Error" },
-	{ MIPI_CSIS_INT_SRC_ERR_UNKNOWN,	"Unknown Error" },
+	{ MIPI_CSIS_INTSRC_ERR_SOT_HS,	"SOT Error" },
+	{ MIPI_CSIS_INTSRC_ERR_LOST_FS,	"Lost Frame Start Error" },
+	{ MIPI_CSIS_INTSRC_ERR_LOST_FE,	"Lost Frame End Error" },
+	{ MIPI_CSIS_INTSRC_ERR_OVER,	"FIFO Overflow Error" },
+	{ MIPI_CSIS_INTSRC_ERR_WRONG_CFG, "Wrong Configuration Error" },
+	{ MIPI_CSIS_INTSRC_ERR_ECC,	"ECC Error" },
+	{ MIPI_CSIS_INTSRC_ERR_CRC,	"CRC Error" },
+	{ MIPI_CSIS_INTSRC_ERR_UNKNOWN,	"Unknown Error" },
 	/* Non-image data receive events */
-	{ MIPI_CSIS_INT_SRC_EVEN_BEFORE,	"Non-image data before even frame" },
-	{ MIPI_CSIS_INT_SRC_EVEN_AFTER,		"Non-image data after even frame" },
-	{ MIPI_CSIS_INT_SRC_ODD_BEFORE,		"Non-image data before odd frame" },
-	{ MIPI_CSIS_INT_SRC_ODD_AFTER,		"Non-image data after odd frame" },
+	{ MIPI_CSIS_INTSRC_EVEN_BEFORE,	"Non-image data before even frame" },
+	{ MIPI_CSIS_INTSRC_EVEN_AFTER,	"Non-image data after even frame" },
+	{ MIPI_CSIS_INTSRC_ODD_BEFORE,	"Non-image data before odd frame" },
+	{ MIPI_CSIS_INTSRC_ODD_AFTER,	"Non-image data after odd frame" },
 	/* Frame start/end */
-	{ MIPI_CSIS_INT_SRC_FRAME_START,	"Frame Start" },
-	{ MIPI_CSIS_INT_SRC_FRAME_END,		"Frame End" },
+	{ MIPI_CSIS_INTSRC_FRAME_START,	"Frame Start" },
+	{ MIPI_CSIS_INTSRC_FRAME_END,	"Frame End" },
 };
 
 #define MIPI_CSIS_NUM_EVENTS ARRAY_SIZE(mipi_csis_events)
 
-enum mipi_csis_clk {
-	MIPI_CSIS_CLK_PCLK,
-	MIPI_CSIS_CLK_WRAP,
-	MIPI_CSIS_CLK_PHY,
-};
-
-static const char * const mipi_csis_clk_id[] = {
-	"pclk",
-	"wrap",
-	"phy",
-};
+static const char * const mipi_csis_clk_id[] = {"pclk", "wrap", "phy"};
 
 struct csis_hw_reset {
 	struct regmap *src;
@@ -270,6 +229,7 @@ struct csi_state {
 	struct platform_device *pdev;
 	struct phy *phy;
 	void __iomem *regs;
+	struct clk *wrap_clk;
 	int irq;
 	u32 flags;
 
@@ -304,9 +264,13 @@ struct csis_pix_format {
 static const struct csis_pix_format mipi_csis_formats[] = {
 	/* YUV formats. */
 	{
-		.code = MEDIA_BUS_FMT_UYVY8_1X16,
+		.code = MEDIA_BUS_FMT_UYVY8_2X8,
 		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT,
-		.width = 16,
+		.width = 8,
+	}, {
+		.code = MEDIA_BUS_FMT_UYVY10_2X10,
+		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT,
+		.width = 10,
 	},
 	/* RAW (Bayer and greyscale) formats. */
 	{
@@ -388,15 +352,8 @@ static const struct csis_pix_format mipi_csis_formats[] = {
 	}
 };
 
-static inline void mipi_csis_write(struct csi_state *state, u32 reg, u32 val)
-{
-	writel(val, state->regs + reg);
-}
-
-static inline u32 mipi_csis_read(struct csi_state *state, u32 reg)
-{
-	return readl(state->regs + reg);
-}
+#define mipi_csis_write(__csis, __r, __v) writel(__v, (__csis)->regs + (__r))
+#define mipi_csis_read(__csis, __r) readl((__csis)->regs + (__r))
 
 static int mipi_csis_dump_regs(struct csi_state *state)
 {
@@ -407,25 +364,23 @@ static int mipi_csis_dump_regs(struct csi_state *state)
 		u32 offset;
 		const char * const name;
 	} registers[] = {
-		{ MIPI_CSIS_CMN_CTRL, "CMN_CTRL" },
-		{ MIPI_CSIS_CLK_CTRL, "CLK_CTRL" },
-		{ MIPI_CSIS_INT_MSK, "INT_MSK" },
-		{ MIPI_CSIS_DPHY_STATUS, "DPHY_STATUS" },
-		{ MIPI_CSIS_DPHY_CMN_CTRL, "DPHY_CMN_CTRL" },
-		{ MIPI_CSIS_DPHY_SCTRL_L, "DPHY_SCTRL_L" },
-		{ MIPI_CSIS_DPHY_SCTRL_H, "DPHY_SCTRL_H" },
-		{ MIPI_CSIS_ISP_CONFIG_CH(0), "ISP_CONFIG_CH0" },
-		{ MIPI_CSIS_ISP_RESOL_CH(0), "ISP_RESOL_CH0" },
-		{ MIPI_CSIS_SDW_CONFIG_CH(0), "SDW_CONFIG_CH0" },
-		{ MIPI_CSIS_SDW_RESOL_CH(0), "SDW_RESOL_CH0" },
-		{ MIPI_CSIS_DBG_CTRL, "DBG_CTRL" },
+		{ 0x04, "CTRL" },
+		{ 0x24, "DPHYCTRL" },
+		{ 0x08, "CLKCTRL" },
+		{ 0x20, "DPHYSTS" },
+		{ 0x10, "INTMSK" },
+		{ 0x40, "CONFIG_CH0" },
+		{ 0x44, "RESOL_CH0" },
+		{ 0xC0, "DBG_CONFIG" },
+		{ 0x38, "DPHYSLAVE_L" },
+		{ 0x3C, "DPHYSLAVE_H" },
 	};
 
 	dev_info(dev, "--- REGISTERS ---\n");
 
 	for (i = 0; i < ARRAY_SIZE(registers); i++) {
 		cfg = mipi_csis_read(state, registers[i].offset);
-		dev_info(dev, "%14s: 0x%08x\n", registers[i].name, cfg);
+		dev_info(dev, "%12s: 0x%08x\n", registers[i].name, cfg);
 	}
 
 	return 0;
@@ -454,7 +409,7 @@ static const struct csis_pix_format *find_csis_format(u32 code)
 
 static void mipi_csis_enable_interrupts(struct csi_state *state, bool on)
 {
-	mipi_csis_write(state, MIPI_CSIS_INT_MSK, on ? 0xffffffff : 0);
+	mipi_csis_write(state, MIPI_CSIS_INTMSK, on ? 0xffffffff : 0);
 }
 
 static void mipi_csis_sw_reset(struct csi_state *state)
@@ -496,13 +451,13 @@ static void mipi_csis_system_enable(struct csi_state *state, int on)
 		val &= ~MIPI_CSIS_CMN_CTRL_ENABLE;
 	mipi_csis_write(state, MIPI_CSIS_CMN_CTRL, val);
 
-	val = mipi_csis_read(state, MIPI_CSIS_DPHY_CMN_CTRL);
-	val &= ~MIPI_CSIS_DPHY_CMN_CTRL_ENABLE;
+	val = mipi_csis_read(state, MIPI_CSIS_DPHYCTRL);
+	val &= ~MIPI_CSIS_DPHYCTRL_ENABLE;
 	if (on) {
 		mask = (1 << (state->bus.num_data_lanes + 1)) - 1;
-		val |= (mask & MIPI_CSIS_DPHY_CMN_CTRL_ENABLE);
+		val |= (mask & MIPI_CSIS_DPHYCTRL_ENABLE);
 	}
-	mipi_csis_write(state, MIPI_CSIS_DPHY_CMN_CTRL, val);
+	mipi_csis_write(state, MIPI_CSIS_DPHYCTRL, val);
 }
 
 /* Called with the state.lock mutex held */
@@ -512,47 +467,23 @@ static void __mipi_csis_set_format(struct csi_state *state)
 	u32 val;
 
 	/* Color format */
-	val = mipi_csis_read(state, MIPI_CSIS_ISP_CONFIG_CH(0));
+	val = mipi_csis_read(state, MIPI_CSIS_ISPCONFIG_CH0);
 	val &= ~(MIPI_CSIS_ISPCFG_ALIGN_32BIT | MIPI_CSIS_ISPCFG_FMT_MASK);
 	val |= state->csis_fmt->fmt_reg;
-	mipi_csis_write(state, MIPI_CSIS_ISP_CONFIG_CH(0), val);
+	mipi_csis_write(state, MIPI_CSIS_ISPCONFIG_CH0, val);
 
 	/* Pixel resolution */
 	val = mf->width | (mf->height << 16);
-	mipi_csis_write(state, MIPI_CSIS_ISP_RESOL_CH(0), val);
+	mipi_csis_write(state, MIPI_CSIS_ISPRESOL_CH0, val);
 }
 
-static int mipi_csis_calculate_params(struct csi_state *state)
+static void mipi_csis_set_hsync_settle(struct csi_state *state, int hs_settle)
 {
-	s64 link_freq;
-	u32 lane_rate;
+	u32 val = mipi_csis_read(state, MIPI_CSIS_DPHYCTRL);
 
-	/* Calculate the line rate from the pixel rate. */
-	link_freq = v4l2_get_link_freq(state->src_sd->ctrl_handler,
-				       state->csis_fmt->width,
-				       state->bus.num_data_lanes * 2);
-	if (link_freq < 0) {
-		dev_err(state->dev, "Unable to obtain link frequency: %d\n",
-			(int)link_freq);
-		return link_freq;
-	}
+	val = (val & ~MIPI_CSIS_DPHYCTRL_HSS_MASK) | (hs_settle << 24);
 
-	lane_rate = link_freq * 2;
-
-	if (lane_rate < 80000000 || lane_rate > 1500000000) {
-		dev_dbg(state->dev, "Out-of-bound lane rate %u\n", lane_rate);
-		return -EINVAL;
-	}
-
-	/*
-	 * The HSSETTLE counter value is document in a table, but can also
-	 * easily be calculated.
-	 */
-	state->hs_settle = (lane_rate - 5000000) / 45000000;
-	dev_dbg(state->dev, "lane rate %u, Ths_settle %u\n",
-		lane_rate, state->hs_settle);
-
-	return 0;
+	mipi_csis_write(state, MIPI_CSIS_DPHYCTRL, val);
 }
 
 static void mipi_csis_set_params(struct csi_state *state)
@@ -568,29 +499,26 @@ static void mipi_csis_set_params(struct csi_state *state)
 
 	__mipi_csis_set_format(state);
 
-	mipi_csis_write(state, MIPI_CSIS_DPHY_CMN_CTRL,
-			MIPI_CSIS_DPHY_CMN_CTRL_HSSETTLE(state->hs_settle));
+	mipi_csis_set_hsync_settle(state, state->hs_settle);
 
-	val = (0 << MIPI_CSIS_ISP_SYNC_HSYNC_LINTV_OFFSET)
-	    | (0 << MIPI_CSIS_ISP_SYNC_VSYNC_SINTV_OFFSET)
-	    | (0 << MIPI_CSIS_ISP_SYNC_VSYNC_EINTV_OFFSET);
-	mipi_csis_write(state, MIPI_CSIS_ISP_SYNC_CH(0), val);
+	val = (0 << MIPI_CSIS_ISPSYNC_HSYNC_LINTV_OFFSET) |
+		(0 << MIPI_CSIS_ISPSYNC_VSYNC_SINTV_OFFSET) |
+		(0 << MIPI_CSIS_ISPSYNC_VSYNC_EINTV_OFFSET);
+	mipi_csis_write(state, MIPI_CSIS_ISPSYNC_CH0, val);
 
 	val = mipi_csis_read(state, MIPI_CSIS_CLK_CTRL);
-	val |= MIPI_CSIS_CLK_CTRL_WCLK_SRC;
+	val &= ~MIPI_CSIS_CLK_CTRL_WCLK_SRC;
+	if (state->wrap_clk)
+		val |= MIPI_CSIS_CLK_CTRL_WCLK_SRC;
+	else
+		val &= ~MIPI_CSIS_CLK_CTRL_WCLK_SRC;
+
 	val |= MIPI_CSIS_CLK_CTRL_CLKGATE_TRAIL_CH0(15);
 	val &= ~MIPI_CSIS_CLK_CTRL_CLKGATE_EN_MSK;
 	mipi_csis_write(state, MIPI_CSIS_CLK_CTRL, val);
 
-	mipi_csis_write(state, MIPI_CSIS_DPHY_BCTRL_L,
-			MIPI_CSIS_DPHY_BCTRL_L_BIAS_REF_VOLT_715MV |
-			MIPI_CSIS_DPHY_BCTRL_L_BGR_CHOPPER_FREQ_3MHZ |
-			MIPI_CSIS_DPHY_BCTRL_L_REG_12P_LVL_CTL_1_2V |
-			MIPI_CSIS_DPHY_BCTRL_L_LP_RX_HYS_LVL_80MV |
-			MIPI_CSIS_DPHY_BCTRL_L_LP_RX_VREF_LVL_715MV |
-			MIPI_CSIS_DPHY_BCTRL_L_LP_CD_HYS_60MV |
-			MIPI_CSIS_DPHY_BCTRL_L_B_DPHYCTRL(20000000));
-	mipi_csis_write(state, MIPI_CSIS_DPHY_BCTRL_H, 0);
+	mipi_csis_write(state, MIPI_CSIS_DPHYBCTRL_L, 0x1f4);
+	mipi_csis_write(state, MIPI_CSIS_DPHYBCTRL_H, 0);
 
 	/* Update the shadow register. */
 	val = mipi_csis_read(state, MIPI_CSIS_CMN_CTRL);
@@ -629,9 +557,12 @@ static int mipi_csis_clk_get(struct csi_state *state)
 	if (ret < 0)
 		return ret;
 
+	state->wrap_clk = devm_clk_get(dev, "wrap");
+	if (IS_ERR(state->wrap_clk))
+		return PTR_ERR(state->wrap_clk);
+
 	/* Set clock rate */
-	ret = clk_set_rate(state->clks[MIPI_CSIS_CLK_WRAP].clk,
-			   state->clk_frequency);
+	ret = clk_set_rate(state->wrap_clk, state->clk_frequency);
 	if (ret < 0)
 		dev_err(dev, "set rate=%d failed: %d\n", state->clk_frequency,
 			ret);
@@ -688,27 +619,21 @@ static void mipi_csis_log_counters(struct csi_state *state, bool non_errors)
 static int mipi_csis_s_stream(struct v4l2_subdev *mipi_sd, int enable)
 {
 	struct csi_state *state = mipi_sd_to_csis_state(mipi_sd);
-	int ret;
+	int ret = 0;
 
 	if (enable) {
-		ret = mipi_csis_calculate_params(state);
-		if (ret < 0)
-			return ret;
-
 		mipi_csis_clear_counters(state);
-
 		ret = pm_runtime_get_sync(&state->pdev->dev);
 		if (ret < 0) {
 			pm_runtime_put_noidle(&state->pdev->dev);
 			return ret;
 		}
 		ret = v4l2_subdev_call(state->src_sd, core, s_power, 1);
-		if (ret < 0 && ret != -ENOIOCTLCMD)
-			goto done;
+		if (ret < 0)
+			return ret;
 	}
 
 	mutex_lock(&state->lock);
-
 	if (enable) {
 		if (state->flags & ST_SUSPENDED) {
 			ret = -EBUSY;
@@ -726,8 +651,6 @@ static int mipi_csis_s_stream(struct v4l2_subdev *mipi_sd, int enable)
 	} else {
 		v4l2_subdev_call(state->src_sd, video, s_stream, 0);
 		ret = v4l2_subdev_call(state->src_sd, core, s_power, 0);
-		if (ret == -ENOIOCTLCMD)
-			ret = 0;
 		mipi_csis_stop_stream(state);
 		state->flags &= ~ST_STREAMING;
 		if (state->debug)
@@ -736,9 +659,7 @@ static int mipi_csis_s_stream(struct v4l2_subdev *mipi_sd, int enable)
 
 unlock:
 	mutex_unlock(&state->lock);
-
-done:
-	if (!enable || ret < 0)
+	if (!enable)
 		pm_runtime_put(&state->pdev->dev);
 
 	return ret;
@@ -751,26 +672,30 @@ static int mipi_csis_link_setup(struct media_entity *entity,
 	struct v4l2_subdev *mipi_sd = media_entity_to_v4l2_subdev(entity);
 	struct csi_state *state = mipi_sd_to_csis_state(mipi_sd);
 	struct v4l2_subdev *remote_sd;
+	int ret = 0;
 
 	dev_dbg(state->dev, "link setup %s -> %s", remote_pad->entity->name,
 		local_pad->entity->name);
 
-	/* We only care about the link to the source. */
-	if (!(local_pad->flags & MEDIA_PAD_FL_SINK))
-		return 0;
-
 	remote_sd = media_entity_to_v4l2_subdev(remote_pad->entity);
 
-	if (flags & MEDIA_LNK_FL_ENABLED) {
-		if (state->src_sd)
-			return -EBUSY;
+	mutex_lock(&state->lock);
 
-		state->src_sd = remote_sd;
-	} else {
-		state->src_sd = NULL;
+	if (local_pad->flags & MEDIA_PAD_FL_SINK) {
+		if (flags & MEDIA_LNK_FL_ENABLED) {
+			if (state->src_sd) {
+				ret = -EBUSY;
+				goto out;
+			}
+			state->src_sd = remote_sd;
+		} else {
+			state->src_sd = NULL;
+		}
 	}
 
-	return 0;
+out:
+	mutex_unlock(&state->lock);
+	return ret;
 }
 
 static struct v4l2_mbus_framefmt *
@@ -796,7 +721,7 @@ static int mipi_csis_init_cfg(struct v4l2_subdev *mipi_sd,
 	which = cfg ? V4L2_SUBDEV_FORMAT_TRY : V4L2_SUBDEV_FORMAT_ACTIVE;
 	fmt_sink = mipi_csis_get_format(state, cfg, which, CSIS_PAD_SINK);
 
-	fmt_sink->code = MEDIA_BUS_FMT_UYVY8_1X16;
+	fmt_sink->code = MEDIA_BUS_FMT_UYVY8_2X8;
 	fmt_sink->width = MIPI_CSIS_DEF_PIX_WIDTH;
 	fmt_sink->height = MIPI_CSIS_DEF_PIX_HEIGHT;
 	fmt_sink->field = V4L2_FIELD_NONE;
@@ -908,25 +833,25 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *mipi_sd,
 	 */
 	switch (csis_fmt->width % 8) {
 	case 0:
-		align = 0;
+		align = 1;
 		break;
 	case 4:
-		align = 1;
+		align = 2;
 		break;
 	case 2:
 	case 6:
-		align = 2;
+		align = 4;
 		break;
 	case 1:
 	case 3:
 	case 5:
 	case 7:
-		align = 3;
+		align = 8;
 		break;
 	}
 
 	v4l_bound_align_image(&fmt->width, 1, CSIS_MAX_PIX_WIDTH, align,
-			      &fmt->height, 1, CSIS_MAX_PIX_HEIGHT, 0, 0);
+			      &fmt->height, 1, CSIS_MAX_PIX_HEIGHT, 1, 0);
 
 	sdformat->format = *fmt;
 
@@ -964,12 +889,12 @@ static irqreturn_t mipi_csis_irq_handler(int irq, void *dev_id)
 	unsigned int i;
 	u32 status;
 
-	status = mipi_csis_read(state, MIPI_CSIS_INT_SRC);
+	status = mipi_csis_read(state, MIPI_CSIS_INTSRC);
 
 	spin_lock_irqsave(&state->slock, flags);
 
 	/* Update the event/error counters */
-	if ((status & MIPI_CSIS_INT_SRC_ERRORS) || state->debug) {
+	if ((status & MIPI_CSIS_INTSRC_ERRORS) || state->debug) {
 		for (i = 0; i < MIPI_CSIS_NUM_EVENTS; i++) {
 			if (!(status & state->events[i].mask))
 				continue;
@@ -978,7 +903,7 @@ static irqreturn_t mipi_csis_irq_handler(int irq, void *dev_id)
 	}
 	spin_unlock_irqrestore(&state->slock, flags);
 
-	mipi_csis_write(state, MIPI_CSIS_INT_SRC, status);
+	mipi_csis_write(state, MIPI_CSIS_INTSRC, status);
 
 	return IRQ_HANDLED;
 }
@@ -1020,9 +945,12 @@ static int mipi_csis_parse_dt(struct platform_device *pdev,
 		state->clk_frequency = DEFAULT_SCLK_CSIS_FREQ;
 
 	/* Get MIPI PHY resets */
-	state->mrst = devm_reset_control_get_exclusive(&pdev->dev, NULL);
+	state->mrst = devm_reset_control_get_exclusive(&pdev->dev, "mrst");
 	if (IS_ERR(state->mrst))
 		return PTR_ERR(state->mrst);
+
+	/* Get MIPI CSI-2 bus configuration from the endpoint node. */
+	of_property_read_u32(node, "fsl,csis-hs-settle", &state->hs_settle);
 
 	return 0;
 }
@@ -1036,7 +964,7 @@ static int mipi_csis_notify_bound(struct v4l2_async_notifier *notifier,
 	struct csi_state *state = mipi_notifier_to_csis_state(notifier);
 	struct media_pad *sink = &state->mipi_sd.entity.pads[CSIS_PAD_SINK];
 
-	return v4l2_create_fwnode_links_to_pad(sd, sink, 0);
+	return v4l2_create_fwnode_links_to_pad(sd, sink);
 }
 
 static const struct v4l2_async_notifier_operations mipi_csis_notify_ops = {
@@ -1067,10 +995,8 @@ static int mipi_csis_subdev_init(struct v4l2_subdev *mipi_sd,
 
 	v4l2_set_subdevdata(mipi_sd, &pdev->dev);
 
-	state->pads[CSIS_PAD_SINK].flags = MEDIA_PAD_FL_SINK
-					 | MEDIA_PAD_FL_MUST_CONNECT;
-	state->pads[CSIS_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE
-					   | MEDIA_PAD_FL_MUST_CONNECT;
+	state->pads[CSIS_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
+	state->pads[CSIS_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE;
 	return media_entity_pads_init(&mipi_sd->entity, CSIS_PADS_NUM,
 				      state->pads);
 }
@@ -1223,8 +1149,9 @@ static int mipi_csis_probe(struct platform_device *pdev)
 			goto unregister_all;
 	}
 
-	dev_info(&pdev->dev, "lanes: %d, freq: %u\n",
-		 state->bus.num_data_lanes, state->clk_frequency);
+	dev_info(&pdev->dev, "lanes: %d, hs_settle: %d, wclk: %d, freq: %u\n",
+		 state->bus.num_data_lanes, state->hs_settle,
+		 state->wrap_clk ? 1 : 0, state->clk_frequency);
 
 	return 0;
 

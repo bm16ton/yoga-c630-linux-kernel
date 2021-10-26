@@ -281,10 +281,11 @@ struct kvmppc_ops {
 				     const struct kvm_memory_slot *old,
 				     const struct kvm_memory_slot *new,
 				     enum kvm_mr_change change);
-	bool (*unmap_gfn_range)(struct kvm *kvm, struct kvm_gfn_range *range);
-	bool (*age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
-	bool (*test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
-	bool (*set_spte_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+	int (*unmap_hva_range)(struct kvm *kvm, unsigned long start,
+			   unsigned long end);
+	int (*age_hva)(struct kvm *kvm, unsigned long start, unsigned long end);
+	int (*test_age_hva)(struct kvm *kvm, unsigned long hva);
+	void (*set_spte_hva)(struct kvm *kvm, unsigned long hva, pte_t pte);
 	void (*free_memslot)(struct kvm_memory_slot *slot);
 	int (*init_vm)(struct kvm *kvm);
 	void (*destroy_vm)(struct kvm *kvm);
@@ -766,7 +767,8 @@ long kvmppc_h_remove(struct kvm_vcpu *vcpu, unsigned long flags,
                      unsigned long pte_index, unsigned long avpn);
 long kvmppc_h_bulk_remove(struct kvm_vcpu *vcpu);
 long kvmppc_h_protect(struct kvm_vcpu *vcpu, unsigned long flags,
-                      unsigned long pte_index, unsigned long avpn);
+                      unsigned long pte_index, unsigned long avpn,
+                      unsigned long va);
 long kvmppc_h_read(struct kvm_vcpu *vcpu, unsigned long flags,
                    unsigned long pte_index);
 long kvmppc_h_clear_ref(struct kvm_vcpu *vcpu, unsigned long flags,

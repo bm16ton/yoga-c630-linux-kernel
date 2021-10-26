@@ -166,8 +166,15 @@ static int __xlate_proc_name(const char *name, struct proc_dir_entry **ret,
 	const char     		*cp = name, *next;
 	struct proc_dir_entry	*de;
 
-	de = *ret ?: &proc_root;
-	while ((next = strchr(cp, '/')) != NULL) {
+	de = *ret;
+	if (!de)
+		de = &proc_root;
+
+	while (1) {
+		next = strchr(cp, '/');
+		if (!next)
+			break;
+
 		de = pde_subdir_find(de, cp, next - cp);
 		if (!de) {
 			WARN(1, "name '%s'\n", name);

@@ -164,9 +164,6 @@ static int sprd_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	struct pwm_state *cstate = &pwm->state;
 	int ret;
 
-	if (state->polarity != PWM_POLARITY_NORMAL)
-		return -EINVAL;
-
 	if (state->enabled) {
 		if (!cstate->enabled) {
 			/*
@@ -183,10 +180,13 @@ static int sprd_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 			}
 		}
 
-		ret = sprd_pwm_config(spc, pwm, state->duty_cycle,
-				      state->period);
-		if (ret)
-			return ret;
+		if (state->period != cstate->period ||
+		    state->duty_cycle != cstate->duty_cycle) {
+			ret = sprd_pwm_config(spc, pwm, state->duty_cycle,
+					      state->period);
+			if (ret)
+				return ret;
+		}
 
 		sprd_pwm_write(spc, pwm->hwpwm, SPRD_PWM_ENABLE, 1);
 	} else if (cstate->enabled) {
@@ -268,6 +268,7 @@ static int sprd_pwm_probe(struct platform_device *pdev)
 
 	spc->chip.dev = &pdev->dev;
 	spc->chip.ops = &sprd_pwm_ops;
+	spc->chip.base = -1;
 	spc->chip.npwm = spc->num_pwms;
 
 	ret = pwmchip_add(&spc->chip);

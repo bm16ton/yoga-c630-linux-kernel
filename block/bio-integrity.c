@@ -204,6 +204,7 @@ bool bio_integrity_prep(struct bio *bio)
 {
 	struct bio_integrity_payload *bip;
 	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
+	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
 	void *buf;
 	unsigned long start, end;
 	unsigned int len, nr_pages;
@@ -237,7 +238,7 @@ bool bio_integrity_prep(struct bio *bio)
 
 	/* Allocate kernel buffer for protection data */
 	len = intervals * bi->tuple_size;
-	buf = kmalloc(len, GFP_NOIO);
+	buf = kmalloc(len, GFP_NOIO | q->bounce_gfp);
 	status = BLK_STS_RESOURCE;
 	if (unlikely(buf == NULL)) {
 		printk(KERN_ERR "could not allocate integrity buffer\n");

@@ -11,7 +11,6 @@
 #include "transaction.h"
 #include "qgroup.h"
 #include "space-info.h"
-#include "tree-mod-log.h"
 
 struct kmem_cache *btrfs_delayed_ref_head_cachep;
 struct kmem_cache *btrfs_delayed_tree_ref_cachep;
@@ -495,7 +494,16 @@ void btrfs_merge_delayed_refs(struct btrfs_trans_handle *trans,
 	if (head->is_data)
 		return;
 
-	seq = btrfs_tree_mod_log_lowest_seq(fs_info);
+	read_lock(&fs_info->tree_mod_log_lock);
+	if (!list_empty(&fs_info->tree_mod_seq_list)) {
+		struct seq_list *elem;
+
+		elem = list_first_entry(&fs_info->tree_mod_seq_list,
+					struct seq_list, list);
+		seq = elem->seq;
+	}
+	read_unlock(&fs_info->tree_mod_log_lock);
+
 again:
 	for (node = rb_first_cached(&head->ref_tree); node;
 	     node = rb_next(node)) {
@@ -509,16 +517,23 @@ again:
 
 int btrfs_check_delayed_seq(struct btrfs_fs_info *fs_info, u64 seq)
 {
+	struct seq_list *elem;
 	int ret = 0;
-	u64 min_seq = btrfs_tree_mod_log_lowest_seq(fs_info);
 
-	if (min_seq != 0 && seq >= min_seq) {
-		btrfs_debug(fs_info,
-			    "holding back delayed_ref %llu, lowest is %llu",
-			    seq, min_seq);
-		ret = 1;
+	read_lock(&fs_info->tree_mod_log_lock);
+	if (!list_empty(&fs_info->tree_mod_seq_list)) {
+		elem = list_first_entry(&fs_info->tree_mod_seq_list,
+					struct seq_list, list);
+		if (seq >= elem->seq) {
+			btrfs_debug(fs_info,
+				"holding back delayed_ref %#x.%x, lowest is %#x.%x",
+				(u32)(seq >> 32), (u32)seq,
+				(u32)(elem->seq >> 32), (u32)elem->seq);
+			ret = 1;
+		}
 	}
 
+	read_unlock(&fs_info->tree_mod_log_lock);
 	return ret;
 }
 
@@ -1000,7 +1015,7 @@ int btrfs_add_delayed_tree_ref(struct btrfs_trans_handle *trans,
 		kmem_cache_free(btrfs_delayed_tree_ref_cachep, ref);
 
 	if (qrecord_inserted)
-		btrfs_qgroup_trace_extent_post(trans, record);
+		btrfs_qgroup_trace_extent_post(fs_info, record);
 
 	return 0;
 }
@@ -1095,7 +1110,7 @@ int btrfs_add_delayed_data_ref(struct btrfs_trans_handle *trans,
 
 
 	if (qrecord_inserted)
-		return btrfs_qgroup_trace_extent_post(trans, record);
+		return btrfs_qgroup_trace_extent_post(fs_info, record);
 	return 0;
 }
 

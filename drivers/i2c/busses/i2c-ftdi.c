@@ -14,7 +14,9 @@ int i2c_ftdi_100k;
 module_param_named(100k, i2c_ftdi_100k, int, 0444);
 MODULE_PARM_DESC(100k, "Drop bus from 400k to 100k");
 
-EXPORT_SYMBOL(i2c_ftdi_100k);
+int i2c_ftdi_adaptive;
+module_param_named(adaptive, i2c_ftdi_adaptive, int, 0444);
+MODULE_PARM_DESC(adaptive, "clock stretching hack NOT WORKING");
 
 const int FTDI_IO_TIMEOUT = 5000;
 //const unsigned FTDI_I2C_FREQ = 400000;
@@ -350,7 +352,6 @@ static u32 ftdi_usb_i2c_func(struct i2c_adapter *adapter)
 {
 	(void) adapter;
 	return I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL;
-//	return I2C_FUNC_I2C;
 }
 
 static const struct i2c_algorithm ftdi_usb_i2c_algo = {
@@ -422,7 +423,11 @@ static int ftdi_mpsse_i2c_setup(struct ftdi_usb *ftdi)
 	int ret;
 
 	ftdi_mpsse_cmd_setup(&cmd, ftdi->buffer, ftdi->buffer_size);
+		if (i2c_ftdi_adaptive) {
+	ret = ftdi_mpsse_enable_adaptive_clocking(&cmd);
+	} else {
 	ret = ftdi_mpsse_disable_adaptive_clocking(&cmd);
+	}
 	if (ret < 0)
 		return ret;
 
@@ -691,4 +696,4 @@ static struct usb_driver ftdi_usb_driver = {
 module_usb_driver(ftdi_usb_driver);
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("FTDI USB-to-serial based something");
-MODULE_AUTHOR("Krinkin Mike <krinkin.m.u@gmail.com>");
+MODULE_AUTHOR("Ben Maddocks <bm16ton@gmail.com), Krinkin Mike <krinkin.m.u@gmail.com>");

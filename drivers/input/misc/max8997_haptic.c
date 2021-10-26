@@ -61,10 +61,15 @@ static int max8997_haptic_set_duty_cycle(struct max8997_haptic *chip)
 		unsigned int duty = chip->pwm_period * chip->level / 100;
 		ret = pwm_config(chip->pwm, duty, chip->pwm_period);
 	} else {
+		int i;
 		u8 duty_index = 0;
 
-		duty_index = DIV_ROUND_UP(chip->level * 64, 100);
-
+		for (i = 0; i <= 64; i++) {
+			if (chip->level <= i * 100 / 64) {
+				duty_index = i;
+				break;
+			}
+		}
 		switch (chip->internal_mode_pattern) {
 		case 0:
 			max8997_write_reg(chip->client,

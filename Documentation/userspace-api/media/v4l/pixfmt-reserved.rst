@@ -17,11 +17,7 @@ you think your format should be listed in a standard format section
 please make a proposal on the linux-media mailing list.
 
 
-.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.5cm}|
-
-.. raw:: latex
-
-    \small
+.. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.7cm}|
 
 .. _reserved-formats:
 
@@ -260,7 +256,3 @@ please make a proposal on the linux-media mailing list.
 	of tiles, resulting in 32-aligned resolutions for the luminance plane
 	and 16-aligned resolutions for the chrominance plane (with 2x2
 	subsampling).
-
-.. raw:: latex
-
-    \normalsize

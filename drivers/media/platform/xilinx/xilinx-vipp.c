@@ -525,7 +525,6 @@ static int xvip_graph_init(struct xvip_composite_device *xdev)
 
 	if (list_empty(&xdev->notifier.asd_list)) {
 		dev_err(xdev->dev, "no subdev found in graph\n");
-		ret = -ENOENT;
 		goto done;
 	}
 

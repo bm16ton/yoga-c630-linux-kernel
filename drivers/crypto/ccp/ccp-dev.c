@@ -548,7 +548,7 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
 	return ccp->cmd_q_count == suspended;
 }
 
-void ccp_dev_suspend(struct sp_device *sp)
+int ccp_dev_suspend(struct sp_device *sp)
 {
 	struct ccp_device *ccp = sp->ccp_data;
 	unsigned long flags;
@@ -556,7 +556,7 @@ void ccp_dev_suspend(struct sp_device *sp)
 
 	/* If there's no device there's nothing to do */
 	if (!ccp)
-		return;
+		return 0;
 
 	spin_lock_irqsave(&ccp->cmd_lock, flags);
 
@@ -572,9 +572,11 @@ void ccp_dev_suspend(struct sp_device *sp)
 	while (!ccp_queues_suspended(ccp))
 		wait_event_interruptible(ccp->suspend_queue,
 					 ccp_queues_suspended(ccp));
+
+	return 0;
 }
 
-void ccp_dev_resume(struct sp_device *sp)
+int ccp_dev_resume(struct sp_device *sp)
 {
 	struct ccp_device *ccp = sp->ccp_data;
 	unsigned long flags;
@@ -582,7 +584,7 @@ void ccp_dev_resume(struct sp_device *sp)
 
 	/* If there's no device there's nothing to do */
 	if (!ccp)
-		return;
+		return 0;
 
 	spin_lock_irqsave(&ccp->cmd_lock, flags);
 
@@ -595,6 +597,8 @@ void ccp_dev_resume(struct sp_device *sp)
 	}
 
 	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
+
+	return 0;
 }
 
 int ccp_dev_init(struct sp_device *sp)

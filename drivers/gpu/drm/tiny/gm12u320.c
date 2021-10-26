@@ -16,9 +16,8 @@
 #include <drm/drm_file.h>
 #include <drm/drm_format_helper.h>
 #include <drm/drm_fourcc.h>
-#include <drm/drm_gem_atomic_helper.h>
-#include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_gem_shmem_helper.h>
+#include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_ioctl.h>
 #include <drm/drm_managed.h>
 #include <drm/drm_modeset_helper_vtables.h>
@@ -96,7 +95,6 @@ struct gm12u320_device {
 		struct drm_rect          rect;
 		int frame;
 		int draw_status_timeout;
-		struct dma_buf_map src_map;
 	} fb_update;
 };
 
@@ -253,6 +251,7 @@ static void gm12u320_copy_fb_to_blocks(struct gm12u320_device *gm12u320)
 {
 	int block, dst_offset, len, remain, ret, x1, x2, y1, y2;
 	struct drm_framebuffer *fb;
+	struct dma_buf_map map;
 	void *vaddr;
 	u8 *src;
 
@@ -266,14 +265,20 @@ static void gm12u320_copy_fb_to_blocks(struct gm12u320_device *gm12u320)
 	x2 = gm12u320->fb_update.rect.x2;
 	y1 = gm12u320->fb_update.rect.y1;
 	y2 = gm12u320->fb_update.rect.y2;
-	vaddr = gm12u320->fb_update.src_map.vaddr; /* TODO: Use mapping abstraction properly */
+
+	ret = drm_gem_shmem_vmap(fb->obj[0], &map);
+	if (ret) {
+		GM12U320_ERR("failed to vmap fb: %d\n", ret);
+		goto put_fb;
+	}
+	vaddr = map.vaddr; /* TODO: Use mapping abstraction properly */
 
 	if (fb->obj[0]->import_attach) {
 		ret = dma_buf_begin_cpu_access(
 			fb->obj[0]->import_attach->dmabuf, DMA_FROM_DEVICE);
 		if (ret) {
 			GM12U320_ERR("dma_buf_begin_cpu_access err: %d\n", ret);
-			goto put_fb;
+			goto vunmap;
 		}
 	}
 
@@ -317,6 +322,8 @@ static void gm12u320_copy_fb_to_blocks(struct gm12u320_device *gm12u320)
 		if (ret)
 			GM12U320_ERR("dma_buf_end_cpu_access err: %d\n", ret);
 	}
+vunmap:
+	drm_gem_shmem_vunmap(fb->obj[0], &map);
 put_fb:
 	drm_framebuffer_put(fb);
 	gm12u320->fb_update.fb = NULL;
@@ -404,7 +411,7 @@ err:
 		GM12U320_ERR("Frame update error: %d\n", ret);
 }
 
-static void gm12u320_fb_mark_dirty(struct drm_framebuffer *fb, const struct dma_buf_map *map,
+static void gm12u320_fb_mark_dirty(struct drm_framebuffer *fb,
 				   struct drm_rect *dirty)
 {
 	struct gm12u320_device *gm12u320 = to_gm12u320(fb->dev);
@@ -418,7 +425,6 @@ static void gm12u320_fb_mark_dirty(struct drm_framebuffer *fb, const struct dma_
 		drm_framebuffer_get(fb);
 		gm12u320->fb_update.fb = fb;
 		gm12u320->fb_update.rect = *dirty;
-		gm12u320->fb_update.src_map = *map;
 		wakeup = true;
 	} else {
 		struct drm_rect *rect = &gm12u320->fb_update.rect;
@@ -447,7 +453,6 @@ static void gm12u320_stop_fb_update(struct gm12u320_device *gm12u320)
 	mutex_lock(&gm12u320->fb_update.lock);
 	old_fb = gm12u320->fb_update.fb;
 	gm12u320->fb_update.fb = NULL;
-	dma_buf_map_clear(&gm12u320->fb_update.src_map);
 	mutex_unlock(&gm12u320->fb_update.lock);
 
 	drm_framebuffer_put(old_fb);
@@ -560,10 +565,9 @@ static void gm12u320_pipe_enable(struct drm_simple_display_pipe *pipe,
 {
 	struct drm_rect rect = { 0, 0, GM12U320_USER_WIDTH, GM12U320_HEIGHT };
 	struct gm12u320_device *gm12u320 = to_gm12u320(pipe->crtc.dev);
-	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(plane_state);
 
 	gm12u320->fb_update.draw_status_timeout = FIRST_FRAME_TIMEOUT;
-	gm12u320_fb_mark_dirty(plane_state->fb, &shadow_plane_state->map[0], &rect);
+	gm12u320_fb_mark_dirty(plane_state->fb, &rect);
 }
 
 static void gm12u320_pipe_disable(struct drm_simple_display_pipe *pipe)
@@ -577,18 +581,16 @@ static void gm12u320_pipe_update(struct drm_simple_display_pipe *pipe,
 				 struct drm_plane_state *old_state)
 {
 	struct drm_plane_state *state = pipe->plane.state;
-	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(state);
 	struct drm_rect rect;
 
 	if (drm_atomic_helper_damage_merged(old_state, state, &rect))
-		gm12u320_fb_mark_dirty(state->fb, &shadow_plane_state->map[0], &rect);
+		gm12u320_fb_mark_dirty(pipe->plane.state->fb, &rect);
 }
 
 static const struct drm_simple_display_pipe_funcs gm12u320_pipe_funcs = {
 	.enable	    = gm12u320_pipe_enable,
 	.disable    = gm12u320_pipe_disable,
 	.update	    = gm12u320_pipe_update,
-	DRM_GEM_SIMPLE_DISPLAY_PIPE_SHADOW_PLANE_FUNCS,
 };
 
 static const uint32_t gm12u320_pipe_formats[] = {

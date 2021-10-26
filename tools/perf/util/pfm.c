@@ -62,16 +62,8 @@ int parse_libpfm_events_option(const struct option *opt, const char *str,
 		}
 
 		/* no event */
-		if (*q == '\0') {
-			if (*sep == '}') {
-				if (grp_evt < 0) {
-					ui__error("cannot close a non-existing event group\n");
-					goto error;
-				}
-				grp_evt--;
-			}
+		if (*q == '\0')
 			continue;
-		}
 
 		memset(&attr, 0, sizeof(attr));
 		event_attr_init(&attr);
@@ -115,7 +107,6 @@ int parse_libpfm_events_option(const struct option *opt, const char *str,
 			grp_evt = -1;
 		}
 	}
-	free(p_orig);
 	return 0;
 error:
 	free(p_orig);

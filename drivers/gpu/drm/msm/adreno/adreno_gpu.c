@@ -15,9 +15,6 @@
 #include <linux/slab.h>
 #include <linux/soc/qcom/mdt_loader.h>
 #include <soc/qcom/ocmem.h>
-
-#include <linux/io-pgtable.h>
-
 #include "adreno_gpu.h"
 #include "a6xx_gpu.h"
 #include "msm_gem.h"
@@ -191,7 +188,10 @@ int adreno_zap_shader_load(struct msm_gpu *gpu, u32 pasid)
 
 void adreno_set_llc_attributes(struct iommu_domain *iommu)
 {
-	iommu_set_pgtable_quirks(iommu, IO_PGTABLE_QUIRK_ARM_OUTER_WBWA);
+	struct io_pgtable_domain_attr pgtbl_cfg;
+
+	pgtbl_cfg.quirks = IO_PGTABLE_QUIRK_ARM_OUTER_WBWA;
+	iommu_domain_set_attr(iommu, DOMAIN_ATTR_IO_PGTABLE_CFG, &pgtbl_cfg);
 }
 
 struct msm_gem_address_space *

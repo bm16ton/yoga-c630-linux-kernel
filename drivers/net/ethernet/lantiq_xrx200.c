@@ -440,6 +440,7 @@ static int xrx200_probe(struct platform_device *pdev)
 	struct resource *res;
 	struct xrx200_priv *priv;
 	struct net_device *net_dev;
+	const u8 *mac;
 	int err;
 
 	/* alloc the network device */
@@ -464,8 +465,10 @@ static int xrx200_probe(struct platform_device *pdev)
 	}
 
 	priv->pmac_reg = devm_ioremap_resource(dev, res);
-	if (IS_ERR(priv->pmac_reg))
+	if (IS_ERR(priv->pmac_reg)) {
+		dev_err(dev, "failed to request and remap io ranges\n");
 		return PTR_ERR(priv->pmac_reg);
+	}
 
 	priv->chan_rx.dma.irq = platform_get_irq_byname(pdev, "rx");
 	if (priv->chan_rx.dma.irq < 0)
@@ -481,8 +484,10 @@ static int xrx200_probe(struct platform_device *pdev)
 		return PTR_ERR(priv->clk);
 	}
 
-	err = of_get_mac_address(np, net_dev->dev_addr);
-	if (err)
+	mac = of_get_mac_address(np);
+	if (!IS_ERR(mac))
+		ether_addr_copy(net_dev->dev_addr, mac);
+	else
 		eth_hw_addr_random(net_dev);
 
 	/* bring up the dma engine and IP core */

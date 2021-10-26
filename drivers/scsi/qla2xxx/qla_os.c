@@ -971,13 +971,6 @@ qla2xxx_mqueuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd,
 		goto qc24_fail_command;
 	}
 
-	if (!qpair->online) {
-		ql_dbg(ql_dbg_io, vha, 0x3077,
-		       "qpair not online. eeh_busy=%d.\n", ha->flags.eeh_busy);
-		cmd->result = DID_NO_CONNECT << 16;
-		goto qc24_fail_command;
-	}
-
 	if (!fcport || fcport->deleted) {
 		cmd->result = DID_IMM_RETRY << 16;
 		goto qc24_fail_command;
@@ -1207,6 +1200,35 @@ qla2x00_wait_for_chip_reset(scsi_qla_host_t *vha)
 	return return_status;
 }
 
+#define ISP_REG_DISCONNECT 0xffffffffU
+/**************************************************************************
+* qla2x00_isp_reg_stat
+*
+* Description:
+*	Read the host status register of ISP before aborting the command.
+*
+* Input:
+*	ha = pointer to host adapter structure.
+*
+*
+* Returns:
+*	Either true or false.
+*
+* Note:	Return true if there is register disconnect.
+**************************************************************************/
+static inline
+uint32_t qla2x00_isp_reg_stat(struct qla_hw_data *ha)
+{
+	struct device_reg_24xx __iomem *reg = &ha->iobase->isp24;
+	struct device_reg_82xx __iomem *reg82 = &ha->iobase->isp82;
+
+	if (IS_P3P_TYPE(ha))
+		return ((rd_reg_dword(&reg82->host_int)) == ISP_REG_DISCONNECT);
+	else
+		return ((rd_reg_dword(&reg->host_status)) ==
+			ISP_REG_DISCONNECT);
+}
+
 /**************************************************************************
 * qla2xxx_eh_abort
 *
@@ -1240,7 +1262,6 @@ qla2xxx_eh_abort(struct scsi_cmnd *cmd)
 	if (qla2x00_isp_reg_stat(ha)) {
 		ql_log(ql_log_info, vha, 0x8042,
 		    "PCI/Register disconnect, exiting.\n");
-		qla_pci_set_eeh_busy(vha);
 		return FAILED;
 	}
 
@@ -1434,7 +1455,6 @@ qla2xxx_eh_device_reset(struct scsi_cmnd *cmd)
 	if (qla2x00_isp_reg_stat(ha)) {
 		ql_log(ql_log_info, vha, 0x803e,
 		    "PCI/Register disconnect, exiting.\n");
-		qla_pci_set_eeh_busy(vha);
 		return FAILED;
 	}
 
@@ -1451,7 +1471,6 @@ qla2xxx_eh_target_reset(struct scsi_cmnd *cmd)
 	if (qla2x00_isp_reg_stat(ha)) {
 		ql_log(ql_log_info, vha, 0x803f,
 		    "PCI/Register disconnect, exiting.\n");
-		qla_pci_set_eeh_busy(vha);
 		return FAILED;
 	}
 
@@ -1487,7 +1506,6 @@ qla2xxx_eh_bus_reset(struct scsi_cmnd *cmd)
 	if (qla2x00_isp_reg_stat(ha)) {
 		ql_log(ql_log_info, vha, 0x8040,
 		    "PCI/Register disconnect, exiting.\n");
-		qla_pci_set_eeh_busy(vha);
 		return FAILED;
 	}
 
@@ -1565,7 +1583,7 @@ qla2xxx_eh_host_reset(struct scsi_cmnd *cmd)
 	if (qla2x00_isp_reg_stat(ha)) {
 		ql_log(ql_log_info, vha, 0x8041,
 		    "PCI/Register disconnect, exiting.\n");
-		qla_pci_set_eeh_busy(vha);
+		schedule_work(&ha->board_disable);
 		return SUCCESS;
 	}
 
@@ -4213,10 +4231,11 @@ qla2x00_mem_alloc(struct qla_hw_data *ha, uint16_t req_len, uint16_t rsp_len,
 
 	/* Get consistent memory allocated for Special Features-CB. */
 	if (IS_QLA27XX(ha) || IS_QLA28XX(ha)) {
-		ha->sf_init_cb = dma_pool_zalloc(ha->s_dma_pool, GFP_KERNEL,
+		ha->sf_init_cb = dma_pool_alloc(ha->s_dma_pool, GFP_KERNEL,
 						&ha->sf_init_cb_dma);
 		if (!ha->sf_init_cb)
 			goto fail_sf_init_cb;
+		memset(ha->sf_init_cb, 0, sizeof(struct init_sf_cb));
 		ql_dbg_pci(ql_dbg_init, ha->pdev, 0x0199,
 			   "sf_init_cb=%p.\n", ha->sf_init_cb);
 	}
@@ -4618,7 +4637,8 @@ qla2x00_free_fw_dump(struct qla_hw_data *ha)
 		dma_free_coherent(&ha->pdev->dev,
 		    EFT_SIZE, ha->eft, ha->eft_dma);
 
-	vfree(ha->fw_dump);
+	if (ha->fw_dump)
+		vfree(ha->fw_dump);
 
 	ha->fce = NULL;
 	ha->fce_dma = 0;
@@ -4632,7 +4652,8 @@ qla2x00_free_fw_dump(struct qla_hw_data *ha)
 	ha->fw_dump_len = 0;
 
 	for (j = 0; j < 2; j++, fwdt++) {
-		vfree(fwdt->template);
+		if (fwdt->template)
+			vfree(fwdt->template);
 		fwdt->template = NULL;
 		fwdt->length = 0;
 	}
@@ -6648,9 +6669,6 @@ qla2x00_do_dpc(void *data)
 
 		schedule();
 
-		if (test_and_clear_bit(DO_EEH_RECOVERY, &base_vha->dpc_flags))
-			qla_pci_set_eeh_busy(base_vha);
-
 		if (!base_vha->flags.init_done || ha->flags.mbox_busy)
 			goto end_loop;
 
@@ -6944,21 +6962,26 @@ intr_on_check:
 			mutex_unlock(&ha->mq_lock);
 		}
 
-		if (test_and_clear_bit(SET_ZIO_THRESHOLD_NEEDED,
-				       &base_vha->dpc_flags)) {
-			u16 threshold = ha->nvme_last_rptd_aen + ha->last_zio_threshold;
-
-			if (threshold > ha->orig_fw_xcb_count)
-				threshold = ha->orig_fw_xcb_count;
-
+		if (test_and_clear_bit(SET_NVME_ZIO_THRESHOLD_NEEDED,
+		    &base_vha->dpc_flags)) {
 			ql_log(ql_log_info, base_vha, 0xffffff,
-			       "SET ZIO Activity exchange threshold to %d.\n",
-			       threshold);
-			if (qla27xx_set_zio_threshold(base_vha, threshold)) {
+				"nvme: SET ZIO Activity exchange threshold to %d.\n",
+						ha->nvme_last_rptd_aen);
+			if (qla27xx_set_zio_threshold(base_vha,
+			    ha->nvme_last_rptd_aen)) {
 				ql_log(ql_log_info, base_vha, 0xffffff,
-				       "Unable to SET ZIO Activity exchange threshold to %d.\n",
-				       threshold);
+				    "nvme: Unable to SET ZIO Activity exchange threshold to %d.\n",
+				    ha->nvme_last_rptd_aen);
 			}
+		}
+
+		if (test_and_clear_bit(SET_ZIO_THRESHOLD_NEEDED,
+		    &base_vha->dpc_flags)) {
+			ql_log(ql_log_info, base_vha, 0xffffff,
+			    "SET ZIO Activity exchange threshold to %d.\n",
+			    ha->last_zio_threshold);
+			qla27xx_set_zio_threshold(base_vha,
+			    ha->last_zio_threshold);
 		}
 
 		if (!IS_QLAFX00(ha))
@@ -7188,13 +7211,14 @@ qla2x00_timer(struct timer_list *t)
 	index = atomic_read(&ha->nvme_active_aen_cnt);
 	if (!vha->vp_idx &&
 	    (index != ha->nvme_last_rptd_aen) &&
+	    (index >= DEFAULT_ZIO_THRESHOLD) &&
 	    ha->zio_mode == QLA_ZIO_MODE_6 &&
 	    !ha->flags.host_shutting_down) {
-		ha->nvme_last_rptd_aen = atomic_read(&ha->nvme_active_aen_cnt);
 		ql_log(ql_log_info, vha, 0x3002,
 		    "nvme: Sched: Set ZIO exchange threshold to %d.\n",
 		    ha->nvme_last_rptd_aen);
-		set_bit(SET_ZIO_THRESHOLD_NEEDED, &vha->dpc_flags);
+		ha->nvme_last_rptd_aen = atomic_read(&ha->nvme_active_aen_cnt);
+		set_bit(SET_NVME_ZIO_THRESHOLD_NEEDED, &vha->dpc_flags);
 		start_dpc++;
 	}
 
@@ -7367,8 +7391,6 @@ static void qla_pci_error_cleanup(scsi_qla_host_t *vha)
 	int i;
 	unsigned long flags;
 
-	ql_dbg(ql_dbg_aer, vha, 0x9000,
-	       "%s\n", __func__);
 	ha->chip_reset++;
 
 	ha->base_qpair->chip_reset = ha->chip_reset;
@@ -7378,16 +7400,28 @@ static void qla_pci_error_cleanup(scsi_qla_host_t *vha)
 			    ha->base_qpair->chip_reset;
 	}
 
-	/*
-	 * purge mailbox might take a while. Slot Reset/chip reset
-	 * will take care of the purge
-	 */
+	/* purge MBox commands */
+	if (atomic_read(&ha->num_pend_mbx_stage3)) {
+		clear_bit(MBX_INTR_WAIT, &ha->mbx_cmd_flags);
+		complete(&ha->mbx_intr_comp);
+	}
+
+	i = 0;
+
+	while (atomic_read(&ha->num_pend_mbx_stage3) ||
+	    atomic_read(&ha->num_pend_mbx_stage2) ||
+	    atomic_read(&ha->num_pend_mbx_stage1)) {
+		msleep(20);
+		i++;
+		if (i > 50)
+			break;
+	}
+
+	ha->flags.purge_mbox = 0;
 
 	mutex_lock(&ha->mq_lock);
-	ha->base_qpair->online = 0;
 	list_for_each_entry(qpair, &base_vha->qp_list, qp_list_elem)
 		qpair->online = 0;
-	wmb();
 	mutex_unlock(&ha->mq_lock);
 
 	qla2x00_mark_all_devices_lost(vha);
@@ -7424,17 +7458,14 @@ qla2xxx_pci_error_detected(struct pci_dev *pdev, pci_channel_state_t state)
 {
 	scsi_qla_host_t *vha = pci_get_drvdata(pdev);
 	struct qla_hw_data *ha = vha->hw;
-	pci_ers_result_t ret = PCI_ERS_RESULT_NEED_RESET;
 
-	ql_log(ql_log_warn, vha, 0x9000,
-	       "PCI error detected, state %x.\n", state);
-	ha->pci_error_state = QLA_PCI_ERR_DETECTED;
+	ql_dbg(ql_dbg_aer, vha, 0x9000,
+	    "PCI error detected, state %x.\n", state);
 
 	if (!atomic_read(&pdev->enable_cnt)) {
 		ql_log(ql_log_info, vha, 0xffff,
 			"PCI device is disabled,state %x\n", state);
-		ret = PCI_ERS_RESULT_NEED_RESET;
-		goto out;
+		return PCI_ERS_RESULT_NEED_RESET;
 	}
 
 	switch (state) {
@@ -7444,12 +7475,11 @@ qla2xxx_pci_error_detected(struct pci_dev *pdev, pci_channel_state_t state)
 			set_bit(QPAIR_ONLINE_CHECK_NEEDED, &vha->dpc_flags);
 			qla2xxx_wake_dpc(vha);
 		}
-		ret = PCI_ERS_RESULT_CAN_RECOVER;
-		break;
+		return PCI_ERS_RESULT_CAN_RECOVER;
 	case pci_channel_io_frozen:
-		qla_pci_set_eeh_busy(vha);
-		ret = PCI_ERS_RESULT_NEED_RESET;
-		break;
+		ha->flags.eeh_busy = 1;
+		qla_pci_error_cleanup(vha);
+		return PCI_ERS_RESULT_NEED_RESET;
 	case pci_channel_io_perm_failure:
 		ha->flags.pci_channel_io_perm_failure = 1;
 		qla2x00_abort_all_cmds(vha, DID_NO_CONNECT << 16);
@@ -7457,12 +7487,9 @@ qla2xxx_pci_error_detected(struct pci_dev *pdev, pci_channel_state_t state)
 			set_bit(QPAIR_ONLINE_CHECK_NEEDED, &vha->dpc_flags);
 			qla2xxx_wake_dpc(vha);
 		}
-		ret = PCI_ERS_RESULT_DISCONNECT;
+		return PCI_ERS_RESULT_DISCONNECT;
 	}
-out:
-	ql_dbg(ql_dbg_aer, vha, 0x600d,
-	       "PCI error detected returning [%x].\n", ret);
-	return ret;
+	return PCI_ERS_RESULT_NEED_RESET;
 }
 
 static pci_ers_result_t
@@ -7476,10 +7503,6 @@ qla2xxx_pci_mmio_enabled(struct pci_dev *pdev)
 	struct device_reg_2xxx __iomem *reg = &ha->iobase->isp;
 	struct device_reg_24xx __iomem *reg24 = &ha->iobase->isp24;
 
-	ql_log(ql_log_warn, base_vha, 0x9000,
-	       "mmio enabled\n");
-
-	ha->pci_error_state = QLA_PCI_MMIO_ENABLED;
 	if (IS_QLA82XX(ha))
 		return PCI_ERS_RESULT_RECOVERED;
 
@@ -7503,11 +7526,10 @@ qla2xxx_pci_mmio_enabled(struct pci_dev *pdev)
 		ql_log(ql_log_info, base_vha, 0x9003,
 		    "RISC paused -- mmio_enabled, Dumping firmware.\n");
 		qla2xxx_dump_fw(base_vha);
-	}
-	/* set PCI_ERS_RESULT_NEED_RESET to trigger call to qla2xxx_pci_slot_reset */
-	ql_dbg(ql_dbg_aer, base_vha, 0x600d,
-	       "mmio enabled returning.\n");
-	return PCI_ERS_RESULT_NEED_RESET;
+
+		return PCI_ERS_RESULT_NEED_RESET;
+	} else
+		return PCI_ERS_RESULT_RECOVERED;
 }
 
 static pci_ers_result_t
@@ -7519,10 +7541,9 @@ qla2xxx_pci_slot_reset(struct pci_dev *pdev)
 	int rc;
 	struct qla_qpair *qpair = NULL;
 
-	ql_log(ql_log_warn, base_vha, 0x9004,
-	       "Slot Reset.\n");
+	ql_dbg(ql_dbg_aer, base_vha, 0x9004,
+	    "Slot Reset.\n");
 
-	ha->pci_error_state = QLA_PCI_SLOT_RESET;
 	/* Workaround: qla2xxx driver which access hardware earlier
 	 * needs error state to be pci_channel_io_online.
 	 * Otherwise mailbox command timesout.
@@ -7556,24 +7577,16 @@ qla2xxx_pci_slot_reset(struct pci_dev *pdev)
 		qpair->online = 1;
 	mutex_unlock(&ha->mq_lock);
 
-	ha->flags.eeh_busy = 0;
 	base_vha->flags.online = 1;
 	set_bit(ABORT_ISP_ACTIVE, &base_vha->dpc_flags);
-	ha->isp_ops->abort_isp(base_vha);
+	if (ha->isp_ops->abort_isp(base_vha) == QLA_SUCCESS)
+		ret =  PCI_ERS_RESULT_RECOVERED;
 	clear_bit(ABORT_ISP_ACTIVE, &base_vha->dpc_flags);
 
-	if (qla2x00_isp_reg_stat(ha)) {
-		ha->flags.eeh_busy = 1;
-		qla_pci_error_cleanup(base_vha);
-		ql_log(ql_log_warn, base_vha, 0x9005,
-		       "Device unable to recover from PCI error.\n");
-	} else {
-		ret =  PCI_ERS_RESULT_RECOVERED;
-	}
 
 exit_slot_reset:
 	ql_dbg(ql_dbg_aer, base_vha, 0x900e,
-	    "Slot Reset returning %x.\n", ret);
+	    "slot_reset return %x.\n", ret);
 
 	return ret;
 }
@@ -7585,55 +7598,16 @@ qla2xxx_pci_resume(struct pci_dev *pdev)
 	struct qla_hw_data *ha = base_vha->hw;
 	int ret;
 
-	ql_log(ql_log_warn, base_vha, 0x900f,
-	       "Pci Resume.\n");
+	ql_dbg(ql_dbg_aer, base_vha, 0x900f,
+	    "pci_resume.\n");
 
+	ha->flags.eeh_busy = 0;
 
 	ret = qla2x00_wait_for_hba_online(base_vha);
 	if (ret != QLA_SUCCESS) {
 		ql_log(ql_log_fatal, base_vha, 0x9002,
 		    "The device failed to resume I/O from slot/link_reset.\n");
 	}
-	ha->pci_error_state = QLA_PCI_RESUME;
-	ql_dbg(ql_dbg_aer, base_vha, 0x600d,
-	       "Pci Resume returning.\n");
-}
-
-void qla_pci_set_eeh_busy(struct scsi_qla_host *vha)
-{
-	struct qla_hw_data *ha = vha->hw;
-	struct scsi_qla_host *base_vha = pci_get_drvdata(ha->pdev);
-	bool do_cleanup = false;
-	unsigned long flags;
-
-	if (ha->flags.eeh_busy)
-		return;
-
-	spin_lock_irqsave(&base_vha->work_lock, flags);
-	if (!ha->flags.eeh_busy) {
-		ha->flags.eeh_busy = 1;
-		do_cleanup = true;
-	}
-	spin_unlock_irqrestore(&base_vha->work_lock, flags);
-
-	if (do_cleanup)
-		qla_pci_error_cleanup(base_vha);
-}
-
-/*
- * this routine will schedule a task to pause IO from interrupt context
- * if caller sees a PCIE error event (register read = 0xf's)
- */
-void qla_schedule_eeh_work(struct scsi_qla_host *vha)
-{
-	struct qla_hw_data *ha = vha->hw;
-	struct scsi_qla_host *base_vha = pci_get_drvdata(ha->pdev);
-
-	if (ha->flags.eeh_busy)
-		return;
-
-	set_bit(DO_EEH_RECOVERY, &base_vha->dpc_flags);
-	qla2xxx_wake_dpc(base_vha);
 }
 
 static void
@@ -7707,7 +7681,6 @@ struct scsi_host_template qla2xxx_driver_template = {
 
 	.eh_timed_out		= fc_eh_timed_out,
 	.eh_abort_handler	= qla2xxx_eh_abort,
-	.eh_should_retry_cmd	= fc_eh_should_retry_cmd,
 	.eh_device_reset_handler = qla2xxx_eh_device_reset,
 	.eh_target_reset_handler = qla2xxx_eh_target_reset,
 	.eh_bus_reset_handler	= qla2xxx_eh_bus_reset,

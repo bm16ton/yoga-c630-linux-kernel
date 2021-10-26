@@ -30,13 +30,13 @@ mlx5_esw_indir_table_decap_vport(struct mlx5_flow_attr *attr);
 
 #else
 /* indir API stubs */
-static inline struct mlx5_esw_indir_table *
+struct mlx5_esw_indir_table *
 mlx5_esw_indir_table_init(void)
 {
 	return NULL;
 }
 
-static inline void
+void
 mlx5_esw_indir_table_destroy(struct mlx5_esw_indir_table *indir)
 {
 }
@@ -57,7 +57,7 @@ mlx5_esw_indir_table_put(struct mlx5_eswitch *esw,
 {
 }
 
-static inline bool
+bool
 mlx5_esw_indir_table_needed(struct mlx5_eswitch *esw,
 			    struct mlx5_flow_attr *attr,
 			    u16 vport_num,

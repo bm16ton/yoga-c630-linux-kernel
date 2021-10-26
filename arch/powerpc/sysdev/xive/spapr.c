@@ -549,7 +549,7 @@ static void xive_spapr_cleanup_queue(unsigned int cpu, struct xive_cpu *xc,
 static bool xive_spapr_match(struct device_node *node)
 {
 	/* Ignore cascaded controllers for the moment */
-	return true;
+	return 1;
 }
 
 #ifdef CONFIG_SMP

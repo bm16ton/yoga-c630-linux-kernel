@@ -27,6 +27,7 @@
  *          Christian König
  */
 
+#include <drm/drm_debugfs.h>
 #include <drm/drm_device.h>
 #include <drm/drm_file.h>
 
@@ -45,7 +46,7 @@
  * wptr.  The GPU then starts fetching commands and executes
  * them until the pointers are equal again.
  */
-static void radeon_debugfs_ring_init(struct radeon_device *rdev, struct radeon_ring *ring);
+static int radeon_debugfs_ring_init(struct radeon_device *rdev, struct radeon_ring *ring);
 
 /**
  * radeon_ring_supports_scratch_reg - check if the ring supports
@@ -386,7 +387,6 @@ int radeon_ring_init(struct radeon_device *rdev, struct radeon_ring *ring, unsig
 	ring->ring_size = ring_size;
 	ring->rptr_offs = rptr_offs;
 	ring->nop = nop;
-	ring->rdev = rdev;
 	/* Allocate ring buffer */
 	if (ring->ring_obj == NULL) {
 		r = radeon_bo_create(rdev, ring->ring_size, PAGE_SIZE, true,
@@ -421,7 +421,9 @@ int radeon_ring_init(struct radeon_device *rdev, struct radeon_ring *ring, unsig
 		ring->next_rptr_gpu_addr = rdev->wb.gpu_addr + index;
 		ring->next_rptr_cpu_addr = &rdev->wb.wb[index/4];
 	}
-	radeon_debugfs_ring_init(rdev, ring);
+	if (radeon_debugfs_ring_init(rdev, ring)) {
+		DRM_ERROR("Failed to register debugfs file for rings !\n");
+	}
 	radeon_ring_lockup_update(rdev, ring);
 	return 0;
 }
@@ -462,10 +464,13 @@ void radeon_ring_fini(struct radeon_device *rdev, struct radeon_ring *ring)
  */
 #if defined(CONFIG_DEBUG_FS)
 
-static int radeon_debugfs_ring_info_show(struct seq_file *m, void *unused)
+static int radeon_debugfs_ring_info(struct seq_file *m, void *data)
 {
-	struct radeon_ring *ring = (struct radeon_ring *) m->private;
-	struct radeon_device *rdev = ring->rdev;
+	struct drm_info_node *node = (struct drm_info_node *) m->private;
+	struct drm_device *dev = node->minor->dev;
+	struct radeon_device *rdev = dev->dev_private;
+	int ridx = *(int*)node->info_ent->data;
+	struct radeon_ring *ring = &rdev->ring[ridx];
 
 	uint32_t rptr, wptr, rptr_next;
 	unsigned count, i, j;
@@ -516,43 +521,44 @@ static int radeon_debugfs_ring_info_show(struct seq_file *m, void *unused)
 	return 0;
 }
 
-DEFINE_SHOW_ATTRIBUTE(radeon_debugfs_ring_info);
+static int radeon_gfx_index = RADEON_RING_TYPE_GFX_INDEX;
+static int cayman_cp1_index = CAYMAN_RING_TYPE_CP1_INDEX;
+static int cayman_cp2_index = CAYMAN_RING_TYPE_CP2_INDEX;
+static int radeon_dma1_index = R600_RING_TYPE_DMA_INDEX;
+static int radeon_dma2_index = CAYMAN_RING_TYPE_DMA1_INDEX;
+static int r600_uvd_index = R600_RING_TYPE_UVD_INDEX;
+static int si_vce1_index = TN_RING_TYPE_VCE1_INDEX;
+static int si_vce2_index = TN_RING_TYPE_VCE2_INDEX;
 
-static const char *radeon_debugfs_ring_idx_to_name(uint32_t ridx)
-{
-	switch (ridx) {
-	case RADEON_RING_TYPE_GFX_INDEX:
-		return "radeon_ring_gfx";
-	case CAYMAN_RING_TYPE_CP1_INDEX:
-		return "radeon_ring_cp1";
-	case CAYMAN_RING_TYPE_CP2_INDEX:
-		return "radeon_ring_cp2";
-	case R600_RING_TYPE_DMA_INDEX:
-		return "radeon_ring_dma1";
-	case CAYMAN_RING_TYPE_DMA1_INDEX:
-		return "radeon_ring_dma2";
-	case R600_RING_TYPE_UVD_INDEX:
-		return "radeon_ring_uvd";
-	case TN_RING_TYPE_VCE1_INDEX:
-		return "radeon_ring_vce1";
-	case TN_RING_TYPE_VCE2_INDEX:
-		return "radeon_ring_vce2";
-	default:
-		return NULL;
+static struct drm_info_list radeon_debugfs_ring_info_list[] = {
+	{"radeon_ring_gfx", radeon_debugfs_ring_info, 0, &radeon_gfx_index},
+	{"radeon_ring_cp1", radeon_debugfs_ring_info, 0, &cayman_cp1_index},
+	{"radeon_ring_cp2", radeon_debugfs_ring_info, 0, &cayman_cp2_index},
+	{"radeon_ring_dma1", radeon_debugfs_ring_info, 0, &radeon_dma1_index},
+	{"radeon_ring_dma2", radeon_debugfs_ring_info, 0, &radeon_dma2_index},
+	{"radeon_ring_uvd", radeon_debugfs_ring_info, 0, &r600_uvd_index},
+	{"radeon_ring_vce1", radeon_debugfs_ring_info, 0, &si_vce1_index},
+	{"radeon_ring_vce2", radeon_debugfs_ring_info, 0, &si_vce2_index},
+};
 
-	}
-}
 #endif
 
-static void radeon_debugfs_ring_init(struct radeon_device *rdev, struct radeon_ring *ring)
+static int radeon_debugfs_ring_init(struct radeon_device *rdev, struct radeon_ring *ring)
 {
 #if defined(CONFIG_DEBUG_FS)
-	const char *ring_name = radeon_debugfs_ring_idx_to_name(ring->idx);
-	struct dentry *root = rdev->ddev->primary->debugfs_root;
+	unsigned i;
+	for (i = 0; i < ARRAY_SIZE(radeon_debugfs_ring_info_list); ++i) {
+		struct drm_info_list *info = &radeon_debugfs_ring_info_list[i];
+		int ridx = *(int*)radeon_debugfs_ring_info_list[i].data;
+		unsigned r;
 
-	if (ring_name)
-		debugfs_create_file(ring_name, 0444, root, ring,
-				    &radeon_debugfs_ring_info_fops);
+		if (&rdev->ring[ridx] != ring)
+			continue;
 
+		r = radeon_debugfs_add_files(rdev, info, 1);
+		if (r)
+			return r;
+	}
 #endif
+	return 0;
 }

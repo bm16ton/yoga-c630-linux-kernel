@@ -179,7 +179,7 @@ static void hi3110_clean(struct net_device *net)
 		net->stats.tx_errors++;
 	dev_kfree_skb(priv->tx_skb);
 	if (priv->tx_len)
-		can_free_echo_skb(priv->net, 0, NULL);
+		can_free_echo_skb(priv->net, 0);
 	priv->tx_skb = NULL;
 	priv->tx_len = 0;
 }
@@ -218,7 +218,7 @@ static int hi3110_spi_trans(struct spi_device *spi, int len)
 	return ret;
 }
 
-static int hi3110_cmd(struct spi_device *spi, u8 command)
+static u8 hi3110_cmd(struct spi_device *spi, u8 command)
 {
 	struct hi3110_priv *priv = spi_get_drvdata(spi);
 

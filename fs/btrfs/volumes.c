@@ -1078,7 +1078,6 @@ static void __btrfs_free_extra_devids(struct btrfs_fs_devices *fs_devices,
 		if (test_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state)) {
 			list_del_init(&device->dev_alloc_list);
 			clear_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
-			fs_devices->rw_devices--;
 		}
 		list_del_init(&device->dev_list);
 		fs_devices->num_devices--;
@@ -1225,8 +1224,7 @@ static int open_fs_devices(struct btrfs_fs_devices *fs_devices,
 	return 0;
 }
 
-static int devid_cmp(void *priv, const struct list_head *a,
-		     const struct list_head *b)
+static int devid_cmp(void *priv, struct list_head *a, struct list_head *b)
 {
 	struct btrfs_device *dev1, *dev2;
 
@@ -1461,7 +1459,7 @@ static bool dev_extent_hole_check_zoned(struct btrfs_device *device,
 		if (ret == -ERANGE) {
 			*hole_start += *hole_size;
 			*hole_size = 0;
-			return true;
+			return 1;
 		}
 
 		*hole_start += zone_size;
@@ -3187,12 +3185,11 @@ out:
 	return ret;
 }
 
-int btrfs_relocate_chunk(struct btrfs_fs_info *fs_info, u64 chunk_offset)
+static int btrfs_relocate_chunk(struct btrfs_fs_info *fs_info, u64 chunk_offset)
 {
 	struct btrfs_root *root = fs_info->chunk_root;
 	struct btrfs_trans_handle *trans;
 	struct btrfs_block_group *block_group;
-	u64 length;
 	int ret;
 
 	/*
@@ -3207,7 +3204,7 @@ int btrfs_relocate_chunk(struct btrfs_fs_info *fs_info, u64 chunk_offset)
 	 * we release the path used to search the chunk/dev tree and before
 	 * the current task acquires this mutex and calls us.
 	 */
-	lockdep_assert_held(&fs_info->reclaim_bgs_lock);
+	lockdep_assert_held(&fs_info->delete_unused_bgs_mutex);
 
 	/* step one, relocate all the extents inside this chunk */
 	btrfs_scrub_pause(fs_info);
@@ -3220,22 +3217,7 @@ int btrfs_relocate_chunk(struct btrfs_fs_info *fs_info, u64 chunk_offset)
 	if (!block_group)
 		return -ENOENT;
 	btrfs_discard_cancel_work(&fs_info->discard_ctl, block_group);
-	length = block_group->length;
 	btrfs_put_block_group(block_group);
-
-	/*
-	 * On a zoned file system, discard the whole block group, this will
-	 * trigger a REQ_OP_ZONE_RESET operation on the device zone. If
-	 * resetting the zone fails, don't treat it as a fatal problem from the
-	 * filesystem's point of view.
-	 */
-	if (btrfs_is_zoned(fs_info)) {
-		ret = btrfs_discard_extent(fs_info, chunk_offset, length, NULL);
-		if (ret)
-			btrfs_info(fs_info,
-				"failed to reset zone %llu after relocation",
-				chunk_offset);
-	}
 
 	trans = btrfs_start_trans_remove_block_group(root->fs_info,
 						     chunk_offset);
@@ -3277,10 +3259,10 @@ again:
 	key.type = BTRFS_CHUNK_ITEM_KEY;
 
 	while (1) {
-		mutex_lock(&fs_info->reclaim_bgs_lock);
+		mutex_lock(&fs_info->delete_unused_bgs_mutex);
 		ret = btrfs_search_slot(NULL, chunk_root, &key, path, 0, 0);
 		if (ret < 0) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			goto error;
 		}
 		BUG_ON(ret == 0); /* Corruption */
@@ -3288,7 +3270,7 @@ again:
 		ret = btrfs_previous_item(chunk_root, path, key.objectid,
 					  key.type);
 		if (ret)
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 		if (ret < 0)
 			goto error;
 		if (ret > 0)
@@ -3309,7 +3291,7 @@ again:
 			else
 				BUG_ON(ret);
 		}
-		mutex_unlock(&fs_info->reclaim_bgs_lock);
+		mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 
 		if (found_key.offset == 0)
 			break;
@@ -3849,10 +3831,10 @@ again:
 			goto error;
 		}
 
-		mutex_lock(&fs_info->reclaim_bgs_lock);
+		mutex_lock(&fs_info->delete_unused_bgs_mutex);
 		ret = btrfs_search_slot(NULL, chunk_root, &key, path, 0, 0);
 		if (ret < 0) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			goto error;
 		}
 
@@ -3866,7 +3848,7 @@ again:
 		ret = btrfs_previous_item(chunk_root, path, 0,
 					  BTRFS_CHUNK_ITEM_KEY);
 		if (ret) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			ret = 0;
 			break;
 		}
@@ -3876,7 +3858,7 @@ again:
 		btrfs_item_key_to_cpu(leaf, &found_key, slot);
 
 		if (found_key.objectid != key.objectid) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			break;
 		}
 
@@ -3893,12 +3875,12 @@ again:
 
 		btrfs_release_path(path);
 		if (!ret) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			goto loop;
 		}
 
 		if (counting) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			spin_lock(&fs_info->balance_lock);
 			bctl->stat.expected++;
 			spin_unlock(&fs_info->balance_lock);
@@ -3923,7 +3905,7 @@ again:
 					count_meta < bctl->meta.limit_min)
 				|| ((chunk_type & BTRFS_BLOCK_GROUP_SYSTEM) &&
 					count_sys < bctl->sys.limit_min)) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			goto loop;
 		}
 
@@ -3937,7 +3919,7 @@ again:
 			ret = btrfs_may_alloc_data_chunk(fs_info,
 							 found_key.offset);
 			if (ret < 0) {
-				mutex_unlock(&fs_info->reclaim_bgs_lock);
+				mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 				goto error;
 			} else if (ret == 1) {
 				chunk_reserved = 1;
@@ -3945,7 +3927,7 @@ again:
 		}
 
 		ret = btrfs_relocate_chunk(fs_info, found_key.offset);
-		mutex_unlock(&fs_info->reclaim_bgs_lock);
+		mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 		if (ret == -ENOSPC) {
 			enospc_errors++;
 		} else if (ret == -ETXTBSY) {
@@ -4830,16 +4812,16 @@ again:
 	key.type = BTRFS_DEV_EXTENT_KEY;
 
 	do {
-		mutex_lock(&fs_info->reclaim_bgs_lock);
+		mutex_lock(&fs_info->delete_unused_bgs_mutex);
 		ret = btrfs_search_slot(NULL, root, &key, path, 0, 0);
 		if (ret < 0) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			goto done;
 		}
 
 		ret = btrfs_previous_item(root, path, 0, key.type);
 		if (ret) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			if (ret < 0)
 				goto done;
 			ret = 0;
@@ -4852,7 +4834,7 @@ again:
 		btrfs_item_key_to_cpu(l, &key, path->slots[0]);
 
 		if (key.objectid != device->devid) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			btrfs_release_path(path);
 			break;
 		}
@@ -4861,7 +4843,7 @@ again:
 		length = btrfs_dev_extent_length(l, dev_extent);
 
 		if (key.offset + length <= new_size) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			btrfs_release_path(path);
 			break;
 		}
@@ -4877,12 +4859,12 @@ again:
 		 */
 		ret = btrfs_may_alloc_data_chunk(fs_info, chunk_offset);
 		if (ret < 0) {
-			mutex_unlock(&fs_info->reclaim_bgs_lock);
+			mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 			goto done;
 		}
 
 		ret = btrfs_relocate_chunk(fs_info, chunk_offset);
-		mutex_unlock(&fs_info->reclaim_bgs_lock);
+		mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 		if (ret == -ENOSPC) {
 			failed++;
 		} else if (ret) {
@@ -6984,46 +6966,6 @@ static u64 calc_stripe_length(u64 type, u64 chunk_len, int num_stripes)
 	return div_u64(chunk_len, data_stripes);
 }
 
-#if BITS_PER_LONG == 32
-/*
- * Due to page cache limit, metadata beyond BTRFS_32BIT_MAX_FILE_SIZE
- * can't be accessed on 32bit systems.
- *
- * This function do mount time check to reject the fs if it already has
- * metadata chunk beyond that limit.
- */
-static int check_32bit_meta_chunk(struct btrfs_fs_info *fs_info,
-				  u64 logical, u64 length, u64 type)
-{
-	if (!(type & BTRFS_BLOCK_GROUP_METADATA))
-		return 0;
-
-	if (logical + length < MAX_LFS_FILESIZE)
-		return 0;
-
-	btrfs_err_32bit_limit(fs_info);
-	return -EOVERFLOW;
-}
-
-/*
- * This is to give early warning for any metadata chunk reaching
- * BTRFS_32BIT_EARLY_WARN_THRESHOLD.
- * Although we can still access the metadata, it's not going to be possible
- * once the limit is reached.
- */
-static void warn_32bit_meta_chunk(struct btrfs_fs_info *fs_info,
-				  u64 logical, u64 length, u64 type)
-{
-	if (!(type & BTRFS_BLOCK_GROUP_METADATA))
-		return;
-
-	if (logical + length < BTRFS_32BIT_EARLY_WARN_THRESHOLD)
-		return;
-
-	btrfs_warn_32bit_limit(fs_info);
-}
-#endif
-
 static int read_one_chunk(struct btrfs_key *key, struct extent_buffer *leaf,
 			  struct btrfs_chunk *chunk)
 {
@@ -7034,7 +6976,6 @@ static int read_one_chunk(struct btrfs_key *key, struct extent_buffer *leaf,
 	u64 logical;
 	u64 length;
 	u64 devid;
-	u64 type;
 	u8 uuid[BTRFS_UUID_SIZE];
 	int num_stripes;
 	int ret;
@@ -7042,15 +6983,7 @@ static int read_one_chunk(struct btrfs_key *key, struct extent_buffer *leaf,
 
 	logical = key->offset;
 	length = btrfs_chunk_length(leaf, chunk);
-	type = btrfs_chunk_type(leaf, chunk);
 	num_stripes = btrfs_chunk_num_stripes(leaf, chunk);
-
-#if BITS_PER_LONG == 32
-	ret = check_32bit_meta_chunk(fs_info, logical, length, type);
-	if (ret < 0)
-		return ret;
-	warn_32bit_meta_chunk(fs_info, logical, length, type);
-#endif
 
 	/*
 	 * Only need to verify chunk item if we're reading from sys chunk array,
@@ -7095,10 +7028,10 @@ static int read_one_chunk(struct btrfs_key *key, struct extent_buffer *leaf,
 	map->io_width = btrfs_chunk_io_width(leaf, chunk);
 	map->io_align = btrfs_chunk_io_align(leaf, chunk);
 	map->stripe_len = btrfs_chunk_stripe_len(leaf, chunk);
-	map->type = type;
+	map->type = btrfs_chunk_type(leaf, chunk);
 	map->sub_stripes = btrfs_chunk_sub_stripes(leaf, chunk);
 	map->verified_stripes = 0;
-	em->orig_block_len = calc_stripe_length(type, em->len,
+	em->orig_block_len = calc_stripe_length(map->type, em->len,
 						map->num_stripes);
 	for (i = 0; i < num_stripes; i++) {
 		map->stripes[i].physical =
@@ -8255,7 +8188,7 @@ static int relocating_repair_kthread(void *data)
 		return -EBUSY;
 	}
 
-	mutex_lock(&fs_info->reclaim_bgs_lock);
+	mutex_lock(&fs_info->delete_unused_bgs_mutex);
 
 	/* Ensure block group still exists */
 	cache = btrfs_lookup_block_group(fs_info, target);
@@ -8277,7 +8210,7 @@ static int relocating_repair_kthread(void *data)
 out:
 	if (cache)
 		btrfs_put_block_group(cache);
-	mutex_unlock(&fs_info->reclaim_bgs_lock);
+	mutex_unlock(&fs_info->delete_unused_bgs_mutex);
 	btrfs_exclop_finish(fs_info);
 
 	return ret;

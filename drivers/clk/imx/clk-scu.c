@@ -426,7 +426,6 @@ struct clk_hw *__imx_clk_scu(struct device *dev, const char *name,
 	if (ret) {
 		kfree(clk);
 		hw = ERR_PTR(ret);
-		return hw;
 	}
 
 	if (dev)

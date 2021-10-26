@@ -317,18 +317,10 @@ static void dwc2_handle_session_req_intr(struct dwc2_hsotg *hsotg)
 
 	if (dwc2_is_device_mode(hsotg)) {
 		if (hsotg->lx_state == DWC2_L2) {
-			if (hsotg->in_ppd) {
-				ret = dwc2_exit_partial_power_down(hsotg, 0,
-								   true);
-				if (ret)
-					dev_err(hsotg->dev,
-						"exit power_down failed\n");
-			}
-
-			/* Exit gadget mode clock gating. */
-			if (hsotg->params.power_down ==
-			    DWC2_POWER_DOWN_PARAM_NONE && hsotg->bus_suspended)
-				dwc2_gadget_exit_clock_gating(hsotg, 0);
+			ret = dwc2_exit_partial_power_down(hsotg, true);
+			if (ret && (ret != -ENOTSUPP))
+				dev_err(hsotg->dev,
+					"exit power_down failed\n");
 		}
 
 		/*
@@ -423,40 +415,32 @@ static void dwc2_handle_wakeup_detected_intr(struct dwc2_hsotg *hsotg)
 		dev_dbg(hsotg->dev, "DSTS=0x%0x\n",
 			dwc2_readl(hsotg, DSTS));
 		if (hsotg->lx_state == DWC2_L2) {
-			if (hsotg->in_ppd) {
-				u32 dctl = dwc2_readl(hsotg, DCTL);
-				/* Clear Remote Wakeup Signaling */
-				dctl &= ~DCTL_RMTWKUPSIG;
-				dwc2_writel(hsotg, dctl, DCTL);
-				ret = dwc2_exit_partial_power_down(hsotg, 1,
-								   true);
-				if (ret)
-					dev_err(hsotg->dev,
-						"exit partial_power_down failed\n");
-				call_gadget(hsotg, resume);
-			}
+			u32 dctl = dwc2_readl(hsotg, DCTL);
 
-			/* Exit gadget mode clock gating. */
-			if (hsotg->params.power_down ==
-			    DWC2_POWER_DOWN_PARAM_NONE && hsotg->bus_suspended)
-				dwc2_gadget_exit_clock_gating(hsotg, 0);
+			/* Clear Remote Wakeup Signaling */
+			dctl &= ~DCTL_RMTWKUPSIG;
+			dwc2_writel(hsotg, dctl, DCTL);
+			ret = dwc2_exit_partial_power_down(hsotg, true);
+			if (ret && (ret != -ENOTSUPP))
+				dev_err(hsotg->dev, "exit power_down failed\n");
+
+			/* Change to L0 state */
+			hsotg->lx_state = DWC2_L0;
+			call_gadget(hsotg, resume);
 		} else {
 			/* Change to L0 state */
 			hsotg->lx_state = DWC2_L0;
 		}
 	} else {
-		if (hsotg->lx_state == DWC2_L2) {
-			if (hsotg->in_ppd) {
-				ret = dwc2_exit_partial_power_down(hsotg, 1,
-								   true);
-				if (ret)
-					dev_err(hsotg->dev,
-						"exit partial_power_down failed\n");
-			}
+		if (hsotg->params.power_down)
+			return;
 
-			if (hsotg->params.power_down ==
-			    DWC2_POWER_DOWN_PARAM_NONE && hsotg->bus_suspended)
-				dwc2_host_exit_clock_gating(hsotg, 1);
+		if (hsotg->lx_state != DWC2_L1) {
+			u32 pcgcctl = dwc2_readl(hsotg, PCGCTL);
+
+			/* Restart the Phy Clock */
+			pcgcctl &= ~PCGCTL_STOPPCLK;
+			dwc2_writel(hsotg, pcgcctl, PCGCTL);
 
 			/*
 			 * If we've got this quirk then the PHY is stuck upon
@@ -532,34 +516,31 @@ static void dwc2_handle_usb_suspend_intr(struct dwc2_hsotg *hsotg)
 			return;
 		}
 		if (dsts & DSTS_SUSPSTS) {
-			switch (hsotg->params.power_down) {
-			case DWC2_POWER_DOWN_PARAM_PARTIAL:
+			if (hsotg->hw_params.power_optimized) {
 				ret = dwc2_enter_partial_power_down(hsotg);
-				if (ret)
-					dev_err(hsotg->dev,
-						"enter partial_power_down failed\n");
+				if (ret) {
+					if (ret != -ENOTSUPP)
+						dev_err(hsotg->dev,
+							"%s: enter partial_power_down failed\n",
+							__func__);
+					goto skip_power_saving;
+				}
 
 				udelay(100);
 
 				/* Ask phy to be suspended */
 				if (!IS_ERR_OR_NULL(hsotg->uphy))
 					usb_phy_set_suspend(hsotg->uphy, true);
-				break;
-			case DWC2_POWER_DOWN_PARAM_HIBERNATION:
-				ret = dwc2_enter_hibernation(hsotg, 0);
-				if (ret)
-					dev_err(hsotg->dev,
-						"enter hibernation failed\n");
-				break;
-			case DWC2_POWER_DOWN_PARAM_NONE:
-				/*
-				 * If neither hibernation nor partial power down are supported,
-				 * clock gating is used to save power.
-				 */
-				if (!hsotg->params.no_clock_gating)
-					dwc2_gadget_enter_clock_gating(hsotg);
 			}
 
+			if (hsotg->hw_params.hibernation) {
+				ret = dwc2_enter_hibernation(hsotg, 0);
+				if (ret && ret != -ENOTSUPP)
+					dev_err(hsotg->dev,
+						"%s: enter hibernation failed\n",
+						__func__);
+			}
+skip_power_saving:
 			/*
 			 * Change to L2 (suspend) state before releasing
 			 * spinlock
@@ -726,7 +707,11 @@ static inline void dwc_handle_gpwrdn_disc_det(struct dwc2_hsotg *hsotg,
 	dwc2_writel(hsotg, gpwrdn_tmp, GPWRDN);
 
 	hsotg->hibernated = 0;
+
+#if IS_ENABLED(CONFIG_USB_DWC2_HOST) ||	\
+	IS_ENABLED(CONFIG_USB_DWC2_DUAL_ROLE)
 	hsotg->bus_suspended = 0;
+#endif
 
 	if (gpwrdn & GPWRDN_IDSTS) {
 		hsotg->op_state = OTG_STATE_B_PERIPHERAL;
@@ -750,11 +735,10 @@ static inline void dwc_handle_gpwrdn_disc_det(struct dwc2_hsotg *hsotg,
  * The GPWRDN interrupts are those that occur in both Host and
  * Device mode while core is in hibernated state.
  */
-static int dwc2_handle_gpwrdn_intr(struct dwc2_hsotg *hsotg)
+static void dwc2_handle_gpwrdn_intr(struct dwc2_hsotg *hsotg)
 {
 	u32 gpwrdn;
 	int linestate;
-	int ret = 0;
 
 	gpwrdn = dwc2_readl(hsotg, GPWRDN);
 	/* clear all interrupt */
@@ -778,27 +762,17 @@ static int dwc2_handle_gpwrdn_intr(struct dwc2_hsotg *hsotg)
 		if (hsotg->hw_params.hibernation &&
 		    hsotg->hibernated) {
 			if (gpwrdn & GPWRDN_IDSTS) {
-				ret = dwc2_exit_hibernation(hsotg, 0, 0, 0);
-				if (ret)
-					dev_err(hsotg->dev,
-						"exit hibernation failed.\n");
+				dwc2_exit_hibernation(hsotg, 0, 0, 0);
 				call_gadget(hsotg, resume);
 			} else {
-				ret = dwc2_exit_hibernation(hsotg, 1, 0, 1);
-				if (ret)
-					dev_err(hsotg->dev,
-						"exit hibernation failed.\n");
+				dwc2_exit_hibernation(hsotg, 1, 0, 1);
 			}
 		}
 	} else if ((gpwrdn & GPWRDN_RST_DET) &&
 		   (gpwrdn & GPWRDN_RST_DET_MSK)) {
 		dev_dbg(hsotg->dev, "%s: GPWRDN_RST_DET\n", __func__);
-		if (!linestate) {
-			ret = dwc2_exit_hibernation(hsotg, 0, 1, 0);
-			if (ret)
-				dev_err(hsotg->dev,
-					"exit hibernation failed.\n");
-		}
+		if (!linestate && (gpwrdn & GPWRDN_BSESSVLD))
+			dwc2_exit_hibernation(hsotg, 0, 1, 0);
 	} else if ((gpwrdn & GPWRDN_STS_CHGINT) &&
 		   (gpwrdn & GPWRDN_STS_CHGINT_MSK)) {
 		dev_dbg(hsotg->dev, "%s: GPWRDN_STS_CHGINT\n", __func__);
@@ -810,8 +784,6 @@ static int dwc2_handle_gpwrdn_intr(struct dwc2_hsotg *hsotg)
 		 */
 		dwc_handle_gpwrdn_disc_det(hsotg, gpwrdn);
 	}
-
-	return ret;
 }
 
 /*

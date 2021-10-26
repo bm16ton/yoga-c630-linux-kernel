@@ -19,7 +19,6 @@ fit into other categories.
    bh1770glc
    eeprom
    c2port
-   dw-xdata-pcie
    ibmvmc
    ics932s401
    isl29003

@@ -24,8 +24,14 @@ enum {
 	I915_PRIORITY_DISPLAY,
 };
 
+#define I915_USER_PRIORITY_SHIFT 0
+#define I915_USER_PRIORITY(x) ((x) << I915_USER_PRIORITY_SHIFT)
+
+#define I915_PRIORITY_COUNT BIT(I915_USER_PRIORITY_SHIFT)
+#define I915_PRIORITY_MASK (I915_PRIORITY_COUNT - 1)
+
 /* Smallest priority value that cannot be bumped. */
-#define I915_PRIORITY_INVALID (INT_MIN)
+#define I915_PRIORITY_INVALID (INT_MIN | (u8)I915_PRIORITY_MASK)
 
 /*
  * Requests containing performance queries must not be preempted by
@@ -39,8 +45,9 @@ enum {
 #define I915_PRIORITY_BARRIER (I915_PRIORITY_UNPREEMPTABLE - 1)
 
 struct i915_priolist {
-	struct list_head requests;
+	struct list_head requests[I915_PRIORITY_COUNT];
 	struct rb_node node;
+	unsigned long used;
 	int priority;
 };
 

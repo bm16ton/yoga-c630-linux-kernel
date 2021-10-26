@@ -2,13 +2,12 @@
 /*
  * System Control and Management Interface (SCMI) Sensor Protocol
  *
- * Copyright (C) 2018-2021 ARM Ltd.
+ * Copyright (C) 2018-2020 ARM Ltd.
  */
 
 #define pr_fmt(fmt) "SCMI Notifications SENSOR - " fmt
 
 #include <linux/bitfield.h>
-#include <linux/module.h>
 #include <linux/scmi_protocol.h>
 
 #include "common.h"
@@ -166,8 +165,7 @@ struct scmi_msg_sensor_reading_get {
 
 struct scmi_resp_sensor_reading_complete {
 	__le32 id;
-	__le32 readings_low;
-	__le32 readings_high;
+	__le64 readings;
 };
 
 struct scmi_sensor_reading_resp {
@@ -203,21 +201,21 @@ struct sensors_info {
 	struct scmi_sensor_info *sensors;
 };
 
-static int scmi_sensor_attributes_get(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_attributes_get(const struct scmi_handle *handle,
 				      struct sensors_info *si)
 {
 	int ret;
 	struct scmi_xfer *t;
 	struct scmi_msg_resp_sensor_attributes *attr;
 
-	ret = ph->xops->xfer_get_init(ph, PROTOCOL_ATTRIBUTES,
-				      0, sizeof(*attr), &t);
+	ret = scmi_xfer_get_init(handle, PROTOCOL_ATTRIBUTES,
+				 SCMI_PROTOCOL_SENSOR, 0, sizeof(*attr), &t);
 	if (ret)
 		return ret;
 
 	attr = t->rx.buf;
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 	if (!ret) {
 		si->num_sensors = le16_to_cpu(attr->num_sensors);
 		si->max_requests = attr->max_requests;
@@ -226,7 +224,7 @@ static int scmi_sensor_attributes_get(const struct scmi_protocol_handle *ph,
 		si->reg_size = le32_to_cpu(attr->reg_size);
 	}
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
@@ -237,7 +235,7 @@ static inline void scmi_parse_range_attrs(struct scmi_range_attrs *out,
 	out->max_range = get_unaligned_le64((void *)&in->max_range_low);
 }
 
-static int scmi_sensor_update_intervals(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_update_intervals(const struct scmi_handle *handle,
 					struct scmi_sensor_info *s)
 {
 	int ret, cnt;
@@ -247,8 +245,8 @@ static int scmi_sensor_update_intervals(const struct scmi_protocol_handle *ph,
 	struct scmi_msg_resp_sensor_list_update_intervals *buf;
 	struct scmi_msg_sensor_list_update_intervals *msg;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_LIST_UPDATE_INTERVALS,
-				      sizeof(*msg), 0, &ti);
+	ret = scmi_xfer_get_init(handle, SENSOR_LIST_UPDATE_INTERVALS,
+				 SCMI_PROTOCOL_SENSOR, sizeof(*msg), 0, &ti);
 	if (ret)
 		return ret;
 
@@ -261,7 +259,7 @@ static int scmi_sensor_update_intervals(const struct scmi_protocol_handle *ph,
 		msg->id = cpu_to_le32(s->id);
 		msg->index = cpu_to_le32(desc_index);
 
-		ret = ph->xops->do_xfer(ph, ti);
+		ret = scmi_do_xfer(handle, ti);
 		if (ret)
 			break;
 
@@ -279,7 +277,7 @@ static int scmi_sensor_update_intervals(const struct scmi_protocol_handle *ph,
 			/* segmented intervals are reported in one triplet */
 			if (s->intervals.segmented &&
 			    (num_remaining || num_returned != 3)) {
-				dev_err(ph->dev,
+				dev_err(handle->dev,
 					"Sensor ID:%d advertises an invalid segmented interval (%d)\n",
 					s->id, s->intervals.count);
 				s->intervals.segmented = false;
@@ -290,7 +288,7 @@ static int scmi_sensor_update_intervals(const struct scmi_protocol_handle *ph,
 			/* Direct allocation when exceeding pre-allocated */
 			if (s->intervals.count >= SCMI_MAX_PREALLOC_POOL) {
 				s->intervals.desc =
-					devm_kcalloc(ph->dev,
+					devm_kcalloc(handle->dev,
 						     s->intervals.count,
 						     sizeof(*s->intervals.desc),
 						     GFP_KERNEL);
@@ -302,7 +300,7 @@ static int scmi_sensor_update_intervals(const struct scmi_protocol_handle *ph,
 				}
 			}
 		} else if (desc_index + num_returned > s->intervals.count) {
-			dev_err(ph->dev,
+			dev_err(handle->dev,
 				"No. of update intervals can't exceed %d\n",
 				s->intervals.count);
 			ret = -EINVAL;
@@ -315,18 +313,18 @@ static int scmi_sensor_update_intervals(const struct scmi_protocol_handle *ph,
 
 		desc_index += num_returned;
 
-		ph->xops->reset_rx_to_maxsz(ph, ti);
+		scmi_reset_rx_to_maxsz(handle, ti);
 		/*
 		 * check for both returned and remaining to avoid infinite
 		 * loop due to buggy firmware
 		 */
 	} while (num_returned && num_remaining);
 
-	ph->xops->xfer_put(ph, ti);
+	scmi_xfer_put(handle, ti);
 	return ret;
 }
 
-static int scmi_sensor_axis_description(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_axis_description(const struct scmi_handle *handle,
 					struct scmi_sensor_info *s)
 {
 	int ret, cnt;
@@ -336,13 +334,13 @@ static int scmi_sensor_axis_description(const struct scmi_protocol_handle *ph,
 	struct scmi_msg_resp_sensor_axis_description *buf;
 	struct scmi_msg_sensor_axis_description_get *msg;
 
-	s->axis = devm_kcalloc(ph->dev, s->num_axis,
+	s->axis = devm_kcalloc(handle->dev, s->num_axis,
 			       sizeof(*s->axis), GFP_KERNEL);
 	if (!s->axis)
 		return -ENOMEM;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_AXIS_DESCRIPTION_GET,
-				      sizeof(*msg), 0, &te);
+	ret = scmi_xfer_get_init(handle, SENSOR_AXIS_DESCRIPTION_GET,
+				 SCMI_PROTOCOL_SENSOR, sizeof(*msg), 0, &te);
 	if (ret)
 		return ret;
 
@@ -356,7 +354,7 @@ static int scmi_sensor_axis_description(const struct scmi_protocol_handle *ph,
 		msg->id = cpu_to_le32(s->id);
 		msg->axis_desc_index = cpu_to_le32(desc_index);
 
-		ret = ph->xops->do_xfer(ph, te);
+		ret = scmi_do_xfer(handle, te);
 		if (ret)
 			break;
 
@@ -365,7 +363,7 @@ static int scmi_sensor_axis_description(const struct scmi_protocol_handle *ph,
 		num_remaining = NUM_AXIS_REMAINING(flags);
 
 		if (desc_index + num_returned > s->num_axis) {
-			dev_err(ph->dev, "No. of axis can't exceed %d\n",
+			dev_err(handle->dev, "No. of axis can't exceed %d\n",
 				s->num_axis);
 			break;
 		}
@@ -407,18 +405,18 @@ static int scmi_sensor_axis_description(const struct scmi_protocol_handle *ph,
 
 		desc_index += num_returned;
 
-		ph->xops->reset_rx_to_maxsz(ph, te);
+		scmi_reset_rx_to_maxsz(handle, te);
 		/*
 		 * check for both returned and remaining to avoid infinite
 		 * loop due to buggy firmware
 		 */
 	} while (num_returned && num_remaining);
 
-	ph->xops->xfer_put(ph, te);
+	scmi_xfer_put(handle, te);
 	return ret;
 }
 
-static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_description_get(const struct scmi_handle *handle,
 				       struct sensors_info *si)
 {
 	int ret, cnt;
@@ -427,8 +425,8 @@ static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
 	struct scmi_xfer *t;
 	struct scmi_msg_resp_sensor_description *buf;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_DESCRIPTION_GET,
-				      sizeof(__le32), 0, &t);
+	ret = scmi_xfer_get_init(handle, SENSOR_DESCRIPTION_GET,
+				 SCMI_PROTOCOL_SENSOR, sizeof(__le32), 0, &t);
 	if (ret)
 		return ret;
 
@@ -439,8 +437,7 @@ static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
 
 		/* Set the number of sensors to be skipped/already read */
 		put_unaligned_le32(desc_index, t->tx.buf);
-
-		ret = ph->xops->do_xfer(ph, t);
+		ret = scmi_do_xfer(handle, t);
 		if (ret)
 			break;
 
@@ -448,7 +445,7 @@ static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
 		num_remaining = le16_to_cpu(buf->num_remaining);
 
 		if (desc_index + num_returned > si->num_sensors) {
-			dev_err(ph->dev, "No. of sensors can't exceed %d",
+			dev_err(handle->dev, "No. of sensors can't exceed %d",
 				si->num_sensors);
 			break;
 		}
@@ -503,8 +500,8 @@ static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
 				 * Since the command is optional, on error carry
 				 * on without any update interval.
 				 */
-				if (scmi_sensor_update_intervals(ph, s))
-					dev_dbg(ph->dev,
+				if (scmi_sensor_update_intervals(handle, s))
+					dev_dbg(handle->dev,
 						"Update Intervals not available for sensor ID:%d\n",
 						s->id);
 			}
@@ -538,7 +535,7 @@ static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
 				}
 			}
 			if (s->num_axis > 0) {
-				ret = scmi_sensor_axis_description(ph, s);
+				ret = scmi_sensor_axis_description(handle, s);
 				if (ret)
 					goto out;
 			}
@@ -548,7 +545,7 @@ static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
 
 		desc_index += num_returned;
 
-		ph->xops->reset_rx_to_maxsz(ph, t);
+		scmi_reset_rx_to_maxsz(handle, t);
 		/*
 		 * check for both returned and remaining to avoid infinite
 		 * loop due to buggy firmware
@@ -556,12 +553,12 @@ static int scmi_sensor_description_get(const struct scmi_protocol_handle *ph,
 	} while (num_returned && num_remaining);
 
 out:
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
 static inline int
-scmi_sensor_request_notify(const struct scmi_protocol_handle *ph, u32 sensor_id,
+scmi_sensor_request_notify(const struct scmi_handle *handle, u32 sensor_id,
 			   u8 message_id, bool enable)
 {
 	int ret;
@@ -569,7 +566,8 @@ scmi_sensor_request_notify(const struct scmi_protocol_handle *ph, u32 sensor_id,
 	struct scmi_xfer *t;
 	struct scmi_msg_sensor_request_notify *cfg;
 
-	ret = ph->xops->xfer_get_init(ph, message_id, sizeof(*cfg), 0, &t);
+	ret = scmi_xfer_get_init(handle, message_id,
+				 SCMI_PROTOCOL_SENSOR, sizeof(*cfg), 0, &t);
 	if (ret)
 		return ret;
 
@@ -577,40 +575,40 @@ scmi_sensor_request_notify(const struct scmi_protocol_handle *ph, u32 sensor_id,
 	cfg->id = cpu_to_le32(sensor_id);
 	cfg->event_control = cpu_to_le32(evt_cntl);
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
-static int scmi_sensor_trip_point_notify(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_trip_point_notify(const struct scmi_handle *handle,
 					 u32 sensor_id, bool enable)
 {
-	return scmi_sensor_request_notify(ph, sensor_id,
+	return scmi_sensor_request_notify(handle, sensor_id,
 					  SENSOR_TRIP_POINT_NOTIFY,
 					  enable);
 }
 
 static int
-scmi_sensor_continuous_update_notify(const struct scmi_protocol_handle *ph,
+scmi_sensor_continuous_update_notify(const struct scmi_handle *handle,
 				     u32 sensor_id, bool enable)
 {
-	return scmi_sensor_request_notify(ph, sensor_id,
+	return scmi_sensor_request_notify(handle, sensor_id,
 					  SENSOR_CONTINUOUS_UPDATE_NOTIFY,
 					  enable);
 }
 
 static int
-scmi_sensor_trip_point_config(const struct scmi_protocol_handle *ph,
-			      u32 sensor_id, u8 trip_id, u64 trip_value)
+scmi_sensor_trip_point_config(const struct scmi_handle *handle, u32 sensor_id,
+			      u8 trip_id, u64 trip_value)
 {
 	int ret;
 	u32 evt_cntl = SENSOR_TP_BOTH;
 	struct scmi_xfer *t;
 	struct scmi_msg_set_sensor_trip_point *trip;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_TRIP_POINT_CONFIG,
-				      sizeof(*trip), 0, &t);
+	ret = scmi_xfer_get_init(handle, SENSOR_TRIP_POINT_CONFIG,
+				 SCMI_PROTOCOL_SENSOR, sizeof(*trip), 0, &t);
 	if (ret)
 		return ret;
 
@@ -620,46 +618,47 @@ scmi_sensor_trip_point_config(const struct scmi_protocol_handle *ph,
 	trip->value_low = cpu_to_le32(trip_value & 0xffffffff);
 	trip->value_high = cpu_to_le32(trip_value >> 32);
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
-static int scmi_sensor_config_get(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_config_get(const struct scmi_handle *handle,
 				  u32 sensor_id, u32 *sensor_config)
 {
 	int ret;
 	struct scmi_xfer *t;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_CONFIG_GET,
-				      sizeof(__le32), sizeof(__le32), &t);
+	ret = scmi_xfer_get_init(handle, SENSOR_CONFIG_GET,
+				 SCMI_PROTOCOL_SENSOR, sizeof(__le32),
+				 sizeof(__le32), &t);
 	if (ret)
 		return ret;
 
 	put_unaligned_le32(cpu_to_le32(sensor_id), t->tx.buf);
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 	if (!ret) {
-		struct sensors_info *si = ph->get_priv(ph);
+		struct sensors_info *si = handle->sensor_priv;
 		struct scmi_sensor_info *s = si->sensors + sensor_id;
 
 		*sensor_config = get_unaligned_le64(t->rx.buf);
 		s->sensor_config = *sensor_config;
 	}
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
-static int scmi_sensor_config_set(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_config_set(const struct scmi_handle *handle,
 				  u32 sensor_id, u32 sensor_config)
 {
 	int ret;
 	struct scmi_xfer *t;
 	struct scmi_msg_sensor_config_set *msg;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_CONFIG_SET,
-				      sizeof(*msg), 0, &t);
+	ret = scmi_xfer_get_init(handle, SENSOR_CONFIG_SET,
+				 SCMI_PROTOCOL_SENSOR, sizeof(*msg), 0, &t);
 	if (ret)
 		return ret;
 
@@ -667,21 +666,21 @@ static int scmi_sensor_config_set(const struct scmi_protocol_handle *ph,
 	msg->id = cpu_to_le32(sensor_id);
 	msg->sensor_config = cpu_to_le32(sensor_config);
 
-	ret = ph->xops->do_xfer(ph, t);
+	ret = scmi_do_xfer(handle, t);
 	if (!ret) {
-		struct sensors_info *si = ph->get_priv(ph);
+		struct sensors_info *si = handle->sensor_priv;
 		struct scmi_sensor_info *s = si->sensors + sensor_id;
 
 		s->sensor_config = sensor_config;
 	}
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
 /**
  * scmi_sensor_reading_get  - Read scalar sensor value
- * @ph: Protocol handle
+ * @handle: Platform handle
  * @sensor_id: Sensor ID
  * @value: The 64bit value sensor reading
  *
@@ -694,17 +693,17 @@ static int scmi_sensor_config_set(const struct scmi_protocol_handle *ph,
  *
  * Return: 0 on Success
  */
-static int scmi_sensor_reading_get(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_reading_get(const struct scmi_handle *handle,
 				   u32 sensor_id, u64 *value)
 {
 	int ret;
 	struct scmi_xfer *t;
 	struct scmi_msg_sensor_reading_get *sensor;
-	struct sensors_info *si = ph->get_priv(ph);
+	struct sensors_info *si = handle->sensor_priv;
 	struct scmi_sensor_info *s = si->sensors + sensor_id;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_READING_GET,
-				      sizeof(*sensor), 0, &t);
+	ret = scmi_xfer_get_init(handle, SENSOR_READING_GET,
+				 SCMI_PROTOCOL_SENSOR, sizeof(*sensor), 0, &t);
 	if (ret)
 		return ret;
 
@@ -712,25 +711,24 @@ static int scmi_sensor_reading_get(const struct scmi_protocol_handle *ph,
 	sensor->id = cpu_to_le32(sensor_id);
 	if (s->async) {
 		sensor->flags = cpu_to_le32(SENSOR_READ_ASYNC);
-		ret = ph->xops->do_xfer_with_response(ph, t);
+		ret = scmi_do_xfer_with_response(handle, t);
 		if (!ret) {
 			struct scmi_resp_sensor_reading_complete *resp;
 
 			resp = t->rx.buf;
 			if (le32_to_cpu(resp->id) == sensor_id)
-				*value =
-					get_unaligned_le64(&resp->readings_low);
+				*value = get_unaligned_le64(&resp->readings);
 			else
 				ret = -EPROTO;
 		}
 	} else {
 		sensor->flags = cpu_to_le32(0);
-		ret = ph->xops->do_xfer(ph, t);
+		ret = scmi_do_xfer(handle, t);
 		if (!ret)
 			*value = get_unaligned_le64(t->rx.buf);
 	}
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
@@ -744,7 +742,7 @@ scmi_parse_sensor_readings(struct scmi_sensor_reading *out,
 
 /**
  * scmi_sensor_reading_get_timestamped  - Read multiple-axis timestamped values
- * @ph: Protocol handle
+ * @handle: Platform handle
  * @sensor_id: Sensor ID
  * @count: The length of the provided @readings array
  * @readings: An array of elements each representing a timestamped per-axis
@@ -757,22 +755,22 @@ scmi_parse_sensor_readings(struct scmi_sensor_reading *out,
  * Return: 0 on Success
  */
 static int
-scmi_sensor_reading_get_timestamped(const struct scmi_protocol_handle *ph,
+scmi_sensor_reading_get_timestamped(const struct scmi_handle *handle,
 				    u32 sensor_id, u8 count,
 				    struct scmi_sensor_reading *readings)
 {
 	int ret;
 	struct scmi_xfer *t;
 	struct scmi_msg_sensor_reading_get *sensor;
-	struct sensors_info *si = ph->get_priv(ph);
+	struct sensors_info *si = handle->sensor_priv;
 	struct scmi_sensor_info *s = si->sensors + sensor_id;
 
 	if (!count || !readings ||
 	    (!s->num_axis && count > 1) || (s->num_axis && count > s->num_axis))
 		return -EINVAL;
 
-	ret = ph->xops->xfer_get_init(ph, SENSOR_READING_GET,
-				      sizeof(*sensor), 0, &t);
+	ret = scmi_xfer_get_init(handle, SENSOR_READING_GET,
+				 SCMI_PROTOCOL_SENSOR, sizeof(*sensor), 0, &t);
 	if (ret)
 		return ret;
 
@@ -780,7 +778,7 @@ scmi_sensor_reading_get_timestamped(const struct scmi_protocol_handle *ph,
 	sensor->id = cpu_to_le32(sensor_id);
 	if (s->async) {
 		sensor->flags = cpu_to_le32(SENSOR_READ_ASYNC);
-		ret = ph->xops->do_xfer_with_response(ph, t);
+		ret = scmi_do_xfer_with_response(handle, t);
 		if (!ret) {
 			int i;
 			struct scmi_resp_sensor_reading_complete_v3 *resp;
@@ -796,7 +794,7 @@ scmi_sensor_reading_get_timestamped(const struct scmi_protocol_handle *ph,
 		}
 	} else {
 		sensor->flags = cpu_to_le32(0);
-		ret = ph->xops->do_xfer(ph, t);
+		ret = scmi_do_xfer(handle, t);
 		if (!ret) {
 			int i;
 			struct scmi_sensor_reading_resp *resp_readings;
@@ -808,26 +806,26 @@ scmi_sensor_reading_get_timestamped(const struct scmi_protocol_handle *ph,
 		}
 	}
 
-	ph->xops->xfer_put(ph, t);
+	scmi_xfer_put(handle, t);
 	return ret;
 }
 
 static const struct scmi_sensor_info *
-scmi_sensor_info_get(const struct scmi_protocol_handle *ph, u32 sensor_id)
+scmi_sensor_info_get(const struct scmi_handle *handle, u32 sensor_id)
 {
-	struct sensors_info *si = ph->get_priv(ph);
+	struct sensors_info *si = handle->sensor_priv;
 
 	return si->sensors + sensor_id;
 }
 
-static int scmi_sensor_count_get(const struct scmi_protocol_handle *ph)
+static int scmi_sensor_count_get(const struct scmi_handle *handle)
 {
-	struct sensors_info *si = ph->get_priv(ph);
+	struct sensors_info *si = handle->sensor_priv;
 
 	return si->num_sensors;
 }
 
-static const struct scmi_sensor_proto_ops sensor_proto_ops = {
+static const struct scmi_sensor_ops sensor_ops = {
 	.count_get = scmi_sensor_count_get,
 	.info_get = scmi_sensor_info_get,
 	.trip_point_config = scmi_sensor_trip_point_config,
@@ -837,17 +835,18 @@ static const struct scmi_sensor_proto_ops sensor_proto_ops = {
 	.config_set = scmi_sensor_config_set,
 };
 
-static int scmi_sensor_set_notify_enabled(const struct scmi_protocol_handle *ph,
+static int scmi_sensor_set_notify_enabled(const struct scmi_handle *handle,
 					  u8 evt_id, u32 src_id, bool enable)
 {
 	int ret;
 
 	switch (evt_id) {
 	case SCMI_EVENT_SENSOR_TRIP_POINT_EVENT:
-		ret = scmi_sensor_trip_point_notify(ph, src_id, enable);
+		ret = scmi_sensor_trip_point_notify(handle, src_id, enable);
 		break;
 	case SCMI_EVENT_SENSOR_UPDATE:
-		ret = scmi_sensor_continuous_update_notify(ph, src_id, enable);
+		ret = scmi_sensor_continuous_update_notify(handle, src_id,
+							   enable);
 		break;
 	default:
 		ret = -EINVAL;
@@ -861,11 +860,10 @@ static int scmi_sensor_set_notify_enabled(const struct scmi_protocol_handle *ph,
 	return ret;
 }
 
-static void *
-scmi_sensor_fill_custom_report(const struct scmi_protocol_handle *ph,
-			       u8 evt_id, ktime_t timestamp,
-			       const void *payld, size_t payld_sz,
-			       void *report, u32 *src_id)
+static void *scmi_sensor_fill_custom_report(const struct scmi_handle *handle,
+					    u8 evt_id, ktime_t timestamp,
+					    const void *payld, size_t payld_sz,
+					    void *report, u32 *src_id)
 {
 	void *rep = NULL;
 
@@ -892,7 +890,7 @@ scmi_sensor_fill_custom_report(const struct scmi_protocol_handle *ph,
 		struct scmi_sensor_info *s;
 		const struct scmi_sensor_update_notify_payld *p = payld;
 		struct scmi_sensor_update_report *r = report;
-		struct sensors_info *sinfo = ph->get_priv(ph);
+		struct sensors_info *sinfo = handle->sensor_priv;
 
 		/* payld_sz is variable for this event */
 		r->sensor_id = le32_to_cpu(p->sensor_id);
@@ -922,13 +920,6 @@ scmi_sensor_fill_custom_report(const struct scmi_protocol_handle *ph,
 	return rep;
 }
 
-static int scmi_sensor_get_num_sources(const struct scmi_protocol_handle *ph)
-{
-	struct sensors_info *si = ph->get_priv(ph);
-
-	return si->num_sensors;
-}
-
 static const struct scmi_event sensor_events[] = {
 	{
 		.id = SCMI_EVENT_SENSOR_TRIP_POINT_EVENT,
@@ -948,55 +939,48 @@ static const struct scmi_event sensor_events[] = {
 };
 
 static const struct scmi_event_ops sensor_event_ops = {
-	.get_num_sources = scmi_sensor_get_num_sources,
 	.set_notify_enabled = scmi_sensor_set_notify_enabled,
 	.fill_custom_report = scmi_sensor_fill_custom_report,
 };
 
-static const struct scmi_protocol_events sensor_protocol_events = {
-	.queue_sz = SCMI_PROTO_QUEUE_SZ,
-	.ops = &sensor_event_ops,
-	.evts = sensor_events,
-	.num_events = ARRAY_SIZE(sensor_events),
-};
-
-static int scmi_sensors_protocol_init(const struct scmi_protocol_handle *ph)
+static int scmi_sensors_protocol_init(struct scmi_handle *handle)
 {
 	u32 version;
 	int ret;
 	struct sensors_info *sinfo;
 
-	ph->xops->version_get(ph, &version);
+	scmi_version_get(handle, SCMI_PROTOCOL_SENSOR, &version);
 
-	dev_dbg(ph->dev, "Sensor Version %d.%d\n",
+	dev_dbg(handle->dev, "Sensor Version %d.%d\n",
 		PROTOCOL_REV_MAJOR(version), PROTOCOL_REV_MINOR(version));
 
-	sinfo = devm_kzalloc(ph->dev, sizeof(*sinfo), GFP_KERNEL);
+	sinfo = devm_kzalloc(handle->dev, sizeof(*sinfo), GFP_KERNEL);
 	if (!sinfo)
 		return -ENOMEM;
 	sinfo->version = version;
 
-	ret = scmi_sensor_attributes_get(ph, sinfo);
+	ret = scmi_sensor_attributes_get(handle, sinfo);
 	if (ret)
 		return ret;
-	sinfo->sensors = devm_kcalloc(ph->dev, sinfo->num_sensors,
+	sinfo->sensors = devm_kcalloc(handle->dev, sinfo->num_sensors,
 				      sizeof(*sinfo->sensors), GFP_KERNEL);
 	if (!sinfo->sensors)
 		return -ENOMEM;
 
-	ret = scmi_sensor_description_get(ph, sinfo);
+	ret = scmi_sensor_description_get(handle, sinfo);
 	if (ret)
 		return ret;
 
-	return ph->set_priv(ph, sinfo);
+	scmi_register_protocol_events(handle,
+				      SCMI_PROTOCOL_SENSOR, SCMI_PROTO_QUEUE_SZ,
+				      &sensor_event_ops, sensor_events,
+				      ARRAY_SIZE(sensor_events),
+				      sinfo->num_sensors);
+
+	handle->sensor_priv = sinfo;
+	handle->sensor_ops = &sensor_ops;
+
+	return 0;
 }
 
-static const struct scmi_protocol scmi_sensors = {
-	.id = SCMI_PROTOCOL_SENSOR,
-	.owner = THIS_MODULE,
-	.instance_init = &scmi_sensors_protocol_init,
-	.ops = &sensor_proto_ops,
-	.events = &sensor_protocol_events,
-};
-
-DEFINE_SCMI_PROTOCOL_REGISTER_UNREGISTER(sensors, scmi_sensors)
+DEFINE_SCMI_PROTOCOL_REGISTER_UNREGISTER(SCMI_PROTOCOL_SENSOR, sensors)

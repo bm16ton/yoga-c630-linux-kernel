@@ -9,7 +9,7 @@
 # License.  See the file "COPYING" in the main directory of this archive
 # for more details.
 #
-ifdef cross_compiling
+ifneq ($(SUBARCH),$(ARCH))
   ifeq ($(CROSS_COMPILE),)
     CROSS_COMPILE := $(call cc-cross-prefix, sh-linux- sh-linux-gnu- sh-unknown-linux-gnu-)
   endif

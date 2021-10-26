@@ -34,6 +34,8 @@
 #include "target_core_internal.h"
 #include "target_core_pscsi.h"
 
+#define ISPRINT(a)  ((a >= ' ') && (a <= '~'))
+
 static inline struct pscsi_dev_virt *PSCSI_DEV(struct se_device *dev)
 {
 	return container_of(dev, struct pscsi_dev_virt, dev);
@@ -909,7 +911,7 @@ new_bio:
 					" %d i: %d bio: %p, allocating another"
 					" bio\n", bio->bi_vcnt, i, bio);
 
-				rc = blk_rq_append_bio(req, bio);
+				rc = blk_rq_append_bio(req, &bio);
 				if (rc) {
 					pr_err("pSCSI: failed to append bio\n");
 					goto fail;
@@ -928,7 +930,7 @@ new_bio:
 	}
 
 	if (bio) {
-		rc = blk_rq_append_bio(req, bio);
+		rc = blk_rq_append_bio(req, &bio);
 		if (rc) {
 			pr_err("pSCSI: failed to append bio\n");
 			goto fail;
@@ -1046,7 +1048,7 @@ static void pscsi_req_done(struct request *req, blk_status_t status)
 	int result = scsi_req(req)->result;
 	u8 scsi_status = status_byte(result) << 1;
 
-	if (scsi_status != SAM_STAT_GOOD) {
+	if (scsi_status) {
 		pr_debug("PSCSI Status Byte exception at cmd: %p CDB:"
 			" 0x%02x Result: 0x%08x\n", cmd, pt->pscsi_cdb[0],
 			result);

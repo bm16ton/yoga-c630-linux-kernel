@@ -31,17 +31,20 @@ if [ -n "$DST_PORT" ]; then
     validate_ports $UDP_DST_MIN $UDP_DST_MAX
 fi
 
+# Base Config
+DELAY="0"        # Zero means max speed
+
 # Flow variation random source port between min and max
 UDP_SRC_MIN=9
 UDP_SRC_MAX=109
 
 # General cleanup everything since last run
 # (especially important if other threads were configured by other scripts)
-[ -z "$APPEND" ] && pg_ctrl "reset"
+pg_ctrl "reset"
 
 # Add remove all other devices and add_device $DEV to thread 0
 thread=0
-[ -z "$APPEND" ] && pg_thread $thread "rem_device_all"
+pg_thread $thread "rem_device_all"
 pg_thread $thread "add_device" $DEV
 
 # How many packets to send (zero means indefinitely)
@@ -77,15 +80,11 @@ pg_set $DEV "flag UDPSRC_RND"
 pg_set $DEV "udp_src_min $UDP_SRC_MIN"
 pg_set $DEV "udp_src_max $UDP_SRC_MAX"
 
-if [ -z "$APPEND" ]; then
-    # start_run
-    echo "Running... ctrl^C to stop" >&2
-    pg_ctrl "start"
-    echo "Done" >&2
+# start_run
+echo "Running... ctrl^C to stop" >&2
+pg_ctrl "start"
+echo "Done" >&2
 
-    # Print results
-    echo "Result device: $DEV"
-    cat /proc/net/pktgen/$DEV
-else
-    echo "Append mode: config done. Do more or use 'pg_ctrl start' to run"
-fi
+# Print results
+echo "Result device: $DEV"
+cat /proc/net/pktgen/$DEV

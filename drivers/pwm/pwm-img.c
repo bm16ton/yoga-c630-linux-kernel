@@ -304,6 +304,7 @@ static int img_pwm_probe(struct platform_device *pdev)
 
 	pwm->chip.dev = &pdev->dev;
 	pwm->chip.ops = &img_pwm_ops;
+	pwm->chip.base = -1;
 	pwm->chip.npwm = IMG_PWM_NPWM;
 
 	ret = pwmchip_add(&pwm->chip);

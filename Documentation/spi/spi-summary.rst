@@ -411,11 +411,8 @@ any more such messages.
         duplex (one pointer is NULL) transfers;
 
       + optionally defining short delays after transfers ... using
-        the spi_transfer.delay.value setting (this delay can be the
-        only protocol effect, if the buffer length is zero) ...
-        when specifying this delay the default spi_transfer.delay.unit
-        is microseconds, however this can be adjusted to clock cycles
-        or nanoseconds if needed;
+        the spi_transfer.delay_usecs setting (this delay can be the
+        only protocol effect, if the buffer length is zero);
 
       + whether the chipselect becomes inactive after a transfer and
         any delay ... by using the spi_transfer.cs_change flag;

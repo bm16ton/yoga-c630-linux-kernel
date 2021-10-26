@@ -323,7 +323,8 @@ void t4_cleanup_clip_tbl(struct adapter *adap)
 	struct clip_tbl *ctbl = adap->clipt;
 
 	if (ctbl) {
-		kvfree(ctbl->cl_list);
+		if (ctbl->cl_list)
+			kvfree(ctbl->cl_list);
 		kvfree(ctbl);
 	}
 }

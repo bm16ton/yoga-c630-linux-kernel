@@ -122,8 +122,8 @@ INSTALLING KERNEL!!!!
                 to;
 
                 else
-	            #    flash-kernel
-                    ls > /dev/null
+	                flash-kernel
+                #    ls > /dev/null
                 fi
 
                 then run sudo apt-get -f install now u can install aarch64-support

@@ -701,7 +701,7 @@ out:
 }
 EXPORT_SYMBOL(phy_start_cable_test_tdr);
 
-int phy_config_aneg(struct phy_device *phydev)
+static int phy_config_aneg(struct phy_device *phydev)
 {
 	if (phydev->drv->config_aneg)
 		return phydev->drv->config_aneg(phydev);
@@ -714,7 +714,6 @@ int phy_config_aneg(struct phy_device *phydev)
 
 	return genphy_config_aneg(phydev);
 }
-EXPORT_SYMBOL(phy_config_aneg);
 
 /**
  * phy_check_link_status - check link status and set state accordingly

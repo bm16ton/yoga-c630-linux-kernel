@@ -15,6 +15,6 @@
 
 void
 ODM_ReadAndConfig_MP_8723B_MAC_REG(/*  TC: Test Chip, MP: MP Chip */
-	struct dm_odm_t *pDM_Odm
+	PDM_ODM_T  pDM_Odm
 );
 #endif

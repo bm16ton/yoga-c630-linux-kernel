@@ -22,6 +22,7 @@
 #include <linux/mfd/syscon.h>
 #include <linux/module.h>
 #include <linux/of.h>
+#include <linux/platform_data/i2c-designware.h>
 #include <linux/platform_device.h>
 #include <linux/pm.h>
 #include <linux/pm_runtime.h>
@@ -205,6 +206,7 @@ static const struct dmi_system_id dw_i2c_hwmon_class_dmi[] = {
 
 static int dw_i2c_plat_probe(struct platform_device *pdev)
 {
+	struct dw_i2c_platform_data *pdata = dev_get_platdata(&pdev->dev);
 	struct i2c_adapter *adap;
 	struct dw_i2c_dev *dev;
 	struct i2c_timings *t;
@@ -234,7 +236,10 @@ static int dw_i2c_plat_probe(struct platform_device *pdev)
 	reset_control_deassert(dev->rst);
 
 	t = &dev->timings;
-	i2c_parse_fw_timings(&pdev->dev, t, false);
+	if (pdata)
+		t->bus_freq_hz = pdata->i2c_scl_freq;
+	else
+		i2c_parse_fw_timings(&pdev->dev, t, false);
 
 	i2c_dw_adjust_bus_speed(dev);
 

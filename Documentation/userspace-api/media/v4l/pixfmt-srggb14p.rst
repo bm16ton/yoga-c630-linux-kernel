@@ -36,11 +36,9 @@ Each cell is one byte.
 
 .. raw:: latex
 
-    \begingroup
     \footnotesize
-    \setlength{\tabcolsep}{2pt}
 
-.. tabularcolumns:: |p{1.6cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|p{3.5cm}|p{3.5cm}|
+.. tabularcolumns:: |p{1.8cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{3.3cm}|p{3.3cm}|p{3.3cm}|
 
 .. flat-table::
     :header-rows:  0
@@ -143,5 +141,5 @@ Each cell is one byte.
 
 .. raw:: latex
 
-    \endgroup
+    \normalsize
 

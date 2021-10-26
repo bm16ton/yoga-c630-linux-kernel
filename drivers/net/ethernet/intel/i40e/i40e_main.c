@@ -6,7 +6,6 @@
 #include <linux/pci.h>
 #include <linux/bpf.h>
 #include <generated/utsrelease.h>
-#include <linux/crash_dump.h>
 
 /* Local includes */
 #include "i40e.h"
@@ -2024,7 +2023,7 @@ static void i40e_undo_add_filter_entries(struct i40e_vsi *vsi,
 }
 
 /**
- * i40e_next_filter - Get the next non-broadcast filter from a list
+ * i40e_next_entry - Get the next non-broadcast filter from a list
  * @next: pointer to filter in list
  *
  * Returns the next non-broadcast filter in the list. Required so that we
@@ -4454,10 +4453,11 @@ int i40e_control_wait_tx_q(int seid, struct i40e_pf *pf, int pf_q,
 }
 
 /**
- * i40e_vsi_enable_tx - Start a VSI's rings
+ * i40e_vsi_control_tx - Start or stop a VSI's rings
  * @vsi: the VSI being configured
+ * @enable: start or stop the rings
  **/
-static int i40e_vsi_enable_tx(struct i40e_vsi *vsi)
+static int i40e_vsi_control_tx(struct i40e_vsi *vsi, bool enable)
 {
 	struct i40e_pf *pf = vsi->back;
 	int i, pf_q, ret = 0;
@@ -4466,7 +4466,7 @@ static int i40e_vsi_enable_tx(struct i40e_vsi *vsi)
 	for (i = 0; i < vsi->num_queue_pairs; i++, pf_q++) {
 		ret = i40e_control_wait_tx_q(vsi->seid, pf,
 					     pf_q,
-					     false /*is xdp*/, true);
+					     false /*is xdp*/, enable);
 		if (ret)
 			break;
 
@@ -4475,7 +4475,7 @@ static int i40e_vsi_enable_tx(struct i40e_vsi *vsi)
 
 		ret = i40e_control_wait_tx_q(vsi->seid, pf,
 					     pf_q + vsi->alloc_queue_pairs,
-					     true /*is xdp*/, true);
+					     true /*is xdp*/, enable);
 		if (ret)
 			break;
 	}
@@ -4573,24 +4573,31 @@ int i40e_control_wait_rx_q(struct i40e_pf *pf, int pf_q, bool enable)
 }
 
 /**
- * i40e_vsi_enable_rx - Start a VSI's rings
+ * i40e_vsi_control_rx - Start or stop a VSI's rings
  * @vsi: the VSI being configured
+ * @enable: start or stop the rings
  **/
-static int i40e_vsi_enable_rx(struct i40e_vsi *vsi)
+static int i40e_vsi_control_rx(struct i40e_vsi *vsi, bool enable)
 {
 	struct i40e_pf *pf = vsi->back;
 	int i, pf_q, ret = 0;
 
 	pf_q = vsi->base_queue;
 	for (i = 0; i < vsi->num_queue_pairs; i++, pf_q++) {
-		ret = i40e_control_wait_rx_q(pf, pf_q, true);
+		ret = i40e_control_wait_rx_q(pf, pf_q, enable);
 		if (ret) {
 			dev_info(&pf->pdev->dev,
-				 "VSI seid %d Rx ring %d enable timeout\n",
-				 vsi->seid, pf_q);
+				 "VSI seid %d Rx ring %d %sable timeout\n",
+				 vsi->seid, pf_q, (enable ? "en" : "dis"));
 			break;
 		}
 	}
+
+	/* Due to HW errata, on Rx disable only, the register can indicate done
+	 * before it really is. Needs 50ms to be sure
+	 */
+	if (!enable)
+		mdelay(50);
 
 	return ret;
 }
@@ -4604,15 +4611,13 @@ int i40e_vsi_start_rings(struct i40e_vsi *vsi)
 	int ret = 0;
 
 	/* do rx first for enable and last for disable */
-	ret = i40e_vsi_enable_rx(vsi);
+	ret = i40e_vsi_control_rx(vsi, true);
 	if (ret)
 		return ret;
-	ret = i40e_vsi_enable_tx(vsi);
+	ret = i40e_vsi_control_tx(vsi, true);
 
 	return ret;
 }
-
-#define I40E_DISABLE_TX_GAP_MSEC	50
 
 /**
  * i40e_vsi_stop_rings - Stop a VSI's rings
@@ -4620,31 +4625,15 @@ int i40e_vsi_start_rings(struct i40e_vsi *vsi)
  **/
 void i40e_vsi_stop_rings(struct i40e_vsi *vsi)
 {
-	struct i40e_pf *pf = vsi->back;
-	int pf_q, err, q_end;
-
 	/* When port TX is suspended, don't wait */
 	if (test_bit(__I40E_PORT_SUSPENDED, vsi->back->state))
 		return i40e_vsi_stop_rings_no_wait(vsi);
 
-	q_end = vsi->base_queue + vsi->num_queue_pairs;
-	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
-		i40e_pre_tx_queue_cfg(&pf->hw, (u32)pf_q, false);
-
-	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++) {
-		err = i40e_control_wait_rx_q(pf, pf_q, false);
-		if (err)
-			dev_info(&pf->pdev->dev,
-				 "VSI seid %d Rx ring %d dissable timeout\n",
-				 vsi->seid, pf_q);
-	}
-
-	msleep(I40E_DISABLE_TX_GAP_MSEC);
-	pf_q = vsi->base_queue;
-	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
-		wr32(&pf->hw, I40E_QTX_ENA(pf_q), 0);
-
-	i40e_vsi_wait_queues_disabled(vsi);
+	/* do rx first for enable and last for disable
+	 * Ignore return value, we need to shutdown whatever we can
+	 */
+	i40e_vsi_control_tx(vsi, false);
+	i40e_vsi_control_rx(vsi, false);
 }
 
 /**
@@ -5214,7 +5203,7 @@ static u8 i40e_pf_get_num_tc(struct i40e_pf *pf)
 }
 
 /**
- * i40e_pf_get_tc_map - Get bitmap for enabled traffic classes
+ * i40e_pf_get_pf_tc_map - Get bitmap for enabled traffic classes
  * @pf: PF being queried
  *
  * Return a bitmap for enabled traffic classes for this PF.
@@ -7290,8 +7279,6 @@ static int i40e_validate_mqprio_qopt(struct i40e_vsi *vsi,
 	}
 	if (vsi->num_queue_pairs <
 	    (mqprio_qopt->qopt.offset[i] + mqprio_qopt->qopt.count[i])) {
-		dev_err(&vsi->back->pdev->dev,
-			"Failed to create traffic channel, insufficient number of queues.\n");
 		return -EINVAL;
 	}
 	if (sum_max_rate > i40e_get_link_speed(vsi)) {
@@ -7317,7 +7304,7 @@ static void i40e_vsi_set_default_tc_config(struct i40e_vsi *vsi)
 	qcount = min_t(int, vsi->alloc_queue_pairs,
 		       i40e_pf_get_max_q_per_tc(vsi->back));
 	for (i = 0; i < I40E_MAX_TRAFFIC_CLASS; i++) {
-		/* For the TC that is not enabled set the offset to default
+		/* For the TC that is not enabled set the offset to to default
 		 * queue and allocate one queue for the given TC.
 		 */
 		vsi->tc_config.tc_info[i].qoffset = 0;
@@ -9447,7 +9434,7 @@ static void i40e_fdir_flush_and_replay(struct i40e_pf *pf)
 }
 
 /**
- * i40e_get_current_atr_cnt - Get the count of total FD ATR filters programmed
+ * i40e_get_current_atr_count - Get the count of total FD ATR filters programmed
  * @pf: board private structure
  **/
 u32 i40e_get_current_atr_cnt(struct i40e_pf *pf)
@@ -10604,7 +10591,7 @@ static void i40e_rebuild(struct i40e_pf *pf, bool reinit, bool lock_acquired)
 	 * need to rebuild the switch model in the HW.
 	 *
 	 * If there were VEBs but the reconstitution failed, we'll try
-	 * to recover minimal use by getting the basic PF VSI working.
+	 * try to recover minimal use by getting the basic PF VSI working.
 	 */
 	if (vsi->uplink_seid != pf->mac_seid) {
 		dev_dbg(&pf->pdev->dev, "attempting to rebuild switch\n");
@@ -11014,11 +11001,6 @@ static int i40e_set_num_rings_in_vsi(struct i40e_vsi *vsi)
 	default:
 		WARN_ON(1);
 		return -ENODATA;
-	}
-
-	if (is_kdump_kernel()) {
-		vsi->num_tx_desc = I40E_MIN_NUM_DESCRIPTORS;
-		vsi->num_rx_desc = I40E_MIN_NUM_DESCRIPTORS;
 	}
 
 	return 0;
@@ -13273,7 +13255,6 @@ static const struct net_device_ops i40e_netdev_ops = {
 	.ndo_poll_controller	= i40e_netpoll,
 #endif
 	.ndo_setup_tc		= __i40e_setup_tc,
-	.ndo_select_queue	= i40e_lan_select_queue,
 	.ndo_set_features	= i40e_set_features,
 	.ndo_set_vf_mac		= i40e_ndo_set_vf_mac,
 	.ndo_set_vf_vlan	= i40e_ndo_set_vf_port_vlan,
@@ -15332,13 +15313,8 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	i40e_check_recovery_mode(pf);
 
-	if (is_kdump_kernel()) {
-		hw->aq.num_arq_entries = I40E_MIN_ARQ_LEN;
-		hw->aq.num_asq_entries = I40E_MIN_ASQ_LEN;
-	} else {
-		hw->aq.num_arq_entries = I40E_AQ_LEN;
-		hw->aq.num_asq_entries = I40E_AQ_LEN;
-	}
+	hw->aq.num_arq_entries = I40E_AQ_LEN;
+	hw->aq.num_asq_entries = I40E_AQ_LEN;
 	hw->aq.arq_buf_size = I40E_MAX_AQ_BUF_SIZE;
 	hw->aq.asq_buf_size = I40E_MAX_AQ_BUF_SIZE;
 	pf->adminq_work_limit = I40E_AQ_WORK_LIMIT;
@@ -15500,14 +15476,6 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	err = i40e_init_interrupt_scheme(pf);
 	if (err)
 		goto err_switch_setup;
-
-	/* Reduce Tx and Rx pairs for kdump
-	 * When MSI-X is enabled, it's not allowed to use more TC queue
-	 * pairs than MSI-X vectors (pf->num_lan_msix) exist. Thus
-	 * vsi->num_queue_pairs will be equal to pf->num_lan_msix, i.e., 1.
-	 */
-	if (is_kdump_kernel())
-		pf->num_lan_msix = 1;
 
 	pf->udp_tunnel_nic.set_port = i40e_udp_tunnel_set_port;
 	pf->udp_tunnel_nic.unset_port = i40e_udp_tunnel_unset_port;

@@ -35,6 +35,7 @@ enum op_dest_type {
 	OP_DEST_MEM,
 	OP_DEST_PUSH,
 	OP_DEST_PUSHF,
+	OP_DEST_LEAVE,
 };
 
 struct op_dest {
@@ -84,9 +85,5 @@ unsigned long arch_dest_reloc_offset(int addend);
 const char *arch_nop_insn(int len);
 
 int arch_decode_hint_reg(struct instruction *insn, u8 sp_reg);
-
-bool arch_is_retpoline(struct symbol *sym);
-
-int arch_rewrite_retpolines(struct objtool_file *file);
 
 #endif /* _ARCH_H */

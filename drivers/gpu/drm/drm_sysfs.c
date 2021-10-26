@@ -156,8 +156,8 @@ static ssize_t status_show(struct device *device,
 
 	status = READ_ONCE(connector->status);
 
-	return sysfs_emit(buf, "%s\n",
-			  drm_get_connector_status_name(status));
+	return snprintf(buf, PAGE_SIZE, "%s\n",
+			drm_get_connector_status_name(status));
 }
 
 static ssize_t dpms_show(struct device *device,
@@ -169,7 +169,8 @@ static ssize_t dpms_show(struct device *device,
 
 	dpms = READ_ONCE(connector->dpms);
 
-	return sysfs_emit(buf, "%s\n", drm_get_dpms_name(dpms));
+	return snprintf(buf, PAGE_SIZE, "%s\n",
+			drm_get_dpms_name(dpms));
 }
 
 static ssize_t enabled_show(struct device *device,
@@ -181,7 +182,7 @@ static ssize_t enabled_show(struct device *device,
 
 	enabled = READ_ONCE(connector->encoder);
 
-	return sysfs_emit(buf, enabled ? "enabled\n" : "disabled\n");
+	return snprintf(buf, PAGE_SIZE, enabled ? "enabled\n" : "disabled\n");
 }
 
 static ssize_t edid_show(struct file *filp, struct kobject *kobj,

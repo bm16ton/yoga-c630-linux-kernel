@@ -47,10 +47,6 @@ struct hinge_state {
 	u64 timestamp;
 };
 
-static const u32 hinge_sensitivity_addresses[] = {
-	HID_USAGE_SENSOR_DATA_FIELD_CUSTOM_VALUE(1),
-};
-
 /* Channel definitions */
 static const struct iio_chan_spec hinge_channels[] = {
 	{
@@ -255,6 +251,18 @@ static int hinge_parse_report(struct platform_device *pdev,
 			&st->hinge[CHANNEL_SCAN_INDEX_HINGE_ANGLE],
 			&st->scale_pre_decml, &st->scale_post_decml);
 
+	/* Set Sensitivity field ids, when there is no individual modifier */
+	if (st->common_attributes.sensitivity.index < 0) {
+		sensor_hub_input_get_attribute_info(hsdev,
+				HID_FEATURE_REPORT, usage_id,
+				HID_USAGE_SENSOR_DATA_MOD_CHANGE_SENSITIVITY_ABS |
+					HID_USAGE_SENSOR_DATA_FIELD_CUSTOM_VALUE(1),
+				&st->common_attributes.sensitivity);
+		dev_dbg(&pdev->dev, "Sensitivity index:report %d:%d\n",
+			st->common_attributes.sensitivity.index,
+			st->common_attributes.sensitivity.report_id);
+	}
+
 	return ret;
 }
 
@@ -281,9 +289,7 @@ static int hid_hinge_probe(struct platform_device *pdev)
 		st->labels[i] = hinge_labels[i];
 
 	ret = hid_sensor_parse_common_attributes(hsdev, hsdev->usage,
-						 &st->common_attributes,
-						 hinge_sensitivity_addresses,
-						 ARRAY_SIZE(hinge_sensitivity_addresses));
+						 &st->common_attributes);
 	if (ret) {
 		dev_err(&pdev->dev, "failed to setup common attributes\n");
 		return ret;

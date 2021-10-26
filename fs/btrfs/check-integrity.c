@@ -1555,11 +1555,10 @@ static void btrfsic_release_block_ctx(struct btrfsic_block_data_ctx *block_ctx)
 		BUG_ON(!block_ctx->pagev);
 		num_pages = (block_ctx->len + (u64)PAGE_SIZE - 1) >>
 			    PAGE_SHIFT;
-		/* Pages must be unmapped in reverse order */
 		while (num_pages > 0) {
 			num_pages--;
 			if (block_ctx->datav[num_pages]) {
-				kunmap_local(block_ctx->datav[num_pages]);
+				kunmap(block_ctx->pagev[num_pages]);
 				block_ctx->datav[num_pages] = NULL;
 			}
 			if (block_ctx->pagev[num_pages]) {
@@ -1638,7 +1637,7 @@ static int btrfsic_read_block(struct btrfsic_state *state,
 		i = j;
 	}
 	for (i = 0; i < num_pages; i++)
-		block_ctx->datav[i] = kmap_local_page(block_ctx->pagev[i]);
+		block_ctx->datav[i] = kmap(block_ctx->pagev[i]);
 
 	return block_ctx->len;
 }
@@ -2678,7 +2677,7 @@ static void __btrfsic_submit_bio(struct bio *bio)
 	dev_state = btrfsic_dev_state_lookup(bio->bi_bdev->bd_dev);
 	if (NULL != dev_state &&
 	    (bio_op(bio) == REQ_OP_WRITE) && bio_has_data(bio)) {
-		int i = 0;
+		unsigned int i = 0;
 		u64 dev_bytenr;
 		u64 cur_bytenr;
 		struct bio_vec bvec;
@@ -2703,7 +2702,7 @@ static void __btrfsic_submit_bio(struct bio *bio)
 
 		bio_for_each_segment(bvec, bio, iter) {
 			BUG_ON(bvec.bv_len != PAGE_SIZE);
-			mapped_datav[i] = kmap_local_page(bvec.bv_page);
+			mapped_datav[i] = kmap(bvec.bv_page);
 			i++;
 
 			if (dev_state->state->print_mask &
@@ -2716,9 +2715,8 @@ static void __btrfsic_submit_bio(struct bio *bio)
 					      mapped_datav, segs,
 					      bio, &bio_is_patched,
 					      bio->bi_opf);
-		/* Unmap in reverse order */
-		for (--i; i >= 0; i--)
-			kunmap_local(mapped_datav[i]);
+		bio_for_each_segment(bvec, bio, iter)
+			kunmap(bvec.bv_page);
 		kfree(mapped_datav);
 	} else if (NULL != dev_state && (bio->bi_opf & REQ_PREFLUSH)) {
 		if (dev_state->state->print_mask &

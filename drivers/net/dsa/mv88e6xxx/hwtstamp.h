@@ -117,8 +117,8 @@ int mv88e6xxx_port_hwtstamp_get(struct dsa_switch *ds, int port,
 
 bool mv88e6xxx_port_rxtstamp(struct dsa_switch *ds, int port,
 			     struct sk_buff *clone, unsigned int type);
-void mv88e6xxx_port_txtstamp(struct dsa_switch *ds, int port,
-			     struct sk_buff *skb);
+bool mv88e6xxx_port_txtstamp(struct dsa_switch *ds, int port,
+			     struct sk_buff *clone, unsigned int type);
 
 int mv88e6xxx_get_ts_info(struct dsa_switch *ds, int port,
 			  struct ethtool_ts_info *info);
@@ -151,9 +151,11 @@ static inline bool mv88e6xxx_port_rxtstamp(struct dsa_switch *ds, int port,
 	return false;
 }
 
-static inline void mv88e6xxx_port_txtstamp(struct dsa_switch *ds, int port,
-					   struct sk_buff *skb)
+static inline bool mv88e6xxx_port_txtstamp(struct dsa_switch *ds, int port,
+					   struct sk_buff *clone,
+					   unsigned int type)
 {
+	return false;
 }
 
 static inline int mv88e6xxx_get_ts_info(struct dsa_switch *ds, int port,

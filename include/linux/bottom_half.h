@@ -4,7 +4,7 @@
 
 #include <linux/preempt.h>
 
-#if defined(CONFIG_PREEMPT_RT) || defined(CONFIG_TRACE_IRQFLAGS)
+#ifdef CONFIG_TRACE_IRQFLAGS
 extern void __local_bh_disable_ip(unsigned long ip, unsigned int cnt);
 #else
 static __always_inline void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
@@ -31,11 +31,5 @@ static inline void local_bh_enable(void)
 {
 	__local_bh_enable_ip(_THIS_IP_, SOFTIRQ_DISABLE_OFFSET);
 }
-
-#ifdef CONFIG_PREEMPT_RT
-extern bool local_bh_blocked(void);
-#else
-static inline bool local_bh_blocked(void) { return false; }
-#endif
 
 #endif /* _LINUX_BH_H */

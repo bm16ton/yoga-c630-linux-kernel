@@ -42,14 +42,6 @@
  */
 
 
-#define pr_fmt(fmt) "[TTM] " fmt
-
-#include <linux/list.h>
-#include <linux/spinlock.h>
-#include <linux/slab.h>
-#include <linux/atomic.h>
-#include "ttm_object.h"
-
 /**
  * struct ttm_object_file
  *
@@ -63,9 +55,16 @@
  *
  * @ref_hash: Hash tables of ref objects, one per ttm_ref_type,
  * for fast lookup of ref objects given a base object.
- *
- * @refcount: reference/usage count
  */
+
+#define pr_fmt(fmt) "[TTM] " fmt
+
+#include <linux/list.h>
+#include <linux/spinlock.h>
+#include <linux/slab.h>
+#include <linux/atomic.h>
+#include "ttm_object.h"
+
 struct ttm_object_file {
 	struct ttm_object_device *tdev;
 	spinlock_t lock;
@@ -74,7 +73,7 @@ struct ttm_object_file {
 	struct kref refcount;
 };
 
-/*
+/**
  * struct ttm_object_device
  *
  * @object_lock: lock that protects the object_hash hash table.
@@ -97,7 +96,7 @@ struct ttm_object_device {
 	struct idr idr;
 };
 
-/*
+/**
  * struct ttm_ref_object
  *
  * @hash: Hash entry for the per-file object reference hash.
@@ -569,7 +568,7 @@ void ttm_object_device_release(struct ttm_object_device **p_tdev)
 /**
  * get_dma_buf_unless_doomed - get a dma_buf reference if possible.
  *
- * @dmabuf: Non-refcounted pointer to a struct dma-buf.
+ * @dma_buf: Non-refcounted pointer to a struct dma-buf.
  *
  * Obtain a file reference from a lookup structure that doesn't refcount
  * the file, but synchronizes with its release method to make sure it has

@@ -48,7 +48,7 @@ static const struct usb_device_id rtw_usb_id_tbl[] = {
 
 MODULE_DEVICE_TABLE(usb, rtw_usb_id_tbl);
 
-static int usb_dvobj_init(struct usb_interface *usb_intf)
+static struct dvobj_priv *usb_dvobj_init(struct usb_interface *usb_intf)
 {
 	int	i;
 	struct dvobj_priv *pdvobjpriv;
@@ -61,7 +61,7 @@ static int usb_dvobj_init(struct usb_interface *usb_intf)
 
 	pdvobjpriv = kzalloc(sizeof(*pdvobjpriv), GFP_KERNEL);
 	if (!pdvobjpriv)
-		return -ENOMEM;
+		return NULL;
 
 	pdvobjpriv->pusbintf = usb_intf;
 	pusbd = interface_to_usbdev(usb_intf);
@@ -108,7 +108,7 @@ static int usb_dvobj_init(struct usb_interface *usb_intf)
 	mutex_init(&pdvobjpriv->usb_vendor_req_mutex);
 	usb_get_dev(pusbd);
 
-	return 0;
+	return pdvobjpriv;
 }
 
 static void usb_dvobj_deinit(struct usb_interface *usb_intf)
@@ -322,25 +322,29 @@ static int rtw_resume(struct usb_interface *pusb_intf)
  *        We accept the new device by returning 0.
  */
 
-static int rtw_usb_if1_init(struct usb_interface *pusb_intf)
+static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
+					struct usb_interface *pusb_intf,
+					const struct usb_device_id *pdid)
 {
-	struct dvobj_priv *dvobj = usb_get_intfdata(pusb_intf);
-	struct adapter *padapter;
-	struct net_device *pnetdev;
+	struct adapter *padapter = NULL;
+	struct net_device *pnetdev = NULL;
 	struct net_device *pmondev;
-	int err = 0;
+	int status = _FAIL;
 
-	pnetdev = rtw_init_netdev();
-	if (!pnetdev)
-		return -ENOMEM;
-	SET_NETDEV_DEV(pnetdev, dvobj_to_dev(dvobj));
-
-	padapter = netdev_priv(pnetdev);
+	padapter = vzalloc(sizeof(*padapter));
+	if (!padapter)
+		goto exit;
 	padapter->dvobj = dvobj;
 	dvobj->if1 = padapter;
 
 	padapter->bDriverStopped = true;
 	mutex_init(&padapter->hw_init_mutex);
+
+	pnetdev = rtw_init_netdev(padapter);
+	if (!pnetdev)
+		goto free_adapter;
+	SET_NETDEV_DEV(pnetdev, dvobj_to_dev(dvobj));
+	padapter = rtw_netdev_priv(pnetdev);
 
 	if (padapter->registrypriv.monitor_enable) {
 		pmondev = rtl88eu_mon_init();
@@ -352,7 +356,6 @@ static int rtw_usb_if1_init(struct usb_interface *pusb_intf)
 	padapter->HalData = kzalloc(sizeof(struct hal_data_8188e), GFP_KERNEL);
 	if (!padapter->HalData) {
 		DBG_88E("Failed to allocate memory for HAL data\n");
-		err = -ENOMEM;
 		goto free_adapter;
 	}
 
@@ -369,7 +372,6 @@ static int rtw_usb_if1_init(struct usb_interface *pusb_intf)
 	if (rtw_init_drv_sw(padapter) == _FAIL) {
 		RT_TRACE(_module_hci_intfs_c_, _drv_err_,
 			 ("Initialize driver software resource Failed!\n"));
-		err = -ENOMEM;
 		goto free_hal_data;
 	}
 
@@ -378,6 +380,7 @@ static int rtw_usb_if1_init(struct usb_interface *pusb_intf)
 		dvobj->pusbdev->do_remote_wakeup = 1;
 		pusb_intf->needs_remote_wakeup = 1;
 		device_init_wakeup(&pusb_intf->dev, 1);
+		pr_debug("\n  padapter->pwrctrlpriv.bSupportRemoteWakeup~~~~~~\n");
 		pr_debug("\n  padapter->pwrctrlpriv.bSupportRemoteWakeup~~~[%d]~~~\n",
 			 device_may_wakeup(&pusb_intf->dev));
 	}
@@ -399,8 +402,7 @@ static int rtw_usb_if1_init(struct usb_interface *pusb_intf)
 		 pnetdev->dev_addr);
 
 	/* step 6. Tell the network stack we exist */
-	err = register_netdev(pnetdev);
-	if (err) {
+	if (register_netdev(pnetdev) != 0) {
 		RT_TRACE(_module_hci_intfs_c_, _drv_err_, ("register_netdev() failed\n"));
 		goto free_hal_data;
 	}
@@ -412,13 +414,21 @@ static int rtw_usb_if1_init(struct usb_interface *pusb_intf)
 		, padapter->hw_init_completed
 	);
 
-	return 0;
+	status = _SUCCESS;
 
 free_hal_data:
-	kfree(padapter->HalData);
+	if (status != _SUCCESS)
+		kfree(padapter->HalData);
 free_adapter:
-	free_netdev(pnetdev);
-	return err;
+	if (status != _SUCCESS) {
+		if (pnetdev)
+			rtw_free_netdev(pnetdev);
+		else
+			vfree(padapter);
+		padapter = NULL;
+	}
+exit:
+	return padapter;
 }
 
 static void rtw_usb_if1_deinit(struct adapter *if1)
@@ -443,28 +453,34 @@ static void rtw_usb_if1_deinit(struct adapter *if1)
 	pr_debug("+r871xu_dev_remove, hw_init_completed=%d\n",
 		 if1->hw_init_completed);
 	rtw_free_drv_sw(if1);
-	if (pnetdev)
-		free_netdev(pnetdev);
+	rtw_free_netdev(pnetdev);
 }
 
 static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *pdid)
 {
-	int err;
+	struct adapter *if1 = NULL;
+	struct dvobj_priv *dvobj;
 
-	err = usb_dvobj_init(pusb_intf);
-	if (err) {
-		pr_debug("usb_dvobj_init failed\n");
-		return err;
+	/* Initialize dvobj_priv */
+	dvobj = usb_dvobj_init(pusb_intf);
+	if (!dvobj) {
+		RT_TRACE(_module_hci_intfs_c_, _drv_err_,
+			 ("initialize device object priv Failed!\n"));
+		goto exit;
 	}
 
-	err = rtw_usb_if1_init(pusb_intf);
-	if (err) {
-		pr_debug("rtw_usb_if1_init failed\n");
-		usb_dvobj_deinit(pusb_intf);
-		return err;
+	if1 = rtw_usb_if1_init(dvobj, pusb_intf, pdid);
+	if (!if1) {
+		pr_debug("rtw_init_primarystruct adapter Failed!\n");
+		goto free_dvobj;
 	}
 
 	return 0;
+
+free_dvobj:
+	usb_dvobj_deinit(pusb_intf);
+exit:
+	return -ENODEV;
 }
 
 /*

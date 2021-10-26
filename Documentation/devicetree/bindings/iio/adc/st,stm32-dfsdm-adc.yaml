@@ -102,6 +102,7 @@ patternProperties:
 
       st,adc-channel-names:
         description: List of single-ended channel names.
+        $ref: /schemas/types.yaml#/definitions/string-array
 
       st,filter-order:
         description: |

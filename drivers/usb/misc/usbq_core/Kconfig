@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-2.0
+#
+# USBQ_CORE device configuration
+#
+
+config UBQ_CORE
+	tristate "UBQ_CORE usb hack tool"
+	help
+	  This driver used with the usbq userland apps helps hack
+	  usb devices in various ways
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called ubq_core.
+
+

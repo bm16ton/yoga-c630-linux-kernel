@@ -32,6 +32,7 @@
 #include <linux/dma-buf.h>
 
 #include <drm/amdgpu_drm.h>
+#include <drm/drm_debugfs.h>
 #include <drm/drm_gem_ttm_helper.h>
 
 #include "amdgpu.h"
@@ -58,7 +59,6 @@ int amdgpu_gem_object_create(struct amdgpu_device *adev, unsigned long size,
 			     struct drm_gem_object **obj)
 {
 	struct amdgpu_bo *bo;
-	struct amdgpu_bo_user *ubo;
 	struct amdgpu_bo_param bp;
 	int r;
 
@@ -72,13 +72,10 @@ int amdgpu_gem_object_create(struct amdgpu_device *adev, unsigned long size,
 	bp.preferred_domain = initial_domain;
 	bp.flags = flags;
 	bp.domain = initial_domain;
-	bp.bo_ptr_size = sizeof(struct amdgpu_bo);
-
-	r = amdgpu_bo_create_user(adev, &bp, &ubo);
+	r = amdgpu_bo_create(adev, &bp, &bo);
 	if (r)
 		return r;
 
-	bo = &ubo->bo;
 	*obj = &bo->tbo.base;
 	(*obj)->funcs = &amdgpu_gem_object_funcs;
 
@@ -858,10 +855,10 @@ int amdgpu_mode_dumb_create(struct drm_file *file_priv,
 }
 
 #if defined(CONFIG_DEBUG_FS)
-static int amdgpu_debugfs_gem_info_show(struct seq_file *m, void *unused)
+static int amdgpu_debugfs_gem_info(struct seq_file *m, void *data)
 {
-	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
-	struct drm_device *dev = adev_to_drm(adev);
+	struct drm_info_node *node = (struct drm_info_node *)m->private;
+	struct drm_device *dev = node->minor->dev;
 	struct drm_file *file;
 	int r;
 
@@ -899,17 +896,16 @@ static int amdgpu_debugfs_gem_info_show(struct seq_file *m, void *unused)
 	return 0;
 }
 
-DEFINE_SHOW_ATTRIBUTE(amdgpu_debugfs_gem_info);
-
+static const struct drm_info_list amdgpu_debugfs_gem_list[] = {
+	{"amdgpu_gem_info", &amdgpu_debugfs_gem_info, 0, NULL},
+};
 #endif
 
-void amdgpu_debugfs_gem_init(struct amdgpu_device *adev)
+int amdgpu_debugfs_gem_init(struct amdgpu_device *adev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	struct drm_minor *minor = adev_to_drm(adev)->primary;
-	struct dentry *root = minor->debugfs_root;
-
-	debugfs_create_file("amdgpu_gem_info", 0444, root, adev,
-			    &amdgpu_debugfs_gem_info_fops);
+	return amdgpu_debugfs_add_files(adev, amdgpu_debugfs_gem_list,
+					ARRAY_SIZE(amdgpu_debugfs_gem_list));
 #endif
+	return 0;
 }

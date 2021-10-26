@@ -160,9 +160,11 @@ static void s390_cpumcfdg_dump(struct perf_sample *sample)
 	const char *color = PERF_COLOR_BLUE;
 	struct cf_ctrset_entry *cep, ce;
 	struct pmu_events_map *map;
+	struct perf_pmu pmu;
 	u64 *p;
 
-	map = pmu_events_map__find();
+	memset(&pmu, 0, sizeof(pmu));
+	map = perf_pmu__find_map(&pmu);
 	while (offset < len) {
 		cep = (struct cf_ctrset_entry *)(buf + offset);
 

@@ -173,6 +173,7 @@ extern int ldsem_down_write_nested(struct ld_semaphore *sem, int subclass,
 
 
 struct tty_ldisc_ops {
+	int	magic;
 	char	*name;
 	int	num;
 	int	flags;
@@ -216,6 +217,8 @@ struct tty_ldisc {
 	struct tty_ldisc_ops *ops;
 	struct tty_struct *tty;
 };
+
+#define TTY_LDISC_MAGIC	0x5403
 
 #define LDISC_FLAG_DEFINED	0x00000001
 

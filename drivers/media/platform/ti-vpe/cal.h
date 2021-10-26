@@ -84,34 +84,35 @@ struct cal_buffer {
 
 /**
  * struct cal_dmaqueue - Queue of DMA buffers
+ * @active: Buffer being DMA'ed to for the current frame
  */
 struct cal_dmaqueue {
 	/**
-	 * @lock: Protects all fields in the cal_dmaqueue.
+	 * Protects all fields in the cal_dmaqueue.
 	 */
 	spinlock_t		lock;
 
 	/**
-	 * @queue: Buffers queued to the driver and waiting for DMA processing.
+	 * Buffers queued to the driver and waiting for DMA processing.
 	 * Buffers are added to the list by the vb2 .buffer_queue() operation,
 	 * and move to @pending when they are scheduled for the next frame.
 	 */
 	struct list_head	queue;
 	/**
-	 * @pending: Buffer provided to the hardware to DMA the next frame.
-	 * Will move to @active at the end of the current frame.
+	 * Buffer provided to the hardware to DMA the next frame. Will move to
+	 * @active at the end of the current frame.
 	 */
 	struct cal_buffer	*pending;
 	/**
-	 * @active: Buffer being DMA'ed to for the current frame. Will be
-	 * retired and given back to vb2 at the end of the current frame if
-	 * a @pending buffer has been scheduled to replace it.
+	 * Buffer being DMA'ed to for the current frame. Will be retired and
+	 * given back to vb2 at the end of the current frame if a @pending
+	 * buffer has been scheduled to replace it.
 	 */
 	struct cal_buffer	*active;
 
-	/** @state: State of the DMA engine. */
+	/** State of the DMA engine. */
 	enum cal_dma_state	state;
-	/** @wait: Wait queue to signal a @state transition to CAL_DMA_STOPPED. */
+	/** Wait queue to signal a @state transition to CAL_DMA_STOPPED. */
 	struct wait_queue_head	wait;
 };
 
@@ -159,7 +160,6 @@ struct cal_camerarx {
 	struct device_node	*sensor_ep_node;
 	struct device_node	*sensor_node;
 	struct v4l2_subdev	*sensor;
-	struct media_pipeline	pipe;
 
 	struct v4l2_subdev	subdev;
 	struct media_pad	pads[2];
@@ -224,7 +224,6 @@ struct cal_ctx {
 
 extern unsigned int cal_debug;
 extern int cal_video_nr;
-extern bool cal_mc_api;
 
 #define cal_dbg(level, cal, fmt, arg...)				\
 	do {								\

@@ -320,7 +320,7 @@ static int wcnss_stop(struct rproc *rproc)
 	return ret;
 }
 
-static void *wcnss_da_to_va(struct rproc *rproc, u64 da, size_t len, bool *is_iomem)
+static void *wcnss_da_to_va(struct rproc *rproc, u64 da, size_t len)
 {
 	struct qcom_wcnss *wcnss = (struct qcom_wcnss *)rproc->priv;
 	int offset;
@@ -530,7 +530,6 @@ static int wcnss_alloc_memory_region(struct qcom_wcnss *wcnss)
 
 static int wcnss_probe(struct platform_device *pdev)
 {
-	const char *fw_name = WCNSS_FIRMWARE_NAME;
 	const struct wcnss_data *data;
 	struct qcom_wcnss *wcnss;
 	struct resource *res;
@@ -548,13 +547,8 @@ static int wcnss_probe(struct platform_device *pdev)
 		return -ENXIO;
 	}
 
-	ret = of_property_read_string(pdev->dev.of_node, "firmware-name",
-				      &fw_name);
-	if (ret < 0 && ret != -EINVAL)
-		return ret;
-
 	rproc = rproc_alloc(&pdev->dev, pdev->name, &wcnss_ops,
-			    fw_name, sizeof(*wcnss));
+			    WCNSS_FIRMWARE_NAME, sizeof(*wcnss));
 	if (!rproc) {
 		dev_err(&pdev->dev, "unable to allocate remoteproc\n");
 		return -ENOMEM;

@@ -41,6 +41,7 @@
 #define RT2880_PCI_REG_ARBCTL		0x80
 
 static void __iomem *rt2880_pci_base;
+static DEFINE_SPINLOCK(rt2880_pci_lock);
 
 static u32 rt2880_pci_reg_read(u32 reg)
 {
@@ -62,14 +63,17 @@ static inline u32 rt2880_pci_get_cfgaddr(unsigned int bus, unsigned int slot,
 static int rt2880_pci_config_read(struct pci_bus *bus, unsigned int devfn,
 				  int where, int size, u32 *val)
 {
+	unsigned long flags;
 	u32 address;
 	u32 data;
 
 	address = rt2880_pci_get_cfgaddr(bus->number, PCI_SLOT(devfn),
 					 PCI_FUNC(devfn), where);
 
+	spin_lock_irqsave(&rt2880_pci_lock, flags);
 	rt2880_pci_reg_write(address, RT2880_PCI_REG_CONFIG_ADDR);
 	data = rt2880_pci_reg_read(RT2880_PCI_REG_CONFIG_DATA);
+	spin_unlock_irqrestore(&rt2880_pci_lock, flags);
 
 	switch (size) {
 	case 1:
@@ -89,12 +93,14 @@ static int rt2880_pci_config_read(struct pci_bus *bus, unsigned int devfn,
 static int rt2880_pci_config_write(struct pci_bus *bus, unsigned int devfn,
 				   int where, int size, u32 val)
 {
+	unsigned long flags;
 	u32 address;
 	u32 data;
 
 	address = rt2880_pci_get_cfgaddr(bus->number, PCI_SLOT(devfn),
 					 PCI_FUNC(devfn), where);
 
+	spin_lock_irqsave(&rt2880_pci_lock, flags);
 	rt2880_pci_reg_write(address, RT2880_PCI_REG_CONFIG_ADDR);
 	data = rt2880_pci_reg_read(RT2880_PCI_REG_CONFIG_DATA);
 
@@ -113,6 +119,7 @@ static int rt2880_pci_config_write(struct pci_bus *bus, unsigned int devfn,
 	}
 
 	rt2880_pci_reg_write(data, RT2880_PCI_REG_CONFIG_DATA);
+	spin_unlock_irqrestore(&rt2880_pci_lock, flags);
 
 	return PCIBIOS_SUCCESSFUL;
 }
@@ -144,25 +151,31 @@ static struct pci_controller rt2880_pci_controller = {
 
 static inline u32 rt2880_pci_read_u32(unsigned long reg)
 {
+	unsigned long flags;
 	u32 address;
 	u32 ret;
 
 	address = rt2880_pci_get_cfgaddr(0, 0, 0, reg);
 
+	spin_lock_irqsave(&rt2880_pci_lock, flags);
 	rt2880_pci_reg_write(address, RT2880_PCI_REG_CONFIG_ADDR);
 	ret = rt2880_pci_reg_read(RT2880_PCI_REG_CONFIG_DATA);
+	spin_unlock_irqrestore(&rt2880_pci_lock, flags);
 
 	return ret;
 }
 
 static inline void rt2880_pci_write_u32(unsigned long reg, u32 val)
 {
+	unsigned long flags;
 	u32 address;
 
 	address = rt2880_pci_get_cfgaddr(0, 0, 0, reg);
 
+	spin_lock_irqsave(&rt2880_pci_lock, flags);
 	rt2880_pci_reg_write(address, RT2880_PCI_REG_CONFIG_ADDR);
 	rt2880_pci_reg_write(val, RT2880_PCI_REG_CONFIG_DATA);
+	spin_unlock_irqrestore(&rt2880_pci_lock, flags);
 }
 
 int pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)

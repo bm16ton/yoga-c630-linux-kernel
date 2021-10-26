@@ -19,8 +19,12 @@ variant-y := $(patsubst "%",%,$(CONFIG_XTENSA_VARIANT_NAME))
 VARIANT = $(variant-y)
 export VARIANT
 
+# Test for cross compiling
+
 ifneq ($(VARIANT),)
-  ifdef cross_compiling
+  COMPILE_ARCH = $(shell uname -m)
+
+  ifneq ($(COMPILE_ARCH), xtensa)
     ifndef CROSS_COMPILE
       CROSS_COMPILE = xtensa_$(VARIANT)-
     endif
@@ -48,7 +52,14 @@ ifneq ($(CONFIG_LD_NO_RELAX),)
 KBUILD_LDFLAGS := --no-relax
 endif
 
-CHECKFLAGS += -D$(if $(CONFIG_CPU_BIG_ENDIAN),__XTENSA_EB__,__XTENSA_EL__)
+ifeq ($(shell echo __XTENSA_EB__ | $(CC) -E - | grep -v "\#"),1)
+CHECKFLAGS += -D__XTENSA_EB__
+KBUILD_CPPFLAGS += -DCONFIG_CPU_BIG_ENDIAN
+endif
+ifeq ($(shell echo __XTENSA_EL__ | $(CC) -E - | grep -v "\#"),1)
+CHECKFLAGS += -D__XTENSA_EL__
+KBUILD_CPPFLAGS += -DCONFIG_CPU_LITTLE_ENDIAN
+endif
 
 vardirs := $(patsubst %,arch/xtensa/variants/%/,$(variant-y))
 plfdirs := $(patsubst %,arch/xtensa/platforms/%/,$(platform-y))

@@ -20,11 +20,12 @@
 /* Set us up with the realtime metadata locked. */
 int
 xchk_setup_rt(
-	struct xfs_scrub	*sc)
+	struct xfs_scrub	*sc,
+	struct xfs_inode	*ip)
 {
 	int			error;
 
-	error = xchk_setup_fs(sc);
+	error = xchk_setup_fs(sc, ip);
 	if (error)
 		return error;
 
@@ -99,7 +100,7 @@ xchk_rtbitmap(
 	int			error;
 
 	/* Is the size of the rtbitmap correct? */
-	if (sc->mp->m_rbmip->i_disk_size !=
+	if (sc->mp->m_rbmip->i_d.di_size !=
 	    XFS_FSB_TO_B(sc->mp, sc->mp->m_sb.sb_rbmblocks)) {
 		xchk_ino_set_corrupt(sc, sc->mp->m_rbmip->i_ino);
 		return 0;

@@ -159,7 +159,7 @@ struct rk_nfc_nand_chip {
 	u32 timing;
 
 	u8 nsels;
-	u8 sels[];
+	u8 sels[0];
 	/* Nothing after this field. */
 };
 

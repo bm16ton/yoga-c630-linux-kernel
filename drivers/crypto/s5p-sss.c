@@ -20,7 +20,6 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/of.h>
-#include <linux/of_device.h>
 #include <linux/platform_device.h>
 #include <linux/scatterlist.h>
 
@@ -402,7 +401,7 @@ static const struct samsung_aes_variant exynos_aes_data = {
 static const struct samsung_aes_variant exynos5433_slim_aes_data = {
 	.aes_offset	= 0x400,
 	.hash_offset	= 0x800,
-	.clk_names	= { "aclk", "pclk", },
+	.clk_names	= { "pclk", "aclk", },
 };
 
 static const struct of_device_id s5p_sss_dt_match[] = {
@@ -425,9 +424,13 @@ MODULE_DEVICE_TABLE(of, s5p_sss_dt_match);
 static inline const struct samsung_aes_variant *find_s5p_sss_version
 				   (const struct platform_device *pdev)
 {
-	if (IS_ENABLED(CONFIG_OF) && (pdev->dev.of_node))
-		return of_device_get_match_data(&pdev->dev);
+	if (IS_ENABLED(CONFIG_OF) && (pdev->dev.of_node)) {
+		const struct of_device_id *match;
 
+		match = of_match_node(s5p_sss_dt_match,
+					pdev->dev.of_node);
+		return (const struct samsung_aes_variant *)match->data;
+	}
 	return (const struct samsung_aes_variant *)
 			platform_get_device_id(pdev)->driver_data;
 }
@@ -2156,7 +2159,7 @@ static struct skcipher_alg algs[] = {
 static int s5p_aes_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
-	int i, j, err;
+	int i, j, err = -ENODEV;
 	const struct samsung_aes_variant *variant;
 	struct s5p_aes_dev *pdata;
 	struct resource *res;
@@ -2186,14 +2189,14 @@ static int s5p_aes_probe(struct platform_device *pdev)
 	}
 
 	pdata->res = res;
-	pdata->ioaddr = devm_ioremap_resource(dev, res);
+	pdata->ioaddr = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(pdata->ioaddr)) {
 		if (!pdata->use_hash)
 			return PTR_ERR(pdata->ioaddr);
 		/* try AES without HASH */
 		res->end -= 0x300;
 		pdata->use_hash = false;
-		pdata->ioaddr = devm_ioremap_resource(dev, res);
+		pdata->ioaddr = devm_ioremap_resource(&pdev->dev, res);
 		if (IS_ERR(pdata->ioaddr))
 			return PTR_ERR(pdata->ioaddr);
 	}

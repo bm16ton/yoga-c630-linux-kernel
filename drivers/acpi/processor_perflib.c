@@ -23,6 +23,8 @@
 #define PREFIX "ACPI: "
 
 #define ACPI_PROCESSOR_FILE_PERFORMANCE	"performance"
+#define _COMPONENT		ACPI_PROCESSOR_COMPONENT
+ACPI_MODULE_NAME("processor_perflib");
 
 static DEFINE_MUTEX(performance_mutex);
 
@@ -63,13 +65,13 @@ static int acpi_processor_get_platform_limit(struct acpi_processor *pr)
 	 * (e.g. 0 = states 0..n; 1 = states 1..n; etc.
 	 */
 	status = acpi_evaluate_integer(pr->handle, "_PPC", NULL, &ppc);
-	if (status != AE_NOT_FOUND) {
+
+	if (status != AE_NOT_FOUND)
 		acpi_processor_ppc_in_use = true;
 
-		if (ACPI_FAILURE(status)) {
-			acpi_evaluation_failure_warn(pr->handle, "_PPC", status);
-			return -ENODEV;
-		}
+	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
+		ACPI_EXCEPTION((AE_INFO, status, "Evaluating _PPC"));
+		return -ENODEV;
 	}
 
 	pr_debug("CPU %d: _PPC is %d - frequency %s limited\n", pr->id,
@@ -96,7 +98,7 @@ static int acpi_processor_get_platform_limit(struct acpi_processor *pr)
  * acpi_processor_ppc_ost: Notify firmware the _PPC evaluation status
  * @handle: ACPI processor handle
  * @status: the status code of _PPC evaluation
- *	0: success. OSPM is now using the performance state specified.
+ *	0: success. OSPM is now using the performance state specificed.
  *	1: failure. OSPM has not changed the number of P-states in use
  */
 static void acpi_processor_ppc_ost(acpi_handle handle, int status)
@@ -197,7 +199,7 @@ static int acpi_processor_get_performance_control(struct acpi_processor *pr)
 
 	status = acpi_evaluate_object(pr->handle, "_PCT", NULL, &buffer);
 	if (ACPI_FAILURE(status)) {
-		acpi_evaluation_failure_warn(pr->handle, "_PCT", status);
+		ACPI_EXCEPTION((AE_INFO, status, "Evaluating _PCT"));
 		return -ENODEV;
 	}
 
@@ -297,7 +299,7 @@ static int acpi_processor_get_performance_states(struct acpi_processor *pr)
 
 	status = acpi_evaluate_object(pr->handle, "_PSS", NULL, &buffer);
 	if (ACPI_FAILURE(status)) {
-		acpi_evaluation_failure_warn(pr->handle, "_PSS", status);
+		ACPI_EXCEPTION((AE_INFO, status, "Evaluating _PSS"));
 		return -ENODEV;
 	}
 
@@ -308,8 +310,8 @@ static int acpi_processor_get_performance_states(struct acpi_processor *pr)
 		goto end;
 	}
 
-	acpi_handle_debug(pr->handle, "Found %d performance states\n",
-			  pss->package.count);
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Found %d performance states\n",
+			  pss->package.count));
 
 	pr->performance->state_count = pss->package.count;
 	pr->performance->states =
@@ -328,13 +330,12 @@ static int acpi_processor_get_performance_states(struct acpi_processor *pr)
 		state.length = sizeof(struct acpi_processor_px);
 		state.pointer = px;
 
-		acpi_handle_debug(pr->handle, "Extracting state %d\n", i);
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "Extracting state %d\n", i));
 
 		status = acpi_extract_package(&(pss->package.elements[i]),
 					      &format, &state);
 		if (ACPI_FAILURE(status)) {
-			acpi_handle_warn(pr->handle, "Invalid _PSS data: %s\n",
-					 acpi_format_exception(status));
+			ACPI_EXCEPTION((AE_INFO, status, "Invalid _PSS data"));
 			result = -EFAULT;
 			kfree(pr->performance->states);
 			goto end;
@@ -342,14 +343,14 @@ static int acpi_processor_get_performance_states(struct acpi_processor *pr)
 
 		amd_fixup_frequency(px, i);
 
-		acpi_handle_debug(pr->handle,
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
 				  "State [%d]: core_frequency[%d] power[%d] transition_latency[%d] bus_master_latency[%d] control[0x%x] status[0x%x]\n",
 				  i,
 				  (u32) px->core_frequency,
 				  (u32) px->power,
 				  (u32) px->transition_latency,
 				  (u32) px->bus_master_latency,
-				  (u32) px->control, (u32) px->status);
+				  (u32) px->control, (u32) px->status));
 
 		/*
 		 * Check that ACPI's u64 MHz will be valid as u32 KHz in cpufreq
@@ -399,8 +400,8 @@ int acpi_processor_get_performance_info(struct acpi_processor *pr)
 		return -EINVAL;
 
 	if (!acpi_has_method(pr->handle, "_PCT")) {
-		acpi_handle_debug(pr->handle,
-				  "ACPI-based processor performance control unavailable\n");
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO,
+				  "ACPI-based processor performance control unavailable\n"));
 		return -ENODEV;
 	}
 
@@ -441,23 +442,24 @@ int acpi_processor_pstate_control(void)
 	if (!acpi_gbl_FADT.smi_command || !acpi_gbl_FADT.pstate_control)
 		return 0;
 
-	pr_debug("Writing pstate_control [0x%x] to smi_command [0x%x]\n",
-		 acpi_gbl_FADT.pstate_control, acpi_gbl_FADT.smi_command);
+	ACPI_DEBUG_PRINT((ACPI_DB_INFO,
+			  "Writing pstate_control [0x%x] to smi_command [0x%x]\n",
+			  acpi_gbl_FADT.pstate_control, acpi_gbl_FADT.smi_command));
 
 	status = acpi_os_write_port(acpi_gbl_FADT.smi_command,
 				    (u32)acpi_gbl_FADT.pstate_control, 8);
 	if (ACPI_SUCCESS(status))
 		return 1;
 
-	pr_warn("Failed to write pstate_control [0x%x] to smi_command [0x%x]: %s\n",
-		acpi_gbl_FADT.pstate_control, acpi_gbl_FADT.smi_command,
-		acpi_format_exception(status));
+	ACPI_EXCEPTION((AE_INFO, status,
+			"Failed to write pstate_control [0x%x] to smi_command [0x%x]",
+			acpi_gbl_FADT.pstate_control, acpi_gbl_FADT.smi_command));
 	return -EIO;
 }
 
 int acpi_processor_notify_smm(struct module *calling_module)
 {
-	static int is_done;
+	static int is_done = 0;
 	int result;
 
 	if (!acpi_processor_cpufreq_init)
@@ -483,7 +485,7 @@ int acpi_processor_notify_smm(struct module *calling_module)
 
 	result = acpi_processor_pstate_control();
 	if (!result) {
-		pr_debug("No SMI port or pstate_control\n");
+		ACPI_DEBUG_PRINT((ACPI_DB_INFO, "No SMI port or pstate_control\n"));
 		module_put(calling_module);
 		return 0;
 	}

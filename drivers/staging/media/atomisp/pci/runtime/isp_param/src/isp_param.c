@@ -155,7 +155,8 @@ ia_css_isp_param_destroy_isp_parameters(
 
 	for (mem = 0; mem < IA_CSS_NUM_MEMORIES; mem++) {
 		for (pclass = 0; pclass < IA_CSS_NUM_PARAM_CLASSES; pclass++) {
-			kvfree(mem_params->params[pclass][mem].address);
+			if (mem_params->params[pclass][mem].address)
+				kvfree(mem_params->params[pclass][mem].address);
 			if (css_params->params[pclass][mem].address)
 				hmm_free(css_params->params[pclass][mem].address);
 			mem_params->params[pclass][mem].address = NULL;

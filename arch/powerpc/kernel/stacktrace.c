@@ -23,56 +23,90 @@
 
 #include <asm/paca.h>
 
-void arch_stack_walk(stack_trace_consume_fn consume_entry, void *cookie,
-		     struct task_struct *task, struct pt_regs *regs)
+/*
+ * Save stack-backtrace addresses into a stack_trace buffer.
+ */
+static void save_context_stack(struct stack_trace *trace, unsigned long sp,
+			struct task_struct *tsk, int savesched)
 {
-	unsigned long sp;
-
-	if (regs && !consume_entry(cookie, regs->nip))
-		return;
-
-	if (regs)
-		sp = regs->gpr[1];
-	else if (task == current)
-		sp = current_stack_frame();
-	else
-		sp = task->thread.ksp;
-
 	for (;;) {
 		unsigned long *stack = (unsigned long *) sp;
 		unsigned long newsp, ip;
 
-		if (!validate_sp(sp, task, STACK_FRAME_OVERHEAD))
+		if (!validate_sp(sp, tsk, STACK_FRAME_OVERHEAD))
 			return;
 
 		newsp = stack[0];
 		ip = stack[STACK_FRAME_LR_SAVE];
 
-		if (!consume_entry(cookie, ip))
+		if (savesched || !in_sched_functions(ip)) {
+			if (!trace->skip)
+				trace->entries[trace->nr_entries++] = ip;
+			else
+				trace->skip--;
+		}
+
+		if (trace->nr_entries >= trace->max_entries)
 			return;
 
 		sp = newsp;
 	}
 }
 
+void save_stack_trace(struct stack_trace *trace)
+{
+	unsigned long sp;
+
+	sp = current_stack_frame();
+
+	save_context_stack(trace, sp, current, 1);
+}
+EXPORT_SYMBOL_GPL(save_stack_trace);
+
+void save_stack_trace_tsk(struct task_struct *tsk, struct stack_trace *trace)
+{
+	unsigned long sp;
+
+	if (!try_get_task_stack(tsk))
+		return;
+
+	if (tsk == current)
+		sp = current_stack_frame();
+	else
+		sp = tsk->thread.ksp;
+
+	save_context_stack(trace, sp, tsk, 0);
+
+	put_task_stack(tsk);
+}
+EXPORT_SYMBOL_GPL(save_stack_trace_tsk);
+
+void
+save_stack_trace_regs(struct pt_regs *regs, struct stack_trace *trace)
+{
+	save_context_stack(trace, regs->gpr[1], current, 0);
+}
+EXPORT_SYMBOL_GPL(save_stack_trace_regs);
+
+#ifdef CONFIG_HAVE_RELIABLE_STACKTRACE
 /*
  * This function returns an error if it detects any unreliable features of the
  * stack.  Otherwise it guarantees that the stack trace is reliable.
  *
  * If the task is not 'current', the caller *must* ensure the task is inactive.
  */
-int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
-			     void *cookie, struct task_struct *task)
+static int __save_stack_trace_tsk_reliable(struct task_struct *tsk,
+					   struct stack_trace *trace)
 {
 	unsigned long sp;
 	unsigned long newsp;
-	unsigned long stack_page = (unsigned long)task_stack_page(task);
+	unsigned long stack_page = (unsigned long)task_stack_page(tsk);
 	unsigned long stack_end;
 	int graph_idx = 0;
 	bool firstframe;
 
 	stack_end = stack_page + THREAD_SIZE;
-	if (!is_idle_task(task)) {
+	if (!is_idle_task(tsk)) {
 		/*
 		 * For user tasks, this is the SP value loaded on
 		 * kernel entry, see "PACAKSAVE(r13)" in _switch() and
@@ -96,10 +130,10 @@ int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
 		stack_end -= STACK_FRAME_OVERHEAD;
 	}
 
-	if (task == current)
+	if (tsk == current)
 		sp = current_stack_frame();
 	else
-		sp = task->thread.ksp;
+		sp = tsk->thread.ksp;
 
 	if (sp < stack_page + sizeof(struct thread_struct) ||
 	    sp > stack_end - STACK_FRAME_MIN_SIZE) {
@@ -148,7 +182,7 @@ int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
 		 * FIXME: IMHO these tests do not belong in
 		 * arch-dependent code, they are generic.
 		 */
-		ip = ftrace_graph_ret_addr(task, &graph_idx, ip, stack);
+		ip = ftrace_graph_ret_addr(tsk, &graph_idx, ip, stack);
 #ifdef CONFIG_KPROBES
 		/*
 		 * Mark stacktraces with kretprobed functions on them
@@ -158,11 +192,35 @@ int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
 			return -EINVAL;
 #endif
 
-		if (!consume_entry(cookie, ip))
-			return -EINVAL;
+		if (trace->nr_entries >= trace->max_entries)
+			return -E2BIG;
+		if (!trace->skip)
+			trace->entries[trace->nr_entries++] = ip;
+		else
+			trace->skip--;
 	}
 	return 0;
 }
+
+int save_stack_trace_tsk_reliable(struct task_struct *tsk,
+				  struct stack_trace *trace)
+{
+	int ret;
+
+	/*
+	 * If the task doesn't have a stack (e.g., a zombie), the stack is
+	 * "reliably" empty.
+	 */
+	if (!try_get_task_stack(tsk))
+		return 0;
+
+	ret = __save_stack_trace_tsk_reliable(tsk, trace);
+
+	put_task_stack(tsk);
+
+	return ret;
+}
+#endif /* CONFIG_HAVE_RELIABLE_STACKTRACE */
 
 #if defined(CONFIG_PPC_BOOK3S_64) && defined(CONFIG_NMI_IPI)
 static void handle_backtrace_ipi(struct pt_regs *regs)

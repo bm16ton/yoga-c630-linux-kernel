@@ -151,7 +151,7 @@ static void _brcmf_set_multicast_list(struct work_struct *work)
 	/* Send down the multicast list first. */
 	cnt = netdev_mc_count(ndev);
 	buflen = sizeof(cnt) + (cnt * ETH_ALEN);
-	buf = kmalloc(buflen, GFP_KERNEL);
+	buf = kmalloc(buflen, GFP_ATOMIC);
 	if (!buf)
 		return;
 	bufp = buf;

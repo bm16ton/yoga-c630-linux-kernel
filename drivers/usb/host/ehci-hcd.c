@@ -651,7 +651,7 @@ static int ehci_run (struct usb_hcd *hcd)
 		"USB %x.%x started, EHCI %x.%02x%s\n",
 		((ehci->sbrn & 0xf0)>>4), (ehci->sbrn & 0x0f),
 		temp >> 8, temp & 0xff,
-		(ignore_oc || ehci->spurious_oc) ? ", overcurrent ignored" : "");
+		ignore_oc ? ", overcurrent ignored" : "");
 
 	ehci_writel(ehci, INTR_MASK,
 		    &ehci->regs->intr_enable); /* Turn On Interrupts */
@@ -703,43 +703,40 @@ EXPORT_SYMBOL_GPL(ehci_setup);
 static irqreturn_t ehci_irq (struct usb_hcd *hcd)
 {
 	struct ehci_hcd		*ehci = hcd_to_ehci (hcd);
-	u32			status, current_status, masked_status, pcd_status = 0;
-	u32			cmd;
+	u32			status, masked_status, pcd_status = 0, cmd;
 	int			bh;
+	unsigned long		flags;
 
-	spin_lock(&ehci->lock);
+	/*
+	 * For threadirqs option we use spin_lock_irqsave() variant to prevent
+	 * deadlock with ehci hrtimer callback, because hrtimer callbacks run
+	 * in interrupt context even when threadirqs is specified. We can go
+	 * back to spin_lock() variant when hrtimer callbacks become threaded.
+	 */
+	spin_lock_irqsave(&ehci->lock, flags);
 
-	status = 0;
-	current_status = ehci_readl(ehci, &ehci->regs->status);
-restart:
+	status = ehci_readl(ehci, &ehci->regs->status);
 
 	/* e.g. cardbus physical eject */
-	if (current_status == ~(u32) 0) {
+	if (status == ~(u32) 0) {
 		ehci_dbg (ehci, "device removed\n");
 		goto dead;
 	}
-	status |= current_status;
 
 	/*
 	 * We don't use STS_FLR, but some controllers don't like it to
 	 * remain on, so mask it out along with the other status bits.
 	 */
-	masked_status = current_status & (INTR_MASK | STS_FLR);
+	masked_status = status & (INTR_MASK | STS_FLR);
 
 	/* Shared IRQ? */
 	if (!masked_status || unlikely(ehci->rh_state == EHCI_RH_HALTED)) {
-		spin_unlock(&ehci->lock);
+		spin_unlock_irqrestore(&ehci->lock, flags);
 		return IRQ_NONE;
 	}
 
 	/* clear (just) interrupts */
 	ehci_writel(ehci, masked_status, &ehci->regs->status);
-
-	/* For edge interrupts, don't race with an interrupt bit being raised */
-	current_status = ehci_readl(ehci, &ehci->regs->status);
-	if (current_status & INTR_MASK)
-		goto restart;
-
 	cmd = ehci_readl(ehci, &ehci->regs->command);
 	bh = 0;
 
@@ -845,7 +842,7 @@ dead:
 
 	if (bh)
 		ehci_work (ehci);
-	spin_unlock(&ehci->lock);
+	spin_unlock_irqrestore(&ehci->lock, flags);
 	if (pcd_status)
 		usb_hcd_poll_rh_status(hcd);
 	return IRQ_HANDLED;

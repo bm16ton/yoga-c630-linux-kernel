@@ -543,8 +543,7 @@ void spu2_dump_msg_hdr(u8 *buf, unsigned int buf_len)
 /**
  * spu2_fmd_init() - At setkey time, initialize the fixed meta data for
  * subsequent skcipher requests for this context.
- * @fmd:               Start of FMD field to be written
- * @spu2_type:         Cipher algorithm
+ * @spu2_cipher_type:  Cipher algorithm
  * @spu2_mode:         Cipher mode
  * @cipher_key_len:    Length of cipher key, in bytes
  * @cipher_iv_len:     Length of cipher initialization vector, in bytes
@@ -599,7 +598,7 @@ static int spu2_fmd_init(struct SPU2_FMD *fmd,
  * SPU request packet.
  * @fmd:            Start of FMD field to be written
  * @is_inbound:     true if decrypting. false if encrypting.
- * @auth_first:     true if alg authenticates before encrypting
+ * @authFirst:      true if alg authenticates before encrypting
  * @protocol:       protocol selector
  * @cipher_type:    cipher algorithm
  * @cipher_mode:    cipher mode
@@ -641,7 +640,6 @@ static void spu2_fmd_ctrl0_write(struct SPU2_FMD *fmd,
  * spu2_fmd_ctrl1_write() - Write ctrl1 field in fixed metadata (FMD) field of
  * SPU request packet.
  * @fmd:            Start of FMD field to be written
- * @is_inbound:     true if decrypting. false if encrypting.
  * @assoc_size:     Length of additional associated data, in bytes
  * @auth_key_len:   Length of authentication key, in bytes
  * @cipher_key_len: Length of cipher key, in bytes
@@ -795,7 +793,7 @@ u32 spu2_ctx_max_payload(enum spu_cipher_alg cipher_alg,
 }
 
 /**
- * spu2_payload_length() -  Given a SPU2 message header, extract the payload
+ * spu_payload_length() -  Given a SPU2 message header, extract the payload
  * length.
  * @spu_hdr:  Start of SPU message header (FMD)
  *
@@ -814,11 +812,10 @@ u32 spu2_payload_length(u8 *spu_hdr)
 }
 
 /**
- * spu2_response_hdr_len() - Determine the expected length of a SPU response
+ * spu_response_hdr_len() - Determine the expected length of a SPU response
  * header.
  * @auth_key_len:  Length of authentication key, in bytes
  * @enc_key_len:   Length of encryption key, in bytes
- * @is_hash:       Unused
  *
  * For SPU2, includes just FMD. OMD is never requested.
  *
@@ -830,7 +827,7 @@ u16 spu2_response_hdr_len(u16 auth_key_len, u16 enc_key_len, bool is_hash)
 }
 
 /**
- * spu2_hash_pad_len() - Calculate the length of hash padding required to extend
+ * spu_hash_pad_len() - Calculate the length of hash padding required to extend
  * data to a full block size.
  * @hash_alg:        hash algorithm
  * @hash_mode:       hash mode
@@ -848,10 +845,8 @@ u16 spu2_hash_pad_len(enum hash_alg hash_alg, enum hash_mode hash_mode,
 }
 
 /**
- * spu2_gcm_ccm_pad_len() -  Determine the length of GCM/CCM padding for either
+ * spu2_gcm_ccm_padlen() -  Determine the length of GCM/CCM padding for either
  * the AAD field or the data.
- * @cipher_mode:  Unused
- * @data_size:    Unused
  *
  * Return:  0. Unlike SPU-M, SPU2 hardware does any GCM/CCM padding required.
  */
@@ -862,7 +857,7 @@ u32 spu2_gcm_ccm_pad_len(enum spu_cipher_mode cipher_mode,
 }
 
 /**
- * spu2_assoc_resp_len() - Determine the size of the AAD2 buffer needed to catch
+ * spu_assoc_resp_len() - Determine the size of the AAD2 buffer needed to catch
  * associated data in a SPU2 output packet.
  * @cipher_mode:   cipher mode
  * @assoc_len:     length of additional associated data, in bytes
@@ -883,11 +878,11 @@ u32 spu2_assoc_resp_len(enum spu_cipher_mode cipher_mode,
 	return resp_len;
 }
 
-/**
- * spu2_aead_ivlen() - Calculate the length of the AEAD IV to be included
+/*
+ * spu_aead_ivlen() - Calculate the length of the AEAD IV to be included
  * in a SPU request after the AAD and before the payload.
  * @cipher_mode:  cipher mode
- * @iv_len:   initialization vector length in bytes
+ * @iv_ctr_len:   initialization vector length in bytes
  *
  * For SPU2, AEAD IV is included in OMD and does not need to be repeated
  * prior to the payload.
@@ -914,9 +909,9 @@ enum hash_type spu2_hash_type(u32 src_sent)
 /**
  * spu2_digest_size() - Determine the size of a hash digest to expect the SPU to
  * return.
- * @alg_digest_size: Number of bytes in the final digest for the given algo
- * @alg:             The hash algorithm
- * @htype:           Type of hash operation (init, update, full, etc)
+ * alg_digest_size: Number of bytes in the final digest for the given algo
+ * alg:             The hash algorithm
+ * htype:           Type of hash operation (init, update, full, etc)
  *
  */
 u32 spu2_digest_size(u32 alg_digest_size, enum hash_alg alg,
@@ -926,7 +921,7 @@ u32 spu2_digest_size(u32 alg_digest_size, enum hash_alg alg,
 }
 
 /**
- * spu2_create_request() - Build a SPU2 request message header, includint FMD and
+ * spu_create_request() - Build a SPU2 request message header, includint FMD and
  * OMD.
  * @spu_hdr: Start of buffer where SPU request header is to be written
  * @req_opts: SPU request message options
@@ -1110,7 +1105,7 @@ u32 spu2_create_request(u8 *spu_hdr,
 }
 
 /**
- * spu2_cipher_req_init() - Build an skcipher SPU2 request message header,
+ * spu_cipher_req_init() - Build an skcipher SPU2 request message header,
  * including FMD and OMD.
  * @spu_hdr:       Location of start of SPU request (FMD field)
  * @cipher_parms:  Parameters describing cipher request
@@ -1167,11 +1162,11 @@ u16 spu2_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
 }
 
 /**
- * spu2_cipher_req_finish() - Finish building a SPU request message header for a
+ * spu_cipher_req_finish() - Finish building a SPU request message header for a
  * block cipher request.
  * @spu_hdr:         Start of the request message header (MH field)
  * @spu_req_hdr_len: Length in bytes of the SPU request header
- * @is_inbound:      0 encrypt, 1 decrypt
+ * @isInbound:       0 encrypt, 1 decrypt
  * @cipher_parms:    Parameters describing cipher operation to be performed
  * @data_size:       Length of the data in the BD field
  *
@@ -1227,7 +1222,7 @@ void spu2_cipher_req_finish(u8 *spu_hdr,
 }
 
 /**
- * spu2_request_pad() - Create pad bytes at the end of the data.
+ * spu_request_pad() - Create pad bytes at the end of the data.
  * @pad_start:      Start of buffer where pad bytes are to be written
  * @gcm_padding:    Length of GCM padding, in bytes
  * @hash_pad_len:   Number of bytes of padding extend data to full block
@@ -1316,7 +1311,7 @@ u8 spu2_rx_status_len(void)
 }
 
 /**
- * spu2_status_process() - Process the status from a SPU response message.
+ * spu_status_process() - Process the status from a SPU response message.
  * @statp:  start of STATUS word
  *
  * Return:  0 - if status is good and response should be processed

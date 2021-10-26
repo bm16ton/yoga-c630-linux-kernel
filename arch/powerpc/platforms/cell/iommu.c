@@ -486,8 +486,7 @@ cell_iommu_setup_window(struct cbe_iommu *iommu, struct device_node *np,
 	window->table.it_size = size >> window->table.it_page_shift;
 	window->table.it_ops = &cell_iommu_ops;
 
-	if (!iommu_init_table(&window->table, iommu->nid, 0, 0))
-		panic("Failed to initialize iommu table");
+	iommu_init_table(&window->table, iommu->nid, 0, 0);
 
 	pr_debug("\tioid      %d\n", window->ioid);
 	pr_debug("\tblocksize %ld\n", window->table.it_blocksize);

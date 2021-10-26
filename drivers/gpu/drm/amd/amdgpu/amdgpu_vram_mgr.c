@@ -25,7 +25,6 @@
 #include <linux/dma-mapping.h>
 #include "amdgpu.h"
 #include "amdgpu_vm.h"
-#include "amdgpu_res_cursor.h"
 #include "amdgpu_atomfirmware.h"
 #include "atom.h"
 
@@ -53,7 +52,7 @@ static ssize_t amdgpu_mem_info_vram_total_show(struct device *dev,
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
-	return sysfs_emit(buf, "%llu\n", adev->gmc.real_vram_size);
+	return snprintf(buf, PAGE_SIZE, "%llu\n", adev->gmc.real_vram_size);
 }
 
 /**
@@ -70,7 +69,7 @@ static ssize_t amdgpu_mem_info_vis_vram_total_show(struct device *dev,
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
-	return sysfs_emit(buf, "%llu\n", adev->gmc.visible_vram_size);
+	return snprintf(buf, PAGE_SIZE, "%llu\n", adev->gmc.visible_vram_size);
 }
 
 /**
@@ -88,7 +87,8 @@ static ssize_t amdgpu_mem_info_vram_used_show(struct device *dev,
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev, TTM_PL_VRAM);
 
-	return sysfs_emit(buf, "%llu\n", amdgpu_vram_mgr_usage(man));
+	return snprintf(buf, PAGE_SIZE, "%llu\n",
+			amdgpu_vram_mgr_usage(man));
 }
 
 /**
@@ -106,7 +106,8 @@ static ssize_t amdgpu_mem_info_vis_vram_used_show(struct device *dev,
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev, TTM_PL_VRAM);
 
-	return sysfs_emit(buf, "%llu\n", amdgpu_vram_mgr_vis_usage(man));
+	return snprintf(buf, PAGE_SIZE, "%llu\n",
+			amdgpu_vram_mgr_vis_usage(man));
 }
 
 static ssize_t amdgpu_mem_info_vram_vendor(struct device *dev,
@@ -118,27 +119,27 @@ static ssize_t amdgpu_mem_info_vram_vendor(struct device *dev,
 
 	switch (adev->gmc.vram_vendor) {
 	case SAMSUNG:
-		return sysfs_emit(buf, "samsung\n");
+		return snprintf(buf, PAGE_SIZE, "samsung\n");
 	case INFINEON:
-		return sysfs_emit(buf, "infineon\n");
+		return snprintf(buf, PAGE_SIZE, "infineon\n");
 	case ELPIDA:
-		return sysfs_emit(buf, "elpida\n");
+		return snprintf(buf, PAGE_SIZE, "elpida\n");
 	case ETRON:
-		return sysfs_emit(buf, "etron\n");
+		return snprintf(buf, PAGE_SIZE, "etron\n");
 	case NANYA:
-		return sysfs_emit(buf, "nanya\n");
+		return snprintf(buf, PAGE_SIZE, "nanya\n");
 	case HYNIX:
-		return sysfs_emit(buf, "hynix\n");
+		return snprintf(buf, PAGE_SIZE, "hynix\n");
 	case MOSEL:
-		return sysfs_emit(buf, "mosel\n");
+		return snprintf(buf, PAGE_SIZE, "mosel\n");
 	case WINBOND:
-		return sysfs_emit(buf, "winbond\n");
+		return snprintf(buf, PAGE_SIZE, "winbond\n");
 	case ESMT:
-		return sysfs_emit(buf, "esmt\n");
+		return snprintf(buf, PAGE_SIZE, "esmt\n");
 	case MICRON:
-		return sysfs_emit(buf, "micron\n");
+		return snprintf(buf, PAGE_SIZE, "micron\n");
 	default:
-		return sysfs_emit(buf, "unknown\n");
+		return snprintf(buf, PAGE_SIZE, "unknown\n");
 	}
 }
 
@@ -566,8 +567,6 @@ static void amdgpu_vram_mgr_del(struct ttm_resource_manager *man,
  *
  * @adev: amdgpu device pointer
  * @mem: TTM memory object
- * @offset: byte offset from the base of VRAM BO
- * @length: number of bytes to export in sg_table
  * @dev: the other device
  * @dir: dma direction
  * @sgt: resulting sg table
@@ -576,47 +575,39 @@ static void amdgpu_vram_mgr_del(struct ttm_resource_manager *man,
  */
 int amdgpu_vram_mgr_alloc_sgt(struct amdgpu_device *adev,
 			      struct ttm_resource *mem,
-			      u64 offset, u64 length,
 			      struct device *dev,
 			      enum dma_data_direction dir,
 			      struct sg_table **sgt)
 {
-	struct amdgpu_res_cursor cursor;
+	struct drm_mm_node *node;
 	struct scatterlist *sg;
 	int num_entries = 0;
+	unsigned int pages;
 	int i, r;
 
 	*sgt = kmalloc(sizeof(**sgt), GFP_KERNEL);
 	if (!*sgt)
 		return -ENOMEM;
 
-	/* Determine the number of DRM_MM nodes to export */
-	amdgpu_res_first(mem, offset, length, &cursor);
-	while (cursor.remaining) {
-		num_entries++;
-		amdgpu_res_next(&cursor, cursor.size);
-	}
+	for (pages = mem->num_pages, node = mem->mm_node;
+	     pages; pages -= node->size, ++node)
+		++num_entries;
 
 	r = sg_alloc_table(*sgt, num_entries, GFP_KERNEL);
 	if (r)
 		goto error_free;
 
-	/* Initialize scatterlist nodes of sg_table */
 	for_each_sgtable_sg((*sgt), sg, i)
 		sg->length = 0;
 
-	/*
-	 * Walk down DRM_MM nodes to populate scatterlist nodes
-	 * @note: Use iterator api to get first the DRM_MM node
-	 * and the number of bytes from it. Access the following
-	 * DRM_MM node(s) if more buffer needs to exported
-	 */
-	amdgpu_res_first(mem, offset, length, &cursor);
+	node = mem->mm_node;
 	for_each_sgtable_sg((*sgt), sg, i) {
-		phys_addr_t phys = cursor.start + adev->gmc.aper_base;
-		size_t size = cursor.size;
+		phys_addr_t phys = (node->start << PAGE_SHIFT) +
+			adev->gmc.aper_base;
+		size_t size = node->size << PAGE_SHIFT;
 		dma_addr_t addr;
 
+		++node;
 		addr = dma_map_resource(dev, phys, size, dir,
 					DMA_ATTR_SKIP_CPU_SYNC);
 		r = dma_mapping_error(dev, addr);
@@ -626,10 +617,7 @@ int amdgpu_vram_mgr_alloc_sgt(struct amdgpu_device *adev,
 		sg_set_page(sg, NULL, size, 0);
 		sg_dma_address(sg) = addr;
 		sg_dma_len(sg) = size;
-
-		amdgpu_res_next(&cursor, cursor.size);
 	}
-
 	return 0;
 
 error_unmap:
@@ -651,13 +639,15 @@ error_free:
 /**
  * amdgpu_vram_mgr_free_sgt - allocate and fill a sg table
  *
+ * @adev: amdgpu device pointer
  * @dev: device pointer
  * @dir: data direction of resource to unmap
  * @sgt: sg table to free
  *
  * Free a previously allocate sg table.
  */
-void amdgpu_vram_mgr_free_sgt(struct device *dev,
+void amdgpu_vram_mgr_free_sgt(struct amdgpu_device *adev,
+			      struct device *dev,
 			      enum dma_data_direction dir,
 			      struct sg_table *sgt)
 {

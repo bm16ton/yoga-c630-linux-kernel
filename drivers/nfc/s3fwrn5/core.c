@@ -124,12 +124,13 @@ static int s3fwrn5_nci_post_setup(struct nci_dev *ndev)
 
 	if (s3fwrn5_firmware_init(info)) {
 		//skip bootloader mode
-		return 0;
+		ret = 0;
+		goto out;
 	}
 
 	ret = s3fwrn5_firmware_update(info);
 	if (ret < 0)
-		return ret;
+		goto out;
 
 	/* NCI core reset */
 
@@ -138,9 +139,12 @@ static int s3fwrn5_nci_post_setup(struct nci_dev *ndev)
 
 	ret = nci_core_reset(info->ndev);
 	if (ret < 0)
-		return ret;
+		goto out;
 
-	return nci_core_init(info->ndev);
+	ret = nci_core_init(info->ndev);
+
+out:
+	return ret;
 }
 
 static struct nci_ops s3fwrn5_nci_ops = {

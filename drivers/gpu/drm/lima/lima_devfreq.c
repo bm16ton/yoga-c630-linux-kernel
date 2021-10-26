@@ -81,7 +81,6 @@ static int lima_devfreq_get_dev_status(struct device *dev,
 }
 
 static struct devfreq_dev_profile lima_devfreq_profile = {
-	.timer = DEVFREQ_TIMER_DELAYED,
 	.polling_ms = 50, /* ~3 frames */
 	.target = lima_devfreq_target,
 	.get_dev_status = lima_devfreq_get_dev_status,
@@ -100,12 +99,20 @@ void lima_devfreq_fini(struct lima_device *ldev)
 		devm_devfreq_remove_device(ldev->dev, devfreq->devfreq);
 		devfreq->devfreq = NULL;
 	}
+
+	dev_pm_opp_of_remove_table(ldev->dev);
+
+	dev_pm_opp_put_regulators(devfreq->regulators_opp_table);
+	dev_pm_opp_put_clkname(devfreq->clkname_opp_table);
+	devfreq->regulators_opp_table = NULL;
+	devfreq->clkname_opp_table = NULL;
 }
 
 int lima_devfreq_init(struct lima_device *ldev)
 {
 	struct thermal_cooling_device *cooling;
 	struct device *dev = ldev->dev;
+	struct opp_table *opp_table;
 	struct devfreq *devfreq;
 	struct lima_devfreq *ldevfreq = &ldev->devfreq;
 	struct dev_pm_opp *opp;
@@ -118,45 +125,50 @@ int lima_devfreq_init(struct lima_device *ldev)
 
 	spin_lock_init(&ldevfreq->lock);
 
-	ret = devm_pm_opp_set_clkname(dev, "core");
-	if (ret)
-		return ret;
-
-	ret = devm_pm_opp_set_regulators(dev, (const char *[]){ "mali" }, 1);
-	if (ret) {
-		/* Continue if the optional regulator is missing */
-		if (ret != -ENODEV)
-			return ret;
+	opp_table = dev_pm_opp_set_clkname(dev, "core");
+	if (IS_ERR(opp_table)) {
+		ret = PTR_ERR(opp_table);
+		goto err_fini;
 	}
 
-	ret = devm_pm_opp_of_add_table(dev);
+	ldevfreq->clkname_opp_table = opp_table;
+
+	opp_table = dev_pm_opp_set_regulators(dev,
+					      (const char *[]){ "mali" },
+					      1);
+	if (IS_ERR(opp_table)) {
+		ret = PTR_ERR(opp_table);
+
+		/* Continue if the optional regulator is missing */
+		if (ret != -ENODEV)
+			goto err_fini;
+	} else {
+		ldevfreq->regulators_opp_table = opp_table;
+	}
+
+	ret = dev_pm_opp_of_add_table(dev);
 	if (ret)
-		return ret;
+		goto err_fini;
 
 	lima_devfreq_reset(ldevfreq);
 
 	cur_freq = clk_get_rate(ldev->clk_gpu);
 
 	opp = devfreq_recommended_opp(dev, &cur_freq, 0);
-	if (IS_ERR(opp))
-		return PTR_ERR(opp);
+	if (IS_ERR(opp)) {
+		ret = PTR_ERR(opp);
+		goto err_fini;
+	}
 
 	lima_devfreq_profile.initial_freq = cur_freq;
 	dev_pm_opp_put(opp);
 
-	/*
-	 * Setup default thresholds for the simple_ondemand governor.
-	 * The values are chosen based on experiments.
-	 */
-	ldevfreq->gov_data.upthreshold = 30;
-	ldevfreq->gov_data.downdifferential = 5;
-
 	devfreq = devm_devfreq_add_device(dev, &lima_devfreq_profile,
-					  DEVFREQ_GOV_SIMPLE_ONDEMAND,
-					  &ldevfreq->gov_data);
+					  DEVFREQ_GOV_SIMPLE_ONDEMAND, NULL);
 	if (IS_ERR(devfreq)) {
 		dev_err(dev, "Couldn't initialize GPU devfreq\n");
-		return PTR_ERR(devfreq);
+		ret = PTR_ERR(devfreq);
+		goto err_fini;
 	}
 
 	ldevfreq->devfreq = devfreq;
@@ -168,6 +180,10 @@ int lima_devfreq_init(struct lima_device *ldev)
 		ldevfreq->cooling = cooling;
 
 	return 0;
+
+err_fini:
+	lima_devfreq_fini(ldev);
+	return ret;
 }
 
 void lima_devfreq_record_busy(struct lima_devfreq *devfreq)

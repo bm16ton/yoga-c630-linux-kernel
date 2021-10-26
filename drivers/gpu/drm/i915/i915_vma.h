@@ -52,9 +52,6 @@ static inline bool i915_vma_is_active(const struct i915_vma *vma)
 	return !i915_active_is_idle(&vma->active);
 }
 
-/* do not reserve memory to prevent deadlocks */
-#define __EXEC_OBJECT_NO_RESERVE BIT(31)
-
 int __must_check __i915_vma_move_to_active(struct i915_vma *vma,
 					   struct i915_request *rq);
 int __must_check i915_vma_move_to_active(struct i915_vma *vma,
@@ -246,22 +243,7 @@ i915_vma_pin_ww(struct i915_vma *vma, struct i915_gem_ww_ctx *ww,
 static inline int __must_check
 i915_vma_pin(struct i915_vma *vma, u64 size, u64 alignment, u64 flags)
 {
-	struct i915_gem_ww_ctx ww;
-	int err;
-
-	i915_gem_ww_ctx_init(&ww, true);
-retry:
-	err = i915_gem_object_lock(vma->obj, &ww);
-	if (!err)
-		err = i915_vma_pin_ww(vma, &ww, size, alignment, flags);
-	if (err == -EDEADLK) {
-		err = i915_gem_ww_ctx_backoff(&ww);
-		if (!err)
-			goto retry;
-	}
-	i915_gem_ww_ctx_fini(&ww);
-
-	return err;
+	return i915_vma_pin_ww(vma, NULL, size, alignment, flags);
 }
 
 int i915_ggtt_pin(struct i915_vma *vma, struct i915_gem_ww_ctx *ww,

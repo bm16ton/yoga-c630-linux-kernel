@@ -166,11 +166,11 @@ static int btf_dump_resize(struct btf_dump *d)
 	if (last_id <= d->last_id)
 		return 0;
 
-	if (libbpf_ensure_mem((void **)&d->type_states, &d->type_states_cap,
-			      sizeof(*d->type_states), last_id + 1))
+	if (btf_ensure_mem((void **)&d->type_states, &d->type_states_cap,
+			   sizeof(*d->type_states), last_id + 1))
 		return -ENOMEM;
-	if (libbpf_ensure_mem((void **)&d->cached_names, &d->cached_names_cap,
-			      sizeof(*d->cached_names), last_id + 1))
+	if (btf_ensure_mem((void **)&d->cached_names, &d->cached_names_cap,
+			   sizeof(*d->cached_names), last_id + 1))
 		return -ENOMEM;
 
 	if (d->last_id == 0) {
@@ -279,7 +279,6 @@ static int btf_dump_mark_referenced(struct btf_dump *d)
 		case BTF_KIND_INT:
 		case BTF_KIND_ENUM:
 		case BTF_KIND_FWD:
-		case BTF_KIND_FLOAT:
 			break;
 
 		case BTF_KIND_VOLATILE:
@@ -454,7 +453,6 @@ static int btf_dump_order_type(struct btf_dump *d, __u32 id, bool through_ptr)
 
 	switch (btf_kind(t)) {
 	case BTF_KIND_INT:
-	case BTF_KIND_FLOAT:
 		tstate->order_state = ORDERED;
 		return 0;
 
@@ -1135,7 +1133,6 @@ skip_mod:
 		case BTF_KIND_STRUCT:
 		case BTF_KIND_UNION:
 		case BTF_KIND_TYPEDEF:
-		case BTF_KIND_FLOAT:
 			goto done;
 		default:
 			pr_warn("unexpected type in decl chain, kind:%u, id:[%u]\n",
@@ -1250,7 +1247,6 @@ static void btf_dump_emit_type_chain(struct btf_dump *d,
 
 		switch (kind) {
 		case BTF_KIND_INT:
-		case BTF_KIND_FLOAT:
 			btf_dump_emit_mods(d, decls);
 			name = btf_name_of(d, t->name_off);
 			btf_dump_printf(d, "%s", name);

@@ -1050,17 +1050,19 @@ static void usbg_cmd_work(struct work_struct *work)
 	tv_nexus = tpg->tpg_nexus;
 	dir = get_cmd_dir(cmd->cmd_buf);
 	if (dir < 0) {
-		__target_init_cmd(se_cmd,
-				  tv_nexus->tvn_se_sess->se_tpg->se_tpg_tfo,
-				  tv_nexus->tvn_se_sess, cmd->data_len, DMA_NONE,
-				  cmd->prio_attr, cmd->sense_iu.sense,
-				  cmd->unpacked_lun);
+		transport_init_se_cmd(se_cmd,
+				tv_nexus->tvn_se_sess->se_tpg->se_tpg_tfo,
+				tv_nexus->tvn_se_sess, cmd->data_len, DMA_NONE,
+				cmd->prio_attr, cmd->sense_iu.sense,
+				cmd->unpacked_lun);
 		goto out;
 	}
 
-	target_submit_cmd(se_cmd, tv_nexus->tvn_se_sess, cmd->cmd_buf,
-			  cmd->sense_iu.sense, cmd->unpacked_lun, 0,
-			  cmd->prio_attr, dir, flags);
+	if (target_submit_cmd(se_cmd, tv_nexus->tvn_se_sess, cmd->cmd_buf,
+			      cmd->sense_iu.sense, cmd->unpacked_lun, 0,
+			      cmd->prio_attr, dir, flags) < 0)
+		goto out;
+
 	return;
 
 out:
@@ -1179,17 +1181,19 @@ static void bot_cmd_work(struct work_struct *work)
 	tv_nexus = tpg->tpg_nexus;
 	dir = get_cmd_dir(cmd->cmd_buf);
 	if (dir < 0) {
-		__target_init_cmd(se_cmd,
-				  tv_nexus->tvn_se_sess->se_tpg->se_tpg_tfo,
-				  tv_nexus->tvn_se_sess, cmd->data_len, DMA_NONE,
-				  cmd->prio_attr, cmd->sense_iu.sense,
-				  cmd->unpacked_lun);
+		transport_init_se_cmd(se_cmd,
+				tv_nexus->tvn_se_sess->se_tpg->se_tpg_tfo,
+				tv_nexus->tvn_se_sess, cmd->data_len, DMA_NONE,
+				cmd->prio_attr, cmd->sense_iu.sense,
+				cmd->unpacked_lun);
 		goto out;
 	}
 
-	target_submit_cmd(se_cmd, tv_nexus->tvn_se_sess,
-			  cmd->cmd_buf, cmd->sense_iu.sense, cmd->unpacked_lun,
-			  cmd->data_len, cmd->prio_attr, dir, 0);
+	if (target_submit_cmd(se_cmd, tv_nexus->tvn_se_sess,
+			cmd->cmd_buf, cmd->sense_iu.sense, cmd->unpacked_lun,
+			cmd->data_len, cmd->prio_attr, dir, 0) < 0)
+		goto out;
+
 	return;
 
 out:

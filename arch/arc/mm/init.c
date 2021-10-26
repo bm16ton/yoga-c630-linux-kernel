@@ -203,6 +203,7 @@ void __init mem_init(void)
 {
 	memblock_free_all();
 	highmem_init();
+	mem_init_print_info(NULL);
 }
 
 #ifdef CONFIG_HIGHMEM

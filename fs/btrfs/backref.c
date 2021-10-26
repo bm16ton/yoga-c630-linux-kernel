@@ -14,7 +14,6 @@
 #include "delayed-ref.h"
 #include "locking.h"
 #include "misc.h"
-#include "tree-mod-log.h"
 
 /* Just an arbitrary number so we can be sure this happened */
 #define BACKREF_FOUND_SHARED 6
@@ -453,7 +452,7 @@ static int add_all_parents(struct btrfs_root *root, struct btrfs_path *path,
 	if (path->slots[0] >= btrfs_header_nritems(eb) ||
 	    is_shared_data_backref(preftrees, eb->start) ||
 	    ref->root_id != btrfs_header_owner(eb)) {
-		if (time_seq == BTRFS_SEQ_LAST)
+		if (time_seq == SEQ_LAST)
 			ret = btrfs_next_leaf(root, path);
 		else
 			ret = btrfs_next_old_leaf(root, path, time_seq);
@@ -477,7 +476,7 @@ static int add_all_parents(struct btrfs_root *root, struct btrfs_path *path,
 		if (slot == 0 &&
 		    (is_shared_data_backref(preftrees, eb->start) ||
 		     ref->root_id != btrfs_header_owner(eb))) {
-			if (time_seq == BTRFS_SEQ_LAST)
+			if (time_seq == SEQ_LAST)
 				ret = btrfs_next_leaf(root, path);
 			else
 				ret = btrfs_next_old_leaf(root, path, time_seq);
@@ -515,7 +514,7 @@ static int add_all_parents(struct btrfs_root *root, struct btrfs_path *path,
 			eie = NULL;
 		}
 next:
-		if (time_seq == BTRFS_SEQ_LAST)
+		if (time_seq == SEQ_LAST)
 			ret = btrfs_next_item(root, path);
 		else
 			ret = btrfs_next_old_item(root, path, time_seq);
@@ -575,7 +574,7 @@ static int resolve_indirect_ref(struct btrfs_fs_info *fs_info,
 
 	if (path->search_commit_root)
 		root_level = btrfs_header_level(root->commit_root);
-	else if (time_seq == BTRFS_SEQ_LAST)
+	else if (time_seq == SEQ_LAST)
 		root_level = btrfs_header_level(root->node);
 	else
 		root_level = btrfs_old_root_level(root, time_seq);
@@ -606,7 +605,7 @@ static int resolve_indirect_ref(struct btrfs_fs_info *fs_info,
 	    search_key.offset >= LLONG_MAX)
 		search_key.offset = 0;
 	path->lowest_level = level;
-	if (time_seq == BTRFS_SEQ_LAST)
+	if (time_seq == SEQ_LAST)
 		ret = btrfs_search_slot(NULL, root, &search_key, path, 0, 0);
 	else
 		ret = btrfs_search_old_slot(root, &search_key, path, time_seq);
@@ -1148,8 +1147,8 @@ static int add_keyed_refs(struct btrfs_fs_info *fs_info,
  * indirect refs to their parent bytenr.
  * When roots are found, they're added to the roots list
  *
- * If time_seq is set to BTRFS_SEQ_LAST, it will not search delayed_refs, and
- * behave much like trans == NULL case, the difference only lies in it will not
+ * If time_seq is set to SEQ_LAST, it will not search delayed_refs, and behave
+ * much like trans == NULL case, the difference only lies in it will not
  * commit root.
  * The special case is for qgroup to search roots in commit_transaction().
  *
@@ -1200,7 +1199,7 @@ static int find_parent_nodes(struct btrfs_trans_handle *trans,
 		path->skip_locking = 1;
 	}
 
-	if (time_seq == BTRFS_SEQ_LAST)
+	if (time_seq == SEQ_LAST)
 		path->skip_locking = 1;
 
 	/*
@@ -1218,9 +1217,9 @@ again:
 
 #ifdef CONFIG_BTRFS_FS_RUN_SANITY_TESTS
 	if (trans && likely(trans->type != __TRANS_DUMMY) &&
-	    time_seq != BTRFS_SEQ_LAST) {
+	    time_seq != SEQ_LAST) {
 #else
-	if (trans && time_seq != BTRFS_SEQ_LAST) {
+	if (trans && time_seq != SEQ_LAST) {
 #endif
 		/*
 		 * look if there are updates for this ref queued and lock the
@@ -1488,15 +1487,15 @@ static int btrfs_find_all_roots_safe(struct btrfs_trans_handle *trans,
 int btrfs_find_all_roots(struct btrfs_trans_handle *trans,
 			 struct btrfs_fs_info *fs_info, u64 bytenr,
 			 u64 time_seq, struct ulist **roots,
-			 bool ignore_offset, bool skip_commit_root_sem)
+			 bool ignore_offset)
 {
 	int ret;
 
-	if (!trans && !skip_commit_root_sem)
+	if (!trans)
 		down_read(&fs_info->commit_root_sem);
 	ret = btrfs_find_all_roots_safe(trans, fs_info, bytenr,
 					time_seq, roots, ignore_offset);
-	if (!trans && !skip_commit_root_sem)
+	if (!trans)
 		up_read(&fs_info->commit_root_sem);
 	return ret;
 }
@@ -1528,7 +1527,7 @@ int btrfs_check_shared(struct btrfs_root *root, u64 inum, u64 bytenr,
 	struct btrfs_trans_handle *trans;
 	struct ulist_iterator uiter;
 	struct ulist_node *node;
-	struct btrfs_seq_list elem = BTRFS_SEQ_LIST_INIT(elem);
+	struct seq_list elem = SEQ_LIST_INIT(elem);
 	int ret = 0;
 	struct share_check shared = {
 		.root_objectid = root->root_key.objectid,
@@ -1954,7 +1953,7 @@ int iterate_extent_inodes(struct btrfs_fs_info *fs_info,
 	struct ulist *roots = NULL;
 	struct ulist_node *ref_node = NULL;
 	struct ulist_node *root_node = NULL;
-	struct btrfs_seq_list seq_elem = BTRFS_SEQ_LIST_INIT(seq_elem);
+	struct seq_list tree_mod_seq_elem = SEQ_LIST_INIT(tree_mod_seq_elem);
 	struct ulist_iterator ref_uiter;
 	struct ulist_iterator root_uiter;
 
@@ -1972,12 +1971,12 @@ int iterate_extent_inodes(struct btrfs_fs_info *fs_info,
 	}
 
 	if (trans)
-		btrfs_get_tree_mod_seq(fs_info, &seq_elem);
+		btrfs_get_tree_mod_seq(fs_info, &tree_mod_seq_elem);
 	else
 		down_read(&fs_info->commit_root_sem);
 
 	ret = btrfs_find_all_leafs(trans, fs_info, extent_item_objectid,
-				   seq_elem.seq, &refs,
+				   tree_mod_seq_elem.seq, &refs,
 				   &extent_item_pos, ignore_offset);
 	if (ret)
 		goto out;
@@ -1985,7 +1984,7 @@ int iterate_extent_inodes(struct btrfs_fs_info *fs_info,
 	ULIST_ITER_INIT(&ref_uiter);
 	while (!ret && (ref_node = ulist_next(refs, &ref_uiter))) {
 		ret = btrfs_find_all_roots_safe(trans, fs_info, ref_node->val,
-						seq_elem.seq, &roots,
+						tree_mod_seq_elem.seq, &roots,
 						ignore_offset);
 		if (ret)
 			break;
@@ -2008,7 +2007,7 @@ int iterate_extent_inodes(struct btrfs_fs_info *fs_info,
 	free_leaf_list(refs);
 out:
 	if (trans) {
-		btrfs_put_tree_mod_seq(fs_info, &seq_elem);
+		btrfs_put_tree_mod_seq(fs_info, &tree_mod_seq_elem);
 		btrfs_end_transaction(trans);
 	} else {
 		up_read(&fs_info->commit_root_sem);

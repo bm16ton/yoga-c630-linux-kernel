@@ -1760,7 +1760,8 @@ static int netsec_xdp_xmit(struct net_device *ndev, int n,
 {
 	struct netsec_priv *priv = netdev_priv(ndev);
 	struct netsec_desc_ring *tx_ring = &priv->desc_ring[NETSEC_RING_TX];
-	int i, nxmit = 0;
+	int drops = 0;
+	int i;
 
 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
 		return -EINVAL;
@@ -1771,11 +1772,12 @@ static int netsec_xdp_xmit(struct net_device *ndev, int n,
 		int err;
 
 		err = netsec_xdp_queue_one(priv, xdpf, true);
-		if (err != NETSEC_XDP_TX)
-			break;
-
-		tx_ring->xdp_xmit++;
-		nxmit++;
+		if (err != NETSEC_XDP_TX) {
+			xdp_return_frame_rx_napi(xdpf);
+			drops++;
+		} else {
+			tx_ring->xdp_xmit++;
+		}
 	}
 	spin_unlock(&tx_ring->lock);
 
@@ -1784,7 +1786,7 @@ static int netsec_xdp_xmit(struct net_device *ndev, int n,
 		tx_ring->xdp_xmit = 0;
 	}
 
-	return nxmit;
+	return n - drops;
 }
 
 static int netsec_xdp_setup(struct netsec_priv *priv, struct bpf_prog *prog,

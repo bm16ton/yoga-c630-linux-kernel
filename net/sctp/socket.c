@@ -4521,10 +4521,6 @@ static int sctp_setsockopt(struct sock *sk, int level, int optname,
 	}
 
 	if (optlen > 0) {
-		/* Trim it to the biggest size sctp sockopt may need if necessary */
-		optlen = min_t(unsigned int, optlen,
-			       PAGE_ALIGN(USHRT_MAX +
-					  sizeof(__u16) * sizeof(struct sctp_reset_streams)));
 		kopt = memdup_sockptr(optval, optlen);
 		if (IS_ERR(kopt))
 			return PTR_ERR(kopt);
@@ -9333,7 +9329,7 @@ void sctp_copy_sock(struct sock *newsk, struct sock *sk,
 	if (newsk->sk_flags & SK_FLAGS_TIMESTAMP)
 		net_enable_timestamp();
 
-	/* Set newsk security attributes from original sk and connection
+	/* Set newsk security attributes from orginal sk and connection
 	 * security attribute from ep.
 	 */
 	security_sctp_sk_clone(ep, sk, newsk);

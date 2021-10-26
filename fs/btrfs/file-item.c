@@ -9,7 +9,6 @@
 #include <linux/highmem.h>
 #include <linux/sched/mm.h>
 #include <crypto/hash.h>
-#include "misc.h"
 #include "ctree.h"
 #include "disk-io.h"
 #include "transaction.h"

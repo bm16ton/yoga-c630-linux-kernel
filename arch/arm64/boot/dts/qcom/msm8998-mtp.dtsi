@@ -328,10 +328,6 @@
 	status = "okay";
 };
 
-&remoteproc_mss {
-	status = "okay";
-};
-
 &remoteproc_slpi {
 	status = "okay";
 };

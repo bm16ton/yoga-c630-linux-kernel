@@ -301,8 +301,9 @@ static void cdns_uart_handle_rx(void *dev_id, unsigned int isrstatus)
 		tty_insert_flip_char(&port->state->port, data, status);
 		isrstatus = 0;
 	}
-
+	spin_unlock(&port->lock);
 	tty_flip_buffer_push(&port->state->port);
+	spin_lock(&port->lock);
 }
 
 /**

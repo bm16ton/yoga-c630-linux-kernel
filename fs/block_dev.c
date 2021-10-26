@@ -79,7 +79,7 @@ static void kill_bdev(struct block_device *bdev)
 {
 	struct address_space *mapping = bdev->bd_inode->i_mapping;
 
-	if (mapping_empty(mapping))
+	if (mapping->nrpages == 0 && mapping->nrexceptional == 0)
 		return;
 
 	invalidate_bh_lrus();
@@ -812,8 +812,6 @@ static void bdev_free_inode(struct inode *inode)
 	free_percpu(bdev->bd_stats);
 	kfree(bdev->bd_meta_info);
 
-	if (!bdev_is_partition(bdev))
-		kfree(bdev->bd_disk);
 	kmem_cache_free(bdev_cachep, BDEV_I(inode));
 }
 
@@ -1242,7 +1240,7 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part);
 int bdev_disk_changed(struct block_device *bdev, bool invalidate)
 {
 	struct gendisk *disk = bdev->bd_disk;
-	int ret = 0;
+	int ret;
 
 	lockdep_assert_held(&bdev->bd_mutex);
 
@@ -1250,11 +1248,9 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
 		return -ENXIO;
 
 rescan:
-	if (bdev->bd_part_count)
-		return -EBUSY;
-	sync_blockdev(bdev);
-	invalidate_bdev(bdev);
-	blk_drop_partitions(disk);
+	ret = blk_drop_partitions(bdev);
+	if (ret)
+		return ret;
 
 	clear_bit(GD_NEED_PART_SCAN, &disk->state);
 
@@ -1270,6 +1266,9 @@ rescan:
 		if (disk_part_scan_enabled(disk) ||
 		    !(disk->flags & GENHD_FL_REMOVABLE))
 			set_capacity(disk, 0);
+	} else {
+		if (disk->fops->revalidate_disk)
+			disk->fops->revalidate_disk(disk);
 	}
 
 	if (get_capacity(disk)) {
@@ -1302,9 +1301,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode)
 {
 	struct gendisk *disk = bdev->bd_disk;
 	int ret = 0;
-
-	if (!(disk->flags & GENHD_FL_UP))
-		return -ENXIO;
 
 	if (!bdev->bd_openers) {
 		if (!bdev_is_partition(bdev)) {
@@ -1340,7 +1336,8 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode)
 			whole->bd_part_count++;
 			mutex_unlock(&whole->bd_mutex);
 
-			if (!bdev_nr_sectors(bdev)) {
+			if (!(disk->flags & GENHD_FL_UP) ||
+			    !bdev_nr_sectors(bdev)) {
 				__blkdev_put(whole, mode, 1);
 				bdput(whole);
 				return -ENXIO;
@@ -1371,12 +1368,16 @@ struct block_device *blkdev_get_no_open(dev_t dev)
 	struct block_device *bdev;
 	struct gendisk *disk;
 
+	down_read(&bdev_lookup_sem);
 	bdev = bdget(dev);
 	if (!bdev) {
+		up_read(&bdev_lookup_sem);
 		blk_request_module(dev);
+		down_read(&bdev_lookup_sem);
+
 		bdev = bdget(dev);
 		if (!bdev)
-			return NULL;
+			goto unlock;
 	}
 
 	disk = bdev->bd_disk;
@@ -1386,11 +1387,14 @@ struct block_device *blkdev_get_no_open(dev_t dev)
 		goto put_disk;
 	if (!try_module_get(bdev->bd_disk->fops->owner))
 		goto put_disk;
+	up_read(&bdev_lookup_sem);
 	return bdev;
 put_disk:
 	put_disk(disk);
 bdput:
 	bdput(bdev);
+unlock:
+	up_read(&bdev_lookup_sem);
 	return NULL;
 }
 
@@ -1436,6 +1440,10 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
 	if (ret)
 		return ERR_PTR(ret);
 
+	/*
+	 * If we lost a race with 'disk' being deleted, try again.  See md.c.
+	 */
+retry:
 	bdev = blkdev_get_no_open(dev);
 	if (!bdev)
 		return ERR_PTR(-ENXIO);
@@ -1482,6 +1490,8 @@ abort_claiming:
 	disk_unblock_events(disk);
 put_blkdev:
 	blkdev_put_no_open(bdev);
+	if (ret == -ERESTARTSYS)
+		goto retry;
 	return ERR_PTR(ret);
 }
 EXPORT_SYMBOL(blkdev_get_by_dev);

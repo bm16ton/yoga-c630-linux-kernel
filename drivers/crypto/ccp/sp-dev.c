@@ -213,8 +213,12 @@ void sp_destroy(struct sp_device *sp)
 
 int sp_suspend(struct sp_device *sp)
 {
+	int ret;
+
 	if (sp->dev_vdata->ccp_vdata) {
-		ccp_dev_suspend(sp);
+		ret = ccp_dev_suspend(sp);
+		if (ret)
+			return ret;
 	}
 
 	return 0;
@@ -222,8 +226,12 @@ int sp_suspend(struct sp_device *sp)
 
 int sp_resume(struct sp_device *sp)
 {
+	int ret;
+
 	if (sp->dev_vdata->ccp_vdata) {
-		ccp_dev_resume(sp);
+		ret = ccp_dev_resume(sp);
+		if (ret)
+			return ret;
 	}
 
 	return 0;
