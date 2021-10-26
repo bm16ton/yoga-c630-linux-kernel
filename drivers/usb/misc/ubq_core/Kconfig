@@ -5,6 +5,7 @@
 
 config UBQ_CORE
 	tristate "UBQ_CORE usb hack tool"
+	depends on USB_GADGET
 	help
 	  This driver used with the usbq userland apps helps hack
 	  usb devices in various ways

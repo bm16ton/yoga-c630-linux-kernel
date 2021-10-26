@@ -1151,7 +1151,6 @@ build_init_pkt(struct usb_interface *interface)
 
 /* table of devices that work with this driver */
 static struct usb_device_id driver_table [] = {
-   { ubq_core },
    { .driver_info = 64},
    {} /* Terminating entry */
 };
@@ -1202,20 +1201,12 @@ driver_probe(struct usb_interface *interface, const struct usb_device_id *id) {
    return 0;
 }
 
-static struct usb_driver ubq_core = {
-   .name = "ubq_core",
+static struct usb_driver ubq_driver = {
+   .name = "ubq_driver",
    .id_table = driver_table,
    .probe = driver_probe,
    .disconnect = driver_disconnect,
 };
-
-module_usb_driver(ubq_core);
-
-MODULE_AUTHOR(DRIVER_AUTHOR);
-MODULE_DESCRIPTION(DRIVER_DESC);
-MODULE_LICENSE("GPL");
-
-
 
 int
 driver_recv_userland_management(msg_t *msg)
@@ -1287,7 +1278,7 @@ ubq_enable_device(void)
    log(SPEC,"ENABLE DEVICE");
    printk("IP = %s\n", ip_num);
    log(INFO,"PORT 64240");
-   return usb_register(&ubq_core);
+   return usb_register(&ubq_driver);
 }
 
 /*
@@ -1298,12 +1289,12 @@ ubq_disable_device(void)
 {
    log(SPEC,"DISABLE DEVICE");
    clean_endpoints();
-   usb_deregister(&ubq_core);
+   usb_deregister(&ubq_driver);
 }
 
 
 int
-ubq_core_init(void)
+ubq_driver_init(void)
 {
    int err;
    udp_opt_t options;
@@ -1335,7 +1326,7 @@ ubq_core_init(void)
 
 
 int
-ubq_core_exit(void)
+ubq_driver_exit(void)
 {
    ubq_disable_device();
    com_close(driver_state.com);

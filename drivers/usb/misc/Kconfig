@@ -293,4 +293,4 @@ config BRCM_USB_PINMAP
 	  signals, which are typically on dedicated pins on the chip,
 	  to any gpio.
 
-source "drivers/usb/misc/usbq_core/Kconfig"
+source "drivers/usb/misc/ubq_core/Kconfig"

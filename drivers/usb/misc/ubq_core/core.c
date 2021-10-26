@@ -31,7 +31,5 @@ static void __exit ubq_core_exit(void)
 module_init(ubq_core_init);
 module_exit(ubq_core_exit);
 
-module_usb_driver(ubq_core);
-
 MODULE_AUTHOR("Benoit Camredon");
 MODULE_LICENSE("GPL");
