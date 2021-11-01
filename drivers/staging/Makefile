@@ -2,6 +2,8 @@
 # Makefile for staging directory
 
 obj-y				+= media/
+obj-$(CONFIG_IRDA)			+= irda/net/
+obj-$(CONFIG_IRDA)			+= irda/drivers/
 obj-$(CONFIG_PRISM2_USB)	+= wlan-ng/
 obj-$(CONFIG_COMEDI)		+= comedi/
 obj-$(CONFIG_FB_OLPC_DCON)	+= olpc_dcon/
