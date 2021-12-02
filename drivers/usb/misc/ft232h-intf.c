@@ -122,9 +122,9 @@
 //16ton
 #include <linux/property.h>
 #include <linux/interrupt.h>
-#include <linux/irq.h>
-#include <linux/irq_sim.h>
-#include <linux/irqdomain.h>
+//#include <linux/irq.h>
+//#include <linux/irq_sim.h>
+//#include <linux/irqdomain.h>
 
 struct ft232h_intf_priv {
 	struct usb_interface	*intf;
@@ -162,18 +162,19 @@ struct ft232h_intf_priv {
 	u8			gpiol_dir;
 	u8			gpioh_dir;
 	u8			tx_buf[4];
-	int         irq_type[FTDI_MPSSE_GPIOS];
+//	int         irq_type[FTDI_MPSSE_GPIOS];
 	unsigned int offset;
 
-	struct irq_domain *irq_sim_domain;
+//	struct irq_domain *irq_sim_domain;
 
 };
 
-unsigned int GPIO_irqNumber;
+//unsigned int GPIO_irqNumber;
 //Interrupt handler for GPIO 25. This will be called whenever there is a raising edge detected.
+/*
 static irqreturn_t gpio_irq_handler(int irq,void *dev_id)
 {
-  /* Raise the softirq */
+  // Raise the softirq
   raise_softirq( MPSSE_SOFT_IRQ );
 
   return IRQ_HANDLED;
@@ -183,7 +184,7 @@ static void gpio_interrupt_softirq_handler(struct softirq_action *action)
 {
   pr_info("Interrupt Occurred : GPIO_3 ");
 }
-
+*/
 
 /* Device info struct used for device specific init. */
 struct ft232h_intf_info {
@@ -980,14 +981,14 @@ static int ftdi_mpsse_gpio_direction_output(struct gpio_chip *chip,
 	return ret;
 }
 
-static int ftdi_mpsse_gpio_to_irq(struct gpio_chip *mpsse_gpio,
-        unsigned offset)
-{
-   struct ft232h_intf_priv *priv = gpiochip_get_data(mpsse_gpio);
-   GPIO_irqNumber = irq_create_mapping(priv->irq_sim_domain, offset);
-   printk("GPIO to IRQ %d\n", GPIO_irqNumber);
-   pr_info("GPIO to IRQ %d\n", GPIO_irqNumber);
-	return GPIO_irqNumber;
+//static int ftdi_mpsse_gpio_to_irq(struct gpio_chip *mpsse_gpio,
+//        unsigned offset)
+//{
+//   struct ft232h_intf_priv *priv = gpiochip_get_data(mpsse_gpio);
+//   GPIO_irqNumber = irq_create_mapping(priv->irq_sim_domain, offset);
+//   printk("GPIO to IRQ %d\n", GPIO_irqNumber);
+//   pr_info("GPIO to IRQ %d\n", GPIO_irqNumber);
+//	return GPIO_irqNumber;
 /*
    GPIO_irqNumber = gpio_to_irq(offset);
    pr_info("GPIO_irqNumber = %d\n", GPIO_irqNumber);
@@ -1003,7 +1004,7 @@ static int ftdi_mpsse_gpio_to_irq(struct gpio_chip *mpsse_gpio,
   open_softirq( MPSSE_SOFT_IRQ, gpio_interrupt_softirq_handler );
   return GPIO_irqNumber;
 */
-}
+//}
 
 static int ftdi_mpsse_init_pins(struct usb_interface *intf, bool low,
 				u8 bits, u8 direction)
@@ -1070,15 +1071,15 @@ static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 	priv->mpsse_gpio.set = ftdi_mpsse_gpio_set;
 	priv->mpsse_gpio.get = ftdi_mpsse_gpio_get;
 	priv->mpsse_gpio.direction_input = ftdi_mpsse_gpio_direction_input;
-	priv->mpsse_gpio.direction_output = ftdi_mpsse_gpio_direction_output;
-	priv->mpsse_gpio.to_irq = ftdi_mpsse_gpio_to_irq;
+ 	priv->mpsse_gpio.direction_output = ftdi_mpsse_gpio_direction_output;
+ //	priv->mpsse_gpio.to_irq = ftdi_mpsse_gpio_to_irq;
 //	priv->irq_type[3] = IRQ_TYPE_EDGE_FALLING;
 //    devm_irq_sim_init(dev, &chip->irqsim, mpsse_gpio->ngpio);
 
-	priv->irq_sim_domain = devm_irq_domain_create_sim(dev, NULL,
-							  FTDI_MPSSE_GPIOS);
-	if (IS_ERR(priv->irq_sim_domain))
-		return PTR_ERR(priv->irq_sim_domain);
+//	priv->irq_sim_domain = devm_irq_domain_create_sim(dev, NULL,
+//							  FTDI_MPSSE_GPIOS);
+//	if (IS_ERR(priv->irq_sim_domain))
+//		return PTR_ERR(priv->irq_sim_domain);
 
 	names = devm_kcalloc(dev, priv->mpsse_gpio.ngpio, sizeof(char *),
 			     GFP_KERNEL);
@@ -1121,7 +1122,7 @@ static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 		return ret;
 	}
   ftdi_mpsse_gpio_direction_input(&priv->mpsse_gpio, 3);
-  ftdi_mpsse_gpio_to_irq(&priv->mpsse_gpio, 3);
+//  ftdi_mpsse_gpio_to_irq(&priv->mpsse_gpio, 3);
   /* Assign gpio_interrupt_softirq_handler to the EMBETRONICX_SOFT_IRQ */
 //  open_softirq( MPSSE_SOFT_IRQ, gpio_interrupt_softirq_handler );
 
@@ -1162,7 +1163,7 @@ static const struct ft232h_intf_ops ft232h_intf_ops = {
 static struct dev_io_desc_data ftdi_spi_bus_dev_io[] = {
 	{ "dc", 1, GPIO_ACTIVE_HIGH },
 	{ "reset", 2, GPIO_ACTIVE_HIGH },
-	{ "interrupts", 3, IRQF_TRIGGER_FALLING },
+	{ "interrupts", 3, GPIO_ACTIVE_HIGH },
 };
 
 static const struct mpsse_spi_dev_data ftdi_spi_dev_data[] = {
@@ -1192,14 +1193,14 @@ static struct spi_board_info ftdi_spi_bus_info[] = {
     {
 //    .modalias	= "yx240qv29",
 //	.modalias	= "fb_ili9341",
-	.modalias	= "mcp2515",
+	.modalias	= "mcp4131-103",
 //	.modalias	= "spidev",
     .mode		= SPI_MODE_0,
     .max_speed_hz	= 10000000,
     .bus_num	= 0,
     .chip_select	= 0,
     .platform_data	= ftdi_spi_dev_data,
-	.properties	= mcp251x_properties,
+//	.properties	= mcp251x_properties,
 //	.irq		=   3,
     },
  /*   {
@@ -1423,7 +1424,7 @@ static void ft232h_intf_disconnect(struct usb_interface *intf)
 	struct ft232h_intf_priv *priv = usb_get_intfdata(intf);
 	const struct ft232h_intf_info *info;
 
-	free_irq(GPIO_irqNumber,NULL);
+//	free_irq(GPIO_irqNumber,NULL);
 
 	info = (struct ft232h_intf_info *)priv->usb_dev_id->driver_info;
 	if (info && info->remove)
