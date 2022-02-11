@@ -4,11 +4,17 @@
 #include <linux/errno.h>
 #include <linux/i2c.h>
 #include <linux/module.h>
+#include <linux/kobject.h>
+#include <linux/sysfs.h>
+#include <linux/string.h>
+#include <linux/fs.h>
 #include <linux/slab.h>
 #include <linux/usb.h>
 #include <linux/mutex.h>
+#include <linux/uaccess.h>
 
 #include "mpsse.h"
+
 
 int i2c_ftdi_100k;
 module_param_named(100k, i2c_ftdi_100k, int, 0444);
@@ -37,6 +43,45 @@ struct ftdi_usb {
 	// I2C bus frequency
 	unsigned freq;
 };
+
+static ssize_t i2cfreq_show(struct device *dev,
+				  struct device_attribute *attr, char *buf)
+{
+	struct ftdi_usb *ftdi = dev_get_drvdata(dev);
+	int ret2;
+
+		ret2 = ftdi->freq;
+
+		return scnprintf(buf, PAGE_SIZE, "%d\n", ret2);
+}
+
+/*
+** This function will be called when we write the sysfsfs file
+*/
+static ssize_t i2cfreq_store(struct device *dev,
+				   struct device_attribute *attr,
+				   const char *valbuf, size_t count)
+{
+        return count;
+}
+static DEVICE_ATTR_RW(i2cfreq);
+
+static int create_sysfs_attrs(struct usb_interface *interface)
+{
+	int retval = 0;
+
+			retval = device_create_file(&interface->dev,
+						    &dev_attr_i2cfreq);
+
+	return retval;
+}
+
+static void remove_sysfs_attrs(struct usb_interface *interface)
+{
+
+			device_remove_file(&interface->dev, &dev_attr_i2cfreq);
+}
+
 
 static int ftdi_mpsse_write(
 	struct ftdi_usb *ftdi, u8 *data, size_t size, size_t *written)
@@ -613,22 +658,12 @@ static int ftdi_reset(struct ftdi_usb *ftdi)
 	return ftdi_i2c_idle(ftdi);
 }
 
-static int ftdi_usb_probe(struct usb_interface *interface,
-			  const struct usb_device_id *id)
+static int ftx232h_jtag_probe(struct usb_interface *interface)
 {
-	struct usb_device *dev = interface_to_usbdev(interface);
-	struct ftdi_usb *ftdi;
-	int ret;
+//	int ifnum = intf->cur_altsetting->desc.bInterfaceNumber;
 	int inf;
-	(void) id;
+	inf = interface->cur_altsetting->desc.bInterfaceNumber;
 
-	ftdi = kzalloc(sizeof(*ftdi), GFP_KERNEL);
-	if (!ftdi)
-		return -ENOMEM;
-
-	ftdi->udev = usb_get_dev(dev);
-	ftdi->interface = usb_get_intf(interface);
-	inf = ftdi->interface->cur_altsetting->desc.bInterfaceNumber;
 	if (inf > 1) {
 		dev_info(&interface->dev, "Ignoring Interface\n");
 		return -ENODEV;
@@ -637,18 +672,63 @@ static int ftdi_usb_probe(struct usb_interface *interface,
 		dev_info(&interface->dev, "Ignoring Interface\n");
 		return -ENODEV;
 		}
+
+	return 0;
+}
+
+static int ftdi_usb_probe(struct usb_interface *interface,
+			  const struct usb_device_id *id)
+{
+	struct usb_device *dev = interface_to_usbdev(interface);
+	struct ftdi_usb *ftdi;
+	int ret;
+	int ret2;
+	int inf;
+//	int error = 0;
+	(void) id;
+
+
+	ftdi = kzalloc(sizeof(*ftdi), GFP_KERNEL);
+	if (!ftdi)
+		return -ENOMEM;
+
+	ftdi->udev = usb_get_dev(dev);
+	ftdi->interface = usb_get_intf(interface);
+	inf = ftdi->interface->cur_altsetting->desc.bInterfaceNumber;
+
+
+     if (ftdi->udev->product && !strcmp(ftdi->udev->product, "ft4232H-16ton")) {
+	 	ret = ftx232h_jtag_probe(interface);
+		if (ret < 0) {
+			ftdi_usb_delete(ftdi);
+		    	return -ENODEV;
+     	}
+	 }
+
+     if (ftdi->udev->product && !strcmp(ftdi->udev->product, "ft2232H-16ton")) {
+		ret = ftx232h_jtag_probe(interface);
+		if (ret < 0) {
+			ftdi_usb_delete(ftdi);
+				return -ENODEV;
+	 	}
+	}
+
+	create_sysfs_attrs(interface);
+
 	ftdi->io_timeout = FTDI_IO_TIMEOUT;
 	if (i2c_ftdi_100k) {
 	ftdi->freq = 100000;
 	} else {
 	ftdi->freq  = 400000;
 	}
+	ret2 = ftdi->freq;
+	dev_info(&interface->dev, "probe i2cftdi freq %d\n", ret2);
 //	ftdi->freq = FTDI_I2C_FREQ;
 	ftdi->buffer = kzalloc(FTDI_IO_BUFFER_SIZE, GFP_KERNEL);
 	ftdi->buffer_size = FTDI_IO_BUFFER_SIZE;
 	if (!ftdi->buffer) {
 		dev_err(&interface->dev,
-			"Failed to initialize the FTDI-based device: %d\n",
+			"Failed to initialize the FTDI-based I2C device: %d\n",
 			-ENOMEM);
 		ftdi_usb_delete(ftdi);
 		return -ENOMEM;
@@ -657,7 +737,7 @@ static int ftdi_usb_probe(struct usb_interface *interface,
 	ret = ftdi_reset(ftdi);
 	if (ret < 0) {
 		dev_err(&interface->dev,
-			"Failed to reset FTDI-based device: %d\n", ret);
+			"Failed to reset FTDI-based I2C device: %d\n", ret);
 		ftdi_usb_delete(ftdi);
 		return ret;
 	}
@@ -672,7 +752,7 @@ static int ftdi_usb_probe(struct usb_interface *interface,
 	i2c_add_adapter(&ftdi->adapter);
 
 	usb_set_intfdata(interface, ftdi);
-	dev_info(&interface->dev, "Initialized FTDI-based device\n");
+	dev_info(&interface->dev, "Initialized FTDI-based I2C device\n");
 	return 0;
 }
 
@@ -680,14 +760,15 @@ static void ftdi_usb_disconnect(struct usb_interface *interface)
 {
 	struct ftdi_usb *ftdi = usb_get_intfdata(interface);
 
+	remove_sysfs_attrs(interface);
 	i2c_del_adapter(&ftdi->adapter);
 	usb_set_intfdata(interface, NULL);
 	ftdi_usb_delete(ftdi);
-	dev_info(&interface->dev, "FTDI-based device has been disconnected\n");
+	dev_info(&interface->dev, "FTDI-based I2C device has been disconnected\n");
 }
 
 static struct usb_driver ftdi_usb_driver = {
-	.name = "ftdi_usb",
+	.name = "i2c-ftdi",
 	.probe = ftdi_usb_probe,
 	.disconnect = ftdi_usb_disconnect,
 	.id_table = ftdi_id_table,
