@@ -215,12 +215,31 @@ static void i2c_tiny_usb_free(struct i2c_tiny_usb *dev)
 	kfree(dev);
 }
 
+static int i2c_gpio_probe(struct usb_interface *interface)
+{
+//	int ifnum = intf->cur_altsetting->desc.bInterfaceNumber;
+	int inf;
+	inf = interface->cur_altsetting->desc.bInterfaceNumber;
+
+	if (inf > 0) {
+		dev_info(&interface->dev, "Ignoring Interface\n");
+		return -ENODEV;
+		}
+	if (inf < 0) {
+		dev_info(&interface->dev, "Ignoring Interface\n");
+		return -ENODEV;
+		}
+
+	return 0;
+}
+
 static int i2c_tiny_usb_probe(struct usb_interface *interface,
 			      const struct usb_device_id *id)
 {
 	struct i2c_tiny_usb *dev;
 	int retval = -ENOMEM;
 	u16 version;
+	int ret;
 
 	dev_dbg(&interface->dev, "probing usb device\n");
 
@@ -234,6 +253,27 @@ static int i2c_tiny_usb_probe(struct usb_interface *interface,
 	dev->usb_dev = usb_get_dev(interface_to_usbdev(interface));
 	dev->interface = interface;
 
+     if (dev->usb_dev->product && !strcmp(dev->usb_dev->product, "i2c-stm32f4-usb")) {
+	 	ret = i2c_gpio_probe(interface);
+		if (ret < 0) {
+		    	return -ENODEV;
+     	}
+	 }
+
+     if (dev->usb_dev->product && !strcmp(dev->usb_dev->product, "i2c-stm32f1-usb")) {
+	 	ret = i2c_gpio_probe(interface);
+		if (ret < 0) {
+		    	return -ENODEV;
+     	}
+	 }
+
+     if (dev->usb_dev->product && !strcmp(dev->usb_dev->product, "16ton")) {
+	 	ret = i2c_gpio_probe(interface);
+		if (ret < 0) {
+		    	return -ENODEV;
+     	}
+	 }
+	 
 	/* save our data pointer in this interface device */
 	usb_set_intfdata(interface, dev);
 
