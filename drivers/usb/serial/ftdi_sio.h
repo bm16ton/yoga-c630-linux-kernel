@@ -37,9 +37,11 @@
 #define FTDI_SIO_SET_LATENCY_TIMER	9 /* Set the latency timer */
 #define FTDI_SIO_GET_LATENCY_TIMER	0x0a /* Get the latency timer */
 #define FTDI_SIO_SET_BITMODE		0x0b /* Set bitbang mode */
+#define FTDI_SIO_SET_BITBANG 11 /* Set the bitbang mode */
 #define FTDI_SIO_READ_PINS		0x0c /* Read immediate value of pins */
 #define FTDI_SIO_READ_EEPROM		0x90 /* Read EEPROM */
-
+#define FTDI_SIO_SET_BITMODE_RESET  0x00
+#define FTDI_SIO_SET_BITMODE_BITBANG     0x01 	/*0x01 asynch bitbang, 0x02 MPSSE, 0x04 sync bb  */
 /* Interface indices for FT2232, FT2232H and FT4232H devices */
 #define INTERFACE_A		1
 #define INTERFACE_B		2
@@ -439,6 +441,12 @@ enum ftdi_sio_baudrate {
 /* FTDI_SIO_SET_BITMODE */
 #define FTDI_SIO_SET_BITMODE_REQUEST_TYPE 0x40
 #define FTDI_SIO_SET_BITMODE_REQUEST FTDI_SIO_SET_BITMODE
+
+#define FTDI_SIO_SET_BITBANG_REQUEST FTDI_SIO_SET_BITBANG
+#define FTDI_SIO_SET_BITBANG_REQUEST_TYPE 0x40
+
+#define FTDI_BITMODE_RESET 0x00 /* Switch back to normal operation */
+#define FTDI_BITMODE_SYNCFIFO 0x40 /* Switch to syncronous FIFO mode */
 
 /* Possible bitmodes for FTDI_SIO_SET_BITMODE_REQUEST */
 #define FTDI_SIO_BITMODE_RESET		0x00
