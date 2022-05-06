@@ -188,7 +188,8 @@ static const struct usb_device_id id_table_combined[] = {
 		.driver_info = (kernel_ulong_t)&ftdi_8u2232c_quirk },
 	{ USB_DEVICE(FTDI_VID, FTDI_4232H_PID) ,
 	    .driver_info = (kernel_ulong_t)&ftdi_8u2232c_quirk },
-	{ USB_DEVICE(FTDI_VID, FTDI_232H_PID) },
+	{ USB_DEVICE(FTDI_VID, FTDI_232H_PID) ,
+	    .driver_info = (kernel_ulong_t)&ftdi_8u2232c_quirk },
 	{ USB_DEVICE(FTDI_VID, FTDI_FTX_PID) },
 	{ USB_DEVICE(FTDI_VID, FTDI_MICRO_CHAMELEON_PID) },
 	{ USB_DEVICE(FTDI_VID, FTDI_RELAIS_PID) },
@@ -1058,6 +1059,8 @@ static const struct usb_device_id id_table_combined[] = {
 	{ USB_DEVICE(FTDI_VID, FTDI_FALCONIA_JTAG_UNBUF_PID),
 		.driver_info = (kernel_ulong_t)&ftdi_jtag_quirk },
 	/* 16ton i2c spi */
+	{ USB_DEVICE(FTDI_VID, FTDI_232H_PID),
+		.driver_info = (kernel_ulong_t)&ftdi_8u2232c_quirk },
 	{ USB_DEVICE(FTDI_VID, FTDI_4232H_PID),
 		.driver_info = (kernel_ulong_t)&ftdi_8u2232c_quirk },
 	{ }					/* Terminating entry */
@@ -2568,7 +2571,7 @@ static int ftdi_8u2232c_probe(struct usb_serial *serial)
 	if (udev->manufacturer && !strcmp(udev->manufacturer, "CALAO Systems"))
 		return ftdi_jtag_probe(serial);
 
-     if (udev->product && (!strcmp(udev->product, "ft4232H-16ton") || !strcmp(udev->product, "ft2232H-16ton")))
+     if (udev->product && (!strcmp(udev->product, "ft4232H-16ton") || !strcmp(udev->product, "ft2232H-16ton") || !strcmp(udev->product, "ft232H-16ton-i2c")))
 		return ft4232_jtag_probe(serial);
 
 	if (udev->product &&

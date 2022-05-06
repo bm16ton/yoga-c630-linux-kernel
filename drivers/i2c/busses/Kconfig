@@ -1179,6 +1179,16 @@ config I2C_RCAR
 
 comment "External I2C/SMBus adapter drivers"
 
+config I2C_CH341
+	tristate "CH341 USB to I2C support"
+	select MFD_CH341
+	help
+	  If you say yes to this option, I2C support will be included for the
+	  WCH CH341, a USB to I2C/SPI/GPIO interface.
+
+	  This driver can also be built as a module.  If so, the module
+	  will be called i2c-ch341.
+
 config I2C_DIOLAN_U2C
 	tristate "Diolan U2C-12 USB adapter"
 	depends on USB
@@ -1224,6 +1234,16 @@ config I2C_ROBOTFUZZ_OSIF
 	  This driver can also be built as a module.  If so, the module
 	  will be called i2c-osif.
 
+config I2C_TI_SMUSBDIG
+	tristate "Texas Instruments SM-USB-DIG I2C interface"
+	depends on MFD_TI_SMUSBDIG
+	help
+	  This adds support for the I2C bus functionality of the
+	  TI SM-USB-DIG USB interface adapter.
+
+	  This driver can also be built as a module.  If so, the module
+	  will be called i2c-ti-smusbdig.
+
 config I2C_TAOS_EVM
 	tristate "TAOS evaluation module"
 	depends on TTY
@@ -1266,12 +1286,6 @@ config I2C_FTDI
 	help
 	  Say yes here to access the I2C part of the ftdi
 	  ft2232h, and probly others.
-
-config I2C_CH341
-	tristate "ch341 I2C master support"
-	depends on USB
-	help
-	  Say yes here to access the I2C part of the ch341.
 
 comment "Other I2C/SMBus bus drivers"
 

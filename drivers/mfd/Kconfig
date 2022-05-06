@@ -1720,6 +1720,15 @@ config MFD_LM3533
 	  additional drivers must be enabled in order to use the LED,
 	  backlight or ambient-light-sensor functionality of the device.
 
+config MFD_TI_SMUSBDIG
+	tristate "Texas Instruments SM-USB-DIG interface adapter"
+	depends on USB
+	select MFD_CORE
+	help
+	  Support for the TI SM-USB-DIG USB to SPI/I2C/1Wire/GPIO adapter.
+	  Additional drivers such as SPI_TI_SMUSBDIG, I2C_TI_SMUSBDIG, etc. must
+	  be enabled in order to use the functionality of the device.
+
 config MFD_TIMBERDALE
 	tristate "Timberdale FPGA"
 	select MFD_CORE
@@ -1796,6 +1805,16 @@ config MFD_LOCHNAGAR
 	depends on I2C=y && OF
 	help
 	  Support for Cirrus Logic Lochnagar audio development board.
+
+config MFD_CH341
+	tristate "WinChipHead CH341 in I2C/SPI/GPIO mode"
+	depends on USB
+	help
+	  If you say yes to this option, support for the CH341 series
+	  of chips, running in I2C/SPI/GPIO mode will be included.
+
+	  This driver can also be built as a module.  If so, the
+	  module will be called ch341-core.
 
 config MFD_ARIZONA
 	select REGMAP
