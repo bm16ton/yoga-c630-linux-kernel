@@ -87,6 +87,21 @@ static inline int ftdi_mpsse_set_freq(struct ftdi_mpsse_cmd *cmd, unsigned freq)
 	return 0;
 }
 
+static inline int ftdi_mpsse_set_output_232h(
+	struct ftdi_mpsse_cmd *cmd, unsigned pinmask, unsigned pinvals)
+{
+	if (cmd->offset + 6 > cmd->size)
+		return -ENOMEM;
+
+	cmd->buffer[cmd->offset++] = 0x80;
+	cmd->buffer[cmd->offset++] = pinvals & 0xff;
+	cmd->buffer[cmd->offset++] = pinmask & 0x03;
+	cmd->buffer[cmd->offset++] = 0x82;
+	cmd->buffer[cmd->offset++] = (pinvals >> 8) & 0xff;
+	cmd->buffer[cmd->offset++] = (pinmask >> 8) & 0xff;
+	return 0;
+}
+
 static inline int ftdi_mpsse_set_output(
 	struct ftdi_mpsse_cmd *cmd, unsigned pinmask, unsigned pinvals)
 {
