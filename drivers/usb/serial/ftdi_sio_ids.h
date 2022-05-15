@@ -22,12 +22,13 @@
 #define FTDI_8U232AM_PID 0x6001 /* Similar device to SIO above */
 #define FTDI_8U232AM_ALT_PID 0x6006 /* FTDI's alternate PID for above */
 #define FTDI_8U2232C_PID 0x6010 /* Dual channel device */
+#define FTDI_2232H_PID 0x6010
 #define FTDI_4232H_PID 0x6011 /* Quad channel hi-speed device */
 #define FTDI_232H_PID  0x6014 /* Single channel hi-speed device */
 #define FTDI_FTX_PID   0x6015 /* FT-X series (FT201X, FT230X, FT231X, etc) */
 #define FTDI_SIO_PID	0x8372	/* Product Id SIO application of 8U100AX */
 #define FTDI_232RL_PID  0xFBFA  /* Product ID for FT232RL */
-
+#define FTDI_4233HPQ_PID  0x6041  /* Product ID for FT232RL */
 
 /*** third-party PIDs (using FTDI_VID) ***/
 

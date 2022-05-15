@@ -47,30 +47,64 @@ static ssize_t dut_store(struct device *dev,
 				   const char *valbuf, size_t count)
 {
         struct ti_smusbdig_i2c *ti_smusbdig_i2c = dev_get_drvdata(dev);
-//            struct usb_interface *interface;
         u8 *buffer = kmalloc(TI_SMUSBDIG_PACKET_SIZE, GFP_KERNEL);
         int volt, ret;
 	
         if (kstrtoint(valbuf, 10, &volt))
 		    return -EINVAL;
 
-        if (volt == 1) {
-        buffer[0] = TI_SMUSBDIG_COMMAND;
-	    buffer[1] = TI_SMUSBDIG_COMMAND_DUTPOWERON;
-        ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig,
-			           buffer, sizeof(buffer));
-		if (ret)
-			return ret;
-        }
         if (volt == 0) {
-        buffer[0] = TI_SMUSBDIG_COMMAND;
-	    buffer[1] = TI_SMUSBDIG_COMMAND_DUTPOWEROFF;
-		ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig,
-				       buffer, sizeof(buffer));
+            buffer[0] = TI_SMUSBDIG_COMMAND;
+//	        buffer[1] = TI_SMUSBDIG_SET_VOUT;
+            buffer[1] = TI_SMUSBDIG_COMMAND_DUTPOWEROFF;
+//	        buffer[2] = TI_SMUSBDIG_DUTOFF;
+        ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig, buffer, 2);
 		if (ret)
 			return ret;
         }
-
+        if (volt == 1) {
+            buffer[0] = TI_SMUSBDIG_COMMAND;
+	        buffer[1] = TI_SMUSBDIG_COMMAND_DUTPOWERON;
+        ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig, buffer, 2);
+		if (ret)
+			return ret;
+        }
+        if (volt == 3) {
+            buffer[0] = TI_SMUSBDIG_COMMAND;
+	        buffer[1] = TI_SMUSBDIG_SET_VOUT;
+	        buffer[2] = TI_SMUSBDIG_DUTOFF;
+        ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig, buffer, 3);
+		if (ret)
+			return ret;
+			
+	        buffer[0] = TI_SMUSBDIG_COMMAND;
+	        buffer[1] = TI_SMUSBDIG_SET_VOUT;
+	        buffer[3] = TI_SMUSBDIG_VOUT3;
+	    ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig, buffer, 3);
+	    if (ret)
+		    return ret;
+         
+            buffer[0] = TI_SMUSBDIG_COMMAND;
+	        buffer[1] = TI_SMUSBDIG_COMMAND_DUTPOWERON;
+        ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig, buffer, 2);
+		if (ret)
+			return ret;
+		}	
+        if (volt == 5) {
+            buffer[0] = TI_SMUSBDIG_COMMAND;
+	        buffer[1] = TI_SMUSBDIG_SET_VOUT;
+	        buffer[2] = TI_SMUSBDIG_DUTOFF;
+        ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig, buffer, 3);
+		if (ret)
+			return ret;
+			
+            buffer[0] = TI_SMUSBDIG_COMMAND;
+	        buffer[1] = TI_SMUSBDIG_COMMAND_DUTPOWERON;
+        ret = ti_smusbdig_xfer(ti_smusbdig_i2c->ti_smusbdig, buffer, 2);
+		if (ret)
+			return ret;
+         }
+         
 	    kfree(buffer);
         return count;
 }
@@ -106,8 +140,6 @@ static int ti_smusbdig_i2c_xfer(struct i2c_adapter *adapter,
 	struct ti_smusbdig_i2c *ti_smusbdig_i2c = i2c_get_adapdata(adapter);
 	struct ti_smusbdig_packet packet;
 	int i, j, k, ret;
-
-//    char *packet = kmalloc(TI_SMUSBDIG_PACKET_SIZE, GFP_KERNEL);
     
     
 	for (i = 0; i < num; i++) {

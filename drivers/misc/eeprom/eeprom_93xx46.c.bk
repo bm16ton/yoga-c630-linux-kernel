@@ -8,7 +8,6 @@
 #include <linux/delay.h>
 #include <linux/device.h>
 #include <linux/gpio/consumer.h>
-#include <linux/property.h>
 #include <linux/kernel.h>
 #include <linux/log2.h>
 #include <linux/module.h>
@@ -581,4 +580,12 @@ module_spi_driver(eeprom_93xx46_driver);
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Driver for 93xx46 EEPROMs");
 MODULE_AUTHOR("Anatolij Gustschin <agust@denx.de>");
+MODULE_ALIAS("spi:93xx46");
+MODULE_ALIAS("spi:eeprom-93xx46");
 MODULE_ALIAS("eeprom_93xx46");
+MODULE_ALIAS("spi:93lc46b");
+MODULE_ALIAS("spi:at93c56");
+MODULE_ALIAS("spi:93c56");
+MODULE_ALIAS("at93c56");
+MODULE_ALIAS("atmel,at93c56");
+MODULE_ALIAS("spi:atmel,at93c56");

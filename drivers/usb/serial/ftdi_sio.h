@@ -165,6 +165,7 @@ enum ftdi_chip_type {
 	FT4232H = 7,
 	FT232H  = 8,
 	FTX     = 9,
+	FT4233HPQ = 10,
 };
 
 enum ftdi_sio_baudrate {
