@@ -2827,6 +2827,8 @@ int cpufreq_register_driver(struct cpufreq_driver *driver_data)
 		goto err_if_unreg;
 	}
 
+    cpufreq_boost_enabled();
+
 	ret = cpuhp_setup_state_nocalls_cpuslocked(CPUHP_AP_ONLINE_DYN,
 						   "cpufreq:online",
 						   cpuhp_cpufreq_online,

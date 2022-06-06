@@ -1181,7 +1181,6 @@ comment "External I2C/SMBus adapter drivers"
 
 config I2C_CH341
 	tristate "CH341 USB to I2C support"
-	select MFD_CH341
 	help
 	  If you say yes to this option, I2C support will be included for the
 	  WCH CH341, a USB to I2C/SPI/GPIO interface.

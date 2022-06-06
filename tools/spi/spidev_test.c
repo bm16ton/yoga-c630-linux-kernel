@@ -35,7 +35,7 @@ static void pabort(const char *s)
 	abort();
 }
 
-static const char *device = "/dev/spidev1.1";
+static const char *device = "/dev/spidev16.0";
 static uint32_t mode;
 static uint8_t bits = 8;
 static char *input_file;

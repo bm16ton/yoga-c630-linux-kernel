@@ -153,3 +153,16 @@ x509.genkey
 
 # Clang's compilation database file
 /compile_commands.json
+
+/drivers/gpio/gpiolib.c.bk 
+/drivers/usb/misc/ft232h-intf.c-commented-code 
+/drivers/usb/misc/ft232h-intf.c-time-b4-last 
+/drivers/usb/misc/ft232h-intf.c.all-good-except-unload 
+/drivers/usb/misc/ft232h-intf.c.best-irq 
+/drivers/usb/misc/ft232h-intf.c.doesnt-seem-to-crash-on-removal 
+/drivers/usb/misc/ft232h-intf.c.gpio-gpiod-hybrid 
+/drivers/usb/misc/ft232h-intf.c.irq-works 
+/drivers/usb/misc/ft232h-intf.c.newest 
+/drivers/usb/misc/ft232h-intf.c.no-modinfo 
+/drivers/usb/misc/ft232h-intf.c.untested 
+/drivers/usb/misc/ft232h-intf.c.working.gpiod-irq-poll-and-ce-output

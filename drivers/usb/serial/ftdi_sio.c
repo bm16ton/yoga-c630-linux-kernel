@@ -135,6 +135,9 @@ int sio_dont_ignore;
 module_param_named(dont_ignore, sio_dont_ignore, int, 0444);
 MODULE_PARM_DESC(dont_ignore, "Dont ignore ftdi's with 16ton product");
 
+int bind232h;
+module_param(bind232h, int, S_IRUSR | S_IWUSR);
+MODULE_PARM_DESC(bind232h, "bind to 232h 16ton");
 
 /*
  * The 8U232AM has the same API as the sio except for:
@@ -2594,6 +2597,14 @@ static int ftdi_8u2232c_probe(struct usb_serial *serial)
 		return ftdi_jtag_probe(serial);
     if (sio_dont_ignore == 1)
         return 0;
+    if (bind232h) {
+	    if (udev->product && !strcmp(udev->product, "ft232H-16ton")) {
+	        return 0;
+	    }
+	}
+	if (udev->product && !strcmp(udev->product, "ft232H-16ton")) {
+	        return -ENODEV;
+	}
     if (udev->product && (!strcmp(udev->product, "ft4232H-16ton") || !strcmp(udev->product, "ft2232H-16ton") || !strcmp(udev->product, "ft4233HPQ-16ton")  || !strcmp(udev->product, "ft232H-16ton") || !strcmp(udev->product, "ft232H-16ton-spi") || !strcmp(udev->product, "ft232H-16ton-i2c")))
 		return ft4232_jtag_probe(serial);
 
