@@ -226,8 +226,8 @@ static int qcom_cpufreq_hw_read_lut(struct device *cpu_dev,
 			 */
 			if (prev->frequency == CPUFREQ_ENTRY_INVALID) {
 				if (!qcom_cpufreq_update_opp(cpu_dev, prev_freq, volt)) {
-					prev->frequency = prev_freq;
-					prev->flags = CPUFREQ_BOOST_FREQ;
+					prev->frequency = freq;
+//					prev->flags = CPUFREQ_BOOST_FREQ;
 				} else {
 					dev_warn(cpu_dev, "failed to update OPP for freq=%d\n",
 						 freq);
@@ -601,6 +601,8 @@ static int qcom_cpufreq_hw_driver_probe(struct platform_device *pdev)
 		dev_dbg(&pdev->dev, "QCOM CPUFreq HW driver initialized\n");
 
 	return ret;
+	
+	
 }
 
 static int qcom_cpufreq_hw_driver_remove(struct platform_device *pdev)

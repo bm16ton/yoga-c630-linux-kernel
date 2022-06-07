@@ -368,9 +368,6 @@
 &i2c1 {
 	status = "okay";
 	clock-frequency = <400000>;
-	/* Overwrite pinctrl-0 from sdm845.dtsi
-	pinctrl-0 = <&qup_i2c3_default &i2c3_hid_active>;
-	*/
 
 	battery@70 {
 		compatible = "some,battery";
@@ -382,23 +379,25 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	hid@15 {
+	tsel: hid@15 {
 		compatible = "hid-over-i2c";
 		reg = <0x15>;
 		hid-descr-addr = <0x1>;
 
 		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
+		
+
 	};
 
-	hid@2c {
+	tsc2: hid@2c {
 		compatible = "hid-over-i2c";
 		reg = <0x2c>;
 		hid-descr-addr = <0x20>;
 
 		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&i2c2_hid_active>;
+		
+               pinctrl-names = "default";
+               pinctrl-0 = <&i2c2_hid_active>;
 	};
 };
 
@@ -406,15 +405,15 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	hid@10 {
+	tsc1: hid@10 {
 		compatible = "hid-over-i2c";
 		reg = <0x10>;
 		hid-descr-addr = <0x1>;
 
-		interrupts-extended = <&tlmm 125 IRQ_TYPE_EDGE_FALLING>;
+		interrupts-extended = <&tlmm 125 IRQ_TYPE_LEVEL_LOW>;
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&i2c6_hid_active>;
+		pinctrl-0 = <&i2c5_hid_active>;
 	};
 };
 
@@ -472,7 +471,7 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	hid@5c {
+	ecsh: hid@5c {
 		compatible = "hid-over-i2c";
 		reg = <0x5c>;
 		hid-descr-addr = <0x1>;
@@ -480,7 +479,7 @@
 		interrupts-extended = <&tlmm 92 IRQ_TYPE_LEVEL_LOW>;
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&i2c12_hid_active>;
+		pinctrl-0 = <&i2c11_hid_active>;
 	};
 };
 
@@ -657,8 +656,8 @@
 		drive-strength = <2>;
 	};
 
-	i2c6_hid_active: i2c6-hid-active {
-		pins = <125>;
+	i2c5_hid_active: i2c5-hid-active {
+		pins = "gpio125";
 		function = "gpio";
 
 		input-enable;
@@ -666,8 +665,8 @@
 		drive-strength = <2>;
 	};
 
-	i2c12_hid_active: i2c12-hid-active {
-		pins = <92>;
+	i2c11_hid_active: i2c11-hid-active {
+		pins = "gpio92";
 		function = "gpio";
 
 		input-enable;
@@ -676,7 +675,7 @@
 	};
 
 	wcd_intr_default: wcd_intr_default {
-		pins = <54>;
+		pins = "gpio54";
 		function = "gpio";
 
 		input-enable;

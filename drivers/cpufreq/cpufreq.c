@@ -1755,7 +1755,7 @@ unsigned int cpufreq_quick_get_max(unsigned int cpu)
 	unsigned int ret_freq = 0;
 
 	if (policy) {
-		ret_freq = policy->max;
+		ret_freq = policy->cpuinfo.max_freq;
 		cpufreq_cpu_put(policy);
 	}
 
@@ -2090,7 +2090,7 @@ unsigned int cpufreq_driver_fast_switch(struct cpufreq_policy *policy,
 	unsigned int freq;
 	int cpu;
 
-	target_freq = clamp_val(target_freq, policy->min, policy->max);
+	target_freq = clamp_val(target_freq, policy->min, policy->cpuinfo.max_freq);
 	freq = cpufreq_driver->fast_switch(policy, target_freq);
 
 	if (!freq)
@@ -2524,7 +2524,7 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 		return ret;
 
 	policy->min = new_data.min;
-	policy->max = new_data.max;
+	policy->max = policy->cpuinfo.max_freq;
 	trace_cpu_frequency_limits(policy);
 
 	policy->cached_target_freq = UINT_MAX;
