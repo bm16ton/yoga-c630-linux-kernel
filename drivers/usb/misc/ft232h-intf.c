@@ -263,6 +263,8 @@ unsigned int GPIO_irqNumber;
 static ssize_t eeprom_show(struct kobject *kobj,
 				  struct kobj_attribute *attr, char *buf)
 {
+ //  struct ft232h_intf_priv *priv = container_of(*intf, struct ft232h_intf_priv,
+ //                                     mpsse_gpio);
 //	struct ft232h_intf_priv *priv = dev_get_drvdata(dev);
 //    ftdi_read_eeprom(priv);
 //    return sysfs_emit(buf, "%hh \n", priv->eeprom);
@@ -1435,24 +1437,36 @@ static void usb_gpio_irq_enable(struct irq_data *irqd)
     struct ft232h_intf_priv *priv = irq_data_get_irq_chip_data(irqd);
 
 	/* Is that needed? */
-	irqon = 1;
+	;
 
     if (priv->irq_enabled[3]) {
         printk(KERN_INFO  "IRQ already enabled returning\n");        
 		return;
     }
-
-
+    
+    if (irqon == 0) {
+    irqon = 1;
+    INIT_WORK(&priv->irq_work, ftdix_read_gpios);
+	schedule_work(&priv->irq_work);
+	}
+	
     priv->irq_enabled[3] = true;
+    printk(KERN_INFO  "IRQ enabled\n");
    
 }
 
 static void usb_gpio_irq_disable(struct irq_data *irqd)
 {
     struct ft232h_intf_priv *priv = irq_data_get_irq_chip_data(irqd);
-//    irqon = 0;
 
+	if (irqon == 1) {            
+		irqon = 0;
+		cancel_work_sync(&priv->irq_work);
+	}
+    
     priv->irq_enabled[3] = false;
+    usleep_range(100, 200);
+    printk(KERN_INFO  "IRQ disabled\n");
 
 }
 
@@ -2092,6 +2106,8 @@ static void ft232h_intf_disconnect(struct usb_interface *intf)
 		irqon = 0;
 		cancel_work_sync(&priv->irq_work);
 	}
+    
+    usleep_range(5000, 5200);
     
     kobject_put(kobj_ref);
 	sysfs_remove_file(kernel_kobj, &eeprom.attr);

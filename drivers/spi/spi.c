@@ -4144,14 +4144,16 @@ static int of_spi_notify(struct notifier_block *nb, unsigned long action,
 		}
 
 		spi = of_register_spi_device(ctlr, rd->dn);
-		put_device(&ctlr->dev);
+		
 
 		if (IS_ERR(spi)) {
 			pr_err("%s: failed to create for '%pOF'\n",
 					__func__, rd->dn);
+			put_device(&ctlr->dev);
 			of_node_clear_flag(rd->dn, OF_POPULATED);
 			return notifier_from_errno(PTR_ERR(spi));
 		}
+		put_device(&ctlr->dev);
 		break;
 
 	case OF_RECONFIG_CHANGE_REMOVE:

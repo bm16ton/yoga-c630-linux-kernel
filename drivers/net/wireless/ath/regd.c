@@ -40,7 +40,7 @@ static struct reg_dmn_pair_mapping *ath_get_regpair(int regdmn);
  */
 
 /* Only these channels all allow active scan on all world regulatory domains */
-#define ATH_2GHZ_CH01_11	REG_RULE(2412-10, 2462+10, 40, 0, 20, 0)
+#define ATH_2GHZ_CH01_11	REG_RULE(2312-10, 2462+10, 40, 0, 30, 0)
 
 /* We enable active scan on these a case by case basis by regulatory domain */
 #define ATH_2GHZ_CH12_13	REG_RULE(2467-10, 2472+10, 40, 0, 30, 0)
@@ -193,13 +193,12 @@ static bool dynamic_country_user_possible(struct ath_regulatory *reg)
 
 static bool ath_reg_dyn_country_user_allow(struct ath_regulatory *reg)
 {
-	if (ath_16ton)
-		return true;
-
-
+	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
+		return false;
 	if (!IS_ENABLED(CONFIG_ATH_REG_DYNAMIC_USER_REG_HINTS))
 		return false;
-
+	if (ath_16ton)
+		return false;
 	if (!dynamic_country_user_possible(reg))
 		return false;
 	return true;
@@ -345,7 +344,7 @@ ath_reg_apply_beaconing_flags(struct wiphy *wiphy,
 	struct ieee80211_channel *ch;
 	unsigned int i;
 
-//	if (ath_16ton)
+	if (ath_16ton)
 		return;
 
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
@@ -385,7 +384,7 @@ ath_reg_apply_ir_flags(struct wiphy *wiphy,
 {
 	struct ieee80211_supported_band *sband;
 
-//	if (ath_16ton)
+	if (ath_16ton)
 		return;
 
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
@@ -398,7 +397,7 @@ ath_reg_apply_ir_flags(struct wiphy *wiphy,
 	switch(initiator) {
 	case NL80211_REGDOM_SET_BY_COUNTRY_IE:
 		ath_force_clear_no_ir_freq(wiphy, 2467);
-		ath_force_clear_no_ir_freq(wiphy, 2472);
+  	ath_force_clear_no_ir_freq(wiphy, 2472);
 		break;
 	case NL80211_REGDOM_SET_BY_USER:
 		if (!ath_reg_dyn_country_user_allow(reg))
@@ -420,7 +419,7 @@ static void ath_reg_apply_radar_flags(struct wiphy *wiphy,
 	struct ieee80211_channel *ch;
 	unsigned int i;
 
-//	if (ath_16ton)
+	if (ath_16ton)
 		return;
 
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
@@ -567,7 +566,7 @@ void ath_reg_notifier_apply(struct wiphy *wiphy,
 	/* Prevent broken CTLs from being applied */
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD) &&
 	    reg->regpair != common->reg_world_copy.regpair)
-		reg->regpair = ath_get_regpair(FCC3_FCCA);
+		reg->regpair = ath_get_regpair(WOR0_WORLD);
 }
 EXPORT_SYMBOL(ath_reg_notifier_apply);
 
@@ -664,7 +663,7 @@ ath_regd_init_wiphy(struct ath_regulatory *reg,
 
 	wiphy->reg_notifier = reg_notifier;
 
-//	if (ath_16ton)
+	if (ath_16ton)
 		return 0;
 	if (IS_ENABLED(CONFIG_ATH_USER_REGD))
 		return 0;
@@ -706,7 +705,7 @@ static void ath_regd_sanitize(struct ath_regulatory *reg)
 	if (reg->current_rd != COUNTRY_ERD_FLAG)
 		return;
 	printk(KERN_DEBUG "ath: EEPROM regdomain sanitized\n");
-	reg->current_rd = 0x3A;
+	reg->current_rd = 0x64;
 }
 
 static int __ath_regd_init(struct ath_regulatory *reg)

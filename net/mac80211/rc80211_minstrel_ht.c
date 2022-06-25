@@ -195,7 +195,7 @@
 #define OFDM_GROUP __OFDM_GROUP(OFDM_GROUP_SHIFT)
 
 
-static bool minstrel_vht_only = true;
+static bool minstrel_vht_only = false;
 module_param(minstrel_vht_only, bool, 0644);
 MODULE_PARM_DESC(minstrel_vht_only,
 		 "Use only VHT rates when VHT is supported by sta.");
