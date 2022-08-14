@@ -25,7 +25,6 @@ int fbtft_gamma_parse_str(struct fbtft_par *par, u32 *curves,
 	unsigned long val = 0;
 	int ret = 0;
 	int curve_counter, value_counter;
-	int _count;
 
 	fbtft_par_dbg(DEBUG_SYSFS, par, "%s() str=\n", __func__);
 
@@ -69,10 +68,7 @@ int fbtft_gamma_parse_str(struct fbtft_par *par, u32 *curves,
 			ret = get_next_ulong(&curve_p, &val, " ", 16);
 			if (ret)
 				goto out;
-
-			_count = curve_counter * par->gamma.num_values +
-				 value_counter;
-			curves[_count] = val;
+			curves[curve_counter * par->gamma.num_values + value_counter] = val;
 			value_counter++;
 		}
 		if (value_counter != par->gamma.num_values) {
