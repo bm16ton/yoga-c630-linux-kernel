@@ -36,18 +36,10 @@
 #include <xen/hvc-console.h>
 
 #include <asm/dma-mapping.h>
-#include <asm/xen/page-coherent.h>
 
 #include <trace/events/swiotlb.h>
 #define MAX_DMA_BITS 32
-/*
- * Used to do a quick range check in swiotlb_tbl_unmap_single and
- * swiotlb_tbl_sync_single_*, to see if the memory was in fact allocated by this
- * API.
- */
 
-static char *xen_io_tlb_start, *xen_io_tlb_end;
-static unsigned long xen_io_tlb_nslabs;
 /*
  * Quick lookup value of the bus address of the IOTLB.
  */
@@ -82,11 +74,6 @@ static inline phys_addr_t xen_dma_to_phys(struct device *dev,
 	return xen_bus_to_phys(dev, dma_to_phys(dev, dma_addr));
 }
 
-static inline dma_addr_t xen_virt_to_bus(struct device *dev, void *address)
-{
-	return xen_phys_to_dma(dev, virt_to_phys(address));
-}
-
 static inline int range_straddles_page_boundary(phys_addr_t p, size_t size)
 {
 	unsigned long next_bfn, xen_pfn = XEN_PFN_DOWN(p);
@@ -111,257 +98,91 @@ static int is_xen_swiotlb_buffer(struct device *dev, dma_addr_t dma_addr)
 	 * have the same virtual address as another address
 	 * in our domain. Therefore _only_ check address within our domain.
 	 */
-	if (pfn_valid(PFN_DOWN(paddr))) {
-		return paddr >= virt_to_phys(xen_io_tlb_start) &&
-		       paddr < virt_to_phys(xen_io_tlb_end);
-	}
+	if (pfn_valid(PFN_DOWN(paddr)))
+		return is_swiotlb_buffer(dev, paddr);
 	return 0;
 }
 
-static int
-xen_swiotlb_fixup(void *buf, size_t size, unsigned long nslabs)
+#ifdef CONFIG_X86
+int xen_swiotlb_fixup(void *buf, unsigned long nslabs)
 {
-	int i, rc;
-	int dma_bits;
+	int rc;
+	unsigned int order = get_order(IO_TLB_SEGSIZE << IO_TLB_SHIFT);
+	unsigned int i, dma_bits = order + PAGE_SHIFT;
 	dma_addr_t dma_handle;
 	phys_addr_t p = virt_to_phys(buf);
 
-	dma_bits = get_order(IO_TLB_SEGSIZE << IO_TLB_SHIFT) + PAGE_SHIFT;
+	BUILD_BUG_ON(IO_TLB_SEGSIZE & (IO_TLB_SEGSIZE - 1));
+	BUG_ON(nslabs % IO_TLB_SEGSIZE);
 
 	i = 0;
 	do {
-		int slabs = min(nslabs - i, (unsigned long)IO_TLB_SEGSIZE);
-
 		do {
 			rc = xen_create_contiguous_region(
-				p + (i << IO_TLB_SHIFT),
-				get_order(slabs << IO_TLB_SHIFT),
+				p + (i << IO_TLB_SHIFT), order,
 				dma_bits, &dma_handle);
 		} while (rc && dma_bits++ < MAX_DMA_BITS);
 		if (rc)
 			return rc;
 
-		i += slabs;
+		i += IO_TLB_SEGSIZE;
 	} while (i < nslabs);
 	return 0;
 }
-static unsigned long xen_set_nslabs(unsigned long nr_tbl)
-{
-	if (!nr_tbl) {
-		xen_io_tlb_nslabs = (64 * 1024 * 1024 >> IO_TLB_SHIFT);
-		xen_io_tlb_nslabs = ALIGN(xen_io_tlb_nslabs, IO_TLB_SEGSIZE);
-	} else
-		xen_io_tlb_nslabs = nr_tbl;
-
-	return xen_io_tlb_nslabs << IO_TLB_SHIFT;
-}
-
-enum xen_swiotlb_err {
-	XEN_SWIOTLB_UNKNOWN = 0,
-	XEN_SWIOTLB_ENOMEM,
-	XEN_SWIOTLB_EFIXUP
-};
-
-static const char *xen_swiotlb_error(enum xen_swiotlb_err err)
-{
-	switch (err) {
-	case XEN_SWIOTLB_ENOMEM:
-		return "Cannot allocate Xen-SWIOTLB buffer\n";
-	case XEN_SWIOTLB_EFIXUP:
-		return "Failed to get contiguous memory for DMA from Xen!\n"\
-		    "You either: don't have the permissions, do not have"\
-		    " enough free memory under 4GB, or the hypervisor memory"\
-		    " is too fragmented!";
-	default:
-		break;
-	}
-	return "";
-}
-int __ref xen_swiotlb_init(int verbose, bool early)
-{
-	unsigned long bytes, order;
-	int rc = -ENOMEM;
-	enum xen_swiotlb_err m_ret = XEN_SWIOTLB_UNKNOWN;
-	unsigned int repeat = 3;
-
-	xen_io_tlb_nslabs = swiotlb_nr_tbl();
-retry:
-	bytes = xen_set_nslabs(xen_io_tlb_nslabs);
-	order = get_order(xen_io_tlb_nslabs << IO_TLB_SHIFT);
-
-	/*
-	 * IO TLB memory already allocated. Just use it.
-	 */
-	if (io_tlb_start != 0) {
-		xen_io_tlb_start = phys_to_virt(io_tlb_start);
-		goto end;
-	}
-
-	/*
-	 * Get IO TLB memory from any location.
-	 */
-	if (early) {
-		xen_io_tlb_start = memblock_alloc(PAGE_ALIGN(bytes),
-						  PAGE_SIZE);
-		if (!xen_io_tlb_start)
-			panic("%s: Failed to allocate %lu bytes align=0x%lx\n",
-			      __func__, PAGE_ALIGN(bytes), PAGE_SIZE);
-	} else {
-#define SLABS_PER_PAGE (1 << (PAGE_SHIFT - IO_TLB_SHIFT))
-#define IO_TLB_MIN_SLABS ((1<<20) >> IO_TLB_SHIFT)
-		while ((SLABS_PER_PAGE << order) > IO_TLB_MIN_SLABS) {
-			xen_io_tlb_start = (void *)xen_get_swiotlb_free_pages(order);
-			if (xen_io_tlb_start)
-				break;
-			order--;
-		}
-		if (order != get_order(bytes)) {
-			pr_warn("Warning: only able to allocate %ld MB for software IO TLB\n",
-				(PAGE_SIZE << order) >> 20);
-			xen_io_tlb_nslabs = SLABS_PER_PAGE << order;
-			bytes = xen_io_tlb_nslabs << IO_TLB_SHIFT;
-		}
-	}
-	if (!xen_io_tlb_start) {
-		m_ret = XEN_SWIOTLB_ENOMEM;
-		goto error;
-	}
-	/*
-	 * And replace that memory with pages under 4GB.
-	 */
-	rc = xen_swiotlb_fixup(xen_io_tlb_start,
-			       bytes,
-			       xen_io_tlb_nslabs);
-	if (rc) {
-		if (early)
-			memblock_free(__pa(xen_io_tlb_start),
-				      PAGE_ALIGN(bytes));
-		else {
-			free_pages((unsigned long)xen_io_tlb_start, order);
-			xen_io_tlb_start = NULL;
-		}
-		m_ret = XEN_SWIOTLB_EFIXUP;
-		goto error;
-	}
-	if (early) {
-		if (swiotlb_init_with_tbl(xen_io_tlb_start, xen_io_tlb_nslabs,
-			 verbose))
-			panic("Cannot allocate SWIOTLB buffer");
-		rc = 0;
-	} else
-		rc = swiotlb_late_init_with_tbl(xen_io_tlb_start, xen_io_tlb_nslabs);
-
-end:
-	xen_io_tlb_end = xen_io_tlb_start + bytes;
-	if (!rc)
-		swiotlb_set_max_segment(PAGE_SIZE);
-
-	return rc;
-error:
-	if (repeat--) {
-		xen_io_tlb_nslabs = max(1024UL, /* Min is 2MB */
-					(xen_io_tlb_nslabs >> 1));
-		pr_info("Lowering to %luMB\n",
-			(xen_io_tlb_nslabs << IO_TLB_SHIFT) >> 20);
-		goto retry;
-	}
-	pr_err("%s (rc:%d)\n", xen_swiotlb_error(m_ret), rc);
-	if (early)
-		panic("%s (rc:%d)", xen_swiotlb_error(m_ret), rc);
-	else
-		free_pages((unsigned long)xen_io_tlb_start, order);
-	return rc;
-}
 
 static void *
-xen_swiotlb_alloc_coherent(struct device *hwdev, size_t size,
-			   dma_addr_t *dma_handle, gfp_t flags,
-			   unsigned long attrs)
+xen_swiotlb_alloc_coherent(struct device *dev, size_t size,
+		dma_addr_t *dma_handle, gfp_t flags, unsigned long attrs)
 {
-	void *ret;
+	u64 dma_mask = dev->coherent_dma_mask;
 	int order = get_order(size);
-	u64 dma_mask = DMA_BIT_MASK(32);
 	phys_addr_t phys;
-	dma_addr_t dev_addr;
+	void *ret;
 
-	/*
-	* Ignore region specifiers - the kernel's ideas of
-	* pseudo-phys memory layout has nothing to do with the
-	* machine physical layout.  We can't allocate highmem
-	* because we can't return a pointer to it.
-	*/
-	flags &= ~(__GFP_DMA | __GFP_HIGHMEM);
-
-	/* Convert the size to actually allocated. */
+	/* Align the allocation to the Xen page size */
 	size = 1UL << (order + XEN_PAGE_SHIFT);
 
-	/* On ARM this function returns an ioremap'ped virtual address for
-	 * which virt_to_phys doesn't return the corresponding physical
-	 * address. In fact on ARM virt_to_phys only works for kernel direct
-	 * mapped RAM memory. Also see comment below.
-	 */
-	ret = xen_alloc_coherent_pages(hwdev, size, dma_handle, flags, attrs);
-
+	ret = (void *)__get_free_pages(flags, get_order(size));
 	if (!ret)
 		return ret;
+	phys = virt_to_phys(ret);
 
-	if (hwdev && hwdev->coherent_dma_mask)
-		dma_mask = hwdev->coherent_dma_mask;
-
-	/* At this point dma_handle is the dma address, next we are
-	 * going to set it to the machine address.
-	 * Do not use virt_to_phys(ret) because on ARM it doesn't correspond
-	 * to *dma_handle. */
-	phys = dma_to_phys(hwdev, *dma_handle);
-	dev_addr = xen_phys_to_dma(hwdev, phys);
-	if (((dev_addr + size - 1 <= dma_mask)) &&
-	    !range_straddles_page_boundary(phys, size))
-		*dma_handle = dev_addr;
-	else {
-		if (xen_create_contiguous_region(phys, order,
-						 fls64(dma_mask), dma_handle) != 0) {
-			xen_free_coherent_pages(hwdev, size, ret, (dma_addr_t)phys, attrs);
-			return NULL;
-		}
-		*dma_handle = phys_to_dma(hwdev, *dma_handle);
+	*dma_handle = xen_phys_to_dma(dev, phys);
+	if (*dma_handle + size - 1 > dma_mask ||
+	    range_straddles_page_boundary(phys, size)) {
+		if (xen_create_contiguous_region(phys, order, fls64(dma_mask),
+				dma_handle) != 0)
+			goto out_free_pages;
 		SetPageXenRemapped(virt_to_page(ret));
 	}
+
 	memset(ret, 0, size);
 	return ret;
+
+out_free_pages:
+	free_pages((unsigned long)ret, get_order(size));
+	return NULL;
 }
 
 static void
-xen_swiotlb_free_coherent(struct device *hwdev, size_t size, void *vaddr,
-			  dma_addr_t dev_addr, unsigned long attrs)
+xen_swiotlb_free_coherent(struct device *dev, size_t size, void *vaddr,
+		dma_addr_t dma_handle, unsigned long attrs)
 {
+	phys_addr_t phys = virt_to_phys(vaddr);
 	int order = get_order(size);
-	phys_addr_t phys;
-	u64 dma_mask = DMA_BIT_MASK(32);
-	struct page *page;
-
-	if (hwdev && hwdev->coherent_dma_mask)
-		dma_mask = hwdev->coherent_dma_mask;
-
-	/* do not use virt_to_phys because on ARM it doesn't return you the
-	 * physical address */
-	phys = xen_dma_to_phys(hwdev, dev_addr);
 
 	/* Convert the size to actually allocated. */
 	size = 1UL << (order + XEN_PAGE_SHIFT);
 
-	if (is_vmalloc_addr(vaddr))
-		page = vmalloc_to_page(vaddr);
-	else
-		page = virt_to_page(vaddr);
+	if (WARN_ON_ONCE(dma_handle + size - 1 > dev->coherent_dma_mask) ||
+	    WARN_ON_ONCE(range_straddles_page_boundary(phys, size)))
+	    	return;
 
-	if (!WARN_ON((dev_addr + size - 1 > dma_mask) ||
-		     range_straddles_page_boundary(phys, size)) &&
-	    TestClearPageXenRemapped(page))
+	if (TestClearPageXenRemapped(virt_to_page(vaddr)))
 		xen_destroy_contiguous_region(phys, order);
-
-	xen_free_coherent_pages(hwdev, size, vaddr, phys_to_dma(hwdev, phys),
-				attrs);
+	free_pages((unsigned long)vaddr, get_order(size));
 }
+#endif /* CONFIG_X86 */
 
 /*
  * Map a single buffer of the indicated size for DMA in streaming mode.  The
@@ -387,15 +208,15 @@ static dma_addr_t xen_swiotlb_map_page(struct device *dev, struct page *page,
 	if (dma_capable(dev, dev_addr, size, true) &&
 	    !range_straddles_page_boundary(phys, size) &&
 		!xen_arch_need_swiotlb(dev, phys, dev_addr) &&
-		swiotlb_force != SWIOTLB_FORCE)
+		!is_swiotlb_force_bounce(dev))
 		goto done;
 
 	/*
 	 * Oh well, have to allocate and map a bounce buffer.
 	 */
-	trace_swiotlb_bounced(dev, dev_addr, size, swiotlb_force);
+	trace_swiotlb_bounced(dev, dev_addr, size);
 
-	map = swiotlb_tbl_map_single(dev, phys, size, size, dir, attrs);
+	map = swiotlb_tbl_map_single(dev, phys, size, size, 0, dir, attrs);
 	if (map == (phys_addr_t)DMA_MAPPING_ERROR)
 		return DMA_MAPPING_ERROR;
 
@@ -406,7 +227,7 @@ static dma_addr_t xen_swiotlb_map_page(struct device *dev, struct page *page,
 	 * Ensure that the address returned is DMA'ble
 	 */
 	if (unlikely(!dma_capable(dev, dev_addr, size, true))) {
-		swiotlb_tbl_unmap_single(dev, map, size, size, dir,
+		swiotlb_tbl_unmap_single(dev, map, size, dir,
 				attrs | DMA_ATTR_SKIP_CPU_SYNC);
 		return DMA_MAPPING_ERROR;
 	}
@@ -445,7 +266,7 @@ static void xen_swiotlb_unmap_page(struct device *hwdev, dma_addr_t dev_addr,
 
 	/* NOTE: We use dev_addr here, not paddr! */
 	if (is_xen_swiotlb_buffer(hwdev, dev_addr))
-		swiotlb_tbl_unmap_single(hwdev, paddr, size, size, dir, attrs);
+		swiotlb_tbl_unmap_single(hwdev, paddr, size, dir, attrs);
 }
 
 static void
@@ -462,7 +283,7 @@ xen_swiotlb_sync_single_for_cpu(struct device *dev, dma_addr_t dma_addr,
 	}
 
 	if (is_xen_swiotlb_buffer(dev, dma_addr))
-		swiotlb_tbl_sync_single(dev, paddr, size, dir, SYNC_FOR_CPU);
+		swiotlb_sync_single_for_cpu(dev, paddr, size, dir);
 }
 
 static void
@@ -472,7 +293,7 @@ xen_swiotlb_sync_single_for_device(struct device *dev, dma_addr_t dma_addr,
 	phys_addr_t paddr = xen_dma_to_phys(dev, dma_addr);
 
 	if (is_xen_swiotlb_buffer(dev, dma_addr))
-		swiotlb_tbl_sync_single(dev, paddr, size, dir, SYNC_FOR_DEVICE);
+		swiotlb_sync_single_for_device(dev, paddr, size, dir);
 
 	if (!dev_is_dma_coherent(dev)) {
 		if (pfn_valid(PFN_DOWN(dma_to_phys(dev, dma_addr))))
@@ -522,7 +343,7 @@ xen_swiotlb_map_sg(struct device *dev, struct scatterlist *sgl, int nelems,
 out_unmap:
 	xen_swiotlb_unmap_sg(dev, sgl, i, dir, attrs | DMA_ATTR_SKIP_CPU_SYNC);
 	sg_dma_len(sgl) = 0;
-	return 0;
+	return -EIO;
 }
 
 static void
@@ -560,12 +381,17 @@ xen_swiotlb_sync_sg_for_device(struct device *dev, struct scatterlist *sgl,
 static int
 xen_swiotlb_dma_supported(struct device *hwdev, u64 mask)
 {
-	return xen_virt_to_bus(hwdev, xen_io_tlb_end - 1) <= mask;
+	return xen_phys_to_dma(hwdev, io_tlb_default_mem.end - 1) <= mask;
 }
 
 const struct dma_map_ops xen_swiotlb_dma_ops = {
+#ifdef CONFIG_X86
 	.alloc = xen_swiotlb_alloc_coherent,
 	.free = xen_swiotlb_free_coherent,
+#else
+	.alloc = dma_direct_alloc,
+	.free = dma_direct_free,
+#endif
 	.sync_single_for_cpu = xen_swiotlb_sync_single_for_cpu,
 	.sync_single_for_device = xen_swiotlb_sync_single_for_device,
 	.sync_sg_for_cpu = xen_swiotlb_sync_sg_for_cpu,

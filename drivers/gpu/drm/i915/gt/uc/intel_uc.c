@@ -3,11 +3,14 @@
  * Copyright © 2016-2019 Intel Corporation
  */
 
+#include <linux/string_helpers.h>
+
 #include "gt/intel_gt.h"
 #include "gt/intel_reset.h"
 #include "intel_guc.h"
 #include "intel_guc_ads.h"
 #include "intel_guc_submission.h"
+#include "gt/intel_rps.h"
 #include "intel_uc.h"
 
 #include "i915_drv.h"
@@ -23,7 +26,7 @@ static void uc_expand_default_options(struct intel_uc *uc)
 		return;
 
 	/* Don't enable GuC/HuC on pre-Gen12 */
-	if (INTEL_GEN(i915) < 12) {
+	if (GRAPHICS_VER(i915) < 12) {
 		i915->params.enable_guc = 0;
 		return;
 	}
@@ -34,8 +37,18 @@ static void uc_expand_default_options(struct intel_uc *uc)
 		return;
 	}
 
-	/* Default: enable HuC authentication only */
-	i915->params.enable_guc = ENABLE_GUC_LOAD_HUC;
+	/* Intermediate platforms are HuC authentication only */
+	if (IS_ALDERLAKE_S(i915) && !IS_ADLS_RPLS(i915)) {
+		i915->params.enable_guc = ENABLE_GUC_LOAD_HUC;
+		return;
+	}
+
+	/* Default: enable HuC authentication and GuC submission */
+	i915->params.enable_guc = ENABLE_GUC_LOAD_HUC | ENABLE_GUC_SUBMISSION;
+
+	/* XEHPSDV and PVC do not use HuC */
+	if (IS_XEHPSDV(i915) || IS_PONTEVECCHIO(i915))
+		i915->params.enable_guc &= ~ENABLE_GUC_LOAD_HUC;
 }
 
 /* Reset GuC providing us with fresh state for both GuC and HuC.
@@ -69,16 +82,18 @@ static void __confirm_options(struct intel_uc *uc)
 	struct drm_i915_private *i915 = uc_to_gt(uc)->i915;
 
 	drm_dbg(&i915->drm,
-		"enable_guc=%d (guc:%s submission:%s huc:%s)\n",
+		"enable_guc=%d (guc:%s submission:%s huc:%s slpc:%s)\n",
 		i915->params.enable_guc,
-		yesno(intel_uc_wants_guc(uc)),
-		yesno(intel_uc_wants_guc_submission(uc)),
-		yesno(intel_uc_wants_huc(uc)));
+		str_yes_no(intel_uc_wants_guc(uc)),
+		str_yes_no(intel_uc_wants_guc_submission(uc)),
+		str_yes_no(intel_uc_wants_huc(uc)),
+		str_yes_no(intel_uc_wants_guc_slpc(uc)));
 
 	if (i915->params.enable_guc == 0) {
 		GEM_BUG_ON(intel_uc_wants_guc(uc));
 		GEM_BUG_ON(intel_uc_wants_guc_submission(uc));
 		GEM_BUG_ON(intel_uc_wants_huc(uc));
+		GEM_BUG_ON(intel_uc_wants_guc_slpc(uc));
 		return;
 	}
 
@@ -120,6 +135,11 @@ void intel_uc_init_early(struct intel_uc *uc)
 		uc->ops = &uc_ops_off;
 }
 
+void intel_uc_init_late(struct intel_uc *uc)
+{
+	intel_guc_init_late(&uc->guc);
+}
+
 void intel_uc_driver_late_release(struct intel_uc *uc)
 {
 }
@@ -159,11 +179,6 @@ void intel_uc_driver_remove(struct intel_uc *uc)
 	__uc_free_load_err_log(uc);
 }
 
-static inline bool guc_communication_enabled(struct intel_guc *guc)
-{
-	return intel_guc_ct_enabled(&guc->ct);
-}
-
 /*
  * Events triggered while CT buffers are disabled are logged in the SCRATCH_15
  * register using the same bits used in the CT message payload. Since our
@@ -197,7 +212,7 @@ static void guc_get_mmio_msg(struct intel_guc *guc)
 static void guc_handle_mmio_msg(struct intel_guc *guc)
 {
 	/* we need communication to be enabled to reply to GuC */
-	GEM_BUG_ON(!guc_communication_enabled(guc));
+	GEM_BUG_ON(!intel_guc_ct_enabled(&guc->ct));
 
 	spin_lock_irq(&guc->irq_lock);
 	if (guc->mmio_msg) {
@@ -207,28 +222,13 @@ static void guc_handle_mmio_msg(struct intel_guc *guc)
 	spin_unlock_irq(&guc->irq_lock);
 }
 
-static void guc_reset_interrupts(struct intel_guc *guc)
-{
-	guc->interrupts.reset(guc);
-}
-
-static void guc_enable_interrupts(struct intel_guc *guc)
-{
-	guc->interrupts.enable(guc);
-}
-
-static void guc_disable_interrupts(struct intel_guc *guc)
-{
-	guc->interrupts.disable(guc);
-}
-
 static int guc_enable_communication(struct intel_guc *guc)
 {
 	struct intel_gt *gt = guc_to_gt(guc);
 	struct drm_i915_private *i915 = gt->i915;
 	int ret;
 
-	GEM_BUG_ON(guc_communication_enabled(guc));
+	GEM_BUG_ON(intel_guc_ct_enabled(&guc->ct));
 
 	ret = i915_inject_probe_error(i915, -ENXIO);
 	if (ret)
@@ -242,7 +242,7 @@ static int guc_enable_communication(struct intel_guc *guc)
 	guc_get_mmio_msg(guc);
 	guc_handle_mmio_msg(guc);
 
-	guc_enable_interrupts(guc);
+	intel_guc_enable_interrupts(guc);
 
 	/* check for CT messages received before we enabled interrupts */
 	spin_lock_irq(&gt->irq_lock);
@@ -265,7 +265,7 @@ static void guc_disable_communication(struct intel_guc *guc)
 	 */
 	guc_clear_mmio_msg(guc);
 
-	guc_disable_interrupts(guc);
+	intel_guc_disable_interrupts(guc);
 
 	intel_guc_ct_disable(&guc->ct);
 
@@ -323,24 +323,14 @@ static int __uc_init(struct intel_uc *uc)
 	if (i915_inject_probe_failure(uc_to_gt(uc)->i915))
 		return -ENOMEM;
 
-	/* XXX: GuC submission is unavailable for now */
-	GEM_BUG_ON(intel_uc_uses_guc_submission(uc));
-
 	ret = intel_guc_init(guc);
 	if (ret)
 		return ret;
 
-	if (intel_uc_uses_huc(uc)) {
-		ret = intel_huc_init(huc);
-		if (ret)
-			goto out_guc;
-	}
+	if (intel_uc_uses_huc(uc))
+		intel_huc_init(huc);
 
 	return 0;
-
-out_guc:
-	intel_guc_fini(guc);
-	return ret;
 }
 
 static void __uc_fini(struct intel_uc *uc)
@@ -441,6 +431,15 @@ static int __uc_check_hw(struct intel_uc *uc)
 	return 0;
 }
 
+static void print_fw_ver(struct intel_uc *uc, struct intel_uc_fw *fw)
+{
+	struct drm_i915_private *i915 = uc_to_gt(uc)->i915;
+
+	drm_info(&i915->drm, "%s firmware %s version %u.%u\n",
+		 intel_uc_fw_type_repr(fw->type), fw->path,
+		 fw->major_ver_found, fw->minor_ver_found);
+}
+
 static int __uc_init_hw(struct intel_uc *uc)
 {
 	struct drm_i915_private *i915 = uc_to_gt(uc)->i915;
@@ -450,6 +449,11 @@ static int __uc_init_hw(struct intel_uc *uc)
 
 	GEM_BUG_ON(!intel_uc_supports_guc(uc));
 	GEM_BUG_ON(!intel_uc_wants_guc(uc));
+
+	print_fw_ver(uc, &guc->fw);
+
+	if (intel_uc_uses_huc(uc))
+		print_fw_ver(uc, &huc->fw);
 
 	if (!intel_uc_fw_is_loadable(&guc->fw)) {
 		ret = __uc_check_hw(uc) ||
@@ -463,14 +467,16 @@ static int __uc_init_hw(struct intel_uc *uc)
 	if (ret)
 		goto err_out;
 
-	guc_reset_interrupts(guc);
+	intel_guc_reset_interrupts(guc);
 
 	/* WaEnableuKernelHeaderValidFix:skl */
 	/* WaEnableGuCBootHashCheckNotSet:skl,bxt,kbl */
-	if (IS_GEN(i915, 9))
+	if (GRAPHICS_VER(i915) == 9)
 		attempts = 3;
 	else
 		attempts = 1;
+
+	intel_rps_raise_unslice(&uc_to_gt(uc)->rps);
 
 	while (attempts--) {
 		/*
@@ -500,40 +506,47 @@ static int __uc_init_hw(struct intel_uc *uc)
 	if (ret)
 		goto err_log_capture;
 
-	intel_huc_auth(huc);
-
-	ret = intel_guc_sample_forcewake(guc);
-	if (ret)
-		goto err_communication;
+	/*
+	 * GSC-loaded HuC is authenticated by the GSC, so we don't need to
+	 * trigger the auth here. However, given that the HuC loaded this way
+	 * survive GT reset, we still need to update our SW bookkeeping to make
+	 * sure it reflects the correct HW status.
+	 */
+	if (intel_huc_is_loaded_by_gsc(huc))
+		intel_huc_update_auth_status(huc);
+	else
+		intel_huc_auth(huc);
 
 	if (intel_uc_uses_guc_submission(uc))
 		intel_guc_submission_enable(guc);
 
-	drm_info(&i915->drm, "%s firmware %s version %u.%u %s:%s\n",
-		 intel_uc_fw_type_repr(INTEL_UC_FW_TYPE_GUC), guc->fw.path,
-		 guc->fw.major_ver_found, guc->fw.minor_ver_found,
-		 "submission",
-		 enableddisabled(intel_uc_uses_guc_submission(uc)));
-
-	if (intel_uc_uses_huc(uc)) {
-		drm_info(&i915->drm, "%s firmware %s version %u.%u %s:%s\n",
-			 intel_uc_fw_type_repr(INTEL_UC_FW_TYPE_HUC),
-			 huc->fw.path,
-			 huc->fw.major_ver_found, huc->fw.minor_ver_found,
-			 "authenticated",
-			 yesno(intel_huc_is_authenticated(huc)));
+	if (intel_uc_uses_guc_slpc(uc)) {
+		ret = intel_guc_slpc_enable(&guc->slpc);
+		if (ret)
+			goto err_submission;
+	} else {
+		/* Restore GT back to RPn for non-SLPC path */
+		intel_rps_lower_unslice(&uc_to_gt(uc)->rps);
 	}
+
+	drm_info(&i915->drm, "GuC submission %s\n",
+		 str_enabled_disabled(intel_uc_uses_guc_submission(uc)));
+	drm_info(&i915->drm, "GuC SLPC %s\n",
+		 str_enabled_disabled(intel_uc_uses_guc_slpc(uc)));
 
 	return 0;
 
 	/*
 	 * We've failed to load the firmware :(
 	 */
-err_communication:
-	guc_disable_communication(guc);
+err_submission:
+	intel_guc_submission_disable(guc);
 err_log_capture:
 	__uc_capture_load_err_log(uc);
 err_out:
+	/* Return GT back to RPn */
+	intel_rps_lower_unslice(&uc_to_gt(uc)->rps);
+
 	__uc_sanitize(uc);
 
 	if (!ret) {
@@ -558,9 +571,6 @@ static void __uc_fini_hw(struct intel_uc *uc)
 	if (intel_uc_uses_guc_submission(uc))
 		intel_guc_submission_disable(guc);
 
-	if (guc_communication_enabled(guc))
-		guc_disable_communication(guc);
-
 	__uc_sanitize(uc);
 }
 
@@ -574,24 +584,67 @@ void intel_uc_reset_prepare(struct intel_uc *uc)
 {
 	struct intel_guc *guc = &uc->guc;
 
-	if (!intel_guc_is_ready(guc))
+	uc->reset_in_progress = true;
+
+	/* Nothing to do if GuC isn't supported */
+	if (!intel_uc_supports_guc(uc))
 		return;
 
-	guc_disable_communication(guc);
+	/* Firmware expected to be running when this function is called */
+	if (!intel_guc_is_ready(guc))
+		goto sanitize;
+
+	if (intel_uc_uses_guc_submission(uc))
+		intel_guc_submission_reset_prepare(guc);
+
+sanitize:
 	__uc_sanitize(uc);
+}
+
+void intel_uc_reset(struct intel_uc *uc, intel_engine_mask_t stalled)
+{
+	struct intel_guc *guc = &uc->guc;
+
+	/* Firmware can not be running when this function is called  */
+	if (intel_uc_uses_guc_submission(uc))
+		intel_guc_submission_reset(guc, stalled);
+}
+
+void intel_uc_reset_finish(struct intel_uc *uc)
+{
+	struct intel_guc *guc = &uc->guc;
+
+	uc->reset_in_progress = false;
+
+	/* Firmware expected to be running when this function is called */
+	if (intel_guc_is_fw_running(guc) && intel_uc_uses_guc_submission(uc))
+		intel_guc_submission_reset_finish(guc);
+}
+
+void intel_uc_cancel_requests(struct intel_uc *uc)
+{
+	struct intel_guc *guc = &uc->guc;
+
+	/* Firmware can not be running when this function is called  */
+	if (intel_uc_uses_guc_submission(uc))
+		intel_guc_submission_cancel_requests(guc);
 }
 
 void intel_uc_runtime_suspend(struct intel_uc *uc)
 {
 	struct intel_guc *guc = &uc->guc;
-	int err;
 
 	if (!intel_guc_is_ready(guc))
 		return;
 
-	err = intel_guc_suspend(guc);
-	if (err)
-		DRM_DEBUG_DRIVER("Failed to suspend GuC, err=%d", err);
+	/*
+	 * Wait for any outstanding CTB before tearing down communication /w the
+	 * GuC.
+	 */
+#define OUTSTANDING_CTB_TIMEOUT_PERIOD	(HZ / 5)
+	intel_guc_wait_for_pending_msg(guc, &guc->outstanding_submission_g2h,
+				       false, OUTSTANDING_CTB_TIMEOUT_PERIOD);
+	GEM_WARN_ON(atomic_read(&guc->outstanding_submission_g2h));
 
 	guc_disable_communication(guc);
 }
@@ -600,27 +653,39 @@ void intel_uc_suspend(struct intel_uc *uc)
 {
 	struct intel_guc *guc = &uc->guc;
 	intel_wakeref_t wakeref;
+	int err;
 
 	if (!intel_guc_is_ready(guc))
 		return;
 
-	with_intel_runtime_pm(uc_to_gt(uc)->uncore->rpm, wakeref)
-		intel_uc_runtime_suspend(uc);
+	with_intel_runtime_pm(&uc_to_gt(uc)->i915->runtime_pm, wakeref) {
+		err = intel_guc_suspend(guc);
+		if (err)
+			DRM_DEBUG_DRIVER("Failed to suspend GuC, err=%d", err);
+	}
 }
 
 static int __uc_resume(struct intel_uc *uc, bool enable_communication)
 {
 	struct intel_guc *guc = &uc->guc;
+	struct intel_gt *gt = guc_to_gt(guc);
 	int err;
 
 	if (!intel_guc_is_fw_running(guc))
 		return 0;
 
 	/* Make sure we enable communication if and only if it's disabled */
-	GEM_BUG_ON(enable_communication == guc_communication_enabled(guc));
+	GEM_BUG_ON(enable_communication == intel_guc_ct_enabled(&guc->ct));
 
 	if (enable_communication)
 		guc_enable_communication(guc);
+
+	/* If we are only resuming GuC communication but not reloading
+	 * GuC, we need to ensure the ARAT timer interrupt is enabled
+	 * again. In case of GuC reload, it is enabled during SLPC enable.
+	 */
+	if (enable_communication && intel_uc_uses_guc_slpc(uc))
+		intel_guc_pm_intrmsk_enable(gt);
 
 	err = intel_guc_resume(guc);
 	if (err) {

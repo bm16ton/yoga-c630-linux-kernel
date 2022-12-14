@@ -65,21 +65,9 @@ enum cmdq_code {
 	CMDQ_CODE_LOGIC = 0xa0,
 };
 
-enum cmdq_cb_status {
-	CMDQ_CB_NORMAL = 0,
-	CMDQ_CB_ERROR
-};
-
 struct cmdq_cb_data {
-	enum cmdq_cb_status	sta;
-	void			*data;
-};
-
-typedef void (*cmdq_async_flush_cb)(struct cmdq_cb_data data);
-
-struct cmdq_task_cb {
-	cmdq_async_flush_cb	cb;
-	void			*data;
+	int			sta;
+	struct cmdq_pkt		*pkt;
 };
 
 struct cmdq_pkt {
@@ -87,8 +75,6 @@ struct cmdq_pkt {
 	dma_addr_t		pa_base;
 	size_t			cmd_buf_size; /* command occupied size */
 	size_t			buf_size; /* real buffer size */
-	struct cmdq_task_cb	cb;
-	struct cmdq_task_cb	async_cb;
 	void			*cl;
 };
 

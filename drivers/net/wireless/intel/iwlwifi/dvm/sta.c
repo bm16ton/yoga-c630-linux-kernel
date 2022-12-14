@@ -5,11 +5,6 @@
  *
  * Portions of this file are derived from the ipw3945 project, as well
  * as portions of the ieee80211 subsystem header files.
- *
- * Contact Information:
- *  Intel Linux Wireless <linuxwifi@intel.com>
- * Intel Corporation, 5200 N.E. Elam Young Parkway, Hillsboro, OR 97124-6497
- *
  *****************************************************************************/
 #include <linux/etherdevice.h>
 #include <net/mac80211.h>
@@ -144,7 +139,7 @@ bool iwl_is_ht40_tx_allowed(struct iwl_priv *priv,
 	if (!sta)
 		return true;
 
-	return sta->bandwidth >= IEEE80211_STA_RX_BW_40;
+	return sta->deflink.bandwidth >= IEEE80211_STA_RX_BW_40;
 }
 
 static void iwl_sta_calc_ht_flags(struct iwl_priv *priv,
@@ -152,7 +147,7 @@ static void iwl_sta_calc_ht_flags(struct iwl_priv *priv,
 				  struct iwl_rxon_context *ctx,
 				  __le32 *flags, __le32 *mask)
 {
-	struct ieee80211_sta_ht_cap *sta_ht_inf = &sta->ht_cap;
+	struct ieee80211_sta_ht_cap *sta_ht_inf = &sta->deflink.ht_cap;
 
 	*mask = STA_FLG_RTS_MIMO_PROT_MSK |
 		STA_FLG_MIMO_DIS_MSK |

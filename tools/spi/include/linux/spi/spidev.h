@@ -1,1 +1,0 @@
-/Part/yoga-c630-linux-kernel/tools/spi/../../include/uapi/linux/spi/spidev.h

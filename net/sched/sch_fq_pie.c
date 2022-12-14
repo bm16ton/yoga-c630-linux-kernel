@@ -94,7 +94,7 @@ static unsigned int fq_pie_classify(struct sk_buff *skb, struct Qdisc *sch,
 		return fq_pie_hash(q, skb) + 1;
 
 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
-	result = tcf_classify(skb, filter, &res, false);
+	result = tcf_classify(skb, NULL, filter, &res, false);
 	if (result >= 0) {
 #ifdef CONFIG_NET_CLS_ACT
 		switch (result) {
@@ -521,9 +521,6 @@ static void fq_pie_reset(struct Qdisc *sch)
 		INIT_LIST_HEAD(&flow->flowchain);
 		pie_vars_init(&flow->vars);
 	}
-
-	sch->q.qlen = 0;
-	sch->qstats.backlog = 0;
 }
 
 static void fq_pie_destroy(struct Qdisc *sch)
@@ -531,6 +528,7 @@ static void fq_pie_destroy(struct Qdisc *sch)
 	struct fq_pie_sched_data *q = qdisc_priv(sch);
 
 	tcf_block_put(q->block);
+	q->p_params.tupdate = 0;
 	del_timer_sync(&q->adapt_timer);
 	kvfree(q->flows);
 }

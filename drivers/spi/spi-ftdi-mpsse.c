@@ -13,6 +13,7 @@
 #include <linux/version.h>
 
 #include <linux/module.h>
+#include <linux/moduleparam.h>
 #include <linux/gpio/consumer.h>
 #include <linux/gpio/machine.h>
 #include <linux/platform_device.h>

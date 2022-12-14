@@ -75,7 +75,7 @@ static int rtw_mac_pre_system_cfg(struct rtw_dev *rtwdev)
 
 	switch (rtw_hci_type(rtwdev)) {
 	case RTW_HCI_TYPE_PCIE:
-		rtw_write32_set(rtwdev, REG_HCI_OPT_CTRL, BIT_BT_DIG_CLK_EN);
+		rtw_write32_set(rtwdev, REG_HCI_OPT_CTRL, BIT_USB_SUS_DIS);
 		break;
 	case RTW_HCI_TYPE_USB:
 		break;
@@ -526,6 +526,25 @@ static int iddma_download_firmware(struct rtw_dev *rtwdev, u32 src, u32 dst,
 
 	if (iddma_enable(rtwdev, src, dst, ch0_ctrl))
 		return -EBUSY;
+
+	return 0;
+}
+
+int rtw_ddma_to_fw_fifo(struct rtw_dev *rtwdev, u32 ocp_src, u32 size)
+{
+	u32 ch0_ctrl = BIT_DDMACH0_OWN | BIT_DDMACH0_DDMA_MODE;
+
+	if (!check_hw_ready(rtwdev, REG_DDMA_CH0CTRL, BIT_DDMACH0_OWN, 0)) {
+		rtw_dbg(rtwdev, RTW_DBG_FW, "busy to start ddma\n");
+		return -EBUSY;
+	}
+
+	ch0_ctrl |= size & BIT_MASK_DDMACH0_DLEN;
+
+	if (iddma_enable(rtwdev, ocp_src, OCPBASE_RXBUF_FW_88XX, ch0_ctrl)) {
+		rtw_dbg(rtwdev, RTW_DBG_FW, "busy to complete ddma\n");
+		return -EBUSY;
+	}
 
 	return 0;
 }

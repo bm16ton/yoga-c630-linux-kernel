@@ -25,6 +25,8 @@
 
 #include <linux/uaccess.h>
 
+#include "internal.h"
+
 static const char *
 strcmp_prefix(const char *a, const char *a_prefix)
 {
@@ -186,12 +188,12 @@ EXPORT_SYMBOL(__vfs_setxattr);
  *  __vfs_setxattr_noperm - perform setxattr operation without performing
  *  permission checks.
  *
- *  @mnt_userns - user namespace of the mount the inode was found from
- *  @dentry - object to perform setxattr on
- *  @name - xattr name to set
- *  @value - value to set @name to
- *  @size - size of @value
- *  @flags - flags to pass into filesystem operations
+ *  @mnt_userns: user namespace of the mount the inode was found from
+ *  @dentry: object to perform setxattr on
+ *  @name: xattr name to set
+ *  @value: value to set @name to
+ *  @size: size of @value
+ *  @flags: flags to pass into filesystem operations
  *
  *  returns the result of the internal setxattr or setsecurity operations.
  *
@@ -242,6 +244,7 @@ int __vfs_setxattr_noperm(struct user_namespace *mnt_userns,
  * __vfs_setxattr_locked - set an extended attribute while holding the inode
  * lock
  *
+ *  @mnt_userns: user namespace of the mount of the target inode
  *  @dentry: object to perform setxattr on
  *  @name: xattr name to set
  *  @value: value to set @name to
@@ -279,9 +282,15 @@ out:
 }
 EXPORT_SYMBOL_GPL(__vfs_setxattr_locked);
 
+static inline bool is_posix_acl_xattr(const char *name)
+{
+	return (strcmp(name, XATTR_NAME_POSIX_ACL_ACCESS) == 0) ||
+	       (strcmp(name, XATTR_NAME_POSIX_ACL_DEFAULT) == 0);
+}
+
 int
 vfs_setxattr(struct user_namespace *mnt_userns, struct dentry *dentry,
-	     const char *name, const void *value, size_t size, int flags)
+	     const char *name, void *value, size_t size, int flags)
 {
 	struct inode *inode = dentry->d_inode;
 	struct inode *delegated_inode = NULL;
@@ -289,11 +298,15 @@ vfs_setxattr(struct user_namespace *mnt_userns, struct dentry *dentry,
 	int error;
 
 	if (size && strcmp(name, XATTR_NAME_CAPS) == 0) {
-		error = cap_convert_nscap(mnt_userns, dentry, &value, size);
+		error = cap_convert_nscap(mnt_userns, dentry,
+					  (const void **)&value, size);
 		if (error < 0)
 			return error;
 		size = error;
 	}
+
+	if (size && is_posix_acl_xattr(name))
+		posix_acl_setxattr_idmapped_mnt(mnt_userns, inode, value, size);
 
 retry_deleg:
 	inode_lock(inode);
@@ -428,7 +441,10 @@ vfs_getxattr(struct user_namespace *mnt_userns, struct dentry *dentry,
 		return ret;
 	}
 nolsm:
-	return __vfs_getxattr(dentry, inode, name, value, size);
+	error = __vfs_getxattr(dentry, inode, name, value, size);
+	if (error > 0 && is_posix_acl_xattr(name))
+		posix_acl_getxattr_idmapped_mnt(mnt_userns, inode, value, size);
+	return error;
 }
 EXPORT_SYMBOL_GPL(vfs_getxattr);
 
@@ -473,6 +489,7 @@ EXPORT_SYMBOL(__vfs_removexattr);
  * __vfs_removexattr_locked - set an extended attribute while holding the inode
  * lock
  *
+ *  @mnt_userns: user namespace of the mount of the target inode
  *  @dentry: object to perform setxattr on
  *  @name: name of xattr to remove
  *  @delegated_inode: on return, will contain an inode pointer that
@@ -537,43 +554,75 @@ EXPORT_SYMBOL_GPL(vfs_removexattr);
 /*
  * Extended attribute SET operations
  */
-static long
-setxattr(struct user_namespace *mnt_userns, struct dentry *d,
-	 const char __user *name, const void __user *value, size_t size,
-	 int flags)
+
+int setxattr_copy(const char __user *name, struct xattr_ctx *ctx)
 {
 	int error;
-	void *kvalue = NULL;
-	char kname[XATTR_NAME_MAX + 1];
 
-	if (flags & ~(XATTR_CREATE|XATTR_REPLACE))
+	if (ctx->flags & ~(XATTR_CREATE|XATTR_REPLACE))
 		return -EINVAL;
 
-	error = strncpy_from_user(kname, name, sizeof(kname));
-	if (error == 0 || error == sizeof(kname))
-		error = -ERANGE;
+	error = strncpy_from_user(ctx->kname->name, name,
+				sizeof(ctx->kname->name));
+	if (error == 0 || error == sizeof(ctx->kname->name))
+		return  -ERANGE;
 	if (error < 0)
 		return error;
 
-	if (size) {
-		if (size > XATTR_SIZE_MAX)
+	error = 0;
+	if (ctx->size) {
+		if (ctx->size > XATTR_SIZE_MAX)
 			return -E2BIG;
-		kvalue = kvmalloc(size, GFP_KERNEL);
-		if (!kvalue)
-			return -ENOMEM;
-		if (copy_from_user(kvalue, value, size)) {
-			error = -EFAULT;
-			goto out;
+
+		ctx->kvalue = vmemdup_user(ctx->cvalue, ctx->size);
+		if (IS_ERR(ctx->kvalue)) {
+			error = PTR_ERR(ctx->kvalue);
+			ctx->kvalue = NULL;
 		}
-		if ((strcmp(kname, XATTR_NAME_POSIX_ACL_ACCESS) == 0) ||
-		    (strcmp(kname, XATTR_NAME_POSIX_ACL_DEFAULT) == 0))
-			posix_acl_fix_xattr_from_user(mnt_userns, kvalue, size);
 	}
 
-	error = vfs_setxattr(mnt_userns, d, kname, kvalue, size, flags);
-out:
-	kvfree(kvalue);
+	return error;
+}
 
+static void setxattr_convert(struct user_namespace *mnt_userns,
+			     struct dentry *d, struct xattr_ctx *ctx)
+{
+	if (ctx->size &&
+		((strcmp(ctx->kname->name, XATTR_NAME_POSIX_ACL_ACCESS) == 0) ||
+		(strcmp(ctx->kname->name, XATTR_NAME_POSIX_ACL_DEFAULT) == 0)))
+		posix_acl_fix_xattr_from_user(ctx->kvalue, ctx->size);
+}
+
+int do_setxattr(struct user_namespace *mnt_userns, struct dentry *dentry,
+		struct xattr_ctx *ctx)
+{
+	setxattr_convert(mnt_userns, dentry, ctx);
+	return vfs_setxattr(mnt_userns, dentry, ctx->kname->name,
+			ctx->kvalue, ctx->size, ctx->flags);
+}
+
+static long
+setxattr(struct user_namespace *mnt_userns, struct dentry *d,
+	const char __user *name, const void __user *value, size_t size,
+	int flags)
+{
+	struct xattr_name kname;
+	struct xattr_ctx ctx = {
+		.cvalue   = value,
+		.kvalue   = NULL,
+		.size     = size,
+		.kname    = &kname,
+		.flags    = flags,
+	};
+	int error;
+
+	error = setxattr_copy(name, &ctx);
+	if (error)
+		return error;
+
+	error = do_setxattr(mnt_userns, d, &ctx);
+
+	kvfree(ctx.kvalue);
 	return error;
 }
 
@@ -639,43 +688,60 @@ SYSCALL_DEFINE5(fsetxattr, int, fd, const char __user *, name,
 /*
  * Extended attribute GET operations
  */
-static ssize_t
-getxattr(struct user_namespace *mnt_userns, struct dentry *d,
-	 const char __user *name, void __user *value, size_t size)
+ssize_t
+do_getxattr(struct user_namespace *mnt_userns, struct dentry *d,
+	struct xattr_ctx *ctx)
 {
 	ssize_t error;
-	void *kvalue = NULL;
-	char kname[XATTR_NAME_MAX + 1];
+	char *kname = ctx->kname->name;
 
-	error = strncpy_from_user(kname, name, sizeof(kname));
-	if (error == 0 || error == sizeof(kname))
-		error = -ERANGE;
-	if (error < 0)
-		return error;
-
-	if (size) {
-		if (size > XATTR_SIZE_MAX)
-			size = XATTR_SIZE_MAX;
-		kvalue = kvzalloc(size, GFP_KERNEL);
-		if (!kvalue)
+	if (ctx->size) {
+		if (ctx->size > XATTR_SIZE_MAX)
+			ctx->size = XATTR_SIZE_MAX;
+		ctx->kvalue = kvzalloc(ctx->size, GFP_KERNEL);
+		if (!ctx->kvalue)
 			return -ENOMEM;
 	}
 
-	error = vfs_getxattr(mnt_userns, d, kname, kvalue, size);
+	error = vfs_getxattr(mnt_userns, d, kname, ctx->kvalue, ctx->size);
 	if (error > 0) {
 		if ((strcmp(kname, XATTR_NAME_POSIX_ACL_ACCESS) == 0) ||
 		    (strcmp(kname, XATTR_NAME_POSIX_ACL_DEFAULT) == 0))
-			posix_acl_fix_xattr_to_user(mnt_userns, kvalue, error);
-		if (size && copy_to_user(value, kvalue, error))
+			posix_acl_fix_xattr_to_user(ctx->kvalue, error);
+		if (ctx->size && copy_to_user(ctx->value, ctx->kvalue, error))
 			error = -EFAULT;
-	} else if (error == -ERANGE && size >= XATTR_SIZE_MAX) {
+	} else if (error == -ERANGE && ctx->size >= XATTR_SIZE_MAX) {
 		/* The file system tried to returned a value bigger
 		   than XATTR_SIZE_MAX bytes. Not possible. */
 		error = -E2BIG;
 	}
 
-	kvfree(kvalue);
+	return error;
+}
 
+static ssize_t
+getxattr(struct user_namespace *mnt_userns, struct dentry *d,
+	 const char __user *name, void __user *value, size_t size)
+{
+	ssize_t error;
+	struct xattr_name kname;
+	struct xattr_ctx ctx = {
+		.value    = value,
+		.kvalue   = NULL,
+		.size     = size,
+		.kname    = &kname,
+		.flags    = 0,
+	};
+
+	error = strncpy_from_user(kname.name, name, sizeof(kname.name));
+	if (error == 0 || error == sizeof(kname.name))
+		error = -ERANGE;
+	if (error < 0)
+		return error;
+
+	error =  do_getxattr(mnt_userns, d, &ctx);
+
+	kvfree(ctx.kvalue);
 	return error;
 }
 

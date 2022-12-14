@@ -134,6 +134,8 @@
 #define GQSPI_DMA_UNALIGN		0x3
 #define GQSPI_DEFAULT_NUM_CS	1	/* Default number of chip selects */
 
+#define GQSPI_MAX_NUM_CS	2	/* Maximum number of chip selects */
+
 #define SPI_AUTOSUSPEND_TIMEOUT		3000
 enum mode_type {GQSPI_MODE_IO, GQSPI_MODE_DMA};
 
@@ -363,8 +365,13 @@ static void zynqmp_qspi_chipselect(struct spi_device *qspi, bool is_high)
 	genfifoentry |= GQSPI_GENFIFO_MODE_SPI;
 
 	if (!is_high) {
-		xqspi->genfifobus = GQSPI_GENFIFO_BUS_LOWER;
-		xqspi->genfifocs = GQSPI_GENFIFO_CS_LOWER;
+		if (!qspi->chip_select) {
+			xqspi->genfifobus = GQSPI_GENFIFO_BUS_LOWER;
+			xqspi->genfifocs = GQSPI_GENFIFO_CS_LOWER;
+		} else {
+			xqspi->genfifobus = GQSPI_GENFIFO_BUS_UPPER;
+			xqspi->genfifocs = GQSPI_GENFIFO_CS_UPPER;
+		}
 		genfifoentry |= xqspi->genfifobus;
 		genfifoentry |= xqspi->genfifocs;
 		genfifoentry |= GQSPI_GENFIFO_CS_SETUP;
@@ -509,17 +516,19 @@ static void zynqmp_qspi_filltxfifo(struct zynqmp_qspi *xqspi, int size)
 	u32 count = 0, intermediate;
 
 	while ((xqspi->bytes_to_transfer > 0) && (count < size) && (xqspi->txbuf)) {
-		memcpy(&intermediate, xqspi->txbuf, 4);
-		zynqmp_gqspi_write(xqspi, GQSPI_TXD_OFST, intermediate);
-
 		if (xqspi->bytes_to_transfer >= 4) {
+			memcpy(&intermediate, xqspi->txbuf, 4);
 			xqspi->txbuf += 4;
 			xqspi->bytes_to_transfer -= 4;
+			count += 4;
 		} else {
+			memcpy(&intermediate, xqspi->txbuf,
+			       xqspi->bytes_to_transfer);
 			xqspi->txbuf += xqspi->bytes_to_transfer;
 			xqspi->bytes_to_transfer = 0;
+			count += xqspi->bytes_to_transfer;
 		}
-		count++;
+		zynqmp_gqspi_write(xqspi, GQSPI_TXD_OFST, intermediate);
 	}
 }
 
@@ -1097,6 +1106,7 @@ static int zynqmp_qspi_probe(struct platform_device *pdev)
 	struct zynqmp_qspi *xqspi;
 	struct device *dev = &pdev->dev;
 	struct device_node *np = dev->of_node;
+	u32 num_cs;
 
 	ctlr = spi_alloc_master(&pdev->dev, sizeof(*xqspi));
 	if (!ctlr)
@@ -1170,9 +1180,23 @@ static int zynqmp_qspi_probe(struct platform_device *pdev)
 		goto clk_dis_all;
 	}
 
-	dma_set_mask(&pdev->dev, DMA_BIT_MASK(44));
+	ret = dma_set_mask(&pdev->dev, DMA_BIT_MASK(44));
+	if (ret)
+		goto clk_dis_all;
+
+	ret = of_property_read_u32(np, "num-cs", &num_cs);
+	if (ret < 0) {
+		ctlr->num_chipselect = GQSPI_DEFAULT_NUM_CS;
+	} else if (num_cs > GQSPI_MAX_NUM_CS) {
+		ret = -EINVAL;
+		dev_err(&pdev->dev, "only %d chip selects are available\n",
+			GQSPI_MAX_NUM_CS);
+		goto clk_dis_all;
+	} else {
+		ctlr->num_chipselect = num_cs;
+	}
+
 	ctlr->bits_per_word_mask = SPI_BPW_MASK(8);
-	ctlr->num_chipselect = GQSPI_DEFAULT_NUM_CS;
 	ctlr->mem_ops = &zynqmp_qspi_mem_ops;
 	ctlr->setup = zynqmp_qspi_setup_op;
 	ctlr->max_speed_hz = clk_get_rate(xqspi->refclk) / 2;

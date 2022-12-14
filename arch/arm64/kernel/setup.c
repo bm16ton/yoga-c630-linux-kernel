@@ -23,6 +23,7 @@
 #include <linux/interrupt.h>
 #include <linux/smp.h>
 #include <linux/fs.h>
+#include <linux/panic_notifier.h>
 #include <linux/proc_fs.h>
 #include <linux/memblock.h>
 #include <linux/of_fdt.h>
@@ -87,12 +88,6 @@ void __init smp_setup_processor_id(void)
 	u64 mpidr = read_cpuid_mpidr() & MPIDR_HWID_BITMASK;
 	set_cpu_logical_map(0, mpidr);
 
-	/*
-	 * clear __my_cpu_offset on boot CPU to avoid hang caused by
-	 * using percpu variable early, for example, lockdep will
-	 * access percpu variable inside lock_release
-	 */
-	set_my_cpu_offset(0);
 	pr_info("Booting Linux on physical CPU 0x%010lx [0x%08x]\n",
 		(unsigned long)mpidr, read_cpuid_id());
 }
@@ -194,11 +189,16 @@ static void __init setup_machine_fdt(phys_addr_t dt_phys)
 
 	if (!dt_virt || !early_init_dt_scan(dt_virt)) {
 		pr_crit("\n"
-			"Error: invalid device tree blob at physical address %pa (virtual address 0x%p)\n"
+			"Error: invalid device tree blob at physical address %pa (virtual address 0x%px)\n"
 			"The dtb must be 8-byte aligned and must not exceed 2 MB in size\n"
 			"\nPlease check your bootloader.",
 			&dt_phys, dt_virt);
 
+		/*
+		 * Note that in this _really_ early stage we cannot even BUG()
+		 * or oops, so the least terrible thing to do is cpu_relax(),
+		 * or else we could end-up printing non-initialized data, etc.
+		 */
 		while (true)
 			cpu_relax();
 	}
@@ -225,6 +225,8 @@ static void __init request_standard_resources(void)
 	kernel_code.end     = __pa_symbol(__init_begin - 1);
 	kernel_data.start   = __pa_symbol(_sdata);
 	kernel_data.end     = __pa_symbol(_end - 1);
+	insert_resource(&iomem_resource, &kernel_code);
+	insert_resource(&iomem_resource, &kernel_data);
 
 	num_standard_resources = memblock.memory.cnt;
 	res_size = num_standard_resources * sizeof(*standard_resources);
@@ -237,27 +239,16 @@ static void __init request_standard_resources(void)
 		if (memblock_is_nomap(region)) {
 			res->name  = "reserved";
 			res->flags = IORESOURCE_MEM;
+			res->start = __pfn_to_phys(memblock_region_reserved_base_pfn(region));
+			res->end = __pfn_to_phys(memblock_region_reserved_end_pfn(region)) - 1;
 		} else {
 			res->name  = "System RAM";
 			res->flags = IORESOURCE_SYSTEM_RAM | IORESOURCE_BUSY;
+			res->start = __pfn_to_phys(memblock_region_memory_base_pfn(region));
+			res->end = __pfn_to_phys(memblock_region_memory_end_pfn(region)) - 1;
 		}
-		res->start = __pfn_to_phys(memblock_region_memory_base_pfn(region));
-		res->end = __pfn_to_phys(memblock_region_memory_end_pfn(region)) - 1;
 
-		request_resource(&iomem_resource, res);
-
-		if (kernel_code.start >= res->start &&
-		    kernel_code.end <= res->end)
-			request_resource(res, &kernel_code);
-		if (kernel_data.start >= res->start &&
-		    kernel_data.end <= res->end)
-			request_resource(res, &kernel_data);
-#ifdef CONFIG_KEXEC_CORE
-		/* Userspace will find "Crash kernel" region in /proc/iomem. */
-		if (crashk_res.end && crashk_res.start >= res->start &&
-		    crashk_res.end <= res->end)
-			request_resource(res, &crashk_res);
-#endif
+		insert_resource(&iomem_resource, res);
 	}
 }
 
@@ -298,10 +289,7 @@ u64 cpu_logical_map(unsigned int cpu)
 
 void __init __no_sanitize_address setup_arch(char **cmdline_p)
 {
-	init_mm.start_code = (unsigned long) _stext;
-	init_mm.end_code   = (unsigned long) _etext;
-	init_mm.end_data   = (unsigned long) _edata;
-	init_mm.brk	   = (unsigned long) _end;
+	setup_initial_init_mm(_stext, _etext, _edata, _end);
 
 	*cmdline_p = boot_command_line;
 
@@ -406,9 +394,6 @@ static inline bool cpu_can_disable(unsigned int cpu)
 static int __init topology_init(void)
 {
 	int i;
-
-	for_each_online_node(i)
-		register_one_node(i);
 
 	for_each_possible_cpu(i) {
 		struct cpu *cpu = &per_cpu(cpu_data.cpu, i);

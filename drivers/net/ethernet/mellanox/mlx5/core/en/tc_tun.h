@@ -51,6 +51,7 @@ struct mlx5e_tc_tunnel {
 			    void *headers_v);
 	bool (*encap_info_equal)(struct mlx5e_encap_key *a,
 				 struct mlx5e_encap_key *b);
+	int (*get_remote_ifindex)(struct net_device *mirred_dev);
 };
 
 extern struct mlx5e_tc_tunnel vxlan_tunnel;
@@ -83,15 +84,18 @@ int mlx5e_tc_tun_update_header_ipv6(struct mlx5e_priv *priv,
 static inline int
 mlx5e_tc_tun_create_header_ipv6(struct mlx5e_priv *priv,
 				struct net_device *mirred_dev,
-				struct mlx5e_encap_entry *e) { return -EOPNOTSUPP; }
-int mlx5e_tc_tun_update_header_ipv6(struct mlx5e_priv *priv,
-				    struct net_device *mirred_dev,
-				    struct mlx5e_encap_entry *e)
+				struct mlx5e_encap_entry *e)
+{ return -EOPNOTSUPP; }
+static inline int
+mlx5e_tc_tun_update_header_ipv6(struct mlx5e_priv *priv,
+				struct net_device *mirred_dev,
+				struct mlx5e_encap_entry *e)
 { return -EOPNOTSUPP; }
 #endif
 int mlx5e_tc_tun_route_lookup(struct mlx5e_priv *priv,
 			      struct mlx5_flow_spec *spec,
-			      struct mlx5_flow_attr *attr);
+			      struct mlx5_flow_attr *attr,
+			      struct net_device *filter_dev);
 
 bool mlx5e_tc_tun_device_to_offload(struct mlx5e_priv *priv,
 				    struct net_device *netdev);

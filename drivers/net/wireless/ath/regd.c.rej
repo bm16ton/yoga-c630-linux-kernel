@@ -1,0 +1,15 @@
+--- drivers/net/wireless/ath/regd.c
++++ drivers/net/wireless/ath/regd.c
+@@ -703,10 +732,10 @@ ath_regd_init_wiphy(struct ath_regulatory *reg,
+  */
+ static void ath_regd_sanitize(struct ath_regulatory *reg)
+ {
+-	if (reg->current_rd != COUNTRY_ERD_FLAG && reg->current_rd != 0)
++	if (reg->current_rd != COUNTRY_ERD_FLAG)
+ 		return;
+ 	printk(KERN_DEBUG "ath: EEPROM regdomain sanitized\n");
+-	reg->current_rd = 0x64;
++	reg->current_rd = 0x3A;
+ }
+ 
+ static int __ath_regd_init(struct ath_regulatory *reg)

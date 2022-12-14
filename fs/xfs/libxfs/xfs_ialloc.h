@@ -33,42 +33,14 @@ xfs_make_iptr(struct xfs_mount *mp, struct xfs_buf *b, int o)
 }
 
 /*
- * Allocate an inode on disk.
- * Mode is used to tell whether the new inode will need space, and whether
- * it is a directory.
- *
- * There are two phases to inode allocation: selecting an AG and ensuring
- * that it contains free inodes, followed by allocating one of the free
- * inodes. xfs_dialloc_select_ag() does the former and returns a locked AGI
- * to the caller, ensuring that followup call to xfs_dialloc_ag() will
- * have free inodes to allocate from. xfs_dialloc_ag() will return the inode
- * number of the free inode we allocated.
+ * Allocate an inode on disk.  Mode is used to tell whether the new inode will
+ * need space, and whether it is a directory.
  */
-int					/* error */
-xfs_dialloc_select_ag(
-	struct xfs_trans **tpp,		/* double pointer of transaction */
-	xfs_ino_t	parent,		/* parent inode (directory) */
-	umode_t		mode,		/* mode bits for new inode */
-	struct xfs_buf	**IO_agbp);
+int xfs_dialloc(struct xfs_trans **tpp, xfs_ino_t parent, umode_t mode,
+		xfs_ino_t *new_ino);
 
-int
-xfs_dialloc_ag(
-	struct xfs_trans	*tp,
-	struct xfs_buf		*agbp,
-	xfs_ino_t		parent,
-	xfs_ino_t		*inop);
-
-/*
- * Free disk inode.  Carefully avoids touching the incore inode, all
- * manipulations incore are the caller's responsibility.
- * The on-disk inode is not changed by this operation, only the
- * btree (free inode mask) is changed.
- */
-int					/* error */
-xfs_difree(
-	struct xfs_trans *tp,		/* transaction pointer */
-	xfs_ino_t	inode,		/* inode to be freed */
-	struct xfs_icluster *ifree);	/* cluster info if deleted */
+int xfs_difree(struct xfs_trans *tp, struct xfs_perag *pag,
+		xfs_ino_t ino, struct xfs_icluster *ifree);
 
 /*
  * Return the location of the inode in imap, for mapping it into a buffer.
@@ -88,27 +60,12 @@ void
 xfs_ialloc_log_agi(
 	struct xfs_trans *tp,		/* transaction pointer */
 	struct xfs_buf	*bp,		/* allocation group header buffer */
-	int		fields);	/* bitmask of fields to log */
+	uint32_t	fields);	/* bitmask of fields to log */
 
-/*
- * Read in the allocation group header (inode allocation section)
- */
-int					/* error */
-xfs_ialloc_read_agi(
-	struct xfs_mount *mp,		/* file system mount structure */
-	struct xfs_trans *tp,		/* transaction pointer */
-	xfs_agnumber_t	agno,		/* allocation group number */
-	struct xfs_buf	**bpp);		/* allocation group hdr buf */
-
-/*
- * Read in the allocation group header to initialise the per-ag data
- * in the mount structure
- */
-int
-xfs_ialloc_pagi_init(
-	struct xfs_mount *mp,		/* file system mount structure */
-	struct xfs_trans *tp,		/* transaction pointer */
-        xfs_agnumber_t  agno);		/* allocation group number */
+int xfs_read_agi(struct xfs_perag *pag, struct xfs_trans *tp,
+		struct xfs_buf **agibpp);
+int xfs_ialloc_read_agi(struct xfs_perag *pag, struct xfs_trans *tp,
+		struct xfs_buf **agibpp);
 
 /*
  * Lookup a record by ino in the btree given by cur.
@@ -130,11 +87,10 @@ int xfs_ialloc_inode_init(struct xfs_mount *mp, struct xfs_trans *tp,
 			  xfs_agnumber_t agno, xfs_agblock_t agbno,
 			  xfs_agblock_t length, unsigned int gen);
 
-int xfs_read_agi(struct xfs_mount *mp, struct xfs_trans *tp,
-		xfs_agnumber_t agno, struct xfs_buf **bpp);
 
 union xfs_btree_rec;
-void xfs_inobt_btrec_to_irec(struct xfs_mount *mp, union xfs_btree_rec *rec,
+void xfs_inobt_btrec_to_irec(struct xfs_mount *mp,
+		const union xfs_btree_rec *rec,
 		struct xfs_inobt_rec_incore *irec);
 int xfs_ialloc_has_inodes_at_extent(struct xfs_btree_cur *cur,
 		xfs_agblock_t bno, xfs_extlen_t len, bool *exists);
@@ -149,5 +105,8 @@ int xfs_inobt_insert_rec(struct xfs_btree_cur *cur, uint16_t holemask,
 int xfs_ialloc_cluster_alignment(struct xfs_mount *mp);
 void xfs_ialloc_setup_geometry(struct xfs_mount *mp);
 xfs_ino_t xfs_ialloc_calc_rootino(struct xfs_mount *mp, int sunit);
+
+int xfs_ialloc_check_shrink(struct xfs_trans *tp, xfs_agnumber_t agno,
+		struct xfs_buf *agibp, xfs_agblock_t new_length);
 
 #endif	/* __XFS_IALLOC_H__ */

@@ -216,6 +216,8 @@ static const char * const snd_pcm_format_names[] = {
 /**
  * snd_pcm_format_name - Return a name string for the given PCM format
  * @format: PCM format
+ *
+ * Return: the format name string
  */
 const char *snd_pcm_format_name(snd_pcm_format_t format)
 {
@@ -810,7 +812,11 @@ EXPORT_SYMBOL(snd_pcm_new_internal);
 static void free_chmap(struct snd_pcm_str *pstr)
 {
 	if (pstr->chmap_kctl) {
-		snd_ctl_remove(pstr->pcm->card, pstr->chmap_kctl);
+		struct snd_card *card = pstr->pcm->card;
+
+		down_write(&card->controls_rwsem);
+		snd_ctl_remove(card, pstr->chmap_kctl);
+		up_write(&card->controls_rwsem);
 		pstr->chmap_kctl = NULL;
 	}
 }
@@ -965,6 +971,8 @@ int snd_pcm_attach_substream(struct snd_pcm *pcm, int stream,
 	init_waitqueue_head(&runtime->tsleep);
 
 	runtime->status->state = SNDRV_PCM_STATE_OPEN;
+	mutex_init(&runtime->buffer_mutex);
+	atomic_set(&runtime->buffer_accessing, 0);
 
 	substream->runtime = runtime;
 	substream->private_data = pcm->private_data;
@@ -998,13 +1006,15 @@ void snd_pcm_detach_substream(struct snd_pcm_substream *substream)
 	} else {
 		substream->runtime = NULL;
 	}
+	mutex_destroy(&runtime->buffer_mutex);
+	snd_fasync_free(runtime->fasync);
 	kfree(runtime);
 	put_pid(substream->pid);
 	substream->pid = NULL;
 	substream->pstr->substream_opened--;
 }
 
-static ssize_t show_pcm_class(struct device *dev,
+static ssize_t pcm_class_show(struct device *dev,
 			      struct device_attribute *attr, char *buf)
 {
 	struct snd_pcm_str *pstr = container_of(dev, struct snd_pcm_str, dev);
@@ -1021,10 +1031,10 @@ static ssize_t show_pcm_class(struct device *dev,
 		str = "none";
 	else
 		str = strs[pcm->dev_class];
-	return sprintf(buf, "%s\n", str);
+	return sysfs_emit(buf, "%s\n", str);
 }
 
-static DEVICE_ATTR(pcm_class, 0444, show_pcm_class, NULL);
+static DEVICE_ATTR_RO(pcm_class);
 static struct attribute *pcm_dev_attrs[] = {
 	&dev_attr_pcm_class.attr,
 	NULL
@@ -1131,6 +1141,8 @@ static int snd_pcm_dev_disconnect(struct snd_device *device)
  * This adds the given notifier to the global list so that the callback is
  * called for each registered PCM devices.  This exists only for PCM OSS
  * emulation, so far.
+ *
+ * Return: zero if successful, or a negative error code
  */
 int snd_pcm_notify(struct snd_pcm_notify *notify, int nfree)
 {

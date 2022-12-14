@@ -33,7 +33,7 @@
 static int efx_ethtool_phys_id(struct net_device *net_dev,
 			       enum ethtool_phys_id_state state)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 	enum efx_led_mode mode = EFX_LED_DEFAULT;
 
 	switch (state) {
@@ -55,13 +55,13 @@ static int efx_ethtool_phys_id(struct net_device *net_dev,
 
 static int efx_ethtool_get_regs_len(struct net_device *net_dev)
 {
-	return efx_nic_get_regs_len(netdev_priv(net_dev));
+	return efx_nic_get_regs_len(efx_netdev_priv(net_dev));
 }
 
 static void efx_ethtool_get_regs(struct net_device *net_dev,
 				 struct ethtool_regs *regs, void *buf)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 
 	regs->version = efx->type->revision;
 	efx_nic_get_regs(efx, buf);
@@ -97,9 +97,11 @@ static void efx_ethtool_get_regs(struct net_device *net_dev,
  */
 
 static int efx_ethtool_get_coalesce(struct net_device *net_dev,
-				    struct ethtool_coalesce *coalesce)
+				    struct ethtool_coalesce *coalesce,
+				    struct kernel_ethtool_coalesce *kernel_coal,
+				    struct netlink_ext_ack *extack)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 	unsigned int tx_usecs, rx_usecs;
 	bool rx_adaptive;
 
@@ -115,9 +117,11 @@ static int efx_ethtool_get_coalesce(struct net_device *net_dev,
 }
 
 static int efx_ethtool_set_coalesce(struct net_device *net_dev,
-				    struct ethtool_coalesce *coalesce)
+				    struct ethtool_coalesce *coalesce,
+				    struct kernel_ethtool_coalesce *kernel_coal,
+				    struct netlink_ext_ack *extack)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 	struct efx_channel *channel;
 	unsigned int tx_usecs, rx_usecs;
 	bool adaptive, rx_may_override_tx;
@@ -153,10 +157,13 @@ static int efx_ethtool_set_coalesce(struct net_device *net_dev,
 	return 0;
 }
 
-static void efx_ethtool_get_ringparam(struct net_device *net_dev,
-				      struct ethtool_ringparam *ring)
+static void
+efx_ethtool_get_ringparam(struct net_device *net_dev,
+			  struct ethtool_ringparam *ring,
+			  struct kernel_ethtool_ringparam *kernel_ring,
+			  struct netlink_ext_ack *extack)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 
 	ring->rx_max_pending = EFX_MAX_DMAQ_SIZE;
 	ring->tx_max_pending = EFX_TXQ_MAX_ENT(efx);
@@ -164,10 +171,13 @@ static void efx_ethtool_get_ringparam(struct net_device *net_dev,
 	ring->tx_pending = efx->txq_entries;
 }
 
-static int efx_ethtool_set_ringparam(struct net_device *net_dev,
-				     struct ethtool_ringparam *ring)
+static int
+efx_ethtool_set_ringparam(struct net_device *net_dev,
+			  struct ethtool_ringparam *ring,
+			  struct kernel_ethtool_ringparam *kernel_ring,
+			  struct netlink_ext_ack *extack)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 	u32 txq_entries;
 
 	if (ring->rx_mini_pending || ring->rx_jumbo_pending ||
@@ -194,7 +204,7 @@ static int efx_ethtool_set_ringparam(struct net_device *net_dev,
 static void efx_ethtool_get_wol(struct net_device *net_dev,
 				struct ethtool_wolinfo *wol)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 	return efx->type->get_wol(efx, wol);
 }
 
@@ -202,14 +212,23 @@ static void efx_ethtool_get_wol(struct net_device *net_dev,
 static int efx_ethtool_set_wol(struct net_device *net_dev,
 			       struct ethtool_wolinfo *wol)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 	return efx->type->set_wol(efx, wol->wolopts);
+}
+
+static void efx_ethtool_get_fec_stats(struct net_device *net_dev,
+				      struct ethtool_fec_stats *fec_stats)
+{
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
+
+	if (efx->type->get_fec_stats)
+		efx->type->get_fec_stats(efx, fec_stats);
 }
 
 static int efx_ethtool_get_ts_info(struct net_device *net_dev,
 				   struct ethtool_ts_info *ts_info)
 {
-	struct efx_nic *efx = netdev_priv(net_dev);
+	struct efx_nic *efx = efx_netdev_priv(net_dev);
 
 	/* Software capabilities */
 	ts_info->so_timestamping = (SOF_TIMESTAMPING_RX_SOFTWARE |
@@ -257,6 +276,7 @@ const struct ethtool_ops efx_ethtool_ops = {
 	.get_module_eeprom	= efx_ethtool_get_module_eeprom,
 	.get_link_ksettings	= efx_ethtool_get_link_ksettings,
 	.set_link_ksettings	= efx_ethtool_set_link_ksettings,
+	.get_fec_stats		= efx_ethtool_get_fec_stats,
 	.get_fecparam		= efx_ethtool_get_fecparam,
 	.set_fecparam		= efx_ethtool_set_fecparam,
 };

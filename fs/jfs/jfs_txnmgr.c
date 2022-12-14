@@ -105,7 +105,7 @@ static DEFINE_SPINLOCK(jfsTxnLock);
 #define TXN_LOCK()		spin_lock(&jfsTxnLock)
 #define TXN_UNLOCK()		spin_unlock(&jfsTxnLock)
 
-#define LAZY_LOCK_INIT()	spin_lock_init(&TxAnchor.LazyLock);
+#define LAZY_LOCK_INIT()	spin_lock_init(&TxAnchor.LazyLock)
 #define LAZY_LOCK(flags)	spin_lock_irqsave(&TxAnchor.LazyLock, flags)
 #define LAZY_UNLOCK(flags) spin_unlock_irqrestore(&TxAnchor.LazyLock, flags)
 
@@ -1490,40 +1490,6 @@ static void diLog(struct jfs_log *log, struct tblock *tblk, struct lrd *lrd,
 		tlck->flag |= tlckWRITEPAGE;
 	} else
 		jfs_err("diLog: UFO type tlck:0x%p", tlck);
-#ifdef  _JFS_WIP
-	/*
-	 *	alloc/free external EA extent
-	 *
-	 * a maplock for txUpdateMap() to update bPWMAP for alloc/free
-	 * of the extent has been formatted at txLock() time;
-	 */
-	else {
-		assert(tlck->type & tlckEA);
-
-		/* log LOG_UPDATEMAP for logredo() to update bmap for
-		 * alloc of new (and free of old) external EA extent;
-		 */
-		lrd->type = cpu_to_le16(LOG_UPDATEMAP);
-		pxdlock = (struct pxd_lock *) & tlck->lock;
-		nlock = pxdlock->index;
-		for (i = 0; i < nlock; i++, pxdlock++) {
-			if (pxdlock->flag & mlckALLOCPXD)
-				lrd->log.updatemap.type =
-				    cpu_to_le16(LOG_ALLOCPXD);
-			else
-				lrd->log.updatemap.type =
-				    cpu_to_le16(LOG_FREEPXD);
-			lrd->log.updatemap.nxd = cpu_to_le16(1);
-			lrd->log.updatemap.pxd = pxdlock->pxd;
-			lrd->backchain =
-			    cpu_to_le32(lmLog(log, tblk, lrd, NULL));
-		}
-
-		/* update bmap */
-		tlck->flag |= tlckUPDATEMAP;
-	}
-#endif				/* _JFS_WIP */
-
 	return;
 }
 

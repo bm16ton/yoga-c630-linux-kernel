@@ -326,12 +326,12 @@ static void *chain_alloc(struct chain_allocator *ca, unsigned int size)
 	return ret;
 }
 
-/**
+/*
  * Data types related to memory bitmaps.
  *
- * Memory bitmap is a structure consiting of many linked lists of
+ * Memory bitmap is a structure consisting of many linked lists of
  * objects.  The main list's elements are of type struct zone_bitmap
- * and each of them corresonds to one zone.  For each zone bitmap
+ * and each of them corresponds to one zone.  For each zone bitmap
  * object there is a list of objects of type struct bm_block that
  * represent each blocks of bitmap in which information is stored.
  *
@@ -427,6 +427,10 @@ struct memory_bitmap {
 
 /**
  * alloc_rtree_node - Allocate a new node and add it to the radix tree.
+ * @gfp_mask: GFP mask for the allocation.
+ * @safe_needed: Get pages not used before hibernation (restore only)
+ * @ca: Pointer to a linked list of pages ("a chain") to allocate from
+ * @list: Radix Tree node to add.
  *
  * This function is used to allocate inner nodes as well as the
  * leave nodes of the radix tree. It also adds the node to the
@@ -902,7 +906,7 @@ static bool rtree_next_node(struct memory_bitmap *bm)
 }
 
 /**
- * memory_bm_rtree_next_pfn - Find the next set bit in a memory bitmap.
+ * memory_bm_next_pfn - Find the next set bit in a memory bitmap.
  * @bm: Memory bitmap.
  *
  * Starting from the last returned position this function searches for the next
@@ -978,8 +982,7 @@ static void memory_bm_recycle(struct memory_bitmap *bm)
  * Register a range of page frames the contents of which should not be saved
  * during hibernation (to be used in the early initialization code).
  */
-void __init __register_nosave_region(unsigned long start_pfn,
-				     unsigned long end_pfn, int use_kmalloc)
+void __init register_nosave_region(unsigned long start_pfn, unsigned long end_pfn)
 {
 	struct nosave_region *region;
 
@@ -995,18 +998,12 @@ void __init __register_nosave_region(unsigned long start_pfn,
 			goto Report;
 		}
 	}
-	if (use_kmalloc) {
-		/* During init, this shouldn't fail */
-		region = kmalloc(sizeof(struct nosave_region), GFP_KERNEL);
-		BUG_ON(!region);
-	} else {
-		/* This allocation cannot fail */
-		region = memblock_alloc(sizeof(struct nosave_region),
-					SMP_CACHE_BYTES);
-		if (!region)
-			panic("%s: Failed to allocate %zu bytes\n", __func__,
-			      sizeof(struct nosave_region));
-	}
+	/* This allocation cannot fail */
+	region = memblock_alloc(sizeof(struct nosave_region),
+				SMP_CACHE_BYTES);
+	if (!region)
+		panic("%s: Failed to allocate %zu bytes\n", __func__,
+		      sizeof(struct nosave_region));
 	region->start_pfn = start_pfn;
 	region->end_pfn = end_pfn;
 	list_add_tail(&region->list, &nosave_regions);
@@ -1146,7 +1143,7 @@ int create_basic_memory_bitmaps(void)
  Free_second_object:
 	kfree(bm2);
  Free_first_bitmap:
- 	memory_bm_free(bm1, PG_UNSAFE_CLEAR);
+	memory_bm_free(bm1, PG_UNSAFE_CLEAR);
  Free_first_object:
 	kfree(bm1);
 	return -ENOMEM;
@@ -1500,7 +1497,7 @@ static struct memory_bitmap copy_bm;
 /**
  * swsusp_free - Free pages allocated for hibernation image.
  *
- * Image pages are alocated before snapshot creation, so they need to be
+ * Image pages are allocated before snapshot creation, so they need to be
  * released after resume.
  */
 void swsusp_free(void)
@@ -1944,7 +1941,7 @@ static inline int get_highmem_buffer(int safe_needed)
 }
 
 /**
- * alloc_highmem_image_pages - Allocate some highmem pages for the image.
+ * alloc_highmem_pages - Allocate some highmem pages for the image.
  *
  * Try to allocate as many pages as needed, but if the number of free highmem
  * pages is less than that, allocate them all.
@@ -2231,7 +2228,7 @@ static int check_header(struct swsusp_info *info)
 }
 
 /**
- * load header - Check the image header and copy the data from it.
+ * load_header - Check the image header and copy the data from it.
  */
 static int load_header(struct swsusp_info *info)
 {
@@ -2326,7 +2323,7 @@ static struct memory_bitmap *safe_highmem_bm;
  * (@nr_highmem_p points to the variable containing the number of highmem image
  * pages).  The pages that are "safe" (ie. will not be overwritten when the
  * hibernation image is restored entirely) have the corresponding bits set in
- * @bm (it must be unitialized).
+ * @bm (it must be uninitialized).
  *
  * NOTE: This function should not be called if there are no highmem image pages.
  */
@@ -2483,7 +2480,7 @@ static inline void free_highmem_data(void) {}
 
 /**
  * prepare_image - Make room for loading hibernation image.
- * @new_bm: Unitialized memory bitmap structure.
+ * @new_bm: Uninitialized memory bitmap structure.
  * @bm: Memory bitmap with unsafe pages marked.
  *
  * Use @bm to mark the pages that will be overwritten in the process of

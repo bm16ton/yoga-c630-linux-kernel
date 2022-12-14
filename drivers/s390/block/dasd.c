@@ -621,7 +621,6 @@ void dasd_set_target_state(struct dasd_device *device, int target)
 	mutex_unlock(&device->state_mutex);
 	dasd_put_device(device);
 }
-EXPORT_SYMBOL(dasd_set_target_state);
 
 /*
  * Enable devices with device numbers in [from..to].
@@ -1423,6 +1422,13 @@ int dasd_start_IO(struct dasd_ccw_req *cqr)
 		if (!cqr->lpm)
 			cqr->lpm = dasd_path_get_opm(device);
 	}
+	/*
+	 * remember the amount of formatted tracks to prevent double format on
+	 * ESE devices
+	 */
+	if (cqr->block)
+		cqr->trkcount = atomic_read(&cqr->block->trkcount);
+
 	if (cqr->cpmode == 1) {
 		rc = ccw_device_tm_start(device->cdev, cqr->cpaddr,
 					 (long) cqr, cqr->lpm);
@@ -1640,6 +1646,7 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 	unsigned long now;
 	int nrf_suppressed = 0;
 	int fp_suppressed = 0;
+	struct request *req;
 	u8 *sense = NULL;
 	int expires;
 
@@ -1718,7 +1725,7 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 		dasd_put_device(device);
 	}
 
-	/* check for for attention message */
+	/* check for attention message */
 	if (scsw_dstat(&irb->scsw) & DEV_STAT_ATTENTION) {
 		device = dasd_device_from_cdev_locked(cdev);
 		if (!IS_ERR(device)) {
@@ -1740,7 +1747,12 @@ void dasd_int_handler(struct ccw_device *cdev, unsigned long intparm,
 	}
 
 	if (dasd_ese_needs_format(cqr->block, irb)) {
-		if (rq_data_dir((struct request *)cqr->callback_data) == READ) {
+		req = dasd_get_callback_data(cqr);
+		if (!req) {
+			cqr->status = DASD_CQR_ERROR;
+			return;
+		}
+		if (rq_data_dir(req) == READ) {
 			device->discipline->ese_read(cqr, irb);
 			cqr->status = DASD_CQR_SUCCESS;
 			cqr->stopclk = now;
@@ -2078,12 +2090,15 @@ static void __dasd_device_check_path_events(struct dasd_device *device)
 
 	if (device->stopped & ~(DASD_STOPPED_DC_WAIT))
 		return;
+
+	dasd_path_clear_all_verify(device);
+	dasd_path_clear_all_fcsec(device);
+
 	rc = device->discipline->pe_handler(device, tbvpm, fcsecpm);
 	if (rc) {
+		dasd_path_add_tbvpm(device, tbvpm);
+		dasd_path_add_fcsecpm(device, fcsecpm);
 		dasd_device_set_timer(device, 50);
-	} else {
-		dasd_path_clear_all_verify(device);
-		dasd_path_clear_all_fcsec(device);
 	}
 };
 
@@ -2763,8 +2778,7 @@ static void __dasd_cleanup_cqr(struct dasd_ccw_req *cqr)
 		 * complete a request partially.
 		 */
 		if (proc_bytes) {
-			blk_update_request(req, BLK_STS_OK,
-					   blk_rq_bytes(req) - proc_bytes);
+			blk_update_request(req, BLK_STS_OK, proc_bytes);
 			blk_mq_requeue_request(req, true);
 		} else if (likely(!blk_should_fake_timeout(req->q))) {
 			blk_mq_complete_request(req);
@@ -3131,7 +3145,7 @@ out:
  * BLK_EH_DONE if the request is handled or terminated
  *		      by the driver.
  */
-enum blk_eh_timer_return dasd_times_out(struct request *req, bool reserved)
+enum blk_eh_timer_return dasd_times_out(struct request *req)
 {
 	struct dasd_block *block = req->q->queuedata;
 	struct dasd_device *device;
@@ -3266,7 +3280,7 @@ static int dasd_alloc_queue(struct dasd_block *block)
 static void dasd_free_queue(struct dasd_block *block)
 {
 	if (block->request_queue) {
-		blk_cleanup_queue(block->request_queue);
+		blk_mq_destroy_queue(block->request_queue);
 		blk_mq_free_tag_set(&block->tag_set);
 		block->request_queue = NULL;
 	}
@@ -3439,15 +3453,6 @@ static void dasd_generic_auto_online(void *data, async_cookie_t cookie)
  */
 int dasd_generic_probe(struct ccw_device *cdev)
 {
-	int ret;
-
-	ret = dasd_add_sysfs_files(cdev);
-	if (ret) {
-		DBF_EVENT_DEVID(DBF_WARNING, cdev, "%s",
-				"dasd_generic_probe: could not add "
-				"sysfs entries");
-		return ret;
-	}
 	cdev->handler = &dasd_int_handler;
 
 	/*
@@ -3488,15 +3493,13 @@ void dasd_generic_remove(struct ccw_device *cdev)
 	struct dasd_block *block;
 
 	device = dasd_device_from_cdev(cdev);
-	if (IS_ERR(device)) {
-		dasd_remove_sysfs_files(cdev);
+	if (IS_ERR(device))
 		return;
-	}
+
 	if (test_and_set_bit(DASD_FLAG_OFFLINE, &device->flags) &&
 	    !test_bit(DASD_FLAG_SAFE_OFFLINE_RUNNING, &device->flags)) {
 		/* Already doing offline processing */
 		dasd_put_device(device);
-		dasd_remove_sysfs_files(cdev);
 		return;
 	}
 	/*
@@ -3515,8 +3518,6 @@ void dasd_generic_remove(struct ccw_device *cdev)
 	 */
 	if (block)
 		dasd_free_block(block);
-
-	dasd_remove_sysfs_files(cdev);
 }
 EXPORT_SYMBOL_GPL(dasd_generic_remove);
 

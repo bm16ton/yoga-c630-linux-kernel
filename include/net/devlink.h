@@ -21,43 +21,8 @@
 #include <linux/xarray.h>
 #include <linux/firmware.h>
 
-#define DEVLINK_RELOAD_STATS_ARRAY_SIZE \
-	(__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-
-struct devlink_dev_stats {
-	u32 reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-	u32 remote_reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-};
-
-struct devlink_ops;
-
-struct devlink {
-	struct list_head list;
-	struct list_head port_list;
-	struct list_head sb_list;
-	struct list_head dpipe_table_list;
-	struct list_head resource_list;
-	struct list_head param_list;
-	struct list_head region_list;
-	struct list_head reporter_list;
-	struct mutex reporters_lock; /* protects reporter_list */
-	struct devlink_dpipe_headers *dpipe_headers;
-	struct list_head trap_list;
-	struct list_head trap_group_list;
-	struct list_head trap_policer_list;
-	const struct devlink_ops *ops;
-	struct xarray snapshot_ids;
-	struct devlink_dev_stats stats;
-	struct device *dev;
-	possible_net_t _net;
-	struct mutex lock; /* Serializes access to devlink instance specific objects such as
-			    * port, sb, dpipe, resource, params, region, traps and more.
-			    */
-	u8 reload_failed:1,
-	   reload_enabled:1,
-	   registered:1;
-	char priv[0] __aligned(NETDEV_ALIGN);
-};
+struct devlink;
+struct devlink_linecard;
 
 struct devlink_port_phys_attrs {
 	u32 port_number; /* Same value as "split group".
@@ -98,11 +63,13 @@ struct devlink_port_pci_vf_attrs {
  * @controller: Associated controller number
  * @sf: Associated PCI SF for of the PCI PF for this port.
  * @pf: Associated PCI PF number for this port.
+ * @external: when set, indicates if a port is for an external controller
  */
 struct devlink_port_pci_sf_attrs {
 	u32 controller;
 	u32 sf;
 	u16 pf;
+	u8 external:1;
 };
 
 /**
@@ -131,13 +98,30 @@ struct devlink_port_attrs {
 	};
 };
 
+struct devlink_rate {
+	struct list_head list;
+	enum devlink_rate_type type;
+	struct devlink *devlink;
+	void *priv;
+	u64 tx_share;
+	u64 tx_max;
+
+	struct devlink_rate *parent;
+	union {
+		struct devlink_port *devlink_port;
+		struct {
+			char *name;
+			refcount_t refcnt;
+		};
+	};
+};
+
 struct devlink_port {
 	struct list_head list;
 	struct list_head param_list;
 	struct list_head region_list;
 	struct devlink *devlink;
 	unsigned int index;
-	bool registered;
 	spinlock_t type_lock; /* Protects type and type_dev
 			       * pointer consistency.
 			       */
@@ -150,6 +134,9 @@ struct devlink_port {
 	struct delayed_work type_warn_dw;
 	struct list_head reporter_list;
 	struct mutex reporters_lock; /* Protects reporter_list */
+
+	struct devlink_rate *devlink_rate;
+	struct devlink_linecard *linecard;
 };
 
 struct devlink_port_new_attrs {
@@ -161,6 +148,40 @@ struct devlink_port_new_attrs {
 	u8 port_index_valid:1,
 	   controller_valid:1,
 	   sfnum_valid:1;
+};
+
+/**
+ * struct devlink_linecard_ops - Linecard operations
+ * @provision: callback to provision the linecard slot with certain
+ *	       type of linecard. As a result of this operation,
+ *	       driver is expected to eventually (could be after
+ *	       the function call returns) call one of:
+ *	       devlink_linecard_provision_set()
+ *	       devlink_linecard_provision_fail()
+ * @unprovision: callback to unprovision the linecard slot. As a result
+ *		 of this operation, driver is expected to eventually
+ *		 (could be after the function call returns) call
+ *	         devlink_linecard_provision_clear()
+ *	         devlink_linecard_provision_fail()
+ * @same_provision: callback to ask the driver if linecard is already
+ *                  provisioned in the same way user asks this linecard to be
+ *                  provisioned.
+ * @types_count: callback to get number of supported types
+ * @types_get: callback to get next type in list
+ */
+struct devlink_linecard_ops {
+	int (*provision)(struct devlink_linecard *linecard, void *priv,
+			 const char *type, const void *type_priv,
+			 struct netlink_ext_ack *extack);
+	int (*unprovision)(struct devlink_linecard *linecard, void *priv,
+			   struct netlink_ext_ack *extack);
+	bool (*same_provision)(struct devlink_linecard *linecard, void *priv,
+			       const char *type, const void *type_priv);
+	unsigned int (*types_count)(struct devlink_linecard *linecard,
+				    void *priv);
+	void (*types_get)(struct devlink_linecard *linecard,
+			  void *priv, unsigned int index, const char **type,
+			  const void **type_priv);
 };
 
 struct devlink_sb_pool_info {
@@ -376,33 +397,6 @@ devlink_resource_size_params_init(struct devlink_resource_size_params *size_para
 
 typedef u64 devlink_resource_occ_get_t(void *priv);
 
-/**
- * struct devlink_resource - devlink resource
- * @name: name of the resource
- * @id: id, per devlink instance
- * @size: size of the resource
- * @size_new: updated size of the resource, reload is needed
- * @size_valid: valid in case the total size of the resource is valid
- *              including its children
- * @parent: parent resource
- * @size_params: size parameters
- * @list: parent list
- * @resource_list: list of child resources
- */
-struct devlink_resource {
-	const char *name;
-	u64 id;
-	u64 size;
-	u64 size_new;
-	bool size_valid;
-	struct devlink_resource *parent;
-	struct devlink_resource_size_params size_params;
-	struct list_head list;
-	struct list_head resource_list;
-	devlink_resource_occ_get_t *occ_get;
-	void *occ_get_priv;
-};
-
 #define DEVLINK_RESOURCE_ID_PARENT_TOP 0
 
 #define DEVLINK_RESOURCE_GENERIC_NAME_PORTS "physical_ports"
@@ -483,7 +477,6 @@ struct devlink_param_item {
 	const struct devlink_param *param;
 	union devlink_param_value driverinit_value;
 	bool driverinit_value_valid;
-	bool published;
 };
 
 enum devlink_param_generic_id {
@@ -498,6 +491,12 @@ enum devlink_param_generic_id {
 	DEVLINK_PARAM_GENERIC_ID_RESET_DEV_ON_DRV_PROBE,
 	DEVLINK_PARAM_GENERIC_ID_ENABLE_ROCE,
 	DEVLINK_PARAM_GENERIC_ID_ENABLE_REMOTE_DEV_RESET,
+	DEVLINK_PARAM_GENERIC_ID_ENABLE_ETH,
+	DEVLINK_PARAM_GENERIC_ID_ENABLE_RDMA,
+	DEVLINK_PARAM_GENERIC_ID_ENABLE_VNET,
+	DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
+	DEVLINK_PARAM_GENERIC_ID_IO_EQ_SIZE,
+	DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
 
 	/* add new param generic ids above here*/
 	__DEVLINK_PARAM_GENERIC_ID_MAX,
@@ -537,6 +536,24 @@ enum devlink_param_generic_id {
 
 #define DEVLINK_PARAM_GENERIC_ENABLE_REMOTE_DEV_RESET_NAME "enable_remote_dev_reset"
 #define DEVLINK_PARAM_GENERIC_ENABLE_REMOTE_DEV_RESET_TYPE DEVLINK_PARAM_TYPE_BOOL
+
+#define DEVLINK_PARAM_GENERIC_ENABLE_ETH_NAME "enable_eth"
+#define DEVLINK_PARAM_GENERIC_ENABLE_ETH_TYPE DEVLINK_PARAM_TYPE_BOOL
+
+#define DEVLINK_PARAM_GENERIC_ENABLE_RDMA_NAME "enable_rdma"
+#define DEVLINK_PARAM_GENERIC_ENABLE_RDMA_TYPE DEVLINK_PARAM_TYPE_BOOL
+
+#define DEVLINK_PARAM_GENERIC_ENABLE_VNET_NAME "enable_vnet"
+#define DEVLINK_PARAM_GENERIC_ENABLE_VNET_TYPE DEVLINK_PARAM_TYPE_BOOL
+
+#define DEVLINK_PARAM_GENERIC_ENABLE_IWARP_NAME "enable_iwarp"
+#define DEVLINK_PARAM_GENERIC_ENABLE_IWARP_TYPE DEVLINK_PARAM_TYPE_BOOL
+
+#define DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_NAME "io_eq_size"
+#define DEVLINK_PARAM_GENERIC_IO_EQ_SIZE_TYPE DEVLINK_PARAM_TYPE_U32
+
+#define DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME "event_eq_size"
+#define DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE DEVLINK_PARAM_TYPE_U32
 
 #define DEVLINK_PARAM_GENERIC(_id, _cmodes, _get, _set, _validate)	\
 {									\
@@ -691,13 +708,17 @@ struct devlink_health_reporter_ops {
  * @trap_name: Trap name.
  * @trap_group_name: Trap group name.
  * @input_dev: Input netdevice.
+ * @dev_tracker: refcount tracker for @input_dev.
  * @fa_cookie: Flow action user cookie.
  * @trap_type: Trap type.
  */
 struct devlink_trap_metadata {
 	const char *trap_name;
 	const char *trap_group_name;
+
 	struct net_device *input_dev;
+	netdevice_tracker dev_tracker;
+
 	const struct flow_action_cookie *fa_cookie;
 	enum devlink_trap_type trap_type;
 };
@@ -1189,6 +1210,11 @@ enum devlink_trap_group_generic_id {
 		.min_burst = _min_burst,				      \
 	}
 
+enum {
+	/* device supports reload operations */
+	DEVLINK_F_RELOAD = 1UL << 0,
+};
+
 struct devlink_ops {
 	/**
 	 * @supported_flash_update_params:
@@ -1207,9 +1233,9 @@ struct devlink_ops {
 			 struct netlink_ext_ack *extack);
 	int (*port_type_set)(struct devlink_port *devlink_port,
 			     enum devlink_port_type port_type);
-	int (*port_split)(struct devlink *devlink, unsigned int port_index,
+	int (*port_split)(struct devlink *devlink, struct devlink_port *port,
 			  unsigned int count, struct netlink_ext_ack *extack);
-	int (*port_unsplit)(struct devlink *devlink, unsigned int port_index,
+	int (*port_unsplit)(struct devlink *devlink, struct devlink_port *port,
 			    struct netlink_ext_ack *extack);
 	int (*sb_pool_get)(struct devlink *devlink, unsigned int sb_index,
 			   u16 pool_index,
@@ -1325,6 +1351,16 @@ struct devlink_ops {
 				     enum devlink_trap_action action,
 				     struct netlink_ext_ack *extack);
 	/**
+	 * @trap_drop_counter_get: Trap drop counter get function.
+	 *
+	 * Should be used by device drivers to report number of packets
+	 * that have been dropped, and cannot be passed to the devlink
+	 * subsystem by the underlying device.
+	 */
+	int (*trap_drop_counter_get)(struct devlink *devlink,
+				     const struct devlink_trap *trap,
+				     u64 *p_drops);
+	/**
 	 * @trap_policer_init: Trap policer initialization function.
 	 *
 	 * Should be used by device drivers to initialize the trap policer in
@@ -1365,8 +1401,8 @@ struct devlink_ops {
 	 *
 	 * Note: @extack can be NULL when port notifier queries the port function.
 	 */
-	int (*port_function_hw_addr_get)(struct devlink *devlink, struct devlink_port *port,
-					 u8 *hw_addr, int *hw_addr_len,
+	int (*port_function_hw_addr_get)(struct devlink_port *port, u8 *hw_addr,
+					 int *hw_addr_len,
 					 struct netlink_ext_ack *extack);
 	/**
 	 * @port_function_hw_addr_set: Port function's hardware address set function.
@@ -1375,7 +1411,7 @@ struct devlink_ops {
 	 * by the devlink port. Driver should return -EOPNOTSUPP if it doesn't support port
 	 * function handling for a particular port.
 	 */
-	int (*port_function_hw_addr_set)(struct devlink *devlink, struct devlink_port *port,
+	int (*port_function_hw_addr_set)(struct devlink_port *port,
 					 const u8 *hw_addr, int hw_addr_len,
 					 struct netlink_ext_ack *extack);
 	/**
@@ -1431,8 +1467,7 @@ struct devlink_ops {
 	 *
 	 * Return: 0 on success, negative value otherwise.
 	 */
-	int (*port_fn_state_get)(struct devlink *devlink,
-				 struct devlink_port *port,
+	int (*port_fn_state_get)(struct devlink_port *port,
 				 enum devlink_port_fn_state *state,
 				 enum devlink_port_fn_opstate *opstate,
 				 struct netlink_ext_ack *extack);
@@ -1447,54 +1482,95 @@ struct devlink_ops {
 	 *
 	 * Return: 0 on success, negative value otherwise.
 	 */
-	int (*port_fn_state_set)(struct devlink *devlink,
-				 struct devlink_port *port,
+	int (*port_fn_state_set)(struct devlink_port *port,
 				 enum devlink_port_fn_state state,
 				 struct netlink_ext_ack *extack);
+
+	/**
+	 * Rate control callbacks.
+	 */
+	int (*rate_leaf_tx_share_set)(struct devlink_rate *devlink_rate, void *priv,
+				      u64 tx_share, struct netlink_ext_ack *extack);
+	int (*rate_leaf_tx_max_set)(struct devlink_rate *devlink_rate, void *priv,
+				    u64 tx_max, struct netlink_ext_ack *extack);
+	int (*rate_node_tx_share_set)(struct devlink_rate *devlink_rate, void *priv,
+				      u64 tx_share, struct netlink_ext_ack *extack);
+	int (*rate_node_tx_max_set)(struct devlink_rate *devlink_rate, void *priv,
+				    u64 tx_max, struct netlink_ext_ack *extack);
+	int (*rate_node_new)(struct devlink_rate *rate_node, void **priv,
+			     struct netlink_ext_ack *extack);
+	int (*rate_node_del)(struct devlink_rate *rate_node, void *priv,
+			     struct netlink_ext_ack *extack);
+	int (*rate_leaf_parent_set)(struct devlink_rate *child,
+				    struct devlink_rate *parent,
+				    void *priv_child, void *priv_parent,
+				    struct netlink_ext_ack *extack);
+	int (*rate_node_parent_set)(struct devlink_rate *child,
+				    struct devlink_rate *parent,
+				    void *priv_child, void *priv_parent,
+				    struct netlink_ext_ack *extack);
+	/**
+	 * selftests_check() - queries if selftest is supported
+	 * @devlink: devlink instance
+	 * @id: test index
+	 * @extack: extack for reporting error messages
+	 *
+	 * Return: true if test is supported by the driver
+	 */
+	bool (*selftest_check)(struct devlink *devlink, unsigned int id,
+			       struct netlink_ext_ack *extack);
+	/**
+	 * selftest_run() - Runs a selftest
+	 * @devlink: devlink instance
+	 * @id: test index
+	 * @extack: extack for reporting error messages
+	 *
+	 * Return: status of the test
+	 */
+	enum devlink_selftest_status
+	(*selftest_run)(struct devlink *devlink, unsigned int id,
+			struct netlink_ext_ack *extack);
 };
 
-static inline void *devlink_priv(struct devlink *devlink)
-{
-	BUG_ON(!devlink);
-	return &devlink->priv;
-}
+void *devlink_priv(struct devlink *devlink);
+struct devlink *priv_to_devlink(void *priv);
+struct device *devlink_to_dev(const struct devlink *devlink);
 
-static inline struct devlink *priv_to_devlink(void *priv)
-{
-	BUG_ON(!priv);
-	return container_of(priv, struct devlink, priv);
-}
-
-static inline struct devlink_port *
-netdev_to_devlink_port(struct net_device *dev)
-{
-	if (dev->netdev_ops->ndo_get_devlink_port)
-		return dev->netdev_ops->ndo_get_devlink_port(dev);
-	return NULL;
-}
-
-static inline struct devlink *netdev_to_devlink(struct net_device *dev)
-{
-	struct devlink_port *devlink_port = netdev_to_devlink_port(dev);
-
-	if (devlink_port)
-		return devlink_port->devlink;
-	return NULL;
-}
+/* Devlink instance explicit locking */
+void devl_lock(struct devlink *devlink);
+int devl_trylock(struct devlink *devlink);
+void devl_unlock(struct devlink *devlink);
+void devl_assert_locked(struct devlink *devlink);
+bool devl_lock_is_held(struct devlink *devlink);
 
 struct ib_device;
 
 struct net *devlink_net(const struct devlink *devlink);
-void devlink_net_set(struct devlink *devlink, struct net *net);
-struct devlink *devlink_alloc(const struct devlink_ops *ops, size_t priv_size);
-int devlink_register(struct devlink *devlink, struct device *dev);
+/* This call is intended for software devices that can create
+ * devlink instances in other namespaces than init_net.
+ *
+ * Drivers that operate on real HW must use devlink_alloc() instead.
+ */
+struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
+				 size_t priv_size, struct net *net,
+				 struct device *dev);
+static inline struct devlink *devlink_alloc(const struct devlink_ops *ops,
+					    size_t priv_size,
+					    struct device *dev)
+{
+	return devlink_alloc_ns(ops, priv_size, &init_net, dev);
+}
+void devlink_set_features(struct devlink *devlink, u64 features);
+void devlink_register(struct devlink *devlink);
 void devlink_unregister(struct devlink *devlink);
-void devlink_reload_enable(struct devlink *devlink);
-void devlink_reload_disable(struct devlink *devlink);
 void devlink_free(struct devlink *devlink);
+int devl_port_register(struct devlink *devlink,
+		       struct devlink_port *devlink_port,
+		       unsigned int port_index);
 int devlink_port_register(struct devlink *devlink,
 			  struct devlink_port *devlink_port,
 			  unsigned int port_index);
+void devl_port_unregister(struct devlink_port *devlink_port);
 void devlink_port_unregister(struct devlink_port *devlink_port);
 void devlink_port_type_eth_set(struct devlink_port *devlink_port,
 			       struct net_device *netdev);
@@ -1508,21 +1584,44 @@ void devlink_port_attrs_pci_pf_set(struct devlink_port *devlink_port, u32 contro
 void devlink_port_attrs_pci_vf_set(struct devlink_port *devlink_port, u32 controller,
 				   u16 pf, u16 vf, bool external);
 void devlink_port_attrs_pci_sf_set(struct devlink_port *devlink_port,
-				   u32 controller, u16 pf, u32 sf);
+				   u32 controller, u16 pf, u32 sf,
+				   bool external);
+int devl_rate_leaf_create(struct devlink_port *port, void *priv);
+void devl_rate_leaf_destroy(struct devlink_port *devlink_port);
+void devl_rate_nodes_destroy(struct devlink *devlink);
+void devlink_port_linecard_set(struct devlink_port *devlink_port,
+			       struct devlink_linecard *linecard);
+struct devlink_linecard *
+devlink_linecard_create(struct devlink *devlink, unsigned int linecard_index,
+			const struct devlink_linecard_ops *ops, void *priv);
+void devlink_linecard_destroy(struct devlink_linecard *linecard);
+void devlink_linecard_provision_set(struct devlink_linecard *linecard,
+				    const char *type);
+void devlink_linecard_provision_clear(struct devlink_linecard *linecard);
+void devlink_linecard_provision_fail(struct devlink_linecard *linecard);
+void devlink_linecard_activate(struct devlink_linecard *linecard);
+void devlink_linecard_deactivate(struct devlink_linecard *linecard);
+void devlink_linecard_nested_dl_set(struct devlink_linecard *linecard,
+				    struct devlink *nested_devlink);
+int devl_sb_register(struct devlink *devlink, unsigned int sb_index,
+		     u32 size, u16 ingress_pools_count,
+		     u16 egress_pools_count, u16 ingress_tc_count,
+		     u16 egress_tc_count);
 int devlink_sb_register(struct devlink *devlink, unsigned int sb_index,
 			u32 size, u16 ingress_pools_count,
 			u16 egress_pools_count, u16 ingress_tc_count,
 			u16 egress_tc_count);
+void devl_sb_unregister(struct devlink *devlink, unsigned int sb_index);
 void devlink_sb_unregister(struct devlink *devlink, unsigned int sb_index);
-int devlink_dpipe_table_register(struct devlink *devlink,
-				 const char *table_name,
-				 struct devlink_dpipe_table_ops *table_ops,
-				 void *priv, bool counter_control_extern);
-void devlink_dpipe_table_unregister(struct devlink *devlink,
-				    const char *table_name);
-int devlink_dpipe_headers_register(struct devlink *devlink,
-				   struct devlink_dpipe_headers *dpipe_headers);
-void devlink_dpipe_headers_unregister(struct devlink *devlink);
+int devl_dpipe_table_register(struct devlink *devlink,
+			      const char *table_name,
+			      struct devlink_dpipe_table_ops *table_ops,
+			      void *priv, bool counter_control_extern);
+void devl_dpipe_table_unregister(struct devlink *devlink,
+				 const char *table_name);
+void devl_dpipe_headers_register(struct devlink *devlink,
+				 struct devlink_dpipe_headers *dpipe_headers);
+void devl_dpipe_headers_unregister(struct devlink *devlink);
 bool devlink_dpipe_table_counter_enabled(struct devlink *devlink,
 					 const char *table_name);
 int devlink_dpipe_entry_ctx_prepare(struct devlink_dpipe_dump_ctx *dump_ctx);
@@ -1538,24 +1637,40 @@ extern struct devlink_dpipe_header devlink_dpipe_header_ethernet;
 extern struct devlink_dpipe_header devlink_dpipe_header_ipv4;
 extern struct devlink_dpipe_header devlink_dpipe_header_ipv6;
 
+int devl_resource_register(struct devlink *devlink,
+			   const char *resource_name,
+			   u64 resource_size,
+			   u64 resource_id,
+			   u64 parent_resource_id,
+			   const struct devlink_resource_size_params *size_params);
 int devlink_resource_register(struct devlink *devlink,
 			      const char *resource_name,
 			      u64 resource_size,
 			      u64 resource_id,
 			      u64 parent_resource_id,
 			      const struct devlink_resource_size_params *size_params);
-void devlink_resources_unregister(struct devlink *devlink,
-				  struct devlink_resource *resource);
-int devlink_resource_size_get(struct devlink *devlink,
-			      u64 resource_id,
-			      u64 *p_resource_size);
+void devl_resources_unregister(struct devlink *devlink);
+void devlink_resources_unregister(struct devlink *devlink);
+int devl_resource_size_get(struct devlink *devlink,
+			   u64 resource_id,
+			   u64 *p_resource_size);
+int devl_dpipe_table_resource_set(struct devlink *devlink,
+				  const char *table_name, u64 resource_id,
+				  u64 resource_units);
 int devlink_dpipe_table_resource_set(struct devlink *devlink,
 				     const char *table_name, u64 resource_id,
 				     u64 resource_units);
+void devl_resource_occ_get_register(struct devlink *devlink,
+				    u64 resource_id,
+				    devlink_resource_occ_get_t *occ_get,
+				    void *occ_get_priv);
 void devlink_resource_occ_get_register(struct devlink *devlink,
 				       u64 resource_id,
 				       devlink_resource_occ_get_t *occ_get,
 				       void *occ_get_priv);
+void devl_resource_occ_get_unregister(struct devlink *devlink,
+				      u64 resource_id);
+
 void devlink_resource_occ_get_unregister(struct devlink *devlink,
 					 u64 resource_id);
 int devlink_params_register(struct devlink *devlink,
@@ -1564,30 +1679,19 @@ int devlink_params_register(struct devlink *devlink,
 void devlink_params_unregister(struct devlink *devlink,
 			       const struct devlink_param *params,
 			       size_t params_count);
-void devlink_params_publish(struct devlink *devlink);
-void devlink_params_unpublish(struct devlink *devlink);
-int devlink_port_params_register(struct devlink_port *devlink_port,
-				 const struct devlink_param *params,
-				 size_t params_count);
-void devlink_port_params_unregister(struct devlink_port *devlink_port,
-				    const struct devlink_param *params,
-				    size_t params_count);
+int devlink_param_register(struct devlink *devlink,
+			   const struct devlink_param *param);
+void devlink_param_unregister(struct devlink *devlink,
+			      const struct devlink_param *param);
 int devlink_param_driverinit_value_get(struct devlink *devlink, u32 param_id,
 				       union devlink_param_value *init_val);
 int devlink_param_driverinit_value_set(struct devlink *devlink, u32 param_id,
 				       union devlink_param_value init_val);
-int
-devlink_port_param_driverinit_value_get(struct devlink_port *devlink_port,
-					u32 param_id,
-					union devlink_param_value *init_val);
-int devlink_port_param_driverinit_value_set(struct devlink_port *devlink_port,
-					    u32 param_id,
-					    union devlink_param_value init_val);
 void devlink_param_value_changed(struct devlink *devlink, u32 param_id);
-void devlink_port_param_value_changed(struct devlink_port *devlink_port,
-				      u32 param_id);
-void devlink_param_value_str_fill(union devlink_param_value *dst_val,
-				  const char *src);
+struct devlink_region *devl_region_create(struct devlink *devlink,
+					  const struct devlink_region_ops *ops,
+					  u32 region_max_snapshots,
+					  u64 region_size);
 struct devlink_region *
 devlink_region_create(struct devlink *devlink,
 		      const struct devlink_region_ops *ops,
@@ -1596,6 +1700,7 @@ struct devlink_region *
 devlink_port_region_create(struct devlink_port *port,
 			   const struct devlink_port_region_ops *ops,
 			   u32 region_max_snapshots, u64 region_size);
+void devl_region_destroy(struct devlink_region *region);
 void devlink_region_destroy(struct devlink_region *region);
 void devlink_port_region_destroy(struct devlink_region *region);
 
@@ -1632,10 +1737,7 @@ int devlink_fmsg_binary_pair_nest_start(struct devlink_fmsg *fmsg,
 					const char *name);
 int devlink_fmsg_binary_pair_nest_end(struct devlink_fmsg *fmsg);
 
-int devlink_fmsg_bool_put(struct devlink_fmsg *fmsg, bool value);
-int devlink_fmsg_u8_put(struct devlink_fmsg *fmsg, u8 value);
 int devlink_fmsg_u32_put(struct devlink_fmsg *fmsg, u32 value);
-int devlink_fmsg_u64_put(struct devlink_fmsg *fmsg, u64 value);
 int devlink_fmsg_string_put(struct devlink_fmsg *fmsg, const char *value);
 int devlink_fmsg_binary_put(struct devlink_fmsg *fmsg, const void *value,
 			    u16 value_len);
@@ -1694,9 +1796,15 @@ void devlink_flash_update_timeout_notify(struct devlink *devlink,
 					 const char *component,
 					 unsigned long timeout);
 
+int devl_traps_register(struct devlink *devlink,
+			const struct devlink_trap *traps,
+			size_t traps_count, void *priv);
 int devlink_traps_register(struct devlink *devlink,
 			   const struct devlink_trap *traps,
 			   size_t traps_count, void *priv);
+void devl_traps_unregister(struct devlink *devlink,
+			   const struct devlink_trap *traps,
+			   size_t traps_count);
 void devlink_traps_unregister(struct devlink *devlink,
 			      const struct devlink_trap *traps,
 			      size_t traps_count);
@@ -1704,26 +1812,35 @@ void devlink_trap_report(struct devlink *devlink, struct sk_buff *skb,
 			 void *trap_ctx, struct devlink_port *in_devlink_port,
 			 const struct flow_action_cookie *fa_cookie);
 void *devlink_trap_ctx_priv(void *trap_ctx);
+int devl_trap_groups_register(struct devlink *devlink,
+			      const struct devlink_trap_group *groups,
+			      size_t groups_count);
 int devlink_trap_groups_register(struct devlink *devlink,
+				 const struct devlink_trap_group *groups,
+				 size_t groups_count);
+void devl_trap_groups_unregister(struct devlink *devlink,
 				 const struct devlink_trap_group *groups,
 				 size_t groups_count);
 void devlink_trap_groups_unregister(struct devlink *devlink,
 				    const struct devlink_trap_group *groups,
 				    size_t groups_count);
 int
-devlink_trap_policers_register(struct devlink *devlink,
-			       const struct devlink_trap_policer *policers,
-			       size_t policers_count);
+devl_trap_policers_register(struct devlink *devlink,
+			    const struct devlink_trap_policer *policers,
+			    size_t policers_count);
 void
-devlink_trap_policers_unregister(struct devlink *devlink,
-				 const struct devlink_trap_policer *policers,
-				 size_t policers_count);
+devl_trap_policers_unregister(struct devlink *devlink,
+			      const struct devlink_trap_policer *policers,
+			      size_t policers_count);
 
 #if IS_ENABLED(CONFIG_NET_DEVLINK)
 
-void devlink_compat_running_version(struct net_device *dev,
+struct devlink *__must_check devlink_try_get(struct devlink *devlink);
+void devlink_put(struct devlink *devlink);
+
+void devlink_compat_running_version(struct devlink *devlink,
 				    char *buf, size_t len);
-int devlink_compat_flash_update(struct net_device *dev, const char *file_name);
+int devlink_compat_flash_update(struct devlink *devlink, const char *file_name);
 int devlink_compat_phys_port_name_get(struct net_device *dev,
 				      char *name, size_t len);
 int devlink_compat_switch_id_get(struct net_device *dev,
@@ -1731,13 +1848,22 @@ int devlink_compat_switch_id_get(struct net_device *dev,
 
 #else
 
+static inline struct devlink *devlink_try_get(struct devlink *devlink)
+{
+	return NULL;
+}
+
+static inline void devlink_put(struct devlink *devlink)
+{
+}
+
 static inline void
-devlink_compat_running_version(struct net_device *dev, char *buf, size_t len)
+devlink_compat_running_version(struct devlink *devlink, char *buf, size_t len)
 {
 }
 
 static inline int
-devlink_compat_flash_update(struct net_device *dev, const char *file_name)
+devlink_compat_flash_update(struct devlink *devlink, const char *file_name)
 {
 	return -EOPNOTSUPP;
 }

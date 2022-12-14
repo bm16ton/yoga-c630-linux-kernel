@@ -851,7 +851,7 @@ NOTES:
 - 0x88A8 traffic will not be received unless VLAN stripping is disabled with
   the following command::
 
-    # ethool -K <ethX> rxvlan off
+    # ethtool -K <ethX> rxvlan off
 
 - 0x88A8/0x8100 double VLANs cannot be used with 0x8100 or 0x8100/0x8100 VLANS
   configured on the same port. 0x88a8/0x8100 traffic will not be received if
@@ -901,6 +901,15 @@ To enable/disable UDP Segmentation Offload, issue the following command::
 
   # ethtool -K <ethX> tx-udp-segmentation [off|on]
 
+GNSS module
+-----------
+Allows user to read messages from the GNSS module and write supported commands.
+If the module is physically present, driver creates 2 TTYs for each supported
+device in /dev, ttyGNSS_<device>:<function>_0 and _1. First one (_0) is RW and
+the second one is RO.
+The protocol of write commands is dependent on the GNSS module as the driver
+writes raw bytes from the TTY to the GNSS i2c. Please refer to the module
+documentation for details.
 
 Performance Optimization
 ========================

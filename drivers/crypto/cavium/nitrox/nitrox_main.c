@@ -35,7 +35,7 @@ static LIST_HEAD(ndevlist);
 static DEFINE_MUTEX(devlist_lock);
 static unsigned int num_devices;
 
-/**
+/*
  * nitrox_pci_tbl - PCI Device ID Table
  */
 static const struct pci_device_id nitrox_pci_tbl[] = {
@@ -65,7 +65,7 @@ struct ucode {
 	u64 code[];
 };
 
-/**
+/*
  * write_to_ucd_unit - Write Firmware to NITROX UCD unit
  */
 static void write_to_ucd_unit(struct nitrox_device *ndev, u32 ucode_size,
@@ -269,15 +269,17 @@ static void nitrox_remove_from_devlist(struct nitrox_device *ndev)
 
 struct nitrox_device *nitrox_get_first_device(void)
 {
-	struct nitrox_device *ndev;
+	struct nitrox_device *ndev = NULL, *iter;
 
 	mutex_lock(&devlist_lock);
-	list_for_each_entry(ndev, &ndevlist, list) {
-		if (nitrox_ready(ndev))
+	list_for_each_entry(iter, &ndevlist, list) {
+		if (nitrox_ready(iter)) {
+			ndev = iter;
 			break;
+		}
 	}
 	mutex_unlock(&devlist_lock);
-	if (&ndev->list == &ndevlist)
+	if (!ndev)
 		return NULL;
 
 	refcount_inc(&ndev->refcnt);
@@ -306,9 +308,7 @@ static int nitrox_device_flr(struct pci_dev *pdev)
 		return -ENOMEM;
 	}
 
-	/* check flr support */
-	if (pcie_has_flr(pdev))
-		pcie_flr(pdev);
+	pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
 
 	pci_restore_state(pdev);
 
@@ -424,8 +424,7 @@ static int nitrox_probe(struct pci_dev *pdev,
 	err = nitrox_device_flr(pdev);
 	if (err) {
 		dev_err(&pdev->dev, "FLR failed\n");
-		pci_disable_device(pdev);
-		return err;
+		goto flr_fail;
 	}
 
 	if (!dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64))) {
@@ -434,16 +433,13 @@ static int nitrox_probe(struct pci_dev *pdev,
 		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
 		if (err) {
 			dev_err(&pdev->dev, "DMA configuration failed\n");
-			pci_disable_device(pdev);
-			return err;
+			goto flr_fail;
 		}
 	}
 
 	err = pci_request_mem_regions(pdev, nitrox_driver_name);
-	if (err) {
-		pci_disable_device(pdev);
-		return err;
-	}
+	if (err)
+		goto flr_fail;
 	pci_set_master(pdev);
 
 	ndev = kzalloc(sizeof(*ndev), GFP_KERNEL);
@@ -479,7 +475,7 @@ static int nitrox_probe(struct pci_dev *pdev,
 
 	err = nitrox_pf_sw_init(ndev);
 	if (err)
-		goto ioremap_err;
+		goto pf_sw_fail;
 
 	err = nitrox_pf_hw_init(ndev);
 	if (err)
@@ -509,12 +505,15 @@ crypto_fail:
 	smp_mb__after_atomic();
 pf_hw_fail:
 	nitrox_pf_sw_cleanup(ndev);
+pf_sw_fail:
+	iounmap(ndev->bar_addr);
 ioremap_err:
 	nitrox_remove_from_devlist(ndev);
 	kfree(ndev);
 	pci_set_drvdata(pdev, NULL);
 ndev_fail:
 	pci_release_mem_regions(pdev);
+flr_fail:
 	pci_disable_device(pdev);
 	return err;
 }

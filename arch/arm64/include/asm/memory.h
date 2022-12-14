@@ -44,11 +44,8 @@
 #define _PAGE_OFFSET(va)	(-(UL(1) << (va)))
 #define PAGE_OFFSET		(_PAGE_OFFSET(VA_BITS))
 #define KIMAGE_VADDR		(MODULES_END)
-#define BPF_JIT_REGION_START	(_PAGE_END(VA_BITS_MIN))
-#define BPF_JIT_REGION_SIZE	(SZ_128M)
-#define BPF_JIT_REGION_END	(BPF_JIT_REGION_START + BPF_JIT_REGION_SIZE)
 #define MODULES_END		(MODULES_VADDR + MODULES_VSIZE)
-#define MODULES_VADDR		(BPF_JIT_REGION_END)
+#define MODULES_VADDR		(_PAGE_END(VA_BITS_MIN))
 #define MODULES_VSIZE		(SZ_128M)
 #define VMEMMAP_START		(-(UL(1) << (VA_BITS - VMEMMAP_SHIFT)))
 #define VMEMMAP_END		(VMEMMAP_START + VMEMMAP_SIZE)
@@ -117,6 +114,14 @@
 #define OVERFLOW_STACK_SIZE	SZ_4K
 
 /*
+ * With the minimum frame size of [x29, x30], exactly half the combined
+ * sizes of the hyp and overflow stacks is the maximum size needed to
+ * save the unwinded stacktrace; plus an additional entry to delimit the
+ * end.
+ */
+#define NVHE_STACKTRACE_SIZE	((OVERFLOW_STACK_SIZE + PAGE_SIZE) / 2 + sizeof(long))
+
+/*
  * Alignment of kernel segments (e.g. .text, .data).
  *
  *  4 KB granule:  16 level 3 entries, with contiguous bit
@@ -135,10 +140,8 @@
 #define MT_NORMAL		0
 #define MT_NORMAL_TAGGED	1
 #define MT_NORMAL_NC		2
-#define MT_NORMAL_WT		3
-#define MT_DEVICE_nGnRnE	4
-#define MT_DEVICE_nGnRE		5
-#define MT_DEVICE_GRE		6
+#define MT_DEVICE_nGnRnE	3
+#define MT_DEVICE_nGnRE		4
 
 /*
  * Memory types for Stage-2 translation
@@ -179,7 +182,11 @@
 #include <linux/types.h>
 #include <asm/bug.h>
 
+#if VA_BITS > 48
 extern u64			vabits_actual;
+#else
+#define vabits_actual		((u64)VA_BITS)
+#endif
 
 extern s64			memstart_addr;
 /* PHYS_OFFSET - the physical address of the start of memory. */
@@ -243,13 +250,14 @@ static inline const void *__tag_set(const void *addr, u8 tag)
 }
 
 #ifdef CONFIG_KASAN_HW_TAGS
-#define arch_enable_tagging()			mte_enable_kernel()
-#define arch_set_tagging_report_once(state)	mte_set_report_once(state)
-#define arch_init_tags(max_tag)			mte_init_tags(max_tag)
+#define arch_enable_tagging_sync()		mte_enable_kernel_sync()
+#define arch_enable_tagging_async()		mte_enable_kernel_async()
+#define arch_enable_tagging_asymm()		mte_enable_kernel_asymm()
+#define arch_force_async_tag_fault()		mte_check_tfsr_exit()
 #define arch_get_random_tag()			mte_get_random_tag()
 #define arch_get_mem_tag(addr)			mte_get_mem_tag(addr)
-#define arch_set_mem_tag_range(addr, size, tag)	\
-			mte_set_mem_tag_range((addr), (size), (tag))
+#define arch_set_mem_tag_range(addr, size, tag, init)	\
+			mte_set_mem_tag_range((addr), (size), (tag), (init))
 #endif /* CONFIG_KASAN_HW_TAGS */
 
 /*
@@ -327,7 +335,7 @@ static inline void *phys_to_virt(phys_addr_t x)
  */
 #define ARCH_PFN_OFFSET		((unsigned long)PHYS_PFN_OFFSET)
 
-#if !defined(CONFIG_SPARSEMEM_VMEMMAP) || defined(CONFIG_DEBUG_VIRTUAL)
+#if defined(CONFIG_DEBUG_VIRTUAL)
 #define page_to_virt(x)	({						\
 	__typeof__(x) __page = x;					\
 	void *__addr = __va(page_to_phys(__page));			\
@@ -347,14 +355,19 @@ static inline void *phys_to_virt(phys_addr_t x)
 	u64 __addr = VMEMMAP_START + (__idx * sizeof(struct page));	\
 	(struct page *)__addr;						\
 })
-#endif /* !CONFIG_SPARSEMEM_VMEMMAP || CONFIG_DEBUG_VIRTUAL */
+#endif /* CONFIG_DEBUG_VIRTUAL */
 
 #define virt_addr_valid(addr)	({					\
 	__typeof__(addr) __addr = __tag_reset(addr);			\
-	__is_lm_address(__addr) && pfn_valid(virt_to_pfn(__addr));	\
+	__is_lm_address(__addr) && pfn_is_map_memory(virt_to_pfn(__addr));	\
 })
 
 void dump_mem_limit(void);
+
+static inline bool defer_reserve_crashkernel(void)
+{
+	return IS_ENABLED(CONFIG_ZONE_DMA) || IS_ENABLED(CONFIG_ZONE_DMA32);
+}
 #endif /* !ASSEMBLY */
 
 /*
@@ -366,6 +379,15 @@ void dump_mem_limit(void);
  */
 #if defined(CONFIG_EFI) && defined(CONFIG_ARM_GIC_V3_ITS)
 # define INIT_MEMBLOCK_RESERVED_REGIONS	(INIT_MEMBLOCK_REGIONS + NR_CPUS + 1)
+#endif
+
+/*
+ * memory regions which marked with flag MEMBLOCK_NOMAP(for example, the memory
+ * of the EFI_UNUSABLE_MEMORY type) may divide a continuous memory block into
+ * multiple parts. As a result, the number of memory regions is large.
+ */
+#ifdef CONFIG_EFI
+#define INIT_MEMBLOCK_MEMORY_REGIONS	(INIT_MEMBLOCK_REGIONS * 8)
 #endif
 
 #include <asm-generic/memory_model.h>

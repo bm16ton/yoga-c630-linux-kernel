@@ -19,18 +19,17 @@
 #include "hantro_hw.h"
 #include "hantro_v4l2.h"
 
-static void set_params(struct hantro_ctx *ctx)
+static void set_params(struct hantro_ctx *ctx, struct vb2_v4l2_buffer *src_buf)
 {
 	const struct hantro_h264_dec_ctrls *ctrls = &ctx->h264_dec.ctrls;
 	const struct v4l2_ctrl_h264_decode_params *dec_param = ctrls->decode;
 	const struct v4l2_ctrl_h264_sps *sps = ctrls->sps;
 	const struct v4l2_ctrl_h264_pps *pps = ctrls->pps;
-	struct vb2_v4l2_buffer *src_buf = hantro_get_src_buf(ctx);
 	struct hantro_dev *vpu = ctx->dev;
 	u32 reg;
 
 	/* Decoder control register 0. */
-	reg = G1_REG_DEC_CTRL0_DEC_AXI_WR_ID(0x0);
+	reg = G1_REG_DEC_CTRL0_DEC_AXI_AUTO;
 	if (sps->flags & V4L2_H264_SPS_FLAG_MB_ADAPTIVE_FRAME_FIELD)
 		reg |= G1_REG_DEC_CTRL0_SEQ_MBAFF_E;
 	if (sps->profile_idc > 66) {
@@ -127,28 +126,14 @@ static void set_params(struct hantro_ctx *ctx)
 
 static void set_ref(struct hantro_ctx *ctx)
 {
-	struct v4l2_h264_dpb_entry *dpb = ctx->h264_dec.dpb;
-	const u8 *b0_reflist, *b1_reflist, *p_reflist;
+	const struct v4l2_h264_reference *b0_reflist, *b1_reflist, *p_reflist;
 	struct hantro_dev *vpu = ctx->dev;
-	u32 dpb_longterm = 0;
-	u32 dpb_valid = 0;
 	int reg_num;
 	u32 reg;
 	int i;
 
-	/*
-	 * Set up bit maps of valid and long term DPBs.
-	 * NOTE: The bits are reversed, i.e. MSb is DPB 0.
-	 */
-	for (i = 0; i < HANTRO_H264_DPB_SIZE; ++i) {
-		if (dpb[i].flags & V4L2_H264_DPB_ENTRY_FLAG_ACTIVE)
-			dpb_valid |= BIT(HANTRO_H264_DPB_SIZE - 1 - i);
-
-		if (dpb[i].flags & V4L2_H264_DPB_ENTRY_FLAG_LONG_TERM)
-			dpb_longterm |= BIT(HANTRO_H264_DPB_SIZE - 1 - i);
-	}
-	vdpu_write_relaxed(vpu, dpb_valid << 16, G1_REG_VALID_REF);
-	vdpu_write_relaxed(vpu, dpb_longterm << 16, G1_REG_LT_REF);
+	vdpu_write_relaxed(vpu, ctx->h264_dec.dpb_valid, G1_REG_VALID_REF);
+	vdpu_write_relaxed(vpu, ctx->h264_dec.dpb_longterm, G1_REG_LT_REF);
 
 	/*
 	 * Set up reference frame picture numbers.
@@ -157,17 +142,8 @@ static void set_ref(struct hantro_ctx *ctx)
 	 * subsequential reference pictures.
 	 */
 	for (i = 0; i < HANTRO_H264_DPB_SIZE; i += 2) {
-		reg = 0;
-		if (dpb[i].flags & V4L2_H264_DPB_ENTRY_FLAG_LONG_TERM)
-			reg |= G1_REG_REF_PIC_REFER0_NBR(dpb[i].pic_num);
-		else
-			reg |= G1_REG_REF_PIC_REFER0_NBR(dpb[i].frame_num);
-
-		if (dpb[i + 1].flags & V4L2_H264_DPB_ENTRY_FLAG_LONG_TERM)
-			reg |= G1_REG_REF_PIC_REFER1_NBR(dpb[i + 1].pic_num);
-		else
-			reg |= G1_REG_REF_PIC_REFER1_NBR(dpb[i + 1].frame_num);
-
+		reg = G1_REG_REF_PIC_REFER0_NBR(hantro_h264_get_ref_nbr(ctx, i)) |
+		      G1_REG_REF_PIC_REFER1_NBR(hantro_h264_get_ref_nbr(ctx, i + 1));
 		vdpu_write_relaxed(vpu, reg, G1_REG_REF_PIC(i / 2));
 	}
 
@@ -181,12 +157,12 @@ static void set_ref(struct hantro_ctx *ctx)
 	 */
 	reg_num = 0;
 	for (i = 0; i < 15; i += 3) {
-		reg = G1_REG_BD_REF_PIC_BINIT_RLIST_F0(b0_reflist[i]) |
-		      G1_REG_BD_REF_PIC_BINIT_RLIST_F1(b0_reflist[i + 1]) |
-		      G1_REG_BD_REF_PIC_BINIT_RLIST_F2(b0_reflist[i + 2]) |
-		      G1_REG_BD_REF_PIC_BINIT_RLIST_B0(b1_reflist[i]) |
-		      G1_REG_BD_REF_PIC_BINIT_RLIST_B1(b1_reflist[i + 1]) |
-		      G1_REG_BD_REF_PIC_BINIT_RLIST_B2(b1_reflist[i + 2]);
+		reg = G1_REG_BD_REF_PIC_BINIT_RLIST_F0(b0_reflist[i].index) |
+		      G1_REG_BD_REF_PIC_BINIT_RLIST_F1(b0_reflist[i + 1].index) |
+		      G1_REG_BD_REF_PIC_BINIT_RLIST_F2(b0_reflist[i + 2].index) |
+		      G1_REG_BD_REF_PIC_BINIT_RLIST_B0(b1_reflist[i].index) |
+		      G1_REG_BD_REF_PIC_BINIT_RLIST_B1(b1_reflist[i + 1].index) |
+		      G1_REG_BD_REF_PIC_BINIT_RLIST_B2(b1_reflist[i + 2].index);
 		vdpu_write_relaxed(vpu, reg, G1_REG_BD_REF_PIC(reg_num++));
 	}
 
@@ -195,12 +171,12 @@ static void set_ref(struct hantro_ctx *ctx)
 	 * of forward and backward reference picture lists and first 4 entries
 	 * of P forward picture list.
 	 */
-	reg = G1_REG_BD_P_REF_PIC_BINIT_RLIST_F15(b0_reflist[15]) |
-	      G1_REG_BD_P_REF_PIC_BINIT_RLIST_B15(b1_reflist[15]) |
-	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F0(p_reflist[0]) |
-	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F1(p_reflist[1]) |
-	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F2(p_reflist[2]) |
-	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F3(p_reflist[3]);
+	reg = G1_REG_BD_P_REF_PIC_BINIT_RLIST_F15(b0_reflist[15].index) |
+	      G1_REG_BD_P_REF_PIC_BINIT_RLIST_B15(b1_reflist[15].index) |
+	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F0(p_reflist[0].index) |
+	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F1(p_reflist[1].index) |
+	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F2(p_reflist[2].index) |
+	      G1_REG_BD_P_REF_PIC_PINIT_RLIST_F3(p_reflist[3].index);
 	vdpu_write_relaxed(vpu, reg, G1_REG_BD_P_REF_PIC);
 
 	/*
@@ -209,12 +185,12 @@ static void set_ref(struct hantro_ctx *ctx)
 	 */
 	reg_num = 0;
 	for (i = 4; i < HANTRO_H264_DPB_SIZE; i += 6) {
-		reg = G1_REG_FWD_PIC_PINIT_RLIST_F0(p_reflist[i]) |
-		      G1_REG_FWD_PIC_PINIT_RLIST_F1(p_reflist[i + 1]) |
-		      G1_REG_FWD_PIC_PINIT_RLIST_F2(p_reflist[i + 2]) |
-		      G1_REG_FWD_PIC_PINIT_RLIST_F3(p_reflist[i + 3]) |
-		      G1_REG_FWD_PIC_PINIT_RLIST_F4(p_reflist[i + 4]) |
-		      G1_REG_FWD_PIC_PINIT_RLIST_F5(p_reflist[i + 5]);
+		reg = G1_REG_FWD_PIC_PINIT_RLIST_F0(p_reflist[i].index) |
+		      G1_REG_FWD_PIC_PINIT_RLIST_F1(p_reflist[i + 1].index) |
+		      G1_REG_FWD_PIC_PINIT_RLIST_F2(p_reflist[i + 2].index) |
+		      G1_REG_FWD_PIC_PINIT_RLIST_F3(p_reflist[i + 3].index) |
+		      G1_REG_FWD_PIC_PINIT_RLIST_F4(p_reflist[i + 4].index) |
+		      G1_REG_FWD_PIC_PINIT_RLIST_F5(p_reflist[i + 5].index);
 		vdpu_write_relaxed(vpu, reg, G1_REG_FWD_PIC(reg_num++));
 	}
 
@@ -226,22 +202,20 @@ static void set_ref(struct hantro_ctx *ctx)
 	}
 }
 
-static void set_buffers(struct hantro_ctx *ctx)
+static void set_buffers(struct hantro_ctx *ctx, struct vb2_v4l2_buffer *src_buf)
 {
 	const struct hantro_h264_dec_ctrls *ctrls = &ctx->h264_dec.ctrls;
-	struct vb2_v4l2_buffer *src_buf, *dst_buf;
+	struct vb2_v4l2_buffer *dst_buf;
 	struct hantro_dev *vpu = ctx->dev;
 	dma_addr_t src_dma, dst_dma;
 	size_t offset = 0;
-
-	src_buf = hantro_get_src_buf(ctx);
-	dst_buf = hantro_get_dst_buf(ctx);
 
 	/* Source (stream) buffer. */
 	src_dma = vb2_dma_contig_plane_dma_addr(&src_buf->vb2_buf, 0);
 	vdpu_write_relaxed(vpu, src_dma, G1_REG_ADDR_STR);
 
 	/* Destination (decoded frame) buffer. */
+	dst_buf = hantro_get_dst_buf(ctx);
 	dst_dma = hantro_get_dec_buf_addr(ctx, &dst_buf->vb2_buf);
 	/* Adjust dma addr to start at second line for bottom field */
 	if (ctrls->decode->flags & V4L2_H264_DECODE_PARAM_FLAG_BOTTOM_FIELD)
@@ -273,18 +247,22 @@ static void set_buffers(struct hantro_ctx *ctx)
 	vdpu_write_relaxed(vpu, ctx->h264_dec.priv.dma, G1_REG_ADDR_QTABLE);
 }
 
-void hantro_g1_h264_dec_run(struct hantro_ctx *ctx)
+int hantro_g1_h264_dec_run(struct hantro_ctx *ctx)
 {
 	struct hantro_dev *vpu = ctx->dev;
+	struct vb2_v4l2_buffer *src_buf;
+	int ret;
 
 	/* Prepare the H264 decoder context. */
-	if (hantro_h264_dec_prepare_run(ctx))
-		return;
+	ret = hantro_h264_dec_prepare_run(ctx);
+	if (ret)
+		return ret;
 
 	/* Configure hardware registers. */
-	set_params(ctx);
+	src_buf = hantro_get_src_buf(ctx);
+	set_params(ctx, src_buf);
 	set_ref(ctx);
-	set_buffers(ctx);
+	set_buffers(ctx, src_buf);
 
 	hantro_end_prepare_run(ctx);
 
@@ -301,4 +279,6 @@ void hantro_g1_h264_dec_run(struct hantro_ctx *ctx)
 			   G1_REG_CONFIG_DEC_CLK_GATE_E,
 			   G1_REG_CONFIG);
 	vdpu_write(vpu, G1_REG_INTERRUPT_DEC_E, G1_REG_INTERRUPT);
+
+	return 0;
 }

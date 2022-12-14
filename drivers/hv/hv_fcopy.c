@@ -129,7 +129,7 @@ static void fcopy_send_data(struct work_struct *dummy)
 
 	/*
 	 * The  strings sent from the host are encoded in
-	 * in utf16; convert it to utf8 strings.
+	 * utf16; convert it to utf8 strings.
 	 * The host assures us that the utf16 strings will not exceed
 	 * the max lengths specified. We will however, reserve room
 	 * for the string terminating character - in the utf16s_utf8s()
@@ -349,6 +349,7 @@ int hv_fcopy_init(struct hv_util_service *srv)
 {
 	recv_buffer = srv->recv_buffer;
 	fcopy_transaction.recv_channel = srv->channel;
+	fcopy_transaction.recv_channel->max_pkt_size = HV_HYP_PAGE_SIZE * 2;
 
 	/*
 	 * When this driver loads, the user level daemon that

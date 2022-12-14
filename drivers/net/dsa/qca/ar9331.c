@@ -101,6 +101,23 @@
 	 AR9331_SW_PORT_STATUS_RX_FLOW_EN | AR9331_SW_PORT_STATUS_TX_FLOW_EN | \
 	 AR9331_SW_PORT_STATUS_SPEED_M)
 
+#define AR9331_SW_REG_PORT_CTRL(_port)			(0x104 + (_port) * 0x100)
+#define AR9331_SW_PORT_CTRL_HEAD_EN			BIT(11)
+#define AR9331_SW_PORT_CTRL_PORT_STATE			GENMASK(2, 0)
+#define AR9331_SW_PORT_CTRL_PORT_STATE_DISABLED		0
+#define AR9331_SW_PORT_CTRL_PORT_STATE_BLOCKING		1
+#define AR9331_SW_PORT_CTRL_PORT_STATE_LISTENING	2
+#define AR9331_SW_PORT_CTRL_PORT_STATE_LEARNING		3
+#define AR9331_SW_PORT_CTRL_PORT_STATE_FORWARD		4
+
+#define AR9331_SW_REG_PORT_VLAN(_port)			(0x108 + (_port) * 0x100)
+#define AR9331_SW_PORT_VLAN_8021Q_MODE			GENMASK(31, 30)
+#define AR9331_SW_8021Q_MODE_SECURE			3
+#define AR9331_SW_8021Q_MODE_CHECK			2
+#define AR9331_SW_8021Q_MODE_FALLBACK			1
+#define AR9331_SW_8021Q_MODE_NONE			0
+#define AR9331_SW_PORT_VLAN_PORT_VID_MEMBER		GENMASK(25, 16)
+
 /* MIB registers */
 #define AR9331_MIB_COUNTER(x)			(0x20000 + ((x) * 0x100))
 
@@ -214,6 +231,7 @@ struct ar9331_sw_port {
 	int idx;
 	struct delayed_work mib_read;
 	struct rtnl_link_stats64 stats;
+	struct ethtool_pause_stats pause_stats;
 	struct spinlock stats_lock;
 };
 
@@ -361,7 +379,7 @@ static int ar9331_sw_mbus_init(struct ar9331_sw_priv *priv)
 	if (!mnp)
 		return -ENODEV;
 
-	ret = of_mdiobus_register(mbus, mnp);
+	ret = devm_of_mdiobus_register(dev, mbus, mnp);
 	of_node_put(mnp);
 	if (ret)
 		return ret;
@@ -371,11 +389,59 @@ static int ar9331_sw_mbus_init(struct ar9331_sw_priv *priv)
 	return 0;
 }
 
+static int ar9331_sw_setup_port(struct dsa_switch *ds, int port)
+{
+	struct ar9331_sw_priv *priv = (struct ar9331_sw_priv *)ds->priv;
+	struct regmap *regmap = priv->regmap;
+	u32 port_mask, port_ctrl, val;
+	int ret;
+
+	/* Generate default port settings */
+	port_ctrl = FIELD_PREP(AR9331_SW_PORT_CTRL_PORT_STATE,
+			       AR9331_SW_PORT_CTRL_PORT_STATE_FORWARD);
+
+	if (dsa_is_cpu_port(ds, port)) {
+		/* CPU port should be allowed to communicate with all user
+		 * ports.
+		 */
+		port_mask = dsa_user_ports(ds);
+		/* Enable Atheros header on CPU port. This will allow us
+		 * communicate with each port separately
+		 */
+		port_ctrl |= AR9331_SW_PORT_CTRL_HEAD_EN;
+	} else if (dsa_is_user_port(ds, port)) {
+		/* User ports should communicate only with the CPU port.
+		 */
+		port_mask = BIT(dsa_upstream_port(ds, port));
+	} else {
+		/* Other ports do not need to communicate at all */
+		port_mask = 0;
+	}
+
+	val = FIELD_PREP(AR9331_SW_PORT_VLAN_8021Q_MODE,
+			 AR9331_SW_8021Q_MODE_NONE) |
+		FIELD_PREP(AR9331_SW_PORT_VLAN_PORT_VID_MEMBER, port_mask);
+
+	ret = regmap_write(regmap, AR9331_SW_REG_PORT_VLAN(port), val);
+	if (ret)
+		goto error;
+
+	ret = regmap_write(regmap, AR9331_SW_REG_PORT_CTRL(port), port_ctrl);
+	if (ret)
+		goto error;
+
+	return 0;
+error:
+	dev_err(priv->dev, "%s: error: %i\n", __func__, ret);
+
+	return ret;
+}
+
 static int ar9331_sw_setup(struct dsa_switch *ds)
 {
 	struct ar9331_sw_priv *priv = (struct ar9331_sw_priv *)ds->priv;
 	struct regmap *regmap = priv->regmap;
-	int ret;
+	int ret, i;
 
 	ret = ar9331_sw_reset(priv);
 	if (ret)
@@ -401,6 +467,12 @@ static int ar9331_sw_setup(struct dsa_switch *ds)
 				AR9331_SW_GLOBAL_CTRL_MFS_M);
 	if (ret)
 		goto error;
+
+	for (i = 0; i < ds->num_ports; i++) {
+		ret = ar9331_sw_setup_port(ds, i);
+		if (ret)
+			goto error;
+	}
 
 	ds->configure_vlan_while_not_filtering = false;
 
@@ -428,54 +500,27 @@ static enum dsa_tag_protocol ar9331_sw_get_tag_protocol(struct dsa_switch *ds,
 	return DSA_TAG_PROTO_AR9331;
 }
 
-static void ar9331_sw_phylink_validate(struct dsa_switch *ds, int port,
-				       unsigned long *supported,
-				       struct phylink_link_state *state)
+static void ar9331_sw_phylink_get_caps(struct dsa_switch *ds, int port,
+				       struct phylink_config *config)
 {
-	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
+	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+		MAC_10 | MAC_100;
 
 	switch (port) {
 	case 0:
-		if (state->interface != PHY_INTERFACE_MODE_GMII)
-			goto unsupported;
-
-		phylink_set(mask, 1000baseT_Full);
-		phylink_set(mask, 1000baseT_Half);
+		__set_bit(PHY_INTERFACE_MODE_GMII,
+			  config->supported_interfaces);
+		config->mac_capabilities |= MAC_1000;
 		break;
 	case 1:
 	case 2:
 	case 3:
 	case 4:
 	case 5:
-		if (state->interface != PHY_INTERFACE_MODE_INTERNAL)
-			goto unsupported;
+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+			  config->supported_interfaces);
 		break;
-	default:
-		bitmap_zero(supported, __ETHTOOL_LINK_MODE_MASK_NBITS);
-		dev_err(ds->dev, "Unsupported port: %i\n", port);
-		return;
 	}
-
-	phylink_set_port_modes(mask);
-	phylink_set(mask, Pause);
-	phylink_set(mask, Asym_Pause);
-
-	phylink_set(mask, 10baseT_Half);
-	phylink_set(mask, 10baseT_Full);
-	phylink_set(mask, 100baseT_Half);
-	phylink_set(mask, 100baseT_Full);
-
-	bitmap_and(supported, supported, mask,
-		   __ETHTOOL_LINK_MODE_MASK_NBITS);
-	bitmap_and(state->advertising, state->advertising, mask,
-		   __ETHTOOL_LINK_MODE_MASK_NBITS);
-
-	return;
-
-unsupported:
-	bitmap_zero(supported, __ETHTOOL_LINK_MODE_MASK_NBITS);
-	dev_err(ds->dev, "Unsupported interface: %d, port: %d\n",
-		state->interface, port);
 }
 
 static void ar9331_sw_phylink_mac_config(struct dsa_switch *ds, int port,
@@ -560,6 +605,7 @@ static void ar9331_sw_phylink_mac_link_up(struct dsa_switch *ds, int port,
 static void ar9331_read_stats(struct ar9331_sw_port *port)
 {
 	struct ar9331_sw_priv *priv = ar9331_sw_port_to_priv(port);
+	struct ethtool_pause_stats *pstats = &port->pause_stats;
 	struct rtnl_link_stats64 *stats = &port->stats;
 	struct ar9331_sw_stats_raw raw;
 	int ret;
@@ -600,6 +646,9 @@ static void ar9331_read_stats(struct ar9331_sw_port *port)
 	stats->multicast += raw.rxmulti;
 	stats->collisions += raw.txcollision;
 
+	pstats->tx_pause_frames += raw.txpause;
+	pstats->rx_pause_frames += raw.rxpause;
+
 	spin_unlock(&port->stats_lock);
 }
 
@@ -624,15 +673,27 @@ static void ar9331_get_stats64(struct dsa_switch *ds, int port,
 	spin_unlock(&p->stats_lock);
 }
 
+static void ar9331_get_pause_stats(struct dsa_switch *ds, int port,
+				   struct ethtool_pause_stats *pause_stats)
+{
+	struct ar9331_sw_priv *priv = (struct ar9331_sw_priv *)ds->priv;
+	struct ar9331_sw_port *p = &priv->port[port];
+
+	spin_lock(&p->stats_lock);
+	memcpy(pause_stats, &p->pause_stats, sizeof(*pause_stats));
+	spin_unlock(&p->stats_lock);
+}
+
 static const struct dsa_switch_ops ar9331_sw_ops = {
 	.get_tag_protocol	= ar9331_sw_get_tag_protocol,
 	.setup			= ar9331_sw_setup,
 	.port_disable		= ar9331_sw_port_disable,
-	.phylink_validate	= ar9331_sw_phylink_validate,
+	.phylink_get_caps	= ar9331_sw_phylink_get_caps,
 	.phylink_mac_config	= ar9331_sw_phylink_mac_config,
 	.phylink_mac_link_down	= ar9331_sw_phylink_mac_link_down,
 	.phylink_mac_link_up	= ar9331_sw_phylink_mac_link_up,
 	.get_stats64		= ar9331_get_stats64,
+	.get_pause_stats	= ar9331_get_pause_stats,
 };
 
 static irqreturn_t ar9331_sw_irq(int irq, void *data)
@@ -774,7 +835,7 @@ static int __ar9331_mdio_write(struct mii_bus *sbus, u8 mode, u16 reg, u16 val)
 		FIELD_GET(AR9331_SW_LOW_ADDR_PHY, reg);
 	r = FIELD_GET(AR9331_SW_LOW_ADDR_REG, reg);
 
-	return mdiobus_write(sbus, p, r, val);
+	return __mdiobus_write(sbus, p, r, val);
 }
 
 static int __ar9331_mdio_read(struct mii_bus *sbus, u16 reg)
@@ -785,7 +846,7 @@ static int __ar9331_mdio_read(struct mii_bus *sbus, u16 reg)
 		FIELD_GET(AR9331_SW_LOW_ADDR_PHY, reg);
 	r = FIELD_GET(AR9331_SW_LOW_ADDR_REG, reg);
 
-	return mdiobus_read(sbus, p, r);
+	return __mdiobus_read(sbus, p, r);
 }
 
 static int ar9331_mdio_read(void *ctx, const void *reg_buf, size_t reg_len,
@@ -805,6 +866,8 @@ static int ar9331_mdio_read(void *ctx, const void *reg_buf, size_t reg_len,
 		return 0;
 	}
 
+	mutex_lock_nested(&sbus->mdio_lock, MDIO_MUTEX_NESTED);
+
 	ret = __ar9331_mdio_read(sbus, reg);
 	if (ret < 0)
 		goto error;
@@ -816,9 +879,13 @@ static int ar9331_mdio_read(void *ctx, const void *reg_buf, size_t reg_len,
 
 	*(u32 *)val_buf |= ret << 16;
 
+	mutex_unlock(&sbus->mdio_lock);
+
 	return 0;
 error:
+	mutex_unlock(&sbus->mdio_lock);
 	dev_err_ratelimited(&sbus->dev, "Bus error. Failed to read register.\n");
+
 	return ret;
 }
 
@@ -828,27 +895,42 @@ static int ar9331_mdio_write(void *ctx, u32 reg, u32 val)
 	struct mii_bus *sbus = priv->sbus;
 	int ret;
 
+	mutex_lock_nested(&sbus->mdio_lock, MDIO_MUTEX_NESTED);
 	if (reg == AR9331_SW_REG_PAGE) {
 		ret = __ar9331_mdio_write(sbus, AR9331_SW_MDIO_PHY_MODE_PAGE,
 					  0, val);
 		if (ret < 0)
 			goto error;
 
+		mutex_unlock(&sbus->mdio_lock);
+
 		return 0;
 	}
 
-	ret = __ar9331_mdio_write(sbus, AR9331_SW_MDIO_PHY_MODE_REG, reg, val);
-	if (ret < 0)
-		goto error;
-
+	/* In case of this switch we work with 32bit registers on top of 16bit
+	 * bus. Some registers (for example access to forwarding database) have
+	 * trigger bit on the first 16bit half of request, the result and
+	 * configuration of request in the second half.
+	 * To make it work properly, we should do the second part of transfer
+	 * before the first one is done.
+	 */
 	ret = __ar9331_mdio_write(sbus, AR9331_SW_MDIO_PHY_MODE_REG, reg + 2,
 				  val >> 16);
 	if (ret < 0)
 		goto error;
 
+	ret = __ar9331_mdio_write(sbus, AR9331_SW_MDIO_PHY_MODE_REG, reg, val);
+	if (ret < 0)
+		goto error;
+
+	mutex_unlock(&sbus->mdio_lock);
+
 	return 0;
+
 error:
+	mutex_unlock(&sbus->mdio_lock);
 	dev_err_ratelimited(&sbus->dev, "Bus error. Failed to write register.\n");
+
 	return ret;
 }
 
@@ -1004,6 +1086,9 @@ static void ar9331_sw_remove(struct mdio_device *mdiodev)
 	struct ar9331_sw_priv *priv = dev_get_drvdata(&mdiodev->dev);
 	unsigned int i;
 
+	if (!priv)
+		return;
+
 	for (i = 0; i < ARRAY_SIZE(priv->port); i++) {
 		struct ar9331_sw_port *port = &priv->port[i];
 
@@ -1011,10 +1096,23 @@ static void ar9331_sw_remove(struct mdio_device *mdiodev)
 	}
 
 	irq_domain_remove(priv->irqdomain);
-	mdiobus_unregister(priv->mbus);
 	dsa_unregister_switch(&priv->ds);
 
 	reset_control_assert(priv->sw_reset);
+
+	dev_set_drvdata(&mdiodev->dev, NULL);
+}
+
+static void ar9331_sw_shutdown(struct mdio_device *mdiodev)
+{
+	struct ar9331_sw_priv *priv = dev_get_drvdata(&mdiodev->dev);
+
+	if (!priv)
+		return;
+
+	dsa_switch_shutdown(&priv->ds);
+
+	dev_set_drvdata(&mdiodev->dev, NULL);
 }
 
 static const struct of_device_id ar9331_sw_of_match[] = {
@@ -1025,6 +1123,7 @@ static const struct of_device_id ar9331_sw_of_match[] = {
 static struct mdio_driver ar9331_sw_mdio_driver = {
 	.probe = ar9331_sw_probe,
 	.remove = ar9331_sw_remove,
+	.shutdown = ar9331_sw_shutdown,
 	.mdiodrv.driver = {
 		.name = AR9331_SW_NAME,
 		.of_match_table = ar9331_sw_of_match,

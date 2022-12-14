@@ -33,7 +33,6 @@
 #include <linux/seq_file.h>
 #include <linux/memblock.h>
 #include <linux/highmem.h>
-#include <linux/swap.h>
 #include <linux/slab.h>
 #include <net/net_namespace.h>
 #include <net/protocol.h>
@@ -359,7 +358,7 @@ static int sctp_v4_available(union sctp_addr *addr, struct sctp_sock *sp)
 	if (addr->v4.sin_addr.s_addr != htonl(INADDR_ANY) &&
 	   ret != RTN_LOCAL &&
 	   !sp->inet.freebind &&
-	   !net->ipv4.sysctl_ip_nonlocal_bind)
+	    !READ_ONCE(net->ipv4.sysctl_ip_nonlocal_bind))
 		return 0;
 
 	if (ipv6_only_sock(sctp_opt2sk(sp)))
@@ -398,7 +397,8 @@ static enum sctp_scope sctp_v4_scope(union sctp_addr *addr)
 		retval = SCTP_SCOPE_LINK;
 	} else if (ipv4_is_private_10(addr->v4.sin_addr.s_addr) ||
 		   ipv4_is_private_172(addr->v4.sin_addr.s_addr) ||
-		   ipv4_is_private_192(addr->v4.sin_addr.s_addr)) {
+		   ipv4_is_private_192(addr->v4.sin_addr.s_addr) ||
+		   ipv4_is_test_198(addr->v4.sin_addr.s_addr)) {
 		retval = SCTP_SCOPE_PRIVATE;
 	} else {
 		retval = SCTP_SCOPE_GLOBAL;
@@ -855,23 +855,6 @@ static int sctp_udp_rcv(struct sock *sk, struct sk_buff *skb)
 	return 0;
 }
 
-static int sctp_udp_err_lookup(struct sock *sk, struct sk_buff *skb)
-{
-	struct sctp_association *asoc;
-	struct sctp_transport *t;
-	int family;
-
-	skb->transport_header += sizeof(struct udphdr);
-	family = (ip_hdr(skb)->version == 4) ? AF_INET : AF_INET6;
-	sk = sctp_err_lookup(dev_net(skb->dev), family, skb, sctp_hdr(skb),
-			     &asoc, &t);
-	if (!sk)
-		return -ENOENT;
-
-	sctp_err_finish(sk, t);
-	return 0;
-}
-
 int sctp_udp_sock_start(struct net *net)
 {
 	struct udp_tunnel_sock_cfg tuncfg = {NULL};
@@ -890,7 +873,7 @@ int sctp_udp_sock_start(struct net *net)
 
 	tuncfg.encap_type = 1;
 	tuncfg.encap_rcv = sctp_udp_rcv;
-	tuncfg.encap_err_lookup = sctp_udp_err_lookup;
+	tuncfg.encap_err_lookup = sctp_udp_v4_err;
 	setup_udp_tunnel_sock(net, sock, &tuncfg);
 	net->sctp.udp4_sock = sock->sk;
 
@@ -912,7 +895,7 @@ int sctp_udp_sock_start(struct net *net)
 
 	tuncfg.encap_type = 1;
 	tuncfg.encap_rcv = sctp_udp_rcv;
-	tuncfg.encap_err_lookup = sctp_udp_err_lookup;
+	tuncfg.encap_err_lookup = sctp_udp_v6_err;
 	setup_udp_tunnel_sock(net, sock, &tuncfg);
 	net->sctp.udp6_sock = sock->sk;
 #endif
@@ -1176,7 +1159,6 @@ static const struct net_protocol sctp_protocol = {
 	.handler     = sctp4_rcv,
 	.err_handler = sctp_v4_err,
 	.no_policy   = 1,
-	.netns_ok    = 1,
 	.icmp_strict_tag_validation = 1,
 };
 
@@ -1541,11 +1523,11 @@ static __init int sctp_init(void)
 	limit = (sysctl_sctp_mem[1]) << (PAGE_SHIFT - 7);
 	max_share = min(4UL*1024*1024, limit);
 
-	sysctl_sctp_rmem[0] = SK_MEM_QUANTUM; /* give each asoc 1 page min */
+	sysctl_sctp_rmem[0] = PAGE_SIZE; /* give each asoc 1 page min */
 	sysctl_sctp_rmem[1] = 1500 * SKB_TRUESIZE(1);
 	sysctl_sctp_rmem[2] = max(sysctl_sctp_rmem[1], max_share);
 
-	sysctl_sctp_wmem[0] = SK_MEM_QUANTUM;
+	sysctl_sctp_wmem[0] = PAGE_SIZE;
 	sysctl_sctp_wmem[1] = 16*1024;
 	sysctl_sctp_wmem[2] = max(64*1024, max_share);
 

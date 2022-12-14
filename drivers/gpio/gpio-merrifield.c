@@ -220,10 +220,8 @@ static void mrfld_irq_ack(struct irq_data *d)
 	raw_spin_unlock_irqrestore(&priv->lock, flags);
 }
 
-static void mrfld_irq_unmask_mask(struct irq_data *d, bool unmask)
+static void mrfld_irq_unmask_mask(struct mrfld_gpio *priv, u32 gpio, bool unmask)
 {
-	struct mrfld_gpio *priv = irq_data_get_irq_chip_data(d);
-	u32 gpio = irqd_to_hwirq(d);
 	void __iomem *gimr = gpio_reg(&priv->chip, gpio, GIMR);
 	unsigned long flags;
 	u32 value;
@@ -241,12 +239,20 @@ static void mrfld_irq_unmask_mask(struct irq_data *d, bool unmask)
 
 static void mrfld_irq_mask(struct irq_data *d)
 {
-	mrfld_irq_unmask_mask(d, false);
+	struct mrfld_gpio *priv = irq_data_get_irq_chip_data(d);
+	u32 gpio = irqd_to_hwirq(d);
+
+	mrfld_irq_unmask_mask(priv, gpio, false);
+	gpiochip_disable_irq(&priv->chip, gpio);
 }
 
 static void mrfld_irq_unmask(struct irq_data *d)
 {
-	mrfld_irq_unmask_mask(d, true);
+	struct mrfld_gpio *priv = irq_data_get_irq_chip_data(d);
+	u32 gpio = irqd_to_hwirq(d);
+
+	gpiochip_enable_irq(&priv->chip, gpio);
+	mrfld_irq_unmask_mask(priv, gpio, true);
 }
 
 static int mrfld_irq_set_type(struct irq_data *d, unsigned int type)
@@ -329,13 +335,15 @@ static int mrfld_irq_set_wake(struct irq_data *d, unsigned int on)
 	return 0;
 }
 
-static struct irq_chip mrfld_irqchip = {
+static const struct irq_chip mrfld_irqchip = {
 	.name		= "gpio-merrifield",
 	.irq_ack	= mrfld_irq_ack,
 	.irq_mask	= mrfld_irq_mask,
 	.irq_unmask	= mrfld_irq_unmask,
 	.irq_set_type	= mrfld_irq_set_type,
 	.irq_set_wake	= mrfld_irq_set_wake,
+	.flags		= IRQCHIP_IMMUTABLE,
+	GPIOCHIP_IRQ_RESOURCE_HELPERS,
 };
 
 static void mrfld_irq_handler(struct irq_desc *desc)
@@ -359,12 +367,8 @@ static void mrfld_irq_handler(struct irq_desc *desc)
 		/* Only interrupts that are enabled */
 		pending &= enabled;
 
-		for_each_set_bit(gpio, &pending, 32) {
-			unsigned int irq;
-
-			irq = irq_find_mapping(gc->irq.domain, base + gpio);
-			generic_handle_irq(irq);
-		}
+		for_each_set_bit(gpio, &pending, 32)
+			generic_handle_domain_irq(gc->irq.domain, base + gpio);
 	}
 
 	chained_irq_exit(irqchip, desc);
@@ -413,6 +417,9 @@ static int mrfld_gpio_add_pin_ranges(struct gpio_chip *chip)
 	int retval;
 
 	pinctrl_dev_name = mrfld_gpio_get_pinctrl_dev_name(priv);
+	if (!pinctrl_dev_name)
+		return -ENOMEM;
+
 	for (i = 0; i < ARRAY_SIZE(mrfld_gpio_ranges); i++) {
 		range = &mrfld_gpio_ranges[i];
 		retval = gpiochip_add_pin_range(&priv->chip, pinctrl_dev_name,
@@ -483,7 +490,7 @@ static int mrfld_gpio_probe(struct pci_dev *pdev, const struct pci_device_id *id
 		return retval;
 
 	girq = &priv->chip.irq;
-	girq->chip = &mrfld_irqchip;
+	gpio_irq_chip_set_chip(girq, &mrfld_irqchip);
 	girq->init_hw = mrfld_irq_init_hw;
 	girq->parent_handler = mrfld_irq_handler;
 	girq->num_parents = 1;

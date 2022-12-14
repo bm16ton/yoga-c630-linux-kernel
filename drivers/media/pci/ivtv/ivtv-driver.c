@@ -57,7 +57,7 @@
 #include <linux/dma-mapping.h>
 #include <media/tveeprom.h>
 #include <media/i2c/saa7115.h>
-#include "tuner-xc2028.h"
+#include "xc2028.h"
 #include <uapi/linux/sched/types.h>
 
 /* If you have already X v4l cards, then set this to X. This way
@@ -837,7 +837,7 @@ static int ivtv_setup_pci(struct ivtv *itv, struct pci_dev *pdev,
 		IVTV_ERR("Can't enable device!\n");
 		return -EIO;
 	}
-	if (pci_set_dma_mask(pdev, DMA_BIT_MASK(32))) {
+	if (dma_set_mask(&pdev->dev, DMA_BIT_MASK(32))) {
 		IVTV_ERR("No suitable DMA available.\n");
 		return -EIO;
 	}
@@ -1390,7 +1390,7 @@ int ivtv_init_on_first_open(struct ivtv *itv)
 
 static void ivtv_remove(struct pci_dev *pdev)
 {
-	struct v4l2_device *v4l2_dev = dev_get_drvdata(&pdev->dev);
+	struct v4l2_device *v4l2_dev = pci_get_drvdata(pdev);
 	struct ivtv *itv = to_ivtv(v4l2_dev);
 	int i;
 

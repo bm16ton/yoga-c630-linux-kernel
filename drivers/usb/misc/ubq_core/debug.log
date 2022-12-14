@@ -1,7 +1,0 @@
-    INFO [                 usbq.pm]: Loading plugins: reload, proxy, pcap, decode, encode, lookfor, usbq_hooks
-    INFO [      usbq.plugins.proxy]: Device listen to 0.0.0.0:64240
-    INFO [      usbq.plugins.proxy]: Host send to 127.0.0.1:64241
-    INFO [       usbq.plugins.pcap]: Logging packets to PCAP file usb.pcap
-    INFO [                 usbq.pm]: Could not load optional plugin usbq_hooks: Module not available.
-    INFO [             usbq.engine]: Starting USB processing engine.
-CRITICAL [             usbq.engine]: User requested exit.

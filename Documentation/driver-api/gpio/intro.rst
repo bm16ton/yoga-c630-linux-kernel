@@ -14,12 +14,12 @@ Due to the history of GPIO interfaces in the kernel, there are two different
 ways to obtain and use GPIOs:
 
   - The descriptor-based interface is the preferred way to manipulate GPIOs,
-    and is described by all the files in this directory excepted gpio-legacy.txt.
+    and is described by all the files in this directory excepted legacy.rst.
   - The legacy integer-based interface which is considered deprecated (but still
-    usable for compatibility reasons) is documented in gpio-legacy.txt.
+    usable for compatibility reasons) is documented in legacy.rst.
 
 The remainder of this document applies to the new descriptor-based interface.
-gpio-legacy.txt contains the same information applied to the legacy
+legacy.rst contains the same information applied to the legacy
 integer-based interface.
 
 
@@ -27,7 +27,7 @@ What is a GPIO?
 ===============
 
 A "General Purpose Input/Output" (GPIO) is a flexible software-controlled
-digital signal. They are provided from many kinds of chip, and are familiar
+digital signal. They are provided from many kinds of chips, and are familiar
 to Linux developers working with embedded and custom hardware. Each GPIO
 represents a bit connected to a particular pin, or "ball" on Ball Grid Array
 (BGA) packages. Board schematics show which external hardware connects to

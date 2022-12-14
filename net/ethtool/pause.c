@@ -21,12 +21,6 @@ const struct nla_policy ethnl_pause_get_policy[] = {
 		NLA_POLICY_NESTED(ethnl_header_policy_stats),
 };
 
-static void ethtool_stats_init(u64 *stats, unsigned int n)
-{
-	while (n--)
-		stats[n] = ETHTOOL_STAT_NOT_SET;
-}
-
 static int pause_prepare_data(const struct ethnl_req_info *req_base,
 			      struct ethnl_reply_data *reply_base,
 			      struct genl_info *info)
@@ -62,8 +56,7 @@ static int pause_reply_size(const struct ethnl_req_info *req_base,
 
 	if (req_base->flags & ETHTOOL_FLAG_STATS)
 		n += nla_total_size(0) +	/* _PAUSE_STATS */
-			nla_total_size_64bit(sizeof(u64)) *
-				(ETHTOOL_A_PAUSE_STAT_MAX - 2);
+		     nla_total_size_64bit(sizeof(u64)) * ETHTOOL_PAUSE_STAT_CNT;
 	return n;
 }
 
@@ -188,6 +181,6 @@ out_ops:
 out_rtnl:
 	rtnl_unlock();
 out_dev:
-	dev_put(dev);
+	ethnl_parse_header_dev_put(&req_info);
 	return ret;
 }

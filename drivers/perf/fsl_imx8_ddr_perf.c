@@ -29,7 +29,7 @@
 #define CNTL_OVER_MASK		0xFFFFFFFE
 
 #define CNTL_CSV_SHIFT		24
-#define CNTL_CSV_MASK		(0xFF << CNTL_CSV_SHIFT)
+#define CNTL_CSV_MASK		(0xFFU << CNTL_CSV_SHIFT)
 
 #define EVENT_CYCLES_ID		0
 #define EVENT_CYCLES_COUNTER	0
@@ -110,7 +110,7 @@ static ssize_t ddr_perf_identifier_show(struct device *dev,
 {
 	struct ddr_pmu *pmu = dev_get_drvdata(dev);
 
-	return sprintf(page, "%s\n", pmu->devtype_data->identifier);
+	return sysfs_emit(page, "%s\n", pmu->devtype_data->identifier);
 }
 
 static umode_t ddr_perf_identifier_attr_visible(struct kobject *kobj,
@@ -170,8 +170,7 @@ static ssize_t ddr_perf_filter_cap_show(struct device *dev,
 		container_of(attr, struct dev_ext_attribute, attr);
 	int cap = (long)ea->var;
 
-	return snprintf(buf, PAGE_SIZE, "%u\n",
-			ddr_perf_filter_cap_get(pmu, cap));
+	return sysfs_emit(buf, "%u\n", ddr_perf_filter_cap_get(pmu, cap));
 }
 
 #define PERF_EXT_ATTR_ENTRY(_name, _func, _var)				\
@@ -220,14 +219,11 @@ ddr_pmu_event_show(struct device *dev, struct device_attribute *attr,
 	struct perf_pmu_events_attr *pmu_attr;
 
 	pmu_attr = container_of(attr, struct perf_pmu_events_attr, attr);
-	return sprintf(page, "event=0x%02llx\n", pmu_attr->id);
+	return sysfs_emit(page, "event=0x%02llx\n", pmu_attr->id);
 }
 
-#define IMX8_DDR_PMU_EVENT_ATTR(_name, _id)				\
-	(&((struct perf_pmu_events_attr[]) {				\
-		{ .attr = __ATTR(_name, 0444, ddr_pmu_event_show, NULL),\
-		  .id = _id, }						\
-	})[0].attr.attr)
+#define IMX8_DDR_PMU_EVENT_ATTR(_name, _id)		\
+	PMU_EVENT_ATTR_ID(_name, ddr_pmu_event_show, _id)
 
 static struct attribute *ddr_perf_events_attrs[] = {
 	IMX8_DDR_PMU_EVENT_ATTR(cycles, EVENT_CYCLES_ID),
@@ -615,7 +611,7 @@ static int ddr_perf_init(struct ddr_pmu *pmu, void __iomem *base,
 		.dev = dev,
 	};
 
-	pmu->id = ida_simple_get(&ddr_ida, 0, 0, GFP_KERNEL);
+	pmu->id = ida_alloc(&ddr_ida, GFP_KERNEL);
 	return pmu->id;
 }
 
@@ -675,7 +671,7 @@ static int ddr_perf_offline_cpu(unsigned int cpu, struct hlist_node *node)
 	perf_pmu_migrate_context(&pmu->pmu, cpu, target);
 	pmu->cpu = target;
 
-	WARN_ON(irq_set_affinity_hint(pmu->irq, cpumask_of(pmu->cpu)));
+	WARN_ON(irq_set_affinity(pmu->irq, cpumask_of(pmu->cpu)));
 
 	return 0;
 }
@@ -752,7 +748,7 @@ static int ddr_perf_probe(struct platform_device *pdev)
 	}
 
 	pmu->irq = irq;
-	ret = irq_set_affinity_hint(pmu->irq, cpumask_of(pmu->cpu));
+	ret = irq_set_affinity(pmu->irq, cpumask_of(pmu->cpu));
 	if (ret) {
 		dev_err(pmu->dev, "Failed to set interrupt affinity!\n");
 		goto ddr_perf_err;
@@ -769,7 +765,7 @@ ddr_perf_err:
 cpuhp_instance_err:
 	cpuhp_remove_multi_state(pmu->cpuhp_state);
 cpuhp_state_err:
-	ida_simple_remove(&ddr_ida, pmu->id);
+	ida_free(&ddr_ida, pmu->id);
 	dev_warn(&pdev->dev, "i.MX8 DDR Perf PMU failed (%d), disabled\n", ret);
 	return ret;
 }
@@ -780,11 +776,10 @@ static int ddr_perf_remove(struct platform_device *pdev)
 
 	cpuhp_state_remove_instance_nocalls(pmu->cpuhp_state, &pmu->node);
 	cpuhp_remove_multi_state(pmu->cpuhp_state);
-	irq_set_affinity_hint(pmu->irq, NULL);
 
 	perf_pmu_unregister(&pmu->pmu);
 
-	ida_simple_remove(&ddr_ida, pmu->id);
+	ida_free(&ddr_ida, pmu->id);
 	return 0;
 }
 

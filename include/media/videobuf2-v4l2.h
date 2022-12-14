@@ -78,6 +78,16 @@ struct vb2_v4l2_buffer {
 int vb2_find_timestamp(const struct vb2_queue *q, u64 timestamp,
 		       unsigned int start_idx);
 
+/**
+ * vb2_find_buffer() - Find a buffer with given timestamp
+ *
+ * @q:		pointer to &struct vb2_queue with videobuf2 queue.
+ * @timestamp:	the timestamp to find.
+ *
+ * Returns the buffer with the given @timestamp, or NULL if not found.
+ */
+struct vb2_buffer *vb2_find_buffer(struct vb2_queue *q, u64 timestamp);
+
 int vb2_querybuf(struct vb2_queue *q, struct v4l2_buffer *b);
 
 /**
@@ -262,6 +272,22 @@ int __must_check vb2_queue_init_name(struct vb2_queue *q, const char *name);
 void vb2_queue_release(struct vb2_queue *q);
 
 /**
+ * vb2_queue_change_type() - change the type of an inactive vb2_queue
+ * @q:		pointer to &struct vb2_queue with videobuf2 queue.
+ * @type:	the type to change to (V4L2_BUF_TYPE_VIDEO_*)
+ *
+ * This function changes the type of the vb2_queue. This is only possible
+ * if the queue is not busy (i.e. no buffers have been allocated).
+ *
+ * vb2_queue_change_type() can be used to support multiple buffer types using
+ * the same queue. The driver can implement v4l2_ioctl_ops.vidioc_reqbufs and
+ * v4l2_ioctl_ops.vidioc_create_bufs functions and call vb2_queue_change_type()
+ * before calling vb2_ioctl_reqbufs() or vb2_ioctl_create_bufs(), and thus
+ * "lock" the buffer type until the buffers have been released.
+ */
+int vb2_queue_change_type(struct vb2_queue *q, unsigned int type);
+
+/**
  * vb2_poll() - implements poll userspace operation
  * @q:		pointer to &struct vb2_queue with videobuf2 queue.
  * @file:	file argument passed to the poll file operation handler
@@ -286,9 +312,28 @@ __poll_t vb2_poll(struct vb2_queue *q, struct file *file, poll_table *wait);
  * The following functions are not part of the vb2 core API, but are simple
  * helper functions that you can use in your struct v4l2_file_operations,
  * struct v4l2_ioctl_ops and struct vb2_ops. They will serialize if vb2_queue->lock
- * or video_device->lock is set, and they will set and test vb2_queue->owner
- * to check if the calling filehandle is permitted to do the queuing operation.
+ * or video_device->lock is set, and they will set and test the queue owner
+ * (vb2_queue->owner) to check if the calling filehandle is permitted to do the
+ * queuing operation.
  */
+
+/**
+ * vb2_queue_is_busy() - check if the queue is busy
+ * @q:		pointer to &struct vb2_queue with videobuf2 queue.
+ * @file:	file through which the vb2 queue access is performed
+ *
+ * The queue is considered busy if it has an owner and the owner is not the
+ * @file.
+ *
+ * Queue ownership is acquired and checked by some of the v4l2_ioctl_ops helpers
+ * below. Drivers can also use this function directly when they need to
+ * open-code ioctl handlers, for instance to add additional checks between the
+ * queue ownership test and the call to the corresponding vb2 operation.
+ */
+static inline bool vb2_queue_is_busy(struct vb2_queue *q, struct file *file)
+{
+	return q->owner && q->owner != file->private_data;
+}
 
 /* struct v4l2_ioctl_ops helpers */
 

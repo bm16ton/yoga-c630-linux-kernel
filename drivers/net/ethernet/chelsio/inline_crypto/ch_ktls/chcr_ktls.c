@@ -33,7 +33,6 @@ static int chcr_get_nfrags_to_send(struct sk_buff *skb, u32 start, u32 len)
 
 	if (unlikely(start < skb_linear_data_len)) {
 		frag_size = min(len, skb_linear_data_len - start);
-		start = 0;
 	} else {
 		start -= skb_linear_data_len;
 
@@ -484,7 +483,7 @@ static int chcr_ktls_dev_add(struct net_device *netdev, struct sock *sk,
 		tx_info->ip_family = AF_INET;
 #if IS_ENABLED(CONFIG_IPV6)
 	} else {
-		if (!sk->sk_ipv6only &&
+		if (!ipv6_only_sock(sk) &&
 		    ipv6_addr_type(&sk->sk_v6_daddr) == IPV6_ADDR_MAPPED) {
 			memcpy(daaddr, &sk->sk_daddr, 4);
 			tx_info->ip_family = AF_INET;
@@ -906,10 +905,10 @@ static int chcr_ktls_xmit_tcb_cpls(struct chcr_ktls_info *tx_info,
 	}
 	/* update receive window */
 	if (first_wr || tx_info->prev_win != tcp_win) {
-		pos = chcr_write_cpl_set_tcb_ulp(tx_info, q, tx_info->tid, pos,
-						 TCB_RCV_WND_W,
-						 TCB_RCV_WND_V(TCB_RCV_WND_M),
-						 TCB_RCV_WND_V(tcp_win), 0);
+		chcr_write_cpl_set_tcb_ulp(tx_info, q, tx_info->tid, pos,
+					   TCB_RCV_WND_W,
+					   TCB_RCV_WND_V(TCB_RCV_WND_M),
+					   TCB_RCV_WND_V(tcp_win), 0);
 		tx_info->prev_win = tcp_win;
 		cpl++;
 	}
@@ -1013,7 +1012,7 @@ chcr_ktls_write_tcp_options(struct chcr_ktls_info *tx_info, struct sk_buff *skb,
 	/* packet length = eth hdr len + ip hdr len + tcp hdr len
 	 * (including options).
 	 */
-	pktlen = skb_transport_offset(skb) + tcp_hdrlen(skb);
+	pktlen = skb_tcp_all_headers(skb);
 
 	ctrl = sizeof(*cpl) + pktlen;
 	len16 = DIV_ROUND_UP(sizeof(*wr) + ctrl, 16);
@@ -1518,7 +1517,6 @@ static int chcr_ktls_tx_plaintxt(struct chcr_ktls_info *tx_info,
 	wr->op_to_compl = htonl(FW_WR_OP_V(FW_ULPTX_WR));
 	wr->flowid_len16 = htonl(wr_mid | FW_WR_LEN16_V(len16));
 	wr->cookie = 0;
-	pos += sizeof(*wr);
 	/* ULP_TXPKT */
 	ulptx = (struct ulp_txpkt *)(wr + 1);
 	ulptx->cmd_dest = htonl(ULPTX_CMD_V(ULP_TX_PKT) |
@@ -1909,7 +1907,7 @@ static int chcr_ktls_sw_fallback(struct sk_buff *skb,
 		return 0;
 
 	th = tcp_hdr(nskb);
-	skb_offset =  skb_transport_offset(nskb) + tcp_hdrlen(nskb);
+	skb_offset = skb_tcp_all_headers(nskb);
 	data_len = nskb->len - skb_offset;
 	skb_tx_timestamp(nskb);
 
@@ -1934,20 +1932,26 @@ static int chcr_ktls_xmit(struct sk_buff *skb, struct net_device *dev)
 	int data_len, qidx, ret = 0, mss;
 	struct tls_record_info *record;
 	struct chcr_ktls_info *tx_info;
+	struct net_device *tls_netdev;
 	struct tls_context *tls_ctx;
 	struct sge_eth_txq *q;
 	struct adapter *adap;
 	unsigned long flags;
 
 	tcp_seq = ntohl(th->seq);
-	skb_offset = skb_transport_offset(skb) + tcp_hdrlen(skb);
+	skb_offset = skb_tcp_all_headers(skb);
 	skb_data_len = skb->len - skb_offset;
 	data_len = skb_data_len;
 
 	mss = skb_is_gso(skb) ? skb_shinfo(skb)->gso_size : data_len;
 
 	tls_ctx = tls_get_ctx(skb->sk);
-	if (unlikely(tls_ctx->netdev != dev))
+	tls_netdev = rcu_dereference_bh(tls_ctx->netdev);
+	/* Don't quit on NULL: if tls_device_down is running in parallel,
+	 * netdev might become NULL, even if tls_is_sk_tx_device_offloaded was
+	 * true. Rather continue processing this packet.
+	 */
+	if (unlikely(tls_netdev && tls_netdev != dev))
 		goto out;
 
 	tx_ctx = chcr_get_ktls_tx_context(tls_ctx);

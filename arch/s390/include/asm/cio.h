@@ -5,10 +5,10 @@
 #ifndef _ASM_S390_CIO_H_
 #define _ASM_S390_CIO_H_
 
-#include <linux/spinlock.h>
 #include <linux/bitops.h>
 #include <linux/genalloc.h>
 #include <asm/types.h>
+#include <asm/tpi.h>
 
 #define LPM_ANYPATH 0xff
 #define __MAX_CSSID 0
@@ -369,7 +369,7 @@ void cio_gp_dma_destroy(struct gen_pool *gp_dma, struct device *dma_dev);
 struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages);
 
 /* Function from drivers/s390/cio/chsc.c */
-int chsc_sstpc(void *page, unsigned int op, u16 ctrl, u64 *clock_delta);
+int chsc_sstpc(void *page, unsigned int op, u16 ctrl, long *clock_delta);
 int chsc_sstpi(void *page, void *result, size_t size);
 int chsc_stzi(void *page, void *result, size_t size);
 int chsc_sgib(u32 origin);

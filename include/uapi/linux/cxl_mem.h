@@ -29,6 +29,18 @@
 	___C(GET_LSA, "Get Label Storage Area"),                          \
 	___C(GET_HEALTH_INFO, "Get Health Info"),                         \
 	___C(GET_LOG, "Get Log"),                                         \
+	___C(SET_PARTITION_INFO, "Set Partition Information"),            \
+	___C(SET_LSA, "Set Label Storage Area"),                          \
+	___C(GET_ALERT_CONFIG, "Get Alert Configuration"),                \
+	___C(SET_ALERT_CONFIG, "Set Alert Configuration"),                \
+	___C(GET_SHUTDOWN_STATE, "Get Shutdown State"),                   \
+	___C(SET_SHUTDOWN_STATE, "Set Shutdown State"),                   \
+	___C(GET_POISON, "Get Poison List"),                              \
+	___C(INJECT_POISON, "Inject Poison"),                             \
+	___C(CLEAR_POISON, "Clear Poison"),                               \
+	___C(GET_SCAN_MEDIA_CAPS, "Get Scan Media Capabilities"),         \
+	___C(SCAN_MEDIA, "Scan Media"),                                   \
+	___C(GET_SCAN_MEDIA, "Get Scan Media Results"),                   \
 	___C(MAX, "invalid / last command")
 
 #define ___C(a, b) CXL_MEM_COMMAND_ID_##a
@@ -38,7 +50,7 @@ enum { CXL_CMDS };
 #define ___C(a, b) { b }
 static const struct {
 	const char *name;
-} cxl_command_names[] = { CXL_CMDS };
+} cxl_command_names[] __attribute__((__unused__)) = { CXL_CMDS };
 
 /*
  * Here's how this actually breaks out:
@@ -56,8 +68,8 @@ static const struct {
  * struct cxl_command_info - Command information returned from a query.
  * @id: ID number for the command.
  * @flags: Flags that specify command behavior.
- * @size_in: Expected input size, or -1 if variable length.
- * @size_out: Expected output size, or -1 if variable length.
+ * @size_in: Expected input size, or ~0 if variable length.
+ * @size_out: Expected output size, or ~0 if variable length.
  *
  * Represents a single command that is supported by both the driver and the
  * hardware. This is returned as part of an array from the query ioctl. The
@@ -66,7 +78,7 @@ static const struct {
  *
  *  - @id = 10
  *  - @flags = 0
- *  - @size_in = -1
+ *  - @size_in = ~0
  *  - @size_out = 0
  *
  * See struct cxl_mem_query_commands.
@@ -77,8 +89,8 @@ struct cxl_command_info {
 	__u32 flags;
 #define CXL_MEM_COMMAND_FLAG_MASK GENMASK(0, 0)
 
-	__s32 size_in;
-	__s32 size_out;
+	__u32 size_in;
+	__u32 size_out;
 };
 
 /**
@@ -157,13 +169,13 @@ struct cxl_send_command {
 	__u32 retval;
 
 	struct {
-		__s32 size;
+		__u32 size;
 		__u32 rsvd;
 		__u64 payload;
 	} in;
 
 	struct {
-		__s32 size;
+		__u32 size;
 		__u32 rsvd;
 		__u64 payload;
 	} out;

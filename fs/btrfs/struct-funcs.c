@@ -12,15 +12,10 @@ static bool check_setget_bounds(const struct extent_buffer *eb,
 {
 	const unsigned long member_offset = (unsigned long)ptr + off;
 
-	if (member_offset > eb->len) {
+	if (unlikely(member_offset + size > eb->len)) {
 		btrfs_warn(eb->fs_info,
-	"bad eb member start: ptr 0x%lx start %llu member offset %lu size %d",
-			(unsigned long)ptr, eb->start, member_offset, size);
-		return false;
-	}
-	if (member_offset + size > eb->len) {
-		btrfs_warn(eb->fs_info,
-	"bad eb member end: ptr 0x%lx start %llu member offset %lu size %d",
+		"bad eb member %s: ptr 0x%lx start %llu member offset %lu size %d",
+			(member_offset > eb->len ? "start" : "end"),
 			(unsigned long)ptr, eb->start, member_offset, size);
 		return false;
 	}
@@ -73,7 +68,7 @@ u##bits btrfs_get_token_##bits(struct btrfs_map_token *token,		\
 	}								\
 	token->kaddr = page_address(token->eb->pages[idx]);		\
 	token->offset = idx << PAGE_SHIFT;				\
-	if (oip + size <= PAGE_SIZE)					\
+	if (INLINE_EXTENT_BUFFER_PAGES == 1 || oip + size <= PAGE_SIZE ) \
 		return get_unaligned_le##bits(token->kaddr + oip);	\
 									\
 	memcpy(lebytes, token->kaddr + oip, part);			\
@@ -94,7 +89,7 @@ u##bits btrfs_get_##bits(const struct extent_buffer *eb,		\
 	u8 lebytes[sizeof(u##bits)];					\
 									\
 	ASSERT(check_setget_bounds(eb, ptr, off, size));		\
-	if (oip + size <= PAGE_SIZE)					\
+	if (INLINE_EXTENT_BUFFER_PAGES == 1 || oip + size <= PAGE_SIZE)	\
 		return get_unaligned_le##bits(kaddr + oip);		\
 									\
 	memcpy(lebytes, kaddr + oip, part);				\
@@ -124,7 +119,7 @@ void btrfs_set_token_##bits(struct btrfs_map_token *token,		\
 	}								\
 	token->kaddr = page_address(token->eb->pages[idx]);		\
 	token->offset = idx << PAGE_SHIFT;				\
-	if (oip + size <= PAGE_SIZE) {					\
+	if (INLINE_EXTENT_BUFFER_PAGES == 1 || oip + size <= PAGE_SIZE) { \
 		put_unaligned_le##bits(val, token->kaddr + oip);	\
 		return;							\
 	}								\
@@ -146,7 +141,7 @@ void btrfs_set_##bits(const struct extent_buffer *eb, void *ptr,	\
 	u8 lebytes[sizeof(u##bits)];					\
 									\
 	ASSERT(check_setget_bounds(eb, ptr, off, size));		\
-	if (oip + size <= PAGE_SIZE) {					\
+	if (INLINE_EXTENT_BUFFER_PAGES == 1 || oip + size <= PAGE_SIZE) { \
 		put_unaligned_le##bits(val, kaddr + oip);		\
 		return;							\
 	}								\

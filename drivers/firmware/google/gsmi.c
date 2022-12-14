@@ -19,6 +19,7 @@
 #include <linux/dma-mapping.h>
 #include <linux/fs.h>
 #include <linux/slab.h>
+#include <linux/panic_notifier.h>
 #include <linux/ioctl.h>
 #include <linux/acpi.h>
 #include <linux/io.h>
@@ -136,12 +137,16 @@ MODULE_PARM_DESC(spincount,
 	"The number of loop iterations to use when using the spin handshake.");
 
 /*
- * Platforms might not support S0ix logging in their GSMI handlers. In order to
- * avoid any side-effects of generating an SMI for S0ix logging, use the S0ix
- * related GSMI commands only for those platforms that explicitly enable this
- * option.
+ * Some older platforms with Apollo Lake chipsets do not support S0ix logging
+ * in their GSMI handlers, and behaved poorly when resuming via power button
+ * press if the logging was attempted. Updated firmware with proper behavior
+ * has long since shipped, removing the need for this opt-in parameter. It
+ * now exists as an opt-out parameter for folks defiantly running old
+ * firmware, or unforeseen circumstances. After the change from opt-in to
+ * opt-out has baked sufficiently, this parameter should probably be removed
+ * entirely.
  */
-static bool s0ix_logging_enable;
+static bool s0ix_logging_enable = true;
 module_param(s0ix_logging_enable, bool, 0600);
 
 static struct gsmi_buf *gsmi_buf_alloc(void)
@@ -676,6 +681,15 @@ static struct notifier_block gsmi_die_notifier = {
 static int gsmi_panic_callback(struct notifier_block *nb,
 			       unsigned long reason, void *arg)
 {
+
+	/*
+	 * Panic callbacks are executed with all other CPUs stopped,
+	 * so we must not attempt to spin waiting for gsmi_dev.lock
+	 * to be released.
+	 */
+	if (spin_is_locked(&gsmi_dev.lock))
+		return NOTIFY_DONE;
+
 	gsmi_shutdown_reason(GSMI_SHUTDOWN_PANIC);
 	return NOTIFY_DONE;
 }

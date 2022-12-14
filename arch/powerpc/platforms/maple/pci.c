@@ -12,10 +12,10 @@
 #include <linux/string.h>
 #include <linux/init.h>
 #include <linux/irq.h>
+#include <linux/of_irq.h>
 
 #include <asm/sections.h>
 #include <asm/io.h>
-#include <asm/prom.h>
 #include <asm/pci-bridge.h>
 #include <asm/machdep.h>
 #include <asm/iommu.h>
@@ -34,7 +34,7 @@ static struct pci_controller *u3_agp, *u3_ht, *u4_pcie;
 
 static int __init fixup_one_level_bus_range(struct device_node *node, int higher)
 {
-	for (; node != 0;node = node->sibling) {
+	for (; node; node = node->sibling) {
 		const int *bus_range;
 		const unsigned int *class_code;
 		int len;

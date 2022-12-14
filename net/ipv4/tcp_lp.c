@@ -63,7 +63,7 @@ enum tcp_lp_state {
  * @sowd: smoothed OWD << 3
  * @owd_min: min OWD
  * @owd_max: max OWD
- * @owd_max_rsv: resrved max owd
+ * @owd_max_rsv: reserved max owd
  * @remote_hz: estimated remote HZ
  * @remote_ref_time: remote reference time
  * @local_ref_time: local reference time
@@ -297,7 +297,7 @@ static void tcp_lp_pkts_acked(struct sock *sk, const struct ack_sample *sample)
 		lp->flag &= ~LP_WITHIN_THR;
 
 	pr_debug("TCP-LP: %05o|%5u|%5u|%15u|%15u|%15u\n", lp->flag,
-		 tp->snd_cwnd, lp->remote_hz, lp->owd_min, lp->owd_max,
+		 tcp_snd_cwnd(tp), lp->remote_hz, lp->owd_min, lp->owd_max,
 		 lp->sowd >> 3);
 
 	if (lp->flag & LP_WITHIN_THR)
@@ -305,7 +305,7 @@ static void tcp_lp_pkts_acked(struct sock *sk, const struct ack_sample *sample)
 
 	/* FIXME: try to reset owd_min and owd_max here
 	 * so decrease the chance the min/max is no longer suitable
-	 * and will usually within threshold when whithin inference */
+	 * and will usually within threshold when within inference */
 	lp->owd_min = lp->sowd >> 3;
 	lp->owd_max = lp->sowd >> 2;
 	lp->owd_max_rsv = lp->sowd >> 2;
@@ -313,12 +313,12 @@ static void tcp_lp_pkts_acked(struct sock *sk, const struct ack_sample *sample)
 	/* happened within inference
 	 * drop snd_cwnd into 1 */
 	if (lp->flag & LP_WITHIN_INF)
-		tp->snd_cwnd = 1U;
+		tcp_snd_cwnd_set(tp, 1U);
 
 	/* happened after inference
 	 * cut snd_cwnd into half */
 	else
-		tp->snd_cwnd = max(tp->snd_cwnd >> 1U, 1U);
+		tcp_snd_cwnd_set(tp, max(tcp_snd_cwnd(tp) >> 1U, 1U));
 
 	/* record this drop time */
 	lp->last_drop = now;

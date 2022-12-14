@@ -2,23 +2,18 @@
 /* Copyright (C) 2020 Facebook */
 
 #include <errno.h>
+#include <linux/err.h>
 #include <net/if.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include <bpf/bpf.h>
+#include <bpf/hashmap.h>
 
 #include "json_writer.h"
 #include "main.h"
 
-static const char * const link_type_name[] = {
-	[BPF_LINK_TYPE_UNSPEC]			= "unspec",
-	[BPF_LINK_TYPE_RAW_TRACEPOINT]		= "raw_tracepoint",
-	[BPF_LINK_TYPE_TRACING]			= "tracing",
-	[BPF_LINK_TYPE_CGROUP]			= "cgroup",
-	[BPF_LINK_TYPE_ITER]			= "iter",
-	[BPF_LINK_TYPE_NETNS]			= "netns",
-};
+static struct hashmap *link_table;
 
 static int link_parse_fd(int *argc, char ***argv)
 {
@@ -59,9 +54,12 @@ static int link_parse_fd(int *argc, char ***argv)
 static void
 show_link_header_json(struct bpf_link_info *info, json_writer_t *wtr)
 {
+	const char *link_type_str;
+
 	jsonw_uint_field(wtr, "id", info->id);
-	if (info->type < ARRAY_SIZE(link_type_name))
-		jsonw_string_field(wtr, "type", link_type_name[info->type]);
+	link_type_str = libbpf_bpf_link_type_str(info->type);
+	if (link_type_str)
+		jsonw_string_field(wtr, "type", link_type_str);
 	else
 		jsonw_uint_field(wtr, "type", info->type);
 
@@ -70,9 +68,11 @@ show_link_header_json(struct bpf_link_info *info, json_writer_t *wtr)
 
 static void show_link_attach_type_json(__u32 attach_type, json_writer_t *wtr)
 {
-	if (attach_type < ARRAY_SIZE(attach_type_name))
-		jsonw_string_field(wtr, "attach_type",
-				   attach_type_name[attach_type]);
+	const char *attach_type_str;
+
+	attach_type_str = libbpf_bpf_attach_type_str(attach_type);
+	if (attach_type_str)
+		jsonw_string_field(wtr, "attach_type", attach_type_str);
 	else
 		jsonw_uint_field(wtr, "attach_type", attach_type);
 }
@@ -113,6 +113,7 @@ static int get_prog_info(int prog_id, struct bpf_prog_info *info)
 static int show_link_close_json(int fd, struct bpf_link_info *info)
 {
 	struct bpf_prog_info prog_info;
+	const char *prog_type_str;
 	int err;
 
 	jsonw_start_object(json_wtr);
@@ -129,12 +130,12 @@ static int show_link_close_json(int fd, struct bpf_link_info *info)
 		if (err)
 			return err;
 
-		if (prog_info.type < prog_type_name_size)
-			jsonw_string_field(json_wtr, "prog_type",
-					   prog_type_name[prog_info.type]);
+		prog_type_str = libbpf_bpf_prog_type_str(prog_info.type);
+		/* libbpf will return NULL for variants unknown to it. */
+		if (prog_type_str)
+			jsonw_string_field(json_wtr, "prog_type", prog_type_str);
 		else
-			jsonw_uint_field(json_wtr, "prog_type",
-					 prog_info.type);
+			jsonw_uint_field(json_wtr, "prog_type", prog_info.type);
 
 		show_link_attach_type_json(info->tracing.attach_type,
 					   json_wtr);
@@ -156,19 +157,18 @@ static int show_link_close_json(int fd, struct bpf_link_info *info)
 		break;
 	}
 
-	if (!hash_empty(link_table.table)) {
-		struct pinned_obj *obj;
+	if (!hashmap__empty(link_table)) {
+		struct hashmap_entry *entry;
 
 		jsonw_name(json_wtr, "pinned");
 		jsonw_start_array(json_wtr);
-		hash_for_each_possible(link_table.table, obj, hash, info->id) {
-			if (obj->id == info->id)
-				jsonw_string(json_wtr, obj->path);
-		}
+		hashmap__for_each_key_entry(link_table, entry,
+					    u32_as_hash_field(info->id))
+			jsonw_string(json_wtr, entry->value);
 		jsonw_end_array(json_wtr);
 	}
 
-	emit_obj_refs_json(&refs_table, info->id, json_wtr);
+	emit_obj_refs_json(refs_table, info->id, json_wtr);
 
 	jsonw_end_object(json_wtr);
 
@@ -177,9 +177,12 @@ static int show_link_close_json(int fd, struct bpf_link_info *info)
 
 static void show_link_header_plain(struct bpf_link_info *info)
 {
+	const char *link_type_str;
+
 	printf("%u: ", info->id);
-	if (info->type < ARRAY_SIZE(link_type_name))
-		printf("%s  ", link_type_name[info->type]);
+	link_type_str = libbpf_bpf_link_type_str(info->type);
+	if (link_type_str)
+		printf("%s  ", link_type_str);
 	else
 		printf("type %u  ", info->type);
 
@@ -188,8 +191,11 @@ static void show_link_header_plain(struct bpf_link_info *info)
 
 static void show_link_attach_type_plain(__u32 attach_type)
 {
-	if (attach_type < ARRAY_SIZE(attach_type_name))
-		printf("attach_type %s  ", attach_type_name[attach_type]);
+	const char *attach_type_str;
+
+	attach_type_str = libbpf_bpf_attach_type_str(attach_type);
+	if (attach_type_str)
+		printf("attach_type %s  ", attach_type_str);
 	else
 		printf("attach_type %u  ", attach_type);
 }
@@ -207,6 +213,7 @@ static void show_iter_plain(struct bpf_link_info *info)
 static int show_link_close_plain(int fd, struct bpf_link_info *info)
 {
 	struct bpf_prog_info prog_info;
+	const char *prog_type_str;
 	int err;
 
 	show_link_header_plain(info);
@@ -221,9 +228,10 @@ static int show_link_close_plain(int fd, struct bpf_link_info *info)
 		if (err)
 			return err;
 
-		if (prog_info.type < prog_type_name_size)
-			printf("\n\tprog_type %s  ",
-			       prog_type_name[prog_info.type]);
+		prog_type_str = libbpf_bpf_prog_type_str(prog_info.type);
+		/* libbpf will return NULL for variants unknown to it. */
+		if (prog_type_str)
+			printf("\n\tprog_type %s  ", prog_type_str);
 		else
 			printf("\n\tprog_type %u  ", prog_info.type);
 
@@ -244,15 +252,14 @@ static int show_link_close_plain(int fd, struct bpf_link_info *info)
 		break;
 	}
 
-	if (!hash_empty(link_table.table)) {
-		struct pinned_obj *obj;
+	if (!hashmap__empty(link_table)) {
+		struct hashmap_entry *entry;
 
-		hash_for_each_possible(link_table.table, obj, hash, info->id) {
-			if (obj->id == info->id)
-				printf("\n\tpinned %s", obj->path);
-		}
+		hashmap__for_each_key_entry(link_table, entry,
+					    u32_as_hash_field(info->id))
+			printf("\n\tpinned %s", (char *)entry->value);
 	}
-	emit_obj_refs_plain(&refs_table, info->id, "\n\tpids ");
+	emit_obj_refs_plain(refs_table, info->id, "\n\tpids ");
 
 	printf("\n");
 
@@ -302,8 +309,15 @@ static int do_show(int argc, char **argv)
 	__u32 id = 0;
 	int err, fd;
 
-	if (show_pinned)
-		build_pinned_obj_table(&link_table, BPF_OBJ_LINK);
+	if (show_pinned) {
+		link_table = hashmap__new(hash_fn_for_key_as_id,
+					  equal_fn_for_key_as_id, NULL);
+		if (IS_ERR(link_table)) {
+			p_err("failed to create hashmap for pinned paths");
+			return -1;
+		}
+		build_pinned_obj_table(link_table, BPF_OBJ_LINK);
+	}
 	build_obj_refs_table(&refs_table, BPF_OBJ_LINK);
 
 	if (argc == 2) {
@@ -344,7 +358,10 @@ static int do_show(int argc, char **argv)
 	if (json_output)
 		jsonw_end_array(json_wtr);
 
-	delete_obj_refs_table(&refs_table);
+	delete_obj_refs_table(refs_table);
+
+	if (show_pinned)
+		delete_pinned_obj_table(link_table);
 
 	return errno == ENOENT ? 0 : -1;
 }
@@ -401,7 +418,8 @@ static int do_help(int argc, char **argv)
 		"       %1$s %2$s help\n"
 		"\n"
 		"       " HELP_SPEC_LINK "\n"
-		"       " HELP_SPEC_OPTIONS "\n"
+		"       " HELP_SPEC_OPTIONS " |\n"
+		"                    {-f|--bpffs} | {-n|--nomount} }\n"
 		"",
 		bin_name, argv[-2]);
 

@@ -27,7 +27,7 @@ static void xdp_umem_unpin_pages(struct xdp_umem *umem)
 {
 	unpin_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
 
-	kfree(umem->pgs);
+	kvfree(umem->pgs);
 	umem->pgs = NULL;
 }
 
@@ -57,7 +57,7 @@ static int xdp_umem_addr_map(struct xdp_umem *umem, struct page **pages,
 static void xdp_umem_release(struct xdp_umem *umem)
 {
 	umem->zc = false;
-	ida_simple_remove(&umem_ida, umem->id);
+	ida_free(&umem_ida, umem->id);
 
 	xdp_umem_addr_unmap(umem);
 	xdp_umem_unpin_pages(umem);
@@ -99,8 +99,7 @@ static int xdp_umem_pin_pages(struct xdp_umem *umem, unsigned long address)
 	long npgs;
 	int err;
 
-	umem->pgs = kcalloc(umem->npgs, sizeof(*umem->pgs),
-			    GFP_KERNEL | __GFP_NOWARN);
+	umem->pgs = kvcalloc(umem->npgs, sizeof(*umem->pgs), GFP_KERNEL | __GFP_NOWARN);
 	if (!umem->pgs)
 		return -ENOMEM;
 
@@ -123,7 +122,7 @@ static int xdp_umem_pin_pages(struct xdp_umem *umem, unsigned long address)
 out_pin:
 	xdp_umem_unpin_pages(umem);
 out_pgs:
-	kfree(umem->pgs);
+	kvfree(umem->pgs);
 	umem->pgs = NULL;
 	return err;
 }
@@ -243,7 +242,7 @@ struct xdp_umem *xdp_umem_create(struct xdp_umem_reg *mr)
 	if (!umem)
 		return ERR_PTR(-ENOMEM);
 
-	err = ida_simple_get(&umem_ida, 0, 0, GFP_KERNEL);
+	err = ida_alloc(&umem_ida, GFP_KERNEL);
 	if (err < 0) {
 		kfree(umem);
 		return ERR_PTR(err);
@@ -252,7 +251,7 @@ struct xdp_umem *xdp_umem_create(struct xdp_umem_reg *mr)
 
 	err = xdp_umem_reg(umem, mr);
 	if (err) {
-		ida_simple_remove(&umem_ida, umem->id);
+		ida_free(&umem_ida, umem->id);
 		kfree(umem);
 		return ERR_PTR(err);
 	}

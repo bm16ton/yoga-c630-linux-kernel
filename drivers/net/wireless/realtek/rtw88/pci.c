@@ -2,7 +2,6 @@
 /* Copyright(c) 2018-2019  Realtek Corporation
  */
 
-#include <linux/dmi.h>
 #include <linux/module.h>
 #include <linux/pci.h>
 #include "main.h"
@@ -267,11 +266,6 @@ static int rtw_pci_init_rx_ring(struct rtw_dev *rtwdev,
 	int buf_sz = RTK_PCI_RX_BUF_SIZE;
 	int i, allocated;
 	int ret = 0;
-
-	if (len > TRX_BD_IDX_MASK) {
-		rtw_err(rtwdev, "len %d exceeds maximum RX entries\n", len);
-		return -EINVAL;
-	}
 
 	head = dma_alloc_coherent(&pdev->dev, ring_sz, &dma, GFP_KERNEL);
 	if (!head) {
@@ -617,6 +611,9 @@ static void rtw_pci_deep_ps_enter(struct rtw_dev *rtwdev)
 	bool tx_empty = true;
 	u8 queue;
 
+	if (rtw_fw_feature_check(&rtwdev->fw, FW_FEATURE_TX_WAKE))
+		goto enter_deep_ps;
+
 	lockdep_assert_held(&rtwpci->irq_lock);
 
 	/* Deep PS state is not allowed to TX-DMA */
@@ -642,7 +639,7 @@ static void rtw_pci_deep_ps_enter(struct rtw_dev *rtwdev)
 			"TX path not empty, cannot enter deep power save state\n");
 		return;
 	}
-
+enter_deep_ps:
 	set_bit(RTW_FLAG_LEISURE_PS_DEEP, rtwdev->flags);
 	rtw_power_mode_change(rtwdev, true);
 }
@@ -679,6 +676,8 @@ static u8 ac_to_hwq[] = {
 	[IEEE80211_AC_BK] = RTW_TX_QUEUE_BK,
 };
 
+static_assert(ARRAY_SIZE(ac_to_hwq) == IEEE80211_NUM_ACS);
+
 static u8 rtw_hw_queue_mapping(struct sk_buff *skb)
 {
 	struct ieee80211_hdr *hdr = (struct ieee80211_hdr *)skb->data;
@@ -690,6 +689,9 @@ static u8 rtw_hw_queue_mapping(struct sk_buff *skb)
 		queue = RTW_TX_QUEUE_BCN;
 	else if (unlikely(ieee80211_is_mgmt(fc) || ieee80211_is_ctl(fc)))
 		queue = RTW_TX_QUEUE_MGMT;
+	else if (is_broadcast_ether_addr(hdr->addr1) ||
+		 is_multicast_ether_addr(hdr->addr1))
+		queue = RTW_TX_QUEUE_HI0;
 	else if (WARN_ON_ONCE(q_mapping >= ARRAY_SIZE(ac_to_hwq)))
 		queue = ac_to_hwq[IEEE80211_AC_BE];
 	else
@@ -735,6 +737,72 @@ static void rtw_pci_dma_check(struct rtw_dev *rtwdev,
 	rtwpci->rx_tag = (rtwpci->rx_tag + 1) % RX_TAG_MAX;
 }
 
+static u32 __pci_get_hw_tx_ring_rp(struct rtw_dev *rtwdev, u8 pci_q)
+{
+	u32 bd_idx_addr = rtw_pci_tx_queue_idx_addr[pci_q];
+	u32 bd_idx = rtw_read16(rtwdev, bd_idx_addr + 2);
+
+	return FIELD_GET(TRX_BD_IDX_MASK, bd_idx);
+}
+
+static void __pci_flush_queue(struct rtw_dev *rtwdev, u8 pci_q, bool drop)
+{
+	struct rtw_pci *rtwpci = (struct rtw_pci *)rtwdev->priv;
+	struct rtw_pci_tx_ring *ring = &rtwpci->tx_rings[pci_q];
+	u32 cur_rp;
+	u8 i;
+
+	/* Because the time taked by the I/O in __pci_get_hw_tx_ring_rp is a
+	 * bit dynamic, it's hard to define a reasonable fixed total timeout to
+	 * use read_poll_timeout* helper. Instead, we can ensure a reasonable
+	 * polling times, so we just use for loop with udelay here.
+	 */
+	for (i = 0; i < 30; i++) {
+		cur_rp = __pci_get_hw_tx_ring_rp(rtwdev, pci_q);
+		if (cur_rp == ring->r.wp)
+			return;
+
+		udelay(1);
+	}
+
+	if (!drop)
+		rtw_warn(rtwdev, "timed out to flush pci tx ring[%d]\n", pci_q);
+}
+
+static void __rtw_pci_flush_queues(struct rtw_dev *rtwdev, u32 pci_queues,
+				   bool drop)
+{
+	u8 q;
+
+	for (q = 0; q < RTK_MAX_TX_QUEUE_NUM; q++) {
+		/* It may be not necessary to flush BCN and H2C tx queues. */
+		if (q == RTW_TX_QUEUE_BCN || q == RTW_TX_QUEUE_H2C)
+			continue;
+
+		if (pci_queues & BIT(q))
+			__pci_flush_queue(rtwdev, q, drop);
+	}
+}
+
+static void rtw_pci_flush_queues(struct rtw_dev *rtwdev, u32 queues, bool drop)
+{
+	u32 pci_queues = 0;
+	u8 i;
+
+	/* If all of the hardware queues are requested to flush,
+	 * flush all of the pci queues.
+	 */
+	if (queues == BIT(rtwdev->hw->queues) - 1) {
+		pci_queues = BIT(RTK_MAX_TX_QUEUE_NUM) - 1;
+	} else {
+		for (i = 0; i < rtwdev->hw->queues; i++)
+			if (queues & BIT(i))
+				pci_queues |= BIT(ac_to_hwq[i]);
+	}
+
+	__rtw_pci_flush_queues(rtwdev, pci_queues, drop);
+}
+
 static void rtw_pci_tx_kick_off_queue(struct rtw_dev *rtwdev, u8 queue)
 {
 	struct rtw_pci *rtwpci = (struct rtw_pci *)rtwdev->priv;
@@ -745,7 +813,8 @@ static void rtw_pci_tx_kick_off_queue(struct rtw_dev *rtwdev, u8 queue)
 	bd_idx = rtw_pci_tx_queue_idx_addr[queue];
 
 	spin_lock_bh(&rtwpci->irq_lock);
-	rtw_pci_deep_ps_leave(rtwdev);
+	if (!rtw_fw_feature_check(&rtwdev->fw, FW_FEATURE_TX_WAKE))
+		rtw_pci_deep_ps_leave(rtwdev);
 	rtw_write16(rtwdev, bd_idx, ring->r.wp & TRX_BD_IDX_MASK);
 	spin_unlock_bh(&rtwpci->irq_lock);
 }
@@ -890,10 +959,12 @@ static int rtw_pci_tx_write(struct rtw_dev *rtwdev,
 		return ret;
 
 	ring = &rtwpci->tx_rings[queue];
+	spin_lock_bh(&rtwpci->irq_lock);
 	if (avail_desc(ring->r.wp, ring->r.rp, ring->r.len) < 2) {
 		ieee80211_stop_queue(rtwdev->hw, skb_get_queue_mapping(skb));
 		ring->queue_stopped = true;
 	}
+	spin_unlock_bh(&rtwpci->irq_lock);
 
 	return 0;
 }
@@ -908,7 +979,7 @@ static void rtw_pci_tx_isr(struct rtw_dev *rtwdev, struct rtw_pci *rtwpci,
 	struct sk_buff *skb;
 	u32 count;
 	u32 bd_idx_addr;
-	u32 bd_idx, cur_rp;
+	u32 bd_idx, cur_rp, rp_idx;
 	u16 q_map;
 
 	ring = &rtwpci->tx_rings[hw_queue];
@@ -917,6 +988,7 @@ static void rtw_pci_tx_isr(struct rtw_dev *rtwdev, struct rtw_pci *rtwpci,
 	bd_idx = rtw_read32(rtwdev, bd_idx_addr);
 	cur_rp = bd_idx >> 16;
 	cur_rp &= TRX_BD_IDX_MASK;
+	rp_idx = ring->r.rp;
 	if (cur_rp >= ring->r.rp)
 		count = cur_rp - ring->r.rp;
 	else
@@ -940,11 +1012,14 @@ static void rtw_pci_tx_isr(struct rtw_dev *rtwdev, struct rtw_pci *rtwpci,
 		}
 
 		if (ring->queue_stopped &&
-		    avail_desc(ring->r.wp, ring->r.rp, ring->r.len) > 4) {
+		    avail_desc(ring->r.wp, rp_idx, ring->r.len) > 4) {
 			q_map = skb_get_queue_mapping(skb);
 			ieee80211_wake_queue(hw, q_map);
 			ring->queue_stopped = false;
 		}
+
+		if (++rp_idx >= ring->r.len)
+			rp_idx = 0;
 
 		skb_pull(skb, rtwdev->chip->tx_pkt_desc_sz);
 
@@ -1285,6 +1360,25 @@ static void rtw_pci_clkreq_set(struct rtw_dev *rtwdev, bool enable)
 	rtw_dbi_write8(rtwdev, RTK_PCIE_LINK_CFG, value);
 }
 
+static void rtw_pci_clkreq_pad_low(struct rtw_dev *rtwdev, bool enable)
+{
+	u8 value;
+	int ret;
+
+	ret = rtw_dbi_read8(rtwdev, RTK_PCIE_LINK_CFG, &value);
+	if (ret) {
+		rtw_err(rtwdev, "failed to read CLKREQ_L1, ret=%d", ret);
+		return;
+	}
+
+	if (enable)
+		value &= ~BIT_CLKREQ_N_PAD;
+	else
+		value |= BIT_CLKREQ_N_PAD;
+
+	rtw_dbi_write8(rtwdev, RTK_PCIE_LINK_CFG, value);
+}
+
 static void rtw_pci_aspm_set(struct rtw_dev *rtwdev, bool enable)
 {
 	u8 value;
@@ -1321,7 +1415,11 @@ static void rtw_pci_link_ps(struct rtw_dev *rtwdev, bool enter)
 	 * throughput. This is probably because the ASPM behavior slightly
 	 * varies from different SOC.
 	 */
-	if (rtwpci->link_ctrl & PCI_EXP_LNKCTL_ASPM_L1)
+	if (!(rtwpci->link_ctrl & PCI_EXP_LNKCTL_ASPM_L1))
+		return;
+
+	if ((enter && atomic_dec_if_positive(&rtwpci->link_usage) == 0) ||
+	    (!enter && atomic_inc_return(&rtwpci->link_usage) == 1))
 		rtw_pci_aspm_set(rtwdev, enter);
 }
 
@@ -1384,12 +1482,15 @@ static void rtw_pci_interface_cfg(struct rtw_dev *rtwdev)
 
 static void rtw_pci_phy_cfg(struct rtw_dev *rtwdev)
 {
+	struct rtw_pci *rtwpci = (struct rtw_pci *)rtwdev->priv;
 	struct rtw_chip_info *chip = rtwdev->chip;
+	struct pci_dev *pdev = rtwpci->pdev;
 	const struct rtw_intf_phy_para *para;
 	u16 cut;
 	u16 value;
 	u16 offset;
 	int i;
+	int ret;
 
 	cut = BIT(0) << rtwdev->hal.cut_version;
 
@@ -1422,15 +1523,38 @@ static void rtw_pci_phy_cfg(struct rtw_dev *rtwdev)
 	}
 
 	rtw_pci_link_cfg(rtwdev);
+
+	/* Disable 8821ce completion timeout by default */
+	if (chip->id == RTW_CHIP_TYPE_8821C) {
+		ret = pcie_capability_set_word(pdev, PCI_EXP_DEVCTL2,
+					       PCI_EXP_DEVCTL2_COMP_TMOUT_DIS);
+		if (ret)
+			rtw_err(rtwdev, "failed to set PCI cap, ret = %d\n",
+				ret);
+	}
 }
 
 static int __maybe_unused rtw_pci_suspend(struct device *dev)
 {
+	struct ieee80211_hw *hw = dev_get_drvdata(dev);
+	struct rtw_dev *rtwdev = hw->priv;
+	struct rtw_chip_info *chip = rtwdev->chip;
+	struct rtw_efuse *efuse = &rtwdev->efuse;
+
+	if (chip->id == RTW_CHIP_TYPE_8822C && efuse->rfe_option == 6)
+		rtw_pci_clkreq_pad_low(rtwdev, true);
 	return 0;
 }
 
 static int __maybe_unused rtw_pci_resume(struct device *dev)
 {
+	struct ieee80211_hw *hw = dev_get_drvdata(dev);
+	struct rtw_dev *rtwdev = hw->priv;
+	struct rtw_chip_info *chip = rtwdev->chip;
+	struct rtw_efuse *efuse = &rtwdev->efuse;
+
+	if (chip->id == RTW_CHIP_TYPE_8822C && efuse->rfe_option == 6)
+		rtw_pci_clkreq_pad_low(rtwdev, false);
 	return 0;
 }
 
@@ -1499,6 +1623,7 @@ static void rtw_pci_destroy(struct rtw_dev *rtwdev, struct pci_dev *pdev)
 static struct rtw_hci_ops rtw_pci_ops = {
 	.tx_write = rtw_pci_tx_write,
 	.tx_kick_off = rtw_pci_tx_kick_off,
+	.flush_queues = rtw_pci_flush_queues,
 	.setup = rtw_pci_setup,
 	.start = rtw_pci_start,
 	.stop = rtw_pci_stop,
@@ -1555,6 +1680,9 @@ static int rtw_pci_napi_poll(struct napi_struct *napi, int budget)
 					      priv);
 	int work_done = 0;
 
+	if (rtwpci->rx_no_aspm)
+		rtw_pci_link_ps(rtwdev, false);
+
 	while (work_done < budget) {
 		u32 work_done_once;
 
@@ -1578,6 +1706,8 @@ static int rtw_pci_napi_poll(struct napi_struct *napi, int budget)
 		if (rtw_pci_get_hw_rx_ring_nr(rtwdev, rtwpci))
 			napi_schedule(napi);
 	}
+	if (rtwpci->rx_no_aspm)
+		rtw_pci_link_ps(rtwdev, true);
 
 	return work_done;
 }
@@ -1588,7 +1718,7 @@ static void rtw_pci_napi_init(struct rtw_dev *rtwdev)
 
 	init_dummy_netdev(&rtwpci->netdev);
 	netif_napi_add(&rtwpci->netdev, &rtwpci->napi, rtw_pci_napi_poll,
-		       RTW_NAPI_WEIGHT_NUM);
+		       NAPI_POLL_WEIGHT);
 }
 
 static void rtw_pci_napi_deinit(struct rtw_dev *rtwdev)
@@ -1599,41 +1729,13 @@ static void rtw_pci_napi_deinit(struct rtw_dev *rtwdev)
 	netif_napi_del(&rtwpci->napi);
 }
 
-enum rtw88_quirk_dis_pci_caps {
-	QUIRK_DIS_PCI_CAP_MSI,
-	QUIRK_DIS_PCI_CAP_ASPM,
-};
-
-static int disable_pci_caps(const struct dmi_system_id *dmi)
-{
-	uintptr_t dis_caps = (uintptr_t)dmi->driver_data;
-
-	if (dis_caps & BIT(QUIRK_DIS_PCI_CAP_MSI))
-		rtw_disable_msi = true;
-	if (dis_caps & BIT(QUIRK_DIS_PCI_CAP_ASPM))
-		rtw_pci_disable_aspm = true;
-
-	return 1;
-}
-
-static const struct dmi_system_id rtw88_pci_quirks[] = {
-	{
-		.callback = disable_pci_caps,
-		.ident = "Protempo Ltd L116HTN6SPW",
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Protempo Ltd"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "L116HTN6SPW"),
-		},
-		.driver_data = (void *)BIT(QUIRK_DIS_PCI_CAP_ASPM),
-	},
-	{}
-};
-
 int rtw_pci_probe(struct pci_dev *pdev,
 		  const struct pci_device_id *id)
 {
+	struct pci_dev *bridge = pci_upstream_bridge(pdev);
 	struct ieee80211_hw *hw;
 	struct rtw_dev *rtwdev;
+	struct rtw_pci *rtwpci;
 	int drv_data_size;
 	int ret;
 
@@ -1650,6 +1752,9 @@ int rtw_pci_probe(struct pci_dev *pdev,
 	rtwdev->chip = (struct rtw_chip_info *)id->driver_data;
 	rtwdev->hci.ops = &rtw_pci_ops;
 	rtwdev->hci.type = RTW_HCI_TYPE_PCIE;
+
+	rtwpci = (struct rtw_pci *)rtwdev->priv;
+	atomic_set(&rtwpci->link_usage, 1);
 
 	ret = rtw_core_init(rtwdev);
 	if (ret)
@@ -1679,7 +1784,10 @@ int rtw_pci_probe(struct pci_dev *pdev,
 		goto err_destroy_pci;
 	}
 
-	dmi_check_system(rtw88_pci_quirks);
+	/* Disable PCIe ASPM L1 while doing NAPI poll for 8821CE */
+	if (rtwdev->chip->id == RTW_CHIP_TYPE_8821C && bridge->vendor == PCI_VENDOR_ID_INTEL)
+		rtwpci->rx_no_aspm = true;
+
 	rtw_pci_phy_cfg(rtwdev);
 
 	ret = rtw_register_hw(rtwdev, hw);

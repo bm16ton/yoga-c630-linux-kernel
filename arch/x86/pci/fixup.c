@@ -353,8 +353,8 @@ static void pci_fixup_video(struct pci_dev *pdev)
 		}
 	}
 }
-DECLARE_PCI_FIXUP_CLASS_FINAL(PCI_ANY_ID, PCI_ANY_ID,
-				PCI_CLASS_DISPLAY_VGA, 8, pci_fixup_video);
+DECLARE_PCI_FIXUP_CLASS_HEADER(PCI_ANY_ID, PCI_ANY_ID,
+			       PCI_CLASS_DISPLAY_VGA, 8, pci_fixup_video);
 
 
 static const struct dmi_system_id msi_k8t_dmi_table[] = {
@@ -375,7 +375,7 @@ static const struct dmi_system_id msi_k8t_dmi_table[] = {
  * The BIOS only gives options "DISABLED" and "AUTO". This code sets
  * the corresponding register-value to enable the soundcard.
  *
- * The soundcard is only enabled, if the mainborad is identified
+ * The soundcard is only enabled, if the mainboard is identified
  * via DMI-tables and the soundcard is detected to be off.
  */
 static void pci_fixup_msi_k8t_onboard_sound(struct pci_dev *dev)

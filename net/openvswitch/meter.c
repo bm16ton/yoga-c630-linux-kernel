@@ -12,7 +12,6 @@
 #include <linux/openvswitch.h>
 #include <linux/netlink.h>
 #include <linux/rculist.h>
-#include <linux/swap.h>
 
 #include <net/netlink.h>
 #include <net/genetlink.h>
@@ -392,7 +391,7 @@ static struct dp_meter *dp_meter_create(struct nlattr **a)
 		 *
 		 * Start with a full bucket.
 		 */
-		band->bucket = (band->burst_size + band->rate) * 1000ULL;
+		band->bucket = band->burst_size * 1000ULL;
 		band_max_delta_t = div_u64(band->bucket, band->rate);
 		if (band_max_delta_t > meter->max_delta_t)
 			meter->max_delta_t = band_max_delta_t;
@@ -649,7 +648,7 @@ bool ovs_meter_execute(struct datapath *dp, struct sk_buff *skb,
 		long long int max_bucket_size;
 
 		band = &meter->bands[i];
-		max_bucket_size = (band->burst_size + band->rate) * 1000LL;
+		max_bucket_size = band->burst_size * 1000LL;
 
 		band->bucket += delta_ms * band->rate;
 		if (band->bucket > max_bucket_size)

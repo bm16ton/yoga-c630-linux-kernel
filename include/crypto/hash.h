@@ -458,7 +458,7 @@ int crypto_ahash_finup(struct ahash_request *req);
  *
  * Return:
  * 0		if the message digest was successfully calculated;
- * -EINPROGRESS	if data is feeded into hardware (DMA) or queued for later;
+ * -EINPROGRESS	if data is fed into hardware (DMA) or queued for later;
  * -EBUSY	if queue is full and request should be resubmitted later;
  * other < 0	if an error occurred
  */
@@ -717,6 +717,8 @@ static inline void ahash_request_set_crypt(struct ahash_request *req,
  */
 struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
 					u32 mask);
+
+int crypto_has_shash(const char *alg_name, u32 type, u32 mask);
 
 static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
 {

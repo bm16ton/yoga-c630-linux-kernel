@@ -182,6 +182,8 @@ enum surface_pixel_format {
 	SURFACE_PIXEL_FORMAT_GRPH_ABGR2101010_XR_BIAS,
 	/*64 bpp */
 	SURFACE_PIXEL_FORMAT_GRPH_ARGB16161616,
+	/*swapped*/
+	SURFACE_PIXEL_FORMAT_GRPH_ABGR16161616,
 	/*float*/
 	SURFACE_PIXEL_FORMAT_GRPH_ARGB16161616F,
 	/*swaped & float*/
@@ -199,8 +201,9 @@ enum surface_pixel_format {
 	SURFACE_PIXEL_FORMAT_VIDEO_420_YCrCb,
 	SURFACE_PIXEL_FORMAT_VIDEO_420_10bpc_YCbCr,
 	SURFACE_PIXEL_FORMAT_VIDEO_420_10bpc_YCrCb,
+	SURFACE_PIXEL_FORMAT_SUBSAMPLE_END,
+	SURFACE_PIXEL_FORMAT_VIDEO_ACrYCb2101010 =
 		SURFACE_PIXEL_FORMAT_SUBSAMPLE_END,
-	SURFACE_PIXEL_FORMAT_VIDEO_ACrYCb2101010,
 	SURFACE_PIXEL_FORMAT_VIDEO_CrYCbA1010102,
 	SURFACE_PIXEL_FORMAT_VIDEO_AYCrCb8888,
 	SURFACE_PIXEL_FORMAT_INVALID
@@ -231,6 +234,22 @@ enum pixel_format {
 	PIXEL_FORMAT_VIDEO_BEGIN = PIXEL_FORMAT_420BPP8,
 	PIXEL_FORMAT_VIDEO_END = PIXEL_FORMAT_420BPP10,
 	PIXEL_FORMAT_UNKNOWN
+};
+
+/*
+ * This structure holds a surface address.  There could be multiple addresses
+ * in cases such as Stereo 3D, Planar YUV, etc.  Other per-flip attributes such
+ * as frame durations and DCC format can also be set.
+ */
+#define DC_MAX_DIRTY_RECTS 3
+struct dc_flip_addrs {
+	struct dc_plane_address address;
+	unsigned int flip_timestamp_in_us;
+	bool flip_immediate;
+	/* TODO: add flip duration for FreeSync */
+	bool triplebuffer_flips;
+	unsigned int dirty_rect_count;
+	struct rect dirty_rects[DC_MAX_DIRTY_RECTS];
 };
 
 enum tile_split_values {
@@ -705,6 +724,7 @@ struct dc_crtc_timing_flags {
 #ifndef TRIM_FSFT
 	uint32_t FAST_TRANSPORT: 1;
 #endif
+	uint32_t VBLANK_SYNCHRONIZABLE: 1;
 };
 
 enum dc_timing_3d_format {
@@ -738,6 +758,11 @@ struct dc_dsc_config {
 	uint32_t version_minor; /* DSC minor version. Full version is formed as 1.version_minor. */
 	bool ycbcr422_simple; /* Tell DSC engine to convert YCbCr 4:2:2 to 'YCbCr 4:2:2 simple'. */
 	int32_t rc_buffer_size; /* DSC RC buffer block size in bytes */
+#if defined(CONFIG_DRM_AMD_DC_DCN)
+	bool is_frl; /* indicate if DSC is applied based on HDMI FRL sink's capability */
+#endif
+	bool is_dp; /* indicate if DSC is applied based on DP's capability */
+	uint32_t mst_pbn; /* pbn of display on dsc mst hub */
 };
 struct dc_crtc_timing {
 	uint32_t h_total;
@@ -755,9 +780,12 @@ struct dc_crtc_timing {
 	uint32_t v_sync_width;
 
 	uint32_t pix_clk_100hz;
+	uint32_t min_refresh_in_uhz;
 
 	uint32_t vic;
 	uint32_t hdmi_vic;
+	uint32_t rid;
+	uint32_t fr_index;
 	enum dc_timing_3d_format timing_3d_format;
 	enum dc_color_depth display_color_depth;
 	enum dc_pixel_encoding pixel_encoding;
@@ -769,6 +797,7 @@ struct dc_crtc_timing {
 #endif
 
 	struct dc_crtc_timing_flags flags;
+	uint32_t dsc_fixed_bits_per_pixel_x16; /* DSC target bitrate in 1/16 of bpp (e.g. 128 -> 8bpp) */
 	struct dc_dsc_config dsc_cfg;
 };
 

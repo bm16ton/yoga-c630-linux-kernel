@@ -107,7 +107,8 @@ static int get_max_afu_index(struct pci_dev *dev, int *afu_idx)
 	int pos;
 	u32 val;
 
-	pos = find_dvsec_from_pos(dev, OCXL_DVSEC_FUNC_ID, 0);
+	pos = pci_find_dvsec_capability(dev, PCI_VENDOR_ID_IBM,
+					OCXL_DVSEC_FUNC_ID);
 	if (!pos)
 		return -ESRCH;
 
@@ -288,7 +289,7 @@ int pnv_ocxl_get_pasid_count(struct pci_dev *dev, int *count)
 	 * be used by a function depends on how many functions exist
 	 * on the device. The NPU needs to be configured to know how
 	 * many bits are available to PASIDs and how many are to be
-	 * used by the function BDF indentifier.
+	 * used by the function BDF identifier.
 	 *
 	 * We only support one AFU-carrying function for now.
 	 */

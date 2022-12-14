@@ -4,6 +4,7 @@
 #
 menuconfig INPUT_JOYSTICK
 	bool "Joysticks/Gamepads"
+	depends on !UML
 	help
 	  If you have a joystick, 6dof controller, gamepad, steering wheel,
 	  weapon control system or something like that you can say Y here
@@ -205,19 +206,6 @@ config JOYSTICK_TWIDJOY
 	  To compile this driver as a module, choose M here: the
 	  module will be called twidjoy.
 
-config JOYSTICK_WIICHUCK
-	tristate "Nintendo Wiimote Extension connector on i2c bus"
-	depends on I2C
-	select INPUT_POLLDEV
-	help
-	  Say Y here if you have a Nintendo Wiimote extension connector
-	  attached directly to an i2c bus, like the Sparcfun Wiichuck adapter
-	  board.  This driver supports both the Nunchuk and the Classic
-	  Controller extensions.
-
-	  To compile this driver as a module, choose M here: the
-	  modules will be called wiichuck.
-
 config JOYSTICK_ZHENHUA
 	tristate "5-byte Zhenhua RC transmitter"
 	select SERIO
@@ -385,6 +373,15 @@ config JOYSTICK_PXRC
 	  To compile this driver as a module, choose M here: the
 	  module will be called pxrc.
 
+config JOYSTICK_QWIIC
+	tristate "SparkFun Qwiic Joystick"
+	depends on I2C
+	help
+	  Say Y here if you want to use the SparkFun Qwiic Joystick.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called qwiic-joystick.
+
 config JOYSTICK_FSIA6B
 	tristate "FlySky FS-iA6B RC Receiver"
 	select SERIO
@@ -401,5 +398,17 @@ config JOYSTICK_N64
 	help
 	  Say Y here if you want enable support for the four
 	  built-in controller ports on the Nintendo 64 console.
+
+config JOYSTICK_SENSEHAT
+	tristate "Raspberry Pi Sense HAT joystick"
+	depends on INPUT && I2C
+	depends on HAS_IOMEM
+	select MFD_SIMPLE_MFD_I2C
+	help
+	  Say Y here if you want to enable the driver for the
+	  the Raspberry Pi Sense HAT.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called sensehat_joystick.
 
 endif

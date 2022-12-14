@@ -66,6 +66,8 @@
  *
  * For an implementation of how to use this look at
  * drm_atomic_helper_setup_commit() from the atomic helper library.
+ *
+ * See also drm_crtc_commit_wait().
  */
 struct drm_crtc_commit {
 	/**
@@ -225,6 +227,18 @@ struct drm_private_state_funcs {
 	 */
 	void (*atomic_destroy_state)(struct drm_private_obj *obj,
 				     struct drm_private_state *state);
+
+	/**
+	 * @atomic_print_state:
+	 *
+	 * If driver subclasses &struct drm_private_state, it should implement
+	 * this optional hook for printing additional driver specific state.
+	 *
+	 * Do not call this directly, use drm_atomic_private_obj_print_state()
+	 * instead.
+	 */
+	void (*atomic_print_state)(struct drm_printer *p,
+				   const struct drm_private_state *state);
 };
 
 /**
@@ -309,14 +323,21 @@ struct drm_private_obj {
 
 /**
  * struct drm_private_state - base struct for driver private object state
- * @state: backpointer to global drm_atomic_state
  *
- * Currently only contains a backpointer to the overall atomic update, but in
- * the future also might hold synchronization information similar to e.g.
- * &drm_crtc.commit.
+ * Currently only contains a backpointer to the overall atomic update,
+ * and the relevant private object but in the future also might hold
+ * synchronization information similar to e.g. &drm_crtc.commit.
  */
 struct drm_private_state {
+	/**
+	 * @state: backpointer to global drm_atomic_state
+	 */
 	struct drm_atomic_state *state;
+
+	/**
+	 * @obj: backpointer to the private object
+	 */
+	struct drm_private_obj *obj;
 };
 
 struct __drm_private_objs_state {
@@ -435,6 +456,8 @@ static inline void drm_crtc_commit_put(struct drm_crtc_commit *commit)
 {
 	kref_put(&commit->ref, __drm_crtc_commit_free);
 }
+
+int drm_crtc_commit_wait(struct drm_crtc_commit *commit);
 
 struct drm_atomic_state * __must_check
 drm_atomic_state_alloc(struct drm_device *dev);
@@ -892,6 +915,22 @@ void drm_state_dump(struct drm_device *dev, struct drm_printer *p);
 			      (new_plane_state) = (__state)->planes[__i].new_state, 1))
 
 /**
+ * for_each_new_plane_in_state_reverse - other than only tracking new state,
+ * it's the same as for_each_oldnew_plane_in_state_reverse
+ * @__state: &struct drm_atomic_state pointer
+ * @plane: &struct drm_plane iteration cursor
+ * @new_plane_state: &struct drm_plane_state iteration cursor for the new state
+ * @__i: int iteration cursor, for macro-internal use
+ */
+#define for_each_new_plane_in_state_reverse(__state, plane, new_plane_state, __i) \
+	for ((__i) = ((__state)->dev->mode_config.num_total_plane - 1);	\
+	     (__i) >= 0;						\
+	     (__i)--)							\
+		for_each_if ((__state)->planes[__i].ptr &&		\
+			     ((plane) = (__state)->planes[__i].ptr,	\
+			      (new_plane_state) = (__state)->planes[__i].new_state, 1))
+
+/**
  * for_each_old_plane_in_state - iterate over all planes in an atomic update
  * @__state: &struct drm_atomic_state pointer
  * @plane: &struct drm_plane iteration cursor
@@ -983,6 +1022,7 @@ void drm_state_dump(struct drm_device *dev, struct drm_printer *p);
 	for ((__i) = 0; \
 	     (__i) < (__state)->num_private_objs && \
 		     ((obj) = (__state)->private_objs[__i].ptr, \
+		      (void)(obj) /* Only to avoid unused-but-set-variable warning */, \
 		      (new_obj_state) = (__state)->private_objs[__i].new_state, 1); \
 	     (__i)++)
 

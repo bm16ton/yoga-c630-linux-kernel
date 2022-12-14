@@ -8,6 +8,7 @@
 
 #include <sysdep/ptrace_user.h>
 #include <generated/asm-offsets.h>
+#include <linux/stddef.h>
 
 #define STUB_MMAP_NR __NR_mmap
 #define MMAP_OFFSET(o) (o)
@@ -108,4 +109,16 @@ static inline void remap_stack_and_trap(void)
 		__syscall_clobber, "r10", "r8", "r9");
 }
 
+static __always_inline void *get_stub_page(void)
+{
+	unsigned long ret;
+
+	asm volatile (
+		"movq %%rsp,%0 ;"
+		"andq %1,%0"
+		: "=a" (ret)
+		: "g" (~(UM_KERN_PAGE_SIZE - 1)));
+
+	return (void *)ret;
+}
 #endif

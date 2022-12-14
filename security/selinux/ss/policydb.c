@@ -41,8 +41,6 @@
 #include "mls.h"
 #include "services.h"
 
-#define _DEBUG_HASHES
-
 #ifdef DEBUG_HASHES
 static const char *symtab_name[SYM_NUM] = {
 	"common prefixes",
@@ -63,7 +61,7 @@ struct policydb_compat_info {
 };
 
 /* These need to be updated if SYM_NUM or OCON_NUM changes */
-static struct policydb_compat_info policydb_compat[] = {
+static const struct policydb_compat_info policydb_compat[] = {
 	{
 		.version	= POLICYDB_VERSION_BASE,
 		.sym_num	= SYM_NUM - 3,
@@ -161,18 +159,16 @@ static struct policydb_compat_info policydb_compat[] = {
 	},
 };
 
-static struct policydb_compat_info *policydb_lookup_compat(int version)
+static const struct policydb_compat_info *policydb_lookup_compat(int version)
 {
 	int i;
-	struct policydb_compat_info *info = NULL;
 
 	for (i = 0; i < ARRAY_SIZE(policydb_compat); i++) {
-		if (policydb_compat[i].version == version) {
-			info = &policydb_compat[i];
-			break;
-		}
+		if (policydb_compat[i].version == version)
+			return &policydb_compat[i];
 	}
-	return info;
+
+	return NULL;
 }
 
 /*
@@ -316,8 +312,7 @@ static int cat_destroy(void *key, void *datum, void *p)
 	return 0;
 }
 
-static int (*destroy_f[SYM_NUM]) (void *key, void *datum, void *datap) =
-{
+static int (*const destroy_f[SYM_NUM]) (void *key, void *datum, void *datap) = {
 	common_destroy,
 	cls_destroy,
 	role_destroy,
@@ -672,8 +667,7 @@ static int cat_index(void *key, void *datum, void *datap)
 	return 0;
 }
 
-static int (*index_f[SYM_NUM]) (void *key, void *datum, void *datap) =
-{
+static int (*const index_f[SYM_NUM]) (void *key, void *datum, void *datap) = {
 	common_index,
 	class_index,
 	role_index,
@@ -704,7 +698,7 @@ static void symtab_hash_eval(struct symtab *s)
 }
 
 #else
-static inline void hash_eval(struct hashtab *h, char *hash_name)
+static inline void hash_eval(struct hashtab *h, const char *hash_name)
 {
 }
 #endif
@@ -874,7 +868,7 @@ int policydb_load_isids(struct policydb *p, struct sidtab *s)
 	rc = sidtab_init(s);
 	if (rc) {
 		pr_err("SELinux:  out of memory on SID table init\n");
-		goto out;
+		return rc;
 	}
 
 	head = p->ocontexts[OCON_ISID];
@@ -885,7 +879,7 @@ int policydb_load_isids(struct policydb *p, struct sidtab *s)
 		if (sid == SECSID_NULL) {
 			pr_err("SELinux:  SID 0 was assigned a context.\n");
 			sidtab_destroy(s);
-			goto out;
+			return -EINVAL;
 		}
 
 		/* Ignore initial SIDs unused by this kernel. */
@@ -897,12 +891,10 @@ int policydb_load_isids(struct policydb *p, struct sidtab *s)
 			pr_err("SELinux:  unable to load initial SID %s.\n",
 			       name);
 			sidtab_destroy(s);
-			goto out;
+			return rc;
 		}
 	}
-	rc = 0;
-out:
-	return rc;
+	return 0;
 }
 
 int policydb_class_isvalid(struct policydb *p, unsigned int class)
@@ -1643,8 +1635,8 @@ bad:
 	return rc;
 }
 
-static int (*read_f[SYM_NUM]) (struct policydb *p, struct symtab *s, void *fp) =
-{
+static int (*const read_f[SYM_NUM]) (struct policydb *p,
+				     struct symtab *s, void *fp) = {
 	common_read,
 	class_read,
 	role_read,
@@ -2215,7 +2207,7 @@ out:
 	return rc;
 }
 
-static int ocontext_read(struct policydb *p, struct policydb_compat_info *info,
+static int ocontext_read(struct policydb *p, const struct policydb_compat_info *info,
 			 void *fp)
 {
 	int i, j, rc;
@@ -2411,7 +2403,7 @@ int policydb_read(struct policydb *p, void *fp)
 	u32 len, nprim, nel, perm;
 
 	char *policydb_str;
-	struct policydb_compat_info *info;
+	const struct policydb_compat_info *info;
 
 	policydb_init(p);
 
@@ -2589,7 +2581,6 @@ int policydb_read(struct policydb *p, void *fp)
 		if (rc)
 			goto bad;
 
-		rc = -EINVAL;
 		rtk->role = le32_to_cpu(buf[0]);
 		rtk->type = le32_to_cpu(buf[1]);
 		rtd->new_role = le32_to_cpu(buf[2]);
@@ -3246,9 +3237,7 @@ static int user_write(void *vkey, void *datum, void *ptr)
 	return 0;
 }
 
-static int (*write_f[SYM_NUM]) (void *key, void *datum,
-				void *datap) =
-{
+static int (*const write_f[SYM_NUM]) (void *key, void *datum, void *datap) = {
 	common_write,
 	class_write,
 	role_write,
@@ -3259,7 +3248,7 @@ static int (*write_f[SYM_NUM]) (void *key, void *datum,
 	cat_write,
 };
 
-static int ocontext_write(struct policydb *p, struct policydb_compat_info *info,
+static int ocontext_write(struct policydb *p, const struct policydb_compat_info *info,
 			  void *fp)
 {
 	unsigned int i, j, rc;
@@ -3616,7 +3605,7 @@ int policydb_write(struct policydb *p, void *fp)
 	__le32 buf[4];
 	u32 config;
 	size_t len;
-	struct policydb_compat_info *info;
+	const struct policydb_compat_info *info;
 
 	/*
 	 * refuse to write policy older than compressed avtab

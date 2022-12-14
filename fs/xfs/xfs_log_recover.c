@@ -25,6 +25,9 @@
 #include "xfs_icache.h"
 #include "xfs_error.h"
 #include "xfs_buf_item.h"
+#include "xfs_ag.h"
+#include "xfs_quota.h"
+#include "xfs_reflink.h"
 
 #define BLK_AVG(blk1, blk2)	((blk1+blk2) >> 1)
 
@@ -36,13 +39,6 @@ STATIC int
 xlog_clear_stale_blocks(
 	struct xlog	*,
 	xfs_lsn_t);
-#if defined(DEBUG)
-STATIC void
-xlog_recover_check_summary(
-	struct xlog *);
-#else
-#define	xlog_recover_check_summary(log)
-#endif
 STATIC int
 xlog_do_recovery_pass(
         struct xlog *, xfs_daddr_t, xfs_daddr_t, int, xfs_daddr_t *);
@@ -78,8 +74,6 @@ xlog_alloc_buffer(
 	struct xlog	*log,
 	int		nbblks)
 {
-	int align_mask = xfs_buftarg_dma_alignment(log->l_targ);
-
 	/*
 	 * Pass log block 0 since we don't have an addr yet, buffer will be
 	 * verified on read.
@@ -107,7 +101,7 @@ xlog_alloc_buffer(
 	if (nbblks > 1 && log->l_sectBBsize > 1)
 		nbblks += log->l_sectBBsize;
 	nbblks = round_up(nbblks, log->l_sectBBsize);
-	return kmem_alloc_io(BBTOB(nbblks), align_mask, KM_MAYFAIL | KM_ZERO);
+	return kvzalloc(BBTOB(nbblks), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
 }
 
 /*
@@ -128,7 +122,7 @@ xlog_do_io(
 	xfs_daddr_t		blk_no,
 	unsigned int		nbblks,
 	char			*data,
-	unsigned int		op)
+	enum req_op		op)
 {
 	int			error;
 
@@ -145,7 +139,7 @@ xlog_do_io(
 
 	error = xfs_rw_bdev(log->l_targ->bt_bdev, log->l_logBBstart + blk_no,
 			BBTOB(nbblks), data, op);
-	if (error && !XFS_FORCED_SHUTDOWN(log->l_mp)) {
+	if (error && !xlog_is_shutdown(log)) {
 		xfs_alert(log->l_mp,
 			  "log recovery %s I/O error at daddr 0x%llx len %d error %d",
 			  op == REQ_OP_WRITE ? "write" : "read",
@@ -374,7 +368,7 @@ out:
 static inline int
 xlog_logrec_hblks(struct xlog *log, struct xlog_rec_header *rh)
 {
-	if (xfs_sb_version_haslogv2(&log->l_mp->m_sb)) {
+	if (xfs_has_logv2(log->l_mp)) {
 		int	h_size = be32_to_cpu(rh->h_size);
 
 		if ((be32_to_cpu(rh->h_version) & XLOG_VERSION_2) &&
@@ -1346,7 +1340,7 @@ xlog_find_tail(
 	 * headers if we have a filesystem using non-persistent counters.
 	 */
 	if (clean)
-		log->l_mp->m_flags |= XFS_MOUNT_WAS_CLEAN;
+		set_bit(XFS_OPSTATE_CLEAN, &log->l_mp->m_opstate);
 
 	/*
 	 * Make sure that there are no blocks in front of the head
@@ -1503,7 +1497,7 @@ xlog_add_record(
 	recp->h_magicno = cpu_to_be32(XLOG_HEADER_MAGIC_NUM);
 	recp->h_cycle = cpu_to_be32(cycle);
 	recp->h_version = cpu_to_be32(
-			xfs_sb_version_haslogv2(&log->l_mp->m_sb) ? 2 : 1);
+			xfs_has_logv2(log->l_mp) ? 2 : 1);
 	recp->h_lsn = cpu_to_be64(xlog_assign_lsn(cycle, block));
 	recp->h_tail_lsn = cpu_to_be64(xlog_assign_lsn(tail_cycle, tail_block));
 	recp->h_fmt = cpu_to_be32(XLOG_FMT);
@@ -1755,6 +1749,30 @@ xlog_recover_release_intent(
 	spin_unlock(&ailp->ail_lock);
 }
 
+int
+xlog_recover_iget(
+	struct xfs_mount	*mp,
+	xfs_ino_t		ino,
+	struct xfs_inode	**ipp)
+{
+	int			error;
+
+	error = xfs_iget(mp, NULL, ino, 0, 0, ipp);
+	if (error)
+		return error;
+
+	error = xfs_qm_dqattach(*ipp);
+	if (error) {
+		xfs_irele(*ipp);
+		return error;
+	}
+
+	if (VFS_I(*ipp)->i_nlink == 0)
+		xfs_iflags_set(*ipp, XFS_IRECOVERY);
+
+	return 0;
+}
+
 /******************************************************************************
  *
  *		Log recover routines
@@ -1775,6 +1793,8 @@ static const struct xlog_recover_item_ops *xlog_recover_item_ops[] = {
 	&xlog_cud_item_ops,
 	&xlog_bui_item_ops,
 	&xlog_bud_item_ops,
+	&xlog_attri_item_ops,
+	&xlog_attrd_item_ops,
 };
 
 static const struct xlog_recover_item_ops *
@@ -2061,7 +2081,9 @@ xlog_recover_add_to_cont_trans(
 	old_ptr = item->ri_buf[item->ri_cnt-1].i_addr;
 	old_len = item->ri_buf[item->ri_cnt-1].i_len;
 
-	ptr = krealloc(old_ptr, len + old_len, GFP_KERNEL | __GFP_NOFAIL);
+	ptr = kvrealloc(old_ptr, old_len, len + old_len, GFP_KERNEL);
+	if (!ptr)
+		return -ENOMEM;
 	memcpy(&ptr[old_len], dp, len);
 	item->ri_buf[item->ri_cnt-1].i_len += len;
 	item->ri_buf[item->ri_cnt-1].i_addr = ptr;
@@ -2439,11 +2461,11 @@ xlog_finish_defer_ops(
 {
 	struct xfs_defer_capture *dfc, *next;
 	struct xfs_trans	*tp;
-	struct xfs_inode	*ip;
 	int			error = 0;
 
 	list_for_each_entry_safe(dfc, next, capture_list, dfc_list) {
 		struct xfs_trans_res	resv;
+		struct xfs_defer_resources dres;
 
 		/*
 		 * Create a new transaction reservation from the captured
@@ -2457,21 +2479,19 @@ xlog_finish_defer_ops(
 
 		error = xfs_trans_alloc(mp, &resv, dfc->dfc_blkres,
 				dfc->dfc_rtxres, XFS_TRANS_RESERVE, &tp);
-		if (error)
+		if (error) {
+			xlog_force_shutdown(mp->m_log, SHUTDOWN_LOG_IO_ERROR);
 			return error;
+		}
 
 		/*
 		 * Transfer to this new transaction all the dfops we captured
 		 * from recovering a single intent item.
 		 */
 		list_del_init(&dfc->dfc_list);
-		xfs_defer_ops_continue(dfc, tp, &ip);
-
+		xfs_defer_ops_continue(dfc, tp, &dres);
 		error = xfs_trans_commit(tp);
-		if (ip) {
-			xfs_iunlock(ip, XFS_ILOCK_EXCL);
-			xfs_irele(ip);
-		}
+		xfs_defer_resources_rele(&dres);
 		if (error)
 			return error;
 	}
@@ -2491,24 +2511,25 @@ xlog_abort_defer_ops(
 
 	list_for_each_entry_safe(dfc, next, capture_list, dfc_list) {
 		list_del_init(&dfc->dfc_list);
-		xfs_defer_ops_release(mp, dfc);
+		xfs_defer_ops_capture_free(mp, dfc);
 	}
 }
+
 /*
  * When this is called, all of the log intent items which did not have
- * corresponding log done items should be in the AIL.  What we do now
- * is update the data structures associated with each one.
+ * corresponding log done items should be in the AIL.  What we do now is update
+ * the data structures associated with each one.
  *
- * Since we process the log intent items in normal transactions, they
- * will be removed at some point after the commit.  This prevents us
- * from just walking down the list processing each one.  We'll use a
- * flag in the intent item to skip those that we've already processed
- * and use the AIL iteration mechanism's generation count to try to
- * speed this up at least a bit.
+ * Since we process the log intent items in normal transactions, they will be
+ * removed at some point after the commit.  This prevents us from just walking
+ * down the list processing each one.  We'll use a flag in the intent item to
+ * skip those that we've already processed and use the AIL iteration mechanism's
+ * generation count to try to speed this up at least a bit.
  *
- * When we start, we know that the intents are the only things in the
- * AIL.  As we process them, however, other items are added to the
- * AIL.
+ * When we start, we know that the intents are the only things in the AIL. As we
+ * process them, however, other items are added to the AIL. Hence we know we
+ * have started recovery on all the pending intents when we find an non-intent
+ * item in the AIL.
  */
 STATIC int
 xlog_recover_process_intents(
@@ -2531,17 +2552,8 @@ xlog_recover_process_intents(
 	for (lip = xfs_trans_ail_cursor_first(ailp, &cur, 0);
 	     lip != NULL;
 	     lip = xfs_trans_ail_cursor_next(ailp, &cur)) {
-		/*
-		 * We're done when we see something other than an intent.
-		 * There should be no intents left in the AIL now.
-		 */
-		if (!xlog_item_is_intent(lip)) {
-#ifdef DEBUG
-			for (; lip; lip = xfs_trans_ail_cursor_next(ailp, &cur))
-				ASSERT(!xlog_item_is_intent(lip));
-#endif
+		if (!xlog_item_is_intent(lip))
 			break;
-		}
 
 		/*
 		 * We should never see a redo item with a LSN higher than
@@ -2582,8 +2594,9 @@ err:
 }
 
 /*
- * A cancel occurs when the mount has failed and we're bailing out.
- * Release all pending log intent items so they don't pin the AIL.
+ * A cancel occurs when the mount has failed and we're bailing out.  Release all
+ * pending log intent items that we haven't started recovery on so they don't
+ * pin the AIL.
  */
 STATIC void
 xlog_recover_cancel_intents(
@@ -2597,17 +2610,8 @@ xlog_recover_cancel_intents(
 	spin_lock(&ailp->ail_lock);
 	lip = xfs_trans_ail_cursor_first(ailp, &cur, 0);
 	while (lip != NULL) {
-		/*
-		 * We're done when we see something other than an intent.
-		 * There should be no intents left in the AIL now.
-		 */
-		if (!xlog_item_is_intent(lip)) {
-#ifdef DEBUG
-			for (; lip; lip = xfs_trans_ail_cursor_next(ailp, &cur))
-				ASSERT(!xlog_item_is_intent(lip));
-#endif
+		if (!xlog_item_is_intent(lip))
 			break;
-		}
 
 		spin_unlock(&ailp->ail_lock);
 		lip->li_ops->iop_release(lip);
@@ -2625,21 +2629,21 @@ xlog_recover_cancel_intents(
  */
 STATIC void
 xlog_recover_clear_agi_bucket(
-	xfs_mount_t	*mp,
-	xfs_agnumber_t	agno,
-	int		bucket)
+	struct xfs_perag	*pag,
+	int			bucket)
 {
-	xfs_trans_t	*tp;
-	xfs_agi_t	*agi;
-	struct xfs_buf	*agibp;
-	int		offset;
-	int		error;
+	struct xfs_mount	*mp = pag->pag_mount;
+	struct xfs_trans	*tp;
+	struct xfs_agi		*agi;
+	struct xfs_buf		*agibp;
+	int			offset;
+	int			error;
 
 	error = xfs_trans_alloc(mp, &M_RES(mp)->tr_clearagi, 0, 0, 0, &tp);
 	if (error)
 		goto out_error;
 
-	error = xfs_read_agi(mp, tp, agno, &agibp);
+	error = xfs_read_agi(pag, tp, &agibp);
 	if (error)
 		goto out_abort;
 
@@ -2658,65 +2662,62 @@ xlog_recover_clear_agi_bucket(
 out_abort:
 	xfs_trans_cancel(tp);
 out_error:
-	xfs_warn(mp, "%s: failed to clear agi %d. Continuing.", __func__, agno);
+	xfs_warn(mp, "%s: failed to clear agi %d. Continuing.", __func__,
+			pag->pag_agno);
 	return;
 }
 
-STATIC xfs_agino_t
-xlog_recover_process_one_iunlink(
-	struct xfs_mount		*mp,
-	xfs_agnumber_t			agno,
-	xfs_agino_t			agino,
-	int				bucket)
+static int
+xlog_recover_iunlink_bucket(
+	struct xfs_perag	*pag,
+	struct xfs_agi		*agi,
+	int			bucket)
 {
-	struct xfs_buf			*ibp;
-	struct xfs_dinode		*dip;
-	struct xfs_inode		*ip;
-	xfs_ino_t			ino;
-	int				error;
+	struct xfs_mount	*mp = pag->pag_mount;
+	struct xfs_inode	*prev_ip = NULL;
+	struct xfs_inode	*ip;
+	xfs_agino_t		prev_agino, agino;
+	int			error = 0;
 
-	ino = XFS_AGINO_TO_INO(mp, agno, agino);
-	error = xfs_iget(mp, NULL, ino, 0, 0, &ip);
-	if (error)
-		goto fail;
+	agino = be32_to_cpu(agi->agi_unlinked[bucket]);
+	while (agino != NULLAGINO) {
+		error = xfs_iget(mp, NULL,
+				XFS_AGINO_TO_INO(mp, pag->pag_agno, agino),
+				0, 0, &ip);
+		if (error)
+			break;
 
-	/*
-	 * Get the on disk inode to find the next inode in the bucket.
-	 */
-	error = xfs_imap_to_bp(mp, NULL, &ip->i_imap, &dip, &ibp, 0);
-	if (error)
-		goto fail_iput;
+		ASSERT(VFS_I(ip)->i_nlink == 0);
+		ASSERT(VFS_I(ip)->i_mode != 0);
+		xfs_iflags_clear(ip, XFS_IRECOVERY);
+		agino = ip->i_next_unlinked;
 
-	xfs_iflags_clear(ip, XFS_IRECOVERY);
-	ASSERT(VFS_I(ip)->i_nlink == 0);
-	ASSERT(VFS_I(ip)->i_mode != 0);
+		if (prev_ip) {
+			ip->i_prev_unlinked = prev_agino;
+			xfs_irele(prev_ip);
 
-	/* setup for the next pass */
-	agino = be32_to_cpu(dip->di_next_unlinked);
-	xfs_buf_relse(ibp);
+			/*
+			 * Ensure the inode is removed from the unlinked list
+			 * before we continue so that it won't race with
+			 * building the in-memory list here. This could be
+			 * serialised with the agibp lock, but that just
+			 * serialises via lockstepping and it's much simpler
+			 * just to flush the inodegc queue and wait for it to
+			 * complete.
+			 */
+			xfs_inodegc_flush(mp);
+		}
 
-	/*
-	 * Prevent any DMAPI event from being sent when the reference on
-	 * the inode is dropped.
-	 */
-	ip->i_d.di_dmevmask = 0;
+		prev_agino = agino;
+		prev_ip = ip;
+	}
 
-	xfs_irele(ip);
-	return agino;
-
- fail_iput:
-	xfs_irele(ip);
- fail:
-	/*
-	 * We can't read in the inode this bucket points to, or this inode
-	 * is messed up.  Just ditch this bucket of inodes.  We will lose
-	 * some inodes and space, but at least we won't hang.
-	 *
-	 * Call xlog_recover_clear_agi_bucket() to perform a transaction to
-	 * clear the inode pointer in the bucket.
-	 */
-	xlog_recover_clear_agi_bucket(mp, agno, bucket);
-	return NULLAGINO;
+	if (prev_ip) {
+		ip->i_prev_unlinked = prev_agino;
+		xfs_irele(prev_ip);
+	}
+	xfs_inodegc_flush(mp);
+	return error;
 }
 
 /*
@@ -2736,62 +2737,76 @@ xlog_recover_process_one_iunlink(
  * of log space.
  *
  * This behaviour is bad for latency on single CPU and non-preemptible kernels,
- * and can prevent other filesytem work (such as CIL pushes) from running. This
+ * and can prevent other filesystem work (such as CIL pushes) from running. This
  * can lead to deadlocks if the recovery process runs out of log reservation
  * space. Hence we need to yield the CPU when there is other kernel work
  * scheduled on this CPU to ensure other scheduled work can run without undue
  * latency.
  */
-STATIC void
+static void
+xlog_recover_iunlink_ag(
+	struct xfs_perag	*pag)
+{
+	struct xfs_agi		*agi;
+	struct xfs_buf		*agibp;
+	int			bucket;
+	int			error;
+
+	error = xfs_read_agi(pag, NULL, &agibp);
+	if (error) {
+		/*
+		 * AGI is b0rked. Don't process it.
+		 *
+		 * We should probably mark the filesystem as corrupt after we've
+		 * recovered all the ag's we can....
+		 */
+		return;
+	}
+
+	/*
+	 * Unlock the buffer so that it can be acquired in the normal course of
+	 * the transaction to truncate and free each inode.  Because we are not
+	 * racing with anyone else here for the AGI buffer, we don't even need
+	 * to hold it locked to read the initial unlinked bucket entries out of
+	 * the buffer. We keep buffer reference though, so that it stays pinned
+	 * in memory while we need the buffer.
+	 */
+	agi = agibp->b_addr;
+	xfs_buf_unlock(agibp);
+
+	for (bucket = 0; bucket < XFS_AGI_UNLINKED_BUCKETS; bucket++) {
+		error = xlog_recover_iunlink_bucket(pag, agi, bucket);
+		if (error) {
+			/*
+			 * Bucket is unrecoverable, so only a repair scan can
+			 * free the remaining unlinked inodes. Just empty the
+			 * bucket and remaining inodes on it unreferenced and
+			 * unfreeable.
+			 */
+			xfs_inodegc_flush(pag->pag_mount);
+			xlog_recover_clear_agi_bucket(pag, bucket);
+		}
+	}
+
+	xfs_buf_rele(agibp);
+}
+
+static void
 xlog_recover_process_iunlinks(
 	struct xlog	*log)
 {
-	xfs_mount_t	*mp;
-	xfs_agnumber_t	agno;
-	xfs_agi_t	*agi;
-	struct xfs_buf	*agibp;
-	xfs_agino_t	agino;
-	int		bucket;
-	int		error;
+	struct xfs_perag	*pag;
+	xfs_agnumber_t		agno;
 
-	mp = log->l_mp;
+	for_each_perag(log->l_mp, agno, pag)
+		xlog_recover_iunlink_ag(pag);
 
-	for (agno = 0; agno < mp->m_sb.sb_agcount; agno++) {
-		/*
-		 * Find the agi for this ag.
-		 */
-		error = xfs_read_agi(mp, NULL, agno, &agibp);
-		if (error) {
-			/*
-			 * AGI is b0rked. Don't process it.
-			 *
-			 * We should probably mark the filesystem as corrupt
-			 * after we've recovered all the ag's we can....
-			 */
-			continue;
-		}
-		/*
-		 * Unlock the buffer so that it can be acquired in the normal
-		 * course of the transaction to truncate and free each inode.
-		 * Because we are not racing with anyone else here for the AGI
-		 * buffer, we don't even need to hold it locked to read the
-		 * initial unlinked bucket entries out of the buffer. We keep
-		 * buffer reference though, so that it stays pinned in memory
-		 * while we need the buffer.
-		 */
-		agi = agibp->b_addr;
-		xfs_buf_unlock(agibp);
-
-		for (bucket = 0; bucket < XFS_AGI_UNLINKED_BUCKETS; bucket++) {
-			agino = be32_to_cpu(agi->agi_unlinked[bucket]);
-			while (agino != NULLAGINO) {
-				agino = xlog_recover_process_one_iunlink(mp,
-							agno, agino, bucket);
-				cond_resched();
-			}
-		}
-		xfs_buf_rele(agibp);
-	}
+	/*
+	 * Flush the pending unlinked inodes to ensure that the inactivations
+	 * are fully completed on disk and the incore inodes can be reclaimed
+	 * before we signal that recovery is complete.
+	 */
+	xfs_inodegc_flush(log->l_mp);
 }
 
 STATIC void
@@ -2808,7 +2823,7 @@ xlog_unpack_data(
 		dp += BBSIZE;
 	}
 
-	if (xfs_sb_version_haslogv2(&log->l_mp->m_sb)) {
+	if (xfs_has_logv2(log->l_mp)) {
 		xlog_in_core_2_t *xhdr = (xlog_in_core_2_t *)rhead;
 		for ( ; i < BTOBB(be32_to_cpu(rhead->h_len)); i++) {
 			j = i / (XLOG_HEADER_CYCLE_SIZE / BBSIZE);
@@ -2856,7 +2871,7 @@ xlog_recover_process(
 	 * the kernel from one that does not add CRCs by default.
 	 */
 	if (crc != old_crc) {
-		if (old_crc || xfs_sb_version_hascrc(&log->l_mp->m_sb)) {
+		if (old_crc || xfs_has_crc(log->l_mp)) {
 			xfs_alert(log->l_mp,
 		"log record CRC mismatch: found 0x%x, expected 0x%x.",
 					le32_to_cpu(old_crc),
@@ -2868,7 +2883,7 @@ xlog_recover_process(
 		 * If the filesystem is CRC enabled, this mismatch becomes a
 		 * fatal log corruption failure.
 		 */
-		if (xfs_sb_version_hascrc(&log->l_mp->m_sb)) {
+		if (xfs_has_crc(log->l_mp)) {
 			XFS_ERROR_REPORT(__func__, XFS_ERRLEVEL_LOW, log->l_mp);
 			return -EFSCORRUPTED;
 		}
@@ -2954,7 +2969,7 @@ xlog_do_recovery_pass(
 	 * Read the header of the tail block and get the iclog buffer size from
 	 * h_size.  Use this to tell how many sectors make up the log header.
 	 */
-	if (xfs_sb_version_haslogv2(&log->l_mp->m_sb)) {
+	if (xfs_has_logv2(log->l_mp)) {
 		/*
 		 * When using variable length iclogs, read first sector of
 		 * iclog header and extract the header size from it.  Get a
@@ -3221,7 +3236,7 @@ xlog_do_log_recovery(
 	xfs_daddr_t	head_blk,
 	xfs_daddr_t	tail_blk)
 {
-	int		error, i;
+	int		error;
 
 	ASSERT(head_blk != tail_blk);
 
@@ -3229,37 +3244,25 @@ xlog_do_log_recovery(
 	 * First do a pass to find all of the cancelled buf log items.
 	 * Store them in the buf_cancel_table for use in the second pass.
 	 */
-	log->l_buf_cancel_table = kmem_zalloc(XLOG_BC_TABLE_SIZE *
-						 sizeof(struct list_head),
-						 0);
-	for (i = 0; i < XLOG_BC_TABLE_SIZE; i++)
-		INIT_LIST_HEAD(&log->l_buf_cancel_table[i]);
+	error = xlog_alloc_buf_cancel_table(log);
+	if (error)
+		return error;
 
 	error = xlog_do_recovery_pass(log, head_blk, tail_blk,
 				      XLOG_RECOVER_PASS1, NULL);
-	if (error != 0) {
-		kmem_free(log->l_buf_cancel_table);
-		log->l_buf_cancel_table = NULL;
-		return error;
-	}
+	if (error != 0)
+		goto out_cancel;
+
 	/*
 	 * Then do a second pass to actually recover the items in the log.
 	 * When it is complete free the table of buf cancel items.
 	 */
 	error = xlog_do_recovery_pass(log, head_blk, tail_blk,
 				      XLOG_RECOVER_PASS2, NULL);
-#ifdef DEBUG
-	if (!error) {
-		int	i;
-
-		for (i = 0; i < XLOG_BC_TABLE_SIZE; i++)
-			ASSERT(list_empty(&log->l_buf_cancel_table[i]));
-	}
-#endif	/* DEBUG */
-
-	kmem_free(log->l_buf_cancel_table);
-	log->l_buf_cancel_table = NULL;
-
+	if (!error)
+		xlog_check_buf_cancel_table(log);
+out_cancel:
+	xlog_free_buf_cancel_table(log);
 	return error;
 }
 
@@ -3286,10 +3289,7 @@ xlog_do_recover(
 	if (error)
 		return error;
 
-	/*
-	 * If IO errors happened during recovery, bail out.
-	 */
-	if (XFS_FORCED_SHUTDOWN(mp))
+	if (xlog_is_shutdown(log))
 		return -EIO;
 
 	/*
@@ -3311,7 +3311,7 @@ xlog_do_recover(
 	xfs_buf_hold(bp);
 	error = _xfs_buf_read(bp, XBF_READ);
 	if (error) {
-		if (!XFS_FORCED_SHUTDOWN(mp)) {
+		if (!xlog_is_shutdown(log)) {
 			xfs_buf_ioerror_alert(bp, __this_address);
 			ASSERT(0);
 		}
@@ -3324,18 +3324,18 @@ xlog_do_recover(
 	xfs_buf_relse(bp);
 
 	/* re-initialise in-core superblock and geometry structures */
+	mp->m_features |= xfs_sb_version_to_features(sbp);
 	xfs_reinit_percpu_counters(mp);
-	error = xfs_initialize_perag(mp, sbp->sb_agcount, &mp->m_maxagi);
+	error = xfs_initialize_perag(mp, sbp->sb_agcount, sbp->sb_dblocks,
+			&mp->m_maxagi);
 	if (error) {
 		xfs_warn(mp, "Failed post-recovery per-ag init: %d", error);
 		return error;
 	}
 	mp->m_alloc_set_aside = xfs_alloc_set_aside(mp);
 
-	xlog_recover_check_summary(log);
-
 	/* Normal transactions can now occur */
-	log->l_flags &= ~XLOG_ACTIVE_RECOVERY;
+	clear_bit(XLOG_ACTIVE_RECOVERY, &log->l_opstate);
 	return 0;
 }
 
@@ -3361,7 +3361,7 @@ xlog_recover(
 	 * could not be verified. Check the superblock LSN against the current
 	 * LSN now that it's known.
 	 */
-	if (xfs_sb_version_hascrc(&log->l_mp->m_sb) &&
+	if (xfs_has_crc(log->l_mp) &&
 	    !xfs_log_check_lsn(log->l_mp, log->l_mp->m_sb.sb_lsn))
 		return -EINVAL;
 
@@ -3388,7 +3388,7 @@ xlog_recover(
 		 * (e.g. unsupported transactions, then simply reject the
 		 * attempt at recovery before touching anything.
 		 */
-		if (XFS_SB_VERSION_NUM(&log->l_mp->m_sb) == XFS_SB_VERSION_5 &&
+		if (xfs_sb_is_v5(&log->l_mp->m_sb) &&
 		    xfs_sb_has_incompat_log_feature(&log->l_mp->m_sb,
 					XFS_SB_FEAT_INCOMPAT_LOG_UNKNOWN)) {
 			xfs_warn(log->l_mp,
@@ -3404,7 +3404,7 @@ xlog_recover(
 
 		/*
 		 * Delay log recovery if the debug hook is set. This is debug
-		 * instrumention to coordinate simulation of I/O failures with
+		 * instrumentation to coordinate simulation of I/O failures with
 		 * log recovery.
 		 */
 		if (xfs_globals.log_recovery_delay) {
@@ -3419,67 +3419,85 @@ xlog_recover(
 						     : "internal");
 
 		error = xlog_do_recover(log, head_blk, tail_blk);
-		log->l_flags |= XLOG_RECOVERY_NEEDED;
+		set_bit(XLOG_RECOVERY_NEEDED, &log->l_opstate);
 	}
 	return error;
 }
 
 /*
- * In the first part of recovery we replay inodes and buffers and build
- * up the list of extent free items which need to be processed.  Here
- * we process the extent free items and clean up the on disk unlinked
- * inode lists.  This is separated from the first part of recovery so
- * that the root and real-time bitmap inodes can be read in from disk in
- * between the two stages.  This is necessary so that we can free space
- * in the real-time portion of the file system.
+ * In the first part of recovery we replay inodes and buffers and build up the
+ * list of intents which need to be processed. Here we process the intents and
+ * clean up the on disk unlinked inode lists. This is separated from the first
+ * part of recovery so that the root and real-time bitmap inodes can be read in
+ * from disk in between the two stages.  This is necessary so that we can free
+ * space in the real-time portion of the file system.
  */
 int
 xlog_recover_finish(
 	struct xlog	*log)
 {
+	int	error;
+
+	error = xlog_recover_process_intents(log);
+	if (error) {
+		/*
+		 * Cancel all the unprocessed intent items now so that we don't
+		 * leave them pinned in the AIL.  This can cause the AIL to
+		 * livelock on the pinned item if anyone tries to push the AIL
+		 * (inode reclaim does this) before we get around to
+		 * xfs_log_mount_cancel.
+		 */
+		xlog_recover_cancel_intents(log);
+		xfs_alert(log->l_mp, "Failed to recover intents");
+		xlog_force_shutdown(log, SHUTDOWN_LOG_IO_ERROR);
+		return error;
+	}
+
 	/*
-	 * Now we're ready to do the transactions needed for the
-	 * rest of recovery.  Start with completing all the extent
-	 * free intent records and then process the unlinked inode
-	 * lists.  At this point, we essentially run in normal mode
-	 * except that we're still performing recovery actions
-	 * rather than accepting new requests.
+	 * Sync the log to get all the intents out of the AIL.  This isn't
+	 * absolutely necessary, but it helps in case the unlink transactions
+	 * would have problems pushing the intents out of the way.
 	 */
-	if (log->l_flags & XLOG_RECOVERY_NEEDED) {
-		int	error;
-		error = xlog_recover_process_intents(log);
-		if (error) {
-			/*
-			 * Cancel all the unprocessed intent items now so that
-			 * we don't leave them pinned in the AIL.  This can
-			 * cause the AIL to livelock on the pinned item if
-			 * anyone tries to push the AIL (inode reclaim does
-			 * this) before we get around to xfs_log_mount_cancel.
-			 */
-			xlog_recover_cancel_intents(log);
-			xfs_alert(log->l_mp, "Failed to recover intents");
+	xfs_log_force(log->l_mp, XFS_LOG_SYNC);
+
+	/*
+	 * Now that we've recovered the log and all the intents, we can clear
+	 * the log incompat feature bits in the superblock because there's no
+	 * longer anything to protect.  We rely on the AIL push to write out the
+	 * updated superblock after everything else.
+	 */
+	if (xfs_clear_incompat_log_features(log->l_mp)) {
+		error = xfs_sync_sb(log->l_mp, false);
+		if (error < 0) {
+			xfs_alert(log->l_mp,
+	"Failed to clear log incompat features on recovery");
 			return error;
 		}
-
-		/*
-		 * Sync the log to get all the intents out of the AIL.
-		 * This isn't absolutely necessary, but it helps in
-		 * case the unlink transactions would have problems
-		 * pushing the intents out of the way.
-		 */
-		xfs_log_force(log->l_mp, XFS_LOG_SYNC);
-
-		xlog_recover_process_iunlinks(log);
-
-		xlog_recover_check_summary(log);
-
-		xfs_notice(log->l_mp, "Ending recovery (logdev: %s)",
-				log->l_mp->m_logname ? log->l_mp->m_logname
-						     : "internal");
-		log->l_flags &= ~XLOG_RECOVERY_NEEDED;
-	} else {
-		xfs_info(log->l_mp, "Ending clean mount");
 	}
+
+	xlog_recover_process_iunlinks(log);
+
+	/*
+	 * Recover any CoW staging blocks that are still referenced by the
+	 * ondisk refcount metadata.  During mount there cannot be any live
+	 * staging extents as we have not permitted any user modifications.
+	 * Therefore, it is safe to free them all right now, even on a
+	 * read-only mount.
+	 */
+	error = xfs_reflink_recover_cow(log->l_mp);
+	if (error) {
+		xfs_alert(log->l_mp,
+	"Failed to recover leftover CoW staging extents, err %d.",
+				error);
+		/*
+		 * If we get an error here, make sure the log is shut down
+		 * but return zero so that any log items committed since the
+		 * end of intents processing can be pushed through the CIL
+		 * and AIL.
+		 */
+		xlog_force_shutdown(log, SHUTDOWN_LOG_IO_ERROR);
+	}
+
 	return 0;
 }
 
@@ -3487,57 +3505,7 @@ void
 xlog_recover_cancel(
 	struct xlog	*log)
 {
-	if (log->l_flags & XLOG_RECOVERY_NEEDED)
+	if (xlog_recovery_needed(log))
 		xlog_recover_cancel_intents(log);
 }
 
-#if defined(DEBUG)
-/*
- * Read all of the agf and agi counters and check that they
- * are consistent with the superblock counters.
- */
-STATIC void
-xlog_recover_check_summary(
-	struct xlog	*log)
-{
-	xfs_mount_t	*mp;
-	struct xfs_buf	*agfbp;
-	struct xfs_buf	*agibp;
-	xfs_agnumber_t	agno;
-	uint64_t	freeblks;
-	uint64_t	itotal;
-	uint64_t	ifree;
-	int		error;
-
-	mp = log->l_mp;
-
-	freeblks = 0LL;
-	itotal = 0LL;
-	ifree = 0LL;
-	for (agno = 0; agno < mp->m_sb.sb_agcount; agno++) {
-		error = xfs_read_agf(mp, NULL, agno, 0, &agfbp);
-		if (error) {
-			xfs_alert(mp, "%s agf read failed agno %d error %d",
-						__func__, agno, error);
-		} else {
-			struct xfs_agf	*agfp = agfbp->b_addr;
-
-			freeblks += be32_to_cpu(agfp->agf_freeblks) +
-				    be32_to_cpu(agfp->agf_flcount);
-			xfs_buf_relse(agfbp);
-		}
-
-		error = xfs_read_agi(mp, NULL, agno, &agibp);
-		if (error) {
-			xfs_alert(mp, "%s agi read failed agno %d error %d",
-						__func__, agno, error);
-		} else {
-			struct xfs_agi	*agi = agibp->b_addr;
-
-			itotal += be32_to_cpu(agi->agi_count);
-			ifree += be32_to_cpu(agi->agi_freecount);
-			xfs_buf_relse(agibp);
-		}
-	}
-}
-#endif /* DEBUG */

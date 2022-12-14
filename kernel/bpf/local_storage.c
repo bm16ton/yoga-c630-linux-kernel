@@ -1,6 +1,7 @@
-//SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-2.0
 #include <linux/bpf-cgroup.h>
 #include <linux/bpf.h>
+#include <linux/bpf_local_storage.h>
 #include <linux/btf.h>
 #include <linux/bug.h>
 #include <linux/filter.h>
@@ -8,8 +9,7 @@
 #include <linux/rbtree.h>
 #include <linux/slab.h>
 #include <uapi/linux/btf.h>
-
-DEFINE_PER_CPU(struct bpf_cgroup_storage*, bpf_cgroup_storage[MAX_BPF_CGROUP_STORAGE_TYPE]);
+#include <linux/btf_ids.h>
 
 #ifdef CONFIG_CGROUP_BPF
 
@@ -164,15 +164,14 @@ static int cgroup_storage_update_elem(struct bpf_map *map, void *key,
 		return 0;
 	}
 
-	new = bpf_map_kmalloc_node(map, sizeof(struct bpf_storage_buffer) +
-				   map->value_size,
-				   __GFP_ZERO | GFP_ATOMIC | __GFP_NOWARN,
+	new = bpf_map_kmalloc_node(map, struct_size(new, data, map->value_size),
+				   __GFP_ZERO | GFP_NOWAIT | __GFP_NOWARN,
 				   map->numa_node);
 	if (!new)
 		return -ENOMEM;
 
 	memcpy(&new->data[0], value, map->value_size);
-	check_and_init_map_lock(map, new->data);
+	check_and_init_map_value(map, new->data);
 
 	new = xchg(&storage->buf, new);
 	kfree_rcu(new, rcu);
@@ -285,8 +284,16 @@ enoent:
 
 static struct bpf_map *cgroup_storage_map_alloc(union bpf_attr *attr)
 {
+	__u32 max_value_size = BPF_LOCAL_STORAGE_MAX_VALUE_SIZE;
 	int numa_node = bpf_map_attr_numa_node(attr);
 	struct bpf_cgroup_storage_map *map;
+
+	/* percpu is bound by PCPU_MIN_UNIT_SIZE, non-percu
+	 * is the same as other local storages.
+	 */
+	if (attr->map_type == BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE)
+		max_value_size = min_t(__u32, max_value_size,
+				       PCPU_MIN_UNIT_SIZE);
 
 	if (attr->key_size != sizeof(struct bpf_cgroup_storage_key) &&
 	    attr->key_size != sizeof(__u64))
@@ -295,7 +302,7 @@ static struct bpf_map *cgroup_storage_map_alloc(union bpf_attr *attr)
 	if (attr->value_size == 0)
 		return ERR_PTR(-EINVAL);
 
-	if (attr->value_size > PAGE_SIZE)
+	if (attr->value_size > max_value_size)
 		return ERR_PTR(-E2BIG);
 
 	if (attr->map_flags & ~LOCAL_STORAGE_CREATE_FLAG_MASK ||
@@ -408,7 +415,7 @@ static int cgroup_storage_check_btf(const struct bpf_map *map,
 static void cgroup_storage_seq_show_elem(struct bpf_map *map, void *key,
 					 struct seq_file *m)
 {
-	enum bpf_cgroup_storage_type stype = cgroup_storage_type(map);
+	enum bpf_cgroup_storage_type stype;
 	struct bpf_cgroup_storage *storage;
 	int cpu;
 
@@ -440,7 +447,8 @@ static void cgroup_storage_seq_show_elem(struct bpf_map *map, void *key,
 	rcu_read_unlock();
 }
 
-static int cgroup_storage_map_btf_id;
+BTF_ID_LIST_SINGLE(cgroup_storage_map_btf_ids, struct,
+		   bpf_cgroup_storage_map)
 const struct bpf_map_ops cgroup_storage_map_ops = {
 	.map_alloc = cgroup_storage_map_alloc,
 	.map_free = cgroup_storage_map_free,
@@ -450,8 +458,7 @@ const struct bpf_map_ops cgroup_storage_map_ops = {
 	.map_delete_elem = cgroup_storage_delete_elem,
 	.map_check_btf = cgroup_storage_check_btf,
 	.map_seq_show_elem = cgroup_storage_seq_show_elem,
-	.map_btf_name = "bpf_cgroup_storage_map",
-	.map_btf_id = &cgroup_storage_map_btf_id,
+	.map_btf_id = &cgroup_storage_map_btf_ids[0],
 };
 
 int bpf_cgroup_storage_assign(struct bpf_prog_aux *aux, struct bpf_map *_map)
@@ -508,7 +515,7 @@ struct bpf_cgroup_storage *bpf_cgroup_storage_alloc(struct bpf_prog *prog,
 						    map->numa_node);
 		if (!storage->buf)
 			goto enomem;
-		check_and_init_map_lock(map, storage->buf->data);
+		check_and_init_map_value(map, storage->buf->data);
 	} else {
 		storage->percpu_buf = bpf_map_alloc_percpu(map, size, 8, gfp);
 		if (!storage->percpu_buf)

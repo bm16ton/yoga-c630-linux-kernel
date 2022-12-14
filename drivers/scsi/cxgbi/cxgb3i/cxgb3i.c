@@ -98,6 +98,7 @@ static struct scsi_host_template cxgb3i_host_template = {
 	.dma_boundary	= PAGE_SIZE - 1,
 	.this_id	= -1,
 	.track_queue_depth = 1,
+	.cmd_size	= sizeof(struct iscsi_cmd),
 };
 
 static struct iscsi_transport cxgb3i_iscsi_transport = {
@@ -1178,7 +1179,7 @@ static int ddp_setup_conn_pgidx(struct cxgbi_sock *csk,
 }
 
 /**
- * cxgb3i_setup_conn_digest - setup conn. digest setting
+ * ddp_setup_conn_digest - setup conn. digest setting
  * @csk: cxgb tcp socket
  * @tid: connection id
  * @hcrc: header digest enabled

@@ -389,10 +389,6 @@ static void say_attributes(struct vc_data *vc)
 	int fg = spk_attr & 0x0f;
 	int bg = spk_attr >> 4;
 
-	if (fg > 8) {
-		synth_printf("%s ", spk_msg_get(MSG_BRIGHT));
-		fg -= 8;
-	}
 	synth_printf("%s", spk_msg_get(MSG_COLORS_START + fg));
 	if (bg > 7) {
 		synth_printf(" %s ", spk_msg_get(MSG_ON_BLINKING));
@@ -474,7 +470,7 @@ static u16 get_char(struct vc_data *vc, u16 *pos, u_char *attribs)
 			c |= 0x100;
 		}
 
-		ch = inverse_translate(vc, c, 1);
+		ch = inverse_translate(vc, c, true);
 		*attribs = (w & 0xff00) >> 8;
 	}
 	return ch;
@@ -1782,7 +1778,7 @@ static void speakup_con_update(struct vc_data *vc)
 {
 	unsigned long flags;
 
-	if (!speakup_console[vc->vc_num] || spk_parked)
+	if (!speakup_console[vc->vc_num] || spk_parked || !synth)
 		return;
 	if (!spin_trylock_irqsave(&speakup_info.spinlock, flags))
 		/* Speakup output, discard */

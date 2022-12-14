@@ -6,7 +6,6 @@
 #include <linux/zalloc.h>
 #include <linux/string.h>
 #include <linux/limits.h>
-#include <linux/string.h>
 #include <string.h>
 #include <sys/file.h>
 #include <signal.h>
@@ -24,8 +23,6 @@
 #include <sys/signalfd.h>
 #include <sys/wait.h>
 #include <poll.h>
-#include <sys/stat.h>
-#include <time.h>
 #include "builtin.h"
 #include "perf.h"
 #include "debug.h"
@@ -1124,8 +1121,6 @@ static int setup_config(struct daemon *daemon)
 #ifndef F_TLOCK
 #define F_TLOCK 2
 
-#include <sys/file.h>
-
 static int lockf(int fd, int cmd, off_t len)
 {
 	if (cmd != F_TLOCK || len != 0)
@@ -1406,8 +1401,10 @@ out:
 
 static int send_cmd_list(struct daemon *daemon)
 {
-	union cmd cmd = { .cmd = CMD_LIST, };
+	union cmd cmd;
 
+	memset(&cmd, 0, sizeof(cmd));
+	cmd.list.cmd = CMD_LIST;
 	cmd.list.verbose = verbose;
 	cmd.list.csv_sep = daemon->csv_sep ? *daemon->csv_sep : 0;
 
@@ -1435,6 +1432,7 @@ static int __cmd_signal(struct daemon *daemon, struct option parent_options[],
 		return -1;
 	}
 
+	memset(&cmd, 0, sizeof(cmd));
 	cmd.signal.cmd = CMD_SIGNAL,
 	cmd.signal.sig = SIGUSR2;
 	strncpy(cmd.signal.name, name, sizeof(cmd.signal.name) - 1);
@@ -1449,7 +1447,7 @@ static int __cmd_stop(struct daemon *daemon, struct option parent_options[],
 		OPT_PARENT(parent_options),
 		OPT_END()
 	};
-	union cmd cmd = { .cmd = CMD_STOP, };
+	union cmd cmd;
 
 	argc = parse_options(argc, argv, start_options, daemon_usage, 0);
 	if (argc)
@@ -1460,6 +1458,8 @@ static int __cmd_stop(struct daemon *daemon, struct option parent_options[],
 		return -1;
 	}
 
+	memset(&cmd, 0, sizeof(cmd));
+	cmd.cmd = CMD_STOP;
 	return send_cmd(daemon, &cmd);
 }
 
@@ -1473,7 +1473,7 @@ static int __cmd_ping(struct daemon *daemon, struct option parent_options[],
 		OPT_PARENT(parent_options),
 		OPT_END()
 	};
-	union cmd cmd = { .cmd = CMD_PING, };
+	union cmd cmd;
 
 	argc = parse_options(argc, argv, ping_options, daemon_usage, 0);
 	if (argc)
@@ -1484,6 +1484,8 @@ static int __cmd_ping(struct daemon *daemon, struct option parent_options[],
 		return -1;
 	}
 
+	memset(&cmd, 0, sizeof(cmd));
+	cmd.cmd = CMD_PING;
 	scnprintf(cmd.ping.name, sizeof(cmd.ping.name), "%s", name);
 	return send_cmd(daemon, &cmd);
 }

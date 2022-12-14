@@ -11,10 +11,9 @@
 #include <linux/module.h>
 #include <linux/regmap.h>
 #include <linux/usb/pd.h>
+#include <linux/usb/tcpci.h>
 #include <linux/usb/tcpm.h>
 #include <linux/usb/typec.h>
-
-#include "tcpci.h"
 
 #define PD_ACTIVITY_TIMEOUT_MS				10000
 
@@ -52,7 +51,7 @@ static const struct regmap_range max_tcpci_tcpci_range[] = {
 	regmap_reg_range(0x00, 0x95)
 };
 
-const struct regmap_access_table max_tcpci_tcpci_write_table = {
+static const struct regmap_access_table max_tcpci_tcpci_write_table = {
 	.yes_ranges = max_tcpci_tcpci_range,
 	.n_yes_ranges = ARRAY_SIZE(max_tcpci_tcpci_range),
 };

@@ -281,6 +281,7 @@ struct mpc_funcs {
 	struct mpcc* (*get_mpcc_for_dpp_from_secondary)(
 			struct mpc_tree *tree,
 			int dpp_id);
+
 	struct mpcc* (*get_mpcc_for_dpp)(
 			struct mpc_tree *tree,
 			int dpp_id);
@@ -345,6 +346,11 @@ struct mpc_funcs {
 			int mpcc_id,
 			const struct mpc_grph_gamut_adjustment *adjust);
 
+	bool (*program_1dlut)(
+			struct mpc *mpc,
+			const struct pwl_params *params,
+			uint32_t rmu_idx);
+
 	bool (*program_shaper)(
 			struct mpc *mpc,
 			const struct pwl_params *params,
@@ -363,6 +369,10 @@ struct mpc_funcs {
 			struct mpc *mpc,
 			int opp_id);
 
+	void (*set_bg_color)(struct mpc *mpc,
+			struct tg_color *bg_color,
+			int mpcc_id);
+	void (*set_mpc_mem_lp_mode)(struct mpc *mpc);
 };
 
 #endif

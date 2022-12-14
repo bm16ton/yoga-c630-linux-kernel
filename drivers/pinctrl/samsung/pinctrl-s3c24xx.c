@@ -234,14 +234,12 @@ static void s3c2410_demux_eint0_3(struct irq_desc *desc)
 {
 	struct irq_data *data = irq_desc_get_irq_data(desc);
 	struct s3c24xx_eint_data *eint_data = irq_desc_get_handler_data(desc);
-	unsigned int virq;
+	int ret;
 
 	/* the first 4 eints have a simple 1 to 1 mapping */
-	virq = irq_linear_revmap(eint_data->domains[data->hwirq], data->hwirq);
+	ret = generic_handle_domain_irq(eint_data->domains[data->hwirq], data->hwirq);
 	/* Something must be really wrong if an unmapped EINT is unmasked */
-	BUG_ON(!virq);
-
-	generic_handle_irq(virq);
+	BUG_ON(ret);
 }
 
 /* Handling of EINTs 0-3 on S3C2412 and S3C2413 */
@@ -290,16 +288,14 @@ static void s3c2412_demux_eint0_3(struct irq_desc *desc)
 	struct s3c24xx_eint_data *eint_data = irq_desc_get_handler_data(desc);
 	struct irq_data *data = irq_desc_get_irq_data(desc);
 	struct irq_chip *chip = irq_data_get_irq_chip(data);
-	unsigned int virq;
+	int ret;
 
 	chained_irq_enter(chip, desc);
 
 	/* the first 4 eints have a simple 1 to 1 mapping */
-	virq = irq_linear_revmap(eint_data->domains[data->hwirq], data->hwirq);
+	ret = generic_handle_domain_irq(eint_data->domains[data->hwirq], data->hwirq);
 	/* Something must be really wrong if an unmapped EINT is unmasked */
-	BUG_ON(!virq);
-
-	generic_handle_irq(virq);
+	BUG_ON(ret);
 
 	chained_irq_exit(chip, desc);
 }
@@ -364,15 +360,14 @@ static inline void s3c24xx_demux_eint(struct irq_desc *desc,
 	pend &= range;
 
 	while (pend) {
-		unsigned int virq, irq;
+		unsigned int irq;
+		int ret;
 
 		irq = __ffs(pend);
 		pend &= ~(1 << irq);
-		virq = irq_linear_revmap(data->domains[irq], irq - offset);
+		ret = generic_handle_domain_irq(data->domains[irq], irq - offset);
 		/* Something is really wrong if an unmapped EINT is unmasked */
-		BUG_ON(!virq);
-
-		generic_handle_irq(virq);
+		BUG_ON(ret);
 	}
 
 	chained_irq_exit(chip, desc);
@@ -530,7 +525,7 @@ static int s3c24xx_eint_init(struct samsung_pinctrl_drv_data *d)
 		ops = (bank->eint_offset == 0) ? &s3c24xx_gpf_irq_ops
 					       : &s3c24xx_gpg_irq_ops;
 
-		bank->irq_domain = irq_domain_add_linear(bank->of_node,
+		bank->irq_domain = irq_domain_create_linear(bank->fwnode,
 				bank->nr_pins, ops, ddata);
 		if (!bank->irq_domain) {
 			dev_err(dev, "wkup irq domain add failed\n");

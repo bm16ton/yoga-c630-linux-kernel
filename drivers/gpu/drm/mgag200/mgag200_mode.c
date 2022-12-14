@@ -9,7 +9,7 @@
  */
 
 #include <linux/delay.h>
-#include <linux/dma-buf-map.h>
+#include <linux/iosys-map.h>
 
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_atomic_state_helper.h>
@@ -17,6 +17,8 @@
 #include <drm/drm_damage_helper.h>
 #include <drm/drm_format_helper.h>
 #include <drm/drm_fourcc.h>
+#include <drm/drm_framebuffer.h>
+#include <drm/drm_gem_atomic_helper.h>
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_plane_helper.h>
 #include <drm/drm_print.h>
@@ -31,57 +33,78 @@
  * This file contains setup code for the CRTC.
  */
 
-static void mga_crtc_load_lut(struct drm_crtc *crtc)
+static void mgag200_crtc_set_gamma_linear(struct mga_device *mdev,
+					  const struct drm_format_info *format)
 {
-	struct drm_device *dev = crtc->dev;
-	struct mga_device *mdev = to_mga_device(dev);
-	struct drm_framebuffer *fb;
-	u16 *r_ptr, *g_ptr, *b_ptr;
 	int i;
-
-	if (!crtc->enabled)
-		return;
-
-	if (!mdev->display_pipe.plane.state)
-		return;
-
-	fb = mdev->display_pipe.plane.state->fb;
-
-	r_ptr = crtc->gamma_store;
-	g_ptr = r_ptr + crtc->gamma_size;
-	b_ptr = g_ptr + crtc->gamma_size;
 
 	WREG8(DAC_INDEX + MGA1064_INDEX, 0);
 
-	if (fb && fb->format->cpp[0] * 8 == 16) {
-		int inc = (fb->format->depth == 15) ? 8 : 4;
-		u8 r, b;
-		for (i = 0; i < MGAG200_LUT_SIZE; i += inc) {
-			if (fb->format->depth == 16) {
-				if (i > (MGAG200_LUT_SIZE >> 1)) {
-					r = b = 0;
-				} else {
-					r = *r_ptr++ >> 8;
-					b = *b_ptr++ >> 8;
-					r_ptr++;
-					b_ptr++;
-				}
-			} else {
-				r = *r_ptr++ >> 8;
-				b = *b_ptr++ >> 8;
-			}
-			/* VGA registers */
-			WREG8(DAC_INDEX + MGA1064_COL_PAL, r);
-			WREG8(DAC_INDEX + MGA1064_COL_PAL, *g_ptr++ >> 8);
-			WREG8(DAC_INDEX + MGA1064_COL_PAL, b);
+	switch (format->format) {
+	case DRM_FORMAT_RGB565:
+		/* Use better interpolation, to take 32 values from 0 to 255 */
+		for (i = 0; i < MGAG200_LUT_SIZE / 8; i++) {
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, i * 8 + i / 4);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, i * 4 + i / 16);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, i * 8 + i / 4);
 		}
-		return;
+		/* Green has one more bit, so add padding with 0 for red and blue. */
+		for (i = MGAG200_LUT_SIZE / 8; i < MGAG200_LUT_SIZE / 4; i++) {
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, 0);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, i * 4 + i / 16);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, 0);
+		}
+		break;
+	case DRM_FORMAT_RGB888:
+	case DRM_FORMAT_XRGB8888:
+		for (i = 0; i < MGAG200_LUT_SIZE; i++) {
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, i);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, i);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, i);
+		}
+		break;
+	default:
+		drm_warn_once(&mdev->base, "Unsupported format %p4cc for gamma correction\n",
+			      &format->format);
+		break;
 	}
-	for (i = 0; i < MGAG200_LUT_SIZE; i++) {
-		/* VGA registers */
-		WREG8(DAC_INDEX + MGA1064_COL_PAL, *r_ptr++ >> 8);
-		WREG8(DAC_INDEX + MGA1064_COL_PAL, *g_ptr++ >> 8);
-		WREG8(DAC_INDEX + MGA1064_COL_PAL, *b_ptr++ >> 8);
+}
+
+static void mgag200_crtc_set_gamma(struct mga_device *mdev,
+				   const struct drm_format_info *format,
+				   struct drm_color_lut *lut)
+{
+	int i;
+
+	WREG8(DAC_INDEX + MGA1064_INDEX, 0);
+
+	switch (format->format) {
+	case DRM_FORMAT_RGB565:
+		/* Use better interpolation, to take 32 values from lut[0] to lut[255] */
+		for (i = 0; i < MGAG200_LUT_SIZE / 8; i++) {
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, lut[i * 8 + i / 4].red >> 8);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, lut[i * 4 + i / 16].green >> 8);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, lut[i * 8 + i / 4].blue >> 8);
+		}
+		/* Green has one more bit, so add padding with 0 for red and blue. */
+		for (i = MGAG200_LUT_SIZE / 8; i < MGAG200_LUT_SIZE / 4; i++) {
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, 0);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, lut[i * 4 + i / 16].green >> 8);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, 0);
+		}
+		break;
+	case DRM_FORMAT_RGB888:
+	case DRM_FORMAT_XRGB8888:
+		for (i = 0; i < MGAG200_LUT_SIZE; i++) {
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, lut[i].red >> 8);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, lut[i].green >> 8);
+			WREG8(DAC_INDEX + MGA1064_COL_PAL, lut[i].blue >> 8);
+		}
+		break;
+	default:
+		drm_warn_once(&mdev->base, "Unsupported format %p4cc for gamma correction\n",
+			      &format->format);
+		break;
 	}
 }
 
@@ -107,712 +130,6 @@ static inline void mga_wait_busy(struct mga_device *mdev)
 	do {
 		status = RREG8(MGAREG_Status + 2);
 	} while ((status & 0x01) && time_before(jiffies, timeout));
-}
-
-/*
- * PLL setup
- */
-
-static int mgag200_g200_set_plls(struct mga_device *mdev, long clock)
-{
-	struct drm_device *dev = &mdev->base;
-	const int post_div_max = 7;
-	const int in_div_min = 1;
-	const int in_div_max = 6;
-	const int feed_div_min = 7;
-	const int feed_div_max = 127;
-	u8 testm, testn;
-	u8 n = 0, m = 0, p, s;
-	long f_vco;
-	long computed;
-	long delta, tmp_delta;
-	long ref_clk = mdev->model.g200.ref_clk;
-	long p_clk_min = mdev->model.g200.pclk_min;
-	long p_clk_max =  mdev->model.g200.pclk_max;
-
-	if (clock > p_clk_max) {
-		drm_err(dev, "Pixel Clock %ld too high\n", clock);
-		return 1;
-	}
-
-	if (clock < p_clk_min >> 3)
-		clock = p_clk_min >> 3;
-
-	f_vco = clock;
-	for (p = 0;
-	     p <= post_div_max && f_vco < p_clk_min;
-	     p = (p << 1) + 1, f_vco <<= 1)
-		;
-
-	delta = clock;
-
-	for (testm = in_div_min; testm <= in_div_max; testm++) {
-		for (testn = feed_div_min; testn <= feed_div_max; testn++) {
-			computed = ref_clk * (testn + 1) / (testm + 1);
-			if (computed < f_vco)
-				tmp_delta = f_vco - computed;
-			else
-				tmp_delta = computed - f_vco;
-			if (tmp_delta < delta) {
-				delta = tmp_delta;
-				m = testm;
-				n = testn;
-			}
-		}
-	}
-	f_vco = ref_clk * (n + 1) / (m + 1);
-	if (f_vco < 100000)
-		s = 0;
-	else if (f_vco < 140000)
-		s = 1;
-	else if (f_vco < 180000)
-		s = 2;
-	else
-		s = 3;
-
-	drm_dbg_kms(dev, "clock: %ld vco: %ld m: %d n: %d p: %d s: %d\n",
-		    clock, f_vco, m, n, p, s);
-
-	WREG_DAC(MGA1064_PIX_PLLC_M, m);
-	WREG_DAC(MGA1064_PIX_PLLC_N, n);
-	WREG_DAC(MGA1064_PIX_PLLC_P, (p | (s << 3)));
-
-	return 0;
-}
-
-#define P_ARRAY_SIZE 9
-
-static int mga_g200se_set_plls(struct mga_device *mdev, long clock)
-{
-	u32 unique_rev_id = mdev->model.g200se.unique_rev_id;
-	unsigned int vcomax, vcomin, pllreffreq;
-	unsigned int delta, tmpdelta, permitteddelta;
-	unsigned int testp, testm, testn;
-	unsigned int p, m, n;
-	unsigned int computed;
-	unsigned int pvalues_e4[P_ARRAY_SIZE] = {16, 14, 12, 10, 8, 6, 4, 2, 1};
-	unsigned int fvv;
-	unsigned int i;
-
-	if (unique_rev_id <= 0x03) {
-
-		m = n = p = 0;
-		vcomax = 320000;
-		vcomin = 160000;
-		pllreffreq = 25000;
-
-		delta = 0xffffffff;
-		permitteddelta = clock * 5 / 1000;
-
-		for (testp = 8; testp > 0; testp /= 2) {
-			if (clock * testp > vcomax)
-				continue;
-			if (clock * testp < vcomin)
-				continue;
-
-			for (testn = 17; testn < 256; testn++) {
-				for (testm = 1; testm < 32; testm++) {
-					computed = (pllreffreq * testn) /
-						(testm * testp);
-					if (computed > clock)
-						tmpdelta = computed - clock;
-					else
-						tmpdelta = clock - computed;
-					if (tmpdelta < delta) {
-						delta = tmpdelta;
-						m = testm - 1;
-						n = testn - 1;
-						p = testp - 1;
-					}
-				}
-			}
-		}
-	} else {
-
-
-		m = n = p = 0;
-		vcomax        = 1600000;
-		vcomin        = 800000;
-		pllreffreq    = 25000;
-
-		if (clock < 25000)
-			clock = 25000;
-
-		clock = clock * 2;
-
-		delta = 0xFFFFFFFF;
-		/* Permited delta is 0.5% as VESA Specification */
-		permitteddelta = clock * 5 / 1000;
-
-		for (i = 0 ; i < P_ARRAY_SIZE ; i++) {
-			testp = pvalues_e4[i];
-
-			if ((clock * testp) > vcomax)
-				continue;
-			if ((clock * testp) < vcomin)
-				continue;
-
-			for (testn = 50; testn <= 256; testn++) {
-				for (testm = 1; testm <= 32; testm++) {
-					computed = (pllreffreq * testn) /
-						(testm * testp);
-					if (computed > clock)
-						tmpdelta = computed - clock;
-					else
-						tmpdelta = clock - computed;
-
-					if (tmpdelta < delta) {
-						delta = tmpdelta;
-						m = testm - 1;
-						n = testn - 1;
-						p = testp - 1;
-					}
-				}
-			}
-		}
-
-		fvv = pllreffreq * (n + 1) / (m + 1);
-		fvv = (fvv - 800000) / 50000;
-
-		if (fvv > 15)
-			fvv = 15;
-
-		p |= (fvv << 4);
-		m |= 0x80;
-
-		clock = clock / 2;
-	}
-
-	if (delta > permitteddelta) {
-		pr_warn("PLL delta too large\n");
-		return 1;
-	}
-
-	WREG_DAC(MGA1064_PIX_PLLC_M, m);
-	WREG_DAC(MGA1064_PIX_PLLC_N, n);
-	WREG_DAC(MGA1064_PIX_PLLC_P, p);
-
-	if (unique_rev_id >= 0x04) {
-		WREG_DAC(0x1a, 0x09);
-		msleep(20);
-		WREG_DAC(0x1a, 0x01);
-
-	}
-
-	return 0;
-}
-
-static int mga_g200wb_set_plls(struct mga_device *mdev, long clock)
-{
-	unsigned int vcomax, vcomin, pllreffreq;
-	unsigned int delta, tmpdelta;
-	unsigned int testp, testm, testn, testp2;
-	unsigned int p, m, n;
-	unsigned int computed;
-	int i, j, tmpcount, vcount;
-	bool pll_locked = false;
-	u8 tmp;
-
-	m = n = p = 0;
-
-	delta = 0xffffffff;
-
-	if (mdev->type == G200_EW3) {
-
-		vcomax = 800000;
-		vcomin = 400000;
-		pllreffreq = 25000;
-
-		for (testp = 1; testp < 8; testp++) {
-			for (testp2 = 1; testp2 < 8; testp2++) {
-				if (testp < testp2)
-					continue;
-				if ((clock * testp * testp2) > vcomax)
-					continue;
-				if ((clock * testp * testp2) < vcomin)
-					continue;
-				for (testm = 1; testm < 26; testm++) {
-					for (testn = 32; testn < 2048 ; testn++) {
-						computed = (pllreffreq * testn) /
-							(testm * testp * testp2);
-						if (computed > clock)
-							tmpdelta = computed - clock;
-						else
-							tmpdelta = clock - computed;
-						if (tmpdelta < delta) {
-							delta = tmpdelta;
-							m = ((testn & 0x100) >> 1) |
-								(testm);
-							n = (testn & 0xFF);
-							p = ((testn & 0x600) >> 3) |
-								(testp2 << 3) |
-								(testp);
-						}
-					}
-				}
-			}
-		}
-	} else {
-
-		vcomax = 550000;
-		vcomin = 150000;
-		pllreffreq = 48000;
-
-		for (testp = 1; testp < 9; testp++) {
-			if (clock * testp > vcomax)
-				continue;
-			if (clock * testp < vcomin)
-				continue;
-
-			for (testm = 1; testm < 17; testm++) {
-				for (testn = 1; testn < 151; testn++) {
-					computed = (pllreffreq * testn) /
-						(testm * testp);
-					if (computed > clock)
-						tmpdelta = computed - clock;
-					else
-						tmpdelta = clock - computed;
-					if (tmpdelta < delta) {
-						delta = tmpdelta;
-						n = testn - 1;
-						m = (testm - 1) |
-							((n >> 1) & 0x80);
-						p = testp - 1;
-					}
-				}
-			}
-		}
-	}
-
-	for (i = 0; i <= 32 && pll_locked == false; i++) {
-		if (i > 0) {
-			WREG8(MGAREG_CRTC_INDEX, 0x1e);
-			tmp = RREG8(MGAREG_CRTC_DATA);
-			if (tmp < 0xff)
-				WREG8(MGAREG_CRTC_DATA, tmp+1);
-		}
-
-		/* set pixclkdis to 1 */
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp |= MGA1064_PIX_CLK_CTL_CLK_DIS;
-		WREG8(DAC_DATA, tmp);
-
-		WREG8(DAC_INDEX, MGA1064_REMHEADCTL);
-		tmp = RREG8(DAC_DATA);
-		tmp |= MGA1064_REMHEADCTL_CLKDIS;
-		WREG8(DAC_DATA, tmp);
-
-		/* select PLL Set C */
-		tmp = RREG8(MGAREG_MEM_MISC_READ);
-		tmp |= 0x3 << 2;
-		WREG8(MGAREG_MEM_MISC_WRITE, tmp);
-
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp |= MGA1064_PIX_CLK_CTL_CLK_POW_DOWN | 0x80;
-		WREG8(DAC_DATA, tmp);
-
-		udelay(500);
-
-		/* reset the PLL */
-		WREG8(DAC_INDEX, MGA1064_VREF_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp &= ~0x04;
-		WREG8(DAC_DATA, tmp);
-
-		udelay(50);
-
-		/* program pixel pll register */
-		WREG_DAC(MGA1064_WB_PIX_PLLC_N, n);
-		WREG_DAC(MGA1064_WB_PIX_PLLC_M, m);
-		WREG_DAC(MGA1064_WB_PIX_PLLC_P, p);
-
-		udelay(50);
-
-		/* turn pll on */
-		WREG8(DAC_INDEX, MGA1064_VREF_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp |= 0x04;
-		WREG_DAC(MGA1064_VREF_CTL, tmp);
-
-		udelay(500);
-
-		/* select the pixel pll */
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp &= ~MGA1064_PIX_CLK_CTL_SEL_MSK;
-		tmp |= MGA1064_PIX_CLK_CTL_SEL_PLL;
-		WREG8(DAC_DATA, tmp);
-
-		WREG8(DAC_INDEX, MGA1064_REMHEADCTL);
-		tmp = RREG8(DAC_DATA);
-		tmp &= ~MGA1064_REMHEADCTL_CLKSL_MSK;
-		tmp |= MGA1064_REMHEADCTL_CLKSL_PLL;
-		WREG8(DAC_DATA, tmp);
-
-		/* reset dotclock rate bit */
-		WREG8(MGAREG_SEQ_INDEX, 1);
-		tmp = RREG8(MGAREG_SEQ_DATA);
-		tmp &= ~0x8;
-		WREG8(MGAREG_SEQ_DATA, tmp);
-
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp &= ~MGA1064_PIX_CLK_CTL_CLK_DIS;
-		WREG8(DAC_DATA, tmp);
-
-		vcount = RREG8(MGAREG_VCOUNT);
-
-		for (j = 0; j < 30 && pll_locked == false; j++) {
-			tmpcount = RREG8(MGAREG_VCOUNT);
-			if (tmpcount < vcount)
-				vcount = 0;
-			if ((tmpcount - vcount) > 2)
-				pll_locked = true;
-			else
-				udelay(5);
-		}
-	}
-	WREG8(DAC_INDEX, MGA1064_REMHEADCTL);
-	tmp = RREG8(DAC_DATA);
-	tmp &= ~MGA1064_REMHEADCTL_CLKDIS;
-	WREG_DAC(MGA1064_REMHEADCTL, tmp);
-	return 0;
-}
-
-static int mga_g200ev_set_plls(struct mga_device *mdev, long clock)
-{
-	unsigned int vcomax, vcomin, pllreffreq;
-	unsigned int delta, tmpdelta;
-	unsigned int testp, testm, testn;
-	unsigned int p, m, n;
-	unsigned int computed;
-	u8 tmp;
-
-	m = n = p = 0;
-	vcomax = 550000;
-	vcomin = 150000;
-	pllreffreq = 50000;
-
-	delta = 0xffffffff;
-
-	for (testp = 16; testp > 0; testp--) {
-		if (clock * testp > vcomax)
-			continue;
-		if (clock * testp < vcomin)
-			continue;
-
-		for (testn = 1; testn < 257; testn++) {
-			for (testm = 1; testm < 17; testm++) {
-				computed = (pllreffreq * testn) /
-					(testm * testp);
-				if (computed > clock)
-					tmpdelta = computed - clock;
-				else
-					tmpdelta = clock - computed;
-				if (tmpdelta < delta) {
-					delta = tmpdelta;
-					n = testn - 1;
-					m = testm - 1;
-					p = testp - 1;
-				}
-			}
-		}
-	}
-
-	WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-	tmp = RREG8(DAC_DATA);
-	tmp |= MGA1064_PIX_CLK_CTL_CLK_DIS;
-	WREG8(DAC_DATA, tmp);
-
-	tmp = RREG8(MGAREG_MEM_MISC_READ);
-	tmp |= 0x3 << 2;
-	WREG8(MGAREG_MEM_MISC_WRITE, tmp);
-
-	WREG8(DAC_INDEX, MGA1064_PIX_PLL_STAT);
-	tmp = RREG8(DAC_DATA);
-	WREG8(DAC_DATA, tmp & ~0x40);
-
-	WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-	tmp = RREG8(DAC_DATA);
-	tmp |= MGA1064_PIX_CLK_CTL_CLK_POW_DOWN;
-	WREG8(DAC_DATA, tmp);
-
-	WREG_DAC(MGA1064_EV_PIX_PLLC_M, m);
-	WREG_DAC(MGA1064_EV_PIX_PLLC_N, n);
-	WREG_DAC(MGA1064_EV_PIX_PLLC_P, p);
-
-	udelay(50);
-
-	WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-	tmp = RREG8(DAC_DATA);
-	tmp &= ~MGA1064_PIX_CLK_CTL_CLK_POW_DOWN;
-	WREG8(DAC_DATA, tmp);
-
-	udelay(500);
-
-	WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-	tmp = RREG8(DAC_DATA);
-	tmp &= ~MGA1064_PIX_CLK_CTL_SEL_MSK;
-	tmp |= MGA1064_PIX_CLK_CTL_SEL_PLL;
-	WREG8(DAC_DATA, tmp);
-
-	WREG8(DAC_INDEX, MGA1064_PIX_PLL_STAT);
-	tmp = RREG8(DAC_DATA);
-	WREG8(DAC_DATA, tmp | 0x40);
-
-	tmp = RREG8(MGAREG_MEM_MISC_READ);
-	tmp |= (0x3 << 2);
-	WREG8(MGAREG_MEM_MISC_WRITE, tmp);
-
-	WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-	tmp = RREG8(DAC_DATA);
-	tmp &= ~MGA1064_PIX_CLK_CTL_CLK_DIS;
-	WREG8(DAC_DATA, tmp);
-
-	return 0;
-}
-
-static int mga_g200eh_set_plls(struct mga_device *mdev, long clock)
-{
-	unsigned int vcomax, vcomin, pllreffreq;
-	unsigned int delta, tmpdelta;
-	unsigned int testp, testm, testn;
-	unsigned int p, m, n;
-	unsigned int computed;
-	int i, j, tmpcount, vcount;
-	u8 tmp;
-	bool pll_locked = false;
-
-	m = n = p = 0;
-
-	if (mdev->type == G200_EH3) {
-		vcomax = 3000000;
-		vcomin = 1500000;
-		pllreffreq = 25000;
-
-		delta = 0xffffffff;
-
-		testp = 0;
-
-		for (testm = 150; testm >= 6; testm--) {
-			if (clock * testm > vcomax)
-				continue;
-			if (clock * testm < vcomin)
-				continue;
-			for (testn = 120; testn >= 60; testn--) {
-				computed = (pllreffreq * testn) / testm;
-				if (computed > clock)
-					tmpdelta = computed - clock;
-				else
-					tmpdelta = clock - computed;
-				if (tmpdelta < delta) {
-					delta = tmpdelta;
-					n = testn;
-					m = testm;
-					p = testp;
-				}
-				if (delta == 0)
-					break;
-			}
-			if (delta == 0)
-				break;
-		}
-	} else {
-
-		vcomax = 800000;
-		vcomin = 400000;
-		pllreffreq = 33333;
-
-		delta = 0xffffffff;
-
-		for (testp = 16; testp > 0; testp >>= 1) {
-			if (clock * testp > vcomax)
-				continue;
-			if (clock * testp < vcomin)
-				continue;
-
-			for (testm = 1; testm < 33; testm++) {
-				for (testn = 17; testn < 257; testn++) {
-					computed = (pllreffreq * testn) /
-						(testm * testp);
-					if (computed > clock)
-						tmpdelta = computed - clock;
-					else
-						tmpdelta = clock - computed;
-					if (tmpdelta < delta) {
-						delta = tmpdelta;
-						n = testn - 1;
-						m = (testm - 1);
-						p = testp - 1;
-					}
-					if ((clock * testp) >= 600000)
-						p |= 0x80;
-				}
-			}
-		}
-	}
-	for (i = 0; i <= 32 && pll_locked == false; i++) {
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp |= MGA1064_PIX_CLK_CTL_CLK_DIS;
-		WREG8(DAC_DATA, tmp);
-
-		tmp = RREG8(MGAREG_MEM_MISC_READ);
-		tmp |= 0x3 << 2;
-		WREG8(MGAREG_MEM_MISC_WRITE, tmp);
-
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp |= MGA1064_PIX_CLK_CTL_CLK_POW_DOWN;
-		WREG8(DAC_DATA, tmp);
-
-		udelay(500);
-
-		WREG_DAC(MGA1064_EH_PIX_PLLC_M, m);
-		WREG_DAC(MGA1064_EH_PIX_PLLC_N, n);
-		WREG_DAC(MGA1064_EH_PIX_PLLC_P, p);
-
-		udelay(500);
-
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp &= ~MGA1064_PIX_CLK_CTL_SEL_MSK;
-		tmp |= MGA1064_PIX_CLK_CTL_SEL_PLL;
-		WREG8(DAC_DATA, tmp);
-
-		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-		tmp = RREG8(DAC_DATA);
-		tmp &= ~MGA1064_PIX_CLK_CTL_CLK_DIS;
-		tmp &= ~MGA1064_PIX_CLK_CTL_CLK_POW_DOWN;
-		WREG8(DAC_DATA, tmp);
-
-		vcount = RREG8(MGAREG_VCOUNT);
-
-		for (j = 0; j < 30 && pll_locked == false; j++) {
-			tmpcount = RREG8(MGAREG_VCOUNT);
-			if (tmpcount < vcount)
-				vcount = 0;
-			if ((tmpcount - vcount) > 2)
-				pll_locked = true;
-			else
-				udelay(5);
-		}
-	}
-
-	return 0;
-}
-
-static int mga_g200er_set_plls(struct mga_device *mdev, long clock)
-{
-	unsigned int vcomax, vcomin, pllreffreq;
-	unsigned int delta, tmpdelta;
-	int testr, testn, testm, testo;
-	unsigned int p, m, n;
-	unsigned int computed, vco;
-	int tmp;
-	const unsigned int m_div_val[] = { 1, 2, 4, 8 };
-
-	m = n = p = 0;
-	vcomax = 1488000;
-	vcomin = 1056000;
-	pllreffreq = 48000;
-
-	delta = 0xffffffff;
-
-	for (testr = 0; testr < 4; testr++) {
-		if (delta == 0)
-			break;
-		for (testn = 5; testn < 129; testn++) {
-			if (delta == 0)
-				break;
-			for (testm = 3; testm >= 0; testm--) {
-				if (delta == 0)
-					break;
-				for (testo = 5; testo < 33; testo++) {
-					vco = pllreffreq * (testn + 1) /
-						(testr + 1);
-					if (vco < vcomin)
-						continue;
-					if (vco > vcomax)
-						continue;
-					computed = vco / (m_div_val[testm] * (testo + 1));
-					if (computed > clock)
-						tmpdelta = computed - clock;
-					else
-						tmpdelta = clock - computed;
-					if (tmpdelta < delta) {
-						delta = tmpdelta;
-						m = testm | (testo << 3);
-						n = testn;
-						p = testr | (testr << 3);
-					}
-				}
-			}
-		}
-	}
-
-	WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-	tmp = RREG8(DAC_DATA);
-	tmp |= MGA1064_PIX_CLK_CTL_CLK_DIS;
-	WREG8(DAC_DATA, tmp);
-
-	WREG8(DAC_INDEX, MGA1064_REMHEADCTL);
-	tmp = RREG8(DAC_DATA);
-	tmp |= MGA1064_REMHEADCTL_CLKDIS;
-	WREG8(DAC_DATA, tmp);
-
-	tmp = RREG8(MGAREG_MEM_MISC_READ);
-	tmp |= (0x3<<2) | 0xc0;
-	WREG8(MGAREG_MEM_MISC_WRITE, tmp);
-
-	WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
-	tmp = RREG8(DAC_DATA);
-	tmp &= ~MGA1064_PIX_CLK_CTL_CLK_DIS;
-	tmp |= MGA1064_PIX_CLK_CTL_CLK_POW_DOWN;
-	WREG8(DAC_DATA, tmp);
-
-	udelay(500);
-
-	WREG_DAC(MGA1064_ER_PIX_PLLC_N, n);
-	WREG_DAC(MGA1064_ER_PIX_PLLC_M, m);
-	WREG_DAC(MGA1064_ER_PIX_PLLC_P, p);
-
-	udelay(50);
-
-	return 0;
-}
-
-static int mgag200_crtc_set_plls(struct mga_device *mdev, long clock)
-{
-	u8 misc;
-
-	switch(mdev->type) {
-	case G200_PCI:
-	case G200_AGP:
-		return mgag200_g200_set_plls(mdev, clock);
-	case G200_SE_A:
-	case G200_SE_B:
-		return mga_g200se_set_plls(mdev, clock);
-	case G200_WB:
-	case G200_EW3:
-		return mga_g200wb_set_plls(mdev, clock);
-	case G200_EV:
-		return mga_g200ev_set_plls(mdev, clock);
-	case G200_EH:
-	case G200_EH3:
-		return mga_g200eh_set_plls(mdev, clock);
-	case G200_ER:
-		return mga_g200er_set_plls(mdev, clock);
-	}
-
-	misc = RREG8(MGA_MISC_IN);
-	misc &= ~MGAREG_MISC_CLK_SEL_MASK;
-	misc |= MGAREG_MISC_CLK_SEL_MGA_MSK;
-	WREG8(MGA_MISC_OUT, misc);
-
-	return 0;
 }
 
 static void mgag200_g200wb_hold_bmc(struct mga_device *mdev)
@@ -927,6 +244,9 @@ static void mgag200_set_startadd(struct mga_device *mdev,
 	u8 crtcc, crtcd, crtcext0;
 
 	startadd = offset / 8;
+
+	if (startadd > 0)
+		drm_WARN_ON_ONCE(dev, mdev->info->bug_no_startadd);
 
 	/*
 	 * Can't store addresses any higher than that, but we also
@@ -1058,6 +378,7 @@ static void mgag200_init_regs(struct mga_device *mdev)
 static void mgag200_set_mode_regs(struct mga_device *mdev,
 				  const struct drm_display_mode *mode)
 {
+	const struct mgag200_device_info *info = mdev->info;
 	unsigned int hdisplay, hsyncstart, hsyncend, htotal;
 	unsigned int vdisplay, vsyncstart, vsyncend, vtotal;
 	u8 misc, crtcext1, crtcext2, crtcext5;
@@ -1092,9 +413,9 @@ static void mgag200_set_mode_regs(struct mga_device *mdev,
 		   ((hdisplay & 0x100) >> 7) |
 		   ((hsyncstart & 0x100) >> 6) |
 		    (htotal & 0x40);
-	if (mdev->type == G200_WB || mdev->type == G200_EW3)
-		crtcext1 |= BIT(7) | /* vrsten */
-			    BIT(3); /* hrsten */
+	if (info->has_vidrst)
+		crtcext1 |= MGAREG_CRTCEXT1_VRSTEN |
+			    MGAREG_CRTCEXT1_HRSTEN;
 
 	crtcext2 = ((vtotal & 0xc00) >> 10) |
 		   ((vdisplay & 0x400) >> 8) |
@@ -1136,10 +457,11 @@ static void mgag200_set_mode_regs(struct mga_device *mdev,
 	WREG8(MGA_MISC_OUT, misc);
 }
 
-static u8 mgag200_get_bpp_shift(struct mga_device *mdev,
-				const struct drm_format_info *format)
+static u8 mgag200_get_bpp_shift(const struct drm_format_info *format)
 {
-	return mdev->bpp_shifts[format->cpp[0] - 1];
+	static const u8 bpp_shift[] = {0, 1, 0, 2};
+
+	return bpp_shift[format->cpp[0] - 1];
 }
 
 /*
@@ -1151,7 +473,7 @@ static u32 mgag200_calculate_offset(struct mga_device *mdev,
 				    const struct drm_framebuffer *fb)
 {
 	u32 offset = fb->pitches[0] / fb->format->cpp[0];
-	u8 bppshift = mgag200_get_bpp_shift(mdev, fb->format);
+	u8 bppshift = mgag200_get_bpp_shift(fb->format);
 
 	if (fb->format->cpp[0] * 8 == 24)
 		offset = (offset * 3) >> (4 - bppshift);
@@ -1188,7 +510,7 @@ static void mgag200_set_format_regs(struct mga_device *mdev,
 
 	bpp = format->cpp[0] * 8;
 
-	bppshift = mgag200_get_bpp_shift(mdev, format);
+	bppshift = mgag200_get_bpp_shift(format);
 	switch (bpp) {
 	case 24:
 		scale = ((1 << bppshift) * 3) - 1;
@@ -1233,7 +555,10 @@ static void mgag200_set_format_regs(struct mga_device *mdev,
 	WREG_GFX(3, 0x00);
 	WREG_GFX(4, 0x00);
 	WREG_GFX(5, 0x40);
-	WREG_GFX(6, 0x05);
+	/* GCTL6 should be 0x05, but we configure memmapsl to 0xb8000 (text mode),
+	 * so that it doesn't hang when running kexec/kdump on G200_SE rev42.
+	 */
+	WREG_GFX(6, 0x0d);
 	WREG_GFX(7, 0x0f);
 	WREG_GFX(8, 0x0f);
 
@@ -1260,13 +585,13 @@ static void mgag200_g200se_set_hiprilvl(struct mga_device *mdev,
 					const struct drm_display_mode *mode,
 					const struct drm_framebuffer *fb)
 {
-	u32 unique_rev_id = mdev->model.g200se.unique_rev_id;
+	struct mgag200_g200se_device *g200se = to_mgag200_g200se_device(&mdev->base);
 	unsigned int hiprilvl;
 	u8 crtcext6;
 
-	if  (unique_rev_id >= 0x04) {
+	if  (g200se->unique_rev_id >= 0x04) {
 		hiprilvl = 0;
-	} else if (unique_rev_id >= 0x02) {
+	} else if (g200se->unique_rev_id >= 0x02) {
 		unsigned int bpp;
 		unsigned long mb;
 
@@ -1291,7 +616,7 @@ static void mgag200_g200se_set_hiprilvl(struct mga_device *mdev,
 		else
 			hiprilvl = 5;
 
-	} else if (unique_rev_id >= 0x01) {
+	} else if (g200se->unique_rev_id >= 0x01) {
 		hiprilvl = 3;
 	} else {
 		hiprilvl = 4;
@@ -1366,23 +691,304 @@ static void mgag200_disable_display(struct mga_device *mdev)
  * Connector
  */
 
-static int mga_vga_get_modes(struct drm_connector *connector)
+static int mgag200_vga_connector_helper_get_modes(struct drm_connector *connector)
 {
-	struct mga_connector *mga_connector = to_mga_connector(connector);
-	struct edid *edid;
-	int ret = 0;
+	struct mga_device *mdev = to_mga_device(connector->dev);
+	int ret;
 
-	edid = drm_get_edid(connector, &mga_connector->i2c->adapter);
-	if (edid) {
-		drm_connector_update_edid_property(connector, edid);
-		ret = drm_add_edid_modes(connector, edid);
-		kfree(edid);
-	}
+	/*
+	 * Protect access to I/O registers from concurrent modesetting
+	 * by acquiring the I/O-register lock.
+	 */
+	mutex_lock(&mdev->rmmio_lock);
+	ret = drm_connector_helper_get_modes_from_ddc(connector);
+	mutex_unlock(&mdev->rmmio_lock);
+
 	return ret;
 }
 
-static uint32_t mga_vga_calculate_mode_bandwidth(struct drm_display_mode *mode,
-							int bits_per_pixel)
+static const struct drm_connector_helper_funcs mga_vga_connector_helper_funcs = {
+	.get_modes  = mgag200_vga_connector_helper_get_modes,
+};
+
+static const struct drm_connector_funcs mga_vga_connector_funcs = {
+	.reset                  = drm_atomic_helper_connector_reset,
+	.fill_modes             = drm_helper_probe_single_connector_modes,
+	.destroy                = drm_connector_cleanup,
+	.atomic_duplicate_state = drm_atomic_helper_connector_duplicate_state,
+	.atomic_destroy_state   = drm_atomic_helper_connector_destroy_state,
+};
+
+/*
+ * Simple Display Pipe
+ */
+
+static enum drm_mode_status
+mgag200_simple_display_pipe_mode_valid(struct drm_simple_display_pipe *pipe,
+				       const struct drm_display_mode *mode)
+{
+	struct mga_device *mdev = to_mga_device(pipe->crtc.dev);
+	const struct mgag200_device_info *info = mdev->info;
+
+	/*
+	 * Some devices have additional limits on the size of the
+	 * display mode.
+	 */
+	if (mode->hdisplay > info->max_hdisplay)
+		return MODE_VIRTUAL_X;
+	if (mode->vdisplay > info->max_vdisplay)
+		return MODE_VIRTUAL_Y;
+
+	if ((mode->hdisplay % 8) != 0 || (mode->hsync_start % 8) != 0 ||
+	    (mode->hsync_end % 8) != 0 || (mode->htotal % 8) != 0) {
+		return MODE_H_ILLEGAL;
+	}
+
+	if (mode->crtc_hdisplay > 2048 || mode->crtc_hsync_start > 4096 ||
+	    mode->crtc_hsync_end > 4096 || mode->crtc_htotal > 4096 ||
+	    mode->crtc_vdisplay > 2048 || mode->crtc_vsync_start > 4096 ||
+	    mode->crtc_vsync_end > 4096 || mode->crtc_vtotal > 4096) {
+		return MODE_BAD;
+	}
+
+	return MODE_OK;
+}
+
+static void
+mgag200_handle_damage(struct mga_device *mdev, struct drm_framebuffer *fb,
+		      struct drm_rect *clip, const struct iosys_map *map)
+{
+	void __iomem *dst = mdev->vram;
+	void *vmap = map->vaddr; /* TODO: Use mapping abstraction properly */
+
+	dst += drm_fb_clip_offset(fb->pitches[0], fb->format, clip);
+	drm_fb_memcpy_toio(dst, fb->pitches[0], vmap, fb, clip);
+}
+
+static void
+mgag200_simple_display_pipe_enable(struct drm_simple_display_pipe *pipe,
+				   struct drm_crtc_state *crtc_state,
+				   struct drm_plane_state *plane_state)
+{
+	struct drm_crtc *crtc = &pipe->crtc;
+	struct drm_device *dev = crtc->dev;
+	struct mga_device *mdev = to_mga_device(dev);
+	struct mgag200_pll *pixpll = &mdev->pixpll;
+	struct drm_display_mode *adjusted_mode = &crtc_state->adjusted_mode;
+	struct mgag200_crtc_state *mgag200_crtc_state = to_mgag200_crtc_state(crtc_state);
+	struct drm_framebuffer *fb = plane_state->fb;
+	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(plane_state);
+	struct drm_rect fullscreen = {
+		.x1 = 0,
+		.x2 = fb->width,
+		.y1 = 0,
+		.y2 = fb->height,
+	};
+
+	/*
+	 * Concurrent operations could possibly trigger a call to
+	 * drm_connector_helper_funcs.get_modes by trying to read the
+	 * display modes. Protect access to I/O registers by acquiring
+	 * the I/O-register lock.
+	 */
+	mutex_lock(&mdev->rmmio_lock);
+
+	if (mdev->type == G200_WB || mdev->type == G200_EW3)
+		mgag200_g200wb_hold_bmc(mdev);
+
+	mgag200_set_format_regs(mdev, fb);
+	mgag200_set_mode_regs(mdev, adjusted_mode);
+
+	pixpll->funcs->update(pixpll, &mgag200_crtc_state->pixpllc);
+
+	if (mdev->type == G200_ER)
+		mgag200_g200er_reset_tagfifo(mdev);
+
+	if (IS_G200_SE(mdev))
+		mgag200_g200se_set_hiprilvl(mdev, adjusted_mode, fb);
+	else if (mdev->type == G200_EV)
+		mgag200_g200ev_set_hiprilvl(mdev);
+
+	if (mdev->type == G200_WB || mdev->type == G200_EW3)
+		mgag200_g200wb_release_bmc(mdev);
+
+	if (crtc_state->gamma_lut)
+		mgag200_crtc_set_gamma(mdev, fb->format, crtc_state->gamma_lut->data);
+	else
+		mgag200_crtc_set_gamma_linear(mdev, fb->format);
+
+	mgag200_enable_display(mdev);
+
+	mgag200_handle_damage(mdev, fb, &fullscreen, &shadow_plane_state->data[0]);
+
+	/* Always scanout image at VRAM offset 0 */
+	mgag200_set_startadd(mdev, (u32)0);
+	mgag200_set_offset(mdev, fb);
+
+	mutex_unlock(&mdev->rmmio_lock);
+}
+
+static void
+mgag200_simple_display_pipe_disable(struct drm_simple_display_pipe *pipe)
+{
+	struct drm_crtc *crtc = &pipe->crtc;
+	struct mga_device *mdev = to_mga_device(crtc->dev);
+
+	mgag200_disable_display(mdev);
+}
+
+static int
+mgag200_simple_display_pipe_check(struct drm_simple_display_pipe *pipe,
+				  struct drm_plane_state *plane_state,
+				  struct drm_crtc_state *crtc_state)
+{
+	struct drm_plane *plane = plane_state->plane;
+	struct drm_device *dev = plane->dev;
+	struct mga_device *mdev = to_mga_device(dev);
+	struct mgag200_pll *pixpll = &mdev->pixpll;
+	struct mgag200_crtc_state *mgag200_crtc_state = to_mgag200_crtc_state(crtc_state);
+	struct drm_framebuffer *new_fb = plane_state->fb;
+	struct drm_framebuffer *fb = NULL;
+	int ret;
+
+	if (!new_fb)
+		return 0;
+
+	if (plane->state)
+		fb = plane->state->fb;
+
+	if (!fb || (fb->format != new_fb->format))
+		crtc_state->mode_changed = true; /* update PLL settings */
+
+	if (crtc_state->mode_changed) {
+		ret = pixpll->funcs->compute(pixpll, crtc_state->mode.clock,
+					     &mgag200_crtc_state->pixpllc);
+		if (ret)
+			return ret;
+	}
+
+	if (crtc_state->color_mgmt_changed && crtc_state->gamma_lut) {
+		if (crtc_state->gamma_lut->length !=
+		    MGAG200_LUT_SIZE * sizeof(struct drm_color_lut)) {
+			drm_err(dev, "Wrong size for gamma_lut %zu\n",
+				crtc_state->gamma_lut->length);
+			return -EINVAL;
+		}
+	}
+	return 0;
+}
+
+static void
+mgag200_simple_display_pipe_update(struct drm_simple_display_pipe *pipe,
+				   struct drm_plane_state *old_state)
+{
+	struct drm_plane *plane = &pipe->plane;
+	struct drm_crtc *crtc = &pipe->crtc;
+	struct drm_device *dev = plane->dev;
+	struct mga_device *mdev = to_mga_device(dev);
+	struct drm_plane_state *state = plane->state;
+	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(state);
+	struct drm_framebuffer *fb = state->fb;
+	struct drm_rect damage;
+	struct drm_atomic_helper_damage_iter iter;
+
+	if (!fb)
+		return;
+
+	mutex_lock(&mdev->rmmio_lock);
+
+	if (crtc->state->color_mgmt_changed && crtc->state->gamma_lut)
+		mgag200_crtc_set_gamma(mdev, fb->format, crtc->state->gamma_lut->data);
+
+	drm_atomic_helper_damage_iter_init(&iter, old_state, state);
+	drm_atomic_for_each_plane_damage(&iter, &damage) {
+		mgag200_handle_damage(mdev, fb, &damage, &shadow_plane_state->data[0]);
+	}
+	/* Always scanout image at VRAM offset 0 */
+	mgag200_set_startadd(mdev, (u32)0);
+	mgag200_set_offset(mdev, fb);
+
+	mutex_unlock(&mdev->rmmio_lock);
+}
+
+static struct drm_crtc_state *
+mgag200_simple_display_pipe_duplicate_crtc_state(struct drm_simple_display_pipe *pipe)
+{
+	struct drm_crtc *crtc = &pipe->crtc;
+	struct drm_crtc_state *crtc_state = crtc->state;
+	struct mgag200_crtc_state *mgag200_crtc_state = to_mgag200_crtc_state(crtc_state);
+	struct mgag200_crtc_state *new_mgag200_crtc_state;
+
+	if (!crtc_state)
+		return NULL;
+
+	new_mgag200_crtc_state = kzalloc(sizeof(*new_mgag200_crtc_state), GFP_KERNEL);
+	if (!new_mgag200_crtc_state)
+		return NULL;
+	__drm_atomic_helper_crtc_duplicate_state(crtc, &new_mgag200_crtc_state->base);
+
+	memcpy(&new_mgag200_crtc_state->pixpllc, &mgag200_crtc_state->pixpllc,
+	       sizeof(new_mgag200_crtc_state->pixpllc));
+
+	return &new_mgag200_crtc_state->base;
+}
+
+static void mgag200_simple_display_pipe_destroy_crtc_state(struct drm_simple_display_pipe *pipe,
+							   struct drm_crtc_state *crtc_state)
+{
+	struct mgag200_crtc_state *mgag200_crtc_state = to_mgag200_crtc_state(crtc_state);
+
+	__drm_atomic_helper_crtc_destroy_state(&mgag200_crtc_state->base);
+	kfree(mgag200_crtc_state);
+}
+
+static void mgag200_simple_display_pipe_reset_crtc(struct drm_simple_display_pipe *pipe)
+{
+	struct drm_crtc *crtc = &pipe->crtc;
+	struct mgag200_crtc_state *mgag200_crtc_state;
+
+	if (crtc->state) {
+		mgag200_simple_display_pipe_destroy_crtc_state(pipe, crtc->state);
+		crtc->state = NULL; /* must be set to NULL here */
+	}
+
+	mgag200_crtc_state = kzalloc(sizeof(*mgag200_crtc_state), GFP_KERNEL);
+	if (!mgag200_crtc_state)
+		return;
+	__drm_atomic_helper_crtc_reset(crtc, &mgag200_crtc_state->base);
+}
+
+static const struct drm_simple_display_pipe_funcs
+mgag200_simple_display_pipe_funcs = {
+	.mode_valid = mgag200_simple_display_pipe_mode_valid,
+	.enable	    = mgag200_simple_display_pipe_enable,
+	.disable    = mgag200_simple_display_pipe_disable,
+	.check	    = mgag200_simple_display_pipe_check,
+	.update	    = mgag200_simple_display_pipe_update,
+	.reset_crtc = mgag200_simple_display_pipe_reset_crtc,
+	.duplicate_crtc_state = mgag200_simple_display_pipe_duplicate_crtc_state,
+	.destroy_crtc_state = mgag200_simple_display_pipe_destroy_crtc_state,
+	DRM_GEM_SIMPLE_DISPLAY_PIPE_SHADOW_PLANE_FUNCS,
+};
+
+static const uint32_t mgag200_simple_display_pipe_formats[] = {
+	DRM_FORMAT_XRGB8888,
+	DRM_FORMAT_RGB565,
+	DRM_FORMAT_RGB888,
+};
+
+static const uint64_t mgag200_simple_display_pipe_fmtmods[] = {
+	DRM_FORMAT_MOD_LINEAR,
+	DRM_FORMAT_MOD_INVALID
+};
+
+/*
+ * Mode config
+ */
+
+/* Calculates a mode's required memory bandwidth (in KiB/sec). */
+static uint32_t mgag200_calculate_mode_bandwidth(const struct drm_display_mode *mode,
+						 unsigned int bits_per_pixel)
 {
 	uint32_t total_area, divisor;
 	uint64_t active_area, pixels_per_second, bandwidth;
@@ -1402,316 +1008,58 @@ static uint32_t mga_vga_calculate_mode_bandwidth(struct drm_display_mode *mode,
 	bandwidth = pixels_per_second * bytes_per_pixel * 100;
 	do_div(bandwidth, divisor);
 
-	return (uint32_t)(bandwidth);
+	return (uint32_t)bandwidth;
 }
 
-#define MODE_BANDWIDTH	MODE_BAD
-
-static enum drm_mode_status mga_vga_mode_valid(struct drm_connector *connector,
-				 struct drm_display_mode *mode)
+static enum drm_mode_status mgag200_mode_config_mode_valid(struct drm_device *dev,
+							   const struct drm_display_mode *mode)
 {
-	struct drm_device *dev = connector->dev;
+	static const unsigned int max_bpp = 4; // DRM_FORMAT_XRGB8888
 	struct mga_device *mdev = to_mga_device(dev);
-	int bpp = 32;
+	unsigned long fbsize, fbpages, max_fbpages;
+	const struct mgag200_device_info *info = mdev->info;
 
-	if (IS_G200_SE(mdev)) {
-		u32 unique_rev_id = mdev->model.g200se.unique_rev_id;
+	max_fbpages = mdev->vram_available >> PAGE_SHIFT;
 
-		if (unique_rev_id == 0x01) {
-			if (mode->hdisplay > 1600)
-				return MODE_VIRTUAL_X;
-			if (mode->vdisplay > 1200)
-				return MODE_VIRTUAL_Y;
-			if (mga_vga_calculate_mode_bandwidth(mode, bpp)
-				> (24400 * 1024))
-				return MODE_BANDWIDTH;
-		} else if (unique_rev_id == 0x02) {
-			if (mode->hdisplay > 1920)
-				return MODE_VIRTUAL_X;
-			if (mode->vdisplay > 1200)
-				return MODE_VIRTUAL_Y;
-			if (mga_vga_calculate_mode_bandwidth(mode, bpp)
-				> (30100 * 1024))
-				return MODE_BANDWIDTH;
-		} else {
-			if (mga_vga_calculate_mode_bandwidth(mode, bpp)
-				> (55000 * 1024))
-				return MODE_BANDWIDTH;
-		}
-	} else if (mdev->type == G200_WB) {
-		if (mode->hdisplay > 1280)
-			return MODE_VIRTUAL_X;
-		if (mode->vdisplay > 1024)
-			return MODE_VIRTUAL_Y;
-		if (mga_vga_calculate_mode_bandwidth(mode, bpp) >
-		    (31877 * 1024))
-			return MODE_BANDWIDTH;
-	} else if (mdev->type == G200_EV &&
-		(mga_vga_calculate_mode_bandwidth(mode, bpp)
-			> (32700 * 1024))) {
-		return MODE_BANDWIDTH;
-	} else if (mdev->type == G200_EH &&
-		(mga_vga_calculate_mode_bandwidth(mode, bpp)
-			> (37500 * 1024))) {
-		return MODE_BANDWIDTH;
-	} else if (mdev->type == G200_ER &&
-		(mga_vga_calculate_mode_bandwidth(mode,
-			bpp) > (55000 * 1024))) {
-		return MODE_BANDWIDTH;
-	}
+	fbsize = mode->hdisplay * mode->vdisplay * max_bpp;
+	fbpages = DIV_ROUND_UP(fbsize, PAGE_SIZE);
 
-	if ((mode->hdisplay % 8) != 0 || (mode->hsync_start % 8) != 0 ||
-	    (mode->hsync_end % 8) != 0 || (mode->htotal % 8) != 0) {
-		return MODE_H_ILLEGAL;
-	}
+	if (fbpages > max_fbpages)
+		return MODE_MEM;
 
-	if (mode->crtc_hdisplay > 2048 || mode->crtc_hsync_start > 4096 ||
-	    mode->crtc_hsync_end > 4096 || mode->crtc_htotal > 4096 ||
-	    mode->crtc_vdisplay > 2048 || mode->crtc_vsync_start > 4096 ||
-	    mode->crtc_vsync_end > 4096 || mode->crtc_vtotal > 4096) {
-		return MODE_BAD;
-	}
+	/*
+	 * Test the mode's required memory bandwidth if the device
+	 * specifies a maximum. Not all devices do though.
+	 */
+	if (info->max_mem_bandwidth) {
+		uint32_t mode_bandwidth = mgag200_calculate_mode_bandwidth(mode, max_bpp * 8);
 
-	/* Validate the mode input by the user */
-	if (connector->cmdline_mode.specified) {
-		if (connector->cmdline_mode.bpp_specified)
-			bpp = connector->cmdline_mode.bpp;
-	}
-
-	if ((mode->hdisplay * mode->vdisplay * (bpp/8)) > mdev->vram_fb_available) {
-		if (connector->cmdline_mode.specified)
-			connector->cmdline_mode.specified = false;
-		return MODE_BAD;
+		if (mode_bandwidth > (info->max_mem_bandwidth * 1024))
+			return MODE_BAD;
 	}
 
 	return MODE_OK;
 }
-
-static void mga_connector_destroy(struct drm_connector *connector)
-{
-	struct mga_connector *mga_connector = to_mga_connector(connector);
-	mgag200_i2c_destroy(mga_connector->i2c);
-	drm_connector_cleanup(connector);
-}
-
-static const struct drm_connector_helper_funcs mga_vga_connector_helper_funcs = {
-	.get_modes  = mga_vga_get_modes,
-	.mode_valid = mga_vga_mode_valid,
-};
-
-static const struct drm_connector_funcs mga_vga_connector_funcs = {
-	.reset                  = drm_atomic_helper_connector_reset,
-	.fill_modes             = drm_helper_probe_single_connector_modes,
-	.destroy                = mga_connector_destroy,
-	.atomic_duplicate_state = drm_atomic_helper_connector_duplicate_state,
-	.atomic_destroy_state   = drm_atomic_helper_connector_destroy_state,
-};
-
-static int mgag200_vga_connector_init(struct mga_device *mdev)
-{
-	struct drm_device *dev = &mdev->base;
-	struct mga_connector *mconnector = &mdev->connector;
-	struct drm_connector *connector = &mconnector->base;
-	struct mga_i2c_chan *i2c;
-	int ret;
-
-	i2c = mgag200_i2c_create(dev);
-	if (!i2c)
-		drm_warn(dev, "failed to add DDC bus\n");
-
-	ret = drm_connector_init_with_ddc(dev, connector,
-					  &mga_vga_connector_funcs,
-					  DRM_MODE_CONNECTOR_VGA,
-					  &i2c->adapter);
-	if (ret)
-		goto err_mgag200_i2c_destroy;
-	drm_connector_helper_add(connector, &mga_vga_connector_helper_funcs);
-
-	mconnector->i2c = i2c;
-
-	return 0;
-
-err_mgag200_i2c_destroy:
-	mgag200_i2c_destroy(i2c);
-	return ret;
-}
-
-/*
- * Simple Display Pipe
- */
-
-static enum drm_mode_status
-mgag200_simple_display_pipe_mode_valid(struct drm_simple_display_pipe *pipe,
-				       const struct drm_display_mode *mode)
-{
-	return MODE_OK;
-}
-
-static void
-mgag200_handle_damage(struct mga_device *mdev, struct drm_framebuffer *fb,
-		      struct drm_rect *clip)
-{
-	struct drm_device *dev = &mdev->base;
-	struct dma_buf_map map;
-	void *vmap;
-	int ret;
-
-	ret = drm_gem_shmem_vmap(fb->obj[0], &map);
-	if (drm_WARN_ON(dev, ret))
-		return; /* BUG: SHMEM BO should always be vmapped */
-	vmap = map.vaddr; /* TODO: Use mapping abstraction properly */
-
-	drm_fb_memcpy_dstclip(mdev->vram, vmap, fb, clip);
-
-	drm_gem_shmem_vunmap(fb->obj[0], &map);
-
-	/* Always scanout image at VRAM offset 0 */
-	mgag200_set_startadd(mdev, (u32)0);
-	mgag200_set_offset(mdev, fb);
-}
-
-static void
-mgag200_simple_display_pipe_enable(struct drm_simple_display_pipe *pipe,
-				   struct drm_crtc_state *crtc_state,
-				   struct drm_plane_state *plane_state)
-{
-	struct drm_crtc *crtc = &pipe->crtc;
-	struct drm_device *dev = crtc->dev;
-	struct mga_device *mdev = to_mga_device(dev);
-	struct drm_display_mode *adjusted_mode = &crtc_state->adjusted_mode;
-	struct drm_framebuffer *fb = plane_state->fb;
-	struct drm_rect fullscreen = {
-		.x1 = 0,
-		.x2 = fb->width,
-		.y1 = 0,
-		.y2 = fb->height,
-	};
-
-	if (mdev->type == G200_WB || mdev->type == G200_EW3)
-		mgag200_g200wb_hold_bmc(mdev);
-
-	mgag200_set_format_regs(mdev, fb);
-	mgag200_set_mode_regs(mdev, adjusted_mode);
-	mgag200_crtc_set_plls(mdev, adjusted_mode->clock);
-
-	if (mdev->type == G200_ER)
-		mgag200_g200er_reset_tagfifo(mdev);
-
-	if (IS_G200_SE(mdev))
-		mgag200_g200se_set_hiprilvl(mdev, adjusted_mode, fb);
-	else if (mdev->type == G200_EV)
-		mgag200_g200ev_set_hiprilvl(mdev);
-
-	if (mdev->type == G200_WB || mdev->type == G200_EW3)
-		mgag200_g200wb_release_bmc(mdev);
-
-	mga_crtc_load_lut(crtc);
-	mgag200_enable_display(mdev);
-
-	mgag200_handle_damage(mdev, fb, &fullscreen);
-}
-
-static void
-mgag200_simple_display_pipe_disable(struct drm_simple_display_pipe *pipe)
-{
-	struct drm_crtc *crtc = &pipe->crtc;
-	struct mga_device *mdev = to_mga_device(crtc->dev);
-
-	mgag200_disable_display(mdev);
-}
-
-static int
-mgag200_simple_display_pipe_check(struct drm_simple_display_pipe *pipe,
-				  struct drm_plane_state *plane_state,
-				  struct drm_crtc_state *crtc_state)
-{
-	struct drm_plane *plane = plane_state->plane;
-	struct drm_framebuffer *new_fb = plane_state->fb;
-	struct drm_framebuffer *fb = NULL;
-
-	if (!new_fb)
-		return 0;
-
-	if (plane->state)
-		fb = plane->state->fb;
-
-	if (!fb || (fb->format != new_fb->format))
-		crtc_state->mode_changed = true; /* update PLL settings */
-
-	return 0;
-}
-
-static void
-mgag200_simple_display_pipe_update(struct drm_simple_display_pipe *pipe,
-				   struct drm_plane_state *old_state)
-{
-	struct drm_plane *plane = &pipe->plane;
-	struct drm_device *dev = plane->dev;
-	struct mga_device *mdev = to_mga_device(dev);
-	struct drm_plane_state *state = plane->state;
-	struct drm_framebuffer *fb = state->fb;
-	struct drm_rect damage;
-
-	if (!fb)
-		return;
-
-	if (drm_atomic_helper_damage_merged(old_state, state, &damage))
-		mgag200_handle_damage(mdev, fb, &damage);
-}
-
-static const struct drm_simple_display_pipe_funcs
-mgag200_simple_display_pipe_funcs = {
-	.mode_valid = mgag200_simple_display_pipe_mode_valid,
-	.enable	    = mgag200_simple_display_pipe_enable,
-	.disable    = mgag200_simple_display_pipe_disable,
-	.check	    = mgag200_simple_display_pipe_check,
-	.update	    = mgag200_simple_display_pipe_update,
-	.prepare_fb = drm_gem_fb_simple_display_pipe_prepare_fb,
-};
-
-static const uint32_t mgag200_simple_display_pipe_formats[] = {
-	DRM_FORMAT_XRGB8888,
-	DRM_FORMAT_RGB565,
-	DRM_FORMAT_RGB888,
-};
-
-static const uint64_t mgag200_simple_display_pipe_fmtmods[] = {
-	DRM_FORMAT_MOD_LINEAR,
-	DRM_FORMAT_MOD_INVALID
-};
-
-/*
- * Mode config
- */
 
 static const struct drm_mode_config_funcs mgag200_mode_config_funcs = {
-	.fb_create     = drm_gem_fb_create_with_dirty,
-	.atomic_check  = drm_atomic_helper_check,
+	.fb_create = drm_gem_fb_create_with_dirty,
+	.mode_valid = mgag200_mode_config_mode_valid,
+	.atomic_check = drm_atomic_helper_check,
 	.atomic_commit = drm_atomic_helper_commit,
 };
 
-static unsigned int mgag200_preferred_depth(struct mga_device *mdev)
-{
-	if (IS_G200_SE(mdev) && mdev->vram_fb_available < (2048*1024))
-		return 16;
-	else
-		return 32;
-}
-
-int mgag200_modeset_init(struct mga_device *mdev)
+int mgag200_modeset_init(struct mga_device *mdev, resource_size_t vram_available)
 {
 	struct drm_device *dev = &mdev->base;
-	struct drm_connector *connector = &mdev->connector.base;
+	struct mga_i2c_chan *i2c = &mdev->i2c;
+	struct drm_connector *connector = &mdev->connector;
 	struct drm_simple_display_pipe *pipe = &mdev->display_pipe;
 	size_t format_count = ARRAY_SIZE(mgag200_simple_display_pipe_formats);
 	int ret;
 
-	mdev->bpp_shifts[0] = 0;
-	mdev->bpp_shifts[1] = 1;
-	mdev->bpp_shifts[2] = 0;
-	mdev->bpp_shifts[3] = 2;
-
 	mgag200_init_regs(mdev);
+
+	mdev->vram_available = vram_available;
 
 	ret = drmm_mode_config_init(dev);
 	if (ret) {
@@ -1722,20 +1070,29 @@ int mgag200_modeset_init(struct mga_device *mdev)
 
 	dev->mode_config.max_width = MGAG200_MAX_FB_WIDTH;
 	dev->mode_config.max_height = MGAG200_MAX_FB_HEIGHT;
-
-	dev->mode_config.preferred_depth = mgag200_preferred_depth(mdev);
-
-	dev->mode_config.fb_base = mdev->mc.vram_base;
-
+	dev->mode_config.preferred_depth = 24;
+	dev->mode_config.fb_base = mdev->vram_res->start;
 	dev->mode_config.funcs = &mgag200_mode_config_funcs;
 
-	ret = mgag200_vga_connector_init(mdev);
+	ret = mgag200_i2c_init(mdev, i2c);
 	if (ret) {
-		drm_err(dev,
-			"mgag200_vga_connector_init() failed, error %d\n",
-			ret);
+		drm_err(dev, "failed to add DDC bus: %d\n", ret);
 		return ret;
 	}
+
+	ret = drm_connector_init_with_ddc(dev, connector,
+					  &mga_vga_connector_funcs,
+					  DRM_MODE_CONNECTOR_VGA,
+					  &i2c->adapter);
+	if (ret) {
+		drm_err(dev, "drm_connector_init_with_ddc() failed: %d\n", ret);
+		return ret;
+	}
+	drm_connector_helper_add(connector, &mga_vga_connector_helper_funcs);
+
+	ret = mgag200_pixpll_init(&mdev->pixpll, mdev);
+	if (ret)
+		return ret;
 
 	ret = drm_simple_display_pipe_init(dev, pipe,
 					   &mgag200_simple_display_pipe_funcs,
@@ -1750,8 +1107,12 @@ int mgag200_modeset_init(struct mga_device *mdev)
 		return ret;
 	}
 
-	/* FIXME: legacy gamma tables; convert to CRTC state */
+	drm_plane_enable_fb_damage_clips(&pipe->plane);
+
+	/* FIXME: legacy gamma tables, but atomic gamma doesn't work without */
 	drm_mode_crtc_set_gamma_size(&pipe->crtc, MGAG200_LUT_SIZE);
+
+	drm_crtc_enable_color_mgmt(&pipe->crtc, 0, false, MGAG200_LUT_SIZE);
 
 	drm_mode_config_reset(dev);
 

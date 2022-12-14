@@ -8,7 +8,7 @@
 #include <asm/timex.h>
 #include <asm/sclp.h>
 #include <asm/kasan.h>
-#include "compressed/decompressor.h"
+#include "decompressor.h"
 #include "boot.h"
 
 #define PRNG_MODE_TDES	 1
@@ -186,9 +186,9 @@ unsigned long get_random_base(unsigned long safe_addr)
 	 */
 	memory_limit -= kasan_estimate_memory_needs(memory_limit);
 
-	if (IS_ENABLED(CONFIG_BLK_DEV_INITRD) && INITRD_START && INITRD_SIZE) {
-		if (safe_addr < INITRD_START + INITRD_SIZE)
-			safe_addr = INITRD_START + INITRD_SIZE;
+	if (IS_ENABLED(CONFIG_BLK_DEV_INITRD) && initrd_data.start && initrd_data.size) {
+		if (safe_addr < initrd_data.start + initrd_data.size)
+			safe_addr = initrd_data.start + initrd_data.size;
 	}
 	safe_addr = ALIGN(safe_addr, THREAD_SIZE);
 

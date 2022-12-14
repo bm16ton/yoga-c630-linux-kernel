@@ -878,7 +878,7 @@ static int lis3lv02d_add_fs(struct lis3lv02d *lis3)
 	return sysfs_create_group(&lis3->pdev->dev.kobj, &lis3lv02d_attribute_group);
 }
 
-int lis3lv02d_remove_fs(struct lis3lv02d *lis3)
+void lis3lv02d_remove_fs(struct lis3lv02d *lis3)
 {
 	sysfs_remove_group(&lis3->pdev->dev.kobj, &lis3lv02d_attribute_group);
 	platform_device_unregister(lis3->pdev);
@@ -894,7 +894,6 @@ int lis3lv02d_remove_fs(struct lis3lv02d *lis3)
 		pm_runtime_set_suspended(lis3->pm_dev);
 	}
 	kfree(lis3->reg_cache);
-	return 0;
 }
 EXPORT_SYMBOL_GPL(lis3lv02d_remove_fs);
 
@@ -1173,16 +1172,14 @@ int lis3lv02d_init_device(struct lis3lv02d *lis3)
 		break;
 	default:
 		pr_err("unknown sensor type 0x%X\n", lis3->whoami);
-		return -EINVAL;
+		return -ENODEV;
 	}
 
 	lis3->reg_cache = kzalloc(max(sizeof(lis3_wai8_regs),
 				     sizeof(lis3_wai12_regs)), GFP_KERNEL);
 
-	if (lis3->reg_cache == NULL) {
-		printk(KERN_ERR DRIVER_NAME "out of memory\n");
+	if (lis3->reg_cache == NULL)
 		return -ENOMEM;
-	}
 
 	mutex_init(&lis3->mutex);
 	atomic_set(&lis3->wake_thread, 0);

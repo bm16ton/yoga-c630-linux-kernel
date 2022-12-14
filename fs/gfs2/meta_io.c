@@ -34,7 +34,7 @@ static int gfs2_aspace_writepage(struct page *page, struct writeback_control *wb
 {
 	struct buffer_head *bh, *head;
 	int nr_underway = 0;
-	int write_flags = REQ_META | REQ_PRIO | wbc_to_write_flags(wbc);
+	blk_opf_t write_flags = REQ_META | REQ_PRIO | wbc_to_write_flags(wbc);
 
 	BUG_ON(!PageLocked(page));
 	BUG_ON(!page_has_buffers(page));
@@ -75,7 +75,7 @@ static int gfs2_aspace_writepage(struct page *page, struct writeback_control *wb
 	do {
 		struct buffer_head *next = bh->b_this_page;
 		if (buffer_async_write(bh)) {
-			submit_bh(REQ_OP_WRITE, write_flags, bh);
+			submit_bh(REQ_OP_WRITE | write_flags, bh);
 			nr_underway++;
 		}
 		bh = next;
@@ -89,13 +89,17 @@ static int gfs2_aspace_writepage(struct page *page, struct writeback_control *wb
 }
 
 const struct address_space_operations gfs2_meta_aops = {
+	.dirty_folio	= block_dirty_folio,
+	.invalidate_folio = block_invalidate_folio,
 	.writepage = gfs2_aspace_writepage,
-	.releasepage = gfs2_releasepage,
+	.release_folio = gfs2_release_folio,
 };
 
 const struct address_space_operations gfs2_rgrp_aops = {
+	.dirty_folio	= block_dirty_folio,
+	.invalidate_folio = block_invalidate_folio,
 	.writepage = gfs2_aspace_writepage,
-	.releasepage = gfs2_releasepage,
+	.release_folio = gfs2_release_folio,
 };
 
 /**
@@ -131,15 +135,18 @@ struct buffer_head *gfs2_getbuf(struct gfs2_glock *gl, u64 blkno, int create)
 				break;
 			yield();
 		}
+		if (!page_has_buffers(page))
+			create_empty_buffers(page, sdp->sd_sb.sb_bsize, 0);
 	} else {
 		page = find_get_page_flags(mapping, index,
 						FGP_LOCK|FGP_ACCESSED);
 		if (!page)
 			return NULL;
+		if (!page_has_buffers(page)) {
+			bh = NULL;
+			goto out_unlock;
+		}
 	}
-
-	if (!page_has_buffers(page))
-		create_empty_buffers(page, sdp->sd_sb.sb_bsize, 0);
 
 	/* Locate header for our buffer within our page */
 	for (bh = page_buffers(page); bufnum--; bh = bh->b_this_page)
@@ -149,6 +156,7 @@ struct buffer_head *gfs2_getbuf(struct gfs2_glock *gl, u64 blkno, int create)
 	if (!buffer_mapped(bh))
 		map_bh(bh, sdp->sd_vfs, blkno);
 
+out_unlock:
 	unlock_page(page);
 	put_page(page);
 
@@ -209,16 +217,14 @@ static void gfs2_meta_read_endio(struct bio *bio)
  * Submit several consecutive buffer head I/O requests as a single bio I/O
  * request.  (See submit_bh_wbc.)
  */
-static void gfs2_submit_bhs(int op, int op_flags, struct buffer_head *bhs[],
-			    int num)
+static void gfs2_submit_bhs(blk_opf_t opf, struct buffer_head *bhs[], int num)
 {
 	while (num > 0) {
 		struct buffer_head *bh = *bhs;
 		struct bio *bio;
 
-		bio = bio_alloc(GFP_NOIO, num);
+		bio = bio_alloc(bh->b_bdev, num, opf, GFP_NOIO);
 		bio->bi_iter.bi_sector = bh->b_blocknr * (bh->b_size >> 9);
-		bio_set_dev(bio, bh->b_bdev);
 		while (num > 0) {
 			bh = *bhs;
 			if (!bio_add_page(bio, bh->b_page, bh->b_size, bh_offset(bh))) {
@@ -229,7 +235,6 @@ static void gfs2_submit_bhs(int op, int op_flags, struct buffer_head *bhs[],
 			num--;
 		}
 		bio->bi_end_io = gfs2_meta_read_endio;
-		bio_set_op_attrs(bio, op, op_flags);
 		submit_bio(bio);
 	}
 }
@@ -239,6 +244,7 @@ static void gfs2_submit_bhs(int op, int op_flags, struct buffer_head *bhs[],
  * @gl: The glock covering the block
  * @blkno: The block number
  * @flags: flags
+ * @rahead: Do read-ahead
  * @bhp: the place where the buffer is returned (NULL on failure)
  *
  * Returns: errno
@@ -251,8 +257,7 @@ int gfs2_meta_read(struct gfs2_glock *gl, u64 blkno, int flags,
 	struct buffer_head *bh, *bhs[2];
 	int num = 0;
 
-	if (unlikely(gfs2_withdrawn(sdp)) &&
-	    (!sdp->sd_jdesc || gl != sdp->sd_jinode_gl)) {
+	if (unlikely(gfs2_withdrawn(sdp)) && !gfs2_withdraw_in_prog(sdp)) {
 		*bhp = NULL;
 		return -EIO;
 	}
@@ -282,7 +287,7 @@ int gfs2_meta_read(struct gfs2_glock *gl, u64 blkno, int flags,
 		}
 	}
 
-	gfs2_submit_bhs(REQ_OP_READ, REQ_META | REQ_PRIO, bhs, num);
+	gfs2_submit_bhs(REQ_OP_READ | REQ_META | REQ_PRIO, bhs, num);
 	if (!(flags & DIO_WAIT))
 		return 0;
 
@@ -310,7 +315,7 @@ int gfs2_meta_read(struct gfs2_glock *gl, u64 blkno, int flags,
 
 int gfs2_meta_wait(struct gfs2_sbd *sdp, struct buffer_head *bh)
 {
-	if (unlikely(gfs2_withdrawn(sdp)))
+	if (unlikely(gfs2_withdrawn(sdp)) && !gfs2_withdraw_in_prog(sdp))
 		return -EIO;
 
 	wait_on_buffer(bh);
@@ -321,7 +326,7 @@ int gfs2_meta_wait(struct gfs2_sbd *sdp, struct buffer_head *bh)
 			gfs2_io_error_bh_wd(sdp, bh);
 		return -EIO;
 	}
-	if (unlikely(gfs2_withdrawn(sdp)))
+	if (unlikely(gfs2_withdrawn(sdp)) && !gfs2_withdraw_in_prog(sdp))
 		return -EIO;
 
 	return 0;
@@ -462,23 +467,22 @@ void gfs2_journal_wipe(struct gfs2_inode *ip, u64 bstart, u32 blen)
 }
 
 /**
- * gfs2_meta_indirect_buffer - Get a metadata buffer
+ * gfs2_meta_buffer - Get a metadata buffer
  * @ip: The GFS2 inode
- * @height: The level of this buf in the metadata (indir addr) tree (if any)
+ * @mtype: The block type (GFS2_METATYPE_*)
  * @num: The block number (device relative) of the buffer
  * @bhp: the buffer is returned here
  *
  * Returns: errno
  */
 
-int gfs2_meta_indirect_buffer(struct gfs2_inode *ip, int height, u64 num,
-			      struct buffer_head **bhp)
+int gfs2_meta_buffer(struct gfs2_inode *ip, u32 mtype, u64 num,
+		     struct buffer_head **bhp)
 {
 	struct gfs2_sbd *sdp = GFS2_SB(&ip->i_inode);
 	struct gfs2_glock *gl = ip->i_gl;
 	struct buffer_head *bh;
 	int ret = 0;
-	u32 mtype = height ? GFS2_METATYPE_IN : GFS2_METATYPE_DI;
 	int rahead = 0;
 
 	if (num == ip->i_no_addr)
@@ -522,7 +526,7 @@ struct buffer_head *gfs2_meta_ra(struct gfs2_glock *gl, u64 dblock, u32 extlen)
 	if (buffer_uptodate(first_bh))
 		goto out;
 	if (!buffer_locked(first_bh))
-		ll_rw_block(REQ_OP_READ, REQ_META | REQ_PRIO, 1, &first_bh);
+		ll_rw_block(REQ_OP_READ | REQ_META | REQ_PRIO, 1, &first_bh);
 
 	dblock++;
 	extlen--;
@@ -531,9 +535,8 @@ struct buffer_head *gfs2_meta_ra(struct gfs2_glock *gl, u64 dblock, u32 extlen)
 		bh = gfs2_getbuf(gl, dblock, CREATE);
 
 		if (!buffer_uptodate(bh) && !buffer_locked(bh))
-			ll_rw_block(REQ_OP_READ,
-				    REQ_RAHEAD | REQ_META | REQ_PRIO,
-				    1, &bh);
+			ll_rw_block(REQ_OP_READ | REQ_RAHEAD | REQ_META |
+				    REQ_PRIO, 1, &bh);
 		brelse(bh);
 		dblock++;
 		extlen--;

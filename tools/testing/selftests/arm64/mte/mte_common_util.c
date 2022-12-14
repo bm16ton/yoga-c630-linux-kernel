@@ -37,6 +37,10 @@ void mte_default_handler(int signum, siginfo_t *si, void *uc)
 		if (si->si_code == SEGV_MTEAERR) {
 			if (cur_mte_cxt.trig_si_code == si->si_code)
 				cur_mte_cxt.fault_valid = true;
+			else
+				ksft_print_msg("Got unexpected SEGV_MTEAERR at pc=$lx, fault addr=%lx\n",
+					       ((ucontext_t *)uc)->uc_mcontext.pc,
+					       addr);
 			return;
 		}
 		/* Compare the context for precise error */
@@ -124,13 +128,16 @@ static void *__mte_allocate_memory_range(size_t size, int mem_type, int mapping,
 	int prot_flag, map_flag;
 	size_t entire_size = size + range_before + range_after;
 
-	if (mem_type != USE_MALLOC && mem_type != USE_MMAP &&
-	    mem_type != USE_MPROTECT) {
+	switch (mem_type) {
+	case USE_MALLOC:
+		return malloc(entire_size) + range_before;
+	case USE_MMAP:
+	case USE_MPROTECT:
+		break;
+	default:
 		ksft_print_msg("FAIL: Invalid allocate request\n");
 		return NULL;
 	}
-	if (mem_type == USE_MALLOC)
-		return malloc(entire_size) + range_before;
 
 	prot_flag = PROT_READ | PROT_WRITE;
 	if (mem_type == USE_MMAP)
@@ -181,10 +188,17 @@ void *mte_allocate_file_memory(size_t size, int mem_type, int mapping, bool tags
 	}
 	/* Initialize the file for mappable size */
 	lseek(fd, 0, SEEK_SET);
-	for (index = INIT_BUFFER_SIZE; index < size; index += INIT_BUFFER_SIZE)
-		write(fd, buffer, INIT_BUFFER_SIZE);
+	for (index = INIT_BUFFER_SIZE; index < size; index += INIT_BUFFER_SIZE) {
+		if (write(fd, buffer, INIT_BUFFER_SIZE) != INIT_BUFFER_SIZE) {
+			perror("initialising buffer");
+			return NULL;
+		}
+	}
 	index -= INIT_BUFFER_SIZE;
-	write(fd, buffer, size - index);
+	if (write(fd, buffer, size - index) != size - index) {
+		perror("initialising buffer");
+		return NULL;
+	}
 	return __mte_allocate_memory_range(size, mem_type, mapping, 0, 0, tags, fd);
 }
 
@@ -202,9 +216,15 @@ void *mte_allocate_file_memory_tag_range(size_t size, int mem_type, int mapping,
 	/* Initialize the file for mappable size */
 	lseek(fd, 0, SEEK_SET);
 	for (index = INIT_BUFFER_SIZE; index < map_size; index += INIT_BUFFER_SIZE)
-		write(fd, buffer, INIT_BUFFER_SIZE);
+		if (write(fd, buffer, INIT_BUFFER_SIZE) != INIT_BUFFER_SIZE) {
+			perror("initialising buffer");
+			return NULL;
+		}
 	index -= INIT_BUFFER_SIZE;
-	write(fd, buffer, map_size - index);
+	if (write(fd, buffer, map_size - index) != map_size - index) {
+		perror("initialising buffer");
+		return NULL;
+	}
 	return __mte_allocate_memory_range(size, mem_type, mapping, range_before,
 					   range_after, true, fd);
 }
@@ -256,22 +276,37 @@ int mte_switch_mode(int mte_option, unsigned long incl_mask)
 {
 	unsigned long en = 0;
 
-	if (!(mte_option == MTE_SYNC_ERR || mte_option == MTE_ASYNC_ERR ||
-	      mte_option == MTE_NONE_ERR || incl_mask <= MTE_ALLOW_NON_ZERO_TAG)) {
-		ksft_print_msg("FAIL: Invalid mte config option\n");
+	switch (mte_option) {
+	case MTE_NONE_ERR:
+	case MTE_SYNC_ERR:
+	case MTE_ASYNC_ERR:
+		break;
+	default:
+		ksft_print_msg("FAIL: Invalid MTE option %x\n", mte_option);
 		return -EINVAL;
 	}
+
+	if (incl_mask & ~MT_INCLUDE_TAG_MASK) {
+		ksft_print_msg("FAIL: Invalid incl_mask %lx\n", incl_mask);
+		return -EINVAL;
+	}
+
 	en = PR_TAGGED_ADDR_ENABLE;
-	if (mte_option == MTE_SYNC_ERR)
+	switch (mte_option) {
+	case MTE_SYNC_ERR:
 		en |= PR_MTE_TCF_SYNC;
-	else if (mte_option == MTE_ASYNC_ERR)
+		break;
+	case MTE_ASYNC_ERR:
 		en |= PR_MTE_TCF_ASYNC;
-	else if (mte_option == MTE_NONE_ERR)
+		break;
+	case MTE_NONE_ERR:
 		en |= PR_MTE_TCF_NONE;
+		break;
+	}
 
 	en |= (incl_mask << PR_MTE_TAG_SHIFT);
 	/* Enable address tagging ABI, mte error reporting mode and tag inclusion mask. */
-	if (!prctl(PR_SET_TAGGED_ADDR_CTRL, en, 0, 0, 0) == 0) {
+	if (prctl(PR_SET_TAGGED_ADDR_CTRL, en, 0, 0, 0) != 0) {
 		ksft_print_msg("FAIL:prctl PR_SET_TAGGED_ADDR_CTRL for mte mode\n");
 		return -EINVAL;
 	}
@@ -285,7 +320,7 @@ int mte_default_setup(void)
 	int ret;
 
 	if (!(hwcaps2 & HWCAP2_MTE)) {
-		ksft_print_msg("FAIL: MTE features unavailable\n");
+		ksft_print_msg("SKIP: MTE features unavailable\n");
 		return KSFT_SKIP;
 	}
 	/* Get current mte mode */
@@ -324,6 +359,7 @@ int create_temp_file(void)
 	/* Create a file in the tmpfs filesystem */
 	fd = mkstemp(&filename[0]);
 	if (fd == -1) {
+		perror(filename);
 		ksft_print_msg("FAIL: Unable to open temporary file\n");
 		return 0;
 	}

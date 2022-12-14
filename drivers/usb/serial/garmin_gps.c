@@ -988,7 +988,7 @@ static int garmin_write_bulk(struct usb_serial_port *port,
 	garmin_data_p->flags &= ~FLAGS_DROP_DATA;
 	spin_unlock_irqrestore(&garmin_data_p->lock, flags);
 
-	buffer = kmalloc(count, GFP_ATOMIC);
+	buffer = kmemdup(buf, count, GFP_ATOMIC);
 	if (!buffer)
 		return -ENOMEM;
 
@@ -997,8 +997,6 @@ static int garmin_write_bulk(struct usb_serial_port *port,
 		kfree(buffer);
 		return -ENOMEM;
 	}
-
-	memcpy(buffer, buf, count);
 
 	usb_serial_debug_data(&port->dev, __func__, count, buffer);
 
@@ -1113,7 +1111,7 @@ static int garmin_write(struct tty_struct *tty, struct usb_serial_port *port,
 }
 
 
-static int garmin_write_room(struct tty_struct *tty)
+static unsigned int garmin_write_room(struct tty_struct *tty)
 {
 	struct usb_serial_port *port = tty->driver_data;
 	/*
@@ -1444,5 +1442,5 @@ MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE("GPL");
 
-module_param(initial_mode, int, S_IRUGO);
+module_param(initial_mode, int, 0444);
 MODULE_PARM_DESC(initial_mode, "Initial mode");

@@ -1,0 +1,11 @@
+--- arch/arm/boot/dts/imx6qdl-kontron-samx6i.dtsi
++++ arch/arm/boot/dts/imx6qdl-kontron-samx6i.dtsi
+@@ -249,7 +239,7 @@
+ 
+ 	/* default boot source: workaround #1 for errata ERR006282 */
+ 	smarc_flash: flash@0 {
+-		compatible = "winbond,w25q16dw", "jedec,spi-nor";
++		compatible = "jedec,spi-nor";
+ 		reg = <0>;
+ 		spi-max-frequency = <20000000>;
+ 	};

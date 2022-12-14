@@ -23,9 +23,6 @@
  *
  */
 
-#include <linux/delay.h>
-#include <linux/slab.h>
-
 #include "core_types.h"
 #include "link_encoder.h"
 #include "dce_dmcu.h"
@@ -57,6 +54,8 @@
 #define MCP_SYNC_PHY_LOCK 0x90
 #define MCP_SYNC_PHY_UNLOCK 0x91
 #define MCP_BL_SET_PWM_FRAC 0x6A  /* Enable or disable Fractional PWM */
+#define CRC_WIN_NOTIFY 0x92
+#define CRC_STOP_UPDATE 0x93
 #define MCP_SEND_EDID_CEA 0xA0
 #define EDID_CEA_CMD_ACK 1
 #define EDID_CEA_CMD_NACK 2
@@ -68,9 +67,7 @@
 //Register access policy version
 #define mmMP0_SMN_C2PMSG_91				0x1609B
 
-#if defined(CONFIG_DRM_AMD_DC_DCN)
 static const uint32_t abm_gain_stepsize = 0x0060;
-#endif
 
 static bool dce_dmcu_init(struct dmcu *dmcu)
 {
@@ -331,7 +328,6 @@ static void dce_get_psr_wait_loop(
 	return;
 }
 
-#if defined(CONFIG_DRM_AMD_DC_DCN)
 static void dcn10_get_dmcu_version(struct dmcu *dmcu)
 {
 	struct dce_dmcu *dmcu_dce = TO_DCE_DMCU(dmcu);
@@ -928,7 +924,84 @@ static bool dcn10_recv_edid_cea_ack(struct dmcu *dmcu, int *offset)
 	return false;
 }
 
-#endif //(CONFIG_DRM_AMD_DC_DCN)
+
+#if defined(CONFIG_DRM_AMD_SECURE_DISPLAY)
+static void dcn10_forward_crc_window(struct dmcu *dmcu,
+					struct crc_region *crc_win,
+					struct otg_phy_mux *mux_mapping)
+{
+	struct dce_dmcu *dmcu_dce = TO_DCE_DMCU(dmcu);
+	unsigned int dmcu_max_retry_on_wait_reg_ready = 801;
+	unsigned int dmcu_wait_reg_ready_interval = 100;
+	unsigned int crc_start = 0, crc_end = 0, otg_phy_mux = 0;
+
+	/* If microcontroller is not running, do nothing */
+	if (dmcu->dmcu_state != DMCU_RUNNING)
+		return;
+
+	if (!crc_win)
+		return;
+
+	/* waitDMCUReadyForCmd */
+	REG_WAIT(MASTER_COMM_CNTL_REG, MASTER_COMM_INTERRUPT, 0,
+				dmcu_wait_reg_ready_interval,
+				dmcu_max_retry_on_wait_reg_ready);
+
+	/* build up nitification data */
+	crc_start = (((unsigned int) crc_win->x_start) << 16) | crc_win->y_start;
+	crc_end = (((unsigned int) crc_win->x_end) << 16) | crc_win->y_end;
+	otg_phy_mux =
+		(((unsigned int) mux_mapping->otg_output_num) << 16) | mux_mapping->phy_output_num;
+
+	dm_write_reg(dmcu->ctx, REG(MASTER_COMM_DATA_REG1),
+					crc_start);
+
+	dm_write_reg(dmcu->ctx, REG(MASTER_COMM_DATA_REG2),
+			crc_end);
+
+	dm_write_reg(dmcu->ctx, REG(MASTER_COMM_DATA_REG3),
+			otg_phy_mux);
+
+	/* setDMCUParam_Cmd */
+	REG_UPDATE(MASTER_COMM_CMD_REG, MASTER_COMM_CMD_REG_BYTE0,
+				CRC_WIN_NOTIFY);
+
+	/* notifyDMCUMsg */
+	REG_UPDATE(MASTER_COMM_CNTL_REG, MASTER_COMM_INTERRUPT, 1);
+}
+
+static void dcn10_stop_crc_win_update(struct dmcu *dmcu,
+					struct otg_phy_mux *mux_mapping)
+{
+	struct dce_dmcu *dmcu_dce = TO_DCE_DMCU(dmcu);
+	unsigned int dmcu_max_retry_on_wait_reg_ready = 801;
+	unsigned int dmcu_wait_reg_ready_interval = 100;
+	unsigned int otg_phy_mux = 0;
+
+	/* If microcontroller is not running, do nothing */
+	if (dmcu->dmcu_state != DMCU_RUNNING)
+		return;
+
+	/* waitDMCUReadyForCmd */
+	REG_WAIT(MASTER_COMM_CNTL_REG, MASTER_COMM_INTERRUPT, 0,
+				dmcu_wait_reg_ready_interval,
+				dmcu_max_retry_on_wait_reg_ready);
+
+	/* build up nitification data */
+	otg_phy_mux =
+		(((unsigned int) mux_mapping->otg_output_num) << 16) | mux_mapping->phy_output_num;
+
+	dm_write_reg(dmcu->ctx, REG(MASTER_COMM_DATA_REG1),
+					otg_phy_mux);
+
+	/* setDMCUParam_Cmd */
+	REG_UPDATE(MASTER_COMM_CMD_REG, MASTER_COMM_CMD_REG_BYTE0,
+				CRC_STOP_UPDATE);
+
+	/* notifyDMCUMsg */
+	REG_UPDATE(MASTER_COMM_CNTL_REG, MASTER_COMM_INTERRUPT, 1);
+}
+#endif
 
 static const struct dmcu_funcs dce_funcs = {
 	.dmcu_init = dce_dmcu_init,
@@ -941,7 +1014,6 @@ static const struct dmcu_funcs dce_funcs = {
 	.is_dmcu_initialized = dce_is_dmcu_initialized
 };
 
-#if defined(CONFIG_DRM_AMD_DC_DCN)
 static const struct dmcu_funcs dcn10_funcs = {
 	.dmcu_init = dcn10_dmcu_init,
 	.load_iram = dcn10_dmcu_load_iram,
@@ -953,6 +1025,10 @@ static const struct dmcu_funcs dcn10_funcs = {
 	.send_edid_cea = dcn10_send_edid_cea,
 	.recv_amd_vsdb = dcn10_recv_amd_vsdb,
 	.recv_edid_cea_ack = dcn10_recv_edid_cea_ack,
+#if defined(CONFIG_DRM_AMD_SECURE_DISPLAY)
+	.forward_crc_window = dcn10_forward_crc_window,
+	.stop_crc_win_update = dcn10_stop_crc_win_update,
+#endif
 	.is_dmcu_initialized = dcn10_is_dmcu_initialized
 };
 
@@ -981,7 +1057,6 @@ static const struct dmcu_funcs dcn21_funcs = {
 	.lock_phy = dcn20_lock_phy,
 	.unlock_phy = dcn20_unlock_phy
 };
-#endif
 
 static void dce_dmcu_construct(
 	struct dce_dmcu *dmcu_dce,
@@ -1001,7 +1076,6 @@ static void dce_dmcu_construct(
 	dmcu_dce->dmcu_mask = dmcu_mask;
 }
 
-#if defined(CONFIG_DRM_AMD_DC_DCN)
 static void dcn21_dmcu_construct(
 		struct dce_dmcu *dmcu_dce,
 		struct dc_context *ctx,
@@ -1019,7 +1093,6 @@ static void dcn21_dmcu_construct(
 		dmcu_dce->base.psp_version = psp_version;
 	}
 }
-#endif
 
 struct dmcu *dce_dmcu_create(
 	struct dc_context *ctx,
@@ -1042,7 +1115,6 @@ struct dmcu *dce_dmcu_create(
 	return &dmcu_dce->base;
 }
 
-#if defined(CONFIG_DRM_AMD_DC_DCN)
 struct dmcu *dcn10_dmcu_create(
 	struct dc_context *ctx,
 	const struct dce_dmcu_registers *regs,
@@ -1105,7 +1177,6 @@ struct dmcu *dcn21_dmcu_create(
 
 	return &dmcu_dce->base;
 }
-#endif
 
 void dce_dmcu_destroy(struct dmcu **dmcu)
 {

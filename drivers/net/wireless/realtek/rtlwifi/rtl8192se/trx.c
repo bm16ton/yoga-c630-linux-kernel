@@ -342,7 +342,7 @@ void rtl92se_tx_fill_desc(struct ieee80211_hw *hw,
 	} else if (mac->opmode == NL80211_IFTYPE_AP ||
 		mac->opmode == NL80211_IFTYPE_ADHOC) {
 		if (sta)
-			bw_40 = sta->bandwidth >= IEEE80211_STA_RX_BW_40;
+			bw_40 = sta->deflink.bandwidth >= IEEE80211_STA_RX_BW_40;
 	}
 
 	seq_number = (le16_to_cpu(hdr->seq_ctrl) & IEEE80211_SCTL_SEQ) >> 4;
@@ -513,7 +513,7 @@ void rtl92se_tx_fill_cmddesc(struct ieee80211_hw *hw, u8 *pdesc8,
 
 	/* This bit indicate this packet is used for FW download. */
 	if (tcb_desc->cmd_or_init == DESC_PACKET_TYPE_INIT) {
-		/* For firmware downlaod we only need to set LINIP */
+		/* For firmware download we only need to set LINIP */
 		set_tx_desc_linip(pdesc, tcb_desc->last_inipkt);
 
 		/* 92SE must set as 1 for firmware download HW DMA error */

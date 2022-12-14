@@ -2,8 +2,8 @@
 # Copyright (C) 2020 Topic Embedded Products
 %YAML 1.2
 ---
-$id: "http://devicetree.org/schemas/power/supply/ltc4162-l.yaml#"
-$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+$id: http://devicetree.org/schemas/power/supply/ltc4162-l.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
 
 title: Linear Technology (Analog Devices) LTC4162-L Charger
 
@@ -29,12 +29,10 @@ properties:
     description: I2C address of the charger.
 
   lltc,rsnsb-micro-ohms:
-    $ref: /schemas/types.yaml#/definitions/uint32
     description: Battery sense resistor in microohm.
     minimum: 1000
 
   lltc,rsnsi-micro-ohms:
-    $ref: /schemas/types.yaml#/definitions/uint32
     description: Input current sense resistor in microohm.
     minimum: 1000
 

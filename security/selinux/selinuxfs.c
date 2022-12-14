@@ -41,6 +41,7 @@
 #include "security.h"
 #include "objsec.h"
 #include "conditional.h"
+#include "ima.h"
 
 enum sel_inos {
 	SEL_ROOT_INO = 2,
@@ -182,6 +183,8 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
 		selinux_status_update_setenforce(state, new_value);
 		if (!new_value)
 			call_blocking_lsm_notifier(LSM_POLICY_CHANGE, NULL);
+
+		selinux_ima_measure_state(state);
 	}
 	length = count;
 out:
@@ -290,6 +293,8 @@ static ssize_t sel_write_disable(struct file *file, const char __user *buf,
 	 *       kernel releases until eventually it is removed
 	 */
 	pr_err("SELinux:  Runtime disable is deprecated, use selinux=0 on the kernel cmdline.\n");
+	pr_err("SELinux:  https://github.com/SELinuxProject/selinux-kernel/wiki/DEPRECATE-runtime-disable\n");
+	ssleep(5);
 
 	if (count >= PAGE_SIZE)
 		return -ENOMEM;
@@ -752,12 +757,17 @@ static ssize_t sel_write_checkreqprot(struct file *file, const char __user *buf,
 		char comm[sizeof(current->comm)];
 
 		memcpy(comm, current->comm, sizeof(comm));
-		pr_warn_once("SELinux: %s (%d) set checkreqprot to 1. This is deprecated and will be rejected in a future kernel release.\n",
-			     comm, current->pid);
+		pr_err("SELinux: %s (%d) set checkreqprot to 1. This is deprecated and will be rejected in a future kernel release.\n",
+		       comm, current->pid);
 	}
 
 	checkreqprot_set(fsi->state, (new_value ? 1 : 0));
+	if (new_value)
+		ssleep(5);
 	length = count;
+
+	selinux_ima_measure_state(fsi->state);
+
 out:
 	kfree(page);
 	return length;
@@ -1977,7 +1987,7 @@ static int sel_make_policycap(struct selinux_fs_info *fsi)
 	struct dentry *dentry = NULL;
 	struct inode *inode = NULL;
 
-	for (iter = 0; iter <= POLICYDB_CAPABILITY_MAX; iter++) {
+	for (iter = 0; iter <= POLICYDB_CAP_MAX; iter++) {
 		if (iter < ARRAY_SIZE(selinux_policycap_names))
 			dentry = d_alloc_name(fsi->policycap_dir,
 					      selinux_policycap_names[iter]);
@@ -2121,6 +2131,8 @@ static int sel_fill_super(struct super_block *sb, struct fs_context *fc)
 	}
 
 	ret = sel_make_avc_files(dentry);
+	if (ret)
+		goto err;
 
 	dentry = sel_make_dir(sb->s_root, "ss", &fsi->last_ino);
 	if (IS_ERR(dentry)) {

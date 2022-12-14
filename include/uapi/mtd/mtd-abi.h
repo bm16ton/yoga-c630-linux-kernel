@@ -69,8 +69,8 @@ enum {
  * struct mtd_write_req - data structure for requesting a write operation
  *
  * @start:	start address
- * @len:	length of data buffer
- * @ooblen:	length of OOB buffer
+ * @len:	length of data buffer (only lower 32 bits are used)
+ * @ooblen:	length of OOB buffer (only lower 32 bits are used)
  * @usr_data:	user-provided data buffer
  * @usr_oob:	user-provided OOB buffer
  * @mode:	MTD mode (see "MTD operation modes")
@@ -205,6 +205,8 @@ struct otp_info {
  * without OOB, e.g., NOR flash.
  */
 #define MEMWRITE		_IOWR('M', 24, struct mtd_write_req)
+/* Erase a given range of user data (must be in mode %MTD_FILE_MODE_OTP_USER) */
+#define OTPERASE		_IOW('M', 25, struct otp_info)
 
 /*
  * Obsolete legacy interface. Keep it in order not to break userspace

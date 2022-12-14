@@ -221,15 +221,10 @@ static int i2c_gpio_probe(struct usb_interface *interface)
 	int inf;
 	inf = interface->cur_altsetting->desc.bInterfaceNumber;
 
-	if (inf > 0) {
+	if (inf <= 3 && inf >= 1) {
 		dev_info(&interface->dev, "Ignoring Interface\n");
 		return -ENODEV;
 		}
-	if (inf < 0) {
-		dev_info(&interface->dev, "Ignoring Interface\n");
-		return -ENODEV;
-		}
-
 	return 0;
 }
 
@@ -274,6 +269,10 @@ static int i2c_tiny_usb_probe(struct usb_interface *interface,
      	}
 	 }
 	 
+	 ret = i2c_gpio_probe(interface);
+		if (ret < 0) {
+		    	return -ENODEV;
+    }
 	/* save our data pointer in this interface device */
 	usb_set_intfdata(interface, dev);
 

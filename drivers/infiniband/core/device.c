@@ -58,6 +58,7 @@ struct workqueue_struct *ib_comp_wq;
 struct workqueue_struct *ib_comp_unbound_wq;
 struct workqueue_struct *ib_wq;
 EXPORT_SYMBOL_GPL(ib_wq);
+static struct workqueue_struct *ib_unreg_wq;
 
 /*
  * Each of the three rwsem locks (devices, clients, client_data) protects the
@@ -491,6 +492,8 @@ static void ib_device_release(struct device *device)
 
 	free_netdevs(dev);
 	WARN_ON(refcount_read(&dev->refcount));
+	if (dev->hw_stats_data)
+		ib_device_release_hw_stats(dev->hw_stats_data);
 	if (dev->port_data) {
 		ib_cache_release_one(dev);
 		ib_security_release_port_pkey_list(dev);
@@ -584,7 +587,6 @@ struct ib_device *_ib_alloc_device(size_t size)
 		return NULL;
 	}
 
-	device->groups[0] = &ib_dev_attr_group;
 	rdma_init_coredev(&device->coredev, device, &init_net);
 
 	INIT_LIST_HEAD(&device->event_handler_list);
@@ -605,6 +607,8 @@ struct ib_device *_ib_alloc_device(size_t size)
 	spin_lock_init(&device->cq_pools_lock);
 	for (i = 0; i < ARRAY_SIZE(device->cq_pools); i++)
 		INIT_LIST_HEAD(&device->cq_pools[i]);
+
+	rwlock_init(&device->cache_lock);
 
 	device->uverbs_cmd_mask =
 		BIT_ULL(IB_USER_VERBS_CMD_ALLOC_MW) |
@@ -779,13 +783,17 @@ static void remove_client_context(struct ib_device *device,
 static int alloc_port_data(struct ib_device *device)
 {
 	struct ib_port_data_rcu *pdata_rcu;
-	unsigned int port;
+	u32 port;
 
 	if (device->port_data)
 		return 0;
 
 	/* This can only be called once the physical port range is defined */
 	if (WARN_ON(!device->phys_port_cnt))
+		return -EINVAL;
+
+	/* Reserve U32_MAX so the logic to go over all the ports is sane */
+	if (WARN_ON(device->phys_port_cnt == U32_MAX))
 		return -EINVAL;
 
 	/*
@@ -819,7 +827,7 @@ static int alloc_port_data(struct ib_device *device)
 	return 0;
 }
 
-static int verify_immutable(const struct ib_device *dev, u8 port)
+static int verify_immutable(const struct ib_device *dev, u32 port)
 {
 	return WARN_ON(!rdma_cap_ib_mad(dev, port) &&
 			    rdma_max_mad_size(dev, port) != 0);
@@ -827,7 +835,7 @@ static int verify_immutable(const struct ib_device *dev, u8 port)
 
 static int setup_port_data(struct ib_device *device)
 {
-	unsigned int port;
+	u32 port;
 	int ret;
 
 	ret = alloc_port_data(device);
@@ -882,15 +890,8 @@ static void ib_policy_change_task(struct work_struct *work)
 
 		rdma_for_each_port (dev, i) {
 			u64 sp;
-			int ret = ib_get_cached_subnet_prefix(dev,
-							      i,
-							      &sp);
-
-			WARN_ONCE(ret,
-				  "ib_get_cached_subnet_prefix err: %d, this should never happen here\n",
-				  ret);
-			if (!ret)
-				ib_security_cache_change(dev, i, sp);
+			ib_get_cached_subnet_prefix(dev, i, &sp);
+			ib_security_cache_change(dev, i, sp);
 		}
 	}
 	up_read(&devices_rwsem);
@@ -1390,6 +1391,12 @@ int ib_register_device(struct ib_device *device, const char *name,
 		return ret;
 	}
 
+	device->groups[0] = &ib_dev_attr_group;
+	device->groups[1] = device->ops.device_group;
+	ret = ib_setup_device_attrs(device);
+	if (ret)
+		goto cache_cleanup;
+
 	ib_device_register_rdmacg(device);
 
 	rdma_counter_init(device);
@@ -1403,7 +1410,7 @@ int ib_register_device(struct ib_device *device, const char *name,
 	if (ret)
 		goto cg_cleanup;
 
-	ret = ib_device_register_sysfs(device);
+	ret = ib_setup_port_attrs(&device->coredev);
 	if (ret) {
 		dev_warn(&device->dev,
 			 "Couldn't register device with driver model\n");
@@ -1445,6 +1452,7 @@ dev_cleanup:
 cg_cleanup:
 	dev_set_uevent_suppress(&device->dev, false);
 	ib_device_unregister_rdmacg(device);
+cache_cleanup:
 	ib_cache_cleanup_one(device);
 	return ret;
 }
@@ -1469,7 +1477,7 @@ static void __ib_unregister_device(struct ib_device *ib_dev)
 	/* Expedite removing unregistered pointers from the hash table */
 	free_netdevs(ib_dev);
 
-	ib_device_unregister_sysfs(ib_dev);
+	ib_free_port_attrs(&ib_dev->coredev);
 	device_del(&ib_dev->dev);
 	ib_device_unregister_rdmacg(ib_dev);
 	ib_cache_cleanup_one(ib_dev);
@@ -1595,7 +1603,7 @@ void ib_unregister_device_queued(struct ib_device *ib_dev)
 	WARN_ON(!refcount_read(&ib_dev->refcount));
 	WARN_ON(!ib_dev->ops.dealloc_driver);
 	get_device(&ib_dev->dev);
-	if (!queue_work(system_unbound_wq, &ib_dev->unregistration_work))
+	if (!queue_work(ib_unreg_wq, &ib_dev->unregistration_work))
 		put_device(&ib_dev->dev);
 }
 EXPORT_SYMBOL(ib_unregister_device_queued);
@@ -1687,13 +1695,11 @@ int ib_device_set_netns_put(struct sk_buff *skb,
 	}
 
 	/*
-	 * Currently supported only for those providers which support
-	 * disassociation and don't do port specific sysfs init. Once a
-	 * port_cleanup infrastructure is implemented, this limitation will be
-	 * removed.
+	 * All the ib_clients, including uverbs, are reset when the namespace is
+	 * changed and this cannot be blocked waiting for userspace to do
+	 * something, so disassociation is mandatory.
 	 */
-	if (!dev->ops.disassociate_ucontext || dev->ops.init_port ||
-	    ib_devices_shared_netns) {
+	if (!dev->ops.disassociate_ucontext || ib_devices_shared_netns) {
 		ret = -EOPNOTSUPP;
 		goto ns_err;
 	}
@@ -2005,7 +2011,7 @@ void ib_dispatch_event_clients(struct ib_event *event)
 }
 
 static int iw_query_port(struct ib_device *device,
-			   u8 port_num,
+			   u32 port_num,
 			   struct ib_port_attr *port_attr)
 {
 	struct in_device *inetdev;
@@ -2044,10 +2050,9 @@ static int iw_query_port(struct ib_device *device,
 }
 
 static int __ib_query_port(struct ib_device *device,
-			   u8 port_num,
+			   u32 port_num,
 			   struct ib_port_attr *port_attr)
 {
-	union ib_gid gid = {};
 	int err;
 
 	memset(port_attr, 0, sizeof(*port_attr));
@@ -2060,11 +2065,8 @@ static int __ib_query_port(struct ib_device *device,
 	    IB_LINK_LAYER_INFINIBAND)
 		return 0;
 
-	err = device->ops.query_gid(device, port_num, 0, &gid);
-	if (err)
-		return err;
-
-	port_attr->subnet_prefix = be64_to_cpu(gid.global.subnet_prefix);
+	ib_get_cached_subnet_prefix(device, port_num,
+				    &port_attr->subnet_prefix);
 	return 0;
 }
 
@@ -2078,7 +2080,7 @@ static int __ib_query_port(struct ib_device *device,
  * @port_attr pointer.
  */
 int ib_query_port(struct ib_device *device,
-		  u8 port_num,
+		  u32 port_num,
 		  struct ib_port_attr *port_attr)
 {
 	if (!rdma_is_port_valid(device, port_num))
@@ -2130,7 +2132,7 @@ static void add_ndev_hash(struct ib_port_data *pdata)
  * NETDEV_UNREGISTER event.
  */
 int ib_device_set_netdev(struct ib_device *ib_dev, struct net_device *ndev,
-			 unsigned int port)
+			 u32 port)
 {
 	struct net_device *old_ndev;
 	struct ib_port_data *pdata;
@@ -2173,7 +2175,7 @@ EXPORT_SYMBOL(ib_device_set_netdev);
 static void free_netdevs(struct ib_device *ib_dev)
 {
 	unsigned long flags;
-	unsigned int port;
+	u32 port;
 
 	if (!ib_dev->port_data)
 		return;
@@ -2204,7 +2206,7 @@ static void free_netdevs(struct ib_device *ib_dev)
 }
 
 struct net_device *ib_device_get_netdev(struct ib_device *ib_dev,
-					unsigned int port)
+					u32 port)
 {
 	struct ib_port_data *pdata;
 	struct net_device *res;
@@ -2291,7 +2293,7 @@ void ib_enum_roce_netdev(struct ib_device *ib_dev,
 			 roce_netdev_callback cb,
 			 void *cookie)
 {
-	unsigned int port;
+	u32 port;
 
 	rdma_for_each_port (ib_dev, port)
 		if (rdma_protocol_roce(ib_dev, port)) {
@@ -2369,7 +2371,7 @@ int ib_enum_all_devs(nldev_callback nldev_cb, struct sk_buff *skb,
  * ib_query_pkey() fetches the specified P_Key table entry.
  */
 int ib_query_pkey(struct ib_device *device,
-		  u8 port_num, u16 index, u16 *pkey)
+		  u32 port_num, u16 index, u16 *pkey)
 {
 	if (!rdma_is_port_valid(device, port_num))
 		return -EINVAL;
@@ -2414,7 +2416,7 @@ EXPORT_SYMBOL(ib_modify_device);
  * @port_modify_mask and @port_modify structure.
  */
 int ib_modify_port(struct ib_device *device,
-		   u8 port_num, int port_modify_mask,
+		   u32 port_num, int port_modify_mask,
 		   struct ib_port_modify *port_modify)
 {
 	int rc;
@@ -2446,10 +2448,10 @@ EXPORT_SYMBOL(ib_modify_port);
  *   parameter may be NULL.
  */
 int ib_find_gid(struct ib_device *device, union ib_gid *gid,
-		u8 *port_num, u16 *index)
+		u32 *port_num, u16 *index)
 {
 	union ib_gid tmp_gid;
-	unsigned int port;
+	u32 port;
 	int ret, i;
 
 	rdma_for_each_port (device, port) {
@@ -2460,7 +2462,8 @@ int ib_find_gid(struct ib_device *device, union ib_gid *gid,
 		     ++i) {
 			ret = rdma_query_gid(device, port, i, &tmp_gid);
 			if (ret)
-				return ret;
+				continue;
+
 			if (!memcmp(&tmp_gid, gid, sizeof *gid)) {
 				*port_num = port;
 				if (index)
@@ -2483,7 +2486,7 @@ EXPORT_SYMBOL(ib_find_gid);
  * @index: The index into the PKey table where the PKey was found.
  */
 int ib_find_pkey(struct ib_device *device,
-		 u8 port_num, u16 pkey, u16 *index)
+		 u32 port_num, u16 pkey, u16 *index)
 {
 	int ret, i;
 	u16 tmp_pkey;
@@ -2526,7 +2529,7 @@ EXPORT_SYMBOL(ib_find_pkey);
  *
  */
 struct net_device *ib_get_net_dev_by_params(struct ib_device *dev,
-					    u8 port,
+					    u32 port,
 					    u16 pkey,
 					    const union ib_gid *gid,
 					    const struct sockaddr *addr)
@@ -2591,7 +2594,8 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, add_gid);
 	SET_DEVICE_OP(dev_ops, advise_mr);
 	SET_DEVICE_OP(dev_ops, alloc_dm);
-	SET_DEVICE_OP(dev_ops, alloc_hw_stats);
+	SET_DEVICE_OP(dev_ops, alloc_hw_device_stats);
+	SET_DEVICE_OP(dev_ops, alloc_hw_port_stats);
 	SET_DEVICE_OP(dev_ops, alloc_mr);
 	SET_DEVICE_OP(dev_ops, alloc_mr_integrity);
 	SET_DEVICE_OP(dev_ops, alloc_mw);
@@ -2610,7 +2614,6 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, create_counters);
 	SET_DEVICE_OP(dev_ops, create_cq);
 	SET_DEVICE_OP(dev_ops, create_flow);
-	SET_DEVICE_OP(dev_ops, create_flow_action_esp);
 	SET_DEVICE_OP(dev_ops, create_qp);
 	SET_DEVICE_OP(dev_ops, create_rwq_ind_table);
 	SET_DEVICE_OP(dev_ops, create_srq);
@@ -2633,6 +2636,7 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, destroy_rwq_ind_table);
 	SET_DEVICE_OP(dev_ops, destroy_srq);
 	SET_DEVICE_OP(dev_ops, destroy_wq);
+	SET_DEVICE_OP(dev_ops, device_group);
 	SET_DEVICE_OP(dev_ops, detach_mcast);
 	SET_DEVICE_OP(dev_ops, disassociate_ucontext);
 	SET_DEVICE_OP(dev_ops, drain_rq);
@@ -2651,12 +2655,12 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, get_hw_stats);
 	SET_DEVICE_OP(dev_ops, get_link_layer);
 	SET_DEVICE_OP(dev_ops, get_netdev);
+	SET_DEVICE_OP(dev_ops, get_numa_node);
 	SET_DEVICE_OP(dev_ops, get_port_immutable);
 	SET_DEVICE_OP(dev_ops, get_vector_affinity);
 	SET_DEVICE_OP(dev_ops, get_vf_config);
 	SET_DEVICE_OP(dev_ops, get_vf_guid);
 	SET_DEVICE_OP(dev_ops, get_vf_stats);
-	SET_DEVICE_OP(dev_ops, init_port);
 	SET_DEVICE_OP(dev_ops, iw_accept);
 	SET_DEVICE_OP(dev_ops, iw_add_ref);
 	SET_DEVICE_OP(dev_ops, iw_connect);
@@ -2672,13 +2676,14 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, modify_ah);
 	SET_DEVICE_OP(dev_ops, modify_cq);
 	SET_DEVICE_OP(dev_ops, modify_device);
-	SET_DEVICE_OP(dev_ops, modify_flow_action_esp);
+	SET_DEVICE_OP(dev_ops, modify_hw_stat);
 	SET_DEVICE_OP(dev_ops, modify_port);
 	SET_DEVICE_OP(dev_ops, modify_qp);
 	SET_DEVICE_OP(dev_ops, modify_srq);
 	SET_DEVICE_OP(dev_ops, modify_wq);
 	SET_DEVICE_OP(dev_ops, peek_cq);
 	SET_DEVICE_OP(dev_ops, poll_cq);
+	SET_DEVICE_OP(dev_ops, port_groups);
 	SET_DEVICE_OP(dev_ops, post_recv);
 	SET_DEVICE_OP(dev_ops, post_send);
 	SET_DEVICE_OP(dev_ops, post_srq_recv);
@@ -2696,7 +2701,6 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_DEVICE_OP(dev_ops, reg_dm_mr);
 	SET_DEVICE_OP(dev_ops, reg_user_mr);
 	SET_DEVICE_OP(dev_ops, reg_user_mr_dmabuf);
-	SET_DEVICE_OP(dev_ops, req_ncomp_notif);
 	SET_DEVICE_OP(dev_ops, req_notify_cq);
 	SET_DEVICE_OP(dev_ops, rereg_user_mr);
 	SET_DEVICE_OP(dev_ops, resize_cq);
@@ -2708,6 +2712,7 @@ void ib_set_device_ops(struct ib_device *dev, const struct ib_device_ops *ops)
 	SET_OBJ_SIZE(dev_ops, ib_cq);
 	SET_OBJ_SIZE(dev_ops, ib_mw);
 	SET_OBJ_SIZE(dev_ops, ib_pd);
+	SET_OBJ_SIZE(dev_ops, ib_qp);
 	SET_OBJ_SIZE(dev_ops, ib_rwq_ind_table);
 	SET_OBJ_SIZE(dev_ops, ib_srq);
 	SET_OBJ_SIZE(dev_ops, ib_ucontext);
@@ -2747,27 +2752,28 @@ static const struct rdma_nl_cbs ibnl_ls_cb_table[RDMA_NL_LS_NUM_OPS] = {
 
 static int __init ib_core_init(void)
 {
-	int ret;
+	int ret = -ENOMEM;
 
 	ib_wq = alloc_workqueue("infiniband", 0, 0);
 	if (!ib_wq)
 		return -ENOMEM;
 
+	ib_unreg_wq = alloc_workqueue("ib-unreg-wq", WQ_UNBOUND,
+				      WQ_UNBOUND_MAX_ACTIVE);
+	if (!ib_unreg_wq)
+		goto err;
+
 	ib_comp_wq = alloc_workqueue("ib-comp-wq",
 			WQ_HIGHPRI | WQ_MEM_RECLAIM | WQ_SYSFS, 0);
-	if (!ib_comp_wq) {
-		ret = -ENOMEM;
-		goto err;
-	}
+	if (!ib_comp_wq)
+		goto err_unbound;
 
 	ib_comp_unbound_wq =
 		alloc_workqueue("ib-comp-unb-wq",
 				WQ_UNBOUND | WQ_HIGHPRI | WQ_MEM_RECLAIM |
 				WQ_SYSFS, WQ_UNBOUND_MAX_ACTIVE);
-	if (!ib_comp_unbound_wq) {
-		ret = -ENOMEM;
+	if (!ib_comp_unbound_wq)
 		goto err_comp;
-	}
 
 	ret = class_register(&ib_class);
 	if (ret) {
@@ -2809,10 +2815,18 @@ static int __init ib_core_init(void)
 
 	nldev_init();
 	rdma_nl_register(RDMA_NL_LS, ibnl_ls_cb_table);
-	roce_gid_mgmt_init();
+	ret = roce_gid_mgmt_init();
+	if (ret) {
+		pr_warn("Couldn't init RoCE GID management\n");
+		goto err_parent;
+	}
 
 	return 0;
 
+err_parent:
+	rdma_nl_unregister(RDMA_NL_LS);
+	nldev_exit();
+	unregister_pernet_device(&rdma_dev_net_ops);
 err_compat:
 	unregister_blocking_lsm_notifier(&ibdev_lsm_nb);
 err_sa:
@@ -2827,6 +2841,8 @@ err_comp_unbound:
 	destroy_workqueue(ib_comp_unbound_wq);
 err_comp:
 	destroy_workqueue(ib_comp_wq);
+err_unbound:
+	destroy_workqueue(ib_unreg_wq);
 err:
 	destroy_workqueue(ib_wq);
 	return ret;
@@ -2848,7 +2864,7 @@ static void __exit ib_core_cleanup(void)
 	destroy_workqueue(ib_comp_wq);
 	/* Make sure that any pending umem accounting work is done. */
 	destroy_workqueue(ib_wq);
-	flush_workqueue(system_unbound_wq);
+	destroy_workqueue(ib_unreg_wq);
 	WARN_ON(!xa_empty(&clients));
 	WARN_ON(!xa_empty(&devices));
 }

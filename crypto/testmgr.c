@@ -55,9 +55,6 @@ MODULE_PARM_DESC(noextratests, "disable expensive crypto self-tests");
 static unsigned int fuzz_iterations = 100;
 module_param(fuzz_iterations, uint, 0644);
 MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
-
-DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
-EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
 #endif
 
 #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
@@ -235,6 +232,20 @@ enum finalization_type {
 	FINALIZATION_TYPE_DIGEST,	/* use digest() */
 };
 
+/*
+ * Whether the crypto operation will occur in-place, and if so whether the
+ * source and destination scatterlist pointers will coincide (req->src ==
+ * req->dst), or whether they'll merely point to two separate scatterlists
+ * (req->src != req->dst) that reference the same underlying memory.
+ *
+ * This is only relevant for algorithm types that support in-place operation.
+ */
+enum inplace_mode {
+	OUT_OF_PLACE,
+	INPLACE_ONE_SGLIST,
+	INPLACE_TWO_SGLISTS,
+};
+
 #define TEST_SG_TOTAL	10000
 
 /**
@@ -268,7 +279,7 @@ struct test_sg_division {
  * crypto test vector can be tested.
  *
  * @name: name of this config, logged for debugging purposes if a test fails
- * @inplace: operate on the data in-place, if applicable for the algorithm type?
+ * @inplace_mode: whether and how to operate on the data in-place, if applicable
  * @req_flags: extra request_flags, e.g. CRYPTO_TFM_REQ_MAY_SLEEP
  * @src_divs: description of how to arrange the source scatterlist
  * @dst_divs: description of how to arrange the dst scatterlist, if applicable
@@ -285,7 +296,7 @@ struct test_sg_division {
  */
 struct testvec_config {
 	const char *name;
-	bool inplace;
+	enum inplace_mode inplace_mode;
 	u32 req_flags;
 	struct test_sg_division src_divs[XBUFSIZE];
 	struct test_sg_division dst_divs[XBUFSIZE];
@@ -310,11 +321,16 @@ struct testvec_config {
 /* Configs for skciphers and aeads */
 static const struct testvec_config default_cipher_testvec_configs[] = {
 	{
-		.name = "in-place",
-		.inplace = true,
+		.name = "in-place (one sglist)",
+		.inplace_mode = INPLACE_ONE_SGLIST,
+		.src_divs = { { .proportion_of_total = 10000 } },
+	}, {
+		.name = "in-place (two sglists)",
+		.inplace_mode = INPLACE_TWO_SGLISTS,
 		.src_divs = { { .proportion_of_total = 10000 } },
 	}, {
 		.name = "out-of-place",
+		.inplace_mode = OUT_OF_PLACE,
 		.src_divs = { { .proportion_of_total = 10000 } },
 	}, {
 		.name = "unaligned buffer, offset=1",
@@ -352,7 +368,7 @@ static const struct testvec_config default_cipher_testvec_configs[] = {
 		.key_offset = 3,
 	}, {
 		.name = "misaligned splits crossing pages, inplace",
-		.inplace = true,
+		.inplace_mode = INPLACE_ONE_SGLIST,
 		.src_divs = {
 			{
 				.proportion_of_total = 7500,
@@ -752,18 +768,39 @@ static int build_cipher_test_sglists(struct cipher_test_sglists *tsgls,
 
 	iov_iter_kvec(&input, WRITE, inputs, nr_inputs, src_total_len);
 	err = build_test_sglist(&tsgls->src, cfg->src_divs, alignmask,
-				cfg->inplace ?
+				cfg->inplace_mode != OUT_OF_PLACE ?
 					max(dst_total_len, src_total_len) :
 					src_total_len,
 				&input, NULL);
 	if (err)
 		return err;
 
-	if (cfg->inplace) {
+	/*
+	 * In-place crypto operations can use the same scatterlist for both the
+	 * source and destination (req->src == req->dst), or can use separate
+	 * scatterlists (req->src != req->dst) which point to the same
+	 * underlying memory.  Make sure to test both cases.
+	 */
+	if (cfg->inplace_mode == INPLACE_ONE_SGLIST) {
 		tsgls->dst.sgl_ptr = tsgls->src.sgl;
 		tsgls->dst.nents = tsgls->src.nents;
 		return 0;
 	}
+	if (cfg->inplace_mode == INPLACE_TWO_SGLISTS) {
+		/*
+		 * For now we keep it simple and only test the case where the
+		 * two scatterlists have identical entries, rather than
+		 * different entries that split up the same memory differently.
+		 */
+		memcpy(tsgls->dst.sgl, tsgls->src.sgl,
+		       tsgls->src.nents * sizeof(tsgls->src.sgl[0]));
+		memcpy(tsgls->dst.sgl_saved, tsgls->src.sgl,
+		       tsgls->src.nents * sizeof(tsgls->src.sgl[0]));
+		tsgls->dst.sgl_ptr = tsgls->dst.sgl;
+		tsgls->dst.nents = tsgls->src.nents;
+		return 0;
+	}
+	/* Out of place */
 	return build_test_sglist(&tsgls->dst,
 				 cfg->dst_divs[0].proportion_of_total ?
 					cfg->dst_divs : cfg->src_divs,
@@ -998,9 +1035,19 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
 
 	p += scnprintf(p, end - p, "random:");
 
-	if (prandom_u32() % 2 == 0) {
-		cfg->inplace = true;
-		p += scnprintf(p, end - p, " inplace");
+	switch (prandom_u32() % 4) {
+	case 0:
+	case 1:
+		cfg->inplace_mode = OUT_OF_PLACE;
+		break;
+	case 2:
+		cfg->inplace_mode = INPLACE_ONE_SGLIST;
+		p += scnprintf(p, end - p, " inplace_one_sglist");
+		break;
+	default:
+		cfg->inplace_mode = INPLACE_TWO_SGLISTS;
+		p += scnprintf(p, end - p, " inplace_two_sglists");
+		break;
 	}
 
 	if (prandom_u32() % 2 == 0) {
@@ -1037,7 +1084,7 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
 					  cfg->req_flags);
 	p += scnprintf(p, end - p, "]");
 
-	if (!cfg->inplace && prandom_u32() % 2 == 0) {
+	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_u32() % 2 == 0) {
 		p += scnprintf(p, end - p, " dst_divs=[");
 		p = generate_random_sgl_divisions(cfg->dst_divs,
 						  ARRAY_SIZE(cfg->dst_divs),
@@ -1061,14 +1108,14 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
 
 static void crypto_disable_simd_for_test(void)
 {
-	preempt_disable();
+	migrate_disable();
 	__this_cpu_write(crypto_simd_disabled_for_test, true);
 }
 
 static void crypto_reenable_simd_for_test(void)
 {
 	__this_cpu_write(crypto_simd_disabled_for_test, false);
-	preempt_enable();
+	migrate_enable();
 }
 
 /*
@@ -1168,11 +1215,6 @@ static inline int check_shash_op(const char *op, int err,
 	return err;
 }
 
-static inline const void *sg_data(struct scatterlist *sg)
-{
-	return page_address(sg_page(sg)) + sg->offset;
-}
-
 /* Test one hash test vector in one configuration, using the shash API */
 static int test_shash_vec_cfg(const struct hash_testvec *vec,
 			      const char *vec_name,
@@ -1230,7 +1272,7 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
 			return 0;
 		if (cfg->nosimd)
 			crypto_disable_simd_for_test();
-		err = crypto_shash_digest(desc, sg_data(&tsgl->sgl[0]),
+		err = crypto_shash_digest(desc, sg_virt(&tsgl->sgl[0]),
 					  tsgl->sgl[0].length, result);
 		if (cfg->nosimd)
 			crypto_reenable_simd_for_test();
@@ -1266,7 +1308,7 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
 		    cfg->finalization_type == FINALIZATION_TYPE_FINUP) {
 			if (divs[i]->nosimd)
 				crypto_disable_simd_for_test();
-			err = crypto_shash_finup(desc, sg_data(&tsgl->sgl[i]),
+			err = crypto_shash_finup(desc, sg_virt(&tsgl->sgl[i]),
 						 tsgl->sgl[i].length, result);
 			if (divs[i]->nosimd)
 				crypto_reenable_simd_for_test();
@@ -1278,7 +1320,7 @@ static int test_shash_vec_cfg(const struct hash_testvec *vec,
 		}
 		if (divs[i]->nosimd)
 			crypto_disable_simd_for_test();
-		err = crypto_shash_update(desc, sg_data(&tsgl->sgl[i]),
+		err = crypto_shash_update(desc, sg_virt(&tsgl->sgl[i]),
 					  tsgl->sgl[i].length);
 		if (divs[i]->nosimd)
 			crypto_reenable_simd_for_test();
@@ -1859,6 +1901,9 @@ static int __alg_test_hash(const struct hash_testvec *vecs,
 	}
 
 	for (i = 0; i < num_vecs; i++) {
+		if (fips_enabled && vecs[i].fips_skip)
+			continue;
+
 		err = test_hash_vec(&vecs[i], i, req, desc, tsgl, hashstate);
 		if (err)
 			goto out;
@@ -2090,7 +2135,8 @@ static int test_aead_vec_cfg(int enc, const struct aead_testvec *vec,
 	/* Check for the correct output (ciphertext or plaintext) */
 	err = verify_correct_output(&tsgls->dst, enc ? vec->ctext : vec->ptext,
 				    enc ? vec->clen : vec->plen,
-				    vec->alen, enc || !cfg->inplace);
+				    vec->alen,
+				    enc || cfg->inplace_mode == OUT_OF_PLACE);
 	if (err == -EOVERFLOW) {
 		pr_err("alg: aead: %s %s overran dst buffer on test vector %s, cfg=\"%s\"\n",
 		       driver, op, vec_name, cfg->name);
@@ -4198,7 +4244,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "authenc(hmac(sha1),cbc(des3_ede))",
 		.test = alg_test_aead,
-		.fips_allowed = 1,
 		.suite = {
 			.aead = __VECS(hmac_sha1_des3_ede_cbc_tv_temp)
 		}
@@ -4225,7 +4270,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "authenc(hmac(sha224),cbc(des3_ede))",
 		.test = alg_test_aead,
-		.fips_allowed = 1,
 		.suite = {
 			.aead = __VECS(hmac_sha224_des3_ede_cbc_tv_temp)
 		}
@@ -4245,7 +4289,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "authenc(hmac(sha256),cbc(des3_ede))",
 		.test = alg_test_aead,
-		.fips_allowed = 1,
 		.suite = {
 			.aead = __VECS(hmac_sha256_des3_ede_cbc_tv_temp)
 		}
@@ -4266,7 +4309,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "authenc(hmac(sha384),cbc(des3_ede))",
 		.test = alg_test_aead,
-		.fips_allowed = 1,
 		.suite = {
 			.aead = __VECS(hmac_sha384_des3_ede_cbc_tv_temp)
 		}
@@ -4294,7 +4336,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "authenc(hmac(sha512),cbc(des3_ede))",
 		.test = alg_test_aead,
-		.fips_allowed = 1,
 		.suite = {
 			.aead = __VECS(hmac_sha512_des3_ede_cbc_tv_temp)
 		}
@@ -4335,30 +4376,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.hash = __VECS(blake2b_512_tv_template)
 		}
 	}, {
-		.alg = "blake2s-128",
-		.test = alg_test_hash,
-		.suite = {
-			.hash = __VECS(blakes2s_128_tv_template)
-		}
-	}, {
-		.alg = "blake2s-160",
-		.test = alg_test_hash,
-		.suite = {
-			.hash = __VECS(blakes2s_160_tv_template)
-		}
-	}, {
-		.alg = "blake2s-224",
-		.test = alg_test_hash,
-		.suite = {
-			.hash = __VECS(blakes2s_224_tv_template)
-		}
-	}, {
-		.alg = "blake2s-256",
-		.test = alg_test_hash,
-		.suite = {
-			.hash = __VECS(blakes2s_256_tv_template)
-		}
-	}, {
 		.alg = "cbc(aes)",
 		.test = alg_test_skcipher,
 		.fips_allowed = 1,
@@ -4370,6 +4387,12 @@ static const struct alg_test_desc alg_test_descs[] = {
 		.test = alg_test_skcipher,
 		.suite = {
 			.cipher = __VECS(anubis_cbc_tv_template)
+		},
+	}, {
+		.alg = "cbc(aria)",
+		.test = alg_test_skcipher,
+		.suite = {
+			.cipher = __VECS(aria_cbc_tv_template)
 		},
 	}, {
 		.alg = "cbc(blowfish)",
@@ -4404,7 +4427,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "cbc(des3_ede)",
 		.test = alg_test_skcipher,
-		.fips_allowed = 1,
 		.suite = {
 			.cipher = __VECS(des3_ede_cbc_tv_template)
 		},
@@ -4456,6 +4478,12 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.hash = __VECS(aes_cbcmac_tv_template)
 		}
 	}, {
+		.alg = "cbcmac(sm4)",
+		.test = alg_test_hash,
+		.suite = {
+			.hash = __VECS(sm4_cbcmac_tv_template)
+		}
+	}, {
 		.alg = "ccm(aes)",
 		.generic_driver = "ccm_base(ctr(aes-generic),cbcmac(aes-generic))",
 		.test = alg_test_aead,
@@ -4467,11 +4495,27 @@ static const struct alg_test_desc alg_test_descs[] = {
 			}
 		}
 	}, {
+		.alg = "ccm(sm4)",
+		.generic_driver = "ccm_base(ctr(sm4-generic),cbcmac(sm4-generic))",
+		.test = alg_test_aead,
+		.suite = {
+			.aead = {
+				____VECS(sm4_ccm_tv_template),
+				.einval_allowed = 1,
+			}
+		}
+	}, {
 		.alg = "cfb(aes)",
 		.test = alg_test_skcipher,
 		.fips_allowed = 1,
 		.suite = {
 			.cipher = __VECS(aes_cfb_tv_template)
+		},
+	}, {
+		.alg = "cfb(aria)",
+		.test = alg_test_skcipher,
+		.suite = {
+			.cipher = __VECS(aria_cfb_tv_template)
 		},
 	}, {
 		.alg = "cfb(sm4)",
@@ -4494,10 +4538,15 @@ static const struct alg_test_desc alg_test_descs[] = {
 		}
 	}, {
 		.alg = "cmac(des3_ede)",
-		.fips_allowed = 1,
 		.test = alg_test_hash,
 		.suite = {
 			.hash = __VECS(des3_ede_cmac64_tv_template)
+		}
+	}, {
+		.alg = "cmac(sm4)",
+		.test = alg_test_hash,
+		.suite = {
+			.hash = __VECS(sm4_cmac128_tv_template)
 		}
 	}, {
 		.alg = "compress_null",
@@ -4517,6 +4566,13 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.hash = __VECS(crc32c_tv_template)
 		}
 	}, {
+		.alg = "crc64-rocksoft",
+		.test = alg_test_hash,
+		.fips_allowed = 1,
+		.suite = {
+			.hash = __VECS(crc64_rocksoft_tv_template)
+		}
+	}, {
 		.alg = "crct10dif",
 		.test = alg_test_hash,
 		.fips_allowed = 1,
@@ -4529,6 +4585,12 @@ static const struct alg_test_desc alg_test_descs[] = {
 		.fips_allowed = 1,
 		.suite = {
 			.cipher = __VECS(aes_ctr_tv_template)
+		}
+	}, {
+		.alg = "ctr(aria)",
+		.test = alg_test_skcipher,
+		.suite = {
+			.cipher = __VECS(aria_ctr_tv_template)
 		}
 	}, {
 		.alg = "ctr(blowfish)",
@@ -4563,7 +4625,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "ctr(des3_ede)",
 		.test = alg_test_skcipher,
-		.fips_allowed = 1,
 		.suite = {
 			.cipher = __VECS(des3_ede_ctr_tv_template)
 		}
@@ -4641,7 +4702,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "dh",
 		.test = alg_test_kpp,
-		.fips_allowed = 1,
 		.suite = {
 			.kpp = __VECS(dh_tv_template)
 		}
@@ -4691,8 +4751,11 @@ static const struct alg_test_desc alg_test_descs[] = {
 		.test = alg_test_null,
 	}, {
 		.alg = "drbg_nopr_hmac_sha512",
-		.test = alg_test_null,
+		.test = alg_test_drbg,
 		.fips_allowed = 1,
+		.suite = {
+			.drbg = __VECS(drbg_nopr_hmac_sha512_tv_template)
+		}
 	}, {
 		.alg = "drbg_nopr_sha1",
 		.fips_allowed = 1,
@@ -4790,6 +4853,12 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.cipher = __VECS(arc4_tv_template)
 		}
 	}, {
+		.alg = "ecb(aria)",
+		.test = alg_test_skcipher,
+		.suite = {
+			.cipher = __VECS(aria_tv_template)
+		}
+	}, {
 		.alg = "ecb(blowfish)",
 		.test = alg_test_skcipher,
 		.suite = {
@@ -4826,7 +4895,6 @@ static const struct alg_test_desc alg_test_descs[] = {
 	}, {
 		.alg = "ecb(des3_ede)",
 		.test = alg_test_skcipher,
-		.fips_allowed = 1,
 		.suite = {
 			.cipher = __VECS(des3_ede_tv_template)
 		}
@@ -4904,11 +4972,42 @@ static const struct alg_test_desc alg_test_descs[] = {
 		}
 	}, {
 #endif
-		.alg = "ecdh",
+		.alg = "ecdh-nist-p192",
+		.test = alg_test_kpp,
+		.suite = {
+			.kpp = __VECS(ecdh_p192_tv_template)
+		}
+	}, {
+		.alg = "ecdh-nist-p256",
 		.test = alg_test_kpp,
 		.fips_allowed = 1,
 		.suite = {
-			.kpp = __VECS(ecdh_tv_template)
+			.kpp = __VECS(ecdh_p256_tv_template)
+		}
+	}, {
+		.alg = "ecdh-nist-p384",
+		.test = alg_test_kpp,
+		.fips_allowed = 1,
+		.suite = {
+			.kpp = __VECS(ecdh_p384_tv_template)
+		}
+	}, {
+		.alg = "ecdsa-nist-p192",
+		.test = alg_test_akcipher,
+		.suite = {
+			.akcipher = __VECS(ecdsa_nist_p192_tv_template)
+		}
+	}, {
+		.alg = "ecdsa-nist-p256",
+		.test = alg_test_akcipher,
+		.suite = {
+			.akcipher = __VECS(ecdsa_nist_p256_tv_template)
+		}
+	}, {
+		.alg = "ecdsa-nist-p384",
+		.test = alg_test_akcipher,
+		.suite = {
+			.akcipher = __VECS(ecdsa_nist_p384_tv_template)
 		}
 	}, {
 		.alg = "ecrdsa",
@@ -4931,6 +5030,43 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.cipher = __VECS(essiv_aes_cbc_tv_template)
 		}
 	}, {
+#if IS_ENABLED(CONFIG_CRYPTO_DH_RFC7919_GROUPS)
+		.alg = "ffdhe2048(dh)",
+		.test = alg_test_kpp,
+		.fips_allowed = 1,
+		.suite = {
+			.kpp = __VECS(ffdhe2048_dh_tv_template)
+		}
+	}, {
+		.alg = "ffdhe3072(dh)",
+		.test = alg_test_kpp,
+		.fips_allowed = 1,
+		.suite = {
+			.kpp = __VECS(ffdhe3072_dh_tv_template)
+		}
+	}, {
+		.alg = "ffdhe4096(dh)",
+		.test = alg_test_kpp,
+		.fips_allowed = 1,
+		.suite = {
+			.kpp = __VECS(ffdhe4096_dh_tv_template)
+		}
+	}, {
+		.alg = "ffdhe6144(dh)",
+		.test = alg_test_kpp,
+		.fips_allowed = 1,
+		.suite = {
+			.kpp = __VECS(ffdhe6144_dh_tv_template)
+		}
+	}, {
+		.alg = "ffdhe8192(dh)",
+		.test = alg_test_kpp,
+		.fips_allowed = 1,
+		.suite = {
+			.kpp = __VECS(ffdhe8192_dh_tv_template)
+		}
+	}, {
+#endif /* CONFIG_CRYPTO_DH_RFC7919_GROUPS */
 		.alg = "gcm(aes)",
 		.generic_driver = "gcm_base(ctr(aes-generic),ghash-generic)",
 		.test = alg_test_aead,
@@ -4939,11 +5075,33 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.aead = __VECS(aes_gcm_tv_template)
 		}
 	}, {
+		.alg = "gcm(aria)",
+		.generic_driver = "gcm_base(ctr(aria-generic),ghash-generic)",
+		.test = alg_test_aead,
+		.suite = {
+			.aead = __VECS(aria_gcm_tv_template)
+		}
+	}, {
+		.alg = "gcm(sm4)",
+		.generic_driver = "gcm_base(ctr(sm4-generic),ghash-generic)",
+		.test = alg_test_aead,
+		.suite = {
+			.aead = __VECS(sm4_gcm_tv_template)
+		}
+	}, {
 		.alg = "ghash",
 		.test = alg_test_hash,
 		.fips_allowed = 1,
 		.suite = {
 			.hash = __VECS(ghash_tv_template)
+		}
+	}, {
+		.alg = "hctr2(aes)",
+		.generic_driver =
+		    "hctr2_base(xctr(aes-generic),polyval-generic)",
+		.test = alg_test_skcipher,
+		.suite = {
+			.cipher = __VECS(aes_hctr2_tv_template)
 		}
 	}, {
 		.alg = "hmac(md5)",
@@ -5200,6 +5358,12 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.hash = __VECS(poly1305_tv_template)
 		}
 	}, {
+		.alg = "polyval",
+		.test = alg_test_hash,
+		.suite = {
+			.hash = __VECS(polyval_tv_template)
+		}
+	}, {
 		.alg = "rfc3686(ctr(aes))",
 		.test = alg_test_skcipher,
 		.fips_allowed = 1,
@@ -5406,6 +5570,12 @@ static const struct alg_test_desc alg_test_descs[] = {
 			.cipher = __VECS(xchacha20_tv_template)
 		},
 	}, {
+		.alg = "xctr(aes)",
+		.test = alg_test_skcipher,
+		.suite = {
+			.cipher = __VECS(aes_xctr_tv_template)
+		}
+	}, {
 		.alg = "xts(aes)",
 		.generic_driver = "xts(ecb(aes-generic))",
 		.test = alg_test_skcipher,
@@ -5564,6 +5734,13 @@ static int alg_find_test(const char *alg)
 	return -1;
 }
 
+static int alg_fips_disabled(const char *driver, const char *alg)
+{
+	pr_info("alg: %s (%s) is disabled due to FIPS\n", alg, driver);
+
+	return -ECANCELED;
+}
+
 int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 {
 	int i;
@@ -5600,9 +5777,13 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
 	if (i < 0 && j < 0)
 		goto notest;
 
-	if (fips_enabled && ((i >= 0 && !alg_test_descs[i].fips_allowed) ||
-			     (j >= 0 && !alg_test_descs[j].fips_allowed)))
-		goto non_fips_alg;
+	if (fips_enabled) {
+		if (j >= 0 && !alg_test_descs[j].fips_allowed)
+			return -EINVAL;
+
+		if (i >= 0 && !alg_test_descs[i].fips_allowed)
+			goto non_fips_alg;
+	}
 
 	rc = 0;
 	if (i >= 0)
@@ -5632,9 +5813,13 @@ test_done:
 
 notest:
 	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
+
+	if (type & CRYPTO_ALG_FIPS_INTERNAL)
+		return alg_fips_disabled(driver, alg);
+
 	return 0;
 non_fips_alg:
-	return -EINVAL;
+	return alg_fips_disabled(driver, alg);
 }
 
 #endif /* CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */

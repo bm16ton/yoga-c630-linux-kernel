@@ -2,7 +2,6 @@
 /*
  * Scheduler topology setup/handling methods
  */
-#include "sched.h"
 
 DEFINE_MUTEX(sched_domains_mutex);
 
@@ -14,15 +13,15 @@ static cpumask_var_t sched_domains_tmpmask2;
 
 static int __init sched_debug_setup(char *str)
 {
-	sched_debug_enabled = true;
+	sched_debug_verbose = true;
 
 	return 0;
 }
-early_param("sched_debug", sched_debug_setup);
+early_param("sched_verbose", sched_debug_setup);
 
 static inline bool sched_debug(void)
 {
-	return sched_debug_enabled;
+	return sched_debug_verbose;
 }
 
 #define SD_FLAG(_name, mflags) [__##_name] = { .meta_flags = mflags, .name = #_name },
@@ -74,7 +73,7 @@ static int sched_domain_debug_one(struct sched_domain *sd, int cpu, int level,
 			break;
 		}
 
-		if (!cpumask_weight(sched_group_span(group))) {
+		if (cpumask_empty(sched_group_span(group))) {
 			printk(KERN_CONT "\n");
 			printk(KERN_ERR "ERROR: empty group\n");
 			break;
@@ -131,7 +130,7 @@ static void sched_domain_debug(struct sched_domain *sd, int cpu)
 {
 	int level = 0;
 
-	if (!sched_debug_enabled)
+	if (!sched_debug_verbose)
 		return;
 
 	if (!sd) {
@@ -152,7 +151,7 @@ static void sched_domain_debug(struct sched_domain *sd, int cpu)
 }
 #else /* !CONFIG_SCHED_DEBUG */
 
-# define sched_debug_enabled 0
+# define sched_debug_verbose 0
 # define sched_domain_debug(sd, cpu) do { } while (0)
 static inline bool sched_debug(void)
 {
@@ -207,7 +206,7 @@ sd_parent_degenerate(struct sched_domain *sd, struct sched_domain *parent)
 
 #if defined(CONFIG_ENERGY_MODEL) && defined(CONFIG_CPU_FREQ_GOV_SCHEDUTIL)
 DEFINE_STATIC_KEY_FALSE(sched_energy_present);
-unsigned int sysctl_sched_energy_aware = 1;
+static unsigned int sysctl_sched_energy_aware = 1;
 DEFINE_MUTEX(sched_energy_mutex);
 bool sched_energy_update;
 
@@ -221,7 +220,7 @@ void rebuild_sched_domains_energy(void)
 }
 
 #ifdef CONFIG_PROC_SYSCTL
-int sched_energy_aware_handler(struct ctl_table *table, int write,
+static int sched_energy_aware_handler(struct ctl_table *table, int write,
 		void *buffer, size_t *lenp, loff_t *ppos)
 {
 	int ret, state;
@@ -238,6 +237,27 @@ int sched_energy_aware_handler(struct ctl_table *table, int write,
 
 	return ret;
 }
+
+static struct ctl_table sched_energy_aware_sysctls[] = {
+	{
+		.procname       = "sched_energy_aware",
+		.data           = &sysctl_sched_energy_aware,
+		.maxlen         = sizeof(unsigned int),
+		.mode           = 0644,
+		.proc_handler   = sched_energy_aware_handler,
+		.extra1         = SYSCTL_ZERO,
+		.extra2         = SYSCTL_ONE,
+	},
+	{}
+};
+
+static int __init sched_energy_aware_sysctl_init(void)
+{
+	register_sysctl_init("kernel", sched_energy_aware_sysctls);
+	return 0;
+}
+
+late_initcall(sched_energy_aware_sysctl_init);
 #endif
 
 static void free_pd(struct perf_domain *pd)
@@ -467,7 +487,7 @@ void rq_attach_root(struct rq *rq, struct root_domain *rd)
 	struct root_domain *old_rd = NULL;
 	unsigned long flags;
 
-	raw_spin_lock_irqsave(&rq->lock, flags);
+	raw_spin_rq_lock_irqsave(rq, flags);
 
 	if (rq->rd) {
 		old_rd = rq->rd;
@@ -493,7 +513,7 @@ void rq_attach_root(struct rq *rq, struct root_domain *rd)
 	if (cpumask_test_cpu(rq->cpu, cpu_active_mask))
 		set_rq_online(rq);
 
-	raw_spin_unlock_irqrestore(&rq->lock, flags);
+	raw_spin_rq_unlock_irqrestore(rq, flags);
 
 	if (old_rd)
 		call_rcu(&old_rd->rcu, free_rootdomain);
@@ -526,7 +546,7 @@ static int init_rootdomain(struct root_domain *rd)
 #ifdef HAVE_RT_PUSH_IPI
 	rd->rto_cpu = -1;
 	raw_spin_lock_init(&rd->rto_lock);
-	init_irq_work(&rd->rto_push_work, rto_push_irq_work_func);
+	rd->rto_push_work = IRQ_WORK_INIT_HARD(rto_push_irq_work_func);
 #endif
 
 	rd->visit_gen = 0;
@@ -675,7 +695,7 @@ static void update_top_cache_domain(int cpu)
 	sd = highest_flag_domain(cpu, SD_ASYM_PACKING);
 	rcu_assign_pointer(per_cpu(sd_asym_packing, cpu), sd);
 
-	sd = lowest_flag_domain(cpu, SD_ASYM_CPUCAPACITY);
+	sd = lowest_flag_domain(cpu, SD_ASYM_CPUCAPACITY_FULL);
 	rcu_assign_pointer(per_cpu(sd_asym_cpucapacity, cpu), sd);
 }
 
@@ -688,7 +708,6 @@ cpu_attach_domain(struct sched_domain *sd, struct root_domain *rd, int cpu)
 {
 	struct rq *rq = cpu_rq(cpu);
 	struct sched_domain *tmp;
-	int numa_distance = 0;
 
 	/* Remove the sched domains which do not contribute to scheduling. */
 	for (tmp = sd; tmp; ) {
@@ -716,12 +735,21 @@ cpu_attach_domain(struct sched_domain *sd, struct root_domain *rd, int cpu)
 		tmp = sd;
 		sd = sd->parent;
 		destroy_sched_domain(tmp);
-		if (sd)
-			sd->child = NULL;
-	}
+		if (sd) {
+			struct sched_group *sg = sd->groups;
 
-	for (tmp = sd; tmp; tmp = tmp->parent)
-		numa_distance += !!(tmp->flags & SD_NUMA);
+			/*
+			 * sched groups hold the flags of the child sched
+			 * domain for convenience. Clear such flags since
+			 * the child is being destroyed.
+			 */
+			do {
+				sg->flags = 0;
+			} while (sg != sd->groups);
+
+			sd->child = NULL;
+		}
+	}
 
 	sched_domain_debug(sd, cpu);
 
@@ -916,10 +944,12 @@ build_group_from_child_sched_domain(struct sched_domain *sd, int cpu)
 		return NULL;
 
 	sg_span = sched_group_span(sg);
-	if (sd->child)
+	if (sd->child) {
 		cpumask_copy(sg_span, sched_domain_span(sd->child));
-	else
+		sg->flags = sd->child->flags;
+	} else {
 		cpumask_copy(sg_span, sched_domain_span(sd));
+	}
 
 	atomic_inc(&sg->ref);
 	return sg;
@@ -934,7 +964,7 @@ static void init_overlap_sched_group(struct sched_domain *sd,
 	int cpu;
 
 	build_balance_mask(sd, sg, mask);
-	cpu = cpumask_first_and(sched_group_span(sg), mask);
+	cpu = cpumask_first(mask);
 
 	sg->sgc = *per_cpu_ptr(sdd->sgc, cpu);
 	if (atomic_inc_return(&sg->sgc->ref) == 1)
@@ -1169,6 +1199,7 @@ static struct sched_group *get_group(int cpu, struct sd_data *sdd)
 	if (child) {
 		cpumask_copy(sched_group_span(sg), sched_domain_span(child));
 		cpumask_copy(group_balance_mask(sg), sched_group_span(sg));
+		sg->flags = child->flags;
 	} else {
 		cpumask_set_cpu(cpu, sched_group_span(sg));
 		cpumask_set_cpu(cpu, group_balance_mask(sg));
@@ -1264,6 +1295,116 @@ next:
 		return;
 
 	update_group_capacity(sd, cpu);
+}
+
+/*
+ * Asymmetric CPU capacity bits
+ */
+struct asym_cap_data {
+	struct list_head link;
+	unsigned long capacity;
+	unsigned long cpus[];
+};
+
+/*
+ * Set of available CPUs grouped by their corresponding capacities
+ * Each list entry contains a CPU mask reflecting CPUs that share the same
+ * capacity.
+ * The lifespan of data is unlimited.
+ */
+static LIST_HEAD(asym_cap_list);
+
+#define cpu_capacity_span(asym_data) to_cpumask((asym_data)->cpus)
+
+/*
+ * Verify whether there is any CPU capacity asymmetry in a given sched domain.
+ * Provides sd_flags reflecting the asymmetry scope.
+ */
+static inline int
+asym_cpu_capacity_classify(const struct cpumask *sd_span,
+			   const struct cpumask *cpu_map)
+{
+	struct asym_cap_data *entry;
+	int count = 0, miss = 0;
+
+	/*
+	 * Count how many unique CPU capacities this domain spans across
+	 * (compare sched_domain CPUs mask with ones representing  available
+	 * CPUs capacities). Take into account CPUs that might be offline:
+	 * skip those.
+	 */
+	list_for_each_entry(entry, &asym_cap_list, link) {
+		if (cpumask_intersects(sd_span, cpu_capacity_span(entry)))
+			++count;
+		else if (cpumask_intersects(cpu_map, cpu_capacity_span(entry)))
+			++miss;
+	}
+
+	WARN_ON_ONCE(!count && !list_empty(&asym_cap_list));
+
+	/* No asymmetry detected */
+	if (count < 2)
+		return 0;
+	/* Some of the available CPU capacity values have not been detected */
+	if (miss)
+		return SD_ASYM_CPUCAPACITY;
+
+	/* Full asymmetry */
+	return SD_ASYM_CPUCAPACITY | SD_ASYM_CPUCAPACITY_FULL;
+
+}
+
+static inline void asym_cpu_capacity_update_data(int cpu)
+{
+	unsigned long capacity = arch_scale_cpu_capacity(cpu);
+	struct asym_cap_data *entry = NULL;
+
+	list_for_each_entry(entry, &asym_cap_list, link) {
+		if (capacity == entry->capacity)
+			goto done;
+	}
+
+	entry = kzalloc(sizeof(*entry) + cpumask_size(), GFP_KERNEL);
+	if (WARN_ONCE(!entry, "Failed to allocate memory for asymmetry data\n"))
+		return;
+	entry->capacity = capacity;
+	list_add(&entry->link, &asym_cap_list);
+done:
+	__cpumask_set_cpu(cpu, cpu_capacity_span(entry));
+}
+
+/*
+ * Build-up/update list of CPUs grouped by their capacities
+ * An update requires explicit request to rebuild sched domains
+ * with state indicating CPU topology changes.
+ */
+static void asym_cpu_capacity_scan(void)
+{
+	struct asym_cap_data *entry, *next;
+	int cpu;
+
+	list_for_each_entry(entry, &asym_cap_list, link)
+		cpumask_clear(cpu_capacity_span(entry));
+
+	for_each_cpu_and(cpu, cpu_possible_mask, housekeeping_cpumask(HK_TYPE_DOMAIN))
+		asym_cpu_capacity_update_data(cpu);
+
+	list_for_each_entry_safe(entry, next, &asym_cap_list, link) {
+		if (cpumask_empty(cpu_capacity_span(entry))) {
+			list_del(&entry->link);
+			kfree(entry);
+		}
+	}
+
+	/*
+	 * Only one capacity value has been detected i.e. this system is symmetric.
+	 * No need to keep this data around.
+	 */
+	if (list_is_singular(&asym_cap_list)) {
+		entry = list_first_entry(&asym_cap_list, typeof(*entry), link);
+		list_del(&entry->link);
+		kfree(entry);
+	}
 }
 
 /*
@@ -1371,7 +1512,6 @@ static int			sched_domains_curr_level;
 int				sched_max_numa_distance;
 static int			*sched_domains_numa_distance;
 static struct cpumask		***sched_domains_numa_masks;
-int __read_mostly		node_reclaim_distance = RECLAIM_DISTANCE;
 #endif
 
 /*
@@ -1399,11 +1539,12 @@ int __read_mostly		node_reclaim_distance = RECLAIM_DISTANCE;
 static struct sched_domain *
 sd_init(struct sched_domain_topology_level *tl,
 	const struct cpumask *cpu_map,
-	struct sched_domain *child, int dflags, int cpu)
+	struct sched_domain *child, int cpu)
 {
 	struct sd_data *sdd = &tl->data;
 	struct sched_domain *sd = *per_cpu_ptr(sdd->sd, cpu);
 	int sd_id, sd_weight, sd_flags = 0;
+	struct cpumask *sd_span;
 
 #ifdef CONFIG_NUMA
 	/*
@@ -1419,9 +1560,6 @@ sd_init(struct sched_domain_topology_level *tl,
 	if (WARN_ONCE(sd_flags & ~TOPOLOGY_SD_FLAGS,
 			"wrong sd_flags in topology description\n"))
 		sd_flags &= TOPOLOGY_SD_FLAGS;
-
-	/* Apply detected topology flags */
-	sd_flags |= dflags;
 
 	*sd = (struct sched_domain){
 		.min_interval		= sd_weight,
@@ -1447,20 +1585,26 @@ sd_init(struct sched_domain_topology_level *tl,
 		.last_balance		= jiffies,
 		.balance_interval	= sd_weight,
 		.max_newidle_lb_cost	= 0,
-		.next_decay_max_lb_cost	= jiffies,
+		.last_decay_max_lb_cost	= jiffies,
 		.child			= child,
 #ifdef CONFIG_SCHED_DEBUG
 		.name			= tl->name,
 #endif
 	};
 
-	cpumask_and(sched_domain_span(sd), cpu_map, tl->mask(cpu));
-	sd_id = cpumask_first(sched_domain_span(sd));
+	sd_span = sched_domain_span(sd);
+	cpumask_and(sd_span, cpu_map, tl->mask(cpu));
+	sd_id = cpumask_first(sd_span);
+
+	sd->flags |= asym_cpu_capacity_classify(sd_span, cpu_map);
+
+	WARN_ONCE((sd->flags & (SD_SHARE_CPUCAPACITY | SD_ASYM_CPUCAPACITY)) ==
+		  (SD_SHARE_CPUCAPACITY | SD_ASYM_CPUCAPACITY),
+		  "CPU capacity asymmetry not supported on SMT\n");
 
 	/*
 	 * Convert topological properties into behaviour.
 	 */
-
 	/* Don't attempt to spread across CPUs of different capacities. */
 	if ((sd->flags & SD_ASYM_CPUCAPACITY) && sd->child)
 		sd->child->flags &= ~SD_PREFER_SIBLING;
@@ -1511,6 +1655,11 @@ static struct sched_domain_topology_level default_topology[] = {
 #ifdef CONFIG_SCHED_SMT
 	{ cpu_smt_mask, cpu_smt_flags, SD_INIT_NAME(SMT) },
 #endif
+
+#ifdef CONFIG_SCHED_CLUSTER
+	{ cpu_clustergroup_mask, cpu_cluster_flags, SD_INIT_NAME(CLS) },
+#endif
+
 #ifdef CONFIG_SCHED_MC
 	{ cpu_coregroup_mask, cpu_core_flags, SD_INIT_NAME(MC) },
 #endif
@@ -1520,6 +1669,7 @@ static struct sched_domain_topology_level default_topology[] = {
 
 static struct sched_domain_topology_level *sched_domain_topology =
 	default_topology;
+static struct sched_domain_topology_level *sched_domain_topology_saved;
 
 #define for_each_sd_topology(tl)			\
 	for (tl = sched_domain_topology; tl->mask; tl++)
@@ -1530,6 +1680,7 @@ void set_sched_topology(struct sched_domain_topology_level *tl)
 		return;
 
 	sched_domain_topology = tl;
+	sched_domain_topology_saved = NULL;
 }
 
 #ifdef CONFIG_NUMA
@@ -1553,8 +1704,12 @@ static void sched_numa_warn(const char *str)
 
 	for (i = 0; i < nr_node_ids; i++) {
 		printk(KERN_WARNING "  ");
-		for (j = 0; j < nr_node_ids; j++)
-			printk(KERN_CONT "%02d ", node_distance(i,j));
+		for (j = 0; j < nr_node_ids; j++) {
+			if (!node_state(i, N_CPU) || !node_state(j, N_CPU))
+				printk(KERN_CONT "(%02d) ", node_distance(i,j));
+			else
+				printk(KERN_CONT " %02d  ", node_distance(i,j));
+		}
 		printk(KERN_CONT "\n");
 	}
 	printk(KERN_WARNING "\n");
@@ -1562,18 +1717,33 @@ static void sched_numa_warn(const char *str)
 
 bool find_numa_distance(int distance)
 {
-	int i;
+	bool found = false;
+	int i, *distances;
 
 	if (distance == node_distance(0, 0))
 		return true;
 
+	rcu_read_lock();
+	distances = rcu_dereference(sched_domains_numa_distance);
+	if (!distances)
+		goto unlock;
 	for (i = 0; i < sched_domains_numa_levels; i++) {
-		if (sched_domains_numa_distance[i] == distance)
-			return true;
+		if (distances[i] == distance) {
+			found = true;
+			break;
+		}
 	}
+unlock:
+	rcu_read_unlock();
 
-	return false;
+	return found;
 }
+
+#define for_each_cpu_node_but(n, nbut)		\
+	for_each_node_state(n, N_CPU)		\
+		if (n == nbut)			\
+			continue;		\
+		else
 
 /*
  * A system can have three types of NUMA topology:
@@ -1594,7 +1764,7 @@ bool find_numa_distance(int distance)
  *   there is an intermediary node C, which is < N hops away from both
  *   nodes A and B, the system is a glueless mesh.
  */
-static void init_numa_topology_type(void)
+static void init_numa_topology_type(int offline_node)
 {
 	int a, b, c, n;
 
@@ -1605,14 +1775,14 @@ static void init_numa_topology_type(void)
 		return;
 	}
 
-	for_each_online_node(a) {
-		for_each_online_node(b) {
+	for_each_cpu_node_but(a, offline_node) {
+		for_each_cpu_node_but(b, offline_node) {
 			/* Find two nodes furthest removed from each other. */
 			if (node_distance(a, b) < n)
 				continue;
 
 			/* Is there an intermediary node between a and b? */
-			for_each_online_node(c) {
+			for_each_cpu_node_but(c, offline_node) {
 				if (node_distance(a, c) < n &&
 				    node_distance(b, c) < n) {
 					sched_numa_topology_type =
@@ -1625,17 +1795,22 @@ static void init_numa_topology_type(void)
 			return;
 		}
 	}
+
+	pr_err("Failed to find a NUMA topology type, defaulting to DIRECT\n");
+	sched_numa_topology_type = NUMA_DIRECT;
 }
 
 
 #define NR_DISTANCE_VALUES (1 << DISTANCE_BITS)
 
-void sched_init_numa(void)
+void sched_init_numa(int offline_node)
 {
 	struct sched_domain_topology_level *tl;
 	unsigned long *distance_map;
 	int nr_levels = 0;
 	int i, j;
+	int *distances;
+	struct cpumask ***masks;
 
 	/*
 	 * O(nr_nodes^2) deduplicating selection sort -- in order to find the
@@ -1646,12 +1821,13 @@ void sched_init_numa(void)
 		return;
 
 	bitmap_zero(distance_map, NR_DISTANCE_VALUES);
-	for (i = 0; i < nr_node_ids; i++) {
-		for (j = 0; j < nr_node_ids; j++) {
+	for_each_cpu_node_but(i, offline_node) {
+		for_each_cpu_node_but(j, offline_node) {
 			int distance = node_distance(i, j);
 
 			if (distance < LOCAL_DISTANCE || distance >= NR_DISTANCE_VALUES) {
 				sched_numa_warn("Invalid distance value range");
+				bitmap_free(distance_map);
 				return;
 			}
 
@@ -1664,16 +1840,17 @@ void sched_init_numa(void)
 	 */
 	nr_levels = bitmap_weight(distance_map, NR_DISTANCE_VALUES);
 
-	sched_domains_numa_distance = kcalloc(nr_levels, sizeof(int), GFP_KERNEL);
-	if (!sched_domains_numa_distance) {
+	distances = kcalloc(nr_levels, sizeof(int), GFP_KERNEL);
+	if (!distances) {
 		bitmap_free(distance_map);
 		return;
 	}
 
 	for (i = 0, j = 0; i < nr_levels; i++, j++) {
 		j = find_next_bit(distance_map, NR_DISTANCE_VALUES, j);
-		sched_domains_numa_distance[i] = j;
+		distances[i] = j;
 	}
+	rcu_assign_pointer(sched_domains_numa_distance, distances);
 
 	bitmap_free(distance_map);
 
@@ -1695,8 +1872,8 @@ void sched_init_numa(void)
 	 */
 	sched_domains_numa_levels = 0;
 
-	sched_domains_numa_masks = kzalloc(sizeof(void *) * nr_levels, GFP_KERNEL);
-	if (!sched_domains_numa_masks)
+	masks = kzalloc(sizeof(void *) * nr_levels, GFP_KERNEL);
+	if (!masks)
 		return;
 
 	/*
@@ -1704,21 +1881,20 @@ void sched_init_numa(void)
 	 * CPUs of nodes that are that many hops away from us.
 	 */
 	for (i = 0; i < nr_levels; i++) {
-		sched_domains_numa_masks[i] =
-			kzalloc(nr_node_ids * sizeof(void *), GFP_KERNEL);
-		if (!sched_domains_numa_masks[i])
+		masks[i] = kzalloc(nr_node_ids * sizeof(void *), GFP_KERNEL);
+		if (!masks[i])
 			return;
 
-		for (j = 0; j < nr_node_ids; j++) {
+		for_each_cpu_node_but(j, offline_node) {
 			struct cpumask *mask = kzalloc(cpumask_size(), GFP_KERNEL);
 			int k;
 
 			if (!mask)
 				return;
 
-			sched_domains_numa_masks[i][j] = mask;
+			masks[i][j] = mask;
 
-			for_each_node(k) {
+			for_each_cpu_node_but(k, offline_node) {
 				if (sched_debug() && (node_distance(j, k) != node_distance(k, j)))
 					sched_numa_warn("Node-distance not symmetric");
 
@@ -1729,6 +1905,7 @@ void sched_init_numa(void)
 			}
 		}
 	}
+	rcu_assign_pointer(sched_domains_numa_masks, masks);
 
 	/* Compute default topology size */
 	for (i = 0; sched_domain_topology[i].mask; i++);
@@ -1766,12 +1943,67 @@ void sched_init_numa(void)
 		};
 	}
 
+	sched_domain_topology_saved = sched_domain_topology;
 	sched_domain_topology = tl;
 
 	sched_domains_numa_levels = nr_levels;
-	sched_max_numa_distance = sched_domains_numa_distance[nr_levels - 1];
+	WRITE_ONCE(sched_max_numa_distance, sched_domains_numa_distance[nr_levels - 1]);
 
-	init_numa_topology_type();
+	init_numa_topology_type(offline_node);
+}
+
+
+static void sched_reset_numa(void)
+{
+	int nr_levels, *distances;
+	struct cpumask ***masks;
+
+	nr_levels = sched_domains_numa_levels;
+	sched_domains_numa_levels = 0;
+	sched_max_numa_distance = 0;
+	sched_numa_topology_type = NUMA_DIRECT;
+	distances = sched_domains_numa_distance;
+	rcu_assign_pointer(sched_domains_numa_distance, NULL);
+	masks = sched_domains_numa_masks;
+	rcu_assign_pointer(sched_domains_numa_masks, NULL);
+	if (distances || masks) {
+		int i, j;
+
+		synchronize_rcu();
+		kfree(distances);
+		for (i = 0; i < nr_levels && masks; i++) {
+			if (!masks[i])
+				continue;
+			for_each_node(j)
+				kfree(masks[i][j]);
+			kfree(masks[i]);
+		}
+		kfree(masks);
+	}
+	if (sched_domain_topology_saved) {
+		kfree(sched_domain_topology);
+		sched_domain_topology = sched_domain_topology_saved;
+		sched_domain_topology_saved = NULL;
+	}
+}
+
+/*
+ * Call with hotplug lock held
+ */
+void sched_update_numa(int cpu, bool online)
+{
+	int node;
+
+	node = cpu_to_node(cpu);
+	/*
+	 * Scheduler NUMA topology is updated when the first CPU of a
+	 * node is onlined or the last CPU of a node is offlined.
+	 */
+	if (cpumask_weight(cpumask_of_node(node)) != 1)
+		return;
+
+	sched_reset_numa();
+	sched_init_numa(online ? NUMA_NO_NODE : node);
 }
 
 void sched_domains_numa_masks_set(unsigned int cpu)
@@ -1781,6 +2013,10 @@ void sched_domains_numa_masks_set(unsigned int cpu)
 
 	for (i = 0; i < sched_domains_numa_levels; i++) {
 		for (j = 0; j < nr_node_ids; j++) {
+			if (!node_state(j, N_CPU))
+				continue;
+
+			/* Set ourselves in the remote node's masks */
 			if (node_distance(j, node) <= sched_domains_numa_distance[i])
 				cpumask_set_cpu(cpu, sched_domains_numa_masks[i][j]);
 		}
@@ -1792,8 +2028,10 @@ void sched_domains_numa_masks_clear(unsigned int cpu)
 	int i, j;
 
 	for (i = 0; i < sched_domains_numa_levels; i++) {
-		for (j = 0; j < nr_node_ids; j++)
-			cpumask_clear_cpu(cpu, sched_domains_numa_masks[i][j]);
+		for (j = 0; j < nr_node_ids; j++) {
+			if (sched_domains_numa_masks[i][j])
+				cpumask_clear_cpu(cpu, sched_domains_numa_masks[i][j]);
+		}
 	}
 }
 
@@ -1807,14 +2045,26 @@ void sched_domains_numa_masks_clear(unsigned int cpu)
  */
 int sched_numa_find_closest(const struct cpumask *cpus, int cpu)
 {
-	int i, j = cpu_to_node(cpu);
+	int i, j = cpu_to_node(cpu), found = nr_cpu_ids;
+	struct cpumask ***masks;
 
+	rcu_read_lock();
+	masks = rcu_dereference(sched_domains_numa_masks);
+	if (!masks)
+		goto unlock;
 	for (i = 0; i < sched_domains_numa_levels; i++) {
-		cpu = cpumask_any_and(cpus, sched_domains_numa_masks[i][j]);
-		if (cpu < nr_cpu_ids)
-			return cpu;
+		if (!masks[i][j])
+			break;
+		cpu = cpumask_any_and(cpus, masks[i][j]);
+		if (cpu < nr_cpu_ids) {
+			found = cpu;
+			break;
+		}
 	}
-	return nr_cpu_ids;
+unlock:
+	rcu_read_unlock();
+
+	return found;
 }
 
 #endif /* CONFIG_NUMA */
@@ -1926,9 +2176,9 @@ static void __sdt_free(const struct cpumask *cpu_map)
 
 static struct sched_domain *build_sched_domain(struct sched_domain_topology_level *tl,
 		const struct cpumask *cpu_map, struct sched_domain_attr *attr,
-		struct sched_domain *child, int dflags, int cpu)
+		struct sched_domain *child, int cpu)
 {
-	struct sched_domain *sd = sd_init(tl, cpu_map, child, dflags, cpu);
+	struct sched_domain *sd = sd_init(tl, cpu_map, child, cpu);
 
 	if (child) {
 		sd->level = child->level + 1;
@@ -1991,65 +2241,6 @@ static bool topology_span_sane(struct sched_domain_topology_level *tl,
 }
 
 /*
- * Find the sched_domain_topology_level where all CPU capacities are visible
- * for all CPUs.
- */
-static struct sched_domain_topology_level
-*asym_cpu_capacity_level(const struct cpumask *cpu_map)
-{
-	int i, j, asym_level = 0;
-	bool asym = false;
-	struct sched_domain_topology_level *tl, *asym_tl = NULL;
-	unsigned long cap;
-
-	/* Is there any asymmetry? */
-	cap = arch_scale_cpu_capacity(cpumask_first(cpu_map));
-
-	for_each_cpu(i, cpu_map) {
-		if (arch_scale_cpu_capacity(i) != cap) {
-			asym = true;
-			break;
-		}
-	}
-
-	if (!asym)
-		return NULL;
-
-	/*
-	 * Examine topology from all CPU's point of views to detect the lowest
-	 * sched_domain_topology_level where a highest capacity CPU is visible
-	 * to everyone.
-	 */
-	for_each_cpu(i, cpu_map) {
-		unsigned long max_capacity = arch_scale_cpu_capacity(i);
-		int tl_id = 0;
-
-		for_each_sd_topology(tl) {
-			if (tl_id < asym_level)
-				goto next_level;
-
-			for_each_cpu_and(j, tl->mask(i), cpu_map) {
-				unsigned long capacity;
-
-				capacity = arch_scale_cpu_capacity(j);
-
-				if (capacity <= max_capacity)
-					continue;
-
-				max_capacity = capacity;
-				asym_level = tl_id;
-				asym_tl = tl;
-			}
-next_level:
-			tl_id++;
-		}
-	}
-
-	return asym_tl;
-}
-
-
-/*
  * Build sched domains for a given set of CPUs and attach the sched domains
  * to the individual CPUs
  */
@@ -2061,7 +2252,6 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 	struct s_data d;
 	struct rq *rq = NULL;
 	int i, ret = -ENOMEM;
-	struct sched_domain_topology_level *tl_asym;
 	bool has_asym = false;
 
 	if (WARN_ON(cpumask_empty(cpu_map)))
@@ -2071,24 +2261,19 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 	if (alloc_state != sa_rootdomain)
 		goto error;
 
-	tl_asym = asym_cpu_capacity_level(cpu_map);
-
 	/* Set up domains for CPUs specified by the cpu_map: */
 	for_each_cpu(i, cpu_map) {
 		struct sched_domain_topology_level *tl;
-		int dflags = 0;
 
 		sd = NULL;
 		for_each_sd_topology(tl) {
-			if (tl == tl_asym) {
-				dflags |= SD_ASYM_CPUCAPACITY;
-				has_asym = true;
-			}
 
 			if (WARN_ON(!topology_span_sane(tl, cpu_map, i)))
 				goto error;
 
-			sd = build_sched_domain(tl, cpu_map, attr, sd, dflags, i);
+			sd = build_sched_domain(tl, cpu_map, attr, sd, i);
+
+			has_asym |= sd->flags & SD_ASYM_CPUCAPACITY;
 
 			if (tl == sched_domain_topology)
 				*per_cpu_ptr(d.sd, i) = sd;
@@ -2109,6 +2294,64 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 			} else {
 				if (build_sched_groups(sd, i))
 					goto error;
+			}
+		}
+	}
+
+	/*
+	 * Calculate an allowed NUMA imbalance such that LLCs do not get
+	 * imbalanced.
+	 */
+	for_each_cpu(i, cpu_map) {
+		unsigned int imb = 0;
+		unsigned int imb_span = 1;
+
+		for (sd = *per_cpu_ptr(d.sd, i); sd; sd = sd->parent) {
+			struct sched_domain *child = sd->child;
+
+			if (!(sd->flags & SD_SHARE_PKG_RESOURCES) && child &&
+			    (child->flags & SD_SHARE_PKG_RESOURCES)) {
+				struct sched_domain __rcu *top_p;
+				unsigned int nr_llcs;
+
+				/*
+				 * For a single LLC per node, allow an
+				 * imbalance up to 12.5% of the node. This is
+				 * arbitrary cutoff based two factors -- SMT and
+				 * memory channels. For SMT-2, the intent is to
+				 * avoid premature sharing of HT resources but
+				 * SMT-4 or SMT-8 *may* benefit from a different
+				 * cutoff. For memory channels, this is a very
+				 * rough estimate of how many channels may be
+				 * active and is based on recent CPUs with
+				 * many cores.
+				 *
+				 * For multiple LLCs, allow an imbalance
+				 * until multiple tasks would share an LLC
+				 * on one node while LLCs on another node
+				 * remain idle. This assumes that there are
+				 * enough logical CPUs per LLC to avoid SMT
+				 * factors and that there is a correlation
+				 * between LLCs and memory channels.
+				 */
+				nr_llcs = sd->span_weight / child->span_weight;
+				if (nr_llcs == 1)
+					imb = sd->span_weight >> 3;
+				else
+					imb = nr_llcs;
+				imb = max(1U, imb);
+				sd->imb_numa_nr = imb;
+
+				/* Set span based on the first NUMA domain. */
+				top_p = sd->parent;
+				while (top_p && !(top_p->flags & SD_NUMA)) {
+					top_p = top_p->parent;
+				}
+				imb_span = top_p ? top_p->span_weight : sd->span_weight;
+			} else {
+				int factor = max(1U, (sd->span_weight / imb_span));
+
+				sd->imb_numa_nr = imb * factor;
 			}
 		}
 	}
@@ -2141,7 +2384,7 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 	if (has_asym)
 		static_branch_inc_cpuslocked(&sched_asym_cpucapacity);
 
-	if (rq && sched_debug_enabled) {
+	if (rq && sched_debug_verbose) {
 		pr_info("root domain span: %*pbl (max cpu_capacity = %lu)\n",
 			cpumask_pr_args(cpu_map), rq->rd->max_cpu_capacity);
 	}
@@ -2159,7 +2402,7 @@ static cpumask_var_t			*doms_cur;
 /* Number of sched domains in 'doms_cur': */
 static int				ndoms_cur;
 
-/* Attribues of custom domains in 'doms_cur' */
+/* Attributes of custom domains in 'doms_cur' */
 static struct sched_domain_attr		*dattr_cur;
 
 /*
@@ -2217,13 +2460,13 @@ int sched_init_domains(const struct cpumask *cpu_map)
 	zalloc_cpumask_var(&fallback_doms, GFP_KERNEL);
 
 	arch_update_cpu_topology();
+	asym_cpu_capacity_scan();
 	ndoms_cur = 1;
 	doms_cur = alloc_sched_domains(ndoms_cur);
 	if (!doms_cur)
 		doms_cur = &fallback_doms;
-	cpumask_and(doms_cur[0], cpu_map, housekeeping_cpumask(HK_FLAG_DOMAIN));
+	cpumask_and(doms_cur[0], cpu_map, housekeeping_cpumask(HK_TYPE_DOMAIN));
 	err = build_sched_domains(doms_cur[0], NULL);
-	register_sched_domain_sysctl();
 
 	return err;
 }
@@ -2298,11 +2541,11 @@ void partition_sched_domains_locked(int ndoms_new, cpumask_var_t doms_new[],
 
 	lockdep_assert_held(&sched_domains_mutex);
 
-	/* Always unregister in case we don't destroy any domains: */
-	unregister_sched_domain_sysctl();
-
 	/* Let the architecture update CPU core mappings: */
 	new_topology = arch_update_cpu_topology();
+	/* Trigger rebuilding CPU capacity asymmetry data */
+	if (new_topology)
+		asym_cpu_capacity_scan();
 
 	if (!doms_new) {
 		WARN_ON_ONCE(dattr_new);
@@ -2311,7 +2554,7 @@ void partition_sched_domains_locked(int ndoms_new, cpumask_var_t doms_new[],
 		if (doms_new) {
 			n = 1;
 			cpumask_and(doms_new[0], cpu_active_mask,
-				    housekeeping_cpumask(HK_FLAG_DOMAIN));
+				    housekeeping_cpumask(HK_TYPE_DOMAIN));
 		}
 	} else {
 		n = ndoms_new;
@@ -2346,7 +2589,7 @@ match1:
 		n = 0;
 		doms_new = &fallback_doms;
 		cpumask_and(doms_new[0], cpu_active_mask,
-			    housekeeping_cpumask(HK_FLAG_DOMAIN));
+			    housekeeping_cpumask(HK_TYPE_DOMAIN));
 	}
 
 	/* Build new domains: */
@@ -2389,7 +2632,7 @@ match3:
 	dattr_cur = dattr_new;
 	ndoms_cur = ndoms_new;
 
-	register_sched_domain_sysctl();
+	update_sched_domain_debugfs();
 }
 
 /*

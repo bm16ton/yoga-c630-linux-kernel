@@ -644,9 +644,7 @@ static int tsl2583_set_pm_runtime_busy(struct tsl2583_chip *chip, bool on)
 	int ret;
 
 	if (on) {
-		ret = pm_runtime_get_sync(&chip->client->dev);
-		if (ret < 0)
-			pm_runtime_put_noidle(&chip->client->dev);
+		ret = pm_runtime_resume_and_get(&chip->client->dev);
 	} else {
 		pm_runtime_mark_last_busy(&chip->client->dev);
 		ret = pm_runtime_put_autosuspend(&chip->client->dev);
@@ -729,8 +727,10 @@ static int tsl2583_read_raw(struct iio_dev *indio_dev,
 read_done:
 	mutex_unlock(&chip->als_mutex);
 
-	if (ret < 0)
+	if (ret < 0) {
+		tsl2583_set_pm_runtime_busy(chip, false);
 		return ret;
+	}
 
 	/*
 	 * Preserve the ret variable if the call to
@@ -791,8 +791,10 @@ static int tsl2583_write_raw(struct iio_dev *indio_dev,
 
 	mutex_unlock(&chip->als_mutex);
 
-	if (ret < 0)
+	if (ret < 0) {
+		tsl2583_set_pm_runtime_busy(chip, false);
 		return ret;
+	}
 
 	ret = tsl2583_set_pm_runtime_busy(chip, false);
 	if (ret < 0)
@@ -856,7 +858,7 @@ static int tsl2583_probe(struct i2c_client *clientp,
 					 TSL2583_POWER_OFF_DELAY_MS);
 	pm_runtime_use_autosuspend(&clientp->dev);
 
-	ret = devm_iio_device_register(indio_dev->dev.parent, indio_dev);
+	ret = iio_device_register(indio_dev);
 	if (ret) {
 		dev_err(&clientp->dev, "%s: iio registration failed\n",
 			__func__);
@@ -880,12 +882,13 @@ static int tsl2583_remove(struct i2c_client *client)
 
 	pm_runtime_disable(&client->dev);
 	pm_runtime_set_suspended(&client->dev);
-	pm_runtime_put_noidle(&client->dev);
 
-	return tsl2583_set_power_state(chip, TSL2583_CNTL_PWR_OFF);
+	tsl2583_set_power_state(chip, TSL2583_CNTL_PWR_OFF);
+
+	return 0;
 }
 
-static int __maybe_unused tsl2583_suspend(struct device *dev)
+static int tsl2583_suspend(struct device *dev)
 {
 	struct iio_dev *indio_dev = i2c_get_clientdata(to_i2c_client(dev));
 	struct tsl2583_chip *chip = iio_priv(indio_dev);
@@ -900,7 +903,7 @@ static int __maybe_unused tsl2583_suspend(struct device *dev)
 	return ret;
 }
 
-static int __maybe_unused tsl2583_resume(struct device *dev)
+static int tsl2583_resume(struct device *dev)
 {
 	struct iio_dev *indio_dev = i2c_get_clientdata(to_i2c_client(dev));
 	struct tsl2583_chip *chip = iio_priv(indio_dev);
@@ -915,11 +918,8 @@ static int __maybe_unused tsl2583_resume(struct device *dev)
 	return ret;
 }
 
-static const struct dev_pm_ops tsl2583_pm_ops = {
-	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-				pm_runtime_force_resume)
-	SET_RUNTIME_PM_OPS(tsl2583_suspend, tsl2583_resume, NULL)
-};
+static DEFINE_RUNTIME_DEV_PM_OPS(tsl2583_pm_ops, tsl2583_suspend,
+				 tsl2583_resume, NULL);
 
 static const struct i2c_device_id tsl2583_idtable[] = {
 	{ "tsl2580", 0 },
@@ -941,7 +941,7 @@ MODULE_DEVICE_TABLE(of, tsl2583_of_match);
 static struct i2c_driver tsl2583_driver = {
 	.driver = {
 		.name = "tsl2583",
-		.pm = &tsl2583_pm_ops,
+		.pm = pm_ptr(&tsl2583_pm_ops),
 		.of_match_table = tsl2583_of_match,
 	},
 	.id_table = tsl2583_idtable,

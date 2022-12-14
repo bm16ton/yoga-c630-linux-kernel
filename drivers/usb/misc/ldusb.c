@@ -68,12 +68,6 @@
 #define USB_DEVICE_ID_LD_HYBRID		0x2090	/* USB Product ID of Automotive Hybrid */
 #define USB_DEVICE_ID_LD_HEATCONTROL	0x20A0	/* USB Product ID of Heat control */
 
-#define USB_VENDOR_ID_VERNIER		0x08f7
-#define USB_DEVICE_ID_VERNIER_GOTEMP	0x0002
-#define USB_DEVICE_ID_VERNIER_SKIP	0x0003
-#define USB_DEVICE_ID_VERNIER_CYCLOPS	0x0004
-#define USB_DEVICE_ID_VERNIER_LCSPEC	0x0006
-
 #ifdef CONFIG_USB_DYNAMIC_MINORS
 #define USB_LD_MINOR_BASE	0
 #else
@@ -117,10 +111,6 @@ static const struct usb_device_id ld_usb_table[] = {
 	{ USB_DEVICE(USB_VENDOR_ID_LD, USB_DEVICE_ID_LD_MCT) },
 	{ USB_DEVICE(USB_VENDOR_ID_LD, USB_DEVICE_ID_LD_HYBRID) },
 	{ USB_DEVICE(USB_VENDOR_ID_LD, USB_DEVICE_ID_LD_HEATCONTROL) },
-	{ USB_DEVICE(USB_VENDOR_ID_VERNIER, USB_DEVICE_ID_VERNIER_GOTEMP) },
-	{ USB_DEVICE(USB_VENDOR_ID_VERNIER, USB_DEVICE_ID_VERNIER_SKIP) },
-	{ USB_DEVICE(USB_VENDOR_ID_VERNIER, USB_DEVICE_ID_VERNIER_CYCLOPS) },
-	{ USB_DEVICE(USB_VENDOR_ID_VERNIER, USB_DEVICE_ID_VERNIER_LCSPEC) },
 	{ }					/* Terminating entry */
 };
 MODULE_DEVICE_TABLE(usb, ld_usb_table);
@@ -726,9 +716,11 @@ static int ld_usb_probe(struct usb_interface *intf, const struct usb_device_id *
 	dev->interrupt_out_urb = usb_alloc_urb(0, GFP_KERNEL);
 	if (!dev->interrupt_out_urb)
 		goto error;
-	dev->interrupt_in_interval = min_interrupt_in_interval > dev->interrupt_in_endpoint->bInterval ? min_interrupt_in_interval : dev->interrupt_in_endpoint->bInterval;
+	dev->interrupt_in_interval = max_t(int, min_interrupt_in_interval,
+					   dev->interrupt_in_endpoint->bInterval);
 	if (dev->interrupt_out_endpoint)
-		dev->interrupt_out_interval = min_interrupt_out_interval > dev->interrupt_out_endpoint->bInterval ? min_interrupt_out_interval : dev->interrupt_out_endpoint->bInterval;
+		dev->interrupt_out_interval = max_t(int, min_interrupt_out_interval,
+						    dev->interrupt_out_endpoint->bInterval);
 
 	/* we can register the device now, as it is ready */
 	usb_set_intfdata(intf, dev);

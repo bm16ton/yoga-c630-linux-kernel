@@ -47,8 +47,6 @@
  *	driver should be able to register multiple nodes
  */
 
-static DEFINE_MUTEX(device_mutex);
-
 struct snd_compr_file {
 	unsigned long caps;
 	struct snd_compr_stream stream;
@@ -812,7 +810,7 @@ static void error_delayed_work(struct work_struct *work)
 	mutex_unlock(&stream->device->lock);
 }
 
-/*
+/**
  * snd_compr_stop_error: Report a fatal error on a stream
  * @stream: pointer to stream
  * @state: state to transition the stream to
@@ -820,6 +818,8 @@ static void error_delayed_work(struct work_struct *work)
  * Stop the stream and set its state.
  *
  * Should be called with compressed device lock held.
+ *
+ * Return: zero if successful, or a negative error code
  */
 int snd_compr_stop_error(struct snd_compr_stream *stream,
 			 snd_pcm_state_t state)
@@ -1159,12 +1159,15 @@ static int snd_compress_dev_free(struct snd_device *device)
 	return 0;
 }
 
-/*
+/**
  * snd_compress_new: create new compress device
  * @card: sound card pointer
  * @device: device number
  * @dirn: device direction, should be of type enum snd_compr_direction
+ * @id: ID string
  * @compr: compress device pointer
+ *
+ * Return: zero if successful, or a negative error code
  */
 int snd_compress_new(struct snd_card *card, int device,
 			int dirn, const char *id, struct snd_compr *compr)
@@ -1179,6 +1182,7 @@ int snd_compress_new(struct snd_card *card, int device,
 	compr->card = card;
 	compr->device = device;
 	compr->direction = dirn;
+	mutex_init(&compr->lock);
 
 	snd_compress_set_id(compr, id);
 
@@ -1192,72 +1196,6 @@ int snd_compress_new(struct snd_card *card, int device,
 	return ret;
 }
 EXPORT_SYMBOL_GPL(snd_compress_new);
-
-static int snd_compress_add_device(struct snd_compr *device)
-{
-	int ret;
-
-	if (!device->card)
-		return -EINVAL;
-
-	/* register the card */
-	ret = snd_card_register(device->card);
-	if (ret)
-		goto out;
-	return 0;
-
-out:
-	pr_err("failed with %d\n", ret);
-	return ret;
-
-}
-
-static int snd_compress_remove_device(struct snd_compr *device)
-{
-	return snd_card_free(device->card);
-}
-
-/**
- * snd_compress_register - register compressed device
- *
- * @device: compressed device to register
- */
-int snd_compress_register(struct snd_compr *device)
-{
-	int retval;
-
-	if (device->name == NULL || device->ops == NULL)
-		return -EINVAL;
-
-	pr_debug("Registering compressed device %s\n", device->name);
-	if (snd_BUG_ON(!device->ops->open))
-		return -EINVAL;
-	if (snd_BUG_ON(!device->ops->free))
-		return -EINVAL;
-	if (snd_BUG_ON(!device->ops->set_params))
-		return -EINVAL;
-	if (snd_BUG_ON(!device->ops->trigger))
-		return -EINVAL;
-
-	mutex_init(&device->lock);
-
-	/* register a compressed card */
-	mutex_lock(&device_mutex);
-	retval = snd_compress_add_device(device);
-	mutex_unlock(&device_mutex);
-	return retval;
-}
-EXPORT_SYMBOL_GPL(snd_compress_register);
-
-int snd_compress_deregister(struct snd_compr *device)
-{
-	pr_debug("Removing compressed device %s\n", device->name);
-	mutex_lock(&device_mutex);
-	snd_compress_remove_device(device);
-	mutex_unlock(&device_mutex);
-	return 0;
-}
-EXPORT_SYMBOL_GPL(snd_compress_deregister);
 
 MODULE_DESCRIPTION("ALSA Compressed offload framework");
 MODULE_AUTHOR("Vinod Koul <vinod.koul@linux.intel.com>");

@@ -1,21 +1,31 @@
-menuconfig LEDS_BLINK
-	bool "LED Blink support"
+config LEDS_BCM63138
+	tristate "LED Support for Broadcom BCM63138 SoC"
 	depends on LEDS_CLASS
-	help
-	  This option enables blink support for the leds class.
-	  If unsure, say Y.
-
-if LEDS_BLINK
-
-config LEDS_BLINK_LGM
-	tristate "LED support for Intel LGM SoC series"
-	depends on GPIOLIB
-	depends on LEDS_CLASS
-	depends on MFD_SYSCON
+	depends on ARCH_BCM4908 || ARCH_BCM_5301X || BCM63XX || COMPILE_TEST
+	depends on HAS_IOMEM
 	depends on OF
+	default ARCH_BCM4908
 	help
-	  Parallel to serial conversion, which is also called SSO controller,
-	  can drive external shift register for LED outputs.
-	  This enables LED support for Serial Shift Output controller(SSO).
+	  This option enables support for LED controller that is part of
+	  BCM63138 SoC. The same hardware block is known to be also used
+	  in BCM4908, BCM6848, BCM6858, BCM63148, BCM63381 and BCM68360.
 
-endif # LEDS_BLINK
+	  If compiled as module it will be called leds-bcm63138.
+
+config LEDS_LGM
+       tristate "LED support for LGM SoC series"
+       depends on X86 || COMPILE_TEST
+       depends on GPIOLIB && LEDS_CLASS && MFD_SYSCON && OF
+       help
+         This option enables support for LEDs connected to GPIO lines on
+         Lightning Mountain (LGM) SoC. Lightning Mountain is a AnyWAN
+         gateway-on-a-chip SoC to be shipped on mid and high end home
+         gateways and routers.
+
+         These LEDs are driven by a Serial Shift Output (SSO) controller.
+         The driver supports hardware blinking and the LEDs can be configured
+         to be triggered by software/CPU or by hardware.
+
+         Say 'Y' here if you are working on LGM SoC based platform. Otherwise,
+         say 'N'. To compile this driver as a module, choose M here: the module
+         will be called leds-lgm-sso.

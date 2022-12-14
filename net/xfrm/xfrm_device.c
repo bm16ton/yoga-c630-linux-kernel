@@ -97,6 +97,18 @@ static void xfrm_outer_mode_prep(struct xfrm_state *x, struct sk_buff *skb)
 	}
 }
 
+static inline bool xmit_xfrm_check_overflow(struct sk_buff *skb)
+{
+	struct xfrm_offload *xo = xfrm_offload(skb);
+	__u32 seq = xo->seq.low;
+
+	seq += skb_shinfo(skb)->gso_segs;
+	if (unlikely(seq < xo->seq.low))
+		return true;
+
+	return false;
+}
+
 struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t features, bool *again)
 {
 	int err;
@@ -117,7 +129,7 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
 
 	sp = skb_sec_path(skb);
 	x = sp->xvec[sp->len - 1];
-	if (xo->flags & XFRM_GRO || x->xso.flags & XFRM_OFFLOAD_INBOUND)
+	if (xo->flags & XFRM_GRO || x->xso.dir == XFRM_DEV_OFFLOAD_IN)
 		return skb;
 
 	/* This skb was already validated on the upper/virtual dev */
@@ -134,7 +146,8 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
 		return skb;
 	}
 
-	if (skb_is_gso(skb) && unlikely(x->xso.dev != dev)) {
+	if (skb_is_gso(skb) && (unlikely(x->xso.dev != dev) ||
+				unlikely(xmit_xfrm_check_overflow(skb)))) {
 		struct sk_buff *segs;
 
 		/* Packet got rerouted, fixup features and segment it. */
@@ -143,7 +156,7 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
 		segs = skb_gso_segment(skb, esp_features);
 		if (IS_ERR(segs)) {
 			kfree_skb(skb);
-			atomic_long_inc(&dev->tx_dropped);
+			dev_core_stats_tx_dropped_inc(dev);
 			return NULL;
 		} else {
 			consume_skb(skb);
@@ -212,7 +225,7 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
 	int err;
 	struct dst_entry *dst;
 	struct net_device *dev;
-	struct xfrm_state_offload *xso = &x->xso;
+	struct xfrm_dev_offload *xso = &x->xso;
 	xfrm_address_t *saddr;
 	xfrm_address_t *daddr;
 
@@ -221,6 +234,9 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
 
 	/* We don't yet support UDP encapsulation and TFC padding. */
 	if (x->encap || x->tfcpad)
+		return -EINVAL;
+
+	if (xuo->flags & ~(XFRM_OFFLOAD_IPV6 | XFRM_OFFLOAD_INBOUND))
 		return -EINVAL;
 
 	dev = dev_get_by_index(net, xuo->ifindex);
@@ -259,17 +275,20 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
 	}
 
 	xso->dev = dev;
+	netdev_tracker_alloc(dev, &xso->dev_tracker, GFP_ATOMIC);
 	xso->real_dev = dev;
-	xso->num_exthdrs = 1;
-	xso->flags = xuo->flags;
+
+	if (xuo->flags & XFRM_OFFLOAD_INBOUND)
+		xso->dir = XFRM_DEV_OFFLOAD_IN;
+	else
+		xso->dir = XFRM_DEV_OFFLOAD_OUT;
 
 	err = dev->xfrmdev_ops->xdo_dev_state_add(x);
 	if (err) {
-		xso->num_exthdrs = 0;
-		xso->flags = 0;
 		xso->dev = NULL;
+		xso->dir = 0;
 		xso->real_dev = NULL;
-		dev_put(dev);
+		netdev_put(dev, &xso->dev_tracker);
 
 		if (err != -EOPNOTSUPP)
 			return err;
@@ -379,16 +398,6 @@ static int xfrm_api_check(struct net_device *dev)
 	return NOTIFY_DONE;
 }
 
-static int xfrm_dev_register(struct net_device *dev)
-{
-	return xfrm_api_check(dev);
-}
-
-static int xfrm_dev_feat_change(struct net_device *dev)
-{
-	return xfrm_api_check(dev);
-}
-
 static int xfrm_dev_down(struct net_device *dev)
 {
 	if (dev->features & NETIF_F_HW_ESP)
@@ -403,10 +412,10 @@ static int xfrm_dev_event(struct notifier_block *this, unsigned long event, void
 
 	switch (event) {
 	case NETDEV_REGISTER:
-		return xfrm_dev_register(dev);
+		return xfrm_api_check(dev);
 
 	case NETDEV_FEAT_CHANGE:
-		return xfrm_dev_feat_change(dev);
+		return xfrm_api_check(dev);
 
 	case NETDEV_DOWN:
 	case NETDEV_UNREGISTER:

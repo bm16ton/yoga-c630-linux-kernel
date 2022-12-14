@@ -237,7 +237,7 @@ static int sun50i_h6_ths_calibrate(struct ths_device *tmdev,
 	 * The calibration data on the H6 is the ambient temperature and
 	 * sensor values that are filled during the factory test stage.
 	 *
-	 * The unit of stored FT temperature is 0.1 degreee celusis.
+	 * The unit of stored FT temperature is 0.1 degree celsius.
 	 *
 	 * We need to calculate a delta between measured and caluclated
 	 * register values and this will become a calibration offset.
@@ -300,7 +300,7 @@ static int sun8i_ths_calibrate(struct ths_device *tmdev)
 		 * or 0x8xx, so they won't be away from the default value
 		 * for a lot.
 		 *
-		 * So here we do not return error if the calibartion data is
+		 * So here we do not return error if the calibration data is
 		 * not available, except the probe needs deferring.
 		 */
 		goto out;
@@ -418,7 +418,7 @@ static int sun8i_h3_thermal_init(struct ths_device *tmdev)
 }
 
 /*
- * Without this undocummented value, the returned temperatures would
+ * Without this undocumented value, the returned temperatures would
  * be higher than real ones by about 20C.
  */
 #define SUN50I_H6_CTRL0_UNK 0x0000002f

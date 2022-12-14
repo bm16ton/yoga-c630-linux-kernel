@@ -35,7 +35,7 @@ static void pabort(const char *s)
 	abort();
 }
 
-static const char *device = "/dev/spidev16.0";
+static const char *device = "/dev/spidev1.1";
 static uint32_t mode;
 static uint8_t bits = 8;
 static char *input_file;
@@ -417,6 +417,7 @@ int main(int argc, char *argv[])
 {
 	int ret = 0;
 	int fd;
+	uint32_t request;
 
 	parse_opts(argc, argv);
 
@@ -430,13 +431,23 @@ int main(int argc, char *argv[])
 	/*
 	 * spi mode
 	 */
+	/* WR is make a request to assign 'mode' */
+	request = mode;
 	ret = ioctl(fd, SPI_IOC_WR_MODE32, &mode);
 	if (ret == -1)
 		pabort("can't set spi mode");
 
+	/* RD is read what mode the device actually is in */
 	ret = ioctl(fd, SPI_IOC_RD_MODE32, &mode);
 	if (ret == -1)
 		pabort("can't get spi mode");
+	/* Drivers can reject some mode bits without returning an error.
+	 * Read the current value to identify what mode it is in, and if it
+	 * differs from the requested mode, warn the user.
+	 */
+	if (request != mode)
+		printf("WARNING device does not support requested mode 0x%x\n",
+			request);
 
 	/*
 	 * bits per word

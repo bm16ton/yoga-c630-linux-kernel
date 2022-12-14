@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
 /*
- * Copyright (C) 2012-2014, 2018-2020 Intel Corporation
+ * Copyright (C) 2012-2014, 2018-2021 Intel Corporation
  * Copyright (C) 2013-2015 Intel Mobile Communications GmbH
  * Copyright (C) 2016-2017 Intel Deutschland GmbH
  */
@@ -234,7 +234,7 @@ static ssize_t iwl_dbgfs_mac_params_read(struct file *file,
 	}
 
 	rcu_read_lock();
-	chanctx_conf = rcu_dereference(vif->chanctx_conf);
+	chanctx_conf = rcu_dereference(vif->bss_conf.chanctx_conf);
 	if (chanctx_conf)
 		pos += scnprintf(buf+pos, bufsz-pos,
 				 "idle rx chains %d, active rx chains: %d\n",
@@ -460,7 +460,7 @@ static ssize_t iwl_dbgfs_os_device_timediff_read(struct file *file,
 	int pos = 0;
 
 	mutex_lock(&mvm->mutex);
-	iwl_mvm_get_sync_time(mvm, &curr_gp2, &curr_os);
+	iwl_mvm_get_sync_time(mvm, CLOCK_BOOTTIME, &curr_gp2, &curr_os, NULL);
 	mutex_unlock(&mvm->mutex);
 
 	do_div(curr_os, NSEC_PER_USEC);
@@ -597,7 +597,7 @@ static ssize_t iwl_dbgfs_rx_phyinfo_write(struct ieee80211_vif *vif, char *buf,
 	mutex_lock(&mvm->mutex);
 	rcu_read_lock();
 
-	chanctx_conf = rcu_dereference(vif->chanctx_conf);
+	chanctx_conf = rcu_dereference(vif->bss_conf.chanctx_conf);
 	/* make sure the channel context is assigned */
 	if (!chanctx_conf) {
 		rcu_read_unlock();

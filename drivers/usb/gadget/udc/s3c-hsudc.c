@@ -126,7 +126,7 @@ struct s3c_hsudc_req {
 /**
  * struct s3c_hsudc - Driver's abstraction of the device controller.
  * @gadget: Instance of usb_gadget which is referenced by gadget driver.
- * @driver: Reference to currenty active gadget driver.
+ * @driver: Reference to currently active gadget driver.
  * @dev: The device reference used by probe function.
  * @lock: Lock to synchronize the usage of Endpoints (EP's are indexed).
  * @regs: Remapped base address of controller's register space.
@@ -633,7 +633,7 @@ static void s3c_hsudc_process_setup(struct s3c_hsudc *hsudc)
 }
 
 /** s3c_hsudc_handle_ep0_intr - Handle endpoint 0 interrupt.
- * @hsudc: Device controller on which endpoint 0 interrupt has occured.
+ * @hsudc: Device controller on which endpoint 0 interrupt has occurred.
  *
  * Handle endpoint 0 interrupt when it occurs. EP0 interrupt could occur
  * when a stall handshake is sent to host or data is sent/received on
@@ -877,7 +877,7 @@ static int s3c_hsudc_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 {
 	struct s3c_hsudc_ep *hsep = our_ep(_ep);
 	struct s3c_hsudc *hsudc = hsep->dev;
-	struct s3c_hsudc_req *hsreq;
+	struct s3c_hsudc_req *hsreq = NULL, *iter;
 	unsigned long flags;
 
 	hsep = our_ep(_ep);
@@ -886,11 +886,13 @@ static int s3c_hsudc_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 
 	spin_lock_irqsave(&hsudc->lock, flags);
 
-	list_for_each_entry(hsreq, &hsep->queue, queue) {
-		if (&hsreq->req == _req)
-			break;
+	list_for_each_entry(iter, &hsep->queue, queue) {
+		if (&iter->req != _req)
+			continue;
+		hsreq = iter;
+		break;
 	}
-	if (&hsreq->req != _req) {
+	if (!hsreq) {
 		spin_unlock_irqrestore(&hsudc->lock, flags);
 		return -EINVAL;
 	}
@@ -1220,9 +1222,8 @@ static int s3c_hsudc_probe(struct platform_device *pdev)
 	struct s3c24xx_hsudc_platdata *pd = dev_get_platdata(&pdev->dev);
 	int ret, i;
 
-	hsudc = devm_kzalloc(&pdev->dev, sizeof(struct s3c_hsudc) +
-			sizeof(struct s3c_hsudc_ep) * pd->epnum,
-			GFP_KERNEL);
+	hsudc = devm_kzalloc(&pdev->dev, struct_size(hsudc, ep, pd->epnum),
+			     GFP_KERNEL);
 	if (!hsudc)
 		return -ENOMEM;
 

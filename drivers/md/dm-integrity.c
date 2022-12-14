@@ -23,6 +23,8 @@
 #include <linux/async_tx.h>
 #include <linux/dm-bufio.h>
 
+#include "dm-audit.h"
+
 #define DM_MSG_PREFIX "integrity"
 
 #define DEFAULT_INTERLEAVE_SECTORS	32768
@@ -35,7 +37,7 @@
 #define MIN_LOG2_INTERLEAVE_SECTORS	3
 #define MAX_LOG2_INTERLEAVE_SECTORS	31
 #define METADATA_WORKQUEUE_MAX_ACTIVE	16
-#define RECALC_SECTORS			8192
+#define RECALC_SECTORS			32768
 #define RECALC_WRITE_SUPER		16
 #define BITMAP_BLOCK_SIZE		4096	/* don't change it */
 #define BITMAP_FLUSH_INTERVAL		(10 * HZ)
@@ -66,14 +68,14 @@ struct superblock {
 	__u8 magic[8];
 	__u8 version;
 	__u8 log2_interleave_sectors;
-	__u16 integrity_tag_size;
-	__u32 journal_sections;
-	__u64 provided_data_sectors;	/* userspace uses this value */
-	__u32 flags;
+	__le16 integrity_tag_size;
+	__le32 journal_sections;
+	__le64 provided_data_sectors;	/* userspace uses this value */
+	__le32 flags;
 	__u8 log2_sectors_per_block;
 	__u8 log2_blocks_per_bitmap_bit;
 	__u8 pad[2];
-	__u64 recalc_sector;
+	__le64 recalc_sector;
 	__u8 pad2[8];
 	__u8 salt[SALT_SIZE];
 };
@@ -86,16 +88,16 @@ struct superblock {
 
 #define	JOURNAL_ENTRY_ROUNDUP		8
 
-typedef __u64 commit_id_t;
+typedef __le64 commit_id_t;
 #define JOURNAL_MAC_PER_SECTOR		8
 
 struct journal_entry {
 	union {
 		struct {
-			__u32 sector_lo;
-			__u32 sector_hi;
+			__le32 sector_lo;
+			__le32 sector_hi;
 		} s;
-		__u64 sector;
+		__le64 sector;
 	} u;
 	commit_id_t last_bytes[];
 	/* __u8 tag[0]; */
@@ -119,8 +121,10 @@ struct journal_entry {
 #define JOURNAL_MAC_SIZE		(JOURNAL_MAC_PER_SECTOR * JOURNAL_BLOCK_SECTORS)
 
 struct journal_sector {
-	__u8 entries[JOURNAL_SECTOR_DATA - JOURNAL_MAC_PER_SECTOR];
-	__u8 mac[JOURNAL_MAC_PER_SECTOR];
+	struct_group(sectors,
+		__u8 entries[JOURNAL_SECTOR_DATA - JOURNAL_MAC_PER_SECTOR];
+		__u8 mac[JOURNAL_MAC_PER_SECTOR];
+	);
 	commit_id_t commit_id;
 };
 
@@ -259,9 +263,11 @@ struct dm_integrity_c {
 
 	struct completion crypto_backoff;
 
+	bool wrote_to_journal;
 	bool journal_uptodate;
 	bool just_formatted;
 	bool recalculate_flag;
+	bool reset_recalculate_flag;
 	bool discard;
 	bool fix_padding;
 	bool fix_hmac;
@@ -293,7 +299,7 @@ struct dm_integrity_io {
 	struct work_struct work;
 
 	struct dm_integrity_c *ic;
-	enum req_opf op;
+	enum req_op op;
 	bool fua;
 
 	struct dm_integrity_range range;
@@ -538,6 +544,7 @@ static int sb_mac(struct dm_integrity_c *ic, bool wr)
 		}
 		if (memcmp((__u8 *)ic->sb + (1 << SECTOR_SHIFT) - size, result, size)) {
 			dm_integrity_io_error(ic, "superblock mac", -EILSEQ);
+			dm_audit_log_target(DM_MSG_PREFIX, "mac-superblock", ic->ti, 0);
 			return -EILSEQ;
 		}
 	}
@@ -545,14 +552,14 @@ static int sb_mac(struct dm_integrity_c *ic, bool wr)
 	return 0;
 }
 
-static int sync_rw_sb(struct dm_integrity_c *ic, int op, int op_flags)
+static int sync_rw_sb(struct dm_integrity_c *ic, blk_opf_t opf)
 {
 	struct dm_io_request io_req;
 	struct dm_io_region io_loc;
+	const enum req_op op = opf & REQ_OP_MASK;
 	int r;
 
-	io_req.bi_op = op;
-	io_req.bi_op_flags = op_flags;
+	io_req.bi_opf = opf;
 	io_req.mem.type = DM_IO_KMEM;
 	io_req.mem.ptr.addr = ic->sb;
 	io_req.notify.fn = NULL;
@@ -805,7 +812,7 @@ static void section_mac(struct dm_integrity_c *ic, unsigned section, __u8 result
 	}
 
 	if (ic->sb->flags & cpu_to_le32(SB_FLAG_FIXED_HMAC)) {
-		uint64_t section_le;
+		__le64 section_le;
 
 		r = crypto_shash_update(desc, (__u8 *)&ic->sb->salt, SALT_SIZE);
 		if (unlikely(r < 0)) {
@@ -875,8 +882,10 @@ static void rw_section_mac(struct dm_integrity_c *ic, unsigned section, bool wr)
 		if (likely(wr))
 			memcpy(&js->mac, result + (j * JOURNAL_MAC_PER_SECTOR), JOURNAL_MAC_PER_SECTOR);
 		else {
-			if (memcmp(&js->mac, result + (j * JOURNAL_MAC_PER_SECTOR), JOURNAL_MAC_PER_SECTOR))
+			if (memcmp(&js->mac, result + (j * JOURNAL_MAC_PER_SECTOR), JOURNAL_MAC_PER_SECTOR)) {
 				dm_integrity_io_error(ic, "journal mac", -EILSEQ);
+				dm_audit_log_target(DM_MSG_PREFIX, "mac-journal", ic->ti, 0);
+			}
 		}
 	}
 }
@@ -1042,8 +1051,9 @@ static void complete_journal_io(unsigned long error, void *context)
 	complete_journal_op(comp);
 }
 
-static void rw_journal_sectors(struct dm_integrity_c *ic, int op, int op_flags,
-			       unsigned sector, unsigned n_sectors, struct journal_completion *comp)
+static void rw_journal_sectors(struct dm_integrity_c *ic, blk_opf_t opf,
+			       unsigned sector, unsigned n_sectors,
+			       struct journal_completion *comp)
 {
 	struct dm_io_request io_req;
 	struct dm_io_region io_loc;
@@ -1059,8 +1069,7 @@ static void rw_journal_sectors(struct dm_integrity_c *ic, int op, int op_flags,
 	pl_index = sector >> (PAGE_SHIFT - SECTOR_SHIFT);
 	pl_offset = (sector << SECTOR_SHIFT) & (PAGE_SIZE - 1);
 
-	io_req.bi_op = op;
-	io_req.bi_op_flags = op_flags;
+	io_req.bi_opf = opf;
 	io_req.mem.type = DM_IO_PAGE_LIST;
 	if (ic->journal_io)
 		io_req.mem.ptr.pl = &ic->journal_io[pl_index];
@@ -1080,7 +1089,8 @@ static void rw_journal_sectors(struct dm_integrity_c *ic, int op, int op_flags,
 
 	r = dm_io(&io_req, 1, &io_loc, NULL);
 	if (unlikely(r)) {
-		dm_integrity_io_error(ic, op == REQ_OP_READ ? "reading journal" : "writing journal", r);
+		dm_integrity_io_error(ic, (opf & REQ_OP_MASK) == REQ_OP_READ ?
+				      "reading journal" : "writing journal", r);
 		if (comp) {
 			WARN_ONCE(1, "asynchronous dm_io failed: %d", r);
 			complete_journal_io(-1UL, comp);
@@ -1088,15 +1098,16 @@ static void rw_journal_sectors(struct dm_integrity_c *ic, int op, int op_flags,
 	}
 }
 
-static void rw_journal(struct dm_integrity_c *ic, int op, int op_flags, unsigned section,
-		       unsigned n_sections, struct journal_completion *comp)
+static void rw_journal(struct dm_integrity_c *ic, blk_opf_t opf,
+		       unsigned section, unsigned n_sections,
+		       struct journal_completion *comp)
 {
 	unsigned sector, n_sectors;
 
 	sector = section * ic->journal_section_sectors;
 	n_sectors = n_sections * ic->journal_section_sectors;
 
-	rw_journal_sectors(ic, op, op_flags, sector, n_sectors, comp);
+	rw_journal_sectors(ic, opf, sector, n_sectors, comp);
 }
 
 static void write_journal(struct dm_integrity_c *ic, unsigned commit_start, unsigned commit_sections)
@@ -1121,7 +1132,7 @@ static void write_journal(struct dm_integrity_c *ic, unsigned commit_start, unsi
 			for (i = 0; i < commit_sections; i++)
 				rw_section_mac(ic, commit_start + i, true);
 		}
-		rw_journal(ic, REQ_OP_WRITE, REQ_FUA | REQ_SYNC, commit_start,
+		rw_journal(ic, REQ_OP_WRITE | REQ_FUA | REQ_SYNC, commit_start,
 			   commit_sections, &io_comp);
 	} else {
 		unsigned to_end;
@@ -1133,7 +1144,8 @@ static void write_journal(struct dm_integrity_c *ic, unsigned commit_start, unsi
 			crypt_comp_1.in_flight = (atomic_t)ATOMIC_INIT(0);
 			encrypt_journal(ic, true, commit_start, to_end, &crypt_comp_1);
 			if (try_wait_for_completion(&crypt_comp_1.comp)) {
-				rw_journal(ic, REQ_OP_WRITE, REQ_FUA, commit_start, to_end, &io_comp);
+				rw_journal(ic, REQ_OP_WRITE | REQ_FUA,
+					   commit_start, to_end, &io_comp);
 				reinit_completion(&crypt_comp_1.comp);
 				crypt_comp_1.in_flight = (atomic_t)ATOMIC_INIT(0);
 				encrypt_journal(ic, true, 0, commit_sections - to_end, &crypt_comp_1);
@@ -1144,17 +1156,17 @@ static void write_journal(struct dm_integrity_c *ic, unsigned commit_start, unsi
 				crypt_comp_2.in_flight = (atomic_t)ATOMIC_INIT(0);
 				encrypt_journal(ic, true, 0, commit_sections - to_end, &crypt_comp_2);
 				wait_for_completion_io(&crypt_comp_1.comp);
-				rw_journal(ic, REQ_OP_WRITE, REQ_FUA, commit_start, to_end, &io_comp);
+				rw_journal(ic, REQ_OP_WRITE | REQ_FUA, commit_start, to_end, &io_comp);
 				wait_for_completion_io(&crypt_comp_2.comp);
 			}
 		} else {
 			for (i = 0; i < to_end; i++)
 				rw_section_mac(ic, commit_start + i, true);
-			rw_journal(ic, REQ_OP_WRITE, REQ_FUA, commit_start, to_end, &io_comp);
+			rw_journal(ic, REQ_OP_WRITE | REQ_FUA, commit_start, to_end, &io_comp);
 			for (i = 0; i < commit_sections - to_end; i++)
 				rw_section_mac(ic, i, true);
 		}
-		rw_journal(ic, REQ_OP_WRITE, REQ_FUA, 0, commit_sections - to_end, &io_comp);
+		rw_journal(ic, REQ_OP_WRITE | REQ_FUA, 0, commit_sections - to_end, &io_comp);
 	}
 
 	wait_for_completion_io(&io_comp.comp);
@@ -1180,8 +1192,7 @@ static void copy_from_journal(struct dm_integrity_c *ic, unsigned section, unsig
 	pl_index = sector >> (PAGE_SHIFT - SECTOR_SHIFT);
 	pl_offset = (sector << SECTOR_SHIFT) & (PAGE_SIZE - 1);
 
-	io_req.bi_op = REQ_OP_WRITE;
-	io_req.bi_op_flags = 0;
+	io_req.bi_opf = REQ_OP_WRITE;
 	io_req.mem.type = DM_IO_PAGE_LIST;
 	io_req.mem.ptr.pl = &ic->journal[pl_index];
 	io_req.mem.offset = pl_offset;
@@ -1428,8 +1439,10 @@ static int dm_integrity_rw_tag(struct dm_integrity_c *ic, unsigned char *tag, se
 		if (op == TAG_READ) {
 			memcpy(tag, dp, to_copy);
 		} else if (op == TAG_WRITE) {
-			memcpy(dp, tag, to_copy);
-			dm_bufio_mark_partial_buffer_dirty(b, *metadata_offset, *metadata_offset + to_copy);
+			if (memcmp(dp, tag, to_copy)) {
+				memcpy(dp, tag, to_copy);
+				dm_bufio_mark_partial_buffer_dirty(b, *metadata_offset, *metadata_offset + to_copy);
+			}
 		} else {
 			/* e.g.: op == TAG_CMP */
 
@@ -1506,8 +1519,7 @@ static void dm_integrity_flush_buffers(struct dm_integrity_c *ic, bool flush_dat
 	if (!ic->meta_dev)
 		flush_data = false;
 	if (flush_data) {
-		fr.io_req.bi_op = REQ_OP_WRITE,
-		fr.io_req.bi_op_flags = REQ_PREFLUSH | REQ_SYNC,
+		fr.io_req.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC,
 		fr.io_req.mem.type = DM_IO_KMEM,
 		fr.io_req.mem.ptr.addr = NULL,
 		fr.io_req.notify.fn = flush_notify,
@@ -1637,7 +1649,7 @@ static void integrity_end_io(struct bio *bio)
 static void integrity_sector_checksum(struct dm_integrity_c *ic, sector_t sector,
 				      const char *data, char *result)
 {
-	__u64 sector_le = cpu_to_le64(sector);
+	__le64 sector_le = cpu_to_le64(sector);
 	SHASH_DESC_ON_STACK(req, ic->internal_hash);
 	int r;
 	unsigned digest_size;
@@ -1762,7 +1774,7 @@ static void integrity_metadata(struct work_struct *w)
 			char *mem, *checksums_ptr;
 
 again:
-			mem = (char *)kmap_atomic(bv.bv_page) + bv.bv_offset;
+			mem = bvec_kmap_local(&bv);
 			pos = 0;
 			checksums_ptr = checksums;
 			do {
@@ -1772,17 +1784,21 @@ again:
 				pos += ic->sectors_per_block << SECTOR_SHIFT;
 				sector += ic->sectors_per_block;
 			} while (pos < bv.bv_len && sectors_to_process && checksums != checksums_onstack);
-			kunmap_atomic(mem);
+			kunmap_local(mem);
 
 			r = dm_integrity_rw_tag(ic, checksums, &dio->metadata_block, &dio->metadata_offset,
 						checksums_ptr - checksums, dio->op == REQ_OP_READ ? TAG_CMP : TAG_WRITE);
 			if (unlikely(r)) {
 				if (r > 0) {
-					char b[BDEVNAME_SIZE];
-					DMERR_LIMIT("%s: Checksum failed at sector 0x%llx", bio_devname(bio, b),
-						    (sector - ((r + ic->tag_size - 1) / ic->tag_size)));
+					sector_t s;
+
+					s = sector - ((r + ic->tag_size - 1) / ic->tag_size);
+					DMERR_LIMIT("%pg: Checksum failed at sector 0x%llx",
+						    bio->bi_bdev, s);
 					r = -EILSEQ;
 					atomic64_inc(&ic->number_of_mismatches);
+					dm_audit_log_bio(DM_MSG_PREFIX, "integrity-checksum",
+							 bio, s, 0);
 				}
 				if (likely(checksums != checksums_onstack))
 					kfree(checksums);
@@ -1816,7 +1832,7 @@ again:
 				unsigned this_len;
 
 				BUG_ON(PageHighMem(biv.bv_page));
-				tag = lowmem_page_address(biv.bv_page) + biv.bv_offset;
+				tag = bvec_virt(&biv);
 				this_len = min(biv.bv_len, data_to_process);
 				r = dm_integrity_rw_tag(ic, tag, &dio->metadata_block, &dio->metadata_offset,
 							this_len, dio->op == REQ_OP_READ ? TAG_READ : TAG_WRITE);
@@ -1950,7 +1966,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
 		n_sectors -= bv.bv_len >> SECTOR_SHIFT;
 		bio_advance_iter(bio, &bio->bi_iter, bv.bv_len);
 retry_kmap:
-		mem = kmap_atomic(bv.bv_page);
+		mem = kmap_local_page(bv.bv_page);
 		if (likely(dio->op == REQ_OP_WRITE))
 			flush_dcache_page(bv.bv_page);
 
@@ -1964,7 +1980,7 @@ retry_kmap:
 
 				if (unlikely(journal_entry_is_inprogress(je))) {
 					flush_dcache_page(bv.bv_page);
-					kunmap_atomic(mem);
+					kunmap_local(mem);
 
 					__io_wait_event(ic->copy_to_journal_wait, !journal_entry_is_inprogress(je));
 					goto retry_kmap;
@@ -1988,6 +2004,8 @@ retry_kmap:
 					if (unlikely(memcmp(checksums_onstack, journal_entry_tag(ic, je), ic->tag_size))) {
 						DMERR_LIMIT("Checksum failed when reading from journal, at sector 0x%llx",
 							    logical_sector);
+						dm_audit_log_bio(DM_MSG_PREFIX, "journal-checksum",
+								 bio, logical_sector, 0);
 					}
 				}
 #endif
@@ -2003,7 +2021,7 @@ retry_kmap:
 					unsigned tag_now = min(biv.bv_len, tag_todo);
 					char *tag_addr;
 					BUG_ON(PageHighMem(biv.bv_page));
-					tag_addr = lowmem_page_address(biv.bv_page) + biv.bv_offset;
+					tag_addr = bvec_virt(&biv);
 					if (likely(dio->op == REQ_OP_WRITE))
 						memcpy(tag_ptr, tag_addr, tag_now);
 					else
@@ -2055,7 +2073,7 @@ retry_kmap:
 
 		if (unlikely(dio->op == REQ_OP_READ))
 			flush_dcache_page(bv.bv_page);
-		kunmap_atomic(mem);
+		kunmap_local(mem);
 	} while (n_sectors);
 
 	if (likely(dio->op == REQ_OP_WRITE)) {
@@ -2358,6 +2376,8 @@ static void integrity_commit(struct work_struct *w)
 	if (!commit_sections)
 		goto release_flush_bios;
 
+	ic->wrote_to_journal = true;
+
 	i = commit_start;
 	for (n = 0; n < commit_sections; n++) {
 		for (j = 0; j < ic->journal_section_entries; j++) {
@@ -2456,9 +2476,11 @@ static void do_journal_write(struct dm_integrity_c *ic, unsigned write_start,
 					dm_integrity_io_error(ic, "invalid sector in journal", -EIO);
 					sec &= ~(sector_t)(ic->sectors_per_block - 1);
 				}
+				if (unlikely(sec >= ic->provided_data_sectors)) {
+					journal_entry_set_unused(je);
+					continue;
+				}
 			}
-			if (unlikely(sec >= ic->provided_data_sectors))
-				continue;
 			get_area_and_offset(ic, sec, &area, &offset);
 			restore_last_bytes(ic, access_journal_data(ic, i, j), je);
 			for (k = j + 1; k < ic->journal_section_entries; k++) {
@@ -2531,8 +2553,10 @@ static void do_journal_write(struct dm_integrity_c *ic, unsigned write_start,
 
 					integrity_sector_checksum(ic, sec + ((l - j) << ic->sb->log2_sectors_per_block),
 								  (char *)access_journal_data(ic, i, l), test_tag);
-					if (unlikely(memcmp(test_tag, journal_entry_tag(ic, je2), ic->tag_size)))
+					if (unlikely(memcmp(test_tag, journal_entry_tag(ic, je2), ic->tag_size))) {
 						dm_integrity_io_error(ic, "tag mismatch when replaying journal", -EILSEQ);
+						dm_audit_log_target(DM_MSG_PREFIX, "integrity-replay-journal", ic->ti, 0);
+					}
 				}
 
 				journal_entry_set_unused(je2);
@@ -2570,10 +2594,6 @@ static void integrity_writer(struct work_struct *w)
 
 	unsigned prev_free_sectors;
 
-	/* the following test is not needed, but it tests the replay code */
-	if (unlikely(dm_post_suspending(ic->ti)) && !ic->meta_dev)
-		return;
-
 	spin_lock_irq(&ic->endio_wait.lock);
 	write_start = ic->committed_section;
 	write_sections = ic->n_committed_sections;
@@ -2606,7 +2626,7 @@ static void recalc_write_super(struct dm_integrity_c *ic)
 	if (dm_integrity_failed(ic))
 		return;
 
-	r = sync_rw_sb(ic, REQ_OP_WRITE, 0);
+	r = sync_rw_sb(ic, REQ_OP_WRITE);
 	if (unlikely(r))
 		dm_integrity_io_error(ic, "writing superblock", r);
 }
@@ -2686,8 +2706,7 @@ next_chunk:
 	if (unlikely(dm_integrity_failed(ic)))
 		goto err;
 
-	io_req.bi_op = REQ_OP_READ;
-	io_req.bi_op_flags = 0;
+	io_req.bi_opf = REQ_OP_READ;
 	io_req.mem.type = DM_IO_VMA;
 	io_req.mem.ptr.addr = ic->recalc_buffer;
 	io_req.notify.fn = NULL;
@@ -2780,7 +2799,7 @@ static void bitmap_block_work(struct work_struct *w)
 	if (bio_list_empty(&waiting))
 		return;
 
-	rw_journal_sectors(ic, REQ_OP_WRITE, REQ_FUA | REQ_SYNC,
+	rw_journal_sectors(ic, REQ_OP_WRITE | REQ_FUA | REQ_SYNC,
 			   bbs->idx * (BITMAP_BLOCK_SIZE >> SECTOR_SHIFT),
 			   BITMAP_BLOCK_SIZE >> SECTOR_SHIFT, NULL);
 
@@ -2826,7 +2845,7 @@ static void bitmap_flush_work(struct work_struct *work)
 	block_bitmap_op(ic, ic->journal, 0, limit, BITMAP_OP_CLEAR);
 	block_bitmap_op(ic, ic->may_write_bitmap, 0, limit, BITMAP_OP_CLEAR);
 
-	rw_journal_sectors(ic, REQ_OP_WRITE, REQ_FUA | REQ_SYNC, 0,
+	rw_journal_sectors(ic, REQ_OP_WRITE | REQ_FUA | REQ_SYNC, 0,
 			   ic->n_bitmap_blocks * (BITMAP_BLOCK_SIZE >> SECTOR_SHIFT), NULL);
 
 	spin_lock_irq(&ic->endio_wait.lock);
@@ -2853,7 +2872,8 @@ static void init_journal(struct dm_integrity_c *ic, unsigned start_section,
 		wraparound_section(ic, &i);
 		for (j = 0; j < ic->journal_section_sectors; j++) {
 			struct journal_sector *js = access_journal(ic, i, j);
-			memset(&js->entries, 0, JOURNAL_SECTOR_DATA);
+			BUILD_BUG_ON(sizeof(js->sectors) != JOURNAL_SECTOR_DATA);
+			memset(&js->sectors, 0, sizeof(js->sectors));
 			js->commit_id = dm_integrity_commit_id(ic, i, j, commit_seq);
 		}
 		for (j = 0; j < ic->journal_section_entries; j++) {
@@ -2897,7 +2917,7 @@ static void replay_journal(struct dm_integrity_c *ic)
 
 	if (!ic->just_formatted) {
 		DEBUG_print("reading journal\n");
-		rw_journal(ic, REQ_OP_READ, 0, 0, ic->journal_sections, NULL);
+		rw_journal(ic, REQ_OP_READ, 0, ic->journal_sections, NULL);
 		if (ic->journal_io)
 			DEBUG_bytes(lowmem_page_address(ic->journal_io[0].page), 64, "read journal");
 		if (ic->journal_io) {
@@ -3080,10 +3100,17 @@ static void dm_integrity_postsuspend(struct dm_target *ti)
 	drain_workqueue(ic->commit_wq);
 
 	if (ic->mode == 'J') {
-		if (ic->meta_dev)
-			queue_work(ic->writer_wq, &ic->writer_work);
+		queue_work(ic->writer_wq, &ic->writer_work);
 		drain_workqueue(ic->writer_wq);
 		dm_integrity_flush_buffers(ic, true);
+		if (ic->wrote_to_journal) {
+			init_journal(ic, ic->free_section,
+				     ic->journal_sections - ic->free_section, ic->commit_seq);
+			if (ic->free_section) {
+				init_journal(ic, 0, ic->free_section,
+					     next_commit_seq(ic->commit_seq));
+			}
+		}
 	}
 
 	if (ic->mode == 'B') {
@@ -3092,7 +3119,7 @@ static void dm_integrity_postsuspend(struct dm_target *ti)
 		/* set to 0 to test bitmap replay code */
 		init_journal(ic, 0, ic->journal_sections, 0);
 		ic->sb->flags &= ~cpu_to_le32(SB_FLAG_DIRTY_BITMAP);
-		r = sync_rw_sb(ic, REQ_OP_WRITE, REQ_FUA);
+		r = sync_rw_sb(ic, REQ_OP_WRITE | REQ_FUA);
 		if (unlikely(r))
 			dm_integrity_io_error(ic, "writing superblock", r);
 #endif
@@ -3111,30 +3138,33 @@ static void dm_integrity_resume(struct dm_target *ti)
 
 	DEBUG_print("resume\n");
 
+	ic->wrote_to_journal = false;
+
 	if (ic->provided_data_sectors != old_provided_data_sectors) {
 		if (ic->provided_data_sectors > old_provided_data_sectors &&
 		    ic->mode == 'B' &&
 		    ic->sb->log2_blocks_per_bitmap_bit == ic->log2_blocks_per_bitmap_bit) {
-			rw_journal_sectors(ic, REQ_OP_READ, 0, 0,
+			rw_journal_sectors(ic, REQ_OP_READ, 0,
 					   ic->n_bitmap_blocks * (BITMAP_BLOCK_SIZE >> SECTOR_SHIFT), NULL);
 			block_bitmap_op(ic, ic->journal, old_provided_data_sectors,
 					ic->provided_data_sectors - old_provided_data_sectors, BITMAP_OP_SET);
-			rw_journal_sectors(ic, REQ_OP_WRITE, REQ_FUA | REQ_SYNC, 0,
+			rw_journal_sectors(ic, REQ_OP_WRITE | REQ_FUA | REQ_SYNC, 0,
 					   ic->n_bitmap_blocks * (BITMAP_BLOCK_SIZE >> SECTOR_SHIFT), NULL);
 		}
 
 		ic->sb->provided_data_sectors = cpu_to_le64(ic->provided_data_sectors);
-		r = sync_rw_sb(ic, REQ_OP_WRITE, REQ_FUA);
+		r = sync_rw_sb(ic, REQ_OP_WRITE | REQ_FUA);
 		if (unlikely(r))
 			dm_integrity_io_error(ic, "writing superblock", r);
 	}
 
 	if (ic->sb->flags & cpu_to_le32(SB_FLAG_DIRTY_BITMAP)) {
 		DEBUG_print("resume dirty_bitmap\n");
-		rw_journal_sectors(ic, REQ_OP_READ, 0, 0,
+		rw_journal_sectors(ic, REQ_OP_READ, 0,
 				   ic->n_bitmap_blocks * (BITMAP_BLOCK_SIZE >> SECTOR_SHIFT), NULL);
 		if (ic->mode == 'B') {
-			if (ic->sb->log2_blocks_per_bitmap_bit == ic->log2_blocks_per_bitmap_bit) {
+			if (ic->sb->log2_blocks_per_bitmap_bit == ic->log2_blocks_per_bitmap_bit &&
+			    !ic->reset_recalculate_flag) {
 				block_bitmap_copy(ic, ic->recalc_bitmap, ic->journal);
 				block_bitmap_copy(ic, ic->may_write_bitmap, ic->journal);
 				if (!block_bitmap_op(ic, ic->journal, 0, ic->provided_data_sectors,
@@ -3149,14 +3179,15 @@ static void dm_integrity_resume(struct dm_target *ti)
 				block_bitmap_op(ic, ic->recalc_bitmap, 0, ic->provided_data_sectors, BITMAP_OP_SET);
 				block_bitmap_op(ic, ic->may_write_bitmap, 0, ic->provided_data_sectors, BITMAP_OP_SET);
 				block_bitmap_op(ic, ic->journal, 0, ic->provided_data_sectors, BITMAP_OP_SET);
-				rw_journal_sectors(ic, REQ_OP_WRITE, REQ_FUA | REQ_SYNC, 0,
+				rw_journal_sectors(ic, REQ_OP_WRITE | REQ_FUA | REQ_SYNC, 0,
 						   ic->n_bitmap_blocks * (BITMAP_BLOCK_SIZE >> SECTOR_SHIFT), NULL);
 				ic->sb->flags |= cpu_to_le32(SB_FLAG_RECALCULATING);
 				ic->sb->recalc_sector = cpu_to_le64(0);
 			}
 		} else {
 			if (!(ic->sb->log2_blocks_per_bitmap_bit == ic->log2_blocks_per_bitmap_bit &&
-			      block_bitmap_op(ic, ic->journal, 0, ic->provided_data_sectors, BITMAP_OP_TEST_ALL_CLEAR))) {
+			      block_bitmap_op(ic, ic->journal, 0, ic->provided_data_sectors, BITMAP_OP_TEST_ALL_CLEAR)) ||
+			    ic->reset_recalculate_flag) {
 				ic->sb->flags |= cpu_to_le32(SB_FLAG_RECALCULATING);
 				ic->sb->recalc_sector = cpu_to_le64(0);
 			}
@@ -3164,15 +3195,19 @@ static void dm_integrity_resume(struct dm_target *ti)
 			replay_journal(ic);
 			ic->sb->flags &= ~cpu_to_le32(SB_FLAG_DIRTY_BITMAP);
 		}
-		r = sync_rw_sb(ic, REQ_OP_WRITE, REQ_FUA);
+		r = sync_rw_sb(ic, REQ_OP_WRITE | REQ_FUA);
 		if (unlikely(r))
 			dm_integrity_io_error(ic, "writing superblock", r);
 	} else {
 		replay_journal(ic);
+		if (ic->reset_recalculate_flag) {
+			ic->sb->flags |= cpu_to_le32(SB_FLAG_RECALCULATING);
+			ic->sb->recalc_sector = cpu_to_le64(0);
+		}
 		if (ic->mode == 'B') {
 			ic->sb->flags |= cpu_to_le32(SB_FLAG_DIRTY_BITMAP);
 			ic->sb->log2_blocks_per_bitmap_bit = ic->log2_blocks_per_bitmap_bit;
-			r = sync_rw_sb(ic, REQ_OP_WRITE, REQ_FUA);
+			r = sync_rw_sb(ic, REQ_OP_WRITE | REQ_FUA);
 			if (unlikely(r))
 				dm_integrity_io_error(ic, "writing superblock", r);
 
@@ -3188,7 +3223,7 @@ static void dm_integrity_resume(struct dm_target *ti)
 				block_bitmap_op(ic, ic->may_write_bitmap, le64_to_cpu(ic->sb->recalc_sector),
 						ic->provided_data_sectors - le64_to_cpu(ic->sb->recalc_sector), BITMAP_OP_SET);
 			}
-			rw_journal_sectors(ic, REQ_OP_WRITE, REQ_FUA | REQ_SYNC, 0,
+			rw_journal_sectors(ic, REQ_OP_WRITE | REQ_FUA | REQ_SYNC, 0,
 					   ic->n_bitmap_blocks * (BITMAP_BLOCK_SIZE >> SECTOR_SHIFT), NULL);
 		}
 	}
@@ -3242,6 +3277,7 @@ static void dm_integrity_status(struct dm_target *ti, status_type_t type,
 		arg_count += !!ic->meta_dev;
 		arg_count += ic->sectors_per_block != 1;
 		arg_count += !!(ic->sb->flags & cpu_to_le32(SB_FLAG_RECALCULATING));
+		arg_count += ic->reset_recalculate_flag;
 		arg_count += ic->discard;
 		arg_count += ic->mode == 'J';
 		arg_count += ic->mode == 'J';
@@ -3261,6 +3297,8 @@ static void dm_integrity_status(struct dm_target *ti, status_type_t type,
 			DMEMIT(" block_size:%u", ic->sectors_per_block << SECTOR_SHIFT);
 		if (ic->sb->flags & cpu_to_le32(SB_FLAG_RECALCULATING))
 			DMEMIT(" recalculate");
+		if (ic->reset_recalculate_flag)
+			DMEMIT(" reset_recalculate");
 		if (ic->discard)
 			DMEMIT(" allow_discards");
 		DMEMIT(" journal_sectors:%u", ic->initial_sectors - SB_SECTORS);
@@ -3294,6 +3332,30 @@ static void dm_integrity_status(struct dm_target *ti, status_type_t type,
 		EMIT_ALG(journal_mac_alg, "journal_mac");
 		break;
 	}
+	case STATUSTYPE_IMA:
+		DMEMIT_TARGET_NAME_VERSION(ti->type);
+		DMEMIT(",dev_name=%s,start=%llu,tag_size=%u,mode=%c",
+			ic->dev->name, ic->start, ic->tag_size, ic->mode);
+
+		if (ic->meta_dev)
+			DMEMIT(",meta_device=%s", ic->meta_dev->name);
+		if (ic->sectors_per_block != 1)
+			DMEMIT(",block_size=%u", ic->sectors_per_block << SECTOR_SHIFT);
+
+		DMEMIT(",recalculate=%c", (ic->sb->flags & cpu_to_le32(SB_FLAG_RECALCULATING)) ?
+		       'y' : 'n');
+		DMEMIT(",allow_discards=%c", ic->discard ? 'y' : 'n');
+		DMEMIT(",fix_padding=%c",
+		       ((ic->sb->flags & cpu_to_le32(SB_FLAG_FIXED_PADDING)) != 0) ? 'y' : 'n');
+		DMEMIT(",fix_hmac=%c",
+		       ((ic->sb->flags & cpu_to_le32(SB_FLAG_FIXED_HMAC)) != 0) ? 'y' : 'n');
+		DMEMIT(",legacy_recalculate=%c", ic->legacy_recalculate ? 'y' : 'n');
+
+		DMEMIT(",journal_sectors=%u", ic->initial_sectors - SB_SECTORS);
+		DMEMIT(",interleave_sectors=%u", 1U << ic->sb->log2_interleave_sectors);
+		DMEMIT(",buffer_sectors=%u", 1U << ic->log2_buffer_sectors);
+		DMEMIT(";");
+		break;
 	}
 }
 
@@ -3316,6 +3378,7 @@ static void dm_integrity_io_hints(struct dm_target *ti, struct queue_limits *lim
 		limits->logical_block_size = ic->sectors_per_block << SECTOR_SHIFT;
 		limits->physical_block_size = ic->sectors_per_block << SECTOR_SHIFT;
 		blk_limits_io_min(limits, ic->sectors_per_block << SECTOR_SHIFT);
+		limits->dma_alignment = limits->logical_block_size - 1;
 	}
 }
 
@@ -3810,7 +3873,7 @@ static int create_journal(struct dm_integrity_c *ic, char **error)
 			for (i = 0; i < ic->journal_sections; i++) {
 				struct scatterlist sg;
 				struct skcipher_request *section_req;
-				__u32 section_le = cpu_to_le32(i);
+				__le32 section_le = cpu_to_le32(i);
 
 				memset(crypt_iv, 0x00, ivsize);
 				memset(crypt_data, 0x00, crypt_len);
@@ -3914,7 +3977,7 @@ static int dm_integrity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 	unsigned extra_args;
 	struct dm_arg_set as;
 	static const struct dm_arg _args[] = {
-		{0, 17, "Invalid number of feature args"},
+		{0, 18, "Invalid number of feature args"},
 	};
 	unsigned journal_sectors, interleave_sectors, buffer_sectors, journal_watermark, sync_msec;
 	bool should_write_sb;
@@ -4059,6 +4122,9 @@ static int dm_integrity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 				goto bad;
 		} else if (!strcmp(opt_string, "recalculate")) {
 			ic->recalculate_flag = true;
+		} else if (!strcmp(opt_string, "reset_recalculate")) {
+			ic->recalculate_flag = true;
+			ic->reset_recalculate_flag = true;
 		} else if (!strcmp(opt_string, "allow_discards")) {
 			ic->discard = true;
 		} else if (!strcmp(opt_string, "fix_padding")) {
@@ -4074,11 +4140,11 @@ static int dm_integrity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 		}
 	}
 
-	ic->data_device_sectors = i_size_read(ic->dev->bdev->bd_inode) >> SECTOR_SHIFT;
+	ic->data_device_sectors = bdev_nr_sectors(ic->dev->bdev);
 	if (!ic->meta_dev)
 		ic->meta_device_sectors = ic->data_device_sectors;
 	else
-		ic->meta_device_sectors = i_size_read(ic->meta_dev->bdev->bd_inode) >> SECTOR_SHIFT;
+		ic->meta_device_sectors = bdev_nr_sectors(ic->meta_dev->bdev);
 
 	if (!journal_sectors) {
 		journal_sectors = min((sector_t)DEFAULT_MAX_JOURNAL_SECTORS,
@@ -4199,7 +4265,7 @@ static int dm_integrity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 		goto bad;
 	}
 
-	r = sync_rw_sb(ic, REQ_OP_READ, 0);
+	r = sync_rw_sb(ic, REQ_OP_READ);
 	if (r) {
 		ti->error = "Error reading superblock";
 		goto bad;
@@ -4328,7 +4394,7 @@ try_smaller_buffer:
 	DEBUG_print("	journal_sections %u\n", (unsigned)le32_to_cpu(ic->sb->journal_sections));
 	DEBUG_print("	journal_entries %u\n", ic->journal_entries);
 	DEBUG_print("	log2_interleave_sectors %d\n", ic->sb->log2_interleave_sectors);
-	DEBUG_print("	data_device_sectors 0x%llx\n", i_size_read(ic->dev->bdev->bd_inode) >> SECTOR_SHIFT);
+	DEBUG_print("	data_device_sectors 0x%llx\n", bdev_nr_sectors(ic->dev->bdev));
 	DEBUG_print("	initial_sectors 0x%x\n", ic->initial_sectors);
 	DEBUG_print("	metadata_run 0x%x\n", ic->metadata_run);
 	DEBUG_print("	log2_metadata_run %d\n", ic->log2_metadata_run);
@@ -4342,6 +4408,7 @@ try_smaller_buffer:
 	}
 
 	if (ic->internal_hash) {
+		size_t recalc_tags_size;
 		ic->recalc_wq = alloc_workqueue("dm-integrity-recalc", WQ_MEM_RECLAIM, 1);
 		if (!ic->recalc_wq ) {
 			ti->error = "Cannot allocate workqueue";
@@ -4355,8 +4422,10 @@ try_smaller_buffer:
 			r = -ENOMEM;
 			goto bad;
 		}
-		ic->recalc_tags = kvmalloc_array(RECALC_SECTORS >> ic->sb->log2_sectors_per_block,
-						 ic->tag_size, GFP_KERNEL);
+		recalc_tags_size = (RECALC_SECTORS >> ic->sb->log2_sectors_per_block) * ic->tag_size;
+		if (crypto_shash_digestsize(ic->internal_hash) > ic->tag_size)
+			recalc_tags_size += crypto_shash_digestsize(ic->internal_hash) - ic->tag_size;
+		ic->recalc_tags = kvmalloc(recalc_tags_size, GFP_KERNEL);
 		if (!ic->recalc_tags) {
 			ti->error = "Cannot allocate tags for recalculating";
 			r = -ENOMEM;
@@ -4379,7 +4448,7 @@ try_smaller_buffer:
 	}
 
 	ic->bufio = dm_bufio_client_create(ic->meta_dev ? ic->meta_dev->bdev : ic->dev->bdev,
-			1U << (SECTOR_SHIFT + ic->log2_buffer_sectors), 1, 0, NULL, NULL);
+			1U << (SECTOR_SHIFT + ic->log2_buffer_sectors), 1, 0, NULL, NULL, 0);
 	if (IS_ERR(ic->bufio)) {
 		r = PTR_ERR(ic->bufio);
 		ti->error = "Cannot initialize dm-bufio";
@@ -4434,15 +4503,13 @@ try_smaller_buffer:
 	}
 
 	if (should_write_sb) {
-		int r;
-
 		init_journal(ic, 0, ic->journal_sections, 0);
 		r = dm_integrity_failed(ic);
 		if (unlikely(r)) {
 			ti->error = "Error initializing journal";
 			goto bad;
 		}
-		r = sync_rw_sb(ic, REQ_OP_WRITE, REQ_FUA);
+		r = sync_rw_sb(ic, REQ_OP_WRITE | REQ_FUA);
 		if (r) {
 			ti->error = "Error initializing superblock";
 			goto bad;
@@ -4475,9 +4542,11 @@ try_smaller_buffer:
 	if (ic->discard)
 		ti->num_discard_bios = 1;
 
+	dm_audit_log_ctr(DM_MSG_PREFIX, ti, 1);
 	return 0;
 
 bad:
+	dm_audit_log_ctr(DM_MSG_PREFIX, ti, 0);
 	dm_integrity_dtr(ti);
 	return r;
 }
@@ -4551,11 +4620,12 @@ static void dm_integrity_dtr(struct dm_target *ti)
 	free_alg(&ic->journal_mac_alg);
 
 	kfree(ic);
+	dm_audit_log_dtr(DM_MSG_PREFIX, ti, 1);
 }
 
 static struct target_type integrity_target = {
 	.name			= "integrity",
-	.version		= {1, 7, 0},
+	.version		= {1, 10, 0},
 	.module			= THIS_MODULE,
 	.features		= DM_TARGET_SINGLETON | DM_TARGET_INTEGRITY,
 	.ctr			= dm_integrity_ctr,

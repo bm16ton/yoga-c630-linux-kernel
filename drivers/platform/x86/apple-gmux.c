@@ -291,10 +291,7 @@ static int gmux_get_brightness(struct backlight_device *bd)
 static int gmux_update_status(struct backlight_device *bd)
 {
 	struct apple_gmux_data *gmux_data = bl_get_data(bd);
-	u32 brightness = bd->props.brightness;
-
-	if (bd->props.state & BL_CORE_SUSPENDED)
-		return 0;
+	u32 brightness = backlight_get_brightness(bd);
 
 	gmux_write32(gmux_data, GMUX_PORT_BRIGHTNESS, brightness);
 
@@ -625,7 +622,7 @@ static int gmux_probe(struct pnp_dev *pnp, const struct pnp_device_id *id)
 	}
 
 	gmux_data->iostart = res->start;
-	gmux_data->iolen = res->end - res->start;
+	gmux_data->iolen = resource_size(res);
 
 	if (gmux_data->iolen < GMUX_MIN_IO_LEN) {
 		pr_err("gmux I/O region too small (%lu < %u)\n",

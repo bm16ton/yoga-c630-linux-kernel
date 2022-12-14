@@ -463,7 +463,7 @@ int mlx4_QUERY_FUNC_CAP_wrapper(struct mlx4_dev *dev, int slave,
 
 		field = min(
 			bitmap_weight(actv_ports.ports, dev->caps.num_ports),
-			dev->caps.num_ports);
+			(unsigned int) dev->caps.num_ports);
 		MLX4_PUT(outbox->buf, field, QUERY_FUNC_CAP_NUM_PORTS_OFFSET);
 
 		size = dev->caps.function_caps; /* set PF behaviours */
@@ -3105,7 +3105,7 @@ void mlx4_replace_zero_macs(struct mlx4_dev *dev)
 		    dev->caps.port_type[i] == MLX4_PORT_TYPE_ETH) {
 			eth_random_addr(mac_addr);
 			dev->port_random_macs |= 1 << i;
-			dev->caps.def_mac[i] = mlx4_mac_to_u64(mac_addr);
+			dev->caps.def_mac[i] = ether_addr_to_u64(mac_addr);
 		}
 }
 EXPORT_SYMBOL_GPL(mlx4_replace_zero_macs);

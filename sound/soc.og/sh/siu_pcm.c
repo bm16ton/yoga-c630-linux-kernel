@@ -217,14 +217,10 @@ static void siu_io_work(struct work_struct *work)
 	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
 		dma_addr_t buff;
 		size_t count;
-		u8 *virt;
 
 		buff = (dma_addr_t)PERIOD_OFFSET(rt->dma_addr,
 						siu_stream->cur_period,
 						siu_stream->period_bytes);
-		virt = PERIOD_OFFSET(rt->dma_area,
-				     siu_stream->cur_period,
-				     siu_stream->period_bytes);
 		count = siu_stream->period_bytes;
 
 		/* DMA transfer start */
@@ -363,7 +359,7 @@ static int siu_pcm_prepare(struct snd_soc_component *component,
 	struct siu_info *info = siu_i2s_data;
 	struct siu_port *port_info = siu_port_info(ss);
 	struct device *dev = ss->pcm->card->dev;
-	struct snd_pcm_runtime 	*rt = ss->runtime;
+	struct snd_pcm_runtime *rt;
 	struct siu_stream *siu_stream;
 	snd_pcm_sframes_t xfer_cnt;
 
@@ -544,13 +540,14 @@ static void siu_pcm_free(struct snd_soc_component *component,
 }
 
 const struct snd_soc_component_driver siu_component = {
-	.name		= DRV_NAME,
-	.open		= siu_pcm_open,
-	.close		= siu_pcm_close,
-	.prepare	= siu_pcm_prepare,
-	.trigger	= siu_pcm_trigger,
-	.pointer	= siu_pcm_pointer_dma,
-	.pcm_construct	= siu_pcm_new,
-	.pcm_destruct	= siu_pcm_free,
+	.name			= DRV_NAME,
+	.open			= siu_pcm_open,
+	.close			= siu_pcm_close,
+	.prepare		= siu_pcm_prepare,
+	.trigger		= siu_pcm_trigger,
+	.pointer		= siu_pcm_pointer_dma,
+	.pcm_construct		= siu_pcm_new,
+	.pcm_destruct		= siu_pcm_free,
+	.legacy_dai_naming	= 1,
 };
 EXPORT_SYMBOL_GPL(siu_component);

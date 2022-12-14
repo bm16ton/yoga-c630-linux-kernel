@@ -10,8 +10,6 @@
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
 
-#include <drm/drm_irq.h>
-
 #include "vc4_drv.h"
 #include "vc4_regs.h"
 
@@ -129,6 +127,9 @@ static int vc4_v3d_debugfs_ident(struct seq_file *m, void *unused)
 int
 vc4_v3d_pm_get(struct vc4_dev *vc4)
 {
+	if (WARN_ON_ONCE(vc4->is_vc5))
+		return -ENODEV;
+
 	mutex_lock(&vc4->power_lock);
 	if (vc4->power_refcount++ == 0) {
 		int ret = pm_runtime_get_sync(&vc4->v3d->pdev->dev);
@@ -147,6 +148,9 @@ vc4_v3d_pm_get(struct vc4_dev *vc4)
 void
 vc4_v3d_pm_put(struct vc4_dev *vc4)
 {
+	if (WARN_ON_ONCE(vc4->is_vc5))
+		return;
+
 	mutex_lock(&vc4->power_lock);
 	if (--vc4->power_refcount == 0) {
 		pm_runtime_mark_last_busy(&vc4->v3d->pdev->dev);
@@ -173,6 +177,9 @@ int vc4_v3d_get_bin_slot(struct vc4_dev *vc4)
 	int slot;
 	uint64_t seqno = 0;
 	struct vc4_exec_info *exec;
+
+	if (WARN_ON_ONCE(vc4->is_vc5))
+		return -ENODEV;
 
 try_again:
 	spin_lock_irqsave(&vc4->job_lock, irqflags);
@@ -318,6 +325,9 @@ int vc4_v3d_bin_bo_get(struct vc4_dev *vc4, bool *used)
 {
 	int ret = 0;
 
+	if (WARN_ON_ONCE(vc4->is_vc5))
+		return -ENODEV;
+
 	mutex_lock(&vc4->bin_bo_lock);
 
 	if (used && *used)
@@ -350,6 +360,9 @@ static void bin_bo_release(struct kref *ref)
 
 void vc4_v3d_bin_bo_put(struct vc4_dev *vc4)
 {
+	if (WARN_ON_ONCE(vc4->is_vc5))
+		return;
+
 	mutex_lock(&vc4->bin_bo_lock);
 	kref_put(&vc4->bin_bo_kref, bin_bo_release);
 	mutex_unlock(&vc4->bin_bo_lock);
@@ -361,7 +374,7 @@ static int vc4_v3d_runtime_suspend(struct device *dev)
 	struct vc4_v3d *v3d = dev_get_drvdata(dev);
 	struct vc4_dev *vc4 = v3d->vc4;
 
-	vc4_irq_uninstall(&vc4->base);
+	vc4_irq_disable(&vc4->base);
 
 	clk_disable_unprepare(v3d->clk);
 
@@ -381,8 +394,8 @@ static int vc4_v3d_runtime_resume(struct device *dev)
 	vc4_v3d_init_hw(&vc4->base);
 
 	/* We disabled the IRQ as part of vc4_irq_uninstall in suspend. */
-	enable_irq(vc4->base.irq);
-	vc4_irq_postinstall(&vc4->base);
+	enable_irq(vc4->irq);
+	vc4_irq_enable(&vc4->base);
 
 	return 0;
 }
@@ -448,7 +461,12 @@ static int vc4_v3d_bind(struct device *dev, struct device *master, void *data)
 
 	vc4_v3d_init_hw(drm);
 
-	ret = drm_irq_install(drm, platform_get_irq(pdev, 0));
+	ret = platform_get_irq(pdev, 0);
+	if (ret < 0)
+		return ret;
+	vc4->irq = ret;
+
+	ret = vc4_irq_install(drm, vc4->irq);
 	if (ret) {
 		DRM_ERROR("Failed to install IRQ handler\n");
 		return ret;
@@ -473,7 +491,7 @@ static void vc4_v3d_unbind(struct device *dev, struct device *master,
 
 	pm_runtime_disable(dev);
 
-	drm_irq_uninstall(drm);
+	vc4_irq_uninstall(drm);
 
 	/* Disable the binner's overflow memory address, so the next
 	 * driver probe (if any) doesn't try to reuse our old

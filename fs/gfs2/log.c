@@ -65,7 +65,6 @@ unsigned int gfs2_struct2blk(struct gfs2_sbd *sdp, unsigned int nstruct)
 
 /**
  * gfs2_remove_from_ail - Remove an entry from the ail lists, updating counters
- * @mapping: The associated mapping (maybe NULL)
  * @bd: The gfs2_bufdata to remove
  *
  * The ail lock _must_ be held when calling this function
@@ -82,11 +81,11 @@ void gfs2_remove_from_ail(struct gfs2_bufdata *bd)
 }
 
 /**
- * gfs2_ail1_start_one - Start I/O on a part of the AIL
- * @sdp: the filesystem
+ * gfs2_ail1_start_one - Start I/O on a transaction
+ * @sdp: The superblock
  * @wbc: The writeback control structure
- * @ai: The ail structure
- *
+ * @tr: The transaction to start I/O on
+ * @plug: The block plug currently active
  */
 
 static int gfs2_ail1_start_one(struct gfs2_sbd *sdp,
@@ -132,7 +131,7 @@ __acquires(&sdp->sd_ail_lock)
 		if (!mapping)
 			continue;
 		spin_unlock(&sdp->sd_ail_lock);
-		ret = generic_writepages(mapping, wbc);
+		ret = filemap_fdatawrite_wbc(mapping, wbc);
 		if (need_resched()) {
 			blk_finish_plug(plug);
 			cond_resched();
@@ -223,8 +222,7 @@ out:
 	spin_unlock(&sdp->sd_ail_lock);
 	blk_finish_plug(&plug);
 	if (ret) {
-		gfs2_lm(sdp, "gfs2_ail1_start_one (generic_writepages) "
-			"returned: %d\n", ret);
+		gfs2_lm(sdp, "gfs2_ail1_start_one returned: %d\n", ret);
 		gfs2_withdraw(sdp);
 	}
 	trace_gfs2_ail_flush(sdp, wbc, 0);
@@ -269,7 +267,7 @@ static void gfs2_log_update_head(struct gfs2_sbd *sdp)
 	sdp->sd_log_head = new_head;
 }
 
-/**
+/*
  * gfs2_ail_empty_tr - empty one of the ail lists of a transaction
  */
 
@@ -595,7 +593,7 @@ void gfs2_log_reserve(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
 {
 	unsigned int blks = tr->tr_reserved;
 	unsigned int revokes = tr->tr_revokes;
-	unsigned int revoke_blks = 0;
+	unsigned int revoke_blks;
 
 	*extra_revokes = 0;
 	if (revokes) {
@@ -695,7 +693,7 @@ void log_flush_wait(struct gfs2_sbd *sdp)
 	}
 }
 
-static int ip_cmp(void *priv, struct list_head *a, struct list_head *b)
+static int ip_cmp(void *priv, const struct list_head *a, const struct list_head *b)
 {
 	struct gfs2_inode *ipa, *ipb;
 
@@ -824,7 +822,7 @@ void gfs2_flush_revokes(struct gfs2_sbd *sdp)
 
 void gfs2_write_log_header(struct gfs2_sbd *sdp, struct gfs2_jdesc *jd,
 			   u64 seq, u32 tail, u32 lblock, u32 flags,
-			   int op_flags)
+			   blk_opf_t op_flags)
 {
 	struct gfs2_log_header *lh;
 	u32 hash, crc;
@@ -859,7 +857,11 @@ void gfs2_write_log_header(struct gfs2_sbd *sdp, struct gfs2_jdesc *jd,
 	if (!list_empty(&jd->extent_list))
 		dblock = gfs2_log_bmap(jd, lblock);
 	else {
-		int ret = gfs2_lblk_to_dblk(jd->jd_inode, lblock, &dblock);
+		unsigned int extlen;
+		int ret;
+
+		extlen = 1;
+		ret = gfs2_get_extent(jd->jd_inode, lblock, &dblock, &extlen);
 		if (gfs2_assert_withdraw(sdp, ret == 0))
 			return;
 	}
@@ -902,7 +904,7 @@ void gfs2_write_log_header(struct gfs2_sbd *sdp, struct gfs2_jdesc *jd,
 
 static void log_write_header(struct gfs2_sbd *sdp, u32 flags)
 {
-	int op_flags = REQ_PREFLUSH | REQ_FUA | REQ_META | REQ_SYNC;
+	blk_opf_t op_flags = REQ_PREFLUSH | REQ_FUA | REQ_META | REQ_SYNC;
 	enum gfs2_freeze_state state = atomic_read(&sdp->sd_freeze_state);
 
 	gfs2_assert_withdraw(sdp, (state != SFS_FROZEN));
@@ -1015,7 +1017,7 @@ static void trans_drain(struct gfs2_trans *tr)
 
 /**
  * gfs2_log_flush - flush incore transaction(s)
- * @sdp: the filesystem
+ * @sdp: The filesystem
  * @gl: The glock structure to flush.  If NULL, flush the whole incore log
  * @flags: The log header flags: GFS2_LOG_HEAD_FLUSH_* and debug flags
  *
@@ -1166,7 +1168,7 @@ out_withdraw:
 
 /**
  * gfs2_merge_trans - Merge a new transaction into a cached transaction
- * @old: Original transaction to be expanded
+ * @sdp: the filesystem
  * @new: New transaction to be merged
  */
 
@@ -1283,7 +1285,7 @@ static inline int gfs2_ail_flush_reqd(struct gfs2_sbd *sdp)
 
 /**
  * gfs2_logd - Update log tail as Active Items get flushed to in-place blocks
- * @sdp: Pointer to GFS2 superblock
+ * @data: Pointer to GFS2 superblock
  *
  * Also, periodically check to make sure that we're using the most recent
  * journal index.

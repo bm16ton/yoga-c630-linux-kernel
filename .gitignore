@@ -18,6 +18,7 @@
 *.c.[012]*.*
 *.dt.yaml
 *.dtb
+*.dtbo
 *.dtb.S
 *.dwo
 *.elf
@@ -35,34 +36,38 @@
 *.mod.c
 *.o
 *.o.*
+*.patch
 *.s
 *.so
 *.so.dbg
 *.su
 *.symtypes
+*.symversions
 *.tab.[ch]
 *.tar
+*.usyms
 *.xz
+*.zst
 Module.symvers
-modules.builtin
 modules.order
 
 #
 # Top-level generic files
 #
-/tags
-/TAGS
 /linux
 /modules-only.symvers
 /vmlinux
 /vmlinux.32
+/vmlinux.map
+/vmlinux.symvers
 /vmlinux-gdb.py
 /vmlinuz
 /System.map
 /Module.markers
+/modules.builtin
 /modules.builtin.modinfo
 /modules.nsdeps
-/vmlinux.symvers
+
 #
 # RPM spec file (make rpm-pkg)
 #
@@ -72,12 +77,6 @@ modules.order
 # Debian directory (make deb-pkg)
 #
 /debian/
-/C630/wifi-extra/crda-3.18/debian/crda/
-/C630/wifi-extra/wireless-regdb-2018.05.09/debian/wireless-regdb/
-/C630/wifi-extra/wireless-regdb-2018.05.09/debian/files
-/C630/wifi-extra/wireless-regdb-2018.05.09/debian/wireless-regdb.debhelper.log
-/C630/wifi-extra/wireless-regdb-2018.05.09/debian/wireless-regdb.substvars
-/C630/wifi-extra/wireless-regdb-2018.05.09/debian/rules.og
 
 #
 # Snap directory (make snap-pkg)
@@ -114,6 +113,10 @@ patches-*
 patches
 series
 
+# ctags files
+tags
+TAGS
+
 # cscope files
 cscope.*
 ncscope.*
@@ -148,21 +151,14 @@ x509.genkey
 /allrandom.config
 /allyes.config
 
+# Kconfig savedefconfig output
+/defconfig
+
 # Kdevelop4
 *.kdev4
 
 # Clang's compilation database file
 /compile_commands.json
 
-/drivers/gpio/gpiolib.c.bk 
-/drivers/usb/misc/ft232h-intf.c-commented-code 
-/drivers/usb/misc/ft232h-intf.c-time-b4-last 
-/drivers/usb/misc/ft232h-intf.c.all-good-except-unload 
-/drivers/usb/misc/ft232h-intf.c.best-irq 
-/drivers/usb/misc/ft232h-intf.c.doesnt-seem-to-crash-on-removal 
-/drivers/usb/misc/ft232h-intf.c.gpio-gpiod-hybrid 
-/drivers/usb/misc/ft232h-intf.c.irq-works 
-/drivers/usb/misc/ft232h-intf.c.newest 
-/drivers/usb/misc/ft232h-intf.c.no-modinfo 
-/drivers/usb/misc/ft232h-intf.c.untested 
-/drivers/usb/misc/ft232h-intf.c.working.gpiod-irq-poll-and-ce-output
+# Documentation toolchain
+sphinx_*/

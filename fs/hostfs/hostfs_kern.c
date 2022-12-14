@@ -14,6 +14,7 @@
 #include <linux/statfs.h>
 #include <linux/slab.h>
 #include <linux/seq_file.h>
+#include <linux/writeback.h>
 #include <linux/mount.h>
 #include <linux/namei.h>
 #include "hostfs.h"
@@ -222,7 +223,7 @@ static struct inode *hostfs_alloc_inode(struct super_block *sb)
 {
 	struct hostfs_inode_info *hi;
 
-	hi = kmem_cache_alloc(hostfs_inode_cache, GFP_KERNEL_ACCOUNT);
+	hi = alloc_inode_sb(sb, hostfs_inode_cache, GFP_KERNEL_ACCOUNT);
 	if (hi == NULL)
 		return NULL;
 	hi->fd = -1;
@@ -316,7 +317,7 @@ retry:
 	if (mode & FMODE_WRITE)
 		r = w = 1;
 
-	name = dentry_name(d_real(file->f_path.dentry, file->f_inode));
+	name = dentry_name(file_dentry(file));
 	if (name == NULL)
 		return -ENOMEM;
 
@@ -381,6 +382,7 @@ static int hostfs_fsync(struct file *file, loff_t start, loff_t end,
 static const struct file_operations hostfs_file_fops = {
 	.llseek		= generic_file_llseek,
 	.splice_read	= generic_file_splice_read,
+	.splice_write	= iter_file_splice_write,
 	.read_iter	= generic_file_read_iter,
 	.write_iter	= generic_file_write_iter,
 	.mmap		= generic_file_mmap,
@@ -414,15 +416,15 @@ static int hostfs_writepage(struct page *page, struct writeback_control *wbc)
 
 	err = write_file(HOSTFS_I(inode)->fd, &base, buffer, count);
 	if (err != count) {
-		ClearPageUptodate(page);
+		if (err >= 0)
+			err = -EIO;
+		mapping_set_error(mapping, err);
 		goto out;
 	}
 
 	if (base > inode->i_size)
 		inode->i_size = base;
 
-	if (PageError(page))
-		ClearPageError(page);
 	err = 0;
 
  out:
@@ -432,8 +434,9 @@ static int hostfs_writepage(struct page *page, struct writeback_control *wbc)
 	return err;
 }
 
-static int hostfs_readpage(struct file *file, struct page *page)
+static int hostfs_read_folio(struct file *file, struct folio *folio)
 {
+	struct page *page = &folio->page;
 	char *buffer;
 	loff_t start = page_offset(page);
 	int bytes_read, ret = 0;
@@ -461,12 +464,12 @@ static int hostfs_readpage(struct file *file, struct page *page)
 }
 
 static int hostfs_write_begin(struct file *file, struct address_space *mapping,
-			      loff_t pos, unsigned len, unsigned flags,
+			      loff_t pos, unsigned len,
 			      struct page **pagep, void **fsdata)
 {
 	pgoff_t index = pos >> PAGE_SHIFT;
 
-	*pagep = grab_cache_page_write_begin(mapping, index, flags);
+	*pagep = grab_cache_page_write_begin(mapping, index);
 	if (!*pagep)
 		return -ENOMEM;
 	return 0;
@@ -502,8 +505,8 @@ static int hostfs_write_end(struct file *file, struct address_space *mapping,
 
 static const struct address_space_operations hostfs_aops = {
 	.writepage 	= hostfs_writepage,
-	.readpage	= hostfs_readpage,
-	.set_page_dirty = __set_page_dirty_nobuffers,
+	.read_folio	= hostfs_read_folio,
+	.dirty_folio	= filemap_dirty_folio,
 	.write_begin	= hostfs_write_begin,
 	.write_end	= hostfs_write_end,
 };
@@ -711,7 +714,6 @@ static int hostfs_mknod(struct user_namespace *mnt_userns, struct inode *dir,
 	if (name == NULL)
 		goto out_put;
 
-	init_special_inode(inode, mode, dev);
 	err = do_mknod(name, mode, MAJOR(dev), MINOR(dev));
 	if (err)
 		goto out_free;
@@ -924,6 +926,9 @@ static int hostfs_fill_sb_common(struct super_block *sb, void *d, int silent)
 	sb->s_op = &hostfs_sbops;
 	sb->s_d_op = &simple_dentry_operations;
 	sb->s_maxbytes = MAX_LFS_FILESIZE;
+	err = super_setup_bdi(sb);
+	if (err)
+		goto out;
 
 	/* NULL is printed as '(null)' by printf(): avoid that. */
 	if (req_root == NULL)

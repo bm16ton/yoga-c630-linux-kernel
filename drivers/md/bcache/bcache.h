@@ -178,7 +178,6 @@
 
 #define pr_fmt(fmt) "bcache: %s() " fmt, __func__
 
-#include <linux/bcache.h>
 #include <linux/bio.h>
 #include <linux/kobject.h>
 #include <linux/list.h>
@@ -190,6 +189,7 @@
 #include <linux/workqueue.h>
 #include <linux/kthread.h>
 
+#include "bcache_ondisk.h"
 #include "bset.h"
 #include "util.h"
 #include "closure.h"
@@ -396,7 +396,12 @@ struct cached_dev {
 	unsigned int		error_limit;
 	unsigned int		offline_seconds;
 
-	char			backing_dev_name[BDEVNAME_SIZE];
+	/*
+	 * Retry to update writeback_rate if contention happens for
+	 * down_read(dc->writeback_lock) in update_writeback_rate()
+	 */
+#define BCH_WBRATE_UPDATE_MAX_SKIPS	15
+	unsigned int		rate_update_retry;
 };
 
 enum alloc_reserve {
@@ -470,8 +475,6 @@ struct cache {
 	atomic_long_t		meta_sectors_written;
 	atomic_long_t		btree_sectors_written;
 	atomic_long_t		sectors_written;
-
-	char			cache_dev_name[BDEVNAME_SIZE];
 };
 
 struct gc_stat {
@@ -803,13 +806,6 @@ static inline sector_t bucket_remainder(struct cache_set *c, sector_t s)
 	return s & (c->cache->sb.bucket_size - 1);
 }
 
-static inline struct cache *PTR_CACHE(struct cache_set *c,
-				      const struct bkey *k,
-				      unsigned int ptr)
-{
-	return c->cache;
-}
-
 static inline size_t PTR_BUCKET_NR(struct cache_set *c,
 				   const struct bkey *k,
 				   unsigned int ptr)
@@ -821,7 +817,7 @@ static inline struct bucket *PTR_BUCKET(struct cache_set *c,
 					const struct bkey *k,
 					unsigned int ptr)
 {
-	return PTR_CACHE(c, k, ptr)->buckets + PTR_BUCKET_NR(c, k, ptr);
+	return c->cache->buckets + PTR_BUCKET_NR(c, k, ptr);
 }
 
 static inline uint8_t gen_after(uint8_t a, uint8_t b)
@@ -840,7 +836,7 @@ static inline uint8_t ptr_stale(struct cache_set *c, const struct bkey *k,
 static inline bool ptr_available(struct cache_set *c, const struct bkey *k,
 				 unsigned int i)
 {
-	return (PTR_DEV(k, i) < MAX_CACHES_PER_SET) && PTR_CACHE(c, k, i);
+	return (PTR_DEV(k, i) < MAX_CACHES_PER_SET) && c->cache;
 }
 
 /* Btree key macros */

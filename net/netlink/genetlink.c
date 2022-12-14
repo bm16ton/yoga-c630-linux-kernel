@@ -40,14 +40,6 @@ void genl_unlock(void)
 }
 EXPORT_SYMBOL(genl_unlock);
 
-#ifdef CONFIG_LOCKDEP
-bool lockdep_genl_is_held(void)
-{
-	return lockdep_is_held(&genl_mutex);
-}
-EXPORT_SYMBOL(lockdep_genl_is_held);
-#endif
-
 static void genl_lock_all(void)
 {
 	down_write(&cb_lock);
@@ -1182,13 +1174,17 @@ static int ctrl_dumppolicy_start(struct netlink_callback *cb)
 							     op.policy,
 							     op.maxattr);
 			if (err)
-				return err;
+				goto err_free_state;
 		}
 	}
 
 	if (!ctx->state)
 		return -ENODATA;
 	return 0;
+
+err_free_state:
+	netlink_policy_dump_free(ctx->state);
+	return err;
 }
 
 static void *ctrl_dumppolicy_prep(struct sk_buff *skb,
@@ -1485,6 +1481,7 @@ int genlmsg_multicast_allns(const struct genl_family *family,
 {
 	if (WARN_ON_ONCE(group >= family->n_mcgrps))
 		return -EINVAL;
+
 	group = family->mcgrp_offset + group;
 	return genlmsg_mcast(skb, portid, group, flags);
 }
@@ -1495,14 +1492,12 @@ void genl_notify(const struct genl_family *family, struct sk_buff *skb,
 {
 	struct net *net = genl_info_net(info);
 	struct sock *sk = net->genl_sock;
-	int report = 0;
-
-	if (info->nlhdr)
-		report = nlmsg_report(info->nlhdr);
 
 	if (WARN_ON_ONCE(group >= family->n_mcgrps))
 		return;
+
 	group = family->mcgrp_offset + group;
-	nlmsg_notify(sk, skb, info->snd_portid, group, report, flags);
+	nlmsg_notify(sk, skb, info->snd_portid, group,
+		     nlmsg_report(info->nlhdr), flags);
 }
 EXPORT_SYMBOL(genl_notify);

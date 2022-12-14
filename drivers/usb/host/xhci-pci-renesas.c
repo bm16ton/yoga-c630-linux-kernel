@@ -120,7 +120,6 @@ static int renesas_fw_verify(const void *fw_data,
 			     size_t length)
 {
 	u16 fw_version_pointer;
-	u16 fw_version;
 
 	/*
 	 * The Firmware's Data Format is describe in
@@ -149,9 +148,6 @@ static int renesas_fw_verify(const void *fw_data,
 		pr_err("fw ver pointer is outside of the firmware image");
 		return -EINVAL;
 	}
-
-	fw_version = get_unaligned_le16(fw_data + fw_version_pointer);
-	pr_err("got firmware version: %02x.", fw_version);
 
 	return 0;
 }
@@ -197,7 +193,7 @@ static int renesas_check_rom_state(struct pci_dev *pdev)
 	if (err)
 		return pcibios_err_to_errno(err);
 
-	if (rom_state & BIT(15)) {
+	if (rom_state & RENESAS_ROM_STATUS_ROM_EXISTS) {
 		/* ROM exists */
 		dev_dbg(&pdev->dev, "ROM exists\n");
 
@@ -208,7 +204,7 @@ static int renesas_check_rom_state(struct pci_dev *pdev)
 
 		case RENESAS_ROM_STATUS_NO_RESULT: /* No result yet */
 			dev_dbg(&pdev->dev, "Unknown ROM status ...\n");
-			break;
+			return -ENOENT;
 
 		case RENESAS_ROM_STATUS_ERROR: /* Error State */
 		default: /* All other states are marked as "Reserved states" */
@@ -224,13 +220,6 @@ static int renesas_fw_check_running(struct pci_dev *pdev)
 {
 	u8 fw_state;
 	int err;
-
-	/*
-	 * Only if device has ROM and loaded FW we can skip loading and
-	 * return success. Otherwise (even unknown state), attempt to load FW.
-	 */
-	if (renesas_check_rom(pdev) && !renesas_check_rom_state(pdev))
-		return 0;
 
 	/*
 	 * Test if the device is actually needing the firmware. As most
@@ -591,21 +580,39 @@ int renesas_xhci_check_request_fw(struct pci_dev *pdev,
 			(struct xhci_driver_data *)id->driver_data;
 	const char *fw_name = driver_data->firmware;
 	const struct firmware *fw;
+	bool has_rom;
 	int err;
+
+	/* Check if device has ROM and loaded, if so skip everything */
+	has_rom = renesas_check_rom(pdev);
+	if (has_rom) {
+		err = renesas_check_rom_state(pdev);
+		if (!err)
+			return 0;
+		else if (err != -ENOENT)
+			has_rom = false;
+	}
 
 	err = renesas_fw_check_running(pdev);
 	/* Continue ahead, if the firmware is already running. */
-	if (err == 0)
+	if (!err)
 		return 0;
 
+	/* no firmware interface available */
 	if (err != 1)
-		return err;
+		return has_rom ? 0 : err;
 
 	pci_dev_get(pdev);
-	err = request_firmware(&fw, fw_name, &pdev->dev);
+	err = firmware_request_nowarn(&fw, fw_name, &pdev->dev);
 	pci_dev_put(pdev);
 	if (err) {
-		dev_err(&pdev->dev, "request_firmware failed: %d\n", err);
+		if (has_rom) {
+			dev_info(&pdev->dev, "failed to load firmware %s, fallback to ROM\n",
+				 fw_name);
+			return 0;
+		}
+		dev_err(&pdev->dev, "failed to load firmware %s: %d\n",
+			fw_name, err);
 		return err;
 	}
 
@@ -619,10 +626,5 @@ exit:
 	return err;
 }
 EXPORT_SYMBOL_GPL(renesas_xhci_check_request_fw);
-
-void renesas_xhci_pci_exit(struct pci_dev *dev)
-{
-}
-EXPORT_SYMBOL_GPL(renesas_xhci_pci_exit);
 
 MODULE_LICENSE("GPL v2");

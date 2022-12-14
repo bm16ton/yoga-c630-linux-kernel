@@ -166,6 +166,7 @@ static const struct net_device_ops rmnet_vnd_ops = {
 
 static const char rmnet_gstrings_stats[][ETH_GSTRING_LEN] = {
 	"Checksum ok",
+	"Bad IPv4 header checksum",
 	"Checksum valid bit not set",
 	"Checksum validation failed",
 	"Checksum error bad buffer",
@@ -174,6 +175,7 @@ static const char rmnet_gstrings_stats[][ETH_GSTRING_LEN] = {
 	"Checksum skipped on ip fragment",
 	"Checksum skipped",
 	"Checksum computed in software",
+	"Checksum computed in hardware",
 };
 
 static void rmnet_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
@@ -222,7 +224,7 @@ void rmnet_vnd_setup(struct net_device *rmnet_dev)
 	rmnet_dev->netdev_ops = &rmnet_vnd_ops;
 	rmnet_dev->mtu = RMNET_DFLT_PACKET_SIZE;
 	rmnet_dev->needed_headroom = RMNET_NEEDED_HEADROOM;
-	eth_random_addr(rmnet_dev->dev_addr);
+	eth_hw_addr_random(rmnet_dev);
 	rmnet_dev->tx_queue_len = RMNET_TX_QUEUE_LEN;
 
 	/* Raw IP mode */

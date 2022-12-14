@@ -524,24 +524,7 @@ static void cpm_uart_set_termios(struct uart_port *port,
 	scval = 0;
 
 	/* byte size */
-	switch (termios->c_cflag & CSIZE) {
-	case CS5:
-		bits = 5;
-		break;
-	case CS6:
-		bits = 6;
-		break;
-	case CS7:
-		bits = 7;
-		break;
-	case CS8:
-		bits = 8;
-		break;
-		/* Never happens, but GCC is too dumb to figure it out */
-	default:
-		bits = 8;
-		break;
-	}
+	bits = tty_get_char_size(termios->c_cflag);
 	sbits = bits - 5;
 
 	if (termios->c_cflag & CSTOPB) {
@@ -1107,6 +1090,7 @@ static void cpm_put_poll_char(struct uart_port *port,
 	cpm_uart_early_write(pinfo, ch, 1, false);
 }
 
+#ifdef CONFIG_SERIAL_CPM_CONSOLE
 static struct uart_port *udbg_port;
 
 static void udbg_cpm_putc(char c)
@@ -1131,6 +1115,7 @@ static int udbg_cpm_getc(void)
 		cpu_relax();
 	return c;
 }
+#endif /* CONFIG_SERIAL_CPM_CONSOLE */
 
 #endif /* CONFIG_CONSOLE_POLL */
 
@@ -1229,12 +1214,6 @@ static int cpm_uart_init_port(struct device_node *np,
 	pinfo->port.fifosize = pinfo->tx_nrfifos * pinfo->tx_fifosize;
 	spin_lock_init(&pinfo->port.lock);
 
-	pinfo->port.irq = irq_of_parse_and_map(np, 0);
-	if (pinfo->port.irq == NO_IRQ) {
-		ret = -EINVAL;
-		goto out_pram;
-	}
-
 	for (i = 0; i < NUM_GPIOS; i++) {
 		struct gpio_desc *gpiod;
 
@@ -1244,7 +1223,7 @@ static int cpm_uart_init_port(struct device_node *np,
 
 		if (IS_ERR(gpiod)) {
 			ret = PTR_ERR(gpiod);
-			goto out_irq;
+			goto out_pram;
 		}
 
 		if (gpiod) {
@@ -1262,7 +1241,7 @@ static int cpm_uart_init_port(struct device_node *np,
 	}
 
 #ifdef CONFIG_PPC_EARLY_DEBUG_CPM
-#ifdef CONFIG_CONSOLE_POLL
+#if defined(CONFIG_CONSOLE_POLL) && defined(CONFIG_SERIAL_CPM_CONSOLE)
 	if (!udbg_port)
 #endif
 		udbg_putc = NULL;
@@ -1270,8 +1249,6 @@ static int cpm_uart_init_port(struct device_node *np,
 
 	return cpm_uart_request_port(&pinfo->port);
 
-out_irq:
-	irq_dispose_mapping(pinfo->port.irq);
 out_pram:
 	cpm_uart_unmap_pram(pinfo, pram);
 out_mem:
@@ -1451,11 +1428,17 @@ static int cpm_uart_probe(struct platform_device *ofdev)
 	/* initialize the device pointer for the port */
 	pinfo->port.dev = &ofdev->dev;
 
-	ret = cpm_uart_init_port(ofdev->dev.of_node, pinfo);
-	if (ret)
-		return ret;
+	pinfo->port.irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
+	if (!pinfo->port.irq)
+		return -EINVAL;
 
-	return uart_add_one_port(&cpm_reg, &pinfo->port);
+	ret = cpm_uart_init_port(ofdev->dev.of_node, pinfo);
+	if (!ret)
+		return uart_add_one_port(&cpm_reg, &pinfo->port);
+
+	irq_dispose_mapping(pinfo->port.irq);
+
+	return ret;
 }
 
 static int cpm_uart_remove(struct platform_device *ofdev)

@@ -65,17 +65,24 @@ bool dal_bios_parser_init_cmd_tbl_helper2(
 	case DCE_VERSION_12_1:
 		*h = dal_cmd_tbl_helper_dce112_get_table2();
 		return true;
-#if defined(CONFIG_DRM_AMD_DC_DCN)
 	case DCN_VERSION_1_0:
 	case DCN_VERSION_1_01:
 	case DCN_VERSION_2_0:
 	case DCN_VERSION_2_1:
+	case DCN_VERSION_2_01:
 	case DCN_VERSION_3_0:
 	case DCN_VERSION_3_01:
 	case DCN_VERSION_3_02:
+	case DCN_VERSION_3_03:
+	case DCN_VERSION_3_1:
+	case DCN_VERSION_3_14:
+	case DCN_VERSION_3_15:
+	case DCN_VERSION_3_16:
+	case DCN_VERSION_3_2:
+	case DCN_VERSION_3_21:
 		*h = dal_cmd_tbl_helper_dce112_get_table2();
 		return true;
-#endif
+
 	default:
 		/* Unsupported DCE */
 		BREAK_TO_DEBUGGER();
@@ -128,7 +135,7 @@ bool dal_cmd_table_helper_controller_id_to_atom2(
 }
 
 /**
- * translate_transmitter_bp_to_atom2 - Translate the Transmitter to the
+ * dal_cmd_table_helper_transmitter_bp_to_atom2 - Translate the Transmitter to the
  *                                     corresponding ATOM BIOS value
  *  @t: transmitter
  *  returns: digitalTransmitter

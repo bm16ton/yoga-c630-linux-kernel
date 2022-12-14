@@ -65,6 +65,7 @@
 #include <asm/irq_remapping.h>
 #include <asm/hw_irq.h>
 #include <asm/apic.h>
+#include <asm/pgtable.h>
 
 #define	for_each_ioapic(idx)		\
 	for ((idx) = 0; (idx) < nr_ioapics; (idx)++)
@@ -764,7 +765,7 @@ static bool irq_active_low(int idx)
 static bool EISA_ELCR(unsigned int irq)
 {
 	if (irq < nr_legacy_irqs()) {
-		unsigned int port = 0x4d0 + (irq >> 3);
+		unsigned int port = PIC_ELCR1 + (irq >> 3);
 		return (inb(port) >> (irq & 7)) & 1;
 	}
 	apic_printk(APIC_VERBOSE, KERN_INFO
@@ -928,7 +929,7 @@ static bool mp_check_pin_attr(int irq, struct irq_alloc_info *info)
 
 	/*
 	 * setup_IO_APIC_irqs() programs all legacy IRQs with default trigger
-	 * and polarity attirbutes. So allow the first user to reprogram the
+	 * and polarity attributes. So allow the first user to reprogram the
 	 * pin with real trigger and polarity attributes.
 	 */
 	if (irq < nr_legacy_irqs() && data->count == 1) {
@@ -994,7 +995,7 @@ static int alloc_isa_irq_from_domain(struct irq_domain *domain,
 
 	/*
 	 * Legacy ISA IRQ has already been allocated, just add pin to
-	 * the pin list assoicated with this IRQ and program the IOAPIC
+	 * the pin list associated with this IRQ and program the IOAPIC
 	 * entry. The IOAPIC entry
 	 */
 	if (irq_data && irq_data->parent_data) {
@@ -1752,7 +1753,7 @@ static inline void ioapic_finish_move(struct irq_data *data, bool moveit)
 		 * with masking the ioapic entry and then polling until
 		 * Remote IRR was clear before reprogramming the
 		 * ioapic I don't trust the Remote IRR bit to be
-		 * completey accurate.
+		 * completely accurate.
 		 *
 		 * However there appears to be no other way to plug
 		 * this race, so if the Remote IRR bit is not
@@ -1830,7 +1831,7 @@ static void ioapic_ack_level(struct irq_data *irq_data)
 	/*
 	 * Tail end of clearing remote IRR bit (either by delivering the EOI
 	 * message via io-apic EOI register write or simulating it using
-	 * mask+edge followed by unnask+level logic) manually when the
+	 * mask+edge followed by unmask+level logic) manually when the
 	 * level triggered interrupt is seen as the edge triggered interrupt
 	 * at the cpu.
 	 */
@@ -1986,7 +1987,8 @@ static struct irq_chip ioapic_chip __read_mostly = {
 	.irq_set_affinity	= ioapic_set_affinity,
 	.irq_retrigger		= irq_chip_retrigger_hierarchy,
 	.irq_get_irqchip_state	= ioapic_irq_get_chip_state,
-	.flags			= IRQCHIP_SKIP_SET_WAKE,
+	.flags			= IRQCHIP_SKIP_SET_WAKE |
+				  IRQCHIP_AFFINITY_PRE_STARTUP,
 };
 
 static struct irq_chip ioapic_ir_chip __read_mostly = {
@@ -1999,7 +2001,8 @@ static struct irq_chip ioapic_ir_chip __read_mostly = {
 	.irq_set_affinity	= ioapic_set_affinity,
 	.irq_retrigger		= irq_chip_retrigger_hierarchy,
 	.irq_get_irqchip_state	= ioapic_irq_get_chip_state,
-	.flags			= IRQCHIP_SKIP_SET_WAKE,
+	.flags			= IRQCHIP_SKIP_SET_WAKE |
+				  IRQCHIP_AFFINITY_PRE_STARTUP,
 };
 
 static inline void init_IO_APIC_traps(void)
@@ -2675,6 +2678,19 @@ static struct resource * __init ioapic_setup_resources(void)
 	return res;
 }
 
+static void io_apic_set_fixmap(enum fixed_addresses idx, phys_addr_t phys)
+{
+	pgprot_t flags = FIXMAP_PAGE_NOCACHE;
+
+	/*
+	 * Ensure fixmaps for IOAPIC MMIO respect memory encryption pgprot
+	 * bits, just like normal ioremap():
+	 */
+	flags = pgprot_decrypted(flags);
+
+	__set_fixmap(idx, phys, flags);
+}
+
 void __init io_apic_init_mappings(void)
 {
 	unsigned long ioapic_phys, idx = FIX_IO_APIC_BASE_0;
@@ -2707,7 +2723,7 @@ fake_ioapic_page:
 				      __func__, PAGE_SIZE, PAGE_SIZE);
 			ioapic_phys = __pa(ioapic_phys);
 		}
-		set_fixmap_nocache(idx, ioapic_phys);
+		io_apic_set_fixmap(idx, ioapic_phys);
 		apic_printk(APIC_VERBOSE, "mapped IOAPIC to %08lx (%08lx)\n",
 			__fix_to_virt(idx) + (ioapic_phys & ~PAGE_MASK),
 			ioapic_phys);
@@ -2836,7 +2852,7 @@ int mp_register_ioapic(int id, u32 address, u32 gsi_base,
 	ioapics[idx].mp_config.flags = MPC_APIC_USABLE;
 	ioapics[idx].mp_config.apicaddr = address;
 
-	set_fixmap_nocache(FIX_IO_APIC_BASE_0 + idx, address);
+	io_apic_set_fixmap(FIX_IO_APIC_BASE_0 + idx, address);
 	if (bad_ioapic_register(idx)) {
 		clear_fixmap(FIX_IO_APIC_BASE_0 + idx);
 		return -ENODEV;

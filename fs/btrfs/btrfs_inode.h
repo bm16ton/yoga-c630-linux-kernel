@@ -14,6 +14,13 @@
 #include "delayed-inode.h"
 
 /*
+ * Since we search a directory based on f_pos (struct dir_context::pos) we have
+ * to start at 2 since '.' and '..' have f_pos of 0 and 1 respectively, so
+ * everybody else has to start at 2 (see btrfs_real_readdir() and dir_emit_dots()).
+ */
+#define BTRFS_DIR_START_INDEX 2
+
+/*
  * ordered_data_close is set by truncate when a file that used
  * to have good data has been truncated to zero.  When it is set
  * the btrfs file release call will add this inode to the
@@ -51,6 +58,13 @@ enum {
 	 * the file range, inode's io_tree).
 	 */
 	BTRFS_INODE_NO_DELALLOC_FLUSH,
+	/*
+	 * Set when we are working on enabling verity for a file. Computing and
+	 * writing the whole Merkle tree can take a while so we want to prevent
+	 * races where two separate tasks attempt to simultaneously start verity
+	 * on the same file.
+	 */
+	BTRFS_INODE_VERITY_IN_PROGRESS,
 };
 
 /* in memory btrfs inode */
@@ -131,17 +145,26 @@ struct btrfs_inode {
 	/* a local copy of root's last_log_commit */
 	int last_log_commit;
 
-	/* total number of bytes pending delalloc, used by stat to calc the
-	 * real block usage of the file
+	/*
+	 * Total number of bytes pending delalloc, used by stat to calculate the
+	 * real block usage of the file. This is used only for files.
 	 */
 	u64 delalloc_bytes;
 
-	/*
-	 * Total number of bytes pending delalloc that fall within a file
-	 * range that is either a hole or beyond EOF (and no prealloc extent
-	 * exists in the range). This is always <= delalloc_bytes.
-	 */
-	u64 new_delalloc_bytes;
+	union {
+		/*
+		 * Total number of bytes pending delalloc that fall within a file
+		 * range that is either a hole or beyond EOF (and no prealloc extent
+		 * exists in the range). This is always <= delalloc_bytes and this
+		 * is used only for files.
+		 */
+		u64 new_delalloc_bytes;
+		/*
+		 * The offset of the last dir index key that was logged.
+		 * This is used only for directories.
+		 */
+		u64 last_dir_index_offset;
+	};
 
 	/*
 	 * total number of bytes pending defrag, used by stat to check whether
@@ -157,8 +180,9 @@ struct btrfs_inode {
 	u64 disk_i_size;
 
 	/*
-	 * if this is a directory then index_cnt is the counter for the index
-	 * number for new files that are created
+	 * If this is a directory then index_cnt is the counter for the index
+	 * number for new files that are created. For an empty directory, this
+	 * must be initialized to BTRFS_DIR_START_INDEX.
 	 */
 	u64 index_cnt;
 
@@ -189,8 +213,10 @@ struct btrfs_inode {
 	 */
 	u64 csum_bytes;
 
-	/* flags field from the on disk inode */
+	/* Backwards incompatible flags, lower half of inode_item::flags  */
 	u32 flags;
+	/* Read-only compatibility flags, upper half of inode_item::flags */
+	u32 ro_flags;
 
 	/*
 	 * Counters to keep track of the number of extent item's we may use due
@@ -220,6 +246,7 @@ struct btrfs_inode {
 	/* Hook into fs_info->delayed_iputs */
 	struct list_head delayed_iput;
 
+	struct rw_semaphore i_mmap_lock;
 	struct inode vfs_inode;
 };
 
@@ -252,18 +279,30 @@ static inline void btrfs_insert_inode_hash(struct inode *inode)
 	__insert_inode_hash(inode, h);
 }
 
+#if BITS_PER_LONG == 32
+
+/*
+ * On 32 bit systems the i_ino of struct inode is 32 bits (unsigned long), so
+ * we use the inode's location objectid which is a u64 to avoid truncation.
+ */
 static inline u64 btrfs_ino(const struct btrfs_inode *inode)
 {
 	u64 ino = inode->location.objectid;
 
-	/*
-	 * !ino: btree_inode
-	 * type == BTRFS_ROOT_ITEM_KEY: subvol dir
-	 */
-	if (!ino || inode->location.type == BTRFS_ROOT_ITEM_KEY)
+	/* type == BTRFS_ROOT_ITEM_KEY: subvol dir */
+	if (inode->location.type == BTRFS_ROOT_ITEM_KEY)
 		ino = inode->vfs_inode.i_ino;
 	return ino;
 }
+
+#else
+
+static inline u64 btrfs_ino(const struct btrfs_inode *inode)
+{
+	return inode->vfs_inode.i_ino;
+}
+
+#endif
 
 static inline void btrfs_i_size_write(struct btrfs_inode *inode, u64 size)
 {
@@ -278,8 +317,7 @@ static inline bool btrfs_is_free_space_inode(struct btrfs_inode *inode)
 	if (root == root->fs_info->tree_root &&
 	    btrfs_ino(inode) != BTRFS_BTREE_INODE_OBJECTID)
 		return true;
-	if (inode->location.objectid == BTRFS_FREE_INO_OBJECTID)
-		return true;
+
 	return false;
 }
 
@@ -314,47 +352,75 @@ static inline void btrfs_set_inode_last_sub_trans(struct btrfs_inode *inode)
 	spin_unlock(&inode->lock);
 }
 
-static inline int btrfs_inode_in_log(struct btrfs_inode *inode, u64 generation)
+/*
+ * Should be called while holding the inode's VFS lock in exclusive mode or in a
+ * context where no one else can access the inode concurrently (during inode
+ * creation or when loading an inode from disk).
+ */
+static inline void btrfs_set_inode_full_sync(struct btrfs_inode *inode)
 {
-	int ret = 0;
+	set_bit(BTRFS_INODE_NEEDS_FULL_SYNC, &inode->runtime_flags);
+	/*
+	 * The inode may have been part of a reflink operation in the last
+	 * transaction that modified it, and then a fsync has reset the
+	 * last_reflink_trans to avoid subsequent fsyncs in the same
+	 * transaction to do unnecessary work. So update last_reflink_trans
+	 * to the last_trans value (we have to be pessimistic and assume a
+	 * reflink happened).
+	 *
+	 * The ->last_trans is protected by the inode's spinlock and we can
+	 * have a concurrent ordered extent completion update it. Also set
+	 * last_reflink_trans to ->last_trans only if the former is less than
+	 * the later, because we can be called in a context where
+	 * last_reflink_trans was set to the current transaction generation
+	 * while ->last_trans was not yet updated in the current transaction,
+	 * and therefore has a lower value.
+	 */
+	spin_lock(&inode->lock);
+	if (inode->last_reflink_trans < inode->last_trans)
+		inode->last_reflink_trans = inode->last_trans;
+	spin_unlock(&inode->lock);
+}
+
+static inline bool btrfs_inode_in_log(struct btrfs_inode *inode, u64 generation)
+{
+	bool ret = false;
 
 	spin_lock(&inode->lock);
 	if (inode->logged_trans == generation &&
 	    inode->last_sub_trans <= inode->last_log_commit &&
-	    inode->last_sub_trans <= inode->root->last_log_commit) {
-		/*
-		 * After a ranged fsync we might have left some extent maps
-		 * (that fall outside the fsync's range). So return false
-		 * here if the list isn't empty, to make sure btrfs_log_inode()
-		 * will be called and process those extent maps.
-		 */
-		smp_mb();
-		if (list_empty(&inode->extent_tree.modified_extents))
-			ret = 1;
-	}
+	    inode->last_sub_trans <= inode->root->last_log_commit)
+		ret = true;
 	spin_unlock(&inode->lock);
 	return ret;
 }
 
-struct btrfs_dio_private {
-	struct inode *inode;
-	u64 logical_offset;
-	u64 disk_bytenr;
-	/* Used for bio::bi_size */
-	u32 bytes;
+/*
+ * Check if the inode has flags compatible with compression
+ */
+static inline bool btrfs_inode_can_compress(const struct btrfs_inode *inode)
+{
+	if (inode->flags & BTRFS_INODE_NODATACOW ||
+	    inode->flags & BTRFS_INODE_NODATASUM)
+		return false;
+	return true;
+}
 
-	/*
-	 * References to this structure. There is one reference per in-flight
-	 * bio plus one while we're still setting up.
-	 */
-	refcount_t refs;
+/*
+ * btrfs_inode_item stores flags in a u64, btrfs_inode stores them in two
+ * separate u32s. These two functions convert between the two representations.
+ */
+static inline u64 btrfs_inode_combine_flags(u32 flags, u32 ro_flags)
+{
+	return (flags | ((u64)ro_flags << 32));
+}
 
-	/* dio_bio came from fs/direct-io.c */
-	struct bio *dio_bio;
-
-	/* Array of checksums */
-	u8 csums[];
-};
+static inline void btrfs_inode_split_flags(u64 inode_item_flags,
+					   u32 *flags, u32 *ro_flags)
+{
+	*flags = (u32)inode_item_flags;
+	*ro_flags = (u32)(inode_item_flags >> 32);
+}
 
 /* Array of bytes with variable length, hexadecimal format 0x1234 */
 #define CSUM_FMT				"0x%*phN"

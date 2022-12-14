@@ -178,12 +178,12 @@
 #include <linux/time64.h>
 #include <linux/parser.h>
 #include <linux/sched/signal.h>
-#include <linux/blk-cgroup.h>
 #include <asm/local.h>
 #include <asm/local64.h>
 #include "blk-rq-qos.h"
 #include "blk-stat.h"
 #include "blk-wbt.h"
+#include "blk-cgroup.h"
 
 #ifdef CONFIG_TRACEPOINTS
 
@@ -533,8 +533,7 @@ struct ioc_gq {
 
 	/* statistics */
 	struct iocg_pcpu_stat __percpu	*pcpu_stat;
-	struct iocg_stat		local_stat;
-	struct iocg_stat		desc_stat;
+	struct iocg_stat		stat;
 	struct iocg_stat		last_stat;
 	u64				last_stat_abs_vusage;
 	u64				usage_delta_us;
@@ -987,10 +986,6 @@ static void ioc_adjust_base_vrate(struct ioc *ioc, u32 rq_wait_pct,
 		return;
 	}
 
-	/* rq_wait signal is always reliable, ignore user vrate_min */
-	if (rq_wait_pct > RQ_WAIT_BUSY_PCT)
-		vrate_min = VRATE_MIN;
-
 	/*
 	 * If vrate is out of bounds, apply clamp gradually as the
 	 * bounds can change abruptly.  Otherwise, apply busy_level
@@ -1375,7 +1370,7 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
 		return true;
 	} else {
 		if (iocg->indelay_since) {
-			iocg->local_stat.indelay_us += now->now - iocg->indelay_since;
+			iocg->stat.indelay_us += now->now - iocg->indelay_since;
 			iocg->indelay_since = 0;
 		}
 		iocg->delay = 0;
@@ -1423,7 +1418,7 @@ static void iocg_pay_debt(struct ioc_gq *iocg, u64 abs_vpay,
 
 	/* if debt is paid in full, restore inuse */
 	if (!iocg->abs_vdebt) {
-		iocg->local_stat.indebt_us += now->now - iocg->indebt_since;
+		iocg->stat.indebt_us += now->now - iocg->indebt_since;
 		iocg->indebt_since = 0;
 
 		propagate_weights(iocg, iocg->active, iocg->last_inuse,
@@ -1444,16 +1439,17 @@ static int iocg_wake_fn(struct wait_queue_entry *wq_entry, unsigned mode,
 		return -1;
 
 	iocg_commit_bio(ctx->iocg, wait->bio, wait->abs_cost, cost);
+	wait->committed = true;
 
 	/*
 	 * autoremove_wake_function() removes the wait entry only when it
-	 * actually changed the task state.  We want the wait always
-	 * removed.  Remove explicitly and use default_wake_function().
+	 * actually changed the task state. We want the wait always removed.
+	 * Remove explicitly and use default_wake_function(). Note that the
+	 * order of operations is important as finish_wait() tests whether
+	 * @wq_entry is removed without grabbing the lock.
 	 */
-	list_del_init(&wq_entry->entry);
-	wait->committed = true;
-
 	default_wake_function(wq_entry, mode, flags, key);
+	list_del_init_careful(&wq_entry->entry);
 	return 0;
 }
 
@@ -1516,7 +1512,7 @@ static void iocg_kick_waitq(struct ioc_gq *iocg, bool pay_debt,
 
 	if (!waitqueue_active(&iocg->waitq)) {
 		if (iocg->wait_since) {
-			iocg->local_stat.wait_us += now->now - iocg->wait_since;
+			iocg->stat.wait_us += now->now - iocg->wait_since;
 			iocg->wait_since = 0;
 		}
 		return;
@@ -1644,11 +1640,30 @@ static void iocg_build_inner_walk(struct ioc_gq *iocg,
 	}
 }
 
+/* propagate the deltas to the parent */
+static void iocg_flush_stat_upward(struct ioc_gq *iocg)
+{
+	if (iocg->level > 0) {
+		struct iocg_stat *parent_stat =
+			&iocg->ancestors[iocg->level - 1]->stat;
+
+		parent_stat->usage_us +=
+			iocg->stat.usage_us - iocg->last_stat.usage_us;
+		parent_stat->wait_us +=
+			iocg->stat.wait_us - iocg->last_stat.wait_us;
+		parent_stat->indebt_us +=
+			iocg->stat.indebt_us - iocg->last_stat.indebt_us;
+		parent_stat->indelay_us +=
+			iocg->stat.indelay_us - iocg->last_stat.indelay_us;
+	}
+
+	iocg->last_stat = iocg->stat;
+}
+
 /* collect per-cpu counters and propagate the deltas to the parent */
-static void iocg_flush_stat_one(struct ioc_gq *iocg, struct ioc_now *now)
+static void iocg_flush_stat_leaf(struct ioc_gq *iocg, struct ioc_now *now)
 {
 	struct ioc *ioc = iocg->ioc;
-	struct iocg_stat new_stat;
 	u64 abs_vusage = 0;
 	u64 vusage_delta;
 	int cpu;
@@ -1664,34 +1679,9 @@ static void iocg_flush_stat_one(struct ioc_gq *iocg, struct ioc_now *now)
 	iocg->last_stat_abs_vusage = abs_vusage;
 
 	iocg->usage_delta_us = div64_u64(vusage_delta, ioc->vtime_base_rate);
-	iocg->local_stat.usage_us += iocg->usage_delta_us;
+	iocg->stat.usage_us += iocg->usage_delta_us;
 
-	/* propagate upwards */
-	new_stat.usage_us =
-		iocg->local_stat.usage_us + iocg->desc_stat.usage_us;
-	new_stat.wait_us =
-		iocg->local_stat.wait_us + iocg->desc_stat.wait_us;
-	new_stat.indebt_us =
-		iocg->local_stat.indebt_us + iocg->desc_stat.indebt_us;
-	new_stat.indelay_us =
-		iocg->local_stat.indelay_us + iocg->desc_stat.indelay_us;
-
-	/* propagate the deltas to the parent */
-	if (iocg->level > 0) {
-		struct iocg_stat *parent_stat =
-			&iocg->ancestors[iocg->level - 1]->desc_stat;
-
-		parent_stat->usage_us +=
-			new_stat.usage_us - iocg->last_stat.usage_us;
-		parent_stat->wait_us +=
-			new_stat.wait_us - iocg->last_stat.wait_us;
-		parent_stat->indebt_us +=
-			new_stat.indebt_us - iocg->last_stat.indebt_us;
-		parent_stat->indelay_us +=
-			new_stat.indelay_us - iocg->last_stat.indelay_us;
-	}
-
-	iocg->last_stat = new_stat;
+	iocg_flush_stat_upward(iocg);
 }
 
 /* get stat counters ready for reading on all active iocgs */
@@ -1702,13 +1692,13 @@ static void iocg_flush_stat(struct list_head *target_iocgs, struct ioc_now *now)
 
 	/* flush leaves and build inner node walk list */
 	list_for_each_entry(iocg, target_iocgs, active_list) {
-		iocg_flush_stat_one(iocg, now);
+		iocg_flush_stat_leaf(iocg, now);
 		iocg_build_inner_walk(iocg, &inner_walk);
 	}
 
 	/* keep flushing upwards by walking the inner list backwards */
 	list_for_each_entry_safe_reverse(iocg, tiocg, &inner_walk, walk_list) {
-		iocg_flush_stat_one(iocg, now);
+		iocg_flush_stat_upward(iocg);
 		list_del_init(&iocg->walk_list);
 	}
 }
@@ -2155,16 +2145,16 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
 
 		/* flush wait and indebt stat deltas */
 		if (iocg->wait_since) {
-			iocg->local_stat.wait_us += now->now - iocg->wait_since;
+			iocg->stat.wait_us += now->now - iocg->wait_since;
 			iocg->wait_since = now->now;
 		}
 		if (iocg->indebt_since) {
-			iocg->local_stat.indebt_us +=
+			iocg->stat.indebt_us +=
 				now->now - iocg->indebt_since;
 			iocg->indebt_since = now->now;
 		}
 		if (iocg->indelay_since) {
-			iocg->local_stat.indelay_us +=
+			iocg->stat.indelay_us +=
 				now->now - iocg->indelay_since;
 			iocg->indelay_since = now->now;
 		}
@@ -2314,11 +2304,28 @@ static void ioc_timer_fn(struct timer_list *timer)
 			hwm = current_hweight_max(iocg);
 			new_hwi = hweight_after_donation(iocg, old_hwi, hwm,
 							 usage, &now);
-			if (new_hwi < hwm) {
+			/*
+			 * Donation calculation assumes hweight_after_donation
+			 * to be positive, a condition that a donor w/ hwa < 2
+			 * can't meet. Don't bother with donation if hwa is
+			 * below 2. It's not gonna make a meaningful difference
+			 * anyway.
+			 */
+			if (new_hwi < hwm && hwa >= 2) {
 				iocg->hweight_donating = hwa;
 				iocg->hweight_after_donation = new_hwi;
 				list_add(&iocg->surplus_list, &surpluses);
-			} else {
+			} else if (!iocg->abs_vdebt) {
+				/*
+				 * @iocg doesn't have enough to donate. Reset
+				 * its inuse to active.
+				 *
+				 * Don't reset debtors as their inuse's are
+				 * owned by debt handling. This shouldn't affect
+				 * donation calculuation in any meaningful way
+				 * as @iocg doesn't have a meaningful amount of
+				 * share anyway.
+				 */
 				TRACE_IOCG_PATH(inuse_shortage, iocg, &now,
 						iocg->inuse, iocg->active,
 						iocg->hweight_inuse, new_hwi);
@@ -2762,7 +2769,7 @@ static void ioc_rqos_done(struct rq_qos *rqos, struct request *rq)
 	if (!ioc->enabled || !rq->alloc_time_ns || !rq->start_time_ns)
 		return;
 
-	switch (req_op(rq) & REQ_OP_MASK) {
+	switch (req_op(rq)) {
 	case REQ_OP_READ:
 		pidx = QOS_RLAT;
 		rw = READ;
@@ -2879,15 +2886,21 @@ static int blk_iocost_init(struct request_queue *q)
 	 * called before policy activation completion, can't assume that the
 	 * target bio has an iocg associated and need to test for NULL iocg.
 	 */
-	rq_qos_add(q, rqos);
+	ret = rq_qos_add(q, rqos);
+	if (ret)
+		goto err_free_ioc;
+
 	ret = blkcg_activate_policy(q, &blkcg_policy_iocost);
-	if (ret) {
-		rq_qos_del(q, rqos);
-		free_percpu(ioc->pcpu_stat);
-		kfree(ioc);
-		return ret;
-	}
+	if (ret)
+		goto err_del_qos;
 	return 0;
+
+err_del_qos:
+	rq_qos_del(q, rqos);
+err_free_ioc:
+	free_percpu(ioc->pcpu_stat);
+	kfree(ioc);
+	return ret;
 }
 
 static struct blkcg_policy_data *ioc_cpd_alloc(gfp_t gfp)
@@ -2991,34 +3004,28 @@ static void ioc_pd_free(struct blkg_policy_data *pd)
 	kfree(iocg);
 }
 
-static size_t ioc_pd_stat(struct blkg_policy_data *pd, char *buf, size_t size)
+static void ioc_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
 {
 	struct ioc_gq *iocg = pd_to_iocg(pd);
 	struct ioc *ioc = iocg->ioc;
-	size_t pos = 0;
 
 	if (!ioc->enabled)
-		return 0;
+		return;
 
 	if (iocg->level == 0) {
 		unsigned vp10k = DIV64_U64_ROUND_CLOSEST(
 			ioc->vtime_base_rate * 10000,
 			VTIME_PER_USEC);
-		pos += scnprintf(buf + pos, size - pos, " cost.vrate=%u.%02u",
-				  vp10k / 100, vp10k % 100);
+		seq_printf(s, " cost.vrate=%u.%02u", vp10k / 100, vp10k % 100);
 	}
 
-	pos += scnprintf(buf + pos, size - pos, " cost.usage=%llu",
-			 iocg->last_stat.usage_us);
+	seq_printf(s, " cost.usage=%llu", iocg->last_stat.usage_us);
 
 	if (blkcg_debug_stats)
-		pos += scnprintf(buf + pos, size - pos,
-				 " cost.wait=%llu cost.indebt=%llu cost.indelay=%llu",
-				 iocg->last_stat.wait_us,
-				 iocg->last_stat.indebt_us,
-				 iocg->last_stat.indelay_us);
-
-	return pos;
+		seq_printf(s, " cost.wait=%llu cost.indebt=%llu cost.indelay=%llu",
+			iocg->last_stat.wait_us,
+			iocg->last_stat.indebt_us,
+			iocg->last_stat.indelay_us);
 }
 
 static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
@@ -3064,19 +3071,19 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
 		if (v < CGROUP_WEIGHT_MIN || v > CGROUP_WEIGHT_MAX)
 			return -EINVAL;
 
-		spin_lock(&blkcg->lock);
+		spin_lock_irq(&blkcg->lock);
 		iocc->dfl_weight = v * WEIGHT_ONE;
 		hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
 			struct ioc_gq *iocg = blkg_to_iocg(blkg);
 
 			if (iocg) {
-				spin_lock_irq(&iocg->ioc->lock);
+				spin_lock(&iocg->ioc->lock);
 				ioc_now(iocg->ioc, &now);
 				weight_updated(iocg, &now);
-				spin_unlock_irq(&iocg->ioc->lock);
+				spin_unlock(&iocg->ioc->lock);
 			}
 		}
-		spin_unlock(&blkcg->lock);
+		spin_unlock_irq(&blkcg->lock);
 
 		return nbytes;
 	}
@@ -3173,12 +3180,12 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
 	if (IS_ERR(bdev))
 		return PTR_ERR(bdev);
 
-	ioc = q_to_ioc(bdev->bd_disk->queue);
+	ioc = q_to_ioc(bdev_get_queue(bdev));
 	if (!ioc) {
-		ret = blk_iocost_init(bdev->bd_disk->queue);
+		ret = blk_iocost_init(bdev_get_queue(bdev));
 		if (ret)
 			goto err;
-		ioc = q_to_ioc(bdev->bd_disk->queue);
+		ioc = q_to_ioc(bdev_get_queue(bdev));
 	}
 
 	spin_lock_irq(&ioc->lock);
@@ -3340,12 +3347,12 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
 	if (IS_ERR(bdev))
 		return PTR_ERR(bdev);
 
-	ioc = q_to_ioc(bdev->bd_disk->queue);
+	ioc = q_to_ioc(bdev_get_queue(bdev));
 	if (!ioc) {
-		ret = blk_iocost_init(bdev->bd_disk->queue);
+		ret = blk_iocost_init(bdev_get_queue(bdev));
 		if (ret)
 			goto err;
-		ioc = q_to_ioc(bdev->bd_disk->queue);
+		ioc = q_to_ioc(bdev_get_queue(bdev));
 	}
 
 	spin_lock_irq(&ioc->lock);

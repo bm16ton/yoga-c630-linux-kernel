@@ -1,6 +1,5 @@
 KERNELRELEASE := $(shell uname -r)
 KDIR := /lib/modules/$(KERNELRELEASE)/build
-obj-m += dependent.o
 
 .PHONY: default
 default:

@@ -196,13 +196,11 @@ static inline u32 ina3221_reg_to_interval_us(u16 config)
 	u32 channels = hweight16(config & INA3221_CONFIG_CHs_EN_MASK);
 	u32 vbus_ct_idx = INA3221_CONFIG_VBUS_CT(config);
 	u32 vsh_ct_idx = INA3221_CONFIG_VSH_CT(config);
-	u32 samples_idx = INA3221_CONFIG_AVG(config);
-	u32 samples = ina3221_avg_samples[samples_idx];
 	u32 vbus_ct = ina3221_conv_time[vbus_ct_idx];
 	u32 vsh_ct = ina3221_conv_time[vsh_ct_idx];
 
 	/* Calculate total conversion time */
-	return channels * (vbus_ct + vsh_ct) * samples;
+	return channels * (vbus_ct + vsh_ct);
 }
 
 static inline int ina3221_wait_for_data(struct ina3221_data *ina)
@@ -230,7 +228,7 @@ static int ina3221_read_value(struct ina3221_data *ina, unsigned int reg,
 	 * Shunt Voltage Sum register has 14-bit value with 1-bit shift
 	 * Other Shunt Voltage registers have 12 bits with 3-bit shift
 	 */
-	if (reg == INA3221_SHUNT_SUM)
+	if (reg == INA3221_SHUNT_SUM || reg == INA3221_CRIT_SUM)
 		*val = sign_extend32(regval >> 1, 14);
 	else
 		*val = sign_extend32(regval >> 3, 12);
@@ -288,13 +286,14 @@ static int ina3221_read_in(struct device *dev, u32 attr, int channel, long *val)
 			return -ENODATA;
 
 		/* Write CONFIG register to trigger a single-shot measurement */
-		if (ina->single_shot)
+		if (ina->single_shot) {
 			regmap_write(ina->regmap, INA3221_CONFIG,
 				     ina->reg_config);
 
-		ret = ina3221_wait_for_data(ina);
-		if (ret)
-			return ret;
+			ret = ina3221_wait_for_data(ina);
+			if (ret)
+				return ret;
+		}
 
 		ret = ina3221_read_value(ina, reg, &regval);
 		if (ret)
@@ -344,13 +343,14 @@ static int ina3221_read_curr(struct device *dev, u32 attr,
 			return -ENODATA;
 
 		/* Write CONFIG register to trigger a single-shot measurement */
-		if (ina->single_shot)
+		if (ina->single_shot) {
 			regmap_write(ina->regmap, INA3221_CONFIG,
 				     ina->reg_config);
 
-		ret = ina3221_wait_for_data(ina);
-		if (ret)
-			return ret;
+			ret = ina3221_wait_for_data(ina);
+			if (ret)
+				return ret;
+		}
 
 		fallthrough;
 	case hwmon_curr_crit:
@@ -465,7 +465,7 @@ static int ina3221_write_curr(struct device *dev, u32 attr,
 	 *     SHUNT_SUM: (1 / 40uV) << 1 = 1 / 20uV
 	 *     SHUNT[1-3]: (1 / 40uV) << 3 = 1 / 5uV
 	 */
-	if (reg == INA3221_SHUNT_SUM)
+	if (reg == INA3221_SHUNT_SUM || reg == INA3221_CRIT_SUM)
 		regval = DIV_ROUND_CLOSEST(voltage_uv, 20) & 0xfffe;
 	else
 		regval = DIV_ROUND_CLOSEST(voltage_uv, 5) & 0xfff8;
@@ -698,7 +698,7 @@ static ssize_t ina3221_shunt_show(struct device *dev,
 	unsigned int channel = sd_attr->index;
 	struct ina3221_input *input = &ina->inputs[channel];
 
-	return snprintf(buf, PAGE_SIZE, "%d\n", input->shunt_resistor);
+	return sysfs_emit(buf, "%d\n", input->shunt_resistor);
 }
 
 static ssize_t ina3221_shunt_store(struct device *dev,

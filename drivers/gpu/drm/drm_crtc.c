@@ -35,9 +35,11 @@
 #include <linux/export.h>
 #include <linux/dma-fence.h>
 #include <linux/uaccess.h>
+#include <drm/drm_blend.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_edid.h>
 #include <drm/drm_fourcc.h>
+#include <drm/drm_framebuffer.h>
 #include <drm/drm_managed.h>
 #include <drm/drm_modeset_lock.h>
 #include <drm/drm_atomic.h>
@@ -735,11 +737,8 @@ int drm_mode_setcrtc(struct drm_device *dev, void *data,
 							   fb->format->format,
 							   fb->modifier);
 			if (ret) {
-				struct drm_format_name_buf format_name;
-
-				DRM_DEBUG_KMS("Invalid pixel format %s, modifier 0x%llx\n",
-					      drm_get_format_name(fb->format->format,
-								  &format_name),
+				DRM_DEBUG_KMS("Invalid pixel format %p4cc, modifier 0x%llx\n",
+					      &fb->format->format,
 					      fb->modifier);
 				goto out;
 			}

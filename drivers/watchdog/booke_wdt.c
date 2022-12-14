@@ -74,7 +74,7 @@ static unsigned long long period_to_sec(unsigned int period)
 /*
  * This procedure will find the highest period which will give a timeout
  * greater than the one required. e.g. for a bus speed of 66666666 and
- * and a parameter of 2 secs, then this procedure will return a value of 38.
+ * a parameter of 2 secs, then this procedure will return a value of 38.
  */
 static unsigned int sec_to_period(unsigned int secs)
 {
@@ -148,7 +148,7 @@ static void __booke_wdt_enable(void *data)
 }
 
 /**
- * booke_wdt_disable - disable the watchdog on the given CPU
+ * __booke_wdt_disable - disable the watchdog on the given CPU
  *
  * This function is called on each CPU.  It disables the watchdog on that CPU.
  *

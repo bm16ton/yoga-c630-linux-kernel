@@ -61,7 +61,7 @@ struct atmel_tcb_pwm_chip {
 	struct atmel_tcb_channel bkup;
 };
 
-const u8 atmel_tcb_divisors[] = { 2, 8, 32, 128, 0, };
+static const u8 atmel_tcb_divisors[] = { 2, 8, 32, 128, 0, };
 
 static inline struct atmel_tcb_pwm_chip *to_tcb_chip(struct pwm_chip *chip)
 {
@@ -72,7 +72,8 @@ static int atmel_tcb_pwm_set_polarity(struct pwm_chip *chip,
 				      struct pwm_device *pwm,
 				      enum pwm_polarity polarity)
 {
-	struct atmel_tcb_pwm_device *tcbpwm = pwm_get_chip_data(pwm);
+	struct atmel_tcb_pwm_chip *tcbpwmc = to_tcb_chip(chip);
+	struct atmel_tcb_pwm_device *tcbpwm = tcbpwmc->pwms[pwm->hwpwm];
 
 	tcbpwm->polarity = polarity;
 
@@ -97,7 +98,6 @@ static int atmel_tcb_pwm_request(struct pwm_chip *chip,
 		return ret;
 	}
 
-	pwm_set_chip_data(pwm, tcbpwm);
 	tcbpwm->polarity = PWM_POLARITY_NORMAL;
 	tcbpwm->duty = 0;
 	tcbpwm->period = 0;
@@ -139,7 +139,7 @@ static int atmel_tcb_pwm_request(struct pwm_chip *chip,
 static void atmel_tcb_pwm_free(struct pwm_chip *chip, struct pwm_device *pwm)
 {
 	struct atmel_tcb_pwm_chip *tcbpwmc = to_tcb_chip(chip);
-	struct atmel_tcb_pwm_device *tcbpwm = pwm_get_chip_data(pwm);
+	struct atmel_tcb_pwm_device *tcbpwm = tcbpwmc->pwms[pwm->hwpwm];
 
 	clk_disable_unprepare(tcbpwmc->clk);
 	tcbpwmc->pwms[pwm->hwpwm] = NULL;
@@ -149,7 +149,7 @@ static void atmel_tcb_pwm_free(struct pwm_chip *chip, struct pwm_device *pwm)
 static void atmel_tcb_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm)
 {
 	struct atmel_tcb_pwm_chip *tcbpwmc = to_tcb_chip(chip);
-	struct atmel_tcb_pwm_device *tcbpwm = pwm_get_chip_data(pwm);
+	struct atmel_tcb_pwm_device *tcbpwm = tcbpwmc->pwms[pwm->hwpwm];
 	unsigned cmr;
 	enum pwm_polarity polarity = tcbpwm->polarity;
 
@@ -206,7 +206,7 @@ static void atmel_tcb_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm)
 static int atmel_tcb_pwm_enable(struct pwm_chip *chip, struct pwm_device *pwm)
 {
 	struct atmel_tcb_pwm_chip *tcbpwmc = to_tcb_chip(chip);
-	struct atmel_tcb_pwm_device *tcbpwm = pwm_get_chip_data(pwm);
+	struct atmel_tcb_pwm_device *tcbpwm = tcbpwmc->pwms[pwm->hwpwm];
 	u32 cmr;
 	enum pwm_polarity polarity = tcbpwm->polarity;
 
@@ -291,7 +291,7 @@ static int atmel_tcb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 				int duty_ns, int period_ns)
 {
 	struct atmel_tcb_pwm_chip *tcbpwmc = to_tcb_chip(chip);
-	struct atmel_tcb_pwm_device *tcbpwm = pwm_get_chip_data(pwm);
+	struct atmel_tcb_pwm_device *tcbpwm = tcbpwmc->pwms[pwm->hwpwm];
 	struct atmel_tcb_pwm_device *atcbpwm = NULL;
 	int i = 0;
 	int slowclk = 0;
@@ -304,7 +304,7 @@ static int atmel_tcb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	/*
 	 * Find best clk divisor:
 	 * the smallest divisor which can fulfill the period_ns requirements.
-	 * If there is a gclk, the first divisor is actuallly the gclk selector
+	 * If there is a gclk, the first divisor is actually the gclk selector
 	 */
 	if (tcbpwmc->gclk)
 		i = 1;
@@ -362,20 +362,37 @@ static int atmel_tcb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	tcbpwm->div = i;
 	tcbpwm->duty = duty;
 
-	/* If the PWM is enabled, call enable to apply the new conf */
-	if (pwm_is_enabled(pwm))
-		atmel_tcb_pwm_enable(chip, pwm);
-
 	return 0;
+}
+
+static int atmel_tcb_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
+			       const struct pwm_state *state)
+{
+	int duty_cycle, period;
+	int ret;
+
+	/* This function only sets a flag in driver data */
+	atmel_tcb_pwm_set_polarity(chip, pwm, state->polarity);
+
+	if (!state->enabled) {
+		atmel_tcb_pwm_disable(chip, pwm);
+		return 0;
+	}
+
+	period = state->period < INT_MAX ? state->period : INT_MAX;
+	duty_cycle = state->duty_cycle < INT_MAX ? state->duty_cycle : INT_MAX;
+
+	ret = atmel_tcb_pwm_config(chip, pwm, duty_cycle, period);
+	if (ret)
+		return ret;
+
+	return atmel_tcb_pwm_enable(chip, pwm);
 }
 
 static const struct pwm_ops atmel_tcb_pwm_ops = {
 	.request = atmel_tcb_pwm_request,
 	.free = atmel_tcb_pwm_free,
-	.config = atmel_tcb_pwm_config,
-	.set_polarity = atmel_tcb_pwm_set_polarity,
-	.enable = atmel_tcb_pwm_enable,
-	.disable = atmel_tcb_pwm_disable,
+	.apply = atmel_tcb_pwm_apply,
 	.owner = THIS_MODULE,
 };
 
@@ -452,9 +469,6 @@ static int atmel_tcb_pwm_probe(struct platform_device *pdev)
 
 	tcbpwm->chip.dev = &pdev->dev;
 	tcbpwm->chip.ops = &atmel_tcb_pwm_ops;
-	tcbpwm->chip.of_xlate = of_pwm_xlate_with_flags;
-	tcbpwm->chip.of_pwm_n_cells = 3;
-	tcbpwm->chip.base = -1;
 	tcbpwm->chip.npwm = NPWM;
 	tcbpwm->channel = channel;
 	tcbpwm->regmap = regmap;
@@ -489,15 +503,12 @@ err_slow_clk:
 static int atmel_tcb_pwm_remove(struct platform_device *pdev)
 {
 	struct atmel_tcb_pwm_chip *tcbpwm = platform_get_drvdata(pdev);
-	int err;
+
+	pwmchip_remove(&tcbpwm->chip);
 
 	clk_disable_unprepare(tcbpwm->slow_clk);
 	clk_put(tcbpwm->slow_clk);
 	clk_put(tcbpwm->clk);
-
-	err = pwmchip_remove(&tcbpwm->chip);
-	if (err < 0)
-		return err;
 
 	return 0;
 }

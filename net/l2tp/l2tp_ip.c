@@ -50,11 +50,13 @@ static struct sock *__l2tp_ip_bind_lookup(const struct net *net, __be32 laddr,
 	sk_for_each_bound(sk, &l2tp_ip_bind_table) {
 		const struct l2tp_ip_sock *l2tp = l2tp_ip_sk(sk);
 		const struct inet_sock *inet = inet_sk(sk);
+		int bound_dev_if;
 
 		if (!net_eq(sock_net(sk), net))
 			continue;
 
-		if (sk->sk_bound_dev_if && dif && sk->sk_bound_dev_if != dif)
+		bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
+		if (bound_dev_if && dif && bound_dev_if != dif)
 			continue;
 
 		if (inet->inet_rcv_saddr && laddr &&
@@ -488,7 +490,7 @@ static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 		}
 	}
 
-	/* We dont need to clone dst here, it is guaranteed to not disappear.
+	/* We don't need to clone dst here, it is guaranteed to not disappear.
 	 *  __dev_xmit_skb() might force a refcount if needed.
 	 */
 	skb_dst_set_noref(skb, &rt->dst);
@@ -515,7 +517,7 @@ no_route:
 }
 
 static int l2tp_ip_recvmsg(struct sock *sk, struct msghdr *msg,
-			   size_t len, int noblock, int flags, int *addr_len)
+			   size_t len, int flags, int *addr_len)
 {
 	struct inet_sock *inet = inet_sk(sk);
 	size_t copied = 0;
@@ -526,7 +528,7 @@ static int l2tp_ip_recvmsg(struct sock *sk, struct msghdr *msg,
 	if (flags & MSG_OOB)
 		goto out;
 
-	skb = skb_recv_datagram(sk, flags, noblock, &err);
+	skb = skb_recv_datagram(sk, flags, &err);
 	if (!skb)
 		goto out;
 
@@ -635,7 +637,6 @@ static struct inet_protosw l2tp_ip_protosw = {
 
 static struct net_protocol l2tp_ip_protocol __read_mostly = {
 	.handler	= l2tp_ip_recv,
-	.netns_ok	= 1,
 };
 
 static int __init l2tp_ip_init(void)

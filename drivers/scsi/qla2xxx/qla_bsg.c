@@ -25,7 +25,12 @@ void qla2x00_bsg_job_done(srb_t *sp, int res)
 	struct bsg_job *bsg_job = sp->u.bsg_job;
 	struct fc_bsg_reply *bsg_reply = bsg_job->reply;
 
-	sp->free(sp);
+	ql_dbg(ql_dbg_user, sp->vha, 0x7009,
+	    "%s: sp hdl %x, result=%x bsg ptr %p\n",
+	    __func__, sp->handle, res, bsg_job);
+
+	/* ref: INIT */
+	kref_put(&sp->cmd_kref, qla2x00_sp_release);
 
 	bsg_reply->result = res;
 	bsg_job_done(bsg_job, bsg_reply->result,
@@ -53,11 +58,19 @@ void qla2x00_bsg_sp_free(srb_t *sp)
 			    bsg_job->reply_payload.sg_list,
 			    bsg_job->reply_payload.sg_cnt, DMA_FROM_DEVICE);
 	} else {
-		dma_unmap_sg(&ha->pdev->dev, bsg_job->request_payload.sg_list,
-		    bsg_job->request_payload.sg_cnt, DMA_TO_DEVICE);
 
-		dma_unmap_sg(&ha->pdev->dev, bsg_job->reply_payload.sg_list,
-		    bsg_job->reply_payload.sg_cnt, DMA_FROM_DEVICE);
+		if (sp->remap.remapped) {
+			dma_pool_free(ha->purex_dma_pool, sp->remap.rsp.buf,
+			    sp->remap.rsp.dma);
+			dma_pool_free(ha->purex_dma_pool, sp->remap.req.buf,
+			    sp->remap.req.dma);
+		} else {
+			dma_unmap_sg(&ha->pdev->dev, bsg_job->request_payload.sg_list,
+				bsg_job->request_payload.sg_cnt, DMA_TO_DEVICE);
+
+			dma_unmap_sg(&ha->pdev->dev, bsg_job->reply_payload.sg_list,
+				bsg_job->reply_payload.sg_cnt, DMA_FROM_DEVICE);
+		}
 	}
 
 	if (sp->type == SRB_CT_CMD ||
@@ -266,6 +279,7 @@ qla2x00_process_els(struct bsg_job *bsg_job)
 	int req_sg_cnt, rsp_sg_cnt;
 	int rval =  (DID_ERROR << 16);
 	uint16_t nextlid = 0;
+	uint32_t els_cmd = 0;
 
 	if (bsg_request->msgcode == FC_BSG_RPT_ELS) {
 		rport = fc_bsg_to_rport(bsg_job);
@@ -279,6 +293,9 @@ qla2x00_process_els(struct bsg_job *bsg_job)
 		vha = shost_priv(host);
 		ha = vha->hw;
 		type = "FC_BSG_HST_ELS_NOLOGIN";
+		els_cmd = bsg_request->rqst_data.h_els.command_code;
+		if (els_cmd == ELS_AUTH_ELS)
+			return qla_edif_process_els(vha, bsg_job);
 	}
 
 	if (!vha->flags.online) {
@@ -415,7 +432,7 @@ done_unmap_sg:
 	goto done_free_fcport;
 
 done_free_fcport:
-	if (bsg_request->msgcode == FC_BSG_RPT_ELS)
+	if (bsg_request->msgcode != FC_BSG_RPT_ELS)
 		qla2x00_free_fcport(fcport);
 done:
 	return rval;
@@ -2408,6 +2425,89 @@ qla2x00_do_dport_diagnostics(struct bsg_job *bsg_job)
 }
 
 static int
+qla2x00_do_dport_diagnostics_v2(struct bsg_job *bsg_job)
+{
+	struct fc_bsg_reply *bsg_reply = bsg_job->reply;
+	struct Scsi_Host *host = fc_bsg_to_shost(bsg_job);
+	scsi_qla_host_t *vha = shost_priv(host);
+	int rval;
+	struct qla_dport_diag_v2 *dd;
+	mbx_cmd_t mc;
+	mbx_cmd_t *mcp = &mc;
+	uint16_t options;
+
+	if (!IS_DPORT_CAPABLE(vha->hw))
+		return -EPERM;
+
+	dd = kzalloc(sizeof(*dd), GFP_KERNEL);
+	if (!dd)
+		return -ENOMEM;
+
+	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
+			bsg_job->request_payload.sg_cnt, dd, sizeof(*dd));
+
+	options  = dd->options;
+
+	/*  Check dport Test in progress */
+	if (options == QLA_GET_DPORT_RESULT_V2 &&
+	    vha->dport_status & DPORT_DIAG_IN_PROGRESS) {
+		bsg_reply->reply_data.vendor_reply.vendor_rsp[0] =
+					EXT_STATUS_DPORT_DIAG_IN_PROCESS;
+		goto dportcomplete;
+	}
+
+	/*  Check chip reset in progress and start/restart requests arrive */
+	if (vha->dport_status & DPORT_DIAG_CHIP_RESET_IN_PROGRESS &&
+	    (options == QLA_START_DPORT_TEST_V2 ||
+	     options == QLA_RESTART_DPORT_TEST_V2)) {
+		vha->dport_status &= ~DPORT_DIAG_CHIP_RESET_IN_PROGRESS;
+	}
+
+	/*  Check chip reset in progress and get result request arrive */
+	if (vha->dport_status & DPORT_DIAG_CHIP_RESET_IN_PROGRESS &&
+	    options == QLA_GET_DPORT_RESULT_V2) {
+		bsg_reply->reply_data.vendor_reply.vendor_rsp[0] =
+					EXT_STATUS_DPORT_DIAG_NOT_RUNNING;
+		goto dportcomplete;
+	}
+
+	rval = qla26xx_dport_diagnostics_v2(vha, dd, mcp);
+
+	if (rval == QLA_SUCCESS) {
+		bsg_reply->reply_data.vendor_reply.vendor_rsp[0] =
+					EXT_STATUS_OK;
+		if (options == QLA_START_DPORT_TEST_V2 ||
+		    options == QLA_RESTART_DPORT_TEST_V2) {
+			dd->mbx1 = mcp->mb[0];
+			dd->mbx2 = mcp->mb[1];
+			vha->dport_status |=  DPORT_DIAG_IN_PROGRESS;
+		} else if (options == QLA_GET_DPORT_RESULT_V2) {
+			dd->mbx1 = le16_to_cpu(vha->dport_data[1]);
+			dd->mbx2 = le16_to_cpu(vha->dport_data[2]);
+		}
+	} else {
+		dd->mbx1 = mcp->mb[0];
+		dd->mbx2 = mcp->mb[1];
+		bsg_reply->reply_data.vendor_reply.vendor_rsp[0] =
+				EXT_STATUS_DPORT_DIAG_ERR;
+	}
+
+dportcomplete:
+	sg_copy_from_buffer(bsg_job->reply_payload.sg_list,
+			    bsg_job->reply_payload.sg_cnt, dd, sizeof(*dd));
+
+	bsg_reply->reply_payload_rcv_len = sizeof(*dd);
+	bsg_job->reply_len = sizeof(*bsg_reply);
+	bsg_reply->result = DID_OK << 16;
+	bsg_job_done(bsg_job, bsg_reply->result,
+		     bsg_reply->reply_payload_rcv_len);
+
+	kfree(dd);
+
+	return 0;
+}
+
+static int
 qla2x00_get_flash_image_status(struct bsg_job *bsg_job)
 {
 	scsi_qla_host_t *vha = shost_priv(fc_bsg_to_shost(bsg_job));
@@ -2585,8 +2685,8 @@ qla2x00_get_host_stats(struct bsg_job *bsg_job)
 
 	data = kzalloc(response_len, GFP_KERNEL);
 	if (!data) {
-		kfree(req_data);
-		return -ENOMEM;
+		ret = -ENOMEM;
+		goto host_stat_out;
 	}
 
 	ret = qla2xxx_get_ini_stats(fc_bsg_to_shost(bsg_job), req_data->stat_type,
@@ -2768,9 +2868,12 @@ qla2x00_manage_host_port(struct bsg_job *bsg_job)
 }
 
 static int
-qla2x00_process_vendor_specific(struct bsg_job *bsg_job)
+qla2x00_process_vendor_specific(struct scsi_qla_host *vha, struct bsg_job *bsg_job)
 {
 	struct fc_bsg_request *bsg_request = bsg_job->request;
+
+	ql_dbg(ql_dbg_edif, vha, 0x911b, "%s FC_BSG_HST_VENDOR cmd[0]=0x%x\n",
+	    __func__, bsg_request->rqst_data.h_vendor.vendor_cmd[0]);
 
 	switch (bsg_request->rqst_data.h_vendor.vendor_cmd[0]) {
 	case QL_VND_LOOPBACK:
@@ -2840,6 +2943,12 @@ qla2x00_process_vendor_specific(struct bsg_job *bsg_job)
 	case QL_VND_DPORT_DIAGNOSTICS:
 		return qla2x00_do_dport_diagnostics(bsg_job);
 
+	case QL_VND_DPORT_DIAGNOSTICS_V2:
+		return qla2x00_do_dport_diagnostics_v2(bsg_job);
+
+	case QL_VND_EDIF_MGMT:
+		return qla_edif_app_mgmt(bsg_job);
+
 	case QL_VND_SS_GET_FLASH_IMAGE_STATUS:
 		return qla2x00_get_flash_image_status(bsg_job);
 
@@ -2854,6 +2963,9 @@ qla2x00_process_vendor_specific(struct bsg_job *bsg_job)
 
 	case QL_VND_MANAGE_HOST_PORT:
 		return qla2x00_manage_host_port(bsg_job);
+
+	case QL_VND_MBX_PASSTHRU:
+		return qla2x00_mailbox_passthru(bsg_job);
 
 	default:
 		return -ENOSYS;
@@ -2897,12 +3009,19 @@ qla24xx_bsg_request(struct bsg_job *bsg_job)
 		ql_dbg(ql_dbg_user, vha, 0x709f,
 		    "BSG: ISP abort active/needed -- cmd=%d.\n",
 		    bsg_request->msgcode);
+		SET_DID_STATUS(bsg_reply->result, DID_ERROR);
 		return -EBUSY;
 	}
 
+	if (test_bit(PFLG_DRIVER_REMOVING, &vha->pci_flags)) {
+		SET_DID_STATUS(bsg_reply->result, DID_ERROR);
+		return -EIO;
+	}
+
 skip_chip_chk:
-	ql_dbg(ql_dbg_user, vha, 0x7000,
-	    "Entered %s msgcode=0x%x.\n", __func__, bsg_request->msgcode);
+	ql_dbg(ql_dbg_user + ql_dbg_verbose, vha, 0x7000,
+	    "Entered %s msgcode=0x%x. bsg ptr %px\n",
+	    __func__, bsg_request->msgcode, bsg_job);
 
 	switch (bsg_request->msgcode) {
 	case FC_BSG_RPT_ELS:
@@ -2913,7 +3032,7 @@ skip_chip_chk:
 		ret = qla2x00_process_ct(bsg_job);
 		break;
 	case FC_BSG_HST_VENDOR:
-		ret = qla2x00_process_vendor_specific(bsg_job);
+		ret = qla2x00_process_vendor_specific(vha, bsg_job);
 		break;
 	case FC_BSG_HST_ADD_RPORT:
 	case FC_BSG_HST_DEL_RPORT:
@@ -2922,6 +3041,10 @@ skip_chip_chk:
 		ql_log(ql_log_warn, vha, 0x705a, "Unsupported BSG request.\n");
 		break;
 	}
+
+	ql_dbg(ql_dbg_user + ql_dbg_verbose, vha, 0x7000,
+	    "%s done with return %x\n", __func__, ret);
+
 	return ret;
 }
 
@@ -2936,6 +3059,15 @@ qla24xx_bsg_timeout(struct bsg_job *bsg_job)
 	unsigned long flags;
 	struct req_que *req;
 
+	ql_log(ql_log_info, vha, 0x708b, "%s CMD timeout. bsg ptr %p.\n",
+	    __func__, bsg_job);
+
+	if (qla2x00_isp_reg_stat(ha)) {
+		ql_log(ql_log_info, vha, 0x9007,
+		    "PCI/Register disconnect.\n");
+		qla_pci_set_eeh_busy(vha);
+	}
+
 	/* find the bsg job from the active list of commands */
 	spin_lock_irqsave(&ha->hardware_lock, flags);
 	for (que = 0; que < ha->max_req_queues; que++) {
@@ -2945,27 +3077,27 @@ qla24xx_bsg_timeout(struct bsg_job *bsg_job)
 
 		for (cnt = 1; cnt < req->num_outstanding_cmds; cnt++) {
 			sp = req->outstanding_cmds[cnt];
-			if (sp) {
-				if (((sp->type == SRB_CT_CMD) ||
-					(sp->type == SRB_ELS_CMD_HST) ||
-					(sp->type == SRB_FXIOCB_BCMD))
-					&& (sp->u.bsg_job == bsg_job)) {
-					req->outstanding_cmds[cnt] = NULL;
-					spin_unlock_irqrestore(&ha->hardware_lock, flags);
-					if (ha->isp_ops->abort_command(sp)) {
-						ql_log(ql_log_warn, vha, 0x7089,
-						    "mbx abort_command "
-						    "failed.\n");
-						bsg_reply->result = -EIO;
-					} else {
-						ql_dbg(ql_dbg_user, vha, 0x708a,
-						    "mbx abort_command "
-						    "success.\n");
-						bsg_reply->result = 0;
-					}
-					spin_lock_irqsave(&ha->hardware_lock, flags);
-					goto done;
+			if (sp &&
+			    (sp->type == SRB_CT_CMD ||
+			     sp->type == SRB_ELS_CMD_HST ||
+			     sp->type == SRB_ELS_CMD_HST_NOLOGIN ||
+			     sp->type == SRB_FXIOCB_BCMD) &&
+			    sp->u.bsg_job == bsg_job) {
+				req->outstanding_cmds[cnt] = NULL;
+				spin_unlock_irqrestore(&ha->hardware_lock, flags);
+
+				if (!ha->flags.eeh_busy && ha->isp_ops->abort_command(sp)) {
+					ql_log(ql_log_warn, vha, 0x7089,
+					    "mbx abort_command failed.\n");
+					bsg_reply->result = -EIO;
+				} else {
+					ql_dbg(ql_dbg_user, vha, 0x708a,
+					    "mbx abort_command success.\n");
+					bsg_reply->result = 0;
 				}
+				spin_lock_irqsave(&ha->hardware_lock, flags);
+				goto done;
+
 			}
 		}
 	}
@@ -2976,6 +3108,52 @@ qla24xx_bsg_timeout(struct bsg_job *bsg_job)
 
 done:
 	spin_unlock_irqrestore(&ha->hardware_lock, flags);
-	sp->free(sp);
+	/* ref: INIT */
+	kref_put(&sp->cmd_kref, qla2x00_sp_release);
 	return 0;
+}
+
+int qla2x00_mailbox_passthru(struct bsg_job *bsg_job)
+{
+	struct fc_bsg_reply *bsg_reply = bsg_job->reply;
+	scsi_qla_host_t *vha = shost_priv(fc_bsg_to_shost(bsg_job));
+	int ret = -EINVAL;
+	int ptsize = sizeof(struct qla_mbx_passthru);
+	struct qla_mbx_passthru *req_data = NULL;
+	uint32_t req_data_len;
+
+	req_data_len = bsg_job->request_payload.payload_len;
+	if (req_data_len != ptsize) {
+		ql_log(ql_log_warn, vha, 0xf0a3, "req_data_len invalid.\n");
+		return -EIO;
+	}
+	req_data = kzalloc(ptsize, GFP_KERNEL);
+	if (!req_data) {
+		ql_log(ql_log_warn, vha, 0xf0a4,
+		       "req_data memory allocation failure.\n");
+		return -ENOMEM;
+	}
+
+	/* Copy the request buffer in req_data */
+	sg_copy_to_buffer(bsg_job->request_payload.sg_list,
+			  bsg_job->request_payload.sg_cnt, req_data, ptsize);
+	ret = qla_mailbox_passthru(vha, req_data->mbx_in, req_data->mbx_out);
+
+	/* Copy the req_data in  request buffer */
+	sg_copy_from_buffer(bsg_job->reply_payload.sg_list,
+			    bsg_job->reply_payload.sg_cnt, req_data, ptsize);
+
+	bsg_reply->reply_payload_rcv_len = ptsize;
+	if (ret == QLA_SUCCESS)
+		bsg_reply->reply_data.vendor_reply.vendor_rsp[0] = EXT_STATUS_OK;
+	else
+		bsg_reply->reply_data.vendor_reply.vendor_rsp[0] = EXT_STATUS_ERR;
+
+	bsg_job->reply_len = sizeof(*bsg_job->reply);
+	bsg_reply->result = DID_OK << 16;
+	bsg_job_done(bsg_job, bsg_reply->result, bsg_reply->reply_payload_rcv_len);
+
+	kfree(req_data);
+
+	return ret;
 }

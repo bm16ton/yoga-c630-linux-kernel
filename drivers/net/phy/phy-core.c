@@ -13,7 +13,7 @@
  */
 const char *phy_speed_to_str(int speed)
 {
-	BUILD_BUG_ON_MSG(__ETHTOOL_LINK_MODE_MASK_NBITS != 92,
+	BUILD_BUG_ON_MSG(__ETHTOOL_LINK_MODE_MASK_NBITS != 93,
 		"Enum ethtool_link_mode_bit_indices and phylib are out of sync. "
 		"If a speed or mode has been added please update phy_speed_to_str "
 		"and the PHY settings array.\n");
@@ -76,7 +76,8 @@ EXPORT_SYMBOL_GPL(phy_duplex_to_str);
 
 /* A mapping of all SUPPORTED settings to speed/duplex.  This table
  * must be grouped by speed and sorted in descending match priority
- * - iow, descending speed. */
+ * - iow, descending speed.
+ */
 
 #define PHY_SETTING(s, d, b) { .speed = SPEED_ ## s, .duplex = DUPLEX_ ## d, \
 			       .bit = ETHTOOL_LINK_MODE_ ## b ## _BIT}
@@ -161,11 +162,11 @@ static const struct phy_setting settings[] = {
 	PHY_SETTING(   2500, FULL,   2500baseT_Full		),
 	PHY_SETTING(   2500, FULL,   2500baseX_Full		),
 	/* 1G */
-	PHY_SETTING(   1000, FULL,   1000baseKX_Full		),
 	PHY_SETTING(   1000, FULL,   1000baseT_Full		),
 	PHY_SETTING(   1000, HALF,   1000baseT_Half		),
 	PHY_SETTING(   1000, FULL,   1000baseT1_Full		),
 	PHY_SETTING(   1000, FULL,   1000baseX_Full		),
+	PHY_SETTING(   1000, FULL,   1000baseKX_Full		),
 	/* 100M */
 	PHY_SETTING(    100, FULL,    100baseT_Full		),
 	PHY_SETTING(    100, FULL,    100baseT1_Full		),
@@ -175,6 +176,7 @@ static const struct phy_setting settings[] = {
 	/* 10M */
 	PHY_SETTING(     10, FULL,     10baseT_Full		),
 	PHY_SETTING(     10, HALF,     10baseT_Half		),
+	PHY_SETTING(     10, FULL,     10baseT1L_Full		),
 };
 #undef PHY_SETTING
 
@@ -242,7 +244,7 @@ size_t phy_speeds(unsigned int *speeds, size_t size,
 	return count;
 }
 
-static int __set_linkmode_max_speed(u32 max_speed, unsigned long *addr)
+static void __set_linkmode_max_speed(u32 max_speed, unsigned long *addr)
 {
 	const struct phy_setting *p;
 	int i;
@@ -253,13 +255,11 @@ static int __set_linkmode_max_speed(u32 max_speed, unsigned long *addr)
 		else
 			break;
 	}
-
-	return 0;
 }
 
-static int __set_phy_supported(struct phy_device *phydev, u32 max_speed)
+static void __set_phy_supported(struct phy_device *phydev, u32 max_speed)
 {
-	return __set_linkmode_max_speed(max_speed, phydev->supported);
+	__set_linkmode_max_speed(max_speed, phydev->supported);
 }
 
 /**
@@ -272,17 +272,11 @@ static int __set_phy_supported(struct phy_device *phydev, u32 max_speed)
  * is connected to a 1G PHY. This function allows the MAC to indicate its
  * maximum speed, and so limit what the PHY will advertise.
  */
-int phy_set_max_speed(struct phy_device *phydev, u32 max_speed)
+void phy_set_max_speed(struct phy_device *phydev, u32 max_speed)
 {
-	int err;
-
-	err = __set_phy_supported(phydev, max_speed);
-	if (err)
-		return err;
+	__set_phy_supported(phydev, max_speed);
 
 	phy_advertise_supported(phydev);
-
-	return 0;
 }
 EXPORT_SYMBOL(phy_set_max_speed);
 
@@ -439,7 +433,9 @@ int phy_speed_down_core(struct phy_device *phydev)
 	if (min_common_speed == SPEED_UNKNOWN)
 		return -EINVAL;
 
-	return __set_linkmode_max_speed(min_common_speed, phydev->advertising);
+	__set_linkmode_max_speed(min_common_speed, phydev->advertising);
+
+	return 0;
 }
 
 static void mmd_phy_indirect(struct mii_bus *bus, int phy_addr, int devad,

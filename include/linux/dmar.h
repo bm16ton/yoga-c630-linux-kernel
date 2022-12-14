@@ -18,11 +18,7 @@
 
 struct acpi_dmar_header;
 
-#ifdef	CONFIG_X86
-# define	DMAR_UNITS_SUPPORTED	MAX_IO_APICS
-#else
-# define	DMAR_UNITS_SUPPORTED	64
-#endif
+#define DMAR_UNITS_SUPPORTED	1024
 
 /* DMAR Flags */
 #define DMAR_INTR_REMAP		0x1
@@ -69,6 +65,7 @@ struct dmar_pci_notify_info {
 
 extern struct rw_semaphore dmar_global_lock;
 extern struct list_head dmar_drhd_units;
+extern int intel_iommu_enabled;
 
 #define for_each_drhd_unit(drhd)					\
 	list_for_each_entry_rcu(drhd, &dmar_drhd_units, list,		\
@@ -92,7 +89,8 @@ extern struct list_head dmar_drhd_units;
 static inline bool dmar_rcu_check(void)
 {
 	return rwsem_is_locked(&dmar_global_lock) ||
-	       system_state == SYSTEM_BOOTING;
+	       system_state == SYSTEM_BOOTING ||
+	       (IS_ENABLED(CONFIG_INTEL_IOMMU) && !intel_iommu_enabled);
 }
 
 #define	dmar_rcu_dereference(p)	rcu_dereference_check((p), dmar_rcu_check())
@@ -121,7 +119,7 @@ extern int dmar_remove_dev_scope(struct dmar_pci_notify_info *info,
 				 u16 segment, struct dmar_dev_scope *devices,
 				 int count);
 /* Intel IOMMU detection */
-extern int detect_intel_iommu(void);
+void detect_intel_iommu(void);
 extern int enable_drhd_fault_handling(void);
 extern int dmar_device_add(acpi_handle handle);
 extern int dmar_device_remove(acpi_handle handle);
@@ -130,6 +128,14 @@ static inline int dmar_res_noop(struct acpi_dmar_header *hdr, void *arg)
 {
 	return 0;
 }
+
+#ifdef CONFIG_DMAR_DEBUG
+void dmar_fault_dump_ptes(struct intel_iommu *iommu, u16 source_id,
+			  unsigned long long addr, u32 pasid);
+#else
+static inline void dmar_fault_dump_ptes(struct intel_iommu *iommu, u16 source_id,
+					unsigned long long addr, u32 pasid) {}
+#endif
 
 #ifdef CONFIG_INTEL_IOMMU
 extern int iommu_detected, no_iommu;
@@ -187,6 +193,10 @@ static inline int dmar_device_remove(void *handle)
 static inline bool dmar_platform_optin(void)
 {
 	return false;
+}
+
+static inline void detect_intel_iommu(void)
+{
 }
 
 #endif /* CONFIG_DMAR_TABLE */

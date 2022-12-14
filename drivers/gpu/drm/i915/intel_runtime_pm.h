@@ -8,8 +8,6 @@
 
 #include <linux/types.h>
 
-#include "display/intel_display.h"
-
 #include "intel_wakeref.h"
 
 #include "i915_utils.h"
@@ -49,10 +47,11 @@ enum i915_drm_suspend_mode {
  */
 struct intel_runtime_pm {
 	atomic_t wakeref_count;
-	struct device *kdev; /* points to i915->drm.pdev->dev */
+	struct device *kdev; /* points to i915->drm.dev */
 	bool available;
 	bool suspended;
 	bool irqs_enabled;
+	bool no_wakeref_tracking;
 
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
 	/*

@@ -14,9 +14,9 @@
 #include <linux/irq.h>
 #include <linux/types.h>
 #include <linux/slab.h>
+#include <linux/of_irq.h>
 
 #include <asm/io.h>
-#include <asm/prom.h>
 #include <asm/cpm2.h>
 
 #include "pq2.h"
@@ -91,10 +91,8 @@ static void pq2ads_pci_irq_demux(struct irq_desc *desc)
 			break;
 
 		for (bit = 0; pend != 0; ++bit, pend <<= 1) {
-			if (pend & 0x80000000) {
-				int virq = irq_linear_revmap(priv->host, bit);
-				generic_handle_irq(virq);
-			}
+			if (pend & 0x80000000)
+				generic_handle_domain_irq(priv->host, bit);
 		}
 	}
 }

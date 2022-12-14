@@ -379,8 +379,6 @@ struct jme_ring {
 #define DECLARE_NET_DEVICE_STATS
 
 #define DECLARE_NAPI_STRUCT struct napi_struct napi;
-#define NETIF_NAPI_SET(dev, napis, pollfn, q) \
-	netif_napi_add(dev, napis, pollfn, q);
 #define JME_NAPI_HOLDER(holder) struct napi_struct *holder
 #define JME_NAPI_WEIGHT(w) int w
 #define JME_NAPI_WEIGHT_VAL(w) w
@@ -411,7 +409,7 @@ struct jme_adapter {
 	struct tasklet_struct	rxempty_task;
 	struct tasklet_struct	rxclean_task;
 	struct tasklet_struct	txclean_task;
-	struct tasklet_struct	linkch_task;
+	struct work_struct	linkch_task;
 	struct tasklet_struct	pcc_task;
 	unsigned long		flags;
 	u32			reg_txcs;

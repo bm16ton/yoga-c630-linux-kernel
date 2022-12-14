@@ -226,7 +226,7 @@ const struct regmap_config bmc150_magn_regmap_config = {
 	.writeable_reg = bmc150_magn_is_writeable_reg,
 	.volatile_reg = bmc150_magn_is_volatile_reg,
 };
-EXPORT_SYMBOL(bmc150_magn_regmap_config);
+EXPORT_SYMBOL_NS(bmc150_magn_regmap_config, IIO_BMC150_MAGN);
 
 static int bmc150_magn_set_power_mode(struct bmc150_magn_data *data,
 				      enum bmc150_magn_power_modes mode,
@@ -890,8 +890,7 @@ int bmc150_magn_probe(struct device *dev, struct regmap *regmap,
 	if (ret)
 		return dev_err_probe(dev, ret, "failed to get regulators\n");
 
-	ret = iio_read_mount_matrix(dev, "mount-matrix",
-				&data->orientation);
+	ret = iio_read_mount_matrix(dev, &data->orientation);
 	if (ret)
 		return ret;
 
@@ -915,14 +914,13 @@ int bmc150_magn_probe(struct device *dev, struct regmap *regmap,
 		data->dready_trig = devm_iio_trigger_alloc(dev,
 							   "%s-dev%d",
 							   indio_dev->name,
-							   indio_dev->id);
+							   iio_device_id(indio_dev));
 		if (!data->dready_trig) {
 			ret = -ENOMEM;
 			dev_err(dev, "iio trigger alloc failed\n");
 			goto err_poweroff;
 		}
 
-		data->dready_trig->dev.parent = dev;
 		data->dready_trig->ops = &bmc150_magn_trigger_ops;
 		iio_trigger_set_drvdata(data->dready_trig, indio_dev);
 		ret = iio_trigger_register(data->dready_trig);
@@ -964,13 +962,14 @@ int bmc150_magn_probe(struct device *dev, struct regmap *regmap,
 	ret = iio_device_register(indio_dev);
 	if (ret < 0) {
 		dev_err(dev, "unable to register iio device\n");
-		goto err_disable_runtime_pm;
+		goto err_pm_cleanup;
 	}
 
 	dev_dbg(dev, "Registered device %s\n", name);
 	return 0;
 
-err_disable_runtime_pm:
+err_pm_cleanup:
+	pm_runtime_dont_use_autosuspend(dev);
 	pm_runtime_disable(dev);
 err_buffer_cleanup:
 	iio_triggered_buffer_cleanup(indio_dev);
@@ -984,9 +983,9 @@ err_poweroff:
 	bmc150_magn_set_power_mode(data, BMC150_MAGN_POWER_MODE_SUSPEND, true);
 	return ret;
 }
-EXPORT_SYMBOL(bmc150_magn_probe);
+EXPORT_SYMBOL_NS(bmc150_magn_probe, IIO_BMC150_MAGN);
 
-int bmc150_magn_remove(struct device *dev)
+void bmc150_magn_remove(struct device *dev)
 {
 	struct iio_dev *indio_dev = dev_get_drvdata(dev);
 	struct bmc150_magn_data *data = iio_priv(indio_dev);
@@ -1009,9 +1008,8 @@ int bmc150_magn_remove(struct device *dev)
 	mutex_unlock(&data->mutex);
 
 	regulator_bulk_disable(ARRAY_SIZE(data->regulators), data->regulators);
-	return 0;
 }
-EXPORT_SYMBOL(bmc150_magn_remove);
+EXPORT_SYMBOL_NS(bmc150_magn_remove, IIO_BMC150_MAGN);
 
 #ifdef CONFIG_PM
 static int bmc150_magn_runtime_suspend(struct device *dev)
@@ -1079,7 +1077,7 @@ const struct dev_pm_ops bmc150_magn_pm_ops = {
 	SET_RUNTIME_PM_OPS(bmc150_magn_runtime_suspend,
 			   bmc150_magn_runtime_resume, NULL)
 };
-EXPORT_SYMBOL(bmc150_magn_pm_ops);
+EXPORT_SYMBOL_NS(bmc150_magn_pm_ops, IIO_BMC150_MAGN);
 
 MODULE_AUTHOR("Irina Tirdea <irina.tirdea@intel.com>");
 MODULE_LICENSE("GPL v2");

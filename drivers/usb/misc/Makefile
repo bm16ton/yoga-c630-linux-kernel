@@ -19,6 +19,7 @@ obj-$(CONFIG_USB_LCD)			+= usblcd.o
 obj-$(CONFIG_USB_LD)			+= ldusb.o
 obj-$(CONFIG_USB_GOTEMP)        += gotemp.o
 obj-$(CONFIG_USB_LEGOTOWER)		+= legousbtower.o
+obj-$(CONFIG_USB_QCOM_EUD)		+= qcom_eud.o
 obj-$(CONFIG_USB_TEST)			+= usbtest.o
 obj-$(CONFIG_USB_EHSET_TEST_FIXTURE)    += ehset.o
 obj-$(CONFIG_USB_TRANCEVIBRATOR)	+= trancevibrator.o
@@ -34,5 +35,4 @@ obj-$(CONFIG_USB_SISUSBVGA)		+= sisusbvga/
 obj-$(CONFIG_USB_LINK_LAYER_TEST)	+= lvstest.o
 obj-$(CONFIG_USB_FT232H_INTF)		+= ft232h-intf.o
 obj-$(CONFIG_BRCM_USB_PINMAP)		+= brcmstb-usb-pinmap.o
-
-obj-$(CONFIG_UBQ_CORE)		+= ubq_core/
+obj-$(CONFIG_USB_ONBOARD_HUB)		+= onboard_usb_hub.o

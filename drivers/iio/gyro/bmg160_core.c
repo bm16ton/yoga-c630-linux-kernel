@@ -766,7 +766,7 @@ static int bmg160_write_event_config(struct iio_dev *indio_dev,
 		return 0;
 	}
 	/*
-	 * We will expect the enable and disable to do operation in
+	 * We will expect the enable and disable to do operation
 	 * in reverse order. This will happen here anyway as our
 	 * resume operation uses sync mode runtime pm calls, the
 	 * suspend operation will be delayed by autosuspend delay
@@ -1106,8 +1106,7 @@ int bmg160_core_probe(struct device *dev, struct regmap *regmap, int irq,
 	if (ret)
 		return ret;
 
-	ret = iio_read_mount_matrix(dev, "mount-matrix",
-				&data->orientation);
+	ret = iio_read_mount_matrix(dev, &data->orientation);
 	if (ret)
 		return ret;
 
@@ -1141,25 +1140,23 @@ int bmg160_core_probe(struct device *dev, struct regmap *regmap, int irq,
 		data->dready_trig = devm_iio_trigger_alloc(dev,
 							   "%s-dev%d",
 							   indio_dev->name,
-							   indio_dev->id);
+							   iio_device_id(indio_dev));
 		if (!data->dready_trig)
 			return -ENOMEM;
 
 		data->motion_trig = devm_iio_trigger_alloc(dev,
 							  "%s-any-motion-dev%d",
 							  indio_dev->name,
-							  indio_dev->id);
+							  iio_device_id(indio_dev));
 		if (!data->motion_trig)
 			return -ENOMEM;
 
-		data->dready_trig->dev.parent = dev;
 		data->dready_trig->ops = &bmg160_trigger_ops;
 		iio_trigger_set_drvdata(data->dready_trig, indio_dev);
 		ret = iio_trigger_register(data->dready_trig);
 		if (ret)
 			return ret;
 
-		data->motion_trig->dev.parent = dev;
 		data->motion_trig->ops = &bmg160_trigger_ops;
 		iio_trigger_set_drvdata(data->motion_trig, indio_dev);
 		ret = iio_trigger_register(data->motion_trig);
@@ -1191,11 +1188,14 @@ int bmg160_core_probe(struct device *dev, struct regmap *regmap, int irq,
 	ret = iio_device_register(indio_dev);
 	if (ret < 0) {
 		dev_err(dev, "unable to register iio device\n");
-		goto err_buffer_cleanup;
+		goto err_pm_cleanup;
 	}
 
 	return 0;
 
+err_pm_cleanup:
+	pm_runtime_dont_use_autosuspend(dev);
+	pm_runtime_disable(dev);
 err_buffer_cleanup:
 	iio_triggered_buffer_cleanup(indio_dev);
 err_trigger_unregister:

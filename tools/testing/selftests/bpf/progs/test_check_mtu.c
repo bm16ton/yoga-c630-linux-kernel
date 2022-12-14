@@ -11,8 +11,8 @@
 char _license[] SEC("license") = "GPL";
 
 /* Userspace will update with MTU it can see on device */
-static volatile const int GLOBAL_USER_MTU;
-static volatile const __u32 GLOBAL_USER_IFINDEX;
+volatile const int GLOBAL_USER_MTU;
+volatile const __u32 GLOBAL_USER_IFINDEX;
 
 /* BPF-prog will update these with MTU values it can see */
 __u32 global_bpf_mtu_xdp = 0;
@@ -153,7 +153,7 @@ int xdp_input_len_exceed(struct xdp_md *ctx)
 	return retval;
 }
 
-SEC("classifier")
+SEC("tc")
 int tc_use_helper(struct __sk_buff *ctx)
 {
 	int retval = BPF_OK; /* Expected retval on successful test */
@@ -172,7 +172,7 @@ out:
 	return retval;
 }
 
-SEC("classifier")
+SEC("tc")
 int tc_exceed_mtu(struct __sk_buff *ctx)
 {
 	__u32 ifindex = GLOBAL_USER_IFINDEX;
@@ -196,7 +196,7 @@ int tc_exceed_mtu(struct __sk_buff *ctx)
 	return retval;
 }
 
-SEC("classifier")
+SEC("tc")
 int tc_exceed_mtu_da(struct __sk_buff *ctx)
 {
 	/* SKB Direct-Access variant */
@@ -223,7 +223,7 @@ int tc_exceed_mtu_da(struct __sk_buff *ctx)
 	return retval;
 }
 
-SEC("classifier")
+SEC("tc")
 int tc_minus_delta(struct __sk_buff *ctx)
 {
 	int retval = BPF_OK; /* Expected retval on successful test */
@@ -245,7 +245,7 @@ int tc_minus_delta(struct __sk_buff *ctx)
 	return retval;
 }
 
-SEC("classifier")
+SEC("tc")
 int tc_input_len(struct __sk_buff *ctx)
 {
 	int retval = BPF_OK; /* Expected retval on successful test */
@@ -265,7 +265,7 @@ int tc_input_len(struct __sk_buff *ctx)
 	return retval;
 }
 
-SEC("classifier")
+SEC("tc")
 int tc_input_len_exceed(struct __sk_buff *ctx)
 {
 	int retval = BPF_DROP; /* Fail */

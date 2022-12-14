@@ -76,14 +76,9 @@ static int fsl_ehci_drv_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	res = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
-	if (!res) {
-		dev_err(&pdev->dev,
-			"Found HC with no IRQ. Check %s setup!\n",
-			dev_name(&pdev->dev));
-		return -ENODEV;
-	}
-	irq = res->start;
+	irq = platform_get_irq(pdev, 0);
+	if (irq < 0)
+		return irq;
 
 	hcd = __usb_create_hcd(&fsl_ehci_hc_driver, pdev->dev.parent,
 			       &pdev->dev, dev_name(&pdev->dev), NULL);
@@ -387,11 +382,11 @@ static int ehci_fsl_setup(struct usb_hcd *hcd)
 	/* EHCI registers start at offset 0x100 */
 	ehci->caps = hcd->regs + 0x100;
 
-#ifdef CONFIG_PPC_83xx
+#if defined(CONFIG_PPC_83xx) || defined(CONFIG_PPC_85xx)
 	/*
-	 * Deal with MPC834X that need port power to be cycled after the power
-	 * fault condition is removed. Otherwise the state machine does not
-	 * reflect PORTSC[CSC] correctly.
+	 * Deal with MPC834X/85XX that need port power to be cycled
+	 * after the power fault condition is removed. Otherwise the
+	 * state machine does not reflect PORTSC[CSC] correctly.
 	 */
 	ehci->need_oc_pp_cycle = 1;
 #endif

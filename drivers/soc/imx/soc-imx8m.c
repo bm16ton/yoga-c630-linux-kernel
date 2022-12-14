@@ -5,14 +5,13 @@
 
 #include <linux/init.h>
 #include <linux/io.h>
-#include <linux/module.h>
-#include <linux/nvmem-consumer.h>
 #include <linux/of_address.h>
 #include <linux/slab.h>
 #include <linux/sys_soc.h>
 #include <linux/platform_device.h>
 #include <linux/arm-smccc.h>
 #include <linux/of.h>
+#include <linux/clk.h>
 
 #define REV_B1				0x21
 
@@ -31,7 +30,7 @@
 
 struct imx8_soc_data {
 	char *name;
-	u32 (*soc_revision)(struct device *dev);
+	u32 (*soc_revision)(void);
 };
 
 static u64 soc_uid;
@@ -52,12 +51,13 @@ static u32 imx8mq_soc_revision_from_atf(void)
 static inline u32 imx8mq_soc_revision_from_atf(void) { return 0; };
 #endif
 
-static u32 __init imx8mq_soc_revision(struct device *dev)
+static u32 __init imx8mq_soc_revision(void)
 {
 	struct device_node *np;
 	void __iomem *ocotp_base;
 	u32 magic;
 	u32 rev;
+	struct clk *clk;
 
 	np = of_find_compatible_node(NULL, NULL, "fsl,imx8mq-ocotp");
 	if (!np)
@@ -65,6 +65,13 @@ static u32 __init imx8mq_soc_revision(struct device *dev)
 
 	ocotp_base = of_iomap(np, 0);
 	WARN_ON(!ocotp_base);
+	clk = of_clk_get_by_name(np, NULL);
+	if (!clk) {
+		WARN_ON(!clk);
+		return 0;
+	}
+
+	clk_prepare_enable(clk);
 
 	/*
 	 * SOC revision on older imx8mq is not available in fuses so query
@@ -77,21 +84,12 @@ static u32 __init imx8mq_soc_revision(struct device *dev)
 			rev = REV_B1;
 	}
 
-	if (dev) {
-		int ret;
+	soc_uid = readl_relaxed(ocotp_base + OCOTP_UID_HIGH);
+	soc_uid <<= 32;
+	soc_uid |= readl_relaxed(ocotp_base + OCOTP_UID_LOW);
 
-		ret = nvmem_cell_read_u64(dev, "soc_unique_id", &soc_uid);
-		if (ret) {
-			iounmap(ocotp_base);
-			of_node_put(np);
-			return ret;
-		}
-	} else {
-		soc_uid = readl_relaxed(ocotp_base + OCOTP_UID_HIGH);
-		soc_uid <<= 32;
-		soc_uid |= readl_relaxed(ocotp_base + OCOTP_UID_LOW);
-	}
-
+	clk_disable_unprepare(clk);
+	clk_put(clk);
 	iounmap(ocotp_base);
 	of_node_put(np);
 
@@ -120,7 +118,7 @@ static void __init imx8mm_soc_uid(void)
 	of_node_put(np);
 }
 
-static u32 __init imx8mm_soc_revision(struct device *dev)
+static u32 __init imx8mm_soc_revision(void)
 {
 	struct device_node *np;
 	void __iomem *anatop_base;
@@ -138,15 +136,7 @@ static u32 __init imx8mm_soc_revision(struct device *dev)
 	iounmap(anatop_base);
 	of_node_put(np);
 
-	if (dev) {
-		int ret;
-
-		ret = nvmem_cell_read_u64(dev, "soc_unique_id", &soc_uid);
-		if (ret)
-			return ret;
-	} else {
-		imx8mm_soc_uid();
-	}
+	imx8mm_soc_uid();
 
 	return rev;
 }
@@ -171,19 +161,11 @@ static const struct imx8_soc_data imx8mp_soc_data = {
 	.soc_revision = imx8mm_soc_revision,
 };
 
-static __maybe_unused const struct of_device_id imx8_machine_match[] = {
+static __maybe_unused const struct of_device_id imx8_soc_match[] = {
 	{ .compatible = "fsl,imx8mq", .data = &imx8mq_soc_data, },
 	{ .compatible = "fsl,imx8mm", .data = &imx8mm_soc_data, },
 	{ .compatible = "fsl,imx8mn", .data = &imx8mn_soc_data, },
 	{ .compatible = "fsl,imx8mp", .data = &imx8mp_soc_data, },
-	{ }
-};
-
-static __maybe_unused const struct of_device_id imx8_soc_match[] = {
-	{ .compatible = "fsl,imx8mq-soc", .data = &imx8mq_soc_data, },
-	{ .compatible = "fsl,imx8mm-soc", .data = &imx8mm_soc_data, },
-	{ .compatible = "fsl,imx8mn-soc", .data = &imx8mn_soc_data, },
-	{ .compatible = "fsl,imx8mp-soc", .data = &imx8mp_soc_data, },
 	{ }
 };
 
@@ -192,7 +174,7 @@ static __maybe_unused const struct of_device_id imx8_soc_match[] = {
 	kasprintf(GFP_KERNEL, "%d.%d", (soc_rev >> 4) & 0xf,  soc_rev & 0xf) : \
 	"unknown"
 
-static int imx8_soc_info(struct platform_device *pdev)
+static int __init imx8_soc_init(void)
 {
 	struct soc_device_attribute *soc_dev_attr;
 	struct soc_device *soc_dev;
@@ -211,10 +193,7 @@ static int imx8_soc_info(struct platform_device *pdev)
 	if (ret)
 		goto free_soc;
 
-	if (pdev)
-		id = of_match_node(imx8_soc_match, pdev->dev.of_node);
-	else
-		id = of_match_node(imx8_machine_match, of_root);
+	id = of_match_node(imx8_soc_match, of_root);
 	if (!id) {
 		ret = -ENODEV;
 		goto free_soc;
@@ -223,16 +202,8 @@ static int imx8_soc_info(struct platform_device *pdev)
 	data = id->data;
 	if (data) {
 		soc_dev_attr->soc_id = data->name;
-		if (data->soc_revision) {
-			if (pdev) {
-				soc_rev = data->soc_revision(&pdev->dev);
-				ret = soc_rev;
-				if (ret < 0)
-					goto free_soc;
-			} else {
-				soc_rev = data->soc_revision(NULL);
-			}
-		}
+		if (data->soc_revision)
+			soc_rev = data->soc_revision();
 	}
 
 	soc_dev_attr->revision = imx8_revision(soc_rev);
@@ -270,24 +241,4 @@ free_soc:
 	kfree(soc_dev_attr);
 	return ret;
 }
-
-/* Retain device_initcall is for backward compatibility with DTS. */
-static int __init imx8_soc_init(void)
-{
-	if (of_find_matching_node_and_match(NULL, imx8_soc_match, NULL))
-		return 0;
-
-	return imx8_soc_info(NULL);
-}
 device_initcall(imx8_soc_init);
-
-static struct platform_driver imx8_soc_info_driver = {
-	.probe = imx8_soc_info,
-	.driver = {
-		.name = "imx8_soc_info",
-		.of_match_table = imx8_soc_match,
-	},
-};
-
-module_platform_driver(imx8_soc_info_driver);
-MODULE_LICENSE("GPL v2");

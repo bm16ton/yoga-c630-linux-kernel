@@ -120,6 +120,7 @@
 #include <linux/usb.h>
 #include <linux/usb/ft232h-intf.h>
 //16ton
+#include <linux/version.h>
 #include <linux/property.h>
 #include <linux/interrupt.h>
 #include <linux/irq.h>
@@ -260,6 +261,7 @@ static uint poll_period = POLL_PERIOD_MS;       // module parameter poll period
 
 unsigned int GPIO_irqNumber;
 
+/*
 static ssize_t eeprom_show(struct kobject *kobj,
 				  struct kobj_attribute *attr, char *buf)
 {
@@ -303,7 +305,7 @@ static void remove_sysfs_attrs(struct usb_interface *intf)
 //			device_remove_file(&intf->dev, &dev_attr_eeprom);
             sysfs_remove_file(kobj_ref,&eeprom.attr);
 }
-
+*/
 /* Use baudrate calculation borrowed from libftdi */
 static int ftdi_to_clkbits(int baudrate, unsigned int clk, int clk_div,
 			   unsigned long *encoded_divisor)
@@ -1295,7 +1297,7 @@ loop:
 		    return;
         }
 
-	usleep_range(priv->irq_poll_interval, priv->irq_poll_interval + 20);
+	usleep_range(priv->irq_poll_interval, priv->irq_poll_interval + 30);
 
     if (irqon == 1) {
 	    goto loop;
@@ -1306,8 +1308,18 @@ loop:
 
 }
 
-const char *gpio_names[] = { "CS", "ce", "reset", "irq", "GPIOL3" };
-const char *gpio_names2[] = { "CS", "ce", "reset", "irq", "GPIOL3", "GPIOH0", "GPIOH1", "GPIOH2", "GPIOH3", "GPIOH4", "GPIOH5", "GPIOH6", "GPIOH7" };
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,18,0)
+static const struct irq_chip usb_gpio_irqchip = {
+	.name = "usbgpio-irq",
+	.irq_enable =  usb_gpio_irq_enable,
+	.irq_disable = usb_gpio_irq_disable,
+	.irq_set_type = usbirq_irq_set_type,
+	.flags = IRQCHIP_IMMUTABLE, GPIOCHIP_IRQ_RESOURCE_HELPERS,
+};
+#endif
+
+const char *gpio_names[] = { "CS", "ce", "csn", "irq", "GPIOL3" };
+const char *gpio_names2[] = { "CS", "ce", "csn", "irq", "GPIOL3", "GPIOH0", "GPIOH1", "GPIOH2", "GPIOH3", "GPIOH4", "GPIOH5", "GPIOH6", "GPIOH7" };
 
 static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 {
@@ -1342,14 +1354,18 @@ static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
 	priv->mpsse_gpio.get = ftdi_mpsse_gpio_get;
 	priv->mpsse_gpio.direction_input = ftdi_mpsse_gpio_direction_input;
  	priv->mpsse_gpio.direction_output = ftdi_mpsse_gpio_direction_output;
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,18,0)
+    ;
+    #else
 	if (irqpoll) {
 	    priv->mpsse_gpio.to_irq = ftdi_mpsse_gpio_to_irq;
     	priv->irq.name = "usbgpio-irq";
     	priv->irq.irq_set_type = usbirq_irq_set_type;
         priv->irq.irq_enable = usb_gpio_irq_enable;
         priv->irq.irq_disable = usb_gpio_irq_disable;
+        .flags = IRQCHIP_IMMUTABLE, GPIOCHIP_IRQ_RESOURCE_HELPERS,
 	}
-	
+	#endif
 	names = devm_kcalloc(dev, priv->mpsse_gpio.ngpio, sizeof(char *),
 			     GFP_KERNEL);
 	if (!names)
@@ -1365,6 +1381,9 @@ static int ft232h_intf_add_mpsse_gpio(struct ft232h_intf_priv *priv)
     if (irqpoll) {
     	girq = &priv->mpsse_gpio.irq;
     	girq->chip = &priv->irq;
+    	#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,18,0)
+    	gpio_irq_chip_set_chip(girq, &usb_gpio_irqchip);
+    	#endif
        	girq->parent_handler = NULL;
     	girq->num_parents = 0;
     	girq->parents = NULL;
@@ -1462,6 +1481,7 @@ static void usb_gpio_irq_disable(struct irq_data *irqd)
 	if (irqon == 1) {            
 		irqon = 0;
 		cancel_work_sync(&priv->irq_work);
+		usleep_range(5100, 5200);
 	}
     
     priv->irq_enabled[3] = false;
@@ -1616,11 +1636,10 @@ static int ft232h_intf_fpp_remove(struct usb_interface *intf)
  */
 #define SPI_INTF_DEVNAME	"spi-ftdi-mpsse"
 
-
+// csn is actually on CS0 but ce is correct on 1 IE AD4 and IRQ on AD6
 static struct dev_io_desc_data ftdi_spi_bus_dev_io[] = {
-	{ "ce", 1, GPIO_ACTIVE_HIGH },
-	{ "csn", 2, GPIO_ACTIVE_LOW },
-	{ "irq", 3, GPIO_ACTIVE_LOW },
+//       { "rst", 1, GPIO_ACTIVE_HIGH },
+//       { "csn", 2, GPIO_ACTIVE_LOW },
 };
 
 static const struct mpsse_spi_dev_data ftdi_spi_dev_data[] = {
@@ -1661,40 +1680,74 @@ static const struct property_entry ili9341_properties[] = {
 	{}
 };
 
+static const struct property_entry w25q32_properties[] = {
+    PROPERTY_ENTRY_STRING("partitions", "poop"),
+    PROPERTY_ENTRY_STRING(".label", "poop"),
+    PROPERTY_ENTRY_STRING(".name", "poop"),
+	{}
+};
+
+static const struct property_entry sx1276_properties[] = {
+    PROPERTY_ENTRY_U32("clock-frequency", 40000000),
+    PROPERTY_ENTRY_U32("center-carrier-frq", 915000000),
+//    PROPERTY_ENTRY_U32("minimal-RF-channel", 11),
+//    PROPERTY_ENTRY_U32("maximum-RF-channel", 11),
+	{}
+};
+
+static const struct software_node nrf24_node = {
+	.properties = nrf24_properties,
+};
+
 static const struct software_node mcp2515_node = {
 	.properties = mcp2515_properties,
+};
+
+static const struct software_node w25q32_node = {
+	.properties = w25q32_properties,
+};
+
+static const struct software_node sx1276_node = {
+	.properties = sx1276_properties,
 };
 
 static struct spi_board_info ftdi_spi_bus_info[] = {
     {
 //    .modalias	= "yx240qv29",
 //	.modalias	= "ili9341",
+    .modalias	= "w25q32",
+//     .modalias	= "sx1278",
+//    .modalias	= "spi-nor",
 //	.modalias	= "mcp2515",
 //    .modalias	= "spi-petra",
-    .modalias	= "nrf24",
+//    .modalias	= "nrf24",
 //	.modalias	= "ili9341",
     .mode		= SPI_MODE_0,
 //    .mode		= SPI_MODE_0 | SPI_LSB_FIRST | SPI_CS_HIGH,
-    .max_speed_hz	= 4000000,
-//    .max_speed_hz	= 30000000,
+//    .max_speed_hz	= 4000000,
+    .max_speed_hz	= 8000000,
     .bus_num	= 0,
     .chip_select	= 0,
     .platform_data	= ftdi_spi_dev_data,
-// 	.properties	= nrf24_properties,    //changed from properties to swnode i dunno aroun kernel 5.15ish
+// 	.swnode	= &nrf24_node,    //changed from properties to swnode i dunno aroun kernel 5.15ish
 //    .properties	= mcp2515_properties,
 //	.swnode  =  &mcp2515_node,
+//    .swnode = &sx1276_node,
+    .swnode = &w25q32_node,
 //	.irq     = 0,
     },
-//   {
-//    .modalias	= "spi-petra",    //use instead of spidev for spidev no-longer enumerates
+/*
+   {
+    .modalias	= "spi-petra",    //use instead of spidev for spidev no-longer enumerates
 //    .modalias	= "w25q32",
 //	  .modalias	= "spidev",
-//    .mode		= SPI_MODE_0,
+    .mode		= SPI_MODE_0,
 //    .mode		= SPI_MODE_0 | SPI_LSB_FIRST | SPI_CS_HIGH,
-//    .max_speed_hz	= 30000000,
-//    .bus_num	= 0,
-//    .chip_select	= 4, // GPIOH0 at ACBUS0
-//    },
+    .max_speed_hz	= 30000000,
+    .bus_num	= 0,
+    .chip_select	= 5, // GPIOH0 at ACBUS0
+    },
+*/
 };
 
 static const struct mpsse_spi_platform_data ftdi_spi_bus_plat_data = {
@@ -1747,6 +1800,8 @@ static struct platform_device *mpsse_dev_register(struct ft232h_intf_priv *priv,
 	if (ret < 0)
 		goto err;
 		
+		if (irqpoll) {
+		
         pd->spi_info[0].irq = GPIO_irqNumber;
           
         priv->ce_gpio = gpiochip_request_own_desc(&priv->mpsse_gpio, 
@@ -1760,7 +1815,8 @@ static struct platform_device *mpsse_dev_register(struct ft232h_intf_priv *priv,
         gpiochip_free_own_desc(priv->ce_gpio);
     
 //	irq_set_irq_type(GPIO_irqNumber, IRQ_TYPE_EDGE_FALLING);
-	irq_set_irq_type(GPIO_irqNumber, irqt);    
+	irq_set_irq_type(GPIO_irqNumber, irqt);   
+	} 
 	pdev = platform_device_alloc(SPI_INTF_DEVNAME, 0);
 	if (!pdev)
 		return NULL;
@@ -1768,8 +1824,9 @@ static struct platform_device *mpsse_dev_register(struct ft232h_intf_priv *priv,
 	pdev->dev.parent = parent;
 	pdev->dev.fwnode = NULL;
 	
+	if (irqpoll) {
 	printk(KERN_INFO "spi-info irq struct = %d\n", pd->spi_info[0].irq);
-
+    }
 	priv->spi_pdev = pdev;
     
 	tbl_size = pd->spi_info_len + 1;
@@ -2034,7 +2091,7 @@ static int ft232h_intf_probe(struct usb_interface *intf,
     return -ENODEV; 
     }	
 
-	create_sysfs_attrs(intf);
+//	create_sysfs_attrs(intf);
 
 	iface_desc = intf->cur_altsetting;
 
@@ -2107,10 +2164,10 @@ static void ft232h_intf_disconnect(struct usb_interface *intf)
 		cancel_work_sync(&priv->irq_work);
 	}
     
-    usleep_range(5000, 5200);
+    usleep_range(7000, 7200);
     
-    kobject_put(kobj_ref);
-	sysfs_remove_file(kernel_kobj, &eeprom.attr);
+//    kobject_put(kobj_ref);
+//	sysfs_remove_file(kernel_kobj, &eeprom.attr);
     
     
 	info = (struct ft232h_intf_info *)priv->usb_dev_id->driver_info;

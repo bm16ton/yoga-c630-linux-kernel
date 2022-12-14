@@ -117,7 +117,7 @@ static bool is_blacklisted_cpu(void)
 		 * storing blocks in 64bit registers to allow three blocks to
 		 * be processed parallel. Parallel operation then allows gaining
 		 * more performance than was trade off, on out-of-order CPUs.
-		 * However Atom does not benefit from this parallellism and
+		 * However Atom does not benefit from this parallelism and
 		 * should be blacklisted.
 		 */
 		return true;
@@ -140,7 +140,7 @@ static int force;
 module_param(force, int, 0);
 MODULE_PARM_DESC(force, "Force module load, ignore CPU blacklist");
 
-static int __init init(void)
+static int __init twofish_3way_init(void)
 {
 	if (!force && is_blacklisted_cpu()) {
 		printk(KERN_INFO
@@ -154,13 +154,13 @@ static int __init init(void)
 					 ARRAY_SIZE(tf_skciphers));
 }
 
-static void __exit fini(void)
+static void __exit twofish_3way_fini(void)
 {
 	crypto_unregister_skciphers(tf_skciphers, ARRAY_SIZE(tf_skciphers));
 }
 
-module_init(init);
-module_exit(fini);
+module_init(twofish_3way_init);
+module_exit(twofish_3way_fini);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Twofish Cipher Algorithm, 3-way parallel asm optimized");

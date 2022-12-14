@@ -41,6 +41,7 @@ static const struct qeth_stats txq_stats[] = {
 	QETH_TXQ_STAT("Queue stopped", stopped),
 	QETH_TXQ_STAT("Doorbell", doorbell),
 	QETH_TXQ_STAT("IRQ for frames", coal_frames),
+	QETH_TXQ_STAT("Completion IRQ", completion_irq),
 	QETH_TXQ_STAT("Completion yield", completion_yield),
 	QETH_TXQ_STAT("Completion timer", completion_timer),
 };
@@ -79,10 +80,8 @@ static void qeth_add_stat_strings(u8 **data, const char *prefix,
 {
 	unsigned int i;
 
-	for (i = 0; i < size; i++) {
-		snprintf(*data, ETH_GSTRING_LEN, "%s%s", prefix, stats[i].name);
-		*data += ETH_GSTRING_LEN;
-	}
+	for (i = 0; i < size; i++)
+		ethtool_sprintf(data, "%s%s", prefix, stats[i].name);
 }
 
 static int qeth_get_sset_count(struct net_device *dev, int stringset)
@@ -124,7 +123,9 @@ static void __qeth_set_coalesce(struct net_device *dev,
 }
 
 static int qeth_set_coalesce(struct net_device *dev,
-			     struct ethtool_coalesce *coal)
+			     struct ethtool_coalesce *coal,
+			     struct kernel_ethtool_coalesce *kernel_coal,
+			     struct netlink_ext_ack *extack)
 {
 	struct qeth_card *card = dev->ml_priv;
 	struct qeth_qdio_out_q *queue;
@@ -143,7 +144,9 @@ static int qeth_set_coalesce(struct net_device *dev,
 }
 
 static void qeth_get_ringparam(struct net_device *dev,
-			       struct ethtool_ringparam *param)
+			       struct ethtool_ringparam *param,
+			       struct kernel_ethtool_ringparam *kernel_param,
+			       struct netlink_ext_ack *extack)
 {
 	struct qeth_card *card = dev->ml_priv;
 
@@ -425,8 +428,8 @@ static int qeth_get_link_ksettings(struct net_device *netdev,
 				   struct ethtool_link_ksettings *cmd)
 {
 	struct qeth_card *card = netdev->ml_priv;
-	struct qeth_link_info link_info;
 
+	QETH_CARD_TEXT(card, 4, "ethtglks");
 	cmd->base.speed = card->info.link_info.speed;
 	cmd->base.duplex = card->info.link_info.duplex;
 	cmd->base.port = card->info.link_info.port;
@@ -435,16 +438,6 @@ static int qeth_get_link_ksettings(struct net_device *netdev,
 	cmd->base.mdio_support = 0;
 	cmd->base.eth_tp_mdix = ETH_TP_MDI_INVALID;
 	cmd->base.eth_tp_mdix_ctrl = ETH_TP_MDI_INVALID;
-
-	/* Check if we can obtain more accurate information.	 */
-	if (!qeth_query_card_info(card, &link_info)) {
-		if (link_info.speed != SPEED_UNKNOWN)
-			cmd->base.speed = link_info.speed;
-		if (link_info.duplex != DUPLEX_UNKNOWN)
-			cmd->base.duplex = link_info.duplex;
-		if (link_info.port != PORT_OTHER)
-			cmd->base.port = link_info.port;
-	}
 
 	qeth_set_ethtool_link_modes(cmd, card->info.link_info.link_mode);
 
@@ -469,11 +462,4 @@ const struct ethtool_ops qeth_ethtool_ops = {
 	.get_per_queue_coalesce = qeth_get_per_queue_coalesce,
 	.set_per_queue_coalesce = qeth_set_per_queue_coalesce,
 	.get_link_ksettings = qeth_get_link_ksettings,
-};
-
-const struct ethtool_ops qeth_osn_ethtool_ops = {
-	.get_strings = qeth_get_strings,
-	.get_ethtool_stats = qeth_get_ethtool_stats,
-	.get_sset_count = qeth_get_sset_count,
-	.get_drvinfo = qeth_get_drvinfo,
 };

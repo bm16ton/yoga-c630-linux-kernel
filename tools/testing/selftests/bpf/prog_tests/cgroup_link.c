@@ -24,7 +24,7 @@ int ping_and_check(int exp_calls, int exp_alt_calls)
 	return 0;
 }
 
-void test_cgroup_link(void)
+void serial_test_cgroup_link(void)
 {
 	struct {
 		const char *path;
@@ -54,7 +54,7 @@ void test_cgroup_link(void)
 
 	for (i = 0; i < cg_nr; i++) {
 		cgs[i].fd = create_and_get_cgroup(cgs[i].path);
-		if (CHECK(cgs[i].fd < 0, "cg_create", "fail: %d\n", cgs[i].fd))
+		if (!ASSERT_GE(cgs[i].fd, 0, "cg_create"))
 			goto cleanup;
 	}
 
@@ -65,17 +65,15 @@ void test_cgroup_link(void)
 	for (i = 0; i < cg_nr; i++) {
 		links[i] = bpf_program__attach_cgroup(skel->progs.egress,
 						      cgs[i].fd);
-		if (CHECK(IS_ERR(links[i]), "cg_attach", "i: %d, err: %ld\n",
-				 i, PTR_ERR(links[i])))
+		if (!ASSERT_OK_PTR(links[i], "cg_attach"))
 			goto cleanup;
 	}
 
 	ping_and_check(cg_nr, 0);
 
-	/* query the number of effective progs and attach flags in root cg */
+	/* query the number of attached progs and attach flags in root cg */
 	err = bpf_prog_query(cgs[0].fd, BPF_CGROUP_INET_EGRESS,
-			     BPF_F_QUERY_EFFECTIVE, &attach_flags, NULL,
-			     &prog_cnt);
+			     0, &attach_flags, NULL, &prog_cnt);
 	CHECK_FAIL(err);
 	CHECK_FAIL(attach_flags != BPF_F_ALLOW_MULTI);
 	if (CHECK(prog_cnt != 1, "effect_cnt", "exp %d, got %d\n", 1, prog_cnt))
@@ -86,17 +84,15 @@ void test_cgroup_link(void)
 			     BPF_F_QUERY_EFFECTIVE, NULL, NULL,
 			     &prog_cnt);
 	CHECK_FAIL(err);
-	CHECK_FAIL(attach_flags != BPF_F_ALLOW_MULTI);
 	if (CHECK(prog_cnt != cg_nr, "effect_cnt", "exp %d, got %d\n",
 		  cg_nr, prog_cnt))
 		goto cleanup;
 
 	/* query the effective prog IDs in last cg */
 	err = bpf_prog_query(cgs[last_cg].fd, BPF_CGROUP_INET_EGRESS,
-			     BPF_F_QUERY_EFFECTIVE, &attach_flags,
-			     prog_ids, &prog_cnt);
+			     BPF_F_QUERY_EFFECTIVE, NULL, prog_ids,
+			     &prog_cnt);
 	CHECK_FAIL(err);
-	CHECK_FAIL(attach_flags != BPF_F_ALLOW_MULTI);
 	if (CHECK(prog_cnt != cg_nr, "effect_cnt", "exp %d, got %d\n",
 		  cg_nr, prog_cnt))
 		goto cleanup;
@@ -121,8 +117,7 @@ void test_cgroup_link(void)
 
 	links[last_cg] = bpf_program__attach_cgroup(skel->progs.egress,
 						    cgs[last_cg].fd);
-	if (CHECK(IS_ERR(links[last_cg]), "cg_attach", "err: %ld\n",
-		  PTR_ERR(links[last_cg])))
+	if (!ASSERT_OK_PTR(links[last_cg], "cg_attach"))
 		goto cleanup;
 
 	ping_and_check(cg_nr + 1, 0);
@@ -147,7 +142,7 @@ void test_cgroup_link(void)
 	/* attempt to mix in with multi-attach bpf_link */
 	tmp_link = bpf_program__attach_cgroup(skel->progs.egress,
 					      cgs[last_cg].fd);
-	if (CHECK(!IS_ERR(tmp_link), "cg_attach_fail", "unexpected success!\n")) {
+	if (!ASSERT_ERR_PTR(tmp_link, "cg_attach_fail")) {
 		bpf_link__destroy(tmp_link);
 		goto cleanup;
 	}
@@ -165,8 +160,7 @@ void test_cgroup_link(void)
 	/* attach back link-based one */
 	links[last_cg] = bpf_program__attach_cgroup(skel->progs.egress,
 						    cgs[last_cg].fd);
-	if (CHECK(IS_ERR(links[last_cg]), "cg_attach", "err: %ld\n",
-		  PTR_ERR(links[last_cg])))
+	if (!ASSERT_OK_PTR(links[last_cg], "cg_attach"))
 		goto cleanup;
 
 	ping_and_check(cg_nr, 0);
@@ -249,8 +243,7 @@ cleanup:
 				 BPF_CGROUP_INET_EGRESS);
 
 	for (i = 0; i < cg_nr; i++) {
-		if (!IS_ERR(links[i]))
-			bpf_link__destroy(links[i]);
+		bpf_link__destroy(links[i]);
 	}
 	test_cgroup_link__destroy(skel);
 

@@ -75,7 +75,7 @@ skl_hda_add_dai_link(struct snd_soc_card *card, struct snd_soc_dai_link *link)
 	struct skl_hda_private *ctx = snd_soc_card_get_drvdata(card);
 	int ret = 0;
 
-	dev_dbg(card->dev, "%s: dai link name - %s\n", __func__, link->name);
+	dev_dbg(card->dev, "dai link name - %s\n", link->name);
 	link->platforms->name = ctx->platform_name;
 	link->nonatomic = 1;
 
@@ -203,7 +203,7 @@ static int skl_hda_audio_probe(struct platform_device *pdev)
 	struct skl_hda_private *ctx;
 	int ret;
 
-	dev_dbg(&pdev->dev, "%s: entry\n", __func__);
+	dev_dbg(&pdev->dev, "entry\n");
 
 	ctx = devm_kzalloc(&pdev->dev, sizeof(*ctx), GFP_KERNEL);
 	if (!ctx)
@@ -258,3 +258,4 @@ MODULE_DESCRIPTION("SKL/KBL/BXT/APL HDA Generic Machine driver");
 MODULE_AUTHOR("Rakesh Ughreja <rakesh.a.ughreja@intel.com>");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:skl_hda_dsp_generic");
+MODULE_IMPORT_NS(SND_SOC_INTEL_HDA_DSP_COMMON);

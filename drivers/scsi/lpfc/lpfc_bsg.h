@@ -1,7 +1,7 @@
 /*******************************************************************
  * This file is part of the Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
- * Copyright (C) 2017-2019 Broadcom. All Rights Reserved. The term *
+ * Copyright (C) 2017-2022 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
  * Copyright (C) 2010-2015 Emulex.  All rights reserved.           *
  * EMULEX and SLI are trademarks of Emulex.                        *
@@ -33,8 +33,6 @@
 #define LPFC_BSG_VENDOR_DIAG_RUN_LOOPBACK	5
 #define LPFC_BSG_VENDOR_GET_MGMT_REV		6
 #define LPFC_BSG_VENDOR_MBOX			7
-#define LPFC_BSG_VENDOR_MENLO_CMD		8
-#define LPFC_BSG_VENDOR_MENLO_DATA		9
 #define LPFC_BSG_VENDOR_DIAG_MODE_END		10
 #define LPFC_BSG_VENDOR_LINK_DIAG_TEST		11
 #define LPFC_BSG_VENDOR_FORCED_LINK_SPEED	14
@@ -43,6 +41,7 @@
 #define LPFC_BSG_VENDOR_RAS_GET_CONFIG		18
 #define LPFC_BSG_VENDOR_RAS_SET_CONFIG		19
 #define LPFC_BSG_VENDOR_GET_TRUNK_INFO		20
+#define LPFC_BSG_VENDOR_GET_CGNBUF_INFO		21
 
 struct set_ct_event {
 	uint32_t command;
@@ -128,16 +127,6 @@ struct dfc_mbox_req {
 	uint32_t outExtWLen;
 	uint32_t extMboxTag;
 	uint32_t extSeqNum;
-};
-
-/* Used for menlo command or menlo data. The xri is only used for menlo data */
-struct menlo_command {
-	uint32_t cmd;
-	uint32_t xri;
-};
-
-struct menlo_response {
-	uint32_t xri; /* return the xri of the iocb exchange */
 };
 
 /*
@@ -384,6 +373,13 @@ struct lpfc_trunk_info {
 
 struct get_trunk_info_req {
 	uint32_t command;
+};
+
+struct get_cgnbuf_info_req {
+	uint32_t command;
+	uint32_t read_size;
+	uint32_t reset;
+#define LPFC_BSG_CGN_RESET_STAT		1
 };
 
 /* driver only */

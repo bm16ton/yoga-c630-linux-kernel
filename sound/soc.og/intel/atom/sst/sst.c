@@ -114,7 +114,7 @@ static irqreturn_t intel_sst_interrupt_mrfld(int irq, void *context)
 static irqreturn_t intel_sst_irq_thread_mrfld(int irq, void *context)
 {
 	struct intel_sst_drv *drv = (struct intel_sst_drv *) context;
-	struct ipc_post *__msg, *msg = NULL;
+	struct ipc_post *__msg, *msg;
 	unsigned long irq_flags;
 
 	spin_lock_irqsave(&drv->rx_msg_lock, irq_flags);
@@ -186,7 +186,7 @@ int sst_driver_ops(struct intel_sst_drv *sst)
 			"SST Driver capabilities missing for dev_id: %x",
 			sst->dev_id);
 		return -EINVAL;
-	};
+	}
 }
 
 void sst_process_pending_msg(struct work_struct *work)
@@ -360,7 +360,6 @@ void sst_context_cleanup(struct intel_sst_drv *ctx)
 	sst_unregister(ctx->dev);
 	sst_set_fw_state_locked(ctx, SST_SHUTDOWN);
 	sysfs_remove_group(&ctx->dev->kobj, &sst_fw_version_attr_group);
-	flush_scheduled_work();
 	destroy_workqueue(ctx->post_msg_wq);
 	cpu_latency_qos_remove_request(ctx->qos);
 	kfree(ctx->fw_sg_list.src);

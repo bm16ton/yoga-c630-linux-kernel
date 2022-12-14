@@ -457,13 +457,4 @@ config MOUSE_NAVPOINT_PXA27x
 	  To compile this driver as a module, choose M here: the
 	  module will be called navpoint.
 
-config MOUSE_NUNCHUK_I2C
-	tristate "Wii nunchuk as mouse over i2c"
-	depends on I2C
-	help
-	  The bootlin wii nunchuk input driver over i2c
-
-	  To compile this driver as a module, choose M here: the
-	  module will be called nunchuk-i2c
-
 endif

@@ -65,32 +65,9 @@ static const struct regmap_config pca9450_regmap_config = {
  * 10: 25mV/4usec
  * 11: 25mV/8usec
  */
-static int pca9450_dvs_set_ramp_delay(struct regulator_dev *rdev,
-				      int ramp_delay)
-{
-	int id = rdev_get_id(rdev);
-	unsigned int ramp_value;
-
-	switch (ramp_delay) {
-	case 1 ... 3125:
-		ramp_value = BUCK1_RAMP_3P125MV;
-		break;
-	case 3126 ... 6250:
-		ramp_value = BUCK1_RAMP_6P25MV;
-		break;
-	case 6251 ... 12500:
-		ramp_value = BUCK1_RAMP_12P5MV;
-		break;
-	case 12501 ... 25000:
-		ramp_value = BUCK1_RAMP_25MV;
-		break;
-	default:
-		ramp_value = BUCK1_RAMP_25MV;
-	}
-
-	return regmap_update_bits(rdev->regmap, PCA9450_REG_BUCK1CTRL + id * 3,
-				  BUCK1_RAMP_MASK, ramp_value << 6);
-}
+static const unsigned int pca9450_dvs_buck_ramp_table[] = {
+	25000, 12500, 6250, 3125
+};
 
 static const struct regulator_ops pca9450_dvs_buck_regulator_ops = {
 	.enable = regulator_enable_regmap,
@@ -100,7 +77,7 @@ static const struct regulator_ops pca9450_dvs_buck_regulator_ops = {
 	.set_voltage_sel = regulator_set_voltage_sel_regmap,
 	.get_voltage_sel = regulator_get_voltage_sel_regmap,
 	.set_voltage_time_sel = regulator_set_voltage_time_sel,
-	.set_ramp_delay = pca9450_dvs_set_ramp_delay,
+	.set_ramp_delay	= regulator_set_ramp_delay_regmap,
 };
 
 static const struct regulator_ops pca9450_buck_regulator_ops = {
@@ -197,6 +174,14 @@ static int buck_set_dvs(const struct regulator_desc *desc,
 		}
 	}
 
+	if (ret == 0) {
+		struct pca9450_regulator_desc *regulator = container_of(desc,
+					struct pca9450_regulator_desc, desc);
+
+		/* Enable DVS control through PMIC_STBY_REQ for this BUCK */
+		ret = regmap_update_bits(regmap, regulator->desc.enable_reg,
+					 BUCK1_DVS_CTRL, BUCK1_DVS_CTRL);
+	}
 	return ret;
 }
 
@@ -251,6 +236,10 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
 			.vsel_mask = BUCK1OUT_DVS0_MASK,
 			.enable_reg = PCA9450_REG_BUCK1CTRL,
 			.enable_mask = BUCK1_ENMODE_MASK,
+			.ramp_reg = PCA9450_REG_BUCK1CTRL,
+			.ramp_mask = BUCK1_RAMP_MASK,
+			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+			.n_ramp_values = ARRAY_SIZE(pca9450_dvs_buck_ramp_table),
 			.owner = THIS_MODULE,
 			.of_parse_cb = pca9450_set_dvs_levels,
 		},
@@ -276,6 +265,10 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
 			.vsel_mask = BUCK2OUT_DVS0_MASK,
 			.enable_reg = PCA9450_REG_BUCK2CTRL,
 			.enable_mask = BUCK1_ENMODE_MASK,
+			.ramp_reg = PCA9450_REG_BUCK2CTRL,
+			.ramp_mask = BUCK2_RAMP_MASK,
+			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+			.n_ramp_values = ARRAY_SIZE(pca9450_dvs_buck_ramp_table),
 			.owner = THIS_MODULE,
 			.of_parse_cb = pca9450_set_dvs_levels,
 		},
@@ -301,6 +294,10 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
 			.vsel_mask = BUCK3OUT_DVS0_MASK,
 			.enable_reg = PCA9450_REG_BUCK3CTRL,
 			.enable_mask = BUCK3_ENMODE_MASK,
+			.ramp_reg = PCA9450_REG_BUCK3CTRL,
+			.ramp_mask = BUCK3_RAMP_MASK,
+			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+			.n_ramp_values = ARRAY_SIZE(pca9450_dvs_buck_ramp_table),
 			.owner = THIS_MODULE,
 			.of_parse_cb = pca9450_set_dvs_levels,
 		},
@@ -477,6 +474,10 @@ static const struct pca9450_regulator_desc pca9450bc_regulators[] = {
 			.vsel_mask = BUCK1OUT_DVS0_MASK,
 			.enable_reg = PCA9450_REG_BUCK1CTRL,
 			.enable_mask = BUCK1_ENMODE_MASK,
+			.ramp_reg = PCA9450_REG_BUCK1CTRL,
+			.ramp_mask = BUCK1_RAMP_MASK,
+			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+			.n_ramp_values = ARRAY_SIZE(pca9450_dvs_buck_ramp_table),
 			.owner = THIS_MODULE,
 			.of_parse_cb = pca9450_set_dvs_levels,
 		},
@@ -502,6 +503,10 @@ static const struct pca9450_regulator_desc pca9450bc_regulators[] = {
 			.vsel_mask = BUCK2OUT_DVS0_MASK,
 			.enable_reg = PCA9450_REG_BUCK2CTRL,
 			.enable_mask = BUCK1_ENMODE_MASK,
+			.ramp_reg = PCA9450_REG_BUCK2CTRL,
+			.ramp_mask = BUCK2_RAMP_MASK,
+			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+			.n_ramp_values = ARRAY_SIZE(pca9450_dvs_buck_ramp_table),
 			.owner = THIS_MODULE,
 			.of_parse_cb = pca9450_set_dvs_levels,
 		},
@@ -705,6 +710,7 @@ static int pca9450_i2c_probe(struct i2c_client *i2c,
 	struct regulator_config config = { };
 	struct pca9450 *pca9450;
 	unsigned int device_id, i;
+	unsigned int reset_ctrl;
 	int ret;
 
 	if (!i2c->irq) {
@@ -805,12 +811,28 @@ static int pca9450_i2c_probe(struct i2c_client *i2c,
 		return ret;
 	}
 
+	if (of_property_read_bool(i2c->dev.of_node, "nxp,wdog_b-warm-reset"))
+		reset_ctrl = WDOG_B_CFG_WARM;
+	else
+		reset_ctrl = WDOG_B_CFG_COLD_LDO12;
+
 	/* Set reset behavior on assertion of WDOG_B signal */
 	ret = regmap_update_bits(pca9450->regmap, PCA9450_REG_RESET_CTRL,
-				WDOG_B_CFG_MASK, WDOG_B_CFG_COLD_LDO12);
+				 WDOG_B_CFG_MASK, reset_ctrl);
 	if (ret) {
 		dev_err(&i2c->dev, "Failed to set WDOG_B reset behavior\n");
 		return ret;
+	}
+
+	if (of_property_read_bool(i2c->dev.of_node, "nxp,i2c-lt-enable")) {
+		/* Enable I2C Level Translator */
+		ret = regmap_update_bits(pca9450->regmap, PCA9450_REG_CONFIG2,
+					 I2C_LT_MASK, I2C_LT_ON_STANDBY_RUN);
+		if (ret) {
+			dev_err(&i2c->dev,
+				"Failed to enable I2C level translator\n");
+			return ret;
+		}
 	}
 
 	/*

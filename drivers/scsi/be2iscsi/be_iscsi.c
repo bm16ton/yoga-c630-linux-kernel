@@ -302,7 +302,7 @@ void beiscsi_iface_destroy_default(struct beiscsi_hba *phba)
 }
 
 /**
- * beiscsi_set_vlan_tag()- Set the VLAN TAG
+ * beiscsi_iface_config_vlan()- Set the VLAN TAG
  * @shost: Scsi Host for the driver instance
  * @iface_param: Interface paramters
  *
@@ -1300,7 +1300,6 @@ static int beiscsi_conn_close(struct beiscsi_endpoint *beiscsi_ep)
 void beiscsi_ep_disconnect(struct iscsi_endpoint *ep)
 {
 	struct beiscsi_endpoint *beiscsi_ep;
-	struct beiscsi_conn *beiscsi_conn;
 	struct beiscsi_hba *phba;
 	uint16_t cri_index;
 
@@ -1317,11 +1316,6 @@ void beiscsi_ep_disconnect(struct iscsi_endpoint *ep)
 			      cri_index,
 			      beiscsi_ep->ep_cid);
 		return;
-	}
-
-	if (beiscsi_ep->conn) {
-		beiscsi_conn = beiscsi_ep->conn;
-		iscsi_suspend_queue(beiscsi_conn->conn);
 	}
 
 	if (!beiscsi_hba_is_online(phba)) {

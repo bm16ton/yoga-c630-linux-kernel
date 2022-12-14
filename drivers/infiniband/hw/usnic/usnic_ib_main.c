@@ -303,7 +303,7 @@ static struct notifier_block usnic_ib_inetaddr_notifier = {
 };
 /* End of inet section*/
 
-static int usnic_port_immutable(struct ib_device *ibdev, u8 port_num,
+static int usnic_port_immutable(struct ib_device *ibdev, u32 port_num,
 			        struct ib_port_immutable *immutable)
 {
 	struct ib_port_attr attr;
@@ -347,6 +347,7 @@ static const struct ib_device_ops usnic_dev_ops = {
 	.dereg_mr = usnic_ib_dereg_mr,
 	.destroy_cq = usnic_ib_destroy_cq,
 	.destroy_qp = usnic_ib_destroy_qp,
+	.device_group = &usnic_attr_group,
 	.get_dev_fw_str = usnic_get_dev_fw_str,
 	.get_link_layer = usnic_ib_port_link_layer,
 	.get_port_immutable = usnic_port_immutable,
@@ -359,6 +360,7 @@ static const struct ib_device_ops usnic_dev_ops = {
 	.reg_user_mr = usnic_ib_reg_mr,
 	INIT_RDMA_OBJ_SIZE(ib_pd, usnic_ib_pd, ibpd),
 	INIT_RDMA_OBJ_SIZE(ib_cq, usnic_ib_cq, ibcq),
+	INIT_RDMA_OBJ_SIZE(ib_qp, usnic_ib_qp_grp, ibqp),
 	INIT_RDMA_OBJ_SIZE(ib_ucontext, usnic_ib_ucontext, ibucontext),
 };
 
@@ -399,8 +401,6 @@ static void *usnic_ib_device_add(struct pci_dev *dev)
 	us_ibdev->ib_dev.dev.parent = &dev->dev;
 
 	ib_set_device_ops(&us_ibdev->ib_dev, &usnic_dev_ops);
-
-	rdma_set_device_sysfs_group(&us_ibdev->ib_dev, &usnic_attr_group);
 
 	ret = ib_device_set_netdev(&us_ibdev->ib_dev, us_ibdev->netdev, 1);
 	if (ret)
@@ -534,6 +534,11 @@ static int usnic_ib_pci_probe(struct pci_dev *pdev,
 	struct usnic_ib_vf *vf;
 	enum usnic_vnic_res_type res_type;
 
+	if (!device_iommu_mapped(&pdev->dev)) {
+		usnic_err("IOMMU required but not present or enabled.  USNIC QPs will not function w/o enabling IOMMU\n");
+		return -EPERM;
+	}
+
 	vf = kzalloc(sizeof(*vf), GFP_KERNEL);
 	if (!vf)
 		return -ENOMEM;
@@ -572,7 +577,7 @@ static int usnic_ib_pci_probe(struct pci_dev *pdev,
 	}
 
 	vf->pf = pf;
-	spin_lock_init(&vf->lock);
+	mutex_init(&vf->lock);
 	mutex_lock(&pf->usdev_lock);
 	list_add_tail(&vf->link, &pf->vf_dev_list);
 	/*
@@ -641,12 +646,6 @@ static int __init usnic_ib_init(void)
 	int err;
 
 	printk_once(KERN_INFO "%s", usnic_version);
-
-	err = usnic_uiom_init(DRV_NAME);
-	if (err) {
-		usnic_err("Unable to initialize umem with err %d\n", err);
-		return err;
-	}
 
 	err = pci_register_driver(&usnic_ib_pci_driver);
 	if (err) {

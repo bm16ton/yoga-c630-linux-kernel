@@ -30,16 +30,25 @@
 #include "atom.h"
 #include "amdgpu_connectors.h"
 #include "amdgpu_display.h"
+#include "soc15_common.h"
+#include "gc/gc_11_0_0_offset.h"
+#include "gc/gc_11_0_0_sh_mask.h"
 #include <asm/div64.h>
 
 #include <linux/pci.h>
 #include <linux/pm_runtime.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_damage_helper.h>
 #include <drm/drm_edid.h>
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_vblank.h>
+
+static int amdgpu_display_framebuffer_init(struct drm_device *dev,
+					   struct amdgpu_framebuffer *rfb,
+					   const struct drm_mode_fb_cmd2 *mode_cmd,
+					   struct drm_gem_object *obj);
 
 static void amdgpu_display_flip_callback(struct dma_fence *f,
 					 struct dma_fence_cb *cb)
@@ -83,9 +92,6 @@ static void amdgpu_display_flip_work_func(struct work_struct *__work)
 	unsigned i;
 	int vpos, hpos;
 
-	if (amdgpu_display_flip_handle_fence(work, &work->excl))
-		return;
-
 	for (i = 0; i < work->shared_count; ++i)
 		if (amdgpu_display_flip_handle_fence(work, &work->shared[i]))
 			return;
@@ -116,8 +122,9 @@ static void amdgpu_display_flip_work_func(struct work_struct *__work)
 	spin_unlock_irqrestore(&crtc->dev->event_lock, flags);
 
 
-	DRM_DEBUG_DRIVER("crtc:%d[%p], pflip_stat:AMDGPU_FLIP_SUBMITTED, work: %p,\n",
-					 amdgpu_crtc->crtc_id, amdgpu_crtc, work);
+	drm_dbg_vbl(adev_to_drm(adev),
+		    "crtc:%d[%p], pflip_stat:AMDGPU_FLIP_SUBMITTED, work: %p,\n",
+		    amdgpu_crtc->crtc_id, amdgpu_crtc, work);
 
 }
 
@@ -203,9 +210,9 @@ int amdgpu_display_crtc_page_flip_target(struct drm_crtc *crtc,
 		goto unpin;
 	}
 
-	r = dma_resv_get_fences_rcu(new_abo->tbo.base.resv, &work->excl,
-					      &work->shared_count,
-					      &work->shared);
+	r = dma_resv_get_fences(new_abo->tbo.base.resv, DMA_RESV_USAGE_WRITE,
+				&work->shared_count,
+				&work->shared);
 	if (unlikely(r != 0)) {
 		DRM_ERROR("failed to get fences for buffer\n");
 		goto unpin;
@@ -254,7 +261,6 @@ unreserve:
 
 cleanup:
 	amdgpu_bo_unref(&work->old_abo);
-	dma_fence_put(work->excl);
 	for (i = 0; i < work->shared_count; ++i)
 		dma_fence_put(work->shared[i]);
 	kfree(work->shared);
@@ -491,6 +497,7 @@ bool amdgpu_display_ddc_probe(struct amdgpu_connector *amdgpu_connector,
 static const struct drm_framebuffer_funcs amdgpu_fb_funcs = {
 	.destroy = drm_gem_fb_destroy,
 	.create_handle = drm_gem_fb_create_handle,
+	.dirty = drm_atomic_helper_dirtyfb,
 };
 
 uint32_t amdgpu_display_supported_domains(struct amdgpu_device *adev,
@@ -509,27 +516,9 @@ uint32_t amdgpu_display_supported_domains(struct amdgpu_device *adev,
 	 */
 	if ((bo_flags & AMDGPU_GEM_CREATE_CPU_GTT_USWC) &&
 	    amdgpu_bo_support_uswc(bo_flags) &&
-	    amdgpu_device_asic_has_dc_support(adev->asic_type)) {
-		switch (adev->asic_type) {
-		case CHIP_CARRIZO:
-		case CHIP_STONEY:
-			domain |= AMDGPU_GEM_DOMAIN_GTT;
-			break;
-		case CHIP_RAVEN:
-			/* enable S/G on PCO and RV2 */
-			if ((adev->apu_flags & AMD_APU_IS_RAVEN2) ||
-			    (adev->apu_flags & AMD_APU_IS_PICASSO))
-				domain |= AMDGPU_GEM_DOMAIN_GTT;
-			break;
-		case CHIP_RENOIR:
-		case CHIP_VANGOGH:
-			domain |= AMDGPU_GEM_DOMAIN_GTT;
-			break;
-
-		default:
-			break;
-		}
-	}
+	    amdgpu_device_asic_has_dc_support(adev->asic_type) &&
+	    adev->mode_info.gpu_vm_support)
+		domain |= AMDGPU_GEM_DOMAIN_GTT;
 #endif
 
 	return domain;
@@ -679,6 +668,11 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 {
 	struct amdgpu_device *adev = drm_to_adev(afb->base.dev);
 	uint64_t modifier = 0;
+	int num_pipes = 0;
+	int num_pkrs = 0;
+
+	num_pkrs = adev->gfx.config.gb_addr_config_fields.num_pkrs;
+	num_pipes = adev->gfx.config.gb_addr_config_fields.num_pipes;
 
 	if (!afb->tiling_flags || !AMDGPU_TILING_GET(afb->tiling_flags, SWIZZLE_MODE)) {
 		modifier = DRM_FORMAT_MOD_LINEAR;
@@ -691,7 +685,7 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 		int bank_xor_bits = 0;
 		int packers = 0;
 		int rb = 0;
-		int pipes = ilog2(adev->gfx.config.gb_addr_config_fields.num_pipes);
+		int pipes = ilog2(num_pipes);
 		uint32_t dcc_offset = AMDGPU_TILING_GET(afb->tiling_flags, DCC_OFFSET_256B);
 
 		switch (swizzle >> 2) {
@@ -707,14 +701,19 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 		case 6: /* 64 KiB _X */
 			block_size_bits = 16;
 			break;
+		case 7: /* 256 KiB */
+			block_size_bits = 18;
+			break;
 		default:
 			/* RESERVED or VAR */
 			return -EINVAL;
 		}
 
-		if (adev->asic_type >= CHIP_SIENNA_CICHLID)
+		if (adev->ip_versions[GC_HWIP][0] >= IP_VERSION(11, 0, 0))
+			version = AMD_FMT_MOD_TILE_VER_GFX11;
+		else if (adev->ip_versions[GC_HWIP][0] >= IP_VERSION(10, 3, 0))
 			version = AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS;
-		else if (adev->family == AMDGPU_FAMILY_NV)
+		else if (adev->ip_versions[GC_HWIP][0] >= IP_VERSION(10, 0, 0))
 			version = AMD_FMT_MOD_TILE_VER_GFX10;
 		else
 			version = AMD_FMT_MOD_TILE_VER_GFX9;
@@ -723,19 +722,32 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 		case 0: /* Z microtiling */
 			return -EINVAL;
 		case 1: /* S microtiling */
-			if (!has_xor)
-				version = AMD_FMT_MOD_TILE_VER_GFX9;
+			if (adev->ip_versions[GC_HWIP][0] < IP_VERSION(11, 0, 0)) {
+				if (!has_xor)
+					version = AMD_FMT_MOD_TILE_VER_GFX9;
+			}
 			break;
 		case 2:
-			if (!has_xor && afb->base.format->cpp[0] != 4)
-				version = AMD_FMT_MOD_TILE_VER_GFX9;
+			if (adev->ip_versions[GC_HWIP][0] < IP_VERSION(11, 0, 0)) {
+				if (!has_xor && afb->base.format->cpp[0] != 4)
+					version = AMD_FMT_MOD_TILE_VER_GFX9;
+			}
 			break;
 		case 3:
 			break;
 		}
 
 		if (has_xor) {
+			if (num_pipes == num_pkrs && num_pkrs == 0) {
+				DRM_ERROR("invalid number of pipes and packers\n");
+				return -EINVAL;
+			}
+
 			switch (version) {
+			case AMD_FMT_MOD_TILE_VER_GFX11:
+				pipe_xor_bits = min(block_size_bits - 8, pipes);
+				packers = ilog2(adev->gfx.config.gb_addr_config_fields.num_pkrs);
+				break;
 			case AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS:
 				pipe_xor_bits = min(block_size_bits - 8, pipes);
 				packers = min(block_size_bits - 8 - pipe_xor_bits,
@@ -769,9 +781,10 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 			u64 render_dcc_offset;
 
 			/* Enable constant encode on RAVEN2 and later. */
-			bool dcc_constant_encode = adev->asic_type > CHIP_RAVEN ||
+			bool dcc_constant_encode = (adev->asic_type > CHIP_RAVEN ||
 						   (adev->asic_type == CHIP_RAVEN &&
-						    adev->external_rev_id >= 0x81);
+						    adev->external_rev_id >= 0x81)) &&
+						    adev->ip_versions[GC_HWIP][0] < IP_VERSION(11, 0, 0);
 
 			int max_cblock_size = dcc_i64b ? AMD_FMT_MOD_DCC_BLOCK_64B :
 					      dcc_i128b ? AMD_FMT_MOD_DCC_BLOCK_128B :
@@ -808,7 +821,7 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 				if (adev->family >= AMDGPU_FAMILY_NV) {
 					int extra_pipe = 0;
 
-					if (adev->asic_type >= CHIP_SIENNA_CICHLID &&
+					if ((adev->ip_versions[GC_HWIP][0] >= IP_VERSION(10, 3, 0)) &&
 					    pipes == packers && pipes > 1)
 						extra_pipe = 1;
 
@@ -834,6 +847,200 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 
 	afb->base.modifier = modifier;
 	afb->base.flags |= DRM_MODE_FB_MODIFIERS;
+	return 0;
+}
+
+/* Mirrors the is_displayable check in radeonsi's gfx6_compute_surface */
+static int check_tiling_flags_gfx6(struct amdgpu_framebuffer *afb)
+{
+	u64 micro_tile_mode;
+
+	/* Zero swizzle mode means linear */
+	if (AMDGPU_TILING_GET(afb->tiling_flags, SWIZZLE_MODE) == 0)
+		return 0;
+
+	micro_tile_mode = AMDGPU_TILING_GET(afb->tiling_flags, MICRO_TILE_MODE);
+	switch (micro_tile_mode) {
+	case 0: /* DISPLAY */
+	case 3: /* RENDER */
+		return 0;
+	default:
+		drm_dbg_kms(afb->base.dev,
+			    "Micro tile mode %llu not supported for scanout\n",
+			    micro_tile_mode);
+		return -EINVAL;
+	}
+}
+
+static void get_block_dimensions(unsigned int block_log2, unsigned int cpp,
+				 unsigned int *width, unsigned int *height)
+{
+	unsigned int cpp_log2 = ilog2(cpp);
+	unsigned int pixel_log2 = block_log2 - cpp_log2;
+	unsigned int width_log2 = (pixel_log2 + 1) / 2;
+	unsigned int height_log2 = pixel_log2 - width_log2;
+
+	*width = 1 << width_log2;
+	*height = 1 << height_log2;
+}
+
+static unsigned int get_dcc_block_size(uint64_t modifier, bool rb_aligned,
+				       bool pipe_aligned)
+{
+	unsigned int ver = AMD_FMT_MOD_GET(TILE_VERSION, modifier);
+
+	switch (ver) {
+	case AMD_FMT_MOD_TILE_VER_GFX9: {
+		/*
+		 * TODO: for pipe aligned we may need to check the alignment of the
+		 * total size of the surface, which may need to be bigger than the
+		 * natural alignment due to some HW workarounds
+		 */
+		return max(10 + (rb_aligned ? (int)AMD_FMT_MOD_GET(RB, modifier) : 0), 12);
+	}
+	case AMD_FMT_MOD_TILE_VER_GFX10:
+	case AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS:
+	case AMD_FMT_MOD_TILE_VER_GFX11: {
+		int pipes_log2 = AMD_FMT_MOD_GET(PIPE_XOR_BITS, modifier);
+
+		if (ver >= AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS && pipes_log2 > 1 &&
+		    AMD_FMT_MOD_GET(PACKERS, modifier) == pipes_log2)
+			++pipes_log2;
+
+		return max(8 + (pipe_aligned ? pipes_log2 : 0), 12);
+	}
+	default:
+		return 0;
+	}
+}
+
+static int amdgpu_display_verify_plane(struct amdgpu_framebuffer *rfb, int plane,
+				       const struct drm_format_info *format,
+				       unsigned int block_width, unsigned int block_height,
+				       unsigned int block_size_log2)
+{
+	unsigned int width = rfb->base.width /
+		((plane && plane < format->num_planes) ? format->hsub : 1);
+	unsigned int height = rfb->base.height /
+		((plane && plane < format->num_planes) ? format->vsub : 1);
+	unsigned int cpp = plane < format->num_planes ? format->cpp[plane] : 1;
+	unsigned int block_pitch = block_width * cpp;
+	unsigned int min_pitch = ALIGN(width * cpp, block_pitch);
+	unsigned int block_size = 1 << block_size_log2;
+	uint64_t size;
+
+	if (rfb->base.pitches[plane] % block_pitch) {
+		drm_dbg_kms(rfb->base.dev,
+			    "pitch %d for plane %d is not a multiple of block pitch %d\n",
+			    rfb->base.pitches[plane], plane, block_pitch);
+		return -EINVAL;
+	}
+	if (rfb->base.pitches[plane] < min_pitch) {
+		drm_dbg_kms(rfb->base.dev,
+			    "pitch %d for plane %d is less than minimum pitch %d\n",
+			    rfb->base.pitches[plane], plane, min_pitch);
+		return -EINVAL;
+	}
+
+	/* Force at least natural alignment. */
+	if (rfb->base.offsets[plane] % block_size) {
+		drm_dbg_kms(rfb->base.dev,
+			    "offset 0x%x for plane %d is not a multiple of block pitch 0x%x\n",
+			    rfb->base.offsets[plane], plane, block_size);
+		return -EINVAL;
+	}
+
+	size = rfb->base.offsets[plane] +
+		(uint64_t)rfb->base.pitches[plane] / block_pitch *
+		block_size * DIV_ROUND_UP(height, block_height);
+
+	if (rfb->base.obj[0]->size < size) {
+		drm_dbg_kms(rfb->base.dev,
+			    "BO size 0x%zx is less than 0x%llx required for plane %d\n",
+			    rfb->base.obj[0]->size, size, plane);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+
+static int amdgpu_display_verify_sizes(struct amdgpu_framebuffer *rfb)
+{
+	const struct drm_format_info *format_info = drm_format_info(rfb->base.format->format);
+	uint64_t modifier = rfb->base.modifier;
+	int ret;
+	unsigned int i, block_width, block_height, block_size_log2;
+
+	if (rfb->base.dev->mode_config.fb_modifiers_not_supported)
+		return 0;
+
+	for (i = 0; i < format_info->num_planes; ++i) {
+		if (modifier == DRM_FORMAT_MOD_LINEAR) {
+			block_width = 256 / format_info->cpp[i];
+			block_height = 1;
+			block_size_log2 = 8;
+		} else {
+			int swizzle = AMD_FMT_MOD_GET(TILE, modifier);
+
+			switch ((swizzle & ~3) + 1) {
+			case DC_SW_256B_S:
+				block_size_log2 = 8;
+				break;
+			case DC_SW_4KB_S:
+			case DC_SW_4KB_S_X:
+				block_size_log2 = 12;
+				break;
+			case DC_SW_64KB_S:
+			case DC_SW_64KB_S_T:
+			case DC_SW_64KB_S_X:
+				block_size_log2 = 16;
+				break;
+			case DC_SW_VAR_S_X:
+				block_size_log2 = 18;
+				break;
+			default:
+				drm_dbg_kms(rfb->base.dev,
+					    "Swizzle mode with unknown block size: %d\n", swizzle);
+				return -EINVAL;
+			}
+
+			get_block_dimensions(block_size_log2, format_info->cpp[i],
+					     &block_width, &block_height);
+		}
+
+		ret = amdgpu_display_verify_plane(rfb, i, format_info,
+						  block_width, block_height, block_size_log2);
+		if (ret)
+			return ret;
+	}
+
+	if (AMD_FMT_MOD_GET(DCC, modifier)) {
+		if (AMD_FMT_MOD_GET(DCC_RETILE, modifier)) {
+			block_size_log2 = get_dcc_block_size(modifier, false, false);
+			get_block_dimensions(block_size_log2 + 8, format_info->cpp[0],
+					     &block_width, &block_height);
+			ret = amdgpu_display_verify_plane(rfb, i, format_info,
+							  block_width, block_height,
+							  block_size_log2);
+			if (ret)
+				return ret;
+
+			++i;
+			block_size_log2 = get_dcc_block_size(modifier, true, true);
+		} else {
+			bool pipe_aligned = AMD_FMT_MOD_GET(DCC_PIPE_ALIGN, modifier);
+
+			block_size_log2 = get_dcc_block_size(modifier, true, pipe_aligned);
+		}
+		get_block_dimensions(block_size_log2 + 8, format_info->cpp[0],
+				     &block_width, &block_height);
+		ret = amdgpu_display_verify_plane(rfb, i, format_info,
+						  block_width, block_height, block_size_log2);
+		if (ret)
+			return ret;
+	}
+
 	return 0;
 }
 
@@ -870,17 +1077,49 @@ static int amdgpu_display_get_fb_info(const struct amdgpu_framebuffer *amdgpu_fb
 	return r;
 }
 
-int amdgpu_display_framebuffer_init(struct drm_device *dev,
-				    struct amdgpu_framebuffer *rfb,
-				    const struct drm_mode_fb_cmd2 *mode_cmd,
-				    struct drm_gem_object *obj)
+static int amdgpu_display_gem_fb_verify_and_init(struct drm_device *dev,
+						 struct amdgpu_framebuffer *rfb,
+						 struct drm_file *file_priv,
+						 const struct drm_mode_fb_cmd2 *mode_cmd,
+						 struct drm_gem_object *obj)
 {
-	int ret, i;
+	int ret;
+
 	rfb->base.obj[0] = obj;
 	drm_helper_mode_fill_fb_struct(dev, &rfb->base, mode_cmd);
+	/* Verify that the modifier is supported. */
+	if (!drm_any_plane_has_format(dev, mode_cmd->pixel_format,
+				      mode_cmd->modifier[0])) {
+		drm_dbg_kms(dev,
+			    "unsupported pixel format %p4cc / modifier 0x%llx\n",
+			    &mode_cmd->pixel_format, mode_cmd->modifier[0]);
+
+		ret = -EINVAL;
+		goto err;
+	}
+
+	ret = amdgpu_display_framebuffer_init(dev, rfb, mode_cmd, obj);
+	if (ret)
+		goto err;
+
 	ret = drm_framebuffer_init(dev, &rfb->base, &amdgpu_fb_funcs);
 	if (ret)
-		goto fail;
+		goto err;
+
+	return 0;
+err:
+	drm_dbg_kms(dev, "Failed to verify and init gem fb: %d\n", ret);
+	rfb->base.obj[0] = NULL;
+	return ret;
+}
+
+static int amdgpu_display_framebuffer_init(struct drm_device *dev,
+					   struct amdgpu_framebuffer *rfb,
+					   const struct drm_mode_fb_cmd2 *mode_cmd,
+					   struct drm_gem_object *obj)
+{
+	struct amdgpu_device *adev = drm_to_adev(dev);
+	int ret, i;
 
 	/*
 	 * This needs to happen before modifier conversion as that might change
@@ -891,34 +1130,42 @@ int amdgpu_display_framebuffer_init(struct drm_device *dev,
 			drm_dbg_kms(dev, "Plane 0 and %d have different BOs: %u vs. %u\n",
 				    i, mode_cmd->handles[0], mode_cmd->handles[i]);
 			ret = -EINVAL;
-			goto fail;
+			return ret;
 		}
 	}
 
 	ret = amdgpu_display_get_fb_info(rfb, &rfb->tiling_flags, &rfb->tmz_surface);
 	if (ret)
-		goto fail;
+		return ret;
 
-	if (dev->mode_config.allow_fb_modifiers &&
+	if (dev->mode_config.fb_modifiers_not_supported && !adev->enable_virtual_display) {
+		drm_WARN_ONCE(dev, adev->family >= AMDGPU_FAMILY_AI,
+			      "GFX9+ requires FB check based on format modifier\n");
+		ret = check_tiling_flags_gfx6(rfb);
+		if (ret)
+			return ret;
+	}
+
+	if (!dev->mode_config.fb_modifiers_not_supported &&
 	    !(rfb->base.flags & DRM_MODE_FB_MODIFIERS)) {
 		ret = convert_tiling_flags_to_modifier(rfb);
 		if (ret) {
 			drm_dbg_kms(dev, "Failed to convert tiling flags 0x%llX to a modifier",
 				    rfb->tiling_flags);
-			goto fail;
+			return ret;
 		}
 	}
 
-	for (i = 1; i < rfb->base.format->num_planes; ++i) {
+	ret = amdgpu_display_verify_sizes(rfb);
+	if (ret)
+		return ret;
+
+	for (i = 0; i < rfb->base.format->num_planes; ++i) {
+		drm_gem_object_get(rfb->base.obj[0]);
 		rfb->base.obj[i] = rfb->base.obj[0];
-		drm_gem_object_get(rfb->base.obj[i]);
 	}
 
 	return 0;
-
-fail:
-	rfb->base.obj[0] = NULL;
-	return ret;
 }
 
 struct drm_framebuffer *
@@ -954,13 +1201,15 @@ amdgpu_display_user_framebuffer_create(struct drm_device *dev,
 		return ERR_PTR(-ENOMEM);
 	}
 
-	ret = amdgpu_display_framebuffer_init(dev, amdgpu_fb, mode_cmd, obj);
+	ret = amdgpu_display_gem_fb_verify_and_init(dev, amdgpu_fb, file_priv,
+						    mode_cmd, obj);
 	if (ret) {
 		kfree(amdgpu_fb);
 		drm_gem_object_put(obj);
 		return ERR_PTR(ret);
 	}
 
+	drm_gem_object_put(obj);
 	return &amdgpu_fb->base;
 }
 
@@ -1108,7 +1357,7 @@ bool amdgpu_display_crtc_scaling_mode_fixup(struct drm_crtc *crtc,
 		if ((!(mode->flags & DRM_MODE_FLAG_INTERLACE)) &&
 		    ((amdgpu_encoder->underscan_type == UNDERSCAN_ON) ||
 		     ((amdgpu_encoder->underscan_type == UNDERSCAN_AUTO) &&
-		      drm_detect_hdmi_monitor(amdgpu_connector_edid(connector)) &&
+		      connector->display_info.is_hdmi &&
 		      amdgpu_display_is_hdtv_mode(mode)))) {
 			if (amdgpu_encoder->underscan_hborder != 0)
 				amdgpu_crtc->h_border = amdgpu_encoder->underscan_hborder;
@@ -1312,6 +1561,21 @@ bool amdgpu_crtc_get_scanout_position(struct drm_crtc *crtc,
 						  stime, etime, mode);
 }
 
+static bool
+amdgpu_display_robj_is_fb(struct amdgpu_device *adev, struct amdgpu_bo *robj)
+{
+	struct drm_device *dev = adev_to_drm(adev);
+	struct drm_fb_helper *fb_helper = dev->fb_helper;
+
+	if (!fb_helper || !fb_helper->buffer)
+		return false;
+
+	if (gem_to_amdgpu_bo(fb_helper->buffer->gem) != robj)
+		return false;
+
+	return true;
+}
+
 int amdgpu_display_suspend_helper(struct amdgpu_device *adev)
 {
 	struct drm_device *dev = adev_to_drm(adev);
@@ -1347,8 +1611,7 @@ int amdgpu_display_suspend_helper(struct amdgpu_device *adev)
 			continue;
 		}
 		robj = gem_to_amdgpu_bo(fb->obj[0]);
-		/* don't unpin kernel fb objects */
-		if (!amdgpu_fbdev_robj_is_fb(adev, robj)) {
+		if (!amdgpu_display_robj_is_fb(adev, robj)) {
 			r = amdgpu_bo_reserve(robj, true);
 			if (r == 0) {
 				amdgpu_bo_unpin(robj);

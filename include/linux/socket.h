@@ -14,6 +14,8 @@ struct file;
 struct pid;
 struct cred;
 struct socket;
+struct sock;
+struct sk_buff;
 
 #define __sockaddr_check_size(size)	\
 	BUILD_BUG_ON(((size) > sizeof(struct __kernel_sockaddr_storage)))
@@ -50,6 +52,9 @@ struct linger {
 struct msghdr {
 	void		*msg_name;	/* ptr to socket address structure */
 	int		msg_namelen;	/* size of socket address structure */
+
+	int		msg_inq;	/* output, data left in socket */
+
 	struct iov_iter	msg_iter;	/* data */
 
 	/*
@@ -62,9 +67,13 @@ struct msghdr {
 		void __user	*msg_control_user;
 	};
 	bool		msg_control_is_user : 1;
-	__kernel_size_t	msg_controllen;	/* ancillary data buffer length */
+	bool		msg_get_inq : 1;/* return INQ after receive */
 	unsigned int	msg_flags;	/* flags on received message */
+	__kernel_size_t	msg_controllen;	/* ancillary data buffer length */
 	struct kiocb	*msg_iocb;	/* ptr to iocb for async requests */
+	struct ubuf_info *msg_ubuf;
+	int (*sg_from_iter)(struct sock *sk, struct sk_buff *skb,
+			    struct iov_iter *from, size_t length);
 };
 
 struct user_msghdr {
@@ -85,7 +94,7 @@ struct mmsghdr {
 
 /*
  *	POSIX 1003.1g - ancillary data object information
- *	Ancillary data consits of a sequence of pairs of
+ *	Ancillary data consists of a sequence of pairs of
  *	(cmsghdr, cmsg_data[])
  */
 
@@ -223,8 +232,11 @@ struct ucred {
 				 * reuses AF_INET address family
 				 */
 #define AF_XDP		44	/* XDP sockets			*/
+#define AF_MCTP		45	/* Management component
+				 * transport protocol
+				 */
 
-#define AF_MAX		45	/* For now.. */
+#define AF_MAX		46	/* For now.. */
 
 /* Protocol families, same as address families. */
 #define PF_UNSPEC	AF_UNSPEC
@@ -274,6 +286,7 @@ struct ucred {
 #define PF_QIPCRTR	AF_QIPCRTR
 #define PF_SMC		AF_SMC
 #define PF_XDP		AF_XDP
+#define PF_MCTP		AF_MCTP
 #define PF_MAX		AF_MAX
 
 /* Maximum queue length specifiable by listen.  */
@@ -360,6 +373,9 @@ struct ucred {
 #define SOL_KCM		281
 #define SOL_TLS		282
 #define SOL_XDP		283
+#define SOL_MPTCP	284
+#define SOL_MCTP	285
+#define SOL_SMC		286
 
 /* IPX options */
 #define IPX_TYPE	1
@@ -405,10 +421,9 @@ extern int recvmsg_copy_msghdr(struct msghdr *msg,
 			       struct user_msghdr __user *umsg, unsigned flags,
 			       struct sockaddr __user **uaddr,
 			       struct iovec **iov);
-extern int __copy_msghdr_from_user(struct msghdr *kmsg,
-				   struct user_msghdr __user *umsg,
-				   struct sockaddr __user **save_addr,
-				   struct iovec __user **uiov, size_t *nsegs);
+extern int __copy_msghdr(struct msghdr *kmsg,
+			 struct user_msghdr *umsg,
+			 struct sockaddr __user **save_addr);
 
 /* helpers which do the actual work for syscalls */
 extern int __sys_recvfrom(int fd, void __user *ubuf, size_t size,
@@ -417,13 +432,13 @@ extern int __sys_recvfrom(int fd, void __user *ubuf, size_t size,
 extern int __sys_sendto(int fd, void __user *buff, size_t len,
 			unsigned int flags, struct sockaddr __user *addr,
 			int addr_len);
-extern int __sys_accept4_file(struct file *file, unsigned file_flags,
-			struct sockaddr __user *upeer_sockaddr,
-			 int __user *upeer_addrlen, int flags,
-			 unsigned long nofile);
+extern struct file *do_accept(struct file *file, unsigned file_flags,
+			      struct sockaddr __user *upeer_sockaddr,
+			      int __user *upeer_addrlen, int flags);
 extern int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
 			 int __user *upeer_addrlen, int flags);
 extern int __sys_socket(int family, int type, int protocol);
+extern struct file *__sys_socket_file(int family, int type, int protocol);
 extern int __sys_bind(int fd, struct sockaddr __user *umyaddr, int addrlen);
 extern int __sys_connect_file(struct file *file, struct sockaddr_storage *addr,
 			      int addrlen, int file_flags);

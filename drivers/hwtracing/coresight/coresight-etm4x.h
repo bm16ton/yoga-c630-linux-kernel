@@ -7,6 +7,7 @@
 #define _CORESIGHT_CORESIGHT_ETM_H
 
 #include <asm/local.h>
+#include <linux/const.h>
 #include <linux/spinlock.h>
 #include <linux/types.h>
 #include "coresight-priv.h"
@@ -29,6 +30,7 @@
 #define TRCAUXCTLR			0x018
 #define TRCEVENTCTL0R			0x020
 #define TRCEVENTCTL1R			0x024
+#define TRCRSR				0x028
 #define TRCSTALLCTLR			0x02C
 #define TRCTSCTLR			0x030
 #define TRCSYNCPR			0x034
@@ -49,6 +51,7 @@
 #define TRCSEQRSTEVR			0x118
 #define TRCSEQSTR			0x11C
 #define TRCEXTINSELR			0x120
+#define TRCEXTINSELRn(n)		(0x120 + (n * 4)) /* n = 0-3 */
 #define TRCCNTRLDVRn(n)			(0x140 + (n * 4)) /* n = 0-3 */
 #define TRCCNTCTLRn(n)			(0x150 + (n * 4)) /* n = 0-3 */
 #define TRCCNTVRn(n)			(0x160 + (n * 4)) /* n = 0-3 */
@@ -126,6 +129,106 @@
 #define TRCCIDR2			0xFF8
 #define TRCCIDR3			0xFFC
 
+#define TRCRSR_TA			BIT(12)
+
+/*
+ * Bit positions of registers that are defined above, in the sysreg.h style
+ * of _MASK for multi bit fields and BIT() for single bits.
+ */
+#define TRCIDR0_INSTP0_MASK			GENMASK(2, 1)
+#define TRCIDR0_TRCBB				BIT(5)
+#define TRCIDR0_TRCCOND				BIT(6)
+#define TRCIDR0_TRCCCI				BIT(7)
+#define TRCIDR0_RETSTACK			BIT(9)
+#define TRCIDR0_NUMEVENT_MASK			GENMASK(11, 10)
+#define TRCIDR0_QSUPP_MASK			GENMASK(16, 15)
+#define TRCIDR0_TSSIZE_MASK			GENMASK(28, 24)
+
+#define TRCIDR2_CIDSIZE_MASK			GENMASK(9, 5)
+#define TRCIDR2_VMIDSIZE_MASK			GENMASK(14, 10)
+#define TRCIDR2_CCSIZE_MASK			GENMASK(28, 25)
+
+#define TRCIDR3_CCITMIN_MASK			GENMASK(11, 0)
+#define TRCIDR3_EXLEVEL_S_MASK			GENMASK(19, 16)
+#define TRCIDR3_EXLEVEL_NS_MASK			GENMASK(23, 20)
+#define TRCIDR3_TRCERR				BIT(24)
+#define TRCIDR3_SYNCPR				BIT(25)
+#define TRCIDR3_STALLCTL			BIT(26)
+#define TRCIDR3_SYSSTALL			BIT(27)
+#define TRCIDR3_NUMPROC_LO_MASK			GENMASK(30, 28)
+#define TRCIDR3_NUMPROC_HI_MASK			GENMASK(13, 12)
+#define TRCIDR3_NOOVERFLOW			BIT(31)
+
+#define TRCIDR4_NUMACPAIRS_MASK			GENMASK(3, 0)
+#define TRCIDR4_NUMPC_MASK			GENMASK(15, 12)
+#define TRCIDR4_NUMRSPAIR_MASK			GENMASK(19, 16)
+#define TRCIDR4_NUMSSCC_MASK			GENMASK(23, 20)
+#define TRCIDR4_NUMCIDC_MASK			GENMASK(27, 24)
+#define TRCIDR4_NUMVMIDC_MASK			GENMASK(31, 28)
+
+#define TRCIDR5_NUMEXTIN_MASK			GENMASK(8, 0)
+#define TRCIDR5_TRACEIDSIZE_MASK		GENMASK(21, 16)
+#define TRCIDR5_ATBTRIG				BIT(22)
+#define TRCIDR5_LPOVERRIDE			BIT(23)
+#define TRCIDR5_NUMSEQSTATE_MASK		GENMASK(27, 25)
+#define TRCIDR5_NUMCNTR_MASK			GENMASK(30, 28)
+
+#define TRCCONFIGR_INSTP0_LOAD			BIT(1)
+#define TRCCONFIGR_INSTP0_STORE			BIT(2)
+#define TRCCONFIGR_INSTP0_LOAD_STORE		(TRCCONFIGR_INSTP0_LOAD | TRCCONFIGR_INSTP0_STORE)
+#define TRCCONFIGR_BB				BIT(3)
+#define TRCCONFIGR_CCI				BIT(4)
+#define TRCCONFIGR_CID				BIT(6)
+#define TRCCONFIGR_VMID				BIT(7)
+#define TRCCONFIGR_COND_MASK			GENMASK(10, 8)
+#define TRCCONFIGR_TS				BIT(11)
+#define TRCCONFIGR_RS				BIT(12)
+#define TRCCONFIGR_QE_W_COUNTS			BIT(13)
+#define TRCCONFIGR_QE_WO_COUNTS			BIT(14)
+#define TRCCONFIGR_VMIDOPT			BIT(15)
+#define TRCCONFIGR_DA				BIT(16)
+#define TRCCONFIGR_DV				BIT(17)
+
+#define TRCEVENTCTL1R_INSTEN_MASK		GENMASK(3, 0)
+#define TRCEVENTCTL1R_INSTEN_0			BIT(0)
+#define TRCEVENTCTL1R_INSTEN_1			BIT(1)
+#define TRCEVENTCTL1R_INSTEN_2			BIT(2)
+#define TRCEVENTCTL1R_INSTEN_3			BIT(3)
+#define TRCEVENTCTL1R_ATB			BIT(11)
+#define TRCEVENTCTL1R_LPOVERRIDE		BIT(12)
+
+#define TRCSTALLCTLR_ISTALL			BIT(8)
+#define TRCSTALLCTLR_INSTPRIORITY		BIT(10)
+#define TRCSTALLCTLR_NOOVERFLOW			BIT(13)
+
+#define TRCVICTLR_EVENT_MASK			GENMASK(7, 0)
+#define TRCVICTLR_SSSTATUS			BIT(9)
+#define TRCVICTLR_TRCRESET			BIT(10)
+#define TRCVICTLR_TRCERR			BIT(11)
+#define TRCVICTLR_EXLEVEL_MASK			GENMASK(22, 16)
+#define TRCVICTLR_EXLEVEL_S_MASK		GENMASK(19, 16)
+#define TRCVICTLR_EXLEVEL_NS_MASK		GENMASK(22, 20)
+
+#define TRCACATRn_TYPE_MASK			GENMASK(1, 0)
+#define TRCACATRn_CONTEXTTYPE_MASK		GENMASK(3, 2)
+#define TRCACATRn_CONTEXTTYPE_CTXID		BIT(2)
+#define TRCACATRn_CONTEXTTYPE_VMID		BIT(3)
+#define TRCACATRn_CONTEXT_MASK			GENMASK(6, 4)
+#define TRCACATRn_EXLEVEL_MASK			GENMASK(14, 8)
+
+#define TRCSSCSRn_STATUS			BIT(31)
+#define TRCSSCCRn_SAC_ARC_RST_MASK		GENMASK(24, 0)
+
+#define TRCSSPCICRn_PC_MASK			GENMASK(7, 0)
+
+#define TRCBBCTLR_MODE				BIT(8)
+#define TRCBBCTLR_RANGE_MASK			GENMASK(7, 0)
+
+#define TRCRSCTLRn_PAIRINV			BIT(21)
+#define TRCRSCTLRn_INV				BIT(20)
+#define TRCRSCTLRn_GROUP_MASK			GENMASK(19, 16)
+#define TRCRSCTLRn_SELECT_MASK			GENMASK(15, 0)
+
 /*
  * System instructions to access ETM registers.
  * See ETMv4.4 spec ARM IHI0064F section 4.3.6 System instructions
@@ -160,10 +263,22 @@
 #define CASE_NOP(__unused, x)					\
 	case (x):	/* fall through */
 
+#define ETE_ONLY_SYSREG_LIST(op, val)		\
+	CASE_##op((val), TRCRSR)		\
+	CASE_##op((val), TRCEXTINSELRn(1))	\
+	CASE_##op((val), TRCEXTINSELRn(2))	\
+	CASE_##op((val), TRCEXTINSELRn(3))
+
 /* List of registers accessible via System instructions */
-#define ETM_SYSREG_LIST(op, val)		\
-	CASE_##op((val), TRCPRGCTLR)		\
+#define ETM4x_ONLY_SYSREG_LIST(op, val)		\
 	CASE_##op((val), TRCPROCSELR)		\
+	CASE_##op((val), TRCVDCTLR)		\
+	CASE_##op((val), TRCVDSACCTLR)		\
+	CASE_##op((val), TRCVDARCCTLR)		\
+	CASE_##op((val), TRCOSLAR)
+
+#define ETM_COMMON_SYSREG_LIST(op, val)		\
+	CASE_##op((val), TRCPRGCTLR)		\
 	CASE_##op((val), TRCSTATR)		\
 	CASE_##op((val), TRCCONFIGR)		\
 	CASE_##op((val), TRCAUXCTLR)		\
@@ -180,9 +295,6 @@
 	CASE_##op((val), TRCVIIECTLR)		\
 	CASE_##op((val), TRCVISSCTLR)		\
 	CASE_##op((val), TRCVIPCSSCTLR)		\
-	CASE_##op((val), TRCVDCTLR)		\
-	CASE_##op((val), TRCVDSACCTLR)		\
-	CASE_##op((val), TRCVDARCCTLR)		\
 	CASE_##op((val), TRCSEQEVRn(0))		\
 	CASE_##op((val), TRCSEQEVRn(1))		\
 	CASE_##op((val), TRCSEQEVRn(2))		\
@@ -277,7 +389,6 @@
 	CASE_##op((val), TRCSSPCICRn(5))	\
 	CASE_##op((val), TRCSSPCICRn(6))	\
 	CASE_##op((val), TRCSSPCICRn(7))	\
-	CASE_##op((val), TRCOSLAR)		\
 	CASE_##op((val), TRCOSLSR)		\
 	CASE_##op((val), TRCACVRn(0))		\
 	CASE_##op((val), TRCACVRn(1))		\
@@ -369,17 +480,43 @@
 	CASE_##op((val), TRCPIDR2)		\
 	CASE_##op((val), TRCPIDR3)
 
-#define ETM4x_READ_SYSREG_CASES(res)	ETM_SYSREG_LIST(READ, (res))
-#define ETM4x_WRITE_SYSREG_CASES(val)	ETM_SYSREG_LIST(WRITE, (val))
+#define ETM4x_READ_SYSREG_CASES(res)		\
+	ETM_COMMON_SYSREG_LIST(READ, (res))	\
+	ETM4x_ONLY_SYSREG_LIST(READ, (res))
 
-#define ETM4x_SYSREG_LIST_CASES		ETM_SYSREG_LIST(NOP, __unused)
+#define ETM4x_WRITE_SYSREG_CASES(val)		\
+	ETM_COMMON_SYSREG_LIST(WRITE, (val))	\
+	ETM4x_ONLY_SYSREG_LIST(WRITE, (val))
+
+#define ETM_COMMON_SYSREG_LIST_CASES		\
+	ETM_COMMON_SYSREG_LIST(NOP, __unused)
+
+#define ETM4x_ONLY_SYSREG_LIST_CASES		\
+	ETM4x_ONLY_SYSREG_LIST(NOP, __unused)
+
+#define ETM4x_SYSREG_LIST_CASES			\
+	ETM_COMMON_SYSREG_LIST_CASES		\
+	ETM4x_ONLY_SYSREG_LIST(NOP, __unused)
+
 #define ETM4x_MMAP_LIST_CASES		ETM_MMAP_LIST(NOP, __unused)
+
+/* ETE only supports system register access */
+#define ETE_READ_CASES(res)			\
+	ETM_COMMON_SYSREG_LIST(READ, (res))	\
+	ETE_ONLY_SYSREG_LIST(READ, (res))
+
+#define ETE_WRITE_CASES(val)			\
+	ETM_COMMON_SYSREG_LIST(WRITE, (val))	\
+	ETE_ONLY_SYSREG_LIST(WRITE, (val))
+
+#define ETE_ONLY_SYSREG_LIST_CASES		\
+	ETE_ONLY_SYSREG_LIST(NOP, __unused)
 
 #define read_etm4x_sysreg_offset(offset, _64bit)				\
 	({									\
 		u64 __val;							\
 										\
-		if (__builtin_constant_p((offset)))				\
+		if (__is_constexpr((offset)))					\
 			__val = read_etm4x_sysreg_const_offset((offset));	\
 		else								\
 			__val = etm4x_sysreg_read((offset), true, (_64bit));	\
@@ -410,14 +547,14 @@
 #define etm4x_read32(csa, offset)					\
 	({								\
 		u32 __val = etm4x_relaxed_read32((csa), (offset));	\
-		__iormb(__val);						\
+		__io_ar(__val);						\
 		__val;							\
 	 })
 
 #define etm4x_read64(csa, offset)					\
 	({								\
 		u64 __val = etm4x_relaxed_read64((csa), (offset));	\
-		__iormb(__val);						\
+		__io_ar(__val);						\
 		__val;							\
 	 })
 
@@ -441,13 +578,13 @@
 
 #define etm4x_write32(csa, val, offset)					\
 	do {								\
-		__iowmb();						\
+		__io_bw();						\
 		etm4x_relaxed_write32((csa), (val), (offset));		\
 	} while (0)
 
 #define etm4x_write64(csa, val, offset)					\
 	do {								\
-		__iowmb();						\
+		__io_bw();						\
 		etm4x_relaxed_write64((csa), (val), (offset));		\
 	} while (0)
 
@@ -506,6 +643,20 @@
 					 ETM_MODE_EXCL_USER)
 
 /*
+ * TRCOSLSR.OSLM advertises the OS Lock model.
+ * OSLM[2:0] = TRCOSLSR[4:3,0]
+ *
+ *	0b000 - Trace OS Lock is not implemented.
+ *	0b010 - Trace OS Lock is implemented.
+ *	0b100 - Trace OS Lock is not implemented, unit is controlled by PE OS Lock.
+ */
+#define ETM_OSLOCK_NI		0b000
+#define ETM_OSLOCK_PRESENT	0b010
+#define ETM_OSLOCK_PE		0b100
+
+#define ETM_OSLSR_OSLM(oslsr)	((((oslsr) & GENMASK(4, 3)) >> 2) | (oslsr & 0x1))
+
+/*
  * TRCDEVARCH Bit field definitions
  * Bits[31:21]	- ARCHITECT = Always Arm Ltd.
  *                * Bits[31:28] = 0x4
@@ -541,11 +692,14 @@
 	((ETM_DEVARCH_MAKE_ARCHID_ARCH_VER(major)) | ETM_DEVARCH_ARCHID_ARCH_PART(0xA13))
 
 #define ETM_DEVARCH_ARCHID_ETMv4x		ETM_DEVARCH_MAKE_ARCHID(0x4)
+#define ETM_DEVARCH_ARCHID_ETE			ETM_DEVARCH_MAKE_ARCHID(0x5)
 
 #define ETM_DEVARCH_ID_MASK						\
 	(ETM_DEVARCH_ARCHITECT_MASK | ETM_DEVARCH_ARCHID_MASK | ETM_DEVARCH_PRESENT)
 #define ETM_DEVARCH_ETMv4x_ARCH						\
 	(ETM_DEVARCH_ARCHITECT_ARM | ETM_DEVARCH_ARCHID_ETMv4x | ETM_DEVARCH_PRESENT)
+#define ETM_DEVARCH_ETE_ARCH						\
+	(ETM_DEVARCH_ARCHITECT_ARM | ETM_DEVARCH_ARCHID_ETE | ETM_DEVARCH_PRESENT)
 
 #define TRCSTATR_IDLE_BIT		0
 #define TRCSTATR_PMSTABLE_BIT		1
@@ -575,22 +729,8 @@
 #define ETM_EXLEVEL_NS_OS		BIT(5)	/* NonSecure EL1	*/
 #define ETM_EXLEVEL_NS_HYP		BIT(6)	/* NonSecure EL2	*/
 
-#define ETM_EXLEVEL_MASK		(GENMASK(6, 0))
-#define ETM_EXLEVEL_S_MASK		(GENMASK(3, 0))
-#define ETM_EXLEVEL_NS_MASK		(GENMASK(6, 4))
-
 /* access level controls in TRCACATRn */
 #define TRCACATR_EXLEVEL_SHIFT		8
-
-/* access level control in TRCVICTLR */
-#define TRCVICTLR_EXLEVEL_SHIFT		16
-#define TRCVICTLR_EXLEVEL_S_SHIFT	16
-#define TRCVICTLR_EXLEVEL_NS_SHIFT	20
-
-/* secure / non secure masks - TRCVICTLR, IDR3 */
-#define TRCVICTLR_EXLEVEL_MASK		(ETM_EXLEVEL_MASK << TRCVICTLR_EXLEVEL_SHIFT)
-#define TRCVICTLR_EXLEVEL_S_MASK	(ETM_EXLEVEL_S_MASK << TRCVICTLR_EXLEVEL_SHIFT)
-#define TRCVICTLR_EXLEVEL_NS_MASK	(ETM_EXLEVEL_NS_MASK << TRCVICTLR_EXLEVEL_SHIFT)
 
 #define ETM_TRCIDR1_ARCH_MAJOR_SHIFT	8
 #define ETM_TRCIDR1_ARCH_MAJOR_MASK	(0xfU << ETM_TRCIDR1_ARCH_MAJOR_SHIFT)
@@ -635,6 +775,8 @@
 #define ETM_ARCH_MINOR_VERSION(arch)	((arch) & 0xfU)
 
 #define ETM_ARCH_V4	ETM_ARCH_VERSION(4, 0)
+#define ETM_ARCH_ETE	ETM_ARCH_VERSION(5, 0)
+
 /* Interpretation of resource numbers change at ETM v4.3 architecture */
 #define ETM_ARCH_V4_3	ETM_ARCH_VERSION(4, 3)
 
@@ -862,7 +1004,12 @@ struct etmv4_save_state {
  * @nooverflow:	Indicate if overflow prevention is supported.
  * @atbtrig:	If the implementation can support ATB triggers
  * @lpoverride:	If the implementation can support low-power state over.
+ * @trfcr:	If the CPU supports FEAT_TRF, value of the TRFCR_ELx that
+ *		allows tracing at all ELs. We don't want to compute this
+ *		at runtime, due to the additional setting of TRFCR_CX when
+ *		in EL2. Otherwise, 0.
  * @config:	structure holding configuration parameters.
+ * @save_trfcr:	Saved TRFCR_EL1 register during a CPU PM event.
  * @save_state:	State to be preserved across power loss
  * @state_needs_restore: True when there is context to restore after PM exit
  * @skip_power_up: Indicates if an implementation can skip powering up
@@ -897,6 +1044,7 @@ struct etmv4_drvdata {
 	u8				s_ex_level;
 	u8				ns_ex_level;
 	u8				q_support;
+	u8				os_lock_model;
 	bool				sticky_enable;
 	bool				boot_enable;
 	bool				os_unlock;
@@ -912,7 +1060,9 @@ struct etmv4_drvdata {
 	bool				nooverflow;
 	bool				atbtrig;
 	bool				lpoverride;
+	u64				trfcr;
 	struct etmv4_config		config;
+	u64				save_trfcr;
 	struct etmv4_save_state		*save_state;
 	bool				state_needs_restore;
 	bool				skip_power_up;
@@ -921,10 +1071,10 @@ struct etmv4_drvdata {
 
 /* Address comparator access types */
 enum etm_addr_acctype {
-	ETM_INSTR_ADDR,
-	ETM_DATA_LOAD_ADDR,
-	ETM_DATA_STORE_ADDR,
-	ETM_DATA_LOAD_STORE_ADDR,
+	TRCACATRn_TYPE_ADDR,
+	TRCACATRn_TYPE_DATA_LOAD_ADDR,
+	TRCACATRn_TYPE_DATA_STORE_ADDR,
+	TRCACATRn_TYPE_DATA_LOAD_STORE_ADDR,
 };
 
 /* Address comparator context types */
@@ -940,4 +1090,9 @@ void etm4_config_trace_mode(struct etmv4_config *config);
 
 u64 etm4x_sysreg_read(u32 offset, bool _relaxed, bool _64bit);
 void etm4x_sysreg_write(u64 val, u32 offset, bool _relaxed, bool _64bit);
+
+static inline bool etm4x_is_ete(struct etmv4_drvdata *drvdata)
+{
+	return drvdata->arch >= ETM_ARCH_ETE;
+}
 #endif

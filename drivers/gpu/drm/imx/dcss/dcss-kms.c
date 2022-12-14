@@ -52,7 +52,6 @@ static void dcss_kms_mode_config_init(struct dcss_kms_dev *kms)
 	config->min_height = 1;
 	config->max_width = 4096;
 	config->max_height = 4096;
-	config->allow_fb_modifiers = true;
 	config->normalize_zpos = true;
 
 	config->funcs = &dcss_drm_mode_config_funcs;
@@ -94,11 +93,8 @@ static int dcss_kms_bridge_connector_init(struct dcss_kms_dev *kms)
 
 	ret = drm_bridge_attach(encoder, bridge, NULL,
 				DRM_BRIDGE_ATTACH_NO_CONNECTOR);
-	if (ret < 0) {
-		dev_err(ddev->dev, "Unable to attach bridge %pOF\n",
-			bridge->of_node);
+	if (ret < 0)
 		return ret;
-	}
 
 	kms->connector = drm_bridge_connector_init(ddev, encoder);
 	if (IS_ERR(kms->connector)) {
@@ -134,8 +130,6 @@ struct dcss_kms_dev *dcss_kms_attach(struct dcss_dev *dcss)
 	if (ret)
 		goto cleanup_mode_config;
 
-	drm->irq_enabled = true;
-
 	ret = dcss_kms_bridge_connector_init(kms);
 	if (ret)
 		goto cleanup_mode_config;
@@ -147,8 +141,6 @@ struct dcss_kms_dev *dcss_kms_attach(struct dcss_dev *dcss)
 	drm_mode_config_reset(drm);
 
 	drm_kms_helper_poll_init(drm);
-
-	drm_bridge_connector_enable_hpd(kms->connector);
 
 	ret = drm_dev_register(drm, 0);
 	if (ret)
@@ -179,7 +171,6 @@ void dcss_kms_detach(struct dcss_kms_dev *kms)
 	drm_kms_helper_poll_fini(drm);
 	drm_atomic_helper_shutdown(drm);
 	drm_crtc_vblank_off(&kms->crtc.base);
-	drm->irq_enabled = false;
 	drm_mode_config_cleanup(drm);
 	dcss_crtc_deinit(&kms->crtc, drm);
 	drm->dev_private = NULL;

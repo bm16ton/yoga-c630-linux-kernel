@@ -5,6 +5,8 @@
 
 #include <linux/prime_numbers.h>
 
+#include "gem/i915_gem_internal.h"
+
 #include "i915_selftest.h"
 #include "intel_engine_heartbeat.h"
 #include "intel_engine_pm.h"
@@ -27,7 +29,7 @@
 
 static struct i915_vma *create_scratch(struct intel_gt *gt)
 {
-	return __vm_create_scratch_for_read(&gt->ggtt->vm, PAGE_SIZE);
+	return __vm_create_scratch_for_read_pinned(&gt->ggtt->vm, PAGE_SIZE);
 }
 
 static bool is_active(struct i915_request *rq)
@@ -49,7 +51,7 @@ static int wait_for_submit(struct intel_engine_cs *engine,
 			   unsigned long timeout)
 {
 	/* Ignore our own attempts to suppress excess tasklets */
-	tasklet_hi_schedule(&engine->execlists.tasklet);
+	tasklet_hi_schedule(&engine->sched_engine->tasklet);
 
 	timeout += jiffies;
 	do {
@@ -126,6 +128,27 @@ static int context_flush(struct intel_context *ce, long timeout)
 	return err;
 }
 
+static int get_lri_mask(struct intel_engine_cs *engine, u32 lri)
+{
+	if ((lri & MI_LRI_LRM_CS_MMIO) == 0)
+		return ~0u;
+
+	if (GRAPHICS_VER(engine->i915) < 12)
+		return 0xfff;
+
+	switch (engine->class) {
+	default:
+	case RENDER_CLASS:
+	case COMPUTE_CLASS:
+		return 0x07ff;
+	case COPY_ENGINE_CLASS:
+		return 0x0fff;
+	case VIDEO_DECODE_CLASS:
+	case VIDEO_ENHANCEMENT_CLASS:
+		return 0x3fff;
+	}
+}
+
 static int live_lrc_layout(void *arg)
 {
 	struct intel_gt *gt = arg;
@@ -153,8 +176,8 @@ static int live_lrc_layout(void *arg)
 			continue;
 
 		hw = shmem_pin_map(engine->default_state);
-		if (IS_ERR(hw)) {
-			err = PTR_ERR(hw);
+		if (!hw) {
+			err = -ENOMEM;
 			break;
 		}
 		hw += LRC_STATE_OFFSET / sizeof(*hw);
@@ -165,6 +188,7 @@ static int live_lrc_layout(void *arg)
 		dw = 0;
 		do {
 			u32 lri = READ_ONCE(hw[dw]);
+			u32 lri_mask;
 
 			if (lri == 0) {
 				dw++;
@@ -192,6 +216,18 @@ static int live_lrc_layout(void *arg)
 				break;
 			}
 
+			/*
+			 * When bit 19 of MI_LOAD_REGISTER_IMM instruction
+			 * opcode is set on Gen12+ devices, HW does not
+			 * care about certain register address offsets, and
+			 * instead check the following for valid address
+			 * ranges on specific engines:
+			 * RCS && CCS: BITS(0 - 10)
+			 * BCS: BITS(0 - 11)
+			 * VECS && VCS: BITS(0 - 13)
+			 */
+			lri_mask = get_lri_mask(engine, lri);
+
 			lri &= 0x7f;
 			lri++;
 			dw++;
@@ -199,7 +235,7 @@ static int live_lrc_layout(void *arg)
 			while (lri) {
 				u32 offset = READ_ONCE(hw[dw]);
 
-				if (offset != lrc[dw]) {
+				if ((offset ^ lrc[dw]) & lri_mask) {
 					pr_err("%s: Different registers found at dword %d, expected %x, found %x\n",
 					       engine->name, dw, offset, lrc[dw]);
 					err = -EINVAL;
@@ -329,8 +365,8 @@ static int live_lrc_fixed(void *arg)
 			continue;
 
 		hw = shmem_pin_map(engine->default_state);
-		if (IS_ERR(hw)) {
-			err = PTR_ERR(hw);
+		if (!hw) {
+			err = -ENOMEM;
 			break;
 		}
 		hw += LRC_STATE_OFFSET / sizeof(*hw);
@@ -584,7 +620,7 @@ static int __live_lrc_gpr(struct intel_engine_cs *engine,
 	int err;
 	int n;
 
-	if (INTEL_GEN(engine->i915) < 9 && engine->class != RENDER_CLASS)
+	if (GRAPHICS_VER(engine->i915) < 9 && engine->class != RENDER_CLASS)
 		return 0; /* GPR only on rcs0 for gen8 */
 
 	err = gpr_make_dirty(engine->kernel_context);
@@ -627,7 +663,7 @@ static int __live_lrc_gpr(struct intel_engine_cs *engine,
 		goto err_rq;
 	}
 
-	cs = i915_gem_object_pin_map(scratch->obj, I915_MAP_WB);
+	cs = i915_gem_object_pin_map_unlocked(scratch->obj, I915_MAP_WB);
 	if (IS_ERR(cs)) {
 		err = PTR_ERR(cs);
 		goto err_rq;
@@ -733,7 +769,6 @@ create_timestamp(struct intel_context *ce, void *slot, int idx)
 
 	intel_ring_advance(rq, cs);
 
-	rq->sched.attr.priority = I915_PRIORITY_MASK;
 	err = 0;
 err:
 	i915_request_get(rq);
@@ -910,6 +945,19 @@ create_user_vma(struct i915_address_space *vm, unsigned long size)
 	return vma;
 }
 
+static u32 safe_poison(u32 offset, u32 poison)
+{
+	/*
+	 * Do not enable predication as it will nop all subsequent commands,
+	 * not only disabling the tests (by preventing all the other SRM) but
+	 * also preventing the arbitration events at the end of the request.
+	 */
+	if (offset == i915_mmio_reg_offset(RING_PREDICATE_RESULT(0)))
+		poison &= ~REG_BIT(0);
+
+	return poison;
+}
+
 static struct i915_vma *
 store_context(struct intel_context *ce, struct i915_vma *scratch)
 {
@@ -921,7 +969,7 @@ store_context(struct intel_context *ce, struct i915_vma *scratch)
 	if (IS_ERR(batch))
 		return batch;
 
-	cs = i915_gem_object_pin_map(batch->obj, I915_MAP_WC);
+	cs = i915_gem_object_pin_map_unlocked(batch->obj, I915_MAP_WC);
 	if (IS_ERR(cs)) {
 		i915_vma_put(batch);
 		return ERR_CAST(cs);
@@ -1085,7 +1133,7 @@ static struct i915_vma *load_context(struct intel_context *ce, u32 poison)
 	if (IS_ERR(batch))
 		return batch;
 
-	cs = i915_gem_object_pin_map(batch->obj, I915_MAP_WC);
+	cs = i915_gem_object_pin_map_unlocked(batch->obj, I915_MAP_WC);
 	if (IS_ERR(cs)) {
 		i915_vma_put(batch);
 		return ERR_CAST(cs);
@@ -1119,7 +1167,9 @@ static struct i915_vma *load_context(struct intel_context *ce, u32 poison)
 		*cs++ = MI_LOAD_REGISTER_IMM(len);
 		while (len--) {
 			*cs++ = hw[dw];
-			*cs++ = poison;
+			*cs++ = safe_poison(hw[dw] & get_lri_mask(ce->engine,
+								  MI_LRI_LRM_CS_MMIO),
+					    poison);
 			dw += 2;
 		}
 	} while (dw < PAGE_SIZE / sizeof(u32) &&
@@ -1199,30 +1249,32 @@ static int compare_isolation(struct intel_engine_cs *engine,
 	u32 *defaults;
 	int err = 0;
 
-	A[0] = i915_gem_object_pin_map(ref[0]->obj, I915_MAP_WC);
+	A[0] = i915_gem_object_pin_map_unlocked(ref[0]->obj, I915_MAP_WC);
 	if (IS_ERR(A[0]))
 		return PTR_ERR(A[0]);
 
-	A[1] = i915_gem_object_pin_map(ref[1]->obj, I915_MAP_WC);
+	A[1] = i915_gem_object_pin_map_unlocked(ref[1]->obj, I915_MAP_WC);
 	if (IS_ERR(A[1])) {
 		err = PTR_ERR(A[1]);
 		goto err_A0;
 	}
 
-	B[0] = i915_gem_object_pin_map(result[0]->obj, I915_MAP_WC);
+	B[0] = i915_gem_object_pin_map_unlocked(result[0]->obj, I915_MAP_WC);
 	if (IS_ERR(B[0])) {
 		err = PTR_ERR(B[0]);
 		goto err_A1;
 	}
 
-	B[1] = i915_gem_object_pin_map(result[1]->obj, I915_MAP_WC);
+	B[1] = i915_gem_object_pin_map_unlocked(result[1]->obj, I915_MAP_WC);
 	if (IS_ERR(B[1])) {
 		err = PTR_ERR(B[1]);
 		goto err_B0;
 	}
 
-	lrc = i915_gem_object_pin_map(ce->state->obj,
-				      i915_coherent_map_type(engine->i915));
+	lrc = i915_gem_object_pin_map_unlocked(ce->state->obj,
+					       i915_coherent_map_type(engine->i915,
+								      ce->state->obj,
+								      false));
 	if (IS_ERR(lrc)) {
 		err = PTR_ERR(lrc);
 		goto err_B1;
@@ -1388,10 +1440,10 @@ err_A:
 
 static bool skip_isolation(const struct intel_engine_cs *engine)
 {
-	if (engine->class == COPY_ENGINE_CLASS && INTEL_GEN(engine->i915) == 9)
+	if (engine->class == COPY_ENGINE_CLASS && GRAPHICS_VER(engine->i915) == 9)
 		return true;
 
-	if (engine->class == RENDER_CLASS && INTEL_GEN(engine->i915) == 11)
+	if (engine->class == RENDER_CLASS && GRAPHICS_VER(engine->i915) == 11)
 		return true;
 
 	return false;
@@ -1550,7 +1602,7 @@ static int __live_lrc_indirect_ctx_bb(struct intel_engine_cs *engine)
 	/* We use the already reserved extra page in context state */
 	if (!a->wa_bb_page) {
 		GEM_BUG_ON(b->wa_bb_page);
-		GEM_BUG_ON(INTEL_GEN(engine->i915) == 12);
+		GEM_BUG_ON(GRAPHICS_VER(engine->i915) == 12);
 		goto unpin_b;
 	}
 
@@ -1612,12 +1664,12 @@ static void garbage_reset(struct intel_engine_cs *engine,
 
 	local_bh_disable();
 	if (!test_and_set_bit(bit, lock)) {
-		tasklet_disable(&engine->execlists.tasklet);
+		tasklet_disable(&engine->sched_engine->tasklet);
 
 		if (!rq->fence.error)
 			__intel_engine_reset_bh(engine, NULL);
 
-		tasklet_enable(&engine->execlists.tasklet);
+		tasklet_enable(&engine->sched_engine->tasklet);
 		clear_and_wake_up_bit(bit, lock);
 	}
 	local_bh_enable();
@@ -1750,8 +1802,8 @@ static int __live_pphwsp_runtime(struct intel_engine_cs *engine)
 	if (IS_ERR(ce))
 		return PTR_ERR(ce);
 
-	ce->runtime.num_underflow = 0;
-	ce->runtime.max_underflow = 0;
+	ce->stats.runtime.num_underflow = 0;
+	ce->stats.runtime.max_underflow = 0;
 
 	do {
 		unsigned int loop = 1024;
@@ -1789,11 +1841,11 @@ static int __live_pphwsp_runtime(struct intel_engine_cs *engine)
 		intel_context_get_avg_runtime_ns(ce));
 
 	err = 0;
-	if (ce->runtime.num_underflow) {
+	if (ce->stats.runtime.num_underflow) {
 		pr_err("%s: pphwsp underflow %u time(s), max %u cycles!\n",
 		       engine->name,
-		       ce->runtime.num_underflow,
-		       ce->runtime.max_underflow);
+		       ce->stats.runtime.num_underflow,
+		       ce->stats.runtime.max_underflow);
 		GEM_TRACE_DUMP();
 		err = -EOVERFLOW;
 	}
@@ -1846,5 +1898,5 @@ int intel_lrc_live_selftests(struct drm_i915_private *i915)
 	if (!HAS_LOGICAL_RING_CONTEXTS(i915))
 		return 0;
 
-	return intel_gt_live_subtests(tests, &i915->gt);
+	return intel_gt_live_subtests(tests, to_gt(i915));
 }

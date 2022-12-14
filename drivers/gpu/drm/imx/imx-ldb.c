@@ -7,6 +7,7 @@
 
 #include <linux/clk.h>
 #include <linux/component.h>
+#include <linux/media-bus-format.h>
 #include <linux/mfd/syscon.h>
 #include <linux/mfd/syscon/imx6q-iomuxc-gpr.h>
 #include <linux/module.h>
@@ -21,6 +22,7 @@
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_bridge.h>
+#include <drm/drm_edid.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_managed.h>
 #include <drm/drm_of.h>
@@ -150,10 +152,9 @@ static int imx_ldb_connector_get_modes(struct drm_connector *connector)
 	if (imx_ldb_ch->mode_valid) {
 		struct drm_display_mode *mode;
 
-		mode = drm_mode_create(connector->dev);
+		mode = drm_mode_duplicate(connector->dev, &imx_ldb_ch->mode);
 		if (!mode)
 			return -EINVAL;
-		drm_mode_copy(mode, &imx_ldb_ch->mode);
 		mode->type |= DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
 		drm_mode_probed_add(connector, mode);
 		num_modes++;
@@ -272,6 +273,11 @@ imx_ldb_encoder_atomic_mode_set(struct drm_encoder *encoder,
 	if (mode->clock > 85000 && !dual) {
 		dev_warn(ldb->dev,
 			 "%s: mode exceeds 85 MHz pixel clock\n", __func__);
+	}
+
+	if (!IS_ALIGNED(mode->hdisplay, 8)) {
+		dev_warn(ldb->dev,
+			 "%s: hdisplay does not align to 8 byte\n", __func__);
 	}
 
 	if (dual) {
@@ -460,10 +466,8 @@ static int imx_ldb_register(struct drm_device *drm,
 
 	if (imx_ldb_ch->bridge) {
 		ret = drm_bridge_attach(encoder, imx_ldb_ch->bridge, NULL, 0);
-		if (ret) {
-			DRM_ERROR("Failed to initialize bridge with drm\n");
+		if (ret)
 			return ret;
-		}
 	} else {
 		/*
 		 * We want to add the connector whenever there is no bridge
@@ -569,6 +573,8 @@ static int imx_ldb_panel_ddc(struct device *dev,
 		edidp = of_get_property(child, "edid", &edid_len);
 		if (edidp) {
 			channel->edid = kmemdup(edidp, edid_len, GFP_KERNEL);
+			if (!channel->edid)
+				return -ENOMEM;
 		} else if (!channel->panel) {
 			/* fallback to display-timings node */
 			ret = of_get_drm_display_mode(child,

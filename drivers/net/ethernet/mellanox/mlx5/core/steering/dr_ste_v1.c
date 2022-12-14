@@ -3,7 +3,7 @@
 
 #include <linux/types.h>
 #include "mlx5_ifc_dr_ste_v1.h"
-#include "dr_ste.h"
+#include "dr_ste_v1.h"
 
 #define DR_STE_CALC_DFNR_TYPE(lookup_type, inner) \
 	((inner) ? DR_STE_V1_LU_TYPE_##lookup_type##_I : \
@@ -47,6 +47,7 @@ enum {
 	DR_STE_V1_LU_TYPE_ETHL3_IPV4_MISC_I		= 0x000f,
 	DR_STE_V1_LU_TYPE_STEERING_REGISTERS_0		= 0x010f,
 	DR_STE_V1_LU_TYPE_STEERING_REGISTERS_1		= 0x0110,
+	DR_STE_V1_LU_TYPE_FLEX_PARSER_OK		= 0x0011,
 	DR_STE_V1_LU_TYPE_FLEX_PARSER_0			= 0x0111,
 	DR_STE_V1_LU_TYPE_FLEX_PARSER_1			= 0x0112,
 	DR_STE_V1_LU_TYPE_ETHL4_MISC_O			= 0x0113,
@@ -88,6 +89,7 @@ enum dr_ste_v1_action_id {
 	DR_STE_V1_ACTION_ID_QUEUE_ID_SEL		= 0x0d,
 	DR_STE_V1_ACTION_ID_ACCELERATED_LIST		= 0x0e,
 	DR_STE_V1_ACTION_ID_MODIFY_LIST			= 0x0f,
+	DR_STE_V1_ACTION_ID_ASO				= 0x12,
 	DR_STE_V1_ACTION_ID_TRAILER			= 0x13,
 	DR_STE_V1_ACTION_ID_COUNTER_ID			= 0x14,
 	DR_STE_V1_ACTION_ID_MAX				= 0x21,
@@ -116,14 +118,20 @@ enum {
 	DR_STE_V1_ACTION_MDFY_FLD_IPV6_SRC_OUT_3	= 0x4f,
 	DR_STE_V1_ACTION_MDFY_FLD_TCP_MISC_0		= 0x5e,
 	DR_STE_V1_ACTION_MDFY_FLD_TCP_MISC_1		= 0x5f,
+	DR_STE_V1_ACTION_MDFY_FLD_CFG_HDR_0_0		= 0x6f,
+	DR_STE_V1_ACTION_MDFY_FLD_CFG_HDR_0_1		= 0x70,
 	DR_STE_V1_ACTION_MDFY_FLD_METADATA_2_CQE	= 0x7b,
 	DR_STE_V1_ACTION_MDFY_FLD_GNRL_PURPOSE		= 0x7c,
-	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_2		= 0x8c,
-	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_3		= 0x8d,
-	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_4		= 0x8e,
-	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_5		= 0x8f,
-	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_6		= 0x90,
-	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_7		= 0x91,
+	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_2_0		= 0x8c,
+	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_2_1		= 0x8d,
+	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_1_0		= 0x8e,
+	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_1_1		= 0x8f,
+	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_0_0		= 0x90,
+	DR_STE_V1_ACTION_MDFY_FLD_REGISTER_0_1		= 0x91,
+};
+
+enum dr_ste_v1_aso_ctx_type {
+	DR_STE_V1_ASO_CTX_TYPE_POLICERS = 0x2,
 };
 
 static const struct mlx5dr_ste_action_modify_field dr_ste_v1_action_modify_field_arr[] = {
@@ -220,22 +228,22 @@ static const struct mlx5dr_ste_action_modify_field dr_ste_v1_action_modify_field
 		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_METADATA_2_CQE, .start = 0, .end = 31,
 	},
 	[MLX5_ACTION_IN_FIELD_METADATA_REG_C_0] = {
-		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_6, .start = 0, .end = 31,
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_0_0, .start = 0, .end = 31,
 	},
 	[MLX5_ACTION_IN_FIELD_METADATA_REG_C_1] = {
-		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_7, .start = 0, .end = 31,
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_0_1, .start = 0, .end = 31,
 	},
 	[MLX5_ACTION_IN_FIELD_METADATA_REG_C_2] = {
-		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_4, .start = 0, .end = 31,
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_1_0, .start = 0, .end = 31,
 	},
 	[MLX5_ACTION_IN_FIELD_METADATA_REG_C_3] = {
-		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_5, .start = 0, .end = 31,
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_1_1, .start = 0, .end = 31,
 	},
 	[MLX5_ACTION_IN_FIELD_METADATA_REG_C_4] = {
-		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_2, .start = 0, .end = 31,
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_2_0, .start = 0, .end = 31,
 	},
 	[MLX5_ACTION_IN_FIELD_METADATA_REG_C_5] = {
-		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_3, .start = 0, .end = 31,
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_REGISTER_2_1, .start = 0, .end = 31,
 	},
 	[MLX5_ACTION_IN_FIELD_OUT_TCP_SEQ_NUM] = {
 		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_TCP_MISC_0, .start = 0, .end = 31,
@@ -246,6 +254,12 @@ static const struct mlx5dr_ste_action_modify_field dr_ste_v1_action_modify_field
 	[MLX5_ACTION_IN_FIELD_OUT_FIRST_VID] = {
 		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_L2_OUT_2, .start = 0, .end = 15,
 	},
+	[MLX5_ACTION_IN_FIELD_OUT_EMD_31_0] = {
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_CFG_HDR_0_1, .start = 0, .end = 31,
+	},
+	[MLX5_ACTION_IN_FIELD_OUT_EMD_47_32] = {
+		.hw_field = DR_STE_V1_ACTION_MDFY_FLD_CFG_HDR_0_0, .start = 0, .end = 15,
+	},
 };
 
 static void dr_ste_v1_set_entry_type(u8 *hw_ste_p, u8 entry_type)
@@ -253,7 +267,7 @@ static void dr_ste_v1_set_entry_type(u8 *hw_ste_p, u8 entry_type)
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, entry_format, entry_type);
 }
 
-static void dr_ste_v1_set_miss_addr(u8 *hw_ste_p, u64 miss_addr)
+void dr_ste_v1_set_miss_addr(u8 *hw_ste_p, u64 miss_addr)
 {
 	u64 index = miss_addr >> 6;
 
@@ -261,7 +275,7 @@ static void dr_ste_v1_set_miss_addr(u8 *hw_ste_p, u64 miss_addr)
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, miss_address_31_6, index);
 }
 
-static u64 dr_ste_v1_get_miss_addr(u8 *hw_ste_p)
+u64 dr_ste_v1_get_miss_addr(u8 *hw_ste_p)
 {
 	u64 index =
 		((u64)MLX5_GET(ste_match_bwc_v1, hw_ste_p, miss_address_31_6) |
@@ -270,12 +284,12 @@ static u64 dr_ste_v1_get_miss_addr(u8 *hw_ste_p)
 	return index << 6;
 }
 
-static void dr_ste_v1_set_byte_mask(u8 *hw_ste_p, u16 byte_mask)
+void dr_ste_v1_set_byte_mask(u8 *hw_ste_p, u16 byte_mask)
 {
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, byte_mask, byte_mask);
 }
 
-static u16 dr_ste_v1_get_byte_mask(u8 *hw_ste_p)
+u16 dr_ste_v1_get_byte_mask(u8 *hw_ste_p)
 {
 	return MLX5_GET(ste_match_bwc_v1, hw_ste_p, byte_mask);
 }
@@ -286,13 +300,13 @@ static void dr_ste_v1_set_lu_type(u8 *hw_ste_p, u16 lu_type)
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, match_definer_ctx_idx, lu_type & 0xFF);
 }
 
-static void dr_ste_v1_set_next_lu_type(u8 *hw_ste_p, u16 lu_type)
+void dr_ste_v1_set_next_lu_type(u8 *hw_ste_p, u16 lu_type)
 {
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, next_entry_format, lu_type >> 8);
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, hash_definer_ctx_idx, lu_type & 0xFF);
 }
 
-static u16 dr_ste_v1_get_next_lu_type(u8 *hw_ste_p)
+u16 dr_ste_v1_get_next_lu_type(u8 *hw_ste_p)
 {
 	u8 mode = MLX5_GET(ste_match_bwc_v1, hw_ste_p, next_entry_format);
 	u8 index = MLX5_GET(ste_match_bwc_v1, hw_ste_p, hash_definer_ctx_idx);
@@ -305,7 +319,7 @@ static void dr_ste_v1_set_hit_gvmi(u8 *hw_ste_p, u16 gvmi)
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, next_table_base_63_48, gvmi);
 }
 
-static void dr_ste_v1_set_hit_addr(u8 *hw_ste_p, u64 icm_addr, u32 ht_size)
+void dr_ste_v1_set_hit_addr(u8 *hw_ste_p, u64 icm_addr, u32 ht_size)
 {
 	u64 index = (icm_addr >> 5) | ht_size;
 
@@ -313,8 +327,7 @@ static void dr_ste_v1_set_hit_addr(u8 *hw_ste_p, u64 icm_addr, u32 ht_size)
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, next_table_base_31_5_size, index);
 }
 
-static void dr_ste_v1_init(u8 *hw_ste_p, u16 lu_type,
-			   u8 entry_type, u16 gvmi)
+void dr_ste_v1_init(u8 *hw_ste_p, u16 lu_type, bool is_rx, u16 gvmi)
 {
 	dr_ste_v1_set_lu_type(hw_ste_p, lu_type);
 	dr_ste_v1_set_next_lu_type(hw_ste_p, MLX5DR_STE_LU_TYPE_DONT_CARE);
@@ -324,8 +337,7 @@ static void dr_ste_v1_init(u8 *hw_ste_p, u16 lu_type,
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, miss_address_63_48, gvmi);
 }
 
-static void dr_ste_v1_prepare_for_postsend(u8 *hw_ste_p,
-					   u32 ste_size)
+void dr_ste_v1_prepare_for_postsend(u8 *hw_ste_p, u32 ste_size)
 {
 	u8 *tag = hw_ste_p + DR_STE_SIZE_CTRL;
 	u8 *mask = tag + DR_STE_SIZE_TAG;
@@ -361,8 +373,8 @@ static void dr_ste_v1_set_reparse(u8 *hw_ste_p)
 	MLX5_SET(ste_match_bwc_v1, hw_ste_p, reparse, 1);
 }
 
-static void dr_ste_v1_set_tx_encap(u8 *hw_ste_p, u8 *d_action,
-				   u32 reformat_id, int size)
+static void dr_ste_v1_set_encap(u8 *hw_ste_p, u8 *d_action,
+				u32 reformat_id, int size)
 {
 	MLX5_SET(ste_double_action_insert_with_ptr_v1, d_action, action_id,
 		 DR_STE_V1_ACTION_ID_INSERT_POINTER);
@@ -374,8 +386,43 @@ static void dr_ste_v1_set_tx_encap(u8 *hw_ste_p, u8 *d_action,
 	dr_ste_v1_set_reparse(hw_ste_p);
 }
 
-static void dr_ste_v1_set_tx_push_vlan(u8 *hw_ste_p, u8 *d_action,
-				       u32 vlan_hdr)
+static void dr_ste_v1_set_insert_hdr(u8 *hw_ste_p, u8 *d_action,
+				     u32 reformat_id,
+				     u8 anchor, u8 offset,
+				     int size)
+{
+	MLX5_SET(ste_double_action_insert_with_ptr_v1, d_action,
+		 action_id, DR_STE_V1_ACTION_ID_INSERT_POINTER);
+	MLX5_SET(ste_double_action_insert_with_ptr_v1, d_action, start_anchor, anchor);
+
+	/* The hardware expects here size and offset in words (2 byte) */
+	MLX5_SET(ste_double_action_insert_with_ptr_v1, d_action, size, size / 2);
+	MLX5_SET(ste_double_action_insert_with_ptr_v1, d_action, start_offset, offset / 2);
+
+	MLX5_SET(ste_double_action_insert_with_ptr_v1, d_action, pointer, reformat_id);
+	MLX5_SET(ste_double_action_insert_with_ptr_v1, d_action, attributes,
+		 DR_STE_V1_ACTION_INSERT_PTR_ATTR_NONE);
+
+	dr_ste_v1_set_reparse(hw_ste_p);
+}
+
+static void dr_ste_v1_set_remove_hdr(u8 *hw_ste_p, u8 *s_action,
+				     u8 anchor, u8 offset,
+				     int size)
+{
+	MLX5_SET(ste_single_action_remove_header_size_v1, s_action,
+		 action_id, DR_STE_V1_ACTION_ID_REMOVE_BY_SIZE);
+	MLX5_SET(ste_single_action_remove_header_size_v1, s_action, start_anchor, anchor);
+
+	/* The hardware expects here size and offset in words (2 byte) */
+	MLX5_SET(ste_single_action_remove_header_size_v1, s_action, remove_size, size / 2);
+	MLX5_SET(ste_single_action_remove_header_size_v1, s_action, start_offset, offset / 2);
+
+	dr_ste_v1_set_reparse(hw_ste_p);
+}
+
+static void dr_ste_v1_set_push_vlan(u8 *hw_ste_p, u8 *d_action,
+				    u32 vlan_hdr)
 {
 	MLX5_SET(ste_double_action_insert_with_inline_v1, d_action,
 		 action_id, DR_STE_V1_ACTION_ID_INSERT_INLINE);
@@ -388,7 +435,7 @@ static void dr_ste_v1_set_tx_push_vlan(u8 *hw_ste_p, u8 *d_action,
 	dr_ste_v1_set_reparse(hw_ste_p);
 }
 
-static void dr_ste_v1_set_rx_pop_vlan(u8 *hw_ste_p, u8 *s_action, u8 vlans_num)
+static void dr_ste_v1_set_pop_vlan(u8 *hw_ste_p, u8 *s_action, u8 vlans_num)
 {
 	MLX5_SET(ste_single_action_remove_header_size_v1, s_action,
 		 action_id, DR_STE_V1_ACTION_ID_REMOVE_BY_SIZE);
@@ -401,11 +448,11 @@ static void dr_ste_v1_set_rx_pop_vlan(u8 *hw_ste_p, u8 *s_action, u8 vlans_num)
 	dr_ste_v1_set_reparse(hw_ste_p);
 }
 
-static void dr_ste_v1_set_tx_encap_l3(u8 *hw_ste_p,
-				      u8 *frst_s_action,
-				      u8 *scnd_d_action,
-				      u32 reformat_id,
-				      int size)
+static void dr_ste_v1_set_encap_l3(u8 *hw_ste_p,
+				   u8 *frst_s_action,
+				   u8 *scnd_d_action,
+				   u32 reformat_id,
+				   int size)
 {
 	/* Remove L2 headers */
 	MLX5_SET(ste_single_action_remove_header_v1, frst_s_action, action_id,
@@ -437,21 +484,6 @@ static void dr_ste_v1_set_rx_decap(u8 *hw_ste_p, u8 *s_action)
 	dr_ste_v1_set_reparse(hw_ste_p);
 }
 
-static void dr_ste_v1_set_rx_decap_l3(u8 *hw_ste_p,
-				      u8 *s_action,
-				      u16 decap_actions,
-				      u32 decap_index)
-{
-	MLX5_SET(ste_single_action_modify_list_v1, s_action, action_id,
-		 DR_STE_V1_ACTION_ID_MODIFY_LIST);
-	MLX5_SET(ste_single_action_modify_list_v1, s_action, num_of_modify_actions,
-		 decap_actions);
-	MLX5_SET(ste_single_action_modify_list_v1, s_action, modify_actions_ptr,
-		 decap_index);
-
-	dr_ste_v1_set_reparse(hw_ste_p);
-}
-
 static void dr_ste_v1_set_rewrite_actions(u8 *hw_ste_p,
 					  u8 *s_action,
 					  u16 num_of_actions,
@@ -465,6 +497,27 @@ static void dr_ste_v1_set_rewrite_actions(u8 *hw_ste_p,
 		 re_write_index);
 
 	dr_ste_v1_set_reparse(hw_ste_p);
+}
+
+static void dr_ste_v1_set_aso_flow_meter(u8 *d_action,
+					 u32 object_id,
+					 u32 offset,
+					 u8 dest_reg_id,
+					 u8 init_color)
+{
+	MLX5_SET(ste_double_action_aso_v1, d_action, action_id,
+		 DR_STE_V1_ACTION_ID_ASO);
+	MLX5_SET(ste_double_action_aso_v1, d_action, aso_context_number,
+		 object_id + (offset / MLX5DR_ASO_FLOW_METER_NUM_PER_OBJ));
+	/* Convert reg_c index to HW 64bit index */
+	MLX5_SET(ste_double_action_aso_v1, d_action, dest_reg_id,
+		 (dest_reg_id - 1) / 2);
+	MLX5_SET(ste_double_action_aso_v1, d_action, aso_context_type,
+		 DR_STE_V1_ASO_CTX_TYPE_POLICERS);
+	MLX5_SET(ste_double_action_aso_v1, d_action, flow_meter.line_id,
+		 offset % MLX5DR_ASO_FLOW_METER_NUM_PER_OBJ);
+	MLX5_SET(ste_double_action_aso_v1, d_action, flow_meter.initial_color,
+		 init_color);
 }
 
 static void dr_ste_v1_arr_init_next_match(u8 **last_ste,
@@ -482,21 +535,40 @@ static void dr_ste_v1_arr_init_next_match(u8 **last_ste,
 	memset(action, 0, MLX5_FLD_SZ_BYTES(ste_mask_and_match_v1, action));
 }
 
-static void dr_ste_v1_set_actions_tx(struct mlx5dr_domain *dmn,
-				     u8 *action_type_set,
-				     u8 *last_ste,
-				     struct mlx5dr_ste_actions_attr *attr,
-				     u32 *added_stes)
+void dr_ste_v1_set_actions_tx(struct mlx5dr_domain *dmn,
+			      u8 *action_type_set,
+			      u32 actions_caps,
+			      u8 *last_ste,
+			      struct mlx5dr_ste_actions_attr *attr,
+			      u32 *added_stes)
 {
 	u8 *action = MLX5_ADDR_OF(ste_match_bwc_v1, last_ste, action);
 	u8 action_sz = DR_STE_ACTION_DOUBLE_SZ;
+	bool allow_modify_hdr = true;
 	bool allow_encap = true;
+
+	if (action_type_set[DR_ACTION_TYP_POP_VLAN]) {
+		if (action_sz < DR_STE_ACTION_SINGLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes,
+						      attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1,
+					      last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+		dr_ste_v1_set_pop_vlan(last_ste, action, attr->vlans.count);
+		action_sz -= DR_STE_ACTION_SINGLE_SZ;
+		action += DR_STE_ACTION_SINGLE_SZ;
+
+		/* Check if vlan_pop and modify_hdr on same STE is supported */
+		if (!(actions_caps & DR_STE_CTX_ACTION_CAP_POP_MDFY))
+			allow_modify_hdr = false;
+	}
 
 	if (action_type_set[DR_ACTION_TYP_CTR])
 		dr_ste_v1_set_counter_id(last_ste, attr->ctr_id);
 
 	if (action_type_set[DR_ACTION_TYP_MODIFY_HDR]) {
-		if (action_sz < DR_STE_ACTION_DOUBLE_SZ) {
+		if (!allow_modify_hdr || action_sz < DR_STE_ACTION_DOUBLE_SZ) {
 			dr_ste_v1_arr_init_next_match(&last_ste, added_stes,
 						      attr->gvmi);
 			action = MLX5_ADDR_OF(ste_mask_and_match_v1,
@@ -521,7 +593,8 @@ static void dr_ste_v1_set_actions_tx(struct mlx5dr_domain *dmn,
 				action_sz = DR_STE_ACTION_TRIPLE_SZ;
 				allow_encap = true;
 			}
-			dr_ste_v1_set_tx_push_vlan(last_ste, action, attr->vlans.headers[i]);
+			dr_ste_v1_set_push_vlan(last_ste, action,
+						attr->vlans.headers[i]);
 			action_sz -= DR_STE_ACTION_DOUBLE_SZ;
 			action += DR_STE_ACTION_DOUBLE_SZ;
 		}
@@ -534,36 +607,79 @@ static void dr_ste_v1_set_actions_tx(struct mlx5dr_domain *dmn,
 			action_sz = DR_STE_ACTION_TRIPLE_SZ;
 			allow_encap = true;
 		}
-		dr_ste_v1_set_tx_encap(last_ste, action,
-				       attr->reformat_id,
-				       attr->reformat_size);
+		dr_ste_v1_set_encap(last_ste, action,
+				    attr->reformat.id,
+				    attr->reformat.size);
 		action_sz -= DR_STE_ACTION_DOUBLE_SZ;
 		action += DR_STE_ACTION_DOUBLE_SZ;
 	} else if (action_type_set[DR_ACTION_TYP_L2_TO_TNL_L3]) {
 		u8 *d_action;
 
-		dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
-		action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
-		action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		if (action_sz < DR_STE_ACTION_TRIPLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
 		d_action = action + DR_STE_ACTION_SINGLE_SZ;
 
-		dr_ste_v1_set_tx_encap_l3(last_ste,
-					  action, d_action,
-					  attr->reformat_id,
-					  attr->reformat_size);
+		dr_ste_v1_set_encap_l3(last_ste,
+				       action, d_action,
+				       attr->reformat.id,
+				       attr->reformat.size);
 		action_sz -= DR_STE_ACTION_TRIPLE_SZ;
 		action += DR_STE_ACTION_TRIPLE_SZ;
+	} else if (action_type_set[DR_ACTION_TYP_INSERT_HDR]) {
+		if (!allow_encap || action_sz < DR_STE_ACTION_DOUBLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+		dr_ste_v1_set_insert_hdr(last_ste, action,
+					 attr->reformat.id,
+					 attr->reformat.param_0,
+					 attr->reformat.param_1,
+					 attr->reformat.size);
+		action_sz -= DR_STE_ACTION_DOUBLE_SZ;
+		action += DR_STE_ACTION_DOUBLE_SZ;
+	} else if (action_type_set[DR_ACTION_TYP_REMOVE_HDR]) {
+		if (action_sz < DR_STE_ACTION_SINGLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+		dr_ste_v1_set_remove_hdr(last_ste, action,
+					 attr->reformat.param_0,
+					 attr->reformat.param_1,
+					 attr->reformat.size);
+		action_sz -= DR_STE_ACTION_SINGLE_SZ;
+		action += DR_STE_ACTION_SINGLE_SZ;
+	}
+
+	if (action_type_set[DR_ACTION_TYP_ASO_FLOW_METER]) {
+		if (action_sz < DR_STE_ACTION_DOUBLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+		dr_ste_v1_set_aso_flow_meter(action,
+					     attr->aso_flow_meter.obj_id,
+					     attr->aso_flow_meter.offset,
+					     attr->aso_flow_meter.dest_reg_id,
+					     attr->aso_flow_meter.init_color);
+		action_sz -= DR_STE_ACTION_DOUBLE_SZ;
+		action += DR_STE_ACTION_DOUBLE_SZ;
 	}
 
 	dr_ste_v1_set_hit_gvmi(last_ste, attr->hit_gvmi);
 	dr_ste_v1_set_hit_addr(last_ste, attr->final_icm_addr, 1);
 }
 
-static void dr_ste_v1_set_actions_rx(struct mlx5dr_domain *dmn,
-				     u8 *action_type_set,
-				     u8 *last_ste,
-				     struct mlx5dr_ste_actions_attr *attr,
-				     u32 *added_stes)
+void dr_ste_v1_set_actions_rx(struct mlx5dr_domain *dmn,
+			      u8 *action_type_set,
+			      u32 actions_caps,
+			      u8 *last_ste,
+			      struct mlx5dr_ste_actions_attr *attr,
+			      u32 *added_stes)
 {
 	u8 *action = MLX5_ADDR_OF(ste_match_bwc_v1, last_ste, action);
 	u8 action_sz = DR_STE_ACTION_DOUBLE_SZ;
@@ -571,9 +687,6 @@ static void dr_ste_v1_set_actions_rx(struct mlx5dr_domain *dmn,
 	bool allow_ctr = true;
 
 	if (action_type_set[DR_ACTION_TYP_TNL_L3_TO_L2]) {
-		dr_ste_v1_set_rx_decap_l3(last_ste, action,
-					  attr->decap_actions,
-					  attr->decap_index);
 		dr_ste_v1_set_rewrite_actions(last_ste, action,
 					      attr->decap_actions,
 					      attr->decap_index);
@@ -608,13 +721,16 @@ static void dr_ste_v1_set_actions_rx(struct mlx5dr_domain *dmn,
 			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
 			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
 			action_sz = DR_STE_ACTION_TRIPLE_SZ;
-			allow_modify_hdr = false;
-			allow_ctr = false;
 		}
 
-		dr_ste_v1_set_rx_pop_vlan(last_ste, action, attr->vlans.count);
+		dr_ste_v1_set_pop_vlan(last_ste, action, attr->vlans.count);
 		action_sz -= DR_STE_ACTION_SINGLE_SZ;
 		action += DR_STE_ACTION_SINGLE_SZ;
+		allow_ctr = false;
+
+		/* Check if vlan_pop and modify_hdr on same STE is supported */
+		if (!(actions_caps & DR_STE_CTX_ACTION_CAP_POP_MDFY))
+			allow_modify_hdr = false;
 	}
 
 	if (action_type_set[DR_ACTION_TYP_MODIFY_HDR]) {
@@ -633,27 +749,124 @@ static void dr_ste_v1_set_actions_rx(struct mlx5dr_domain *dmn,
 		action += DR_STE_ACTION_DOUBLE_SZ;
 	}
 
+	if (action_type_set[DR_ACTION_TYP_PUSH_VLAN]) {
+		int i;
+
+		for (i = 0; i < attr->vlans.count; i++) {
+			if (action_sz < DR_STE_ACTION_DOUBLE_SZ ||
+			    !allow_modify_hdr) {
+				dr_ste_v1_arr_init_next_match(&last_ste,
+							      added_stes,
+							      attr->gvmi);
+				action = MLX5_ADDR_OF(ste_mask_and_match_v1,
+						      last_ste, action);
+				action_sz = DR_STE_ACTION_TRIPLE_SZ;
+			}
+			dr_ste_v1_set_push_vlan(last_ste, action,
+						attr->vlans.headers[i]);
+			action_sz -= DR_STE_ACTION_DOUBLE_SZ;
+			action += DR_STE_ACTION_DOUBLE_SZ;
+		}
+	}
+
 	if (action_type_set[DR_ACTION_TYP_CTR]) {
-		/* Counter action set after decap to exclude decaped header */
+		/* Counter action set after decap and before insert_hdr
+		 * to exclude decaped / encaped header respectively.
+		 */
 		if (!allow_ctr) {
 			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
 			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
 			action_sz = DR_STE_ACTION_TRIPLE_SZ;
 			allow_modify_hdr = true;
-			allow_ctr = false;
 		}
 		dr_ste_v1_set_counter_id(last_ste, attr->ctr_id);
+		allow_ctr = false;
+	}
+
+	if (action_type_set[DR_ACTION_TYP_L2_TO_TNL_L2]) {
+		if (action_sz < DR_STE_ACTION_DOUBLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+		dr_ste_v1_set_encap(last_ste, action,
+				    attr->reformat.id,
+				    attr->reformat.size);
+		action_sz -= DR_STE_ACTION_DOUBLE_SZ;
+		action += DR_STE_ACTION_DOUBLE_SZ;
+		allow_modify_hdr = false;
+	} else if (action_type_set[DR_ACTION_TYP_L2_TO_TNL_L3]) {
+		u8 *d_action;
+
+		if (action_sz < DR_STE_ACTION_TRIPLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+
+		d_action = action + DR_STE_ACTION_SINGLE_SZ;
+
+		dr_ste_v1_set_encap_l3(last_ste,
+				       action, d_action,
+				       attr->reformat.id,
+				       attr->reformat.size);
+		action_sz -= DR_STE_ACTION_TRIPLE_SZ;
+		allow_modify_hdr = false;
+	} else if (action_type_set[DR_ACTION_TYP_INSERT_HDR]) {
+		/* Modify header, decap, and encap must use different STEs */
+		if (!allow_modify_hdr || action_sz < DR_STE_ACTION_DOUBLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+		dr_ste_v1_set_insert_hdr(last_ste, action,
+					 attr->reformat.id,
+					 attr->reformat.param_0,
+					 attr->reformat.param_1,
+					 attr->reformat.size);
+		action_sz -= DR_STE_ACTION_DOUBLE_SZ;
+		action += DR_STE_ACTION_DOUBLE_SZ;
+		allow_modify_hdr = false;
+	} else if (action_type_set[DR_ACTION_TYP_REMOVE_HDR]) {
+		if (action_sz < DR_STE_ACTION_SINGLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+			allow_modify_hdr = true;
+			allow_ctr = true;
+		}
+		dr_ste_v1_set_remove_hdr(last_ste, action,
+					 attr->reformat.param_0,
+					 attr->reformat.param_1,
+					 attr->reformat.size);
+		action_sz -= DR_STE_ACTION_SINGLE_SZ;
+		action += DR_STE_ACTION_SINGLE_SZ;
+	}
+
+	if (action_type_set[DR_ACTION_TYP_ASO_FLOW_METER]) {
+		if (action_sz < DR_STE_ACTION_DOUBLE_SZ) {
+			dr_ste_v1_arr_init_next_match(&last_ste, added_stes, attr->gvmi);
+			action = MLX5_ADDR_OF(ste_mask_and_match_v1, last_ste, action);
+			action_sz = DR_STE_ACTION_TRIPLE_SZ;
+		}
+		dr_ste_v1_set_aso_flow_meter(action,
+					     attr->aso_flow_meter.obj_id,
+					     attr->aso_flow_meter.offset,
+					     attr->aso_flow_meter.dest_reg_id,
+					     attr->aso_flow_meter.init_color);
+		action_sz -= DR_STE_ACTION_DOUBLE_SZ;
+		action += DR_STE_ACTION_DOUBLE_SZ;
 	}
 
 	dr_ste_v1_set_hit_gvmi(last_ste, attr->hit_gvmi);
 	dr_ste_v1_set_hit_addr(last_ste, attr->final_icm_addr, 1);
 }
 
-static void dr_ste_v1_set_action_set(u8 *d_action,
-				     u8 hw_field,
-				     u8 shifter,
-				     u8 length,
-				     u32 data)
+void dr_ste_v1_set_action_set(u8 *d_action,
+			      u8 hw_field,
+			      u8 shifter,
+			      u8 length,
+			      u32 data)
 {
 	shifter += MLX5_MODIFY_HEADER_V1_QW_OFFSET;
 	MLX5_SET(ste_double_action_set_v1, d_action, action_id, DR_STE_V1_ACTION_ID_SET);
@@ -663,11 +876,11 @@ static void dr_ste_v1_set_action_set(u8 *d_action,
 	MLX5_SET(ste_double_action_set_v1, d_action, inline_data, data);
 }
 
-static void dr_ste_v1_set_action_add(u8 *d_action,
-				     u8 hw_field,
-				     u8 shifter,
-				     u8 length,
-				     u32 data)
+void dr_ste_v1_set_action_add(u8 *d_action,
+			      u8 hw_field,
+			      u8 shifter,
+			      u8 length,
+			      u32 data)
 {
 	shifter += MLX5_MODIFY_HEADER_V1_QW_OFFSET;
 	MLX5_SET(ste_double_action_add_v1, d_action, action_id, DR_STE_V1_ACTION_ID_ADD);
@@ -677,12 +890,12 @@ static void dr_ste_v1_set_action_add(u8 *d_action,
 	MLX5_SET(ste_double_action_add_v1, d_action, add_value, data);
 }
 
-static void dr_ste_v1_set_action_copy(u8 *d_action,
-				      u8 dst_hw_field,
-				      u8 dst_shifter,
-				      u8 dst_len,
-				      u8 src_hw_field,
-				      u8 src_shifter)
+void dr_ste_v1_set_action_copy(u8 *d_action,
+			       u8 dst_hw_field,
+			       u8 dst_shifter,
+			       u8 dst_len,
+			       u8 src_hw_field,
+			       u8 src_shifter)
 {
 	dst_shifter += MLX5_MODIFY_HEADER_V1_QW_OFFSET;
 	src_shifter += MLX5_MODIFY_HEADER_V1_QW_OFFSET;
@@ -697,11 +910,11 @@ static void dr_ste_v1_set_action_copy(u8 *d_action,
 #define DR_STE_DECAP_L3_ACTION_NUM	8
 #define DR_STE_L2_HDR_MAX_SZ		20
 
-static int dr_ste_v1_set_action_decap_l3_list(void *data,
-					      u32 data_sz,
-					      u8 *hw_action,
-					      u32 hw_action_sz,
-					      u16 *used_hw_action_num)
+int dr_ste_v1_set_action_decap_l3_list(void *data,
+				       u32 data_sz,
+				       u8 *hw_action,
+				       u32 hw_action_sz,
+				       u16 *used_hw_action_num)
 {
 	u8 padded_data[DR_STE_L2_HDR_MAX_SZ] = {};
 	void *data_ptr = padded_data;
@@ -826,8 +1039,8 @@ static int dr_ste_v1_build_eth_l2_src_dst_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_l2_src_dst_init(struct mlx5dr_ste_build *sb,
-						struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l2_src_dst_init(struct mlx5dr_ste_build *sb,
+					 struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l2_src_dst_bit_mask(mask, sb->inner, sb->bit_mask);
 
@@ -850,8 +1063,8 @@ static int dr_ste_v1_build_eth_l3_ipv6_dst_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_l3_ipv6_dst_init(struct mlx5dr_ste_build *sb,
-						 struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l3_ipv6_dst_init(struct mlx5dr_ste_build *sb,
+					  struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l3_ipv6_dst_tag(mask, sb, sb->bit_mask);
 
@@ -874,8 +1087,8 @@ static int dr_ste_v1_build_eth_l3_ipv6_src_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_l3_ipv6_src_init(struct mlx5dr_ste_build *sb,
-						 struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l3_ipv6_src_init(struct mlx5dr_ste_build *sb,
+					  struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l3_ipv6_src_tag(mask, sb, sb->bit_mask);
 
@@ -909,8 +1122,8 @@ static int dr_ste_v1_build_eth_l3_ipv4_5_tuple_tag(struct mlx5dr_match_param *va
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_l3_ipv4_5_tuple_init(struct mlx5dr_ste_build *sb,
-						     struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l3_ipv4_5_tuple_init(struct mlx5dr_ste_build *sb,
+					      struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l3_ipv4_5_tuple_tag(mask, sb, sb->bit_mask);
 
@@ -928,8 +1141,8 @@ static void dr_ste_v1_build_eth_l2_src_or_dst_bit_mask(struct mlx5dr_match_param
 	DR_STE_SET_TAG(eth_l2_src_v1, bit_mask, first_vlan_id, mask, first_vid);
 	DR_STE_SET_TAG(eth_l2_src_v1, bit_mask, first_cfi, mask, first_cfi);
 	DR_STE_SET_TAG(eth_l2_src_v1, bit_mask, first_priority, mask, first_prio);
-	DR_STE_SET_TAG(eth_l2_src_v1, bit_mask, ip_fragmented, mask, frag); // ?
-	DR_STE_SET_TAG(eth_l2_src_v1, bit_mask, l3_ethertype, mask, ethertype); // ?
+	DR_STE_SET_TAG(eth_l2_src_v1, bit_mask, ip_fragmented, mask, frag);
+	DR_STE_SET_TAG(eth_l2_src_v1, bit_mask, l3_ethertype, mask, ethertype);
 	DR_STE_SET_ONES(eth_l2_src_v1, bit_mask, l3_type, mask, ip_version);
 
 	if (mask->svlan_tag || mask->cvlan_tag) {
@@ -1050,8 +1263,8 @@ static int dr_ste_v1_build_eth_l2_src_tag(struct mlx5dr_match_param *value,
 	return dr_ste_v1_build_eth_l2_src_or_dst_tag(value, sb->inner, tag);
 }
 
-static void dr_ste_v1_build_eth_l2_src_init(struct mlx5dr_ste_build *sb,
-					    struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l2_src_init(struct mlx5dr_ste_build *sb,
+				     struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l2_src_bit_mask(mask, sb->inner, sb->bit_mask);
 
@@ -1083,8 +1296,8 @@ static int dr_ste_v1_build_eth_l2_dst_tag(struct mlx5dr_match_param *value,
 	return dr_ste_v1_build_eth_l2_src_or_dst_tag(value, sb->inner, tag);
 }
 
-static void dr_ste_v1_build_eth_l2_dst_init(struct mlx5dr_ste_build *sb,
-					    struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l2_dst_init(struct mlx5dr_ste_build *sb,
+				     struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l2_dst_bit_mask(mask, sb->inner, sb->bit_mask);
 
@@ -1163,8 +1376,8 @@ static int dr_ste_v1_build_eth_l2_tnl_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_l2_tnl_init(struct mlx5dr_ste_build *sb,
-					    struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l2_tnl_init(struct mlx5dr_ste_build *sb,
+				     struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l2_tnl_bit_mask(mask, sb->inner, sb->bit_mask);
 
@@ -1180,12 +1393,13 @@ static int dr_ste_v1_build_eth_l3_ipv4_misc_tag(struct mlx5dr_match_param *value
 	struct mlx5dr_match_spec *spec = sb->inner ? &value->inner : &value->outer;
 
 	DR_STE_SET_TAG(eth_l3_ipv4_misc_v1, tag, time_to_live, spec, ttl_hoplimit);
+	DR_STE_SET_TAG(eth_l3_ipv4_misc_v1, tag, ihl, spec, ipv4_ihl);
 
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_l3_ipv4_misc_init(struct mlx5dr_ste_build *sb,
-						  struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l3_ipv4_misc_init(struct mlx5dr_ste_build *sb,
+					   struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l3_ipv4_misc_tag(mask, sb, sb->bit_mask);
 
@@ -1224,8 +1438,8 @@ static int dr_ste_v1_build_eth_ipv6_l3_l4_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_ipv6_l3_l4_init(struct mlx5dr_ste_build *sb,
-						struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_ipv6_l3_l4_init(struct mlx5dr_ste_build *sb,
+					 struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_ipv6_l3_l4_tag(mask, sb, sb->bit_mask);
 
@@ -1248,8 +1462,8 @@ static int dr_ste_v1_build_mpls_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_mpls_init(struct mlx5dr_ste_build *sb,
-				      struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_mpls_init(struct mlx5dr_ste_build *sb,
+			       struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_mpls_tag(mask, sb, sb->bit_mask);
 
@@ -1275,8 +1489,8 @@ static int dr_ste_v1_build_tnl_gre_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_tnl_gre_init(struct mlx5dr_ste_build *sb,
-					 struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_tnl_gre_init(struct mlx5dr_ste_build *sb,
+				  struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_tnl_gre_tag(mask, sb, sb->bit_mask);
 
@@ -1320,14 +1534,96 @@ static int dr_ste_v1_build_tnl_mpls_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_tnl_mpls_init(struct mlx5dr_ste_build *sb,
-					  struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_tnl_mpls_init(struct mlx5dr_ste_build *sb,
+				   struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_tnl_mpls_tag(mask, sb, sb->bit_mask);
 
 	sb->lu_type = DR_STE_V1_LU_TYPE_MPLS_I;
 	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
 	sb->ste_build_tag_func = &dr_ste_v1_build_tnl_mpls_tag;
+}
+
+static int dr_ste_v1_build_tnl_mpls_over_udp_tag(struct mlx5dr_match_param *value,
+						 struct mlx5dr_ste_build *sb,
+						 u8 *tag)
+{
+	struct mlx5dr_match_misc2 *misc2 = &value->misc2;
+	u8 *parser_ptr;
+	u8 parser_id;
+	u32 mpls_hdr;
+
+	mpls_hdr = misc2->outer_first_mpls_over_udp_label << HDR_MPLS_OFFSET_LABEL;
+	misc2->outer_first_mpls_over_udp_label = 0;
+	mpls_hdr |= misc2->outer_first_mpls_over_udp_exp << HDR_MPLS_OFFSET_EXP;
+	misc2->outer_first_mpls_over_udp_exp = 0;
+	mpls_hdr |= misc2->outer_first_mpls_over_udp_s_bos << HDR_MPLS_OFFSET_S_BOS;
+	misc2->outer_first_mpls_over_udp_s_bos = 0;
+	mpls_hdr |= misc2->outer_first_mpls_over_udp_ttl << HDR_MPLS_OFFSET_TTL;
+	misc2->outer_first_mpls_over_udp_ttl = 0;
+
+	parser_id = sb->caps->flex_parser_id_mpls_over_udp;
+	parser_ptr = dr_ste_calc_flex_parser_offset(tag, parser_id);
+	*(__be32 *)parser_ptr = cpu_to_be32(mpls_hdr);
+
+	return 0;
+}
+
+void dr_ste_v1_build_tnl_mpls_over_udp_init(struct mlx5dr_ste_build *sb,
+					    struct mlx5dr_match_param *mask)
+{
+	dr_ste_v1_build_tnl_mpls_over_udp_tag(mask, sb, sb->bit_mask);
+
+	/* STEs with lookup type FLEX_PARSER_{0/1} includes
+	 * flex parsers_{0-3}/{4-7} respectively.
+	 */
+	sb->lu_type = sb->caps->flex_parser_id_mpls_over_udp > DR_STE_MAX_FLEX_0_ID ?
+		      DR_STE_V1_LU_TYPE_FLEX_PARSER_1 :
+		      DR_STE_V1_LU_TYPE_FLEX_PARSER_0;
+
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_tnl_mpls_over_udp_tag;
+}
+
+static int dr_ste_v1_build_tnl_mpls_over_gre_tag(struct mlx5dr_match_param *value,
+						 struct mlx5dr_ste_build *sb,
+						 u8 *tag)
+{
+	struct mlx5dr_match_misc2 *misc2 = &value->misc2;
+	u8 *parser_ptr;
+	u8 parser_id;
+	u32 mpls_hdr;
+
+	mpls_hdr = misc2->outer_first_mpls_over_gre_label << HDR_MPLS_OFFSET_LABEL;
+	misc2->outer_first_mpls_over_gre_label = 0;
+	mpls_hdr |= misc2->outer_first_mpls_over_gre_exp << HDR_MPLS_OFFSET_EXP;
+	misc2->outer_first_mpls_over_gre_exp = 0;
+	mpls_hdr |= misc2->outer_first_mpls_over_gre_s_bos << HDR_MPLS_OFFSET_S_BOS;
+	misc2->outer_first_mpls_over_gre_s_bos = 0;
+	mpls_hdr |= misc2->outer_first_mpls_over_gre_ttl << HDR_MPLS_OFFSET_TTL;
+	misc2->outer_first_mpls_over_gre_ttl = 0;
+
+	parser_id = sb->caps->flex_parser_id_mpls_over_gre;
+	parser_ptr = dr_ste_calc_flex_parser_offset(tag, parser_id);
+	*(__be32 *)parser_ptr = cpu_to_be32(mpls_hdr);
+
+	return 0;
+}
+
+void dr_ste_v1_build_tnl_mpls_over_gre_init(struct mlx5dr_ste_build *sb,
+					    struct mlx5dr_match_param *mask)
+{
+	dr_ste_v1_build_tnl_mpls_over_gre_tag(mask, sb, sb->bit_mask);
+
+	/* STEs with lookup type FLEX_PARSER_{0/1} includes
+	 * flex parsers_{0-3}/{4-7} respectively.
+	 */
+	sb->lu_type = sb->caps->flex_parser_id_mpls_over_gre > DR_STE_MAX_FLEX_0_ID ?
+		      DR_STE_V1_LU_TYPE_FLEX_PARSER_1 :
+		      DR_STE_V1_LU_TYPE_FLEX_PARSER_0;
+
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_tnl_mpls_over_gre_tag;
 }
 
 static int dr_ste_v1_build_icmp_tag(struct mlx5dr_match_param *value,
@@ -1361,16 +1657,14 @@ static int dr_ste_v1_build_icmp_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static int dr_ste_v1_build_icmp_init(struct mlx5dr_ste_build *sb,
-				     struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_icmp_init(struct mlx5dr_ste_build *sb,
+			       struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_icmp_tag(mask, sb, sb->bit_mask);
 
 	sb->lu_type = DR_STE_V1_LU_TYPE_ETHL4_MISC_O;
 	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
 	sb->ste_build_tag_func = &dr_ste_v1_build_icmp_tag;
-
-	return 0;
 }
 
 static int dr_ste_v1_build_general_purpose_tag(struct mlx5dr_match_param *value,
@@ -1385,8 +1679,8 @@ static int dr_ste_v1_build_general_purpose_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_general_purpose_init(struct mlx5dr_ste_build *sb,
-						 struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_general_purpose_init(struct mlx5dr_ste_build *sb,
+					  struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_general_purpose_tag(mask, sb, sb->bit_mask);
 
@@ -1412,8 +1706,8 @@ static int dr_ste_v1_build_eth_l4_misc_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_eth_l4_misc_init(struct mlx5dr_ste_build *sb,
-					     struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_eth_l4_misc_init(struct mlx5dr_ste_build *sb,
+				      struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_eth_l4_misc_tag(mask, sb, sb->bit_mask);
 
@@ -1442,9 +1736,8 @@ dr_ste_v1_build_flex_parser_tnl_vxlan_gpe_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void
-dr_ste_v1_build_flex_parser_tnl_vxlan_gpe_init(struct mlx5dr_ste_build *sb,
-					       struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_flex_parser_tnl_vxlan_gpe_init(struct mlx5dr_ste_build *sb,
+						    struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_flex_parser_tnl_vxlan_gpe_tag(mask, sb, sb->bit_mask);
 
@@ -1472,15 +1765,35 @@ dr_ste_v1_build_flex_parser_tnl_geneve_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void
-dr_ste_v1_build_flex_parser_tnl_geneve_init(struct mlx5dr_ste_build *sb,
-					    struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_flex_parser_tnl_geneve_init(struct mlx5dr_ste_build *sb,
+						 struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_flex_parser_tnl_geneve_tag(mask, sb, sb->bit_mask);
 
 	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_TNL_HEADER;
 	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
 	sb->ste_build_tag_func = &dr_ste_v1_build_flex_parser_tnl_geneve_tag;
+}
+
+static int dr_ste_v1_build_tnl_header_0_1_tag(struct mlx5dr_match_param *value,
+					      struct mlx5dr_ste_build *sb,
+					      uint8_t *tag)
+{
+	struct mlx5dr_match_misc5 *misc5 = &value->misc5;
+
+	DR_STE_SET_TAG(tunnel_header, tag, tunnel_header_0, misc5, tunnel_header_0);
+	DR_STE_SET_TAG(tunnel_header, tag, tunnel_header_1, misc5, tunnel_header_1);
+
+	return 0;
+}
+
+void dr_ste_v1_build_tnl_header_0_1_init(struct mlx5dr_ste_build *sb,
+					 struct mlx5dr_match_param *mask)
+{
+	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_TNL_HEADER;
+	dr_ste_v1_build_tnl_header_0_1_tag(mask, sb, sb->bit_mask);
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_tnl_header_0_1_tag;
 }
 
 static int dr_ste_v1_build_register_0_tag(struct mlx5dr_match_param *value,
@@ -1497,8 +1810,8 @@ static int dr_ste_v1_build_register_0_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_register_0_init(struct mlx5dr_ste_build *sb,
-					    struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_register_0_init(struct mlx5dr_ste_build *sb,
+				     struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_register_0_tag(mask, sb, sb->bit_mask);
 
@@ -1521,8 +1834,8 @@ static int dr_ste_v1_build_register_1_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_register_1_init(struct mlx5dr_ste_build *sb,
-					    struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_register_1_init(struct mlx5dr_ste_build *sb,
+				     struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_register_1_tag(mask, sb, sb->bit_mask);
 
@@ -1548,7 +1861,7 @@ static int dr_ste_v1_build_src_gvmi_qpn_tag(struct mlx5dr_match_param *value,
 	struct mlx5dr_match_misc *misc = &value->misc;
 	struct mlx5dr_cmd_vport_cap *vport_cap;
 	struct mlx5dr_domain *dmn = sb->dmn;
-	struct mlx5dr_cmd_caps *caps;
+	struct mlx5dr_domain *vport_dmn;
 	u8 *bit_mask = sb->bit_mask;
 
 	DR_STE_SET_TAG(src_gvmi_qp_v1, tag, source_qp, misc, source_sqn);
@@ -1556,22 +1869,22 @@ static int dr_ste_v1_build_src_gvmi_qpn_tag(struct mlx5dr_match_param *value,
 	if (sb->vhca_id_valid) {
 		/* Find port GVMI based on the eswitch_owner_vhca_id */
 		if (misc->source_eswitch_owner_vhca_id == dmn->info.caps.gvmi)
-			caps = &dmn->info.caps;
+			vport_dmn = dmn;
 		else if (dmn->peer_dmn && (misc->source_eswitch_owner_vhca_id ==
 					   dmn->peer_dmn->info.caps.gvmi))
-			caps = &dmn->peer_dmn->info.caps;
+			vport_dmn = dmn->peer_dmn;
 		else
 			return -EINVAL;
 
-		 misc->source_eswitch_owner_vhca_id = 0;
+		misc->source_eswitch_owner_vhca_id = 0;
 	} else {
-		caps = &dmn->info.caps;
+		vport_dmn = dmn;
 	}
 
 	if (!MLX5_GET(ste_src_gvmi_qp_v1, bit_mask, source_gvmi))
 		return 0;
 
-	vport_cap = mlx5dr_get_vport_cap(caps, misc->source_port);
+	vport_cap = mlx5dr_domain_get_vport_cap(vport_dmn, misc->source_port);
 	if (!vport_cap) {
 		mlx5dr_err(dmn, "Vport 0x%x is disabled or invalid\n",
 			   misc->source_port);
@@ -1585,8 +1898,8 @@ static int dr_ste_v1_build_src_gvmi_qpn_tag(struct mlx5dr_match_param *value,
 	return 0;
 }
 
-static void dr_ste_v1_build_src_gvmi_qpn_init(struct mlx5dr_ste_build *sb,
-					      struct mlx5dr_match_param *mask)
+void dr_ste_v1_build_src_gvmi_qpn_init(struct mlx5dr_ste_build *sb,
+				       struct mlx5dr_match_param *mask)
 {
 	dr_ste_v1_build_src_gvmi_qpn_bit_mask(mask, sb->bit_mask);
 
@@ -1595,7 +1908,206 @@ static void dr_ste_v1_build_src_gvmi_qpn_init(struct mlx5dr_ste_build *sb,
 	sb->ste_build_tag_func = &dr_ste_v1_build_src_gvmi_qpn_tag;
 }
 
-struct mlx5dr_ste_ctx ste_ctx_v1 = {
+static void dr_ste_v1_set_flex_parser(u32 *misc4_field_id,
+				      u32 *misc4_field_value,
+				      bool *parser_is_used,
+				      u8 *tag)
+{
+	u32 id = *misc4_field_id;
+	u8 *parser_ptr;
+
+	if (id >= DR_NUM_OF_FLEX_PARSERS || parser_is_used[id])
+		return;
+
+	parser_is_used[id] = true;
+	parser_ptr = dr_ste_calc_flex_parser_offset(tag, id);
+
+	*(__be32 *)parser_ptr = cpu_to_be32(*misc4_field_value);
+	*misc4_field_id = 0;
+	*misc4_field_value = 0;
+}
+
+static int dr_ste_v1_build_felx_parser_tag(struct mlx5dr_match_param *value,
+					   struct mlx5dr_ste_build *sb,
+					   u8 *tag)
+{
+	struct mlx5dr_match_misc4 *misc_4_mask = &value->misc4;
+	bool parser_is_used[DR_NUM_OF_FLEX_PARSERS] = {};
+
+	dr_ste_v1_set_flex_parser(&misc_4_mask->prog_sample_field_id_0,
+				  &misc_4_mask->prog_sample_field_value_0,
+				  parser_is_used, tag);
+
+	dr_ste_v1_set_flex_parser(&misc_4_mask->prog_sample_field_id_1,
+				  &misc_4_mask->prog_sample_field_value_1,
+				  parser_is_used, tag);
+
+	dr_ste_v1_set_flex_parser(&misc_4_mask->prog_sample_field_id_2,
+				  &misc_4_mask->prog_sample_field_value_2,
+				  parser_is_used, tag);
+
+	dr_ste_v1_set_flex_parser(&misc_4_mask->prog_sample_field_id_3,
+				  &misc_4_mask->prog_sample_field_value_3,
+				  parser_is_used, tag);
+
+	return 0;
+}
+
+void dr_ste_v1_build_flex_parser_0_init(struct mlx5dr_ste_build *sb,
+					struct mlx5dr_match_param *mask)
+{
+	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_0;
+	dr_ste_v1_build_felx_parser_tag(mask, sb, sb->bit_mask);
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_felx_parser_tag;
+}
+
+void dr_ste_v1_build_flex_parser_1_init(struct mlx5dr_ste_build *sb,
+					struct mlx5dr_match_param *mask)
+{
+	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_1;
+	dr_ste_v1_build_felx_parser_tag(mask, sb, sb->bit_mask);
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_felx_parser_tag;
+}
+
+static int
+dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_tag(struct mlx5dr_match_param *value,
+						   struct mlx5dr_ste_build *sb,
+						   u8 *tag)
+{
+	struct mlx5dr_match_misc3 *misc3 = &value->misc3;
+	u8 parser_id = sb->caps->flex_parser_id_geneve_tlv_option_0;
+	u8 *parser_ptr = dr_ste_calc_flex_parser_offset(tag, parser_id);
+
+	MLX5_SET(ste_flex_parser_0, parser_ptr, flex_parser_3,
+		 misc3->geneve_tlv_option_0_data);
+	misc3->geneve_tlv_option_0_data = 0;
+
+	return 0;
+}
+
+void
+dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_init(struct mlx5dr_ste_build *sb,
+						    struct mlx5dr_match_param *mask)
+{
+	dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_tag(mask, sb, sb->bit_mask);
+
+	/* STEs with lookup type FLEX_PARSER_{0/1} includes
+	 * flex parsers_{0-3}/{4-7} respectively.
+	 */
+	sb->lu_type = sb->caps->flex_parser_id_geneve_tlv_option_0 > 3 ?
+		      DR_STE_V1_LU_TYPE_FLEX_PARSER_1 :
+		      DR_STE_V1_LU_TYPE_FLEX_PARSER_0;
+
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_tag;
+}
+
+static int
+dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_tag(struct mlx5dr_match_param *value,
+							 struct mlx5dr_ste_build *sb,
+							 uint8_t *tag)
+{
+	u8 parser_id = sb->caps->flex_parser_id_geneve_tlv_option_0;
+	struct mlx5dr_match_misc *misc = &value->misc;
+
+	if (misc->geneve_tlv_option_0_exist) {
+		MLX5_SET(ste_flex_parser_ok, tag, flex_parsers_ok, 1 << parser_id);
+		misc->geneve_tlv_option_0_exist = 0;
+	}
+
+	return 0;
+}
+
+void
+dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_init(struct mlx5dr_ste_build *sb,
+							  struct mlx5dr_match_param *mask)
+{
+	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_OK;
+	dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_tag(mask, sb, sb->bit_mask);
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_tag;
+}
+
+static int dr_ste_v1_build_flex_parser_tnl_gtpu_tag(struct mlx5dr_match_param *value,
+						    struct mlx5dr_ste_build *sb,
+						    u8 *tag)
+{
+	struct mlx5dr_match_misc3 *misc3 = &value->misc3;
+
+	DR_STE_SET_TAG(flex_parser_tnl_gtpu, tag, gtpu_msg_flags, misc3, gtpu_msg_flags);
+	DR_STE_SET_TAG(flex_parser_tnl_gtpu, tag, gtpu_msg_type, misc3, gtpu_msg_type);
+	DR_STE_SET_TAG(flex_parser_tnl_gtpu, tag, gtpu_teid, misc3, gtpu_teid);
+
+	return 0;
+}
+
+void dr_ste_v1_build_flex_parser_tnl_gtpu_init(struct mlx5dr_ste_build *sb,
+					       struct mlx5dr_match_param *mask)
+{
+	dr_ste_v1_build_flex_parser_tnl_gtpu_tag(mask, sb, sb->bit_mask);
+
+	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_TNL_HEADER;
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_flex_parser_tnl_gtpu_tag;
+}
+
+static int
+dr_ste_v1_build_tnl_gtpu_flex_parser_0_tag(struct mlx5dr_match_param *value,
+					   struct mlx5dr_ste_build *sb,
+					   u8 *tag)
+{
+	if (dr_is_flex_parser_0_id(sb->caps->flex_parser_id_gtpu_dw_0))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_dw_0, sb->caps, &value->misc3);
+	if (dr_is_flex_parser_0_id(sb->caps->flex_parser_id_gtpu_teid))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_teid, sb->caps, &value->misc3);
+	if (dr_is_flex_parser_0_id(sb->caps->flex_parser_id_gtpu_dw_2))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_dw_2, sb->caps, &value->misc3);
+	if (dr_is_flex_parser_0_id(sb->caps->flex_parser_id_gtpu_first_ext_dw_0))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_first_ext_dw_0, sb->caps, &value->misc3);
+	return 0;
+}
+
+void
+dr_ste_v1_build_tnl_gtpu_flex_parser_0_init(struct mlx5dr_ste_build *sb,
+					    struct mlx5dr_match_param *mask)
+{
+	dr_ste_v1_build_tnl_gtpu_flex_parser_0_tag(mask, sb, sb->bit_mask);
+
+	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_0;
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_tnl_gtpu_flex_parser_0_tag;
+}
+
+static int
+dr_ste_v1_build_tnl_gtpu_flex_parser_1_tag(struct mlx5dr_match_param *value,
+					   struct mlx5dr_ste_build *sb,
+					   u8 *tag)
+{
+	if (dr_is_flex_parser_1_id(sb->caps->flex_parser_id_gtpu_dw_0))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_dw_0, sb->caps, &value->misc3);
+	if (dr_is_flex_parser_1_id(sb->caps->flex_parser_id_gtpu_teid))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_teid, sb->caps, &value->misc3);
+	if (dr_is_flex_parser_1_id(sb->caps->flex_parser_id_gtpu_dw_2))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_dw_2, sb->caps, &value->misc3);
+	if (dr_is_flex_parser_1_id(sb->caps->flex_parser_id_gtpu_first_ext_dw_0))
+		DR_STE_SET_FLEX_PARSER_FIELD(tag, gtpu_first_ext_dw_0, sb->caps, &value->misc3);
+	return 0;
+}
+
+void
+dr_ste_v1_build_tnl_gtpu_flex_parser_1_init(struct mlx5dr_ste_build *sb,
+					    struct mlx5dr_match_param *mask)
+{
+	dr_ste_v1_build_tnl_gtpu_flex_parser_1_tag(mask, sb, sb->bit_mask);
+
+	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_1;
+	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
+	sb->ste_build_tag_func = &dr_ste_v1_build_tnl_gtpu_flex_parser_1_tag;
+}
+
+static struct mlx5dr_ste_ctx ste_ctx_v1 = {
 	/* Builders */
 	.build_eth_l2_src_dst_init	= &dr_ste_v1_build_eth_l2_src_dst_init,
 	.build_eth_l3_ipv6_src_init	= &dr_ste_v1_build_eth_l3_ipv6_src_init,
@@ -1609,14 +2121,25 @@ struct mlx5dr_ste_ctx ste_ctx_v1 = {
 	.build_mpls_init		= &dr_ste_v1_build_mpls_init,
 	.build_tnl_gre_init		= &dr_ste_v1_build_tnl_gre_init,
 	.build_tnl_mpls_init		= &dr_ste_v1_build_tnl_mpls_init,
+	.build_tnl_mpls_over_udp_init	= &dr_ste_v1_build_tnl_mpls_over_udp_init,
+	.build_tnl_mpls_over_gre_init	= &dr_ste_v1_build_tnl_mpls_over_gre_init,
 	.build_icmp_init		= &dr_ste_v1_build_icmp_init,
 	.build_general_purpose_init	= &dr_ste_v1_build_general_purpose_init,
 	.build_eth_l4_misc_init		= &dr_ste_v1_build_eth_l4_misc_init,
 	.build_tnl_vxlan_gpe_init	= &dr_ste_v1_build_flex_parser_tnl_vxlan_gpe_init,
 	.build_tnl_geneve_init		= &dr_ste_v1_build_flex_parser_tnl_geneve_init,
+	.build_tnl_geneve_tlv_opt_init	= &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_init,
+	.build_tnl_geneve_tlv_opt_exist_init = &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_init,
 	.build_register_0_init		= &dr_ste_v1_build_register_0_init,
 	.build_register_1_init		= &dr_ste_v1_build_register_1_init,
 	.build_src_gvmi_qpn_init	= &dr_ste_v1_build_src_gvmi_qpn_init,
+	.build_flex_parser_0_init	= &dr_ste_v1_build_flex_parser_0_init,
+	.build_flex_parser_1_init	= &dr_ste_v1_build_flex_parser_1_init,
+	.build_tnl_gtpu_init		= &dr_ste_v1_build_flex_parser_tnl_gtpu_init,
+	.build_tnl_header_0_1_init	= &dr_ste_v1_build_tnl_header_0_1_init,
+	.build_tnl_gtpu_flex_parser_0_init = &dr_ste_v1_build_tnl_gtpu_flex_parser_0_init,
+	.build_tnl_gtpu_flex_parser_1_init = &dr_ste_v1_build_tnl_gtpu_flex_parser_1_init,
+
 	/* Getters and Setters */
 	.ste_init			= &dr_ste_v1_init,
 	.set_next_lu_type		= &dr_ste_v1_set_next_lu_type,
@@ -1627,6 +2150,10 @@ struct mlx5dr_ste_ctx ste_ctx_v1 = {
 	.set_byte_mask			= &dr_ste_v1_set_byte_mask,
 	.get_byte_mask			= &dr_ste_v1_get_byte_mask,
 	/* Actions */
+	.actions_caps			= DR_STE_CTX_ACTION_CAP_TX_POP |
+					  DR_STE_CTX_ACTION_CAP_RX_PUSH |
+					  DR_STE_CTX_ACTION_CAP_RX_ENCAP |
+					  DR_STE_CTX_ACTION_CAP_POP_MDFY,
 	.set_actions_rx			= &dr_ste_v1_set_actions_rx,
 	.set_actions_tx			= &dr_ste_v1_set_actions_tx,
 	.modify_field_arr_sz		= ARRAY_SIZE(dr_ste_v1_action_modify_field_arr),
@@ -1638,3 +2165,8 @@ struct mlx5dr_ste_ctx ste_ctx_v1 = {
 	/* Send */
 	.prepare_for_postsend		= &dr_ste_v1_prepare_for_postsend,
 };
+
+struct mlx5dr_ste_ctx *mlx5dr_ste_get_ctx_v1(void)
+{
+	return &ste_ctx_v1;
+}

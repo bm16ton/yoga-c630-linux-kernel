@@ -26,7 +26,7 @@
 #include <drm/drm_plane_helper.h>
 #include <nouveau_bo.h>
 
-#include <nvif/clc37e.h>
+#include <nvif/if0014.h>
 #include <nvif/pushc37b.h>
 
 #include <nvhw/class/clc37e.h>
@@ -82,18 +82,14 @@ wndwc37e_ilut_set(struct nv50_wndw *wndw, struct nv50_wndw_atom *asyw)
 	return 0;
 }
 
-static bool
+static void
 wndwc37e_ilut(struct nv50_wndw *wndw, struct nv50_wndw_atom *asyw, int size)
 {
-	if (size != 256 && size != 1024)
-		return false;
-
 	asyw->xlut.i.size = size == 1024 ? NVC37E_SET_CONTROL_INPUT_LUT_SIZE_SIZE_1025 :
 					   NVC37E_SET_CONTROL_INPUT_LUT_SIZE_SIZE_257;
 	asyw->xlut.i.range = NVC37E_SET_CONTROL_INPUT_LUT_RANGE_UNITY;
 	asyw->xlut.i.output_mode = NVC37E_SET_CONTROL_INPUT_LUT_OUTPUT_MODE_INTERPOLATE;
 	asyw->xlut.i.load = head907d_olut_load;
-	return true;
 }
 
 int
@@ -355,9 +351,8 @@ wndwc37e_new_(const struct nv50_wndw_func *func, struct nouveau_drm *drm,
 	      enum drm_plane_type type, int index, s32 oclass, u32 heads,
 	      struct nv50_wndw **pwndw)
 {
-	struct nvc37e_window_channel_dma_v0 args = {
-		.pushbuf = 0xb0007e00 | index,
-		.index = index,
+	struct nvif_disp_chan_v0 args = {
+		.id = index,
 	};
 	struct nv50_disp *disp = nv50_disp(drm->dev);
 	struct nv50_wndw *wndw;

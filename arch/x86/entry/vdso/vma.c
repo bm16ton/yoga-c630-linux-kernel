@@ -358,7 +358,7 @@ int map_vdso_once(const struct vdso_image *image, unsigned long addr)
 	mmap_write_lock(mm);
 	/*
 	 * Check if we have already mapped vdso blob - fail to prevent
-	 * abusing from userspace install_speciall_mapping, which may
+	 * abusing from userspace install_special_mapping, which may
 	 * not do accounting and rlimit right.
 	 * We could search vma near context.vdso, but it's a slowpath,
 	 * so let's explicitly check all VMAs to be completely sure.
@@ -438,7 +438,7 @@ bool arch_syscall_is_vdso_sigreturn(struct pt_regs *regs)
 static __init int vdso_setup(char *s)
 {
 	vdso64_enabled = simple_strtoul(s, NULL, 0);
-	return 0;
+	return 1;
 }
 __setup("vdso=", vdso_setup);
 

@@ -7,6 +7,7 @@
 
 #include "cmsg.h"
 #include "main.h"
+#include "conntrack.h"
 #include "../nfpcore/nfp_cpp.h"
 #include "../nfpcore/nfp_nsp.h"
 #include "../nfp_app.h"
@@ -40,6 +41,8 @@
 	 BIT(FLOW_DISSECTOR_KEY_ENC_OPTS) | \
 	 BIT(FLOW_DISSECTOR_KEY_ENC_IP) | \
 	 BIT(FLOW_DISSECTOR_KEY_MPLS) | \
+	 BIT(FLOW_DISSECTOR_KEY_CT) | \
+	 BIT(FLOW_DISSECTOR_KEY_META) | \
 	 BIT(FLOW_DISSECTOR_KEY_IP))
 
 #define NFP_FLOWER_WHITELIST_TUN_DISSECTOR \
@@ -88,7 +91,7 @@ struct nfp_flower_merge_check {
 	};
 };
 
-static int
+int
 nfp_flower_xmit_flow(struct nfp_app *app, struct nfp_fl_payload *nfp_flow,
 		     u8 mtype)
 {
@@ -133,20 +136,16 @@ nfp_flower_xmit_flow(struct nfp_app *app, struct nfp_fl_payload *nfp_flow,
 	return 0;
 }
 
-static bool nfp_flower_check_higher_than_mac(struct flow_cls_offload *f)
+static bool nfp_flower_check_higher_than_mac(struct flow_rule *rule)
 {
-	struct flow_rule *rule = flow_cls_offload_flow_rule(f);
-
 	return flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS) ||
 	       flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV6_ADDRS) ||
 	       flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS) ||
 	       flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ICMP);
 }
 
-static bool nfp_flower_check_higher_than_l3(struct flow_cls_offload *f)
+static bool nfp_flower_check_higher_than_l3(struct flow_rule *rule)
 {
-	struct flow_rule *rule = flow_cls_offload_flow_rule(f);
-
 	return flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS) ||
 	       flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ICMP);
 }
@@ -235,15 +234,14 @@ nfp_flower_calc_udp_tun_layer(struct flow_dissector_key_ports *enc_ports,
 	return 0;
 }
 
-static int
+int
 nfp_flower_calculate_key_layers(struct nfp_app *app,
 				struct net_device *netdev,
 				struct nfp_fl_key_ls *ret_key_ls,
-				struct flow_cls_offload *flow,
+				struct flow_rule *rule,
 				enum nfp_flower_tun_type *tun_type,
 				struct netlink_ext_ack *extack)
 {
-	struct flow_rule *rule = flow_cls_offload_flow_rule(flow);
 	struct flow_dissector *dissector = rule->match.dissector;
 	struct flow_match_basic basic = { NULL, NULL};
 	struct nfp_flower_priv *priv = app->priv;
@@ -361,8 +359,8 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 			flow_rule_match_enc_opts(rule, &enc_op);
 
 		if (!flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ENC_PORTS)) {
-			/* check if GRE, which has no enc_ports */
-			if (!netif_is_gretap(netdev)) {
+			/* Check if GRE, which has no enc_ports */
+			if (!netif_is_gretap(netdev) && !netif_is_ip6gretap(netdev)) {
 				NL_SET_ERR_MSG_MOD(extack, "unsupported offload: an exact match on L4 destination port is required for non-GRE tunnels");
 				return -EOPNOTSUPP;
 			}
@@ -451,7 +449,7 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 			NL_SET_ERR_MSG_MOD(extack, "unsupported offload: match on given EtherType is not supported");
 			return -EOPNOTSUPP;
 		}
-	} else if (nfp_flower_check_higher_than_mac(flow)) {
+	} else if (nfp_flower_check_higher_than_mac(rule)) {
 		NL_SET_ERR_MSG_MOD(extack, "unsupported offload: cannot match above L2 without specified EtherType");
 		return -EOPNOTSUPP;
 	}
@@ -470,7 +468,7 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 	}
 
 	if (!(key_layer & NFP_FLOWER_LAYER_TP) &&
-	    nfp_flower_check_higher_than_l3(flow)) {
+	    nfp_flower_check_higher_than_l3(rule)) {
 		NL_SET_ERR_MSG_MOD(extack, "unsupported offload: cannot match on L4 information without specified IP protocol type");
 		return -EOPNOTSUPP;
 	}
@@ -542,7 +540,7 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 	return 0;
 }
 
-static struct nfp_fl_payload *
+struct nfp_fl_payload *
 nfp_flower_allocate_new(struct nfp_fl_key_ls *key_layer)
 {
 	struct nfp_fl_payload *flow_pay;
@@ -1004,9 +1002,7 @@ int nfp_flower_merge_offloaded_flows(struct nfp_app *app,
 				     struct nfp_fl_payload *sub_flow1,
 				     struct nfp_fl_payload *sub_flow2)
 {
-	struct flow_cls_offload merge_tc_off;
 	struct nfp_flower_priv *priv = app->priv;
-	struct netlink_ext_ack *extack = NULL;
 	struct nfp_fl_payload *merge_flow;
 	struct nfp_fl_key_ls merge_key_ls;
 	struct nfp_merge_info *merge_info;
@@ -1015,13 +1011,12 @@ int nfp_flower_merge_offloaded_flows(struct nfp_app *app,
 
 	ASSERT_RTNL();
 
-	extack = merge_tc_off.common.extack;
 	if (sub_flow1 == sub_flow2 ||
 	    nfp_flower_is_merge_flow(sub_flow1) ||
 	    nfp_flower_is_merge_flow(sub_flow2))
 		return -EINVAL;
 
-	/* check if the two flows are already merged */
+	/* Check if the two flows are already merged */
 	parent_ctx = (u64)(be32_to_cpu(sub_flow1->meta.host_ctx_id)) << 32;
 	parent_ctx |= (u64)(be32_to_cpu(sub_flow2->meta.host_ctx_id));
 	if (rhashtable_lookup_fast(&priv->merge_table,
@@ -1060,9 +1055,8 @@ int nfp_flower_merge_offloaded_flows(struct nfp_app *app,
 	if (err)
 		goto err_unlink_sub_flow1;
 
-	merge_tc_off.cookie = merge_flow->tc_flower_cookie;
-	err = nfp_compile_flow_metadata(app, &merge_tc_off, merge_flow,
-					merge_flow->ingress_dev, extack);
+	err = nfp_compile_flow_metadata(app, merge_flow->tc_flower_cookie, merge_flow,
+					merge_flow->ingress_dev, NULL);
 	if (err)
 		goto err_unlink_sub_flow2;
 
@@ -1176,6 +1170,11 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 		return -EOPNOTSUPP;
 	}
 
+	if (key_layer & NFP_FLOWER_LAYER_IPV6)
+		flow->pre_tun_rule.is_ipv6 = true;
+	else
+		flow->pre_tun_rule.is_ipv6 = false;
+
 	/* Skip fields known to exist. */
 	mask += sizeof(struct nfp_flower_meta_tci);
 	ext += sizeof(struct nfp_flower_meta_tci);
@@ -1186,13 +1185,6 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 	mask += sizeof(struct nfp_flower_in_port);
 	ext += sizeof(struct nfp_flower_in_port);
 
-	/* Ensure destination MAC address matches pre_tun_dev. */
-	mac = (struct nfp_flower_mac_mpls *)ext;
-	if (memcmp(&mac->mac_dst[0], flow->pre_tun_rule.dev->dev_addr, 6)) {
-		NL_SET_ERR_MSG_MOD(extack, "unsupported pre-tunnel rule: dest MAC must match output dev MAC");
-		return -EOPNOTSUPP;
-	}
-
 	/* Ensure destination MAC address is fully matched. */
 	mac = (struct nfp_flower_mac_mpls *)mask;
 	if (!is_broadcast_ether_addr(&mac->mac_dst[0])) {
@@ -1200,10 +1192,35 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 		return -EOPNOTSUPP;
 	}
 
+	/* Ensure source MAC address is fully matched. This is only needed
+	 * for firmware with the DECAP_V2 feature enabled. Don't do this
+	 * for firmware without this feature to keep old behaviour.
+	 */
+	if (priv->flower_ext_feats & NFP_FL_FEATS_DECAP_V2) {
+		mac = (struct nfp_flower_mac_mpls *)mask;
+		if (!is_broadcast_ether_addr(&mac->mac_src[0])) {
+			NL_SET_ERR_MSG_MOD(extack,
+					   "unsupported pre-tunnel rule: source MAC field must not be masked");
+			return -EOPNOTSUPP;
+		}
+	}
+
 	if (mac->mpls_lse) {
 		NL_SET_ERR_MSG_MOD(extack, "unsupported pre-tunnel rule: MPLS not supported");
 		return -EOPNOTSUPP;
 	}
+
+	/* Ensure destination MAC address matches pre_tun_dev. */
+	mac = (struct nfp_flower_mac_mpls *)ext;
+	if (memcmp(&mac->mac_dst[0], flow->pre_tun_rule.dev->dev_addr, 6)) {
+		NL_SET_ERR_MSG_MOD(extack,
+				   "unsupported pre-tunnel rule: dest MAC must match output dev MAC");
+		return -EOPNOTSUPP;
+	}
+
+	/* Save mac addresses in pre_tun_rule entry for later use */
+	memcpy(&flow->pre_tun_rule.loc_mac, &mac->mac_dst[0], ETH_ALEN);
+	memcpy(&flow->pre_tun_rule.rem_mac, &mac->mac_src[0], ETH_ALEN);
 
 	mask += sizeof(struct nfp_flower_mac_mpls);
 	ext += sizeof(struct nfp_flower_mac_mpls);
@@ -1233,17 +1250,21 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 	if ((priv->flower_ext_feats & NFP_FL_FEATS_VLAN_QINQ)) {
 		if (key_ls->key_layer_two & NFP_FLOWER_LAYER2_QINQ) {
 			struct nfp_flower_vlan *vlan_tags;
+			u16 vlan_tpid;
 			u16 vlan_tci;
 
 			vlan_tags = (struct nfp_flower_vlan *)ext;
 
 			vlan_tci = be16_to_cpu(vlan_tags->outer_tci);
+			vlan_tpid = be16_to_cpu(vlan_tags->outer_tpid);
 
 			vlan_tci &= ~NFP_FLOWER_MASK_VLAN_PRESENT;
 			flow->pre_tun_rule.vlan_tci = cpu_to_be16(vlan_tci);
+			flow->pre_tun_rule.vlan_tpid = cpu_to_be16(vlan_tpid);
 			vlan = true;
 		} else {
 			flow->pre_tun_rule.vlan_tci = cpu_to_be16(0xffff);
+			flow->pre_tun_rule.vlan_tpid = cpu_to_be16(0xffff);
 		}
 	}
 
@@ -1276,6 +1297,20 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 	return 0;
 }
 
+static bool offload_pre_check(struct flow_cls_offload *flow)
+{
+	struct flow_rule *rule = flow_cls_offload_flow_rule(flow);
+	struct flow_dissector *dissector = rule->match.dissector;
+
+	if (dissector->used_keys & BIT(FLOW_DISSECTOR_KEY_CT))
+		return false;
+
+	if (flow->common.chain_index)
+		return false;
+
+	return true;
+}
+
 /**
  * nfp_flower_add_offload() - Adds a new flow to hardware.
  * @app:	Pointer to the APP handle
@@ -1290,6 +1325,7 @@ static int
 nfp_flower_add_offload(struct nfp_app *app, struct net_device *netdev,
 		       struct flow_cls_offload *flow)
 {
+	struct flow_rule *rule = flow_cls_offload_flow_rule(flow);
 	enum nfp_flower_tun_type tun_type = NFP_FL_TUNNEL_NONE;
 	struct nfp_flower_priv *priv = app->priv;
 	struct netlink_ext_ack *extack = NULL;
@@ -1302,11 +1338,20 @@ nfp_flower_add_offload(struct nfp_app *app, struct net_device *netdev,
 	if (nfp_netdev_is_nfp_repr(netdev))
 		port = nfp_port_from_netdev(netdev);
 
+	if (is_pre_ct_flow(flow))
+		return nfp_fl_ct_handle_pre_ct(priv, netdev, flow, extack);
+
+	if (is_post_ct_flow(flow))
+		return nfp_fl_ct_handle_post_ct(priv, netdev, flow, extack);
+
+	if (!offload_pre_check(flow))
+		return -EOPNOTSUPP;
+
 	key_layer = kmalloc(sizeof(*key_layer), GFP_KERNEL);
 	if (!key_layer)
 		return -ENOMEM;
 
-	err = nfp_flower_calculate_key_layers(app, netdev, key_layer, flow,
+	err = nfp_flower_calculate_key_layers(app, netdev, key_layer, rule,
 					      &tun_type, extack);
 	if (err)
 		goto err_free_key_ls;
@@ -1317,12 +1362,12 @@ nfp_flower_add_offload(struct nfp_app *app, struct net_device *netdev,
 		goto err_free_key_ls;
 	}
 
-	err = nfp_flower_compile_flow_match(app, flow, key_layer, netdev,
+	err = nfp_flower_compile_flow_match(app, rule, key_layer, netdev,
 					    flow_pay, tun_type, extack);
 	if (err)
 		goto err_destroy_flow;
 
-	err = nfp_flower_compile_action(app, flow, netdev, flow_pay, extack);
+	err = nfp_flower_compile_action(app, rule, netdev, flow_pay, extack);
 	if (err)
 		goto err_destroy_flow;
 
@@ -1332,7 +1377,7 @@ nfp_flower_add_offload(struct nfp_app *app, struct net_device *netdev,
 			goto err_destroy_flow;
 	}
 
-	err = nfp_compile_flow_metadata(app, flow, flow_pay, netdev, extack);
+	err = nfp_compile_flow_metadata(app, flow->cookie, flow_pay, netdev, extack);
 	if (err)
 		goto err_destroy_flow;
 
@@ -1344,11 +1389,30 @@ nfp_flower_add_offload(struct nfp_app *app, struct net_device *netdev,
 		goto err_release_metadata;
 	}
 
-	if (flow_pay->pre_tun_rule.dev)
-		err = nfp_flower_xmit_pre_tun_flow(app, flow_pay);
-	else
+	if (flow_pay->pre_tun_rule.dev) {
+		if (priv->flower_ext_feats & NFP_FL_FEATS_DECAP_V2) {
+			struct nfp_predt_entry *predt;
+
+			predt = kzalloc(sizeof(*predt), GFP_KERNEL);
+			if (!predt) {
+				err = -ENOMEM;
+				goto err_remove_rhash;
+			}
+			predt->flow_pay = flow_pay;
+			INIT_LIST_HEAD(&predt->nn_list);
+			spin_lock_bh(&priv->predt_lock);
+			list_add(&predt->list_head, &priv->predt_list);
+			flow_pay->pre_tun_rule.predt = predt;
+			nfp_tun_link_and_update_nn_entries(app, predt);
+			spin_unlock_bh(&priv->predt_lock);
+		} else {
+			err = nfp_flower_xmit_pre_tun_flow(app, flow_pay);
+		}
+	} else {
 		err = nfp_flower_xmit_flow(app, flow_pay,
 					   NFP_FLOWER_CMSG_TYPE_FLOW_ADD);
+	}
+
 	if (err)
 		goto err_remove_rhash;
 
@@ -1452,7 +1516,7 @@ err_free_links:
 	kfree_rcu(merge_flow, rcu);
 }
 
-static void
+void
 nfp_flower_del_linked_merge_flows(struct nfp_app *app,
 				  struct nfp_fl_payload *sub_flow)
 {
@@ -1481,6 +1545,7 @@ nfp_flower_del_offload(struct nfp_app *app, struct net_device *netdev,
 		       struct flow_cls_offload *flow)
 {
 	struct nfp_flower_priv *priv = app->priv;
+	struct nfp_fl_ct_map_entry *ct_map_ent;
 	struct netlink_ext_ack *extack = NULL;
 	struct nfp_fl_payload *nfp_flow;
 	struct nfp_port *port = NULL;
@@ -1489,6 +1554,14 @@ nfp_flower_del_offload(struct nfp_app *app, struct net_device *netdev,
 	extack = flow->common.extack;
 	if (nfp_netdev_is_nfp_repr(netdev))
 		port = nfp_port_from_netdev(netdev);
+
+	/* Check ct_map_table */
+	ct_map_ent = rhashtable_lookup_fast(&priv->ct_map_table, &flow->cookie,
+					    nfp_ct_map_params);
+	if (ct_map_ent) {
+		err = nfp_fl_ct_del_flow(ct_map_ent);
+		return err;
+	}
 
 	nfp_flow = nfp_flower_search_fl_table(app, flow->cookie, netdev);
 	if (!nfp_flow) {
@@ -1511,11 +1584,25 @@ nfp_flower_del_offload(struct nfp_app *app, struct net_device *netdev,
 		goto err_free_merge_flow;
 	}
 
-	if (nfp_flow->pre_tun_rule.dev)
-		err = nfp_flower_xmit_pre_tun_del_flow(app, nfp_flow);
-	else
+	if (nfp_flow->pre_tun_rule.dev) {
+		if (priv->flower_ext_feats & NFP_FL_FEATS_DECAP_V2) {
+			struct nfp_predt_entry *predt;
+
+			predt = nfp_flow->pre_tun_rule.predt;
+			if (predt) {
+				spin_lock_bh(&priv->predt_lock);
+				nfp_tun_unlink_and_update_nn_entries(app, predt);
+				list_del(&predt->list_head);
+				spin_unlock_bh(&priv->predt_lock);
+				kfree(predt);
+			}
+		} else {
+			err = nfp_flower_xmit_pre_tun_del_flow(app, nfp_flow);
+		}
+	} else {
 		err = nfp_flower_xmit_flow(app, nfp_flow,
 					   NFP_FLOWER_CMSG_TYPE_FLOW_DEL);
+	}
 	/* Fall through on error. */
 
 err_free_merge_flow:
@@ -1568,7 +1655,7 @@ __nfp_flower_update_merge_stats(struct nfp_app *app,
 	}
 }
 
-static void
+void
 nfp_flower_update_merge_stats(struct nfp_app *app,
 			      struct nfp_fl_payload *sub_flow)
 {
@@ -1595,9 +1682,16 @@ nfp_flower_get_stats(struct nfp_app *app, struct net_device *netdev,
 		     struct flow_cls_offload *flow)
 {
 	struct nfp_flower_priv *priv = app->priv;
+	struct nfp_fl_ct_map_entry *ct_map_ent;
 	struct netlink_ext_ack *extack = NULL;
 	struct nfp_fl_payload *nfp_flow;
 	u32 ctx_id;
+
+	/* Check ct_map table first */
+	ct_map_ent = rhashtable_lookup_fast(&priv->ct_map_table, &flow->cookie,
+					    nfp_ct_map_params);
+	if (ct_map_ent)
+		return nfp_fl_ct_stats(flow, ct_map_ent);
 
 	extack = flow->common.extack;
 	nfp_flow = nfp_flower_search_fl_table(app, flow->cookie, netdev);
@@ -1646,9 +1740,10 @@ nfp_flower_repr_offload(struct nfp_app *app, struct net_device *netdev,
 static int nfp_flower_setup_tc_block_cb(enum tc_setup_type type,
 					void *type_data, void *cb_priv)
 {
+	struct flow_cls_common_offload *common = type_data;
 	struct nfp_repr *repr = cb_priv;
 
-	if (!tc_cls_can_offload_and_chain0(repr->netdev, type_data))
+	if (!tc_can_offload_extack(repr->netdev, common->extack))
 		return -EOPNOTSUPP;
 
 	switch (type) {
@@ -1732,9 +1827,6 @@ nfp_flower_indr_block_cb_priv_lookup(struct nfp_app *app,
 	struct nfp_flower_indr_block_cb_priv *cb_priv;
 	struct nfp_flower_priv *priv = app->priv;
 
-	/* All callback list access should be protected by RTNL. */
-	ASSERT_RTNL();
-
 	list_for_each_entry(cb_priv, &priv->indr_block_cb_priv, list)
 		if (cb_priv->netdev == netdev)
 			return cb_priv;
@@ -1746,10 +1838,6 @@ static int nfp_flower_setup_indr_block_cb(enum tc_setup_type type,
 					  void *type_data, void *cb_priv)
 {
 	struct nfp_flower_indr_block_cb_priv *priv = cb_priv;
-	struct flow_cls_offload *flower = type_data;
-
-	if (flower->common.chain_index)
-		return -EOPNOTSUPP;
 
 	switch (type) {
 	case TC_SETUP_CLSFLOWER:
@@ -1833,12 +1921,29 @@ nfp_flower_setup_indr_tc_block(struct net_device *netdev, struct Qdisc *sch, str
 	return 0;
 }
 
+static int
+nfp_setup_tc_no_dev(struct nfp_app *app, enum tc_setup_type type, void *data)
+{
+	if (!data)
+		return -EOPNOTSUPP;
+
+	switch (type) {
+	case TC_SETUP_ACT:
+		return nfp_setup_tc_act_offload(app, data);
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
 int
 nfp_flower_indr_setup_tc_cb(struct net_device *netdev, struct Qdisc *sch, void *cb_priv,
 			    enum tc_setup_type type, void *type_data,
 			    void *data,
 			    void (*cleanup)(struct flow_block_cb *block_cb))
 {
+	if (!netdev)
+		return nfp_setup_tc_no_dev(cb_priv, type, data);
+
 	if (!nfp_fl_is_netdev_to_offload(netdev))
 		return -EOPNOTSUPP;
 

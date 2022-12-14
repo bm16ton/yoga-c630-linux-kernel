@@ -26,8 +26,6 @@
 #include <linux/mount.h>
 #include <linux/bug.h>
 
-#include <linux/uaccess.h>
-
 #include "internal.h"
 
 static void proc_evict_inode(struct inode *inode)
@@ -66,7 +64,7 @@ static struct inode *proc_alloc_inode(struct super_block *sb)
 {
 	struct proc_inode *ei;
 
-	ei = kmem_cache_alloc(proc_inode_cachep, GFP_KERNEL);
+	ei = alloc_inode_sb(sb, proc_inode_cachep, GFP_KERNEL);
 	if (!ei)
 		return NULL;
 	ei->pid = NULL;
@@ -214,7 +212,15 @@ static void unuse_pde(struct proc_dir_entry *pde)
 		complete(pde->pde_unload_completion);
 }
 
-/* pde is locked on entry, unlocked on exit */
+/*
+ * At most 2 contexts can enter this function: the one doing the last
+ * close on the descriptor and whoever is deleting PDE itself.
+ *
+ * First to enter calls ->proc_release hook and signals its completion
+ * to the second one which waits and then does nothing.
+ *
+ * PDE is locked on entry, unlocked on exit.
+ */
 static void close_pdeo(struct proc_dir_entry *pde, struct pde_opener *pdeo)
 	__releases(&pde->pde_unload_lock)
 {
@@ -224,9 +230,6 @@ static void close_pdeo(struct proc_dir_entry *pde, struct pde_opener *pdeo)
 	 *
 	 * rmmod (remove_proc_entry() et al) can't delete an entry and proceed:
 	 * "struct file" needs to be available at the right moment.
-	 *
-	 * Therefore, first process to enter this function does ->release() and
-	 * signals its completion to the other process which does nothing.
 	 */
 	if (pdeo->closing) {
 		/* somebody else is doing that, just wait */
@@ -240,10 +243,12 @@ static void close_pdeo(struct proc_dir_entry *pde, struct pde_opener *pdeo)
 
 		pdeo->closing = true;
 		spin_unlock(&pde->pde_unload_lock);
+
 		file = pdeo->file;
 		pde->proc_ops->proc_release(file_inode(file), file);
+
 		spin_lock(&pde->pde_unload_lock);
-		/* After ->release. */
+		/* Strictly after ->proc_release, see above. */
 		list_del(&pdeo->lh);
 		c = pdeo->c;
 		spin_unlock(&pde->pde_unload_lock);
@@ -273,25 +278,15 @@ void proc_entry_rundown(struct proc_dir_entry *de)
 	spin_unlock(&de->pde_unload_lock);
 }
 
-static loff_t pde_lseek(struct proc_dir_entry *pde, struct file *file, loff_t offset, int whence)
-{
-	typeof_member(struct proc_ops, proc_lseek) lseek;
-
-	lseek = pde->proc_ops->proc_lseek;
-	if (!lseek)
-		lseek = default_llseek;
-	return lseek(file, offset, whence);
-}
-
 static loff_t proc_reg_llseek(struct file *file, loff_t offset, int whence)
 {
 	struct proc_dir_entry *pde = PDE(file_inode(file));
 	loff_t rv = -EINVAL;
 
 	if (pde_is_permanent(pde)) {
-		return pde_lseek(pde, file, offset, whence);
+		return pde->proc_ops->proc_lseek(file, offset, whence);
 	} else if (use_pde(pde)) {
-		rv = pde_lseek(pde, file, offset, whence);
+		rv = pde->proc_ops->proc_lseek(file, offset, whence);
 		unuse_pde(pde);
 	}
 	return rv;
@@ -493,12 +488,14 @@ proc_reg_get_unmapped_area(struct file *file, unsigned long orig_addr,
 
 static int proc_reg_open(struct inode *inode, struct file *file)
 {
-	struct proc_fs_info *fs_info = proc_sb_info(inode->i_sb);
 	struct proc_dir_entry *pde = PDE(inode);
 	int rv = 0;
 	typeof_member(struct proc_ops, proc_open) open;
 	typeof_member(struct proc_ops, proc_release) release;
 	struct pde_opener *pdeo;
+
+	if (!pde->proc_ops->proc_lseek)
+		file->f_mode &= ~FMODE_LSEEK;
 
 	if (pde_is_permanent(pde)) {
 		open = pde->proc_ops->proc_open;
@@ -506,9 +503,6 @@ static int proc_reg_open(struct inode *inode, struct file *file)
 			rv = open(inode, file);
 		return rv;
 	}
-
-	if (fs_info->pidonly == PROC_PIDONLY_ON)
-		return -ENOENT;
 
 	/*
 	 * Ensure that
@@ -664,6 +658,7 @@ struct inode *proc_get_inode(struct super_block *sb, struct proc_dir_entry *de)
 		return NULL;
 	}
 
+	inode->i_private = de->data;
 	inode->i_ino = de->low_ino;
 	inode->i_mtime = inode->i_atime = inode->i_ctime = current_time(inode);
 	PROC_I(inode)->pde = de;

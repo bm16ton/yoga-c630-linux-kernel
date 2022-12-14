@@ -23,8 +23,6 @@
  *
  */
 
-#include <linux/delay.h>
-
 #include "dce110_transform_v.h"
 #include "dm_services.h"
 #include "dc.h"
@@ -708,7 +706,8 @@ bool dce110_transform_v_construct(
 	xfm_dce->lb_pixel_depth_supported =
 			LB_PIXEL_DEPTH_18BPP |
 			LB_PIXEL_DEPTH_24BPP |
-			LB_PIXEL_DEPTH_30BPP;
+			LB_PIXEL_DEPTH_30BPP |
+			LB_PIXEL_DEPTH_36BPP;
 
 	xfm_dce->prescaler_on = true;
 	xfm_dce->lb_bits_per_entry = LB_BITS_PER_ENTRY;

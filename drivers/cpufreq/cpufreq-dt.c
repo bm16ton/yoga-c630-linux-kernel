@@ -29,9 +29,9 @@ struct private_data {
 
 	cpumask_var_t cpus;
 	struct device *cpu_dev;
-	struct opp_table *opp_table;
 	struct cpufreq_frequency_table *freq_table;
 	bool have_static_opps;
+	int opp_token;
 };
 
 static LIST_HEAD(priv_list);
@@ -143,8 +143,6 @@ static int cpufreq_init(struct cpufreq_policy *policy)
 		cpufreq_dt_attr[1] = &cpufreq_freq_attr_scaling_boost_freqs;
 	}
 
-	dev_pm_opp_of_register_em(cpu_dev, policy->cpus);
-
 	return 0;
 
 out_clk_put:
@@ -184,6 +182,7 @@ static struct cpufreq_driver dt_cpufreq_driver = {
 	.exit = cpufreq_exit,
 	.online = cpufreq_online,
 	.offline = cpufreq_offline,
+	.register_em = cpufreq_register_em_with_opp,
 	.name = "cpufreq-dt",
 	.attr = cpufreq_dt_attr,
 	.suspend = cpufreq_generic_suspend,
@@ -194,7 +193,7 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 	struct private_data *priv;
 	struct device *cpu_dev;
 	bool fallback = false;
-	const char *reg_name;
+	const char *reg_name[] = { NULL, NULL };
 	int ret;
 
 	/* Check if this CPU is already covered by some other policy */
@@ -219,12 +218,11 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 	 * OPP layer will be taking care of regulators now, but it needs to know
 	 * the name of the regulator first.
 	 */
-	reg_name = find_supply_name(cpu_dev);
-	if (reg_name) {
-		priv->opp_table = dev_pm_opp_set_regulators(cpu_dev, &reg_name,
-							    1);
-		if (IS_ERR(priv->opp_table)) {
-			ret = PTR_ERR(priv->opp_table);
+	reg_name[0] = find_supply_name(cpu_dev);
+	if (reg_name[0]) {
+		priv->opp_token = dev_pm_opp_set_regulators(cpu_dev, reg_name);
+		if (priv->opp_token < 0) {
+			ret = priv->opp_token;
 			if (ret != -EPROBE_DEFER)
 				dev_err(cpu_dev, "failed to set regulators: %d\n",
 					ret);
@@ -255,10 +253,15 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 	 * before updating priv->cpus. Otherwise, we will end up creating
 	 * duplicate OPPs for the CPUs.
 	 *
-	 * OPPs might be populated at runtime, don't check for error here.
+	 * OPPs might be populated at runtime, don't fail for error here unless
+	 * it is -EPROBE_DEFER.
 	 */
-	if (!dev_pm_opp_of_cpumask_add_table(priv->cpus))
+	ret = dev_pm_opp_of_cpumask_add_table(priv->cpus);
+	if (!ret) {
 		priv->have_static_opps = true;
+	} else if (ret == -EPROBE_DEFER) {
+		goto out;
+	}
 
 	/*
 	 * The OPP table must be initialized, statically or dynamically, by this
@@ -291,7 +294,7 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 out:
 	if (priv->have_static_opps)
 		dev_pm_opp_of_cpumask_remove_table(priv->cpus);
-	dev_pm_opp_put_regulators(priv->opp_table);
+	dev_pm_opp_put_regulators(priv->opp_token);
 free_cpumask:
 	free_cpumask_var(priv->cpus);
 	return ret;
@@ -305,7 +308,7 @@ static void dt_cpufreq_release(void)
 		dev_pm_opp_free_cpufreq_table(priv->cpu_dev, &priv->freq_table);
 		if (priv->have_static_opps)
 			dev_pm_opp_of_cpumask_remove_table(priv->cpus);
-		dev_pm_opp_put_regulators(priv->opp_table);
+		dev_pm_opp_put_regulators(priv->opp_token);
 		free_cpumask_var(priv->cpus);
 		list_del(&priv->node);
 	}

@@ -35,7 +35,7 @@
 
 #include "regs-gpio.h"
 #include <linux/platform_data/leds-s3c24xx.h>
-#include <mach/irqs.h>
+#include "irqs.h"
 #include "gpio-samsung.h"
 #include <linux/platform_data/mtd-nand-s3c2410.h>
 #include <linux/platform_data/i2c-s3c2410.h>
@@ -542,10 +542,14 @@ static const struct property_entry mini2440_at24_properties[] = {
 	{ }
 };
 
+static const struct software_node mini2440_at24_node = {
+	.properties = mini2440_at24_properties,
+};
+
 static struct i2c_board_info mini2440_i2c_devs[] __initdata = {
 	{
 		I2C_BOARD_INFO("24c08", 0x50),
-		.properties = mini2440_at24_properties,
+		.swnode = &mini2440_at24_node,
 	},
 };
 
@@ -620,7 +624,7 @@ static char mini2440_features_str[12] __initdata = "0tb";
 static int __init mini2440_features_setup(char *str)
 {
 	if (str)
-		strlcpy(mini2440_features_str, str,
+		strscpy(mini2440_features_str, str,
 			sizeof(mini2440_features_str));
 	return 1;
 }
@@ -785,6 +789,7 @@ static void __init mini2440_init(void)
 MACHINE_START(MINI2440, "MINI2440")
 	/* Maintainer: Michel Pollet <buserror@gmail.com> */
 	.atag_offset	= 0x100,
+	.nr_irqs	= NR_IRQS_S3C2440,
 	.map_io		= mini2440_map_io,
 	.init_machine	= mini2440_init,
 	.init_irq	= s3c2440_init_irq,

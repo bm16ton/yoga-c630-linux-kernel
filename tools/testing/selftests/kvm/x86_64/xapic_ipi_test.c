@@ -39,11 +39,6 @@
 /* Default delay between migrate_pages calls (microseconds) */
 #define DEFAULT_DELAY_USECS 500000
 
-#define HALTER_VCPU_ID 0
-#define SENDER_VCPU_ID 1
-
-volatile uint32_t *apic_base = (volatile uint32_t *)APIC_DEFAULT_GPA;
-
 /*
  * Vector for IPI from sender vCPU to halting vCPU.
  * Value is arbitrary and was chosen for the alternating bit pattern. Any
@@ -81,49 +76,9 @@ struct test_data_page {
 
 struct thread_params {
 	struct test_data_page *data;
-	struct kvm_vm *vm;
-	uint32_t vcpu_id;
+	struct kvm_vcpu *vcpu;
 	uint64_t *pipis_rcvd; /* host address of ipis_rcvd global */
 };
-
-uint32_t read_apic_reg(uint reg)
-{
-	return apic_base[reg >> 2];
-}
-
-void write_apic_reg(uint reg, uint32_t val)
-{
-	apic_base[reg >> 2] = val;
-}
-
-void disable_apic(void)
-{
-	wrmsr(MSR_IA32_APICBASE,
-	      rdmsr(MSR_IA32_APICBASE) &
-		~(MSR_IA32_APICBASE_ENABLE | MSR_IA32_APICBASE_EXTD));
-}
-
-void enable_xapic(void)
-{
-	uint64_t val = rdmsr(MSR_IA32_APICBASE);
-
-	/* Per SDM: to enable xAPIC when in x2APIC must first disable APIC */
-	if (val & MSR_IA32_APICBASE_EXTD) {
-		disable_apic();
-		wrmsr(MSR_IA32_APICBASE,
-		      rdmsr(MSR_IA32_APICBASE) | MSR_IA32_APICBASE_ENABLE);
-	} else if (!(val & MSR_IA32_APICBASE_ENABLE)) {
-		wrmsr(MSR_IA32_APICBASE, val | MSR_IA32_APICBASE_ENABLE);
-	}
-
-	/*
-	 * Per SDM: reset value of spurious interrupt vector register has the
-	 * APIC software enabled bit=0. It must be enabled in addition to the
-	 * enable bit in the MSR.
-	 */
-	val = read_apic_reg(APIC_SPIV) | APIC_SPIV_APIC_ENABLED;
-	write_apic_reg(APIC_SPIV, val);
-}
 
 void verify_apic_base_addr(void)
 {
@@ -136,10 +91,10 @@ void verify_apic_base_addr(void)
 static void halter_guest_code(struct test_data_page *data)
 {
 	verify_apic_base_addr();
-	enable_xapic();
+	xapic_enable();
 
-	data->halter_apic_id = GET_APIC_ID_FIELD(read_apic_reg(APIC_ID));
-	data->halter_lvr = read_apic_reg(APIC_LVR);
+	data->halter_apic_id = GET_APIC_ID_FIELD(xapic_read_reg(APIC_ID));
+	data->halter_lvr = xapic_read_reg(APIC_LVR);
 
 	/*
 	 * Loop forever HLTing and recording halts & wakes. Disable interrupts
@@ -150,8 +105,8 @@ static void halter_guest_code(struct test_data_page *data)
 	 * TPR and PPR for diagnostic purposes in case the test fails.
 	 */
 	for (;;) {
-		data->halter_tpr = read_apic_reg(APIC_TASKPRI);
-		data->halter_ppr = read_apic_reg(APIC_PROCPRI);
+		data->halter_tpr = xapic_read_reg(APIC_TASKPRI);
+		data->halter_ppr = xapic_read_reg(APIC_PROCPRI);
 		data->hlt_count++;
 		asm volatile("sti; hlt; cli");
 		data->wake_count++;
@@ -166,7 +121,7 @@ static void halter_guest_code(struct test_data_page *data)
 static void guest_ipi_handler(struct ex_regs *regs)
 {
 	ipis_rcvd++;
-	write_apic_reg(APIC_EOI, 77);
+	xapic_write_reg(APIC_EOI, 77);
 }
 
 static void sender_guest_code(struct test_data_page *data)
@@ -179,7 +134,7 @@ static void sender_guest_code(struct test_data_page *data)
 	uint64_t tsc_start;
 
 	verify_apic_base_addr();
-	enable_xapic();
+	xapic_enable();
 
 	/*
 	 * Init interrupt command register for sending IPIs
@@ -206,8 +161,8 @@ static void sender_guest_code(struct test_data_page *data)
 		 * First IPI can be sent unconditionally because halter vCPU
 		 * starts earlier.
 		 */
-		write_apic_reg(APIC_ICR2, icr2_val);
-		write_apic_reg(APIC_ICR, icr_val);
+		xapic_write_reg(APIC_ICR2, icr2_val);
+		xapic_write_reg(APIC_ICR, icr_val);
 		data->ipis_sent++;
 
 		/*
@@ -239,6 +194,7 @@ static void sender_guest_code(struct test_data_page *data)
 static void *vcpu_thread(void *arg)
 {
 	struct thread_params *params = (struct thread_params *)arg;
+	struct kvm_vcpu *vcpu = params->vcpu;
 	struct ucall uc;
 	int old;
 	int r;
@@ -247,17 +203,17 @@ static void *vcpu_thread(void *arg)
 	r = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &old);
 	TEST_ASSERT(r == 0,
 		    "pthread_setcanceltype failed on vcpu_id=%u with errno=%d",
-		    params->vcpu_id, r);
+		    vcpu->id, r);
 
-	fprintf(stderr, "vCPU thread running vCPU %u\n", params->vcpu_id);
-	vcpu_run(params->vm, params->vcpu_id);
-	exit_reason = vcpu_state(params->vm, params->vcpu_id)->exit_reason;
+	fprintf(stderr, "vCPU thread running vCPU %u\n", vcpu->id);
+	vcpu_run(vcpu);
+	exit_reason = vcpu->run->exit_reason;
 
 	TEST_ASSERT(exit_reason == KVM_EXIT_IO,
 		    "vCPU %u exited with unexpected exit reason %u-%s, expected KVM_EXIT_IO",
-		    params->vcpu_id, exit_reason, exit_reason_str(exit_reason));
+		    vcpu->id, exit_reason, exit_reason_str(exit_reason));
 
-	if (get_ucall(params->vm, params->vcpu_id, &uc) == UCALL_ABORT) {
+	if (get_ucall(vcpu, &uc) == UCALL_ABORT) {
 		TEST_ASSERT(false,
 			    "vCPU %u exited with error: %s.\n"
 			    "Sending vCPU sent %lu IPIs to halting vCPU\n"
@@ -265,7 +221,7 @@ static void *vcpu_thread(void *arg)
 			    "Halter TPR=%#x PPR=%#x LVR=%#x\n"
 			    "Migrations attempted: %lu\n"
 			    "Migrations completed: %lu\n",
-			    params->vcpu_id, (const char *)uc.args[0],
+			    vcpu->id, (const char *)uc.args[0],
 			    params->data->ipis_sent, params->data->hlt_count,
 			    params->data->wake_count,
 			    *params->pipis_rcvd, params->data->halter_tpr,
@@ -277,7 +233,7 @@ static void *vcpu_thread(void *arg)
 	return NULL;
 }
 
-static void cancel_join_vcpu_thread(pthread_t thread, uint32_t vcpu_id)
+static void cancel_join_vcpu_thread(pthread_t thread, struct kvm_vcpu *vcpu)
 {
 	void *retval;
 	int r;
@@ -285,12 +241,12 @@ static void cancel_join_vcpu_thread(pthread_t thread, uint32_t vcpu_id)
 	r = pthread_cancel(thread);
 	TEST_ASSERT(r == 0,
 		    "pthread_cancel on vcpu_id=%d failed with errno=%d",
-		    vcpu_id, r);
+		    vcpu->id, r);
 
 	r = pthread_join(thread, &retval);
 	TEST_ASSERT(r == 0,
 		    "pthread_join on vcpu_id=%d failed with errno=%d",
-		    vcpu_id, r);
+		    vcpu->id, r);
 	TEST_ASSERT(retval == PTHREAD_CANCELED,
 		    "expected retval=%p, got %p", PTHREAD_CANCELED,
 		    retval);
@@ -456,34 +412,30 @@ int main(int argc, char *argv[])
 	if (delay_usecs <= 0)
 		delay_usecs = DEFAULT_DELAY_USECS;
 
-	vm = vm_create_default(HALTER_VCPU_ID, 0, halter_guest_code);
-	params[0].vm = vm;
-	params[1].vm = vm;
+	vm = vm_create_with_one_vcpu(&params[0].vcpu, halter_guest_code);
 
 	vm_init_descriptor_tables(vm);
-	vcpu_init_descriptor_tables(vm, HALTER_VCPU_ID);
-	vm_handle_exception(vm, IPI_VECTOR, guest_ipi_handler);
+	vcpu_init_descriptor_tables(params[0].vcpu);
+	vm_install_exception_handler(vm, IPI_VECTOR, guest_ipi_handler);
 
-	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA, 0);
+	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
 
-	vm_vcpu_add_default(vm, SENDER_VCPU_ID, sender_guest_code);
+	params[1].vcpu = vm_vcpu_add(vm, 1, sender_guest_code);
 
-	test_data_page_vaddr = vm_vaddr_alloc(vm, 0x1000, 0x1000, 0, 0);
-	data =
-	   (struct test_data_page *)addr_gva2hva(vm, test_data_page_vaddr);
+	test_data_page_vaddr = vm_vaddr_alloc_page(vm);
+	data = addr_gva2hva(vm, test_data_page_vaddr);
 	memset(data, 0, sizeof(*data));
 	params[0].data = data;
 	params[1].data = data;
 
-	vcpu_args_set(vm, HALTER_VCPU_ID, 1, test_data_page_vaddr);
-	vcpu_args_set(vm, SENDER_VCPU_ID, 1, test_data_page_vaddr);
+	vcpu_args_set(params[0].vcpu, 1, test_data_page_vaddr);
+	vcpu_args_set(params[1].vcpu, 1, test_data_page_vaddr);
 
 	pipis_rcvd = (uint64_t *)addr_gva2hva(vm, (uint64_t)&ipis_rcvd);
 	params[0].pipis_rcvd = pipis_rcvd;
 	params[1].pipis_rcvd = pipis_rcvd;
 
 	/* Start halter vCPU thread and wait for it to execute first HLT. */
-	params[0].vcpu_id = HALTER_VCPU_ID;
 	r = pthread_create(&threads[0], NULL, vcpu_thread, &params[0]);
 	TEST_ASSERT(r == 0,
 		    "pthread_create halter failed errno=%d", errno);
@@ -503,7 +455,6 @@ int main(int argc, char *argv[])
 		"Halter vCPU thread reported its APIC ID: %u after %d seconds.\n",
 		data->halter_apic_id, wait_secs);
 
-	params[1].vcpu_id = SENDER_VCPU_ID;
 	r = pthread_create(&threads[1], NULL, vcpu_thread, &params[1]);
 	TEST_ASSERT(r == 0, "pthread_create sender failed errno=%d", errno);
 
@@ -519,8 +470,8 @@ int main(int argc, char *argv[])
 	/*
 	 * Cancel threads and wait for them to stop.
 	 */
-	cancel_join_vcpu_thread(threads[0], HALTER_VCPU_ID);
-	cancel_join_vcpu_thread(threads[1], SENDER_VCPU_ID);
+	cancel_join_vcpu_thread(threads[0], params[0].vcpu);
+	cancel_join_vcpu_thread(threads[1], params[1].vcpu);
 
 	fprintf(stderr,
 		"Test successful after running for %d seconds.\n"

@@ -32,11 +32,12 @@
 #include <drm/ttm/ttm_bo_api.h>
 #include <drm/ttm/ttm_bo_driver.h>
 #include <drm/ttm/ttm_placement.h>
+#include <drm/ttm/ttm_range_manager.h>
 
 #include "qxl_drv.h"
 #include "qxl_object.h"
 
-static struct qxl_device *qxl_get_qdev(struct ttm_bo_device *bdev)
+static struct qxl_device *qxl_get_qdev(struct ttm_device *bdev)
 {
 	struct qxl_mman *mman;
 	struct qxl_device *qdev;
@@ -69,7 +70,7 @@ static void qxl_evict_flags(struct ttm_buffer_object *bo,
 	*placement = qbo->placement;
 }
 
-int qxl_ttm_io_mem_reserve(struct ttm_bo_device *bdev,
+int qxl_ttm_io_mem_reserve(struct ttm_device *bdev,
 			   struct ttm_resource *mem)
 {
 	struct qxl_device *qdev = qxl_get_qdev(bdev);
@@ -81,13 +82,13 @@ int qxl_ttm_io_mem_reserve(struct ttm_bo_device *bdev,
 	case TTM_PL_VRAM:
 		mem->bus.is_iomem = true;
 		mem->bus.offset = (mem->start << PAGE_SHIFT) + qdev->vram_base;
-		mem->bus.caching = ttm_cached;
+		mem->bus.caching = ttm_write_combined;
 		break;
 	case TTM_PL_PRIV:
 		mem->bus.is_iomem = true;
 		mem->bus.offset = (mem->start << PAGE_SHIFT) +
 			qdev->surfaceram_base;
-		mem->bus.caching = ttm_cached;
+		mem->bus.caching = ttm_write_combined;
 		break;
 	default:
 		return -EINVAL;
@@ -98,10 +99,8 @@ int qxl_ttm_io_mem_reserve(struct ttm_bo_device *bdev,
 /*
  * TTM backend functions.
  */
-static void qxl_ttm_backend_destroy(struct ttm_bo_device *bdev,
-				    struct ttm_tt *ttm)
+static void qxl_ttm_backend_destroy(struct ttm_device *bdev, struct ttm_tt *ttm)
 {
-	ttm_tt_destroy_common(bdev, ttm);
 	ttm_tt_fini(ttm);
 	kfree(ttm);
 }
@@ -114,7 +113,7 @@ static struct ttm_tt *qxl_ttm_tt_create(struct ttm_buffer_object *bo,
 	ttm = kzalloc(sizeof(struct ttm_tt), GFP_KERNEL);
 	if (ttm == NULL)
 		return NULL;
-	if (ttm_tt_init(ttm, bo, page_flags, ttm_cached)) {
+	if (ttm_tt_init(ttm, bo, page_flags, ttm_cached, 0)) {
 		kfree(ttm);
 		return NULL;
 	}
@@ -122,18 +121,17 @@ static struct ttm_tt *qxl_ttm_tt_create(struct ttm_buffer_object *bo,
 }
 
 static void qxl_bo_move_notify(struct ttm_buffer_object *bo,
-			       bool evict,
 			       struct ttm_resource *new_mem)
 {
 	struct qxl_bo *qbo;
 	struct qxl_device *qdev;
 
-	if (!qxl_ttm_bo_is_qxl_bo(bo))
+	if (!qxl_ttm_bo_is_qxl_bo(bo) || !bo->resource)
 		return;
 	qbo = to_qxl_bo(bo);
 	qdev = to_qxl(qbo->tbo.base.dev);
 
-	if (bo->mem.mem_type == TTM_PL_PRIV && qbo->surface_id)
+	if (bo->resource->mem_type == TTM_PL_PRIV && qbo->surface_id)
 		qxl_surface_evict(qdev, qbo, new_mem ? true : false);
 }
 
@@ -142,35 +140,28 @@ static int qxl_bo_move(struct ttm_buffer_object *bo, bool evict,
 		       struct ttm_resource *new_mem,
 		       struct ttm_place *hop)
 {
-	struct ttm_resource *old_mem = &bo->mem;
+	struct ttm_resource *old_mem = bo->resource;
 	int ret;
 
-	qxl_bo_move_notify(bo, evict, new_mem);
+	qxl_bo_move_notify(bo, new_mem);
 
 	ret = ttm_bo_wait_ctx(bo, ctx);
 	if (ret)
-		goto out;
+		return ret;
 
 	if (old_mem->mem_type == TTM_PL_SYSTEM && bo->ttm == NULL) {
 		ttm_bo_move_null(bo, new_mem);
 		return 0;
 	}
-	ret = ttm_bo_move_memcpy(bo, ctx, new_mem);
-out:
-	if (ret) {
-		swap(*new_mem, bo->mem);
-		qxl_bo_move_notify(bo, false, new_mem);
-		swap(*new_mem, bo->mem);
-	}
-	return ret;
+	return ttm_bo_move_memcpy(bo, ctx, new_mem);
 }
 
 static void qxl_bo_delete_mem_notify(struct ttm_buffer_object *bo)
 {
-	qxl_bo_move_notify(bo, false, NULL);
+	qxl_bo_move_notify(bo, NULL);
 }
 
-static struct ttm_bo_driver qxl_bo_driver = {
+static struct ttm_device_funcs qxl_bo_driver = {
 	.ttm_tt_create = &qxl_ttm_tt_create,
 	.ttm_tt_destroy = &qxl_ttm_backend_destroy,
 	.eviction_valuable = ttm_bo_eviction_valuable,
@@ -193,10 +184,10 @@ int qxl_ttm_init(struct qxl_device *qdev)
 	int num_io_pages; /* != rom->num_io_pages, we include surface0 */
 
 	/* No others user of address space so set it to 0 */
-	r = ttm_bo_device_init(&qdev->mman.bdev, &qxl_bo_driver, NULL,
-			       qdev->ddev.anon_inode->i_mapping,
-			       qdev->ddev.vma_offset_manager,
-			       false, false);
+	r = ttm_device_init(&qdev->mman.bdev, &qxl_bo_driver, NULL,
+			    qdev->ddev.anon_inode->i_mapping,
+			    qdev->ddev.vma_offset_manager,
+			    false, false);
 	if (r) {
 		DRM_ERROR("failed initializing buffer object driver(%d).\n", r);
 		return r;
@@ -227,45 +218,18 @@ void qxl_ttm_fini(struct qxl_device *qdev)
 {
 	ttm_range_man_fini(&qdev->mman.bdev, TTM_PL_VRAM);
 	ttm_range_man_fini(&qdev->mman.bdev, TTM_PL_PRIV);
-	ttm_bo_device_release(&qdev->mman.bdev);
+	ttm_device_fini(&qdev->mman.bdev);
 	DRM_INFO("qxl: ttm finalized\n");
 }
-
-#define QXL_DEBUGFS_MEM_TYPES 2
-
-#if defined(CONFIG_DEBUG_FS)
-static int qxl_mm_dump_table(struct seq_file *m, void *data)
-{
-	struct drm_info_node *node = (struct drm_info_node *)m->private;
-	struct ttm_resource_manager *man = (struct ttm_resource_manager *)node->info_ent->data;
-	struct drm_printer p = drm_seq_file_printer(m);
-
-	ttm_resource_manager_debug(man, &p);
-	return 0;
-}
-#endif
 
 void qxl_ttm_debugfs_init(struct qxl_device *qdev)
 {
 #if defined(CONFIG_DEBUG_FS)
-	static struct drm_info_list qxl_mem_types_list[QXL_DEBUGFS_MEM_TYPES];
-	static char qxl_mem_types_names[QXL_DEBUGFS_MEM_TYPES][32];
-	unsigned int i;
-
-	for (i = 0; i < QXL_DEBUGFS_MEM_TYPES; i++) {
-		if (i == 0)
-			sprintf(qxl_mem_types_names[i], "qxl_mem_mm");
-		else
-			sprintf(qxl_mem_types_names[i], "qxl_surf_mm");
-		qxl_mem_types_list[i].name = qxl_mem_types_names[i];
-		qxl_mem_types_list[i].show = &qxl_mm_dump_table;
-		qxl_mem_types_list[i].driver_features = 0;
-		if (i == 0)
-			qxl_mem_types_list[i].data = ttm_manager_type(&qdev->mman.bdev, TTM_PL_VRAM);
-		else
-			qxl_mem_types_list[i].data = ttm_manager_type(&qdev->mman.bdev, TTM_PL_PRIV);
-
-	}
-	qxl_debugfs_add_files(qdev, qxl_mem_types_list, i);
+	ttm_resource_manager_create_debugfs(ttm_manager_type(&qdev->mman.bdev,
+							     TTM_PL_VRAM),
+					    qdev->ddev.primary->debugfs_root, "qxl_mem_mm");
+	ttm_resource_manager_create_debugfs(ttm_manager_type(&qdev->mman.bdev,
+							     TTM_PL_PRIV),
+					    qdev->ddev.primary->debugfs_root, "qxl_surf_mm");
 #endif
 }

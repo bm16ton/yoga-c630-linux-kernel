@@ -40,9 +40,9 @@ int cpufreq_frequency_table_cpuinfo(struct cpufreq_policy *policy,
 
 	cpufreq_for_each_valid_entry(pos, table) {
 		freq = pos->frequency;
-		
+
 		if (freq > cpuinfo_max_freq)
-		    cpuinfo_max_freq = freq;
+			cpuinfo_max_freq = freq;
 
 		if (!cpufreq_boost_enabled()
 		    && (pos->flags & CPUFREQ_BOOST_FREQ))

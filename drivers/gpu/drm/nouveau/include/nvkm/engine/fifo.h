@@ -26,7 +26,6 @@ struct nvkm_fifo_chan {
 	struct nvkm_gpuobj *inst;
 	struct nvkm_gpuobj *push;
 	struct nvkm_vmm *vmm;
-	void __iomem *user;
 	u64 addr;
 	u32 size;
 
@@ -44,7 +43,6 @@ struct nvkm_fifo {
 	struct mutex mutex;
 
 	struct nvkm_event uevent; /* async user trigger */
-	struct nvkm_event cevent; /* channel creation event */
 	struct nvkm_event kevent; /* channel killed */
 };
 
@@ -77,4 +75,5 @@ int gp100_fifo_new(struct nvkm_device *, enum nvkm_subdev_type, int inst, struct
 int gp10b_fifo_new(struct nvkm_device *, enum nvkm_subdev_type, int inst, struct nvkm_fifo **);
 int gv100_fifo_new(struct nvkm_device *, enum nvkm_subdev_type, int inst, struct nvkm_fifo **);
 int tu102_fifo_new(struct nvkm_device *, enum nvkm_subdev_type, int inst, struct nvkm_fifo **);
+int ga102_fifo_new(struct nvkm_device *, enum nvkm_subdev_type, int inst, struct nvkm_fifo **);
 #endif

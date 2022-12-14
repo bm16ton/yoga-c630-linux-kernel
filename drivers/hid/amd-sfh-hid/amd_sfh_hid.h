@@ -2,17 +2,32 @@
 /*
  * AMD MP2 Sensors transport driver
  *
+ * Copyright 2020-2021 Advanced Micro Devices, Inc.
  * Authors: Nehal Bakulchandra Shah <Nehal-bakulchandra.shah@amd.com>
  *	    Sandeep Singh <sandeep.singh@amd.com>
+ *	    Basavaraj Natikar <Basavaraj.Natikar@amd.com>
  */
 
 #ifndef AMDSFH_HID_H
 #define AMDSFH_HID_H
 
-#define MAX_HID_DEVICES		4
-#define BUS_AMD_AMDTP		0x20
+#define MAX_HID_DEVICES		5
 #define AMD_SFH_HID_VENDOR	0x1022
 #define AMD_SFH_HID_PRODUCT	0x0001
+
+struct request_list {
+	struct hid_device *hid;
+	struct list_head list;
+	u8 report_id;
+	u8 sensor_idx;
+	u8 report_type;
+	u8 current_index;
+};
+
+struct amd_input_data {
+	u32 *sensor_virt_addr[MAX_HID_DEVICES];
+	u8 *input_report[MAX_HID_DEVICES];
+};
 
 struct amdtp_cl_data {
 	u8 init_done;
@@ -26,7 +41,6 @@ struct amdtp_cl_data {
 	u8 *hid_descr[MAX_HID_DEVICES];
 	int hid_descr_size[MAX_HID_DEVICES];
 	phys_addr_t phys_addr_base;
-	u32 *sensor_virt_addr[MAX_HID_DEVICES];
 	dma_addr_t sensor_dma_addr[MAX_HID_DEVICES];
 	u32 sensor_sts[MAX_HID_DEVICES];
 	u32 sensor_requested_cnt[MAX_HID_DEVICES];
@@ -34,10 +48,11 @@ struct amdtp_cl_data {
 	u8 report_id[MAX_HID_DEVICES];
 	u8 sensor_idx[MAX_HID_DEVICES];
 	u8 *feature_report[MAX_HID_DEVICES];
-	u8 *input_report[MAX_HID_DEVICES];
 	u8 request_done[MAX_HID_DEVICES];
+	struct amd_input_data *in_data;
 	struct delayed_work work;
 	struct delayed_work work_buffer;
+	struct request_list req_list;
 };
 
 /**

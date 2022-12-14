@@ -249,25 +249,26 @@ static void nixge_hw_dma_bd_release(struct net_device *ndev)
 	struct sk_buff *skb;
 	int i;
 
-	for (i = 0; i < RX_BD_NUM; i++) {
-		phys_addr = nixge_hw_dma_bd_get_addr(&priv->rx_bd_v[i],
-						     phys);
+	if (priv->rx_bd_v) {
+		for (i = 0; i < RX_BD_NUM; i++) {
+			phys_addr = nixge_hw_dma_bd_get_addr(&priv->rx_bd_v[i],
+							     phys);
 
-		dma_unmap_single(ndev->dev.parent, phys_addr,
-				 NIXGE_MAX_JUMBO_FRAME_SIZE,
-				 DMA_FROM_DEVICE);
+			dma_unmap_single(ndev->dev.parent, phys_addr,
+					 NIXGE_MAX_JUMBO_FRAME_SIZE,
+					 DMA_FROM_DEVICE);
 
-		skb = (struct sk_buff *)(uintptr_t)
-			nixge_hw_dma_bd_get_addr(&priv->rx_bd_v[i],
-						 sw_id_offset);
-		dev_kfree_skb(skb);
-	}
+			skb = (struct sk_buff *)(uintptr_t)
+				nixge_hw_dma_bd_get_addr(&priv->rx_bd_v[i],
+							 sw_id_offset);
+			dev_kfree_skb(skb);
+		}
 
-	if (priv->rx_bd_v)
 		dma_free_coherent(ndev->dev.parent,
 				  sizeof(*priv->rx_bd_v) * RX_BD_NUM,
 				  priv->rx_bd_v,
 				  priv->rx_bd_p);
+	}
 
 	if (priv->tx_skb)
 		devm_kfree(ndev->dev.parent, priv->tx_skb);
@@ -324,8 +325,9 @@ static int nixge_hw_dma_bd_init(struct net_device *ndev)
 					 + sizeof(*priv->rx_bd_v) *
 					 ((i + 1) % RX_BD_NUM));
 
-		skb = netdev_alloc_skb_ip_align(ndev,
-						NIXGE_MAX_JUMBO_FRAME_SIZE);
+		skb = __netdev_alloc_skb_ip_align(ndev,
+						  NIXGE_MAX_JUMBO_FRAME_SIZE,
+						  GFP_KERNEL);
 		if (!skb)
 			goto out;
 
@@ -899,6 +901,7 @@ static int nixge_open(struct net_device *ndev)
 err_rx_irq:
 	free_irq(priv->tx_irq, ndev);
 err_tx_irq:
+	napi_disable(&priv->napi);
 	phy_stop(phy);
 	phy_disconnect(phy);
 	tasklet_kill(&priv->dma_err_tasklet);
@@ -993,8 +996,11 @@ static void nixge_ethtools_get_drvinfo(struct net_device *ndev,
 	strlcpy(ed->bus_info, "platform", sizeof(ed->bus_info));
 }
 
-static int nixge_ethtools_get_coalesce(struct net_device *ndev,
-				       struct ethtool_coalesce *ecoalesce)
+static int
+nixge_ethtools_get_coalesce(struct net_device *ndev,
+			    struct ethtool_coalesce *ecoalesce,
+			    struct kernel_ethtool_coalesce *kernel_coal,
+			    struct netlink_ext_ack *extack)
 {
 	struct nixge_priv *priv = netdev_priv(ndev);
 	u32 regval = 0;
@@ -1008,8 +1014,11 @@ static int nixge_ethtools_get_coalesce(struct net_device *ndev,
 	return 0;
 }
 
-static int nixge_ethtools_set_coalesce(struct net_device *ndev,
-				       struct ethtool_coalesce *ecoalesce)
+static int
+nixge_ethtools_set_coalesce(struct net_device *ndev,
+			    struct ethtool_coalesce *ecoalesce,
+			    struct kernel_ethtool_coalesce *kernel_coal,
+			    struct netlink_ext_ack *extack)
 {
 	struct nixge_priv *priv = netdev_priv(ndev);
 
@@ -1203,7 +1212,7 @@ static void *nixge_get_nvmem_address(struct device *dev)
 
 	cell = nvmem_cell_get(dev, "address");
 	if (IS_ERR(cell))
-		return NULL;
+		return cell;
 
 	mac = nvmem_cell_read(cell, &cell_size);
 	nvmem_cell_put(cell);
@@ -1223,8 +1232,6 @@ static int nixge_of_get_resources(struct platform_device *pdev)
 {
 	const struct of_device_id *of_id;
 	enum nixge_version version;
-	struct resource *ctrlres;
-	struct resource *dmares;
 	struct net_device *ndev;
 	struct nixge_priv *priv;
 
@@ -1236,23 +1243,17 @@ static int nixge_of_get_resources(struct platform_device *pdev)
 
 	version = (enum nixge_version)of_id->data;
 	if (version <= NIXGE_V2)
-		dmares = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+		priv->dma_regs = devm_platform_get_and_ioremap_resource(pdev, 0, NULL);
 	else
-		dmares = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-						      "dma");
-
-	priv->dma_regs = devm_ioremap_resource(&pdev->dev, dmares);
+		priv->dma_regs = devm_platform_ioremap_resource_byname(pdev, "dma");
 	if (IS_ERR(priv->dma_regs)) {
 		netdev_err(ndev, "failed to map dma regs\n");
 		return PTR_ERR(priv->dma_regs);
 	}
-	if (version <= NIXGE_V2) {
+	if (version <= NIXGE_V2)
 		priv->ctrl_regs = priv->dma_regs + NIXGE_REG_CTRL_OFFSET;
-	} else {
-		ctrlres = platform_get_resource_byname(pdev, IORESOURCE_MEM,
-						       "ctrl");
-		priv->ctrl_regs = devm_ioremap_resource(&pdev->dev, ctrlres);
-	}
+	else
+		priv->ctrl_regs = devm_platform_ioremap_resource_byname(pdev, "ctrl");
 	if (IS_ERR(priv->ctrl_regs)) {
 		netdev_err(ndev, "failed to map ctrl regs\n");
 		return PTR_ERR(priv->ctrl_regs);
@@ -1284,8 +1285,8 @@ static int nixge_probe(struct platform_device *pdev)
 	ndev->max_mtu = NIXGE_JUMBO_MTU;
 
 	mac_addr = nixge_get_nvmem_address(&pdev->dev);
-	if (mac_addr && is_valid_ether_addr(mac_addr)) {
-		ether_addr_copy(ndev->dev_addr, mac_addr);
+	if (!IS_ERR(mac_addr) && is_valid_ether_addr(mac_addr)) {
+		eth_hw_addr_set(ndev, mac_addr);
 		kfree(mac_addr);
 	} else {
 		eth_hw_addr_random(ndev);

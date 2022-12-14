@@ -741,8 +741,8 @@ static const struct ethtool_ops smsc75xx_ethtool_ops = {
 	.set_eeprom	= smsc75xx_ethtool_set_eeprom,
 	.get_wol	= smsc75xx_ethtool_get_wol,
 	.set_wol	= smsc75xx_ethtool_set_wol,
-	.get_link_ksettings	= usbnet_get_link_ksettings,
-	.set_link_ksettings	= usbnet_set_link_ksettings,
+	.get_link_ksettings	= usbnet_get_link_ksettings_mii,
+	.set_link_ksettings	= usbnet_set_link_ksettings_mii,
 };
 
 static int smsc75xx_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
@@ -757,9 +757,10 @@ static int smsc75xx_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
 
 static void smsc75xx_init_mac_address(struct usbnet *dev)
 {
+	u8 addr[ETH_ALEN];
+
 	/* maybe the boot loader passed the MAC address in devicetree */
-	if (!eth_platform_get_mac_address(&dev->udev->dev,
-			dev->net->dev_addr)) {
+	if (!platform_get_ethdev_address(&dev->udev->dev, dev->net)) {
 		if (is_valid_ether_addr(dev->net->dev_addr)) {
 			/* device tree values are valid so use them */
 			netif_dbg(dev, ifup, dev->net, "MAC address read from the device tree\n");
@@ -768,8 +769,8 @@ static void smsc75xx_init_mac_address(struct usbnet *dev)
 	}
 
 	/* try reading mac address from EEPROM */
-	if (smsc75xx_read_eeprom(dev, EEPROM_MAC_OFFSET, ETH_ALEN,
-			dev->net->dev_addr) == 0) {
+	if (smsc75xx_read_eeprom(dev, EEPROM_MAC_OFFSET, ETH_ALEN, addr) == 0) {
+		eth_hw_addr_set(dev->net, addr);
 		if (is_valid_ether_addr(dev->net->dev_addr)) {
 			/* eeprom values are valid so use them */
 			netif_dbg(dev, ifup, dev->net,
@@ -1439,7 +1440,7 @@ static const struct net_device_ops smsc75xx_netdev_ops = {
 	.ndo_change_mtu		= smsc75xx_change_mtu,
 	.ndo_set_mac_address 	= eth_mac_addr,
 	.ndo_validate_addr	= eth_validate_addr,
-	.ndo_do_ioctl 		= smsc75xx_ioctl,
+	.ndo_eth_ioctl		= smsc75xx_ioctl,
 	.ndo_set_rx_mode	= smsc75xx_set_multicast,
 	.ndo_set_features	= smsc75xx_set_features,
 };

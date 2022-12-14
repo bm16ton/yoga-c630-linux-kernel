@@ -116,7 +116,7 @@ extern unsigned int vdso32_enabled;
  * now struct_user_regs, they are different)
  */
 
-#define ELF_CORE_COPY_REGS_COMMON(pr_reg, regs)	\
+#define ELF_CORE_COPY_REGS(pr_reg, regs)	\
 do {						\
 	pr_reg[0] = regs->bx;			\
 	pr_reg[1] = regs->cx;			\
@@ -128,24 +128,13 @@ do {						\
 	pr_reg[7] = regs->ds;			\
 	pr_reg[8] = regs->es;			\
 	pr_reg[9] = regs->fs;			\
+	savesegment(gs, pr_reg[10]);		\
 	pr_reg[11] = regs->orig_ax;		\
 	pr_reg[12] = regs->ip;			\
 	pr_reg[13] = regs->cs;			\
 	pr_reg[14] = regs->flags;		\
 	pr_reg[15] = regs->sp;			\
 	pr_reg[16] = regs->ss;			\
-} while (0);
-
-#define ELF_CORE_COPY_REGS(pr_reg, regs)	\
-do {						\
-	ELF_CORE_COPY_REGS_COMMON(pr_reg, regs);\
-	pr_reg[10] = get_user_gs(regs);		\
-} while (0);
-
-#define ELF_CORE_COPY_KERNEL_REGS(pr_reg, regs)	\
-do {						\
-	ELF_CORE_COPY_REGS_COMMON(pr_reg, regs);\
-	savesegment(gs, pr_reg[10]);		\
 } while (0);
 
 #define ELF_PLATFORM	(utsname()->machine)
@@ -283,12 +272,12 @@ extern u32 elf_hwcap2;
  *
  * The decision process for determining the results are:
  *
- *                 CPU: | lacks NX*  | has NX, ia32     | has NX, x86_64 |
- * ELF:                 |            |                  |                |
+ *                 CPU: | lacks NX*  | has NX, ia32     | has NX, x86_64 |
+ * ELF:                 |            |                  |                |
  * ---------------------|------------|------------------|----------------|
- * missing PT_GNU_STACK | exec-all   | exec-all         | exec-none      |
- * PT_GNU_STACK == RWX  | exec-stack | exec-stack       | exec-stack     |
- * PT_GNU_STACK == RW   | exec-none  | exec-none        | exec-none      |
+ * missing PT_GNU_STACK | exec-all   | exec-all         | exec-none      |
+ * PT_GNU_STACK == RWX  | exec-stack | exec-stack       | exec-stack     |
+ * PT_GNU_STACK == RW   | exec-none  | exec-none        | exec-none      |
  *
  *  exec-all  : all PROT_READ user mappings are executable, except when
  *              backed by files on a noexec-filesystem.
@@ -312,6 +301,7 @@ do {									\
 		NEW_AUX_ENT(AT_SYSINFO,	VDSO_ENTRY);			\
 		NEW_AUX_ENT(AT_SYSINFO_EHDR, VDSO_CURRENT_BASE);	\
 	}								\
+	NEW_AUX_ENT(AT_MINSIGSTKSZ, get_sigframe_size());		\
 } while (0)
 
 /*
@@ -328,6 +318,7 @@ extern unsigned long task_size_32bit(void);
 extern unsigned long task_size_64bit(int full_addr_space);
 extern unsigned long get_mmap_base(int is_legacy);
 extern bool mmap_address_hint_valid(unsigned long addr, unsigned long len);
+extern unsigned long get_sigframe_size(void);
 
 #ifdef CONFIG_X86_32
 
@@ -349,6 +340,7 @@ do {									\
 	if (vdso64_enabled)						\
 		NEW_AUX_ENT(AT_SYSINFO_EHDR,				\
 			    (unsigned long __force)current->mm->context.vdso); \
+	NEW_AUX_ENT(AT_MINSIGSTKSZ, get_sigframe_size());		\
 } while (0)
 
 /* As a historical oddity, the x32 and x86_64 vDSOs are controlled together. */
@@ -357,6 +349,7 @@ do {									\
 	if (vdso64_enabled)						\
 		NEW_AUX_ENT(AT_SYSINFO_EHDR,				\
 			    (unsigned long __force)current->mm->context.vdso); \
+	NEW_AUX_ENT(AT_MINSIGSTKSZ, get_sigframe_size());		\
 } while (0)
 
 #define AT_SYSINFO		32

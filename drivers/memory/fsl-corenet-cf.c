@@ -172,7 +172,6 @@ out:
 static int ccf_probe(struct platform_device *pdev)
 {
 	struct ccf_private *ccf;
-	struct resource *r;
 	const struct of_device_id *match;
 	u32 errinten;
 	int ret, irq;
@@ -185,17 +184,9 @@ static int ccf_probe(struct platform_device *pdev)
 	if (!ccf)
 		return -ENOMEM;
 
-	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-	if (!r) {
-		dev_err(&pdev->dev, "%s: no mem resource\n", __func__);
-		return -ENXIO;
-	}
-
-	ccf->regs = devm_ioremap_resource(&pdev->dev, r);
-	if (IS_ERR(ccf->regs)) {
-		dev_err(&pdev->dev, "%s: can't map mem resource\n", __func__);
+	ccf->regs = devm_platform_ioremap_resource(pdev, 0);
+	if (IS_ERR(ccf->regs))
 		return PTR_ERR(ccf->regs);
-	}
 
 	ccf->dev = &pdev->dev;
 	ccf->info = match->data;

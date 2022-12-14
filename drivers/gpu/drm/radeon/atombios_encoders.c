@@ -141,8 +141,6 @@ atombios_set_backlight_level(struct radeon_encoder *radeon_encoder, u8 level)
 	}
 }
 
-#if defined(CONFIG_BACKLIGHT_CLASS_DEVICE) || defined(CONFIG_BACKLIGHT_CLASS_DEVICE_MODULE)
-
 static u8 radeon_atom_bl_level(struct backlight_device *bd)
 {
 	u8 level;
@@ -198,7 +196,8 @@ void radeon_atom_backlight_init(struct radeon_encoder *radeon_encoder,
 	 * so don't register a backlight device
 	 */
 	if ((rdev->pdev->subsystem_vendor == PCI_VENDOR_ID_APPLE) &&
-	    (rdev->pdev->device == 0x6741))
+	    (rdev->pdev->device == 0x6741) &&
+	    !dmi_match(DMI_PRODUCT_NAME, "iMac12,1"))
 		return;
 
 	if (!radeon_encoder->enc_priv)
@@ -284,18 +283,6 @@ static void radeon_atom_backlight_exit(struct radeon_encoder *radeon_encoder)
 		DRM_INFO("radeon atom LVDS backlight unloaded\n");
 	}
 }
-
-#else /* !CONFIG_BACKLIGHT_CLASS_DEVICE */
-
-void radeon_atom_backlight_init(struct radeon_encoder *encoder)
-{
-}
-
-static void radeon_atom_backlight_exit(struct radeon_encoder *encoder)
-{
-}
-
-#endif
 
 static bool radeon_atom_mode_fixup(struct drm_encoder *encoder,
 				   const struct drm_display_mode *mode,

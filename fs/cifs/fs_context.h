@@ -13,7 +13,12 @@
 #include <linux/parser.h>
 #include <linux/fs_parser.h>
 
-#define cifs_invalf(fc, fmt, ...) invalf(fc, fmt, ## __VA_ARGS__)
+/* Log errors in fs_context (new mount api) but also in dmesg (old style) */
+#define cifs_errorf(fc, fmt, ...)			\
+	do {						\
+		errorf(fc, fmt, ## __VA_ARGS__);	\
+		cifs_dbg(VFS, fmt, ## __VA_ARGS__);	\
+	} while (0)
 
 enum smb_version {
 	Smb_1 = 1,
@@ -42,11 +47,8 @@ enum cifs_sec_param {
 	Opt_sec_krb5p,
 	Opt_sec_ntlmsspi,
 	Opt_sec_ntlmssp,
-	Opt_ntlm,
-	Opt_sec_ntlmi,
 	Opt_sec_ntlmv2,
 	Opt_sec_ntlmv2i,
-	Opt_sec_lanman,
 	Opt_sec_none,
 
 	Opt_sec_err
@@ -60,6 +62,7 @@ enum cifs_param {
 	Opt_noblocksend,
 	Opt_noautotune,
 	Opt_nolease,
+	Opt_nosparse,
 	Opt_hard,
 	Opt_soft,
 	Opt_perm,
@@ -96,6 +99,7 @@ enum cifs_param {
 	Opt_nosharesock,
 	Opt_persistent,
 	Opt_resilient,
+	Opt_tcp_nodelay,
 	Opt_domainauto,
 	Opt_rdma,
 	Opt_modesid,
@@ -115,11 +119,13 @@ enum cifs_param {
 	Opt_dirmode,
 	Opt_min_enc_offload,
 	Opt_blocksize,
+	Opt_rasize,
 	Opt_rsize,
 	Opt_wsize,
 	Opt_actimeo,
 	Opt_acdirmax,
 	Opt_acregmax,
+	Opt_closetimeo,
 	Opt_echo_interval,
 	Opt_max_credits,
 	Opt_snapshot,
@@ -149,6 +155,7 @@ enum cifs_param {
 
 struct smb3_fs_context {
 	bool uid_specified;
+	bool cruid_specified;
 	bool gid_specified;
 	bool sloppy;
 	bool got_ip;
@@ -162,8 +169,10 @@ struct smb3_fs_context {
 	char *password;
 	char *domainname;
 	char *source;
+	char *server_hostname;
 	char *UNC;
 	char *nodename;
+	char workstation_name[CIFS_MAX_WORKSTATION_LEN];
 	char *iocharset;  /* local code page for mapping to and from Unicode */
 	char source_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* clnt nb name */
 	char target_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* srvr nb name */
@@ -215,6 +224,7 @@ struct smb3_fs_context {
 	bool noautotune:1;
 	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
 	bool no_lease:1;     /* disable requesting leases */
+	bool no_sparse:1;    /* do not attempt to set files sparse */
 	bool fsc:1;	/* enable fscache */
 	bool mfsymlinks:1; /* use Minshall+French Symlinks */
 	bool multiuser:1;
@@ -230,6 +240,7 @@ struct smb3_fs_context {
 	/* reuse existing guid for multichannel */
 	u8 client_guid[SMB2_CLIENT_GUID_SIZE];
 	unsigned int bsize;
+	unsigned int rasize;
 	unsigned int rsize;
 	unsigned int wsize;
 	unsigned int min_offload;
@@ -237,6 +248,8 @@ struct smb3_fs_context {
 	/* attribute cache timemout for files and directories in jiffies */
 	unsigned long acregmax;
 	unsigned long acdirmax;
+	/* timeout for deferred close of files in jiffies */
+	unsigned long closetimeo;
 	struct smb_version_operations *ops;
 	struct smb_version_values *vals;
 	char *prepath;
@@ -257,10 +270,6 @@ struct smb3_fs_context {
 
 extern const struct fs_parameter_spec smb3_fs_parameters[];
 
-extern int cifs_parse_cache_flavor(char *value,
-				   struct smb3_fs_context *ctx);
-extern int cifs_parse_security_flavors(char *value,
-				       struct smb3_fs_context *ctx);
 extern int smb3_init_fs_context(struct fs_context *fc);
 extern void smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx);
 extern void smb3_cleanup_fs_context(struct smb3_fs_context *ctx);
@@ -273,4 +282,9 @@ static inline struct smb3_fs_context *smb3_fc2context(const struct fs_context *f
 extern int smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx);
 extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
 
+/*
+ * max deferred close timeout (jiffies) - 2^30
+ */
+#define SMB3_MAX_DCLOSETIMEO (1 << 30)
+#define SMB3_DEF_DCLOSETIMEO (5 * HZ) /* Can increase later, other clients use larger */
 #endif

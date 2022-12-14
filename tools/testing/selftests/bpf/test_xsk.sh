@@ -43,12 +43,11 @@
 #   ** veth<xxxx> in root namespace
 #   ** veth<yyyy> in af_xdp<xxxx> namespace
 #   ** namespace af_xdp<xxxx>
-#   * create a spec file veth.spec that includes this run-time configuration
 #   *** xxxx and yyyy are randomly generated 4 digit numbers used to avoid
 #       conflict with any existing interface
 #   * tests the veth and xsk layers of the topology
 #
-# See the source xdpxceiver.c for information on each test
+# See the source xskxceiver.c for information on each test
 #
 # Kernel configuration:
 # ---------------------
@@ -63,28 +62,32 @@
 # ----------------
 # Must run with CAP_NET_ADMIN capability.
 #
-# Run (full color-coded output):
-#   sudo ./test_xsk.sh -c
+# Run:
+#   sudo ./test_xsk.sh
 #
 # If running from kselftests:
-#   sudo make colorconsole=1 run_tests
+#   sudo make run_tests
 #
-# Run (full output without color-coding):
-#   sudo ./test_xsk.sh
+# Run with verbose output:
+#   sudo ./test_xsk.sh -v
+#
+# Run and dump packet contents:
+#   sudo ./test_xsk.sh -D
 
 . xsk_prereqs.sh
 
-while getopts c flag
+while getopts "vD" flag
 do
 	case "${flag}" in
-		c) colorconsole=1;;
+		v) verbose=1;;
+		D) dump_pkts=1;;
 	esac
 done
 
 TEST_NAME="PREREQUISITES"
 
 URANDOM=/dev/urandom
-[ ! -e "${URANDOM}" ] && { echo "${URANDOM} not found. Skipping tests."; test_exit 1 1; }
+[ ! -e "${URANDOM}" ] && { echo "${URANDOM} not found. Skipping tests."; test_exit $ksft_fail; }
 
 VETH0_POSTFIX=$(cat ${URANDOM} | tr -dc '0-9' | fold -w 256 | head -n 1 | head --bytes 4)
 VETH0=ve${VETH0_POSTFIX}
@@ -94,18 +97,38 @@ NS0=root
 NS1=af_xdp${VETH1_POSTFIX}
 MTU=1500
 
+trap ctrl_c INT
+
+function ctrl_c() {
+        cleanup_exit ${VETH0} ${VETH1} ${NS1}
+	exit 1
+}
+
 setup_vethPairs() {
-	echo "setting up ${VETH0}: namespace: ${NS0}"
+	if [[ $verbose -eq 1 ]]; then
+	        echo "setting up ${VETH0}: namespace: ${NS0}"
+	fi
 	ip netns add ${NS1}
-	ip link add ${VETH0} type veth peer name ${VETH1}
+	ip link add ${VETH0} numtxqueues 4 numrxqueues 4 type veth peer name ${VETH1} numtxqueues 4 numrxqueues 4
 	if [ -f /proc/net/if_inet6 ]; then
 		echo 1 > /proc/sys/net/ipv6/conf/${VETH0}/disable_ipv6
 	fi
-	echo "setting up ${VETH1}: namespace: ${NS1}"
+	if [[ $verbose -eq 1 ]]; then
+	        echo "setting up ${VETH1}: namespace: ${NS1}"
+	fi
+
+	if [[ $busy_poll -eq 1 ]]; then
+	        echo 2 > /sys/class/net/${VETH0}/napi_defer_hard_irqs
+		echo 200000 > /sys/class/net/${VETH0}/gro_flush_timeout
+		echo 2 > /sys/class/net/${VETH1}/napi_defer_hard_irqs
+		echo 200000 > /sys/class/net/${VETH1}/gro_flush_timeout
+	fi
+
 	ip link set ${VETH1} netns ${NS1}
 	ip netns exec ${NS1} ip link set ${VETH1} mtu ${MTU}
 	ip link set ${VETH0} mtu ${MTU}
 	ip netns exec ${NS1} ip link set ${VETH1} up
+	ip netns exec ${NS1} ip link set dev lo up
 	ip link set ${VETH0} up
 }
 
@@ -121,11 +144,13 @@ if [ $retval -ne 0 ]; then
 	exit $retval
 fi
 
-echo "${VETH0}:${VETH1},${NS1}" > ${SPECFILE}
+if [[ $verbose -eq 1 ]]; then
+	ARGS+="-v "
+fi
 
-validate_veth_spec_file
-
-echo "Spec file created: ${SPECFILE}"
+if [[ $dump_pkts -eq 1 ]]; then
+	ARGS="-D "
+fi
 
 test_status $retval "${TEST_NAME}"
 
@@ -133,127 +158,31 @@ test_status $retval "${TEST_NAME}"
 
 statusList=()
 
-### TEST 1
-TEST_NAME="XSK KSELFTEST FRAMEWORK"
+TEST_NAME="XSK_SELFTESTS_SOFTIRQ"
 
-echo "Switching interfaces [${VETH0}, ${VETH1}] to XDP Generic mode"
-vethXDPgeneric ${VETH0} ${VETH1} ${NS1}
+exec_xskxceiver
 
-retval=$?
-if [ $retval -eq 0 ]; then
-	echo "Switching interfaces [${VETH0}, ${VETH1}] to XDP Native mode"
-	vethXDPnative ${VETH0} ${VETH1} ${NS1}
-fi
+cleanup_exit ${VETH0} ${VETH1} ${NS1}
+TEST_NAME="XSK_SELFTESTS_BUSY_POLL"
+busy_poll=1
 
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 2
-TEST_NAME="SKB NOPOLL"
-
-vethXDPgeneric ${VETH0} ${VETH1} ${NS1}
-
-params=("-S")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 3
-TEST_NAME="SKB POLL"
-
-vethXDPgeneric ${VETH0} ${VETH1} ${NS1}
-
-params=("-S" "-p")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 4
-TEST_NAME="DRV NOPOLL"
-
-vethXDPnative ${VETH0} ${VETH1} ${NS1}
-
-params=("-N")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 5
-TEST_NAME="DRV POLL"
-
-vethXDPnative ${VETH0} ${VETH1} ${NS1}
-
-params=("-N" "-p")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 6
-TEST_NAME="SKB SOCKET TEARDOWN"
-
-vethXDPgeneric ${VETH0} ${VETH1} ${NS1}
-
-params=("-S" "-T")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 7
-TEST_NAME="DRV SOCKET TEARDOWN"
-
-vethXDPnative ${VETH0} ${VETH1} ${NS1}
-
-params=("-N" "-T")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 8
-TEST_NAME="SKB BIDIRECTIONAL SOCKETS"
-
-vethXDPgeneric ${VETH0} ${VETH1} ${NS1}
-
-params=("-S" "-B")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
-
-### TEST 9
-TEST_NAME="DRV BIDIRECTIONAL SOCKETS"
-
-vethXDPnative ${VETH0} ${VETH1} ${NS1}
-
-params=("-N" "-B")
-execxdpxceiver params
-
-retval=$?
-test_status $retval "${TEST_NAME}"
-statusList+=($retval)
+setup_vethPairs
+exec_xskxceiver
 
 ## END TESTS
 
 cleanup_exit ${VETH0} ${VETH1} ${NS1}
 
-for _status in "${statusList[@]}"
+failures=0
+echo -e "\nSummary:"
+for i in "${!statusList[@]}"
 do
-	if [ $_status -ne 0 ]; then
-		test_exit $ksft_fail 0
+	if [ ${statusList[$i]} -ne 0 ]; then
+	        test_status ${statusList[$i]} ${nameList[$i]}
+		failures=1
 	fi
 done
 
-test_exit $ksft_pass 0
+if [ $failures -eq 0 ]; then
+        echo "All tests successful!"
+fi

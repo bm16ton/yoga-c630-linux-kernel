@@ -22,8 +22,6 @@ static inline void pmd_populate(struct mm_struct *mm, pmd_t *pmd,
 	set_pmd(pmd, __pmd(__pa(page_address(pte))));
 }
 
-#define pmd_pgtable(pmd) pmd_page(pmd)
-
 extern void pgd_init(unsigned long *p);
 
 static inline pte_t *pte_alloc_one_kernel(struct mm_struct *mm)
@@ -46,7 +44,7 @@ static inline pgd_t *pgd_alloc(struct mm_struct *mm)
 	pgd_t *ret;
 	pgd_t *init;
 
-	ret = (pgd_t *) __get_free_pages(GFP_KERNEL, PGD_ORDER);
+	ret = (pgd_t *) __get_free_page(GFP_KERNEL);
 	if (ret) {
 		init = pgd_offset(&init_mm, 0UL);
 		pgd_init((unsigned long *)ret);

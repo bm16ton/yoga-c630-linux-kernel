@@ -827,14 +827,14 @@ static int sst_get_ssp_mode(struct snd_soc_dai *dai, unsigned int fmt)
 {
 	int format;
 
-	format = (fmt & SND_SOC_DAIFMT_MASTER_MASK);
+	format = (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK);
 	dev_dbg(dai->dev, "Enter:%s, format=%x\n", __func__, format);
 
 	switch (format) {
-	case SND_SOC_DAIFMT_CBS_CFS:
-		return SSP_MODE_MASTER;
-	case SND_SOC_DAIFMT_CBM_CFM:
-		return SSP_MODE_SLAVE;
+	case SND_SOC_DAIFMT_BP_FP:
+		return SSP_MODE_PROVIDER;
+	case SND_SOC_DAIFMT_BC_FC:
+		return SSP_MODE_CONSUMER;
 	default:
 		dev_err(dai->dev, "Invalid ssp protocol: %d\n", format);
 	}
@@ -905,7 +905,7 @@ static const struct sst_ssp_config sst_ssp_configs = {
 	.ssp_id = SSP_CODEC,
 	.bits_per_slot = 24,
 	.slots = 4,
-	.ssp_mode = SSP_MODE_MASTER,
+	.ssp_mode = SSP_MODE_PROVIDER,
 	.pcm_mode = SSP_PCM_MODE_NETWORK,
 	.duplex = SSP_DUPLEX,
 	.ssp_protocol = SSP_MODE_PCM,
@@ -1328,7 +1328,7 @@ int sst_send_pipe_gains(struct snd_soc_dai *dai, int stream, int mute)
 {
 	struct sst_data *drv = snd_soc_dai_get_drvdata(dai);
 	struct snd_soc_dapm_widget *w;
-	struct snd_soc_dapm_path *p = NULL;
+	struct snd_soc_dapm_path *p;
 
 	dev_dbg(dai->dev, "enter, dai-name=%s dir=%d\n", dai->name, stream);
 
@@ -1392,7 +1392,7 @@ int sst_send_pipe_gains(struct snd_soc_dai *dai, int stream, int mute)
 static int sst_fill_module_list(struct snd_kcontrol *kctl,
 	 struct snd_soc_dapm_widget *w, int type)
 {
-	struct sst_module *module = NULL;
+	struct sst_module *module;
 	struct snd_soc_component *c = snd_soc_dapm_to_component(w->dapm);
 	struct sst_ids *ids = w->priv;
 	int ret = 0;

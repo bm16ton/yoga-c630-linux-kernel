@@ -8,6 +8,7 @@
 #include <linux/interrupt.h>
 #include <linux/etherdevice.h>
 #include <linux/netdevice.h>
+#include <linux/module.h>
 
 #include "hinic_hw_dev.h"
 #include "hinic_dev.h"
@@ -836,8 +837,10 @@ int hinic_ndo_set_vf_trust(struct net_device *netdev, int vf, bool setting)
 int hinic_ndo_set_vf_bw(struct net_device *netdev,
 			int vf, int min_tx_rate, int max_tx_rate)
 {
-	u32 speeds[] = {SPEED_10, SPEED_100, SPEED_1000, SPEED_10000,
-			SPEED_25000, SPEED_40000, SPEED_100000};
+	static const u32 speeds[] = {
+		SPEED_10, SPEED_100, SPEED_1000, SPEED_10000,
+		SPEED_25000, SPEED_40000, SPEED_100000
+	};
 	struct hinic_dev *nic_dev = netdev_priv(netdev);
 	struct hinic_port_cap port_cap = { 0 };
 	enum hinic_port_link_state link_state;
@@ -846,12 +849,6 @@ int hinic_ndo_set_vf_bw(struct net_device *netdev,
 	if (vf >= nic_dev->sriov_info.num_vfs) {
 		netif_err(nic_dev, drv, netdev, "VF number must be less than %d\n",
 			  nic_dev->sriov_info.num_vfs);
-		return -EINVAL;
-	}
-
-	if (max_tx_rate < min_tx_rate) {
-		netif_err(nic_dev, drv, netdev, "Max rate %d must be greater than or equal to min rate %d\n",
-			  max_tx_rate, min_tx_rate);
 		return -EINVAL;
 	}
 
@@ -1178,7 +1175,6 @@ int hinic_vf_func_init(struct hinic_hwdev *hwdev)
 			dev_err(&hwdev->hwif->pdev->dev,
 				"Failed to register VF, err: %d, status: 0x%x, out size: 0x%x\n",
 				err, register_info.status, out_size);
-			hinic_unregister_vf_mbox_cb(hwdev, HINIC_MOD_L2NIC);
 			return -EIO;
 		}
 	} else {

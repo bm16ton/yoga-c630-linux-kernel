@@ -520,7 +520,7 @@ static int siox_probe(struct device *dev)
 	return sdriver->probe(sdevice);
 }
 
-static int siox_remove(struct device *dev)
+static void siox_remove(struct device *dev)
 {
 	struct siox_driver *sdriver =
 		container_of(dev->driver, struct siox_driver, driver);
@@ -528,8 +528,6 @@ static int siox_remove(struct device *dev)
 
 	if (sdriver->remove)
 		sdriver->remove(sdevice);
-
-	return 0;
 }
 
 static void siox_shutdown(struct device *dev)
@@ -841,6 +839,8 @@ static struct siox_device *siox_device_add(struct siox_master *smaster,
 
 err_device_register:
 	/* don't care to make the buffer smaller again */
+	put_device(&sdevice->dev);
+	sdevice = NULL;
 
 err_buf_alloc:
 	siox_master_unlock(smaster);

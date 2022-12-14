@@ -25,7 +25,37 @@
 #include <linux/usb.h>
 #include <linux/usb/serial.h>
 #include <asm/unaligned.h>
+#include <linux/gpio.h>
+#include <linux/mutex.h>
 #include "pl2303.h"
+
+static int pl2303_vendor_write(struct usb_serial *serial, u16 value, u16 index);
+static int pl2303_vendor_read(struct usb_serial *serial, u16 value, unsigned char buf[1]);
+
+struct pl2303_type_data {
+	const char *name;
+	speed_t max_baud_rate;
+	unsigned long quirks;
+	unsigned int no_autoxonxoff:1;
+	unsigned int no_divisors:1;
+	unsigned int alt_divisors:1;
+};
+
+struct pl2303_gpio;
+struct pl2303_serial_private {
+	const struct pl2303_type_data *type;
+	unsigned long quirks;
+	u8 ngpio;
+	struct pl2303_gpio *gpio;
+};
+
+struct pl2303_private {
+	spinlock_t lock;
+	u8 line_control;
+	u8 line_status;
+
+	u8 line_settings[7];
+};
 
 
 #define PL2303_QUIRK_UART_STATE_IDX0		BIT(0)
@@ -106,6 +136,7 @@ static const struct usb_device_id id_table[] = {
 	{ USB_DEVICE(HP_VENDOR_ID, HP_LCM220_PRODUCT_ID) },
 	{ USB_DEVICE(HP_VENDOR_ID, HP_LCM960_PRODUCT_ID) },
 	{ USB_DEVICE(HP_VENDOR_ID, HP_LM920_PRODUCT_ID) },
+	{ USB_DEVICE(HP_VENDOR_ID, HP_LM930_PRODUCT_ID) },
 	{ USB_DEVICE(HP_VENDOR_ID, HP_LM940_PRODUCT_ID) },
 	{ USB_DEVICE(HP_VENDOR_ID, HP_TD620_PRODUCT_ID) },
 	{ USB_DEVICE(CRESSI_VENDOR_ID, CRESSI_EDY_PRODUCT_ID) },
@@ -116,6 +147,7 @@ static const struct usb_device_id id_table[] = {
 	{ USB_DEVICE(ADLINK_VENDOR_ID, ADLINK_ND6530GC_PRODUCT_ID) },
 	{ USB_DEVICE(SMART_VENDOR_ID, SMART_PRODUCT_ID) },
 	{ USB_DEVICE(AT_VENDOR_ID, AT_VTKIT3_PRODUCT_ID) },
+	{ USB_DEVICE(IBM_VENDOR_ID, IBM_PRODUCT_ID) },
 	{ }					/* Terminating entry */
 };
 
@@ -157,6 +189,22 @@ MODULE_DEVICE_TABLE(usb, id_table);
 #define UART_OVERRUN_ERROR		0x40
 #define UART_CTS			0x80
 
+#define HXD_GPIO_01_CTRL		0x0001
+#define HXD_GPIO_01_VALUE		0x0081
+#define HXD_GPIO_23_DIR_CTRL		0x0c0c
+#define HXD_GPIO_23_VALUE_CTRL		0x0d0d
+#define HXD_GPIO_23_VALUE		0x8d8d
+
+#define HXD_GPIO0_DIR_MASK		0x10
+#define HXD_GPIO1_DIR_MASK		0x20
+#define HXD_GPIO2_DIR_MASK		0x03
+#define HXD_GPIO3_DIR_MASK		0x0c
+
+#define HXD_GPIO0_VALUE_MASK		0x40
+#define HXD_GPIO1_VALUE_MASK		0x80
+#define HXD_GPIO2_VALUE_MASK		0x01
+#define HXD_GPIO3_VALUE_MASK		0x02
+
 #define PL2303_FLOWCTRL_MASK		0xf0
 
 #define PL2303_READ_TYPE_HX_STATUS	0x8080
@@ -174,42 +222,251 @@ MODULE_DEVICE_TABLE(usb, id_table);
 static void pl2303_set_break(struct usb_serial_port *port, bool enable);
 
 enum pl2303_type {
-	TYPE_01,	/* Type 0 and 1 (difference unknown) */
-	TYPE_HX,	/* HX version of the pl2303 chip */
-	TYPE_HXN,	/* HXN version of the pl2303 chip */
+	TYPE_H,
+	TYPE_HX,
+	TYPE_TA,
+	TYPE_TB,
+	TYPE_HXD,
+	TYPE_HXN,
 	TYPE_COUNT
 };
 
-struct pl2303_type_data {
-	speed_t max_baud_rate;
-	unsigned long quirks;
-	unsigned int no_autoxonxoff:1;
-	unsigned int no_divisors:1;
+#ifdef CONFIG_USB_SERIAL_PL2303_GPIO
+struct pl2303_gpio_desc {
+	u8 dir_offset;
+	u8 dir_mask;
+	u16 dir_ctrl;
+	u8 value_offset;
+	u8 value_mask;
+	u16 value_ctrl;
+	u16 read_ctrl;
 };
 
-struct pl2303_serial_private {
-	const struct pl2303_type_data *type;
-	unsigned long quirks;
+struct pl2303_gpio {
+	struct pl2303_gpio_desc *descs;
+	u8 data[3];
+	struct mutex lock;
+	struct usb_serial *serial;
+	struct gpio_chip gpio_chip;
 };
 
-struct pl2303_private {
-	spinlock_t lock;
-	u8 line_control;
-	u8 line_status;
+static inline struct pl2303_gpio *to_pl2303_gpio(struct gpio_chip *chip)
+{
+	return container_of(chip, struct pl2303_gpio, gpio_chip);
+}
 
-	u8 line_settings[7];
-};
+static void pl2303_gpio_add(struct usb_serial *serial, u8 num, u16 read_ctrl,
+			u8 dir_offset, u8 dir_mask, u16 dir_ctrl,
+			u8 value_offset, u8 value_mask, u16 value_ctrl)
+{
+	struct pl2303_serial_private *spriv = usb_get_serial_data(serial);
+	struct pl2303_gpio *gpio = spriv->gpio;
+
+	BUG_ON(num >= spriv->ngpio);
+	gpio->descs[num].dir_offset = dir_offset;
+	gpio->descs[num].dir_mask = dir_mask;
+	gpio->descs[num].dir_ctrl = dir_ctrl;
+
+	gpio->descs[num].value_offset = value_offset;
+	gpio->descs[num].value_mask = value_mask;
+	gpio->descs[num].value_ctrl = value_ctrl;
+
+	gpio->descs[num].read_ctrl = read_ctrl;
+}
+
+static int pl2303_gpio_direction_in(struct gpio_chip *chip, unsigned offset)
+{
+	struct pl2303_gpio *gpio = to_pl2303_gpio(chip);
+	struct pl2303_gpio_desc *desc;
+	int ret;
+
+	mutex_lock(&gpio->lock);
+	desc = gpio->descs+offset;
+	gpio->data[desc->dir_offset] &= ~desc->dir_mask;
+	ret = pl2303_vendor_write(gpio->serial, desc->dir_ctrl,
+				gpio->data[desc->dir_offset]);
+	mutex_unlock(&gpio->lock);
+
+	return ret;
+}
+
+static int pl2303_gpio_direction_out(struct gpio_chip *chip,
+				unsigned offset, int value)
+{
+	struct pl2303_gpio *gpio = to_pl2303_gpio(chip);
+	struct pl2303_gpio_desc *desc;
+	int ret;
+
+	mutex_lock(&gpio->lock);
+	desc = gpio->descs+offset;
+	gpio->data[desc->dir_offset] |= desc->dir_mask;
+	ret = pl2303_vendor_write(gpio->serial, desc->dir_ctrl,
+				gpio->data[desc->dir_offset]);
+	if (ret)
+		goto error;
+
+	if (value)
+		gpio->data[desc->value_offset] |= desc->value_mask;
+	else
+		gpio->data[desc->value_offset] &= ~desc->value_mask;
+
+	ret = pl2303_vendor_write(gpio->serial, desc->value_ctrl,
+				gpio->data[desc->value_offset]);
+error:
+	mutex_unlock(&gpio->lock);
+
+	return ret;
+}
+
+static void pl2303_gpio_set(struct gpio_chip *chip, unsigned offset, int value)
+{
+	struct pl2303_gpio *gpio = to_pl2303_gpio(chip);
+	struct pl2303_gpio_desc *desc;
+
+	mutex_lock(&gpio->lock);
+	desc = gpio->descs+offset;
+	if (value)
+		gpio->data[desc->value_offset] |= desc->value_mask;
+	else
+		gpio->data[desc->value_offset] &= ~desc->value_mask;
+
+	pl2303_vendor_write(gpio->serial, desc->value_ctrl,
+			gpio->data[desc->value_offset]);
+	mutex_unlock(&gpio->lock);
+}
+
+static int pl2303_gpio_get(struct gpio_chip *chip, unsigned offset)
+{
+	struct pl2303_gpio *gpio = to_pl2303_gpio(chip);
+	struct pl2303_gpio_desc *desc;
+	unsigned char *buf;
+	int value;
+
+	buf = kzalloc(1, GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
+
+	mutex_lock(&gpio->lock);
+	desc = gpio->descs+offset;
+
+	if (pl2303_vendor_read(gpio->serial, desc->read_ctrl, buf)) {
+		mutex_unlock(&gpio->lock);
+		return -EIO;
+	}
+
+	value = buf[0] & desc->value_mask;
+	mutex_unlock(&gpio->lock);
+	kfree(buf);
+
+	return value;
+}
+
+static int pl2303_gpio_startup(struct usb_serial *serial)
+{
+	struct pl2303_serial_private *spriv = usb_get_serial_data(serial);
+	struct pl2303_gpio *gpio;
+	int ret;
+
+	gpio = kzalloc(sizeof(struct pl2303_gpio), GFP_KERNEL);
+	if (!gpio)
+		return -ENOMEM;
+
+	gpio->descs = kcalloc(spriv->ngpio, sizeof(struct pl2303_gpio_desc),
+			GFP_KERNEL);
+	if (!gpio->descs) {
+		kfree(gpio);
+		return -ENOMEM;
+	}
+	spriv->gpio = gpio;
+
+	pl2303_gpio_add(serial, 0, HXD_GPIO_01_VALUE,
+			0, HXD_GPIO0_DIR_MASK, HXD_GPIO_01_CTRL,
+			0, HXD_GPIO0_VALUE_MASK, HXD_GPIO_01_CTRL);
+	pl2303_gpio_add(serial, 1, HXD_GPIO_01_VALUE,
+			0, HXD_GPIO1_DIR_MASK, HXD_GPIO_01_CTRL,
+			0, HXD_GPIO1_VALUE_MASK, HXD_GPIO_01_CTRL);
+
+	if (spriv->ngpio == 4) {
+		pl2303_gpio_add(serial, 2, HXD_GPIO_23_VALUE,
+				1, HXD_GPIO2_DIR_MASK, HXD_GPIO_23_DIR_CTRL,
+				2, HXD_GPIO2_VALUE_MASK,
+				HXD_GPIO_23_VALUE_CTRL);
+		pl2303_gpio_add(serial, 3, HXD_GPIO_23_VALUE,
+				1, HXD_GPIO3_DIR_MASK, HXD_GPIO_23_DIR_CTRL,
+				2, HXD_GPIO3_VALUE_MASK,
+				HXD_GPIO_23_VALUE_CTRL);
+	}
+
+	gpio->serial = serial;
+	mutex_init(&gpio->lock);
+
+	gpio->gpio_chip.label = "pl2303";
+	gpio->gpio_chip.owner = THIS_MODULE;
+	gpio->gpio_chip.direction_input = pl2303_gpio_direction_in;
+	gpio->gpio_chip.get = pl2303_gpio_get;
+	gpio->gpio_chip.direction_output = pl2303_gpio_direction_out;
+	gpio->gpio_chip.set = pl2303_gpio_set;
+	gpio->gpio_chip.can_sleep  = true;
+	gpio->gpio_chip.ngpio = spriv->ngpio;
+	gpio->gpio_chip.base = -1;
+//	gpio->gpio_chip.dev = &serial->interface->dev;
+
+	ret = gpiochip_add(&gpio->gpio_chip);
+	if (ret < 0) {
+		kfree(gpio);
+		return ret;
+	}
+	return 0;
+}
+
+static void pl2303_gpio_release(struct usb_serial *serial)
+{
+	struct pl2303_serial_private *spriv = usb_get_serial_data(serial);
+	struct pl2303_gpio *gpio = (struct pl2303_gpio *)spriv->gpio;
+
+	gpiochip_remove(&gpio->gpio_chip);
+	kfree(gpio->descs);
+	kfree(gpio);
+}
+#endif
+
+
+
+#ifdef CONFIG_USB_SERIAL_PL2303_GPIO
+static int pl2303_gpio_startup(struct usb_serial *serial);
+static void pl2303_gpio_release(struct usb_serial *serial);
+#else
+static inline int pl2303_gpio_startup(struct usb_serial *serial) { return 0; }
+static inline void pl2303_gpio_release(struct usb_serial *serial) {}
+#endif
 
 static const struct pl2303_type_data pl2303_type_data[TYPE_COUNT] = {
-	[TYPE_01] = {
+	[TYPE_H] = {
+		.name			= "H",
 		.max_baud_rate		= 1228800,
 		.quirks			= PL2303_QUIRK_LEGACY,
 		.no_autoxonxoff		= true,
 	},
 	[TYPE_HX] = {
+		.name			= "HX",
+		.max_baud_rate		= 6000000,
+	},
+	[TYPE_TA] = {
+		.name			= "TA",
+		.max_baud_rate		= 6000000,
+		.alt_divisors		= true,
+	},
+	[TYPE_TB] = {
+		.name			= "TB",
+		.max_baud_rate		= 12000000,
+		.alt_divisors		= true,
+	},
+	[TYPE_HXD] = {
+		.name			= "HXD",
 		.max_baud_rate		= 12000000,
 	},
 	[TYPE_HXN] = {
+		.name			= "G",
 		.max_baud_rate		= 12000000,
 		.no_divisors		= true,
 	},
@@ -363,49 +620,129 @@ static int pl2303_calc_num_ports(struct usb_serial *serial,
 	return 1;
 }
 
+static bool pl2303_supports_hx_status(struct usb_serial *serial)
+{
+	int ret;
+	u8 buf;
+
+	ret = usb_control_msg_recv(serial->dev, 0, VENDOR_READ_REQUEST,
+			VENDOR_READ_REQUEST_TYPE, PL2303_READ_TYPE_HX_STATUS,
+			0, &buf, 1, 100, GFP_KERNEL);
+
+	return ret == 0;
+}
+
+static int pl2303_detect_type(struct usb_serial *serial)
+{
+	struct usb_device_descriptor *desc = &serial->dev->descriptor;
+	u16 bcdDevice, bcdUSB;
+
+	/*
+	 * Legacy PL2303H, variants 0 and 1 (difference unknown).
+	 */
+	if (desc->bDeviceClass == 0x02)
+		return TYPE_H;		/* variant 0 */
+
+	if (desc->bMaxPacketSize0 != 0x40) {
+		if (desc->bDeviceClass == 0x00 || desc->bDeviceClass == 0xff)
+			return TYPE_H;	/* variant 1 */
+
+		return TYPE_H;		/* variant 0 */
+	}
+
+	bcdDevice = le16_to_cpu(desc->bcdDevice);
+	bcdUSB = le16_to_cpu(desc->bcdUSB);
+
+	switch (bcdUSB) {
+	case 0x101:
+		/* USB 1.0.1? Let's assume they meant 1.1... */
+		fallthrough;
+	case 0x110:
+		switch (bcdDevice) {
+		case 0x300:
+			return TYPE_HX;
+		case 0x400:
+			return TYPE_HXD;
+		default:
+			return TYPE_HX;
+		}
+		break;
+	case 0x200:
+		switch (bcdDevice) {
+		case 0x100:	/* GC */
+		case 0x105:
+			return TYPE_HXN;
+		case 0x300:	/* GT / TA */
+			if (pl2303_supports_hx_status(serial))
+				return TYPE_TA;
+			fallthrough;
+		case 0x305:
+		case 0x400:	/* GL */
+		case 0x405:
+			return TYPE_HXN;
+		case 0x500:	/* GE / TB */
+			if (pl2303_supports_hx_status(serial))
+				return TYPE_TB;
+			fallthrough;
+		case 0x505:
+		case 0x600:	/* GS */
+		case 0x605:
+		case 0x700:	/* GR */
+		case 0x705:
+			return TYPE_HXN;
+		}
+		break;
+	}
+
+	dev_err(&serial->interface->dev,
+			"unknown device type, please report to linux-usb@vger.kernel.org\n");
+	return -ENODEV;
+}
+
 static int pl2303_startup(struct usb_serial *serial)
 {
 	struct pl2303_serial_private *spriv;
-	enum pl2303_type type = TYPE_01;
+	enum pl2303_type type;
 	unsigned char *buf;
-	int res;
+	int ret;
+	u16 bcdDevice;
+	u8 major_revision;
+
+
+	ret = pl2303_detect_type(serial);
+	if (ret < 0)
+		return ret;
+
+	type = ret;
+	dev_dbg(&serial->interface->dev, "device type: %s\n", pl2303_type_data[type].name);
 
 	spriv = kzalloc(sizeof(*spriv), GFP_KERNEL);
 	if (!spriv)
 		return -ENOMEM;
 
-	buf = kmalloc(1, GFP_KERNEL);
-	if (!buf) {
-		kfree(spriv);
-		return -ENOMEM;
-	}
-
-	if (serial->dev->descriptor.bDeviceClass == 0x02)
-		type = TYPE_01;		/* type 0 */
-	else if (serial->dev->descriptor.bMaxPacketSize0 == 0x40)
-		type = TYPE_HX;
-	else if (serial->dev->descriptor.bDeviceClass == 0x00)
-		type = TYPE_01;		/* type 1 */
-	else if (serial->dev->descriptor.bDeviceClass == 0xFF)
-		type = TYPE_01;		/* type 1 */
-	dev_dbg(&serial->interface->dev, "device type: %d\n", type);
-
-	if (type == TYPE_HX) {
-		res = usb_control_msg(serial->dev,
-				usb_rcvctrlpipe(serial->dev, 0),
-				VENDOR_READ_REQUEST, VENDOR_READ_REQUEST_TYPE,
-				PL2303_READ_TYPE_HX_STATUS, 0, buf, 1, 100);
-		if (res != 1)
-			type = TYPE_HXN;
-	}
-
 	spriv->type = &pl2303_type_data[type];
 	spriv->quirks = (unsigned long)usb_get_serial_data(serial);
 	spriv->quirks |= spriv->type->quirks;
 
+	spriv->ngpio = 0;
+	if (type == TYPE_HX) {
+		bcdDevice = le16_to_cpu(serial->dev->descriptor.bcdDevice);
+		major_revision = bcdDevice = bcdDevice >> 8;
+		if (major_revision == 3)
+			spriv->ngpio = 2;
+		else if (major_revision == 4)
+			spriv->ngpio = 4;
+	}
+
 	usb_set_serial_data(serial, spriv);
 
 	if (type != TYPE_HXN) {
+		buf = kmalloc(1, GFP_KERNEL);
+		if (!buf) {
+			kfree(spriv);
+			return -ENOMEM;
+		}
+
 		pl2303_vendor_read(serial, 0x8484, buf);
 		pl2303_vendor_write(serial, 0x0404, 0);
 		pl2303_vendor_read(serial, 0x8484, buf);
@@ -420,10 +757,17 @@ static int pl2303_startup(struct usb_serial *serial)
 			pl2303_vendor_write(serial, 2, 0x24);
 		else
 			pl2303_vendor_write(serial, 2, 0x44);
+
+		kfree(buf);
 	}
 
-	kfree(buf);
-
+	if (spriv->ngpio > 0) {
+		ret = pl2303_gpio_startup(serial);
+		if (ret) {
+			kfree(spriv);
+			return ret;
+		}
+	}
 	return 0;
 }
 
@@ -431,6 +775,8 @@ static void pl2303_release(struct usb_serial *serial)
 {
 	struct pl2303_serial_private *spriv = usb_get_serial_data(serial);
 
+	if (spriv->ngpio > 0)
+		pl2303_gpio_release(serial);
 	kfree(spriv);
 }
 
@@ -554,6 +900,45 @@ static speed_t pl2303_encode_baud_rate_divisor(unsigned char buf[4],
 	return baud;
 }
 
+static speed_t pl2303_encode_baud_rate_divisor_alt(unsigned char buf[4],
+								speed_t baud)
+{
+	unsigned int baseline, mantissa, exponent;
+
+	/*
+	 * Apparently, for the TA version the formula is:
+	 *   baudrate = 12M * 32 / (mantissa * 2^exponent)
+	 * where
+	 *   mantissa = buf[10:0]
+	 *   exponent = buf[15:13 16]
+	 */
+	baseline = 12000000 * 32;
+	mantissa = baseline / baud;
+	if (mantissa == 0)
+		mantissa = 1;   /* Avoid dividing by zero if baud > 32*12M. */
+	exponent = 0;
+	while (mantissa >= 2048) {
+		if (exponent < 15) {
+			mantissa >>= 1; /* divide by 2 */
+			exponent++;
+		} else {
+			/* Exponent is maxed. Trim mantissa and leave. */
+			mantissa = 2047;
+			break;
+		}
+	}
+
+	buf[3] = 0x80;
+	buf[2] = exponent & 0x01;
+	buf[1] = (exponent & ~0x01) << 4 | mantissa >> 8;
+	buf[0] = mantissa & 0xff;
+
+	/* Calculate and return the exact baud rate. */
+	baud = (baseline / mantissa) >> exponent;
+
+	return baud;
+}
+
 static void pl2303_encode_baud_rate(struct tty_struct *tty,
 					struct usb_serial_port *port,
 					u8 buf[4])
@@ -581,6 +966,8 @@ static void pl2303_encode_baud_rate(struct tty_struct *tty,
 
 	if (baud == baud_sup)
 		baud = pl2303_encode_baud_rate_direct(buf, baud);
+	else if (spriv->type->alt_divisors)
+		baud = pl2303_encode_baud_rate_divisor_alt(buf, baud);
 	else
 		baud = pl2303_encode_baud_rate_divisor(buf, baud);
 
@@ -680,20 +1067,7 @@ static void pl2303_set_termios(struct tty_struct *tty,
 
 	pl2303_get_line_request(port, buf);
 
-	switch (C_CSIZE(tty)) {
-	case CS5:
-		buf[6] = 5;
-		break;
-	case CS6:
-		buf[6] = 6;
-		break;
-	case CS7:
-		buf[6] = 7;
-		break;
-	default:
-	case CS8:
-		buf[6] = 8;
-	}
+	buf[6] = tty_get_char_size(tty->termios.c_cflag);
 	dev_dbg(&port->dev, "data bits = %d\n", buf[6]);
 
 	/* For reference buf[0]:buf[3] baud rate value */
@@ -940,18 +1314,6 @@ static int pl2303_carrier_raised(struct usb_serial_port *port)
 	return 0;
 }
 
-static int pl2303_get_serial(struct tty_struct *tty,
-			struct serial_struct *ss)
-{
-	struct usb_serial_port *port = tty->driver_data;
-
-	ss->type = PORT_16654;
-	ss->line = port->minor;
-	ss->port = port->port_number;
-	ss->baud_base = 460800;
-	return 0;
-}
-
 static void pl2303_set_break(struct usb_serial_port *port, bool enable)
 {
 	struct usb_serial *serial = port->serial;
@@ -1135,7 +1497,6 @@ static struct usb_serial_driver pl2303_device = {
 	.close =		pl2303_close,
 	.dtr_rts =		pl2303_dtr_rts,
 	.carrier_raised =	pl2303_carrier_raised,
-	.get_serial =		pl2303_get_serial,
 	.break_ctl =		pl2303_break_ctl,
 	.set_termios =		pl2303_set_termios,
 	.tiocmget =		pl2303_tiocmget,

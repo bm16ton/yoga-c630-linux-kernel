@@ -79,13 +79,12 @@ static struct pcf50633 *gta02_pcf;
 
 static long gta02_panic_blink(int state)
 {
-	long delay = 0;
 	char led;
 
 	led = (state) ? 1 : 0;
 	gpio_direction_output(GTA02_GPIO_AUX_LED, led);
 
-	return delay;
+	return 0;
 }
 
 
@@ -573,6 +572,7 @@ static void __init gta02_init_time(void)
 MACHINE_START(NEO1973_GTA02, "GTA02")
 	/* Maintainer: Nelson Castillo <arhuaco@freaks-unidos.net> */
 	.atag_offset	= 0x100,
+	.nr_irqs	= NR_IRQS_S3C2442,
 	.map_io		= gta02_map_io,
 	.init_irq	= s3c2442_init_irq,
 	.init_machine	= gta02_machine_init,

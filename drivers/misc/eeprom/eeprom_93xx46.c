@@ -8,7 +8,6 @@
 #include <linux/delay.h>
 #include <linux/device.h>
 #include <linux/gpio/consumer.h>
-#include <linux/property.h>
 #include <linux/kernel.h>
 #include <linux/log2.h>
 #include <linux/module.h>
@@ -408,8 +407,8 @@ static const struct of_device_id eeprom_93xx46_of_table[] = {
 MODULE_DEVICE_TABLE(of, eeprom_93xx46_of_table);
 
 static const struct spi_device_id eeprom_93xx46_spi_ids[] = {
-	{ .name = "eeprom_93xx46",
-	  .driver_data = (kernel_ulong_t)&at93c56_data, },
+	{ .name = "eeprom-93xx46",
+	  .driver_data = (kernel_ulong_t)&at93c46_data, },
 	{ .name = "at93c46",
 	  .driver_data = (kernel_ulong_t)&at93c46_data, },
 	{ .name = "at93c46d",
@@ -556,19 +555,17 @@ static int eeprom_93xx46_probe(struct spi_device *spi)
 	return 0;
 }
 
-static int eeprom_93xx46_remove(struct spi_device *spi)
+static void eeprom_93xx46_remove(struct spi_device *spi)
 {
 	struct eeprom_93xx46_dev *edev = spi_get_drvdata(spi);
 
 	if (!(edev->pdata->flags & EE_READONLY))
 		device_remove_file(&spi->dev, &dev_attr_erase);
-
-	return 0;
 }
 
 static struct spi_driver eeprom_93xx46_driver = {
 	.driver = {
-		.name	= "eeprom_93xx46",
+		.name	= "93xx46",
 		.of_match_table = of_match_ptr(eeprom_93xx46_of_table),
 	},
 	.probe		= eeprom_93xx46_probe,
@@ -581,4 +578,6 @@ module_spi_driver(eeprom_93xx46_driver);
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Driver for 93xx46 EEPROMs");
 MODULE_AUTHOR("Anatolij Gustschin <agust@denx.de>");
-MODULE_ALIAS("eeprom_93xx46");
+MODULE_ALIAS("spi:93xx46");
+MODULE_ALIAS("spi:eeprom-93xx46");
+MODULE_ALIAS("spi:93lc46b");

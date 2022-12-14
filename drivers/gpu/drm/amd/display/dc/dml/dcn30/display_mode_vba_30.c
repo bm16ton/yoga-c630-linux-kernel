@@ -300,7 +300,7 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		unsigned int MaxLineBufferLines,
 		unsigned int LineBufferSize,
 		unsigned int DPPOutputBufferPixels,
-		double DETBufferSizeInKByte,
+		unsigned int DETBufferSizeInKByte,
 		unsigned int WritebackInterfaceBufferSize,
 		double DCFCLK,
 		double ReturnBW,
@@ -319,8 +319,8 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		unsigned int DPPPerPlane[],
 		bool DCCEnable[],
 		double DPPCLK[],
-		double DETBufferSizeY[],
-		double DETBufferSizeC[],
+		unsigned int DETBufferSizeY[],
+		unsigned int DETBufferSizeC[],
 		unsigned int SwathHeightY[],
 		unsigned int SwathHeightC[],
 		unsigned int LBBitPerPixel[],
@@ -438,8 +438,8 @@ static void UseMinimumDCFCLK(
 		int dpte_group_bytes[],
 		double PrefetchLinesY[][2][DC__NUM_DPP__MAX],
 		double PrefetchLinesC[][2][DC__NUM_DPP__MAX],
-		int swath_width_luma_ub_all_states[][2][DC__NUM_DPP__MAX],
-		int swath_width_chroma_ub_all_states[][2][DC__NUM_DPP__MAX],
+		unsigned int swath_width_luma_ub_all_states[][2][DC__NUM_DPP__MAX],
+		unsigned int swath_width_chroma_ub_all_states[][2][DC__NUM_DPP__MAX],
 		int BytePerPixelY[],
 		int BytePerPixelC[],
 		int HTotal[],
@@ -571,7 +571,7 @@ static void CalculateStutterEfficiency(
 		double SRExitTime,
 		bool SynchronizedVBlank,
 		int DPPPerPlane[],
-		double DETBufferSizeY[],
+		unsigned int DETBufferSizeY[],
 		int BytePerPixelY[],
 		double BytePerPixelDETY[],
 		double SwathWidthY[],
@@ -604,7 +604,7 @@ static void CalculateStutterEfficiency(
 static void CalculateSwathAndDETConfiguration(
 		bool ForceSingleDPP,
 		int NumberOfActivePlanes,
-		long DETBufferSizeInKByte,
+		unsigned int DETBufferSizeInKByte,
 		double MaximumSwathWidthLuma[],
 		double MaximumSwathWidthChroma[],
 		enum scan_direction_class SourceScan[],
@@ -636,8 +636,8 @@ static void CalculateSwathAndDETConfiguration(
 		double SwathWidthChroma[],
 		int SwathHeightY[],
 		int SwathHeightC[],
-		double DETBufferSizeY[],
-		double DETBufferSizeC[],
+		unsigned int DETBufferSizeY[],
+		unsigned int DETBufferSizeC[],
 		bool ViewportSizeSupportPerPlane[],
 		bool *ViewportSizeSupport);
 static void CalculateSwathWidth(
@@ -711,18 +711,6 @@ static double CalculateUrgentLatency(
 		double UrgentLatencyAdjustmentFabricClockComponent,
 		double UrgentLatencyAdjustmentFabricClockReference,
 		double FabricClockSingle);
-
-static bool CalculateBytePerPixelAnd256BBlockSizes(
-		enum source_format_class SourcePixelFormat,
-		enum dm_swizzle_mode SurfaceTiling,
-		unsigned int *BytePerPixelY,
-		unsigned int *BytePerPixelC,
-		double       *BytePerPixelDETY,
-		double       *BytePerPixelDETC,
-		unsigned int *BlockHeight256BytesY,
-		unsigned int *BlockHeight256BytesC,
-		unsigned int *BlockWidth256BytesY,
-		unsigned int *BlockWidth256BytesC);
 
 void dml30_recalculate(struct display_mode_lib *mode_lib)
 {
@@ -2095,7 +2083,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 	DTRACE("   return_bus_bw      = %f", v->ReturnBW);
 
 	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
-		CalculateBytePerPixelAnd256BBlockSizes(
+		dml30_CalculateBytePerPixelAnd256BBlockSizes(
 				v->SourcePixelFormat[k],
 				v->SurfaceTiling[k],
 				&v->BytePerPixelY[k],
@@ -2596,7 +2584,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 			}
 		}
 
-		v->NotEnoughUrgentLatencyHiding = false;
+		v->NotEnoughUrgentLatencyHiding[0][0] = false;
 		v->NotEnoughUrgentLatencyHidingPre = false;
 
 		for (k = 0; k < v->NumberOfActivePlanes; ++k) {
@@ -2614,7 +2602,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 			CalculateUrgentBurstFactor(
 					v->swath_width_luma_ub[k],
 					v->swath_width_chroma_ub[k],
-					v->DETBufferSizeInKByte,
+					v->DETBufferSizeInKByte[0],
 					v->SwathHeightY[k],
 					v->SwathHeightC[k],
 					v->HTotal[k] / v->PixelClock[k],
@@ -2636,7 +2624,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 			CalculateUrgentBurstFactor(
 					v->swath_width_luma_ub[k],
 					v->swath_width_chroma_ub[k],
-					v->DETBufferSizeInKByte,
+					v->DETBufferSizeInKByte[0],
 					v->SwathHeightY[k],
 					v->SwathHeightC[k],
 					v->HTotal[k] / v->PixelClock[k],
@@ -2681,7 +2669,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 			if (v->VRatioPrefetchY[k] > 4 || v->VRatioPrefetchC[k] > 4)
 				VRatioPrefetchMoreThan4 = true;
 			if (v->NoUrgentLatencyHiding[k] == true)
-				v->NotEnoughUrgentLatencyHiding = true;
+				v->NotEnoughUrgentLatencyHiding[0][0] = true;
 
 			if (v->NoUrgentLatencyHidingPre[k] == true)
 				v->NotEnoughUrgentLatencyHidingPre = true;
@@ -2689,7 +2677,8 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 		v->FractionOfUrgentBandwidth = MaxTotalRDBandwidthNoUrgentBurst / v->ReturnBW;
 
 
-		if (MaxTotalRDBandwidth <= v->ReturnBW && v->NotEnoughUrgentLatencyHiding == 0 && v->NotEnoughUrgentLatencyHidingPre == 0 && !VRatioPrefetchMoreThan4
+		if (MaxTotalRDBandwidth <= v->ReturnBW && v->NotEnoughUrgentLatencyHiding[0][0] == 0
+				&& v->NotEnoughUrgentLatencyHidingPre == 0 && !VRatioPrefetchMoreThan4
 				&& !DestinationLineTimesForPrefetchLessThan2)
 			v->PrefetchModeSupported = true;
 		else {
@@ -2794,8 +2783,9 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 		}
 
 		v->VStartupLines = v->VStartupLines + 1;
-		v->PrefetchAndImmediateFlipSupported = (v->PrefetchModeSupported == true && ((!v->ImmediateFlipSupport && !v->HostVMEnable && v->ImmediateFlipRequirement != dm_immediate_flip_required) || v->ImmediateFlipSupported)) ? true : false;
-
+		v->PrefetchModeSupported = (v->PrefetchModeSupported == true && ((!v->ImmediateFlipSupport &&
+				!v->HostVMEnable && v->ImmediateFlipRequirement[0] != dm_immediate_flip_required) ||
+				v->ImmediateFlipSupported)) ? true : false;
 	} while (!v->PrefetchModeSupported && v->VStartupLines <= v->MaximumMaxVStartupLines);
 	ASSERT(v->PrefetchModeSupported);
 
@@ -2809,7 +2799,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 			v->MaxLineBufferLines,
 			v->LineBufferSize,
 			v->DPPOutputBufferPixels,
-			v->DETBufferSizeInKByte,
+			v->DETBufferSizeInKByte[0],
 			v->WritebackInterfaceBufferSize,
 			v->DCFCLK,
 			v->ReturnBW,
@@ -3028,7 +3018,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 				v->SurfaceWidthC[k],
 				v->SurfaceHeightY[k],
 				v->SurfaceHeightC[k],
-				v->DETBufferSizeInKByte * 1024,
+				v->DETBufferSizeInKByte[0] * 1024,
 				v->BlockHeight256BytesY[k],
 				v->BlockHeight256BytesC[k],
 				v->SurfaceTiling[k],
@@ -3047,40 +3037,12 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 
 	{
 		//Maximum Bandwidth Used
-		double TotalWRBandwidth = 0;
-		double MaxPerPlaneVActiveWRBandwidth = 0;
-		double WRBandwidth = 0;
-		double MaxUsedBW = 0;
-		for (k = 0; k < v->NumberOfActivePlanes; ++k) {
-			if (v->WritebackEnable[k] == true
-					&& v->WritebackPixelFormat[k] == dm_444_32) {
-				WRBandwidth = v->WritebackDestinationWidth[k] * v->WritebackDestinationHeight[k]
-						/ (v->HTotal[k] * v->WritebackSourceHeight[k] / v->PixelClock[k]) * 4;
-			} else if (v->WritebackEnable[k] == true) {
-				WRBandwidth = v->WritebackDestinationWidth[k] * v->WritebackDestinationHeight[k]
-						/ (v->HTotal[k] * v->WritebackSourceHeight[k] / v->PixelClock[k]) * 8;
-			}
-			TotalWRBandwidth = TotalWRBandwidth + WRBandwidth;
-			MaxPerPlaneVActiveWRBandwidth = dml_max(MaxPerPlaneVActiveWRBandwidth, WRBandwidth);
-		}
-
 		v->TotalDataReadBandwidth = 0;
 		for (k = 0; k < v->NumberOfActivePlanes; ++k) {
 			v->TotalDataReadBandwidth = v->TotalDataReadBandwidth
 					+ v->ReadBandwidthPlaneLuma[k]
 					+ v->ReadBandwidthPlaneChroma[k];
 		}
-
-		{
-			double MaxPerPlaneVActiveRDBandwidth = 0;
-			for (k = 0; k < v->NumberOfActivePlanes; ++k) {
-				MaxPerPlaneVActiveRDBandwidth = dml_max(MaxPerPlaneVActiveRDBandwidth,
-						v->ReadBandwidthPlaneLuma[k] + v->ReadBandwidthPlaneChroma[k]);
-
-			}
-		}
-
-		MaxUsedBW = MaxTotalRDBandwidth + TotalWRBandwidth;
 	}
 
 	// VStartup Margin
@@ -3163,7 +3125,7 @@ static void DisplayPipeConfiguration(struct display_mode_lib *mode_lib)
 
 	for (k = 0; k < mode_lib->vba.NumberOfActivePlanes; ++k) {
 
-		CalculateBytePerPixelAnd256BBlockSizes(
+		dml30_CalculateBytePerPixelAnd256BBlockSizes(
 				mode_lib->vba.SourcePixelFormat[k],
 				mode_lib->vba.SurfaceTiling[k],
 				&BytePerPixY[k],
@@ -3178,7 +3140,7 @@ static void DisplayPipeConfiguration(struct display_mode_lib *mode_lib)
 	CalculateSwathAndDETConfiguration(
 			false,
 			mode_lib->vba.NumberOfActivePlanes,
-			mode_lib->vba.DETBufferSizeInKByte,
+			mode_lib->vba.DETBufferSizeInKByte[0],
 			dummy1,
 			dummy2,
 			mode_lib->vba.SourceScan,
@@ -3216,7 +3178,7 @@ static void DisplayPipeConfiguration(struct display_mode_lib *mode_lib)
 			&dummysinglestring);
 }
 
-static bool CalculateBytePerPixelAnd256BBlockSizes(
+void dml30_CalculateBytePerPixelAnd256BBlockSizes(
 		enum source_format_class SourcePixelFormat,
 		enum dm_swizzle_mode SurfaceTiling,
 		unsigned int *BytePerPixelY,
@@ -3303,7 +3265,6 @@ static bool CalculateBytePerPixelAnd256BBlockSizes(
 		*BlockWidth256BytesY = 256U / *BytePerPixelY / *BlockHeight256BytesY;
 		*BlockWidth256BytesC = 256U / *BytePerPixelC / *BlockHeight256BytesC;
 	}
-	return true;
 }
 
 static double CalculateTWait(
@@ -3574,16 +3535,9 @@ static double TruncToValidBPP(
 		MinDSCBPP = 8;
 		MaxDSCBPP = 3 * DSCInputBitPerComponent - 1.0 / 16;
 	} else {
-		if (Output == dm_hdmi) {
-			NonDSCBPP0 = 24;
-			NonDSCBPP1 = 24;
-			NonDSCBPP2 = 24;
-		}
-		else {
-			NonDSCBPP0 = 16;
-			NonDSCBPP1 = 20;
-			NonDSCBPP2 = 24;
-		}
+		NonDSCBPP0 = 16;
+		NonDSCBPP1 = 20;
+		NonDSCBPP2 = 24;
 
 		if (Format == dm_n422) {
 			MinDSCBPP = 7;
@@ -3642,8 +3596,7 @@ static double TruncToValidBPP(
 void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_lib)
 {
 	struct vba_vars_st *v = &mode_lib->vba;
-	int MinPrefetchMode = 0;
-	int MaxPrefetchMode = 2;
+	int MinPrefetchMode, MaxPrefetchMode;
 	int i;
 	unsigned int j, k, m;
 	bool   EnoughWritebackUnits = true;
@@ -3654,6 +3607,10 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 	bool NotUrgentLatencyHiding[DC__NUM_DPP__MAX] = { 0 };
 
 	/*MODE SUPPORT, VOLTAGE STATE AND SOC CONFIGURATION*/
+
+	CalculateMinAndMaxPrefetchMode(
+		mode_lib->vba.AllowDRAMSelfRefreshOrDRAMClockChangeInVblank,
+		&MinPrefetchMode, &MaxPrefetchMode);
 
 	/*Scale Ratio, taps Support Check*/
 
@@ -3711,7 +3668,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 	/*Bandwidth Support Check*/
 
 	for (k = 0; k <= v->NumberOfActivePlanes - 1; k++) {
-		CalculateBytePerPixelAnd256BBlockSizes(
+		dml30_CalculateBytePerPixelAnd256BBlockSizes(
 				v->SourcePixelFormat[k],
 				v->SurfaceTiling[k],
 				&v->BytePerPixelY[k],
@@ -3912,7 +3869,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 	CalculateSwathAndDETConfiguration(
 			true,
 			v->NumberOfActivePlanes,
-			v->DETBufferSizeInKByte,
+			v->DETBufferSizeInKByte[0],
 			v->MaximumSwathWidthLuma,
 			v->MaximumSwathWidthChroma,
 			v->SourceScan,
@@ -4062,7 +4019,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 					v->RequiredDPPCLK[i][j][NumberOfNonSplitPlaneOfMaximumBandwidth] = v->MinDPPCLKUsingSingleDPP[NumberOfNonSplitPlaneOfMaximumBandwidth]
 							* (1 + v->DISPCLKDPPCLKDSCCLKDownSpreading / 100) / 2;
 					v->TotalNumberOfActiveDPP[i][j] = v->TotalNumberOfActiveDPP[i][j] + 1;
-					v->TotalNumberOfSingleDPPPlanes[i][j] = v->TotalNumberOfSingleDPPPlanes[i][j] + 1;
+					v->TotalNumberOfSingleDPPPlanes[i][j] = v->TotalNumberOfSingleDPPPlanes[i][j] - 1;
 				}
 			}
 			if (v->TotalNumberOfActiveDPP[i][j] > v->MaxNumDPP) {
@@ -4377,7 +4334,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 			CalculateSwathAndDETConfiguration(
 					false,
 					v->NumberOfActivePlanes,
-					v->DETBufferSizeInKByte,
+					v->DETBufferSizeInKByte[0],
 					v->MaximumSwathWidthLuma,
 					v->MaximumSwathWidthChroma,
 					v->SourceScan,
@@ -4600,7 +4557,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 				CalculateUrgentBurstFactor(
 						v->swath_width_luma_ub_this_state[k],
 						v->swath_width_chroma_ub_this_state[k],
-						v->DETBufferSizeInKByte,
+						v->DETBufferSizeInKByte[0],
 						v->SwathHeightYThisState[k],
 						v->SwathHeightCThisState[k],
 						v->HTotal[k] / v->PixelClock[k],
@@ -4753,7 +4710,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 				v->HostVMMinPageSize,
 				v->HostVMMaxNonCachedPageTableLevels,
 				v->DynamicMetadataVMEnabled,
-				v->ImmediateFlipRequirement,
+				v->ImmediateFlipRequirement[0],
 				v->ProgressiveToInterlaceUnitInOPP,
 				v->MaxAveragePercentOfIdealSDPPortBWDisplayCanUseInNormalSystemOperation,
 				v->PercentOfIdealDRAMFabricAndSDPPortBWReceivedAfterUrgLatencyPixelMixedWithVMData,
@@ -5003,7 +4960,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 					CalculateUrgentBurstFactor(
 							v->swath_width_luma_ub_this_state[k],
 							v->swath_width_chroma_ub_this_state[k],
-							v->DETBufferSizeInKByte,
+							v->DETBufferSizeInKByte[0],
 							v->SwathHeightYThisState[k],
 							v->SwathHeightCThisState[k],
 							v->HTotal[k] / v->PixelClock[k],
@@ -5164,7 +5121,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 					v->NextMaxVStartup = v->NextMaxVStartup - 1;
 				}
 			} while (!((v->PrefetchSupported[i][j] == true && v->DynamicMetadataSupported[i][j] == true && v->VRatioInPrefetchSupported[i][j] == true
-					&& ((v->HostVMEnable == false && v->ImmediateFlipRequirement != dm_immediate_flip_required)
+					&& ((v->HostVMEnable == false && v->ImmediateFlipRequirement[0] != dm_immediate_flip_required)
 							|| v->ImmediateFlipSupportedForState[i][j] == true))
 					|| (v->NextMaxVStartup == v->MaxMaxVStartup[i][j] && NextPrefetchModeState > MaxPrefetchMode)));
 
@@ -5175,7 +5132,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 					v->MaxLineBufferLines,
 					v->LineBufferSize,
 					v->DPPOutputBufferPixels,
-					v->DETBufferSizeInKByte,
+					v->DETBufferSizeInKByte[0],
 					v->WritebackInterfaceBufferSize,
 					v->DCFCLKState[i][j],
 					v->ReturnBWPerState[i][j],
@@ -5305,7 +5262,7 @@ void dml30_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_l
 					&& ViewportExceedsSurface == 0 && v->PrefetchSupported[i][j] == 1 && v->DynamicMetadataSupported[i][j] == 1
 					&& v->TotalVerticalActiveBandwidthSupport[i][j] == 1 && v->VRatioInPrefetchSupported[i][j] == 1
 					&& v->PTEBufferSizeNotExceeded[i][j] == 1 && v->NonsupportedDSCInputBPC == 0
-					&& ((v->HostVMEnable == 0 && v->ImmediateFlipRequirement != dm_immediate_flip_required)
+					&& ((v->HostVMEnable == 0 && v->ImmediateFlipRequirement[0] != dm_immediate_flip_required)
 							|| v->ImmediateFlipSupportedForState[i][j] == true)) {
 				v->ModeSupport[i][j] = true;
 			} else {
@@ -5347,7 +5304,7 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		unsigned int MaxLineBufferLines,
 		unsigned int LineBufferSize,
 		unsigned int DPPOutputBufferPixels,
-		double DETBufferSizeInKByte,
+		unsigned int DETBufferSizeInKByte,
 		unsigned int WritebackInterfaceBufferSize,
 		double DCFCLK,
 		double ReturnBW,
@@ -5366,8 +5323,8 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		unsigned int DPPPerPlane[],
 		bool DCCEnable[],
 		double DPPCLK[],
-		double DETBufferSizeY[],
-		double DETBufferSizeC[],
+		unsigned int DETBufferSizeY[],
+		unsigned int DETBufferSizeC[],
 		unsigned int SwathHeightY[],
 		unsigned int SwathHeightC[],
 		unsigned int LBBitPerPixel[],
@@ -6104,7 +6061,7 @@ static void CalculateStutterEfficiency(
 		double SRExitTime,
 		bool SynchronizedVBlank,
 		int DPPPerPlane[],
-		double DETBufferSizeY[],
+		unsigned int DETBufferSizeY[],
 		int BytePerPixelY[],
 		double BytePerPixelDETY[],
 		double SwathWidthY[],
@@ -6251,7 +6208,7 @@ static void CalculateStutterEfficiency(
 static void CalculateSwathAndDETConfiguration(
 		bool ForceSingleDPP,
 		int NumberOfActivePlanes,
-		long DETBufferSizeInKByte,
+		unsigned int DETBufferSizeInKByte,
 		double MaximumSwathWidthLuma[],
 		double MaximumSwathWidthChroma[],
 		enum scan_direction_class SourceScan[],
@@ -6283,8 +6240,8 @@ static void CalculateSwathAndDETConfiguration(
 		double SwathWidthChroma[],
 		int SwathHeightY[],
 		int SwathHeightC[],
-		double DETBufferSizeY[],
-		double DETBufferSizeC[],
+		unsigned int DETBufferSizeY[],
+		unsigned int DETBufferSizeC[],
 		bool ViewportSizeSupportPerPlane[],
 		bool *ViewportSizeSupport)
 {
@@ -6653,8 +6610,7 @@ static double CalculateUrgentLatency(
 	return ret;
 }
 
-
-static void UseMinimumDCFCLK(
+static noinline_for_stack void UseMinimumDCFCLK(
 		struct display_mode_lib *mode_lib,
 		int MaxInterDCNTileRepeaters,
 		int MaxPrefetchMode,
@@ -6698,8 +6654,8 @@ static void UseMinimumDCFCLK(
 		int dpte_group_bytes[],
 		double PrefetchLinesY[][2][DC__NUM_DPP__MAX],
 		double PrefetchLinesC[][2][DC__NUM_DPP__MAX],
-		int swath_width_luma_ub_all_states[][2][DC__NUM_DPP__MAX],
-		int swath_width_chroma_ub_all_states[][2][DC__NUM_DPP__MAX],
+		unsigned int swath_width_luma_ub_all_states[][2][DC__NUM_DPP__MAX],
+		unsigned int swath_width_chroma_ub_all_states[][2][DC__NUM_DPP__MAX],
 		int BytePerPixelY[],
 		int BytePerPixelC[],
 		int HTotal[],

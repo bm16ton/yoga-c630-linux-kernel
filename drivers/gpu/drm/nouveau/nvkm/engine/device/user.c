@@ -161,8 +161,8 @@ nvkm_udevice_info(struct nvkm_udevice *udev, void *data, u32 size)
 	if (imem && args->v0.ram_size > 0)
 		args->v0.ram_user = args->v0.ram_user - imem->reserved;
 
-	strncpy(args->v0.chip, device->chip->name, sizeof(args->v0.chip));
-	strncpy(args->v0.name, device->name, sizeof(args->v0.name));
+	snprintf(args->v0.chip, sizeof(args->v0.chip), "%s", device->chip->name);
+	snprintf(args->v0.name, sizeof(args->v0.name), "%s", device->name);
 	return 0;
 }
 
@@ -346,6 +346,7 @@ nvkm_udevice_child_get(struct nvkm_object *object, int index,
 			return -EINVAL;
 
 		oclass->base = sclass->base;
+		oclass->engine = NULL;
 	}
 
 	oclass->ctor = nvkm_udevice_child_new;
@@ -397,7 +398,7 @@ nvkm_udevice_new(const struct nvkm_oclass *oclass, void *data, u32 size,
 		return ret;
 
 	/* give priviledged clients register access */
-	if (client->super)
+	if (args->v0.priv)
 		func = &nvkm_udevice_super;
 	else
 		func = &nvkm_udevice;

@@ -259,6 +259,28 @@ and ``ioctl(SECCOMP_IOCTL_NOTIF_SEND)`` a response, indicating what should be
 returned to userspace. The ``id`` member of ``struct seccomp_notif_resp`` should
 be the same ``id`` as in ``struct seccomp_notif``.
 
+Userspace can also add file descriptors to the notifying process via
+``ioctl(SECCOMP_IOCTL_NOTIF_ADDFD)``. The ``id`` member of
+``struct seccomp_notif_addfd`` should be the same ``id`` as in
+``struct seccomp_notif``. The ``newfd_flags`` flag may be used to set flags
+like O_CLOEXEC on the file descriptor in the notifying process. If the supervisor
+wants to inject the file descriptor with a specific number, the
+``SECCOMP_ADDFD_FLAG_SETFD`` flag can be used, and set the ``newfd`` member to
+the specific number to use. If that file descriptor is already open in the
+notifying process it will be replaced. The supervisor can also add an FD, and
+respond atomically by using the ``SECCOMP_ADDFD_FLAG_SEND`` flag and the return
+value will be the injected file descriptor number.
+
+The notifying process can be preempted, resulting in the notification being
+aborted. This can be problematic when trying to take actions on behalf of the
+notifying process that are long-running and typically retryable (mounting a
+filesytem). Alternatively, at filter installation time, the
+``SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV`` flag can be set. This flag makes it
+such that when a user notification is received by the supervisor, the notifying
+process will ignore non-fatal signals until the response is sent. Signals that
+are sent prior to the notification being received by userspace are handled
+normally.
+
 It is worth noting that ``struct seccomp_data`` contains the values of register
 arguments to the syscall, but does not contain pointers to memory. The task's
 memory is accessible to suitably privileged traces via ``ptrace()`` or

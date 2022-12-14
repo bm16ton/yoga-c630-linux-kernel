@@ -17,8 +17,6 @@
 
 #include "ixgbevf.h"
 
-#define IXGBE_ALL_RAR_ENTRIES 16
-
 enum {NETDEV_STATS, IXGBEVF_STATS};
 
 struct ixgbe_stats {
@@ -130,8 +128,6 @@ static void ixgbevf_set_msglevel(struct net_device *netdev, u32 data)
 	adapter->msg_enable = data;
 }
 
-#define IXGBE_GET_STAT(_A_, _R_) (_A_->stats._R_)
-
 static int ixgbevf_get_regs_len(struct net_device *netdev)
 {
 #define IXGBE_REGS_LEN 45
@@ -225,7 +221,9 @@ static void ixgbevf_get_drvinfo(struct net_device *netdev,
 }
 
 static void ixgbevf_get_ringparam(struct net_device *netdev,
-				  struct ethtool_ringparam *ring)
+				  struct ethtool_ringparam *ring,
+				  struct kernel_ethtool_ringparam *kernel_ring,
+				  struct netlink_ext_ack *extack)
 {
 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
 
@@ -236,7 +234,9 @@ static void ixgbevf_get_ringparam(struct net_device *netdev,
 }
 
 static int ixgbevf_set_ringparam(struct net_device *netdev,
-				 struct ethtool_ringparam *ring)
+				 struct ethtool_ringparam *ring,
+				 struct kernel_ethtool_ringparam *kernel_ring,
+				 struct netlink_ext_ack *extack)
 {
 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
 	struct ixgbevf_ring *tx_ring = NULL, *rx_ring = NULL;
@@ -787,7 +787,9 @@ static int ixgbevf_nway_reset(struct net_device *netdev)
 }
 
 static int ixgbevf_get_coalesce(struct net_device *netdev,
-				struct ethtool_coalesce *ec)
+				struct ethtool_coalesce *ec,
+				struct kernel_ethtool_coalesce *kernel_coal,
+				struct netlink_ext_ack *extack)
 {
 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
 
@@ -811,7 +813,9 @@ static int ixgbevf_get_coalesce(struct net_device *netdev,
 }
 
 static int ixgbevf_set_coalesce(struct net_device *netdev,
-				struct ethtool_coalesce *ec)
+				struct ethtool_coalesce *ec,
+				struct kernel_ethtool_coalesce *kernel_coal,
+				struct netlink_ext_ack *extack)
 {
 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
 	struct ixgbevf_q_vector *q_vector;

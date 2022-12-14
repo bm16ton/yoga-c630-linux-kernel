@@ -53,14 +53,12 @@ static int journal_read_bucket(struct cache *ca, struct list_head *list,
 reread:		left = ca->sb.bucket_size - offset;
 		len = min_t(unsigned int, left, PAGE_SECTORS << JSET_BITS);
 
-		bio_reset(bio);
+		bio_reset(bio, ca->bdev, REQ_OP_READ);
 		bio->bi_iter.bi_sector	= bucket + offset;
-		bio_set_dev(bio, ca->bdev);
 		bio->bi_iter.bi_size	= len << 9;
 
 		bio->bi_end_io	= journal_read_endio;
 		bio->bi_private = &cl;
-		bio_set_op_attrs(bio, REQ_OP_READ, 0);
 		bch_bio_map(bio, data);
 
 		closure_bio_submit(ca->set, bio, &cl);
@@ -111,7 +109,7 @@ reread:		left = ca->sb.bucket_size - offset;
 			 * Check from the oldest jset for last_seq. If
 			 * i->j.seq < j->last_seq, it means the oldest jset
 			 * in list is expired and useless, remove it from
-			 * this list. Otherwise, j is a condidate jset for
+			 * this list. Otherwise, j is a candidate jset for
 			 * further following checks.
 			 */
 			while (!list_empty(list)) {
@@ -407,6 +405,11 @@ err:
 	return ret;
 }
 
+void bch_journal_space_reserve(struct journal *j)
+{
+	j->do_reserve = true;
+}
+
 /* Journalling */
 
 static void btree_flush_write(struct cache_set *c)
@@ -498,7 +501,7 @@ static void btree_flush_write(struct cache_set *c)
 		 * - If there are matched nodes recorded in btree_nodes[],
 		 *   they are clean now (this is why and how the oldest
 		 *   journal entry can be reclaimed). These selected nodes
-		 *   will be ignored and skipped in the folowing for-loop.
+		 *   will be ignored and skipped in the following for-loop.
 		 */
 		if (((btree_current_write(b)->journal - fifo_front_p) &
 		     mask) != 0) {
@@ -611,11 +614,9 @@ static void do_journal_discard(struct cache *ca)
 
 		atomic_set(&ja->discard_in_flight, DISCARD_IN_FLIGHT);
 
-		bio_init(bio, bio->bi_inline_vecs, 1);
-		bio_set_op_attrs(bio, REQ_OP_DISCARD, 0);
+		bio_init(bio, ca->bdev, bio->bi_inline_vecs, 1, REQ_OP_DISCARD);
 		bio->bi_iter.bi_sector	= bucket_to_sector(ca->set,
 						ca->sb.d[ja->discard_idx]);
-		bio_set_dev(bio, ca->bdev);
 		bio->bi_iter.bi_size	= bucket_bytes(ca);
 		bio->bi_end_io		= journal_discard_endio;
 
@@ -625,12 +626,30 @@ static void do_journal_discard(struct cache *ca)
 	}
 }
 
+static unsigned int free_journal_buckets(struct cache_set *c)
+{
+	struct journal *j = &c->journal;
+	struct cache *ca = c->cache;
+	struct journal_device *ja = &c->cache->journal;
+	unsigned int n;
+
+	/* In case njournal_buckets is not power of 2 */
+	if (ja->cur_idx >= ja->discard_idx)
+		n = ca->sb.njournal_buckets +  ja->discard_idx - ja->cur_idx;
+	else
+		n = ja->discard_idx - ja->cur_idx;
+
+	if (n > (1 + j->do_reserve))
+		return n - (1 + j->do_reserve);
+
+	return 0;
+}
+
 static void journal_reclaim(struct cache_set *c)
 {
 	struct bkey *k = &c->journal.key;
 	struct cache *ca = c->cache;
 	uint64_t last_seq;
-	unsigned int next;
 	struct journal_device *ja = &ca->journal;
 	atomic_t p __maybe_unused;
 
@@ -653,12 +672,10 @@ static void journal_reclaim(struct cache_set *c)
 	if (c->journal.blocks_free)
 		goto out;
 
-	next = (ja->cur_idx + 1) % ca->sb.njournal_buckets;
-	/* No space available on this device */
-	if (next == ja->discard_idx)
+	if (!free_journal_buckets(c))
 		goto out;
 
-	ja->cur_idx = next;
+	ja->cur_idx = (ja->cur_idx + 1) % ca->sb.njournal_buckets;
 	k->ptr[0] = MAKE_PTR(0,
 			     bucket_to_sector(c, ca->sb.d[ja->cur_idx]),
 			     ca->sb.nr_this_dev);
@@ -768,20 +785,18 @@ static void journal_write_unlocked(struct closure *cl)
 	w->data->csum		= csum_set(w->data);
 
 	for (i = 0; i < KEY_PTRS(k); i++) {
-		ca = PTR_CACHE(c, k, i);
+		ca = c->cache;
 		bio = &ca->journal.bio;
 
 		atomic_long_add(sectors, &ca->meta_sectors_written);
 
-		bio_reset(bio);
+		bio_reset(bio, ca->bdev, REQ_OP_WRITE | 
+			  REQ_SYNC | REQ_META | REQ_PREFLUSH | REQ_FUA);
 		bio->bi_iter.bi_sector	= PTR_OFFSET(k, i);
-		bio_set_dev(bio, ca->bdev);
 		bio->bi_iter.bi_size = sectors << 9;
 
 		bio->bi_end_io	= journal_write_endio;
 		bio->bi_private = w;
-		bio_set_op_attrs(bio, REQ_OP_WRITE,
-				 REQ_SYNC|REQ_META|REQ_PREFLUSH|REQ_FUA);
 		bch_bio_map(bio, w->data);
 
 		trace_bcache_journal_write(bio, w->data->keys);

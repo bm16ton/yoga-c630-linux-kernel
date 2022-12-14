@@ -997,8 +997,8 @@ xfs_rtfree_extent(
 	 */
 	if (tp->t_frextents_delta + mp->m_sb.sb_frextents ==
 	    mp->m_sb.sb_rextents) {
-		if (!(mp->m_rbmip->i_d.di_flags & XFS_DIFLAG_NEWRTBM))
-			mp->m_rbmip->i_d.di_flags |= XFS_DIFLAG_NEWRTBM;
+		if (!(mp->m_rbmip->i_diflags & XFS_DIFLAG_NEWRTBM))
+			mp->m_rbmip->i_diflags |= XFS_DIFLAG_NEWRTBM;
 		*(uint64_t *)&VFS_I(mp->m_rbmip)->i_atime = 0;
 		xfs_trans_log_inode(tp, mp->m_rbmip, XFS_ILOG_CORE);
 	}
@@ -1008,16 +1008,17 @@ xfs_rtfree_extent(
 /* Find all the free records within a given range. */
 int
 xfs_rtalloc_query_range(
+	struct xfs_mount		*mp,
 	struct xfs_trans		*tp,
-	struct xfs_rtalloc_rec		*low_rec,
-	struct xfs_rtalloc_rec		*high_rec,
+	const struct xfs_rtalloc_rec	*low_rec,
+	const struct xfs_rtalloc_rec	*high_rec,
 	xfs_rtalloc_query_range_fn	fn,
 	void				*priv)
 {
 	struct xfs_rtalloc_rec		rec;
-	struct xfs_mount		*mp = tp->t_mountp;
 	xfs_rtblock_t			rtstart;
 	xfs_rtblock_t			rtend;
+	xfs_rtblock_t			high_key;
 	int				is_free;
 	int				error = 0;
 
@@ -1026,12 +1027,12 @@ xfs_rtalloc_query_range(
 	if (low_rec->ar_startext >= mp->m_sb.sb_rextents ||
 	    low_rec->ar_startext == high_rec->ar_startext)
 		return 0;
-	high_rec->ar_startext = min(high_rec->ar_startext,
-			mp->m_sb.sb_rextents - 1);
+
+	high_key = min(high_rec->ar_startext, mp->m_sb.sb_rextents - 1);
 
 	/* Iterate the bitmap, looking for discrepancies. */
 	rtstart = low_rec->ar_startext;
-	while (rtstart <= high_rec->ar_startext) {
+	while (rtstart <= high_key) {
 		/* Is the first block free? */
 		error = xfs_rtcheck_range(mp, tp, rtstart, 1, 1, &rtend,
 				&is_free);
@@ -1039,8 +1040,7 @@ xfs_rtalloc_query_range(
 			break;
 
 		/* How long does the extent go for? */
-		error = xfs_rtfind_forw(mp, tp, rtstart,
-				high_rec->ar_startext, &rtend);
+		error = xfs_rtfind_forw(mp, tp, rtstart, high_key, &rtend);
 		if (error)
 			break;
 
@@ -1048,7 +1048,7 @@ xfs_rtalloc_query_range(
 			rec.ar_startext = rtstart;
 			rec.ar_extcount = rtend - rtstart + 1;
 
-			error = fn(tp, &rec, priv);
+			error = fn(mp, tp, &rec, priv);
 			if (error)
 				break;
 		}
@@ -1062,6 +1062,7 @@ xfs_rtalloc_query_range(
 /* Find all the free records. */
 int
 xfs_rtalloc_query_all(
+	struct xfs_mount		*mp,
 	struct xfs_trans		*tp,
 	xfs_rtalloc_query_range_fn	fn,
 	void				*priv)
@@ -1069,10 +1070,10 @@ xfs_rtalloc_query_all(
 	struct xfs_rtalloc_rec		keys[2];
 
 	keys[0].ar_startext = 0;
-	keys[1].ar_startext = tp->t_mountp->m_sb.sb_rextents - 1;
+	keys[1].ar_startext = mp->m_sb.sb_rextents - 1;
 	keys[0].ar_extcount = keys[1].ar_extcount = 0;
 
-	return xfs_rtalloc_query_range(tp, &keys[0], &keys[1], fn, priv);
+	return xfs_rtalloc_query_range(mp, tp, &keys[0], &keys[1], fn, priv);
 }
 
 /* Is the given extent all free? */

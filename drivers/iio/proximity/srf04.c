@@ -37,9 +37,8 @@
 #include <linux/err.h>
 #include <linux/gpio/consumer.h>
 #include <linux/kernel.h>
+#include <linux/mod_devicetable.h>
 #include <linux/module.h>
-#include <linux/of.h>
-#include <linux/of_device.h>
 #include <linux/platform_device.h>
 #include <linux/property.h>
 #include <linux/sched.h>
@@ -100,9 +99,11 @@ static int srf04_read(struct srf04_data *data)
 	u64 dt_ns;
 	u32 time_ns, distance_mm;
 
-	if (data->gpiod_power)
-		pm_runtime_get_sync(data->dev);
-
+	if (data->gpiod_power) {
+		ret = pm_runtime_resume_and_get(data->dev);
+		if (ret < 0)
+			return ret;
+	}
 	/*
 	 * just one read-echo-cycle can take place at a time
 	 * ==> lock against concurrent reading calls
@@ -233,12 +234,12 @@ static const struct iio_chan_spec srf04_chan_spec[] = {
 };
 
 static const struct of_device_id of_srf04_match[] = {
-	{ .compatible = "devantech,srf04", .data = &srf04_cfg},
-	{ .compatible = "maxbotix,mb1000", .data = &mb_lv_cfg},
-	{ .compatible = "maxbotix,mb1010", .data = &mb_lv_cfg},
-	{ .compatible = "maxbotix,mb1020", .data = &mb_lv_cfg},
-	{ .compatible = "maxbotix,mb1030", .data = &mb_lv_cfg},
-	{ .compatible = "maxbotix,mb1040", .data = &mb_lv_cfg},
+	{ .compatible = "devantech,srf04", .data = &srf04_cfg },
+	{ .compatible = "maxbotix,mb1000", .data = &mb_lv_cfg },
+	{ .compatible = "maxbotix,mb1010", .data = &mb_lv_cfg },
+	{ .compatible = "maxbotix,mb1020", .data = &mb_lv_cfg },
+	{ .compatible = "maxbotix,mb1030", .data = &mb_lv_cfg },
+	{ .compatible = "maxbotix,mb1040", .data = &mb_lv_cfg },
 	{},
 };
 
@@ -259,7 +260,7 @@ static int srf04_probe(struct platform_device *pdev)
 
 	data = iio_priv(indio_dev);
 	data->dev = dev;
-	data->cfg = of_match_device(of_srf04_match, dev)->data;
+	data->cfg = device_get_match_data(dev);
 
 	mutex_init(&data->lock);
 	init_completion(&data->rising);
@@ -287,10 +288,8 @@ static int srf04_probe(struct platform_device *pdev)
 		return PTR_ERR(data->gpiod_power);
 	}
 	if (data->gpiod_power) {
-
-		if (of_property_read_u32(dev->of_node, "startup-time-ms",
-						&data->startup_time_ms))
-			data->startup_time_ms = 100;
+		data->startup_time_ms = 100;
+		device_property_read_u32(dev, "startup-time-ms", &data->startup_time_ms);
 		dev_dbg(dev, "using power gpio: startup-time-ms=%d\n",
 							data->startup_time_ms);
 	}

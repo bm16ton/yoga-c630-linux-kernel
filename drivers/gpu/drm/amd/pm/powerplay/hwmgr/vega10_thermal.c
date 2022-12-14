@@ -64,25 +64,24 @@ int vega10_fan_ctrl_get_fan_speed_info(struct pp_hwmgr *hwmgr,
 	return 0;
 }
 
-int vega10_fan_ctrl_get_fan_speed_percent(struct pp_hwmgr *hwmgr,
+int vega10_fan_ctrl_get_fan_speed_pwm(struct pp_hwmgr *hwmgr,
 		uint32_t *speed)
 {
-	uint32_t current_rpm;
-	uint32_t percent = 0;
+	struct amdgpu_device *adev = hwmgr->adev;
+	uint32_t duty100, duty;
+	uint64_t tmp64;
 
-	if (hwmgr->thermal_controller.fanInfo.bNoFan)
-		return 0;
+	duty100 = REG_GET_FIELD(RREG32_SOC15(THM, 0, mmCG_FDO_CTRL1),
+				CG_FDO_CTRL1, FMAX_DUTY100);
+	duty = REG_GET_FIELD(RREG32_SOC15(THM, 0, mmCG_THERMAL_STATUS),
+				CG_THERMAL_STATUS, FDO_PWM_DUTY);
 
-	if (vega10_get_current_rpm(hwmgr, &current_rpm))
-		return -1;
+	if (!duty100)
+		return -EINVAL;
 
-	if (hwmgr->thermal_controller.
-			advanceFanControlParameters.usMaxFanRPM != 0)
-		percent = current_rpm * 100 /
-			hwmgr->thermal_controller.
-			advanceFanControlParameters.usMaxFanRPM;
-
-	*speed = percent > 100 ? 100 : percent;
+	tmp64 = (uint64_t)duty * 255;
+	do_div(tmp64, duty100);
+	*speed = MIN((uint32_t)tmp64, 255);
 
 	return 0;
 }
@@ -241,12 +240,11 @@ int vega10_fan_ctrl_stop_smc_fan_control(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * vega10_fan_ctrl_set_fan_speed_percent - Set Fan Speed in percent.
+ * vega10_fan_ctrl_set_fan_speed_pwm - Set Fan Speed in PWM.
  * @hwmgr:  the address of the powerplay hardware manager.
- * @speed: is the percentage value (0% - 100%) to be set.
- * Exception: Fails is the 100% setting appears to be 0.
+ * @speed: is the percentage value (0 - 255) to be set.
  */
-int vega10_fan_ctrl_set_fan_speed_percent(struct pp_hwmgr *hwmgr,
+int vega10_fan_ctrl_set_fan_speed_pwm(struct pp_hwmgr *hwmgr,
 		uint32_t speed)
 {
 	struct amdgpu_device *adev = hwmgr->adev;
@@ -257,8 +255,7 @@ int vega10_fan_ctrl_set_fan_speed_percent(struct pp_hwmgr *hwmgr,
 	if (hwmgr->thermal_controller.fanInfo.bNoFan)
 		return 0;
 
-	if (speed > 100)
-		speed = 100;
+	speed = MIN(speed, 255);
 
 	if (PP_CAP(PHM_PlatformCaps_MicrocodeFanControl))
 		vega10_fan_ctrl_stop_smc_fan_control(hwmgr);
@@ -270,7 +267,7 @@ int vega10_fan_ctrl_set_fan_speed_percent(struct pp_hwmgr *hwmgr,
 		return -EINVAL;
 
 	tmp64 = (uint64_t)speed * duty100;
-	do_div(tmp64, 100);
+	do_div(tmp64, 255);
 	duty = (uint32_t)tmp64;
 
 	WREG32_SOC15(THM, 0, mmCG_FDO_CTRL0,

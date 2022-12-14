@@ -39,6 +39,7 @@
 
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
+#include <drm/drm_probe_helper.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_atomic.h>
@@ -378,11 +379,11 @@ nouveau_fbcon_create(struct drm_fb_helper *helper,
 			      FBINFO_HWACCEL_FILLRECT |
 			      FBINFO_HWACCEL_IMAGEBLIT;
 	info->fbops = &nouveau_fbcon_sw_ops;
-	info->fix.smem_start = nvbo->bo.mem.bus.offset;
-	info->fix.smem_len = nvbo->bo.mem.num_pages << PAGE_SHIFT;
+	info->fix.smem_start = nvbo->bo.resource->bus.offset;
+	info->fix.smem_len = nvbo->bo.base.size;
 
 	info->screen_base = nvbo_kmap_obj_iovirtual(nvbo);
-	info->screen_size = nvbo->bo.mem.num_pages << PAGE_SHIFT;
+	info->screen_size = nvbo->bo.base.size;
 
 	drm_fb_helper_fill_info(info, &fbcon->helper, sizes);
 
@@ -466,7 +467,7 @@ nouveau_fbcon_set_suspend_work(struct work_struct *work)
 	if (state == FBINFO_STATE_RUNNING) {
 		nouveau_fbcon_hotplug_resume(drm->fbcon);
 		pm_runtime_mark_last_busy(drm->dev->dev);
-		pm_runtime_put_sync(drm->dev->dev);
+		pm_runtime_put_autosuspend(drm->dev->dev);
 	}
 }
 
@@ -605,6 +606,7 @@ nouveau_fbcon_fini(struct drm_device *dev)
 	if (!drm->fbcon)
 		return;
 
+	drm_kms_helper_poll_fini(dev);
 	nouveau_fbcon_accel_fini(dev);
 	nouveau_fbcon_destroy(dev, drm->fbcon);
 	kfree(drm->fbcon);

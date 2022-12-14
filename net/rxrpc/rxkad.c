@@ -431,7 +431,7 @@ static int rxkad_secure_packet(struct rxrpc_call *call,
 		break;
 	}
 
-	_leave(" = %d [set %hx]", ret, y);
+	_leave(" = %d [set %x]", ret, y);
 	return ret;
 }
 
@@ -482,7 +482,6 @@ static int rxkad_verify_packet_1(struct rxrpc_call *call, struct sk_buff *skb,
 					     RXKADDATALEN);
 		goto protocol_error;
 	}
-	offset += sizeof(sechdr);
 	len -= sizeof(sechdr);
 
 	buf = ntohl(sechdr.data_size);
@@ -541,7 +540,7 @@ static int rxkad_verify_packet_2(struct rxrpc_call *call, struct sk_buff *skb,
 	 * directly into the target buffer.
 	 */
 	sg = _sg;
-	nsg = skb_shinfo(skb)->nr_frags;
+	nsg = skb_shinfo(skb)->nr_frags + 1;
 	if (nsg <= 4) {
 		nsg = 4;
 	} else {
@@ -576,7 +575,6 @@ static int rxkad_verify_packet_2(struct rxrpc_call *call, struct sk_buff *skb,
 					     RXKADDATALEN);
 		goto protocol_error;
 	}
-	offset += sizeof(sechdr);
 	len -= sizeof(sechdr);
 
 	buf = ntohl(sechdr.data_size);

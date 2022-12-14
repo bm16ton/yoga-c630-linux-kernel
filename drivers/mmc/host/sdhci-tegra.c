@@ -15,6 +15,8 @@
 #include <linux/of.h>
 #include <linux/of_device.h>
 #include <linux/pinctrl/consumer.h>
+#include <linux/pm_opp.h>
+#include <linux/pm_runtime.h>
 #include <linux/regulator/consumer.h>
 #include <linux/reset.h>
 #include <linux/mmc/card.h>
@@ -24,6 +26,9 @@
 #include <linux/gpio/consumer.h>
 #include <linux/ktime.h>
 
+#include <soc/tegra/common.h>
+
+#include "sdhci-cqhci.h"
 #include "sdhci-pltfm.h"
 #include "cqhci.h"
 
@@ -115,6 +120,8 @@
  * SDMMC hardware data timeout.
  */
 #define NVQUIRK_HAS_TMCLK				BIT(10)
+
+#define NVQUIRK_HAS_ANDROID_GPT_SECTOR			BIT(11)
 
 /* SDMMC CQE Base Address for Tegra Host Ver 4.1 and Higher */
 #define SDHCI_TEGRA_CQE_BASE_ADDR			0xF000
@@ -354,23 +361,6 @@ static void tegra_sdhci_set_tap(struct sdhci_host *host, unsigned int tap)
 	}
 }
 
-static void tegra_sdhci_hs400_enhanced_strobe(struct mmc_host *mmc,
-					      struct mmc_ios *ios)
-{
-	struct sdhci_host *host = mmc_priv(mmc);
-	u32 val;
-
-	val = sdhci_readl(host, SDHCI_TEGRA_VENDOR_SYS_SW_CTRL);
-
-	if (ios->enhanced_strobe)
-		val |= SDHCI_TEGRA_SYS_SW_CTRL_ENHANCED_STROBE;
-	else
-		val &= ~SDHCI_TEGRA_SYS_SW_CTRL_ENHANCED_STROBE;
-
-	sdhci_writel(host, val, SDHCI_TEGRA_VENDOR_SYS_SW_CTRL);
-
-}
-
 static void tegra_sdhci_reset(struct sdhci_host *host, u8 mask)
 {
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
@@ -378,7 +368,7 @@ static void tegra_sdhci_reset(struct sdhci_host *host, u8 mask)
 	const struct sdhci_tegra_soc_data *soc_data = tegra_host->soc_data;
 	u32 misc_ctrl, clk_ctrl, pad_ctrl;
 
-	sdhci_reset(host, mask);
+	sdhci_and_cqhci_reset(host, mask);
 
 	if (!(mask & SDHCI_RESET_ALL))
 		return;
@@ -600,49 +590,49 @@ static void tegra_sdhci_parse_pad_autocal_dt(struct sdhci_host *host)
 			&tegra_host->autocal_offsets;
 	int err;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-up-offset-3v3",
 			&autocal->pull_up_3v3);
 	if (err)
 		autocal->pull_up_3v3 = 0;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-down-offset-3v3",
 			&autocal->pull_down_3v3);
 	if (err)
 		autocal->pull_down_3v3 = 0;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-up-offset-1v8",
 			&autocal->pull_up_1v8);
 	if (err)
 		autocal->pull_up_1v8 = 0;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-down-offset-1v8",
 			&autocal->pull_down_1v8);
 	if (err)
 		autocal->pull_down_1v8 = 0;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-up-offset-sdr104",
 			&autocal->pull_up_sdr104);
 	if (err)
 		autocal->pull_up_sdr104 = autocal->pull_up_1v8;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-down-offset-sdr104",
 			&autocal->pull_down_sdr104);
 	if (err)
 		autocal->pull_down_sdr104 = autocal->pull_down_1v8;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-up-offset-hs400",
 			&autocal->pull_up_hs400);
 	if (err)
 		autocal->pull_up_hs400 = autocal->pull_up_1v8;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-down-offset-hs400",
 			&autocal->pull_down_hs400);
 	if (err)
@@ -657,7 +647,7 @@ static void tegra_sdhci_parse_pad_autocal_dt(struct sdhci_host *host)
 	if (!(tegra_host->soc_data->nvquirks & NVQUIRK_NEEDS_PAD_CONTROL))
 		return;
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-up-offset-3v3-timeout",
 			&autocal->pull_up_3v3_timeout);
 	if (err) {
@@ -668,7 +658,7 @@ static void tegra_sdhci_parse_pad_autocal_dt(struct sdhci_host *host)
 		autocal->pull_up_3v3_timeout = 0;
 	}
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-down-offset-3v3-timeout",
 			&autocal->pull_down_3v3_timeout);
 	if (err) {
@@ -679,7 +669,7 @@ static void tegra_sdhci_parse_pad_autocal_dt(struct sdhci_host *host)
 		autocal->pull_down_3v3_timeout = 0;
 	}
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-up-offset-1v8-timeout",
 			&autocal->pull_up_1v8_timeout);
 	if (err) {
@@ -690,7 +680,7 @@ static void tegra_sdhci_parse_pad_autocal_dt(struct sdhci_host *host)
 		autocal->pull_up_1v8_timeout = 0;
 	}
 
-	err = device_property_read_u32(host->mmc->parent,
+	err = device_property_read_u32(mmc_dev(host->mmc),
 			"nvidia,pad-autocal-pull-down-offset-1v8-timeout",
 			&autocal->pull_down_1v8_timeout);
 	if (err) {
@@ -724,17 +714,17 @@ static void tegra_sdhci_parse_tap_and_trim(struct sdhci_host *host)
 	struct sdhci_tegra *tegra_host = sdhci_pltfm_priv(pltfm_host);
 	int err;
 
-	err = device_property_read_u32(host->mmc->parent, "nvidia,default-tap",
+	err = device_property_read_u32(mmc_dev(host->mmc), "nvidia,default-tap",
 				       &tegra_host->default_tap);
 	if (err)
 		tegra_host->default_tap = 0;
 
-	err = device_property_read_u32(host->mmc->parent, "nvidia,default-trim",
+	err = device_property_read_u32(mmc_dev(host->mmc), "nvidia,default-trim",
 				       &tegra_host->default_trim);
 	if (err)
 		tegra_host->default_trim = 0;
 
-	err = device_property_read_u32(host->mmc->parent, "nvidia,dqs-trim",
+	err = device_property_read_u32(mmc_dev(host->mmc), "nvidia,dqs-trim",
 				       &tegra_host->dqs_trim);
 	if (err)
 		tegra_host->dqs_trim = 0x11;
@@ -745,7 +735,7 @@ static void tegra_sdhci_parse_dt(struct sdhci_host *host)
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
 	struct sdhci_tegra *tegra_host = sdhci_pltfm_priv(pltfm_host);
 
-	if (device_property_read_bool(host->mmc->parent, "supports-cqe"))
+	if (device_property_read_bool(mmc_dev(host->mmc), "supports-cqe"))
 		tegra_host->enable_hwcq = true;
 	else
 		tegra_host->enable_hwcq = false;
@@ -758,7 +748,9 @@ static void tegra_sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 {
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
 	struct sdhci_tegra *tegra_host = sdhci_pltfm_priv(pltfm_host);
+	struct device *dev = mmc_dev(host->mmc);
 	unsigned long host_clk;
+	int err;
 
 	if (!clock)
 		return sdhci_set_clock(host, clock);
@@ -776,8 +768,13 @@ static void tegra_sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 	 * from clk_get_rate() is used.
 	 */
 	host_clk = tegra_host->ddr_signaling ? clock * 2 : clock;
-	clk_set_rate(pltfm_host->clk, host_clk);
-	tegra_host->curr_clk_rate = host_clk;
+
+	err = dev_pm_opp_set_rate(dev, host_clk);
+	if (err)
+		dev_err(dev, "failed to set clk rate to %luHz: %d\n",
+			host_clk, err);
+
+	tegra_host->curr_clk_rate = clk_get_rate(pltfm_host->clk);
 	if (tegra_host->ddr_signaling)
 		host->max_clk = host_clk;
 	else
@@ -789,6 +786,32 @@ static void tegra_sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 		tegra_sdhci_pad_autocalib(host);
 		tegra_host->pad_calib_required = false;
 	}
+}
+
+static void tegra_sdhci_hs400_enhanced_strobe(struct mmc_host *mmc,
+					      struct mmc_ios *ios)
+{
+	struct sdhci_host *host = mmc_priv(mmc);
+	u32 val;
+
+	val = sdhci_readl(host, SDHCI_TEGRA_VENDOR_SYS_SW_CTRL);
+
+	if (ios->enhanced_strobe) {
+		val |= SDHCI_TEGRA_SYS_SW_CTRL_ENHANCED_STROBE;
+		/*
+		 * When CMD13 is sent from mmc_select_hs400es() after
+		 * switching to HS400ES mode, the bus is operating at
+		 * either MMC_HIGH_26_MAX_DTR or MMC_HIGH_52_MAX_DTR.
+		 * To meet Tegra SDHCI requirement at HS400ES mode, force SDHCI
+		 * interface clock to MMC_HS200_MAX_DTR (200 MHz) so that host
+		 * controller CAR clock and the interface clock are rate matched.
+		 */
+		tegra_sdhci_set_clock(host, MMC_HS200_MAX_DTR);
+	} else {
+		val &= ~SDHCI_TEGRA_SYS_SW_CTRL_ENHANCED_STROBE;
+	}
+
+	sdhci_writel(host, val, SDHCI_TEGRA_VENDOR_SYS_SW_CTRL);
 }
 
 static unsigned int tegra_sdhci_get_max_clock(struct sdhci_host *host)
@@ -1361,6 +1384,7 @@ static const struct sdhci_tegra_soc_data soc_data_tegra20 = {
 	.pdata = &sdhci_tegra20_pdata,
 	.dma_mask = DMA_BIT_MASK(32),
 	.nvquirks = NVQUIRK_FORCE_SDHCI_SPEC_200 |
+		    NVQUIRK_HAS_ANDROID_GPT_SECTOR |
 		    NVQUIRK_ENABLE_BLOCK_GAP_DET,
 };
 
@@ -1390,6 +1414,7 @@ static const struct sdhci_tegra_soc_data soc_data_tegra30 = {
 	.nvquirks = NVQUIRK_ENABLE_SDHCI_SPEC_300 |
 		    NVQUIRK_ENABLE_SDR50 |
 		    NVQUIRK_ENABLE_SDR104 |
+		    NVQUIRK_HAS_ANDROID_GPT_SECTOR |
 		    NVQUIRK_HAS_PADCALIB,
 };
 
@@ -1422,6 +1447,7 @@ static const struct sdhci_pltfm_data sdhci_tegra114_pdata = {
 static const struct sdhci_tegra_soc_data soc_data_tegra114 = {
 	.pdata = &sdhci_tegra114_pdata,
 	.dma_mask = DMA_BIT_MASK(32),
+	.nvquirks = NVQUIRK_HAS_ANDROID_GPT_SECTOR,
 };
 
 static const struct sdhci_pltfm_data sdhci_tegra124_pdata = {
@@ -1438,6 +1464,7 @@ static const struct sdhci_pltfm_data sdhci_tegra124_pdata = {
 static const struct sdhci_tegra_soc_data soc_data_tegra124 = {
 	.pdata = &sdhci_tegra124_pdata,
 	.dma_mask = DMA_BIT_MASK(34),
+	.nvquirks = NVQUIRK_HAS_ANDROID_GPT_SECTOR,
 };
 
 static const struct sdhci_ops tegra210_sdhci_ops = {
@@ -1561,7 +1588,7 @@ static int sdhci_tegra_add_host(struct sdhci_host *host)
 
 	host->mmc->caps2 |= MMC_CAP2_CQE | MMC_CAP2_CQE_DCMD;
 
-	cq_host = devm_kzalloc(host->mmc->parent,
+	cq_host = devm_kzalloc(mmc_dev(host->mmc),
 				sizeof(*cq_host), GFP_KERNEL);
 	if (!cq_host) {
 		ret = -ENOMEM;
@@ -1592,7 +1619,6 @@ cleanup:
 
 static int sdhci_tegra_probe(struct platform_device *pdev)
 {
-	const struct of_device_id *match;
 	const struct sdhci_tegra_soc_data *soc_data;
 	struct sdhci_host *host;
 	struct sdhci_pltfm_host *pltfm_host;
@@ -1600,10 +1626,9 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 	struct clk *clk;
 	int rc;
 
-	match = of_match_device(sdhci_tegra_dt_match, &pdev->dev);
-	if (!match)
+	soc_data = of_device_get_match_data(&pdev->dev);
+	if (!soc_data)
 		return -EINVAL;
-	soc_data = match->data;
 
 	host = sdhci_pltfm_init(pdev, soc_data->pdata, sizeof(*tegra_host));
 	if (IS_ERR(host))
@@ -1615,6 +1640,9 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 	tegra_host->pad_calib_required = false;
 	tegra_host->pad_control_available = false;
 	tegra_host->soc_data = soc_data;
+
+	if (soc_data->nvquirks & NVQUIRK_HAS_ANDROID_GPT_SECTOR)
+		host->mmc->caps2 |= MMC_CAP2_ALT_GPT_TEGRA;
 
 	if (soc_data->nvquirks & NVQUIRK_NEEDS_PAD_CONTROL) {
 		rc = tegra_sdhci_init_pinctrl_info(&pdev->dev, tegra_host);
@@ -1643,6 +1671,9 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 
 	/* HW busy detection is supported, but R1B responses are required. */
 	host->mmc->caps |= MMC_CAP_WAIT_WHILE_BUSY | MMC_CAP_NEED_RSP_BUSY;
+
+	/* GPIO CD can be set as a wakeup source */
+	host->mmc->caps |= MMC_CAP_CD_WAKE;
 
 	tegra_sdhci_parse_dt(host);
 
@@ -1696,7 +1727,6 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 				   "failed to get clock\n");
 		goto err_clk_get;
 	}
-	clk_prepare_enable(clk);
 	pltfm_host->clk = clk;
 
 	tegra_host->rst = devm_reset_control_get_exclusive(&pdev->dev,
@@ -1707,15 +1737,24 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 		goto err_rst_get;
 	}
 
-	rc = reset_control_assert(tegra_host->rst);
+	rc = devm_tegra_core_dev_init_opp_table_common(&pdev->dev);
 	if (rc)
 		goto err_rst_get;
+
+	pm_runtime_enable(&pdev->dev);
+	rc = pm_runtime_resume_and_get(&pdev->dev);
+	if (rc)
+		goto err_pm_get;
+
+	rc = reset_control_assert(tegra_host->rst);
+	if (rc)
+		goto err_rst_assert;
 
 	usleep_range(2000, 4000);
 
 	rc = reset_control_deassert(tegra_host->rst);
 	if (rc)
-		goto err_rst_get;
+		goto err_rst_assert;
 
 	usleep_range(2000, 4000);
 
@@ -1727,8 +1766,11 @@ static int sdhci_tegra_probe(struct platform_device *pdev)
 
 err_add_host:
 	reset_control_assert(tegra_host->rst);
+err_rst_assert:
+	pm_runtime_put_sync_suspend(&pdev->dev);
+err_pm_get:
+	pm_runtime_disable(&pdev->dev);
 err_rst_get:
-	clk_disable_unprepare(pltfm_host->clk);
 err_clk_get:
 	clk_disable_unprepare(tegra_host->tmclk);
 err_power_req:
@@ -1747,19 +1789,38 @@ static int sdhci_tegra_remove(struct platform_device *pdev)
 
 	reset_control_assert(tegra_host->rst);
 	usleep_range(2000, 4000);
-	clk_disable_unprepare(pltfm_host->clk);
-	clk_disable_unprepare(tegra_host->tmclk);
 
+	pm_runtime_put_sync_suspend(&pdev->dev);
+	pm_runtime_force_suspend(&pdev->dev);
+
+	clk_disable_unprepare(tegra_host->tmclk);
 	sdhci_pltfm_free(pdev);
 
 	return 0;
 }
 
-#ifdef CONFIG_PM_SLEEP
-static int __maybe_unused sdhci_tegra_suspend(struct device *dev)
+static int __maybe_unused sdhci_tegra_runtime_suspend(struct device *dev)
 {
 	struct sdhci_host *host = dev_get_drvdata(dev);
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
+
+	clk_disable_unprepare(pltfm_host->clk);
+
+	return 0;
+}
+
+static int __maybe_unused sdhci_tegra_runtime_resume(struct device *dev)
+{
+	struct sdhci_host *host = dev_get_drvdata(dev);
+	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
+
+	return clk_prepare_enable(pltfm_host->clk);
+}
+
+#ifdef CONFIG_PM_SLEEP
+static int sdhci_tegra_suspend(struct device *dev)
+{
+	struct sdhci_host *host = dev_get_drvdata(dev);
 	int ret;
 
 	if (host->mmc->caps2 & MMC_CAP2_CQE) {
@@ -1774,17 +1835,26 @@ static int __maybe_unused sdhci_tegra_suspend(struct device *dev)
 		return ret;
 	}
 
-	clk_disable_unprepare(pltfm_host->clk);
-	return 0;
+	ret = pm_runtime_force_suspend(dev);
+	if (ret) {
+		sdhci_resume_host(host);
+		cqhci_resume(host->mmc);
+		return ret;
+	}
+
+	return mmc_gpio_set_cd_wake(host->mmc, true);
 }
 
-static int __maybe_unused sdhci_tegra_resume(struct device *dev)
+static int sdhci_tegra_resume(struct device *dev)
 {
 	struct sdhci_host *host = dev_get_drvdata(dev);
-	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
 	int ret;
 
-	ret = clk_prepare_enable(pltfm_host->clk);
+	ret = mmc_gpio_set_cd_wake(host->mmc, false);
+	if (ret)
+		return ret;
+
+	ret = pm_runtime_force_resume(dev);
 	if (ret)
 		return ret;
 
@@ -1803,13 +1873,16 @@ static int __maybe_unused sdhci_tegra_resume(struct device *dev)
 suspend_host:
 	sdhci_suspend_host(host);
 disable_clk:
-	clk_disable_unprepare(pltfm_host->clk);
+	pm_runtime_force_suspend(dev);
 	return ret;
 }
 #endif
 
-static SIMPLE_DEV_PM_OPS(sdhci_tegra_dev_pm_ops, sdhci_tegra_suspend,
-			 sdhci_tegra_resume);
+static const struct dev_pm_ops sdhci_tegra_dev_pm_ops = {
+	SET_RUNTIME_PM_OPS(sdhci_tegra_runtime_suspend, sdhci_tegra_runtime_resume,
+			   NULL)
+	SET_SYSTEM_SLEEP_PM_OPS(sdhci_tegra_suspend, sdhci_tegra_resume)
+};
 
 static struct platform_driver sdhci_tegra_driver = {
 	.driver		= {

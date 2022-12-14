@@ -10,6 +10,8 @@
  *	 Using root's kernel master key (kmk), calculate the HMAC
  */
 
+#define pr_fmt(fmt) "EVM: "fmt
+
 #include <linux/export.h>
 #include <linux/crypto.h>
 #include <linux/xattr.h>
@@ -24,7 +26,7 @@
 static unsigned char evmkey[MAX_KEY_SIZE];
 static const int evmkey_len = MAX_KEY_SIZE;
 
-struct crypto_shash *hmac_tfm;
+static struct crypto_shash *hmac_tfm;
 static struct crypto_shash *evm_tfm[HASH_ALGO__LAST];
 
 static DEFINE_MUTEX(mutex);
@@ -73,7 +75,7 @@ static struct shash_desc *init_desc(char type, uint8_t hash_algo)
 {
 	long rc;
 	const char *algo;
-	struct crypto_shash **tfm, *tmp_tfm = NULL;
+	struct crypto_shash **tfm, *tmp_tfm;
 	struct shash_desc *desc;
 
 	if (type == EVM_XATTR_HMAC) {
@@ -118,16 +120,13 @@ unlock:
 alloc:
 	desc = kmalloc(sizeof(*desc) + crypto_shash_descsize(*tfm),
 			GFP_KERNEL);
-	if (!desc) {
-		crypto_free_shash(tmp_tfm);
+	if (!desc)
 		return ERR_PTR(-ENOMEM);
-	}
 
 	desc->tfm = *tfm;
 
 	rc = crypto_shash_init(desc);
 	if (rc) {
-		crypto_free_shash(tmp_tfm);
 		kfree(desc);
 		return ERR_PTR(rc);
 	}
@@ -175,6 +174,30 @@ static void hmac_add_misc(struct shash_desc *desc, struct inode *inode,
 	    type != EVM_XATTR_PORTABLE_DIGSIG)
 		crypto_shash_update(desc, (u8 *)&inode->i_sb->s_uuid, UUID_SIZE);
 	crypto_shash_final(desc, digest);
+
+	pr_debug("hmac_misc: (%zu) [%*phN]\n", sizeof(struct h_misc),
+		 (int)sizeof(struct h_misc), &hmac_misc);
+}
+
+/*
+ * Dump large security xattr values as a continuous ascii hexademical string.
+ * (pr_debug is limited to 64 bytes.)
+ */
+static void dump_security_xattr(const char *prefix, const void *src,
+				size_t count)
+{
+#if defined(DEBUG) || defined(CONFIG_DYNAMIC_DEBUG)
+	char *asciihex, *p;
+
+	p = asciihex = kmalloc(count * 2 + 1, GFP_KERNEL);
+	if (!asciihex)
+		return;
+
+	p = bin2hex(p, src, count);
+	*p = 0;
+	pr_debug("%s: (%zu) %.*s\n", prefix, count, (int)count * 2, asciihex);
+	kfree(asciihex);
+#endif
 }
 
 /*
@@ -196,7 +219,7 @@ static int evm_calc_hmac_or_hash(struct dentry *dentry,
 	size_t xattr_size = 0;
 	char *xattr_value = NULL;
 	int error;
-	int size;
+	int size, user_space_size;
 	bool ima_present = false;
 
 	if (!(inode->i_opflags & IOP_XATTR) ||
@@ -216,6 +239,13 @@ static int evm_calc_hmac_or_hash(struct dentry *dentry,
 		if (strcmp(xattr->name, XATTR_NAME_IMA) == 0)
 			is_ima = true;
 
+		/*
+		 * Skip non-enabled xattrs for locally calculated
+		 * signatures/HMACs.
+		 */
+		if (type != EVM_XATTR_PORTABLE_DIGSIG && !xattr->enabled)
+			continue;
+
 		if ((req_xattr_name && req_xattr_value)
 		    && !strcmp(xattr->name, req_xattr_name)) {
 			error = 0;
@@ -223,6 +253,16 @@ static int evm_calc_hmac_or_hash(struct dentry *dentry,
 					     req_xattr_value_len);
 			if (is_ima)
 				ima_present = true;
+
+			if (req_xattr_value_len < 64)
+				pr_debug("%s: (%zu) [%*phN]\n", req_xattr_name,
+					 req_xattr_value_len,
+					 (int)req_xattr_value_len,
+					 req_xattr_value);
+			else
+				dump_security_xattr(req_xattr_name,
+						    req_xattr_value,
+						    req_xattr_value_len);
 			continue;
 		}
 		size = vfs_getxattr_alloc(&init_user_ns, dentry, xattr->name,
@@ -234,11 +274,24 @@ static int evm_calc_hmac_or_hash(struct dentry *dentry,
 		if (size < 0)
 			continue;
 
+		user_space_size = vfs_getxattr(&init_user_ns, dentry,
+					       xattr->name, NULL, 0);
+		if (user_space_size != size)
+			pr_debug("file %s: xattr %s size mismatch (kernel: %d, user: %d)\n",
+				 dentry->d_name.name, xattr->name, size,
+				 user_space_size);
 		error = 0;
 		xattr_size = size;
 		crypto_shash_update(desc, (const u8 *)xattr_value, xattr_size);
 		if (is_ima)
 			ima_present = true;
+
+		if (xattr_size < 64)
+			pr_debug("%s: (%zu) [%*phN]", xattr->name, xattr_size,
+				 (int)xattr_size, xattr_value);
+		else
+			dump_security_xattr(xattr->name, xattr_value,
+					    xattr_size);
 	}
 	hmac_add_misc(desc, inode, type, data->digest);
 

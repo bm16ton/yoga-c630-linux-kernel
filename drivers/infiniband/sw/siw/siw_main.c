@@ -98,15 +98,14 @@ static int siw_create_tx_threads(void)
 			continue;
 
 		siw_tx_thread[cpu] =
-			kthread_create(siw_run_sq, (unsigned long *)(long)cpu,
-				       "siw_tx/%d", cpu);
+			kthread_run_on_cpu(siw_run_sq,
+					   (unsigned long *)(long)cpu,
+					   cpu, "siw_tx/%u");
 		if (IS_ERR(siw_tx_thread[cpu])) {
 			siw_tx_thread[cpu] = NULL;
 			continue;
 		}
-		kthread_bind(siw_tx_thread[cpu], cpu);
 
-		wake_up_process(siw_tx_thread[cpu]);
 		assigned++;
 	}
 	return assigned;
@@ -120,6 +119,7 @@ static int siw_dev_qualified(struct net_device *netdev)
 	 * <linux/if_arp.h> for type identifiers.
 	 */
 	if (netdev->type == ARPHRD_ETHER || netdev->type == ARPHRD_IEEE802 ||
+	    netdev->type == ARPHRD_NONE ||
 	    (netdev->type == ARPHRD_LOOPBACK && loopback_enabled))
 		return 1;
 
@@ -297,6 +297,7 @@ static const struct ib_device_ops siw_device_ops = {
 
 	INIT_RDMA_OBJ_SIZE(ib_cq, siw_cq, base_cq),
 	INIT_RDMA_OBJ_SIZE(ib_pd, siw_pd, base_pd),
+	INIT_RDMA_OBJ_SIZE(ib_qp, siw_qp, base_qp),
 	INIT_RDMA_OBJ_SIZE(ib_srq, siw_srq, base_srq),
 	INIT_RDMA_OBJ_SIZE(ib_ucontext, siw_ucontext, base_ucontext),
 };
@@ -315,12 +316,12 @@ static struct siw_device *siw_device_create(struct net_device *netdev)
 
 	sdev->netdev = netdev;
 
-	if (netdev->type != ARPHRD_LOOPBACK) {
+	if (netdev->type != ARPHRD_LOOPBACK && netdev->type != ARPHRD_NONE) {
 		addrconf_addr_eui48((unsigned char *)&base_dev->node_guid,
 				    netdev->dev_addr);
 	} else {
 		/*
-		 * The loopback device does not have a HW address,
+		 * This device does not have a HW address,
 		 * but connection mangagement lib expects gid != 0
 		 */
 		size_t len = min_t(size_t, strlen(base_dev->name), 6);

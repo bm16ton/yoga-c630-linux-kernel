@@ -172,12 +172,6 @@
 #define MLXBF_I2C_SMBUS_THIGH_MAX_TBUF            0x14
 #define MLXBF_I2C_SMBUS_SCL_LOW_TIMEOUT           0x18
 
-enum {
-	MLXBF_I2C_TIMING_100KHZ = 100000,
-	MLXBF_I2C_TIMING_400KHZ = 400000,
-	MLXBF_I2C_TIMING_1000KHZ = 1000000,
-};
-
 /*
  * Defines SMBus operating frequency and core clock frequency.
  * According to ADB files, default values are compliant to 100KHz SMBus
@@ -317,6 +311,7 @@ static u64 mlxbf_i2c_corepll_frequency;
  * exact.
  */
 #define MLXBF_I2C_SMBUS_TIMEOUT   (300 * 1000) /* 300ms */
+#define MLXBF_I2C_SMBUS_LOCK_POLL_TIMEOUT (300 * 1000) /* 300ms */
 
 /* Encapsulates timing parameters. */
 struct mlxbf_i2c_timings {
@@ -527,6 +522,25 @@ static bool mlxbf_smbus_master_wait_for_idle(struct mlxbf_i2c_priv *priv)
 	return false;
 }
 
+/*
+ * wait for the lock to be released before acquiring it.
+ */
+static bool mlxbf_i2c_smbus_master_lock(struct mlxbf_i2c_priv *priv)
+{
+	if (mlxbf_smbus_poll(priv->smbus->io, MLXBF_I2C_SMBUS_MASTER_GW,
+			   MLXBF_I2C_MASTER_LOCK_BIT, true,
+			   MLXBF_I2C_SMBUS_LOCK_POLL_TIMEOUT))
+		return true;
+
+	return false;
+}
+
+static void mlxbf_i2c_smbus_master_unlock(struct mlxbf_i2c_priv *priv)
+{
+	/* Clear the gw to clear the lock */
+	writel(0, priv->smbus->io + MLXBF_I2C_SMBUS_MASTER_GW);
+}
+
 static bool mlxbf_i2c_smbus_transaction_success(u32 master_status,
 						u32 cause_status)
 {
@@ -718,9 +732,18 @@ mlxbf_i2c_smbus_start_transaction(struct mlxbf_i2c_priv *priv,
 	slave = request->slave & GENMASK(6, 0);
 	addr = slave << 1;
 
-	/* First of all, check whether the HW is idle. */
-	if (WARN_ON(!mlxbf_smbus_master_wait_for_idle(priv)))
+	/*
+	 * Try to acquire the smbus gw lock before any reads of the GW register since
+	 * a read sets the lock.
+	 */
+	if (WARN_ON(!mlxbf_i2c_smbus_master_lock(priv)))
 		return -EBUSY;
+
+	/* Check whether the HW is idle */
+	if (WARN_ON(!mlxbf_smbus_master_wait_for_idle(priv))) {
+		ret = -EBUSY;
+		goto out_unlock;
+	}
 
 	/* Set first byte. */
 	data_desc[data_idx++] = addr;
@@ -775,7 +798,7 @@ mlxbf_i2c_smbus_start_transaction(struct mlxbf_i2c_priv *priv,
 		ret = mlxbf_i2c_smbus_enable(priv, slave, write_len, block_en,
 					 pec_en, 0);
 		if (ret)
-			return ret;
+			goto out_unlock;
 	}
 
 	if (read_en) {
@@ -801,6 +824,9 @@ mlxbf_i2c_smbus_start_transaction(struct mlxbf_i2c_priv *priv,
 		writel(MLXBF_I2C_SMBUS_MASTER_FSM_PS_STATE_MASK,
 			priv->smbus->io + MLXBF_I2C_SMBUS_MASTER_FSM);
 	}
+
+out_unlock:
+	mlxbf_i2c_smbus_master_unlock(priv);
 
 	return ret;
 }
@@ -1202,7 +1228,7 @@ static int mlxbf_i2c_init_timings(struct platform_device *pdev,
 
 	ret = device_property_read_u32(dev, "clock-frequency", &config_khz);
 	if (ret < 0)
-		config_khz = MLXBF_I2C_TIMING_100KHZ;
+		config_khz = I2C_MAX_STANDARD_MODE_FREQ;
 
 	switch (config_khz) {
 	default:
@@ -1210,15 +1236,15 @@ static int mlxbf_i2c_init_timings(struct platform_device *pdev,
 		pr_warn("Illegal value %d: defaulting to 100 KHz\n",
 			config_khz);
 		fallthrough;
-	case MLXBF_I2C_TIMING_100KHZ:
+	case I2C_MAX_STANDARD_MODE_FREQ:
 		config_idx = MLXBF_I2C_TIMING_CONFIG_100KHZ;
 		break;
 
-	case MLXBF_I2C_TIMING_400KHZ:
+	case I2C_MAX_FAST_MODE_FREQ:
 		config_idx = MLXBF_I2C_TIMING_CONFIG_400KHZ;
 		break;
 
-	case MLXBF_I2C_TIMING_1000KHZ:
+	case I2C_MAX_FAST_MODE_PLUS_FREQ:
 		config_idx = MLXBF_I2C_TIMING_CONFIG_1000KHZ;
 		break;
 	}

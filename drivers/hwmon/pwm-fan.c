@@ -49,16 +49,6 @@ struct pwm_fan_ctx {
 	struct hwmon_channel_info fan_channel;
 };
 
-static const u32 pwm_fan_channel_config_pwm[] = {
-	HWMON_PWM_INPUT,
-	0
-};
-
-static const struct hwmon_channel_info pwm_fan_channel_pwm = {
-	.type = hwmon_pwm,
-	.config = pwm_fan_channel_config_pwm,
-};
-
 /* This handler assumes self resetting edge triggered interrupt. */
 static irqreturn_t pulse_handler(int irq, void *dev_id)
 {
@@ -336,8 +326,6 @@ static int pwm_fan_probe(struct platform_device *pdev)
 			return ret;
 	}
 
-	ctx->pwm_value = MAX_PWM;
-
 	pwm_init_state(ctx->pwm, &ctx->pwm_state);
 
 	/*
@@ -389,7 +377,7 @@ static int pwm_fan_probe(struct platform_device *pdev)
 	if (!channels)
 		return -ENOMEM;
 
-	channels[0] = &pwm_fan_channel_pwm;
+	channels[0] = HWMON_CHANNEL_INFO(pwm, HWMON_PWM_INPUT);
 
 	for (i = 0; i < ctx->tach_count; i++) {
 		struct pwm_fan_tach *tach = &ctx->tachs[i];

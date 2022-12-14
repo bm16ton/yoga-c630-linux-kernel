@@ -84,10 +84,6 @@ static void ks_wlan_hw_wakeup_task(struct work_struct *work)
 			return;
 		}
 	}
-
-	/* power save */
-	if (atomic_read(&priv->sme_task.count) > 0)
-		tasklet_enable(&priv->sme_task);
 }
 
 static void ks_wlan_do_power_save(struct ks_wlan_private *priv)
@@ -524,13 +520,11 @@ void hostif_mib_get_confirm(struct ks_wlan_private *priv)
 	struct net_device *dev = priv->net_dev;
 	u32 mib_status;
 	u32 mib_attribute;
-	u16 mib_val_size;
-	u16 mib_val_type;
 
 	mib_status = get_dword(priv);
 	mib_attribute = get_dword(priv);
-	mib_val_size = get_word(priv);
-	mib_val_type = get_word(priv);
+	get_word(priv); /* mib_val_size */
+	get_word(priv); /* mib_val_type */
 
 	if (mib_status) {
 		netdev_err(priv->net_dev, "attribute=%08X, status=%08X\n",
@@ -543,7 +537,7 @@ void hostif_mib_get_confirm(struct ks_wlan_private *priv)
 		hostif_sme_enqueue(priv, SME_GET_MAC_ADDRESS);
 		ether_addr_copy(priv->eth_addr, priv->rxp);
 		priv->mac_address_valid = true;
-		ether_addr_copy(dev->dev_addr, priv->eth_addr);
+		eth_hw_addr_set(dev, priv->eth_addr);
 		netdev_info(dev, "MAC ADDRESS = %pM\n", priv->eth_addr);
 		break;
 	case DOT11_PRODUCT_VERSION:
@@ -846,9 +840,7 @@ void hostif_ps_adhoc_set_confirm(struct ks_wlan_private *priv)
 static
 void hostif_infrastructure_set_confirm(struct ks_wlan_private *priv)
 {
-	u16 result_code;
-
-	result_code = get_word(priv);
+	get_word(priv); /* result_code */
 	priv->infra_status = 1;	/* infrastructure mode set */
 	hostif_sme_enqueue(priv, SME_MODE_SET_CONFIRM);
 }
@@ -926,14 +918,14 @@ static
 void hostif_phy_information_confirm(struct ks_wlan_private *priv)
 {
 	struct iw_statistics *wstats = &priv->wstats;
-	u8 rssi, signal, noise;
+	u8 rssi, signal;
 	u8 link_speed;
 	u32 transmitted_frame_count, received_fragment_count;
 	u32 failed_count, fcs_error_count;
 
 	rssi = get_byte(priv);
 	signal = get_byte(priv);
-	noise = get_byte(priv);
+	get_byte(priv); /* noise */
 	link_speed = get_byte(priv);
 	transmitted_frame_count = get_dword(priv);
 	received_fragment_count = get_dword(priv);
@@ -2204,10 +2196,11 @@ static void hostif_sme_execute(struct ks_wlan_private *priv, int event)
 	}
 }
 
-static
-void hostif_sme_task(struct tasklet_struct *t)
+static void hostif_sme_work(struct work_struct *work)
 {
-	struct ks_wlan_private *priv = from_tasklet(priv, t, sme_task);
+	struct ks_wlan_private *priv;
+
+	priv = container_of(work, struct ks_wlan_private, sme_work);
 
 	if (priv->dev_state < DEVICE_STATE_BOOT)
 		return;
@@ -2218,7 +2211,7 @@ void hostif_sme_task(struct tasklet_struct *t)
 	hostif_sme_execute(priv, priv->sme_i.event_buff[priv->sme_i.qhead]);
 	inc_smeqhead(priv);
 	if (cnt_smeqbody(priv) > 0)
-		tasklet_schedule(&priv->sme_task);
+		schedule_work(&priv->sme_work);
 }
 
 /* send to Station Management Entity module */
@@ -2233,7 +2226,7 @@ void hostif_sme_enqueue(struct ks_wlan_private *priv, u16 event)
 		netdev_err(priv->net_dev, "sme queue buffer overflow\n");
 	}
 
-	tasklet_schedule(&priv->sme_task);
+	schedule_work(&priv->sme_work);
 }
 
 static inline void hostif_aplist_init(struct ks_wlan_private *priv)
@@ -2258,7 +2251,7 @@ static inline void hostif_sme_init(struct ks_wlan_private *priv)
 	priv->sme_i.qtail = 0;
 	spin_lock_init(&priv->sme_i.sme_spin);
 	priv->sme_i.sme_flag = 0;
-	tasklet_setup(&priv->sme_task, hostif_sme_task);
+	INIT_WORK(&priv->sme_work, hostif_sme_work);
 }
 
 static inline void hostif_wpa_init(struct ks_wlan_private *priv)
@@ -2316,5 +2309,5 @@ int hostif_init(struct ks_wlan_private *priv)
 
 void hostif_exit(struct ks_wlan_private *priv)
 {
-	tasklet_kill(&priv->sme_task);
+	cancel_work_sync(&priv->sme_work);
 }

@@ -10,7 +10,7 @@
 
 #include <linux/pci.h>
 
-#define HL_PLDM_PCI_ELBI_TIMEOUT_MSEC	(HL_PCI_ELBI_TIMEOUT_MSEC * 10)
+#define HL_PLDM_PCI_ELBI_TIMEOUT_MSEC	(HL_PCI_ELBI_TIMEOUT_MSEC * 100)
 
 #define IATU_REGION_CTRL_REGION_EN_MASK		BIT(31)
 #define IATU_REGION_CTRL_MATCH_MODE_MASK	BIT(30)
@@ -83,6 +83,58 @@ static void hl_pci_bars_unmap(struct hl_device *hdev)
 	}
 
 	pci_release_regions(pdev);
+}
+
+int hl_pci_elbi_read(struct hl_device *hdev, u64 addr, u32 *data)
+{
+	struct pci_dev *pdev = hdev->pdev;
+	ktime_t timeout;
+	u64 msec;
+	u32 val;
+
+	if (hdev->pldm)
+		msec = HL_PLDM_PCI_ELBI_TIMEOUT_MSEC;
+	else
+		msec = HL_PCI_ELBI_TIMEOUT_MSEC;
+
+	/* Clear previous status */
+	pci_write_config_dword(pdev, mmPCI_CONFIG_ELBI_STS, 0);
+
+	pci_write_config_dword(pdev, mmPCI_CONFIG_ELBI_ADDR, (u32) addr);
+	pci_write_config_dword(pdev, mmPCI_CONFIG_ELBI_CTRL, 0);
+
+	timeout = ktime_add_ms(ktime_get(), msec);
+	for (;;) {
+		pci_read_config_dword(pdev, mmPCI_CONFIG_ELBI_STS, &val);
+		if (val & PCI_CONFIG_ELBI_STS_MASK)
+			break;
+		if (ktime_compare(ktime_get(), timeout) > 0) {
+			pci_read_config_dword(pdev, mmPCI_CONFIG_ELBI_STS,
+						&val);
+			break;
+		}
+
+		usleep_range(300, 500);
+	}
+
+	if ((val & PCI_CONFIG_ELBI_STS_MASK) == PCI_CONFIG_ELBI_STS_DONE) {
+		pci_read_config_dword(pdev, mmPCI_CONFIG_ELBI_DATA, data);
+
+		return 0;
+	}
+
+	if (val & PCI_CONFIG_ELBI_STS_ERR) {
+		dev_err(hdev->dev, "Error reading from ELBI\n");
+		return -EIO;
+	}
+
+	if (!(val & PCI_CONFIG_ELBI_STS_MASK)) {
+		dev_err(hdev->dev, "ELBI read didn't finish in time\n");
+		return -EIO;
+	}
+
+	dev_err(hdev->dev, "ELBI read has undefined bits in status\n");
+	return -EIO;
 }
 
 /**
@@ -173,27 +225,6 @@ int hl_pci_iatu_write(struct hl_device *hdev, u32 addr, u32 data)
 }
 
 /**
- * hl_pci_reset_link_through_bridge() - Reset PCI link.
- * @hdev: Pointer to hl_device structure.
- */
-static void hl_pci_reset_link_through_bridge(struct hl_device *hdev)
-{
-	struct pci_dev *pdev = hdev->pdev;
-	struct pci_dev *parent_port;
-	u16 val;
-
-	parent_port = pdev->bus->self;
-	pci_read_config_word(parent_port, PCI_BRIDGE_CONTROL, &val);
-	val |= PCI_BRIDGE_CTL_BUS_RESET;
-	pci_write_config_word(parent_port, PCI_BRIDGE_CONTROL, val);
-	ssleep(1);
-
-	val &= ~(PCI_BRIDGE_CTL_BUS_RESET);
-	pci_write_config_word(parent_port, PCI_BRIDGE_CONTROL, val);
-	ssleep(3);
-}
-
-/**
  * hl_pci_set_inbound_region() - Configure inbound region
  * @hdev: Pointer to hl_device structure.
  * @region: Inbound region number.
@@ -228,21 +259,19 @@ int hl_pci_set_inbound_region(struct hl_device *hdev, u8 region,
 	}
 
 	/* Point to the specified address */
-	rc |= hl_pci_iatu_write(hdev, offset + 0x14,
-			lower_32_bits(pci_region->addr));
-	rc |= hl_pci_iatu_write(hdev, offset + 0x18,
-			upper_32_bits(pci_region->addr));
+	rc |= hl_pci_iatu_write(hdev, offset + 0x14, lower_32_bits(pci_region->addr));
+	rc |= hl_pci_iatu_write(hdev, offset + 0x18, upper_32_bits(pci_region->addr));
+
+	/* Set bar type as memory */
 	rc |= hl_pci_iatu_write(hdev, offset + 0x0, 0);
 
 	/* Enable + bar/address match + match enable + bar number */
 	ctrl_reg_val = FIELD_PREP(IATU_REGION_CTRL_REGION_EN_MASK, 1);
-	ctrl_reg_val |= FIELD_PREP(IATU_REGION_CTRL_MATCH_MODE_MASK,
-			pci_region->mode);
+	ctrl_reg_val |= FIELD_PREP(IATU_REGION_CTRL_MATCH_MODE_MASK, pci_region->mode);
 	ctrl_reg_val |= FIELD_PREP(IATU_REGION_CTRL_NUM_MATCH_EN_MASK, 1);
 
 	if (pci_region->mode == PCI_BAR_MATCH_MODE)
-		ctrl_reg_val |= FIELD_PREP(IATU_REGION_CTRL_BAR_NUM_MASK,
-				pci_region->bar);
+		ctrl_reg_val |= FIELD_PREP(IATU_REGION_CTRL_BAR_NUM_MASK, pci_region->bar);
 
 	rc |= hl_pci_iatu_write(hdev, offset + 0x4, ctrl_reg_val);
 
@@ -286,10 +315,7 @@ int hl_pci_set_outbound_region(struct hl_device *hdev,
 				lower_32_bits(outbound_region_end_address));
 	rc |= hl_pci_iatu_write(hdev, 0x014, 0);
 
-	if ((hdev->power9_64bit_dma_enable) && (hdev->dma_mask == 64))
-		rc |= hl_pci_iatu_write(hdev, 0x018, 0x08000000);
-	else
-		rc |= hl_pci_iatu_write(hdev, 0x018, 0);
+	rc |= hl_pci_iatu_write(hdev, 0x018, 0);
 
 	rc |= hl_pci_iatu_write(hdev, 0x020,
 				upper_32_bits(outbound_region_end_address));
@@ -308,6 +334,32 @@ int hl_pci_set_outbound_region(struct hl_device *hdev,
 }
 
 /**
+ * hl_get_pci_memory_region() - get PCI region for given address
+ * @hdev: Pointer to hl_device structure.
+ * @addr: device address
+ *
+ * @return region index on success, otherwise PCI_REGION_NUMBER (invalid
+ *         region index)
+ */
+enum pci_region hl_get_pci_memory_region(struct hl_device *hdev, u64 addr)
+{
+	int i;
+
+	for  (i = 0 ; i < PCI_REGION_NUMBER ; i++) {
+		struct pci_mem_region *region = &hdev->pci_mem_region[i];
+
+		if (!region->used)
+			continue;
+
+		if ((addr >= region->region_base) &&
+			(addr < region->region_base + region->region_size))
+			return i;
+	}
+
+	return PCI_REGION_NUMBER;
+}
+
+/**
  * hl_pci_init() - PCI initialization code.
  * @hdev: Pointer to hl_device structure.
  *
@@ -317,11 +369,9 @@ int hl_pci_set_outbound_region(struct hl_device *hdev,
  */
 int hl_pci_init(struct hl_device *hdev)
 {
+	struct asic_fixed_properties *prop = &hdev->asic_prop;
 	struct pci_dev *pdev = hdev->pdev;
 	int rc;
-
-	if (hdev->reset_pcilink)
-		hl_pci_reset_link_through_bridge(hdev);
 
 	rc = pci_enable_device_mem(pdev);
 	if (rc) {
@@ -333,24 +383,29 @@ int hl_pci_init(struct hl_device *hdev)
 
 	rc = hdev->asic_funcs->pci_bars_map(hdev);
 	if (rc) {
-		dev_err(hdev->dev, "Failed to initialize PCI BARs\n");
+		dev_err(hdev->dev, "Failed to map PCI BAR addresses\n");
 		goto disable_device;
 	}
 
 	rc = hdev->asic_funcs->init_iatu(hdev);
 	if (rc) {
-		dev_err(hdev->dev, "Failed to initialize iATU\n");
+		dev_err(hdev->dev, "PCI controller was not initialized successfully\n");
 		goto unmap_pci_bars;
 	}
 
-	rc = dma_set_mask_and_coherent(&pdev->dev,
-					DMA_BIT_MASK(hdev->dma_mask));
+	/* Driver must sleep in order for FW to finish the iATU configuration */
+	if (hdev->asic_prop.iatu_done_by_fw)
+		usleep_range(2000, 3000);
+
+	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(prop->dma_mask));
 	if (rc) {
 		dev_err(hdev->dev,
 			"Failed to set dma mask to %d bits, error %d\n",
-			hdev->dma_mask, rc);
+			prop->dma_mask, rc);
 		goto unmap_pci_bars;
 	}
+
+	dma_set_max_seg_size(&pdev->dev, U32_MAX);
 
 	return 0;
 
@@ -364,7 +419,7 @@ disable_device:
 }
 
 /**
- * hl_fw_fini() - PCI finalization code.
+ * hl_pci_fini() - PCI finalization code.
  * @hdev: Pointer to hl_device structure
  *
  * Unmap PCI bars and disable PCI device.

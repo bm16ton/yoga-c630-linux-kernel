@@ -191,8 +191,7 @@ static int pppol2tp_recvmsg(struct socket *sock, struct msghdr *msg,
 		goto end;
 
 	err = 0;
-	skb = skb_recv_datagram(sk, flags & ~MSG_DONTWAIT,
-				flags & MSG_DONTWAIT, &err);
+	skb = skb_recv_datagram(sk, flags, &err);
 	if (!skb)
 		goto end;
 
@@ -226,7 +225,7 @@ static void pppol2tp_recv(struct l2tp_session *session, struct sk_buff *skb, int
 	/* If the first two bytes are 0xFF03, consider that it is the PPP's
 	 * Address and Control fields and skip them. The L2TP module has always
 	 * worked this way, although, in theory, the use of these fields should
-	 * be negociated and handled at the PPP layer. These fields are
+	 * be negotiated and handled at the PPP layer. These fields are
 	 * constant: 0xFF is the All-Stations Address and 0x03 the Unnumbered
 	 * Information command with Poll/Final bit set to zero (RFC 1662).
 	 */
@@ -1554,7 +1553,7 @@ static void pppol2tp_seq_session_show(struct seq_file *m, void *v)
 		   session->lns_mode ? "LNS" : "LAC",
 		   0,
 		   jiffies_to_msecs(session->reorder_timeout));
-	seq_printf(m, "   %hu/%hu %ld/%ld/%ld %ld/%ld/%ld\n",
+	seq_printf(m, "   %u/%u %ld/%ld/%ld %ld/%ld/%ld\n",
 		   session->nr, session->ns,
 		   atomic_long_read(&session->stats.tx_packets),
 		   atomic_long_read(&session->stats.tx_bytes),

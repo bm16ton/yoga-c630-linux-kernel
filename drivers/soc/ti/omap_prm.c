@@ -88,6 +88,7 @@ struct omap_reset_data {
 #define OMAP_PRM_HAS_RSTCTRL	BIT(0)
 #define OMAP_PRM_HAS_RSTST	BIT(1)
 #define OMAP_PRM_HAS_NO_CLKDM	BIT(2)
+#define OMAP_PRM_RET_WHEN_IDLE	BIT(3)
 
 #define OMAP_PRM_HAS_RESETS	(OMAP_PRM_HAS_RSTCTRL | OMAP_PRM_HAS_RSTST)
 
@@ -174,7 +175,8 @@ static const struct omap_prm_data omap4_prm_data[] = {
 		.name = "core", .base = 0x4a306700,
 		.pwrstctrl = 0x0, .pwrstst = 0x4, .dmap = &omap_prm_reton,
 		.rstctrl = 0x210, .rstst = 0x214, .clkdm_name = "ducati",
-		.rstmap = rst_map_012
+		.rstmap = rst_map_012,
+		.flags = OMAP_PRM_RET_WHEN_IDLE,
 	},
 	{
 		.name = "ivahd", .base = 0x4a306f00,
@@ -199,7 +201,8 @@ static const struct omap_prm_data omap4_prm_data[] = {
 	},
 	{
 		.name = "l4per", .base = 0x4a307400,
-		.pwrstctrl = 0x0, .pwrstst = 0x4, .dmap = &omap_prm_reton
+		.pwrstctrl = 0x0, .pwrstst = 0x4, .dmap = &omap_prm_reton,
+		.flags = OMAP_PRM_RET_WHEN_IDLE,
 	},
 	{
 		.name = "cefuse", .base = 0x4a307600,
@@ -517,7 +520,7 @@ static int omap_prm_domain_power_on(struct generic_pm_domain *domain)
 {
 	struct omap_prm_domain *prmd;
 	int ret;
-	u32 v;
+	u32 v, mode;
 
 	prmd = genpd_to_prm_domain(domain);
 	if (!prmd->cap)
@@ -530,7 +533,12 @@ static int omap_prm_domain_power_on(struct generic_pm_domain *domain)
 	else
 		v = readl_relaxed(prmd->prm->base + prmd->pwrstctrl);
 
-	writel_relaxed(v | OMAP_PRMD_ON_ACTIVE,
+	if (prmd->prm->data->flags & OMAP_PRM_RET_WHEN_IDLE)
+		mode = OMAP_PRMD_RETENTION;
+	else
+		mode = OMAP_PRMD_ON_ACTIVE;
+
+	writel_relaxed((v & ~PRM_POWERSTATE_MASK) | mode,
 		       prmd->prm->base + prmd->pwrstctrl);
 
 	/* wait for the transition bit to get cleared */
@@ -817,25 +825,28 @@ static int omap_reset_deassert(struct reset_controller_dev *rcdev,
 	writel_relaxed(v, reset->prm->base + reset->prm->data->rstctrl);
 	spin_unlock_irqrestore(&reset->lock, flags);
 
-	if (!has_rstst)
-		goto exit;
-
-	/* wait for the status to be set */
+	/* wait for the reset bit to clear */
 	ret = readl_relaxed_poll_timeout_atomic(reset->prm->base +
-						 reset->prm->data->rstst,
-						 v, v & BIT(st_bit), 1,
-						 OMAP_RESET_MAX_WAIT);
+						reset->prm->data->rstctrl,
+						v, !(v & BIT(id)), 1,
+						OMAP_RESET_MAX_WAIT);
 	if (ret)
 		pr_err("%s: timedout waiting for %s:%lu\n", __func__,
 		       reset->prm->data->name, id);
 
-exit:
-	if (reset->clkdm) {
-		/* At least dra7 iva needs a delay before clkdm idle */
-		if (has_rstst)
-			udelay(1);
-		pdata->clkdm_allow_idle(reset->clkdm);
+	/* wait for the status to be set */
+	if (has_rstst) {
+		ret = readl_relaxed_poll_timeout_atomic(reset->prm->base +
+						 reset->prm->data->rstst,
+						 v, v & BIT(st_bit), 1,
+						 OMAP_RESET_MAX_WAIT);
+		if (ret)
+			pr_err("%s: timedout waiting for %s:%lu\n", __func__,
+			       reset->prm->data->name, id);
 	}
+
+	if (reset->clkdm)
+		pdata->clkdm_allow_idle(reset->clkdm);
 
 	return ret;
 }
@@ -930,22 +941,19 @@ static int omap_prm_probe(struct platform_device *pdev)
 	struct resource *res;
 	const struct omap_prm_data *data;
 	struct omap_prm *prm;
-	const struct of_device_id *match;
 	int ret;
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (!res)
 		return -ENODEV;
 
-	match = of_match_device(omap_prm_id_table, &pdev->dev);
-	if (!match)
+	data = of_device_get_match_data(&pdev->dev);
+	if (!data)
 		return -ENOTSUPP;
 
 	prm = devm_kzalloc(&pdev->dev, sizeof(*prm), GFP_KERNEL);
 	if (!prm)
 		return -ENOMEM;
-
-	data = match->data;
 
 	while (data->base != res->start) {
 		if (!data->base)

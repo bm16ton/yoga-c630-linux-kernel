@@ -26,7 +26,7 @@
  * for transport over USB using a simpler USB device model than the
  * previous CDC "Ethernet Control Model" (ECM, or "CDC Ethernet").
  *
- * For details, see www.usb.org/developers/devclass_docs/CDC_EEM10.pdf
+ * For details, see https://usb.org/sites/default/files/CDC_EEM10.pdf
  *
  * This version has been tested with GIGAntIC WuaoW SIM Smart Card on 2.6.24,
  * 2.6.27 and 2.6.30rc2 kernel.
@@ -218,7 +218,7 @@ static int eem_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 				if (unlikely(!skb2))
 					goto next;
 				skb_trim(skb2, len);
-				put_unaligned_le16(BIT(15) | (1 << 11) | len,
+				put_unaligned_le16(BIT(15) | BIT(11) | len,
 						skb_push(skb2, 2));
 				eem_linkcmd(dev, skb2);
 				break;

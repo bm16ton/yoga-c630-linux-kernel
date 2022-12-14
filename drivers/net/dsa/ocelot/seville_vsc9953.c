@@ -6,18 +6,37 @@
 #include <soc/mscc/ocelot_vcap.h>
 #include <soc/mscc/ocelot_sys.h>
 #include <soc/mscc/ocelot.h>
+#include <linux/mdio/mdio-mscc-miim.h>
+#include <linux/of_mdio.h>
 #include <linux/of_platform.h>
 #include <linux/pcs-lynx.h>
 #include <linux/dsa/ocelot.h>
 #include <linux/iopoll.h>
 #include "felix.h"
 
-#define MSCC_MIIM_CMD_OPR_WRITE			BIT(1)
-#define MSCC_MIIM_CMD_OPR_READ			BIT(2)
-#define MSCC_MIIM_CMD_WRDATA_SHIFT		4
-#define MSCC_MIIM_CMD_REGAD_SHIFT		20
-#define MSCC_MIIM_CMD_PHYAD_SHIFT		25
-#define MSCC_MIIM_CMD_VLD			BIT(31)
+#define VSC9953_NUM_PORTS			10
+
+#define VSC9953_VCAP_POLICER_BASE		11
+#define VSC9953_VCAP_POLICER_MAX		31
+#define VSC9953_VCAP_POLICER_BASE2		120
+#define VSC9953_VCAP_POLICER_MAX2		161
+
+#define VSC9953_PORT_MODE_SERDES		(OCELOT_PORT_MODE_1000BASEX | \
+						 OCELOT_PORT_MODE_SGMII | \
+						 OCELOT_PORT_MODE_QSGMII)
+
+static const u32 vsc9953_port_modes[VSC9953_NUM_PORTS] = {
+	VSC9953_PORT_MODE_SERDES,
+	VSC9953_PORT_MODE_SERDES,
+	VSC9953_PORT_MODE_SERDES,
+	VSC9953_PORT_MODE_SERDES,
+	VSC9953_PORT_MODE_SERDES,
+	VSC9953_PORT_MODE_SERDES,
+	VSC9953_PORT_MODE_SERDES,
+	VSC9953_PORT_MODE_SERDES,
+	OCELOT_PORT_MODE_INTERNAL,
+	OCELOT_PORT_MODE_INTERNAL,
+};
 
 static const u32 vsc9953_ana_regmap[] = {
 	REG(ANA_ADVLEARN,			0x00b500),
@@ -251,27 +270,98 @@ static const u32 vsc9953_rew_regmap[] = {
 
 static const u32 vsc9953_sys_regmap[] = {
 	REG(SYS_COUNT_RX_OCTETS,		0x000000),
+	REG(SYS_COUNT_RX_UNICAST,		0x000004),
 	REG(SYS_COUNT_RX_MULTICAST,		0x000008),
+	REG(SYS_COUNT_RX_BROADCAST,		0x00000c),
 	REG(SYS_COUNT_RX_SHORTS,		0x000010),
 	REG(SYS_COUNT_RX_FRAGMENTS,		0x000014),
 	REG(SYS_COUNT_RX_JABBERS,		0x000018),
+	REG(SYS_COUNT_RX_CRC_ALIGN_ERRS,	0x00001c),
+	REG(SYS_COUNT_RX_SYM_ERRS,		0x000020),
 	REG(SYS_COUNT_RX_64,			0x000024),
 	REG(SYS_COUNT_RX_65_127,		0x000028),
 	REG(SYS_COUNT_RX_128_255,		0x00002c),
-	REG(SYS_COUNT_RX_256_1023,		0x000030),
-	REG(SYS_COUNT_RX_1024_1526,		0x000034),
-	REG(SYS_COUNT_RX_1527_MAX,		0x000038),
+	REG(SYS_COUNT_RX_256_511,		0x000030),
+	REG(SYS_COUNT_RX_512_1023,		0x000034),
+	REG(SYS_COUNT_RX_1024_1526,		0x000038),
+	REG(SYS_COUNT_RX_1527_MAX,		0x00003c),
+	REG(SYS_COUNT_RX_PAUSE,			0x000040),
+	REG(SYS_COUNT_RX_CONTROL,		0x000044),
 	REG(SYS_COUNT_RX_LONGS,			0x000048),
+	REG(SYS_COUNT_RX_CLASSIFIED_DROPS,	0x00004c),
+	REG(SYS_COUNT_RX_RED_PRIO_0,		0x000050),
+	REG(SYS_COUNT_RX_RED_PRIO_1,		0x000054),
+	REG(SYS_COUNT_RX_RED_PRIO_2,		0x000058),
+	REG(SYS_COUNT_RX_RED_PRIO_3,		0x00005c),
+	REG(SYS_COUNT_RX_RED_PRIO_4,		0x000060),
+	REG(SYS_COUNT_RX_RED_PRIO_5,		0x000064),
+	REG(SYS_COUNT_RX_RED_PRIO_6,		0x000068),
+	REG(SYS_COUNT_RX_RED_PRIO_7,		0x00006c),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_0,		0x000070),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_1,		0x000074),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_2,		0x000078),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_3,		0x00007c),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_4,		0x000080),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_5,		0x000084),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_6,		0x000088),
+	REG(SYS_COUNT_RX_YELLOW_PRIO_7,		0x00008c),
+	REG(SYS_COUNT_RX_GREEN_PRIO_0,		0x000090),
+	REG(SYS_COUNT_RX_GREEN_PRIO_1,		0x000094),
+	REG(SYS_COUNT_RX_GREEN_PRIO_2,		0x000098),
+	REG(SYS_COUNT_RX_GREEN_PRIO_3,		0x00009c),
+	REG(SYS_COUNT_RX_GREEN_PRIO_4,		0x0000a0),
+	REG(SYS_COUNT_RX_GREEN_PRIO_5,		0x0000a4),
+	REG(SYS_COUNT_RX_GREEN_PRIO_6,		0x0000a8),
+	REG(SYS_COUNT_RX_GREEN_PRIO_7,		0x0000ac),
 	REG(SYS_COUNT_TX_OCTETS,		0x000100),
+	REG(SYS_COUNT_TX_UNICAST,		0x000104),
+	REG(SYS_COUNT_TX_MULTICAST,		0x000108),
+	REG(SYS_COUNT_TX_BROADCAST,		0x00010c),
 	REG(SYS_COUNT_TX_COLLISION,		0x000110),
 	REG(SYS_COUNT_TX_DROPS,			0x000114),
+	REG(SYS_COUNT_TX_PAUSE,			0x000118),
 	REG(SYS_COUNT_TX_64,			0x00011c),
 	REG(SYS_COUNT_TX_65_127,		0x000120),
-	REG(SYS_COUNT_TX_128_511,		0x000124),
-	REG(SYS_COUNT_TX_512_1023,		0x000128),
-	REG(SYS_COUNT_TX_1024_1526,		0x00012c),
-	REG(SYS_COUNT_TX_1527_MAX,		0x000130),
+	REG(SYS_COUNT_TX_128_255,		0x000124),
+	REG(SYS_COUNT_TX_256_511,		0x000128),
+	REG(SYS_COUNT_TX_512_1023,		0x00012c),
+	REG(SYS_COUNT_TX_1024_1526,		0x000130),
+	REG(SYS_COUNT_TX_1527_MAX,		0x000134),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_0,		0x000138),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_1,		0x00013c),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_2,		0x000140),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_3,		0x000144),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_4,		0x000148),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_5,		0x00014c),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_6,		0x000150),
+	REG(SYS_COUNT_TX_YELLOW_PRIO_7,		0x000154),
+	REG(SYS_COUNT_TX_GREEN_PRIO_0,		0x000158),
+	REG(SYS_COUNT_TX_GREEN_PRIO_1,		0x00015c),
+	REG(SYS_COUNT_TX_GREEN_PRIO_2,		0x000160),
+	REG(SYS_COUNT_TX_GREEN_PRIO_3,		0x000164),
+	REG(SYS_COUNT_TX_GREEN_PRIO_4,		0x000168),
+	REG(SYS_COUNT_TX_GREEN_PRIO_5,		0x00016c),
+	REG(SYS_COUNT_TX_GREEN_PRIO_6,		0x000170),
+	REG(SYS_COUNT_TX_GREEN_PRIO_7,		0x000174),
 	REG(SYS_COUNT_TX_AGING,			0x000178),
+	REG(SYS_COUNT_DROP_LOCAL,		0x000200),
+	REG(SYS_COUNT_DROP_TAIL,		0x000204),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_0,	0x000208),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_1,	0x00020c),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_2,	0x000210),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_3,	0x000214),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_4,	0x000218),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_5,	0x00021c),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_6,	0x000220),
+	REG(SYS_COUNT_DROP_YELLOW_PRIO_7,	0x000224),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_0,	0x000228),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_1,	0x00022c),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_2,	0x000230),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_3,	0x000234),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_4,	0x000238),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_5,	0x00023c),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_6,	0x000240),
+	REG(SYS_COUNT_DROP_GREEN_PRIO_7,	0x000244),
 	REG(SYS_RESET_CFG,			0x000318),
 	REG_RESERVED(SYS_SR_ETYPE_CFG),
 	REG(SYS_VLAN_ETYPE_CFG,			0x000320),
@@ -524,100 +614,379 @@ static const struct reg_field vsc9953_regfields[REGFIELD_MAX] = {
 	[SYS_PAUSE_CFG_PAUSE_ENA] = REG_FIELD_ID(SYS_PAUSE_CFG, 0, 1, 11, 4),
 };
 
-static const struct ocelot_stat_layout vsc9953_stats_layout[] = {
-	{ .offset = 0x00,	.name = "rx_octets", },
-	{ .offset = 0x01,	.name = "rx_unicast", },
-	{ .offset = 0x02,	.name = "rx_multicast", },
-	{ .offset = 0x03,	.name = "rx_broadcast", },
-	{ .offset = 0x04,	.name = "rx_shorts", },
-	{ .offset = 0x05,	.name = "rx_fragments", },
-	{ .offset = 0x06,	.name = "rx_jabbers", },
-	{ .offset = 0x07,	.name = "rx_crc_align_errs", },
-	{ .offset = 0x08,	.name = "rx_sym_errs", },
-	{ .offset = 0x09,	.name = "rx_frames_below_65_octets", },
-	{ .offset = 0x0A,	.name = "rx_frames_65_to_127_octets", },
-	{ .offset = 0x0B,	.name = "rx_frames_128_to_255_octets", },
-	{ .offset = 0x0C,	.name = "rx_frames_256_to_511_octets", },
-	{ .offset = 0x0D,	.name = "rx_frames_512_to_1023_octets", },
-	{ .offset = 0x0E,	.name = "rx_frames_1024_to_1526_octets", },
-	{ .offset = 0x0F,	.name = "rx_frames_over_1526_octets", },
-	{ .offset = 0x10,	.name = "rx_pause", },
-	{ .offset = 0x11,	.name = "rx_control", },
-	{ .offset = 0x12,	.name = "rx_longs", },
-	{ .offset = 0x13,	.name = "rx_classified_drops", },
-	{ .offset = 0x14,	.name = "rx_red_prio_0", },
-	{ .offset = 0x15,	.name = "rx_red_prio_1", },
-	{ .offset = 0x16,	.name = "rx_red_prio_2", },
-	{ .offset = 0x17,	.name = "rx_red_prio_3", },
-	{ .offset = 0x18,	.name = "rx_red_prio_4", },
-	{ .offset = 0x19,	.name = "rx_red_prio_5", },
-	{ .offset = 0x1A,	.name = "rx_red_prio_6", },
-	{ .offset = 0x1B,	.name = "rx_red_prio_7", },
-	{ .offset = 0x1C,	.name = "rx_yellow_prio_0", },
-	{ .offset = 0x1D,	.name = "rx_yellow_prio_1", },
-	{ .offset = 0x1E,	.name = "rx_yellow_prio_2", },
-	{ .offset = 0x1F,	.name = "rx_yellow_prio_3", },
-	{ .offset = 0x20,	.name = "rx_yellow_prio_4", },
-	{ .offset = 0x21,	.name = "rx_yellow_prio_5", },
-	{ .offset = 0x22,	.name = "rx_yellow_prio_6", },
-	{ .offset = 0x23,	.name = "rx_yellow_prio_7", },
-	{ .offset = 0x24,	.name = "rx_green_prio_0", },
-	{ .offset = 0x25,	.name = "rx_green_prio_1", },
-	{ .offset = 0x26,	.name = "rx_green_prio_2", },
-	{ .offset = 0x27,	.name = "rx_green_prio_3", },
-	{ .offset = 0x28,	.name = "rx_green_prio_4", },
-	{ .offset = 0x29,	.name = "rx_green_prio_5", },
-	{ .offset = 0x2A,	.name = "rx_green_prio_6", },
-	{ .offset = 0x2B,	.name = "rx_green_prio_7", },
-	{ .offset = 0x40,	.name = "tx_octets", },
-	{ .offset = 0x41,	.name = "tx_unicast", },
-	{ .offset = 0x42,	.name = "tx_multicast", },
-	{ .offset = 0x43,	.name = "tx_broadcast", },
-	{ .offset = 0x44,	.name = "tx_collision", },
-	{ .offset = 0x45,	.name = "tx_drops", },
-	{ .offset = 0x46,	.name = "tx_pause", },
-	{ .offset = 0x47,	.name = "tx_frames_below_65_octets", },
-	{ .offset = 0x48,	.name = "tx_frames_65_to_127_octets", },
-	{ .offset = 0x49,	.name = "tx_frames_128_255_octets", },
-	{ .offset = 0x4A,	.name = "tx_frames_256_511_octets", },
-	{ .offset = 0x4B,	.name = "tx_frames_512_1023_octets", },
-	{ .offset = 0x4C,	.name = "tx_frames_1024_1526_octets", },
-	{ .offset = 0x4D,	.name = "tx_frames_over_1526_octets", },
-	{ .offset = 0x4E,	.name = "tx_yellow_prio_0", },
-	{ .offset = 0x4F,	.name = "tx_yellow_prio_1", },
-	{ .offset = 0x50,	.name = "tx_yellow_prio_2", },
-	{ .offset = 0x51,	.name = "tx_yellow_prio_3", },
-	{ .offset = 0x52,	.name = "tx_yellow_prio_4", },
-	{ .offset = 0x53,	.name = "tx_yellow_prio_5", },
-	{ .offset = 0x54,	.name = "tx_yellow_prio_6", },
-	{ .offset = 0x55,	.name = "tx_yellow_prio_7", },
-	{ .offset = 0x56,	.name = "tx_green_prio_0", },
-	{ .offset = 0x57,	.name = "tx_green_prio_1", },
-	{ .offset = 0x58,	.name = "tx_green_prio_2", },
-	{ .offset = 0x59,	.name = "tx_green_prio_3", },
-	{ .offset = 0x5A,	.name = "tx_green_prio_4", },
-	{ .offset = 0x5B,	.name = "tx_green_prio_5", },
-	{ .offset = 0x5C,	.name = "tx_green_prio_6", },
-	{ .offset = 0x5D,	.name = "tx_green_prio_7", },
-	{ .offset = 0x5E,	.name = "tx_aged", },
-	{ .offset = 0x80,	.name = "drop_local", },
-	{ .offset = 0x81,	.name = "drop_tail", },
-	{ .offset = 0x82,	.name = "drop_yellow_prio_0", },
-	{ .offset = 0x83,	.name = "drop_yellow_prio_1", },
-	{ .offset = 0x84,	.name = "drop_yellow_prio_2", },
-	{ .offset = 0x85,	.name = "drop_yellow_prio_3", },
-	{ .offset = 0x86,	.name = "drop_yellow_prio_4", },
-	{ .offset = 0x87,	.name = "drop_yellow_prio_5", },
-	{ .offset = 0x88,	.name = "drop_yellow_prio_6", },
-	{ .offset = 0x89,	.name = "drop_yellow_prio_7", },
-	{ .offset = 0x8A,	.name = "drop_green_prio_0", },
-	{ .offset = 0x8B,	.name = "drop_green_prio_1", },
-	{ .offset = 0x8C,	.name = "drop_green_prio_2", },
-	{ .offset = 0x8D,	.name = "drop_green_prio_3", },
-	{ .offset = 0x8E,	.name = "drop_green_prio_4", },
-	{ .offset = 0x8F,	.name = "drop_green_prio_5", },
-	{ .offset = 0x90,	.name = "drop_green_prio_6", },
-	{ .offset = 0x91,	.name = "drop_green_prio_7", },
+static const struct ocelot_stat_layout vsc9953_stats_layout[OCELOT_NUM_STATS] = {
+	[OCELOT_STAT_RX_OCTETS] = {
+		.name = "rx_octets",
+		.reg = SYS_COUNT_RX_OCTETS,
+	},
+	[OCELOT_STAT_RX_UNICAST] = {
+		.name = "rx_unicast",
+		.reg = SYS_COUNT_RX_UNICAST,
+	},
+	[OCELOT_STAT_RX_MULTICAST] = {
+		.name = "rx_multicast",
+		.reg = SYS_COUNT_RX_MULTICAST,
+	},
+	[OCELOT_STAT_RX_BROADCAST] = {
+		.name = "rx_broadcast",
+		.reg = SYS_COUNT_RX_BROADCAST,
+	},
+	[OCELOT_STAT_RX_SHORTS] = {
+		.name = "rx_shorts",
+		.reg = SYS_COUNT_RX_SHORTS,
+	},
+	[OCELOT_STAT_RX_FRAGMENTS] = {
+		.name = "rx_fragments",
+		.reg = SYS_COUNT_RX_FRAGMENTS,
+	},
+	[OCELOT_STAT_RX_JABBERS] = {
+		.name = "rx_jabbers",
+		.reg = SYS_COUNT_RX_JABBERS,
+	},
+	[OCELOT_STAT_RX_CRC_ALIGN_ERRS] = {
+		.name = "rx_crc_align_errs",
+		.reg = SYS_COUNT_RX_CRC_ALIGN_ERRS,
+	},
+	[OCELOT_STAT_RX_SYM_ERRS] = {
+		.name = "rx_sym_errs",
+		.reg = SYS_COUNT_RX_SYM_ERRS,
+	},
+	[OCELOT_STAT_RX_64] = {
+		.name = "rx_frames_below_65_octets",
+		.reg = SYS_COUNT_RX_64,
+	},
+	[OCELOT_STAT_RX_65_127] = {
+		.name = "rx_frames_65_to_127_octets",
+		.reg = SYS_COUNT_RX_65_127,
+	},
+	[OCELOT_STAT_RX_128_255] = {
+		.name = "rx_frames_128_to_255_octets",
+		.reg = SYS_COUNT_RX_128_255,
+	},
+	[OCELOT_STAT_RX_256_511] = {
+		.name = "rx_frames_256_to_511_octets",
+		.reg = SYS_COUNT_RX_256_511,
+	},
+	[OCELOT_STAT_RX_512_1023] = {
+		.name = "rx_frames_512_to_1023_octets",
+		.reg = SYS_COUNT_RX_512_1023,
+	},
+	[OCELOT_STAT_RX_1024_1526] = {
+		.name = "rx_frames_1024_to_1526_octets",
+		.reg = SYS_COUNT_RX_1024_1526,
+	},
+	[OCELOT_STAT_RX_1527_MAX] = {
+		.name = "rx_frames_over_1526_octets",
+		.reg = SYS_COUNT_RX_1527_MAX,
+	},
+	[OCELOT_STAT_RX_PAUSE] = {
+		.name = "rx_pause",
+		.reg = SYS_COUNT_RX_PAUSE,
+	},
+	[OCELOT_STAT_RX_CONTROL] = {
+		.name = "rx_control",
+		.reg = SYS_COUNT_RX_CONTROL,
+	},
+	[OCELOT_STAT_RX_LONGS] = {
+		.name = "rx_longs",
+		.reg = SYS_COUNT_RX_LONGS,
+	},
+	[OCELOT_STAT_RX_CLASSIFIED_DROPS] = {
+		.name = "rx_classified_drops",
+		.reg = SYS_COUNT_RX_CLASSIFIED_DROPS,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_0] = {
+		.name = "rx_red_prio_0",
+		.reg = SYS_COUNT_RX_RED_PRIO_0,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_1] = {
+		.name = "rx_red_prio_1",
+		.reg = SYS_COUNT_RX_RED_PRIO_1,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_2] = {
+		.name = "rx_red_prio_2",
+		.reg = SYS_COUNT_RX_RED_PRIO_2,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_3] = {
+		.name = "rx_red_prio_3",
+		.reg = SYS_COUNT_RX_RED_PRIO_3,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_4] = {
+		.name = "rx_red_prio_4",
+		.reg = SYS_COUNT_RX_RED_PRIO_4,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_5] = {
+		.name = "rx_red_prio_5",
+		.reg = SYS_COUNT_RX_RED_PRIO_5,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_6] = {
+		.name = "rx_red_prio_6",
+		.reg = SYS_COUNT_RX_RED_PRIO_6,
+	},
+	[OCELOT_STAT_RX_RED_PRIO_7] = {
+		.name = "rx_red_prio_7",
+		.reg = SYS_COUNT_RX_RED_PRIO_7,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_0] = {
+		.name = "rx_yellow_prio_0",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_0,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_1] = {
+		.name = "rx_yellow_prio_1",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_1,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_2] = {
+		.name = "rx_yellow_prio_2",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_2,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_3] = {
+		.name = "rx_yellow_prio_3",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_3,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_4] = {
+		.name = "rx_yellow_prio_4",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_4,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_5] = {
+		.name = "rx_yellow_prio_5",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_5,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_6] = {
+		.name = "rx_yellow_prio_6",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_6,
+	},
+	[OCELOT_STAT_RX_YELLOW_PRIO_7] = {
+		.name = "rx_yellow_prio_7",
+		.reg = SYS_COUNT_RX_YELLOW_PRIO_7,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_0] = {
+		.name = "rx_green_prio_0",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_0,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_1] = {
+		.name = "rx_green_prio_1",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_1,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_2] = {
+		.name = "rx_green_prio_2",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_2,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_3] = {
+		.name = "rx_green_prio_3",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_3,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_4] = {
+		.name = "rx_green_prio_4",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_4,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_5] = {
+		.name = "rx_green_prio_5",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_5,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_6] = {
+		.name = "rx_green_prio_6",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_6,
+	},
+	[OCELOT_STAT_RX_GREEN_PRIO_7] = {
+		.name = "rx_green_prio_7",
+		.reg = SYS_COUNT_RX_GREEN_PRIO_7,
+	},
+	[OCELOT_STAT_TX_OCTETS] = {
+		.name = "tx_octets",
+		.reg = SYS_COUNT_TX_OCTETS,
+	},
+	[OCELOT_STAT_TX_UNICAST] = {
+		.name = "tx_unicast",
+		.reg = SYS_COUNT_TX_UNICAST,
+	},
+	[OCELOT_STAT_TX_MULTICAST] = {
+		.name = "tx_multicast",
+		.reg = SYS_COUNT_TX_MULTICAST,
+	},
+	[OCELOT_STAT_TX_BROADCAST] = {
+		.name = "tx_broadcast",
+		.reg = SYS_COUNT_TX_BROADCAST,
+	},
+	[OCELOT_STAT_TX_COLLISION] = {
+		.name = "tx_collision",
+		.reg = SYS_COUNT_TX_COLLISION,
+	},
+	[OCELOT_STAT_TX_DROPS] = {
+		.name = "tx_drops",
+		.reg = SYS_COUNT_TX_DROPS,
+	},
+	[OCELOT_STAT_TX_PAUSE] = {
+		.name = "tx_pause",
+		.reg = SYS_COUNT_TX_PAUSE,
+	},
+	[OCELOT_STAT_TX_64] = {
+		.name = "tx_frames_below_65_octets",
+		.reg = SYS_COUNT_TX_64,
+	},
+	[OCELOT_STAT_TX_65_127] = {
+		.name = "tx_frames_65_to_127_octets",
+		.reg = SYS_COUNT_TX_65_127,
+	},
+	[OCELOT_STAT_TX_128_255] = {
+		.name = "tx_frames_128_255_octets",
+		.reg = SYS_COUNT_TX_128_255,
+	},
+	[OCELOT_STAT_TX_256_511] = {
+		.name = "tx_frames_256_511_octets",
+		.reg = SYS_COUNT_TX_256_511,
+	},
+	[OCELOT_STAT_TX_512_1023] = {
+		.name = "tx_frames_512_1023_octets",
+		.reg = SYS_COUNT_TX_512_1023,
+	},
+	[OCELOT_STAT_TX_1024_1526] = {
+		.name = "tx_frames_1024_1526_octets",
+		.reg = SYS_COUNT_TX_1024_1526,
+	},
+	[OCELOT_STAT_TX_1527_MAX] = {
+		.name = "tx_frames_over_1526_octets",
+		.reg = SYS_COUNT_TX_1527_MAX,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_0] = {
+		.name = "tx_yellow_prio_0",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_0,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_1] = {
+		.name = "tx_yellow_prio_1",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_1,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_2] = {
+		.name = "tx_yellow_prio_2",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_2,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_3] = {
+		.name = "tx_yellow_prio_3",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_3,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_4] = {
+		.name = "tx_yellow_prio_4",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_4,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_5] = {
+		.name = "tx_yellow_prio_5",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_5,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_6] = {
+		.name = "tx_yellow_prio_6",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_6,
+	},
+	[OCELOT_STAT_TX_YELLOW_PRIO_7] = {
+		.name = "tx_yellow_prio_7",
+		.reg = SYS_COUNT_TX_YELLOW_PRIO_7,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_0] = {
+		.name = "tx_green_prio_0",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_0,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_1] = {
+		.name = "tx_green_prio_1",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_1,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_2] = {
+		.name = "tx_green_prio_2",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_2,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_3] = {
+		.name = "tx_green_prio_3",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_3,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_4] = {
+		.name = "tx_green_prio_4",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_4,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_5] = {
+		.name = "tx_green_prio_5",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_5,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_6] = {
+		.name = "tx_green_prio_6",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_6,
+	},
+	[OCELOT_STAT_TX_GREEN_PRIO_7] = {
+		.name = "tx_green_prio_7",
+		.reg = SYS_COUNT_TX_GREEN_PRIO_7,
+	},
+	[OCELOT_STAT_TX_AGED] = {
+		.name = "tx_aged",
+		.reg = SYS_COUNT_TX_AGING,
+	},
+	[OCELOT_STAT_DROP_LOCAL] = {
+		.name = "drop_local",
+		.reg = SYS_COUNT_DROP_LOCAL,
+	},
+	[OCELOT_STAT_DROP_TAIL] = {
+		.name = "drop_tail",
+		.reg = SYS_COUNT_DROP_TAIL,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_0] = {
+		.name = "drop_yellow_prio_0",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_0,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_1] = {
+		.name = "drop_yellow_prio_1",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_1,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_2] = {
+		.name = "drop_yellow_prio_2",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_2,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_3] = {
+		.name = "drop_yellow_prio_3",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_3,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_4] = {
+		.name = "drop_yellow_prio_4",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_4,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_5] = {
+		.name = "drop_yellow_prio_5",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_5,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_6] = {
+		.name = "drop_yellow_prio_6",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_6,
+	},
+	[OCELOT_STAT_DROP_YELLOW_PRIO_7] = {
+		.name = "drop_yellow_prio_7",
+		.reg = SYS_COUNT_DROP_YELLOW_PRIO_7,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_0] = {
+		.name = "drop_green_prio_0",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_0,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_1] = {
+		.name = "drop_green_prio_1",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_1,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_2] = {
+		.name = "drop_green_prio_2",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_2,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_3] = {
+		.name = "drop_green_prio_3",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_3,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_4] = {
+		.name = "drop_green_prio_4",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_4,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_5] = {
+		.name = "drop_green_prio_5",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_5,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_6] = {
+		.name = "drop_green_prio_6",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_6,
+	},
+	[OCELOT_STAT_DROP_GREEN_PRIO_7] = {
+		.name = "drop_green_prio_7",
+		.reg = SYS_COUNT_DROP_GREEN_PRIO_7,
+	},
 };
 
 static const struct vcap_field vsc9953_vcap_es0_keys[] = {
@@ -857,7 +1226,6 @@ static struct vcap_props vsc9953_vcap_props[] = {
 #define VSC9953_INIT_TIMEOUT			50000
 #define VSC9953_GCB_RST_SLEEP			100
 #define VSC9953_SYS_RAMINIT_SLEEP		80
-#define VCS9953_MII_TIMEOUT			10000
 
 static int vsc9953_gcb_soft_rst_status(struct ocelot *ocelot)
 {
@@ -877,82 +1245,6 @@ static int vsc9953_sys_ram_init_status(struct ocelot *ocelot)
 	return val;
 }
 
-static int vsc9953_gcb_miim_pending_status(struct ocelot *ocelot)
-{
-	int val;
-
-	ocelot_field_read(ocelot, GCB_MIIM_MII_STATUS_PENDING, &val);
-
-	return val;
-}
-
-static int vsc9953_gcb_miim_busy_status(struct ocelot *ocelot)
-{
-	int val;
-
-	ocelot_field_read(ocelot, GCB_MIIM_MII_STATUS_BUSY, &val);
-
-	return val;
-}
-
-static int vsc9953_mdio_write(struct mii_bus *bus, int phy_id, int regnum,
-			      u16 value)
-{
-	struct ocelot *ocelot = bus->priv;
-	int err, cmd, val;
-
-	/* Wait while MIIM controller becomes idle */
-	err = readx_poll_timeout(vsc9953_gcb_miim_pending_status, ocelot,
-				 val, !val, 10, VCS9953_MII_TIMEOUT);
-	if (err) {
-		dev_err(ocelot->dev, "MDIO write: pending timeout\n");
-		goto out;
-	}
-
-	cmd = MSCC_MIIM_CMD_VLD | (phy_id << MSCC_MIIM_CMD_PHYAD_SHIFT) |
-	      (regnum << MSCC_MIIM_CMD_REGAD_SHIFT) |
-	      (value << MSCC_MIIM_CMD_WRDATA_SHIFT) |
-	      MSCC_MIIM_CMD_OPR_WRITE;
-
-	ocelot_write(ocelot, cmd, GCB_MIIM_MII_CMD);
-
-out:
-	return err;
-}
-
-static int vsc9953_mdio_read(struct mii_bus *bus, int phy_id, int regnum)
-{
-	struct ocelot *ocelot = bus->priv;
-	int err, cmd, val;
-
-	/* Wait until MIIM controller becomes idle */
-	err = readx_poll_timeout(vsc9953_gcb_miim_pending_status, ocelot,
-				 val, !val, 10, VCS9953_MII_TIMEOUT);
-	if (err) {
-		dev_err(ocelot->dev, "MDIO read: pending timeout\n");
-		goto out;
-	}
-
-	/* Write the MIIM COMMAND register */
-	cmd = MSCC_MIIM_CMD_VLD | (phy_id << MSCC_MIIM_CMD_PHYAD_SHIFT) |
-	      (regnum << MSCC_MIIM_CMD_REGAD_SHIFT) | MSCC_MIIM_CMD_OPR_READ;
-
-	ocelot_write(ocelot, cmd, GCB_MIIM_MII_CMD);
-
-	/* Wait while read operation via the MIIM controller is in progress */
-	err = readx_poll_timeout(vsc9953_gcb_miim_busy_status, ocelot,
-				 val, !val, 10, VCS9953_MII_TIMEOUT);
-	if (err) {
-		dev_err(ocelot->dev, "MDIO read: busy timeout\n");
-		goto out;
-	}
-
-	val = ocelot_read(ocelot, GCB_MIIM_MII_DATA);
-
-	err = val & 0xFFFF;
-out:
-	return err;
-}
 
 /* CORE_ENA is in SYS:SYSTEM:RESET_CFG
  * MEM_INIT is in SYS:SYSTEM:RESET_CFG
@@ -994,14 +1286,7 @@ static void vsc9953_phylink_validate(struct ocelot *ocelot, int port,
 				     unsigned long *supported,
 				     struct phylink_link_state *state)
 {
-	struct ocelot_port *ocelot_port = ocelot->ports[port];
 	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
-
-	if (state->interface != PHY_INTERFACE_MODE_NA &&
-	    state->interface != ocelot_port->phy_mode) {
-		bitmap_zero(supported, __ETHTOOL_LINK_MODE_MASK_NBITS);
-		return;
-	}
 
 	phylink_set_port_modes(mask);
 	phylink_set(mask, Autoneg);
@@ -1012,35 +1297,15 @@ static void vsc9953_phylink_validate(struct ocelot *ocelot, int port,
 	phylink_set(mask, 100baseT_Full);
 	phylink_set(mask, 100baseT_Half);
 	phylink_set(mask, 1000baseT_Full);
+	phylink_set(mask, 1000baseX_Full);
 
 	if (state->interface == PHY_INTERFACE_MODE_INTERNAL) {
 		phylink_set(mask, 2500baseT_Full);
 		phylink_set(mask, 2500baseX_Full);
 	}
 
-	bitmap_and(supported, supported, mask,
-		   __ETHTOOL_LINK_MODE_MASK_NBITS);
-	bitmap_and(state->advertising, state->advertising, mask,
-		   __ETHTOOL_LINK_MODE_MASK_NBITS);
-}
-
-static int vsc9953_prevalidate_phy_mode(struct ocelot *ocelot, int port,
-					phy_interface_t phy_mode)
-{
-	switch (phy_mode) {
-	case PHY_INTERFACE_MODE_INTERNAL:
-		if (port != 8 && port != 9)
-			return -ENOTSUPP;
-		return 0;
-	case PHY_INTERFACE_MODE_SGMII:
-	case PHY_INTERFACE_MODE_QSGMII:
-		/* Not supported on internal to-CPU ports */
-		if (port == 8 || port == 9)
-			return -ENOTSUPP;
-		return 0;
-	default:
-		return -ENOTSUPP;
-	}
+	linkmode_and(supported, supported, mask);
+	linkmode_and(state->advertising, state->advertising, mask);
 }
 
 /* Watermark encode
@@ -1091,26 +1356,24 @@ static int vsc9953_mdio_bus_alloc(struct ocelot *ocelot)
 	int rc;
 
 	felix->pcs = devm_kcalloc(dev, felix->info->num_ports,
-				  sizeof(struct phy_device *),
+				  sizeof(struct phylink_pcs *),
 				  GFP_KERNEL);
 	if (!felix->pcs) {
 		dev_err(dev, "failed to allocate array for PCS PHYs\n");
 		return -ENOMEM;
 	}
 
-	bus = devm_mdiobus_alloc(dev);
-	if (!bus)
-		return -ENOMEM;
+	rc = mscc_miim_setup(dev, &bus, "VSC9953 internal MDIO bus",
+			     ocelot->targets[GCB],
+			     ocelot->map[GCB][GCB_MIIM_MII_STATUS & REG_MASK]);
 
-	bus->name = "VSC9953 internal MDIO bus";
-	bus->read = vsc9953_mdio_read;
-	bus->write = vsc9953_mdio_write;
-	bus->parent = dev;
-	bus->priv = ocelot;
-	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-imdio", dev_name(dev));
+	if (rc) {
+		dev_err(dev, "failed to setup MDIO bus\n");
+		return rc;
+	}
 
 	/* Needed in order to initialize the bus mutex lock */
-	rc = mdiobus_register(bus);
+	rc = devm_of_mdiobus_register(dev, bus, NULL);
 	if (rc < 0) {
 		dev_err(dev, "failed to register MDIO bus\n");
 		return rc;
@@ -1120,9 +1383,9 @@ static int vsc9953_mdio_bus_alloc(struct ocelot *ocelot)
 
 	for (port = 0; port < felix->info->num_ports; port++) {
 		struct ocelot_port *ocelot_port = ocelot->ports[port];
+		struct phylink_pcs *phylink_pcs;
+		struct mdio_device *mdio_device;
 		int addr = port + 4;
-		struct mdio_device *pcs;
-		struct lynx_pcs *lynx;
 
 		if (dsa_is_unused_port(felix->ds, port))
 			continue;
@@ -1130,17 +1393,17 @@ static int vsc9953_mdio_bus_alloc(struct ocelot *ocelot)
 		if (ocelot_port->phy_mode == PHY_INTERFACE_MODE_INTERNAL)
 			continue;
 
-		pcs = mdio_device_create(felix->imdio, addr);
-		if (IS_ERR(pcs))
+		mdio_device = mdio_device_create(felix->imdio, addr);
+		if (IS_ERR(mdio_device))
 			continue;
 
-		lynx = lynx_pcs_create(pcs);
-		if (!lynx) {
-			mdio_device_free(pcs);
+		phylink_pcs = lynx_pcs_create(mdio_device);
+		if (!phylink_pcs) {
+			mdio_device_free(mdio_device);
 			continue;
 		}
 
-		felix->pcs[port] = lynx;
+		felix->pcs[port] = phylink_pcs;
 
 		dev_info(dev, "Found PCS at internal MDIO address %d\n", addr);
 	}
@@ -1154,15 +1417,18 @@ static void vsc9953_mdio_bus_free(struct ocelot *ocelot)
 	int port;
 
 	for (port = 0; port < ocelot->num_phys_ports; port++) {
-		struct lynx_pcs *pcs = felix->pcs[port];
+		struct phylink_pcs *phylink_pcs = felix->pcs[port];
+		struct mdio_device *mdio_device;
 
-		if (!pcs)
+		if (!phylink_pcs)
 			continue;
 
-		mdio_device_free(pcs->mdio);
-		lynx_pcs_destroy(pcs);
+		mdio_device = lynx_get_mdio_device(phylink_pcs);
+		mdio_device_free(mdio_device);
+		lynx_pcs_destroy(phylink_pcs);
 	}
-	mdiobus_unregister(felix->imdio);
+
+	/* mdiobus_unregister and mdiobus_free handled by devres */
 }
 
 static const struct felix_info seville_info_vsc9953 = {
@@ -1172,15 +1438,19 @@ static const struct felix_info seville_info_vsc9953 = {
 	.map			= vsc9953_regmap,
 	.ops			= &vsc9953_ops,
 	.stats_layout		= vsc9953_stats_layout,
-	.num_stats		= ARRAY_SIZE(vsc9953_stats_layout),
 	.vcap			= vsc9953_vcap_props,
+	.vcap_pol_base		= VSC9953_VCAP_POLICER_BASE,
+	.vcap_pol_max		= VSC9953_VCAP_POLICER_MAX,
+	.vcap_pol_base2		= VSC9953_VCAP_POLICER_BASE2,
+	.vcap_pol_max2		= VSC9953_VCAP_POLICER_MAX2,
 	.num_mact_rows		= 2048,
-	.num_ports		= 10,
+	.num_ports		= VSC9953_NUM_PORTS,
 	.num_tx_queues		= OCELOT_NUM_TC,
 	.mdio_bus_alloc		= vsc9953_mdio_bus_alloc,
 	.mdio_bus_free		= vsc9953_mdio_bus_free,
 	.phylink_validate	= vsc9953_phylink_validate,
-	.prevalidate_phy_mode	= vsc9953_prevalidate_phy_mode,
+	.port_modes		= vsc9953_port_modes,
+	.init_regmap		= ocelot_regmap_init,
 };
 
 static int seville_probe(struct platform_device *pdev)
@@ -1245,16 +1515,31 @@ err_alloc_felix:
 
 static int seville_remove(struct platform_device *pdev)
 {
-	struct felix *felix;
+	struct felix *felix = platform_get_drvdata(pdev);
 
-	felix = platform_get_drvdata(pdev);
+	if (!felix)
+		return 0;
 
 	dsa_unregister_switch(felix->ds);
 
 	kfree(felix->ds);
 	kfree(felix);
 
+	platform_set_drvdata(pdev, NULL);
+
 	return 0;
+}
+
+static void seville_shutdown(struct platform_device *pdev)
+{
+	struct felix *felix = platform_get_drvdata(pdev);
+
+	if (!felix)
+		return;
+
+	dsa_switch_shutdown(felix->ds);
+
+	platform_set_drvdata(pdev, NULL);
 }
 
 static const struct of_device_id seville_of_match[] = {
@@ -1266,6 +1551,7 @@ MODULE_DEVICE_TABLE(of, seville_of_match);
 static struct platform_driver seville_vsc9953_driver = {
 	.probe		= seville_probe,
 	.remove		= seville_remove,
+	.shutdown	= seville_shutdown,
 	.driver = {
 		.name		= "mscc_seville",
 		.of_match_table	= of_match_ptr(seville_of_match),

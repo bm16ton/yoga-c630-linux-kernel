@@ -38,7 +38,7 @@ static int __init timer_get_base_and_rate(struct device_node *np,
 	}
 
 	/*
-	 * Not all implementations use a periphal clock, so don't panic
+	 * Not all implementations use a peripheral clock, so don't panic
 	 * if it's not present
 	 */
 	pclk = of_clk_get_by_name(np, "pclk");
@@ -47,7 +47,7 @@ static int __init timer_get_base_and_rate(struct device_node *np,
 			pr_warn("pclk for %pOFn is present, but could not be activated\n",
 				np);
 
-	if (!of_property_read_u32(np, "clock-freq", rate) &&
+	if (!of_property_read_u32(np, "clock-freq", rate) ||
 	    !of_property_read_u32(np, "clock-frequency", rate))
 		return 0;
 

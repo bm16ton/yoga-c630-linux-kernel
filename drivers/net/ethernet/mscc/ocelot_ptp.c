@@ -4,6 +4,8 @@
  * Copyright (c) 2017 Microsemi Corporation
  * Copyright 2020 NXP
  */
+#include <linux/time64.h>
+
 #include <soc/mscc/ocelot_ptp.h>
 #include <soc/mscc/ocelot_sys.h>
 #include <soc/mscc/ocelot.h>
@@ -70,6 +72,10 @@ int ocelot_ptp_settime64(struct ptp_clock_info *ptp,
 	ocelot_write_rix(ocelot, val, PTP_PIN_CFG, TOD_ACC_PIN);
 
 	spin_unlock_irqrestore(&ocelot->ptp_clock_lock, flags);
+
+	if (ocelot->ops->tas_clock_adjust)
+		ocelot->ops->tas_clock_adjust(ocelot);
+
 	return 0;
 }
 EXPORT_SYMBOL(ocelot_ptp_settime64);
@@ -103,6 +109,9 @@ int ocelot_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 		ocelot_write_rix(ocelot, val, PTP_PIN_CFG, TOD_ACC_PIN);
 
 		spin_unlock_irqrestore(&ocelot->ptp_clock_lock, flags);
+
+		if (ocelot->ops->tas_clock_adjust)
+			ocelot->ops->tas_clock_adjust(ocelot);
 	} else {
 		/* Fall back using ocelot_ptp_settime64 which is not exact. */
 		struct timespec64 ts;
@@ -115,6 +124,7 @@ int ocelot_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 
 		ocelot_ptp_settime64(ptp, &ts);
 	}
+
 	return 0;
 }
 EXPORT_SYMBOL(ocelot_ptp_adjtime);

@@ -1,11 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0
 /*
  * Generic infrastructure for lifetime debugging of objects.
  *
- * Started by Thomas Gleixner
- *
  * Copyright (C) 2008, Thomas Gleixner <tglx@linutronix.de>
- *
- * For licencing details see kernel-base/COPYING
  */
 
 #define pr_fmt(fmt) "ODEBUG: " fmt
@@ -557,7 +554,12 @@ __debug_object_init(void *addr, const struct debug_obj_descr *descr, int onstack
 	struct debug_obj *obj;
 	unsigned long flags;
 
-	fill_pool();
+	/*
+	 * On RT enabled kernels the pool refill must happen in preemptible
+	 * context:
+	 */
+	if (!IS_ENABLED(CONFIG_PREEMPT_RT) || preemptible())
+		fill_pool();
 
 	db = get_bucket((unsigned long) addr);
 

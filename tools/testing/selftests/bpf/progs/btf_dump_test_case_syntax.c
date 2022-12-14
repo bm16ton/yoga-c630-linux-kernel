@@ -94,7 +94,7 @@ typedef void (* (*signal_t)(int, void (*)(int)))(int);
 
 typedef char * (*fn_ptr_arr1_t[10])(int **);
 
-typedef char * (* const (* const fn_ptr_arr2_t[5])())(char * (*)(int));
+typedef char * (* (* const fn_ptr_arr2_t[5])())(char * (*)(int));
 
 struct struct_w_typedefs {
 	int_t a;
@@ -189,7 +189,7 @@ struct struct_with_embedded_stuff {
 			const char *d;
 		} e;
 		union {
-			volatile long int f;
+			volatile long f;
 			void * restrict g;
 		};
 	};
@@ -213,6 +213,12 @@ struct struct_with_embedded_stuff {
 	struct_in_array_t *v;
 };
 
+struct float_struct {
+	float f;
+	const double *d;
+	volatile long double *ld;
+};
+
 struct root_struct {
 	enum e1 _1;
 	enum e2 _2;
@@ -227,6 +233,7 @@ struct root_struct {
 	union_fwd_t *_12;
 	union_fwd_ptr_t _13;
 	struct struct_with_embedded_stuff _14;
+	struct float_struct _15;
 };
 
 /* ------ END-EXPECTED-OUTPUT ------ */

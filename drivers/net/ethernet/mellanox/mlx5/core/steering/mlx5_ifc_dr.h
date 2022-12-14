@@ -8,12 +8,6 @@ enum {
 	MLX5DR_STE_LU_TYPE_DONT_CARE			= 0x0f,
 };
 
-enum mlx5dr_ste_entry_type {
-	MLX5DR_STE_TYPE_TX		= 1,
-	MLX5DR_STE_TYPE_RX		= 2,
-	MLX5DR_STE_TYPE_MODIFY_PKT	= 6,
-};
-
 struct mlx5_ifc_ste_general_bits {
 	u8         entry_type[0x4];
 	u8         reserved_at_4[0x4];
@@ -434,10 +428,7 @@ struct mlx5_ifc_ste_gre_bits {
 };
 
 struct mlx5_ifc_ste_flex_parser_0_bits {
-	u8         parser_3_label[0x14];
-	u8         parser_3_exp[0x3];
-	u8         parser_3_s_bos[0x1];
-	u8         parser_3_ttl[0x8];
+	u8         flex_parser_3[0x20];
 
 	u8         flex_parser_2[0x20];
 
@@ -454,6 +445,14 @@ struct mlx5_ifc_ste_flex_parser_1_bits {
 	u8         flex_parser_5[0x20];
 
 	u8         flex_parser_4[0x20];
+};
+
+struct mlx5_ifc_ste_flex_parser_ok_bits {
+	u8         flex_parser_3[0x20];
+	u8         flex_parser_2[0x20];
+	u8         flex_parsers_ok[0x8];
+	u8         reserved_at_48[0x18];
+	u8         flex_parser_0[0x20];
 };
 
 struct mlx5_ifc_ste_flex_parser_tnl_bits {
@@ -486,6 +485,25 @@ struct mlx5_ifc_ste_flex_parser_tnl_geneve_bits {
 	u8         reserved_at_38[0x8];
 
 	u8         reserved_at_40[0x40];
+};
+
+struct mlx5_ifc_ste_flex_parser_tnl_gtpu_bits {
+	u8	   reserved_at_0[0x5];
+	u8	   gtpu_msg_flags[0x3];
+	u8	   gtpu_msg_type[0x8];
+	u8	   reserved_at_10[0x10];
+
+	u8	   gtpu_teid[0x20];
+
+	u8	   reserved_at_40[0x40];
+};
+
+struct mlx5_ifc_ste_tunnel_header_bits {
+	u8	   tunnel_header_0[0x20];
+
+	u8	   tunnel_header_1[0x20];
+
+	u8	   reserved_at_40[0x40];
 };
 
 struct mlx5_ifc_ste_general_purpose_bits {
@@ -554,6 +572,32 @@ struct mlx5_ifc_dr_action_hw_copy_bits {
 	u8         reserved_at_30[0x2];
 	u8         source_left_shifter[0x6];
 	u8         reserved_at_38[0x8];
+};
+
+enum {
+	MLX5DR_ASO_FLOW_METER_NUM_PER_OBJ = 2,
+};
+
+struct mlx5_ifc_ste_aso_flow_meter_action_bits {
+	u8         reserved_at_0[0xc];
+	u8         action[0x1];
+	u8         initial_color[0x2];
+	u8         line_id[0x1];
+};
+
+struct mlx5_ifc_ste_double_action_aso_v1_bits {
+	u8         action_id[0x8];
+	u8         aso_context_number[0x18];
+
+	u8         dest_reg_id[0x2];
+	u8         change_ordering_tag[0x1];
+	u8         aso_check_ordering[0x1];
+	u8         aso_context_type[0x4];
+	u8         reserved_at_28[0x8];
+	union {
+		u8 aso_fields[0x10];
+		struct mlx5_ifc_ste_aso_flow_meter_action_bits flow_meter;
+	};
 };
 
 #endif /* MLX5_IFC_DR_H */

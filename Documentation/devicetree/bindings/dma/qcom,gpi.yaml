@@ -19,7 +19,12 @@ allOf:
 properties:
   compatible:
     enum:
+      - qcom,sc7280-gpi-dma
       - qcom,sdm845-gpi-dma
+      - qcom,sm8150-gpi-dma
+      - qcom,sm8250-gpi-dma
+      - qcom,sm8350-gpi-dma
+      - qcom,sm8450-gpi-dma
 
   reg:
     maxItems: 1
@@ -27,6 +32,7 @@ properties:
   interrupts:
     description:
       Interrupt lines for each GPI instance
+    minItems: 1
     maxItems: 13
 
   "#dma-cells":
@@ -64,7 +70,7 @@ examples:
     #include <dt-bindings/interrupt-controller/arm-gic.h>
     #include <dt-bindings/dma/qcom-gpi.h>
     gpi_dma0: dma-controller@800000 {
-        compatible = "qcom,gpi-dma";
+        compatible = "qcom,sdm845-gpi-dma";
         #dma-cells = <3>;
         reg = <0x00800000 0x60000>;
         iommus = <&apps_smmu 0x0016 0x0>;

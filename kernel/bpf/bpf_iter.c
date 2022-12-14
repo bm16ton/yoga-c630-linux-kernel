@@ -5,6 +5,7 @@
 #include <linux/anon_inodes.h>
 #include <linux/filter.h>
 #include <linux/bpf.h>
+#include <linux/rcupdate_trace.h>
 
 struct bpf_iter_target_info {
 	struct list_head list;
@@ -67,23 +68,27 @@ static void bpf_iter_done_stop(struct seq_file *seq)
 	iter_priv->done_stop = true;
 }
 
+static inline bool bpf_iter_target_support_resched(const struct bpf_iter_target_info *tinfo)
+{
+	return tinfo->reg_info->feature & BPF_ITER_RESCHED;
+}
+
 static bool bpf_iter_support_resched(struct seq_file *seq)
 {
 	struct bpf_iter_priv_data *iter_priv;
 
 	iter_priv = container_of(seq->private, struct bpf_iter_priv_data,
 				 target_private);
-	return iter_priv->tinfo->reg_info->feature & BPF_ITER_RESCHED;
+	return bpf_iter_target_support_resched(iter_priv->tinfo);
 }
 
 /* maximum visited objects before bailing out */
 #define MAX_ITER_OBJECTS	1000000
 
 /* bpf_seq_read, a customized and simpler version for bpf iterator.
- * no_llseek is assumed for this file.
  * The following are differences from seq_read():
  *  . fixed buffer size (PAGE_SIZE)
- *  . assuming no_llseek
+ *  . assuming NULL ->llseek()
  *  . stop() may call bpf program, handling potential overflow there
  */
 static ssize_t bpf_seq_read(struct file *file, char __user *buf, size_t size,
@@ -329,35 +334,56 @@ static void cache_btf_id(struct bpf_iter_target_info *tinfo,
 bool bpf_iter_prog_supported(struct bpf_prog *prog)
 {
 	const char *attach_fname = prog->aux->attach_func_name;
+	struct bpf_iter_target_info *tinfo = NULL, *iter;
 	u32 prog_btf_id = prog->aux->attach_btf_id;
 	const char *prefix = BPF_ITER_FUNC_PREFIX;
-	struct bpf_iter_target_info *tinfo;
 	int prefix_len = strlen(prefix);
-	bool supported = false;
 
 	if (strncmp(attach_fname, prefix, prefix_len))
 		return false;
 
 	mutex_lock(&targets_mutex);
-	list_for_each_entry(tinfo, &targets, list) {
-		if (tinfo->btf_id && tinfo->btf_id == prog_btf_id) {
-			supported = true;
+	list_for_each_entry(iter, &targets, list) {
+		if (iter->btf_id && iter->btf_id == prog_btf_id) {
+			tinfo = iter;
 			break;
 		}
-		if (!strcmp(attach_fname + prefix_len, tinfo->reg_info->target)) {
-			cache_btf_id(tinfo, prog);
-			supported = true;
+		if (!strcmp(attach_fname + prefix_len, iter->reg_info->target)) {
+			cache_btf_id(iter, prog);
+			tinfo = iter;
 			break;
 		}
 	}
 	mutex_unlock(&targets_mutex);
 
-	if (supported) {
+	if (tinfo) {
 		prog->aux->ctx_arg_info_size = tinfo->reg_info->ctx_arg_info_size;
 		prog->aux->ctx_arg_info = tinfo->reg_info->ctx_arg_info;
 	}
 
-	return supported;
+	return tinfo != NULL;
+}
+
+const struct bpf_func_proto *
+bpf_iter_get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+{
+	const struct bpf_iter_target_info *tinfo;
+	const struct bpf_func_proto *fn = NULL;
+
+	mutex_lock(&targets_mutex);
+	list_for_each_entry(tinfo, &targets, list) {
+		if (tinfo->btf_id == prog->aux->attach_btf_id) {
+			const struct bpf_iter_reg *reg_info;
+
+			reg_info = tinfo->reg_info;
+			if (reg_info->get_func_proto)
+				fn = reg_info->get_func_proto(func_id, prog);
+			break;
+		}
+	}
+	mutex_unlock(&targets_mutex);
+
+	return fn;
 }
 
 static void bpf_iter_link_release(struct bpf_link *link)
@@ -473,15 +499,15 @@ bool bpf_link_is_iter(struct bpf_link *link)
 	return link->ops == &bpf_iter_link_lops;
 }
 
-int bpf_iter_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+int bpf_iter_link_attach(const union bpf_attr *attr, bpfptr_t uattr,
+			 struct bpf_prog *prog)
 {
-	union bpf_iter_link_info __user *ulinfo;
+	struct bpf_iter_target_info *tinfo = NULL, *iter;
 	struct bpf_link_primer link_primer;
-	struct bpf_iter_target_info *tinfo;
 	union bpf_iter_link_info linfo;
 	struct bpf_iter_link *link;
 	u32 prog_btf_id, linfo_len;
-	bool existed = false;
+	bpfptr_t ulinfo;
 	int err;
 
 	if (attr->link_create.target_fd || attr->link_create.flags)
@@ -489,32 +515,36 @@ int bpf_iter_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
 
 	memset(&linfo, 0, sizeof(union bpf_iter_link_info));
 
-	ulinfo = u64_to_user_ptr(attr->link_create.iter_info);
+	ulinfo = make_bpfptr(attr->link_create.iter_info, uattr.is_kernel);
 	linfo_len = attr->link_create.iter_info_len;
-	if (!ulinfo ^ !linfo_len)
+	if (bpfptr_is_null(ulinfo) ^ !linfo_len)
 		return -EINVAL;
 
-	if (ulinfo) {
+	if (!bpfptr_is_null(ulinfo)) {
 		err = bpf_check_uarg_tail_zero(ulinfo, sizeof(linfo),
 					       linfo_len);
 		if (err)
 			return err;
 		linfo_len = min_t(u32, linfo_len, sizeof(linfo));
-		if (copy_from_user(&linfo, ulinfo, linfo_len))
+		if (copy_from_bpfptr(&linfo, ulinfo, linfo_len))
 			return -EFAULT;
 	}
 
 	prog_btf_id = prog->aux->attach_btf_id;
 	mutex_lock(&targets_mutex);
-	list_for_each_entry(tinfo, &targets, list) {
-		if (tinfo->btf_id == prog_btf_id) {
-			existed = true;
+	list_for_each_entry(iter, &targets, list) {
+		if (iter->btf_id == prog_btf_id) {
+			tinfo = iter;
 			break;
 		}
 	}
 	mutex_unlock(&targets_mutex);
-	if (!existed)
+	if (!tinfo)
 		return -ENOENT;
+
+	/* Only allow sleepable program for resched-able iterator */
+	if (prog->aux->sleepable && !bpf_iter_target_support_resched(tinfo))
+		return -EINVAL;
 
 	link = kzalloc(sizeof(*link), GFP_USER | __GFP_NOWARN);
 	if (!link)
@@ -523,7 +553,7 @@ int bpf_iter_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
 	bpf_link_init(&link->link, BPF_LINK_TYPE_ITER, &bpf_iter_link_lops, prog);
 	link->tinfo = tinfo;
 
-	err  = bpf_link_prime(&link->link, &link_primer);
+	err = bpf_link_prime(&link->link, &link_primer);
 	if (err) {
 		kfree(link);
 		return err;
@@ -661,11 +691,20 @@ int bpf_iter_run_prog(struct bpf_prog *prog, void *ctx)
 {
 	int ret;
 
-	rcu_read_lock();
-	migrate_disable();
-	ret = BPF_PROG_RUN(prog, ctx);
-	migrate_enable();
-	rcu_read_unlock();
+	if (prog->aux->sleepable) {
+		rcu_read_lock_trace();
+		migrate_disable();
+		might_fault();
+		ret = bpf_prog_run(prog, ctx);
+		migrate_enable();
+		rcu_read_unlock_trace();
+	} else {
+		rcu_read_lock();
+		migrate_disable();
+		ret = bpf_prog_run(prog, ctx);
+		migrate_enable();
+		rcu_read_unlock();
+	}
 
 	/* bpf program can only return 0 or 1:
 	 *  0 : okay
@@ -675,3 +714,55 @@ int bpf_iter_run_prog(struct bpf_prog *prog, void *ctx)
 	 */
 	return ret == 0 ? 0 : -EAGAIN;
 }
+
+BPF_CALL_4(bpf_for_each_map_elem, struct bpf_map *, map, void *, callback_fn,
+	   void *, callback_ctx, u64, flags)
+{
+	return map->ops->map_for_each_callback(map, callback_fn, callback_ctx, flags);
+}
+
+const struct bpf_func_proto bpf_for_each_map_elem_proto = {
+	.func		= bpf_for_each_map_elem,
+	.gpl_only	= false,
+	.ret_type	= RET_INTEGER,
+	.arg1_type	= ARG_CONST_MAP_PTR,
+	.arg2_type	= ARG_PTR_TO_FUNC,
+	.arg3_type	= ARG_PTR_TO_STACK_OR_NULL,
+	.arg4_type	= ARG_ANYTHING,
+};
+
+BPF_CALL_4(bpf_loop, u32, nr_loops, void *, callback_fn, void *, callback_ctx,
+	   u64, flags)
+{
+	bpf_callback_t callback = (bpf_callback_t)callback_fn;
+	u64 ret;
+	u32 i;
+
+	/* Note: these safety checks are also verified when bpf_loop
+	 * is inlined, be careful to modify this code in sync. See
+	 * function verifier.c:inline_bpf_loop.
+	 */
+	if (flags)
+		return -EINVAL;
+	if (nr_loops > BPF_MAX_LOOPS)
+		return -E2BIG;
+
+	for (i = 0; i < nr_loops; i++) {
+		ret = callback((u64)i, (u64)(long)callback_ctx, 0, 0, 0);
+		/* return value: 0 - continue, 1 - stop and return */
+		if (ret)
+			return i + 1;
+	}
+
+	return i;
+}
+
+const struct bpf_func_proto bpf_loop_proto = {
+	.func		= bpf_loop,
+	.gpl_only	= false,
+	.ret_type	= RET_INTEGER,
+	.arg1_type	= ARG_ANYTHING,
+	.arg2_type	= ARG_PTR_TO_FUNC,
+	.arg3_type	= ARG_PTR_TO_STACK_OR_NULL,
+	.arg4_type	= ARG_ANYTHING,
+};

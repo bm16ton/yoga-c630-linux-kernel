@@ -202,6 +202,9 @@ struct mlx5_wqe_fmr_seg {
 struct mlx5_wqe_ctrl_seg {
 	__be32			opmod_idx_opcode;
 	__be32			qpn_ds;
+
+	struct_group(trailer,
+
 	u8			signature;
 	u8			rsvd[2];
 	u8			fm_ce_se;
@@ -211,6 +214,8 @@ struct mlx5_wqe_ctrl_seg {
 		__be32		umr_mkey;
 		__be32		tis_tir_num;
 	};
+
+	); /* end of trailer group */
 };
 
 #define MLX5_WQE_CTRL_DS_MASK 0x3f
@@ -550,8 +555,8 @@ static inline const char *mlx5_qp_state_str(int state)
 static inline int mlx5_get_qp_default_ts(struct mlx5_core_dev *dev)
 {
 	return !MLX5_CAP_ROCE(dev, qp_ts_format) ?
-		       MLX5_QPC_TIMESTAMP_FORMAT_FREE_RUNNING :
-		       MLX5_QPC_TIMESTAMP_FORMAT_DEFAULT;
+		       MLX5_TIMESTAMP_FORMAT_FREE_RUNNING :
+		       MLX5_TIMESTAMP_FORMAT_DEFAULT;
 }
 
 #endif /* MLX5_QP_H */

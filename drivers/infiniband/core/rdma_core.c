@@ -68,7 +68,7 @@ static int uverbs_try_lock_object(struct ib_uobject *uobj,
 	 * In exclusive access mode, we check that the counter is zero (nobody
 	 * claimed this object) and we set it to -1. Releasing a shared access
 	 * lock is done simply by decreasing the counter. As for exclusive
-	 * access locks, since only a single one of them is is allowed
+	 * access locks, since only a single one of them is allowed
 	 * concurrently, setting the counter to zero is enough for releasing
 	 * this lock.
 	 */
@@ -112,7 +112,7 @@ static void assert_uverbs_usecnt(struct ib_uobject *uobj,
  * however the type's allocat_commit function cannot have been called and the
  * uobject cannot be on the uobjects_lists
  *
- * For RDMA_REMOVE_DESTROY the caller shold be holding a kref (eg via
+ * For RDMA_REMOVE_DESTROY the caller should be holding a kref (eg via
  * rdma_lookup_get_uobject) and the object is left in a state where the caller
  * needs to call rdma_lookup_put_uobject.
  *
@@ -916,7 +916,7 @@ static int __uverbs_cleanup_ufile(struct ib_uverbs_file *ufile,
 }
 
 /*
- * Destroy the uncontext and every uobject associated with it.
+ * Destroy the ucontext and every uobject associated with it.
  *
  * This is internally locked and can be called in parallel from multiple
  * contexts.

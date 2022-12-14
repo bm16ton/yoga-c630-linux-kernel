@@ -5,8 +5,6 @@
 #ifndef __XIVE_INTERNAL_H
 #define __XIVE_INTERNAL_H
 
-#define XIVE_IPI_HW_IRQ		0 /* interrupt source # for IPIs */
-
 /*
  * A "disabled" interrupt should never fire, to catch problems
  * we set its logical number to this
@@ -60,6 +58,7 @@ struct xive_ops {
 	void	(*put_ipi)(unsigned int cpu, struct xive_cpu *xc);
 #endif
 	int	(*debug_show)(struct seq_file *m, void *private);
+	int	(*debug_create)(struct dentry *xive_dir);
 	const char *name;
 };
 
@@ -74,5 +73,6 @@ static inline u32 xive_alloc_order(u32 queue_shift)
 }
 
 extern bool xive_cmdline_disabled;
+extern bool xive_has_save_restore;
 
 #endif /*  __XIVE_INTERNAL_H */

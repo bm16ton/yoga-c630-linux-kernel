@@ -698,11 +698,7 @@ static int irda_discover_daddr_and_lsap_sel(struct irda_sock *self, char *name)
  *
  */
 static int irda_getname(struct socket *sock, struct sockaddr *uaddr,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
 			int peer)
-#else
-			int *uaddr_len, int peer)
-#endif
 {
 	struct sockaddr_irda saddr;
 	struct sock *sk = sock->sk;
@@ -1367,9 +1363,13 @@ static int irda_recvmsg_dgram(struct socket *sock, struct msghdr *msg,
 	struct sk_buff *skb;
 	size_t copied;
 	int err;
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 18, 6)
 	skb = skb_recv_datagram(sk, flags & ~MSG_DONTWAIT,
 				flags & MSG_DONTWAIT, &err);
+#else
+
+	skb = skb_recv_datagram(sk, flags, &err);
+#endif
 	if (!skb)
 		return err;
 
@@ -1830,13 +1830,6 @@ static int irda_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 		break;
 	}
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 2, 0)
-	case SIOCGSTAMP:
-		if (sk != NULL)
-			err = sock_get_timestamp(sk, (struct timeval __user *)arg);
-		break;
-
-#endif
 	case SIOCGIFADDR:
 	case SIOCSIFADDR:
 	case SIOCGIFDSTADDR:
@@ -2607,9 +2600,7 @@ static const struct proto_ops irda_stream_ops = {
 	.getname =	irda_getname,
 	.poll =		irda_poll,
 	.ioctl =	irda_ioctl,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0)
         .gettstamp =	sock_gettstamp,
-#endif
 #ifdef CONFIG_COMPAT
 	.compat_ioctl =	irda_compat_ioctl,
 #endif
@@ -2634,9 +2625,7 @@ static const struct proto_ops irda_seqpacket_ops = {
 	.getname =	irda_getname,
 	.poll =		datagram_poll,
 	.ioctl =	irda_ioctl,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0)
         .gettstamp =	sock_gettstamp,
-#endif
 #ifdef CONFIG_COMPAT
 	.compat_ioctl =	irda_compat_ioctl,
 #endif
@@ -2661,9 +2650,7 @@ static const struct proto_ops irda_dgram_ops = {
 	.getname =	irda_getname,
 	.poll =		datagram_poll,
 	.ioctl =	irda_ioctl,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0)
         .gettstamp =	sock_gettstamp,
-#endif
 #ifdef CONFIG_COMPAT
 	.compat_ioctl =	irda_compat_ioctl,
 #endif
@@ -2689,9 +2676,7 @@ static const struct proto_ops irda_ultra_ops = {
 	.getname =	irda_getname,
 	.poll =		datagram_poll,
 	.ioctl =	irda_ioctl,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0)
         .gettstamp =	sock_gettstamp,
-#endif
 #ifdef CONFIG_COMPAT
 	.compat_ioctl =	irda_compat_ioctl,
 #endif

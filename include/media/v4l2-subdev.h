@@ -313,6 +313,17 @@ struct v4l2_subdev_audio_ops {
 };
 
 /**
+ * struct v4l2_mbus_frame_desc_entry_csi2
+ *
+ * @vc: CSI-2 virtual channel
+ * @dt: CSI-2 data type ID
+ */
+struct v4l2_mbus_frame_desc_entry_csi2 {
+	u8 vc;
+	u8 dt;
+};
+
+/**
  * enum v4l2_mbus_frame_desc_flags - media bus frame description flags
  *
  * @V4L2_MBUS_FRAME_DESC_FL_LEN_MAX:
@@ -335,23 +346,58 @@ enum v4l2_mbus_frame_desc_flags {
  *		%FRAME_DESC_FL_BLOB is not set.
  * @length:	number of octets per frame, valid if @flags
  *		%V4L2_MBUS_FRAME_DESC_FL_LEN_MAX is set.
+ * @bus:	Bus-specific frame descriptor parameters
+ * @bus.csi2:	CSI-2-specific bus configuration
  */
 struct v4l2_mbus_frame_desc_entry {
 	enum v4l2_mbus_frame_desc_flags flags;
 	u32 pixelcode;
 	u32 length;
+	union {
+		struct v4l2_mbus_frame_desc_entry_csi2 csi2;
+	} bus;
 };
 
 #define V4L2_FRAME_DESC_ENTRY_MAX	4
 
 /**
+ * enum v4l2_mbus_frame_desc_type - media bus frame description type
+ *
+ * @V4L2_MBUS_FRAME_DESC_TYPE_UNDEFINED:
+ *	Undefined frame desc type. Drivers should not use this, it is
+ *	for backwards compatibility.
+ * @V4L2_MBUS_FRAME_DESC_TYPE_PARALLEL:
+ *	Parallel media bus.
+ * @V4L2_MBUS_FRAME_DESC_TYPE_CSI2:
+ *	CSI-2 media bus. Frame desc parameters must be set in
+ *	&struct v4l2_mbus_frame_desc_entry->csi2.
+ */
+enum v4l2_mbus_frame_desc_type {
+	V4L2_MBUS_FRAME_DESC_TYPE_UNDEFINED = 0,
+	V4L2_MBUS_FRAME_DESC_TYPE_PARALLEL,
+	V4L2_MBUS_FRAME_DESC_TYPE_CSI2,
+};
+
+/**
  * struct v4l2_mbus_frame_desc - media bus data frame description
+ * @type: type of the bus (enum v4l2_mbus_frame_desc_type)
  * @entry: frame descriptors array
  * @num_entries: number of entries in @entry array
  */
 struct v4l2_mbus_frame_desc {
+	enum v4l2_mbus_frame_desc_type type;
 	struct v4l2_mbus_frame_desc_entry entry[V4L2_FRAME_DESC_ENTRY_MAX];
 	unsigned short num_entries;
+};
+
+/**
+ * enum v4l2_subdev_pre_streamon_flags - Flags for pre_streamon subdev core op
+ *
+ * @V4L2_SUBDEV_PRE_STREAMON_FL_MANUAL_LP: Set the transmitter to either LP-11
+ *	or LP-111 mode before call to s_stream().
+ */
+enum v4l2_subdev_pre_streamon_flags {
+	V4L2_SUBDEV_PRE_STREAMON_FL_MANUAL_LP = BIT(0),
 };
 
 /**
@@ -409,6 +455,19 @@ struct v4l2_mbus_frame_desc {
  * @s_rx_buffer: set a host allocated memory buffer for the subdev. The subdev
  *	can adjust @size to a lower value and must not write more data to the
  *	buffer starting at @data than the original value of @size.
+ *
+ * @pre_streamon: May be called before streaming is actually started, to help
+ *	initialising the bus. Current usage is to set a CSI-2 transmitter to
+ *	LP-11 or LP-111 mode before streaming. See &enum
+ *	v4l2_subdev_pre_streamon_flags.
+ *
+ *	pre_streamon shall return error if it cannot perform the operation as
+ *	indicated by the flags argument. In particular, -EACCES indicates lack
+ *	of support for the operation. The caller shall call post_streamoff for
+ *	each successful call of pre_streamon.
+ *
+ * @post_streamoff: Called after streaming is stopped, but if and only if
+ *	pre_streamon was called earlier.
  */
 struct v4l2_subdev_video_ops {
 	int (*s_routing)(struct v4l2_subdev *sd, u32 input, u32 output, u32 config);
@@ -435,6 +494,8 @@ struct v4l2_subdev_video_ops {
 			struct v4l2_dv_timings *timings);
 	int (*s_rx_buffer)(struct v4l2_subdev *sd, void *buf,
 			   unsigned int *size);
+	int (*pre_streamon)(struct v4l2_subdev *sd, u32 flags);
+	int (*post_streamoff)(struct v4l2_subdev *sd);
 };
 
 /**
@@ -620,11 +681,32 @@ struct v4l2_subdev_ir_ops {
  * This structure only needs to be passed to the pad op if the 'which' field
  * of the main argument is set to %V4L2_SUBDEV_FORMAT_TRY. For
  * %V4L2_SUBDEV_FORMAT_ACTIVE it is safe to pass %NULL.
+ *
+ * Note: This struct is also used in active state, and the 'try' prefix is
+ * historical and to be removed.
  */
 struct v4l2_subdev_pad_config {
 	struct v4l2_mbus_framefmt try_fmt;
 	struct v4l2_rect try_crop;
 	struct v4l2_rect try_compose;
+};
+
+/**
+ * struct v4l2_subdev_state - Used for storing subdev state information.
+ *
+ * @_lock: default for 'lock'
+ * @lock: mutex for the state. May be replaced by the user.
+ * @pads: &struct v4l2_subdev_pad_config array
+ *
+ * This structure only needs to be passed to the pad op if the 'which' field
+ * of the main argument is set to %V4L2_SUBDEV_FORMAT_TRY. For
+ * %V4L2_SUBDEV_FORMAT_ACTIVE it is safe to pass %NULL.
+ */
+struct v4l2_subdev_state {
+	/* lock for the struct v4l2_subdev_state fields */
+	struct mutex _lock;
+	struct mutex *lock;
+	struct v4l2_subdev_pad_config *pads;
 };
 
 /**
@@ -677,41 +759,30 @@ struct v4l2_subdev_pad_config {
  *		     this operation as close as possible to stream on time. The
  *		     operation shall fail if the pad index it has been called on
  *		     is not valid or in case of unrecoverable failures.
- *
- * @set_mbus_config: set the media bus configuration of a remote sub-device.
- *		     This operations is intended to allow, in combination with
- *		     the get_mbus_config operation, the negotiation of media bus
- *		     configuration parameters between media sub-devices. The
- *		     operation shall not fail if the requested configuration is
- *		     not supported, but the driver shall update the content of
- *		     the %config argument to reflect what has been actually
- *		     applied to the hardware. The operation shall fail if the
- *		     pad index it has been called on is not valid or in case of
- *		     unrecoverable failures.
  */
 struct v4l2_subdev_pad_ops {
 	int (*init_cfg)(struct v4l2_subdev *sd,
-			struct v4l2_subdev_pad_config *cfg);
+			struct v4l2_subdev_state *state);
 	int (*enum_mbus_code)(struct v4l2_subdev *sd,
-			      struct v4l2_subdev_pad_config *cfg,
+			      struct v4l2_subdev_state *state,
 			      struct v4l2_subdev_mbus_code_enum *code);
 	int (*enum_frame_size)(struct v4l2_subdev *sd,
-			       struct v4l2_subdev_pad_config *cfg,
+			       struct v4l2_subdev_state *state,
 			       struct v4l2_subdev_frame_size_enum *fse);
 	int (*enum_frame_interval)(struct v4l2_subdev *sd,
-				   struct v4l2_subdev_pad_config *cfg,
+				   struct v4l2_subdev_state *state,
 				   struct v4l2_subdev_frame_interval_enum *fie);
 	int (*get_fmt)(struct v4l2_subdev *sd,
-		       struct v4l2_subdev_pad_config *cfg,
+		       struct v4l2_subdev_state *state,
 		       struct v4l2_subdev_format *format);
 	int (*set_fmt)(struct v4l2_subdev *sd,
-		       struct v4l2_subdev_pad_config *cfg,
+		       struct v4l2_subdev_state *state,
 		       struct v4l2_subdev_format *format);
 	int (*get_selection)(struct v4l2_subdev *sd,
-			     struct v4l2_subdev_pad_config *cfg,
+			     struct v4l2_subdev_state *state,
 			     struct v4l2_subdev_selection *sel);
 	int (*set_selection)(struct v4l2_subdev *sd,
-			     struct v4l2_subdev_pad_config *cfg,
+			     struct v4l2_subdev_state *state,
 			     struct v4l2_subdev_selection *sel);
 	int (*get_edid)(struct v4l2_subdev *sd, struct v4l2_edid *edid);
 	int (*set_edid)(struct v4l2_subdev *sd, struct v4l2_edid *edid);
@@ -729,8 +800,6 @@ struct v4l2_subdev_pad_ops {
 	int (*set_frame_desc)(struct v4l2_subdev *sd, unsigned int pad,
 			      struct v4l2_mbus_frame_desc *fd);
 	int (*get_mbus_config)(struct v4l2_subdev *sd, unsigned int pad,
-			       struct v4l2_mbus_config *config);
-	int (*set_mbus_config)(struct v4l2_subdev *sd, unsigned int pad,
 			       struct v4l2_mbus_config *config);
 };
 
@@ -858,8 +927,14 @@ struct v4l2_subdev_platform_data {
  * @asd: Pointer to respective &struct v4l2_async_subdev.
  * @notifier: Pointer to the managing notifier.
  * @subdev_notifier: A sub-device notifier implicitly registered for the sub-
- *		     device using v4l2_device_register_sensor_subdev().
+ *		     device using v4l2_async_register_subdev_sensor().
  * @pdata: common part of subdevice platform data
+ * @state_lock: A pointer to a lock used for all the subdev's states, set by the
+ *		driver. This is	optional. If NULL, each state instance will get
+ *		a lock of its own.
+ * @active_state: Active state for the subdev (NULL for subdevs tracking the
+ *		  state internally). Initialized by calling
+ *		  v4l2_subdev_init_finalize().
  *
  * Each instance of a subdev driver should create this struct, either
  * stand-alone or embedded in a larger struct.
@@ -891,6 +966,20 @@ struct v4l2_subdev {
 	struct v4l2_async_notifier *notifier;
 	struct v4l2_async_notifier *subdev_notifier;
 	struct v4l2_subdev_platform_data *pdata;
+	struct mutex *state_lock;
+
+	/*
+	 * The fields below are private, and should only be accessed via
+	 * appropriate functions.
+	 */
+
+	/*
+	 * TODO: active_state should most likely be changed from a pointer to an
+	 * embedded field. For the time being it's kept as a pointer to more
+	 * easily catch uses of active_state in the cases where the driver
+	 * doesn't support it.
+	 */
+	struct v4l2_subdev_state *active_state;
 };
 
 
@@ -922,14 +1011,14 @@ struct v4l2_subdev {
  * struct v4l2_subdev_fh - Used for storing subdev information per file handle
  *
  * @vfh: pointer to &struct v4l2_fh
- * @pad: pointer to &struct v4l2_subdev_pad_config
+ * @state: pointer to &struct v4l2_subdev_state
  * @owner: module pointer to the owner of this file handle
  */
 struct v4l2_subdev_fh {
 	struct v4l2_fh vfh;
 	struct module *owner;
 #if defined(CONFIG_VIDEO_V4L2_SUBDEV_API)
-	struct v4l2_subdev_pad_config *pad;
+	struct v4l2_subdev_state *state;
 #endif
 };
 
@@ -945,60 +1034,79 @@ struct v4l2_subdev_fh {
 #if defined(CONFIG_VIDEO_V4L2_SUBDEV_API)
 
 /**
- * v4l2_subdev_get_try_format - ancillary routine to call
+ * v4l2_subdev_get_pad_format - ancillary routine to call
  *	&struct v4l2_subdev_pad_config->try_fmt
  *
  * @sd: pointer to &struct v4l2_subdev
- * @cfg: pointer to &struct v4l2_subdev_pad_config array.
- * @pad: index of the pad in the @cfg array.
+ * @state: pointer to &struct v4l2_subdev_state
+ * @pad: index of the pad in the &struct v4l2_subdev_state->pads array
  */
 static inline struct v4l2_mbus_framefmt *
-v4l2_subdev_get_try_format(struct v4l2_subdev *sd,
-			   struct v4l2_subdev_pad_config *cfg,
+v4l2_subdev_get_pad_format(struct v4l2_subdev *sd,
+			   struct v4l2_subdev_state *state,
 			   unsigned int pad)
 {
+	if (WARN_ON(!state))
+		return NULL;
 	if (WARN_ON(pad >= sd->entity.num_pads))
 		pad = 0;
-	return &cfg[pad].try_fmt;
+	return &state->pads[pad].try_fmt;
 }
 
 /**
- * v4l2_subdev_get_try_crop - ancillary routine to call
+ * v4l2_subdev_get_pad_crop - ancillary routine to call
  *	&struct v4l2_subdev_pad_config->try_crop
  *
  * @sd: pointer to &struct v4l2_subdev
- * @cfg: pointer to &struct v4l2_subdev_pad_config array.
- * @pad: index of the pad in the @cfg array.
+ * @state: pointer to &struct v4l2_subdev_state.
+ * @pad: index of the pad in the &struct v4l2_subdev_state->pads array.
  */
 static inline struct v4l2_rect *
-v4l2_subdev_get_try_crop(struct v4l2_subdev *sd,
-			 struct v4l2_subdev_pad_config *cfg,
+v4l2_subdev_get_pad_crop(struct v4l2_subdev *sd,
+			 struct v4l2_subdev_state *state,
 			 unsigned int pad)
 {
+	if (WARN_ON(!state))
+		return NULL;
 	if (WARN_ON(pad >= sd->entity.num_pads))
 		pad = 0;
-	return &cfg[pad].try_crop;
+	return &state->pads[pad].try_crop;
 }
 
 /**
- * v4l2_subdev_get_try_compose - ancillary routine to call
+ * v4l2_subdev_get_pad_compose - ancillary routine to call
  *	&struct v4l2_subdev_pad_config->try_compose
  *
  * @sd: pointer to &struct v4l2_subdev
- * @cfg: pointer to &struct v4l2_subdev_pad_config array.
- * @pad: index of the pad in the @cfg array.
+ * @state: pointer to &struct v4l2_subdev_state.
+ * @pad: index of the pad in the &struct v4l2_subdev_state->pads array.
  */
 static inline struct v4l2_rect *
-v4l2_subdev_get_try_compose(struct v4l2_subdev *sd,
-			    struct v4l2_subdev_pad_config *cfg,
+v4l2_subdev_get_pad_compose(struct v4l2_subdev *sd,
+			    struct v4l2_subdev_state *state,
 			    unsigned int pad)
 {
+	if (WARN_ON(!state))
+		return NULL;
 	if (WARN_ON(pad >= sd->entity.num_pads))
 		pad = 0;
-	return &cfg[pad].try_compose;
+	return &state->pads[pad].try_compose;
 }
 
-#endif
+/*
+ * Temprary helpers until uses of v4l2_subdev_get_try_* functions have been
+ * renamed
+ */
+#define v4l2_subdev_get_try_format(sd, state, pad) \
+	v4l2_subdev_get_pad_format(sd, state, pad)
+
+#define v4l2_subdev_get_try_crop(sd, state, pad) \
+	v4l2_subdev_get_pad_crop(sd, state, pad)
+
+#define v4l2_subdev_get_try_compose(sd, state, pad) \
+	v4l2_subdev_get_pad_compose(sd, state, pad)
+
+#endif /* CONFIG_VIDEO_V4L2_SUBDEV_API */
 
 extern const struct v4l2_file_operations v4l2_subdev_fops;
 
@@ -1097,20 +1205,167 @@ int v4l2_subdev_link_validate_default(struct v4l2_subdev *sd,
 int v4l2_subdev_link_validate(struct media_link *link);
 
 /**
- * v4l2_subdev_alloc_pad_config - Allocates memory for pad config
+ * __v4l2_subdev_state_alloc - allocate v4l2_subdev_state
  *
- * @sd: pointer to struct v4l2_subdev
+ * @sd: pointer to &struct v4l2_subdev for which the state is being allocated.
+ * @lock_name: name of the state lock
+ * @key: lock_class_key for the lock
+ *
+ * Must call __v4l2_subdev_state_free() when state is no longer needed.
+ *
+ * Not to be called directly by the drivers.
  */
-struct
-v4l2_subdev_pad_config *v4l2_subdev_alloc_pad_config(struct v4l2_subdev *sd);
+struct v4l2_subdev_state *__v4l2_subdev_state_alloc(struct v4l2_subdev *sd,
+						    const char *lock_name,
+						    struct lock_class_key *key);
 
 /**
- * v4l2_subdev_free_pad_config - Frees memory allocated by
- *	v4l2_subdev_alloc_pad_config().
+ * __v4l2_subdev_state_free - free a v4l2_subdev_state
  *
- * @cfg: pointer to &struct v4l2_subdev_pad_config
+ * @state: v4l2_subdev_state to be freed.
+ *
+ * Not to be called directly by the drivers.
  */
-void v4l2_subdev_free_pad_config(struct v4l2_subdev_pad_config *cfg);
+void __v4l2_subdev_state_free(struct v4l2_subdev_state *state);
+
+/**
+ * v4l2_subdev_init_finalize() - Finalizes the initialization of the subdevice
+ * @sd: The subdev
+ *
+ * This function finalizes the initialization of the subdev, including
+ * allocation of the active state for the subdev.
+ *
+ * This function must be called by the subdev drivers that use the centralized
+ * active state, after the subdev struct has been initialized and
+ * media_entity_pads_init() has been called, but before registering the
+ * subdev.
+ *
+ * The user must call v4l2_subdev_cleanup() when the subdev is being removed.
+ */
+#define v4l2_subdev_init_finalize(sd)                                          \
+	({                                                                     \
+		static struct lock_class_key __key;                            \
+		const char *name = KBUILD_BASENAME                             \
+			":" __stringify(__LINE__) ":sd->active_state->lock";   \
+		__v4l2_subdev_init_finalize(sd, name, &__key);                 \
+	})
+
+int __v4l2_subdev_init_finalize(struct v4l2_subdev *sd, const char *name,
+				struct lock_class_key *key);
+
+/**
+ * v4l2_subdev_cleanup() - Releases the resources allocated by the subdevice
+ * @sd: The subdevice
+ *
+ * This function will release the resources allocated in
+ * v4l2_subdev_init_finalize.
+ */
+void v4l2_subdev_cleanup(struct v4l2_subdev *sd);
+
+/**
+ * v4l2_subdev_lock_state() - Locks the subdev state
+ * @state: The subdevice state
+ *
+ * Locks the given subdev state.
+ *
+ * The state must be unlocked with v4l2_subdev_unlock_state() after use.
+ */
+static inline void v4l2_subdev_lock_state(struct v4l2_subdev_state *state)
+{
+	mutex_lock(state->lock);
+}
+
+/**
+ * v4l2_subdev_unlock_state() - Unlocks the subdev state
+ * @state: The subdevice state
+ *
+ * Unlocks the given subdev state.
+ */
+static inline void v4l2_subdev_unlock_state(struct v4l2_subdev_state *state)
+{
+	mutex_unlock(state->lock);
+}
+
+/**
+ * v4l2_subdev_get_unlocked_active_state() - Checks that the active subdev state
+ *					     is unlocked and returns it
+ * @sd: The subdevice
+ *
+ * Returns the active state for the subdevice, or NULL if the subdev does not
+ * support active state. If the state is not NULL, calls
+ * lockdep_assert_not_held() to issue a warning if the state is locked.
+ *
+ * This function is to be used e.g. when getting the active state for the sole
+ * purpose of passing it forward, without accessing the state fields.
+ */
+static inline struct v4l2_subdev_state *
+v4l2_subdev_get_unlocked_active_state(struct v4l2_subdev *sd)
+{
+	if (sd->active_state)
+		lockdep_assert_not_held(sd->active_state->lock);
+	return sd->active_state;
+}
+
+/**
+ * v4l2_subdev_get_locked_active_state() - Checks that the active subdev state
+ *					   is locked and returns it
+ *
+ * @sd: The subdevice
+ *
+ * Returns the active state for the subdevice, or NULL if the subdev does not
+ * support active state. If the state is not NULL, calls lockdep_assert_held()
+ * to issue a warning if the state is not locked.
+ *
+ * This function is to be used when the caller knows that the active state is
+ * already locked.
+ */
+static inline struct v4l2_subdev_state *
+v4l2_subdev_get_locked_active_state(struct v4l2_subdev *sd)
+{
+	if (sd->active_state)
+		lockdep_assert_held(sd->active_state->lock);
+	return sd->active_state;
+}
+
+/**
+ * v4l2_subdev_lock_and_get_active_state() - Locks and returns the active subdev
+ *					     state for the subdevice
+ * @sd: The subdevice
+ *
+ * Returns the locked active state for the subdevice, or NULL if the subdev
+ * does not support active state.
+ *
+ * The state must be unlocked with v4l2_subdev_unlock_state() after use.
+ */
+static inline struct v4l2_subdev_state *
+v4l2_subdev_lock_and_get_active_state(struct v4l2_subdev *sd)
+{
+	if (sd->active_state)
+		v4l2_subdev_lock_state(sd->active_state);
+	return sd->active_state;
+}
+
+#if defined(CONFIG_VIDEO_V4L2_SUBDEV_API)
+
+/**
+ * v4l2_subdev_get_fmt() - Fill format based on state
+ * @sd: subdevice
+ * @state: subdevice state
+ * @format: pointer to &struct v4l2_subdev_format
+ *
+ * Fill @format->format field based on the information in the @format struct.
+ *
+ * This function can be used by the subdev drivers which support active state to
+ * implement v4l2_subdev_pad_ops.get_fmt if the subdev driver does not need to
+ * do anything special in their get_fmt op.
+ *
+ * Returns 0 on success, error value otherwise.
+ */
+int v4l2_subdev_get_fmt(struct v4l2_subdev *sd, struct v4l2_subdev_state *state,
+			struct v4l2_subdev_format *format);
+
+#endif /* CONFIG_VIDEO_V4L2_SUBDEV_API */
+
 #endif /* CONFIG_MEDIA_CONTROLLER */
 
 /**
@@ -1155,6 +1410,70 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
 	})
 
 /**
+ * v4l2_subdev_call_state_active - call an operation of a v4l2_subdev which
+ *				   takes state as a parameter, passing the
+ *				   subdev its active state.
+ *
+ * @sd: pointer to the &struct v4l2_subdev
+ * @o: name of the element at &struct v4l2_subdev_ops that contains @f.
+ *     Each element there groups a set of callbacks functions.
+ * @f: callback function to be called.
+ *     The callback functions are defined in groups, according to
+ *     each element at &struct v4l2_subdev_ops.
+ * @args: arguments for @f.
+ *
+ * This is similar to v4l2_subdev_call(), except that this version can only be
+ * used for ops that take a subdev state as a parameter. The macro will get the
+ * active state, lock it before calling the op and unlock it after the call.
+ */
+#define v4l2_subdev_call_state_active(sd, o, f, args...)		\
+	({								\
+		int __result;						\
+		struct v4l2_subdev_state *state;			\
+		state = v4l2_subdev_get_unlocked_active_state(sd);	\
+		if (state)						\
+			v4l2_subdev_lock_state(state);			\
+		__result = v4l2_subdev_call(sd, o, f, state, ##args);	\
+		if (state)						\
+			v4l2_subdev_unlock_state(state);		\
+		__result;						\
+	})
+
+/**
+ * v4l2_subdev_call_state_try - call an operation of a v4l2_subdev which
+ *				takes state as a parameter, passing the
+ *				subdev a newly allocated try state.
+ *
+ * @sd: pointer to the &struct v4l2_subdev
+ * @o: name of the element at &struct v4l2_subdev_ops that contains @f.
+ *     Each element there groups a set of callbacks functions.
+ * @f: callback function to be called.
+ *     The callback functions are defined in groups, according to
+ *     each element at &struct v4l2_subdev_ops.
+ * @args: arguments for @f.
+ *
+ * This is similar to v4l2_subdev_call_state_active(), except that as this
+ * version allocates a new state, this is only usable for
+ * V4L2_SUBDEV_FORMAT_TRY use cases.
+ *
+ * Note: only legacy non-MC drivers may need this macro.
+ */
+#define v4l2_subdev_call_state_try(sd, o, f, args...)                 \
+	({                                                            \
+		int __result;                                         \
+		static struct lock_class_key __key;                   \
+		const char *name = KBUILD_BASENAME                    \
+			":" __stringify(__LINE__) ":state->lock";     \
+		struct v4l2_subdev_state *state =                     \
+			__v4l2_subdev_state_alloc(sd, name, &__key);  \
+		v4l2_subdev_lock_state(state);                        \
+		__result = v4l2_subdev_call(sd, o, f, state, ##args); \
+		v4l2_subdev_unlock_state(state);                      \
+		__v4l2_subdev_state_free(state);                      \
+		__result;                                             \
+	})
+
+/**
  * v4l2_subdev_has_op - Checks if a subdev defines a certain operation.
  *
  * @sd: pointer to the &struct v4l2_subdev
@@ -1178,4 +1497,4 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
 void v4l2_subdev_notify_event(struct v4l2_subdev *sd,
 			      const struct v4l2_event *ev);
 
-#endif
+#endif /* _V4L2_SUBDEV_H */

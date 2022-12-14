@@ -1036,14 +1036,11 @@ static bool is_associated(struct usbnet *usbdev)
 {
 	struct rndis_wlan_private *priv = get_rndis_wlan_priv(usbdev);
 	u8 bssid[ETH_ALEN];
-	int ret;
 
 	if (!priv->radio_on)
 		return false;
 
-	ret = get_bssid(usbdev, bssid);
-
-	return (ret == 0 && !is_zero_ether_addr(bssid));
+	return (get_bssid(usbdev, bssid) == 0 && !is_zero_ether_addr(bssid));
 }
 
 static int disassociate(struct usbnet *usbdev, bool reset_ssid)
@@ -2816,8 +2813,9 @@ static void rndis_wlan_do_link_up_work(struct usbnet *usbdev)
 						resp_ie_len, 0, GFP_KERNEL);
 		} else {
 			struct cfg80211_roam_info roam_info = {
-				.channel = get_current_channel(usbdev, NULL),
-				.bssid = bssid,
+				.links[0].channel =
+					get_current_channel(usbdev, NULL),
+				.links[0].bssid = bssid,
 				.req_ie = req_ie,
 				.req_ie_len = req_ie_len,
 				.resp_ie = resp_ie,
@@ -3504,7 +3502,6 @@ fail:
 	cancel_delayed_work_sync(&priv->dev_poller_work);
 	cancel_delayed_work_sync(&priv->scan_work);
 	cancel_work_sync(&priv->work);
-	flush_workqueue(priv->workqueue);
 	destroy_workqueue(priv->workqueue);
 
 	wiphy_free(wiphy);
@@ -3521,7 +3518,6 @@ static void rndis_wlan_unbind(struct usbnet *usbdev, struct usb_interface *intf)
 	cancel_delayed_work_sync(&priv->dev_poller_work);
 	cancel_delayed_work_sync(&priv->scan_work);
 	cancel_work_sync(&priv->work);
-	flush_workqueue(priv->workqueue);
 	destroy_workqueue(priv->workqueue);
 
 	rndis_unbind(usbdev, intf);

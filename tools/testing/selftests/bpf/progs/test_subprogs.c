@@ -4,8 +4,18 @@
 
 const char LICENSE[] SEC("license") = "GPL";
 
+struct {
+	__uint(type, BPF_MAP_TYPE_ARRAY);
+	__uint(max_entries, 1);
+	__type(key, __u32);
+	__type(value, __u64);
+} array SEC(".maps");
+
 __noinline int sub1(int x)
 {
+	int key = 0;
+
+	bpf_map_lookup_elem(&array, &key);
 	return x + 1;
 }
 
@@ -23,6 +33,9 @@ static __noinline int sub3(int z)
 
 static __noinline int sub4(int w)
 {
+	int key = 0;
+
+	bpf_map_lookup_elem(&array, &key);
 	return w + sub3(5) + sub1(6);
 }
 
@@ -76,6 +89,11 @@ int prog2(void *ctx)
 	return 0;
 }
 
+static int empty_callback(__u32 index, void *data)
+{
+	return 0;
+}
+
 /* prog3 has the same section name as prog1 */
 SEC("raw_tp/sys_enter")
 int prog3(void *ctx)
@@ -84,6 +102,9 @@ int prog3(void *ctx)
 
 	if (!BPF_CORE_READ(t, pid) || !get_task_tgid((uintptr_t)t))
 		return 1;
+
+	/* test that ld_imm64 with BPF_PSEUDO_FUNC doesn't get blinded */
+	bpf_loop(1, empty_callback, NULL, 0);
 
 	res3 = sub3(5) + 6; /* (5 + 3 + (4 + 1)) + 6 = 19 */
 	return 0;

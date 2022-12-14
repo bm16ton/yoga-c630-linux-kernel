@@ -1,0 +1,7 @@
+What:		/sys/bus/platform/devices/ftdi-fifo-fpp-mgr.N/cfg_mode
+Date:		Feb 2019
+Kernel Version:	5.2
+Contact:	Anatolij Gustschin <agust@denx.de>
+Description:
+		Contains either "fifo" or "bitbang" and controls if fifo
+		of bitbang configuration mode is used in the driver.

@@ -14,7 +14,6 @@
 struct file;
 
 extern void fput(struct file *);
-extern void fput_many(struct file *, unsigned int);
 
 struct file_operations;
 struct task_struct;
@@ -47,7 +46,6 @@ static inline void fdput(struct fd fd)
 }
 
 extern struct file *fget(unsigned int fd);
-extern struct file *fget_many(unsigned int fd, unsigned int refs);
 extern struct file *fget_raw(unsigned int fd);
 extern struct file *fget_task(struct task_struct *task, unsigned int fd);
 extern unsigned long __fdget(unsigned int fd);
@@ -92,23 +90,19 @@ extern void put_unused_fd(unsigned int fd);
 
 extern void fd_install(unsigned int fd, struct file *file);
 
-extern int __receive_fd(int fd, struct file *file, int __user *ufd,
+extern int __receive_fd(struct file *file, int __user *ufd,
 			unsigned int o_flags);
+
+extern int receive_fd(struct file *file, unsigned int o_flags);
+
 static inline int receive_fd_user(struct file *file, int __user *ufd,
 				  unsigned int o_flags)
 {
 	if (ufd == NULL)
 		return -EFAULT;
-	return __receive_fd(-1, file, ufd, o_flags);
+	return __receive_fd(file, ufd, o_flags);
 }
-static inline int receive_fd(struct file *file, unsigned int o_flags)
-{
-	return __receive_fd(-1, file, NULL, o_flags);
-}
-static inline int receive_fd_replace(int fd, struct file *file, unsigned int o_flags)
-{
-	return __receive_fd(fd, file, NULL, o_flags);
-}
+int receive_fd_replace(int new_fd, struct file *file, unsigned int o_flags);
 
 extern void flush_delayed_fput(void);
 extern void __fput_sync(struct file *);

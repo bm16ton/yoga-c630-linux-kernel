@@ -336,7 +336,7 @@ static int bch_allocator_thread(void *arg)
 				mutex_unlock(&ca->set->bucket_lock);
 				blkdev_issue_discard(ca->bdev,
 					bucket_to_sector(ca->set, bucket),
-					ca->sb.bucket_size, GFP_KERNEL, 0);
+					ca->sb.bucket_size, GFP_KERNEL);
 				mutex_lock(&ca->set->bucket_lock);
 			}
 
@@ -482,8 +482,7 @@ void bch_bucket_free(struct cache_set *c, struct bkey *k)
 	unsigned int i;
 
 	for (i = 0; i < KEY_PTRS(k); i++)
-		__bch_bucket_free(PTR_CACHE(c, k, i),
-				  PTR_BUCKET(c, k, i));
+		__bch_bucket_free(c->cache, PTR_BUCKET(c, k, i));
 }
 
 int __bch_bucket_alloc_set(struct cache_set *c, unsigned int reserve,
@@ -674,7 +673,7 @@ bool bch_alloc_sectors(struct cache_set *c,
 		SET_PTR_OFFSET(&b->key, i, PTR_OFFSET(&b->key, i) + sectors);
 
 		atomic_long_add(sectors,
-				&PTR_CACHE(c, &b->key, i)->sectors_written);
+				&c->cache->sectors_written);
 	}
 
 	if (b->sectors_free < c->cache->sb.block_size)

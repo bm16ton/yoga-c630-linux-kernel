@@ -3,6 +3,7 @@
 #include <linux/hugetlb.h>
 #include <linux/bitops.h>
 #include <linux/mmu_notifier.h>
+#include <linux/mm_inline.h>
 #include <asm/cacheflush.h>
 #include <asm/tlbflush.h>
 
@@ -317,7 +318,7 @@ EXPORT_SYMBOL_GPL(wp_shared_mapping_range);
  * pfn_mkwrite(). And then after a TLB flush following the write-protection
  * pick up all dirty bits.
  *
- * Note: This function currently skips transhuge page-table entries, since
+ * This function currently skips transhuge page-table entries, since
  * it's intended for dirty-tracking on the PTE level. It will warn on
  * encountering transhuge dirty entries, though, and can easily be extended
  * to handle them as well.

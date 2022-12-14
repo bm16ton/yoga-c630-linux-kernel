@@ -23,8 +23,6 @@
  *
  */
 
-#include <linux/slab.h>
-
 #include "dm_services.h"
 #include "basics/conversion.h"
 
@@ -216,9 +214,7 @@ static void set_spatial_dither(
 	REG_UPDATE(FMT_BIT_DEPTH_CONTROL,
 		FMT_TEMPORAL_DITHER_EN, 0);
 
-	/* no 10bpc on DCE11*/
-	if (params->flags.SPATIAL_DITHER_ENABLED == 0 ||
-		params->flags.SPATIAL_DITHER_DEPTH == 2)
+	if (params->flags.SPATIAL_DITHER_ENABLED == 0)
 		return;
 
 	/* only use FRAME_COUNTER_MAX if frameRandom == 1*/

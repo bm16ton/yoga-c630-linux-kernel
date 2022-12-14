@@ -39,10 +39,29 @@
  * @x2: horizontal ending coordinate (exclusive)
  * @y1: vertical starting coordinate (inclusive)
  * @y2: vertical ending coordinate (exclusive)
+ *
+ * Note that this must match the layout of struct drm_mode_rect or the damage
+ * helpers like drm_atomic_helper_damage_iter_init() break.
  */
 struct drm_rect {
 	int x1, y1, x2, y2;
 };
+
+/**
+ * DRM_RECT_INIT - initialize a rectangle from x/y/w/h
+ * @x: x coordinate
+ * @y: y coordinate
+ * @w: width
+ * @h: height
+ *
+ * RETURNS:
+ * A new rectangle of the specified size.
+ */
+#define DRM_RECT_INIT(x, y, w, h) ((struct drm_rect){ \
+		.x1 = (x), \
+		.y1 = (y), \
+		.x2 = (x) + (w), \
+		.y2 = (y) + (h) })
 
 /**
  * DRM_RECT_FMT - printf string for &struct drm_rect
