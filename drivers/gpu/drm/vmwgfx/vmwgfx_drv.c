@@ -25,7 +25,6 @@
  *
  **************************************************************************/
 
-<<<<<<< HEAD
 
 #include "vmwgfx_drv.h"
 
@@ -34,13 +33,6 @@
 #include "vmwgfx_binding.h"
 #include "ttm_object.h"
 
-=======
-#include <linux/dma-mapping.h>
-#include <linux/module.h>
-#include <linux/pci.h>
-#include <linux/cc_platform.h>
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_aperture.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_gem_ttm_helper.h>
@@ -52,19 +44,11 @@
 #include <drm/ttm/ttm_placement.h>
 #include <generated/utsrelease.h>
 
-<<<<<<< HEAD
 #include <linux/cc_platform.h>
 #include <linux/dma-mapping.h>
 #include <linux/module.h>
 #include <linux/pci.h>
 #include <linux/version.h>
-=======
-#include "ttm_object.h"
-#include "vmwgfx_binding.h"
-#include "vmwgfx_devcaps.h"
-#include "vmwgfx_drv.h"
-#include "vmwgfx_mksstat.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define VMWGFX_DRIVER_DESC "Linux drm driver for VMware graphics devices"
 
@@ -1028,11 +1012,7 @@ static int vmw_driver_load(struct vmw_private *dev_priv, u32 pci_id)
 		goto out_err0;
 	}
 
-<<<<<<< HEAD
 	dev_priv->tdev = ttm_object_device_init(&vmw_prime_dmabuf_ops);
-=======
-	dev_priv->tdev = ttm_object_device_init(12, &vmw_prime_dmabuf_ops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(dev_priv->tdev == NULL)) {
 		drm_err(&dev_priv->drm,
@@ -1153,10 +1133,7 @@ static int vmw_driver_load(struct vmw_private *dev_priv, u32 pci_id)
 	vmw_host_printf("vmwgfx: Module Version: %d.%d.%d (kernel: %s)",
 			VMWGFX_DRIVER_MAJOR, VMWGFX_DRIVER_MINOR,
 			VMWGFX_DRIVER_PATCHLEVEL, UTS_RELEASE);
-<<<<<<< HEAD
 	vmw_write_driver_id(dev_priv);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (dev_priv->enable_fb) {
 		vmw_fifo_resource_inc(dev_priv);
@@ -1209,13 +1186,7 @@ static void vmw_driver_unload(struct drm_device *dev)
 
 	unregister_pm_notifier(&dev_priv->pm_nb);
 
-<<<<<<< HEAD
 	vmw_sw_context_fini(dev_priv);
-=======
-	if (dev_priv->ctx.res_ht_initialized)
-		vmwgfx_ht_remove(&dev_priv->ctx.res_ht);
-	vfree(dev_priv->ctx.cmd_bounce);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (dev_priv->enable_fb) {
 		vmw_fb_off(dev_priv);
 		vmw_fb_close(dev_priv);
@@ -1450,7 +1421,6 @@ static void vmw_remove(struct pci_dev *pdev)
 }
 
 static void vmw_debugfs_resource_managers_init(struct vmw_private *vmw)
-<<<<<<< HEAD
 {
 	struct drm_minor *minor = vmw->drm.primary;
 	struct dentry *root = minor->debugfs_root;
@@ -1465,34 +1435,6 @@ static void vmw_debugfs_resource_managers_init(struct vmw_private *vmw)
 					    root, "mob_ttm");
 	ttm_resource_manager_create_debugfs(ttm_manager_type(&vmw->bdev, VMW_PL_SYSTEM),
 					    root, "system_mob_ttm");
-=======
-{
-	struct drm_minor *minor = vmw->drm.primary;
-	struct dentry *root = minor->debugfs_root;
-
-	ttm_resource_manager_create_debugfs(ttm_manager_type(&vmw->bdev, TTM_PL_SYSTEM),
-					    root, "system_ttm");
-	ttm_resource_manager_create_debugfs(ttm_manager_type(&vmw->bdev, TTM_PL_VRAM),
-					    root, "vram_ttm");
-	ttm_resource_manager_create_debugfs(ttm_manager_type(&vmw->bdev, VMW_PL_GMR),
-					    root, "gmr_ttm");
-	ttm_resource_manager_create_debugfs(ttm_manager_type(&vmw->bdev, VMW_PL_MOB),
-					    root, "mob_ttm");
-	ttm_resource_manager_create_debugfs(ttm_manager_type(&vmw->bdev, VMW_PL_SYSTEM),
-					    root, "system_mob_ttm");
-}
-
-static unsigned long
-vmw_get_unmapped_area(struct file *file, unsigned long uaddr,
-		      unsigned long len, unsigned long pgoff,
-		      unsigned long flags)
-{
-	struct drm_file *file_priv = file->private_data;
-	struct vmw_private *dev_priv = vmw_priv(file_priv->minor->dev);
-
-	return drm_get_unmapped_area(file, uaddr, len, pgoff, flags,
-				     dev_priv->drm.vma_offset_manager);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int vmwgfx_pm_notifier(struct notifier_block *nb, unsigned long val,

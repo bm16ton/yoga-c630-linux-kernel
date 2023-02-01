@@ -1803,11 +1803,7 @@ static int slic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto unmap;
 	}
 
-<<<<<<< HEAD
 	netif_napi_add(dev, &sdev->napi, slic_poll);
-=======
-	netif_napi_add(dev, &sdev->napi, slic_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	netif_carrier_off(dev);
 
 	err = register_netdev(dev);

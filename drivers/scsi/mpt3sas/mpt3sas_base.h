@@ -77,13 +77,8 @@
 #define MPT3SAS_DRIVER_NAME		"mpt3sas"
 #define MPT3SAS_AUTHOR "Avago Technologies <MPT-FusionLinux.pdl@avagotech.com>"
 #define MPT3SAS_DESCRIPTION	"LSI MPT Fusion SAS 3.0 Device Driver"
-<<<<<<< HEAD
 #define MPT3SAS_DRIVER_VERSION		"43.100.00.00"
 #define MPT3SAS_MAJOR_VERSION		43
-=======
-#define MPT3SAS_DRIVER_VERSION		"42.100.00.00"
-#define MPT3SAS_MAJOR_VERSION		42
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MPT3SAS_MINOR_VERSION		100
 #define MPT3SAS_BUILD_VERSION		0
 #define MPT3SAS_RELEASE_VERSION	00

@@ -10,11 +10,6 @@
 #ifndef __DRV_TYPES_H__
 #define __DRV_TYPES_H__
 
-<<<<<<< HEAD
-=======
-#define DRV_NAME "r8188eu"
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "osdep_service.h"
 #include "wlan_bssdef.h"
 #include "rtw_ht.h"
@@ -39,16 +34,9 @@
 #include "rtl8188e_hal.h"
 #include "rtw_fw.h"
 
-<<<<<<< HEAD
 #define FW_RTL8188EU	"rtlwifi/rtl8188eufw.bin"
 
 struct registry_priv {
-=======
-#define DRIVERVERSION	"v4.1.4_6773.20130222"
-
-struct registry_priv {
-	u8	chip_version;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8	rfintfs;
 	u8	lbkmode;
 	u8	hci;
@@ -231,11 +219,7 @@ struct adapter {
 
 #define adapter_to_dvobj(adapter) (adapter->dvobj)
 
-<<<<<<< HEAD
 void rtw_handle_dualmac(struct adapter *adapter, bool init);
-=======
-int rtw_handle_dualmac(struct adapter *adapter, bool init);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline u8 *myid(struct eeprom_priv *peepriv)
 {

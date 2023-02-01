@@ -1067,7 +1067,6 @@ static const struct samsung_cmu_info core_cmu_info __initconst = {
 	.clk_name		= "dout_clkcmu_core_bus",
 };
 
-<<<<<<< HEAD
 /* ---- CMU_FSYS0 ---------------------------------------------------------- */
 
 /* Register Offset definitions for CMU_FSYS2 (0x17700000) */
@@ -1435,8 +1434,6 @@ static const struct samsung_cmu_info fsys1_cmu_info __initconst = {
 	.clk_name		= "dout_clkcmu_fsys1_bus",
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* ---- CMU_FSYS2 ---------------------------------------------------------- */
 
 /* Register Offset definitions for CMU_FSYS2 (0x17c00000) */
@@ -1700,13 +1697,10 @@ static const struct samsung_gate_clock peric0_gate_clks[] __initconst = {
 	     "mout_peric0_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_PERIC0_TOP0_IPCLKPORT_PCLK_0,
 	     21, 0, 0),
-<<<<<<< HEAD
 	GATE(CLK_GOUT_PERIC0_PCLK_1, "gout_peric0_pclk_1",
 	     "mout_peric0_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_PERIC0_TOP0_IPCLKPORT_PCLK_1,
 	     21, 0, 0),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	GATE(CLK_GOUT_PERIC0_PCLK_2, "gout_peric0_pclk_2",
 	     "mout_peric0_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC0_UID_PERIC0_TOP0_IPCLKPORT_PCLK_2,
@@ -1958,13 +1952,10 @@ static const struct samsung_gate_clock peric1_gate_clks[] __initconst = {
 	     "mout_peric1_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC1_UID_PERIC1_TOP0_IPCLKPORT_PCLK_0,
 	     21, 0, 0),
-<<<<<<< HEAD
 	GATE(CLK_GOUT_PERIC1_PCLK_1, "gout_peric1_pclk_1",
 	     "mout_peric1_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC1_UID_PERIC1_TOP0_IPCLKPORT_PCLK_1,
 	     21, 0, 0),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	GATE(CLK_GOUT_PERIC1_PCLK_2, "gout_peric1_pclk_2",
 	     "mout_peric1_bus_user",
 	     CLK_CON_GAT_GOUT_BLK_PERIC1_UID_PERIC1_TOP0_IPCLKPORT_PCLK_2,
@@ -2086,15 +2077,12 @@ static const struct of_device_id exynosautov9_cmu_of_match[] = {
 		.compatible = "samsung,exynosautov9-cmu-core",
 		.data = &core_cmu_info,
 	}, {
-<<<<<<< HEAD
 		.compatible = "samsung,exynosautov9-cmu-fsys0",
 		.data = &fsys0_cmu_info,
 	}, {
 		.compatible = "samsung,exynosautov9-cmu-fsys1",
 		.data = &fsys1_cmu_info,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.compatible = "samsung,exynosautov9-cmu-fsys2",
 		.data = &fsys2_cmu_info,
 	}, {

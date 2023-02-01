@@ -45,11 +45,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-<<<<<<< HEAD
 		pon@800 {
-=======
-		power-on@800 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,pm8916-pon";
 			reg = <0x0800>;
 

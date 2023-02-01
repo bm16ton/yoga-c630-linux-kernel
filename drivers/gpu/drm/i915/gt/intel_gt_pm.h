@@ -55,7 +55,6 @@ static inline void intel_gt_pm_might_put(struct intel_gt *gt)
 	for (tmp = 1, intel_gt_pm_get(gt); tmp; \
 	     intel_gt_pm_put(gt), tmp = 0)
 
-<<<<<<< HEAD
 /**
  * with_intel_gt_pm_if_awake - if GT is PM awake, get a reference to prevent
  *	it to sleep, run some code and then asynchrously put the reference
@@ -64,8 +63,6 @@ static inline void intel_gt_pm_might_put(struct intel_gt *gt)
  * @gt: pointer to the gt
  * @wf: pointer to a temporary wakeref.
  */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define with_intel_gt_pm_if_awake(gt, wf) \
 	for (wf = intel_gt_pm_get_if_awake(gt); wf; intel_gt_pm_put_async(gt), wf = 0)
 

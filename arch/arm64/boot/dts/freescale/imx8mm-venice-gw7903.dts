@@ -250,11 +250,7 @@
 };
 
 &gpio2 {
-<<<<<<< HEAD
 	gpio-line-names = "dig2_in", "dig2_out#", "dig2_ctl", "", "", "", "dig1_ctl", "",
-=======
-	gpio-line-names = "dig2_in", "dig2_out#", "", "", "", "", "", "",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		"dig1_out#", "dig1_in", "", "", "", "", "", "",
 		"", "", "", "", "", "", "", "",
 		"", "", "", "", "", "", "", "";
@@ -634,11 +630,8 @@
 			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x40000041 /* RS232# */
 			MX8MM_IOMUXC_SD1_DATA7_GPIO2_IO9	0x40000041 /* DIG1_IN */
 			MX8MM_IOMUXC_SD1_DATA6_GPIO2_IO8	0x40000041 /* DIG1_OUT */
-<<<<<<< HEAD
 			MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6	0x40000041 /* DIG1_CTL */
 			MX8MM_IOMUXC_SD1_DATA0_GPIO2_IO2	0x40000041 /* DIG2_CTL */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			MX8MM_IOMUXC_SD1_CLK_GPIO2_IO0		0x40000041 /* DIG2_IN */
 			MX8MM_IOMUXC_SD1_CMD_GPIO2_IO1		0x40000041 /* DIG2_OUT */
 			MX8MM_IOMUXC_ECSPI1_MOSI_GPIO5_IO7	0x40000041 /* SIM1DET# */

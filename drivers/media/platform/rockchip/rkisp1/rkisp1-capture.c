@@ -926,11 +926,7 @@ static void rkisp1_pipeline_stream_disable(struct rkisp1_capture *cap)
 	 * If the other capture is streaming, isp and sensor nodes shouldn't
 	 * be disabled, skip them.
 	 */
-<<<<<<< HEAD
 	if (rkisp1->pipe.start_count < 2)
-=======
-	if (rkisp1->pipe.streaming_count < 2)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		v4l2_subdev_call(&rkisp1->isp.sd, video, s_stream, false);
 
 	v4l2_subdev_call(&rkisp1->resizer_devs[cap->id].sd, video, s_stream,

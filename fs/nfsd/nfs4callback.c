@@ -916,10 +916,6 @@ static int setup_callback_client(struct nfs4_client *clp, struct nfs4_cb_conn *c
 	} else {
 		if (!conn->cb_xprt)
 			return -EINVAL;
-<<<<<<< HEAD
-=======
-		clp->cl_cb_conn.cb_xprt = conn->cb_xprt;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		clp->cl_cb_session = ses;
 		args.bc_xprt = conn->cb_xprt;
 		args.prognumber = clp->cl_cb_session->se_cb_prog;

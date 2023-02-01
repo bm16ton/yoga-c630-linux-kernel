@@ -322,11 +322,7 @@ static int igc_ptp_feature_enable_i225(struct ptp_clock_info *ptp,
 		ts = ns_to_timespec64(ns);
 		if (rq->perout.index == 1) {
 			if (use_freq) {
-<<<<<<< HEAD
 				tsauxc_mask = IGC_TSAUXC_EN_CLK1 | IGC_TSAUXC_ST1;
-=======
-				tsauxc_mask = IGC_TSAUXC_EN_CLK1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				tsim_mask = 0;
 			} else {
 				tsauxc_mask = IGC_TSAUXC_EN_TT1;
@@ -337,11 +333,7 @@ static int igc_ptp_feature_enable_i225(struct ptp_clock_info *ptp,
 			freqout = IGC_FREQOUT1;
 		} else {
 			if (use_freq) {
-<<<<<<< HEAD
 				tsauxc_mask = IGC_TSAUXC_EN_CLK0 | IGC_TSAUXC_ST0;
-=======
-				tsauxc_mask = IGC_TSAUXC_EN_CLK0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				tsim_mask = 0;
 			} else {
 				tsauxc_mask = IGC_TSAUXC_EN_TT0;
@@ -355,19 +347,12 @@ static int igc_ptp_feature_enable_i225(struct ptp_clock_info *ptp,
 		tsauxc = rd32(IGC_TSAUXC);
 		tsim = rd32(IGC_TSIM);
 		if (rq->perout.index == 1) {
-<<<<<<< HEAD
 			tsauxc &= ~(IGC_TSAUXC_EN_TT1 | IGC_TSAUXC_EN_CLK1 |
 				    IGC_TSAUXC_ST1);
 			tsim &= ~IGC_TSICR_TT1;
 		} else {
 			tsauxc &= ~(IGC_TSAUXC_EN_TT0 | IGC_TSAUXC_EN_CLK0 |
 				    IGC_TSAUXC_ST0);
-=======
-			tsauxc &= ~(IGC_TSAUXC_EN_TT1 | IGC_TSAUXC_EN_CLK1);
-			tsim &= ~IGC_TSICR_TT1;
-		} else {
-			tsauxc &= ~(IGC_TSAUXC_EN_TT0 | IGC_TSAUXC_EN_CLK0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			tsim &= ~IGC_TSICR_TT0;
 		}
 		if (on) {

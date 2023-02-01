@@ -860,7 +860,6 @@ static int vmd_enable_domain(struct vmd_dev *vmd, unsigned long features)
 
 	pci_scan_child_bus(vmd->bus);
 	vmd_domain_reset(vmd);
-<<<<<<< HEAD
 
 	/* When Intel VMD is enabled, the OS does not discover the Root Ports
 	 * owned by Intel VMD within the MMCFG space. pci_reset_bus() applies
@@ -880,10 +879,6 @@ static int vmd_enable_domain(struct vmd_dev *vmd, unsigned long features)
 		}
 	}
 
-=======
-	list_for_each_entry(child, &vmd->bus->children, node)
-		pci_reset_bus(child->self);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pci_assign_unassigned_bus_resources(vmd->bus);
 
 	/*

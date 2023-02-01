@@ -614,11 +614,7 @@ static int handle_hca_cap(struct mlx5_core_dev *dev, void *set_ctx)
 		MLX5_SET(cmd_hca_cap, set_hca_cap, num_total_dynamic_vf_msix,
 			 MLX5_CAP_GEN_MAX(dev, num_total_dynamic_vf_msix));
 
-<<<<<<< HEAD
 	if (MLX5_CAP_GEN(dev, roce_rw_supported) && MLX5_CAP_GEN_MAX(dev, roce))
-=======
-	if (MLX5_CAP_GEN(dev, roce_rw_supported))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		MLX5_SET(cmd_hca_cap, set_hca_cap, roce,
 			 mlx5_is_roce_on(dev));
 
@@ -746,7 +742,6 @@ static int set_hca_cap(struct mlx5_core_dev *dev)
 		goto out;
 	}
 
-<<<<<<< HEAD
 	memset(set_ctx, 0, set_sz);
 	err = handle_hca_cap_port_selection(dev, set_ctx);
 	if (err) {
@@ -754,8 +749,6 @@ static int set_hca_cap(struct mlx5_core_dev *dev)
 		goto out;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	kfree(set_ctx);
 	return err;
@@ -1101,11 +1094,7 @@ static void mlx5_cleanup_once(struct mlx5_core_dev *dev)
 	mlx5_devcom_unregister_device(dev->priv.devcom);
 }
 
-<<<<<<< HEAD
 static int mlx5_function_setup(struct mlx5_core_dev *dev, bool boot, u64 timeout)
-=======
-static int mlx5_function_setup(struct mlx5_core_dev *dev, u64 timeout)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err;
 
@@ -1201,8 +1190,6 @@ static int mlx5_function_setup(struct mlx5_core_dev *dev, u64 timeout)
 		goto reclaim_boot_pages;
 	}
 	mlx5_start_health_fw_log_up(dev);
-
-	mlx5_start_health_poll(dev);
 
 	return 0;
 
@@ -1380,11 +1367,7 @@ int mlx5_init_one(struct mlx5_core_dev *dev)
 	mutex_lock(&dev->intf_state_mutex);
 	dev->state = MLX5_DEVICE_STATE_UP;
 
-<<<<<<< HEAD
 	err = mlx5_function_setup(dev, true, mlx5_tout_ms(dev, FW_PRE_INIT_TIMEOUT));
-=======
-	err = mlx5_function_setup(dev, mlx5_tout_ms(dev, FW_PRE_INIT_TIMEOUT));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		goto err_function;
 
@@ -1453,7 +1436,6 @@ out:
 	mutex_unlock(&dev->intf_state_mutex);
 	devl_unlock(devlink);
 }
-<<<<<<< HEAD
 
 int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
 {
@@ -1490,44 +1472,6 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
 	mutex_unlock(&dev->intf_state_mutex);
 	return 0;
 
-=======
-
-int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
-{
-	int err = 0;
-	u64 timeout;
-
-	devl_assert_locked(priv_to_devlink(dev));
-	mutex_lock(&dev->intf_state_mutex);
-	if (test_bit(MLX5_INTERFACE_STATE_UP, &dev->intf_state)) {
-		mlx5_core_warn(dev, "interface is up, NOP\n");
-		goto out;
-	}
-	/* remove any previous indication of internal error */
-	dev->state = MLX5_DEVICE_STATE_UP;
-
-	if (recovery)
-		timeout = mlx5_tout_ms(dev, FW_PRE_INIT_ON_RECOVERY_TIMEOUT);
-	else
-		timeout = mlx5_tout_ms(dev, FW_PRE_INIT_TIMEOUT);
-	err = mlx5_function_setup(dev, timeout);
-	if (err)
-		goto err_function;
-
-	err = mlx5_load(dev);
-	if (err)
-		goto err_load;
-
-	set_bit(MLX5_INTERFACE_STATE_UP, &dev->intf_state);
-
-	err = mlx5_attach_device(dev);
-	if (err)
-		goto err_attach;
-
-	mutex_unlock(&dev->intf_state_mutex);
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_attach:
 	clear_bit(MLX5_INTERFACE_STATE_UP, &dev->intf_state);
 	mlx5_unload(dev);
@@ -1544,7 +1488,6 @@ int mlx5_load_one(struct mlx5_core_dev *dev, bool recovery)
 {
 	struct devlink *devlink = priv_to_devlink(dev);
 	int ret;
-<<<<<<< HEAD
 
 	devl_lock(devlink);
 	ret = mlx5_load_one_devl_locked(dev, recovery);
@@ -1559,22 +1502,6 @@ void mlx5_unload_one_devl_locked(struct mlx5_core_dev *dev)
 
 	mlx5_detach_device(dev);
 
-=======
-
-	devl_lock(devlink);
-	ret = mlx5_load_one_devl_locked(dev, recovery);
-	devl_unlock(devlink);
-	return ret;
-}
-
-void mlx5_unload_one_devl_locked(struct mlx5_core_dev *dev)
-{
-	devl_assert_locked(priv_to_devlink(dev));
-	mutex_lock(&dev->intf_state_mutex);
-
-	mlx5_detach_device(dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!test_bit(MLX5_INTERFACE_STATE_UP, &dev->intf_state)) {
 		mlx5_core_warn(dev, "%s: interface is down, NOP\n",
 			       __func__);
@@ -1619,11 +1546,8 @@ static const int types[] = {
 	MLX5_CAP_IPSEC,
 	MLX5_CAP_PORT_SELECTION,
 	MLX5_CAP_DEV_SHAMPO,
-<<<<<<< HEAD
 	MLX5_CAP_MACSEC,
 	MLX5_CAP_ADV_VIRTUALIZATION,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void mlx5_hca_caps_free(struct mlx5_core_dev *dev)

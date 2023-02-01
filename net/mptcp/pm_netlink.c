@@ -796,11 +796,7 @@ static void mptcp_pm_nl_rm_addr_or_subflow(struct mptcp_sock *msk,
 		u8 rm_id = rm_list->ids[i];
 		bool removed = false;
 
-<<<<<<< HEAD
 		mptcp_for_each_subflow_safe(msk, subflow, tmp) {
-=======
-		list_for_each_entry_safe(subflow, tmp, &msk->conn_list, node) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
 			int how = RCV_SHUTDOWN | SEND_SHUTDOWN;
 			u8 id = subflow->local_id;
@@ -809,7 +805,6 @@ static void mptcp_pm_nl_rm_addr_or_subflow(struct mptcp_sock *msk,
 				continue;
 			if (rm_type == MPTCP_MIB_RMSUBFLOW && !mptcp_local_id_match(msk, id, rm_id))
 				continue;
-<<<<<<< HEAD
 
 			pr_debug(" -> %s rm_list_ids[%d]=%u local_id=%u remote_id=%u mpc_id=%u",
 				 rm_type == MPTCP_MIB_RMADDR ? "address" : "subflow",
@@ -830,28 +825,6 @@ static void mptcp_pm_nl_rm_addr_or_subflow(struct mptcp_sock *msk,
 		if (!removed)
 			continue;
 
-=======
-
-			pr_debug(" -> %s rm_list_ids[%d]=%u local_id=%u remote_id=%u mpc_id=%u",
-				 rm_type == MPTCP_MIB_RMADDR ? "address" : "subflow",
-				 i, rm_id, subflow->local_id, subflow->remote_id,
-				 msk->mpc_endpoint_id);
-			spin_unlock_bh(&msk->pm.lock);
-			mptcp_subflow_shutdown(sk, ssk, how);
-
-			/* the following takes care of updating the subflows counter */
-			mptcp_close_ssk(sk, ssk, subflow);
-			spin_lock_bh(&msk->pm.lock);
-
-			removed = true;
-			__MPTCP_INC_STATS(sock_net(sk), rm_type);
-		}
-		if (rm_type == MPTCP_MIB_RMSUBFLOW)
-			__set_bit(rm_id ? rm_id : msk->mpc_endpoint_id, msk->pm.id_avail_bitmap);
-		if (!removed)
-			continue;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!mptcp_pm_is_kernel(msk))
 			continue;
 
@@ -1354,11 +1327,7 @@ static int mptcp_nl_cmd_add_addr(struct sk_buff *skb, struct genl_info *info)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	entry = kmalloc(sizeof(*entry), GFP_KERNEL_ACCOUNT);
-=======
-	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!entry) {
 		GENL_SET_ERR_MSG(info, "can't allocate addr");
 		return -ENOMEM;
@@ -1501,7 +1470,6 @@ static int mptcp_nl_remove_id_zero_address(struct net *net,
 	while ((msk = mptcp_token_iter_next(net, &s_slot, &s_num)) != NULL) {
 		struct sock *sk = (struct sock *)msk;
 		struct mptcp_addr_info msk_local;
-<<<<<<< HEAD
 
 		if (list_empty(&msk->conn_list) || mptcp_pm_is_userspace(msk))
 			goto next;
@@ -1510,16 +1478,6 @@ static int mptcp_nl_remove_id_zero_address(struct net *net,
 		if (!mptcp_addresses_equal(&msk_local, addr, addr->port))
 			goto next;
 
-=======
-
-		if (list_empty(&msk->conn_list) || mptcp_pm_is_userspace(msk))
-			goto next;
-
-		local_address((struct sock_common *)msk, &msk_local);
-		if (!mptcp_addresses_equal(&msk_local, addr, addr->port))
-			goto next;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		lock_sock(sk);
 		spin_lock_bh(&msk->pm.lock);
 		mptcp_pm_remove_addr(msk, &list);
@@ -1958,14 +1916,6 @@ static int mptcp_nl_cmd_set_flags(struct sk_buff *skb, struct genl_info *info)
 	if (!entry) {
 		spin_unlock_bh(&pernet->lock);
 		return -EINVAL;
-<<<<<<< HEAD
-=======
-	}
-	if ((addr.flags & MPTCP_PM_ADDR_FLAG_FULLMESH) &&
-	    (entry->flags & MPTCP_PM_ADDR_FLAG_SIGNAL)) {
-		spin_unlock_bh(&pernet->lock);
-		return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	if ((addr.flags & MPTCP_PM_ADDR_FLAG_FULLMESH) &&
 	    (entry->flags & MPTCP_PM_ADDR_FLAG_SIGNAL)) {
@@ -1978,14 +1928,6 @@ static int mptcp_nl_cmd_set_flags(struct sk_buff *skb, struct genl_info *info)
 	addr = *entry;
 	spin_unlock_bh(&pernet->lock);
 
-<<<<<<< HEAD
-=======
-	changed = (addr.flags ^ entry->flags) & mask;
-	entry->flags = (entry->flags & ~mask) | (addr.flags & mask);
-	addr = *entry;
-	spin_unlock_bh(&pernet->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mptcp_nl_set_flags(net, &addr.addr, bkup, changed);
 	return 0;
 }
@@ -2326,26 +2268,6 @@ static const struct genl_small_ops mptcp_pm_ops[] = {
 		.cmd    = MPTCP_PM_CMD_SUBFLOW_DESTROY,
 		.doit   = mptcp_nl_cmd_sf_destroy,
 		.flags  = GENL_UNS_ADMIN_PERM,
-	},
-	{
-		.cmd    = MPTCP_PM_CMD_ANNOUNCE,
-		.doit   = mptcp_nl_cmd_announce,
-		.flags  = GENL_ADMIN_PERM,
-	},
-	{
-		.cmd    = MPTCP_PM_CMD_REMOVE,
-		.doit   = mptcp_nl_cmd_remove,
-		.flags  = GENL_ADMIN_PERM,
-	},
-	{
-		.cmd    = MPTCP_PM_CMD_SUBFLOW_CREATE,
-		.doit   = mptcp_nl_cmd_sf_create,
-		.flags  = GENL_ADMIN_PERM,
-	},
-	{
-		.cmd    = MPTCP_PM_CMD_SUBFLOW_DESTROY,
-		.doit   = mptcp_nl_cmd_sf_destroy,
-		.flags  = GENL_ADMIN_PERM,
 	},
 };
 

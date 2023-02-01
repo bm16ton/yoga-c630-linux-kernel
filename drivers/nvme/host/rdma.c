@@ -788,7 +788,6 @@ out_free_queues:
 	return ret;
 }
 
-<<<<<<< HEAD
 static int nvme_rdma_alloc_tag_set(struct nvme_ctrl *ctrl)
 {
 	unsigned int cmd_size = sizeof(struct nvme_rdma_request) +
@@ -802,68 +801,10 @@ static int nvme_rdma_alloc_tag_set(struct nvme_ctrl *ctrl)
 			&nvme_rdma_mq_ops, BLK_MQ_F_SHOULD_MERGE,
 			ctrl->opts->nr_poll_queues ? HCTX_MAX_TYPES : 2,
 			cmd_size);
-=======
-static int nvme_rdma_alloc_admin_tag_set(struct nvme_ctrl *nctrl)
-{
-	struct nvme_rdma_ctrl *ctrl = to_rdma_ctrl(nctrl);
-	struct blk_mq_tag_set *set = &ctrl->admin_tag_set;
-	int ret;
-
-	memset(set, 0, sizeof(*set));
-	set->ops = &nvme_rdma_admin_mq_ops;
-	set->queue_depth = NVME_AQ_MQ_TAG_DEPTH;
-	set->reserved_tags = NVMF_RESERVED_TAGS;
-	set->numa_node = nctrl->numa_node;
-	set->cmd_size = sizeof(struct nvme_rdma_request) +
-			NVME_RDMA_DATA_SGL_SIZE;
-	set->driver_data = ctrl;
-	set->nr_hw_queues = 1;
-	set->timeout = NVME_ADMIN_TIMEOUT;
-	set->flags = BLK_MQ_F_NO_SCHED;
-	ret = blk_mq_alloc_tag_set(set);
-	if (!ret)
-		ctrl->ctrl.admin_tagset = set;
-	return ret;
-}
-
-static int nvme_rdma_alloc_tag_set(struct nvme_ctrl *nctrl)
-{
-	struct nvme_rdma_ctrl *ctrl = to_rdma_ctrl(nctrl);
-	struct blk_mq_tag_set *set = &ctrl->tag_set;
-	int ret;
-
-	memset(set, 0, sizeof(*set));
-	set->ops = &nvme_rdma_mq_ops;
-	set->queue_depth = nctrl->sqsize + 1;
-	set->reserved_tags = NVMF_RESERVED_TAGS;
-	set->numa_node = nctrl->numa_node;
-	set->flags = BLK_MQ_F_SHOULD_MERGE;
-	set->cmd_size = sizeof(struct nvme_rdma_request) +
-			NVME_RDMA_DATA_SGL_SIZE;
-	if (nctrl->max_integrity_segments)
-		set->cmd_size += sizeof(struct nvme_rdma_sgl) +
-				 NVME_RDMA_METADATA_SGL_SIZE;
-	set->driver_data = ctrl;
-	set->nr_hw_queues = nctrl->queue_count - 1;
-	set->timeout = NVME_IO_TIMEOUT;
-	set->nr_maps = nctrl->opts->nr_poll_queues ? HCTX_MAX_TYPES : 2;
-	ret = blk_mq_alloc_tag_set(set);
-	if (!ret)
-		ctrl->ctrl.tagset = set;
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void nvme_rdma_destroy_admin_queue(struct nvme_rdma_ctrl *ctrl)
 {
-<<<<<<< HEAD
-=======
-	if (remove) {
-		blk_mq_destroy_queue(ctrl->ctrl.admin_q);
-		blk_mq_destroy_queue(ctrl->ctrl.fabrics_q);
-		blk_mq_free_tag_set(ctrl->ctrl.admin_tagset);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ctrl->async_event_sqe.data) {
 		cancel_work_sync(&ctrl->ctrl.async_event_work);
 		nvme_rdma_free_qe(ctrl->device->dev, &ctrl->async_event_sqe,
@@ -905,7 +846,6 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
 		goto out_free_queue;
 
 	if (new) {
-<<<<<<< HEAD
 		error = nvme_alloc_admin_tag_set(&ctrl->ctrl,
 				&ctrl->admin_tag_set, &nvme_rdma_admin_mq_ops,
 				BLK_MQ_F_NO_SCHED,
@@ -913,17 +853,6 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
 				NVME_RDMA_DATA_SGL_SIZE);
 		if (error)
 			goto out_free_async_qe;
-=======
-		error = nvme_rdma_alloc_admin_tag_set(&ctrl->ctrl);
-		if (error)
-			goto out_free_async_qe;
-
-		ctrl->ctrl.fabrics_q = blk_mq_init_queue(&ctrl->admin_tag_set);
-		if (IS_ERR(ctrl->ctrl.fabrics_q)) {
-			error = PTR_ERR(ctrl->ctrl.fabrics_q);
-			goto out_free_tagset;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	}
 
@@ -956,21 +885,9 @@ out_quiesce_queue:
 out_stop_queue:
 	nvme_rdma_stop_queue(&ctrl->queues[0]);
 	nvme_cancel_admin_tagset(&ctrl->ctrl);
-<<<<<<< HEAD
 out_remove_admin_tag_set:
 	if (new)
 		nvme_remove_admin_tag_set(&ctrl->ctrl);
-=======
-out_cleanup_queue:
-	if (new)
-		blk_mq_destroy_queue(ctrl->ctrl.admin_q);
-out_cleanup_fabrics_q:
-	if (new)
-		blk_mq_destroy_queue(ctrl->ctrl.fabrics_q);
-out_free_tagset:
-	if (new)
-		blk_mq_free_tag_set(ctrl->ctrl.admin_tagset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_free_async_qe:
 	if (ctrl->async_event_sqe.data) {
 		nvme_rdma_free_qe(ctrl->device->dev, &ctrl->async_event_sqe,
@@ -982,19 +899,6 @@ out_free_queue:
 	return error;
 }
 
-<<<<<<< HEAD
-=======
-static void nvme_rdma_destroy_io_queues(struct nvme_rdma_ctrl *ctrl,
-		bool remove)
-{
-	if (remove) {
-		blk_mq_destroy_queue(ctrl->ctrl.connect_q);
-		blk_mq_free_tag_set(ctrl->ctrl.tagset);
-	}
-	nvme_rdma_free_io_queues(ctrl);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
 {
 	int ret, nr_queues;
@@ -1007,13 +911,6 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
 		ret = nvme_rdma_alloc_tag_set(&ctrl->ctrl);
 		if (ret)
 			goto out_free_io_queues;
-<<<<<<< HEAD
-=======
-
-		ret = nvme_ctrl_init_connect_q(&(ctrl->ctrl));
-		if (ret)
-			goto out_free_tag_set;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/*
@@ -1060,14 +957,7 @@ out_wait_freeze_timed_out:
 out_cleanup_tagset:
 	nvme_cancel_tagset(&ctrl->ctrl);
 	if (new)
-<<<<<<< HEAD
 		nvme_remove_io_tag_set(&ctrl->ctrl);
-=======
-		blk_mq_destroy_queue(ctrl->ctrl.connect_q);
-out_free_tag_set:
-	if (new)
-		blk_mq_free_tag_set(ctrl->ctrl.tagset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_free_io_queues:
 	nvme_rdma_free_io_queues(ctrl);
 	return ret;
@@ -1080,17 +970,11 @@ static void nvme_rdma_teardown_admin_queue(struct nvme_rdma_ctrl *ctrl,
 	blk_sync_queue(ctrl->ctrl.admin_q);
 	nvme_rdma_stop_queue(&ctrl->queues[0]);
 	nvme_cancel_admin_tagset(&ctrl->ctrl);
-<<<<<<< HEAD
 	if (remove) {
 		nvme_start_admin_queue(&ctrl->ctrl);
 		nvme_remove_admin_tag_set(&ctrl->ctrl);
 	}
 	nvme_rdma_destroy_admin_queue(ctrl);
-=======
-	if (remove)
-		nvme_start_admin_queue(&ctrl->ctrl);
-	nvme_rdma_destroy_admin_queue(ctrl, remove);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void nvme_rdma_teardown_io_queues(struct nvme_rdma_ctrl *ctrl,
@@ -1114,11 +998,7 @@ static void nvme_rdma_stop_ctrl(struct nvme_ctrl *nctrl)
 {
 	struct nvme_rdma_ctrl *ctrl = to_rdma_ctrl(nctrl);
 
-<<<<<<< HEAD
 	flush_work(&ctrl->err_work);
-=======
-	cancel_work_sync(&ctrl->err_work);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cancel_delayed_work_sync(&ctrl->reconnect_work);
 }
 

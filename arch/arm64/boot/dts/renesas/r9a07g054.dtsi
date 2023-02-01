@@ -261,11 +261,8 @@
 			interrupt-names = "error", "rx", "tx";
 			clocks = <&cpg CPG_MOD R9A07G054_RSPI0_CLKB>;
 			resets = <&cpg R9A07G054_RSPI0_RST>;
-<<<<<<< HEAD
 			dmas = <&dmac 0x2e95>, <&dmac 0x2e96>;
 			dma-names = "tx", "rx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			power-domains = <&cpg>;
 			num-cs = <1>;
 			#address-cells = <1>;
@@ -282,11 +279,8 @@
 			interrupt-names = "error", "rx", "tx";
 			clocks = <&cpg CPG_MOD R9A07G054_RSPI1_CLKB>;
 			resets = <&cpg R9A07G054_RSPI1_RST>;
-<<<<<<< HEAD
 			dmas = <&dmac 0x2e99>, <&dmac 0x2e9a>;
 			dma-names = "tx", "rx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			power-domains = <&cpg>;
 			num-cs = <1>;
 			#address-cells = <1>;
@@ -303,11 +297,8 @@
 			interrupt-names = "error", "rx", "tx";
 			clocks = <&cpg CPG_MOD R9A07G054_RSPI2_CLKB>;
 			resets = <&cpg R9A07G054_RSPI2_RST>;
-<<<<<<< HEAD
 			dmas = <&dmac 0x2e9d>, <&dmac 0x2e9e>;
 			dma-names = "tx", "rx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			power-domains = <&cpg>;
 			num-cs = <1>;
 			#address-cells = <1>;
@@ -659,13 +650,10 @@
 			reg = <0 0x11030000 0 0x10000>;
 			gpio-controller;
 			#gpio-cells = <2>;
-<<<<<<< HEAD
 			#address-cells = <2>;
 			#interrupt-cells = <2>;
 			interrupt-parent = <&irqc>;
 			interrupt-controller;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			gpio-ranges = <&pinctrl 0 0 392>;
 			clocks = <&cpg CPG_MOD R9A07G054_GPIO_HCLK>;
 			power-domains = <&cpg>;
@@ -674,7 +662,6 @@
 				 <&cpg R9A07G054_GPIO_SPARE_RESETN>;
 		};
 
-<<<<<<< HEAD
 		irqc: interrupt-controller@110a0000 {
 			compatible = "renesas,r9a07g054-irqc",
 				     "renesas,rzg2l-irqc";
@@ -730,8 +717,6 @@
 			resets = <&cpg R9A07G054_IA55_RESETN>;
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dmac: dma-controller@11820000 {
 			compatible = "renesas,r9a07g054-dmac",
 				     "renesas,rz-dmac";
@@ -799,11 +784,7 @@
 			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
 		};
 
-<<<<<<< HEAD
 		sdhi0: mmc@11c00000 {
-=======
-		sdhi0: mmc@11c00000  {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "renesas,sdhi-r9a07g054",
 				     "renesas,rcar-gen3-sdhi";
 			reg = <0x0 0x11c00000 0 0x10000>;

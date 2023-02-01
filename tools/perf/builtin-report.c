@@ -752,7 +752,6 @@ static int count_sample_event(struct perf_tool *tool __maybe_unused,
 	return 0;
 }
 
-<<<<<<< HEAD
 static int count_lost_samples_event(struct perf_tool *tool,
 				    union perf_event *event,
 				    struct perf_sample *sample,
@@ -769,8 +768,6 @@ static int count_lost_samples_event(struct perf_tool *tool,
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int process_attr(struct perf_tool *tool __maybe_unused,
 			union perf_event *event,
 			struct evlist **pevlist);
@@ -780,10 +777,7 @@ static void stats_setup(struct report *rep)
 	memset(&rep->tool, 0, sizeof(rep->tool));
 	rep->tool.attr = process_attr;
 	rep->tool.sample = count_sample_event;
-<<<<<<< HEAD
 	rep->tool.lost_samples = count_lost_samples_event;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rep->tool.no_warn = true;
 }
 

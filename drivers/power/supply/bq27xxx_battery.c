@@ -950,17 +950,10 @@ static struct bq27xxx_dm_reg bq27621_dm_regs[] = {
 #define bq27621_dm_regs NULL
 #endif
 
-<<<<<<< HEAD
 #define bq27z561_dm_regs NULL
 #define bq28z610_dm_regs NULL
 #define bq34z100_dm_regs NULL
 #define bq78z100_dm_regs NULL
-=======
-#define bq27z561_dm_regs 0
-#define bq28z610_dm_regs 0
-#define bq34z100_dm_regs 0
-#define bq78z100_dm_regs 0
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define BQ27XXX_O_ZERO		BIT(0)
 #define BQ27XXX_O_OTDC		BIT(1) /* has OTC/OTD overtemperature flags */

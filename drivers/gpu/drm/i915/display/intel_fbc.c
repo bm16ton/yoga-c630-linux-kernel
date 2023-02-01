@@ -55,19 +55,11 @@
 
 #define for_each_fbc_id(__dev_priv, __fbc_id) \
 	for ((__fbc_id) = INTEL_FBC_A; (__fbc_id) < I915_MAX_FBCS; (__fbc_id)++) \
-<<<<<<< HEAD
 		for_each_if(RUNTIME_INFO(__dev_priv)->fbc_mask & BIT(__fbc_id))
 
 #define for_each_intel_fbc(__dev_priv, __fbc, __fbc_id) \
 	for_each_fbc_id((__dev_priv), (__fbc_id)) \
 		for_each_if((__fbc) = (__dev_priv)->display.fbc[(__fbc_id)])
-=======
-		for_each_if(INTEL_INFO(__dev_priv)->display.fbc_mask & BIT(__fbc_id))
-
-#define for_each_intel_fbc(__dev_priv, __fbc, __fbc_id) \
-	for_each_fbc_id((__dev_priv), (__fbc_id)) \
-		for_each_if((__fbc) = (__dev_priv)->fbc[(__fbc_id)])
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct intel_fbc_funcs {
 	void (*activate)(struct intel_fbc *fbc);
@@ -1104,15 +1096,12 @@ static int intel_fbc_check_plane(struct intel_atomic_state *state,
 	if (DISPLAY_VER(i915) >= 12 && crtc_state->has_psr2) {
 		plane_state->no_fbc_reason = "PSR2 enabled";
 		return 0;
-<<<<<<< HEAD
 	}
 
 	/* Wa_14016291713 */
 	if (IS_DISPLAY_VER(i915, 12, 13) && crtc_state->has_psr) {
 		plane_state->no_fbc_reason = "PSR1 enabled (Wa_14016291713)";
 		return 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!pixel_format_is_valid(plane_state)) {
@@ -1272,7 +1261,6 @@ bool intel_fbc_pre_update(struct intel_atomic_state *state,
 	bool need_vblank_wait = false;
 	struct intel_plane *plane;
 	int i;
-<<<<<<< HEAD
 
 	for_each_new_intel_plane_in_state(state, plane, plane_state, i) {
 		struct intel_fbc *fbc = plane->fbc;
@@ -1288,23 +1276,6 @@ bool intel_fbc_pre_update(struct intel_atomic_state *state,
 		mutex_unlock(&fbc->lock);
 	}
 
-=======
-
-	for_each_new_intel_plane_in_state(state, plane, plane_state, i) {
-		struct intel_fbc *fbc = plane->fbc;
-
-		if (!fbc || plane->pipe != crtc->pipe)
-			continue;
-
-		mutex_lock(&fbc->lock);
-
-		if (fbc->state.plane == plane)
-			need_vblank_wait |= __intel_fbc_pre_update(state, crtc, plane);
-
-		mutex_unlock(&fbc->lock);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return need_vblank_wait;
 }
 
@@ -1312,17 +1283,10 @@ static void __intel_fbc_disable(struct intel_fbc *fbc)
 {
 	struct drm_i915_private *i915 = fbc->i915;
 	struct intel_plane *plane = fbc->state.plane;
-<<<<<<< HEAD
 
 	drm_WARN_ON(&i915->drm, !mutex_is_locked(&fbc->lock));
 	drm_WARN_ON(&i915->drm, fbc->active);
 
-=======
-
-	drm_WARN_ON(&i915->drm, !mutex_is_locked(&fbc->lock));
-	drm_WARN_ON(&i915->drm, fbc->active);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_dbg_kms(&i915->drm, "Disabling FBC on [PLANE:%d:%s]\n",
 		    plane->base.base.id, plane->base.name);
 
@@ -1746,28 +1710,17 @@ void intel_fbc_init(struct drm_i915_private *i915)
 	enum intel_fbc_id fbc_id;
 
 	if (!drm_mm_initialized(&i915->mm.stolen))
-<<<<<<< HEAD
 		RUNTIME_INFO(i915)->fbc_mask = 0;
 
 	if (need_fbc_vtd_wa(i915))
 		RUNTIME_INFO(i915)->fbc_mask = 0;
-=======
-		mkwrite_device_info(i915)->display.fbc_mask = 0;
-
-	if (need_fbc_vtd_wa(i915))
-		mkwrite_device_info(i915)->display.fbc_mask = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	i915->params.enable_fbc = intel_sanitize_fbc_option(i915);
 	drm_dbg_kms(&i915->drm, "Sanitized enable_fbc value: %d\n",
 		    i915->params.enable_fbc);
 
 	for_each_fbc_id(i915, fbc_id)
-<<<<<<< HEAD
 		i915->display.fbc[fbc_id] = intel_fbc_create(i915, fbc_id);
-=======
-		i915->fbc[fbc_id] = intel_fbc_create(i915, fbc_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1887,11 +1840,7 @@ void intel_fbc_debugfs_register(struct drm_i915_private *i915)
 	struct drm_minor *minor = i915->drm.primary;
 	struct intel_fbc *fbc;
 
-<<<<<<< HEAD
 	fbc = i915->display.fbc[INTEL_FBC_A];
-=======
-	fbc = i915->fbc[INTEL_FBC_A];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (fbc)
 		intel_fbc_debugfs_add(fbc, minor->debugfs_root);
 }

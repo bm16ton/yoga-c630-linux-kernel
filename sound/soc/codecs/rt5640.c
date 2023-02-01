@@ -2430,72 +2430,9 @@ static void rt5640_cancel_work(void *data)
 }
 
 void rt5640_set_ovcd_params(struct snd_soc_component *component)
-<<<<<<< HEAD
-=======
 {
 	struct rt5640_priv *rt5640 = snd_soc_component_get_drvdata(component);
 
-	snd_soc_component_write(component, RT5640_PR_BASE + RT5640_BIAS_CUR4,
-		0xa800 | rt5640->ovcd_sf);
-
-	snd_soc_component_update_bits(component, RT5640_MICBIAS,
-		RT5640_MIC1_OVTH_MASK | RT5640_MIC1_OVCD_MASK,
-		rt5640->ovcd_th | RT5640_MIC1_OVCD_EN);
-
-	/*
-	 * The over-current-detect is only reliable in detecting the absence
-	 * of over-current, when the mic-contact in the jack is short-circuited,
-	 * the hardware periodically retries if it can apply the bias-current
-	 * leading to the ovcd status flip-flopping 1-0-1 with it being 0 about
-	 * 10% of the time, as we poll the ovcd status bit we might hit that
-	 * 10%, so we enable sticky mode and when checking OVCD we clear the
-	 * status, msleep() a bit and then check to get a reliable reading.
-	 */
-	snd_soc_component_update_bits(component, RT5640_IRQ_CTRL2,
-		RT5640_MB1_OC_STKY_MASK, RT5640_MB1_OC_STKY_EN);
-}
-EXPORT_SYMBOL_GPL(rt5640_set_ovcd_params);
-
-static void rt5640_disable_jack_detect(struct snd_soc_component *component)
-{
-	struct rt5640_priv *rt5640 = snd_soc_component_get_drvdata(component);
-
-	/*
-	 * soc_remove_component() force-disables jack and thus rt5640->jack
-	 * could be NULL at the time of driver's module unloading.
-	 */
-	if (!rt5640->jack)
-		return;
-
-	if (rt5640->jd_gpio_irq_requested)
-		free_irq(rt5640->jd_gpio_irq, rt5640);
-
-	if (rt5640->irq_requested)
-		free_irq(rt5640->irq, rt5640);
-
-	rt5640_cancel_work(rt5640);
-
-	if (rt5640->jack->status & SND_JACK_MICROPHONE) {
-		rt5640_disable_micbias1_ovcd_irq(component);
-		rt5640_disable_micbias1_for_ovcd(component);
-		snd_soc_jack_report(rt5640->jack, 0, SND_JACK_BTN_0);
-	}
-
-	rt5640->jd_gpio_irq_requested = false;
-	rt5640->irq_requested = false;
-	rt5640->jd_gpio = NULL;
-	rt5640->jack = NULL;
-}
-
-static void rt5640_enable_jack_detect(struct snd_soc_component *component,
-				      struct snd_soc_jack *jack,
-				      struct rt5640_set_jack_data *jack_data)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	struct rt5640_priv *rt5640 = snd_soc_component_get_drvdata(component);
-	int ret;
-
-<<<<<<< HEAD
 	snd_soc_component_write(component, RT5640_PR_BASE + RT5640_BIAS_CUR4,
 		0xa800 | rt5640->ovcd_sf);
 
@@ -2558,11 +2495,6 @@ static void rt5640_enable_jack_detect(struct snd_soc_component *component,
 	/* Select JD-source */
 	snd_soc_component_update_bits(component, RT5640_JD_CTRL,
 		RT5640_JD_MASK, rt5640->jd_src << RT5640_JD_SFT);
-=======
-	/* Select JD-source */
-	snd_soc_component_update_bits(component, RT5640_JD_CTRL,
-		RT5640_JD_MASK, rt5640->jd_src);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Selecting GPIO01 as an interrupt */
 	snd_soc_component_update_bits(component, RT5640_GPIO_CTRL1,
@@ -2572,17 +2504,8 @@ static void rt5640_enable_jack_detect(struct snd_soc_component *component,
 	snd_soc_component_update_bits(component, RT5640_GPIO_CTRL3,
 		RT5640_GP1_PF_MASK, RT5640_GP1_PF_OUT);
 
-<<<<<<< HEAD
 	snd_soc_component_write(component, RT5640_DUMMY1, 0x3f41);
 
-=======
-	/* Enabling jd2 in general control 1 */
-	snd_soc_component_write(component, RT5640_DUMMY1, 0x3f41);
-
-	/* Enabling jd2 in general control 2 */
-	snd_soc_component_write(component, RT5640_DUMMY2, 0x4001);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rt5640_set_ovcd_params(component);
 
 	/*
@@ -2811,15 +2734,8 @@ static int rt5640_probe(struct snd_soc_component *component)
 
 	if (device_property_read_u32(component->dev,
 				     "realtek,jack-detect-source", &val) == 0) {
-<<<<<<< HEAD
 		if (val <= RT5640_JD_SRC_HDA_HEADER)
 			rt5640->jd_src = val;
-=======
-		if (val <= RT5640_JD_SRC_GPIO4)
-			rt5640->jd_src = val << RT5640_JD_SFT;
-		else if (val == RT5640_JD_SRC_HDA_HEADER)
-			rt5640->jd_src = RT5640_JD_SRC_HDA_HEADER;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		else
 			dev_warn(component->dev, "Warning: Invalid jack-detect-source value: %d, leaving jack-detect disabled\n",
 				 val);
@@ -2900,7 +2816,6 @@ static int rt5640_resume(struct snd_soc_component *component)
 	regcache_sync(rt5640->regmap);
 
 	if (rt5640->jack) {
-<<<<<<< HEAD
 		if (rt5640->jd_src == RT5640_JD_SRC_HDA_HEADER) {
 			snd_soc_component_update_bits(component,
 				RT5640_DUMMY2, 0x1100, 0x1100);
@@ -2926,14 +2841,6 @@ static int rt5640_resume(struct snd_soc_component *component)
 						RT5640_JD2_EN);
 			}
 		}
-=======
-		if (rt5640->jd_src == RT5640_JD_SRC_HDA_HEADER)
-			snd_soc_component_update_bits(component,
-				RT5640_DUMMY2, 0x1100, 0x1100);
-		else
-			snd_soc_component_write(component, RT5640_DUMMY2,
-				0x4001);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		queue_delayed_work(system_long_wq, &rt5640->jack_work, 0);
 	}

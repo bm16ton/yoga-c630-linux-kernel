@@ -53,11 +53,8 @@ static ssize_t link_show(struct device *dev, struct device_attribute *attr,
 		link = port->sw->link_usb4 ? "usb4" : "tbt";
 	else if (tb_port_has_remote(port))
 		link = port->remote->sw->link_usb4 ? "usb4" : "tbt";
-<<<<<<< HEAD
 	else if (port->xdomain)
 		link = port->xdomain->link_usb4 ? "usb4" : "tbt";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		link = "none";
 

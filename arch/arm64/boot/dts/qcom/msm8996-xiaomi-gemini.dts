@@ -8,10 +8,7 @@
 #include "msm8996-xiaomi-common.dtsi"
 #include <dt-bindings/sound/qcom,q6afe.h>
 #include <dt-bindings/sound/qcom,q6asm.h>
-<<<<<<< HEAD
 #include <dt-bindings/sound/qcom,wcd9335.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <dt-bindings/input/ti-drv260x.h>
 
 / {
@@ -197,11 +194,7 @@
 		};
 
 		codec {
-<<<<<<< HEAD
 			sound-dai = <&wcd9335 AIF4_PB>;
-=======
-			sound-dai = <&wcd9335 6>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 	};
 
@@ -216,11 +209,7 @@
 		};
 
 		codec {
-<<<<<<< HEAD
 			sound-dai = <&wcd9335 AIF1_CAP>;
-=======
-			sound-dai = <&wcd9335 1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 	};
 };

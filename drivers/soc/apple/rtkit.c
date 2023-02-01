@@ -660,15 +660,12 @@ int apple_rtkit_send_message_wait(struct apple_rtkit *rtk, u8 ep, u64 message,
 }
 EXPORT_SYMBOL_GPL(apple_rtkit_send_message_wait);
 
-<<<<<<< HEAD
 int apple_rtkit_poll(struct apple_rtkit *rtk)
 {
 	return mbox_client_peek_data(rtk->mbox_chan);
 }
 EXPORT_SYMBOL_GPL(apple_rtkit_poll);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int apple_rtkit_start_ep(struct apple_rtkit *rtk, u8 endpoint)
 {
 	u64 msg;
@@ -929,15 +926,10 @@ int apple_rtkit_wake(struct apple_rtkit *rtk)
 }
 EXPORT_SYMBOL_GPL(apple_rtkit_wake);
 
-<<<<<<< HEAD
 static void apple_rtkit_free(void *data)
 {
 	struct apple_rtkit *rtk = data;
 
-=======
-static void apple_rtkit_free(struct apple_rtkit *rtk)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mbox_free_channel(rtk->mbox_chan);
 	destroy_workqueue(rtk->wq);
 
@@ -960,12 +952,7 @@ struct apple_rtkit *devm_apple_rtkit_init(struct device *dev, void *cookie,
 	if (IS_ERR(rtk))
 		return rtk;
 
-<<<<<<< HEAD
 	ret = devm_add_action_or_reset(dev, apple_rtkit_free, rtk);
-=======
-	ret = devm_add_action_or_reset(dev, (void (*)(void *))apple_rtkit_free,
-				       rtk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ERR_PTR(ret);
 

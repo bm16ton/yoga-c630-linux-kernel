@@ -352,7 +352,6 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
 
 	err = 0;
 
-<<<<<<< HEAD
 	if (attrs[XFRMA_MTIMER_THRESH]) {
 		if (!attrs[XFRMA_ENCAP]) {
 			NL_SET_ERR_MSG(extack, "MTIMER_THRESH attribute can only be set on ENCAP states");
@@ -360,11 +359,6 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
 			goto out;
 		}
 	}
-=======
-	if (attrs[XFRMA_MTIMER_THRESH])
-		if (!attrs[XFRMA_ENCAP])
-			err = -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	return err;
@@ -2144,11 +2138,7 @@ static bool xfrm_userpolicy_is_valid(__u8 policy)
 }
 
 static int xfrm_set_default(struct sk_buff *skb, struct nlmsghdr *nlh,
-<<<<<<< HEAD
 			    struct nlattr **attrs, struct netlink_ext_ack *extack)
-=======
-			    struct nlattr **attrs)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct net *net = sock_net(skb->sk);
 	struct xfrm_userpolicy_default *up = nlmsg_data(nlh);
@@ -2169,11 +2159,7 @@ static int xfrm_set_default(struct sk_buff *skb, struct nlmsghdr *nlh,
 }
 
 static int xfrm_get_default(struct sk_buff *skb, struct nlmsghdr *nlh,
-<<<<<<< HEAD
 			    struct nlattr **attrs, struct netlink_ext_ack *extack)
-=======
-			    struct nlattr **attrs)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sk_buff *r_skb;
 	struct nlmsghdr *r_nlh;
@@ -3066,16 +3052,6 @@ static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 	}
 
 	err = link->doit(skb, nlh, attrs, extack);
-
-	/* We need to free skb allocated in xfrm_alloc_compat() before
-	 * returning from this function, because consume_skb() won't take
-	 * care of frag_list since netlink destructor sets
-	 * sbk->head to NULL. (see netlink_skb_destructor())
-	 */
-	if (skb_has_frag_list(skb)) {
-		kfree_skb(skb_shinfo(skb)->frag_list);
-		skb_shinfo(skb)->frag_list = NULL;
-	}
 
 	/* We need to free skb allocated in xfrm_alloc_compat() before
 	 * returning from this function, because consume_skb() won't take

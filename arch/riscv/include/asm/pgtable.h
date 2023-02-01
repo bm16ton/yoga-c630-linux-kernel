@@ -426,14 +426,6 @@ static inline void update_mmu_cache_pmd(struct vm_area_struct *vma,
 	update_mmu_cache(vma, address, ptep);
 }
 
-static inline void update_mmu_cache_pmd(struct vm_area_struct *vma,
-		unsigned long address, pmd_t *pmdp)
-{
-	pte_t *ptep = (pte_t *)pmdp;
-
-	update_mmu_cache(vma, address, ptep);
-}
-
 #define __HAVE_ARCH_PTE_SAME
 static inline int pte_same(pte_t pte_a, pte_t pte_b)
 {
@@ -608,10 +600,7 @@ static inline int pmd_dirty(pmd_t pmd)
 	return pte_dirty(pmd_pte(pmd));
 }
 
-<<<<<<< HEAD
 #define pmd_young pmd_young
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline int pmd_young(pmd_t pmd)
 {
 	return pte_young(pmd_pte(pmd));

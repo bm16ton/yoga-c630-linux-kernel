@@ -7,10 +7,7 @@
 //
 
 #include <linux/firmware.h>
-<<<<<<< HEAD
 #include <linux/kfifo.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/slab.h>
 #include "avs.h"
 #include "messages.h"
@@ -303,7 +300,6 @@ void avs_release_firmwares(struct avs_dev *adev)
 		kfree(entry);
 	}
 }
-<<<<<<< HEAD
 
 unsigned int __kfifo_fromio_locked(struct kfifo *fifo, const void __iomem *src, unsigned int len,
 				   spinlock_t *lock)
@@ -326,5 +322,3 @@ unsigned int __kfifo_fromio_locked(struct kfifo *fifo, const void __iomem *src, 
 
 	return len;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

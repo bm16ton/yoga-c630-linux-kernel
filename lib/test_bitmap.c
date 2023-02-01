@@ -1225,7 +1225,6 @@ static void __init selftest(void)
 	test_bitmap_cut();
 	test_bitmap_print_buf();
 	test_bitmap_const_eval();
-<<<<<<< HEAD
 
 	test_find_nth_bit();
 	test_for_each_set_bit();
@@ -1238,8 +1237,6 @@ static void __init selftest(void)
 	test_for_each_clear_bitrange_from();
 	test_for_each_set_clump8();
 	test_for_each_set_bit_wrap();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 KSTM_MODULE_LOADERS(test_bitmap);

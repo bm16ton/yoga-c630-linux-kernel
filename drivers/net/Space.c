@@ -68,11 +68,7 @@ static int netdev_boot_setup_add(char *name, struct ifmap *map)
 	for (i = 0; i < NETDEV_BOOT_SETUP_MAX; i++) {
 		if (s[i].name[0] == '\0' || s[i].name[0] == ' ') {
 			memset(s[i].name, 0, sizeof(s[i].name));
-<<<<<<< HEAD
 			strscpy(s[i].name, name, IFNAMSIZ);
-=======
-			strlcpy(s[i].name, name, IFNAMSIZ);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			memcpy(&s[i].map, map, sizeof(s[i].map));
 			break;
 		}

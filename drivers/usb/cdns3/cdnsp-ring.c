@@ -2034,12 +2034,7 @@ int cdnsp_queue_ctrl_tx(struct cdnsp_device *pdev, struct cdnsp_request *preq)
 
 	/* If there's data, queue data TRBs */
 	if (preq->request.length > 0) {
-<<<<<<< HEAD
 		field = TRB_TYPE(TRB_DATA);
-=======
-		remainder = cdnsp_td_remainder(pdev, 0, preq->request.length,
-					       preq->request.length, preq, 1, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (zlp)
 			field |= TRB_CHAIN;

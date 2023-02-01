@@ -445,17 +445,10 @@ static bool amdgpu_mem_visible(struct amdgpu_device *adev,
 		/* ttm_resource_ioremap only supports contiguous memory */
 		if (end != cursor.start)
 			return false;
-<<<<<<< HEAD
 
 		end = cursor.start + cursor.size;
 	}
 
-=======
-
-		end = cursor.start + cursor.size;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return end <= adev->gmc.visible_vram_size;
 }
 
@@ -1324,20 +1317,12 @@ uint64_t amdgpu_ttm_tt_pte_flags(struct amdgpu_device *adev, struct ttm_tt *ttm,
 static bool amdgpu_ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 					    const struct ttm_place *place)
 {
-<<<<<<< HEAD
 	struct dma_resv_iter resv_cursor;
 	struct dma_fence *f;
 
 	if (!amdgpu_bo_is_amdgpu_bo(bo))
 		return ttm_bo_eviction_valuable(bo, place);
 
-=======
-	unsigned long num_pages = bo->resource->num_pages;
-	struct dma_resv_iter resv_cursor;
-	struct amdgpu_res_cursor cursor;
-	struct dma_fence *f;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Swapout? */
 	if (bo->resource->mem_type == TTM_PL_SYSTEM)
 		return true;
@@ -1356,7 +1341,6 @@ static bool amdgpu_ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 			return false;
 	}
 
-<<<<<<< HEAD
 	/* Preemptible BOs don't own system resources managed by the
 	 * driver (pages, VRAM, GART space). They point to resources
 	 * owned by someone else (e.g. pageable memory in user mode
@@ -1369,131 +1353,9 @@ static bool amdgpu_ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 
 	if (bo->resource->mem_type == TTM_PL_TT &&
 	    amdgpu_bo_encrypted(ttm_to_amdgpu_bo(bo)))
-=======
-	switch (bo->resource->mem_type) {
-	case AMDGPU_PL_PREEMPT:
-		/* Preemptible BOs don't own system resources managed by the
-		 * driver (pages, VRAM, GART space). They point to resources
-		 * owned by someone else (e.g. pageable memory in user mode
-		 * or a DMABuf). They are used in a preemptible context so we
-		 * can guarantee no deadlocks and good QoS in case of MMU
-		 * notifiers or DMABuf move notifiers from the resource owner.
-		 */
-		return false;
-	case TTM_PL_TT:
-		if (amdgpu_bo_is_amdgpu_bo(bo) &&
-		    amdgpu_bo_encrypted(ttm_to_amdgpu_bo(bo)))
-			return false;
-		return true;
-
-	case TTM_PL_VRAM:
-		/* Check each drm MM node individually */
-		amdgpu_res_first(bo->resource, 0, (u64)num_pages << PAGE_SHIFT,
-				 &cursor);
-		while (cursor.remaining) {
-			if (place->fpfn < PFN_DOWN(cursor.start + cursor.size)
-			    && !(place->lpfn &&
-				 place->lpfn <= PFN_DOWN(cursor.start)))
-				return true;
-
-			amdgpu_res_next(&cursor, cursor.size);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 
 	return ttm_bo_eviction_valuable(bo, place);
-}
-
-static void amdgpu_ttm_vram_mm_access(struct amdgpu_device *adev, loff_t pos,
-				      void *buf, size_t size, bool write)
-{
-	while (size) {
-		uint64_t aligned_pos = ALIGN_DOWN(pos, 4);
-		uint64_t bytes = 4 - (pos & 0x3);
-		uint32_t shift = (pos & 0x3) * 8;
-		uint32_t mask = 0xffffffff << shift;
-		uint32_t value = 0;
-
-		if (size < bytes) {
-			mask &= 0xffffffff >> (bytes - size) * 8;
-			bytes = size;
-		}
-
-		if (mask != 0xffffffff) {
-			amdgpu_device_mm_access(adev, aligned_pos, &value, 4, false);
-			if (write) {
-				value &= ~mask;
-				value |= (*(uint32_t *)buf << shift) & mask;
-				amdgpu_device_mm_access(adev, aligned_pos, &value, 4, true);
-			} else {
-				value = (value & mask) >> shift;
-				memcpy(buf, &value, bytes);
-			}
-		} else {
-			amdgpu_device_mm_access(adev, aligned_pos, buf, 4, write);
-		}
-
-		pos += bytes;
-		buf += bytes;
-		size -= bytes;
-	}
-}
-
-static int amdgpu_ttm_access_memory_sdma(struct ttm_buffer_object *bo,
-					unsigned long offset, void *buf, int len, int write)
-{
-	struct amdgpu_bo *abo = ttm_to_amdgpu_bo(bo);
-	struct amdgpu_device *adev = amdgpu_ttm_adev(abo->tbo.bdev);
-	struct amdgpu_res_cursor src_mm;
-	struct amdgpu_job *job;
-	struct dma_fence *fence;
-	uint64_t src_addr, dst_addr;
-	unsigned int num_dw;
-	int r, idx;
-
-	if (len != PAGE_SIZE)
-		return -EINVAL;
-
-	if (!adev->mman.sdma_access_ptr)
-		return -EACCES;
-
-	if (!drm_dev_enter(adev_to_drm(adev), &idx))
-		return -ENODEV;
-
-	if (write)
-		memcpy(adev->mman.sdma_access_ptr, buf, len);
-
-	num_dw = ALIGN(adev->mman.buffer_funcs->copy_num_dw, 8);
-	r = amdgpu_job_alloc_with_ib(adev, num_dw * 4, AMDGPU_IB_POOL_DELAYED, &job);
-	if (r)
-		goto out;
-
-	amdgpu_res_first(abo->tbo.resource, offset, len, &src_mm);
-	src_addr = amdgpu_ttm_domain_start(adev, bo->resource->mem_type) + src_mm.start;
-	dst_addr = amdgpu_bo_gpu_offset(adev->mman.sdma_access_bo);
-	if (write)
-		swap(src_addr, dst_addr);
-
-	amdgpu_emit_copy_buffer(adev, &job->ibs[0], src_addr, dst_addr, PAGE_SIZE, false);
-
-	amdgpu_ring_pad_ib(adev->mman.buffer_funcs_ring, &job->ibs[0]);
-	WARN_ON(job->ibs[0].length_dw > num_dw);
-
-	r = amdgpu_job_submit(job, &adev->mman.entity, AMDGPU_FENCE_OWNER_UNDEFINED, &fence);
-	if (r) {
-		amdgpu_job_free(job);
-		goto out;
-	}
-
-	if (!dma_fence_wait_timeout(fence, false, adev->sdma_timeout))
-		r = -ETIMEDOUT;
-	dma_fence_put(fence);
-
-	if (!(r || write))
-		memcpy(buf, adev->mman.sdma_access_ptr, len);
-out:
-	drm_dev_exit(idx);
-	return r;
 }
 
 static void amdgpu_ttm_vram_mm_access(struct amdgpu_device *adev, loff_t pos,

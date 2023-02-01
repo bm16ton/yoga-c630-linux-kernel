@@ -836,11 +836,7 @@ static int __init save_async_options(char *buf)
 	if (strlen(buf) >= ASYNC_DRV_NAMES_MAX_LEN)
 		pr_warn("Too long list of driver names for 'driver_async_probe'!\n");
 
-<<<<<<< HEAD
 	strscpy(async_probe_drv_names, buf, ASYNC_DRV_NAMES_MAX_LEN);
-=======
-	strlcpy(async_probe_drv_names, buf, ASYNC_DRV_NAMES_MAX_LEN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	async_probe_default = parse_option_str(async_probe_drv_names, "*");
 
 	return 1;

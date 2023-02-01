@@ -2200,13 +2200,6 @@ lpfc_issue_els_plogi(struct lpfc_vport *vport, uint32_t did, uint8_t retry)
 	if (!elsiocb)
 		return 1;
 
-<<<<<<< HEAD
-=======
-	spin_lock_irq(&ndlp->lock);
-	ndlp->nlp_flag &= ~NLP_FCP_PRLI_RJT;
-	spin_unlock_irq(&ndlp->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pcmd = (uint8_t *)elsiocb->cmd_dmabuf->virt;
 
 	/* For PLOGI request, remainder of payload is service parameters */
@@ -2755,15 +2748,9 @@ lpfc_cmpl_els_adisc(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 
 	/* we pass cmdiocb to state machine which needs rspiocb as well */
 	cmdiocb->rsp_iocb = rspiocb;
-<<<<<<< HEAD
 
 	ndlp = cmdiocb->ndlp;
 
-=======
-
-	ndlp = cmdiocb->ndlp;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ulp_status = get_job_ulpstatus(phba, rspiocb);
 	ulp_word4 = get_job_word4(phba, rspiocb);
 
@@ -2912,7 +2899,6 @@ lpfc_issue_els_adisc(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 	lpfc_debugfs_disc_trc(vport, LPFC_DISC_TRC_ELS_CMD,
 			      "Issue ADISC:   did:x%x refcnt %d",
 			      ndlp->nlp_DID, kref_read(&ndlp->kref), 0);
-<<<<<<< HEAD
 
 	rc = lpfc_sli_issue_iocb(phba, LPFC_ELS_RING, elsiocb, 0);
 	if (rc == IOCB_ERROR) {
@@ -2923,18 +2909,6 @@ lpfc_issue_els_adisc(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 
 	return 0;
 
-=======
-
-	rc = lpfc_sli_issue_iocb(phba, LPFC_ELS_RING, elsiocb, 0);
-	if (rc == IOCB_ERROR) {
-		lpfc_els_free_iocb(phba, elsiocb);
-		lpfc_nlp_put(ndlp);
-		goto err;
-	}
-
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err:
 	spin_lock_irq(&ndlp->lock);
 	ndlp->nlp_flag &= ~NLP_ADISC_SND;
@@ -3207,19 +3181,11 @@ lpfc_cmpl_els_cmd(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	struct lpfc_nodelist *free_ndlp;
 	IOCB_t *irsp;
 	u32 ulp_status, ulp_word4, tmo, did, iotag;
-<<<<<<< HEAD
 
 	ulp_status = get_job_ulpstatus(phba, rspiocb);
 	ulp_word4 = get_job_word4(phba, rspiocb);
 	did = get_job_els_rsp64_did(phba, cmdiocb);
 
-=======
-
-	ulp_status = get_job_ulpstatus(phba, rspiocb);
-	ulp_word4 = get_job_word4(phba, rspiocb);
-	did = get_job_els_rsp64_did(phba, cmdiocb);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (phba->sli_rev == LPFC_SLI_REV4) {
 		tmo = get_wqe_tmo(cmdiocb);
 		iotag = get_wqe_reqtag(cmdiocb);
@@ -3352,19 +3318,11 @@ lpfc_cmpl_els_disc_cmd(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	u32 cmd;
 	struct lpfc_nodelist *ndlp = cmdiocb->ndlp;
 	u32 ulp_status, ulp_word4, tmo, did, iotag;
-<<<<<<< HEAD
 
 	ulp_status = get_job_ulpstatus(phba, rspiocb);
 	ulp_word4 = get_job_word4(phba, rspiocb);
 	did = get_job_els_rsp64_did(phba, cmdiocb);
 
-=======
-
-	ulp_status = get_job_ulpstatus(phba, rspiocb);
-	ulp_word4 = get_job_word4(phba, rspiocb);
-	did = get_job_els_rsp64_did(phba, cmdiocb);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (phba->sli_rev == LPFC_SLI_REV4) {
 		tmo = get_wqe_tmo(cmdiocb);
 		iotag = get_wqe_reqtag(cmdiocb);
@@ -4030,12 +3988,8 @@ lpfc_cmpl_els_edc(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 		goto out;
 
 	/* ELS cmd tag <ulpIoTag> completes */
-<<<<<<< HEAD
 	lpfc_printf_log(phba, KERN_INFO,
 			LOG_ELS | LOG_CGN_MGMT | LOG_LDS_EVENT,
-=======
-	lpfc_printf_log(phba, KERN_INFO, LOG_ELS | LOG_CGN_MGMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			"4676 Fabric EDC Rsp: "
 			"0x%02x, 0x%08x\n",
 			edc_rsp->acc_hdr.la_cmd,
@@ -4072,32 +4026,18 @@ lpfc_cmpl_els_edc(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 			if (bytes_remain < FC_TLV_DESC_SZ_FROM_LENGTH(tlv) ||
 			    FC_TLV_DESC_SZ_FROM_LENGTH(tlv) !=
 					sizeof(struct fc_diag_lnkflt_desc)) {
-<<<<<<< HEAD
 				lpfc_printf_log(phba, KERN_WARNING,
 					LOG_ELS | LOG_CGN_MGMT | LOG_LDS_EVENT,
-=======
-				lpfc_printf_log(
-					phba, KERN_WARNING, LOG_CGN_MGMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					"6462 Truncated Link Fault Diagnostic "
 					"descriptor[%d]: %d vs 0x%zx 0x%zx\n",
 					desc_cnt, bytes_remain,
 					FC_TLV_DESC_SZ_FROM_LENGTH(tlv),
-<<<<<<< HEAD
 					sizeof(struct fc_diag_lnkflt_desc));
 				goto out;
 			}
 			plnkflt = (struct fc_diag_lnkflt_desc *)tlv;
 			lpfc_printf_log(phba, KERN_INFO,
 				LOG_ELS | LOG_LDS_EVENT,
-=======
-					sizeof(struct fc_diag_cg_sig_desc));
-				goto out;
-			}
-			plnkflt = (struct fc_diag_lnkflt_desc *)tlv;
-			lpfc_printf_log(
-				phba, KERN_INFO, LOG_ELS | LOG_CGN_MGMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				"4617 Link Fault Desc Data: 0x%08x 0x%08x "
 				"0x%08x 0x%08x 0x%08x\n",
 				be32_to_cpu(plnkflt->desc_tag),
@@ -4177,7 +4117,6 @@ out:
 }
 
 static void
-<<<<<<< HEAD
 lpfc_format_edc_lft_desc(struct lpfc_hba *phba, struct fc_tlv_desc *tlv)
 {
 	struct fc_diag_lnkflt_desc *lft = (struct fc_diag_lnkflt_desc *)tlv;
@@ -4198,10 +4137,6 @@ lpfc_format_edc_cgn_desc(struct lpfc_hba *phba, struct fc_tlv_desc *tlv)
 {
 	struct fc_diag_cg_sig_desc *cgd = (struct fc_diag_cg_sig_desc *)tlv;
 
-=======
-lpfc_format_edc_cgn_desc(struct lpfc_hba *phba, struct fc_diag_cg_sig_desc *cgd)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* We are assuming cgd was zero'ed before calling this routine */
 
 	/* Configure the congestion detection capability */
@@ -4245,7 +4180,6 @@ lpfc_format_edc_cgn_desc(struct lpfc_hba *phba, struct fc_diag_cg_sig_desc *cgd)
 		cpu_to_be16(EDC_CG_SIGFREQ_MSEC);
 }
 
-<<<<<<< HEAD
 static bool
 lpfc_link_is_lds_capable(struct lpfc_hba *phba)
 {
@@ -4263,8 +4197,6 @@ lpfc_link_is_lds_capable(struct lpfc_hba *phba)
 	return false;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  /**
   * lpfc_issue_els_edc - Exchange Diagnostic Capabilities with the fabric.
   * @vport: pointer to a host virtual N_Port data structure.
@@ -4292,21 +4224,12 @@ lpfc_issue_els_edc(struct lpfc_vport *vport, uint8_t retry)
 {
 	struct lpfc_hba  *phba = vport->phba;
 	struct lpfc_iocbq *elsiocb;
-<<<<<<< HEAD
 	struct fc_els_edc *edc_req;
 	struct fc_tlv_desc *tlv;
 	u16 cmdsize;
 	struct lpfc_nodelist *ndlp;
 	u8 *pcmd = NULL;
 	u32 cgn_desc_size, lft_desc_size;
-=======
-	struct lpfc_els_edc_req *edc_req;
-	struct fc_diag_cg_sig_desc *cgn_desc;
-	u16 cmdsize;
-	struct lpfc_nodelist *ndlp;
-	u8 *pcmd = NULL;
-	u32 edc_req_size, cgn_desc_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int rc;
 
 	if (vport->port_type == LPFC_NPIV_PORT)
@@ -4316,7 +4239,6 @@ lpfc_issue_els_edc(struct lpfc_vport *vport, uint8_t retry)
 	if (!ndlp || ndlp->nlp_state != NLP_STE_UNMAPPED_NODE)
 		return -ENODEV;
 
-<<<<<<< HEAD
 	cgn_desc_size = (phba->cgn_init_reg_signal) ?
 				sizeof(struct fc_diag_cg_sig_desc) : 0;
 	lft_desc_size = (lpfc_link_is_lds_capable(phba)) ?
@@ -4328,15 +4250,6 @@ lpfc_issue_els_edc(struct lpfc_vport *vport, uint8_t retry)
 		goto try_rdf;
 
 	cmdsize += sizeof(struct fc_els_edc);
-=======
-	/* If HBA doesn't support signals, drop into RDF */
-	if (!phba->cgn_init_reg_signal)
-		goto try_rdf;
-
-	edc_req_size = sizeof(struct fc_els_edc);
-	cgn_desc_size = sizeof(struct fc_diag_cg_sig_desc);
-	cmdsize = edc_req_size + cgn_desc_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	elsiocb = lpfc_prep_els_iocb(vport, 1, cmdsize, retry, ndlp,
 				     ndlp->nlp_DID, ELS_CMD_EDC);
 	if (!elsiocb)
@@ -4345,7 +4258,6 @@ lpfc_issue_els_edc(struct lpfc_vport *vport, uint8_t retry)
 	/* Configure the payload for the supported Diagnostics capabilities. */
 	pcmd = (u8 *)elsiocb->cmd_dmabuf->virt;
 	memset(pcmd, 0, cmdsize);
-<<<<<<< HEAD
 	edc_req = (struct fc_els_edc *)pcmd;
 	edc_req->desc_len = cpu_to_be32(cgn_desc_size + lft_desc_size);
 	edc_req->edc_cmd = ELS_EDC;
@@ -4359,17 +4271,6 @@ lpfc_issue_els_edc(struct lpfc_vport *vport, uint8_t retry)
 
 	if (lft_desc_size)
 		lpfc_format_edc_lft_desc(phba, tlv);
-=======
-	edc_req = (struct lpfc_els_edc_req *)pcmd;
-	edc_req->edc.desc_len = cpu_to_be32(cgn_desc_size);
-	edc_req->edc.edc_cmd = ELS_EDC;
-
-	cgn_desc = &edc_req->cgn_desc;
-
-	lpfc_format_edc_cgn_desc(phba, cgn_desc);
-
-	phba->cgn_sig_freq = lpfc_fabric_cgn_frequency;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lpfc_printf_vlog(vport, KERN_INFO, LOG_ELS | LOG_CGN_MGMT,
 			 "4623 Xmit EDC to remote "
@@ -4941,18 +4842,8 @@ lpfc_els_retry(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 			 */
 			if (stat.un.b.lsRjtRsnCodeExp ==
 			    LSEXP_REQ_UNSUPPORTED) {
-<<<<<<< HEAD
 				if (cmd == ELS_CMD_PRLI)
 					goto out_retry;
-=======
-				if (cmd == ELS_CMD_PRLI) {
-					spin_lock_irq(&ndlp->lock);
-					ndlp->nlp_flag |= NLP_FCP_PRLI_RJT;
-					spin_unlock_irq(&ndlp->lock);
-					retry = 0;
-					goto out_retry;
-				}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			break;
 		}
@@ -5933,7 +5824,6 @@ lpfc_issue_els_edc_rsp(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 		       struct lpfc_nodelist *ndlp)
 {
 	struct lpfc_hba  *phba = vport->phba;
-<<<<<<< HEAD
 	struct fc_els_edc_resp *edc_rsp;
 	struct fc_tlv_desc *tlv;
 	struct lpfc_iocbq *elsiocb;
@@ -5949,16 +5839,6 @@ lpfc_issue_els_edc_rsp(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 	lft_desc_size = (lpfc_link_is_lds_capable(phba)) ?
 				sizeof(struct fc_diag_lnkflt_desc) : 0;
 	cmdsize += cgn_desc_size + lft_desc_size;
-=======
-	struct lpfc_els_edc_rsp *edc_rsp;
-	struct lpfc_iocbq *elsiocb;
-	IOCB_t *icmd, *cmd;
-	union lpfc_wqe128 *wqe;
-	uint8_t *pcmd;
-	int cmdsize, rc;
-
-	cmdsize = sizeof(struct lpfc_els_edc_rsp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	elsiocb = lpfc_prep_els_iocb(vport, 0, cmdsize, cmdiocb->retry,
 				     ndlp, ndlp->nlp_DID, ELS_CMD_ACC);
 	if (!elsiocb)
@@ -5980,7 +5860,6 @@ lpfc_issue_els_edc_rsp(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 	pcmd = elsiocb->cmd_dmabuf->virt;
 	memset(pcmd, 0, cmdsize);
 
-<<<<<<< HEAD
 	edc_rsp = (struct fc_els_edc_resp *)pcmd;
 	edc_rsp->acc_hdr.la_cmd = ELS_LS_ACC;
 	edc_rsp->desc_list_len = cpu_to_be32(sizeof(struct fc_els_lsri_desc) +
@@ -5994,17 +5873,6 @@ lpfc_issue_els_edc_rsp(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 	tlv = fc_tlv_next_desc(tlv);
 	if (lft_desc_size)
 		lpfc_format_edc_lft_desc(phba, tlv);
-=======
-	edc_rsp = (struct lpfc_els_edc_rsp *)pcmd;
-	edc_rsp->edc_rsp.acc_hdr.la_cmd = ELS_LS_ACC;
-	edc_rsp->edc_rsp.desc_list_len = cpu_to_be32(
-		FC_TLV_DESC_LENGTH_FROM_SZ(struct lpfc_els_edc_rsp));
-	edc_rsp->edc_rsp.lsri.desc_tag = cpu_to_be32(ELS_DTAG_LS_REQ_INFO);
-	edc_rsp->edc_rsp.lsri.desc_len = cpu_to_be32(
-		FC_TLV_DESC_LENGTH_FROM_SZ(struct fc_els_lsri_desc));
-	edc_rsp->edc_rsp.lsri.rqst_w0.cmd = ELS_EDC;
-	lpfc_format_edc_cgn_desc(phba, &edc_rsp->cgn_desc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lpfc_debugfs_disc_trc(vport, LPFC_DISC_TRC_ELS_RSP,
 			      "Issue EDC ACC:      did:x%x flg:x%x refcnt %d",
@@ -9269,11 +9137,7 @@ lpfc_els_rcv_edc(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 	uint32_t *ptr, dtag;
 	const char *dtag_nm;
 	int desc_cnt = 0, bytes_remain;
-<<<<<<< HEAD
 	struct fc_diag_lnkflt_desc *plnkflt;
-=======
-	bool rcv_cap_desc = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	payload = cmdiocb->cmd_dmabuf->virt;
 
@@ -9281,12 +9145,8 @@ lpfc_els_rcv_edc(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 	bytes_remain = be32_to_cpu(edc_req->desc_len);
 
 	ptr = (uint32_t *)payload;
-<<<<<<< HEAD
 	lpfc_printf_vlog(vport, KERN_INFO,
 			 LOG_ELS | LOG_CGN_MGMT | LOG_LDS_EVENT,
-=======
-	lpfc_printf_vlog(vport, KERN_INFO, LOG_ELS | LOG_CGN_MGMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 "3319 Rcv EDC payload len %d: x%x x%x x%x\n",
 			 bytes_remain, be32_to_cpu(*ptr),
 			 be32_to_cpu(*(ptr + 1)), be32_to_cpu(*(ptr + 2)));
@@ -9305,16 +9165,10 @@ lpfc_els_rcv_edc(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 	 * cycle through EDC diagnostic descriptors to find the
 	 * congestion signaling capability descriptor
 	 */
-<<<<<<< HEAD
 	while (bytes_remain) {
 		if (bytes_remain < FC_TLV_DESC_HDR_SZ) {
 			lpfc_printf_log(phba, KERN_WARNING,
 					LOG_ELS | LOG_CGN_MGMT | LOG_LDS_EVENT,
-=======
-	while (bytes_remain && !rcv_cap_desc) {
-		if (bytes_remain < FC_TLV_DESC_HDR_SZ) {
-			lpfc_printf_log(phba, KERN_WARNING, LOG_CGN_MGMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					"6464 Truncated TLV hdr on "
 					"Diagnostic descriptor[%d]\n",
 					desc_cnt);
@@ -9327,18 +9181,12 @@ lpfc_els_rcv_edc(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 			if (bytes_remain < FC_TLV_DESC_SZ_FROM_LENGTH(tlv) ||
 			    FC_TLV_DESC_SZ_FROM_LENGTH(tlv) !=
 				sizeof(struct fc_diag_lnkflt_desc)) {
-<<<<<<< HEAD
 				lpfc_printf_log(phba, KERN_WARNING,
 					LOG_ELS | LOG_CGN_MGMT | LOG_LDS_EVENT,
-=======
-				lpfc_printf_log(
-					phba, KERN_WARNING, LOG_CGN_MGMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					"6465 Truncated Link Fault Diagnostic "
 					"descriptor[%d]: %d vs 0x%zx 0x%zx\n",
 					desc_cnt, bytes_remain,
 					FC_TLV_DESC_SZ_FROM_LENGTH(tlv),
-<<<<<<< HEAD
 					sizeof(struct fc_diag_lnkflt_desc));
 				goto out;
 			}
@@ -9354,12 +9202,6 @@ lpfc_els_rcv_edc(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 				be32_to_cpu(
 					plnkflt->degrade_deactivate_threshold),
 				be32_to_cpu(plnkflt->fec_degrade_interval));
-=======
-					sizeof(struct fc_diag_cg_sig_desc));
-				goto out;
-			}
-			/* No action for Link Fault descriptor for now */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		case ELS_DTAG_CG_SIGNAL_CAP:
 			if (bytes_remain < FC_TLV_DESC_SZ_FROM_LENGTH(tlv) ||
@@ -9386,19 +9228,11 @@ lpfc_els_rcv_edc(struct lpfc_vport *vport, struct lpfc_iocbq *cmdiocb,
 
 			lpfc_least_capable_settings(
 				phba, (struct fc_diag_cg_sig_desc *)tlv);
-<<<<<<< HEAD
 			break;
 		default:
 			dtag_nm = lpfc_get_tlv_dtag_nm(dtag);
 			lpfc_printf_log(phba, KERN_WARNING,
 					LOG_ELS | LOG_CGN_MGMT | LOG_LDS_EVENT,
-=======
-			rcv_cap_desc = true;
-			break;
-		default:
-			dtag_nm = lpfc_get_tlv_dtag_nm(dtag);
-			lpfc_printf_log(phba, KERN_WARNING, LOG_CGN_MGMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					"6467 unknown Diagnostic "
 					"Descriptor[%d]: tag x%x (%s)\n",
 					desc_cnt, dtag, dtag_nm);

@@ -193,7 +193,6 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 		return -ENODEV;
 	}
 
-<<<<<<< HEAD
 	if (!device->power.flags.ignore_parent) {
 		struct acpi_device *parent;
 
@@ -205,15 +204,6 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 					  acpi_power_state_string(parent->power.state));
 			return -ENODEV;
 		}
-=======
-	if (!device->power.flags.ignore_parent && device->parent &&
-	    state < device->parent->power.state) {
-		acpi_handle_debug(device->handle,
-				  "Cannot transition to %s for parent in %s\n",
-				  acpi_power_state_string(state),
-				  acpi_power_state_string(device->parent->power.state));
-		return -ENODEV;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/*
@@ -1491,11 +1481,7 @@ EXPORT_SYMBOL_GPL(acpi_storage_d3);
  * not valid to ask for the ACPI power state of the device in that time frame.
  *
  * This function is intended to be used in a driver's probe or remove
-<<<<<<< HEAD
  * function. See Documentation/firmware-guide/acpi/non-d0-probe.rst for
-=======
- * function. See Documentation/firmware-guide/acpi/low-power-probe.rst for
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * more information.
  */
 bool acpi_dev_state_d0(struct device *dev)

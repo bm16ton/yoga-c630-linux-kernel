@@ -224,18 +224,12 @@ machine-$(CONFIG_ARCH_ZYNQ)		+= zynq
 machine-$(CONFIG_PLAT_VERSATILE)	+= versatile
 machine-$(CONFIG_PLAT_SPEAR)		+= spear
 
-<<<<<<< HEAD
 # legacy platforms provide their own mach/*.h headers globally,
 # these three are mutually exclusive
 machdirs-$(CONFIG_ARCH_FOOTBRIDGE)	+= arch/arm/mach-footbridge
 machdirs-$(CONFIG_ARCH_RPC)		+= arch/arm/mach-rpc
 machdirs-$(CONFIG_ARCH_SA1100)		+= arch/arm/mach-sa1100
 KBUILD_CPPFLAGS += $(patsubst %,-I$(srctree)/%/include,$(machdirs-y))
-=======
-# Platform directory name.  This list is sorted alphanumerically
-# by CONFIG_* macro name.
-plat-$(CONFIG_PLAT_ORION)	+= orion
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # The byte offset of the kernel image in RAM from the start of RAM.
 TEXT_OFFSET := $(textofs-y)

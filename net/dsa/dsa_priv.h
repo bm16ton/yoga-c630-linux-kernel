@@ -132,7 +132,6 @@ struct dsa_switchdev_event_work {
 	unsigned char addr[ETH_ALEN];
 	u16 vid;
 	bool host_addr;
-<<<<<<< HEAD
 };
 
 enum dsa_standalone_event {
@@ -142,17 +141,6 @@ enum dsa_standalone_event {
 	DSA_MC_DEL,
 };
 
-=======
-};
-
-enum dsa_standalone_event {
-	DSA_UC_ADD,
-	DSA_UC_DEL,
-	DSA_MC_ADD,
-	DSA_MC_DEL,
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dsa_standalone_event_work {
 	struct work_struct work;
 	struct net_device *dev;
@@ -307,24 +295,16 @@ int dsa_port_mrp_add_ring_role(const struct dsa_port *dp,
 int dsa_port_mrp_del_ring_role(const struct dsa_port *dp,
 			       const struct switchdev_obj_ring_role_mrp *mrp);
 int dsa_port_phylink_create(struct dsa_port *dp);
-<<<<<<< HEAD
 void dsa_port_phylink_destroy(struct dsa_port *dp);
 int dsa_shared_port_link_register_of(struct dsa_port *dp);
 void dsa_shared_port_link_unregister_of(struct dsa_port *dp);
-=======
-int dsa_port_link_register_of(struct dsa_port *dp);
-void dsa_port_link_unregister_of(struct dsa_port *dp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr);
 void dsa_port_hsr_leave(struct dsa_port *dp, struct net_device *hsr);
 int dsa_port_tag_8021q_vlan_add(struct dsa_port *dp, u16 vid, bool broadcast);
 void dsa_port_tag_8021q_vlan_del(struct dsa_port *dp, u16 vid, bool broadcast);
 void dsa_port_set_host_flood(struct dsa_port *dp, bool uc, bool mc);
-<<<<<<< HEAD
 int dsa_port_change_master(struct dsa_port *dp, struct net_device *master,
 			   struct netlink_ext_ack *extack);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* slave.c */
 extern const struct dsa_device_ops notag_netdev_ops;
@@ -342,11 +322,8 @@ void dsa_slave_sync_ha(struct net_device *dev);
 void dsa_slave_unsync_ha(struct net_device *dev);
 void dsa_slave_setup_tagger(struct net_device *slave);
 int dsa_slave_change_mtu(struct net_device *dev, int new_mtu);
-<<<<<<< HEAD
 int dsa_slave_change_master(struct net_device *dev, struct net_device *master,
 			    struct netlink_ext_ack *extack);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int dsa_slave_manage_vlan_filtering(struct net_device *dev,
 				    bool vlan_filtering);
 
@@ -582,10 +559,7 @@ void dsa_lag_map(struct dsa_switch_tree *dst, struct dsa_lag *lag);
 void dsa_lag_unmap(struct dsa_switch_tree *dst, struct dsa_lag *lag);
 struct dsa_lag *dsa_tree_lag_find(struct dsa_switch_tree *dst,
 				  const struct net_device *lag_dev);
-<<<<<<< HEAD
 struct net_device *dsa_tree_find_first_master(struct dsa_switch_tree *dst);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int dsa_tree_notify(struct dsa_switch_tree *dst, unsigned long e, void *v);
 int dsa_broadcast(unsigned long e, void *v);
 int dsa_tree_change_tag_proto(struct dsa_switch_tree *dst,

@@ -49,11 +49,7 @@
  */
 	.align	12
 
-<<<<<<< HEAD
 #if defined(CONFIG_PPC_BOOK3S_32) || defined(CONFIG_PPC_E500)
-=======
-#if defined(CONFIG_PPC_BOOK3S_32) || defined(CONFIG_E500)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.globl	prepare_transfer_to_handler
 prepare_transfer_to_handler:
 	/* if from kernel, check interrupted DOZE/NAP mode */
@@ -72,17 +68,10 @@ prepare_transfer_to_handler:
 	lwz	r9,_MSR(r11)		/* if sleeping, clear MSR.EE */
 	rlwinm	r9,r9,0,~MSR_EE
 	lwz	r12,_LINK(r11)		/* and return to address in LR */
-<<<<<<< HEAD
 	REST_GPR(2, r11)
 	b	fast_exception_return
 _ASM_NOKPROBE_SYMBOL(prepare_transfer_to_handler)
 #endif /* CONFIG_PPC_BOOK3S_32 || CONFIG_PPC_E500 */
-=======
-	lwz	r2, GPR2(r11)
-	b	fast_exception_return
-_ASM_NOKPROBE_SYMBOL(prepare_transfer_to_handler)
-#endif /* CONFIG_PPC_BOOK3S_32 || CONFIG_E500 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if defined(CONFIG_PPC_KUEP) && defined(CONFIG_PPC_BOOK3S_32)
 	.globl	__kuep_lock
@@ -112,10 +101,7 @@ __kuep_unlock:
 
 	.globl	transfer_to_syscall
 transfer_to_syscall:
-<<<<<<< HEAD
 	stw	r3, ORIG_GPR3(r1)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	stw	r11, GPR1(r1)
 	stw	r11, 0(r1)
 	mflr	r12
@@ -136,15 +122,9 @@ transfer_to_syscall:
 	SAVE_NVGPRS(r1)
 	kuep_lock
 
-<<<<<<< HEAD
 	/* Calling convention has r3 = regs, r4 = orig r0 */
 	addi	r3,r1,STACK_FRAME_OVERHEAD
 	mr	r4,r0
-=======
-	/* Calling convention has r9 = orig r0, r10 = regs */
-	addi	r10,r1,STACK_FRAME_OVERHEAD
-	mr	r9,r0
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bl	system_call_exception
 
 ret_from_syscall:
@@ -185,15 +165,8 @@ syscall_exit_finish:
 	REST_NVGPRS(r1)
 	mtctr	r4
 	mtxer	r5
-<<<<<<< HEAD
 	REST_GPR(0, r1)
 	REST_GPRS(3, 12, r1)
-=======
-	lwz	r0,GPR0(r1)
-	lwz	r3,GPR3(r1)
-	REST_GPRS(4, 11, r1)
-	lwz	r12,GPR12(r1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	b	1b
 
 #ifdef CONFIG_44x
@@ -285,14 +258,8 @@ fast_exception_return:
 	beq	3f			/* if not, we've got problems */
 #endif
 
-<<<<<<< HEAD
 2:	lwz	r10,_CCR(r11)
 	REST_GPRS(1, 6, r11)
-=======
-2:	REST_GPRS(3, 6, r11)
-	lwz	r10,_CCR(r11)
-	REST_GPRS(1, 2, r11)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mtcr	r10
 	lwz	r10,_LINK(r11)
 	mtlr	r10
@@ -353,11 +320,7 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	li	r0,0
 
 	/*
-<<<<<<< HEAD
 	 * Leaving a stale exception marker on the stack can confuse
-=======
-	 * Leaving a stale exception_marker on the stack can confuse
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * the reliable stack unwinder later on. Clear it.
 	 */
 	stw	r0,8(r1)
@@ -409,11 +372,7 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	mtspr	SPRN_XER,r5
 
 	/*
-<<<<<<< HEAD
 	 * Leaving a stale exception marker on the stack can confuse
-=======
-	 * Leaving a stale exception_marker on the stack can confuse
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * the reliable stack unwinder later on. Clear it.
 	 */
 	stw	r0,8(r1)
@@ -492,14 +451,8 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return)
 	lwz	r3,_MSR(r1);						\
 	andi.	r3,r3,MSR_PR;						\
 	bne	interrupt_return;					\
-<<<<<<< HEAD
 	REST_GPR(0, r1);						\
 	REST_GPRS(2, 8, r1);						\
-=======
-	lwz	r0,GPR0(r1);						\
-	lwz	r2,GPR2(r1);						\
-	REST_GPRS(3, 8, r1);						\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lwz	r10,_XER(r1);						\
 	lwz	r11,_CTR(r1);						\
 	mtspr	SPRN_XER,r10;						\

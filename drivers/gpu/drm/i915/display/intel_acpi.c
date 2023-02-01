@@ -332,7 +332,6 @@ void intel_acpi_assign_connector_fwnodes(struct drm_i915_private *i915)
 	 */
 	fwnode_handle_put(fwnode);
 }
-<<<<<<< HEAD
 
 void intel_acpi_video_register(struct drm_i915_private *i915)
 {
@@ -359,5 +358,3 @@ void intel_acpi_video_register(struct drm_i915_private *i915)
 	}
 	drm_connector_list_iter_end(&conn_iter);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

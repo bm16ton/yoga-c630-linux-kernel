@@ -422,7 +422,6 @@ void __khugepaged_enter(struct mm_struct *mm)
 	mm_slot = mm_slot_alloc(mm_slot_cache);
 	if (!mm_slot)
 		return;
-<<<<<<< HEAD
 
 	slot = &mm_slot->slot;
 
@@ -430,13 +429,6 @@ void __khugepaged_enter(struct mm_struct *mm)
 	VM_BUG_ON_MM(hpage_collapse_test_exit(mm), mm);
 	if (unlikely(test_and_set_bit(MMF_VM_HUGEPAGE, &mm->flags))) {
 		mm_slot_free(mm_slot_cache, mm_slot);
-=======
-
-	/* __khugepaged_exit() must not run from under us */
-	VM_BUG_ON_MM(khugepaged_test_exit(mm), mm);
-	if (unlikely(test_and_set_bit(MMF_VM_HUGEPAGE, &mm->flags))) {
-		free_mm_slot(mm_slot);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 	}
 
@@ -460,11 +452,7 @@ void khugepaged_enter_vma(struct vm_area_struct *vma,
 {
 	if (!test_bit(MMF_VM_HUGEPAGE, &vma->vm_mm->flags) &&
 	    hugepage_flags_enabled()) {
-<<<<<<< HEAD
 		if (hugepage_vma_check(vma, vm_flags, false, false, true))
-=======
-		if (hugepage_vma_check(vma, vm_flags, false, false))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__khugepaged_enter(vma->vm_mm);
 	}
 }
@@ -581,7 +569,6 @@ static int __collapse_huge_page_isolate(struct vm_area_struct *vma,
 
 		VM_BUG_ON_PAGE(!PageAnon(page), page);
 
-<<<<<<< HEAD
 		if (page_mapcount(page) > 1) {
 			++shared;
 			if (cc->is_khugepaged &&
@@ -590,13 +577,6 @@ static int __collapse_huge_page_isolate(struct vm_area_struct *vma,
 				count_vm_event(THP_SCAN_EXCEED_SHARED_PTE);
 				goto out;
 			}
-=======
-		if (page_mapcount(page) > 1 &&
-				++shared > khugepaged_max_ptes_shared) {
-			result = SCAN_EXCEED_SHARED_PTE;
-			count_vm_event(THP_SCAN_EXCEED_SHARED_PTE);
-			goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (PageCompound(page)) {
@@ -827,68 +807,6 @@ static bool hpage_collapse_alloc_page(struct page **hpage, gfp_t gfp, int node,
 
 	prep_transhuge_page(*hpage);
 	count_vm_event(THP_COLLAPSE_ALLOC);
-<<<<<<< HEAD
-=======
-	return *hpage;
-}
-#else
-static int khugepaged_find_target_node(void)
-{
-	return 0;
-}
-
-static inline struct page *alloc_khugepaged_hugepage(void)
-{
-	struct page *page;
-
-	page = alloc_pages(alloc_hugepage_khugepaged_gfpmask(),
-			   HPAGE_PMD_ORDER);
-	if (page)
-		prep_transhuge_page(page);
-	return page;
-}
-
-static struct page *khugepaged_alloc_hugepage(bool *wait)
-{
-	struct page *hpage;
-
-	do {
-		hpage = alloc_khugepaged_hugepage();
-		if (!hpage) {
-			count_vm_event(THP_COLLAPSE_ALLOC_FAILED);
-			if (!*wait)
-				return NULL;
-
-			*wait = false;
-			khugepaged_alloc_sleep();
-		} else
-			count_vm_event(THP_COLLAPSE_ALLOC);
-	} while (unlikely(!hpage) && likely(hugepage_flags_enabled()));
-
-	return hpage;
-}
-
-static bool khugepaged_prealloc_page(struct page **hpage, bool *wait)
-{
-	/*
-	 * If the hpage allocated earlier was briefly exposed in page cache
-	 * before collapse_file() failed, it is possible that racing lookups
-	 * have not yet completed, and would then be unpleasantly surprised by
-	 * finding the hpage reused for the same mapping at a different offset.
-	 * Just release the previous allocation if there is any danger of that.
-	 */
-	if (*hpage && page_count(*hpage) > 1) {
-		put_page(*hpage);
-		*hpage = NULL;
-	}
-
-	if (!*hpage)
-		*hpage = khugepaged_alloc_hugepage(wait);
-
-	if (unlikely(!*hpage))
-		return false;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return true;
 }
 
@@ -914,21 +832,8 @@ static int hugepage_vma_revalidate(struct mm_struct *mm, unsigned long address,
 
 	if (!transhuge_vma_suitable(vma, address))
 		return SCAN_ADDRESS_RANGE;
-<<<<<<< HEAD
 	if (!hugepage_vma_check(vma, vma->vm_flags, false, false,
 				cc->is_khugepaged))
-=======
-	if (!hugepage_vma_check(vma, vma->vm_flags, false, false))
-		return SCAN_VMA_CHECK;
-	/*
-	 * Anon VMA expected, the address may be unmapped then
-	 * remapped to file after khugepaged reaquired the mmap_lock.
-	 *
-	 * hugepage_vma_check may return true for qualified file
-	 * vmas.
-	 */
-	if (!vma->anon_vma || !vma_is_anonymous(vma))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return SCAN_VMA_CHECK;
 	/*
 	 * Anon VMA expected, the address may be unmapped then
@@ -1023,12 +928,8 @@ static int __collapse_huge_page_swapin(struct mm_struct *mm,
 		 */
 		if (ret & VM_FAULT_RETRY) {
 			trace_mm_collapse_huge_page_swapin(mm, swapped_in, referenced, 0);
-<<<<<<< HEAD
 			/* Likely, but not guaranteed, that page lock failed */
 			return SCAN_PAGE_LOCK;
-=======
-			return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		if (ret & VM_FAULT_ERROR) {
 			mmap_read_unlock(mm);
@@ -1085,13 +986,8 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 	 */
 	mmap_read_unlock(mm);
 
-<<<<<<< HEAD
 	result = alloc_charge_hpage(&hpage, mm, cc);
 	if (result != SCAN_SUCCEED)
-=======
-	if (unlikely(mem_cgroup_charge(page_folio(new_page), mm, gfp))) {
-		result = SCAN_CGROUP_CHARGE_FAIL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_nolock;
 
 	mmap_read_lock(mm);
@@ -1107,7 +1003,6 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 		goto out_nolock;
 	}
 
-<<<<<<< HEAD
 	if (unmapped) {
 		/*
 		 * __collapse_huge_page_swapin will return with mmap_lock
@@ -1118,16 +1013,6 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 						     referenced);
 		if (result != SCAN_SUCCEED)
 			goto out_nolock;
-=======
-	/*
-	 * __collapse_huge_page_swapin will return with mmap_lock released
-	 * when it fails. So we jump out_nolock directly in that case.
-	 * Continuing to collapse causes inconsistency.
-	 */
-	if (unmapped && !__collapse_huge_page_swapin(mm, vma, address,
-						     pmd, referenced)) {
-		goto out_nolock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	mmap_read_unlock(mm);
@@ -1137,20 +1022,12 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 	 * handled by the anon_vma lock + PG_lock.
 	 */
 	mmap_write_lock(mm);
-<<<<<<< HEAD
 	result = hugepage_vma_revalidate(mm, address, true, &vma, cc);
 	if (result != SCAN_SUCCEED)
 		goto out_up_write;
 	/* check if the pmd is still valid */
 	result = check_pmd_still_valid(mm, address, pmd);
 	if (result != SCAN_SUCCEED)
-=======
-	result = hugepage_vma_revalidate(mm, address, &vma);
-	if (result)
-		goto out_up_write;
-	/* check if the pmd is still valid */
-	if (mm_find_pmd(mm, address) != pmd)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_up_write;
 
 	anon_vma_lock_write(vma->anon_vma);
@@ -1193,10 +1070,6 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 		pmd_populate(mm, pmd, pmd_pgtable(_pmd));
 		spin_unlock(pmd_ptl);
 		anon_vma_unlock_write(vma->anon_vma);
-<<<<<<< HEAD
-=======
-		result = SCAN_FAIL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_up_write;
 	}
 
@@ -1215,11 +1088,7 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 	 * avoid the copy_huge_page writes to become visible after
 	 * the set_pmd_at() write.
 	 */
-<<<<<<< HEAD
 	__SetPageUptodate(hpage);
-=======
-	__SetPageUptodate(new_page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pgtable = pmd_pgtable(_pmd);
 
 	_pmd = mk_huge_pmd(hpage, vma->vm_page_prot);
@@ -1227,13 +1096,8 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 
 	spin_lock(pmd_ptl);
 	BUG_ON(!pmd_none(*pmd));
-<<<<<<< HEAD
 	page_add_new_anon_rmap(hpage, vma, address);
 	lru_cache_add_inactive_or_unevictable(hpage, vma);
-=======
-	page_add_new_anon_rmap(new_page, vma, address);
-	lru_cache_add_inactive_or_unevictable(new_page, vma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pgtable_trans_huge_deposit(mm, pmd, pgtable);
 	set_pmd_at(mm, address, pmd, _pmd);
 	update_mmu_cache_pmd(vma, address, pmd);
@@ -1245,19 +1109,12 @@ static int collapse_huge_page(struct mm_struct *mm, unsigned long address,
 out_up_write:
 	mmap_write_unlock(mm);
 out_nolock:
-<<<<<<< HEAD
 	if (hpage) {
 		mem_cgroup_uncharge(page_folio(hpage));
 		put_page(hpage);
 	}
 	trace_mm_collapse_huge_page(mm, result == SCAN_SUCCEED, result);
 	return result;
-=======
-	if (!IS_ERR_OR_NULL(*hpage))
-		mem_cgroup_uncharge(page_folio(*hpage));
-	trace_mm_collapse_huge_page(mm, isolated, result);
-	return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int hpage_collapse_scan_pmd(struct mm_struct *mm,
@@ -1341,7 +1198,6 @@ static int hpage_collapse_scan_pmd(struct mm_struct *mm,
 			goto out_unmap;
 		}
 
-<<<<<<< HEAD
 		if (page_mapcount(page) > 1) {
 			++shared;
 			if (cc->is_khugepaged &&
@@ -1350,24 +1206,13 @@ static int hpage_collapse_scan_pmd(struct mm_struct *mm,
 				count_vm_event(THP_SCAN_EXCEED_SHARED_PTE);
 				goto out_unmap;
 			}
-=======
-		if (page_mapcount(page) > 1 &&
-				++shared > khugepaged_max_ptes_shared) {
-			result = SCAN_EXCEED_SHARED_PTE;
-			count_vm_event(THP_SCAN_EXCEED_SHARED_PTE);
-			goto out_unmap;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		page = compound_head(page);
 
 		/*
 		 * Record which node the original page is from and save this
-<<<<<<< HEAD
 		 * information to cc->node_load[].
-=======
-		 * information to khugepaged_node_load[].
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * Khugepaged will allocate hugepage from the node has the max
 		 * hit record.
 		 */
@@ -1494,11 +1339,7 @@ static void collect_mm_slot(struct khugepaged_mm_slot *mm_slot)
  * "multiple-add" is thought to be more expensive than just handling it, should
  * it occur.
  */
-<<<<<<< HEAD
 static bool khugepaged_add_pte_mapped_thp(struct mm_struct *mm,
-=======
-static void khugepaged_add_pte_mapped_thp(struct mm_struct *mm,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					  unsigned long addr)
 {
 	struct khugepaged_mm_slot *mm_slot;
@@ -1515,7 +1356,6 @@ static void khugepaged_add_pte_mapped_thp(struct mm_struct *mm,
 		ret = true;
 	}
 	spin_unlock(&khugepaged_mm_lock);
-<<<<<<< HEAD
 	return ret;
 }
 
@@ -1577,20 +1417,6 @@ static void collapse_and_free_pmd(struct mm_struct *mm, struct vm_area_struct *v
 	pmd = pmdp_collapse_flush(vma, addr, pmdp);
 	tlb_remove_table_sync_one();
 	mmu_notifier_invalidate_range_end(&range);
-=======
-}
-
-static void collapse_and_free_pmd(struct mm_struct *mm, struct vm_area_struct *vma,
-				  unsigned long addr, pmd_t *pmdp)
-{
-	spinlock_t *ptl;
-	pmd_t pmd;
-
-	mmap_assert_write_locked(mm);
-	ptl = pmd_lock(vma->vm_mm, pmdp);
-	pmd = pmdp_collapse_flush(vma, addr, pmdp);
-	spin_unlock(ptl);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mm_dec_nr_ptes(mm);
 	page_table_check_pte_clear_range(mm, addr, pmd);
 	pte_free(mm, pmd_pgtable(pmd));
@@ -1629,11 +1455,7 @@ int collapse_pte_mapped_thp(struct mm_struct *mm, unsigned long addr,
 
 	if (!vma || !vma->vm_file ||
 	    !range_in_vma(vma, haddr, haddr + HPAGE_PMD_SIZE))
-<<<<<<< HEAD
 		return SCAN_VMA_CHECK;
-=======
-		return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * If we are here, we've succeeded in replacing all the native pages
@@ -1642,21 +1464,12 @@ int collapse_pte_mapped_thp(struct mm_struct *mm, unsigned long addr,
 	 * and map it by a PMD, regardless of sysfs THP settings. As such, let's
 	 * analogously elide sysfs THP settings here.
 	 */
-<<<<<<< HEAD
 	if (!hugepage_vma_check(vma, vma->vm_flags, false, false, false))
 		return SCAN_VMA_CHECK;
 
 	/* Keep pmd pgtable for uffd-wp; see comment in retract_page_tables() */
 	if (userfaultfd_wp(vma))
 		return SCAN_PTE_UFFD_WP;
-=======
-	if (!hugepage_vma_check(vma, vma->vm_flags | VM_HUGEPAGE, false, false))
-		return;
-
-	/* Keep pmd pgtable for uffd-wp; see comment in retract_page_tables() */
-	if (userfaultfd_wp(vma))
-		return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hpage = find_lock_page(vma->vm_file->f_mapping,
 			       linear_page_index(vma, haddr));
@@ -1752,7 +1565,6 @@ int collapse_pte_mapped_thp(struct mm_struct *mm, unsigned long addr,
 		add_mm_counter(vma->vm_mm, mm_counter_file(hpage), -count);
 	}
 
-<<<<<<< HEAD
 	/* step 4: remove pte entries */
 	/* we make no change to anon, but protect concurrent anon page lookup */
 	if (vma->anon_vma)
@@ -1770,10 +1582,6 @@ maybe_install_pmd:
 			? set_huge_pmd(vma, haddr, pmd, hpage)
 			: SCAN_SUCCEED;
 
-=======
-	/* step 4: collapse pmd */
-	collapse_and_free_pmd(mm, vma, haddr, pmd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 drop_hpage:
 	unlock_page(hpage);
 	put_page(hpage);
@@ -1785,11 +1593,7 @@ abort:
 	goto drop_hpage;
 }
 
-<<<<<<< HEAD
 static void khugepaged_collapse_pte_mapped_thps(struct khugepaged_mm_slot *mm_slot)
-=======
-static void khugepaged_collapse_pte_mapped_thps(struct mm_slot *mm_slot)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mm_slot *slot = &mm_slot->slot;
 	struct mm_struct *mm = slot->mm;
@@ -1818,13 +1622,7 @@ static int retract_page_tables(struct address_space *mapping, pgoff_t pgoff,
 			       struct collapse_control *cc)
 {
 	struct vm_area_struct *vma;
-<<<<<<< HEAD
 	int target_result = SCAN_FAIL;
-=======
-	struct mm_struct *mm;
-	unsigned long addr;
-	pmd_t *pmd;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	i_mmap_lock_write(mapping);
 	vma_interval_tree_foreach(vma, &mapping->i_mmap, pgoff, pgoff) {
@@ -1876,13 +1674,9 @@ static int retract_page_tables(struct address_space *mapping, pgoff_t pgoff,
 		 * Also, it's not MADV_COLLAPSE's job to collapse other
 		 * mappings - let khugepaged take care of them later.
 		 */
-<<<<<<< HEAD
 		result = SCAN_PTE_MAPPED_HUGEPAGE;
 		if ((cc->is_khugepaged || is_target) &&
 		    mmap_write_trylock(mm)) {
-=======
-		if (mmap_write_trylock(mm)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			/*
 			 * When a vma is registered with uffd-wp, we can't
 			 * recycle the pmd pgtable because there can be pte
@@ -1891,7 +1685,6 @@ static int retract_page_tables(struct address_space *mapping, pgoff_t pgoff,
 			 * it'll always mapped in small page size for uffd-wp
 			 * registered ranges.
 			 */
-<<<<<<< HEAD
 			if (hpage_collapse_test_exit(mm)) {
 				result = SCAN_ANY_PROCESS;
 				goto unlock_next;
@@ -1907,10 +1700,6 @@ static int retract_page_tables(struct address_space *mapping, pgoff_t pgoff,
 				result = SCAN_SUCCEED;
 
 unlock_next:
-=======
-			if (!khugepaged_test_exit(mm) && !userfaultfd_wp(vma))
-				collapse_and_free_pmd(mm, vma, addr, pmd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mmap_write_unlock(mm);
 			goto next;
 		}
@@ -1970,22 +1759,8 @@ static int collapse_file(struct mm_struct *mm, unsigned long addr,
 	VM_BUG_ON(!IS_ENABLED(CONFIG_READ_ONLY_THP_FOR_FS) && !is_shmem);
 	VM_BUG_ON(start & (HPAGE_PMD_NR - 1));
 
-<<<<<<< HEAD
 	result = alloc_charge_hpage(&hpage, mm, cc);
 	if (result != SCAN_SUCCEED)
-=======
-	/* Only allocate from the target node */
-	gfp = alloc_hugepage_khugepaged_gfpmask() | __GFP_THISNODE;
-
-	new_page = khugepaged_alloc_page(hpage, gfp, node);
-	if (!new_page) {
-		result = SCAN_ALLOC_HUGE_PAGE_FAIL;
-		goto out;
-	}
-
-	if (unlikely(mem_cgroup_charge(page_folio(new_page), mm, gfp))) {
-		result = SCAN_CGROUP_CHARGE_FAIL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out;
 
 	/*
@@ -2049,13 +1824,8 @@ static int collapse_file(struct mm_struct *mm, unsigned long addr,
 
 				xas_unlock_irq(&xas);
 				/* swap in or instantiate fallocated page */
-<<<<<<< HEAD
 				if (shmem_get_folio(mapping->host, index,
 						&folio, SGP_NOALLOC)) {
-=======
-				if (shmem_getpage(mapping->host, index, &page,
-						  SGP_NOALLOC)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					result = SCAN_FAIL;
 					goto xa_unlocked;
 				}
@@ -2219,35 +1989,21 @@ out_unlock:
 		smp_mb();
 		if (inode_is_open_for_write(mapping->host)) {
 			result = SCAN_FAIL;
-<<<<<<< HEAD
 			__mod_lruvec_page_state(hpage, NR_FILE_THPS, -nr);
-=======
-			__mod_lruvec_page_state(new_page, NR_FILE_THPS, -nr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			filemap_nr_thps_dec(mapping);
 			goto xa_locked;
 		}
 	}
 
 	if (nr_none) {
-<<<<<<< HEAD
 		__mod_lruvec_page_state(hpage, NR_FILE_PAGES, nr_none);
 		/* nr_none is always 0 for non-shmem. */
 		__mod_lruvec_page_state(hpage, NR_SHMEM, nr_none);
-=======
-		__mod_lruvec_page_state(new_page, NR_FILE_PAGES, nr_none);
-		/* nr_none is always 0 for non-shmem. */
-		__mod_lruvec_page_state(new_page, NR_SHMEM, nr_none);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Join all the small entries into a single multi-index entry */
 	xas_set_order(&xas, start, HPAGE_PMD_ORDER);
-<<<<<<< HEAD
 	xas_store(&xas, hpage);
-=======
-	xas_store(&xas, new_page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 xa_locked:
 	xas_unlock_irq(&xas);
 xa_unlocked:
@@ -2346,15 +2102,10 @@ xa_unlocked:
 		unlock_page(hpage);
 out:
 	VM_BUG_ON(!list_empty(&pagelist));
-<<<<<<< HEAD
 	if (hpage) {
 		mem_cgroup_uncharge(page_folio(hpage));
 		put_page(hpage);
 	}
-=======
-	if (!IS_ERR_OR_NULL(*hpage))
-		mem_cgroup_uncharge(page_folio(*hpage));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* TODO: tracepoints */
 	return result;
 }
@@ -2391,11 +2142,7 @@ static int hpage_collapse_scan_file(struct mm_struct *mm, unsigned long addr,
 		}
 
 		/*
-<<<<<<< HEAD
 		 * TODO: khugepaged should compact smaller compound pages
-=======
-		 * XXX: khugepaged should compact smaller compound pages
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * into a PMD sized page
 		 */
 		if (PageTransCompound(page)) {
@@ -2469,7 +2216,6 @@ static int hpage_collapse_scan_file(struct mm_struct *mm, unsigned long addr,
 	BUILD_BUG();
 }
 
-<<<<<<< HEAD
 static void khugepaged_collapse_pte_mapped_thps(struct khugepaged_mm_slot *mm_slot)
 {
 }
@@ -2478,10 +2224,6 @@ static bool khugepaged_add_pte_mapped_thp(struct mm_struct *mm,
 					  unsigned long addr)
 {
 	return false;
-=======
-static void khugepaged_collapse_pte_mapped_thps(struct mm_slot *mm_slot)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 
@@ -2536,11 +2278,7 @@ static unsigned int khugepaged_scan_mm_slot(unsigned int pages, int *result,
 			progress++;
 			break;
 		}
-<<<<<<< HEAD
 		if (!hugepage_vma_check(vma, vma->vm_flags, false, false, true)) {
-=======
-		if (!hugepage_vma_check(vma, vma->vm_flags, false, false)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 skip:
 			progress++;
 			continue;
@@ -2666,10 +2404,7 @@ static void khugepaged_do_scan(struct collapse_control *cc)
 	unsigned int progress = 0, pass_through_head = 0;
 	unsigned int pages = READ_ONCE(khugepaged_pages_to_scan);
 	bool wait = true;
-<<<<<<< HEAD
 	int result = SCAN_SUCCEED;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lru_add_drain_all();
 

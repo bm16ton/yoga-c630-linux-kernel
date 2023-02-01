@@ -363,11 +363,7 @@ static void __ieee80211_set_default_key(struct ieee80211_link_data *link,
 	if (idx >= 0 && idx < NUM_DEFAULT_KEYS) {
 		key = key_mtx_dereference(sdata->local, sdata->keys[idx]);
 		if (!key)
-<<<<<<< HEAD
 			key = key_mtx_dereference(sdata->local, link->gtk[idx]);
-=======
-			key = key_mtx_dereference(sdata->local, sdata->deflink.gtk[idx]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (uni) {
@@ -378,11 +374,7 @@ static void __ieee80211_set_default_key(struct ieee80211_link_data *link,
 	}
 
 	if (multi)
-<<<<<<< HEAD
 		rcu_assign_pointer(link->default_multicast_key, key);
-=======
-		rcu_assign_pointer(sdata->deflink.default_multicast_key, key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ieee80211_debugfs_key_update_default(sdata);
 }
@@ -405,16 +397,9 @@ __ieee80211_set_default_mgmt_key(struct ieee80211_link_data *link, int idx)
 
 	if (idx >= NUM_DEFAULT_KEYS &&
 	    idx < NUM_DEFAULT_KEYS + NUM_DEFAULT_MGMT_KEYS)
-<<<<<<< HEAD
 		key = key_mtx_dereference(sdata->local, link->gtk[idx]);
 
 	rcu_assign_pointer(link->default_mgmt_key, key);
-=======
-		key = key_mtx_dereference(sdata->local,
-					  sdata->deflink.gtk[idx]);
-
-	rcu_assign_pointer(sdata->deflink.default_mgmt_key, key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ieee80211_debugfs_key_update_default(sdata);
 }
@@ -438,16 +423,9 @@ __ieee80211_set_default_beacon_key(struct ieee80211_link_data *link, int idx)
 	if (idx >= NUM_DEFAULT_KEYS + NUM_DEFAULT_MGMT_KEYS &&
 	    idx < NUM_DEFAULT_KEYS + NUM_DEFAULT_MGMT_KEYS +
 	    NUM_DEFAULT_BEACON_KEYS)
-<<<<<<< HEAD
 		key = key_mtx_dereference(sdata->local, link->gtk[idx]);
 
 	rcu_assign_pointer(link->default_beacon_key, key);
-=======
-		key = key_mtx_dereference(sdata->local,
-					  sdata->deflink.gtk[idx]);
-
-	rcu_assign_pointer(sdata->deflink.default_beacon_key, key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ieee80211_debugfs_key_update_default(sdata);
 }
@@ -480,20 +458,13 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 
 	if (new) {
 		idx = new->conf.keyidx;
-<<<<<<< HEAD
 		is_wep = new->conf.cipher == WLAN_CIPHER_SUITE_WEP40 ||
 			 new->conf.cipher == WLAN_CIPHER_SUITE_WEP104;
 		link_id = new->conf.link_id;
-=======
-		list_add_tail_rcu(&new->list, &sdata->key_list);
-		is_wep = new->conf.cipher == WLAN_CIPHER_SUITE_WEP40 ||
-			 new->conf.cipher == WLAN_CIPHER_SUITE_WEP104;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		idx = old->conf.keyidx;
 		is_wep = old->conf.cipher == WLAN_CIPHER_SUITE_WEP40 ||
 			 old->conf.cipher == WLAN_CIPHER_SUITE_WEP104;
-<<<<<<< HEAD
 		link_id = old->conf.link_id;
 	}
 
@@ -517,8 +488,6 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 		}
 	} else {
 		link = &sdata->deflink;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if ((is_wep || pairwise) && idx >= NUM_DEFAULT_KEYS)
@@ -558,11 +527,7 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 			    !(new->conf.flags & IEEE80211_KEY_FLAG_NO_AUTO_TX))
 				_ieee80211_set_tx_key(new, true);
 		} else {
-<<<<<<< HEAD
 			rcu_assign_pointer(link_sta->gtk[idx], new);
-=======
-			rcu_assign_pointer(sta->deflink.gtk[idx], new);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		/* Only needed for transition from no key -> key.
 		 * Still triggers unnecessary when using Extended Key ID
@@ -576,7 +541,6 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 						sdata->default_unicast_key);
 		defmultikey = old &&
 			old == key_mtx_dereference(sdata->local,
-<<<<<<< HEAD
 						   link->default_multicast_key);
 		defmgmtkey = old &&
 			old == key_mtx_dereference(sdata->local,
@@ -584,15 +548,6 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 		defbeaconkey = old &&
 			old == key_mtx_dereference(sdata->local,
 						   link->default_beacon_key);
-=======
-						sdata->deflink.default_multicast_key);
-		defmgmtkey = old &&
-			old == key_mtx_dereference(sdata->local,
-						sdata->deflink.default_mgmt_key);
-		defbeaconkey = old &&
-			old == key_mtx_dereference(sdata->local,
-						   sdata->deflink.default_beacon_key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (defunikey && !new)
 			__ieee80211_set_default_key(link, -1, true, false);
@@ -608,14 +563,6 @@ static int ieee80211_key_replace(struct ieee80211_sub_if_data *sdata,
 		else
 			rcu_assign_pointer(link->gtk[idx], new);
 
-<<<<<<< HEAD
-=======
-		if (is_wep || pairwise)
-			rcu_assign_pointer(sdata->keys[idx], new);
-		else
-			rcu_assign_pointer(sdata->deflink.gtk[idx], new);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (defunikey && new)
 			__ieee80211_set_default_key(link, new->conf.keyidx,
 						    true, false);
@@ -920,7 +867,6 @@ int ieee80211_key_link(struct ieee80211_key *key,
 		    (old_key && old_key->conf.cipher != key->conf.cipher))
 			goto out;
 	} else if (sta) {
-<<<<<<< HEAD
 		struct link_sta_info *link_sta = &sta->deflink;
 		int link_id = key->conf.link_id;
 
@@ -934,21 +880,13 @@ int ieee80211_key_link(struct ieee80211_key *key,
 		}
 
 		old_key = key_mtx_dereference(sdata->local, link_sta->gtk[idx]);
-=======
-		old_key = key_mtx_dereference(sdata->local,
-					      sta->deflink.gtk[idx]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		if (idx < NUM_DEFAULT_KEYS)
 			old_key = key_mtx_dereference(sdata->local,
 						      sdata->keys[idx]);
 		if (!old_key)
 			old_key = key_mtx_dereference(sdata->local,
-<<<<<<< HEAD
 						      link->gtk[idx]);
-=======
-						      sdata->deflink.gtk[idx]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Non-pairwise keys must also not switch the cipher on rekey */

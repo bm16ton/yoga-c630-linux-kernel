@@ -111,9 +111,6 @@ __can_get_echo_skb(struct net_device *dev, unsigned int idx,
 		if (skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS)
 			skb_tstamp_tx(skb, skb_hwtstamps(skb));
 
-		if (skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS)
-			skb_tstamp_tx(skb, skb_hwtstamps(skb));
-
 		/* get the real payload length for netdev statistics */
 		*len_ptr = can_skb_get_data_len(skb);
 
@@ -192,20 +189,6 @@ EXPORT_SYMBOL_GPL(can_free_echo_skb);
 /* fill common values for CAN sk_buffs */
 static void init_can_skb_reserve(struct sk_buff *skb)
 {
-<<<<<<< HEAD
-=======
-	struct sk_buff *skb;
-
-	skb = netdev_alloc_skb(dev, sizeof(struct can_skb_priv) +
-			       sizeof(struct can_frame));
-	if (unlikely(!skb)) {
-		*cf = NULL;
-
-		return NULL;
-	}
-
-	skb->protocol = htons(ETH_P_CAN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	skb->pkt_type = PACKET_BROADCAST;
 	skb->ip_summed = CHECKSUM_UNNECESSARY;
 
@@ -337,7 +320,6 @@ static bool can_skb_headroom_valid(struct net_device *dev, struct sk_buff *skb)
 		skb_reset_mac_header(skb);
 		skb_reset_network_header(skb);
 		skb_reset_transport_header(skb);
-<<<<<<< HEAD
 
 		/* set CANFD_FDF flag for CAN FD frames */
 		if (can_is_canfd_skb(skb)) {
@@ -346,8 +328,6 @@ static bool can_skb_headroom_valid(struct net_device *dev, struct sk_buff *skb)
 			cfd = (struct canfd_frame *)skb->data;
 			cfd->flags |= CANFD_FDF;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return true;
@@ -356,7 +336,6 @@ static bool can_skb_headroom_valid(struct net_device *dev, struct sk_buff *skb)
 /* Drop a given socketbuffer if it does not contain a valid CAN frame. */
 bool can_dropped_invalid_skb(struct net_device *dev, struct sk_buff *skb)
 {
-<<<<<<< HEAD
 	switch (ntohs(skb->protocol)) {
 	case ETH_P_CAN:
 		if (!can_is_can_skb(skb))
@@ -374,19 +353,6 @@ bool can_dropped_invalid_skb(struct net_device *dev, struct sk_buff *skb)
 		break;
 
 	default:
-=======
-	const struct canfd_frame *cfd = (struct canfd_frame *)skb->data;
-
-	if (skb->protocol == htons(ETH_P_CAN)) {
-		if (unlikely(skb->len != CAN_MTU ||
-			     cfd->len > CAN_MAX_DLEN))
-			goto inval_skb;
-	} else if (skb->protocol == htons(ETH_P_CANFD)) {
-		if (unlikely(skb->len != CANFD_MTU ||
-			     cfd->len > CANFD_MAX_DLEN))
-			goto inval_skb;
-	} else {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto inval_skb;
 	}
 

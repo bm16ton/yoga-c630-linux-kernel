@@ -1702,7 +1702,6 @@ static inline kgid_t i_gid_into_mnt(struct user_namespace *mnt_userns,
 				    const struct inode *inode)
 {
 	return AS_KGIDT(make_vfsgid(mnt_userns, i_user_ns(inode), inode->i_gid));
-<<<<<<< HEAD
 }
 
 /**
@@ -1799,104 +1798,6 @@ static inline void inode_fsgid_set(struct inode *inode,
 static inline bool fsuidgid_has_mapping(struct super_block *sb,
 					struct user_namespace *mnt_userns)
 {
-=======
-}
-
-/**
- * i_gid_into_vfsgid - map an inode's i_gid down into a mnt_userns
- * @mnt_userns: user namespace of the mount the inode was found from
- * @inode: inode to map
- *
- * Return: the inode's i_gid mapped down according to @mnt_userns.
- * If the inode's i_gid has no mapping INVALID_VFSGID is returned.
- */
-static inline vfsgid_t i_gid_into_vfsgid(struct user_namespace *mnt_userns,
-					 const struct inode *inode)
-{
-	return make_vfsgid(mnt_userns, i_user_ns(inode), inode->i_gid);
-}
-
-/**
- * i_gid_needs_update - check whether inode's i_gid needs to be updated
- * @mnt_userns: user namespace of the mount the inode was found from
- * @attr: the new attributes of @inode
- * @inode: the inode to update
- *
- * Check whether the $inode's i_gid field needs to be updated taking idmapped
- * mounts into account if the filesystem supports it.
- *
- * Return: true if @inode's i_gid field needs to be updated, false if not.
- */
-static inline bool i_gid_needs_update(struct user_namespace *mnt_userns,
-				      const struct iattr *attr,
-				      const struct inode *inode)
-{
-	return ((attr->ia_valid & ATTR_GID) &&
-		!vfsgid_eq(attr->ia_vfsgid,
-			   i_gid_into_vfsgid(mnt_userns, inode)));
-}
-
-/**
- * i_gid_update - update @inode's i_gid field
- * @mnt_userns: user namespace of the mount the inode was found from
- * @attr: the new attributes of @inode
- * @inode: the inode to update
- *
- * Safely update @inode's i_gid field translating the vfsgid of any idmapped
- * mount into the filesystem kgid.
- */
-static inline void i_gid_update(struct user_namespace *mnt_userns,
-				const struct iattr *attr,
-				struct inode *inode)
-{
-	if (attr->ia_valid & ATTR_GID)
-		inode->i_gid = from_vfsgid(mnt_userns, i_user_ns(inode),
-					   attr->ia_vfsgid);
-}
-
-/**
- * inode_fsuid_set - initialize inode's i_uid field with callers fsuid
- * @inode: inode to initialize
- * @mnt_userns: user namespace of the mount the inode was found from
- *
- * Initialize the i_uid field of @inode. If the inode was found/created via
- * an idmapped mount map the caller's fsuid according to @mnt_users.
- */
-static inline void inode_fsuid_set(struct inode *inode,
-				   struct user_namespace *mnt_userns)
-{
-	inode->i_uid = mapped_fsuid(mnt_userns, i_user_ns(inode));
-}
-
-/**
- * inode_fsgid_set - initialize inode's i_gid field with callers fsgid
- * @inode: inode to initialize
- * @mnt_userns: user namespace of the mount the inode was found from
- *
- * Initialize the i_gid field of @inode. If the inode was found/created via
- * an idmapped mount map the caller's fsgid according to @mnt_users.
- */
-static inline void inode_fsgid_set(struct inode *inode,
-				   struct user_namespace *mnt_userns)
-{
-	inode->i_gid = mapped_fsgid(mnt_userns, i_user_ns(inode));
-}
-
-/**
- * fsuidgid_has_mapping() - check whether caller's fsuid/fsgid is mapped
- * @sb: the superblock we want a mapping in
- * @mnt_userns: user namespace of the relevant mount
- *
- * Check whether the caller's fsuid and fsgid have a valid mapping in the
- * s_user_ns of the superblock @sb. If the caller is on an idmapped mount map
- * the caller's fsuid and fsgid according to the @mnt_userns first.
- *
- * Return: true if fsuid and fsgid is mapped, false if not.
- */
-static inline bool fsuidgid_has_mapping(struct super_block *sb,
-					struct user_namespace *mnt_userns)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct user_namespace *fs_userns = sb->s_user_ns;
 	kuid_t kuid;
 	kgid_t kgid;
@@ -2247,11 +2148,8 @@ struct file_operations {
 				   loff_t len, unsigned int remap_flags);
 	int (*fadvise)(struct file *, loff_t, loff_t, int);
 	int (*uring_cmd)(struct io_uring_cmd *ioucmd, unsigned int issue_flags);
-<<<<<<< HEAD
 	int (*uring_cmd_iopoll)(struct io_uring_cmd *, struct io_comp_batch *,
 				unsigned int poll_flags);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __randomize_layout;
 
 struct inode_operations {

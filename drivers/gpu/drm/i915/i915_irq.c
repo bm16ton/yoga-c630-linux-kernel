@@ -2352,7 +2352,6 @@ gen8_de_misc_irq_handler(struct drm_i915_private *dev_priv, u32 iir)
 
 		for_each_intel_encoder_with_psr(&dev_priv->drm, encoder) {
 			struct intel_dp *intel_dp = enc_to_intel_dp(encoder);
-<<<<<<< HEAD
 
 			if (DISPLAY_VER(dev_priv) >= 12)
 				iir_reg = TRANS_PSR_IIR(intel_dp->psr.transcoder);
@@ -2367,22 +2366,6 @@ gen8_de_misc_irq_handler(struct drm_i915_private *dev_priv, u32 iir)
 
 			intel_psr_irq_handler(intel_dp, psr_iir);
 
-=======
-
-			if (DISPLAY_VER(dev_priv) >= 12)
-				iir_reg = TRANS_PSR_IIR(intel_dp->psr.transcoder);
-			else
-				iir_reg = EDP_PSR_IIR;
-
-			psr_iir = intel_uncore_read(&dev_priv->uncore, iir_reg);
-			intel_uncore_write(&dev_priv->uncore, iir_reg, psr_iir);
-
-			if (psr_iir)
-				found = true;
-
-			intel_psr_irq_handler(intel_dp, psr_iir);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			/* prior GEN12 only have one EDP PSR */
 			if (DISPLAY_VER(dev_priv) < 12)
 				break;
@@ -2821,19 +2804,11 @@ static irqreturn_t dg1_irq_handler(int irq, void *arg)
 	if (master_ctl & GEN11_DISPLAY_IRQ)
 		gen11_display_irq_handler(i915);
 
-<<<<<<< HEAD
 	gu_misc_iir = gen11_gu_misc_irq_ack(i915, master_ctl);
 
 	dg1_master_intr_enable(regs);
 
 	gen11_gu_misc_irq_handler(i915, gu_misc_iir);
-=======
-	gu_misc_iir = gen11_gu_misc_irq_ack(gt, master_ctl);
-
-	dg1_master_intr_enable(regs);
-
-	gen11_gu_misc_irq_handler(gt, gu_misc_iir);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pmu_irq_stats(i915, IRQ_HANDLED);
 
@@ -4398,13 +4373,8 @@ HPD_FUNCS(ilk);
 
 void intel_hpd_irq_setup(struct drm_i915_private *i915)
 {
-<<<<<<< HEAD
 	if (i915->display_irqs_enabled && i915->display.funcs.hotplug)
 		i915->display.funcs.hotplug->hpd_irq_setup(i915);
-=======
-	if (i915->display_irqs_enabled && i915->hotplug_funcs)
-		i915->hotplug_funcs->hpd_irq_setup(i915);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -4457,7 +4427,6 @@ void intel_irq_init(struct drm_i915_private *dev_priv)
 
 	if (HAS_GMCH(dev_priv)) {
 		if (I915_HAS_HOTPLUG(dev_priv))
-<<<<<<< HEAD
 			dev_priv->display.funcs.hotplug = &i915_hpd_funcs;
 	} else {
 		if (HAS_PCH_DG2(dev_priv))
@@ -4474,24 +4443,6 @@ void intel_irq_init(struct drm_i915_private *dev_priv)
 			dev_priv->display.funcs.hotplug = &spt_hpd_funcs;
 		else
 			dev_priv->display.funcs.hotplug = &ilk_hpd_funcs;
-=======
-			dev_priv->hotplug_funcs = &i915_hpd_funcs;
-	} else {
-		if (HAS_PCH_DG2(dev_priv))
-			dev_priv->hotplug_funcs = &icp_hpd_funcs;
-		else if (HAS_PCH_DG1(dev_priv))
-			dev_priv->hotplug_funcs = &dg1_hpd_funcs;
-		else if (DISPLAY_VER(dev_priv) >= 11)
-			dev_priv->hotplug_funcs = &gen11_hpd_funcs;
-		else if (IS_GEMINILAKE(dev_priv) || IS_BROXTON(dev_priv))
-			dev_priv->hotplug_funcs = &bxt_hpd_funcs;
-		else if (INTEL_PCH_TYPE(dev_priv) >= PCH_ICP)
-			dev_priv->hotplug_funcs = &icp_hpd_funcs;
-		else if (INTEL_PCH_TYPE(dev_priv) >= PCH_SPT)
-			dev_priv->hotplug_funcs = &spt_hpd_funcs;
-		else
-			dev_priv->hotplug_funcs = &ilk_hpd_funcs;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 

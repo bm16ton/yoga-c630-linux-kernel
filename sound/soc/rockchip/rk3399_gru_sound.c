@@ -174,11 +174,7 @@ static int rockchip_sound_cdndp_init(struct snd_soc_pcm_runtime *rtd)
 
 	/* Enable jack detection. */
 	ret = snd_soc_card_jack_new(card, "DP Jack", SND_JACK_LINEOUT,
-<<<<<<< HEAD
 				    &cdn_dp_card_jack);
-=======
-				    &cdn_dp_card_jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(card->dev, "Can't create DP Jack %d\n", ret);
 		return ret;

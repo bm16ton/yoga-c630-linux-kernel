@@ -515,14 +515,7 @@ static int ah_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
 
 	if (aalg_desc->uinfo.auth.icv_fullbits/8 !=
 	    crypto_ahash_digestsize(ahash)) {
-<<<<<<< HEAD
 		NL_SET_ERR_MSG(extack, "Kernel was unable to initialize cryptographic operations");
-=======
-		pr_info("%s: %s digestsize %u != %u\n",
-			__func__, x->aalg->alg_name,
-			crypto_ahash_digestsize(ahash),
-			aalg_desc->uinfo.auth.icv_fullbits / 8);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto error;
 	}
 

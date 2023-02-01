@@ -269,11 +269,7 @@ exit:
 	return flag;
 }
 
-<<<<<<< HEAD
 static int sync_session_response(struct vpu_inst *inst, unsigned long key, long timeout, int try)
-=======
-static int sync_session_response(struct vpu_inst *inst, unsigned long key)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vpu_core *core;
 
@@ -283,19 +279,12 @@ static int sync_session_response(struct vpu_inst *inst, unsigned long key)
 	core = inst->core;
 
 	call_void_vop(inst, wait_prepare);
-<<<<<<< HEAD
 	wait_event_timeout(core->ack_wq, check_is_responsed(inst, key), timeout);
 	call_void_vop(inst, wait_finish);
 
 	if (!check_is_responsed(inst, key)) {
 		if (try)
 			return -EINVAL;
-=======
-	wait_event_timeout(core->ack_wq, check_is_responsed(inst, key), VPU_TIMEOUT);
-	call_void_vop(inst, wait_finish);
-
-	if (!check_is_responsed(inst, key)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(inst->dev, "[%d] sync session timeout\n", inst->id);
 		set_bit(inst->id, &core->hang_mask);
 		mutex_lock(&inst->core->cmd_lock);
@@ -307,7 +296,6 @@ static int sync_session_response(struct vpu_inst *inst, unsigned long key)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void vpu_core_keep_active(struct vpu_core *core)
 {
 	struct vpu_rpc_event pkt;
@@ -321,8 +309,6 @@ static void vpu_core_keep_active(struct vpu_core *core)
 	mutex_unlock(&core->cmd_lock);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int vpu_session_send_cmd(struct vpu_inst *inst, u32 id, void *data)
 {
 	unsigned long key;
@@ -333,7 +319,6 @@ static int vpu_session_send_cmd(struct vpu_inst *inst, u32 id, void *data)
 		return -EINVAL;
 
 	ret = vpu_request_cmd(inst, id, data, &key, &sync);
-<<<<<<< HEAD
 	if (ret)
 		goto exit;
 
@@ -353,11 +338,6 @@ static int vpu_session_send_cmd(struct vpu_inst *inst, u32 id, void *data)
 		ret = sync_session_response(inst, key, VPU_TIMEOUT, 0);
 
 exit:
-=======
-	if (!ret && sync)
-		ret = sync_session_response(inst, key);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		dev_err(inst->dev, "[%d] send cmd(0x%x) fail\n", inst->id, id);
 

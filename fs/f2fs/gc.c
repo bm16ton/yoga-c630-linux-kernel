@@ -96,19 +96,6 @@ static int gc_thread_func(void *data)
 		 * invalidated soon after by user update or deletion.
 		 * So, I'd like to wait some time to collect dirty segments.
 		 */
-<<<<<<< HEAD
-=======
-		if (sbi->gc_mode == GC_URGENT_HIGH) {
-			spin_lock(&sbi->gc_urgent_high_lock);
-			if (sbi->gc_urgent_high_limited &&
-					!sbi->gc_urgent_high_remaining--) {
-				sbi->gc_urgent_high_limited = false;
-				sbi->gc_mode = GC_NORMAL;
-			}
-			spin_unlock(&sbi->gc_urgent_high_lock);
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (sbi->gc_mode == GC_URGENT_HIGH ||
 				sbi->gc_mode == GC_URGENT_MID) {
 			wait_ms = gc_th->urgent_sleep_time;
@@ -294,11 +281,7 @@ static void select_policy(struct f2fs_sb_info *sbi, int gc_type,
 
 	/* let's select beginning hot/small space first in no_heap mode*/
 	if (f2fs_need_rand_seg(sbi))
-<<<<<<< HEAD
 		p->offset = prandom_u32_max(MAIN_SECS(sbi) * sbi->segs_per_sec);
-=======
-		p->offset = prandom_u32() % (MAIN_SECS(sbi) * sbi->segs_per_sec);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else if (test_opt(sbi, NOHEAP) &&
 		(type == CURSEG_HOT_DATA || IS_NODESEG(type)))
 		p->offset = 0;
@@ -1126,10 +1109,7 @@ static bool is_alive(struct f2fs_sb_info *sbi, struct f2fs_summary *sum,
 	if (ofs_in_node >= max_addrs) {
 		f2fs_err(sbi, "Inconsistent ofs_in_node:%u in summary, ino:%u, nid:%u, max:%u",
 			ofs_in_node, dni->ino, dni->nid, max_addrs);
-<<<<<<< HEAD
 		f2fs_put_page(node_page, 1);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 	}
 

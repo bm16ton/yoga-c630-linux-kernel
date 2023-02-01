@@ -470,7 +470,6 @@ static noinline void kcsan_found_watchpoint(const volatile void *ptr,
 	 * reader has access_mask!=0, we have to ignore the found watchpoint.
 	 *
 	 * reorder_access is never created from an access with access_mask set.
-<<<<<<< HEAD
 	 */
 	if (ctx->access_mask && !find_reorder_access(ctx, ptr, size, type, ip))
 		return;
@@ -486,23 +485,6 @@ static noinline void kcsan_found_watchpoint(const volatile void *ptr,
 		return;
 
 	/*
-=======
-	 */
-	if (ctx->access_mask && !find_reorder_access(ctx, ptr, size, type, ip))
-		return;
-
-	/*
-	 * If the other thread does not want to ignore the access, and there was
-	 * a value change as a result of this thread's operation, we will still
-	 * generate a report of unknown origin.
-	 *
-	 * Use CONFIG_KCSAN_REPORT_RACE_UNKNOWN_ORIGIN=n to filter.
-	 */
-	if (!is_assert && kcsan_ignore_address(ptr))
-		return;
-
-	/*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * Consuming the watchpoint must be guarded by kcsan_is_enabled() to
 	 * avoid erroneously triggering reports if the context is disabled.
 	 */

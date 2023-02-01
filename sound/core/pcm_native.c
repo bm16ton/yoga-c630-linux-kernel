@@ -3293,11 +3293,7 @@ static int snd_pcm_common_ioctl(struct file *file,
 	if (PCM_RUNTIME_CHECK(substream))
 		return -ENXIO;
 
-<<<<<<< HEAD
 	if (substream->runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (substream->runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 
 	res = snd_power_wait(substream->pcm->card);
@@ -3428,11 +3424,7 @@ int snd_pcm_kernel_ioctl(struct snd_pcm_substream *substream,
 	snd_pcm_uframes_t *frames = arg;
 	snd_pcm_sframes_t result;
 	
-<<<<<<< HEAD
 	if (substream->runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (substream->runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 
 	switch (cmd) {
@@ -3477,13 +3469,8 @@ static ssize_t snd_pcm_read(struct file *file, char __user *buf, size_t count,
 	if (PCM_RUNTIME_CHECK(substream))
 		return -ENXIO;
 	runtime = substream->runtime;
-<<<<<<< HEAD
 	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
 	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (runtime->status->state == SNDRV_PCM_STATE_OPEN ||
-	    runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 	if (!frame_aligned(runtime, count))
 		return -EINVAL;
@@ -3507,13 +3494,8 @@ static ssize_t snd_pcm_write(struct file *file, const char __user *buf,
 	if (PCM_RUNTIME_CHECK(substream))
 		return -ENXIO;
 	runtime = substream->runtime;
-<<<<<<< HEAD
 	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
 	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (runtime->status->state == SNDRV_PCM_STATE_OPEN ||
-	    runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 	if (!frame_aligned(runtime, count))
 		return -EINVAL;
@@ -3539,13 +3521,8 @@ static ssize_t snd_pcm_readv(struct kiocb *iocb, struct iov_iter *to)
 	if (PCM_RUNTIME_CHECK(substream))
 		return -ENXIO;
 	runtime = substream->runtime;
-<<<<<<< HEAD
 	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
 	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (runtime->status->state == SNDRV_PCM_STATE_OPEN ||
-	    runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 	if (!iter_is_iovec(to))
 		return -EINVAL;
@@ -3581,13 +3558,8 @@ static ssize_t snd_pcm_writev(struct kiocb *iocb, struct iov_iter *from)
 	if (PCM_RUNTIME_CHECK(substream))
 		return -ENXIO;
 	runtime = substream->runtime;
-<<<<<<< HEAD
 	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
 	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (runtime->status->state == SNDRV_PCM_STATE_OPEN ||
-	    runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 	if (!iter_is_iovec(from))
 		return -EINVAL;
@@ -3626,11 +3598,7 @@ static __poll_t snd_pcm_poll(struct file *file, poll_table *wait)
 		return ok | EPOLLERR;
 
 	runtime = substream->runtime;
-<<<<<<< HEAD
 	if (runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ok | EPOLLERR;
 
 	poll_wait(file, &runtime->sleep, wait);
@@ -3947,11 +3915,7 @@ static int snd_pcm_mmap(struct file *file, struct vm_area_struct *area)
 	substream = pcm_file->substream;
 	if (PCM_RUNTIME_CHECK(substream))
 		return -ENXIO;
-<<<<<<< HEAD
 	if (substream->runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (substream->runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 
 	offset = area->vm_pgoff << PAGE_SHIFT;
@@ -3989,11 +3953,7 @@ static int snd_pcm_fasync(int fd, struct file * file, int on)
 	if (PCM_RUNTIME_CHECK(substream))
 		return -ENXIO;
 	runtime = substream->runtime;
-<<<<<<< HEAD
 	if (runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
-=======
-	if (runtime->status->state == SNDRV_PCM_STATE_DISCONNECTED)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBADFD;
 	return snd_fasync_helper(fd, file, on, &runtime->fasync);
 }

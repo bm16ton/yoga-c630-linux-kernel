@@ -9,13 +9,8 @@
 #include <linux/gpio/consumer.h>
 #include <linux/mfd/rohm-bd957x.h>
 #include <linux/module.h>
-<<<<<<< HEAD
 #include <linux/platform_device.h>
 #include <linux/property.h>
-=======
-#include <linux/of.h>
-#include <linux/platform_device.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/regmap.h>
 #include <linux/watchdog.h>
 
@@ -207,17 +202,10 @@ static int bd957x_set_wdt_mode(struct bd9576_wdt_priv *priv, int hw_margin,
 static int bd9576_wdt_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
-<<<<<<< HEAD
 	struct bd9576_wdt_priv *priv;
 	u32 hw_margin[2];
 	u32 hw_margin_max = BD957X_WDT_DEFAULT_MARGIN, hw_margin_min = 0;
 	int count;
-=======
-	struct device_node *np = dev->parent->of_node;
-	struct bd9576_wdt_priv *priv;
-	u32 hw_margin[2];
-	u32 hw_margin_max = BD957X_WDT_DEFAULT_MARGIN, hw_margin_min = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
@@ -233,37 +221,22 @@ static int bd9576_wdt_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-<<<<<<< HEAD
 	priv->gpiod_en = devm_fwnode_gpiod_get(dev, dev_fwnode(dev->parent),
 					       "rohm,watchdog-enable",
 					       GPIOD_OUT_LOW,
 					       "watchdog-enable");
-=======
-	priv->gpiod_en = devm_gpiod_get_from_of_node(dev, dev->parent->of_node,
-						     "rohm,watchdog-enable-gpios",
-						     0, GPIOD_OUT_LOW,
-						     "watchdog-enable");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(priv->gpiod_en))
 		return dev_err_probe(dev, PTR_ERR(priv->gpiod_en),
 			      "getting watchdog-enable GPIO failed\n");
 
-<<<<<<< HEAD
 	priv->gpiod_ping = devm_fwnode_gpiod_get(dev, dev_fwnode(dev->parent),
 						 "rohm,watchdog-ping",
 						 GPIOD_OUT_LOW,
 						 "watchdog-ping");
-=======
-	priv->gpiod_ping = devm_gpiod_get_from_of_node(dev, dev->parent->of_node,
-						     "rohm,watchdog-ping-gpios",
-						     0, GPIOD_OUT_LOW,
-						     "watchdog-ping");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(priv->gpiod_ping))
 		return dev_err_probe(dev, PTR_ERR(priv->gpiod_ping),
 				     "getting watchdog-ping GPIO failed\n");
 
-<<<<<<< HEAD
 	count = device_property_count_u32(dev->parent, "rohm,hw-timeout-ms");
 	if (count < 0 && count != -EINVAL)
 		return count;
@@ -285,31 +258,14 @@ static int bd9576_wdt_probe(struct platform_device *pdev)
 			hw_margin_max = hw_margin[1];
 			hw_margin_min = hw_margin[0];
 		}
-=======
-	ret = of_property_read_variable_u32_array(np, "rohm,hw-timeout-ms",
-						  &hw_margin[0], 1, 2);
-	if (ret < 0 && ret != -EINVAL)
-		return ret;
-
-	if (ret == 1)
-		hw_margin_max = hw_margin[0];
-
-	if (ret == 2) {
-		hw_margin_max = hw_margin[1];
-		hw_margin_min = hw_margin[0];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ret = bd957x_set_wdt_mode(priv, hw_margin_max, hw_margin_min);
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	priv->always_running = device_property_read_bool(dev->parent,
 							 "always-running");
-=======
-	priv->always_running = of_property_read_bool(np, "always-running");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	watchdog_set_drvdata(&priv->wdd, priv);
 

@@ -212,29 +212,12 @@ static int msc313_rtc_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-<<<<<<< HEAD
 	clk = devm_clk_get_enabled(dev, NULL);
-=======
-	clk = devm_clk_get(dev, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(clk)) {
 		dev_err(dev, "No input reference clock\n");
 		return PTR_ERR(clk);
 	}
 
-<<<<<<< HEAD
-=======
-	ret = clk_prepare_enable(clk);
-	if (ret) {
-		dev_err(dev, "Failed to enable the reference clock, %d\n", ret);
-		return ret;
-	}
-
-	ret = devm_add_action_or_reset(dev, (void (*) (void *))clk_disable_unprepare, clk);
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rate = clk_get_rate(clk);
 	writew(rate & 0xFFFF, priv->rtc_base + REG_RTC_FREQ_CW_L);
 	writew((rate >> 16) & 0xFFFF, priv->rtc_base + REG_RTC_FREQ_CW_H);

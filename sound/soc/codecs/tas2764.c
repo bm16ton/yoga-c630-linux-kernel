@@ -38,7 +38,6 @@ struct tas2764_priv {
 
 	bool dac_powered;
 	bool unmuted;
-<<<<<<< HEAD
 };
 
 static const char *tas2764_int_ltch0_msgs[8] = {
@@ -59,8 +58,6 @@ static const unsigned int tas2764_int_readout_regs[6] = {
 	TAS2764_INT_LTCH2,
 	TAS2764_INT_LTCH3,
 	TAS2764_INT_LTCH4,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static irqreturn_t tas2764_irq(int irq, void *data)
@@ -588,7 +585,6 @@ static int tas2764_codec_probe(struct snd_soc_component *component)
 
 static DECLARE_TLV_DB_SCALE(tas2764_digital_tlv, 1100, 50, 0);
 static DECLARE_TLV_DB_SCALE(tas2764_playback_volume, -10050, 50, 1);
-<<<<<<< HEAD
 
 static const char * const tas2764_hpf_texts[] = {
 	"Disabled", "2 Hz", "50 Hz", "100 Hz", "200 Hz",
@@ -598,8 +594,6 @@ static const char * const tas2764_hpf_texts[] = {
 static SOC_ENUM_SINGLE_DECL(
 	tas2764_hpf_enum, TAS2764_DC_BLK0,
 	TAS2764_DC_BLK0_HPF_FREQ_PB_SHIFT, tas2764_hpf_texts);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct snd_kcontrol_new tas2764_snd_controls[] = {
 	SOC_SINGLE_TLV("Speaker Volume", TAS2764_DVC, 0,

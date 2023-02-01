@@ -1520,15 +1520,9 @@ static int parse_pred(const char *str, void *data,
 			pred->regex.field_len = field->size;
 
 		} else if (field->filter_type == FILTER_DYN_STRING) {
-<<<<<<< HEAD
 			pred->fn_num = FILTER_PRED_FN_STRLOC;
 		} else if (field->filter_type == FILTER_RDYN_STRING)
 			pred->fn_num = FILTER_PRED_FN_STRRELLOC;
-=======
-			pred->fn = filter_pred_strloc;
-		} else if (field->filter_type == FILTER_RDYN_STRING)
-			pred->fn = filter_pred_strrelloc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		else {
 
 			if (!ustring_per_cpu) {
@@ -1539,15 +1533,9 @@ static int parse_pred(const char *str, void *data,
 			}
 
 			if (ustring)
-<<<<<<< HEAD
 				pred->fn_num = FILTER_PRED_FN_PCHAR_USER;
 			else
 				pred->fn_num = FILTER_PRED_FN_PCHAR;
-=======
-				pred->fn = filter_pred_pchar_user;
-			else
-				pred->fn = filter_pred_pchar;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		/* go past the last quote */
 		i++;

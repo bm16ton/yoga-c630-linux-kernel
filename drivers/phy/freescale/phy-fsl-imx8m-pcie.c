@@ -59,11 +59,7 @@ struct imx8_pcie_phy {
 	bool			clkreq_unused;
 };
 
-<<<<<<< HEAD
 static int imx8_pcie_phy_power_on(struct phy *phy)
-=======
-static int imx8_pcie_phy_init(struct phy *phy)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 	u32 val, pad_mode;
@@ -141,22 +137,14 @@ static int imx8_pcie_phy_init(struct phy *phy)
 	return ret;
 }
 
-<<<<<<< HEAD
 static int imx8_pcie_phy_init(struct phy *phy)
-=======
-static int imx8_pcie_phy_power_on(struct phy *phy)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct imx8_pcie_phy *imx8_phy = phy_get_drvdata(phy);
 
 	return clk_prepare_enable(imx8_phy->clk);
 }
 
-<<<<<<< HEAD
 static int imx8_pcie_phy_exit(struct phy *phy)
-=======
-static int imx8_pcie_phy_power_off(struct phy *phy)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct imx8_pcie_phy *imx8_phy = phy_get_drvdata(phy);
 
@@ -167,13 +155,8 @@ static int imx8_pcie_phy_power_off(struct phy *phy)
 
 static const struct phy_ops imx8_pcie_phy_ops = {
 	.init		= imx8_pcie_phy_init,
-<<<<<<< HEAD
 	.exit		= imx8_pcie_phy_exit,
 	.power_on	= imx8_pcie_phy_power_on,
-=======
-	.power_on	= imx8_pcie_phy_power_on,
-	.power_off	= imx8_pcie_phy_power_off,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.owner		= THIS_MODULE,
 };
 

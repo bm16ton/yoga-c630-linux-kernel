@@ -30,10 +30,7 @@
 #include <linux/security.h>
 #include <linux/hugetlb.h>
 #include <linux/swapops.h>
-<<<<<<< HEAD
 #include <linux/miscdevice.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int sysctl_unprivileged_userfaultfd __read_mostly;
 
@@ -111,7 +108,6 @@ static bool userfaultfd_is_initialized(struct userfaultfd_ctx *ctx)
 	return ctx->features & UFFD_FEATURE_INITIALIZED;
 }
 
-<<<<<<< HEAD
 static void userfaultfd_set_vm_flags(struct vm_area_struct *vma,
 				     vm_flags_t flags)
 {
@@ -127,8 +123,6 @@ static void userfaultfd_set_vm_flags(struct vm_area_struct *vma,
 		vma_set_page_prot(vma);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int userfaultfd_wake_function(wait_queue_entry_t *wq, unsigned mode,
 				     int wake_flags, void *key)
 {
@@ -639,12 +633,8 @@ static void userfaultfd_event_wait_completion(struct userfaultfd_ctx *ctx,
 		for_each_vma(vmi, vma) {
 			if (vma->vm_userfaultfd_ctx.ctx == release_new_ctx) {
 				vma->vm_userfaultfd_ctx = NULL_VM_UFFD_CTX;
-<<<<<<< HEAD
 				userfaultfd_set_vm_flags(vma,
 							 vma->vm_flags & ~__VM_UFFD_FLAGS);
-=======
-				vma->vm_flags &= ~__VM_UFFD_FLAGS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 		}
 		mmap_write_unlock(mm);
@@ -678,11 +668,7 @@ int dup_userfaultfd(struct vm_area_struct *vma, struct list_head *fcs)
 	octx = vma->vm_userfaultfd_ctx.ctx;
 	if (!octx || !(octx->features & UFFD_FEATURE_EVENT_FORK)) {
 		vma->vm_userfaultfd_ctx = NULL_VM_UFFD_CTX;
-<<<<<<< HEAD
 		userfaultfd_set_vm_flags(vma, vma->vm_flags & ~__VM_UFFD_FLAGS);
-=======
-		vma->vm_flags &= ~__VM_UFFD_FLAGS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 
@@ -763,11 +749,7 @@ void mremap_userfaultfd_prep(struct vm_area_struct *vma,
 	} else {
 		/* Drop uffd context if remap feature not enabled */
 		vma->vm_userfaultfd_ctx = NULL_VM_UFFD_CTX;
-<<<<<<< HEAD
 		userfaultfd_set_vm_flags(vma, vma->vm_flags & ~__VM_UFFD_FLAGS);
-=======
-		vma->vm_flags &= ~__VM_UFFD_FLAGS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -922,12 +904,8 @@ static int userfaultfd_release(struct inode *inode, struct file *file)
 				 vma->vm_file, vma->vm_pgoff,
 				 vma_policy(vma),
 				 NULL_VM_UFFD_CTX, anon_vma_name(vma));
-<<<<<<< HEAD
 		if (prev) {
 			mas_pause(&mas);
-=======
-		if (prev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			vma = prev;
 		} else {
 			prev = vma;

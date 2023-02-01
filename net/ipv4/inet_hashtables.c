@@ -706,11 +706,7 @@ static int inet_reuseport_add_sock(struct sock *sk,
 
 int __inet_hash(struct sock *sk, struct sock *osk)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hashinfo = tcp_or_dccp_get_hashinfo(sk);
-=======
-	struct inet_hashinfo *hashinfo = sk->sk_prot->h.hashinfo;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct inet_listen_hashbucket *ilb2;
 	int err = 0;
 
@@ -756,11 +752,7 @@ EXPORT_SYMBOL_GPL(inet_hash);
 
 void inet_unhash(struct sock *sk)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hashinfo = tcp_or_dccp_get_hashinfo(sk);
-=======
-	struct inet_hashinfo *hashinfo = sk->sk_prot->h.hashinfo;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (sk_unhashed(sk))
 		return;
@@ -1027,13 +1019,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
 	if (likely(remaining > 1))
 		remaining &= ~1U;
 
-<<<<<<< HEAD
 	get_random_sleepable_once(table_perturb,
 				  INET_TABLE_PERTURB_SIZE * sizeof(*table_perturb));
-=======
-	get_random_slow_once(table_perturb,
-			     INET_TABLE_PERTURB_SIZE * sizeof(*table_perturb));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	index = port_offset & (INET_TABLE_PERTURB_SIZE - 1);
 
 	offset = READ_ONCE(table_perturb[index]) + (port_offset >> 32);
@@ -1092,7 +1079,6 @@ next_port:
 	return -EADDRNOTAVAIL;
 
 ok:
-<<<<<<< HEAD
 	/* Find the corresponding tb2 bucket since we need to
 	 * add the socket to the bhash2 table as well
 	 */
@@ -1107,18 +1093,12 @@ ok:
 			goto error;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Here we want to add a little bit of randomness to the next source
 	 * port that will be chosen. We use a max() with a random here so that
 	 * on low contention the randomness is maximal and on high contention
 	 * it may be inexistent.
 	 */
-<<<<<<< HEAD
 	i = max_t(int, i, prandom_u32_max(8) * 2);
-=======
-	i = max_t(int, i, (prandom_u32() & 7) * 2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	WRITE_ONCE(table_perturb[index], READ_ONCE(table_perturb[index]) + i + 2);
 
 	/* Head lock still held and bh's disabled */

@@ -185,10 +185,6 @@ int erofs_namei(struct inode *dir, const struct qstr *name, erofs_nid_t *nid,
 	if (IS_ERR(de))
 		return PTR_ERR(de);
 
-<<<<<<< HEAD
-=======
-	/* the target page has been mapped */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ndirents)
 		de = find_target_dirent(&qn, (u8 *)de, EROFS_BLKSIZ, ndirents);
 

@@ -145,7 +145,6 @@ static inline struct rb_node *tree_search(struct btrfs_ordered_inode_tree *tree,
 
 /**
  * Add an ordered extent to the per-inode tree.
-<<<<<<< HEAD
  *
  * @inode:           Inode that this extent is for.
  * @file_offset:     Logical offset in file where the extent starts.
@@ -157,19 +156,6 @@ static inline struct rb_node *tree_search(struct btrfs_ordered_inode_tree *tree,
  * @flags:           Flags specifying type of extent (1 << BTRFS_ORDERED_*).
  * @compress_type:   Compression algorithm used for data.
  *
-=======
- *
- * @inode:           Inode that this extent is for.
- * @file_offset:     Logical offset in file where the extent starts.
- * @num_bytes:       Logical length of extent in file.
- * @ram_bytes:       Full length of unencoded data.
- * @disk_bytenr:     Offset of extent on disk.
- * @disk_num_bytes:  Size of extent on disk.
- * @offset:          Offset into unencoded data where file data starts.
- * @flags:           Flags specifying type of extent (1 << BTRFS_ORDERED_*).
- * @compress_type:   Compression algorithm used for data.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Most of these parameters correspond to &struct btrfs_file_extent_item. The
  * tree is given a single reference on the ordered extent that was inserted.
  *

@@ -15,10 +15,7 @@ config PINCTRL_MSM
 config PINCTRL_APQ8064
 	tristate "Qualcomm APQ8064 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -27,10 +24,7 @@ config PINCTRL_APQ8064
 config PINCTRL_APQ8084
 	tristate "Qualcomm APQ8084 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -39,10 +33,7 @@ config PINCTRL_APQ8084
 config PINCTRL_IPQ4019
 	tristate "Qualcomm IPQ4019 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -51,10 +42,7 @@ config PINCTRL_IPQ4019
 config PINCTRL_IPQ8064
 	tristate "Qualcomm IPQ8064 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -63,10 +51,7 @@ config PINCTRL_IPQ8064
 config PINCTRL_IPQ8074
 	tristate "Qualcomm Technologies, Inc. IPQ8074 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for
@@ -77,10 +62,7 @@ config PINCTRL_IPQ8074
 config PINCTRL_IPQ6018
 	tristate "Qualcomm Technologies, Inc. IPQ6018 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for
@@ -91,10 +73,7 @@ config PINCTRL_IPQ6018
 config PINCTRL_MSM8226
 	tristate "Qualcomm 8226 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -104,10 +83,7 @@ config PINCTRL_MSM8226
 config PINCTRL_MSM8660
 	tristate "Qualcomm 8660 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -116,10 +92,7 @@ config PINCTRL_MSM8660
 config PINCTRL_MSM8960
 	tristate "Qualcomm 8960 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -136,10 +109,7 @@ config PINCTRL_MDM9607
 config PINCTRL_MDM9615
 	tristate "Qualcomm 9615 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -148,10 +118,7 @@ config PINCTRL_MDM9615
 config PINCTRL_MSM8X74
 	tristate "Qualcomm 8x74 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -160,10 +127,7 @@ config PINCTRL_MSM8X74
 config PINCTRL_MSM8909
 	tristate "Qualcomm 8909 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -180,10 +144,7 @@ config PINCTRL_MSM8916
 config PINCTRL_MSM8953
 	tristate "Qualcomm 8953 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -194,10 +155,7 @@ config PINCTRL_MSM8953
 config PINCTRL_MSM8976
 	tristate "Qualcomm 8976 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -208,10 +166,7 @@ config PINCTRL_MSM8976
 config PINCTRL_MSM8994
 	tristate "Qualcomm 8994 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -221,10 +176,7 @@ config PINCTRL_MSM8994
 config PINCTRL_MSM8996
 	tristate "Qualcomm MSM8996 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -233,10 +185,7 @@ config PINCTRL_MSM8996
 config PINCTRL_MSM8998
 	tristate "Qualcomm MSM8998 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -245,10 +194,7 @@ config PINCTRL_MSM8998
 config PINCTRL_QCM2290
 	tristate "Qualcomm QCM2290 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -257,10 +203,7 @@ config PINCTRL_QCM2290
 config PINCTRL_QCS404
 	tristate "Qualcomm QCS404 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -308,10 +251,7 @@ config PINCTRL_QCOM_SSBI_PMIC
 config PINCTRL_SC7180
 	tristate "Qualcomm Technologies Inc SC7180 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -321,10 +261,7 @@ config PINCTRL_SC7180
 config PINCTRL_SC7280
 	tristate "Qualcomm Technologies Inc SC7280 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -334,10 +271,7 @@ config PINCTRL_SC7280
 config PINCTRL_SC7280_LPASS_LPI
 	tristate "Qualcomm Technologies Inc SC7280 LPASS LPI pin controller driver"
 	depends on GPIOLIB
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_LPASS_LPI
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -347,10 +281,7 @@ config PINCTRL_SC7280_LPASS_LPI
 config PINCTRL_SC8180X
 	tristate "Qualcomm Technologies Inc SC8180x pin controller driver"
 	depends on (OF || ACPI)
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -360,10 +291,7 @@ config PINCTRL_SC8180X
 config PINCTRL_SC8280XP
 	tristate "Qualcomm Technologies Inc SC8280xp pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -373,10 +301,7 @@ config PINCTRL_SC8280XP
 config PINCTRL_SDM660
 	tristate "Qualcomm Technologies Inc SDM660 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -386,10 +311,7 @@ config PINCTRL_SDM660
 config PINCTRL_SDM845
 	tristate "Qualcomm Technologies Inc SDM845 pin controller driver"
 	depends on (OF || ACPI)
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -399,10 +321,7 @@ config PINCTRL_SDM845
 config PINCTRL_SDX55
 	tristate "Qualcomm Technologies Inc SDX55 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -412,10 +331,7 @@ config PINCTRL_SDX55
 config PINCTRL_SM6115
 	tristate "Qualcomm Technologies Inc SM6115,SM4250 pin controller driver"
 	depends on GPIOLIB && OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -425,10 +341,7 @@ config PINCTRL_SM6115
 config PINCTRL_SM6125
 	tristate "Qualcomm Technologies Inc SM6125 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -438,10 +351,7 @@ config PINCTRL_SM6125
 config PINCTRL_SM6350
 	tristate "Qualcomm Technologies Inc SM6350 pin controller driver"
 	depends on GPIOLIB && OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -451,10 +361,7 @@ config PINCTRL_SM6350
 config PINCTRL_SM6375
 	tristate "Qualcomm Technologies Inc SM6375 pin controller driver"
 	depends on GPIOLIB && OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -464,10 +371,7 @@ config PINCTRL_SM6375
 config PINCTRL_SDX65
 	tristate "Qualcomm Technologies Inc SDX65 pin controller driver"
 	depends on GPIOLIB && OF
-<<<<<<< HEAD
 	depends on ARM || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -477,10 +381,7 @@ config PINCTRL_SDX65
 config PINCTRL_SM8150
 	tristate "Qualcomm Technologies Inc SM8150 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	 This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -490,10 +391,7 @@ config PINCTRL_SM8150
 config PINCTRL_SM8250
 	tristate "Qualcomm Technologies Inc SM8250 pin controller driver"
 	depends on OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -503,10 +401,7 @@ config PINCTRL_SM8250
 config PINCTRL_SM8250_LPASS_LPI
 	tristate "Qualcomm Technologies Inc SM8250 LPASS LPI pin controller driver"
 	depends on GPIOLIB
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_LPASS_LPI
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -515,10 +410,7 @@ config PINCTRL_SM8250_LPASS_LPI
 
 config PINCTRL_SM8350
 	tristate "Qualcomm Technologies Inc SM8350 pin controller driver"
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
@@ -528,17 +420,13 @@ config PINCTRL_SM8350
 config PINCTRL_SM8450
 	tristate "Qualcomm Technologies Inc SM8450 pin controller driver"
 	depends on GPIOLIB && OF
-<<<<<<< HEAD
 	depends on ARM64 || COMPILE_TEST
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PINCTRL_MSM
 	help
 	  This is the pinctrl, pinmux, pinconf and gpiolib driver for the
 	  Qualcomm Technologies Inc TLMM block found on the Qualcomm
 	  Technologies Inc SM8450 platform.
 
-<<<<<<< HEAD
 config PINCTRL_SM8450_LPASS_LPI
 	tristate "Qualcomm Technologies Inc SM8450 LPASS LPI pin controller driver"
 	depends on GPIOLIB
@@ -559,8 +447,6 @@ config PINCTRL_SC8280XP_LPASS_LPI
 	  Qualcomm Technologies Inc LPASS (Low Power Audio SubSystem) LPI
 	  (Low Power Island) found on the Qualcomm Technologies Inc SC8280XP platform.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config PINCTRL_LPASS_LPI
 	tristate "Qualcomm Technologies Inc LPASS LPI pin controller driver"
 	select PINMUX

@@ -2009,10 +2009,7 @@
 
 		hda@3510000 {
 			nvidia,model = "NVIDIA Jetson AGX Orin HDA";
-<<<<<<< HEAD
 			status = "okay";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 	};
 
@@ -2021,7 +2018,6 @@
 		stdout-path = "serial0:115200n8";
 	};
 
-<<<<<<< HEAD
 	bus@0 {
 		ethernet@6800000 {
 			status = "okay";
@@ -2043,8 +2039,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpio-keys {
 		compatible = "gpio-keys";
 		status = "okay";
@@ -2139,7 +2133,6 @@
 
 		label = "NVIDIA Jetson AGX Orin APE";
 	};
-<<<<<<< HEAD
 
 	pcie@14100000 {
 		status = "okay";
@@ -2191,6 +2184,4 @@
 		phy-names = "p2u-0", "p2u-1", "p2u-2", "p2u-3", "p2u-4",
 			    "p2u-5", "p2u-6", "p2u-7";
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

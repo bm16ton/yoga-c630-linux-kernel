@@ -127,13 +127,8 @@ static int at91sam9g20ek_audio_probe(struct platform_device *pdev)
 
 	ret = atmel_ssc_set_audio(0);
 	if (ret) {
-<<<<<<< HEAD
 		dev_err(&pdev->dev, "ssc channel is not valid: %d\n", ret);
 		return ret;
-=======
-		dev_err(&pdev->dev, "ssc channel is not valid\n");
-		return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	card->dev = &pdev->dev;
@@ -165,12 +160,8 @@ static int at91sam9g20ek_audio_probe(struct platform_device *pdev)
 	if (!cpu_np) {
 		dev_err(&pdev->dev, "dai and pcm info missing\n");
 		of_node_put(codec_np);
-<<<<<<< HEAD
 		ret = -EINVAL;
 		goto err;
-=======
-		return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	at91sam9g20ek_dai.cpus->of_node = cpu_np;
 	at91sam9g20ek_dai.platforms->of_node = cpu_np;

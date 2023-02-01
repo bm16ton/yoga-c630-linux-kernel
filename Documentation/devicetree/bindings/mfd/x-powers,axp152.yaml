@@ -4,11 +4,7 @@
 $id: http://devicetree.org/schemas/mfd/x-powers,axp152.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-<<<<<<< HEAD
 title: X-Powers AXP PMIC
-=======
-title: X-Powers AXP PMIC Device Tree Bindings
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 maintainers:
   - Chen-Yu Tsai <wens@csie.org>
@@ -97,12 +93,9 @@ properties:
           - x-powers,axp809
           - x-powers,axp813
       - items:
-<<<<<<< HEAD
           - const: x-powers,axp228
           - const: x-powers,axp221
       - items:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - const: x-powers,axp805
           - const: x-powers,axp806
       - items:
@@ -270,10 +263,7 @@ properties:
       "^(([a-f])?ldo[0-9]|dcdc[0-7a-e]|ldo(_|-)io(0|1)|(dc1)?sw|rtc(_|-)ldo|drivevbus|dc5ldo)$":
         $ref: /schemas/regulator/regulator.yaml#
         type: object
-<<<<<<< HEAD
         unevaluatedProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
         properties:
           regulator-ramp-delay:

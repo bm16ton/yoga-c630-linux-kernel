@@ -18,10 +18,7 @@
 #include <linux/vdpa.h>
 #include <linux/vhost_iotlb.h>
 #include <linux/iova.h>
-<<<<<<< HEAD
 #include <uapi/linux/vdpa.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "vdpa_sim.h"
 
@@ -692,13 +689,9 @@ static void vdpasim_free(struct vdpa_device *vdpa)
 	}
 
 	kvfree(vdpasim->buffer);
-<<<<<<< HEAD
 	for (i = 0; i < vdpasim->dev_attr.nas; i++)
 		vhost_iotlb_reset(&vdpasim->iommu[i]);
 	kfree(vdpasim->iommu);
-=======
-	vhost_iotlb_free(vdpasim->iommu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(vdpasim->vqs);
 	kfree(vdpasim->config);
 }

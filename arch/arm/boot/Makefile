@@ -90,14 +90,4 @@ $(obj)/bootp/bootp: $(obj)/zImage FORCE
 $(obj)/bootpImage: $(obj)/bootp/bootp FORCE
 	$(call if_changed,objcopy)
 
-<<<<<<< HEAD
-=======
-PHONY += initrd
-initrd:
-	@test "$(INITRD_PHYS)" != "" || \
-	(echo This machine does not support INITRD; exit -1)
-	@test "$(INITRD)" != "" || \
-	(echo You must specify INITRD; exit -1)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 subdir-	    := bootp compressed dts

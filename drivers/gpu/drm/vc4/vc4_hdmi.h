@@ -196,19 +196,7 @@ struct vc4_hdmi {
 
 	/**
 	 * @mutex: Mutex protecting the driver access across multiple
-<<<<<<< HEAD
 	 * frameworks (KMS, ALSA, CEC).
-=======
-	 * frameworks (KMS, ALSA).
-	 *
-	 * NOTE: While supported, CEC has been left out since
-	 * cec_s_phys_addr_from_edid() might call .adap_enable and lead to a
-	 * reentrancy issue between .get_modes (or .detect) and .adap_enable.
-	 * Since we don't share any state between the CEC hooks and KMS', it's
-	 * not a big deal. The only trouble might come from updating the CEC
-	 * clock divider which might be affected by a modeset, but CEC should
-	 * be resilient to that.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
 	struct mutex mutex;
 

@@ -610,11 +610,6 @@ static void pca9685_pwm_remove(struct i2c_client *client)
 	}
 
 	pm_runtime_disable(&client->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused pca9685_pwm_runtime_suspend(struct device *dev)

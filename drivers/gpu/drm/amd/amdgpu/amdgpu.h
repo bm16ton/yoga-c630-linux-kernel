@@ -1062,11 +1062,8 @@ struct amdgpu_device {
 	uint32_t                        scpm_status;
 
 	struct work_struct		reset_work;
-<<<<<<< HEAD
 
 	bool                            job_hang;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct amdgpu_device *drm_to_adev(struct drm_device *ddev)
@@ -1295,12 +1292,9 @@ u32 amdgpu_device_pcie_port_rreg(struct amdgpu_device *adev,
 				u32 reg);
 void amdgpu_device_pcie_port_wreg(struct amdgpu_device *adev,
 				u32 reg, u32 v);
-<<<<<<< HEAD
 struct dma_fence *amdgpu_device_switch_gang(struct amdgpu_device *adev,
 					    struct dma_fence *gang);
 bool amdgpu_device_has_display_hardware(struct amdgpu_device *adev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* atpx handler */
 #if defined(CONFIG_VGA_SWITCHEROO)

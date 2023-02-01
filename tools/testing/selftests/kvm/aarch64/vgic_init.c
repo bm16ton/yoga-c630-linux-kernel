@@ -662,13 +662,8 @@ int test_kvm_device(uint32_t gic_dev_type)
 					     : KVM_DEV_TYPE_ARM_VGIC_V2;
 
 	if (!__kvm_test_create_device(v.vm, other)) {
-<<<<<<< HEAD
 		ret = __kvm_create_device(v.vm, other);
 		TEST_ASSERT(ret < 0 && (errno == EINVAL || errno == EEXIST),
-=======
-		ret = __kvm_test_create_device(v.vm, other);
-		TEST_ASSERT(ret && (errno == EINVAL || errno == EEXIST),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				"create GIC device while other version exists");
 	}
 

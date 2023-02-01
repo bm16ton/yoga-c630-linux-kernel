@@ -80,7 +80,6 @@
 
 DEFINE_STATIC_KEY_FALSE(shared_processor);
 EXPORT_SYMBOL(shared_processor);
-<<<<<<< HEAD
 
 #ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
 struct static_key paravirt_steal_enabled;
@@ -95,8 +94,6 @@ static int __init parse_no_stealacc(char *arg)
 
 early_param("no-steal-acc", parse_no_stealacc);
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int CMO_PrPSP = -1;
 int CMO_SecPSP = -1;

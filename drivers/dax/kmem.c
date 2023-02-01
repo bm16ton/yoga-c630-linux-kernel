@@ -88,17 +88,13 @@ static int dev_dax_kmem_probe(struct dev_dax *dev_dax)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	init_node_memory_type(numa_node, dax_slowmem_type);
 
 	rc = -ENOMEM;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	data = kzalloc(struct_size(data, res, dev_dax->nr_range), GFP_KERNEL);
 	if (!data)
 		goto err_dax_kmem_data;
 
-	rc = -ENOMEM;
 	data->res_name = kstrdup(dev_name(dev), GFP_KERNEL);
 	if (!data->res_name)
 		goto err_res_name;

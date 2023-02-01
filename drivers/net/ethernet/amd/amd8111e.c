@@ -185,7 +185,6 @@ static void amd8111e_set_ext_phy(struct net_device *dev)
 	advert = amd8111e_mdio_read(dev, lp->ext_phy_addr, MII_ADVERTISE);
 	tmp = advert & ~(ADVERTISE_ALL | ADVERTISE_100BASE4);
 	switch (lp->ext_phy_option) {
-<<<<<<< HEAD
 	default:
 	case SPEED_AUTONEG: /* advertise all values */
 		tmp |= (ADVERTISE_10HALF | ADVERTISE_10FULL |
@@ -203,26 +202,6 @@ static void amd8111e_set_ext_phy(struct net_device *dev)
 	case SPEED100_FULL:
 		tmp |= ADVERTISE_100FULL;
 		break;
-=======
-
-		default:
-		case SPEED_AUTONEG: /* advertise all values */
-			tmp |= (ADVERTISE_10HALF | ADVERTISE_10FULL |
-				ADVERTISE_100HALF | ADVERTISE_100FULL);
-			break;
-		case SPEED10_HALF:
-			tmp |= ADVERTISE_10HALF;
-			break;
-		case SPEED10_FULL:
-			tmp |= ADVERTISE_10FULL;
-			break;
-		case SPEED100_HALF:
-			tmp |= ADVERTISE_100HALF;
-			break;
-		case SPEED100_FULL:
-			tmp |= ADVERTISE_100FULL;
-			break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if(advert != tmp)
@@ -257,11 +236,7 @@ static int amd8111e_free_skbs(struct net_device *dev)
 	/* Freeing previously allocated receive buffers */
 	for (i = 0; i < NUM_RX_BUFFERS; i++) {
 		rx_skbuff = lp->rx_skbuff[i];
-<<<<<<< HEAD
 		if (rx_skbuff) {
-=======
-		if (rx_skbuff != NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			dma_unmap_single(&lp->pci_dev->dev,
 					 lp->rx_dma_addr[i],
 					 lp->rx_buff_len - 2, DMA_FROM_DEVICE);
@@ -1108,11 +1083,7 @@ static irqreturn_t amd8111e_interrupt(int irq, void *dev_id)
 	unsigned int intr0, intren0;
 	unsigned int handled = 1;
 
-<<<<<<< HEAD
 	if (unlikely(!dev))
-=======
-	if (unlikely(dev == NULL))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return IRQ_NONE;
 
 	spin_lock(&lp->lock);
@@ -1582,11 +1553,7 @@ static int amd8111e_enable_magicpkt(struct amd8111e_priv *lp)
 static int amd8111e_enable_link_change(struct amd8111e_priv *lp)
 {
 
-<<<<<<< HEAD
 	/* Adapter is already stopped/suspended/interrupt-disabled */
-=======
-	/* Adapter is already stoped/suspended/interrupt-disabled */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	writel(VAL0 | LCMODE_SW, lp->mmio + CMD7);
 
 	/* To eliminate PCI posting bug */

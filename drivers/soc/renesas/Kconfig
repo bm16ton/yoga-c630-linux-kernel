@@ -44,10 +44,7 @@ config ARCH_RZG2L
 	bool
 	select PM
 	select PM_GENERIC_DOMAINS
-<<<<<<< HEAD
 	select RENESAS_RZG2L_IRQC
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config ARCH_RZN1
 	bool

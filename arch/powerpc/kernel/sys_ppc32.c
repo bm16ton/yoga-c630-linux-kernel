@@ -57,7 +57,6 @@
 #include <asm/syscalls.h>
 #include <asm/switch_to.h>
 
-<<<<<<< HEAD
 #ifdef CONFIG_PPC32
 #define PPC32_SYSCALL_DEFINE4	SYSCALL_DEFINE4
 #define PPC32_SYSCALL_DEFINE5	SYSCALL_DEFINE5
@@ -72,18 +71,6 @@ PPC32_SYSCALL_DEFINE6(ppc_pread64,
 		       unsigned int, fd,
 		       char __user *, ubuf, compat_size_t, count,
 		       u32, reg6, u32, pos1, u32, pos2)
-=======
-unsigned long compat_sys_mmap2(unsigned long addr, size_t len,
-			  unsigned long prot, unsigned long flags,
-			  unsigned long fd, unsigned long pgoff)
-{
-	/* This should remain 12 even if PAGE_SIZE changes */
-	return sys_mmap(addr, len, prot, flags, fd, pgoff << 12);
-}
-
-compat_ssize_t compat_sys_pread64(unsigned int fd, char __user *ubuf, compat_size_t count,
-			     u32 reg6, u32 pos1, u32 pos2)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return ksys_pread64(fd, ubuf, count, merge_64(pos1, pos2));
 }
@@ -110,21 +97,9 @@ PPC32_SYSCALL_DEFINE4(ppc_truncate64,
 	return ksys_truncate(path, merge_64(len1, len2));
 }
 
-<<<<<<< HEAD
 PPC32_SYSCALL_DEFINE4(ppc_ftruncate64,
 		       unsigned int, fd, u32, reg4,
 		       unsigned long, len1, unsigned long, len2)
-=======
-asmlinkage long compat_sys_fallocate(int fd, int mode, u32 offset1, u32 offset2,
-				     u32 len1, u32 len2)
-{
-	return ksys_fallocate(fd, mode, merge_64(offset1, offset2),
-			     merge_64(len1, len2));
-}
-
-asmlinkage int compat_sys_ftruncate64(unsigned int fd, u32 reg4, unsigned long len1,
-				 unsigned long len2)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return ksys_ftruncate(fd, merge_64(len1, len2));
 }

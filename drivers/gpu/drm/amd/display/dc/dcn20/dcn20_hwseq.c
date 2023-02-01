@@ -1615,7 +1615,6 @@ static void dcn20_update_dchubp_dpp(
 			&& hubp->funcs->phantom_hubp_post_enable)
 		hubp->funcs->phantom_hubp_post_enable(hubp);
 }
-<<<<<<< HEAD
 
 static int calculate_vready_offset_for_group(struct pipe_ctx *pipe)
 {
@@ -1639,8 +1638,6 @@ static int calculate_vready_offset_for_group(struct pipe_ctx *pipe)
 		if (other_pipe->pipe_dlg_param.vready_offset > vready_offset)
 			vready_offset = other_pipe->pipe_dlg_param.vready_offset;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return vready_offset;
 }
@@ -1668,15 +1665,8 @@ static void dcn20_program_pipe(
 				pipe_ctx->pipe_dlg_param.vupdate_width);
 
 		if (pipe_ctx->stream->mall_stream_config.type != SUBVP_PHANTOM) {
-<<<<<<< HEAD
 			pipe_ctx->stream_res.tg->funcs->wait_for_state(pipe_ctx->stream_res.tg, CRTC_STATE_VBLANK);
 			pipe_ctx->stream_res.tg->funcs->wait_for_state(pipe_ctx->stream_res.tg, CRTC_STATE_VACTIVE);
-=======
-			pipe_ctx->stream_res.tg->funcs->wait_for_state(
-				pipe_ctx->stream_res.tg, CRTC_STATE_VBLANK);
-			pipe_ctx->stream_res.tg->funcs->wait_for_state(
-				pipe_ctx->stream_res.tg, CRTC_STATE_VACTIVE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		pipe_ctx->stream_res.tg->funcs->set_vtg_params(
@@ -1885,7 +1875,6 @@ void dcn20_post_unlock_program_front_end(
 
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
-<<<<<<< HEAD
 		struct pipe_ctx *old_pipe = &dc->current_state->res_ctx.pipe_ctx[i];
 
 		/* If an active, non-phantom pipe is being transitioned into a phantom
@@ -1924,58 +1913,6 @@ void dcn20_post_unlock_program_front_end(
 		}
 	}
 
-=======
-		struct pipe_ctx *mpcc_pipe;
-
-		if (pipe->vtp_locked) {
-			dc->hwseq->funcs.wait_for_blank_complete(pipe->stream_res.opp);
-			pipe->plane_res.hubp->funcs->set_blank(pipe->plane_res.hubp, true);
-			pipe->vtp_locked = false;
-
-			for (mpcc_pipe = pipe->bottom_pipe; mpcc_pipe; mpcc_pipe = mpcc_pipe->bottom_pipe)
-				mpcc_pipe->plane_res.hubp->funcs->set_blank(mpcc_pipe->plane_res.hubp, true);
-
-			for (i = 0; i < dc->res_pool->pipe_count; i++)
-				if (context->res_ctx.pipe_ctx[i].update_flags.bits.disable)
-					dc->hwss.disable_plane(dc, &dc->current_state->res_ctx.pipe_ctx[i]);
-		}
-	}
-
-	for (i = 0; i < dc->res_pool->pipe_count; i++) {
-		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
-		struct pipe_ctx *old_pipe = &dc->current_state->res_ctx.pipe_ctx[i];
-
-		/* If an active, non-phantom pipe is being transitioned into a phantom
-		 * pipe, wait for the double buffer update to complete first before we do
-		 * phantom pipe programming (HUBP_VTG_SEL updates right away so that can
-		 * cause issues).
-		 */
-		if (pipe->stream && pipe->stream->mall_stream_config.type == SUBVP_PHANTOM &&
-				old_pipe->stream && old_pipe->stream->mall_stream_config.type != SUBVP_PHANTOM) {
-			old_pipe->stream_res.tg->funcs->wait_for_state(
-					old_pipe->stream_res.tg,
-					CRTC_STATE_VBLANK);
-			old_pipe->stream_res.tg->funcs->wait_for_state(
-					old_pipe->stream_res.tg,
-					CRTC_STATE_VACTIVE);
-		}
-	}
-
-	for (i = 0; i < dc->res_pool->pipe_count; i++) {
-		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
-
-		if (pipe->plane_state && !pipe->top_pipe) {
-			/* Program phantom pipe here to prevent a frame of underflow in the MPO transition
-			 * case (if a pipe being used for a video plane transitions to a phantom pipe, it
-			 * can underflow due to HUBP_VTG_SEL programming if done in the regular front end
-			 * programming sequence).
-			 */
-			if (pipe->stream && pipe->stream->mall_stream_config.type == SUBVP_PHANTOM)
-					dcn20_program_pipe(dc, pipe, context);
-		}
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Only program the MALL registers after all the main and phantom pipes
 	 * are done programming.
 	 */
@@ -2076,13 +2013,10 @@ void dcn20_optimize_bandwidth(
 				context->bw_ctx.bw.dcn.clk.dramclk_khz <= dc->clk_mgr->bw_params->dc_mode_softmax_memclk * 1000)
 			dc->clk_mgr->funcs->set_max_memclk(dc->clk_mgr, dc->clk_mgr->bw_params->dc_mode_softmax_memclk);
 
-<<<<<<< HEAD
 	/* increase compbuf size */
 	if (hubbub->funcs->program_compbuf_size)
 		hubbub->funcs->program_compbuf_size(hubbub, context->bw_ctx.bw.dcn.compbuf_size_kb, true);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dc->clk_mgr->funcs->update_clocks(
 			dc->clk_mgr,
 			context,
@@ -2098,12 +2032,6 @@ void dcn20_optimize_bandwidth(
 						pipe_ctx->dlg_regs.optimized_min_dst_y_next_start);
 		}
 	}
-<<<<<<< HEAD
-=======
-	/* increase compbuf size */
-	if (hubbub->funcs->program_compbuf_size)
-		hubbub->funcs->program_compbuf_size(hubbub, context->bw_ctx.bw.dcn.compbuf_size_kb, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 bool dcn20_update_bandwidth(
@@ -2556,7 +2484,6 @@ void dcn20_update_visual_confirm_color(struct dc *dc, struct pipe_ctx *pipe_ctx,
 		get_mpctree_visual_confirm_color(pipe_ctx, color);
 	else if (dc->debug.visual_confirm == VISUAL_CONFIRM_SWIZZLE)
 		get_surface_tile_visual_confirm_color(pipe_ctx, color);
-<<<<<<< HEAD
 	else if (dc->debug.visual_confirm == VISUAL_CONFIRM_SUBVP)
 		get_subvp_visual_confirm_color(dc, pipe_ctx, color);
 
@@ -2564,11 +2491,6 @@ void dcn20_update_visual_confirm_color(struct dc *dc, struct pipe_ctx *pipe_ctx,
 		memcpy(&pipe_ctx->plane_state->visual_confirm_color, color, sizeof(struct tg_color));
 		mpc->funcs->set_bg_color(mpc, color, mpcc_id);
 	}
-=======
-
-	if (mpc->funcs->set_bg_color)
-		mpc->funcs->set_bg_color(mpc, color, mpcc_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void dcn20_update_mpcc(struct dc *dc, struct pipe_ctx *pipe_ctx)

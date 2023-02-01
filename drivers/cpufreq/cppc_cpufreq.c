@@ -63,15 +63,12 @@ static struct cppc_workaround_oem_info wa_info[] = {
 
 static struct cpufreq_driver cppc_cpufreq_driver;
 
-<<<<<<< HEAD
 static enum {
 	FIE_UNSET = -1,
 	FIE_ENABLED,
 	FIE_DISABLED
 } fie_disabled = FIE_UNSET;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_ACPI_CPPC_CPUFREQ_FIE
 module_param(fie_disabled, int, 0444);
 MODULE_PARM_DESC(fie_disabled, "Disable Frequency Invariance Engine (FIE)");

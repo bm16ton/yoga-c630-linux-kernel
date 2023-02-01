@@ -980,11 +980,7 @@ struct hns_roce_hem_head {
 
 static struct hns_roce_hem_item *
 hem_list_alloc_item(struct hns_roce_dev *hr_dev, int start, int end, int count,
-<<<<<<< HEAD
 		    bool exist_bt)
-=======
-		    bool exist_bt, int bt_level)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct hns_roce_hem_item *hem;
 
@@ -1245,11 +1241,7 @@ alloc_root_hem(struct hns_roce_dev *hr_dev, int unit, int *max_ba_num,
 	/* indicate to last region */
 	r = &regions[region_cnt - 1];
 	hem = hem_list_alloc_item(hr_dev, offset, r->offset + r->count - 1,
-<<<<<<< HEAD
 				  ba_num, true);
-=======
-				  ba_num, true, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!hem)
 		return ERR_PTR(-ENOMEM);
 
@@ -1266,11 +1258,7 @@ static int alloc_fake_root_bt(struct hns_roce_dev *hr_dev, void *cpu_base,
 	struct hns_roce_hem_item *hem;
 
 	hem = hem_list_alloc_item(hr_dev, r->offset, r->offset + r->count - 1,
-<<<<<<< HEAD
 				  r->count, false);
-=======
-				  r->count, false, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!hem)
 		return -ENOMEM;
 

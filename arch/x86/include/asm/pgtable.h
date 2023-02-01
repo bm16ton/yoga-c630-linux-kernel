@@ -1439,7 +1439,6 @@ static inline bool arch_has_hw_pte_young(void)
 	return true;
 }
 
-<<<<<<< HEAD
 #ifdef CONFIG_XEN_PV
 #define arch_has_hw_nonleaf_pmd_young arch_has_hw_nonleaf_pmd_young
 static inline bool arch_has_hw_nonleaf_pmd_young(void)
@@ -1448,8 +1447,6 @@ static inline bool arch_has_hw_nonleaf_pmd_young(void)
 }
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_PAGE_TABLE_CHECK
 static inline bool pte_user_accessible_page(pte_t pte)
 {

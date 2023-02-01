@@ -19,11 +19,8 @@ enum {
 	CLK_ALPHA_PLL_TYPE_ZONDA,
 	CLK_ALPHA_PLL_TYPE_LUCID_EVO,
 	CLK_ALPHA_PLL_TYPE_RIVIAN_EVO,
-<<<<<<< HEAD
 	CLK_ALPHA_PLL_TYPE_DEFAULT_EVO,
 	CLK_ALPHA_PLL_TYPE_BRAMMO_EVO,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	CLK_ALPHA_PLL_TYPE_MAX,
 };
 
@@ -161,10 +158,7 @@ extern const struct clk_ops clk_alpha_pll_zonda_ops;
 #define clk_alpha_pll_postdiv_zonda_ops clk_alpha_pll_postdiv_fabia_ops
 
 extern const struct clk_ops clk_alpha_pll_lucid_evo_ops;
-<<<<<<< HEAD
 extern const struct clk_ops clk_alpha_pll_reset_lucid_evo_ops;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern const struct clk_ops clk_alpha_pll_fixed_lucid_evo_ops;
 extern const struct clk_ops clk_alpha_pll_postdiv_lucid_evo_ops;
 

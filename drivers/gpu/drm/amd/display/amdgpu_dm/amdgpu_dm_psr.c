@@ -174,7 +174,6 @@ bool amdgpu_dm_psr_enable(struct dc_stream_state *stream)
 					   &stream, 1,
 					   &params);
 
-<<<<<<< HEAD
 	/*
 	 * Only enable static-screen optimizations for PSR1. For PSR SU, this
 	 * causes vstartup interrupt issues, used by amdgpu_dm to send vblank
@@ -182,9 +181,6 @@ bool amdgpu_dm_psr_enable(struct dc_stream_state *stream)
 	 */
 	if (link->psr_settings.psr_version < DC_PSR_VERSION_SU_1)
 		power_opt |= psr_power_opt_z10_static_screen;
-=======
-	power_opt |= psr_power_opt_z10_static_screen;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return dc_link_set_psr_allow_active(link, &psr_enable, false, false, &power_opt);
 }

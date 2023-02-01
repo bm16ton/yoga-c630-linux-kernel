@@ -155,16 +155,9 @@ static int __fwnode_iio_channel_get(struct iio_channel *channel,
 	if (err)
 		return err;
 
-<<<<<<< HEAD
 	idev = bus_find_device_by_fwnode(&iio_bus_type, iiospec.fwnode);
 	if (!idev) {
 		fwnode_handle_put(iiospec.fwnode);
-=======
-	idev = bus_find_device(&iio_bus_type, NULL, iiospec.np,
-			       iio_dev_node_match);
-	if (idev == NULL) {
-		of_node_put(iiospec.np);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EPROBE_DEFER;
 	}
 
@@ -173,13 +166,8 @@ static int __fwnode_iio_channel_get(struct iio_channel *channel,
 	if (indio_dev->info->fwnode_xlate)
 		index = indio_dev->info->fwnode_xlate(indio_dev, &iiospec);
 	else
-<<<<<<< HEAD
 		index = __fwnode_iio_simple_xlate(indio_dev, &iiospec);
 	fwnode_handle_put(iiospec.fwnode);
-=======
-		index = __of_iio_simple_xlate(indio_dev, &iiospec);
-	of_node_put(iiospec.np);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (index < 0)
 		goto err_put;
 	channel->channel = &indio_dev->channels[index];
@@ -446,17 +434,9 @@ struct iio_channel *devm_fwnode_iio_channel_get_by_name(struct device *dev,
 	struct iio_channel *channel;
 	int ret;
 
-<<<<<<< HEAD
 	channel = fwnode_iio_channel_get_by_name(fwnode, channel_name);
 	if (IS_ERR(channel))
 		return channel;
-=======
-	channel = of_iio_channel_get_by_name(np, channel_name);
-	if (IS_ERR(channel))
-		return channel;
-	if (!channel)
-		return ERR_PTR(-ENODEV);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = devm_add_action_or_reset(dev, devm_iio_channel_free, channel);
 	if (ret)
@@ -612,11 +592,7 @@ int iio_read_channel_raw(struct iio_channel *chan, int *val)
 	int ret;
 
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
-<<<<<<< HEAD
 	if (!chan->indio_dev->info) {
-=======
-	if (chan->indio_dev->info == NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -ENODEV;
 		goto err_unlock;
 	}
@@ -635,11 +611,7 @@ int iio_read_channel_average_raw(struct iio_channel *chan, int *val)
 	int ret;
 
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
-<<<<<<< HEAD
 	if (!chan->indio_dev->info) {
-=======
-	if (chan->indio_dev->info == NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -ENODEV;
 		goto err_unlock;
 	}
@@ -738,11 +710,7 @@ int iio_convert_raw_to_processed(struct iio_channel *chan, int raw,
 	int ret;
 
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
-<<<<<<< HEAD
 	if (!chan->indio_dev->info) {
-=======
-	if (chan->indio_dev->info == NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -ENODEV;
 		goto err_unlock;
 	}
@@ -763,11 +731,7 @@ int iio_read_channel_attribute(struct iio_channel *chan, int *val, int *val2,
 	int ret;
 
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
-<<<<<<< HEAD
 	if (!chan->indio_dev->info) {
-=======
-	if (chan->indio_dev->info == NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -ENODEV;
 		goto err_unlock;
 	}
@@ -793,11 +757,7 @@ int iio_read_channel_processed_scale(struct iio_channel *chan, int *val,
 	int ret;
 
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
-<<<<<<< HEAD
 	if (!chan->indio_dev->info) {
-=======
-	if (chan->indio_dev->info == NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -ENODEV;
 		goto err_unlock;
 	}
@@ -959,11 +919,7 @@ int iio_get_channel_type(struct iio_channel *chan, enum iio_chan_type *type)
 	/* Need to verify underlying driver has not gone away */
 
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
-<<<<<<< HEAD
 	if (!chan->indio_dev->info) {
-=======
-	if (chan->indio_dev->info == NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -ENODEV;
 		goto err_unlock;
 	}
@@ -990,11 +946,7 @@ int iio_write_channel_attribute(struct iio_channel *chan, int val, int val2,
 	int ret;
 
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
-<<<<<<< HEAD
 	if (!chan->indio_dev->info) {
-=======
-	if (chan->indio_dev->info == NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -ENODEV;
 		goto err_unlock;
 	}

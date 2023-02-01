@@ -362,14 +362,8 @@ ret_from_mc_except:
 /* Core exception code for all exceptions except TLB misses. */
 #define EXCEPTION_COMMON_LVL(n, scratch, excf)				    \
 exc_##n##_common:							    \
-<<<<<<< HEAD
 	SAVE_GPR(0, r1);		/* save r0 in stackframe */	    \
 	SAVE_GPRS(2, 9, r1);		/* save r2 - r9 in stackframe */    \
-=======
-	std	r0,GPR0(r1);		/* save r0 in stackframe */	    \
-	std	r2,GPR2(r1);		/* save r2 in stackframe */	    \
-	SAVE_GPRS(3, 9, r1);		/* save r3 - r9 in stackframe */    \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	std	r10,_NIP(r1);		/* save SRR0 to stackframe */	    \
 	std	r11,_MSR(r1);		/* save SRR1 to stackframe */	    \
 	beq	2f;			/* if from kernel mode */	    \
@@ -464,15 +458,6 @@ exc_##n##_bad_stack:							    \
 	addi	r3,r1,STACK_FRAME_OVERHEAD;				\
 	bl	hdlr;							\
 	b	interrupt_return
-<<<<<<< HEAD
-=======
-
-/* This value is used to mark exception frames on the stack. */
-	.section	".toc","aw"
-exception_marker:
-	.tc	ID_EXC_MARKER[TC],STACK_FRAME_REGS_MARKER
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * And here we have the exception vectors !
@@ -905,15 +890,9 @@ kernel_dbg_exc:
 
 .macro SEARCH_RESTART_TABLE
 #ifdef CONFIG_RELOCATABLE
-<<<<<<< HEAD
 	__LOAD_PACA_TOC(r11)
 	LOAD_REG_ADDR_ALTTOC(r14, r11, __start___restart_table)
 	LOAD_REG_ADDR_ALTTOC(r15, r11, __stop___restart_table)
-=======
-	ld	r11,PACATOC(r13)
-	ld	r14,__start___restart_table@got(r11)
-	ld	r15,__stop___restart_table@got(r11)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 	LOAD_REG_IMMEDIATE_SYM(r14, r11, __start___restart_table)
 	LOAD_REG_IMMEDIATE_SYM(r15, r11, __stop___restart_table)
@@ -1067,14 +1046,8 @@ bad_stack_book3e:
 	mfspr	r11,SPRN_ESR
 	std	r10,_DEAR(r1)
 	std	r11,_ESR(r1)
-<<<<<<< HEAD
 	SAVE_GPR(0, r1);		/* save r0 in stackframe */	    \
 	SAVE_GPRS(2, 9, r1);		/* save r2 - r9 in stackframe */    \
-=======
-	std	r0,GPR0(r1);		/* save r0 in stackframe */	    \
-	std	r2,GPR2(r1);		/* save r2 in stackframe */	    \
-	SAVE_GPRS(3, 9, r1);		/* save r3 - r9 in stackframe */    \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ld	r3,PACA_EXGEN+EX_R10(r13);/* get back r10 */		    \
 	ld	r4,PACA_EXGEN+EX_R11(r13);/* get back r11 */		    \
 	mfspr	r5,SPRN_SPRG_GEN_SCRATCH;/* get back r13 XXX can be wrong */ \
@@ -1088,11 +1061,7 @@ bad_stack_book3e:
 	std	r10,_LINK(r1)
 	std	r11,_CTR(r1)
 	std	r12,_XER(r1)
-<<<<<<< HEAD
 	SAVE_NVGPRS(r1)
-=======
-	SAVE_GPRS(14, 31, r1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lhz	r12,PACA_TRAP_SAVE(r13)
 	std	r12,_TRAP(r1)
 	addi	r11,r1,INT_FRAME_SIZE
@@ -1340,13 +1309,8 @@ a2_tlbinit_after_linear_map:
 
 	/* Now we branch the new virtual address mapped by this entry */
 #ifdef CONFIG_RELOCATABLE
-<<<<<<< HEAD
 	__LOAD_PACA_TOC(r5)
 	LOAD_REG_ADDR_ALTTOC(r3, r5, 1f)
-=======
-	ld	r5,PACATOC(r13)
-	ld	r3,1f@got(r5)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 	LOAD_REG_IMMEDIATE_SYM(r3, r5, 1f)
 #endif

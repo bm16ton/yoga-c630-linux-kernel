@@ -480,15 +480,12 @@ void thermal_zone_device_update(struct thermal_zone_device *tz,
 	for (count = 0; count < tz->num_trips; count++)
 		handle_thermal_trip(tz, count);
 
-<<<<<<< HEAD
 	monitor_thermal_zone(tz);
 out:
 	mutex_unlock(&tz->lock);
 }
 EXPORT_SYMBOL_GPL(thermal_zone_device_update);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void thermal_zone_device_check(struct work_struct *work)
 {
 	struct thermal_zone_device *tz = container_of(work, struct
@@ -886,13 +883,6 @@ __thermal_cooling_device_register(struct device_node *np,
 	cdev->id = ret;
 	id = ret;
 
-<<<<<<< HEAD
-=======
-	ret = dev_set_name(&cdev->device, "cooling_device%d", cdev->id);
-	if (ret)
-		goto out_ida_remove;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cdev->type = kstrdup(type ? type : "", GFP_KERNEL);
 	if (!cdev->type) {
 		ret = -ENOMEM;
@@ -907,14 +897,11 @@ __thermal_cooling_device_register(struct device_node *np,
 	cdev->device.class = &thermal_class;
 	cdev->devdata = devdata;
 	thermal_cooling_device_setup_sysfs(cdev);
-<<<<<<< HEAD
 	ret = dev_set_name(&cdev->device, "cooling_device%d", cdev->id);
 	if (ret) {
 		thermal_cooling_device_destroy_sysfs(cdev);
 		goto out_kfree_type;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = device_register(&cdev->device);
 	if (ret)
 		goto out_kfree_type;
@@ -1200,17 +1187,12 @@ thermal_zone_device_register_with_trips(const char *type, struct thermal_trip *t
 		return ERR_PTR(-EINVAL);
 	}
 
-<<<<<<< HEAD
 	if (strlen(type) >= THERMAL_NAME_LENGTH) {
-=======
-	if (type && strlen(type) >= THERMAL_NAME_LENGTH) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_err("Thermal zone name (%s) too long, should be under %d chars\n",
 		       type, THERMAL_NAME_LENGTH);
 		return ERR_PTR(-EINVAL);
 	}
 
-<<<<<<< HEAD
 	/*
 	 * Max trip count can't exceed 31 as the "mask >> num_trips" condition.
 	 * For example, shifting by 32 will result in compiler warning:
@@ -1225,9 +1207,6 @@ thermal_zone_device_register_with_trips(const char *type, struct thermal_trip *t
 	 * 32 bit shift will cause overflow of 4 byte integer.
 	 */
 	if (num_trips > (BITS_PER_TYPE(int) - 1) || num_trips < 0 || mask >> num_trips) {
-=======
-	if (num_trips > THERMAL_MAX_TRIPS || num_trips < 0 || mask >> num_trips) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_err("Incorrect number of thermal trips\n");
 		return ERR_PTR(-EINVAL);
 	}
@@ -1256,10 +1235,6 @@ thermal_zone_device_register_with_trips(const char *type, struct thermal_trip *t
 	tz->id = id;
 	strscpy(tz->type, type, sizeof(tz->type));
 
-	result = dev_set_name(&tz->device, "thermal_zone%d", tz->id);
-	if (result)
-		goto remove_id;
-
 	if (!ops->critical)
 		ops->critical = thermal_zone_device_critical;
 
@@ -1282,14 +1257,11 @@ thermal_zone_device_register_with_trips(const char *type, struct thermal_trip *t
 	/* A new thermal zone needs to be updated anyway. */
 	atomic_set(&tz->need_update, 1);
 
-<<<<<<< HEAD
 	result = dev_set_name(&tz->device, "thermal_zone%d", tz->id);
 	if (result) {
 		thermal_zone_destroy_device_groups(tz);
 		goto remove_id;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	result = device_register(&tz->device);
 	if (result)
 		goto release_device;

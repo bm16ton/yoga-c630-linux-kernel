@@ -324,7 +324,6 @@ struct drm_monitor_range_info {
 };
 
 /**
-<<<<<<< HEAD
  * struct drm_luminance_range_info - Panel's luminance range for
  * &drm_display_info. Calculated using data in EDID
  *
@@ -341,8 +340,6 @@ struct drm_luminance_range_info {
 };
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * enum drm_privacy_screen_status - privacy screen status
  *
  * This enum is used to track and control the state of the integrated privacy
@@ -614,7 +611,6 @@ struct drm_display_info {
 	/**
 	 * @edid_hdmi_rgb444_dc_modes: Mask of supported hdmi deep color modes
 	 * in RGB 4:4:4. Even more stuff redundant with @bus_formats.
-<<<<<<< HEAD
 	 */
 	u8 edid_hdmi_rgb444_dc_modes;
 
@@ -622,15 +618,6 @@ struct drm_display_info {
 	 * @edid_hdmi_ycbcr444_dc_modes: Mask of supported hdmi deep color
 	 * modes in YCbCr 4:4:4. Even more stuff redundant with @bus_formats.
 	 */
-=======
-	 */
-	u8 edid_hdmi_rgb444_dc_modes;
-
-	/**
-	 * @edid_hdmi_ycbcr444_dc_modes: Mask of supported hdmi deep color
-	 * modes in YCbCr 4:4:4. Even more stuff redundant with @bus_formats.
-	 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 edid_hdmi_ycbcr444_dc_modes;
 
 	/**
@@ -654,14 +641,11 @@ struct drm_display_info {
 	struct drm_monitor_range_info monitor_range;
 
 	/**
-<<<<<<< HEAD
 	 * @luminance_range: Luminance range supported by panel
 	 */
 	struct drm_luminance_range_info luminance_range;
 
 	/**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * @mso_stream_count: eDP Multi-SST Operation (MSO) stream count from
 	 * the DisplayID VESA vendor block. 0 for conventional Single-Stream
 	 * Transport (SST), or 2 or 4 MSO streams.
@@ -672,15 +656,12 @@ struct drm_display_info {
 	 * @mso_pixel_overlap: eDP MSO segment pixel overlap, 0-8 pixels.
 	 */
 	u8 mso_pixel_overlap;
-<<<<<<< HEAD
 
 	/**
 	 * @max_dsc_bpp: Maximum DSC target bitrate, if it is set to 0 the
 	 * monitor's default value is used instead.
 	 */
 	u32 max_dsc_bpp;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 int drm_display_info_set_bus_formats(struct drm_display_info *info,

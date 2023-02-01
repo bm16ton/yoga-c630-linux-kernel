@@ -61,7 +61,6 @@
 #define IO_TLB_MIN_SLABS ((1<<20) >> IO_TLB_SHIFT)
 
 #define INVALID_PHYS_ADDR (~(phys_addr_t)0)
-<<<<<<< HEAD
 
 struct io_tlb_slot {
 	phys_addr_t orig_addr;
@@ -79,25 +78,6 @@ phys_addr_t swiotlb_unencrypted_base;
 static unsigned long default_nslabs = IO_TLB_DEFAULT_SIZE >> IO_TLB_SHIFT;
 static unsigned long default_nareas;
 
-=======
-
-struct io_tlb_slot {
-	phys_addr_t orig_addr;
-	size_t alloc_size;
-	unsigned int list;
-};
-
-static bool swiotlb_force_bounce;
-static bool swiotlb_force_disable;
-
-struct io_tlb_mem io_tlb_default_mem;
-
-phys_addr_t swiotlb_unencrypted_base;
-
-static unsigned long default_nslabs = IO_TLB_DEFAULT_SIZE >> IO_TLB_SHIFT;
-static unsigned long default_nareas;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * struct io_tlb_area - IO TLB memory area descriptor
  *
@@ -332,7 +312,6 @@ void __init swiotlb_init_remap(bool addressing_limit, unsigned int flags,
 	size_t alloc_size;
 	size_t bytes;
 	void *tlb;
-<<<<<<< HEAD
 
 	if (!addressing_limit && !swiotlb_force_bounce)
 		return;
@@ -389,59 +368,6 @@ retry:
 		return;
 	}
 
-=======
-
-	if (!addressing_limit && !swiotlb_force_bounce)
-		return;
-	if (swiotlb_force_disable)
-		return;
-
-	/*
-	 * default_nslabs maybe changed when adjust area number.
-	 * So allocate bounce buffer after adjusting area number.
-	 */
-	if (!default_nareas)
-		swiotlb_adjust_nareas(num_possible_cpus());
-
-	nslabs = default_nslabs;
-	/*
-	 * By default allocate the bounce buffer memory from low memory, but
-	 * allow to pick a location everywhere for hypervisors with guest
-	 * memory encryption.
-	 */
-retry:
-	bytes = PAGE_ALIGN(nslabs << IO_TLB_SHIFT);
-	if (flags & SWIOTLB_ANY)
-		tlb = memblock_alloc(bytes, PAGE_SIZE);
-	else
-		tlb = memblock_alloc_low(bytes, PAGE_SIZE);
-	if (!tlb) {
-		pr_warn("%s: failed to allocate tlb structure\n", __func__);
-		return;
-	}
-
-	if (remap && remap(tlb, nslabs) < 0) {
-		memblock_free(tlb, PAGE_ALIGN(bytes));
-
-		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
-		if (nslabs < IO_TLB_MIN_SLABS)
-			panic("%s: Failed to remap %zu bytes\n",
-			      __func__, bytes);
-		goto retry;
-	}
-
-	alloc_size = PAGE_ALIGN(array_size(sizeof(*mem->slots), nslabs));
-	mem->slots = memblock_alloc(alloc_size, PAGE_SIZE);
-	if (!mem->slots)
-		panic("%s: Failed to allocate %zu bytes align=0x%lx\n",
-		      __func__, alloc_size, PAGE_SIZE);
-
-	mem->areas = memblock_alloc(array_size(sizeof(struct io_tlb_area),
-		default_nareas), SMP_CACHE_BYTES);
-	if (!mem->areas)
-		panic("%s: Failed to allocate mem->areas.\n", __func__);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	swiotlb_init_io_tlb_mem(mem, __pa(tlb), nslabs, flags, false,
 				default_nareas);
 
@@ -505,7 +431,6 @@ retry:
 		pr_warn("only able to allocate %ld MB\n",
 			(PAGE_SIZE << order) >> 20);
 	}
-<<<<<<< HEAD
 
 	if (!default_nareas)
 		swiotlb_adjust_nareas(num_possible_cpus());
@@ -522,24 +447,6 @@ retry:
 	if (!mem->slots)
 		goto error_slots;
 
-=======
-
-	if (!default_nareas)
-		swiotlb_adjust_nareas(num_possible_cpus());
-
-	area_order = get_order(array_size(sizeof(*mem->areas),
-		default_nareas));
-	mem->areas = (struct io_tlb_area *)
-		__get_free_pages(GFP_KERNEL | __GFP_ZERO, area_order);
-	if (!mem->areas)
-		goto error_area;
-
-	mem->slots = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
-		get_order(array_size(sizeof(*mem->slots), nslabs)));
-	if (!mem->slots)
-		goto error_slots;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_memory_decrypted((unsigned long)vstart,
 			     (nslabs << IO_TLB_SHIFT) >> PAGE_SHIFT);
 	swiotlb_init_io_tlb_mem(mem, virt_to_phys(vstart), nslabs, 0, true,
@@ -827,16 +734,11 @@ phys_addr_t swiotlb_tbl_map_single(struct device *dev, phys_addr_t orig_addr,
 	int index;
 	phys_addr_t tlb_addr;
 
-<<<<<<< HEAD
 	if (!mem || !mem->nslabs) {
 		dev_warn_ratelimited(dev,
 			"Can not allocate SWIOTLB buffer earlier and can't now provide you with the DMA bounce buffer");
 		return (phys_addr_t)DMA_MAPPING_ERROR;
 	}
-=======
-	if (!mem || !mem->nslabs)
-		panic("Can not allocate SWIOTLB buffer earlier and can't now provide you with the DMA bounce buffer");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (cc_platform_has(CC_ATTR_MEM_ENCRYPT))
 		pr_warn_once("Memory encryption is active and system is using DMA bounce buffers\n");
@@ -1043,15 +945,9 @@ static int __init __maybe_unused swiotlb_create_default_debugfs(void)
 #ifdef CONFIG_DEBUG_FS
 late_initcall(swiotlb_create_default_debugfs);
 #endif
-<<<<<<< HEAD
 
 #ifdef CONFIG_DMA_RESTRICTED_POOL
 
-=======
-
-#ifdef CONFIG_DMA_RESTRICTED_POOL
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct page *swiotlb_alloc(struct device *dev, size_t size)
 {
 	struct io_tlb_mem *mem = dev->dma_io_tlb_mem;

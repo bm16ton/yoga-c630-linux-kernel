@@ -5,14 +5,10 @@ top_srcdir = $(realpath ../../../../../)
 
 CFLAGS += -I$(top_srcdir)/usr/include/
 
-<<<<<<< HEAD
 TEST_GEN_PROGS := fp-stress \
 	sve-ptrace sve-probe-vls \
 	vec-syscfg \
 	za-fork za-ptrace
-=======
-TEST_GEN_PROGS := sve-ptrace sve-probe-vls vec-syscfg za-fork za-ptrace
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 TEST_GEN_PROGS_EXTENDED := fp-pidbench fpsimd-test \
 	rdvl-sme rdvl-sve \
 	sve-test \

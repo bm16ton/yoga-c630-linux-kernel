@@ -137,7 +137,6 @@ static void vpr_info_dq(const struct ddebug_query *query, const char *msg)
 			fmtlen--;
 	}
 
-<<<<<<< HEAD
 	v3pr_info("%s: func=\"%s\" file=\"%s\" module=\"%s\" format=\"%.*s\" lineno=%u-%u class=%s\n",
 		  msg,
 		  query->function ?: "",
@@ -145,15 +144,6 @@ static void vpr_info_dq(const struct ddebug_query *query, const char *msg)
 		  query->module ?: "",
 		  fmtlen, query->format ?: "",
 		  query->first_lineno, query->last_lineno, query->class_string);
-=======
-	v3pr_info("%s: func=\"%s\" file=\"%s\" module=\"%s\" format=\"%.*s\" lineno=%u-%u\n",
-		 msg,
-		 query->function ?: "",
-		 query->filename ?: "",
-		 query->module ?: "",
-		 fmtlen, query->format ?: "",
-		 query->first_lineno, query->last_lineno);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct ddebug_class_map *ddebug_find_valid_class(struct ddebug_table const *dt,
@@ -269,13 +259,6 @@ static int ddebug_change(const struct ddebug_query *query,
 				  ddebug_describe_flags(dp->flags, &fbuf),
 				  ddebug_describe_flags(newflags, &nbuf));
 			dp->flags = newflags;
-<<<<<<< HEAD
-=======
-			v4pr_info("changed %s:%d [%s]%s =%s\n",
-				 trim_prefix(dp->filename), dp->lineno,
-				 dt->mod_name, dp->function,
-				 ddebug_describe_flags(dp->flags, &fbuf));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 	mutex_unlock(&ddebug_lock);
@@ -613,7 +596,6 @@ static int ddebug_exec_queries(char *query, const char *modname)
 	return nfound;
 }
 
-<<<<<<< HEAD
 /* apply a new bitmap to the sys-knob's current bit-state */
 static int ddebug_apply_class_bitmap(const struct ddebug_class_param *dcp,
 				     unsigned long *new_bits, unsigned long *old_bits)
@@ -826,8 +808,6 @@ const struct kernel_param_ops param_ops_dyndbg_classes = {
 };
 EXPORT_SYMBOL(param_ops_dyndbg_classes);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PREFIX_SIZE 64
 
 static int remaining(int wrote)
@@ -1279,11 +1259,7 @@ static int __ddebug_add_module(struct _ddebug_info *di, unsigned int base,
 	list_add_tail(&dt->link, &ddebug_tables);
 	mutex_unlock(&ddebug_lock);
 
-<<<<<<< HEAD
 	vpr_info("%3u debug prints in module %s\n", di->num_descs, modname);
-=======
-	vpr_info("%3u debug prints in module %s\n", n, dt->mod_name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1449,16 +1425,11 @@ static int __init dynamic_debug_init(void)
 
 	ddebug_init_success = 1;
 	vpr_info("%d prdebugs in %d modules, %d KiB in ddebug tables, %d kiB in __dyndbg section\n",
-<<<<<<< HEAD
 		 i, mod_ct, (int)((mod_ct * sizeof(struct ddebug_table)) >> 10),
 		 (int)((i * sizeof(struct _ddebug)) >> 10));
 
 	if (di.num_classes)
 		v2pr_info("  %d builtin ddebug class-maps\n", di.num_classes);
-=======
-		 entries, modct, (int)((modct * sizeof(struct ddebug_table)) >> 10),
-		 (int)((entries * sizeof(struct _ddebug)) >> 10));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* now that ddebug tables are loaded, process all boot args
 	 * again to find and activate queries given in dyndbg params.

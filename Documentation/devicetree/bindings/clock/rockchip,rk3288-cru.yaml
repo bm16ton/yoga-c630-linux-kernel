@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-=======
-# SPDX-License-Identifier: GPL-2.0
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 %YAML 1.2
 ---
 $id: http://devicetree.org/schemas/clock/rockchip,rk3288-cru.yaml#

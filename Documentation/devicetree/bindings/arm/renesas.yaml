@@ -264,10 +264,7 @@ properties:
                   - renesas,r8a779m4
                   - renesas,r8a779m5
                   - renesas,r8a779m8
-<<<<<<< HEAD
                   - renesas,r8a779mb
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - enum:
                   - renesas,r8a7795
                   - renesas,r8a77961
@@ -420,7 +417,6 @@ properties:
           - const: renesas,r8a779m8
           - const: renesas,r8a7795
 
-<<<<<<< HEAD
       - description: R-Car H3Ne-1.7G (R8A779MB)
         items:
           - enum:
@@ -429,8 +425,6 @@ properties:
           - const: renesas,r8a779mb
           - const: renesas,r8a7795
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - description: RZ/N1D (R9A06G032)
         items:
           - enum:

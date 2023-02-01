@@ -626,16 +626,11 @@ struct ipu3_uapi_stats_3a {
  * @b:	white balance gain for B channel.
  * @gb:	white balance gain for Gb channel.
  *
-<<<<<<< HEAD
  * For BNR parameters WB gain factor for the three channels [Ggr, Ggb, Gb, Gr].
  * Their precision is U3.13 and the range is (0, 8) and the actual gain is
  * Gx + 1, it is typically Gx = 1.
  *
  * Pout = {Pin * (1 + Gx)}.
-=======
- * Precision u3.13, range [0, 8). White balance correction is done by applying
- * a multiplicative gain to each color channels prior to BNR.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct ipu3_uapi_bnr_static_config_wb_gains_config {
 	__u16 gr;

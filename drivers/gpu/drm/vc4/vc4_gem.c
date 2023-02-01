@@ -1313,9 +1313,6 @@ int vc4_gem_init(struct drm_device *dev)
 	if (WARN_ON_ONCE(vc4->is_vc5))
 		return -ENODEV;
 
-	if (WARN_ON_ONCE(vc4->is_vc5))
-		return -ENODEV;
-
 	vc4->dma_fence_context = dma_fence_context_alloc(1);
 
 	INIT_LIST_HEAD(&vc4->bin_job_list);

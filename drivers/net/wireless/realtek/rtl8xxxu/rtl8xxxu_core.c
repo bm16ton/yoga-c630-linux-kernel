@@ -1608,11 +1608,7 @@ static int rtl8xxxu_identify_chip(struct rtl8xxxu_priv *priv)
 {
 	struct device *dev = &priv->udev->dev;
 	struct ieee80211_hw *hw = priv->hw;
-<<<<<<< HEAD
 	u32 val32, bonding, sys_cfg;
-=======
-	u32 val32, bonding;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 val16;
 
 	sys_cfg = rtl8xxxu_read32(priv, REG_SYS_CFG);
@@ -4687,33 +4683,6 @@ rtl8xxxu_bss_info_changed(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 			rarpt->bit_rate = bit_rate;
 			rarpt->desc_rate = highest_rate;
 
-			highest_rate = fls(ramask) - 1;
-			if (highest_rate < DESC_RATE_MCS0) {
-				rarpt->txrate.legacy =
-				rtl8xxxu_legacy_ratetable[highest_rate].bitrate;
-			} else {
-				rtl8xxxu_desc_to_mcsrate(highest_rate,
-							 &mcs, &nss);
-				rarpt->txrate.flags |= RATE_INFO_FLAGS_MCS;
-
-				rarpt->txrate.mcs = mcs;
-				rarpt->txrate.nss = nss;
-
-				if (sgi) {
-					rarpt->txrate.flags |=
-						RATE_INFO_FLAGS_SHORT_GI;
-				}
-
-				if (rtl8xxxu_ht40_2g &&
-				    (sta->deflink.ht_cap.cap & IEEE80211_HT_CAP_SUP_WIDTH_20_40))
-					rarpt->txrate.bw = RATE_INFO_BW_40;
-				else
-					rarpt->txrate.bw = RATE_INFO_BW_20;
-			}
-			bit_rate = cfg80211_calculate_bitrate(&rarpt->txrate);
-			rarpt->bit_rate = bit_rate;
-			rarpt->desc_rate = highest_rate;
-
 			priv->vif = vif;
 			priv->rssi_level = RTL8XXXU_RATR_STA_INIT;
 
@@ -5149,11 +5118,7 @@ static void rtl8xxxu_tx(struct ieee80211_hw *hw,
 	if (control && control->sta)
 		sta = control->sta;
 
-<<<<<<< HEAD
 	queue = rtl8xxxu_queue_select(hdr, skb);
-=======
-	queue = rtl8xxxu_queue_select(hw, skb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	tx_desc = skb_push(skb, tx_desc_size);
 
@@ -6753,10 +6718,6 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
 	hw = ieee80211_alloc_hw(sizeof(struct rtl8xxxu_priv), &rtl8xxxu_ops);
 	if (!hw) {
 		ret = -ENOMEM;
-<<<<<<< HEAD
-=======
-		priv = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto err_put_dev;
 	}
 
@@ -6867,17 +6828,9 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
 err_set_intfdata:
 	usb_set_intfdata(interface, NULL);
 
-<<<<<<< HEAD
 	kfree(priv->fw_data);
 	mutex_destroy(&priv->usb_buf_mutex);
 	mutex_destroy(&priv->h2c_mutex);
-=======
-	if (priv) {
-		kfree(priv->fw_data);
-		mutex_destroy(&priv->usb_buf_mutex);
-		mutex_destroy(&priv->h2c_mutex);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ieee80211_free_hw(hw);
 err_put_dev:

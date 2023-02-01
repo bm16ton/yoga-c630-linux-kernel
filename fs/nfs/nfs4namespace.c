@@ -164,11 +164,7 @@ static int nfs4_validate_fspath(struct dentry *dentry,
 	return 0;
 }
 
-<<<<<<< HEAD
 size_t nfs_parse_server_name(char *string, size_t len, struct sockaddr_storage *ss,
-=======
-size_t nfs_parse_server_name(char *string, size_t len, struct sockaddr *sa,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			     size_t salen, struct net *net, int port)
 {
 	struct sockaddr *sa = (struct sockaddr *)ss;
@@ -178,11 +174,7 @@ size_t nfs_parse_server_name(char *string, size_t len, struct sockaddr *sa,
 	if (ret == 0) {
 		ret = rpc_uaddr2sockaddr(net, string, len, sa, salen);
 		if (ret == 0) {
-<<<<<<< HEAD
 			ret = nfs_dns_resolve_name(net, string, len, ss, salen);
-=======
-			ret = nfs_dns_resolve_name(net, string, len, sa, salen);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (ret < 0)
 				ret = 0;
 		}
@@ -514,11 +506,7 @@ static int nfs4_try_replacing_one_location(struct nfs_server *server,
 			continue;
 
 		salen = nfs_parse_server_name(buf->data, buf->len,
-<<<<<<< HEAD
 					      sap, sizeof(*sap), net, 0);
-=======
-						sap, addr_bufsize, net, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (salen == 0)
 			continue;
 		rpc_set_port((struct sockaddr *)sap, NFS_PORT);

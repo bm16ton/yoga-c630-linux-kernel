@@ -608,18 +608,6 @@ otherwise noted.
 	change miscellaneous file flags and attributes.  Callers hold
 	i_rwsem exclusive.  If unset, then fall back to f_op->ioctl().
 
-``fileattr_get``
-	called on ioctl(FS_IOC_GETFLAGS) and ioctl(FS_IOC_FSGETXATTR) to
-	retrieve miscellaneous file flags and attributes.  Also called
-	before the relevant SET operation to check what is being changed
-	(in this case with i_rwsem locked exclusive).  If unset, then
-	fall back to f_op->ioctl().
-
-``fileattr_set``
-	called on ioctl(FS_IOC_SETFLAGS) and ioctl(FS_IOC_FSSETXATTR) to
-	change miscellaneous file flags and attributes.  Callers hold
-	i_rwsem exclusive.  If unset, then fall back to f_op->ioctl().
-
 
 The Address Space Object
 ========================

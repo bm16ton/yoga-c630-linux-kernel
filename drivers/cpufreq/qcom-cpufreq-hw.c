@@ -313,21 +313,6 @@ static void qcom_get_related_cpus(int index, struct cpumask *m)
 	}
 }
 
-<<<<<<< HEAD
-=======
-static unsigned long qcom_lmh_get_throttle_freq(struct qcom_cpufreq_data *data)
-{
-	unsigned int lval;
-
-	if (data->soc_data->reg_current_vote)
-		lval = readl_relaxed(data->base + data->soc_data->reg_current_vote) & 0x3ff;
-	else
-		lval = readl_relaxed(data->base + data->soc_data->reg_domain_state) & 0xff;
-
-	return lval * xo_rate;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void qcom_lmh_dcvs_notify(struct qcom_cpufreq_data *data)
 {
 	struct cpufreq_policy *policy = data->policy;
@@ -349,19 +334,11 @@ static void qcom_lmh_dcvs_notify(struct qcom_cpufreq_data *data)
 	if (IS_ERR(opp)) {
 		dev_warn(dev, "Can't find the OPP for throttling: %pe!\n", opp);
 	} else {
-<<<<<<< HEAD
 	throttled_freq = freq_hz / HZ_PER_KHZ;
 		if (throttled_freq > policy->cpuinfo.max_freq)
 		throttled_freq = policy->cpuinfo.max_freq;
 	/* Update thermal pressure (the boost frequencies are accepted) */
 	arch_update_thermal_pressure(policy->related_cpus, throttled_freq);
-=======
-		throttled_freq = freq_hz / HZ_PER_KHZ;
-		if (throttled_freq > policy->cpuinfo.max_freq)
-		throttled_freq = policy->cpuinfo.max_freq;
-		/* Update thermal pressure (the boost frequencies are accepted) */
-		arch_update_thermal_pressure(policy->related_cpus, throttled_freq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		dev_pm_opp_put(opp);
 	}

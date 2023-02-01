@@ -1,10 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
 /*
-<<<<<<< HEAD
  * Copyright (C) 2012-2014, 2018-2022 Intel Corporation
-=======
- * Copyright (C) 2012-2014, 2018-2021 Intel Corporation
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Copyright (C) 2013-2015 Intel Mobile Communications GmbH
  * Copyright (C) 2015-2017 Intel Deutschland GmbH
  */
@@ -672,11 +668,7 @@ struct iwl_rx_no_data {
 	__le32 phy_info[2];
 	__le32 rx_vec[2];
 } __packed; /* RX_NO_DATA_NTFY_API_S_VER_1,
-<<<<<<< HEAD
 	       RX_NO_DATA_NTFY_API_S_VER_2 */
-=======
-	       TX_NO_DATA_NTFY_API_S_VER_2 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct iwl_frame_release {
 	u8 baid;

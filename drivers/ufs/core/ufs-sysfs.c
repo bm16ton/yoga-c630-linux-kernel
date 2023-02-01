@@ -225,21 +225,13 @@ static ssize_t wb_on_store(struct device *dev, struct device_attribute *attr,
 	unsigned int wb_enable;
 	ssize_t res;
 
-<<<<<<< HEAD
 	if (!ufshcd_is_wb_allowed(hba) || (ufshcd_is_clkscaling_supported(hba)
 		&& ufshcd_enable_wb_if_scaling_up(hba))) {
-=======
-	if (!ufshcd_is_wb_allowed(hba) || ufshcd_is_clkscaling_supported(hba)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * If the platform supports UFSHCD_CAP_CLK_SCALING, turn WB
 		 * on/off will be done while clock scaling up/down.
 		 */
-<<<<<<< HEAD
 		dev_warn(dev, "It is not allowed to configure WB!\n");
-=======
-		dev_warn(dev, "To control WB through wb_on is not allowed!\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EOPNOTSUPP;
 	}
 
@@ -263,7 +255,6 @@ out:
 	return res < 0 ? res : count;
 }
 
-<<<<<<< HEAD
 static ssize_t enable_wb_buf_flush_show(struct device *dev,
 				    struct device_attribute *attr,
 				    char *buf)
@@ -307,8 +298,6 @@ out:
 	return res < 0 ? res : count;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static DEVICE_ATTR_RW(rpm_lvl);
 static DEVICE_ATTR_RO(rpm_target_dev_state);
 static DEVICE_ATTR_RO(rpm_target_link_state);
@@ -317,10 +306,7 @@ static DEVICE_ATTR_RO(spm_target_dev_state);
 static DEVICE_ATTR_RO(spm_target_link_state);
 static DEVICE_ATTR_RW(auto_hibern8);
 static DEVICE_ATTR_RW(wb_on);
-<<<<<<< HEAD
 static DEVICE_ATTR_RW(enable_wb_buf_flush);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct attribute *ufs_sysfs_ufshcd_attrs[] = {
 	&dev_attr_rpm_lvl.attr,
@@ -331,10 +317,7 @@ static struct attribute *ufs_sysfs_ufshcd_attrs[] = {
 	&dev_attr_spm_target_link_state.attr,
 	&dev_attr_auto_hibern8.attr,
 	&dev_attr_wb_on.attr,
-<<<<<<< HEAD
 	&dev_attr_enable_wb_buf_flush.attr,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	NULL
 };
 
@@ -342,7 +325,6 @@ static const struct attribute_group ufs_sysfs_default_group = {
 	.attrs = ufs_sysfs_ufshcd_attrs,
 };
 
-<<<<<<< HEAD
 static ssize_t clock_scaling_show(struct device *dev, struct device_attribute *attr,
 				  char *buf)
 {
@@ -377,8 +359,6 @@ static const struct attribute_group ufs_sysfs_capabilities_group = {
 	.attrs = ufs_sysfs_capabilities_attrs,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static ssize_t monitor_enable_show(struct device *dev,
 				   struct device_attribute *attr, char *buf)
 {
@@ -1234,10 +1214,7 @@ static const struct attribute_group ufs_sysfs_attributes_group = {
 
 static const struct attribute_group *ufs_sysfs_groups[] = {
 	&ufs_sysfs_default_group,
-<<<<<<< HEAD
 	&ufs_sysfs_capabilities_group,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&ufs_sysfs_monitor_group,
 	&ufs_sysfs_device_descriptor_group,
 	&ufs_sysfs_interconnect_descriptor_group,

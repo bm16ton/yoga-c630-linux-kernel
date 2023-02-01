@@ -1412,10 +1412,7 @@ static ssize_t name_show(struct device *dev, struct device_attribute *attr,
 			 char *buf)
 {
 	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sysfs_emit(buf, "%s\n", indio_dev->name);
 }
 
@@ -1425,10 +1422,7 @@ static ssize_t label_show(struct device *dev, struct device_attribute *attr,
 			  char *buf)
 {
 	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sysfs_emit(buf, "%s\n", indio_dev->label);
 }
 
@@ -1801,10 +1795,7 @@ static int iio_chrdev_release(struct inode *inode, struct file *filp)
 	struct iio_dev_opaque *iio_dev_opaque =
 		container_of(inode->i_cdev, struct iio_dev_opaque, chrdev);
 	struct iio_dev *indio_dev = &iio_dev_opaque->indio_dev;
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(ib);
 	clear_bit(IIO_BUSY_BIT_POS, &iio_dev_opaque->flags);
 	iio_device_put(indio_dev);
@@ -1932,7 +1923,6 @@ int __iio_device_register(struct iio_dev *indio_dev, struct module *this_mod)
 		return -EINVAL;
 
 	iio_dev_opaque->driver_module = this_mod;
-<<<<<<< HEAD
 
 	/* If the calling driver did not initialize firmware node, do it here */
 	if (dev_fwnode(&indio_dev->dev))
@@ -1941,16 +1931,6 @@ int __iio_device_register(struct iio_dev *indio_dev, struct module *this_mod)
 		fwnode = dev_fwnode(indio_dev->dev.parent);
 	device_set_node(&indio_dev->dev, fwnode);
 
-=======
-
-	/* If the calling driver did not initialize firmware node, do it here */
-	if (dev_fwnode(&indio_dev->dev))
-		fwnode = dev_fwnode(&indio_dev->dev);
-	else
-		fwnode = dev_fwnode(indio_dev->dev.parent);
-	device_set_node(&indio_dev->dev, fwnode);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fwnode_property_read_string(fwnode, "label", &indio_dev->label);
 
 	ret = iio_check_unique_scan_index(indio_dev);
@@ -1993,21 +1973,12 @@ int __iio_device_register(struct iio_dev *indio_dev, struct module *this_mod)
 		cdev_init(&iio_dev_opaque->chrdev, &iio_buffer_fileops);
 	else if (iio_dev_opaque->event_interface)
 		cdev_init(&iio_dev_opaque->chrdev, &iio_event_fileops);
-<<<<<<< HEAD
 
 	if (iio_dev_opaque->attached_buffers_cnt || iio_dev_opaque->event_interface) {
 		indio_dev->dev.devt = MKDEV(MAJOR(iio_devt), iio_dev_opaque->id);
 		iio_dev_opaque->chrdev.owner = this_mod;
 	}
 
-=======
-
-	if (iio_dev_opaque->attached_buffers_cnt || iio_dev_opaque->event_interface) {
-		indio_dev->dev.devt = MKDEV(MAJOR(iio_devt), iio_dev_opaque->id);
-		iio_dev_opaque->chrdev.owner = this_mod;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* assign device groups now; they should be all registered now */
 	indio_dev->dev.groups = iio_dev_opaque->groups;
 
@@ -2036,15 +2007,9 @@ EXPORT_SYMBOL(__iio_device_register);
 void iio_device_unregister(struct iio_dev *indio_dev)
 {
 	struct iio_dev_opaque *iio_dev_opaque = to_iio_dev_opaque(indio_dev);
-<<<<<<< HEAD
 
 	cdev_device_del(&iio_dev_opaque->chrdev, &indio_dev->dev);
 
-=======
-
-	cdev_device_del(&iio_dev_opaque->chrdev, &indio_dev->dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
 
 	iio_device_unregister_debugfs(indio_dev);

@@ -787,10 +787,7 @@ static int vma_replace_policy(struct vm_area_struct *vma,
 static int mbind_range(struct mm_struct *mm, unsigned long start,
 		       unsigned long end, struct mempolicy *new_pol)
 {
-<<<<<<< HEAD
 	MA_STATE(mas, &mm->mm_mt, start, start);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vm_area_struct *prev;
 	struct vm_area_struct *vma;
 	int err = 0;
@@ -807,15 +804,9 @@ static int mbind_range(struct mm_struct *mm, unsigned long start,
 	if (start > vma->vm_start)
 		prev = vma;
 
-<<<<<<< HEAD
 	for (; vma; vma = mas_next(&mas, end - 1)) {
 		unsigned long vmstart = max(start, vma->vm_start);
 		unsigned long vmend = min(end, vma->vm_end);
-=======
-	for (; vma && vma->vm_start < end; prev = vma, vma = vma->vm_next) {
-		vmstart = max(start, vma->vm_start);
-		vmend   = min(end, vma->vm_end);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (mpol_equal(vma_policy(vma), new_pol))
 			goto next;
@@ -875,10 +866,7 @@ static long do_set_mempolicy(unsigned short mode, unsigned short flags,
 		goto out;
 	}
 
-<<<<<<< HEAD
 	task_lock(current);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = mpol_set_nodemask(new, nodes, scratch);
 	if (ret) {
 		task_unlock(current);
@@ -1222,10 +1210,7 @@ static struct page *new_page(struct page *page, unsigned long start)
 	struct folio *dst, *src = page_folio(page);
 	struct vm_area_struct *vma;
 	unsigned long address;
-<<<<<<< HEAD
 	VMA_ITERATOR(vmi, current->mm, start);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gfp_t gfp = GFP_HIGHUSER_MOVABLE | __GFP_RETRY_MAYFAIL;
 
 	for_each_vma(vmi, vma) {
@@ -1509,10 +1494,7 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned long, start, unsigned long, le
 	unsigned long vmend;
 	unsigned long end;
 	int err = -ENOENT;
-<<<<<<< HEAD
 	VMA_ITERATOR(vmi, mm, start);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	start = untagged_addr(start);
 	if (start & ~PAGE_MASK)
@@ -1530,11 +1512,7 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned long, start, unsigned long, le
 	if (home_node >= MAX_NUMNODES || !node_online(home_node))
 		return -EINVAL;
 
-<<<<<<< HEAD
 	len = PAGE_ALIGN(len);
-=======
-	len = (len + PAGE_SIZE - 1) & PAGE_MASK;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	end = start + len;
 
 	if (end < start)
@@ -1542,13 +1520,7 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned long, start, unsigned long, le
 	if (end == start)
 		return 0;
 	mmap_write_lock(mm);
-<<<<<<< HEAD
 	for_each_vma_range(vmi, vma, end) {
-=======
-	vma = find_vma(mm, start);
-	for (; vma && vma->vm_start < end;  vma = vma->vm_next) {
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vmstart = max(start, vma->vm_start);
 		vmend   = min(end, vma->vm_end);
 		new = mpol_dup(vma_policy(vma));
@@ -1568,10 +1540,7 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned long, start, unsigned long, le
 		 * the home node for vmas we already updated before.
 		 */
 		if (new->mode != MPOL_BIND && new->mode != MPOL_PREFERRED_MANY) {
-<<<<<<< HEAD
 			mpol_put(new);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			err = -EOPNOTSUPP;
 			break;
 		}
@@ -2187,21 +2156,12 @@ static struct page *alloc_pages_preferred_many(gfp_t gfp, unsigned int order,
  * @vma: Pointer to VMA or NULL if not available.
  * @addr: Virtual address of the allocation.  Must be inside @vma.
  * @hugepage: For hugepages try only the preferred node if possible.
-<<<<<<< HEAD
  *
  * Allocate a folio for a specific address in @vma, using the appropriate
  * NUMA policy.  When @vma is not NULL the caller must hold the mmap_lock
  * of the mm_struct of the VMA to prevent it from going away.  Should be
  * used for all allocations for folios that will be mapped into user space.
  *
-=======
- *
- * Allocate a folio for a specific address in @vma, using the appropriate
- * NUMA policy.  When @vma is not NULL the caller must hold the mmap_lock
- * of the mm_struct of the VMA to prevent it from going away.  Should be
- * used for all allocations for folios that will be mapped into user space.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Return: The folio on success or NULL if allocation fails.
  */
 struct folio *vma_alloc_folio(gfp_t gfp, int order, struct vm_area_struct *vma,

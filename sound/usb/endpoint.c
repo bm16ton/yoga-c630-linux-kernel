@@ -46,15 +46,6 @@ struct snd_usb_clock_ref {
 	struct list_head list;
 };
 
-/* clock refcounting */
-struct snd_usb_clock_ref {
-	unsigned char clock;
-	atomic_t locked;
-	int opened;
-	int rate;
-	struct list_head list;
-};
-
 /*
  * snd_usb_endpoint is a model that abstracts everything related to an
  * USB endpoint and its streaming.
@@ -926,10 +917,7 @@ static int endpoint_set_interface(struct snd_usb_audio *chip,
 
 	if (chip->quirk_flags & QUIRK_FLAG_IFACE_DELAY)
 		msleep(50);
-<<<<<<< HEAD
 	ep->iface_ref->altset = altset;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1441,33 +1429,6 @@ static int init_sample_rate(struct snd_usb_audio *chip,
 	return 0;
 }
 
-static int init_sample_rate(struct snd_usb_audio *chip,
-			    struct snd_usb_endpoint *ep)
-{
-	struct snd_usb_clock_ref *clock = ep->clock_ref;
-	int err;
-
-	if (clock) {
-		if (atomic_read(&clock->locked))
-			return 0;
-		if (clock->rate == ep->cur_rate)
-			return 0;
-		if (clock->rate && clock->rate != ep->cur_rate) {
-			usb_audio_dbg(chip, "Mismatched sample rate %d vs %d for EP 0x%x\n",
-				      clock->rate, ep->cur_rate, ep->ep_num);
-			return -EINVAL;
-		}
-	}
-
-	err = snd_usb_init_sample_rate(chip, ep->cur_audiofmt, ep->cur_rate);
-	if (err < 0)
-		return err;
-
-	if (clock)
-		clock->rate = ep->cur_rate;
-	return 0;
-}
-
 /*
  * snd_usb_endpoint_prepare: Prepare the endpoint
  *
@@ -1716,7 +1677,6 @@ void snd_usb_endpoint_stop(struct snd_usb_endpoint *ep, bool keep_pending)
 		stop_urbs(ep, false, keep_pending);
 		if (ep->clock_ref)
 			atomic_dec(&ep->clock_ref->locked);
-<<<<<<< HEAD
 
 		if (ep->chip->quirk_flags & QUIRK_FLAG_FORCE_IFACE_RESET &&
 		    usb_pipeout(ep->pipe)) {
@@ -1724,8 +1684,6 @@ void snd_usb_endpoint_stop(struct snd_usb_endpoint *ep, bool keep_pending)
 			if (ep->iface_ref)
 				ep->iface_ref->need_setup = true;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 

@@ -12,10 +12,7 @@
 #include <linux/errno.h>
 #include <linux/gfp.h>
 #include <linux/cpu.h>
-<<<<<<< HEAD
 #include <linux/uio.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/asm-extable.h>
 #include <asm/ctl_reg.h>
 #include <asm/io.h>
@@ -86,75 +83,14 @@ notrace void *s390_kernel_write(void *dst, const void *src, size_t size)
 	return dst;
 }
 
-<<<<<<< HEAD
 void __init memcpy_real_init(void)
-=======
-static int __no_sanitize_address __memcpy_real(void *dest, void *src, size_t count)
-{
-	union register_pair _dst, _src;
-	int rc = -EFAULT;
-
-	_dst.even = (unsigned long) dest;
-	_dst.odd  = (unsigned long) count;
-	_src.even = (unsigned long) src;
-	_src.odd  = (unsigned long) count;
-	asm volatile (
-		"0:	mvcle	%[dst],%[src],0\n"
-		"1:	jo	0b\n"
-		"	lhi	%[rc],0\n"
-		"2:\n"
-		EX_TABLE(1b,2b)
-		: [rc] "+&d" (rc), [dst] "+&d" (_dst.pair), [src] "+&d" (_src.pair)
-		: : "cc", "memory");
-	return rc;
-}
-
-static unsigned long __no_sanitize_address _memcpy_real(unsigned long dest,
-							unsigned long src,
-							unsigned long count)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	memcpy_real_ptep = vmem_get_alloc_pte(__memcpy_real_area, true);
 	if (!memcpy_real_ptep)
 		panic("Couldn't setup memcpy real area");
 }
 
-<<<<<<< HEAD
 size_t memcpy_real_iter(struct iov_iter *iter, unsigned long src, size_t count)
-=======
-/*
- * Copy memory in real mode (kernel to kernel)
- */
-int memcpy_real(void *dest, unsigned long src, size_t count)
-{
-	unsigned long _dest  = (unsigned long)dest;
-	unsigned long _src   = (unsigned long)src;
-	unsigned long _count = (unsigned long)count;
-	int rc;
-
-	if (S390_lowcore.nodat_stack != 0) {
-		preempt_disable();
-		rc = call_on_stack(3, S390_lowcore.nodat_stack,
-				   unsigned long, _memcpy_real,
-				   unsigned long, _dest,
-				   unsigned long, _src,
-				   unsigned long, _count);
-		preempt_enable();
-		return rc;
-	}
-	/*
-	 * This is a really early memcpy_real call, the stacks are
-	 * not set up yet. Just call _memcpy_real on the early boot
-	 * stack
-	 */
-	return _memcpy_real(_dest, _src, _count);
-}
-
-/*
- * Copy memory in absolute mode (kernel to kernel)
- */
-void memcpy_absolute(void *dest, void *src, size_t count)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	size_t len, copied, res = 0;
 	unsigned long phys, offset;
@@ -185,7 +121,6 @@ void memcpy_absolute(void *dest, void *src, size_t count)
 	return res;
 }
 
-<<<<<<< HEAD
 int memcpy_real(void *dest, unsigned long src, size_t count)
 {
 	struct iov_iter iter;
@@ -203,12 +138,6 @@ int memcpy_real(void *dest, unsigned long src, size_t count)
  * Find CPU that owns swapped prefix page
  */
 static int get_swapped_owner(phys_addr_t addr)
-=======
-/*
- * Check if physical address is within prefix or zero page
- */
-static int is_swapped(phys_addr_t addr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	phys_addr_t lc;
 	int cpu;
@@ -232,16 +161,12 @@ void *xlate_dev_mem_ptr(phys_addr_t addr)
 {
 	void *ptr = phys_to_virt(addr);
 	void *bounce = ptr;
-<<<<<<< HEAD
 	struct lowcore *abs_lc;
 	unsigned long flags;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long size;
 	int this_cpu, cpu;
 
 	cpus_read_lock();
-<<<<<<< HEAD
 	this_cpu = get_cpu();
 	if (addr >= sizeof(struct lowcore)) {
 		cpu = get_swapped_owner(addr);
@@ -265,16 +190,6 @@ void *xlate_dev_mem_ptr(phys_addr_t addr)
 	}
 out:
 	put_cpu();
-=======
-	preempt_disable();
-	if (is_swapped(addr)) {
-		size = PAGE_SIZE - (addr & ~PAGE_MASK);
-		bounce = (void *) __get_free_page(GFP_ATOMIC);
-		if (bounce)
-			memcpy_absolute(bounce, ptr, size);
-	}
-	preempt_enable();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cpus_read_unlock();
 	return bounce;
 }

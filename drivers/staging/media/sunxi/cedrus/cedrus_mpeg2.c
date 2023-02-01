@@ -121,28 +121,12 @@ static int cedrus_mpeg2_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 	/* Forward and backward prediction reference buffers. */
 	vq = v4l2_m2m_get_vq(ctx->fh.m2m_ctx, V4L2_BUF_TYPE_VIDEO_CAPTURE);
 
-<<<<<<< HEAD
 	cedrus_write_ref_buf_addr(ctx, vq, pic->forward_ref_ts,
 				  VE_DEC_MPEG_FWD_REF_LUMA_ADDR,
 				  VE_DEC_MPEG_FWD_REF_CHROMA_ADDR);
 	cedrus_write_ref_buf_addr(ctx, vq, pic->backward_ref_ts,
 				  VE_DEC_MPEG_BWD_REF_LUMA_ADDR,
 				  VE_DEC_MPEG_BWD_REF_CHROMA_ADDR);
-=======
-	forward_idx = vb2_find_timestamp(vq, pic->forward_ref_ts, 0);
-	fwd_luma_addr = cedrus_dst_buf_addr(ctx, forward_idx, 0);
-	fwd_chroma_addr = cedrus_dst_buf_addr(ctx, forward_idx, 1);
-
-	cedrus_write(dev, VE_DEC_MPEG_FWD_REF_LUMA_ADDR, fwd_luma_addr);
-	cedrus_write(dev, VE_DEC_MPEG_FWD_REF_CHROMA_ADDR, fwd_chroma_addr);
-
-	backward_idx = vb2_find_timestamp(vq, pic->backward_ref_ts, 0);
-	bwd_luma_addr = cedrus_dst_buf_addr(ctx, backward_idx, 0);
-	bwd_chroma_addr = cedrus_dst_buf_addr(ctx, backward_idx, 1);
-
-	cedrus_write(dev, VE_DEC_MPEG_BWD_REF_LUMA_ADDR, bwd_luma_addr);
-	cedrus_write(dev, VE_DEC_MPEG_BWD_REF_CHROMA_ADDR, bwd_chroma_addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Destination luma and chroma buffers. */
 

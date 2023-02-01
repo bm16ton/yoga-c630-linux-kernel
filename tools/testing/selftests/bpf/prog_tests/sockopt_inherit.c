@@ -170,17 +170,12 @@ static void run_test(int cgroup_fd)
 	pthread_t tid;
 	int err;
 
-<<<<<<< HEAD
 	obj = bpf_object__open_file("sockopt_inherit.bpf.o", NULL);
-=======
-	obj = bpf_object__open_file("sockopt_inherit.o", NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ASSERT_OK_PTR(obj, "obj_open"))
 		return;
 
 	err = bpf_object__load(obj);
 	if (!ASSERT_OK(err, "obj_load"))
-<<<<<<< HEAD
 		goto close_bpf_object;
 
 	err = prog_attach(obj, cgroup_fd, "cgroup/getsockopt", "_getsockopt");
@@ -189,16 +184,6 @@ static void run_test(int cgroup_fd)
 
 	err = prog_attach(obj, cgroup_fd, "cgroup/setsockopt", "_setsockopt");
 	if (!ASSERT_OK(err, "prog_attach _setsockopt"))
-=======
-		goto close_bpf_object;
-
-	err = prog_attach(obj, cgroup_fd, "cgroup/getsockopt", "_getsockopt");
-	if (CHECK_FAIL(err))
-		goto close_bpf_object;
-
-	err = prog_attach(obj, cgroup_fd, "cgroup/setsockopt", "_setsockopt");
-	if (CHECK_FAIL(err))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto close_bpf_object;
 
 	server_fd = start_server();
@@ -206,13 +191,8 @@ static void run_test(int cgroup_fd)
 		goto close_bpf_object;
 
 	pthread_mutex_lock(&server_started_mtx);
-<<<<<<< HEAD
 	if (!ASSERT_OK(pthread_create(&tid, NULL, server_thread,
 				      (void *)&server_fd), "pthread_create")) {
-=======
-	if (CHECK_FAIL(pthread_create(&tid, NULL, server_thread,
-				      (void *)&server_fd))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pthread_mutex_unlock(&server_started_mtx);
 		goto close_server_fd;
 	}

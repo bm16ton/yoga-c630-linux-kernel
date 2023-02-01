@@ -50,12 +50,8 @@ xfs_refcount_lookup_le(
 	xfs_agblock_t		bno,
 	int			*stat)
 {
-<<<<<<< HEAD
 	trace_xfs_refcount_lookup(cur->bc_mp, cur->bc_ag.pag->pag_agno,
 			xfs_refcount_encode_startblock(bno, domain),
-=======
-	trace_xfs_refcount_lookup(cur->bc_mp, cur->bc_ag.pag->pag_agno, bno,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			XFS_LOOKUP_LE);
 	cur->bc_rec.rc.rc_startblock = bno;
 	cur->bc_rec.rc.rc_blockcount = 0;
@@ -74,12 +70,8 @@ xfs_refcount_lookup_ge(
 	xfs_agblock_t		bno,
 	int			*stat)
 {
-<<<<<<< HEAD
 	trace_xfs_refcount_lookup(cur->bc_mp, cur->bc_ag.pag->pag_agno,
 			xfs_refcount_encode_startblock(bno, domain),
-=======
-	trace_xfs_refcount_lookup(cur->bc_mp, cur->bc_ag.pag->pag_agno, bno,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			XFS_LOOKUP_GE);
 	cur->bc_rec.rc.rc_startblock = bno;
 	cur->bc_rec.rc.rc_blockcount = 0;
@@ -98,12 +90,8 @@ xfs_refcount_lookup_eq(
 	xfs_agblock_t		bno,
 	int			*stat)
 {
-<<<<<<< HEAD
 	trace_xfs_refcount_lookup(cur->bc_mp, cur->bc_ag.pag->pag_agno,
 			xfs_refcount_encode_startblock(bno, domain),
-=======
-	trace_xfs_refcount_lookup(cur->bc_mp, cur->bc_ag.pag->pag_agno, bno,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			XFS_LOOKUP_LE);
 	cur->bc_rec.rc.rc_startblock = bno;
 	cur->bc_rec.rc.rc_blockcount = 0;
@@ -158,15 +146,7 @@ xfs_refcount_get_rec(
 		goto out_bad_rec;
 
 	/* check for valid extent range, including overflow */
-<<<<<<< HEAD
 	if (!xfs_verify_agbext(pag, irec->rc_startblock, irec->rc_blockcount))
-=======
-	if (!xfs_verify_agbno(pag, realstart))
-		goto out_bad_rec;
-	if (realstart > realstart + irec->rc_blockcount)
-		goto out_bad_rec;
-	if (!xfs_verify_agbno(pag, realstart + irec->rc_blockcount - 1))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_bad_rec;
 
 	if (irec->rc_refcount == 0 || irec->rc_refcount > MAXREFCOUNT)
@@ -200,14 +180,10 @@ xfs_refcount_update(
 	int			error;
 
 	trace_xfs_refcount_update(cur->bc_mp, cur->bc_ag.pag->pag_agno, irec);
-<<<<<<< HEAD
 
 	start = xfs_refcount_encode_startblock(irec->rc_startblock,
 			irec->rc_domain);
 	rec.refc.rc_startblock = cpu_to_be32(start);
-=======
-	rec.refc.rc_startblock = cpu_to_be32(irec->rc_startblock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rec.refc.rc_blockcount = cpu_to_be32(irec->rc_blockcount);
 	rec.refc.rc_refcount = cpu_to_be32(irec->rc_refcount);
 
@@ -232,10 +208,7 @@ xfs_refcount_insert(
 	int				error;
 
 	trace_xfs_refcount_insert(cur->bc_mp, cur->bc_ag.pag->pag_agno, irec);
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cur->bc_rec.rc.rc_startblock = irec->rc_startblock;
 	cur->bc_rec.rc.rc_blockcount = irec->rc_blockcount;
 	cur->bc_rec.rc.rc_refcount = irec->rc_refcount;
@@ -460,12 +433,9 @@ xfs_refcount_merge_center_extents(
 
 	trace_xfs_refcount_merge_center_extents(cur->bc_mp,
 			cur->bc_ag.pag->pag_agno, left, center, right);
-<<<<<<< HEAD
 
 	ASSERT(left->rc_domain == center->rc_domain);
 	ASSERT(right->rc_domain == center->rc_domain);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Make sure the center and right extents are not in the btree.
@@ -542,11 +512,8 @@ xfs_refcount_merge_left_extent(
 
 	trace_xfs_refcount_merge_left_extent(cur->bc_mp,
 			cur->bc_ag.pag->pag_agno, left, cleft);
-<<<<<<< HEAD
 
 	ASSERT(left->rc_domain == cleft->rc_domain);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* If the extent at agbno (cleft) wasn't synthesized, remove it. */
 	if (cleft->rc_refcount > 1) {
@@ -608,11 +575,8 @@ xfs_refcount_merge_right_extent(
 
 	trace_xfs_refcount_merge_right_extent(cur->bc_mp,
 			cur->bc_ag.pag->pag_agno, cright, right);
-<<<<<<< HEAD
 
 	ASSERT(right->rc_domain == cright->rc_domain);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * If the extent ending at agbno+aglen (cright) wasn't synthesized,
@@ -1306,28 +1270,20 @@ xfs_refcount_finish_one(
 	case XFS_REFCOUNT_INCREASE:
 		error = xfs_refcount_adjust(rcur, bno, blockcount, &new_agbno,
 				new_len, XFS_REFCOUNT_ADJUST_INCREASE);
-<<<<<<< HEAD
 		if (error)
 			goto out_drop;
 		if (*new_len > 0)
 			error = xfs_refcount_continue_op(rcur, startblock,
 					new_agbno, *new_len, new_fsb);
-=======
-		*new_fsb = XFS_AGB_TO_FSB(mp, pag->pag_agno, new_agbno);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case XFS_REFCOUNT_DECREASE:
 		error = xfs_refcount_adjust(rcur, bno, blockcount, &new_agbno,
 				new_len, XFS_REFCOUNT_ADJUST_DECREASE);
-<<<<<<< HEAD
 		if (error)
 			goto out_drop;
 		if (*new_len > 0)
 			error = xfs_refcount_continue_op(rcur, startblock,
 					new_agbno, *new_len, new_fsb);
-=======
-		*new_fsb = XFS_AGB_TO_FSB(mp, pag->pag_agno, new_agbno);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case XFS_REFCOUNT_ALLOC_COW:
 		*new_fsb = startblock + blockcount;
@@ -1892,13 +1848,8 @@ xfs_refcount_recover_cow_leftovers(
 				&rr->rr_rrec);
 
 		/* Free the orphan record */
-<<<<<<< HEAD
 		fsb = XFS_AGB_TO_FSB(mp, pag->pag_agno,
 				rr->rr_rrec.rc_startblock);
-=======
-		agbno = rr->rr_rrec.rc_startblock - XFS_REFC_COW_START;
-		fsb = XFS_AGB_TO_FSB(mp, pag->pag_agno, agbno);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		xfs_refcount_free_cow_extent(tp, fsb,
 				rr->rr_rrec.rc_blockcount);
 

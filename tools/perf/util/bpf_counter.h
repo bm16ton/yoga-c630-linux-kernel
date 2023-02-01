@@ -4,18 +4,12 @@
 
 #include <linux/list.h>
 #include <sys/resource.h>
-<<<<<<< HEAD
 
 #ifdef HAVE_LIBBPF_SUPPORT
 #include <bpf/bpf.h>
 #include <bpf/btf.h>
 #include <bpf/libbpf.h>
 #endif
-=======
-#include <bpf/bpf.h>
-#include <bpf/btf.h>
-#include <bpf/libbpf.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct evsel;
 struct target;
@@ -96,11 +90,8 @@ static inline void set_max_rlimit(void)
 	setrlimit(RLIMIT_MEMLOCK, &rinf);
 }
 
-<<<<<<< HEAD
 #ifdef HAVE_BPF_SKEL
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline __u32 bpf_link_get_id(int fd)
 {
 	struct bpf_link_info link_info = { .id = 0, };
@@ -141,9 +132,6 @@ static inline int bperf_trigger_reading(int prog_fd, int cpu)
 
 	return bpf_prog_test_run_opts(prog_fd, &opts);
 }
-<<<<<<< HEAD
 #endif /* HAVE_BPF_SKEL */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* __PERF_BPF_COUNTER_H */

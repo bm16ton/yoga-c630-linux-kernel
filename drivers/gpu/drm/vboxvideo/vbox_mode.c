@@ -477,11 +477,7 @@ static const struct drm_plane_helper_funcs vbox_cursor_helper_funcs = {
 static const struct drm_plane_funcs vbox_cursor_plane_funcs = {
 	.update_plane	= drm_atomic_helper_update_plane,
 	.disable_plane	= drm_atomic_helper_disable_plane,
-<<<<<<< HEAD
 	.destroy	= drm_plane_helper_destroy,
-=======
-	.destroy	= drm_primary_helper_destroy,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	DRM_GEM_SHADOW_PLANE_FUNCS,
 };
 

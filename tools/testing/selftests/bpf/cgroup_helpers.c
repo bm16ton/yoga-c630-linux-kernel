@@ -39,16 +39,7 @@
 	CGROUP_WORK_DIR, pid, path)
 
 #define format_cgroup_path(buf, path) \
-<<<<<<< HEAD
 	format_cgroup_path_pid(buf, path, getpid())
-=======
-	snprintf(buf, sizeof(buf), "%s%s%d%s", CGROUP_MOUNT_PATH, \
-	CGROUP_WORK_DIR, getpid(), path)
-
-#define format_classid_path(buf)				\
-	snprintf(buf, sizeof(buf), "%s%s", NETCLS_MOUNT_PATH,	\
-		 CGROUP_WORK_DIR)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define format_parent_cgroup_path(buf, path) \
 	format_cgroup_path_pid(buf, path, getppid())

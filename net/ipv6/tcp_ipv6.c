@@ -147,10 +147,7 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr *uaddr,
 {
 	struct sockaddr_in6 *usin = (struct sockaddr_in6 *) uaddr;
 	struct inet_connection_sock *icsk = inet_csk(sk);
-<<<<<<< HEAD
 	struct in6_addr *saddr = NULL, *final_p, final;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct inet_timewait_death_row *tcp_death_row;
 	struct ipv6_pinfo *np = tcp_inet6_sk(sk);
 	struct inet_sock *inet = inet_sk(sk);
@@ -319,7 +316,6 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr *uaddr,
 	inet->inet_dport = usin->sin6_port;
 
 	tcp_set_state(sk, TCP_SYN_SENT);
-	tcp_death_row = sock_net(sk)->ipv4.tcp_death_row;
 	err = inet6_hash_connect(tcp_death_row, sk);
 	if (err)
 		goto late_failure;
@@ -350,12 +346,7 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr *uaddr,
 
 late_failure:
 	tcp_set_state(sk, TCP_CLOSE);
-<<<<<<< HEAD
 	inet_bhash2_reset_saddr(sk);
-=======
-	if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK))
-		inet_reset_saddr(sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 failure:
 	inet->inet_dport = 0;
 	sk->sk_route_caps = 0;
@@ -952,16 +943,11 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
 			mark = inet_twsk(sk)->tw_mark;
 		else
 			mark = sk->sk_mark;
-<<<<<<< HEAD
 		skb_set_delivery_time(buff, tcp_transmit_time(sk), true);
 	}
 	if (txhash) {
 		/* autoflowlabel/skb_get_hash_flowi6 rely on buff->hash */
 		skb_set_hash(buff, txhash, PKT_HASH_TYPE_L4);
-=======
-		}
-		skb_set_delivery_time(buff, tcp_transmit_time(sk), true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	fl6.flowi6_mark = IP6_REPLY_MARK(net, skb->mark) ?: mark;
 	fl6.fl6_dport = t1->dest;

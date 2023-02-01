@@ -775,11 +775,7 @@ static void efx_unregister_netdev(struct efx_nic *efx)
 	BUG_ON(netdev_priv(efx->net_dev) != efx);
 
 	if (efx_dev_registered(efx)) {
-<<<<<<< HEAD
 		strscpy(efx->name, pci_name(efx->pci_dev), sizeof(efx->name));
-=======
-		strlcpy(efx->name, pci_name(efx->pci_dev), sizeof(efx->name));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		efx_siena_fini_mcdi_logging(efx);
 		device_remove_file(&efx->pci_dev->dev, &dev_attr_phy_type);
 		unregister_netdev(efx->net_dev);
@@ -1152,7 +1148,6 @@ static int efx_pm_freeze(struct device *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void efx_pci_shutdown(struct pci_dev *pci_dev)
 {
 	struct efx_nic *efx = pci_get_drvdata(pci_dev);
@@ -1164,8 +1159,6 @@ static void efx_pci_shutdown(struct pci_dev *pci_dev)
 	pci_disable_device(pci_dev);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int efx_pm_thaw(struct device *dev)
 {
 	int rc;
@@ -1270,10 +1263,7 @@ static struct pci_driver efx_pci_driver = {
 	.probe		= efx_pci_probe,
 	.remove		= efx_pci_remove,
 	.driver.pm	= &efx_pm_ops,
-<<<<<<< HEAD
 	.shutdown	= efx_pci_shutdown,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.err_handler	= &efx_siena_err_handlers,
 #ifdef CONFIG_SFC_SIENA_SRIOV
 	.sriov_configure = efx_pci_sriov_configure,

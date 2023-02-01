@@ -331,17 +331,10 @@ struct kvm_vcpu_arch {
 		FP_STATE_HOST_OWNED,
 		FP_STATE_GUEST_OWNED,
 	} fp_state;
-<<<<<<< HEAD
 
 	/* Configuration flags, set once and for all before the vcpu can run */
 	u8 cflags;
 
-=======
-
-	/* Configuration flags, set once and for all before the vcpu can run */
-	u8 cflags;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Input flags to the hypervisor code, potentially cleared after use */
 	u8 iflags;
 
@@ -543,12 +536,9 @@ struct kvm_vcpu_arch {
 #define IN_WFIT			__vcpu_single_flag(sflags, BIT(3))
 /* vcpu system registers loaded on physical CPU */
 #define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
-<<<<<<< HEAD
 /* Software step state is Active-pending */
 #define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
 #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\

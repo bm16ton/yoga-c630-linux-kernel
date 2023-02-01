@@ -628,19 +628,10 @@ static int inv_mpu6050_read_channel_data(struct iio_dev *indio_dev,
 		break;
 	case IIO_TEMP:
 		/* temperature sensor work only with accel and/or gyro */
-<<<<<<< HEAD
-=======
-//	if (!inv_mpu6050_ftemp) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!st->chip_config.accl_en && !st->chip_config.gyro_en) {
 			result = -EBUSY;
 			goto error_power_off;
 		}
-<<<<<<< HEAD
-=======
-//	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!st->chip_config.temp_en) {
 			result = inv_mpu6050_switch_engine(st, true,
 					INV_MPU6050_SENSOR_TEMP);
@@ -1488,11 +1479,6 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 	} else {
 		st->plat_data = *pdata;
 	}
-<<<<<<< HEAD
-=======
-//16ton
-	if (!inv_mpu6050_noirq) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (irq > 0) {
 		desc = irq_get_irq_data(irq);
@@ -1524,12 +1510,7 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 			irq_type);
 		return -EINVAL;
 	}
-<<<<<<< HEAD
 
-=======
-    }
-//16ton
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	st->vdd_supply = devm_regulator_get(dev, "vdd");
 	if (IS_ERR(st->vdd_supply))
 		return dev_err_probe(dev, PTR_ERR(st->vdd_supply),
@@ -1652,25 +1633,14 @@ int inv_mpu_core_probe(struct regmap *regmap, int irq, const char *name,
 			dev_err(dev, "configure buffer fail %d\n", result);
 			return result;
 		}
-<<<<<<< HEAD
 
-=======
-//16ton
-	if (!inv_mpu6050_noirq) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		result = inv_mpu6050_probe_trigger(indio_dev, irq_type);
 		if (result) {
 			dev_err(dev, "trigger probe fail %d\n", result);
 			return result;
 		}
-<<<<<<< HEAD
 	}
 
-=======
-	}
-	}
-//16ton
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	result = devm_iio_device_register(dev, indio_dev);
 	if (result) {
 		dev_err(dev, "IIO register fail %d\n", result);

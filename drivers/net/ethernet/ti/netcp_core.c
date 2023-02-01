@@ -2095,11 +2095,7 @@ static int netcp_create_interface(struct netcp_device *netcp_device,
 	}
 
 	/* NAPI register */
-<<<<<<< HEAD
 	netif_napi_add(ndev, &netcp->rx_napi, netcp_rx_poll);
-=======
-	netif_napi_add(ndev, &netcp->rx_napi, netcp_rx_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	netif_napi_add_tx(ndev, &netcp->tx_napi, netcp_tx_poll);
 
 	/* Register the network device */

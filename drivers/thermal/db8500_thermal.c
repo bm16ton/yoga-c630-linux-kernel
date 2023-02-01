@@ -72,11 +72,7 @@ static int db8500_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 	return 0;
 }
 
-<<<<<<< HEAD
 static const struct thermal_zone_device_ops thdev_ops = {
-=======
-static struct thermal_zone_of_device_ops thdev_ops = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_temp = db8500_thermal_get_temp,
 };
 

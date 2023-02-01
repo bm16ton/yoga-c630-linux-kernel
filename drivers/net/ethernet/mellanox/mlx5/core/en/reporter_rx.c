@@ -117,30 +117,6 @@ static int mlx5e_rx_reporter_err_icosq_cqe_recover(void *ctx)
 
 	mlx5e_activate_rq(rq);
 	rq->stats->recover++;
-<<<<<<< HEAD
-=======
-
-	if (xskrq) {
-		mlx5e_activate_rq(xskrq);
-		xskrq->stats->recover++;
-	}
-
-	mlx5e_trigger_napi_icosq(icosq->channel);
-
-	mutex_unlock(&icosq->channel->icosq_recovery_lock);
-
-	return 0;
-out:
-	clear_bit(MLX5E_SQ_STATE_RECOVERING, &icosq->state);
-	mutex_unlock(&icosq->channel->icosq_recovery_lock);
-	return err;
-}
-
-static int mlx5e_rq_to_ready(struct mlx5e_rq *rq, int curr_state)
-{
-	struct net_device *dev = rq->netdev;
-	int err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (xskrq) {
 		mlx5e_activate_rq(xskrq);
@@ -397,7 +373,6 @@ mlx5e_rx_reporter_diagnose_common_ptp_config(struct mlx5e_priv *priv, struct mlx
 	int err;
 
 	err = mlx5e_health_fmsg_named_obj_nest_start(fmsg, "PTP");
-<<<<<<< HEAD
 	if (err)
 		return err;
 
@@ -459,69 +434,6 @@ static int mlx5e_rx_reporter_build_diagnose_output_ptp_rq(struct mlx5e_rq *rq,
 	if (err)
 		return err;
 
-=======
-	if (err)
-		return err;
-
-	err = devlink_fmsg_u32_pair_put(fmsg, "filter_type", priv->tstamp.rx_filter);
-	if (err)
-		return err;
-
-	err = mlx5e_rx_reporter_diagnose_generic_rq(&ptp_ch->rq, fmsg);
-	if (err)
-		return err;
-
-	return mlx5e_health_fmsg_named_obj_nest_end(fmsg);
-}
-
-static int
-mlx5e_rx_reporter_diagnose_common_config(struct devlink_health_reporter *reporter,
-					 struct devlink_fmsg *fmsg)
-{
-	struct mlx5e_priv *priv = devlink_health_reporter_priv(reporter);
-	struct mlx5e_rq *generic_rq = &priv->channels.c[0]->rq;
-	struct mlx5e_ptp *ptp_ch = priv->channels.ptp;
-	int err;
-
-	err = mlx5e_health_fmsg_named_obj_nest_start(fmsg, "Common config");
-	if (err)
-		return err;
-
-	err = mlx5e_rx_reporter_diagnose_generic_rq(generic_rq, fmsg);
-	if (err)
-		return err;
-
-	if (ptp_ch && test_bit(MLX5E_PTP_STATE_RX, ptp_ch->state)) {
-		err = mlx5e_rx_reporter_diagnose_common_ptp_config(priv, ptp_ch, fmsg);
-		if (err)
-			return err;
-	}
-
-	return mlx5e_health_fmsg_named_obj_nest_end(fmsg);
-}
-
-static int mlx5e_rx_reporter_build_diagnose_output_ptp_rq(struct mlx5e_rq *rq,
-							  struct devlink_fmsg *fmsg)
-{
-	int err;
-
-	err = devlink_fmsg_obj_nest_start(fmsg);
-	if (err)
-		return err;
-
-	err = devlink_fmsg_string_pair_put(fmsg, "channel", "ptp");
-	if (err)
-		return err;
-
-	err = mlx5e_rx_reporter_build_diagnose_output_rq_common(rq, fmsg);
-	if (err)
-		return err;
-
-	err = devlink_fmsg_obj_nest_end(fmsg);
-	if (err)
-		return err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

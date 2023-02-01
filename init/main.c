@@ -838,10 +838,7 @@ static void __init mm_init(void)
 	init_mem_debugging_and_hardening();
 	kfence_alloc_pool();
 	report_meminit();
-<<<<<<< HEAD
 	kmsan_init_shadow();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	stack_depot_early_init();
 	mem_init();
 	mem_init_print_info();
@@ -855,12 +852,9 @@ static void __init mm_init(void)
 	pgtable_init();
 	debug_objects_mem_init();
 	vmalloc_init();
-<<<<<<< HEAD
 	/* Should be run after vmap initialization */
 	if (early_page_ext_enabled())
 		page_ext_init();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Should be run before the first non-init thread is created */
 	init_espfix_bsp();
 	/* Should be run after espfix64 is set up. */
@@ -1052,7 +1046,6 @@ asmlinkage __visible void __init __no_sanitize_address start_kernel(void)
 	hrtimers_init();
 	softirq_init();
 	timekeeping_init();
-<<<<<<< HEAD
 	time_init();
 
 	/* This must be after timekeeping is initialized */
@@ -1060,19 +1053,6 @@ asmlinkage __visible void __init __no_sanitize_address start_kernel(void)
 
 	/* These make use of the fully initialized rng */
 	kfence_init();
-=======
-	kfence_init();
-	time_init();
-
-	/*
-	 * For best initial stack canary entropy, prepare it after:
-	 * - setup_arch() for any UEFI RNG entropy and boot cmdline access
-	 * - timekeeping_init() for ktime entropy used in random_init()
-	 * - time_init() for making random_get_entropy() work on some platforms
-	 * - random_init() to initialize the RNG from from early entropy sources
-	 */
-	random_init(command_line);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	boot_init_stack_canary();
 
 	perf_event_init();
@@ -1273,11 +1253,7 @@ trace_initcall_start_cb(void *data, initcall_t fn)
 static __init_or_module void
 trace_initcall_finish_cb(void *data, initcall_t fn, int ret)
 {
-<<<<<<< HEAD
 	ktime_t rettime, *calltime = data;
-=======
-	ktime_t rettime, *calltime = (ktime_t *)data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rettime = ktime_get();
 	printk(KERN_DEBUG "initcall %pS returned %d after %lld usecs\n",

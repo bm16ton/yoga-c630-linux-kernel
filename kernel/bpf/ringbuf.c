@@ -323,7 +323,6 @@ static __poll_t ringbuf_map_poll_kern(struct bpf_map *map, struct file *filp,
 	return 0;
 }
 
-<<<<<<< HEAD
 static __poll_t ringbuf_map_poll_user(struct bpf_map *map, struct file *filp,
 				      struct poll_table_struct *pts)
 {
@@ -337,8 +336,6 @@ static __poll_t ringbuf_map_poll_user(struct bpf_map *map, struct file *filp,
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 BTF_ID_LIST_SINGLE(ringbuf_map_btf_ids, struct, bpf_ringbuf_map)
 const struct bpf_map_ops ringbuf_map_ops = {
 	.map_meta_equal = bpf_map_meta_equal,
@@ -351,7 +348,6 @@ const struct bpf_map_ops ringbuf_map_ops = {
 	.map_delete_elem = ringbuf_map_delete_elem,
 	.map_get_next_key = ringbuf_map_get_next_key,
 	.map_btf_id = &ringbuf_map_btf_ids[0],
-<<<<<<< HEAD
 };
 
 BTF_ID_LIST_SINGLE(user_ringbuf_map_btf_ids, struct, bpf_ringbuf_map)
@@ -366,8 +362,6 @@ const struct bpf_map_ops user_ringbuf_map_ops = {
 	.map_delete_elem = ringbuf_map_delete_elem,
 	.map_get_next_key = ringbuf_map_get_next_key,
 	.map_btf_id = &user_ringbuf_map_btf_ids[0],
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Given pointer to ring buffer record metadata and struct bpf_ringbuf itself,
@@ -645,7 +639,6 @@ const struct bpf_func_proto bpf_ringbuf_discard_dynptr_proto = {
 	.arg1_type	= ARG_PTR_TO_DYNPTR | DYNPTR_TYPE_RINGBUF | OBJ_RELEASE,
 	.arg2_type	= ARG_ANYTHING,
 };
-<<<<<<< HEAD
 
 static int __bpf_user_ringbuf_peek(struct bpf_ringbuf *rb, void **sample, u32 *size)
 {
@@ -781,5 +774,3 @@ const struct bpf_func_proto bpf_user_ringbuf_drain_proto = {
 	.arg3_type	= ARG_PTR_TO_STACK_OR_NULL,
 	.arg4_type	= ARG_ANYTHING,
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

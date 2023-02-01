@@ -1531,19 +1531,11 @@ struct devlink_ops {
 	(*selftest_run)(struct devlink *devlink, unsigned int id,
 			struct netlink_ext_ack *extack);
 };
-<<<<<<< HEAD
 
 void *devlink_priv(struct devlink *devlink);
 struct devlink *priv_to_devlink(void *priv);
 struct device *devlink_to_dev(const struct devlink *devlink);
 
-=======
-
-void *devlink_priv(struct devlink *devlink);
-struct devlink *priv_to_devlink(void *priv);
-struct device *devlink_to_dev(const struct devlink *devlink);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Devlink instance explicit locking */
 void devl_lock(struct devlink *devlink);
 int devl_trylock(struct devlink *devlink);
@@ -1572,12 +1564,9 @@ void devlink_set_features(struct devlink *devlink, u64 features);
 void devlink_register(struct devlink *devlink);
 void devlink_unregister(struct devlink *devlink);
 void devlink_free(struct devlink *devlink);
-<<<<<<< HEAD
 void devlink_port_init(struct devlink *devlink,
 		       struct devlink_port *devlink_port);
 void devlink_port_fini(struct devlink_port *devlink_port);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int devl_port_register(struct devlink *devlink,
 		       struct devlink_port *devlink_port,
 		       unsigned int port_index);

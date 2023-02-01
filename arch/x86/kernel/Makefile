@@ -29,11 +29,8 @@ KASAN_SANITIZE_sev.o					:= n
 # With some compiler versions the generated code results in boot hangs, caused
 # by several compilation units. To be safe, disable all instrumentation.
 KCSAN_SANITIZE := n
-<<<<<<< HEAD
 KMSAN_SANITIZE_head$(BITS).o				:= n
 KMSAN_SANITIZE_nmi.o					:= n
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # If instrumentation of this dir is enabled, boot hangs during first second.
 # Probably could be more selective here, but note that files related to irqs,
@@ -144,11 +141,8 @@ obj-$(CONFIG_UNWINDER_GUESS)		+= unwind_guess.o
 
 obj-$(CONFIG_AMD_MEM_ENCRYPT)		+= sev.o
 
-<<<<<<< HEAD
 obj-$(CONFIG_CFI_CLANG)			+= cfi.o
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ###
 # 64 bit specific files
 ifeq ($(CONFIG_X86_64),y)

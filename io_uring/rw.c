@@ -33,7 +33,6 @@ static inline bool io_file_supports_nowait(struct io_kiocb *req)
 	return req->flags & REQ_F_SUPPORT_NOWAIT;
 }
 
-<<<<<<< HEAD
 #ifdef CONFIG_COMPAT
 static int io_iov_compat_buffer_select_prep(struct io_rw *rw)
 {
@@ -74,8 +73,6 @@ static int io_iov_buffer_select_prep(struct io_kiocb *req)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
@@ -112,7 +109,6 @@ int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	rw->addr = READ_ONCE(sqe->addr);
 	rw->len = READ_ONCE(sqe->len);
 	rw->flags = READ_ONCE(sqe->rw_flags);
-<<<<<<< HEAD
 
 	/* Have to do this validation here, as this is in io_read() rw->len might
 	 * have chanaged due to buffer selection
@@ -123,8 +119,6 @@ int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 			return ret;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -359,82 +353,6 @@ static int kiocb_done(struct io_kiocb *req, ssize_t ret,
 	return IOU_ISSUE_SKIP_COMPLETE;
 }
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_COMPAT
-static ssize_t io_compat_import(struct io_kiocb *req, struct iovec *iov,
-				unsigned int issue_flags)
-{
-	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
-	struct compat_iovec __user *uiov;
-	compat_ssize_t clen;
-	void __user *buf;
-	size_t len;
-
-	uiov = u64_to_user_ptr(rw->addr);
-	if (!access_ok(uiov, sizeof(*uiov)))
-		return -EFAULT;
-	if (__get_user(clen, &uiov->iov_len))
-		return -EFAULT;
-	if (clen < 0)
-		return -EINVAL;
-
-	len = clen;
-	buf = io_buffer_select(req, &len, issue_flags);
-	if (!buf)
-		return -ENOBUFS;
-	rw->addr = (unsigned long) buf;
-	iov[0].iov_base = buf;
-	rw->len = iov[0].iov_len = (compat_size_t) len;
-	return 0;
-}
-#endif
-
-static ssize_t __io_iov_buffer_select(struct io_kiocb *req, struct iovec *iov,
-				      unsigned int issue_flags)
-{
-	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
-	struct iovec __user *uiov = u64_to_user_ptr(rw->addr);
-	void __user *buf;
-	ssize_t len;
-
-	if (copy_from_user(iov, uiov, sizeof(*uiov)))
-		return -EFAULT;
-
-	len = iov[0].iov_len;
-	if (len < 0)
-		return -EINVAL;
-	buf = io_buffer_select(req, &len, issue_flags);
-	if (!buf)
-		return -ENOBUFS;
-	rw->addr = (unsigned long) buf;
-	iov[0].iov_base = buf;
-	rw->len = iov[0].iov_len = len;
-	return 0;
-}
-
-static ssize_t io_iov_buffer_select(struct io_kiocb *req, struct iovec *iov,
-				    unsigned int issue_flags)
-{
-	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
-
-	if (req->flags & (REQ_F_BUFFER_SELECTED|REQ_F_BUFFER_RING)) {
-		iov[0].iov_base = u64_to_user_ptr(rw->addr);
-		iov[0].iov_len = rw->len;
-		return 0;
-	}
-	if (rw->len != 1)
-		return -EINVAL;
-
-#ifdef CONFIG_COMPAT
-	if (req->ctx->compat)
-		return io_compat_import(req, iov, issue_flags);
-#endif
-
-	return __io_iov_buffer_select(req, iov, issue_flags);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct iovec *__io_import_iovec(int ddir, struct io_kiocb *req,
 				       struct io_rw_state *s,
 				       unsigned int issue_flags)
@@ -457,12 +375,8 @@ static struct iovec *__io_import_iovec(int ddir, struct io_kiocb *req,
 	buf = u64_to_user_ptr(rw->addr);
 	sqe_len = rw->len;
 
-<<<<<<< HEAD
 	if (opcode == IORING_OP_READ || opcode == IORING_OP_WRITE ||
 	    (req->flags & REQ_F_BUFFER_SELECT)) {
-=======
-	if (opcode == IORING_OP_READ || opcode == IORING_OP_WRITE) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (io_do_buffer_select(req)) {
 			buf = io_buffer_select(req, &sqe_len, issue_flags);
 			if (!buf)
@@ -478,17 +392,6 @@ static struct iovec *__io_import_iovec(int ddir, struct io_kiocb *req,
 	}
 
 	iovec = s->fast_iov;
-<<<<<<< HEAD
-=======
-	if (req->flags & REQ_F_BUFFER_SELECT) {
-		ret = io_iov_buffer_select(req, iovec, issue_flags);
-		if (ret)
-			return ERR_PTR(ret);
-		iov_iter_init(iter, ddir, iovec, 1, iovec->iov_len);
-		return NULL;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = __import_iovec(ddir, buf, sqe_len, UIO_FASTIOV, &iovec, iter,
 			      req->ctx->compat);
 	if (unlikely(ret < 0))
@@ -1031,11 +934,7 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
 			goto copy_iov;
 
 		if (ret2 != req->cqe.res && ret2 >= 0 && need_complete_io(req)) {
-<<<<<<< HEAD
 			struct io_async_rw *io;
-=======
-			struct io_async_rw *rw;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			trace_io_uring_short_write(req->ctx, kiocb->ki_pos - ret2,
 						req->cqe.res, ret2);
@@ -1048,15 +947,9 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
 			iov_iter_save_state(&s->iter, &s->iter_state);
 			ret = io_setup_async_rw(req, iovec, s, true);
 
-<<<<<<< HEAD
 			io = req->async_data;
 			if (io)
 				io->bytes_done += ret2;
-=======
-			rw = req->async_data;
-			if (rw)
-				rw->bytes_done += ret2;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			if (kiocb->ki_flags & IOCB_WRITE)
 				kiocb_end_write(req);
@@ -1112,11 +1005,7 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
 
 	wq_list_for_each(pos, start, &ctx->iopoll_list) {
 		struct io_kiocb *req = container_of(pos, struct io_kiocb, comp_list);
-<<<<<<< HEAD
 		struct file *file = req->file;
-=======
-		struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		int ret;
 
 		/*
@@ -1127,7 +1016,6 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
 		if (READ_ONCE(req->iopoll_completed))
 			break;
 
-<<<<<<< HEAD
 		if (req->opcode == IORING_OP_URING_CMD) {
 			struct io_uring_cmd *ioucmd;
 
@@ -1139,9 +1027,6 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
 
 			ret = file->f_op->iopoll(&rw->kiocb, &iob, poll_flags);
 		}
-=======
-		ret = rw->kiocb.ki_filp->f_op->iopoll(&rw->kiocb, &iob, poll_flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (unlikely(ret < 0))
 			return ret;
 		else if (ret)
@@ -1170,15 +1055,11 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
 			continue;
 
 		req->cqe.flags = io_put_kbuf(req, 0);
-<<<<<<< HEAD
 		if (unlikely(!__io_fill_cqe_req(ctx, req))) {
 			spin_lock(&ctx->completion_lock);
 			io_req_cqe_overflow(req);
 			spin_unlock(&ctx->completion_lock);
 		}
-=======
-		__io_fill_cqe_req(req->ctx, req);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (unlikely(!nr_events))

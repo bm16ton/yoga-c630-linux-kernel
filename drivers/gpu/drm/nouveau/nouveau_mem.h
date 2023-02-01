@@ -25,15 +25,12 @@ int nouveau_mem_new(struct nouveau_cli *, u8 kind, u8 comp,
 		    struct ttm_resource **);
 void nouveau_mem_del(struct ttm_resource_manager *man,
 		     struct ttm_resource *);
-<<<<<<< HEAD
 bool nouveau_mem_intersects(struct ttm_resource *res,
 			    const struct ttm_place *place,
 			    size_t size);
 bool nouveau_mem_compatible(struct ttm_resource *res,
 			    const struct ttm_place *place,
 			    size_t size);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int nouveau_mem_vram(struct ttm_resource *, bool contig, u8 page);
 int nouveau_mem_host(struct ttm_resource *, struct ttm_tt *);
 void nouveau_mem_fini(struct nouveau_mem *);

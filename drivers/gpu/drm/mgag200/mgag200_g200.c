@@ -3,15 +3,11 @@
 #include <linux/pci.h>
 #include <linux/vmalloc.h>
 
-<<<<<<< HEAD
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_gem_atomic_helper.h>
 #include <drm/drm_probe_helper.h>
-=======
-#include <drm/drm_drv.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "mgag200_drv.h"
 
@@ -38,7 +34,6 @@ static int mgag200_g200_init_pci_options(struct pci_dev *pdev)
 	return mgag200_init_pci_options(pdev, option, 0x00008000);
 }
 
-<<<<<<< HEAD
 static void mgag200_g200_init_registers(struct mgag200_g200_device *g200)
 {
 	static const u8 dacvalue[] = {
@@ -268,8 +263,6 @@ static int mgag200_g200_pipeline_init(struct mga_device *mdev)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * DRM Device
  */
@@ -400,17 +393,12 @@ out:
 	pci_unmap_rom(pdev, rom);
 }
 
-<<<<<<< HEAD
 static const struct mgag200_device_funcs mgag200_g200_device_funcs = {
 	.pixpllc_atomic_check = mgag200_g200_pixpllc_atomic_check,
 	.pixpllc_atomic_update = mgag200_g200_pixpllc_atomic_update,
 };
 
 struct mga_device *mgag200_g200_device_create(struct pci_dev *pdev, const struct drm_driver *drv)
-=======
-struct mga_device *mgag200_g200_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-					      enum mga_type type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mgag200_g200_device *g200;
 	struct mga_device *mdev;
@@ -436,7 +424,6 @@ struct mga_device *mgag200_g200_device_create(struct pci_dev *pdev, const struct
 
 	mgag200_g200_init_refclk(g200);
 
-<<<<<<< HEAD
 	ret = mgag200_device_init(mdev, &mgag200_g200_device_info,
 				  &mgag200_g200_device_funcs);
 	if (ret)
@@ -456,17 +443,5 @@ struct mga_device *mgag200_g200_device_create(struct pci_dev *pdev, const struct
 
 	drm_mode_config_reset(dev);
 
-=======
-	ret = mgag200_device_init(mdev, type, &mgag200_g200_device_info);
-	if (ret)
-		return ERR_PTR(ret);
-
-	vram_available = mgag200_device_probe_vram(mdev);
-
-	ret = mgag200_modeset_init(mdev, vram_available);
-	if (ret)
-		return ERR_PTR(ret);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return mdev;
 }

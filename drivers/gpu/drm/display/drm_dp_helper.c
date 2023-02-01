@@ -30,10 +30,7 @@
 #include <linux/sched.h>
 #include <linux/seq_file.h>
 #include <linux/string_helpers.h>
-<<<<<<< HEAD
 #include <linux/dynamic_debug.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <drm/display/drm_dp_helper.h>
 #include <drm/display/drm_dp_mst_helper.h>
@@ -44,7 +41,6 @@
 
 #include "drm_dp_helper_internal.h"
 
-<<<<<<< HEAD
 DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
 			"DRM_UT_CORE",
 			"DRM_UT_DRIVER",
@@ -57,8 +53,6 @@ DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
 			"DRM_UT_DP",
 			"DRM_UT_DRMRES");
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dp_aux_backlight {
 	struct backlight_device *base;
 	struct drm_dp_aux *aux;
@@ -409,7 +403,6 @@ void drm_dp_link_train_channel_eq_delay(const struct drm_dp_aux *aux,
 }
 EXPORT_SYMBOL(drm_dp_link_train_channel_eq_delay);
 
-<<<<<<< HEAD
 /**
  * drm_dp_phy_name() - Get the name of the given DP PHY
  * @dp_phy: The DP PHY identifier
@@ -442,8 +435,6 @@ const char *drm_dp_phy_name(enum drm_dp_phy dp_phy)
 }
 EXPORT_SYMBOL(drm_dp_phy_name);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void drm_dp_lttpr_link_train_clock_recovery_delay(void)
 {
 	usleep_range(100, 200);
@@ -1651,11 +1642,7 @@ static int drm_dp_aux_reply_duration(const struct drm_dp_aux_msg *msg)
 
 /*
  * Calculate the length of the i2c transfer in usec, assuming
-<<<<<<< HEAD
  * the i2c bus speed is as specified. Gives the "worst"
-=======
- * the i2c bus speed is as specified. Gives the the "worst"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * case estimate, ie. successful while as long as possible.
  * Doesn't account the "MOT" bit, and instead assumes each
  * message includes a START, ADDRESS and STOP. Neither does it

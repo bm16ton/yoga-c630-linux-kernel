@@ -848,12 +848,8 @@ static int memac_accept_rx_pause_frames(struct fman_mac *memac, bool en)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int memac_modify_mac_address(struct fman_mac *memac,
 				    const enet_addr_t *enet_addr)
-=======
-int memac_modify_mac_address(struct fman_mac *memac, const enet_addr_t *enet_addr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (!is_init_done(memac->memac_drv_param))
 		return -EINVAL;

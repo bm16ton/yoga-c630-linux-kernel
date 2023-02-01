@@ -475,10 +475,7 @@ void slab_kmem_cache_release(struct kmem_cache *s)
 void kmem_cache_destroy(struct kmem_cache *s)
 {
 	int refcnt;
-<<<<<<< HEAD
 	bool rcu_set;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!s) || !kasan_check_byte(s))
 		return;
@@ -486,11 +483,8 @@ void kmem_cache_destroy(struct kmem_cache *s)
 	cpus_read_lock();
 	mutex_lock(&slab_mutex);
 
-<<<<<<< HEAD
 	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	refcnt = --s->refcount;
 	if (refcnt)
 		goto out_unlock;
@@ -501,11 +495,7 @@ void kmem_cache_destroy(struct kmem_cache *s)
 out_unlock:
 	mutex_unlock(&slab_mutex);
 	cpus_read_unlock();
-<<<<<<< HEAD
 	if (!refcnt && !rcu_set)
-=======
-	if (!refcnt && !(s->flags & SLAB_TYPESAFE_BY_RCU))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kmem_cache_release(s);
 }
 EXPORT_SYMBOL(kmem_cache_destroy);
@@ -744,7 +734,6 @@ struct kmem_cache *kmalloc_slab(size_t size, gfp_t flags)
 	return kmalloc_caches[kmalloc_type(flags)][index];
 }
 
-<<<<<<< HEAD
 size_t kmalloc_size_roundup(size_t size)
 {
 	struct kmem_cache *c;
@@ -765,8 +754,6 @@ size_t kmalloc_size_roundup(size_t size)
 }
 EXPORT_SYMBOL(kmalloc_size_roundup);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_ZONE_DMA
 #define KMALLOC_DMA_NAME(sz)	.name[KMALLOC_DMA] = "dma-kmalloc-" #sz,
 #else
@@ -790,13 +777,8 @@ EXPORT_SYMBOL(kmalloc_size_roundup);
 
 /*
  * kmalloc_info[] is to make slub_debug=,kmalloc-xx option work at boot time.
-<<<<<<< HEAD
  * kmalloc_index() supports up to 2^21=2MB, so the final entry of the table is
  * kmalloc-2M.
-=======
- * kmalloc_index() supports up to 2^25=32MB, so the final entry of the table is
- * kmalloc-32M.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 const struct kmalloc_info_struct kmalloc_info[] __initconst = {
 	INIT_KMALLOC_INFO(0, 0),
@@ -820,15 +802,7 @@ const struct kmalloc_info_struct kmalloc_info[] __initconst = {
 	INIT_KMALLOC_INFO(262144, 256k),
 	INIT_KMALLOC_INFO(524288, 512k),
 	INIT_KMALLOC_INFO(1048576, 1M),
-<<<<<<< HEAD
 	INIT_KMALLOC_INFO(2097152, 2M)
-=======
-	INIT_KMALLOC_INFO(2097152, 2M),
-	INIT_KMALLOC_INFO(4194304, 4M),
-	INIT_KMALLOC_INFO(8388608, 8M),
-	INIT_KMALLOC_INFO(16777216, 16M),
-	INIT_KMALLOC_INFO(33554432, 32M)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*
@@ -940,7 +914,6 @@ void __init create_kmalloc_caches(slab_flags_t flags)
 
 	/* Kmalloc array is now usable */
 	slab_state = UP;
-<<<<<<< HEAD
 }
 
 void free_large_kmalloc(struct folio *folio, void *object)
@@ -1065,8 +1038,6 @@ size_t __ksize(const void *object)
 	}
 
 	return slab_ksize(folio_slab(folio)->slab_cache);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void *kmalloc_trace(struct kmem_cache *s, gfp_t gfpflags, size_t size)
@@ -1149,15 +1120,10 @@ EXPORT_SYMBOL(kmalloc_large);
 
 void *kmalloc_large_node(size_t size, gfp_t flags, int node)
 {
-<<<<<<< HEAD
 	void *ret = __kmalloc_large_node(size, flags, node);
 
 	trace_kmalloc(_RET_IP_, ret, size, PAGE_SIZE << get_order(size),
 		      flags, node);
-=======
-	void *ret = kmalloc_order(size, flags, order);
-	trace_kmalloc(_RET_IP_, ret, NULL, size, PAGE_SIZE << order, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 EXPORT_SYMBOL(kmalloc_large_node);

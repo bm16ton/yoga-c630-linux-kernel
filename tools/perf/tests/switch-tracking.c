@@ -399,16 +399,10 @@ static int test__switch_tracking(struct test_suite *test __maybe_unused, int sub
 		goto out;
 	}
 
-<<<<<<< HEAD
 	switch_evsel = evlist__add_sched_switch(evlist, true);
 	if (IS_ERR(switch_evsel)) {
 		err = PTR_ERR(switch_evsel);
 		pr_debug("Failed to create event %s\n", sched_switch);
-=======
-	err = parse_event(evlist, sched_switch);
-	if (err) {
-		pr_debug("Failed to parse event %s\n", sched_switch);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_err;
 	}
 

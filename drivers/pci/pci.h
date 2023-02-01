@@ -583,15 +583,6 @@ static inline void pcie_set_ecrc_checking(struct pci_dev *dev) { }
 static inline void pcie_ecrc_get_policy(char *str) { }
 #endif
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_PCIE_PTM
-void pci_ptm_init(struct pci_dev *dev);
-#else
-static inline void pci_ptm_init(struct pci_dev *dev) { }
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct pci_dev_reset_methods {
 	u16 vendor;
 	u16 device;
@@ -785,7 +776,6 @@ static inline pci_power_t mid_pci_get_power_state(struct pci_dev *pdev)
 }
 #endif
 
-<<<<<<< HEAD
 /*
  * Config Address for PCI Configuration Mechanism #1
  *
@@ -831,6 +821,4 @@ static inline pci_power_t mid_pci_get_power_state(struct pci_dev *pdev)
 	(PCI_CONF1_ADDRESS(bus, dev, func, reg) | \
 	 PCI_CONF1_EXT_REG(reg))
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* DRIVERS_PCI_H */

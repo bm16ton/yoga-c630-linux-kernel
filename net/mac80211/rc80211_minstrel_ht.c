@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (C) 2010-2013 Felix Fietkau <nbd@openwrt.org>
-<<<<<<< HEAD
  * Copyright (C) 2019-2022 Intel Corporation
-=======
- * Copyright (C) 2019-2021 Intel Corporation
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #include <linux/netdevice.h>
 #include <linux/types.h>
@@ -1565,7 +1561,6 @@ minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi)
 	minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_tp_rate[0]);
 
 	/* Fill up remaining, keep one entry for max_probe_rate */
-<<<<<<< HEAD
 	for (; i < (max_rates - 1); i++)
 		minstrel_ht_set_rate(mp, mi, rates, i, mi->max_tp_rate[i]);
 
@@ -1577,18 +1572,6 @@ minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi)
 
 	mi->sta->deflink.agg.max_rc_amsdu_len = minstrel_ht_get_max_amsdu_len(mi);
 	ieee80211_sta_recalc_aggregates(mi->sta);
-=======
-	for (; i < (mp->hw->max_rates - 1); i++)
-		minstrel_ht_set_rate(mp, mi, rates, i, mi->max_tp_rate[i]);
-
-	if (i < mp->hw->max_rates)
-		minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_prob_rate);
-
-	if (i < IEEE80211_TX_RATE_TABLE_SIZE)
-		rates->rate[i].idx = -1;
-
-	mi->sta->max_rc_amsdu_len = minstrel_ht_get_max_amsdu_len(mi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rate_control_set_rates(mp->hw, mi->sta, rates);
 }
 

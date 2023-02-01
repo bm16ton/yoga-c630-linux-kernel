@@ -753,10 +753,7 @@ union apple_properties_protocol {
 typedef u32 efi_tcg2_event_log_format;
 
 #define INITRD_EVENT_TAG_ID 0x8F3B22ECU
-<<<<<<< HEAD
 #define LOAD_OPTIONS_EVENT_TAG_ID 0x8F3B22EDU
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define EV_EVENT_TAG 0x00000006U
 #define EFI_TCG2_EVENT_HEADER_VERSION	0x1
 

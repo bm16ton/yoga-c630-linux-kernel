@@ -620,11 +620,7 @@ static int nt35950_probe(struct mipi_dsi_device *dsi)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void nt35950_remove(struct mipi_dsi_device *dsi)
-=======
-static int nt35950_remove(struct mipi_dsi_device *dsi)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct nt35950 *nt = mipi_dsi_get_drvdata(dsi);
 	int ret;
@@ -643,11 +639,6 @@ static int nt35950_remove(struct mipi_dsi_device *dsi)
 	}
 
 	drm_panel_remove(&nt->panel);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct nt35950_panel_mode sharp_ls055d1sx04_modes[] = {

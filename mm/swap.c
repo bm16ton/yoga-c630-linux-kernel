@@ -366,11 +366,7 @@ static void folio_activate_drain(int cpu)
 		folio_batch_move_lru(fbatch, folio_activate_fn);
 }
 
-<<<<<<< HEAD
 void folio_activate(struct folio *folio)
-=======
-static void folio_activate(struct folio *folio)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (folio_test_lru(folio) && !folio_test_active(folio) &&
 	    !folio_test_unevictable(folio)) {
@@ -389,11 +385,7 @@ static inline void folio_activate_drain(int cpu)
 {
 }
 
-<<<<<<< HEAD
 void folio_activate(struct folio *folio)
-=======
-static void folio_activate(struct folio *folio)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct lruvec *lruvec;
 
@@ -434,7 +426,6 @@ static void __lru_cache_activate_folio(struct folio *folio)
 	}
 
 	local_unlock(&cpu_fbatches.lock);
-<<<<<<< HEAD
 }
 
 #ifdef CONFIG_LRU_GEN
@@ -468,8 +459,6 @@ static void folio_inc_refs(struct folio *folio)
 #else
 static void folio_inc_refs(struct folio *folio)
 {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif /* CONFIG_LRU_GEN */
 
@@ -485,14 +474,11 @@ static void folio_inc_refs(struct folio *folio)
  */
 void folio_mark_accessed(struct folio *folio)
 {
-<<<<<<< HEAD
 	if (lru_gen_enabled()) {
 		folio_inc_refs(folio);
 		return;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!folio_test_referenced(folio)) {
 		folio_set_referenced(folio);
 	} else if (folio_test_unevictable(folio)) {
@@ -537,14 +523,11 @@ void folio_add_lru(struct folio *folio)
 			folio_test_unevictable(folio), folio);
 	VM_BUG_ON_FOLIO(folio_test_lru(folio), folio);
 
-<<<<<<< HEAD
 	/* see the comment in lru_gen_add_folio() */
 	if (lru_gen_enabled() && !folio_test_unevictable(folio) &&
 	    lru_gen_in_fault() && !(current->flags & PF_MEMALLOC))
 		folio_set_active(folio);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	folio_get(folio);
 	local_lock(&cpu_fbatches.lock);
 	fbatch = this_cpu_ptr(&cpu_fbatches.lru_add);
@@ -563,21 +546,12 @@ EXPORT_SYMBOL(folio_add_lru);
  */
 void folio_add_lru_vma(struct folio *folio, struct vm_area_struct *vma)
 {
-<<<<<<< HEAD
 	VM_BUG_ON_FOLIO(folio_test_lru(folio), folio);
 
 	if (unlikely((vma->vm_flags & (VM_LOCKED | VM_SPECIAL)) == VM_LOCKED))
 		mlock_new_page(&folio->page);
 	else
 		folio_add_lru(folio);
-=======
-	VM_BUG_ON_PAGE(PageLRU(page), page);
-
-	if (unlikely((vma->vm_flags & (VM_LOCKED | VM_SPECIAL)) == VM_LOCKED))
-		mlock_new_page(page);
-	else
-		lru_cache_add(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -644,11 +618,7 @@ static void lru_deactivate_file_fn(struct lruvec *lruvec, struct folio *folio)
 
 static void lru_deactivate_fn(struct lruvec *lruvec, struct folio *folio)
 {
-<<<<<<< HEAD
 	if (!folio_test_unevictable(folio) && (folio_test_active(folio) || lru_gen_enabled())) {
-=======
-	if (folio_test_active(folio) && !folio_test_unevictable(folio)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		long nr_pages = folio_nr_pages(folio);
 
 		lruvec_del_folio(lruvec, folio);
@@ -761,13 +731,8 @@ void deactivate_page(struct page *page)
 {
 	struct folio *folio = page_folio(page);
 
-<<<<<<< HEAD
 	if (folio_test_lru(folio) && !folio_test_unevictable(folio) &&
 	    (folio_test_active(folio) || lru_gen_enabled())) {
-=======
-	if (folio_test_lru(folio) && folio_test_active(folio) &&
-	    !folio_test_unevictable(folio)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct folio_batch *fbatch;
 
 		folio_get(folio);
@@ -805,7 +770,6 @@ void mark_page_lazyfree(struct page *page)
 void lru_add_drain(void)
 {
 	local_lock(&cpu_fbatches.lock);
-<<<<<<< HEAD
 	lru_add_drain_cpu(smp_processor_id());
 	local_unlock(&cpu_fbatches.lock);
 	mlock_page_drain_local();
@@ -822,24 +786,6 @@ static void lru_add_and_bh_lrus_drain(void)
 	local_lock(&cpu_fbatches.lock);
 	lru_add_drain_cpu(smp_processor_id());
 	local_unlock(&cpu_fbatches.lock);
-=======
-	lru_add_drain_cpu(smp_processor_id());
-	local_unlock(&cpu_fbatches.lock);
-	mlock_page_drain_local();
-}
-
-/*
- * It's called from per-cpu workqueue context in SMP case so
- * lru_add_drain_cpu and invalidate_bh_lrus_cpu should run on
- * the same cpu. It shouldn't be a problem in !SMP case since
- * the core is only one and the locks will disable preemption.
- */
-static void lru_add_and_bh_lrus_drain(void)
-{
-	local_lock(&cpu_fbatches.lock);
-	lru_add_drain_cpu(smp_processor_id());
-	local_unlock(&cpu_fbatches.lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	invalidate_bh_lrus_cpu();
 	mlock_page_drain_local();
 }

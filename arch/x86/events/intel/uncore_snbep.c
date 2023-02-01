@@ -3804,7 +3804,6 @@ static const struct attribute_group *skx_iio_attr_update[] = {
 	NULL,
 };
 
-<<<<<<< HEAD
 static void pmu_clear_mapping_attr(const struct attribute_group **groups,
 				   struct attribute_group *ag)
 {
@@ -3820,8 +3819,6 @@ static void pmu_clear_mapping_attr(const struct attribute_group **groups,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int
 pmu_iio_set_mapping(struct intel_uncore_type *type, struct attribute_group *ag)
 {
@@ -4511,11 +4508,8 @@ static int sad_cfg_iio_topology(struct intel_uncore_type *type, u8 *sad_pmon_map
 		type->topology = NULL;
 	}
 
-<<<<<<< HEAD
 	pci_dev_put(dev);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -5165,14 +5159,11 @@ static int icx_iio_get_topology(struct intel_uncore_type *type)
 
 static int icx_iio_set_mapping(struct intel_uncore_type *type)
 {
-<<<<<<< HEAD
 	/* Detect ICX-D system. This case is not supported */
 	if (boot_cpu_data.x86_model == INTEL_FAM6_ICELAKE_D) {
 		pmu_clear_mapping_attr(type->attr_update, &icx_iio_mapping_group);
 		return -EPERM;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return pmu_iio_set_mapping(type, &icx_iio_mapping_group);
 }
 

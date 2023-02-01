@@ -684,7 +684,6 @@ static void clk_core_get_boundaries(struct clk_core *core,
 		*max_rate = min(*max_rate, clk_user->max_rate);
 }
 
-<<<<<<< HEAD
 /*
  * clk_hw_get_rate_range() - returns the clock rate range for a hw clk
  * @hw: the hw clk we want to get the range from
@@ -701,8 +700,6 @@ void clk_hw_get_rate_range(struct clk_hw *hw, unsigned long *min_rate,
 }
 EXPORT_SYMBOL_GPL(clk_hw_get_rate_range);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool clk_core_check_boundaries(struct clk_core *core,
 				      unsigned long min_rate,
 				      unsigned long max_rate)
@@ -1295,31 +1292,19 @@ static void clk_core_disable_unprepare(struct clk_core *core)
 	clk_core_unprepare_lock(core);
 }
 
-static void clk_unprepare_unused_subtree(struct clk_core *core,
-						struct device *dev)
+static void __init clk_unprepare_unused_subtree(struct clk_core *core)
 {
 	struct clk_core *child;
 
 	lockdep_assert_held(&prepare_lock);
 
 	hlist_for_each_entry(child, &core->children, child_node)
-		clk_unprepare_unused_subtree(child, dev);
-
-	if (dev && core->dev != dev)
-		return;
-
-	/*
-	 * clock will be unprepared on sync_state,
-	 * so leave as is on clk_disable_unused
-	 */
-	if (!dev && dev_has_sync_state(core->dev) &&
-		core->dev->driver->sync_state == clk_sync_state_disable_unused)
-		return;
+		clk_unprepare_unused_subtree(child);
 
 	if (core->prepare_count)
 		return;
 
-	if (!dev && core->flags & CLK_IGNORE_UNUSED)
+	if (core->flags & CLK_IGNORE_UNUSED)
 		return;
 
 	if (clk_pm_runtime_get(core))
@@ -1337,8 +1322,7 @@ static void clk_unprepare_unused_subtree(struct clk_core *core,
 	clk_pm_runtime_put(core);
 }
 
-static void clk_disable_unused_subtree(struct clk_core *core,
-					struct device *dev)
+static void __init clk_disable_unused_subtree(struct clk_core *core)
 {
 	struct clk_core *child;
 	unsigned long flags;
@@ -1346,18 +1330,7 @@ static void clk_disable_unused_subtree(struct clk_core *core,
 	lockdep_assert_held(&prepare_lock);
 
 	hlist_for_each_entry(child, &core->children, child_node)
-		clk_disable_unused_subtree(child, dev);
-
-	if (dev && core->dev != dev)
-		return;
-
-	/*
-	 * clock will be disabled on sync_state,
-	 * so leave as is on clk_disable_unused
-	 */
-	if (!dev && dev_has_sync_state(core->dev) &&
-		core->dev->driver->sync_state == clk_sync_state_disable_unused)
-		return;
+		clk_disable_unused_subtree(child);
 
 	if (core->flags & CLK_OPS_PARENT_ENABLE)
 		clk_core_prepare_enable(core->parent);
@@ -1370,7 +1343,7 @@ static void clk_disable_unused_subtree(struct clk_core *core,
 	if (core->enable_count)
 		goto unlock_out;
 
-	if (!dev && core->flags & CLK_IGNORE_UNUSED)
+	if (core->flags & CLK_IGNORE_UNUSED)
 		goto unlock_out;
 
 	/*
@@ -1403,45 +1376,34 @@ static int __init clk_ignore_unused_setup(char *__unused)
 }
 __setup("clk_ignore_unused", clk_ignore_unused_setup);
 
-static void __clk_disable_unused(struct device *dev)
+static int __init clk_disable_unused(void)
 {
 	struct clk_core *core;
 
-	clk_prepare_lock();
-
-	hlist_for_each_entry(core, &clk_root_list, child_node)
-		clk_disable_unused_subtree(core, dev);
-
-	hlist_for_each_entry(core, &clk_orphan_list, child_node)
-		clk_disable_unused_subtree(core, dev);
-
-	hlist_for_each_entry(core, &clk_root_list, child_node)
-		clk_unprepare_unused_subtree(core, dev);
-
-	hlist_for_each_entry(core, &clk_orphan_list, child_node)
-		clk_unprepare_unused_subtree(core, dev);
-
-	clk_prepare_unlock();
-}
-
-static int __init clk_disable_unused(void)
-{
 	if (clk_ignore_unused) {
 		pr_warn("clk: Not disabling unused clocks\n");
 		return 0;
 	}
 
-	__clk_disable_unused(NULL);
+	clk_prepare_lock();
+
+	hlist_for_each_entry(core, &clk_root_list, child_node)
+		clk_disable_unused_subtree(core);
+
+	hlist_for_each_entry(core, &clk_orphan_list, child_node)
+		clk_disable_unused_subtree(core);
+
+	hlist_for_each_entry(core, &clk_root_list, child_node)
+		clk_unprepare_unused_subtree(core);
+
+	hlist_for_each_entry(core, &clk_orphan_list, child_node)
+		clk_unprepare_unused_subtree(core);
+
+	clk_prepare_unlock();
 
 	return 0;
 }
 late_initcall_sync(clk_disable_unused);
-
-void clk_sync_state_disable_unused(struct device *dev)
-{
-	__clk_disable_unused(dev);
-}
-EXPORT_SYMBOL_GPL(clk_sync_state_disable_unused);
 
 static int clk_core_determine_round_nolock(struct clk_core *core,
 					   struct clk_rate_request *req)
@@ -1453,10 +1415,7 @@ static int clk_core_determine_round_nolock(struct clk_core *core,
 	if (!core)
 		return 0;
 
-	req->rate = clamp(req->rate, req->min_rate, req->max_rate);
-
 	/*
-<<<<<<< HEAD
 	 * Some clock providers hand-craft their clk_rate_requests and
 	 * might not fill min_rate and max_rate.
 	 *
@@ -1471,8 +1430,6 @@ static int clk_core_determine_round_nolock(struct clk_core *core,
 		req->rate = clamp(req->rate, req->min_rate, req->max_rate);
 
 	/*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * At this point, core protection will be disabled
 	 * - if the provider is not protected at all
 	 * - if the calling consumer is the only one which has exclusivity
@@ -2554,13 +2511,10 @@ static int clk_set_rate_range_nolock(struct clk *clk,
 		ret = -EINVAL;
 		goto out;
 	}
-<<<<<<< HEAD
 
 	rate = clk->core->req_rate;
 	if (clk->core->flags & CLK_GET_RATE_NOCACHE)
 		rate = clk_core_get_rate_recalc(clk->core);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Since the boundaries have been changed, let's give the
@@ -2579,11 +2533,7 @@ static int clk_set_rate_range_nolock(struct clk *clk,
 	 * - the determine_rate() callback does not really check for
 	 *   this corner case when determining the rate
 	 */
-<<<<<<< HEAD
 	rate = clamp(rate, min, max);
-=======
-	rate = clamp(clk->core->req_rate, min, max);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = clk_core_set_rate_nolock(clk->core, rate);
 	if (ret) {
 		/* rollback the changes */
@@ -3679,11 +3629,7 @@ static void clk_core_reparent_orphans_nolock(void)
 			__clk_set_parent_before(orphan, parent);
 			__clk_set_parent_after(orphan, parent, NULL);
 			__clk_recalc_accuracies(orphan);
-<<<<<<< HEAD
 			__clk_recalc_rates(orphan, true, 0);
-=======
-			__clk_recalc_rates(orphan, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			/*
 			 * __clk_init_parent() will set the initial req_rate to

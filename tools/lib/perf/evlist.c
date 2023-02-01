@@ -40,35 +40,22 @@ static void __perf_evlist__propagate_maps(struct perf_evlist *evlist,
 	 * We already have cpus for evsel (via PMU sysfs) so
 	 * keep it, if there's no target cpu list defined.
 	 */
-<<<<<<< HEAD
 	if (evsel->system_wide) {
 		perf_cpu_map__put(evsel->cpus);
 		evsel->cpus = perf_cpu_map__new(NULL);
 	} else if (!evsel->own_cpus || evlist->has_user_cpus ||
 		   (!evsel->requires_cpu && perf_cpu_map__empty(evlist->user_requested_cpus))) {
 		perf_cpu_map__put(evsel->cpus);
-=======
-	if (!evsel->own_cpus ||
-	    (!evsel->system_wide && evlist->has_user_cpus) ||
-	    (!evsel->system_wide &&
-	     !evsel->requires_cpu &&
-	     perf_cpu_map__empty(evlist->user_requested_cpus))) {
-		perf_cpu_map__put(evsel->cpus);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		evsel->cpus = perf_cpu_map__get(evlist->user_requested_cpus);
 	} else if (evsel->cpus != evsel->own_cpus) {
 		perf_cpu_map__put(evsel->cpus);
 		evsel->cpus = perf_cpu_map__get(evsel->own_cpus);
 	}
 
-<<<<<<< HEAD
 	if (evsel->system_wide) {
 		perf_thread_map__put(evsel->threads);
 		evsel->threads = perf_thread_map__new_dummy();
 	} else {
-=======
-	if (!evsel->system_wide) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		perf_thread_map__put(evsel->threads);
 		evsel->threads = perf_thread_map__get(evlist->threads);
 	}
@@ -80,13 +67,7 @@ static void perf_evlist__propagate_maps(struct perf_evlist *evlist)
 {
 	struct perf_evsel *evsel;
 
-<<<<<<< HEAD
 	evlist->needs_map_propagation = true;
-=======
-	/* Recomputing all_cpus, so start with a blank slate. */
-	perf_cpu_map__put(evlist->all_cpus);
-	evlist->all_cpus = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	perf_evlist__for_each_evsel(evlist, evsel)
 		__perf_evlist__propagate_maps(evlist, evsel);
@@ -506,10 +487,7 @@ mmap_per_evsel(struct perf_evlist *evlist, struct perf_evlist_mmap_ops *ops,
 			if (ops->idx)
 				ops->idx(evlist, evsel, mp, idx);
 
-<<<<<<< HEAD
 			/* Debug message used by test scripts */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pr_debug("idx %d: mmapping fd %d\n", idx, *output);
 			if (ops->mmap(map, mp, *output, evlist_cpu) < 0)
 				return -1;
@@ -519,10 +497,7 @@ mmap_per_evsel(struct perf_evlist *evlist, struct perf_evlist_mmap_ops *ops,
 			if (!idx)
 				perf_evlist__set_mmap_first(evlist, map, overwrite);
 		} else {
-<<<<<<< HEAD
 			/* Debug message used by test scripts */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pr_debug("idx %d: set output fd %d -> %d\n", idx, fd, *output);
 			if (ioctl(fd, PERF_EVENT_IOC_SET_OUTPUT, *output) != 0)
 				return -1;
@@ -557,17 +532,10 @@ mmap_per_thread(struct perf_evlist *evlist, struct perf_evlist_mmap_ops *ops,
 	int nr_cpus    = perf_cpu_map__nr(evlist->all_cpus);
 	int cpu, thread, idx = 0;
 	int nr_mmaps = 0;
-<<<<<<< HEAD
 
 	pr_debug("%s: nr cpu values (may include -1) %d nr threads %d\n",
 		 __func__, nr_cpus, nr_threads);
 
-=======
-
-	pr_debug("%s: nr cpu values (may include -1) %d nr threads %d\n",
-		 __func__, nr_cpus, nr_threads);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* per-thread mmaps */
 	for (thread = 0; thread < nr_threads; thread++, idx++) {
 		int output = -1;
@@ -577,21 +545,12 @@ mmap_per_thread(struct perf_evlist *evlist, struct perf_evlist_mmap_ops *ops,
 				   &output_overwrite, &nr_mmaps))
 			goto out_unmap;
 	}
-<<<<<<< HEAD
 
 	/* system-wide mmaps i.e. per-cpu */
 	for (cpu = 1; cpu < nr_cpus; cpu++, idx++) {
 		int output = -1;
 		int output_overwrite = -1;
 
-=======
-
-	/* system-wide mmaps i.e. per-cpu */
-	for (cpu = 1; cpu < nr_cpus; cpu++, idx++) {
-		int output = -1;
-		int output_overwrite = -1;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (mmap_per_evsel(evlist, ops, idx, mp, cpu, 0, &output,
 				   &output_overwrite, &nr_mmaps))
 			goto out_unmap;

@@ -16,10 +16,7 @@
 #include <linux/of_device.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
-<<<<<<< HEAD
 #include <linux/reset.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/videodev2.h>
 
 #include <media/rcar-fcp.h>
@@ -626,10 +623,7 @@ static int __maybe_unused vsp1_pm_runtime_suspend(struct device *dev)
 	struct vsp1_device *vsp1 = dev_get_drvdata(dev);
 
 	rcar_fcp_disable(vsp1->fcp);
-<<<<<<< HEAD
 	reset_control_assert(vsp1->rstc);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -639,7 +633,6 @@ static int __maybe_unused vsp1_pm_runtime_resume(struct device *dev)
 	struct vsp1_device *vsp1 = dev_get_drvdata(dev);
 	int ret;
 
-<<<<<<< HEAD
 	ret = reset_control_deassert(vsp1->rstc);
 	if (ret < 0)
 		return ret;
@@ -665,15 +658,6 @@ done:
 		reset_control_assert(vsp1->rstc);
 
 	return ret;
-=======
-	if (vsp1->info) {
-		ret = vsp1_device_init(vsp1);
-		if (ret < 0)
-			return ret;
-	}
-
-	return rcar_fcp_enable(vsp1->fcp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct dev_pm_ops vsp1_pm_ops = {
@@ -804,10 +788,7 @@ static const struct vsp1_device_info vsp1_device_infos[] = {
 	}, {
 		.version = VI6_IP_VERSION_MODEL_VSPD_V3,
 		.model = "VSP2-D",
-<<<<<<< HEAD
 		.soc = VI6_IP_VERSION_SOC_V3H,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.gen = 3,
 		.features = VSP1_HAS_BRS | VSP1_HAS_BRU,
 		.lif_count = 1,
@@ -816,7 +797,6 @@ static const struct vsp1_device_info vsp1_device_infos[] = {
 		.wpf_count = 1,
 		.num_bru_inputs = 5,
 	}, {
-<<<<<<< HEAD
 		.version = VI6_IP_VERSION_MODEL_VSPD_V3,
 		.model = "VSP2-D",
 		.soc = VI6_IP_VERSION_SOC_V3M,
@@ -828,8 +808,6 @@ static const struct vsp1_device_info vsp1_device_infos[] = {
 		.wpf_count = 1,
 		.num_bru_inputs = 5,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.version = VI6_IP_VERSION_MODEL_VSPDL_GEN3,
 		.model = "VSP2-DL",
 		.gen = 3,
@@ -852,7 +830,6 @@ static const struct vsp1_device_info vsp1_device_infos[] = {
 	},
 };
 
-<<<<<<< HEAD
 static const struct vsp1_device_info rzg2l_vsp2_device_info = {
 	.version = VI6_IP_VERSION_MODEL_VSPD_RZG2L,
 	.model = "VSP2-D",
@@ -898,16 +875,10 @@ static const struct vsp1_device_info *vsp1_lookup_info(struct vsp1_device *vsp1)
 	return NULL;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int vsp1_probe(struct platform_device *pdev)
 {
 	struct vsp1_device *vsp1;
 	struct device_node *fcp_node;
-<<<<<<< HEAD
-=======
-	unsigned int i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 	int irq;
 
@@ -930,14 +901,11 @@ static int vsp1_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
-<<<<<<< HEAD
 	vsp1->rstc = devm_reset_control_get_shared(&pdev->dev, NULL);
 	if (IS_ERR(vsp1->rstc))
 		return dev_err_probe(&pdev->dev, PTR_ERR(vsp1->rstc),
 				     "failed to get reset control\n");
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* FCP (optional). */
 	fcp_node = of_parse_phandle(pdev->dev.of_node, "renesas,fcp", 0);
 	if (fcp_node) {
@@ -966,24 +934,8 @@ static int vsp1_probe(struct platform_device *pdev)
 	if (ret < 0)
 		goto done;
 
-<<<<<<< HEAD
 	vsp1->info = vsp1_lookup_info(vsp1);
 	if (!vsp1->info) {
-=======
-	vsp1->version = vsp1_read(vsp1, VI6_IP_VERSION);
-
-	for (i = 0; i < ARRAY_SIZE(vsp1_device_infos); ++i) {
-		if ((vsp1->version & VI6_IP_VERSION_MODEL_MASK) ==
-		    vsp1_device_infos[i].version) {
-			vsp1->info = &vsp1_device_infos[i];
-			break;
-		}
-	}
-
-	if (!vsp1->info) {
-		dev_err(&pdev->dev, "unsupported IP version 0x%08x\n",
-			vsp1->version);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vsp1_device_put(vsp1);
 		ret = -ENXIO;
 		goto done;
@@ -1040,10 +992,7 @@ static int vsp1_remove(struct platform_device *pdev)
 static const struct of_device_id vsp1_of_match[] = {
 	{ .compatible = "renesas,vsp1" },
 	{ .compatible = "renesas,vsp2" },
-<<<<<<< HEAD
 	{ .compatible = "renesas,r9a07g044-vsp2", .data = &rzg2l_vsp2_device_info },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ },
 };
 MODULE_DEVICE_TABLE(of, vsp1_of_match);

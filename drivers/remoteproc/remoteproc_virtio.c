@@ -26,7 +26,6 @@
 
 #include "remoteproc_internal.h"
 
-<<<<<<< HEAD
 static int copy_dma_range_map(struct device *to, struct device *from)
 {
 	const struct bus_dma_region *map = from->dma_range_map, *new_map, *r;
@@ -53,11 +52,6 @@ static struct rproc_vdev *vdev_to_rvdev(struct virtio_device *vdev)
 	pdev = container_of(vdev->dev.parent, struct platform_device, dev);
 
 	return platform_get_drvdata(pdev);
-=======
-static struct rproc_vdev *vdev_to_rvdev(struct virtio_device *vdev)
-{
-	return container_of(vdev->dev.parent, struct rproc_vdev, dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static  struct rproc *vdev_to_rproc(struct virtio_device *vdev)

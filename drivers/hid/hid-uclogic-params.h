@@ -29,7 +29,6 @@ enum uclogic_params_pen_inrange {
 	UCLOGIC_PARAMS_PEN_INRANGE_NONE,
 };
 
-<<<<<<< HEAD
 /* Types of frames */
 enum uclogic_params_frame_type {
 	/* Frame with buttons */
@@ -40,8 +39,6 @@ enum uclogic_params_frame_type {
 	UCLOGIC_PARAMS_FRAME_MOUSE,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Pen report's subreport data.
  */

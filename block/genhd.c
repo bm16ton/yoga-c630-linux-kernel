@@ -356,11 +356,7 @@ void disk_uevent(struct gendisk *disk, enum kobject_action action)
 }
 EXPORT_SYMBOL_GPL(disk_uevent);
 
-<<<<<<< HEAD
 int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner)
-=======
-int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct block_device *bdev;
 
@@ -370,12 +366,9 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
 		return -EINVAL;
 	if (disk->open_partitions)
 		return -EBUSY;
-<<<<<<< HEAD
 	/* Someone else has bdev exclusively open? */
 	if (disk->part0->bd_holder && disk->part0->bd_holder != owner)
 		return -EBUSY;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	set_bit(GD_NEED_PART_SCAN, &disk->state);
 	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL);
@@ -420,16 +413,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
 	 * Otherwise just allocate the device numbers for both the whole device
 	 * and all partitions from the extended dev_t space.
 	 */
-<<<<<<< HEAD
 	ret = -EINVAL;
 	if (disk->major) {
 		if (WARN_ON(!disk->minors))
 			goto out_exit_elevator;
-=======
-	if (disk->major) {
-		if (WARN_ON(!disk->minors))
-			return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (disk->minors > DISK_MAX_PARTS) {
 			pr_err("block: can't allocate more than %d partitions\n",
@@ -437,7 +424,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
 			disk->minors = DISK_MAX_PARTS;
 		}
 		if (disk->first_minor + disk->minors > MINORMASK + 1)
-<<<<<<< HEAD
 			goto out_exit_elevator;
 	} else {
 		if (WARN_ON(disk->minors))
@@ -446,16 +432,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
 		ret = blk_alloc_ext_minor();
 		if (ret < 0)
 			goto out_exit_elevator;
-=======
-			return -EINVAL;
-	} else {
-		if (WARN_ON(disk->minors))
-			return -EINVAL;
-
-		ret = blk_alloc_ext_minor();
-		if (ret < 0)
-			return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		disk->major = BLOCK_EXT_MAJOR;
 		disk->first_minor = ret;
 	}
@@ -509,19 +485,11 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
 	ret = bd_register_pending_holders(disk);
 	if (ret < 0)
 		goto out_put_slave_dir;
-<<<<<<< HEAD
 
 	ret = blk_register_queue(disk);
 	if (ret)
 		goto out_put_slave_dir;
 
-=======
-
-	ret = blk_register_queue(disk);
-	if (ret)
-		goto out_put_slave_dir;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
 		ret = bdi_register(disk->bdi, "%u:%u",
 				   disk->major, disk->first_minor);
@@ -535,11 +503,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
 
 		bdev_add(disk->part0, ddev->devt);
 		if (get_capacity(disk))
-<<<<<<< HEAD
 			disk_scan_partitions(disk, FMODE_READ, NULL);
-=======
-			disk_scan_partitions(disk, FMODE_READ);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * Announce the disk and partitions after all partitions are
@@ -547,7 +511,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
 		 */
 		dev_set_uevent_suppress(ddev, 0);
 		disk_uevent(disk, KOBJ_ADD);
-<<<<<<< HEAD
 	} else {
 		/*
 		 * Even if the block_device for a hidden gendisk is not
@@ -555,8 +518,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
 		 * freeing of the dynamic major works.
 		 */
 		disk->part0->bd_dev = MKDEV(disk->major, disk->first_minor);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	disk_update_readahead(disk);
@@ -572,10 +533,7 @@ out_unregister_queue:
 	rq_qos_exit(disk->queue);
 out_put_slave_dir:
 	kobject_put(disk->slave_dir);
-<<<<<<< HEAD
 	disk->slave_dir = NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_put_holder_dir:
 	kobject_put(disk->part0->bd_holder_dir);
 out_del_integrity:
@@ -588,12 +546,9 @@ out_device_del:
 out_free_ext_minor:
 	if (disk->major == BLOCK_EXT_MAJOR)
 		blk_free_ext_minor(disk->first_minor);
-<<<<<<< HEAD
 out_exit_elevator:
 	if (disk->queue->elevator)
 		elevator_exit(disk->queue);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 EXPORT_SYMBOL(device_add_disk);
@@ -663,10 +618,6 @@ void del_gendisk(struct gendisk *disk)
 	 * Prevent new I/O from crossing bio_queue_enter().
 	 */
 	blk_queue_start_drain(q);
-<<<<<<< HEAD
-=======
-	blk_mq_freeze_queue_wait(q);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
@@ -691,13 +642,9 @@ void del_gendisk(struct gendisk *disk)
 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
 	device_del(disk_to_dev(disk));
 
-<<<<<<< HEAD
 	blk_mq_freeze_queue_wait(q);
 
 	blk_throtl_cancel_bios(disk);
-=======
-	blk_throtl_cancel_bios(disk->queue);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	blk_sync_queue(q);
 	blk_flush_integrity();
@@ -1221,12 +1168,8 @@ static void disk_release(struct device *dev)
 	    !test_bit(GD_ADDED, &disk->state))
 		blk_mq_exit_queue(disk->queue);
 
-<<<<<<< HEAD
 	blkcg_exit_disk(disk);
 
-=======
-	blkcg_exit_queue(disk->queue);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bioset_exit(&disk->bio_split);
 
 	disk_release_events(disk);
@@ -1439,11 +1382,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
 	if (xa_insert(&disk->part_tbl, 0, disk->part0, GFP_KERNEL))
 		goto out_destroy_part_tbl;
 
-<<<<<<< HEAD
 	if (blkcg_init_disk(disk))
-=======
-	if (blkcg_init_queue(q))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_erase_part0;
 
 	rand_initialize_disk(disk);

@@ -22,10 +22,7 @@
 #define SPSR_SS		(1 << 21)
 
 extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
-<<<<<<< HEAD
 extern unsigned char iter_ss_begin, iter_ss_end;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static volatile uint64_t sw_bp_addr, hw_bp_addr;
 static volatile uint64_t wp_addr, wp_data_addr;
 static volatile uint64_t svc_addr;
@@ -242,7 +239,6 @@ static void guest_svc_handler(struct ex_regs *regs)
 	svc_addr = regs->pc;
 }
 
-<<<<<<< HEAD
 enum single_step_op {
 	SINGLE_STEP_ENABLE = 0,
 	SINGLE_STEP_DISABLE = 1,
@@ -283,8 +279,6 @@ static void guest_code_ss(int test_cnt)
 	GUEST_DONE();
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int debug_version(struct kvm_vcpu *vcpu)
 {
 	uint64_t id_aa64dfr0;
@@ -293,11 +287,7 @@ static int debug_version(struct kvm_vcpu *vcpu)
 	return id_aa64dfr0 & 0xf;
 }
 
-<<<<<<< HEAD
 static void test_guest_debug_exceptions(void)
-=======
-int main(int argc, char *argv[])
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct kvm_vcpu *vcpu;
 	struct kvm_vm *vm;
@@ -310,12 +300,6 @@ int main(int argc, char *argv[])
 	vm_init_descriptor_tables(vm);
 	vcpu_init_descriptor_tables(vcpu);
 
-<<<<<<< HEAD
-=======
-	__TEST_REQUIRE(debug_version(vcpu) >= 6,
-		       "Armv8 debug architecture not supported.");
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
 				ESR_EC_BRK_INS, guest_sw_bp_handler);
 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
@@ -348,7 +332,6 @@ int main(int argc, char *argv[])
 
 done:
 	kvm_vm_free(vm);
-<<<<<<< HEAD
 }
 
 void test_single_step_from_userspace(int test_cnt)
@@ -452,7 +435,5 @@ int main(int argc, char *argv[])
 	test_guest_debug_exceptions();
 	test_single_step_from_userspace(ss_iteration);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }

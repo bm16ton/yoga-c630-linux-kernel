@@ -423,11 +423,6 @@ static void vbg_pci_remove(struct pci_dev *pci)
 	mutex_unlock(&vbg_gdev_mutex);
 
 	free_irq(pci->irq, gdev);
-<<<<<<< HEAD
-=======
-	device_remove_file(gdev->dev, &dev_attr_host_features);
-	device_remove_file(gdev->dev, &dev_attr_host_version);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	misc_deregister(&gdev->misc_device_user);
 	misc_deregister(&gdev->misc_device);
 	vbg_core_exit(gdev);

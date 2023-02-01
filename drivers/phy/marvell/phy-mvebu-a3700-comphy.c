@@ -274,10 +274,6 @@ struct mvebu_a3700_comphy_lane {
 	int submode;
 	bool invert_tx;
 	bool invert_rx;
-<<<<<<< HEAD
-=======
-	bool needs_reset;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct gbe_phy_init_data_fix {
@@ -372,21 +368,12 @@ static u16 gbe_phy_init[512] = {
 static inline void comphy_reg_set(void __iomem *addr, u32 data, u32 mask)
 {
 	u32 val;
-<<<<<<< HEAD
 
 	val = readl(addr);
 	val = (val & ~mask) | (data & mask);
 	writel(val, addr);
 }
 
-=======
-
-	val = readl(addr);
-	val = (val & ~mask) | (data & mask);
-	writel(val, addr);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void comphy_reg_set16(void __iomem *addr, u16 data, u16 mask)
 {
 	u16 val;
@@ -839,12 +826,9 @@ mvebu_a3700_comphy_usb3_power_on(struct mvebu_a3700_comphy_lane *lane)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	/* COMPHY register reset (cleared automatically) */
 	comphy_lane_reg_set(lane, COMPHY_SFT_RESET, SFT_RST, SFT_RST);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * 0. Set PHY OTG Control(0x5d034), bit 4, Power up OTG module The
 	 * register belong to UTMI module, so it is set in UTMI phy driver.
@@ -1113,7 +1097,6 @@ mvebu_a3700_comphy_pcie_power_off(struct mvebu_a3700_comphy_lane *lane)
 	/* Power off PLL, Tx, Rx */
 	comphy_lane_reg_set(lane, COMPHY_POWER_PLL_CTRL,
 			    0x0, PU_PLL_BIT | PU_RX_BIT | PU_TX_BIT);
-<<<<<<< HEAD
 }
 
 static void mvebu_a3700_comphy_usb3_power_off(struct mvebu_a3700_comphy_lane *lane)
@@ -1124,46 +1107,6 @@ static void mvebu_a3700_comphy_usb3_power_off(struct mvebu_a3700_comphy_lane *la
 	 */
 }
 
-=======
-}
-
-static int mvebu_a3700_comphy_reset(struct phy *phy)
-{
-	struct mvebu_a3700_comphy_lane *lane = phy_get_drvdata(phy);
-	u16 mask, data;
-
-	dev_dbg(lane->dev, "resetting lane %d\n", lane->id);
-
-	/* COMPHY reset for internal logic */
-	comphy_lane_reg_set(lane, COMPHY_SFT_RESET,
-			    SFT_RST_NO_REG, SFT_RST_NO_REG);
-
-	/* COMPHY register reset (cleared automatically) */
-	comphy_lane_reg_set(lane, COMPHY_SFT_RESET, SFT_RST, SFT_RST);
-
-	/* PIPE soft and register reset */
-	data = PIPE_SOFT_RESET | PIPE_REG_RESET;
-	mask = data;
-	comphy_lane_reg_set(lane, COMPHY_PIPE_RST_CLK_CTRL, data, mask);
-
-	/* Release PIPE register reset */
-	comphy_lane_reg_set(lane, COMPHY_PIPE_RST_CLK_CTRL,
-			    0x0, PIPE_REG_RESET);
-
-	/* Reset SB configuration register (only for lanes 0 and 1) */
-	if (lane->id == 0 || lane->id == 1) {
-		u32 mask, data;
-
-		data = PIN_RESET_CORE_BIT | PIN_RESET_COMPHY_BIT |
-		       PIN_PU_PLL_BIT | PIN_PU_RX_BIT | PIN_PU_TX_BIT;
-		mask = data | PIN_PU_IVREF_BIT | PIN_TX_IDLE_BIT;
-		comphy_periph_reg_set(lane, COMPHY_PHY_CFG1, data, mask);
-	}
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool mvebu_a3700_comphy_check_mode(int lane,
 					  enum phy_mode mode,
 					  int submode)
@@ -1202,13 +1145,6 @@ static int mvebu_a3700_comphy_set_mode(struct phy *phy, enum phy_mode mode,
 	    (lane->mode != mode || lane->submode != submode))
 		return -EBUSY;
 
-<<<<<<< HEAD
-=======
-	/* If changing mode, ensure reset is called */
-	if (lane->mode != PHY_MODE_INVALID && lane->mode != mode)
-		lane->needs_reset = true;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Just remember the mode, ->power_on() will do the real setup */
 	lane->mode = mode;
 	lane->submode = submode;
@@ -1219,26 +1155,11 @@ static int mvebu_a3700_comphy_set_mode(struct phy *phy, enum phy_mode mode,
 static int mvebu_a3700_comphy_power_on(struct phy *phy)
 {
 	struct mvebu_a3700_comphy_lane *lane = phy_get_drvdata(phy);
-<<<<<<< HEAD
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!mvebu_a3700_comphy_check_mode(lane->id, lane->mode,
 					   lane->submode)) {
 		dev_err(lane->dev, "invalid COMPHY mode\n");
 		return -EINVAL;
-<<<<<<< HEAD
-=======
-	}
-
-	if (lane->needs_reset) {
-		ret = mvebu_a3700_comphy_reset(phy);
-		if (ret)
-			return ret;
-
-		lane->needs_reset = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	switch (lane->mode) {
@@ -1264,7 +1185,6 @@ static int mvebu_a3700_comphy_power_off(struct phy *phy)
 {
 	struct mvebu_a3700_comphy_lane *lane = phy_get_drvdata(phy);
 
-<<<<<<< HEAD
 	switch (lane->id) {
 	case 0:
 		mvebu_a3700_comphy_usb3_power_off(lane);
@@ -1278,43 +1198,15 @@ static int mvebu_a3700_comphy_power_off(struct phy *phy)
 		mvebu_a3700_comphy_usb3_power_off(lane);
 		mvebu_a3700_comphy_sata_power_off(lane);
 		return 0;
-=======
-	switch (lane->mode) {
-	case PHY_MODE_USB_HOST_SS:
-		/*
-		 * The USB3 MAC sets the USB3 PHY to low state, so we do not
-		 * need to power off USB3 PHY again.
-		 */
-		break;
-
-	case PHY_MODE_SATA:
-		mvebu_a3700_comphy_sata_power_off(lane);
-		break;
-
-	case PHY_MODE_ETHERNET:
-		mvebu_a3700_comphy_ethernet_power_off(lane);
-		break;
-
-	case PHY_MODE_PCIE:
-		mvebu_a3700_comphy_pcie_power_off(lane);
-		break;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		dev_err(lane->dev, "invalid COMPHY mode\n");
 		return -EINVAL;
 	}
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct phy_ops mvebu_a3700_comphy_ops = {
 	.power_on	= mvebu_a3700_comphy_power_on,
 	.power_off	= mvebu_a3700_comphy_power_off,
-	.reset		= mvebu_a3700_comphy_reset,
 	.set_mode	= mvebu_a3700_comphy_set_mode,
 	.owner		= THIS_MODULE,
 };
@@ -1452,12 +1344,7 @@ static int mvebu_a3700_comphy_probe(struct platform_device *pdev)
 		 * To avoid relying on the bootloader/firmware configuration,
 		 * power off all comphys.
 		 */
-<<<<<<< HEAD
 		mvebu_a3700_comphy_power_off(phy);
-=======
-		mvebu_a3700_comphy_reset(phy);
-		lane->needs_reset = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	provider = devm_of_phy_provider_register(&pdev->dev,

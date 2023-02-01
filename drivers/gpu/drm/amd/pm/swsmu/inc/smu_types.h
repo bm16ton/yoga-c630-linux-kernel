@@ -235,7 +235,6 @@
 	__SMU_DUMMY_MAP(UnforceGfxVid),           \
 	__SMU_DUMMY_MAP(HeavySBR),			\
 	__SMU_DUMMY_MAP(SetBadHBMPagesRetiredFlagsPerChannel), \
-<<<<<<< HEAD
 	__SMU_DUMMY_MAP(EnableGfxImu), \
 	__SMU_DUMMY_MAP(DriverMode2Reset), \
 	__SMU_DUMMY_MAP(GetGfxOffStatus),		 \
@@ -244,9 +243,6 @@
 	__SMU_DUMMY_MAP(SetNumBadMemoryPagesRetired),		\
 	__SMU_DUMMY_MAP(SetBadMemoryPagesRetiredFlagsPerChannel), \
 	__SMU_DUMMY_MAP(AllowGpo),
-=======
-	__SMU_DUMMY_MAP(EnableGfxImu),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #undef __SMU_DUMMY_MAP
 #define __SMU_DUMMY_MAP(type)	SMU_MSG_##type

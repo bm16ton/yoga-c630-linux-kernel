@@ -197,11 +197,7 @@ struct ip_set_region {
 };
 
 /* Max range where every element is added/deleted in one step */
-<<<<<<< HEAD
 #define IPSET_MAX_RANGE		(1<<14)
-=======
-#define IPSET_MAX_RANGE		(1<<20)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* The max revision number supported by any set type + 1 */
 #define IPSET_REVISION_MAX	9

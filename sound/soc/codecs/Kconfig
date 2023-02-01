@@ -692,12 +692,9 @@ config SND_SOC_CS35L45_I2C
 	  Enable support for Cirrus Logic CS35L45 smart speaker amplifier
 	  with I2C control.
 
-<<<<<<< HEAD
 config SND_SOC_CS42L42_CORE
 	tristate
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config SND_SOC_CS42L42
 	tristate "Cirrus Logic CS42L42 CODEC (I2C)"
 	depends on I2C
@@ -1213,12 +1210,7 @@ config SND_SOC_RK3328
 
 config SND_SOC_RK817
 	tristate "Rockchip RK817 audio CODEC"
-<<<<<<< HEAD
 	depends on MFD_RK808 || COMPILE_TEST
-=======
-	depends on MFD_RK808
-	select REGMAP_I2C
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config SND_SOC_RL6231
 	tristate
@@ -1765,15 +1757,10 @@ config SND_SOC_WCD_MBHC
 config SND_SOC_WCD934X
 	tristate "WCD9340/WCD9341 Codec"
 	depends on COMMON_CLK
-<<<<<<< HEAD
 	depends on SLIMBUS
 	select REGMAP_SLIMBUS
 	select SND_SOC_WCD_MBHC
 	depends on MFD_WCD934X || COMPILE_TEST
-=======
-	select SND_SOC_WCD_MBHC
-	depends on MFD_WCD934X
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  The WCD9340/9341 is a audio codec IC Integrated in
 	  Qualcomm SoCs like SDM845.

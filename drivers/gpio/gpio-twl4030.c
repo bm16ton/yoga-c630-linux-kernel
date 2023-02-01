@@ -600,21 +600,6 @@ out:
 	return ret;
 }
 
-<<<<<<< HEAD
-=======
-/* Cannot use as gpio_twl4030_probe() calls us */
-static int gpio_twl4030_remove(struct platform_device *pdev)
-{
-	struct gpio_twl4030_priv *priv = platform_get_drvdata(pdev);
-
-	gpiochip_remove(&priv->gpio_chip);
-
-	/* REVISIT no support yet for deregistering all the IRQs */
-	WARN_ON(!is_module());
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct of_device_id twl_gpio_match[] = {
 	{ .compatible = "ti,twl4030-gpio", },
 	{ },

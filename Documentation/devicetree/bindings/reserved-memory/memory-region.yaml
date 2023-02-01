@@ -4,11 +4,7 @@
 $id: http://devicetree.org/schemas/reserved-memory/memory-region.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-<<<<<<< HEAD
 title: Reserved Memory Region
-=======
-title: Reserved Memory Region Device Tree Binding
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 maintainers:
   - devicetree-spec@vger.kernel.org

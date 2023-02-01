@@ -323,11 +323,8 @@ struct mt76_wcid {
 
 	struct list_head list;
 	struct idr pktid;
-<<<<<<< HEAD
 
 	struct mt76_sta_stats stats;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct mt76_txq {
@@ -844,29 +841,6 @@ struct mt76_power_limits {
 	s8 ru[7][12];
 };
 
-<<<<<<< HEAD
-=======
-enum mt76_phy_type {
-	MT_PHY_TYPE_CCK,
-	MT_PHY_TYPE_OFDM,
-	MT_PHY_TYPE_HT,
-	MT_PHY_TYPE_HT_GF,
-	MT_PHY_TYPE_VHT,
-	MT_PHY_TYPE_HE_SU = 8,
-	MT_PHY_TYPE_HE_EXT_SU,
-	MT_PHY_TYPE_HE_TB,
-	MT_PHY_TYPE_HE_MU,
-	__MT_PHY_TYPE_HE_MAX,
-};
-
-struct mt76_sta_stats {
-	u64 tx_mode[__MT_PHY_TYPE_HE_MAX];
-	u64 tx_bw[4];		/* 20, 40, 80, 160 */
-	u64 tx_nss[4];		/* 1, 2, 3, 4 */
-	u64 tx_mcs[16];		/* mcs idx */
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct mt76_ethtool_worker_info {
 	u64 *data;
 	int idx;

@@ -168,11 +168,7 @@ static void aggr_printout(struct perf_stat_config *config,
 					id.socket,
 					id.die,
 					id.core);
-<<<<<<< HEAD
 			} else if (id.cpu.cpu > -1) {
-=======
-			} else if (id.core > -1) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				fprintf(config->output, "\"cpu\" : \"%d\", ",
 					id.cpu.cpu);
 			}
@@ -183,11 +179,7 @@ static void aggr_printout(struct perf_stat_config *config,
 					id.die,
 					config->csv_output ? 0 : -3,
 					id.core, config->csv_sep);
-<<<<<<< HEAD
 			} else if (id.cpu.cpu > -1) {
-=======
-			} else if (id.core > -1) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				fprintf(config->output, "CPU%*d%s",
 					config->csv_output ? 0 : -7,
 					id.cpu.cpu, config->csv_sep);
@@ -197,7 +189,6 @@ static void aggr_printout(struct perf_stat_config *config,
 	case AGGR_THREAD:
 		if (config->json_output) {
 			fprintf(config->output, "\"thread\" : \"%s-%d\", ",
-<<<<<<< HEAD
 				perf_thread_map__comm(evsel->core.threads, id.thread_idx),
 				perf_thread_map__pid(evsel->core.threads, id.thread_idx));
 		} else {
@@ -206,16 +197,6 @@ static void aggr_printout(struct perf_stat_config *config,
 				perf_thread_map__comm(evsel->core.threads, id.thread_idx),
 				config->csv_output ? 0 : -8,
 				perf_thread_map__pid(evsel->core.threads, id.thread_idx),
-=======
-				perf_thread_map__comm(evsel->core.threads, id.thread),
-				perf_thread_map__pid(evsel->core.threads, id.thread));
-		} else {
-			fprintf(config->output, "%*s-%*d%s",
-				config->csv_output ? 0 : 16,
-				perf_thread_map__comm(evsel->core.threads, id.thread),
-				config->csv_output ? 0 : -8,
-				perf_thread_map__pid(evsel->core.threads, id.thread),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				config->csv_sep);
 		}
 		break;
@@ -461,11 +442,7 @@ static void print_metric_header(struct perf_stat_config *config,
 		fprintf(os->fh, "%*s ", config->metric_only_len, unit);
 }
 
-<<<<<<< HEAD
 static int first_shadow_map_idx(struct perf_stat_config *config,
-=======
-static int first_shadow_cpu_map_idx(struct perf_stat_config *config,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				struct evsel *evsel, const struct aggr_cpu_id *id)
 {
 	struct perf_cpu_map *cpus = evsel__cpus(evsel);
@@ -474,12 +451,9 @@ static int first_shadow_cpu_map_idx(struct perf_stat_config *config,
 
 	if (config->aggr_mode == AGGR_NONE)
 		return perf_cpu_map__idx(cpus, id->cpu);
-<<<<<<< HEAD
 
 	if (config->aggr_mode == AGGR_THREAD)
 		return id->thread_idx;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!config->aggr_get_id)
 		return 0;
@@ -675,11 +649,7 @@ static void printout(struct perf_stat_config *config, struct aggr_cpu_id id, int
 	}
 
 	perf_stat__print_shadow_stats(config, counter, uval,
-<<<<<<< HEAD
 				first_shadow_map_idx(config, counter, &id),
-=======
-				first_shadow_cpu_map_idx(config, counter, &id),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				&out, &config->metric_events, st);
 	if (!config->csv_output && !config->metric_only && !config->json_output) {
 		print_noise(config, counter, noise);
@@ -709,11 +679,7 @@ static void aggr_update_shadow(struct perf_stat_config *config,
 				val += perf_counts(counter->counts, idx, 0)->val;
 			}
 			perf_stat__update_shadow_stats(counter, val,
-<<<<<<< HEAD
 					first_shadow_map_idx(config, counter, &id),
-=======
-					first_shadow_cpu_map_idx(config, counter, &id),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					&rt_stat);
 		}
 	}
@@ -738,11 +704,7 @@ static void uniquify_event_name(struct evsel *counter)
 			counter->name = new_name;
 		}
 	} else {
-<<<<<<< HEAD
 		if (evsel__is_hybrid(counter)) {
-=======
-		if (perf_pmu__has_hybrid()) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = asprintf(&new_name, "%s/%s/",
 				       counter->pmu_name, counter->name);
 		} else {
@@ -782,7 +744,6 @@ static void collect_all_aliases(struct perf_stat_config *config, struct evsel *c
 	}
 }
 
-<<<<<<< HEAD
 static bool hybrid_merge(struct evsel *counter, struct perf_stat_config *config,
 			 bool check)
 {
@@ -791,28 +752,6 @@ static bool hybrid_merge(struct evsel *counter, struct perf_stat_config *config,
 			return config->hybrid_merge;
 		else
 			return !config->hybrid_merge;
-=======
-static bool is_uncore(struct evsel *evsel)
-{
-	struct perf_pmu *pmu = evsel__find_pmu(evsel);
-
-	return pmu && pmu->is_uncore;
-}
-
-static bool hybrid_uniquify(struct evsel *evsel)
-{
-	return perf_pmu__has_hybrid() && !is_uncore(evsel);
-}
-
-static bool hybrid_merge(struct evsel *counter, struct perf_stat_config *config,
-			 bool check)
-{
-	if (hybrid_uniquify(counter)) {
-		if (check)
-			return config && config->hybrid_merge;
-		else
-			return config && !config->hybrid_merge;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return false;
@@ -995,11 +934,7 @@ static struct perf_aggr_thread_value *sort_aggr_thread(
 
 		buf[i].counter = counter;
 		buf[i].id = aggr_cpu_id__empty();
-<<<<<<< HEAD
 		buf[i].id.thread_idx = thread;
-=======
-		buf[i].id.thread = thread;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		buf[i].uval = uval;
 		buf[i].val = val;
 		buf[i].run = run;
@@ -1199,15 +1134,12 @@ static void print_metric_headers(struct perf_stat_config *config,
 	struct outstate os = {
 		.fh = config->output
 	};
-<<<<<<< HEAD
 	struct perf_stat_output_ctx out = {
 		.ctx = &os,
 		.print_metric = print_metric_header,
 		.new_line = new_line_metric,
 		.force_header = true,
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool first = true;
 
 		if (config->json_output && !config->interval)
@@ -1231,21 +1163,11 @@ static void print_metric_headers(struct perf_stat_config *config,
 	/* Print metrics headers only */
 	evlist__for_each_entry(evlist, counter) {
 		os.evsel = counter;
-<<<<<<< HEAD
 
 		if (!first && config->json_output)
 			fprintf(config->output, ", ");
 		first = false;
 
-=======
-		out.ctx = &os;
-		out.print_metric = print_metric_header;
-		if (!first && config->json_output)
-			fprintf(config->output, ", ");
-		first = false;
-		out.new_line = new_line_metric;
-		out.force_header = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		perf_stat__print_shadow_stats(config, counter, 0,
 					      0,
 					      &out,

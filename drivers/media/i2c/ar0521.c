@@ -406,10 +406,6 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 			  struct v4l2_subdev_format *format)
 {
 	struct ar0521_dev *sensor = to_ar0521_dev(sd);
-<<<<<<< HEAD
-=======
-	int ret = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ar0521_adj_fmt(&format->format);
 
@@ -426,11 +422,7 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 	}
 
 	mutex_unlock(&sensor->lock);
-<<<<<<< HEAD
 	return 0;
-=======
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ar0521_s_ctrl(struct v4l2_ctrl *ctrl)
@@ -1027,11 +1019,7 @@ entity_cleanup:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void ar0521_remove(struct i2c_client *client)
-=======
-static int ar0521_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct ar0521_dev *sensor = to_ar0521_dev(sd);
@@ -1044,10 +1032,6 @@ static int ar0521_remove(struct i2c_client *client)
 		ar0521_power_off(&client->dev);
 	pm_runtime_set_suspended(&client->dev);
 	mutex_destroy(&sensor->lock);
-<<<<<<< HEAD
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct dev_pm_ops ar0521_pm_ops = {

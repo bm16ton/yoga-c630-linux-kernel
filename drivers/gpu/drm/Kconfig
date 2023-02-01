@@ -85,22 +85,6 @@ config DRM_KUNIT_TEST
 
 	  If in doubt, say "N".
 
-config DRM_KUNIT_TEST
-	tristate "KUnit tests for DRM" if !KUNIT_ALL_TESTS
-	depends on DRM && KUNIT=y
-	select DRM_KMS_HELPER
-	default KUNIT_ALL_TESTS
-	help
-	  This builds unit tests for DRM. This option is not useful for
-	  distributions or general kernels, but only for kernel
-	  developers working on DRM and associated drivers.
-
-	  For more information on KUnit and unit tests in general,
-	  please refer to the KUnit documentation in
-	  Documentation/dev-tools/kunit/.
-
-	  If in doubt, say "N".
-
 config DRM_KMS_HELPER
 	tristate
 	depends on DRM
@@ -229,19 +213,11 @@ config DRM_TTM_HELPER
 	help
 	  Helpers for ttm-based gem objects
 
-<<<<<<< HEAD
 config DRM_GEM_DMA_HELPER
 	tristate
 	depends on DRM
 	help
 	  Choose this if you need the GEM DMA helper functions
-=======
-config DRM_GEM_CMA_HELPER
-	tristate
-	depends on DRM
-	help
-	  Choose this if you need the GEM CMA helper functions
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config DRM_GEM_SHMEM_HELPER
 	tristate
@@ -303,7 +279,6 @@ config DRM_AMDGPU
 	select BACKLIGHT_CLASS_DEVICE
 	select INTERVAL_TREE
 	select DRM_BUDDY
-<<<<<<< HEAD
 	# amdgpu depends on ACPI_VIDEO when ACPI is enabled, for select to work
 	# ACPI_VIDEO's dependencies must also be selected.
 	select INPUT if ACPI
@@ -311,8 +286,6 @@ config DRM_AMDGPU
 	# On x86 ACPI_VIDEO also needs ACPI_WMI
 	select X86_PLATFORM_DEVICES if ACPI && X86
 	select ACPI_WMI if ACPI && X86
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Choose this option if you have a recent AMD Radeon graphics card.
 

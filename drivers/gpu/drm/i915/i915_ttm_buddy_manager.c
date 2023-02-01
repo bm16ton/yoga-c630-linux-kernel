@@ -173,7 +173,6 @@ static void i915_ttm_buddy_man_free(struct ttm_resource_manager *man,
 	kfree(bman_res);
 }
 
-<<<<<<< HEAD
 static bool i915_ttm_buddy_man_intersects(struct ttm_resource_manager *man,
 					  struct ttm_resource *res,
 					  const struct ttm_place *place,
@@ -245,8 +244,6 @@ static bool i915_ttm_buddy_man_compatible(struct ttm_resource_manager *man,
 	return true;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void i915_ttm_buddy_man_debug(struct ttm_resource_manager *man,
 				     struct drm_printer *printer)
 {
@@ -274,11 +271,8 @@ static void i915_ttm_buddy_man_debug(struct ttm_resource_manager *man,
 static const struct ttm_resource_manager_func i915_ttm_buddy_manager_func = {
 	.alloc = i915_ttm_buddy_man_alloc,
 	.free = i915_ttm_buddy_man_free,
-<<<<<<< HEAD
 	.intersects = i915_ttm_buddy_man_intersects,
 	.compatible = i915_ttm_buddy_man_compatible,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.debug = i915_ttm_buddy_man_debug,
 };
 

@@ -1076,11 +1076,7 @@ iwl_op_mode_mvm_start(struct iwl_trans *trans, const struct iwl_cfg *cfg,
 	static const u8 no_reclaim_cmds[] = {
 		TX_CMD,
 	};
-<<<<<<< HEAD
 	size_t scan_size;
-=======
-	int scan_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 min_backoff;
 	struct iwl_mvm_csme_conn_info *csme_conn_info __maybe_unused;
 
@@ -1379,11 +1375,7 @@ void iwl_mvm_stop_device(struct iwl_mvm *mvm)
 	iwl_trans_stop_device(mvm->trans);
 	iwl_free_fw_paging(&mvm->fwrt);
 	iwl_fw_dump_conf_clear(&mvm->fwrt);
-<<<<<<< HEAD
 	iwl_mvm_mei_device_state(mvm, false);
-=======
-	iwl_mvm_mei_device_down(mvm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void iwl_op_mode_mvm_stop(struct iwl_op_mode *op_mode)

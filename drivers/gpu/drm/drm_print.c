@@ -23,11 +23,6 @@
  * Rob Clark <robdclark@gmail.com>
  */
 
-<<<<<<< HEAD
-=======
-#define DEBUG /* for pr_debug() */
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/stdarg.h>
 
 #include <linux/io.h>

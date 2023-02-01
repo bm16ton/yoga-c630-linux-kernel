@@ -253,10 +253,6 @@ static inline int kunit_run_all_tests(void)
 #endif /* IS_BUILTIN(CONFIG_KUNIT) */
 
 #define __kunit_test_suites(unique_array, ...)				       \
-<<<<<<< HEAD
-=======
-	MODULE_INFO(test, "Y");						       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	static struct kunit_suite *unique_array[]			       \
 	__aligned(sizeof(struct kunit_suite *))				       \
 	__used __section(".kunit_test_suites") = { __VA_ARGS__ }
@@ -477,7 +473,6 @@ void kunit_do_failed_assertion(struct kunit *test,
 			       const struct kunit_loc *loc,
 			       enum kunit_assert_type type,
 			       const struct kunit_assert *assert,
-<<<<<<< HEAD
 			       assert_format_t assert_format,
 			       const char *fmt, ...);
 
@@ -491,26 +486,10 @@ void kunit_do_failed_assertion(struct kunit *test,
 				  assert_format,			       \
 				  fmt,					       \
 				  ##__VA_ARGS__);			       \
-=======
-			       const char *fmt, ...);
-
-#define KUNIT_ASSERTION(test, assert_type, pass, assert_class, INITIALIZER, fmt, ...) do { \
-	if (unlikely(!(pass))) {					       \
-		static const struct kunit_loc __loc = KUNIT_CURRENT_LOC;       \
-		struct assert_class __assertion = INITIALIZER;		       \
-		kunit_do_failed_assertion(test,				       \
-					  &__loc,			       \
-					  assert_type,			       \
-					  &__assertion.assert,		       \
-					  fmt,				       \
-					  ##__VA_ARGS__);		       \
-	}								       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } while (0)
 
 
 #define KUNIT_FAIL_ASSERTION(test, assert_type, fmt, ...)		       \
-<<<<<<< HEAD
 	_KUNIT_FAILED(test,						       \
 		      assert_type,					       \
 		      kunit_fail_assert,				       \
@@ -518,15 +497,6 @@ void kunit_do_failed_assertion(struct kunit *test,
 		      {},						       \
 		      fmt,						       \
 		      ##__VA_ARGS__)
-=======
-	KUNIT_ASSERTION(test,						       \
-			assert_type,					       \
-			false,						       \
-			kunit_fail_assert,				       \
-			KUNIT_INIT_FAIL_ASSERT_STRUCT,			       \
-			fmt,						       \
-			##__VA_ARGS__)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * KUNIT_FAIL() - Always causes a test to fail when evaluated.
@@ -551,7 +521,6 @@ void kunit_do_failed_assertion(struct kunit *test,
 			      expected_true,				       \
 			      fmt,					       \
 			      ...)					       \
-<<<<<<< HEAD
 do {									       \
 	if (likely(!!(condition) == !!expected_true))			       \
 		break;							       \
@@ -565,16 +534,6 @@ do {									       \
 		      fmt,						       \
 		      ##__VA_ARGS__);					       \
 } while (0)
-=======
-	KUNIT_ASSERTION(test,						       \
-			assert_type,					       \
-			!!(condition) == !!expected_true,		       \
-			kunit_unary_assert,				       \
-			KUNIT_INIT_UNARY_ASSERT_STRUCT(#condition,	       \
-						       expected_true),	       \
-			fmt,						       \
-			##__VA_ARGS__)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define KUNIT_TRUE_MSG_ASSERTION(test, assert_type, condition, fmt, ...)       \
 	KUNIT_UNARY_ASSERTION(test,					       \
@@ -623,7 +582,6 @@ do {									       \
 		.left_text = #left,					       \
 		.right_text = #right,					       \
 	};								       \
-<<<<<<< HEAD
 									       \
 	if (likely(__left op __right))					       \
 		break;							       \
@@ -637,19 +595,6 @@ do {									       \
 						      __right),		       \
 		      fmt,						       \
 		      ##__VA_ARGS__);					       \
-=======
-									       \
-	KUNIT_ASSERTION(test,						       \
-			assert_type,					       \
-			__left op __right,				       \
-			assert_class,					       \
-			KUNIT_INIT_BINARY_ASSERT_STRUCT(format_func,	       \
-							&__text,	       \
-							__left,		       \
-							__right),	       \
-			fmt,						       \
-			##__VA_ARGS__);					       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } while (0)
 
 #define KUNIT_BINARY_INT_ASSERTION(test,				       \
@@ -697,7 +642,6 @@ do {									       \
 		.left_text = #left,					       \
 		.right_text = #right,					       \
 	};								       \
-<<<<<<< HEAD
 									       \
 	if (likely(strcmp(__left, __right) op 0))			       \
 		break;							       \
@@ -712,19 +656,6 @@ do {									       \
 						      __right),		       \
 		      fmt,						       \
 		      ##__VA_ARGS__);					       \
-=======
-									       \
-	KUNIT_ASSERTION(test,						       \
-			assert_type,					       \
-			strcmp(__left, __right) op 0,			       \
-			kunit_binary_str_assert,			       \
-			KUNIT_INIT_BINARY_ASSERT_STRUCT(kunit_binary_str_assert_format,\
-							&__text,	       \
-							__left,		       \
-							__right),	       \
-			fmt,						       \
-			##__VA_ARGS__);					       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } while (0)
 
 #define KUNIT_PTR_NOT_ERR_OR_NULL_MSG_ASSERTION(test,			       \
@@ -735,7 +666,6 @@ do {									       \
 do {									       \
 	const typeof(ptr) __ptr = (ptr);				       \
 									       \
-<<<<<<< HEAD
 	if (!IS_ERR_OR_NULL(__ptr))					       \
 		break;							       \
 									       \
@@ -746,16 +676,6 @@ do {									       \
 		      KUNIT_INIT_PTR_NOT_ERR_STRUCT(#ptr, __ptr),	       \
 		      fmt,						       \
 		      ##__VA_ARGS__);					       \
-=======
-	KUNIT_ASSERTION(test,						       \
-			assert_type,					       \
-			!IS_ERR_OR_NULL(__ptr),				       \
-			kunit_ptr_not_err_assert,			       \
-			KUNIT_INIT_PTR_NOT_ERR_STRUCT(#ptr,		       \
-						      __ptr),		       \
-			fmt,						       \
-			##__VA_ARGS__);					       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } while (0)
 
 /**

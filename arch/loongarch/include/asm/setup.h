@@ -13,13 +13,9 @@
 
 extern unsigned long eentry;
 extern unsigned long tlbrentry;
-<<<<<<< HEAD
 extern void tlb_init(int cpu);
 extern void cpu_cache_init(void);
 extern void cache_error_setup(void);
-=======
-extern void cpu_cache_init(void);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern void per_cpu_trap_init(int cpu);
 extern void set_handler(unsigned long offset, void *addr, unsigned long len);
 extern void set_merr_handler(unsigned long offset, void *addr, unsigned long len);

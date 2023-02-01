@@ -41,11 +41,8 @@ properties:
       - rockchip,rk3368-power-controller
       - rockchip,rk3399-power-controller
       - rockchip,rk3568-power-controller
-<<<<<<< HEAD
       - rockchip,rk3588-power-controller
       - rockchip,rv1126-power-controller
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   "#power-domain-cells":
     const: 1
@@ -124,11 +121,8 @@ $defs:
           "include/dt-bindings/power/rk3368-power.h"
           "include/dt-bindings/power/rk3399-power.h"
           "include/dt-bindings/power/rk3568-power.h"
-<<<<<<< HEAD
           "include/dt-bindings/power/rk3588-power.h"
           "include/dt-bindings/power/rockchip,rv1126-power.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
       clocks:
         minItems: 1

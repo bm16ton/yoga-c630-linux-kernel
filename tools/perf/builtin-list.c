@@ -68,12 +68,6 @@ int cmd_list(int argc, const char **argv)
 			pr_warning("WARNING: hybrid cputype is not supported!\n");
 	}
 
-	if (hybrid_type) {
-		pmu_name = perf_pmu__hybrid_type_to_pmu(hybrid_type);
-		if (!pmu_name)
-			pr_warning("WARNING: hybrid cputype is not supported!\n");
-	}
-
 	if (argc == 0) {
 		print_events(NULL, raw_dump, !desc_flag, long_desc_flag,
 				details_flag, deprecated, pmu_name);

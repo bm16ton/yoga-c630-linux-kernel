@@ -107,12 +107,8 @@ config PPC_BOOK3S_64
 
 config PPC_BOOK3E_64
 	bool "Embedded processors"
-<<<<<<< HEAD
 	select PPC_E500
 	select PPC_E500MC
-=======
-	select PPC_FSL_BOOK3E
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select PPC_FPU # Make it a choice ?
 	select PPC_SMP_MUXED_IPI
 	select PPC_DOORBELL
@@ -130,11 +126,7 @@ choice
 	  If unsure, select Generic.
 
 config GENERIC_CPU
-<<<<<<< HEAD
 	bool "Generic (POWER5 and PowerPC 970 and above)"
-=======
-	bool "Generic (POWER4 and above)"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on PPC_BOOK3S_64 && !CPU_LITTLE_ENDIAN
 	select PPC_64S_HASH_MMU
 
@@ -187,19 +179,11 @@ config POWER10_CPU
 
 config E5500_CPU
 	bool "Freescale e5500"
-<<<<<<< HEAD
 	depends on PPC64 && PPC_E500
 
 config E6500_CPU
 	bool "Freescale e6500"
 	depends on PPC64 && PPC_E500
-=======
-	depends on PPC64 && E500
-
-config E6500_CPU
-	bool "Freescale e6500"
-	depends on PPC64 && E500
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config 405_CPU
 	bool "40x family"
@@ -261,10 +245,7 @@ config TARGET_CPU
 	default "power7" if POWER7_CPU
 	default "power8" if POWER8_CPU
 	default "power9" if POWER9_CPU
-<<<<<<< HEAD
 	default "power10" if POWER10_CPU
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default "405" if 405_CPU
 	default "440" if 440_CPU
 	default "464" if 464_CPU
@@ -343,31 +324,10 @@ config BOOKE
 	default y
 
 config BOOKE_OR_40x
-<<<<<<< HEAD
-=======
 	bool
 	depends on BOOKE || 40x
 	default y
 
-config FSL_BOOKE
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	bool
-	depends on BOOKE || 40x
-	default y
-
-<<<<<<< HEAD
-=======
-# this is for common code between PPC32 & PPC64 FSL BOOKE
-config PPC_FSL_BOOK3E
-	bool
-	select ARCH_SUPPORTS_HUGETLBFS if PHYS_64BIT || PPC64
-	imply FSL_EMB_PERFMON
-	select PPC_SMP_MUXED_IPI
-	select PPC_DOORBELL
-	select PPC_KUEP
-	default y if FSL_BOOKE
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config PTE_64BIT
 	bool
 	depends on 44x || PPC_E500 || PPC_86xx
@@ -512,13 +472,6 @@ config PPC_MMU_NOHASH
 	def_bool y
 	depends on !PPC_BOOK3S
 
-<<<<<<< HEAD
-=======
-config PPC_BOOK3E_MMU
-	def_bool y
-	depends on FSL_BOOKE || PPC_BOOK3E
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config PPC_HAVE_PMU_SUPPORT
 	bool
 

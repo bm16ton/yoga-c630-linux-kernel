@@ -163,10 +163,7 @@ struct ffa_drv_info {
 	struct mutex tx_lock; /* lock to protect Tx buffer */
 	void *rx_buffer;
 	void *tx_buffer;
-<<<<<<< HEAD
 	bool mem_ops_native;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct ffa_drv_info *drv_info;
@@ -267,36 +264,24 @@ static int ffa_rxtx_unmap(u16 vm_id)
 	return 0;
 }
 
-<<<<<<< HEAD
 #define PARTITION_INFO_GET_RETURN_COUNT_ONLY	BIT(0)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* buffer must be sizeof(struct ffa_partition_info) * num_partitions */
 static int
 __ffa_partition_info_get(u32 uuid0, u32 uuid1, u32 uuid2, u32 uuid3,
 			 struct ffa_partition_info *buffer, int num_partitions)
 {
-<<<<<<< HEAD
 	int idx, count, flags = 0, sz, buf_sz;
 	ffa_value_t partition_info;
 
 	if (!buffer || !num_partitions) /* Just get the count for now */
 		flags = PARTITION_INFO_GET_RETURN_COUNT_ONLY;
 
-=======
-	int count;
-	ffa_value_t partition_info;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&drv_info->rx_lock);
 	invoke_ffa_fn((ffa_value_t){
 		      .a0 = FFA_PARTITION_INFO_GET,
 		      .a1 = uuid0, .a2 = uuid1, .a3 = uuid2, .a4 = uuid3,
-<<<<<<< HEAD
 		      .a5 = flags,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		      }, &partition_info);
 
 	if (partition_info.a0 == FFA_ERROR) {
@@ -306,7 +291,6 @@ __ffa_partition_info_get(u32 uuid0, u32 uuid1, u32 uuid2, u32 uuid3,
 
 	count = partition_info.a2;
 
-<<<<<<< HEAD
 	if (drv_info->version > FFA_VERSION_1_0) {
 		buf_sz = sz = partition_info.a3;
 		if (sz > sizeof(*buffer))
@@ -320,10 +304,6 @@ __ffa_partition_info_get(u32 uuid0, u32 uuid1, u32 uuid2, u32 uuid3,
 		for (idx = 0; idx < count; idx++)
 			memcpy(buffer + idx, drv_info->rx_buffer + idx * sz,
 			       buf_sz);
-=======
-	if (buffer && count <= num_partitions)
-		memcpy(buffer, drv_info->rx_buffer, sizeof(*buffer) * count);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ffa_rx_release();
 
@@ -609,7 +589,6 @@ static int ffa_memory_reclaim(u64 g_handle, u32 flags)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int ffa_features(u32 func_feat_id, u32 input_props,
 			u32 *if_props_1, u32 *if_props_2)
 {
@@ -643,8 +622,6 @@ static void ffa_set_up_mem_ops_native_flag(void)
 		drv_info->mem_ops_native = true;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static u32 ffa_api_version_get(void)
 {
 	return drv_info->version;
@@ -671,7 +648,6 @@ static int ffa_partition_info_get(const char *uuid_str,
 	return 0;
 }
 
-<<<<<<< HEAD
 static void _ffa_mode_32bit_set(struct ffa_device *dev)
 {
 	dev->mode_32bit = true;
@@ -683,11 +659,6 @@ static void ffa_mode_32bit_set(struct ffa_device *dev)
 		return;
 
 	_ffa_mode_32bit_set(dev);
-=======
-static void ffa_mode_32bit_set(struct ffa_device *dev)
-{
-	dev->mode_32bit = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ffa_sync_send_receive(struct ffa_device *dev,
@@ -697,7 +668,6 @@ static int ffa_sync_send_receive(struct ffa_device *dev,
 				       dev->mode_32bit, data);
 }
 
-<<<<<<< HEAD
 static int ffa_memory_share(struct ffa_mem_ops_args *args)
 {
 	if (drv_info->mem_ops_native)
@@ -707,19 +677,6 @@ static int ffa_memory_share(struct ffa_mem_ops_args *args)
 }
 
 static int ffa_memory_lend(struct ffa_mem_ops_args *args)
-=======
-static int
-ffa_memory_share(struct ffa_device *dev, struct ffa_mem_ops_args *args)
-{
-	if (dev->mode_32bit)
-		return ffa_memory_ops(FFA_MEM_SHARE, args);
-
-	return ffa_memory_ops(FFA_FN_NATIVE(MEM_SHARE), args);
-}
-
-static int
-ffa_memory_lend(struct ffa_device *dev, struct ffa_mem_ops_args *args)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/* Note that upon a successful MEM_LEND request the caller
 	 * must ensure that the memory region specified is not accessed
@@ -728,7 +685,6 @@ ffa_memory_lend(struct ffa_device *dev, struct ffa_mem_ops_args *args)
 	 * however on systems without a hypervisor the responsibility
 	 * falls to the calling kernel driver to prevent access.
 	 */
-<<<<<<< HEAD
 	if (drv_info->mem_ops_native)
 		return ffa_memory_ops(FFA_FN_NATIVE(MEM_LEND), args);
 
@@ -746,47 +702,22 @@ static const struct ffa_msg_ops ffa_drv_msg_ops = {
 };
 
 static const struct ffa_mem_ops ffa_drv_mem_ops = {
-=======
-	if (dev->mode_32bit)
-		return ffa_memory_ops(FFA_MEM_LEND, args);
-
-	return ffa_memory_ops(FFA_FN_NATIVE(MEM_LEND), args);
-}
-
-static const struct ffa_dev_ops ffa_ops = {
-	.api_version_get = ffa_api_version_get,
-	.partition_info_get = ffa_partition_info_get,
-	.mode_32bit_set = ffa_mode_32bit_set,
-	.sync_send_receive = ffa_sync_send_receive,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.memory_reclaim = ffa_memory_reclaim,
 	.memory_share = ffa_memory_share,
 	.memory_lend = ffa_memory_lend,
 };
 
-<<<<<<< HEAD
 static const struct ffa_ops ffa_drv_ops = {
 	.info_ops = &ffa_drv_info_ops,
 	.msg_ops = &ffa_drv_msg_ops,
 	.mem_ops = &ffa_drv_mem_ops,
 };
-=======
-const struct ffa_dev_ops *ffa_dev_ops_get(struct ffa_device *dev)
-{
-	if (ffa_device_is_valid(dev))
-		return &ffa_ops;
-
-	return NULL;
-}
-EXPORT_SYMBOL_GPL(ffa_dev_ops_get);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void ffa_device_match_uuid(struct ffa_device *ffa_dev, const uuid_t *uuid)
 {
 	int count, idx;
 	struct ffa_partition_info *pbuf, *tpbuf;
 
-<<<<<<< HEAD
 	/*
 	 * FF-A v1.1 provides UUID for each partition as part of the discovery
 	 * API, the discovered UUID must be populated in the device's UUID and
@@ -795,8 +726,6 @@ void ffa_device_match_uuid(struct ffa_device *ffa_dev, const uuid_t *uuid)
 	if (drv_info->version > FFA_VERSION_1_0)
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	count = ffa_partition_probe(uuid, &pbuf);
 	if (count <= 0)
 		return;
@@ -810,10 +739,7 @@ void ffa_device_match_uuid(struct ffa_device *ffa_dev, const uuid_t *uuid)
 static void ffa_setup_partitions(void)
 {
 	int count, idx;
-<<<<<<< HEAD
 	uuid_t uuid;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ffa_device *ffa_dev;
 	struct ffa_partition_info *pbuf, *tpbuf;
 
@@ -824,7 +750,6 @@ static void ffa_setup_partitions(void)
 	}
 
 	for (idx = 0, tpbuf = pbuf; idx < count; idx++, tpbuf++) {
-<<<<<<< HEAD
 		import_uuid(&uuid, (u8 *)tpbuf->uuid);
 
 		/* Note that if the UUID will be uuid_null, that will require
@@ -834,28 +759,15 @@ static void ffa_setup_partitions(void)
 		 * discovery API and the same is passed.
 		 */
 		ffa_dev = ffa_device_register(&uuid, tpbuf->id, &ffa_drv_ops);
-=======
-		/* Note that the &uuid_null parameter will require
-		 * ffa_device_match() to find the UUID of this partition id
-		 * with help of ffa_device_match_uuid(). Once the FF-A spec
-		 * is updated to provide correct UUID here for each partition
-		 * as part of the discovery API, we need to pass the
-		 * discovered UUID here instead.
-		 */
-		ffa_dev = ffa_device_register(&uuid_null, tpbuf->id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!ffa_dev) {
 			pr_err("%s: failed to register partition ID 0x%x\n",
 			       __func__, tpbuf->id);
 			continue;
 		}
-<<<<<<< HEAD
 
 		if (drv_info->version > FFA_VERSION_1_0 &&
 		    !(tpbuf->properties & FFA_PARTITION_AARCH64_EXEC))
 			_ffa_mode_32bit_set(ffa_dev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	kfree(pbuf);
 }
@@ -913,11 +825,8 @@ static int __init ffa_init(void)
 
 	ffa_setup_partitions();
 
-<<<<<<< HEAD
 	ffa_set_up_mem_ops_native_flag();
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 free_pages:
 	if (drv_info->tx_buffer)

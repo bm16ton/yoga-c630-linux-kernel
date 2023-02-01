@@ -45,11 +45,6 @@ int snd_sof_create_page_table(struct device *dev,
 		u32 pfn = snd_sgbuf_get_addr(dmab, i * PAGE_SIZE) >> PAGE_SHIFT;
 		u8 *pg_table;
 
-<<<<<<< HEAD
-=======
-		dev_vdbg(dev, "pfn i %i idx %d pfn %x\n", i, idx, pfn);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pg_table = (u8 *)(page_table + idx);
 
 		/*

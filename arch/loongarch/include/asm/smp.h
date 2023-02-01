@@ -19,7 +19,6 @@ extern cpumask_t cpu_sibling_map[];
 extern cpumask_t cpu_core_map[];
 extern cpumask_t cpu_foreign_map[];
 
-<<<<<<< HEAD
 void loongson_smp_setup(void);
 void loongson_prepare_cpus(unsigned int max_cpus);
 void loongson_boot_secondary(int cpu, struct task_struct *idle);
@@ -30,27 +29,11 @@ void loongson_send_ipi_mask(const struct cpumask *mask, unsigned int action);
 #ifdef CONFIG_HOTPLUG_CPU
 int loongson_cpu_disable(void);
 void loongson_cpu_die(unsigned int cpu);
-=======
-void loongson3_smp_setup(void);
-void loongson3_prepare_cpus(unsigned int max_cpus);
-void loongson3_boot_secondary(int cpu, struct task_struct *idle);
-void loongson3_init_secondary(void);
-void loongson3_smp_finish(void);
-void loongson3_send_ipi_single(int cpu, unsigned int action);
-void loongson3_send_ipi_mask(const struct cpumask *mask, unsigned int action);
-#ifdef CONFIG_HOTPLUG_CPU
-int loongson3_cpu_disable(void);
-void loongson3_cpu_die(unsigned int cpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 static inline void plat_smp_setup(void)
 {
-<<<<<<< HEAD
 	loongson_smp_setup();
-=======
-	loongson3_smp_setup();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline int raw_smp_processor_id(void)
@@ -95,53 +78,25 @@ extern void calculate_cpu_foreign_map(void);
  */
 extern void show_ipi_list(struct seq_file *p, int prec);
 
-<<<<<<< HEAD
 static inline void arch_send_call_function_single_ipi(int cpu)
 {
 	loongson_send_ipi_single(cpu, SMP_CALL_FUNCTION);
-=======
-/*
- * This function sends a 'reschedule' IPI to another CPU.
- * it goes straight through and wastes no time serializing
- * anything. Worst case is that we lose a reschedule ...
- */
-static inline void smp_send_reschedule(int cpu)
-{
-	loongson3_send_ipi_single(cpu, SMP_RESCHEDULE);
-}
-
-static inline void arch_send_call_function_single_ipi(int cpu)
-{
-	loongson3_send_ipi_single(cpu, SMP_CALL_FUNCTION);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void arch_send_call_function_ipi_mask(const struct cpumask *mask)
 {
-<<<<<<< HEAD
 	loongson_send_ipi_mask(mask, SMP_CALL_FUNCTION);
-=======
-	loongson3_send_ipi_mask(mask, SMP_CALL_FUNCTION);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_HOTPLUG_CPU
 static inline int __cpu_disable(void)
 {
-<<<<<<< HEAD
 	return loongson_cpu_disable();
-=======
-	return loongson3_cpu_disable();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void __cpu_die(unsigned int cpu)
 {
-<<<<<<< HEAD
 	loongson_cpu_die(cpu);
-=======
-	loongson3_cpu_die(cpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 extern void play_dead(void);

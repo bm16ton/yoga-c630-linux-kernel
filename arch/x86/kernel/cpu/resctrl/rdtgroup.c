@@ -1032,14 +1032,7 @@ static int rdt_delay_linear_show(struct kernfs_open_file *of,
 static int max_threshold_occ_show(struct kernfs_open_file *of,
 				  struct seq_file *seq, void *v)
 {
-<<<<<<< HEAD
 	seq_printf(seq, "%u\n", resctrl_rmid_realloc_threshold);
-=======
-	struct rdt_resource *r = of->kn->parent->priv;
-	struct rdt_hw_resource *hw_res = resctrl_to_arch_res(r);
-
-	seq_printf(seq, "%u\n", resctrl_cqm_threshold * hw_res->mon_scale);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1061,10 +1054,6 @@ static int rdt_thread_throttle_mode_show(struct kernfs_open_file *of,
 static ssize_t max_threshold_occ_write(struct kernfs_open_file *of,
 				       char *buf, size_t nbytes, loff_t off)
 {
-<<<<<<< HEAD
-=======
-	struct rdt_hw_resource *hw_res;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int bytes;
 	int ret;
 
@@ -1075,12 +1064,7 @@ static ssize_t max_threshold_occ_write(struct kernfs_open_file *of,
 	if (bytes > resctrl_rmid_realloc_limit)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	resctrl_rmid_realloc_threshold = resctrl_arch_round_mon_val(bytes);
-=======
-	hw_res = resctrl_to_arch_res(of->kn->parent->priv);
-	resctrl_cqm_threshold = bytes / hw_res->mon_scale;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return nbytes;
 }
@@ -1369,10 +1353,7 @@ static int rdtgroup_size_show(struct kernfs_open_file *of,
 			      struct seq_file *s, void *v)
 {
 	struct resctrl_schema *schema;
-<<<<<<< HEAD
 	enum resctrl_conf_type type;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rdtgroup *rdtgrp;
 	struct rdt_resource *r;
 	struct rdt_domain *d;
@@ -1404,16 +1385,11 @@ static int rdtgroup_size_show(struct kernfs_open_file *of,
 		goto out;
 	}
 
-<<<<<<< HEAD
 	closid = rdtgrp->closid;
 
 	list_for_each_entry(schema, &resctrl_schema_all, list) {
 		r = schema->res;
 		type = schema->conf_type;
-=======
-	list_for_each_entry(schema, &resctrl_schema_all, list) {
-		r = schema->res;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sep = false;
 		seq_printf(s, "%*s:", max_name_width, schema->name);
 		list_for_each_entry(d, &r->domains, list) {
@@ -1422,18 +1398,12 @@ static int rdtgroup_size_show(struct kernfs_open_file *of,
 			if (rdtgrp->mode == RDT_MODE_PSEUDO_LOCKSETUP) {
 				size = 0;
 			} else {
-<<<<<<< HEAD
 				if (is_mba_sc(r))
 					ctrl = d->mbps_val[closid];
 				else
 					ctrl = resctrl_arch_get_config(r, d,
 								       closid,
 								       type);
-=======
-				ctrl = resctrl_arch_get_config(r, d,
-							       rdtgrp->closid,
-							       schema->conf_type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				if (r->rid == RDT_RESOURCE_MBA)
 					size = ctrl;
 				else
@@ -1791,11 +1761,7 @@ static int rdtgroup_create_info_dir(struct kernfs_node *parent_kn)
 	if (ret)
 		goto out_destroy;
 
-<<<<<<< HEAD
 	/* loop over enabled controls, these are all alloc_capable */
-=======
-	/* loop over enabled controls, these are all alloc_enabled */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(s, &resctrl_schema_all, list) {
 		r = s->res;
 		fflags =  r->fflags | RF_CTRL_INFO;
@@ -1926,7 +1892,6 @@ void rdt_domain_reconfigure_cdp(struct rdt_resource *r)
 
 	if (r->rid == RDT_RESOURCE_L3)
 		l3_qos_cfg_update(&hw_res->cdp_enabled);
-<<<<<<< HEAD
 }
 
 static int mba_sc_domain_allocate(struct rdt_resource *r, struct rdt_domain *d)
@@ -1951,8 +1916,6 @@ static void mba_sc_domain_destroy(struct rdt_resource *r,
 {
 	kfree(d->mbps_val);
 	d->mbps_val = NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1974,11 +1937,7 @@ static bool supports_mba_mbps(void)
 static int set_mba_sc(bool mba_sc)
 {
 	struct rdt_resource *r = &rdt_resources_all[RDT_RESOURCE_MBA].r_resctrl;
-<<<<<<< HEAD
 	u32 num_closid = resctrl_arch_get_num_closid(r);
-=======
-	struct rdt_hw_domain *hw_dom;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rdt_domain *d;
 	int i;
 
@@ -1986,16 +1945,10 @@ static int set_mba_sc(bool mba_sc)
 		return -EINVAL;
 
 	r->membw.mba_sc = mba_sc;
-<<<<<<< HEAD
 
 	list_for_each_entry(d, &r->domains, list) {
 		for (i = 0; i < num_closid; i++)
 			d->mbps_val[i] = MBA_MAX_MBPS;
-=======
-	list_for_each_entry(d, &r->domains, list) {
-		hw_dom = resctrl_to_arch_dom(d);
-		setup_default_ctrlval(r, hw_dom->ctrl_val, hw_dom->mbps_val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -2193,11 +2146,7 @@ static int schemata_list_create(void)
 	struct rdt_resource *r;
 	int ret = 0;
 
-<<<<<<< HEAD
 	for_each_alloc_capable_rdt_resource(r) {
-=======
-	for_each_alloc_enabled_rdt_resource(r) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (resctrl_arch_get_cdp_enabled(r->rid)) {
 			ret = schemata_list_add(r, CDP_CODE);
 			if (ret)
@@ -2886,7 +2835,6 @@ static void rdtgroup_init_mba(struct rdt_resource *r, u32 closid)
 	struct rdt_domain *d;
 
 	list_for_each_entry(d, &r->domains, list) {
-<<<<<<< HEAD
 		if (is_mba_sc(r)) {
 			d->mbps_val[closid] = MBA_MAX_MBPS;
 			continue;
@@ -2894,10 +2842,6 @@ static void rdtgroup_init_mba(struct rdt_resource *r, u32 closid)
 
 		cfg = &d->staged_config[CDP_NONE];
 		cfg->new_ctrl = r->default_ctrl;
-=======
-		cfg = &d->staged_config[CDP_NONE];
-		cfg->new_ctrl = is_mba_sc(r) ? MBA_MAX_MBPS : r->default_ctrl;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		cfg->have_new_ctrl = true;
 	}
 }

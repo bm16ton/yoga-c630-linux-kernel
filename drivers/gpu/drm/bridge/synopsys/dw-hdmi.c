@@ -3138,19 +3138,11 @@ static irqreturn_t dw_hdmi_irq(int irq, void *dev_id)
 
 		if (phy_stat & HDMI_PHY_HPD)
 			status = connector_status_connected;
-<<<<<<< HEAD
 
 		if (!(phy_stat & (HDMI_PHY_HPD | HDMI_PHY_RX_SENSE)))
 			status = connector_status_disconnected;
 	}
 
-=======
-
-		if (!(phy_stat & (HDMI_PHY_HPD | HDMI_PHY_RX_SENSE)))
-			status = connector_status_disconnected;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (status != connector_status_unknown) {
 		dev_dbg(hdmi->dev, "EVENT=%s\n",
 			status == connector_status_connected ?

@@ -986,7 +986,6 @@ enum vfio_device_mig_state {
 	VFIO_DEVICE_STATE_RUNNING_P2P = 5,
 };
 
-<<<<<<< HEAD
 /*
  * Upon VFIO_DEVICE_FEATURE_SET, allow the device to be moved into a low power
  * state with the platform-based power management.  Device use of lower power
@@ -1129,8 +1128,6 @@ struct vfio_device_feature_dma_logging_report {
 
 #define VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT 8
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* -------- API for Type1 VFIO IOMMU -------- */
 
 /**

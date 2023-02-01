@@ -672,11 +672,7 @@ void intel_hpd_poll_enable(struct drm_i915_private *dev_priv)
 	    !INTEL_DISPLAY_ENABLED(dev_priv))
 		return;
 
-<<<<<<< HEAD
 	WRITE_ONCE(dev_priv->display.hotplug.poll_enabled, true);
-=======
-	WRITE_ONCE(dev_priv->hotplug.poll_enabled, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * We might already be holding dev->mode_config.mutex, so do this in a
@@ -711,13 +707,8 @@ void intel_hpd_poll_disable(struct drm_i915_private *dev_priv)
 	if (!HAS_DISPLAY(dev_priv))
 		return;
 
-<<<<<<< HEAD
 	WRITE_ONCE(dev_priv->display.hotplug.poll_enabled, false);
 	schedule_work(&dev_priv->display.hotplug.poll_init_work);
-=======
-	WRITE_ONCE(dev_priv->hotplug.poll_enabled, false);
-	schedule_work(&dev_priv->hotplug.poll_init_work);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void intel_hpd_init_work(struct drm_i915_private *dev_priv)

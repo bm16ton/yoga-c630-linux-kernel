@@ -161,11 +161,8 @@
 #define AMDGPU_VCN_SW_RING_FLAG		(1 << 9)
 #define AMDGPU_VCN_FW_LOGGING_FLAG	(1 << 10)
 #define AMDGPU_VCN_SMU_VERSION_INFO_FLAG (1 << 11)
-<<<<<<< HEAD
 #define AMDGPU_VCN_SMU_DPM_INTERFACE_FLAG (1 << 11)
 #define AMDGPU_VCN_VF_RB_SETUP_FLAG (1 << 14)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define AMDGPU_VCN_IB_FLAG_DECODE_BUFFER	0x00000001
 #define AMDGPU_VCN_CMD_FLAG_MSG_BUFFER		0x00000001
@@ -175,12 +172,9 @@
 #define VCN_CODEC_DISABLE_MASK_HEVC (1 << 2)
 #define VCN_CODEC_DISABLE_MASK_H264 (1 << 3)
 
-<<<<<<< HEAD
 #define AMDGPU_VCN_SMU_DPM_INTERFACE_DGPU (0)
 #define AMDGPU_VCN_SMU_DPM_INTERFACE_APU (1)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum fw_queue_mode {
 	FW_QUEUE_RING_RESET = 1,
 	FW_QUEUE_DPG_HOLD_OFF = 2,
@@ -328,7 +322,6 @@ struct amdgpu_fw_shared {
 	struct amdgpu_fw_shared_smu_interface_info smu_interface_info;
 };
 
-<<<<<<< HEAD
 struct amdgpu_fw_shared_rb_setup {
 	uint32_t is_rb_enabled_flags;
 	uint32_t rb_addr_lo;
@@ -340,20 +333,15 @@ struct amdgpu_fw_shared_rb_setup {
 	uint32_t  reserved[6];
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct amdgpu_vcn4_fw_shared {
 	uint32_t present_flag_0;
 	uint8_t pad[12];
 	struct amdgpu_fw_shared_unified_queue_struct sq;
 	uint8_t pad1[8];
 	struct amdgpu_fw_shared_fw_logging fw_log;
-<<<<<<< HEAD
 	uint8_t pad2[20];
 	struct amdgpu_fw_shared_rb_setup rb_setup;
 	struct amdgpu_fw_shared_smu_interface_info smu_dpm_interface;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct amdgpu_vcn_fwlog {

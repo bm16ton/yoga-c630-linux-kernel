@@ -307,7 +307,6 @@ static void __unix_remove_socket(struct sock *sk)
 }
 
 static void __unix_insert_socket(struct net *net, struct sock *sk)
-<<<<<<< HEAD
 {
 	DEBUG_NET_WARN_ON_ONCE(!sk_unhashed(sk));
 	sk_add_node(sk, &net->unx.table.buckets[sk->sk_hash]);
@@ -346,46 +345,6 @@ static void unix_insert_bsd_socket(struct sock *sk)
 
 static void unix_remove_bsd_socket(struct sock *sk)
 {
-=======
-{
-	DEBUG_NET_WARN_ON_ONCE(!sk_unhashed(sk));
-	sk_add_node(sk, &net->unx.table.buckets[sk->sk_hash]);
-}
-
-static void __unix_set_addr_hash(struct net *net, struct sock *sk,
-				 struct unix_address *addr, unsigned int hash)
-{
-	__unix_remove_socket(sk);
-	smp_store_release(&unix_sk(sk)->addr, addr);
-
-	sk->sk_hash = hash;
-	__unix_insert_socket(net, sk);
-}
-
-static void unix_remove_socket(struct net *net, struct sock *sk)
-{
-	spin_lock(&net->unx.table.locks[sk->sk_hash]);
-	__unix_remove_socket(sk);
-	spin_unlock(&net->unx.table.locks[sk->sk_hash]);
-}
-
-static void unix_insert_unbound_socket(struct net *net, struct sock *sk)
-{
-	spin_lock(&net->unx.table.locks[sk->sk_hash]);
-	__unix_insert_socket(net, sk);
-	spin_unlock(&net->unx.table.locks[sk->sk_hash]);
-}
-
-static void unix_insert_bsd_socket(struct sock *sk)
-{
-	spin_lock(&bsd_socket_locks[sk->sk_hash]);
-	sk_add_bind_node(sk, &bsd_socket_buckets[sk->sk_hash]);
-	spin_unlock(&bsd_socket_locks[sk->sk_hash]);
-}
-
-static void unix_remove_bsd_socket(struct sock *sk)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!hlist_unhashed(&sk->sk_bind_node)) {
 		spin_lock(&bsd_socket_locks[sk->sk_hash]);
 		__sk_del_bind_node(sk);
@@ -969,7 +928,6 @@ struct proto unix_dgram_proto = {
 #ifdef CONFIG_BPF_SYSCALL
 	.psock_update_sk_prot	= unix_dgram_bpf_update_proto,
 #endif
-<<<<<<< HEAD
 };
 
 struct proto unix_stream_proto = {
@@ -983,21 +941,6 @@ struct proto unix_stream_proto = {
 #endif
 };
 
-=======
-};
-
-struct proto unix_stream_proto = {
-	.name			= "UNIX-STREAM",
-	.owner			= THIS_MODULE,
-	.obj_size		= sizeof(struct unix_sock),
-	.close			= unix_close,
-	.unhash			= unix_unhash,
-#ifdef CONFIG_BPF_SYSCALL
-	.psock_update_sk_prot	= unix_stream_bpf_update_proto,
-#endif
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct sock *unix_create1(struct net *net, struct socket *sock, int kern, int type)
 {
 	struct unix_sock *u;
@@ -1204,11 +1147,7 @@ static int unix_autobind(struct sock *sk)
 	addr->name->sun_family = AF_UNIX;
 	refcount_set(&addr->refcnt, 1);
 
-<<<<<<< HEAD
 	ordernum = get_random_u32();
-=======
-	ordernum = prandom_u32();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lastnum = ordernum & 0xFFFFF;
 retry:
 	ordernum = (ordernum + 1) & 0xFFFFF;
@@ -1322,7 +1261,6 @@ static int unix_bind_abstract(struct sock *sk, struct sockaddr_un *sunaddr,
 	struct net *net = sock_net(sk);
 	struct unix_address *addr;
 	int err;
-<<<<<<< HEAD
 
 	addr = unix_create_addr(sunaddr, addr_len);
 	if (!addr)
@@ -1377,62 +1315,6 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 	else
 		err = unix_bind_abstract(sk, sunaddr, addr_len);
 
-=======
-
-	addr = unix_create_addr(sunaddr, addr_len);
-	if (!addr)
-		return -ENOMEM;
-
-	err = mutex_lock_interruptible(&u->bindlock);
-	if (err)
-		goto out;
-
-	if (u->addr) {
-		err = -EINVAL;
-		goto out_mutex;
-	}
-
-	new_hash = unix_abstract_hash(addr->name, addr->len, sk->sk_type);
-	unix_table_double_lock(net, old_hash, new_hash);
-
-	if (__unix_find_socket_byname(net, addr->name, addr->len, new_hash))
-		goto out_spin;
-
-	__unix_set_addr_hash(net, sk, addr, new_hash);
-	unix_table_double_unlock(net, old_hash, new_hash);
-	mutex_unlock(&u->bindlock);
-	return 0;
-
-out_spin:
-	unix_table_double_unlock(net, old_hash, new_hash);
-	err = -EADDRINUSE;
-out_mutex:
-	mutex_unlock(&u->bindlock);
-out:
-	unix_release_addr(addr);
-	return err;
-}
-
-static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
-{
-	struct sockaddr_un *sunaddr = (struct sockaddr_un *)uaddr;
-	struct sock *sk = sock->sk;
-	int err;
-
-	if (addr_len == offsetof(struct sockaddr_un, sun_path) &&
-	    sunaddr->sun_family == AF_UNIX)
-		return unix_autobind(sk);
-
-	err = unix_validate_addr(sunaddr, addr_len);
-	if (err)
-		return err;
-
-	if (sunaddr->sun_path[0])
-		err = unix_bind_bsd(sk, sunaddr, addr_len);
-	else
-		err = unix_bind_abstract(sk, sunaddr, addr_len);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return err;
 }
 
@@ -2131,7 +2013,6 @@ restart_locked:
 			sk->sk_state = TCP_CLOSE;
 			unix_state_unlock(sk);
 
-			sk->sk_state = TCP_CLOSE;
 			unix_dgram_disconnected(sk, other);
 			sock_put(other);
 			err = -ECONNREFUSED;
@@ -2663,7 +2544,6 @@ static int unix_dgram_recvmsg(struct socket *sock, struct msghdr *msg, size_t si
 
 static int unix_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
 {
-<<<<<<< HEAD
 	struct unix_sock *u = unix_sk(sk);
 	struct sk_buff *skb;
 	int err, copied;
@@ -2676,34 +2556,6 @@ static int unix_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
 
 	copied = recv_actor(sk, skb);
 	kfree_skb(skb);
-=======
-	int copied = 0;
-
-	while (1) {
-		struct unix_sock *u = unix_sk(sk);
-		struct sk_buff *skb;
-		int used, err;
-
-		mutex_lock(&u->iolock);
-		skb = skb_recv_datagram(sk, MSG_DONTWAIT, &err);
-		mutex_unlock(&u->iolock);
-		if (!skb)
-			return err;
-
-		used = recv_actor(sk, skb);
-		if (used <= 0) {
-			if (!copied)
-				copied = used;
-			kfree_skb(skb);
-			break;
-		} else if (used <= skb->len) {
-			copied += used;
-		}
-
-		kfree_skb(skb);
-		break;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return copied;
 }
@@ -3452,15 +3304,9 @@ static struct sock *unix_get_next(struct seq_file *seq, struct sock *sk,
 	if (sk)
 		return sk;
 
-<<<<<<< HEAD
 
 	spin_unlock(&seq_file_net(seq)->unx.table.locks[bucket]);
 
-=======
-
-	spin_unlock(&seq_file_net(seq)->unx.table.locks[bucket]);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*pos = set_bucket_offset(++bucket, 1);
 
 	return unix_get_first(seq, pos);
@@ -3891,15 +3737,6 @@ static int __init af_unix_init(void)
 	}
 
 	rc = proto_register(&unix_dgram_proto, 1);
-<<<<<<< HEAD
-=======
-	if (rc != 0) {
-		pr_crit("%s: Cannot create unix_sock SLAB cache!\n", __func__);
-		goto out;
-	}
-
-	rc = proto_register(&unix_stream_proto, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (rc != 0) {
 		pr_crit("%s: Cannot create unix_sock SLAB cache!\n", __func__);
 		goto out;

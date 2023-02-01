@@ -24,10 +24,7 @@ obj-y += samsung/
 obj-y += st/
 obj-y += sunxi/
 obj-y += ti/
-<<<<<<< HEAD
 obj-y += verisilicon/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 obj-y += via/
 obj-y += xilinx/
 

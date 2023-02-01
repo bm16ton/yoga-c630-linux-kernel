@@ -31,10 +31,6 @@
 #define RADEON_MODE_H
 
 #include <drm/display/drm_dp_helper.h>
-<<<<<<< HEAD
-=======
-#include <drm/display/drm_dp_mst_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_crtc.h>
 #include <drm/drm_edid.h>
 #include <drm/drm_encoder.h>
@@ -958,18 +954,6 @@ void radeon_crtc_handle_flip(struct radeon_device *rdev, int crtc_id);
 
 int radeon_align_pitch(struct radeon_device *rdev, int width, int bpp, bool tiled);
 
-<<<<<<< HEAD
-=======
-/* mst */
-int radeon_dp_mst_init(struct radeon_connector *radeon_connector);
-int radeon_dp_mst_probe(struct radeon_connector *radeon_connector);
-int radeon_dp_mst_check_status(struct radeon_connector *radeon_connector);
-void radeon_mst_debugfs_init(struct radeon_device *rdev);
-void radeon_dp_mst_prepare_pll(struct drm_crtc *crtc, struct drm_display_mode *mode);
-
-void radeon_setup_mst_connector(struct drm_device *dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int radeon_atom_pick_dig_encoder(struct drm_encoder *encoder, int fe_idx);
 void radeon_atom_release_dig_encoder(struct radeon_device *rdev, int enc_idx);
 #endif

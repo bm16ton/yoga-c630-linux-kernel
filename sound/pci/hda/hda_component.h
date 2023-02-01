@@ -16,9 +16,4 @@ struct hda_component {
 	char name[HDA_MAX_NAME_SIZE];
 	struct hda_codec *codec;
 	void (*playback_hook)(struct device *dev, int action);
-<<<<<<< HEAD
-=======
-	int (*suspend_hook)(struct device *dev);
-	int (*resume_hook)(struct device *dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

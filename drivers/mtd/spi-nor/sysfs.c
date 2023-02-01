@@ -67,7 +67,6 @@ static struct bin_attribute *spi_nor_sysfs_bin_entries[] = {
 	NULL
 };
 
-<<<<<<< HEAD
 static umode_t spi_nor_sysfs_is_visible(struct kobject *kobj,
 					struct attribute *attr, int n)
 {
@@ -81,8 +80,6 @@ static umode_t spi_nor_sysfs_is_visible(struct kobject *kobj,
 	return 0444;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static umode_t spi_nor_sysfs_is_bin_visible(struct kobject *kobj,
 					    struct bin_attribute *attr, int n)
 {
@@ -98,10 +95,7 @@ static umode_t spi_nor_sysfs_is_bin_visible(struct kobject *kobj,
 
 static const struct attribute_group spi_nor_sysfs_group = {
 	.name		= "spi-nor",
-<<<<<<< HEAD
 	.is_visible	= spi_nor_sysfs_is_visible,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.is_bin_visible	= spi_nor_sysfs_is_bin_visible,
 	.attrs		= spi_nor_sysfs_entries,
 	.bin_attrs	= spi_nor_sysfs_bin_entries,

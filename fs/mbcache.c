@@ -166,12 +166,8 @@ static struct mb_cache_entry *__entry_find(struct mb_cache *cache,
 	while (node) {
 		entry = hlist_bl_entry(node, struct mb_cache_entry,
 				       e_hash_list);
-<<<<<<< HEAD
 		if (entry->e_key == key &&
 		    test_bit(MBE_REUSABLE_B, &entry->e_flags) &&
-=======
-		if (entry->e_key == key && entry->e_reusable &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		    atomic_inc_not_zero(&entry->e_refcnt))
 			goto out;
 		node = node->next;
@@ -315,15 +311,9 @@ static unsigned long mb_cache_shrink(struct mb_cache *cache,
 		entry = list_first_entry(&cache->c_list,
 					 struct mb_cache_entry, e_list);
 		/* Drop initial hash reference if there is no user */
-<<<<<<< HEAD
 		if (test_bit(MBE_REFERENCED_B, &entry->e_flags) ||
 		    atomic_cmpxchg(&entry->e_refcnt, 1, 0) != 1) {
 			clear_bit(MBE_REFERENCED_B, &entry->e_flags);
-=======
-		if (entry->e_referenced ||
-		    atomic_cmpxchg(&entry->e_refcnt, 1, 0) != 1) {
-			entry->e_referenced = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			list_move_tail(&entry->e_list, &cache->c_list);
 			continue;
 		}

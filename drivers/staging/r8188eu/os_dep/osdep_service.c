@@ -5,10 +5,6 @@
 
 #include "../include/osdep_service.h"
 #include "../include/drv_types.h"
-<<<<<<< HEAD
-=======
-#include "../include/recv_osdep.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../include/rtw_ioctl_set.h"
 
 /*
@@ -57,21 +53,13 @@ struct net_device *rtw_alloc_etherdev_with_old_priv(int sizeof_priv,
 
 	pnetdev = alloc_etherdev_mq(sizeof(struct rtw_netdev_priv_indicator), 4);
 	if (!pnetdev)
-<<<<<<< HEAD
 		return NULL;
-=======
-		goto RETURN;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pnetdev->dev.type = &wlan_type;
 	pnpi = netdev_priv(pnetdev);
 	pnpi->priv = old_priv;
 	pnpi->sizeof_priv = sizeof_priv;
 
-<<<<<<< HEAD
-=======
-RETURN:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return pnetdev;
 }
 
@@ -82,31 +70,18 @@ struct net_device *rtw_alloc_etherdev(int sizeof_priv)
 
 	pnetdev = alloc_etherdev_mq(sizeof(struct rtw_netdev_priv_indicator), 4);
 	if (!pnetdev)
-<<<<<<< HEAD
 		return NULL;
-=======
-		goto RETURN;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pnpi = netdev_priv(pnetdev);
 
 	pnpi->priv = vzalloc(sizeof_priv);
 	if (!pnpi->priv) {
 		free_netdev(pnetdev);
-<<<<<<< HEAD
 		return NULL;
 	}
 
 	pnpi->sizeof_priv = sizeof_priv;
 
-=======
-		pnetdev = NULL;
-		goto RETURN;
-	}
-
-	pnpi->sizeof_priv = sizeof_priv;
-RETURN:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return pnetdev;
 }
 

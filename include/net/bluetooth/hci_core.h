@@ -238,10 +238,7 @@ struct adv_info {
 	bool	enabled;
 	bool	pending;
 	bool	periodic;
-<<<<<<< HEAD
 	__u8	mesh;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__u8	instance;
 	__u32	flags;
 	__u16	timeout;
@@ -517,10 +514,7 @@ struct hci_dev {
 	struct list_head	cmd_sync_work_list;
 	struct mutex		cmd_sync_work_lock;
 	struct work_struct	cmd_sync_cancel_work;
-<<<<<<< HEAD
 	struct work_struct	reenable_adv_work;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	__u16			discov_timeout;
 	struct delayed_work	discov_off;
@@ -1589,12 +1583,8 @@ struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
 				      u32 flags, u16 adv_data_len, u8 *adv_data,
 				      u16 scan_rsp_len, u8 *scan_rsp_data,
 				      u16 timeout, u16 duration, s8 tx_power,
-<<<<<<< HEAD
 				      u32 min_interval, u32 max_interval,
 				      u8 mesh_handle);
-=======
-				      u32 min_interval, u32 max_interval);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct adv_info *hci_add_per_instance(struct hci_dev *hdev, u8 instance,
 				      u32 flags, u8 data_len, u8 *data,
 				      u32 min_interval, u32 max_interval);
@@ -1729,12 +1719,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
 	((dev)->le_features[3] & HCI_LE_CIS_PERIPHERAL)
 #define bis_capable(dev) ((dev)->le_features[3] & HCI_LE_ISO_BROADCASTER)
 
-<<<<<<< HEAD
 #define mws_transport_config_capable(dev) (((dev)->commands[30] & 0x08) && \
 	(!test_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &(dev)->quirks)))
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* ----- HCI protocols ----- */
 #define HCI_PROTO_DEFER             0x01
 
@@ -2023,12 +2010,9 @@ void hci_mgmt_chan_unregister(struct hci_mgmt_chan *c);
 #define DISCOV_LE_FAST_ADV_INT_MAX	0x00F0	/* 150 msec */
 #define DISCOV_LE_PER_ADV_INT_MIN	0x00A0	/* 200 msec */
 #define DISCOV_LE_PER_ADV_INT_MAX	0x00A0	/* 200 msec */
-<<<<<<< HEAD
 #define DISCOV_LE_ADV_MESH_MIN		0x00A0  /* 100 msec */
 #define DISCOV_LE_ADV_MESH_MAX		0x00A0  /* 100 msec */
 #define INTERVAL_TO_MS(x)		(((x) * 10) / 0x10)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define NAME_RESOLVE_DURATION		msecs_to_jiffies(10240)	/* 10.24 sec */
 

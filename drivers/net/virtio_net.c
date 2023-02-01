@@ -796,7 +796,6 @@ static struct sk_buff *receive_small(struct net_device *dev,
 			 dev->name, len, GOOD_PACKET_LEN);
 		dev->stats.rx_length_errors++;
 		goto err;
-<<<<<<< HEAD
 	}
 
 	if (likely(!vi->xdp_enabled)) {
@@ -804,15 +803,6 @@ static struct sk_buff *receive_small(struct net_device *dev,
 		goto skip_xdp;
 	}
 
-=======
-	}
-
-	if (likely(!vi->xdp_enabled)) {
-		xdp_prog = NULL;
-		goto skip_xdp;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rcu_read_lock();
 	xdp_prog = rcu_dereference(rq->xdp_prog);
 	if (xdp_prog) {
@@ -2376,30 +2366,9 @@ static void virtnet_get_ringparam(struct net_device *dev,
 				  struct ethtool_ringparam *ring,
 				  struct kernel_ethtool_ringparam *kernel_ring,
 				  struct netlink_ext_ack *extack)
-<<<<<<< HEAD
-=======
 {
 	struct virtnet_info *vi = netdev_priv(dev);
 
-	ring->rx_max_pending = vi->rq[0].vq->num_max;
-	ring->tx_max_pending = vi->sq[0].vq->num_max;
-	ring->rx_pending = virtqueue_get_vring_size(vi->rq[0].vq);
-	ring->tx_pending = virtqueue_get_vring_size(vi->sq[0].vq);
-}
-
-static int virtnet_set_ringparam(struct net_device *dev,
-				 struct ethtool_ringparam *ring,
-				 struct kernel_ethtool_ringparam *kernel_ring,
-				 struct netlink_ext_ack *extack)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	struct virtnet_info *vi = netdev_priv(dev);
-	u32 rx_pending, tx_pending;
-	struct receive_queue *rq;
-	struct send_queue *sq;
-	int i, err;
-
-<<<<<<< HEAD
 	ring->rx_max_pending = vi->rq[0].vq->num_max;
 	ring->tx_max_pending = vi->sq[0].vq->num_max;
 	ring->rx_pending = virtqueue_get_vring_size(vi->rq[0].vq);
@@ -2417,8 +2386,6 @@ static int virtnet_set_ringparam(struct net_device *dev,
 	struct send_queue *sq;
 	int i, err;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
 		return -EINVAL;
 
@@ -3833,16 +3800,6 @@ static int virtnet_probe(struct virtio_device *vdev)
 
 	INIT_WORK(&vi->config_work, virtnet_config_changed_work);
 	spin_lock_init(&vi->refill_lock);
-<<<<<<< HEAD
-=======
-
-	/* If we can receive ANY GSO packets, we must allocate large ones. */
-	if (virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO4) ||
-	    virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_TSO6) ||
-	    virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_ECN) ||
-	    virtio_has_feature(vdev, VIRTIO_NET_F_GUEST_UFO))
-		vi->big_packets = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (virtio_has_feature(vdev, VIRTIO_NET_F_MRG_RXBUF))
 		vi->mergeable_rx_bufs = true;

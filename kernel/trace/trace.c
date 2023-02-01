@@ -1751,19 +1751,12 @@ void latency_fsnotify(struct trace_array *tr)
 	irq_work_queue(&tr->fsnotify_irqwork);
 }
 
-<<<<<<< HEAD
 #else /* !LATENCY_FS_NOTIFY */
-=======
-#elif defined(CONFIG_TRACER_MAX_TRACE) || defined(CONFIG_HWLAT_TRACER)	\
-	|| defined(CONFIG_OSNOISE_TRACER)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define trace_create_maxlat_file(tr, d_tracer)				\
 	trace_create_file("tracing_max_latency", TRACE_MODE_WRITE,	\
 			  d_tracer, &tr->max_latency, &tracing_max_lat_fops)
 
-#else
-#define trace_create_maxlat_file(tr, d_tracer)	 do { } while (0)
 #endif
 
 /*
@@ -7807,36 +7800,8 @@ struct tracing_log_err {
 static DEFINE_MUTEX(tracing_err_log_lock);
 
 static struct tracing_log_err *alloc_tracing_log_err(int len)
-<<<<<<< HEAD
 {
 	struct tracing_log_err *err;
-
-	err = kzalloc(sizeof(*err), GFP_KERNEL);
-	if (!err)
-		return ERR_PTR(-ENOMEM);
-
-	err->cmd = kzalloc(len, GFP_KERNEL);
-	if (!err->cmd) {
-		kfree(err);
-		return ERR_PTR(-ENOMEM);
-	}
-
-	return err;
-}
-
-static void free_tracing_log_err(struct tracing_log_err *err)
-{
-	kfree(err->cmd);
-	kfree(err);
-}
-
-static struct tracing_log_err *get_tracing_log_err(struct trace_array *tr,
-						   int len)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	struct tracing_log_err *err;
-	char *cmd;
 
 	err = kzalloc(sizeof(*err), GFP_KERNEL);
 	if (!err)
@@ -9650,11 +9615,9 @@ init_tracer_tracefs(struct trace_array *tr, struct dentry *d_tracer)
 
 	create_trace_options_dir(tr);
 
-<<<<<<< HEAD
 #ifdef CONFIG_TRACER_MAX_TRACE
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	trace_create_maxlat_file(tr, d_tracer);
+#endif
 
 	if (ftrace_create_function_files(tr, d_tracer))
 		MEM_FAIL(1, "Could not allocate function filter files");
@@ -10373,7 +10336,6 @@ __init static void tracing_set_default_clock(void)
 #else
 static inline void tracing_set_default_clock(void) { }
 #endif
-<<<<<<< HEAD
 
 __init static int late_trace_init(void)
 {
@@ -10382,16 +10344,6 @@ __init static int late_trace_init(void)
 		tracepoint_printk = 0;
 	}
 
-=======
-
-__init static int late_trace_init(void)
-{
-	if (tracepoint_printk && tracepoint_printk_stop_on_boot) {
-		static_key_disable(&tracepoint_printk_key.key);
-		tracepoint_printk = 0;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tracing_set_default_clock();
 	clear_boot_tracer();
 	return 0;

@@ -23,21 +23,7 @@ enum pmu_type {
 	PMU_TYPE_EVNTSEL,
 };
 
-<<<<<<< HEAD
 static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
-=======
-enum index {
-	INDEX_ZERO = 0,
-	INDEX_ONE,
-	INDEX_TWO,
-	INDEX_THREE,
-	INDEX_FOUR,
-	INDEX_FIVE,
-	INDEX_ERROR,
-};
-
-static unsigned int get_msr_base(struct kvm_pmu *pmu, enum pmu_type type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned int num_counters = pmu->nr_arch_gp_counters;
 
@@ -52,9 +38,6 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
 {
 	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
 	unsigned int idx;
-
-	if (!vcpu->kvm->arch.enable_pmu)
-		return NULL;
 
 	if (!vcpu->kvm->arch.enable_pmu)
 		return NULL;
@@ -101,25 +84,6 @@ static bool amd_pmc_is_enabled(struct kvm_pmc *pmc)
 	return true;
 }
 
-<<<<<<< HEAD
-=======
-static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
-{
-	unsigned int base = get_msr_base(pmu, PMU_TYPE_COUNTER);
-	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
-
-	if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
-		/*
-		 * The idx is contiguous. The MSRs are not. The counter MSRs
-		 * are interleaved with the event select MSRs.
-		 */
-		pmc_idx *= 2;
-	}
-
-	return get_gp_pmc_amd(pmu, base + pmc_idx, PMU_TYPE_COUNTER);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
 {
 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);

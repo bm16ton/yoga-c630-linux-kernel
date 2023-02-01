@@ -2149,7 +2149,6 @@ static inline void mlxsw_reg_spvc_pack(char *payload, u16 local_port, bool et1,
  * The switch port egress VLAN EtherType configures which EtherType to push at
  * egress for packets incoming through a local port for which 'SPVID.egr_et_set'
  * is set.
-<<<<<<< HEAD
  */
 #define MLXSW_REG_SPEVET_ID 0x202A
 #define MLXSW_REG_SPEVET_LEN 0x08
@@ -2217,235 +2216,6 @@ static inline void mlxsw_reg_smpe_pack(char *payload, u16 local_port,
 	mlxsw_reg_smpe_local_port_set(payload, local_port);
 	mlxsw_reg_smpe_smpe_index_set(payload, smpe_index);
 	mlxsw_reg_smpe_evid_set(payload, evid);
-}
-
-/* SMID-V2 - Switch Multicast ID Version 2 Register
- * ------------------------------------------------
- * The MID record maps from a MID (Multicast ID), which is a unique identifier
- * of the multicast group within the stacking domain, into a list of local
- * ports into which the packet is replicated.
- */
-#define MLXSW_REG_SMID2_ID 0x2034
-#define MLXSW_REG_SMID2_LEN 0x120
-
-MLXSW_REG_DEFINE(smid2, MLXSW_REG_SMID2_ID, MLXSW_REG_SMID2_LEN);
-
-/* reg_smid2_swid
- * Switch partition ID.
- * Access: Index
- */
-MLXSW_ITEM32(reg, smid2, swid, 0x00, 24, 8);
-
-/* reg_smid2_mid
- * Multicast identifier - global identifier that represents the multicast group
- * across all devices.
- * Access: Index
- */
-MLXSW_ITEM32(reg, smid2, mid, 0x00, 0, 16);
-
-/* reg_smid2_smpe_valid
- * SMPE is valid.
- * When not valid, the egress VID will not be modified by the SMPE table.
- * Access: RW
- *
- * Note: Reserved when legacy bridge model is used and on Spectrum-2.
- */
-MLXSW_ITEM32(reg, smid2, smpe_valid, 0x08, 20, 1);
-
-/* reg_smid2_smpe
- * Switch multicast port to egress VID.
- * Access: RW
- *
- * Note: Reserved when legacy bridge model is used and on Spectrum-2.
- */
-MLXSW_ITEM32(reg, smid2, smpe, 0x08, 0, 16);
-
-/* reg_smid2_port
- * Local port memebership (1 bit per port).
- * Access: RW
- */
-MLXSW_ITEM_BIT_ARRAY(reg, smid2, port, 0x20, 0x80, 1);
-
-/* reg_smid2_port_mask
- * Local port mask (1 bit per port).
- * Access: WO
- */
-MLXSW_ITEM_BIT_ARRAY(reg, smid2, port_mask, 0xA0, 0x80, 1);
-
-static inline void mlxsw_reg_smid2_pack(char *payload, u16 mid, u16 port,
-					bool set, bool smpe_valid, u16 smpe)
-{
-	MLXSW_REG_ZERO(smid2, payload);
-	mlxsw_reg_smid2_swid_set(payload, 0);
-	mlxsw_reg_smid2_mid_set(payload, mid);
-	mlxsw_reg_smid2_port_set(payload, port, set);
-	mlxsw_reg_smid2_port_mask_set(payload, port, 1);
-	mlxsw_reg_smid2_smpe_valid_set(payload, smpe_valid);
-	mlxsw_reg_smid2_smpe_set(payload, smpe_valid ? smpe : 0);
-}
-
-/* CWTP - Congetion WRED ECN TClass Profile
- * ----------------------------------------
- * Configures the profiles for queues of egress port and traffic class
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
- */
-#define MLXSW_REG_SPEVET_ID 0x202A
-#define MLXSW_REG_SPEVET_LEN 0x08
-
-<<<<<<< HEAD
-/* reg_cwtp_local_port
- * Local port number
- * Not supported for CPU port
- * Access: Index
- */
-MLXSW_ITEM32_LP(reg, cwtp, 0x00, 16, 0x00, 12);
-=======
-MLXSW_REG_DEFINE(spevet, MLXSW_REG_SPEVET_ID, MLXSW_REG_SPEVET_LEN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-/* reg_spevet_local_port
- * Egress Local port number.
- * Not supported to CPU port.
- * Access: Index
- */
-MLXSW_ITEM32_LP(reg, spevet, 0x00, 16, 0x00, 12);
-
-/* reg_spevet_et_vlan
- * Egress EtherType VLAN to push when SPVID.egr_et_set field set for the packet:
- * 0: ether_type0 - (default)
- * 1: ether_type1
- * 2: ether_type2
- * Access: RW
- */
-MLXSW_ITEM32(reg, spevet, et_vlan, 0x04, 16, 2);
-
-static inline void mlxsw_reg_spevet_pack(char *payload, u16 local_port,
-					 u8 et_vlan)
-{
-	MLXSW_REG_ZERO(spevet, payload);
-	mlxsw_reg_spevet_local_port_set(payload, local_port);
-	mlxsw_reg_spevet_et_vlan_set(payload, et_vlan);
-}
-
-/* SMPE - Switch Multicast Port to Egress VID
- * ------------------------------------------
- * The switch multicast port to egress VID maps
- * {egress_port, SMPE index} -> {VID}.
- */
-#define MLXSW_REG_SMPE_ID 0x202B
-#define MLXSW_REG_SMPE_LEN 0x0C
-
-<<<<<<< HEAD
-static inline void mlxsw_reg_cwtp_pack(char *payload, u16 local_port,
-				       u8 traffic_class)
-{
-	int i;
-=======
-MLXSW_REG_DEFINE(smpe, MLXSW_REG_SMPE_ID, MLXSW_REG_SMPE_LEN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-/* reg_smpe_local_port
- * Local port number.
- * CPU port is not supported.
- * Access: Index
- */
-MLXSW_ITEM32_LP(reg, smpe, 0x00, 16, 0x00, 12);
-
-/* reg_smpe_smpe_index
- * Switch multicast port to egress VID.
- * Range is 0..cap_max_rmpe-1.
- * Access: Index
- */
-MLXSW_ITEM32(reg, smpe, smpe_index, 0x04, 0, 16);
-
-/* reg_smpe_evid
- * Egress VID.
- * Access: RW
- */
-MLXSW_ITEM32(reg, smpe, evid, 0x08, 0, 12);
-
-static inline void mlxsw_reg_smpe_pack(char *payload, u16 local_port,
-				       u16 smpe_index, u16 evid)
-{
-	MLXSW_REG_ZERO(smpe, payload);
-	mlxsw_reg_smpe_local_port_set(payload, local_port);
-	mlxsw_reg_smpe_smpe_index_set(payload, smpe_index);
-	mlxsw_reg_smpe_evid_set(payload, evid);
-}
-
-/* SFTR-V2 - Switch Flooding Table Version 2 Register
- * --------------------------------------------------
- * The switch flooding table is used for flooding packet replication. The table
- * defines a bit mask of ports for packet replication.
- */
-#define MLXSW_REG_SFTR2_ID 0x202F
-#define MLXSW_REG_SFTR2_LEN 0x120
-
-MLXSW_REG_DEFINE(sftr2, MLXSW_REG_SFTR2_ID, MLXSW_REG_SFTR2_LEN);
-
-/* reg_sftr2_swid
- * Switch partition ID with which to associate the port.
- * Access: Index
- */
-<<<<<<< HEAD
-MLXSW_ITEM32_LP(reg, cwtpm, 0x00, 16, 0x00, 12);
-=======
-MLXSW_ITEM32(reg, sftr2, swid, 0x00, 24, 8);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-/* reg_sftr2_flood_table
- * Flooding table index to associate with the specific type on the specific
- * switch partition.
- * Access: Index
- */
-MLXSW_ITEM32(reg, sftr2, flood_table, 0x00, 16, 6);
-
-/* reg_sftr2_index
- * Index. Used as an index into the Flooding Table in case the table is
- * configured to use VID / FID or FID Offset.
- * Access: Index
- */
-MLXSW_ITEM32(reg, sftr2, index, 0x00, 0, 16);
-
-/* reg_sftr2_table_type
- * See mlxsw_flood_table_type
- * Access: RW
- */
-MLXSW_ITEM32(reg, sftr2, table_type, 0x04, 16, 3);
-
-/* reg_sftr2_range
- * Range of entries to update
- * Access: Index
- */
-MLXSW_ITEM32(reg, sftr2, range, 0x04, 0, 16);
-
-/* reg_sftr2_port
- * Local port membership (1 bit per port).
- * Access: RW
- */
-MLXSW_ITEM_BIT_ARRAY(reg, sftr2, port, 0x20, 0x80, 1);
-
-/* reg_sftr2_port_mask
- * Local port mask (1 bit per port).
- * Access: WO
- */
-MLXSW_ITEM_BIT_ARRAY(reg, sftr2, port_mask, 0xA0, 0x80, 1);
-
-static inline void mlxsw_reg_sftr2_pack(char *payload,
-					unsigned int flood_table,
-					unsigned int index,
-					enum mlxsw_flood_table_type table_type,
-					unsigned int range, u16 port, bool set)
-{
-	MLXSW_REG_ZERO(sftr2, payload);
-	mlxsw_reg_sftr2_swid_set(payload, 0);
-	mlxsw_reg_sftr2_flood_table_set(payload, flood_table);
-	mlxsw_reg_sftr2_index_set(payload, index);
-	mlxsw_reg_sftr2_table_type_set(payload, table_type);
-	mlxsw_reg_sftr2_range_set(payload, range);
-	mlxsw_reg_sftr2_port_set(payload, port, set);
-	mlxsw_reg_sftr2_port_mask_set(payload, port, 1);
 }
 
 /* SMID-V2 - Switch Multicast ID Version 2 Register
@@ -4983,36 +4753,6 @@ static inline void mlxsw_reg_ptys_ext_eth_unpack(char *payload,
 			mlxsw_reg_ptys_ext_eth_proto_oper_get(payload);
 }
 
-<<<<<<< HEAD
-=======
-static inline void mlxsw_reg_ptys_ib_pack(char *payload, u16 local_port,
-					  u16 proto_admin, u16 link_width)
-{
-	MLXSW_REG_ZERO(ptys, payload);
-	mlxsw_reg_ptys_local_port_set(payload, local_port);
-	mlxsw_reg_ptys_proto_mask_set(payload, MLXSW_REG_PTYS_PROTO_MASK_IB);
-	mlxsw_reg_ptys_ib_proto_admin_set(payload, proto_admin);
-	mlxsw_reg_ptys_ib_link_width_admin_set(payload, link_width);
-}
-
-static inline void mlxsw_reg_ptys_ib_unpack(char *payload, u16 *p_ib_proto_cap,
-					    u16 *p_ib_link_width_cap,
-					    u16 *p_ib_proto_oper,
-					    u16 *p_ib_link_width_oper)
-{
-	if (p_ib_proto_cap)
-		*p_ib_proto_cap = mlxsw_reg_ptys_ib_proto_cap_get(payload);
-	if (p_ib_link_width_cap)
-		*p_ib_link_width_cap =
-			mlxsw_reg_ptys_ib_link_width_cap_get(payload);
-	if (p_ib_proto_oper)
-		*p_ib_proto_oper = mlxsw_reg_ptys_ib_proto_oper_get(payload);
-	if (p_ib_link_width_oper)
-		*p_ib_link_width_oper =
-			mlxsw_reg_ptys_ib_link_width_oper_get(payload);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* PPAD - Port Physical Address Register
  * -------------------------------------
  * The PPAD register configures the per port physical MAC address.
@@ -5786,30 +5526,6 @@ static inline void mlxsw_reg_ppcnt_pack(char *payload, u16 local_port,
 	mlxsw_reg_ppcnt_prio_tc_set(payload, prio_tc);
 }
 
-<<<<<<< HEAD
-=======
-/* PLIB - Port Local to InfiniBand Port
- * ------------------------------------
- * The PLIB register performs mapping from Local Port into InfiniBand Port.
- */
-#define MLXSW_REG_PLIB_ID 0x500A
-#define MLXSW_REG_PLIB_LEN 0x10
-
-MLXSW_REG_DEFINE(plib, MLXSW_REG_PLIB_ID, MLXSW_REG_PLIB_LEN);
-
-/* reg_plib_local_port
- * Local port number.
- * Access: Index
- */
-MLXSW_ITEM32_LP(reg, plib, 0x00, 16, 0x00, 12);
-
-/* reg_plib_ib_port
- * InfiniBand port remapping for local_port.
- * Access: RW
- */
-MLXSW_ITEM32(reg, plib, ib_port, 0x00, 0, 8);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* PPTB - Port Prio To Buffer Register
  * -----------------------------------
  * Configures the switch priority to buffer table.
@@ -6392,7 +6108,6 @@ static inline void mlxsw_reg_pddr_pack(char *payload, u16 local_port,
  * -------------------------------------------------
  * The PMMP register allows to override the module memory map advertisement.
  * The register can only be set when the module is disabled by PMAOS register.
-<<<<<<< HEAD
  */
 #define MLXSW_REG_PMMP_ID 0x5044
 #define MLXSW_REG_PMMP_LEN 0x2C
@@ -6409,153 +6124,6 @@ MLXSW_ITEM32(reg, pmmp, module, 0x00, 16, 8);
  * Slot index.
  * Access: Index
  */
-MLXSW_ITEM32(reg, pmmp, slot_index, 0x00, 24, 4);
-
-/* reg_pmmp_sticky
- * When set, will keep eeprom_override values after plug-out event.
- * Access: OP
- */
-MLXSW_ITEM32(reg, pmmp, sticky, 0x00, 0, 1);
-
-/* reg_pmmp_eeprom_override_mask
- * Write mask bit (negative polarity).
- * 0 - Allow write
- * 1 - Ignore write
- * On write, indicates which of the bits from eeprom_override field are
- * updated.
- * Access: WO
- */
-MLXSW_ITEM32(reg, pmmp, eeprom_override_mask, 0x04, 16, 16);
-
-enum {
-	/* Set module to low power mode */
-	MLXSW_REG_PMMP_EEPROM_OVERRIDE_LOW_POWER_MASK = BIT(8),
-};
-
-/* reg_pmmp_eeprom_override
- * Override / ignore EEPROM advertisement properties bitmask
- * Access: RW
- */
-MLXSW_ITEM32(reg, pmmp, eeprom_override, 0x04, 0, 16);
-
-static inline void mlxsw_reg_pmmp_pack(char *payload, u8 slot_index, u8 module)
-{
-	MLXSW_REG_ZERO(pmmp, payload);
-	mlxsw_reg_pmmp_slot_index_set(payload, slot_index);
-	mlxsw_reg_pmmp_module_set(payload, module);
-}
-
-/* PLLP - Port Local port to Label Port mapping Register
- * -----------------------------------------------------
- * The PLLP register returns the mapping from Local Port into Label Port.
- */
-#define MLXSW_REG_PLLP_ID 0x504A
-#define MLXSW_REG_PLLP_LEN 0x10
-
-MLXSW_REG_DEFINE(pllp, MLXSW_REG_PLLP_ID, MLXSW_REG_PLLP_LEN);
-
-/* reg_pllp_local_port
- * Local port number.
- * Access: Index
- */
-MLXSW_ITEM32_LP(reg, pllp, 0x00, 16, 0x00, 12);
-
-/* reg_pllp_label_port
- * Front panel label of the port.
- * Access: RO
- */
-MLXSW_ITEM32(reg, pllp, label_port, 0x00, 0, 8);
-
-/* reg_pllp_split_num
- * Label split mapping for local_port.
- * Access: RO
- */
-MLXSW_ITEM32(reg, pllp, split_num, 0x04, 0, 4);
-
-/* reg_pllp_slot_index
- * Slot index (0: Main board).
- * Access: RO
- */
-MLXSW_ITEM32(reg, pllp, slot_index, 0x08, 0, 4);
-
-static inline void mlxsw_reg_pllp_pack(char *payload, u16 local_port)
-{
-	MLXSW_REG_ZERO(pllp, payload);
-	mlxsw_reg_pllp_local_port_set(payload, local_port);
-}
-
-static inline void mlxsw_reg_pllp_unpack(char *payload, u8 *label_port,
-					 u8 *split_num, u8 *slot_index)
-{
-	*label_port = mlxsw_reg_pllp_label_port_get(payload);
-	*split_num = mlxsw_reg_pllp_split_num_get(payload);
-	*slot_index = mlxsw_reg_pllp_slot_index_get(payload);
-}
-
-/* PMTM - Port Module Type Mapping Register
- * ----------------------------------------
- * The PMTM register allows query or configuration of module types.
- * The register can only be set when the module is disabled by PMAOS register
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
- */
-#define MLXSW_REG_PMMP_ID 0x5044
-#define MLXSW_REG_PMMP_LEN 0x2C
-
-MLXSW_REG_DEFINE(pmmp, MLXSW_REG_PMMP_ID, MLXSW_REG_PMMP_LEN);
-
-<<<<<<< HEAD
-/* reg_pmtm_slot_index
- * Slot index.
- * Access: Index
- */
-MLXSW_ITEM32(reg, pmtm, slot_index, 0x00, 24, 4);
-
-/* reg_pmtm_module
- * Module number.
- * Access: Index
- */
-MLXSW_ITEM32(reg, pmtm, module, 0x00, 16, 8);
-
-enum mlxsw_reg_pmtm_module_type {
-	MLXSW_REG_PMTM_MODULE_TYPE_BACKPLANE_4_LANES = 0,
-	MLXSW_REG_PMTM_MODULE_TYPE_QSFP = 1,
-	MLXSW_REG_PMTM_MODULE_TYPE_SFP = 2,
-	MLXSW_REG_PMTM_MODULE_TYPE_BACKPLANE_SINGLE_LANE = 4,
-	MLXSW_REG_PMTM_MODULE_TYPE_BACKPLANE_2_LANES = 8,
-	MLXSW_REG_PMTM_MODULE_TYPE_CHIP2CHIP4X = 10,
-	MLXSW_REG_PMTM_MODULE_TYPE_CHIP2CHIP2X = 11,
-	MLXSW_REG_PMTM_MODULE_TYPE_CHIP2CHIP1X = 12,
-	MLXSW_REG_PMTM_MODULE_TYPE_QSFP_DD = 14,
-	MLXSW_REG_PMTM_MODULE_TYPE_OSFP = 15,
-	MLXSW_REG_PMTM_MODULE_TYPE_SFP_DD = 16,
-	MLXSW_REG_PMTM_MODULE_TYPE_DSFP = 17,
-	MLXSW_REG_PMTM_MODULE_TYPE_CHIP2CHIP8X = 18,
-	MLXSW_REG_PMTM_MODULE_TYPE_TWISTED_PAIR = 19,
-};
-=======
-/* reg_pmmp_module
- * Module number.
- * Access: Index
- */
-MLXSW_ITEM32(reg, pmmp, module, 0x00, 16, 8);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-/* reg_pmmp_slot_index
- * Slot index.
- * Access: Index
- */
-<<<<<<< HEAD
-MLXSW_ITEM32(reg, pmtm, module_type, 0x04, 0, 5);
-
-static inline void mlxsw_reg_pmtm_pack(char *payload, u8 slot_index, u8 module)
-{
-	MLXSW_REG_ZERO(pmtm, payload);
-	mlxsw_reg_pmtm_slot_index_set(payload, slot_index);
-	mlxsw_reg_pmtm_module_set(payload, module);
-}
-
-=======
 MLXSW_ITEM32(reg, pmmp, slot_index, 0x00, 24, 4);
 
 /* reg_pmmp_sticky
@@ -6691,7 +6259,6 @@ static inline void mlxsw_reg_pmtm_pack(char *payload, u8 slot_index, u8 module)
 	mlxsw_reg_pmtm_module_set(payload, module);
 }
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* HTGT - Host Trap Group Table
  * ----------------------------
  * Configures the properties for forwarding to CPU.
@@ -9466,7 +9033,6 @@ mlxsw_reg_rmft2_ipv6_pack(char *payload, bool v, u16 offset, u16 virtual_router,
 			    MLXSW_REG_REIV_REC_MAX_COUNT)
 
 MLXSW_REG_DEFINE(reiv, MLXSW_REG_REIV_ID, MLXSW_REG_REIV_LEN);
-<<<<<<< HEAD
 
 /* reg_reiv_port_page
  * Port page - elport_record[0] is 256*port_page.
@@ -9479,20 +9045,6 @@ MLXSW_ITEM32(reg, reiv, port_page, 0x00, 0, 4);
  * Range is 0..cap_max_router_interfaces-1.
  * Access: Index
  */
-=======
-
-/* reg_reiv_port_page
- * Port page - elport_record[0] is 256*port_page.
- * Access: Index
- */
-MLXSW_ITEM32(reg, reiv, port_page, 0x00, 0, 4);
-
-/* reg_reiv_erif
- * Egress RIF.
- * Range is 0..cap_max_router_interfaces-1.
- * Access: Index
- */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MLXSW_ITEM32(reg, reiv, erif, 0x04, 0, 16);
 
 /* reg_reiv_rec_update
@@ -13211,10 +12763,6 @@ static const struct mlxsw_reg_info *mlxsw_reg_infos[] = {
 	MLXSW_REG(spvc),
 	MLXSW_REG(spevet),
 	MLXSW_REG(smpe),
-<<<<<<< HEAD
-=======
-	MLXSW_REG(sftr2),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	MLXSW_REG(smid2),
 	MLXSW_REG(cwtp),
 	MLXSW_REG(cwtpm),

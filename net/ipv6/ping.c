@@ -206,10 +206,7 @@ struct proto pingv6_prot = {
 	.init =		ping_init_sock,
 	.close =	ping_close,
 	.destroy =	ping_v6_destroy,
-<<<<<<< HEAD
 	.pre_connect =	ping_v6_pre_connect,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.connect =	ip6_datagram_connect_v6_only,
 	.disconnect =	__udp_disconnect,
 	.setsockopt =	ipv6_setsockopt,

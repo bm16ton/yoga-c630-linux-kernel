@@ -443,11 +443,8 @@ static void md_submit_bio(struct bio *bio)
 	}
 
 	bio = bio_split_to_limits(bio);
-<<<<<<< HEAD
 	if (!bio)
 		return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (mddev->ro == 1 && unlikely(rw == WRITE)) {
 		if (bio_sectors(bio) != 0)
@@ -5853,11 +5850,7 @@ int md_run(struct mddev *mddev)
 			}
 		}
 		sysfs_notify_dirent_safe(rdev->sysfs_state);
-<<<<<<< HEAD
 		nowait = nowait && bdev_nowait(rdev->bdev);
-=======
-		nowait = nowait && blk_queue_nowait(bdev_get_queue(rdev->bdev));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!bioset_initialized(&mddev->bio_set)) {
@@ -6994,11 +6987,7 @@ static int hot_add_disk(struct mddev *mddev, dev_t dev)
 	 * If the new disk does not support REQ_NOWAIT,
 	 * disable on the whole MD.
 	 */
-<<<<<<< HEAD
 	if (!bdev_nowait(rdev->bdev)) {
-=======
-	if (!blk_queue_nowait(bdev_get_queue(rdev->bdev))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_info("%s: Disabling nowait because %pg does not support nowait\n",
 			mdname(mddev), rdev->bdev);
 		blk_queue_flag_clear(QUEUE_FLAG_NOWAIT, mddev->queue);

@@ -190,7 +190,6 @@ static struct clk_rcg2 lpass_core_cc_ext_if1_clk_src = {
 	},
 };
 
-<<<<<<< HEAD
 static struct clk_rcg2 lpass_core_cc_ext_mclk0_clk_src = {
 	.cmd_rcgr = 0x20000,
 	.mnd_width = 8,
@@ -204,8 +203,6 @@ static struct clk_rcg2 lpass_core_cc_ext_mclk0_clk_src = {
 		.ops = &clk_rcg2_ops,
 	},
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct clk_branch lpass_core_cc_core_clk = {
 	.halt_reg = 0x1f000,
@@ -299,7 +296,6 @@ static struct clk_branch lpass_core_cc_lpm_mem0_core_clk = {
 	},
 };
 
-<<<<<<< HEAD
 static struct clk_branch lpass_core_cc_ext_mclk0_clk = {
 	.halt_reg = 0x20014,
 	.halt_check = BRANCH_HALT,
@@ -318,8 +314,6 @@ static struct clk_branch lpass_core_cc_ext_mclk0_clk = {
 	},
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct clk_branch lpass_core_cc_sysnoc_mport_core_clk = {
 	.halt_reg = 0x23000,
 	.halt_check = BRANCH_HALT_VOTED,
@@ -363,11 +357,8 @@ static struct clk_regmap *lpass_core_cc_sc7280_clocks[] = {
 	[LPASS_CORE_CC_LPM_CORE_CLK] = &lpass_core_cc_lpm_core_clk.clkr,
 	[LPASS_CORE_CC_LPM_MEM0_CORE_CLK] = &lpass_core_cc_lpm_mem0_core_clk.clkr,
 	[LPASS_CORE_CC_SYSNOC_MPORT_CORE_CLK] = &lpass_core_cc_sysnoc_mport_core_clk.clkr,
-<<<<<<< HEAD
 	[LPASS_CORE_CC_EXT_MCLK0_CLK] = &lpass_core_cc_ext_mclk0_clk.clkr,
 	[LPASS_CORE_CC_EXT_MCLK0_CLK_SRC] = &lpass_core_cc_ext_mclk0_clk_src.clkr,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct regmap_config lpass_core_cc_sc7280_regmap_config = {

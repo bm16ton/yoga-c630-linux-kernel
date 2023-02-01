@@ -2,7 +2,6 @@
 /* Copyright (c) 2020-2021 Microchip Technology Inc */
 
 / {
-<<<<<<< HEAD
 	compatible = "microchip,mpfs-icicle-reference-rtlv2210", "microchip,mpfs-icicle-kit",
 		     "microchip,mpfs";
 
@@ -11,28 +10,13 @@
 		reg = <0x0 0x40000000 0x0 0xF0>;
 		microchip,sync-update-mask = /bits/ 32 <0>;
 		#pwm-cells = <3>;
-=======
-	compatible = "microchip,mpfs-icicle-reference-rtlv2203", "microchip,mpfs";
-
-	core_pwm0: pwm@41000000 {
-		compatible = "microchip,corepwm-rtl-v4";
-		reg = <0x0 0x41000000 0x0 0xF0>;
-		microchip,sync-update-mask = /bits/ 32 <0>;
-		#pwm-cells = <2>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		clocks = <&fabric_clk3>;
 		status = "disabled";
 	};
 
-<<<<<<< HEAD
 	i2c2: i2c@40000200 {
 		compatible = "microchip,corei2c-rtl-v7";
 		reg = <0x0 0x40000200 0x0 0x100>;
-=======
-	i2c2: i2c@44000000 {
-		compatible = "microchip,corei2c-rtl-v7";
-		reg = <0x0 0x44000000 0x0 0x1000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		#address-cells = <1>;
 		#size-cells = <0>;
 		clocks = <&fabric_clk3>;
@@ -45,11 +29,7 @@
 	fabric_clk3: fabric-clk3 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-<<<<<<< HEAD
 		clock-frequency = <50000000>;
-=======
-		clock-frequency = <62500000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	fabric_clk1: fabric-clk1 {
@@ -57,7 +37,6 @@
 		#clock-cells = <0>;
 		clock-frequency = <125000000>;
 	};
-<<<<<<< HEAD
 
 	pcie: pcie@3000000000 {
 		compatible = "microchip,pcie-host-1.0";
@@ -88,6 +67,4 @@
 			interrupt-controller;
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

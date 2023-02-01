@@ -344,32 +344,7 @@ void pdc_cpu_rendezvous_unlock(void)
 {
 	spin_unlock(&pdc_lock);
 }
-<<<<<<< HEAD
-=======
 
-/**
- * pdc_pat_get_PDC_entrypoint - Get PDC entry point for current CPU
- * @retval: -1 on error, 0 on success
- */
-int pdc_pat_get_PDC_entrypoint(unsigned long *pdc_entry)
-{
-	int retval = 0;
-	unsigned long flags;
-
-	if (!IS_ENABLED(CONFIG_SMP) || !is_pdc_pat()) {
-		*pdc_entry = MEM_PDC;
-		return 0;
-	}
-
-	spin_lock_irqsave(&pdc_lock, flags);
-	retval = mem_pdc_call(PDC_PAT_CPU, PDC_PAT_CPU_GET_PDC_ENTRYPOINT,
-			__pa(pdc_result));
-	*pdc_entry = pdc_result[0];
-	spin_unlock_irqrestore(&pdc_lock, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	return retval;
-}
 /**
  * pdc_pat_get_PDC_entrypoint - Get PDC entry point for current CPU
  * @retval: -1 on error, 0 on success

@@ -275,10 +275,6 @@ static void merge_rbio(struct btrfs_raid_bio *dest,
 	/* Also inherit the bitmaps from @victim. */
 	bitmap_or(&dest->dbitmap, &victim->dbitmap, &dest->dbitmap,
 		  dest->stripe_nsectors);
-<<<<<<< HEAD
-=======
-	dest->generic_bio_cnt += victim->generic_bio_cnt;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bio_list_init(&victim->bio_list);
 }
 
@@ -817,11 +813,6 @@ static void rbio_orig_end_io(struct btrfs_raid_bio *rbio, blk_status_t err)
 	struct bio *cur = bio_list_get(&rbio->bio_list);
 	struct bio *extra;
 
-<<<<<<< HEAD
-=======
-	if (rbio->generic_bio_cnt)
-		btrfs_bio_counter_sub(rbio->bioc->fs_info, rbio->generic_bio_cnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Clear the data bitmap, as the rbio may be cached for later usage.
 	 * do this before before unlock_stripe() so there will be no new bio
@@ -893,17 +884,10 @@ static struct sector_ptr *sector_in_rbio(struct btrfs_raid_bio *rbio,
 {
 	struct sector_ptr *sector;
 	int index;
-<<<<<<< HEAD
 
 	ASSERT(stripe_nr >= 0 && stripe_nr < rbio->real_stripes);
 	ASSERT(sector_nr >= 0 && sector_nr < rbio->stripe_nsectors);
 
-=======
-
-	ASSERT(stripe_nr >= 0 && stripe_nr < rbio->real_stripes);
-	ASSERT(sector_nr >= 0 && sector_nr < rbio->stripe_nsectors);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	index = stripe_nr * rbio->stripe_nsectors + sector_nr;
 	ASSERT(index >= 0 && index < rbio->nr_sectors);
 
@@ -959,10 +943,7 @@ static struct btrfs_raid_bio *alloc_rbio(struct btrfs_fs_info *fs_info,
 	spin_lock_init(&rbio->bio_list_lock);
 	INIT_LIST_HEAD(&rbio->stripe_cache);
 	INIT_LIST_HEAD(&rbio->hash_list);
-<<<<<<< HEAD
 	btrfs_get_bioc(bioc);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rbio->bioc = bioc;
 	rbio->nr_pages = num_pages;
 	rbio->nr_sectors = num_sectors;
@@ -1145,7 +1126,6 @@ static void index_rbio_pages(struct btrfs_raid_bio *rbio)
 	spin_lock_irq(&rbio->bio_list_lock);
 	bio_list_for_each(bio, &rbio->bio_list)
 		index_one_bio(rbio, bio);
-<<<<<<< HEAD
 
 	spin_unlock_irq(&rbio->bio_list_lock);
 }
@@ -1162,24 +1142,6 @@ static void bio_get_trace_info(struct btrfs_raid_bio *rbio, struct bio *bio,
 	if (!bio->bi_bdev)
 		goto not_found;
 
-=======
-
-	spin_unlock_irq(&rbio->bio_list_lock);
-}
-
-static void bio_get_trace_info(struct btrfs_raid_bio *rbio, struct bio *bio,
-			       struct raid56_bio_trace_info *trace_info)
-{
-	const struct btrfs_io_context *bioc = rbio->bioc;
-	int i;
-
-	ASSERT(bioc);
-
-	/* We rely on bio->bi_bdev to find the stripe number. */
-	if (!bio->bi_bdev)
-		goto not_found;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < bioc->num_stripes; i++) {
 		if (bio->bi_bdev != bioc->stripes[i].dev->bdev)
 			continue;
@@ -1847,22 +1809,11 @@ void raid56_parity_write(struct bio *bio, struct btrfs_io_context *bioc)
 
 	rbio = alloc_rbio(fs_info, bioc);
 	if (IS_ERR(rbio)) {
-<<<<<<< HEAD
 		ret = PTR_ERR(rbio);
 		goto fail;
 	}
 	rbio->operation = BTRFS_RBIO_WRITE;
 	rbio_add_bio(rbio, bio);
-=======
-		btrfs_put_bioc(bioc);
-		ret = PTR_ERR(rbio);
-		goto out_dec_counter;
-	}
-	rbio->operation = BTRFS_RBIO_WRITE;
-	rbio_add_bio(rbio, bio);
-
-	rbio->generic_bio_cnt = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * don't plug on full rbios, just get them out the door
@@ -1870,15 +1821,10 @@ void raid56_parity_write(struct bio *bio, struct btrfs_io_context *bioc)
 	 */
 	if (rbio_is_full(rbio)) {
 		ret = full_stripe_write(rbio);
-<<<<<<< HEAD
 		if (ret) {
 			__free_raid_bio(rbio);
 			goto fail;
 		}
-=======
-		if (ret)
-			goto out_dec_counter;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 	}
 
@@ -1892,25 +1838,15 @@ void raid56_parity_write(struct bio *bio, struct btrfs_io_context *bioc)
 		list_add_tail(&rbio->plug_list, &plug->rbio_list);
 	} else {
 		ret = __raid56_parity_write(rbio);
-<<<<<<< HEAD
 		if (ret) {
 			__free_raid_bio(rbio);
 			goto fail;
 		}
-=======
-		if (ret)
-			goto out_dec_counter;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return;
 
-<<<<<<< HEAD
 fail:
-=======
-out_dec_counter:
-	btrfs_bio_counter_dec(fs_info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bio->bi_status = errno_to_blk_status(ret);
 	bio_endio(bio);
 }
@@ -2258,25 +2194,11 @@ cleanup:
  * of the drive.
  */
 void raid56_parity_recover(struct bio *bio, struct btrfs_io_context *bioc,
-<<<<<<< HEAD
 			   int mirror_num)
-=======
-			   int mirror_num, bool generic_io)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct btrfs_fs_info *fs_info = bioc->fs_info;
 	struct btrfs_raid_bio *rbio;
 
-<<<<<<< HEAD
-=======
-	if (generic_io) {
-		ASSERT(bioc->mirror_num == mirror_num);
-		btrfs_bio(bio)->mirror_num = mirror_num;
-	} else {
-		btrfs_get_bioc(bioc);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rbio = alloc_rbio(fs_info, bioc);
 	if (IS_ERR(rbio)) {
 		bio->bi_status = errno_to_blk_status(PTR_ERR(rbio));
@@ -2292,20 +2214,10 @@ void raid56_parity_recover(struct bio *bio, struct btrfs_io_context *bioc,
 "%s could not find the bad stripe in raid56 so that we cannot recover any more (bio has logical %llu len %llu, bioc has map_type %llu)",
 			   __func__, bio->bi_iter.bi_sector << 9,
 			   (u64)bio->bi_iter.bi_size, bioc->map_type);
-<<<<<<< HEAD
 		__free_raid_bio(rbio);
 		bio->bi_status = BLK_STS_IOERR;
 		goto out_end_bio;
 	}
-=======
-		kfree(rbio);
-		bio->bi_status = BLK_STS_IOERR;
-		goto out_end_bio;
-	}
-
-	if (generic_io)
-		rbio->generic_bio_cnt = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Loop retry:
@@ -2335,11 +2247,6 @@ void raid56_parity_recover(struct bio *bio, struct btrfs_io_context *bioc,
 	return;
 
 out_end_bio:
-<<<<<<< HEAD
-=======
-	btrfs_bio_counter_dec(fs_info);
-	btrfs_put_bioc(bioc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bio_endio(bio);
 }
 
@@ -2403,16 +2310,6 @@ struct btrfs_raid_bio *raid56_parity_alloc_scrub_rbio(struct bio *bio,
 	ASSERT(i < rbio->real_stripes);
 
 	bitmap_copy(&rbio->dbitmap, dbitmap, stripe_nsectors);
-<<<<<<< HEAD
-=======
-
-	/*
-	 * We have already increased bio_counter when getting bioc, record it
-	 * so we can free it at rbio_orig_end_io().
-	 */
-	rbio->generic_bio_cnt = 1;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return rbio;
 }
 
@@ -2854,15 +2751,6 @@ raid56_alloc_missing_rbio(struct bio *bio, struct btrfs_io_context *bioc)
 		return NULL;
 	}
 
-<<<<<<< HEAD
-=======
-	/*
-	 * When we get bioc, we have already increased bio_counter, record it
-	 * so we can free it at rbio_orig_end_io()
-	 */
-	rbio->generic_bio_cnt = 1;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return rbio;
 }
 

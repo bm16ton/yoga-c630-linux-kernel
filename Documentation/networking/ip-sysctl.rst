@@ -1039,7 +1039,6 @@ tcp_challenge_ack_limit - INTEGER
 	attacks and probably should not be enabled.
 	TCP stack implements per TCP socket limits anyway.
 	Default: INT_MAX (unlimited)
-<<<<<<< HEAD
 
 tcp_ehash_entries - INTEGER
 	Show the number of hash buckets for TCP sockets in the current
@@ -1069,8 +1068,6 @@ tcp_child_ehash_entries - INTEGER
 	Possible values: 0, 2^n (n: 0 - 24 (16Mi))
 
 	Default: 0
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 UDP variables
 =============

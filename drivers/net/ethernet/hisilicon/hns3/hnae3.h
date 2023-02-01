@@ -97,11 +97,8 @@ enum HNAE3_DEV_CAP_BITS {
 	HNAE3_DEV_SUPPORT_VLAN_FLTR_MDF_B,
 	HNAE3_DEV_SUPPORT_MC_MAC_MNG_B,
 	HNAE3_DEV_SUPPORT_CQ_B,
-<<<<<<< HEAD
 	HNAE3_DEV_SUPPORT_FEC_STATS_B,
 	HNAE3_DEV_SUPPORT_LANE_NUM_B,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define hnae3_ae_dev_fd_supported(ae_dev) \
@@ -164,15 +161,12 @@ enum HNAE3_DEV_CAP_BITS {
 #define hnae3_ae_dev_cq_supported(ae_dev) \
 	test_bit(HNAE3_DEV_SUPPORT_CQ_B, (ae_dev)->caps)
 
-<<<<<<< HEAD
 #define hnae3_ae_dev_fec_stats_supported(ae_dev) \
 	test_bit(HNAE3_DEV_SUPPORT_FEC_STATS_B, (ae_dev)->caps)
 
 #define hnae3_ae_dev_lane_num_supported(ae_dev) \
 	test_bit(HNAE3_DEV_SUPPORT_LANE_NUM_B, (ae_dev)->caps)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum HNAE3_PF_CAP_BITS {
 	HNAE3_PF_SUPPORT_VLAN_FLTR_MDF_B = 0,
 };
@@ -287,10 +281,7 @@ enum hnae3_dbg_cmd {
 	HNAE3_DBG_CMD_TC_SCH_INFO,
 	HNAE3_DBG_CMD_QOS_PAUSE_CFG,
 	HNAE3_DBG_CMD_QOS_PRI_MAP,
-<<<<<<< HEAD
 	HNAE3_DBG_CMD_QOS_DSCP_MAP,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	HNAE3_DBG_CMD_QOS_BUF_CFG,
 	HNAE3_DBG_CMD_DEV_INFO,
 	HNAE3_DBG_CMD_TX_BD,
@@ -329,14 +320,11 @@ enum hnae3_dbg_cmd {
 	HNAE3_DBG_CMD_UNKNOWN,
 };
 
-<<<<<<< HEAD
 enum hnae3_tc_map_mode {
 	HNAE3_TC_MAP_MODE_PRIO,
 	HNAE3_TC_MAP_MODE_DSCP,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct hnae3_vector_info {
 	u8 __iomem *io_addr;
 	int vector;
@@ -769,11 +757,8 @@ struct hnae3_ae_ops {
 	int (*get_link_diagnosis_info)(struct hnae3_handle *handle,
 				       u32 *status_code);
 	void (*clean_vf_config)(struct hnae3_ae_dev *ae_dev, int num_vfs);
-<<<<<<< HEAD
 	int (*get_dscp_prio)(struct hnae3_handle *handle, u8 dscp,
 			     u8 *tc_map_mode, u8 *priority);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct hnae3_dcb_ops {

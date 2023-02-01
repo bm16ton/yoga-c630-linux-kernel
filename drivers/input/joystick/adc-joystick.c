@@ -253,7 +253,6 @@ static int adc_joystick_probe(struct platform_device *pdev)
 	if (error)
 		return error;
 
-<<<<<<< HEAD
 	if (joy->polled) {
 		input_setup_polling(input, adc_joystick_poll);
 		input_set_poll_interval(input, poll_interval);
@@ -274,18 +273,6 @@ static int adc_joystick_probe(struct platform_device *pdev)
 			dev_err(dev, "Unable to add action\n");
 			return error;
 		}
-=======
-	joy->buffer = iio_channel_get_all_cb(dev, adc_joystick_handle, joy);
-	if (IS_ERR(joy->buffer)) {
-		dev_err(dev, "Unable to allocate callback buffer\n");
-		return PTR_ERR(joy->buffer);
-	}
-
-	error = devm_add_action_or_reset(dev, adc_joystick_cleanup, joy->buffer);
-	if (error)  {
-		dev_err(dev, "Unable to add action\n");
-		return error;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	input_set_drvdata(input, joy);

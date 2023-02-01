@@ -115,7 +115,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &wifi {
 	status = "okay";
 	pinctrl-names = "default", "dbdc";
@@ -123,8 +122,6 @@
 	pinctrl-1 = <&wf_dbdc_pins>;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &pio {
 	uart1_pins: uart1-pins {
 		mux {
@@ -139,7 +136,6 @@
 			groups = "uart2";
 		};
 	};
-<<<<<<< HEAD
 
 	wf_2g_5g_pins: wf-2g-5g-pins {
 		mux {
@@ -171,6 +167,4 @@
 			drive-strength = <4>;
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

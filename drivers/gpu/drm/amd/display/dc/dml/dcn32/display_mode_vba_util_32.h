@@ -216,10 +216,7 @@ void dml32_CalculateDETBufferSize(
 void dml32_CalculateODMMode(
 		unsigned int MaximumPixelsPerLinePerDSCUnit,
 		unsigned int HActive,
-<<<<<<< HEAD
 		enum output_format_class OutFormat,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		enum output_encoder_class Output,
 		enum odm_combine_policy ODMUse,
 		double StateDispclk,
@@ -231,10 +228,7 @@ void dml32_CalculateODMMode(
 		double DISPCLKDPPCLKDSCCLKDownSpreading,
 		double DISPCLKRampingMargin,
 		double DISPCLKDPPCLKVCOSpeed,
-<<<<<<< HEAD
 		unsigned int NumberOfDSCSlices,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Output */
 		bool *TotalAvailablePipesSupport,
@@ -333,12 +327,8 @@ unsigned int dml32_DSCDelayRequirement(bool DSCEnabled,
 		enum output_format_class  OutputFormat,
 		enum output_encoder_class Output,
 		double PixelClock,
-<<<<<<< HEAD
 		double PixelClockBackEnd,
 		double dsc_delay_factor_wa);
-=======
-		double PixelClockBackEnd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void dml32_CalculateSurfaceSizeInMall(
 		unsigned int NumberOfActiveSurfaces,
@@ -753,10 +743,7 @@ bool dml32_CalculatePrefetchSchedule(
 		unsigned int SwathHeightY,
 		unsigned int SwathHeightC,
 		double TWait,
-<<<<<<< HEAD
 		double TPreReq,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Output */
 		double   *DSTXAfterScaler,
 		double   *DSTYAfterScaler,
@@ -1154,7 +1141,6 @@ void dml32_CalculateImmediateFlipBandwithSupport(unsigned int NumberOfActiveSurf
 		double  *FractionOfUrgentBandwidth,
 		bool *ImmediateFlipBandwidthSupport);
 
-<<<<<<< HEAD
 bool dml32_CalculateDETSwathFillLatencyHiding(unsigned int NumberOfActiveSurfaces,
 		double ReturnBW,
 		double UrgentLatency,
@@ -1173,6 +1159,4 @@ bool dml32_CalculateDETSwathFillLatencyHiding(unsigned int NumberOfActiveSurface
 		double	VRatioC[],
 		enum dm_use_mall_for_pstate_change_mode UsesMALLForPStateChange[DC__NUM_DPP__MAX]);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

@@ -2546,7 +2546,6 @@ static const struct drm_display_mode logictechno_lttd800480070_l2rt_mode = {
 	.hsync_start = 800 + 112,
 	.hsync_end = 800 + 112 + 3,
 	.htotal = 800 + 112 + 3 + 85,
-<<<<<<< HEAD
 	.vdisplay = 480,
 	.vsync_start = 480 + 38,
 	.vsync_end = 480 + 38 + 3,
@@ -2580,41 +2579,6 @@ static const struct drm_display_mode logictechno_lttd800480070_l6wh_rt_mode = {
 	.hsync_end = 800 + 154 + 3,
 	.htotal = 800 + 154 + 3 + 43,
 	.vdisplay = 480,
-=======
-	.vdisplay = 480,
-	.vsync_start = 480 + 38,
-	.vsync_end = 480 + 38 + 3,
-	.vtotal = 480 + 38 + 3 + 29,
-	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
-};
-
-static const struct panel_desc logictechno_lttd800480070_l2rt = {
-	.modes = &logictechno_lttd800480070_l2rt_mode,
-	.num_modes = 1,
-	.bpc = 8,
-	.size = {
-		.width = 154,
-		.height = 86,
-	},
-	.delay = {
-		.prepare = 45,
-		.enable = 100,
-		.disable = 100,
-		.unprepare = 45
-	},
-	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
-	.bus_flags = DRM_BUS_FLAG_PIXDATA_SAMPLE_NEGEDGE,
-	.connector_type = DRM_MODE_CONNECTOR_DPI,
-};
-
-static const struct drm_display_mode logictechno_lttd800480070_l6wh_rt_mode = {
-	.clock = 33000,
-	.hdisplay = 800,
-	.hsync_start = 800 + 154,
-	.hsync_end = 800 + 154 + 3,
-	.htotal = 800 + 154 + 3 + 43,
-	.vdisplay = 480,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.vsync_start = 480 + 47,
 	.vsync_end = 480 + 47 + 3,
 	.vtotal = 480 + 47 + 3 + 20,
@@ -2736,7 +2700,6 @@ static const struct panel_desc multi_inno_mi0700s4t_6 = {
 	.connector_type = DRM_MODE_CONNECTOR_DPI,
 };
 
-<<<<<<< HEAD
 static const struct display_timing multi_inno_mi0800ft_9_timing = {
 	.pixelclock = { 32000000, 40000000, 50000000 },
 	.hactive = { 800, 800, 800 },
@@ -2767,8 +2730,6 @@ static const struct panel_desc multi_inno_mi0800ft_9 = {
 	.connector_type = DRM_MODE_CONNECTOR_DPI,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct display_timing multi_inno_mi1010ait_1cp_timing = {
 	.pixelclock = { 68900000, 70000000, 73400000 },
 	.hactive = { 1280, 1280, 1280 },
@@ -3286,7 +3247,6 @@ static const struct panel_desc rocktech_rk101ii01d_ct = {
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
-<<<<<<< HEAD
 static const struct display_timing samsung_ltl101al01_timing = {
 	.pixelclock = { 66663000, 66663000, 66663000 },
 	.hactive = { 1280, 1280, 1280 },
@@ -3318,8 +3278,6 @@ static const struct panel_desc samsung_ltl101al01 = {
 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct drm_display_mode samsung_ltn101nt05_mode = {
 	.clock = 54030,
 	.hdisplay = 1024,
@@ -4204,12 +4162,9 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "multi-inno,mi0700s4t-6",
 		.data = &multi_inno_mi0700s4t_6,
 	}, {
-<<<<<<< HEAD
 		.compatible = "multi-inno,mi0800ft-9",
 		.data = &multi_inno_mi0800ft_9,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.compatible = "multi-inno,mi1010ait-1cp",
 		.data = &multi_inno_mi1010ait_1cp,
 	}, {
@@ -4270,12 +4225,9 @@ static const struct of_device_id platform_of_match[] = {
 		.compatible = "rocktech,rk101ii01d-ct",
 		.data = &rocktech_rk101ii01d_ct,
 	}, {
-<<<<<<< HEAD
 		.compatible = "samsung,ltl101al01",
 		.data = &samsung_ltl101al01,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.compatible = "samsung,ltn101nt05",
 		.data = &samsung_ltn101nt05,
 	}, {

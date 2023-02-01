@@ -2944,15 +2944,12 @@ static int atmel_serial_probe(struct platform_device *pdev)
 	if (ret)
 		goto err;
 
-<<<<<<< HEAD
 	atmel_port->gclk = devm_clk_get_optional(&pdev->dev, "gclk");
 	if (IS_ERR(atmel_port->gclk)) {
 		ret = PTR_ERR(atmel_port->gclk);
 		goto err_clk_disable_unprepare;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = atmel_init_port(atmel_port, pdev);
 	if (ret)
 		goto err_clk_disable_unprepare;

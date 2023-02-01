@@ -191,7 +191,6 @@ struct ip_mreq_source {
 };
 
 struct ip_msfilter {
-<<<<<<< HEAD
 	__be32		imsf_multiaddr;
 	__be32		imsf_interface;
 	__u32		imsf_fmode;
@@ -199,23 +198,6 @@ struct ip_msfilter {
 	union {
 		__be32		imsf_slist[1];
 		__DECLARE_FLEX_ARRAY(__be32, imsf_slist_flex);
-=======
-	union {
-		struct {
-			__be32		imsf_multiaddr_aux;
-			__be32		imsf_interface_aux;
-			__u32		imsf_fmode_aux;
-			__u32		imsf_numsrc_aux;
-			__be32		imsf_slist[1];
-		};
-		struct {
-			__be32		imsf_multiaddr;
-			__be32		imsf_interface;
-			__u32		imsf_fmode;
-			__u32		imsf_numsrc;
-			__be32		imsf_slist_flex[];
-		};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 

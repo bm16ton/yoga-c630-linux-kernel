@@ -6,31 +6,19 @@
 volatile unsigned short uprobe_ref_ctr __attribute__((unused)) __attribute((section(".probes")));
 
 /* uprobe attach point */
-<<<<<<< HEAD
 static noinline void trigger_func(void)
-=======
-static void trigger_func(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	asm volatile ("");
 }
 
 /* attach point for byname uprobe */
-<<<<<<< HEAD
 static noinline void trigger_func2(void)
-=======
-static void trigger_func2(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	asm volatile ("");
 }
 
 /* attach point for byname sleepable uprobe */
-<<<<<<< HEAD
 static noinline void trigger_func3(void)
-=======
-static void trigger_func3(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	asm volatile ("");
 }

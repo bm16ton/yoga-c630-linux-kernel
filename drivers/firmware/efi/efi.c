@@ -614,11 +614,7 @@ int __init efi_config_parse_tables(const efi_config_table_t *config_tables,
 
 		seed = early_memremap(efi_rng_seed, sizeof(*seed));
 		if (seed != NULL) {
-<<<<<<< HEAD
 			size = min_t(u32, seed->size, SZ_1K); // sanity check
-=======
-			size = min(seed->size, EFI_RANDOM_SEED_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			early_memunmap(seed, sizeof(*seed));
 		} else {
 			pr_err("Could not map UEFI random seed!\n");

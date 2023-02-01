@@ -13,7 +13,6 @@ typedef struct func_desc func_desc_t;
 #include <asm-generic/sections.h>
 
 extern char __head_end[];
-<<<<<<< HEAD
 extern char __srwx_boundary[];
 
 /* Patch sites */
@@ -28,8 +27,6 @@ extern s32 patch__memset_nocache, patch__memcpy_nocache;
 
 extern long flush_branch_caches;
 extern long kvm_flush_link_stack;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef __powerpc64__
 

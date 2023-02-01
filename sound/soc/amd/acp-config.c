@@ -130,7 +130,6 @@ struct snd_soc_acpi_mach snd_soc_acpi_amd_sof_machines[] = {
 };
 EXPORT_SYMBOL(snd_soc_acpi_amd_sof_machines);
 
-<<<<<<< HEAD
 struct snd_soc_acpi_mach snd_soc_acpi_amd_rmb_sof_machines[] = {
 	{
 		.id = "AMDI1019",
@@ -161,6 +160,4 @@ struct snd_soc_acpi_mach snd_soc_acpi_amd_rmb_sof_machines[] = {
 };
 EXPORT_SYMBOL(snd_soc_acpi_amd_rmb_sof_machines);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_LICENSE("Dual BSD/GPL");

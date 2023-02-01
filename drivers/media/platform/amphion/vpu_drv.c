@@ -245,15 +245,11 @@ static int __init vpu_driver_init(void)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	ret = vpu_core_driver_init();
 	if (ret)
 		platform_driver_unregister(&amphion_vpu_driver);
 
 	return ret;
-=======
-	return vpu_core_driver_init();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void __exit vpu_driver_exit(void)

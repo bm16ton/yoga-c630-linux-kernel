@@ -700,10 +700,7 @@ static const struct dc_debug_options debug_defaults_drv = {
 	.dwb_fi_phase = -1, // -1 = disable
 	.dmub_command_table = true,
 	.use_max_lb = false,
-<<<<<<< HEAD
 	.exit_idle_opt_for_cursor_updates = true
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct dc_debug_options debug_defaults_diags = {

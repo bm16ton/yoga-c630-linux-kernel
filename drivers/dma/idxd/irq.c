@@ -22,14 +22,6 @@ struct idxd_resubmit {
 	struct idxd_desc *desc;
 };
 
-<<<<<<< HEAD
-=======
-struct idxd_resubmit {
-	struct work_struct work;
-	struct idxd_desc *desc;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct idxd_int_handle_revoke {
 	struct work_struct work;
 	struct idxd_device *idxd;
@@ -87,21 +79,12 @@ static void idxd_int_handle_revoke_drain(struct idxd_irq_entry *ie)
 	desc.flags = IDXD_OP_FLAG_RCI;
 	desc.opcode = DSA_OPCODE_DRAIN;
 	desc.priv = 1;
-<<<<<<< HEAD
 
 	if (ie->pasid != INVALID_IOASID)
 		desc.pasid = ie->pasid;
 	desc.int_handle = ie->int_handle;
 	portal = idxd_wq_portal_addr(wq);
 
-=======
-
-	if (ie->pasid != INVALID_IOASID)
-		desc.pasid = ie->pasid;
-	desc.int_handle = ie->int_handle;
-	portal = idxd_wq_portal_addr(wq);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * The wmb() makes sure that the descriptor is all there before we
 	 * issue.
@@ -156,7 +139,6 @@ static void idxd_int_handle_revoke(struct work_struct *work)
 		dev_warn(dev, "Unexpected int handle refresh interrupt.\n");
 		return;
 	}
-<<<<<<< HEAD
 
 	/*
 	 * The loop attempts to acquire new interrupt handle for all interrupt
@@ -174,25 +156,6 @@ static void idxd_int_handle_revoke(struct work_struct *work)
 		if (ie->int_handle == INVALID_INT_HANDLE)
 			continue;
 
-=======
-
-	/*
-	 * The loop attempts to acquire new interrupt handle for all interrupt
-	 * vectors that supports a handle. If a new interrupt handle is acquired and the
-	 * wq is kernel type, the driver will kill the percpu_ref to pause all
-	 * ongoing descriptor submissions. The interrupt handle is then changed.
-	 * After change, the percpu_ref is revived and all the pending submissions
-	 * are woken to try again. A drain is sent to for the interrupt handle
-	 * at the end to make sure all invalid int handle descriptors are processed.
-	 */
-	for (i = 1; i < idxd->irq_cnt; i++) {
-		struct idxd_irq_entry *ie = idxd_get_ie(idxd, i);
-		struct idxd_wq *wq = ie_to_wq(ie);
-
-		if (ie->int_handle == INVALID_INT_HANDLE)
-			continue;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rc = idxd_device_request_int_handle(idxd, i, &new_handle, IDXD_IRQ_MSIX);
 		if (rc < 0) {
 			dev_warn(dev, "get int handle %d failed: %d\n", i, rc);

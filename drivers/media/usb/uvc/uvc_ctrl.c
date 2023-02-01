@@ -2421,16 +2421,9 @@ static void uvc_ctrl_prune_entity(struct uvc_device *dev,
 static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 			       struct uvc_control *ctrl)
 {
-<<<<<<< HEAD
 	const struct uvc_control_mapping *mappings;
 	unsigned int num_mappings;
 	unsigned int i;
-=======
-	const struct uvc_control_info *info = uvc_ctrls;
-	const struct uvc_control_info *iend = info + ARRAY_SIZE(uvc_ctrls);
-	const struct uvc_control_mapping *mapping;
-	const struct uvc_control_mapping *mend;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * XU controls initialization requires querying the device for control
@@ -2470,17 +2463,11 @@ static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 	 */
 	if (chain->dev->info->mappings) {
 		bool custom = false;
-<<<<<<< HEAD
 
 		for (i = 0; chain->dev->info->mappings[i]; ++i) {
 			const struct uvc_control_mapping *mapping =
 				chain->dev->info->mappings[i];
 
-=======
-		unsigned int i;
-
-		for (i = 0; (mapping = chain->dev->info->mappings[i]); ++i) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (uvc_entity_match_guid(ctrl->entity, mapping->entity) &&
 			    ctrl->info.selector == mapping->selector) {
 				__uvc_ctrl_add_mapping(chain, ctrl, mapping);
@@ -2493,16 +2480,9 @@ static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 	}
 
 	/* Process common mappings next. */
-<<<<<<< HEAD
 	for (i = 0; i < ARRAY_SIZE(uvc_ctrl_mappings); ++i) {
 		const struct uvc_control_mapping *mapping = &uvc_ctrl_mappings[i];
 
-=======
-	mapping = uvc_ctrl_mappings;
-	mend = mapping + ARRAY_SIZE(uvc_ctrl_mappings);
-
-	for (; mapping < mend; ++mapping) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (uvc_entity_match_guid(ctrl->entity, mapping->entity) &&
 		    ctrl->info.selector == mapping->selector)
 			__uvc_ctrl_add_mapping(chain, ctrl, mapping);
@@ -2510,7 +2490,6 @@ static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 
 	/* Finally process version-specific mappings. */
 	if (chain->dev->uvc_version < 0x0150) {
-<<<<<<< HEAD
 		mappings = uvc_ctrl_mappings_uvc11;
 		num_mappings = ARRAY_SIZE(uvc_ctrl_mappings_uvc11);
 	} else {
@@ -2521,16 +2500,6 @@ static void uvc_ctrl_init_ctrl(struct uvc_video_chain *chain,
 	for (i = 0; i < num_mappings; ++i) {
 		const struct uvc_control_mapping *mapping = &mappings[i];
 
-=======
-		mapping = uvc_ctrl_mappings_uvc11;
-		mend = mapping + ARRAY_SIZE(uvc_ctrl_mappings_uvc11);
-	} else {
-		mapping = uvc_ctrl_mappings_uvc15;
-		mend = mapping + ARRAY_SIZE(uvc_ctrl_mappings_uvc15);
-	}
-
-	for (; mapping < mend; ++mapping) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (uvc_entity_match_guid(ctrl->entity, mapping->entity) &&
 		    ctrl->info.selector == mapping->selector)
 			__uvc_ctrl_add_mapping(chain, ctrl, mapping);

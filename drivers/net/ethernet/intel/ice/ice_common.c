@@ -182,7 +182,6 @@ bool ice_is_e810t(struct ice_hw *hw)
 {
 	switch (hw->device_id) {
 	case ICE_DEV_ID_E810C_SFP:
-<<<<<<< HEAD
 		switch (hw->subsystem_device_id) {
 		case ICE_SUBDEV_ID_E810T:
 		case ICE_SUBDEV_ID_E810T2:
@@ -200,11 +199,6 @@ bool ice_is_e810t(struct ice_hw *hw)
 		case ICE_SUBDEV_ID_E810T5:
 			return true;
 		}
-=======
-		if (hw->subsystem_device_id == ICE_SUBDEV_ID_E810T ||
-		    hw->subsystem_device_id == ICE_SUBDEV_ID_E810T2)
-			return true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		break;
@@ -305,10 +299,7 @@ ice_aq_get_phy_caps(struct ice_port_info *pi, bool qual_mods, u8 report_mode,
 	struct ice_aqc_get_phy_caps *cmd;
 	u16 pcaps_size = sizeof(*pcaps);
 	struct ice_aq_desc desc;
-<<<<<<< HEAD
 	const char *prefix;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ice_hw *hw;
 	int status;
 
@@ -773,7 +764,6 @@ static void ice_cleanup_fltr_mgmt_struct(struct ice_hw *hw)
 					 &recps[i].rg_list, l_entry) {
 			list_del(&rg_entry->l_entry);
 			devm_kfree(ice_hw_to_dev(hw), rg_entry);
-<<<<<<< HEAD
 		}
 
 		if (recps[i].adv_rule) {
@@ -799,33 +789,6 @@ static void ice_cleanup_fltr_mgmt_struct(struct ice_hw *hw)
 				devm_kfree(ice_hw_to_dev(hw), lst_itr);
 			}
 		}
-=======
-		}
-
-		if (recps[i].adv_rule) {
-			struct ice_adv_fltr_mgmt_list_entry *tmp_entry;
-			struct ice_adv_fltr_mgmt_list_entry *lst_itr;
-
-			mutex_destroy(&recps[i].filt_rule_lock);
-			list_for_each_entry_safe(lst_itr, tmp_entry,
-						 &recps[i].filt_rules,
-						 list_entry) {
-				list_del(&lst_itr->list_entry);
-				devm_kfree(ice_hw_to_dev(hw), lst_itr->lkups);
-				devm_kfree(ice_hw_to_dev(hw), lst_itr);
-			}
-		} else {
-			struct ice_fltr_mgmt_list_entry *lst_itr, *tmp_entry;
-
-			mutex_destroy(&recps[i].filt_rule_lock);
-			list_for_each_entry_safe(lst_itr, tmp_entry,
-						 &recps[i].filt_rules,
-						 list_entry) {
-				list_del(&lst_itr->list_entry);
-				devm_kfree(ice_hw_to_dev(hw), lst_itr);
-			}
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (recps[i].root_buf)
 			devm_kfree(ice_hw_to_dev(hw), recps[i].root_buf);
 	}
@@ -2570,11 +2533,8 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
 	info->tmr1_owned = ((number & ICE_TS_TMR1_OWND_M) != 0);
 	info->tmr1_ena = ((number & ICE_TS_TMR1_ENA_M) != 0);
 
-<<<<<<< HEAD
 	info->ts_ll_read = ((number & ICE_TS_LL_TX_TS_READ_M) != 0);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	info->ena_ports = logical_id;
 	info->tmr_own_map = phys_id;
 
@@ -2592,11 +2552,8 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
 		  info->tmr1_owned);
 	ice_debug(hw, ICE_DBG_INIT, "dev caps: tmr1_ena = %u\n",
 		  info->tmr1_ena);
-<<<<<<< HEAD
 	ice_debug(hw, ICE_DBG_INIT, "dev caps: ts_ll_read = %u\n",
 		  info->ts_ll_read);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ice_debug(hw, ICE_DBG_INIT, "dev caps: ieee_1588 ena_ports = %u\n",
 		  info->ena_ports);
 	ice_debug(hw, ICE_DBG_INIT, "dev caps: tmr_own_map = %u\n",
@@ -2959,7 +2916,6 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
 }
 
 /**
-<<<<<<< HEAD
  * ice_is_100m_speed_supported
  * @hw: pointer to the HW struct
  *
@@ -2980,8 +2936,6 @@ bool ice_is_100m_speed_supported(struct ice_hw *hw)
 }
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * ice_get_link_speed_based_on_phy_type - returns link speed
  * @phy_type_low: lower part of phy_type
  * @phy_type_high: higher part of phy_type
@@ -5350,11 +5304,7 @@ ice_aq_get_gpio(struct ice_hw *hw, u16 gpio_ctrl_handle, u8 pin_idx,
 }
 
 /**
-<<<<<<< HEAD
  * ice_is_fw_api_min_ver
-=======
- * ice_fw_supports_link_override
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @hw: pointer to the hardware structure
  * @maj: major version
  * @min: minor version
@@ -5558,20 +5508,7 @@ ice_lldp_fltr_add_remove(struct ice_hw *hw, u16 vsi_num, bool add)
  */
 bool ice_fw_supports_report_dflt_cfg(struct ice_hw *hw)
 {
-<<<<<<< HEAD
 	return ice_is_fw_api_min_ver(hw, ICE_FW_API_REPORT_DFLT_CFG_MAJ,
 				     ICE_FW_API_REPORT_DFLT_CFG_MIN,
 				     ICE_FW_API_REPORT_DFLT_CFG_PATCH);
-=======
-	if (hw->api_maj_ver == ICE_FW_API_REPORT_DFLT_CFG_MAJ) {
-		if (hw->api_min_ver > ICE_FW_API_REPORT_DFLT_CFG_MIN)
-			return true;
-		if (hw->api_min_ver == ICE_FW_API_REPORT_DFLT_CFG_MIN &&
-		    hw->api_patch >= ICE_FW_API_REPORT_DFLT_CFG_PATCH)
-			return true;
-	} else if (hw->api_maj_ver > ICE_FW_API_REPORT_DFLT_CFG_MAJ) {
-		return true;
-	}
-	return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

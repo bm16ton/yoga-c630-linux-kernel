@@ -6,11 +6,8 @@
 
 set -e
 
-<<<<<<< HEAD
 skip_test=0
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 pythonchecker=$(dirname $0)/lib/perf_json_output_lint.py
 if [ "x$PYTHON" == "x" ]
 then
@@ -139,7 +136,6 @@ check_per_socket()
 	echo "[Success]"
 }
 
-<<<<<<< HEAD
 # The perf stat options for per-socket, per-core, per-die
 # and -A ( no_aggr mode ) uses the info fetched from this
 # directory: "/sys/devices/system/cpu/cpu*/topology". For
@@ -183,16 +179,4 @@ then
 else
 	echo "[Skip] Skipping tests for system_wide_no_aggr, per_core, per_die and per_socket since socket id exposed via topology is invalid"
 fi
-=======
-check_no_args
-check_system_wide
-check_system_wide_no_aggr
-check_interval
-check_event
-check_per_core
-check_per_thread
-check_per_die
-check_per_node
-check_per_socket
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exit 0

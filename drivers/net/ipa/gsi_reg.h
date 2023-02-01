@@ -106,13 +106,7 @@ chtype_protocol_encoded(enum ipa_version version, enum gsi_channel_type type)
 }
 
 #define GSI_CH_C_CNTXT_1_OFFSET(ch) \
-<<<<<<< HEAD
 			(0x0001c004 + 0x4000 * GSI_EE_AP + 0x80 * (ch))
-=======
-		GSI_EE_N_CH_C_CNTXT_1_OFFSET((ch), GSI_EE_AP)
-#define GSI_EE_N_CH_C_CNTXT_1_OFFSET(ch, ee) \
-		(0x0001c004 + 0x4000 * (ee) + 0x80 * (ch))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Encoded value for CH_C_CNTXT_1 register R_LENGTH field */
 static inline u32 r_length_encoded(enum ipa_version version, u32 length)
@@ -162,13 +156,7 @@ enum gsi_prefetch_mode {
 			(0x0001c06c + 0x4000 * GSI_EE_AP + 0x80 * (ch))
 
 #define GSI_EV_CH_E_CNTXT_0_OFFSET(ev) \
-<<<<<<< HEAD
 			(0x0001d000 + 0x4000 * GSI_EE_AP + 0x80 * (ev))
-=======
-		GSI_EE_N_EV_CH_E_CNTXT_0_OFFSET((ev), GSI_EE_AP)
-#define GSI_EE_N_EV_CH_E_CNTXT_0_OFFSET(ev, ee) \
-		(0x0001d000 + 0x4000 * (ee) + 0x80 * (ev))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* enum gsi_channel_type defines EV_CHTYPE field values in EV_CH_E_CNTXT_0 */
 #define EV_CHTYPE_FMASK			GENMASK(3, 0)
 #define EV_EE_FMASK			GENMASK(7, 4)
@@ -178,13 +166,7 @@ enum gsi_prefetch_mode {
 #define EV_ELEMENT_SIZE_FMASK		GENMASK(31, 24)
 
 #define GSI_EV_CH_E_CNTXT_1_OFFSET(ev) \
-<<<<<<< HEAD
 			(0x0001d004 + 0x4000 * GSI_EE_AP + 0x80 * (ev))
-=======
-		GSI_EE_N_EV_CH_E_CNTXT_1_OFFSET((ev), GSI_EE_AP)
-#define GSI_EE_N_EV_CH_E_CNTXT_1_OFFSET(ev, ee) \
-		(0x0001d004 + 0x4000 * (ee) + 0x80 * (ev))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Encoded value for EV_CH_C_CNTXT_1 register EV_R_LENGTH field */
 static inline u32 ev_r_length_encoded(enum ipa_version version, u32 length)
 {
@@ -388,13 +370,7 @@ enum gsi_general_id {
 #define INTYPE_FMASK			GENMASK(0, 0)
 
 #define GSI_ERROR_LOG_OFFSET \
-<<<<<<< HEAD
 			(0x0001f200 + 0x4000 * GSI_EE_AP)
-=======
-			GSI_EE_N_ERROR_LOG_OFFSET(GSI_EE_AP)
-#define GSI_EE_N_ERROR_LOG_OFFSET(ee) \
-			(0x0001f200 + 0x4000 * (ee))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Fields below are present for IPA v3.5.1 and above */
 #define ERR_ARG3_FMASK			GENMASK(3, 0)

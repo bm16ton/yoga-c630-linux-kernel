@@ -7,7 +7,6 @@ usage() {
 	echo "Usage:"
 	echo "	$0 -r <release> | <vmlinux> [<base path>|auto] [<modules path>]"
 }
-<<<<<<< HEAD
 
 # Try to find a Rust demangler
 if type llvm-cxxfilt >/dev/null 2>&1 ; then
@@ -16,8 +15,6 @@ elif type c++filt >/dev/null 2>&1 ; then
 	cppfilt=c++filt
 	cppfilt_opts=-i
 fi
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 if [[ $1 == "-r" ]] ; then
 	vmlinux=""

@@ -105,7 +105,6 @@
 			interrupts = <2>, <3>;
 		};
 
-<<<<<<< HEAD
 		timer-mfd@10000080 {
 			compatible = "brcm,bcm7038-twd", "simple-mfd", "syscon";
 			reg = <0x10000080 0x30>;
@@ -120,16 +119,6 @@
 
 				timeout-sec = <30>;
 			};
-=======
-		wdt: watchdog@1000009c {
-			compatible = "brcm,bcm7038-wdt";
-			reg = <0x1000009c 0xc>;
-
-			clocks = <&periph_osc>;
-			clock-names = "refclk";
-
-			timeout-sec = <30>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		uart0: serial@10000180 {

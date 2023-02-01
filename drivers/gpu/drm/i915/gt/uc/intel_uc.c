@@ -435,17 +435,11 @@ static void print_fw_ver(struct intel_uc *uc, struct intel_uc_fw *fw)
 {
 	struct drm_i915_private *i915 = uc_to_gt(uc)->i915;
 
-<<<<<<< HEAD
 	drm_info(&i915->drm, "%s firmware %s version %u.%u.%u\n",
 		 intel_uc_fw_type_repr(fw->type), fw->file_selected.path,
 		 fw->file_selected.major_ver,
 		 fw->file_selected.minor_ver,
 		 fw->file_selected.patch_ver);
-=======
-	drm_info(&i915->drm, "%s firmware %s version %u.%u\n",
-		 intel_uc_fw_type_repr(fw->type), fw->path,
-		 fw->major_ver_found, fw->minor_ver_found);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __uc_init_hw(struct intel_uc *uc)

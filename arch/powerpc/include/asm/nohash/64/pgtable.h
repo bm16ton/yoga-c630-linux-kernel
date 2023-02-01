@@ -70,11 +70,7 @@
 /*
  * Include the PTE bits definitions
  */
-<<<<<<< HEAD
 #include <asm/nohash/pte-e500.h>
-=======
-#include <asm/nohash/pte-book3e.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define PTE_RPN_MASK	(~((1UL << PTE_RPN_SHIFT) - 1))
 

@@ -46,15 +46,11 @@
 #include "string2.h"
 #include "memswap.h"
 #include "util.h"
-<<<<<<< HEAD
 #ifdef HAVE_LIBBPF_SUPPORT
 #include <bpf/hashmap.h>
 #else
 #include "util/hashmap.h"
 #endif
-=======
-#include "hashmap.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "pmu-hybrid.h"
 #include "off_cpu.h"
 #include "../perf-sys.h"
@@ -1668,7 +1664,6 @@ static int evsel__match_other_cpu(struct evsel *evsel, struct evsel *other,
 }
 
 static int evsel__hybrid_group_cpu_map_idx(struct evsel *evsel, int cpu_map_idx)
-<<<<<<< HEAD
 {
 	struct evsel *leader = evsel__leader(evsel);
 
@@ -1683,22 +1678,6 @@ static int evsel__hybrid_group_cpu_map_idx(struct evsel *evsel, int cpu_map_idx)
 static int get_group_fd(struct evsel *evsel, int cpu_map_idx, int thread)
 {
 	struct evsel *leader = evsel__leader(evsel);
-=======
-{
-	struct evsel *leader = evsel__leader(evsel);
-
-	if ((evsel__is_hybrid(evsel) && !evsel__is_hybrid(leader)) ||
-	    (!evsel__is_hybrid(evsel) && evsel__is_hybrid(leader))) {
-		return evsel__match_other_cpu(evsel, leader, cpu_map_idx);
-	}
-
-	return cpu_map_idx;
-}
-
-static int get_group_fd(struct evsel *evsel, int cpu_map_idx, int thread)
-{
-	struct evsel *leader = evsel__leader(evsel);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int fd;
 
 	if (evsel__is_group_leader(evsel))
@@ -1834,11 +1813,7 @@ static struct perf_thread_map *empty_thread_map;
 static int __evsel__prepare_open(struct evsel *evsel, struct perf_cpu_map *cpus,
 		struct perf_thread_map *threads)
 {
-<<<<<<< HEAD
 	int nthreads = perf_thread_map__nr(threads);
-=======
-	int nthreads;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if ((perf_missing_features.write_backward && evsel->core.attr.write_backward) ||
 	    (perf_missing_features.aux_output     && evsel->core.attr.aux_output))
@@ -1877,11 +1852,8 @@ static int __evsel__prepare_open(struct evsel *evsel, struct perf_cpu_map *cpus,
 
 static void evsel__disable_missing_features(struct evsel *evsel)
 {
-<<<<<<< HEAD
 	if (perf_missing_features.read_lost)
 		evsel->core.attr.read_format &= ~PERF_FORMAT_LOST;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (perf_missing_features.weight_struct) {
 		evsel__set_sample_bit(evsel, WEIGHT);
 		evsel__reset_sample_bit(evsel, WEIGHT_STRUCT);
@@ -1917,7 +1889,6 @@ int evsel__prepare_open(struct evsel *evsel, struct perf_cpu_map *cpus,
 			struct perf_thread_map *threads)
 {
 	int err;
-<<<<<<< HEAD
 
 	err = __evsel__prepare_open(evsel, cpus, threads);
 	if (err)
@@ -1925,15 +1896,6 @@ int evsel__prepare_open(struct evsel *evsel, struct perf_cpu_map *cpus,
 
 	evsel__disable_missing_features(evsel);
 
-=======
-
-	err = __evsel__prepare_open(evsel, cpus, threads);
-	if (err)
-		return err;
-
-	evsel__disable_missing_features(evsel);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return err;
 }
 
@@ -2094,14 +2056,7 @@ static int evsel__open_cpu(struct evsel *evsel, struct perf_cpu_map *cpus,
 	if (threads == NULL)
 		threads = empty_thread_map;
 
-<<<<<<< HEAD
 	nthreads = perf_thread_map__nr(threads);
-=======
-	if (evsel->core.system_wide)
-		nthreads = 1;
-	else
-		nthreads = threads->nr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (evsel->cgrp)
 		pid = evsel->cgrp->fd;
@@ -2126,10 +2081,7 @@ retry_open:
 
 			test_attr__ready();
 
-<<<<<<< HEAD
 			/* Debug message used by test scripts */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pr_debug2_peo("sys_perf_event_open: pid %d  cpu %d  group_fd %d  flags %#lx",
 				pid, perf_cpu_map__cpu(cpus, idx).cpu, group_fd, evsel->open_flags);
 
@@ -2155,10 +2107,7 @@ retry_open:
 						fd, group_fd, evsel->open_flags);
 			}
 
-<<<<<<< HEAD
 			/* Debug message used by test scripts */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pr_debug2_peo(" = %d\n", fd);
 
 			if (evsel->bpf_fd >= 0) {

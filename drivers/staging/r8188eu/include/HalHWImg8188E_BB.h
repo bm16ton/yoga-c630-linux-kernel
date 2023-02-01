@@ -10,21 +10,13 @@
 *                           AGC_TAB_1T.TXT
 ******************************************************************************/
 
-<<<<<<< HEAD
 int ODM_ReadAndConfig_AGC_TAB_1T_8188E(struct odm_dm_struct *odm);
-=======
-enum HAL_STATUS ODM_ReadAndConfig_AGC_TAB_1T_8188E(struct odm_dm_struct *odm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /******************************************************************************
 *                           PHY_REG_1T.TXT
 ******************************************************************************/
 
-<<<<<<< HEAD
 int ODM_ReadAndConfig_PHY_REG_1T_8188E(struct odm_dm_struct *odm);
-=======
-enum HAL_STATUS ODM_ReadAndConfig_PHY_REG_1T_8188E(struct odm_dm_struct *odm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /******************************************************************************
 *                           PHY_REG_PG.TXT

@@ -1240,13 +1240,7 @@ static void hidg_free(struct usb_function *f)
 
 	hidg = func_to_hidg(f);
 	opts = container_of(f->fi, struct f_hid_opts, func_inst);
-<<<<<<< HEAD
 	put_device(&hidg->dev);
-=======
-	kfree(hidg->report_desc);
-	kfree(hidg->set_report_buf);
-	kfree(hidg);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&opts->lock);
 	--opts->refcnt;
 	mutex_unlock(&opts->lock);

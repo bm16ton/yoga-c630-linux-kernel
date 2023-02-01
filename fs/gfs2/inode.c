@@ -130,10 +130,7 @@ struct inode *gfs2_inode_lookup(struct super_block *sb, unsigned int type,
 	if (inode->i_state & I_NEW) {
 		struct gfs2_sbd *sdp = GFS2_SB(inode);
 		struct gfs2_glock *io_gl;
-<<<<<<< HEAD
 		int extra_flags = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		error = gfs2_glock_get(sdp, no_addr, &gfs2_inode_glops, CREATE,
 				       &ip->i_gl);
@@ -145,18 +142,12 @@ struct inode *gfs2_inode_lookup(struct super_block *sb, unsigned int type,
 		if (unlikely(error))
 			goto fail;
 
-<<<<<<< HEAD
 		if (blktype == GFS2_BLKST_UNLINKED)
 			extra_flags |= LM_FLAG_TRY;
 		else
 			gfs2_cancel_delete_work(io_gl);
 		error = gfs2_glock_nq_init(io_gl, LM_ST_SHARED,
 					   GL_EXACT | GL_NOPID | extra_flags,
-=======
-		if (blktype != GFS2_BLKST_UNLINKED)
-			gfs2_cancel_delete_work(io_gl);
-		error = gfs2_glock_nq_init(io_gl, LM_ST_SHARED, GL_EXACT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					   &ip->i_iopen_gh);
 		gfs2_glock_put(io_gl);
 		if (unlikely(error))
@@ -223,11 +214,8 @@ struct inode *gfs2_inode_lookup(struct super_block *sb, unsigned int type,
 	return inode;
 
 fail:
-<<<<<<< HEAD
 	if (error == GLR_TRYFAILED)
 		error = -EAGAIN;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (gfs2_holder_initialized(&ip->i_iopen_gh))
 		gfs2_glock_dq_uninit(&ip->i_iopen_gh);
 	if (gfs2_holder_initialized(&i_gh))
@@ -738,12 +726,8 @@ static int gfs2_create_inode(struct inode *dir, struct dentry *dentry,
 	error = insert_inode_locked4(inode, ip->i_no_addr, iget_test, &ip->i_no_addr);
 	BUG_ON(error);
 
-<<<<<<< HEAD
 	error = gfs2_glock_nq_init(io_gl, LM_ST_SHARED, GL_EXACT | GL_NOPID,
 				   &ip->i_iopen_gh);
-=======
-	error = gfs2_glock_nq_init(io_gl, LM_ST_SHARED, GL_EXACT, &ip->i_iopen_gh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (error)
 		goto fail_gunlock2;
 

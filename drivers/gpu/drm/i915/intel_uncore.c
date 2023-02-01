@@ -1008,7 +1008,6 @@ static const struct i915_range gen11_shadowed_regs[] = {
 	{ .start = 0x1D8230, .end = 0x1D8230 },
 	{ .start = 0x1D8510, .end = 0x1D8550 },
 };
-<<<<<<< HEAD
 
 static const struct i915_range gen12_shadowed_regs[] = {
 	{ .start =   0x2030, .end =   0x2030 },
@@ -1035,34 +1034,6 @@ static const struct i915_range gen12_shadowed_regs[] = {
 	{ .start = 0x1D8030, .end = 0x1D8030 },
 	{ .start = 0x1D8510, .end = 0x1D8550 },
 
-=======
-
-static const struct i915_range gen12_shadowed_regs[] = {
-	{ .start =   0x2030, .end =   0x2030 },
-	{ .start =   0x2510, .end =   0x2550 },
-	{ .start =   0xA008, .end =   0xA00C },
-	{ .start =   0xA188, .end =   0xA188 },
-	{ .start =   0xA278, .end =   0xA278 },
-	{ .start =   0xA540, .end =   0xA56C },
-	{ .start =   0xC4C8, .end =   0xC4C8 },
-	{ .start =   0xC4D4, .end =   0xC4D4 },
-	{ .start =   0xC600, .end =   0xC600 },
-	{ .start =  0x22030, .end =  0x22030 },
-	{ .start =  0x22510, .end =  0x22550 },
-	{ .start = 0x1C0030, .end = 0x1C0030 },
-	{ .start = 0x1C0510, .end = 0x1C0550 },
-	{ .start = 0x1C4030, .end = 0x1C4030 },
-	{ .start = 0x1C4510, .end = 0x1C4550 },
-	{ .start = 0x1C8030, .end = 0x1C8030 },
-	{ .start = 0x1C8510, .end = 0x1C8550 },
-	{ .start = 0x1D0030, .end = 0x1D0030 },
-	{ .start = 0x1D0510, .end = 0x1D0550 },
-	{ .start = 0x1D4030, .end = 0x1D4030 },
-	{ .start = 0x1D4510, .end = 0x1D4550 },
-	{ .start = 0x1D8030, .end = 0x1D8030 },
-	{ .start = 0x1D8510, .end = 0x1D8550 },
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * The rest of these ranges are specific to Xe_HP and beyond, but
 	 * are reserved/unused ranges on earlier gen12 platforms, so they can
@@ -1174,12 +1145,9 @@ static bool is_shadowed(struct intel_uncore *uncore, u32 offset)
 {
 	if (drm_WARN_ON(&uncore->i915->drm, !uncore->shadowed_reg_table))
 		return false;
-<<<<<<< HEAD
 
 	if (IS_GSI_REG(offset))
 		offset += uncore->gsi_offset;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return BSEARCH(offset,
 		       uncore->shadowed_reg_table,
@@ -2271,14 +2239,11 @@ static int i915_pmic_bus_access_notifier(struct notifier_block *nb,
 	return NOTIFY_OK;
 }
 
-<<<<<<< HEAD
 static void uncore_unmap_mmio(struct drm_device *drm, void *regs)
 {
 	iounmap(regs);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int intel_uncore_setup_mmio(struct intel_uncore *uncore, phys_addr_t phys_addr)
 {
 	struct drm_i915_private *i915 = uncore->i915;
@@ -2294,13 +2259,7 @@ int intel_uncore_setup_mmio(struct intel_uncore *uncore, phys_addr_t phys_addr)
 	 * For dgfx chips register range is expanded to 4MB, and this larger
 	 * range is also used for integrated gpus beginning with Meteor Lake.
 	 */
-<<<<<<< HEAD
 	if (IS_DGFX(i915) || GRAPHICS_VER_FULL(i915) >= IP_VER(12, 70))
-=======
-	if (GRAPHICS_VER(i915) < 5)
-		mmio_size = 512 * 1024;
-	else if (IS_DGFX(i915))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mmio_size = 4 * 1024 * 1024;
 	else if (GRAPHICS_VER(i915) >= 5)
 		mmio_size = 2 * 1024 * 1024;
@@ -2313,16 +2272,7 @@ int intel_uncore_setup_mmio(struct intel_uncore *uncore, phys_addr_t phys_addr)
 		return -EIO;
 	}
 
-<<<<<<< HEAD
 	return drmm_add_action_or_reset(&i915->drm, uncore_unmap_mmio, uncore->regs);
-=======
-	return 0;
-}
-
-void intel_uncore_cleanup_mmio(struct intel_uncore *uncore)
-{
-	iounmap(uncore->regs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void intel_uncore_init_early(struct intel_uncore *uncore,
@@ -2332,10 +2282,6 @@ void intel_uncore_init_early(struct intel_uncore *uncore,
 	uncore->i915 = gt->i915;
 	uncore->gt = gt;
 	uncore->rpm = &gt->i915->runtime_pm;
-<<<<<<< HEAD
-=======
-	uncore->debug = &gt->i915->mmio_debug;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void uncore_raw_init(struct intel_uncore *uncore)

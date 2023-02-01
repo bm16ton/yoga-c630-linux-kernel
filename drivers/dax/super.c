@@ -445,11 +445,7 @@ struct dax_device *alloc_dax(void *private, const struct dax_operations *ops)
 	if (WARN_ON_ONCE(ops && !ops->zero_page_range))
 		return ERR_PTR(-EINVAL);
 
-<<<<<<< HEAD
 	minor = ida_alloc_max(&dax_minor_ida, MINORMASK, GFP_KERNEL);
-=======
-	minor = ida_simple_get(&dax_minor_ida, 0, MINORMASK+1, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (minor < 0)
 		return ERR_PTR(-ENOMEM);
 
@@ -463,11 +459,7 @@ struct dax_device *alloc_dax(void *private, const struct dax_operations *ops)
 	return dax_dev;
 
  err_dev:
-<<<<<<< HEAD
 	ida_free(&dax_minor_ida, minor);
-=======
-	ida_simple_remove(&dax_minor_ida, minor);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ERR_PTR(-ENOMEM);
 }
 EXPORT_SYMBOL_GPL(alloc_dax);

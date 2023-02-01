@@ -57,45 +57,6 @@ void ath11k_debugfs_add_dbring_entry(struct ath11k *ar,
 				     enum wmi_direct_buffer_module id,
 				     enum ath11k_dbg_dbr_event event,
 				     struct hal_srng *srng)
-<<<<<<< HEAD
-=======
-{
-	struct ath11k_debug_dbr *dbr_debug;
-	struct ath11k_dbg_dbr_data *dbr_data;
-	struct ath11k_dbg_dbr_entry *entry;
-
-	if (id >= WMI_DIRECT_BUF_MAX || event >= ATH11K_DBG_DBR_EVENT_MAX)
-		return;
-
-	dbr_debug = ar->debug.dbr_debug[id];
-	if (!dbr_debug)
-		return;
-
-	if (!dbr_debug->dbr_debug_enabled)
-		return;
-
-	dbr_data = &dbr_debug->dbr_dbg_data;
-
-	spin_lock_bh(&dbr_data->lock);
-
-	if (dbr_data->entries) {
-		entry = &dbr_data->entries[dbr_data->dbr_debug_idx];
-		entry->hp = srng->u.src_ring.hp;
-		entry->tp = *srng->u.src_ring.tp_addr;
-		entry->timestamp = jiffies;
-		entry->event = event;
-
-		dbr_data->dbr_debug_idx++;
-		if (dbr_data->dbr_debug_idx ==
-		    dbr_data->num_ring_debug_entries)
-			dbr_data->dbr_debug_idx = 0;
-	}
-
-	spin_unlock_bh(&dbr_data->lock);
-}
-
-static void ath11k_fw_stats_pdevs_free(struct list_head *head)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ath11k_debug_dbr *dbr_debug;
 	struct ath11k_dbg_dbr_data *dbr_data;
@@ -156,18 +117,8 @@ void ath11k_debugfs_fw_stats_process(struct ath11k *ar, struct ath11k_fw_stats *
 		return;
 	}
 
-<<<<<<< HEAD
 	if (stats->stats_id == WMI_REQUEST_VDEV_STAT) {
 		if (list_empty(&stats->vdevs)) {
-=======
-	if (stats.stats_id == WMI_REQUEST_RSSI_PER_CHAIN_STAT) {
-		ar->debug.fw_stats_done = true;
-		goto complete;
-	}
-
-	if (stats.stats_id == WMI_REQUEST_VDEV_STAT) {
-		if (list_empty(&stats.vdevs)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ath11k_warn(ab, "empty vdev stats");
 			return;
 		}
@@ -963,7 +914,6 @@ static const struct file_operations fops_fw_dbglog = {
 	.llseek = default_llseek,
 };
 
-<<<<<<< HEAD
 static int ath11k_open_sram_dump(struct inode *inode, struct file *file)
 {
 	struct ath11k_base *ab = inode->i_private;
@@ -1021,8 +971,6 @@ static const struct file_operations fops_sram_dump = {
 	.llseek = default_llseek,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ath11k_debugfs_pdev_create(struct ath11k_base *ab)
 {
 	if (test_bit(ATH11K_FLAG_REGISTERED, &ab->dev_flags))
@@ -1421,7 +1369,6 @@ static const struct file_operations fops_dbr_debug = {
 	.llseek = default_llseek,
 };
 
-<<<<<<< HEAD
 static ssize_t ath11k_write_ps_timekeeper_enable(struct file *file,
 						 const char __user *user_buf,
 						 size_t count, loff_t *ppos)
@@ -1609,8 +1556,6 @@ static const struct file_operations fops_ps_state_enable = {
 	.llseek = default_llseek,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ath11k_debugfs_register(struct ath11k *ar)
 {
 	struct ath11k_base *ab = ar->ab;
@@ -1657,7 +1602,6 @@ int ath11k_debugfs_register(struct ath11k *ar)
 		debugfs_create_file("enable_dbr_debug", 0200, ar->debug.debugfs_pdev,
 				    ar, &fops_dbr_debug);
 
-<<<<<<< HEAD
 	debugfs_create_file("ps_state_enable", 0600, ar->debug.debugfs_pdev, ar,
 			    &fops_ps_state_enable);
 
@@ -1672,8 +1616,6 @@ int ath11k_debugfs_register(struct ath11k *ar)
 				    &fops_reset_ps_duration);
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1702,7 +1644,6 @@ static ssize_t ath11k_write_twt_add_dialog(struct file *file,
 {
 	struct ath11k_vif *arvif = file->private_data;
 	struct wmi_twt_add_dialog_params params = { 0 };
-<<<<<<< HEAD
 	struct wmi_twt_enable_params twt_params = {0};
 	struct ath11k *ar = arvif->ar;
 	u8 buf[128] = {0};
@@ -1710,13 +1651,6 @@ static ssize_t ath11k_write_twt_add_dialog(struct file *file,
 
 	if (ar->twt_enabled == 0) {
 		ath11k_err(ar->ab, "twt support is not enabled\n");
-=======
-	u8 buf[128] = {0};
-	int ret;
-
-	if (arvif->ar->twt_enabled == 0) {
-		ath11k_err(arvif->ar->ab, "twt support is not enabled\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EOPNOTSUPP;
 	}
 
@@ -1746,7 +1680,6 @@ static ssize_t ath11k_write_twt_add_dialog(struct file *file,
 	if (ret != 16)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	/* In the case of station vif, TWT is entirely handled by
 	 * the firmware based on the input parameters in the TWT enable
 	 * WMI command that is sent to the target during assoc.
@@ -1763,13 +1696,10 @@ static ssize_t ath11k_write_twt_add_dialog(struct file *file,
 		ath11k_wmi_send_twt_enable_cmd(ar, ar->pdev->pdev_id, &twt_params);
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	params.vdev_id = arvif->vdev_id;
 
 	ret = ath11k_wmi_send_twt_add_dialog_cmd(arvif->ar, &params);
 	if (ret)
-<<<<<<< HEAD
 		goto err_twt_add_dialog;
 
 	return count;
@@ -1782,11 +1712,6 @@ err_twt_add_dialog:
 	}
 
 	return ret;
-=======
-		return ret;
-
-	return count;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static ssize_t ath11k_write_twt_del_dialog(struct file *file,
@@ -1795,7 +1720,6 @@ static ssize_t ath11k_write_twt_del_dialog(struct file *file,
 {
 	struct ath11k_vif *arvif = file->private_data;
 	struct wmi_twt_del_dialog_params params = { 0 };
-<<<<<<< HEAD
 	struct wmi_twt_enable_params twt_params = {0};
 	struct ath11k *ar = arvif->ar;
 	u8 buf[64] = {0};
@@ -1803,13 +1727,6 @@ static ssize_t ath11k_write_twt_del_dialog(struct file *file,
 
 	if (ar->twt_enabled == 0) {
 		ath11k_err(ar->ab, "twt support is not enabled\n");
-=======
-	u8 buf[64] = {0};
-	int ret;
-
-	if (arvif->ar->twt_enabled == 0) {
-		ath11k_err(arvif->ar->ab, "twt support is not enabled\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EOPNOTSUPP;
 	}
 
@@ -1835,15 +1752,12 @@ static ssize_t ath11k_write_twt_del_dialog(struct file *file,
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	if (arvif->vif->type == NL80211_IFTYPE_STATION) {
 		ath11k_wmi_send_twt_disable_cmd(ar, ar->pdev->pdev_id);
 		ath11k_wmi_fill_default_twt_params(&twt_params);
 		ath11k_wmi_send_twt_enable_cmd(ar, ar->pdev->pdev_id, &twt_params);
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return count;
 }
 
@@ -1947,7 +1861,6 @@ static const struct file_operations ath11k_fops_twt_resume_dialog = {
 	.open = simple_open
 };
 
-<<<<<<< HEAD
 void ath11k_debugfs_add_interface(struct ath11k_vif *arvif)
 {
 	struct ath11k_base *ab = arvif->ar->ab;
@@ -1970,44 +1883,13 @@ void ath11k_debugfs_add_interface(struct ath11k_vif *arvif)
 
 	debugfs_create_file("resume_dialog", 0200, arvif->debugfs_twt,
 			    arvif, &ath11k_fops_twt_resume_dialog);
-=======
-int ath11k_debugfs_add_interface(struct ath11k_vif *arvif)
-{
-	if (arvif->vif->type == NL80211_IFTYPE_AP && !arvif->debugfs_twt) {
-		arvif->debugfs_twt = debugfs_create_dir("twt",
-							arvif->vif->debugfs_dir);
-		if (!arvif->debugfs_twt || IS_ERR(arvif->debugfs_twt)) {
-			ath11k_warn(arvif->ar->ab,
-				    "failed to create directory %p\n",
-				    arvif->debugfs_twt);
-			arvif->debugfs_twt = NULL;
-			return -1;
-		}
-
-		debugfs_create_file("add_dialog", 0200, arvif->debugfs_twt,
-				    arvif, &ath11k_fops_twt_add_dialog);
-
-		debugfs_create_file("del_dialog", 0200, arvif->debugfs_twt,
-				    arvif, &ath11k_fops_twt_del_dialog);
-
-		debugfs_create_file("pause_dialog", 0200, arvif->debugfs_twt,
-				    arvif, &ath11k_fops_twt_pause_dialog);
-
-		debugfs_create_file("resume_dialog", 0200, arvif->debugfs_twt,
-				    arvif, &ath11k_fops_twt_resume_dialog);
-	}
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void ath11k_debugfs_remove_interface(struct ath11k_vif *arvif)
 {
-<<<<<<< HEAD
 	if (!arvif->debugfs_twt)
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	debugfs_remove_recursive(arvif->debugfs_twt);
 	arvif->debugfs_twt = NULL;
 }

@@ -2683,14 +2683,11 @@ struct v4l2_create_buffers {
 #ifndef __KERNEL__
 #define V4L2_PIX_FMT_HM12 V4L2_PIX_FMT_NV12_16L16
 #define V4L2_PIX_FMT_SUNXI_TILED_NV12 V4L2_PIX_FMT_NV12_32L32
-<<<<<<< HEAD
 /*
  * This capability was never implemented, anyone using this cap should drop it
  * from their code.
  */
 #define V4L2_CAP_ASYNCIO 0x02000000
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #endif /* _UAPI__LINUX_VIDEODEV2_H */

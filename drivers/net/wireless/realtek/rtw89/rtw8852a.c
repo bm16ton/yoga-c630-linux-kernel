@@ -431,10 +431,7 @@ static const struct rtw89_imr_info rtw8852a_imr_info = {
 	.cpu_disp_imr_set	= B_AX_CPU_DISP_IMR_SET,
 	.other_disp_imr_clr	= B_AX_OTHER_DISP_IMR_CLR,
 	.other_disp_imr_set	= 0,
-<<<<<<< HEAD
 	.bbrpt_com_err_imr_reg	= R_AX_BBRPT_COM_ERR_IMR_ISR,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bbrpt_chinfo_err_imr_reg = R_AX_BBRPT_CHINFO_ERR_IMR_ISR,
 	.bbrpt_err_imr_set	= 0,
 	.bbrpt_dfs_err_imr_reg	= R_AX_BBRPT_DFS_ERR_IMR_ISR,
@@ -457,7 +454,6 @@ static const struct rtw89_imr_info rtw8852a_imr_info = {
 	.tmac_imr_set		= B_AX_TMAC_IMR_SET,
 };
 
-<<<<<<< HEAD
 static const struct rtw89_rrsr_cfgs rtw8852a_rrsr_cfgs = {
 	.ref_rate = {R_AX_TRXPTCL_RRSR_CTL_0, B_AX_WMAC_RESP_REF_RATE_SEL, 0},
 	.rsc = {R_AX_TRXPTCL_RRSR_CTL_0, B_AX_WMAC_RESP_RSC_MASK, 2},
@@ -483,8 +479,6 @@ static const struct rtw89_dig_regs rtw8852a_dig_regs = {
 			      B_PATH1_S20_FOLLOW_BY_PAGCUGC_EN_MSK},
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtw8852ae_efuse_parsing(struct rtw89_efuse *efuse,
 				    struct rtw8852a_efuse *map)
 {
@@ -692,11 +686,7 @@ static void rtw8852a_power_trim(struct rtw89_dev *rtwdev)
 }
 
 static void rtw8852a_set_channel_mac(struct rtw89_dev *rtwdev,
-<<<<<<< HEAD
 				     const struct rtw89_chan *chan,
-=======
-				     struct rtw89_channel_params *param,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				     u8 mac_idx)
 {
 	u32 rf_mod = rtw89_mac_reg_by_idx(R_AX_WMAC_RFMOD, mac_idx);
@@ -705,7 +695,6 @@ static void rtw8852a_set_channel_mac(struct rtw89_dev *rtwdev,
 	u32 chk_rate = rtw89_mac_reg_by_idx(R_AX_TXRATE_CHK, mac_idx);
 	u8 txsc20 = 0, txsc40 = 0;
 
-<<<<<<< HEAD
 	switch (chan->band_width) {
 	case RTW89_CHANNEL_WIDTH_80:
 		txsc40 = rtw89_phy_get_txsc(rtwdev, chan,
@@ -713,26 +702,13 @@ static void rtw8852a_set_channel_mac(struct rtw89_dev *rtwdev,
 		fallthrough;
 	case RTW89_CHANNEL_WIDTH_40:
 		txsc20 = rtw89_phy_get_txsc(rtwdev, chan,
-=======
-	switch (param->bandwidth) {
-	case RTW89_CHANNEL_WIDTH_80:
-		txsc40 = rtw89_phy_get_txsc(rtwdev, param,
-					    RTW89_CHANNEL_WIDTH_40);
-		fallthrough;
-	case RTW89_CHANNEL_WIDTH_40:
-		txsc20 = rtw89_phy_get_txsc(rtwdev, param,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					    RTW89_CHANNEL_WIDTH_20);
 		break;
 	default:
 		break;
 	}
 
-<<<<<<< HEAD
 	switch (chan->band_width) {
-=======
-	switch (param->bandwidth) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case RTW89_CHANNEL_WIDTH_80:
 		rtw89_write8_mask(rtwdev, rf_mod, B_AX_WMAC_RFMOD_MASK, BIT(1));
 		rtw89_write32(rtwdev, sub_carr, txsc20 | (txsc40 << 4));
@@ -749,11 +725,7 @@ static void rtw8852a_set_channel_mac(struct rtw89_dev *rtwdev,
 		break;
 	}
 
-<<<<<<< HEAD
 	if (chan->channel > 14)
-=======
-	if (param->center_chan > 14)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rtw89_write8_set(rtwdev, chk_rate,
 				 B_AX_CHECK_CCK_EN | B_AX_RTS_LIMIT_IN_OFDM6);
 	else
@@ -1156,19 +1128,12 @@ static void rtw8852a_bb_sethw(struct rtw89_dev *rtwdev)
 	if (rtwdev->hal.cv <= CHIP_CCV) {
 		rtw89_phy_write32_set(rtwdev, R_RSTB_WATCH_DOG, B_P0_RSTB_WATCH_DOG);
 		rtw89_phy_write32(rtwdev, R_BRK_ASYNC_RST_EN_1, 0x864FA000);
-<<<<<<< HEAD
 		rtw89_phy_write32(rtwdev, R_BRK_ASYNC_RST_EN_2, 0x43F);
-=======
-		rtw89_phy_write32(rtwdev, R_BRK_ASYNC_RST_EN_2, 0x3F);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rtw89_phy_write32(rtwdev, R_BRK_ASYNC_RST_EN_3, 0x7FFF);
 		rtw89_phy_write32_set(rtwdev, R_SPOOF_ASYNC_RST, B_SPOOF_ASYNC_RST);
 		rtw89_phy_write32_set(rtwdev, R_P0_TXPW_RSTB, B_P0_TXPW_RSTB_MANON);
 		rtw89_phy_write32_set(rtwdev, R_P1_TXPW_RSTB, B_P1_TXPW_RSTB_MANON);
-<<<<<<< HEAD
 		rtw89_phy_write32_set(rtwdev, R_PLCP_HISTOGRAM, B_STS_PARSING_TIME);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	rtw89_phy_write32_mask(rtwdev, R_CFO_TRK0, B_CFO_TRK_MSK, 0x1f);
 	rtw89_phy_write32_mask(rtwdev, R_CFO_TRK1, B_CFO_TRK_MSK, 0x0c);
@@ -1192,7 +1157,6 @@ static void rtw8852a_bbrst_for_rfk(struct rtw89_dev *rtwdev,
 }
 
 static void rtw8852a_set_channel_bb(struct rtw89_dev *rtwdev,
-<<<<<<< HEAD
 				    const struct rtw89_chan *chan,
 				    enum rtw89_phy_idx phy_idx)
 {
@@ -1206,52 +1170,25 @@ static void rtw8852a_set_channel_bb(struct rtw89_dev *rtwdev,
 
 	rtw8852a_ctrl_ch(rtwdev, chan->channel, phy_idx);
 	rtw8852a_ctrl_bw(rtwdev, pri_ch_idx, chan->band_width, phy_idx);
-=======
-				    struct rtw89_channel_params *param,
-				    enum rtw89_phy_idx phy_idx)
-{
-	bool cck_en = param->center_chan <= 14;
-	u8 pri_ch_idx = param->pri_ch_idx;
-
-	if (cck_en)
-		rtw8852a_ctrl_sco_cck(rtwdev, param->center_chan,
-				      param->primary_chan, param->bandwidth);
-
-	rtw8852a_ctrl_ch(rtwdev, param->center_chan, phy_idx);
-	rtw8852a_ctrl_bw(rtwdev, pri_ch_idx, param->bandwidth, phy_idx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (cck_en) {
 		rtw89_phy_write32_mask(rtwdev, R_RXCCA, B_RXCCA_DIS, 0);
 	} else {
 		rtw89_phy_write32_mask(rtwdev, R_RXCCA, B_RXCCA_DIS, 1);
 		rtw8852a_bbrst_for_rfk(rtwdev, phy_idx);
 	}
-<<<<<<< HEAD
 	rtw8852a_spur_elimination(rtwdev, chan->channel);
 	rtw89_phy_write32_mask(rtwdev, R_MAC_PIN_SEL, B_CH_IDX_SEG0,
 			       chan->primary_channel);
-=======
-	rtw8852a_spur_elimination(rtwdev, param->center_chan);
-	rtw89_phy_write32_mask(rtwdev, R_MAC_PIN_SEL, B_CH_IDX_SEG0,
-			       param->primary_chan);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rtw8852a_bb_reset_all(rtwdev, phy_idx);
 }
 
 static void rtw8852a_set_channel(struct rtw89_dev *rtwdev,
-<<<<<<< HEAD
 				 const struct rtw89_chan *chan,
 				 enum rtw89_mac_idx mac_idx,
 				 enum rtw89_phy_idx phy_idx)
 {
 	rtw8852a_set_channel_mac(rtwdev, chan, mac_idx);
 	rtw8852a_set_channel_bb(rtwdev, chan, phy_idx);
-=======
-				 struct rtw89_channel_params *params)
-{
-	rtw8852a_set_channel_mac(rtwdev, params, RTW89_MAC_0);
-	rtw8852a_set_channel_bb(rtwdev, params, RTW89_PHY_0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void rtw8852a_dfs_en(struct rtw89_dev *rtwdev, bool en)
@@ -1302,7 +1239,6 @@ static void rtw8852a_adc_en(struct rtw89_dev *rtwdev, bool en)
 }
 
 static void rtw8852a_set_channel_help(struct rtw89_dev *rtwdev, bool enter,
-<<<<<<< HEAD
 				      struct rtw89_channel_help_params *p,
 				      const struct rtw89_chan *chan,
 				      enum rtw89_mac_idx mac_idx,
@@ -1314,36 +1250,16 @@ static void rtw8852a_set_channel_help(struct rtw89_dev *rtwdev, bool enter,
 		rtw89_mac_cfg_ppdu_status(rtwdev, mac_idx, false);
 		rtw8852a_dfs_en(rtwdev, false);
 		rtw8852a_tssi_cont_en_phyidx(rtwdev, false, phy_idx);
-=======
-				      struct rtw89_channel_help_params *p)
-{
-	u8 phy_idx = RTW89_PHY_0;
-
-	if (enter) {
-		rtw89_chip_stop_sch_tx(rtwdev, RTW89_MAC_0, &p->tx_en, RTW89_SCH_TX_SEL_ALL);
-		rtw89_mac_cfg_ppdu_status(rtwdev, RTW89_MAC_0, false);
-		rtw8852a_dfs_en(rtwdev, false);
-		rtw8852a_tssi_cont_en_phyidx(rtwdev, false, RTW89_PHY_0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rtw8852a_adc_en(rtwdev, false);
 		fsleep(40);
 		rtw8852a_bb_reset_en(rtwdev, phy_idx, false);
 	} else {
-<<<<<<< HEAD
 		rtw89_mac_cfg_ppdu_status(rtwdev, mac_idx, true);
 		rtw8852a_adc_en(rtwdev, true);
 		rtw8852a_dfs_en(rtwdev, true);
 		rtw8852a_tssi_cont_en_phyidx(rtwdev, true, phy_idx);
 		rtw8852a_bb_reset_en(rtwdev, phy_idx, true);
 		rtw89_chip_resume_sch_tx(rtwdev, mac_idx, p->tx_en);
-=======
-		rtw89_mac_cfg_ppdu_status(rtwdev, RTW89_MAC_0, true);
-		rtw8852a_adc_en(rtwdev, true);
-		rtw8852a_dfs_en(rtwdev, true);
-		rtw8852a_tssi_cont_en_phyidx(rtwdev, true, RTW89_PHY_0);
-		rtw8852a_bb_reset_en(rtwdev, phy_idx, true);
-		rtw89_chip_resume_sch_tx(rtwdev, RTW89_MAC_0, p->tx_en);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -1393,16 +1309,10 @@ static void rtw8852a_rfk_channel(struct rtw89_dev *rtwdev)
 	rtw8852a_dpk(rtwdev, phy_idx);
 }
 
-<<<<<<< HEAD
 static void rtw8852a_rfk_band_changed(struct rtw89_dev *rtwdev,
 				      enum rtw89_phy_idx phy_idx)
 {
 	rtw8852a_tssi_scan(rtwdev, phy_idx);
-=======
-static void rtw8852a_rfk_band_changed(struct rtw89_dev *rtwdev)
-{
-	rtw8852a_tssi_scan(rtwdev, RTW89_PHY_0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void rtw8852a_rfk_scan(struct rtw89_dev *rtwdev, bool start)
@@ -1501,17 +1411,11 @@ static void rtw8852a_set_txpwr_ref(struct rtw89_dev *rtwdev,
 }
 
 static void rtw8852a_set_txpwr_byrate(struct rtw89_dev *rtwdev,
-<<<<<<< HEAD
 				      const struct rtw89_chan *chan,
 				      enum rtw89_phy_idx phy_idx)
 {
 	u8 band = chan->band_type;
 	u8 ch = chan->channel;
-=======
-				      enum rtw89_phy_idx phy_idx)
-{
-	u8 ch = rtwdev->hal.current_channel;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	static const u8 rs[] = {
 		RTW89_RS_CCK,
 		RTW89_RS_OFDM,
@@ -1537,12 +1441,8 @@ static void rtw8852a_set_txpwr_byrate(struct rtw89_dev *rtwdev,
 			for (j = 0; j < rtw89_rs_idx_max[rs[i]]; j++) {
 				cur.idx = j;
 				shf = (j % 4) * 8;
-<<<<<<< HEAD
 				tmp = rtw89_phy_read_txpwr_byrate(rtwdev, band,
 								  &cur);
-=======
-				tmp = rtw89_phy_read_txpwr_byrate(rtwdev, &cur);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				val |= (tmp << shf);
 
 				if ((j + 1) % 4)
@@ -1557,15 +1457,10 @@ static void rtw8852a_set_txpwr_byrate(struct rtw89_dev *rtwdev,
 }
 
 static void rtw8852a_set_txpwr_offset(struct rtw89_dev *rtwdev,
-<<<<<<< HEAD
 				      const struct rtw89_chan *chan,
 				      enum rtw89_phy_idx phy_idx)
 {
 	u8 band = chan->band_type;
-=======
-				      enum rtw89_phy_idx phy_idx)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw89_rate_desc desc = {
 		.nss = RTW89_NSS_1,
 		.rs = RTW89_RS_OFFSET,
@@ -1576,11 +1471,7 @@ static void rtw8852a_set_txpwr_offset(struct rtw89_dev *rtwdev,
 	rtw89_debug(rtwdev, RTW89_DBG_TXPWR, "[TXPWR] set txpwr offset\n");
 
 	for (desc.idx = 0; desc.idx < RTW89_RATE_OFFSET_MAX; desc.idx++) {
-<<<<<<< HEAD
 		v = rtw89_phy_read_txpwr_byrate(rtwdev, band, &desc);
-=======
-		v = rtw89_phy_read_txpwr_byrate(rtwdev, &desc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		val |= ((v & 0xf) << (4 * desc.idx));
 	}
 
@@ -1589,7 +1480,6 @@ static void rtw8852a_set_txpwr_offset(struct rtw89_dev *rtwdev,
 }
 
 static void rtw8852a_set_txpwr_limit(struct rtw89_dev *rtwdev,
-<<<<<<< HEAD
 				     const struct rtw89_chan *chan,
 				     enum rtw89_phy_idx phy_idx)
 {
@@ -1600,43 +1490,21 @@ static void rtw8852a_set_txpwr_limit(struct rtw89_dev *rtwdev,
 	u32 addr, val;
 	const s8 *ptr;
 	u8 i, j;
-=======
-				     enum rtw89_phy_idx phy_idx)
-{
-#define __MAC_TXPWR_LMT_PAGE_SIZE 40
-	u8 ch = rtwdev->hal.current_channel;
-	u8 bw = rtwdev->hal.current_band_width;
-	struct rtw89_txpwr_limit lmt[NTX_NUM_8852A];
-	u32 addr, val;
-	const s8 *ptr;
-	u8 i, j, k;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rtw89_debug(rtwdev, RTW89_DBG_TXPWR,
 		    "[TXPWR] set txpwr limit with ch=%d bw=%d\n", ch, bw);
 
 	for (i = 0; i < NTX_NUM_8852A; i++) {
-<<<<<<< HEAD
 		rtw89_phy_fill_txpwr_limit(rtwdev, chan, &lmt[i], i);
-=======
-		rtw89_phy_fill_txpwr_limit(rtwdev, &lmt[i], i);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		for (j = 0; j < __MAC_TXPWR_LMT_PAGE_SIZE; j += 4) {
 			addr = R_AX_PWR_LMT + j + __MAC_TXPWR_LMT_PAGE_SIZE * i;
 			ptr = (s8 *)&lmt[i] + j;
-<<<<<<< HEAD
 
 			val = FIELD_PREP(GENMASK(7, 0), ptr[0]) |
 			      FIELD_PREP(GENMASK(15, 8), ptr[1]) |
 			      FIELD_PREP(GENMASK(23, 16), ptr[2]) |
 			      FIELD_PREP(GENMASK(31, 24), ptr[3]);
-=======
-			val = 0;
-
-			for (k = 0; k < 4; k++)
-				val |= (ptr[k] << (8 * k));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			rtw89_mac_txpwr_write32(rtwdev, phy_idx, addr, val);
 		}
@@ -1645,7 +1513,6 @@ static void rtw8852a_set_txpwr_limit(struct rtw89_dev *rtwdev,
 }
 
 static void rtw8852a_set_txpwr_limit_ru(struct rtw89_dev *rtwdev,
-<<<<<<< HEAD
 					const struct rtw89_chan *chan,
 					enum rtw89_phy_idx phy_idx)
 {
@@ -1656,44 +1523,22 @@ static void rtw8852a_set_txpwr_limit_ru(struct rtw89_dev *rtwdev,
 	u32 addr, val;
 	const s8 *ptr;
 	u8 i, j;
-=======
-					enum rtw89_phy_idx phy_idx)
-{
-#define __MAC_TXPWR_LMT_RU_PAGE_SIZE 24
-	u8 ch = rtwdev->hal.current_channel;
-	u8 bw = rtwdev->hal.current_band_width;
-	struct rtw89_txpwr_limit_ru lmt_ru[NTX_NUM_8852A];
-	u32 addr, val;
-	const s8 *ptr;
-	u8 i, j, k;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rtw89_debug(rtwdev, RTW89_DBG_TXPWR,
 		    "[TXPWR] set txpwr limit ru with ch=%d bw=%d\n", ch, bw);
 
 	for (i = 0; i < NTX_NUM_8852A; i++) {
-<<<<<<< HEAD
 		rtw89_phy_fill_txpwr_limit_ru(rtwdev, chan, &lmt_ru[i], i);
-=======
-		rtw89_phy_fill_txpwr_limit_ru(rtwdev, &lmt_ru[i], i);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		for (j = 0; j < __MAC_TXPWR_LMT_RU_PAGE_SIZE; j += 4) {
 			addr = R_AX_PWR_RU_LMT + j +
 			       __MAC_TXPWR_LMT_RU_PAGE_SIZE * i;
 			ptr = (s8 *)&lmt_ru[i] + j;
-<<<<<<< HEAD
 
 			val = FIELD_PREP(GENMASK(7, 0), ptr[0]) |
 			      FIELD_PREP(GENMASK(15, 8), ptr[1]) |
 			      FIELD_PREP(GENMASK(23, 16), ptr[2]) |
 			      FIELD_PREP(GENMASK(31, 24), ptr[3]);
-=======
-			val = 0;
-
-			for (k = 0; k < 4; k++)
-				val |= (ptr[k] << (8 * k));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			rtw89_mac_txpwr_write32(rtwdev, phy_idx, addr, val);
 		}
@@ -1702,7 +1547,6 @@ static void rtw8852a_set_txpwr_limit_ru(struct rtw89_dev *rtwdev,
 #undef __MAC_TXPWR_LMT_RU_PAGE_SIZE
 }
 
-<<<<<<< HEAD
 static void rtw8852a_set_txpwr(struct rtw89_dev *rtwdev,
 			       const struct rtw89_chan *chan,
 			       enum rtw89_phy_idx phy_idx)
@@ -1717,19 +1561,6 @@ static void rtw8852a_set_txpwr_ctrl(struct rtw89_dev *rtwdev,
 				    enum rtw89_phy_idx phy_idx)
 {
 	rtw8852a_set_txpwr_ref(rtwdev, phy_idx);
-=======
-static void rtw8852a_set_txpwr(struct rtw89_dev *rtwdev)
-{
-	rtw8852a_set_txpwr_byrate(rtwdev, RTW89_PHY_0);
-	rtw8852a_set_txpwr_limit(rtwdev, RTW89_PHY_0);
-	rtw8852a_set_txpwr_limit_ru(rtwdev, RTW89_PHY_0);
-}
-
-static void rtw8852a_set_txpwr_ctrl(struct rtw89_dev *rtwdev)
-{
-	rtw8852a_set_txpwr_ref(rtwdev, RTW89_PHY_0);
-	rtw8852a_set_txpwr_offset(rtwdev, RTW89_PHY_0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int
@@ -1806,19 +1637,12 @@ void rtw8852a_bb_set_pmac_tx(struct rtw89_dev *rtwdev,
 			     struct rtw8852a_bb_pmac_info *tx_info,
 			     enum rtw89_phy_idx idx)
 {
-<<<<<<< HEAD
 	const struct rtw89_chan *chan = rtw89_chan_get(rtwdev, RTW89_SUB_ENTITY_0);
 
 	if (!tx_info->en_pmac_tx) {
 		rtw8852a_stop_pmac_tx(rtwdev, tx_info, idx);
 		rtw89_phy_write32_idx(rtwdev, R_PD_CTRL, B_PD_HIT_DIS, 0, idx);
 		if (chan->band_type == RTW89_BAND_2G)
-=======
-	if (!tx_info->en_pmac_tx) {
-		rtw8852a_stop_pmac_tx(rtwdev, tx_info, idx);
-		rtw89_phy_write32_idx(rtwdev, R_PD_CTRL, B_PD_HIT_DIS, 0, idx);
-		if (rtwdev->hal.current_band_type == RTW89_BAND_2G)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			rtw89_phy_write32_clr(rtwdev, R_RXCCA, B_RXCCA_DIS);
 		return;
 	}
@@ -2020,12 +1844,9 @@ static void rtw8852a_btc_init_cfg(struct rtw89_dev *rtwdev)
 				      RF_PATH_A, BTC_BT_SS_GROUP, 0x5ff);
 		rtw8852a_set_trx_mask(rtwdev,
 				      RF_PATH_B, BTC_BT_SS_GROUP, 0x5ff);
-<<<<<<< HEAD
 		/* set path-A(S0) Tx/Rx no-mask if GNT_WL=0 && BT_S1=tx group */
 		rtw8852a_set_trx_mask(rtwdev,
 				      RF_PATH_A, BTC_BT_TX_GROUP, 0x5ff);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else { /* set WL Tx stb if GNT_WL = 0 && BT_S1 = ss group for 3-ant */
 		rtw8852a_set_trx_mask(rtwdev,
 				      RF_PATH_A, BTC_BT_SS_GROUP, 0x5df);
@@ -2239,7 +2060,6 @@ void rtw8852a_btc_wl_s1_standby(struct rtw89_dev *rtwdev, bool state)
 	rtw89_write_rf(rtwdev, RF_PATH_B, RR_LUTWE, RFREG_MASK, 0x0);
 }
 
-<<<<<<< HEAD
 static void rtw8852a_set_wl_lna2(struct rtw89_dev *rtwdev, u8 level)
 {
 	/* level=0 Default:    TIA 1/0= (LNA2,TIAN6) = (7,1)/(5,1) = 21dB/12dB
@@ -2285,8 +2105,6 @@ static void rtw8852a_btc_set_wl_rx_gain(struct rtw89_dev *rtwdev, u32 level)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtw8852a_fill_freq_with_ppdu(struct rtw89_dev *rtwdev,
 					 struct rtw89_rx_phy_ppdu *phy_ppdu,
 					 struct ieee80211_rx_status *status)
@@ -2307,21 +2125,12 @@ static void rtw8852a_query_ppdu(struct rtw89_dev *rtwdev,
 				struct ieee80211_rx_status *status)
 {
 	u8 path;
-<<<<<<< HEAD
 	u8 *rx_power = phy_ppdu->rssi;
 
 	status->signal = RTW89_RSSI_RAW_TO_DBM(max(rx_power[RF_PATH_A], rx_power[RF_PATH_B]));
 	for (path = 0; path < rtwdev->chip->rf_path_num; path++) {
 		status->chains |= BIT(path);
 		status->chain_signal[path] = RTW89_RSSI_RAW_TO_DBM(rx_power[path]);
-=======
-	s8 *rx_power = phy_ppdu->rssi;
-
-	status->signal = max_t(s8, rx_power[RF_PATH_A], rx_power[RF_PATH_B]);
-	for (path = 0; path < rtwdev->chip->rf_path_num; path++) {
-		status->chains |= BIT(path);
-		status->chain_signal[path] = rx_power[path];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	if (phy_ppdu->valid)
 		rtw8852a_fill_freq_with_ppdu(rtwdev, phy_ppdu, status);
@@ -2372,11 +2181,8 @@ static const struct rtw89_chip_ops rtw8852a_chip_ops = {
 	.btc_bt_aci_imp		= rtw8852a_btc_bt_aci_imp,
 	.btc_update_bt_cnt	= rtw8852a_btc_update_bt_cnt,
 	.btc_wl_s1_standby	= rtw8852a_btc_wl_s1_standby,
-<<<<<<< HEAD
 	.btc_set_wl_rx_gain	= rtw8852a_btc_set_wl_rx_gain,
 	.btc_set_policy		= rtw89_btc_set_policy,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 const struct rtw89_chip_info rtw8852a_chip_info = {
@@ -2384,10 +2190,7 @@ const struct rtw89_chip_info rtw8852a_chip_info = {
 	.ops			= &rtw8852a_chip_ops,
 	.fw_name		= "rtw89/rtw8852a_fw.bin",
 	.fifo_size		= 458752,
-<<<<<<< HEAD
 	.dle_scc_rsvd_size	= 0,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.max_amsdu_limit	= 3500,
 	.dis_2g_40m_ul_ofdma	= true,
 	.rsvd_ple_ofst		= 0x6f800,
@@ -2409,13 +2212,9 @@ const struct rtw89_chip_info rtw8852a_chip_info = {
 	.txpwr_factor_rf	= 2,
 	.txpwr_factor_mac	= 1,
 	.dig_table		= &rtw89_8852a_phy_dig_table,
-<<<<<<< HEAD
 	.dig_regs		= &rtw8852a_dig_regs,
 	.tssi_dbw_table		= NULL,
 	.support_chanctx_num	= 1,
-=======
-	.tssi_dbw_table		= NULL,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.support_bands		= BIT(NL80211_BAND_2GHZ) |
 				  BIT(NL80211_BAND_5GHZ),
 	.support_bw160		= false,
@@ -2426,12 +2225,9 @@ const struct rtw89_chip_info rtw8852a_chip_info = {
 	.acam_num		= 128,
 	.bcam_num		= 10,
 	.scam_num		= 128,
-<<<<<<< HEAD
 	.bacam_num		= 2,
 	.bacam_dynamic_num	= 4,
 	.bacam_v1		= false,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.sec_ctrl_efuse_size	= 4,
 	.physical_efuse_size	= 1216,
 	.logical_efuse_size	= 1536,
@@ -2440,7 +2236,6 @@ const struct rtw89_chip_info rtw8852a_chip_info = {
 	.dav_log_efuse_size	= 0,
 	.phycap_addr		= 0x580,
 	.phycap_size		= 128,
-<<<<<<< HEAD
 	.para_ver		= 0x0,
 	.wlcx_desired		= 0x06000000,
 	.btcx_desired		= 0x7,
@@ -2461,13 +2256,6 @@ const struct rtw89_chip_info rtw8852a_chip_info = {
 	.fcxbtafh_ver		= 1,
 	.fcxbtdevinfo_ver	= 1,
 
-=======
-	.para_ver		= 0x05050864,
-	.wlcx_desired		= 0x05050000,
-	.btcx_desired		= 0x5,
-	.scbd			= 0x1,
-	.mailbox		= 0x1,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.afh_guard_ch		= 6,
 	.wl_rssi_thres		= rtw89_btc_8852a_wl_rssi_thres,
 	.bt_rssi_thres		= rtw89_btc_8852a_bt_rssi_thres,
@@ -2493,13 +2281,9 @@ const struct rtw89_chip_info rtw8852a_chip_info = {
 	.page_regs		= &rtw8852a_page_regs,
 	.dcfo_comp		= &rtw8852a_dcfo_comp,
 	.dcfo_comp_sft		= 3,
-<<<<<<< HEAD
 	.imr_info		= &rtw8852a_imr_info,
 	.rrsr_cfgs		= &rtw8852a_rrsr_cfgs,
 	.dma_ch_mask		= 0,
-=======
-	.imr_info		= &rtw8852a_imr_info
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL(rtw8852a_chip_info);
 

@@ -101,7 +101,6 @@ u16 nvmet_parse_fabrics_admin_cmd(struct nvmet_req *req)
 		req->execute = nvmet_execute_auth_receive;
 		break;
 #endif
-<<<<<<< HEAD
 	default:
 		pr_debug("received unknown capsule type 0x%x\n",
 			cmd->fabrics.fctype);
@@ -127,33 +126,6 @@ u16 nvmet_parse_fabrics_io_cmd(struct nvmet_req *req)
 #endif
 	default:
 		pr_debug("received unknown capsule type 0x%x\n",
-=======
-	default:
-		pr_debug("received unknown capsule type 0x%x\n",
-			cmd->fabrics.fctype);
-		req->error_loc = offsetof(struct nvmf_common_command, fctype);
-		return NVME_SC_INVALID_OPCODE | NVME_SC_DNR;
-	}
-
-	return 0;
-}
-
-u16 nvmet_parse_fabrics_io_cmd(struct nvmet_req *req)
-{
-	struct nvme_command *cmd = req->cmd;
-
-	switch (cmd->fabrics.fctype) {
-#ifdef CONFIG_NVME_TARGET_AUTH
-	case nvme_fabrics_type_auth_send:
-		req->execute = nvmet_execute_auth_send;
-		break;
-	case nvme_fabrics_type_auth_receive:
-		req->execute = nvmet_execute_auth_receive;
-		break;
-#endif
-	default:
-		pr_debug("received unknown capsule type 0x%x\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			cmd->fabrics.fctype);
 		req->error_loc = offsetof(struct nvmf_common_command, fctype);
 		return NVME_SC_INVALID_OPCODE | NVME_SC_DNR;
@@ -303,15 +275,7 @@ static void nvmet_execute_admin_connect(struct nvmet_req *req)
 		ctrl->cntlid, ctrl->subsys->subsysnqn, ctrl->hostnqn,
 		ctrl->pi_support ? " T10-PI is enabled" : "",
 		nvmet_has_auth(ctrl) ? " with DH-HMAC-CHAP" : "");
-<<<<<<< HEAD
 	req->cqe->result.u32 = cpu_to_le32(nvmet_connect_result(ctrl));
-=======
-	req->cqe->result.u16 = cpu_to_le16(ctrl->cntlid);
-
-	if (nvmet_has_auth(ctrl))
-		req->cqe->result.u32 |=
-			cpu_to_le32((u32)NVME_CONNECT_AUTHREQ_ATR << 16);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	kfree(d);
 complete:
@@ -366,22 +330,9 @@ static void nvmet_execute_io_connect(struct nvmet_req *req)
 	status = nvmet_install_queue(ctrl, req);
 	if (status)
 		goto out_ctrl_put;
-<<<<<<< HEAD
 
 	pr_debug("adding queue %d to ctrl %d.\n", qid, ctrl->cntlid);
 	req->cqe->result.u32 = cpu_to_le32(nvmet_connect_result(ctrl));
-=======
-
-	/* pass back cntlid for successful completion */
-	req->cqe->result.u16 = cpu_to_le16(ctrl->cntlid);
-
-	pr_debug("adding queue %d to ctrl %d.\n", qid, ctrl->cntlid);
-	req->cqe->result.u16 = cpu_to_le16(ctrl->cntlid);
-	if (nvmet_has_auth(ctrl))
-		req->cqe->result.u32 |=
-			cpu_to_le32((u32)NVME_CONNECT_AUTHREQ_ATR << 16);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	kfree(d);
 complete:

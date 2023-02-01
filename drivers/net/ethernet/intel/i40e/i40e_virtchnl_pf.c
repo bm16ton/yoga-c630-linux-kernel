@@ -1578,10 +1578,7 @@ bool i40e_reset_vf(struct i40e_vf *vf, bool flr)
 	i40e_cleanup_reset_vf(vf);
 
 	i40e_flush(hw);
-<<<<<<< HEAD
 	usleep_range(20000, 40000);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	clear_bit(I40E_VF_STATE_RESETTING, &vf->vf_states);
 
 	return true;

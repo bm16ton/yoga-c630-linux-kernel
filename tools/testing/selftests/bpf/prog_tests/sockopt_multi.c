@@ -310,11 +310,7 @@ void test_sockopt_multi(void)
 	if (!ASSERT_GE(cg_child, 0, "join_cgroup /parent/child"))
 		goto out;
 
-<<<<<<< HEAD
 	obj = bpf_object__open_file("sockopt_multi.bpf.o", NULL);
-=======
-	obj = bpf_object__open_file("sockopt_multi.o", NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ASSERT_OK_PTR(obj, "obj_load"))
 		goto out;
 

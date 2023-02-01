@@ -8,11 +8,8 @@
 #include "qcom-msm8226.dtsi"
 #include "qcom-pm8226.dtsi"
 
-<<<<<<< HEAD
 /delete-node/ &adsp_region;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 / {
 	model = "ASUS ZenWatch 2";
 	compatible = "asus,sparrow", "qcom,apq8026";
@@ -62,13 +59,10 @@
 	};
 };
 
-<<<<<<< HEAD
 &adsp {
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &blsp1_uart1 {
 	status = "okay";
 

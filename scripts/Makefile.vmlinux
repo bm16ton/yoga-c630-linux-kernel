@@ -1,29 +1,22 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
-<<<<<<< HEAD
 PHONY := __default
 __default: vmlinux
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 include include/config/auto.conf
 include $(srctree)/scripts/Kbuild.include
 
 # for c_flags
 include $(srctree)/scripts/Makefile.lib
 
-<<<<<<< HEAD
 targets :=
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 quiet_cmd_cc_o_c = CC      $@
       cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
 
 %.o: %.c FORCE
 	$(call if_changed_dep,cc_o_c)
 
-<<<<<<< HEAD
 ifdef CONFIG_MODULES
 targets += .vmlinux.export.o
 vmlinux: .vmlinux.export.o
@@ -39,9 +32,6 @@ cmd_link_vmlinux =							\
 targets += vmlinux
 vmlinux: scripts/link-vmlinux.sh vmlinux.o $(KBUILD_LDS) FORCE
 	+$(call if_changed_dep,link_vmlinux)
-=======
-targets := $(MAKECMDGOALS)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # Add FORCE to the prequisites of a target to force it to be always rebuilt.
 # ---------------------------------------------------------------------------

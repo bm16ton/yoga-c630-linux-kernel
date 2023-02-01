@@ -357,33 +357,20 @@ static int dw_i2s_set_fmt(struct snd_soc_dai *cpu_dai, unsigned int fmt)
 	int ret = 0;
 
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FC:
-=======
-	case SND_SOC_DAIFMT_CBP_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (dev->capability & DW_I2S_SLAVE)
 			ret = 0;
 		else
 			ret = -EINVAL;
 		break;
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (dev->capability & DW_I2S_MASTER)
 			ret = 0;
 		else
 			ret = -EINVAL;
 		break;
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FP:
 	case SND_SOC_DAIFMT_BP_FC:
-=======
-	case SND_SOC_DAIFMT_CBP_CFC:
-	case SND_SOC_DAIFMT_CBC_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -EINVAL;
 		break;
 	default:

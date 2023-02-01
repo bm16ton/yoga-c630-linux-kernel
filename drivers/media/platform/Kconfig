@@ -81,10 +81,7 @@ source "drivers/media/platform/samsung/Kconfig"
 source "drivers/media/platform/st/Kconfig"
 source "drivers/media/platform/sunxi/Kconfig"
 source "drivers/media/platform/ti/Kconfig"
-<<<<<<< HEAD
 source "drivers/media/platform/verisilicon/Kconfig"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/media/platform/via/Kconfig"
 source "drivers/media/platform/xilinx/Kconfig"
 

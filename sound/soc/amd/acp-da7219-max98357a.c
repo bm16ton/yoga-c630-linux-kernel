@@ -151,11 +151,7 @@ static int cz_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 				    SND_JACK_HEADSET | SND_JACK_LINEOUT |
 				    SND_JACK_BTN_0 | SND_JACK_BTN_1 |
 				    SND_JACK_BTN_2 | SND_JACK_BTN_3,
-<<<<<<< HEAD
 				    &cz_jack);
-=======
-				    &cz_jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(card->dev, "HP jack creation failed %d\n", ret);
 		return ret;

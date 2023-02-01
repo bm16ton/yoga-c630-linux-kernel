@@ -30,13 +30,8 @@
 #include <drm/drm_damage_helper.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_encoder.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
 #include <drm/drm_fb_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
-#include <drm/drm_fb_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
@@ -123,7 +118,6 @@ struct ingenic_drm {
 	struct notifier_block clock_nb;
 
 	struct drm_private_obj private_obj;
-<<<<<<< HEAD
 };
 
 struct ingenic_drm_bridge {
@@ -133,17 +127,6 @@ struct ingenic_drm_bridge {
 	struct drm_bus_cfg bus_cfg;
 };
 
-=======
-};
-
-struct ingenic_drm_bridge {
-	struct drm_encoder encoder;
-	struct drm_bridge bridge, *next_bridge;
-
-	struct drm_bus_cfg bus_cfg;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct ingenic_drm_bridge *
 to_ingenic_drm_bridge(struct drm_encoder *encoder)
 {
@@ -498,13 +481,8 @@ static int ingenic_drm_plane_atomic_check(struct drm_plane *plane,
 		return PTR_ERR(priv_state);
 
 	ret = drm_atomic_helper_check_plane_state(new_plane_state, crtc_state,
-<<<<<<< HEAD
 						  DRM_PLANE_NO_SCALING,
 						  DRM_PLANE_NO_SCALING,
-=======
-						  DRM_PLANE_HELPER_NO_SCALING,
-						  DRM_PLANE_HELPER_NO_SCALING,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						  priv->soc_info->has_osd,
 						  true);
 	if (ret)
@@ -691,16 +669,11 @@ static void ingenic_drm_plane_atomic_update(struct drm_plane *plane,
 
 	if (newstate && newstate->fb) {
 		if (priv->soc_info->map_noncoherent)
-<<<<<<< HEAD
 			drm_fb_dma_sync_non_coherent(&priv->drm, oldstate, newstate);
-=======
-			drm_fb_cma_sync_non_coherent(&priv->drm, oldstate, newstate);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		crtc_state = newstate->crtc->state;
 		plane_id = !!(priv->soc_info->has_osd && plane != &priv->f0);
 
-<<<<<<< HEAD
 		addr = drm_fb_dma_get_gem_addr(newstate->fb, newstate, 0);
 		width = newstate->src_w >> 16;
 		height = newstate->src_h >> 16;
@@ -709,16 +682,6 @@ static void ingenic_drm_plane_atomic_update(struct drm_plane *plane,
 		priv_state = ingenic_drm_get_new_priv_state(priv, state);
 		next_id = (priv_state && priv_state->use_palette) ? HWDESC_PALETTE : plane_id;
 
-=======
-		addr = drm_fb_cma_get_gem_addr(newstate->fb, newstate, 0);
-		width = newstate->src_w >> 16;
-		height = newstate->src_h >> 16;
-		cpp = newstate->fb->format->cpp[0];
-
-		priv_state = ingenic_drm_get_new_priv_state(priv, state);
-		next_id = (priv_state && priv_state->use_palette) ? HWDESC_PALETTE : plane_id;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hwdesc = &priv->dma_hwdescs->hwdesc[plane_id];
 		hwdesc->addr = addr;
 		hwdesc->cmd = JZ_LCD_CMD_EOF_IRQ | (width * height * cpp / 4);
@@ -951,11 +914,7 @@ static struct drm_gem_object *
 ingenic_drm_gem_create_object(struct drm_device *drm, size_t size)
 {
 	struct ingenic_drm *priv = drm_device_get_priv(drm);
-<<<<<<< HEAD
 	struct drm_gem_dma_object *obj;
-=======
-	struct drm_gem_cma_object *obj;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	obj = kzalloc(sizeof(*obj), GFP_KERNEL);
 	if (!obj)
@@ -988,11 +947,7 @@ static void ingenic_drm_destroy_state(struct drm_private_obj *obj,
 	kfree(priv_state);
 }
 
-<<<<<<< HEAD
 DEFINE_DRM_GEM_DMA_FOPS(ingenic_drm_fops);
-=======
-DEFINE_DRM_GEM_CMA_FOPS(ingenic_drm_fops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct drm_driver ingenic_drm_driver_data = {
 	.driver_features	= DRIVER_MODESET | DRIVER_GEM | DRIVER_ATOMIC,
@@ -1005,11 +960,7 @@ static const struct drm_driver ingenic_drm_driver_data = {
 
 	.fops			= &ingenic_drm_fops,
 	.gem_create_object	= ingenic_drm_gem_create_object,
-<<<<<<< HEAD
 	DRM_GEM_DMA_DRIVER_OPS,
-=======
-	DRM_GEM_CMA_DRIVER_OPS,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct drm_plane_funcs ingenic_drm_primary_plane_funcs = {

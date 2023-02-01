@@ -18,12 +18,6 @@ properties:
       - qcom,q6afe-clocks
       - qcom,q6prm-lpass-clocks
 
-<<<<<<< HEAD
-=======
-  reg:
-    maxItems: 1
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#clock-cells':
     const: 2
     description:
@@ -35,10 +29,6 @@ properties:
 
 required:
   - compatible
-<<<<<<< HEAD
-=======
-  - reg
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - "#clock-cells"
 
 additionalProperties: false
@@ -48,7 +38,6 @@ examples:
     #include <dt-bindings/soc/qcom,apr.h>
     #include <dt-bindings/sound/qcom,q6afe.h>
     apr {
-<<<<<<< HEAD
         compatible = "qcom,apr-v2";
         qcom,domain = <APR_DOMAIN_ADSP>;
         #address-cells = <1>;
@@ -65,21 +54,6 @@ examples:
             };
         };
     };
-=======
-        #address-cells = <1>;
-        #size-cells = <0>;
-        apr-service@4 {
-            reg = <APR_SVC_AFE>;
-            #address-cells = <1>;
-            #size-cells = <0>;
-            clock-controller@2 {
-              compatible = "qcom,q6afe-clocks";
-              reg = <2>;
-              #clock-cells = <2>;
-            };
-        };
-      };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   - |
     #include <dt-bindings/soc/qcom,gpr.h>
@@ -88,7 +62,6 @@ examples:
         qcom,domain = <GPR_DOMAIN_ID_ADSP>;
         #address-cells = <1>;
         #size-cells = <0>;
-<<<<<<< HEAD
 
         service@2 {
             reg = <GPR_PRM_MODULE_IID>;
@@ -100,17 +73,3 @@ examples:
             };
         };
     };
-=======
-        service@2 {
-            reg = <GPR_PRM_MODULE_IID>;
-            compatible = "qcom,q6prm";
-            #address-cells = <1>;
-            #size-cells = <0>;
-            clock-controller@2 {
-              compatible = "qcom,q6prm-lpass-clocks";
-              reg = <2>;
-              #clock-cells = <2>;
-            };
-        };
-      };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

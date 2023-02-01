@@ -590,7 +590,6 @@ static __init int add_pcspkr(void)
 device_initcall(add_pcspkr);
 #endif	/* CONFIG_PCSPKR_PLATFORM */
 
-<<<<<<< HEAD
 static char ppc_hw_desc_buf[128] __initdata;
 
 struct seq_buf ppc_hw_desc __initdata = {
@@ -600,8 +599,6 @@ struct seq_buf ppc_hw_desc __initdata = {
 	.readpos = 0,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static __init void probe_machine(void)
 {
 	extern struct machdep_calls __machine_desc_start;
@@ -748,7 +745,6 @@ static int dump_kernel_offset(struct notifier_block *self, unsigned long v,
 		 kaslr_offset(), KERNELBASE);
 
 	return NOTIFY_DONE;
-<<<<<<< HEAD
 }
 
 static int ppc_panic_platform_handler(struct notifier_block *this,
@@ -764,23 +760,6 @@ static int ppc_panic_platform_handler(struct notifier_block *this,
 	return NOTIFY_DONE;
 }
 
-=======
-}
-
-static int ppc_panic_platform_handler(struct notifier_block *this,
-				      unsigned long event, void *ptr)
-{
-	/*
-	 * This handler is only registered if we have a panic callback
-	 * on ppc_md, hence NULL check is not needed.
-	 * Also, it may not return, so it runs really late on panic path.
-	 */
-	ppc_md.panic(ptr);
-
-	return NOTIFY_DONE;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct notifier_block ppc_fadump_block = {
 	.notifier_call = ppc_panic_fadump_handler,
 	.priority = INT_MAX, /* run early, to notify the firmware ASAP */

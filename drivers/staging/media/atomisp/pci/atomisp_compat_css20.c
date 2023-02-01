@@ -1573,23 +1573,6 @@ void atomisp_free_metadata_output_buf(struct atomisp_sub_device *asd)
 	}
 }
 
-<<<<<<< HEAD
-=======
-void atomisp_css_get_dis_statistics(struct atomisp_sub_device *asd,
-				    struct atomisp_css_buffer *isp_css_buffer,
-				    struct ia_css_isp_dvs_statistics_map *dvs_map)
-{
-	if (asd->params.dvs_stat) {
-		if (dvs_map)
-			ia_css_translate_dvs2_statistics(
-			    asd->params.dvs_stat, dvs_map);
-		else
-			ia_css_get_dvs2_statistics(asd->params.dvs_stat,
-						   isp_css_buffer->css_buffer.data.stats_dvs);
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void atomisp_css_temp_pipe_to_pipe_id(struct atomisp_sub_device *asd,
 				      struct atomisp_css_event *current_event)
 {
@@ -2631,15 +2614,9 @@ static int __get_frame_info(struct atomisp_sub_device *asd,
 	}
 	dev_dbg(isp->dev, "get frame info: w=%d, h=%d, num_invalid_frames %d.\n",
 		info->res.width, info->res.height, p_info.num_invalid_frames);
-<<<<<<< HEAD
 
 	return 0;
 
-=======
-
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 get_info_err:
 	atomisp_destroy_pipes_stream_force(asd);
 	return -EINVAL;
@@ -2702,11 +2679,7 @@ int atomisp_get_css_frame_info(struct atomisp_sub_device *asd,
 	struct atomisp_device *isp = asd->isp;
 
 	if (ATOMISP_SOC_CAMERA(asd)) {
-<<<<<<< HEAD
 		stream_index = ATOMISP_INPUT_STREAM_GENERAL;
-=======
-		stream_index = atomisp_source_pad_to_stream_id(asd, source_pad);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		stream_index = (pipe_index == IA_CSS_PIPE_ID_YUVPP) ?
 			       ATOMISP_INPUT_STREAM_VIDEO :
@@ -3773,35 +3746,6 @@ void atomisp_css_morph_table_free(struct ia_css_morph_table *table)
 	ia_css_morph_table_free(table);
 }
 
-<<<<<<< HEAD
-=======
-void atomisp_css_set_cont_prev_start_time(struct atomisp_device *isp,
-	unsigned int overlap)
-{
-	/* CSS 2.0 doesn't support this API. */
-	dev_dbg(isp->dev, "set cont prev start time is not supported.\n");
-	return;
-}
-
-/* Set the ACC binary arguments */
-int atomisp_css_set_acc_parameters(struct atomisp_acc_fw *acc_fw)
-{
-	unsigned int mem;
-
-	for (mem = 0; mem < ATOMISP_ACC_NR_MEMORY; mem++) {
-		if (acc_fw->args[mem].length == 0)
-			continue;
-
-		ia_css_isp_param_set_css_mem_init(&acc_fw->fw->mem_initializers,
-						  IA_CSS_PARAM_CLASS_PARAM, mem,
-						  acc_fw->args[mem].css_ptr,
-						  acc_fw->args[mem].length);
-	}
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct atomisp_sub_device *__get_atomisp_subdev(
     struct ia_css_pipe *css_pipe,
     struct atomisp_device *isp,
@@ -3838,11 +3782,8 @@ int atomisp_css_isr_thread(struct atomisp_device *isp,
 	struct atomisp_css_event current_event;
 	struct atomisp_sub_device *asd;
 
-<<<<<<< HEAD
 	lockdep_assert_held(&isp->mutex);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (!ia_css_dequeue_psys_event(&current_event.event)) {
 		if (current_event.event.type ==
 		    IA_CSS_EVENT_TYPE_FW_ASSERT) {

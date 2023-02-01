@@ -737,7 +737,6 @@ enum ethtool_module_power_mode {
 };
 
 /**
-<<<<<<< HEAD
  * enum ethtool_podl_pse_admin_state - operational state of the PoDL PSE
  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
  * @ETHTOOL_PODL_PSE_ADMIN_STATE_UNKNOWN: state of PoDL PSE functions are
@@ -783,8 +782,6 @@ enum ethtool_podl_pse_pw_d_status {
 };
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * struct ethtool_gstrings - string set for data tagging
  * @cmd: Command number = %ETHTOOL_GSTRINGS
  * @string_set: String set ID; one of &enum ethtool_stringset
@@ -1494,17 +1491,10 @@ struct ethtool_per_queue_op {
  * FEC modes, because it's unclear whether in this case other modes constrain
  * AUTO or are independent choices.
  * Drivers must reject SET requests if they support none of the requested modes.
-<<<<<<< HEAD
  *
  * If device does not support FEC drivers may use %ETHTOOL_FEC_NONE instead
  * of returning %EOPNOTSUPP from %ETHTOOL_GFECPARAM.
  *
-=======
- *
- * If device does not support FEC drivers may use %ETHTOOL_FEC_NONE instead
- * of returning %EOPNOTSUPP from %ETHTOOL_GFECPARAM.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * See enum ethtool_fec_config_bits for definition of valid bits for both
  * @fec and @active_fec.
  */

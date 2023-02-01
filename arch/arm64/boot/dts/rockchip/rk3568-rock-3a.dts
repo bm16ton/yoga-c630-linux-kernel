@@ -67,7 +67,6 @@
 		regulator-boot-on;
 	};
 
-<<<<<<< HEAD
 	vcc3v3_pcie: vcc3v3-pcie-regulator {
 		compatible = "regulator-fixed";
 		enable-active-high;
@@ -80,8 +79,6 @@
 		vin-supply = <&vcc5v0_sys>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vcc3v3_sys: vcc3v3-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc3v3_sys";
@@ -146,7 +143,6 @@
 		regulator-max-microvolt = <5000000>;
 		vin-supply = <&vcc5v0_usb>;
 	};
-<<<<<<< HEAD
 
 	vcc_cam: vcc-cam {
 		compatible = "regulator-fixed";
@@ -179,8 +175,6 @@
 			regulator-off-in-suspend;
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &combphy0 {
@@ -191,13 +185,10 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &combphy2 {
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &cpu0 {
 	cpu-supply = <&vdd_cpu>;
 };
@@ -497,7 +488,6 @@
 	};
 };
 
-<<<<<<< HEAD
 &i2c3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c3m1_xfer>;
@@ -526,8 +516,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &i2s0_8ch {
 	status = "okay";
 };
@@ -549,7 +537,6 @@
 	};
 };
 
-<<<<<<< HEAD
 &pcie2x1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie_reset_h>;
@@ -571,31 +558,24 @@
 		};
 	};
 
-=======
-&pinctrl {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ethernet {
 		eth_phy_rst: eth_phy_rst {
 			rockchip,pins = <3 RK_PB0 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
-<<<<<<< HEAD
 	hym8563 {
 		hym8563_int: hym8563-int {
 			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	leds {
 		led_user_en: led_user_en {
 			rockchip,pins = <0 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
-<<<<<<< HEAD
 	pcie {
 		pcie_enable_h: pcie-enable-h {
 			rockchip,pins = <0 RK_PD4 RK_FUNC_GPIO &pcfg_pull_none>;
@@ -606,8 +586,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pmic {
 		pmic_int: pmic_int {
 			rockchip,pins =
@@ -715,11 +693,7 @@
 };
 
 &usb2phy0_otg {
-<<<<<<< HEAD
 	phy-supply = <&vcc5v0_usb_otg>;
-=======
-	vbus-supply = <&vcc5v0_usb_otg>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = "okay";
 };
 

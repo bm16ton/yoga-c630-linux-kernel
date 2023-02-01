@@ -155,14 +155,7 @@ static int journal_submit_commit_record(journal_t *journal,
 
 	if (journal->j_flags & JBD2_BARRIER &&
 	    !jbd2_has_feature_async_commit(journal))
-<<<<<<< HEAD
 		write_flags |= REQ_PREFLUSH | REQ_FUA;
-=======
-		ret = submit_bh(REQ_OP_WRITE | REQ_SYNC | REQ_PREFLUSH |
-				REQ_FUA, bh);
-	else
-		ret = submit_bh(REQ_OP_WRITE | REQ_SYNC, bh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	submit_bh(write_flags, bh);
 	*cbh = bh;

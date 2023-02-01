@@ -698,12 +698,8 @@ static int venc_set_properties(struct venus_inst *inst)
 			return ret;
 	}
 
-<<<<<<< HEAD
 	if (inst->fmt_cap->pixfmt == V4L2_PIX_FMT_HEVC &&
 	    ctr->profile.hevc == V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_10) {
-=======
-	if (inst->fmt_cap->pixfmt == V4L2_PIX_FMT_HEVC) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct hfi_hdr10_pq_sei hdr10;
 		unsigned int c;
 

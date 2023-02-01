@@ -1832,12 +1832,8 @@ static enum dbg_status qed_find_nvram_image(struct qed_hwfn *p_hwfn,
 					    struct qed_ptt *p_ptt,
 					    u32 image_type,
 					    u32 *nvram_offset_bytes,
-<<<<<<< HEAD
 					    u32 *nvram_size_bytes,
 					    bool b_can_sleep)
-=======
-					    u32 *nvram_size_bytes)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u32 ret_mcp_resp, ret_mcp_param, ret_txn_size;
 	struct mcp_file_att file_att;
@@ -1851,12 +1847,8 @@ static enum dbg_status qed_find_nvram_image(struct qed_hwfn *p_hwfn,
 					&ret_mcp_resp,
 					&ret_mcp_param,
 					&ret_txn_size,
-<<<<<<< HEAD
 					(u32 *)&file_att,
 					b_can_sleep);
-=======
-					(u32 *)&file_att, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Check response */
 	if (nvm_result || (ret_mcp_resp & FW_MSG_CODE_MASK) !=
@@ -1883,13 +1875,9 @@ static enum dbg_status qed_find_nvram_image(struct qed_hwfn *p_hwfn,
 static enum dbg_status qed_nvram_read(struct qed_hwfn *p_hwfn,
 				      struct qed_ptt *p_ptt,
 				      u32 nvram_offset_bytes,
-<<<<<<< HEAD
 				      u32 nvram_size_bytes,
 				      u32 *ret_buf,
 				      bool b_can_sleep)
-=======
-				      u32 nvram_size_bytes, u32 *ret_buf)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u32 ret_mcp_resp, ret_mcp_param, ret_read_size, bytes_to_copy;
 	s32 bytes_left = nvram_size_bytes;
@@ -1915,11 +1903,7 @@ static enum dbg_status qed_nvram_read(struct qed_hwfn *p_hwfn,
 				       &ret_mcp_resp,
 				       &ret_mcp_param, &ret_read_size,
 				       (u32 *)((u8 *)ret_buf + read_offset),
-<<<<<<< HEAD
 				       b_can_sleep))
-=======
-				       false))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return DBG_STATUS_NVRAM_READ_FAILED;
 
 		/* Check response */

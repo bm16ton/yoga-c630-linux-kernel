@@ -1076,10 +1076,6 @@ static bool kvm_xen_schedop_poll(struct kvm_vcpu *vcpu, bool longmode,
 			del_timer(&vcpu->arch.xen.poll_timer);
 
 		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-<<<<<<< HEAD
-=======
-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	vcpu->arch.xen.poll_evtchn = 0;

@@ -33,10 +33,6 @@ static DEFINE_SPINLOCK(kernfs_idr_lock);	/* root->ino_idr */
 
 static bool __kernfs_active(struct kernfs_node *kn)
 {
-<<<<<<< HEAD
-=======
-	lockdep_assert_held(&kernfs_root(kn)->kernfs_rwsem);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return atomic_read(&kn->active) >= 0;
 }
 
@@ -481,7 +477,6 @@ static void kernfs_drain(struct kernfs_node *kn)
 	lockdep_assert_held_write(&root->kernfs_rwsem);
 	WARN_ON_ONCE(kernfs_active(kn));
 
-<<<<<<< HEAD
 	/*
 	 * Skip draining if already fully drained. This avoids draining and its
 	 * lockdep annotations for nodes which have never been activated
@@ -492,8 +487,6 @@ static void kernfs_drain(struct kernfs_node *kn)
 	    !kernfs_should_drain_open_files(kn))
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	up_write(&root->kernfs_rwsem);
 
 	if (kernfs_lockdep(kn)) {
@@ -1431,11 +1424,7 @@ static void __kernfs_remove(struct kernfs_node *kn)
 		pos = kernfs_leftmost_descendant(kn);
 
 		/*
-<<<<<<< HEAD
 		 * kernfs_drain() may drop kernfs_rwsem temporarily and @pos's
-=======
-		 * kernfs_drain() drops kernfs_rwsem temporarily and @pos's
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * base ref could have been put by someone else by the time
 		 * the function returns.  Make sure it doesn't go away
 		 * underneath us.

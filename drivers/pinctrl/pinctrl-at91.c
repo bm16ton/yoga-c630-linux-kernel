@@ -24,8 +24,6 @@
 #include <linux/pinctrl/consumer.h>
 #include <linux/pm.h>
 
-#include <soc/at91/pm.h>
-
 #include "pinctrl-at91.h"
 #include "core.h"
 
@@ -52,7 +50,6 @@ struct at91_pinctrl_mux_ops;
 struct at91_gpio_chip {
 	struct gpio_chip	chip;
 	struct pinctrl_gpio_range range;
-<<<<<<< HEAD
 	struct at91_gpio_chip	*next;
 	int			pioc_hwirq;
 	int			pioc_virq;
@@ -63,15 +60,6 @@ struct at91_gpio_chip {
 	u32			wakeups;
 	u32			backups;
 	u32			id;
-=======
-	struct at91_gpio_chip	*next;		/* Bank sharing same clock */
-	int			pioc_hwirq;	/* PIO bank interrupt identifier on AIC */
-	int			pioc_virq;	/* PIO bank Linux virtual interrupt */
-	int			pioc_idx;	/* PIO bank index */
-	void __iomem		*regbase;	/* PIO bank virtual address */
-	struct clk		*clock;		/* associated clock */
-	const struct at91_pinctrl_mux_ops *ops;	/* ops */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct at91_gpio_chip *gpio_chips[MAX_GPIO_BANKS];
@@ -1644,12 +1632,6 @@ static void gpio_irq_ack(struct irq_data *d)
 	/* the interrupt is already cleared before by reading ISR */
 }
 
-<<<<<<< HEAD
-=======
-static u32 wakeups[MAX_GPIO_BANKS];
-static u32 backups[MAX_GPIO_BANKS];
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int gpio_irq_set_wake(struct irq_data *d, unsigned state)
 {
 	struct at91_gpio_chip *at91_gpio = irq_data_get_irq_chip_data(d);

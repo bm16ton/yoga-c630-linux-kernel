@@ -46,11 +46,7 @@ struct rnbd_srv_dev {
 struct rnbd_srv_sess_dev {
 	/* Entry inside rnbd_srv_dev struct */
 	struct list_head		dev_list;
-<<<<<<< HEAD
 	struct block_device		*bdev;
-=======
-	struct rnbd_dev			*rnbd_dev;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rnbd_srv_session		*sess;
 	struct rnbd_srv_dev		*dev;
 	struct kobject                  kobj;

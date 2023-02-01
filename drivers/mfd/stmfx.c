@@ -472,11 +472,6 @@ static void stmfx_remove(struct i2c_client *client)
 	stmfx_irq_exit(client);
 
 	stmfx_chip_exit(client);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_PM_SLEEP

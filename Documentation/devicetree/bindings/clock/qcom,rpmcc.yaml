@@ -29,10 +29,7 @@ properties:
           - qcom,rpmcc-mdm9607
           - qcom,rpmcc-msm8226
           - qcom,rpmcc-msm8660
-<<<<<<< HEAD
           - qcom,rpmcc-msm8909
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - qcom,rpmcc-msm8916
           - qcom,rpmcc-msm8936
           - qcom,rpmcc-msm8953
@@ -47,10 +44,7 @@ properties:
           - qcom,rpmcc-sdm660
           - qcom,rpmcc-sm6115
           - qcom,rpmcc-sm6125
-<<<<<<< HEAD
           - qcom,rpmcc-sm6375
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - const: qcom,rpmcc
 
   '#clock-cells':

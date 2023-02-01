@@ -121,23 +121,6 @@ static inline bool free_area_empty(struct free_area *area, int migratetype)
 
 struct pglist_data;
 
-<<<<<<< HEAD
-=======
-/*
- * Add a wild amount of padding here to ensure data fall into separate
- * cachelines.  There are very few zone structures in the machine, so space
- * consumption is not a concern here.
- */
-#if defined(CONFIG_SMP)
-struct zone_padding {
-	char x[0];
-} ____cacheline_internodealigned_in_smp;
-#define ZONE_PADDING(name)	struct zone_padding name;
-#else
-#define ZONE_PADDING(name)
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_NUMA
 enum numa_stat_item {
 	NUMA_HIT,		/* allocated in intended node */
@@ -225,10 +208,7 @@ enum node_stat_item {
 #endif
 #ifdef CONFIG_NUMA_BALANCING
 	PGPROMOTE_SUCCESS,	/* promote successfully */
-<<<<<<< HEAD
 	PGPROMOTE_CANDIDATE,	/* candidate pages to promote */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 	NR_VM_NODE_STAT_ITEMS
 };
@@ -585,16 +565,6 @@ enum zone_watermarks {
 #define NR_LOWORDER_PCP_LISTS (MIGRATE_PCPTYPES * (PAGE_ALLOC_COSTLY_ORDER + 1))
 #define NR_PCP_LISTS (NR_LOWORDER_PCP_LISTS + NR_PCP_THP)
 
-<<<<<<< HEAD
-=======
-/*
- * Shift to encode migratetype and order in the same integer, with order
- * in the least significant bits.
- */
-#define NR_PCP_ORDER_WIDTH 8
-#define NR_PCP_ORDER_MASK ((1<<NR_PCP_ORDER_WIDTH) - 1)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define min_wmark_pages(z) (z->_watermark[WMARK_MIN] + z->watermark_boost)
 #define low_wmark_pages(z) (z->_watermark[WMARK_LOW] + z->watermark_boost)
 #define high_wmark_pages(z) (z->_watermark[WMARK_HIGH] + z->watermark_boost)
@@ -966,11 +936,8 @@ static inline bool zone_is_empty(struct zone *zone)
 #define ZONES_PGOFF		(NODES_PGOFF - ZONES_WIDTH)
 #define LAST_CPUPID_PGOFF	(ZONES_PGOFF - LAST_CPUPID_WIDTH)
 #define KASAN_TAG_PGOFF		(LAST_CPUPID_PGOFF - KASAN_TAG_WIDTH)
-<<<<<<< HEAD
 #define LRU_GEN_PGOFF		(KASAN_TAG_PGOFF - LRU_GEN_WIDTH)
 #define LRU_REFS_PGOFF		(LRU_GEN_PGOFF - LRU_REFS_WIDTH)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Define the bit shifts to access each section.  For non-existent
@@ -1178,15 +1145,10 @@ typedef struct pglist_data {
 	atomic_t nr_writeback_throttled;/* nr of writeback-throttled tasks */
 	unsigned long nr_reclaim_start;	/* nr pages written while throttled
 					 * when throttling started. */
-<<<<<<< HEAD
 #ifdef CONFIG_MEMORY_HOTPLUG
 	struct mutex kswapd_lock;
 #endif
 	struct task_struct *kswapd;	/* Protected by kswapd_lock */
-=======
-	struct task_struct *kswapd;	/* Protected by
-					   mem_hotplug_begin/done() */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int kswapd_order;
 	enum zone_type kswapd_highest_zoneidx;
 

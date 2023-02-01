@@ -424,7 +424,6 @@ static void array_map_free(struct bpf_map *map)
 	int i;
 
 	if (map_value_has_kptrs(map)) {
-<<<<<<< HEAD
 		if (array->map.map_type == BPF_MAP_TYPE_PERCPU_ARRAY) {
 			for (i = 0; i < array->map.max_entries; i++) {
 				void __percpu *pptr = array->pptrs[i & array->index_mask];
@@ -439,10 +438,6 @@ static void array_map_free(struct bpf_map *map)
 			for (i = 0; i < array->map.max_entries; i++)
 				bpf_map_free_kptrs(map, array_map_elem_ptr(array, i));
 		}
-=======
-		for (i = 0; i < array->map.max_entries; i++)
-			bpf_map_free_kptrs(map, array_map_elem_ptr(array, i));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bpf_map_free_kptr_off_tab(map);
 	}
 

@@ -219,11 +219,7 @@ static int f2fs_acl_update_mode(struct user_namespace *mnt_userns,
 		return error;
 	if (error == 0)
 		*acl = NULL;
-<<<<<<< HEAD
 	if (!vfsgid_in_group_p(i_gid_into_vfsgid(mnt_userns, inode)) &&
-=======
-	if (!in_group_p(i_gid_into_mnt(mnt_userns, inode)) &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    !capable_wrt_inode_uidgid(mnt_userns, inode, CAP_FSETID))
 		mode &= ~S_ISGID;
 	*mode_p = mode;

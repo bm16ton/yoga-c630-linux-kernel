@@ -1071,11 +1071,7 @@ static struct platform_driver mtk_pcie_driver = {
 	.probe = mtk_pcie_probe,
 	.remove = mtk_pcie_remove,
 	.driver = {
-<<<<<<< HEAD
 		.name = "mtk-pcie-gen3",
-=======
-		.name = "mtk-pcie",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.of_match_table = mtk_pcie_of_match,
 		.pm = &mtk_pcie_pm_ops,
 	},

@@ -68,10 +68,7 @@
 #include <asm/stacktrace.h>
 #include <asm/nmi.h>
 #include <asm/disassemble.h>
-<<<<<<< HEAD
 #include <asm/udbg.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if defined(CONFIG_DEBUGGER) || defined(CONFIG_KEXEC_CORE)
 int (*__debugger)(struct pt_regs *regs) __read_mostly;
@@ -854,7 +851,6 @@ bail:
 }
 
 #ifdef CONFIG_PPC_BOOK3S_64
-<<<<<<< HEAD
 DEFINE_INTERRUPT_HANDLER_RAW(machine_check_early_boot)
 {
 	udbg_printf("Machine check (early boot)\n");
@@ -868,8 +864,6 @@ DEFINE_INTERRUPT_HANDLER_RAW(machine_check_early_boot)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 DEFINE_INTERRUPT_HANDLER_ASYNC(machine_check_exception_async)
 {
 	__machine_check_exception(regs);

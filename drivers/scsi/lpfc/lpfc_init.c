@@ -4678,55 +4678,6 @@ lpfc_vmid_res_alloc(struct lpfc_hba *phba, struct lpfc_vport *vport)
 }
 
 /**
- * lpfc_vmid_res_alloc - Allocates resources for VMID
- * @phba: pointer to lpfc hba data structure.
- * @vport: pointer to vport data structure
- *
- * This routine allocated the resources needed for the VMID.
- *
- * Return codes
- *	0 on Success
- *	Non-0 on Failure
- */
-static int
-lpfc_vmid_res_alloc(struct lpfc_hba *phba, struct lpfc_vport *vport)
-{
-	/* VMID feature is supported only on SLI4 */
-	if (phba->sli_rev == LPFC_SLI_REV3) {
-		phba->cfg_vmid_app_header = 0;
-		phba->cfg_vmid_priority_tagging = 0;
-	}
-
-	if (lpfc_is_vmid_enabled(phba)) {
-		vport->vmid =
-		    kcalloc(phba->cfg_max_vmid, sizeof(struct lpfc_vmid),
-			    GFP_KERNEL);
-		if (!vport->vmid)
-			return -ENOMEM;
-
-		rwlock_init(&vport->vmid_lock);
-
-		/* Set the VMID parameters for the vport */
-		vport->vmid_priority_tagging = phba->cfg_vmid_priority_tagging;
-		vport->vmid_inactivity_timeout =
-		    phba->cfg_vmid_inactivity_timeout;
-		vport->max_vmid = phba->cfg_max_vmid;
-		vport->cur_vmid_cnt = 0;
-
-		vport->vmid_priority_range = bitmap_zalloc
-			(LPFC_VMID_MAX_PRIORITY_RANGE, GFP_KERNEL);
-
-		if (!vport->vmid_priority_range) {
-			kfree(vport->vmid);
-			return -ENOMEM;
-		}
-
-		hash_init(vport->hash_table);
-	}
-	return 0;
-}
-
-/**
  * lpfc_create_port - Create an FC port
  * @phba: pointer to lpfc hba data structure.
  * @instance: a unique integer ID to this FC port.
@@ -4787,30 +4738,8 @@ lpfc_create_port(struct lpfc_hba *phba, int instance, struct device *dev)
 				/* template is for a no reset SCSI Host */
 				template->eh_host_reset_handler = NULL;
 
-<<<<<<< HEAD
 			/* Seed updated value of sg_tablesize */
 			template->sg_tablesize = lpfc_get_sg_tablesize(phba);
-=======
-			/* Template for all vports this physical port creates */
-			memcpy(&phba->vport_template, &lpfc_template,
-			       sizeof(*template));
-			phba->vport_template.shost_groups = lpfc_vport_groups;
-			phba->vport_template.eh_bus_reset_handler = NULL;
-			phba->vport_template.eh_host_reset_handler = NULL;
-			phba->vport_template.vendor_id = 0;
-
-			/* Initialize the host templates with updated value */
-			if (phba->sli_rev == LPFC_SLI_REV4) {
-				template->sg_tablesize = phba->cfg_scsi_seg_cnt;
-				phba->vport_template.sg_tablesize =
-					phba->cfg_scsi_seg_cnt;
-			} else {
-				template->sg_tablesize = phba->cfg_sg_seg_cnt;
-				phba->vport_template.sg_tablesize =
-					phba->cfg_sg_seg_cnt;
-			}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			/* NVMET is for physical port only */
 			template = &lpfc_template_nvme;
@@ -6711,7 +6640,6 @@ lpfc_sli4_async_sli_evt(struct lpfc_hba *phba, struct lpfc_acqe_sli *acqe_sli)
 			}
 		}
 		break;
-<<<<<<< HEAD
 	case LPFC_SLI_EVENT_TYPE_RD_SIGNAL:
 		/* May be accompanied by a temperature event */
 		lpfc_printf_log(phba, KERN_INFO,
@@ -6721,8 +6649,6 @@ lpfc_sli4_async_sli_evt(struct lpfc_hba *phba, struct lpfc_acqe_sli *acqe_sli)
 				acqe_sli->event_data1, acqe_sli->event_data2,
 				acqe_sli->event_data3);
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		lpfc_printf_log(phba, KERN_INFO, LOG_SLI,
 				"3193 Unrecognized SLI event, type: 0x%x",
@@ -7136,15 +7062,12 @@ lpfc_cgn_params_val(struct lpfc_hba *phba, struct lpfc_cgn_param *p_cfg_param)
 	spin_unlock_irq(&phba->hbalock);
 }
 
-<<<<<<< HEAD
 static const char * const lpfc_cmf_mode_to_str[] = {
 	"OFF",
 	"MANAGED",
 	"MONITOR",
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * lpfc_cgn_params_parse - Process a FW cong parm change event
  * @phba: pointer to lpfc hba data structure.
@@ -7164,10 +7087,7 @@ lpfc_cgn_params_parse(struct lpfc_hba *phba,
 {
 	struct lpfc_cgn_info *cp;
 	uint32_t crc, oldmode;
-<<<<<<< HEAD
 	char acr_string[4] = {0};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Make sure the FW has encoded the correct magic number to
 	 * validate the congestion parameter in FW memory.
@@ -7244,12 +7164,6 @@ lpfc_cgn_params_parse(struct lpfc_hba *phba,
 					lpfc_issue_els_edc(phba->pport, 0);
 				break;
 			case LPFC_CFG_MONITOR:
-<<<<<<< HEAD
-=======
-				lpfc_printf_log(phba, KERN_INFO, LOG_CGN_MGMT,
-						"4661 Switch from MANAGED to "
-						"`MONITOR mode\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				phba->cmf_max_bytes_per_interval =
 					phba->cmf_link_byte_count;
 
@@ -7268,18 +7182,11 @@ lpfc_cgn_params_parse(struct lpfc_hba *phba,
 					lpfc_issue_els_edc(phba->pport, 0);
 				break;
 			case LPFC_CFG_MANAGED:
-<<<<<<< HEAD
-=======
-				lpfc_printf_log(phba, KERN_INFO, LOG_CGN_MGMT,
-						"4662 Switch from MONITOR to "
-						"MANAGED mode\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				lpfc_cmf_signal_init(phba);
 				break;
 			}
 			break;
 		}
-<<<<<<< HEAD
 		if (oldmode != LPFC_CFG_OFF ||
 		    oldmode != phba->cgn_p.cgn_param_mode) {
 			if (phba->cgn_p.cgn_param_mode == LPFC_CFG_MANAGED)
@@ -7295,8 +7202,6 @@ lpfc_cgn_params_parse(struct lpfc_hba *phba,
 				 [phba->cgn_p.cgn_param_mode],
 				 acr_string);
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		lpfc_printf_log(phba, KERN_ERR, LOG_CGN_MGMT | LOG_INIT,
 				"4669 FW cgn parm buf wrong magic 0x%x "

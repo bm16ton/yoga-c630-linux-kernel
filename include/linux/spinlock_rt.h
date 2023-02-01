@@ -2,11 +2,7 @@
 #ifndef __LINUX_SPINLOCK_RT_H
 #define __LINUX_SPINLOCK_RT_H
 
-<<<<<<< HEAD
 #ifndef __LINUX_INSIDE_SPINLOCK_H
-=======
-#ifndef __LINUX_SPINLOCK_H
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #error Do not include directly. Use spinlock.h
 #endif
 

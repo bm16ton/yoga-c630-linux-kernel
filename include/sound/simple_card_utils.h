@@ -52,10 +52,6 @@ struct prop_nums {
 	int cpus;
 	int codecs;
 	int platforms;
-<<<<<<< HEAD
-=======
-	int c2c;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct asoc_simple_priv {
@@ -68,10 +64,6 @@ struct asoc_simple_priv {
 		struct snd_soc_dai_link_component *platforms;
 		struct asoc_simple_data adata;
 		struct snd_soc_codec_conf *codec_conf;
-<<<<<<< HEAD
-=======
-		struct snd_soc_pcm_stream *c2c_conf;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct prop_nums num;
 		unsigned int mclk_fs;
 	} *dai_props;
@@ -82,7 +74,6 @@ struct asoc_simple_priv {
 	struct snd_soc_dai_link_component *dlcs;
 	struct snd_soc_dai_link_component dummy;
 	struct snd_soc_codec_conf *codec_conf;
-	struct snd_soc_pcm_stream *c2c_conf;
 	struct gpio_desc *pa_gpio;
 	const struct snd_soc_ops *ops;
 	unsigned int dpcm_selectable:1;

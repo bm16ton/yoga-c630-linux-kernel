@@ -2469,11 +2469,7 @@ static int accept_cr(struct c4iw_ep *ep, struct sk_buff *skb,
 	}
 
 	if (!is_t4(adapter_type)) {
-<<<<<<< HEAD
 		u32 isn = (get_random_u32() & ~7UL) - 1;
-=======
-		u32 isn = (prandom_u32() & ~7UL) - 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		skb = get_skb(skb, roundup(sizeof(*rpl5), 16), GFP_KERNEL);
 		rpl5 = __skb_put_zero(skb, roundup(sizeof(*rpl5), 16));

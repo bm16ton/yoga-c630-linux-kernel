@@ -6,7 +6,6 @@
 //          Amadeusz Slawinski <amadeuszx.slawinski@linux.intel.com>
 //
 
-<<<<<<< HEAD
 #include <sound/hdaudio_ext.h>
 #include "avs.h"
 #include "registers.h"
@@ -15,36 +14,21 @@
 #define AVS_ADSPCS_INTERVAL_US		500
 #define AVS_ADSPCS_TIMEOUT_US		50000
 #define AVS_ADSPCS_DELAY_US		1000
-=======
-#include <linux/module.h>
-#include <sound/hdaudio_ext.h>
-#include "avs.h"
-#include "registers.h"
-
-#define AVS_ADSPCS_INTERVAL_US		500
-#define AVS_ADSPCS_TIMEOUT_US		50000
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int avs_dsp_core_power(struct avs_dev *adev, u32 core_mask, bool power)
 {
 	u32 value, mask, reg;
 	int ret;
 
-<<<<<<< HEAD
 	value = snd_hdac_adsp_readl(adev, AVS_ADSP_REG_ADSPCS);
 	trace_avs_dsp_core_op(value, core_mask, "power", power);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mask = AVS_ADSPCS_SPA_MASK(core_mask);
 	value = power ? mask : 0;
 
 	snd_hdac_adsp_updatel(adev, AVS_ADSP_REG_ADSPCS, mask, value);
-<<<<<<< HEAD
 	/* Delay the polling to avoid false positives. */
 	usleep_range(AVS_ADSPCS_DELAY_US, 2 * AVS_ADSPCS_DELAY_US);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mask = AVS_ADSPCS_CPA_MASK(core_mask);
 	value = power ? mask : 0;
@@ -65,12 +49,9 @@ int avs_dsp_core_reset(struct avs_dev *adev, u32 core_mask, bool reset)
 	u32 value, mask, reg;
 	int ret;
 
-<<<<<<< HEAD
 	value = snd_hdac_adsp_readl(adev, AVS_ADSP_REG_ADSPCS);
 	trace_avs_dsp_core_op(value, core_mask, "reset", reset);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mask = AVS_ADSPCS_CRST_MASK(core_mask);
 	value = reset ? mask : 0;
 
@@ -92,12 +73,9 @@ int avs_dsp_core_stall(struct avs_dev *adev, u32 core_mask, bool stall)
 	u32 value, mask, reg;
 	int ret;
 
-<<<<<<< HEAD
 	value = snd_hdac_adsp_readl(adev, AVS_ADSP_REG_ADSPCS);
 	trace_avs_dsp_core_op(value, core_mask, "stall", stall);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mask = AVS_ADSPCS_CSTALL_MASK(core_mask);
 	value = stall ? mask : 0;
 
@@ -107,7 +85,6 @@ int avs_dsp_core_stall(struct avs_dev *adev, u32 core_mask, bool stall)
 				       reg, (reg & mask) == value,
 				       AVS_ADSPCS_INTERVAL_US,
 				       AVS_ADSPCS_TIMEOUT_US);
-<<<<<<< HEAD
 	if (ret) {
 		dev_err(adev->dev, "core_mask %d %sstall failed: %d\n",
 			core_mask, stall ? "" : "un", ret);
@@ -117,13 +94,6 @@ int avs_dsp_core_stall(struct avs_dev *adev, u32 core_mask, bool stall)
 	/* Give HW time to propagate the change. */
 	usleep_range(AVS_ADSPCS_DELAY_US, 2 * AVS_ADSPCS_DELAY_US);
 	return 0;
-=======
-	if (ret)
-		dev_err(adev->dev, "core_mask %d %sstall failed: %d\n",
-			core_mask, stall ? "" : "un", ret);
-
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int avs_dsp_core_enable(struct avs_dev *adev, u32 core_mask)
@@ -198,7 +168,6 @@ static int avs_dsp_get_core(struct avs_dev *adev, u32 core_id)
 
 	adev->core_refs[core_id]++;
 	if (adev->core_refs[core_id] == 1) {
-<<<<<<< HEAD
 		/*
 		 * No cores other than main-core can be running for DSP
 		 * to achieve d0ix. Conscious SET_D0IX IPC failure is permitted,
@@ -208,8 +177,6 @@ static int avs_dsp_get_core(struct avs_dev *adev, u32 core_id)
 		if (ret && ret != -AVS_EIPC)
 			goto err_disable_d0ix;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = avs_dsp_enable(adev, mask);
 		if (ret)
 			goto err_enable_dsp;
@@ -218,11 +185,8 @@ static int avs_dsp_get_core(struct avs_dev *adev, u32 core_id)
 	return 0;
 
 err_enable_dsp:
-<<<<<<< HEAD
 	avs_dsp_enable_d0ix(adev);
 err_disable_d0ix:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	adev->core_refs[core_id]--;
 err:
 	dev_err(adev->dev, "get core %d failed: %d\n", core_id, ret);
@@ -248,12 +212,9 @@ static int avs_dsp_put_core(struct avs_dev *adev, u32 core_id)
 		ret = avs_dsp_disable(adev, mask);
 		if (ret)
 			goto err;
-<<<<<<< HEAD
 
 		/* Match disable_d0ix in avs_dsp_get_core(). */
 		avs_dsp_enable_d0ix(adev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -367,8 +328,3 @@ int avs_dsp_delete_pipeline(struct avs_dev *adev, u8 instance_id)
 	ida_free(&adev->ppl_ida, instance_id);
 	return ret;
 }
-<<<<<<< HEAD
-=======
-
-MODULE_LICENSE("GPL");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

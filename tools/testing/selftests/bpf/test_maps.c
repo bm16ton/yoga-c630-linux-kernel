@@ -1147,13 +1147,8 @@ out_sockmap:
 	exit(1);
 }
 
-<<<<<<< HEAD
 #define MAPINMAP_PROG "./test_map_in_map.bpf.o"
 #define MAPINMAP_INVALID_PROG "./test_map_in_map_invalid.bpf.o"
-=======
-#define MAPINMAP_PROG "./test_map_in_map.o"
-#define MAPINMAP_INVALID_PROG "./test_map_in_map_invalid.o"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void test_map_in_map(void)
 {
 	struct bpf_object *obj;
@@ -1517,15 +1512,12 @@ again:
 	key = -1;
 	assert(bpf_map_get_next_key(fd, NULL, &key) < 0 && errno == ENOENT);
 	assert(bpf_map_get_next_key(fd, &key, &key) < 0 && errno == ENOENT);
-<<<<<<< HEAD
 
 	key = 0;
 	bpf_map_delete_elem(fd, &key);
 	if (j++ < 5)
 		goto again;
 	close(fd);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void test_map_rdonly(void)

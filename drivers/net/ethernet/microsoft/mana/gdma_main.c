@@ -397,14 +397,11 @@ static void mana_gd_process_eq_events(void *arg)
 			break;
 		}
 
-<<<<<<< HEAD
 		/* Per GDMA spec, rmb is necessary after checking owner_bits, before
 		 * reading eqe.
 		 */
 		rmb();
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mana_gd_process_eqe(eq);
 
 		eq->head++;
@@ -1142,14 +1139,11 @@ static int mana_gd_read_cqe(struct gdma_queue *cq, struct gdma_comp *comp)
 	if (WARN_ON_ONCE(owner_bits != new_bits))
 		return -1;
 
-<<<<<<< HEAD
 	/* Per GDMA spec, rmb is necessary after checking owner_bits, before
 	 * reading completion info
 	 */
 	rmb();
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	comp->wq_num = cqe->cqe_info.wq_num;
 	comp->is_sq = cqe->cqe_info.is_sq;
 	memcpy(comp->cqe_data, cqe->cqe_data, GDMA_COMP_DATA_SIZE);

@@ -74,13 +74,10 @@ struct tusb320_priv {
 	struct extcon_dev *edev;
 	struct tusb320_ops *ops;
 	enum tusb320_attached_state state;
-<<<<<<< HEAD
 	struct typec_port *port;
 	struct typec_capability	cap;
 	enum typec_port_type port_type;
 	enum typec_pwr_opmode pwr_opmode;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const char * const tusb_attached_states[] = {
@@ -116,104 +113,6 @@ static int tusb320_check_signature(struct tusb320_priv *priv)
 }
 
 static int tusb320_set_mode(struct tusb320_priv *priv, enum tusb320_mode mode)
-<<<<<<< HEAD
-=======
-{
-	int ret;
-
-	/* Mode cannot be changed while cable is attached */
-	if (priv->state != TUSB320_ATTACHED_STATE_NONE)
-		return -EBUSY;
-
-	/* Write mode */
-	ret = regmap_write_bits(priv->regmap, TUSB320_REGA,
-		TUSB320_REGA_MODE_SELECT_MASK << TUSB320_REGA_MODE_SELECT_SHIFT,
-		mode << TUSB320_REGA_MODE_SELECT_SHIFT);
-	if (ret) {
-		dev_err(priv->dev, "failed to write mode: %d\n", ret);
-		return ret;
-	}
-
-	return 0;
-}
-
-static int tusb320l_set_mode(struct tusb320_priv *priv, enum tusb320_mode mode)
-{
-	int ret;
-
-	/* Disable CC state machine */
-	ret = regmap_write_bits(priv->regmap, TUSB320_REGA,
-		TUSB320L_REGA_DISABLE_TERM, 1);
-	if (ret) {
-		dev_err(priv->dev,
-			"failed to disable CC state machine: %d\n", ret);
-		return ret;
-	}
-
-	/* Write mode */
-	ret = regmap_write_bits(priv->regmap, TUSB320_REGA,
-		TUSB320_REGA_MODE_SELECT_MASK << TUSB320_REGA_MODE_SELECT_SHIFT,
-		mode << TUSB320_REGA_MODE_SELECT_SHIFT);
-	if (ret) {
-		dev_err(priv->dev, "failed to write mode: %d\n", ret);
-		goto err;
-	}
-
-	msleep(5);
-err:
-	/* Re-enable CC state machine */
-	ret = regmap_write_bits(priv->regmap, TUSB320_REGA,
-		TUSB320L_REGA_DISABLE_TERM, 0);
-	if (ret)
-		dev_err(priv->dev,
-			"failed to re-enable CC state machine: %d\n", ret);
-
-	return ret;
-}
-
-static int tusb320_reset(struct tusb320_priv *priv)
-{
-	int ret;
-
-	/* Set mode to default (follow PORT pin) */
-	ret = priv->ops->set_mode(priv, TUSB320_MODE_PORT);
-	if (ret && ret != -EBUSY) {
-		dev_err(priv->dev,
-			"failed to set mode to PORT: %d\n", ret);
-		return ret;
-	}
-
-	/* Perform soft reset */
-	ret = regmap_write_bits(priv->regmap, TUSB320_REGA,
-			TUSB320_REGA_I2C_SOFT_RESET, 1);
-	if (ret) {
-		dev_err(priv->dev,
-			"failed to write soft reset bit: %d\n", ret);
-		return ret;
-	}
-
-	/* Wait for chip to go through reset */
-	msleep(95);
-
-	return 0;
-}
-
-static int tusb320l_get_revision(struct tusb320_priv *priv, unsigned int *revision)
-{
-	return regmap_read(priv->regmap, TUSB320L_REGA0_REVISION, revision);
-}
-
-static struct tusb320_ops tusb320_ops = {
-	.set_mode = tusb320_set_mode,
-};
-
-static struct tusb320_ops tusb320l_ops = {
-	.set_mode = tusb320l_set_mode,
-	.get_revision = tusb320l_get_revision,
-};
-
-static irqreturn_t tusb320_irq_handler(int irq, void *dev_id)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 
@@ -371,7 +270,6 @@ static void tusb320_extcon_irq_handler(struct tusb320_priv *priv, u8 reg)
 	extcon_sync(priv->edev, EXTCON_USB_HOST);
 
 	priv->state = state;
-<<<<<<< HEAD
 }
 
 static void tusb320_typec_irq_handler(struct tusb320_priv *priv, u8 reg9)
@@ -436,8 +334,6 @@ static irqreturn_t tusb320_state_update_handler(struct tusb320_priv *priv,
 	 */
 	if (priv->port)
 		tusb320_typec_irq_handler(priv, reg);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	regmap_write(priv->regmap, TUSB320_REG9, reg);
 
@@ -559,7 +455,6 @@ static int tusb320_probe(struct i2c_client *client,
 
 	priv->ops = (struct tusb320_ops*)match_data;
 
-<<<<<<< HEAD
 	if (priv->ops->get_revision) {
 		ret = priv->ops->get_revision(priv, &revision);
 		if (ret)
@@ -571,26 +466,6 @@ static int tusb320_probe(struct i2c_client *client,
 
 	ret = tusb320_extcon_probe(priv);
 	if (ret)
-=======
-	priv->edev = devm_extcon_dev_allocate(priv->dev, tusb320_extcon_cable);
-	if (IS_ERR(priv->edev)) {
-		dev_err(priv->dev, "failed to allocate extcon device\n");
-		return PTR_ERR(priv->edev);
-	}
-
-	if (priv->ops->get_revision) {
-		ret = priv->ops->get_revision(priv, &revision);
-		if (ret)
-			dev_warn(priv->dev,
-				"failed to read revision register: %d\n", ret);
-		else
-			dev_info(priv->dev, "chip revision %d\n", revision);
-	}
-
-	ret = devm_extcon_dev_register(priv->dev, priv->edev);
-	if (ret < 0) {
-		dev_err(priv->dev, "failed to register extcon device\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 
 	ret = tusb320_typec_probe(client, priv);
@@ -610,17 +485,6 @@ static int tusb320_probe(struct i2c_client *client,
 		 * them again and make sure the interrupt status bit is cleared.
 		 */
 		tusb320_state_update_handler(priv, true);
-
-	/* Reset chip to its default state */
-	ret = tusb320_reset(priv);
-	if (ret)
-		dev_warn(priv->dev, "failed to reset chip: %d\n", ret);
-	else
-		/*
-		 * State and polarity might change after a reset, so update
-		 * them again and make sure the interrupt status bit is cleared.
-		 */
-		tusb320_irq_handler(client->irq, priv);
 
 	ret = devm_request_threaded_irq(priv->dev, client->irq, NULL,
 					tusb320_irq_handler,

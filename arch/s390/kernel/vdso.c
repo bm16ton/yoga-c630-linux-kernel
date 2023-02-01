@@ -227,11 +227,7 @@ static unsigned long vdso_addr(unsigned long start, unsigned long len)
 	end -= len;
 
 	if (end > start) {
-<<<<<<< HEAD
 		offset = prandom_u32_max(((end - start) >> PAGE_SHIFT) + 1);
-=======
-		offset = get_random_int() % (((end - start) >> PAGE_SHIFT) + 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		addr = start + (offset << PAGE_SHIFT);
 	} else {
 		addr = start;

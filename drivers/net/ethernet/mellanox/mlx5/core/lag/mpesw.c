@@ -7,7 +7,6 @@
 #include "eswitch.h"
 #include "lib/mlx5.h"
 
-<<<<<<< HEAD
 static int add_mpesw_rule(struct mlx5_lag *ldev)
 {
 	struct mlx5_core_dev *dev = ldev->pf[MLX5_LAG_P1].dev;
@@ -61,48 +60,11 @@ static int mlx5_lag_mpesw_queue_work(struct mlx5_core_dev *dev,
 {
 	struct mlx5_lag *ldev = dev->priv.lag;
 	struct mlx5_mpesw_work_st *work;
-=======
-void mlx5_mpesw_work(struct work_struct *work)
-{
-	struct mlx5_lag *ldev = container_of(work, struct mlx5_lag, mpesw_work);
-
-	mutex_lock(&ldev->lock);
-	mlx5_disable_lag(ldev);
-	mutex_unlock(&ldev->lock);
-}
-
-static void mlx5_lag_disable_mpesw(struct mlx5_core_dev *dev)
-{
-	struct mlx5_lag *ldev = dev->priv.lag;
-
-	if (!queue_work(ldev->wq, &ldev->mpesw_work))
-		mlx5_core_warn(dev, "failed to queue work\n");
-}
-
-void mlx5_lag_del_mpesw_rule(struct mlx5_core_dev *dev)
-{
-	struct mlx5_lag *ldev = dev->priv.lag;
-
-	if (!ldev)
-		return;
-
-	mutex_lock(&ldev->lock);
-	if (!atomic_dec_return(&ldev->lag_mpesw.mpesw_rule_count) &&
-	    ldev->mode == MLX5_LAG_MODE_MPESW)
-		mlx5_lag_disable_mpesw(dev);
-	mutex_unlock(&ldev->lock);
-}
-
-int mlx5_lag_add_mpesw_rule(struct mlx5_core_dev *dev)
-{
-	struct mlx5_lag *ldev = dev->priv.lag;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err = 0;
 
 	if (!ldev)
 		return 0;
 
-<<<<<<< HEAD
 	work = kzalloc(sizeof(*work), GFP_KERNEL);
 	if (!work)
 		return -ENOMEM;
@@ -132,24 +94,6 @@ void mlx5_lag_del_mpesw_rule(struct mlx5_core_dev *dev)
 int mlx5_lag_add_mpesw_rule(struct mlx5_core_dev *dev)
 {
 	return mlx5_lag_mpesw_queue_work(dev, MLX5_MPESW_OP_ENABLE);
-=======
-	mutex_lock(&ldev->lock);
-	if (atomic_add_return(1, &ldev->lag_mpesw.mpesw_rule_count) != 1)
-		goto out;
-
-	if (ldev->mode != MLX5_LAG_MODE_NONE) {
-		err = -EINVAL;
-		goto out;
-	}
-
-	err = mlx5_activate_lag(ldev, NULL, MLX5_LAG_MODE_MPESW, false);
-	if (err)
-		mlx5_core_warn(dev, "Failed to create LAG in MPESW mode (%d)\n", err);
-
-out:
-	mutex_unlock(&ldev->lock);
-	return err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int mlx5_lag_do_mirred(struct mlx5_core_dev *mdev, struct net_device *out_dev)
@@ -159,18 +103,9 @@ int mlx5_lag_do_mirred(struct mlx5_core_dev *mdev, struct net_device *out_dev)
 	if (!netif_is_bond_master(out_dev) || !ldev)
 		return 0;
 
-<<<<<<< HEAD
 	if (ldev->mode == MLX5_LAG_MODE_MPESW)
 		return -EOPNOTSUPP;
 
-=======
-	mutex_lock(&ldev->lock);
-	if (ldev->mode == MLX5_LAG_MODE_MPESW) {
-		mutex_unlock(&ldev->lock);
-		return -EOPNOTSUPP;
-	}
-	mutex_unlock(&ldev->lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -184,18 +119,10 @@ bool mlx5_lag_mpesw_is_activated(struct mlx5_core_dev *dev)
 
 void mlx5_lag_mpesw_init(struct mlx5_lag *ldev)
 {
-<<<<<<< HEAD
-=======
-	INIT_WORK(&ldev->mpesw_work, mlx5_mpesw_work);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomic_set(&ldev->lag_mpesw.mpesw_rule_count, 0);
 }
 
 void mlx5_lag_mpesw_cleanup(struct mlx5_lag *ldev)
 {
-<<<<<<< HEAD
 	WARN_ON(atomic_read(&ldev->lag_mpesw.mpesw_rule_count));
-=======
-	cancel_delayed_work_sync(&ldev->bond_work);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

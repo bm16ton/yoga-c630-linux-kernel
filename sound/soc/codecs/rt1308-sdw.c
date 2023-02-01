@@ -50,10 +50,7 @@ static bool rt1308_volatile_register(struct device *dev, unsigned int reg)
 	case 0x3008:
 	case 0x300a:
 	case 0xc000:
-<<<<<<< HEAD
 	case 0xc710:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case 0xc860 ... 0xc863:
 	case 0xc870 ... 0xc873:
 		return true;
@@ -204,10 +201,7 @@ static int rt1308_io_init(struct device *dev, struct sdw_slave *slave)
 {
 	struct rt1308_sdw_priv *rt1308 = dev_get_drvdata(dev);
 	int ret = 0;
-<<<<<<< HEAD
 	unsigned int tmp;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (rt1308->hw_init)
 		return 0;
@@ -239,13 +233,10 @@ static int rt1308_io_init(struct device *dev, struct sdw_slave *slave)
 	/* sw reset */
 	regmap_write(rt1308->regmap, RT1308_SDW_RESET, 0);
 
-<<<<<<< HEAD
 	regmap_read(rt1308->regmap, 0xc710, &tmp);
 	rt1308->hw_ver = tmp;
 	dev_dbg(dev, "%s, hw_ver=0x%x\n", __func__, rt1308->hw_ver);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* initial settings */
 	regmap_write(rt1308->regmap, 0xc103, 0xc0);
 	regmap_write(rt1308->regmap, 0xc030, 0x17);

@@ -1,5 +1,2 @@
 CONFIG_BONDING=y
-<<<<<<< HEAD
 CONFIG_MACVLAN=y
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

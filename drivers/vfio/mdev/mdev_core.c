@@ -23,67 +23,6 @@ static struct class_compat *mdev_bus_compat_class;
 static LIST_HEAD(mdev_list);
 static DEFINE_MUTEX(mdev_list_lock);
 
-<<<<<<< HEAD
-=======
-struct device *mdev_parent_dev(struct mdev_device *mdev)
-{
-	return mdev->type->parent->dev;
-}
-EXPORT_SYMBOL(mdev_parent_dev);
-
-/*
- * Return the index in supported_type_groups that this mdev_device was created
- * from.
- */
-unsigned int mdev_get_type_group_id(struct mdev_device *mdev)
-{
-	return mdev->type->type_group_id;
-}
-EXPORT_SYMBOL(mdev_get_type_group_id);
-
-/*
- * Used in mdev_type_attribute sysfs functions to return the index in the
- * supported_type_groups that the sysfs is called from.
- */
-unsigned int mtype_get_type_group_id(struct mdev_type *mtype)
-{
-	return mtype->type_group_id;
-}
-EXPORT_SYMBOL(mtype_get_type_group_id);
-
-/*
- * Used in mdev_type_attribute sysfs functions to return the parent struct
- * device
- */
-struct device *mtype_get_parent_dev(struct mdev_type *mtype)
-{
-	return mtype->parent->dev;
-}
-EXPORT_SYMBOL(mtype_get_parent_dev);
-
-/* Should be called holding parent_list_lock */
-static struct mdev_parent *__find_parent_device(struct device *dev)
-{
-	struct mdev_parent *parent;
-
-	list_for_each_entry(parent, &parent_list, next) {
-		if (parent->dev == dev)
-			return parent;
-	}
-	return NULL;
-}
-
-void mdev_release_parent(struct kref *kref)
-{
-	struct mdev_parent *parent = container_of(kref, struct mdev_parent,
-						  ref);
-	struct device *dev = parent->dev;
-
-	kfree(parent);
-	put_device(dev);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Caller must hold parent unreg_sem read or write lock */
 static void mdev_device_remove_common(struct mdev_device *mdev)
 {
@@ -98,15 +37,8 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
 
 static int mdev_device_remove_cb(struct device *dev, void *data)
 {
-<<<<<<< HEAD
 	if (dev->bus == &mdev_bus_type)
 		mdev_device_remove_common(to_mdev_device(dev));
-=======
-	struct mdev_device *mdev = mdev_from_dev(dev);
-
-	if (mdev)
-		mdev_device_remove_common(mdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -115,68 +47,30 @@ static int mdev_device_remove_cb(struct device *dev, void *data)
  * @parent: parent structure registered
  * @dev: device structure representing parent device.
  * @mdev_driver: Device driver to bind to the newly created mdev
-<<<<<<< HEAD
  * @types: Array of supported mdev types
  * @nr_types: Number of entries in @types
  *
  * Registers the @parent stucture as a parent for mdev types and thus mdev
  * devices.  The caller needs to hold a reference on @dev that must not be
  * released until after the call to mdev_unregister_parent().
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Returns a negative value on error, otherwise 0.
  */
-<<<<<<< HEAD
 int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
 		struct mdev_driver *mdev_driver, struct mdev_type **types,
 		unsigned int nr_types)
-=======
-int mdev_register_device(struct device *dev, struct mdev_driver *mdev_driver)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	char *env_string = "MDEV_STATE=registered";
 	char *envp[] = { env_string, NULL };
 	int ret;
 
-<<<<<<< HEAD
 	memset(parent, 0, sizeof(*parent));
-=======
-	/* check for mandatory ops */
-	if (!mdev_driver->supported_type_groups)
-		return -EINVAL;
-
-	dev = get_device(dev);
-	if (!dev)
-		return -EINVAL;
-
-	mutex_lock(&parent_list_lock);
-
-	/* Check for duplicate */
-	parent = __find_parent_device(dev);
-	if (parent) {
-		parent = NULL;
-		ret = -EEXIST;
-		goto add_dev_err;
-	}
-
-	parent = kzalloc(sizeof(*parent), GFP_KERNEL);
-	if (!parent) {
-		ret = -ENOMEM;
-		goto add_dev_err;
-	}
-
-	kref_init(&parent->ref);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	init_rwsem(&parent->unreg_sem);
 	parent->dev = dev;
 	parent->mdev_driver = mdev_driver;
-<<<<<<< HEAD
 	parent->types = types;
 	parent->nr_types = nr_types;
 	atomic_set(&parent->available_instances, mdev_driver->max_instances);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!mdev_bus_compat_class) {
 		mdev_bus_compat_class = class_compat_register("mdev_bus");
@@ -222,13 +116,7 @@ EXPORT_SYMBOL(mdev_unregister_parent);
 static void mdev_device_release(struct device *dev)
 {
 	struct mdev_device *mdev = to_mdev_device(dev);
-<<<<<<< HEAD
 	struct mdev_parent *parent = mdev->type->parent;
-=======
-
-	/* Pairs with the get in mdev_device_create() */
-	kobject_put(&mdev->type->kobj);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_lock(&mdev_list_lock);
 	list_del(&mdev->next);

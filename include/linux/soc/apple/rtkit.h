@@ -152,7 +152,6 @@ int apple_rtkit_send_message(struct apple_rtkit *rtk, u8 ep, u64 message,
 int apple_rtkit_send_message_wait(struct apple_rtkit *rtk, u8 ep, u64 message,
 				  unsigned long timeout, bool atomic);
 
-<<<<<<< HEAD
 /*
  * Process incoming messages in atomic context.
  * This only guarantees that messages arrive as far as the recv_message_early
@@ -165,6 +164,4 @@ int apple_rtkit_send_message_wait(struct apple_rtkit *rtk, u8 ep, u64 message,
  */
 int apple_rtkit_poll(struct apple_rtkit *rtk);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _LINUX_APPLE_RTKIT_H_ */

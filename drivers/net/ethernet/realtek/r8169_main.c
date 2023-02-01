@@ -1408,13 +1408,8 @@ static void rtl8169_get_drvinfo(struct net_device *dev,
 	struct rtl8169_private *tp = netdev_priv(dev);
 	struct rtl_fw *rtl_fw = tp->rtl_fw;
 
-<<<<<<< HEAD
 	strscpy(info->driver, KBUILD_MODNAME, sizeof(info->driver));
 	strscpy(info->bus_info, pci_name(tp->pci_dev), sizeof(info->bus_info));
-=======
-	strlcpy(info->driver, KBUILD_MODNAME, sizeof(info->driver));
-	strlcpy(info->bus_info, pci_name(tp->pci_dev), sizeof(info->bus_info));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	BUILD_BUG_ON(sizeof(info->fw_version) < sizeof(rtl_fw->version));
 	if (rtl_fw)
 		strscpy(info->fw_version, rtl_fw->version,
@@ -2685,13 +2680,8 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
 		RTL_W8(tp, Config2, RTL_R8(tp, Config2) | ClkReqEn);
 
 		switch (tp->mac_version) {
-<<<<<<< HEAD
 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
 		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
-=======
-		case RTL_GIGA_MAC_VER_45 ... RTL_GIGA_MAC_VER_48:
-		case RTL_GIGA_MAC_VER_60 ... RTL_GIGA_MAC_VER_63:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			/* reset ephy tx/rx disable timer */
 			r8168_mac_ocp_modify(tp, 0xe094, 0xff00, 0);
 			/* chip can trigger L1.2 */
@@ -2702,13 +2692,8 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
 		}
 	} else {
 		switch (tp->mac_version) {
-<<<<<<< HEAD
 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
 		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
-=======
-		case RTL_GIGA_MAC_VER_45 ... RTL_GIGA_MAC_VER_48:
-		case RTL_GIGA_MAC_VER_60 ... RTL_GIGA_MAC_VER_63:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			r8168_mac_ocp_modify(tp, 0xe092, 0x00ff, 0);
 			break;
 		default:
@@ -4616,11 +4601,7 @@ static void rtl8169_down(struct rtl8169_private *tp)
 	pci_clear_master(tp->pci_dev);
 	rtl_pci_commit(tp);
 
-<<<<<<< HEAD
 	rtl8169_cleanup(tp);
-=======
-	rtl8169_cleanup(tp, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rtl_disable_exit_l1(tp);
 	rtl_prepare_power_down(tp);
 }
@@ -4859,26 +4840,6 @@ static const struct dev_pm_ops rtl8169_pm_ops = {
 		       rtl8169_runtime_idle)
 };
 
-<<<<<<< HEAD
-=======
-static void rtl_wol_shutdown_quirk(struct rtl8169_private *tp)
-{
-	/* WoL fails with 8168b when the receiver is disabled. */
-	switch (tp->mac_version) {
-	case RTL_GIGA_MAC_VER_11:
-	case RTL_GIGA_MAC_VER_12:
-	case RTL_GIGA_MAC_VER_17:
-		pci_clear_master(tp->pci_dev);
-
-		RTL_W8(tp, ChipCmd, CmdRxEnb);
-		rtl_pci_commit(tp);
-		break;
-	default:
-		break;
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtl_shutdown(struct pci_dev *pdev)
 {
 	struct rtl8169_private *tp = pci_get_drvdata(pdev);
@@ -4892,12 +4853,6 @@ static void rtl_shutdown(struct pci_dev *pdev)
 
 	if (system_state == SYSTEM_POWER_OFF &&
 	    tp->dash_type == RTL_DASH_NONE) {
-<<<<<<< HEAD
-=======
-		if (tp->saved_wolopts)
-			rtl_wol_shutdown_quirk(tp);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pci_wake_from_d3(pdev, tp->saved_wolopts);
 		pci_set_power_state(pdev, PCI_D3hot);
 	}
@@ -5170,11 +5125,7 @@ done:
 /* register is set if system vendor successfully tested ASPM 1.2 */
 static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
 {
-<<<<<<< HEAD
 	if (tp->mac_version >= RTL_GIGA_MAC_VER_61 &&
-=======
-	if (tp->mac_version >= RTL_GIGA_MAC_VER_60 &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    r8168_mac_ocp_read(tp, 0xc0b2) & 0xf)
 		return true;
 
@@ -5208,15 +5159,9 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		return -ENOMEM;
 
 	/* Get the *optional* external "ether_clk" used on some boards */
-<<<<<<< HEAD
 	tp->clk = devm_clk_get_optional_enabled(&pdev->dev, "ether_clk");
 	if (IS_ERR(tp->clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(tp->clk), "failed to get ether_clk\n");
-=======
-	rc = rtl_get_ether_clk(tp);
-	if (rc)
-		return rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* enable device (incl. PCI PM wakeup and hotplug setup) */
 	rc = pcim_enable_device(pdev);
@@ -5235,15 +5180,6 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		return -ENODEV;
 	}
 
-<<<<<<< HEAD
-=======
-	/* check for weird/broken PCI region reporting */
-	if (pci_resource_len(pdev, region) < R8169_REGS_SIZE) {
-		dev_err(&pdev->dev, "Invalid PCI region size(s), aborting\n");
-		return -ENODEV;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = pcim_iomap_regions(pdev, BIT(region), KBUILD_MODNAME);
 	if (rc < 0) {
 		dev_err(&pdev->dev, "cannot remap MMIO, aborting\n");
@@ -5270,11 +5206,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	 */
 	if (rtl_aspm_is_safe(tp))
 		rc = 0;
-<<<<<<< HEAD
 	else if (tp->mac_version >= RTL_GIGA_MAC_VER_46)
-=======
-	else if (tp->mac_version >= RTL_GIGA_MAC_VER_45)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rc = pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);
 	else
 		rc = pci_disable_link_state(pdev, PCIE_LINK_STATE_L1);

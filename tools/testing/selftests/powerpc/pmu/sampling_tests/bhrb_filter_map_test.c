@@ -96,7 +96,6 @@ static int bhrb_filter_map_test(void)
 		}
 	}
 
-<<<<<<< HEAD
 	/*
 	 * Combine filter maps which includes a valid branch filter and an invalid branch
 	 * filter. Example: any ( PERF_SAMPLE_BRANCH_ANY) and any_call
@@ -106,8 +105,6 @@ static int bhrb_filter_map_test(void)
 	event.attr.branch_sample_type = PERF_SAMPLE_BRANCH_ANY | PERF_SAMPLE_BRANCH_ANY_CALL;
 	FAIL_IF(!event_open(&event));
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

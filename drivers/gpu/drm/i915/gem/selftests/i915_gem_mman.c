@@ -93,11 +93,7 @@ static int check_partial_mapping(struct drm_i915_gem_object *obj,
 {
 	const unsigned long npages = obj->base.size / PAGE_SIZE;
 	struct drm_i915_private *i915 = to_i915(obj->base.dev);
-<<<<<<< HEAD
 	struct i915_gtt_view view;
-=======
-	struct i915_ggtt_view view;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct i915_vma *vma;
 	unsigned long page;
 	u32 __iomem *io;

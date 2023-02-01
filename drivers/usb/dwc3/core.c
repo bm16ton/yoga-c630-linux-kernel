@@ -168,11 +168,7 @@ static void __dwc3_set_mode(struct work_struct *work)
 	 */
 	if (dwc->current_dr_role && ((DWC3_IP_IS(DWC3) ||
 			DWC3_VER_IS_PRIOR(DWC31, 190A)) &&
-<<<<<<< HEAD
 			desired_dr_role != DWC3_GCTL_PRTCAP_OTG)) {
-=======
-			dwc->desired_dr_role != DWC3_GCTL_PRTCAP_OTG)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		reg = dwc3_readl(dwc->regs, DWC3_GCTL);
 		reg |= DWC3_GCTL_CORESOFTRESET;
 		dwc3_writel(dwc->regs, DWC3_GCTL, reg);
@@ -1797,12 +1793,6 @@ static int dwc3_probe(struct platform_device *pdev)
 	dwc->regs_size	= resource_size(&dwc_res);
 
 	dwc3_get_properties(dwc);
-
-	if (!dwc->sysdev_is_parent) {
-		ret = dma_set_mask_and_coherent(dwc->sysdev, DMA_BIT_MASK(64));
-		if (ret)
-			return ret;
-	}
 
 	dwc->reset = devm_reset_control_array_get_optional_shared(dev);
 	if (IS_ERR(dwc->reset)) {

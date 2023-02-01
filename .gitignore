@@ -1,0 +1,163 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# NOTE! Don't add files that are generated in specific
+# subdirectories here. Add them in the ".gitignore" file
+# in that subdirectory instead.
+#
+# NOTE! Please use 'git ls-files -i --exclude-standard'
+# command after changing this file, to see if there are
+# any tracked files which get ignored after the change.
+#
+# Normal rules (sorted alphabetically)
+#
+.*
+*.a
+*.asn1.[ch]
+*.c.[012]*.*
+*.dt.yaml
+*.dwo
+*.gcno
+*.i
+*.ko
+*.lex.c
+*.ll
+*.lst
+*.lz4
+*.lzma
+*.lzo
+*.mod
+*.mod.c
+*.o
+*.o.*
+*.s
+*.so
+*.so.dbg
+*.su
+*.symtypes
+*.tab.[ch]
+*.tar
+*.xz
+Module.symvers
+modules.builtin
+modules.order
+
+#
+# Top-level generic files
+#
+/tags
+/TAGS
+/linux
+/modules-only.symvers
+/vmlinux
+/vmlinux.32
+/vmlinux-gdb.py
+/vmlinuz
+/System.map
+/Module.markers
+/modules.builtin.modinfo
+/modules.nsdeps
+/vmlinux.symvers
+#
+# RPM spec file (make rpm-pkg)
+#
+/*.spec
+
+#
+# Debian directory (make deb-pkg)
+#
+/debian/
+/C630/wifi-extra/crda-3.18/debian/crda/
+/C630/wifi-extra/wireless-regdb-2018.05.09/debian/wireless-regdb/
+/C630/wifi-extra/wireless-regdb-2018.05.09/debian/files
+/C630/wifi-extra/wireless-regdb-2018.05.09/debian/wireless-regdb.debhelper.log
+/C630/wifi-extra/wireless-regdb-2018.05.09/debian/wireless-regdb.substvars
+/C630/wifi-extra/wireless-regdb-2018.05.09/debian/rules.og
+
+#
+# Snap directory (make snap-pkg)
+#
+/snap/
+
+#
+# tar directory (make tar*-pkg)
+#
+/tar-install/
+
+#
+# We don't want to ignore the following even if they are dot-files
+#
+!.clang-format
+!.cocciconfig
+!.get_maintainer.ignore
+!.gitattributes
+!.gitignore
+!.mailmap
+
+#
+# Generated include files
+#
+/include/config/
+/include/generated/
+/include/ksym/
+/arch/*/include/generated/
+
+# stgit generated dirs
+patches-*
+
+# quilt's files
+patches
+series
+
+# cscope files
+cscope.*
+ncscope.*
+
+# gnu global files
+GPATH
+GRTAGS
+GSYMS
+GTAGS
+
+# id-utils files
+ID
+
+*.rej
+*.orig
+*~
+\#*#
+
+#
+# Leavings from module signing
+#
+extra_certificates
+signing_key.pem
+signing_key.priv
+signing_key.x509
+x509.genkey
+
+# Kconfig presets
+/all.config
+/alldef.config
+/allmod.config
+/allno.config
+/allrandom.config
+/allyes.config
+
+# Kdevelop4
+*.kdev4
+
+# Clang's compilation database file
+/compile_commands.json
+
+/drivers/gpio/gpiolib.c.bk 
+/drivers/usb/misc/ft232h-intf.c-commented-code 
+/drivers/usb/misc/ft232h-intf.c-time-b4-last 
+/drivers/usb/misc/ft232h-intf.c.all-good-except-unload 
+/drivers/usb/misc/ft232h-intf.c.best-irq 
+/drivers/usb/misc/ft232h-intf.c.doesnt-seem-to-crash-on-removal 
+/drivers/usb/misc/ft232h-intf.c.gpio-gpiod-hybrid 
+/drivers/usb/misc/ft232h-intf.c.irq-works 
+/drivers/usb/misc/ft232h-intf.c.newest 
+/drivers/usb/misc/ft232h-intf.c.no-modinfo 
+/drivers/usb/misc/ft232h-intf.c.untested 
+/drivers/usb/misc/ft232h-intf.c.working.gpiod-irq-poll-and-ce-output

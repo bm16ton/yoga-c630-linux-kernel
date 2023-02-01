@@ -1069,11 +1069,7 @@ static __always_inline void __ClearPageAnonExclusive(struct page *page)
  * alloc-free cycle to prevent from reusing the page.
  */
 #define PAGE_FLAGS_CHECK_AT_PREP	\
-<<<<<<< HEAD
 	((PAGEFLAGS_MASK & ~__PG_HWPOISON) | LRU_GEN_MASK | LRU_REFS_MASK)
-=======
-	(PAGEFLAGS_MASK & ~__PG_HWPOISON)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define PAGE_FLAGS_PRIVATE				\
 	(1UL << PG_private | 1UL << PG_private_2)

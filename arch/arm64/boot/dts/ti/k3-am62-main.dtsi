@@ -54,15 +54,12 @@
 			reg = <0x4044 0x8>;
 			#phy-cells = <1>;
 		};
-<<<<<<< HEAD
 
 		epwm_tbclk: clock@4130 {
 			compatible = "ti,am62-epwm-tbclk", "syscon";
 			reg = <0x4130 0x4>;
 			#clock-cells = <1>;
 		};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	dmss: bus@48000000 {
@@ -593,7 +590,6 @@
 		interrupt-names = "int0", "int1";
 		bosch,mram-cfg = <0x0 128 64 64 64 64 32 32>;
 	};
-<<<<<<< HEAD
 
 	epwm0: pwm@23000000 {
 		compatible = "ti,am64-epwm", "ti,am3352-ehrpwm";
@@ -621,6 +617,4 @@
 		clocks = <&epwm_tbclk 2>, <&k3_clks 88 0>;
 		clock-names = "tbclk", "fck";
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

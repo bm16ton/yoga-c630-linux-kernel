@@ -1131,14 +1131,6 @@ static int populate_properties(struct tb_xdomain *xd,
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-static inline struct tb_switch *tb_xdomain_parent(struct tb_xdomain *xd)
-{
-	return tb_to_switch(xd->dev.parent);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tb_xdomain_update_link_attributes(struct tb_xdomain *xd)
 {
 	bool change = false;
@@ -1427,7 +1419,6 @@ static int tb_xdomain_get_properties(struct tb_xdomain *xd)
 	 * registered, we notify the userspace that it has changed.
 	 */
 	if (!update) {
-<<<<<<< HEAD
 		/*
 		 * Now disable lane 1 if bonding was not enabled. Do
 		 * this only if bonding was possible at the beginning
@@ -1441,14 +1432,6 @@ static int tb_xdomain_get_properties(struct tb_xdomain *xd)
 			if (!port->bonded)
 				tb_port_disable(port->dual_link_port);
 		}
-=======
-		struct tb_port *port;
-
-		/* Now disable lane 1 if bonding was not enabled */
-		port = tb_port_at(xd->route, tb_xdomain_parent(xd));
-		if (!port->bonded)
-			tb_port_disable(port->dual_link_port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (device_add(&xd->dev)) {
 			dev_err(&xd->dev, "failed to add XDomain device\n");
@@ -1459,11 +1442,8 @@ static int tb_xdomain_get_properties(struct tb_xdomain *xd)
 		if (xd->vendor_name && xd->device_name)
 			dev_info(&xd->dev, "%s %s\n", xd->vendor_name,
 				 xd->device_name);
-<<<<<<< HEAD
 
 		tb_xdomain_debugfs_init(xd);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		kobject_uevent(&xd->dev.kobj, KOBJ_CHANGE);
 	}
@@ -1712,11 +1692,7 @@ static ssize_t maxhopid_show(struct device *dev, struct device_attribute *attr,
 {
 	struct tb_xdomain *xd = container_of(dev, struct tb_xdomain, dev);
 
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%d\n", xd->remote_max_hopid);
-=======
-	return sprintf(buf, "%d\n", xd->remote_max_hopid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 static DEVICE_ATTR_RO(maxhopid);
 
@@ -2468,11 +2444,7 @@ int tb_xdomain_init(void)
 	tb_property_add_immediate(xdomain_property_dir, "deviceid", 0x1);
 	tb_property_add_immediate(xdomain_property_dir, "devicerv", 0x80000100);
 
-<<<<<<< HEAD
 	xdomain_property_block_gen = get_random_u32();
-=======
-	xdomain_property_block_gen = prandom_u32();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

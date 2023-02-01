@@ -194,11 +194,7 @@ int amdgpu_vcn_sw_init(struct amdgpu_device *adev)
 		fw_name = FIRMWARE_VCN4_0_2;
 		if ((adev->firmware.load_type == AMDGPU_FW_LOAD_PSP) &&
 			(adev->pg_flags & AMD_PG_SUPPORT_VCN_DPG))
-<<<<<<< HEAD
 			adev->vcn.indirect_sram = true;
-=======
-			adev->vcn.indirect_sram = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case IP_VERSION(4, 0, 4):
 		fw_name = FIRMWARE_VCN4_0_4;

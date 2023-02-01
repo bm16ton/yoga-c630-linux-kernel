@@ -776,7 +776,6 @@ test_subflows()
 	rm -f "$evts"
 }
 
-<<<<<<< HEAD
 test_subflows_v4_v6_mix()
 {
 	# Attempt to add a listener at 10.0.2.1:<subflow-port>
@@ -823,8 +822,6 @@ test_subflows_v4_v6_mix()
 	sleep 0.5
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 test_prio()
 {
 	local count
@@ -861,10 +858,7 @@ make_connection "v6"
 test_announce
 test_remove
 test_subflows
-<<<<<<< HEAD
 test_subflows_v4_v6_mix
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 test_prio
 
 exit 0

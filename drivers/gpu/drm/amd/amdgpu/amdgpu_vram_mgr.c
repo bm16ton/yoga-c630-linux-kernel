@@ -710,7 +710,6 @@ void amdgpu_vram_mgr_free_sgt(struct device *dev,
 
 /**
  * amdgpu_vram_mgr_vis_usage - how many bytes are used in the visible part
-<<<<<<< HEAD
  *
  * @mgr: amdgpu_vram_mgr pointer
  *
@@ -761,14 +760,9 @@ static bool amdgpu_vram_mgr_intersects(struct ttm_resource_manager *man,
  * @res: The resource to test
  * @place: The place to test against
  * @size: Size of the new allocation
-=======
- *
- * @mgr: amdgpu_vram_mgr pointer
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Test each drm buddy block for placement compatibility.
  */
-<<<<<<< HEAD
 static bool amdgpu_vram_mgr_compatible(struct ttm_resource_manager *man,
 				       struct ttm_resource *res,
 				       const struct ttm_place *place,
@@ -790,11 +784,6 @@ static bool amdgpu_vram_mgr_compatible(struct ttm_resource_manager *man,
 	}
 
 	return true;
-=======
-uint64_t amdgpu_vram_mgr_vis_usage(struct amdgpu_vram_mgr *mgr)
-{
-	return atomic64_read(&mgr->vis_usage);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -811,7 +800,6 @@ static void amdgpu_vram_mgr_debug(struct ttm_resource_manager *man,
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 	struct drm_buddy *mm = &mgr->mm;
 	struct drm_buddy_block *block;
-<<<<<<< HEAD
 
 	drm_printf(printer, "  vis usage:%llu\n",
 		   amdgpu_vram_mgr_vis_usage(mgr));
@@ -822,18 +810,6 @@ static void amdgpu_vram_mgr_debug(struct ttm_resource_manager *man,
 
 	drm_buddy_print(mm, printer);
 
-=======
-
-	drm_printf(printer, "  vis usage:%llu\n",
-		   amdgpu_vram_mgr_vis_usage(mgr));
-
-	mutex_lock(&mgr->lock);
-	drm_printf(printer, "default_page_size: %lluKiB\n",
-		   mgr->default_page_size >> 10);
-
-	drm_buddy_print(mm, printer);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_printf(printer, "reserved:\n");
 	list_for_each_entry(block, &mgr->reserved_pages, link)
 		drm_buddy_block_print(mm, block, printer);
@@ -906,11 +882,7 @@ void amdgpu_vram_mgr_fini(struct amdgpu_device *adev)
 		kfree(rsv);
 
 	list_for_each_entry_safe(rsv, temp, &mgr->reserved_pages, blocks) {
-<<<<<<< HEAD
 		drm_buddy_free_list(&mgr->mm, &rsv->allocated);
-=======
-		drm_buddy_free_list(&mgr->mm, &rsv->blocks);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(rsv);
 	}
 	drm_buddy_fini(&mgr->mm);

@@ -166,7 +166,6 @@ static u32 array_agc_tab_1t_8188e[] = {
 		0xC78, 0x407F0001,
 };
 
-<<<<<<< HEAD
 static void odm_ConfigBB_AGC_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr, u32 Bitmask, u32 Data)
 {
 	rtl8188e_PHY_SetBBReg(pDM_Odm->Adapter, Addr, Bitmask, Data);
@@ -175,9 +174,6 @@ static void odm_ConfigBB_AGC_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr, u32 
 }
 
 int ODM_ReadAndConfig_AGC_TAB_1T_8188E(struct odm_dm_struct *dm_odm)
-=======
-enum HAL_STATUS ODM_ReadAndConfig_AGC_TAB_1T_8188E(struct odm_dm_struct *dm_odm)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u32     hex         = 0;
 	u32     i           = 0;
@@ -187,10 +183,6 @@ enum HAL_STATUS ODM_ReadAndConfig_AGC_TAB_1T_8188E(struct odm_dm_struct *dm_odm)
 	struct adapter *adapter =  dm_odm->Adapter;
 	struct xmit_frame *pxmit_frame = NULL;
 	u8 bndy_cnt = 1;
-<<<<<<< HEAD
-=======
-	enum HAL_STATUS rst = HAL_STATUS_SUCCESS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hex += ODM_ITRF_USB << 8;
 	hex += ODM_CE << 16;
@@ -201,11 +193,7 @@ enum HAL_STATUS ODM_ReadAndConfig_AGC_TAB_1T_8188E(struct odm_dm_struct *dm_odm)
 		pxmit_frame = rtw_IOL_accquire_xmit_frame(adapter);
 		if (!pxmit_frame) {
 			pr_info("rtw_IOL_accquire_xmit_frame failed\n");
-<<<<<<< HEAD
 			return -ENOMEM;
-=======
-			return HAL_STATUS_FAILURE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -256,17 +244,10 @@ enum HAL_STATUS ODM_ReadAndConfig_AGC_TAB_1T_8188E(struct odm_dm_struct *dm_odm)
 	if (biol) {
 		if (!rtl8188e_IOL_exec_cmds_sync(dm_odm->Adapter, pxmit_frame, 1000, bndy_cnt)) {
 			printk("~~~ %s IOL_exec_cmds Failed !!!\n", __func__);
-<<<<<<< HEAD
 			return -1;
 		}
 	}
 	return 0;
-=======
-			rst = HAL_STATUS_FAILURE;
-		}
-	}
-	return rst;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /******************************************************************************
@@ -467,7 +448,6 @@ static u32 array_phy_reg_1t_8188e[] = {
 		0xF00, 0x00000300,
 };
 
-<<<<<<< HEAD
 static void odm_ConfigBB_PHY_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr, u32 Bitmask, u32 Data)
 {
 	if (Addr == 0xfe) {
@@ -493,9 +473,6 @@ static void odm_ConfigBB_PHY_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr, u32 
 }
 
 int ODM_ReadAndConfig_PHY_REG_1T_8188E(struct odm_dm_struct *dm_odm)
-=======
-enum HAL_STATUS ODM_ReadAndConfig_PHY_REG_1T_8188E(struct odm_dm_struct *dm_odm)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u32     hex         = 0;
 	u32     i           = 0;
@@ -505,10 +482,6 @@ enum HAL_STATUS ODM_ReadAndConfig_PHY_REG_1T_8188E(struct odm_dm_struct *dm_odm)
 	struct adapter *adapter =  dm_odm->Adapter;
 	struct xmit_frame *pxmit_frame = NULL;
 	u8 bndy_cnt = 1;
-<<<<<<< HEAD
-=======
-	enum HAL_STATUS rst = HAL_STATUS_SUCCESS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hex += ODM_ITRF_USB << 8;
 	hex += ODM_CE << 16;
 	hex += 0xFF000000;
@@ -518,11 +491,7 @@ enum HAL_STATUS ODM_ReadAndConfig_PHY_REG_1T_8188E(struct odm_dm_struct *dm_odm)
 		pxmit_frame = rtw_IOL_accquire_xmit_frame(adapter);
 		if (!pxmit_frame) {
 			pr_info("rtw_IOL_accquire_xmit_frame failed\n");
-<<<<<<< HEAD
 			return -ENOMEM;
-=======
-			return HAL_STATUS_FAILURE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -604,19 +573,11 @@ enum HAL_STATUS ODM_ReadAndConfig_PHY_REG_1T_8188E(struct odm_dm_struct *dm_odm)
 	}
 	if (biol) {
 		if (!rtl8188e_IOL_exec_cmds_sync(dm_odm->Adapter, pxmit_frame, 1000, bndy_cnt)) {
-<<<<<<< HEAD
 			pr_info("~~~ IOL Config %s Failed !!!\n", __func__);
 			return -1;
 		}
 	}
 	return 0;
-=======
-			rst = HAL_STATUS_FAILURE;
-			pr_info("~~~ IOL Config %s Failed !!!\n", __func__);
-		}
-	}
-	return rst;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /******************************************************************************
@@ -715,7 +676,6 @@ static u32 array_phy_reg_pg_8188e[] = {
 
 };
 
-<<<<<<< HEAD
 static void odm_ConfigBB_PHY_REG_PG_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr, u32 Bitmask,
 					  u32 Data)
 {
@@ -735,8 +695,6 @@ static void odm_ConfigBB_PHY_REG_PG_8188E(struct odm_dm_struct *pDM_Odm, u32 Add
 		storePwrIndexDiffRateOffset(pDM_Odm->Adapter, Addr, Bitmask, Data);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void ODM_ReadAndConfig_PHY_REG_PG_8188E(struct odm_dm_struct *dm_odm)
 {
 	u32  hex;

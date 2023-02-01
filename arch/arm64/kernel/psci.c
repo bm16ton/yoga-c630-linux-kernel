@@ -38,11 +38,7 @@ static int __init cpu_psci_cpu_prepare(unsigned int cpu)
 
 static int cpu_psci_cpu_boot(unsigned int cpu)
 {
-<<<<<<< HEAD
 	phys_addr_t pa_secondary_entry = __pa_symbol(secondary_entry);
-=======
-	phys_addr_t pa_secondary_entry = __pa_symbol(function_nocfi(secondary_entry));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err = psci_ops.cpu_on(cpu_logical_map(cpu), pa_secondary_entry);
 	if (err)
 		pr_err("failed to boot CPU%d (%d)\n", cpu, err);

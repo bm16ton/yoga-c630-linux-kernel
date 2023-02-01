@@ -318,7 +318,6 @@ static __maybe_unused int mdio_bus_phy_resume(struct device *dev)
 
 	phydev->suspended_by_mdio_bus = 0;
 
-<<<<<<< HEAD
 	/* If we managed to get here with the PHY state machine in a state
 	 * neither PHY_HALTED, PHY_READY nor PHY_UP, this is an indication
 	 * that something went wrong and we should most likely be using
@@ -326,13 +325,6 @@ static __maybe_unused int mdio_bus_phy_resume(struct device *dev)
 	 */
 	WARN_ON(phydev->state != PHY_HALTED && phydev->state != PHY_READY &&
 		phydev->state != PHY_UP);
-=======
-	/* If we manged to get here with the PHY state machine in a state neither
-	 * PHY_HALTED nor PHY_READY this is an indication that something went wrong
-	 * and we should most likely be using MAC managed PM and we are not.
-	 */
-	WARN_ON(phydev->state != PHY_HALTED && phydev->state != PHY_READY);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = phy_init_hw(phydev);
 	if (ret < 0)
@@ -567,11 +559,7 @@ static ssize_t phy_dev_flags_show(struct device *dev,
 {
 	struct phy_device *phydev = to_phy_device(dev);
 
-<<<<<<< HEAD
 	return sysfs_emit(buf, "0x%08x\n", phydev->dev_flags);
-=======
-	return sprintf(buf, "0x%08x\n", phydev->dev_flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 static DEVICE_ATTR_RO(phy_dev_flags);
 
@@ -1005,10 +993,7 @@ EXPORT_SYMBOL(phy_device_register);
 void phy_device_remove(struct phy_device *phydev)
 {
 	unregister_mii_timestamper(phydev->mii_ts);
-<<<<<<< HEAD
 	pse_control_put(phydev->psec);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	device_del(&phydev->mdio.dev);
 

@@ -389,7 +389,6 @@ static void noinstr el1_undef(struct pt_regs *regs, unsigned long esr)
 	exit_to_kernel_mode(regs);
 }
 
-<<<<<<< HEAD
 static void noinstr el1_bti(struct pt_regs *regs, unsigned long esr)
 {
 	enter_from_kernel_mode(regs);
@@ -399,8 +398,6 @@ static void noinstr el1_bti(struct pt_regs *regs, unsigned long esr)
 	exit_to_kernel_mode(regs);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void noinstr el1_dbg(struct pt_regs *regs, unsigned long esr)
 {
 	unsigned long far = read_sysreg(far_el1);
@@ -602,11 +599,7 @@ static void noinstr el0_undef(struct pt_regs *regs, unsigned long esr)
 {
 	enter_from_user_mode(regs);
 	local_daif_restore(DAIF_PROCCTX);
-<<<<<<< HEAD
 	do_undefinstr(regs, esr);
-=======
-	do_undefinstr(regs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	exit_to_user_mode(regs);
 }
 
@@ -614,11 +607,7 @@ static void noinstr el0_bti(struct pt_regs *regs)
 {
 	enter_from_user_mode(regs);
 	local_daif_restore(DAIF_PROCCTX);
-<<<<<<< HEAD
 	do_el0_bti(regs);
-=======
-	do_bti(regs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	exit_to_user_mode(regs);
 }
 
@@ -653,11 +642,7 @@ static void noinstr el0_fpac(struct pt_regs *regs, unsigned long esr)
 {
 	enter_from_user_mode(regs);
 	local_daif_restore(DAIF_PROCCTX);
-<<<<<<< HEAD
 	do_el0_fpac(regs, esr);
-=======
-	do_ptrauth_fault(regs, esr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	exit_to_user_mode(regs);
 }
 

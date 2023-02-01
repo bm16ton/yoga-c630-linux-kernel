@@ -663,39 +663,11 @@ static int atomisp_open(struct file *file)
 
 	dev_dbg(isp->dev, "open device %s\n", vdev->name);
 
-<<<<<<< HEAD
 	ret = v4l2_fh_open(file);
 	if (ret)
 		return ret;
 
 	mutex_lock(&isp->mutex);
-=======
-	/*
-	 * Ensure that if we are still loading we block. Once the loading
-	 * is over we can proceed. We can't blindly hold the lock until
-	 * that occurs as if the load fails we'll deadlock the unload
-	 */
-	rt_mutex_lock(&isp->loading);
-	/*
-	 * FIXME: revisit this with a better check once the code structure
-	 * is cleaned up a bit more
-	 */
-	ret = v4l2_fh_open(file);
-	if (ret) {
-		dev_err(isp->dev,
-			"%s: v4l2_fh_open() returned error %d\n",
-		       __func__, ret);
-		rt_mutex_unlock(&isp->loading);
-		return ret;
-	}
-	if (!isp->ready) {
-		rt_mutex_unlock(&isp->loading);
-		return -ENXIO;
-	}
-	rt_mutex_unlock(&isp->loading);
-
-	rt_mutex_lock(&isp->mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	asd->subdev.devnode = vdev;
 	/* Deferred firmware loading case. */
@@ -777,31 +749,14 @@ done:
 	/* Ensure that a mode is set */
 	v4l2_ctrl_s_ctrl(asd->run_mode, pipe->default_run_mode);
 
-<<<<<<< HEAD
-=======
-	if (acc_node)
-		acc_pipe->users++;
-	else
-		pipe->users++;
-	rt_mutex_unlock(&isp->mutex);
-
-	/* Ensure that a mode is set */
-	if (!acc_node)
-		v4l2_ctrl_s_ctrl(asd->run_mode, pipe->default_run_mode);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 css_error:
 	atomisp_css_uninit(isp);
 	pm_runtime_put(vdev->v4l2_dev->dev);
 error:
-<<<<<<< HEAD
 	mutex_unlock(&isp->mutex);
 	v4l2_fh_release(file);
-=======
-	rt_mutex_unlock(&isp->mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -868,18 +823,6 @@ static int atomisp_release(struct file *file)
 	if (atomisp_subdev_users(asd))
 		goto done;
 
-<<<<<<< HEAD
-=======
-	/* clear the sink pad for file input */
-	if (isp->sw_contex.file_input && asd->fmt_auto->val) {
-		struct v4l2_mbus_framefmt isp_sink_fmt = { 0 };
-
-		atomisp_subdev_set_ffmt(&asd->subdev, fh.state,
-					V4L2_SUBDEV_FORMAT_ACTIVE,
-					ATOMISP_SUBDEV_PAD_SINK, &isp_sink_fmt);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomisp_css_free_stat_buffers(asd);
 	atomisp_free_internal_buffers(asd);
 	ret = v4l2_subdev_call(isp->inputs[asd->input_curr].camera,
@@ -913,24 +856,12 @@ static int atomisp_release(struct file *file)
 		dev_err(isp->dev, "Failed to power off device\n");
 
 done:
-<<<<<<< HEAD
 	atomisp_subdev_set_selection(&asd->subdev, fh.state,
 				     V4L2_SUBDEV_FORMAT_ACTIVE,
 				     atomisp_subdev_source_pad(vdev),
 				     V4L2_SEL_TGT_COMPOSE, 0,
 				     &clear_compose);
 	mutex_unlock(&isp->mutex);
-=======
-	if (!acc_node) {
-		atomisp_subdev_set_selection(&asd->subdev, fh.state,
-					     V4L2_SUBDEV_FORMAT_ACTIVE,
-					     atomisp_subdev_source_pad(vdev),
-					     V4L2_SEL_TGT_COMPOSE, 0,
-					     &clear_compose);
-	}
-	rt_mutex_unlock(&isp->mutex);
-	mutex_unlock(&isp->streamoff_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return v4l2_fh_release(file);
 }
@@ -1192,21 +1123,6 @@ const struct v4l2_file_operations atomisp_fops = {
 	 * needs to be made safe for compat tasks instead.
 	.compat_ioctl32 = atomisp_compat_ioctl32,
 	 */
-<<<<<<< HEAD
-=======
-#endif
-	.poll = atomisp_poll,
-};
-
-const struct v4l2_file_operations atomisp_file_fops = {
-	.owner = THIS_MODULE,
-	.open = atomisp_open,
-	.release = atomisp_release,
-	.mmap = atomisp_file_mmap,
-	.unlocked_ioctl = video_ioctl2,
-#ifdef CONFIG_COMPAT
-	/* .compat_ioctl32 = atomisp_compat_ioctl32, */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 	.poll = atomisp_poll,
 };

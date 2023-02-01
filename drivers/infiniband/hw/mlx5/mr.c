@@ -40,10 +40,6 @@
 #include <linux/dma-buf.h>
 #include <linux/dma-resv.h>
 #include <rdma/ib_umem_odp.h>
-<<<<<<< HEAD
-=======
-#include <rdma/ib_verbs.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "dm.h"
 #include "mlx5_ib.h"
 #include "umr.h"
@@ -939,12 +935,8 @@ static struct mlx5_ib_mr *alloc_cacheable_mr(struct ib_pd *pd,
 	 * cache then synchronously create an uncached one.
 	 */
 	if (!ent || ent->limit == 0 ||
-<<<<<<< HEAD
 	    !mlx5r_umr_can_reconfig(dev, 0, access_flags) ||
 	    mlx5_umem_needs_ats(dev, umem, access_flags)) {
-=======
-	    !mlx5r_umr_can_reconfig(dev, 0, access_flags)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mutex_lock(&dev->slow_path_mutex);
 		mr = reg_create(pd, umem, iova, access_flags, page_size, false);
 		mutex_unlock(&dev->slow_path_mutex);
@@ -1413,11 +1405,6 @@ static int umr_rereg_pas(struct mlx5_ib_mr *mr, struct ib_pd *pd,
 
 	mr->ibmr.iova = iova;
 	mr->ibmr.length = new_umem->length;
-<<<<<<< HEAD
-=======
-	mr->ibmr.iova = iova;
-	mr->ibmr.length = new_umem->length;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mr->page_shift = order_base_2(page_size);
 	mr->umem = new_umem;
 	err = mlx5r_umr_update_mr_pas(mr, upd_flags);

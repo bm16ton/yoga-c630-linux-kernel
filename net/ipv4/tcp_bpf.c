@@ -281,11 +281,7 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
 	bool cork = false, enospc = sk_msg_full(msg), redir_ingress;
 	struct sock *sk_redir;
 	u32 tosend, origsize, sent, delta = 0;
-<<<<<<< HEAD
 	u32 eval;
-=======
-	u32 eval = __SK_NONE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 more_data:
@@ -345,12 +341,8 @@ more_data:
 		release_sock(sk);
 
 		origsize = msg->sg.size;
-<<<<<<< HEAD
 		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
 					    msg, tosend, flags);
-=======
-		ret = tcp_bpf_sendmsg_redir(sk_redir, msg, tosend, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sent = origsize - msg->sg.size;
 
 		if (eval == __SK_REDIRECT)

@@ -9,7 +9,6 @@
 #ifndef __SOUND_SOC_SOF_OF_H
 #define __SOUND_SOC_SOF_OF_H
 
-<<<<<<< HEAD
 struct snd_sof_of_mach {
 	const char *compatible;
 	const char *drv_name;
@@ -17,15 +16,10 @@ struct snd_sof_of_mach {
 	const char *sof_tplg_filename;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern const struct dev_pm_ops sof_of_pm;
 
 int sof_of_probe(struct platform_device *pdev);
 int sof_of_remove(struct platform_device *pdev);
-<<<<<<< HEAD
 void sof_of_shutdown(struct platform_device *pdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

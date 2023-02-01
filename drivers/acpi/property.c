@@ -1269,18 +1269,11 @@ acpi_node_get_parent(const struct fwnode_handle *fwnode)
 		return to_acpi_data_node(fwnode)->parent;
 	}
 	if (is_acpi_device_node(fwnode)) {
-<<<<<<< HEAD
 		struct acpi_device *parent;
 
 		parent = acpi_dev_parent(to_acpi_device_node(fwnode));
 		if (parent)
 			return acpi_fwnode_handle(parent);
-=======
-		struct device *dev = to_acpi_device_node(fwnode)->dev.parent;
-
-		if (dev)
-			return acpi_fwnode_handle(to_acpi_device(dev));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return NULL;

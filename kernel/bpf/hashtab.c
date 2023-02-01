@@ -151,11 +151,9 @@ static inline int htab_lock_bucket(const struct bpf_htab *htab,
 				   unsigned long *pflags)
 {
 	unsigned long flags;
-	bool use_raw_lock;
 
 	hash = hash & HASHTAB_MAP_LOCK_MASK;
 
-<<<<<<< HEAD
 	preempt_disable();
 	if (unlikely(__this_cpu_inc_return(*(htab->map_locked[hash])) != 1)) {
 		__this_cpu_dec(*(htab->map_locked[hash]));
@@ -164,26 +162,6 @@ static inline int htab_lock_bucket(const struct bpf_htab *htab,
 	}
 
 	raw_spin_lock_irqsave(&b->raw_lock, flags);
-=======
-	use_raw_lock = htab_use_raw_lock(htab);
-	if (use_raw_lock)
-		preempt_disable();
-	else
-		migrate_disable();
-	if (unlikely(__this_cpu_inc_return(*(htab->map_locked[hash])) != 1)) {
-		__this_cpu_dec(*(htab->map_locked[hash]));
-		if (use_raw_lock)
-			preempt_enable();
-		else
-			migrate_enable();
-		return -EBUSY;
-	}
-
-	if (use_raw_lock)
-		raw_spin_lock_irqsave(&b->raw_lock, flags);
-	else
-		spin_lock_irqsave(&b->lock, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*pflags = flags;
 
 	return 0;
@@ -193,24 +171,10 @@ static inline void htab_unlock_bucket(const struct bpf_htab *htab,
 				      struct bucket *b, u32 hash,
 				      unsigned long flags)
 {
-	bool use_raw_lock = htab_use_raw_lock(htab);
-
 	hash = hash & HASHTAB_MAP_LOCK_MASK;
-<<<<<<< HEAD
 	raw_spin_unlock_irqrestore(&b->raw_lock, flags);
 	__this_cpu_dec(*(htab->map_locked[hash]));
 	preempt_enable();
-=======
-	if (use_raw_lock)
-		raw_spin_unlock_irqrestore(&b->raw_lock, flags);
-	else
-		spin_unlock_irqrestore(&b->lock, flags);
-	__this_cpu_dec(*(htab->map_locked[hash]));
-	if (use_raw_lock)
-		preempt_enable();
-	else
-		migrate_enable();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool htab_lru_map_delete_node(void *arg, struct bpf_lru_node *node);
@@ -901,23 +865,9 @@ find_first_elem:
 static void htab_elem_free(struct bpf_htab *htab, struct htab_elem *l)
 {
 	if (htab->map.map_type == BPF_MAP_TYPE_PERCPU_HASH)
-<<<<<<< HEAD
 		bpf_mem_cache_free(&htab->pcpu_ma, l->ptr_to_pptr);
 	check_and_free_fields(htab, l);
 	bpf_mem_cache_free(&htab->ma, l);
-=======
-		free_percpu(htab_elem_get_ptr(l, htab->map.key_size));
-	check_and_free_fields(htab, l);
-	kfree(l);
-}
-
-static void htab_elem_free_rcu(struct rcu_head *head)
-{
-	struct htab_elem *l = container_of(head, struct htab_elem, rcu);
-	struct bpf_htab *htab = l->htab;
-
-	htab_elem_free(htab, l);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void htab_put_fd_value(struct bpf_htab *htab, struct htab_elem *l)
@@ -1053,18 +1003,9 @@ static struct htab_elem *alloc_htab_elem(struct bpf_htab *htab, void *key,
 				 * old element will be freed immediately.
 				 * Otherwise return an error
 				 */
-<<<<<<< HEAD
 				return ERR_PTR(-E2BIG);
 		inc_elem_count(htab);
 		l_new = bpf_mem_cache_alloc(&htab->ma);
-=======
-				l_new = ERR_PTR(-E2BIG);
-				goto dec_count;
-			}
-		l_new = bpf_map_kmalloc_node(&htab->map, htab->elem_size,
-					     GFP_NOWAIT | __GFP_NOWARN,
-					     htab->map.numa_node);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!l_new) {
 			l_new = ERR_PTR(-ENOMEM);
 			goto dec_count;
@@ -1079,12 +1020,7 @@ static struct htab_elem *alloc_htab_elem(struct bpf_htab *htab, void *key,
 			pptr = htab_elem_get_ptr(l_new, key_size);
 		} else {
 			/* alloc_percpu zero-fills */
-<<<<<<< HEAD
 			pptr = bpf_mem_cache_alloc(&htab->pcpu_ma);
-=======
-			pptr = bpf_map_alloc_percpu(&htab->map, size, 8,
-						    GFP_NOWAIT | __GFP_NOWARN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (!pptr) {
 				bpf_mem_cache_free(&htab->ma, l_new);
 				l_new = ERR_PTR(-ENOMEM);
@@ -1563,42 +1499,6 @@ static void htab_map_free_timers(struct bpf_map *map)
 		htab_free_prealloced_timers(htab);
 }
 
-static void htab_free_malloced_timers(struct bpf_htab *htab)
-{
-	int i;
-
-	rcu_read_lock();
-	for (i = 0; i < htab->n_buckets; i++) {
-		struct hlist_nulls_head *head = select_bucket(htab, i);
-		struct hlist_nulls_node *n;
-		struct htab_elem *l;
-
-		hlist_nulls_for_each_entry(l, n, head, hash_node) {
-			/* We don't reset or free kptr on uref dropping to zero,
-			 * hence just free timer.
-			 */
-			bpf_timer_cancel_and_free(l->key +
-						  round_up(htab->map.key_size, 8) +
-						  htab->map.timer_off);
-		}
-		cond_resched_rcu();
-	}
-	rcu_read_unlock();
-}
-
-static void htab_map_free_timers(struct bpf_map *map)
-{
-	struct bpf_htab *htab = container_of(map, struct bpf_htab, map);
-
-	/* We don't reset or free kptr on uref dropping to zero. */
-	if (!map_value_has_timer(&htab->map))
-		return;
-	if (!htab_is_prealloc(htab))
-		htab_free_malloced_timers(htab);
-	else
-		htab_free_prealloced_timers(htab);
-}
-
 /* Called when map->refcnt goes to zero, either from workqueue or from syscall */
 static void htab_map_free(struct bpf_map *map)
 {
@@ -1614,10 +1514,6 @@ static void htab_map_free(struct bpf_map *map)
 	 * underneath and is reponsible for waiting for callbacks to finish
 	 * during bpf_mem_alloc_destroy().
 	 */
-<<<<<<< HEAD
-=======
-	rcu_barrier();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!htab_is_prealloc(htab)) {
 		delete_all_elements(htab);
 	} else {

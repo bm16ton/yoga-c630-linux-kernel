@@ -182,10 +182,7 @@ static inline bool mpol_is_preferred_many(struct mempolicy *pol)
 	return  (pol->mode == MPOL_PREFERRED_MANY);
 }
 
-<<<<<<< HEAD
 extern bool apply_policy_zone(struct mempolicy *policy, enum zone_type zone);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #else
 
@@ -296,13 +293,5 @@ static inline bool mpol_is_preferred_many(struct mempolicy *pol)
 	return  false;
 }
 
-<<<<<<< HEAD
-=======
-static inline bool mpol_is_preferred_many(struct mempolicy *pol)
-{
-	return  false;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_NUMA */
 #endif

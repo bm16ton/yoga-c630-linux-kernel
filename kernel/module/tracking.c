@@ -10,10 +10,7 @@
 #include <linux/printk.h>
 #include <linux/slab.h>
 #include <linux/list.h>
-<<<<<<< HEAD
 #include <linux/debugfs.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/rculist.h>
 #include "internal.h"
 
@@ -66,7 +63,6 @@ void print_unloaded_tainted_modules(void)
 		}
 	}
 }
-<<<<<<< HEAD
 
 #ifdef CONFIG_DEBUG_FS
 static void *unloaded_tainted_modules_seq_start(struct seq_file *m, loff_t *pos)
@@ -134,5 +130,3 @@ static int __init unloaded_tainted_modules_init(void)
 }
 module_init(unloaded_tainted_modules_init);
 #endif /* CONFIG_DEBUG_FS */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

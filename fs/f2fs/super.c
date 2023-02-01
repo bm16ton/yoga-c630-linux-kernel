@@ -1342,14 +1342,11 @@ default_check:
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	if (test_opt(sbi, ATGC) && f2fs_lfs_mode(sbi)) {
 		f2fs_err(sbi, "LFS not compatible with ATGC");
 		return -EINVAL;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (f2fs_sb_has_readonly(sbi) && !f2fs_readonly(sbi->sb)) {
 		f2fs_err(sbi, "Allow to mount readonly mode only");
 		return -EROFS;
@@ -2176,17 +2173,10 @@ static void f2fs_enable_checkpoint(struct f2fs_sb_info *sbi)
 		sync_inodes_sb(sbi->sb);
 		f2fs_io_schedule_timeout(DEFAULT_IO_TIMEOUT);
 	} while (get_pages(sbi, F2FS_DIRTY_DATA) && retry--);
-<<<<<<< HEAD
 
 	if (unlikely(retry < 0))
 		f2fs_warn(sbi, "checkpoint=enable has some unwritten data.");
 
-=======
-
-	if (unlikely(retry < 0))
-		f2fs_warn(sbi, "checkpoint=enable has some unwritten data.");
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f2fs_down_write(&sbi->gc_lock);
 	f2fs_dirty_to_prefree(sbi);
 
@@ -4197,12 +4187,9 @@ try_onemore:
 	err = f2fs_init_write_merge_io(sbi);
 	if (err)
 		goto free_bio_info;
-<<<<<<< HEAD
 
 	spin_lock_init(&sbi->error_lock);
 	memcpy(sbi->errors, raw_super->s_errors, MAX_F2FS_ERRORS);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	init_f2fs_rwsem(&sbi->cp_rwsem);
 	init_f2fs_rwsem(&sbi->quota_sem);

@@ -490,11 +490,8 @@ void drm_gem_fb_end_cpu_access(struct drm_framebuffer *fb, enum dma_data_directi
 }
 EXPORT_SYMBOL(drm_gem_fb_end_cpu_access);
 
-<<<<<<< HEAD
 // TODO Drop this function and replace by drm_format_info_bpp() once all
 // DRM_FORMAT_* provide proper block info in drivers/gpu/drm/drm_fourcc.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static __u32 drm_gem_afbc_get_bpp(struct drm_device *dev,
 				  const struct drm_mode_fb_cmd2 *mode_cmd)
 {

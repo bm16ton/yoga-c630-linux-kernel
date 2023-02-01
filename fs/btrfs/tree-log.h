@@ -20,10 +20,7 @@ struct btrfs_log_ctx {
 	int log_transid;
 	bool log_new_dentries;
 	bool logging_new_name;
-<<<<<<< HEAD
 	bool logging_new_delayed_dentries;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Indicate if the inode being logged was logged before. */
 	bool logged_before;
 	/* Tracks the last logged dir item/index key offset. */
@@ -44,10 +41,7 @@ static inline void btrfs_init_log_ctx(struct btrfs_log_ctx *ctx,
 	ctx->log_transid = 0;
 	ctx->log_new_dentries = false;
 	ctx->logging_new_name = false;
-<<<<<<< HEAD
 	ctx->logging_new_delayed_dentries = false;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ctx->logged_before = false;
 	ctx->inode = inode;
 	INIT_LIST_HEAD(&ctx->list);

@@ -859,12 +859,8 @@
 #define CLK_VDO1_DPINTF				47
 #define CLK_VDO1_DISP_MONITOR_DPINTF		48
 #define CLK_VDO1_26M_SLOW			49
-<<<<<<< HEAD
 #define CLK_VDO1_DPI1_HDMI			50
 #define CLK_VDO1_NR_CLK				51
 
-=======
-#define CLK_VDO1_NR_CLK				50
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _DT_BINDINGS_CLK_MT8195_H */

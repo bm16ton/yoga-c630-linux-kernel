@@ -249,10 +249,6 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
 	const struct tcp_sock *tp = tcp_sk(sk);
 	struct net *net = sock_net(sk);
 	struct inet_timewait_sock *tw;
-<<<<<<< HEAD
-=======
-	struct inet_timewait_death_row *tcp_death_row = sock_net(sk)->ipv4.tcp_death_row;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	tw = inet_twsk_alloc(sk, &net->ipv4.tcp_death_row, state);
 

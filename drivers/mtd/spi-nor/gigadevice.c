@@ -30,11 +30,7 @@ gd25q256_post_bfpt(struct spi_nor *nor,
 }
 
 static const struct spi_nor_fixups gd25q256_fixups = {
-<<<<<<< HEAD
 	.post_bfpt = gd25q256_post_bfpt,
-=======
-	.default_init = gd25q256_default_init,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flash_info gigadevice_nor_parts[] = {

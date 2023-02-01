@@ -444,44 +444,6 @@ void rproc_remove_rvdev(struct rproc_vdev *rvdev)
 	if (rvdev)
 		list_del(&rvdev->node);
 }
-<<<<<<< HEAD
-=======
-
-/**
- * rproc_rvdev_release() - release the existence of a rvdev
- *
- * @dev: the subdevice's dev
- */
-static void rproc_rvdev_release(struct device *dev)
-{
-	struct rproc_vdev *rvdev = container_of(dev, struct rproc_vdev, dev);
-
-	of_reserved_mem_device_release(dev);
-	dma_release_coherent_memory(dev);
-
-	kfree(rvdev);
-}
-
-static int copy_dma_range_map(struct device *to, struct device *from)
-{
-	const struct bus_dma_region *map = from->dma_range_map, *new_map, *r;
-	int num_ranges = 0;
-
-	if (!map)
-		return 0;
-
-	for (r = map; r->size; r++)
-		num_ranges++;
-
-	new_map = kmemdup(map, array_size(num_ranges + 1, sizeof(*map)),
-			  GFP_KERNEL);
-	if (!new_map)
-		return -ENOMEM;
-	to->dma_range_map = new_map;
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * rproc_handle_vdev() - handle a vdev fw resource
  * @rproc: the remote processor
@@ -517,13 +479,8 @@ static int rproc_handle_vdev(struct rproc *rproc, void *ptr,
 	struct device *dev = &rproc->dev;
 	struct rproc_vdev *rvdev;
 	size_t rsc_size;
-<<<<<<< HEAD
 	struct rproc_vdev_data rvdev_data;
 	struct platform_device *pdev;
-=======
-	int i, ret;
-	char name[16];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* make sure resource isn't truncated */
 	rsc_size = struct_size(rsc, vring, rsc->num_of_vrings);
@@ -552,7 +509,6 @@ static int rproc_handle_vdev(struct rproc *rproc, void *ptr,
 	rvdev_data.rsc_offset = offset;
 	rvdev_data.rsc = rsc;
 
-<<<<<<< HEAD
 	/*
 	 * When there is more than one remote processor, rproc->nb_vdev number is
 	 * same for each separate instances of "rproc". If rvdev_data.index is used
@@ -564,51 +520,6 @@ static int rproc_handle_vdev(struct rproc *rproc, void *ptr,
 	if (IS_ERR(pdev)) {
 		dev_err(dev, "failed to create rproc-virtio device\n");
 		return PTR_ERR(pdev);
-=======
-	/* Initialise vdev subdevice */
-	snprintf(name, sizeof(name), "vdev%dbuffer", rvdev->index);
-	rvdev->dev.parent = &rproc->dev;
-	rvdev->dev.release = rproc_rvdev_release;
-	dev_set_name(&rvdev->dev, "%s#%s", dev_name(rvdev->dev.parent), name);
-	dev_set_drvdata(&rvdev->dev, rvdev);
-
-	ret = device_register(&rvdev->dev);
-	if (ret) {
-		put_device(&rvdev->dev);
-		return ret;
-	}
-
-	ret = copy_dma_range_map(&rvdev->dev, rproc->dev.parent);
-	if (ret)
-		goto free_rvdev;
-
-	/* Make device dma capable by inheriting from parent's capabilities */
-	set_dma_ops(&rvdev->dev, get_dma_ops(rproc->dev.parent));
-
-	ret = dma_coerce_mask_and_coherent(&rvdev->dev,
-					   dma_get_mask(rproc->dev.parent));
-	if (ret) {
-		dev_warn(dev,
-			 "Failed to set DMA mask %llx. Trying to continue... (%pe)\n",
-			 dma_get_mask(rproc->dev.parent), ERR_PTR(ret));
-	}
-
-	/* parse the vrings */
-	for (i = 0; i < rsc->num_of_vrings; i++) {
-		ret = rproc_parse_vring(rvdev, rsc, i);
-		if (ret)
-			goto free_rvdev;
-	}
-
-	/* remember the resource offset*/
-	rvdev->rsc_offset = offset;
-
-	/* allocate the vring resources */
-	for (i = 0; i < rsc->num_of_vrings; i++) {
-		ret = rproc_alloc_vring(rvdev, i);
-		if (ret)
-			goto unwind_vring_allocations;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -1829,56 +1740,6 @@ static int rproc_stop(struct rproc *rproc, bool crashed)
 
 /*
  * __rproc_detach(): Does the opposite of __rproc_attach()
-<<<<<<< HEAD
-=======
- */
-static int __rproc_detach(struct rproc *rproc)
-{
-	struct device *dev = &rproc->dev;
-	int ret;
-
-	/* No need to continue if a detach() operation has not been provided */
-	if (!rproc->ops->detach)
-		return -EINVAL;
-
-	/* Stop any subdevices for the remote processor */
-	rproc_stop_subdevices(rproc, false);
-
-	/* the installed resource table is no longer accessible */
-	ret = rproc_reset_rsc_table_on_detach(rproc);
-	if (ret) {
-		dev_err(dev, "can't reset resource table: %d\n", ret);
-		return ret;
-	}
-
-	/* Tell the remote processor the core isn't available anymore */
-	ret = rproc->ops->detach(rproc);
-	if (ret) {
-		dev_err(dev, "can't detach from rproc: %d\n", ret);
-		return ret;
-	}
-
-	rproc_unprepare_subdevices(rproc);
-
-	rproc->state = RPROC_DETACHED;
-
-	dev_info(dev, "detached remote processor %s\n", rproc->name);
-
-	return 0;
-}
-
-/**
- * rproc_trigger_recovery() - recover a remoteproc
- * @rproc: the remote processor
- *
- * The recovery is done by resetting all the virtio devices, that way all the
- * rpmsg drivers will be reseted along with the remote processor making the
- * remoteproc functional again.
- *
- * This function can sleep, so it cannot be called from atomic context.
- *
- * Return: 0 on success or a negative value upon failure
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 static int __rproc_detach(struct rproc *rproc)
 {

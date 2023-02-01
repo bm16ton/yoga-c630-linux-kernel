@@ -81,12 +81,6 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
 /* Forward declaration, a strange C thing */
 struct task_struct;
 
-<<<<<<< HEAD
-=======
-/* Free all resources held by a thread. */
-extern void release_thread(struct task_struct *);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned long __get_wchan(struct task_struct *p);
 
 #define task_pt_regs(p) \

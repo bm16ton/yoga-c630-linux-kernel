@@ -218,10 +218,6 @@ static int alloc_qpn(struct hns_roce_dev *hr_dev, struct hns_roce_qp *hr_qp)
 
 	if (hr_qp->ibqp.qp_type == IB_QPT_GSI) {
 		num = 1;
-<<<<<<< HEAD
-=======
-		hr_qp->doorbell_qpn = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		mutex_lock(&qp_table->bank_mutex);
 		bankid = get_least_load_bankid_for_qp(qp_table->bank);
@@ -556,7 +552,6 @@ static void set_ext_sge_param(struct hns_roce_dev *hr_dev, u32 sq_wqe_cnt,
 	ext_wqe_sge_cnt = get_sge_num_from_max_send_sge(is_ud_or_gsi,
 							cap->max_send_sge);
 
-<<<<<<< HEAD
 	if (hr_qp->config & HNS_ROCE_EXSGE_FLAGS) {
 		inline_ext_sge = max(ext_wqe_sge_cnt,
 				     get_sge_num_from_max_inl_data(is_ud_or_gsi,
@@ -566,9 +561,6 @@ static void set_ext_sge_param(struct hns_roce_dev *hr_dev, u32 sq_wqe_cnt,
 
 		hr_qp->sq.max_gs = max(1U, (hr_qp->sq.ext_sge_cnt + std_sge_num));
 		hr_qp->sq.max_gs = min(hr_qp->sq.max_gs, hr_dev->caps.max_sq_sg);
-=======
-	hr_qp->sq.max_gs = max(1U, cap->max_send_sge);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		ext_wqe_sge_cnt = hr_qp->sq.ext_sge_cnt;
 	} else {
@@ -1069,14 +1061,6 @@ static int set_qp_param(struct hns_roce_dev *hr_dev, struct hns_roce_qp *hr_qp,
 	struct hns_roce_ucontext *uctx;
 	int ret;
 
-<<<<<<< HEAD
-=======
-	if (init_attr->cap.max_inline_data > hr_dev->caps.max_sq_inline)
-		init_attr->cap.max_inline_data = hr_dev->caps.max_sq_inline;
-
-	hr_qp->max_inline_data = init_attr->cap.max_inline_data;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (init_attr->sq_sig_type == IB_SIGNAL_ALL_WR)
 		hr_qp->sq_signal_bits = IB_SIGNAL_ALL_WR;
 	else
@@ -1292,11 +1276,7 @@ int hns_roce_create_qp(struct ib_qp *qp, struct ib_qp_init_attr *init_attr,
 
 	ret = hns_roce_create_qp_common(hr_dev, pd, init_attr, udata, hr_qp);
 	if (ret)
-<<<<<<< HEAD
 		ibdev_err(ibdev, "create QP type 0x%x failed(%d)\n",
-=======
-		ibdev_err(ibdev, "Create QP type 0x%x failed(%d)\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			  init_attr->qp_type, ret);
 
 	return ret;

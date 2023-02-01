@@ -358,7 +358,6 @@ static bool fsl_ssi_is_ac97(struct fsl_ssi *ssi)
 static bool fsl_ssi_is_i2s_clock_provider(struct fsl_ssi *ssi)
 {
 	return (ssi->dai_fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) ==
-<<<<<<< HEAD
 		SND_SOC_DAIFMT_BP_FP;
 }
 
@@ -366,15 +365,6 @@ static bool fsl_ssi_is_i2s_bc_fp(struct fsl_ssi *ssi)
 {
 	return (ssi->dai_fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) ==
 		SND_SOC_DAIFMT_BC_FP;
-=======
-		SND_SOC_DAIFMT_CBC_CFC;
-}
-
-static bool fsl_ssi_is_i2s_cbp_cfc(struct fsl_ssi *ssi)
-{
-	return (ssi->dai_fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) ==
-		SND_SOC_DAIFMT_CBP_CFC;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -857,11 +847,7 @@ static int fsl_ssi_hw_params(struct snd_pcm_substream *substream,
 		u8 i2s_net = ssi->i2s_net;
 
 		/* Normal + Network mode to send 16-bit data in 32-bit frames */
-<<<<<<< HEAD
 		if (fsl_ssi_is_i2s_bc_fp(ssi) && sample_size == 16)
-=======
-		if (fsl_ssi_is_i2s_cbp_cfc(ssi) && sample_size == 16)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			i2s_net = SSI_SCR_I2S_MODE_NORMAL | SSI_SCR_NET;
 
 		/* Use Normal mode to send mono data at 1st slot of 2 slots */
@@ -934,28 +920,17 @@ static int _fsl_ssi_set_dai_fmt(struct fsl_ssi *ssi, unsigned int fmt)
 	switch (fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
 	case SND_SOC_DAIFMT_I2S:
 		switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 		case SND_SOC_DAIFMT_BP_FP:
-=======
-		case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (IS_ERR(ssi->baudclk)) {
 				dev_err(ssi->dev,
 					"missing baudclk for master mode\n");
 				return -EINVAL;
 			}
 			fallthrough;
-<<<<<<< HEAD
 		case SND_SOC_DAIFMT_BC_FP:
 			ssi->i2s_net |= SSI_SCR_I2S_MODE_MASTER;
 			break;
 		case SND_SOC_DAIFMT_BC_FC:
-=======
-		case SND_SOC_DAIFMT_CBP_CFC:
-			ssi->i2s_net |= SSI_SCR_I2S_MODE_MASTER;
-			break;
-		case SND_SOC_DAIFMT_CBP_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ssi->i2s_net |= SSI_SCR_I2S_MODE_SLAVE;
 			break;
 		default:
@@ -1017,26 +992,15 @@ static int _fsl_ssi_set_dai_fmt(struct fsl_ssi *ssi, unsigned int fmt)
 
 	/* DAI clock provider masks */
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Output bit and frame sync clocks */
 		strcr |= SSI_STCR_TFDIR | SSI_STCR_TXDIR;
 		scr |= SSI_SCR_SYS_CLK_EN;
 		break;
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FC:
 		/* Input bit or frame sync clocks */
 		break;
 	case SND_SOC_DAIFMT_BC_FP:
-=======
-	case SND_SOC_DAIFMT_CBP_CFP:
-		/* Input bit or frame sync clocks */
-		break;
-	case SND_SOC_DAIFMT_CBP_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Input bit clock but output frame sync clock */
 		strcr |= SSI_STCR_TFDIR;
 		break;

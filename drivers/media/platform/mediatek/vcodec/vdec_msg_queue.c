@@ -221,11 +221,7 @@ static void vdec_msg_queue_core_work(struct work_struct *work)
 	mtk_vcodec_dec_disable_hardware(ctx, MTK_VDEC_CORE);
 	vdec_msg_queue_qbuf(&ctx->msg_queue.lat_ctx, lat_buf);
 
-<<<<<<< HEAD
 	if (!list_empty(&dev->msg_queue_core_ctx.ready_queue)) {
-=======
-	if (!list_empty(&ctx->msg_queue.lat_ctx.ready_queue)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mtk_v4l2_debug(3, "re-schedule to decode for core: %d",
 			       dev->msg_queue_core_ctx.ready_num);
 		queue_work(dev->core_workqueue, &msg_queue->core_work);

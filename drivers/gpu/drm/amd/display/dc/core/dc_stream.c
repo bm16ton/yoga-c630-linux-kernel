@@ -276,11 +276,8 @@ static void program_cursor_attributes(
 		}
 
 		dc->hwss.set_cursor_attribute(pipe_ctx);
-<<<<<<< HEAD
 
 		dc_send_update_cursor_info_to_dmu(pipe_ctx, i);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (dc->hwss.set_cursor_sdr_white_level)
 			dc->hwss.set_cursor_sdr_white_level(pipe_ctx);
 	}
@@ -387,11 +384,8 @@ static void program_cursor_position(
 		}
 
 		dc->hwss.set_cursor_position(pipe_ctx);
-<<<<<<< HEAD
 
 		dc_send_update_cursor_info_to_dmu(pipe_ctx, i);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (pipe_to_program)

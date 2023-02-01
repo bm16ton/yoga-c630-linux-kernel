@@ -306,11 +306,7 @@ config PINCTRL_MCP23S08
 	  corresponding interrupt-controller.
 
 config PINCTRL_MICROCHIP_SGPIO
-<<<<<<< HEAD
 	tristate "Pinctrl driver for Microsemi/Microchip Serial GPIO"
-=======
-	bool "Pinctrl driver for Microsemi/Microchip Serial GPIO"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on OF
 	depends on HAS_IOMEM
 	select GPIOLIB
@@ -328,12 +324,9 @@ config PINCTRL_MICROCHIP_SGPIO
 	  connect control signals from SFP modules and to act as an
 	  LED controller.
 
-<<<<<<< HEAD
 	  If compiled as a module, the module name will be
 	  pinctrl-microchip-sgpio.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config PINCTRL_OCELOT
 	tristate "Pinctrl driver for the Microsemi Ocelot and Jaguar2 SoCs"
 	depends on OF
@@ -345,16 +338,12 @@ config PINCTRL_OCELOT
 	select GENERIC_PINMUX_FUNCTIONS
 	select OF_GPIO
 	select REGMAP_MMIO
-<<<<<<< HEAD
 	help
 	  Support for the internal GPIO interfaces on Microsemi Ocelot and
 	  Jaguar2 SoCs.
 
 	  If conpiled as a module, the module name will be pinctrl-ocelot.
 
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config PINCTRL_OXNAS
 	bool
 	depends on OF
@@ -432,7 +421,6 @@ config PINCTRL_SINGLE
 	tristate "One-register-per-pin type device tree based pinctrl driver"
 	depends on OF
 	depends on HAS_IOMEM
-<<<<<<< HEAD
 	select GENERIC_PINCTRL_GROUPS
 	select GENERIC_PINMUX_FUNCTIONS
 	select GENERIC_PINCONF
@@ -506,98 +494,6 @@ config PINCTRL_ZYNQ
 	select PINMUX
 	select GENERIC_PINCONF
 	help
-=======
-	select GENERIC_PINCTRL_GROUPS
-	select GENERIC_PINMUX_FUNCTIONS
-	select GENERIC_PINCONF
-	help
-	  This selects the device tree based generic pinctrl driver.
-
-config PINCTRL_ST
-	bool
-	depends on OF
-	select PINMUX
-	select PINCONF
-	select GPIOLIB_IRQCHIP
-
-config PINCTRL_STARFIVE
-	tristate "Pinctrl and GPIO driver for the StarFive JH7100 SoC"
-	depends on SOC_STARFIVE || COMPILE_TEST
-	depends on OF
-	default SOC_STARFIVE
-	select GENERIC_PINCTRL_GROUPS
-	select GENERIC_PINMUX_FUNCTIONS
-	select GENERIC_PINCONF
-	select GPIOLIB
-	select GPIOLIB_IRQCHIP
-	select OF_GPIO
-	help
-	  Say yes here to support pin control on the StarFive JH7100 SoC.
-	  This also provides an interface to the GPIO pins not used by other
-	  peripherals supporting inputs, outputs, configuring pull-up/pull-down
-	  and interrupts on input changes.
-
-config PINCTRL_STMFX
-	tristate "STMicroelectronics STMFX GPIO expander pinctrl driver"
-	depends on I2C
-	depends on OF_GPIO
-	select GENERIC_PINCONF
-	select GPIOLIB_IRQCHIP
-	select MFD_STMFX
-	help
-	  Driver for STMicroelectronics Multi-Function eXpander (STMFX)
-	  GPIO expander.
-	  This provides a GPIO interface supporting inputs and outputs,
-	  and configuring push-pull, open-drain, and can also be used as
-	  interrupt-controller.
-
-config PINCTRL_SX150X
-	bool "Semtech SX150x I2C GPIO expander pinctrl driver"
-	depends on I2C=y
-	select PINMUX
-	select PINCONF
-	select GENERIC_PINCONF
-	select GPIOLIB
-	select GPIOLIB_IRQCHIP
-	select REGMAP
-	help
-	  Say Y here to provide support for Semtech SX150x-series I2C
-	  GPIO expanders as pinctrl module.
-	  Compatible models include:
-	  - 8 bits:  sx1508q, sx1502q
-	  - 16 bits: sx1509q, sx1506q
-
-config PINCTRL_TB10X
-	bool
-	depends on OF && ARC_PLAT_TB10X
-	select GPIOLIB
-
-config PINCTRL_THUNDERBAY
-	tristate "Generic pinctrl and GPIO driver for Intel Thunder Bay SoC"
-	depends on ARCH_THUNDERBAY || (ARM64 && COMPILE_TEST)
-	depends on HAS_IOMEM
-	select PINMUX
-	select PINCONF
-	select GENERIC_PINCONF
-	select GENERIC_PINCTRL_GROUPS
-	select GENERIC_PINMUX_FUNCTIONS
-	select GPIOLIB
-	select GPIOLIB_IRQCHIP
-	select GPIO_GENERIC
-	help
-	  This selects pin control driver for the Intel Thunder Bay SoC.
-	  It provides pin config functions such as pull-up, pull-down,
-	  interrupt, drive strength, sec lock, Schmitt trigger, slew
-	  rate control and direction control. This module will be
-	  called as pinctrl-thunderbay.
-
-config PINCTRL_ZYNQ
-	bool "Pinctrl driver for Xilinx Zynq"
-	depends on ARCH_ZYNQ
-	select PINMUX
-	select GENERIC_PINCONF
-	help
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	  This selects the pinctrl driver for Xilinx Zynq.
 
 config PINCTRL_ZYNQMP

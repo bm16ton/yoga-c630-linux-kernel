@@ -19,8 +19,6 @@
 
 struct ksz_device;
 
-#define KSZ_MAX_NUM_PORTS 8
-
 struct vlan_table {
 	u32 table[3];
 };
@@ -47,10 +45,7 @@ struct ksz_chip_data {
 	int num_statics;
 	int cpu_ports;
 	int port_cnt;
-<<<<<<< HEAD
 	u8 port_nirqs;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct ksz_dev_ops *ops;
 	bool phy_errata_9477;
 	bool ksz87xx_eee_link_erratum;
@@ -70,7 +65,6 @@ struct ksz_chip_data {
 	bool supports_rmii[KSZ_MAX_NUM_PORTS];
 	bool supports_rgmii[KSZ_MAX_NUM_PORTS];
 	bool internal_phy[KSZ_MAX_NUM_PORTS];
-<<<<<<< HEAD
 	bool gbit_capable[KSZ_MAX_NUM_PORTS];
 	const struct regmap_access_table *wr_table;
 	const struct regmap_access_table *rd_table;
@@ -85,8 +79,6 @@ struct ksz_irq {
 	int irq_num;
 	char name[16];
 	struct ksz_device *dev;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ksz_port {
@@ -106,12 +98,9 @@ struct ksz_port {
 	u16 max_frame;
 	u32 rgmii_tx_val;
 	u32 rgmii_rx_val;
-<<<<<<< HEAD
 	struct ksz_device *ksz_dev;
 	struct ksz_irq pirq;
 	u8 num;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ksz_device {
@@ -149,10 +138,6 @@ struct ksz_device {
 	unsigned long mib_read_interval;
 	u16 mirror_rx;
 	u16 mirror_tx;
-<<<<<<< HEAD
-=======
-	u32 features;			/* chip specific features */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 port_mask;
 	struct mutex lock_irq;		/* IRQ Access */
 	struct ksz_irq girq;
@@ -273,117 +258,6 @@ enum ksz_xmii_ctrl1 {
 	P_GMII_NOT_1GBIT,
 };
 
-/* List of supported models */
-enum ksz_model {
-	KSZ8795,
-	KSZ8794,
-	KSZ8765,
-	KSZ8830,
-	KSZ9477,
-	KSZ9897,
-	KSZ9893,
-	KSZ9567,
-	LAN9370,
-	LAN9371,
-	LAN9372,
-	LAN9373,
-	LAN9374,
-};
-
-enum ksz_chip_id {
-	KSZ8795_CHIP_ID = 0x8795,
-	KSZ8794_CHIP_ID = 0x8794,
-	KSZ8765_CHIP_ID = 0x8765,
-	KSZ8830_CHIP_ID = 0x8830,
-	KSZ9477_CHIP_ID = 0x00947700,
-	KSZ9897_CHIP_ID = 0x00989700,
-	KSZ9893_CHIP_ID = 0x00989300,
-	KSZ9567_CHIP_ID = 0x00956700,
-	LAN9370_CHIP_ID = 0x00937000,
-	LAN9371_CHIP_ID = 0x00937100,
-	LAN9372_CHIP_ID = 0x00937200,
-	LAN9373_CHIP_ID = 0x00937300,
-	LAN9374_CHIP_ID = 0x00937400,
-};
-
-enum ksz_regs {
-	REG_IND_CTRL_0,
-	REG_IND_DATA_8,
-	REG_IND_DATA_CHECK,
-	REG_IND_DATA_HI,
-	REG_IND_DATA_LO,
-	REG_IND_MIB_CHECK,
-	REG_IND_BYTE,
-	P_FORCE_CTRL,
-	P_LINK_STATUS,
-	P_LOCAL_CTRL,
-	P_NEG_RESTART_CTRL,
-	P_REMOTE_STATUS,
-	P_SPEED_STATUS,
-	S_TAIL_TAG_CTRL,
-	P_STP_CTRL,
-	S_START_CTRL,
-	S_BROADCAST_CTRL,
-	S_MULTICAST_CTRL,
-	P_XMII_CTRL_0,
-	P_XMII_CTRL_1,
-};
-
-enum ksz_masks {
-	PORT_802_1P_REMAPPING,
-	SW_TAIL_TAG_ENABLE,
-	MIB_COUNTER_OVERFLOW,
-	MIB_COUNTER_VALID,
-	VLAN_TABLE_FID,
-	VLAN_TABLE_MEMBERSHIP,
-	VLAN_TABLE_VALID,
-	STATIC_MAC_TABLE_VALID,
-	STATIC_MAC_TABLE_USE_FID,
-	STATIC_MAC_TABLE_FID,
-	STATIC_MAC_TABLE_OVERRIDE,
-	STATIC_MAC_TABLE_FWD_PORTS,
-	DYNAMIC_MAC_TABLE_ENTRIES_H,
-	DYNAMIC_MAC_TABLE_MAC_EMPTY,
-	DYNAMIC_MAC_TABLE_NOT_READY,
-	DYNAMIC_MAC_TABLE_ENTRIES,
-	DYNAMIC_MAC_TABLE_FID,
-	DYNAMIC_MAC_TABLE_SRC_PORT,
-	DYNAMIC_MAC_TABLE_TIMESTAMP,
-	ALU_STAT_WRITE,
-	ALU_STAT_READ,
-	P_MII_TX_FLOW_CTRL,
-	P_MII_RX_FLOW_CTRL,
-};
-
-enum ksz_shifts {
-	VLAN_TABLE_MEMBERSHIP_S,
-	VLAN_TABLE,
-	STATIC_MAC_FWD_PORTS,
-	STATIC_MAC_FID,
-	DYNAMIC_MAC_ENTRIES_H,
-	DYNAMIC_MAC_ENTRIES,
-	DYNAMIC_MAC_FID,
-	DYNAMIC_MAC_TIMESTAMP,
-	DYNAMIC_MAC_SRC_PORT,
-	ALU_STAT_INDEX,
-};
-
-enum ksz_xmii_ctrl0 {
-	P_MII_100MBIT,
-	P_MII_10MBIT,
-	P_MII_FULL_DUPLEX,
-	P_MII_HALF_DUPLEX,
-};
-
-enum ksz_xmii_ctrl1 {
-	P_RGMII_SEL,
-	P_RMII_SEL,
-	P_GMII_SEL,
-	P_MII_SEL,
-	P_GMII_1GBIT,
-	P_GMII_NOT_1GBIT,
-};
-
 struct alu_struct {
 	/* entry 1 */
 	u8	is_static:1;
@@ -405,23 +279,15 @@ struct alu_struct {
 
 struct ksz_dev_ops {
 	int (*setup)(struct dsa_switch *ds);
-<<<<<<< HEAD
 	void (*teardown)(struct dsa_switch *ds);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 (*get_port_addr)(int port, int offset);
 	void (*cfg_port_member)(struct ksz_device *dev, int port, u8 member);
 	void (*flush_dyn_mac_table)(struct ksz_device *dev, int port);
 	void (*port_cleanup)(struct ksz_device *dev, int port);
 	void (*port_setup)(struct ksz_device *dev, int port, bool cpu_port);
-<<<<<<< HEAD
 	int (*set_ageing_time)(struct ksz_device *dev, unsigned int msecs);
 	int (*r_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 *val);
 	int (*w_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 val);
-=======
-	void (*r_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 *val);
-	void (*w_phy)(struct ksz_device *dev, u16 phy, u16 reg, u16 val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*r_mib_cnt)(struct ksz_device *dev, int port, u16 addr,
 			  u64 *cnt);
 	void (*r_mib_pkt)(struct ksz_device *dev, int port, u16 addr,
@@ -531,14 +397,10 @@ static inline int ksz_read64(struct ksz_device *dev, u32 reg, u64 *val)
 	int ret;
 
 	ret = regmap_bulk_read(dev->regmap[2], reg, value, 2);
-<<<<<<< HEAD
 	if (ret)
 		dev_err(dev->dev, "can't read 64bit reg: 0x%x %pe\n", reg,
 			ERR_PTR(ret));
 	else
-=======
-	if (!ret)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*val = (u64)value[0] << 32 | value[1];
 
 	return ret;
@@ -638,14 +500,6 @@ static inline void ksz_prmw8(struct ksz_device *dev, int port, int offset,
 			   mask, val);
 }
 
-static inline void ksz_prmw8(struct ksz_device *dev, int port, int offset,
-			     u8 mask, u8 val)
-{
-	regmap_update_bits(dev->regmap[0],
-			   dev->dev_ops->get_port_addr(port, offset),
-			   mask, val);
-}
-
 static inline void ksz_regmap_lock(void *__mtx)
 {
 	struct mutex *mtx = __mtx;
@@ -694,13 +548,10 @@ static inline int is_lan937x(struct ksz_device *dev)
 
 #define SW_REV_ID_M			GENMASK(7, 4)
 
-<<<<<<< HEAD
 /* KSZ9893, KSZ9563, KSZ8563 specific register  */
 #define REG_CHIP_ID4			0x0f
 #define SKU_ID_KSZ8563			0x3c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Driver set switch broadcast storm protection at 10% rate. */
 #define BROADCAST_STORM_PROT_RATE	10
 
@@ -715,13 +566,6 @@ static inline int is_lan937x(struct ksz_device *dev)
 
 #define SW_START			0x01
 
-<<<<<<< HEAD
-=======
-/* Used with variable features to indicate capabilities. */
-#define GBIT_SUPPORT			BIT(0)
-#define IS_9893				BIT(2)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* xMII configuration */
 #define P_MII_DUPLEX_M			BIT(6)
 #define P_MII_100MBIT_M			BIT(4)
@@ -732,7 +576,6 @@ static inline int is_lan937x(struct ksz_device *dev)
 #define P_MII_MAC_MODE			BIT(2)
 #define P_MII_SEL_M			0x3
 
-<<<<<<< HEAD
 /* Interrupt */
 #define REG_SW_PORT_INT_STATUS__1	0x001B
 #define REG_SW_PORT_INT_MASK__1		0x001F
@@ -742,8 +585,6 @@ static inline int is_lan937x(struct ksz_device *dev)
 
 #define PORT_SRC_PHY_INT		1
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Regmap tables generation */
 #define KSZ_SPI_OP_RD		3
 #define KSZ_SPI_OP_WR		2

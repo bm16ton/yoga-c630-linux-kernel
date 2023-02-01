@@ -111,11 +111,7 @@ static void accel_rule_handle_work(struct work_struct *work)
 	if (unlikely(test_bit(MLX5E_PRIV_RX_FLAG_DELETING, priv_rx->flags)))
 		goto out;
 
-<<<<<<< HEAD
 	rule = mlx5e_accel_fs_add_sk(accel_rule->priv->fs, priv_rx->sk,
-=======
-	rule = mlx5e_accel_fs_add_sk(accel_rule->priv, priv_rx->sk,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				     mlx5e_tir_get_tirn(&priv_rx->tir),
 				     MLX5_FS_DEFAULT_FLOW_TAG);
 	if (!IS_ERR_OR_NULL(rule))
@@ -366,10 +362,6 @@ static void resync_init(struct mlx5e_ktls_rx_resync_ctx *resync,
 static void resync_handle_seq_match(struct mlx5e_ktls_offload_context_rx *priv_rx,
 				    struct mlx5e_channel *c)
 {
-<<<<<<< HEAD
-=======
-	struct tls12_crypto_info_aes_gcm_128 *info = &priv_rx->crypto_info;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mlx5e_ktls_resync_resp *ktls_resync;
 	struct mlx5e_icosq *sq;
 	bool trigger_poll;
@@ -377,7 +369,6 @@ static void resync_handle_seq_match(struct mlx5e_ktls_offload_context_rx *priv_r
 	sq = &c->async_icosq;
 	ktls_resync = sq->ktls_resync;
 	trigger_poll = false;
-<<<<<<< HEAD
 
 	spin_lock_bh(&ktls_resync->lock);
 	spin_lock_bh(&priv_rx->lock);
@@ -413,19 +404,6 @@ static void resync_handle_seq_match(struct mlx5e_ktls_offload_context_rx *priv_r
 	spin_unlock_bh(&priv_rx->lock);
 	spin_unlock_bh(&ktls_resync->lock);
 
-=======
-
-	spin_lock_bh(&ktls_resync->lock);
-	spin_lock_bh(&priv_rx->lock);
-	memcpy(info->rec_seq, &priv_rx->resync.sw_rcd_sn_be, sizeof(info->rec_seq));
-	if (list_empty(&priv_rx->list)) {
-		list_add_tail(&priv_rx->list, &ktls_resync->list);
-		trigger_poll = !test_and_set_bit(MLX5E_SQ_STATE_PENDING_TLS_RX_RESYNC, &sq->state);
-	}
-	spin_unlock_bh(&priv_rx->lock);
-	spin_unlock_bh(&ktls_resync->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!trigger_poll)
 		return;
 
@@ -649,7 +627,6 @@ int mlx5e_ktls_add_rx(struct net_device *netdev, struct sock *sk,
 
 	INIT_LIST_HEAD(&priv_rx->list);
 	spin_lock_init(&priv_rx->lock);
-<<<<<<< HEAD
 	switch (crypto_info->cipher_type) {
 	case TLS_CIPHER_AES_GCM_128:
 		priv_rx->crypto_info.crypto_info_128 =
@@ -664,10 +641,6 @@ int mlx5e_ktls_add_rx(struct net_device *netdev, struct sock *sk,
 			  crypto_info->cipher_type);
 		return -EOPNOTSUPP;
 	}
-=======
-	priv_rx->crypto_info  =
-		*(struct tls12_crypto_info_aes_gcm_128 *)crypto_info;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rxq = mlx5e_ktls_sk_get_rxq(sk);
 	priv_rx->rxq = rxq;

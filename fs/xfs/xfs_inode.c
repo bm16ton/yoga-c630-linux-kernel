@@ -3157,11 +3157,7 @@ xfs_iflush(
 	if (XFS_TEST_ERROR(ip->i_forkoff > mp->m_sb.sb_inodesize,
 				mp, XFS_ERRTAG_IFLUSH_6)) {
 		xfs_alert_tag(mp, XFS_PTAG_IFLUSH,
-<<<<<<< HEAD
 			"%s: bad inode %llu, forkoff 0x%x, ptr "PTR_FMT,
-=======
-			"%s: bad inode %Lu, forkoff 0x%x, ptr "PTR_FMT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__func__, ip->i_ino, ip->i_forkoff, ip);
 		goto flush_out;
 	}

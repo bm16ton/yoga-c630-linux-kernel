@@ -33,14 +33,10 @@ struct ltc2497_driverdata {
 	 * DMA (thus cache coherency maintenance) may require the
 	 * transfer buffers to live in their own cache lines.
 	 */
-<<<<<<< HEAD
 	union {
 		__be32 d32;
 		u8 d8[3];
 	} data __aligned(IIO_DMA_MINALIGN);
-=======
-	__be32 buf __aligned(IIO_DMA_MINALIGN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int ltc2497_result_and_measure(struct ltc2497core_driverdata *ddata,
@@ -62,7 +58,6 @@ static int ltc2497_result_and_measure(struct ltc2497core_driverdata *ddata,
 			return ret;
 		}
 
-<<<<<<< HEAD
 		/*
 		 * The data format is 16/24 bit 2s complement, but with an upper sign bit on the
 		 * resolution + 1 position, which is set for positive values only. Given this
@@ -76,9 +71,6 @@ static int ltc2497_result_and_measure(struct ltc2497core_driverdata *ddata,
 			*val = (be32_to_cpu(st->data.d32) >> st->sub_lsb)
 				- BIT(ddata->chip_info->resolution + 1);
 		}
-=======
-		*val = (be32_to_cpu(st->buf) >> 14) - (1 << 17);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * The part started a new conversion at the end of the above i2c

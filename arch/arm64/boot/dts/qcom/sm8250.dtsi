@@ -2180,19 +2180,11 @@
 			status = "disabled";
 
 			ufs_mem_phy_lanes: phy@1d87400 {
-<<<<<<< HEAD
 				reg = <0 0x01d87400 0 0x16c>,
 				      <0 0x01d87600 0 0x200>,
 				      <0 0x01d87c00 0 0x200>,
 				      <0 0x01d87800 0 0x16c>,
 				      <0 0x01d87a00 0 0x200>;
-=======
-				reg = <0 0x01d87400 0 0x108>,
-				      <0 0x01d87600 0 0x1e0>,
-				      <0 0x01d87c00 0 0x1dc>,
-				      <0 0x01d87800 0 0x108>,
-				      <0 0x01d87a00 0 0x1e0>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				#phy-cells = <0>;
 			};
 		};
@@ -2267,7 +2259,6 @@
 			clocks = <&aoncc LPASS_CDC_VA_MCLK>,
 				<&q6afecc LPASS_HW_MACRO_VOTE LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
 				<&q6afecc LPASS_HW_DCODEC_VOTE LPASS_CLK_ATTRIBUTE_COUPLE_NO>;
-<<<<<<< HEAD
 
 			clock-names = "mclk", "macro", "dcodec";
 
@@ -2275,107 +2266,6 @@
 			clock-frequency = <9600000>;
 			clock-output-names = "fsgen";
 			#sound-dai-cells = <1>;
-		};
-
-		rxmacro: rxmacro@3200000 {
-			pinctrl-names = "default";
-			pinctrl-0 = <&rx_swr_active>;
-			compatible = "qcom,sm8250-lpass-rx-macro";
-			reg = <0 0x3200000 0 0x1000>;
-			status = "disabled";
-
-			clocks = <&q6afecc LPASS_CLK_ID_TX_CORE_MCLK LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				<&q6afecc LPASS_CLK_ID_TX_CORE_NPL_MCLK  LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				<&q6afecc LPASS_HW_MACRO_VOTE LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				<&q6afecc LPASS_HW_DCODEC_VOTE LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				<&vamacro>;
-
-			clock-names = "mclk", "npl", "macro", "dcodec", "fsgen";
-
-			#clock-cells = <0>;
-			clock-frequency = <9600000>;
-			clock-output-names = "mclk";
-			#sound-dai-cells = <1>;
-		};
-
-		swr1: soundwire-controller@3210000 {
-			reg = <0 0x3210000 0 0x2000>;
-			compatible = "qcom,soundwire-v1.5.1";
-			status = "disabled";
-			interrupts = <GIC_SPI 298 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&rxmacro>;
-			clock-names = "iface";
-			label = "RX";
-			qcom,din-ports = <0>;
-			qcom,dout-ports = <5>;
-
-			qcom,ports-sinterval-low =	/bits/ 8 <0x03 0x1F 0x1F 0x07 0x00>;
-			qcom,ports-offset1 =		/bits/ 8 <0x00 0x00 0x0B 0x01 0x00>;
-			qcom,ports-offset2 =		/bits/ 8 <0x00 0x00 0x0B 0x00 0x00>;
-			qcom,ports-hstart =		/bits/ 8 <0xFF 0x03 0xFF 0xFF 0xFF>;
-			qcom,ports-hstop =		/bits/ 8 <0xFF 0x06 0xFF 0xFF 0xFF>;
-			qcom,ports-word-length =	/bits/ 8 <0x01 0x07 0x04 0xFF 0xFF>;
-			qcom,ports-block-pack-mode =	/bits/ 8 <0xFF 0x00 0x01 0xFF 0xFF>;
-			qcom,ports-lane-control =	/bits/ 8 <0x01 0x00 0x00 0x00 0x00>;
-			qcom,ports-block-group-count =	/bits/ 8 <0xFF 0xFF 0xFF 0xFF 0x00>;
-
-			#sound-dai-cells = <1>;
-			#address-cells = <2>;
-			#size-cells = <0>;
-		};
-
-		txmacro: txmacro@3220000 {
-			pinctrl-names = "default";
-			pinctrl-0 = <&tx_swr_active>;
-			compatible = "qcom,sm8250-lpass-tx-macro";
-			reg = <0 0x3220000 0 0x1000>;
-			status = "disabled";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-			clocks = <&q6afecc LPASS_CLK_ID_TX_CORE_MCLK LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				 <&q6afecc LPASS_CLK_ID_TX_CORE_NPL_MCLK  LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				 <&q6afecc LPASS_HW_MACRO_VOTE LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				 <&q6afecc LPASS_HW_DCODEC_VOTE LPASS_CLK_ATTRIBUTE_COUPLE_NO>,
-				 <&vamacro>;
-
-			clock-names = "mclk", "npl", "macro", "dcodec", "fsgen";
-
-			#clock-cells = <0>;
-			clock-frequency = <9600000>;
-			clock-output-names = "mclk";
-			#address-cells = <2>;
-			#size-cells = <2>;
-			#sound-dai-cells = <1>;
-		};
-
-		/* tx macro */
-		swr2: soundwire-controller@3230000 {
-			reg = <0 0x3230000 0 0x2000>;
-			compatible = "qcom,soundwire-v1.5.1";
-			interrupts-extended = <&intc GIC_SPI 297 IRQ_TYPE_LEVEL_HIGH>;
-			interrupt-names = "core";
-			status = "disabled";
-
-			clocks = <&txmacro>;
-			clock-names = "iface";
-			label = "TX";
-
-			qcom,din-ports = <5>;
-			qcom,dout-ports = <0>;
-			qcom,ports-sinterval-low =	/bits/ 8 <0xFF 0x01 0x01 0x03 0x03>;
-			qcom,ports-offset1 =		/bits/ 8 <0xFF 0x01 0x00 0x02 0x00>;
-			qcom,ports-offset2 =		/bits/ 8 <0xFF 0x00 0x00 0x00 0x00>;
-			qcom,ports-block-pack-mode =	/bits/ 8 <0xFF 0xFF 0xFF 0xFF 0xFF>;
-			qcom,ports-hstart =		/bits/ 8 <0xFF 0xFF 0xFF 0xFF 0xFF>;
-			qcom,ports-hstop =		/bits/ 8 <0xFF 0xFF 0xFF 0xFF 0xFF>;
-			qcom,ports-word-length =	/bits/ 8 <0xFF 0xFF 0xFF 0xFF 0xFF>;
-			qcom,ports-block-group-count =	/bits/ 8 <0xFF 0xFF 0xFF 0xFF 0xFF>;
-			qcom,ports-lane-control =	/bits/ 8 <0xFF 0x00 0x01 0x00 0x01>;
-			qcom,port-offset = <1>;
-			#sound-dai-cells = <1>;
-			#address-cells = <2>;
-			#size-cells = <0>;
 		};
 
 		rxmacro: rxmacro@3200000 {
@@ -2567,68 +2457,6 @@
 					drive-strength = <2>;
 					bias-pull-down;
 					input-enable;
-				};
-			};
-
-			rx_swr_active: rx_swr-active-pins {
-				clk {
-					pins = "gpio3";
-					function = "swr_rx_clk";
-					drive-strength = <2>;
-					slew-rate = <1>;
-					bias-disable;
-				};
-
-				data {
-					pins = "gpio4", "gpio5";
-					function = "swr_rx_data";
-					drive-strength = <2>;
-					slew-rate = <1>;
-					bias-bus-hold;
-				};
-			};
-
-			tx_swr_active: tx_swr-active-pins {
-				clk {
-					pins = "gpio0";
-					function = "swr_tx_clk";
-					drive-strength = <2>;
-					slew-rate = <1>;
-					bias-disable;
-				};
-
-				data {
-					pins = "gpio1", "gpio2";
-					function = "swr_tx_data";
-					drive-strength = <2>;
-					slew-rate = <1>;
-					bias-bus-hold;
-				};
-			};
-
-			tx_swr_sleep: tx_swr-sleep-pins {
-				clk {
-					pins = "gpio0";
-					function = "swr_tx_clk";
-					drive-strength = <2>;
-					input-enable;
-					bias-pull-down;
-				};
-
-				data1 {
-					pins = "gpio1";
-					function = "swr_tx_data";
-					drive-strength = <2>;
-					input-enable;
-					bias-bus-hold;
-				};
-
-				data2 {
-					pins = "gpio2";
-					function = "swr_tx_data";
-					drive-strength = <2>;
-					input-enable;
-					bias-pull-down;
 				};
 			};
 
@@ -3064,23 +2892,11 @@
 			dp_phy: dp-phy@88ea200 {
 				reg = <0 0x088ea200 0 0x200>,
 				      <0 0x088ea400 0 0x200>,
-<<<<<<< HEAD
 				      <0 0x088eaa00 0 0x200>,
 				      <0 0x088ea600 0 0x200>,
 				      <0 0x088ea800 0 0x200>;
 				#phy-cells = <0>;
 				#clock-cells = <1>;
-=======
-				      <0 0x088eac00 0 0x400>,
-				      <0 0x088ea600 0 0x200>,
-				      <0 0x088ea800 0 0x200>,
-				      <0 0x088eaa00 0 0x100>;
-				#phy-cells = <0>;
-				#clock-cells = <1>;
-				clocks = <&gcc GCC_USB3_PRIM_PHY_PIPE_CLK>;
-				clock-names = "pipe0";
-				clock-output-names = "usb3_phy_pipe_clk_src";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			};
 		};
 
@@ -3871,28 +3687,6 @@
 				clock-names = "iface", "ref";
 
 				status = "disabled";
-<<<<<<< HEAD
-=======
-
-				dsi_opp_table: opp-table {
-					compatible = "operating-points-v2";
-
-					opp-187500000 {
-						opp-hz = /bits/ 64 <187500000>;
-						required-opps = <&rpmhpd_opp_low_svs>;
-					};
-
-					opp-300000000 {
-						opp-hz = /bits/ 64 <300000000>;
-						required-opps = <&rpmhpd_opp_svs>;
-					};
-
-					opp-358000000 {
-						opp-hz = /bits/ 64 <358000000>;
-						required-opps = <&rpmhpd_opp_svs_l1>;
-					};
-				};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			};
 		};
 

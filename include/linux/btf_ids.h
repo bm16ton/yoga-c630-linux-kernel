@@ -204,11 +204,7 @@ extern struct btf_id_set8 name;
 
 #else
 
-<<<<<<< HEAD
 #define BTF_ID_LIST(name) static u32 __maybe_unused name[16];
-=======
-#define BTF_ID_LIST(name) static u32 __maybe_unused name[5];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define BTF_ID(prefix, name)
 #define BTF_ID_FLAGS(prefix, name, ...)
 #define BTF_ID_UNUSED

@@ -100,13 +100,7 @@ xchk_allocbt_rec(
 	bno = be32_to_cpu(rec->alloc.ar_startblock);
 	len = be32_to_cpu(rec->alloc.ar_blockcount);
 
-<<<<<<< HEAD
 	if (!xfs_verify_agbext(pag, bno, len))
-=======
-	if (bno + len <= bno ||
-	    !xfs_verify_agbno(pag, bno) ||
-	    !xfs_verify_agbno(pag, bno + len - 1))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		xchk_btree_set_corrupt(bs->sc, bs->cur, 0);
 
 	xchk_allocbt_xref(bs->sc, bno, len);

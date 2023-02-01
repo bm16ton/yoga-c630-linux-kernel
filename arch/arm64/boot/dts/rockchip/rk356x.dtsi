@@ -592,7 +592,6 @@
 		status = "disabled";
 	};
 
-<<<<<<< HEAD
 	vpu: video-codec@fdea0400 {
 		compatible = "rockchip,rk3568-vpu";
 		reg = <0x0 0xfdea0000 0x0 0x800>;
@@ -633,8 +632,6 @@
 		#iommu-cells = <0>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sdmmc2: mmc@fe000000 {
 		compatible = "rockchip,rk3568-dw-mshc", "rockchip,rk3288-dw-mshc";
 		reg = <0x0 0xfe000000 0x0 0x4000>;
@@ -742,7 +739,6 @@
 		status = "disabled";
 	};
 
-<<<<<<< HEAD
 	dsi0: dsi@fe060000 {
 		compatible = "rockchip,rk3568-mipi-dsi", "snps,dw-mipi-dsi";
 		reg = <0x00 0xfe060000 0x00 0x10000>;
@@ -799,8 +795,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hdmi: hdmi@fe0a0000 {
 		compatible = "rockchip,rk3568-dw-hdmi";
 		reg = <0x0 0xfe0a0000 0x0 0x20000>;
@@ -1696,7 +1690,6 @@
 		status = "disabled";
 	};
 
-<<<<<<< HEAD
 	csi_dphy: phy@fe870000 {
 		compatible = "rockchip,rk3568-csi-dphy";
 		reg = <0x0 0xfe870000 0x0 0x10000>;
@@ -1733,8 +1726,6 @@
 		status = "disabled";
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	usb2phy0: usb2phy@fe8a0000 {
 		compatible = "rockchip,rk3568-usb2phy";
 		reg = <0x0 0xfe8a0000 0x0 0x10000>;

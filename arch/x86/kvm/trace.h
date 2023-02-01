@@ -1372,7 +1372,6 @@ TRACE_EVENT(kvm_hv_stimer_cleanup,
 TRACE_EVENT(kvm_apicv_inhibit_changed,
 	    TP_PROTO(int reason, bool set, unsigned long inhibits),
 	    TP_ARGS(reason, set, inhibits),
-<<<<<<< HEAD
 
 	TP_STRUCT__entry(
 		__field(int, reason)
@@ -1409,44 +1408,6 @@ TRACE_EVENT(kvm_apicv_accept_irq,
 		__entry->vec		= vec;
 	),
 
-=======
-
-	TP_STRUCT__entry(
-		__field(int, reason)
-		__field(bool, set)
-		__field(unsigned long, inhibits)
-	),
-
-	TP_fast_assign(
-		__entry->reason = reason;
-		__entry->set = set;
-		__entry->inhibits = inhibits;
-	),
-
-	TP_printk("%s reason=%u, inhibits=0x%lx",
-		  __entry->set ? "set" : "cleared",
-		  __entry->reason, __entry->inhibits)
-);
-
-TRACE_EVENT(kvm_apicv_accept_irq,
-	    TP_PROTO(__u32 apicid, __u16 dm, __u16 tm, __u8 vec),
-	    TP_ARGS(apicid, dm, tm, vec),
-
-	TP_STRUCT__entry(
-		__field(	__u32,		apicid		)
-		__field(	__u16,		dm		)
-		__field(	__u16,		tm		)
-		__field(	__u8,		vec		)
-	),
-
-	TP_fast_assign(
-		__entry->apicid		= apicid;
-		__entry->dm		= dm;
-		__entry->tm		= tm;
-		__entry->vec		= vec;
-	),
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	TP_printk("apicid %x vec %u (%s|%s)",
 		  __entry->apicid, __entry->vec,
 		  __print_symbolic((__entry->dm >> 8 & 0x7), kvm_deliver_mode),

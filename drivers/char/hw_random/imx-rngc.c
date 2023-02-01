@@ -303,18 +303,6 @@ static int imx_rngc_probe(struct platform_device *pdev)
 		rng_type == RNGC_TYPE_RNGB ? 'B' : 'C',
 		(ver_id >> RNGC_VER_MAJ_SHIFT) & 0xff, ver_id & 0xff);
 	return 0;
-<<<<<<< HEAD
-=======
-}
-
-static int __exit imx_rngc_remove(struct platform_device *pdev)
-{
-	struct imx_rngc *rngc = platform_get_drvdata(pdev);
-
-	hwrng_unregister(&rngc->rng);
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused imx_rngc_suspend(struct device *dev)

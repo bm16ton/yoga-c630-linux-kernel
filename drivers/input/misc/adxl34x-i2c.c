@@ -104,11 +104,6 @@ static void adxl34x_i2c_remove(struct i2c_client *client)
 	struct adxl34x *ac = i2c_get_clientdata(client);
 
 	adxl34x_remove(ac);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused adxl34x_i2c_suspend(struct device *dev)

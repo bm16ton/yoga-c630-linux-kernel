@@ -1585,11 +1585,7 @@ smsc9420_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	dev->netdev_ops = &smsc9420_netdev_ops;
 	dev->ethtool_ops = &smsc9420_ethtool_ops;
 
-<<<<<<< HEAD
 	netif_napi_add(dev, &pd->napi, smsc9420_rx_poll);
-=======
-	netif_napi_add(dev, &pd->napi, smsc9420_rx_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	result = register_netdev(dev);
 	if (result) {

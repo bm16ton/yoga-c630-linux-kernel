@@ -1001,43 +1001,12 @@ static void btf_dump_emit_enum32_val(struct btf_dump *d,
 	const struct btf_enum *v = btf_enum(t);
 	bool is_signed = btf_kflag(t);
 	const char *fmt_str;
-<<<<<<< HEAD
 	const char *name;
 	size_t dup_cnt;
 	int i;
 
 	for (i = 0; i < vlen; i++, v++) {
 		name = btf_name_of(d, v->name_off);
-		/* enumerators share namespace with typedef idents */
-		dup_cnt = btf_dump_name_dups(d, d->ident_names, name);
-		if (dup_cnt > 1) {
-			fmt_str = is_signed ? "\n%s%s___%zd = %d," : "\n%s%s___%zd = %u,";
-			btf_dump_printf(d, fmt_str, pfx(lvl + 1), name, dup_cnt, v->val);
-		} else {
-			fmt_str = is_signed ? "\n%s%s = %d," : "\n%s%s = %u,";
-			btf_dump_printf(d, fmt_str, pfx(lvl + 1), name, v->val);
-		}
-	}
-}
-
-static void btf_dump_emit_enum64_val(struct btf_dump *d,
-				     const struct btf_type *t,
-				     int lvl, __u16 vlen)
-{
-	const struct btf_enum64 *v = btf_enum64(t);
-	bool is_signed = btf_kflag(t);
-	const char *fmt_str;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	const char *name;
-	size_t dup_cnt;
-	__u64 val;
-	int i;
-
-	for (i = 0; i < vlen; i++, v++) {
-		name = btf_name_of(d, v->name_off);
-<<<<<<< HEAD
-=======
 		/* enumerators share namespace with typedef idents */
 		dup_cnt = btf_dump_name_dups(d, d->ident_names, name);
 		if (dup_cnt > 1) {
@@ -1064,7 +1033,6 @@ static void btf_dump_emit_enum64_val(struct btf_dump *d,
 
 	for (i = 0; i < vlen; i++, v++) {
 		name = btf_name_of(d, v->name_off);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dup_cnt = btf_dump_name_dups(d, d->ident_names, name);
 		val = btf_enum64_value(v);
 		if (dup_cnt > 1) {

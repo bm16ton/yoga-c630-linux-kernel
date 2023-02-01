@@ -1018,7 +1018,6 @@ static int iscsi_target_handle_csg_one(struct iscsit_conn *conn, struct iscsi_lo
 	return 0;
 }
 
-<<<<<<< HEAD
 /*
  * RETURN VALUE:
  *
@@ -1026,8 +1025,6 @@ static int iscsi_target_handle_csg_one(struct iscsit_conn *conn, struct iscsi_lo
  * -1 = Login failed
  *  0 = More PDU exchanges required
  */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int iscsi_target_do_login(struct iscsit_conn *conn, struct iscsi_login *login)
 {
 	int pdu_count = 0;

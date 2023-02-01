@@ -85,11 +85,7 @@ static void test_max_pkt_size(int fd)
 }
 
 #define NUM_PKTS 10000
-<<<<<<< HEAD
 void serial_test_xdp_do_redirect(void)
-=======
-void test_xdp_do_redirect(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err, xdp_prog_fd, tc_prog_fd, ifindex_src, ifindex_dst;
 	char data[sizeof(pkt_udp) + sizeof(__u32)];

@@ -285,7 +285,6 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
 	 * Restore the guest's debug registers if we were using them.
 	 */
 	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
-<<<<<<< HEAD
 		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
 			if (!(*vcpu_cpsr(vcpu) & DBG_SPSR_SS))
 				/*
@@ -295,8 +294,6 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
 				vcpu_set_flag(vcpu, DBG_SS_ACTIVE_PENDING);
 		}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		restore_guest_debug_regs(vcpu);
 
 		/*
@@ -330,20 +327,12 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
 	 * If SPE is present on this CPU and is available at current EL,
 	 * we may need to check if the host state needs to be saved.
 	 */
-<<<<<<< HEAD
 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
-=======
-	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_PMSVER_SHIFT) &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(SYS_PMBIDR_EL1_P_SHIFT)))
 		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
 
 	/* Check if we have TRBE implemented and available at the host */
-<<<<<<< HEAD
 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
-=======
-	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_TRBE_SHIFT) &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_PROG))
 		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
 }

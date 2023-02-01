@@ -133,13 +133,8 @@ static void bcm2835_i2s_start_clock(struct bcm2835_i2s_dev *dev)
 		return;
 
 	switch (provider) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
 	case SND_SOC_DAIFMT_BP_FC:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
-	case SND_SOC_DAIFMT_CBC_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		clk_prepare_enable(dev->clk);
 		dev->clk_prepared = true;
 		break;
@@ -390,21 +385,12 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 
 	/* Check if CPU is bit clock provider */
 	switch (dev->fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
 	case SND_SOC_DAIFMT_BP_FC:
 		bit_clock_provider = true;
 		break;
 	case SND_SOC_DAIFMT_BC_FP:
 	case SND_SOC_DAIFMT_BC_FC:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
-	case SND_SOC_DAIFMT_CBC_CFP:
-		bit_clock_provider = true;
-		break;
-	case SND_SOC_DAIFMT_CBP_CFC:
-	case SND_SOC_DAIFMT_CBP_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bit_clock_provider = false;
 		break;
 	default:
@@ -413,21 +399,12 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 
 	/* Check if CPU is frame sync provider */
 	switch (dev->fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
 	case SND_SOC_DAIFMT_BC_FP:
 		frame_sync_provider = true;
 		break;
 	case SND_SOC_DAIFMT_BP_FC:
 	case SND_SOC_DAIFMT_BC_FC:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
-	case SND_SOC_DAIFMT_CBP_CFC:
-		frame_sync_provider = true;
-		break;
-	case SND_SOC_DAIFMT_CBC_CFP:
-	case SND_SOC_DAIFMT_CBP_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		frame_sync_provider = false;
 		break;
 	default:

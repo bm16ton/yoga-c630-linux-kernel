@@ -38,12 +38,6 @@ void posix_acl_fix_xattr_to_user(void *value, size_t size);
 void posix_acl_getxattr_idmapped_mnt(struct user_namespace *mnt_userns,
 				     const struct inode *inode,
 				     void *value, size_t size);
-<<<<<<< HEAD
-=======
-void posix_acl_setxattr_idmapped_mnt(struct user_namespace *mnt_userns,
-				     const struct inode *inode,
-				     void *value, size_t size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline void posix_acl_fix_xattr_from_user(void *value, size_t size)
 {
@@ -55,15 +49,6 @@ static inline void
 posix_acl_getxattr_idmapped_mnt(struct user_namespace *mnt_userns,
 				const struct inode *inode, void *value,
 				size_t size)
-<<<<<<< HEAD
-=======
-{
-}
-static inline void
-posix_acl_setxattr_idmapped_mnt(struct user_namespace *mnt_userns,
-				const struct inode *inode, void *value,
-				size_t size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 }
 #endif

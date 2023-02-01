@@ -53,12 +53,6 @@ extern bool smb2_is_valid_oplock_break(char *buffer,
 				       struct TCP_Server_Info *srv);
 extern int smb3_handle_read_data(struct TCP_Server_Info *server,
 				 struct mid_q_entry *mid);
-<<<<<<< HEAD
-=======
-
-extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst,
-				   struct smb2_file_all_info *src);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
 				struct cifs_sb_info *cifs_sb, const char *path,
 				__u32 *reparse_tag);

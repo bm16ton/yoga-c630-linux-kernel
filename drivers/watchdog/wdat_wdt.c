@@ -342,14 +342,8 @@ static int wdat_wdt_probe(struct platform_device *pdev)
 		return -EINVAL;
 
 	wdat->period = tbl->timer_period;
-<<<<<<< HEAD
 	wdat->wdd.min_timeout = DIV_ROUND_UP(wdat->period * tbl->min_count, 1000);
 	wdat->wdd.max_timeout = wdat->period * tbl->max_count / 1000;
-=======
-	wdat->wdd.min_hw_heartbeat_ms = wdat->period * tbl->min_count;
-	wdat->wdd.max_hw_heartbeat_ms = wdat->period * tbl->max_count;
-	wdat->wdd.min_timeout = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wdat->stopped_in_sleep = tbl->flags & ACPI_WDAT_STOPPED;
 	wdat->wdd.info = &wdat_wdt_info;
 	wdat->wdd.ops = &wdat_wdt_ops;

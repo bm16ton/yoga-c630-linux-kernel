@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
 
 snd-sof-objs := core.o ops.o loader.o ipc.o pcm.o pm.o debug.o topology.o\
-<<<<<<< HEAD
 		control.o trace.o iomem-utils.o sof-audio.o stream-ipc.o
 
 # IPC implementations
@@ -15,10 +14,6 @@ snd-sof-objs += ipc4.o ipc4-loader.o ipc4-topology.o ipc4-control.o ipc4-pcm.o\
 endif
 
 # SOF client support
-=======
-		control.o trace.o iomem-utils.o sof-audio.o stream-ipc.o\
-		ipc3-topology.o ipc3.o ipc3-control.o ipc3-pcm.o
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ifneq ($(CONFIG_SND_SOC_SOF_CLIENT),)
 snd-sof-objs += sof-client.o
 endif

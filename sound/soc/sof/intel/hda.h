@@ -515,15 +515,12 @@ struct sof_intel_hda_dev {
 
 	/* FW clock config, 0:HPRO, 1:LPRO */
 	bool clk_config_lpro;
-<<<<<<< HEAD
 
 	wait_queue_head_t waitq;
 	bool code_loading;
 
 	/* Intel NHLT information */
 	struct nhlt_acpi_table *nhlt;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct hdac_bus *sof_to_bus(struct snd_sof_dev *s)
@@ -565,18 +562,12 @@ struct sof_intel_hda_stream {
  */
 int hda_dsp_probe(struct snd_sof_dev *sdev);
 int hda_dsp_remove(struct snd_sof_dev *sdev);
-<<<<<<< HEAD
 int hda_dsp_core_power_up(struct snd_sof_dev *sdev, unsigned int core_mask);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int hda_dsp_core_run(struct snd_sof_dev *sdev, unsigned int core_mask);
 int hda_dsp_enable_core(struct snd_sof_dev *sdev, unsigned int core_mask);
 int hda_dsp_core_reset_power_down(struct snd_sof_dev *sdev,
 				  unsigned int core_mask);
-<<<<<<< HEAD
 int hda_power_down_dsp(struct snd_sof_dev *sdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int hda_dsp_core_get(struct snd_sof_dev *sdev, int core);
 void hda_dsp_ipc_int_enable(struct snd_sof_dev *sdev);
 void hda_dsp_ipc_int_disable(struct snd_sof_dev *sdev);
@@ -590,10 +581,7 @@ int hda_dsp_resume(struct snd_sof_dev *sdev);
 int hda_dsp_runtime_suspend(struct snd_sof_dev *sdev);
 int hda_dsp_runtime_resume(struct snd_sof_dev *sdev);
 int hda_dsp_runtime_idle(struct snd_sof_dev *sdev);
-<<<<<<< HEAD
 int hda_dsp_shutdown_dma_flush(struct snd_sof_dev *sdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int hda_dsp_shutdown(struct snd_sof_dev *sdev);
 int hda_dsp_set_hw_params_upon_resume(struct snd_sof_dev *sdev);
 void hda_dsp_dump(struct snd_sof_dev *sdev, u32 flags);
@@ -680,7 +668,6 @@ int hda_dsp_ipc_cmd_done(struct snd_sof_dev *sdev, int dir);
  */
 int hda_dsp_cl_boot_firmware(struct snd_sof_dev *sdev);
 int hda_dsp_cl_boot_firmware_iccmax(struct snd_sof_dev *sdev);
-<<<<<<< HEAD
 int hda_cl_copy_fw(struct snd_sof_dev *sdev, struct hdac_ext_stream *hext_stream);
 struct hdac_ext_stream *hda_cl_stream_prepare(struct snd_sof_dev *sdev, unsigned int format,
 					      unsigned int size, struct snd_dma_buffer *dmab,
@@ -689,8 +676,6 @@ int hda_cl_cleanup(struct snd_sof_dev *sdev, struct snd_dma_buffer *dmab,
 		   struct hdac_ext_stream *hext_stream);
 int cl_dsp_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot);
 #define HDA_CL_STREAM_FORMAT 0x40
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* pre and post fw run ops */
 int hda_dsp_pre_fw_run(struct snd_sof_dev *sdev);
@@ -747,11 +732,7 @@ static inline int hda_codec_i915_exit(struct snd_sof_dev *sdev) { return 0; }
 /*
  * Trace Control.
  */
-<<<<<<< HEAD
 int hda_dsp_trace_init(struct snd_sof_dev *sdev, struct snd_dma_buffer *dmab,
-=======
-int hda_dsp_trace_init(struct snd_sof_dev *sdev,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		       struct sof_ipc_dma_trace_params_ext *dtrace_params);
 int hda_dsp_trace_release(struct snd_sof_dev *sdev);
 int hda_dsp_trace_trigger(struct snd_sof_dev *sdev, int cmd);
@@ -795,7 +776,6 @@ int hda_dsp_dais_suspend(struct snd_sof_dev *sdev);
 /*
  * Platform Specific HW abstraction Ops.
  */
-<<<<<<< HEAD
 extern struct snd_sof_dsp_ops sof_hda_common_ops;
 
 extern struct snd_sof_dsp_ops sof_skl_ops;
@@ -810,12 +790,6 @@ extern struct snd_sof_dsp_ops sof_icl_ops;
 int sof_icl_ops_init(struct snd_sof_dev *sdev);
 extern struct snd_sof_dsp_ops sof_mtl_ops;
 int sof_mtl_ops_init(struct snd_sof_dev *sdev);
-=======
-extern const struct snd_sof_dsp_ops sof_apl_ops;
-extern const struct snd_sof_dsp_ops sof_cnl_ops;
-extern const struct snd_sof_dsp_ops sof_tgl_ops;
-extern const struct snd_sof_dsp_ops sof_icl_ops;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 extern const struct sof_intel_dsp_desc skl_chip_info;
 extern const struct sof_intel_dsp_desc apl_chip_info;
@@ -826,10 +800,7 @@ extern const struct sof_intel_dsp_desc tglh_chip_info;
 extern const struct sof_intel_dsp_desc ehl_chip_info;
 extern const struct sof_intel_dsp_desc jsl_chip_info;
 extern const struct sof_intel_dsp_desc adls_chip_info;
-<<<<<<< HEAD
 extern const struct sof_intel_dsp_desc mtl_chip_info;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Probes support */
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_HDA_PROBES)
@@ -870,7 +841,6 @@ int hda_ctrl_dai_widget_free(struct snd_soc_dapm_widget *w, unsigned int quirk_f
 #define SOF_HDA_POSITION_QUIRK_USE_DPIB_DDR_UPDATE	(2) /* recommended with VC0 or VC1 */
 
 extern int sof_hda_position_quirk;
-<<<<<<< HEAD
 
 void hda_set_dai_drv_ops(struct snd_sof_dev *sdev, struct snd_sof_dsp_ops *ops);
 void hda_ops_free(struct snd_sof_dev *sdev);
@@ -886,7 +856,5 @@ irqreturn_t hda_dsp_ipc4_irq_thread(int irq, void *context);
 int hda_dsp_ipc4_send_msg(struct snd_sof_dev *sdev, struct snd_sof_ipc_msg *msg);
 void hda_ipc4_dump(struct snd_sof_dev *sdev);
 extern struct sdw_intel_ops sdw_callback;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

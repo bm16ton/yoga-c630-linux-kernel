@@ -649,17 +649,8 @@ phys_pud_init(pud_t *pud_page, unsigned long paddr, unsigned long paddr_end,
 		if (page_size_mask & (1<<PG_LEVEL_1G)) {
 			pages++;
 			spin_lock(&init_mm.page_table_lock);
-<<<<<<< HEAD
 			set_pud_init(pud,
 				     pfn_pud(paddr >> PAGE_SHIFT, prot_sethuge(prot)),
-=======
-
-			prot = __pgprot(pgprot_val(prot) | _PAGE_PSE);
-
-			set_pte_init((pte_t *)pud,
-				     pfn_pte((paddr & PUD_MASK) >> PAGE_SHIFT,
-					     prot),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				     init);
 			spin_unlock(&init_mm.page_table_lock);
 			paddr_last = paddr_next;

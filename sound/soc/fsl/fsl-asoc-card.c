@@ -537,10 +537,7 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 	struct device *codec_dev = NULL;
 	const char *codec_dai_name;
 	const char *codec_dev_name;
-<<<<<<< HEAD
 	u32 asrc_fmt = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 width;
 	int ret;
 

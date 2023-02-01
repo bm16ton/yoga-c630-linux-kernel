@@ -368,7 +368,6 @@
 	 */
 };
 
-<<<<<<< HEAD
 &pcie_phy {
 	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
 	clocks = <&pcie0_refclk>;
@@ -391,8 +390,6 @@
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &snvs_pwrkey {
 	status = "okay";
 };
@@ -545,7 +542,6 @@
 		>;
 	};
 
-<<<<<<< HEAD
 	pinctrl_pcie0: pcie0grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C4_SCL__PCIE_CLKREQ_B	0x60 /* open drain, pull up */
@@ -559,8 +555,6 @@
 		>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pinctrl_pmic: pmicgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO03__GPIO1_IO03	0x000001c0

@@ -2990,7 +2990,6 @@ static int
 _base_config_dma_addressing(struct MPT3SAS_ADAPTER *ioc, struct pci_dev *pdev)
 {
 	struct sysinfo s;
-<<<<<<< HEAD
 	u64 coherent_dma_mask, dma_mask;
 
 	if (ioc->is_mcpu_endpoint || sizeof(dma_addr_t) == 4 ||
@@ -3011,21 +3010,6 @@ _base_config_dma_addressing(struct MPT3SAS_ADAPTER *ioc, struct pci_dev *pdev)
 
 	if (dma_set_mask(&pdev->dev, dma_mask) ||
 	    dma_set_coherent_mask(&pdev->dev, coherent_dma_mask))
-=======
-
-	if (ioc->is_mcpu_endpoint ||
-	    sizeof(dma_addr_t) == 4 || ioc->use_32bit_dma ||
-	    dma_get_required_mask(&pdev->dev) <= 32)
-		ioc->dma_mask = 32;
-	/* Set 63 bit DMA mask for all SAS3 and SAS35 controllers */
-	else if (ioc->hba_mpi_version_belonged > MPI2_VERSION)
-		ioc->dma_mask = 63;
-	else
-		ioc->dma_mask = 64;
-
-	if (dma_set_mask(&pdev->dev, DMA_BIT_MASK(ioc->dma_mask)) ||
-	    dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(ioc->dma_mask)))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENODEV;
 
 	if (ioc->dma_mask > 32) {
@@ -4336,7 +4320,7 @@ _base_put_smid_scsi_io_atomic(struct MPT3SAS_ADAPTER *ioc, u16 smid,
 	descriptor.MSIxIndex = _base_set_and_get_msix_index(ioc, smid);
 	descriptor.SMID = cpu_to_le16(smid);
 
-	writel(*request, &ioc->chip->AtomicRequestDescriptorPost);
+	writel(cpu_to_le32(*request), &ioc->chip->AtomicRequestDescriptorPost);
 }
 
 /**
@@ -4358,7 +4342,7 @@ _base_put_smid_fast_path_atomic(struct MPT3SAS_ADAPTER *ioc, u16 smid,
 	descriptor.MSIxIndex = _base_set_and_get_msix_index(ioc, smid);
 	descriptor.SMID = cpu_to_le16(smid);
 
-	writel(*request, &ioc->chip->AtomicRequestDescriptorPost);
+	writel(cpu_to_le32(*request), &ioc->chip->AtomicRequestDescriptorPost);
 }
 
 /**
@@ -4381,7 +4365,7 @@ _base_put_smid_hi_priority_atomic(struct MPT3SAS_ADAPTER *ioc, u16 smid,
 	descriptor.MSIxIndex = msix_task;
 	descriptor.SMID = cpu_to_le16(smid);
 
-	writel(*request, &ioc->chip->AtomicRequestDescriptorPost);
+	writel(cpu_to_le32(*request), &ioc->chip->AtomicRequestDescriptorPost);
 }
 
 /**
@@ -4402,7 +4386,7 @@ _base_put_smid_default_atomic(struct MPT3SAS_ADAPTER *ioc, u16 smid)
 	descriptor.MSIxIndex = _base_set_and_get_msix_index(ioc, smid);
 	descriptor.SMID = cpu_to_le16(smid);
 
-	writel(*request, &ioc->chip->AtomicRequestDescriptorPost);
+	writel(cpu_to_le32(*request), &ioc->chip->AtomicRequestDescriptorPost);
 }
 
 /**
@@ -5386,7 +5370,6 @@ _base_update_diag_trigger_pages(struct MPT3SAS_ADAPTER *ioc)
  *
  * Returns 0 for success, non-zero for failure.
  *
-<<<<<<< HEAD
  */
 static int _base_assign_fw_reported_qd(struct MPT3SAS_ADAPTER *ioc)
 {
@@ -5435,107 +5418,6 @@ static int _base_assign_fw_reported_qd(struct MPT3SAS_ADAPTER *ioc)
 		pr_err("%s: failure at %s:%d/%s()!\n",
 		    ioc->name, __FILE__, __LINE__, __func__);
 		goto out;
-=======
- */
-static int _base_assign_fw_reported_qd(struct MPT3SAS_ADAPTER *ioc)
-{
-	Mpi2ConfigReply_t mpi_reply;
-	Mpi2SasIOUnitPage1_t *sas_iounit_pg1 = NULL;
-	Mpi26PCIeIOUnitPage1_t pcie_iounit_pg1;
-	u16 depth;
-	int sz;
-	int rc = 0;
-
-	ioc->max_wideport_qd = MPT3SAS_SAS_QUEUE_DEPTH;
-	ioc->max_narrowport_qd = MPT3SAS_SAS_QUEUE_DEPTH;
-	ioc->max_sata_qd = MPT3SAS_SATA_QUEUE_DEPTH;
-	ioc->max_nvme_qd = MPT3SAS_NVME_QUEUE_DEPTH;
-	if (!ioc->is_gen35_ioc)
-		goto out;
-	/* sas iounit page 1 */
-	sz = offsetof(Mpi2SasIOUnitPage1_t, PhyData);
-	sas_iounit_pg1 = kzalloc(sizeof(Mpi2SasIOUnitPage1_t), GFP_KERNEL);
-	if (!sas_iounit_pg1) {
-		pr_err("%s: failure at %s:%d/%s()!\n",
-		    ioc->name, __FILE__, __LINE__, __func__);
-		return rc;
-	}
-	rc = mpt3sas_config_get_sas_iounit_pg1(ioc, &mpi_reply,
-	    sas_iounit_pg1, sz);
-	if (rc) {
-		pr_err("%s: failure at %s:%d/%s()!\n",
-		    ioc->name, __FILE__, __LINE__, __func__);
-		goto out;
-	}
-
-	depth = le16_to_cpu(sas_iounit_pg1->SASWideMaxQueueDepth);
-	ioc->max_wideport_qd = (depth ? depth : MPT3SAS_SAS_QUEUE_DEPTH);
-
-	depth = le16_to_cpu(sas_iounit_pg1->SASNarrowMaxQueueDepth);
-	ioc->max_narrowport_qd = (depth ? depth : MPT3SAS_SAS_QUEUE_DEPTH);
-
-	depth = sas_iounit_pg1->SATAMaxQDepth;
-	ioc->max_sata_qd = (depth ? depth : MPT3SAS_SATA_QUEUE_DEPTH);
-
-	/* pcie iounit page 1 */
-	rc = mpt3sas_config_get_pcie_iounit_pg1(ioc, &mpi_reply,
-	    &pcie_iounit_pg1, sizeof(Mpi26PCIeIOUnitPage1_t));
-	if (rc) {
-		pr_err("%s: failure at %s:%d/%s()!\n",
-		    ioc->name, __FILE__, __LINE__, __func__);
-		goto out;
-	}
-	ioc->max_nvme_qd = (le16_to_cpu(pcie_iounit_pg1.NVMeMaxQueueDepth)) ?
-	    (le16_to_cpu(pcie_iounit_pg1.NVMeMaxQueueDepth)) :
-	    MPT3SAS_NVME_QUEUE_DEPTH;
-out:
-	dinitprintk(ioc, pr_err(
-	    "MaxWidePortQD: 0x%x MaxNarrowPortQD: 0x%x MaxSataQD: 0x%x MaxNvmeQD: 0x%x\n",
-	    ioc->max_wideport_qd, ioc->max_narrowport_qd,
-	    ioc->max_sata_qd, ioc->max_nvme_qd));
-	kfree(sas_iounit_pg1);
-	return rc;
-}
-
-/**
- * _base_static_config_pages - static start of day config pages
- * @ioc: per adapter object
- */
-static int
-_base_static_config_pages(struct MPT3SAS_ADAPTER *ioc)
-{
-	Mpi2ConfigReply_t mpi_reply;
-	u32 iounit_pg1_flags;
-	int tg_flags = 0;
-	int rc;
-	ioc->nvme_abort_timeout = 30;
-
-	rc = mpt3sas_config_get_manufacturing_pg0(ioc, &mpi_reply,
-	    &ioc->manu_pg0);
-	if (rc)
-		return rc;
-	if (ioc->ir_firmware) {
-		rc = mpt3sas_config_get_manufacturing_pg10(ioc, &mpi_reply,
-		    &ioc->manu_pg10);
-		if (rc)
-			return rc;
-	}
-	/*
-	 * Ensure correct T10 PI operation if vendor left EEDPTagMode
-	 * flag unset in NVDATA.
-	 */
-	rc = mpt3sas_config_get_manufacturing_pg11(ioc, &mpi_reply,
-	    &ioc->manu_pg11);
-	if (rc)
-		return rc;
-	if (!ioc->is_gen35_ioc && ioc->manu_pg11.EEDPTagMode == 0) {
-		pr_err("%s: overriding NVDATA EEDPTagMode setting\n",
-		    ioc->name);
-		ioc->manu_pg11.EEDPTagMode &= ~0x3;
-		ioc->manu_pg11.EEDPTagMode |= 0x1;
-		mpt3sas_config_set_manufacturing_pg11(ioc, &mpi_reply,
-		    &ioc->manu_pg11);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	ioc->max_nvme_qd = (le16_to_cpu(pcie_iounit_pg1.NVMeMaxQueueDepth)) ?
 	    (le16_to_cpu(pcie_iounit_pg1.NVMeMaxQueueDepth)) :
@@ -5773,7 +5655,6 @@ _base_static_config_pages(struct MPT3SAS_ADAPTER *ioc)
 	rc = _base_assign_fw_reported_qd(ioc);
 	if (rc)
 		return rc;
-<<<<<<< HEAD
 
 	/*
 	 * ATTO doesn't use bios page 2 and 3 for bios settings.
@@ -5789,14 +5670,6 @@ _base_static_config_pages(struct MPT3SAS_ADAPTER *ioc)
 			return rc;
 	}
 
-=======
-	rc = mpt3sas_config_get_bios_pg2(ioc, &mpi_reply, &ioc->bios_pg2);
-	if (rc)
-		return rc;
-	rc = mpt3sas_config_get_bios_pg3(ioc, &mpi_reply, &ioc->bios_pg3);
-	if (rc)
-		return rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = mpt3sas_config_get_ioc_pg8(ioc, &mpi_reply, &ioc->ioc_pg8);
 	if (rc)
 		return rc;
@@ -7190,7 +7063,7 @@ _base_handshake_req_reply_wait(struct MPT3SAS_ADAPTER *ioc, int request_bytes,
 
 	/* send message 32-bits at a time */
 	for (i = 0, failed = 0; i < request_bytes/4 && !failed; i++) {
-		writel(request[i], &ioc->chip->Doorbell);
+		writel(cpu_to_le32(request[i]), &ioc->chip->Doorbell);
 		if ((_base_wait_for_doorbell_ack(ioc, 5)))
 			failed = 1;
 	}
@@ -7209,16 +7082,16 @@ _base_handshake_req_reply_wait(struct MPT3SAS_ADAPTER *ioc, int request_bytes,
 	}
 
 	/* read the first two 16-bits, it gives the total length of the reply */
-	reply[0] = ioc->base_readl(&ioc->chip->Doorbell)
-		& MPI2_DOORBELL_DATA_MASK;
+	reply[0] = le16_to_cpu(ioc->base_readl(&ioc->chip->Doorbell)
+	    & MPI2_DOORBELL_DATA_MASK);
 	writel(0, &ioc->chip->HostInterruptStatus);
 	if ((_base_wait_for_doorbell_int(ioc, 5))) {
 		ioc_err(ioc, "doorbell handshake int failed (line=%d)\n",
 			__LINE__);
 		return -EFAULT;
 	}
-	reply[1] = ioc->base_readl(&ioc->chip->Doorbell)
-		& MPI2_DOORBELL_DATA_MASK;
+	reply[1] = le16_to_cpu(ioc->base_readl(&ioc->chip->Doorbell)
+	    & MPI2_DOORBELL_DATA_MASK);
 	writel(0, &ioc->chip->HostInterruptStatus);
 
 	for (i = 2; i < default_reply->MsgLength * 2; i++)  {
@@ -7230,8 +7103,9 @@ _base_handshake_req_reply_wait(struct MPT3SAS_ADAPTER *ioc, int request_bytes,
 		if (i >=  reply_bytes/2) /* overflow case */
 			ioc->base_readl(&ioc->chip->Doorbell);
 		else
-			reply[i] = ioc->base_readl(&ioc->chip->Doorbell)
-				& MPI2_DOORBELL_DATA_MASK;
+			reply[i] = le16_to_cpu(
+			    ioc->base_readl(&ioc->chip->Doorbell)
+			    & MPI2_DOORBELL_DATA_MASK);
 		writel(0, &ioc->chip->HostInterruptStatus);
 	}
 

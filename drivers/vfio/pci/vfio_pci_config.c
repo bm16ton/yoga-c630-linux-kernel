@@ -26,11 +26,7 @@
 #include <linux/vfio.h>
 #include <linux/slab.h>
 
-<<<<<<< HEAD
 #include "vfio_pci_priv.h"
-=======
-#include <linux/vfio_pci_core.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Fake capability ID for standard config space */
 #define PCI_CAP_ID_BASIC	0

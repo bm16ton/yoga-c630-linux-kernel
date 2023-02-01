@@ -267,18 +267,6 @@ static void dw_pcie_free_msi(struct dw_pcie_rp *pp)
 
 	irq_domain_remove(pp->msi_domain);
 	irq_domain_remove(pp->irq_domain);
-<<<<<<< HEAD
-=======
-
-	if (pp->msi_data) {
-		struct dw_pcie *pci = to_dw_pcie_from_pp(pp);
-		struct device *dev = pci->dev;
-
-		dma_unmap_page(dev, pp->msi_data, PAGE_SIZE, DMA_FROM_DEVICE);
-		if (pp->msi_page)
-			__free_page(pp->msi_page);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void dw_pcie_msi_init(struct dw_pcie_rp *pp)
@@ -339,10 +327,7 @@ static int dw_pcie_msi_host_init(struct dw_pcie_rp *pp)
 	struct dw_pcie *pci = to_dw_pcie_from_pp(pp);
 	struct device *dev = pci->dev;
 	struct platform_device *pdev = to_platform_device(dev);
-<<<<<<< HEAD
 	u64 *msi_vaddr;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 	u32 ctrl, num_ctrls;
 
@@ -382,7 +367,6 @@ static int dw_pcie_msi_host_init(struct dw_pcie_rp *pp)
 						    dw_chained_msi_isr, pp);
 	}
 
-<<<<<<< HEAD
 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
 	if (ret)
 		dev_warn(dev, "Failed to set DMA mask to 32-bit. Devices with only 32-bit MSI support may not work properly\n");
@@ -393,24 +377,6 @@ static int dw_pcie_msi_host_init(struct dw_pcie_rp *pp)
 		dev_err(dev, "Failed to alloc and map MSI data\n");
 		dw_pcie_free_msi(pp);
 		return -ENOMEM;
-=======
-	ret = dma_set_mask(dev, DMA_BIT_MASK(32));
-	if (ret)
-		dev_warn(dev, "Failed to set DMA mask to 32-bit. Devices with only 32-bit MSI support may not work properly\n");
-
-	pp->msi_page = alloc_page(GFP_DMA32);
-	pp->msi_data = dma_map_page(dev, pp->msi_page, 0,
-				    PAGE_SIZE, DMA_FROM_DEVICE);
-	ret = dma_mapping_error(dev, pp->msi_data);
-	if (ret) {
-		dev_err(pci->dev, "Failed to map MSI data\n");
-		__free_page(pp->msi_page);
-		pp->msi_page = NULL;
-		pp->msi_data = 0;
-		dw_pcie_free_msi(pp);
-
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;

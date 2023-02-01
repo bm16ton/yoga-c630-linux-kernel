@@ -345,7 +345,6 @@ static pid_t get_tgid(char *buf)
 
 	return tgid;
 
-<<<<<<< HEAD
 }
 
 static __u64 get_ts_nsec(char *buf)
@@ -426,88 +425,6 @@ static int get_arg_type(const char *arg)
 	}
 }
 
-=======
-}
-
-static __u64 get_ts_nsec(char *buf)
-{
-	__u64 ts_nsec;
-	char ts_nsec_str[FIELD_BUFF] = {0};
-	char *endptr;
-
-	search_pattern(&ts_nsec_pattern, ts_nsec_str, buf);
-	errno = 0;
-	ts_nsec = strtoull(ts_nsec_str, &endptr, 10);
-	if (errno != 0 || endptr == ts_nsec_str || *endptr != '\0') {
-		if (debug_on)
-			fprintf(stderr, "wrong ts_nsec in follow buf:\n%s\n", buf);
-		return -1;
-	}
-
-	return ts_nsec;
-}
-
-static __u64 get_free_ts_nsec(char *buf)
-{
-	__u64 free_ts_nsec;
-	char free_ts_nsec_str[FIELD_BUFF] = {0};
-	char *endptr;
-
-	search_pattern(&free_ts_nsec_pattern, free_ts_nsec_str, buf);
-	errno = 0;
-	free_ts_nsec = strtoull(free_ts_nsec_str, &endptr, 10);
-	if (errno != 0 || endptr == free_ts_nsec_str || *endptr != '\0') {
-		if (debug_on)
-			fprintf(stderr, "wrong free_ts_nsec in follow buf:\n%s\n", buf);
-		return -1;
-	}
-
-	return free_ts_nsec;
-}
-
-static char *get_comm(char *buf)
-{
-	char *comm_str = malloc(TASK_COMM_LEN);
-
-	memset(comm_str, 0, TASK_COMM_LEN);
-
-	search_pattern(&comm_pattern, comm_str, buf);
-	errno = 0;
-	if (errno != 0) {
-		if (debug_on)
-			fprintf(stderr, "wrong comm in follow buf:\n%s\n", buf);
-		return NULL;
-	}
-
-	return comm_str;
-}
-
-static int get_arg_type(const char *arg)
-{
-	if (!strcmp(arg, "pid") || !strcmp(arg, "p"))
-		return ARG_PID;
-	else if (!strcmp(arg, "tgid") || !strcmp(arg, "tg"))
-		return ARG_TGID;
-	else if (!strcmp(arg, "name") || !strcmp(arg, "n"))
-		return  ARG_COMM;
-	else if (!strcmp(arg, "stacktrace") || !strcmp(arg, "st"))
-		return ARG_STACKTRACE;
-	else if (!strcmp(arg, "free") || !strcmp(arg, "f"))
-		return ARG_FREE;
-	else if (!strcmp(arg, "txt") || !strcmp(arg, "T"))
-		return ARG_TXT;
-	else if (!strcmp(arg, "free_ts") || !strcmp(arg, "ft"))
-		return ARG_FREE_TS;
-	else if (!strcmp(arg, "alloc_ts") || !strcmp(arg, "at"))
-		return ARG_ALLOC_TS;
-	else if (!strcmp(arg, "allocator") || !strcmp(arg, "ator"))
-		return ARG_ALLOCATOR;
-	else {
-		return ARG_UNKNOWN;
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int get_allocator(const char *buf, const char *migrate_info)
 {
 	char *tmp, *first_line, *second_line;
@@ -553,16 +470,12 @@ static bool match_str_list(const char *str, char **list, int list_size)
 
 static bool is_need(char *buf)
 {
-<<<<<<< HEAD
 	__u64 ts_nsec, free_ts_nsec;
 
 	ts_nsec = get_ts_nsec(buf);
 	free_ts_nsec = get_free_ts_nsec(buf);
 
 	if ((filter & FILTER_UNRELEASE) && free_ts_nsec != 0 && ts_nsec < free_ts_nsec)
-=======
-	if ((filter & FILTER_UNRELEASE) && get_free_ts_nsec(buf) != 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 	if ((filter & FILTER_PID) && !match_num_list(get_pid(buf), fc.pids, fc.pids_size))
 		return false;

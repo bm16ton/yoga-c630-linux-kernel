@@ -642,11 +642,8 @@ struct phy_device {
 	unsigned interrupts:1;
 	unsigned irq_suspended:1;
 	unsigned irq_rerun:1;
-<<<<<<< HEAD
 
 	int rate_matching;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	enum phy_state state;
 
@@ -1714,11 +1711,8 @@ int phy_disable_interrupts(struct phy_device *phydev);
 void phy_request_interrupt(struct phy_device *phydev);
 void phy_free_interrupt(struct phy_device *phydev);
 void phy_print_status(struct phy_device *phydev);
-<<<<<<< HEAD
 int phy_get_rate_matching(struct phy_device *phydev,
 			    phy_interface_t iface);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void phy_set_max_speed(struct phy_device *phydev, u32 max_speed);
 void phy_remove_link_mode(struct phy_device *phydev, u32 link_mode);
 void phy_advertise_supported(struct phy_device *phydev);

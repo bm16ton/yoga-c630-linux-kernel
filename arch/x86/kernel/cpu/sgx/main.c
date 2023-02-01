@@ -49,16 +49,11 @@ static LIST_HEAD(sgx_dirty_page_list);
  * Reset post-kexec EPC pages to the uninitialized state. The pages are removed
  * from the input list, and made available for the page allocator. SECS pages
  * prepending their children in the input list are left intact.
-<<<<<<< HEAD
  *
  * Return 0 when sanitization was successful or kthread was stopped, and the
  * number of unsanitized pages otherwise.
  */
 static unsigned long __sgx_sanitize_pages(struct list_head *dirty_page_list)
-=======
- */
-static void __sgx_sanitize_pages(struct list_head *dirty_page_list)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long left_dirty = 0;
 	struct sgx_epc_page *page;
@@ -72,11 +67,6 @@ static void __sgx_sanitize_pages(struct list_head *dirty_page_list)
 
 		page = list_first_entry(dirty_page_list, struct sgx_epc_page, list);
 
-<<<<<<< HEAD
-=======
-		page = list_first_entry(dirty_page_list, struct sgx_epc_page, list);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Checking page->poison without holding the node->lock
 		 * is racy, but losing the race (i.e. poison is set just
@@ -87,19 +77,11 @@ static void __sgx_sanitize_pages(struct list_head *dirty_page_list)
 		if (page->poison) {
 			struct sgx_epc_section *section = &sgx_epc_sections[page->section];
 			struct sgx_numa_node *node = section->node;
-<<<<<<< HEAD
 
 			spin_lock(&node->lock);
 			list_move(&page->list, &node->sgx_poison_page_list);
 			spin_unlock(&node->lock);
 
-=======
-
-			spin_lock(&node->lock);
-			list_move(&page->list, &node->sgx_poison_page_list);
-			spin_unlock(&node->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			continue;
 		}
 
@@ -114,20 +96,14 @@ static void __sgx_sanitize_pages(struct list_head *dirty_page_list)
 		} else {
 			/* The page is not yet clean - move to the dirty list. */
 			list_move_tail(&page->list, &dirty);
-<<<<<<< HEAD
 			left_dirty++;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		cond_resched();
 	}
 
 	list_splice(&dirty, dirty_page_list);
-<<<<<<< HEAD
 	return left_dirty;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool sgx_reclaimer_age(struct sgx_epc_page *epc_page)
@@ -425,14 +401,7 @@ static int ksgxd(void *p)
 	 * required for SECS pages, whose child pages blocked EREMOVE.
 	 */
 	__sgx_sanitize_pages(&sgx_dirty_page_list);
-<<<<<<< HEAD
 	WARN_ON(__sgx_sanitize_pages(&sgx_dirty_page_list));
-=======
-	__sgx_sanitize_pages(&sgx_dirty_page_list);
-
-	/* sanity check: */
-	WARN_ON(!list_empty(&sgx_dirty_page_list));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	while (!kthread_should_stop()) {
 		if (try_to_freeze())
@@ -468,21 +437,12 @@ bool current_is_ksgxd(void)
 {
 	return current == ksgxd_tsk;
 }
-<<<<<<< HEAD
 
 static struct sgx_epc_page *__sgx_alloc_epc_page_from_node(int nid)
 {
 	struct sgx_numa_node *node = &sgx_numa_nodes[nid];
 	struct sgx_epc_page *page = NULL;
 
-=======
-
-static struct sgx_epc_page *__sgx_alloc_epc_page_from_node(int nid)
-{
-	struct sgx_numa_node *node = &sgx_numa_nodes[nid];
-	struct sgx_epc_page *page = NULL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_lock(&node->lock);
 
 	if (list_empty(&node->free_page_list)) {
@@ -521,7 +481,6 @@ struct sgx_epc_page *__sgx_alloc_epc_page(void)
 		if (page)
 			return page;
 	}
-<<<<<<< HEAD
 
 	/* Fall back to the non-local NUMA nodes: */
 	while (true) {
@@ -529,15 +488,6 @@ struct sgx_epc_page *__sgx_alloc_epc_page(void)
 		if (nid == nid_of_current)
 			break;
 
-=======
-
-	/* Fall back to the non-local NUMA nodes: */
-	while (true) {
-		nid = next_node_in(nid, sgx_numa_mask);
-		if (nid == nid_of_current)
-			break;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		page = __sgx_alloc_epc_page_from_node(nid);
 		if (page)
 			return page;

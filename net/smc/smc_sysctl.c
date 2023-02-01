@@ -16,17 +16,12 @@
 
 #include "smc.h"
 #include "smc_core.h"
-<<<<<<< HEAD
 #include "smc_llc.h"
 #include "smc_sysctl.h"
 
 static int min_sndbuf = SMC_BUF_MIN_SIZE;
 static int min_rcvbuf = SMC_BUF_MIN_SIZE;
 
-=======
-#include "smc_sysctl.h"
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct ctl_table smc_table[] = {
 	{
 		.procname       = "autocorking_size",
@@ -44,7 +39,6 @@ static struct ctl_table smc_table[] = {
 		.extra1		= SYSCTL_ZERO,
 		.extra2		= SYSCTL_TWO,
 	},
-<<<<<<< HEAD
 	{
 		.procname	= "smcr_testlink_time",
 		.data		= &init_net.smc.sysctl_smcr_testlink_time,
@@ -68,8 +62,6 @@ static struct ctl_table smc_table[] = {
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &min_rcvbuf,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{  }
 };
 
@@ -95,12 +87,9 @@ int __net_init smc_sysctl_net_init(struct net *net)
 
 	net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
 	net->smc.sysctl_smcr_buf_type = SMCR_PHYS_CONT_BUFS;
-<<<<<<< HEAD
 	net->smc.sysctl_smcr_testlink_time = SMC_LLC_TESTLINK_DEFAULT_TIME;
 	WRITE_ONCE(net->smc.sysctl_wmem, READ_ONCE(net->ipv4.sysctl_tcp_wmem[1]));
 	WRITE_ONCE(net->smc.sysctl_rmem, READ_ONCE(net->ipv4.sysctl_tcp_rmem[1]));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 

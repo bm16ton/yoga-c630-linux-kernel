@@ -639,7 +639,6 @@ static struct bio *alloc_tio(struct clone_info *ci, struct dm_target *ti,
 	clone->bi_bdev = md->disk->part0;
 	if (unlikely(ti->needs_bio_set_dev))
 		bio_set_dev(clone, md->disk->part0);
-<<<<<<< HEAD
 
 	if (len) {
 		clone->bi_iter.bi_size = to_bytes(*len);
@@ -647,15 +646,6 @@ static struct bio *alloc_tio(struct clone_info *ci, struct dm_target *ti,
 			bio_integrity_trim(clone);
 	}
 
-=======
-
-	if (len) {
-		clone->bi_iter.bi_size = to_bytes(*len);
-		if (bio_integrity(clone))
-			bio_integrity_trim(clone);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return clone;
 }
 
@@ -775,7 +765,6 @@ static struct table_device *open_table_device(struct mapped_device *md,
 	td->dm_dev.mode = mode;
 	td->dm_dev.bdev = bdev;
 	td->dm_dev.dax_dev = fs_dax_get_by_bdev(bdev, &part_off, NULL, NULL);
-<<<<<<< HEAD
 	format_dev_t(td->dm_dev.name, dev);
 	list_add(&td->list, &md->table_devices);
 	return td;
@@ -785,9 +774,6 @@ out_blkdev_put:
 out_free_td:
 	kfree(td);
 	return ERR_PTR(r);
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1036,7 +1022,6 @@ static void dm_wq_requeue_work(struct work_struct *work)
 		__dm_io_complete(io, false);
 		io = next;
 	}
-<<<<<<< HEAD
 }
 
 /*
@@ -1077,48 +1062,6 @@ static inline void __dm_io_dec_pending(struct dm_io *io)
 		dm_io_complete(io);
 }
 
-=======
-}
-
-/*
- * Two staged requeue:
- *
- * 1) io->orig_bio points to the real original bio, and the part mapped to
- *    this io must be requeued, instead of other parts of the original bio.
- *
- * 2) io->orig_bio points to new cloned bio which matches the requeued dm_io.
- */
-static void dm_io_complete(struct dm_io *io)
-{
-	bool first_requeue;
-
-	/*
-	 * Only dm_io that has been split needs two stage requeue, otherwise
-	 * we may run into long bio clone chain during suspend and OOM could
-	 * be triggered.
-	 *
-	 * Also flush data dm_io won't be marked as DM_IO_WAS_SPLIT, so they
-	 * also aren't handled via the first stage requeue.
-	 */
-	if (dm_io_flagged(io, DM_IO_WAS_SPLIT))
-		first_requeue = true;
-	else
-		first_requeue = false;
-
-	__dm_io_complete(io, first_requeue);
-}
-
-/*
- * Decrements the number of outstanding ios that a bio has been
- * cloned into, completing the original io if necc.
- */
-static inline void __dm_io_dec_pending(struct dm_io *io)
-{
-	if (atomic_dec_and_test(&io->io_count))
-		dm_io_complete(io);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void dm_io_set_error(struct dm_io *io, blk_status_t error)
 {
 	unsigned long flags;
@@ -1516,19 +1459,11 @@ static void __map_bio(struct bio *clone)
 		BUG();
 	}
 }
-<<<<<<< HEAD
 
 static void setup_split_accounting(struct clone_info *ci, unsigned len)
 {
 	struct dm_io *io = ci->io;
 
-=======
-
-static void setup_split_accounting(struct clone_info *ci, unsigned len)
-{
-	struct dm_io *io = ci->io;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ci->sector_count > len) {
 		/*
 		 * Split needed, save the mapped part for accounting.
@@ -1691,7 +1626,6 @@ static blk_status_t __process_abnormal_io(struct clone_info *ci,
 		break;
 	default:
 		break;
-<<<<<<< HEAD
 	}
 
 	/*
@@ -1746,62 +1680,6 @@ static void dm_queue_poll_io(struct bio *bio, struct dm_io *io)
 		io->next = *head;
 	}
 
-=======
-	}
-
-	/*
-	 * Even though the device advertised support for this type of
-	 * request, that does not mean every target supports it, and
-	 * reconfiguration might also have changed that since the
-	 * check was performed.
-	 */
-	if (unlikely(!num_bios))
-		return BLK_STS_NOTSUPP;
-
-	__send_changing_extent_only(ci, ti, num_bios);
-	return BLK_STS_OK;
-}
-
-/*
- * Reuse ->bi_private as dm_io list head for storing all dm_io instances
- * associated with this bio, and this bio's bi_private needs to be
- * stored in dm_io->data before the reuse.
- *
- * bio->bi_private is owned by fs or upper layer, so block layer won't
- * touch it after splitting. Meantime it won't be changed by anyone after
- * bio is submitted. So this reuse is safe.
- */
-static inline struct dm_io **dm_poll_list_head(struct bio *bio)
-{
-	return (struct dm_io **)&bio->bi_private;
-}
-
-static void dm_queue_poll_io(struct bio *bio, struct dm_io *io)
-{
-	struct dm_io **head = dm_poll_list_head(bio);
-
-	if (!(bio->bi_opf & REQ_DM_POLL_LIST)) {
-		bio->bi_opf |= REQ_DM_POLL_LIST;
-		/*
-		 * Save .bi_private into dm_io, so that we can reuse
-		 * .bi_private as dm_io list head for storing dm_io list
-		 */
-		io->data = bio->bi_private;
-
-		/* tell block layer to poll for completion */
-		bio->bi_cookie = ~BLK_QC_T_NONE;
-
-		io->next = NULL;
-	} else {
-		/*
-		 * bio recursed due to split, reuse original poll list,
-		 * and save bio->bi_private too.
-		 */
-		io->data = (*head)->data;
-		io->next = *head;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*head = io;
 }
 
@@ -1869,7 +1747,6 @@ static void dm_split_and_process_bio(struct mapped_device *md,
 	struct dm_io *io;
 	blk_status_t error = BLK_STS_OK;
 	bool is_abnormal;
-<<<<<<< HEAD
 
 	is_abnormal = is_abnormal_io(bio);
 	if (unlikely(is_abnormal)) {
@@ -1885,21 +1762,6 @@ static void dm_split_and_process_bio(struct mapped_device *md,
 	init_clone_info(&ci, md, map, bio, is_abnormal);
 	io = ci.io;
 
-=======
-
-	is_abnormal = is_abnormal_io(bio);
-	if (unlikely(is_abnormal)) {
-		/*
-		 * Use bio_split_to_limits() for abnormal IO (e.g. discard, etc)
-		 * otherwise associated queue_limits won't be imposed.
-		 */
-		bio = bio_split_to_limits(bio);
-	}
-
-	init_clone_info(&ci, md, map, bio, is_abnormal);
-	io = ci.io;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (bio->bi_opf & REQ_PREFLUSH) {
 		__send_empty_flush(&ci);
 		/* dm_io_complete submits any data associated with flush */
@@ -2112,7 +1974,6 @@ static void cleanup_mapped_device(struct mapped_device *md)
 		md->disk->private_data = NULL;
 		spin_unlock(&_minor_lock);
 		if (dm_get_md_type(md) != DM_TYPE_NONE) {
-<<<<<<< HEAD
 			struct table_device *td;
 
 			dm_sysfs_exit(md);
@@ -2128,10 +1989,6 @@ static void cleanup_mapped_device(struct mapped_device *md)
 			mutex_lock(&md->table_devices_lock);
 			del_gendisk(md->disk);
 			mutex_unlock(&md->table_devices_lock);
-=======
-			dm_sysfs_exit(md);
-			del_gendisk(md->disk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		dm_queue_destroy_crypto_profile(md->queue);
 		put_disk(md->disk);
@@ -2463,10 +2320,7 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
 {
 	enum dm_queue_mode type = dm_table_get_type(t);
 	struct queue_limits limits;
-<<<<<<< HEAD
 	struct table_device *td;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int r;
 
 	switch (type) {
@@ -2494,7 +2348,6 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
 	r = dm_table_set_restrictions(t, md->queue, &limits);
 	if (r)
 		return r;
-<<<<<<< HEAD
 
 	/*
 	 * Hold lock to make sure add_disk() and del_gendisk() won't concurrent
@@ -2520,18 +2373,6 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
 	if (r)
 		goto out_undo_holders;
 
-=======
-
-	r = add_disk(md->disk);
-	if (r)
-		return r;
-
-	r = dm_sysfs_init(md);
-	if (r) {
-		del_gendisk(md->disk);
-		return r;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	md->type = type;
 	return 0;
 

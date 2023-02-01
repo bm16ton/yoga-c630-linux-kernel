@@ -176,69 +176,41 @@
         "UMask": "0x4"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Cycles when uops are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequencer (MS) is busy",
-=======
-        "BriefDescription": "Cycles when uops are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequenser (MS) is busy",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
         "CounterMask": "1",
         "EventCode": "0x79",
         "EventName": "IDQ.MS_CYCLES",
-<<<<<<< HEAD
         "PublicDescription": "Cycles when uops are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequencer (MS) is busy.",
-=======
-        "PublicDescription": "Cycles when uops are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequenser (MS) is busy.",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "SampleAfterValue": "2000003",
         "UMask": "0x30"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Cycles when uops initiated by Decode Stream Buffer (DSB) are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequencer (MS) is busy",
-=======
-        "BriefDescription": "Cycles when uops initiated by Decode Stream Buffer (DSB) are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequenser (MS) is busy",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
         "CounterMask": "1",
         "EventCode": "0x79",
         "EventName": "IDQ.MS_DSB_CYCLES",
-<<<<<<< HEAD
         "PublicDescription": "Cycles when uops initiated by Decode Stream Buffer (DSB) are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequencer (MS) is busy.",
-=======
-        "PublicDescription": "Cycles when uops initiated by Decode Stream Buffer (DSB) are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequenser (MS) is busy.",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "SampleAfterValue": "2000003",
         "UMask": "0x10"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Deliveries to Instruction Decode Queue (IDQ) initiated by Decode Stream Buffer (DSB) while Microcode Sequencer (MS) is busy",
-=======
-        "BriefDescription": "Deliveries to Instruction Decode Queue (IDQ) initiated by Decode Stream Buffer (DSB) while Microcode Sequenser (MS) is busy",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
         "CounterMask": "1",
         "EdgeDetect": "1",
         "EventCode": "0x79",
         "EventName": "IDQ.MS_DSB_OCCUR",
-<<<<<<< HEAD
         "PublicDescription": "Deliveries to Instruction Decode Queue (IDQ) initiated by Decode Stream Buffer (DSB) while Microcode Sequencer (MS) is busy.",
-=======
-        "PublicDescription": "Deliveries to Instruction Decode Queue (IDQ) initiated by Decode Stream Buffer (DSB) while Microcode Sequenser (MS) is busy.",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "SampleAfterValue": "2000003",
         "UMask": "0x10"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Uops initiated by Decode Stream Buffer (DSB) that are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequencer (MS) is busy",
-=======
-        "BriefDescription": "Uops initiated by Decode Stream Buffer (DSB) that are being delivered to Instruction Decode Queue (IDQ) while Microcode Sequenser (MS) is busy",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
         "EventCode": "0x79",
@@ -248,11 +220,7 @@
         "UMask": "0x10"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Uops initiated by MITE and delivered to Instruction Decode Queue (IDQ) while Microcode Sequencer (MS) is busy",
-=======
-        "BriefDescription": "Uops initiated by MITE and delivered to Instruction Decode Queue (IDQ) while Microcode Sequenser (MS) is busy",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
         "EventCode": "0x79",
@@ -274,11 +242,7 @@
         "UMask": "0x30"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Uops delivered to Instruction Decode Queue (IDQ) while Microcode Sequencer (MS) is busy",
-=======
-        "BriefDescription": "Uops delivered to Instruction Decode Queue (IDQ) while Microcode Sequenser (MS) is busy",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
         "EventCode": "0x79",

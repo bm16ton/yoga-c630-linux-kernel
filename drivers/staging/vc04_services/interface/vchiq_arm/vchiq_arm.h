@@ -100,11 +100,7 @@ vchiq_dump_platform_use_state(struct vchiq_state *state);
 extern void
 vchiq_dump_service_use_state(struct vchiq_state *state);
 
-<<<<<<< HEAD
 extern int
-=======
-extern enum vchiq_status
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 vchiq_use_internal(struct vchiq_state *state, struct vchiq_service *service,
 		   enum USE_TYPE_E use_type);
 extern int

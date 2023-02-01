@@ -135,15 +135,12 @@ static const struct rtc_class_ops isl12022_rtc_ops = {
 	.set_time	= isl12022_rtc_set_time,
 };
 
-<<<<<<< HEAD
 static const struct regmap_config regmap_config = {
 	.reg_bits = 8,
 	.val_bits = 8,
 	.use_single_write = true,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int isl12022_probe(struct i2c_client *client)
 {
 	struct isl12022 *isl12022;

@@ -42,14 +42,10 @@
 #define SERDES_MUX_QSGMII(i, p, m, c) \
 	SERDES_MUX(i, p, PHY_MODE_ETHERNET, PHY_INTERFACE_MODE_QSGMII, m, c)
 #define SERDES_MUX_RGMII(i, p, m, c) \
-<<<<<<< HEAD
 	SERDES_MUX(i, p, PHY_MODE_ETHERNET, PHY_INTERFACE_MODE_RGMII, m, c), \
 	SERDES_MUX(i, p, PHY_MODE_ETHERNET, PHY_INTERFACE_MODE_RGMII_TXID, m, c), \
 	SERDES_MUX(i, p, PHY_MODE_ETHERNET, PHY_INTERFACE_MODE_RGMII_RXID, m, c), \
 	SERDES_MUX(i, p, PHY_MODE_ETHERNET, PHY_INTERFACE_MODE_RGMII_ID, m, c)
-=======
-	SERDES_MUX(i, p, PHY_MODE_ETHERNET, PHY_INTERFACE_MODE_RGMII, m, c)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void lan_rmw_(u32 val, u32 mask, void __iomem *mem, u32 offset)
 {
@@ -101,7 +97,6 @@ static const struct serdes_mux lan966x_serdes_muxes[] = {
 			 HSIO_HW_CFG_SD6G_1_CFG_SET(1)),
 
 	SERDES_MUX_RGMII(RGMII(0), 2, HSIO_HW_CFG_RGMII_0_CFG |
-<<<<<<< HEAD
 			 HSIO_HW_CFG_RGMII_ENA |
 			 HSIO_HW_CFG_GMII_ENA,
 			 HSIO_HW_CFG_RGMII_0_CFG_SET(0) |
@@ -125,23 +120,6 @@ static const struct serdes_mux lan966x_serdes_muxes[] = {
 			 HSIO_HW_CFG_RGMII_1_CFG_SET(BIT(0)) |
 			 HSIO_HW_CFG_RGMII_ENA_SET(BIT(1)) |
 			 HSIO_HW_CFG_GMII_ENA_SET(BIT(6))),
-=======
-			 HSIO_HW_CFG_RGMII_ENA,
-			 HSIO_HW_CFG_RGMII_0_CFG_SET(BIT(0)) |
-			 HSIO_HW_CFG_RGMII_ENA_SET(BIT(0))),
-	SERDES_MUX_RGMII(RGMII(1), 3, HSIO_HW_CFG_RGMII_1_CFG |
-			 HSIO_HW_CFG_RGMII_ENA,
-			 HSIO_HW_CFG_RGMII_1_CFG_SET(BIT(0)) |
-			 HSIO_HW_CFG_RGMII_ENA_SET(BIT(1))),
-	SERDES_MUX_RGMII(RGMII(0), 5, HSIO_HW_CFG_RGMII_0_CFG |
-			 HSIO_HW_CFG_RGMII_ENA,
-			 HSIO_HW_CFG_RGMII_0_CFG_SET(BIT(0)) |
-			 HSIO_HW_CFG_RGMII_ENA_SET(BIT(0))),
-	SERDES_MUX_RGMII(RGMII(1), 6, HSIO_HW_CFG_RGMII_1_CFG |
-			 HSIO_HW_CFG_RGMII_ENA,
-			 HSIO_HW_CFG_RGMII_1_CFG_SET(BIT(0)) |
-			 HSIO_HW_CFG_RGMII_ENA_SET(BIT(1))),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct serdes_ctrl {
@@ -415,7 +393,6 @@ static int lan966x_sd6g40_setup(struct serdes_macro *macro, u32 idx, int mode)
 	return lan966x_sd6g40_setup_lane(macro, conf, idx);
 }
 
-<<<<<<< HEAD
 static int lan966x_rgmii_setup(struct serdes_macro *macro, u32 idx, int mode)
 {
 	bool tx_delay = false;
@@ -477,8 +454,6 @@ static int serdes_set_speed(struct phy *phy, int speed)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int serdes_set_mode(struct phy *phy, enum phy_mode mode, int submode)
 {
 	struct serdes_macro *macro = phy_get_drvdata(phy);
@@ -498,12 +473,9 @@ static int serdes_set_mode(struct phy *phy, enum phy_mode mode, int submode)
 	    submode == PHY_INTERFACE_MODE_2500BASEX)
 		submode = PHY_INTERFACE_MODE_SGMII;
 
-<<<<<<< HEAD
 	if (submode == PHY_INTERFACE_MODE_QUSGMII)
 		submode = PHY_INTERFACE_MODE_QSGMII;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < ARRAY_SIZE(lan966x_serdes_muxes); i++) {
 		if (macro->idx != lan966x_serdes_muxes[i].idx ||
 		    mode != lan966x_serdes_muxes[i].mode ||
@@ -527,13 +499,9 @@ static int serdes_set_mode(struct phy *phy, enum phy_mode mode, int submode)
 						    macro->mode);
 
 		if (macro->idx < RGMII_MAX)
-<<<<<<< HEAD
 			return lan966x_rgmii_setup(macro,
 						   macro->idx - (SERDES6G_MAX + 1),
 						   macro->mode);
-=======
-			return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		return -EOPNOTSUPP;
 	}
@@ -543,10 +511,7 @@ static int serdes_set_mode(struct phy *phy, enum phy_mode mode, int submode)
 
 static const struct phy_ops serdes_ops = {
 	.set_mode	= serdes_set_mode,
-<<<<<<< HEAD
 	.set_speed	= serdes_set_speed,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.owner		= THIS_MODULE,
 };
 

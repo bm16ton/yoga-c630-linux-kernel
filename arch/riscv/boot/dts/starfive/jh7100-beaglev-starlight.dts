@@ -8,11 +8,7 @@
 #include "jh7100.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/leds/common.h>
-<<<<<<< HEAD
 #include <dt-bindings/pinctrl/pinctrl-starfive-jh7100.h>
-=======
-#include <dt-bindings/pinctrl/pinctrl-starfive.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 / {
 	model = "BeagleV Starlight Beta";

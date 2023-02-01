@@ -468,11 +468,7 @@ static int mlx5_devlink_enable_roce_validate(struct devlink *devlink, u32 id,
 	bool new_state = val.vbool;
 
 	if (new_state && !MLX5_CAP_GEN(dev, roce) &&
-<<<<<<< HEAD
 	    !(MLX5_CAP_GEN(dev, roce_rw_supported) && MLX5_CAP_GEN_MAX(dev, roce))) {
-=======
-	    !MLX5_CAP_GEN(dev, roce_rw_supported)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		NL_SET_ERR_MSG_MOD(extack, "Device doesn't support RoCE");
 		return -EOPNOTSUPP;
 	}
@@ -567,11 +563,7 @@ static int mlx5_devlink_eq_depth_validate(struct devlink *devlink, u32 id,
 					  union devlink_param_value val,
 					  struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	return (val.vu32 >= 64 && val.vu32 <= 4096) ? 0 : -EINVAL;
-=======
-	return (val.vu16 >= 64 && val.vu16 <= 4096) ? 0 : -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct devlink_param mlx5_devlink_params[] = {

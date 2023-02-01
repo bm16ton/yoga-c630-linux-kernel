@@ -246,7 +246,6 @@ arch_test_bit_acquire(unsigned long nr, const volatile unsigned long *addr)
 	return __builtin_constant_p(nr) ? constant_test_bit_acquire(nr, addr) :
 					  variable_test_bit(nr, addr);
 }
-<<<<<<< HEAD
 
 static __always_inline unsigned long variable__ffs(unsigned long word)
 {
@@ -255,8 +254,6 @@ static __always_inline unsigned long variable__ffs(unsigned long word)
 		: "rm" (word));
 	return word;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * __ffs - find first set bit in word

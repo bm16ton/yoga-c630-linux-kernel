@@ -10,7 +10,6 @@
 #include <linux/spinlock.h>
 #include "virt-dma.h"
 
-<<<<<<< HEAD
 /* HiSilicon DMA register common field define */
 #define HISI_DMA_Q_SQ_BASE_L			0x0
 #define HISI_DMA_Q_SQ_BASE_H			0x4
@@ -92,34 +91,6 @@ enum hisi_dma_reg_layout {
 	HISI_DMA_REG_LAYOUT_HIP08,
 	HISI_DMA_REG_LAYOUT_HIP09
 };
-=======
-#define HISI_DMA_SQ_BASE_L		0x0
-#define HISI_DMA_SQ_BASE_H		0x4
-#define HISI_DMA_SQ_DEPTH		0x8
-#define HISI_DMA_SQ_TAIL_PTR		0xc
-#define HISI_DMA_CQ_BASE_L		0x10
-#define HISI_DMA_CQ_BASE_H		0x14
-#define HISI_DMA_CQ_DEPTH		0x18
-#define HISI_DMA_CQ_HEAD_PTR		0x1c
-#define HISI_DMA_CTRL0			0x20
-#define HISI_DMA_CTRL0_QUEUE_EN_S	0
-#define HISI_DMA_CTRL0_QUEUE_PAUSE_S	4
-#define HISI_DMA_CTRL1			0x24
-#define HISI_DMA_CTRL1_QUEUE_RESET_S	0
-#define HISI_DMA_Q_FSM_STS		0x30
-#define HISI_DMA_FSM_STS_MASK		GENMASK(3, 0)
-#define HISI_DMA_INT_STS		0x40
-#define HISI_DMA_INT_STS_MASK		GENMASK(12, 0)
-#define HISI_DMA_INT_MSK		0x44
-#define HISI_DMA_MODE			0x217c
-#define HISI_DMA_OFFSET			0x100
-
-#define HISI_DMA_MSI_NUM		32
-#define HISI_DMA_CHAN_NUM		30
-#define HISI_DMA_Q_DEPTH_VAL		1024
-
-#define PCI_BAR_2			2
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum hisi_dma_mode {
 	EP = 0,
@@ -472,14 +443,6 @@ static void hisi_dma_reset_or_disable_hw_chan(struct hisi_dma_chan *chan,
 	hisi_dma_do_reset(hdma_dev, index);
 	hisi_dma_reset_qp_point(hdma_dev, index);
 	hisi_dma_pause_dma(hdma_dev, index, false);
-<<<<<<< HEAD
-=======
-
-	if (!disable) {
-		hisi_dma_enable_dma(hdma_dev, index, true);
-		hisi_dma_unmask_irq(hdma_dev, index);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!disable) {
 		hisi_dma_enable_dma(hdma_dev, index, true);
@@ -776,11 +739,7 @@ static irqreturn_t hisi_dma_irq(int irq, void *data)
 	q_base = hdma_dev->queue_base;
 	if (desc) {
 		chan->cq_head = (chan->cq_head + 1) % hdma_dev->chan_depth;
-<<<<<<< HEAD
 		hisi_dma_chan_write(q_base, HISI_DMA_Q_CQ_HEAD_PTR,
-=======
-		hisi_dma_chan_write(hdma_dev->base, HISI_DMA_CQ_HEAD_PTR,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				    chan->qp_num, chan->cq_head);
 		if (FIELD_GET(STATUS_MASK, cqe->w0) == STATUS_SUCC) {
 			vchan_cookie_complete(&desc->vd);
@@ -1020,13 +979,9 @@ static int hisi_dma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	chan_num = hisi_dma_get_chan_num(pdev);
 	hdma_dev = devm_kzalloc(dev, struct_size(hdma_dev, chan, chan_num),
 				GFP_KERNEL);
-=======
-	hdma_dev = devm_kzalloc(dev, struct_size(hdma_dev, chan, HISI_DMA_CHAN_NUM), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!hdma_dev)
 		return -EINVAL;
 
@@ -1040,36 +995,16 @@ static int hisi_dma_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_drvdata(pdev, hdma_dev);
 	pci_set_master(pdev);
 
-<<<<<<< HEAD
 	msi_num = hisi_dma_get_msi_num(pdev);
 
 	/* This will be freed by 'pcim_release()'. See 'pcim_enable_device()' */
 	ret = pci_alloc_irq_vectors(pdev, msi_num, msi_num, PCI_IRQ_MSI);
-=======
-	/* This will be freed by 'pcim_release()'. See 'pcim_enable_device()' */
-	ret = pci_alloc_irq_vectors(pdev, HISI_DMA_MSI_NUM, HISI_DMA_MSI_NUM,
-				    PCI_IRQ_MSI);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		dev_err(dev, "Failed to allocate MSI vectors!\n");
 		return ret;
 	}
 
-<<<<<<< HEAD
 	hisi_dma_init_dma_dev(hdma_dev);
-=======
-	dma_dev = &hdma_dev->dma_dev;
-	dma_cap_set(DMA_MEMCPY, dma_dev->cap_mask);
-	dma_dev->device_free_chan_resources = hisi_dma_free_chan_resources;
-	dma_dev->device_prep_dma_memcpy = hisi_dma_prep_dma_memcpy;
-	dma_dev->device_tx_status = hisi_dma_tx_status;
-	dma_dev->device_issue_pending = hisi_dma_issue_pending;
-	dma_dev->device_terminate_all = hisi_dma_terminate_all;
-	dma_dev->device_synchronize = hisi_dma_synchronize;
-	dma_dev->directions = BIT(DMA_MEM_TO_MEM);
-	dma_dev->dev = dev;
-	INIT_LIST_HEAD(&dma_dev->channels);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hisi_dma_set_mode(hdma_dev, RC);
 

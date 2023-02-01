@@ -2589,11 +2589,7 @@ static void mod_cur_headers(struct pktgen_dev *pkt_dev)
 		pkt_dev->cur_pkt_size = t;
 	} else if (pkt_dev->n_imix_entries > 0) {
 		struct imix_pkt *entry;
-<<<<<<< HEAD
 		__u32 t = prandom_u32_max(IMIX_PRECISION);
-=======
-		__u32 t = prandom_u32() % IMIX_PRECISION;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		__u8 entry_index = pkt_dev->imix_distribution[t];
 
 		entry = &pkt_dev->imix_entries[entry_index];

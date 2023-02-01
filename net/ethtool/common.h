@@ -53,9 +53,4 @@ int ethtool_get_module_info_call(struct net_device *dev,
 int ethtool_get_module_eeprom_call(struct net_device *dev,
 				   struct ethtool_eeprom *ee, u8 *data);
 
-int ethtool_get_module_info_call(struct net_device *dev,
-				 struct ethtool_modinfo *modinfo);
-int ethtool_get_module_eeprom_call(struct net_device *dev,
-				   struct ethtool_eeprom *ee, u8 *data);
-
 #endif /* _ETHTOOL_COMMON_H */

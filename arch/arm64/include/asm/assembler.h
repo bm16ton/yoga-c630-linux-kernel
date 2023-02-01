@@ -293,11 +293,7 @@ alternative_endif
 alternative_if_not ARM64_KVM_PROTECTED_MODE
 	ASM_BUG()
 alternative_else_nop_endif
-<<<<<<< HEAD
 alternative_cb ARM64_ALWAYS_SYSTEM, kvm_compute_final_ctr_el0
-=======
-alternative_cb kvm_compute_final_ctr_el0
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	movz	\reg, #0
 	movk	\reg, #0, lsl #16
 	movk	\reg, #0, lsl #32
@@ -881,11 +877,7 @@ alternative_endif
 
 	.macro __mitigate_spectre_bhb_loop      tmp
 #ifdef CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY
-<<<<<<< HEAD
 alternative_cb ARM64_ALWAYS_SYSTEM, spectre_bhb_patch_loop_iter
-=======
-alternative_cb  spectre_bhb_patch_loop_iter
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mov	\tmp, #32		// Patched to correct the immediate
 alternative_cb_end
 .Lspectre_bhb_loop\@:
@@ -898,11 +890,7 @@ alternative_cb_end
 
 	.macro mitigate_spectre_bhb_loop	tmp
 #ifdef CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY
-<<<<<<< HEAD
 alternative_cb ARM64_ALWAYS_SYSTEM, spectre_bhb_patch_loop_mitigation_enable
-=======
-alternative_cb	spectre_bhb_patch_loop_mitigation_enable
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	b	.L_spectre_bhb_loop_done\@	// Patched to NOP
 alternative_cb_end
 	__mitigate_spectre_bhb_loop	\tmp
@@ -916,11 +904,7 @@ alternative_cb_end
 	stp	x0, x1, [sp, #-16]!
 	stp	x2, x3, [sp, #-16]!
 	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_3
-<<<<<<< HEAD
 alternative_cb ARM64_ALWAYS_SYSTEM, smccc_patch_fw_mitigation_conduit
-=======
-alternative_cb	smccc_patch_fw_mitigation_conduit
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nop					// Patched to SMC/HVC #0
 alternative_cb_end
 	ldp	x2, x3, [sp], #16
@@ -930,11 +914,7 @@ alternative_cb_end
 
 	.macro mitigate_spectre_bhb_clear_insn
 #ifdef CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY
-<<<<<<< HEAD
 alternative_cb ARM64_ALWAYS_SYSTEM, spectre_bhb_patch_clearbhb
-=======
-alternative_cb	spectre_bhb_patch_clearbhb
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Patched to NOP when not supported */
 	clearbhb
 	isb

@@ -80,7 +80,6 @@ int tcf_classify(struct sk_buff *skb,
 		 const struct tcf_block *block,
 		 const struct tcf_proto *tp, struct tcf_result *res,
 		 bool compat_mode);
-<<<<<<< HEAD
 
 static inline bool tc_cls_stats_dump(struct tcf_proto *tp,
 				     struct tcf_walker *arg,
@@ -94,8 +93,6 @@ static inline bool tc_cls_stats_dump(struct tcf_proto *tp,
 	arg->count++;
 	return true;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #else
 static inline bool tcf_block_shared(struct tcf_block *block)

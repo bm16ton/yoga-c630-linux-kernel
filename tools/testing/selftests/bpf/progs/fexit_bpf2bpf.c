@@ -73,17 +73,10 @@ int test_subprog2(struct args_subprog2 *ctx)
 			      __builtin_preserve_access_index(&skb->len));
 
 	ret = ctx->ret;
-<<<<<<< HEAD
 	/* bpf_prog_test_load() loads "test_pkt_access.bpf.o" with
 	 * BPF_F_TEST_RND_HI32 which randomizes upper 32 bits after BPF_ALU32
 	 * insns. Hence after 'w0 <<= 1' upper bits of $rax are random. That is
 	 * expected and correct. Trim them.
-=======
-	/* bpf_prog_test_load() loads "test_pkt_access.o" with BPF_F_TEST_RND_HI32
-	 * which randomizes upper 32 bits after BPF_ALU32 insns.
-	 * Hence after 'w0 <<= 1' upper bits of $rax are random.
-	 * That is expected and correct. Trim them.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
 	ret = (__u32) ret;
 	if (len != 74 || ret != 148)

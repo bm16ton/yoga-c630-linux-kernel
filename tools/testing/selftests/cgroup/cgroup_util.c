@@ -563,13 +563,8 @@ ssize_t proc_read_text(int pid, bool thread, const char *item, char *buf, size_t
 	else
 		snprintf(path, sizeof(path), "/proc/%d/%s", pid, item);
 
-<<<<<<< HEAD
 	ret = read_text(path, buf, size);
 	return ret < 0 ? -1 : ret;
-=======
-	size = read_text(path, buf, size);
-	return size < 0 ? -1 : size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int proc_read_strstr(int pid, bool thread, const char *item, const char *needle)

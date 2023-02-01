@@ -438,17 +438,6 @@ static void inno_dsidphy_mipi_mode_enable(struct inno_dsidphy *inno)
 	 * Tclk-pre = Tpin_txbyteclkhs * value
 	 */
 	clk_pre = DIV_ROUND_UP(cfg->clk_pre, BITS_PER_BYTE);
-<<<<<<< HEAD
-=======
-
-	/*
-	 * The value of counter for HS Tlpx Time
-	 * Tlpx = Tpin_txbyteclkhs * (2 + value)
-	 */
-	lpx = DIV_ROUND_UP(cfg->lpx, t_txbyteclkhs);
-	if (lpx >= 2)
-		lpx -= 2;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The value of counter for HS Tta-go

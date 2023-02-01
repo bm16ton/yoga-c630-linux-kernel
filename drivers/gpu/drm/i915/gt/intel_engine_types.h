@@ -166,7 +166,6 @@ struct intel_engine_execlists {
 	struct timer_list preempt;
 
 	/**
-<<<<<<< HEAD
 	 * @preempt_target: active request at the time of the preemption request
 	 *
 	 * We force a preemption to occur if the pending contexts have not
@@ -182,8 +181,6 @@ struct intel_engine_execlists {
 	const struct i915_request *preempt_target;
 
 	/**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * @ccid: identifier for contexts submitted to this engine
 	 */
 	u32 ccid;

@@ -5946,10 +5946,6 @@ static struct attribute *lpfc_hba_attrs[] = {
 	&dev_attr_lpfc_xlane_priority.attr,
 	&dev_attr_lpfc_sg_seg_cnt.attr,
 	&dev_attr_lpfc_max_scsicmpl_time.attr,
-<<<<<<< HEAD
-=======
-	&dev_attr_lpfc_stat_data_ctrl.attr,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&dev_attr_lpfc_aer_support.attr,
 	&dev_attr_lpfc_aer_state_cleanup.attr,
 	&dev_attr_lpfc_sriov_nr_virtfn.attr,
@@ -6008,10 +6004,6 @@ static struct attribute *lpfc_vport_attrs[] = {
 	&dev_attr_npiv_info.attr,
 	&dev_attr_lpfc_enable_da_id.attr,
 	&dev_attr_lpfc_max_scsicmpl_time.attr,
-<<<<<<< HEAD
-=======
-	&dev_attr_lpfc_stat_data_ctrl.attr,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&dev_attr_lpfc_static_vport.attr,
 	&dev_attr_cmf_info.attr,
 	NULL,

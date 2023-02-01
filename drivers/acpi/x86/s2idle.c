@@ -364,7 +364,6 @@ out:
 	return ret;
 }
 
-<<<<<<< HEAD
 struct amd_lps0_hid_device_data {
 	const bool check_off_by_one;
 };
@@ -408,15 +407,12 @@ static const struct dmi_system_id s2idle_dmi_table[] __initconst = {
 	{}
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int lps0_device_attach(struct acpi_device *adev,
 			      const struct acpi_device_id *not_used)
 {
 	if (lps0_device_handle)
 		return 0;
 
-<<<<<<< HEAD
 	lps0_dsm_func_mask_microsoft = validate_dsm(adev->handle,
 						    ACPI_LPS0_DSM_UUID_MICROSOFT, 0,
 						    &lps0_dsm_guid_microsoft);
@@ -438,36 +434,6 @@ static int lps0_device_attach(struct acpi_device *adev,
 			acpi_handle_debug(adev->handle, "_DSM UUID %s: Adjusted function mask: 0x%x\n",
 					  ACPI_LPS0_DSM_UUID_AMD, lps0_dsm_func_mask);
 		} else if (lps0_dsm_func_mask_microsoft > 0 && rev_id) {
-=======
-	if (acpi_s2idle_vendor_amd()) {
-		/* AMD0004, AMD0005, AMDI0005:
-		 * - Should use rev_id 0x0
-		 * - function mask > 0x3: Should use AMD method, but has off by one bug
-		 * - function mask = 0x3: Should use Microsoft method
-		 * AMDI0006:
-		 * - should use rev_id 0x0
-		 * - function mask = 0x3: Should use Microsoft method
-		 * AMDI0007:
-		 * - Should use rev_id 0x2
-		 * - Should only use AMD method
-		 */
-		const char *hid = acpi_device_hid(adev);
-		rev_id = strcmp(hid, "AMDI0007") ? 0 : 2;
-		lps0_dsm_func_mask = validate_dsm(adev->handle,
-					ACPI_LPS0_DSM_UUID_AMD, rev_id, &lps0_dsm_guid);
-		lps0_dsm_func_mask_microsoft = validate_dsm(adev->handle,
-					ACPI_LPS0_DSM_UUID_MICROSOFT, 0,
-					&lps0_dsm_guid_microsoft);
-		if (lps0_dsm_func_mask > 0x3 && (!strcmp(hid, "AMD0004") ||
-						 !strcmp(hid, "AMD0005") ||
-						 !strcmp(hid, "AMDI0005"))) {
-			lps0_dsm_func_mask = (lps0_dsm_func_mask << 1) | 0x1;
-			acpi_handle_debug(adev->handle, "_DSM UUID %s: Adjusted function mask: 0x%x\n",
-					  ACPI_LPS0_DSM_UUID_AMD, lps0_dsm_func_mask);
-		} else if (lps0_dsm_func_mask_microsoft > 0 &&
-				(!strcmp(hid, "AMDI0007") ||
-				 !strcmp(hid, "AMDI0008"))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			lps0_dsm_func_mask_microsoft = -EINVAL;
 			acpi_handle_debug(adev->handle, "_DSM Using AMD method\n");
 		}
@@ -564,41 +530,10 @@ void acpi_s2idle_check(void)
 	if (!lps0_device_handle || sleep_no_lps0)
 		return;
 
-<<<<<<< HEAD
 	list_for_each_entry(handler, &lps0_s2idle_devops_head, list_node) {
 		if (handler->check)
 			handler->check();
 	}
-=======
-	list_for_each_entry(handler, &lps0_s2idle_devops_head, list_node)
-		if (handler->restore)
-			handler->restore();
-
-	/* Modern standby exit */
-	if (lps0_dsm_func_mask_microsoft > 0)
-		acpi_sleep_run_lps0_dsm(ACPI_LPS0_MS_EXIT,
-				lps0_dsm_func_mask_microsoft, lps0_dsm_guid_microsoft);
-
-	/* LPS0 exit */
-	if (lps0_dsm_func_mask > 0)
-		acpi_sleep_run_lps0_dsm(acpi_s2idle_vendor_amd() ?
-					ACPI_LPS0_EXIT_AMD :
-					ACPI_LPS0_EXIT,
-					lps0_dsm_func_mask, lps0_dsm_guid);
-	if (lps0_dsm_func_mask_microsoft > 0)
-		acpi_sleep_run_lps0_dsm(ACPI_LPS0_EXIT,
-				lps0_dsm_func_mask_microsoft, lps0_dsm_guid_microsoft);
-
-	/* Screen on */
-	if (lps0_dsm_func_mask_microsoft > 0)
-		acpi_sleep_run_lps0_dsm(ACPI_LPS0_SCREEN_ON,
-				lps0_dsm_func_mask_microsoft, lps0_dsm_guid_microsoft);
-	if (lps0_dsm_func_mask > 0)
-		acpi_sleep_run_lps0_dsm(acpi_s2idle_vendor_amd() ?
-					ACPI_LPS0_SCREEN_ON_AMD :
-					ACPI_LPS0_SCREEN_ON,
-					lps0_dsm_func_mask, lps0_dsm_guid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void acpi_s2idle_restore_early(void)
@@ -658,7 +593,6 @@ void __init acpi_s2idle_setup(void)
 
 int acpi_register_lps0_dev(struct acpi_s2idle_dev_ops *arg)
 {
-<<<<<<< HEAD
 	unsigned int sleep_flags;
 
 	if (!lps0_device_handle || sleep_no_lps0)
@@ -667,14 +601,6 @@ int acpi_register_lps0_dev(struct acpi_s2idle_dev_ops *arg)
 	sleep_flags = lock_system_sleep();
 	list_add(&arg->list_node, &lps0_s2idle_devops_head);
 	unlock_system_sleep(sleep_flags);
-=======
-	if (!lps0_device_handle || sleep_no_lps0)
-		return -ENODEV;
-
-	lock_system_sleep();
-	list_add(&arg->list_node, &lps0_s2idle_devops_head);
-	unlock_system_sleep();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -682,7 +608,6 @@ EXPORT_SYMBOL_GPL(acpi_register_lps0_dev);
 
 void acpi_unregister_lps0_dev(struct acpi_s2idle_dev_ops *arg)
 {
-<<<<<<< HEAD
 	unsigned int sleep_flags;
 
 	if (!lps0_device_handle || sleep_no_lps0)
@@ -691,14 +616,6 @@ void acpi_unregister_lps0_dev(struct acpi_s2idle_dev_ops *arg)
 	sleep_flags = lock_system_sleep();
 	list_del(&arg->list_node);
 	unlock_system_sleep(sleep_flags);
-=======
-	if (!lps0_device_handle || sleep_no_lps0)
-		return;
-
-	lock_system_sleep();
-	list_del(&arg->list_node);
-	unlock_system_sleep();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(acpi_unregister_lps0_dev);
 

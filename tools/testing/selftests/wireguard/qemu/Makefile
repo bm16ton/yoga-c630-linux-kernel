@@ -209,7 +209,6 @@ KERNEL_ARCH := m68k
 KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/vmlinux
 KERNEL_CMDLINE := $(shell sed -n 's/CONFIG_CMDLINE=\(.*\)/\1/p' arch/m68k.config)
 QEMU_VPORT_RESULT := virtio-serial-device
-<<<<<<< HEAD
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host,accel=kvm -machine virt -append $(KERNEL_CMDLINE)
 else
@@ -247,45 +246,6 @@ QEMU_VPORT_RESULT := virtio-serial-ccw
 ifeq ($(HOST_ARCH),$(ARCH))
 QEMU_MACHINE := -cpu host,accel=kvm -machine s390-ccw-virtio -append $(KERNEL_CMDLINE)
 else
-=======
-ifeq ($(HOST_ARCH),$(ARCH))
-QEMU_MACHINE := -cpu host,accel=kvm -machine virt -append $(KERNEL_CMDLINE)
-else
-QEMU_MACHINE := -machine virt -smp 1 -append $(KERNEL_CMDLINE)
-endif
-else ifeq ($(ARCH),riscv64)
-CHOST := riscv64-linux-musl
-QEMU_ARCH := riscv64
-KERNEL_ARCH := riscv
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/arch/riscv/boot/Image
-QEMU_VPORT_RESULT := virtio-serial-device
-ifeq ($(HOST_ARCH),$(ARCH))
-QEMU_MACHINE := -cpu host,accel=kvm -machine virt
-else
-QEMU_MACHINE := -cpu rv64 -machine virt
-endif
-else ifeq ($(ARCH),riscv32)
-CHOST := riscv32-linux-musl
-QEMU_ARCH := riscv32
-KERNEL_ARCH := riscv
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/arch/riscv/boot/Image
-QEMU_VPORT_RESULT := virtio-serial-device
-ifeq ($(HOST_ARCH),$(ARCH))
-QEMU_MACHINE := -cpu host,accel=kvm -machine virt
-else
-QEMU_MACHINE := -cpu rv32 -machine virt
-endif
-else ifeq ($(ARCH),s390x)
-CHOST := s390x-linux-musl
-QEMU_ARCH := s390x
-KERNEL_ARCH := s390
-KERNEL_BZIMAGE := $(KERNEL_BUILD_PATH)/arch/s390/boot/bzImage
-KERNEL_CMDLINE := $(shell sed -n 's/CONFIG_CMDLINE=\(.*\)/\1/p' arch/s390x.config)
-QEMU_VPORT_RESULT := virtio-serial-ccw
-ifeq ($(HOST_ARCH),$(ARCH))
-QEMU_MACHINE := -cpu host,accel=kvm -machine s390-ccw-virtio -append $(KERNEL_CMDLINE)
-else
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 QEMU_MACHINE := -cpu max -machine s390-ccw-virtio -append $(KERNEL_CMDLINE)
 endif
 else ifeq ($(ARCH),um)
@@ -295,7 +255,6 @@ KERNEL_ARCH := um
 KERNEL_CMDLINE := $(shell sed -n 's/CONFIG_CMDLINE=\(.*\)/\1/p' arch/um.config)
 else
 $(error I only build: x86_64, i686, arm, armeb, aarch64, aarch64_be, mips, mipsel, mips64, mips64el, powerpc64, powerpc64le, powerpc, m68k, riscv64, riscv32, s390x, um)
-<<<<<<< HEAD
 endif
 
 TOOLCHAIN_FILENAME := $(CHOST)-cross.tgz
@@ -323,35 +282,6 @@ endif
 
 USERSPACE_DEPS := $(TOOLCHAIN_PATH)/.installed $(TOOLCHAIN_PATH)/$(CHOST)/include/linux/.installed
 
-=======
-endif
-
-TOOLCHAIN_FILENAME := $(CHOST)-cross.tgz
-TOOLCHAIN_TAR := $(DISTFILES_PATH)/$(TOOLCHAIN_FILENAME)
-TOOLCHAIN_PATH := $(BUILD_PATH)/$(CHOST)-cross
-TOOLCHAIN_DIR := https://download.wireguard.com/qemu-test/toolchains/20211123/
-$(eval $(call file_download,toolchain-sha256sums-20211123,$(TOOLCHAIN_DIR)SHA256SUMS#,83da033fd8c798df476c21d9612da2dfb896ec62fbed4ceec5eefc0e56b3f0c8))
-$(eval $(call file_download,$(TOOLCHAIN_FILENAME),$(TOOLCHAIN_DIR),,$(DISTFILES_PATH)/toolchain-sha256sums-20211123))
-
-STRIP := $(CHOST)-strip
-CROSS_COMPILE_FLAG := --build=$(CBUILD) --host=$(CHOST)
-$(info Building for $(CHOST) using $(CBUILD))
-ifneq ($(ARCH),um)
-export CROSS_COMPILE := $(CHOST)-
-endif
-export PATH := $(TOOLCHAIN_PATH)/bin:$(PATH)
-export CC := $(CHOST)-gcc
-CCACHE_PATH := $(shell which ccache 2>/dev/null)
-ifneq ($(CCACHE_PATH),)
-export KBUILD_BUILD_TIMESTAMP := Fri Jun  5 15:58:00 CEST 2015
-export PATH := $(TOOLCHAIN_PATH)/bin/ccache:$(PATH)
-export CCACHE_SLOPPINESS := file_macro,time_macros
-export CCACHE_DIR ?= $(PWD)/ccache
-endif
-
-USERSPACE_DEPS := $(TOOLCHAIN_PATH)/.installed $(TOOLCHAIN_PATH)/$(CHOST)/include/linux/.installed
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 comma := ,
 build: $(KERNEL_BZIMAGE)
 qemu: $(KERNEL_BZIMAGE)
@@ -413,15 +343,10 @@ $(KERNEL_BZIMAGE): $(TOOLCHAIN_PATH)/.installed $(KERNEL_BUILD_PATH)/.config $(B
 .PHONY: $(KERNEL_BZIMAGE)
 
 $(TOOLCHAIN_PATH)/$(CHOST)/include/linux/.installed: | $(KERNEL_BUILD_PATH)/.config $(TOOLCHAIN_PATH)/.installed
-<<<<<<< HEAD
 ifneq ($(ARCH),um)
 	rm -rf $(TOOLCHAIN_PATH)/$(CHOST)/include/linux
 	$(MAKE) -C $(KERNEL_PATH) O=$(KERNEL_BUILD_PATH) INSTALL_HDR_PATH=$(TOOLCHAIN_PATH)/$(CHOST) ARCH=$(KERNEL_ARCH) CROSS_COMPILE=$(CROSS_COMPILE) headers_install
 endif
-=======
-	rm -rf $(TOOLCHAIN_PATH)/$(CHOST)/include/linux
-	$(MAKE) -C $(KERNEL_PATH) O=$(KERNEL_BUILD_PATH) INSTALL_HDR_PATH=$(TOOLCHAIN_PATH)/$(CHOST) ARCH=$(KERNEL_ARCH) CROSS_COMPILE=$(CROSS_COMPILE) headers_install
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	touch $@
 
 $(TOOLCHAIN_PATH)/.installed: $(TOOLCHAIN_TAR)

@@ -12,7 +12,6 @@
 #include <sound/jack.h>
 #include <sound/pcm.h>
 #include <sound/soc.h>
-<<<<<<< HEAD
 #include <sound/rt5682s.h>
 #include <linux/soundwire/sdw.h>
 
@@ -25,20 +24,11 @@
 #define DEFAULT_MCLK_RATE              19200000
 #define RT5682_PLL_FREQ (48000 * 512)
 #define MI2S_BCLK_RATE		1536000
-=======
-#include <linux/soundwire/sdw.h>
-
-#include "common.h"
-#include "lpass.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct sc7280_snd_data {
 	struct snd_soc_card card;
 	struct sdw_stream_runtime *sruntime[LPASS_MAX_PORTS];
-<<<<<<< HEAD
 	u32 pri_mi2s_clk_count;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct snd_soc_jack hs_jack;
 	struct snd_soc_jack hdmi_jack;
 	bool jack_setup;
@@ -69,11 +59,7 @@ static int sc7280_headset_init(struct snd_soc_pcm_runtime *rtd)
 					     SND_JACK_BTN_0 | SND_JACK_BTN_1 |
 					     SND_JACK_BTN_2 | SND_JACK_BTN_3 |
 					     SND_JACK_BTN_4 | SND_JACK_BTN_5,
-<<<<<<< HEAD
 					     &pdata->hs_jack);
-=======
-					     &pdata->hs_jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (rval < 0) {
 			dev_err(card->dev, "Unable to add Headset Jack\n");
@@ -92,15 +78,10 @@ static int sc7280_headset_init(struct snd_soc_pcm_runtime *rtd)
 		pdata->jack_setup = true;
 	}
 	switch (cpu_dai->id) {
-<<<<<<< HEAD
 	case MI2S_PRIMARY:
 	case LPASS_CDC_DMA_RX0:
 	case LPASS_CDC_DMA_TX3:
 	case TX_CODEC_DMA_TX_3:
-=======
-	case LPASS_CDC_DMA_RX0:
-	case LPASS_CDC_DMA_TX3:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		for_each_rtd_codec_dais(rtd, i, codec_dai) {
 			rval = snd_soc_component_set_jack(component, &pdata->hs_jack, NULL);
 			if (rval != 0 && rval != -ENOTSUPP) {
@@ -126,11 +107,7 @@ static int sc7280_hdmi_init(struct snd_soc_pcm_runtime *rtd)
 	int rval;
 
 	rval = snd_soc_card_jack_new(card, "HDMI Jack",	SND_JACK_LINEOUT,
-<<<<<<< HEAD
 				     &pdata->hdmi_jack);
-=======
-				     &pdata->hdmi_jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (rval < 0) {
 		dev_err(card->dev, "Unable to add HDMI Jack\n");
@@ -144,7 +121,6 @@ static int sc7280_hdmi_init(struct snd_soc_pcm_runtime *rtd)
 	return snd_soc_component_set_jack(component, &pdata->hdmi_jack, NULL);
 }
 
-<<<<<<< HEAD
 static int sc7280_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
@@ -184,30 +160,21 @@ static int sc7280_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int sc7280_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(rtd, 0);
 
 	switch (cpu_dai->id) {
-<<<<<<< HEAD
 	case MI2S_PRIMARY:
 	case LPASS_CDC_DMA_TX3:
 	case TX_CODEC_DMA_TX_3:
-=======
-	case LPASS_CDC_DMA_TX3:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return sc7280_headset_init(rtd);
 	case LPASS_CDC_DMA_RX0:
 	case LPASS_CDC_DMA_VA_TX0:
 	case MI2S_SECONDARY:
-<<<<<<< HEAD
 	case RX_CODEC_DMA_RX_0:
 	case SECONDARY_MI2S_RX:
 	case VA_CODEC_DMA_TX_0:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	case LPASS_DP_RX:
 		return sc7280_hdmi_init(rtd);
@@ -235,13 +202,10 @@ static int sc7280_snd_hw_params(struct snd_pcm_substream *substream,
 	switch (cpu_dai->id) {
 	case LPASS_CDC_DMA_TX3:
 	case LPASS_CDC_DMA_RX0:
-<<<<<<< HEAD
 	case RX_CODEC_DMA_RX_0:
 	case SECONDARY_MI2S_RX:
 	case TX_CODEC_DMA_TX_3:
 	case VA_CODEC_DMA_TX_0:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		for_each_rtd_codec_dais(rtd, i, codec_dai) {
 			sruntime = snd_soc_dai_get_stream(codec_dai, substream->stream);
 			if (sruntime != ERR_PTR(-ENOTSUPP))
@@ -292,12 +256,9 @@ static int sc7280_snd_prepare(struct snd_pcm_substream *substream)
 	switch (cpu_dai->id) {
 	case LPASS_CDC_DMA_RX0:
 	case LPASS_CDC_DMA_TX3:
-<<<<<<< HEAD
 	case RX_CODEC_DMA_RX_0:
 	case TX_CODEC_DMA_TX_3:
 	case VA_CODEC_DMA_TX_0:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return sc7280_snd_swr_prepare(substream);
 	default:
 		break;
@@ -316,12 +277,9 @@ static int sc7280_snd_hw_free(struct snd_pcm_substream *substream)
 	switch (cpu_dai->id) {
 	case LPASS_CDC_DMA_RX0:
 	case LPASS_CDC_DMA_TX3:
-<<<<<<< HEAD
 	case RX_CODEC_DMA_RX_0:
 	case TX_CODEC_DMA_TX_3:
 	case VA_CODEC_DMA_TX_0:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (sruntime && data->stream_prepared[cpu_dai->id]) {
 			sdw_disable_stream(sruntime);
 			sdw_deprepare_stream(sruntime);
@@ -334,7 +292,6 @@ static int sc7280_snd_hw_free(struct snd_pcm_substream *substream)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void sc7280_snd_shutdown(struct snd_pcm_substream *substream)
 {
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
@@ -399,12 +356,6 @@ static const struct snd_soc_ops sc7280_ops = {
 static const struct snd_soc_dapm_widget sc7280_snd_widgets[] = {
 	SND_SOC_DAPM_HP("Headphone Jack", NULL),
 	SND_SOC_DAPM_MIC("Headset Mic", NULL),
-=======
-static const struct snd_soc_ops sc7280_ops = {
-	.hw_params = sc7280_snd_hw_params,
-	.hw_free = sc7280_snd_hw_free,
-	.prepare = sc7280_snd_prepare,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int sc7280_snd_platform_probe(struct platform_device *pdev)
@@ -426,12 +377,9 @@ static int sc7280_snd_platform_probe(struct platform_device *pdev)
 	card->driver_name = "SC7280";
 	card->dev = dev;
 
-<<<<<<< HEAD
 	card->dapm_widgets = sc7280_snd_widgets;
 	card->num_dapm_widgets = ARRAY_SIZE(sc7280_snd_widgets);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = qcom_snd_parse_of(card);
 	if (ret)
 		return ret;

@@ -507,21 +507,12 @@ pgoff_t page_cache_prev_miss(struct address_space *mapping,
 #define FGP_HEAD		0x00000080
 #define FGP_ENTRY		0x00000100
 #define FGP_STABLE		0x00000200
-<<<<<<< HEAD
 
 struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
 		int fgp_flags, gfp_t gfp);
 struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
 		int fgp_flags, gfp_t gfp);
 
-=======
-
-struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
-		int fgp_flags, gfp_t gfp);
-struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
-		int fgp_flags, gfp_t gfp);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * filemap_get_folio - Find and get a folio.
  * @mapping: The address_space to search.
@@ -687,7 +678,6 @@ static inline pgoff_t folio_next_index(struct folio *folio)
  * Return: The page containing the file data for this index.
  */
 static inline struct page *folio_file_page(struct folio *folio, pgoff_t index)
-<<<<<<< HEAD
 {
 	/* HugeTLBfs indexes the page cache in units of hpage_size */
 	if (folio_test_hugetlb(folio))
@@ -709,29 +699,6 @@ static inline bool folio_contains(struct folio *folio, pgoff_t index)
 {
 	/* HugeTLBfs indexes the page cache in units of hpage_size */
 	if (folio_test_hugetlb(folio))
-=======
-{
-	/* HugeTLBfs indexes the page cache in units of hpage_size */
-	if (folio_test_hugetlb(folio))
-		return &folio->page;
-	return folio_page(folio, index & (folio_nr_pages(folio) - 1));
-}
-
-/**
- * folio_contains - Does this folio contain this index?
- * @folio: The folio.
- * @index: The page index within the file.
- *
- * Context: The caller should have the page locked in order to prevent
- * (eg) shmem from moving the page between the page cache and swap cache
- * and changing its index in the middle of the operation.
- * Return: true or false.
- */
-static inline bool folio_contains(struct folio *folio, pgoff_t index)
-{
-	/* HugeTLBfs indexes the page cache in units of hpage_size */
-	if (folio_test_hugetlb(folio))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return folio->index == index;
 	return index - folio_index(folio) < folio_nr_pages(folio);
 }
@@ -751,13 +718,8 @@ static inline struct page *find_subpage(struct page *head, pgoff_t index)
 
 unsigned filemap_get_folios(struct address_space *mapping, pgoff_t *start,
 		pgoff_t end, struct folio_batch *fbatch);
-<<<<<<< HEAD
 unsigned filemap_get_folios_contig(struct address_space *mapping,
 		pgoff_t *start, pgoff_t end, struct folio_batch *fbatch);
-=======
-unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t start,
-			       unsigned int nr_pages, struct page **pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned find_get_pages_range_tag(struct address_space *mapping, pgoff_t *index,
 			pgoff_t end, xa_mark_t tag, unsigned int nr_pages,
 			struct page **pages);
@@ -790,7 +752,6 @@ extern struct page * read_cache_page_gfp(struct address_space *mapping,
 
 static inline struct page *read_mapping_page(struct address_space *mapping,
 				pgoff_t index, struct file *file)
-<<<<<<< HEAD
 {
 	return read_cache_page(mapping, index, NULL, file);
 }
@@ -798,15 +759,6 @@ static inline struct page *read_mapping_page(struct address_space *mapping,
 static inline struct folio *read_mapping_folio(struct address_space *mapping,
 				pgoff_t index, struct file *file)
 {
-=======
-{
-	return read_cache_page(mapping, index, NULL, file);
-}
-
-static inline struct folio *read_mapping_folio(struct address_space *mapping,
-				pgoff_t index, struct file *file)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return read_cache_folio(mapping, index, NULL, file);
 }
 
@@ -1043,21 +995,10 @@ static inline int lock_page_killable(struct page *page)
  * Return value and mmap_lock implications depend on flags; see
  * __folio_lock_or_retry().
  */
-<<<<<<< HEAD
 static inline bool folio_lock_or_retry(struct folio *folio,
 		struct mm_struct *mm, unsigned int flags)
-=======
-static inline bool lock_page_or_retry(struct page *page, struct mm_struct *mm,
-				     unsigned int flags)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
-	struct folio *folio;
 	might_sleep();
-<<<<<<< HEAD
-=======
-
-	folio = page_folio(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return folio_trylock(folio) || __folio_lock_or_retry(folio, mm, flags);
 }
 
@@ -1098,10 +1039,6 @@ static inline int wait_on_page_locked_killable(struct page *page)
 	return folio_wait_locked_killable(page_folio(page));
 }
 
-<<<<<<< HEAD
-=======
-int folio_put_wait_locked(struct folio *folio, int state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void wait_on_page_writeback(struct page *page);
 void folio_wait_writeback(struct folio *folio);
 int folio_wait_writeback_killable(struct folio *folio);

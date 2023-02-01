@@ -12,10 +12,7 @@
 #include <net/bluetooth/mgmt.h>
 
 #include "hci_request.h"
-<<<<<<< HEAD
 #include "hci_codec.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "hci_debugfs.h"
 #include "smp.h"
 #include "eir.h"
@@ -250,11 +247,7 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
 	skb = __hci_cmd_sync_sk(hdev, opcode, plen, param, event, timeout, sk);
 	if (IS_ERR(skb)) {
 		bt_dev_err(hdev, "Opcode 0x%4x failed: %ld", opcode,
-<<<<<<< HEAD
 				PTR_ERR(skb));
-=======
-			   PTR_ERR(skb));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return PTR_ERR(skb);
 	}
 
@@ -329,7 +322,6 @@ static void hci_cmd_sync_cancel_work(struct work_struct *work)
 	wake_up_interruptible(&hdev->req_wait_q);
 }
 
-<<<<<<< HEAD
 static int hci_scan_disable_sync(struct hci_dev *hdev);
 static int scan_disable_sync(struct hci_dev *hdev, void *data)
 {
@@ -631,8 +623,6 @@ unlock:
 	hci_dev_unlock(hdev);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void hci_cmd_sync_init(struct hci_dev *hdev)
 {
 	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
@@ -640,13 +630,10 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
 	mutex_init(&hdev->cmd_sync_work_lock);
 
 	INIT_WORK(&hdev->cmd_sync_cancel_work, hci_cmd_sync_cancel_work);
-<<<<<<< HEAD
 	INIT_WORK(&hdev->reenable_adv_work, reenable_adv);
 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable);
 	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart);
 	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void hci_cmd_sync_clear(struct hci_dev *hdev)
@@ -654,10 +641,7 @@ void hci_cmd_sync_clear(struct hci_dev *hdev)
 	struct hci_cmd_sync_work_entry *entry, *tmp;
 
 	cancel_work_sync(&hdev->cmd_sync_work);
-<<<<<<< HEAD
 	cancel_work_sync(&hdev->reenable_adv_work);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
 		if (entry->destroy)
@@ -1656,17 +1640,6 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
 }
 
-<<<<<<< HEAD
-=======
-static void cancel_adv_timeout(struct hci_dev *hdev)
-{
-	if (hdev->adv_instance_timeout) {
-		hdev->adv_instance_timeout = 0;
-		cancel_delayed_work(&hdev->adv_instance_expire);
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
 {
 	struct {
@@ -1818,7 +1791,6 @@ static int hci_clear_adv_sets_sync(struct hci_dev *hdev, struct sock *sk)
 static int hci_clear_adv_sync(struct hci_dev *hdev, struct sock *sk, bool force)
 {
 	struct adv_info *adv, *n;
-<<<<<<< HEAD
 	int err = 0;
 
 	if (ext_adv_capable(hdev))
@@ -1826,12 +1798,6 @@ static int hci_clear_adv_sync(struct hci_dev *hdev, struct sock *sk, bool force)
 		err = hci_clear_adv_sets_sync(hdev, sk);
 	if (ext_adv_capable(hdev))
 		return err;
-=======
-
-	if (ext_adv_capable(hdev))
-		/* Remove all existing sets */
-		return hci_clear_adv_sets_sync(hdev, sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* This is safe as long as there is no command send while the lock is
 	 * held.
@@ -1859,7 +1825,6 @@ static int hci_clear_adv_sync(struct hci_dev *hdev, struct sock *sk, bool force)
 static int hci_remove_adv_sync(struct hci_dev *hdev, u8 instance,
 			       struct sock *sk)
 {
-<<<<<<< HEAD
 	int err = 0;
 
 	/* If we use extended advertising, instance has to be removed first. */
@@ -1867,13 +1832,6 @@ static int hci_remove_adv_sync(struct hci_dev *hdev, u8 instance,
 		err = hci_remove_ext_adv_instance_sync(hdev, instance, sk);
 	if (ext_adv_capable(hdev))
 		return err;
-=======
-	int err;
-
-	/* If we use extended advertising, instance has to be removed first. */
-	if (ext_adv_capable(hdev))
-		return hci_remove_ext_adv_instance_sync(hdev, instance, sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* This is safe as long as there is no command send while the lock is
 	 * held.
@@ -1972,23 +1930,16 @@ int hci_read_tx_power_sync(struct hci_dev *hdev, __le16 handle, u8 type)
 int hci_disable_advertising_sync(struct hci_dev *hdev)
 {
 	u8 enable = 0x00;
-<<<<<<< HEAD
 	int err = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* If controller is not advertising we are done. */
 	if (!hci_dev_test_flag(hdev, HCI_LE_ADV))
 		return 0;
 
 	if (ext_adv_capable(hdev))
-<<<<<<< HEAD
 		err = hci_disable_ext_adv_instance_sync(hdev, 0x00);
 	if (ext_adv_capable(hdev))
 		return err;
-=======
-		return hci_disable_ext_adv_instance_sync(hdev, 0x00);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_ENABLE,
 				     sizeof(enable), &enable, HCI_CMD_TIMEOUT);
@@ -2001,15 +1952,11 @@ static int hci_le_set_ext_scan_enable_sync(struct hci_dev *hdev, u8 val,
 
 	memset(&cp, 0, sizeof(cp));
 	cp.enable = val;
-<<<<<<< HEAD
 
 	if (hci_dev_test_flag(hdev, HCI_MESH))
 		cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
 	else
 		cp.filter_dup = filter_dup;
-=======
-	cp.filter_dup = filter_dup;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_ENABLE,
 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
@@ -2025,15 +1972,11 @@ static int hci_le_set_scan_enable_sync(struct hci_dev *hdev, u8 val,
 
 	memset(&cp, 0, sizeof(cp));
 	cp.enable = val;
-<<<<<<< HEAD
 
 	if (val && hci_dev_test_flag(hdev, HCI_MESH))
 		cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
 	else
 		cp.filter_dup = filter_dup;
-=======
-	cp.filter_dup = filter_dup;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_SCAN_ENABLE,
 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
@@ -2672,10 +2615,7 @@ static int hci_passive_scan_sync(struct hci_dev *hdev)
 	u8 own_addr_type;
 	u8 filter_policy;
 	u16 window, interval;
-<<<<<<< HEAD
 	u8 filter_dups = LE_SCAN_FILTER_DUP_ENABLE;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	if (hdev->scanning_paused) {
@@ -2738,7 +2678,6 @@ static int hci_passive_scan_sync(struct hci_dev *hdev)
 		interval = hdev->le_scan_interval;
 	}
 
-<<<<<<< HEAD
 	/* Disable all filtering for Mesh */
 	if (hci_dev_test_flag(hdev, HCI_MESH)) {
 		filter_policy = 0;
@@ -2749,13 +2688,6 @@ static int hci_passive_scan_sync(struct hci_dev *hdev)
 
 	return hci_start_scan_sync(hdev, LE_SCAN_PASSIVE, interval, window,
 				   own_addr_type, filter_policy, filter_dups);
-=======
-	bt_dev_dbg(hdev, "LE passive scan with acceptlist = %d", filter_policy);
-
-	return hci_start_scan_sync(hdev, LE_SCAN_PASSIVE, interval, window,
-				   own_addr_type, filter_policy,
-				   LE_SCAN_FILTER_DUP_ENABLE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* This function controls the passive scanning based on hdev->pend_le_conns
@@ -2805,12 +2737,8 @@ int hci_update_passive_scan_sync(struct hci_dev *hdev)
 	bt_dev_dbg(hdev, "ADV monitoring is %s",
 		   hci_is_adv_monitoring(hdev) ? "on" : "off");
 
-<<<<<<< HEAD
 	if (!hci_dev_test_flag(hdev, HCI_MESH) &&
 	    list_empty(&hdev->pend_le_conns) &&
-=======
-	if (list_empty(&hdev->pend_le_conns) &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    list_empty(&hdev->pend_le_reports) &&
 	    !hci_is_adv_monitoring(hdev) &&
 	    !hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
@@ -3626,11 +3554,7 @@ static const struct hci_init_stage hci_init2[] = {
 static int hci_le_read_buffer_size_sync(struct hci_dev *hdev)
 {
 	/* Use Read LE Buffer Size V2 if supported */
-<<<<<<< HEAD
 	if (iso_capable(hdev) && hdev->commands[41] & 0x20)
-=======
-	if (hdev->commands[41] & 0x20)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return __hci_cmd_sync_status(hdev,
 					     HCI_OP_LE_READ_BUFFER_SIZE_V2,
 					     0, NULL, HCI_CMD_TIMEOUT);
@@ -3655,17 +3579,10 @@ static int hci_le_read_supported_states_sync(struct hci_dev *hdev)
 
 /* LE Controller init stage 2 command sequence */
 static const struct hci_init_stage le_init2[] = {
-<<<<<<< HEAD
 	/* HCI_OP_LE_READ_LOCAL_FEATURES */
 	HCI_INIT(hci_le_read_local_features_sync),
 	/* HCI_OP_LE_READ_BUFFER_SIZE */
 	HCI_INIT(hci_le_read_buffer_size_sync),
-=======
-	/* HCI_OP_LE_READ_BUFFER_SIZE */
-	HCI_INIT(hci_le_read_buffer_size_sync),
-	/* HCI_OP_LE_READ_LOCAL_FEATURES */
-	HCI_INIT(hci_le_read_local_features_sync),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* HCI_OP_LE_READ_SUPPORTED_STATES */
 	HCI_INIT(hci_le_read_supported_states_sync),
 	{}
@@ -3864,12 +3781,8 @@ static int hci_read_page_scan_activity_sync(struct hci_dev *hdev)
 static int hci_read_def_err_data_reporting_sync(struct hci_dev *hdev)
 {
 	if (!(hdev->commands[18] & 0x04) ||
-<<<<<<< HEAD
 	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING) ||
 	    test_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks))
-=======
-	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_DEF_ERR_DATA_REPORTING,
@@ -4327,20 +4240,12 @@ static int hci_set_event_mask_page_2_sync(struct hci_dev *hdev)
 /* Read local codec list if the HCI command is supported */
 static int hci_read_local_codecs_sync(struct hci_dev *hdev)
 {
-<<<<<<< HEAD
 	if (hdev->commands[45] & 0x04)
 		hci_read_supported_codecs_v2(hdev);
 	else if (hdev->commands[29] & 0x20)
 		hci_read_supported_codecs(hdev);
 
 	return 0;
-=======
-	if (!(hdev->commands[29] & 0x20))
-		return 0;
-
-	return __hci_cmd_sync_status(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
-				     HCI_CMD_TIMEOUT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Read local pairing options if the HCI command is supported */
@@ -4356,11 +4261,7 @@ static int hci_read_local_pairing_opts_sync(struct hci_dev *hdev)
 /* Get MWS transport configuration if the HCI command is supported */
 static int hci_get_mws_transport_config_sync(struct hci_dev *hdev)
 {
-<<<<<<< HEAD
 	if (!mws_transport_config_capable(hdev))
-=======
-	if (!(hdev->commands[30] & 0x08))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	return __hci_cmd_sync_status(hdev, HCI_OP_GET_MWS_TRANSPORT_CONFIG,
@@ -4400,12 +4301,8 @@ static int hci_set_err_data_report_sync(struct hci_dev *hdev)
 	bool enabled = hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED);
 
 	if (!(hdev->commands[18] & 0x08) ||
-<<<<<<< HEAD
 	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING) ||
 	    test_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks))
-=======
-	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	if (enabled == hdev->err_data_reporting)
@@ -4564,12 +4461,9 @@ static const struct {
 	HCI_QUIRK_BROKEN(STORED_LINK_KEY,
 			 "HCI Delete Stored Link Key command is advertised, "
 			 "but not supported."),
-<<<<<<< HEAD
 	HCI_QUIRK_BROKEN(ERR_DATA_REPORTING,
 			 "HCI Read Default Erroneous Data Reporting command is "
 			 "advertised, but not supported."),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	HCI_QUIRK_BROKEN(READ_TRANSMIT_POWER,
 			 "HCI Read Transmit Power Level command is advertised, "
 			 "but not supported."),
@@ -4841,7 +4735,6 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
 	BT_DBG("All LE pending actions cleared");
 }
 
-<<<<<<< HEAD
 static int hci_dev_shutdown(struct hci_dev *hdev)
 {
 	int err = 0;
@@ -4867,8 +4760,6 @@ static int hci_dev_shutdown(struct hci_dev *hdev)
 	return err;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int hci_dev_close_sync(struct hci_dev *hdev)
 {
 	bool auto_off;
@@ -4878,7 +4769,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
 
 	cancel_delayed_work(&hdev->power_off);
 	cancel_delayed_work(&hdev->ncmd_timer);
-<<<<<<< HEAD
 	cancel_delayed_work(&hdev->le_scan_disable);
 	cancel_delayed_work(&hdev->le_scan_restart);
 
@@ -4891,19 +4781,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
 
 	err = hci_dev_shutdown(hdev);
 
-=======
-
-	hci_request_cancel_all(hdev);
-
-	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-	    test_bit(HCI_UP, &hdev->flags)) {
-		/* Execute vendor specific shutdown routine */
-		if (hdev->shutdown)
-			err = hdev->shutdown(hdev);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
 		cancel_delayed_work_sync(&hdev->cmd_timer);
 		return err;
@@ -5501,11 +5378,7 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
 	/* Pause advertising since active scanning disables address resolution
 	 * which advertising depend on in order to generate its RPAs.
 	 */
-<<<<<<< HEAD
 	if (use_ll_privacy(hdev) && hci_dev_test_flag(hdev, HCI_PRIVACY)) {
-=======
-	if (use_ll_privacy(hdev)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = hci_pause_advertising_sync(hdev);
 		if (err) {
 			bt_dev_err(hdev, "pause advertising failed: %d", err);
@@ -6219,7 +6092,6 @@ int hci_le_pa_terminate_sync(struct hci_dev *hdev, u16 handle)
 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_PA_TERM_SYNC,
 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
 }
-<<<<<<< HEAD
 
 int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
 			   bool use_rpa, struct adv_info *adv_instance,
@@ -6313,5 +6185,3 @@ int hci_update_adv_data(struct hci_dev *hdev, u8 instance)
 	*inst_ptr = instance;
 	return hci_cmd_sync_queue(hdev, _update_adv_data_sync, inst_ptr, NULL);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

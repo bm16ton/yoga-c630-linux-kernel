@@ -24,11 +24,8 @@ description: |
   Right now only flash partition case is covered but it may be extended to e.g.
   UBI volumes in the future.
 
-<<<<<<< HEAD
   Variables can be defined as NVMEM device subnodes.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 maintainers:
   - Rafał Miłecki <rafal@milecki.pl>
 
@@ -45,7 +42,6 @@ properties:
   reg:
     maxItems: 1
 
-<<<<<<< HEAD
   bootcmd:
     type: object
     description: Command to use for automatic booting
@@ -54,8 +50,6 @@ properties:
     type: object
     description: Ethernet interface's MAC address
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 additionalProperties: false
 
 examples:
@@ -74,11 +68,8 @@ examples:
         env: partition@40000 {
             compatible = "u-boot,env";
             reg = <0x40000 0x10000>;
-<<<<<<< HEAD
 
             mac: ethaddr {
             };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         };
     };

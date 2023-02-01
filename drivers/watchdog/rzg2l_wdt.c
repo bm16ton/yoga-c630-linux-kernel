@@ -10,11 +10,7 @@
 #include <linux/io.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
-<<<<<<< HEAD
 #include <linux/of_device.h>
-=======
-#include <linux/of.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
 #include <linux/reset.h>
@@ -44,14 +40,11 @@ module_param(nowayout, bool, 0);
 MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started (default="
 				__MODULE_STRING(WATCHDOG_NOWAYOUT) ")");
 
-<<<<<<< HEAD
 enum rz_wdt_type {
 	WDT_RZG2L,
 	WDT_RZV2M,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct rzg2l_wdt_priv {
 	void __iomem *base;
 	struct watchdog_device wdev;
@@ -60,10 +53,7 @@ struct rzg2l_wdt_priv {
 	unsigned long delay;
 	struct clk *pclk;
 	struct clk *osc_clk;
-<<<<<<< HEAD
 	enum rz_wdt_type devtype;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void rzg2l_wdt_wait_delay(struct rzg2l_wdt_priv *priv)
@@ -158,7 +148,6 @@ static int rzg2l_wdt_restart(struct watchdog_device *wdev,
 	clk_prepare_enable(priv->pclk);
 	clk_prepare_enable(priv->osc_clk);
 
-<<<<<<< HEAD
 	if (priv->devtype == WDT_RZG2L) {
 		/* Generate Reset (WDTRSTB) Signal on parity error */
 		rzg2l_wdt_write(priv, 0, PECR);
@@ -182,13 +171,6 @@ static int rzg2l_wdt_restart(struct watchdog_device *wdev,
 		/* Wait 2 consecutive overflow cycles for reset */
 		mdelay(DIV_ROUND_UP(2 * 0xFFFFF * 1000, priv->osc_clk_rate));
 	}
-=======
-	/* Generate Reset (WDTRSTB) Signal on parity error */
-	rzg2l_wdt_write(priv, 0, PECR);
-
-	/* Force parity error */
-	rzg2l_wdt_write(priv, PEEN_FORCE, PEEN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -269,11 +251,8 @@ static int rzg2l_wdt_probe(struct platform_device *pdev)
 	if (ret)
 		return dev_err_probe(dev, ret, "failed to deassert");
 
-<<<<<<< HEAD
 	priv->devtype = (uintptr_t)of_device_get_match_data(dev);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pm_runtime_enable(&pdev->dev);
 
 	priv->wdev.info = &rzg2l_wdt_ident;
@@ -302,12 +281,8 @@ static int rzg2l_wdt_probe(struct platform_device *pdev)
 }
 
 static const struct of_device_id rzg2l_wdt_ids[] = {
-<<<<<<< HEAD
 	{ .compatible = "renesas,rzg2l-wdt", .data = (void *)WDT_RZG2L },
 	{ .compatible = "renesas,rzv2m-wdt", .data = (void *)WDT_RZV2M },
-=======
-	{ .compatible = "renesas,rzg2l-wdt", },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, rzg2l_wdt_ids);

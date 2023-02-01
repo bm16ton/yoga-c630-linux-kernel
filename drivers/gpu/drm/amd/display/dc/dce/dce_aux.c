@@ -814,15 +814,6 @@ bool dce_aux_transfer_with_retries(struct ddc_service *ddc,
 								"dce_aux_transfer_with_retries: AUX_RET_SUCCESS: AUX_TRANSACTION_REPLY_I2C_OVER_AUX_DEFER");
 
 				retry_on_defer = true;
-<<<<<<< HEAD
-=======
-				fallthrough;
-			case AUX_TRANSACTION_REPLY_I2C_OVER_AUX_NACK:
-				if (*payload->reply == AUX_TRANSACTION_REPLY_I2C_OVER_AUX_NACK)
-					DC_TRACE_LEVEL_MESSAGE(DAL_TRACE_LEVEL_INFORMATION,
-								LOG_FLAG_I2cAux_DceAux,
-								"dce_aux_transfer_with_retries: AUX_RET_SUCCESS: AUX_TRANSACTION_REPLY_I2C_OVER_AUX_NACK");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 				if (aux_defer_retries >= AUX_MIN_DEFER_RETRIES
 						&& defer_time_in_ms >= AUX_MAX_DEFER_TIMEOUT_MS) {
@@ -951,10 +942,6 @@ bool dce_aux_transfer_with_retries(struct ddc_service *ddc,
 		case AUX_RET_ERROR_ENGINE_ACQUIRE:
 		case AUX_RET_ERROR_UNKNOWN:
 		default:
-			DC_TRACE_LEVEL_MESSAGE(DAL_TRACE_LEVEL_INFORMATION,
-						LOG_FLAG_I2cAux_DceAux,
-						"dce_aux_transfer_with_retries: Failure: operation_result=%d",
-						(int)operation_result);
 			goto fail;
 		}
 	}
@@ -962,23 +949,11 @@ bool dce_aux_transfer_with_retries(struct ddc_service *ddc,
 fail:
 	DC_TRACE_LEVEL_MESSAGE(DAL_TRACE_LEVEL_ERROR,
 				LOG_FLAG_Error_I2cAux,
-<<<<<<< HEAD
 				"%s: Failure: operation_result=%d",
 				__func__,
 				(int)operation_result);
 	if (!payload_reply)
 		payload->reply = NULL;
 
-=======
-				"dce_aux_transfer_with_retries: FAILURE");
-	if (!payload_reply)
-		payload->reply = NULL;
-
-	DC_TRACE_LEVEL_MESSAGE(DAL_TRACE_LEVEL_ERROR,
-				WPP_BIT_FLAG_DC_ERROR,
-				"AUX transaction failed. Result: %d",
-				operation_result);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }

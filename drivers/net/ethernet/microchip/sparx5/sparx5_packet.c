@@ -222,34 +222,20 @@ static int sparx5_inject(struct sparx5 *sparx5,
 	return NETDEV_TX_OK;
 }
 
-<<<<<<< HEAD
 netdev_tx_t sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev)
-=======
-int sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct net_device_stats *stats = &dev->stats;
 	struct sparx5_port *port = netdev_priv(dev);
 	struct sparx5 *sparx5 = port->sparx5;
 	u32 ifh[IFH_LEN];
-<<<<<<< HEAD
 	netdev_tx_t ret;
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	memset(ifh, 0, IFH_LEN * 4);
 	sparx5_set_port_ifh(ifh, port->portno);
 
 	if (sparx5->ptp && skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) {
-<<<<<<< HEAD
 		if (sparx5_ptp_txtstamp_request(port, skb) < 0)
 			return NETDEV_TX_BUSY;
-=======
-		ret = sparx5_ptp_txtstamp_request(port, skb);
-		if (ret)
-			return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		sparx5_set_port_ifh_rew_op(ifh, SPARX5_SKB_CB(skb)->rew_op);
 		sparx5_set_port_ifh_pdu_type(ifh, SPARX5_SKB_CB(skb)->pdu_type);
@@ -263,7 +249,6 @@ int sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev)
 	else
 		ret = sparx5_inject(sparx5, ifh, skb, dev);
 
-<<<<<<< HEAD
 	if (ret == -EBUSY)
 		goto busy;
 	if (ret < 0)
@@ -289,25 +274,6 @@ busy:
 	    SPARX5_SKB_CB(skb)->rew_op == IFH_REW_OP_TWO_STEP_PTP)
 		sparx5_ptp_txtstamp_release(port, skb);
 	return NETDEV_TX_BUSY;
-=======
-	if (ret == NETDEV_TX_OK) {
-		stats->tx_bytes += skb->len;
-		stats->tx_packets++;
-
-		if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP &&
-		    SPARX5_SKB_CB(skb)->rew_op == IFH_REW_OP_TWO_STEP_PTP)
-			return ret;
-
-		dev_kfree_skb_any(skb);
-	} else {
-		stats->tx_dropped++;
-
-		if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP &&
-		    SPARX5_SKB_CB(skb)->rew_op == IFH_REW_OP_TWO_STEP_PTP)
-			sparx5_ptp_txtstamp_release(port, skb);
-	}
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static enum hrtimer_restart sparx5_injection_timeout(struct hrtimer *tmr)

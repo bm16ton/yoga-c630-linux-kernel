@@ -152,12 +152,8 @@ static int liteeth_stop(struct net_device *netdev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static netdev_tx_t liteeth_start_xmit(struct sk_buff *skb,
 				      struct net_device *netdev)
-=======
-static int liteeth_start_xmit(struct sk_buff *skb, struct net_device *netdev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct liteeth *priv = netdev_priv(netdev);
 	void __iomem *txbuffer;

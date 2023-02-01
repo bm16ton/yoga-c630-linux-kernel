@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
-<<<<<<< HEAD
  * Copyright (C) 2019-2022 Linaro Ltd.
-=======
- * Copyright (C) 2019-2021 Linaro Ltd.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <linux/types.h>
@@ -79,10 +75,7 @@ ipa_mem_zero_region_add(struct gsi_trans *trans, enum ipa_mem_id mem_id)
 int ipa_mem_setup(struct ipa *ipa)
 {
 	dma_addr_t addr = ipa->zero_addr;
-<<<<<<< HEAD
 	const struct ipa_reg *reg;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct ipa_mem *mem;
 	struct gsi_trans *trans;
 	u32 offset;
@@ -120,15 +113,10 @@ int ipa_mem_setup(struct ipa *ipa)
 	/* Tell the hardware where the processing context area is located */
 	mem = ipa_mem_find(ipa, IPA_MEM_MODEM_PROC_CTX);
 	offset = ipa->mem_offset + mem->offset;
-<<<<<<< HEAD
 
 	reg = ipa_reg(ipa, LOCAL_PKT_PROC_CNTXT);
 	val = ipa_reg_encode(reg, IPA_BASE_ADDR, offset);
 	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
-=======
-	val = proc_cntxt_base_addr_encoded(ipa->version, offset);
-	iowrite32(val, ipa->reg_virt + IPA_REG_LOCAL_PKT_PROC_CNTXT_OFFSET);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -321,10 +309,7 @@ static bool ipa_mem_size_valid(struct ipa *ipa)
 int ipa_mem_config(struct ipa *ipa)
 {
 	struct device *dev = &ipa->pdev->dev;
-<<<<<<< HEAD
 	const struct ipa_reg *reg;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct ipa_mem *mem;
 	dma_addr_t addr;
 	u32 mem_size;

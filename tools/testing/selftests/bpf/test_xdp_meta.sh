@@ -1,9 +1,6 @@
 #!/bin/sh
 
-<<<<<<< HEAD
 BPF_FILE="test_xdp_meta.bpf.o"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # Kselftest framework requirement - SKIP code is 4.
 readonly KSFT_SKIP=4
 readonly NS1="ns1-$(mktemp -u XXXXXX)"
@@ -46,19 +43,11 @@ ip netns exec ${NS2} ip addr add 10.1.1.22/24 dev veth2
 ip netns exec ${NS1} tc qdisc add dev veth1 clsact
 ip netns exec ${NS2} tc qdisc add dev veth2 clsact
 
-<<<<<<< HEAD
 ip netns exec ${NS1} tc filter add dev veth1 ingress bpf da obj ${BPF_FILE} sec t
 ip netns exec ${NS2} tc filter add dev veth2 ingress bpf da obj ${BPF_FILE} sec t
 
 ip netns exec ${NS1} ip link set dev veth1 xdp obj ${BPF_FILE} sec x
 ip netns exec ${NS2} ip link set dev veth2 xdp obj ${BPF_FILE} sec x
-=======
-ip netns exec ${NS1} tc filter add dev veth1 ingress bpf da obj test_xdp_meta.o sec t
-ip netns exec ${NS2} tc filter add dev veth2 ingress bpf da obj test_xdp_meta.o sec t
-
-ip netns exec ${NS1} ip link set dev veth1 xdp obj test_xdp_meta.o sec x
-ip netns exec ${NS2} ip link set dev veth2 xdp obj test_xdp_meta.o sec x
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 ip netns exec ${NS1} ip link set dev veth1 up
 ip netns exec ${NS2} ip link set dev veth2 up

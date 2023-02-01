@@ -20,11 +20,7 @@
 #include <drm/drm_format_helper.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_managed.h>
 #include <drm/drm_mipi_dbi.h>
@@ -79,13 +75,9 @@ static void st7586_xrgb8888_to_gray332(u8 *dst, void *vaddr,
 	if (!buf)
 		return;
 
-<<<<<<< HEAD
 	iosys_map_set_vaddr(&dst_map, buf);
 	iosys_map_set_vaddr(&vmap, vaddr);
 	drm_fb_xrgb8888_to_gray8(&dst_map, NULL, &vmap, fb, clip);
-=======
-	drm_fb_xrgb8888_to_gray8(buf, 0, vaddr, fb, clip);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	src = buf;
 
 	for (y = clip->y1; y < clip->y2; y++) {
@@ -103,13 +95,8 @@ static void st7586_xrgb8888_to_gray332(u8 *dst, void *vaddr,
 static int st7586_buf_copy(void *dst, struct drm_framebuffer *fb,
 			   struct drm_rect *clip)
 {
-<<<<<<< HEAD
 	struct drm_gem_dma_object *dma_obj = drm_fb_dma_get_gem_obj(fb, 0);
 	void *src = dma_obj->vaddr;
-=======
-	struct drm_gem_cma_object *cma_obj = drm_fb_cma_get_gem_obj(fb, 0);
-	void *src = cma_obj->vaddr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret = 0;
 
 	ret = drm_gem_fb_begin_cpu_access(fb, DMA_FROM_DEVICE);

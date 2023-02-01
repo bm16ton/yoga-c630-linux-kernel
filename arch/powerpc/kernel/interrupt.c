@@ -307,7 +307,6 @@ notrace unsigned long syscall_exit_prepare(unsigned long r3,
 
 	return ret;
 }
-<<<<<<< HEAD
 
 #ifdef CONFIG_PPC64
 notrace unsigned long syscall_exit_restart(unsigned long r3, struct pt_regs *regs)
@@ -345,56 +344,11 @@ notrace unsigned long interrupt_exit_user_prepare(struct pt_regs *regs)
 	BUG_ON(regs_is_unrecoverable(regs));
 	BUG_ON(arch_irq_disabled_regs(regs));
 	CT_WARN_ON(ct_state() == CONTEXT_USER);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-#ifdef CONFIG_PPC64
-notrace unsigned long syscall_exit_restart(unsigned long r3, struct pt_regs *regs)
-{
-	/*
-<<<<<<< HEAD
-	 * We don't need to restore AMR on the way back to userspace for KUAP.
-	 * AMR can only have been unlocked if we interrupted the kernel.
-	 */
-=======
-	 * This is called when detecting a soft-pending interrupt as well as
-	 * an alternate-return interrupt. So we can't just have the alternate
-	 * return path clear SRR1[MSR] and set PACA_IRQ_HARD_DIS (unless
-	 * the soft-pending case were to fix things up as well). RI might be
-	 * disabled, in which case it gets re-enabled by __hard_irq_disable().
-	 */
-	__hard_irq_disable();
-	local_paca->irq_happened |= PACA_IRQ_HARD_DIS;
-
-#ifdef CONFIG_PPC_BOOK3S_64
-	set_kuap(AMR_KUAP_BLOCKED);
-#endif
-
-	trace_hardirqs_off();
-	user_exit_irqoff();
-	account_cpu_user_entry();
-
-	BUG_ON(!user_mode(regs));
-
-	regs->exit_result = interrupt_exit_user_prepare_main(regs->exit_result, regs);
-
-	return regs->exit_result;
-}
-#endif
-
-notrace unsigned long interrupt_exit_user_prepare(struct pt_regs *regs)
-{
-	unsigned long ret;
-
-	BUG_ON(regs_is_unrecoverable(regs));
-	BUG_ON(arch_irq_disabled_regs(regs));
-	CT_WARN_ON(ct_state() == CONTEXT_USER);
 
 	/*
 	 * We don't need to restore AMR on the way back to userspace for KUAP.
 	 * AMR can only have been unlocked if we interrupted the kernel.
 	 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kuap_assert_locked();
 
 	local_irq_disable();
@@ -429,13 +383,9 @@ notrace unsigned long interrupt_exit_kernel_prepare(struct pt_regs *regs)
 	 * context to user. See also the comment in the performance monitor
 	 * handler in exceptions-64e.S
 	 */
-<<<<<<< HEAD
 	if (!IS_ENABLED(CONFIG_PPC_BOOK3E_64) &&
 	    TRAP(regs) != INTERRUPT_PROGRAM &&
 	    TRAP(regs) != INTERRUPT_PERFMON)
-=======
-	if (TRAP(regs) != INTERRUPT_PROGRAM)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		CT_WARN_ON(ct_state() == CONTEXT_USER);
 
 	kuap = kuap_get_and_assert_locked();

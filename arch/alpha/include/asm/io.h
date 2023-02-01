@@ -661,7 +661,6 @@ extern void outsl (unsigned long port, const void *src, unsigned long count);
  */
 #define xlate_dev_mem_ptr(p)	__va(p)
 
-<<<<<<< HEAD
 /*
  * These get provided from <asm-generic/iomap.h> since alpha does not
  * select GENERIC_IOMAP.
@@ -680,8 +679,6 @@ extern void outsl (unsigned long port, const void *src, unsigned long count);
 
 #include <asm-generic/io.h>
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __KERNEL__ */
 
 #endif /* __ALPHA_IO_H */

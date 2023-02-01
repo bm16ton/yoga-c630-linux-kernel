@@ -124,11 +124,7 @@ void producer(struct sockaddr_un *consumer_addr)
 
 	wait_for_signal(pipefd[0]);
 	if (connect(cfd, (struct sockaddr *)consumer_addr,
-<<<<<<< HEAD
 		     sizeof(*consumer_addr)) != 0) {
-=======
-		     sizeof(struct sockaddr)) != 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		perror("Connect failed");
 		kill(0, SIGTERM);
 		exit(1);

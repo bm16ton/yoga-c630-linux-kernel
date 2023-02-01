@@ -294,21 +294,13 @@ struct dsa_port {
 
 	u8			lag_tx_enabled:1;
 
-<<<<<<< HEAD
-=======
-	u8			devlink_port_setup:1;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Master state bits, valid only on CPU ports */
 	u8			master_admin_up:1;
 	u8			master_oper_up:1;
 
-<<<<<<< HEAD
 	/* Valid only on user ports */
 	u8			cpu_port_in_lag:1;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8			setup:1;
 
 	struct device_node	*dn;
@@ -361,17 +353,10 @@ enum dsa_db_type {
 	DSA_DB_LAG,
 	DSA_DB_BRIDGE,
 };
-<<<<<<< HEAD
 
 struct dsa_db {
 	enum dsa_db_type type;
 
-=======
-
-struct dsa_db {
-	enum dsa_db_type type;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	union {
 		const struct dsa_port *dp;
 		struct dsa_lag lag;
@@ -575,7 +560,6 @@ static inline bool dsa_is_user_port(struct dsa_switch *ds, int p)
 	list_for_each_entry((_dp), &(_dst)->ports, list) \
 		if (dsa_port_is_user((_dp)))
 
-<<<<<<< HEAD
 #define dsa_tree_for_each_user_port_continue_reverse(_dp, _dst) \
 	list_for_each_entry_continue_reverse((_dp), &(_dst)->ports, list) \
 		if (dsa_port_is_user((_dp)))
@@ -584,8 +568,6 @@ static inline bool dsa_is_user_port(struct dsa_switch *ds, int p)
 	list_for_each_entry((_dp), &(_dst)->ports, list) \
 		if (dsa_port_is_cpu((_dp)))
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define dsa_switch_for_each_port(_dp, _ds) \
 	list_for_each_entry((_dp), &(_ds)->dst->ports, list) \
 		if ((_dp)->ds == (_ds))
@@ -617,7 +599,6 @@ static inline bool dsa_is_user_port(struct dsa_switch *ds, int p)
 static inline u32 dsa_user_ports(struct dsa_switch *ds)
 {
 	struct dsa_port *dp;
-<<<<<<< HEAD
 	u32 mask = 0;
 
 	dsa_switch_for_each_user_port(dp, ds)
@@ -631,21 +612,6 @@ static inline u32 dsa_cpu_ports(struct dsa_switch *ds)
 	struct dsa_port *cpu_dp;
 	u32 mask = 0;
 
-=======
-	u32 mask = 0;
-
-	dsa_switch_for_each_user_port(dp, ds)
-		mask |= BIT(dp->index);
-
-	return mask;
-}
-
-static inline u32 dsa_cpu_ports(struct dsa_switch *ds)
-{
-	struct dsa_port *cpu_dp;
-	u32 mask = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dsa_switch_for_each_cpu_port(cpu_dp, ds)
 		mask |= BIT(cpu_dp->index);
 
@@ -757,7 +723,6 @@ static inline bool dsa_port_offloads_lag(struct dsa_port *dp,
 	return dsa_port_lag_dev_get(dp) == lag->dev;
 }
 
-<<<<<<< HEAD
 static inline struct net_device *dsa_port_to_master(const struct dsa_port *dp)
 {
 	if (dp->cpu_port_in_lag)
@@ -766,8 +731,6 @@ static inline struct net_device *dsa_port_to_master(const struct dsa_port *dp)
 	return dp->cpu_dp->master;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline
 struct net_device *dsa_port_to_bridge_port(const struct dsa_port *dp)
 {
@@ -852,15 +815,12 @@ dsa_tree_offloads_bridge_dev(struct dsa_switch_tree *dst,
 	return false;
 }
 
-<<<<<<< HEAD
 static inline bool dsa_port_tree_same(const struct dsa_port *a,
 				      const struct dsa_port *b)
 {
 	return a->ds->dst == b->ds->dst;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 typedef int dsa_fdb_dump_cb_t(const unsigned char *addr, u16 vid,
 			      bool is_static, void *data);
 struct dsa_switch_ops {
@@ -883,13 +843,10 @@ struct dsa_switch_ops {
 	 */
 	int	(*connect_tag_protocol)(struct dsa_switch *ds,
 					enum dsa_tag_protocol proto);
-<<<<<<< HEAD
 
 	int	(*port_change_master)(struct dsa_switch *ds, int port,
 				      struct net_device *master,
 				      struct netlink_ext_ack *extack);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Optional switch-wide initialization and destruction methods */
 	int	(*setup)(struct dsa_switch *ds);
@@ -1147,12 +1104,8 @@ struct dsa_switch_ops {
 					int port);
 	int	(*crosschip_lag_join)(struct dsa_switch *ds, int sw_index,
 				      int port, struct dsa_lag lag,
-<<<<<<< HEAD
 				      struct netdev_lag_upper_info *info,
 				      struct netlink_ext_ack *extack);
-=======
-				      struct netdev_lag_upper_info *info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int	(*crosschip_lag_leave)(struct dsa_switch *ds, int sw_index,
 				       int port, struct dsa_lag lag);
 
@@ -1227,12 +1180,8 @@ struct dsa_switch_ops {
 	int	(*port_lag_change)(struct dsa_switch *ds, int port);
 	int	(*port_lag_join)(struct dsa_switch *ds, int port,
 				 struct dsa_lag lag,
-<<<<<<< HEAD
 				 struct netdev_lag_upper_info *info,
 				 struct netlink_ext_ack *extack);
-=======
-				 struct netdev_lag_upper_info *info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int	(*port_lag_leave)(struct dsa_switch *ds, int port,
 				  struct dsa_lag lag);
 

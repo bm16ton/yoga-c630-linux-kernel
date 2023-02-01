@@ -523,11 +523,7 @@ static int mvebu_pcie_handle_iobase_change(struct mvebu_pcie_port *port)
 
 	/* Are the new iobase/iolimit values invalid? */
 	if (conf->iolimit < conf->iobase ||
-<<<<<<< HEAD
 	    le16_to_cpu(conf->iolimitupper) < le16_to_cpu(conf->iobaseupper))
-=======
-	    conf->iolimitupper < conf->iobaseupper)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return mvebu_pcie_set_window(port, port->io_target, port->io_attr,
 					     &desired, &port->iowin);
 
@@ -556,11 +552,7 @@ static int mvebu_pcie_handle_membase_change(struct mvebu_pcie_port *port)
 	struct pci_bridge_emul_conf *conf = &port->bridge.conf;
 
 	/* Are the new membase/memlimit values invalid? */
-<<<<<<< HEAD
 	if (le16_to_cpu(conf->memlimit) < le16_to_cpu(conf->membase))
-=======
-	if (conf->memlimit < conf->membase)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return mvebu_pcie_set_window(port, port->mem_target, port->mem_attr,
 					     &desired, &port->memwin);
 

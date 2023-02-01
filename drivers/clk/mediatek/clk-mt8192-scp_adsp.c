@@ -41,10 +41,7 @@ static const struct of_device_id of_match_clk_mt8192_scp_adsp[] = {
 
 static struct platform_driver clk_mt8192_scp_adsp_drv = {
 	.probe = mtk_clk_simple_probe,
-<<<<<<< HEAD
 	.remove = mtk_clk_simple_remove,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.driver = {
 		.name = "clk-mt8192-scp_adsp",
 		.of_match_table = of_match_clk_mt8192_scp_adsp,

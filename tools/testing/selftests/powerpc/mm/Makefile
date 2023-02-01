@@ -3,11 +3,7 @@ noarg:
 	$(MAKE) -C ../
 
 TEST_GEN_PROGS := hugetlb_vs_thp_test subpage_prot prot_sao segv_errors wild_bctr \
-<<<<<<< HEAD
 		  large_vm_fork_separation bad_accesses exec_prot pkey_exec_prot \
-=======
-		  large_vm_fork_separation bad_accesses pkey_exec_prot \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		  pkey_siginfo stack_expansion_signal stack_expansion_ldst \
 		  large_vm_gpr_corruption
 TEST_PROGS := stress_code_patching.sh

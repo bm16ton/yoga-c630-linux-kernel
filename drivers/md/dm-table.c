@@ -234,21 +234,12 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
 		return 0;
 
 	if ((start >= dev_size) || (start + len > dev_size)) {
-<<<<<<< HEAD
 		DMERR("%s: %pg too small for target: "
 		      "start=%llu, len=%llu, dev_size=%llu",
 		      dm_device_name(ti->table->md), bdev,
 		      (unsigned long long)start,
 		      (unsigned long long)len,
 		      (unsigned long long)dev_size);
-=======
-		DMWARN("%s: %pg too small for target: "
-		       "start=%llu, len=%llu, dev_size=%llu",
-		       dm_device_name(ti->table->md), bdev,
-		       (unsigned long long)start,
-		       (unsigned long long)len,
-		       (unsigned long long)dev_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 1;
 	}
 
@@ -260,17 +251,10 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
 		unsigned int zone_sectors = bdev_zone_sectors(bdev);
 
 		if (start & (zone_sectors - 1)) {
-<<<<<<< HEAD
 			DMERR("%s: start=%llu not aligned to h/w zone size %u of %pg",
 			      dm_device_name(ti->table->md),
 			      (unsigned long long)start,
 			      zone_sectors, bdev);
-=======
-			DMWARN("%s: start=%llu not aligned to h/w zone size %u of %pg",
-			       dm_device_name(ti->table->md),
-			       (unsigned long long)start,
-			       zone_sectors, bdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 1;
 		}
 
@@ -284,17 +268,10 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
 		 * the sector range.
 		 */
 		if (len & (zone_sectors - 1)) {
-<<<<<<< HEAD
 			DMERR("%s: len=%llu not aligned to h/w zone size %u of %pg",
 			      dm_device_name(ti->table->md),
 			      (unsigned long long)len,
 			      zone_sectors, bdev);
-=======
-			DMWARN("%s: len=%llu not aligned to h/w zone size %u of %pg",
-			       dm_device_name(ti->table->md),
-			       (unsigned long long)len,
-			       zone_sectors, bdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 1;
 		}
 	}
@@ -303,36 +280,20 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
 		return 0;
 
 	if (start & (logical_block_size_sectors - 1)) {
-<<<<<<< HEAD
 		DMERR("%s: start=%llu not aligned to h/w "
 		      "logical block size %u of %pg",
 		      dm_device_name(ti->table->md),
 		      (unsigned long long)start,
 		      limits->logical_block_size, bdev);
-=======
-		DMWARN("%s: start=%llu not aligned to h/w "
-		       "logical block size %u of %pg",
-		       dm_device_name(ti->table->md),
-		       (unsigned long long)start,
-		       limits->logical_block_size, bdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 1;
 	}
 
 	if (len & (logical_block_size_sectors - 1)) {
-<<<<<<< HEAD
 		DMERR("%s: len=%llu not aligned to h/w "
 		      "logical block size %u of %pg",
 		      dm_device_name(ti->table->md),
 		      (unsigned long long)len,
 		      limits->logical_block_size, bdev);
-=======
-		DMWARN("%s: len=%llu not aligned to h/w "
-		       "logical block size %u of %pg",
-		       dm_device_name(ti->table->md),
-		       (unsigned long long)len,
-		       limits->logical_block_size, bdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 1;
 	}
 
@@ -657,21 +618,12 @@ static int validate_hardware_logical_block_alignment(struct dm_table *t,
 	}
 
 	if (remaining) {
-<<<<<<< HEAD
 		DMERR("%s: table line %u (start sect %llu len %llu) "
 		      "not aligned to h/w logical block size %u",
 		      dm_device_name(t->md), i,
 		      (unsigned long long) ti->begin,
 		      (unsigned long long) ti->len,
 		      limits->logical_block_size);
-=======
-		DMWARN("%s: table line %u (start sect %llu len %llu) "
-		       "not aligned to h/w logical block size %u",
-		       dm_device_name(t->md), i,
-		       (unsigned long long) ti->begin,
-		       (unsigned long long) ti->len,
-		       limits->logical_block_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 	}
 
@@ -1375,11 +1327,7 @@ static int dm_table_construct_crypto_profile(struct dm_table *t)
 	if (t->md->queue &&
 	    !blk_crypto_has_capabilities(profile,
 					 t->md->queue->crypto_profile)) {
-<<<<<<< HEAD
 		DMERR("Inline encryption capabilities of new DM table were more restrictive than the old table's. This is not supported!");
-=======
-		DMWARN("Inline encryption capabilities of new DM table were more restrictive than the old table's. This is not supported!");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dm_destroy_crypto_profile(profile);
 		return -EINVAL;
 	}

@@ -333,11 +333,7 @@ static void sunplus_shutdown(struct uart_port *port)
 
 static void sunplus_set_termios(struct uart_port *port,
 				struct ktermios *termios,
-<<<<<<< HEAD
 				const struct ktermios *oldtermios)
-=======
-				struct ktermios *oldtermios)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u32 ext, div, div_l, div_h, baud, lcr;
 	u32 clk = port->uartclk;

@@ -377,15 +377,9 @@ cifs_get_file_info_unix(struct file *filp)
 		rc = 0;
 	} else
 		goto cifs_gfiunix_out;
-<<<<<<< HEAD
 
 	rc = cifs_fattr_to_inode(inode, &fattr);
 
-=======
-
-	rc = cifs_fattr_to_inode(inode, &fattr);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 cifs_gfiunix_out:
 	free_xid(xid);
 	return rc;
@@ -995,27 +989,9 @@ int cifs_get_inode_info(struct inode **inode, const char *full_path,
 			cifs_dbg(FYI, "No need to revalidate cached inode sizes\n");
 			goto out;
 		}
-<<<<<<< HEAD
 		rc = server->ops->query_path_info(xid, tcon, cifs_sb, full_path, &tmp_data,
 						  &adjust_tz, &is_reparse_point);
 		data = &tmp_data;
-=======
-		tmp_data = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
-		if (!tmp_data) {
-			rc = -ENOMEM;
-			goto out;
-		}
-		rc = server->ops->query_path_info(xid, tcon, cifs_sb,
-						 full_path, tmp_data,
-						 &adjust_tz, &is_reparse_point);
-#ifdef CONFIG_CIFS_DFS_UPCALL
-		if (rc == -ENOENT && is_tcon_dfs(tcon))
-			rc = cifs_dfs_query_info_nonascii_quirk(xid, tcon,
-								cifs_sb,
-								full_path);
-#endif
-		data = tmp_data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/*
@@ -2314,7 +2290,6 @@ cifs_dentry_needs_reval(struct dentry *dentry)
 		return true;
 
 	if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
-<<<<<<< HEAD
 		spin_lock(&cfid->fid_lock);
 		if (cfid->time && cifs_i->time > cfid->time) {
 			spin_unlock(&cfid->fid_lock);
@@ -2322,15 +2297,6 @@ cifs_dentry_needs_reval(struct dentry *dentry)
 			return false;
 		}
 		spin_unlock(&cfid->fid_lock);
-=======
-		mutex_lock(&cfid->fid_mutex);
-		if (cfid->time && cifs_i->time > cfid->time) {
-			mutex_unlock(&cfid->fid_mutex);
-			close_cached_dir(cfid);
-			return false;
-		}
-		mutex_unlock(&cfid->fid_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		close_cached_dir(cfid);
 	}
 	/*

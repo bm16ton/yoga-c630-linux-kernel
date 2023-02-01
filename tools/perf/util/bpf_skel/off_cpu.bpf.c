@@ -94,11 +94,8 @@ const volatile bool has_prev_state = false;
 const volatile bool needs_cgroup = false;
 const volatile bool uses_cgroup_v1 = false;
 
-<<<<<<< HEAD
 int perf_subsys_id = -1;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Old kernel used to call it task_struct->state and now it's '__state'.
  * Use BPF CO-RE "ignored suffix rule" to deal with it like below:
@@ -124,7 +121,6 @@ static inline __u64 get_cgroup_id(struct task_struct *t)
 {
 	struct cgroup *cgrp;
 
-<<<<<<< HEAD
 	if (!uses_cgroup_v1)
 		return BPF_CORE_READ(t, cgroups, dfl_cgrp, kn, id);
 
@@ -138,13 +134,6 @@ static inline __u64 get_cgroup_id(struct task_struct *t)
 	}
 
 	cgrp = BPF_CORE_READ(t, cgroups, subsys[perf_subsys_id], cgroup);
-=======
-	if (uses_cgroup_v1)
-		cgrp = BPF_CORE_READ(t, cgroups, subsys[perf_event_cgrp_id], cgroup);
-	else
-		cgrp = BPF_CORE_READ(t, cgroups, dfl_cgrp);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return BPF_CORE_READ(cgrp, kn, id);
 }
 

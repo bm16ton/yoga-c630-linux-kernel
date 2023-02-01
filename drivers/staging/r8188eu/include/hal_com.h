@@ -143,11 +143,4 @@ u8 MRateToHwRate(u8 rate);
 
 void HalSetBrateCfg(struct adapter *Adapter, u8 *mBratesOS, u16 *pBrateCfg);
 
-<<<<<<< HEAD
-=======
-bool Hal_MappingOutPipe(struct adapter *pAdapter, u8 NumOutPipe);
-
-s32 c2h_evt_read(struct adapter *adapter, u8 *buf);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __HAL_COMMON_H__ */

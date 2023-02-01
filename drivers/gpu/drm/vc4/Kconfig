@@ -12,11 +12,7 @@ config DRM_VC4
 	select DRM_DISPLAY_HDMI_HELPER
 	select DRM_DISPLAY_HELPER
 	select DRM_KMS_HELPER
-<<<<<<< HEAD
 	select DRM_GEM_DMA_HELPER
-=======
-	select DRM_GEM_CMA_HELPER
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select DRM_PANEL_BRIDGE
 	select SND_PCM
 	select SND_PCM_ELD

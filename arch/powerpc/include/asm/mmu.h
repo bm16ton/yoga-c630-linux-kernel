@@ -214,11 +214,7 @@ enum {
 #elif defined(CONFIG_44x)
 #define MMU_FTRS_ALWAYS		MMU_FTR_TYPE_44x
 #endif
-<<<<<<< HEAD
 #ifdef CONFIG_PPC_E500
-=======
-#ifdef CONFIG_E500
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MMU_FTRS_ALWAYS		MMU_FTR_TYPE_FSL_E
 #endif
 

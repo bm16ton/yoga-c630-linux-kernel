@@ -2160,12 +2160,6 @@ struct net_device {
 #if IS_ENABLED(CONFIG_ATALK)
 	void 			*atalk_ptr;
 #endif
-<<<<<<< HEAD
-=======
-#if IS_ENABLED(CONFIG_DECNET)
-	struct dn_dev __rcu     *dn_ptr;
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if IS_ENABLED(CONFIG_AX25)
 	void			*ax25_ptr;
 #endif
@@ -2567,25 +2561,15 @@ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
  * @dev:  network device
  * @napi: NAPI context
  * @poll: polling function
-<<<<<<< HEAD
-=======
- * @weight: default weight
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * netif_napi_add() must be used to initialize a NAPI context prior to calling
  * *any* of the other NAPI-related functions.
  */
 static inline void
 netif_napi_add(struct net_device *dev, struct napi_struct *napi,
-<<<<<<< HEAD
 	       int (*poll)(struct napi_struct *, int))
 {
 	netif_napi_add_weight(dev, napi, poll, NAPI_POLL_WEIGHT);
-=======
-	       int (*poll)(struct napi_struct *, int), int weight)
-{
-	netif_napi_add_weight(dev, napi, poll, weight);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void
@@ -2597,11 +2581,6 @@ netif_napi_add_tx_weight(struct net_device *dev,
 	set_bit(NAPI_STATE_NO_BUSY_POLL, &napi->state);
 	netif_napi_add_weight(dev, napi, poll, weight);
 }
-<<<<<<< HEAD
-=======
-
-#define netif_tx_napi_add netif_napi_add_tx_weight
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * netif_napi_add_tx() - initialize a NAPI context to be used for Tx only
@@ -4003,7 +3982,6 @@ static inline void __dev_put(struct net_device *dev)
 #endif
 	}
 }
-<<<<<<< HEAD
 
 static inline void __dev_hold(struct net_device *dev)
 {
@@ -4025,29 +4003,6 @@ static inline void __netdev_tracker_alloc(struct net_device *dev,
 #endif
 }
 
-=======
-
-static inline void __dev_hold(struct net_device *dev)
-{
-	if (dev) {
-#ifdef CONFIG_PCPU_DEV_REFCNT
-		this_cpu_inc(*dev->pcpu_refcnt);
-#else
-		refcount_inc(&dev->dev_refcnt);
-#endif
-	}
-}
-
-static inline void __netdev_tracker_alloc(struct net_device *dev,
-					  netdevice_tracker *tracker,
-					  gfp_t gfp)
-{
-#ifdef CONFIG_NET_DEV_REFCNT_TRACKER
-	ref_tracker_alloc(&dev->refcnt_tracker, tracker, gfp);
-#endif
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* netdev_tracker_alloc() can upgrade a prior untracked reference
  * taken by dev_get_by_name()/dev_get_by_index() to a tracked one.
  */

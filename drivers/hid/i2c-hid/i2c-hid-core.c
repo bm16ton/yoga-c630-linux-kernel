@@ -554,12 +554,8 @@ static void i2c_hid_get_input(struct i2c_hid *ihid)
 	i2c_hid_dbg(ihid, "input: %*ph\n", ret_size, ihid->inbuf);
 
 	if (test_bit(I2C_HID_STARTED, &ihid->flags)) {
-<<<<<<< HEAD
 		if (ihid->hid->group != HID_GROUP_RMI)
 			pm_wakeup_event(&ihid->client->dev, 0);
-=======
-		pm_wakeup_event(&ihid->client->dev, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		hid_input_report(ihid->hid, HID_INPUT_REPORT,
 				ihid->inbuf + sizeof(__le16),
@@ -670,17 +666,10 @@ static int i2c_hid_get_raw_report(struct hid_device *hid,
 	ret_count = i2c_hid_get_report(ihid,
 			report_type == HID_FEATURE_REPORT ? 0x03 : 0x01,
 			report_id, buf, count);
-<<<<<<< HEAD
 
 	if (ret_count > 0 && !report_id)
 		ret_count++;
 
-=======
-
-	if (ret_count > 0 && !report_id)
-		ret_count++;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret_count;
 }
 

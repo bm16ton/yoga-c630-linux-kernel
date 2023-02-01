@@ -340,7 +340,6 @@ static enum usb_device_speed dwc3_qcom_read_usb2_speed(struct dwc3_qcom *qcom)
 
 	return udev->speed;
 }
-<<<<<<< HEAD
 
 static void dwc3_qcom_enable_wakeup_irq(int irq, unsigned int polarity)
 {
@@ -350,17 +349,6 @@ static void dwc3_qcom_enable_wakeup_irq(int irq, unsigned int polarity)
 	if (polarity)
 		irq_set_irq_type(irq, polarity);
 
-=======
-
-static void dwc3_qcom_enable_wakeup_irq(int irq, unsigned int polarity)
-{
-	if (!irq)
-		return;
-
-	if (polarity)
-		irq_set_irq_type(irq, polarity);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	enable_irq(irq);
 	enable_irq_wake(irq);
 }
@@ -1026,13 +1014,6 @@ static const struct dev_pm_ops dwc3_qcom_dev_pm_ops = {
 
 static const struct of_device_id dwc3_qcom_of_match[] = {
 	{ .compatible = "qcom,dwc3" },
-<<<<<<< HEAD
-=======
-	{ .compatible = "qcom,msm8996-dwc3" },
-	{ .compatible = "qcom,msm8998-dwc3" },
-	{ .compatible = "qcom,sdm660-dwc3" },
-	{ .compatible = "qcom,sdm845-dwc3" },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 MODULE_DEVICE_TABLE(of, dwc3_qcom_of_match);

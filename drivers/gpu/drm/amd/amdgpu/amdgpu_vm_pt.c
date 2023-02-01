@@ -639,7 +639,6 @@ static void amdgpu_vm_pt_free(struct amdgpu_vm_bo_base *entry)
 	}
 	ttm_bo_set_bulk_move(&entry->bo->tbo, NULL);
 	entry->bo->vm_bo = NULL;
-<<<<<<< HEAD
 
 	spin_lock(&entry->vm->status_lock);
 	list_del(&entry->vm_status);
@@ -668,12 +667,6 @@ void amdgpu_vm_pt_free_work(struct work_struct *work)
 	amdgpu_bo_unreserve(vm->root.bo);
 }
 
-=======
-	list_del(&entry->vm_status);
-	amdgpu_bo_unref(&entry->bo);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * amdgpu_vm_pt_free_dfs - free PD/PT levels
  *
@@ -685,17 +678,12 @@ void amdgpu_vm_pt_free_work(struct work_struct *work)
  */
 static void amdgpu_vm_pt_free_dfs(struct amdgpu_device *adev,
 				  struct amdgpu_vm *vm,
-<<<<<<< HEAD
 				  struct amdgpu_vm_pt_cursor *start,
 				  bool unlocked)
-=======
-				  struct amdgpu_vm_pt_cursor *start)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct amdgpu_vm_pt_cursor cursor;
 	struct amdgpu_vm_bo_base *entry;
 
-<<<<<<< HEAD
 	if (unlocked) {
 		spin_lock(&vm->status_lock);
 		for_each_amdgpu_vm_pt_dfs_safe(adev, vm, start, cursor, entry)
@@ -708,8 +696,6 @@ static void amdgpu_vm_pt_free_dfs(struct amdgpu_device *adev,
 		return;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for_each_amdgpu_vm_pt_dfs_safe(adev, vm, start, cursor, entry)
 		amdgpu_vm_pt_free(entry);
 
@@ -726,11 +712,7 @@ static void amdgpu_vm_pt_free_dfs(struct amdgpu_device *adev,
  */
 void amdgpu_vm_pt_free_root(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 {
-<<<<<<< HEAD
 	amdgpu_vm_pt_free_dfs(adev, vm, NULL, false);
-=======
-	amdgpu_vm_pt_free_dfs(adev, vm, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1023,12 +1005,8 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 				if (cursor.entry->bo) {
 					params->table_freed = true;
 					amdgpu_vm_pt_free_dfs(adev, params->vm,
-<<<<<<< HEAD
 							      &cursor,
 							      params->unlocked);
-=======
-							      &cursor);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				}
 				amdgpu_vm_pt_next(adev, &cursor);
 			}

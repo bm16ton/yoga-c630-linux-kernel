@@ -191,10 +191,6 @@ void kvm_riscv_vcpu_wfi(struct kvm_vcpu *vcpu)
 		kvm_vcpu_srcu_read_unlock(vcpu);
 		kvm_vcpu_halt(vcpu);
 		kvm_vcpu_srcu_read_lock(vcpu);
-<<<<<<< HEAD
-=======
-		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 

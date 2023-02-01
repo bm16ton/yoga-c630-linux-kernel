@@ -426,11 +426,8 @@ static const struct usb_device_id blacklist_table[] = {
 						     BTUSB_WIDEBAND_SPEECH },
 	{ USB_DEVICE(0x04ca, 0x4006), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
-<<<<<<< HEAD
 	{ USB_DEVICE(0x0cb8, 0xc549), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Realtek 8852CE Bluetooth devices */
 	{ USB_DEVICE(0x04ca, 0x4007), .driver_info = BTUSB_REALTEK |
@@ -443,11 +440,8 @@ static const struct usb_device_id blacklist_table[] = {
 						     BTUSB_WIDEBAND_SPEECH },
 	{ USB_DEVICE(0x13d3, 0x3586), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
-<<<<<<< HEAD
 	{ USB_DEVICE(0x13d3, 0x3592), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Realtek Bluetooth devices */
 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
@@ -476,12 +470,9 @@ static const struct usb_device_id blacklist_table[] = {
 	{ USB_DEVICE(0x0489, 0xe0c8), .driver_info = BTUSB_MEDIATEK |
 						     BTUSB_WIDEBAND_SPEECH |
 						     BTUSB_VALID_LE_STATES },
-<<<<<<< HEAD
 	{ USB_DEVICE(0x0489, 0xe0e0), .driver_info = BTUSB_MEDIATEK |
 						     BTUSB_WIDEBAND_SPEECH |
 						     BTUSB_VALID_LE_STATES },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ USB_DEVICE(0x04ca, 0x3802), .driver_info = BTUSB_MEDIATEK |
 						     BTUSB_WIDEBAND_SPEECH |
 						     BTUSB_VALID_LE_STATES },
@@ -494,7 +485,6 @@ static const struct usb_device_id blacklist_table[] = {
 	{ USB_DEVICE(0x13d3, 0x3567), .driver_info = BTUSB_MEDIATEK |
 						     BTUSB_WIDEBAND_SPEECH |
 						     BTUSB_VALID_LE_STATES },
-<<<<<<< HEAD
 	{ USB_DEVICE(0x13d3, 0x3578), .driver_info = BTUSB_MEDIATEK |
 						     BTUSB_WIDEBAND_SPEECH |
 						     BTUSB_VALID_LE_STATES },
@@ -507,11 +497,6 @@ static const struct usb_device_id blacklist_table[] = {
 	{ USB_DEVICE(0x0e8d, 0x0608), .driver_info = BTUSB_MEDIATEK |
 						     BTUSB_WIDEBAND_SPEECH |
 						     BTUSB_VALID_LE_STATES },
-=======
-	{ USB_DEVICE(0x0489, 0xe0cd), .driver_info = BTUSB_MEDIATEK |
-						     BTUSB_WIDEBAND_SPEECH |
-						     BTUSB_VALID_LE_STATES },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* MediaTek MT7922A Bluetooth devices */
 	{ USB_DEVICE(0x0489, 0xe0d8), .driver_info = BTUSB_MEDIATEK |
@@ -547,32 +532,17 @@ static const struct usb_device_id blacklist_table[] = {
 	{ USB_DEVICE(0x0bda, 0xb009), .driver_info = BTUSB_REALTEK },
 	{ USB_DEVICE(0x2ff8, 0xb011), .driver_info = BTUSB_REALTEK },
 
-<<<<<<< HEAD
 	/* Additional Realtek 8761BUV Bluetooth devices */
 	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
-=======
-	/* Additional Realtek 8761B Bluetooth devices */
-	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
-						     BTUSB_WIDEBAND_SPEECH },
-
-	/* Additional Realtek 8761BU Bluetooth devices */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
 	  					     BTUSB_WIDEBAND_SPEECH },
 	{ USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
-<<<<<<< HEAD
 	{ USB_DEVICE(0x0bda, 0x8771), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
 	{ USB_DEVICE(0x7392, 0xc611), .driver_info = BTUSB_REALTEK |
 						     BTUSB_WIDEBAND_SPEECH },
-=======
-
-	/* Additional Realtek 8761BUV Bluetooth devices */
-	{ USB_DEVICE(0x0bda, 0x8771), .driver_info = BTUSB_REALTEK |
-						     BTUSB_WIDEBAND_SPEECH },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Additional Realtek 8821AE Bluetooth devices */
 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
@@ -2153,10 +2123,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 		 * without these the controller will lock up.
 		 */
 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
-<<<<<<< HEAD
 		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks);
 		set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
 
@@ -2199,7 +2166,6 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 			msleep(200);
 		else
 			bt_dev_warn(hdev, "CSR: Couldn't suspend the device for our Barrot 8041a02 receive-issue workaround");
-<<<<<<< HEAD
 
 		pm_runtime_forbid(&data->udev->dev);
 
@@ -2292,100 +2258,6 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
 {
 	struct urb *urb;
 
-=======
-
-		pm_runtime_forbid(&data->udev->dev);
-
-		device_set_wakeup_capable(&data->udev->dev, false);
-
-		/* Re-enable autosuspend if this was requested */
-		if (enable_autosuspend)
-			usb_enable_autosuspend(data->udev);
-	}
-
-	kfree_skb(skb);
-
-	return 0;
-}
-
-static int inject_cmd_complete(struct hci_dev *hdev, __u16 opcode)
-{
-	struct sk_buff *skb;
-	struct hci_event_hdr *hdr;
-	struct hci_ev_cmd_complete *evt;
-
-	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
-	if (!skb)
-		return -ENOMEM;
-
-	hdr = skb_put(skb, sizeof(*hdr));
-	hdr->evt = HCI_EV_CMD_COMPLETE;
-	hdr->plen = sizeof(*evt) + 1;
-
-	evt = skb_put(skb, sizeof(*evt));
-	evt->ncmd = 0x01;
-	evt->opcode = cpu_to_le16(opcode);
-
-	skb_put_u8(skb, 0x00);
-
-	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-
-	return hci_recv_frame(hdev, skb);
-}
-
-static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
-				 int count)
-{
-	struct hci_dev *hdev = data->hdev;
-
-	/* When the device is in bootloader mode, then it can send
-	 * events via the bulk endpoint. These events are treated the
-	 * same way as the ones received from the interrupt endpoint.
-	 */
-	if (btintel_test_flag(hdev, INTEL_BOOTLOADER))
-		return btusb_recv_intr(data, buffer, count);
-
-	return btusb_recv_bulk(data, buffer, count);
-}
-
-static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
-{
-	if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
-		struct hci_event_hdr *hdr = (void *)skb->data;
-
-		if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
-		    hdr->plen > 0) {
-			const void *ptr = skb->data + HCI_EVENT_HDR_SIZE + 1;
-			unsigned int len = skb->len - HCI_EVENT_HDR_SIZE - 1;
-
-			switch (skb->data[2]) {
-			case 0x02:
-				/* When switching to the operational firmware
-				 * the device sends a vendor specific event
-				 * indicating that the bootup completed.
-				 */
-				btintel_bootup(hdev, ptr, len);
-				break;
-			case 0x06:
-				/* When the firmware loading completes the
-				 * device sends out a vendor specific event
-				 * indicating the result of the firmware
-				 * loading.
-				 */
-				btintel_secure_send_result(hdev, ptr, len);
-				break;
-			}
-		}
-	}
-
-	return hci_recv_frame(hdev, skb);
-}
-
-static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
-{
-	struct urb *urb;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	BT_DBG("%s", hdev->name);
 
 	switch (hci_skb_pkt_type(skb)) {

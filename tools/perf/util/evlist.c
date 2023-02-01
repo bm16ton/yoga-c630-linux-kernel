@@ -41,10 +41,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
-<<<<<<< HEAD
 #include <sys/timerfd.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <linux/bitops.h>
 #include <linux/hash.h>
@@ -271,31 +268,6 @@ int evlist__add_dummy(struct evlist *evlist)
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-static void evlist__add_on_all_cpus(struct evlist *evlist, struct evsel *evsel)
-{
-	evsel->core.system_wide = true;
-
-	/*
-	 * All CPUs.
-	 *
-	 * Note perf_event_open() does not accept CPUs that are not online, so
-	 * in fact this CPU list will include only all online CPUs.
-	 */
-	perf_cpu_map__put(evsel->core.own_cpus);
-	evsel->core.own_cpus = perf_cpu_map__new(NULL);
-	perf_cpu_map__put(evsel->core.cpus);
-	evsel->core.cpus = perf_cpu_map__get(evsel->core.own_cpus);
-
-	/* No threads */
-	perf_thread_map__put(evsel->core.threads);
-	evsel->core.threads = perf_thread_map__new_dummy();
-
-	evlist__add(evlist, evsel);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct evsel *evlist__add_aux_dummy(struct evlist *evlist, bool system_wide)
 {
 	struct evsel *evsel = evlist__dummy_event(evlist);
@@ -308,7 +280,6 @@ struct evsel *evlist__add_aux_dummy(struct evlist *evlist, bool system_wide)
 	evsel->core.attr.exclude_hv = 1;
 	evsel->core.attr.freq = 0;
 	evsel->core.attr.sample_period = 1;
-<<<<<<< HEAD
 	evsel->core.system_wide = system_wide;
 	evsel->no_aux_samples = true;
 	evsel->name = strdup("dummy:u");
@@ -333,18 +304,6 @@ struct evsel *evlist__add_sched_switch(struct evlist *evlist, bool system_wide)
 	evlist__add(evlist, evsel);
 	return evsel;
 };
-=======
-	evsel->no_aux_samples = true;
-	evsel->name = strdup("dummy:u");
-
-	if (system_wide)
-		evlist__add_on_all_cpus(evlist, evsel);
-	else
-		evlist__add(evlist, evsel);
-
-	return evsel;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int evlist__add_attrs(struct evlist *evlist, struct perf_event_attr *attrs, size_t nr_attrs)
 {
@@ -539,11 +498,8 @@ static void __evlist__disable(struct evlist *evlist, char *evsel_name, bool excl
 				continue;
 			if (pos->disabled || !evsel__is_group_leader(pos) || !pos->core.fd)
 				continue;
-<<<<<<< HEAD
 			if (excl_dummy && evsel__is_dummy_event(pos))
 				continue;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (pos->immediate)
 				has_imm = true;
 			if (pos->immediate != imm)
@@ -609,11 +565,8 @@ static void __evlist__enable(struct evlist *evlist, char *evsel_name, bool excl_
 			continue;
 		if (!evsel__is_group_leader(pos) || !pos->core.fd)
 			continue;
-<<<<<<< HEAD
 		if (excl_dummy && evsel__is_dummy_event(pos))
 			continue;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		evsel__enable_cpu(pos, evlist_cpu_itr.cpu_map_idx);
 	}
 	affinity__cleanup(affinity);
@@ -645,14 +598,11 @@ void evlist__enable_non_dummy(struct evlist *evlist)
 	__evlist__enable(evlist, NULL, true);
 }
 
-<<<<<<< HEAD
 void evlist__enable_evsel(struct evlist *evlist, char *evsel_name)
 {
 	__evlist__enable(evlist, evsel_name, false);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void evlist__toggle_enable(struct evlist *evlist)
 {
 	(evlist->enabled ? evlist__disable : evlist__enable)(evlist);
@@ -2213,7 +2163,6 @@ int evlist__ctlfd_process(struct evlist *evlist, enum evlist_ctl_cmd *cmd)
 	return err;
 }
 
-<<<<<<< HEAD
 /**
  * struct event_enable_time - perf record -D/--delay single time range.
  * @start: start of time range to enable events in milliseconds
@@ -2442,22 +2391,6 @@ void event_enable_timer__exit(struct event_enable_timer **ep)
 		return;
 	free((*ep)->times);
 	zfree(ep);
-=======
-int evlist__ctlfd_update(struct evlist *evlist, struct pollfd *update)
-{
-	int ctlfd_pos = evlist->ctl_fd.pos;
-	struct pollfd *entries = evlist->core.pollfd.entries;
-
-	if (!evlist__ctlfd_initialized(evlist))
-		return 0;
-
-	if (entries[ctlfd_pos].fd != update->fd ||
-	    entries[ctlfd_pos].events != update->events)
-		return -1;
-
-	entries[ctlfd_pos].revents = update->revents;
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 struct evsel *evlist__find_evsel(struct evlist *evlist, int idx)

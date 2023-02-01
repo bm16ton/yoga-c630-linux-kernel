@@ -431,19 +431,11 @@ struct i2c_adapter *i2c_acpi_find_adapter_by_handle(acpi_handle handle)
 	dev = bus_find_device(&i2c_bus_type, NULL, handle, device_match_acpi_handle);
 	if (!dev)
 		return NULL;
-<<<<<<< HEAD
 
 	adapter = i2c_verify_adapter(dev);
 	if (!adapter)
 		put_device(dev);
 
-=======
-
-	adapter = i2c_verify_adapter(dev);
-	if (!adapter)
-		put_device(dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return adapter;
 }
 EXPORT_SYMBOL_GPL(i2c_acpi_find_adapter_by_handle);

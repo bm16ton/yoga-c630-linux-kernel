@@ -417,12 +417,9 @@ static int taprio_enqueue_one(struct sk_buff *skb, struct Qdisc *sch,
 			      struct Qdisc *child, struct sk_buff **to_free)
 {
 	struct taprio_sched *q = qdisc_priv(sch);
-<<<<<<< HEAD
 	struct net_device *dev = qdisc_dev(sch);
 	int prio = skb->priority;
 	u8 tc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* sk_flags are only safe to use on full sockets. */
 	if (skb->sk && sk_fullsock(skb->sk) && sock_flag(skb->sk, SOCK_TXTIME)) {
@@ -434,37 +431,26 @@ static int taprio_enqueue_one(struct sk_buff *skb, struct Qdisc *sch,
 			return qdisc_drop(skb, sch, to_free);
 	}
 
-<<<<<<< HEAD
 	/* Devices with full offload are expected to honor this in hardware */
 	tc = netdev_get_prio_tc_map(dev, prio);
 	if (skb->len > q->max_frm_len[tc])
 		return qdisc_drop(skb, sch, to_free);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qdisc_qstats_backlog_inc(sch, skb);
 	sch->q.qlen++;
 
 	return qdisc_enqueue(skb, child, to_free);
 }
 
-<<<<<<< HEAD
 /* Will not be called in the full offload case, since the TX queues are
  * attached to the Qdisc created using qdisc_create_dflt()
  */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int taprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 			  struct sk_buff **to_free)
 {
 	struct taprio_sched *q = qdisc_priv(sch);
 	struct Qdisc *child;
 	int queue;
-
-	if (unlikely(FULL_OFFLOAD_IS_ENABLED(q->flags))) {
-		WARN_ONCE(1, "Trying to enqueue skb into the root of a taprio qdisc configured with full offload\n");
-		return qdisc_drop(skb, sch, to_free);
-	}
 
 	queue = skb_get_queue_mapping(skb);
 
@@ -474,17 +460,10 @@ static int taprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 
 	/* Large packets might not be transmitted when the transmission duration
 	 * exceeds any configured interval. Therefore, segment the skb into
-<<<<<<< HEAD
 	 * smaller chunks. Drivers with full offload are expected to handle
 	 * this in hardware.
 	 */
 	if (skb_is_gso(skb)) {
-=======
-	 * smaller chunks. Skip it for the full offload case, as the driver
-	 * and/or the hardware is expected to handle this.
-	 */
-	if (skb_is_gso(skb) && !FULL_OFFLOAD_IS_ENABLED(q->flags)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		unsigned int slen = 0, numsegs = 0, len = qdisc_pkt_len(skb);
 		netdev_features_t features = netif_skb_features(skb);
 		struct sk_buff *segs, *nskb;
@@ -565,23 +544,6 @@ static struct sk_buff *taprio_peek(struct Qdisc *sch)
 	return NULL;
 }
 
-<<<<<<< HEAD
-=======
-static struct sk_buff *taprio_peek_offload(struct Qdisc *sch)
-{
-	WARN_ONCE(1, "Trying to peek into the root of a taprio qdisc configured with full offload\n");
-
-	return NULL;
-}
-
-static struct sk_buff *taprio_peek(struct Qdisc *sch)
-{
-	struct taprio_sched *q = qdisc_priv(sch);
-
-	return q->peek(sch);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void taprio_set_budget(struct taprio_sched *q, struct sched_entry *entry)
 {
 	atomic_set(&entry->budget,
@@ -680,23 +642,6 @@ done:
 	return skb;
 }
 
-<<<<<<< HEAD
-=======
-static struct sk_buff *taprio_dequeue_offload(struct Qdisc *sch)
-{
-	WARN_ONCE(1, "Trying to dequeue from the root of a taprio qdisc configured with full offload\n");
-
-	return NULL;
-}
-
-static struct sk_buff *taprio_dequeue(struct Qdisc *sch)
-{
-	struct taprio_sched *q = qdisc_priv(sch);
-
-	return q->dequeue(sch);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool should_restart_cycle(const struct sched_gate_list *oper,
 				 const struct sched_entry *entry)
 {

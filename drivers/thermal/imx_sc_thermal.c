@@ -91,29 +91,10 @@ static int imx_sc_thermal_probe(struct platform_device *pdev)
 	for (i = 0; resource_id[i] > 0; i++) {
 
 		sensor = devm_kzalloc(&pdev->dev, sizeof(*sensor), GFP_KERNEL);
-<<<<<<< HEAD
 		if (!sensor)
 			return -ENOMEM;
 
 		sensor->resource_id = resource_id[i];
-=======
-		if (!sensor) {
-			of_node_put(child);
-			ret = -ENOMEM;
-			goto put_node;
-		}
-
-		ret = thermal_zone_of_get_sensor_id(child,
-						    sensor_np,
-						    &sensor->resource_id);
-		if (ret < 0) {
-			dev_err(&pdev->dev,
-				"failed to get valid sensor resource id: %d\n",
-				ret);
-			of_node_put(child);
-			break;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		sensor->tzd = devm_thermal_of_zone_register(&pdev->dev, sensor->resource_id,
 							    sensor, &imx_sc_thermal_ops);
@@ -124,7 +105,6 @@ static int imx_sc_thermal_probe(struct platform_device *pdev)
 			 * use-after-free error
 			 */
 			ret = PTR_ERR(sensor->tzd);
-<<<<<<< HEAD
 
 			devm_kfree(&pdev->dev, sensor);
 
@@ -138,25 +118,13 @@ static int imx_sc_thermal_probe(struct platform_device *pdev)
 
 			dev_err(&pdev->dev, "failed to register thermal zone\n");
 			return ret;
-=======
-			of_node_put(child);
-			break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (devm_thermal_add_hwmon_sysfs(sensor->tzd))
 			dev_warn(&pdev->dev, "failed to add hwmon sysfs attributes\n");
 	}
 
-<<<<<<< HEAD
 	return 0;
-=======
-put_node:
-	of_node_put(sensor_np);
-	of_node_put(np);
-
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int imx_sc_thermal_remove(struct platform_device *pdev)

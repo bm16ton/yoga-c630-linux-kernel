@@ -5,11 +5,7 @@
 
 / {
 	model = "AST2600 A1 EVB";
-<<<<<<< HEAD
 	compatible = "aspeed,ast2600-evb-a1", "aspeed,ast2600-evb", "aspeed,ast2600";
-=======
-	compatible = "aspeed,ast2600-evb-a1", "aspeed,ast2600";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/delete-node/regulator-vcc-sdhci0;
 	/delete-node/regulator-vcc-sdhci1;

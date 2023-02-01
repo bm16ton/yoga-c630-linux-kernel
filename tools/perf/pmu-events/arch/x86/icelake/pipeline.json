@@ -167,11 +167,7 @@
         "UMask": "0x10"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "number of branch instructions retired that were mispredicted and taken.",
-=======
-        "BriefDescription": "number of branch instructions retired that were mispredicted and taken. Non PEBS",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc5",
@@ -541,7 +537,6 @@
     },
     {
         "BriefDescription": "Counts cycles after recovery from a branch misprediction or machine clear till the first uop is issued from the resteered path.",
-<<<<<<< HEAD
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x0d",
@@ -577,43 +572,6 @@
         "UMask": "0x10"
     },
     {
-=======
-        "CollectPEBSRecord": "2",
-        "Counter": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x0d",
-        "EventName": "INT_MISC.CLEAR_RESTEER_CYCLES",
-        "PEBScounters": "0,1,2,3,4,5,6,7",
-        "PublicDescription": "Cycles after recovery from a branch misprediction or machine clear till the first uop is issued from the resteered path.",
-        "SampleAfterValue": "500009",
-        "Speculative": "1",
-        "UMask": "0x80"
-    },
-    {
-        "BriefDescription": "Core cycles the allocator was stalled due to recovery from earlier clear event for this thread",
-        "CollectPEBSRecord": "2",
-        "Counter": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x0D",
-        "EventName": "INT_MISC.RECOVERY_CYCLES",
-        "PEBScounters": "0,1,2,3,4,5,6,7",
-        "PublicDescription": "Counts core cycles when the Resource allocator was stalled due to recovery from an earlier branch misprediction or machine clear event.",
-        "SampleAfterValue": "500009",
-        "Speculative": "1",
-        "UMask": "0x1"
-    },
-    {
-        "BriefDescription": "TMA slots where uops got dropped",
-        "CollectPEBSRecord": "2",
-        "Counter": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x0d",
-        "EventName": "INT_MISC.UOP_DROPPING",
-        "PEBScounters": "0,1,2,3,4,5,6,7",
-        "PublicDescription": "Estimated number of Top-down Microarchitecture Analysis slots that got dropped due to non front-end reasons",
-        "SampleAfterValue": "1000003",
-        "Speculative": "1",
-        "UMask": "0x10"
-    },
-    {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "The number of times that split load operations are temporarily blocked because all resources for handling the split accesses are in use.",
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3",

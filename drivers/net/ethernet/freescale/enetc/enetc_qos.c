@@ -64,16 +64,10 @@ static int enetc_setup_taprio(struct net_device *ndev,
 		return -EINVAL;
 	gcl_len = admin_conf->num_entries;
 
-<<<<<<< HEAD
 	tge = enetc_rd(hw, ENETC_PTGCR);
 	if (!admin_conf->enable) {
 		enetc_wr(hw, ENETC_PTGCR, tge & ~ENETC_PTGCR_TGE);
 		enetc_reset_ptcmsdur(hw);
-=======
-	tge = enetc_rd(hw, ENETC_QBV_PTGCR_OFFSET);
-	if (!admin_conf->enable) {
-		enetc_wr(hw, ENETC_QBV_PTGCR_OFFSET, tge & ~ENETC_QBV_TGE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		priv->active_offloads &= ~ENETC_F_QBV;
 
@@ -121,7 +115,6 @@ static int enetc_setup_taprio(struct net_device *ndev,
 	cbd.cls = BDCR_CMD_PORT_GCL;
 	cbd.status_flags = 0;
 
-<<<<<<< HEAD
 	enetc_wr(hw, ENETC_PTGCR, tge | ENETC_PTGCR_TGE);
 
 	err = enetc_send_cmd(priv->si, &cbd);
@@ -129,18 +122,6 @@ static int enetc_setup_taprio(struct net_device *ndev,
 		enetc_wr(hw, ENETC_PTGCR, tge & ~ENETC_PTGCR_TGE);
 
 	enetc_cbd_free_data_mem(priv->si, data_size, tmp, &dma);
-=======
-	enetc_wr(hw, ENETC_QBV_PTGCR_OFFSET, tge | ENETC_QBV_TGE);
-
-	err = enetc_send_cmd(priv->si, &cbd);
-	if (err)
-		enetc_wr(hw, ENETC_QBV_PTGCR_OFFSET, tge & ~ENETC_QBV_TGE);
-
-	enetc_cbd_free_data_mem(priv->si, data_size, tmp, &dma);
-
-	if (!err)
-		priv->active_offloads |= ENETC_F_QBV;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (err)
 		return err;
@@ -326,11 +307,7 @@ int enetc_setup_tc_txtime(struct net_device *ndev, void *type_data)
 		return -EINVAL;
 
 	/* TSD and Qbv are mutually exclusive in hardware */
-<<<<<<< HEAD
 	if (enetc_rd(hw, ENETC_PTGCR) & ENETC_PTGCR_TGE)
-=======
-	if (enetc_rd(hw, ENETC_QBV_PTGCR_OFFSET) & ENETC_QBV_TGE)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBUSY;
 
 	priv->tx_ring[tc]->tsd_enable = qopt->enable;

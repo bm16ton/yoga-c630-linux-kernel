@@ -4753,19 +4753,10 @@ static int decode_getfattr_attrs(struct xdr_stream *xdr, uint32_t *bitmap,
 	if (status < 0)
 		goto xdr_error;
 
-<<<<<<< HEAD
 	status = decode_attr_security_label(xdr, bitmap, fattr->label);
 	if (status < 0)
 		goto xdr_error;
 	fattr->valid |= status;
-=======
-	if (fattr->label) {
-		status = decode_attr_security_label(xdr, bitmap, fattr->label);
-		if (status < 0)
-			goto xdr_error;
-		fattr->valid |= status;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 xdr_error:
 	dprintk("%s: xdr returned %d\n", __func__, -status);

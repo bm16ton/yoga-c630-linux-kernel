@@ -187,11 +187,7 @@
 			reg = <0x2011000 0x1000>;
 		};
 
-<<<<<<< HEAD
 		rpm: rpm@108000 {
-=======
-		rpm@108000 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,rpm-msm8960";
 			reg = <0x108000 0x1000>;
 			qcom,ipc = <&l2cc 0x8 2>;

@@ -585,11 +585,7 @@ static unsigned long __init lance_probe1( struct net_device *dev,
 		/* No ethernet address! (Set some default address) */
 		eth_hw_addr_set(dev, OldRieblDefHwaddr);
 		break;
-<<<<<<< HEAD
 	case NEW_RIEBL:
-=======
-	  case NEW_RIEBL:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		lp->memcpy_f(addr, RIEBL_HWADDR_ADDR, ETH_ALEN);
 		eth_hw_addr_set(dev, addr);
 		break;

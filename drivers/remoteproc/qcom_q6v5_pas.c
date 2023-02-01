@@ -766,7 +766,6 @@ static const struct adsp_data sc8280xp_nsp0_resource = {
 	.auto_boot = true,
 	.proxy_pd_names = (char*[]){
 		"nsp",
-<<<<<<< HEAD
 		NULL
 	},
 	.ssr_name = "cdsp0",
@@ -784,25 +783,6 @@ static const struct adsp_data sc8280xp_nsp1_resource = {
 		"nsp",
 		NULL
 	},
-=======
-		NULL
-	},
-	.ssr_name = "cdsp0",
-	.sysmon_name = "cdsp",
-	.ssctl_id = 0x17,
-};
-
-static const struct adsp_data sc8280xp_nsp1_resource = {
-	.crash_reason_smem = 633,
-	.firmware_name = "cdsp.mdt",
-	.pas_id = 30,
-	.has_aggre2_clk = false,
-	.auto_boot = true,
-	.proxy_pd_names = (char*[]){
-		"nsp",
-		NULL
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ssr_name = "cdsp1",
 	.sysmon_name = "cdsp1",
 	.ssctl_id = 0x20,

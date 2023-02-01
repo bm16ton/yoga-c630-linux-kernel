@@ -945,7 +945,6 @@ the new default in GnuPG v2). To set it, add (or modify) the
 
     trust-model tofu+pgp
 
-<<<<<<< HEAD
 Using the kernel.org web of trust repository
 --------------------------------------------
 
@@ -960,67 +959,3 @@ If you are a kernel developer, please consider submitting your key for
 inclusion into that keyring.
 
 .. _`Kernel developer PGP Keyring`: https://korg.docs.kernel.org/pgpkeys.html
-=======
-How to use keyservers (more) safely
------------------------------------
-
-If you get a "No public key" error when trying to validate someone's
-tag, then you should attempt to lookup that key using a keyserver. It is
-important to keep in mind that there is absolutely no guarantee that the
-key you retrieve from PGP keyservers belongs to the actual person --
-that much is by design. You are supposed to use the Web of Trust to
-establish key validity.
-
-How to properly maintain the Web of Trust is beyond the scope of this
-document, simply because doing it properly requires both effort and
-dedication that tends to be beyond the caring threshold of most human
-beings. Here are some shortcuts that will help you reduce the risk of
-importing a malicious key.
-
-First, let's say you've tried to run ``git verify-tag`` but it returned
-an error saying the key is not found::
-
-    $ git verify-tag sunxi-fixes-for-4.15-2
-    gpg: Signature made Sun 07 Jan 2018 10:51:55 PM EST
-    gpg:                using RSA key DA73759BF8619E484E5A3B47389A54219C0F2430
-    gpg:                issuer "wens@...org"
-    gpg: Can't check signature: No public key
-
-Let's query the keyserver for more info about that key fingerprint (the
-fingerprint probably belongs to a subkey, so we can't use it directly
-without finding out the ID of the master key it is associated with)::
-
-    $ gpg --search DA73759BF8619E484E5A3B47389A54219C0F2430
-    gpg: data source: hkp://keys.gnupg.net
-    (1) Chen-Yu Tsai <wens@...org>
-          4096 bit RSA key C94035C21B4F2AEB, created: 2017-03-14, expires: 2019-03-15
-    Keys 1-1 of 1 for "DA73759BF8619E484E5A3B47389A54219C0F2430".  Enter number(s), N)ext, or Q)uit > q
-
-Locate the ID of the master key in the output, in our example
-``C94035C21B4F2AEB``. Now display the key of Linus Torvalds that you
-have on your keyring::
-
-    $ gpg --list-key torvalds@kernel.org
-    pub   rsa2048 2011-09-20 [SC]
-          ABAF11C65A2970B130ABE3C479BE3E4300411886
-    uid           [ unknown] Linus Torvalds <torvalds@kernel.org>
-    sub   rsa2048 2011-09-20 [E]
-
-Next, find a trust path from Linus Torvalds to the key-id you found via ``gpg
---search`` of the unknown key.  For this, you can use several tools including
-https://github.com/mricon/wotmate,
-https://git.kernel.org/pub/scm/docs/kernel/pgpkeys.git/tree/graphs, and
-https://the.earth.li/~noodles/pathfind.html.
-
-If you get a few decent trust paths, then it's a pretty good indication
-that it is a valid key. You can add it to your keyring from the
-keyserver now::
-
-    $ gpg --recv-key C94035C21B4F2AEB
-
-This process is not perfect, and you are obviously trusting the
-administrators of the PGP Pathfinder service to not be malicious (in
-fact, this goes against :ref:`devs_not_infra`). However, if you
-do not carefully maintain your own web of trust, then it is a marked
-improvement over blindly trusting keyservers.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

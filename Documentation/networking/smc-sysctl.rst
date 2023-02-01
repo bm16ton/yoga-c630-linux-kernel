@@ -34,7 +34,6 @@ smcr_buf_type - INTEGER
         - 1 - Use virtually contiguous buffers
         - 2 - Mixed use of the two types. Try physically contiguous buffers first.
           If not available, use virtually contiguous buffers then.
-<<<<<<< HEAD
 
 smcr_testlink_time - INTEGER
 	How frequently SMC-R link sends out TEST_LINK LLC messages to confirm
@@ -60,5 +59,3 @@ rmem - INTEGER
 	only allowed 512KiB for SMC-R and 1MiB for SMC-D.
 
 	Default: 128K
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

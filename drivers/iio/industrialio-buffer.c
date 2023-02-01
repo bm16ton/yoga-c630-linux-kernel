@@ -1468,7 +1468,6 @@ static int iio_buffer_register_legacy_sysfs_groups(struct iio_dev *indio_dev,
 
 	memcpy(attrs, &buffer_attrs[buffer_attrcount],
 	       scan_el_attrcount * sizeof(*attrs));
-<<<<<<< HEAD
 
 	group = &iio_dev_opaque->legacy_scan_el_group;
 	group->attrs = attrs;
@@ -1478,34 +1477,16 @@ static int iio_buffer_register_legacy_sysfs_groups(struct iio_dev *indio_dev,
 	if (ret)
 		goto error_free_scan_el_attrs;
 
-=======
-
-	group = &iio_dev_opaque->legacy_scan_el_group;
-	group->attrs = attrs;
-	group->name = "scan_elements";
-
-	ret = iio_device_register_sysfs_group(indio_dev, group);
-	if (ret)
-		goto error_free_scan_el_attrs;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 error_free_scan_el_attrs:
 	kfree(iio_dev_opaque->legacy_scan_el_group.attrs);
 error_free_buffer_attrs:
 	kfree(iio_dev_opaque->legacy_buffer_group.attrs);
-<<<<<<< HEAD
 
 	return ret;
 }
 
-=======
-
-	return ret;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void iio_buffer_unregister_legacy_sysfs_groups(struct iio_dev *indio_dev)
 {
 	struct iio_dev_opaque *iio_dev_opaque = to_iio_dev_opaque(indio_dev);

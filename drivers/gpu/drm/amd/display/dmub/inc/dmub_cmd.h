@@ -234,12 +234,7 @@ union dmub_psr_debug_flags {
 };
 
 /**
-<<<<<<< HEAD
  * DMUB visual confirm color
-=======
- * DMUB feature capabilities.
- * After DMUB init, driver will query FW capabilities prior to enabling certain features.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct dmub_feature_caps {
 	/**
@@ -248,7 +243,6 @@ struct dmub_feature_caps {
 	uint8_t psr;
 	uint8_t fw_assisted_mclk_switch;
 	uint8_t reserved[6];
-<<<<<<< HEAD
 };
 
 struct dmub_visual_confirm_color {
@@ -259,8 +253,6 @@ struct dmub_visual_confirm_color {
 	uint16_t color_g_y;
 	uint16_t color_b_cb;
 	uint16_t panel_inst;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #if defined(__cplusplus)
@@ -408,14 +400,9 @@ union dmub_fw_boot_options {
 		uint32_t diag_env: 1; /* 1 if diagnostic environment */
 		uint32_t gpint_scratch8: 1; /* 1 if GPINT is in scratch8*/
 		uint32_t usb4_cm_version: 1; /**< 1 CM support */
-<<<<<<< HEAD
 		uint32_t dpia_hpd_int_enable_supported: 1; /* 1 if dpia hpd int enable supported */
 
 		uint32_t reserved : 16; /**< reserved */
-=======
-
-		uint32_t reserved : 17; /**< reserved */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} bits; /**< boot bits */
 	uint32_t all; /**< 32-bit access to bits */
 };
@@ -668,13 +655,10 @@ enum dmub_cmd_type {
 	 */
 	DMUB_CMD__QUERY_FEATURE_CAPS = 6,
 	/**
-<<<<<<< HEAD
 	 * Command type used to get visual confirm color.
 	 */
 	DMUB_CMD__GET_VISUAL_CONFIRM_COLOR = 8,
 	/**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * Command type used for all PSR commands.
 	 */
 	DMUB_CMD__PSR = 64,
@@ -745,15 +729,12 @@ enum dmub_cmd_type {
 	/**
 	 * Command type used for all VBIOS interface commands.
 	 */
-<<<<<<< HEAD
 
 	/**
 	 * Command type used to set DPIA HPD interrupt state
 	 */
 	DMUB_CMD__DPIA_HPD_INT_ENABLE = 86,
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	DMUB_CMD__VBIOS = 128,
 };
 
@@ -777,16 +758,6 @@ enum dmub_out_cmd_type {
 	 * Command type used for SET_CONFIG Reply notification
 	 */
 	DMUB_OUT_CMD__SET_CONFIG_REPLY = 3,
-<<<<<<< HEAD
-=======
-};
-
-/* DMUB_CMD__DPIA command sub-types. */
-enum dmub_cmd_dpia_type {
-	DMUB_CMD__DPIA_DIG1_DPIA_CONTROL = 0,
-	DMUB_CMD__DPIA_SET_CONFIG_ACCESS = 1,
-	DMUB_CMD__DPIA_MST_ALLOC_SLOTS = 2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* DMUB_CMD__DPIA command sub-types. */
@@ -1025,7 +996,6 @@ struct dmub_cmd_fw_assisted_mclk_switch_pipe_data_v2 {
 			uint16_t vtotal;
 			uint8_t main_pipe_index;
 			uint8_t phantom_pipe_index;
-<<<<<<< HEAD
 			/* Since the microschedule is calculated in terms of OTG lines,
 			 * include any scaling factors to make sure when we get accurate
 			 * conversion when programming MALL_START_LINE (which is in terms
@@ -1037,10 +1007,6 @@ struct dmub_cmd_fw_assisted_mclk_switch_pipe_data_v2 {
 			uint8_t is_drr;
 			uint8_t main_split_pipe_index;
 			uint8_t phantom_split_pipe_index;
-=======
-			uint8_t is_drr;
-			uint8_t padding;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} subvp_data;
 
 		struct {
@@ -1062,15 +1028,11 @@ struct dmub_cmd_fw_assisted_mclk_switch_pipe_data_v2 {
 		} vblank_data;
 	} pipe_config;
 
-<<<<<<< HEAD
 	/* - subvp_data in the union (pipe_config) takes up 27 bytes.
 	 * - Make the "mode" field a uint8_t instead of enum so we only use 1 byte (only
 	 *   for the DMCUB command, cast to enum once we populate the DMCUB subvp state).
 	 */
 	uint8_t mode; // enum mclk_switch_mode
-=======
-	enum mclk_switch_mode mode;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -1298,7 +1260,6 @@ struct dmub_cmd_mst_alloc_slots_control_data {
 struct dmub_rb_cmd_set_mst_alloc_slots {
 	struct dmub_cmd_header header; /* header */
 	struct dmub_cmd_mst_alloc_slots_control_data mst_slots_control; /* mst slots control */
-<<<<<<< HEAD
 };
 
 /**
@@ -1307,8 +1268,6 @@ struct dmub_rb_cmd_set_mst_alloc_slots {
 struct dmub_rb_cmd_dpia_hpd_int_enable {
 	struct dmub_cmd_header header; /* header */
 	uint32_t enable; /* dpia hpd interrupt enable */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -1583,7 +1542,6 @@ struct set_config_reply_control_data {
 struct dmub_rb_cmd_dp_set_config_reply {
 	struct dmub_cmd_header header;
 	struct set_config_reply_control_data set_config_reply_control;
-<<<<<<< HEAD
 };
 
 /**
@@ -1712,136 +1670,6 @@ enum dmub_cmd_mall_type {
 };
 
 /**
-=======
-};
-
-/**
- * Data passed from driver to FW in a DMUB_CMD__QUERY_HPD_STATE command.
- */
-struct dmub_cmd_hpd_state_query_data {
-	uint8_t instance; /**< HPD instance or DPIA instance */
-	uint8_t result; /**< For returning HPD state */
-	uint16_t pad; /** < Alignment */
-	enum aux_channel_type ch_type; /**< enum aux_channel_type */
-	enum aux_return_code_type status; /**< for returning the status of command */
-};
-
-/**
- * Definition of a DMUB_CMD__QUERY_HPD_STATE command.
- */
-struct dmub_rb_cmd_query_hpd_state {
-	/**
-	 * Command header.
-	 */
-	struct dmub_cmd_header header;
-	/**
-	 * Data passed from driver to FW in a DMUB_CMD__QUERY_HPD_STATE command.
-	 */
-	struct dmub_cmd_hpd_state_query_data data;
-};
-
-/*
- * Command IDs should be treated as stable ABI.
- * Do not reuse or modify IDs.
- */
-
-/**
- * PSR command sub-types.
- */
-enum dmub_cmd_psr_type {
-	/**
-	 * Set PSR version support.
-	 */
-	DMUB_CMD__PSR_SET_VERSION		= 0,
-	/**
-	 * Copy driver-calculated parameters to PSR state.
-	 */
-	DMUB_CMD__PSR_COPY_SETTINGS		= 1,
-	/**
-	 * Enable PSR.
-	 */
-	DMUB_CMD__PSR_ENABLE			= 2,
-
-	/**
-	 * Disable PSR.
-	 */
-	DMUB_CMD__PSR_DISABLE			= 3,
-
-	/**
-	 * Set PSR level.
-	 * PSR level is a 16-bit value dicated by driver that
-	 * will enable/disable different functionality.
-	 */
-	DMUB_CMD__PSR_SET_LEVEL			= 4,
-
-	/**
-	 * Forces PSR enabled until an explicit PSR disable call.
-	 */
-	DMUB_CMD__PSR_FORCE_STATIC		= 5,
-	/**
-	 * Set vtotal in psr active for FreeSync PSR.
-	 */
-	DMUB_CMD__SET_SINK_VTOTAL_IN_PSR_ACTIVE = 6,
-	/**
-	 * Set PSR power option
-	 */
-	DMUB_CMD__SET_PSR_POWER_OPT = 7,
-};
-
-enum dmub_cmd_fams_type {
-	DMUB_CMD__FAMS_SETUP_FW_CTRL	= 0,
-	DMUB_CMD__FAMS_DRR_UPDATE		= 1,
-	DMUB_CMD__HANDLE_SUBVP_CMD	= 2, // specifically for SubVP cmd
-	/**
-	 * For SubVP set manual trigger in FW because it
-	 * triggers DRR_UPDATE_PENDING which SubVP relies
-	 * on (for any SubVP cases that use a DRR display)
-	 */
-	DMUB_CMD__FAMS_SET_MANUAL_TRIGGER = 3,
-};
-
-/**
- * PSR versions.
- */
-enum psr_version {
-	/**
-	 * PSR version 1.
-	 */
-	PSR_VERSION_1				= 0,
-	/**
-	 * Freesync PSR SU.
-	 */
-	PSR_VERSION_SU_1			= 1,
-	/**
-	 * PSR not supported.
-	 */
-	PSR_VERSION_UNSUPPORTED			= 0xFFFFFFFF,
-};
-
-/**
- * enum dmub_cmd_mall_type - MALL commands
- */
-enum dmub_cmd_mall_type {
-	/**
-	 * Allows display refresh from MALL.
-	 */
-	DMUB_CMD__MALL_ACTION_ALLOW = 0,
-	/**
-	 * Disallows display refresh from MALL.
-	 */
-	DMUB_CMD__MALL_ACTION_DISALLOW = 1,
-	/**
-	 * Cursor copy for MALL.
-	 */
-	DMUB_CMD__MALL_ACTION_COPY_CURSOR = 2,
-	/**
-	 * Controls DF requests.
-	 */
-	DMUB_CMD__MALL_ACTION_NO_DF_REQ = 3,
-};
-
-/**
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * PHY Link rate for DP.
  */
 enum phy_link_rate {
@@ -2214,7 +2042,6 @@ union dmub_psr_su_debug_flags {
 		 */
 		uint8_t reset_state : 1;
 	} bitfields;
-<<<<<<< HEAD
 
 	/**
 	 * Union for debug flags.
@@ -2222,15 +2049,6 @@ union dmub_psr_su_debug_flags {
 	uint32_t u32All;
 };
 
-=======
-
-	/**
-	 * Union for debug flags.
-	 */
-	uint32_t u32All;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * Data passed from driver to FW in a DMUB_CMD__UPDATE_DIRTY_RECT command.
  * This triggers a selective update for PSR SU.
@@ -2281,7 +2099,6 @@ struct dmub_rb_cmd_update_dirty_rect {
 /**
  * Data passed from driver to FW in a DMUB_CMD__UPDATE_CURSOR_INFO command.
  */
-<<<<<<< HEAD
 union dmub_reg_cursor_control_cfg {
 	struct {
 		uint32_t     cur_enable: 1;
@@ -2375,9 +2192,6 @@ struct dmub_cursor_attributes_cfg {
 };
 
 struct dmub_cmd_update_cursor_payload0 {
-=======
-struct dmub_cmd_update_cursor_info_data {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/**
 	 * Cursor dirty rects.
 	 */
@@ -2404,7 +2218,6 @@ struct dmub_cmd_update_cursor_info_data {
 	 * Currently the support is only for 0 or 1
 	 */
 	uint8_t panel_inst;
-<<<<<<< HEAD
 	/**
 	 * Cursor Position Register.
 	 * Registers contains Hubp & Dpp modules
@@ -2419,8 +2232,6 @@ struct dmub_cmd_update_cursor_payload1 {
 union dmub_cmd_update_cursor_info_data {
 	struct dmub_cmd_update_cursor_payload0 payload0;
 	struct dmub_cmd_update_cursor_payload1 payload1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 /**
  * Definition of a DMUB_CMD__UPDATE_CURSOR_INFO command.
@@ -2433,11 +2244,7 @@ struct dmub_rb_cmd_update_cursor_info {
 	/**
 	 * Data passed from driver to FW in a DMUB_CMD__UPDATE_CURSOR_INFO command.
 	 */
-<<<<<<< HEAD
 	union dmub_cmd_update_cursor_info_data update_cursor_info_data;
-=======
-	struct dmub_cmd_update_cursor_info_data update_cursor_info_data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -2554,7 +2361,6 @@ union dmub_hw_lock_flags {
 	 */
 	uint8_t u8All;
 };
-<<<<<<< HEAD
 
 /**
  * Instances of HW to be locked.
@@ -2583,36 +2389,6 @@ struct dmub_hw_lock_inst_flags {
 };
 
 /**
-=======
-
-/**
- * Instances of HW to be locked.
- *
- * Note: If updating with more HW components, fields
- * in dmub_inbox0_cmd_lock_hw must be updated to match.
- */
-struct dmub_hw_lock_inst_flags {
-	/**
-	 * OTG HW instance for OTG master update lock.
-	 */
-	uint8_t otg_inst;
-	/**
-	 * OPP instance for cursor lock.
-	 */
-	uint8_t opp_inst;
-	/**
-	 * OTG HW instance for global update lock.
-	 * TODO: Remove, and re-use otg_inst.
-	 */
-	uint8_t dig_inst;
-	/**
-	 * Explicit pad to 4 byte boundary.
-	 */
-	uint8_t pad;
-};
-
-/**
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Clients that can acquire the HW Lock Manager.
  *
  * Note: If updating with more clients, fields in
@@ -3137,7 +2913,6 @@ struct dmub_rb_cmd_query_feature_caps {
 	struct dmub_cmd_query_feature_caps_data query_feature_caps_data;
 };
 
-<<<<<<< HEAD
 /**
  * Data passed from driver to FW in a DMUB_CMD__GET_VISUAL_CONFIRM_COLOR command.
  */
@@ -3167,16 +2942,6 @@ struct dmub_optc_state {
 	uint32_t v_total_max;
 	uint32_t v_total_min;
 	uint32_t tg_inst;
-=======
-struct dmub_optc_state {
-	uint32_t v_total_max;
-	uint32_t v_total_min;
-	uint32_t v_total_mid;
-	uint32_t v_total_mid_frame_num;
-	uint32_t tg_inst;
-	uint32_t enable_manual_trigger;
-	uint32_t clear_force_vsync;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct dmub_rb_cmd_drr_update {
@@ -3541,14 +3306,11 @@ union dmub_rb_cmd {
 	 * Definition of a DMUB_CMD__QUERY_FEATURE_CAPS command.
 	 */
 	struct dmub_rb_cmd_query_feature_caps query_feature_caps;
-<<<<<<< HEAD
 
 	/**
 	 * Definition of a DMUB_CMD__GET_VISUAL_CONFIRM_COLOR command.
 	 */
 	struct dmub_rb_cmd_get_visual_confirm_color visual_confirm_color;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dmub_rb_cmd_drr_update drr_update;
 	struct dmub_rb_cmd_fw_assisted_mclk_switch fw_assisted_mclk_switch;
 
@@ -3585,13 +3347,10 @@ union dmub_rb_cmd {
 	 * Definition of a DMUB_CMD__QUERY_HPD_STATE command.
 	 */
 	struct dmub_rb_cmd_query_hpd_state query_hpd;
-<<<<<<< HEAD
 	/**
 	 * Definition of a DMUB_CMD__DPIA_HPD_INT_ENABLE command.
 	 */
 	struct dmub_rb_cmd_dpia_hpd_int_enable dpia_hpd_int_enable;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**

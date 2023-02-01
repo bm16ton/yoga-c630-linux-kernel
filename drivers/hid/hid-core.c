@@ -1687,22 +1687,6 @@ static void hid_process_report(struct hid_device *hid,
 		/* we need to do the memcpy at the end for var items */
 		for (a = 0; a < report->maxfield; a++) {
 			field = report->field[a];
-<<<<<<< HEAD
-
-			if (field->flags & HID_MAIN_ITEM_VARIABLE)
-				memcpy(field->value, field->new_value,
-				       field->report_count * sizeof(__s32));
-		}
-	} else {
-		/* FEATURE_REPORT, regular processing */
-		for (a = 0; a < report->maxfield; a++) {
-			field = report->field[a];
-
-			if (field->flags & HID_MAIN_ITEM_VARIABLE)
-				hid_input_var_field(hid, field, interrupt);
-			else
-				hid_input_array_field(hid, field, interrupt);
-=======
 
 			if (field->flags & HID_MAIN_ITEM_VARIABLE)
 				memcpy(field->value, field->new_value,
@@ -1751,47 +1735,9 @@ static void __hid_insert_field_entry(struct hid_device *hid,
 		if (entry->priority > next->priority) {
 			list_add_tail(&entry->list, &next->list);
 			return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		}
-	}
-}
-
-<<<<<<< HEAD
-/*
- * Insert a given usage_index in a field in the list
- * of processed usages in the report.
- *
- * The elements of lower priority score are processed
- * first.
- */
-static void __hid_insert_field_entry(struct hid_device *hid,
-				     struct hid_report *report,
-				     struct hid_field_entry *entry,
-				     struct hid_field *field,
-				     unsigned int usage_index)
-{
-	struct hid_field_entry *next;
-
-	entry->field = field;
-	entry->index = usage_index;
-	entry->priority = field->usages_priorities[usage_index];
-
-	/* insert the element at the correct position */
-	list_for_each_entry(next,
-			    &report->field_entry_list,
-			    list) {
-		/*
-		 * the priority of our element is strictly higher
-		 * than the next one, insert it before
-		 */
-		if (entry->priority > next->priority) {
-			list_add_tail(&entry->list, &next->list);
-			return;
 		}
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* lowest priority score: insert at the end */
 	list_add_tail(&entry->list, &report->field_entry_list);
 }
@@ -2411,11 +2357,7 @@ EXPORT_SYMBOL_GPL(hid_hw_close);
  * @reqtype: hid request type
  */
 void hid_hw_request(struct hid_device *hdev,
-<<<<<<< HEAD
 		    struct hid_report *report, enum hid_class_request reqtype)
-=======
-		    struct hid_report *report, int reqtype)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (hdev->ll_driver->request)
 		return hdev->ll_driver->request(hdev, report, reqtype);
@@ -2440,11 +2382,7 @@ EXPORT_SYMBOL_GPL(hid_hw_request);
  */
 int hid_hw_raw_request(struct hid_device *hdev,
 		       unsigned char reportnum, __u8 *buf,
-<<<<<<< HEAD
 		       size_t len, enum hid_report_type rtype, enum hid_class_request reqtype)
-=======
-		       size_t len, unsigned char rtype, int reqtype)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (len < 1 || len > HID_MAX_BUFFER_SIZE || !buf)
 		return -EINVAL;

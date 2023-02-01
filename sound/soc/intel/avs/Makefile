@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
-<<<<<<< HEAD
 snd-soc-avs-objs := dsp.o ipc.o messages.o utils.o core.o loader.o \
 		    topology.o path.o pcm.o board_selection.o
 snd-soc-avs-objs += cldma.o
@@ -14,9 +13,3 @@ obj-$(CONFIG_SND_SOC_INTEL_AVS) += snd-soc-avs.o
 
 # Machine support
 obj-$(CONFIG_SND_SOC) += boards/
-=======
-snd-soc-avs-objs := dsp.o ipc.o messages.o utils.o core.o loader.o
-snd-soc-avs-objs += cldma.o
-
-obj-$(CONFIG_SND_SOC_INTEL_AVS) += snd-soc-avs.o
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -86,25 +86,11 @@ struct intel_uc_fw {
 		const enum intel_uc_fw_status status;
 		enum intel_uc_fw_status __status; /* no accidental overwrites */
 	};
-<<<<<<< HEAD
 	struct intel_uc_fw_file file_wanted;
 	struct intel_uc_fw_file file_selected;
-=======
-	const char *wanted_path;
-	const char *path;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool user_overridden;
 	size_t size;
 	struct drm_i915_gem_object *obj;
-	/**
-	 * @dummy: A vma used in binding the uc fw to ggtt. We can't define this
-	 * vma on the stack as it can lead to a stack overflow, so we define it
-	 * here. Safe to have 1 copy per uc fw because the binding is single
-	 * threaded as it done during driver load (inherently single threaded)
-	 * or during a GT reset (mutex guarantees single threaded).
-	 */
-	struct i915_vma_resource dummy;
-	struct i915_vma *rsa_data;
 
 	/**
 	 * @dummy: A vma used in binding the uc fw to ggtt. We can't define this
@@ -115,12 +101,6 @@ struct intel_uc_fw {
 	 */
 	struct i915_vma_resource dummy;
 	struct i915_vma *rsa_data;
-
-	struct {
-		const char *path;
-		u16 major_ver;
-		u16 minor_ver;
-	} fallback;
 
 	u32 rsa_size;
 	u32 ucode_size;

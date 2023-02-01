@@ -2574,12 +2574,7 @@ static int rocker_probe_port(struct rocker *rocker, unsigned int port_number)
 	dev->netdev_ops = &rocker_port_netdev_ops;
 	dev->ethtool_ops = &rocker_port_ethtool_ops;
 	netif_napi_add_tx(dev, &rocker_port->napi_tx, rocker_port_poll_tx);
-<<<<<<< HEAD
 	netif_napi_add(dev, &rocker_port->napi_rx, rocker_port_poll_rx);
-=======
-	netif_napi_add(dev, &rocker_port->napi_rx, rocker_port_poll_rx,
-		       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rocker_carrier_init(rocker_port);
 
 	dev->features |= NETIF_F_NETNS_LOCAL | NETIF_F_SG;

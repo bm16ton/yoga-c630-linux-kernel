@@ -127,13 +127,9 @@ static int qcom_a53pll_probe(struct platform_device *pdev)
 	if (!init.name)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	init.parent_data = &(const struct clk_parent_data){
 		.fw_name = "xo", .name = "xo_board",
 	};
-=======
-	init.parent_names = (const char *[]){ "xo" };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	init.num_parents = 1;
 	init.ops = &clk_pll_sr2_ops;
 	pll->clkr.hw.init = &init;

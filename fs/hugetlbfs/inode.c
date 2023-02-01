@@ -531,11 +531,7 @@ hugetlb_vmdelete_list(struct rb_root_cached *root, pgoff_t start, pgoff_t end,
 	 * an inclusive "last".
 	 */
 	vma_interval_tree_foreach(vma, root, start, end ? end - 1 : ULONG_MAX) {
-<<<<<<< HEAD
 		unsigned long v_start;
-=======
-		unsigned long v_offset;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		unsigned long v_end;
 
 		if (!hugetlb_vma_trylock_write(vma))
@@ -556,7 +552,6 @@ hugetlb_vmdelete_list(struct rb_root_cached *root, pgoff_t start, pgoff_t end,
 	}
 }
 
-<<<<<<< HEAD
 /*
  * Called with hugetlb fault mutex held.
  * Returns true if page was actually removed, false otherwise.
@@ -592,10 +587,6 @@ static bool remove_inode_single_folio(struct hstate *h, struct inode *inode,
 		if (unlikely(hugetlb_unreserve_pages(inode, index,
 							index + 1, 1)))
 			hugetlb_fix_reserve_counts(inode);
-=======
-		unmap_hugepage_range(vma, vma->vm_start + v_offset, v_end,
-				     NULL, zap_flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	folio_unlock(folio);
@@ -642,7 +633,6 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
 			u32 hash = 0;
 
 			index = folio->index;
-<<<<<<< HEAD
 			hash = hugetlb_fault_mutex_hash(mapping, index);
 			mutex_lock(&hugetlb_fault_mutex_table[hash]);
 
@@ -654,62 +644,6 @@ static void remove_inode_hugepages(struct inode *inode, loff_t lstart,
 				freed++;
 
 			mutex_unlock(&hugetlb_fault_mutex_table[hash]);
-=======
-			if (!truncate_op) {
-				/*
-				 * Only need to hold the fault mutex in the
-				 * hole punch case.  This prevents races with
-				 * page faults.  Races are not possible in the
-				 * case of truncation.
-				 */
-				hash = hugetlb_fault_mutex_hash(mapping, index);
-				mutex_lock(&hugetlb_fault_mutex_table[hash]);
-			}
-
-			/*
-			 * If folio is mapped, it was faulted in after being
-			 * unmapped in caller.  Unmap (again) now after taking
-			 * the fault mutex.  The mutex will prevent faults
-			 * until we finish removing the folio.
-			 *
-			 * This race can only happen in the hole punch case.
-			 * Getting here in a truncate operation is a bug.
-			 */
-			if (unlikely(folio_mapped(folio))) {
-				BUG_ON(truncate_op);
-
-				mutex_unlock(&hugetlb_fault_mutex_table[hash]);
-				i_mmap_lock_write(mapping);
-				mutex_lock(&hugetlb_fault_mutex_table[hash]);
-				hugetlb_vmdelete_list(&mapping->i_mmap,
-					index * pages_per_huge_page(h),
-					(index + 1) * pages_per_huge_page(h),
-					ZAP_FLAG_DROP_MARKER);
-				i_mmap_unlock_write(mapping);
-			}
-
-			folio_lock(folio);
-			/*
-			 * We must free the huge page and remove from page
-			 * cache BEFORE removing the region/reserve map
-			 * (hugetlb_unreserve_pages).  In rare out of memory
-			 * conditions, removal of the region/reserve map could
-			 * fail. Correspondingly, the subpool and global
-			 * reserve usage count can need to be adjusted.
-			 */
-			VM_BUG_ON(HPageRestoreReserve(&folio->page));
-			hugetlb_delete_from_page_cache(&folio->page);
-			freed++;
-			if (!truncate_op) {
-				if (unlikely(hugetlb_unreserve_pages(inode,
-							index, index + 1, 1)))
-					hugetlb_fix_reserve_counts(inode);
-			}
-
-			folio_unlock(folio);
-			if (!truncate_op)
-				mutex_unlock(&hugetlb_fault_mutex_table[hash]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		folio_batch_release(&fbatch);
 		cond_resched();
@@ -794,7 +728,6 @@ static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 	hole_end = round_down(offset + len, hpage_size);
 
 	inode_lock(inode);
-<<<<<<< HEAD
 
 	/* protected by i_rwsem */
 	if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE)) {
@@ -809,22 +742,6 @@ static long hugetlbfs_punch_hole(struct inode *inode, loff_t offset, loff_t len)
 		hugetlbfs_zero_partial_page(h, mapping,
 				offset, min(offset + len, hole_start));
 
-=======
-
-	/* protected by i_rwsem */
-	if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE)) {
-		inode_unlock(inode);
-		return -EPERM;
-	}
-
-	i_mmap_lock_write(mapping);
-
-	/* If range starts before first full page, zero partial page. */
-	if (offset < hole_start)
-		hugetlbfs_zero_partial_page(h, mapping,
-				offset, min(offset + len, hole_start));
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Unmap users of full pages in the hole. */
 	if (hole_end > hole_start) {
 		if (!RB_EMPTY_ROOT(&mapping->i_mmap.rb_root))

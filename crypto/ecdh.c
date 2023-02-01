@@ -200,11 +200,7 @@ static struct kpp_alg ecdh_nist_p384 = {
 
 static bool ecdh_nist_p192_registered;
 
-<<<<<<< HEAD
 static int __init ecdh_init(void)
-=======
-static int ecdh_init(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 

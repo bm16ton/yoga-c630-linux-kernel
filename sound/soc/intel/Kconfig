@@ -23,11 +23,7 @@ config SND_SOC_INTEL_CATPT
 	depends on ACPI || COMPILE_TEST
 	depends on DMADEVICES && SND_DMA_SGBUF
 	select DW_DMAC_CORE
-<<<<<<< HEAD
 	select SND_SOC_ACPI if ACPI
-=======
-	select SND_SOC_ACPI_INTEL_MATCH
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select WANT_DEV_COREDUMP
 	select SND_INTEL_DSP_CONFIG
 	help
@@ -215,7 +211,6 @@ config SND_SOC_INTEL_KEEMBAY
 
 config SND_SOC_INTEL_AVS
 	tristate "Intel AVS driver"
-<<<<<<< HEAD
 	depends on X86 || COMPILE_TEST
 	depends on PCI
 	depends on COMMON_CLK
@@ -226,23 +221,13 @@ config SND_SOC_INTEL_AVS
 	select SND_HDA_DSP_LOADER
 	select SND_INTEL_DSP_CONFIG
 	select WANT_DEV_COREDUMP
-=======
-	depends on PCI && ACPI
-	depends on COMMON_CLK
-	select SND_SOC_ACPI
-	select SND_HDA_EXT_CORE
-	select SND_HDA_DSP_LOADER
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Enable support for Intel(R) cAVS 1.5 platforms with DSP
 	  capabilities. This includes Skylake, Kabylake, Amberlake and
 	  Apollolake.
 
-<<<<<<< HEAD
 # Machine board drivers
 source "sound/soc/intel/avs/boards/Kconfig"
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # ASoC codec drivers
 source "sound/soc/intel/boards/Kconfig"

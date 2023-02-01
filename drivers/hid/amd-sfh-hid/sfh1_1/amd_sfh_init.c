@@ -288,21 +288,13 @@ int amd_sfh1_1_init(struct amd_mp2_dev *mp2)
 
 	phy_base <<= 21;
 	if (!devm_request_mem_region(dev, phy_base, 128 * 1024, "amd_sfh")) {
-<<<<<<< HEAD
 		dev_dbg(dev, "can't reserve mmio registers\n");
-=======
-		dev_err(dev, "can't reserve mmio registers\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENOMEM;
 	}
 
 	mp2->vsbase = devm_ioremap(dev, phy_base, 128 * 1024);
 	if (!mp2->vsbase) {
-<<<<<<< HEAD
 		dev_dbg(dev, "failed to remap vsbase\n");
-=======
-		dev_err(dev, "failed to remap vsbase\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENOMEM;
 	}
 
@@ -311,11 +303,7 @@ int amd_sfh1_1_init(struct amd_mp2_dev *mp2)
 
 	memcpy_fromio(&binfo, mp2->vsbase, sizeof(struct sfh_base_info));
 	if (binfo.sbase.fw_info.fw_ver == 0 || binfo.sbase.s_list.sl.sensors == 0) {
-<<<<<<< HEAD
 		dev_dbg(dev, "failed to get sensors\n");
-=======
-		dev_err(dev, "failed to get sensors\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EOPNOTSUPP;
 	}
 	dev_dbg(dev, "firmware version 0x%x\n", binfo.sbase.fw_info.fw_ver);

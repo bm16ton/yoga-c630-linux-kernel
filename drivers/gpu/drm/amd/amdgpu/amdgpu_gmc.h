@@ -264,7 +264,6 @@ struct amdgpu_gmc {
 	u64 mall_size;
 	/* number of UMC instances */
 	int num_umc;
-<<<<<<< HEAD
 	/* mode2 save restore */
 	u64 VM_L2_CNTL;
 	u64 VM_L2_CNTL2;
@@ -291,8 +290,6 @@ struct amdgpu_gmc {
 	u64 VM_CONTEXT_PAGE_TABLE_END_ADDR_LO32[16];
 	u64 VM_CONTEXT_PAGE_TABLE_END_ADDR_HI32[16];
 	u64 MC_VM_MX_L1_TLB_CNTL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define amdgpu_gmc_flush_gpu_tlb(adev, vmid, vmhub, type) ((adev)->gmc.gmc_funcs->flush_gpu_tlb((adev), (vmid), (vmhub), (type)))

@@ -43,13 +43,8 @@ static int duration = 0;
 
 #define FLAVORS_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_flavors.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_flavors.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_flavors"				\
 
@@ -73,13 +68,8 @@ static int duration = 0;
 
 #define NESTING_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_nesting.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_nesting.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_nesting"				\
 
@@ -106,13 +96,8 @@ static int duration = 0;
 
 #define ARRAYS_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_arrays.bpf.o",			\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_arrays.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_arrays"					\
 
@@ -145,13 +130,8 @@ static int duration = 0;
 
 #define PRIMITIVES_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_primitives.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_primitives.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_primitives"				\
 
@@ -223,13 +203,8 @@ static int duration = 0;
 
 #define INTS_CASE_COMMON(name)						\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_ints.bpf.o",			\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_ints.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_ints"
 
@@ -248,13 +223,8 @@ static int duration = 0;
 
 #define FIELD_EXISTS_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_existence.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_existence.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_existence"
 
@@ -289,11 +259,7 @@ static int duration = 0;
 	BITFIELDS_CASE_COMMON("test_core_reloc_bitfields_probed.bpf.o",	\
 			      "probed:", name),				\
 	.fails = true,							\
-<<<<<<< HEAD
 	.run_btfgen_fails = true,					\
-=======
-	.run_btfgen_fails = true,							\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_bitfields",				\
 }, {									\
@@ -306,13 +272,8 @@ static int duration = 0;
 
 #define SIZE_CASE_COMMON(name)						\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_size.bpf.o",			\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_size.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_size"
 
@@ -346,22 +307,13 @@ static int duration = 0;
 #define SIZE_ERR_CASE(name) {						\
 	SIZE_CASE_COMMON(name),						\
 	.fails = true,							\
-<<<<<<< HEAD
 	.run_btfgen_fails = true,					\
-=======
-	.run_btfgen_fails = true,							\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #define TYPE_BASED_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_type_based.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_type_based.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_type_based"
 
@@ -379,13 +331,8 @@ static int duration = 0;
 
 #define TYPE_ID_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_type_id.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_type_id.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_type_id"
 
@@ -403,13 +350,8 @@ static int duration = 0;
 
 #define ENUMVAL_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_enumval.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_enumval.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_enumval"
 
@@ -427,13 +369,8 @@ static int duration = 0;
 
 #define ENUM64VAL_CASE_COMMON(name)					\
 	.case_name = #name,						\
-<<<<<<< HEAD
 	.bpf_obj_file = "test_core_reloc_enum64val.bpf.o",		\
 	.btf_src_file = "btf__core_reloc_" #name ".bpf.o",		\
-=======
-	.bpf_obj_file = "test_core_reloc_enum64val.o",			\
-	.btf_src_file = "btf__core_reloc_" #name ".o",			\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.raw_tp_name = "sys_enter",					\
 	.prog_name = "test_core_enum64val"
 

@@ -3091,15 +3091,11 @@ static int xilinx_dma_probe(struct platform_device *pdev)
 		xdev->ext_addr = false;
 
 	/* Set the dma mask bits */
-<<<<<<< HEAD
 	err = dma_set_mask_and_coherent(xdev->dev, DMA_BIT_MASK(addr_width));
 	if (err < 0) {
 		dev_err(xdev->dev, "DMA mask error %d\n", err);
 		goto disable_clks;
 	}
-=======
-	dma_set_mask_and_coherent(xdev->dev, DMA_BIT_MASK(addr_width));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Initialize the DMA engine */
 	xdev->common.dev = &pdev->dev;

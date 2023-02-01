@@ -89,36 +89,6 @@ static u32 sdma_v5_2_get_reg_offset(struct amdgpu_device *adev, u32 instance, u3
 	return base + internal_offset;
 }
 
-<<<<<<< HEAD
-=======
-static int sdma_v5_2_init_inst_ctx(struct amdgpu_sdma_instance *sdma_inst)
-{
-	int err = 0;
-	const struct sdma_firmware_header_v1_0 *hdr;
-
-	err = amdgpu_ucode_validate(sdma_inst->fw);
-	if (err)
-		return err;
-
-	hdr = (const struct sdma_firmware_header_v1_0 *)sdma_inst->fw->data;
-	sdma_inst->fw_version = le32_to_cpu(hdr->header.ucode_version);
-	sdma_inst->feature_version = le32_to_cpu(hdr->ucode_feature_version);
-
-	if (sdma_inst->feature_version >= 20)
-		sdma_inst->burst_nop = true;
-
-	return 0;
-}
-
-static void sdma_v5_2_destroy_inst_ctx(struct amdgpu_device *adev)
-{
-	release_firmware(adev->sdma.instance[0].fw);
-
-	memset((void *)adev->sdma.instance, 0,
-	       sizeof(struct amdgpu_sdma_instance) * AMDGPU_MAX_SDMA_INSTANCES);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * sdma_v5_2_init_microcode - load ucode images from disk
  *
@@ -141,7 +111,6 @@ static int sdma_v5_2_init_microcode(struct amdgpu_device *adev)
 	switch (adev->ip_versions[SDMA0_HWIP][0]) {
 	case IP_VERSION(5, 2, 0):
 		chip_name = "sienna_cichlid_sdma";
-<<<<<<< HEAD
 		break;
 	case IP_VERSION(5, 2, 2):
 		chip_name = "navy_flounder_sdma";
@@ -152,18 +121,6 @@ static int sdma_v5_2_init_microcode(struct amdgpu_device *adev)
 	case IP_VERSION(5, 2, 4):
 		chip_name = "dimgrey_cavefish_sdma";
 		break;
-=======
-		break;
-	case IP_VERSION(5, 2, 2):
-		chip_name = "navy_flounder_sdma";
-		break;
-	case IP_VERSION(5, 2, 1):
-		chip_name = "vangogh_sdma";
-		break;
-	case IP_VERSION(5, 2, 4):
-		chip_name = "dimgrey_cavefish_sdma";
-		break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case IP_VERSION(5, 2, 5):
 		chip_name = "beige_goby_sdma";
 		break;
@@ -181,39 +138,6 @@ static int sdma_v5_2_init_microcode(struct amdgpu_device *adev)
 	}
 
 	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s.bin", chip_name);
-<<<<<<< HEAD
-=======
-
-	err = request_firmware(&adev->sdma.instance[0].fw, fw_name, adev->dev);
-	if (err)
-		goto out;
-
-	err = sdma_v5_2_init_inst_ctx(&adev->sdma.instance[0]);
-	if (err)
-		goto out;
-
-	for (i = 1; i < adev->sdma.num_instances; i++)
-		memcpy((void *)&adev->sdma.instance[i],
-		       (void *)&adev->sdma.instance[0],
-		       sizeof(struct amdgpu_sdma_instance));
-
-	if (amdgpu_sriov_vf(adev) && (adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(5, 2, 0)))
-		return 0;
-
-	DRM_DEBUG("psp_load == '%s'\n",
-		  adev->firmware.load_type == AMDGPU_FW_LOAD_PSP ? "true" : "false");
-
-	if (adev->firmware.load_type == AMDGPU_FW_LOAD_PSP) {
-		for (i = 0; i < adev->sdma.num_instances; i++) {
-			info = &adev->firmware.ucode[AMDGPU_UCODE_ID_SDMA0 + i];
-			info->ucode_id = AMDGPU_UCODE_ID_SDMA0 + i;
-			info->fw = adev->sdma.instance[i].fw;
-			header = (const struct common_firmware_header *)info->fw->data;
-			adev->firmware.fw_size +=
-				ALIGN(le32_to_cpu(header->ucode_size_bytes), PAGE_SIZE);
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return amdgpu_sdma_init_microcode(adev, fw_name, 0, true);
 }
@@ -1418,13 +1342,7 @@ static int sdma_v5_2_hw_init(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-<<<<<<< HEAD
 	return sdma_v5_2_start(adev);
-=======
-	r = sdma_v5_2_start(adev);
-
-	return r;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int sdma_v5_2_hw_fini(void *handle)

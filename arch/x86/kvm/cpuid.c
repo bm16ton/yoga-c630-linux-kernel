@@ -186,19 +186,11 @@ static void kvm_update_kvm_cpuid_base(struct kvm_vcpu *vcpu)
 
 		if (entry) {
 			u32 signature[3];
-<<<<<<< HEAD
 
 			signature[0] = entry->ebx;
 			signature[1] = entry->ecx;
 			signature[2] = entry->edx;
 
-=======
-
-			signature[0] = entry->ebx;
-			signature[1] = entry->ecx;
-			signature[2] = entry->edx;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			BUILD_BUG_ON(sizeof(signature) > sizeof(KVM_SIGNATURE));
 			if (!memcmp(signature, KVM_SIGNATURE, sizeof(signature))) {
 				vcpu->arch.kvm_cpuid_base = function;
@@ -332,7 +324,6 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
 {
 	struct kvm_lapic *apic = vcpu->arch.apic;
 	struct kvm_cpuid_entry2 *best;
-	u64 guest_supported_xcr0;
 
 	best = kvm_find_cpuid_entry(vcpu, 1);
 	if (best && apic) {
@@ -344,7 +335,6 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
 		kvm_apic_set_version(vcpu);
 	}
 
-<<<<<<< HEAD
 	vcpu->arch.guest_supported_xcr0 =
 		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
 
@@ -355,12 +345,6 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
 	 */
 	vcpu->arch.guest_fpu.fpstate->user_xfeatures = vcpu->arch.guest_supported_xcr0 |
 						       XFEATURE_MASK_FPSSE;
-=======
-	guest_supported_xcr0 =
-		cpuid_get_supported_xcr0(vcpu->arch.cpuid_entries, vcpu->arch.cpuid_nent);
-
-	vcpu->arch.guest_fpu.fpstate->user_xfeatures = guest_supported_xcr0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	kvm_update_pv_runtime(vcpu);
 
@@ -435,15 +419,12 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
 		return 0;
 	}
 
-<<<<<<< HEAD
 	if (kvm_cpuid_has_hyperv(e2, nent)) {
 		r = kvm_hv_vcpu_init(vcpu);
 		if (r)
 			return r;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	r = kvm_check_cpuid(vcpu, e2, nent);
 	if (r)
 		return r;
@@ -794,11 +775,6 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
 	if (!entry)
 		return NULL;
 
-<<<<<<< HEAD
-=======
-	entry = &array->entries[array->nent++];
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memset(entry, 0, sizeof(*entry));
 	entry->function = function;
 	entry->index = index;
@@ -1362,11 +1338,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
 	if (sanity_check_entries(entries, cpuid->nent, type))
 		return -EINVAL;
 
-<<<<<<< HEAD
 	array.entries = kvcalloc(cpuid->nent, sizeof(struct kvm_cpuid_entry2), GFP_KERNEL);
-=======
-	array.entries = kvcalloc(sizeof(struct kvm_cpuid_entry2), cpuid->nent, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!array.entries)
 		return -ENOMEM;
 

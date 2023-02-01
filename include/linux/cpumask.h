@@ -307,7 +307,6 @@ unsigned int __pure cpumask_next_wrap(int n, const struct cpumask *mask, int sta
  * After the loop, cpu is >= nr_cpu_ids.
  */
 #define for_each_cpu_and(cpu, mask1, mask2)				\
-<<<<<<< HEAD
 	for_each_and_bit(cpu, cpumask_bits(mask1), cpumask_bits(mask2), nr_cpumask_bits)
 
 /**
@@ -327,11 +326,6 @@ unsigned int __pure cpumask_next_wrap(int n, const struct cpumask *mask, int sta
  */
 #define for_each_cpu_andnot(cpu, mask1, mask2)				\
 	for_each_andnot_bit(cpu, cpumask_bits(mask1), cpumask_bits(mask2), nr_cpumask_bits)
-=======
-	for ((cpu) = -1;						\
-		(cpu) = cpumask_next_and((cpu), (mask1), (mask2)),	\
-		(cpu) < nr_cpu_ids;)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * cpumask_any_but - return a "random" in a cpumask, but not this one.
@@ -352,7 +346,6 @@ unsigned int cpumask_any_but(const struct cpumask *mask, unsigned int cpu)
 			break;
 	return i;
 }
-<<<<<<< HEAD
 
 /**
  * cpumask_nth - get the first cpu in a cpumask
@@ -397,8 +390,6 @@ unsigned int cpumask_nth_andnot(unsigned int cpu, const struct cpumask *srcp1,
 	return find_nth_andnot_bit(cpumask_bits(srcp1), cpumask_bits(srcp2),
 				nr_cpumask_bits, cpumask_check(cpu));
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define CPU_BITS_NONE						\
 {								\
@@ -1201,16 +1192,10 @@ cpumap_print_list_to_buf(char *buf, const struct cpumask *mask,
  * cover a worst-case of every other cpu being on one of two nodes for a
  * very large NR_CPUS.
  *
-<<<<<<< HEAD
  *  Use PAGE_SIZE as a minimum for smaller configurations while avoiding
  *  unsigned comparison to -1.
  */
 #define CPUMAP_FILE_MAX_BYTES  (((NR_CPUS * 9)/32 > PAGE_SIZE) \
-=======
- *  Use PAGE_SIZE as a minimum for smaller configurations.
- */
-#define CPUMAP_FILE_MAX_BYTES  ((((NR_CPUS * 9)/32 - 1) > PAGE_SIZE) \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					? (NR_CPUS * 9)/32 - 1 : PAGE_SIZE)
 #define CPULIST_FILE_MAX_BYTES  (((NR_CPUS * 7)/2 > PAGE_SIZE) ? (NR_CPUS * 7)/2 : PAGE_SIZE)
 

@@ -5,11 +5,7 @@
 $id: http://devicetree.org/schemas/net/sunplus,sp7021-emac.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-<<<<<<< HEAD
 title: Sunplus SP7021 Dual Ethernet MAC
-=======
-title: Sunplus SP7021 Dual Ethernet MAC Device Tree Bindings
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 maintainers:
   - Wells Lu <wellslutw@gmail.com>
@@ -36,10 +32,7 @@ properties:
 
   ethernet-ports:
     type: object
-<<<<<<< HEAD
     additionalProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     description: Ethernet ports to PHY
 
     properties:
@@ -52,10 +45,7 @@ properties:
     patternProperties:
       "^port@[0-1]$":
         type: object
-<<<<<<< HEAD
         additionalProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         description: Port to PHY
 
         properties:

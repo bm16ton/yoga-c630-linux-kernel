@@ -53,10 +53,7 @@ struct brcmf_mp_device {
 	struct brcmfmac_pd_cc *country_codes;
 	const char	*board_type;
 	unsigned char	mac[ETH_ALEN];
-<<<<<<< HEAD
 	const char	*antenna_sku;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	union {
 		struct brcmfmac_sdio_pd sdio;
 	} bus;

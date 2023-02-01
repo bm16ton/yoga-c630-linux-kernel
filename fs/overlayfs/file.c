@@ -38,11 +38,7 @@ static char ovl_whatisit(struct inode *inode, struct inode *realinode)
 #define OVL_OPEN_FLAGS (O_NOATIME | FMODE_NONOTIFY)
 
 static struct file *ovl_open_realfile(const struct file *file,
-<<<<<<< HEAD
 				      const struct path *realpath)
-=======
-				      struct path *realpath)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct inode *realinode = d_inode(realpath->dentry);
 	struct inode *inode = file_inode(file);

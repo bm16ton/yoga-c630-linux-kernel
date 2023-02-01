@@ -1801,14 +1801,8 @@ static int stm32_fmc2_nfc_parse_child(struct stm32_fmc2_nfc *nfc,
 		nand->cs_used[i] = cs;
 	}
 
-<<<<<<< HEAD
 	nand->wp_gpio = devm_fwnode_gpiod_get(nfc->dev, of_fwnode_handle(dn),
 					      "wp", GPIOD_OUT_HIGH, "wp");
-=======
-	nand->wp_gpio = devm_gpiod_get_from_of_node(nfc->dev, dn,
-						    "wp-gpios", 0,
-						    GPIOD_OUT_HIGH, "wp");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(nand->wp_gpio)) {
 		ret = PTR_ERR(nand->wp_gpio);
 		if (ret != -ENOENT)

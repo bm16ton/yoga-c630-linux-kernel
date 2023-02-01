@@ -217,10 +217,7 @@ static int brcmf_init_nvram_parser(struct nvram_parser *nvp,
 		size = data_len;
 	/* Add space for properties we may add */
 	size += strlen(BRCMF_FW_DEFAULT_BOARDREV) + 1;
-<<<<<<< HEAD
 	size += BRCMF_FW_MACADDR_LEN + 1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Alloc for extra 0 byte + roundup by 4 + length field */
 	size += 1 + 3 + sizeof(u32);
 	nvp->nvram = kzalloc(size, GFP_KERNEL);
@@ -619,7 +616,6 @@ static int brcmf_fw_complete_request(const struct firmware *fw,
 
 static char *brcm_alt_fw_path(const char *path, const char *board_type)
 {
-<<<<<<< HEAD
 	char base[BRCMF_FW_NAME_LEN];
 	const char *suffix;
 	char *ret;
@@ -643,24 +639,6 @@ static char *brcm_alt_fw_path(const char *path, const char *board_type)
 	brcmf_dbg(TRACE, "FW alt path: %s\n", ret);
 
 	return ret;
-=======
-	char alt_path[BRCMF_FW_NAME_LEN];
-	char suffix[5];
-
-	strscpy(alt_path, path, BRCMF_FW_NAME_LEN);
-	/* At least one character + suffix */
-	if (strlen(alt_path) < 5)
-		return NULL;
-
-	/* strip .txt or .bin at the end */
-	strscpy(suffix, alt_path + strlen(alt_path) - 4, 5);
-	alt_path[strlen(alt_path) - 4] = 0;
-	strlcat(alt_path, ".", BRCMF_FW_NAME_LEN);
-	strlcat(alt_path, board_type, BRCMF_FW_NAME_LEN);
-	strlcat(alt_path, suffix, BRCMF_FW_NAME_LEN);
-
-	return kstrdup(alt_path, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int brcmf_fw_request_firmware(const struct firmware **fw,
@@ -670,7 +648,6 @@ static int brcmf_fw_request_firmware(const struct firmware **fw,
 	unsigned int i;
 	int ret;
 
-<<<<<<< HEAD
 	/* Files can be board-specific, first try board-specific paths */
 	for (i = 0; i < ARRAY_SIZE(fwctx->req->board_types); i++) {
 		char *alt_path;
@@ -683,17 +660,6 @@ static int brcmf_fw_request_firmware(const struct firmware **fw,
 			goto fallback;
 
 		ret = firmware_request_nowarn(fw, alt_path, fwctx->dev);
-=======
-	/* Files can be board-specific, first try a board-specific path */
-	if (cur->type == BRCMF_FW_TYPE_NVRAM && fwctx->req->board_type) {
-		char *alt_path;
-
-		alt_path = brcm_alt_fw_path(cur->path, fwctx->req->board_type);
-		if (!alt_path)
-			goto fallback;
-
-		ret = request_firmware(fw, alt_path, fwctx->dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(alt_path);
 		if (ret == 0)
 			return ret;
@@ -727,7 +693,6 @@ static void brcmf_fw_request_done_alt_path(const struct firmware *fw, void *ctx)
 {
 	struct brcmf_fw *fwctx = ctx;
 	struct brcmf_fw_item *first = &fwctx->req->items[0];
-<<<<<<< HEAD
 	const char *board_type, *alt_path;
 	int ret = 0;
 
@@ -762,17 +727,6 @@ fallback:
 				      brcmf_fw_request_done);
 
 	if (ret < 0)
-=======
-	int ret = 0;
-
-	/* Fall back to canonical path if board firmware not found */
-	if (!fw)
-		ret = request_firmware_nowait(THIS_MODULE, true, first->path,
-					      fwctx->dev, GFP_KERNEL, fwctx,
-					      brcmf_fw_request_done);
-
-	if (fw || ret < 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		brcmf_fw_request_done(fw, ctx);
 }
 
@@ -816,18 +770,11 @@ int brcmf_fw_get_firmwares(struct device *dev, struct brcmf_fw_request *req,
 	fwctx->done = fw_cb;
 
 	/* First try alternative board-specific path if any */
-<<<<<<< HEAD
 	if (fwctx->req->board_types[0])
 		alt_path = brcm_alt_fw_path(first->path,
 					    fwctx->req->board_types[0]);
 	if (alt_path) {
 		fwctx->board_index++;
-=======
-	if (fwctx->req->board_type)
-		alt_path = brcm_alt_fw_path(first->path,
-					    fwctx->req->board_type);
-	if (alt_path) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = request_firmware_nowait(THIS_MODULE, true, alt_path,
 					      fwctx->dev, GFP_KERNEL, fwctx,
 					      brcmf_fw_request_done_alt_path);

@@ -59,7 +59,6 @@
 		#size-cells = <2>;
 		ranges;
 
-<<<<<<< HEAD
 		rwdt: watchdog@e6020000 {
 			compatible = "renesas,r8a779g0-wdt",
 				     "renesas,rcar-gen4-wdt";
@@ -215,8 +214,6 @@
 			#interrupt-cells = <2>;
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		cpg: clock-controller@e6150000 {
 			compatible = "renesas,r8a779g0-cpg-mssr";
 			reg = <0 0xe6150000 0 0x4000>;
@@ -238,7 +235,6 @@
 			#power-domain-cells = <1>;
 		};
 
-<<<<<<< HEAD
 		i2c0: i2c@e6500000 {
 			compatible = "renesas,i2c-r8a779g0",
 				     "renesas,rcar-gen4-i2c";
@@ -323,8 +319,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hscif0: serial@e6540000 {
 			compatible = "renesas,hscif-r8a779g0",
 				     "renesas,rcar-gen4-hscif",
@@ -332,11 +326,7 @@
 			reg = <0 0xe6540000 0 96>;
 			interrupts = <GIC_SPI 246 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 514>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779G0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779G0_CLK_S0D3_PER>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			power-domains = <&sysc R8A779G0_PD_ALWAYS_ON>;
@@ -344,7 +334,6 @@
 			status = "disabled";
 		};
 
-<<<<<<< HEAD
 		avb0: ethernet@e6800000 {
 			compatible = "renesas,etheravb-r8a779g0",
 				     "renesas,etheravb-rcar-gen4";
@@ -486,8 +475,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gic: interrupt-controller@f1000000 {
 			compatible = "arm,gic-v3";
 			#interrupt-cells = <3>;

@@ -129,13 +129,6 @@ int atomisp_alloc_metadata_output_buf(struct atomisp_sub_device *asd);
 
 void atomisp_free_metadata_output_buf(struct atomisp_sub_device *asd);
 
-<<<<<<< HEAD
-=======
-void atomisp_css_get_dis_statistics(struct atomisp_sub_device *asd,
-				    struct atomisp_css_buffer *isp_css_buffer,
-				    struct ia_css_isp_dvs_statistics_map *dvs_map);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void atomisp_css_temp_pipe_to_pipe_id(struct atomisp_sub_device *asd,
 				      struct atomisp_css_event *current_event);
 
@@ -442,12 +435,6 @@ int atomisp_css_get_dis_stat(struct atomisp_sub_device *asd,
 
 int atomisp_css_update_stream(struct atomisp_sub_device *asd);
 
-<<<<<<< HEAD
-=======
-struct atomisp_acc_fw;
-int atomisp_css_set_acc_parameters(struct atomisp_acc_fw *acc_fw);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int atomisp_css_isr_thread(struct atomisp_device *isp,
 			   bool *frame_done_found,
 			   bool *css_pipe_done);

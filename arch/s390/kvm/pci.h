@@ -46,15 +46,9 @@ extern struct zpci_aift *aift;
 static inline struct kvm *kvm_s390_pci_si_to_kvm(struct zpci_aift *aift,
 						 unsigned long si)
 {
-<<<<<<< HEAD
 	if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) || !aift->kzdev ||
 	    !aift->kzdev[si])
 		return NULL;
-=======
-	if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) || aift->kzdev == 0 ||
-	    aift->kzdev[si] == 0)
-		return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return aift->kzdev[si]->kvm;
 };
 

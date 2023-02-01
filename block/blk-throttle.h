@@ -55,12 +55,7 @@ struct throtl_service_queue {
 enum tg_state_flags {
 	THROTL_TG_PENDING	= 1 << 0,	/* on parent's pending tree */
 	THROTL_TG_WAS_EMPTY	= 1 << 1,	/* bio_lists[] became non-empty */
-<<<<<<< HEAD
 	THROTL_TG_CANCELING	= 1 << 2,	/* starts to cancel bio */
-=======
-	THROTL_TG_HAS_IOPS_LIMIT = 1 << 2,	/* tg has iops limit */
-	THROTL_TG_CANCELING	= 1 << 3,	/* starts to cancel bio */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum {
@@ -103,12 +98,8 @@ struct throtl_grp {
 	unsigned int flags;
 
 	/* are there any throtl rules between this group and td? */
-<<<<<<< HEAD
 	bool has_rules_bps[2];
 	bool has_rules_iops[2];
-=======
-	bool has_rules[2];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* internally used bytes per second rate limits */
 	uint64_t bps[2][LIMIT_CNT];
@@ -130,7 +121,6 @@ struct throtl_grp {
 	uint64_t last_bytes_disp[2];
 	unsigned int last_io_disp[2];
 
-<<<<<<< HEAD
 	/*
 	 * The following two fields are updated when new configuration is
 	 * submitted while some bios are still throttled, they record how many
@@ -140,8 +130,6 @@ struct throtl_grp {
 	uint64_t carryover_bytes[2];
 	unsigned int carryover_ios[2];
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long last_check_time;
 
 	unsigned long latency_target; /* us */
@@ -180,7 +168,6 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
  * Internal throttling interface
  */
 #ifndef CONFIG_BLK_DEV_THROTTLING
-<<<<<<< HEAD
 static inline int blk_throtl_init(struct gendisk *disk) { return 0; }
 static inline void blk_throtl_exit(struct gendisk *disk) { }
 static inline void blk_throtl_register(struct gendisk *disk) { }
@@ -212,29 +199,6 @@ static inline bool blk_throtl_bio(struct bio *bio)
 {
 
 	if (!blk_should_throtl(bio))
-=======
-static inline int blk_throtl_init(struct request_queue *q) { return 0; }
-static inline void blk_throtl_exit(struct request_queue *q) { }
-static inline void blk_throtl_register_queue(struct request_queue *q) { }
-static inline bool blk_throtl_bio(struct bio *bio) { return false; }
-static inline void blk_throtl_cancel_bios(struct request_queue *q) { }
-#else /* CONFIG_BLK_DEV_THROTTLING */
-int blk_throtl_init(struct request_queue *q);
-void blk_throtl_exit(struct request_queue *q);
-void blk_throtl_register_queue(struct request_queue *q);
-bool __blk_throtl_bio(struct bio *bio);
-void blk_throtl_cancel_bios(struct request_queue *q);
-static inline bool blk_throtl_bio(struct bio *bio)
-{
-	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
-
-	/* no need to throttle bps any more if the bio has been throttled */
-	if (bio_flagged(bio, BIO_BPS_THROTTLED) &&
-	    !(tg->flags & THROTL_TG_HAS_IOPS_LIMIT))
-		return false;
-
-	if (!tg->has_rules[bio_data_dir(bio)])
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 
 	return __blk_throtl_bio(bio);

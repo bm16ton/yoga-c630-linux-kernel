@@ -19,10 +19,7 @@ struct intel_plane_state;
 
 enum intel_fbc_id {
 	INTEL_FBC_A,
-<<<<<<< HEAD
 	INTEL_FBC_B,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	I915_MAX_FBCS,
 };

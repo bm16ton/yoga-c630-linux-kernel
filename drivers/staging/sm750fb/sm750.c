@@ -726,12 +726,8 @@ static int lynxfb_set_fbinfo(struct fb_info *info, int index)
 		0x800f0 + (int)crtc->channel * 0x140;
 
 	pr_info("crtc->cursor.mmio = %p\n", crtc->cursor.mmio);
-<<<<<<< HEAD
 	crtc->cursor.max_h = 64;
 	crtc->cursor.max_w = 64;
-=======
-	crtc->cursor.max_h = crtc->cursor.max_w = 64;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	crtc->cursor.size = crtc->cursor.max_h * crtc->cursor.max_w * 2 / 8;
 	crtc->cursor.vstart = sm750_dev->pvMem + crtc->cursor.offset;
 

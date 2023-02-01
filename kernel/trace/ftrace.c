@@ -8273,12 +8273,7 @@ static int kallsyms_callback(void *data, const char *name,
 	if (args->addrs[idx])
 		return 0;
 
-<<<<<<< HEAD
 	if (!ftrace_location(addr))
-=======
-	addr = ftrace_location(addr);
-	if (!addr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	args->addrs[idx] = addr;

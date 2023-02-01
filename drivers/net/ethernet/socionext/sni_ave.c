@@ -1689,12 +1689,7 @@ static int ave_probe(struct platform_device *pdev)
 		 pdev->name, pdev->id);
 
 	/* Register as a NAPI supported driver */
-<<<<<<< HEAD
 	netif_napi_add(ndev, &priv->napi_rx, ave_napi_poll_rx);
-=======
-	netif_napi_add(ndev, &priv->napi_rx, ave_napi_poll_rx,
-		       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	netif_napi_add_tx(ndev, &priv->napi_tx, ave_napi_poll_tx);
 
 	platform_set_drvdata(pdev, ndev);

@@ -927,16 +927,11 @@ void synchronize_rcu_expedited(void)
 		// them, which allows reuse of ->gp_seq_polled_exp_snap.
 		rcu_poll_gp_seq_start_unlocked(&rcu_state.gp_seq_polled_exp_snap);
 		rcu_poll_gp_seq_end_unlocked(&rcu_state.gp_seq_polled_exp_snap);
-<<<<<<< HEAD
 
 		local_irq_save(flags);
 		WARN_ON_ONCE(num_online_cpus() > 1);
 		rcu_state.expedited_sequence += (1 << RCU_SEQ_CTR_SHIFT);
 		local_irq_restore(flags);
-=======
-		if (rcu_init_invoked())
-			cond_resched();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;  // Context allows vacuous grace periods.
 	}
 
@@ -1039,7 +1034,6 @@ unsigned long start_poll_synchronize_rcu_expedited(void)
 EXPORT_SYMBOL_GPL(start_poll_synchronize_rcu_expedited);
 
 /**
-<<<<<<< HEAD
  * start_poll_synchronize_rcu_expedited_full - Take a full snapshot and start expedited grace period
  * @rgosp: Place to put snapshot of grace-period state
  *
@@ -1058,8 +1052,6 @@ void start_poll_synchronize_rcu_expedited_full(struct rcu_gp_oldstate *rgosp)
 EXPORT_SYMBOL_GPL(start_poll_synchronize_rcu_expedited_full);
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * cond_synchronize_rcu_expedited - Conditionally wait for an expedited RCU grace period
  *
  * @oldstate: value from get_state_synchronize_rcu(), start_poll_synchronize_rcu(), or start_poll_synchronize_rcu_expedited()
@@ -1085,7 +1077,6 @@ void cond_synchronize_rcu_expedited(unsigned long oldstate)
 		synchronize_rcu_expedited();
 }
 EXPORT_SYMBOL_GPL(cond_synchronize_rcu_expedited);
-<<<<<<< HEAD
 
 /**
  * cond_synchronize_rcu_expedited_full - Conditionally wait for an expedited RCU grace period
@@ -1113,5 +1104,3 @@ void cond_synchronize_rcu_expedited_full(struct rcu_gp_oldstate *rgosp)
 		synchronize_rcu_expedited();
 }
 EXPORT_SYMBOL_GPL(cond_synchronize_rcu_expedited_full);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

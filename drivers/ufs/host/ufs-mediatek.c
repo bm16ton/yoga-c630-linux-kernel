@@ -19,10 +19,6 @@
 #include <linux/pm_qos.h>
 #include <linux/regulator/consumer.h>
 #include <linux/reset.h>
-<<<<<<< HEAD
-=======
-#include <linux/sched/clock.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/soc/mediatek/mtk_sip_svc.h>
 
 #include <ufs/ufshcd.h>
@@ -50,7 +46,6 @@ static const struct of_device_id ufs_mtk_of_match[] = {
 	{},
 };
 
-<<<<<<< HEAD
 /*
  * Details of UIC Errors
  */
@@ -89,8 +84,6 @@ static const char *const ufs_uic_dl_err_str[] = {
 	"PA_INIT"
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool ufs_mtk_is_boost_crypt_enabled(struct ufs_hba *hba)
 {
 	struct ufs_mtk_host *host = ufshcd_get_variant(hba);
@@ -642,15 +635,12 @@ static void ufs_mtk_boost_pm_qos(struct ufs_hba *hba, bool boost)
 				       boost ? 0 : PM_QOS_DEFAULT_VALUE);
 }
 
-<<<<<<< HEAD
 static void ufs_mtk_scale_perf(struct ufs_hba *hba, bool scale_up)
 {
 	ufs_mtk_boost_crypt(hba, scale_up);
 	ufs_mtk_boost_pm_qos(hba, scale_up);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void ufs_mtk_pwr_ctrl(struct ufs_hba *hba, bool on)
 {
 	struct ufs_mtk_host *host = ufshcd_get_variant(hba);
@@ -658,19 +648,11 @@ static void ufs_mtk_pwr_ctrl(struct ufs_hba *hba, bool on)
 	if (on) {
 		phy_power_on(host->mphy);
 		ufs_mtk_setup_ref_clk(hba, on);
-<<<<<<< HEAD
 		if (!ufshcd_is_clkscaling_supported(hba))
 			ufs_mtk_scale_perf(hba, on);
 	} else {
 		if (!ufshcd_is_clkscaling_supported(hba))
 			ufs_mtk_scale_perf(hba, on);
-=======
-		ufs_mtk_boost_crypt(hba, on);
-		ufs_mtk_boost_pm_qos(hba, on);
-	} else {
-		ufs_mtk_boost_pm_qos(hba, on);
-		ufs_mtk_boost_crypt(hba, on);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ufs_mtk_setup_ref_clk(hba, on);
 		phy_power_off(host->mphy);
 	}
@@ -756,7 +738,6 @@ static u32 ufs_mtk_get_ufs_hci_version(struct ufs_hba *hba)
 	return hba->ufs_version;
 }
 
-<<<<<<< HEAD
 /**
  * ufs_mtk_init_clocks - Init mtk driver private clocks
  *
@@ -797,8 +778,6 @@ static void ufs_mtk_init_clocks(struct ufs_hba *hba)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MAX_VCC_NAME 30
 static int ufs_mtk_vreg_fix_vcc(struct ufs_hba *hba)
 {
@@ -919,24 +898,18 @@ static int ufs_mtk_init(struct ufs_hba *hba)
 
 	/* Enable WriteBooster */
 	hba->caps |= UFSHCD_CAP_WB_EN;
-<<<<<<< HEAD
 
 	/* Enable clk scaling*/
 	hba->caps |= UFSHCD_CAP_CLK_SCALING;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hba->quirks |= UFSHCI_QUIRK_SKIP_MANUAL_WB_FLUSH_CTRL;
 	hba->vps->wb_flush_threshold = UFS_WB_BUF_REMAIN_PERCENT(80);
 
 	if (host->caps & UFS_MTK_CAP_DISABLE_AH8)
 		hba->caps |= UFSHCD_CAP_HIBERN8_WITH_CLK_GATING;
 
-<<<<<<< HEAD
 	ufs_mtk_init_clocks(hba);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * ufshcd_vops_init() is invoked after
 	 * ufshcd_setup_clock(true) in ufshcd_hba_init() thus
@@ -949,13 +922,10 @@ static int ufs_mtk_init(struct ufs_hba *hba)
 
 	host->ip_ver = ufshcd_readl(hba, REG_UFS_MTK_IP_VER);
 
-<<<<<<< HEAD
 	/* Initialize pm-qos request */
 	cpu_latency_qos_add_request(&host->pm_qos_req, PM_QOS_DEFAULT_VALUE);
 	host->pm_qos_init = true;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	goto out;
 
 out_variant_clear:
@@ -1370,7 +1340,6 @@ fail:
 
 static void ufs_mtk_dbg_register_dump(struct ufs_hba *hba)
 {
-<<<<<<< HEAD
 	/* Dump ufshci register 0x140 ~ 0x14C */
 	ufshcd_dump_regs(hba, REG_UFS_XOUFS_CTRL, 0x10,
 			 "XOUFS Ctrl (0x140): ");
@@ -1381,15 +1350,6 @@ static void ufs_mtk_dbg_register_dump(struct ufs_hba *hba)
 	ufshcd_dump_regs(hba, REG_UFS_MPHYCTRL,
 			 REG_UFS_REJECT_MON - REG_UFS_MPHYCTRL + 4,
 			 "MPHY Ctrl (0x2200): ");
-=======
-	ufshcd_dump_regs(hba, REG_UFS_REFCLK_CTRL, 0x4, "Ref-Clk Ctrl ");
-
-	ufshcd_dump_regs(hba, REG_UFS_EXTREG, 0x4, "Ext Reg ");
-
-	ufshcd_dump_regs(hba, REG_UFS_MPHYCTRL,
-			 REG_UFS_REJECT_MON - REG_UFS_MPHYCTRL + 4,
-			 "MPHY Ctrl ");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Direct debugging information to REG_MTK_PROBE */
 	ufs_mtk_dbg_sel(hba);
@@ -1446,7 +1406,6 @@ static void ufs_mtk_event_notify(struct ufs_hba *hba,
 				 enum ufs_event_type evt, void *data)
 {
 	unsigned int val = *(u32 *)data;
-<<<<<<< HEAD
 	unsigned long reg;
 	u8 bit;
 
@@ -1542,10 +1501,6 @@ static int ufs_mtk_clk_scale_notify(struct ufs_hba *hba, bool scale_up,
 	}
 
 	return 0;
-=======
-
-	trace_ufs_mtk_event(evt, val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1569,11 +1524,8 @@ static const struct ufs_hba_variant_ops ufs_hba_mtk_vops = {
 	.dbg_register_dump   = ufs_mtk_dbg_register_dump,
 	.device_reset        = ufs_mtk_device_reset,
 	.event_notify        = ufs_mtk_event_notify,
-<<<<<<< HEAD
 	.config_scaling_param = ufs_mtk_config_scaling_param,
 	.clk_scale_notify    = ufs_mtk_clk_scale_notify,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**

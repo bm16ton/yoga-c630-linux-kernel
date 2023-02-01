@@ -90,11 +90,8 @@
 #define KVASER_USB_LEAF_SWOPTION_FREQ_32_MHZ_CLK BIT(5)
 #define KVASER_USB_LEAF_SWOPTION_FREQ_24_MHZ_CLK BIT(6)
 
-<<<<<<< HEAD
 #define KVASER_USB_LEAF_SWOPTION_EXT_CAP BIT(12)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* error factors */
 #define M16C_EF_ACKE			BIT(0)
 #define M16C_EF_CRCE			BIT(1)
@@ -379,14 +376,10 @@ static const u8 kvaser_usb_leaf_cmd_sizes_leaf[] = {
 	[CMD_RX_EXT_MESSAGE]		= kvaser_fsize(u.leaf.rx_can),
 	[CMD_LEAF_LOG_MESSAGE]		= kvaser_fsize(u.leaf.log_message),
 	[CMD_CHIP_STATE_EVENT]		= kvaser_fsize(u.leaf.chip_state_event),
-<<<<<<< HEAD
 	[CMD_CAN_ERROR_EVENT]		= kvaser_fsize(u.leaf.can_error_event),
 	[CMD_GET_CAPABILITIES_RESP]	= kvaser_fsize(u.leaf.cap_res),
 	[CMD_GET_BUS_PARAMS_REPLY]	= kvaser_fsize(u.busparams),
 	[CMD_ERROR_EVENT]		= kvaser_fsize(u.leaf.error_event),
-=======
-	[CMD_CAN_ERROR_EVENT]		= kvaser_fsize(u.leaf.error_event),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* ignored events: */
 	[CMD_FLUSH_QUEUE_REPLY]		= CMD_SIZE_ANY,
 };
@@ -400,12 +393,8 @@ static const u8 kvaser_usb_leaf_cmd_sizes_usbcan[] = {
 	[CMD_RX_STD_MESSAGE]		= kvaser_fsize(u.usbcan.rx_can),
 	[CMD_RX_EXT_MESSAGE]		= kvaser_fsize(u.usbcan.rx_can),
 	[CMD_CHIP_STATE_EVENT]		= kvaser_fsize(u.usbcan.chip_state_event),
-<<<<<<< HEAD
 	[CMD_CAN_ERROR_EVENT]		= kvaser_fsize(u.usbcan.can_error_event),
 	[CMD_ERROR_EVENT]		= kvaser_fsize(u.usbcan.error_event),
-=======
-	[CMD_CAN_ERROR_EVENT]		= kvaser_fsize(u.usbcan.error_event),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* ignored events: */
 	[CMD_USBCAN_CLOCK_OVERFLOW_EVENT] = CMD_SIZE_ANY,
 };
@@ -433,15 +422,12 @@ struct kvaser_usb_err_summary {
 	};
 };
 
-<<<<<<< HEAD
 struct kvaser_usb_net_leaf_priv {
 	struct kvaser_usb_net_priv *net;
 
 	struct delayed_work chip_state_req_work;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct can_bittiming_const kvaser_usb_leaf_m16c_bittiming_const = {
 	.name = "kvaser_usb_ucii",
 	.tseg1_min = 4,
@@ -683,12 +669,9 @@ static void kvaser_usb_leaf_get_software_info_leaf(struct kvaser_usb *dev,
 	dev->fw_version = le32_to_cpu(softinfo->fw_version);
 	dev->max_tx_urbs = le16_to_cpu(softinfo->max_outstanding_tx);
 
-<<<<<<< HEAD
 	if (sw_options & KVASER_USB_LEAF_SWOPTION_EXT_CAP)
 		dev->card_data.capabilities |= KVASER_USB_CAP_EXT_CAP;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (dev->driver_info->quirks & KVASER_USB_QUIRK_IGNORE_CLK_FREQ) {
 		/* Firmware expects bittiming parameters calculated for 16MHz
 		 * clock, regardless of the actual clock
@@ -1648,11 +1631,8 @@ static int kvaser_usb_leaf_stop_chip(struct kvaser_usb_net_priv *priv)
 	int err;
 
 	reinit_completion(&priv->stop_comp);
-<<<<<<< HEAD
 
 	cancel_delayed_work(&leaf->chip_state_req_work);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = kvaser_usb_leaf_send_simple_cmd(priv->dev, CMD_STOP_CHIP,
 					      priv->channel);
@@ -1700,7 +1680,6 @@ static int kvaser_usb_leaf_init_card(struct kvaser_usb *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int kvaser_usb_leaf_init_channel(struct kvaser_usb_net_priv *priv)
 {
 	struct kvaser_usb_net_leaf_priv *leaf;
@@ -1728,9 +1707,6 @@ static void kvaser_usb_leaf_remove_channel(struct kvaser_usb_net_priv *priv)
 
 static int kvaser_usb_leaf_set_bittiming(const struct net_device *netdev,
 					 const struct kvaser_usb_busparams *busparams)
-=======
-static int kvaser_usb_leaf_set_bittiming(struct net_device *netdev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct kvaser_usb_net_priv *priv = netdev_priv(netdev);
 	struct kvaser_usb *dev = priv->dev;

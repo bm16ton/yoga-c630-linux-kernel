@@ -571,12 +571,8 @@ static void mxser_handle_cts(struct tty_struct *tty, struct mxser_port *info,
  * This routine is called to set the UART divisor registers to match
  * the specified baud rate for a serial port.
  */
-<<<<<<< HEAD
 static void mxser_change_speed(struct tty_struct *tty,
 			       const struct ktermios *old_termios)
-=======
-static void mxser_change_speed(struct tty_struct *tty, struct ktermios *old_termios)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mxser_port *info = tty->driver_data;
 	unsigned cflag, cval;

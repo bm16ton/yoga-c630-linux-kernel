@@ -178,11 +178,7 @@ static ssize_t snapshot_write(struct file *filp, const char __user *buf,
 		need_wait = false;
 	}
 
-<<<<<<< HEAD
 	sleep_flags = lock_system_sleep();
-=======
-	lock_system_sleep();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	data = filp->private_data;
 

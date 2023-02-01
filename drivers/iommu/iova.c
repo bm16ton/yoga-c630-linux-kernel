@@ -197,11 +197,7 @@ static int __alloc_and_insert_iova_range(struct iova_domain *iovad,
 
 	curr = __get_cached_rbnode(iovad, limit_pfn);
 	curr_iova = to_iova(curr);
-<<<<<<< HEAD
 	retry_pfn = curr_iova->pfn_hi;
-=======
-	retry_pfn = curr_iova->pfn_hi + 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 retry:
 	do {
@@ -215,11 +211,7 @@ retry:
 	if (high_pfn < size || new_pfn < low_pfn) {
 		if (low_pfn == iovad->start_pfn && retry_pfn < limit_pfn) {
 			high_pfn = limit_pfn;
-<<<<<<< HEAD
 			low_pfn = retry_pfn + 1;
-=======
-			low_pfn = retry_pfn;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			curr = iova_find_limit(iovad, limit_pfn);
 			curr_iova = to_iova(curr);
 			goto retry;
@@ -883,7 +875,7 @@ static unsigned long iova_rcache_get(struct iova_domain *iovad,
 {
 	unsigned int log_size = order_base_2(size);
 
-	if (log_size >= IOVA_RANGE_CACHE_MAX_SIZE || !iovad->rcaches)
+	if (log_size >= IOVA_RANGE_CACHE_MAX_SIZE)
 		return 0;
 
 	return __iova_rcache_get(&iovad->rcaches[log_size], limit_pfn - size);

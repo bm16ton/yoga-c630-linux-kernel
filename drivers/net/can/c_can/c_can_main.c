@@ -429,11 +429,7 @@ static void c_can_setup_receive_object(struct net_device *dev, int iface,
 static bool c_can_tx_busy(const struct c_can_priv *priv,
 			  const struct c_can_tx_ring *tx_ring)
 {
-<<<<<<< HEAD
 	if (c_can_get_tx_free(priv, tx_ring) > 0)
-=======
-	if (c_can_get_tx_free(tx_ring) > 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 
 	netif_stop_queue(priv->dev);
@@ -441,11 +437,7 @@ static bool c_can_tx_busy(const struct c_can_priv *priv,
 	/* Memory barrier before checking tx_free (head and tail) */
 	smp_mb();
 
-<<<<<<< HEAD
 	if (c_can_get_tx_free(priv, tx_ring) == 0) {
-=======
-	if (c_can_get_tx_free(tx_ring) == 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		netdev_dbg(priv->dev,
 			   "Stopping tx-queue (tx_head=0x%08x, tx_tail=0x%08x, len=%d).\n",
 			   tx_ring->head, tx_ring->tail,
@@ -473,11 +465,7 @@ static netdev_tx_t c_can_start_xmit(struct sk_buff *skb,
 
 	idx = c_can_get_tx_head(tx_ring);
 	tx_ring->head++;
-<<<<<<< HEAD
 	if (c_can_get_tx_free(priv, tx_ring) == 0)
-=======
-	if (c_can_get_tx_free(tx_ring) == 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		netif_stop_queue(dev);
 
 	if (idx < c_can_get_tx_tail(tx_ring))
@@ -760,11 +748,7 @@ static void c_can_do_tx(struct net_device *dev)
 		return;
 
 	tx_ring->tail += pkts;
-<<<<<<< HEAD
 	if (c_can_get_tx_free(priv, tx_ring)) {
-=======
-	if (c_can_get_tx_free(tx_ring)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Make sure that anybody stopping the queue after
 		 * this sees the new tx_ring->tail.
 		 */
@@ -776,12 +760,7 @@ static void c_can_do_tx(struct net_device *dev)
 	stats->tx_packets += pkts;
 
 	tail = c_can_get_tx_tail(tx_ring);
-<<<<<<< HEAD
 	if (priv->type == BOSCH_D_CAN && tail == 0) {
-=======
-
-	if (tail == 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		u8 head = c_can_get_tx_head(tx_ring);
 
 		/* Start transmission for all cached messages */

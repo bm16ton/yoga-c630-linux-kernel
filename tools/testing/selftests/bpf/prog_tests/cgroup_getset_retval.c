@@ -10,10 +10,7 @@
 
 #include "cgroup_getset_retval_setsockopt.skel.h"
 #include "cgroup_getset_retval_getsockopt.skel.h"
-<<<<<<< HEAD
 #include "cgroup_getset_retval_hooks.skel.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define SOL_CUSTOM	0xdeadbeef
 
@@ -437,7 +434,6 @@ close_bpf_object:
 	cgroup_getset_retval_getsockopt__destroy(obj);
 }
 
-<<<<<<< HEAD
 struct exposed_hook {
 	const char *name;
 	int expected_err;
@@ -482,8 +478,6 @@ close_skel:
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void test_cgroup_getset_retval(void)
 {
 	int cgroup_fd = -1;
@@ -527,12 +521,9 @@ void test_cgroup_getset_retval(void)
 	if (test__start_subtest("getsockopt-retval_sync"))
 		test_getsockopt_retval_sync(cgroup_fd, sock_fd);
 
-<<<<<<< HEAD
 	if (test__start_subtest("exposed_hooks"))
 		test_exposed_hooks(cgroup_fd, sock_fd);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 close_fd:
 	close(cgroup_fd);
 }

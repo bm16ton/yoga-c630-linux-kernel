@@ -126,7 +126,6 @@ static struct lruvec *__munlock_page(struct page *page, struct lruvec *lruvec)
 
 	if (!TestClearPageLRU(page))
 		goto munlock;
-<<<<<<< HEAD
 
 	isolated = true;
 	lruvec = folio_lruvec_relock_irq(page_folio(page), lruvec);
@@ -149,30 +148,6 @@ munlock:
 			__count_vm_events(UNEVICTABLE_PGSTRANDED, nr_pages);
 	}
 
-=======
-
-	isolated = true;
-	lruvec = folio_lruvec_relock_irq(page_folio(page), lruvec);
-
-	if (PageUnevictable(page)) {
-		/* Then mlock_count is maintained, but might undercount */
-		if (page->mlock_count)
-			page->mlock_count--;
-		if (page->mlock_count)
-			goto out;
-	}
-	/* else assume that was the last mlock: reclaim will fix it if not */
-
-munlock:
-	if (TestClearPageMlocked(page)) {
-		__mod_zone_page_state(page_zone(page), NR_MLOCK, -nr_pages);
-		if (isolated || !PageUnevictable(page))
-			__count_vm_events(UNEVICTABLE_PGMUNLOCKED, nr_pages);
-		else
-			__count_vm_events(UNEVICTABLE_PGSTRANDED, nr_pages);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* page_evictable() has to be checked *after* clearing Mlocked */
 	if (isolated && PageUnevictable(page) && page_evictable(page)) {
 		del_page_from_lru_list(page, lruvec);
@@ -683,10 +658,7 @@ SYSCALL_DEFINE2(munlock, unsigned long, start, size_t, len)
  */
 static int apply_mlockall_flags(int flags)
 {
-<<<<<<< HEAD
 	MA_STATE(mas, &current->mm->mm_mt, 0, 0);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vm_area_struct *vma, *prev = NULL;
 	vm_flags_t to_add = 0;
 
@@ -783,7 +755,6 @@ int user_shm_lock(size_t size, struct ucounts *ucounts)
 
 	if ((memlock == LONG_MAX || memlock > lock_limit) && !capable(CAP_IPC_LOCK)) {
 		dec_rlimit_ucounts(ucounts, UCOUNT_RLIMIT_MEMLOCK, locked);
-<<<<<<< HEAD
 		goto out;
 	}
 	if (!get_ucounts(ucounts)) {
@@ -791,15 +762,6 @@ int user_shm_lock(size_t size, struct ucounts *ucounts)
 		allowed = 0;
 		goto out;
 	}
-=======
-		goto out;
-	}
-	if (!get_ucounts(ucounts)) {
-		dec_rlimit_ucounts(ucounts, UCOUNT_RLIMIT_MEMLOCK, locked);
-		allowed = 0;
-		goto out;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	allowed = 1;
 out:
 	spin_unlock(&shmlock_user_lock);

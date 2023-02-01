@@ -29,12 +29,8 @@ struct msm_dsi_phy_ops {
 };
 
 struct msm_dsi_phy_cfg {
-<<<<<<< HEAD
 	const struct regulator_bulk_data *regulator_data;
 	int num_regulators;
-=======
-	struct dsi_reg_config reg_cfg;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct msm_dsi_phy_ops ops;
 
 	unsigned long	min_pll_rate;

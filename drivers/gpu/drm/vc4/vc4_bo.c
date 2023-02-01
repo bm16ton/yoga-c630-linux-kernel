@@ -179,11 +179,7 @@ static void vc4_bo_destroy(struct vc4_bo *bo)
 		bo->validated_shader = NULL;
 	}
 
-<<<<<<< HEAD
 	drm_gem_dma_free(&bo->base);
-=======
-	drm_gem_cma_free(&bo->base);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void vc4_bo_remove_from_cache(struct vc4_bo *bo)
@@ -399,9 +395,6 @@ struct drm_gem_object *vc4_create_object(struct drm_device *dev, size_t size)
 	struct vc4_dev *vc4 = to_vc4_dev(dev);
 	struct vc4_bo *bo;
 	int ret;
-
-	if (WARN_ON_ONCE(vc4->is_vc5))
-		return ERR_PTR(-ENODEV);
 
 	if (WARN_ON_ONCE(vc4->is_vc5))
 		return ERR_PTR(-ENODEV);
@@ -754,11 +747,7 @@ static int vc4_gem_object_mmap(struct drm_gem_object *obj, struct vm_area_struct
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	return drm_gem_dma_mmap(&bo->base, vma);
-=======
-	return drm_gem_cma_mmap(&bo->base, vma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct vm_operations_struct vc4_vm_ops = {
@@ -770,13 +759,8 @@ static const struct vm_operations_struct vc4_vm_ops = {
 static const struct drm_gem_object_funcs vc4_gem_object_funcs = {
 	.free = vc4_free_object,
 	.export = vc4_prime_export,
-<<<<<<< HEAD
 	.get_sg_table = drm_gem_dma_object_get_sg_table,
 	.vmap = drm_gem_dma_object_vmap,
-=======
-	.get_sg_table = drm_gem_cma_object_get_sg_table,
-	.vmap = drm_gem_cma_object_vmap,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.mmap = vc4_gem_object_mmap,
 	.vm_ops = &vc4_vm_ops,
 };

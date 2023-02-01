@@ -1116,14 +1116,10 @@ static void skl_shutdown(struct pci_dev *pci)
 	if (!skl->init_done)
 		return;
 
-<<<<<<< HEAD
 	snd_hdac_stop_streams(bus);
 	snd_hdac_ext_bus_link_power_down_all(bus);
 	skl_dsp_sleep(skl->dsp);
 
-=======
-	snd_hdac_stop_streams_and_chip(bus);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(s, &bus->stream_list, list) {
 		stream = stream_to_hdac_ext_stream(s);
 		snd_hdac_ext_stream_decouple(bus, stream, false);

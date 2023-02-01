@@ -1692,17 +1692,6 @@ static int __init pc87360_find(int sioaddr, u8 *devid,
 				}
 			}
 		}
-<<<<<<< HEAD
-=======
-		if (data->tempnr) {
-			data->temp_alarms = pc87360_read_value(data, LD_TEMP,
-					    NO_BANK, PC87365_REG_TEMP_ALARMS)
-					    & 0x3F;
-		}
-
-		data->last_updated = jiffies;
-		data->valid = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	superio_exit(sioaddr);

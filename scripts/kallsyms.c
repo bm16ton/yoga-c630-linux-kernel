@@ -88,11 +88,7 @@ static unsigned char best_table_len[256];
 static void usage(void)
 {
 	fprintf(stderr, "Usage: kallsyms [--all-symbols] [--absolute-percpu] "
-<<<<<<< HEAD
 			"[--base-relative] in.map > out.S\n");
-=======
-			"[--base-relative] < in.map > out.S\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	exit(1);
 }
 
@@ -128,12 +124,6 @@ static bool is_ignored_symbol(const char *name, char type)
 
 	/* Symbol names that begin with the following are ignored.*/
 	static const char * const ignored_prefixes[] = {
-<<<<<<< HEAD
-=======
-		"$",			/* local symbols for ARM, MIPS, etc. */
-		".L",			/* local labels, .LBB,.Ltmpxxx,.L__unnamed_xx,.LASANPC, etc. */
-		"__crc_",		/* modversions */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		"__efistub_",		/* arm64 EFI stub namespace */
 		"__kvm_nvhe_$",		/* arm64 local symbols in non-VHE KVM namespace */
 		"__kvm_nvhe_.L",	/* arm64 local symbols in non-VHE KVM namespace */

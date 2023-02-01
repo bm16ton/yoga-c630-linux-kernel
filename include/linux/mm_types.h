@@ -257,7 +257,6 @@ struct page {
  * @_refcount: Do not access this member directly.  Use folio_ref_count()
  *    to find how many references there are to this folio.
  * @memcg_data: Memory Control Group data.
-<<<<<<< HEAD
  * @_flags_1: For large folios, additional page flags.
  * @__head: Points to the folio.  Do not use.
  * @_folio_dtor: Which destructor to use for this folio.
@@ -265,8 +264,6 @@ struct page {
  * @_total_mapcount: Do not use directly, call folio_entire_mapcount().
  * @_pincount: Do not use directly, call folio_maybe_dma_pinned().
  * @_folio_nr_pages: Do not use directly, call folio_nr_pages().
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * A folio is a physically, virtually and logically contiguous set
  * of bytes.  It is a power-of-two in size, and it is aligned to that
@@ -305,7 +302,6 @@ struct folio {
 		};
 		struct page page;
 	};
-<<<<<<< HEAD
 	unsigned long _flags_1;
 	unsigned long __head;
 	unsigned char _folio_dtor;
@@ -317,11 +313,6 @@ struct folio {
 #endif
 };
 
-=======
-};
-
-static_assert(sizeof(struct page) == sizeof(struct folio));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define FOLIO_MATCH(pg, fl)						\
 	static_assert(offsetof(struct page, pg) == offsetof(struct folio, fl))
 FOLIO_MATCH(flags, flags);
@@ -336,7 +327,6 @@ FOLIO_MATCH(_refcount, _refcount);
 FOLIO_MATCH(memcg_data, memcg_data);
 #endif
 #undef FOLIO_MATCH
-<<<<<<< HEAD
 #define FOLIO_MATCH(pg, fl)						\
 	static_assert(offsetof(struct folio, fl) ==			\
 			offsetof(struct page, pg) + sizeof(struct page))
@@ -350,8 +340,6 @@ FOLIO_MATCH(compound_pincount, _pincount);
 FOLIO_MATCH(compound_nr, _folio_nr_pages);
 #endif
 #undef FOLIO_MATCH
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline atomic_t *folio_mapcount_ptr(struct folio *folio)
 {
@@ -706,7 +694,6 @@ struct mm_struct {
 		 * merging.
 		 */
 		unsigned long ksm_merging_pages;
-<<<<<<< HEAD
 		/*
 		 * Represent how many pages are checked for ksm merging
 		 * including merged and not merged.
@@ -729,9 +716,6 @@ struct mm_struct {
 #endif
 		} lru_gen;
 #endif /* CONFIG_LRU_GEN */
-=======
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} __randomize_layout;
 
 	/*
@@ -768,7 +752,6 @@ struct lru_gen_mm_list {
 	spinlock_t lock;
 };
 
-<<<<<<< HEAD
 void lru_gen_add_mm(struct mm_struct *mm);
 void lru_gen_del_mm(struct mm_struct *mm);
 #ifdef CONFIG_MEMCG
@@ -846,8 +829,6 @@ extern void tlb_gather_mmu(struct mmu_gather *tlb, struct mm_struct *mm);
 extern void tlb_gather_mmu_fullmm(struct mmu_gather *tlb, struct mm_struct *mm);
 extern void tlb_finish_mmu(struct mmu_gather *tlb);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct vm_fault;
 
 /**

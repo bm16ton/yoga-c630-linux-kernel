@@ -205,11 +205,7 @@ nfp_get_drvinfo(struct nfp_app *app, struct pci_dev *pdev,
 {
 	char nsp_version[ETHTOOL_FWVERS_LEN] = {};
 
-<<<<<<< HEAD
 	strscpy(drvinfo->driver, dev_driver_string(&pdev->dev),
-=======
-	strlcpy(drvinfo->driver, dev_driver_string(&pdev->dev),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sizeof(drvinfo->driver));
 	nfp_net_get_nspinfo(app, nsp_version);
 	snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
@@ -325,7 +321,6 @@ nfp_net_get_link_ksettings(struct net_device *netdev,
 	if (eth_port) {
 		ethtool_link_ksettings_add_link_mode(cmd, supported, Pause);
 		ethtool_link_ksettings_add_link_mode(cmd, advertising, Pause);
-<<<<<<< HEAD
 		if (eth_port->supp_aneg) {
 			ethtool_link_ksettings_add_link_mode(cmd, supported, Autoneg);
 			if (eth_port->aneg == NFP_ANEG_AUTO) {
@@ -333,10 +328,6 @@ nfp_net_get_link_ksettings(struct net_device *netdev,
 				cmd->base.autoneg = AUTONEG_ENABLE;
 			}
 		}
-=======
-		cmd->base.autoneg = eth_port->aneg != NFP_ANEG_DISABLED ?
-			AUTONEG_ENABLE : AUTONEG_DISABLE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		nfp_net_set_fec_link_mode(eth_port, cmd);
 	}
 
@@ -490,7 +481,6 @@ static int nfp_net_set_ringparam(struct net_device *netdev,
 }
 
 static int nfp_test_link(struct net_device *netdev)
-<<<<<<< HEAD
 {
 	if (!netif_carrier_ok(netdev) || !(netdev->flags & IFF_UP))
 		return 1;
@@ -527,44 +517,6 @@ static int nfp_test_nsp(struct net_device *netdev)
 	if (err < 0)
 		netdev_info(netdev, "NSP Test: reading bsp version failed %d\n", err);
 
-=======
-{
-	if (!netif_carrier_ok(netdev) || !(netdev->flags & IFF_UP))
-		return 1;
-
-	return 0;
-}
-
-static int nfp_test_nsp(struct net_device *netdev)
-{
-	struct nfp_app *app = nfp_app_from_netdev(netdev);
-	struct nfp_nsp_identify *nspi;
-	struct nfp_nsp *nsp;
-	int err;
-
-	nsp = nfp_nsp_open(app->cpp);
-	if (IS_ERR(nsp)) {
-		err = PTR_ERR(nsp);
-		netdev_info(netdev, "NSP Test: failed to access the NSP: %d\n", err);
-		goto exit;
-	}
-
-	if (nfp_nsp_get_abi_ver_minor(nsp) < 15) {
-		err = -EOPNOTSUPP;
-		goto exit_close_nsp;
-	}
-
-	nspi = kzalloc(sizeof(*nspi), GFP_KERNEL);
-	if (!nspi) {
-		err = -ENOMEM;
-		goto exit_close_nsp;
-	}
-
-	err = nfp_nsp_read_identify(nsp, nspi, sizeof(*nspi));
-	if (err < 0)
-		netdev_info(netdev, "NSP Test: reading bsp version failed %d\n", err);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(nspi);
 exit_close_nsp:
 	nfp_nsp_close(nsp);
@@ -1764,7 +1716,6 @@ static int nfp_net_set_phys_id(struct net_device *netdev,
 	return err;
 }
 
-<<<<<<< HEAD
 #define NFP_EEPROM_LEN ETH_ALEN
 
 static int
@@ -1919,8 +1870,6 @@ nfp_net_set_eeprom(struct net_device *netdev,
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct ethtool_ops nfp_net_ethtool_ops = {
 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
 				     ETHTOOL_COALESCE_MAX_FRAMES |

@@ -52,11 +52,7 @@ static void __p_branch_sample_type(char *buf, size_t size, u64 value)
 		bit_name(ABORT_TX), bit_name(IN_TX), bit_name(NO_TX),
 		bit_name(COND), bit_name(CALL_STACK), bit_name(IND_JUMP),
 		bit_name(CALL), bit_name(NO_FLAGS), bit_name(NO_CYCLES),
-<<<<<<< HEAD
 		bit_name(TYPE_SAVE), bit_name(HW_INDEX), bit_name(PRIV_SAVE),
-=======
-		bit_name(TYPE_SAVE), bit_name(HW_INDEX),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		{ .name = NULL, }
 	};
 #undef bit_name

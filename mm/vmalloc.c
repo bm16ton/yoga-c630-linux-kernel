@@ -320,12 +320,9 @@ int ioremap_page_range(unsigned long addr, unsigned long end,
 	err = vmap_range_noflush(addr, end, phys_addr, pgprot_nx(prot),
 				 ioremap_max_page_shift);
 	flush_cache_vmap(addr, end);
-<<<<<<< HEAD
 	if (!err)
 		kmsan_ioremap_page_range(addr, end, phys_addr, prot,
 					 ioremap_max_page_shift);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return err;
 }
 
@@ -422,11 +419,7 @@ static void vunmap_p4d_range(pgd_t *pgd, unsigned long addr, unsigned long end,
  *
  * This is an internal function only. Do not use outside mm/.
  */
-<<<<<<< HEAD
 void __vunmap_range_noflush(unsigned long start, unsigned long end)
-=======
-void vunmap_range_noflush(unsigned long start, unsigned long end)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long next;
 	pgd_t *pgd;
@@ -448,15 +441,12 @@ void vunmap_range_noflush(unsigned long start, unsigned long end)
 		arch_sync_kernel_mappings(start, end);
 }
 
-<<<<<<< HEAD
 void vunmap_range_noflush(unsigned long start, unsigned long end)
 {
 	kmsan_vunmap_range_noflush(start, end);
 	__vunmap_range_noflush(start, end);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * vunmap_range - unmap kernel virtual addresses
  * @addr: start of the VM area to unmap
@@ -594,11 +584,7 @@ static int vmap_small_pages_range_noflush(unsigned long addr, unsigned long end,
  *
  * This is an internal function only. Do not use outside mm/.
  */
-<<<<<<< HEAD
 int __vmap_pages_range_noflush(unsigned long addr, unsigned long end,
-=======
-int vmap_pages_range_noflush(unsigned long addr, unsigned long end,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pgprot_t prot, struct page **pages, unsigned int page_shift)
 {
 	unsigned int i, nr = (end - addr) >> PAGE_SHIFT;
@@ -611,7 +597,6 @@ int vmap_pages_range_noflush(unsigned long addr, unsigned long end,
 
 	for (i = 0; i < nr; i += 1U << (page_shift - PAGE_SHIFT)) {
 		int err;
-<<<<<<< HEAD
 
 		err = vmap_range_noflush(addr, addr + (1UL << page_shift),
 					page_to_phys(pages[i]), prot,
@@ -649,38 +634,6 @@ static int vmap_pages_range(unsigned long addr, unsigned long end,
 {
 	int err;
 
-=======
-
-		err = vmap_range_noflush(addr, addr + (1UL << page_shift),
-					__pa(page_address(pages[i])), prot,
-					page_shift);
-		if (err)
-			return err;
-
-		addr += 1UL << page_shift;
-	}
-
-	return 0;
-}
-
-/**
- * vmap_pages_range - map pages to a kernel virtual address
- * @addr: start of the VM area to map
- * @end: end of the VM area to map (non-inclusive)
- * @prot: page protection flags to use
- * @pages: pages to map (always PAGE_SIZE pages)
- * @page_shift: maximum shift that the pages may be mapped with, @pages must
- * be aligned and contiguous up to at least this shift.
- *
- * RETURNS:
- * 0 on success, -errno on failure.
- */
-static int vmap_pages_range(unsigned long addr, unsigned long end,
-		pgprot_t prot, struct page **pages, unsigned int page_shift)
-{
-	int err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = vmap_pages_range_noflush(addr, end, prot, pages, page_shift);
 	flush_cache_vmap(addr, end);
 	return err;
@@ -1379,12 +1332,8 @@ find_vmap_lowest_linear_match(struct list_head *head, unsigned long size,
 }
 
 static void
-<<<<<<< HEAD
 find_vmap_lowest_match_check(struct rb_root *root, struct list_head *head,
 			     unsigned long size, unsigned long align)
-=======
-find_vmap_lowest_match_check(unsigned long size, unsigned long align)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vmap_area *va_1, *va_2;
 	unsigned long vstart;
@@ -1393,13 +1342,8 @@ find_vmap_lowest_match_check(unsigned long size, unsigned long align)
 	get_random_bytes(&rnd, sizeof(rnd));
 	vstart = VMALLOC_START + rnd;
 
-<<<<<<< HEAD
 	va_1 = find_vmap_lowest_match(root, size, align, vstart, false);
 	va_2 = find_vmap_lowest_linear_match(head, size, align, vstart);
-=======
-	va_1 = find_vmap_lowest_match(size, align, vstart, false);
-	va_2 = find_vmap_lowest_linear_match(size, align, vstart);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (va_1 != va_2)
 		pr_emerg("not lowest: t: 0x%p, l: 0x%p, v: 0x%lx\n",
@@ -1586,11 +1530,7 @@ __alloc_vmap_area(struct rb_root *root, struct list_head *head,
 		return vend;
 
 #if DEBUG_AUGMENT_LOWEST_MATCH_CHECK
-<<<<<<< HEAD
 	find_vmap_lowest_match_check(root, head, size, align);
-=======
-	find_vmap_lowest_match_check(size, align);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 	return nva_start_addr;

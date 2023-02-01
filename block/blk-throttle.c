@@ -420,12 +420,7 @@ static void tg_update_has_rules(struct throtl_grp *tg)
 	struct throtl_grp *parent_tg = sq_to_tg(tg->service_queue.parent_sq);
 	struct throtl_data *td = tg->td;
 	int rw;
-	int has_iops_limit = 0;
 
-	for (rw = READ; rw <= WRITE; rw++) {
-		unsigned int iops_limit = tg_iops_limit(tg, rw);
-
-<<<<<<< HEAD
 	for (rw = READ; rw <= WRITE; rw++) {
 		tg->has_rules_iops[rw] =
 			(parent_tg && parent_tg->has_rules_iops[rw]) ||
@@ -436,21 +431,6 @@ static void tg_update_has_rules(struct throtl_grp *tg)
 			(td->limit_valid[td->limit_index] &&
 			 (tg_bps_limit(tg, rw) != U64_MAX));
 	}
-=======
-		tg->has_rules[rw] = (parent_tg && parent_tg->has_rules[rw]) ||
-			(td->limit_valid[td->limit_index] &&
-			 (tg_bps_limit(tg, rw) != U64_MAX ||
-			  iops_limit != UINT_MAX));
-
-		if (iops_limit != UINT_MAX)
-			has_iops_limit = 1;
-	}
-
-	if (has_iops_limit)
-		tg->flags |= THROTL_TG_HAS_IOPS_LIMIT;
-	else
-		tg->flags &= ~THROTL_TG_HAS_IOPS_LIMIT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void throtl_pd_online(struct blkg_policy_data *pd)
@@ -681,13 +661,10 @@ static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
 	tg->io_disp[rw] = 0;
 	tg->slice_start[rw] = jiffies;
 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
-<<<<<<< HEAD
 	if (clear_carryover) {
 		tg->carryover_bytes[rw] = 0;
 		tg->carryover_ios[rw] = 0;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	throtl_log(&tg->service_queue,
 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
@@ -899,14 +876,8 @@ static bool tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
 		jiffy_elapsed_rnd = tg->td->throtl_slice;
 
 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
-<<<<<<< HEAD
 	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
 			tg->carryover_bytes[rw];
-=======
-	bytes_allowed = mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed_rnd,
-					    (u64)HZ);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
 		if (wait)
 			*wait = 0;
@@ -1882,39 +1853,6 @@ static bool throtl_hierarchy_can_upgrade(struct throtl_grp *tg)
 			return false;
 	}
 	return false;
-}
-
-void blk_throtl_cancel_bios(struct request_queue *q)
-{
-	struct cgroup_subsys_state *pos_css;
-	struct blkcg_gq *blkg;
-
-	spin_lock_irq(&q->queue_lock);
-	/*
-	 * queue_lock is held, rcu lock is not needed here technically.
-	 * However, rcu lock is still held to emphasize that following
-	 * path need RCU protection and to prevent warning from lockdep.
-	 */
-	rcu_read_lock();
-	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
-		struct throtl_grp *tg = blkg_to_tg(blkg);
-		struct throtl_service_queue *sq = &tg->service_queue;
-
-		/*
-		 * Set the flag to make sure throtl_pending_timer_fn() won't
-		 * stop until all throttled bios are dispatched.
-		 */
-		blkg_to_tg(blkg)->flags |= THROTL_TG_CANCELING;
-		/*
-		 * Update disptime after setting the above flag to make sure
-		 * throtl_select_dispatch() won't exit without dispatching.
-		 */
-		tg_update_disptime(tg);
-
-		throtl_schedule_pending_timer(sq, jiffies + 1);
-	}
-	rcu_read_unlock();
-	spin_unlock_irq(&q->queue_lock);
 }
 
 static bool throtl_can_upgrade(struct throtl_data *td,

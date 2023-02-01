@@ -1350,7 +1350,6 @@ static const struct i915_power_well_desc_list xelpd_power_wells[] = {
 	I915_PW_DESCRIPTORS(xelpd_power_wells_main),
 };
 
-<<<<<<< HEAD
 /*
  * MTL is based on XELPD power domains with the exception of power gating for:
  * - DDI_IO (moved to PLL logic)
@@ -1462,8 +1461,6 @@ static const struct i915_power_well_desc_list xelpdp_power_wells[] = {
 	I915_PW_DESCRIPTORS(xelpdp_power_wells_main),
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void init_power_well_domains(const struct i915_power_well_instance *inst,
 				    struct i915_power_well *power_well)
 {
@@ -1502,11 +1499,7 @@ __set_power_wells(struct i915_power_domains *power_domains,
 {
 	struct drm_i915_private *i915 = container_of(power_domains,
 						     struct drm_i915_private,
-<<<<<<< HEAD
 						     display.power.domains);
-=======
-						     power_domains);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 power_well_ids = 0;
 	const struct i915_power_well_desc_list *desc_list;
 	const struct i915_power_well_desc *desc;
@@ -1565,11 +1558,7 @@ int intel_display_power_map_init(struct i915_power_domains *power_domains)
 {
 	struct drm_i915_private *i915 = container_of(power_domains,
 						     struct drm_i915_private,
-<<<<<<< HEAD
 						     display.power.domains);
-=======
-						     power_domains);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * The enabling order will be from lower to higher indexed wells,
 	 * the disabling order is reversed.
@@ -1579,13 +1568,9 @@ int intel_display_power_map_init(struct i915_power_domains *power_domains)
 		return 0;
 	}
 
-<<<<<<< HEAD
 	if (DISPLAY_VER(i915) >= 14)
 		return set_power_wells(power_domains, xelpdp_power_wells);
 	else if (DISPLAY_VER(i915) >= 13)
-=======
-	if (DISPLAY_VER(i915) >= 13)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return set_power_wells(power_domains, xelpd_power_wells);
 	else if (IS_DG1(i915))
 		return set_power_wells(power_domains, dg1_power_wells);

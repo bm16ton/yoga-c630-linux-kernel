@@ -131,7 +131,6 @@ raspberrypi_clk_variants[RPI_FIRMWARE_NUM_CLK_ID] = {
 	[RPI_FIRMWARE_V3D_CLK_ID] = {
 		.export = true,
 	},
-<<<<<<< HEAD
 	[RPI_FIRMWARE_PIXEL_CLK_ID] = {
 		.export = true,
 	},
@@ -144,11 +143,6 @@ raspberrypi_clk_variants[RPI_FIRMWARE_NUM_CLK_ID] = {
 	[RPI_FIRMWARE_VEC_CLK_ID] = {
 		.export = true,
 	},
-=======
-	[RPI_FIRMWARE_PIXEL_BVB_CLK_ID] = {
-		.export = true,
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*

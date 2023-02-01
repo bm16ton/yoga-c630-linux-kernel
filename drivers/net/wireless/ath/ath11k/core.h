@@ -498,7 +498,6 @@ struct ath11k_sta {
 
 	bool use_4addr_set;
 	u16 tcl_metadata;
-<<<<<<< HEAD
 
 	/* Protected with ar->data_lock */
 	enum ath11k_wmi_peer_ps_state peer_ps_state;
@@ -508,8 +507,6 @@ struct ath11k_sta {
 	bool peer_current_ps_valid;
 
 	u32 bw_prev;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define ATH11K_MIN_5G_FREQ 4150
@@ -719,7 +716,6 @@ struct ath11k {
 	u8 twt_enabled;
 	bool nlo_enabled;
 	u8 alpha2[REG_ALPHA2_LEN + 1];
-<<<<<<< HEAD
 	struct ath11k_fw_stats fw_stats;
 	struct completion fw_stats_complete;
 	bool fw_stats_done;
@@ -727,8 +723,6 @@ struct ath11k {
 	/* protected by conf_mutex */
 	bool ps_state_enable;
 	bool ps_timekeeper_enable;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ath11k_band_cap {

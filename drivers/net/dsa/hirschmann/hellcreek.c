@@ -1153,19 +1153,11 @@ static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
 	if (ret)
 		goto out;
 	ret = __hellcreek_fdb_add(hellcreek, &udp6_ptp);
-<<<<<<< HEAD
 	if (ret)
 		goto out;
 	ret = __hellcreek_fdb_add(hellcreek, &l2_p2p);
 	if (ret)
 		goto out;
-=======
-	if (ret)
-		goto out;
-	ret = __hellcreek_fdb_add(hellcreek, &l2_p2p);
-	if (ret)
-		goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = __hellcreek_fdb_add(hellcreek, &udp4_p2p);
 	if (ret)
 		goto out;

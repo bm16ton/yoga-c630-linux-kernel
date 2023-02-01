@@ -222,11 +222,7 @@ void ipa_uc_power(struct ipa *ipa)
 static void send_uc_command(struct ipa *ipa, u32 command, u32 command_param)
 {
 	struct ipa_uc_mem_area *shared = ipa_uc_shared(ipa);
-<<<<<<< HEAD
 	const struct ipa_reg *reg;
-=======
-	u32 offset;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val;
 
 	/* Fill in the command data */
@@ -237,16 +233,10 @@ static void send_uc_command(struct ipa *ipa, u32 command, u32 command_param)
 	shared->response_param = 0;
 
 	/* Use an interrupt to tell the microcontroller the command is ready */
-<<<<<<< HEAD
 	reg = ipa_reg(ipa, IPA_IRQ_UC);
 	val = ipa_reg_bit(reg, UC_INTR);
 
 	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
-=======
-	val = u32_encode_bits(1, UC_INTR_FMASK);
-	offset = ipa_reg_irq_uc_offset(ipa->version);
-	iowrite32(val, ipa->reg_virt + offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Tell the microcontroller the AP is shutting down */

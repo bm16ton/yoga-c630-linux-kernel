@@ -236,11 +236,7 @@ static int load_firmware(struct rt_firmware *rtfw, struct device *device)
 {
 	int ret = _SUCCESS;
 	const struct firmware *fw;
-<<<<<<< HEAD
 	const char *fw_name = FW_RTL8188EU;
-=======
-	const char *fw_name = "rtlwifi/rtl8188eufw.bin";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err = request_firmware(&fw, fw_name, device);
 
 	if (err) {

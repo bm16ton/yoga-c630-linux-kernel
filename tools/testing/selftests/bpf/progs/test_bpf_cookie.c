@@ -28,22 +28,14 @@ static void update(void *ctx, __u64 *res)
 	*res |= bpf_get_attach_cookie(ctx);
 }
 
-<<<<<<< HEAD
 SEC("kprobe")
-=======
-SEC("kprobe/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int handle_kprobe(struct pt_regs *ctx)
 {
 	update(ctx, &kprobe_res);
 	return 0;
 }
 
-<<<<<<< HEAD
 SEC("kretprobe")
-=======
-SEC("kretprobe/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int handle_kretprobe(struct pt_regs *ctx)
 {
 	update(ctx, &kretprobe_res);

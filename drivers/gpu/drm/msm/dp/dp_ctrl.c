@@ -1243,12 +1243,7 @@ static int dp_ctrl_link_train(struct dp_ctrl_private *ctrl,
 {
 	int ret = 0;
 	const u8 *dpcd = ctrl->panel->dpcd;
-<<<<<<< HEAD
 	u8 encoding[] = { 0, DP_SET_ANSI_8B10B };
-=======
-	u8 encoding = DP_SET_ANSI_8B10B;
-	u8 ssc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 assr;
 	struct dp_link_info link_info = {0};
 
@@ -1259,7 +1254,6 @@ static int dp_ctrl_link_train(struct dp_ctrl_private *ctrl,
 	link_info.capabilities = DP_LINK_CAP_ENHANCED_FRAMING;
 
 	dp_aux_link_configure(ctrl->aux, &link_info);
-<<<<<<< HEAD
 
 	if (drm_dp_max_downspread(dpcd))
 		encoding[0] |= DP_SPREAD_AMP_0_5;
@@ -1267,17 +1261,6 @@ static int dp_ctrl_link_train(struct dp_ctrl_private *ctrl,
 	/* config DOWNSPREAD_CTRL and MAIN_LINK_CHANNEL_CODING_SET */
 	drm_dp_dpcd_write(ctrl->aux, DP_DOWNSPREAD_CTRL, encoding, 2);
 
-=======
-
-	if (drm_dp_max_downspread(dpcd)) {
-		ssc = DP_SPREAD_AMP_0_5;
-		drm_dp_dpcd_write(ctrl->aux, DP_DOWNSPREAD_CTRL, &ssc, 1);
-	}
-
-	drm_dp_dpcd_write(ctrl->aux, DP_MAIN_LINK_CHANNEL_CODING_SET,
-				&encoding, 1);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (drm_dp_alternate_scrambler_reset_cap(dpcd)) {
 		assr = DP_ALTERNATE_SCRAMBLER_RESET_ENABLE;
 		drm_dp_dpcd_write(ctrl->aux, DP_EDP_CONFIGURATION_SET,
@@ -1370,12 +1353,7 @@ static int dp_ctrl_enable_mainlink_clocks(struct dp_ctrl_private *ctrl)
 	if (ret)
 		DRM_ERROR("Unable to start link clocks. ret=%d\n", ret);
 
-<<<<<<< HEAD
 	drm_dbg_dp(ctrl->drm_dev, "link rate=%d\n", ctrl->link->link_params.rate);
-=======
-	drm_dbg_dp(ctrl->drm_dev, "link rate=%d pixel_clk=%d\n",
-		ctrl->link->link_params.rate, ctrl->dp_ctrl.pixel_rate);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -1386,30 +1364,6 @@ void dp_ctrl_reset_irq_ctrl(struct dp_ctrl *dp_ctrl, bool enable)
 
 	ctrl = container_of(dp_ctrl, struct dp_ctrl_private, dp_ctrl);
 
-<<<<<<< HEAD
-	dp_catalog_ctrl_reset(ctrl->catalog);
-=======
-	drm_dbg_dp(ctrl->drm_dev, "link rate=%d pixel_clk=%d\n",
-			ctrl->link->link_params.rate, ctrl->dp_ctrl.pixel_rate);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	/*
-	 * all dp controller programmable registers will not
-	 * be reset to default value after DP_SW_RESET
-	 * therefore interrupt mask bits have to be updated
-	 * to enable/disable interrupts
-	 */
-	dp_catalog_ctrl_enable_irq(ctrl->catalog, enable);
-}
-
-<<<<<<< HEAD
-=======
-void dp_ctrl_reset_irq_ctrl(struct dp_ctrl *dp_ctrl, bool enable)
-{
-	struct dp_ctrl_private *ctrl;
-
-	ctrl = container_of(dp_ctrl, struct dp_ctrl_private, dp_ctrl);
-
 	dp_catalog_ctrl_reset(ctrl->catalog);
 
 	/*
@@ -1421,7 +1375,6 @@ void dp_ctrl_reset_irq_ctrl(struct dp_ctrl *dp_ctrl, bool enable)
 	dp_catalog_ctrl_enable_irq(ctrl->catalog, enable);
 }
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void dp_ctrl_phy_init(struct dp_ctrl *dp_ctrl)
 {
 	struct dp_ctrl_private *ctrl;
@@ -1543,11 +1496,6 @@ static int dp_ctrl_link_maintenance(struct dp_ctrl_private *ctrl)
 
 	ctrl->link->phy_params.p_level = 0;
 	ctrl->link->phy_params.v_level = 0;
-<<<<<<< HEAD
-=======
-
-	ctrl->dp_ctrl.pixel_rate = ctrl->panel->dp_mode.drm_mode.clock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = dp_ctrl_setup_main_link(ctrl, &training_step);
 	if (ret)
@@ -1562,41 +1510,6 @@ end:
 	return ret;
 }
 
-<<<<<<< HEAD
-=======
-static int dp_ctrl_on_stream_phy_test_report(struct dp_ctrl *dp_ctrl);
-
-static int dp_ctrl_process_phy_test_request(struct dp_ctrl_private *ctrl)
-{
-	int ret = 0;
-
-	if (!ctrl->link->phy_params.phy_test_pattern_sel) {
-		drm_dbg_dp(ctrl->drm_dev,
-			"no test pattern selected by sink\n");
-		return ret;
-	}
-
-	/*
-	 * The global reset will need DP link related clocks to be
-	 * running. Add the global reset just before disabling the
-	 * link clocks and core clocks.
-	 */
-	ret = dp_ctrl_off(&ctrl->dp_ctrl);
-	if (ret) {
-		DRM_ERROR("failed to disable DP controller\n");
-		return ret;
-	}
-
-	ret = dp_ctrl_on_link(&ctrl->dp_ctrl);
-	if (!ret)
-		ret = dp_ctrl_on_stream_phy_test_report(&ctrl->dp_ctrl);
-	else
-		DRM_ERROR("failed to enable DP link controller\n");
-
-	return ret;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool dp_ctrl_send_phy_test_pattern(struct dp_ctrl_private *ctrl)
 {
 	bool success = false;
@@ -1781,29 +1694,17 @@ int dp_ctrl_on_link(struct dp_ctrl *dp_ctrl)
 	if (ctrl->link->sink_request & DP_TEST_LINK_PHY_TEST_PATTERN) {
 		drm_dbg_dp(ctrl->drm_dev,
 				"using phy test link parameters\n");
-<<<<<<< HEAD
 		if (!pixel_rate)
 			pixel_rate = phy_cts_pixel_clk_khz;
-=======
-		if (!ctrl->panel->dp_mode.drm_mode.clock)
-			ctrl->dp_ctrl.pixel_rate = phy_cts_pixel_clk_khz;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		ctrl->link->link_params.rate = rate;
 		ctrl->link->link_params.num_lanes =
 			ctrl->panel->link_info.num_lanes;
 	}
 
-<<<<<<< HEAD
 	drm_dbg_dp(ctrl->drm_dev, "rate=%d, num_lanes=%d, pixel_rate=%lu\n",
 		ctrl->link->link_params.rate, ctrl->link->link_params.num_lanes,
 		pixel_rate);
-=======
-	drm_dbg_dp(ctrl->drm_dev, "rate=%d, num_lanes=%d, pixel_rate=%d\n",
-		ctrl->link->link_params.rate, ctrl->link->link_params.num_lanes,
-		ctrl->dp_ctrl.pixel_rate);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rc = dp_ctrl_enable_mainlink_clocks(ctrl);
 	if (rc)
@@ -1900,38 +1801,12 @@ static int dp_ctrl_link_retrain(struct dp_ctrl_private *ctrl)
 	return dp_ctrl_setup_main_link(ctrl, &training_step);
 }
 
-<<<<<<< HEAD
-=======
-static int dp_ctrl_on_stream_phy_test_report(struct dp_ctrl *dp_ctrl)
-{
-	int ret;
-	struct dp_ctrl_private *ctrl;
-
-	ctrl = container_of(dp_ctrl, struct dp_ctrl_private, dp_ctrl);
-
-	ctrl->dp_ctrl.pixel_rate = ctrl->panel->dp_mode.drm_mode.clock;
-
-	ret = dp_ctrl_enable_stream_clocks(ctrl);
-	if (ret) {
-		DRM_ERROR("Failed to start pixel clocks. ret=%d\n", ret);
-		return ret;
-	}
-
-	dp_ctrl_send_phy_test_pattern(ctrl);
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int dp_ctrl_on_stream(struct dp_ctrl *dp_ctrl, bool force_link_train)
 {
 	int ret = 0;
 	bool mainlink_ready = false;
 	struct dp_ctrl_private *ctrl;
-<<<<<<< HEAD
 	unsigned long pixel_rate;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long pixel_rate_orig;
 
 	if (!dp_ctrl)
@@ -1939,22 +1814,12 @@ int dp_ctrl_on_stream(struct dp_ctrl *dp_ctrl, bool force_link_train)
 
 	ctrl = container_of(dp_ctrl, struct dp_ctrl_private, dp_ctrl);
 
-<<<<<<< HEAD
 	pixel_rate = pixel_rate_orig = ctrl->panel->dp_mode.drm_mode.clock;
 
 	if (dp_ctrl->wide_bus_en)
 		pixel_rate >>= 1;
 
 	drm_dbg_dp(ctrl->drm_dev, "rate=%d, num_lanes=%d, pixel_rate=%lu\n",
-=======
-	ctrl->dp_ctrl.pixel_rate = ctrl->panel->dp_mode.drm_mode.clock;
-
-	pixel_rate_orig = ctrl->dp_ctrl.pixel_rate;
-	if (dp_ctrl->wide_bus_en)
-		ctrl->dp_ctrl.pixel_rate >>= 1;
-
-	drm_dbg_dp(ctrl->drm_dev, "rate=%d, num_lanes=%d, pixel_rate=%d\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ctrl->link->link_params.rate,
 		ctrl->link->link_params.num_lanes, pixel_rate);
 
@@ -2067,17 +1932,10 @@ int dp_ctrl_off_link(struct dp_ctrl *dp_ctrl)
 	if (ret) {
 		DRM_ERROR("Failed to disable link clocks. ret=%d\n", ret);
 	}
-<<<<<<< HEAD
 
 	DRM_DEBUG_DP("Before, phy=%p init_count=%d power_on=%d\n",
 		phy, phy->init_count, phy->power_count);
 
-=======
-
-	DRM_DEBUG_DP("Before, phy=%p init_count=%d power_on=%d\n",
-		phy, phy->init_count, phy->power_count);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phy_power_off(phy);
 
 	DRM_DEBUG_DP("After, phy=%p init_count=%d power_on=%d\n",

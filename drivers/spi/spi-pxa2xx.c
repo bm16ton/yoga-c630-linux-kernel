@@ -1261,21 +1261,12 @@ static int setup(struct spi_device *spi)
 		chip->lpss_tx_threshold = SSITF_TxLoThresh(tx_thres) |
 					  SSITF_TxHiThresh(tx_hi_thres);
 	}
-<<<<<<< HEAD
 
 	if (is_mrfld_ssp(drv_data)) {
 		chip->lpss_rx_threshold = rx_thres;
 		chip->lpss_tx_threshold = tx_thres;
 	}
 
-=======
-
-	if (is_mrfld_ssp(drv_data)) {
-		chip->lpss_rx_threshold = rx_thres;
-		chip->lpss_tx_threshold = tx_thres;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Set DMA burst and threshold outside of chip_info path so that if
 	 * chip_info goes away after setting chip->enable_dma, the burst and

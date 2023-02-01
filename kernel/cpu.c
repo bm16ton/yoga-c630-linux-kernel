@@ -642,7 +642,6 @@ static bool cpuhp_next_state(bool bringup,
 			     enum cpuhp_state *state_to_run,
 			     struct cpuhp_cpu_state *st,
 			     enum cpuhp_state target)
-<<<<<<< HEAD
 {
 	do {
 		if (bringup) {
@@ -709,44 +708,6 @@ static inline void cpuhp_invoke_callback_range_nofail(bool bringup,
 						      enum cpuhp_state target)
 {
 	__cpuhp_invoke_callback_range(bringup, cpu, st, target, true);
-=======
-{
-	do {
-		if (bringup) {
-			if (st->state >= target)
-				return false;
-
-			*state_to_run = ++st->state;
-		} else {
-			if (st->state <= target)
-				return false;
-
-			*state_to_run = st->state--;
-		}
-
-		if (!cpuhp_step_empty(bringup, cpuhp_get_step(*state_to_run)))
-			break;
-	} while (true);
-
-	return true;
-}
-
-static int cpuhp_invoke_callback_range(bool bringup,
-				       unsigned int cpu,
-				       struct cpuhp_cpu_state *st,
-				       enum cpuhp_state target)
-{
-	enum cpuhp_state state;
-	int err = 0;
-
-	while (cpuhp_next_state(bringup, &state, st, target)) {
-		err = cpuhp_invoke_callback(cpu, state, bringup, NULL, NULL);
-		if (err)
-			break;
-	}
-
-	return err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool can_rollback_cpu(struct cpuhp_cpu_state *st)
@@ -1080,20 +1041,10 @@ static int take_cpu_down(void *_param)
 	 */
 	WARN_ON(st->state != (CPUHP_TEARDOWN_CPU - 1));
 
-<<<<<<< HEAD
 	/*
 	 * Invoke the former CPU_DYING callbacks. DYING must not fail!
 	 */
 	cpuhp_invoke_callback_range_nofail(false, cpu, st, target);
-=======
-	/* Invoke the former CPU_DYING callbacks */
-	ret = cpuhp_invoke_callback_range(false, cpu, st, target);
-
-	/*
-	 * DYING must not fail!
-	 */
-	WARN_ON_ONCE(ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Give up timekeeping duties */
 	tick_handover_do_timer();
@@ -1374,19 +1325,11 @@ void notify_cpu_starting(unsigned int cpu)
 
 	rcu_cpu_starting(cpu);	/* Enables RCU usage on this CPU. */
 	cpumask_set_cpu(cpu, &cpus_booted_once_mask);
-<<<<<<< HEAD
-=======
-	ret = cpuhp_invoke_callback_range(true, cpu, st, target);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * STARTING must not fail!
 	 */
-<<<<<<< HEAD
 	cpuhp_invoke_callback_range_nofail(true, cpu, st, target);
-=======
-	WARN_ON_ONCE(ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

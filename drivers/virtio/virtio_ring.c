@@ -11,10 +11,7 @@
 #include <linux/module.h>
 #include <linux/hrtimer.h>
 #include <linux/dma-mapping.h>
-<<<<<<< HEAD
 #include <linux/kmsan.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/spinlock.h>
 #include <xen/xen.h>
 
@@ -1089,7 +1086,6 @@ static int vring_alloc_queue_split(struct vring_virtqueue_split *vring_split,
 
 	vring_split->vring_align = vring_align;
 	vring_split->may_reduce_num = may_reduce_num;
-<<<<<<< HEAD
 
 	return 0;
 }
@@ -1115,33 +1111,6 @@ static struct virtqueue *vring_create_virtqueue_split(
 	if (err)
 		return NULL;
 
-=======
-
-	return 0;
-}
-
-static struct virtqueue *vring_create_virtqueue_split(
-	unsigned int index,
-	unsigned int num,
-	unsigned int vring_align,
-	struct virtio_device *vdev,
-	bool weak_barriers,
-	bool may_reduce_num,
-	bool context,
-	bool (*notify)(struct virtqueue *),
-	void (*callback)(struct virtqueue *),
-	const char *name)
-{
-	struct vring_virtqueue_split vring_split = {};
-	struct virtqueue *vq;
-	int err;
-
-	err = vring_alloc_queue_split(&vring_split, vdev, num, vring_align,
-				      may_reduce_num);
-	if (err)
-		return NULL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vq = __vring_new_virtqueue(index, &vring_split, vdev, weak_barriers,
 				   context, notify, callback, name);
 	if (!vq) {

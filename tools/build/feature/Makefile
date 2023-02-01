@@ -63,10 +63,7 @@ FILES=                                          \
          test-libbpf-bpf_map_create.bin		\
          test-libbpf-bpf_object__next_program.bin \
          test-libbpf-bpf_object__next_map.bin   \
-<<<<<<< HEAD
          test-libbpf-bpf_program__set_insns.bin	\
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
          test-libbpf-btf__raw_data.bin          \
          test-get_cpuid.bin                     \
          test-sdt.bin                           \
@@ -320,12 +317,9 @@ $(OUTPUT)test-libbpf-bpf_object__next_program.bin:
 $(OUTPUT)test-libbpf-bpf_object__next_map.bin:
 	$(BUILD) -lbpf
 
-<<<<<<< HEAD
 $(OUTPUT)test-libbpf-bpf_program__set_insns.bin:
 	$(BUILD) -lbpf
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 $(OUTPUT)test-libbpf-btf__raw_data.bin:
 	$(BUILD) -lbpf
 

@@ -477,10 +477,7 @@ int amdgpu_vm_pde_update(struct amdgpu_vm_update_params *params,
 int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 			  uint64_t start, uint64_t end,
 			  uint64_t dst, uint64_t flags);
-<<<<<<< HEAD
 void amdgpu_vm_pt_free_work(struct work_struct *work);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if defined(CONFIG_DEBUG_FS)
 void amdgpu_debugfs_vm_bo_info(struct amdgpu_vm *vm, struct seq_file *m);

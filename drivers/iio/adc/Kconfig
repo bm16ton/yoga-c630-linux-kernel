@@ -935,7 +935,6 @@ config ROCKCHIP_SARADC
 	  To compile this driver as a module, choose M here: the
 	  module will be called rockchip_saradc.
 
-<<<<<<< HEAD
 config RICHTEK_RTQ6056
 	tristate "Richtek RTQ6056 Current and Power Monitor ADC"
 	depends on I2C
@@ -951,8 +950,6 @@ config RICHTEK_RTQ6056
 	  This driver can also be built as a module. If so, the module will be
 	  called rtq6056.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config RZG2L_ADC
 	tristate "Renesas RZ/G2L ADC driver"
 	depends on ARCH_RZG2L || COMPILE_TEST

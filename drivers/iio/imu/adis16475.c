@@ -270,7 +270,6 @@ static int adis16475_get_freq(struct adis16475 *st, u32 *freq)
 		ret = __adis_read_reg_16(&st->adis, ADIS16475_REG_UP_SCALE, &sync_scale);
 		if (ret)
 			goto error;
-<<<<<<< HEAD
 
 		sample_rate = st->clk_freq * sync_scale;
 	}
@@ -281,18 +280,6 @@ static int adis16475_get_freq(struct adis16475 *st, u32 *freq)
 
 	adis_dev_unlock(&st->adis);
 
-=======
-
-		sample_rate = st->clk_freq * sync_scale;
-	}
-
-	ret = __adis_read_reg_16(&st->adis, ADIS16475_REG_DEC_RATE, &dec);
-	if (ret)
-		goto error;
-
-	adis_dev_unlock(&st->adis);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*freq = DIV_ROUND_CLOSEST(sample_rate, dec + 1);
 
 	return 0;

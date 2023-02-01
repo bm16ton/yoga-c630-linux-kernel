@@ -443,7 +443,7 @@ static int break_ksm(struct vm_area_struct *vma, unsigned long addr)
 		cond_resched();
 		page = follow_page(vma, addr,
 				FOLL_GET | FOLL_MIGRATION | FOLL_REMOTE);
-		if (IS_ERR_OR_NULL(page) || is_zone_device_page(page))
+		if (IS_ERR_OR_NULL(page))
 			break;
 		if (PageKsm(page))
 			ret = handle_mm_fault(vma, addr,
@@ -528,7 +528,7 @@ static struct page *get_mergeable_page(struct ksm_rmap_item *rmap_item)
 		goto out;
 
 	page = follow_page(vma, addr, FOLL_GET);
-	if (IS_ERR_OR_NULL(page) || is_zone_device_page(page))
+	if (IS_ERR_OR_NULL(page))
 		goto out;
 	if (is_zone_device_page(page))
 		goto out_putpage;
@@ -790,11 +790,7 @@ out:
 	cond_resched();		/* we're called from many long loops */
 }
 
-<<<<<<< HEAD
 static void remove_trailing_rmap_items(struct ksm_rmap_item **rmap_list)
-=======
-static void remove_trailing_rmap_items(struct rmap_item **rmap_list)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	while (*rmap_list) {
 		struct ksm_rmap_item *rmap_item = *rmap_list;
@@ -834,20 +830,12 @@ static int unmerge_ksm_pages(struct vm_area_struct *vma,
 	return err;
 }
 
-<<<<<<< HEAD
 static inline struct ksm_stable_node *folio_stable_node(struct folio *folio)
-=======
-static inline struct stable_node *folio_stable_node(struct folio *folio)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return folio_test_ksm(folio) ? folio_raw_mapping(folio) : NULL;
 }
 
-<<<<<<< HEAD
 static inline struct ksm_stable_node *page_stable_node(struct page *page)
-=======
-static inline struct stable_node *page_stable_node(struct page *page)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return folio_stable_node(page_folio(page));
 }
@@ -1083,10 +1071,7 @@ static int write_protect_page(struct vm_area_struct *vma, struct page *page,
 			goto out_unlock;
 		}
 
-<<<<<<< HEAD
 		/* See page_try_share_anon_rmap(): clear PTE first. */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (anon_exclusive && page_try_share_anon_rmap(page)) {
 			set_pte_at(mm, pvmw.address, pvmw.pte, entry);
 			goto out_unlock;
@@ -1194,18 +1179,11 @@ static int replace_page(struct vm_area_struct *vma, struct page *page,
 	ptep_clear_flush(vma, addr, ptep);
 	set_pte_at_notify(mm, addr, ptep, newpte);
 
-<<<<<<< HEAD
 	folio = page_folio(page);
 	page_remove_rmap(page, vma, false);
 	if (!folio_mapped(folio))
 		folio_free_swap(folio);
 	folio_put(folio);
-=======
-	page_remove_rmap(page, vma, false);
-	if (!page_mapped(page))
-		try_to_free_swap(page);
-	put_page(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pte_unmap_unlock(ptep, ptl);
 	err = 0;
@@ -2325,7 +2303,7 @@ next_mm:
 			if (ksm_test_exit(mm))
 				break;
 			*page = follow_page(vma, ksm_scan.address, FOLL_GET);
-			if (IS_ERR_OR_NULL(*page) || is_zone_device_page(*page)) {
+			if (IS_ERR_OR_NULL(*page)) {
 				ksm_scan.address += PAGE_SIZE;
 				cond_resched();
 				continue;

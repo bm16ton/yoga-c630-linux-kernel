@@ -61,11 +61,7 @@ struct kvm_pgtable_walk_data {
 
 static bool kvm_phys_is_valid(u64 phys)
 {
-<<<<<<< HEAD
 	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
-=======
-	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_PARANGE_MAX));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)

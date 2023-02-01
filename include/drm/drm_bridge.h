@@ -949,11 +949,8 @@ static inline int drm_panel_bridge_set_orientation(struct drm_connector *connect
 #if defined(CONFIG_OF) && defined(CONFIG_DRM_PANEL_BRIDGE)
 struct drm_bridge *devm_drm_of_get_bridge(struct device *dev, struct device_node *node,
 					  u32 port, u32 endpoint);
-<<<<<<< HEAD
 struct drm_bridge *drmm_of_get_bridge(struct drm_device *drm, struct device_node *node,
 					  u32 port, u32 endpoint);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline struct drm_bridge *devm_drm_of_get_bridge(struct device *dev,
 							struct device_node *node,
@@ -962,7 +959,6 @@ static inline struct drm_bridge *devm_drm_of_get_bridge(struct device *dev,
 {
 	return ERR_PTR(-ENODEV);
 }
-<<<<<<< HEAD
 
 static inline struct drm_bridge *drmm_of_get_bridge(struct drm_device *drm,
 						     struct device_node *node,
@@ -971,8 +967,6 @@ static inline struct drm_bridge *drmm_of_get_bridge(struct drm_device *drm,
 {
 	return ERR_PTR(-ENODEV);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #endif

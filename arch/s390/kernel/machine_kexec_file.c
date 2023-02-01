@@ -223,12 +223,9 @@ static int kexec_file_add_ipl_report(struct kimage *image,
 		data->kernel_buf + offsetof(struct lowcore, ipl_parmblock_ptr);
 	*lc_ipl_parmblock_ptr = (__u32)buf.mem;
 
-<<<<<<< HEAD
 	if (image->type == KEXEC_TYPE_CRASH)
 		buf.mem += crashk_res.start;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = kexec_add_buffer(&buf);
 out:
 	return ret;

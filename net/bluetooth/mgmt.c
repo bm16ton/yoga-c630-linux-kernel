@@ -1050,7 +1050,6 @@ static void discov_off(struct work_struct *work)
 	mgmt_new_settings(hdev);
 
 	hci_dev_unlock(hdev);
-<<<<<<< HEAD
 }
 
 static int send_settings_rsp(struct sock *sk, u16 opcode, struct hci_dev *hdev);
@@ -1108,8 +1107,6 @@ static void mesh_send_done(struct work_struct *work)
 		return;
 
 	hci_cmd_sync_queue(hdev, mesh_send_done_sync, NULL, mesh_next);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void mgmt_init_hdev(struct sock *sk, struct hci_dev *hdev)
@@ -1303,7 +1300,6 @@ static void restart_le_actions(struct hci_dev *hdev)
 		}
 	}
 }
-<<<<<<< HEAD
 
 static int new_settings(struct hci_dev *hdev, struct sock *skip)
 {
@@ -1313,22 +1309,10 @@ static int new_settings(struct hci_dev *hdev, struct sock *skip)
 				  sizeof(ev), HCI_MGMT_SETTING_EVENTS, skip);
 }
 
-=======
-
-static int new_settings(struct hci_dev *hdev, struct sock *skip)
-{
-	__le32 ev = cpu_to_le32(get_current_settings(hdev));
-
-	return mgmt_limited_event(MGMT_EV_NEW_SETTINGS, hdev, &ev,
-				  sizeof(ev), HCI_MGMT_SETTING_EVENTS, skip);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
 {
 	struct mgmt_pending_cmd *cmd = data;
 	struct mgmt_mode *cp;
-<<<<<<< HEAD
 
 	/* Make sure cmd still outstanding. */
 	if (cmd != pending_find(MGMT_OP_SET_POWERED, hdev))
@@ -1348,27 +1332,6 @@ static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
 
 		send_settings_rsp(cmd->sk, cmd->opcode, hdev);
 
-=======
-
-	/* Make sure cmd still outstanding. */
-	if (cmd != pending_find(MGMT_OP_SET_POWERED, hdev))
-		return;
-
-	cp = cmd->param;
-
-	bt_dev_dbg(hdev, "err %d", err);
-
-	if (!err) {
-		if (cp->val) {
-			hci_dev_lock(hdev);
-			restart_le_actions(hdev);
-			hci_update_passive_scan(hdev);
-			hci_dev_unlock(hdev);
-		}
-
-		send_settings_rsp(cmd->sk, cmd->opcode, hdev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Only call new_setting for power on as power off is deferred
 		 * to hdev->power_off work which does call hci_dev_do_close.
 		 */
@@ -1520,27 +1483,15 @@ static void mgmt_set_discoverable_complete(struct hci_dev *hdev, void *data,
 					   int err)
 {
 	struct mgmt_pending_cmd *cmd = data;
-<<<<<<< HEAD
 
 	bt_dev_dbg(hdev, "err %d", err);
 
 	/* Make sure cmd still outstanding. */
 	if (cmd != pending_find(MGMT_OP_SET_DISCOVERABLE, hdev))
 		return;
-=======
 
-	bt_dev_dbg(hdev, "err %d", err);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	/* Make sure cmd still outstanding. */
-	if (cmd != pending_find(MGMT_OP_SET_DISCOVERABLE, hdev))
-		return;
-
-<<<<<<< HEAD
-=======
 	hci_dev_lock(hdev);
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err) {
 		u8 mgmt_err = mgmt_status(err);
 		mgmt_cmd_status(cmd->sk, cmd->index, cmd->opcode, mgmt_err);
@@ -1706,27 +1657,15 @@ static void mgmt_set_connectable_complete(struct hci_dev *hdev, void *data,
 					  int err)
 {
 	struct mgmt_pending_cmd *cmd = data;
-<<<<<<< HEAD
 
 	bt_dev_dbg(hdev, "err %d", err);
 
 	/* Make sure cmd still outstanding. */
 	if (cmd != pending_find(MGMT_OP_SET_CONNECTABLE, hdev))
 		return;
-=======
 
-	bt_dev_dbg(hdev, "err %d", err);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	/* Make sure cmd still outstanding. */
-	if (cmd != pending_find(MGMT_OP_SET_CONNECTABLE, hdev))
-		return;
-
-<<<<<<< HEAD
-=======
 	hci_dev_lock(hdev);
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err) {
 		u8 mgmt_err = mgmt_status(err);
 		mgmt_cmd_status(cmd->sk, cmd->index, cmd->opcode, mgmt_err);
@@ -1947,76 +1886,6 @@ failed:
 }
 
 static void set_ssp_complete(struct hci_dev *hdev, void *data, int err)
-<<<<<<< HEAD
-=======
-{
-	struct cmd_lookup match = { NULL, hdev };
-	struct mgmt_pending_cmd *cmd = data;
-	struct mgmt_mode *cp = cmd->param;
-	u8 enable = cp->val;
-	bool changed;
-
-	/* Make sure cmd still outstanding. */
-	if (cmd != pending_find(MGMT_OP_SET_SSP, hdev))
-		return;
-
-	if (err) {
-		u8 mgmt_err = mgmt_status(err);
-
-		if (enable && hci_dev_test_and_clear_flag(hdev,
-							  HCI_SSP_ENABLED)) {
-			hci_dev_clear_flag(hdev, HCI_HS_ENABLED);
-			new_settings(hdev, NULL);
-		}
-
-		mgmt_pending_foreach(MGMT_OP_SET_SSP, hdev, cmd_status_rsp,
-				     &mgmt_err);
-		return;
-	}
-
-	if (enable) {
-		changed = !hci_dev_test_and_set_flag(hdev, HCI_SSP_ENABLED);
-	} else {
-		changed = hci_dev_test_and_clear_flag(hdev, HCI_SSP_ENABLED);
-
-		if (!changed)
-			changed = hci_dev_test_and_clear_flag(hdev,
-							      HCI_HS_ENABLED);
-		else
-			hci_dev_clear_flag(hdev, HCI_HS_ENABLED);
-	}
-
-	mgmt_pending_foreach(MGMT_OP_SET_SSP, hdev, settings_rsp, &match);
-
-	if (changed)
-		new_settings(hdev, match.sk);
-
-	if (match.sk)
-		sock_put(match.sk);
-
-	hci_update_eir_sync(hdev);
-}
-
-static int set_ssp_sync(struct hci_dev *hdev, void *data)
-{
-	struct mgmt_pending_cmd *cmd = data;
-	struct mgmt_mode *cp = cmd->param;
-	bool changed = false;
-	int err;
-
-	if (cp->val)
-		changed = !hci_dev_test_and_set_flag(hdev, HCI_SSP_ENABLED);
-
-	err = hci_write_ssp_mode_sync(hdev, cp->val);
-
-	if (!err && changed)
-		hci_dev_clear_flag(hdev, HCI_SSP_ENABLED);
-
-	return err;
-}
-
-static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct cmd_lookup match = { NULL, hdev };
 	struct mgmt_pending_cmd *cmd = data;
@@ -2253,11 +2122,8 @@ static int set_le_sync(struct hci_dev *hdev, void *data)
 	int err;
 
 	if (!val) {
-<<<<<<< HEAD
 		hci_clear_adv_instance_sync(hdev, NULL, 0x00, true);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
 			hci_disable_advertising_sync(hdev);
 
@@ -2290,7 +2156,6 @@ static int set_le_sync(struct hci_dev *hdev, void *data)
 	}
 
 	return err;
-<<<<<<< HEAD
 }
 
 static void set_mesh_complete(struct hci_dev *hdev, void *data, int err)
@@ -2602,8 +2467,6 @@ static int mesh_send(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
 done:
 	hci_dev_unlock(hdev);
 	return err;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
@@ -2752,19 +2615,11 @@ static void mgmt_class_complete(struct hci_dev *hdev, void *data, int err)
 static int add_uuid_sync(struct hci_dev *hdev, void *data)
 {
 	int err;
-<<<<<<< HEAD
 
 	err = hci_update_class_sync(hdev);
 	if (err)
 		return err;
 
-=======
-
-	err = hci_update_class_sync(hdev);
-	if (err)
-		return err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return hci_update_eir_sync(hdev);
 }
 
@@ -4523,7 +4378,6 @@ static const u8 iso_socket_uuid[16] = {
 	0x6a, 0x49, 0xe0, 0x05, 0x88, 0xf1, 0xba, 0x6f,
 };
 
-<<<<<<< HEAD
 /* 2ce463d7-7a03-4d8d-bf05-5f24e8f36e76 */
 static const u8 mgmt_mesh_uuid[16] = {
 	0x76, 0x6e, 0xf3, 0xe8, 0x24, 0x5f, 0x05, 0xbf,
@@ -4535,13 +4389,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
 {
 	struct mgmt_rp_read_exp_features_info *rp;
 	size_t len;
-=======
-static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
-				  void *data, u16 data_len)
-{
-	char buf[122];   /* Enough space for 6 features: 2 + 20 * 6 */
-	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 idx = 0;
 	u32 flags;
 	int status;
@@ -4616,7 +4463,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
 		idx++;
 	}
 
-<<<<<<< HEAD
 	if (hdev && lmp_le_capable(hdev)) {
 		if (hci_dev_test_flag(hdev, HCI_MESH_EXPERIMENTAL))
 			flags = BIT(0);
@@ -4628,8 +4474,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
 		idx++;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rp->feature_count = cpu_to_le16(idx);
 
 	/* After reading the experimental features information, enable
@@ -4943,27 +4787,14 @@ static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
 			goto unlock_quality_report;
 		}
 
-<<<<<<< HEAD
 		if (val)
 			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
 		else
 			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
 	}
-=======
-	// Do we need to be atomic with the conn_flags?
-	if (enabled && privacy_mode_capable(hdev))
-		hdev->conn_flags |= HCI_CONN_FLAG_DEVICE_PRIVACY;
-	else
-		hdev->conn_flags &= ~HCI_CONN_FLAG_DEVICE_PRIVACY;
-
-	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, hdev,
-				  &ev, sizeof(ev),
-				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bt_dev_dbg(hdev, "quality report enable %d changed %d", val, changed);
 
-<<<<<<< HEAD
 	memcpy(rp.uuid, quality_report_uuid, 16);
 	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
 	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
@@ -5174,445 +5005,6 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
 	struct mgmt_cp_set_exp_feature *cp = data;
 	size_t i = 0;
 
-=======
-static int exp_feature_changed(struct hci_dev *hdev, const u8 *uuid,
-			       bool enabled, struct sock *skip)
-{
-	struct mgmt_ev_exp_feature_changed ev;
-
-	memset(&ev, 0, sizeof(ev));
-	memcpy(ev.uuid, uuid, 16);
-	ev.flags = cpu_to_le32(enabled ? BIT(0) : 0);
-
-	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, hdev,
-				  &ev, sizeof(ev),
-				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
-}
-
-#define EXP_FEAT(_uuid, _set_func)	\
-{					\
-	.uuid = _uuid,			\
-	.set_func = _set_func,		\
-}
-
-/* The zero key uuid is special. Multiple exp features are set through it. */
-static int set_zero_key_func(struct sock *sk, struct hci_dev *hdev,
-			     struct mgmt_cp_set_exp_feature *cp, u16 data_len)
-{
-	struct mgmt_rp_set_exp_feature rp;
-
-	memset(rp.uuid, 0, 16);
-	rp.flags = cpu_to_le32(0);
-
-#ifdef CONFIG_BT_FEATURE_DEBUG
-	if (!hdev) {
-		bool changed = bt_dbg_get();
-
-		bt_dbg_set(false);
-
-		if (changed)
-			exp_feature_changed(NULL, ZERO_KEY, false, sk);
-	}
-#endif
-
-	if (hdev && use_ll_privacy(hdev) && !hdev_is_powered(hdev)) {
-		bool changed;
-
-		changed = hci_dev_test_and_clear_flag(hdev,
-						      HCI_ENABLE_LL_PRIVACY);
-		if (changed)
-			exp_feature_changed(hdev, rpa_resolution_uuid, false,
-					    sk);
-	}
-
-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-
-	return mgmt_cmd_complete(sk, hdev ? hdev->id : MGMT_INDEX_NONE,
-				 MGMT_OP_SET_EXP_FEATURE, 0,
-				 &rp, sizeof(rp));
-}
-
-#ifdef CONFIG_BT_FEATURE_DEBUG
-static int set_debug_func(struct sock *sk, struct hci_dev *hdev,
-			  struct mgmt_cp_set_exp_feature *cp, u16 data_len)
-{
-	struct mgmt_rp_set_exp_feature rp;
-
-	bool val, changed;
-	int err;
-
-	/* Command requires to use the non-controller index */
-	if (hdev)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_INDEX);
-
-	/* Parameters are limited to a single octet */
-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	/* Only boolean on/off is supported */
-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	val = !!cp->param[0];
-	changed = val ? !bt_dbg_get() : bt_dbg_get();
-	bt_dbg_set(val);
-
-	memcpy(rp.uuid, debug_uuid, 16);
-	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
-
-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-
-	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
-				MGMT_OP_SET_EXP_FEATURE, 0,
-				&rp, sizeof(rp));
-
-	if (changed)
-		exp_feature_changed(hdev, debug_uuid, val, sk);
-
-	return err;
-}
-#endif
-
-static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
-				   struct mgmt_cp_set_exp_feature *cp,
-				   u16 data_len)
-{
-	struct mgmt_rp_set_exp_feature rp;
-	bool val, changed;
-	int err;
-	u32 flags;
-
-	/* Command requires to use the controller index */
-	if (!hdev)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_INDEX);
-
-	/* Changes can only be made when controller is powered down */
-	if (hdev_is_powered(hdev))
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_REJECTED);
-
-	/* Parameters are limited to a single octet */
-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	/* Only boolean on/off is supported */
-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	val = !!cp->param[0];
-
-	if (val) {
-		changed = !hci_dev_test_and_set_flag(hdev,
-						     HCI_ENABLE_LL_PRIVACY);
-		hci_dev_clear_flag(hdev, HCI_ADVERTISING);
-
-		/* Enable LL privacy + supported settings changed */
-		flags = BIT(0) | BIT(1);
-	} else {
-		changed = hci_dev_test_and_clear_flag(hdev,
-						      HCI_ENABLE_LL_PRIVACY);
-
-		/* Disable LL privacy + supported settings changed */
-		flags = BIT(1);
-	}
-
-	memcpy(rp.uuid, rpa_resolution_uuid, 16);
-	rp.flags = cpu_to_le32(flags);
-
-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-
-	err = mgmt_cmd_complete(sk, hdev->id,
-				MGMT_OP_SET_EXP_FEATURE, 0,
-				&rp, sizeof(rp));
-
-	if (changed)
-		exp_ll_privacy_feature_changed(val, hdev, sk);
-
-	return err;
-}
-
-static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
-				   struct mgmt_cp_set_exp_feature *cp,
-				   u16 data_len)
-{
-	struct mgmt_rp_set_exp_feature rp;
-	bool val, changed;
-	int err;
-
-	/* Command requires to use a valid controller index */
-	if (!hdev)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_INDEX);
-
-	/* Parameters are limited to a single octet */
-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	/* Only boolean on/off is supported */
-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	hci_req_sync_lock(hdev);
-
-	val = !!cp->param[0];
-	changed = (val != hci_dev_test_flag(hdev, HCI_QUALITY_REPORT));
-
-	if (!aosp_has_quality_report(hdev) && !hdev->set_quality_report) {
-		err = mgmt_cmd_status(sk, hdev->id,
-				      MGMT_OP_SET_EXP_FEATURE,
-				      MGMT_STATUS_NOT_SUPPORTED);
-		goto unlock_quality_report;
-	}
-
-	if (changed) {
-		if (hdev->set_quality_report)
-			err = hdev->set_quality_report(hdev, val);
-		else
-			err = aosp_set_quality_report(hdev, val);
-
-		if (err) {
-			err = mgmt_cmd_status(sk, hdev->id,
-					      MGMT_OP_SET_EXP_FEATURE,
-					      MGMT_STATUS_FAILED);
-			goto unlock_quality_report;
-		}
-
-		if (val)
-			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
-		else
-			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
-	}
-
-	bt_dev_dbg(hdev, "quality report enable %d changed %d", val, changed);
-
-	memcpy(rp.uuid, quality_report_uuid, 16);
-	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-
-	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_EXP_FEATURE, 0,
-				&rp, sizeof(rp));
-
-	if (changed)
-		exp_feature_changed(hdev, quality_report_uuid, val, sk);
-
-unlock_quality_report:
-	hci_req_sync_unlock(hdev);
-	return err;
-}
-
-static int set_offload_codec_func(struct sock *sk, struct hci_dev *hdev,
-				  struct mgmt_cp_set_exp_feature *cp,
-				  u16 data_len)
-{
-	bool val, changed;
-	int err;
-	struct mgmt_rp_set_exp_feature rp;
-
-	/* Command requires to use a valid controller index */
-	if (!hdev)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_INDEX);
-
-	/* Parameters are limited to a single octet */
-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	/* Only boolean on/off is supported */
-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	val = !!cp->param[0];
-	changed = (val != hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED));
-
-	if (!hdev->get_data_path_id) {
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_NOT_SUPPORTED);
-	}
-
-	if (changed) {
-		if (val)
-			hci_dev_set_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED);
-		else
-			hci_dev_clear_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED);
-	}
-
-	bt_dev_info(hdev, "offload codecs enable %d changed %d",
-		    val, changed);
-
-	memcpy(rp.uuid, offload_codecs_uuid, 16);
-	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-	err = mgmt_cmd_complete(sk, hdev->id,
-				MGMT_OP_SET_EXP_FEATURE, 0,
-				&rp, sizeof(rp));
-
-	if (changed)
-		exp_feature_changed(hdev, offload_codecs_uuid, val, sk);
-
-	return err;
-}
-
-static int set_le_simultaneous_roles_func(struct sock *sk, struct hci_dev *hdev,
-					  struct mgmt_cp_set_exp_feature *cp,
-					  u16 data_len)
-{
-	bool val, changed;
-	int err;
-	struct mgmt_rp_set_exp_feature rp;
-
-	/* Command requires to use a valid controller index */
-	if (!hdev)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_INDEX);
-
-	/* Parameters are limited to a single octet */
-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	/* Only boolean on/off is supported */
-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	val = !!cp->param[0];
-	changed = (val != hci_dev_test_flag(hdev, HCI_LE_SIMULTANEOUS_ROLES));
-
-	if (!hci_dev_le_state_simultaneous(hdev)) {
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_NOT_SUPPORTED);
-	}
-
-	if (changed) {
-		if (val)
-			hci_dev_set_flag(hdev, HCI_LE_SIMULTANEOUS_ROLES);
-		else
-			hci_dev_clear_flag(hdev, HCI_LE_SIMULTANEOUS_ROLES);
-	}
-
-	bt_dev_info(hdev, "LE simultaneous roles enable %d changed %d",
-		    val, changed);
-
-	memcpy(rp.uuid, le_simultaneous_roles_uuid, 16);
-	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-	err = mgmt_cmd_complete(sk, hdev->id,
-				MGMT_OP_SET_EXP_FEATURE, 0,
-				&rp, sizeof(rp));
-
-	if (changed)
-		exp_feature_changed(hdev, le_simultaneous_roles_uuid, val, sk);
-
-	return err;
-}
-
-#ifdef CONFIG_BT_LE
-static int set_iso_socket_func(struct sock *sk, struct hci_dev *hdev,
-			       struct mgmt_cp_set_exp_feature *cp, u16 data_len)
-{
-	struct mgmt_rp_set_exp_feature rp;
-	bool val, changed = false;
-	int err;
-
-	/* Command requires to use the non-controller index */
-	if (hdev)
-		return mgmt_cmd_status(sk, hdev->id,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_INDEX);
-
-	/* Parameters are limited to a single octet */
-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	/* Only boolean on/off is supported */
-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-				       MGMT_OP_SET_EXP_FEATURE,
-				       MGMT_STATUS_INVALID_PARAMS);
-
-	val = cp->param[0] ? true : false;
-	if (val)
-		err = iso_init();
-	else
-		err = iso_exit();
-
-	if (!err)
-		changed = true;
-
-	memcpy(rp.uuid, iso_socket_uuid, 16);
-	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
-
-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-
-	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
-				MGMT_OP_SET_EXP_FEATURE, 0,
-				&rp, sizeof(rp));
-
-	if (changed)
-		exp_feature_changed(hdev, iso_socket_uuid, val, sk);
-
-	return err;
-}
-#endif
-
-static const struct mgmt_exp_feature {
-	const u8 *uuid;
-	int (*set_func)(struct sock *sk, struct hci_dev *hdev,
-			struct mgmt_cp_set_exp_feature *cp, u16 data_len);
-} exp_features[] = {
-	EXP_FEAT(ZERO_KEY, set_zero_key_func),
-#ifdef CONFIG_BT_FEATURE_DEBUG
-	EXP_FEAT(debug_uuid, set_debug_func),
-#endif
-	EXP_FEAT(rpa_resolution_uuid, set_rpa_resolution_func),
-	EXP_FEAT(quality_report_uuid, set_quality_report_func),
-	EXP_FEAT(offload_codecs_uuid, set_offload_codec_func),
-	EXP_FEAT(le_simultaneous_roles_uuid, set_le_simultaneous_roles_func),
-#ifdef CONFIG_BT_LE
-	EXP_FEAT(iso_socket_uuid, set_iso_socket_func),
-#endif
-
-	/* end with a null feature */
-	EXP_FEAT(NULL, NULL)
-};
-
-static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
-			   void *data, u16 data_len)
-{
-	struct mgmt_cp_set_exp_feature *cp = data;
-	size_t i = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bt_dev_dbg(hdev, "sock %p", sk);
 
 	for (i = 0; exp_features[i].uuid; i++) {
@@ -7876,15 +7268,9 @@ static void get_conn_info_complete(struct hci_dev *hdev, void *data, int err)
 	struct mgmt_cp_get_conn_info *cp = cmd->param;
 	struct mgmt_rp_get_conn_info rp;
 	u8 status;
-<<<<<<< HEAD
 
 	bt_dev_dbg(hdev, "err %d", err);
 
-=======
-
-	bt_dev_dbg(hdev, "err %d", err);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memcpy(&rp.addr, &cp->addr.bdaddr, sizeof(rp.addr));
 
 	status = mgmt_status(err);
@@ -9316,11 +8702,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
 				   timeout, duration,
 				   HCI_ADV_TX_POWER_NO_PREFERENCE,
 				   hdev->le_adv_min_interval,
-<<<<<<< HEAD
 				   hdev->le_adv_max_interval, 0);
-=======
-				   hdev->le_adv_max_interval);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(adv)) {
 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
 				      MGMT_STATUS_FAILED);
@@ -9524,11 +8906,7 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
 	/* Create advertising instance with no advertising or response data */
 	adv = hci_add_adv_instance(hdev, cp->instance, flags, 0, NULL, 0, NULL,
 				   timeout, duration, tx_power, min_interval,
-<<<<<<< HEAD
 				   max_interval, 0);
-=======
-				   max_interval);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (IS_ERR(adv)) {
 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
@@ -9545,21 +8923,6 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
 			hci_remove_adv_instance(hdev, cp->instance);
 			goto unlock;
 		}
-<<<<<<< HEAD
-
-		err = hci_cmd_sync_queue(hdev, add_ext_adv_params_sync, cmd,
-					 add_ext_adv_params_complete);
-		if (err < 0)
-			mgmt_pending_free(cmd);
-	} else {
-		rp.instance = cp->instance;
-		rp.tx_power = HCI_ADV_TX_POWER_NO_PREFERENCE;
-		rp.max_adv_data_len = tlv_data_max_len(hdev, flags, true);
-		rp.max_scan_rsp_len = tlv_data_max_len(hdev, flags, false);
-		err = mgmt_cmd_complete(sk, hdev->id,
-					MGMT_OP_ADD_EXT_ADV_PARAMS,
-					MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
-=======
 
 		err = hci_cmd_sync_queue(hdev, add_ext_adv_params_sync, cmd,
 					 add_ext_adv_params_complete);
@@ -9579,50 +8942,6 @@ unlock:
 	hci_dev_unlock(hdev);
 
 	return err;
-}
-
-static void add_ext_adv_data_complete(struct hci_dev *hdev, void *data, int err)
-{
-	struct mgmt_pending_cmd *cmd = data;
-	struct mgmt_cp_add_ext_adv_data *cp = cmd->param;
-	struct mgmt_rp_add_advertising rp;
-
-	add_adv_complete(hdev, cmd->sk, cp->instance, err);
-
-	memset(&rp, 0, sizeof(rp));
-
-	rp.instance = cp->instance;
-
-	if (err)
-		mgmt_cmd_status(cmd->sk, cmd->index, cmd->opcode,
-				mgmt_status(err));
-	else
-		mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode,
-				  mgmt_status(err), &rp, sizeof(rp));
-
-	mgmt_pending_free(cmd);
-}
-
-static int add_ext_adv_data_sync(struct hci_dev *hdev, void *data)
-{
-	struct mgmt_pending_cmd *cmd = data;
-	struct mgmt_cp_add_ext_adv_data *cp = cmd->param;
-	int err;
-
-	if (ext_adv_capable(hdev)) {
-		err = hci_update_adv_data_sync(hdev, cp->instance);
-		if (err)
-			return err;
-
-		err = hci_update_scan_rsp_data_sync(hdev, cp->instance);
-		if (err)
-			return err;
-
-		return hci_enable_ext_advertising_sync(hdev, cp->instance);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-
-	return hci_schedule_adv_instance_sync(hdev, cp->instance, true);
 }
 
 static void add_ext_adv_data_complete(struct hci_dev *hdev, void *data, int err)
@@ -10345,7 +9664,6 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
 	struct mgmt_ev_device_connected *ev;
 	u16 eir_len = 0;
 	u32 flags = 0;
-<<<<<<< HEAD
 
 	/* allocate buff for LE or BR/EDR adv */
 	if (conn->le_adv_data_len > 0)
@@ -10356,18 +9674,6 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
 				     sizeof(*ev) + (name ? eir_precalc_len(name_len) : 0) +
 				     eir_precalc_len(sizeof(conn->dev_class)));
 
-=======
-
-	/* allocate buff for LE or BR/EDR adv */
-	if (conn->le_adv_data_len > 0)
-		skb = mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_CONNECTED,
-				     sizeof(*ev) + conn->le_adv_data_len);
-	else
-		skb = mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_CONNECTED,
-				     sizeof(*ev) + (name ? eir_precalc_len(name_len) : 0) +
-				     eir_precalc_len(sizeof(conn->dev_class)));
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ev = skb_put(skb, sizeof(*ev));
 	bacpy(&ev->addr.bdaddr, &conn->dst);
 	ev->addr.type = link_to_bdaddr(conn->type, conn->dst_type);
@@ -10992,7 +10298,6 @@ static void mgmt_adv_monitor_device_found(struct hci_dev *hdev,
 		kfree_skb(skb);
 }
 
-<<<<<<< HEAD
 static void mesh_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr,
 			      u8 addr_type, s8 rssi, u32 flags, u8 *eir,
 			      u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len,
@@ -11059,8 +10364,6 @@ accepted:
 	mgmt_event_skb(skb, NULL);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len,
@@ -11069,14 +10372,11 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
 	struct sk_buff *skb;
 	struct mgmt_ev_device_found *ev;
 	bool report_device = hci_discovery_active(hdev);
-<<<<<<< HEAD
 
 	if (hci_dev_test_flag(hdev, HCI_MESH) && link_type == LE_LINK)
 		mesh_device_found(hdev, bdaddr, addr_type, rssi, flags,
 				  eir, eir_len, scan_rsp, scan_rsp_len,
 				  instant);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Don't send events for a non-kernel initiated discovery. With
 	 * LE one exception is if we have pend_le_reports > 0 in which
@@ -11138,17 +10438,10 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
 	if (eir_len > 0)
 		/* Copy EIR or advertising data into event */
 		skb_put_data(skb, eir, eir_len);
-<<<<<<< HEAD
 
 	if (dev_class && !eir_get_data(eir, eir_len, EIR_CLASS_OF_DEV, NULL)) {
 		u8 eir_cod[5];
 
-=======
-
-	if (dev_class && !eir_get_data(eir, eir_len, EIR_CLASS_OF_DEV, NULL)) {
-		u8 eir_cod[5];
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		eir_len += eir_append_data(eir_cod, 0, EIR_CLASS_OF_DEV,
 					   dev_class, 3);
 		skb_put_data(skb, eir_cod, sizeof(eir_cod));

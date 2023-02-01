@@ -14,7 +14,6 @@
 #include "kvm_util.h"
 #include "processor.h"
 
-<<<<<<< HEAD
 /* VMCALL and VMMCALL are both 3-byte opcodes. */
 #define HYPERCALL_INSN_SIZE	3
 
@@ -39,51 +38,10 @@ static uint64_t do_sched_yield(uint8_t apic_id)
 		     : "=a"(ret)
 		     : "a"((uint64_t)KVM_HC_SCHED_YIELD), "b"((uint64_t)apic_id)
 		     : "memory");
-=======
-static bool ud_expected;
-
-static void guest_ud_handler(struct ex_regs *regs)
-{
-	GUEST_ASSERT(ud_expected);
-	GUEST_DONE();
-}
-
-extern unsigned char svm_hypercall_insn;
-static uint64_t svm_do_sched_yield(uint8_t apic_id)
-{
-	uint64_t ret;
-
-	asm volatile("mov %1, %%rax\n\t"
-		     "mov %2, %%rbx\n\t"
-		     "svm_hypercall_insn:\n\t"
-		     "vmmcall\n\t"
-		     "mov %%rax, %0\n\t"
-		     : "=r"(ret)
-		     : "r"((uint64_t)KVM_HC_SCHED_YIELD), "r"((uint64_t)apic_id)
-		     : "rax", "rbx", "memory");
 
 	return ret;
 }
 
-extern unsigned char vmx_hypercall_insn;
-static uint64_t vmx_do_sched_yield(uint8_t apic_id)
-{
-	uint64_t ret;
-
-	asm volatile("mov %1, %%rax\n\t"
-		     "mov %2, %%rbx\n\t"
-		     "vmx_hypercall_insn:\n\t"
-		     "vmcall\n\t"
-		     "mov %%rax, %0\n\t"
-		     : "=r"(ret)
-		     : "r"((uint64_t)KVM_HC_SCHED_YIELD), "r"((uint64_t)apic_id)
-		     : "rax", "rbx", "memory");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	return ret;
-}
-
-<<<<<<< HEAD
 static void guest_main(void)
 {
 	const uint8_t *native_hypercall_insn;
@@ -96,40 +54,12 @@ static void guest_main(void)
 	} else if (is_amd_cpu()) {
 		native_hypercall_insn = svm_vmmcall;
 		other_hypercall_insn  = vmx_vmcall;
-=======
-static void assert_hypercall_insn(unsigned char *exp_insn, unsigned char *obs_insn)
-{
-	uint32_t exp = 0, obs = 0;
-
-	memcpy(&exp, exp_insn, sizeof(exp));
-	memcpy(&obs, obs_insn, sizeof(obs));
-
-	GUEST_ASSERT_EQ(exp, obs);
-}
-
-static void guest_main(void)
-{
-	unsigned char *native_hypercall_insn, *hypercall_insn;
-	uint8_t apic_id;
-
-	apic_id = GET_APIC_ID_FIELD(xapic_read_reg(APIC_ID));
-
-	if (is_intel_cpu()) {
-		native_hypercall_insn = &vmx_hypercall_insn;
-		hypercall_insn = &svm_hypercall_insn;
-		svm_do_sched_yield(apic_id);
-	} else if (is_amd_cpu()) {
-		native_hypercall_insn = &svm_hypercall_insn;
-		hypercall_insn = &vmx_hypercall_insn;
-		vmx_do_sched_yield(apic_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		GUEST_ASSERT(0);
 		/* unreachable */
 		return;
 	}
 
-<<<<<<< HEAD
 	memcpy(hypercall_insn, other_hypercall_insn, HYPERCALL_INSN_SIZE);
 
 	ret = do_sched_yield(GET_APIC_ID_FIELD(xapic_read_reg(APIC_ID)));
@@ -153,20 +83,6 @@ static void guest_main(void)
 	GUEST_DONE();
 }
 
-=======
-	GUEST_ASSERT(!ud_expected);
-	assert_hypercall_insn(native_hypercall_insn, hypercall_insn);
-	GUEST_DONE();
-}
-
-static void setup_ud_vector(struct kvm_vcpu *vcpu)
-{
-	vm_init_descriptor_tables(vcpu->vm);
-	vcpu_init_descriptor_tables(vcpu);
-	vm_install_exception_handler(vcpu->vm, UD_VECTOR, guest_ud_handler);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void enter_guest(struct kvm_vcpu *vcpu)
 {
 	struct kvm_run *run = vcpu->run;
@@ -187,17 +103,12 @@ static void enter_guest(struct kvm_vcpu *vcpu)
 	}
 }
 
-<<<<<<< HEAD
 static void test_fix_hypercall(bool disable_quirk)
-=======
-static void test_fix_hypercall(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct kvm_vcpu *vcpu;
 	struct kvm_vm *vm;
 
 	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
-<<<<<<< HEAD
 
 	vm_init_descriptor_tables(vcpu->vm);
 	vcpu_init_descriptor_tables(vcpu);
@@ -209,31 +120,6 @@ static void test_fix_hypercall(void)
 
 	quirk_disabled = disable_quirk;
 	sync_global_to_guest(vm, quirk_disabled);
-=======
-	setup_ud_vector(vcpu);
-
-	ud_expected = false;
-	sync_global_to_guest(vm, ud_expected);
-
-	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
-
-	enter_guest(vcpu);
-}
-
-static void test_fix_hypercall_disabled(void)
-{
-	struct kvm_vcpu *vcpu;
-	struct kvm_vm *vm;
-
-	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
-	setup_ud_vector(vcpu);
-
-	vm_enable_cap(vm, KVM_CAP_DISABLE_QUIRKS2,
-		      KVM_X86_QUIRK_FIX_HYPERCALL_INSN);
-
-	ud_expected = true;
-	sync_global_to_guest(vm, ud_expected);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
 
@@ -244,11 +130,6 @@ int main(void)
 {
 	TEST_REQUIRE(kvm_check_cap(KVM_CAP_DISABLE_QUIRKS2) & KVM_X86_QUIRK_FIX_HYPERCALL_INSN);
 
-<<<<<<< HEAD
 	test_fix_hypercall(false);
 	test_fix_hypercall(true);
-=======
-	test_fix_hypercall();
-	test_fix_hypercall_disabled();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

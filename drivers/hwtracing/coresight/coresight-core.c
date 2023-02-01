@@ -1691,16 +1691,11 @@ struct coresight_device *coresight_register(struct coresight_desc *desc)
 out_unlock:
 	mutex_unlock(&coresight_mutex);
 	/* Success */
-<<<<<<< HEAD
 	if (!ret) {
 		if (cti_assoc_ops && cti_assoc_ops->add)
 			cti_assoc_ops->add(csdev);
 		return csdev;
 	}
-=======
-	if (!ret)
-		return csdev;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Unregister the device if needed */
 	if (registered) {
@@ -1808,21 +1803,12 @@ static int __init coresight_init(void)
 	ret = etm_perf_init();
 	if (ret)
 		goto exit_bus_unregister;
-<<<<<<< HEAD
 
 	/* initialise the coresight syscfg API */
 	ret = cscfg_init();
 	if (!ret)
 		return 0;
 
-=======
-
-	/* initialise the coresight syscfg API */
-	ret = cscfg_init();
-	if (!ret)
-		return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	etm_perf_exit();
 exit_bus_unregister:
 	bus_unregister(&coresight_bustype);

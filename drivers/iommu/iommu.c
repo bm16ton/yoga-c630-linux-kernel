@@ -8,7 +8,6 @@
 
 #include <linux/amba/bus.h>
 #include <linux/device.h>
-#include <linux/dma-iommu.h>
 #include <linux/kernel.h>
 #include <linux/bits.h>
 #include <linux/bug.h>
@@ -80,11 +79,8 @@ static const char * const iommu_group_resv_type_string[] = {
 #define IOMMU_CMD_LINE_DMA_API		BIT(0)
 #define IOMMU_CMD_LINE_STRICT		BIT(1)
 
-<<<<<<< HEAD
 static int iommu_bus_notifier(struct notifier_block *nb,
 			      unsigned long action, void *data);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int iommu_alloc_default_domain(struct iommu_group *group,
 				      struct device *dev);
 static struct iommu_domain *__iommu_domain_alloc(struct bus_type *bus,
@@ -152,11 +148,8 @@ static const char *iommu_domain_type_str(unsigned int t)
 
 static int __init iommu_subsys_init(void)
 {
-<<<<<<< HEAD
 	struct notifier_block *nb;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!(iommu_cmd_line & IOMMU_CMD_LINE_DMA_API)) {
 		if (IS_ENABLED(CONFIG_IOMMU_DEFAULT_PASSTHROUGH))
 			iommu_set_default_passthrough(false);
@@ -182,7 +175,6 @@ static int __init iommu_subsys_init(void)
 			iommu_dma_strict ? "strict" : "lazy",
 			(iommu_cmd_line & IOMMU_CMD_LINE_STRICT) ?
 				"(set via kernel command line)" : "");
-<<<<<<< HEAD
 
 	nb = kcalloc(ARRAY_SIZE(iommu_buses), sizeof(*nb), GFP_KERNEL);
 	if (!nb)
@@ -192,14 +184,11 @@ static int __init iommu_subsys_init(void)
 		nb[i].notifier_call = iommu_bus_notifier;
 		bus_register_notifier(iommu_buses[i], &nb[i]);
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 subsys_initcall(iommu_subsys_init);
 
-<<<<<<< HEAD
 static int remove_iommu_group(struct device *dev, void *data)
 {
 	if (dev->iommu && dev->iommu->iommu_dev == data)
@@ -208,8 +197,6 @@ static int remove_iommu_group(struct device *dev, void *data)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * iommu_device_register() - Register an IOMMU hardware instance
  * @iommu: IOMMU handle for the instance
@@ -221,7 +208,6 @@ static int remove_iommu_group(struct device *dev, void *data)
 int iommu_device_register(struct iommu_device *iommu,
 			  const struct iommu_ops *ops, struct device *hwdev)
 {
-<<<<<<< HEAD
 	int err = 0;
 
 	/* We need to be able to take module references appropriately */
@@ -238,15 +224,6 @@ int iommu_device_register(struct iommu_device *iommu,
 	iommu->ops = ops;
 	if (hwdev)
 		iommu->fwnode = dev_fwnode(hwdev);
-=======
-	/* We need to be able to take module references appropriately */
-	if (WARN_ON(is_module_address((unsigned long)ops) && !ops->owner))
-		return -EINVAL;
-
-	iommu->ops = ops;
-	if (hwdev)
-		iommu->fwnode = hwdev->fwnode;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	spin_lock(&iommu_device_lock);
 	list_add_tail(&iommu->list, &iommu_device_list);
@@ -753,10 +730,6 @@ struct iommu_group *iommu_group_alloc(void)
 	ret = kobject_init_and_add(&group->kobj, &iommu_group_ktype,
 				   NULL, "%d", group->id);
 	if (ret) {
-<<<<<<< HEAD
-=======
-		ida_free(&iommu_group_ida, group->id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kobject_put(&group->kobj);
 		return ERR_PTR(ret);
 	}
@@ -1891,37 +1864,8 @@ bool device_iommu_capable(struct device *dev, enum iommu_cap cap)
 	if (!dev->iommu || !dev->iommu->iommu_dev)
 		return false;
 
-<<<<<<< HEAD
 	ops = dev_iommu_ops(dev);
 	if (!ops->capable)
-=======
-/**
- * device_iommu_capable() - check for a general IOMMU capability
- * @dev: device to which the capability would be relevant, if available
- * @cap: IOMMU capability
- *
- * Return: true if an IOMMU is present and supports the given capability
- * for the given device, otherwise false.
- */
-bool device_iommu_capable(struct device *dev, enum iommu_cap cap)
-{
-	const struct iommu_ops *ops;
-
-	if (!dev->iommu || !dev->iommu->iommu_dev)
-		return false;
-
-	ops = dev_iommu_ops(dev);
-	if (!ops->capable)
-		return false;
-
-	return ops->capable(cap);
-}
-EXPORT_SYMBOL_GPL(device_iommu_capable);
-
-bool iommu_capable(struct bus_type *bus, enum iommu_cap cap)
-{
-	if (!bus->iommu_ops || !bus->iommu_ops->capable)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 
 	return ops->capable(dev, cap);
@@ -2244,7 +2188,6 @@ static size_t iommu_pgsize(struct iommu_domain *domain, unsigned long iova,
 
 	/* Make sure we have at least one suitable page size */
 	BUG_ON(!pgsizes);
-<<<<<<< HEAD
 
 	/* Pick the biggest page size remaining */
 	pgsize_idx = __fls(pgsizes);
@@ -2277,40 +2220,6 @@ static size_t iommu_pgsize(struct iommu_domain *domain, unsigned long iova,
 	if (offset + pgsize_next <= size)
 		size = offset;
 
-=======
-
-	/* Pick the biggest page size remaining */
-	pgsize_idx = __fls(pgsizes);
-	pgsize = BIT(pgsize_idx);
-	if (!count)
-		return pgsize;
-
-	/* Find the next biggest support page size, if it exists */
-	pgsizes = domain->pgsize_bitmap & ~GENMASK(pgsize_idx, 0);
-	if (!pgsizes)
-		goto out_set_count;
-
-	pgsize_idx_next = __ffs(pgsizes);
-	pgsize_next = BIT(pgsize_idx_next);
-
-	/*
-	 * There's no point trying a bigger page size unless the virtual
-	 * and physical addresses are similarly offset within the larger page.
-	 */
-	if ((iova ^ paddr) & (pgsize_next - 1))
-		goto out_set_count;
-
-	/* Calculate the offset to the next page size alignment boundary */
-	offset = pgsize_next - (addr_merge & (pgsize_next - 1));
-
-	/*
-	 * If size is big enough to accommodate the larger page, reduce
-	 * the number of smaller pages.
-	 */
-	if (offset + pgsize_next <= size)
-		size = offset;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_set_count:
 	*count = size >> pgsize_idx;
 	return pgsize;

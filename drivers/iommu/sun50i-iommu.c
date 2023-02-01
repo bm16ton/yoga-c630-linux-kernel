@@ -836,10 +836,7 @@ static const struct iommu_ops sun50i_iommu_ops = {
 		.attach_dev	= sun50i_iommu_attach_device,
 		.detach_dev	= sun50i_iommu_detach_device,
 		.flush_iotlb_all = sun50i_iommu_flush_iotlb_all,
-<<<<<<< HEAD
 		.iotlb_sync_map = sun50i_iommu_iotlb_sync_map,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.iotlb_sync	= sun50i_iommu_iotlb_sync,
 		.iova_to_phys	= sun50i_iommu_iova_to_phys,
 		.map		= sun50i_iommu_map,

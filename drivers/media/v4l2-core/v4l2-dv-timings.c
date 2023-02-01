@@ -168,7 +168,6 @@ bool v4l2_valid_dv_timings(const struct v4l2_dv_timings *t,
 	if (!bt->interlaced &&
 	    (bt->il_vbackporch || bt->il_vsync || bt->il_vfrontporch))
 		return false;
-<<<<<<< HEAD
 	/*
 	 * Some video receivers cannot properly separate the frontporch,
 	 * backporch and sync values, and instead they only have the total
@@ -183,16 +182,6 @@ bool v4l2_valid_dv_timings(const struct v4l2_dv_timings *t,
 		return false;
 	if (bt->interlaced && (bt->il_vfrontporch > max_vert ||
 	    bt->il_vsync > max_vert || bt->il_vbackporch > max_vert))
-=======
-	if (bt->hfrontporch > 2 * bt->width ||
-	    bt->hsync > 1024 || bt->hbackporch > 1024)
-		return false;
-	if (bt->vfrontporch > 4096 ||
-	    bt->vsync > 128 || bt->vbackporch > 4096)
-		return false;
-	if (bt->interlaced && (bt->il_vfrontporch > 4096 ||
-	    bt->il_vsync > 128 || bt->il_vbackporch > 4096))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 	return fnc == NULL || fnc(t, fnc_handle);
 }

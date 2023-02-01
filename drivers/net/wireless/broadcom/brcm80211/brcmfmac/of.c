@@ -88,11 +88,7 @@ void brcmf_of_probe(struct device *dev, enum brcmf_bus_type bus_type,
 
 	/* Set board-type to the first string of the machine compatible prop */
 	root = of_find_node_by_path("/");
-<<<<<<< HEAD
 	if (root && err) {
-=======
-	if (root) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		char *board_type;
 		const char *tmp;
 

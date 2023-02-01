@@ -386,59 +386,8 @@ err_put_file:
 	fput(sync_file->file);
 err_put_fd:
 	put_unused_fd(fd);
-<<<<<<< HEAD
 	return ret;
 }
-
-static long dma_buf_import_sync_file(struct dma_buf *dmabuf,
-				     const void __user *user_data)
-{
-	struct dma_buf_import_sync_file arg;
-	struct dma_fence *fence, *f;
-	enum dma_resv_usage usage;
-	struct dma_fence_unwrap iter;
-	unsigned int num_fences;
-	int ret = 0;
-
-	if (copy_from_user(&arg, user_data, sizeof(arg)))
-		return -EFAULT;
-
-	if (arg.flags & ~DMA_BUF_SYNC_RW)
-		return -EINVAL;
-
-	if ((arg.flags & DMA_BUF_SYNC_RW) == 0)
-		return -EINVAL;
-
-	fence = sync_file_get_fence(arg.fd);
-	if (!fence)
-		return -EINVAL;
-
-	usage = (arg.flags & DMA_BUF_SYNC_WRITE) ? DMA_RESV_USAGE_WRITE :
-						   DMA_RESV_USAGE_READ;
-
-	num_fences = 0;
-	dma_fence_unwrap_for_each(f, &iter, fence)
-		++num_fences;
-
-	if (num_fences > 0) {
-		dma_resv_lock(dmabuf->resv, NULL);
-
-		ret = dma_resv_reserve_fences(dmabuf->resv, num_fences);
-		if (!ret) {
-			dma_fence_unwrap_for_each(f, &iter, fence)
-				dma_resv_add_fence(dmabuf->resv, f, usage);
-		}
-
-		dma_resv_unlock(dmabuf->resv);
-	}
-
-	dma_fence_put(fence);
-
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	return ret;
-}
-#endif
 
 static long dma_buf_import_sync_file(struct dma_buf *dmabuf,
 				     const void __user *user_data)
@@ -578,10 +527,6 @@ static inline int is_dma_buf_file(struct file *file)
 static struct file *dma_buf_getfile(size_t size, int flags)
 {
 	static atomic64_t dmabuf_inode = ATOMIC64_INIT(0);
-<<<<<<< HEAD
-=======
-	struct file *file;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct inode *inode = alloc_anon_inode(dma_buf_mnt->mnt_sb);
 	struct file *file;
 
@@ -598,10 +543,7 @@ static struct file *dma_buf_getfile(size_t size, int flags)
 	 * value.
 	 */
 	inode->i_ino = atomic64_add_return(1, &dmabuf_inode);
-<<<<<<< HEAD
 	flags &= O_ACCMODE | O_NONBLOCK;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	file = alloc_file_pseudo(inode, dma_buf_mnt, "dmabuf",
 				 flags, &dma_buf_fops);
 	if (IS_ERR(file))
@@ -713,11 +655,8 @@ struct dma_buf *dma_buf_export(const struct dma_buf_export_info *exp_info)
 	init_waitqueue_head(&dmabuf->poll);
 	dmabuf->cb_in.poll = dmabuf->cb_out.poll = &dmabuf->poll;
 	dmabuf->cb_in.active = dmabuf->cb_out.active = 0;
-<<<<<<< HEAD
 	mutex_init(&dmabuf->lock);
 	INIT_LIST_HEAD(&dmabuf->attachments);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!resv) {
 		dmabuf->resv = (struct dma_resv *)&dmabuf[1];
@@ -730,31 +669,16 @@ struct dma_buf *dma_buf_export(const struct dma_buf_export_info *exp_info)
 	if (ret)
 		goto err_dmabuf;
 
-<<<<<<< HEAD
 	file->private_data = dmabuf;
 	file->f_path.dentry->d_fsdata = dmabuf;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dmabuf->file = file;
 
 	mutex_lock(&db_list.lock);
 	list_add(&dmabuf->list_node, &db_list.head);
 	mutex_unlock(&db_list.lock);
 
-	ret = dma_buf_stats_setup(dmabuf);
-	if (ret)
-		goto err_sysfs;
-
 	return dmabuf;
 
-err_sysfs:
-	/*
-	 * Set file->f_path.dentry->d_fsdata to NULL so that when
-	 * dma_buf_release() gets invoked by dentry_ops, it exits
-	 * early before calling the release() dma_buf op.
-	 */
-	file->f_path.dentry->d_fsdata = NULL;
-	fput(file);
 err_dmabuf:
 	if (!resv)
 		dma_resv_fini(dmabuf->resv);

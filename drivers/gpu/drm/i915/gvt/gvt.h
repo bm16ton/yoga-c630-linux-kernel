@@ -36,10 +36,7 @@
 #include <uapi/linux/pci_regs.h>
 #include <linux/kvm_host.h>
 #include <linux/vfio.h>
-<<<<<<< HEAD
 #include <linux/mdev.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "i915_drv.h"
 #include "intel_gvt.h"
@@ -216,10 +213,6 @@ struct intel_vgpu {
 
 	u32 scan_nonprivbb;
 
-<<<<<<< HEAD
-=======
-	struct vfio_device vfio_device;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vfio_region *region;
 	int num_regions;
 	struct eventfd_ctx *intx_trigger;
@@ -456,20 +449,6 @@ int intel_gvt_load_firmware(struct intel_gvt *gvt);
 /* ring context size i.e. the first 0x50 dwords*/
 #define RING_CTX_SIZE 320
 
-<<<<<<< HEAD
-=======
-struct intel_vgpu_creation_params {
-	__u64 low_gm_sz;  /* in MB */
-	__u64 high_gm_sz; /* in MB */
-	__u64 fence_sz;
-	__u64 resolution;
-	__s32 primary;
-	__u64 vgpu_id;
-
-	__u32 weight;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int intel_vgpu_alloc_resource(struct intel_vgpu *vgpu,
 			      const struct intel_vgpu_config *conf);
 void intel_vgpu_reset_resource(struct intel_vgpu *vgpu);

@@ -2324,16 +2324,10 @@ static void record_and_restart(struct perf_event *event, unsigned long val,
 		}
 
 		if (event->attr.sample_type & PERF_SAMPLE_WEIGHT_TYPE &&
-<<<<<<< HEAD
 						ppmu->get_mem_weight) {
 			ppmu->get_mem_weight(&data.weight.full, event->attr.sample_type);
 			data.sample_flags |= PERF_SAMPLE_WEIGHT_TYPE;
 		}
-=======
-						ppmu->get_mem_weight)
-			ppmu->get_mem_weight(&data.weight.full, event->attr.sample_type);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (perf_event_overflow(event, &data, regs))
 			power_pmu_stop(event, 0);
 	} else if (period) {

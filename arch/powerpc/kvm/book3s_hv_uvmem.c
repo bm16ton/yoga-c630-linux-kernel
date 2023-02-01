@@ -718,11 +718,7 @@ static struct page *kvmppc_uvmem_get_page(unsigned long gpa, struct kvm *kvm)
 
 	dpage = pfn_to_page(uvmem_pfn);
 	dpage->zone_device_data = pvt;
-<<<<<<< HEAD
 	zone_device_page_init(dpage);
-=======
-	lock_page(dpage);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return dpage;
 out_clear:
 	spin_lock(&kvmppc_uvmem_bitmap_lock);

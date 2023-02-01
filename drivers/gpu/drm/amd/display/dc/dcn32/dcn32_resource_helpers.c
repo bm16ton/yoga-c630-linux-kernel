@@ -28,14 +28,11 @@
 #include "dcn20/dcn20_resource.h"
 #include "dml/dcn32/display_mode_vba_util_32.h"
 
-<<<<<<< HEAD
 static bool is_dual_plane(enum surface_pixel_format format)
 {
 	return format >= SURFACE_PIXEL_FORMAT_VIDEO_BEGIN || format == SURFACE_PIXEL_FORMAT_GRPH_RGBE_ALPHA;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * ********************************************************************************************
  * dcn32_helper_calculate_num_ways_for_subvp: Calculate number of ways needed for SubVP
@@ -74,16 +71,11 @@ uint32_t dcn32_helper_calculate_num_ways_for_subvp(struct dc *dc, struct dc_stat
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 
-<<<<<<< HEAD
 		/* Find the phantom pipes.
 		 * - For pipe split case we need to loop through the bottom and next ODM
 		 *   pipes or only half the viewport size is counted
 		 */
 		if (pipe->stream && pipe->plane_state &&
-=======
-		// Find the phantom pipes
-		if (pipe->stream && pipe->plane_state && !pipe->top_pipe && !pipe->prev_odm_pipe &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pipe->stream->mall_stream_config.type == SUBVP_PHANTOM) {
 			struct pipe_ctx *main_pipe = NULL;
 
@@ -119,11 +111,7 @@ uint32_t dcn32_helper_calculate_num_ways_for_subvp(struct dc *dc, struct dc_stat
 			mall_alloc_width_blk_aligned = full_vp_width_blk_aligned;
 
 			/* mall_alloc_height_blk_aligned_l/c = CEILING(sub_vp_height_l/c - 1, blk_height_l/c) + blk_height_l/c */
-<<<<<<< HEAD
 			mall_alloc_height_blk_aligned = (pipe->plane_res.scl_data.viewport.height - 1 + mblk_height - 1) /
-=======
-			mall_alloc_height_blk_aligned = (pipe->stream->timing.v_addressable - 1 + mblk_height - 1) /
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					mblk_height * mblk_height + mblk_height;
 
 			/* full_mblk_width_ub_l/c = mall_alloc_width_blk_aligned_l/c;
@@ -138,15 +126,9 @@ uint32_t dcn32_helper_calculate_num_ways_for_subvp(struct dc *dc, struct dc_stat
 			// (MALL is 64-byte aligned)
 			cache_lines_per_plane = bytes_in_mall / dc->caps.cache_line_size + 2;
 
-<<<<<<< HEAD
 			/* For DCC divide by 256 */
 			if (pipe->plane_state->dcc.enable)
 				cache_lines_per_plane = cache_lines_per_plane + (cache_lines_per_plane / 256) + 1;
-=======
-			// For DCC we must cache the meat surface, so double cache lines required
-			if (pipe->plane_state->dcc.enable)
-				cache_lines_per_plane *= 2;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			cache_lines_used += cache_lines_per_plane;
 		}
 	}
@@ -251,7 +233,6 @@ bool dcn32_mpo_in_use(struct dc_state *context)
 	return false;
 }
 
-<<<<<<< HEAD
 
 bool dcn32_any_surfaces_rotated(struct dc *dc, struct dc_state *context)
 {
@@ -470,38 +451,3 @@ void dcn32_restore_mall_state(struct dc *dc,
 			pipe->plane_state->is_phantom = temp_config->is_phantom_plane[i];
 	}
 }
-=======
-void dcn32_determine_det_override(struct dc_state *context, display_e2e_pipe_params_st *pipes,
-		bool *is_pipe_split_expected, int pipe_cnt)
-{
-	int i, j, count, stream_segments, pipe_segments[MAX_PIPES];
-
-	if (context->stream_count > 0) {
-		stream_segments = 18 / context->stream_count;
-		for (i = 0; i < context->stream_count; i++) {
-			count = 0;
-			for (j = 0; j < pipe_cnt; j++) {
-				if (context->res_ctx.pipe_ctx[j].stream == context->streams[i]) {
-					count++;
-					if (is_pipe_split_expected[j])
-						count++;
-				}
-			}
-			pipe_segments[i] = stream_segments / count;
-		}
-
-		for (i = 0; i < pipe_cnt; i++) {
-			pipes[i].pipe.src.det_size_override = 0;
-			for (j = 0; j < context->stream_count; j++) {
-				if (context->res_ctx.pipe_ctx[i].stream == context->streams[j]) {
-					pipes[i].pipe.src.det_size_override = pipe_segments[j] * DCN3_2_DET_SEG_SIZE;
-					break;
-				}
-			}
-		}
-	} else {
-		for (i = 0; i < pipe_cnt; i++)
-			pipes[i].pipe.src.det_size_override = 4 * DCN3_2_DET_SEG_SIZE; //DCN3_2_DEFAULT_DET_SIZE
-	}
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

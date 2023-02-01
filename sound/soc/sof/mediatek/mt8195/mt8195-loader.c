@@ -21,11 +21,7 @@ void sof_hifixdsp_boot_sequence(struct snd_sof_dev *sdev, u32 boot_addr)
 
 	/* pull high StatVectorSel to use AltResetVec (set bit4 to 1) */
 	snd_sof_dsp_update_bits(sdev, DSP_REG_BAR, DSP_RESET_SW,
-<<<<<<< HEAD
 				STATVECTOR_SEL, STATVECTOR_SEL);
-=======
-				DSP_RESET_SW, DSP_RESET_SW);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* toggle  DReset & BReset */
 	/* pull high DReset & BReset */
@@ -33,12 +29,9 @@ void sof_hifixdsp_boot_sequence(struct snd_sof_dev *sdev, u32 boot_addr)
 				ADSP_BRESET_SW | ADSP_DRESET_SW,
 				ADSP_BRESET_SW | ADSP_DRESET_SW);
 
-<<<<<<< HEAD
 	/* delay 10 DSP cycles at 26M about 1us by IP vendor's suggestion */
 	udelay(1);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* pull low DReset & BReset */
 	snd_sof_dsp_update_bits(sdev, DSP_REG_BAR, DSP_RESET_SW,
 				ADSP_BRESET_SW | ADSP_DRESET_SW,
@@ -56,7 +49,6 @@ void sof_hifixdsp_boot_sequence(struct snd_sof_dev *sdev, u32 boot_addr)
 
 void sof_hifixdsp_shutdown(struct snd_sof_dev *sdev)
 {
-<<<<<<< HEAD
 	/* RUN_STALL pull high again to reset */
 	snd_sof_dsp_update_bits(sdev, DSP_REG_BAR, DSP_RESET_SW,
 				ADSP_RUNSTALL, ADSP_RUNSTALL);
@@ -65,13 +57,5 @@ void sof_hifixdsp_shutdown(struct snd_sof_dev *sdev)
 	snd_sof_dsp_update_bits(sdev, DSP_REG_BAR, DSP_RESET_SW,
 				ADSP_BRESET_SW | ADSP_DRESET_SW,
 				ADSP_BRESET_SW | ADSP_DRESET_SW);
-=======
-	/* Clear to 0 firstly */
-	snd_sof_dsp_write(sdev, DSP_REG_BAR, DSP_RESET_SW, 0x0);
-
-	/* RUN_STALL pull high again to reset */
-	snd_sof_dsp_update_bits(sdev, DSP_REG_BAR, DSP_RESET_SW,
-				ADSP_RUNSTALL, ADSP_RUNSTALL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 

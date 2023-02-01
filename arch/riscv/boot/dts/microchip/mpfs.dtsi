@@ -330,11 +330,7 @@
 		};
 
 		qspi: spi@21000000 {
-<<<<<<< HEAD
 			compatible = "microchip,mpfs-qspi", "microchip,coreqspi-rtl-v2";
-=======
-			compatible = "microchip,mpfs-qspi";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0x0 0x21000000 0x0 0x1000>;
@@ -468,38 +464,6 @@
 			status = "disabled";
 		};
 
-<<<<<<< HEAD
-=======
-		pcie: pcie@2000000000 {
-			compatible = "microchip,pcie-host-1.0";
-			#address-cells = <0x3>;
-			#interrupt-cells = <0x1>;
-			#size-cells = <0x2>;
-			device_type = "pci";
-			reg = <0x20 0x0 0x0 0x8000000>, <0x0 0x43000000 0x0 0x10000>;
-			reg-names = "cfg", "apb";
-			bus-range = <0x0 0x7f>;
-			interrupt-parent = <&plic>;
-			interrupts = <119>;
-			interrupt-map = <0 0 0 1 &pcie_intc 0>,
-					<0 0 0 2 &pcie_intc 1>,
-					<0 0 0 3 &pcie_intc 2>,
-					<0 0 0 4 &pcie_intc 3>;
-			interrupt-map-mask = <0 0 0 7>;
-			clocks = <&fabric_clk1>, <&fabric_clk1>, <&fabric_clk3>;
-			clock-names = "fic0", "fic1", "fic3";
-			ranges = <0x3000000 0x0 0x8000000 0x20 0x8000000 0x0 0x80000000>;
-			msi-parent = <&pcie>;
-			msi-controller;
-			status = "disabled";
-			pcie_intc: interrupt-controller {
-				#address-cells = <0>;
-				#interrupt-cells = <1>;
-				interrupt-controller;
-			};
-		};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mbox: mailbox@37020000 {
 			compatible = "microchip,mpfs-mailbox";
 			reg = <0x0 0x37020000 0x0 0x1000>, <0x0 0x2000318C 0x0 0x40>;

@@ -59,10 +59,7 @@
 MODULE_FIRMWARE("amdgpu/aldebaran_smc.bin");
 MODULE_FIRMWARE("amdgpu/smu_13_0_0.bin");
 MODULE_FIRMWARE("amdgpu/smu_13_0_7.bin");
-<<<<<<< HEAD
 MODULE_FIRMWARE("amdgpu/smu_13_0_10.bin");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define mmMP1_SMN_C2PMSG_66                                                                            0x0282
 #define mmMP1_SMN_C2PMSG_66_BASE_IDX                                                                   0
@@ -213,13 +210,9 @@ int smu_v13_0_init_pptable_microcode(struct smu_context *smu)
 	if (!adev->scpm_enabled)
 		return 0;
 
-<<<<<<< HEAD
 	if ((adev->ip_versions[MP1_HWIP][0] == IP_VERSION(13, 0, 7)) ||
 	    (adev->ip_versions[MP1_HWIP][0] == IP_VERSION(13, 0, 0)) ||
 	    (adev->ip_versions[MP1_HWIP][0] == IP_VERSION(13, 0, 10)))
-=======
-	if (adev->ip_versions[MP1_HWIP][0] == IP_VERSION(13, 0, 7))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	/* override pptable_id from driver parameter */
@@ -228,30 +221,6 @@ int smu_v13_0_init_pptable_microcode(struct smu_context *smu)
 		dev_info(adev->dev, "override pptable id %d\n", pptable_id);
 	} else {
 		pptable_id = smu->smu_table.boot_values.pp_table_id;
-<<<<<<< HEAD
-=======
-
-		/*
-		 * Temporary solution for SMU V13.0.0 with SCPM enabled:
-		 *   - use vbios carried pptable when pptable_id is 3664, 3715 or 3795
-		 *   - use 36831 soft pptable when pptable_id is 3683
-		 */
-		if (adev->ip_versions[MP1_HWIP][0] == IP_VERSION(13, 0, 0)) {
-			switch (pptable_id) {
-			case 3664:
-			case 3715:
-			case 3795:
-				pptable_id = 0;
-				break;
-			case 3683:
-				pptable_id = 36831;
-				break;
-			default:
-				dev_err(adev->dev, "Unsupported pptable id %d\n", pptable_id);
-				return -EINVAL;
-			}
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* "pptable_id == 0" means vbios carries the pptable. */
@@ -281,10 +250,7 @@ int smu_v13_0_check_fw_status(struct smu_context *smu)
 
 	switch (adev->ip_versions[MP1_HWIP][0]) {
 	case IP_VERSION(13, 0, 4):
-<<<<<<< HEAD
 	case IP_VERSION(13, 0, 11):
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mp1_fw_flags = RREG32_PCIE(MP1_Public |
 					   (smnMP1_V13_0_4_FIRMWARE_FLAGS & 0xffffffff));
 		break;
@@ -324,11 +290,8 @@ int smu_v13_0_check_fw_version(struct smu_context *smu)
 		smu->smc_driver_if_version = SMU13_DRIVER_IF_VERSION_ALDE;
 		break;
 	case IP_VERSION(13, 0, 0):
-<<<<<<< HEAD
 		smu->smc_driver_if_version = SMU13_DRIVER_IF_VERSION_SMU_V13_0_0_0;
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case IP_VERSION(13, 0, 10):
 		smu->smc_driver_if_version = SMU13_DRIVER_IF_VERSION_SMU_V13_0_0_10;
 		break;
@@ -341,10 +304,7 @@ int smu_v13_0_check_fw_version(struct smu_context *smu)
 		smu->smc_driver_if_version = SMU13_DRIVER_IF_VERSION_YELLOW_CARP;
 		break;
 	case IP_VERSION(13, 0, 4):
-<<<<<<< HEAD
 	case IP_VERSION(13, 0, 11):
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		smu->smc_driver_if_version = SMU13_DRIVER_IF_VERSION_SMU_V13_0_4;
 		break;
 	case IP_VERSION(13, 0, 5):
@@ -497,30 +457,6 @@ int smu_v13_0_setup_pptable(struct smu_context *smu)
 		dev_info(adev->dev, "override pptable id %d\n", pptable_id);
 	} else {
 		pptable_id = smu->smu_table.boot_values.pp_table_id;
-<<<<<<< HEAD
-=======
-
-		/*
-		 * Temporary solution for SMU V13.0.0 with SCPM disabled:
-		 *   - use 3664, 3683 or 3715 on request
-		 *   - use 3664 when pptable_id is 0
-		 * TODO: drop these when the pptable carried in vbios is ready.
-		 */
-		if (adev->ip_versions[MP1_HWIP][0] == IP_VERSION(13, 0, 0)) {
-			switch (pptable_id) {
-			case 0:
-				pptable_id = 3664;
-				break;
-			case 3664:
-			case 3683:
-			case 3715:
-				break;
-			default:
-				dev_err(adev->dev, "Unsupported pptable id %d\n", pptable_id);
-				return -EINVAL;
-			}
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* force using vbios pptable in sriov mode */
@@ -908,11 +844,8 @@ int smu_v13_0_gfx_off_control(struct smu_context *smu, bool enable)
 	case IP_VERSION(13, 0, 5):
 	case IP_VERSION(13, 0, 7):
 	case IP_VERSION(13, 0, 8):
-<<<<<<< HEAD
 	case IP_VERSION(13, 0, 10):
 	case IP_VERSION(13, 0, 11):
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!(adev->pm.pp_feature & PP_GFXOFF_MASK))
 			return 0;
 		if (enable)
@@ -1137,12 +1070,9 @@ int smu_v13_0_enable_thermal_alert(struct smu_context *smu)
 {
 	int ret = 0;
 
-<<<<<<< HEAD
 	if (!smu->irq_source.num_types)
 		return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = amdgpu_irq_get(smu->adev, &smu->irq_source, 0);
 	if (ret)
 		return ret;
@@ -1152,12 +1082,9 @@ int smu_v13_0_enable_thermal_alert(struct smu_context *smu)
 
 int smu_v13_0_disable_thermal_alert(struct smu_context *smu)
 {
-<<<<<<< HEAD
 	if (!smu->irq_source.num_types)
 		return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return amdgpu_irq_put(smu->adev, &smu->irq_source, 0);
 }
 
@@ -1334,12 +1261,8 @@ int smu_v13_0_set_fan_speed_rpm(struct smu_context *smu,
 				uint32_t speed)
 {
 	struct amdgpu_device *adev = smu->adev;
-<<<<<<< HEAD
 	uint32_t crystal_clock_freq = 2500;
 	uint32_t tach_period;
-=======
-	uint32_t tach_period, crystal_clock_freq;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (!speed)
@@ -1349,10 +1272,6 @@ int smu_v13_0_set_fan_speed_rpm(struct smu_context *smu,
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-=======
-	crystal_clock_freq = amdgpu_asic_get_xclk(adev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tach_period = 60 * crystal_clock_freq * 10000 / (8 * speed);
 	WREG32_SOC15(THM, 0, regCG_TACH_CTRL,
 		     REG_SET_FIELD(RREG32_SOC15(THM, 0, regCG_TACH_CTRL),
@@ -1537,12 +1456,9 @@ int smu_v13_0_register_irq_handler(struct smu_context *smu)
 	struct amdgpu_irq_src *irq_src = &smu->irq_source;
 	int ret = 0;
 
-<<<<<<< HEAD
 	if (amdgpu_sriov_vf(adev))
 		return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	irq_src->num_types = 1;
 	irq_src->funcs = &smu_v13_0_irq_funcs;
 
@@ -2235,7 +2151,6 @@ int smu_v13_0_run_btc(struct smu_context *smu)
 	return res;
 }
 
-<<<<<<< HEAD
 int smu_v13_0_gpo_control(struct smu_context *smu,
 			  bool enablement)
 {
@@ -2251,8 +2166,6 @@ int smu_v13_0_gpo_control(struct smu_context *smu,
 	return res;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int smu_v13_0_deep_sleep_control(struct smu_context *smu,
 				 bool enablement)
 {
@@ -2354,13 +2267,10 @@ bool smu_v13_0_baco_is_support(struct smu_context *smu)
 	    !smu_baco->platform_support)
 		return false;
 
-<<<<<<< HEAD
 	/* return true if ASIC is in BACO state already */
 	if (smu_v13_0_baco_get_state(smu) == SMU_BACO_STATE_ENTER)
 		return true;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (smu_cmn_feature_is_supported(smu, SMU_FEATURE_BACO_BIT) &&
 	    !smu_cmn_feature_is_enabled(smu, SMU_FEATURE_BACO_BIT))
 		return false;

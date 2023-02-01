@@ -87,7 +87,6 @@ ap_ts_pen_1v8: &i2c13 {
 	pins = "gpio51";
 };
 
-<<<<<<< HEAD
 &sound {
 	audio-routing =
 		"IN1_HPHL", "HPHL_OUT",
@@ -118,8 +117,6 @@ ap_ts_pen_1v8: &i2c13 {
 	us-euro-gpios = <&tlmm 81 GPIO_ACTIVE_HIGH>;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &tlmm {
 	tp_int_odl: tp-int-odl {
 		pins = "gpio7";
@@ -138,7 +135,6 @@ ap_ts_pen_1v8: &i2c13 {
 		function = "gpio";
 		bias-disable;
 	};
-<<<<<<< HEAD
 
 	us_euro_hs_sel: us-euro-hs-sel {
 		pins = "gpio81";
@@ -146,6 +142,4 @@ ap_ts_pen_1v8: &i2c13 {
 		bias-pull-down;
 		drive-strength = <2>;
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

@@ -4,24 +4,11 @@
 #ifndef __MT7915_REGS_H
 #define __MT7915_REGS_H
 
-<<<<<<< HEAD
-=======
-struct __map {
-	u32 phys;
-	u32 maps;
-	u32 size;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* used to differentiate between generations */
 struct mt7915_reg_desc {
 	const u32 *reg_rev;
 	const u32 *offs_rev;
-<<<<<<< HEAD
 	const struct mt76_connac_reg_map *map;
-=======
-	const struct __map *map;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 map_size;
 };
 
@@ -59,10 +46,7 @@ enum offs_rev {
 	AGG_AWSCR0,
 	AGG_PCR0,
 	AGG_ACR0,
-<<<<<<< HEAD
 	AGG_ACR4,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	AGG_MRCR,
 	AGG_ATCR1,
 	AGG_ATCR3,
@@ -482,12 +466,9 @@ enum offs_rev {
 #define MT_AGG_ACR_CFEND_RATE		GENMASK(13, 0)
 #define MT_AGG_ACR_BAR_RATE		GENMASK(29, 16)
 
-<<<<<<< HEAD
 #define MT_AGG_ACR4(_band)		MT_WF_AGG(_band, __OFFS(AGG_ACR4))
 #define MT_AGG_ACR_PPDU_TXS2H		BIT(1)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MT_AGG_MRCR(_band)		MT_WF_AGG(_band, __OFFS(AGG_MRCR))
 #define MT_AGG_MRCR_BAR_CNT_LIMIT		GENMASK(15, 12)
 #define MT_AGG_MRCR_LAST_RTS_CTS_RN		BIT(6)
@@ -681,7 +662,6 @@ enum offs_rev {
 
 #define MT_INT_RX(q)			(dev->q_int_mask[__RXQ(q)])
 #define MT_INT_TX_MCU(q)		(dev->q_int_mask[(q)])
-<<<<<<< HEAD
 
 #define MT_INT_RX_DONE_MCU		(MT_INT_RX(MT_RXQ_MCU) |	\
 					 MT_INT_RX(MT_RXQ_MCU_WA))
@@ -716,42 +696,6 @@ enum offs_rev {
 #define MT_MCU_CMD_NORMAL_STATE		BIT(5)
 #define MT_MCU_CMD_ERROR_MASK		GENMASK(5, 1)
 
-=======
-
-#define MT_INT_RX_DONE_MCU		(MT_INT_RX(MT_RXQ_MCU) |	\
-					 MT_INT_RX(MT_RXQ_MCU_WA))
-
-#define MT_INT_BAND0_RX_DONE		(MT_INT_RX(MT_RXQ_MAIN) |	\
-					 MT_INT_RX(MT_RXQ_MAIN_WA))
-
-#define MT_INT_BAND1_RX_DONE		(MT_INT_RX(MT_RXQ_BAND1) |	\
-					 MT_INT_RX(MT_RXQ_BAND1_WA) |	\
-					 MT_INT_RX(MT_RXQ_MAIN_WA))
-
-#define MT_INT_RX_DONE_ALL		(MT_INT_RX_DONE_MCU |		\
-					 MT_INT_BAND0_RX_DONE |		\
-					 MT_INT_BAND1_RX_DONE)
-
-#define MT_INT_TX_DONE_FWDL		BIT(26)
-#define MT_INT_TX_DONE_MCU_WM		BIT(27)
-#define MT_INT_TX_DONE_MCU_WA		BIT(15)
-#define MT_INT_TX_DONE_BAND0		BIT(30)
-#define MT_INT_TX_DONE_BAND1		BIT(31)
-#define MT_INT_TX_DONE_MCU_WA_MT7916	BIT(25)
-
-#define MT_INT_TX_DONE_MCU		(MT_INT_TX_MCU(MT_MCUQ_WA) |	\
-					 MT_INT_TX_MCU(MT_MCUQ_WM) |	\
-					 MT_INT_TX_MCU(MT_MCUQ_FWDL))
-
-#define MT_MCU_CMD			__REG(INT_MCU_CMD_SOURCE)
-#define MT_MCU_CMD_STOP_DMA_FW_RELOAD	BIT(1)
-#define MT_MCU_CMD_STOP_DMA		BIT(2)
-#define MT_MCU_CMD_RESET_DONE		BIT(3)
-#define MT_MCU_CMD_RECOVERY_DONE	BIT(4)
-#define MT_MCU_CMD_NORMAL_STATE		BIT(5)
-#define MT_MCU_CMD_ERROR_MASK		GENMASK(5, 1)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* TOP RGU */
 #define MT_TOP_RGU_BASE			0x18000000
 #define MT_TOP_PWR_CTRL			(MT_TOP_RGU_BASE + (0x0))

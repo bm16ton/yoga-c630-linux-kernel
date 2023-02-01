@@ -672,15 +672,12 @@ int ath11k_wow_op_suspend(struct ieee80211_hw *hw,
 	struct ath11k *ar = hw->priv;
 	int ret;
 
-<<<<<<< HEAD
 	ret = ath11k_mac_wait_tx_complete(ar);
 	if (ret) {
 		ath11k_warn(ar->ab, "failed to wait tx complete: %d\n", ret);
 		return ret;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&ar->conf_mutex);
 
 	ret = ath11k_dp_rx_pktlog_stop(ar->ab, true);
@@ -712,16 +709,6 @@ int ath11k_wow_op_suspend(struct ieee80211_hw *hw,
 		goto cleanup;
 	}
 
-<<<<<<< HEAD
-=======
-	ath11k_mac_drain_tx(ar);
-	ret = ath11k_mac_wait_tx_complete(ar);
-	if (ret) {
-		ath11k_warn(ar->ab, "failed to wait tx complete: %d\n", ret);
-		goto cleanup;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ath11k_wow_set_hw_filter(ar);
 	if (ret) {
 		ath11k_warn(ar->ab, "failed to set hw filter: %d\n",

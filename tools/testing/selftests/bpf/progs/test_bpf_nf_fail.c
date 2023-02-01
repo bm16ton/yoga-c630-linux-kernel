@@ -70,7 +70,6 @@ int lookup_insert(struct __sk_buff *ctx)
 }
 
 SEC("?tc")
-<<<<<<< HEAD
 int write_not_allowlisted_field(struct __sk_buff *ctx)
 {
 	struct bpf_ct_opts___local opts = {};
@@ -85,8 +84,6 @@ int write_not_allowlisted_field(struct __sk_buff *ctx)
 }
 
 SEC("?tc")
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int set_timeout_after_insert(struct __sk_buff *ctx)
 {
 	struct bpf_ct_opts___local opts = {};

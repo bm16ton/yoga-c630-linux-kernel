@@ -882,12 +882,6 @@ static inline u8 get_cqe_opcode(struct mlx5_cqe64 *cqe)
 	return cqe->op_own >> 4;
 }
 
-static inline u8 get_cqe_enhanced_num_mini_cqes(struct mlx5_cqe64 *cqe)
-{
-	/* num_of_mini_cqes is zero based */
-	return get_cqe_opcode(cqe) + 1;
-}
-
 static inline u8 get_cqe_lro_tcppsh(struct mlx5_cqe64 *cqe)
 {
 	return (cqe->lro.tcppsh_abort_dupack >> 6) & 1;
@@ -1206,15 +1200,10 @@ enum mlx5_cap_type {
 	MLX5_CAP_DEV_EVENT = 0x14,
 	MLX5_CAP_IPSEC,
 	MLX5_CAP_DEV_SHAMPO = 0x1d,
-<<<<<<< HEAD
 	MLX5_CAP_MACSEC = 0x1f,
 	MLX5_CAP_GENERAL_2 = 0x20,
 	MLX5_CAP_PORT_SELECTION = 0x25,
 	MLX5_CAP_ADV_VIRTUALIZATION = 0x26,
-=======
-	MLX5_CAP_GENERAL_2 = 0x20,
-	MLX5_CAP_PORT_SELECTION = 0x25,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* NUM OF CAP Types */
 	MLX5_CAP_NUM
 };
@@ -1380,7 +1369,6 @@ enum mlx5_qcam_feature_groups {
 	MLX5_GET(port_selection_cap, \
 		 mdev->caps.hca[MLX5_CAP_PORT_SELECTION]->max, cap)
 
-<<<<<<< HEAD
 #define MLX5_CAP_ADV_VIRTUALIZATION(mdev, cap) \
 	MLX5_GET(adv_virtualization_cap, \
 		 mdev->caps.hca[MLX5_CAP_ADV_VIRTUALIZATION]->cur, cap)
@@ -1389,8 +1377,6 @@ enum mlx5_qcam_feature_groups {
 	MLX5_GET(adv_virtualization_cap, \
 		 mdev->caps.hca[MLX5_CAP_ADV_VIRTUALIZATION]->max, cap)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MLX5_CAP_FLOWTABLE_PORT_SELECTION(mdev, cap) \
 	MLX5_CAP_PORT_SELECTION(mdev, flow_table_properties_port_selection.cap)
 
@@ -1471,12 +1457,9 @@ enum mlx5_qcam_feature_groups {
 
 #define MLX5_CAP_DEV_SHAMPO(mdev, cap)\
 	MLX5_GET(shampo_cap, mdev->caps.hca_cur[MLX5_CAP_DEV_SHAMPO], cap)
-<<<<<<< HEAD
 
 #define MLX5_CAP_MACSEC(mdev, cap)\
 	MLX5_GET(macsec_cap, (mdev)->caps.hca[MLX5_CAP_MACSEC]->cur, cap)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum {
 	MLX5_CMD_STAT_OK			= 0x0,

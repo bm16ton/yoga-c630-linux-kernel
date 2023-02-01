@@ -285,11 +285,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
 
 out:
 	if (allocate_crypto)
-<<<<<<< HEAD
 		cifs_free_hash(&shash);
-=======
-		cifs_free_hash(&hash, &sdesc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ses)
 		cifs_put_smb_ses(ses);
 	return rc;
@@ -544,13 +540,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
 	unsigned char *sigptr = smb3_signature;
 	struct kvec *iov = rqst->rq_iov;
 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
-<<<<<<< HEAD
 	struct shash_desc *shash = NULL;
-=======
-	struct shash_desc *shash;
-	struct crypto_shash *hash;
-	struct sdesc *sdesc = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct smb_rqst drqst;
 	u8 key[SMB3_SIGN_KEY_SIZE];
 

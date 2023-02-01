@@ -17,58 +17,6 @@
 		tx-fault-gpios = <&gpiosb 5 GPIO_ACTIVE_HIGH>;
 		maximum-power-milliwatt = <3000>;
 	};
-<<<<<<< HEAD
-=======
-
-	sfp_eth1: sfp-eth1 {
-		compatible = "sff,sfp";
-		i2c-bus = <&i2c1>;
-		los-gpios = <&gpiosb 7 GPIO_ACTIVE_HIGH>;
-		mod-def0-gpios = <&gpiosb 8 GPIO_ACTIVE_LOW>;
-		tx-disable-gpios = <&gpiosb 9 GPIO_ACTIVE_HIGH>;
-		tx-fault-gpios = <&gpiosb 10 GPIO_ACTIVE_HIGH>;
-		maximum-power-milliwatt = <3000>;
-	};
-};
-
-&sdhci0 {
-	status = "okay";
-	bus-width = <8>;
-	mmc-ddr-1_8v;
-	mmc-hs400-1_8v;
-	marvell,pad-type = "fixed-1-8v";
-	non-removable;
-	no-sd;
-	no-sdio;
-};
-
-&spi0 {
-	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&spi_quad_pins>;
-
-	flash@0 {
-		compatible = "jedec,spi-nor";
-		reg = <0>;
-		spi-max-frequency = <54000000>;
-
-		partitions {
-			compatible = "fixed-partitions";
-			#address-cells = <1>;
-			#size-cells = <1>;
-
-			partition@0 {
-				label = "firmware";
-				reg = <0x0 0x180000>;
-			};
-
-			partition@180000 {
-				label = "u-boot-env";
-				reg = <0x180000 0x10000>;
-			};
-		};
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &pinctrl_nb {
@@ -88,31 +36,6 @@
 	sda-gpios = <&gpionb 1 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
 };
 
-<<<<<<< HEAD
-=======
-&i2c1 {
-	status = "okay";
-	pinctrl-names = "default", "recovery";
-	pinctrl-0 = <&i2c2_pins>;
-	pinctrl-1 = <&i2c2_recovery_pins>;
-	/delete-property/mrvl,i2c-fast-mode;
-	scl-gpios = <&gpionb 2 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
-	sda-gpios = <&gpionb 3 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
-
-	nct375@48 {
-		status = "okay";
-		compatible = "ti,tmp75c";
-		reg = <0x48>;
-	};
-
-	nct375@49 {
-		status = "okay";
-		compatible = "ti,tmp75c";
-		reg = <0x49>;
-	};
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &eth0 {
 	phy-mode = "sgmii";
 	sfp = <&sfp_eth0>;

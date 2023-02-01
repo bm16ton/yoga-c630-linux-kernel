@@ -231,11 +231,7 @@ static int rkisp1_config_isp(struct rkisp1_isp *isp,
 		struct v4l2_mbus_framefmt *src_frm;
 
 		src_frm = rkisp1_isp_get_pad_fmt(isp, NULL,
-<<<<<<< HEAD
 						 RKISP1_ISP_PAD_SOURCE_VIDEO,
-=======
-						 RKISP1_ISP_PAD_SINK_VIDEO,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						 V4L2_SUBDEV_FORMAT_ACTIVE);
 		rkisp1_params_pre_configure(&rkisp1->params, sink_fmt->bayer_pat,
 					    src_frm->quantization,
@@ -345,12 +341,9 @@ static void rkisp1_isp_start(struct rkisp1_isp *isp)
 	       RKISP1_CIF_ISP_CTRL_ISP_ENABLE |
 	       RKISP1_CIF_ISP_CTRL_ISP_INFORM_ENABLE;
 	rkisp1_write(rkisp1, RKISP1_CIF_ISP_CTRL, val);
-<<<<<<< HEAD
 
 	if (isp->src_fmt->pixel_enc != V4L2_PIXEL_ENC_BAYER)
 		rkisp1_params_post_configure(&rkisp1->params);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* ----------------------------------------------------------------------------
@@ -442,10 +435,7 @@ static int rkisp1_isp_init_config(struct v4l2_subdev *sd,
 	struct v4l2_mbus_framefmt *sink_fmt, *src_fmt;
 	struct v4l2_rect *sink_crop, *src_crop;
 
-<<<<<<< HEAD
 	/* Video. */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sink_fmt = v4l2_subdev_get_try_format(sd, sd_state,
 					      RKISP1_ISP_PAD_SINK_VIDEO);
 	sink_fmt->width = RKISP1_DEFAULT_WIDTH;
@@ -477,10 +467,7 @@ static int rkisp1_isp_init_config(struct v4l2_subdev *sd,
 					    RKISP1_ISP_PAD_SOURCE_VIDEO);
 	*src_crop = *sink_crop;
 
-<<<<<<< HEAD
 	/* Parameters and statistics. */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sink_fmt = v4l2_subdev_get_try_format(sd, sd_state,
 					      RKISP1_ISP_PAD_SINK_PARAMS);
 	src_fmt = v4l2_subdev_get_try_format(sd, sd_state,
@@ -544,20 +531,12 @@ static void rkisp1_isp_set_src_fmt(struct rkisp1_isp *isp,
 	 * Copy the color space for the sink pad. When converting from Bayer to
 	 * YUV, default to a limited quantization range.
 	 */
-<<<<<<< HEAD
 	src_fmt->colorspace = sink_fmt->colorspace;
 	src_fmt->xfer_func = sink_fmt->xfer_func;
 	src_fmt->ycbcr_enc = sink_fmt->ycbcr_enc;
 
 	if (sink_info->pixel_enc == V4L2_PIXEL_ENC_BAYER &&
 	    src_info->pixel_enc == V4L2_PIXEL_ENC_YUV)
-=======
-	if (format->flags & V4L2_MBUS_FRAMEFMT_SET_CSC &&
-	    format->quantization == V4L2_QUANTIZATION_FULL_RANGE &&
-	    src_info->pixel_enc == V4L2_PIXEL_ENC_YUV)
-		src_fmt->quantization = V4L2_QUANTIZATION_FULL_RANGE;
-	else if (src_info->pixel_enc == V4L2_PIXEL_ENC_YUV)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		src_fmt->quantization = V4L2_QUANTIZATION_LIM_RANGE;
 	else
 		src_fmt->quantization = sink_fmt->quantization;
@@ -596,7 +575,6 @@ static void rkisp1_isp_set_src_fmt(struct rkisp1_isp *isp,
 
 	*format = *src_fmt;
 
-<<<<<<< HEAD
 	/*
 	 * Restore the SET_CSC flag if it was set to indicate support for the
 	 * CSC setting API.
@@ -604,8 +582,6 @@ static void rkisp1_isp_set_src_fmt(struct rkisp1_isp *isp,
 	if (set_csc)
 		format->flags |= V4L2_MBUS_FRAMEFMT_SET_CSC;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Store the source format info when setting the active format. */
 	if (which == V4L2_SUBDEV_FORMAT_ACTIVE)
 		isp->src_fmt = src_info;

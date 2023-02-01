@@ -79,11 +79,7 @@
 #define H_NOT_ENOUGH_RESOURCES -44
 #define H_R_STATE       -45
 #define H_RESCINDED     -46
-<<<<<<< HEAD
 #define H_ABORTED	-54
-=======
-#define H_P1		-54
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define H_P2		-55
 #define H_P3		-56
 #define H_P4		-57
@@ -104,10 +100,6 @@
 #define H_COP_HW	-74
 #define H_STATE		-75
 #define H_IN_USE	-77
-<<<<<<< HEAD
-=======
-#define H_ABORTED	-78
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define H_UNSUPPORTED_FLAG_START	-256
 #define H_UNSUPPORTED_FLAG_END		-511
 #define H_MULTI_THREADS_ACTIVE	-9005

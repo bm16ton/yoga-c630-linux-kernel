@@ -26,12 +26,8 @@ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
 		     : "=a" (*hv_status),
 		       "+c" (control), "+d" (input_address),
 		       KVM_ASM_SAFE_OUTPUTS(vector)
-<<<<<<< HEAD
 		     : [output_address] "r"(output_address),
 		       "a" (-EFAULT)
-=======
-		     : [output_address] "r"(output_address)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		     : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
 	return vector;
 }
@@ -86,7 +82,6 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
 	}
 
 	vector = hypercall(hcall->control, input, output, &res);
-<<<<<<< HEAD
 	if (hcall->ud_expected) {
 		GUEST_ASSERT_2(vector == UD_VECTOR, hcall->control, vector);
 	} else {
@@ -94,15 +89,6 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
 		GUEST_ASSERT_2(res == hcall->expect, hcall->expect, res);
 	}
 
-=======
-	if (hcall->ud_expected)
-		GUEST_ASSERT_2(vector == UD_VECTOR, hcall->control, vector);
-	else
-		GUEST_ASSERT_2(!vector, hcall->control, vector);
-
-	GUEST_ASSERT_2(!hcall->ud_expected || res == hcall->expect,
-			hcall->expect, res);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	GUEST_DONE();
 }
 
@@ -522,11 +508,7 @@ static void guest_test_hcalls_access(void)
 		switch (stage) {
 		case 0:
 			feat->eax |= HV_MSR_HYPERCALL_AVAILABLE;
-<<<<<<< HEAD
 			hcall->control = 0xbeef;
-=======
-			hcall->control = 0xdeadbeef;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			hcall->expect = HV_STATUS_INVALID_HYPERCALL_CODE;
 			break;
 

@@ -370,10 +370,7 @@ enum {
 	IFLA_GRO_MAX_SIZE,
 	IFLA_TSO_MAX_SIZE,
 	IFLA_TSO_MAX_SEGS,
-<<<<<<< HEAD
 	IFLA_ALLMULTI,		/* Allmulti count: > 0 means acts ALLMULTI */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	__IFLA_MAX
 };
@@ -1379,7 +1376,6 @@ enum {
 
 #define IFLA_MCTP_MAX (__IFLA_MCTP_MAX - 1)
 
-<<<<<<< HEAD
 /* DSA section */
 
 enum {
@@ -1390,6 +1386,4 @@ enum {
 
 #define IFLA_DSA_MAX	(__IFLA_DSA_MAX - 1)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _UAPI_LINUX_IF_LINK_H */

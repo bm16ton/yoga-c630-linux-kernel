@@ -617,7 +617,6 @@ static enum resp_states atomic_reply(struct rxe_qp *qp,
 
 		vaddr = iova_to_vaddr(mr, qp->resp.va + qp->resp.offset,
 					sizeof(u64));
-<<<<<<< HEAD
 
 		/* check vaddr is 8 bytes aligned. */
 		if (!vaddr || (uintptr_t)vaddr & 7) {
@@ -640,30 +639,6 @@ static enum resp_states atomic_reply(struct rxe_qp *qp,
 
 		qp->resp.msn++;
 
-=======
-
-		/* check vaddr is 8 bytes aligned. */
-		if (!vaddr || (uintptr_t)vaddr & 7) {
-			ret = RESPST_ERR_MISALIGNED_ATOMIC;
-			goto out;
-		}
-
-		spin_lock_bh(&atomic_ops_lock);
-		res->atomic.orig_val = value = *vaddr;
-
-		if (pkt->opcode == IB_OPCODE_RC_COMPARE_SWAP) {
-			if (value == atmeth_comp(pkt))
-				value = atmeth_swap_add(pkt);
-		} else {
-			value += atmeth_swap_add(pkt);
-		}
-
-		*vaddr = value;
-		spin_unlock_bh(&atomic_ops_lock);
-
-		qp->resp.msn++;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* next expected psn, read handles this separately */
 		qp->resp.psn = (pkt->psn + 1) & BTH_PSN_MASK;
 		qp->resp.ack_psn = qp->resp.psn;
@@ -1051,30 +1026,17 @@ finish:
 		return RESPST_CLEANUP;
 }
 
-<<<<<<< HEAD
 
 static int send_common_ack(struct rxe_qp *qp, u8 syndrome, u32 psn,
 				  int opcode, const char *msg)
-=======
-static int send_ack(struct rxe_qp *qp, u8 syndrome, u32 psn)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err;
 	struct rxe_pkt_info ack_pkt;
 	struct sk_buff *skb;
 
-<<<<<<< HEAD
 	skb = prepare_ack_packet(qp, &ack_pkt, opcode, 0, psn, syndrome);
 	if (!skb)
 		return -ENOMEM;
-=======
-	skb = prepare_ack_packet(qp, &ack_pkt, IB_OPCODE_RC_ACKNOWLEDGE,
-				 0, psn, syndrome);
-	if (!skb) {
-		err = -ENOMEM;
-		goto err1;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = rxe_xmit_packet(qp, &ack_pkt, skb);
 	if (err)
@@ -1083,7 +1045,6 @@ static int send_ack(struct rxe_qp *qp, u8 syndrome, u32 psn)
 	return err;
 }
 
-<<<<<<< HEAD
 static int send_ack(struct rxe_qp *qp, u8 syndrome, u32 psn)
 {
 	return send_common_ack(qp, syndrome, psn,
@@ -1094,35 +1055,12 @@ static int send_atomic_ack(struct rxe_qp *qp, u8 syndrome, u32 psn)
 {
 	int ret = send_common_ack(qp, syndrome, psn,
 			IB_OPCODE_RC_ATOMIC_ACKNOWLEDGE, "ATOMIC ACK");
-=======
-static int send_atomic_ack(struct rxe_qp *qp, u8 syndrome, u32 psn)
-{
-	int err = 0;
-	struct rxe_pkt_info ack_pkt;
-	struct sk_buff *skb;
-
-	skb = prepare_ack_packet(qp, &ack_pkt, IB_OPCODE_RC_ATOMIC_ACKNOWLEDGE,
-				 0, psn, syndrome);
-	if (!skb) {
-		err = -ENOMEM;
-		goto out;
-	}
-
-	err = rxe_xmit_packet(qp, &ack_pkt, skb);
-	if (err)
-		pr_err_ratelimited("Failed sending atomic ack\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* have to clear this since it is used to trigger
 	 * long read replies
 	 */
 	qp->resp.res = NULL;
-<<<<<<< HEAD
 	return ret;
-=======
-out:
-	return err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static enum resp_states acknowledge(struct rxe_qp *qp,

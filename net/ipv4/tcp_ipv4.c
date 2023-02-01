@@ -210,11 +210,6 @@ int tcp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 	struct flowi4 *fl4;
 	struct rtable *rt;
 	int err;
-<<<<<<< HEAD
-=======
-	struct ip_options_rcu *inet_opt;
-	struct inet_timewait_death_row *tcp_death_row = sock_net(sk)->ipv4.tcp_death_row;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (addr_len < sizeof(struct sockaddr_in))
 		return -EINVAL;
@@ -336,12 +331,7 @@ failure:
 	 * if necessary.
 	 */
 	tcp_set_state(sk, TCP_CLOSE);
-<<<<<<< HEAD
 	inet_bhash2_reset_saddr(sk);
-=======
-	if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK))
-		inet_reset_saddr(sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ip_rt_put(rt);
 	sk->sk_route_caps = 0;
 	inet->inet_dport = 0;
@@ -2308,27 +2298,16 @@ static bool seq_sk_match(struct seq_file *seq, const struct sock *sk)
  */
 static void *listening_get_first(struct seq_file *seq)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
 	struct tcp_iter_state *st = seq->private;
 
 	st->offset = 0;
 	for (; st->bucket <= hinfo->lhash2_mask; st->bucket++) {
-=======
-	struct tcp_iter_state *st = seq->private;
-
-	st->offset = 0;
-	for (; st->bucket <= tcp_hashinfo.lhash2_mask; st->bucket++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct inet_listen_hashbucket *ilb2;
 		struct hlist_nulls_node *node;
 		struct sock *sk;
 
-<<<<<<< HEAD
 		ilb2 = &hinfo->lhash2[st->bucket];
-=======
-		ilb2 = &tcp_hashinfo.lhash2[st->bucket];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (hlist_nulls_empty(&ilb2->nulls_head))
 			continue;
 
@@ -2365,12 +2344,8 @@ static void *listening_get_next(struct seq_file *seq, void *cur)
 			return sk;
 	}
 
-<<<<<<< HEAD
 	hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
 	ilb2 = &hinfo->lhash2[st->bucket];
-=======
-	ilb2 = &tcp_hashinfo.lhash2[st->bucket];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock(&ilb2->lock);
 	++st->bucket;
 	return listening_get_first(seq);
@@ -2404,10 +2379,7 @@ static inline bool empty_bucket(struct inet_hashinfo *hinfo,
  */
 static void *established_get_first(struct seq_file *seq)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct tcp_iter_state *st = seq->private;
 
 	st->offset = 0;
@@ -2421,11 +2393,7 @@ static void *established_get_first(struct seq_file *seq)
 			continue;
 
 		spin_lock_bh(lock);
-<<<<<<< HEAD
 		sk_nulls_for_each(sk, node, &hinfo->ehash[st->bucket].chain) {
-=======
-		sk_nulls_for_each(sk, node, &tcp_hashinfo.ehash[st->bucket].chain) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (seq_sk_match(seq, sk))
 				return sk;
 		}
@@ -2437,16 +2405,10 @@ static void *established_get_first(struct seq_file *seq)
 
 static void *established_get_next(struct seq_file *seq, void *cur)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
 	struct tcp_iter_state *st = seq->private;
 	struct hlist_nulls_node *node;
 	struct sock *sk = cur;
-=======
-	struct sock *sk = cur;
-	struct hlist_nulls_node *node;
-	struct tcp_iter_state *st = seq->private;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	++st->num;
 	++st->offset;
@@ -2505,11 +2467,7 @@ static void *tcp_seek_last_pos(struct seq_file *seq)
 
 	switch (st->state) {
 	case TCP_SEQ_STATE_LISTENING:
-<<<<<<< HEAD
 		if (st->bucket > hinfo->lhash2_mask)
-=======
-		if (st->bucket > tcp_hashinfo.lhash2_mask)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		st->state = TCP_SEQ_STATE_LISTENING;
 		rc = listening_get_first(seq);
@@ -2595,11 +2553,7 @@ void tcp_seq_stop(struct seq_file *seq, void *v)
 	switch (st->state) {
 	case TCP_SEQ_STATE_LISTENING:
 		if (v != SEQ_START_TOKEN)
-<<<<<<< HEAD
 			spin_unlock(&hinfo->lhash2[st->bucket].lock);
-=======
-			spin_unlock(&tcp_hashinfo.lhash2[st->bucket].lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case TCP_SEQ_STATE_ESTABLISHED:
 		if (v)
@@ -2798,10 +2752,7 @@ static int bpf_iter_tcp_realloc_batch(struct bpf_tcp_iter_state *iter,
 static unsigned int bpf_iter_tcp_listening_batch(struct seq_file *seq,
 						 struct sock *start_sk)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_tcp_iter_state *iter = seq->private;
 	struct tcp_iter_state *st = &iter->state;
 	struct hlist_nulls_node *node;
@@ -2821,11 +2772,7 @@ static unsigned int bpf_iter_tcp_listening_batch(struct seq_file *seq,
 			expected++;
 		}
 	}
-<<<<<<< HEAD
 	spin_unlock(&hinfo->lhash2[st->bucket].lock);
-=======
-	spin_unlock(&tcp_hashinfo.lhash2[st->bucket].lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return expected;
 }
@@ -2833,10 +2780,7 @@ static unsigned int bpf_iter_tcp_listening_batch(struct seq_file *seq,
 static unsigned int bpf_iter_tcp_established_batch(struct seq_file *seq,
 						   struct sock *start_sk)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_tcp_iter_state *iter = seq->private;
 	struct tcp_iter_state *st = &iter->state;
 	struct hlist_nulls_node *node;
@@ -2856,21 +2800,14 @@ static unsigned int bpf_iter_tcp_established_batch(struct seq_file *seq,
 			expected++;
 		}
 	}
-<<<<<<< HEAD
 	spin_unlock_bh(inet_ehash_lockp(hinfo, st->bucket));
-=======
-	spin_unlock_bh(inet_ehash_lockp(&tcp_hashinfo, st->bucket));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return expected;
 }
 
 static struct sock *bpf_iter_tcp_batch(struct seq_file *seq)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_tcp_iter_state *iter = seq->private;
 	struct tcp_iter_state *st = &iter->state;
 	unsigned int expected;
@@ -2886,11 +2823,7 @@ static struct sock *bpf_iter_tcp_batch(struct seq_file *seq)
 		st->offset = 0;
 		st->bucket++;
 		if (st->state == TCP_SEQ_STATE_LISTENING &&
-<<<<<<< HEAD
 		    st->bucket > hinfo->lhash2_mask) {
-=======
-		    st->bucket > tcp_hashinfo.lhash2_mask) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			st->state = TCP_SEQ_STATE_ESTABLISHED;
 			st->bucket = 0;
 		}
@@ -3163,24 +3096,13 @@ EXPORT_SYMBOL(tcp_prot);
 
 static void __net_exit tcp_sk_exit(struct net *net)
 {
-<<<<<<< HEAD
 	if (net->ipv4.tcp_congestion_control)
 		bpf_module_put(net->ipv4.tcp_congestion_control,
 			       net->ipv4.tcp_congestion_control->owner);
-=======
-	struct inet_timewait_death_row *tcp_death_row = net->ipv4.tcp_death_row;
-
-	if (net->ipv4.tcp_congestion_control)
-		bpf_module_put(net->ipv4.tcp_congestion_control,
-			       net->ipv4.tcp_congestion_control->owner);
-	if (refcount_dec_and_test(&tcp_death_row->tw_refcount))
-		kfree(tcp_death_row);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void __net_init tcp_set_hashinfo(struct net *net)
 {
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo;
 	unsigned int ehash_entries;
 	struct net *old_net;
@@ -3203,9 +3125,6 @@ fallback:
 		hinfo = &tcp_hashinfo;
 		ehash_entries = tcp_hashinfo.ehash_mask + 1;
 	}
-=======
-	int cnt;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	net->ipv4.tcp_death_row.hashinfo = hinfo;
 	net->ipv4.tcp_death_row.sysctl_max_tw_buckets = ehash_entries / 2;
@@ -3239,18 +3158,8 @@ static int __net_init tcp_sk_init(struct net *net)
 	net->ipv4.sysctl_tcp_tw_reuse = 2;
 	net->ipv4.sysctl_tcp_no_ssthresh_metrics_save = 1;
 
-<<<<<<< HEAD
 	refcount_set(&net->ipv4.tcp_death_row.tw_refcount, 1);
 	tcp_set_hashinfo(net);
-=======
-	net->ipv4.tcp_death_row = kzalloc(sizeof(struct inet_timewait_death_row), GFP_KERNEL);
-	if (!net->ipv4.tcp_death_row)
-		return -ENOMEM;
-	refcount_set(&net->ipv4.tcp_death_row->tw_refcount, 1);
-	cnt = tcp_hashinfo.ehash_mask + 1;
-	net->ipv4.tcp_death_row->sysctl_max_tw_buckets = cnt / 2;
-	net->ipv4.tcp_death_row->hashinfo = &tcp_hashinfo;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	net->ipv4.sysctl_tcp_sack = 1;
 	net->ipv4.sysctl_tcp_window_scaling = 1;

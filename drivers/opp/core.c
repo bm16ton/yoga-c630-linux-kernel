@@ -838,49 +838,11 @@ _opp_config_clk_single(struct device *dev, struct opp_table *opp_table,
 			ret);
 	} else {
 		opp_table->rate_clk_single = freq;
-<<<<<<< HEAD
-=======
 	}
 
 	return ret;
 }
 
-/*
- * Simple implementation for configuring multiple clocks. Configure clocks in
- * the order in which they are present in the array while scaling up.
- */
-int dev_pm_opp_config_clks_simple(struct device *dev,
-		struct opp_table *opp_table, struct dev_pm_opp *opp, void *data,
-		bool scaling_down)
-{
-	int ret, i;
-
-	if (scaling_down) {
-		for (i = opp_table->clk_count - 1; i >= 0; i--) {
-			ret = clk_set_rate(opp_table->clks[i], opp->rates[i]);
-			if (ret) {
-				dev_err(dev, "%s: failed to set clock rate: %d\n", __func__,
-					ret);
-				return ret;
-			}
-		}
-	} else {
-		for (i = 0; i < opp_table->clk_count; i++) {
-			ret = clk_set_rate(opp_table->clks[i], opp->rates[i]);
-			if (ret) {
-				dev_err(dev, "%s: failed to set clock rate: %d\n", __func__,
-					ret);
-				return ret;
-			}
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-
-	return ret;
-}
-EXPORT_SYMBOL_GPL(dev_pm_opp_config_clks_simple);
-
-<<<<<<< HEAD
 /*
  * Simple implementation for configuring multiple clocks. Configure clocks in
  * the order in which they are present in the array while scaling up.
@@ -915,8 +877,6 @@ int dev_pm_opp_config_clks_simple(struct device *dev,
 }
 EXPORT_SYMBOL_GPL(dev_pm_opp_config_clks_simple);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int _opp_config_regulator_single(struct device *dev,
 			struct dev_pm_opp *old_opp, struct dev_pm_opp *new_opp,
 			struct regulator **regulators, unsigned int count)

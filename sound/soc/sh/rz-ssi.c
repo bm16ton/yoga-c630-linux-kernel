@@ -59,13 +59,7 @@
 #define SSIFSR_RDC_MASK		0x3f
 #define SSIFSR_RDC_SHIFT	8
 
-<<<<<<< HEAD
 #define SSIFSR_TDE		BIT(16)
-=======
-#define SSIFSR_TDC(x)		(((x) & 0x1f) << 24)
-#define SSIFSR_TDE		BIT(16)
-#define SSIFSR_RDC(x)		(((x) & 0x1f) << 8)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define SSIFSR_RDF		BIT(0)
 
 #define SSIOFR_LRCONT		BIT(8)
@@ -604,11 +598,7 @@ static int rz_ssi_dma_transfer(struct rz_ssi_priv *ssi,
 		return -EINVAL;
 
 	runtime = substream->runtime;
-<<<<<<< HEAD
 	if (runtime->state == SNDRV_PCM_STATE_DRAINING)
-=======
-	if (runtime->status->state == SNDRV_PCM_STATE_DRAINING)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Stream is ending, so do not queue up any more DMA
 		 * transfers otherwise we play partial sound clips
@@ -777,11 +767,7 @@ static int rz_ssi_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	struct rz_ssi_priv *ssi = snd_soc_dai_get_drvdata(dai);
 
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		dev_err(ssi->dev, "Codec should be clk and frame consumer\n");
@@ -920,18 +906,11 @@ static struct snd_soc_dai_driver rz_ssi_soc_dai[] = {
 };
 
 static const struct snd_soc_component_driver rz_ssi_soc_component = {
-<<<<<<< HEAD
 	.name			= "rz-ssi",
 	.open			= rz_ssi_pcm_open,
 	.pointer		= rz_ssi_pcm_pointer,
 	.pcm_construct		= rz_ssi_pcm_new,
 	.legacy_dai_naming	= 1,
-=======
-	.name		= "rz-ssi",
-	.open		= rz_ssi_pcm_open,
-	.pointer	= rz_ssi_pcm_pointer,
-	.pcm_construct	= rz_ssi_pcm_new,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int rz_ssi_probe(struct platform_device *pdev)
@@ -1038,35 +1017,22 @@ static int rz_ssi_probe(struct platform_device *pdev)
 
 	ssi->rstc = devm_reset_control_get_exclusive(&pdev->dev, NULL);
 	if (IS_ERR(ssi->rstc)) {
-<<<<<<< HEAD
 		ret = PTR_ERR(ssi->rstc);
 		goto err_reset;
-=======
-		rz_ssi_release_dma_channels(ssi);
-		return PTR_ERR(ssi->rstc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	reset_control_deassert(ssi->rstc);
 	pm_runtime_enable(&pdev->dev);
 	ret = pm_runtime_resume_and_get(&pdev->dev);
 	if (ret < 0) {
-<<<<<<< HEAD
 		dev_err(&pdev->dev, "pm_runtime_resume_and_get failed\n");
 		goto err_pm;
-=======
-		rz_ssi_release_dma_channels(ssi);
-		pm_runtime_disable(ssi->dev);
-		reset_control_assert(ssi->rstc);
-		return dev_err_probe(ssi->dev, ret, "pm_runtime_resume_and_get failed\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ret = devm_snd_soc_register_component(&pdev->dev, &rz_ssi_soc_component,
 					      rz_ssi_soc_dai,
 					      ARRAY_SIZE(rz_ssi_soc_dai));
 	if (ret < 0) {
-<<<<<<< HEAD
 		dev_err(&pdev->dev, "failed to register snd component\n");
 		goto err_snd_soc;
 	}
@@ -1081,16 +1047,6 @@ err_pm:
 err_reset:
 	rz_ssi_release_dma_channels(ssi);
 
-=======
-		rz_ssi_release_dma_channels(ssi);
-
-		pm_runtime_put(ssi->dev);
-		pm_runtime_disable(ssi->dev);
-		reset_control_assert(ssi->rstc);
-		dev_err(&pdev->dev, "failed to register snd component\n");
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 

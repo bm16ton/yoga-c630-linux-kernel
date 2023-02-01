@@ -19,10 +19,7 @@
 #define SLEEP_CLOCK_SELECT_INTERNAL_BIT	0x02
 #define HOST_CSTATE_BIT			0x04
 #define PLATFORM_CAP_PCIE_GLOBAL_RESET	0x08
-<<<<<<< HEAD
 #define PLATFORM_CAP_PCIE_PME_D3COLD	0x10
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define FW_BUILD_ID_MASK "QC_IMAGE_VERSION_STRING="
 
@@ -1756,11 +1753,8 @@ static int ath11k_qmi_host_cap_send(struct ath11k_base *ab)
 	if (ab->hw_params.global_reset)
 		req.nm_modem |= PLATFORM_CAP_PCIE_GLOBAL_RESET;
 
-<<<<<<< HEAD
 	req.nm_modem |= PLATFORM_CAP_PCIE_PME_D3COLD;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ath11k_dbg(ab, ATH11K_DBG_QMI, "qmi host cap request\n");
 
 	ret = qmi_txn_init(&ab->qmi.handle, &txn,
@@ -2479,15 +2473,9 @@ success:
 		ath11k_warn(ab, "qmi failed to load caldata\n");
 		goto out_qmi_cal;
 	}
-<<<<<<< HEAD
 
 	ath11k_dbg(ab, ATH11K_DBG_QMI, "qmi caldata type: %u\n", file_type);
 
-=======
-
-	ath11k_dbg(ab, ATH11K_DBG_QMI, "qmi caldata type: %u\n", file_type);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_qmi_cal:
 	if (!ab->qmi.target.eeprom_caldata)
 		release_firmware(fw_entry);
@@ -3029,15 +3017,10 @@ static void ath11k_qmi_msg_fw_ready_cb(struct qmi_handle *qmi_hdl,
 
 	ath11k_dbg(ab, ATH11K_DBG_QMI, "qmi firmware ready\n");
 
-<<<<<<< HEAD
 	if (!ab->qmi.cal_done) {
 		ab->qmi.cal_done = 1;
 		wake_up(&ab->qmi.cold_boot_waitq);
 	}
-=======
-	ab->qmi.cal_done = 1;
-	wake_up(&ab->qmi.cold_boot_waitq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ath11k_qmi_driver_event_post(qmi, ATH11K_QMI_EVENT_FW_READY, NULL);
 }
@@ -3051,6 +3034,8 @@ static void ath11k_qmi_msg_cold_boot_cal_done_cb(struct qmi_handle *qmi_hdl,
 					      struct ath11k_qmi, handle);
 	struct ath11k_base *ab = qmi->ab;
 
+	ab->qmi.cal_done = 1;
+	wake_up(&ab->qmi.cold_boot_waitq);
 	ath11k_dbg(ab, ATH11K_DBG_QMI, "qmi cold boot calibration done\n");
 }
 
@@ -3105,12 +3090,9 @@ static const struct qmi_msg_handler ath11k_qmi_msg_handlers[] = {
 			sizeof(struct qmi_wlfw_fw_init_done_ind_msg_v01),
 		.fn = ath11k_qmi_msg_fw_init_done_cb,
 	},
-<<<<<<< HEAD
 
 	/* end of list */
 	{},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int ath11k_qmi_ops_new_server(struct qmi_handle *qmi_hdl,
@@ -3228,7 +3210,6 @@ static void ath11k_qmi_driver_event_work(struct work_struct *work)
 
 			break;
 		case ATH11K_QMI_EVENT_FW_READY:
-<<<<<<< HEAD
 			/* For targets requiring a FW restart upon cold
 			 * boot completion, there is no need to process
 			 * FW ready; such targets will receive FW init
@@ -3243,8 +3224,6 @@ static void ath11k_qmi_driver_event_work(struct work_struct *work)
 			ath11k_core_qmi_firmware_ready(ab);
 			set_bit(ATH11K_FLAG_REGISTERED, &ab->dev_flags);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		case ATH11K_QMI_EVENT_COLD_BOOT_CAL_DONE:
 			break;

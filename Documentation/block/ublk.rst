@@ -144,7 +144,6 @@ managing and controlling ublk devices with help of several control commands:
   For retrieving device info via ``ublksrv_ctrl_dev_info``. It is the server's
   responsibility to save IO target specific info in userspace.
 
-<<<<<<< HEAD
 - ``UBLK_CMD_START_USER_RECOVERY``
 
   This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. This
@@ -181,8 +180,6 @@ managing and controlling ublk devices with help of several control commands:
   double-write since the driver may issue the same I/O request twice. It
   might be useful to a read-only FS or a VM backend.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Data plane
 ----------
 

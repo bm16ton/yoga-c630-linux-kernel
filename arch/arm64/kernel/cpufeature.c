@@ -115,27 +115,6 @@ EXPORT_SYMBOL(arm64_use_ng_mappings);
 
 DEFINE_PER_CPU_READ_MOSTLY(const char *, this_cpu_vector) = vectors;
 
-<<<<<<< HEAD
-=======
-/*
- * Permit PER_LINUX32 and execve() of 32-bit binaries even if not all CPUs
- * support it?
- */
-static bool __read_mostly allow_mismatched_32bit_el0;
-
-/*
- * Static branch enabled only if allow_mismatched_32bit_el0 is set and we have
- * seen at least one CPU capable of 32-bit EL0.
- */
-DEFINE_STATIC_KEY_FALSE(arm64_mismatched_32bit_el0);
-
-/*
- * Mask of CPUs supporting 32-bit EL0.
- * Only valid if arm64_mismatched_32bit_el0 is enabled.
- */
-static cpumask_var_t cpu_32bit_el0_mask __cpumask_var_read_mostly;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Permit PER_LINUX32 and execve() of 32-bit binaries even if not all CPUs
  * support it?
@@ -217,7 +196,6 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_SPECRES_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_SB_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_FRINTTS_SHIFT, 4, 0),
-<<<<<<< HEAD
 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_GPI_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
@@ -238,28 +216,6 @@ static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
 		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR2_EL1_APA3_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-=======
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_GPI_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_GPA_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_LRCPC_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_FCMA_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_JSCVT_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_EL1_API_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_EL1_APA_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DPB_SHIFT, 4, 0),
-	ARM64_FTR_END,
-};
-
-static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_HIGHER_SAFE, ID_AA64ISAR2_EL1_BC_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR2_EL1_APA3_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_GPA3_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_RPRES_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_WFxT_SHIFT, 4, 0),
@@ -274,7 +230,6 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_MPAM_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SEL2_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
-<<<<<<< HEAD
 				   FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SVE_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_RAS_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_GIC_SHIFT, 4, 0),
@@ -284,31 +239,14 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_EL2_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_EL1_SHIFT, 4, ID_AA64PFR0_EL1_ELx_64BIT_ONLY),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_EL0_SHIFT, 4, ID_AA64PFR0_EL1_ELx_64BIT_ONLY),
-=======
-				   FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_SVE_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_RAS_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_GIC_SHIFT, 4, 0),
-	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_ASIMD_SHIFT, 4, ID_AA64PFR0_ASIMD_NI),
-	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL3_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL2_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ARM64_FTR_END,
 };
 
 static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SME),
-<<<<<<< HEAD
 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SME_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MPAM_frac_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_RAS_frac_SHIFT, 4, 0),
-=======
-		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_SME_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_MPAMFRAC_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_RASFRAC_SHIFT, 4, 0),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_MTE),
 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MTE_SHIFT, 4, ID_AA64PFR1_EL1_MTE_NI),
 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SSBS_SHIFT, 4, ID_AA64PFR1_EL1_SSBS_NI),
@@ -358,15 +296,9 @@ static const struct arm64_ftr_bits ftr_id_aa64smfr0[] = {
 };
 
 static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
-<<<<<<< HEAD
 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR0_EL1_ECV_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR0_EL1_FGT_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR0_EL1_EXS_SHIFT, 4, 0),
-=======
-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR0_ECV_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR0_FGT_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR0_EXS_SHIFT, 4, 0),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Page size not being supported at Stage-2 is not fatal. You
 	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
@@ -410,7 +342,6 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
 };
 
 static const struct arm64_ftr_bits ftr_id_aa64mmfr1[] = {
-<<<<<<< HEAD
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_TIDCP1_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_AFP_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_ETS_SHIFT, 4, 0),
@@ -423,20 +354,6 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr1[] = {
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_VH_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_VMIDBits_SHIFT, 4, 0),
 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_EL1_HAFDBS_SHIFT, 4, 0),
-=======
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_TIDCP1_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_AFP_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_ETS_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_TWED_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_XNX_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_HIGHER_SAFE, ID_AA64MMFR1_SPECSEI_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_PAN_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_LOR_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_HPD_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_VHE_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_VMIDBITS_SHIFT, 4, 0),
-	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR1_HADBS_SHIFT, 4, 0),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ARM64_FTR_END,
 };
 
@@ -1363,7 +1280,6 @@ void update_cpu_features(int cpu,
 		/* Probe vector lengths */
 		if (!system_capabilities_finalized())
 			vec_update_vq_map(ARM64_VEC_SME);
-<<<<<<< HEAD
 	}
 
 	/*
@@ -1378,22 +1294,6 @@ void update_cpu_features(int cpu,
 	}
 
 	/*
-=======
-	}
-
-	/*
-	 * The kernel uses the LDGM/STGM instructions and the number of tags
-	 * they read/write depends on the GMID_EL1.BS field. Check that the
-	 * value is the same on all CPUs.
-	 */
-	if (IS_ENABLED(CONFIG_ARM64_MTE) &&
-	    id_aa64pfr1_mte(info->reg_id_aa64pfr1)) {
-		taint |= check_update_ftr_reg(SYS_GMID_EL1, cpu,
-					      info->reg_gmid, boot->reg_gmid);
-	}
-
-	/*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * If we don't have AArch32 at all then skip the checks entirely
 	 * as the register values may be UNKNOWN and we're not going to be
 	 * using them for anything.
@@ -1818,11 +1718,7 @@ static phys_addr_t kpti_ng_pgd_alloc(int shift)
 	return kpti_ng_temp_alloc;
 }
 
-<<<<<<< HEAD
 static void
-=======
-static void __nocfi
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 kpti_install_ng_mappings(const struct arm64_cpu_capabilities *__unused)
 {
 	typedef void (kpti_remap_fn)(int, int, phys_addr_t, unsigned long);
@@ -1850,33 +1746,7 @@ kpti_install_ng_mappings(const struct arm64_cpu_capabilities *__unused)
 	if (arm64_use_ng_mappings)
 		return;
 
-	remap_fn = (void *)__pa_symbol(function_nocfi(idmap_kpti_install_ng_mappings));
-
-	if (!cpu) {
-		alloc = __get_free_pages(GFP_ATOMIC | __GFP_ZERO, order);
-		kpti_ng_temp_pgd = (pgd_t *)(alloc + (levels - 1) * PAGE_SIZE);
-		kpti_ng_temp_alloc = kpti_ng_temp_pgd_pa = __pa(kpti_ng_temp_pgd);
-
-		//
-		// Create a minimal page table hierarchy that permits us to map
-		// the swapper page tables temporarily as we traverse them.
-		//
-		// The physical pages are laid out as follows:
-		//
-		// +--------+-/-------+-/------ +-\\--------+
-		// :  PTE[] : | PMD[] : | PUD[] : || PGD[]  :
-		// +--------+-\-------+-\------ +-//--------+
-		//      ^
-		// The first page is mapped into this hierarchy at a PMD_SHIFT
-		// aligned virtual address, so that we can manipulate the PTE
-		// level entries while the mapping is active. The first entry
-		// covers the PTE[] page itself, the remaining entries are free
-		// to be used as a ad-hoc fixmap.
-		//
-		create_kpti_ng_temp_pgd(kpti_ng_temp_pgd, __pa(alloc),
-					KPTI_NG_TEMP_VA, PAGE_SIZE, PAGE_KERNEL,
-					kpti_ng_pgd_alloc, 0);
-	}
+	remap_fn = (void *)__pa_symbol(idmap_kpti_install_ng_mappings);
 
 	if (!cpu) {
 		alloc = __get_free_pages(GFP_ATOMIC | __GFP_ZERO, order);
@@ -2267,11 +2137,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
 		.matches = has_useable_gicv3_cpuif,
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_GIC_SHIFT,
-=======
-		.field_pos = ID_AA64PFR0_GIC_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.sign = FTR_UNSIGNED,
 		.min_field_value = 1,
@@ -2282,11 +2148,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64MMFR0_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR0_EL1_ECV_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR0_ECV_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.sign = FTR_UNSIGNED,
 		.min_field_value = 1,
@@ -2298,11 +2160,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64MMFR1_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR1_EL1_PAN_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR1_PAN_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.sign = FTR_UNSIGNED,
 		.min_field_value = 1,
@@ -2316,11 +2174,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64MMFR1_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR1_EL1_PAN_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR1_PAN_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.sign = FTR_UNSIGNED,
 		.min_field_value = 3,
@@ -2358,15 +2212,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.matches = has_32bit_el0,
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_EL0_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR0_EL1_ELx_32BIT_64BIT,
-=======
-		.field_pos = ID_AA64PFR0_EL0_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 #ifdef CONFIG_KVM
 	{
@@ -2376,15 +2224,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_EL1_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR0_EL1_ELx_32BIT_64BIT,
-=======
-		.field_pos = ID_AA64PFR0_EL1_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.desc = "Protected KVM",
@@ -2403,11 +2245,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		 * more details.
 		 */
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_CSV3_SHIFT,
-=======
-		.field_pos = ID_AA64PFR0_CSV3_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.min_field_value = 1,
 		.matches = unmap_kernel_at_el0,
@@ -2450,15 +2288,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.capability = ARM64_SVE,
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_SVE_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR0_EL1_SVE_IMP,
-=======
-		.field_pos = ID_AA64PFR0_SVE_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR0_SVE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.matches = has_cpuid_feature,
 		.cpu_enable = sve_kernel_enable,
 	},
@@ -2471,15 +2303,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_RAS_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR0_EL1_RAS_IMP,
-=======
-		.field_pos = ID_AA64PFR0_RAS_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR0_RAS_V1,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.cpu_enable = cpu_clear_disr,
 	},
 #endif /* CONFIG_ARM64_RAS_EXTN */
@@ -2496,15 +2322,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.matches = has_amu,
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_AMU_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR0_EL1_AMU_IMP,
-=======
-		.field_pos = ID_AA64PFR0_AMU_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR0_AMU,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.cpu_enable = cpu_amu_enable,
 	},
 #endif /* CONFIG_ARM64_AMU_EXTN */
@@ -2527,11 +2347,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.capability = ARM64_HAS_STAGE2_FWB,
 		.sys_reg = SYS_ID_AA64MMFR2_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR2_EL1_FWB_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR2_FWB_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.min_field_value = 1,
 		.matches = has_cpuid_feature,
@@ -2542,11 +2358,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.capability = ARM64_HAS_ARMv8_4_TTL,
 		.sys_reg = SYS_ID_AA64MMFR2_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR2_EL1_TTL_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR2_TTL_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.min_field_value = 1,
 		.matches = has_cpuid_feature,
@@ -2576,11 +2388,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.capability = ARM64_HW_DBM,
 		.sys_reg = SYS_ID_AA64MMFR1_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR1_EL1_HAFDBS_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR1_HADBS_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.min_field_value = 2,
 		.matches = has_hw_dbm,
@@ -2603,11 +2411,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64PFR1_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR1_EL1_SSBS_SHIFT,
-=======
-		.field_pos = ID_AA64PFR1_SSBS_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.sign = FTR_UNSIGNED,
 		.min_field_value = ID_AA64PFR1_EL1_SSBS_IMP,
@@ -2620,11 +2424,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.matches = has_useable_cnp,
 		.sys_reg = SYS_ID_AA64MMFR2_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR2_EL1_CnP_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR2_CNP_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.min_field_value = 1,
 		.cpu_enable = cpu_enable_cnp,
@@ -2729,11 +2529,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
 		.matches = can_use_gic_priorities,
 		.sys_reg = SYS_ID_AA64PFR0_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR0_EL1_GIC_SHIFT,
-=======
-		.field_pos = ID_AA64PFR0_GIC_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.field_width = 4,
 		.sign = FTR_UNSIGNED,
 		.min_field_value = 1,
@@ -2747,11 +2543,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.sys_reg = SYS_ID_AA64MMFR2_EL1,
 		.sign = FTR_UNSIGNED,
 		.field_width = 4,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR2_EL1_E0PD_SHIFT,
-=======
-		.field_pos = ID_AA64MMFR2_E0PD_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.matches = has_cpuid_feature,
 		.min_field_value = 1,
 		.cpu_enable = cpu_enable_e0pd,
@@ -2780,15 +2572,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.matches = has_cpuid_feature,
 		.cpu_enable = bti_enable,
 		.sys_reg = SYS_ID_AA64PFR1_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR1_EL1_BT_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR1_EL1_BT_IMP,
-=======
-		.field_pos = ID_AA64PFR1_BT_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR1_BT_BTI,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.sign = FTR_UNSIGNED,
 	},
 #endif
@@ -2799,15 +2585,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64PFR1_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR1_EL1_MTE_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR1_EL1_MTE_MTE2,
-=======
-		.field_pos = ID_AA64PFR1_MTE_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR1_MTE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.sign = FTR_UNSIGNED,
 		.cpu_enable = cpu_enable_mte,
 	},
@@ -2817,15 +2597,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
 		.matches = has_cpuid_feature,
 		.sys_reg = SYS_ID_AA64PFR1_EL1,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR1_EL1_MTE_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR1_EL1_MTE_MTE3,
-=======
-		.field_pos = ID_AA64PFR1_MTE_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR1_MTE_ASYMM,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.sign = FTR_UNSIGNED,
 	},
 #endif /* CONFIG_ARM64_MTE */
@@ -2847,15 +2621,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.capability = ARM64_SME,
 		.sys_reg = SYS_ID_AA64PFR1_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64PFR1_EL1_SME_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64PFR1_EL1_SME_IMP,
-=======
-		.field_pos = ID_AA64PFR1_SME_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64PFR1_SME,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.matches = has_cpuid_feature,
 		.cpu_enable = sme_kernel_enable,
 	},
@@ -2890,15 +2658,9 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 		.sys_reg = SYS_ID_AA64MMFR1_EL1,
 		.sign = FTR_UNSIGNED,
-<<<<<<< HEAD
 		.field_pos = ID_AA64MMFR1_EL1_TIDCP1_SHIFT,
 		.field_width = 4,
 		.min_field_value = ID_AA64MMFR1_EL1_TIDCP1_IMP,
-=======
-		.field_pos = ID_AA64MMFR1_TIDCP1_SHIFT,
-		.field_width = 4,
-		.min_field_value = ID_AA64MMFR1_TIDCP1_IMP,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.matches = has_cpuid_feature,
 		.cpu_enable = cpu_trap_el0_impdef,
 	},
@@ -2906,11 +2668,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
 };
 
 #define HWCAP_CPUID_MATCH(reg, field, width, s, min_value)			\
-<<<<<<< HEAD
 		.matches = has_user_cpuid_feature,					\
-=======
-		.matches = has_cpuid_feature,					\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.sys_reg = reg,							\
 		.field_pos = field,						\
 		.field_width = width,						\
@@ -2994,19 +2752,11 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
 	HWCAP_CAP(SYS_ID_AA64ISAR0_EL1, ID_AA64ISAR0_EL1_TS_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_FLAGM),
 	HWCAP_CAP(SYS_ID_AA64ISAR0_EL1, ID_AA64ISAR0_EL1_TS_SHIFT, 4, FTR_UNSIGNED, 2, CAP_HWCAP, KERNEL_HWCAP_FLAGM2),
 	HWCAP_CAP(SYS_ID_AA64ISAR0_EL1, ID_AA64ISAR0_EL1_RNDR_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_RNG),
-<<<<<<< HEAD
 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_EL1_FP_SHIFT, 4, FTR_SIGNED, 0, CAP_HWCAP, KERNEL_HWCAP_FP),
 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_EL1_FP_SHIFT, 4, FTR_SIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_FPHP),
 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_EL1_AdvSIMD_SHIFT, 4, FTR_SIGNED, 0, CAP_HWCAP, KERNEL_HWCAP_ASIMD),
 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_EL1_AdvSIMD_SHIFT, 4, FTR_SIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_ASIMDHP),
 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_EL1_DIT_SHIFT, 4, FTR_SIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_DIT),
-=======
-	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_FP_SHIFT, 4, FTR_SIGNED, 0, CAP_HWCAP, KERNEL_HWCAP_FP),
-	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_FP_SHIFT, 4, FTR_SIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_FPHP),
-	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_ASIMD_SHIFT, 4, FTR_SIGNED, 0, CAP_HWCAP, KERNEL_HWCAP_ASIMD),
-	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_ASIMD_SHIFT, 4, FTR_SIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_ASIMDHP),
-	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_DIT_SHIFT, 4, FTR_SIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_DIT),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_EL1_DPB_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_DCPOP),
 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_EL1_DPB_SHIFT, 4, FTR_UNSIGNED, 2, CAP_HWCAP, KERNEL_HWCAP_DCPODP),
 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_EL1_JSCVT_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_JSCVT),
@@ -3019,46 +2769,30 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_EL1_BF16_SHIFT, 4, FTR_UNSIGNED, 2, CAP_HWCAP, KERNEL_HWCAP_EBF16),
 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_EL1_DGH_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_DGH),
 	HWCAP_CAP(SYS_ID_AA64ISAR1_EL1, ID_AA64ISAR1_EL1_I8MM_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_I8MM),
-<<<<<<< HEAD
 	HWCAP_CAP(SYS_ID_AA64MMFR2_EL1, ID_AA64MMFR2_EL1_AT_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_USCAT),
 #ifdef CONFIG_ARM64_SVE
 	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_EL1_SVE_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR0_EL1_SVE_IMP, CAP_HWCAP, KERNEL_HWCAP_SVE),
-=======
-	HWCAP_CAP(SYS_ID_AA64MMFR2_EL1, ID_AA64MMFR2_AT_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_USCAT),
-#ifdef CONFIG_ARM64_SVE
-	HWCAP_CAP(SYS_ID_AA64PFR0_EL1, ID_AA64PFR0_SVE_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR0_SVE, CAP_HWCAP, KERNEL_HWCAP_SVE),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_SVEver_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_SVEver_SVE2, CAP_HWCAP, KERNEL_HWCAP_SVE2),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_AES_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_AES_IMP, CAP_HWCAP, KERNEL_HWCAP_SVEAES),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_AES_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_AES_PMULL128, CAP_HWCAP, KERNEL_HWCAP_SVEPMULL),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_BitPerm_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_BitPerm_IMP, CAP_HWCAP, KERNEL_HWCAP_SVEBITPERM),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_BF16_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_BF16_IMP, CAP_HWCAP, KERNEL_HWCAP_SVEBF16),
-<<<<<<< HEAD
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_BF16_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_BF16_EBF16, CAP_HWCAP, KERNEL_HWCAP_SVE_EBF16),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_SHA3_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_SHA3_IMP, CAP_HWCAP, KERNEL_HWCAP_SVESHA3),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_SM4_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_SM4_IMP, CAP_HWCAP, KERNEL_HWCAP_SVESM4),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_I8MM_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_I8MM_IMP, CAP_HWCAP, KERNEL_HWCAP_SVEI8MM),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_F32MM_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_F32MM_IMP, CAP_HWCAP, KERNEL_HWCAP_SVEF32MM),
 	HWCAP_CAP(SYS_ID_AA64ZFR0_EL1, ID_AA64ZFR0_EL1_F64MM_SHIFT, 4, FTR_UNSIGNED, ID_AA64ZFR0_EL1_F64MM_IMP, CAP_HWCAP, KERNEL_HWCAP_SVEF64MM),
 #endif
-<<<<<<< HEAD
 	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_EL1_SSBS_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_EL1_SSBS_SSBS2, CAP_HWCAP, KERNEL_HWCAP_SSBS),
 #ifdef CONFIG_ARM64_BTI
 	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_EL1_BT_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_EL1_BT_IMP, CAP_HWCAP, KERNEL_HWCAP_BTI),
-=======
-	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_SSBS_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_SSBS_PSTATE_INSNS, CAP_HWCAP, KERNEL_HWCAP_SSBS),
-#ifdef CONFIG_ARM64_BTI
-	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_BT_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_BT_BTI, CAP_HWCAP, KERNEL_HWCAP_BTI),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 #ifdef CONFIG_ARM64_PTR_AUTH
 	HWCAP_MULTI_CAP(ptr_auth_hwcap_addr_matches, CAP_HWCAP, KERNEL_HWCAP_PACA),
 	HWCAP_MULTI_CAP(ptr_auth_hwcap_gen_matches, CAP_HWCAP, KERNEL_HWCAP_PACG),
 #endif
 #ifdef CONFIG_ARM64_MTE
-<<<<<<< HEAD
 	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_EL1_MTE_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_EL1_MTE_MTE2, CAP_HWCAP, KERNEL_HWCAP_MTE),
 	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_EL1_MTE_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_EL1_MTE_MTE3, CAP_HWCAP, KERNEL_HWCAP_MTE3),
 #endif /* CONFIG_ARM64_MTE */
@@ -3068,17 +2802,6 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
 	HWCAP_CAP(SYS_ID_AA64ISAR2_EL1, ID_AA64ISAR2_EL1_WFxT_SHIFT, 4, FTR_UNSIGNED, ID_AA64ISAR2_EL1_WFxT_IMP, CAP_HWCAP, KERNEL_HWCAP_WFXT),
 #ifdef CONFIG_ARM64_SME
 	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_EL1_SME_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_EL1_SME_IMP, CAP_HWCAP, KERNEL_HWCAP_SME),
-=======
-	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_MTE_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_MTE, CAP_HWCAP, KERNEL_HWCAP_MTE),
-	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_MTE_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_MTE_ASYMM, CAP_HWCAP, KERNEL_HWCAP_MTE3),
-#endif /* CONFIG_ARM64_MTE */
-	HWCAP_CAP(SYS_ID_AA64MMFR0_EL1, ID_AA64MMFR0_ECV_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_ECV),
-	HWCAP_CAP(SYS_ID_AA64MMFR1_EL1, ID_AA64MMFR1_AFP_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_AFP),
-	HWCAP_CAP(SYS_ID_AA64ISAR2_EL1, ID_AA64ISAR2_EL1_RPRES_SHIFT, 4, FTR_UNSIGNED, 1, CAP_HWCAP, KERNEL_HWCAP_RPRES),
-	HWCAP_CAP(SYS_ID_AA64ISAR2_EL1, ID_AA64ISAR2_EL1_WFxT_SHIFT, 4, FTR_UNSIGNED, ID_AA64ISAR2_EL1_WFxT_IMP, CAP_HWCAP, KERNEL_HWCAP_WFXT),
-#ifdef CONFIG_ARM64_SME
-	HWCAP_CAP(SYS_ID_AA64PFR1_EL1, ID_AA64PFR1_SME_SHIFT, 4, FTR_UNSIGNED, ID_AA64PFR1_SME, CAP_HWCAP, KERNEL_HWCAP_SME),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	HWCAP_CAP(SYS_ID_AA64SMFR0_EL1, ID_AA64SMFR0_EL1_FA64_SHIFT, 1, FTR_UNSIGNED, ID_AA64SMFR0_EL1_FA64_IMP, CAP_HWCAP, KERNEL_HWCAP_SME_FA64),
 	HWCAP_CAP(SYS_ID_AA64SMFR0_EL1, ID_AA64SMFR0_EL1_I16I64_SHIFT, 4, FTR_UNSIGNED, ID_AA64SMFR0_EL1_I16I64_IMP, CAP_HWCAP, KERNEL_HWCAP_SME_I16I64),
 	HWCAP_CAP(SYS_ID_AA64SMFR0_EL1, ID_AA64SMFR0_EL1_F64F64_SHIFT, 1, FTR_UNSIGNED, ID_AA64SMFR0_EL1_F64F64_IMP, CAP_HWCAP, KERNEL_HWCAP_SME_F64F64),

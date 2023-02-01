@@ -91,11 +91,7 @@ static void update_general_status(struct f2fs_sb_info *sbi)
 	si->ndirty_files = sbi->ndirty_inode[FILE_INODE];
 	si->nquota_files = sbi->nquota_files;
 	si->ndirty_all = sbi->ndirty_inode[DIRTY_META];
-<<<<<<< HEAD
 	si->aw_cnt = atomic_read(&sbi->atomic_files);
-=======
-	si->aw_cnt = sbi->atomic_files;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	si->max_aw_cnt = atomic_read(&sbi->max_aw_cnt);
 	si->nr_dio_read = get_pages(sbi, F2FS_DIO_READ);
 	si->nr_dio_write = get_pages(sbi, F2FS_DIO_WRITE);

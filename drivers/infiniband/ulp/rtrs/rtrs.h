@@ -150,11 +150,7 @@ struct rtrs_srv_ops {
 	 *	@usrlen:	Size of the user message
 	 */
 	int (*rdma_ev)(void *priv,
-<<<<<<< HEAD
 		       struct rtrs_srv_op *id,
-=======
-		       struct rtrs_srv_op *id, int dir,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		       void *data, size_t datalen, const void *usr,
 		       size_t usrlen);
 	/**

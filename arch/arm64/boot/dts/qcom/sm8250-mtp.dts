@@ -635,11 +635,7 @@
 	wcd938x: codec {
 		compatible = "qcom,wcd9380-codec";
 		#sound-dai-cells = <1>;
-<<<<<<< HEAD
 		reset-gpios = <&tlmm 32 GPIO_ACTIVE_LOW>;
-=======
-		reset-gpios = <&tlmm 32 0>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vdd-buck-supply = <&vreg_s4a_1p8>;
 		vdd-rxtx-supply = <&vreg_s4a_1p8>;
 		vdd-io-supply = <&vreg_s4a_1p8>;

@@ -23,18 +23,11 @@
 提交的流程会让人畏惧。本文档包含了一系列建议，可以大大提高你
 的改动被接受的机会.
 
-<<<<<<< HEAD
 本文档以较为简洁的行文给出了大量建议。关于内核开发流程如何进行的详细信息，
 参见： Documentation/translations/zh_CN/process/development-process.rst 。
 Documentation/translations/zh_CN/process/submit-checklist.rst 给出了一系列
 提交补丁之前要检查的事项。设备树相关的补丁，请参阅
 Documentation/devicetree/bindings/submitting-patches.rst 。
-=======
-以下文档含有大量简洁的建议， 具体请见：
-:ref:`Documentation/process <development_process_main>`
-同样，:ref:`Documentation/translations/zh_CN/process/submit-checklist.rst <cn_submitchecklist>`
-给出在提交代码前需要检查的项目的列表。
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 本文档假设您正在使用 ``git`` 准备你的补丁。如果您不熟悉 ``git`` ，最好学习
 如何使用它，这将使您作为内核开发人员的生活变得更加轻松。
@@ -89,26 +82,11 @@ Documentation/process/maintainer-handbooks.rst 。
 URL来查找补丁描述并将其放入补丁中。也就是说，补丁（系列）及其描述应该是独立的。
 这对维护人员和审阅者都有好处。一些审阅者可能甚至没有收到补丁的早期版本。
 
-<<<<<<< HEAD
 用祈使句描述你的变更，例如“make xyzzy do frotz”而不是“[This patch]make
 xyzzy do frotz”或“[I]changed xyzzy to do frotz”，就好像你在命令代码库改变
 它的行为一样。
 
 如果您想要引用一个特定的提交，不要只引用提交的SHA-1 ID。还请包括提交的一行
-=======
-描述你在命令语气中的变化，例如“make xyzzy do frotz”而不是“[This patch]make
-xyzzy do frotz”或“[I]changed xyzzy to do frotz”，就好像你在命令代码库改变
-它的行为一样。
-
-如果修补程序修复了一个记录的bug条目，请按编号和URL引用该bug条目。如果补丁来
-自邮件列表讨论，请给出邮件列表存档的URL；使用带有 ``Message-ID`` 的
-https://lore.kernel.org/ 重定向，以确保链接不会过时。
-
-但是，在没有外部资源的情况下，尽量让你的解释可理解。除了提供邮件列表存档或
-bug的URL之外，还要总结需要提交补丁的相关讨论要点。
-
-如果您想要引用一个特定的提交，不要只引用提交的 SHA-1 ID。还请包括提交的一行
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 摘要，以便于审阅者了解它是关于什么的。例如::
 
         Commit e21d2170f36602ae2708 ("video: remove unnecessary
@@ -242,19 +220,11 @@ Documentation/translations/zh_CN/process/stable-kernel-rules.rst 。
 
 如果更改影响到用户侧内核接口，请向手册页维护人员（如维护人员文件中所列）发送
 手册页补丁，或至少发送更改通知，以便一些信息进入手册页。还应将用户空间API
-<<<<<<< HEAD
 更改抄送到 linux-api@vger.kernel.org 。
 
 
 不要MIME编码，不要链接，不要压缩，不要附件，只要纯文本
 ------------------------------------------------------
-=======
-更改复制到 linux-api@vger.kernel.org。
-
-
-6) 没有 MIME 编码，没有链接，没有压缩，没有附件，只有纯文本
------------------------------------------------------------
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Linus 和其他的内核开发者需要阅读和评论你提交的改动。对于内核开发者来说
 ，可以“引用”你的改动很重要，使用一般的邮件工具，他们就可以在你的
@@ -574,19 +544,10 @@ Fixes: 指示补丁修复了之前提交的一个问题。它可以便于确定�
   V2 -> V3: Removed redundant helper function
   V1 -> V2: Cleaned up coding style and addressed review comments
 
-<<<<<<< HEAD
   path/to/file | 5+++--
   ...
 
 在后面的参考资料中能看到正确补丁格式的更多细节。
-=======
-手动添加回复补丁的的标题头(In-Reply_To:) 是有帮助的（例如，使用 ``git send-email`` ）
-将补丁与以前的相关讨论关联起来，例如，将bug修复程序链接到电子邮件和bug报告。
-但是，对于多补丁系列，最好避免在回复时使用链接到该系列的旧版本。这样，
-补丁的多个版本就不会成为电子邮件客户端中无法管理的引用序列。如果链接有用，
-可以使用 https://lore.kernel.org/ 重定向器（例如，在封面电子邮件文本中）
-链接到补丁系列的早期版本。
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 .. _zh_backtraces:
 

@@ -127,10 +127,7 @@ static inline struct evsel *evlist__add_dummy_on_all_cpus(struct evlist *evlist)
 {
 	return evlist__add_aux_dummy(evlist, true);
 }
-<<<<<<< HEAD
 struct evsel *evlist__add_sched_switch(struct evlist *evlist, bool system_wide);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int evlist__add_sb_event(struct evlist *evlist, struct perf_event_attr *attr,
 			 evsel__sb_cb_t cb, void *data);
@@ -212,11 +209,8 @@ void evlist__enable(struct evlist *evlist);
 void evlist__toggle_enable(struct evlist *evlist);
 void evlist__disable_evsel(struct evlist *evlist, char *evsel_name);
 void evlist__enable_evsel(struct evlist *evlist, char *evsel_name);
-<<<<<<< HEAD
 void evlist__disable_non_dummy(struct evlist *evlist);
 void evlist__enable_non_dummy(struct evlist *evlist);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void evlist__set_selected(struct evlist *evlist, struct evsel *evsel);
 
@@ -430,7 +424,6 @@ void evlist__close_control(int ctl_fd, int ctl_fd_ack, bool *ctl_fd_close);
 int evlist__initialize_ctlfd(struct evlist *evlist, int ctl_fd, int ctl_fd_ack);
 int evlist__finalize_ctlfd(struct evlist *evlist);
 bool evlist__ctlfd_initialized(struct evlist *evlist);
-int evlist__ctlfd_update(struct evlist *evlist, struct pollfd *update);
 int evlist__ctlfd_process(struct evlist *evlist, enum evlist_ctl_cmd *cmd);
 int evlist__ctlfd_ack(struct evlist *evlist);
 

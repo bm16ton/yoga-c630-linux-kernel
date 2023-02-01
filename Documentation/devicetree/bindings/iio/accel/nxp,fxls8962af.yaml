@@ -27,11 +27,6 @@ properties:
   vdd-supply:
     description: phandle to the regulator that provides power to the accelerometer
 
-<<<<<<< HEAD
-=======
-  spi-max-frequency: true
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   interrupts:
     maxItems: 1
 
@@ -47,14 +42,10 @@ required:
   - compatible
   - reg
 
-<<<<<<< HEAD
 allOf:
   - $ref: /schemas/spi/spi-peripheral-props.yaml#
 
 unevaluatedProperties: false
-=======
-additionalProperties: false
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

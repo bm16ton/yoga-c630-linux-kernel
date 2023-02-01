@@ -15,11 +15,7 @@
  * value of the decimation factor and ODR set for each FIFO data set.
  *
  * LSM6DSO/LSM6DSOX/ASM330LHH/ASM330LHHX/LSM6DSR/LSM6DSRX/ISM330DHCX/
-<<<<<<< HEAD
  * LSM6DST/LSM6DSOP/LSM6DSTX:
-=======
- * LSM6DST/LSM6DSOP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * The FIFO buffer can be configured to store data from gyroscope and
  * accelerometer. Each sample is queued with a tag (1B) indicating data
  * source (gyroscope, accelerometer, hw timer).

@@ -63,19 +63,11 @@
 /* Setup 16 mailboxes */
 #define FLEXCAN_QUIRK_NR_MB_16 BIT(13)
 /* Device supports RX via mailboxes */
-<<<<<<< HEAD
 #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX BIT(14)
 /* Device supports RTR reception via mailboxes */
 #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR BIT(15)
 /* Device supports RX via FIFO */
 #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
-=======
-#define FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX BIT(14)
-/* Device supports RTR reception via mailboxes */
-#define FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR BIT(15)
-/* Device supports RX via FIFO */
-#define FLEXCAN_QUIRK_SUPPPORT_RX_FIFO BIT(16)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct flexcan_devtype_data {
 	u32 quirks;		/* quirks needed for different IP cores */
@@ -129,11 +121,7 @@ flexcan_supports_rx_mailbox(const struct flexcan_priv *priv)
 {
 	const u32 quirks = priv->devtype_data.quirks;
 
-<<<<<<< HEAD
 	return quirks & FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX;
-=======
-	return quirks & FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool
@@ -141,17 +129,10 @@ flexcan_supports_rx_mailbox_rtr(const struct flexcan_priv *priv)
 {
 	const u32 quirks = priv->devtype_data.quirks;
 
-<<<<<<< HEAD
 	return (quirks & (FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 			  FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR)) ==
 		(FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		 FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR);
-=======
-	return (quirks & (FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-			  FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR)) ==
-		(FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		 FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool
@@ -159,11 +140,7 @@ flexcan_supports_rx_fifo(const struct flexcan_priv *priv)
 {
 	const u32 quirks = priv->devtype_data.quirks;
 
-<<<<<<< HEAD
 	return quirks & FLEXCAN_QUIRK_SUPPORT_RX_FIFO;
-=======
-	return quirks & FLEXCAN_QUIRK_SUPPPORT_RX_FIFO;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool
@@ -172,11 +149,7 @@ flexcan_active_rx_rtr(const struct flexcan_priv *priv)
 	const u32 quirks = priv->devtype_data.quirks;
 
 	if (quirks & FLEXCAN_QUIRK_USE_RX_MAILBOX) {
-<<<<<<< HEAD
 		if (quirks & FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR)
-=======
-		if (quirks & FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return true;
 	} else {
 		/*  RX-FIFO is always RTR capable */

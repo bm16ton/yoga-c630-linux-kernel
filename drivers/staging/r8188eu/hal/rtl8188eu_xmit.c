@@ -431,11 +431,7 @@ bool rtl8188eu_xmitframe_complete(struct adapter *adapt, struct xmit_priv *pxmit
 	rtw_xmitframe_coalesce(adapt, pxmitframe->pkt, pxmitframe);
 
 	/*  always return ndis_packet after rtw_xmitframe_coalesce */
-<<<<<<< HEAD
 	rtw_xmit_complete(adapt, pxmitframe);
-=======
-	rtw_os_xmit_complete(adapt, pxmitframe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* 3 2. aggregate same priority and same DA(AP or STA) frames */
 	pfirstframe = pxmitframe;
@@ -505,11 +501,7 @@ bool rtl8188eu_xmitframe_complete(struct adapter *adapt, struct xmit_priv *pxmit
 
 		rtw_xmitframe_coalesce(adapt, pxmitframe->pkt, pxmitframe);
 		/*  always return ndis_packet after rtw_xmitframe_coalesce */
-<<<<<<< HEAD
 		rtw_xmit_complete(adapt, pxmitframe);
-=======
-		rtw_os_xmit_complete(adapt, pxmitframe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*  (len - TXDESC_SIZE) == pxmitframe->attrib.last_txcmdsz */
 		update_txdesc(pxmitframe, pxmitframe->buf_addr, pxmitframe->attrib.last_txcmdsz, true);

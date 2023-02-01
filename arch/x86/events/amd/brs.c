@@ -81,11 +81,7 @@ static bool __init amd_brs_detect(void)
  * a br_sel_map. Software filtering is not supported because it would not correlate well
  * with a sampling period.
  */
-<<<<<<< HEAD
 static int amd_brs_setup_filter(struct perf_event *event)
-=======
-int amd_brs_setup_filter(struct perf_event *event)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u64 type = event->attr.branch_sample_type;
 
@@ -100,7 +96,6 @@ int amd_brs_setup_filter(struct perf_event *event)
 	return 0;
 }
 
-<<<<<<< HEAD
 static inline int amd_is_brs_event(struct perf_event *e)
 {
 	return (e->hw.config & AMD64_RAW_EVENT_MASK) == AMD_FAM19H_BRS_EVENT;
@@ -168,8 +163,6 @@ int amd_brs_hw_config(struct perf_event *event)
 	return ret;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* tos = top of stack, i.e., last valid entry written */
 static inline int amd_brs_get_tos(union amd_debug_extn_cfg *cfg)
 {

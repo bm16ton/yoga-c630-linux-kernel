@@ -729,7 +729,6 @@ static int eb_reserve(struct i915_execbuffer *eb)
 	bool unpinned;
 
 	/*
-<<<<<<< HEAD
 	 * We have one more buffers that we couldn't bind, which could be due to
 	 * various reasons. To resolve this we have 4 passes, with every next
 	 * level turning the screws tighter:
@@ -793,34 +792,6 @@ retry:
 					if (!err)
 						goto retry;
 				}
-=======
-	 * Attempt to pin all of the buffers into the GTT.
-	 * This is done in 2 phases:
-	 *
-	 * 1. Unbind all objects that do not match the GTT constraints for
-	 *    the execbuffer (fenceable, mappable, alignment etc).
-	 * 2. Bind new objects.
-	 *
-	 * This avoid unnecessary unbinding of later objects in order to make
-	 * room for the earlier objects *unless* we need to defragment.
-	 *
-	 * Defragmenting is skipped if all objects are pinned at a fixed location.
-	 */
-	for (pass = 0; pass <= 2; pass++) {
-		int pin_flags = PIN_USER | PIN_VALIDATE;
-
-		if (pass == 0)
-			pin_flags |= PIN_NONBLOCK;
-
-		if (pass >= 1)
-			unpinned = eb_unbind(eb, pass == 2);
-
-		if (pass == 2) {
-			err = mutex_lock_interruptible(&eb->context->vm->mutex);
-			if (!err) {
-				err = i915_gem_evict_vm(eb->context->vm, &eb->ww);
-				mutex_unlock(&eb->context->vm->mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			if (err)
 				return err;
@@ -2028,19 +1999,11 @@ static int eb_capture_stage(struct i915_execbuffer *eb)
 
 		if (!(flags & EXEC_OBJECT_CAPTURE))
 			continue;
-<<<<<<< HEAD
 
 		if (i915_gem_context_is_recoverable(eb->gem_context) &&
 		    (IS_DGFX(eb->i915) || GRAPHICS_VER_FULL(eb->i915) > IP_VER(12, 0)))
 			return -EINVAL;
 
-=======
-
-		if (i915_gem_context_is_recoverable(eb->gem_context) &&
-		    (IS_DGFX(eb->i915) || GRAPHICS_VER_FULL(eb->i915) > IP_VER(12, 0)))
-			return -EINVAL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		for_each_batch_create_order(eb, j) {
 			struct i915_capture_list *capture;
 
@@ -2051,7 +2014,6 @@ static int eb_capture_stage(struct i915_execbuffer *eb)
 			capture->next = eb->capture_lists[j];
 			capture->vma_res = i915_vma_resource_get(vma->resource);
 			eb->capture_lists[j] = capture;
-<<<<<<< HEAD
 		}
 	}
 
@@ -2088,44 +2050,6 @@ static void eb_capture_release(struct i915_execbuffer *eb)
 			eb->capture_lists[j] = NULL;
 		}
 	}
-=======
-		}
-	}
-
-	return 0;
-}
-
-/* Commit once we're in the critical path */
-static void eb_capture_commit(struct i915_execbuffer *eb)
-{
-	unsigned int j;
-
-	for_each_batch_create_order(eb, j) {
-		struct i915_request *rq = eb->requests[j];
-
-		if (!rq)
-			break;
-
-		rq->capture_list = eb->capture_lists[j];
-		eb->capture_lists[j] = NULL;
-	}
-}
-
-/*
- * Release anything that didn't get committed due to errors.
- * The capture_list will otherwise be freed at request retire.
- */
-static void eb_capture_release(struct i915_execbuffer *eb)
-{
-	unsigned int j;
-
-	for_each_batch_create_order(eb, j) {
-		if (eb->capture_lists[j]) {
-			i915_request_free_capture_list(eb->capture_lists[j]);
-			eb->capture_lists[j] = NULL;
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void eb_capture_list_clear(struct i915_execbuffer *eb)
@@ -2201,7 +2125,6 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 			err = i915_request_await_object
 				(eb_find_first_request_added(eb), obj,
 				 flags & EXEC_OBJECT_WRITE);
-<<<<<<< HEAD
 		}
 
 		for_each_batch_add_order(eb, j) {
@@ -2239,45 +2162,6 @@ static int eb_move_to_gpu(struct i915_execbuffer *eb)
 				break;
 		}
 
-=======
-		}
-
-		for_each_batch_add_order(eb, j) {
-			if (err)
-				break;
-			if (!eb->requests[j])
-				continue;
-
-			err = _i915_vma_move_to_active(vma, eb->requests[j],
-						       j ? NULL :
-						       eb->composite_fence ?
-						       eb->composite_fence :
-						       &eb->requests[j]->fence,
-						       flags | __EXEC_OBJECT_NO_RESERVE);
-		}
-	}
-
-#ifdef CONFIG_MMU_NOTIFIER
-	if (!err && (eb->args->flags & __EXEC_USERPTR_USED)) {
-		read_lock(&eb->i915->mm.notifier_lock);
-
-		/*
-		 * count is always at least 1, otherwise __EXEC_USERPTR_USED
-		 * could not have been set
-		 */
-		for (i = 0; i < count; i++) {
-			struct eb_vma *ev = &eb->vma[i];
-			struct drm_i915_gem_object *obj = ev->vma->obj;
-
-			if (!i915_gem_object_is_userptr(obj))
-				continue;
-
-			err = i915_gem_object_userptr_submit_done(obj);
-			if (err)
-				break;
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		read_unlock(&eb->i915->mm.notifier_lock);
 	}
 #endif
@@ -2457,7 +2341,6 @@ static int eb_parse(struct i915_execbuffer *eb)
 	batch = eb_dispatch_secure(eb, shadow);
 	if (IS_ERR(batch))
 		return PTR_ERR(batch);
-<<<<<<< HEAD
 
 	err = dma_resv_reserve_fences(shadow->obj->base.resv, 1);
 	if (err)
@@ -2471,21 +2354,6 @@ static int eb_parse(struct i915_execbuffer *eb)
 	if (err)
 		return err;
 
-=======
-
-	err = dma_resv_reserve_fences(shadow->obj->base.resv, 1);
-	if (err)
-		return err;
-
-	err = intel_engine_cmd_parser(eb->context->engine,
-				      eb->batches[0]->vma,
-				      eb->batch_start_offset,
-				      eb->batch_len[0],
-				      shadow, trampoline);
-	if (err)
-		return err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	eb->batches[0] = &eb->vma[eb->buffer_count++];
 	eb->batches[0]->vma = i915_vma_get(shadow);
 	eb->batches[0]->flags = __EXEC_OBJECT_HAS_PIN;

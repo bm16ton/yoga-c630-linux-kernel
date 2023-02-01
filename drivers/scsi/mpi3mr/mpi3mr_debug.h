@@ -23,7 +23,6 @@
 #define MPI3_DEBUG_RESET		0x00000020
 #define MPI3_DEBUG_SCSI_ERROR		0x00000040
 #define MPI3_DEBUG_REPLY		0x00000080
-<<<<<<< HEAD
 #define MPI3_DEBUG_CFG_ERROR		0x00000100
 #define MPI3_DEBUG_TRANSPORT_ERROR	0x00000200
 #define MPI3_DEBUG_BSG_ERROR		0x00008000
@@ -31,11 +30,6 @@
 #define MPI3_DEBUG_SCSI_INFO		0x00020000
 #define MPI3_DEBUG_CFG_INFO		0x00040000
 #define MPI3_DEBUG_TRANSPORT_INFO	0x00080000
-=======
-#define MPI3_DEBUG_BSG_ERROR		0x00008000
-#define MPI3_DEBUG_BSG_INFO		0x00010000
-#define MPI3_DEBUG_SCSI_INFO		0x00020000
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MPI3_DEBUG			0x01000000
 #define MPI3_DEBUG_SG			0x02000000
 
@@ -132,7 +126,6 @@
 			pr_info("%s: " fmt, (ioc)->name, ##__VA_ARGS__); \
 	} while (0)
 
-<<<<<<< HEAD
 #define dprint_cfg_info(ioc, fmt, ...) \
 	do { \
 		if (ioc->logging_level & MPI3_DEBUG_CFG_INFO) \
@@ -156,8 +149,6 @@
 			pr_info("%s: " fmt, (ioc)->name, ##__VA_ARGS__); \
 	} while (0)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* MPT3SAS_DEBUG_H_INCLUDED */
 
 /**

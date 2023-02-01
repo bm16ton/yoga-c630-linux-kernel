@@ -158,11 +158,6 @@ static void mc3230_remove(struct i2c_client *client)
 	iio_device_unregister(indio_dev);
 
 	mc3230_set_opcon(iio_priv(indio_dev), MC3230_MODE_OPCON_STANDBY);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int mc3230_suspend(struct device *dev)

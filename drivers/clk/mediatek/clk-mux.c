@@ -4,10 +4,7 @@
  * Author: Owen Chen <owen.chen@mediatek.com>
  */
 
-<<<<<<< HEAD
 #include <linux/clk.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/clk-provider.h>
 #include <linux/compiler_types.h>
 #include <linux/container_of.h>
@@ -132,7 +129,6 @@ static int mtk_clk_mux_set_parent_setclr_lock(struct clk_hw *hw, u8 index)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int mtk_clk_mux_determine_rate(struct clk_hw *hw,
 				      struct clk_rate_request *req)
 {
@@ -145,11 +141,6 @@ const struct clk_ops mtk_mux_clr_set_upd_ops = {
 	.get_parent = mtk_clk_mux_get_parent,
 	.set_parent = mtk_clk_mux_set_parent_setclr_lock,
 	.determine_rate = mtk_clk_mux_determine_rate,
-=======
-const struct clk_ops mtk_mux_clr_set_upd_ops = {
-	.get_parent = mtk_clk_mux_get_parent,
-	.set_parent = mtk_clk_mux_set_parent_setclr_lock,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_GPL(mtk_mux_clr_set_upd_ops);
 
@@ -279,7 +270,6 @@ void mtk_clk_unregister_muxes(const struct mtk_mux *muxes, int num,
 }
 EXPORT_SYMBOL_GPL(mtk_clk_unregister_muxes);
 
-<<<<<<< HEAD
 /*
  * This clock notifier is called when the frequency of the parent
  * PLL clock is to be changed. The idea is to switch the parent to a
@@ -317,6 +307,4 @@ int devm_mtk_clk_mux_notifier_register(struct device *dev, struct clk *clk,
 }
 EXPORT_SYMBOL_GPL(devm_mtk_clk_mux_notifier_register);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_LICENSE("GPL");

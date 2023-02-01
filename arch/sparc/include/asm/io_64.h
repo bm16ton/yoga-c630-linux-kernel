@@ -429,13 +429,9 @@ static inline void __iomem *ioremap(unsigned long offset, unsigned long size)
 static inline void __iomem *ioremap_np(unsigned long offset, unsigned long size)
 {
 	return NULL;
-<<<<<<< HEAD
 
 }
 #define ioremap_np ioremap_np
-=======
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline void iounmap(volatile void __iomem *addr)
 {

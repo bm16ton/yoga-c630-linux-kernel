@@ -1653,12 +1653,7 @@ static int mtk_star_probe(struct platform_device *pdev)
 	ndev->netdev_ops = &mtk_star_netdev_ops;
 	ndev->ethtool_ops = &mtk_star_ethtool_ops;
 
-<<<<<<< HEAD
 	netif_napi_add(ndev, &priv->rx_napi, mtk_star_rx_poll);
-=======
-	netif_napi_add(ndev, &priv->rx_napi, mtk_star_rx_poll,
-		       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	netif_napi_add_tx(ndev, &priv->tx_napi, mtk_star_tx_poll);
 
 	return devm_register_netdev(dev, ndev);

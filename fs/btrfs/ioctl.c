@@ -1126,19 +1126,11 @@ iterate:
 		 */
 		if (WARN_ON(key.objectid < ino) || key.type < BTRFS_EXTENT_DATA_KEY)
 			goto next;
-<<<<<<< HEAD
 
 		/* It's beyond our target range, definitely not extent found */
 		if (key.objectid > ino || key.type > BTRFS_EXTENT_DATA_KEY)
 			goto not_found;
 
-=======
-
-		/* It's beyond our target range, definitely not extent found */
-		if (key.objectid > ino || key.type > BTRFS_EXTENT_DATA_KEY)
-			goto not_found;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 *	|	|<- File extent ->|
 		 *	\- start
@@ -1226,17 +1218,10 @@ static struct extent_map *defrag_lookup_extent(struct inode *inode, u64 start,
 
 		/* get the big lock and read metadata off disk */
 		if (!locked)
-<<<<<<< HEAD
 			lock_extent(io_tree, start, end, &cached);
 		em = defrag_get_extent(BTRFS_I(inode), start, newer_than);
 		if (!locked)
 			unlock_extent(io_tree, start, end, &cached);
-=======
-			lock_extent_bits(io_tree, start, end, &cached);
-		em = defrag_get_extent(BTRFS_I(inode), start, newer_than);
-		if (!locked)
-			unlock_extent_cached(io_tree, start, end, &cached);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (IS_ERR(em))
 			return NULL;
@@ -1348,17 +1333,10 @@ again:
 	while (1) {
 		struct btrfs_ordered_extent *ordered;
 
-<<<<<<< HEAD
 		lock_extent(&inode->io_tree, page_start, page_end, &cached_state);
 		ordered = btrfs_lookup_ordered_range(inode, page_start, PAGE_SIZE);
 		unlock_extent(&inode->io_tree, page_start, page_end,
 			      &cached_state);
-=======
-		lock_extent_bits(&inode->io_tree, page_start, page_end, &cached_state);
-		ordered = btrfs_lookup_ordered_range(inode, page_start, PAGE_SIZE);
-		unlock_extent_cached(&inode->io_tree, page_start, page_end,
-				     &cached_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!ordered)
 			break;
 
@@ -1602,7 +1580,6 @@ static_assert(IS_ALIGNED(CLUSTER_SIZE, PAGE_SIZE));
 
 /*
  * Defrag one contiguous target range.
-<<<<<<< HEAD
  *
  * @inode:	target inode
  * @target:	target range to defrag
@@ -1611,16 +1588,6 @@ static_assert(IS_ALIGNED(CLUSTER_SIZE, PAGE_SIZE));
  *
  * Caller should ensure:
  *
-=======
- *
- * @inode:	target inode
- * @target:	target range to defrag
- * @pages:	locked pages covering the defrag range
- * @nr_pages:	number of locked pages
- *
- * Caller should ensure:
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * - Pages are prepared
  *   Pages should be locked, no ordered extent in the pages range,
  *   no writeback.
@@ -1649,11 +1616,7 @@ static int defrag_one_locked_target(struct btrfs_inode *inode,
 		return ret;
 	clear_extent_bit(&inode->io_tree, start, start + len - 1,
 			 EXTENT_DELALLOC | EXTENT_DO_ACCOUNTING |
-<<<<<<< HEAD
 			 EXTENT_DEFRAG, cached_state);
-=======
-			 EXTENT_DEFRAG, 0, 0, cached_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_extent_defrag(&inode->io_tree, start, start + len - 1, cached_state);
 
 	/* Update the page status */
@@ -1703,15 +1666,9 @@ static int defrag_one_range(struct btrfs_inode *inode, u64 start, u32 len,
 		wait_on_page_writeback(pages[i]);
 
 	/* Lock the pages range */
-<<<<<<< HEAD
 	lock_extent(&inode->io_tree, start_index << PAGE_SHIFT,
 		    (last_index << PAGE_SHIFT) + PAGE_SIZE - 1,
 		    &cached_state);
-=======
-	lock_extent_bits(&inode->io_tree, start_index << PAGE_SHIFT,
-			 (last_index << PAGE_SHIFT) + PAGE_SIZE - 1,
-			 &cached_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Now we have a consistent view about the extent map, re-check
 	 * which range really needs to be defragged.
@@ -1737,15 +1694,9 @@ static int defrag_one_range(struct btrfs_inode *inode, u64 start, u32 len,
 		kfree(entry);
 	}
 unlock_extent:
-<<<<<<< HEAD
 	unlock_extent(&inode->io_tree, start_index << PAGE_SHIFT,
 		      (last_index << PAGE_SHIFT) + PAGE_SIZE - 1,
 		      &cached_state);
-=======
-	unlock_extent_cached(&inode->io_tree, start_index << PAGE_SHIFT,
-			     (last_index << PAGE_SHIFT) + PAGE_SIZE - 1,
-			     &cached_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 free_pages:
 	for (i = 0; i < nr_pages; i++) {
 		if (pages[i]) {
@@ -1756,7 +1707,6 @@ free_pages:
 	kfree(pages);
 	return ret;
 }
-<<<<<<< HEAD
 
 static int defrag_one_cluster(struct btrfs_inode *inode,
 			      struct file_ra_state *ra,
@@ -1800,51 +1750,6 @@ static int defrag_one_cluster(struct btrfs_inode *inode,
 		if (entry->start + range_len <= *last_scanned_ret)
 			continue;
 
-=======
-
-static int defrag_one_cluster(struct btrfs_inode *inode,
-			      struct file_ra_state *ra,
-			      u64 start, u32 len, u32 extent_thresh,
-			      u64 newer_than, bool do_compress,
-			      unsigned long *sectors_defragged,
-			      unsigned long max_sectors,
-			      u64 *last_scanned_ret)
-{
-	const u32 sectorsize = inode->root->fs_info->sectorsize;
-	struct defrag_target_range *entry;
-	struct defrag_target_range *tmp;
-	LIST_HEAD(target_list);
-	int ret;
-
-	ret = defrag_collect_targets(inode, start, len, extent_thresh,
-				     newer_than, do_compress, false,
-				     &target_list, NULL);
-	if (ret < 0)
-		goto out;
-
-	list_for_each_entry(entry, &target_list, list) {
-		u32 range_len = entry->len;
-
-		/* Reached or beyond the limit */
-		if (max_sectors && *sectors_defragged >= max_sectors) {
-			ret = 1;
-			break;
-		}
-
-		if (max_sectors)
-			range_len = min_t(u32, range_len,
-				(max_sectors - *sectors_defragged) * sectorsize);
-
-		/*
-		 * If defrag_one_range() has updated last_scanned_ret,
-		 * our range may already be invalid (e.g. hole punched).
-		 * Skip if our range is before last_scanned_ret, as there is
-		 * no need to defrag the range anymore.
-		 */
-		if (entry->start + range_len <= *last_scanned_ret)
-			continue;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ra)
 			page_cache_sync_readahead(inode->vfs_inode.i_mapping,
 				ra, NULL, entry->start >> PAGE_SHIFT,

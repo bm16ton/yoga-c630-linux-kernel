@@ -8,10 +8,7 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,gcc-msm8974.h>
 #include <dt-bindings/gpio/gpio.h>
-<<<<<<< HEAD
 #include <dt-bindings/power/qcom-rpmpd.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <dt-bindings/reset/qcom,gcc-msm8974.h>
 
 / {
@@ -48,16 +45,6 @@
 		};
 	};
 
-<<<<<<< HEAD
-=======
-	tcsr_mutex: hwlock {
-		compatible = "qcom,tcsr-mutex";
-		syscon = <&tcsr_mutex_block 0 0x80>;
-
-		#hwlock-cells = <1>;
-	};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	reserved-memory {
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -67,14 +54,11 @@
 			reg = <0x3000000 0x100000>;
 			no-map;
 		};
-<<<<<<< HEAD
 
 		adsp_region: adsp@dc00000 {
 			reg = <0x0dc00000 0x1900000>;
 			no-map;
 		};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	smd {
@@ -130,7 +114,6 @@
 		hwlocks = <&tcsr_mutex 3>;
 	};
 
-<<<<<<< HEAD
 	smp2p-adsp {
 		compatible = "qcom,smp2p";
 		qcom,smem = <443>, <429>;
@@ -156,8 +139,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	soc: soc {
 		compatible = "simple-bus";
 		#address-cells = <1>;
@@ -180,7 +161,6 @@
 		sdhc_1: mmc@f9824900 {
 			compatible = "qcom,msm8226-sdhci", "qcom,sdhci-msm-v4";
 			reg = <0xf9824900 0x11c>, <0xf9824000 0x800>;
-<<<<<<< HEAD
 			reg-names = "hc", "core";
 			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>;
@@ -189,16 +169,6 @@
 				 <&gcc GCC_SDCC1_APPS_CLK>,
 				 <&xo_board>;
 			clock-names = "iface", "core", "xo";
-=======
-			reg-names = "hc_mem", "core_mem";
-			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>;
-			interrupt-names = "hc_irq", "pwr_irq";
-			clocks = <&gcc GCC_SDCC1_APPS_CLK>,
-				 <&gcc GCC_SDCC1_AHB_CLK>,
-				 <&xo_board>;
-			clock-names = "core", "iface", "xo";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pinctrl-names = "default";
 			pinctrl-0 = <&sdhc1_default_state>;
 			status = "disabled";
@@ -207,7 +177,6 @@
 		sdhc_2: mmc@f98a4900 {
 			compatible = "qcom,msm8226-sdhci", "qcom,sdhci-msm-v4";
 			reg = <0xf98a4900 0x11c>, <0xf98a4000 0x800>;
-<<<<<<< HEAD
 			reg-names = "hc", "core";
 			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH>;
@@ -216,16 +185,6 @@
 				 <&gcc GCC_SDCC2_APPS_CLK>,
 				 <&xo_board>;
 			clock-names = "iface", "core", "xo";
-=======
-			reg-names = "hc_mem", "core_mem";
-			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH>;
-			interrupt-names = "hc_irq", "pwr_irq";
-			clocks = <&gcc GCC_SDCC2_APPS_CLK>,
-				 <&gcc GCC_SDCC2_AHB_CLK>,
-				 <&xo_board>;
-			clock-names = "core", "iface", "xo";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pinctrl-names = "default";
 			pinctrl-0 = <&sdhc2_default_state>;
 			status = "disabled";
@@ -234,7 +193,6 @@
 		sdhc_3: mmc@f9864900 {
 			compatible = "qcom,msm8226-sdhci", "qcom,sdhci-msm-v4";
 			reg = <0xf9864900 0x11c>, <0xf9864000 0x800>;
-<<<<<<< HEAD
 			reg-names = "hc", "core";
 			interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
@@ -243,16 +201,6 @@
 				 <&gcc GCC_SDCC3_APPS_CLK>,
 				 <&xo_board>;
 			clock-names = "iface", "core", "xo";
-=======
-			reg-names = "hc_mem", "core_mem";
-			interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
-			interrupt-names = "hc_irq", "pwr_irq";
-			clocks = <&gcc GCC_SDCC3_APPS_CLK>,
-				 <&gcc GCC_SDCC3_AHB_CLK>,
-				 <&xo_board>;
-			clock-names = "core", "iface", "xo";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pinctrl-names = "default";
 			pinctrl-0 = <&sdhc3_default_state>;
 			status = "disabled";
@@ -584,7 +532,6 @@
 			reg = <0xfc428000 0x4000>;
 		};
 
-<<<<<<< HEAD
 		tcsr_mutex: hwlock@fd484000 {
 			compatible = "qcom,msm8226-tcsr-mutex", "qcom,tcsr-mutex";
 			reg = <0xfd484000 0x1000>;
@@ -623,11 +570,6 @@
 
 				label = "lpass";
 			};
-=======
-		tcsr_mutex_block: syscon@fd484000 {
-			compatible = "syscon";
-			reg = <0xfd484000 0x2000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 	};
 

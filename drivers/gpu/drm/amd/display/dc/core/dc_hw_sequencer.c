@@ -402,7 +402,6 @@ void get_hdr_visual_confirm_color(
 	}
 }
 
-<<<<<<< HEAD
 void get_subvp_visual_confirm_color(
 		struct dc *dc,
 		struct pipe_ctx *pipe_ctx,
@@ -441,8 +440,6 @@ void get_subvp_visual_confirm_color(
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void get_surface_tile_visual_confirm_color(
 		struct pipe_ctx *pipe_ctx,
 		struct tg_color *color)

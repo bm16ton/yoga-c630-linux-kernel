@@ -254,15 +254,12 @@ struct otp_info {
 #define MEMWRITE		_IOWR('M', 24, struct mtd_write_req)
 /* Erase a given range of user data (must be in mode %MTD_FILE_MODE_OTP_USER) */
 #define OTPERASE		_IOW('M', 25, struct otp_info)
-<<<<<<< HEAD
 /*
  * Most generic read interface; can read in-band and/or out-of-band in various
  * modes (see "struct mtd_read_req"). This ioctl is not supported for flashes
  * without OOB, e.g., NOR flash.
  */
 #define MEMREAD			_IOWR('M', 26, struct mtd_read_req)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Obsolete legacy interface. Keep it in order not to break userspace

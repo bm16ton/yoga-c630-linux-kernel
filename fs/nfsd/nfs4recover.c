@@ -815,15 +815,9 @@ __cld_pipe_inprogress_downcall(const struct cld_msg_v2 __user *cmsg,
 				princhash.data = memdup_user(
 						&ci->cc_princhash.cp_data,
 						princhashlen);
-<<<<<<< HEAD
 				if (IS_ERR(princhash.data)) {
 					kfree(name.data);
 					return PTR_ERR(princhash.data);
-=======
-				if (IS_ERR_OR_NULL(princhash.data)) {
-					kfree(name.data);
-					return -EFAULT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				}
 				princhash.len = princhashlen;
 			} else

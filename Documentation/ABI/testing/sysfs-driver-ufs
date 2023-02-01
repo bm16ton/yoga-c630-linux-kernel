@@ -1417,7 +1417,6 @@ Description:	This node is used to set or display whether UFS WriteBooster is
 		platform that doesn't support UFSHCD_CAP_CLK_SCALING, we can
 		disable/enable WriteBooster through this sysfs node.
 
-<<<<<<< HEAD
 What:		/sys/bus/platform/drivers/ufshcd/*/enable_wb_buf_flush
 What:		/sys/bus/platform/devices/*.ufs/enable_wb_buf_flush
 Date:		July 2022
@@ -1427,8 +1426,6 @@ Description:	This entry shows the status of WriteBooster buffer flushing
 		If flushing is enabled, the device executes the flush
 		operation when the command queue is empty.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 What:		/sys/bus/platform/drivers/ufshcd/*/device_descriptor/hpb_version
 What:		/sys/bus/platform/devices/*.ufs/device_descriptor/hpb_version
 Date:		June 2021
@@ -1603,7 +1600,6 @@ Description:	This entry shows the status of HPB.
 
 		The file is read only.
 
-<<<<<<< HEAD
 Contact:	Daniil Lunev <dlunev@chromium.org>
 What:		/sys/bus/platform/drivers/ufshcd/*/capabilities/
 What:		/sys/bus/platform/devices/*.ufs/capabilities/
@@ -1641,8 +1637,6 @@ Description:	Indicates status of Write Booster.
 
 		The file is read only.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 What:		/sys/class/scsi_device/*/device/hpb_param_sysfs/activation_thld
 Date:		February 2021
 Contact:	Avri Altman <avri.altman@wdc.com>

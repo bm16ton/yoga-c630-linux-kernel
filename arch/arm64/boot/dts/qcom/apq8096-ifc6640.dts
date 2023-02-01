@@ -368,11 +368,7 @@
 
 	bus-width = <4>;
 
-<<<<<<< HEAD
 	cd-gpios = <&tlmm 38 GPIO_ACTIVE_LOW>;
-=======
-	cd-gpios = <&tlmm 38 0x1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vmmc-supply = <&vreg_l21a_2p95>;
 	vqmmc-supply = <&vreg_l13a_2p95>;

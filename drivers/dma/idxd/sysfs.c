@@ -1077,11 +1077,7 @@ static ssize_t wq_ats_disable_show(struct device *dev, struct device_attribute *
 {
 	struct idxd_wq *wq = confdev_to_wq(dev);
 
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%u\n", test_bit(WQ_FLAG_ATS_DISABLE, &wq->flags));
-=======
-	return sysfs_emit(buf, "%u\n", wq->ats_dis);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static ssize_t wq_ats_disable_store(struct device *dev, struct device_attribute *attr,
@@ -1166,7 +1162,6 @@ static ssize_t wq_enqcmds_retries_store(struct device *dev, struct device_attrib
 static struct device_attribute dev_attr_wq_enqcmds_retries =
 		__ATTR(enqcmds_retries, 0644, wq_enqcmds_retries_show, wq_enqcmds_retries_store);
 
-<<<<<<< HEAD
 static ssize_t wq_op_config_show(struct device *dev,
 				 struct device_attribute *attr, char *buf)
 {
@@ -1229,8 +1224,6 @@ err:
 static struct device_attribute dev_attr_wq_op_config =
 		__ATTR(op_config, 0644, wq_op_config_show, wq_op_config_store);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct attribute *idxd_wq_attributes[] = {
 	&dev_attr_wq_clients.attr,
 	&dev_attr_wq_state.attr,
@@ -1248,10 +1241,7 @@ static struct attribute *idxd_wq_attributes[] = {
 	&dev_attr_wq_ats_disable.attr,
 	&dev_attr_wq_occupancy.attr,
 	&dev_attr_wq_enqcmds_retries.attr,
-<<<<<<< HEAD
 	&dev_attr_wq_op_config.attr,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	NULL,
 };
 
@@ -1491,21 +1481,12 @@ static ssize_t max_tokens_show(struct device *dev,
 
 static DEVICE_ATTR_RO(max_tokens);	/* deprecated */
 static DEVICE_ATTR_RO(max_read_buffers);
-<<<<<<< HEAD
 
 static ssize_t read_buffer_limit_show(struct device *dev,
 				      struct device_attribute *attr, char *buf)
 {
 	struct idxd_device *idxd = confdev_to_idxd(dev);
 
-=======
-
-static ssize_t read_buffer_limit_show(struct device *dev,
-				      struct device_attribute *attr, char *buf)
-{
-	struct idxd_device *idxd = confdev_to_idxd(dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sysfs_emit(buf, "%u\n", idxd->rdbuf_limit);
 }
 
@@ -1568,7 +1549,6 @@ static ssize_t cmd_status_show(struct device *dev,
 			       struct device_attribute *attr, char *buf)
 {
 	struct idxd_device *idxd = confdev_to_idxd(dev);
-<<<<<<< HEAD
 
 	return sysfs_emit(buf, "%#x\n", idxd->cmd_status);
 }
@@ -1619,21 +1599,6 @@ static umode_t idxd_device_attr_visible(struct kobject *kobj,
 
 	return attr->mode;
 }
-=======
-
-	return sysfs_emit(buf, "%#x\n", idxd->cmd_status);
-}
-
-static ssize_t cmd_status_store(struct device *dev, struct device_attribute *attr,
-				const char *buf, size_t count)
-{
-	struct idxd_device *idxd = confdev_to_idxd(dev);
-
-	idxd->cmd_status = 0;
-	return count;
-}
-static DEVICE_ATTR_RW(cmd_status);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct attribute *idxd_device_attributes[] = {
 	&dev_attr_version.attr,

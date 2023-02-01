@@ -216,7 +216,6 @@ static const char *conf_get_autoheader_name(void)
 	return name ? name : "include/generated/autoconf.h";
 }
 
-<<<<<<< HEAD
 static const char *conf_get_rustccfg_name(void)
 {
 	char *name = getenv("KCONFIG_RUSTCCFG");
@@ -224,8 +223,6 @@ static const char *conf_get_rustccfg_name(void)
 	return name ? name : "include/generated/rustc_cfg";
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
 {
 	char *p2;
@@ -615,7 +612,6 @@ static const struct comment_style comment_style_c = {
 
 static void conf_write_heading(FILE *fp, const struct comment_style *cs)
 {
-<<<<<<< HEAD
 	if (!cs)
 		return;
 
@@ -624,13 +620,6 @@ static void conf_write_heading(FILE *fp, const struct comment_style *cs)
 	fprintf(fp, "%s Automatically generated file; DO NOT EDIT.\n",
 		cs->decoration);
 
-=======
-	fprintf(fp, "%s\n", cs->prefix);
-
-	fprintf(fp, "%s Automatically generated file; DO NOT EDIT.\n",
-		cs->decoration);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fprintf(fp, "%s %s\n", cs->decoration, rootmenu.prompt->text);
 
 	fprintf(fp, "%s\n", cs->postfix);
@@ -654,7 +643,6 @@ static char *escape_string_value(const char *in)
 
 		len++;
 		p++;
-<<<<<<< HEAD
 	}
 
 	out = xmalloc(len);
@@ -775,85 +763,6 @@ static void print_symbol_for_rustccfg(FILE *fp, struct symbol *sym)
 	size_t val_prefixed_len;
 	char *escaped = NULL;
 
-=======
-	}
-
-	out = xmalloc(len);
-	out[0] = '\0';
-
-	strcat(out, "\"");
-
-	p = in;
-	while (1) {
-		len = strcspn(p, "\"\\");
-		strncat(out, p, len);
-		p += len;
-
-		if (p[0] == '\0')
-			break;
-
-		strcat(out, "\\");
-		strncat(out, p++, 1);
-	}
-
-	strcat(out, "\"");
-
-	return out;
-}
-
-enum output_n { OUTPUT_N, OUTPUT_N_AS_UNSET, OUTPUT_N_NONE };
-
-static void __print_symbol(FILE *fp, struct symbol *sym, enum output_n output_n,
-			   bool escape_string)
-{
-	const char *val;
-	char *escaped = NULL;
-
-	if (sym->type == S_UNKNOWN)
-		return;
-
-	val = sym_get_string_value(sym);
-
-	if ((sym->type == S_BOOLEAN || sym->type == S_TRISTATE) &&
-	    output_n != OUTPUT_N && *val == 'n') {
-		if (output_n == OUTPUT_N_AS_UNSET)
-			fprintf(fp, "# %s%s is not set\n", CONFIG_, sym->name);
-		return;
-	}
-
-	if (sym->type == S_STRING && escape_string) {
-		escaped = escape_string_value(val);
-		val = escaped;
-	}
-
-	fprintf(fp, "%s%s=%s\n", CONFIG_, sym->name, val);
-
-	free(escaped);
-}
-
-static void print_symbol_for_dotconfig(FILE *fp, struct symbol *sym)
-{
-	__print_symbol(fp, sym, OUTPUT_N_AS_UNSET, true);
-}
-
-static void print_symbol_for_autoconf(FILE *fp, struct symbol *sym)
-{
-	__print_symbol(fp, sym, OUTPUT_N_NONE, false);
-}
-
-void print_symbol_for_listconfig(struct symbol *sym)
-{
-	__print_symbol(stdout, sym, OUTPUT_N, true);
-}
-
-static void print_symbol_for_c(FILE *fp, struct symbol *sym)
-{
-	const char *val;
-	const char *sym_suffix = "";
-	const char *val_prefix = "";
-	char *escaped = NULL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (sym->type == S_UNKNOWN)
 		return;
 
@@ -862,7 +771,6 @@ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
 	switch (sym->type) {
 	case S_BOOLEAN:
 	case S_TRISTATE:
-<<<<<<< HEAD
 		/*
 		 * We do not care about disabled ones, i.e. no need for
 		 * what otherwise are "comments" in other printers.
@@ -880,30 +788,15 @@ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
 		 * be used as the equivalent of `IS_BUILTIN()`/`IS_MODULE()`.
 		 */
 		fprintf(fp, "--cfg=%s%s\n", CONFIG_, sym->name);
-=======
-		switch (*val) {
-		case 'n':
-			return;
-		case 'm':
-			sym_suffix = "_MODULE";
-			/* fall through */
-		default:
-			val = "1";
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case S_HEX:
 		if (val[0] != '0' || (val[1] != 'x' && val[1] != 'X'))
 			val_prefix = "0x";
 		break;
-	case S_STRING:
-		escaped = escape_string_value(val);
-		val = escaped;
 	default:
 		break;
 	}
 
-<<<<<<< HEAD
 	if (strlen(val_prefix) > 0) {
 		val_prefixed_len = strlen(val) + strlen(val_prefix) + 1;
 		val_prefixed = xmalloc(val_prefixed_len);
@@ -919,12 +812,6 @@ static void print_symbol_for_c(FILE *fp, struct symbol *sym)
 
 	free(escaped);
 	free(val_prefixed);
-=======
-	fprintf(fp, "#define %s%s%s %s%s\n", CONFIG_, sym->name, sym_suffix,
-		val_prefix, val);
-
-	free(escaped);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1313,15 +1200,12 @@ int conf_write_autoconf(int overwrite)
 				    &comment_style_c);
 	if (ret)
 		return ret;
-<<<<<<< HEAD
 
 	ret = __conf_write_autoconf(conf_get_rustccfg_name(),
 				    print_symbol_for_rustccfg,
 				    NULL);
 	if (ret)
 		return ret;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Create include/config/auto.conf. This must be the last step because

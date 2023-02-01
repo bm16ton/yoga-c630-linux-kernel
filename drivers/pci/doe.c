@@ -29,12 +29,9 @@
 #define PCI_DOE_FLAG_CANCEL	0
 #define PCI_DOE_FLAG_DEAD	1
 
-<<<<<<< HEAD
 /* Max data object length is 2^18 dwords */
 #define PCI_DOE_MAX_LENGTH	(1 << 18)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * struct pci_doe_mb - State for a single DOE mailbox
  *
@@ -113,10 +110,7 @@ static int pci_doe_send_req(struct pci_doe_mb *doe_mb,
 {
 	struct pci_dev *pdev = doe_mb->pdev;
 	int offset = doe_mb->cap_offset;
-<<<<<<< HEAD
 	size_t length;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val;
 	int i;
 
@@ -133,7 +127,6 @@ static int pci_doe_send_req(struct pci_doe_mb *doe_mb,
 	if (FIELD_GET(PCI_DOE_STATUS_ERROR, val))
 		return -EIO;
 
-<<<<<<< HEAD
 	/* Length is 2 DW of header + length of payload in DW */
 	length = 2 + task->request_pl_sz / sizeof(u32);
 	if (length > PCI_DOE_MAX_LENGTH)
@@ -141,23 +134,13 @@ static int pci_doe_send_req(struct pci_doe_mb *doe_mb,
 	if (length == PCI_DOE_MAX_LENGTH)
 		length = 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Write DOE Header */
 	val = FIELD_PREP(PCI_DOE_DATA_OBJECT_HEADER_1_VID, task->prot.vid) |
 		FIELD_PREP(PCI_DOE_DATA_OBJECT_HEADER_1_TYPE, task->prot.type);
 	pci_write_config_dword(pdev, offset + PCI_DOE_WRITE, val);
-<<<<<<< HEAD
 	pci_write_config_dword(pdev, offset + PCI_DOE_WRITE,
 			       FIELD_PREP(PCI_DOE_DATA_OBJECT_HEADER_2_LENGTH,
 					  length));
-=======
-	/* Length is 2 DW of header + length of payload in DW */
-	pci_write_config_dword(pdev, offset + PCI_DOE_WRITE,
-			       FIELD_PREP(PCI_DOE_DATA_OBJECT_HEADER_2_LENGTH,
-					  2 + task->request_pl_sz /
-						sizeof(u32)));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < task->request_pl_sz / sizeof(u32); i++)
 		pci_write_config_dword(pdev, offset + PCI_DOE_WRITE,
 				       task->request_pl[i]);
@@ -204,14 +187,10 @@ static int pci_doe_recv_resp(struct pci_doe_mb *doe_mb, struct pci_doe_task *tas
 	pci_write_config_dword(pdev, offset + PCI_DOE_READ, 0);
 
 	length = FIELD_GET(PCI_DOE_DATA_OBJECT_HEADER_2_LENGTH, val);
-<<<<<<< HEAD
 	/* A value of 0x0 indicates max data object length */
 	if (!length)
 		length = PCI_DOE_MAX_LENGTH;
 	if (length < 2)
-=======
-	if (length > SZ_1M || length < 2)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EIO;
 
 	/* First 2 dwords have already been read */

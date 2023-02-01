@@ -54,14 +54,6 @@ union flowi_uli {
 		__u8	code;
 	} icmpt;
 
-<<<<<<< HEAD
-=======
-	struct {
-		__le16	dport;
-		__le16	sport;
-	} dnports;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__be32		gre_key;
 
 	struct {
@@ -196,14 +188,6 @@ static inline struct flowi *flowi6_to_flowi(struct flowi6 *fl6)
 static inline struct flowi_common *flowi6_to_flowi_common(struct flowi6 *fl6)
 {
 	return &(fl6->__fl_common);
-<<<<<<< HEAD
-=======
-}
-
-static inline struct flowi *flowidn_to_flowi(struct flowidn *fldn)
-{
-	return container_of(fldn, struct flowi, u.dn);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 __u32 __get_hash_from_flowi6(const struct flowi6 *fl6, struct flow_keys *keys);

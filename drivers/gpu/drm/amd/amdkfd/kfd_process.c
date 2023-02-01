@@ -689,7 +689,6 @@ void kfd_process_destroy_wq(void)
 }
 
 static void kfd_process_free_gpuvm(struct kgd_mem *mem,
-<<<<<<< HEAD
 			struct kfd_process_device *pdd, void **kptr)
 {
 	struct kfd_dev *dev = pdd->dev;
@@ -697,15 +696,6 @@ static void kfd_process_free_gpuvm(struct kgd_mem *mem,
 	if (kptr && *kptr) {
 		amdgpu_amdkfd_gpuvm_unmap_gtt_bo_from_kernel(mem);
 		*kptr = NULL;
-=======
-			struct kfd_process_device *pdd, void *kptr)
-{
-	struct kfd_dev *dev = pdd->dev;
-
-	if (kptr) {
-		amdgpu_amdkfd_gpuvm_unmap_gtt_bo_from_kernel(mem);
-		kptr = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	amdgpu_amdkfd_gpuvm_unmap_memory_from_gpu(dev->adev, mem, pdd->drm_priv);
@@ -805,11 +795,7 @@ static void kfd_process_device_destroy_ib_mem(struct kfd_process_device *pdd)
 	if (!qpd->ib_kaddr || !qpd->ib_base)
 		return;
 
-<<<<<<< HEAD
 	kfd_process_free_gpuvm(qpd->ib_mem, pdd, &qpd->ib_kaddr);
-=======
-	kfd_process_free_gpuvm(qpd->ib_mem, pdd, qpd->ib_kaddr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 struct kfd_process *kfd_create_process(struct file *filep)
@@ -1013,7 +999,6 @@ static void kfd_process_kunmap_signal_bo(struct kfd_process *p)
 		pdd, GET_IDR_HANDLE(p->signal_handle));
 	if (!mem)
 		goto out;
-<<<<<<< HEAD
 
 	amdgpu_amdkfd_gpuvm_unmap_gtt_bo_from_kernel(mem);
 
@@ -1021,15 +1006,6 @@ out:
 	mutex_unlock(&p->mutex);
 }
 
-=======
-
-	amdgpu_amdkfd_gpuvm_unmap_gtt_bo_from_kernel(mem);
-
-out:
-	mutex_unlock(&p->mutex);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void kfd_process_free_outstanding_kfd_bos(struct kfd_process *p)
 {
 	int i;
@@ -1301,11 +1277,7 @@ static void kfd_process_device_destroy_cwsr_dgpu(struct kfd_process_device *pdd)
 	if (!dev->cwsr_enabled || !qpd->cwsr_kaddr || !qpd->cwsr_base)
 		return;
 
-<<<<<<< HEAD
 	kfd_process_free_gpuvm(qpd->cwsr_mem, pdd, &qpd->cwsr_kaddr);
-=======
-	kfd_process_free_gpuvm(qpd->cwsr_mem, pdd, qpd->cwsr_kaddr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void kfd_process_set_trap_handler(struct qcm_process_device *qpd,
@@ -1604,15 +1576,9 @@ int kfd_process_device_init_vm(struct kfd_process_device *pdd,
 	p = pdd->process;
 	dev = pdd->dev;
 
-<<<<<<< HEAD
 	ret = amdgpu_amdkfd_gpuvm_acquire_process_vm(dev->adev, drm_file,
 						     &p->kgd_process_info,
 						     &p->ef);
-=======
-	ret = amdgpu_amdkfd_gpuvm_acquire_process_vm(
-		dev->adev, drm_file, p->pasid,
-		&p->kgd_process_info, &p->ef);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		pr_err("Failed to create process VM object\n");
 		return ret;
@@ -1640,10 +1606,6 @@ err_set_pasid:
 err_init_cwsr:
 	kfd_process_device_destroy_ib_mem(pdd);
 err_reserve_ib_mem:
-<<<<<<< HEAD
-=======
-	kfd_process_device_free_bos(pdd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pdd->drm_priv = NULL;
 
 	return ret;

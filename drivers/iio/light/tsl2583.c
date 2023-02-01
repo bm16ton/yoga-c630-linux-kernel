@@ -884,11 +884,6 @@ static void tsl2583_remove(struct i2c_client *client)
 	pm_runtime_set_suspended(&client->dev);
 
 	tsl2583_set_power_state(chip, TSL2583_CNTL_PWR_OFF);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int tsl2583_suspend(struct device *dev)

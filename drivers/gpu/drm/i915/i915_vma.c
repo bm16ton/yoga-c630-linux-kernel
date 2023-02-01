@@ -1203,11 +1203,7 @@ err_st_alloc:
 }
 
 static noinline struct sg_table *
-<<<<<<< HEAD
 intel_partial_pages(const struct i915_gtt_view *view,
-=======
-intel_partial_pages(const struct i915_ggtt_view *view,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		    struct drm_i915_gem_object *obj)
 {
 	struct sg_table *st;
@@ -1251,7 +1247,6 @@ __i915_vma_get_pages(struct i915_vma *vma)
 	 */
 	GEM_BUG_ON(!i915_gem_object_has_pinned_pages(vma->obj));
 
-<<<<<<< HEAD
 	switch (vma->gtt_view.type) {
 	default:
 		GEM_BUG_ON(vma->gtt_view.type);
@@ -1272,39 +1267,13 @@ __i915_vma_get_pages(struct i915_vma *vma)
 
 	case I915_GTT_VIEW_PARTIAL:
 		pages = intel_partial_pages(&vma->gtt_view, vma->obj);
-=======
-	switch (vma->ggtt_view.type) {
-	default:
-		GEM_BUG_ON(vma->ggtt_view.type);
-		fallthrough;
-	case I915_GGTT_VIEW_NORMAL:
-		pages = vma->obj->mm.pages;
-		break;
-
-	case I915_GGTT_VIEW_ROTATED:
-		pages =
-			intel_rotate_pages(&vma->ggtt_view.rotated, vma->obj);
-		break;
-
-	case I915_GGTT_VIEW_REMAPPED:
-		pages =
-			intel_remap_pages(&vma->ggtt_view.remapped, vma->obj);
-		break;
-
-	case I915_GGTT_VIEW_PARTIAL:
-		pages = intel_partial_pages(&vma->ggtt_view, vma->obj);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 
 	if (IS_ERR(pages)) {
 		drm_err(&vma->vm->i915->drm,
 			"Failed to get pages for VMA view type %u (%ld)!\n",
-<<<<<<< HEAD
 			vma->gtt_view.type, PTR_ERR(pages));
-=======
-			vma->ggtt_view.type, PTR_ERR(pages));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return PTR_ERR(pages);
 	}
 
@@ -1600,11 +1569,7 @@ static int __i915_ggtt_pin(struct i915_vma *vma, struct i915_gem_ww_ctx *ww,
 			 * locked objects when called from execbuf when pinning
 			 * is removed. This would probably regress badly.
 			 */
-<<<<<<< HEAD
 			i915_gem_evict_vm(vm, NULL, NULL);
-=======
-			i915_gem_evict_vm(vm, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mutex_unlock(&vm->mutex);
 		}
 	} while (1);
@@ -2149,11 +2114,7 @@ int i915_vma_unbind_async(struct i915_vma *vma, bool trylock_vm)
 	if (!obj->mm.rsgt)
 		return -EBUSY;
 
-<<<<<<< HEAD
 	err = dma_resv_reserve_fences(obj->base.resv, 2);
-=======
-	err = dma_resv_reserve_fences(obj->base.resv, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return -EBUSY;
 

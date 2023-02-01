@@ -197,11 +197,6 @@ extern void psb_intel_lvds_set_brightness(struct drm_device *dev, int level);
 extern void oaktrail_lvds_init(struct drm_device *dev,
 			   struct psb_intel_mode_device *mode_dev);
 extern void oaktrail_wait_for_INTR_PKT_SENT(struct drm_device *dev);
-<<<<<<< HEAD
-=======
-extern void oaktrail_dsi_init(struct drm_device *dev,
-			   struct psb_intel_mode_device *mode_dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct gma_i2c_chan *oaktrail_lvds_i2c_init(struct drm_device *dev);
 extern void mid_dsi_init(struct drm_device *dev,
 		    struct psb_intel_mode_device *mode_dev, int dsi_num);

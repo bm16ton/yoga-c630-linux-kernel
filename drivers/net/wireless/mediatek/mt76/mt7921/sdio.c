@@ -96,10 +96,7 @@ static int mt7921s_probe(struct sdio_func *func,
 		.tx_complete_skb = mt7921_usb_sdio_tx_complete_skb,
 		.tx_status_data = mt7921_usb_sdio_tx_status_data,
 		.rx_skb = mt7921_queue_rx_skb,
-<<<<<<< HEAD
 		.rx_check = mt7921_rx_check,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.sta_ps = mt7921_sta_ps,
 		.sta_add = mt7921_mac_sta_add,
 		.sta_assoc = mt7921_mac_sta_assoc,
@@ -198,10 +195,6 @@ static void mt7921s_remove(struct sdio_func *func)
 	mt7921s_unregister_device(dev);
 }
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_PM
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int mt7921s_suspend(struct device *__dev)
 {
 	struct sdio_func *func = dev_to_sdio_func(__dev);
@@ -308,38 +301,18 @@ failed:
 	return err;
 }
 
-<<<<<<< HEAD
-=======
-static const struct dev_pm_ops mt7921s_pm_ops = {
-	.suspend = mt7921s_suspend,
-	.resume = mt7921s_resume,
-};
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_DEVICE_TABLE(sdio, mt7921s_table);
 MODULE_FIRMWARE(MT7921_FIRMWARE_WM);
 MODULE_FIRMWARE(MT7921_ROM_PATCH);
 
-<<<<<<< HEAD
 static DEFINE_SIMPLE_DEV_PM_OPS(mt7921s_pm_ops, mt7921s_suspend, mt7921s_resume);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct sdio_driver mt7921s_driver = {
 	.name		= KBUILD_MODNAME,
 	.probe		= mt7921s_probe,
 	.remove		= mt7921s_remove,
 	.id_table	= mt7921s_table,
-<<<<<<< HEAD
 	.drv.pm		= pm_sleep_ptr(&mt7921s_pm_ops),
-=======
-#ifdef CONFIG_PM
-	.drv = {
-		.pm = &mt7921s_pm_ops,
-	}
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 module_sdio_driver(mt7921s_driver);
 MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");

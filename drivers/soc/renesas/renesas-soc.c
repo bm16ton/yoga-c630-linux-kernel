@@ -329,10 +329,7 @@ static const struct of_device_id renesas_socs[] __initconst = {
 	{ .compatible = "renesas,r8a779m0",	.data = &soc_rcar_h3 },
 	{ .compatible = "renesas,r8a779m1",	.data = &soc_rcar_h3 },
 	{ .compatible = "renesas,r8a779m8",	.data = &soc_rcar_h3 },
-<<<<<<< HEAD
 	{ .compatible = "renesas,r8a779mb",	.data = &soc_rcar_h3 },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 #ifdef CONFIG_ARCH_R8A77960
 	{ .compatible = "renesas,r8a7796",	.data = &soc_rcar_m3_w },
@@ -371,17 +368,12 @@ static const struct of_device_id renesas_socs[] __initconst = {
 	{ .compatible = "renesas,r8a779g0",	.data = &soc_rcar_v4h },
 #endif
 #if defined(CONFIG_ARCH_R9A07G043)
-<<<<<<< HEAD
 #ifdef CONFIG_RISCV
 	{ .compatible = "renesas,r9a07g043",	.data = &soc_rz_five },
 #else
 	{ .compatible = "renesas,r9a07g043",	.data = &soc_rz_g2ul },
 #endif
 #endif
-=======
-	{ .compatible = "renesas,r9a07g043",	.data = &soc_rz_g2ul },
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if defined(CONFIG_ARCH_R9A07G044)
 	{ .compatible = "renesas,r9a07g044",	.data = &soc_rz_g2l },
 #endif

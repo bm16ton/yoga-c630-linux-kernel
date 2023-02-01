@@ -133,13 +133,7 @@ static int mlx5e_xsk_enable_locked(struct mlx5e_priv *priv,
 	 * any Fill Ring entries at the setup stage.
 	 */
 
-<<<<<<< HEAD
 	mlx5e_rx_res_xsk_update(priv->rx_res, &priv->channels, ix, true);
-=======
-	err = mlx5e_rx_res_xsk_activate(priv->rx_res, &priv->channels, ix);
-	if (unlikely(err))
-		goto err_deactivate;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mlx5e_deactivate_rq(&c->rq);
 	mlx5e_flush_rq(&c->rq, MLX5_RQC_STATE_RDY);
@@ -183,7 +177,6 @@ static int mlx5e_xsk_disable_locked(struct mlx5e_priv *priv, u16 ix)
 		goto remove_pool;
 
 	c = priv->channels.c[ix];
-<<<<<<< HEAD
 
 	mlx5e_activate_rq(&c->rq);
 	mlx5e_trigger_napi_icosq(c);
@@ -191,9 +184,6 @@ static int mlx5e_xsk_disable_locked(struct mlx5e_priv *priv, u16 ix)
 
 	mlx5e_rx_res_xsk_update(priv->rx_res, &priv->channels, ix, false);
 
-=======
-	mlx5e_rx_res_xsk_deactivate(priv->rx_res, ix);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mlx5e_deactivate_xsk(c);
 	mlx5e_close_xsk(c);
 

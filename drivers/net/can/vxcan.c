@@ -38,16 +38,9 @@ static netdev_tx_t vxcan_xmit(struct sk_buff *oskb, struct net_device *dev)
 {
 	struct vxcan_priv *priv = netdev_priv(dev);
 	struct net_device *peer;
-<<<<<<< HEAD
 	struct net_device_stats *peerstats, *srcstats = &dev->stats;
 	struct sk_buff *skb;
 	unsigned int len;
-=======
-	struct canfd_frame *cfd = (struct canfd_frame *)oskb->data;
-	struct net_device_stats *peerstats, *srcstats = &dev->stats;
-	struct sk_buff *skb;
-	u8 len;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (can_dropped_invalid_skb(dev, oskb))
 		return NETDEV_TX_OK;
@@ -76,11 +69,7 @@ static netdev_tx_t vxcan_xmit(struct sk_buff *oskb, struct net_device *dev)
 	skb->dev        = peer;
 	skb->ip_summed  = CHECKSUM_UNNECESSARY;
 
-<<<<<<< HEAD
 	len = can_skb_get_data_len(skb);
-=======
-	len = cfd->can_id & CAN_RTR_FLAG ? 0 : cfd->len;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (netif_rx(skb) == NET_RX_SUCCESS) {
 		srcstats->tx_packets++;
 		srcstats->tx_bytes += len;

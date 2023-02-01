@@ -327,17 +327,10 @@ iter_intervals_process_response(const struct scmi_protocol_handle *ph,
 {
 	const struct scmi_msg_resp_sensor_list_update_intervals *r = response;
 	struct scmi_sensor_info *s = ((struct scmi_sens_ipriv *)p)->priv;
-<<<<<<< HEAD
 
 	s->intervals.desc[st->desc_index + st->loop_idx] =
 		le32_to_cpu(r->intervals[st->loop_idx]);
 
-=======
-
-	s->intervals.desc[st->desc_index + st->loop_idx] =
-		le32_to_cpu(r->intervals[st->loop_idx]);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -613,7 +606,6 @@ iter_sens_descr_process_response(const struct scmi_protocol_handle *ph,
 	if (si->version == SCMIv2_SENSOR_PROTOCOL) {
 		s->intervals.segmented = false;
 		s->intervals.count = 1;
-<<<<<<< HEAD
 		/*
 		 * Convert SCMIv2.0 update interval format to
 		 * SCMIv3.0 to be used as the common exposed
@@ -628,22 +620,6 @@ iter_sens_descr_process_response(const struct scmi_protocol_handle *ph,
 		 * Since the command is optional, on error carry
 		 * on without any update interval.
 		 */
-=======
-		/*
-		 * Convert SCMIv2.0 update interval format to
-		 * SCMIv3.0 to be used as the common exposed
-		 * descriptor, accessible via common macros.
-		 */
-		s->intervals.desc[0] = (SENSOR_UPDATE_BASE(attrh) << 5) |
-					SENSOR_UPDATE_SCALE(attrh);
-	} else {
-		/*
-		 * From SCMIv3.0 update intervals are retrieved
-		 * via a dedicated (optional) command.
-		 * Since the command is optional, on error carry
-		 * on without any update interval.
-		 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (scmi_sensor_update_intervals(ph, s))
 			dev_dbg(ph->dev,
 				"Update Intervals not available for sensor ID:%d\n",
@@ -799,10 +775,6 @@ static int scmi_sensor_config_get(const struct scmi_protocol_handle *ph,
 	put_unaligned_le32(sensor_id, t->tx.buf);
 	ret = ph->xops->do_xfer(ph, t);
 	if (!ret) {
-<<<<<<< HEAD
-=======
-		struct sensors_info *si = ph->get_priv(ph);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct scmi_sensor_info *s = si->sensors + sensor_id;
 
 		*sensor_config = get_unaligned_le64(t->rx.buf);
@@ -821,12 +793,9 @@ static int scmi_sensor_config_set(const struct scmi_protocol_handle *ph,
 	struct scmi_msg_sensor_config_set *msg;
 	struct sensors_info *si = ph->get_priv(ph);
 
-<<<<<<< HEAD
 	if (sensor_id >= si->num_sensors)
 		return -EINVAL;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ph->xops->xfer_get_init(ph, SENSOR_CONFIG_SET,
 				      sizeof(*msg), 0, &t);
 	if (ret)
@@ -838,10 +807,6 @@ static int scmi_sensor_config_set(const struct scmi_protocol_handle *ph,
 
 	ret = ph->xops->do_xfer(ph, t);
 	if (!ret) {
-<<<<<<< HEAD
-=======
-		struct sensors_info *si = ph->get_priv(ph);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct scmi_sensor_info *s = si->sensors + sensor_id;
 
 		s->sensor_config = sensor_config;
@@ -872,16 +837,11 @@ static int scmi_sensor_reading_get(const struct scmi_protocol_handle *ph,
 	int ret;
 	struct scmi_xfer *t;
 	struct scmi_msg_sensor_reading_get *sensor;
-<<<<<<< HEAD
 	struct scmi_sensor_info *s;
 	struct sensors_info *si = ph->get_priv(ph);
 
 	if (sensor_id >= si->num_sensors)
 		return -EINVAL;
-=======
-	struct sensors_info *si = ph->get_priv(ph);
-	struct scmi_sensor_info *s = si->sensors + sensor_id;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = ph->xops->xfer_get_init(ph, SENSOR_READING_GET,
 				      sizeof(*sensor), 0, &t);
@@ -945,13 +905,8 @@ scmi_sensor_reading_get_timestamped(const struct scmi_protocol_handle *ph,
 	int ret;
 	struct scmi_xfer *t;
 	struct scmi_msg_sensor_reading_get *sensor;
-<<<<<<< HEAD
 	struct scmi_sensor_info *s;
 	struct sensors_info *si = ph->get_priv(ph);
-=======
-	struct sensors_info *si = ph->get_priv(ph);
-	struct scmi_sensor_info *s = si->sensors + sensor_id;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (sensor_id >= si->num_sensors)
 		return -EINVAL;
@@ -1006,12 +961,9 @@ static const struct scmi_sensor_info *
 scmi_sensor_info_get(const struct scmi_protocol_handle *ph, u32 sensor_id)
 {
 	struct sensors_info *si = ph->get_priv(ph);
-<<<<<<< HEAD
 
 	if (sensor_id >= si->num_sensors)
 		return NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return si->sensors + sensor_id;
 }

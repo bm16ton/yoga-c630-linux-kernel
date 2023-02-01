@@ -37,47 +37,6 @@ qca8k_split_addr(u32 regaddr, u16 *r1, u16 *r2, u16 *page)
 }
 
 static int
-<<<<<<< HEAD
-=======
-qca8k_set_lo(struct qca8k_priv *priv, int phy_id, u32 regnum, u16 lo)
-{
-	u16 *cached_lo = &priv->mdio_cache.lo;
-	struct mii_bus *bus = priv->bus;
-	int ret;
-
-	if (lo == *cached_lo)
-		return 0;
-
-	ret = bus->write(bus, phy_id, regnum, lo);
-	if (ret < 0)
-		dev_err_ratelimited(&bus->dev,
-				    "failed to write qca8k 32bit lo register\n");
-
-	*cached_lo = lo;
-	return 0;
-}
-
-static int
-qca8k_set_hi(struct qca8k_priv *priv, int phy_id, u32 regnum, u16 hi)
-{
-	u16 *cached_hi = &priv->mdio_cache.hi;
-	struct mii_bus *bus = priv->bus;
-	int ret;
-
-	if (hi == *cached_hi)
-		return 0;
-
-	ret = bus->write(bus, phy_id, regnum, hi);
-	if (ret < 0)
-		dev_err_ratelimited(&bus->dev,
-				    "failed to write qca8k 32bit hi register\n");
-
-	*cached_hi = hi;
-	return 0;
-}
-
-static int
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 qca8k_mii_read32(struct mii_bus *bus, int phy_id, u32 regnum, u32 *val)
 {
 	int ret;
@@ -100,11 +59,7 @@ qca8k_mii_read32(struct mii_bus *bus, int phy_id, u32 regnum, u32 *val)
 }
 
 static void
-<<<<<<< HEAD
 qca8k_mii_write32(struct mii_bus *bus, int phy_id, u32 regnum, u32 val)
-=======
-qca8k_mii_write32(struct qca8k_priv *priv, int phy_id, u32 regnum, u32 val)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u16 lo, hi;
 	int ret;
@@ -112,18 +67,12 @@ qca8k_mii_write32(struct qca8k_priv *priv, int phy_id, u32 regnum, u32 val)
 	lo = val & 0xffff;
 	hi = (u16)(val >> 16);
 
-<<<<<<< HEAD
 	ret = bus->write(bus, phy_id, regnum, lo);
 	if (ret >= 0)
 		ret = bus->write(bus, phy_id, regnum + 1, hi);
 	if (ret < 0)
 		dev_err_ratelimited(&bus->dev,
 				    "failed to write qca8k 32bit register\n");
-=======
-	ret = qca8k_set_lo(priv, phy_id, regnum, lo);
-	if (ret >= 0)
-		ret = qca8k_set_hi(priv, phy_id, regnum + 1, hi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int
@@ -162,7 +111,6 @@ static void qca8k_rw_reg_ack_handler(struct dsa_switch *ds, struct sk_buff *skb)
 
 	command = get_unaligned_le32(&mgmt_ethhdr->command);
 	cmd = FIELD_GET(QCA_HDR_MGMT_CMD, command);
-<<<<<<< HEAD
 
 	len = FIELD_GET(QCA_HDR_MGMT_LENGTH, command);
 	/* Special case for len of 15 as this is the max value for len and needs to
@@ -173,9 +121,6 @@ static void qca8k_rw_reg_ack_handler(struct dsa_switch *ds, struct sk_buff *skb)
 
 	/* We can ignore odd value, we always round up them in the alloc function. */
 	len *= sizeof(u16);
-=======
-	len = FIELD_GET(QCA_HDR_MGMT_LENGTH, command);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Make sure the seq match the requested packet */
 	if (get_unaligned_le32(&mgmt_ethhdr->seq) == mgmt_eth_data->seq)
@@ -222,7 +167,6 @@ static struct sk_buff *qca8k_alloc_mdio_header(enum mdio_cmd cmd, u32 reg, u32 *
 	if (!skb)
 		return NULL;
 
-<<<<<<< HEAD
 	/* Hdr mgmt length value is in step of word size.
 	 * As an example to process 4 byte of data the correct length to set is 2.
 	 * To process 8 byte 4, 12 byte 6, 16 byte 8...
@@ -250,19 +194,6 @@ static struct sk_buff *qca8k_alloc_mdio_header(enum mdio_cmd cmd, u32 reg, u32 *
 	/* Max reg value is 0xf(15) but switch will always return the next size (32 byte) */
 	if (real_len == 16)
 		real_len--;
-=======
-	/* Max value for len reg is 15 (0xf) but the switch actually return 16 byte
-	 * Actually for some reason the steps are:
-	 * 0: nothing
-	 * 1-4: first 4 byte
-	 * 5-6: first 12 byte
-	 * 7-15: all 16 byte
-	 */
-	if (len == 16)
-		real_len = 15;
-	else
-		real_len = len;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	skb_reset_mac_header(skb);
 	skb_set_network_header(skb, skb->len);
@@ -476,11 +407,7 @@ qca8k_regmap_write(void *ctx, uint32_t reg, uint32_t val)
 	if (ret < 0)
 		goto exit;
 
-<<<<<<< HEAD
 	qca8k_mii_write32(bus, 0x10 | r2, r1, val);
-=======
-	qca8k_mii_write32(priv, 0x10 | r2, r1, val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 exit:
 	mutex_unlock(&bus->mdio_lock);
@@ -513,11 +440,7 @@ qca8k_regmap_update_bits(void *ctx, uint32_t reg, uint32_t mask, uint32_t write_
 
 	val &= ~mask;
 	val |= write_val;
-<<<<<<< HEAD
 	qca8k_mii_write32(bus, 0x10 | r2, r1, val);
-=======
-	qca8k_mii_write32(priv, 0x10 | r2, r1, val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 exit:
 	mutex_unlock(&bus->mdio_lock);
@@ -792,22 +715,14 @@ qca8k_mdio_write(struct qca8k_priv *priv, int phy, int regnum, u16 data)
 	if (ret)
 		goto exit;
 
-<<<<<<< HEAD
 	qca8k_mii_write32(bus, 0x10 | r2, r1, val);
-=======
-	qca8k_mii_write32(priv, 0x10 | r2, r1, val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = qca8k_mdio_busy_wait(bus, QCA8K_MDIO_MASTER_CTRL,
 				   QCA8K_MDIO_MASTER_BUSY);
 
 exit:
 	/* even if the busy_wait timeouts try to clear the MASTER_EN */
-<<<<<<< HEAD
 	qca8k_mii_write32(bus, 0x10 | r2, r1, 0);
-=======
-	qca8k_mii_write32(priv, 0x10 | r2, r1, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_unlock(&bus->mdio_lock);
 
@@ -837,11 +752,7 @@ qca8k_mdio_read(struct qca8k_priv *priv, int phy, int regnum)
 	if (ret)
 		goto exit;
 
-<<<<<<< HEAD
 	qca8k_mii_write32(bus, 0x10 | r2, r1, val);
-=======
-	qca8k_mii_write32(priv, 0x10 | r2, r1, val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = qca8k_mdio_busy_wait(bus, QCA8K_MDIO_MASTER_CTRL,
 				   QCA8K_MDIO_MASTER_BUSY);
@@ -852,11 +763,7 @@ qca8k_mdio_read(struct qca8k_priv *priv, int phy, int regnum)
 
 exit:
 	/* even if the busy_wait timeouts try to clear the MASTER_EN */
-<<<<<<< HEAD
 	qca8k_mii_write32(bus, 0x10 | r2, r1, 0);
-=======
-	qca8k_mii_write32(priv, 0x10 | r2, r1, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_unlock(&bus->mdio_lock);
 
@@ -2026,11 +1933,6 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
 	}
 
 	priv->mdio_cache.page = 0xffff;
-<<<<<<< HEAD
-=======
-	priv->mdio_cache.lo = 0xffff;
-	priv->mdio_cache.hi = 0xffff;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Check the detected switch id */
 	ret = qca8k_read_switch_id(priv);
@@ -2070,11 +1972,6 @@ qca8k_sw_remove(struct mdio_device *mdiodev)
 		qca8k_port_set_status(priv, i, 0);
 
 	dsa_unregister_switch(priv->ds);
-<<<<<<< HEAD
-=======
-
-	dev_set_drvdata(&mdiodev->dev, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void qca8k_sw_shutdown(struct mdio_device *mdiodev)

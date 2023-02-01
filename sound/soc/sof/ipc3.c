@@ -7,7 +7,6 @@
 //
 //
 
-<<<<<<< HEAD
 #include <sound/sof/stream.h>
 #include <sound/sof/control.h>
 #include <trace/events/sof.h>
@@ -1054,10 +1053,6 @@ static int sof_ipc3_set_core_state(struct snd_sof_dev *sdev, int core_idx, bool 
 	return sof_ipc3_tx_msg(sdev, &core_cfg, sizeof(core_cfg),
 			       &reply, sizeof(reply), false);
 }
-=======
-#include "sof-priv.h"
-#include "ipc3-ops.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int sof_ipc3_ctx_ipc(struct snd_sof_dev *sdev, int cmd)
 {
@@ -1068,13 +1063,8 @@ static int sof_ipc3_ctx_ipc(struct snd_sof_dev *sdev, int cmd)
 	struct sof_ipc_reply reply;
 
 	/* send ctx save ipc to dsp */
-<<<<<<< HEAD
 	return sof_ipc3_tx_msg(sdev, &pm_ctx, sizeof(pm_ctx),
 			       &reply, sizeof(reply), false);
-=======
-	return sof_ipc_tx_message(sdev->ipc, pm_ctx.hdr.cmd, &pm_ctx,
-				  sizeof(pm_ctx), &reply, sizeof(reply));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int sof_ipc3_ctx_save(struct snd_sof_dev *sdev)
@@ -1090,17 +1080,13 @@ static int sof_ipc3_ctx_restore(struct snd_sof_dev *sdev)
 static const struct sof_ipc_pm_ops ipc3_pm_ops = {
 	.ctx_save = sof_ipc3_ctx_save,
 	.ctx_restore = sof_ipc3_ctx_restore,
-<<<<<<< HEAD
 	.set_core_state = sof_ipc3_set_core_state,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 const struct sof_ipc_ops ipc3_ops = {
 	.tplg = &ipc3_tplg_ops,
 	.pm = &ipc3_pm_ops,
 	.pcm = &ipc3_pcm_ops,
-<<<<<<< HEAD
 	.fw_loader = &ipc3_loader_ops,
 	.fw_tracing = &ipc3_dtrace_ops,
 
@@ -1108,6 +1094,4 @@ const struct sof_ipc_ops ipc3_ops = {
 	.rx_msg = sof_ipc3_rx_msg,
 	.set_get_data = sof_ipc3_set_get_data,
 	.get_reply = sof_ipc3_get_reply,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

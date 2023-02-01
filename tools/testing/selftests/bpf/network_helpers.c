@@ -426,13 +426,10 @@ static int setns_by_fd(int nsfd)
 	if (!ASSERT_OK(err, "mount /sys/fs/bpf"))
 		return err;
 
-<<<<<<< HEAD
 	err = mount("debugfs", "/sys/kernel/debug", "debugfs", 0, NULL);
 	if (!ASSERT_OK(err, "mount /sys/kernel/debug"))
 		return err;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

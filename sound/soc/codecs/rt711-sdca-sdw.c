@@ -230,11 +230,7 @@ static int rt711_sdca_read_prop(struct sdw_slave *slave)
 	}
 
 	/* set the timeout values */
-<<<<<<< HEAD
 	prop->clk_stop_timeout = 700;
-=======
-	prop->clk_stop_timeout = 20;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* wake-up event */
 	prop->wake_capable = 1;
@@ -453,11 +449,8 @@ static int __maybe_unused rt711_sdca_dev_resume(struct device *dev)
 				msecs_to_jiffies(RT711_PROBE_TIMEOUT));
 	if (!time) {
 		dev_err(&slave->dev, "Initialization not complete, timed out\n");
-<<<<<<< HEAD
 		sdw_show_ping_status(slave->bus, true);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ETIMEDOUT;
 	}
 

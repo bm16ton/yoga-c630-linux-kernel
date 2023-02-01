@@ -85,7 +85,6 @@ struct qcom_ssr_subsystem {
 	const char *name;
 	struct srcu_notifier_head notifier_list;
 	struct list_head list;
-	enum qcom_ssr_notify_type current_state;
 };
 
 static LIST_HEAD(qcom_ssr_subsystem_list);
@@ -393,9 +392,6 @@ void *qcom_register_ssr_notifier(const char *name, struct notifier_block *nb)
 
 	srcu_notifier_chain_register(&info->notifier_list, nb);
 
-	/* Notify newly registered notifier block of current remoteproc state */
-	nb->notifier_call(nb, info->current_state, NULL);
-
 	return &info->notifier_list;
 }
 EXPORT_SYMBOL_GPL(qcom_register_ssr_notifier);
@@ -424,9 +420,8 @@ static int ssr_notify_prepare(struct rproc_subdev *subdev)
 		.crashed = false,
 	};
 
-	ssr->info->current_state = QCOM_SSR_BEFORE_POWERUP;
 	srcu_notifier_call_chain(&ssr->info->notifier_list,
-				 ssr->info->current_state, &data);
+				 QCOM_SSR_BEFORE_POWERUP, &data);
 	return 0;
 }
 
@@ -438,9 +433,8 @@ static int ssr_notify_start(struct rproc_subdev *subdev)
 		.crashed = false,
 	};
 
-	ssr->info->current_state = QCOM_SSR_AFTER_POWERUP;
 	srcu_notifier_call_chain(&ssr->info->notifier_list,
-				 ssr->info->current_state, &data);
+				 QCOM_SSR_AFTER_POWERUP, &data);
 	return 0;
 }
 
@@ -452,9 +446,8 @@ static void ssr_notify_stop(struct rproc_subdev *subdev, bool crashed)
 		.crashed = crashed,
 	};
 
-	ssr->info->current_state = QCOM_SSR_BEFORE_SHUTDOWN;
 	srcu_notifier_call_chain(&ssr->info->notifier_list,
-				 ssr->info->current_state, &data);
+				 QCOM_SSR_BEFORE_SHUTDOWN, &data);
 }
 
 static void ssr_notify_unprepare(struct rproc_subdev *subdev)
@@ -465,9 +458,8 @@ static void ssr_notify_unprepare(struct rproc_subdev *subdev)
 		.crashed = false,
 	};
 
-	ssr->info->current_state = QCOM_SSR_AFTER_SHUTDOWN;
 	srcu_notifier_call_chain(&ssr->info->notifier_list,
-				 ssr->info->current_state, &data);
+				 QCOM_SSR_AFTER_SHUTDOWN, &data);
 }
 
 /**
@@ -492,7 +484,6 @@ void qcom_add_ssr_subdev(struct rproc *rproc, struct qcom_rproc_ssr *ssr,
 	}
 
 	ssr->info = info;
-	ssr->info->current_state = QCOM_SSR_BEFORE_POWERUP;
 	ssr->subdev.prepare = ssr_notify_prepare;
 	ssr->subdev.start = ssr_notify_start;
 	ssr->subdev.stop = ssr_notify_stop;

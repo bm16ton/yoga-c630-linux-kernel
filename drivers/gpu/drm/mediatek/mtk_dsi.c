@@ -685,6 +685,16 @@ static void mtk_dsi_poweroff(struct mtk_dsi *dsi)
 	if (--dsi->refcount != 0)
 		return;
 
+	/*
+	 * mtk_dsi_stop() and mtk_dsi_start() is asymmetric, since
+	 * mtk_dsi_stop() should be called after mtk_drm_crtc_atomic_disable(),
+	 * which needs irq for vblank, and mtk_dsi_stop() will disable irq.
+	 * mtk_dsi_start() needs to be called in mtk_output_dsi_enable(),
+	 * after dsi is fully set.
+	 */
+	mtk_dsi_stop(dsi);
+
+	mtk_dsi_switch_to_cmd_mode(dsi, VM_DONE_INT_FLAG, 500);
 	mtk_dsi_reset_engine(dsi);
 	mtk_dsi_lane0_ulp_mode_enter(dsi);
 	mtk_dsi_clk_ulp_mode_enter(dsi);
@@ -735,20 +745,6 @@ static void mtk_output_dsi_disable(struct mtk_dsi *dsi)
 	if (!dsi->enabled)
 		return;
 
-<<<<<<< HEAD
-=======
-	/*
-	 * mtk_dsi_stop() and mtk_dsi_start() is asymmetric, since
-	 * mtk_dsi_stop() should be called after mtk_drm_crtc_atomic_disable(),
-	 * which needs irq for vblank, and mtk_dsi_stop() will disable irq.
-	 * mtk_dsi_start() needs to be called in mtk_output_dsi_enable(),
-	 * after dsi is fully set.
-	 */
-	mtk_dsi_stop(dsi);
-
-	mtk_dsi_switch_to_cmd_mode(dsi, VM_DONE_INT_FLAG, 500);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dsi->enabled = false;
 }
 
@@ -811,7 +807,6 @@ static void mtk_dsi_bridge_atomic_post_disable(struct drm_bridge *bridge,
 
 static const struct drm_bridge_funcs mtk_dsi_bridge_funcs = {
 	.attach = mtk_dsi_bridge_attach,
-<<<<<<< HEAD
 	.atomic_destroy_state = drm_atomic_helper_bridge_destroy_state,
 	.atomic_disable = mtk_dsi_bridge_atomic_disable,
 	.atomic_duplicate_state = drm_atomic_helper_bridge_duplicate_state,
@@ -819,12 +814,6 @@ static const struct drm_bridge_funcs mtk_dsi_bridge_funcs = {
 	.atomic_pre_enable = mtk_dsi_bridge_atomic_pre_enable,
 	.atomic_post_disable = mtk_dsi_bridge_atomic_post_disable,
 	.atomic_reset = drm_atomic_helper_bridge_reset,
-=======
-	.atomic_disable = mtk_dsi_bridge_atomic_disable,
-	.atomic_enable = mtk_dsi_bridge_atomic_enable,
-	.atomic_pre_enable = mtk_dsi_bridge_atomic_pre_enable,
-	.atomic_post_disable = mtk_dsi_bridge_atomic_post_disable,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.mode_set = mtk_dsi_bridge_mode_set,
 };
 
@@ -914,18 +903,6 @@ static int mtk_dsi_host_attach(struct mipi_dsi_host *host,
 	dsi->next_bridge = devm_drm_of_get_bridge(dev, dev->of_node, 0, 0);
 	if (IS_ERR(dsi->next_bridge))
 		return PTR_ERR(dsi->next_bridge);
-<<<<<<< HEAD
-=======
-
-	drm_bridge_add(&dsi->bridge);
-
-	ret = component_add(host->dev, &mtk_dsi_component_ops);
-	if (ret) {
-		DRM_ERROR("failed to add dsi_host component: %d\n", ret);
-		drm_bridge_remove(&dsi->bridge);
-		return ret;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_bridge_add(&dsi->bridge);
 
@@ -936,16 +913,6 @@ static int mtk_dsi_host_attach(struct mipi_dsi_host *host,
 		return ret;
 	}
 
-	return 0;
-}
-
-static int mtk_dsi_host_detach(struct mipi_dsi_host *host,
-			       struct mipi_dsi_device *device)
-{
-	struct mtk_dsi *dsi = host_to_dsi(host);
-
-	component_del(host->dev, &mtk_dsi_component_ops);
-	drm_bridge_remove(&dsi->bridge);
 	return 0;
 }
 

@@ -91,11 +91,7 @@ static void test_hugepage(int pagemap_fd, int pagesize)
 	for (i = 0; i < hpage_len; i++)
 		map[i] = (char)i;
 
-<<<<<<< HEAD
 	if (check_huge_anon(map, 1, hpage_len)) {
-=======
-	if (check_huge(map)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ksft_test_result_pass("Test %s huge page allocation\n", __func__);
 
 		clear_softdirty();

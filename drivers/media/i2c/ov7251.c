@@ -1781,11 +1781,6 @@ static void ov7251_remove(struct i2c_client *client)
 	if (!pm_runtime_status_suspended(ov7251->dev))
 		ov7251_set_power_off(ov7251->dev);
 	pm_runtime_set_suspended(ov7251->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct dev_pm_ops ov7251_pm_ops = {

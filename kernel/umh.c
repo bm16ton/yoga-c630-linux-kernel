@@ -28,10 +28,7 @@
 #include <linux/async.h>
 #include <linux/uaccess.h>
 #include <linux/initrd.h>
-<<<<<<< HEAD
 #include <linux/freezer.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <trace/events/module.h>
 

@@ -2722,11 +2722,6 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
 			icr = __kvm_lapic_get_reg64(s->regs, APIC_ICR);
 			__kvm_lapic_set_reg(s->regs, APIC_ICR2, icr >> 32);
 		}
-<<<<<<< HEAD
-=======
-	} else {
-		kvm_lapic_xapic_id_updated(vcpu->arch.apic);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -3020,15 +3015,9 @@ int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
 		if (ret)
 			return ret;
 	}
-<<<<<<< HEAD
 
 	vcpu->arch.pv_eoi.msr_val = data;
 
-=======
-
-	vcpu->arch.pv_eoi.msr_val = data;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -3037,22 +3026,8 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
 	struct kvm_lapic *apic = vcpu->arch.apic;
 	u8 sipi_vector;
 	int r;
-<<<<<<< HEAD
 
 	if (!kvm_apic_has_pending_init_or_sipi(vcpu))
-=======
-	unsigned long pe;
-
-	if (!lapic_in_kernel(vcpu))
-		return 0;
-
-	/*
-	 * Read pending events before calling the check_events
-	 * callback.
-	 */
-	pe = smp_load_acquire(&apic->pending_events);
-	if (!pe)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	if (is_guest_mode(vcpu)) {
@@ -3073,12 +3048,7 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
 	 */
 	if (!kvm_apic_init_sipi_allowed(vcpu)) {
 		WARN_ON_ONCE(vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED);
-<<<<<<< HEAD
 		clear_bit(KVM_APIC_SIPI, &apic->pending_events);
-=======
-		if (test_bit(KVM_APIC_SIPI, &pe))
-			clear_bit(KVM_APIC_SIPI, &apic->pending_events);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 

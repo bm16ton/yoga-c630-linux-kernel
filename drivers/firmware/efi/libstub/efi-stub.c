@@ -39,15 +39,9 @@
 
 #ifdef CONFIG_ARM64
 # define EFI_RT_VIRTUAL_LIMIT	DEFAULT_MAP_WINDOW_64
-<<<<<<< HEAD
 #elif defined(CONFIG_RISCV) || defined(CONFIG_LOONGARCH)
 # define EFI_RT_VIRTUAL_LIMIT	TASK_SIZE_MIN
 #else /* Only if TASK_SIZE is a constant */
-=======
-#elif defined(CONFIG_RISCV)
-# define EFI_RT_VIRTUAL_LIMIT	TASK_SIZE_MIN
-#else
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # define EFI_RT_VIRTUAL_LIMIT	TASK_SIZE
 #endif
 
@@ -215,45 +209,8 @@ efi_status_t __efiapi efi_pe_entry(efi_handle_t handle,
 	/* Ask the firmware to clear memory on unclean shutdown */
 	efi_enable_reset_attack_mitigation();
 
-<<<<<<< HEAD
 	efi_load_initrd(image, ULONG_MAX, efi_get_max_initrd_addr(image_addr),
 			NULL);
-=======
-	secure_boot = efi_get_secureboot();
-
-	/*
-	 * Unauthenticated device tree data is a security hazard, so ignore
-	 * 'dtb=' unless UEFI Secure Boot is disabled.  We assume that secure
-	 * boot is enabled if we can't determine its state.
-	 */
-	if (!IS_ENABLED(CONFIG_EFI_ARMSTUB_DTB_LOADER) ||
-	     secure_boot != efi_secureboot_mode_disabled) {
-		if (strstr(cmdline_ptr, "dtb="))
-			efi_err("Ignoring DTB from command line.\n");
-	} else {
-		status = efi_load_dtb(image, &fdt_addr, &fdt_size);
-
-		if (status != EFI_SUCCESS) {
-			efi_err("Failed to load device tree!\n");
-			goto fail_free_image;
-		}
-	}
-
-	if (fdt_addr) {
-		efi_info("Using DTB from command line\n");
-	} else {
-		/* Look for a device tree configuration table entry. */
-		fdt_addr = (uintptr_t)get_fdt(&fdt_size);
-		if (fdt_addr)
-			efi_info("Using DTB from configuration table\n");
-	}
-
-	if (!fdt_addr)
-		efi_info("Generating empty DTB\n");
-
-	efi_load_initrd(image, &initrd_addr, &initrd_size, ULONG_MAX,
-			efi_get_max_initrd_addr(image_addr));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	efi_random_get_seed();
 

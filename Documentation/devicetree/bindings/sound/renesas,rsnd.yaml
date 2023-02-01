@@ -118,19 +118,11 @@ properties:
       port(@[0-9a-f]+)?:
         $ref: audio-graph-port.yaml#
         unevaluatedProperties: false
-<<<<<<< HEAD
 
   port:
     $ref: audio-graph-port.yaml#
     unevaluatedProperties: false
 
-=======
-
-  port:
-    $ref: audio-graph-port.yaml#
-    unevaluatedProperties: false
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   rcar_sound,dvc:
     description: DVC subnode.
     type: object

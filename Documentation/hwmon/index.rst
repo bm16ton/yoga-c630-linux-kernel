@@ -44,10 +44,6 @@ Hardware Monitoring Kernel Drivers
    asc7621
    aspeed-pwm-tacho
    asus_ec_sensors
-<<<<<<< HEAD
-=======
-   asus_wmi_ec_sensors
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
    asus_wmi_sensors
    bcm54140
    bel-pfe

@@ -180,7 +180,6 @@ vmw_validation_find_bo_dup(struct vmw_validation_context *ctx,
 	if (!ctx->merge_dups)
 		return NULL;
 
-<<<<<<< HEAD
 	if (ctx->sw_context) {
 		struct vmwgfx_hash_item *hash;
 		unsigned long key = (unsigned long) vbo;
@@ -191,13 +190,6 @@ vmw_validation_find_bo_dup(struct vmw_validation_context *ctx,
 				break;
 			}
 		}
-=======
-	if (ctx->ht) {
-		struct vmwgfx_hash_item *hash;
-
-		if (!vmwgfx_ht_find_item(ctx->ht, (unsigned long) vbo, &hash))
-			bo_node = container_of(hash, typeof(*bo_node), hash);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		struct  vmw_validation_bo_node *entry;
 
@@ -230,7 +222,6 @@ vmw_validation_find_res_dup(struct vmw_validation_context *ctx,
 	if (!ctx->merge_dups)
 		return NULL;
 
-<<<<<<< HEAD
 	if (ctx->sw_context) {
 		struct vmwgfx_hash_item *hash;
 		unsigned long key = (unsigned long) res;
@@ -241,13 +232,6 @@ vmw_validation_find_res_dup(struct vmw_validation_context *ctx,
 				break;
 			}
 		}
-=======
-	if (ctx->ht) {
-		struct vmwgfx_hash_item *hash;
-
-		if (!vmwgfx_ht_find_item(ctx->ht, (unsigned long) res, &hash))
-			res_node = container_of(hash, typeof(*res_node), hash);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		struct  vmw_validation_res_node *entry;
 
@@ -302,17 +286,8 @@ int vmw_validation_add_bo(struct vmw_validation_context *ctx,
 
 		if (ctx->sw_context) {
 			bo_node->hash.key = (unsigned long) vbo;
-<<<<<<< HEAD
 			hash_add_rcu(ctx->sw_context->res_ht, &bo_node->hash.head,
 				bo_node->hash.key);
-=======
-			ret = vmwgfx_ht_insert_item(ctx->ht, &bo_node->hash);
-			if (ret) {
-				DRM_ERROR("Failed to initialize a buffer "
-					  "validation entry.\n");
-				return ret;
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		val_buf = &bo_node->base;
 		val_buf->bo = ttm_bo_get_unless_zero(&vbo->base);
@@ -361,16 +336,7 @@ int vmw_validation_add_resource(struct vmw_validation_context *ctx,
 
 	if (ctx->sw_context) {
 		node->hash.key = (unsigned long) res;
-<<<<<<< HEAD
 		hash_add_rcu(ctx->sw_context->res_ht, &node->hash.head, node->hash.key);
-=======
-		ret = vmwgfx_ht_insert_item(ctx->ht, &node->hash);
-		if (ret) {
-			DRM_ERROR("Failed to initialize a resource validation "
-				  "entry.\n");
-			return ret;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	node->res = vmw_resource_reference_unless_doomed(res);
 	if (!node->res)
@@ -718,7 +684,6 @@ void vmw_validation_drop_ht(struct vmw_validation_context *ctx)
 		return;
 
 	list_for_each_entry(entry, &ctx->bo_list, base.head)
-<<<<<<< HEAD
 		hash_del_rcu(&entry->hash.head);
 
 	list_for_each_entry(val, &ctx->resource_list, head)
@@ -726,15 +691,6 @@ void vmw_validation_drop_ht(struct vmw_validation_context *ctx)
 
 	list_for_each_entry(val, &ctx->resource_ctx_list, head)
 		hash_del_rcu(&entry->hash.head);
-=======
-		(void) vmwgfx_ht_remove_item(ctx->ht, &entry->hash);
-
-	list_for_each_entry(val, &ctx->resource_list, head)
-		(void) vmwgfx_ht_remove_item(ctx->ht, &val->hash);
-
-	list_for_each_entry(val, &ctx->resource_ctx_list, head)
-		(void) vmwgfx_ht_remove_item(ctx->ht, &val->hash);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ctx->sw_context = NULL;
 }

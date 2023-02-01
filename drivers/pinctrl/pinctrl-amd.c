@@ -246,11 +246,7 @@ static void amd_gpio_dbg_show(struct seq_file *s, struct gpio_chip *gc)
 		}
 		seq_printf(s, "GPIO bank%d\n", bank);
 		for (; i < pin_num; i++) {
-<<<<<<< HEAD
 			seq_printf(s, "#%d\t", i);
-=======
-			seq_printf(s, "📌%d\t", i);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			raw_spin_lock_irqsave(&gpio_dev->lock, flags);
 			pin_reg = readl(gpio_dev->base + i * 4);
 			raw_spin_unlock_irqrestore(&gpio_dev->lock, flags);
@@ -282,24 +278,16 @@ static void amd_gpio_dbg_show(struct seq_file *s, struct gpio_chip *gc)
 			}
 
 			if (pin_reg & BIT(INTERRUPT_MASK_OFF))
-<<<<<<< HEAD
 				interrupt_mask = "😛";
 			else
 				interrupt_mask = "😷";
 			seq_printf(s, "int %s (%s)| active-%s| %s-⚡| ",
-=======
-				interrupt_mask = "-";
-			else
-				interrupt_mask = "+";
-			seq_printf(s, "int %s (🎭 %s)| active-%s| %s-🔫| ",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   interrupt_enable,
 				   interrupt_mask,
 				   active_level,
 				   level_trig);
 
 			if (pin_reg & BIT(WAKE_CNTRL_OFF_S0I3))
-<<<<<<< HEAD
 				wake_cntrl0 = "⏰";
 			else
 				wake_cntrl0 = " ∅";
@@ -316,24 +304,6 @@ static void amd_gpio_dbg_show(struct seq_file *s, struct gpio_chip *gc)
 			else
 				wake_cntrl2 = " ∅";
 			seq_printf(s, "S4/S5 %s| ", wake_cntrl2);
-=======
-				wake_cntrl0 = "+";
-			else
-				wake_cntrl0 = "∅";
-			seq_printf(s, "S0i3 🌅 %s| ", wake_cntrl0);
-
-			if (pin_reg & BIT(WAKE_CNTRL_OFF_S3))
-				wake_cntrl1 = "+";
-			else
-				wake_cntrl1 = "∅";
-			seq_printf(s, "S3 🌅 %s| ", wake_cntrl1);
-
-			if (pin_reg & BIT(WAKE_CNTRL_OFF_S4))
-				wake_cntrl2 = "+";
-			else
-				wake_cntrl2 = "∅";
-			seq_printf(s, "S4/S5 🌅 %s| ", wake_cntrl2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			if (pin_reg & BIT(PULL_UP_ENABLE_OFF)) {
 				pull_up_enable = "+";
@@ -397,11 +367,7 @@ static void amd_gpio_dbg_show(struct seq_file *s, struct gpio_chip *gc)
 				debounce_enable = "  ∅";
 			}
 			snprintf(debounce_value, sizeof(debounce_value), "%u", time * unit);
-<<<<<<< HEAD
 			seq_printf(s, "debounce %s (🕑 %sus)| ", debounce_enable, debounce_value);
-=======
-			seq_printf(s, "debounce %s (⏰ %sus)| ", debounce_enable, debounce_value);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			seq_printf(s, " 0x%x\n", pin_reg);
 		}
 	}
@@ -662,7 +628,6 @@ static bool do_amd_gpio_irq_handler(int irq, void *dev_id)
 		/* Each status bit covers four pins */
 		for (i = 0; i < 4; i++) {
 			regval = readl(regs + i);
-<<<<<<< HEAD
 
 			if (regval & PIN_IRQ_PENDING)
 				dev_dbg(&gpio_dev->pdev->dev,
@@ -672,24 +637,11 @@ static bool do_amd_gpio_irq_handler(int irq, void *dev_id)
 			/* caused wake on resume context for shared IRQ */
 			if (irq < 0 && (regval & BIT(WAKE_STS_OFF)))
 				return true;
-=======
-			/* caused wake on resume context for shared IRQ */
-			if (irq < 0 && (regval & BIT(WAKE_STS_OFF))) {
-				dev_dbg(&gpio_dev->pdev->dev,
-					"Waking due to GPIO %d: 0x%x",
-					irqnr + i, regval);
-				return true;
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			if (!(regval & PIN_IRQ_PENDING) ||
 			    !(regval & BIT(INTERRUPT_MASK_OFF)))
 				continue;
-<<<<<<< HEAD
 			generic_handle_domain_irq_safe(gc->irq.domain, irqnr + i);
-=======
-			generic_handle_domain_irq(gc->irq.domain, irqnr + i);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			/* Clear interrupt.
 			 * We must read the pin register again, in case the

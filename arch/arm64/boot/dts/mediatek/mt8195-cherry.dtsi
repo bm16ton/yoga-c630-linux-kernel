@@ -4,10 +4,7 @@
  */
 
 #include <dt-bindings/gpio/gpio.h>
-<<<<<<< HEAD
 #include <dt-bindings/spmi/spmi.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "mt8195.dtsi"
 #include "mt6359.dtsi"
 
@@ -21,10 +18,7 @@
 		i2c5 = &i2c5;
 		i2c7 = &i2c7;
 		mmc0 = &mmc0;
-<<<<<<< HEAD
 		mmc1 = &mmc1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		serial0 = &uart0;
 	};
 
@@ -112,7 +106,6 @@
 		enable-active-high;
 		regulator-always-on;
 	};
-<<<<<<< HEAD
 
 	reserved_memory: reserved-memory {
 		#address-cells = <2>;
@@ -125,8 +118,6 @@
 			no-map;
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &i2c0 {
@@ -144,7 +135,6 @@
 	i2c-scl-internal-delay-ns = <12500>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c1_pins>;
-<<<<<<< HEAD
 
 	trackpad@15 {
 		compatible = "elan,ekth3000";
@@ -155,8 +145,6 @@
 		vcc-supply = <&pp3300_s3>;
 		wakeup-source;
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &i2c2 {
@@ -173,7 +161,6 @@
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c3_pins>;
-<<<<<<< HEAD
 
 	tpm@50 {
 		compatible = "google,cr50";
@@ -182,8 +169,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&cr50_int>;
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &i2c4 {
@@ -254,7 +239,6 @@
 	vqmmc-supply = <&mt6359_vufs_ldo_reg>;
 };
 
-<<<<<<< HEAD
 &mmc1 {
 	status = "okay";
 
@@ -273,8 +257,6 @@
 	vqmmc-supply = <&mt_pmic_vmc_ldo_reg>;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* for CPU-L */
 &mt6359_vcore_buck_reg {
 	regulator-always-on;
@@ -482,7 +464,6 @@
 		"AP_SPI_FLASH_MOSI",
 		"AP_SPI_FLASH_MISO";
 
-<<<<<<< HEAD
 	cr50_int: cr50-irq-default-pins {
 		pins-gsc-ap-int-odl {
 			pinmux = <PINMUX_GPIO88__FUNC_GPIO88>;
@@ -498,8 +479,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	i2c0_pins: i2c0-default-pins {
 		pins-bus {
 			pinmux = <PINMUX_GPIO8__FUNC_SDA0>,
@@ -626,7 +605,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	mmc1_pins_detect: mmc1-detect-pins {
 		pins-insert {
 			pinmux = <PINMUX_GPIO54__FUNC_GPIO54>;
@@ -653,8 +631,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nor_pins_default: nor-default-pins {
 		pins-ck-io {
 			pinmux = <PINMUX_GPIO142__FUNC_SPINOR_IO0>,
@@ -715,7 +691,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	scp_pins: scp-default-pins {
 		pins-vreq {
 			pinmux = <PINMUX_GPIO76__FUNC_SCP_VREQ_VAO>;
@@ -724,8 +699,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spi0_pins: spi0-default-pins {
 		pins-cs-mosi-clk {
 			pinmux = <PINMUX_GPIO132__FUNC_SPIM0_CSB>,
@@ -748,7 +721,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	trackpad_pins: trackpad-default-pins {
 		pins-int-n {
 			pinmux = <PINMUX_GPIO6__FUNC_GPIO6>;
@@ -757,8 +729,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	touchscreen_pins: touchscreen-default-pins {
 		pins-int-n {
 			pinmux = <PINMUX_GPIO92__FUNC_GPIO92>;
@@ -780,7 +750,6 @@
 	interrupts-extended = <&pio 222 IRQ_TYPE_LEVEL_HIGH>;
 };
 
-<<<<<<< HEAD
 &scp {
 	status = "okay";
 
@@ -795,15 +764,12 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &spi0 {
 	status = "okay";
 
 	pinctrl-names = "default";
 	pinctrl-0 = <&spi0_pins>;
 	mediatek,pad-select = <0>;
-<<<<<<< HEAD
 
 	cros_ec: ec@0 {
 		#address-cells = <1>;
@@ -906,8 +872,6 @@
 			};
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &u3phy0 {
@@ -959,7 +923,6 @@
 	vusb33-supply = <&mt6359_vusb_ldo_reg>;
 	vbus-supply = <&usb_vbus>;
 };
-<<<<<<< HEAD
 
 #include <arm/cros-ec-keyboard.dtsi>
 #include <arm/cros-ec-sbs.dtsi>
@@ -993,5 +956,3 @@
 		CROS_STD_MAIN_KEYMAP
 	>;
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

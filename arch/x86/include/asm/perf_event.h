@@ -207,12 +207,8 @@ union cpuid_0x80000022_ebx {
 	struct {
 		/* Number of Core Performance Counters */
 		unsigned int	num_core_pmc:4;
-<<<<<<< HEAD
 		/* Number of available LBR Stack Entries */
 		unsigned int	lbr_v2_stack_sz:6;
-=======
-		unsigned int	reserved:6;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Number of Data Fabric Counters */
 		unsigned int	num_df_pmc:6;
 	} split;

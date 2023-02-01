@@ -33,11 +33,6 @@
 #define MEI_FW_PAGE_SIZE 4096UL
 
 /*
- * FW page size for DMA allocations
- */
-#define MEI_FW_PAGE_SIZE 4096UL
-
-/*
  * MEI Version
  */
 #define HBM_MINOR_VERSION                   2

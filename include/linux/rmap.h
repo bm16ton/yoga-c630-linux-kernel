@@ -180,21 +180,6 @@ typedef int __bitwise rmap_t;
 /* The (sub)page is exclusive to a single process. */
 #define RMAP_EXCLUSIVE		((__force rmap_t)BIT(0))
 
-<<<<<<< HEAD
-=======
-/* RMAP flags, currently only relevant for some anon rmap operations. */
-typedef int __bitwise rmap_t;
-
-/*
- * No special request: if the page is a subpage of a compound page, it is
- * mapped via a PTE. The mapped (sub)page is possibly shared between processes.
- */
-#define RMAP_NONE		((__force rmap_t)0)
-
-/* The (sub)page is exclusive to a single process. */
-#define RMAP_EXCLUSIVE		((__force rmap_t)BIT(0))
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * The compound page is not mapped via PTEs, but instead via a single PMD and
  * should be accounted accordingly.
@@ -285,11 +270,7 @@ dup:
  * @page: the exclusive anonymous page to try marking possibly shared
  *
  * The caller needs to hold the PT lock and has to have the page table entry
-<<<<<<< HEAD
  * cleared/invalidated.
-=======
- * cleared/invalidated+flushed, to properly sync against GUP-fast.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * This is similar to page_try_dup_anon_rmap(), however, not used during fork()
  * to duplicate a mapping, but instead to prepare for KSM or temporarily
@@ -305,7 +286,6 @@ static inline int page_try_share_anon_rmap(struct page *page)
 {
 	VM_BUG_ON_PAGE(!PageAnon(page) || !PageAnonExclusive(page), page);
 
-<<<<<<< HEAD
 	/* device private pages cannot get pinned via GUP. */
 	if (unlikely(is_device_private_page(page))) {
 		ClearPageAnonExclusive(page);
@@ -368,14 +348,6 @@ static inline int page_try_share_anon_rmap(struct page *page)
 	 */
 	if (IS_ENABLED(CONFIG_HAVE_FAST_GUP))
 		smp_mb__after_atomic();
-=======
-	/* See page_try_dup_anon_rmap(). */
-	if (likely(!is_device_private_page(page) &&
-	    unlikely(page_maybe_dma_pinned(page))))
-		return -EBUSY;
-
-	ClearPageAnonExclusive(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -489,18 +461,8 @@ struct rmap_walk_control {
 
 void rmap_walk(struct folio *folio, struct rmap_walk_control *rwc);
 void rmap_walk_locked(struct folio *folio, struct rmap_walk_control *rwc);
-<<<<<<< HEAD
 struct anon_vma *folio_lock_anon_vma_read(struct folio *folio,
 					  struct rmap_walk_control *rwc);
-=======
-
-/*
- * Called by memory-failure.c to kill processes.
- */
-struct anon_vma *folio_lock_anon_vma_read(struct folio *folio,
-					  struct rmap_walk_control *rwc);
-void page_unlock_anon_vma_read(struct anon_vma *anon_vma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #else	/* !CONFIG_MMU */
 

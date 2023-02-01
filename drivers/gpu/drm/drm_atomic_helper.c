@@ -38,10 +38,6 @@
 #include <drm/drm_drv.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
-<<<<<<< HEAD
-=======
-#include <drm/drm_plane_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_print.h>
 #include <drm/drm_self_refresh_helper.h>
 #include <drm/drm_vblank.h>
@@ -949,10 +945,6 @@ int drm_atomic_helper_check_crtc_state(struct drm_crtc_state *crtc_state,
 				       bool can_disable_primary_planes)
 {
 	struct drm_device *dev = crtc_state->crtc->dev;
-<<<<<<< HEAD
-=======
-	struct drm_atomic_state *state = crtc_state->state;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!crtc_state->enable)
 		return 0;
@@ -963,18 +955,7 @@ int drm_atomic_helper_check_crtc_state(struct drm_crtc_state *crtc_state,
 		struct drm_plane *plane;
 
 		drm_for_each_plane_mask(plane, dev, crtc_state->plane_mask) {
-<<<<<<< HEAD
 			if (plane->type == DRM_PLANE_TYPE_PRIMARY) {
-=======
-			struct drm_plane_state *plane_state;
-
-			if (plane->type != DRM_PLANE_TYPE_PRIMARY)
-				continue;
-			plane_state = drm_atomic_get_plane_state(state, plane);
-			if (IS_ERR(plane_state))
-				return PTR_ERR(plane_state);
-			if (plane_state->fb && plane_state->crtc) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				has_primary_plane = true;
 				break;
 			}
@@ -1899,16 +1880,12 @@ int drm_atomic_helper_async_check(struct drm_device *dev,
 		return -EBUSY;
 	}
 
-<<<<<<< HEAD
 	ret = funcs->atomic_async_check(plane, state);
 	if (ret != 0)
 		drm_dbg_atomic(dev,
 			       "[PLANE:%d:%s] driver async check failed\n",
 			       plane->base.id, plane->name);
 	return ret;
-=======
-	return funcs->atomic_async_check(plane, state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(drm_atomic_helper_async_check);
 

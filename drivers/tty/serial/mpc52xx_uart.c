@@ -1364,11 +1364,7 @@ static const struct uart_ops mpc52xx_uart_ops = {
 /* Interrupt handling                                                       */
 /* ======================================================================== */
 
-<<<<<<< HEAD
 static inline bool
-=======
-static inline unsigned int
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 mpc52xx_uart_int_rx_chars(struct uart_port *port)
 {
 	struct tty_port *tport = &port->state->port;

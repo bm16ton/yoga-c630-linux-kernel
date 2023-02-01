@@ -2,13 +2,9 @@
 #ifndef _LINUX_FORTIFY_STRING_H_
 #define _LINUX_FORTIFY_STRING_H_
 
-<<<<<<< HEAD
 #include <linux/bug.h>
 #include <linux/const.h>
 #include <linux/limits.h>
-=======
-#include <linux/const.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define __FORTIFY_INLINE extern __always_inline __gnu_inline __overloadable
 #define __RENAME(x) __asm__(#x)
@@ -22,17 +18,10 @@ void __write_overflow_field(size_t avail, size_t wanted) __compiletime_warning("
 
 #define __compiletime_strlen(p)					\
 ({								\
-<<<<<<< HEAD
 	char *__p = (char *)(p);				\
 	size_t __ret = SIZE_MAX;				\
 	size_t __p_size = __member_size(p);			\
 	if (__p_size != SIZE_MAX &&				\
-=======
-	unsigned char *__p = (unsigned char *)(p);		\
-	size_t __ret = (size_t)-1;				\
-	size_t __p_size = __builtin_object_size(p, 1);		\
-	if (__p_size != (size_t)-1 &&				\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    __builtin_constant_p(*__p)) {			\
 		size_t __p_len = __p_size - 1;			\
 		if (__builtin_constant_p(__p[__p_len]) &&	\
@@ -96,7 +85,6 @@ extern char *__underlying_strncpy(char *p, const char *q, __kernel_size_t size) 
 	__underlying_memcpy(dst, src, bytes)
 
 /*
-<<<<<<< HEAD
  * Clang's use of __builtin_*object_size() within inlines needs hinting via
  * __pass_*object_size(). The preference is to only ever use type 1 (member
  * size, rather than struct size), but there remain some stragglers using
@@ -144,16 +132,6 @@ extern char *__underlying_strncpy(char *p, const char *q, __kernel_size_t size) 
  * __nonstring when it is a character array.
  *
  */
-=======
- * Clang's use of __builtin_object_size() within inlines needs hinting via
- * __pass_object_size(). The preference is to only ever use type 1 (member
- * size, rather than struct size), but there remain some stragglers using
- * type 0 that will be converted in the future.
- */
-#define POS	__pass_object_size(1)
-#define POS0	__pass_object_size(0)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 __FORTIFY_INLINE __diagnose_as(__builtin_strncpy, 1, 2, 3)
 char *strncpy(char * const POS p, const char *q, __kernel_size_t size)
 {
@@ -181,20 +159,12 @@ char *strcat(char * const POS p, const char *q)
 extern __kernel_size_t __real_strnlen(const char *, __kernel_size_t) __RENAME(strnlen);
 __FORTIFY_INLINE __kernel_size_t strnlen(const char * const POS p, __kernel_size_t maxlen)
 {
-<<<<<<< HEAD
 	size_t p_size = __member_size(p);
-=======
-	size_t p_size = __builtin_object_size(p, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size_t p_len = __compiletime_strlen(p);
 	size_t ret;
 
 	/* We can take compile-time actions when maxlen is const. */
-<<<<<<< HEAD
 	if (__builtin_constant_p(maxlen) && p_len != SIZE_MAX) {
-=======
-	if (__builtin_constant_p(maxlen) && p_len != (size_t)-1) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* If p is const, we can use its compile-time-known len. */
 		if (maxlen >= p_size)
 			return p_len;
@@ -219,17 +189,10 @@ __FORTIFY_INLINE __diagnose_as(__builtin_strlen, 1)
 __kernel_size_t __fortify_strlen(const char * const POS p)
 {
 	__kernel_size_t ret;
-<<<<<<< HEAD
 	size_t p_size = __member_size(p);
 
 	/* Give up if we don't know how large p is. */
 	if (p_size == SIZE_MAX)
-=======
-	size_t p_size = __builtin_object_size(p, 1);
-
-	/* Give up if we don't know how large p is. */
-	if (p_size == (size_t)-1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return __underlying_strlen(p);
 	ret = strnlen(p, p_size);
 	if (p_size <= ret)
@@ -241,13 +204,8 @@ __kernel_size_t __fortify_strlen(const char * const POS p)
 extern size_t __real_strlcpy(char *, const char *, size_t) __RENAME(strlcpy);
 __FORTIFY_INLINE size_t strlcpy(char * const POS p, const char * const POS q, size_t size)
 {
-<<<<<<< HEAD
 	size_t p_size = __member_size(p);
 	size_t q_size = __member_size(q);
-=======
-	size_t p_size = __builtin_object_size(p, 1);
-	size_t q_size = __builtin_object_size(q, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size_t q_len;	/* Full count of source string length. */
 	size_t len;	/* Count of characters going into destination. */
 
@@ -343,7 +301,6 @@ __FORTIFY_INLINE void fortify_memset_chk(__kernel_size_t size,
 		/*
 		 * Length argument is a constant expression, so we
 		 * can perform compile-time bounds checking where
-<<<<<<< HEAD
 		 * buffer sizes are also known at compile time.
 		 */
 
@@ -354,17 +311,6 @@ __FORTIFY_INLINE void fortify_memset_chk(__kernel_size_t size,
 
 		/* Warn when write size is larger than dest field. */
 		if (__compiletime_lessthan(p_size_field, size))
-=======
-		 * buffer sizes are known.
-		 */
-
-		/* Error when size is larger than enclosing struct. */
-		if (p_size > p_size_field && p_size < size)
-			__write_overflow();
-
-		/* Warn when write size is larger than dest field. */
-		if (p_size_field < size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__write_overflow_field(p_size_field, size);
 	}
 	/*
@@ -378,17 +324,10 @@ __FORTIFY_INLINE void fortify_memset_chk(__kernel_size_t size,
 	/*
 	 * Always stop accesses beyond the struct that contains the
 	 * field, when the buffer's remaining size is known.
-<<<<<<< HEAD
 	 * (The SIZE_MAX test is to optimize away checks where the buffer
 	 * lengths are unknown.)
 	 */
 	if (p_size != SIZE_MAX && p_size < size)
-=======
-	 * (The -1 test is to optimize away checks where the buffer
-	 * lengths are unknown.)
-	 */
-	if (p_size != (size_t)(-1) && p_size < size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		fortify_panic("memset");
 }
 
@@ -399,7 +338,6 @@ __FORTIFY_INLINE void fortify_memset_chk(__kernel_size_t size,
 })
 
 /*
-<<<<<<< HEAD
  * __struct_size() vs __member_size() must be captured here to avoid
  * evaluating argument side-effects further into the macro layers.
  */
@@ -407,13 +345,6 @@ __FORTIFY_INLINE void fortify_memset_chk(__kernel_size_t size,
 #define memset(p, c, s) __fortify_memset_chk(p, c, s,			\
 		__struct_size(p), __member_size(p))
 #endif
-=======
- * __builtin_object_size() must be captured here to avoid evaluating argument
- * side-effects further into the macro layers.
- */
-#define memset(p, c, s) __fortify_memset_chk(p, c, s,			\
-		__builtin_object_size(p, 0), __builtin_object_size(p, 1))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * To make sure the compiler can enforce protection against buffer overflows,
@@ -446,11 +377,7 @@ __FORTIFY_INLINE void fortify_memset_chk(__kernel_size_t size,
  * V = vulnerable to run-time overflow (will need refactoring to solve)
  *
  */
-<<<<<<< HEAD
 __FORTIFY_INLINE bool fortify_memcpy_chk(__kernel_size_t size,
-=======
-__FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 const size_t p_size,
 					 const size_t q_size,
 					 const size_t p_size_field,
@@ -461,7 +388,6 @@ __FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
 		/*
 		 * Length argument is a constant expression, so we
 		 * can perform compile-time bounds checking where
-<<<<<<< HEAD
 		 * buffer sizes are also known at compile time.
 		 */
 
@@ -475,33 +401,15 @@ __FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
 
 		/* Warn when write size argument larger than dest field. */
 		if (__compiletime_lessthan(p_size_field, size))
-=======
-		 * buffer sizes are known.
-		 */
-
-		/* Error when size is larger than enclosing struct. */
-		if (p_size > p_size_field && p_size < size)
-			__write_overflow();
-		if (q_size > q_size_field && q_size < size)
-			__read_overflow2();
-
-		/* Warn when write size argument larger than dest field. */
-		if (p_size_field < size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__write_overflow_field(p_size_field, size);
 		/*
 		 * Warn for source field over-read when building with W=1
 		 * or when an over-write happened, so both can be fixed at
 		 * the same time.
 		 */
-<<<<<<< HEAD
 		if ((IS_ENABLED(KBUILD_EXTRA_WARN1) ||
 		     __compiletime_lessthan(p_size_field, size)) &&
 		    __compiletime_lessthan(q_size_field, size))
-=======
-		if ((IS_ENABLED(KBUILD_EXTRA_WARN1) || p_size_field < size) &&
-		    q_size_field < size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__read_overflow2_field(q_size_field, size);
 	}
 	/*
@@ -515,7 +423,6 @@ __FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
 	/*
 	 * Always stop accesses beyond the struct that contains the
 	 * field, when the buffer's remaining size is known.
-<<<<<<< HEAD
 	 * (The SIZE_MAX test is to optimize away checks where the buffer
 	 * lengths are unknown.)
 	 */
@@ -543,19 +450,10 @@ __FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
 		return true;
 
 	return false;
-=======
-	 * (The -1 test is to optimize away checks where the buffer
-	 * lengths are unknown.)
-	 */
-	if ((p_size != (size_t)(-1) && p_size < size) ||
-	    (q_size != (size_t)(-1) && q_size < size))
-		fortify_panic(func);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #define __fortify_memcpy_chk(p, q, size, p_size, q_size,		\
 			     p_size_field, q_size_field, op) ({		\
-<<<<<<< HEAD
 	const size_t __fortify_size = (size_t)(size);			\
 	const size_t __p_size = (p_size);				\
 	const size_t __q_size = (q_size);				\
@@ -568,16 +466,10 @@ __FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
 		  __fortify_size,					\
 		  "field \"" #p "\" at " __FILE__ ":" __stringify(__LINE__), \
 		  __p_size_field);					\
-=======
-	size_t __fortify_size = (size_t)(size);				\
-	fortify_memcpy_chk(__fortify_size, p_size, q_size,		\
-			   p_size_field, q_size_field, #op);		\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__underlying_##op(p, q, __fortify_size);			\
 })
 
 /*
-<<<<<<< HEAD
  * Notes about compile-time buffer size detection:
  *
  * With these types...
@@ -626,18 +518,6 @@ __FORTIFY_INLINE void fortify_memcpy_chk(__kernel_size_t size,
 #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,			\
 		__struct_size(p), __struct_size(q),			\
 		__member_size(p), __member_size(q),			\
-=======
- * __builtin_object_size() must be captured here to avoid evaluating argument
- * side-effects further into the macro layers.
- */
-#define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,			\
-		__builtin_object_size(p, 0), __builtin_object_size(q, 0), \
-		__builtin_object_size(p, 1), __builtin_object_size(q, 1), \
-		memcpy)
-#define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,			\
-		__builtin_object_size(p, 0), __builtin_object_size(q, 0), \
-		__builtin_object_size(p, 1), __builtin_object_size(q, 1), \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		memmove)
 
 extern void *__real_memscan(void *, int, __kernel_size_t) __RENAME(memscan);
@@ -714,7 +594,6 @@ char *strcpy(char * const POS p, const char * const POS q)
 	size_t size;
 
 	/* If neither buffer size is known, immediately give up. */
-<<<<<<< HEAD
 	if (__builtin_constant_p(p_size) &&
 	    __builtin_constant_p(q_size) &&
 	    p_size == SIZE_MAX && q_size == SIZE_MAX)
@@ -722,13 +601,6 @@ char *strcpy(char * const POS p, const char * const POS q)
 	size = strlen(q) + 1;
 	/* Compile-time check for const size overflow. */
 	if (__compiletime_lessthan(p_size, size))
-=======
-	if (p_size == (size_t)-1 && q_size == (size_t)-1)
-		return __underlying_strcpy(p, q);
-	size = strlen(q) + 1;
-	/* Compile-time check for const size overflow. */
-	if (__builtin_constant_p(size) && p_size < size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		__write_overflow();
 	/* Run-time check for dynamic size overflow. */
 	if (p_size < size)

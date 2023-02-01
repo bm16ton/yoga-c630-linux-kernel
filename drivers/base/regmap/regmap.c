@@ -2249,14 +2249,8 @@ int regmap_noinc_write(struct regmap *map, unsigned int reg,
 	size_t write_len;
 	int ret;
 
-<<<<<<< HEAD
 	if (!map->write && !(map->bus && map->bus->reg_noinc_write))
 		return -EINVAL;
-=======
-	if (!map->write)
-		return -ENOTSUPP;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (val_len % map->format.val_bytes)
 		return -EINVAL;
 	if (!IS_ALIGNED(reg, map->reg_stride))

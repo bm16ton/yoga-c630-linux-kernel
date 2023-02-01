@@ -597,13 +597,8 @@ void virtio_gpu_cmd_transfer_to_host_2d(struct virtio_gpu_device *vgdev,
 	bool use_dma_api = !virtio_has_dma_quirk(vgdev->vdev);
 
 	if (virtio_gpu_is_shmem(bo) && use_dma_api)
-<<<<<<< HEAD
 		dma_sync_sgtable_for_device(&vgdev->vdev->dev,
 					    bo->base.sgt, DMA_TO_DEVICE);
-=======
-		dma_sync_sgtable_for_device(vgdev->vdev->dev.parent,
-					    shmem->pages, DMA_TO_DEVICE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	cmd_p = virtio_gpu_alloc_cmd(vgdev, &vbuf, sizeof(*cmd_p));
 	memset(cmd_p, 0, sizeof(*cmd_p));

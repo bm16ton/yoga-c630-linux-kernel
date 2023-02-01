@@ -2,20 +2,15 @@
 
 #include <linux/pci.h>
 
-<<<<<<< HEAD
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_gem_atomic_helper.h>
 #include <drm/drm_probe_helper.h>
-=======
-#include <drm/drm_drv.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "mgag200_drv.h"
 
 /*
-<<<<<<< HEAD
  * PIXPLLC
  */
 
@@ -172,15 +167,12 @@ static int mgag200_g200eh3_pipeline_init(struct mga_device *mdev)
 }
 
 /*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * DRM device
  */
 
 static const struct mgag200_device_info mgag200_g200eh3_device_info =
 	MGAG200_DEVICE_INFO_INIT(2048, 2048, 0, false, 1, 0, false);
 
-<<<<<<< HEAD
 static const struct mgag200_device_funcs mgag200_g200eh3_device_funcs = {
 	.pixpllc_atomic_check = mgag200_g200eh3_pixpllc_atomic_check,
 	.pixpllc_atomic_update = mgag200_g200eh_pixpllc_atomic_update, // same as G200EH
@@ -188,11 +180,6 @@ static const struct mgag200_device_funcs mgag200_g200eh3_device_funcs = {
 
 struct mga_device *mgag200_g200eh3_device_create(struct pci_dev *pdev,
 						 const struct drm_driver *drv)
-=======
-struct mga_device *mgag200_g200eh3_device_create(struct pci_dev *pdev,
-						 const struct drm_driver *drv,
-						 enum mga_type type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mga_device *mdev;
 	struct drm_device *dev;
@@ -214,7 +201,6 @@ struct mga_device *mgag200_g200eh3_device_create(struct pci_dev *pdev,
 	if (ret)
 		return ERR_PTR(ret);
 
-<<<<<<< HEAD
 	ret = mgag200_device_init(mdev, &mgag200_g200eh3_device_info,
 				  &mgag200_g200eh3_device_funcs);
 	if (ret)
@@ -234,17 +220,5 @@ struct mga_device *mgag200_g200eh3_device_create(struct pci_dev *pdev,
 
 	drm_mode_config_reset(dev);
 
-=======
-	ret = mgag200_device_init(mdev, type, &mgag200_g200eh3_device_info);
-	if (ret)
-		return ERR_PTR(ret);
-
-	vram_available = mgag200_device_probe_vram(mdev);
-
-	ret = mgag200_modeset_init(mdev, vram_available);
-	if (ret)
-		return ERR_PTR(ret);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return mdev;
 }

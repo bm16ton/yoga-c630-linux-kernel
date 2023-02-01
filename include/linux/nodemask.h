@@ -505,7 +505,6 @@ static inline int num_node_state(enum node_states state)
 static inline int node_random(const nodemask_t *maskp)
 {
 #if defined(CONFIG_NUMA) && (MAX_NUMNODES > 1)
-<<<<<<< HEAD
 	int w, bit;
 
 	w = nodes_weight(*maskp);
@@ -520,14 +519,6 @@ static inline int node_random(const nodemask_t *maskp)
 		bit = find_nth_bit(maskp->bits, MAX_NUMNODES, prandom_u32_max(w));
 		break;
 	}
-=======
-	int w, bit = NUMA_NO_NODE;
-
-	w = nodes_weight(*maskp);
-	if (w)
-		bit = bitmap_ord_to_pos(maskp->bits,
-			get_random_int() % w, MAX_NUMNODES);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return bit;
 #else
 	return 0;

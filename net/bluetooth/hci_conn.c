@@ -321,7 +321,6 @@ static bool find_next_esco_param(struct hci_conn *conn,
 	return conn->attempt <= size;
 }
 
-<<<<<<< HEAD
 static int configure_datapath_sync(struct hci_dev *hdev, struct bt_codec *codec)
 {
 	int err;
@@ -371,23 +370,11 @@ static int hci_enhanced_setup_sync(struct hci_dev *hdev, void *data)
 
 	kfree(conn_handle);
 
-=======
-static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
-{
-	struct hci_dev *hdev = conn->hdev;
-	struct hci_cp_enhanced_setup_sync_conn cp;
-	const struct sco_param *param;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bt_dev_dbg(hdev, "hcon %p", conn);
 
 	/* for offload use case, codec needs to configured before opening SCO */
 	if (conn->codec.data_path)
-<<<<<<< HEAD
 		configure_datapath_sync(hdev, &conn->codec);
-=======
-		hci_req_configure_datapath(hdev, &conn->codec);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	conn->state = BT_CONNECT;
 	conn->out = true;
@@ -405,11 +392,7 @@ static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
 	case BT_CODEC_MSBC:
 		if (!find_next_esco_param(conn, esco_param_msbc,
 					  ARRAY_SIZE(esco_param_msbc)))
-<<<<<<< HEAD
 			return -EINVAL;
-=======
-			return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		param = &esco_param_msbc[conn->attempt - 1];
 		cp.tx_coding_format.id = 0x05;
@@ -461,19 +444,11 @@ static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
 		if (lmp_esco_capable(conn->link)) {
 			if (!find_next_esco_param(conn, esco_param_cvsd,
 						  ARRAY_SIZE(esco_param_cvsd)))
-<<<<<<< HEAD
 				return -EINVAL;
 			param = &esco_param_cvsd[conn->attempt - 1];
 		} else {
 			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
 				return -EINVAL;
-=======
-				return false;
-			param = &esco_param_cvsd[conn->attempt - 1];
-		} else {
-			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
-				return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			param = &sco_param_cvsd[conn->attempt - 1];
 		}
 		cp.tx_coding_format.id = 2;
@@ -496,11 +471,7 @@ static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
 		cp.out_transport_unit_size = 16;
 		break;
 	default:
-<<<<<<< HEAD
 		return -EINVAL;
-=======
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	cp.retrans_effort = param->retrans_effort;
@@ -508,15 +479,9 @@ static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
 	cp.max_latency = __cpu_to_le16(param->max_latency);
 
 	if (hci_send_cmd(hdev, HCI_OP_ENHANCED_SETUP_SYNC_CONN, sizeof(cp), &cp) < 0)
-<<<<<<< HEAD
 		return -EIO;
 
 	return 0;
-=======
-		return false;
-
-	return true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool hci_setup_sync_conn(struct hci_conn *conn, __u16 handle)
@@ -573,7 +538,6 @@ static bool hci_setup_sync_conn(struct hci_conn *conn, __u16 handle)
 
 bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
 {
-<<<<<<< HEAD
 	int result;
 	struct conn_handle_t *conn_handle;
 
@@ -592,10 +556,6 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
 
 		return result == 0;
 	}
-=======
-	if (enhanced_sync_conn_capable(conn->hdev))
-		return hci_enhanced_setup_sync_conn(conn, handle);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return hci_setup_sync_conn(conn, handle);
 }
@@ -1252,7 +1212,6 @@ void hci_conn_failed(struct hci_conn *conn, u8 status)
 				    conn->dst_type, status);
 		break;
 	}
-<<<<<<< HEAD
 
 	conn->state = BT_CLOSED;
 	hci_connect_cfm(conn, status);
@@ -1265,20 +1224,6 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
 
 	hci_dev_lock(hdev);
 
-=======
-
-	conn->state = BT_CLOSED;
-	hci_connect_cfm(conn, status);
-	hci_conn_del(conn);
-}
-
-static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
-{
-	struct hci_conn *conn = data;
-
-	hci_dev_lock(hdev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!err) {
 		hci_connect_le_scan_cleanup(conn);
 		goto done;
@@ -1297,7 +1242,6 @@ done:
 }
 
 static int hci_connect_le_sync(struct hci_dev *hdev, void *data)
-<<<<<<< HEAD
 {
 	struct hci_conn *conn = data;
 
@@ -1358,68 +1302,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
 		}
 	}
 
-=======
-{
-	struct hci_conn *conn = data;
-
-	bt_dev_dbg(hdev, "conn %p", conn);
-
-	return hci_le_create_conn_sync(hdev, conn);
-}
-
-struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
-				u8 dst_type, bool dst_resolved, u8 sec_level,
-				u16 conn_timeout, u8 role)
-{
-	struct hci_conn *conn;
-	struct smp_irk *irk;
-	int err;
-
-	/* Let's make sure that le is enabled.*/
-	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
-		if (lmp_le_capable(hdev))
-			return ERR_PTR(-ECONNREFUSED);
-
-		return ERR_PTR(-EOPNOTSUPP);
-	}
-
-	/* Since the controller supports only one LE connection attempt at a
-	 * time, we return -EBUSY if there is any connection attempt running.
-	 */
-	if (hci_lookup_le_connect(hdev))
-		return ERR_PTR(-EBUSY);
-
-	/* If there's already a connection object but it's not in
-	 * scanning state it means it must already be established, in
-	 * which case we can't do anything else except report a failure
-	 * to connect.
-	 */
-	conn = hci_conn_hash_lookup_le(hdev, dst, dst_type);
-	if (conn && !test_bit(HCI_CONN_SCANNING, &conn->flags)) {
-		return ERR_PTR(-EBUSY);
-	}
-
-	/* Check if the destination address has been resolved by the controller
-	 * since if it did then the identity address shall be used.
-	 */
-	if (!dst_resolved) {
-		/* When given an identity address with existing identity
-		 * resolving key, the connection needs to be established
-		 * to a resolvable random address.
-		 *
-		 * Storing the resolvable random address is required here
-		 * to handle connection failures. The address will later
-		 * be resolved back into the original identity address
-		 * from the connect request.
-		 */
-		irk = hci_find_irk_by_addr(hdev, dst, dst_type);
-		if (irk && bacmp(&irk->rpa, BDADDR_ANY)) {
-			dst = &irk->rpa;
-			dst_type = ADDR_LE_DEV_RANDOM;
-		}
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (conn) {
 		bacpy(&conn->dst, dst);
 	} else {
@@ -1999,11 +1881,7 @@ static int hci_create_cis_sync(struct hci_dev *hdev, void *data)
 			continue;
 
 		/* Check if all CIS(s) belonging to a CIG are ready */
-<<<<<<< HEAD
 		if (!conn->link || conn->link->state != BT_CONNECTED ||
-=======
-		if (conn->link->state != BT_CONNECTED ||
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		    conn->state != BT_CONNECT) {
 			cmd.cp.num_cis = 0;
 			break;

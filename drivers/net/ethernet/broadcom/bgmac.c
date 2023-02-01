@@ -1527,11 +1527,7 @@ int bgmac_enet_probe(struct bgmac *bgmac)
 	if (bcm47xx_nvram_getenv("et0_no_txint", NULL, 0) == 0)
 		bgmac->int_mask &= ~BGMAC_IS_TX_MASK;
 
-<<<<<<< HEAD
 	netif_napi_add(net_dev, &bgmac->napi, bgmac_poll);
-=======
-	netif_napi_add(net_dev, &bgmac->napi, bgmac_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = bgmac_phy_connect(bgmac);
 	if (err) {

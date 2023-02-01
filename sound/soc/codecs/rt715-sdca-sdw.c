@@ -244,11 +244,8 @@ static int __maybe_unused rt715_dev_resume(struct device *dev)
 					   msecs_to_jiffies(RT715_PROBE_TIMEOUT));
 	if (!time) {
 		dev_err(&slave->dev, "Enumeration not complete, timed out\n");
-<<<<<<< HEAD
 		sdw_show_ping_status(slave->bus, true);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ETIMEDOUT;
 	}
 

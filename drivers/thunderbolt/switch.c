@@ -258,17 +258,6 @@ static inline bool nvm_upgradeable(struct tb_switch *sw)
 	return nvm_readable(sw);
 }
 
-<<<<<<< HEAD
-=======
-static inline int nvm_read(struct tb_switch *sw, unsigned int address,
-			   void *buf, size_t size)
-{
-	if (tb_switch_is_usb4(sw))
-		return usb4_switch_nvm_read(sw, address, buf, size);
-	return dma_port_flash_read(sw->dma_port, address, buf, size);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int nvm_authenticate(struct tb_switch *sw, bool auth_only)
 {
 	int ret;
@@ -1118,8 +1107,6 @@ void tb_port_lane_bonding_disable(struct tb_port *port)
  */
 int tb_port_wait_for_link_width(struct tb_port *port, int width,
 				int timeout_msec)
-<<<<<<< HEAD
-=======
 {
 	ktime_t timeout = ktime_add_ms(ktime_get(), timeout_msec);
 	int ret;
@@ -1145,110 +1132,6 @@ int tb_port_wait_for_link_width(struct tb_port *port, int width,
 }
 
 static int tb_port_do_update_credits(struct tb_port *port)
-{
-	u32 nfc_credits;
-	int ret;
-
-	ret = tb_port_read(port, &nfc_credits, TB_CFG_PORT, ADP_CS_4, 1);
-	if (ret)
-		return ret;
-
-	if (nfc_credits != port->config.nfc_credits) {
-		u32 total;
-
-		total = (nfc_credits & ADP_CS_4_TOTAL_BUFFERS_MASK) >>
-			ADP_CS_4_TOTAL_BUFFERS_SHIFT;
-
-		tb_port_dbg(port, "total credits changed %u -> %u\n",
-			    port->total_credits, total);
-
-		port->config.nfc_credits = nfc_credits;
-		port->total_credits = total;
-	}
-
-	return 0;
-}
-
-/**
- * tb_port_update_credits() - Re-read port total credits
- * @port: Port to update
- *
- * After the link is bonded (or bonding was disabled) the port total
- * credits may change, so this function needs to be called to re-read
- * the credits. Updates also the second lane adapter.
- */
-int tb_port_update_credits(struct tb_port *port)
-{
-	int ret;
-
-	ret = tb_port_do_update_credits(port);
-	if (ret)
-		return ret;
-	return tb_port_do_update_credits(port->dual_link_port);
-}
-
-static int tb_port_start_lane_initialization(struct tb_port *port)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	ktime_t timeout = ktime_add_ms(ktime_get(), timeout_msec);
-	int ret;
-
-	do {
-		ret = tb_port_get_link_width(port);
-		if (ret < 0) {
-			/*
-			 * Sometimes we get port locked error when
-			 * polling the lanes so we can ignore it and
-			 * retry.
-			 */
-			if (ret != -EACCES)
-				return ret;
-		} else if (ret == width) {
-			return 0;
-		}
-
-		usleep_range(1000, 2000);
-	} while (ktime_before(ktime_get(), timeout));
-
-	return -ETIMEDOUT;
-}
-
-<<<<<<< HEAD
-static int tb_port_do_update_credits(struct tb_port *port)
-=======
-/*
- * Returns true if the port had something (router, XDomain) connected
- * before suspend.
- */
-static bool tb_port_resume(struct tb_port *port)
-{
-	bool has_remote = tb_port_has_remote(port);
-
-	if (port->usb4) {
-		usb4_port_device_resume(port->usb4);
-	} else if (!has_remote) {
-		/*
-		 * For disconnected downstream lane adapters start lane
-		 * initialization now so we detect future connects.
-		 *
-		 * For XDomain start the lane initialzation now so the
-		 * link gets re-established.
-		 *
-		 * This is only needed for non-USB4 ports.
-		 */
-		if (!tb_is_upstream_port(port) || port->xdomain)
-			tb_port_start_lane_initialization(port);
-	}
-
-	return has_remote || port->xdomain;
-}
-
-/**
- * tb_port_is_enabled() - Is the adapter port enabled
- * @port: Port to check
- */
-bool tb_port_is_enabled(struct tb_port *port)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u32 nfc_credits;
 	int ret;
@@ -3582,38 +3465,6 @@ struct tb_port *tb_switch_find_port(struct tb_switch *sw,
 	return NULL;
 }
 
-<<<<<<< HEAD
-=======
-static int __tb_port_pm_secondary_set(struct tb_port *port, bool secondary)
-{
-	u32 phy;
-	int ret;
-
-	ret = tb_port_read(port, &phy, TB_CFG_PORT,
-			   port->cap_phy + LANE_ADP_CS_1, 1);
-	if (ret)
-		return ret;
-
-	if (secondary)
-		phy |= LANE_ADP_CS_1_PMS;
-	else
-		phy &= ~LANE_ADP_CS_1_PMS;
-
-	return tb_port_write(port, &phy, TB_CFG_PORT,
-			     port->cap_phy + LANE_ADP_CS_1, 1);
-}
-
-static int tb_port_pm_secondary_enable(struct tb_port *port)
-{
-	return __tb_port_pm_secondary_set(port, true);
-}
-
-static int tb_port_pm_secondary_disable(struct tb_port *port)
-{
-	return __tb_port_pm_secondary_set(port, false);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tb_switch_pm_secondary_resolve(struct tb_switch *sw)
 {
 	struct tb_switch *parent = tb_switch_parent(sw);
@@ -3632,86 +3483,6 @@ static int tb_switch_pm_secondary_resolve(struct tb_switch *sw)
 	return tb_port_pm_secondary_disable(down);
 }
 
-<<<<<<< HEAD
-=======
-/* Called for USB4 or Titan Ridge routers only */
-static bool tb_port_clx_supported(struct tb_port *port, enum tb_clx clx)
-{
-	u32 mask, val;
-	bool ret;
-
-	/* Don't enable CLx in case of two single-lane links */
-	if (!port->bonded && port->dual_link_port)
-		return false;
-
-	/* Don't enable CLx in case of inter-domain link */
-	if (port->xdomain)
-		return false;
-
-	if (tb_switch_is_usb4(port->sw)) {
-		if (!usb4_port_clx_supported(port))
-			return false;
-	} else if (!tb_lc_is_clx_supported(port)) {
-		return false;
-	}
-
-	switch (clx) {
-	case TB_CL1:
-		/* CL0s and CL1 are enabled and supported together */
-		mask = LANE_ADP_CS_0_CL0S_SUPPORT | LANE_ADP_CS_0_CL1_SUPPORT;
-		break;
-
-	/* For now we support only CL0s and CL1. Not CL2 */
-	case TB_CL2:
-	default:
-		return false;
-	}
-
-	ret = tb_port_read(port, &val, TB_CFG_PORT,
-			   port->cap_phy + LANE_ADP_CS_0, 1);
-	if (ret)
-		return false;
-
-	return !!(val & mask);
-}
-
-static int __tb_port_clx_set(struct tb_port *port, enum tb_clx clx, bool enable)
-{
-	u32 phy, mask;
-	int ret;
-
-	/* CL0s and CL1 are enabled and supported together */
-	if (clx == TB_CL1)
-		mask = LANE_ADP_CS_1_CL0S_ENABLE | LANE_ADP_CS_1_CL1_ENABLE;
-	else
-		/* For now we support only CL0s and CL1. Not CL2 */
-		return -EOPNOTSUPP;
-
-	ret = tb_port_read(port, &phy, TB_CFG_PORT,
-			   port->cap_phy + LANE_ADP_CS_1, 1);
-	if (ret)
-		return ret;
-
-	if (enable)
-		phy |= mask;
-	else
-		phy &= ~mask;
-
-	return tb_port_write(port, &phy, TB_CFG_PORT,
-			     port->cap_phy + LANE_ADP_CS_1, 1);
-}
-
-static int tb_port_clx_disable(struct tb_port *port, enum tb_clx clx)
-{
-	return __tb_port_clx_set(port, clx, false);
-}
-
-static int tb_port_clx_enable(struct tb_port *port, enum tb_clx clx)
-{
-	return __tb_port_clx_set(port, clx, true);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int __tb_switch_enable_clx(struct tb_switch *sw, enum tb_clx clx)
 {
 	struct tb_switch *parent = tb_switch_parent(sw);

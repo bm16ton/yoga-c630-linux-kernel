@@ -5,28 +5,9 @@
 #include <linux/file.h>
 #include <linux/io_uring_types.h>
 
-<<<<<<< HEAD
 #define FFS_NOWAIT		0x1UL
 #define FFS_ISREG		0x2UL
 #define FFS_MASK		~(FFS_NOWAIT|FFS_ISREG)
-=======
-/*
- * FFS_SCM is only available on 64-bit archs, for 32-bit we just define it as 0
- * and define IO_URING_SCM_ALL. For this case, we use SCM for all files as we
- * can't safely always dereference the file when the task has exited and ring
- * cleanup is done. If a file is tracked and part of SCM, then unix gc on
- * process exit may reap it before __io_sqe_files_unregister() is run.
- */
-#define FFS_NOWAIT		0x1UL
-#define FFS_ISREG		0x2UL
-#if defined(CONFIG_64BIT)
-#define FFS_SCM			0x4UL
-#else
-#define IO_URING_SCM_ALL
-#define FFS_SCM			0x0UL
-#endif
-#define FFS_MASK		~(FFS_NOWAIT|FFS_ISREG|FFS_SCM)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 bool io_alloc_file_tables(struct io_file_table *table, unsigned nr_files);
 void io_free_file_tables(struct io_file_table *table);
@@ -44,10 +25,7 @@ unsigned int io_file_get_flags(struct file *file);
 
 static inline void io_file_bitmap_clear(struct io_file_table *table, int bit)
 {
-<<<<<<< HEAD
 	WARN_ON_ONCE(!test_bit(bit, table->bitmap));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__clear_bit(bit, table->bitmap);
 	table->alloc_hint = bit;
 }

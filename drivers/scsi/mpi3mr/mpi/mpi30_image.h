@@ -1,11 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
-<<<<<<< HEAD
  *  Copyright 2018-2022 Broadcom Inc. All rights reserved.
-=======
- *  Copyright 2018-2021 Broadcom Inc. All rights reserved.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #ifndef MPI30_IMAGE_H
 #define MPI30_IMAGE_H     1
@@ -67,12 +62,9 @@ struct mpi3_component_image_header {
 #define MPI3_IMAGE_HEADER_SIGNATURE1_PBLP                     (0x504c4250)
 #define MPI3_IMAGE_HEADER_SIGNATURE1_MANIFEST                 (0x464e414d)
 #define MPI3_IMAGE_HEADER_SIGNATURE1_OEM                      (0x204d454f)
-<<<<<<< HEAD
 #define MPI3_IMAGE_HEADER_SIGNATURE1_RMC                      (0x20434d52)
 #define MPI3_IMAGE_HEADER_SIGNATURE1_SMM                      (0x204d4d53)
 #define MPI3_IMAGE_HEADER_SIGNATURE1_PSW                      (0x20575350)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MPI3_IMAGE_HEADER_SIGNATURE2_VALUE                    (0x50584546)
 #define MPI3_IMAGE_HEADER_FLAGS_DEVICE_KEY_BASIS_MASK         (0x00000030)
 #define MPI3_IMAGE_HEADER_FLAGS_DEVICE_KEY_BASIS_CDI          (0x00000000)

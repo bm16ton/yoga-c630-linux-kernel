@@ -452,7 +452,6 @@ unregister_ports:
 
 static int cros_typec_usb_safe_state(struct cros_typec_port *port)
 {
-<<<<<<< HEAD
 	int ret;
 	port->state.mode = TYPEC_STATE_SAFE;
 
@@ -461,11 +460,6 @@ static int cros_typec_usb_safe_state(struct cros_typec_port *port)
 		ret = typec_mux_set(port->mux, &port->state);
 
 	return ret;
-=======
-	port->state.mode = TYPEC_STATE_SAFE;
-
-	return typec_mux_set(port->mux, &port->state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -959,7 +953,6 @@ static int cros_typec_send_clear_event(struct cros_typec_data *typec, int port_n
 
 	return cros_ec_cmd(typec->ec, 0, EC_CMD_TYPEC_CONTROL, &req,
 			   sizeof(req), NULL, 0);
-<<<<<<< HEAD
 }
 
 static void cros_typec_register_partner_pdos(struct cros_typec_data *typec,
@@ -1000,8 +993,6 @@ static void cros_typec_register_partner_pdos(struct cros_typec_data *typec,
 									   &caps_desc);
 	if (IS_ERR(port->partner_sink_caps))
 		dev_warn(typec->dev, "Failed to register sink caps, port: %d\n", port_num);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void cros_typec_handle_status(struct cros_typec_data *typec, int port_num)

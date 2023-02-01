@@ -161,7 +161,6 @@ static inline void flush_tlb_fix_spurious_fault(struct vm_area_struct *vma,
 	 * it avoids the spurious fault problem by flushing the TLB before
 	 * upgrading PTE permissions, see radix__ptep_set_access_flags.
 	 */
-<<<<<<< HEAD
 }
 
 static inline bool __pte_flags_need_flush(unsigned long oldval,
@@ -217,8 +216,6 @@ static inline bool pte_needs_flush(pte_t oldpte, pte_t newpte)
 static inline bool huge_pmd_needs_flush(pmd_t oldpmd, pmd_t newpmd)
 {
 	return __pte_flags_need_flush(pmd_val(oldpmd), pmd_val(newpmd));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #define huge_pmd_needs_flush huge_pmd_needs_flush
 

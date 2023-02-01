@@ -441,14 +441,6 @@ static void adrf6780_properties_parse(struct adrf6780_state *st)
 	st->vdet_out_en = device_property_read_bool(&spi->dev, "adi,vdet-out-en");
 }
 
-<<<<<<< HEAD
-=======
-static void adrf6780_clk_disable(void *data)
-{
-	clk_disable_unprepare(data);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void adrf6780_powerdown(void *data)
 {
 	/* Disable all components in the Enable Register */
@@ -476,27 +468,11 @@ static int adrf6780_probe(struct spi_device *spi)
 
 	adrf6780_properties_parse(st);
 
-<<<<<<< HEAD
 	st->clkin = devm_clk_get_enabled(&spi->dev, "lo_in");
-=======
-	st->clkin = devm_clk_get(&spi->dev, "lo_in");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(st->clkin))
 		return dev_err_probe(&spi->dev, PTR_ERR(st->clkin),
 				     "failed to get the LO input clock\n");
 
-<<<<<<< HEAD
-=======
-	ret = clk_prepare_enable(st->clkin);
-	if (ret)
-		return ret;
-
-	ret = devm_add_action_or_reset(&spi->dev, adrf6780_clk_disable,
-				       st->clkin);
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&st->lock);
 
 	ret = adrf6780_init(st);

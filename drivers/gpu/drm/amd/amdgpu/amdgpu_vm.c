@@ -351,7 +351,6 @@ int amdgpu_vm_validate_pt_bos(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 	struct amdgpu_bo *bo;
 	int r;
 
-<<<<<<< HEAD
 	spin_lock(&vm->status_lock);
 	while (!list_empty(&vm->evicted)) {
 		bo_base = list_first_entry(&vm->evicted,
@@ -361,11 +360,6 @@ int amdgpu_vm_validate_pt_bos(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 
 		bo = bo_base->bo;
 		shadow = amdgpu_bo_shadowed(bo);
-=======
-	list_for_each_entry_safe(bo_base, tmp, &vm->evicted, vm_status) {
-		struct amdgpu_bo *bo = bo_base->bo;
-		struct amdgpu_bo *shadow = amdgpu_bo_shadowed(bo);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		r = validate(param, bo);
 		if (r)
@@ -382,13 +376,9 @@ int amdgpu_vm_validate_pt_bos(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 			vm->update_funcs->map_table(to_amdgpu_bo_vm(bo));
 			amdgpu_vm_bo_relocated(bo_base);
 		}
-<<<<<<< HEAD
 		spin_lock(&vm->status_lock);
 	}
 	spin_unlock(&vm->status_lock);
-=======
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	amdgpu_vm_eviction_lock(vm);
 	vm->evicting = false;
@@ -409,26 +399,18 @@ int amdgpu_vm_validate_pt_bos(struct amdgpu_device *adev, struct amdgpu_vm *vm,
  */
 bool amdgpu_vm_ready(struct amdgpu_vm *vm)
 {
-<<<<<<< HEAD
 	bool empty;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool ret;
 
 	amdgpu_vm_eviction_lock(vm);
 	ret = !vm->evicting;
 	amdgpu_vm_eviction_unlock(vm);
-<<<<<<< HEAD
 
 	spin_lock(&vm->status_lock);
 	empty = list_empty(&vm->evicted);
 	spin_unlock(&vm->status_lock);
 
 	return ret && empty;
-=======
-
-	return ret && list_empty(&vm->evicted);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -696,16 +678,12 @@ int amdgpu_vm_update_pdes(struct amdgpu_device *adev,
 	struct amdgpu_vm_update_params params;
 	struct amdgpu_vm_bo_base *entry;
 	bool flush_tlb_needed = false;
-<<<<<<< HEAD
 	LIST_HEAD(relocated);
 	int r, idx;
 
 	spin_lock(&vm->status_lock);
 	list_splice_init(&vm->relocated, &relocated);
 	spin_unlock(&vm->status_lock);
-=======
-	int r, idx;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (list_empty(&relocated))
 		return 0;
@@ -722,11 +700,7 @@ int amdgpu_vm_update_pdes(struct amdgpu_device *adev,
 	if (r)
 		goto error;
 
-<<<<<<< HEAD
 	list_for_each_entry(entry, &relocated, vm_status) {
-=======
-	list_for_each_entry(entry, &vm->relocated, vm_status) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* vm_flush_needed after updating moved PDEs */
 		flush_tlb_needed |= entry->moved;
 
@@ -742,14 +716,8 @@ int amdgpu_vm_update_pdes(struct amdgpu_device *adev,
 	if (flush_tlb_needed)
 		atomic64_inc(&vm->tlb_seq);
 
-<<<<<<< HEAD
 	while (!list_empty(&relocated)) {
 		entry = list_first_entry(&relocated, struct amdgpu_vm_bo_base,
-=======
-	while (!list_empty(&vm->relocated)) {
-		entry = list_first_entry(&vm->relocated,
-					 struct amdgpu_vm_bo_base,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 vm_status);
 		amdgpu_vm_bo_idle(entry);
 	}
@@ -946,10 +914,7 @@ void amdgpu_vm_get_memory(struct amdgpu_vm *vm, uint64_t *vram_mem,
 {
 	struct amdgpu_bo_va *bo_va, *tmp;
 
-<<<<<<< HEAD
 	spin_lock(&vm->status_lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry_safe(bo_va, tmp, &vm->idle, base.vm_status) {
 		if (!bo_va->base.bo)
 			continue;
@@ -974,10 +939,6 @@ void amdgpu_vm_get_memory(struct amdgpu_vm *vm, uint64_t *vram_mem,
 		amdgpu_bo_get_memory(bo_va->base.bo, vram_mem,
 				gtt_mem, cpu_mem);
 	}
-<<<<<<< HEAD
-=======
-	spin_lock(&vm->invalidated_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry_safe(bo_va, tmp, &vm->invalidated, base.vm_status) {
 		if (!bo_va->base.bo)
 			continue;
@@ -990,11 +951,7 @@ void amdgpu_vm_get_memory(struct amdgpu_vm *vm, uint64_t *vram_mem,
 		amdgpu_bo_get_memory(bo_va->base.bo, vram_mem,
 				gtt_mem, cpu_mem);
 	}
-<<<<<<< HEAD
 	spin_unlock(&vm->status_lock);
-=======
-	spin_unlock(&vm->invalidated_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 /**
  * amdgpu_vm_bo_update - update all BO mappings in the vm page table
@@ -2275,11 +2232,8 @@ void amdgpu_vm_fini(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 
 	amdgpu_amdkfd_gpuvm_destroy_cb(adev, vm);
 
-<<<<<<< HEAD
 	flush_work(&vm->pt_free_work);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	root = amdgpu_bo_ref(vm->root.bo);
 	amdgpu_bo_reserve(root, true);
 	amdgpu_vm_set_pasid(adev, vm, 0);

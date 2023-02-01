@@ -27,10 +27,6 @@ static struct acp_card_drvdata rt5682_rt1019_data = {
 	.hs_codec_id = RT5682,
 	.amp_codec_id = RT1019,
 	.dmic_codec_id = DMIC,
-<<<<<<< HEAD
-=======
-	.gpio_spkr_en = EN_SPKR_GPIO_GB,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct acp_card_drvdata rt5682s_max_data = {
@@ -40,10 +36,6 @@ static struct acp_card_drvdata rt5682s_max_data = {
 	.hs_codec_id = RT5682S,
 	.amp_codec_id = MAX98360A,
 	.dmic_codec_id = DMIC,
-<<<<<<< HEAD
-=======
-	.gpio_spkr_en = EN_SPKR_GPIO_NONE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct acp_card_drvdata rt5682s_rt1019_data = {
@@ -53,7 +45,6 @@ static struct acp_card_drvdata rt5682s_rt1019_data = {
 	.hs_codec_id = RT5682S,
 	.amp_codec_id = RT1019,
 	.dmic_codec_id = DMIC,
-<<<<<<< HEAD
 };
 
 static struct acp_card_drvdata max_nau8825_data = {
@@ -76,9 +67,6 @@ static struct acp_card_drvdata rt5682s_rt1019_rmb_data = {
 	.dmic_codec_id = DMIC,
 	.soc_mclk = true,
 	.platform = REMBRANDT,
-=======
-	.gpio_spkr_en = EN_SPKR_GPIO_NONE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct snd_kcontrol_new acp_controls[] = {
@@ -93,25 +81,15 @@ static const struct snd_kcontrol_new acp_controls[] = {
 static const struct snd_soc_dapm_widget acp_widgets[] = {
 	SND_SOC_DAPM_HP("Headphone Jack", NULL),
 	SND_SOC_DAPM_MIC("Headset Mic", NULL),
-<<<<<<< HEAD
 	SND_SOC_DAPM_SPK("Spk", NULL),
 	SND_SOC_DAPM_SPK("Left Spk", NULL),
 	SND_SOC_DAPM_SPK("Right Spk", NULL),
-=======
-	SND_SOC_DAPM_SPK("Spk", event_spkr_handler),
-	SND_SOC_DAPM_SPK("Left Spk", event_spkr_handler),
-	SND_SOC_DAPM_SPK("Right Spk", event_spkr_handler),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int acp_asoc_probe(struct platform_device *pdev)
 {
 	struct snd_soc_card *card = NULL;
 	struct device *dev = &pdev->dev;
-<<<<<<< HEAD
-=======
-	unsigned int spkr_gpio;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (!pdev->id_entry)
@@ -129,26 +107,9 @@ static int acp_asoc_probe(struct platform_device *pdev)
 	card->controls = acp_controls;
 	card->num_controls = ARRAY_SIZE(acp_controls);
 	card->drvdata = (struct acp_card_drvdata *)pdev->id_entry->driver_data;
-<<<<<<< HEAD
 
 	acp_legacy_dai_links_create(card);
 
-=======
-	spkr_gpio = ((struct acp_card_drvdata *)(card->drvdata))->gpio_spkr_en;
-
-	acp_legacy_dai_links_create(card);
-
-	if (gpio_is_valid(spkr_gpio)) {
-		ret = devm_gpio_request(dev, spkr_gpio, "spkren");
-		if (ret) {
-			dev_err(dev, "(%s) gpio request failed: %d\n",
-				__func__, ret);
-			return ret;
-		}
-		gpio_direction_output(spkr_gpio, 0);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = devm_snd_soc_register_card(&pdev->dev, card);
 	if (ret) {
 		dev_err(&pdev->dev,
@@ -173,7 +134,6 @@ static const struct platform_device_id board_ids[] = {
 		.name = "acp3xalc5682s1019",
 		.driver_data = (kernel_ulong_t)&rt5682s_rt1019_data,
 	},
-<<<<<<< HEAD
 	{
 		.name = "rmb-nau8825-max",
 		.driver_data = (kernel_ulong_t)&max_nau8825_data,
@@ -182,16 +142,11 @@ static const struct platform_device_id board_ids[] = {
 		.name = "rmb-rt5682s-rt1019",
 		.driver_data = (kernel_ulong_t)&rt5682s_rt1019_rmb_data,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 static struct platform_driver acp_asoc_audio = {
 	.driver = {
-<<<<<<< HEAD
 		.pm = &snd_soc_pm_ops,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.name = "acp_mach",
 	},
 	.probe = acp_asoc_probe,
@@ -205,9 +160,6 @@ MODULE_DESCRIPTION("ACP chrome audio support");
 MODULE_ALIAS("platform:acp3xalc56821019");
 MODULE_ALIAS("platform:acp3xalc5682sm98360");
 MODULE_ALIAS("platform:acp3xalc5682s1019");
-<<<<<<< HEAD
 MODULE_ALIAS("platform:rmb-nau8825-max");
 MODULE_ALIAS("platform:rmb-rt5682s-rt1019");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_LICENSE("GPL v2");

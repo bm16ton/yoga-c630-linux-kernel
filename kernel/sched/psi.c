@@ -226,15 +226,9 @@ static bool test_state(unsigned int *tasks, enum psi_states state, bool oncpu)
 		return unlikely(tasks[NR_MEMSTALL] &&
 			tasks[NR_RUNNING] == tasks[NR_MEMSTALL_RUNNING]);
 	case PSI_CPU_SOME:
-<<<<<<< HEAD
 		return unlikely(tasks[NR_RUNNING] > oncpu);
 	case PSI_CPU_FULL:
 		return unlikely(tasks[NR_RUNNING] && !oncpu);
-=======
-		return unlikely(tasks[NR_RUNNING] > tasks[NR_ONCPU]);
-	case PSI_CPU_FULL:
-		return unlikely(tasks[NR_RUNNING] && !tasks[NR_ONCPU]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case PSI_NONIDLE:
 		return tasks[NR_IOWAIT] || tasks[NR_MEMSTALL] ||
 			tasks[NR_RUNNING];
@@ -545,19 +539,12 @@ static u64 update_triggers(struct psi_group *group, u64 now)
 
 			/* Calculate growth since last update */
 			growth = window_update(&t->win, now, total[t->state]);
-<<<<<<< HEAD
 			if (!t->pending_event) {
 				if (growth < t->threshold)
 					continue;
 
 				t->pending_event = true;
 			}
-=======
-			if (growth < t->threshold)
-				continue;
-
-			t->pending_event = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		/* Limit event signaling to once per window */
 		if (now < t->last_event_time + t->win.size)
@@ -722,7 +709,6 @@ static void psi_group_change(struct psi_group *group, int cpu,
 	 */
 	write_seqcount_begin(&groupc->seq);
 
-<<<<<<< HEAD
 	/*
 	 * Start with TSK_ONCPU, which doesn't have a corresponding
 	 * task count - it's just a boolean flag directly encoded in
@@ -738,9 +724,6 @@ static void psi_group_change(struct psi_group *group, int cpu,
 	} else {
 		state_mask = groupc->state_mask & PSI_ONCPU;
 	}
-=======
-	record_times(groupc, now);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The rest of the state mask is calculated based on the task
@@ -752,11 +735,10 @@ static void psi_group_change(struct psi_group *group, int cpu,
 		if (groupc->tasks[t]) {
 			groupc->tasks[t]--;
 		} else if (!psi_bug) {
-			printk_deferred(KERN_ERR "psi: task underflow! cpu=%d t=%d tasks=[%u %u %u %u %u] clear=%x set=%x\n",
+			printk_deferred(KERN_ERR "psi: task underflow! cpu=%d t=%d tasks=[%u %u %u %u] clear=%x set=%x\n",
 					cpu, t, groupc->tasks[0],
 					groupc->tasks[1], groupc->tasks[2],
-					groupc->tasks[3], groupc->tasks[4],
-					clear, set);
+					groupc->tasks[3], clear, set);
 			psi_bug = 1;
 		}
 	}
@@ -795,17 +777,11 @@ static void psi_group_change(struct psi_group *group, int cpu,
 	 * task in a cgroup is in_memstall, the corresponding groupc
 	 * on that cpu is in PSI_MEM_FULL state.
 	 */
-<<<<<<< HEAD
 	if (unlikely((state_mask & PSI_ONCPU) && cpu_curr(cpu)->in_memstall))
 		state_mask |= (1 << PSI_MEM_FULL);
 
 	record_times(groupc, now);
 
-=======
-	if (unlikely(groupc->tasks[NR_ONCPU] && cpu_curr(cpu)->in_memstall))
-		state_mask |= (1 << PSI_MEM_FULL);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	groupc->state_mask = state_mask;
 
 	write_seqcount_end(&groupc->seq);
@@ -819,28 +795,9 @@ static void psi_group_change(struct psi_group *group, int cpu,
 
 static inline struct psi_group *task_psi_group(struct task_struct *task)
 {
-	if (*iter == &psi_system)
-		return NULL;
-
 #ifdef CONFIG_CGROUPS
-<<<<<<< HEAD
 	if (static_branch_likely(&psi_cgroups_enabled))
 		return cgroup_psi(task_dfl_cgroup(task));
-=======
-	if (static_branch_likely(&psi_cgroups_enabled)) {
-		struct cgroup *cgroup = NULL;
-
-		if (!*iter)
-			cgroup = task->cgroups->dfl_cgrp;
-		else
-			cgroup = cgroup_parent(*iter);
-
-		if (cgroup && cgroup_parent(cgroup)) {
-			*iter = cgroup;
-			return cgroup_psi(cgroup);
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 	return &psi_system;
 }
@@ -864,11 +821,6 @@ void psi_task_change(struct task_struct *task, int clear, int set)
 {
 	int cpu = task_cpu(task);
 	struct psi_group *group;
-<<<<<<< HEAD
-=======
-	bool wake_clock = true;
-	void *iter = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 now;
 
 	if (!task->pid)
@@ -877,27 +829,11 @@ void psi_task_change(struct task_struct *task, int clear, int set)
 	psi_flags_change(task, clear, set);
 
 	now = cpu_clock(cpu);
-<<<<<<< HEAD
 
 	group = task_psi_group(task);
 	do {
 		psi_group_change(group, cpu, clear, set, now, true);
 	} while ((group = group->parent));
-=======
-	/*
-	 * Periodic aggregation shuts off if there is a period of no
-	 * task changes, so we wake it back up if necessary. However,
-	 * don't do this if the task change is the aggregation worker
-	 * itself going to sleep, or we'll ping-pong forever.
-	 */
-	if (unlikely((clear & TSK_RUNNING) &&
-		     (task->flags & PF_WQ_WORKER) &&
-		     wq_worker_last_func(task) == psi_avgs_work))
-		wake_clock = false;
-
-	while ((group = iterate_groups(task, &iter)))
-		psi_group_change(group, cpu, clear, set, now, wake_clock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void psi_task_switch(struct task_struct *prev, struct task_struct *next,
@@ -905,18 +841,11 @@ void psi_task_switch(struct task_struct *prev, struct task_struct *next,
 {
 	struct psi_group *group, *common = NULL;
 	int cpu = task_cpu(prev);
-<<<<<<< HEAD
-=======
-	void *iter;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 now = cpu_clock(cpu);
 
 	if (next->pid) {
-		bool identical_state;
-
 		psi_flags_change(next, 0, TSK_ONCPU);
 		/*
-<<<<<<< HEAD
 		 * Set TSK_ONCPU on @next's cgroups. If @next shares any
 		 * ancestors with @prev, those will already have @prev's
 		 * TSK_ONCPU bit set, and we can stop the iteration there.
@@ -925,33 +854,16 @@ void psi_task_switch(struct task_struct *prev, struct task_struct *next,
 		do {
 			if (per_cpu_ptr(group->pcpu, cpu)->state_mask &
 			    PSI_ONCPU) {
-=======
-		 * When switching between tasks that have an identical
-		 * runtime state, the cgroup that contains both tasks
-		 * we reach the first common ancestor. Iterate @next's
-		 * ancestors only until we encounter @prev's ONCPU.
-		 */
-		identical_state = prev->psi_flags == next->psi_flags;
-		iter = NULL;
-		while ((group = iterate_groups(next, &iter))) {
-			if (identical_state &&
-			    per_cpu_ptr(group->pcpu, cpu)->tasks[NR_ONCPU]) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				common = group;
 				break;
 			}
 
 			psi_group_change(group, cpu, 0, TSK_ONCPU, now, true);
-<<<<<<< HEAD
 		} while ((group = group->parent));
-=======
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (prev->pid) {
 		int clear = TSK_ONCPU, set = 0;
-<<<<<<< HEAD
 		bool wake_clock = true;
 
 		/*
@@ -1031,39 +943,6 @@ void psi_account_irqtime(struct task_struct *task, u32 delta)
 		if (group->poll_states & (1 << PSI_IRQ_FULL))
 			psi_schedule_poll_work(group, 1);
 	} while ((group = group->parent));
-=======
-
-		/*
-		 * When we're going to sleep, psi_dequeue() lets us
-		 * handle TSK_RUNNING, TSK_MEMSTALL_RUNNING and
-		 * TSK_IOWAIT here, where we can combine it with
-		 * TSK_ONCPU and save walking common ancestors twice.
-		 */
-		if (sleep) {
-			clear |= TSK_RUNNING;
-			if (prev->in_memstall)
-				clear |= TSK_MEMSTALL_RUNNING;
-			if (prev->in_iowait)
-				set |= TSK_IOWAIT;
-		}
-
-		psi_flags_change(prev, clear, set);
-
-		iter = NULL;
-		while ((group = iterate_groups(prev, &iter)) && group != common)
-			psi_group_change(group, cpu, clear, set, now, true);
-
-		/*
-		 * TSK_ONCPU is handled up to the common ancestor. If we're tasked
-		 * with dequeuing too, finish that for the rest of the hierarchy.
-		 */
-		if (sleep) {
-			clear &= ~TSK_ONCPU;
-			for (; group; group = iterate_groups(prev, &iter))
-				psi_group_change(group, cpu, clear, set, now, true);
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 
@@ -1137,7 +1016,6 @@ int psi_cgroup_alloc(struct cgroup *cgroup)
 
 	cgroup->psi = kzalloc(sizeof(struct psi_group), GFP_KERNEL);
 	if (!cgroup->psi)
-<<<<<<< HEAD
 		return -ENOMEM;
 
 	cgroup->psi->pcpu = alloc_percpu(struct psi_group_cpu);
@@ -1147,16 +1025,6 @@ int psi_cgroup_alloc(struct cgroup *cgroup)
 	}
 	group_init(cgroup->psi);
 	cgroup->psi->parent = cgroup_psi(cgroup_parent(cgroup));
-=======
-		return -ENOMEM;
-
-	cgroup->psi->pcpu = alloc_percpu(struct psi_group_cpu);
-	if (!cgroup->psi->pcpu) {
-		kfree(cgroup->psi);
-		return -ENOMEM;
-	}
-	group_init(cgroup->psi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1291,15 +1159,11 @@ int psi_show(struct seq_file *m, struct psi_group *group, enum psi_res res)
 		group->avg_next_update = update_averages(group, now);
 	mutex_unlock(&group->avgs_lock);
 
-<<<<<<< HEAD
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
 	only_full = res == PSI_IRQ;
 #endif
 
 	for (full = 0; full < 2 - only_full; full++) {
-=======
-	for (full = 0; full < 2; full++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		unsigned long avg[3] = { 0, };
 		u64 total = 0;
 		int w;
@@ -1664,12 +1528,9 @@ static int __init psi_proc_init(void)
 		proc_create("pressure/io", 0666, NULL, &psi_io_proc_ops);
 		proc_create("pressure/memory", 0666, NULL, &psi_memory_proc_ops);
 		proc_create("pressure/cpu", 0666, NULL, &psi_cpu_proc_ops);
-<<<<<<< HEAD
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
 		proc_create("pressure/irq", 0666, NULL, &psi_irq_proc_ops);
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return 0;
 }

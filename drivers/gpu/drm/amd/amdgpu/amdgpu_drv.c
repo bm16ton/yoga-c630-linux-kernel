@@ -23,7 +23,6 @@
  */
 
 #include <drm/amdgpu_drm.h>
-#include <drm/drm_aperture.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_gem.h>
 #include <drm/drm_vblank.h>
@@ -38,11 +37,8 @@
 #include <linux/mmu_notifier.h>
 #include <linux/suspend.h>
 #include <linux/cc_platform.h>
-<<<<<<< HEAD
 #include <linux/fb.h>
 #include <linux/dynamic_debug.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "amdgpu.h"
 #include "amdgpu_irq.h"
@@ -107,16 +103,10 @@
  * - 3.46.0 - To enable hot plug amdgpu tests in libdrm
  * - 3.47.0 - Add AMDGPU_GEM_CREATE_DISCARDABLE and AMDGPU_VM_NOALLOC flags
  * - 3.48.0 - Add IP discovery version info to HW INFO
-<<<<<<< HEAD
  *   3.49.0 - Add gang submit into CS IOCTL
  */
 #define KMS_DRIVER_MAJOR	3
 #define KMS_DRIVER_MINOR	49
-=======
- */
-#define KMS_DRIVER_MAJOR	3
-#define KMS_DRIVER_MINOR	48
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define KMS_DRIVER_PATCHLEVEL	0
 
 int amdgpu_vram_limit;
@@ -189,10 +179,7 @@ int amdgpu_mes_kiq;
 int amdgpu_noretry = -1;
 int amdgpu_force_asic_type = -1;
 int amdgpu_tmz = -1; /* auto */
-<<<<<<< HEAD
 uint amdgpu_freesync_vid_mode;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int amdgpu_reset_method = -1; /* auto */
 int amdgpu_num_kcq = -1;
 int amdgpu_smartshift_bias;
@@ -200,7 +187,6 @@ int amdgpu_use_xgmi_p2p = 1;
 int amdgpu_vcnfw_log;
 
 static void amdgpu_drv_delayed_reset_work_handler(struct work_struct *work);
-<<<<<<< HEAD
 
 DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
 			"DRM_UT_CORE",
@@ -213,8 +199,6 @@ DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
 			"DRM_UT_LEASE",
 			"DRM_UT_DP",
 			"DRM_UT_DRMRES");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct amdgpu_mgpu_info mgpu_info = {
 	.mutex = __MUTEX_INITIALIZER(mgpu_info.mutex),
@@ -2138,14 +2122,6 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	}
 #endif
 
-<<<<<<< HEAD
-=======
-	/* Get rid of things like offb */
-	ret = drm_aperture_remove_conflicting_pci_framebuffers(pdev, &amdgpu_kms_driver);
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	adev = devm_drm_dev_alloc(&pdev->dev, &amdgpu_kms_driver, typeof(*adev), ddev);
 	if (IS_ERR(adev))
 		return PTR_ERR(adev);
@@ -2249,7 +2225,6 @@ amdgpu_pci_remove(struct pci_dev *pdev)
 {
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(dev);
-<<<<<<< HEAD
 
 	if (adev->pm.rpm_mode != AMDGPU_RUNPM_NONE) {
 		pm_runtime_get_sync(dev->dev);
@@ -2292,18 +2267,6 @@ amdgpu_pci_remove(struct pci_dev *pdev)
 
 	drm_dev_unplug(dev);
 
-=======
-
-	drm_dev_unplug(dev);
-
-	if (adev->pm.rpm_mode != AMDGPU_RUNPM_NONE) {
-		pm_runtime_get_sync(dev->dev);
-		pm_runtime_forbid(dev->dev);
-	}
-
-	amdgpu_driver_unload_kms(dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Flush any in flight DMA operations from device.
 	 * Clear the Bus Master Enable bit and then wait on the PCIe Device

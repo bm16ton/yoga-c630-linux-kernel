@@ -464,9 +464,6 @@ void intel_guc_load_status(struct intel_guc *guc, struct drm_printer *p);
 
 void intel_guc_write_barrier(struct intel_guc *guc);
 
-<<<<<<< HEAD
 void intel_guc_dump_time_info(struct intel_guc *guc, struct drm_printer *p);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

@@ -533,15 +533,10 @@ static int __init gpio_mockup_register_chip(int idx)
 	}
 
 	fwnode = fwnode_create_software_node(properties, NULL);
-<<<<<<< HEAD
 	if (IS_ERR(fwnode)) {
 		kfree_strarray(line_names, ngpio);
 		return PTR_ERR(fwnode);
 	}
-=======
-	if (IS_ERR(fwnode))
-		return PTR_ERR(fwnode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pdevinfo.name = "gpio-mockup";
 	pdevinfo.id = idx;

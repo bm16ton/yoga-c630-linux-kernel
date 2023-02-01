@@ -1483,7 +1483,6 @@ static int max98396_probe(struct snd_soc_component *component)
 			   MAX98396_CLK_MON_AUTO_RESTART_MASK,
 			   MAX98396_CLK_MON_AUTO_RESTART_MASK);
 
-<<<<<<< HEAD
 	regmap_update_bits(max98396->regmap,
 			   MAX98396_R203F_ENABLE_CTRLS,
 			   MAX98396_CTRL_DMON_STUCK_EN_MASK,
@@ -1565,8 +1564,6 @@ static int max98396_probe(struct snd_soc_component *component)
 			max98396->dmon_mag_threshold);
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Speaker Amplifier PCM RX Enable by default */
 	regmap_update_bits(max98396->regmap,
 			   MAX98396_R205E_PCM_RX_EN,
@@ -1698,7 +1695,6 @@ static void max98396_read_device_property(struct device *dev,
 		max98396->bypass_slot = value & 0xF;
 	else
 		max98396->bypass_slot = 0;
-<<<<<<< HEAD
 
 	max98396->dmon_stuck_enable =
 		device_property_read_bool(dev, "adi,dmon-stuck-enable");
@@ -1720,8 +1716,6 @@ static void max98396_read_device_property(struct device *dev,
 		max98396->dmon_duration = value;
 	else
 		max98396->dmon_duration = 64;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void max98396_core_supplies_disable(void *priv)

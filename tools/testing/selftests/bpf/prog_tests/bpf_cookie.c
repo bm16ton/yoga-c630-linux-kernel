@@ -13,11 +13,7 @@
 #include "kprobe_multi.skel.h"
 
 /* uprobe attach point */
-<<<<<<< HEAD
 static noinline void trigger_func(void)
-=======
-static void trigger_func(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	asm volatile ("");
 }

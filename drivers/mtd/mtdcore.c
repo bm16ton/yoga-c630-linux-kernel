@@ -102,10 +102,6 @@ static DEVICE_ATTR(name, 0444, mtd_##name##_show, NULL)
 #define MTD_DEVICE_ATTR_RW(name) \
 static DEVICE_ATTR(name, 0644, mtd_##name##_show, mtd_##name##_store)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static ssize_t mtd_type_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
@@ -799,10 +795,7 @@ int del_mtd_device(struct mtd_info *mtd)
 		       mtd->index, mtd->name, mtd->usecount);
 		ret = -EBUSY;
 	} else {
-<<<<<<< HEAD
 		mtd_of_node = mtd_get_of_node(mtd);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		debugfs_remove_recursive(mtd->dbg.dfs_dir);
 
 		/* Try to remove the NVMEM provider */

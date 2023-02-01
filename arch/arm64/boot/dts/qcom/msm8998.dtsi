@@ -2076,11 +2076,7 @@
 		};
 
 		sdhc2: mmc@c0a4900 {
-<<<<<<< HEAD
 			compatible = "qcom,msm8998-sdhci", "qcom,sdhci-msm-v4";
-=======
-			compatible = "qcom,sdhci-msm-v4";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			reg = <0x0c0a4900 0x314>, <0x0c0a4000 0x800>;
 			reg-names = "hc", "core";
 

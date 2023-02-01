@@ -106,16 +106,7 @@ mt7921u_mcu_send_message(struct mt76_dev *mdev, struct sk_buff *skb,
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	mdev->mcu.timeout = 3 * HZ;
-=======
-	if (cmd == MCU_UNI_CMD(HIF_CTRL) ||
-	    cmd == MCU_UNI_CMD(SUSPEND) ||
-	    cmd == MCU_UNI_CMD(OFFLOAD))
-		mdev->mcu.timeout = HZ;
-	else
-		mdev->mcu.timeout = 3 * HZ;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (cmd != MCU_CMD(FW_SCATTER))
 		ep = MT_EP_OUT_INBAND_CMD;
@@ -187,10 +178,7 @@ static int mt7921u_probe(struct usb_interface *usb_intf,
 		.tx_complete_skb = mt7921_usb_sdio_tx_complete_skb,
 		.tx_status_data = mt7921_usb_sdio_tx_status_data,
 		.rx_skb = mt7921_queue_rx_skb,
-<<<<<<< HEAD
 		.rx_check = mt7921_rx_check,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.sta_ps = mt7921_sta_ps,
 		.sta_add = mt7921_mac_sta_add,
 		.sta_assoc = mt7921_mac_sta_assoc,
@@ -321,11 +309,6 @@ static int mt7921u_suspend(struct usb_interface *intf, pm_message_t state)
 	mt76u_stop_rx(&dev->mt76);
 	mt76u_stop_tx(&dev->mt76);
 
-<<<<<<< HEAD
-=======
-	set_bit(MT76_STATE_SUSPEND, &dev->mphy.state);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 failed:
@@ -365,11 +348,6 @@ static int mt7921u_resume(struct usb_interface *intf)
 			goto failed;
 	}
 
-<<<<<<< HEAD
-=======
-	clear_bit(MT76_STATE_SUSPEND, &dev->mphy.state);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = mt76u_resume_rx(&dev->mt76);
 	if (err < 0)
 		goto failed;

@@ -1563,7 +1563,6 @@ static inline bool rt_supported(int ts_cap)
 	return ts_cap == MLX5_TIMESTAMP_FORMAT_CAP_REAL_TIME ||
 	       ts_cap == MLX5_TIMESTAMP_FORMAT_CAP_FREE_RUNNING_AND_REAL_TIME;
 }
-<<<<<<< HEAD
 
 /*
  * PCI Peer to Peer is a trainwreck. If no switch is present then things
@@ -1600,6 +1599,4 @@ static inline bool mlx5_umem_needs_ats(struct mlx5_ib_dev *dev,
 	return access_flags & IB_ACCESS_RELAXED_ORDERING;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* MLX5_IB_H */

@@ -930,7 +930,6 @@ static notrace bool rcu_preempt_need_deferred_qs(struct task_struct *t)
 	return false;
 }
 
-<<<<<<< HEAD
 // Except that we do need to respond to a request by an expedited
 // grace period for a quiescent state from this CPU.  Note that in
 // non-preemptible kernels, there can be no context switches within RCU
@@ -938,12 +937,6 @@ static notrace bool rcu_preempt_need_deferred_qs(struct task_struct *t)
 // structure's blocked-tasks list is always empty.  is therefore no need to
 // actually check it.  Instead, a quiescent state from this CPU suffices,
 // and this function is only called from such a quiescent state.
-=======
-// Except that we do need to respond to a request by an expedited grace
-// period for a quiescent state from this CPU.  Note that requests from
-// tasks are handled when removing the task from the blocked-tasks list
-// below.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 notrace void rcu_preempt_deferred_qs(struct task_struct *t)
 {
 	struct rcu_data *rdp = this_cpu_ptr(&rcu_data);
@@ -1246,16 +1239,11 @@ static void rcu_boost_kthread_setaffinity(struct rcu_node *rnp, int outgoingcpu)
 		    cpu != outgoingcpu)
 			cpumask_set_cpu(cpu, cm);
 	cpumask_and(cm, cm, housekeeping_cpumask(HK_TYPE_RCU));
-<<<<<<< HEAD
 	if (cpumask_empty(cm)) {
 		cpumask_copy(cm, housekeeping_cpumask(HK_TYPE_RCU));
 		if (outgoingcpu >= 0)
 			cpumask_clear_cpu(outgoingcpu, cm);
 	}
-=======
-	if (cpumask_empty(cm))
-		cpumask_copy(cm, housekeeping_cpumask(HK_TYPE_RCU));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_cpus_allowed_ptr(t, cm);
 	mutex_unlock(&rnp->boost_kthread_mutex);
 	free_cpumask_var(cm);

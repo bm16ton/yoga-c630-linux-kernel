@@ -38,17 +38,6 @@
 
 #define IDEAPAD_RFKILL_DEV_NUM	3
 
-<<<<<<< HEAD
-=======
-#if IS_ENABLED(CONFIG_ACPI_WMI)
-static const char *const ideapad_wmi_fnesc_events[] = {
-	"26CAB2E5-5CF1-46AE-AAC3-4A12B6BA50E6", /* Yoga 3 */
-	"56322276-8493-4CE8-A783-98C991274F5E", /* Yoga 700 */
-	"8FC0DE0C-B4E4-43FD-B0F3-8871711C1294", /* Legion 5 */
-};
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum {
 	CFG_CAP_BT_BIT       = 16,
 	CFG_CAP_3G_BIT       = 17,
@@ -187,7 +176,6 @@ MODULE_PARM_DESC(set_fn_lock_led,
 	"Enable driver based updates of the fn-lock LED on fn-lock changes. "
 	"If you need this please report this to: platform-driver-x86@vger.kernel.org");
 
-<<<<<<< HEAD
 static bool ctrl_ps2_aux_port;
 module_param(ctrl_ps2_aux_port, bool, 0444);
 MODULE_PARM_DESC(ctrl_ps2_aux_port,
@@ -230,8 +218,6 @@ static void ideapad_shared_exit(struct ideapad_private *priv)
 	mutex_unlock(&ideapad_shared_mutex);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * ACPI Helpers
  */
@@ -1003,7 +989,6 @@ static int ideapad_dytc_profile_init(struct ideapad_private *priv)
 
 	if (dytc_version < 4) {
 		dev_info(&priv->platform_device->dev, "DYTC_VERSION < 4 is not supported\n");
-<<<<<<< HEAD
 		return -ENODEV;
 	}
 
@@ -1013,17 +998,6 @@ static int ideapad_dytc_profile_init(struct ideapad_private *priv)
 			 "DYTC_VERSION 4 support may not work. Pass ideapad_laptop.allow_v4_dytc=Y on the kernel commandline to enable\n");
 		return -ENODEV;
 	}
-=======
-		return -ENODEV;
-	}
-
-	if (dytc_version < 5 &&
-	    !(allow_v4_dytc || dmi_check_system(ideapad_dytc_v4_allow_table))) {
-		dev_info(&priv->platform_device->dev,
-			 "DYTC_VERSION 4 support may not work. Pass ideapad_laptop.allow_v4_dytc=Y on the kernel commandline to enable\n");
-		return -ENODEV;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	priv->dytc = kzalloc(sizeof(*priv->dytc), GFP_KERNEL);
 	if (!priv->dytc)
@@ -1632,7 +1606,6 @@ static void ideapad_acpi_notify(acpi_handle handle, u32 event, void *data)
 	}
 }
 
-<<<<<<< HEAD
 /* On some models we need to call exec_sals(SALS_FNLOCK_ON/OFF) to set the LED */
 static const struct dmi_system_id set_fn_lock_led_list[] = {
 	{
@@ -1646,46 +1619,6 @@ static const struct dmi_system_id set_fn_lock_led_list[] = {
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
 			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo Legion 5 15ARH05"),
-		}
-	},
-	{}
-};
-=======
-#if IS_ENABLED(CONFIG_ACPI_WMI)
-static void ideapad_wmi_notify(u32 value, void *context)
-{
-	struct ideapad_private *priv = context;
-	unsigned long result;
-
-	switch (value) {
-	case 128:
-		ideapad_input_report(priv, value);
-		break;
-	case 208:
-		if (!priv->features.set_fn_lock_led)
-			break;
-
-		if (!eval_hals(priv->adev->handle, &result)) {
-			bool state = test_bit(HALS_FNLOCK_STATE_BIT, &result);
-
-			exec_sals(priv->adev->handle, state ? SALS_FNLOCK_ON : SALS_FNLOCK_OFF);
-		}
-		break;
-	default:
-		dev_info(&priv->platform_device->dev,
-			 "Unknown WMI event: %u\n", value);
-	}
-}
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-/* On some models we need to call exec_sals(SALS_FNLOCK_ON/OFF) to set the LED */
-static const struct dmi_system_id set_fn_lock_led_list[] = {
-	{
-		/* https://bugzilla.kernel.org/show_bug.cgi?id=212671 */
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
-			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo Legion R7000P2020H"),
 		}
 	},
 	{}
@@ -1710,7 +1643,6 @@ static const struct dmi_system_id hw_rfkill_list[] = {
 	{}
 };
 
-<<<<<<< HEAD
 /*
  * On some models the EC toggles the touchpad muted LED on touchpad toggle
  * hotkey presses, but the EC does not actually disable the touchpad itself.
@@ -1728,8 +1660,6 @@ static const struct dmi_system_id ctrl_ps2_aux_port_list[] = {
 	{}
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct dmi_system_id no_touchpad_switch_list[] = {
 	{
 	.ident = "Lenovo Yoga 3 Pro 1370",
@@ -1757,11 +1687,8 @@ static void ideapad_check_features(struct ideapad_private *priv)
 		set_fn_lock_led || dmi_check_system(set_fn_lock_led_list);
 	priv->features.hw_rfkill_switch =
 		hw_rfkill_switch || dmi_check_system(hw_rfkill_list);
-<<<<<<< HEAD
 	priv->features.ctrl_ps2_aux_port =
 		ctrl_ps2_aux_port || dmi_check_system(ctrl_ps2_aux_port_list);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Most ideapads with ELAN0634 touchpad don't use EC touchpad switch */
 	if (acpi_dev_present("ELAN0634", NULL, -1))

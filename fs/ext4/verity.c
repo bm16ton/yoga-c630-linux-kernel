@@ -79,11 +79,7 @@ static int pagecache_write(struct inode *inode, const void *buf, size_t count,
 		size_t n = min_t(size_t, count,
 				 PAGE_SIZE - offset_in_page(pos));
 		struct page *page;
-<<<<<<< HEAD
 		void *fsdata = NULL;
-=======
-		void *fsdata;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		int res;
 
 		res = aops->write_begin(NULL, mapping, pos, n, &page, &fsdata);

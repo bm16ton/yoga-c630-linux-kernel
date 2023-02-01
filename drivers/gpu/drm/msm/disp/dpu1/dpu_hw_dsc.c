@@ -37,20 +37,12 @@ static void dpu_hw_dsc_disable(struct dpu_hw_dsc *dsc)
 }
 
 static void dpu_hw_dsc_config(struct dpu_hw_dsc *hw_dsc,
-<<<<<<< HEAD
 			      struct drm_dsc_config *dsc,
-=======
-			      struct msm_display_dsc_config *dsc,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			      u32 mode,
 			      u32 initial_lines)
 {
 	struct dpu_hw_blk_reg_map *c = &hw_dsc->hw;
-<<<<<<< HEAD
 	u32 data;
-=======
-	u32 data, lsb, bpp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 slice_last_group_size;
 	u32 det_thresh_flatness;
 	bool is_cmd_mode = !(mode & DSC_MODE_VIDEO);
@@ -60,7 +52,6 @@ static void dpu_hw_dsc_config(struct dpu_hw_dsc *hw_dsc,
 	if (is_cmd_mode)
 		initial_lines += 1;
 
-<<<<<<< HEAD
 	slice_last_group_size = 3 - (dsc->slice_width % 3);
 	data = (initial_lines << 20);
 	data |= ((slice_last_group_size - 1) << 18);
@@ -123,101 +114,20 @@ static void dpu_hw_dsc_config(struct dpu_hw_dsc *hw_dsc,
 	data |= dsc->rc_quant_incr_limit1 << 9;
 	data |= dsc->rc_quant_incr_limit0 << 4;
 	data |= dsc->rc_edge_factor;
-=======
-	slice_last_group_size = 3 - (dsc->drm->slice_width % 3);
-	data = (initial_lines << 20);
-	data |= ((slice_last_group_size - 1) << 18);
-	/* bpp is 6.4 format, 4 LSBs bits are for fractional part */
-	data |= dsc->drm->bits_per_pixel << 12;
-	lsb = dsc->drm->bits_per_pixel % 4;
-	bpp = dsc->drm->bits_per_pixel / 4;
-	bpp *= 4;
-	bpp <<= 4;
-	bpp |= lsb;
-
-	data |= bpp << 8;
-	data |= (dsc->drm->block_pred_enable << 7);
-	data |= (dsc->drm->line_buf_depth << 3);
-	data |= (dsc->drm->simple_422 << 2);
-	data |= (dsc->drm->convert_rgb << 1);
-	data |= dsc->drm->bits_per_component;
-
-	DPU_REG_WRITE(c, DSC_ENC, data);
-
-	data = dsc->drm->pic_width << 16;
-	data |= dsc->drm->pic_height;
-	DPU_REG_WRITE(c, DSC_PICTURE, data);
-
-	data = dsc->drm->slice_width << 16;
-	data |= dsc->drm->slice_height;
-	DPU_REG_WRITE(c, DSC_SLICE, data);
-
-	data = dsc->drm->slice_chunk_size << 16;
-	DPU_REG_WRITE(c, DSC_CHUNK_SIZE, data);
-
-	data = dsc->drm->initial_dec_delay << 16;
-	data |= dsc->drm->initial_xmit_delay;
-	DPU_REG_WRITE(c, DSC_DELAY, data);
-
-	data = dsc->drm->initial_scale_value;
-	DPU_REG_WRITE(c, DSC_SCALE_INITIAL, data);
-
-	data = dsc->drm->scale_decrement_interval;
-	DPU_REG_WRITE(c, DSC_SCALE_DEC_INTERVAL, data);
-
-	data = dsc->drm->scale_increment_interval;
-	DPU_REG_WRITE(c, DSC_SCALE_INC_INTERVAL, data);
-
-	data = dsc->drm->first_line_bpg_offset;
-	DPU_REG_WRITE(c, DSC_FIRST_LINE_BPG_OFFSET, data);
-
-	data = dsc->drm->nfl_bpg_offset << 16;
-	data |= dsc->drm->slice_bpg_offset;
-	DPU_REG_WRITE(c, DSC_BPG_OFFSET, data);
-
-	data = dsc->drm->initial_offset << 16;
-	data |= dsc->drm->final_offset;
-	DPU_REG_WRITE(c, DSC_DSC_OFFSET, data);
-
-	det_thresh_flatness = 7 + 2 * (dsc->drm->bits_per_component - 8);
-	data = det_thresh_flatness << 10;
-	data |= dsc->drm->flatness_max_qp << 5;
-	data |= dsc->drm->flatness_min_qp;
-	DPU_REG_WRITE(c, DSC_FLATNESS, data);
-
-	data = dsc->drm->rc_model_size;
-	DPU_REG_WRITE(c, DSC_RC_MODEL_SIZE, data);
-
-	data = dsc->drm->rc_tgt_offset_low << 18;
-	data |= dsc->drm->rc_tgt_offset_high << 14;
-	data |= dsc->drm->rc_quant_incr_limit1 << 9;
-	data |= dsc->drm->rc_quant_incr_limit0 << 4;
-	data |= dsc->drm->rc_edge_factor;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	DPU_REG_WRITE(c, DSC_RC, data);
 }
 
 static void dpu_hw_dsc_config_thresh(struct dpu_hw_dsc *hw_dsc,
-<<<<<<< HEAD
 				     struct drm_dsc_config *dsc)
 {
 	struct drm_dsc_rc_range_parameters *rc = dsc->rc_range_params;
-=======
-				     struct msm_display_dsc_config *dsc)
-{
-	struct drm_dsc_rc_range_parameters *rc = dsc->drm->rc_range_params;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dpu_hw_blk_reg_map *c = &hw_dsc->hw;
 	u32 off;
 	int i;
 
 	off = DSC_RC_BUF_THRESH;
 	for (i = 0; i < DSC_NUM_BUF_RANGES - 1 ; i++) {
-<<<<<<< HEAD
 		DPU_REG_WRITE(c, off, dsc->rc_buf_thresh[i]);
-=======
-		DPU_REG_WRITE(c, off, dsc->drm->rc_buf_thresh[i]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		off += 4;
 	}
 

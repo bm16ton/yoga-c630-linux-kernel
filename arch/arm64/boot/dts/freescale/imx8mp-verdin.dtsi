@@ -146,7 +146,6 @@
 	};
 };
 
-<<<<<<< HEAD
 &A53_0 {
 	cpu-supply = <&reg_vdd_arm>;
 };
@@ -163,8 +162,6 @@
 	cpu-supply = <&reg_vdd_arm>;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &cpu_alert0 {
 	temperature = <95000>;
 };
@@ -305,10 +302,6 @@
 	status = "disabled";
 };
 
-<<<<<<< HEAD
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Verdin CAN_2 */
 &flexcan2 {
 	pinctrl-names = "default";
@@ -476,11 +469,7 @@
 				regulator-ramp-delay = <3125>;
 			};
 
-<<<<<<< HEAD
 			reg_vdd_arm: BUCK2 {
-=======
-			BUCK2 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				nxp,dvs-run-voltage = <950000>;
 				nxp,dvs-standby-voltage = <850000>;
 				regulator-always-on;

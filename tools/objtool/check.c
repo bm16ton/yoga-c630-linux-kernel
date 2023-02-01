@@ -1164,7 +1164,6 @@ __weak bool arch_is_retpoline(struct symbol *sym)
 {
 	return false;
 }
-<<<<<<< HEAD
 
 __weak bool arch_is_rethunk(struct symbol *sym)
 {
@@ -1190,33 +1189,6 @@ static struct reloc *insn_reloc(struct objtool_file *file, struct instruction *i
 		}
 	}
 
-=======
-
-__weak bool arch_is_rethunk(struct symbol *sym)
-{
-	return false;
-}
-
-#define NEGATIVE_RELOC	((void *)-1L)
-
-static struct reloc *insn_reloc(struct objtool_file *file, struct instruction *insn)
-{
-	if (insn->reloc == NEGATIVE_RELOC)
-		return NULL;
-
-	if (!insn->reloc) {
-		if (!file)
-			return NULL;
-
-		insn->reloc = find_reloc_by_dest_range(file->elf, insn->sec,
-						       insn->offset, insn->len);
-		if (!insn->reloc) {
-			insn->reloc = NEGATIVE_RELOC;
-			return NULL;
-		}
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return insn->reloc;
 }
 
@@ -1571,21 +1543,12 @@ static int add_call_destinations(struct objtool_file *file)
 					  dest_off);
 				return -1;
 			}
-<<<<<<< HEAD
 
 			add_call_dest(file, insn, dest, false);
 
 		} else if (reloc->sym->retpoline_thunk) {
 			add_retpoline_call(file, insn);
 
-=======
-
-			add_call_dest(file, insn, dest, false);
-
-		} else if (reloc->sym->retpoline_thunk) {
-			add_retpoline_call(file, insn);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else
 			add_call_dest(file, insn, reloc->sym, false);
 	}
@@ -2174,12 +2137,6 @@ static int read_noendbr_hints(struct objtool_file *file)
 			return -1;
 		}
 
-<<<<<<< HEAD
-=======
-		if (insn->type == INSN_ENDBR)
-			WARN_FUNC("ANNOTATE_NOENDBR on ENDBR", insn->sec, insn->offset);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		insn->noendbr = 1;
 	}
 
@@ -3389,13 +3346,10 @@ static int validate_branch(struct objtool_file *file, struct symbol *func,
 		next_insn = next_insn_to_validate(file, insn);
 
 		if (func && insn->func && func != insn->func->pfunc) {
-<<<<<<< HEAD
 			/* Ignore KCFI type preambles, which always fall through */
 			if (!strncmp(func->name, "__cfi_", 6))
 				return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			WARN("%s() falls through to next function %s()",
 			     func->name, insn->func->name);
 			return 1;
@@ -4193,13 +4147,9 @@ static int validate_ibt(struct objtool_file *file)
 		    !strcmp(sec->name, "__bug_table")			||
 		    !strcmp(sec->name, "__ex_table")			||
 		    !strcmp(sec->name, "__jump_table")			||
-<<<<<<< HEAD
 		    !strcmp(sec->name, "__mcount_loc")			||
 		    !strcmp(sec->name, ".kcfi_traps")			||
 		    strstr(sec->name, "__patchable_function_entries"))
-=======
-		    !strcmp(sec->name, "__mcount_loc"))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			continue;
 
 		list_for_each_entry(reloc, &sec->reloc->reloc_list, list)

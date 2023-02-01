@@ -101,7 +101,6 @@ config INTEL_QEP
 	  To compile this driver as a module, choose M here: the module
 	  will be called intel-qep.
 
-<<<<<<< HEAD
 config TI_ECAP_CAPTURE
 	tristate "TI eCAP capture driver"
 	depends on ARCH_OMAP2PLUS || ARCH_DAVINCI_DA8XX || ARCH_KEYSTONE || ARCH_K3 || COMPILE_TEST
@@ -117,6 +116,4 @@ config TI_ECAP_CAPTURE
 	  To compile this driver as a module, choose M here: the module
 	  will be called ti-ecap-capture.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endif # COUNTER

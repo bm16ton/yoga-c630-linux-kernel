@@ -42,15 +42,9 @@
 #include "intel_display_types.h"
 #include "intel_fb.h"
 #include "intel_fb_pin.h"
-<<<<<<< HEAD
 #include "intel_sprite.h"
 #include "skl_scaler.h"
 #include "skl_watermark.h"
-=======
-#include "intel_pm.h"
-#include "intel_sprite.h"
-#include "skl_scaler.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void intel_plane_state_reset(struct intel_plane_state *plane_state,
 				    struct intel_plane *plane)

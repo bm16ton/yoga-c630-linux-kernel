@@ -13,19 +13,11 @@ if MEDIA_USB_SUPPORT
 if MEDIA_CAMERA_SUPPORT
 	comment "Webcam devices"
 
-<<<<<<< HEAD
-=======
-source "drivers/media/usb/cpia2/Kconfig"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/media/usb/gspca/Kconfig"
 source "drivers/media/usb/pwc/Kconfig"
 source "drivers/media/usb/s2255/Kconfig"
 source "drivers/media/usb/usbtv/Kconfig"
 source "drivers/media/usb/uvc/Kconfig"
-<<<<<<< HEAD
-=======
-source "drivers/media/usb/zr364xx/Kconfig"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 endif
 
@@ -44,10 +36,6 @@ if (MEDIA_ANALOG_TV_SUPPORT || MEDIA_DIGITAL_TV_SUPPORT)
 
 source "drivers/media/usb/au0828/Kconfig"
 source "drivers/media/usb/cx231xx/Kconfig"
-<<<<<<< HEAD
-=======
-source "drivers/media/usb/tm6000/Kconfig"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 endif
 

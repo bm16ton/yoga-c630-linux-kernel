@@ -64,24 +64,6 @@ static const struct dmi_system_id sof_tplg_table[] = {
 		},
 		.driver_data = "sof-tgl-rt5682-ssp0-max98373-ssp2.tplg",
 	},
-<<<<<<< HEAD
-	{
-		.callback = sof_tplg_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "Alder Lake Client Platform"),
-			DMI_MATCH(DMI_OEM_STRING, "AUDIO-ADL_MAX98373_ALC5682I_I2S"),
-		},
-		.driver_data = "sof-adl-rt5682-ssp0-max98373-ssp2.tplg",
-	},
-	{
-		.callback = sof_tplg_cb,
-		.matches = {
-			DMI_MATCH(DMI_PRODUCT_FAMILY, "Google_Brya"),
-			DMI_MATCH(DMI_OEM_STRING, "AUDIO-MAX98390_ALC5682I_I2S"),
-		},
-		.driver_data = "sof-adl-max98390-ssp2-rt5682-ssp0.tplg",
-=======
 	{
 		.callback = sof_tplg_cb,
 		.matches = {
@@ -102,42 +84,6 @@ static const struct dmi_system_id sof_tplg_table[] = {
 	{
 		.callback = sof_tplg_cb,
 		.matches = {
-			DMI_MATCH(DMI_PRODUCT_FAMILY, "Google_Brya"),
-			DMI_MATCH(DMI_OEM_STRING, "AUDIO_AMP-MAX98360_ALC5682VS_I2S_2WAY"),
-		},
-		.driver_data = "sof-adl-max98360a-rt5682-2way.tplg",
-	},
-	{
-		.callback = sof_tplg_cb,
-		.matches = {
-			DMI_MATCH(DMI_PRODUCT_FAMILY, "Google_Brya"),
-			DMI_MATCH(DMI_OEM_STRING, "AUDIO-AUDIO_MAX98357_ALC5682I_I2S_2WAY"),
-		},
-		.driver_data = "sof-adl-max98357a-rt5682-2way.tplg",
-	},
-	{
-		.callback = sof_tplg_cb,
-		.matches = {
-			DMI_MATCH(DMI_PRODUCT_FAMILY, "Google_Brya"),
-			DMI_MATCH(DMI_OEM_STRING, "AUDIO-MAX98360_ALC5682I_I2S_AMP_SSP2"),
-		},
-		.driver_data = "sof-adl-max98357a-rt5682.tplg",
-	},
-	{}
-};
-
-static const struct dmi_system_id community_key_platforms[] = {
-	{
-		.ident = "Up boards",
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "AAEON"),
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	},
-	{
-		.callback = sof_tplg_cb,
-		.matches = {
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_FAMILY, "Google_Brya"),
 			DMI_MATCH(DMI_OEM_STRING, "AUDIO_AMP-MAX98360_ALC5682VS_I2S_2WAY"),
 		},
@@ -195,11 +141,6 @@ static const struct dmi_system_id community_key_platforms[] = {
 			DMI_MATCH(DMI_PRODUCT_FAMILY, "Google"),
 		}
 	},
-=======
-			DMI_MATCH(DMI_PRODUCT_FAMILY, "Google"),
-		}
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{},
 };
 
@@ -344,7 +285,6 @@ int sof_pci_probe(struct pci_dev *pci, const struct pci_device_id *pci_id)
 	if (tplg_filename) {
 		sof_pdata->tplg_filename = tplg_filename;
 
-<<<<<<< HEAD
 		dev_dbg(dev, "Module parameter used, changed tplg filename to %s\n",
 			sof_pdata->tplg_filename);
 	} else {
@@ -353,18 +293,13 @@ int sof_pci_probe(struct pci_dev *pci, const struct pci_device_id *pci_id)
 			sof_pdata->tplg_filename = sof_dmi_override_tplg_name;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* set callback to be called on successful device probe to enable runtime_pm */
 	sof_pdata->sof_probe_complete = sof_pci_probe_complete;
 
 	/* call sof helper for DSP hardware probe */
 	ret = snd_sof_device_probe(dev, sof_pdata);
-<<<<<<< HEAD
 
 out:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		pci_release_regions(pci);
 

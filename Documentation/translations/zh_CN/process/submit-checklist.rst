@@ -86,7 +86,6 @@ Linux内核补丁提交检查单
     请参阅 ``Documentation/ABI/README`` 。更改用户空间接口的补丁应该抄送
     linux-api@vger.kernel.org。
 
-<<<<<<< HEAD
 19) 已通过至少注入slab和page分配失败进行检查。请参阅 ``Documentation/fault-injection/`` 。
     如果新代码是实质性的，那么添加子系统特定的故障注入可能是合适的。
 
@@ -104,24 +103,6 @@ Linux内核补丁提交检查单
     ``Documentation/userspace-api/ioctl/ioctl-number.rst`` 。
 
 24) 如果修改后的源代码依赖或使用与以下 ``Kconfig`` 符号相关的任何内核API或
-=======
-20) 已通过至少注入slab和page分配失败进行检查。请参阅 ``Documentation/fault-injection/``
-    如果新代码是实质性的，那么添加子系统特定的故障注入可能是合适的。
-
-21) 新添加的代码已经用 ``gcc -W`` 编译（使用 ``make EXTRA-CFLAGS=-W`` ）。这
-    将产生大量噪声，但对于查找诸如“警告：有符号和无符号之间的比较”之类的错误
-    很有用。
-
-22) 在它被合并到-mm补丁集中之后进行测试，以确保它仍然与所有其他排队的补丁以
-    及VM、VFS和其他子系统中的各种更改一起工作。
-
-23) 所有内存屏障例如 ``barrier()``, ``rmb()``, ``wmb()`` 都需要源代码中的注
-    释来解释它们正在执行的操作及其原因的逻辑。
-
-24) 如果补丁添加了任何ioctl，那么也要更新 ``Documentation/userspace-api/ioctl/ioctl-number.rst``
-
-25) 如果修改后的源代码依赖或使用与以下 ``Kconfig`` 符号相关的任何内核API或
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     功能，则在禁用相关 ``Kconfig`` 符号和/或 ``=m`` （如果该选项可用）的情况
     下测试以下多个构建[并非所有这些都同时存在，只是它们的各种/随机组合]：
 

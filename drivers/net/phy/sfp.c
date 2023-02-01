@@ -256,14 +256,10 @@ struct sfp {
 	struct sfp_eeprom_id id;
 	unsigned int module_power_mW;
 	unsigned int module_t_start_up;
-<<<<<<< HEAD
 	unsigned int module_t_wait;
 	bool tx_fault_ignore;
 
 	const struct sfp_quirk *quirk;
-=======
-	bool tx_fault_ignore;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if IS_ENABLED(CONFIG_HWMON)
 	struct sfp_diag diag;
@@ -2097,12 +2093,6 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
 	sfp->quirk = sfp_lookup_quirk(&id);
 	if (sfp->quirk && sfp->quirk->fixup)
 		sfp->quirk->fixup(sfp);
-
-	if (!memcmp(id.base.vendor_name, "HUAWEI          ", 16) &&
-	    !memcmp(id.base.vendor_pn, "MA5671A         ", 16))
-		sfp->tx_fault_ignore = true;
-	else
-		sfp->tx_fault_ignore = false;
 
 	return 0;
 }

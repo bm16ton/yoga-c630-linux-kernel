@@ -12,15 +12,11 @@ if ! [ -x "$(command -v cc)" ]; then
 fi
 
 # skip the test if the hardware doesn't support branch stack sampling
-<<<<<<< HEAD
 # and if the architecture doesn't support filter types: any,save_type,u
 if ! perf record -o- --no-buildid --branch-filter any,save_type,u -- true > /dev/null 2>&1 ; then
 	echo "skip: system doesn't support filter types: any,save_type,u"
 	exit 2
 fi
-=======
-perf record -b -o- -B true > /dev/null 2>&1 || exit 2
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 TMPDIR=$(mktemp -d /tmp/__perf_test.program.XXXXX)
 

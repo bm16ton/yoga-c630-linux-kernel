@@ -94,11 +94,7 @@ config RPMSG_WWAN_CTRL
 
 config IOSM
 	tristate "IOSM Driver for Intel M.2 WWAN Device"
-<<<<<<< HEAD
 	depends on PCI
-=======
-	depends on INTEL_IOMMU
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select NET_DEVLINK
 	select RELAY if WWAN_DEBUGFS
 	help

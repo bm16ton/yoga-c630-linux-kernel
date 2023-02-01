@@ -219,7 +219,6 @@
 
 #define PMQOS_CPU_LATENCY   BIT(0)
 
-<<<<<<< HEAD
 /* Max number of dataline */
 #define FSL_SAI_DL_NUM		(8)
 /* default dataline type is zero */
@@ -227,8 +226,6 @@
 #define FSL_SAI_DL_I2S		BIT(0)
 #define FSL_SAI_DL_PDM		BIT(1)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct fsl_sai_soc_data {
 	bool use_imx_pcm;
 	bool use_edma;
@@ -237,10 +234,7 @@ struct fsl_sai_soc_data {
 	unsigned int pins;
 	unsigned int reg_offset;
 	unsigned int flags;
-<<<<<<< HEAD
 	unsigned int max_register;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -306,12 +300,9 @@ struct fsl_sai {
 	struct fsl_sai_verid verid;
 	struct fsl_sai_param param;
 	struct pm_qos_request pm_qos_req;
-<<<<<<< HEAD
 	struct pinctrl *pinctrl;
 	struct pinctrl_state *pins_state;
 	struct sdma_peripheral_config audio_config[2];
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define TX 1

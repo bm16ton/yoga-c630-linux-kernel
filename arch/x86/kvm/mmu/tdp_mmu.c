@@ -372,7 +372,6 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
 	}
 }
 
-<<<<<<< HEAD
 static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
 {
 	kvm_account_pgtable_pages((void *)sp->spt, +1);
@@ -383,8 +382,6 @@ static void tdp_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
 	kvm_account_pgtable_pages((void *)sp->spt, -1);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * tdp_mmu_unlink_sp() - Remove a shadow page from the list of used pages
  *
@@ -657,7 +654,6 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
 	WARN_ON_ONCE(iter->yielded || is_removed_spte(iter->old_spte));
 
 	lockdep_assert_held_read(&kvm->mmu_lock);
-<<<<<<< HEAD
 
 	/*
 	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
@@ -670,20 +666,6 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
 			      new_spte, iter->level, true);
 	handle_changed_spte_acc_track(iter->old_spte, new_spte, iter->level);
 
-=======
-
-	/*
-	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
-	 * does not hold the mmu_lock.
-	 */
-	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
-		return -EBUSY;
-
-	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-			      new_spte, iter->level, true);
-	handle_changed_spte_acc_track(iter->old_spte, new_spte, iter->level);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -927,7 +909,6 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
 	 */
 	__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_1G);
 	__tdp_mmu_zap_root(kvm, root, shared, root->role.level);
-<<<<<<< HEAD
 
 	rcu_read_unlock();
 }
@@ -950,30 +931,6 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
 	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
 			   sp->gfn, sp->role.level + 1, true, true);
 
-=======
-
-	rcu_read_unlock();
-}
-
-bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-{
-	u64 old_spte;
-
-	/*
-	 * This helper intentionally doesn't allow zapping a root shadow page,
-	 * which doesn't have a parent page table and thus no associated entry.
-	 */
-	if (WARN_ON_ONCE(!sp->ptep))
-		return false;
-
-	old_spte = kvm_tdp_mmu_read_spte(sp->ptep);
-	if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
-		return false;
-
-	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
-			   sp->gfn, sp->role.level + 1, true, true);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return true;
 }
 
@@ -1063,7 +1020,6 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
  * zap" completes.
  */
 void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
-<<<<<<< HEAD
 {
 	flush_workqueue(kvm->arch.tdp_mmu_zap_wq);
 }
@@ -1107,51 +1063,6 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
 					  struct kvm_page_fault *fault,
 					  struct tdp_iter *iter)
 {
-=======
-{
-	flush_workqueue(kvm->arch.tdp_mmu_zap_wq);
-}
-
-/*
- * Mark each TDP MMU root as invalid to prevent vCPUs from reusing a root that
- * is about to be zapped, e.g. in response to a memslots update.  The actual
- * zapping is performed asynchronously, so a reference is taken on all roots.
- * Using a separate workqueue makes it easy to ensure that the destruction is
- * performed before the "fast zap" completes, without keeping a separate list
- * of invalidated roots; the list is effectively the list of work items in
- * the workqueue.
- *
- * Get a reference even if the root is already invalid, the asynchronous worker
- * assumes it was gifted a reference to the root it processes.  Because mmu_lock
- * is held for write, it should be impossible to observe a root with zero refcount,
- * i.e. the list of roots cannot be stale.
- *
- * This has essentially the same effect for the TDP MMU
- * as updating mmu_valid_gen does for the shadow MMU.
- */
-void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
-{
-	struct kvm_mmu_page *root;
-
-	lockdep_assert_held_write(&kvm->mmu_lock);
-	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
-		if (!root->role.invalid &&
-		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root))) {
-			root->role.invalid = true;
-			tdp_mmu_schedule_zap_root(kvm, root);
-		}
-	}
-}
-
-/*
- * Installs a last-level SPTE to handle a TDP page fault.
- * (NPT/EPT violation/misconfiguration)
- */
-static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
-					  struct kvm_page_fault *fault,
-					  struct tdp_iter *iter)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(iter->sptep));
 	u64 new_spte;
 	int ret = RET_PF_FIXED;
@@ -1232,10 +1143,7 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
 	if (account_nx)
 		account_huge_nx_page(kvm, sp);
 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-<<<<<<< HEAD
 	tdp_account_mmu_page(kvm, sp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

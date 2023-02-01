@@ -977,7 +977,6 @@ static void lower_barrier(struct r10conf *conf)
 	wake_up(&conf->wait_barrier);
 }
 
-<<<<<<< HEAD
 static bool stop_waiting_barrier(struct r10conf *conf)
 {
 	struct bio_list *bio_list = current->bio_list;
@@ -1031,65 +1030,22 @@ static bool wait_barrier(struct r10conf *conf, bool nowait)
 
 	write_seqlock_irq(&conf->resync_lock);
 	if (conf->barrier) {
-=======
-static bool wait_barrier(struct r10conf *conf, bool nowait)
-{
-	bool ret = true;
-
-	spin_lock_irq(&conf->resync_lock);
-	if (conf->barrier) {
-		struct bio_list *bio_list = current->bio_list;
-		conf->nr_waiting++;
-		/* Wait for the barrier to drop.
-		 * However if there are already pending
-		 * requests (preventing the barrier from
-		 * rising completely), and the
-		 * pre-process bio queue isn't empty,
-		 * then don't wait, as we need to empty
-		 * that queue to get the nr_pending
-		 * count down.
-		 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Return false when nowait flag is set */
 		if (nowait) {
 			ret = false;
 		} else {
-<<<<<<< HEAD
 			conf->nr_waiting++;
 			raid10_log(conf->mddev, "wait barrier");
 			wait_event_barrier(conf, stop_waiting_barrier(conf));
 			conf->nr_waiting--;
 		}
-=======
-			raid10_log(conf->mddev, "wait barrier");
-			wait_event_lock_irq(conf->wait_barrier,
-					    !conf->barrier ||
-					    (atomic_read(&conf->nr_pending) &&
-					     bio_list &&
-					     (!bio_list_empty(&bio_list[0]) ||
-					      !bio_list_empty(&bio_list[1]))) ||
-					     /* move on if recovery thread is
-					      * blocked by us
-					      */
-					     (conf->mddev->thread->tsk == current &&
-					      test_bit(MD_RECOVERY_RUNNING,
-						       &conf->mddev->recovery) &&
-					      conf->nr_queued > 0),
-					    conf->resync_lock);
-		}
-		conf->nr_waiting--;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!conf->nr_waiting)
 			wake_up(&conf->wait_barrier);
 	}
 	/* Only increment nr_pending when we wait */
 	if (ret)
 		atomic_inc(&conf->nr_pending);
-<<<<<<< HEAD
 	write_sequnlock_irq(&conf->resync_lock);
-=======
-	spin_unlock_irq(&conf->resync_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -2065,11 +2021,7 @@ static int enough(struct r10conf *conf, int ignore)
  * Otherwise, it must be degraded:
  *	- recovery is interrupted.
  *	- &mddev->degraded is bumped.
-<<<<<<< HEAD
  *
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @rdev is marked as &Faulty excluding case when array is failed and
  * &mddev->fail_last_dev is off.
  */
@@ -4193,11 +4145,6 @@ static int raid10_run(struct mddev *mddev)
 	conf->thread = NULL;
 
 	if (mddev->queue) {
-<<<<<<< HEAD
-=======
-		blk_queue_max_discard_sectors(mddev->queue,
-					      UINT_MAX);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
 		blk_queue_io_min(mddev->queue, mddev->chunk_sectors << 9);
 		raid10_set_io_opt(conf);

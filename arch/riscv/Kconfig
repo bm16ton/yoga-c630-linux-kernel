@@ -45,10 +45,7 @@ config RISCV
 	select ARCH_WANT_FRAME_POINTERS
 	select ARCH_WANT_GENERAL_HUGETLB
 	select ARCH_WANT_HUGE_PMD_SHARE if 64BIT
-<<<<<<< HEAD
 	select ARCH_WANTS_THP_SWAP if HAVE_ARCH_TRANSPARENT_HUGEPAGE
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select BINFMT_FLAT_NO_DATA_START_OFFSET if !MMU
 	select BUILDTIME_TABLE_SORT if MMU
 	select CLONE_BACKWARDS
@@ -73,10 +70,7 @@ config RISCV
 	select GENERIC_SMP_IDLE_THREAD
 	select GENERIC_TIME_VSYSCALL if MMU && 64BIT
 	select GENERIC_VDSO_TIME_NS if HAVE_GENERIC_VDSO
-<<<<<<< HEAD
 	select HARDIRQS_SW_RESEND
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select HAVE_ARCH_AUDITSYSCALL
 	select HAVE_ARCH_JUMP_LABEL if !XIP_KERNEL
 	select HAVE_ARCH_JUMP_LABEL_RELATIVE if !XIP_KERNEL
@@ -236,12 +230,9 @@ config RISCV_DMA_NONCOHERENT
 	select ARCH_HAS_SETUP_DMA_OPS
 	select DMA_DIRECT_REMAP
 
-<<<<<<< HEAD
 config AS_HAS_INSN
 	def_bool $(as-instr,.insn r 51$(comma) 0$(comma) 0$(comma) t0$(comma) t0$(comma) zero)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "arch/riscv/Kconfig.socs"
 source "arch/riscv/Kconfig.erratas"
 
@@ -404,10 +395,7 @@ config RISCV_ISA_C
 config RISCV_ISA_SVPBMT
 	bool "SVPBMT extension support"
 	depends on 64BIT && MMU
-<<<<<<< HEAD
 	depends on !XIP_KERNEL
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select RISCV_ALTERNATIVE
 	default y
 	help
@@ -514,11 +502,7 @@ config KEXEC_FILE
 	select KEXEC_CORE
 	select KEXEC_ELF
 	select HAVE_IMA_KEXEC if IMA
-<<<<<<< HEAD
 	depends on 64BIT && MMU
-=======
-	depends on 64BIT
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  This is new version of kexec system call. This system call is
 	  file based and takes file descriptors as system call argument

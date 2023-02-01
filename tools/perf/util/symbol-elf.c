@@ -1303,11 +1303,7 @@ dso__load_sym_internal(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 			   (!used_opd && syms_ss->adjust_symbols)) {
 			GElf_Phdr phdr;
 
-<<<<<<< HEAD
 			if (elf_read_program_header(runtime_ss->elf,
-=======
-			if (elf_read_program_header(syms_ss->elf,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						    (u64)sym.st_value, &phdr)) {
 				pr_debug4("%s: failed to find program header for "
 					   "symbol: %s st_value: %#" PRIx64 "\n",

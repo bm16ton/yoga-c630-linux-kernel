@@ -202,19 +202,11 @@ static void p9_conn_cancel(struct p9_conn *m, int err)
 
 	list_for_each_entry_safe(req, rtmp, &m->req_list, req_list) {
 		list_move(&req->req_list, &cancel_list);
-<<<<<<< HEAD
 		WRITE_ONCE(req->status, REQ_STATUS_ERROR);
 	}
 	list_for_each_entry_safe(req, rtmp, &m->unsent_req_list, req_list) {
 		list_move(&req->req_list, &cancel_list);
 		WRITE_ONCE(req->status, REQ_STATUS_ERROR);
-=======
-		req->status = REQ_STATUS_ERROR;
-	}
-	list_for_each_entry_safe(req, rtmp, &m->unsent_req_list, req_list) {
-		list_move(&req->req_list, &cancel_list);
-		req->status = REQ_STATUS_ERROR;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	spin_unlock(&m->req_lock);
@@ -684,11 +676,7 @@ static int p9_fd_request(struct p9_client *client, struct p9_req_t *req)
 		return m->err;
 
 	spin_lock(&m->req_lock);
-<<<<<<< HEAD
 	WRITE_ONCE(req->status, REQ_STATUS_UNSENT);
-=======
-	req->status = REQ_STATUS_UNSENT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_add_tail(&req->req_list, &m->unsent_req_list);
 	spin_unlock(&m->req_lock);
 
@@ -715,11 +703,7 @@ static int p9_fd_cancel(struct p9_client *client, struct p9_req_t *req)
 
 	if (req->status == REQ_STATUS_UNSENT) {
 		list_del(&req->req_list);
-<<<<<<< HEAD
 		WRITE_ONCE(req->status, REQ_STATUS_FLSHD);
-=======
-		req->status = REQ_STATUS_FLSHD;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		p9_req_put(client, req);
 		ret = 0;
 	}
@@ -748,11 +732,7 @@ static int p9_fd_cancelled(struct p9_client *client, struct p9_req_t *req)
 	 * remove it from the list.
 	 */
 	list_del(&req->req_list);
-<<<<<<< HEAD
 	WRITE_ONCE(req->status, REQ_STATUS_FLSHD);
-=======
-	req->status = REQ_STATUS_FLSHD;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock(&m->req_lock);
 
 	p9_req_put(client, req);

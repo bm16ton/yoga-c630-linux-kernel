@@ -407,11 +407,6 @@ static void pcf857x_remove(struct i2c_client *client)
 	if (pdata && pdata->teardown)
 		pdata->teardown(client, gpio->chip.base, gpio->chip.ngpio,
 				pdata->context);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void pcf857x_shutdown(struct i2c_client *client)

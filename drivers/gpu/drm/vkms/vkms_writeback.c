@@ -47,17 +47,9 @@ static int vkms_wb_encoder_atomic_check(struct drm_encoder *encoder,
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	ret = drm_atomic_helper_check_wb_encoder_state(encoder, conn_state);
 	if (ret < 0)
 		return ret;
-=======
-	if (fb->format->format != vkms_wb_formats[0]) {
-		DRM_DEBUG_KMS("Invalid pixel format %p4cc\n",
-			      &fb->format->format);
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -87,22 +79,15 @@ static int vkms_wb_prepare_job(struct drm_writeback_connector *wb_connector,
 	if (!vkmsjob)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	ret = drm_gem_fb_vmap(job->fb, vkmsjob->wb_frame_info.map, vkmsjob->data);
-=======
-	ret = drm_gem_fb_vmap(job->fb, vkmsjob->map, vkmsjob->data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		DRM_ERROR("vmap failed: %d\n", ret);
 		goto err_kfree;
 	}
 
-<<<<<<< HEAD
 	vkmsjob->wb_frame_info.fb = job->fb;
 	drm_framebuffer_get(vkmsjob->wb_frame_info.fb);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	job->priv = vkmsjob;
 
 	return 0;
@@ -121,15 +106,10 @@ static void vkms_wb_cleanup_job(struct drm_writeback_connector *connector,
 	if (!job->fb)
 		return;
 
-<<<<<<< HEAD
 	drm_gem_fb_vunmap(job->fb, vkmsjob->wb_frame_info.map);
 
 	drm_framebuffer_put(vkmsjob->wb_frame_info.fb);
 
-=======
-	drm_gem_fb_vunmap(job->fb, vkmsjob->map);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vkmsdev = drm_device_to_vkms_device(job->fb->dev);
 	vkms_set_composer(&vkmsdev->output, false);
 	kfree(vkmsjob);

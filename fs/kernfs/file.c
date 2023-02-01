@@ -59,7 +59,6 @@ static inline struct mutex *kernfs_open_file_mutex_lock(struct kernfs_node *kn)
 }
 
 /**
-<<<<<<< HEAD
  * of_on - Return the kernfs_open_node of the specified kernfs_open_file
  * @of: taret kernfs_open_file
  */
@@ -71,33 +70,6 @@ static struct kernfs_open_node *of_on(struct kernfs_open_file *of)
 
 /**
  * kernfs_deref_open_node_locked - Get kernfs_open_node corresponding to @kn
-=======
- * kernfs_deref_open_node - Get kernfs_open_node corresponding to @kn.
- *
- * @of: associated kernfs_open_file instance.
- * @kn: target kernfs_node.
- *
- * Fetch and return ->attr.open of @kn if @of->list is non empty.
- * If @of->list is not empty we can safely assume that @of is on
- * @kn->attr.open->files list and this guarantees that @kn->attr.open
- * will not vanish i.e. dereferencing outside RCU read-side critical
- * section is safe here.
- *
- * The caller needs to make sure that @of->list is not empty.
- */
-static struct kernfs_open_node *
-kernfs_deref_open_node(struct kernfs_open_file *of, struct kernfs_node *kn)
-{
-	struct kernfs_open_node *on;
-
-	on = rcu_dereference_check(kn->attr.open, !list_empty(&of->list));
-
-	return on;
-}
-
-/**
- * kernfs_deref_open_node_protected - Get kernfs_open_node corresponding to @kn
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * @kn: target kernfs_node.
  *
@@ -112,11 +84,7 @@ kernfs_deref_open_node(struct kernfs_open_file *of, struct kernfs_node *kn)
  * The caller needs to make sure that kernfs_open_file_mutex is held.
  */
 static struct kernfs_open_node *
-<<<<<<< HEAD
 kernfs_deref_open_node_locked(struct kernfs_node *kn)
-=======
-kernfs_deref_open_node_protected(struct kernfs_node *kn)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return rcu_dereference_protected(kn->attr.open,
 				lockdep_is_held(kernfs_open_file_mutex_ptr(kn)));
@@ -227,16 +195,8 @@ static void kernfs_seq_stop(struct seq_file *sf, void *v)
 static int kernfs_seq_show(struct seq_file *sf, void *v)
 {
 	struct kernfs_open_file *of = sf->private;
-	struct kernfs_open_node *on = kernfs_deref_open_node(of, of->kn);
 
-	if (!on)
-		return -EINVAL;
-
-<<<<<<< HEAD
 	of->event = atomic_read(&of_on(of)->event);
-=======
-	of->event = atomic_read(&on->event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return of->kn->attr.ops->seq_show(sf, v);
 }
@@ -259,7 +219,6 @@ static ssize_t kernfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 	struct kernfs_open_file *of = kernfs_of(iocb->ki_filp);
 	ssize_t len = min_t(size_t, iov_iter_count(iter), PAGE_SIZE);
 	const struct kernfs_ops *ops;
-	struct kernfs_open_node *on;
 	char *buf;
 
 	buf = of->prealloc_buf;
@@ -281,18 +240,7 @@ static ssize_t kernfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 		goto out_free;
 	}
 
-<<<<<<< HEAD
 	of->event = atomic_read(&of_on(of)->event);
-=======
-	on = kernfs_deref_open_node(of, of->kn);
-	if (!on) {
-		len = -EINVAL;
-		mutex_unlock(&of->mutex);
-		goto out_free;
-	}
-
-	of->event = atomic_read(&on->event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ops = kernfs_ops(of->kn);
 	if (ops->read)
@@ -609,7 +557,6 @@ out_unlock:
 static int kernfs_get_open_node(struct kernfs_node *kn,
 				struct kernfs_open_file *of)
 {
-<<<<<<< HEAD
 	struct kernfs_open_node *on;
 	struct mutex *mutex;
 
@@ -627,41 +574,13 @@ static int kernfs_get_open_node(struct kernfs_node *kn,
 		init_waitqueue_head(&on->poll);
 		INIT_LIST_HEAD(&on->files);
 		rcu_assign_pointer(kn->attr.open, on);
-=======
-	struct kernfs_open_node *on, *new_on = NULL;
-	struct mutex *mutex = NULL;
-
-	mutex = kernfs_open_file_mutex_lock(kn);
-	on = kernfs_deref_open_node_protected(kn);
-
-	if (on) {
-		list_add_tail(&of->list, &on->files);
-		mutex_unlock(mutex);
-		return 0;
-	} else {
-		/* not there, initialize a new one */
-		new_on = kmalloc(sizeof(*new_on), GFP_KERNEL);
-		if (!new_on) {
-			mutex_unlock(mutex);
-			return -ENOMEM;
-		}
-		atomic_set(&new_on->event, 1);
-		init_waitqueue_head(&new_on->poll);
-		INIT_LIST_HEAD(&new_on->files);
-		list_add_tail(&of->list, &new_on->files);
-		rcu_assign_pointer(kn->attr.open, new_on);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
-	mutex_unlock(mutex);
 
-<<<<<<< HEAD
 	list_add_tail(&of->list, &on->files);
 	if (kn->flags & KERNFS_HAS_RELEASE)
 		on->nr_to_release++;
 
 	mutex_unlock(mutex);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -680,7 +599,6 @@ static int kernfs_get_open_node(struct kernfs_node *kn,
  *	None.
  */
 static void kernfs_unlink_open_file(struct kernfs_node *kn,
-<<<<<<< HEAD
 				    struct kernfs_open_file *of,
 				    bool open_failed)
 {
@@ -688,20 +606,6 @@ static void kernfs_unlink_open_file(struct kernfs_node *kn,
 	struct mutex *mutex;
 
 	mutex = kernfs_open_file_mutex_lock(kn);
-=======
-				 struct kernfs_open_file *of)
-{
-	struct kernfs_open_node *on;
-	struct mutex *mutex = NULL;
-
-	mutex = kernfs_open_file_mutex_lock(kn);
-
-	on = kernfs_deref_open_node_protected(kn);
-	if (!on) {
-		mutex_unlock(mutex);
-		return;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	on = kernfs_deref_open_node_locked(kn);
 	if (!on) {
@@ -709,7 +613,6 @@ static void kernfs_unlink_open_file(struct kernfs_node *kn,
 		return;
 	}
 
-<<<<<<< HEAD
 	if (of) {
 		if (kn->flags & KERNFS_HAS_RELEASE) {
 			WARN_ON_ONCE(of->released == open_failed);
@@ -721,8 +624,6 @@ static void kernfs_unlink_open_file(struct kernfs_node *kn,
 		list_del(&of->list);
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (list_empty(&on->files)) {
 		rcu_assign_pointer(kn->attr.open, NULL);
 		kfree_rcu(on, rcu_head);
@@ -848,11 +749,7 @@ static int kernfs_fop_open(struct inode *inode, struct file *file)
 	return 0;
 
 err_put_node:
-<<<<<<< HEAD
 	kernfs_unlink_open_file(kn, of, true);
-=======
-	kernfs_unlink_open_file(kn, of);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_seq_release:
 	seq_release(inode, file);
 err_free:
@@ -892,24 +789,16 @@ static int kernfs_fop_release(struct inode *inode, struct file *filp)
 {
 	struct kernfs_node *kn = inode->i_private;
 	struct kernfs_open_file *of = kernfs_of(filp);
-	struct mutex *mutex = NULL;
 
 	if (kn->flags & KERNFS_HAS_RELEASE) {
-<<<<<<< HEAD
 		struct mutex *mutex;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mutex = kernfs_open_file_mutex_lock(kn);
 		kernfs_release_file(kn, of);
 		mutex_unlock(mutex);
 	}
 
-<<<<<<< HEAD
 	kernfs_unlink_open_file(kn, of, false);
-=======
-	kernfs_unlink_open_file(kn, of);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	seq_release(inode, filp);
 	kfree(of->prealloc_buf);
 	kfree(of);
@@ -940,7 +829,6 @@ void kernfs_drain_open_files(struct kernfs_node *kn)
 {
 	struct kernfs_open_node *on;
 	struct kernfs_open_file *of;
-<<<<<<< HEAD
 	struct mutex *mutex;
 
 	mutex = kernfs_open_file_mutex_lock(kn);
@@ -948,29 +836,6 @@ void kernfs_drain_open_files(struct kernfs_node *kn)
 	if (!on) {
 		mutex_unlock(mutex);
 		return;
-=======
-	struct mutex *mutex = NULL;
-
-	if (!(kn->flags & (KERNFS_HAS_MMAP | KERNFS_HAS_RELEASE)))
-		return;
-
-	/*
-	 * lockless opportunistic check is safe below because no one is adding to
-	 * ->attr.open at this point of time. This check allows early bail out
-	 * if ->attr.open is already NULL. kernfs_unlink_open_file makes
-	 * ->attr.open NULL only while holding kernfs_open_file_mutex so below
-	 * check under kernfs_open_file_mutex_ptr(kn) will ensure bailing out if
-	 * ->attr.open became NULL while waiting for the mutex.
-	 */
-	if (!rcu_access_pointer(kn->attr.open))
-		return;
-
-	mutex = kernfs_open_file_mutex_lock(kn);
-	on = kernfs_deref_open_node_protected(kn);
-	if (!on) {
-		mutex_unlock(mutex);
-		return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	list_for_each_entry(of, &on->files, list) {
@@ -986,10 +851,7 @@ void kernfs_drain_open_files(struct kernfs_node *kn)
 			kernfs_release_file(kn, of);
 	}
 
-<<<<<<< HEAD
 	WARN_ON_ONCE(on->nr_mmapped || on->nr_to_release);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(mutex);
 }
 
@@ -1009,15 +871,7 @@ void kernfs_drain_open_files(struct kernfs_node *kn)
  */
 __poll_t kernfs_generic_poll(struct kernfs_open_file *of, poll_table *wait)
 {
-<<<<<<< HEAD
 	struct kernfs_open_node *on = of_on(of);
-=======
-	struct kernfs_node *kn = kernfs_dentry_node(of->file->f_path.dentry);
-	struct kernfs_open_node *on = kernfs_deref_open_node(of, kn);
-
-	if (!on)
-		return EPOLLERR;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	poll_wait(of->file, &on->poll, wait);
 

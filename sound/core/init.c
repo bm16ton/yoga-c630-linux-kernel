@@ -178,15 +178,8 @@ int snd_card_new(struct device *parent, int idx, const char *xid,
 		return -ENOMEM;
 
 	err = snd_card_init(card, parent, idx, xid, module, extra_size);
-<<<<<<< HEAD
 	if (err < 0)
 		return err; /* card is freed by error handler */
-=======
-	if (err < 0) {
-		kfree(card);
-		return err;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	*card_ret = card;
 	return 0;
@@ -238,11 +231,7 @@ int snd_devm_card_new(struct device *parent, int idx, const char *xid,
 	card->managed = true;
 	err = snd_card_init(card, parent, idx, xid, module, extra_size);
 	if (err < 0) {
-<<<<<<< HEAD
 		devres_free(card); /* in managed mode, we need to free manually */
-=======
-		devres_free(card);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return err;
 	}
 
@@ -306,11 +295,8 @@ static int snd_card_init(struct snd_card *card, struct device *parent,
 		mutex_unlock(&snd_card_mutex);
 		dev_err(parent, "cannot find the slot for index %d (range 0-%i), error: %d\n",
 			 idx, snd_ecards_limit - 1, err);
-<<<<<<< HEAD
 		if (!card->managed)
 			kfree(card); /* manually free here, as no destructor called */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return err;
 	}
 	set_bit(idx, snd_cards_lock);		/* lock it */
@@ -1153,7 +1139,6 @@ EXPORT_SYMBOL(snd_card_file_remove);
 /**
  * snd_power_ref_and_wait - wait until the card gets powered up
  * @card: soundcard structure
-<<<<<<< HEAD
  *
  * Take the power_ref reference count of the given card, and
  * wait until the card gets powered up to SNDRV_CTL_POWER_D0 state.
@@ -1164,18 +1149,6 @@ EXPORT_SYMBOL(snd_card_file_remove);
  * The caller needs to pull down the refcount via snd_power_unref() later
  * no matter whether the error is returned from this function or not.
  *
-=======
- *
- * Take the power_ref reference count of the given card, and
- * wait until the card gets powered up to SNDRV_CTL_POWER_D0 state.
- * The refcount is down again while sleeping until power-up, hence this
- * function can be used for syncing the floating control ops accesses,
- * typically around calling control ops.
- *
- * The caller needs to pull down the refcount via snd_power_unref() later
- * no matter whether the error is returned from this function or not.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Return: Zero if successful, or a negative error code.
  */
 int snd_power_ref_and_wait(struct snd_card *card)

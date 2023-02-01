@@ -68,12 +68,8 @@ union group_cap_reg {
 		u64 total_rdbufs:8;	/* formerly total_tokens */
 		u64 rdbuf_ctrl:1;	/* formerly token_en */
 		u64 rdbuf_limit:1;	/* formerly token_limit */
-<<<<<<< HEAD
 		u64 progress_limit:1;	/* descriptor and batch descriptor */
 		u64 rsvd:45;
-=======
-		u64 rsvd:46;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	u64 bits;
 } __packed;
@@ -293,7 +289,6 @@ union msix_perm {
 
 union group_flags {
 	struct {
-<<<<<<< HEAD
 		u64 tc_a:3;
 		u64 tc_b:3;
 		u64 rsvd:1;
@@ -306,16 +301,6 @@ union group_flags {
 		u64 rsvd4:2;
 		u64 batch_progress_limit:2;
 		u64 rsvd5:26;
-=======
-		u32 tc_a:3;
-		u32 tc_b:3;
-		u32 rsvd:1;
-		u32 use_rdbuf_limit:1;
-		u32 rdbufs_reserved:8;
-		u32 rsvd2:4;
-		u32 rdbufs_allowed:8;
-		u32 rsvd3:4;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	u64 bits;
 } __packed;

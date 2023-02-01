@@ -31,11 +31,8 @@ enum counter_comp_type {
 	COUNTER_COMP_ENUM,
 	COUNTER_COMP_COUNT_DIRECTION,
 	COUNTER_COMP_COUNT_MODE,
-<<<<<<< HEAD
 	COUNTER_COMP_SIGNAL_POLARITY,
 	COUNTER_COMP_ARRAY,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -43,7 +40,6 @@ enum counter_comp_type {
  * @type:		Counter component data type
  * @name:		device-specific component name
  * @priv:		component-relevant data
-<<<<<<< HEAD
  * @action_read:	Synapse action mode read callback. The read value of the
  *			respective Synapse action mode should be passed back via
  *			the action parameter.
@@ -152,68 +148,6 @@ enum counter_comp_type {
  *				parameter. The write value of the respective
  *				Signal u64 array component element is passed via
  *				the val parameter.
-=======
- * @action_read:		Synapse action mode read callback. The read value of the
- *			respective Synapse action mode should be passed back via
- *			the action parameter.
- * @device_u8_read:		Device u8 component read callback. The read value of the
- *			respective Device u8 component should be passed back via
- *			the val parameter.
- * @count_u8_read:		Count u8 component read callback. The read value of the
- *			respective Count u8 component should be passed back via
- *			the val parameter.
- * @signal_u8_read:		Signal u8 component read callback. The read value of the
- *			respective Signal u8 component should be passed back via
- *			the val parameter.
- * @device_u32_read:		Device u32 component read callback. The read value of
- *			the respective Device u32 component should be passed
- *			back via the val parameter.
- * @count_u32_read:		Count u32 component read callback. The read value of the
- *			respective Count u32 component should be passed back via
- *			the val parameter.
- * @signal_u32_read:		Signal u32 component read callback. The read value of
- *			the respective Signal u32 component should be passed
- *			back via the val parameter.
- * @device_u64_read:		Device u64 component read callback. The read value of
- *			the respective Device u64 component should be passed
- *			back via the val parameter.
- * @count_u64_read:		Count u64 component read callback. The read value of the
- *			respective Count u64 component should be passed back via
- *			the val parameter.
- * @signal_u64_read:		Signal u64 component read callback. The read value of
- *			the respective Signal u64 component should be passed
- *			back via the val parameter.
- * @action_write:		Synapse action mode write callback. The write value of
- *			the respective Synapse action mode is passed via the
- *			action parameter.
- * @device_u8_write:		Device u8 component write callback. The write value of
- *			the respective Device u8 component is passed via the val
- *			parameter.
- * @count_u8_write:		Count u8 component write callback. The write value of
- *			the respective Count u8 component is passed via the val
- *			parameter.
- * @signal_u8_write:		Signal u8 component write callback. The write value of
- *			the respective Signal u8 component is passed via the val
- *			parameter.
- * @device_u32_write:		Device u32 component write callback. The write value of
- *			the respective Device u32 component is passed via the
- *			val parameter.
- * @count_u32_write:		Count u32 component write callback. The write value of
- *			the respective Count u32 component is passed via the val
- *			parameter.
- * @signal_u32_write:		Signal u32 component write callback. The write value of
- *			the respective Signal u32 component is passed via the
- *			val parameter.
- * @device_u64_write:		Device u64 component write callback. The write value of
- *			the respective Device u64 component is passed via the
- *			val parameter.
- * @count_u64_write:		Count u64 component write callback. The write value of
- *			the respective Count u64 component is passed via the val
- *			parameter.
- * @signal_u64_write:		Signal u64 component write callback. The write value of
- *			the respective Signal u64 component is passed via the
- *			val parameter.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct counter_comp {
 	enum counter_comp_type type;
@@ -241,7 +175,6 @@ struct counter_comp {
 				      struct counter_count *count, u64 *val);
 		int (*signal_u64_read)(struct counter_device *counter,
 				       struct counter_signal *signal, u64 *val);
-<<<<<<< HEAD
 		int (*signal_array_u32_read)(struct counter_device *counter,
 					     struct counter_signal *signal,
 					     size_t idx, u32 *val);
@@ -253,8 +186,6 @@ struct counter_comp {
 		int (*signal_array_u64_read)(struct counter_device *counter,
 					     struct counter_signal *signal,
 					     size_t idx, u64 *val);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	union {
 		int (*action_write)(struct counter_device *counter,
@@ -278,7 +209,6 @@ struct counter_comp {
 				       struct counter_count *count, u64 val);
 		int (*signal_u64_write)(struct counter_device *counter,
 					struct counter_signal *signal, u64 val);
-<<<<<<< HEAD
 		int (*signal_array_u32_write)(struct counter_device *counter,
 					      struct counter_signal *signal,
 					      size_t idx, u32 val);
@@ -290,8 +220,6 @@ struct counter_comp {
 		int (*signal_array_u64_write)(struct counter_device *counter,
 					      struct counter_signal *signal,
 					      size_t idx, u64 val);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 
@@ -596,7 +524,6 @@ struct counter_available {
 	.priv = &(_available), \
 }
 
-<<<<<<< HEAD
 struct counter_array {
 	enum counter_comp_type type;
 	const struct counter_available *avail;
@@ -650,8 +577,6 @@ struct counter_array {
 #define COUNTER_COMP_CAPTURE(_read, _write) \
 	COUNTER_COMP_COUNT_U64("capture", _read, _write)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define COUNTER_COMP_CEILING(_read, _write) \
 	COUNTER_COMP_COUNT_U64("ceiling", _read, _write)
 
@@ -677,7 +602,6 @@ struct counter_array {
 #define COUNTER_COMP_FLOOR(_read, _write) \
 	COUNTER_COMP_COUNT_U64("floor", _read, _write)
 
-<<<<<<< HEAD
 #define COUNTER_COMP_POLARITY(_read, _write, _available) \
 { \
 	.type = COUNTER_COMP_SIGNAL_POLARITY, \
@@ -687,14 +611,11 @@ struct counter_array {
 	.priv = &(_available), \
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define COUNTER_COMP_PRESET(_read, _write) \
 	COUNTER_COMP_COUNT_U64("preset", _read, _write)
 
 #define COUNTER_COMP_PRESET_ENABLE(_read, _write) \
 	COUNTER_COMP_COUNT_BOOL("preset_enable", _read, _write)
-<<<<<<< HEAD
 
 #define COUNTER_COMP_ARRAY_CAPTURE(_read, _write, _array) \
 	COUNTER_COMP_COUNT_ARRAY_U64("capture", _read, _write, _array)
@@ -707,7 +628,5 @@ struct counter_array {
 	.signal_array_u32_write = (_write), \
 	.priv = &(_array), \
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _COUNTER_H_ */

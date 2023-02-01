@@ -43,10 +43,7 @@ static const struct of_device_id drv_name##_irqchip_match_table[] = {
 
 #define IRQCHIP_MATCH(compat, fn) { .compatible = compat,		\
 				    .data = typecheck_irq_init_cb(fn), },
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define IRQCHIP_PLATFORM_DRIVER_END(drv_name, ...)			\
 	{},								\

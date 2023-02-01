@@ -176,21 +176,12 @@ static inline int is_swapin_error_entry(swp_entry_t entry)
 
 #if IS_ENABLED(CONFIG_DEVICE_PRIVATE)
 static inline swp_entry_t make_readable_device_private_entry(pgoff_t offset)
-<<<<<<< HEAD
 {
 	return swp_entry(SWP_DEVICE_READ, offset);
 }
 
 static inline swp_entry_t make_writable_device_private_entry(pgoff_t offset)
 {
-=======
-{
-	return swp_entry(SWP_DEVICE_READ, offset);
-}
-
-static inline swp_entry_t make_writable_device_private_entry(pgoff_t offset)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return swp_entry(SWP_DEVICE_WRITE, offset);
 }
 
@@ -213,7 +204,6 @@ static inline swp_entry_t make_readable_device_exclusive_entry(pgoff_t offset)
 static inline swp_entry_t make_writable_device_exclusive_entry(pgoff_t offset)
 {
 	return swp_entry(SWP_DEVICE_EXCLUSIVE_WRITE, offset);
-<<<<<<< HEAD
 }
 
 static inline bool is_device_exclusive_entry(swp_entry_t entry)
@@ -224,18 +214,6 @@ static inline bool is_device_exclusive_entry(swp_entry_t entry)
 
 static inline bool is_writable_device_exclusive_entry(swp_entry_t entry)
 {
-=======
-}
-
-static inline bool is_device_exclusive_entry(swp_entry_t entry)
-{
-	return swp_type(entry) == SWP_DEVICE_EXCLUSIVE_READ ||
-		swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE;
-}
-
-static inline bool is_writable_device_exclusive_entry(swp_entry_t entry)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return unlikely(swp_type(entry) == SWP_DEVICE_EXCLUSIVE_WRITE);
 }
 #else /* CONFIG_DEVICE_PRIVATE */
@@ -301,7 +279,6 @@ static inline int is_readable_migration_entry(swp_entry_t entry)
 static inline int is_readable_exclusive_migration_entry(swp_entry_t entry)
 {
 	return unlikely(swp_type(entry) == SWP_MIGRATION_READ_EXCLUSIVE);
-<<<<<<< HEAD
 }
 
 static inline swp_entry_t make_readable_migration_entry(pgoff_t offset)
@@ -311,24 +288,12 @@ static inline swp_entry_t make_readable_migration_entry(pgoff_t offset)
 
 static inline swp_entry_t make_readable_exclusive_migration_entry(pgoff_t offset)
 {
-=======
-}
-
-static inline swp_entry_t make_readable_migration_entry(pgoff_t offset)
-{
-	return swp_entry(SWP_MIGRATION_READ, offset);
-}
-
-static inline swp_entry_t make_readable_exclusive_migration_entry(pgoff_t offset)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return swp_entry(SWP_MIGRATION_READ_EXCLUSIVE, offset);
 }
 
 static inline swp_entry_t make_writable_migration_entry(pgoff_t offset)
 {
 	return swp_entry(SWP_MIGRATION_WRITE, offset);
-<<<<<<< HEAD
 }
 
 /*
@@ -375,8 +340,6 @@ static inline bool is_migration_entry_dirty(swp_entry_t entry)
 		return swp_offset(entry) & SWP_MIG_DIRTY;
 	/* Keep the old behavior of clean page after migration */
 	return false;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 extern void __migration_entry_wait(struct mm_struct *mm, pte_t *ptep,
@@ -386,13 +349,8 @@ extern void migration_entry_wait(struct mm_struct *mm, pmd_t *pmd,
 #ifdef CONFIG_HUGETLB_PAGE
 extern void __migration_entry_wait_huge(pte_t *ptep, spinlock_t *ptl);
 extern void migration_entry_wait_huge(struct vm_area_struct *vma, pte_t *pte);
-<<<<<<< HEAD
 #endif	/* CONFIG_HUGETLB_PAGE */
 #else  /* CONFIG_MIGRATION */
-=======
-#endif
-#else
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline swp_entry_t make_readable_migration_entry(pgoff_t offset)
 {
 	return swp_entry(0, 0);
@@ -420,11 +378,7 @@ static inline void migration_entry_wait(struct mm_struct *mm, pmd_t *pmd,
 #ifdef CONFIG_HUGETLB_PAGE
 static inline void __migration_entry_wait_huge(pte_t *ptep, spinlock_t *ptl) { }
 static inline void migration_entry_wait_huge(struct vm_area_struct *vma, pte_t *pte) { }
-<<<<<<< HEAD
 #endif	/* CONFIG_HUGETLB_PAGE */
-=======
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline int is_writable_migration_entry(swp_entry_t entry)
 {
 	return 0;
@@ -561,109 +515,6 @@ static inline bool is_pfn_swap_entry(swp_entry_t entry)
 	       is_device_exclusive_entry(entry);
 }
 
-typedef unsigned long pte_marker;
-
-#define  PTE_MARKER_UFFD_WP  BIT(0)
-#define  PTE_MARKER_MASK     (PTE_MARKER_UFFD_WP)
-
-#ifdef CONFIG_PTE_MARKER
-
-static inline swp_entry_t make_pte_marker_entry(pte_marker marker)
-{
-	return swp_entry(SWP_PTE_MARKER, marker);
-}
-
-static inline bool is_pte_marker_entry(swp_entry_t entry)
-{
-	return swp_type(entry) == SWP_PTE_MARKER;
-}
-
-static inline pte_marker pte_marker_get(swp_entry_t entry)
-{
-	return swp_offset(entry) & PTE_MARKER_MASK;
-}
-
-static inline bool is_pte_marker(pte_t pte)
-{
-	return is_swap_pte(pte) && is_pte_marker_entry(pte_to_swp_entry(pte));
-}
-
-#else /* CONFIG_PTE_MARKER */
-
-static inline swp_entry_t make_pte_marker_entry(pte_marker marker)
-{
-	/* This should never be called if !CONFIG_PTE_MARKER */
-	WARN_ON_ONCE(1);
-	return swp_entry(0, 0);
-}
-
-static inline bool is_pte_marker_entry(swp_entry_t entry)
-{
-	return false;
-}
-
-static inline pte_marker pte_marker_get(swp_entry_t entry)
-{
-	return 0;
-}
-
-static inline bool is_pte_marker(pte_t pte)
-{
-	return false;
-}
-
-#endif /* CONFIG_PTE_MARKER */
-
-static inline pte_t make_pte_marker(pte_marker marker)
-{
-	return swp_entry_to_pte(make_pte_marker_entry(marker));
-}
-
-/*
- * This is a special version to check pte_none() just to cover the case when
- * the pte is a pte marker.  It existed because in many cases the pte marker
- * should be seen as a none pte; it's just that we have stored some information
- * onto the none pte so it becomes not-none any more.
- *
- * It should be used when the pte is file-backed, ram-based and backing
- * userspace pages, like shmem.  It is not needed upon pgtables that do not
- * support pte markers at all.  For example, it's not needed on anonymous
- * memory, kernel-only memory (including when the system is during-boot),
- * non-ram based generic file-system.  It's fine to be used even there, but the
- * extra pte marker check will be pure overhead.
- *
- * For systems configured with !CONFIG_PTE_MARKER this will be automatically
- * optimized to pte_none().
- */
-static inline int pte_none_mostly(pte_t pte)
-{
-	return pte_none(pte) || is_pte_marker(pte);
-}
-
-static inline struct page *pfn_swap_entry_to_page(swp_entry_t entry)
-{
-	struct page *p = pfn_to_page(swp_offset(entry));
-
-	/*
-	 * Any use of migration entries may only occur while the
-	 * corresponding page is locked
-	 */
-	BUG_ON(is_migration_entry(entry) && !PageLocked(p));
-
-	return p;
-}
-
-/*
- * A pfn swap entry is a special type of swap entry that always has a pfn stored
- * in the swap offset. They are used to represent unaddressable device memory
- * and to restrict access to a page undergoing migration.
- */
-static inline bool is_pfn_swap_entry(swp_entry_t entry)
-{
-	return is_migration_entry(entry) || is_device_private_entry(entry) ||
-	       is_device_exclusive_entry(entry);
-}
-
 struct page_vma_mapped_walk;
 
 #ifdef CONFIG_ARCH_ENABLE_THP_MIGRATION
@@ -699,11 +550,7 @@ static inline int is_pmd_migration_entry(pmd_t pmd)
 {
 	return is_swap_pmd(pmd) && is_migration_entry(pmd_to_swp_entry(pmd));
 }
-<<<<<<< HEAD
 #else  /* CONFIG_ARCH_ENABLE_THP_MIGRATION */
-=======
-#else
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline int set_pmd_migration_entry(struct page_vma_mapped_walk *pvmw,
 		struct page *page)
 {
@@ -752,11 +599,6 @@ static inline int is_hwpoison_entry(swp_entry_t entry)
 	return swp_type(entry) == SWP_HWPOISON;
 }
 
-static inline unsigned long hwpoison_entry_to_pfn(swp_entry_t entry)
-{
-	return swp_offset(entry);
-}
-
 static inline void num_poisoned_pages_inc(void)
 {
 	atomic_long_inc(&num_poisoned_pages);
@@ -767,16 +609,7 @@ static inline void num_poisoned_pages_sub(long i)
 	atomic_long_sub(i, &num_poisoned_pages);
 }
 
-<<<<<<< HEAD
 #else  /* CONFIG_MEMORY_FAILURE */
-=======
-static inline void num_poisoned_pages_sub(long i)
-{
-	atomic_long_sub(i, &num_poisoned_pages);
-}
-
-#else
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline swp_entry_t make_hwpoison_entry(struct page *page)
 {
@@ -795,11 +628,7 @@ static inline void num_poisoned_pages_inc(void)
 static inline void num_poisoned_pages_sub(long i)
 {
 }
-<<<<<<< HEAD
 #endif  /* CONFIG_MEMORY_FAILURE */
-=======
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline int non_swap_entry(swp_entry_t entry)
 {

@@ -696,7 +696,6 @@ static int ht16k33_seg_probe(struct device *dev, struct ht16k33_priv *priv,
 	}
 	if (err)
 		return err;
-<<<<<<< HEAD
 
 	err = linedisp_register(&seg->linedisp, dev, 4, seg->curr,
 				ht16k33_linedisp_update);
@@ -719,30 +718,6 @@ static int ht16k33_probe(struct i2c_client *client)
 	uint32_t dft_brightness;
 	int err;
 
-=======
-
-	err = linedisp_register(&seg->linedisp, dev, 4, seg->curr,
-				ht16k33_linedisp_update);
-	if (err)
-		goto err_remove_map_file;
-
-	return 0;
-
-err_remove_map_file:
-	device_remove_file(dev, &dev_attr_map_seg7);
-	device_remove_file(dev, &dev_attr_map_seg14);
-	return err;
-}
-
-static int ht16k33_probe(struct i2c_client *client)
-{
-	struct device *dev = &client->dev;
-	const struct of_device_id *id;
-	struct ht16k33_priv *priv;
-	uint32_t dft_brightness;
-	int err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		dev_err(dev, "i2c_check_functionality error\n");
 		return -EIO;
@@ -821,11 +796,6 @@ static void ht16k33_remove(struct i2c_client *client)
 		device_remove_file(&client->dev, &dev_attr_map_seg14);
 		break;
 	}
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id ht16k33_i2c_match[] = {

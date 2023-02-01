@@ -247,7 +247,6 @@ static void mei_gsc_mkhi_ver(struct mei_cl_device *cldev)
 		dev_err(&cldev->dev, "FW version command failed %d\n", ret);
 	mei_cldev_disable(cldev);
 }
-<<<<<<< HEAD
 
 static void mei_gsc_mkhi_fix_ver(struct mei_cl_device *cldev)
 {
@@ -281,8 +280,6 @@ out:
 	mei_cldev_disable(cldev);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * mei_wd - wd client on the bus, change protocol version
  *   as the API has changed.
@@ -555,11 +552,7 @@ static struct mei_fixup {
 	MEI_FIXUP(MEI_UUID_WD, mei_wd),
 	MEI_FIXUP(MEI_UUID_MKHIF_FIX, mei_mkhi_fix),
 	MEI_FIXUP(MEI_UUID_IGSC_MKHI, mei_gsc_mkhi_ver),
-<<<<<<< HEAD
 	MEI_FIXUP(MEI_UUID_IGSC_MKHI_FIX, mei_gsc_mkhi_fix_ver),
-=======
-	MEI_FIXUP(MEI_UUID_IGSC_MKHI_FIX, mei_gsc_mkhi_ver),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	MEI_FIXUP(MEI_UUID_HDCP, whitelist),
 	MEI_FIXUP(MEI_UUID_ANY, vt_support),
 	MEI_FIXUP(MEI_UUID_PAVP, pxp_is_ready),

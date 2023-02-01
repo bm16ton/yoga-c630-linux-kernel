@@ -911,11 +911,7 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 
 	ret = devm_spi_register_controller(&pdev->dev, controller);
 	if (ret < 0) {
-<<<<<<< HEAD
 		dev_err_probe(&pdev->dev, ret, "spi_register_controller error\n");
-=======
-		dev_err_probe(&pdev->dev, ret, "spi_register_controller error: %i\n", ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto free_dma;
 	}
 

@@ -1261,7 +1261,6 @@ drm_gem_unlock_reservations(struct drm_gem_object **objs, int count,
 	ww_acquire_fini(acquire_ctx);
 }
 EXPORT_SYMBOL(drm_gem_unlock_reservations);
-<<<<<<< HEAD
 
 /**
  * drm_gem_lru_init - initialize a LRU
@@ -1430,5 +1429,3 @@ tail:
 	return freed;
 }
 EXPORT_SYMBOL(drm_gem_lru_scan);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

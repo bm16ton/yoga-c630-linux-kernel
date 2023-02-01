@@ -1412,13 +1412,8 @@ static int ovl_make_workdir(struct super_block *sb, struct ovl_fs *ofs,
 		pr_warn("upper fs needs to support d_type.\n");
 
 	/* Check if upper/work fs supports O_TMPFILE */
-<<<<<<< HEAD
 	tmpfile = ovl_do_tmpfile(ofs, ofs->workdir, S_IFREG | 0);
 	ofs->tmpfile = !IS_ERR(tmpfile);
-=======
-	temp = ovl_do_tmpfile(ofs, ofs->workdir, S_IFREG | 0);
-	ofs->tmpfile = !IS_ERR(temp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ofs->tmpfile)
 		fput(tmpfile);
 	else

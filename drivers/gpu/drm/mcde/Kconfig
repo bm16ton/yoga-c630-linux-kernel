@@ -10,11 +10,7 @@ config DRM_MCDE
 	select DRM_BRIDGE
 	select DRM_PANEL_BRIDGE
 	select DRM_KMS_HELPER
-<<<<<<< HEAD
 	select DRM_GEM_DMA_HELPER
-=======
-	select DRM_GEM_CMA_HELPER
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select VT_HW_CONSOLE_BINDING if FRAMEBUFFER_CONSOLE
 	help
 	  Choose this option for DRM support for the ST-Ericsson MCDE

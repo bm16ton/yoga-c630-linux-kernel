@@ -239,22 +239,13 @@ static int ntxec_probe(struct i2c_client *client)
 	return res;
 }
 
-<<<<<<< HEAD
 static void ntxec_remove(struct i2c_client *client)
-=======
-static int ntxec_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (client == poweroff_restart_client) {
 		poweroff_restart_client = NULL;
 		pm_power_off = NULL;
 		unregister_restart_handler(&ntxec_restart_handler);
 	}
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id of_ntxec_match_table[] = {

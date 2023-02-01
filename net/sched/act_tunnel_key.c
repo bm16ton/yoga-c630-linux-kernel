@@ -357,11 +357,7 @@ static int tunnel_key_init(struct net *net, struct nlattr *nla,
 			   struct tcf_proto *tp, u32 act_flags,
 			   struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_tunnel_key_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, tunnel_key_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = act_flags & TCA_ACT_FLAGS_BIND;
 	struct nlattr *tb[TCA_TUNNEL_KEY_MAX + 1];
 	struct tcf_tunnel_key_params *params_new;
@@ -828,61 +824,6 @@ static int tcf_tunnel_key_offload_act_setup(struct tc_action *act,
 	return 0;
 }
 
-static void tcf_tunnel_encap_put_tunnel(void *priv)
-{
-	struct ip_tunnel_info *tunnel = priv;
-
-	kfree(tunnel);
-}
-
-static int tcf_tunnel_encap_get_tunnel(struct flow_action_entry *entry,
-				       const struct tc_action *act)
-{
-	entry->tunnel = tcf_tunnel_info_copy(act);
-	if (!entry->tunnel)
-		return -ENOMEM;
-	entry->destructor = tcf_tunnel_encap_put_tunnel;
-	entry->destructor_priv = entry->tunnel;
-	return 0;
-}
-
-static int tcf_tunnel_key_offload_act_setup(struct tc_action *act,
-					    void *entry_data,
-					    u32 *index_inc,
-					    bool bind,
-					    struct netlink_ext_ack *extack)
-{
-	int err;
-
-	if (bind) {
-		struct flow_action_entry *entry = entry_data;
-
-		if (is_tcf_tunnel_set(act)) {
-			entry->id = FLOW_ACTION_TUNNEL_ENCAP;
-			err = tcf_tunnel_encap_get_tunnel(entry, act);
-			if (err)
-				return err;
-		} else if (is_tcf_tunnel_release(act)) {
-			entry->id = FLOW_ACTION_TUNNEL_DECAP;
-		} else {
-			NL_SET_ERR_MSG_MOD(extack, "Unsupported tunnel key mode offload");
-			return -EOPNOTSUPP;
-		}
-		*index_inc = 1;
-	} else {
-		struct flow_offload_action *fl_action = entry_data;
-
-		if (is_tcf_tunnel_set(act))
-			fl_action->id = FLOW_ACTION_TUNNEL_ENCAP;
-		else if (is_tcf_tunnel_release(act))
-			fl_action->id = FLOW_ACTION_TUNNEL_DECAP;
-		else
-			return -EOPNOTSUPP;
-	}
-
-	return 0;
-}
-
 static struct tc_action_ops act_tunnel_key_ops = {
 	.kind		=	"tunnel_key",
 	.id		=	TCA_ID_TUNNEL_KEY,
@@ -891,11 +832,6 @@ static struct tc_action_ops act_tunnel_key_ops = {
 	.dump		=	tunnel_key_dump,
 	.init		=	tunnel_key_init,
 	.cleanup	=	tunnel_key_release,
-<<<<<<< HEAD
-=======
-	.walk		=	tunnel_key_walker,
-	.lookup		=	tunnel_key_search,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.offload_act_setup =	tcf_tunnel_key_offload_act_setup,
 	.size		=	sizeof(struct tcf_tunnel_key),
 };

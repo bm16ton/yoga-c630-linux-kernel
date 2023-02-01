@@ -128,7 +128,6 @@ deadline_rb_root(struct dd_per_prio *per_prio, struct request *rq)
 static u8 dd_rq_ioclass(struct request *rq)
 {
 	return IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
-<<<<<<< HEAD
 }
 
 /*
@@ -143,8 +142,6 @@ deadline_earlier_request(struct request *rq)
 		return rb_entry_rq(node);
 
 	return NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -354,13 +351,9 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
 	 */
 	spin_lock_irqsave(&dd->zone_lock, flags);
 	list_for_each_entry(rq, &per_prio->fifo_list[DD_WRITE], queuelist) {
-<<<<<<< HEAD
 		if (blk_req_can_dispatch_to_zone(rq) &&
 		    (blk_queue_nonrot(rq->q) ||
 		     !deadline_is_seq_write(dd, rq)))
-=======
-		if (blk_req_can_dispatch_to_zone(rq))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto out;
 	}
 	rq = NULL;
@@ -654,19 +647,11 @@ static void dd_exit_sched(struct elevator_queue *e)
 
 		WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_READ]));
 		WARN_ON_ONCE(!list_empty(&per_prio->fifo_list[DD_WRITE]));
-<<<<<<< HEAD
 
 		spin_lock(&dd->lock);
 		queued = dd_queued(dd, prio);
 		spin_unlock(&dd->lock);
 
-=======
-
-		spin_lock(&dd->lock);
-		queued = dd_queued(dd, prio);
-		spin_unlock(&dd->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		WARN_ONCE(queued != 0,
 			  "statistics for priority %d: i %u m %u d %u c %u\n",
 			  prio, stats->inserted, stats->merged,
@@ -860,7 +845,6 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
 static void dd_prepare_request(struct request *rq)
 {
 	rq->elv.priv[0] = NULL;
-<<<<<<< HEAD
 }
 
 static bool dd_has_write_work(struct blk_mq_hw_ctx *hctx)
@@ -873,8 +857,6 @@ static bool dd_has_write_work(struct blk_mq_hw_ctx *hctx)
 			return true;
 
 	return false;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -916,11 +898,6 @@ static void dd_finish_request(struct request *rq)
 
 		spin_lock_irqsave(&dd->zone_lock, flags);
 		blk_req_zone_write_unlock(rq);
-<<<<<<< HEAD
-=======
-		if (!list_empty(&per_prio->fifo_list[DD_WRITE]))
-			blk_mq_sched_mark_restart_hctx(rq->mq_hctx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		spin_unlock_irqrestore(&dd->zone_lock, flags);
 
 		if (dd_has_write_work(rq->mq_hctx))
@@ -939,19 +916,11 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
 {
 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
 	enum dd_prio prio;
-<<<<<<< HEAD
 
 	for (prio = 0; prio <= DD_PRIO_MAX; prio++)
 		if (dd_has_work_for_prio(&dd->per_prio[prio]))
 			return true;
 
-=======
-
-	for (prio = 0; prio <= DD_PRIO_MAX; prio++)
-		if (dd_has_work_for_prio(&dd->per_prio[prio]))
-			return true;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 

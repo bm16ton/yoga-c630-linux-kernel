@@ -15,10 +15,6 @@
 #include <linux/bitfield.h>
 #include <linux/clk.h>
 #include <linux/dev_printk.h>
-<<<<<<< HEAD
-=======
-#include <linux/dma-iommu.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/dma-mapping.h>
 #include <linux/err.h>
 #include <linux/interrupt.h>
@@ -36,11 +32,8 @@
 #include <linux/swab.h>
 #include <linux/types.h>
 
-<<<<<<< HEAD
 #include "dma-iommu.h"
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define DART_MAX_STREAMS 16
 #define DART_MAX_TTBR 4
 #define MAX_DARTS_PER_DEVICE 2
@@ -89,22 +82,16 @@
 #define DART_TTBR_VALID BIT(31)
 #define DART_TTBR_SHIFT 12
 
-<<<<<<< HEAD
 struct apple_dart_hw {
 	u32 oas;
 	enum io_pgtable_fmt fmt;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Private structure associated with each DART device.
  *
  * @dev: device struct
-<<<<<<< HEAD
  * @hw: SoC-specific hardware data
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @regs: mapped MMIO region
  * @irq: interrupt number, can be shared with other DARTs
  * @clks: clocks associated with this DART
@@ -118,10 +105,7 @@ struct apple_dart_hw {
  */
 struct apple_dart {
 	struct device *dev;
-<<<<<<< HEAD
 	const struct apple_dart_hw *hw;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	void __iomem *regs;
 
@@ -445,21 +429,13 @@ static int apple_dart_finalize_domain(struct iommu_domain *domain,
 	pgtbl_cfg = (struct io_pgtable_cfg){
 		.pgsize_bitmap = dart->pgsize,
 		.ias = 32,
-<<<<<<< HEAD
 		.oas = dart->hw->oas,
-=======
-		.oas = 36,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.coherent_walk = 1,
 		.iommu_dev = dart->dev,
 	};
 
 	dart_domain->pgtbl_ops =
-<<<<<<< HEAD
 		alloc_io_pgtable_ops(dart->hw->fmt, &pgtbl_cfg, domain);
-=======
-		alloc_io_pgtable_ops(APPLE_DART, &pgtbl_cfg, domain);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!dart_domain->pgtbl_ops) {
 		ret = -ENOMEM;
 		goto done;
@@ -782,11 +758,7 @@ static void apple_dart_get_resv_regions(struct device *dev,
 
 		region = iommu_alloc_resv_region(DOORBELL_ADDR,
 						 PAGE_SIZE, prot,
-<<<<<<< HEAD
 						 IOMMU_RESV_MSI, GFP_KERNEL);
-=======
-						 IOMMU_RESV_MSI);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!region)
 			return;
 
@@ -856,30 +828,6 @@ static irqreturn_t apple_dart_irq(int irq, void *dev)
 	return IRQ_HANDLED;
 }
 
-<<<<<<< HEAD
-=======
-static int apple_dart_set_bus_ops(const struct iommu_ops *ops)
-{
-	int ret;
-
-	if (!iommu_present(&platform_bus_type)) {
-		ret = bus_set_iommu(&platform_bus_type, ops);
-		if (ret)
-			return ret;
-	}
-#ifdef CONFIG_PCI
-	if (!iommu_present(&pci_bus_type)) {
-		ret = bus_set_iommu(&pci_bus_type, ops);
-		if (ret) {
-			bus_set_iommu(&platform_bus_type, NULL);
-			return ret;
-		}
-	}
-#endif
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int apple_dart_probe(struct platform_device *pdev)
 {
 	int ret;
@@ -893,10 +841,7 @@ static int apple_dart_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	dart->dev = dev;
-<<<<<<< HEAD
 	dart->hw = of_device_get_match_data(dev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_lock_init(&dart->lock);
 
 	dart->regs = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
@@ -938,21 +883,10 @@ static int apple_dart_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, dart);
 
-<<<<<<< HEAD
 	ret = iommu_device_sysfs_add(&dart->iommu, dev, NULL, "apple-dart.%s",
 				     dev_name(&pdev->dev));
 	if (ret)
 		goto err_free_irq;
-=======
-	ret = apple_dart_set_bus_ops(&apple_dart_iommu_ops);
-	if (ret)
-		goto err_free_irq;
-
-	ret = iommu_device_sysfs_add(&dart->iommu, dev, NULL, "apple-dart.%s",
-				     dev_name(&pdev->dev));
-	if (ret)
-		goto err_remove_bus_ops;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = iommu_device_register(&dart->iommu, &apple_dart_iommu_ops, dev);
 	if (ret)
@@ -966,11 +900,6 @@ static int apple_dart_probe(struct platform_device *pdev)
 
 err_sysfs_remove:
 	iommu_device_sysfs_remove(&dart->iommu);
-<<<<<<< HEAD
-=======
-err_remove_bus_ops:
-	apple_dart_set_bus_ops(NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_free_irq:
 	free_irq(dart->irq, dart);
 err_clk_disable:
@@ -985,10 +914,6 @@ static int apple_dart_remove(struct platform_device *pdev)
 
 	apple_dart_hw_reset(dart);
 	free_irq(dart->irq, dart);
-<<<<<<< HEAD
-=======
-	apple_dart_set_bus_ops(NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	iommu_device_unregister(&dart->iommu);
 	iommu_device_sysfs_remove(&dart->iommu);
@@ -998,7 +923,6 @@ static int apple_dart_remove(struct platform_device *pdev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static const struct apple_dart_hw apple_dart_hw_t8103 = {
 	.oas = 36,
 	.fmt = APPLE_DART,
@@ -1011,10 +935,6 @@ static const struct apple_dart_hw apple_dart_hw_t6000 = {
 static const struct of_device_id apple_dart_of_match[] = {
 	{ .compatible = "apple,t8103-dart", .data = &apple_dart_hw_t8103 },
 	{ .compatible = "apple,t6000-dart", .data = &apple_dart_hw_t6000 },
-=======
-static const struct of_device_id apple_dart_of_match[] = {
-	{ .compatible = "apple,t8103-dart", .data = NULL },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{},
 };
 MODULE_DEVICE_TABLE(of, apple_dart_of_match);

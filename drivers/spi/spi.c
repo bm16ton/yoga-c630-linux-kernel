@@ -304,85 +304,8 @@ static const struct attribute_group spi_controller_statistics_group = {
 	.attrs  = spi_controller_statistics_attrs,
 };
 
-static ssize_t
-new_device_store(struct device *dev, struct device_attribute *attr,
-		 const char *buf, size_t count)
-{
-	struct spi_controller *ctlr = container_of(dev, struct spi_controller,
-						   dev);
-	struct spi_device *spi;
-	struct spi_board_info bi = {
-		.modalias = "spidev",
-		.max_speed_hz = ctlr->max_speed_hz,
-	};
-
-	if (kstrtou16(buf, 0, &bi.chip_select) < 0)
-		return -EINVAL;
-
-	spi = spi_new_device(ctlr, &bi);
-	if (!spi) {
-		dev_err(dev, "can't create new device\n");
-		return -ENXIO;
-	}
-
-	mutex_lock(&ctlr->bus_lock_mutex);
-	list_add_tail(&spi->userspace_device, &ctlr->userspace_devices);
-	mutex_unlock(&ctlr->bus_lock_mutex);
-
-	dev_info(dev, "created spidev device %s\n", dev_name(&spi->dev));
-
-	return count;
-}
-static DEVICE_ATTR_WO(new_device);
-
-static ssize_t
-delete_device_store(struct device *dev, struct device_attribute *attr,
-		    const char *buf, size_t count)
-{
-	struct spi_controller *ctlr = container_of(dev, struct spi_controller,
-						   dev);
-	struct spi_device *spi, *next;
-	int ret = -ENXIO;
-	u16 cs;
-
-	if (kstrtou16(buf, 0, &cs) < 0)
-		return -EINVAL;
-
-	mutex_lock(&ctlr->bus_lock_mutex);
-	list_for_each_entry_safe(spi, next, &ctlr->userspace_devices,
-				 userspace_device) {
-		if (spi->chip_select != cs)
-			continue;
-
-		dev_info(dev, "deleting spidev device %s\n",
-			 dev_name(&spi->dev));
-		list_del(&spi->userspace_device);
-		spi_unregister_device(spi);
-		ret = count;
-		break;
-	}
-	mutex_unlock(&ctlr->bus_lock_mutex);
-
-	if (ret == -ENXIO)
-		dev_err(dev, "can't find spidev device %u in list\n", cs);
-
-	return ret;
-}
-static DEVICE_ATTR_WO(delete_device);
-
-static struct attribute *spi_controller_userspace_attrs[] = {
-	&dev_attr_new_device.attr,
-	&dev_attr_delete_device.attr,
-	NULL,
-};
-
-static const struct attribute_group spi_controller_userspace_group = {
-	.attrs  = spi_controller_userspace_attrs,
-};
-
 static const struct attribute_group *spi_master_groups[] = {
 	&spi_controller_statistics_group,
-	&spi_controller_userspace_group,
 	NULL,
 };
 
@@ -1259,23 +1182,6 @@ static int __spi_unmap_msg(struct spi_controller *ctlr, struct spi_message *msg)
 	if (!ctlr->cur_msg_mapped || !ctlr->can_dma)
 		return 0;
 
-<<<<<<< HEAD
-=======
-	if (ctlr->dma_tx)
-		tx_dev = ctlr->dma_tx->device->dev;
-	else if (ctlr->dma_map_dev)
-		tx_dev = ctlr->dma_map_dev;
-	else
-		tx_dev = ctlr->dev.parent;
-
-	if (ctlr->dma_rx)
-		rx_dev = ctlr->dma_rx->device->dev;
-	else if (ctlr->dma_map_dev)
-		rx_dev = ctlr->dma_map_dev;
-	else
-		rx_dev = ctlr->dev.parent;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
 		/* The sync has already been done after each transfer. */
 		unsigned long attrs = DMA_ATTR_SKIP_CPU_SYNC;
@@ -1745,7 +1651,6 @@ static int __spi_pump_transfer_message(struct spi_controller *ctlr,
 
 	trace_spi_message_start(msg);
 
-<<<<<<< HEAD
 	ret = spi_split_transfers_maxsize(ctlr, msg,
 					  spi_max_transfer_size(msg->spi),
 					  GFP_KERNEL | GFP_DMA);
@@ -1755,8 +1660,6 @@ static int __spi_pump_transfer_message(struct spi_controller *ctlr,
 		return ret;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ctlr->prepare_message) {
 		ret = ctlr->prepare_message(ctlr, msg);
 		if (ret) {
@@ -2499,11 +2402,7 @@ struct spi_device *spi_new_ancillary_device(struct spi_device *spi,
 		goto err_out;
 	}
 
-<<<<<<< HEAD
 	strscpy(ancillary->modalias, "dummy", sizeof(ancillary->modalias));
-=======
-	strlcpy(ancillary->modalias, "dummy", sizeof(ancillary->modalias));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Use provided chip-select for ancillary device */
 	ancillary->chip_select = chip_select;
@@ -2977,10 +2876,6 @@ struct spi_controller *__spi_alloc_controller(struct device *dev,
 		return NULL;
 
 	device_initialize(&ctlr->dev);
-<<<<<<< HEAD
-=======
-	INIT_LIST_HEAD(&ctlr->userspace_devices);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INIT_LIST_HEAD(&ctlr->queue);
 	spin_lock_init(&ctlr->queue_lock);
 	spin_lock_init(&ctlr->bus_lock_spinlock);

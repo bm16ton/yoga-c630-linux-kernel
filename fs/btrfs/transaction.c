@@ -168,12 +168,6 @@ static noinline void switch_commit_roots(struct btrfs_trans_handle *trans)
 	 */
 	ASSERT(cur_trans->state == TRANS_STATE_COMMIT_DOING);
 
-	/*
-	 * At this point no one can be using this transaction to modify any tree
-	 * and no one can start another transaction to modify any tree either.
-	 */
-	ASSERT(cur_trans->state == TRANS_STATE_COMMIT_DOING);
-
 	down_write(&fs_info->commit_root_sem);
 
 	if (test_bit(BTRFS_FS_RELOC_RUNNING, &fs_info->flags))
@@ -201,49 +195,6 @@ static noinline void switch_commit_roots(struct btrfs_trans_handle *trans)
 	}
 	spin_unlock(&cur_trans->dropped_roots_lock);
 
-<<<<<<< HEAD
-=======
-	/*
-	 * We have to update the last_byte_to_unpin under the commit_root_sem,
-	 * at the same time we swap out the commit roots.
-	 *
-	 * This is because we must have a real view of the last spot the caching
-	 * kthreads were while caching.  Consider the following views of the
-	 * extent tree for a block group
-	 *
-	 * commit root
-	 * +----+----+----+----+----+----+----+
-	 * |\\\\|    |\\\\|\\\\|    |\\\\|\\\\|
-	 * +----+----+----+----+----+----+----+
-	 * 0    1    2    3    4    5    6    7
-	 *
-	 * new commit root
-	 * +----+----+----+----+----+----+----+
-	 * |    |    |    |\\\\|    |    |\\\\|
-	 * +----+----+----+----+----+----+----+
-	 * 0    1    2    3    4    5    6    7
-	 *
-	 * If the cache_ctl->progress was at 3, then we are only allowed to
-	 * unpin [0,1) and [2,3], because the caching thread has already
-	 * processed those extents.  We are not allowed to unpin [5,6), because
-	 * the caching thread will re-start it's search from 3, and thus find
-	 * the hole from [4,6) to add to the free space cache.
-	 */
-	write_lock(&fs_info->block_group_cache_lock);
-	list_for_each_entry_safe(caching_ctl, next,
-				 &fs_info->caching_block_groups, list) {
-		struct btrfs_block_group *cache = caching_ctl->block_group;
-
-		if (btrfs_block_group_done(cache)) {
-			cache->last_byte_to_unpin = (u64)-1;
-			list_del_init(&caching_ctl->list);
-			btrfs_put_caching_control(caching_ctl);
-		} else {
-			cache->last_byte_to_unpin = caching_ctl->progress;
-		}
-	}
-	write_unlock(&fs_info->block_group_cache_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	up_write(&fs_info->commit_root_sem);
 }
 
@@ -877,7 +828,6 @@ static noinline void wait_for_commit(struct btrfs_transaction *commit,
 	u64 transid = commit->transid;
 	bool put = false;
 
-<<<<<<< HEAD
 	/*
 	 * At the moment this function is called with min_state either being
 	 * TRANS_STATE_COMPLETED or TRANS_STATE_SUPER_COMMITTED.
@@ -887,8 +837,6 @@ static noinline void wait_for_commit(struct btrfs_transaction *commit,
 	else
 		btrfs_might_wait_for_state(fs_info, BTRFS_LOCKDEP_TRANS_SUPER_COMMITTED);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (1) {
 		wait_event(commit->commit_wait, commit->state >= min_state);
 		if (put)
@@ -1946,14 +1894,6 @@ static void update_super_roots(struct btrfs_fs_info *fs_info)
 		super->cache_generation = 0;
 	if (test_bit(BTRFS_FS_UPDATE_UUID_TREE_GEN, &fs_info->flags))
 		super->uuid_tree_generation = root_item->generation;
-
-	if (btrfs_fs_incompat(fs_info, EXTENT_TREE_V2)) {
-		root_item = &fs_info->block_group_root->root_item;
-
-		super->block_group_root = root_item->bytenr;
-		super->block_group_root_generation = root_item->generation;
-		super->block_group_root_level = root_item->level;
-	}
 }
 
 int btrfs_transaction_in_commit(struct btrfs_fs_info *info)
@@ -2001,10 +1941,7 @@ void btrfs_commit_transaction_async(struct btrfs_trans_handle *trans)
 	 * Wait for the current transaction commit to start and block
 	 * subsequent transaction joins
 	 */
-<<<<<<< HEAD
 	btrfs_might_wait_for_state(fs_info, BTRFS_LOCKDEP_TRANS_COMMIT_START);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wait_event(fs_info->transaction_blocked_wait,
 		   cur_trans->state >= TRANS_STATE_COMMIT_START ||
 		   TRANS_ABORTED(cur_trans));
@@ -2350,7 +2287,6 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 		   atomic_read(&cur_trans->num_writers) == 1);
 
 	/*
-<<<<<<< HEAD
 	 * Make lockdep happy by acquiring the state locks after
 	 * btrfs_trans_num_writers is released. If we acquired the state locks
 	 * before releasing the btrfs_trans_num_writers lock then lockdep would
@@ -2361,8 +2297,6 @@ int btrfs_commit_transaction(struct btrfs_trans_handle *trans)
 	btrfs_trans_state_lockdep_acquire(fs_info, BTRFS_LOCKDEP_TRANS_UNBLOCKED);
 
 	/*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * We've started the commit, clear the flag in case we were triggered to
 	 * do an async commit but somebody else started before the transaction
 	 * kthread could do the work.

@@ -988,9 +988,6 @@ struct efa_admin_host_info {
 /* create_cq_resp */
 #define EFA_ADMIN_CREATE_CQ_RESP_DB_VALID_MASK              BIT(0)
 
-/* create_cq_resp */
-#define EFA_ADMIN_CREATE_CQ_RESP_DB_VALID_MASK              BIT(0)
-
 /* feature_device_attr_desc */
 #define EFA_ADMIN_FEATURE_DEVICE_ATTR_DESC_RDMA_READ_MASK   BIT(0)
 #define EFA_ADMIN_FEATURE_DEVICE_ATTR_DESC_RNR_RETRY_MASK   BIT(1)

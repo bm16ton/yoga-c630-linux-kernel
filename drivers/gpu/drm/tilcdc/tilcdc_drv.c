@@ -480,11 +480,7 @@ DEFINE_DRM_GEM_DMA_FOPS(fops);
 
 static const struct drm_driver tilcdc_driver = {
 	.driver_features    = DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
-<<<<<<< HEAD
 	DRM_GEM_DMA_DRIVER_OPS,
-=======
-	DRM_GEM_CMA_DRIVER_OPS,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_DEBUG_FS
 	.debugfs_init       = tilcdc_debugfs_init,
 #endif

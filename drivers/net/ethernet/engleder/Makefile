@@ -6,9 +6,5 @@
 obj-$(CONFIG_TSNEP) += tsnep.o
 
 tsnep-objs := tsnep_main.o tsnep_ethtool.o tsnep_ptp.o tsnep_tc.o \
-<<<<<<< HEAD
 	      tsnep_rxnfc.o $(tsnep-y)
-=======
-	      $(tsnep-y)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 tsnep-$(CONFIG_TSNEP_SELFTESTS) += tsnep_selftests.o

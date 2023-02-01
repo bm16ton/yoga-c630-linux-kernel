@@ -1779,7 +1779,6 @@ static void at91udc_of_init(struct at91_udc *udc, struct device_node *np)
 	if (of_property_read_u32(np, "atmel,vbus-polled", &val) == 0)
 		board->vbus_polled = 1;
 
-<<<<<<< HEAD
 	board->vbus_pin = fwnode_gpiod_get_index(of_fwnode_handle(np),
 						 "atmel,vbus", 0, GPIOD_IN,
 						 "udc_vbus");
@@ -1788,14 +1787,6 @@ static void at91udc_of_init(struct at91_udc *udc, struct device_node *np)
 
 	board->pullup_pin = fwnode_gpiod_get_index(of_fwnode_handle(np),
 						   "atmel,pullup", 0,
-=======
-	board->vbus_pin = gpiod_get_from_of_node(np, "atmel,vbus-gpio", 0,
-						 GPIOD_IN, "udc_vbus");
-	if (IS_ERR(board->vbus_pin))
-		board->vbus_pin = NULL;
-
-	board->pullup_pin = gpiod_get_from_of_node(np, "atmel,pullup-gpio", 0,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						   GPIOD_ASIS, "udc_pullup");
 	if (IS_ERR(board->pullup_pin))
 		board->pullup_pin = NULL;

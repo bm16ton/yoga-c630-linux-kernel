@@ -122,11 +122,6 @@ struct tty_operations;
 /**
  * struct tty_struct - state associated with a tty while open
  *
-<<<<<<< HEAD
-=======
- * @magic: magic value set early in @alloc_tty_struct to %TTY_MAGIC, for
- *	   debugging purposes
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @kref: reference counting by tty_kref_get() and tty_kref_put(), reaching zero
  *	  frees the structure
  * @dev: class device or %NULL (e.g. ptys, serdev)
@@ -262,12 +257,6 @@ struct tty_file_private {
 	struct list_head list;
 };
 
-<<<<<<< HEAD
-=======
-/* tty magic number */
-#define TTY_MAGIC		0x5401
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * DOC: TTY Struct Flags
  *
@@ -439,11 +428,7 @@ int tty_hung_up_p(struct file *filp);
 void do_SAK(struct tty_struct *tty);
 void __do_SAK(struct tty_struct *tty);
 void no_tty(void);
-<<<<<<< HEAD
 speed_t tty_termios_baud_rate(const struct ktermios *termios);
-=======
-speed_t tty_termios_baud_rate(struct ktermios *termios);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void tty_termios_encode_baud_rate(struct ktermios *termios, speed_t ibaud,
 		speed_t obaud);
 void tty_encode_baud_rate(struct tty_struct *tty, speed_t ibaud,
@@ -466,7 +451,6 @@ static inline speed_t tty_get_baud_rate(struct tty_struct *tty)
 
 unsigned char tty_get_char_size(unsigned int cflag);
 unsigned char tty_get_frame_size(unsigned int cflag);
-<<<<<<< HEAD
 
 void tty_termios_copy_hw(struct ktermios *new, const struct ktermios *old);
 int tty_termios_hw_change(const struct ktermios *a, const struct ktermios *b);
@@ -474,15 +458,6 @@ int tty_set_termios(struct tty_struct *tty, struct ktermios *kt);
 
 void tty_wakeup(struct tty_struct *tty);
 
-=======
-
-void tty_termios_copy_hw(struct ktermios *new, struct ktermios *old);
-int tty_termios_hw_change(const struct ktermios *a, const struct ktermios *b);
-int tty_set_termios(struct tty_struct *tty, struct ktermios *kt);
-
-void tty_wakeup(struct tty_struct *tty);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int tty_mode_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long arg);
 int tty_perform_flush(struct tty_struct *tty, unsigned long arg);
 struct tty_struct *tty_init_dev(struct tty_driver *driver, int idx);

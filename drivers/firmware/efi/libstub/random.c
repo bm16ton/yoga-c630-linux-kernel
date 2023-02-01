@@ -77,7 +77,6 @@ efi_status_t efi_random_get_seed(void)
 		return status;
 
 	/*
-<<<<<<< HEAD
 	 * Check whether a seed was provided by a prior boot stage. In that
 	 * case, instead of overwriting it, let's create a new buffer that can
 	 * hold both, and concatenate the existing and the new seeds.
@@ -91,18 +90,12 @@ efi_status_t efi_random_get_seed(void)
 	}
 
 	/*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * Use EFI_ACPI_RECLAIM_MEMORY here so that it is guaranteed that the
 	 * allocation will survive a kexec reboot (although we refresh the seed
 	 * beforehand)
 	 */
 	status = efi_bs_call(allocate_pool, EFI_ACPI_RECLAIM_MEMORY,
-<<<<<<< HEAD
 			     struct_size(seed, bits, seed_size),
-=======
-			     sizeof(*seed) + EFI_RANDOM_SEED_SIZE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			     (void **)&seed);
 	if (status != EFI_SUCCESS) {
 		efi_warn("Failed to allocate memory for RNG seed.\n");

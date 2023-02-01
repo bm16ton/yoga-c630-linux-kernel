@@ -19,10 +19,7 @@
 #include "lmac_common.h"
 #include "npc.h"
 #include "rvu_npc_hash.h"
-<<<<<<< HEAD
 #include "mcs.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define DEBUGFS_DIR_NAME "octeontx2"
 
@@ -231,7 +228,6 @@ static const struct file_operations rvu_dbg_##name##_fops = { \
 
 static void print_nix_qsize(struct seq_file *filp, struct rvu_pfvf *pfvf);
 
-<<<<<<< HEAD
 static int rvu_dbg_mcs_port_stats_display(struct seq_file *filp, void *unused, int dir)
 {
 	struct mcs *mcs = filp->private;
@@ -576,8 +572,6 @@ static void rvu_dbg_mcs_init(struct rvu *rvu)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define LMT_MAPTBL_ENTRY_SIZE 16
 /* Dump LMTST map table */
 static ssize_t rvu_dbg_lmtst_map_table_display(struct file *filp,

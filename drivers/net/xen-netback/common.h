@@ -386,11 +386,7 @@ int xenvif_dealloc_kthread(void *data);
 irqreturn_t xenvif_ctrl_irq_fn(int irq, void *data);
 
 bool xenvif_have_rx_work(struct xenvif_queue *queue, bool test_kthread);
-<<<<<<< HEAD
 bool xenvif_rx_queue_tail(struct xenvif_queue *queue, struct sk_buff *skb);
-=======
-void xenvif_rx_queue_tail(struct xenvif_queue *queue, struct sk_buff *skb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void xenvif_carrier_on(struct xenvif *vif);
 

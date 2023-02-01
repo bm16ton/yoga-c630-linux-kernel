@@ -1572,11 +1572,7 @@ emsgsize:
 				paged = true;
 				zc = true;
 			} else {
-<<<<<<< HEAD
 				uarg_to_msgzc(uarg)->zerocopy = 0;
-=======
-				uarg->zerocopy = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				skb_zcopy_set(skb, uarg, &extra_uref);
 			}
 		}
@@ -1657,14 +1653,7 @@ alloc_new_skb:
 				 (fraglen + alloc_extra < SKB_MAX_ALLOC ||
 				  !(rt->dst.dev->features & NETIF_F_SG)))
 				alloclen = fraglen;
-<<<<<<< HEAD
 			else {
-=======
-			else if (!zc) {
-				alloclen = min_t(int, fraglen, MAX_HEADER);
-				pagedlen = fraglen - alloclen;
-			} else {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				alloclen = fragheaderlen + transhdrlen;
 				pagedlen = datalen - transhdrlen;
 			}

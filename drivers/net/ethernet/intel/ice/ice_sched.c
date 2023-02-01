@@ -1001,7 +1001,6 @@ ice_sched_add_nodes_to_hw_layer(struct ice_port_info *pi,
 			return -EIO;
 		return -ENOSPC;
 	}
-<<<<<<< HEAD
 
 	return ice_sched_add_elems(pi, tc_node, parent, layer, num_nodes,
 				   num_nodes_added, first_node_teid);
@@ -1030,36 +1029,6 @@ ice_sched_add_nodes_to_layer(struct ice_port_info *pi,
 	u16 new_num_nodes = num_nodes;
 	int status = 0;
 
-=======
-
-	return ice_sched_add_elems(pi, tc_node, parent, layer, num_nodes,
-				   num_nodes_added, first_node_teid);
-}
-
-/**
- * ice_sched_add_nodes_to_layer - Add nodes to a given layer
- * @pi: port information structure
- * @tc_node: pointer to TC node
- * @parent: pointer to parent node
- * @layer: layer number to add nodes
- * @num_nodes: number of nodes to be added
- * @first_node_teid: pointer to the first node TEID
- * @num_nodes_added: pointer to number of nodes added
- *
- * This function add nodes to a given layer.
- */
-static int
-ice_sched_add_nodes_to_layer(struct ice_port_info *pi,
-			     struct ice_sched_node *tc_node,
-			     struct ice_sched_node *parent, u8 layer,
-			     u16 num_nodes, u32 *first_node_teid,
-			     u16 *num_nodes_added)
-{
-	u32 *first_teid_ptr = first_node_teid;
-	u16 new_num_nodes = num_nodes;
-	int status = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*num_nodes_added = 0;
 	while (*num_nodes_added < num_nodes) {
 		u16 max_child_nodes, num_added = 0;

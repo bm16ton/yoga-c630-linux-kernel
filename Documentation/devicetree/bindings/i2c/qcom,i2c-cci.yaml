@@ -13,10 +13,7 @@ maintainers:
 properties:
   compatible:
     enum:
-<<<<<<< HEAD
       - qcom,msm8226-cci
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - qcom,msm8916-cci
       - qcom,msm8974-cci
       - qcom,msm8996-cci
@@ -31,19 +28,11 @@ properties:
     const: 0
 
   clocks:
-<<<<<<< HEAD
     minItems: 3
     maxItems: 6
 
   clock-names:
     minItems: 3
-=======
-    minItems: 4
-    maxItems: 6
-
-  clock-names:
-    minItems: 4
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     maxItems: 6
 
   interrupts:
@@ -90,10 +79,7 @@ allOf:
         compatible:
           contains:
             enum:
-<<<<<<< HEAD
               - qcom,msm8226-cci
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - qcom,msm8916-cci
     then:
       properties:
@@ -104,7 +90,6 @@ allOf:
         compatible:
           contains:
             enum:
-<<<<<<< HEAD
               - qcom,msm8226-cci
               - qcom,msm8974-cci
     then:
@@ -122,8 +107,6 @@ allOf:
         compatible:
           contains:
             enum:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - qcom,msm8916-cci
               - qcom,msm8996-cci
     then:
@@ -162,10 +145,7 @@ allOf:
           contains:
             enum:
               - qcom,sm8250-cci
-<<<<<<< HEAD
               - qcom,sm8450-cci
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     then:
       properties:
         clocks:

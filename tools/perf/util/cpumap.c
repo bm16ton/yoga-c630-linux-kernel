@@ -112,7 +112,6 @@ static struct perf_cpu_map *cpu_map__from_mask(const struct perf_record_cpu_map_
 
 }
 
-<<<<<<< HEAD
 static struct perf_cpu_map *cpu_map__from_range(const struct perf_record_cpu_map_data *data)
 {
 	struct perf_cpu_map *map;
@@ -146,14 +145,6 @@ struct perf_cpu_map *cpu_map__new_data(const struct perf_record_cpu_map_data *da
 		pr_err("cpu_map__new_data unknown type %d\n", data->type);
 		return NULL;
 	}
-=======
-struct perf_cpu_map *cpu_map__new_data(const struct perf_record_cpu_map_data *data)
-{
-	if (data->type == PERF_CPU_MAP__CPUS)
-		return cpu_map__from_entries(data);
-	else
-		return cpu_map__from_mask(data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 size_t cpu_map__fprintf(struct perf_cpu_map *map, FILE *fp)
@@ -352,7 +343,6 @@ struct aggr_cpu_id aggr_cpu_id__cpu(struct perf_cpu cpu, void *data)
 
 	id.cpu = cpu;
 	return id;
-<<<<<<< HEAD
 
 }
 
@@ -360,15 +350,6 @@ struct aggr_cpu_id aggr_cpu_id__node(struct perf_cpu cpu, void *data __maybe_unu
 {
 	struct aggr_cpu_id id = aggr_cpu_id__empty();
 
-=======
-
-}
-
-struct aggr_cpu_id aggr_cpu_id__node(struct perf_cpu cpu, void *data __maybe_unused)
-{
-	struct aggr_cpu_id id = aggr_cpu_id__empty();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	id.node = cpu__get_node(cpu);
 	return id;
 }
@@ -686,11 +667,7 @@ const struct perf_cpu_map *cpu_map__online(void) /* thread unsafe */
 
 bool aggr_cpu_id__equal(const struct aggr_cpu_id *a, const struct aggr_cpu_id *b)
 {
-<<<<<<< HEAD
 	return a->thread_idx == b->thread_idx &&
-=======
-	return a->thread == b->thread &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		a->node == b->node &&
 		a->socket == b->socket &&
 		a->die == b->die &&
@@ -700,11 +677,7 @@ bool aggr_cpu_id__equal(const struct aggr_cpu_id *a, const struct aggr_cpu_id *b
 
 bool aggr_cpu_id__is_empty(const struct aggr_cpu_id *a)
 {
-<<<<<<< HEAD
 	return a->thread_idx == -1 &&
-=======
-	return a->thread == -1 &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		a->node == -1 &&
 		a->socket == -1 &&
 		a->die == -1 &&

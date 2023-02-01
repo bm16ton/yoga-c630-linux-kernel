@@ -190,11 +190,7 @@ int main(int argc, char *argv[])
 	void *addr_map_capsule;
 	struct stat st;
 	char *log_buf;
-<<<<<<< HEAD
 	int ret;
-=======
-	int ret = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (getuid() != 0) {
 		printf("Please run the tool as root - Exiting.\n");

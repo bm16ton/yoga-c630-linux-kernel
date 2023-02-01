@@ -6,10 +6,7 @@ config UML
 	bool
 	default y
 	select ARCH_EPHEMERAL_INODES
-<<<<<<< HEAD
 	select ARCH_HAS_FORTIFY_SOURCE
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select ARCH_HAS_GCOV_PROFILE_ALL
 	select ARCH_HAS_KCOV
 	select ARCH_HAS_STRNCPY_FROM_USER

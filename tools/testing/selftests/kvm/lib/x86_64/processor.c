@@ -111,7 +111,6 @@ static void sregs_dump(FILE *stream, struct kvm_sregs *sregs, uint8_t indent)
 	}
 }
 
-<<<<<<< HEAD
 bool kvm_is_tdp_enabled(void)
 {
 	if (is_intel_cpu())
@@ -120,8 +119,6 @@ bool kvm_is_tdp_enabled(void)
 		return get_kvm_amd_param_bool("npt");
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void virt_arch_pgd_alloc(struct kvm_vm *vm)
 {
 	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
@@ -225,7 +222,6 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
 	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);
 }
 
-<<<<<<< HEAD
 void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
 		    uint64_t nr_bytes, int level)
 {
@@ -245,8 +241,6 @@ void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm,
 					  struct kvm_vcpu *vcpu,
 					  uint64_t vaddr)
@@ -609,7 +603,6 @@ static void vcpu_setup(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
 
 	sregs.cr3 = vm->pgd;
 	vcpu_sregs_set(vcpu, &sregs);
-<<<<<<< HEAD
 }
 
 void __vm_xsave_require_permission(int bit, const char *name)
@@ -646,44 +639,6 @@ void __vm_xsave_require_permission(int bit, const char *name)
 		    bitmask);
 }
 
-=======
-}
-
-void __vm_xsave_require_permission(int bit, const char *name)
-{
-	int kvm_fd;
-	u64 bitmask;
-	long rc;
-	struct kvm_device_attr attr = {
-		.group = 0,
-		.attr = KVM_X86_XCOMP_GUEST_SUPP,
-		.addr = (unsigned long) &bitmask
-	};
-
-	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XFD));
-
-	kvm_fd = open_kvm_dev_path_or_exit();
-	rc = __kvm_ioctl(kvm_fd, KVM_GET_DEVICE_ATTR, &attr);
-	close(kvm_fd);
-
-	if (rc == -1 && (errno == ENXIO || errno == EINVAL))
-		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported");
-
-	TEST_ASSERT(rc == 0, "KVM_GET_DEVICE_ATTR(0, KVM_X86_XCOMP_GUEST_SUPP) error: %ld", rc);
-
-	__TEST_REQUIRE(bitmask & (1ULL << bit),
-		       "Required XSAVE feature '%s' not supported", name);
-
-	TEST_REQUIRE(!syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, bit));
-
-	rc = syscall(SYS_arch_prctl, ARCH_GET_XCOMP_GUEST_PERM, &bitmask);
-	TEST_ASSERT(rc == 0, "prctl(ARCH_GET_XCOMP_GUEST_PERM) error: %ld", rc);
-	TEST_ASSERT(bitmask & (1ULL << bit),
-		    "prctl(ARCH_REQ_XCOMP_GUEST_PERM) failure bitmask=0x%lx",
-		    bitmask);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
 				  void *guest_code)
 {
@@ -967,7 +922,6 @@ const struct kvm_msr_list *kvm_get_msr_index_list(void)
 const struct kvm_msr_list *kvm_get_feature_msr_index_list(void)
 {
 	static const struct kvm_msr_list *list;
-<<<<<<< HEAD
 
 	if (!list)
 		list = __kvm_get_msr_index_list(true);
@@ -1003,43 +957,6 @@ static void vcpu_save_xsave_state(struct kvm_vcpu *vcpu,
 
 struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu)
 {
-=======
-
-	if (!list)
-		list = __kvm_get_msr_index_list(true);
-	return list;
-}
-
-bool kvm_msr_is_in_save_restore_list(uint32_t msr_index)
-{
-	const struct kvm_msr_list *list = kvm_get_msr_index_list();
-	int i;
-
-	for (i = 0; i < list->nmsrs; ++i) {
-		if (list->indices[i] == msr_index)
-			return true;
-	}
-
-	return false;
-}
-
-static void vcpu_save_xsave_state(struct kvm_vcpu *vcpu,
-				  struct kvm_x86_state *state)
-{
-	int size = vm_check_cap(vcpu->vm, KVM_CAP_XSAVE2);
-
-	if (size) {
-		state->xsave = malloc(size);
-		vcpu_xsave2_get(vcpu, state->xsave);
-	} else {
-		state->xsave = malloc(sizeof(struct kvm_xsave));
-		vcpu_xsave_get(vcpu, state->xsave);
-	}
-}
-
-struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct kvm_msr_list *msr_list = kvm_get_msr_index_list();
 	struct kvm_x86_state *state;
 	int i;
@@ -1062,7 +979,6 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu)
 	vcpu_run_complete_io(vcpu);
 
 	state = malloc(sizeof(*state) + msr_list->nmsrs * sizeof(state->msrs.entries[0]));
-<<<<<<< HEAD
 
 	vcpu_events_get(vcpu, &state->events);
 	vcpu_mp_state_get(vcpu, &state->mp_state);
@@ -1072,17 +988,6 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu)
 	if (kvm_has_cap(KVM_CAP_XCRS))
 		vcpu_xcrs_get(vcpu, &state->xcrs);
 
-=======
-
-	vcpu_events_get(vcpu, &state->events);
-	vcpu_mp_state_get(vcpu, &state->mp_state);
-	vcpu_regs_get(vcpu, &state->regs);
-	vcpu_save_xsave_state(vcpu, state);
-
-	if (kvm_has_cap(KVM_CAP_XCRS))
-		vcpu_xcrs_get(vcpu, &state->xcrs);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vcpu_sregs_get(vcpu, &state->sregs);
 
 	if (nested_size) {
@@ -1403,27 +1308,9 @@ done:
 /* Returns true if kvm_intel was loaded with unrestricted_guest=1. */
 bool vm_is_unrestricted_guest(struct kvm_vm *vm)
 {
-<<<<<<< HEAD
-=======
-	char val = 'N';
-	size_t count;
-	FILE *f;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Ensure that a KVM vendor-specific module is loaded. */
 	if (vm == NULL)
 		close(open_kvm_dev_path_or_exit());
 
-<<<<<<< HEAD
 	return get_kvm_intel_param_bool("unrestricted_guest");
-=======
-	f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
-	if (f) {
-		count = fread(&val, sizeof(char), 1, f);
-		TEST_ASSERT(count == 1, "Unable to read from param file.");
-		fclose(f);
-	}
-
-	return val == 'Y';
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

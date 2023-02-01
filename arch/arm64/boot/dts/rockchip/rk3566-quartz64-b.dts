@@ -4,10 +4,7 @@
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pinctrl/rockchip.h>
-<<<<<<< HEAD
 #include <dt-bindings/soc/rockchip,vop2.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "rk3566.dtsi"
 
 / {
@@ -32,7 +29,6 @@
 		#clock-cells = <0>;
 	};
 
-<<<<<<< HEAD
 	hdmi-con {
 		compatible = "hdmi-connector";
 		type = "a";
@@ -44,8 +40,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	leds {
 		compatible = "gpio-leds";
 
@@ -60,7 +54,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	sound {
 		compatible = "simple-audio-card";
 		simple-audio-card,format = "i2s";
@@ -76,8 +69,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sdio_pwrseq: sdio-pwrseq {
 		status = "okay";
 		compatible = "mmc-pwrseq-simple";
@@ -90,7 +81,6 @@
 		power-off-delay-us = <5000000>;
 	};
 
-<<<<<<< HEAD
 	vcc3v3_pcie_p: vcc3v3-pcie-p-regulator {
 		compatible = "regulator-fixed";
 		enable-active-high;
@@ -103,8 +93,6 @@
 		vin-supply = <&vcc_3v3>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vcc5v0_in: vcc5v0-in-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_in";
@@ -164,13 +152,10 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &combphy2 {
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &cpu0 {
 	cpu-supply = <&vdd_cpu>;
 };
@@ -210,7 +195,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &gpu {
 	mali-supply = <&vdd_gpu>;
 	status = "okay";
@@ -238,8 +222,6 @@
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &i2c0 {
 	status = "okay";
 
@@ -265,7 +247,6 @@
 		reg = <0x20>;
 		interrupt-parent = <&gpio0>;
 		interrupts = <RK_PA3 IRQ_TYPE_LEVEL_LOW>;
-<<<<<<< HEAD
 		assigned-clocks = <&cru I2S1_MCLKOUT_TX>;
 		assigned-clock-parents = <&cru CLK_I2S1_8CH_TX>;
 		clock-names = "mclk";
@@ -276,13 +257,6 @@
 		pinctrl-0 = <&pmic_int>, <&i2s1m0_mclk>;
 		rockchip,system-power-controller;
 		#sound-dai-cells = <0>;
-=======
-		clock-output-names = "rk808-clkout1", "rk808-clkout2";
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&pmic_int>;
-		rockchip,system-power-controller;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		wakeup-source;
 		#clock-cells = <1>;
 
@@ -521,7 +495,6 @@
 	status = "disabled";
 };
 
-<<<<<<< HEAD
 &i2s0_8ch {
 	status = "okay";
 };
@@ -536,8 +509,6 @@
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &mdio1 {
 	rgmii_phy1: ethernet-phy@1 {
 		compatible = "ethernet-phy-ieee802.3-c22";
@@ -545,7 +516,6 @@
 	};
 };
 
-<<<<<<< HEAD
 &pcie2x1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie_reset_h>;
@@ -554,8 +524,6 @@
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &pinctrl {
 	bt {
 		bt_enable_h: bt-enable-h {
@@ -577,7 +545,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	pcie {
 		pcie_enable_h: pcie-enable-h {
 			rockchip,pins = <0 RK_PA6 RK_FUNC_GPIO &pcfg_pull_none>;
@@ -588,8 +555,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pmic {
 		pmic_int: pmic_int {
 			rockchip,pins =
@@ -648,11 +613,7 @@
 	disable-wp;
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdmmc0_bus4 &sdmmc0_clk &sdmmc0_cmd &sdmmc0_det>;
-<<<<<<< HEAD
 	sd-uhs-sdr50;
-=======
-	sd-uhs-sdr104;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vmmc-supply = <&vcc3v3_sd>;
 	vqmmc-supply = <&vccio_sd>;
 	status = "okay";
@@ -759,7 +720,6 @@
 &usb_host0_ohci {
 	status = "okay";
 };
-<<<<<<< HEAD
 
 &vop {
 	assigned-clocks = <&cru DCLK_VOP0>, <&cru DCLK_VOP1>;
@@ -777,5 +737,3 @@
 		remote-endpoint = <&hdmi_in_vp0>;
 	};
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

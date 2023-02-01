@@ -30,10 +30,7 @@ enum AMDGPU_RESET_FLAGS {
 
 	AMDGPU_NEED_FULL_RESET = 0,
 	AMDGPU_SKIP_HW_RESET = 1,
-<<<<<<< HEAD
 	AMDGPU_RESET_FOR_DEVICE_REMOVE = 2,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct amdgpu_reset_context {
@@ -115,12 +112,8 @@ static inline bool amdgpu_reset_get_reset_domain(struct amdgpu_reset_domain *dom
 
 static inline void amdgpu_reset_put_reset_domain(struct amdgpu_reset_domain *domain)
 {
-<<<<<<< HEAD
 	if (domain)
 		kref_put(&domain->refcount, amdgpu_reset_destroy_reset_domain);
-=======
-	kref_put(&domain->refcount, amdgpu_reset_destroy_reset_domain);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool amdgpu_reset_domain_schedule(struct amdgpu_reset_domain *domain,

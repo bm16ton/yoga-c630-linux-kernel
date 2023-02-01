@@ -1,11 +1,7 @@
 /*******************************************************************
  * This file is part of the Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
-<<<<<<< HEAD
  * Copyright (C) 2017-2022 Broadcom. All Rights Reserved. The term *
-=======
- * Copyright (C) 2017-2021 Broadcom. All Rights Reserved. The term *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
  * Copyright (C) 2004-2013 Emulex.  All rights reserved.           *
  * EMULEX and SLI are trademarks of Emulex.                        *

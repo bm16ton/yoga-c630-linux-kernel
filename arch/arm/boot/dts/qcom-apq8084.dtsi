@@ -419,11 +419,7 @@
 			status = "disabled";
 		};
 
-<<<<<<< HEAD
 		sdhc_1: mmc@f9824900 {
-=======
-		mmc@f9824900 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,apq8084-sdhci", "qcom,sdhci-msm-v4";
 			reg = <0xf9824900 0x11c>, <0xf9824000 0x800>;
 			reg-names = "hc", "core";
@@ -436,11 +432,7 @@
 			status = "disabled";
 		};
 
-<<<<<<< HEAD
 		sdhc_2: mmc@f98a4900 {
-=======
-		mmc@f98a4900 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,apq8084-sdhci", "qcom,sdhci-msm-v4";
 			reg = <0xf98a4900 0x11c>, <0xf98a4000 0x800>;
 			reg-names = "hc", "core";

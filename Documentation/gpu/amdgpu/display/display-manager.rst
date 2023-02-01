@@ -40,7 +40,6 @@ Atomic Implementation
 
 .. kernel-doc:: drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
    :functions: amdgpu_dm_atomic_check amdgpu_dm_atomic_commit_tail
-<<<<<<< HEAD
 
 Color Management Properties
 ===========================
@@ -182,5 +181,3 @@ following path:
 2. On DC interface, :c:type:`struct mpcc_blnd_cfg <mpcc_blnd_cfg>` programs the
    MPCC blend configuration considering the :c:type:`dc_plane_info
    <dc_plane_info>` input from DPP.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

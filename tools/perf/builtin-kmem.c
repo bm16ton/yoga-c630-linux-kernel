@@ -200,14 +200,8 @@ static int evsel__process_alloc_event(struct evsel *evsel, struct perf_sample *s
 	if (evsel__field(evsel, "node")) {
 		int node1, node2;
 
-<<<<<<< HEAD
 		node1 = cpu__get_node((struct perf_cpu){.cpu = sample->cpu});
 		node2 = evsel__intval(evsel, sample, "node");
-=======
-	if (!ret) {
-		int node1 = cpu__get_node((struct perf_cpu){.cpu = sample->cpu}),
-		    node2 = evsel__intval(evsel, sample, "node");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * If the field "node" is NUMA_NO_NODE (-1), we don't take it

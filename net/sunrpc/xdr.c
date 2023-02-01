@@ -947,7 +947,6 @@ void xdr_init_encode(struct xdr_stream *xdr, struct xdr_buf *buf, __be32 *p,
 EXPORT_SYMBOL_GPL(xdr_init_encode);
 
 /**
-<<<<<<< HEAD
  * xdr_init_encode_pages - Initialize an xdr_stream for encoding into pages
  * @xdr: pointer to xdr_stream struct
  * @buf: pointer to XDR buffer into which to encode data
@@ -970,8 +969,6 @@ void xdr_init_encode_pages(struct xdr_stream *xdr, struct xdr_buf *buf,
 EXPORT_SYMBOL_GPL(xdr_init_encode_pages);
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * __xdr_commit_encode - Ensure all data is written to buffer
  * @xdr: pointer to xdr_stream
  *

@@ -240,14 +240,7 @@ static int sdma_v5_0_init_microcode(struct amdgpu_device *adev)
 {
 	const char *chip_name;
 	char fw_name[40];
-<<<<<<< HEAD
 	int ret, i;
-=======
-	int err = 0, i;
-	struct amdgpu_firmware_info *info = NULL;
-	const struct common_firmware_header *header = NULL;
-	const struct sdma_firmware_header_v1_0 *hdr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (amdgpu_sriov_vf(adev) && (adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(5, 0, 5)))
 		return 0;

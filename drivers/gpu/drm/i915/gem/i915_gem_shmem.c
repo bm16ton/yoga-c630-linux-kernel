@@ -73,19 +73,11 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
 	 * object, bail early.
 	 */
 	if (size > resource_size(&mr->region))
-<<<<<<< HEAD
 		return -ENOMEM;
 
 	if (sg_alloc_table(st, page_count, GFP_KERNEL | __GFP_NOWARN))
 		return -ENOMEM;
 
-=======
-		return -ENOMEM;
-
-	if (sg_alloc_table(st, page_count, GFP_KERNEL))
-		return -ENOMEM;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Get the list of pages out of our struct file.  They'll be pinned
 	 * at this point until we release them.
@@ -217,11 +209,7 @@ static int shmem_get_pages(struct drm_i915_gem_object *obj)
 	GEM_BUG_ON(obj->write_domain & I915_GEM_GPU_DOMAINS);
 
 rebuild_st:
-<<<<<<< HEAD
 	st = kmalloc(sizeof(*st), GFP_KERNEL | __GFP_NOWARN);
-=======
-	st = kmalloc(sizeof(*st), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!st)
 		return -ENOMEM;
 

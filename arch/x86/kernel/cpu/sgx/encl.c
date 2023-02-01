@@ -12,12 +12,9 @@
 #include "encls.h"
 #include "sgx.h"
 
-<<<<<<< HEAD
 static int sgx_encl_lookup_backing(struct sgx_encl *encl, unsigned long page_index,
 			    struct sgx_backing *backing);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PCMDS_PER_PAGE (PAGE_SIZE / sizeof(struct sgx_pcmd))
 /*
  * 32 PCMD entries share a PCMD page. PCMD_FIRST_MASK is used to
@@ -350,16 +347,11 @@ static vm_fault_t sgx_encl_eaug_page(struct vm_area_struct *vma,
 	}
 
 	va_page = sgx_encl_grow(encl, false);
-<<<<<<< HEAD
 	if (IS_ERR(va_page)) {
 		if (PTR_ERR(va_page) == -EBUSY)
 			vmret = VM_FAULT_NOPAGE;
 		goto err_out_epc;
 	}
-=======
-	if (IS_ERR(va_page))
-		goto err_out_epc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (va_page)
 		list_add(&va_page->list, &encl->va_pages);
@@ -711,7 +703,6 @@ void sgx_encl_release(struct kref *ref)
 		}
 
 		kfree(entry);
-<<<<<<< HEAD
 		/*
 		 * Invoke scheduler on every XA_CHECK_SCHED iteration
 		 * to prevent soft lockups.
@@ -724,10 +715,6 @@ void sgx_encl_release(struct kref *ref)
 
 			xas_lock(&xas);
 		}
-=======
-		/* Invoke scheduler to prevent soft lockups. */
-		cond_resched();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	xas_unlock(&xas);
 
@@ -959,11 +946,7 @@ static struct page *sgx_encl_get_backing_page(struct sgx_encl *encl,
  *   0 on success,
  *   -errno otherwise.
  */
-<<<<<<< HEAD
 static int __sgx_encl_get_backing(struct sgx_encl *encl, unsigned long page_index,
-=======
-static int sgx_encl_get_backing(struct sgx_encl *encl, unsigned long page_index,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 struct sgx_backing *backing)
 {
 	pgoff_t page_pcmd_off = sgx_encl_get_backing_page_pcmd_offset(encl, page_index);
@@ -1038,7 +1021,6 @@ static struct mem_cgroup *sgx_encl_get_mem_cgroup(struct sgx_encl *encl)
 }
 
 /**
-<<<<<<< HEAD
  * sgx_encl_alloc_backing() - create a new backing storage page
  * @encl:	an enclave pointer
  * @page_index:	enclave page index
@@ -1072,76 +1054,27 @@ int sgx_encl_alloc_backing(struct sgx_encl *encl, unsigned long page_index,
 
 /**
  * sgx_encl_lookup_backing() - retrieve an existing backing storage page
-=======
- * sgx_encl_alloc_backing() - allocate a new backing storage page
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @encl:	an enclave pointer
  * @page_index:	enclave page index
  * @backing:	data for accessing backing storage for the page
  *
-<<<<<<< HEAD
  * Retrieve a backing page for loading data back into an EPC page with ELDU.
  * It is the caller's responsibility to ensure that it is appropriate to use
  * sgx_encl_lookup_backing() rather than sgx_encl_alloc_backing(). If lookup is
  * not used correctly, this will cause an allocation which is not accounted for.
  * This function takes a reference on an existing backing page which must be
  * dropped with a corresponding call to sgx_encl_put_backing().
-=======
- * When called from ksgxd, sets the active memcg from one of the
- * mms in the enclave's mm_list prior to any backing page allocation,
- * in order to ensure that shmem page allocations are charged to the
- * enclave.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Return:
  *   0 on success,
  *   -errno otherwise.
  */
-<<<<<<< HEAD
 static int sgx_encl_lookup_backing(struct sgx_encl *encl, unsigned long page_index,
 			   struct sgx_backing *backing)
 {
 	return __sgx_encl_get_backing(encl, page_index, backing);
 }
 
-=======
-int sgx_encl_alloc_backing(struct sgx_encl *encl, unsigned long page_index,
-			   struct sgx_backing *backing)
-{
-	struct mem_cgroup *encl_memcg = sgx_encl_get_mem_cgroup(encl);
-	struct mem_cgroup *memcg = set_active_memcg(encl_memcg);
-	int ret;
-
-	ret = sgx_encl_get_backing(encl, page_index, backing);
-
-	set_active_memcg(memcg);
-	mem_cgroup_put(encl_memcg);
-
-	return ret;
-}
-
-/**
- * sgx_encl_lookup_backing() - retrieve an existing backing storage page
- * @encl:	an enclave pointer
- * @page_index:	enclave page index
- * @backing:	data for accessing backing storage for the page
- *
- * Retrieve a backing page for loading data back into an EPC page with ELDU.
- * It is the caller's responsibility to ensure that it is appropriate to use
- * sgx_encl_lookup_backing() rather than sgx_encl_alloc_backing(). If lookup is
- * not used correctly, this will cause an allocation which is not accounted for.
- *
- * Return:
- *   0 on success,
- *   -errno otherwise.
- */
-int sgx_encl_lookup_backing(struct sgx_encl *encl, unsigned long page_index,
-			   struct sgx_backing *backing)
-{
-	return sgx_encl_get_backing(encl, page_index, backing);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * sgx_encl_put_backing() - Unpin the backing storage
  * @backing:	data for accessing backing storage for the page

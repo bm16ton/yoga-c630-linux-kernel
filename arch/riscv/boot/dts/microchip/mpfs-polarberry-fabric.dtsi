@@ -13,7 +13,6 @@
 		#clock-cells = <0>;
 		clock-frequency = <125000000>;
 	};
-<<<<<<< HEAD
 
 	pcie: pcie@2000000000 {
 		compatible = "microchip,pcie-host-1.0";
@@ -43,6 +42,4 @@
 			interrupt-controller;
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

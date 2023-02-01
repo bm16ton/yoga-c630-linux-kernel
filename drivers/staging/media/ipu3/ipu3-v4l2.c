@@ -222,27 +222,12 @@ static int imgu_subdev_get_selection(struct v4l2_subdev *sd,
 
 	switch (sel->target) {
 	case V4L2_SEL_TGT_CROP:
-<<<<<<< HEAD
 		sel->r = *imgu_subdev_get_crop(imgu_sd, sd_state, sel->pad,
 					       sel->which);
 		return 0;
 	case V4L2_SEL_TGT_COMPOSE:
 		sel->r = *imgu_subdev_get_compose(imgu_sd, sd_state, sel->pad,
 						  sel->which);
-=======
-		if (sel->which == V4L2_SUBDEV_FORMAT_TRY)
-			sel->r = *v4l2_subdev_get_try_crop(sd, sd_state,
-							   sel->pad);
-		else
-			sel->r = imgu_sd->rect.eff;
-		return 0;
-	case V4L2_SEL_TGT_COMPOSE:
-		if (sel->which == V4L2_SUBDEV_FORMAT_TRY)
-			sel->r = *v4l2_subdev_get_try_compose(sd, sd_state,
-							      sel->pad);
-		else
-			sel->r = imgu_sd->rect.bds;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	default:
 		return -EINVAL;
@@ -268,21 +253,12 @@ static int imgu_subdev_set_selection(struct v4l2_subdev *sd,
 
 	switch (sel->target) {
 	case V4L2_SEL_TGT_CROP:
-<<<<<<< HEAD
 		rect = imgu_subdev_get_crop(imgu_sd, sd_state, sel->pad,
 					    sel->which);
 		break;
 	case V4L2_SEL_TGT_COMPOSE:
 		rect = imgu_subdev_get_compose(imgu_sd, sd_state, sel->pad,
 					       sel->which);
-=======
-		try_sel = v4l2_subdev_get_try_crop(sd, sd_state, sel->pad);
-		rect = &imgu_sd->rect.eff;
-		break;
-	case V4L2_SEL_TGT_COMPOSE:
-		try_sel = v4l2_subdev_get_try_compose(sd, sd_state, sel->pad);
-		rect = &imgu_sd->rect.bds;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		return -EINVAL;
@@ -518,11 +494,7 @@ static int imgu_vb2_start_streaming(struct vb2_queue *vq, unsigned int count)
 	pipe = node->pipe;
 	imgu_pipe = &imgu->imgu_pipe[pipe];
 	atomic_set(&node->sequence, 0);
-<<<<<<< HEAD
 	r = video_device_pipeline_start(&node->vdev, &imgu_pipe->pipeline);
-=======
-	r = media_pipeline_start(&node->vdev.entity, &imgu_pipe->pipeline);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (r < 0)
 		goto fail_return_bufs;
 

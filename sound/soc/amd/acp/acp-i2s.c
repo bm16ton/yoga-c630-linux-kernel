@@ -25,7 +25,6 @@
 
 #define DRV_NAME "acp_i2s_playcap"
 
-<<<<<<< HEAD
 static int acp_i2s_set_fmt(struct snd_soc_dai *cpu_dai,
 			   unsigned int fmt)
 {
@@ -85,14 +84,11 @@ static int acp_i2s_set_tdm_slot(struct snd_soc_dai *dai, u32 tx_mask, u32 rx_mas
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_hw_params *params,
 			    struct snd_soc_dai *dai)
 {
 	struct device *dev = dai->component->dev;
 	struct acp_dev_data *adata;
-<<<<<<< HEAD
 	struct acp_resource *rsrc;
 	u32 val;
 	u32 xfer_resolution;
@@ -101,13 +97,6 @@ static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_
 
 	adata = snd_soc_dai_get_drvdata(dai);
 	rsrc = adata->rsrc;
-=======
-	u32 val;
-	u32 xfer_resolution;
-	u32 reg_val;
-
-	adata = snd_soc_dai_get_drvdata(dai);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* These values are as per Hardware Spec */
 	switch (params_format(params)) {
@@ -132,7 +121,6 @@ static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_
 		switch (dai->driver->id) {
 		case I2S_BT_INSTANCE:
 			reg_val = ACP_BTTDM_ITER;
-<<<<<<< HEAD
 			fmt_reg = ACP_BTTDM_TXFRMT;
 			break;
 		case I2S_SP_INSTANCE:
@@ -142,11 +130,6 @@ static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_
 		case I2S_HS_INSTANCE:
 			reg_val = ACP_HSTDM_ITER;
 			fmt_reg = ACP_HSTDM_TXFRMT;
-=======
-			break;
-		case I2S_SP_INSTANCE:
-			reg_val = ACP_I2STDM_ITER;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		default:
 			dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
@@ -156,7 +139,6 @@ static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_
 		switch (dai->driver->id) {
 		case I2S_BT_INSTANCE:
 			reg_val = ACP_BTTDM_IRER;
-<<<<<<< HEAD
 			fmt_reg = ACP_BTTDM_RXFRMT;
 			break;
 		case I2S_SP_INSTANCE:
@@ -166,11 +148,6 @@ static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_
 		case I2S_HS_INSTANCE:
 			reg_val = ACP_HSTDM_IRER;
 			fmt_reg = ACP_HSTDM_RXFRMT;
-=======
-			break;
-		case I2S_SP_INSTANCE:
-			reg_val = ACP_I2STDM_IRER;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		default:
 			dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
@@ -183,7 +160,6 @@ static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_
 	val = val | (xfer_resolution  << 3);
 	writel(val, adata->acp_base + reg_val);
 
-<<<<<<< HEAD
 	if (adata->tdm_mode) {
 		val = readl(adata->acp_base + reg_val);
 		writel(val | BIT(1), adata->acp_base + reg_val);
@@ -262,8 +238,6 @@ static int acp_i2s_hwparams(struct snd_pcm_substream *substream, struct snd_pcm_
 		adata->lrclk_div = lrclk_div_val;
 		adata->bclk_div = bclk_div_val;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -272,10 +246,7 @@ static int acp_i2s_trigger(struct snd_pcm_substream *substream, int cmd, struct 
 	struct acp_stream *stream = substream->runtime->private_data;
 	struct device *dev = dai->component->dev;
 	struct acp_dev_data *adata = dev_get_drvdata(dev);
-<<<<<<< HEAD
 	struct acp_resource *rsrc = adata->rsrc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val, period_bytes, reg_val, ier_val, water_val, buf_size, buf_reg;
 
 	period_bytes = frames_to_bytes(substream->runtime, substream->runtime->period_size);
@@ -300,15 +271,12 @@ static int acp_i2s_trigger(struct snd_pcm_substream *substream, int cmd, struct 
 				ier_val = ACP_I2STDM_IER;
 				buf_reg = ACP_I2S_TX_RINGBUFSIZE;
 				break;
-<<<<<<< HEAD
 			case I2S_HS_INSTANCE:
 				water_val = ACP_HS_TX_INTR_WATERMARK_SIZE;
 				reg_val = ACP_HSTDM_ITER;
 				ier_val = ACP_HSTDM_IER;
 				buf_reg = ACP_HS_TX_RINGBUFSIZE;
 				break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			default:
 				dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
 				return -EINVAL;
@@ -327,15 +295,12 @@ static int acp_i2s_trigger(struct snd_pcm_substream *substream, int cmd, struct 
 				ier_val = ACP_I2STDM_IER;
 				buf_reg = ACP_I2S_RX_RINGBUFSIZE;
 				break;
-<<<<<<< HEAD
 			case I2S_HS_INSTANCE:
 				water_val = ACP_HS_RX_INTR_WATERMARK_SIZE;
 				reg_val = ACP_HSTDM_IRER;
 				ier_val = ACP_HSTDM_IER;
 				buf_reg = ACP_HS_RX_RINGBUFSIZE;
 				break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			default:
 				dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
 				return -EINVAL;
@@ -347,11 +312,8 @@ static int acp_i2s_trigger(struct snd_pcm_substream *substream, int cmd, struct 
 		val = val | BIT(0);
 		writel(val, adata->acp_base + reg_val);
 		writel(1, adata->acp_base + ier_val);
-<<<<<<< HEAD
 		if (rsrc->soc_mclk)
 			acp_set_i2s_clk(adata, dai->driver->id);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	case SNDRV_PCM_TRIGGER_STOP:
 	case SNDRV_PCM_TRIGGER_SUSPEND:
@@ -364,12 +326,9 @@ static int acp_i2s_trigger(struct snd_pcm_substream *substream, int cmd, struct 
 			case I2S_SP_INSTANCE:
 				reg_val = ACP_I2STDM_ITER;
 				break;
-<<<<<<< HEAD
 			case I2S_HS_INSTANCE:
 				reg_val = ACP_HSTDM_ITER;
 				break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			default:
 				dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
 				return -EINVAL;
@@ -383,12 +342,9 @@ static int acp_i2s_trigger(struct snd_pcm_substream *substream, int cmd, struct 
 			case I2S_SP_INSTANCE:
 				reg_val = ACP_I2STDM_IRER;
 				break;
-<<<<<<< HEAD
 			case I2S_HS_INSTANCE:
 				reg_val = ACP_HSTDM_IRER;
 				break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			default:
 				dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
 				return -EINVAL;
@@ -404,12 +360,9 @@ static int acp_i2s_trigger(struct snd_pcm_substream *substream, int cmd, struct 
 		if (!(readl(adata->acp_base + ACP_I2STDM_ITER) & BIT(0)) &&
 		    !(readl(adata->acp_base + ACP_I2STDM_IRER) & BIT(0)))
 			writel(0, adata->acp_base + ACP_I2STDM_IER);
-<<<<<<< HEAD
 		if (!(readl(adata->acp_base + ACP_HSTDM_ITER) & BIT(0)) &&
 		    !(readl(adata->acp_base + ACP_HSTDM_IRER) & BIT(0)))
 			writel(0, adata->acp_base + ACP_HSTDM_IER);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	default:
 		return -EINVAL;
@@ -422,10 +375,7 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 {
 	struct device *dev = dai->component->dev;
 	struct acp_dev_data *adata = dev_get_drvdata(dev);
-<<<<<<< HEAD
 	struct acp_resource *rsrc = adata->rsrc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct acp_stream *stream = substream->runtime->private_data;
 	u32 reg_dma_size = 0, reg_fifo_size = 0, reg_fifo_addr = 0;
 	u32 phy_addr = 0, acp_fifo_addr = 0, ext_int_ctrl;
@@ -435,11 +385,7 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 	case I2S_SP_INSTANCE:
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK) {
 			reg_dma_size = ACP_I2S_TX_DMA_SIZE;
-<<<<<<< HEAD
 			acp_fifo_addr = rsrc->sram_pte_offset +
-=======
-			acp_fifo_addr = ACP_SRAM_PTE_OFFSET +
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						SP_PB_FIFO_ADDR_OFFSET;
 			reg_fifo_addr =	ACP_I2S_TX_FIFOADDR;
 			reg_fifo_size = ACP_I2S_TX_FIFOSIZE;
@@ -448,11 +394,7 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 			writel(phy_addr, adata->acp_base + ACP_I2S_TX_RINGBUFADDR);
 		} else {
 			reg_dma_size = ACP_I2S_RX_DMA_SIZE;
-<<<<<<< HEAD
 			acp_fifo_addr = rsrc->sram_pte_offset +
-=======
-			acp_fifo_addr = ACP_SRAM_PTE_OFFSET +
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						SP_CAPT_FIFO_ADDR_OFFSET;
 			reg_fifo_addr = ACP_I2S_RX_FIFOADDR;
 			reg_fifo_size = ACP_I2S_RX_FIFOSIZE;
@@ -463,11 +405,7 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 	case I2S_BT_INSTANCE:
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK) {
 			reg_dma_size = ACP_BT_TX_DMA_SIZE;
-<<<<<<< HEAD
 			acp_fifo_addr = rsrc->sram_pte_offset +
-=======
-			acp_fifo_addr = ACP_SRAM_PTE_OFFSET +
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						BT_PB_FIFO_ADDR_OFFSET;
 			reg_fifo_addr = ACP_BT_TX_FIFOADDR;
 			reg_fifo_size = ACP_BT_TX_FIFOSIZE;
@@ -476,11 +414,7 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 			writel(phy_addr, adata->acp_base + ACP_BT_TX_RINGBUFADDR);
 		} else {
 			reg_dma_size = ACP_BT_RX_DMA_SIZE;
-<<<<<<< HEAD
 			acp_fifo_addr = rsrc->sram_pte_offset +
-=======
-			acp_fifo_addr = ACP_SRAM_PTE_OFFSET +
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						BT_CAPT_FIFO_ADDR_OFFSET;
 			reg_fifo_addr = ACP_BT_RX_FIFOADDR;
 			reg_fifo_size = ACP_BT_RX_FIFOSIZE;
@@ -489,7 +423,6 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 			writel(phy_addr, adata->acp_base + ACP_BT_RX_RINGBUFADDR);
 		}
 		break;
-<<<<<<< HEAD
 	case I2S_HS_INSTANCE:
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK) {
 			reg_dma_size = ACP_HS_TX_DMA_SIZE;
@@ -511,8 +444,6 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 			writel(phy_addr, adata->acp_base + ACP_HS_RX_RINGBUFADDR);
 		}
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
 		return -EINVAL;
@@ -522,7 +453,6 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 	writel(acp_fifo_addr, adata->acp_base + reg_fifo_addr);
 	writel(FIFO_SIZE, adata->acp_base + reg_fifo_size);
 
-<<<<<<< HEAD
 	ext_int_ctrl = readl(ACP_EXTERNAL_INTR_CNTL(adata, rsrc->irqp_used));
 	ext_int_ctrl |= BIT(I2S_RX_THRESHOLD(rsrc->offset)) |
 			BIT(BT_RX_THRESHOLD(rsrc->offset)) |
@@ -532,13 +462,6 @@ static int acp_i2s_prepare(struct snd_pcm_substream *substream, struct snd_soc_d
 			BIT(HS_TX_THRESHOLD(rsrc->offset));
 
 	writel(ext_int_ctrl, ACP_EXTERNAL_INTR_CNTL(adata, rsrc->irqp_used));
-=======
-	ext_int_ctrl = readl(adata->acp_base + ACP_EXTERNAL_INTR_CNTL);
-	ext_int_ctrl |= BIT(I2S_RX_THRESHOLD) | BIT(BT_RX_THRESHOLD)
-			| BIT(I2S_TX_THRESHOLD) | BIT(BT_TX_THRESHOLD);
-
-	writel(ext_int_ctrl, adata->acp_base + ACP_EXTERNAL_INTR_CNTL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -547,54 +470,34 @@ static int acp_i2s_startup(struct snd_pcm_substream *substream, struct snd_soc_d
 {
 	struct acp_stream *stream = substream->runtime->private_data;
 	struct device *dev = dai->component->dev;
-<<<<<<< HEAD
 	struct acp_dev_data *adata = dev_get_drvdata(dev);
 	struct acp_resource *rsrc = adata->rsrc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int dir = substream->stream;
 	unsigned int irq_bit = 0;
 
 	switch (dai->driver->id) {
 	case I2S_SP_INSTANCE:
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK) {
-<<<<<<< HEAD
 			irq_bit = BIT(I2S_TX_THRESHOLD(rsrc->offset));
 			stream->pte_offset = ACP_SRAM_SP_PB_PTE_OFFSET;
 			stream->fifo_offset = SP_PB_FIFO_ADDR_OFFSET;
 		} else {
 			irq_bit = BIT(I2S_RX_THRESHOLD(rsrc->offset));
-=======
-			irq_bit = BIT(I2S_TX_THRESHOLD);
-			stream->pte_offset = ACP_SRAM_SP_PB_PTE_OFFSET;
-			stream->fifo_offset = SP_PB_FIFO_ADDR_OFFSET;
-		} else {
-			irq_bit = BIT(I2S_RX_THRESHOLD);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			stream->pte_offset = ACP_SRAM_SP_CP_PTE_OFFSET;
 			stream->fifo_offset = SP_CAPT_FIFO_ADDR_OFFSET;
 		}
 		break;
 	case I2S_BT_INSTANCE:
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK) {
-<<<<<<< HEAD
 			irq_bit = BIT(BT_TX_THRESHOLD(rsrc->offset));
 			stream->pte_offset = ACP_SRAM_BT_PB_PTE_OFFSET;
 			stream->fifo_offset = BT_PB_FIFO_ADDR_OFFSET;
 		} else {
 			irq_bit = BIT(BT_RX_THRESHOLD(rsrc->offset));
-=======
-			irq_bit = BIT(BT_TX_THRESHOLD);
-			stream->pte_offset = ACP_SRAM_BT_PB_PTE_OFFSET;
-			stream->fifo_offset = BT_PB_FIFO_ADDR_OFFSET;
-		} else {
-			irq_bit = BIT(BT_RX_THRESHOLD);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			stream->pte_offset = ACP_SRAM_BT_CP_PTE_OFFSET;
 			stream->fifo_offset = BT_CAPT_FIFO_ADDR_OFFSET;
 		}
 		break;
-<<<<<<< HEAD
 	case I2S_HS_INSTANCE:
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK) {
 			irq_bit = BIT(HS_TX_THRESHOLD(rsrc->offset));
@@ -606,8 +509,6 @@ static int acp_i2s_startup(struct snd_pcm_substream *substream, struct snd_soc_d
 			stream->fifo_offset = HS_CAPT_FIFO_ADDR_OFFSET;
 		}
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		dev_err(dev, "Invalid dai id %x\n", dai->driver->id);
 		return -EINVAL;
@@ -617,10 +518,7 @@ static int acp_i2s_startup(struct snd_pcm_substream *substream, struct snd_soc_d
 	stream->id = dai->driver->id + dir;
 	stream->dai_id = dai->driver->id;
 	stream->irq_bit = irq_bit;
-<<<<<<< HEAD
 	stream->dir = substream->stream;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -630,11 +528,8 @@ const struct snd_soc_dai_ops asoc_acp_cpu_dai_ops = {
 	.hw_params = acp_i2s_hwparams,
 	.prepare = acp_i2s_prepare,
 	.trigger = acp_i2s_trigger,
-<<<<<<< HEAD
 	.set_fmt = acp_i2s_set_fmt,
 	.set_tdm_slot = acp_i2s_set_tdm_slot,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS_GPL(asoc_acp_cpu_dai_ops, SND_SOC_ACP_COMMON);
 
@@ -642,10 +537,7 @@ int asoc_acp_i2s_probe(struct snd_soc_dai *dai)
 {
 	struct device *dev = dai->component->dev;
 	struct acp_dev_data *adata = dev_get_drvdata(dev);
-<<<<<<< HEAD
 	struct acp_resource *rsrc = adata->rsrc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int val;
 
 	if (!adata->acp_base) {
@@ -653,13 +545,8 @@ int asoc_acp_i2s_probe(struct snd_soc_dai *dai)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	val = readl(adata->acp_base + rsrc->i2s_pin_cfg_offset);
 	if (val != rsrc->i2s_mode) {
-=======
-	val = readl(adata->acp_base + ACP_I2S_PIN_CONFIG);
-	if (val != I2S_MODE) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(dev, "I2S Mode not supported val %x\n", val);
 		return -EINVAL;
 	}

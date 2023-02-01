@@ -41,7 +41,6 @@
 		vin-supply = <&reg_3p3v_s5>;
 	};
 
-<<<<<<< HEAD
 	reg_3p3v_s0: regulator-3p3v-s0 {
 		compatible = "regulator-fixed";
 		regulator-name = "V_3V3_S0";
@@ -52,8 +51,6 @@
 		vin-supply = <&reg_3p3v_s5>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	reg_3p3v_s5: regulator-3p3v-s5 {
 		compatible = "regulator-fixed";
 		regulator-name = "V_3V3_S5";
@@ -276,10 +273,6 @@
 			reset-assert-us = <1000>;
 		};
 	};
-};
-
-&hdmi {
-	ddc-i2c-bus = <&i2c2>;
 };
 
 &hdmi {

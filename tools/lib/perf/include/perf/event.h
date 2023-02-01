@@ -6,7 +6,6 @@
 #include <linux/types.h>
 #include <linux/limits.h>
 #include <linux/bpf.h>
-#include <linux/compiler.h>
 #include <sys/types.h> /* pid_t */
 
 #define event_contains(obj, mem) ((obj).header.size > offsetof(typeof(obj), mem))
@@ -185,7 +184,6 @@ struct perf_record_mask_cpu_map64 {
 	char                     __pad[4];
 	/* Bitmap data. */
 	__u64			 mask[];
-<<<<<<< HEAD
 };
 
 /*
@@ -206,20 +204,9 @@ struct perf_record_range_cpu_map {
 	__u8 __pad;
 	__u16 start_cpu;
 	__u16 end_cpu;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
-/*
- * 'struct perf_record_cpu_map_data' is packed as unfortunately an earlier
- * version had unaligned data and we wish to retain file format compatibility.
- * -irogers
- */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpacked"
-#pragma GCC diagnostic ignored "-Wattributes"
-
-struct __packed perf_record_cpu_map_data {
+struct perf_record_cpu_map_data {
 	__u16			 type;
 	union {
 		/* Used when type == PERF_CPU_MAP__CPUS. */
@@ -228,17 +215,10 @@ struct __packed perf_record_cpu_map_data {
 		struct perf_record_mask_cpu_map32 mask32_data;
 		/* Used when type == PERF_CPU_MAP__MASK and long_size == 8. */
 		struct perf_record_mask_cpu_map64 mask64_data;
-<<<<<<< HEAD
 		/* Used when type == PERF_CPU_MAP__RANGE_CPUS. */
 		struct perf_record_range_cpu_map range_cpu_data;
 	};
 } __attribute__((packed));
-
-#pragma GCC diagnostic pop
-=======
-	};
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #pragma GCC diagnostic pop
 

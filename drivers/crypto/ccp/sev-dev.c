@@ -211,7 +211,6 @@ static int sev_read_init_ex_file(void)
 	if (IS_ERR(fp)) {
 		int ret = PTR_ERR(fp);
 
-<<<<<<< HEAD
 		if (ret == -ENOENT) {
 			dev_info(sev->dev,
 				"SEV: %s does not exist and will be created later.\n",
@@ -222,26 +221,14 @@ static int sev_read_init_ex_file(void)
 				"SEV: could not open %s for read, error %d\n",
 				init_ex_path, ret);
 		}
-=======
-		dev_err(sev->dev,
-			"SEV: could not open %s for read, error %d\n",
-			init_ex_path, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 
 	nread = kernel_read(fp, sev_init_ex_buffer, NV_LENGTH, NULL);
 	if (nread != NV_LENGTH) {
-<<<<<<< HEAD
 		dev_info(sev->dev,
 			"SEV: could not read %u bytes to non volatile memory area, ret %ld\n",
 			NV_LENGTH, nread);
-=======
-		dev_err(sev->dev,
-			"SEV: failed to read %u bytes to non volatile memory area, ret %ld\n",
-			NV_LENGTH, nread);
-		return -EIO;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	dev_dbg(sev->dev, "SEV: read %ld bytes from NV file\n", nread);
@@ -433,23 +420,12 @@ static int __sev_init_locked(int *error)
 static int __sev_init_ex_locked(int *error)
 {
 	struct sev_data_init_ex data;
-<<<<<<< HEAD
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	memset(&data, 0, sizeof(data));
 	data.length = sizeof(data);
 	data.nv_address = __psp_pa(sev_init_ex_buffer);
 	data.nv_len = NV_LENGTH;
 
-<<<<<<< HEAD
-=======
-	ret = sev_read_init_ex_file();
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (sev_es_tmr) {
 		/*
 		 * Do not include the encryption mask on the physical
@@ -468,11 +444,7 @@ static int __sev_platform_init_locked(int *error)
 {
 	struct psp_device *psp = psp_master;
 	struct sev_device *sev;
-<<<<<<< HEAD
 	int rc = 0, psp_ret = -1;
-=======
-	int rc, psp_ret = -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int (*init_function)(int *error);
 
 	if (!psp || !psp->sev_data)
@@ -483,7 +455,6 @@ static int __sev_platform_init_locked(int *error)
 	if (sev->state == SEV_STATE_INIT)
 		return 0;
 
-<<<<<<< HEAD
 	if (sev_init_ex_buffer) {
 		init_function = __sev_init_ex_locked;
 		rc = sev_read_init_ex_file();
@@ -493,10 +464,6 @@ static int __sev_platform_init_locked(int *error)
 		init_function = __sev_init_locked;
 	}
 
-=======
-	init_function = sev_init_ex_buffer ? __sev_init_ex_locked :
-			__sev_init_locked;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = init_function(&psp_ret);
 	if (rc && psp_ret == SEV_RET_SECURE_DATA_INVALID) {
 		/*
@@ -1343,12 +1310,7 @@ void sev_pci_init(void)
 	if (sev_get_api_version())
 		goto err;
 
-<<<<<<< HEAD
 	if (sev_update_firmware(sev->dev) == 0)
-=======
-	if (sev_version_greater_or_equal(0, 15) &&
-	    sev_update_firmware(sev->dev) == 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sev_get_api_version();
 
 	/* If an init_ex_path is provided rely on INIT_EX for PSP initialization

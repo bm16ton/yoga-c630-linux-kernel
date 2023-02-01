@@ -73,11 +73,7 @@ optprobe_template_entry:
 	 * further below.
 	 */
 #ifdef CONFIG_PPC64
-<<<<<<< HEAD
 	LOAD_PACA_TOC()
-=======
-	ld	r2,PACATOC(r13)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 	.global optprobe_template_op_address

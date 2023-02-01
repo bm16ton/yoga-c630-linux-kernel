@@ -84,34 +84,15 @@ struct amd_spi_freq {
 };
 
 /**
-<<<<<<< HEAD
  * struct amd_spi - SPI driver instance
  * @io_remap_addr:	Start address of the SPI controller registers
  * @version:		SPI controller hardware version
  * @speed_hz:		Device frequency
-=======
- * enum amd_spi_versions - SPI controller versions
- * @AMD_SPI_V1:		AMDI0061 hardware version
- * @AMD_SPI_V2:		AMDI0062 hardware version
- */
-enum amd_spi_versions {
-	AMD_SPI_V1 = 1,
-	AMD_SPI_V2,
-};
-
-/**
- * struct amd_spi - SPI driver instance
- * @io_remap_addr:	Start address of the SPI controller registers
- * @version:		SPI controller hardware version
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct amd_spi {
 	void __iomem *io_remap_addr;
 	enum amd_spi_versions version;
-<<<<<<< HEAD
 	unsigned int speed_hz;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline u8 amd_spi_readreg8(struct amd_spi *amd_spi, int idx)
@@ -232,7 +213,6 @@ static int amd_spi_execute_opcode(struct amd_spi *amd_spi)
 	default:
 		return -ENODEV;
 	}
-<<<<<<< HEAD
 }
 
 static int amd_spi_master_setup(struct spi_device *spi)
@@ -242,8 +222,6 @@ static int amd_spi_master_setup(struct spi_device *spi)
 	amd_spi_clear_fifo_ptr(amd_spi);
 
 	return 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct amd_spi_freq amd_spi_freq[] = {
@@ -260,7 +238,6 @@ static const struct amd_spi_freq amd_spi_freq[] = {
 
 static int amd_set_spi_freq(struct amd_spi *amd_spi, u32 speed_hz)
 {
-<<<<<<< HEAD
 	unsigned int i, spd7_val, alt_spd;
 
 	if (speed_hz < AMD_SPI_MIN_HZ)
@@ -290,11 +267,6 @@ static int amd_set_spi_freq(struct amd_spi *amd_spi, u32 speed_hz)
 		amd_spi_setclear_reg32(amd_spi, AMD_SPI_SPEED_REG, spd7_val,
 				       AMD_SPI_SPD7_MASK);
 	}
-=======
-	struct amd_spi *amd_spi = spi_master_get_devdata(spi->master);
-
-	amd_spi_clear_fifo_ptr(amd_spi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -319,7 +291,6 @@ static inline int amd_spi_fifo_xfer(struct amd_spi *amd_spi,
 
 		if (xfer->tx_buf) {
 			buf = (u8 *)xfer->tx_buf;
-<<<<<<< HEAD
 			if (!tx_len) {
 				cmd_opcode = *(u8 *)xfer->tx_buf;
 				buf++;
@@ -332,39 +303,6 @@ static inline int amd_spi_fifo_xfer(struct amd_spi *amd_spi,
 				amd_spi_writereg8(amd_spi, fifo_pos + i, buf[i]);
 
 			fifo_pos += xfer->len;
-=======
-			tx_len = xfer->len - 1;
-			cmd_opcode = *(u8 *)xfer->tx_buf;
-			buf++;
-			amd_spi_set_opcode(amd_spi, cmd_opcode);
-
-			/* Write data into the FIFO. */
-			for (i = 0; i < tx_len; i++) {
-				iowrite8(buf[i], ((u8 __iomem *)amd_spi->io_remap_addr +
-					 AMD_SPI_FIFO_BASE + i));
-			}
-
-			amd_spi_set_tx_count(amd_spi, tx_len);
-			amd_spi_clear_fifo_ptr(amd_spi);
-			/* Execute command */
-			amd_spi_execute_opcode(amd_spi);
-		}
-		if (m_cmd & AMD_SPI_XFER_RX) {
-			/*
-			 * Store no. of bytes to be received from
-			 * FIFO
-			 */
-			rx_len = xfer->len;
-			buf = (u8 *)xfer->rx_buf;
-			amd_spi_set_rx_count(amd_spi, rx_len);
-			amd_spi_clear_fifo_ptr(amd_spi);
-			/* Execute command */
-			amd_spi_execute_opcode(amd_spi);
-			amd_spi_busy_wait(amd_spi);
-			/* Read data from FIFO to receive buffer  */
-			for (i = 0; i < rx_len; i++)
-				buf[i] = amd_spi_readreg8(amd_spi, AMD_SPI_FIFO_BASE + tx_len + i);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		/* Store no. of bytes to be received from FIFO */
@@ -403,14 +341,8 @@ static inline int amd_spi_fifo_xfer(struct amd_spi *amd_spi,
 
 	/* Update statistics */
 	message->actual_length = tx_len + rx_len + 1;
-<<<<<<< HEAD
 
 fin_msg:
-=======
-	/* complete the transaction */
-	message->status = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (amd_spi->version) {
 	case AMD_SPI_V1:
 		break;
@@ -439,11 +371,6 @@ static int amd_spi_master_transfer(struct spi_master *master,
 	 * program the controller.
 	 */
 	return amd_spi_fifo_xfer(amd_spi, master, msg);
-}
-
-static size_t amd_spi_max_transfer_size(struct spi_device *spi)
-{
-	return AMD_SPI_FIFO_SIZE;
 }
 
 static size_t amd_spi_max_transfer_size(struct spi_device *spi)

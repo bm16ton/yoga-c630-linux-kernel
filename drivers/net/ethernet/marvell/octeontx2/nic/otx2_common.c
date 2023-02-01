@@ -586,11 +586,7 @@ void otx2_get_mac_from_af(struct net_device *netdev)
 }
 EXPORT_SYMBOL(otx2_get_mac_from_af);
 
-<<<<<<< HEAD
 int otx2_txschq_config(struct otx2_nic *pfvf, int lvl, int prio, bool txschq_for_pfc)
-=======
-int otx2_txschq_config(struct otx2_nic *pfvf, int lvl)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u16 (*schq_list)[MAX_TXSCHQ_PER_FUNC];
 	struct otx2_hw *hw = &pfvf->hw;
@@ -646,15 +642,10 @@ int otx2_txschq_config(struct otx2_nic *pfvf, int lvl)
 		if (lvl == hw->txschq_link_cfg_lvl) {
 			req->num_regs++;
 			req->reg[2] = NIX_AF_TL3_TL2X_LINKX_CFG(schq, hw->tx_link);
-<<<<<<< HEAD
 			/* Enable this queue and backpressure
 			 * and set relative channel
 			 */
 			req->regval[2] = BIT_ULL(13) | BIT_ULL(12) | prio;
-=======
-			/* Enable this queue and backpressure */
-			req->regval[2] = BIT_ULL(13) | BIT_ULL(12);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	} else if (lvl == NIX_TXSCH_LVL_TL2) {
 		parent = schq_list[NIX_TXSCH_LVL_TL1][prio];
@@ -668,15 +659,10 @@ int otx2_txschq_config(struct otx2_nic *pfvf, int lvl)
 		if (lvl == hw->txschq_link_cfg_lvl) {
 			req->num_regs++;
 			req->reg[2] = NIX_AF_TL3_TL2X_LINKX_CFG(schq, hw->tx_link);
-<<<<<<< HEAD
 			/* Enable this queue and backpressure
 			 * and set relative channel
 			 */
 			req->regval[2] = BIT_ULL(13) | BIT_ULL(12) | prio;
-=======
-			/* Enable this queue and backpressure */
-			req->regval[2] = BIT_ULL(13) | BIT_ULL(12);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	} else if (lvl == NIX_TXSCH_LVL_TL1) {
 		/* Default config for TL1.
@@ -856,12 +842,7 @@ int otx2_sq_aq_init(void *dev, u16 qidx, u16 sqb_aura)
 	aq->sq.max_sqe_size = NIX_MAXSQESZ_W16; /* 128 byte */
 	aq->sq.cq_ena = 1;
 	aq->sq.ena = 1;
-<<<<<<< HEAD
 	aq->sq.smq = otx2_get_smq_idx(pfvf, qidx);
-=======
-	/* Only one SMQ is allocated, map all SQ's to that SMQ  */
-	aq->sq.smq = pfvf->hw.txschq_list[NIX_TXSCH_LVL_SMQ][0];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	aq->sq.smq_rr_quantum = mtu_to_dwrr_weight(pfvf, pfvf->tx_max_pktlen);
 	aq->sq.default_chan = pfvf->hw.tx_chan_base;
 	aq->sq.sqe_stype = NIX_STYPE_STF; /* Cache SQB */

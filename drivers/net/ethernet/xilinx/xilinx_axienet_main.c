@@ -645,11 +645,7 @@ static int axienet_device_reset(struct net_device *ndev)
  * @nr_bds:	Max number of descriptors to clean up
  * @force:	Whether to clean descriptors even if not complete
  * @sizep:	Pointer to a u32 filled with the total sum of all bytes
-<<<<<<< HEAD
  *		in all cleaned-up descriptors. Ignored if NULL.
-=======
- * 		in all cleaned-up descriptors. Ignored if NULL.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @budget:	NAPI budget (use 0 when not called from NAPI poll)
  *
  * Would either be called after a successful transmit operation, or after
@@ -1883,13 +1879,8 @@ static int axienet_probe(struct platform_device *pdev)
 	u64_stats_init(&lp->rx_stat_sync);
 	u64_stats_init(&lp->tx_stat_sync);
 
-<<<<<<< HEAD
 	netif_napi_add(ndev, &lp->napi_rx, axienet_rx_poll);
 	netif_napi_add(ndev, &lp->napi_tx, axienet_tx_poll);
-=======
-	netif_napi_add(ndev, &lp->napi_rx, axienet_rx_poll, NAPI_POLL_WEIGHT);
-	netif_napi_add(ndev, &lp->napi_tx, axienet_tx_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lp->axi_clk = devm_clk_get_optional(&pdev->dev, "s_axi_lite_clk");
 	if (!lp->axi_clk) {

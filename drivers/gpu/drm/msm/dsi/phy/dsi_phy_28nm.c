@@ -104,11 +104,7 @@ static void pll_28nm_software_reset(struct dsi_pll_28nm *pll_28nm)
 	 * reset bit off and back on.
 	 */
 	dsi_phy_write_udelay(base + REG_DSI_28nm_PHY_PLL_TEST_CFG,
-<<<<<<< HEAD
 			     DSI_28nm_PHY_PLL_TEST_CFG_PLL_SW_RESET, 1);
-=======
-			DSI_28nm_PHY_PLL_TEST_CFG_PLL_SW_RESET, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dsi_phy_write_udelay(base + REG_DSI_28nm_PHY_PLL_TEST_CFG, 0x00, 1);
 }
 
@@ -205,15 +201,9 @@ static int dsi_pll_28nm_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_SDM_CFG1, sdm_cfg1);
 	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_SDM_CFG2,
-<<<<<<< HEAD
 		      DSI_28nm_PHY_PLL_SDM_CFG2_FREQ_SEED_7_0(sdm_cfg2));
 	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_SDM_CFG3,
 		      DSI_28nm_PHY_PLL_SDM_CFG3_FREQ_SEED_15_8(sdm_cfg3));
-=======
-		DSI_28nm_PHY_PLL_SDM_CFG2_FREQ_SEED_7_0(sdm_cfg2));
-	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_SDM_CFG3,
-		DSI_28nm_PHY_PLL_SDM_CFG3_FREQ_SEED_15_8(sdm_cfg3));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_SDM_CFG4, 0x00);
 
 	/* Add hardware recommended delay for correct PLL configuration */
@@ -326,21 +316,12 @@ static int _dsi_pll_28nm_vco_prepare_hpm(struct dsi_pll_28nm *pll_28nm)
 	for (i = 0; i < 2; i++) {
 		/* DSI Uniphy lock detect setting */
 		dsi_phy_write_udelay(base + REG_DSI_28nm_PHY_PLL_LKDET_CFG2,
-<<<<<<< HEAD
 				     0x0c, 100);
 		dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_LKDET_CFG2, 0x0d);
 
 		/* poll for PLL ready status */
 		locked = pll_28nm_poll_for_ready(pll_28nm, max_reads,
 						 timeout_us);
-=======
-				0x0c, 100);
-		dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_LKDET_CFG2, 0x0d);
-
-		/* poll for PLL ready status */
-		locked = pll_28nm_poll_for_ready(pll_28nm,
-						max_reads, timeout_us);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (locked)
 			break;
 
@@ -527,48 +508,28 @@ static int dsi_28nm_pll_restore_state(struct msm_dsi_phy *phy)
 	}
 
 	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_POSTDIV3_CFG,
-<<<<<<< HEAD
 		      cached_state->postdiv3);
 	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_POSTDIV1_CFG,
 		      cached_state->postdiv1);
 	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_VREG_CFG,
 		      cached_state->byte_mux);
-=======
-			cached_state->postdiv3);
-	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_POSTDIV1_CFG,
-			cached_state->postdiv1);
-	dsi_phy_write(base + REG_DSI_28nm_PHY_PLL_VREG_CFG,
-			cached_state->byte_mux);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
 static int pll_28nm_register(struct dsi_pll_28nm *pll_28nm, struct clk_hw **provided_clocks)
 {
-<<<<<<< HEAD
 	char clk_name[32];
-=======
-	char clk_name[32], parent1[32], parent2[32], vco_name[32];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct clk_init_data vco_init = {
 		.parent_data = &(const struct clk_parent_data) {
 			.fw_name = "ref", .name = "xo",
 		},
 		.num_parents = 1,
-<<<<<<< HEAD
 		.name = clk_name,
 		.flags = CLK_IGNORE_UNUSED,
 	};
 	struct device *dev = &pll_28nm->phy->pdev->dev;
 	struct clk_hw *hw, *analog_postdiv, *indirect_path_div2, *byte_mux;
-=======
-		.name = vco_name,
-		.flags = CLK_IGNORE_UNUSED,
-	};
-	struct device *dev = &pll_28nm->phy->pdev->dev;
-	struct clk_hw *hw;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	DBG("%d", pll_28nm->phy->id);
@@ -578,17 +539,12 @@ static int pll_28nm_register(struct dsi_pll_28nm *pll_28nm, struct clk_hw **prov
 	else
 		vco_init.ops = &clk_ops_dsi_pll_28nm_vco_hpm;
 
-<<<<<<< HEAD
 	snprintf(clk_name, sizeof(clk_name), "dsi%dvco_clk", pll_28nm->phy->id);
-=======
-	snprintf(vco_name, 32, "dsi%dvco_clk", pll_28nm->phy->id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pll_28nm->clk_hw.init = &vco_init;
 	ret = devm_clk_hw_register(dev, &pll_28nm->clk_hw);
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	snprintf(clk_name, sizeof(clk_name), "dsi%danalog_postdiv_clk", pll_28nm->phy->id);
 	analog_postdiv = devm_clk_hw_register_divider_parent_hw(dev, clk_name,
 			&pll_28nm->clk_hw, CLK_SET_RATE_PARENT,
@@ -609,37 +565,10 @@ static int pll_28nm_register(struct dsi_pll_28nm *pll_28nm, struct clk_hw **prov
 			&pll_28nm->clk_hw, 0, pll_28nm->phy->pll_base +
 				REG_DSI_28nm_PHY_PLL_POSTDIV3_CFG,
 			0, 8, 0, NULL);
-=======
-	snprintf(clk_name, 32, "dsi%danalog_postdiv_clk", pll_28nm->phy->id);
-	snprintf(parent1, 32, "dsi%dvco_clk", pll_28nm->phy->id);
-	hw = devm_clk_hw_register_divider(dev, clk_name,
-			parent1, CLK_SET_RATE_PARENT,
-			pll_28nm->phy->pll_base +
-			REG_DSI_28nm_PHY_PLL_POSTDIV1_CFG,
-			0, 4, 0, NULL);
-	if (IS_ERR(hw))
-		return PTR_ERR(hw);
-
-	snprintf(clk_name, 32, "dsi%dindirect_path_div2_clk", pll_28nm->phy->id);
-	snprintf(parent1, 32, "dsi%danalog_postdiv_clk", pll_28nm->phy->id);
-	hw = devm_clk_hw_register_fixed_factor(dev, clk_name,
-			parent1, CLK_SET_RATE_PARENT,
-			1, 2);
-	if (IS_ERR(hw))
-		return PTR_ERR(hw);
-
-	snprintf(clk_name, 32, "dsi%dpll", pll_28nm->phy->id);
-	snprintf(parent1, 32, "dsi%dvco_clk", pll_28nm->phy->id);
-	hw = devm_clk_hw_register_divider(dev, clk_name,
-				parent1, 0, pll_28nm->phy->pll_base +
-				REG_DSI_28nm_PHY_PLL_POSTDIV3_CFG,
-				0, 8, 0, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(hw))
 		return PTR_ERR(hw);
 	provided_clocks[DSI_PIXEL_PLL_CLK] = hw;
 
-<<<<<<< HEAD
 	snprintf(clk_name, sizeof(clk_name), "dsi%dbyte_mux", pll_28nm->phy->id);
 	byte_mux = devm_clk_hw_register_mux_parent_hws(dev, clk_name,
 			((const struct clk_hw *[]){
@@ -653,23 +582,6 @@ static int pll_28nm_register(struct dsi_pll_28nm *pll_28nm, struct clk_hw **prov
 	snprintf(clk_name, sizeof(clk_name), "dsi%dpllbyte", pll_28nm->phy->id);
 	hw = devm_clk_hw_register_fixed_factor_parent_hw(dev, clk_name,
 			byte_mux, CLK_SET_RATE_PARENT, 1, 4);
-=======
-	snprintf(clk_name, 32, "dsi%dbyte_mux", pll_28nm->phy->id);
-	snprintf(parent1, 32, "dsi%dvco_clk", pll_28nm->phy->id);
-	snprintf(parent2, 32, "dsi%dindirect_path_div2_clk", pll_28nm->phy->id);
-	hw = devm_clk_hw_register_mux(dev, clk_name,
-			((const char *[]){
-				parent1, parent2
-			}), 2, CLK_SET_RATE_PARENT, pll_28nm->phy->pll_base +
-			REG_DSI_28nm_PHY_PLL_VREG_CFG, 1, 1, 0, NULL);
-	if (IS_ERR(hw))
-		return PTR_ERR(hw);
-
-	snprintf(clk_name, 32, "dsi%dpllbyte", pll_28nm->phy->id);
-	snprintf(parent1, 32, "dsi%dbyte_mux", pll_28nm->phy->id);
-	hw = devm_clk_hw_register_fixed_factor(dev, clk_name,
-				parent1, CLK_SET_RATE_PARENT, 1, 4);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(hw))
 		return PTR_ERR(hw);
 	provided_clocks[DSI_BYTE_PLL_CLK] = hw;
@@ -858,17 +770,8 @@ static const struct regulator_bulk_data dsi_phy_28nm_regulators[] = {
 
 const struct msm_dsi_phy_cfg dsi_phy_28nm_hpm_cfgs = {
 	.has_phy_regulator = true,
-<<<<<<< HEAD
 	.regulator_data = dsi_phy_28nm_regulators,
 	.num_regulators = ARRAY_SIZE(dsi_phy_28nm_regulators),
-=======
-	.reg_cfg = {
-		.num = 1,
-		.regs = {
-			{"vddio", 100000, 100},
-		},
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ops = {
 		.enable = dsi_28nm_phy_enable,
 		.disable = dsi_28nm_phy_disable,
@@ -884,17 +787,8 @@ const struct msm_dsi_phy_cfg dsi_phy_28nm_hpm_cfgs = {
 
 const struct msm_dsi_phy_cfg dsi_phy_28nm_hpm_famb_cfgs = {
 	.has_phy_regulator = true,
-<<<<<<< HEAD
 	.regulator_data = dsi_phy_28nm_regulators,
 	.num_regulators = ARRAY_SIZE(dsi_phy_28nm_regulators),
-=======
-	.reg_cfg = {
-		.num = 1,
-		.regs = {
-			{"vddio", 100000, 100},
-		},
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ops = {
 		.enable = dsi_28nm_phy_enable,
 		.disable = dsi_28nm_phy_disable,
@@ -910,17 +804,8 @@ const struct msm_dsi_phy_cfg dsi_phy_28nm_hpm_famb_cfgs = {
 
 const struct msm_dsi_phy_cfg dsi_phy_28nm_lp_cfgs = {
 	.has_phy_regulator = true,
-<<<<<<< HEAD
 	.regulator_data = dsi_phy_28nm_regulators,
 	.num_regulators = ARRAY_SIZE(dsi_phy_28nm_regulators),
-=======
-	.reg_cfg = {
-		.num = 1,
-		.regs = {
-			{"vddio", 100000, 100},	/* 1.8 V */
-		},
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ops = {
 		.enable = dsi_28nm_phy_enable,
 		.disable = dsi_28nm_phy_disable,

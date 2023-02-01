@@ -28,10 +28,7 @@
 #include "util/parse-events-hybrid.h"
 #include "util/pmu-hybrid.h"
 #include "tracepoint.h"
-<<<<<<< HEAD
 #include "thread_map.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define MAX_NAME_LEN 100
 
@@ -153,7 +150,6 @@ struct event_symbol event_symbols_sw[PERF_COUNT_SW_MAX] = {
 	},
 };
 
-<<<<<<< HEAD
 bool is_event_supported(u8 type, u64 config)
 {
 	bool ret = true;
@@ -191,15 +187,6 @@ bool is_event_supported(u8 type, u64 config)
 	perf_thread_map__put(tmap);
 	return ret;
 }
-=======
-#define __PERF_EVENT_FIELD(config, name) \
-	((config & PERF_EVENT_##name##_MASK) >> PERF_EVENT_##name##_SHIFT)
-
-#define PERF_EVENT_RAW(config)		__PERF_EVENT_FIELD(config, RAW)
-#define PERF_EVENT_CONFIG(config)	__PERF_EVENT_FIELD(config, CONFIG)
-#define PERF_EVENT_TYPE(config)		__PERF_EVENT_FIELD(config, TYPE)
-#define PERF_EVENT_ID(config)		__PERF_EVENT_FIELD(config, EVENT)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 const char *event_type(int type)
 {

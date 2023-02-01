@@ -168,11 +168,7 @@ struct paca_struct {
 #ifdef CONFIG_PPC64
 	u64 exit_save_r1;		/* Syscall/interrupt R1 save */
 #endif
-<<<<<<< HEAD
 #ifdef CONFIG_PPC_BOOK3E_64
-=======
-#ifdef CONFIG_PPC_BOOK3E
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 trap_save;			/* Used when bad stack is encountered */
 #endif
 #ifdef CONFIG_PPC_BOOK3S_64

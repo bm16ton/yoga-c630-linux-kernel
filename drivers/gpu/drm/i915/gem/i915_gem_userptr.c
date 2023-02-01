@@ -100,7 +100,6 @@ static const struct mmu_interval_notifier_ops i915_gem_userptr_notifier_ops = {
 
 static int
 i915_gem_userptr_init__mmu_notifier(struct drm_i915_gem_object *obj)
-<<<<<<< HEAD
 {
 	return mmu_interval_notifier_insert(&obj->userptr.notifier, current->mm,
 					    obj->userptr.ptr, obj->base.size,
@@ -113,20 +112,6 @@ static void i915_gem_object_userptr_drop_ref(struct drm_i915_gem_object *obj)
 
 	assert_object_held_shared(obj);
 
-=======
-{
-	return mmu_interval_notifier_insert(&obj->userptr.notifier, current->mm,
-					    obj->userptr.ptr, obj->base.size,
-					    &i915_gem_userptr_notifier_ops);
-}
-
-static void i915_gem_object_userptr_drop_ref(struct drm_i915_gem_object *obj)
-{
-	struct page **pvec = NULL;
-
-	assert_object_held_shared(obj);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!--obj->userptr.page_ref) {
 		pvec = obj->userptr.pvec;
 		obj->userptr.pvec = NULL;
@@ -410,17 +395,10 @@ i915_gem_userptr_pwrite(struct drm_i915_gem_object *obj,
 			const struct drm_i915_gem_pwrite *args)
 {
 	drm_dbg(obj->base.dev, "pwrite to userptr no longer allowed\n");
-<<<<<<< HEAD
 
 	return -EINVAL;
 }
 
-=======
-
-	return -EINVAL;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int
 i915_gem_userptr_pread(struct drm_i915_gem_object *obj,
 		       const struct drm_i915_gem_pread *args)
@@ -448,21 +426,12 @@ static const struct drm_i915_gem_object_ops i915_gem_userptr_ops = {
 static int
 probe_range(struct mm_struct *mm, unsigned long addr, unsigned long len)
 {
-<<<<<<< HEAD
 	VMA_ITERATOR(vmi, mm, addr);
 	struct vm_area_struct *vma;
 	unsigned long end = addr + len;
 
 	mmap_read_lock(mm);
 	for_each_vma_range(vmi, vma, end) {
-=======
-	const unsigned long end = addr + len;
-	struct vm_area_struct *vma;
-	int ret = -EFAULT;
-
-	mmap_read_lock(mm);
-	for (vma = find_vma(mm, addr); vma; vma = vma->vm_next) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Check for holes, note that we also update the addr below */
 		if (vma->vm_start > addr)
 			break;
@@ -470,25 +439,13 @@ probe_range(struct mm_struct *mm, unsigned long addr, unsigned long len)
 		if (vma->vm_flags & (VM_PFNMAP | VM_MIXEDMAP))
 			break;
 
-<<<<<<< HEAD
-=======
-		if (vma->vm_end >= end) {
-			ret = 0;
-			break;
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		addr = vma->vm_end;
 	}
 	mmap_read_unlock(mm);
 
-<<<<<<< HEAD
 	if (vma || addr < end)
 		return -EFAULT;
 	return 0;
-=======
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

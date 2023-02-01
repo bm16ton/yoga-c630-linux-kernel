@@ -464,16 +464,12 @@ int snd_soc_put_volsw_sx(struct snd_kcontrol *kcontrol,
 	ret = err;
 
 	if (snd_soc_volsw_is_stereo(mc)) {
-<<<<<<< HEAD
 		unsigned int val2 = ucontrol->value.integer.value[1];
 
 		if (mc->platform_max && val2 > mc->platform_max)
 			return -EINVAL;
 		if (val2 > max)
 			return -EINVAL;
-=======
-		unsigned int val2;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		val_mask = mask << rshift;
 		val2 = (val2 + min) & mask;
@@ -552,11 +548,7 @@ int snd_soc_put_volsw_range(struct snd_kcontrol *kcontrol,
 		return -EINVAL;
 	if (mc->platform_max && tmp > mc->platform_max)
 		return -EINVAL;
-<<<<<<< HEAD
 	if (tmp > mc->max - mc->min)
-=======
-	if (tmp > mc->max - mc->min + 1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	if (invert)
@@ -577,11 +569,7 @@ int snd_soc_put_volsw_range(struct snd_kcontrol *kcontrol,
 			return -EINVAL;
 		if (mc->platform_max && tmp > mc->platform_max)
 			return -EINVAL;
-<<<<<<< HEAD
 		if (tmp > mc->max - mc->min)
-=======
-		if (tmp > mc->max - mc->min + 1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return -EINVAL;
 
 		if (invert)

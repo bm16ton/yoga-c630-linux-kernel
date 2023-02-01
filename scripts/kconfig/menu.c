@@ -722,13 +722,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
 	if (!expr_eq(prop->menu->dep, prop->visible.expr))
 		get_dep_str(r, prop->visible.expr, "  Visible if: ");
 
-<<<<<<< HEAD
 	menu = prop->menu;
 	for (i = 0; menu != &rootmenu && i < 8; menu = menu->parent) {
-=======
-	menu = prop->menu->parent;
-	for (i = 0; menu && i < 8; menu = menu->parent) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bool accessible = menu_is_visible(menu);
 
 		submenu[i++] = menu;
@@ -754,17 +749,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
 		menu = submenu[i];
 		if (jump && menu == location)
 			jump->offset = strlen(r->s);
-<<<<<<< HEAD
 		str_printf(r, "%*c-> %s", j, ' ', menu_get_prompt(menu));
-=======
-
-		if (menu == &rootmenu)
-			/* The real rootmenu prompt is ugly */
-			str_printf(r, "%*cMain menu", j, ' ');
-		else
-			str_printf(r, "%*c-> %s", j, ' ', menu_get_prompt(menu));
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (menu->sym) {
 			str_printf(r, " (%s [=%s])", menu->sym->name ?
 				menu->sym->name : "<choice>",

@@ -1907,19 +1907,11 @@ static int __auxtrace_mmap__read(struct mmap *map,
 
 	if (!snapshot) {
 		int err;
-<<<<<<< HEAD
 
 		err = auxtrace_mmap__write_tail(mm, head, kernel_is_64_bit);
 		if (err < 0)
 			return err;
 
-=======
-
-		err = auxtrace_mmap__write_tail(mm, head, kernel_is_64_bit);
-		if (err < 0)
-			return err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (itr->read_finish) {
 			err = itr->read_finish(itr, mm->idx);
 			if (err < 0)

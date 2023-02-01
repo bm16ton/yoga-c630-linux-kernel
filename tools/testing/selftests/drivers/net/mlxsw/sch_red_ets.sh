@@ -24,7 +24,6 @@ BACKLOG1=200000
 BACKLOG2=500000
 
 install_root_qdisc()
-<<<<<<< HEAD
 {
 	tc qdisc add dev $swp3 parent 1: handle 10: $QDISC \
 	   bands 8 priomap 7 6 5 4 3 2 1 0
@@ -32,15 +31,6 @@ install_root_qdisc()
 
 install_qdisc_tc0()
 {
-=======
-{
-	tc qdisc add dev $swp3 root handle 10: $QDISC \
-	   bands 8 priomap 7 6 5 4 3 2 1 0
-}
-
-install_qdisc_tc0()
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	local -a args=("$@")
 
 	tc qdisc add dev $swp3 parent 10:8 handle 108: red \
@@ -77,18 +67,7 @@ uninstall_qdisc_tc1()
 
 uninstall_root_qdisc()
 {
-<<<<<<< HEAD
 	tc qdisc del dev $swp3 parent 1:
-}
-
-uninstall_qdisc()
-{
-	uninstall_qdisc_tc0
-	uninstall_qdisc_tc1
-	uninstall_root_qdisc
-=======
-	tc qdisc del dev $swp3 root
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 uninstall_qdisc()

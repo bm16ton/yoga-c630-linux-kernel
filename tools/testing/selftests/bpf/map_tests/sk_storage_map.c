@@ -458,11 +458,7 @@ static void test_sk_storage_map_basic(void)
 	struct {
 		int cnt;
 		int lock;
-<<<<<<< HEAD
 	} value = { .cnt = 0xeB9f, .lock = 1, }, lookup_value;
-=======
-	} value = { .cnt = 0xeB9f, .lock = 0, }, lookup_value;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_map_create_opts bad_xattr;
 	int btf_fd, map_fd, sk_fd, err;
 

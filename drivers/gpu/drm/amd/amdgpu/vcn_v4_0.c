@@ -30,10 +30,7 @@
 #include "soc15d.h"
 #include "soc15_hw_ip.h"
 #include "vcn_v2_0.h"
-<<<<<<< HEAD
 #include "mmsch_v4_0.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "vcn/vcn_4_0_0_offset.h"
 #include "vcn/vcn_4_0_0_sh_mask.h"
@@ -49,11 +46,8 @@
 #define VCN_VID_SOC_ADDRESS_2_0							0x1fb00
 #define VCN1_VID_SOC_ADDRESS_3_0						0x48300
 
-<<<<<<< HEAD
 #define VCN_HARVEST_MMSCH								0
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define RDECODE_MSG_CREATE							0x00000000
 #define RDECODE_MESSAGE_CREATE							0x00000001
 
@@ -62,20 +56,14 @@ static int amdgpu_ih_clientid_vcns[] = {
 	SOC15_IH_CLIENTID_VCN1
 };
 
-<<<<<<< HEAD
 static int vcn_v4_0_start_sriov(struct amdgpu_device *adev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void vcn_v4_0_set_unified_ring_funcs(struct amdgpu_device *adev);
 static void vcn_v4_0_set_irq_funcs(struct amdgpu_device *adev);
 static int vcn_v4_0_set_powergating_state(void *handle,
         enum amd_powergating_state state);
 static int vcn_v4_0_pause_dpg_mode(struct amdgpu_device *adev,
         int inst_idx, struct dpg_pause_state *new_state);
-<<<<<<< HEAD
 static void vcn_v4_0_unified_ring_set_wptr(struct amdgpu_ring *ring);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * vcn_v4_0_early_init - set function pointers
@@ -88,12 +76,9 @@ static int vcn_v4_0_early_init(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-<<<<<<< HEAD
 	if (amdgpu_sriov_vf(adev))
 		adev->vcn.harvest_config = VCN_HARVEST_MMSCH;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* re-use enc ring as unified ring */
 	adev->vcn.num_enc_rings = 1;
 
@@ -142,14 +127,10 @@ static int vcn_v4_0_sw_init(void *handle)
 
 		ring = &adev->vcn.inst[i].ring_enc[0];
 		ring->use_doorbell = true;
-<<<<<<< HEAD
 		if (amdgpu_sriov_vf(adev))
 			ring->doorbell_index = (adev->doorbell_index.vcn.vcn_ring0_1 << 1) + i * (adev->vcn.num_enc_rings + 1) + 1;
 		else
 			ring->doorbell_index = (adev->doorbell_index.vcn.vcn_ring0_1 << 1) + 2 + 8 * i;
-=======
-		ring->doorbell_index = (adev->doorbell_index.vcn.vcn_ring0_1 << 1) + 2 + 8 * i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		sprintf(ring->name, "vcn_unified_%d", i);
 
@@ -162,7 +143,6 @@ static int vcn_v4_0_sw_init(void *handle)
 		fw_shared->present_flag_0 = cpu_to_le32(AMDGPU_FW_SHARED_FLAG_0_UNIFIED_QUEUE);
 		fw_shared->sq.is_enabled = 1;
 
-<<<<<<< HEAD
 		fw_shared->present_flag_0 |= cpu_to_le32(AMDGPU_VCN_SMU_DPM_INTERFACE_FLAG);
 		fw_shared->smu_dpm_interface.smu_interface_type = (adev->flags & AMD_IS_APU) ?
 			AMDGPU_VCN_SMU_DPM_INTERFACE_APU : AMDGPU_VCN_SMU_DPM_INTERFACE_DGPU;
@@ -170,21 +150,16 @@ static int vcn_v4_0_sw_init(void *handle)
 		if (amdgpu_sriov_vf(adev))
 			fw_shared->present_flag_0 |= cpu_to_le32(AMDGPU_VCN_VF_RB_SETUP_FLAG);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (amdgpu_vcnfw_log)
 			amdgpu_vcn_fwlog_init(&adev->vcn.inst[i]);
 	}
 
-<<<<<<< HEAD
 	if (amdgpu_sriov_vf(adev)) {
 		r = amdgpu_virt_alloc_mm_table(adev);
 		if (r)
 			return r;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (adev->pg_flags & AMD_PG_SUPPORT_VCN_DPG)
 		adev->vcn.pause_dpg_mode = vcn_v4_0_pause_dpg_mode;
 
@@ -218,12 +193,9 @@ static int vcn_v4_0_sw_fini(void *handle)
 		drm_dev_exit(idx);
 	}
 
-<<<<<<< HEAD
 	if (amdgpu_sriov_vf(adev))
 		amdgpu_virt_free_mm_table(adev);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	r = amdgpu_vcn_suspend(adev);
 	if (r)
 		return r;
@@ -246,7 +218,6 @@ static int vcn_v4_0_hw_init(void *handle)
 	struct amdgpu_ring *ring;
 	int i, r;
 
-<<<<<<< HEAD
 	if (amdgpu_sriov_vf(adev)) {
 		r = vcn_v4_0_start_sriov(adev);
 		if (r)
@@ -283,20 +254,6 @@ static int vcn_v4_0_hw_init(void *handle)
 				goto done;
 
 		}
-=======
-	for (i = 0; i < adev->vcn.num_vcn_inst; ++i) {
-		if (adev->vcn.harvest_config & (1 << i))
-			continue;
-
-		ring = &adev->vcn.inst[i].ring_enc[0];
-
-		adev->nbio.funcs->vcn_doorbell_range(adev, ring->use_doorbell,
-				((adev->doorbell_index.vcn.vcn_ring0_1 << 1) + 8 * i), i);
-
-		r = amdgpu_ring_test_helper(ring);
-		if (r)
-			goto done;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 done:
@@ -324,7 +281,6 @@ static int vcn_v4_0_hw_fini(void *handle)
 	for (i = 0; i < adev->vcn.num_vcn_inst; ++i) {
 		if (adev->vcn.harvest_config & (1 << i))
 			continue;
-<<<<<<< HEAD
 		if (!amdgpu_sriov_vf(adev)) {
 			if ((adev->pg_flags & AMD_PG_SUPPORT_VCN_DPG) ||
                         (adev->vcn.cur_state != AMD_PG_STATE_GATE &&
@@ -333,14 +289,6 @@ static int vcn_v4_0_hw_fini(void *handle)
 			}
 		}
 
-=======
-
-		if ((adev->pg_flags & AMD_PG_SUPPORT_VCN_DPG) ||
-                        (adev->vcn.cur_state != AMD_PG_STATE_GATE &&
-                                RREG32_SOC15(VCN, i, regUVD_STATUS))) {
-                        vcn_v4_0_set_powergating_state(adev, AMD_PG_STATE_GATE);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -1212,7 +1160,6 @@ static int vcn_v4_0_start(struct amdgpu_device *adev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int vcn_v4_0_start_sriov(struct amdgpu_device *adev)
 {
 	int i;
@@ -1421,8 +1368,6 @@ static int vcn_v4_0_start_sriov(struct amdgpu_device *adev)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * vcn_v4_0_stop_dpg_mode - VCN stop with dpg mode
  *
@@ -1643,39 +1588,23 @@ static void vcn_v4_0_unified_ring_set_wptr(struct amdgpu_ring *ring)
 	}
 }
 
-<<<<<<< HEAD
 static int vcn_v4_0_limit_sched(struct amdgpu_cs_parser *p,
 				struct amdgpu_job *job)
-=======
-static int vcn_v4_0_limit_sched(struct amdgpu_cs_parser *p)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct drm_gpu_scheduler **scheds;
 
 	/* The create msg must be in the first IB submitted */
-<<<<<<< HEAD
 	if (atomic_read(&job->base.entity->fence_seq))
-=======
-	if (atomic_read(&p->entity->fence_seq))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	scheds = p->adev->gpu_sched[AMDGPU_HW_IP_VCN_ENC]
 		[AMDGPU_RING_PRIO_0].sched;
-<<<<<<< HEAD
 	drm_sched_entity_modify_sched(job->base.entity, scheds, 1);
 	return 0;
 }
 
 static int vcn_v4_0_dec_msg(struct amdgpu_cs_parser *p, struct amdgpu_job *job,
 			    uint64_t addr)
-=======
-	drm_sched_entity_modify_sched(p->entity, scheds, 1);
-	return 0;
-}
-
-static int vcn_v4_0_dec_msg(struct amdgpu_cs_parser *p, uint64_t addr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ttm_operation_ctx ctx = { false, false };
 	struct amdgpu_bo_va_mapping *map;
@@ -1746,11 +1675,7 @@ static int vcn_v4_0_dec_msg(struct amdgpu_cs_parser *p, uint64_t addr)
 		if (create[0] == 0x7 || create[0] == 0x10 || create[0] == 0x11)
 			continue;
 
-<<<<<<< HEAD
 		r = vcn_v4_0_limit_sched(p, job);
-=======
-		r = vcn_v4_0_limit_sched(p);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (r)
 			goto out;
 	}
@@ -1763,7 +1688,6 @@ out:
 #define RADEON_VCN_ENGINE_TYPE_DECODE                                 (0x00000003)
 
 static int vcn_v4_0_ring_patch_cs_in_place(struct amdgpu_cs_parser *p,
-<<<<<<< HEAD
 					   struct amdgpu_job *job,
 					   struct amdgpu_ib *ib)
 {
@@ -1792,34 +1716,6 @@ static int vcn_v4_0_ring_patch_cs_in_place(struct amdgpu_cs_parser *p,
 	addr = ((u64)decode_buffer->msg_buffer_address_hi) << 32 |
 		decode_buffer->msg_buffer_address_lo;
 	return vcn_v4_0_dec_msg(p, job, addr);
-=======
-				struct amdgpu_job *job,
-				struct amdgpu_ib *ib)
-{
-	struct amdgpu_ring *ring = to_amdgpu_ring(p->entity->rq->sched);
-	struct amdgpu_vcn_decode_buffer *decode_buffer = NULL;
-	uint32_t val;
-	int r = 0;
-
-	/* The first instance can decode anything */
-	if (!ring->me)
-		return r;
-
-	/* unified queue ib header has 8 double words. */
-	if (ib->length_dw < 8)
-		return r;
-
-	val = amdgpu_ib_get_value(ib, 6); //RADEON_VCN_ENGINE_TYPE
-
-	if (val == RADEON_VCN_ENGINE_TYPE_DECODE) {
-		decode_buffer = (struct amdgpu_vcn_decode_buffer *)&ib->ptr[10];
-
-		if (decode_buffer->valid_buf_flag  & 0x1)
-			r = vcn_v4_0_dec_msg(p, ((u64)decode_buffer->msg_buffer_address_hi) << 32 |
-						decode_buffer->msg_buffer_address_lo);
-	}
-	return r;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct amdgpu_ring_funcs vcn_v4_0_unified_ring_vm_funcs = {
@@ -1965,7 +1861,6 @@ static int vcn_v4_0_set_powergating_state(void *handle, enum amd_powergating_sta
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int ret;
 
-<<<<<<< HEAD
 	/* for SRIOV, guest should not control VCN Power-gating
 	 * MMSCH FW should control Power-gating and clock-gating
 	 * guest should avoid touching CGC and PG
@@ -1975,8 +1870,6 @@ static int vcn_v4_0_set_powergating_state(void *handle, enum amd_powergating_sta
 		return 0;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if(state == adev->vcn.cur_state)
 		return 0;
 

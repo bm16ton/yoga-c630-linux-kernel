@@ -183,7 +183,6 @@ struct sof_intel_dsp_desc {
 	u32 sdw_shim_base;
 	u32 sdw_alh_base;
 	u32 quirks;
-<<<<<<< HEAD
 	enum sof_intel_hw_ip_version hw_ip_version;
 	bool (*check_sdw_irq)(struct snd_sof_dev *sdev);
 	bool (*check_ipc_irq)(struct snd_sof_dev *sdev);
@@ -193,12 +192,6 @@ struct sof_intel_dsp_desc {
 };
 
 extern struct snd_sof_dsp_ops sof_tng_ops;
-=======
-	bool (*check_sdw_irq)(struct snd_sof_dev *sdev);
-};
-
-extern const struct snd_sof_dsp_ops sof_tng_ops;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 extern const struct sof_intel_dsp_desc tng_chip_info;
 

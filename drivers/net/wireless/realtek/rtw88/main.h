@@ -22,10 +22,6 @@
 #define MAX_PG_CAM_BACKUP_NUM		8
 
 #define RTW_SCAN_MAX_SSIDS		4
-<<<<<<< HEAD
-=======
-#define RTW_SCAN_MAX_IE_LEN		128
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define RTW_MAX_PATTERN_NUM		12
 #define RTW_MAX_PATTERN_MASK_SIZE	16
@@ -1232,10 +1228,7 @@ struct rtw_chip_info {
 	const char *wow_fw_name;
 	const struct wiphy_wowlan_support *wowlan_stub;
 	const u8 max_sched_scan_ssids;
-<<<<<<< HEAD
 	const u16 max_scan_ie_len;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* coex paras */
 	u32 coex_para_ver;
@@ -1887,33 +1880,6 @@ struct rtw_sar {
 	union rtw_sar_cfg cfg[RTW_RF_PATH_MAX][RTW_RATE_SECTION_MAX];
 };
 
-enum rtw_sar_sources {
-	RTW_SAR_SOURCE_NONE,
-	RTW_SAR_SOURCE_COMMON,
-};
-
-enum rtw_sar_bands {
-	RTW_SAR_BAND_0,
-	RTW_SAR_BAND_1,
-	/* RTW_SAR_BAND_2, not used now */
-	RTW_SAR_BAND_3,
-	RTW_SAR_BAND_4,
-
-	RTW_SAR_BAND_NR,
-};
-
-/* the union is reserved for other knids of SAR sources
- * which might not re-use same format with array common.
- */
-union rtw_sar_cfg {
-	s8 common[RTW_SAR_BAND_NR];
-};
-
-struct rtw_sar {
-	enum rtw_sar_sources src;
-	union rtw_sar_cfg cfg[RTW_RF_PATH_MAX][RTW_RATE_SECTION_MAX];
-};
-
 struct rtw_hal {
 	u32 rcr;
 
@@ -2000,10 +1966,7 @@ struct rtw_hw_scan_info {
 	struct ieee80211_vif *scanning_vif;
 	u8 probe_pg_size;
 	u8 op_pri_ch_idx;
-<<<<<<< HEAD
 	u8 op_pri_ch;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 op_chan;
 	u8 op_bw;
 };
@@ -2015,11 +1978,7 @@ struct rtw_dev {
 	struct rtw_hci hci;
 
 	struct rtw_hw_scan_info scan_info;
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip;
-=======
-	struct rtw_chip_info *chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_hal hal;
 	struct rtw_fifo_conf fifo;
 	struct rtw_fw_state fw;
@@ -2173,7 +2132,6 @@ static inline int rtw_chip_dump_fw_crash(struct rtw_dev *rtwdev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static inline
 enum nl80211_band rtw_hw_to_nl80211_band(enum rtw_supported_band hw_band)
 {
@@ -2188,8 +2146,6 @@ enum nl80211_band rtw_hw_to_nl80211_band(enum rtw_supported_band hw_band)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtw_set_rx_freq_band(struct rtw_rx_pkt_stat *pkt_stat, u8 channel);
 void rtw_set_dtim_period(struct rtw_dev *rtwdev, int dtim_period);
 void rtw_get_channel_params(struct cfg80211_chan_def *chandef,
@@ -2231,10 +2187,7 @@ int rtw_dump_fw(struct rtw_dev *rtwdev, const u32 ocp_src, u32 size,
 		u32 fwcd_item);
 int rtw_dump_reg(struct rtw_dev *rtwdev, const u32 addr, const u32 size);
 void rtw_set_txrx_1ss(struct rtw_dev *rtwdev, bool config_1ss);
-<<<<<<< HEAD
 void rtw_update_channel(struct rtw_dev *rtwdev, u8 center_channel,
 			u8 primary_channel, enum rtw_supported_band band,
 			enum rtw_bandwidth bandwidth);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

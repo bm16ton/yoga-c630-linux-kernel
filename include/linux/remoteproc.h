@@ -633,11 +633,7 @@ struct rproc_vring {
 /**
  * struct rproc_vdev - remoteproc state for a supported virtio device
  * @subdev: handle for registering the vdev as a rproc subdevice
-<<<<<<< HEAD
  * @pdev: remoteproc virtio platform device
-=======
- * @dev: device struct used for reference count semantics
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @id: virtio device id (as in virtio_ids.h)
  * @node: list node
  * @rproc: the rproc handle

@@ -144,8 +144,5 @@ static inline void ath11k_get_ce_msi_idx(struct ath11k_base *ab, u32 ce_id,
 	else
 		*msi_data_idx = ce_id;
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _HIF_H_ */

@@ -612,7 +612,6 @@ Commit message
 
     See: https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
 
-<<<<<<< HEAD
   **BAD_FIXES_TAG**
     The Fixes: tag is malformed or does not follow the community conventions.
     This can occur if the tag have been split into multiple lines (e.g., when
@@ -620,8 +619,6 @@ Commit message
 
     See: https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Comparison style
 ----------------

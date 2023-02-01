@@ -1749,10 +1749,6 @@ MODULE_DEVICE_TABLE(i2c, max98088_i2c_id);
 static int max98088_i2c_probe(struct i2c_client *i2c)
 {
 	struct max98088_priv *max98088;
-<<<<<<< HEAD
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct i2c_device_id *id;
 
 	max98088 = devm_kzalloc(&i2c->dev, sizeof(struct max98088_priv),
@@ -1775,14 +1771,8 @@ static int max98088_i2c_probe(struct i2c_client *i2c)
 	i2c_set_clientdata(i2c, max98088);
 	max98088->pdata = i2c->dev.platform_data;
 
-<<<<<<< HEAD
 	return devm_snd_soc_register_component(&i2c->dev, &soc_component_dev_max98088,
 					      &max98088_dai[0], 2);
-=======
-	ret = devm_snd_soc_register_component(&i2c->dev, &soc_component_dev_max98088,
-					      &max98088_dai[0], 2);
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #if defined(CONFIG_OF)

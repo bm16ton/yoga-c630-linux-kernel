@@ -1077,10 +1077,6 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
 {
 	struct iavf_adapter *adapter = netdev_priv(netdev);
 	struct sockaddr *addr = p;
-<<<<<<< HEAD
-=======
-	bool handle_mac = iavf_is_mac_set_handled(netdev, addr->sa_data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (!is_valid_ether_addr(addr->sa_data))
@@ -1091,18 +1087,9 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	ret = wait_event_interruptible_timeout(adapter->vc_waitqueue,
 					       iavf_is_mac_set_handled(netdev, addr->sa_data),
 					       msecs_to_jiffies(2500));
-=======
-
-
-	if (handle_mac)
-		goto done;
-
-	ret = wait_event_interruptible_timeout(adapter->vc_waitqueue, false, msecs_to_jiffies(2500));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* If ret < 0 then it means wait was interrupted.
 	 * If ret == 0 then it means we got a timeout.
@@ -1116,10 +1103,6 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
 	if (!ret)
 		return -EAGAIN;
 
-<<<<<<< HEAD
-=======
-done:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ether_addr_equal(netdev->dev_addr, addr->sa_data))
 		return -EACCES;
 
@@ -1405,21 +1388,12 @@ void iavf_down(struct iavf_adapter *adapter)
 	adapter->link_up = false;
 	iavf_napi_disable_all(adapter);
 	iavf_irq_disable(adapter);
-<<<<<<< HEAD
 
 	iavf_clear_mac_vlan_filters(adapter);
 	iavf_clear_cloud_filters(adapter);
 	iavf_clear_fdir_filters(adapter);
 	iavf_clear_adv_rss_conf(adapter);
 
-=======
-
-	iavf_clear_mac_vlan_filters(adapter);
-	iavf_clear_cloud_filters(adapter);
-	iavf_clear_fdir_filters(adapter);
-	iavf_clear_adv_rss_conf(adapter);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!(adapter->flags & IAVF_FLAG_PF_COMMS_FAILED)) {
 		/* cancel any current operation */
 		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
@@ -1506,89 +1480,6 @@ static void iavf_free_queues(struct iavf_adapter *adapter)
 /**
  * iavf_set_queue_vlan_tag_loc - set location for VLAN tag offload
  * @adapter: board private structure
-<<<<<<< HEAD
-=======
- *
- * Based on negotiated capabilities, the VLAN tag needs to be inserted and/or
- * stripped in certain descriptor fields. Instead of checking the offload
- * capability bits in the hot path, cache the location the ring specific
- * flags.
- */
-void iavf_set_queue_vlan_tag_loc(struct iavf_adapter *adapter)
-{
-	int i;
-
-	for (i = 0; i < adapter->num_active_queues; i++) {
-		struct iavf_ring *tx_ring = &adapter->tx_rings[i];
-		struct iavf_ring *rx_ring = &adapter->rx_rings[i];
-
-		/* prevent multiple L2TAG bits being set after VFR */
-		tx_ring->flags &=
-			~(IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1 |
-			  IAVF_TXR_FLAGS_VLAN_TAG_LOC_L2TAG2);
-		rx_ring->flags &=
-			~(IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1 |
-			  IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2);
-
-		if (VLAN_ALLOWED(adapter)) {
-			tx_ring->flags |= IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1;
-			rx_ring->flags |= IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1;
-		} else if (VLAN_V2_ALLOWED(adapter)) {
-			struct virtchnl_vlan_supported_caps *stripping_support;
-			struct virtchnl_vlan_supported_caps *insertion_support;
-
-			stripping_support =
-				&adapter->vlan_v2_caps.offloads.stripping_support;
-			insertion_support =
-				&adapter->vlan_v2_caps.offloads.insertion_support;
-
-			if (stripping_support->outer) {
-				if (stripping_support->outer &
-				    VIRTCHNL_VLAN_TAG_LOCATION_L2TAG1)
-					rx_ring->flags |=
-						IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1;
-				else if (stripping_support->outer &
-					 VIRTCHNL_VLAN_TAG_LOCATION_L2TAG2_2)
-					rx_ring->flags |=
-						IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2;
-			} else if (stripping_support->inner) {
-				if (stripping_support->inner &
-				    VIRTCHNL_VLAN_TAG_LOCATION_L2TAG1)
-					rx_ring->flags |=
-						IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1;
-				else if (stripping_support->inner &
-					 VIRTCHNL_VLAN_TAG_LOCATION_L2TAG2_2)
-					rx_ring->flags |=
-						IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2;
-			}
-
-			if (insertion_support->outer) {
-				if (insertion_support->outer &
-				    VIRTCHNL_VLAN_TAG_LOCATION_L2TAG1)
-					tx_ring->flags |=
-						IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1;
-				else if (insertion_support->outer &
-					 VIRTCHNL_VLAN_TAG_LOCATION_L2TAG2)
-					tx_ring->flags |=
-						IAVF_TXR_FLAGS_VLAN_TAG_LOC_L2TAG2;
-			} else if (insertion_support->inner) {
-				if (insertion_support->inner &
-				    VIRTCHNL_VLAN_TAG_LOCATION_L2TAG1)
-					tx_ring->flags |=
-						IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1;
-				else if (insertion_support->inner &
-					 VIRTCHNL_VLAN_TAG_LOCATION_L2TAG2)
-					tx_ring->flags |=
-						IAVF_TXR_FLAGS_VLAN_TAG_LOC_L2TAG2;
-			}
-		}
-	}
-}
-
-/**
- * iavf_alloc_queues - Allocate memory for all rings
- * @adapter: board private structure to initialize
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Based on negotiated capabilities, the VLAN tag needs to be inserted and/or
  * stripped in certain descriptor fields. Instead of checking the offload
@@ -3353,17 +3244,10 @@ static void iavf_adminq_task(struct work_struct *work)
 			if (VLAN_V2_ALLOWED(adapter))
 				iavf_set_vlan_offload_features
 					(adapter, 0, netdev->features);
-<<<<<<< HEAD
 
 			iavf_set_queue_vlan_tag_loc(adapter);
 		}
 
-=======
-
-			iavf_set_queue_vlan_tag_loc(adapter);
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adapter->flags &= ~IAVF_FLAG_SETUP_NETDEV_FEATURES;
 	}
 	if ((adapter->flags &
@@ -3966,11 +3850,7 @@ static int iavf_parse_cls_flower(struct iavf_adapter *adapter,
 				field_flags |= IAVF_CLOUD_FIELD_IIP;
 			} else {
 				dev_err(&adapter->pdev->dev, "Bad ip src mask 0x%08x\n",
-<<<<<<< HEAD
 					be32_to_cpu(match.mask->src));
-=======
-					be32_to_cpu(match.mask->dst));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				return -EINVAL;
 			}
 		}

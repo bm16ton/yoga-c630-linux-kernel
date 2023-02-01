@@ -27,20 +27,15 @@
 #include "util.h"
 #include "llvm-utils.h"
 #include "c++/clang-c.h"
-<<<<<<< HEAD
 #ifdef HAVE_LIBBPF_SUPPORT
 #include <bpf/hashmap.h>
 #else
 #include "util/hashmap.h"
 #endif
-=======
-#include "hashmap.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "asm/bug.h"
 
 #include <internal/xyarray.h>
 
-<<<<<<< HEAD
 #ifndef HAVE_LIBBPF_BPF_PROGRAM__SET_INSNS
 int bpf_program__set_insns(struct bpf_program *prog __maybe_unused,
 			   struct bpf_insn *new_insns __maybe_unused, size_t new_insn_cnt __maybe_unused)
@@ -59,8 +54,6 @@ int libbpf_register_prog_handler(const char *sec __maybe_unused,
 }
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* temporarily disable libbpf deprecation warnings */
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
@@ -85,7 +78,6 @@ struct bpf_prog_priv {
 struct bpf_perf_object {
 	struct list_head list;
 	struct bpf_object *obj;
-<<<<<<< HEAD
 };
 
 struct bpf_preproc_result {
@@ -93,15 +85,6 @@ struct bpf_preproc_result {
 	int new_insn_cnt;
 };
 
-=======
-};
-
-struct bpf_preproc_result {
-	struct bpf_insn *new_insn_ptr;
-	int new_insn_cnt;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static LIST_HEAD(bpf_objects_list);
 static struct hashmap *bpf_program_hash;
 static struct hashmap *bpf_map_hash;

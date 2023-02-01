@@ -417,12 +417,7 @@ static const struct dmi_system_id critclk_systems[] = {
 			DMI_MATCH(DMI_SYS_VENDOR, "SIEMENS AG"),
 		},
 	},
-<<<<<<< HEAD
 	{}
-=======
-
-	{ /*sentinel*/ }
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int pmc_setup_clks(struct pci_dev *pdev, void __iomem *pmc_regmap,

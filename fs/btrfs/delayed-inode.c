@@ -360,15 +360,8 @@ static int __btrfs_add_delayed_item(struct btrfs_delayed_node *delayed_node,
 	struct btrfs_delayed_item *item;
 	bool leftmost = true;
 
-<<<<<<< HEAD
 	if (ins->type == BTRFS_DELAYED_INSERTION_ITEM)
 		root = &delayed_node->ins_root;
-=======
-	if (ins->ins_or_del == BTRFS_DELAYED_INSERTION_ITEM)
-		root = &delayed_node->ins_root;
-	else if (ins->ins_or_del == BTRFS_DELAYED_DELETION_ITEM)
-		root = &delayed_node->del_root;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		root = &delayed_node->del_root;
 
@@ -392,21 +385,10 @@ static int __btrfs_add_delayed_item(struct btrfs_delayed_node *delayed_node,
 
 	rb_link_node(node, parent_node, p);
 	rb_insert_color_cached(node, root, leftmost);
-<<<<<<< HEAD
 
 	if (ins->type == BTRFS_DELAYED_INSERTION_ITEM &&
 	    ins->index >= delayed_node->index_cnt)
 		delayed_node->index_cnt = ins->index + 1;
-=======
-	ins->delayed_node = delayed_node;
-
-	/* Delayed items are always for dir index items. */
-	ASSERT(ins->key.type == BTRFS_DIR_INDEX_KEY);
-
-	if (ins->ins_or_del == BTRFS_DELAYED_INSERTION_ITEM &&
-	    ins->key.offset >= delayed_node->index_cnt)
-		delayed_node->index_cnt = ins->key.offset + 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	delayed_node->count++;
 	atomic_inc(&delayed_node->root->fs_info->delayed_root->items);
@@ -528,11 +510,7 @@ static int btrfs_delayed_item_reserve_metadata(struct btrfs_trans_handle *trans,
 		 * for the number of leaves that will be used, based on the delayed
 		 * node's index_items_size field.
 		 */
-<<<<<<< HEAD
 		if (item->type == BTRFS_DELAYED_DELETION_ITEM)
-=======
-		if (item->ins_or_del == BTRFS_DELAYED_DELETION_ITEM)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			item->bytes_reserved = num_bytes;
 	}
 
@@ -668,24 +646,15 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 	struct btrfs_delayed_item *next;
 	const int max_size = BTRFS_LEAF_DATA_SIZE(fs_info);
 	struct btrfs_item_batch batch;
-<<<<<<< HEAD
 	struct btrfs_key first_key;
 	const u32 first_data_size = first_item->data_len;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int total_size;
 	char *ins_data = NULL;
 	int ret;
 	bool continuous_keys_only = false;
-<<<<<<< HEAD
 
 	lockdep_assert_held(&node->mutex);
 
-=======
-
-	lockdep_assert_held(&node->mutex);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * During normal operation the delayed index offset is continuously
 	 * increasing, so we can batch insert all items as there will not be any
@@ -707,15 +676,9 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 	ASSERT(first_item->bytes_reserved == 0);
 
 	list_add_tail(&first_item->tree_list, &item_list);
-<<<<<<< HEAD
 	batch.total_data_size = first_data_size;
 	batch.nr = 1;
 	total_size = first_data_size + sizeof(struct btrfs_item);
-=======
-	batch.total_data_size = first_item->data_len;
-	batch.nr = 1;
-	total_size = first_item->data_len + sizeof(struct btrfs_item);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	curr = first_item;
 
 	while (true) {
@@ -729,12 +692,7 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 		 * We cannot allow gaps in the key space if we're doing log
 		 * replay.
 		 */
-<<<<<<< HEAD
 		if (continuous_keys_only && (next->index != curr->index + 1))
-=======
-		if (continuous_keys_only &&
-		    (next->key.offset != curr->key.offset + 1))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 
 		ASSERT(next->bytes_reserved == 0);
@@ -751,16 +709,11 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 	}
 
 	if (batch.nr == 1) {
-<<<<<<< HEAD
 		first_key.objectid = node->inode_id;
 		first_key.type = BTRFS_DIR_INDEX_KEY;
 		first_key.offset = first_item->index;
 		batch.keys = &first_key;
 		batch.data_sizes = &first_data_size;
-=======
-		batch.keys = &first_item->key;
-		batch.data_sizes = &first_item->data_len;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		struct btrfs_key *ins_keys;
 		u32 *ins_sizes;
@@ -777,13 +730,9 @@ static int btrfs_insert_delayed_item(struct btrfs_trans_handle *trans,
 		batch.keys = ins_keys;
 		batch.data_sizes = ins_sizes;
 		list_for_each_entry(curr, &item_list, tree_list) {
-<<<<<<< HEAD
 			ins_keys[i].objectid = node->inode_id;
 			ins_keys[i].type = BTRFS_DIR_INDEX_KEY;
 			ins_keys[i].offset = curr->index;
-=======
-			ins_keys[i] = curr->key;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ins_sizes[i] = curr->data_len;
 			i++;
 		}
@@ -879,10 +828,7 @@ static int btrfs_batch_delete_items(struct btrfs_trans_handle *trans,
 				    struct btrfs_path *path,
 				    struct btrfs_delayed_item *item)
 {
-<<<<<<< HEAD
 	const u64 ino = item->delayed_node->inode_id;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct btrfs_fs_info *fs_info = root->fs_info;
 	struct btrfs_delayed_item *curr, *next;
 	struct extent_buffer *leaf = path->nodes[0];
@@ -921,13 +867,9 @@ static int btrfs_batch_delete_items(struct btrfs_trans_handle *trans,
 
 		slot++;
 		btrfs_item_key_to_cpu(leaf, &key, slot);
-<<<<<<< HEAD
 		if (key.objectid != ino ||
 		    key.type != BTRFS_DIR_INDEX_KEY ||
 		    key.offset != next->index)
-=======
-		if (btrfs_comp_cpu_keys(&next->key, &key) != 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		nitems++;
 		curr = next;
@@ -945,14 +887,8 @@ static int btrfs_batch_delete_items(struct btrfs_trans_handle *trans,
 		 * Check btrfs_delayed_item_reserve_metadata() to see why we
 		 * don't need to release/reserve qgroup space.
 		 */
-<<<<<<< HEAD
 		trace_btrfs_space_reservation(fs_info, "delayed_item", ino,
 					      total_reserved_size, 0);
-=======
-		trace_btrfs_space_reservation(fs_info, "delayed_item",
-					      item->key.objectid, total_reserved_size,
-					      0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		btrfs_block_rsv_release(fs_info, &fs_info->delayed_block_rsv,
 					total_reserved_size, NULL);
 	}
@@ -970,17 +906,12 @@ static int btrfs_delete_delayed_items(struct btrfs_trans_handle *trans,
 				      struct btrfs_root *root,
 				      struct btrfs_delayed_node *node)
 {
-<<<<<<< HEAD
 	struct btrfs_key key;
 	int ret = 0;
 
 	key.objectid = node->inode_id;
 	key.type = BTRFS_DIR_INDEX_KEY;
 
-=======
-	int ret = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (ret == 0) {
 		struct btrfs_delayed_item *item;
 
@@ -991,12 +922,8 @@ static int btrfs_delete_delayed_items(struct btrfs_trans_handle *trans,
 			break;
 		}
 
-<<<<<<< HEAD
 		key.offset = item->index;
 		ret = btrfs_search_slot(trans, root, &key, path, -1, 1);
-=======
-		ret = btrfs_search_slot(trans, root, &item->key, path, -1, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret > 0) {
 			/*
 			 * There's no matching item in the leaf. This means we
@@ -1509,14 +1436,7 @@ int btrfs_insert_delayed_dir_index(struct btrfs_trans_handle *trans,
 		goto release_node;
 	}
 
-<<<<<<< HEAD
 	delayed_item->index = index;
-=======
-	delayed_item->key.objectid = btrfs_ino(dir);
-	delayed_item->key.type = BTRFS_DIR_INDEX_KEY;
-	delayed_item->key.offset = index;
-	delayed_item->ins_or_del = BTRFS_DELAYED_INSERTION_ITEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dir_item = (struct btrfs_dir_item *)delayed_item->data;
 	dir_item->location = *disk_key;
@@ -1540,12 +1460,7 @@ int btrfs_insert_delayed_dir_index(struct btrfs_trans_handle *trans,
 	}
 
 	if (reserve_leaf_space) {
-<<<<<<< HEAD
 		ret = btrfs_delayed_item_reserve_metadata(trans, delayed_item);
-=======
-		ret = btrfs_delayed_item_reserve_metadata(trans, dir->root,
-							  delayed_item);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Space was reserved for a dir index item insertion when we
 		 * started the transaction, so getting a failure here should be
@@ -1659,12 +1574,7 @@ int btrfs_delete_delayed_dir_index(struct btrfs_trans_handle *trans,
 		goto end;
 	}
 
-<<<<<<< HEAD
 	item->index = index;
-=======
-	item->key = item_key;
-	item->ins_or_del = BTRFS_DELAYED_DELETION_ITEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = btrfs_delayed_item_reserve_metadata(trans, item);
 	/*

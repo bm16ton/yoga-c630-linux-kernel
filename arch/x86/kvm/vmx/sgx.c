@@ -129,11 +129,7 @@ static int sgx_inject_fault(struct kvm_vcpu *vcpu, gva_t gva, int trapnr)
 		ex.address = gva;
 		ex.error_code_valid = true;
 		ex.nested_page_fault = false;
-<<<<<<< HEAD
 		kvm_inject_emulated_page_fault(vcpu, &ex);
-=======
-		kvm_inject_page_fault(vcpu, &ex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		kvm_inject_gp(vcpu, 0);
 	}
@@ -186,15 +182,10 @@ static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
 	/* Enforce CPUID restriction on max enclave size. */
 	max_size_log2 = (attributes & SGX_ATTR_MODE64BIT) ? sgx_12_0->edx >> 8 :
 							    sgx_12_0->edx;
-<<<<<<< HEAD
 	if (size >= BIT_ULL(max_size_log2)) {
 		kvm_inject_gp(vcpu, 0);
 		return 1;
 	}
-=======
-	if (size >= BIT_ULL(max_size_log2))
-		kvm_inject_gp(vcpu, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * sgx_virt_ecreate() returns:

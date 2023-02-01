@@ -5,11 +5,7 @@
 
 lib-y	+= memcopy.o memset.o checksum.o \
 	   ashldi3.o ashrdi3.o lshrdi3.o \
-<<<<<<< HEAD
 	   divsi3.o udivsi3.o modsi3.o umodsi3.o mulsi3.o umulsidi3.o \
-=======
-	   divsi3.o udivsi3.o modsi3.o umodsi3.o mulsi3.o \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	   usercopy.o strncpy_user.o strnlen_user.o
 lib-$(CONFIG_PCI) += pci-auto.o
 lib-$(CONFIG_KCSAN) += kcsan-stubs.o

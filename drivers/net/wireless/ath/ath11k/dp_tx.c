@@ -113,10 +113,7 @@ tcl_ring_sel:
 	tcl_ring_retry = false;
 
 	ti.ring_id = ring_selector % ab->hw_params.max_tx_ring;
-<<<<<<< HEAD
 	ti.rbm_id = ab->hw_params.hal_params->tcl2wbm_rbm_map[ti.ring_id].rbm_id;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ring_map |= BIT(ti.ring_id);
 
@@ -128,12 +125,8 @@ tcl_ring_sel:
 	spin_unlock_bh(&tx_ring->tx_idr_lock);
 
 	if (unlikely(ret < 0)) {
-<<<<<<< HEAD
 		if (ring_map == (BIT(ab->hw_params.max_tx_ring) - 1) ||
 		    !ab->hw_params.tcl_ring_retry) {
-=======
-		if (ring_map == (BIT(ab->hw_params.max_tx_ring) - 1)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			atomic_inc(&ab->soc_stats.tx_err.misc_fail);
 			return -ENOSPC;
 		}
@@ -251,11 +244,7 @@ tcl_ring_sel:
 		 * Restart ring selection if some rings are not checked yet.
 		 */
 		if (unlikely(ring_map != (BIT(ab->hw_params.max_tx_ring)) - 1) &&
-<<<<<<< HEAD
 		    ab->hw_params.tcl_ring_retry && ab->hw_params.max_tx_ring > 1) {
-=======
-		    ab->hw_params.max_tx_ring > 1) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			tcl_ring_retry = true;
 			ring_selector++;
 		}
@@ -618,15 +607,9 @@ static void ath11k_dp_tx_complete_msdu(struct ath11k *ar,
 
 	status.rates = &status_rate;
 	status.n_rates = 1;
-<<<<<<< HEAD
 
 	spin_unlock_bh(&ab->base_lock);
 
-=======
-
-	spin_unlock_bh(&ab->base_lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ieee80211_tx_status_ext(ar->hw, &status);
 }
 

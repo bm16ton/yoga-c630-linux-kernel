@@ -158,11 +158,7 @@ void fscrypt_destroy_prepared_key(struct super_block *sb,
 				  struct fscrypt_prepared_key *prep_key)
 {
 	crypto_free_skcipher(prep_key->tfm);
-<<<<<<< HEAD
 	fscrypt_destroy_inline_crypt_key(sb, prep_key);
-=======
-	fscrypt_destroy_inline_crypt_key(prep_key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memzero_explicit(prep_key, sizeof(*prep_key));
 }
 
@@ -499,12 +495,8 @@ static void put_crypt_info(struct fscrypt_info *ci)
 	if (ci->ci_direct_key)
 		fscrypt_put_direct_key(ci->ci_direct_key);
 	else if (ci->ci_owns_key)
-<<<<<<< HEAD
 		fscrypt_destroy_prepared_key(ci->ci_inode->i_sb,
 					     &ci->ci_enc_key);
-=======
-		fscrypt_destroy_prepared_key(&ci->ci_enc_key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mk = ci->ci_master_key;
 	if (mk) {

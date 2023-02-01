@@ -21,11 +21,7 @@ possible we decided to do following:
   - Devices behind real busses where there is a connector resource
     are represented as struct spi_device or struct i2c_device. Note
     that standard UARTs are not busses so there is no struct uart_device,
-<<<<<<< HEAD
     although some of them may be represented by struct serdev_device.
-=======
-    although some of them may be represented by sturct serdev_device.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 As both ACPI and Device Tree represent a tree of devices (and their
 resources) this implementation follows the Device Tree way as much as

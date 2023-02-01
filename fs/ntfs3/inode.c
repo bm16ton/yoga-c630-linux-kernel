@@ -129,12 +129,9 @@ next_attr:
 	rsize = attr->non_res ? 0 : le32_to_cpu(attr->res.data_size);
 	asize = le32_to_cpu(attr->size);
 
-<<<<<<< HEAD
 	if (le16_to_cpu(attr->name_off) + attr->name_len > asize)
 		goto out;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (attr->type) {
 	case ATTR_STD:
 		if (attr->non_res ||
@@ -370,7 +367,6 @@ next_attr:
 attr_unpack_run:
 	roff = le16_to_cpu(attr->nres.run_off);
 
-<<<<<<< HEAD
 	if (roff > asize) {
 		err = -EINVAL;
 		goto out;
@@ -378,9 +374,6 @@ attr_unpack_run:
 
 	t64 = le64_to_cpu(attr->nres.svcn);
 
-=======
-	t64 = le64_to_cpu(attr->nres.svcn);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = run_unpack_ex(run, sbi, ino, t64, le64_to_cpu(attr->nres.evcn),
 			    t64, Add2Ptr(attr, roff), asize - roff);
 	if (err < 0)
@@ -646,18 +639,9 @@ static noinline int ntfs_get_block_vbo(struct inode *inode, u64 vbo,
 			bh->b_size = block_size;
 			off = vbo & (PAGE_SIZE - 1);
 			set_bh_page(bh, page, off);
-<<<<<<< HEAD
 			err = bh_read(bh, 0);
 			if (err < 0)
 				goto out;
-=======
-			ll_rw_block(REQ_OP_READ, 1, &bh);
-			wait_on_buffer(bh);
-			if (!buffer_uptodate(bh)) {
-				err = -EIO;
-				goto out;
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			zero_user_segment(page, off + voff, off + block_size);
 		}
 	}

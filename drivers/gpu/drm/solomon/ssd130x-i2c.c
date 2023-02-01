@@ -39,20 +39,11 @@ static int ssd130x_i2c_probe(struct i2c_client *client)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void ssd130x_i2c_remove(struct i2c_client *client)
-=======
-static int ssd130x_i2c_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ssd130x_device *ssd130x = i2c_get_clientdata(client);
 
 	ssd130x_remove(ssd130x);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ssd130x_i2c_shutdown(struct i2c_client *client)

@@ -689,11 +689,7 @@
 			status = "disabled";
 			reg = <0x65a00000 0xcd00>;
 			interrupt-names = "dwc_usb3";
-<<<<<<< HEAD
 			interrupts = <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>;
-=======
-			interrupts = <0 134 4>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_usb0>, <&pinctrl_usb2>;
 			clock-names = "ref", "bus_early", "suspend";
@@ -795,11 +791,7 @@
 			status = "disabled";
 			reg = <0x65c00000 0xcd00>;
 			interrupt-names = "dwc_usb3";
-<<<<<<< HEAD
 			interrupts = <GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>;
-=======
-			interrupts = <0 137 4>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_usb1>, <&pinctrl_usb3>;
 			clock-names = "ref", "bus_early", "suspend";

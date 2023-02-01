@@ -138,11 +138,7 @@ EXPORT_SYMBOL(rtw_phy_set_edcca_th);
 
 void rtw_phy_adaptivity_set_mode(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_dm_info *dm_info = &rtwdev->dm_info;
 
 	/* turn off in debugfs for debug usage */
@@ -169,11 +165,7 @@ void rtw_phy_adaptivity_set_mode(struct rtw_dev *rtwdev)
 
 static void rtw_phy_adaptivity_init(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rtw_phy_adaptivity_set_mode(rtwdev);
 	if (chip->ops->adaptivity_init)
@@ -188,11 +180,7 @@ static void rtw_phy_adaptivity(struct rtw_dev *rtwdev)
 
 static void rtw_phy_cfo_init(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (chip->ops->cfo_init)
 		chip->ops->cfo_init(rtwdev);
@@ -671,11 +659,7 @@ EXPORT_SYMBOL(rtw_phy_parsing_cfo);
 
 static void rtw_phy_cfo_track(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (chip->ops->cfo_track)
 		chip->ops->cfo_track(rtwdev);
@@ -2495,11 +2479,7 @@ static void rtw_phy_set_tx_path_by_reg(struct rtw_dev *rtwdev,
 {
 	struct rtw_path_div *path_div = &rtwdev->dm_path_div;
 	enum rtw_bb_path tx_path_sel_cck = tx_path_sel_1ss;
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (tx_path_sel_1ss == path_div->current_tx_path)
 		return;
@@ -2554,11 +2534,7 @@ static void rtw_phy_tx_path_diversity_2ss(struct rtw_dev *rtwdev)
 
 void rtw_phy_tx_path_diversity(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!chip->path_div_supported)
 		return;

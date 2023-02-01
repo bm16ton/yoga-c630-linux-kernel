@@ -17,12 +17,8 @@
 #define	UBLK_CMD_STOP_DEV	0x07
 #define	UBLK_CMD_SET_PARAMS	0x08
 #define	UBLK_CMD_GET_PARAMS	0x09
-<<<<<<< HEAD
 #define	UBLK_CMD_START_USER_RECOVERY	0x10
 #define	UBLK_CMD_END_USER_RECOVERY	0x11
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * IO commands, issued by ublk server, and handled by ublk driver.
  *
@@ -79,7 +75,6 @@
  */
 #define UBLK_F_NEED_GET_DATA (1UL << 2)
 
-<<<<<<< HEAD
 #define UBLK_F_USER_RECOVERY	(1UL << 3)
 
 #define UBLK_F_USER_RECOVERY_REISSUE	(1UL << 4)
@@ -88,11 +83,6 @@
 #define UBLK_S_DEV_DEAD	0
 #define UBLK_S_DEV_LIVE	1
 #define UBLK_S_DEV_QUIESCED	2
-=======
-/* device state */
-#define UBLK_S_DEV_DEAD	0
-#define UBLK_S_DEV_LIVE	1
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* shipped via sqe->cmd of io_uring command */
 struct ublksrv_ctrl_cmd {

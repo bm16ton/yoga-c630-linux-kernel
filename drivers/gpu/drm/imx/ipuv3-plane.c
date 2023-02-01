@@ -8,19 +8,11 @@
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_blend.h>
-<<<<<<< HEAD
 #include <drm/drm_fb_dma_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_fb_cma_helper.h>
-#include <drm/drm_fourcc.h>
-#include <drm/drm_framebuffer.h>
-#include <drm/drm_gem_atomic_helper.h>
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_managed.h>
 
 #include <video/imx-ipu-v3.h>
@@ -400,13 +392,8 @@ static int ipu_plane_atomic_check(struct drm_plane *plane,
 		return -EINVAL;
 
 	ret = drm_atomic_helper_check_plane_state(new_state, crtc_state,
-<<<<<<< HEAD
 						  DRM_PLANE_NO_SCALING,
 						  DRM_PLANE_NO_SCALING,
-=======
-						  DRM_PLANE_HELPER_NO_SCALING,
-						  DRM_PLANE_HELPER_NO_SCALING,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						  can_position, true);
 	if (ret)
 		return ret;
@@ -627,14 +614,11 @@ static void ipu_plane_atomic_update(struct drm_plane *plane,
 		break;
 	}
 
-<<<<<<< HEAD
 	if (ipu_plane->dp_flow == IPU_DP_FLOW_SYNC_BG)
 		width = ipu_src_rect_width(new_state);
 	else
 		width = drm_rect_width(&new_state->src) >> 16;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	eba = drm_plane_state_to_eba(new_state, 0);
 
 	/*
@@ -643,12 +627,7 @@ static void ipu_plane_atomic_update(struct drm_plane *plane,
 	 */
 	if (ipu_state->use_pre) {
 		axi_id = ipu_chan_assign_axi_id(ipu_plane->dma);
-<<<<<<< HEAD
 		ipu_prg_channel_configure(ipu_plane->ipu_ch, axi_id, width,
-=======
-		ipu_prg_channel_configure(ipu_plane->ipu_ch, axi_id,
-					  ipu_src_rect_width(new_state),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					  drm_rect_height(&new_state->src) >> 16,
 					  fb->pitches[0], fb->format->format,
 					  fb->modifier, &eba);
@@ -703,14 +682,8 @@ static void ipu_plane_atomic_update(struct drm_plane *plane,
 		break;
 	}
 
-<<<<<<< HEAD
 	ipu_dmfc_config_wait4eot(ipu_plane->dmfc, width);
 
-=======
-	ipu_dmfc_config_wait4eot(ipu_plane->dmfc, ALIGN(drm_rect_width(dst), 8));
-
-	width = ipu_src_rect_width(new_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	height = drm_rect_height(&new_state->src) >> 16;
 	info = drm_format_info(fb->format->format);
 	ipu_calculate_bursts(width, info->cpp[0], fb->pitches[0],
@@ -774,12 +747,7 @@ static void ipu_plane_atomic_update(struct drm_plane *plane,
 		ipu_cpmem_set_burstsize(ipu_plane->ipu_ch, 16);
 
 		ipu_cpmem_zero(ipu_plane->alpha_ch);
-<<<<<<< HEAD
 		ipu_cpmem_set_resolution(ipu_plane->alpha_ch, width,
-=======
-		ipu_cpmem_set_resolution(ipu_plane->alpha_ch,
-					 ipu_src_rect_width(new_state),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 drm_rect_height(&new_state->src) >> 16);
 		ipu_cpmem_set_format_passthrough(ipu_plane->alpha_ch, 8);
 		ipu_cpmem_set_high_priority(ipu_plane->alpha_ch);

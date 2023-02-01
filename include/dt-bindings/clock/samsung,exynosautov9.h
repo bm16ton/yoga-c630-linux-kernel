@@ -185,7 +185,6 @@
 
 #define CORE_NR_CLK			6
 
-<<<<<<< HEAD
 /* CMU_FSYS0 */
 #define CLK_MOUT_FSYS0_BUS_USER		1
 #define CLK_MOUT_FSYS0_PCIE_USER	2
@@ -254,8 +253,6 @@
 
 #define FSYS1_NR_CLK				19
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* CMU_FSYS2 */
 #define CLK_MOUT_FSYS2_BUS_USER		1
 #define CLK_MOUT_FSYS2_UFS_EMBD_USER	2

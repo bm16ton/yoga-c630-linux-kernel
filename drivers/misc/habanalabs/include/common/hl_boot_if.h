@@ -34,10 +34,7 @@ enum cpu_boot_err {
 	CPU_BOOT_ERR_BINNING_FAIL = 19,
 	CPU_BOOT_ERR_TPM_FAIL = 20,
 	CPU_BOOT_ERR_TMP_THRESH_INIT_FAIL = 21,
-<<<<<<< HEAD
 	CPU_BOOT_ERR_EEPROM_FAIL = 22,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	CPU_BOOT_ERR_ENABLED = 31,
 	CPU_BOOT_ERR_SCND_EN = 63,
 	CPU_BOOT_ERR_LAST = 64 /* we have 2 registers of 32 bits */
@@ -119,12 +116,9 @@ enum cpu_boot_err {
  * CPU_BOOT_ERR0_TMP_THRESH_INIT_FAIL	Failed to set threshold for tmperature
  *					sensor.
  *
-<<<<<<< HEAD
  * CPU_BOOT_ERR_EEPROM_FAIL		Failed reading EEPROM data. Defaults
  *					are used.
  *
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * CPU_BOOT_ERR0_ENABLED		Error registers enabled.
  *					This is a main indication that the
  *					running FW populates the error
@@ -149,10 +143,7 @@ enum cpu_boot_err {
 #define CPU_BOOT_ERR0_BINNING_FAIL		(1 << CPU_BOOT_ERR_BINNING_FAIL)
 #define CPU_BOOT_ERR0_TPM_FAIL			(1 << CPU_BOOT_ERR_TPM_FAIL)
 #define CPU_BOOT_ERR0_TMP_THRESH_INIT_FAIL	(1 << CPU_BOOT_ERR_TMP_THRESH_INIT_FAIL)
-<<<<<<< HEAD
 #define CPU_BOOT_ERR0_EEPROM_FAIL		(1 << CPU_BOOT_ERR_EEPROM_FAIL)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CPU_BOOT_ERR0_ENABLED			(1 << CPU_BOOT_ERR_ENABLED)
 #define CPU_BOOT_ERR1_ENABLED			(1 << CPU_BOOT_ERR_ENABLED)
 
@@ -440,13 +431,9 @@ struct cpu_dyn_regs {
 	__le32 gic_host_ints_irq;
 	__le32 gic_host_soft_rst_irq;
 	__le32 gic_rot_qm_irq_ctrl;
-<<<<<<< HEAD
 	__le32 cpu_rst_status;
 	__le32 eng_arc_irq_ctrl;
 	__le32 reserved1[20];		/* reserve for future use */
-=======
-	__le32 reserved1[22];		/* reserve for future use */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* TODO: remove the desc magic after the code is updated to use message */
@@ -485,7 +472,6 @@ enum comms_msg_type {
 	HL_COMMS_BINNING_CONF_TYPE = 3,
 };
 
-<<<<<<< HEAD
 /*
  * Binning information shared between LKD and FW
  * @tpc_mask - TPC binning information
@@ -506,8 +492,6 @@ struct lkd_fw_binning_info {
 	__le32 reserved;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* TODO: remove this struct after the code is updated to use message */
 /* this is the comms descriptor header - meta data */
 struct comms_desc_header {
@@ -568,17 +552,7 @@ struct lkd_fw_comms_msg {
 		struct {
 			__u8 fw_cfg_skip; /* 1 - skip, 0 - don't skip */
 		};
-<<<<<<< HEAD
 		struct lkd_fw_binning_info binning_info;
-=======
-		struct {
-			__le64 tpc_binning_conf;
-			__le32 dec_binning_conf;
-			__le32 hbm_binning_conf;
-			__le32 edma_binning_conf;
-			__le32 mme_redundancy_conf; /* use MME_REDUNDANT_COLUMN */
-		};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 

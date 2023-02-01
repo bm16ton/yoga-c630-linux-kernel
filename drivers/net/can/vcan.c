@@ -86,21 +86,13 @@ static void vcan_rx(struct sk_buff *skb, struct net_device *dev)
 static netdev_tx_t vcan_tx(struct sk_buff *skb, struct net_device *dev)
 {
 	struct net_device_stats *stats = &dev->stats;
-<<<<<<< HEAD
 	unsigned int len;
 	int loop;
-=======
-	int loop, len;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (can_dropped_invalid_skb(dev, skb))
 		return NETDEV_TX_OK;
 
-<<<<<<< HEAD
 	len = can_skb_get_data_len(skb);
-=======
-	len = cfd->can_id & CAN_RTR_FLAG ? 0 : cfd->len;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	stats->tx_packets++;
 	stats->tx_bytes += len;
 

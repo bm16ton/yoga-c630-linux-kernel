@@ -355,9 +355,6 @@ struct gpio_desc *gpiod_get_from_of_node(const struct device_node *node,
 
 	lflags = of_convert_gpio_flags(of_flags);
 
-	if (flags & OF_GPIO_PULL_DISABLE)
-		lflags |= GPIO_PULL_DISABLE;
-
 	ret = gpiod_configure_flags(desc, propname, lflags, dflags);
 	if (ret < 0) {
 		gpiod_put(desc);
@@ -379,11 +376,6 @@ static struct gpio_desc *of_find_spi_gpio(struct device_node *np,
 					  enum of_gpio_flags *of_flags)
 {
 	char prop_name[32]; /* 32 is max size of property name */
-<<<<<<< HEAD
-=======
-	const struct device_node *np = dev->of_node;
-	struct gpio_desc *desc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Hopefully the compiler stubs the rest of the function if this
@@ -412,11 +404,6 @@ static struct gpio_desc *of_find_spi_cs_gpio(struct device_node *np,
 					     unsigned int idx,
 					     enum of_gpio_flags *of_flags)
 {
-<<<<<<< HEAD
-=======
-	const struct device_node *np = dev->of_node;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!IS_ENABLED(CONFIG_SPI_MASTER))
 		return ERR_PTR(-ENOENT);
 
@@ -453,11 +440,6 @@ static struct gpio_desc *of_find_regulator_gpio(struct device_node *np,
 		"wlf,ldo1ena", /* WM8994 */
 		"wlf,ldo2ena", /* WM8994 */
 	};
-<<<<<<< HEAD
-=======
-	const struct device_node *np = dev->of_node;
-	struct gpio_desc *desc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 
 	if (!IS_ENABLED(CONFIG_REGULATOR))
@@ -551,29 +533,7 @@ struct gpio_desc *of_find_gpio(struct device *dev, const char *con_id,
 	if (IS_ERR(desc))
 		return desc;
 
-<<<<<<< HEAD
 	*flags = of_convert_gpio_flags(of_flags);
-=======
-	if (of_flags & OF_GPIO_ACTIVE_LOW)
-		*flags |= GPIO_ACTIVE_LOW;
-
-	if (of_flags & OF_GPIO_SINGLE_ENDED) {
-		if (of_flags & OF_GPIO_OPEN_DRAIN)
-			*flags |= GPIO_OPEN_DRAIN;
-		else
-			*flags |= GPIO_OPEN_SOURCE;
-	}
-
-	if (of_flags & OF_GPIO_TRANSITORY)
-		*flags |= GPIO_TRANSITORY;
-
-	if (of_flags & OF_GPIO_PULL_UP)
-		*flags |= GPIO_PULL_UP;
-	if (of_flags & OF_GPIO_PULL_DOWN)
-		*flags |= GPIO_PULL_DOWN;
-	if (of_flags & OF_GPIO_PULL_DISABLE)
-		*flags |= GPIO_PULL_DISABLE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return desc;
 }
@@ -631,20 +591,7 @@ static struct gpio_desc *of_parse_own_gpio(struct device_node *np,
 	if (IS_ERR(desc))
 		return desc;
 
-<<<<<<< HEAD
 	*lflags = of_convert_gpio_flags(xlate_flags);
-=======
-	if (xlate_flags & OF_GPIO_ACTIVE_LOW)
-		*lflags |= GPIO_ACTIVE_LOW;
-	if (xlate_flags & OF_GPIO_TRANSITORY)
-		*lflags |= GPIO_TRANSITORY;
-	if (xlate_flags & OF_GPIO_PULL_UP)
-		*lflags |= GPIO_PULL_UP;
-	if (xlate_flags & OF_GPIO_PULL_DOWN)
-		*lflags |= GPIO_PULL_DOWN;
-	if (xlate_flags & OF_GPIO_PULL_DISABLE)
-		*lflags |= GPIO_PULL_DISABLE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (of_property_read_bool(np, "input"))
 		*dflags |= GPIOD_IN;

@@ -94,10 +94,7 @@ enum ovs_datapath_attr {
 	OVS_DP_ATTR_PER_CPU_PIDS,   /* Netlink PIDS to receive upcalls in
 				     * per-cpu dispatch mode
 				     */
-<<<<<<< HEAD
 	OVS_DP_ATTR_IFINDEX,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__OVS_DP_ATTR_MAX
 };
 

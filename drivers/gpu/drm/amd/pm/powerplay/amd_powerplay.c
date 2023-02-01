@@ -1486,10 +1486,7 @@ static int pp_get_prv_buffer_details(void *handle, void **addr, size_t *size)
 {
 	struct pp_hwmgr *hwmgr = handle;
 	struct amdgpu_device *adev = hwmgr->adev;
-<<<<<<< HEAD
 	int err;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!addr || !size)
 		return -EINVAL;
@@ -1497,13 +1494,9 @@ static int pp_get_prv_buffer_details(void *handle, void **addr, size_t *size)
 	*addr = NULL;
 	*size = 0;
 	if (adev->pm.smu_prv_buffer) {
-<<<<<<< HEAD
 		err = amdgpu_bo_kmap(adev->pm.smu_prv_buffer, addr);
 		if (err)
 			return err;
-=======
-		amdgpu_bo_kmap(adev->pm.smu_prv_buffer, addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*size = adev->pm.smu_prv_buffer_size;
 	}
 

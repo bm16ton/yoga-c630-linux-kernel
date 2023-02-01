@@ -21,10 +21,7 @@
 #include <linux/io.h>
 #include <linux/iopoll.h>
 #include <linux/module.h>
-<<<<<<< HEAD
 #include <linux/mod_devicetable.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/nvmem-consumer.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
@@ -244,10 +241,7 @@ struct stm32_adc_cfg {
  * @chan_name:		channel name array
  * @num_diff:		number of differential channels
  * @int_ch:		internal channel indexes array
-<<<<<<< HEAD
  * @nsmps:		number of channels with optional sample time
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct stm32_adc {
 	struct stm32_adc_common	*common;
@@ -274,10 +268,7 @@ struct stm32_adc {
 	char			chan_name[STM32_ADC_CH_MAX][STM32_ADC_CH_SZ];
 	u32			num_diff;
 	int			int_ch[STM32_ADC_INT_CH_NB];
-<<<<<<< HEAD
 	int			nsmps;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct stm32_adc_diff_channel {
@@ -1874,11 +1865,7 @@ static void stm32_adc_chan_init_one(struct iio_dev *indio_dev,
 
 static int stm32_adc_get_legacy_chan_count(struct iio_dev *indio_dev, struct stm32_adc *adc)
 {
-<<<<<<< HEAD
 	struct device *dev = &indio_dev->dev;
-=======
-	struct device_node *node = indio_dev->dev.of_node;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct stm32_adc_info *adc_info = adc->cfg->adc_info;
 	int num_channels = 0, ret;
 
@@ -1890,7 +1877,6 @@ static int stm32_adc_get_legacy_chan_count(struct iio_dev *indio_dev, struct stm
 		num_channels += ret;
 	}
 
-<<<<<<< HEAD
 	/*
 	 * each st,adc-diff-channels is a group of 2 u32 so we divide @ret
 	 * to get the *real* number of channels.
@@ -1900,10 +1886,6 @@ static int stm32_adc_get_legacy_chan_count(struct iio_dev *indio_dev, struct stm
 		return ret;
 
 	ret /= (int)(sizeof(struct stm32_adc_diff_channel) / sizeof(u32));
-=======
-	ret = of_property_count_elems_of_size(node, "st,adc-diff-channels",
-					      sizeof(struct stm32_adc_diff_channel));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret > adc_info->max_channels) {
 		dev_err(&indio_dev->dev, "Bad st,adc-diff-channels?\n");
 		return -EINVAL;
@@ -1921,46 +1903,6 @@ static int stm32_adc_get_legacy_chan_count(struct iio_dev *indio_dev, struct stm
 
 	return num_channels;
 }
-<<<<<<< HEAD
-=======
-
-static int stm32_adc_legacy_chan_init(struct iio_dev *indio_dev,
-				      struct stm32_adc *adc,
-				      struct iio_chan_spec *channels)
-{
-	struct device_node *node = indio_dev->dev.of_node;
-	const struct stm32_adc_info *adc_info = adc->cfg->adc_info;
-	struct stm32_adc_diff_channel diff[STM32_ADC_CH_MAX];
-	u32 num_diff = adc->num_diff;
-	int size = num_diff * sizeof(*diff) / sizeof(u32);
-	int scan_index = 0, val, ret, i;
-	struct property *prop;
-	const __be32 *cur;
-	u32 smp = 0;
-
-	if (num_diff) {
-		ret = of_property_read_u32_array(node, "st,adc-diff-channels",
-						 (u32 *)diff, size);
-		if (ret) {
-			dev_err(&indio_dev->dev, "Failed to get diff channels %d\n", ret);
-			return ret;
-		}
-
-		for (i = 0; i < num_diff; i++) {
-			if (diff[i].vinp >= adc_info->max_channels ||
-			    diff[i].vinn >= adc_info->max_channels) {
-				dev_err(&indio_dev->dev, "Invalid channel in%d-in%d\n",
-					diff[i].vinp, diff[i].vinn);
-				return -EINVAL;
-			}
-
-			stm32_adc_chan_init_one(indio_dev, &channels[scan_index],
-						diff[i].vinp, diff[i].vinn,
-						scan_index, true);
-			scan_index++;
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int stm32_adc_legacy_chan_init(struct iio_dev *indio_dev,
 				      struct stm32_adc *adc,
@@ -1984,15 +1926,10 @@ static int stm32_adc_legacy_chan_init(struct iio_dev *indio_dev,
 		}
 
 		for (i = 0; i < num_diff; i++) {
-<<<<<<< HEAD
 			if (diff[i].vinp >= adc_info->max_channels ||
 			    diff[i].vinn >= adc_info->max_channels) {
 				dev_err(&indio_dev->dev, "Invalid channel in%d-in%d\n",
 					diff[i].vinp, diff[i].vinn);
-=======
-			if (val == diff[i].vinp) {
-				dev_err(&indio_dev->dev, "channel %d misconfigured\n",	val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				return -EINVAL;
 			}
 
@@ -2003,7 +1940,6 @@ static int stm32_adc_legacy_chan_init(struct iio_dev *indio_dev,
 		}
 	}
 
-<<<<<<< HEAD
 	ret = device_property_read_u32_array(dev, "st,adc-channels", chans,
 					     nchans);
 	if (ret)
@@ -2035,8 +1971,6 @@ static int stm32_adc_legacy_chan_init(struct iio_dev *indio_dev,
 			return ret;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < scan_index; i++) {
 		/*
 		 * This check is used with the above logic so that smp value
@@ -2045,12 +1979,8 @@ static int stm32_adc_legacy_chan_init(struct iio_dev *indio_dev,
 		 * or one value per channel. The point is to have the same
 		 * behavior as 'of_property_read_u32_index()'.
 		 */
-<<<<<<< HEAD
 		if (i < adc->nsmps)
 			smp = smps[i];
-=======
-		of_property_read_u32_index(node, "st,min-sample-time-nsecs", i, &smp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Prepare sampling time settings */
 		stm32_adc_smpr_init(adc, channels[i].channel, smp);
@@ -2098,36 +2028,21 @@ static int stm32_adc_generic_chan_init(struct iio_dev *indio_dev,
 				       struct stm32_adc *adc,
 				       struct iio_chan_spec *channels)
 {
-<<<<<<< HEAD
 	const struct stm32_adc_info *adc_info = adc->cfg->adc_info;
 	struct fwnode_handle *child;
-=======
-	struct device_node *node = indio_dev->dev.of_node;
-	const struct stm32_adc_info *adc_info = adc->cfg->adc_info;
-	struct device_node *child;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const char *name;
 	int val, scan_index = 0, ret;
 	bool differential;
 	u32 vin[2];
 
-<<<<<<< HEAD
 	device_for_each_child_node(&indio_dev->dev, child) {
 		ret = fwnode_property_read_u32(child, "reg", &val);
-=======
-	for_each_available_child_of_node(node, child) {
-		ret = of_property_read_u32(child, "reg", &val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret) {
 			dev_err(&indio_dev->dev, "Missing channel index %d\n", ret);
 			goto err;
 		}
 
-<<<<<<< HEAD
 		ret = fwnode_property_read_string(child, "label", &name);
-=======
-		ret = of_property_read_string(child, "label", &name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* label is optional */
 		if (!ret) {
 			if (strlen(name) >= STM32_ADC_CH_SZ) {
@@ -2154,11 +2069,7 @@ static int stm32_adc_generic_chan_init(struct iio_dev *indio_dev,
 		}
 
 		differential = false;
-<<<<<<< HEAD
 		ret = fwnode_property_read_u32_array(child, "diff-channels", vin, 2);
-=======
-		ret = of_property_read_u32_array(child, "diff-channels", vin, 2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* diff-channels is optional */
 		if (!ret) {
 			differential = true;
@@ -2176,11 +2087,7 @@ static int stm32_adc_generic_chan_init(struct iio_dev *indio_dev,
 					vin[1], scan_index, differential);
 
 		val = 0;
-<<<<<<< HEAD
 		ret = fwnode_property_read_u32(child, "st,min-sample-time-ns", &val);
-=======
-		ret = of_property_read_u32(child, "st,min-sample-time-ns", &val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* st,min-sample-time-ns is optional */
 		if (ret && ret != -EINVAL) {
 			dev_err(&indio_dev->dev, "Invalid st,min-sample-time-ns property %d\n",
@@ -2198,23 +2105,13 @@ static int stm32_adc_generic_chan_init(struct iio_dev *indio_dev,
 	return scan_index;
 
 err:
-<<<<<<< HEAD
 	fwnode_handle_put(child);
-=======
-	of_node_put(child);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
 
-<<<<<<< HEAD
 static int stm32_adc_chan_fw_init(struct iio_dev *indio_dev, bool timestamping)
 {
-=======
-static int stm32_adc_chan_of_init(struct iio_dev *indio_dev, bool timestamping)
-{
-	struct device_node *node = indio_dev->dev.of_node;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct stm32_adc *adc = iio_priv(indio_dev);
 	const struct stm32_adc_info *adc_info = adc->cfg->adc_info;
 	struct iio_chan_spec *channels;
@@ -2224,11 +2121,7 @@ static int stm32_adc_chan_of_init(struct iio_dev *indio_dev, bool timestamping)
 	for (i = 0; i < STM32_ADC_INT_CH_NB; i++)
 		adc->int_ch[i] = STM32_ADC_INT_CH_NONE;
 
-<<<<<<< HEAD
 	num_channels = device_get_child_node_count(&indio_dev->dev);
-=======
-	num_channels = of_get_available_child_count(node);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* If no channels have been found, fallback to channels legacy properties. */
 	if (!num_channels) {
 		legacy = true;
@@ -2259,12 +2152,8 @@ static int stm32_adc_chan_of_init(struct iio_dev *indio_dev, bool timestamping)
 		return -ENOMEM;
 
 	if (legacy)
-<<<<<<< HEAD
 		ret = stm32_adc_legacy_chan_init(indio_dev, adc, channels,
 						 num_channels);
-=======
-		ret = stm32_adc_legacy_chan_init(indio_dev, adc, channels);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		ret = stm32_adc_generic_chan_init(indio_dev, adc, channels);
 	if (ret < 0)
@@ -2392,11 +2281,7 @@ static int stm32_adc_probe(struct platform_device *pdev)
 		}
 	}
 
-<<<<<<< HEAD
 	ret = stm32_adc_fw_get_resolution(indio_dev);
-=======
-	ret = stm32_adc_of_get_resolution(indio_dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		return ret;
 
@@ -2413,11 +2298,7 @@ static int stm32_adc_probe(struct platform_device *pdev)
 		timestamping = true;
 	}
 
-<<<<<<< HEAD
 	ret = stm32_adc_chan_fw_init(indio_dev, timestamping);
-=======
-	ret = stm32_adc_chan_of_init(indio_dev, timestamping);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		goto err_dma_disable;
 

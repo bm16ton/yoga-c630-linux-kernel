@@ -1501,12 +1501,8 @@ static int do_flock(struct file *file, int cmd, struct file_lock *fl)
 		error = gfs2_glock_nq(fl_gh);
 		if (error != GLR_TRYFAILED)
 			break;
-<<<<<<< HEAD
 		fl_gh->gh_flags &= ~LM_FLAG_TRY_1CB;
 		fl_gh->gh_flags |= LM_FLAG_TRY;
-=======
-		fl_gh->gh_flags = LM_FLAG_TRY | GL_EXACT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		msleep(sleeptime);
 	}
 	if (error) {

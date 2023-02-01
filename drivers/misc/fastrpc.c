@@ -342,11 +342,7 @@ static int fastrpc_map_get(struct fastrpc_map *map)
 
 
 static int fastrpc_map_lookup(struct fastrpc_user *fl, int fd,
-<<<<<<< HEAD
 			    struct fastrpc_map **ppmap, bool take_ref)
-=======
-			    struct fastrpc_map **ppmap)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct fastrpc_session_ctx *sess = fl->sctx;
 	struct fastrpc_map *map = NULL;
@@ -354,7 +350,6 @@ static int fastrpc_map_lookup(struct fastrpc_user *fl, int fd,
 
 	spin_lock(&fl->lock);
 	list_for_each_entry(map, &fl->maps, node) {
-<<<<<<< HEAD
 		if (map->fd != fd)
 			continue;
 
@@ -365,12 +360,6 @@ static int fastrpc_map_lookup(struct fastrpc_user *fl, int fd,
 					__func__, fd, ret);
 				break;
 			}
-=======
-		if (map->fd == fd) {
-			*ppmap = map;
-			mutex_unlock(&fl->mutex);
-			return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		*ppmap = map;
@@ -378,17 +367,6 @@ static int fastrpc_map_lookup(struct fastrpc_user *fl, int fd,
 		break;
 	}
 	spin_unlock(&fl->lock);
-
-	return ret;
-}
-
-static int fastrpc_map_find(struct fastrpc_user *fl, int fd,
-			    struct fastrpc_map **ppmap)
-{
-	int ret = fastrpc_map_lookup(fl, fd, ppmap);
-
-	if (!ret)
-		fastrpc_map_get(*ppmap);
 
 	return ret;
 }
@@ -1058,11 +1036,7 @@ static int fastrpc_put_args(struct fastrpc_invoke_ctx *ctx,
 	for (i = 0; i < FASTRPC_MAX_FDLIST; i++) {
 		if (!fdlist[i])
 			break;
-<<<<<<< HEAD
 		if (!fastrpc_map_lookup(fl, (int)fdlist[i], &mmap, false))
-=======
-		if (!fastrpc_map_lookup(fl, (int)fdlist[i], &mmap))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			fastrpc_map_put(mmap);
 	}
 
@@ -1544,11 +1518,7 @@ static int fastrpc_get_info_from_dsp(struct fastrpc_user *fl, uint32_t *dsp_attr
 	args[1].ptr = (u64)(uintptr_t)&dsp_attr_buf[1];
 	args[1].length = dsp_attr_buf_len;
 	args[1].fd = -1;
-<<<<<<< HEAD
 	fl->pd = USER_PD;
-=======
-	fl->pd = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return fastrpc_internal_invoke(fl, true, FASTRPC_DSP_UTILITIES_HANDLE,
 				       FASTRPC_SCALARS(0, 1, 1), args);

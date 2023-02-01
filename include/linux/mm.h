@@ -729,13 +729,9 @@ static inline unsigned int compound_order(struct page *page)
  */
 static inline unsigned int folio_order(struct folio *folio)
 {
-<<<<<<< HEAD
 	if (!folio_test_large(folio))
 		return 0;
 	return folio->_folio_order;
-=======
-	return compound_order(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #include <linux/huge_mm.h>
@@ -1528,14 +1524,11 @@ static inline unsigned long folio_pfn(struct folio *folio)
 	return page_to_pfn(&folio->page);
 }
 
-<<<<<<< HEAD
 static inline struct folio *pfn_folio(unsigned long pfn)
 {
 	return page_folio(pfn_to_page(pfn));
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline atomic_t *folio_pincount_ptr(struct folio *folio)
 {
 	return &folio_page(folio, 1)->compound_pincount;
@@ -1668,7 +1661,6 @@ static inline void set_page_links(struct page *page, enum zone_type zone,
  */
 static inline long folio_nr_pages(struct folio *folio)
 {
-<<<<<<< HEAD
 	if (!folio_test_large(folio))
 		return 1;
 #ifdef CONFIG_64BIT
@@ -1676,9 +1668,6 @@ static inline long folio_nr_pages(struct folio *folio)
 #else
 	return 1L << folio->_folio_order;
 #endif
-=======
-	return compound_nr(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1857,7 +1846,6 @@ extern void pagefault_out_of_memory(void);
  */
 #define SHOW_MEM_FILTER_NODES		(0x0001u)	/* disallowed nodes */
 
-<<<<<<< HEAD
 extern void __show_free_areas(unsigned int flags, nodemask_t *nodemask, int max_zone_idx);
 static void __maybe_unused show_free_areas(unsigned int flags, nodemask_t *nodemask)
 {
@@ -1872,17 +1860,6 @@ struct zap_details {
 	bool even_cows;			/* Zap COWed private pages too? */
 	zap_flags_t zap_flags;		/* Extra flags for zapping */
 };
-=======
-extern void show_free_areas(unsigned int flags, nodemask_t *nodemask);
-
-#ifdef CONFIG_MMU
-extern bool can_do_mlock(void);
-#else
-static inline bool can_do_mlock(void) { return false; }
-#endif
-extern int user_shm_lock(size_t, struct ucounts *);
-extern void user_shm_unlock(size_t, struct ucounts *);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Whether to drop the pte markers, for example, the uffd-wp information for
@@ -2841,30 +2818,12 @@ extern struct vm_area_struct * find_vma(struct mm_struct * mm, unsigned long add
 extern struct vm_area_struct * find_vma_prev(struct mm_struct * mm, unsigned long addr,
 					     struct vm_area_struct **pprev);
 
-<<<<<<< HEAD
 /*
  * Look up the first VMA which intersects the interval [start_addr, end_addr)
  * NULL if none.  Assume start_addr < end_addr.
  */
 struct vm_area_struct *find_vma_intersection(struct mm_struct *mm,
 			unsigned long start_addr, unsigned long end_addr);
-=======
-/**
- * find_vma_intersection() - Look up the first VMA which intersects the interval
- * @mm: The process address space.
- * @start_addr: The inclusive start user address.
- * @end_addr: The exclusive end user address.
- *
- * Returns: The first VMA within the provided range, %NULL otherwise.  Assumes
- * start_addr < end_addr.
- */
-static inline
-struct vm_area_struct *find_vma_intersection(struct mm_struct *mm,
-					     unsigned long start_addr,
-					     unsigned long end_addr)
-{
-	struct vm_area_struct *vma = find_vma(mm, start_addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * vma_lookup() - Find a VMA at a specific address
@@ -2877,24 +2836,6 @@ static inline
 struct vm_area_struct *vma_lookup(struct mm_struct *mm, unsigned long addr)
 {
 	return mtree_load(&mm->mm_mt, addr);
-}
-
-/**
- * vma_lookup() - Find a VMA at a specific address
- * @mm: The process address space.
- * @addr: The user address.
- *
- * Return: The vm_area_struct at the given address, %NULL otherwise.
- */
-static inline
-struct vm_area_struct *vma_lookup(struct mm_struct *mm, unsigned long addr)
-{
-	struct vm_area_struct *vma = find_vma(mm, addr);
-
-	if (vma && addr < vma->vm_start)
-		vma = NULL;
-
-	return vma;
 }
 
 static inline unsigned long vm_start_gap(struct vm_area_struct *vma)
@@ -3116,13 +3057,8 @@ static inline int vm_fault_to_errno(vm_fault_t vm_fault, int foll_flags)
  * PageAnonExclusive() has to protect against concurrent GUP:
  * * Ordinary GUP: Using the PT lock
  * * GUP-fast and fork(): mm->write_protect_seq
-<<<<<<< HEAD
  * * GUP-fast and KSM or temporary unmapping (swap, migration): see
  *    page_try_share_anon_rmap()
-=======
- * * GUP-fast and KSM or temporary unmapping (swap, migration):
- *   clear/invalidate+flush of the page table entry
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Must be called with the (sub)page that's actually referenced via the
  * page table entry, which might not necessarily be the head page for a
@@ -3143,14 +3079,11 @@ static inline bool gup_must_unshare(unsigned int flags, struct page *page)
 	 */
 	if (!PageAnon(page))
 		return false;
-<<<<<<< HEAD
 
 	/* Paired with a memory barrier in page_try_share_anon_rmap(). */
 	if (IS_ENABLED(CONFIG_HAVE_FAST_GUP))
 		smp_rmb();
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Note that PageKsm() pages cannot be exclusive, and consequently,
 	 * cannot get pinned.
@@ -3158,7 +3091,6 @@ static inline bool gup_must_unshare(unsigned int flags, struct page *page)
 	return !PageAnonExclusive(page);
 }
 
-<<<<<<< HEAD
 /*
  * Indicates whether GUP can follow a PROT_NONE mapped page, or whether
  * a (NUMA hinting) fault is required.
@@ -3174,8 +3106,6 @@ static inline bool gup_can_follow_protnone(unsigned int flags)
 	return flags & FOLL_FORCE;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 typedef int (*pte_fn_t)(pte_t *pte, unsigned long addr, void *data);
 extern int apply_to_page_range(struct mm_struct *mm, unsigned long address,
 			       unsigned long size, pte_fn_t fn, void *data);
@@ -3375,7 +3305,6 @@ static inline int __get_huge_page_for_hwpoison(unsigned long pfn, int flags)
 	return 0;
 }
 #endif
-<<<<<<< HEAD
 
 #ifndef arch_memory_failure
 static inline int arch_memory_failure(unsigned long pfn, int flags)
@@ -3384,16 +3313,6 @@ static inline int arch_memory_failure(unsigned long pfn, int flags)
 }
 #endif
 
-=======
-
-#ifndef arch_memory_failure
-static inline int arch_memory_failure(unsigned long pfn, int flags)
-{
-	return -ENXIO;
-}
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifndef arch_is_platform_page
 static inline bool arch_is_platform_page(u64 paddr)
 {
@@ -3569,15 +3488,4 @@ madvise_set_anon_name(struct mm_struct *mm, unsigned long start,
 }
 #endif
 
-<<<<<<< HEAD
-=======
-/*
- * Whether to drop the pte markers, for example, the uffd-wp information for
- * file-backed memory.  This should only be specified when we will completely
- * drop the page in the mm, either by truncation or unmapping of the vma.  By
- * default, the flag is not set.
- */
-#define  ZAP_FLAG_DROP_MARKER        ((__force zap_flags_t) BIT(0))
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _LINUX_MM_H */

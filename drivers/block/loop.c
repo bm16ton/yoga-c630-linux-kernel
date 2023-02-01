@@ -44,7 +44,6 @@ enum {
 	Lo_rundown,
 	Lo_deleting,
 };
-<<<<<<< HEAD
 
 struct loop_func_table;
 
@@ -90,53 +89,6 @@ struct loop_cmd {
 	struct cgroup_subsys_state *memcg_css;
 };
 
-=======
-
-struct loop_func_table;
-
-struct loop_device {
-	int		lo_number;
-	loff_t		lo_offset;
-	loff_t		lo_sizelimit;
-	int		lo_flags;
-	char		lo_file_name[LO_NAME_SIZE];
-
-	struct file *	lo_backing_file;
-	struct block_device *lo_device;
-
-	gfp_t		old_gfp_mask;
-
-	spinlock_t		lo_lock;
-	int			lo_state;
-	spinlock_t              lo_work_lock;
-	struct workqueue_struct *workqueue;
-	struct work_struct      rootcg_work;
-	struct list_head        rootcg_cmd_list;
-	struct list_head        idle_worker_list;
-	struct rb_root          worker_tree;
-	struct timer_list       timer;
-	bool			use_dio;
-	bool			sysfs_inited;
-
-	struct request_queue	*lo_queue;
-	struct blk_mq_tag_set	tag_set;
-	struct gendisk		*lo_disk;
-	struct mutex		lo_mutex;
-	bool			idr_visible;
-};
-
-struct loop_cmd {
-	struct list_head list_entry;
-	bool use_aio; /* use AIO interface to handle I/O */
-	atomic_t ref; /* only for aio */
-	long ret;
-	struct kiocb iocb;
-	struct bio_vec *bvec;
-	struct cgroup_subsys_state *blkcg_css;
-	struct cgroup_subsys_state *memcg_css;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
 #define LOOP_DEFAULT_HW_Q_DEPTH (128)
 
@@ -618,17 +570,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
 	int error;
 	bool partscan;
 	bool is_loop;
-<<<<<<< HEAD
 
 	if (!file)
 		return -EBADF;
 
-=======
-
-	if (!file)
-		return -EBADF;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* suppress uevents while reconfiguring the device */
 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
 
@@ -873,10 +818,6 @@ static void loop_workfn(struct work_struct *work);
 
 #ifdef CONFIG_BLK_CGROUP
 static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
-<<<<<<< HEAD
-{
-	return !css || css == blkcg_root_css;
-=======
 {
 	return !css || css == blkcg_root_css;
 }
@@ -887,89 +828,6 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
 }
 #endif
 
-static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
-{
-	struct rb_node **node, *parent = NULL;
-	struct loop_worker *cur_worker, *worker = NULL;
-	struct work_struct *work;
-	struct list_head *cmd_list;
-
-	spin_lock_irq(&lo->lo_work_lock);
-
-	if (queue_on_root_worker(cmd->blkcg_css))
-		goto queue_work;
-
-	node = &lo->worker_tree.rb_node;
-
-	while (*node) {
-		parent = *node;
-		cur_worker = container_of(*node, struct loop_worker, rb_node);
-		if (cur_worker->blkcg_css == cmd->blkcg_css) {
-			worker = cur_worker;
-			break;
-		} else if ((long)cur_worker->blkcg_css < (long)cmd->blkcg_css) {
-			node = &(*node)->rb_left;
-		} else {
-			node = &(*node)->rb_right;
-		}
-	}
-	if (worker)
-		goto queue_work;
-
-	worker = kzalloc(sizeof(struct loop_worker), GFP_NOWAIT | __GFP_NOWARN);
-	/*
-	 * In the event we cannot allocate a worker, just queue on the
-	 * rootcg worker and issue the I/O as the rootcg
-	 */
-	if (!worker) {
-		cmd->blkcg_css = NULL;
-		if (cmd->memcg_css)
-			css_put(cmd->memcg_css);
-		cmd->memcg_css = NULL;
-		goto queue_work;
-	}
-
-	worker->blkcg_css = cmd->blkcg_css;
-	css_get(worker->blkcg_css);
-	INIT_WORK(&worker->work, loop_workfn);
-	INIT_LIST_HEAD(&worker->cmd_list);
-	INIT_LIST_HEAD(&worker->idle_list);
-	worker->lo = lo;
-	rb_link_node(&worker->rb_node, parent, node);
-	rb_insert_color(&worker->rb_node, &lo->worker_tree);
-queue_work:
-	if (worker) {
-		/*
-		 * We need to remove from the idle list here while
-		 * holding the lock so that the idle timer doesn't
-		 * free the worker
-		 */
-		if (!list_empty(&worker->idle_list))
-			list_del_init(&worker->idle_list);
-		work = &worker->work;
-		cmd_list = &worker->cmd_list;
-	} else {
-		work = &lo->rootcg_work;
-		cmd_list = &lo->rootcg_cmd_list;
-	}
-	list_add_tail(&cmd->list_entry, cmd_list);
-	queue_work(lo->workqueue, work);
-	spin_unlock_irq(&lo->lo_work_lock);
-}
-
-static void loop_set_timer(struct loop_device *lo)
-{
-	timer_reduce(&lo->timer, jiffies + LOOP_IDLE_WORKER_TIMEOUT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-}
-#else
-static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
-{
-	return !css;
-}
-#endif
-
-<<<<<<< HEAD
 static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
 {
 	struct rb_node **node, *parent = NULL;
@@ -1068,31 +926,6 @@ static void loop_free_idle_workers(struct loop_device *lo, bool delete_all)
 
 static void loop_free_idle_workers_timer(struct timer_list *timer)
 {
-=======
-static void loop_free_idle_workers(struct loop_device *lo, bool delete_all)
-{
-	struct loop_worker *pos, *worker;
-
-	spin_lock_irq(&lo->lo_work_lock);
-	list_for_each_entry_safe(worker, pos, &lo->idle_worker_list,
-				idle_list) {
-		if (!delete_all &&
-		    time_is_after_jiffies(worker->last_ran_at +
-					  LOOP_IDLE_WORKER_TIMEOUT))
-			break;
-		list_del(&worker->idle_list);
-		rb_erase(&worker->rb_node, &lo->worker_tree);
-		css_put(worker->blkcg_css);
-		kfree(worker);
-	}
-	if (!list_empty(&lo->idle_worker_list))
-		loop_set_timer(lo);
-	spin_unlock_irq(&lo->lo_work_lock);
-}
-
-static void loop_free_idle_workers_timer(struct timer_list *timer)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct loop_device *lo = container_of(timer, struct loop_device, timer);
 
 	return loop_free_idle_workers(lo, false);
@@ -2010,15 +1843,9 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
 				cgroup_get_e_css(cmd->blkcg_css->cgroup,
 						&memory_cgrp_subsys);
 		}
-<<<<<<< HEAD
 #endif
 	}
 #endif
-=======
-#endif
-	}
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	loop_queue_work(lo, cmd);
 
 	return BLK_STS_OK;
@@ -2080,17 +1907,10 @@ static void loop_process_work(struct loop_worker *worker,
 
 		loop_handle_cmd(cmd);
 		cond_resched();
-<<<<<<< HEAD
 
 		spin_lock_irq(&lo->lo_work_lock);
 	}
 
-=======
-
-		spin_lock_irq(&lo->lo_work_lock);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * We only add to the idle list if there are no pending cmds
 	 * *and* the worker will not run again which ensures that it
@@ -2225,21 +2045,12 @@ static int loop_add(int i)
 	err = add_disk(disk);
 	if (err)
 		goto out_cleanup_disk;
-<<<<<<< HEAD
 
 	/* Show this loop device. */
 	mutex_lock(&loop_ctl_mutex);
 	lo->idr_visible = true;
 	mutex_unlock(&loop_ctl_mutex);
 
-=======
-
-	/* Show this loop device. */
-	mutex_lock(&loop_ctl_mutex);
-	lo->idr_visible = true;
-	mutex_unlock(&loop_ctl_mutex);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return i;
 
 out_cleanup_disk:
@@ -2379,11 +2190,7 @@ MODULE_ALIAS("devname:loop-control");
 
 static int __init loop_init(void)
 {
-<<<<<<< HEAD
 	int i;
-=======
-	int i, nr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	part_shift = 0;
@@ -2422,11 +2229,7 @@ static int __init loop_init(void)
 	}
 
 	/* pre-create number of devices given by config or max_loop */
-<<<<<<< HEAD
 	for (i = 0; i < max_loop; i++)
-=======
-	for (i = 0; i < nr; i++)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		loop_add(i);
 
 	printk(KERN_INFO "loop: module loaded\n");

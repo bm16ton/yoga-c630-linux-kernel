@@ -30,10 +30,7 @@
 #include "dc_hw_types.h"
 #include "core_types.h"
 #include "../basics/conversion.h"
-<<<<<<< HEAD
 #include "cursor_reg_cache.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define CTX dc_dmub_srv->ctx
 #define DC_LOGGER CTX->logger
@@ -393,7 +390,6 @@ void dc_dmub_srv_query_caps_cmd(struct dmub_srv *dmub)
 	}
 }
 
-<<<<<<< HEAD
 void dc_dmub_srv_get_visual_confirm_color_cmd(struct dc *dc, struct pipe_ctx *pipe_ctx)
 {
 	union dmub_rb_cmd cmd = { 0 };
@@ -425,8 +421,6 @@ void dc_dmub_srv_get_visual_confirm_color_cmd(struct dc *dc, struct pipe_ctx *pi
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_DRM_AMD_DC_DCN
 /**
  * ***********************************************************************************************
@@ -642,11 +636,7 @@ static void populate_subvp_cmd_pipe_info(struct dc *dc,
 			&cmd->fw_assisted_mclk_switch_v2.config_data.pipe_data[cmd_pipe_index];
 	struct dc_crtc_timing *main_timing = &subvp_pipe->stream->timing;
 	struct dc_crtc_timing *phantom_timing = &subvp_pipe->stream->mall_stream_config.paired_stream->timing;
-<<<<<<< HEAD
 	uint32_t out_num_stream, out_den_stream, out_num_plane, out_den_plane, out_num, out_den;
-=======
-	uint32_t out_num, out_den;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pipe_data->mode = SUBVP;
 	pipe_data->pipe_config.subvp_data.pix_clk_100hz = subvp_pipe->stream->timing.pix_clk_100hz;
@@ -663,7 +653,6 @@ static void populate_subvp_cmd_pipe_info(struct dc *dc,
 	/* Calculate the scaling factor from the src and dst height.
 	 * e.g. If 3840x2160 being downscaled to 1920x1080, the scaling factor is 1/2.
 	 * Reduce the fraction 1080/2160 = 1/2 for the "scaling factor"
-<<<<<<< HEAD
 	 *
 	 * Make sure to combine stream and plane scaling together.
 	 */
@@ -674,13 +663,6 @@ static void populate_subvp_cmd_pipe_info(struct dc *dc,
 	reduce_fraction(out_num_stream * out_num_plane, out_den_stream * out_den_plane, &out_num, &out_den);
 	pipe_data->pipe_config.subvp_data.scale_factor_numerator = out_num;
 	pipe_data->pipe_config.subvp_data.scale_factor_denominator = out_den;
-=======
-	 */
-	reduce_fraction(subvp_pipe->stream->src.height, subvp_pipe->stream->dst.height, &out_num, &out_den);
-	// TODO: Uncomment below lines once DMCUB include headers are promoted
-	//pipe_data->pipe_config.subvp_data.scale_factor_numerator = out_num;
-	//pipe_data->pipe_config.subvp_data.scale_factor_denominator = out_den;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	// Prefetch lines is equal to VACTIVE + BP + VSYNC
 	pipe_data->pipe_config.subvp_data.prefetch_lines =
@@ -693,7 +675,6 @@ static void populate_subvp_cmd_pipe_info(struct dc *dc,
 	pipe_data->pipe_config.subvp_data.processing_delay_lines =
 			div64_u64(((uint64_t)(dc->caps.subvp_fw_processing_delay_us) * ((uint64_t)phantom_timing->pix_clk_100hz * 100) +
 					((uint64_t)phantom_timing->h_total * 1000000 - 1)), ((uint64_t)phantom_timing->h_total * 1000000));
-<<<<<<< HEAD
 
 	if (subvp_pipe->bottom_pipe) {
 		pipe_data->pipe_config.subvp_data.main_split_pipe_index = subvp_pipe->bottom_pipe->pipe_idx;
@@ -703,15 +684,12 @@ static void populate_subvp_cmd_pipe_info(struct dc *dc,
 		pipe_data->pipe_config.subvp_data.main_split_pipe_index = 0;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	// Find phantom pipe index based on phantom stream
 	for (j = 0; j < dc->res_pool->pipe_count; j++) {
 		struct pipe_ctx *phantom_pipe = &context->res_ctx.pipe_ctx[j];
 
 		if (phantom_pipe->stream == subvp_pipe->stream->mall_stream_config.paired_stream) {
 			pipe_data->pipe_config.subvp_data.phantom_pipe_index = phantom_pipe->pipe_idx;
-<<<<<<< HEAD
 			if (phantom_pipe->bottom_pipe) {
 				pipe_data->pipe_config.subvp_data.phantom_split_pipe_index = phantom_pipe->bottom_pipe->pipe_idx;
 			} else if (phantom_pipe->next_odm_pipe) {
@@ -719,8 +697,6 @@ static void populate_subvp_cmd_pipe_info(struct dc *dc,
 			} else {
 				pipe_data->pipe_config.subvp_data.phantom_split_pipe_index = 0;
 			}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		}
 	}
@@ -765,13 +741,9 @@ void dc_dmub_setup_subvp_dmub_command(struct dc *dc,
 		if (!pipe->stream)
 			continue;
 
-<<<<<<< HEAD
 		/* For SubVP pipe count, only count the top most (ODM / MPC) pipe
 		 */
 		if (pipe->plane_state && !pipe->top_pipe && !pipe->prev_odm_pipe &&
-=======
-		if (pipe->plane_state && !pipe->top_pipe &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pipe->stream->mall_stream_config.type == SUBVP_MAIN)
 			subvp_pipes[subvp_count++] = pipe;
 	}
@@ -784,16 +756,12 @@ void dc_dmub_setup_subvp_dmub_command(struct dc *dc,
 			if (!pipe->stream)
 				continue;
 
-<<<<<<< HEAD
 			/* When populating subvp cmd info, only pass in the top most (ODM / MPC) pipe.
 			 * Any ODM or MPC splits being used in SubVP will be handled internally in
 			 * populate_subvp_cmd_pipe_info
 			 */
 			if (pipe->plane_state && pipe->stream->mall_stream_config.paired_stream &&
 					!pipe->top_pipe && !pipe->prev_odm_pipe &&
-=======
-			if (pipe->plane_state && pipe->stream->mall_stream_config.paired_stream &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pipe->stream->mall_stream_config.type == SUBVP_MAIN) {
 				populate_subvp_cmd_pipe_info(dc, context, &cmd, pipe, cmd_pipe_index++);
 			} else if (pipe->plane_state && pipe->stream->mall_stream_config.type == SUBVP_NONE) {
@@ -913,7 +881,6 @@ void dc_dmub_srv_log_diagnostic_data(struct dc_dmub_srv *dc_dmub_srv)
 		diag_data.is_cw0_enabled,
 		diag_data.is_cw6_enabled);
 }
-<<<<<<< HEAD
 
 static bool dc_dmub_should_update_cursor_data(struct pipe_ctx *pipe_ctx)
 {
@@ -1058,5 +1025,3 @@ void dc_send_update_cursor_info_to_dmu(
 		dc_send_cmd_to_dmu(pCtx->stream->ctx->dmub_srv, &cmd);
 	}
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

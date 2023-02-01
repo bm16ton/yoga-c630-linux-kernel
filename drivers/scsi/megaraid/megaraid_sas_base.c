@@ -3195,19 +3195,6 @@ static void megasas_map_queues(struct Scsi_Host *shost)
 	qoff += map->nr_queues;
 	offset += map->nr_queues;
 
-<<<<<<< HEAD
-=======
-	offset = instance->low_latency_index_start;
-
-	/* Setup Default hctx */
-	map = &shost->tag_set.map[HCTX_TYPE_DEFAULT];
-	map->nr_queues = instance->msix_vectors - offset;
-	map->queue_offset = 0;
-	blk_mq_pci_map_queues(map, instance->pdev, offset);
-	qoff += map->nr_queues;
-	offset += map->nr_queues;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* we never use READ queue, so can't cheat blk-mq */
 	shost->tag_set.map[HCTX_TYPE_READ].nr_queues = 0;
 
@@ -3222,11 +3209,6 @@ static void megasas_map_queues(struct Scsi_Host *shost)
 		map->queue_offset = qoff;
 		blk_mq_map_queues(map);
 	}
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void megasas_aen_polling(struct work_struct *work);
@@ -8051,15 +8033,9 @@ skip_firing_dcmds:
 
 	if (instance->adapter_type != MFI_SERIES) {
 		megasas_release_fusion(instance);
-<<<<<<< HEAD
 		pd_seq_map_sz =
 			struct_size((struct MR_PD_CFG_SEQ_NUM_SYNC *)0,
 				    seq, MAX_PHYSICAL_DEVICES);
-=======
-		pd_seq_map_sz = sizeof(struct MR_PD_CFG_SEQ_NUM_SYNC) +
-				(sizeof(struct MR_PD_CFG_SEQ) *
-					(MAX_PHYSICAL_DEVICES - 1));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		for (i = 0; i < 2 ; i++) {
 			if (fusion->ld_map[i])
 				dma_free_coherent(&instance->pdev->dev,
@@ -8795,11 +8771,7 @@ int megasas_update_device_list(struct megasas_instance *instance,
 		if (event_type & SCAN_VD_CHANNEL) {
 			if (!instance->requestorId ||
 			megasas_get_ld_vf_affiliation(instance, 0)) {
-<<<<<<< HEAD
 				return megasas_ld_list_query(instance,
-=======
-				dcmd_ret = megasas_ld_list_query(instance,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						MR_LD_QUERY_TYPE_EXPOSED_TO_HOST);
 			}
 		}
@@ -9032,10 +9004,7 @@ static int __init megasas_init(void)
 	 */
 	pr_info("megasas: %s\n", MEGASAS_VERSION);
 
-<<<<<<< HEAD
 	megasas_dbg_lvl = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	support_poll_for_event = 2;
 	support_device_change = 1;
 	support_nvme_encapsulation = true;

@@ -672,15 +672,9 @@ int dsa_port_lag_join(struct dsa_port *dp, struct net_device *lag_dev,
 	err = dsa_port_bridge_join(dp, bridge_dev, extack);
 	if (err)
 		goto err_bridge_join;
-<<<<<<< HEAD
 
 	return 0;
 
-=======
-
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_bridge_join:
 	dsa_port_notify(dp, DSA_NOTIFIER_LAG_LEAVE, &info);
 err_lag_join:
@@ -860,8 +854,6 @@ restore:
 		dp->vlan_filtering = old_vlan_filtering;
 
 	return err;
-<<<<<<< HEAD
-=======
 }
 
 /* This enforces legacy behavior for switch drivers which assume they can't
@@ -982,233 +974,6 @@ int dsa_port_mtu_change(struct dsa_port *dp, int new_mtu)
 int dsa_port_fdb_add(struct dsa_port *dp, const unsigned char *addr,
 		     u16 vid)
 {
-	struct dsa_notifier_fdb_info info = {
-		.dp = dp,
-		.addr = addr,
-		.vid = vid,
-		.db = {
-			.type = DSA_DB_BRIDGE,
-			.bridge = *dp->bridge,
-		},
-	};
-
-	/* Refcounting takes bridge.num as a key, and should be global for all
-	 * bridges in the absence of FDB isolation, and per bridge otherwise.
-	 * Force the bridge.num to zero here in the absence of FDB isolation.
-	 */
-	if (!dp->ds->fdb_isolation)
-		info.db.bridge.num = 0;
-
-	return dsa_port_notify(dp, DSA_NOTIFIER_FDB_ADD, &info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-}
-
-int dsa_port_fdb_del(struct dsa_port *dp, const unsigned char *addr,
-		     u16 vid)
-{
-<<<<<<< HEAD
-	struct net_device *br = dsa_port_bridge_dev_get(dp);
-	struct dsa_switch *ds = dp->ds;
-
-	if (!br)
-		return false;
-
-	return !ds->configure_vlan_while_not_filtering && !br_vlan_enabled(br);
-=======
-	struct dsa_notifier_fdb_info info = {
-		.dp = dp,
-		.addr = addr,
-		.vid = vid,
-		.db = {
-			.type = DSA_DB_BRIDGE,
-			.bridge = *dp->bridge,
-		},
-	};
-
-	if (!dp->ds->fdb_isolation)
-		info.db.bridge.num = 0;
-
-	return dsa_port_notify(dp, DSA_NOTIFIER_FDB_DEL, &info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-}
-
-static int dsa_port_host_fdb_add(struct dsa_port *dp,
-				 const unsigned char *addr, u16 vid,
-				 struct dsa_db db)
-{
-	struct dsa_notifier_fdb_info info = {
-		.dp = dp,
-		.addr = addr,
-		.vid = vid,
-		.db = db,
-	};
-
-	if (!dp->ds->fdb_isolation)
-		info.db.bridge.num = 0;
-
-	return dsa_port_notify(dp, DSA_NOTIFIER_HOST_FDB_ADD, &info);
-}
-
-int dsa_port_standalone_host_fdb_add(struct dsa_port *dp,
-				     const unsigned char *addr, u16 vid)
-{
-	struct dsa_db db = {
-		.type = DSA_DB_PORT,
-		.dp = dp,
-	};
-
-	return dsa_port_host_fdb_add(dp, addr, vid, db);
-}
-
-<<<<<<< HEAD
-int dsa_port_mst_enable(struct dsa_port *dp, bool on,
-			struct netlink_ext_ack *extack)
-{
-	if (on && !dsa_port_supports_mst(dp)) {
-		NL_SET_ERR_MSG_MOD(extack, "Hardware does not support MST");
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-int dsa_port_pre_bridge_flags(const struct dsa_port *dp,
-			      struct switchdev_brport_flags flags,
-			      struct netlink_ext_ack *extack)
-=======
-int dsa_port_bridge_host_fdb_add(struct dsa_port *dp,
-				 const unsigned char *addr, u16 vid)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	struct dsa_port *cpu_dp = dp->cpu_dp;
-	struct dsa_db db = {
-		.type = DSA_DB_BRIDGE,
-		.bridge = *dp->bridge,
-	};
-	int err;
-
-	/* Avoid a call to __dev_set_promiscuity() on the master, which
-	 * requires rtnl_lock(), since we can't guarantee that is held here,
-	 * and we can't take it either.
-	 */
-	if (cpu_dp->master->priv_flags & IFF_UNICAST_FLT) {
-		err = dev_uc_add(cpu_dp->master, addr);
-		if (err)
-			return err;
-	}
-
-	return dsa_port_host_fdb_add(dp, addr, vid, db);
-}
-
-<<<<<<< HEAD
-int dsa_port_bridge_flags(struct dsa_port *dp,
-			  struct switchdev_brport_flags flags,
-			  struct netlink_ext_ack *extack)
-{
-	struct dsa_switch *ds = dp->ds;
-	int err;
-
-	if (!ds->ops->port_bridge_flags)
-		return -EOPNOTSUPP;
-
-	err = ds->ops->port_bridge_flags(ds, dp->index, flags, extack);
-	if (err)
-		return err;
-
-	if (flags.mask & BR_LEARNING) {
-		bool learning = flags.val & BR_LEARNING;
-
-		if (learning == dp->learning)
-			return 0;
-
-		if ((dp->learning && !learning) &&
-		    (dp->stp_state == BR_STATE_LEARNING ||
-		     dp->stp_state == BR_STATE_FORWARDING))
-			dsa_port_fast_age(dp);
-
-		dp->learning = learning;
-	}
-
-	return 0;
-}
-
-void dsa_port_set_host_flood(struct dsa_port *dp, bool uc, bool mc)
-{
-	struct dsa_switch *ds = dp->ds;
-
-	if (ds->ops->port_set_host_flood)
-		ds->ops->port_set_host_flood(ds, dp->index, uc, mc);
-}
-
-int dsa_port_vlan_msti(struct dsa_port *dp,
-		       const struct switchdev_vlan_msti *msti)
-{
-	struct dsa_switch *ds = dp->ds;
-
-	if (!ds->ops->vlan_msti_set)
-		return -EOPNOTSUPP;
-
-	return ds->ops->vlan_msti_set(ds, *dp->bridge, msti);
-}
-
-int dsa_port_mtu_change(struct dsa_port *dp, int new_mtu)
-{
-	struct dsa_notifier_mtu_info info = {
-		.dp = dp,
-		.mtu = new_mtu,
-=======
-static int dsa_port_host_fdb_del(struct dsa_port *dp,
-				 const unsigned char *addr, u16 vid,
-				 struct dsa_db db)
-{
-	struct dsa_notifier_fdb_info info = {
-		.dp = dp,
-		.addr = addr,
-		.vid = vid,
-		.db = db,
-	};
-
-	if (!dp->ds->fdb_isolation)
-		info.db.bridge.num = 0;
-
-	return dsa_port_notify(dp, DSA_NOTIFIER_HOST_FDB_DEL, &info);
-}
-
-int dsa_port_standalone_host_fdb_del(struct dsa_port *dp,
-				     const unsigned char *addr, u16 vid)
-{
-	struct dsa_db db = {
-		.type = DSA_DB_PORT,
-		.dp = dp,
-	};
-
-	return dsa_port_host_fdb_del(dp, addr, vid, db);
-}
-
-int dsa_port_bridge_host_fdb_del(struct dsa_port *dp,
-				 const unsigned char *addr, u16 vid)
-{
-	struct dsa_port *cpu_dp = dp->cpu_dp;
-	struct dsa_db db = {
-		.type = DSA_DB_BRIDGE,
-		.bridge = *dp->bridge,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	};
-	int err;
-
-	if (cpu_dp->master->priv_flags & IFF_UNICAST_FLT) {
-		err = dev_uc_del(cpu_dp->master, addr);
-		if (err)
-			return err;
-	}
-
-	return dsa_port_host_fdb_del(dp, addr, vid, db);
-}
-
-int dsa_port_lag_fdb_add(struct dsa_port *dp, const unsigned char *addr,
-			 u16 vid)
-{
-<<<<<<< HEAD
 	struct dsa_notifier_fdb_info info = {
 		.dp = dp,
 		.addr = addr,
@@ -1349,8 +1114,6 @@ int dsa_port_bridge_host_fdb_del(struct dsa_port *dp,
 int dsa_port_lag_fdb_add(struct dsa_port *dp, const unsigned char *addr,
 			 u16 vid)
 {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dsa_notifier_lag_fdb_info info = {
 		.lag = dp->lag,
 		.addr = addr,
@@ -1463,22 +1226,14 @@ int dsa_port_standalone_host_mdb_add(const struct dsa_port *dp,
 int dsa_port_bridge_host_mdb_add(const struct dsa_port *dp,
 				 const struct switchdev_obj_port_mdb *mdb)
 {
-<<<<<<< HEAD
 	struct net_device *master = dsa_port_to_master(dp);
-=======
-	struct dsa_port *cpu_dp = dp->cpu_dp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dsa_db db = {
 		.type = DSA_DB_BRIDGE,
 		.bridge = *dp->bridge,
 	};
 	int err;
 
-<<<<<<< HEAD
 	err = dev_mc_add(master, mdb->addr);
-=======
-	err = dev_mc_add(cpu_dp->master, mdb->addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -1515,22 +1270,14 @@ int dsa_port_standalone_host_mdb_del(const struct dsa_port *dp,
 int dsa_port_bridge_host_mdb_del(const struct dsa_port *dp,
 				 const struct switchdev_obj_port_mdb *mdb)
 {
-<<<<<<< HEAD
 	struct net_device *master = dsa_port_to_master(dp);
-=======
-	struct dsa_port *cpu_dp = dp->cpu_dp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dsa_db db = {
 		.type = DSA_DB_BRIDGE,
 		.bridge = *dp->bridge,
 	};
 	int err;
 
-<<<<<<< HEAD
 	err = dev_mc_del(master, mdb->addr);
-=======
-	err = dev_mc_del(cpu_dp->master, mdb->addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -1565,30 +1312,19 @@ int dsa_port_host_vlan_add(struct dsa_port *dp,
 			   const struct switchdev_obj_port_vlan *vlan,
 			   struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct net_device *master = dsa_port_to_master(dp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dsa_notifier_vlan_info info = {
 		.dp = dp,
 		.vlan = vlan,
 		.extack = extack,
 	};
-<<<<<<< HEAD
-=======
-	struct dsa_port *cpu_dp = dp->cpu_dp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	err = dsa_port_notify(dp, DSA_NOTIFIER_HOST_VLAN_ADD, &info);
 	if (err && err != -EOPNOTSUPP)
 		return err;
 
-<<<<<<< HEAD
 	vlan_vid_add(master, htons(ETH_P_8021Q), vlan->vid);
-=======
-	vlan_vid_add(cpu_dp->master, htons(ETH_P_8021Q), vlan->vid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return err;
 }
@@ -1596,29 +1332,18 @@ int dsa_port_host_vlan_add(struct dsa_port *dp,
 int dsa_port_host_vlan_del(struct dsa_port *dp,
 			   const struct switchdev_obj_port_vlan *vlan)
 {
-<<<<<<< HEAD
 	struct net_device *master = dsa_port_to_master(dp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dsa_notifier_vlan_info info = {
 		.dp = dp,
 		.vlan = vlan,
 	};
-<<<<<<< HEAD
-=======
-	struct dsa_port *cpu_dp = dp->cpu_dp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	err = dsa_port_notify(dp, DSA_NOTIFIER_HOST_VLAN_DEL, &info);
 	if (err && err != -EOPNOTSUPP)
 		return err;
 
-<<<<<<< HEAD
 	vlan_vid_del(master, htons(ETH_P_8021Q), vlan->vid);
-=======
-	vlan_vid_del(cpu_dp->master, htons(ETH_P_8021Q), vlan->vid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return err;
 }
@@ -1627,17 +1352,10 @@ int dsa_port_mrp_add(const struct dsa_port *dp,
 		     const struct switchdev_obj_mrp *mrp)
 {
 	struct dsa_switch *ds = dp->ds;
-<<<<<<< HEAD
 
 	if (!ds->ops->port_mrp_add)
 		return -EOPNOTSUPP;
 
-=======
-
-	if (!ds->ops->port_mrp_add)
-		return -EOPNOTSUPP;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ds->ops->port_mrp_add(ds, dp->index, mrp);
 }
 
@@ -1645,17 +1363,10 @@ int dsa_port_mrp_del(const struct dsa_port *dp,
 		     const struct switchdev_obj_mrp *mrp)
 {
 	struct dsa_switch *ds = dp->ds;
-<<<<<<< HEAD
 
 	if (!ds->ops->port_mrp_del)
 		return -EOPNOTSUPP;
 
-=======
-
-	if (!ds->ops->port_mrp_del)
-		return -EOPNOTSUPP;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ds->ops->port_mrp_del(ds, dp->index, mrp);
 }
 
@@ -1663,17 +1374,10 @@ int dsa_port_mrp_add_ring_role(const struct dsa_port *dp,
 			       const struct switchdev_obj_ring_role_mrp *mrp)
 {
 	struct dsa_switch *ds = dp->ds;
-<<<<<<< HEAD
 
 	if (!ds->ops->port_mrp_add_ring_role)
 		return -EOPNOTSUPP;
 
-=======
-
-	if (!ds->ops->port_mrp_add_ring_role)
-		return -EOPNOTSUPP;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ds->ops->port_mrp_add_ring_role(ds, dp->index, mrp);
 }
 
@@ -1684,7 +1388,6 @@ int dsa_port_mrp_del_ring_role(const struct dsa_port *dp,
 
 	if (!ds->ops->port_mrp_del_ring_role)
 		return -EOPNOTSUPP;
-<<<<<<< HEAD
 
 	return ds->ops->port_mrp_del_ring_role(ds, dp->index, mrp);
 }
@@ -1817,10 +1520,6 @@ rewind_old_bridge:
 	}
 
 	return err;
-=======
-
-	return ds->ops->port_mrp_del_ring_role(ds, dp->index, mrp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void dsa_port_set_tag_protocol(struct dsa_port *cpu_dp,
@@ -1978,10 +1677,7 @@ int dsa_port_phylink_create(struct dsa_port *dp)
 {
 	struct dsa_switch *ds = dp->ds;
 	phy_interface_t mode;
-<<<<<<< HEAD
 	struct phylink *pl;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	err = of_get_phy_mode(dp->dn, &mode);
@@ -1998,7 +1694,6 @@ int dsa_port_phylink_create(struct dsa_port *dp)
 	if (ds->ops->phylink_get_caps)
 		ds->ops->phylink_get_caps(ds, dp->index, &dp->pl_config);
 
-<<<<<<< HEAD
 	pl = phylink_create(&dp->pl_config, of_fwnode_handle(dp->dn),
 			    mode, &dsa_port_phylink_mac_ops);
 	if (IS_ERR(pl)) {
@@ -2018,19 +1713,6 @@ void dsa_port_phylink_destroy(struct dsa_port *dp)
 }
 
 static int dsa_shared_port_setup_phy_of(struct dsa_port *dp, bool enable)
-=======
-	dp->pl = phylink_create(&dp->pl_config, of_fwnode_handle(dp->dn),
-				mode, &dsa_port_phylink_mac_ops);
-	if (IS_ERR(dp->pl)) {
-		pr_err("error creating PHYLINK: %ld\n", PTR_ERR(dp->pl));
-		return PTR_ERR(dp->pl);
-	}
-
-	return 0;
-}
-
-static int dsa_port_setup_phy_of(struct dsa_port *dp, bool enable)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dsa_switch *ds = dp->ds;
 	struct phy_device *phydev;
@@ -2303,15 +1985,9 @@ int dsa_shared_port_link_register_of(struct dsa_port *dp)
 			if (ds->ops->phylink_mac_link_down)
 				ds->ops->phylink_mac_link_down(ds, port,
 					MLO_AN_FIXED, PHY_INTERFACE_MODE_NA);
-<<<<<<< HEAD
 
 			return dsa_shared_port_phylink_register(dp);
-=======
-			of_node_put(phy_np);
-			return dsa_port_phylink_register(dp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
-		of_node_put(phy_np);
 		return 0;
 	}
 

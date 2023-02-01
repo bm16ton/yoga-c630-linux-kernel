@@ -71,14 +71,7 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
 static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
 {
 	int bit;
-<<<<<<< HEAD
 	struct kvm_pmc *pmc;
-=======
-	u64 diff = pmu->global_ctrl ^ data;
-	struct kvm_pmc *pmc;
-
-	pmu->global_ctrl = data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
@@ -400,11 +393,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 	struct kvm_pmc *pmc;
 	u32 msr = msr_info->index;
 	u64 data = msr_info->data;
-<<<<<<< HEAD
 	u64 reserved_bits, diff;
-=======
-	u64 reserved_bits;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (msr) {
 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
@@ -442,13 +431,9 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		if (pmu->pebs_enable == data)
 			return 0;
 		if (!(data & pmu->pebs_enable_mask)) {
-<<<<<<< HEAD
 			diff = pmu->pebs_enable ^ data;
 			pmu->pebs_enable = data;
 			reprogram_counters(pmu, diff);
-=======
-			pmu->pebs_enable = data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 0;
 		}
 		break;
@@ -791,18 +776,13 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
 void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
 {
 	struct kvm_pmc *pmc = NULL;
-<<<<<<< HEAD
 	int bit, hw_idx;
-=======
-	int bit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for_each_set_bit(bit, (unsigned long *)&pmu->global_ctrl,
 			 X86_PMC_IDX_MAX) {
 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
 
 		if (!pmc || !pmc_speculative_in_use(pmc) ||
-<<<<<<< HEAD
 		    !intel_pmc_is_enabled(pmc) || !pmc->perf_event)
 			continue;
 
@@ -813,15 +793,6 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
 		hw_idx = pmc->perf_event->hw.idx;
 		if (hw_idx != pmc->idx && hw_idx > -1)
 			pmu->host_cross_mapped_mask |= BIT_ULL(hw_idx);
-=======
-		    !intel_pmc_is_enabled(pmc))
-			continue;
-
-		if (pmc->perf_event && pmc->idx != pmc->perf_event->hw.idx) {
-			pmu->host_cross_mapped_mask |=
-				BIT_ULL(pmc->perf_event->hw.idx);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 

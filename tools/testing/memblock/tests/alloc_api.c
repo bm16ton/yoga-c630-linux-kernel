@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "alloc_api.h"
 
-<<<<<<< HEAD
 static int alloc_test_flags = TEST_F_NONE;
 
 static inline const char * const get_memblock_alloc_name(int flags)
@@ -18,8 +17,6 @@ static inline void *run_memblock_alloc(phys_addr_t size, phys_addr_t align)
 	return memblock_alloc(size, align);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * A simple test that tries to allocate a small memory region.
  * Expect to allocate an aligned region near the end of the available memory.
@@ -28,34 +25,19 @@ static int alloc_top_down_simple_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
 	phys_addr_t size = SZ_2;
 	phys_addr_t expected_start;
 
 	PREFIX_PUSH();
-=======
-
-	PREFIX_PUSH();
-
-	phys_addr_t size = SZ_2;
-	phys_addr_t expected_start;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	expected_start = memblock_end_of_DRAM() - SMP_CACHE_BYTES;
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, size);
 	ASSERT_EQ(rgn->base, expected_start);
 
@@ -92,22 +74,13 @@ static int alloc_top_down_disjoint_check(void)
 	struct memblock_region *rgn2 = &memblock.reserved.regions[0];
 	struct region r1;
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
-=======
-
-	PREFIX_PUSH();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t r2_size = SZ_16;
 	/* Use custom alignment */
 	phys_addr_t alignment = SMP_CACHE_BYTES * 2;
 	phys_addr_t total_size;
 	phys_addr_t expected_start;
 
-<<<<<<< HEAD
 	PREFIX_PUSH();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	r1.base = memblock_end_of_DRAM() - SZ_2;
@@ -118,17 +91,11 @@ static int alloc_top_down_disjoint_check(void)
 
 	memblock_reserve(r1.base, r1.size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r2_size, alignment);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r2_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r2_size, alignment);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn1->size, r1.size);
 	ASSERT_EQ(rgn1->base, r1.base);
 
@@ -157,12 +124,6 @@ static int alloc_top_down_before_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
-=======
-
-	PREFIX_PUSH();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * The first region ends at the aligned address to test region merging
 	 */
@@ -170,25 +131,16 @@ static int alloc_top_down_before_check(void)
 	phys_addr_t r2_size = SZ_512;
 	phys_addr_t total_size = r1_size + r2_size;
 
-<<<<<<< HEAD
 	PREFIX_PUSH();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	memblock_reserve(memblock_end_of_DRAM() - total_size, r1_size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r2_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r2_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r2_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, total_size);
 	ASSERT_EQ(rgn->base, memblock_end_of_DRAM() - total_size);
 
@@ -216,19 +168,10 @@ static int alloc_top_down_after_check(void)
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	struct region r1;
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
 	phys_addr_t r2_size = SZ_512;
 	phys_addr_t total_size;
 
 	PREFIX_PUSH();
-=======
-
-	PREFIX_PUSH();
-
-	phys_addr_t r2_size = SZ_512;
-	phys_addr_t total_size;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	/*
@@ -241,17 +184,11 @@ static int alloc_top_down_after_check(void)
 
 	memblock_reserve(r1.base, r1.size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r2_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r2_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r2_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, total_size);
 	ASSERT_EQ(rgn->base, r1.base - r2_size);
 
@@ -280,19 +217,10 @@ static int alloc_top_down_second_fit_check(void)
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	struct region r1, r2;
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
 	phys_addr_t r3_size = SZ_1K;
 	phys_addr_t total_size;
 
 	PREFIX_PUSH();
-=======
-
-	PREFIX_PUSH();
-
-	phys_addr_t r3_size = SZ_1K;
-	phys_addr_t total_size;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	r1.base = memblock_end_of_DRAM() - SZ_512;
@@ -306,17 +234,11 @@ static int alloc_top_down_second_fit_check(void)
 	memblock_reserve(r1.base, r1.size);
 	memblock_reserve(r2.base, r2.size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r3_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r3_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r3_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, r2.size + r3_size);
 	ASSERT_EQ(rgn->base, r2.base - r3_size);
 
@@ -344,12 +266,6 @@ static int alloc_in_between_generic_check(void)
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	struct region r1, r2;
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
-=======
-
-	PREFIX_PUSH();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t gap_size = SMP_CACHE_BYTES;
 	phys_addr_t r3_size = SZ_64;
 	/*
@@ -358,10 +274,7 @@ static int alloc_in_between_generic_check(void)
 	phys_addr_t rgn_size = (MEM_SIZE - (2 * gap_size + r3_size)) / 2;
 	phys_addr_t total_size;
 
-<<<<<<< HEAD
 	PREFIX_PUSH();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	r1.size = rgn_size;
@@ -375,17 +288,11 @@ static int alloc_in_between_generic_check(void)
 	memblock_reserve(r1.base, r1.size);
 	memblock_reserve(r2.base, r2.size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r3_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r3_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r3_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, total_size);
 	ASSERT_EQ(rgn->base, r1.base - r2.size - r3_size);
 
@@ -413,20 +320,11 @@ static int alloc_in_between_generic_check(void)
 static int alloc_small_gaps_generic_check(void)
 {
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
-=======
-
-	PREFIX_PUSH();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t region_size = SZ_1K;
 	phys_addr_t gap_size = SZ_256;
 	phys_addr_t region_end;
 
-<<<<<<< HEAD
 	PREFIX_PUSH();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	region_end = memblock_start_of_DRAM();
@@ -436,11 +334,7 @@ static int alloc_small_gaps_generic_check(void)
 		region_end += gap_size + region_size;
 	}
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(region_size, SMP_CACHE_BYTES);
-=======
-	allocated_ptr = memblock_alloc(region_size, SMP_CACHE_BYTES);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ASSERT_EQ(allocated_ptr, NULL);
 
@@ -458,20 +352,12 @@ static int alloc_all_reserved_generic_check(void)
 	void *allocated_ptr = NULL;
 
 	PREFIX_PUSH();
-<<<<<<< HEAD
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	/* Simulate full memory */
 	memblock_reserve(memblock_start_of_DRAM(), MEM_SIZE);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(SZ_256, SMP_CACHE_BYTES);
-=======
-	allocated_ptr = memblock_alloc(SZ_256, SMP_CACHE_BYTES);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ASSERT_EQ(allocated_ptr, NULL);
 
@@ -496,7 +382,6 @@ static int alloc_all_reserved_generic_check(void)
 static int alloc_no_space_generic_check(void)
 {
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
 	phys_addr_t available_size = SZ_256;
 	phys_addr_t reserved_size = MEM_SIZE - available_size;
 
@@ -507,20 +392,6 @@ static int alloc_no_space_generic_check(void)
 	memblock_reserve(memblock_start_of_DRAM(), reserved_size);
 
 	allocated_ptr = run_memblock_alloc(SZ_1K, SMP_CACHE_BYTES);
-=======
-
-	PREFIX_PUSH();
-
-	setup_memblock();
-
-	phys_addr_t available_size = SZ_256;
-	phys_addr_t reserved_size = MEM_SIZE - available_size;
-
-	/* Simulate almost-full memory */
-	memblock_reserve(memblock_start_of_DRAM(), reserved_size);
-
-	allocated_ptr = memblock_alloc(SZ_1K, SMP_CACHE_BYTES);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ASSERT_EQ(allocated_ptr, NULL);
 
@@ -544,35 +415,20 @@ static int alloc_limited_space_generic_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
 	phys_addr_t available_size = SZ_256;
 	phys_addr_t reserved_size = MEM_SIZE - available_size;
 
 	PREFIX_PUSH();
-=======
-
-	PREFIX_PUSH();
-
-	phys_addr_t available_size = SZ_256;
-	phys_addr_t reserved_size = MEM_SIZE - available_size;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	/* Simulate almost-full memory */
 	memblock_reserve(memblock_start_of_DRAM(), reserved_size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(available_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, available_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(available_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, MEM_SIZE);
 	ASSERT_EQ(rgn->base, memblock_start_of_DRAM());
 
@@ -598,7 +454,6 @@ static int alloc_no_memory_generic_check(void)
 
 	reset_memblock_regions();
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(SZ_1K, SMP_CACHE_BYTES);
 
 	ASSERT_EQ(allocated_ptr, NULL);
@@ -633,9 +488,6 @@ static int alloc_too_large_generic_check(void)
 	setup_memblock();
 
 	allocated_ptr = run_memblock_alloc(MEM_SIZE + SZ_2, SMP_CACHE_BYTES);
-=======
-	allocated_ptr = memblock_alloc(SZ_1K, SMP_CACHE_BYTES);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ASSERT_EQ(allocated_ptr, NULL);
 	ASSERT_EQ(rgn->size, 0);
@@ -658,7 +510,6 @@ static int alloc_bottom_up_simple_check(void)
 	void *allocated_ptr = NULL;
 
 	PREFIX_PUSH();
-<<<<<<< HEAD
 	setup_memblock();
 
 	allocated_ptr = run_memblock_alloc(SZ_2, SMP_CACHE_BYTES);
@@ -666,14 +517,6 @@ static int alloc_bottom_up_simple_check(void)
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, SZ_2, alloc_test_flags);
 
-=======
-
-	setup_memblock();
-
-	allocated_ptr = memblock_alloc(SZ_2, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, SZ_2);
 	ASSERT_EQ(rgn->base, memblock_start_of_DRAM());
 
@@ -708,22 +551,13 @@ static int alloc_bottom_up_disjoint_check(void)
 	struct memblock_region *rgn2 = &memblock.reserved.regions[1];
 	struct region r1;
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
-=======
-
-	PREFIX_PUSH();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t r2_size = SZ_16;
 	/* Use custom alignment */
 	phys_addr_t alignment = SMP_CACHE_BYTES * 2;
 	phys_addr_t total_size;
 	phys_addr_t expected_start;
 
-<<<<<<< HEAD
 	PREFIX_PUSH();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	r1.base = memblock_start_of_DRAM() + SZ_2;
@@ -734,16 +568,10 @@ static int alloc_bottom_up_disjoint_check(void)
 
 	memblock_reserve(r1.base, r1.size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r2_size, alignment);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r2_size, alloc_test_flags);
-=======
-	allocated_ptr = memblock_alloc(r2_size, alignment);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ASSERT_EQ(rgn1->size, r1.size);
 	ASSERT_EQ(rgn1->base, r1.base);
@@ -773,35 +601,20 @@ static int alloc_bottom_up_before_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
-=======
-
-	PREFIX_PUSH();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t r1_size = SZ_512;
 	phys_addr_t r2_size = SZ_128;
 	phys_addr_t total_size = r1_size + r2_size;
 
-<<<<<<< HEAD
 	PREFIX_PUSH();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	memblock_reserve(memblock_start_of_DRAM() + r1_size, r2_size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r1_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r1_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r1_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, total_size);
 	ASSERT_EQ(rgn->base, memblock_start_of_DRAM());
 
@@ -828,19 +641,10 @@ static int alloc_bottom_up_after_check(void)
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	struct region r1;
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
 	phys_addr_t r2_size = SZ_512;
 	phys_addr_t total_size;
 
 	PREFIX_PUSH();
-=======
-
-	PREFIX_PUSH();
-
-	phys_addr_t r2_size = SZ_512;
-	phys_addr_t total_size;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	/*
@@ -853,17 +657,11 @@ static int alloc_bottom_up_after_check(void)
 
 	memblock_reserve(r1.base, r1.size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r2_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r2_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r2_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, total_size);
 	ASSERT_EQ(rgn->base, r1.base);
 
@@ -893,19 +691,10 @@ static int alloc_bottom_up_second_fit_check(void)
 	struct memblock_region *rgn  = &memblock.reserved.regions[1];
 	struct region r1, r2;
 	void *allocated_ptr = NULL;
-<<<<<<< HEAD
 	phys_addr_t r3_size = SZ_1K;
 	phys_addr_t total_size;
 
 	PREFIX_PUSH();
-=======
-
-	PREFIX_PUSH();
-
-	phys_addr_t r3_size = SZ_1K;
-	phys_addr_t total_size;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	r1.base = memblock_start_of_DRAM();
@@ -919,17 +708,11 @@ static int alloc_bottom_up_second_fit_check(void)
 	memblock_reserve(r1.base, r1.size);
 	memblock_reserve(r2.base, r2.size);
 
-<<<<<<< HEAD
 	allocated_ptr = run_memblock_alloc(r3_size, SMP_CACHE_BYTES);
 
 	ASSERT_NE(allocated_ptr, NULL);
 	assert_mem_content(allocated_ptr, r3_size, alloc_test_flags);
 
-=======
-	allocated_ptr = memblock_alloc(r3_size, SMP_CACHE_BYTES);
-
-	ASSERT_NE(allocated_ptr, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(rgn->size, r2.size + r3_size);
 	ASSERT_EQ(rgn->base, r2.base);
 
@@ -989,15 +772,8 @@ static int alloc_after_check(void)
 static int alloc_in_between_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
-<<<<<<< HEAD
 	run_top_down(alloc_in_between_generic_check);
 	run_bottom_up(alloc_in_between_generic_check);
-=======
-	memblock_set_bottom_up(false);
-	alloc_in_between_generic_check();
-	memblock_set_bottom_up(true);
-	alloc_in_between_generic_check();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1016,15 +792,8 @@ static int alloc_second_fit_check(void)
 static int alloc_small_gaps_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
-<<<<<<< HEAD
 	run_top_down(alloc_small_gaps_generic_check);
 	run_bottom_up(alloc_small_gaps_generic_check);
-=======
-	memblock_set_bottom_up(false);
-	alloc_small_gaps_generic_check();
-	memblock_set_bottom_up(true);
-	alloc_small_gaps_generic_check();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1032,15 +801,8 @@ static int alloc_small_gaps_check(void)
 static int alloc_all_reserved_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
-<<<<<<< HEAD
 	run_top_down(alloc_all_reserved_generic_check);
 	run_bottom_up(alloc_all_reserved_generic_check);
-=======
-	memblock_set_bottom_up(false);
-	alloc_all_reserved_generic_check();
-	memblock_set_bottom_up(true);
-	alloc_all_reserved_generic_check();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1048,15 +810,8 @@ static int alloc_all_reserved_check(void)
 static int alloc_no_space_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
-<<<<<<< HEAD
 	run_top_down(alloc_no_space_generic_check);
 	run_bottom_up(alloc_no_space_generic_check);
-=======
-	memblock_set_bottom_up(false);
-	alloc_no_space_generic_check();
-	memblock_set_bottom_up(true);
-	alloc_no_space_generic_check();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1064,15 +819,8 @@ static int alloc_no_space_check(void)
 static int alloc_limited_space_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
-<<<<<<< HEAD
 	run_top_down(alloc_limited_space_generic_check);
 	run_bottom_up(alloc_limited_space_generic_check);
-=======
-	memblock_set_bottom_up(false);
-	alloc_limited_space_generic_check();
-	memblock_set_bottom_up(true);
-	alloc_limited_space_generic_check();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1080,7 +828,6 @@ static int alloc_limited_space_check(void)
 static int alloc_no_memory_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
-<<<<<<< HEAD
 	run_top_down(alloc_no_memory_generic_check);
 	run_bottom_up(alloc_no_memory_generic_check);
 
@@ -1092,17 +839,10 @@ static int alloc_too_large_check(void)
 	test_print("\tRunning %s...\n", __func__);
 	run_top_down(alloc_too_large_generic_check);
 	run_bottom_up(alloc_too_large_generic_check);
-=======
-	memblock_set_bottom_up(false);
-	alloc_no_memory_generic_check();
-	memblock_set_bottom_up(true);
-	alloc_no_memory_generic_check();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
-<<<<<<< HEAD
 static int memblock_alloc_checks_internal(int flags)
 {
 	const char *func = get_memblock_alloc_name(flags);
@@ -1111,15 +851,6 @@ static int memblock_alloc_checks_internal(int flags)
 	prefix_reset();
 	prefix_push(func);
 	test_print("Running %s tests...\n", func);
-=======
-int memblock_alloc_checks(void)
-{
-	const char *func_testing = "memblock_alloc";
-
-	prefix_reset();
-	prefix_push(func_testing);
-	test_print("Running %s tests...\n", func_testing);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	reset_memblock_attributes();
 	dummy_physical_memory_init();
@@ -1135,10 +866,7 @@ int memblock_alloc_checks(void)
 	alloc_no_space_check();
 	alloc_limited_space_check();
 	alloc_no_memory_check();
-<<<<<<< HEAD
 	alloc_too_large_check();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dummy_physical_memory_cleanup();
 
@@ -1146,7 +874,6 @@ int memblock_alloc_checks(void)
 
 	return 0;
 }
-<<<<<<< HEAD
 
 int memblock_alloc_checks(void)
 {
@@ -1155,5 +882,3 @@ int memblock_alloc_checks(void)
 
 	return 0;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

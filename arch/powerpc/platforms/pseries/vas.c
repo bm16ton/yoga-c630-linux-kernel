@@ -200,7 +200,6 @@ static irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
 	struct vas_user_win_ref *tsk_ref;
 	int rc;
 
-<<<<<<< HEAD
 	while (atomic_read(&txwin->pending_faults)) {
 		rc = h_get_nx_fault(txwin->vas_win.winid, (u64)virt_to_phys(&crb));
 		if (!rc) {
@@ -209,20 +208,12 @@ static irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
 			vas_update_csb(&crb, tsk_ref);
 		}
 		atomic_dec(&txwin->pending_faults);
-=======
-	rc = h_get_nx_fault(txwin->vas_win.winid, (u64)virt_to_phys(&crb));
-	if (!rc) {
-		tsk_ref = &txwin->vas_win.task_ref;
-		vas_dump_crb(&crb);
-		vas_update_csb(&crb, tsk_ref);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return IRQ_HANDLED;
 }
 
 /*
-<<<<<<< HEAD
  * irq_default_primary_handler() can be used only with IRQF_ONESHOT
  * which disables IRQ before executing the thread handler and enables
  * it after. But this disabling interrupt sets the VAS IRQ OFF
@@ -245,8 +236,6 @@ static irqreturn_t pseries_vas_irq_handler(int irq, void *data)
 }
 
 /*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Allocate window and setup IRQ mapping.
  */
 static int allocate_setup_window(struct pseries_vas_window *txwin,
@@ -276,14 +265,9 @@ static int allocate_setup_window(struct pseries_vas_window *txwin,
 		goto out_irq;
 	}
 
-<<<<<<< HEAD
 	rc = request_threaded_irq(txwin->fault_virq,
 				  pseries_vas_irq_handler,
 				  pseries_vas_fault_thread_fn, 0,
-=======
-	rc = request_threaded_irq(txwin->fault_virq, NULL,
-				  pseries_vas_fault_thread_fn, IRQF_ONESHOT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				  txwin->name, txwin);
 	if (rc) {
 		pr_err("VAS-Window[%d]: Request IRQ(%u) failed with %d\n",
@@ -543,21 +527,10 @@ static const struct vas_user_win_ops vops_pseries = {
 int vas_register_api_pseries(struct module *mod, enum vas_cop_type cop_type,
 			     const char *name)
 {
-<<<<<<< HEAD
 	if (!copypaste_feat)
 		return -ENOTSUPP;
 
 	return vas_register_coproc_api(mod, cop_type, name, &vops_pseries);
-=======
-	int rc;
-
-	if (!copypaste_feat)
-		return -ENOTSUPP;
-
-	rc = vas_register_coproc_api(mod, cop_type, name, &vops_pseries);
-
-	return rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(vas_register_api_pseries);
 
@@ -879,7 +852,6 @@ int vas_reconfig_capabilties(u8 type, int new_nr_creds)
 	mutex_unlock(&vas_pseries_mutex);
 	return rc;
 }
-<<<<<<< HEAD
 
 int pseries_vas_dlpar_cpu(void)
 {
@@ -899,8 +871,6 @@ int pseries_vas_dlpar_cpu(void)
 	return rc;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Total number of default credits available (target_credits)
  * in LPAR depends on number of cores configured. It varies based on
@@ -915,7 +885,6 @@ static int pseries_vas_notifier(struct notifier_block *nb,
 	struct of_reconfig_data *rd = data;
 	struct device_node *dn = rd->dn;
 	const __be32 *intserv = NULL;
-<<<<<<< HEAD
 	int len;
 
 	/*
@@ -925,9 +894,6 @@ static int pseries_vas_notifier(struct notifier_block *nb,
 	 */
 	if (is_shared_processor())
 		return NOTIFY_OK;
-=======
-	int new_nr_creds, len, rc = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if ((action == OF_RECONFIG_ATTACH_NODE) ||
 		(action == OF_RECONFIG_DETACH_NODE))
@@ -939,23 +905,7 @@ static int pseries_vas_notifier(struct notifier_block *nb,
 	if (!intserv)
 		return NOTIFY_OK;
 
-<<<<<<< HEAD
 	return pseries_vas_dlpar_cpu();
-=======
-	rc = h_query_vas_capabilities(H_QUERY_VAS_CAPABILITIES,
-					vascaps[VAS_GZIP_DEF_FEAT_TYPE].feat,
-					(u64)virt_to_phys(&hv_cop_caps));
-	if (!rc) {
-		new_nr_creds = be16_to_cpu(hv_cop_caps.target_lpar_creds);
-		rc = vas_reconfig_capabilties(VAS_GZIP_DEF_FEAT_TYPE,
-						new_nr_creds);
-	}
-
-	if (rc)
-		pr_err("Failed reconfig VAS capabilities with DLPAR\n");
-
-	return rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct notifier_block pseries_vas_nb = {

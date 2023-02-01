@@ -17,11 +17,7 @@
 
 struct ksmbd_tree_conn_status
 ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
-<<<<<<< HEAD
 			const char *share_name)
-=======
-			char *share_name)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ksmbd_tree_conn_status status = {-ENOENT, NULL};
 	struct ksmbd_tree_connect_response *resp = NULL;
@@ -30,11 +26,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
 	struct sockaddr *peer_addr;
 	int ret;
 
-<<<<<<< HEAD
 	sc = ksmbd_share_config_get(conn->um, share_name);
-=======
-	sc = ksmbd_share_config_get(share_name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!sc)
 		return status;
 
@@ -69,11 +61,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
 		struct ksmbd_share_config *new_sc;
 
 		ksmbd_share_config_del(sc);
-<<<<<<< HEAD
 		new_sc = ksmbd_share_config_get(conn->um, share_name);
-=======
-		new_sc = ksmbd_share_config_get(share_name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!new_sc) {
 			pr_err("Failed to update stale share config\n");
 			status.ret = -ESTALE;

@@ -111,7 +111,6 @@ static void ttm_range_man_free(struct ttm_resource_manager *man,
 
 	ttm_resource_fini(man, res);
 	kfree(node);
-<<<<<<< HEAD
 }
 
 static bool ttm_range_man_intersects(struct ttm_resource_manager *man,
@@ -143,15 +142,12 @@ static bool ttm_range_man_compatible(struct ttm_resource_manager *man,
 		return false;
 
 	return true;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ttm_range_man_debug(struct ttm_resource_manager *man,
 				struct drm_printer *printer)
 {
 	struct ttm_range_manager *rman = to_range_manager(man);
-<<<<<<< HEAD
 
 	spin_lock(&rman->lock);
 	drm_mm_print(&rman->mm, printer);
@@ -163,17 +159,6 @@ static const struct ttm_resource_manager_func ttm_range_manager_func = {
 	.free = ttm_range_man_free,
 	.intersects = ttm_range_man_intersects,
 	.compatible = ttm_range_man_compatible,
-=======
-
-	spin_lock(&rman->lock);
-	drm_mm_print(&rman->mm, printer);
-	spin_unlock(&rman->lock);
-}
-
-static const struct ttm_resource_manager_func ttm_range_manager_func = {
-	.alloc = ttm_range_man_alloc,
-	.free = ttm_range_man_free,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.debug = ttm_range_man_debug
 };
 

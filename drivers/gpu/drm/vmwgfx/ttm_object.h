@@ -42,11 +42,6 @@
 #include <linux/list.h>
 #include <linux/rcupdate.h>
 
-<<<<<<< HEAD
-=======
-#include "vmwgfx_hashtab.h"
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * enum ttm_object_type
  *
@@ -107,11 +102,7 @@ struct ttm_base_object {
 	struct ttm_object_file *tfile;
 	struct kref refcount;
 	void (*refcount_release) (struct ttm_base_object **base);
-<<<<<<< HEAD
 	u64 handle;
-=======
-	u32 handle;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	enum ttm_object_type object_type;
 	u32 shareable;
 };
@@ -267,10 +258,6 @@ extern void ttm_object_file_release(struct ttm_object_file **p_tfile);
 /**
  * ttm_object device init - initialize a struct ttm_object_device
  *
-<<<<<<< HEAD
-=======
- * @hash_order: Order of hash table used to hash the base objects.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @ops: DMA buf ops for prime objects of this device.
  *
  * This function is typically called on device initialization to prepare
@@ -278,12 +265,7 @@ extern void ttm_object_file_release(struct ttm_object_file **p_tfile);
  */
 
 extern struct ttm_object_device *
-<<<<<<< HEAD
 ttm_object_device_init(const struct dma_buf_ops *ops);
-=======
-ttm_object_device_init(unsigned int hash_order,
-		       const struct dma_buf_ops *ops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * ttm_object_device_release - release data held by a ttm_object_device
@@ -325,21 +307,4 @@ extern int ttm_prime_handle_to_fd(struct ttm_object_file *tfile,
 #define ttm_prime_object_kfree(__obj, __prime)		\
 	kfree_rcu(__obj, __prime.base.rhead)
 
-<<<<<<< HEAD
-=======
-struct ttm_base_object *
-ttm_base_object_noref_lookup(struct ttm_object_file *tfile, uint32_t key);
-
-/**
- * ttm_base_object_noref_release - release a base object pointer looked up
- * without reference
- *
- * Releases a base object pointer looked up with ttm_base_object_noref_lookup().
- */
-static inline void ttm_base_object_noref_release(void)
-{
-	__acquire(RCU);
-	rcu_read_unlock();
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

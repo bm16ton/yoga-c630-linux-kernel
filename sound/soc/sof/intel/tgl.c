@@ -24,54 +24,26 @@ static const struct snd_sof_debugfs_map tgl_dsp_debugfs[] = {
 
 static int tgl_dsp_core_get(struct snd_sof_dev *sdev, int core)
 {
-<<<<<<< HEAD
 	const struct sof_ipc_pm_ops *pm_ops = sdev->ipc->ops->pm;
-=======
-	struct sof_ipc_pm_core_config pm_core_config = {
-		.hdr = {
-			.cmd = SOF_IPC_GLB_PM_MSG | SOF_IPC_PM_CORE_ENABLE,
-			.size = sizeof(pm_core_config),
-		},
-		.enable_mask = sdev->enabled_cores_mask | BIT(core),
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* power up primary core if not already powered up and return */
 	if (core == SOF_DSP_PRIMARY_CORE)
 		return hda_dsp_enable_core(sdev, BIT(core));
 
-<<<<<<< HEAD
 	if (pm_ops->set_core_state)
 		return pm_ops->set_core_state(sdev, core, true);
 
 	return 0;
-=======
-	/* notify DSP for secondary cores */
-	return sof_ipc_tx_message(sdev->ipc, pm_core_config.hdr.cmd,
-				 &pm_core_config, sizeof(pm_core_config),
-				 &pm_core_config, sizeof(pm_core_config));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int tgl_dsp_core_put(struct snd_sof_dev *sdev, int core)
 {
-<<<<<<< HEAD
 	const struct sof_ipc_pm_ops *pm_ops = sdev->ipc->ops->pm;
-=======
-	struct sof_ipc_pm_core_config pm_core_config = {
-		.hdr = {
-			.cmd = SOF_IPC_GLB_PM_MSG | SOF_IPC_PM_CORE_ENABLE,
-			.size = sizeof(pm_core_config),
-		},
-		.enable_mask = sdev->enabled_cores_mask & ~BIT(core),
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* power down primary core and return */
 	if (core == SOF_DSP_PRIMARY_CORE)
 		return hda_dsp_core_reset_power_down(sdev, BIT(core));
 
-<<<<<<< HEAD
 	if (pm_ops->set_core_state)
 		return pm_ops->set_core_state(sdev, core, false);
 
@@ -141,116 +113,6 @@ int sof_tgl_ops_init(struct snd_sof_dev *sdev)
 	sof_tgl_ops.core_put = tgl_dsp_core_put;
 
 	return 0;
-=======
-	/* notify DSP for secondary cores */
-	return sof_ipc_tx_message(sdev->ipc, pm_core_config.hdr.cmd,
-				 &pm_core_config, sizeof(pm_core_config),
-				 &pm_core_config, sizeof(pm_core_config));
-}
-
-/* Tigerlake ops */
-const struct snd_sof_dsp_ops sof_tgl_ops = {
-	/* probe/remove/shutdown */
-	.probe		= hda_dsp_probe,
-	.remove		= hda_dsp_remove,
-	.shutdown	= hda_dsp_shutdown,
-
-	/* Register IO */
-	.write		= sof_io_write,
-	.read		= sof_io_read,
-	.write64	= sof_io_write64,
-	.read64		= sof_io_read64,
-
-	/* Block IO */
-	.block_read	= sof_block_read,
-	.block_write	= sof_block_write,
-
-	/* Mailbox IO */
-	.mailbox_read	= sof_mailbox_read,
-	.mailbox_write	= sof_mailbox_write,
-
-	/* doorbell */
-	.irq_thread	= cnl_ipc_irq_thread,
-
-	/* ipc */
-	.send_msg	= cnl_ipc_send_msg,
-	.fw_ready	= sof_fw_ready,
-	.get_mailbox_offset = hda_dsp_ipc_get_mailbox_offset,
-	.get_window_offset = hda_dsp_ipc_get_window_offset,
-
-	.ipc_msg_data	= hda_ipc_msg_data,
-	.set_stream_data_offset = hda_set_stream_data_offset,
-
-	/* machine driver */
-	.machine_select = hda_machine_select,
-	.machine_register = sof_machine_register,
-	.machine_unregister = sof_machine_unregister,
-	.set_mach_params = hda_set_mach_params,
-
-	/* debug */
-	.debug_map	= tgl_dsp_debugfs,
-	.debug_map_count	= ARRAY_SIZE(tgl_dsp_debugfs),
-	.dbg_dump	= hda_dsp_dump,
-	.ipc_dump	= cnl_ipc_dump,
-	.debugfs_add_region_item = snd_sof_debugfs_add_region_item_iomem,
-
-	/* stream callbacks */
-	.pcm_open	= hda_dsp_pcm_open,
-	.pcm_close	= hda_dsp_pcm_close,
-	.pcm_hw_params	= hda_dsp_pcm_hw_params,
-	.pcm_hw_free	= hda_dsp_stream_hw_free,
-	.pcm_trigger	= hda_dsp_pcm_trigger,
-	.pcm_pointer	= hda_dsp_pcm_pointer,
-	.pcm_ack	= hda_dsp_pcm_ack,
-
-	/* firmware loading */
-	.load_firmware = snd_sof_load_firmware_raw,
-
-	/* pre/post fw run */
-	.pre_fw_run = hda_dsp_pre_fw_run,
-	.post_fw_run = hda_dsp_post_fw_run,
-
-	/* parse platform specific extended manifest */
-	.parse_platform_ext_manifest = hda_dsp_ext_man_get_cavs_config_data,
-
-	/* dsp core get/put */
-	.core_get = tgl_dsp_core_get,
-	.core_put = tgl_dsp_core_put,
-
-	/* firmware run */
-	.run = hda_dsp_cl_boot_firmware_iccmax,
-
-	/* trace callback */
-	.trace_init = hda_dsp_trace_init,
-	.trace_release = hda_dsp_trace_release,
-	.trace_trigger = hda_dsp_trace_trigger,
-
-	/* client ops */
-	.register_ipc_clients = hda_register_clients,
-	.unregister_ipc_clients = hda_unregister_clients,
-
-	/* DAI drivers */
-	.drv		= skl_dai,
-	.num_drv	= SOF_SKL_NUM_DAIS,
-
-	/* PM */
-	.suspend		= hda_dsp_suspend,
-	.resume			= hda_dsp_resume,
-	.runtime_suspend	= hda_dsp_runtime_suspend,
-	.runtime_resume		= hda_dsp_runtime_resume,
-	.runtime_idle		= hda_dsp_runtime_idle,
-	.set_hw_params_upon_resume = hda_dsp_set_hw_params_upon_resume,
-	.set_power_state	= hda_dsp_set_power_state,
-
-	/* ALSA HW info flags */
-	.hw_info =	SNDRV_PCM_INFO_MMAP |
-			SNDRV_PCM_INFO_MMAP_VALID |
-			SNDRV_PCM_INFO_INTERLEAVED |
-			SNDRV_PCM_INFO_PAUSE |
-			SNDRV_PCM_INFO_NO_PERIOD_WAKEUP,
-
-	.dsp_arch_ops = &sof_xtensa_arch_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(sof_tgl_ops_init, SND_SOC_SOF_INTEL_HDA_COMMON);
 
@@ -271,14 +133,11 @@ const struct sof_intel_dsp_desc tgl_chip_info = {
 	.sdw_shim_base = SDW_SHIM_BASE,
 	.sdw_alh_base = SDW_ALH_BASE,
 	.check_sdw_irq	= hda_common_check_sdw_irq,
-<<<<<<< HEAD
 	.check_ipc_irq	= hda_dsp_check_ipc_irq,
 	.cl_init = cl_dsp_init,
 	.power_down_dsp = hda_power_down_dsp,
 	.disable_interrupts = hda_dsp_disable_interrupts,
 	.hw_ip_version = SOF_INTEL_CAVS_2_5,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(tgl_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);
 
@@ -299,14 +158,11 @@ const struct sof_intel_dsp_desc tglh_chip_info = {
 	.sdw_shim_base = SDW_SHIM_BASE,
 	.sdw_alh_base = SDW_ALH_BASE,
 	.check_sdw_irq	= hda_common_check_sdw_irq,
-<<<<<<< HEAD
 	.check_ipc_irq	= hda_dsp_check_ipc_irq,
 	.cl_init = cl_dsp_init,
 	.power_down_dsp = hda_power_down_dsp,
 	.disable_interrupts = hda_dsp_disable_interrupts,
 	.hw_ip_version = SOF_INTEL_CAVS_2_5,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(tglh_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);
 
@@ -320,26 +176,18 @@ const struct sof_intel_dsp_desc ehl_chip_info = {
 	.ipc_ack = CNL_DSP_REG_HIPCIDA,
 	.ipc_ack_mask = CNL_DSP_REG_HIPCIDA_DONE,
 	.ipc_ctl = CNL_DSP_REG_HIPCCTL,
-<<<<<<< HEAD
 	.rom_status_reg = HDA_DSP_SRAM_REG_ROM_STATUS,
 	.rom_init_timeout	= 300,
 	.ssp_count = TGL_SSP_COUNT,
-=======
-	.rom_init_timeout	= 300,
-	.ssp_count = ICL_SSP_COUNT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ssp_base_offset = CNL_SSP_BASE_OFFSET,
 	.sdw_shim_base = SDW_SHIM_BASE,
 	.sdw_alh_base = SDW_ALH_BASE,
 	.check_sdw_irq	= hda_common_check_sdw_irq,
-<<<<<<< HEAD
 	.check_ipc_irq	= hda_dsp_check_ipc_irq,
 	.cl_init = cl_dsp_init,
 	.power_down_dsp = hda_power_down_dsp,
 	.disable_interrupts = hda_dsp_disable_interrupts,
 	.hw_ip_version = SOF_INTEL_CAVS_2_5,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(ehl_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);
 
@@ -353,25 +201,17 @@ const struct sof_intel_dsp_desc adls_chip_info = {
 	.ipc_ack = CNL_DSP_REG_HIPCIDA,
 	.ipc_ack_mask = CNL_DSP_REG_HIPCIDA_DONE,
 	.ipc_ctl = CNL_DSP_REG_HIPCCTL,
-<<<<<<< HEAD
 	.rom_status_reg = HDA_DSP_SRAM_REG_ROM_STATUS,
 	.rom_init_timeout	= 300,
 	.ssp_count = TGL_SSP_COUNT,
-=======
-	.rom_init_timeout	= 300,
-	.ssp_count = ICL_SSP_COUNT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ssp_base_offset = CNL_SSP_BASE_OFFSET,
 	.sdw_shim_base = SDW_SHIM_BASE,
 	.sdw_alh_base = SDW_ALH_BASE,
 	.check_sdw_irq	= hda_common_check_sdw_irq,
-<<<<<<< HEAD
 	.check_ipc_irq	= hda_dsp_check_ipc_irq,
 	.cl_init = cl_dsp_init,
 	.power_down_dsp = hda_power_down_dsp,
 	.disable_interrupts = hda_dsp_disable_interrupts,
 	.hw_ip_version = SOF_INTEL_CAVS_2_5,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(adls_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);

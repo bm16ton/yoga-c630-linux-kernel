@@ -57,14 +57,6 @@ Low level entry and exit
 
    entry
 
-Low level entry and exit
-========================
-
-.. toctree::
-   :maxdepth: 1
-
-   entry
-
 Concurrency primitives
 ======================
 

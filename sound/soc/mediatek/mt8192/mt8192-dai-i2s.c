@@ -45,10 +45,6 @@ struct mtk_afe_i2s_priv {
 	int rate; /* for determine which apll to use */
 	int low_jitter_en;
 
-<<<<<<< HEAD
-=======
-	const char *share_property_name;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int share_i2s_id;
 
 	int mclk_id;
@@ -1987,87 +1983,50 @@ static const struct mtk_afe_i2s_priv mt8192_i2s_priv[DAI_I2S_NUM] = {
 	[DAI_I2S0] = {
 		.id = MT8192_DAI_I2S_0,
 		.mclk_id = MT8192_I2S0_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s0-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S1] = {
 		.id = MT8192_DAI_I2S_1,
 		.mclk_id = MT8192_I2S1_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s1-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S2] = {
 		.id = MT8192_DAI_I2S_2,
 		.mclk_id = MT8192_I2S2_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s2-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S3] = {
 		.id = MT8192_DAI_I2S_3,
 		.mclk_id = MT8192_I2S3_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s3-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S5] = {
 		.id = MT8192_DAI_I2S_5,
 		.mclk_id = MT8192_I2S5_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s5-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S6] = {
 		.id = MT8192_DAI_I2S_6,
 		.mclk_id = MT8192_I2S6_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s6-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S7] = {
 		.id = MT8192_DAI_I2S_7,
 		.mclk_id = MT8192_I2S7_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s7-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S8] = {
 		.id = MT8192_DAI_I2S_8,
 		.mclk_id = MT8192_I2S8_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s8-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 	[DAI_I2S9] = {
 		.id = MT8192_DAI_I2S_9,
 		.mclk_id = MT8192_I2S9_MCK,
-<<<<<<< HEAD
-=======
-		.share_property_name = "i2s9-share",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.share_i2s_id = -1,
 	},
 };
 
-<<<<<<< HEAD
 /**
  * mt8192_dai_i2s_set_share() - Set up I2S ports to share a single clock.
  * @afe: Pointer to &struct mtk_base_afe
@@ -2093,27 +2052,6 @@ int mt8192_dai_i2s_set_share(struct mtk_base_afe *afe, const char *main_i2s_name
 	return 0;
 }
 EXPORT_SYMBOL_GPL(mt8192_dai_i2s_set_share);
-=======
-static int mt8192_dai_i2s_get_share(struct mtk_base_afe *afe)
-{
-	struct mt8192_afe_private *afe_priv = afe->platform_priv;
-	const struct device_node *of_node = afe->dev->of_node;
-	const char *of_str;
-	const char *property_name;
-	struct mtk_afe_i2s_priv *i2s_priv;
-	int i;
-
-	for (i = 0; i < DAI_I2S_NUM; i++) {
-		i2s_priv = afe_priv->dai_priv[mt8192_i2s_priv[i].id];
-		property_name = mt8192_i2s_priv[i].share_property_name;
-		if (of_property_read_string(of_node, property_name, &of_str))
-			continue;
-		i2s_priv->share_i2s_id = get_i2s_id_by_name(afe, of_str);
-	}
-
-	return 0;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int mt8192_dai_i2s_set_priv(struct mtk_base_afe *afe)
 {
@@ -2159,13 +2097,5 @@ int mt8192_dai_i2s_register(struct mtk_base_afe *afe)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-=======
-	/* parse share i2s */
-	ret = mt8192_dai_i2s_get_share(afe);
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }

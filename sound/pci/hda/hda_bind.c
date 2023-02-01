@@ -157,17 +157,10 @@ static int hda_codec_driver_remove(struct device *dev)
 		return codec->bus->core.ext_ops->hdev_detach(&codec->core);
 	}
 
-<<<<<<< HEAD
 	snd_hda_codec_disconnect_pcms(codec);
 	snd_hda_jack_tbl_disconnect(codec);
 	if (!refcount_dec_and_test(&codec->pcm_ref))
 		wait_event(codec->remove_sleep, !refcount_read(&codec->pcm_ref));
-=======
-	refcount_dec(&codec->pcm_ref);
-	snd_hda_codec_disconnect_pcms(codec);
-	snd_hda_jack_tbl_disconnect(codec);
-	wait_event(codec->remove_sleep, !refcount_read(&codec->pcm_ref));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snd_power_sync_ref(codec->bus->card);
 
 	if (codec->patch_ops.free)

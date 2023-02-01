@@ -237,13 +237,8 @@ static void f2fs_handle_step_decompress(struct bio_post_read_ctx *ctx,
 		struct page *page = bv->bv_page;
 
 		if (f2fs_is_compressed_page(page))
-<<<<<<< HEAD
 			f2fs_end_read_compressed_page(page, false, blkaddr,
 						      in_task);
-=======
-			f2fs_end_read_compressed_page(page, PageError(page),
-						blkaddr, in_task);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		else
 			all_compressed = false;
 
@@ -273,11 +268,7 @@ static void f2fs_post_read_work(struct work_struct *work)
 	if (ctx->enabled_steps & STEP_DECOMPRESS)
 		f2fs_handle_step_decompress(ctx, true);
 
-<<<<<<< HEAD
 	f2fs_verify_and_finish_bio(bio, true);
-=======
-	f2fs_verify_and_finish_bio(ctx->bio, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void f2fs_read_end_io(struct bio *bio)
@@ -1615,11 +1606,8 @@ next_block:
 					(flag != F2FS_GET_BLOCK_FIEMAP ||
 					IS_ENABLED(CONFIG_F2FS_CHECK_FS))) {
 				err = -EFSCORRUPTED;
-<<<<<<< HEAD
 				f2fs_handle_error(sbi,
 						ERROR_CORRUPTED_CLUSTER);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				goto sync_out;
 			}
 			if (flag == F2FS_GET_BLOCK_BMAP) {
@@ -3395,104 +3383,6 @@ unlock_out:
 
 static int __find_data_block(struct inode *inode, pgoff_t index,
 				block_t *blk_addr)
-<<<<<<< HEAD
-=======
-{
-	struct dnode_of_data dn;
-	struct page *ipage;
-	struct extent_info ei = {0, };
-	int err = 0;
-
-	ipage = f2fs_get_node_page(F2FS_I_SB(inode), inode->i_ino);
-	if (IS_ERR(ipage))
-		return PTR_ERR(ipage);
-
-	set_new_dnode(&dn, inode, ipage, ipage, 0);
-
-	if (f2fs_lookup_extent_cache(inode, index, &ei)) {
-		dn.data_blkaddr = ei.blk + index - ei.fofs;
-	} else {
-		/* hole case */
-		err = f2fs_get_dnode_of_data(&dn, index, LOOKUP_NODE);
-		if (err) {
-			dn.data_blkaddr = NULL_ADDR;
-			err = 0;
-		}
-	}
-	*blk_addr = dn.data_blkaddr;
-	f2fs_put_dnode(&dn);
-	return err;
-}
-
-static int __reserve_data_block(struct inode *inode, pgoff_t index,
-				block_t *blk_addr, bool *node_changed)
-{
-	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
-	struct dnode_of_data dn;
-	struct page *ipage;
-	int err = 0;
-
-	f2fs_do_map_lock(sbi, F2FS_GET_BLOCK_PRE_AIO, true);
-
-	ipage = f2fs_get_node_page(sbi, inode->i_ino);
-	if (IS_ERR(ipage)) {
-		err = PTR_ERR(ipage);
-		goto unlock_out;
-	}
-	set_new_dnode(&dn, inode, ipage, ipage, 0);
-
-	err = f2fs_get_block(&dn, index);
-
-	*blk_addr = dn.data_blkaddr;
-	*node_changed = dn.node_changed;
-	f2fs_put_dnode(&dn);
-
-unlock_out:
-	f2fs_do_map_lock(sbi, F2FS_GET_BLOCK_PRE_AIO, false);
-	return err;
-}
-
-static int prepare_atomic_write_begin(struct f2fs_sb_info *sbi,
-			struct page *page, loff_t pos, unsigned int len,
-			block_t *blk_addr, bool *node_changed)
-{
-	struct inode *inode = page->mapping->host;
-	struct inode *cow_inode = F2FS_I(inode)->cow_inode;
-	pgoff_t index = page->index;
-	int err = 0;
-	block_t ori_blk_addr = NULL_ADDR;
-
-	/* If pos is beyond the end of file, reserve a new block in COW inode */
-	if ((pos & PAGE_MASK) >= i_size_read(inode))
-		goto reserve_block;
-
-	/* Look for the block in COW inode first */
-	err = __find_data_block(cow_inode, index, blk_addr);
-	if (err)
-		return err;
-	else if (*blk_addr != NULL_ADDR)
-		return 0;
-
-	/* Look for the block in the original inode */
-	err = __find_data_block(inode, index, &ori_blk_addr);
-	if (err)
-		return err;
-
-reserve_block:
-	/* Finally, we should reserve a new block in COW inode for the update */
-	err = __reserve_data_block(cow_inode, index, blk_addr, node_changed);
-	if (err)
-		return err;
-	inc_atomic_write_cnt(inode);
-
-	if (ori_blk_addr != NULL_ADDR)
-		*blk_addr = ori_blk_addr;
-	return 0;
-}
-
-static int f2fs_write_begin(struct file *file, struct address_space *mapping,
-		loff_t pos, unsigned len, struct page **pagep, void **fsdata)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dnode_of_data dn;
 	struct page *ipage;
@@ -3803,7 +3693,6 @@ bool f2fs_release_folio(struct folio *folio, gfp_t wait)
 	/* If this is dirty folio, keep private data */
 	if (folio_test_dirty(folio))
 		return false;
-<<<<<<< HEAD
 
 	sbi = F2FS_M_SB(folio->mapping);
 	if (test_opt(sbi, COMPRESS_CACHE)) {
@@ -3815,19 +3704,6 @@ bool f2fs_release_folio(struct folio *folio, gfp_t wait)
 
 	clear_page_private_gcing(&folio->page);
 
-=======
-
-	sbi = F2FS_M_SB(folio->mapping);
-	if (test_opt(sbi, COMPRESS_CACHE)) {
-		struct inode *inode = folio->mapping->host;
-
-		if (inode->i_ino == F2FS_COMPRESS_INO(sbi))
-			clear_page_private_data(&folio->page);
-	}
-
-	clear_page_private_gcing(&folio->page);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	folio_detach_private(folio);
 	return true;
 }
@@ -3836,7 +3712,6 @@ static bool f2fs_dirty_data_folio(struct address_space *mapping,
 		struct folio *folio)
 {
 	struct inode *inode = mapping->host;
-<<<<<<< HEAD
 
 	trace_f2fs_set_page_dirty(&folio->page, DATA);
 
@@ -3845,17 +3720,6 @@ static bool f2fs_dirty_data_folio(struct address_space *mapping,
 	BUG_ON(folio_test_swapcache(folio));
 
 	if (filemap_dirty_folio(mapping, folio)) {
-=======
-
-	trace_f2fs_set_page_dirty(&folio->page, DATA);
-
-	if (!folio_test_uptodate(folio))
-		folio_mark_uptodate(folio);
-	BUG_ON(folio_test_swapcache(folio));
-
-	if (!folio_test_dirty(folio)) {
-		filemap_dirty_folio(mapping, folio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		f2fs_update_dirty_folio(inode, folio);
 		return true;
 	}

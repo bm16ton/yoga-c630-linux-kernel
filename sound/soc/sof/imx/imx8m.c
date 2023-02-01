@@ -412,11 +412,7 @@ static int imx8m_dsp_suspend(struct snd_sof_dev *sdev, unsigned int target_state
 }
 
 /* i.MX8 ops */
-<<<<<<< HEAD
 static struct snd_sof_dsp_ops sof_imx8m_ops = {
-=======
-static const struct snd_sof_dsp_ops sof_imx8m_ops = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* probe and remove */
 	.probe		= imx8m_probe,
 	.remove		= imx8m_remove,
@@ -475,7 +471,6 @@ static const struct snd_sof_dsp_ops sof_imx8m_ops = {
 };
 
 static struct sof_dev_desc sof_of_imx8mp_desc = {
-<<<<<<< HEAD
 	.ipc_supported_mask	= BIT(SOF_IPC),
 	.ipc_default		= SOF_IPC,
 	.default_fw_path = {
@@ -487,11 +482,6 @@ static struct sof_dev_desc sof_of_imx8mp_desc = {
 	.default_fw_filename = {
 		[SOF_IPC] = "sof-imx8m.ri",
 	},
-=======
-	.default_fw_path = "imx/sof",
-	.default_tplg_path = "imx/sof-tplg",
-	.default_fw_filename = "sof-imx8m.ri",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.nocodec_tplg_filename = "sof-imx8-nocodec.tplg",
 	.ops = &sof_imx8m_ops,
 };

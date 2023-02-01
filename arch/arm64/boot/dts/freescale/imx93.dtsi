@@ -7,10 +7,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
-<<<<<<< HEAD
 #include <dt-bindings/power/fsl,imx93-power.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "imx93-pinfunc.h"
 
@@ -20,7 +17,6 @@
 	#size-cells = <2>;
 
 	aliases {
-<<<<<<< HEAD
 		i2c0 = &lpi2c1;
 		i2c1 = &lpi2c2;
 		i2c2 = &lpi2c3;
@@ -29,8 +25,6 @@
 		i2c5 = &lpi2c6;
 		i2c6 = &lpi2c7;
 		i2c7 = &lpi2c8;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mmc0 = &usdhc1;
 		mmc1 = &usdhc2;
 		mmc2 = &usdhc3;
@@ -87,14 +81,11 @@
 		clock-output-names = "clk_ext1";
 	};
 
-<<<<<<< HEAD
 	pmu {
 		compatible = "arm,cortex-a55-pmu";
 		interrupts = <GIC_PPI 7 (GIC_CPU_MASK_SIMPLE(2) | IRQ_TYPE_LEVEL_HIGH)>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	psci {
 		compatible = "arm,psci-1.0";
 		method = "smc";
@@ -135,14 +126,11 @@
 			#size-cells = <1>;
 			ranges;
 
-<<<<<<< HEAD
 			anomix_ns_gpr: syscon@44210000 {
 				compatible = "fsl,imx93-aonmix-ns-syscfg", "syscon";
 				reg = <0x44210000 0x1000>;
 			};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mu1: mailbox@44230000 {
 				compatible = "fsl,imx93-mu", "fsl,imx8ulp-mu";
 				reg = <0x44230000 0x10000>;
@@ -159,7 +147,6 @@
 				clock-names = "per";
 			};
 
-<<<<<<< HEAD
 			lpi2c1: i2c@44340000 {
 				compatible = "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
 				reg = <0x44340000 0x10000>;
@@ -204,8 +191,6 @@
 				status = "disabled";
 			};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			lpuart1: serial@44380000 {
 				compatible = "fsl,imx93-lpuart", "fsl,imx7ulp-lpuart";
 				reg = <0x44380000 0x1000>;
@@ -239,7 +224,6 @@
 				status = "okay";
 			};
 
-<<<<<<< HEAD
 			src: system-controller@44460000 {
 				compatible = "fsl,imx93-src", "syscon";
 				reg = <0x44460000 0x10000>;
@@ -264,8 +248,6 @@
 				};
 			};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			anatop: anatop@44480000 {
 				compatible = "fsl,imx93-anatop", "syscon";
 				reg = <0x44480000 0x10000>;
@@ -279,14 +261,11 @@
 			#size-cells = <1>;
 			ranges;
 
-<<<<<<< HEAD
 			wakeupmix_gpr: syscon@42420000 {
 				compatible = "fsl,imx93-wakeupmix-syscfg", "syscon";
 				reg = <0x42420000 0x1000>;
 			};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mu2: mailbox@42440000 {
 				compatible = "fsl,imx93-mu", "fsl,imx8ulp-mu";
 				reg = <0x42440000 0x10000>;
@@ -295,7 +274,6 @@
 				status = "disabled";
 			};
 
-<<<<<<< HEAD
 			lpi2c3: i2c@42530000 {
 				compatible = "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
 				reg = <0x42530000 0x10000>;
@@ -316,8 +294,6 @@
 				status = "disabled";
 			};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			lpuart3: serial@42570000 {
 				compatible = "fsl,imx93-lpuart", "fsl,imx7ulp-lpuart";
 				reg = <0x42570000 0x1000>;
@@ -371,7 +347,6 @@
 				clock-names = "ipg";
 				status = "disabled";
 			};
-<<<<<<< HEAD
 
 			lpi2c5: i2c@426b0000 {
 				compatible = "fsl,imx93-lpi2c", "fsl,imx7ulp-lpi2c";
@@ -413,8 +388,6 @@
 				status = "disabled";
 			};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		aips3: bus@42800000 {
@@ -428,13 +401,8 @@
 				compatible = "fsl,imx93-usdhc", "fsl,imx8mm-usdhc";
 				reg = <0x42850000 0x10000>;
 				interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
-<<<<<<< HEAD
 				clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
 					 <&clk IMX93_CLK_WAKEUP_AXI>,
-=======
-				clocks = <&clk IMX93_CLK_DUMMY>,
-					 <&clk IMX93_CLK_DUMMY>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 <&clk IMX93_CLK_USDHC1_GATE>;
 				clock-names = "ipg", "ahb", "per";
 				bus-width = <8>;
@@ -447,13 +415,8 @@
 				compatible = "fsl,imx93-usdhc", "fsl,imx8mm-usdhc";
 				reg = <0x42860000 0x10000>;
 				interrupts = <GIC_SPI 87 IRQ_TYPE_LEVEL_HIGH>;
-<<<<<<< HEAD
 				clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
 					 <&clk IMX93_CLK_WAKEUP_AXI>,
-=======
-				clocks = <&clk IMX93_CLK_DUMMY>,
-					 <&clk IMX93_CLK_DUMMY>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 <&clk IMX93_CLK_USDHC2_GATE>;
 				clock-names = "ipg", "ahb", "per";
 				bus-width = <4>;
@@ -466,13 +429,8 @@
 				compatible = "fsl,imx93-usdhc", "fsl,imx8mm-usdhc";
 				reg = <0x428b0000 0x10000>;
 				interrupts = <GIC_SPI 205 IRQ_TYPE_LEVEL_HIGH>;
-<<<<<<< HEAD
 				clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
 					 <&clk IMX93_CLK_WAKEUP_AXI>,
-=======
-				clocks = <&clk IMX93_CLK_DUMMY>,
-					 <&clk IMX93_CLK_DUMMY>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 <&clk IMX93_CLK_USDHC3_GATE>;
 				clock-names = "ipg", "ahb", "per";
 				bus-width = <4>;
@@ -538,7 +496,6 @@
 			clock-names = "gpio", "port";
 			gpio-ranges = <&iomuxc 0 92 16>;
 		};
-<<<<<<< HEAD
 
 		s4muap: mailbox@47520000 {
 			compatible = "fsl,imx93-mu-s4";
@@ -568,7 +525,5 @@
 			#power-domain-cells = <1>;
 			status = "disabled";
 		};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };

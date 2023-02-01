@@ -49,10 +49,7 @@ struct mem_cgroup;
 struct module;
 struct bpf_func_state;
 struct ftrace_ops;
-<<<<<<< HEAD
 struct cgroup;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 extern struct idr btf_idr;
 extern spinlock_t btf_idr_lock;
@@ -260,7 +257,6 @@ static inline bool map_value_has_spin_lock(const struct bpf_map *map)
 }
 
 static inline bool map_value_has_timer(const struct bpf_map *map)
-<<<<<<< HEAD
 {
 	return map->timer_off >= 0;
 }
@@ -351,50 +347,6 @@ static inline void zero_map_value(struct bpf_map *map, void *dst)
 		curr_off = next_off + map->off_arr->field_sz[i];
 	}
 	memset(dst + curr_off, 0, map->value_size - curr_off);
-=======
-{
-	return map->timer_off >= 0;
-}
-
-static inline bool map_value_has_kptrs(const struct bpf_map *map)
-{
-	return !IS_ERR_OR_NULL(map->kptr_off_tab);
-}
-
-static inline void check_and_init_map_value(struct bpf_map *map, void *dst)
-{
-	if (unlikely(map_value_has_spin_lock(map)))
-		memset(dst + map->spin_lock_off, 0, sizeof(struct bpf_spin_lock));
-	if (unlikely(map_value_has_timer(map)))
-		memset(dst + map->timer_off, 0, sizeof(struct bpf_timer));
-	if (unlikely(map_value_has_kptrs(map))) {
-		struct bpf_map_value_off *tab = map->kptr_off_tab;
-		int i;
-
-		for (i = 0; i < tab->nr_off; i++)
-			*(u64 *)(dst + tab->off[i].offset) = 0;
-	}
-}
-
-/* copy everything but bpf_spin_lock and bpf_timer. There could be one of each. */
-static inline void copy_map_value(struct bpf_map *map, void *dst, void *src)
-{
-	u32 curr_off = 0;
-	int i;
-
-	if (likely(!map->off_arr)) {
-		memcpy(dst, src, map->value_size);
-		return;
-	}
-
-	for (i = 0; i < map->off_arr->cnt; i++) {
-		u32 next_off = map->off_arr->field_off[i];
-
-		memcpy(dst + curr_off, src + curr_off, next_off - curr_off);
-		curr_off += map->off_arr->field_sz[i];
-	}
-	memcpy(dst + curr_off, src + curr_off, map->value_size - curr_off);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void copy_map_value_locked(struct bpf_map *map, void *dst, void *src,
@@ -500,11 +452,7 @@ enum bpf_type_flag {
 	/* DYNPTR points to memory local to the bpf program. */
 	DYNPTR_TYPE_LOCAL	= BIT(8 + BPF_BASE_TYPE_BITS),
 
-<<<<<<< HEAD
 	/* DYNPTR points to a kernel-produced ringbuf record. */
-=======
-	/* DYNPTR points to a ringbuf record. */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	DYNPTR_TYPE_RINGBUF	= BIT(9 + BPF_BASE_TYPE_BITS),
 
 	/* Size is known at compile time. */
@@ -709,10 +657,7 @@ enum bpf_reg_type {
 	PTR_TO_MEM,		 /* reg points to valid memory region */
 	PTR_TO_BUF,		 /* reg points to a read/write buffer */
 	PTR_TO_FUNC,		 /* reg points to a bpf program function */
-<<<<<<< HEAD
 	PTR_TO_DYNPTR,		 /* reg points to a dynptr */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__BPF_REG_TYPE_MAX,
 
 	/* Extended reg_types. */
@@ -833,12 +778,9 @@ enum bpf_cgroup_storage_type {
  */
 #define MAX_BPF_FUNC_REG_ARGS 5
 
-<<<<<<< HEAD
 /* The argument is a structure. */
 #define BTF_FMODEL_STRUCT_ARG		BIT(0)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct btf_func_model {
 	u8 ret_size;
 	u8 nr_args;
@@ -923,13 +865,10 @@ u64 notrace __bpf_prog_enter_lsm_cgroup(struct bpf_prog *prog,
 					struct bpf_tramp_run_ctx *run_ctx);
 void notrace __bpf_prog_exit_lsm_cgroup(struct bpf_prog *prog, u64 start,
 					struct bpf_tramp_run_ctx *run_ctx);
-<<<<<<< HEAD
 u64 notrace __bpf_prog_enter_struct_ops(struct bpf_prog *prog,
 					struct bpf_tramp_run_ctx *run_ctx);
 void notrace __bpf_prog_exit_struct_ops(struct bpf_prog *prog, u64 start,
 					struct bpf_tramp_run_ctx *run_ctx);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void notrace __bpf_tramp_enter(struct bpf_tramp_image *tr);
 void notrace __bpf_tramp_exit(struct bpf_tramp_image *tr);
 
@@ -2120,19 +2059,12 @@ struct bpf_kfunc_arg_meta {
 struct bpf_reg_state;
 int btf_check_subprog_arg_match(struct bpf_verifier_env *env, int subprog,
 				struct bpf_reg_state *regs);
-<<<<<<< HEAD
 int btf_check_subprog_call(struct bpf_verifier_env *env, int subprog,
 			   struct bpf_reg_state *regs);
 int btf_check_kfunc_arg_match(struct bpf_verifier_env *env,
 			      const struct btf *btf, u32 func_id,
 			      struct bpf_reg_state *regs,
 			      struct bpf_kfunc_arg_meta *meta);
-=======
-int btf_check_kfunc_arg_match(struct bpf_verifier_env *env,
-			      const struct btf *btf, u32 func_id,
-			      struct bpf_reg_state *regs,
-			      u32 kfunc_flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int btf_prepare_func_args(struct bpf_verifier_env *env, int subprog,
 			  struct bpf_reg_state *reg);
 int btf_check_type_match(struct bpf_verifier_log *log, const struct bpf_prog *prog,
@@ -2160,7 +2092,6 @@ static inline bool unprivileged_ebpf_enabled(void)
 	return !sysctl_unprivileged_bpf_disabled;
 }
 
-<<<<<<< HEAD
 /* Not all bpf prog type has the bpf_ctx.
  * For the bpf prog type that has initialized the bpf_ctx,
  * this function can be used to decide if a kernel function
@@ -2171,8 +2102,6 @@ static inline bool has_current_bpf_ctx(void)
 	return !!current->bpf_ctx;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void notrace bpf_prog_inc_misses_counter(struct bpf_prog *prog);
 #else /* !CONFIG_BPF_SYSCALL */
 static inline struct bpf_prog *bpf_prog_get(u32 ufd)
@@ -2392,14 +2321,11 @@ static inline bool unprivileged_ebpf_enabled(void)
 	return false;
 }
 
-<<<<<<< HEAD
 static inline bool has_current_bpf_ctx(void)
 {
 	return false;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void bpf_prog_inc_misses_counter(struct bpf_prog *prog)
 {
 }
@@ -2640,10 +2566,7 @@ extern const struct bpf_func_proto bpf_loop_proto;
 extern const struct bpf_func_proto bpf_copy_from_user_task_proto;
 extern const struct bpf_func_proto bpf_set_retval_proto;
 extern const struct bpf_func_proto bpf_get_retval_proto;
-<<<<<<< HEAD
 extern const struct bpf_func_proto bpf_user_ringbuf_drain_proto;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 const struct bpf_func_proto *tracing_prog_func_proto(
   enum bpf_func_id func_id, const struct bpf_prog *prog);
@@ -2788,11 +2711,7 @@ enum bpf_dynptr_type {
 	BPF_DYNPTR_TYPE_INVALID,
 	/* Points to memory that is local to the bpf program */
 	BPF_DYNPTR_TYPE_LOCAL,
-<<<<<<< HEAD
 	/* Underlying data is a kernel-produced ringbuf record */
-=======
-	/* Underlying data is a ringbuf record */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	BPF_DYNPTR_TYPE_RINGBUF,
 };
 
@@ -2800,10 +2719,7 @@ void bpf_dynptr_init(struct bpf_dynptr_kern *ptr, void *data,
 		     enum bpf_dynptr_type type, u32 offset, u32 size);
 void bpf_dynptr_set_null(struct bpf_dynptr_kern *ptr);
 int bpf_dynptr_check_size(u32 size);
-<<<<<<< HEAD
 u32 bpf_dynptr_get_size(struct bpf_dynptr_kern *ptr);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_BPF_LSM
 void bpf_cgroup_atype_get(u32 attach_btf_id, int cgroup_atype);
@@ -2813,7 +2729,6 @@ static inline void bpf_cgroup_atype_get(u32 attach_btf_id, int cgroup_atype) {}
 static inline void bpf_cgroup_atype_put(int cgroup_atype) {}
 #endif /* CONFIG_BPF_LSM */
 
-<<<<<<< HEAD
 struct key;
 
 #ifdef CONFIG_KEYS
@@ -2822,6 +2737,4 @@ struct bpf_key {
 	bool has_ref;
 };
 #endif /* CONFIG_KEYS */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _LINUX_BPF_H */

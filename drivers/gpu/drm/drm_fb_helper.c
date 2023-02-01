@@ -382,7 +382,6 @@ static void drm_fb_helper_damage_blit_real(struct drm_fb_helper *fb_helper,
 	unsigned int y;
 	void *src;
 
-<<<<<<< HEAD
 	switch (drm_format_info_bpp(fb->format, 0)) {
 	case 1:
 		offset += clip->x1 / 8;
@@ -403,8 +402,6 @@ static void drm_fb_helper_damage_blit_real(struct drm_fb_helper *fb_helper,
 	}
 
 	src = fb_helper->fbdev->screen_buffer + offset;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	iosys_map_incr(dst, offset); /* go to first pixel within clip rect */
 
 	for (y = clip->y1; y < clip->y2; y++) {

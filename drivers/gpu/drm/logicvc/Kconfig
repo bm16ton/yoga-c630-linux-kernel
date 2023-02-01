@@ -3,12 +3,7 @@ config DRM_LOGICVC
 	depends on DRM
 	depends on OF || COMPILE_TEST
 	select DRM_KMS_HELPER
-<<<<<<< HEAD
 	select DRM_KMS_DMA_HELPER
 	select DRM_GEM_DMA_HELPER
-=======
-	select DRM_KMS_CMA_HELPER
-	select DRM_GEM_CMA_HELPER
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  DRM display driver for the logiCVC programmable logic block from Xylon

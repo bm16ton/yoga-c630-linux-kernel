@@ -1903,12 +1903,6 @@ bool dc_is_stream_unchanged(
 	if (memcmp(&old_stream->audio_info, &stream->audio_info, sizeof(stream->audio_info)) != 0)
 		return false;
 
-<<<<<<< HEAD
-=======
-	if (old_stream->odm_2to1_policy_applied != stream->odm_2to1_policy_applied)
-		return false;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return true;
 }
 
@@ -2379,7 +2373,6 @@ static int acquire_resource_from_hw_enabled_state(
 			id_src[0] = tg_inst;
 			numPipes = 1;
 		}
-<<<<<<< HEAD
 
 		for (i = 0; i < numPipes; i++) {
 			//Check if src id invalid
@@ -2408,36 +2401,6 @@ static int acquire_resource_from_hw_enabled_state(
 						pool->mpc->mpcc_array[pipe_ctx->plane_res.mpcc_inst].dpp_id =
 								s.dpp_id;
 
-=======
-
-		for (i = 0; i < numPipes; i++) {
-			//Check if src id invalid
-			if (id_src[i] == 0xf)
-				return -1;
-
-			pipe_ctx = &res_ctx->pipe_ctx[id_src[i]];
-
-			pipe_ctx->stream_res.tg = pool->timing_generators[tg_inst];
-			pipe_ctx->plane_res.mi = pool->mis[id_src[i]];
-			pipe_ctx->plane_res.hubp = pool->hubps[id_src[i]];
-			pipe_ctx->plane_res.ipp = pool->ipps[id_src[i]];
-			pipe_ctx->plane_res.xfm = pool->transforms[id_src[i]];
-			pipe_ctx->plane_res.dpp = pool->dpps[id_src[i]];
-			pipe_ctx->stream_res.opp = pool->opps[id_src[i]];
-
-			if (pool->dpps[id_src[i]]) {
-				pipe_ctx->plane_res.mpcc_inst = pool->dpps[id_src[i]]->inst;
-
-				if (pool->mpc->funcs->read_mpcc_state) {
-					struct mpcc_state s = {0};
-
-					pool->mpc->funcs->read_mpcc_state(pool->mpc, pipe_ctx->plane_res.mpcc_inst, &s);
-
-					if (s.dpp_id < MAX_MPCC)
-						pool->mpc->mpcc_array[pipe_ctx->plane_res.mpcc_inst].dpp_id =
-								s.dpp_id;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					if (s.bot_mpcc_id < MAX_MPCC)
 						pool->mpc->mpcc_array[pipe_ctx->plane_res.mpcc_inst].mpcc_bot =
 								&pool->mpc->mpcc_array[s.bot_mpcc_id];
@@ -3617,7 +3580,6 @@ void check_syncd_pipes_for_disabled_master_pipe(struct dc *dc,
 	}
 }
 
-<<<<<<< HEAD
 void reset_sync_context_for_pipe(const struct dc *dc,
 	struct dc_state *context,
 	uint8_t pipe_idx)
@@ -3635,8 +3597,6 @@ void reset_sync_context_for_pipe(const struct dc *dc,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 uint8_t resource_transmitter_to_phy_idx(const struct dc *dc, enum transmitter transmitter)
 {
 	/* TODO - get transmitter to phy idx mapping from DMUB */
@@ -3701,7 +3661,6 @@ const struct link_hwss *get_link_hwss(const struct dc_link *link,
 	else
 		return get_virtual_link_hwss();
 }
-<<<<<<< HEAD
 
 bool is_h_timing_divisible_by_2(struct dc_stream_state *stream)
 {
@@ -3776,5 +3735,3 @@ bool dc_resource_acquire_secondary_pipe_for_mpc_odm(
 
 	return true;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

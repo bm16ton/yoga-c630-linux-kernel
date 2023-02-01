@@ -720,13 +720,8 @@ int vmw_du_primary_plane_atomic_check(struct drm_plane *plane,
 							   new_state->crtc);
 
 	ret = drm_atomic_helper_check_plane_state(new_state, crtc_state,
-<<<<<<< HEAD
 						  DRM_PLANE_NO_SCALING,
 						  DRM_PLANE_NO_SCALING,
-=======
-						  DRM_PLANE_HELPER_NO_SCALING,
-						  DRM_PLANE_HELPER_NO_SCALING,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						  false, true);
 
 	if (!ret && new_fb) {

@@ -428,44 +428,7 @@ const struct bpf_func_proto bpf_get_current_ancestor_cgroup_id_proto = {
 	.ret_type	= RET_INTEGER,
 	.arg1_type	= ARG_ANYTHING,
 };
-<<<<<<< HEAD
 #endif /* CONFIG_CGROUPS */
-=======
-
-#ifdef CONFIG_CGROUP_BPF
-
-BPF_CALL_2(bpf_get_local_storage, struct bpf_map *, map, u64, flags)
-{
-	/* flags argument is not used now,
-	 * but provides an ability to extend the API.
-	 * verifier checks that its value is correct.
-	 */
-	enum bpf_cgroup_storage_type stype = cgroup_storage_type(map);
-	struct bpf_cgroup_storage *storage;
-	struct bpf_cg_run_ctx *ctx;
-	void *ptr;
-
-	/* get current cgroup storage from BPF run context */
-	ctx = container_of(current->bpf_ctx, struct bpf_cg_run_ctx, run_ctx);
-	storage = ctx->prog_item->cgroup_storage[stype];
-
-	if (stype == BPF_CGROUP_STORAGE_SHARED)
-		ptr = &READ_ONCE(storage->buf)->data[0];
-	else
-		ptr = this_cpu_ptr(storage->percpu_buf);
-
-	return (unsigned long)ptr;
-}
-
-const struct bpf_func_proto bpf_get_local_storage_proto = {
-	.func		= bpf_get_local_storage,
-	.gpl_only	= false,
-	.ret_type	= RET_PTR_TO_MAP_VALUE,
-	.arg1_type	= ARG_CONST_MAP_PTR,
-	.arg2_type	= ARG_ANYTHING,
-};
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define BPF_STRTOX_BASE_MASK 0x1F
 
@@ -593,20 +556,6 @@ const struct bpf_func_proto bpf_strtoul_proto = {
 	.arg2_type	= ARG_CONST_SIZE,
 	.arg3_type	= ARG_ANYTHING,
 	.arg4_type	= ARG_PTR_TO_LONG,
-};
-
-BPF_CALL_3(bpf_strncmp, const char *, s1, u32, s1_sz, const char *, s2)
-{
-	return strncmp(s1, s2, s1_sz);
-}
-
-static const struct bpf_func_proto bpf_strncmp_proto = {
-	.func		= bpf_strncmp,
-	.gpl_only	= false,
-	.ret_type	= RET_INTEGER,
-	.arg1_type	= ARG_PTR_TO_MEM,
-	.arg2_type	= ARG_CONST_SIZE,
-	.arg3_type	= ARG_PTR_TO_CONST_STR,
 };
 
 BPF_CALL_3(bpf_strncmp, const char *, s1, u32, s1_sz, const char *, s2)
@@ -1428,16 +1377,9 @@ BPF_CALL_2(bpf_kptr_xchg, void *, map_value, void *, ptr)
 }
 
 /* Unlike other PTR_TO_BTF_ID helpers the btf_id in bpf_kptr_xchg()
-<<<<<<< HEAD
  * helper is determined dynamically by the verifier. Use BPF_PTR_POISON to
  * denote type that verifier will determine.
  */
-=======
- * helper is determined dynamically by the verifier.
- */
-#define BPF_PTR_POISON ((void *)((0xeB9FUL << 2) + POISON_POINTER_DELTA))
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct bpf_func_proto bpf_kptr_xchg_proto = {
 	.func         = bpf_kptr_xchg,
 	.gpl_only     = false,
@@ -1466,11 +1408,7 @@ static void bpf_dynptr_set_type(struct bpf_dynptr_kern *ptr, enum bpf_dynptr_typ
 	ptr->size |= type << DYNPTR_TYPE_SHIFT;
 }
 
-<<<<<<< HEAD
 u32 bpf_dynptr_get_size(struct bpf_dynptr_kern *ptr)
-=======
-static u32 bpf_dynptr_get_size(struct bpf_dynptr_kern *ptr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return ptr->size & DYNPTR_SIZE_MASK;
 }
@@ -1659,11 +1597,8 @@ bpf_base_func_proto(enum bpf_func_id func_id)
 		return &bpf_ktime_get_ns_proto;
 	case BPF_FUNC_ktime_get_boot_ns:
 		return &bpf_ktime_get_boot_ns_proto;
-<<<<<<< HEAD
 	case BPF_FUNC_ktime_get_tai_ns:
 		return &bpf_ktime_get_tai_ns_proto;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case BPF_FUNC_ringbuf_output:
 		return &bpf_ringbuf_output_proto;
 	case BPF_FUNC_ringbuf_reserve:
@@ -1674,21 +1609,12 @@ bpf_base_func_proto(enum bpf_func_id func_id)
 		return &bpf_ringbuf_discard_proto;
 	case BPF_FUNC_ringbuf_query:
 		return &bpf_ringbuf_query_proto;
-<<<<<<< HEAD
 	case BPF_FUNC_strncmp:
 		return &bpf_strncmp_proto;
 	case BPF_FUNC_strtol:
 		return &bpf_strtol_proto;
 	case BPF_FUNC_strtoul:
 		return &bpf_strtoul_proto;
-=======
-	case BPF_FUNC_for_each_map_elem:
-		return &bpf_for_each_map_elem_proto;
-	case BPF_FUNC_loop:
-		return &bpf_loop_proto;
-	case BPF_FUNC_strncmp:
-		return &bpf_strncmp_proto;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		break;
 	}
@@ -1717,15 +1643,12 @@ bpf_base_func_proto(enum bpf_func_id func_id)
 		return &bpf_timer_cancel_proto;
 	case BPF_FUNC_kptr_xchg:
 		return &bpf_kptr_xchg_proto;
-<<<<<<< HEAD
 	case BPF_FUNC_for_each_map_elem:
 		return &bpf_for_each_map_elem_proto;
 	case BPF_FUNC_loop:
 		return &bpf_loop_proto;
 	case BPF_FUNC_user_ringbuf_drain:
 		return &bpf_user_ringbuf_drain_proto;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case BPF_FUNC_ringbuf_reserve_dynptr:
 		return &bpf_ringbuf_reserve_dynptr_proto;
 	case BPF_FUNC_ringbuf_submit_dynptr:

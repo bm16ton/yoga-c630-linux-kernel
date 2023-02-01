@@ -14,11 +14,8 @@ properties:
     enum:
       - qcom,sc7280-lpass-wsa-macro
       - qcom,sm8250-lpass-wsa-macro
-<<<<<<< HEAD
       - qcom,sm8450-lpass-wsa-macro
       - qcom,sc8280xp-lpass-wsa-macro
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   reg:
     maxItems: 1

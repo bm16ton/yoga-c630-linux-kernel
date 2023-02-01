@@ -219,12 +219,6 @@ int devkmsg_sysctl_set_loglvl(struct ctl_table *table, int write,
 	return 0;
 }
 #endif /* CONFIG_PRINTK && CONFIG_SYSCTL */
-<<<<<<< HEAD
-=======
-
-/* Number of registered extended console drivers. */
-static int nr_ext_console_drivers;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Helper macros to handle lockdep when locking/unlocking console_sem. We use
@@ -2299,10 +2293,7 @@ asmlinkage __visible int _printk(const char *fmt, ...)
 }
 EXPORT_SYMBOL(_printk);
 
-<<<<<<< HEAD
 static bool pr_flush(int timeout_ms, bool reset_on_progress);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool __pr_flush(struct console *con, int timeout_ms, bool reset_on_progress);
 
 #else /* CONFIG_PRINTK */
@@ -2337,10 +2328,7 @@ static void call_console_driver(struct console *con, const char *text, size_t le
 {
 }
 static bool suppress_message_printing(int level) { return false; }
-<<<<<<< HEAD
 static bool pr_flush(int timeout_ms, bool reset_on_progress) { return true; }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool __pr_flush(struct console *con, int timeout_ms, bool reset_on_progress) { return true; }
 
 #endif /* CONFIG_PRINTK */
@@ -2638,7 +2626,6 @@ static bool abandon_console_lock_in_panic(void)
  * Requires the console_lock.
  */
 static inline bool console_is_usable(struct console *con)
-<<<<<<< HEAD
 {
 	if (!(con->flags & CON_ENABLED))
 		return false;
@@ -2664,33 +2651,6 @@ static void __console_unlock(void)
 	up_console_sem();
 }
 
-=======
-{
-	if (!(con->flags & CON_ENABLED))
-		return false;
-
-	if (!con->write)
-		return false;
-
-	/*
-	 * Console drivers may assume that per-cpu resources have been
-	 * allocated. So unless they're explicitly marked as being able to
-	 * cope (CON_ANYTIME) don't call them until this CPU is officially up.
-	 */
-	if (!cpu_online(raw_smp_processor_id()) &&
-	    !(con->flags & CON_ANYTIME))
-		return false;
-
-	return true;
-}
-
-static void __console_unlock(void)
-{
-	console_locked = 0;
-	up_console_sem();
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Print one record for the given console. The record printed is whatever
  * record is the next available record for the given console.
@@ -2736,7 +2696,6 @@ static bool console_emit_next_record(struct console *con, char *text, char *ext_
 			suppress_panic_printk = 1;
 			pr_warn_once("Too many dropped messages. Suppress messages on non-panic CPUs to prevent livelock.\n");
 		}
-<<<<<<< HEAD
 	}
 
 	/* Skip record that has level above the console loglevel. */
@@ -2745,16 +2704,6 @@ static bool console_emit_next_record(struct console *con, char *text, char *ext_
 		goto skip;
 	}
 
-=======
-	}
-
-	/* Skip record that has level above the console loglevel. */
-	if (suppress_message_printing(r.info->level)) {
-		con->seq++;
-		goto skip;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ext_text) {
 		write_text = ext_text;
 		len = info_print_ext_header(ext_text, CONSOLE_EXT_LOG_MAX, r.info);
@@ -3236,12 +3185,6 @@ void register_console(struct console *newcon)
 		console_drivers->next = newcon;
 	}
 
-<<<<<<< HEAD
-=======
-	if (newcon->flags & CON_EXTENDED)
-		nr_ext_console_drivers++;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	newcon->dropped = 0;
 	if (newcon->flags & CON_PRINTBUFFER) {
 		/* Get a consistent copy of @syslog_seq. */
@@ -3266,12 +3209,6 @@ void register_console(struct console *newcon)
 	if (bootcon_enabled &&
 	    ((newcon->flags & (CON_CONSDEV | CON_BOOT)) == CON_CONSDEV) &&
 	    !keep_bootcon) {
-<<<<<<< HEAD
-=======
-		/* We need to iterate through all boot consoles, to make
-		 * sure we print everything out, before we unregister them.
-		 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		for_each_console(con)
 			if (con->flags & CON_BOOT)
 				unregister_console(con);
@@ -3491,18 +3428,10 @@ static bool __pr_flush(struct console *con, int timeout_ms, bool reset_on_progre
  * Context: Process context. May sleep while acquiring console lock.
  * Return: true if all enabled printers are caught up.
  */
-<<<<<<< HEAD
 static bool pr_flush(int timeout_ms, bool reset_on_progress)
 {
 	return __pr_flush(NULL, timeout_ms, reset_on_progress);
 }
-=======
-bool pr_flush(int timeout_ms, bool reset_on_progress)
-{
-	return __pr_flush(NULL, timeout_ms, reset_on_progress);
-}
-EXPORT_SYMBOL(pr_flush);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Delayed printk version, for scheduler-internal messages:
@@ -3933,15 +3862,9 @@ int __printk_cpu_sync_try_get(void)
 {
 	int cpu;
 	int old;
-<<<<<<< HEAD
 
 	cpu = smp_processor_id();
 
-=======
-
-	cpu = smp_processor_id();
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Guarantee loads and stores from this CPU when it is the lock owner
 	 * are _not_ visible to the previous lock owner. This pairs with

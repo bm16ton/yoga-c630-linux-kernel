@@ -219,14 +219,10 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
 		}
 		writel(acr_value, ptpaddr + PTP_ACR);
 		mutex_unlock(&priv->aux_ts_lock);
-<<<<<<< HEAD
 		/* wait for auxts fifo clear to finish */
 		ret = readl_poll_timeout(ptpaddr + PTP_ACR, acr_value,
 					 !(acr_value & PTP_ACR_ATSFC),
 					 10, 10000);
-=======
-		ret = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 
 	default:

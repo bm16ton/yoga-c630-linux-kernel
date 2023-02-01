@@ -73,7 +73,6 @@
 #
 # Run and dump packet contents:
 #   sudo ./test_xsk.sh -D
-<<<<<<< HEAD
 #
 # Run test suite for physical device in loopback mode
 #   sudo ./test_xsk.sh -i IFACE
@@ -83,20 +82,11 @@
 ETH=""
 
 while getopts "vDi:" flag
-=======
-
-. xsk_prereqs.sh
-
-while getopts "vD" flag
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 do
 	case "${flag}" in
 		v) verbose=1;;
 		D) dump_pkts=1;;
-<<<<<<< HEAD
 		i) ETH=${OPTARG};;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	esac
 done
 
@@ -166,10 +156,7 @@ else
 	fi
 fi
 
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 if [[ $verbose -eq 1 ]]; then
 	ARGS+="-v "
 fi
@@ -185,7 +172,6 @@ test_status $retval "${TEST_NAME}"
 
 statusList=()
 
-<<<<<<< HEAD
 TEST_NAME="XSK_SELFTESTS_${VETH0}_SOFTIRQ"
 
 exec_xskxceiver
@@ -199,17 +185,6 @@ busy_poll=1
 if [ -z $ETH ]; then
 	setup_vethPairs
 fi
-=======
-TEST_NAME="XSK_SELFTESTS_SOFTIRQ"
-
-exec_xskxceiver
-
-cleanup_exit ${VETH0} ${VETH1} ${NS1}
-TEST_NAME="XSK_SELFTESTS_BUSY_POLL"
-busy_poll=1
-
-setup_vethPairs
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exec_xskxceiver
 
 ## END TESTS

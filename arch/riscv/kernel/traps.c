@@ -52,9 +52,6 @@ void die(struct pt_regs *regs, const char *str)
 	if (kexec_should_crash(current))
 		crash_kexec(regs);
 
-	if (regs && kexec_should_crash(current))
-		crash_kexec(regs);
-
 	bust_spinlocks(0);
 	add_taint(TAINT_DIE, LOCKDEP_NOW_UNRELIABLE);
 	spin_unlock_irq(&die_lock);
@@ -217,11 +214,7 @@ static DEFINE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)],
  * shadow stack, handled_ kernel_ stack_ overflow(in kernel/entry.S) is used
  * to get per-cpu overflow stack(get_overflow_stack).
  */
-<<<<<<< HEAD
 long shadow_stack[SHADOW_OVERFLOW_STACK_SIZE/sizeof(long)] __aligned(16);
-=======
-long shadow_stack[SHADOW_OVERFLOW_STACK_SIZE/sizeof(long)];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 asmlinkage unsigned long get_overflow_stack(void)
 {
 	return (unsigned long)this_cpu_ptr(overflow_stack) +

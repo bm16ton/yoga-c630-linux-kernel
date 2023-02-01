@@ -28,10 +28,7 @@ enum {
 	SEG6_LOCAL_BPF,
 	SEG6_LOCAL_VRFTABLE,
 	SEG6_LOCAL_COUNTERS,
-<<<<<<< HEAD
 	SEG6_LOCAL_FLAVORS,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__SEG6_LOCAL_MAX,
 };
 #define SEG6_LOCAL_MAX (__SEG6_LOCAL_MAX - 1)
@@ -114,7 +111,6 @@ enum {
 
 #define SEG6_LOCAL_CNT_MAX (__SEG6_LOCAL_CNT_MAX - 1)
 
-<<<<<<< HEAD
 /* SRv6 End* Flavor attributes */
 enum {
 	SEG6_LOCAL_FLV_UNSPEC,
@@ -138,6 +134,4 @@ enum {
 
 #define SEG6_LOCAL_FLV_OP_MAX (__SEG6_LOCAL_FLV_OP_MAX - 1)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

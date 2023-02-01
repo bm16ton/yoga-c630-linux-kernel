@@ -215,14 +215,7 @@ static int etnaviv_iommu_find_iova(struct etnaviv_iommu_context *context,
 		 * this mapping.
 		 */
 		list_for_each_entry_safe(m, n, &list, scan_node) {
-<<<<<<< HEAD
 			etnaviv_iommu_reap_mapping(m);
-=======
-			etnaviv_iommu_remove_mapping(context, m);
-			etnaviv_iommu_context_put(m->context);
-			m->context = NULL;
-			list_del_init(&m->mmu_node);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			list_del_init(&m->scan_node);
 		}
 
@@ -274,14 +267,7 @@ static int etnaviv_iommu_insert_exact(struct etnaviv_iommu_context *context,
 	}
 
 	list_for_each_entry_safe(m, n, &scan_list, scan_node) {
-<<<<<<< HEAD
 		etnaviv_iommu_reap_mapping(m);
-=======
-		etnaviv_iommu_remove_mapping(context, m);
-		etnaviv_iommu_context_put(m->context);
-		m->context = NULL;
-		list_del_init(&m->mmu_node);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		list_del_init(&m->scan_node);
 	}
 

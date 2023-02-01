@@ -6,20 +6,14 @@
 
 /dts-v1/;
 #include <dt-bindings/clock/mt8192-clk.h>
-<<<<<<< HEAD
 #include <dt-bindings/gce/mt8192-gce.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/memory/mt8192-larb-port.h>
 #include <dt-bindings/pinctrl/mt8192-pinfunc.h>
 #include <dt-bindings/phy/phy.h>
 #include <dt-bindings/power/mt8192-power.h>
-<<<<<<< HEAD
 #include <dt-bindings/reset/mt8192-resets.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 / {
 	compatible = "mediatek,mt8192";
@@ -322,14 +316,8 @@
 		};
 
 		scpsys: syscon@10006000 {
-<<<<<<< HEAD
 			compatible = "mediatek,mt8192-scpsys", "syscon", "simple-mfd";
 			reg = <0 0x10006000 0 0x1000>;
-=======
-			compatible = "syscon", "simple-mfd";
-			reg = <0 0x10006000 0 0x1000>;
-			#power-domain-cells = <1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			/* System Power Manager */
 			spm: power-controller {
@@ -574,7 +562,6 @@
 			assigned-clock-parents = <&topckgen CLK_TOP_OSC_D10>;
 		};
 
-<<<<<<< HEAD
 		gce: mailbox@10228000 {
 			compatible = "mediatek,mt8192-gce";
 			reg = <0 0x10228000 0 0x4000>;
@@ -584,8 +571,6 @@
 			clock-names = "gce";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		scp_adsp: clock-controller@10720000 {
 			compatible = "mediatek,mt8192-scp_adsp";
 			reg = <0 0x10720000 0 0x1000>;
@@ -768,18 +753,12 @@
 			assigned-clock-parents = <&topckgen CLK_TOP_UNIVPLL_D5_D4>,
 						 <&topckgen CLK_TOP_UNIVPLL_D5_D4>;
 			clocks = <&infracfg CLK_INFRA_SSUSB>,
-<<<<<<< HEAD
 				 <&apmixedsys CLK_APMIXED_USBPLL>,
 				 <&clk26m>,
 				 <&clk26m>,
 				 <&infracfg CLK_INFRA_SSUSB_XHCI>;
 			clock-names = "sys_ck", "ref_ck", "mcu_ck", "dma_ck",
 				      "xhci_ck";
-=======
-				 <&infracfg CLK_INFRA_SSUSB_XHCI>,
-				 <&apmixedsys CLK_APMIXED_USBPLL>;
-			clock-names = "sys_ck", "xhci_ck", "ref_ck";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			wakeup-source;
 			mediatek,syscon-wakeup = <&pericfg 0x420 102>;
 			status = "disabled";
@@ -962,7 +941,6 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			status = "disabled";
-<<<<<<< HEAD
 		};
 
 		efuse: efuse@11c10000 {
@@ -980,25 +958,6 @@
 			};
 		};
 
-=======
-		};
-
-		efuse: efuse@11c10000 {
-			compatible = "mediatek,mt8192-efuse", "mediatek,efuse";
-			reg = <0 0x11c10000 0 0x1000>;
-			#address-cells = <1>;
-			#size-cells = <1>;
-
-			lvts_e_data1: data1@1c0 {
-				reg = <0x1c0 0x58>;
-			};
-
-			svs_calibration: calib@580 {
-				reg = <0x580 0x68>;
-			};
-		};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		i2c3: i2c@11cb0000 {
 			compatible = "mediatek,mt8192-i2c";
 			reg = <0 0x11cb0000 0 0x1000>,
@@ -1157,7 +1116,6 @@
 			};
 		};
 
-<<<<<<< HEAD
 		mipi_tx0: dsi-phy@11e50000 {
 			compatible = "mediatek,mt8183-mipi-tx";
 			reg = <0 0x11e50000 0 0x1000>;
@@ -1168,8 +1126,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		i2c0: i2c@11f00000 {
 			compatible = "mediatek,mt8192-i2c";
 			reg = <0 0x11f00000 0 0x1000>,
@@ -1252,7 +1208,6 @@
 			compatible = "mediatek,mt8192-mmsys", "syscon";
 			reg = <0 0x14000000 0 0x1000>;
 			#clock-cells = <1>;
-<<<<<<< HEAD
 			#reset-cells = <1>;
 			mboxes = <&gce 0 CMDQ_THR_PRIO_HIGHEST>,
 				 <&gce 1 CMDQ_THR_PRIO_HIGHEST>;
@@ -1267,8 +1222,6 @@
 			mediatek,gce-events = <CMDQ_EVENT_DISP_STREAM_DONE_ENG_EVENT_0>,
 					      <CMDQ_EVENT_DISP_STREAM_DONE_ENG_EVENT_1>;
 			power-domains = <&spm MT8192_POWER_DOMAIN_DISP>;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		smi_common: smi@14002000 {
@@ -1302,7 +1255,6 @@
 			power-domains = <&spm MT8192_POWER_DOMAIN_DISP>;
 		};
 
-<<<<<<< HEAD
 		ovl0: ovl@14005000 {
 			compatible = "mediatek,mt8192-disp-ovl";
 			reg = <0 0x14005000 0 0x1000>;
@@ -1437,8 +1389,6 @@
 			mediatek,gce-client-reg = <&gce SUBSYS_1401XXXX 0x5000 0x1000>;
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dpi0: dpi@14016000 {
 			compatible = "mediatek,mt8192-dpi";
 			reg = <0 0x14016000 0 0x1000>;

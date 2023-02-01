@@ -58,12 +58,8 @@ properties:
       - const: ocmem
 
   iommus:
-<<<<<<< HEAD
     minItems: 1
     maxItems: 64
-=======
-    maxItems: 1
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   sram:
     $ref: /schemas/types.yaml#/definitions/phandle-array
@@ -86,10 +82,7 @@ properties:
 
   zap-shader:
     type: object
-<<<<<<< HEAD
     additionalProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     description: |
       For a5xx and a6xx devices this node contains a memory-region that
       points to reserved memory to store the zap shader that can be used to

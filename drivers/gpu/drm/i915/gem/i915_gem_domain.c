@@ -434,11 +434,7 @@ i915_gem_object_pin_to_display_plane(struct drm_i915_gem_object *obj,
 	 */
 	vma = ERR_PTR(-ENOSPC);
 	if ((flags & PIN_MAPPABLE) == 0 &&
-<<<<<<< HEAD
 	    (!view || view->type == I915_GTT_VIEW_NORMAL))
-=======
-	    (!view || view->type == I915_GGTT_VIEW_NORMAL))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vma = i915_gem_object_ggtt_pin_ww(obj, ww, view, 0, alignment,
 						  flags | PIN_MAPPABLE |
 						  PIN_NONBLOCK);

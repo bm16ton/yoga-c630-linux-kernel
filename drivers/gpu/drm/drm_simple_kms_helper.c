@@ -222,13 +222,8 @@ static int drm_simple_kms_plane_atomic_check(struct drm_plane *plane,
 						   &pipe->crtc);
 
 	ret = drm_atomic_helper_check_plane_state(plane_state, crtc_state,
-<<<<<<< HEAD
 						  DRM_PLANE_NO_SCALING,
 						  DRM_PLANE_NO_SCALING,
-=======
-						  DRM_PLANE_HELPER_NO_SCALING,
-						  DRM_PLANE_HELPER_NO_SCALING,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						  false, false);
 	if (ret)
 		return ret;

@@ -232,7 +232,6 @@ static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb)
 	return cb;
 }
 
-<<<<<<< HEAD
 static inline bool tc_qdisc_stats_dump(struct Qdisc *sch,
 				       unsigned long cl,
 				       struct qdisc_walker *arg)
@@ -246,6 +245,4 @@ static inline bool tc_qdisc_stats_dump(struct Qdisc *sch,
 	return true;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

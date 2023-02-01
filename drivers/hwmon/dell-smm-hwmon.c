@@ -686,7 +686,6 @@ static umode_t dell_smm_is_visible(const void *drvdata, enum hwmon_sensor_types 
 		case hwmon_fan_input:
 			if (data->fan[channel])
 				return 0444;
-<<<<<<< HEAD
 
 			break;
 		case hwmon_fan_label:
@@ -734,55 +733,6 @@ static umode_t dell_smm_is_visible(const void *drvdata, enum hwmon_sensor_types 
 		break;
 	}
 
-=======
-
-			break;
-		case hwmon_fan_label:
-			if (data->fan[channel] && !data->disallow_fan_type_call)
-				return 0444;
-
-			break;
-		case hwmon_fan_min:
-		case hwmon_fan_max:
-		case hwmon_fan_target:
-			if (data->fan_nominal_speed[channel])
-				return 0444;
-
-			break;
-		default:
-			break;
-		}
-		break;
-	case hwmon_pwm:
-		if (data->disallow_fan_support)
-			break;
-
-		switch (attr) {
-		case hwmon_pwm_input:
-			if (data->fan[channel])
-				return 0644;
-
-			break;
-		case hwmon_pwm_enable:
-			if (data->auto_fan)
-				/*
-				 * There is no command for retrieve the current status
-				 * from BIOS, and userspace/firmware itself can change
-				 * it.
-				 * Thus we can only provide write-only access for now.
-				 */
-				return 0200;
-
-			break;
-		default:
-			break;
-		}
-		break;
-	default:
-		break;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1057,21 +1007,12 @@ static int __init dell_smm_init_hwmon(struct device *dev)
 		err = i8k_get_fan_status(data, i);
 		if (err < 0)
 			err = i8k_get_fan_type(data, i);
-<<<<<<< HEAD
 
 		if (err < 0)
 			continue;
 
 		data->fan[i] = true;
 
-=======
-
-		if (err < 0)
-			continue;
-
-		data->fan[i] = true;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* the cooling device is not critical, ignore failures */
 		if (IS_REACHABLE(CONFIG_THERMAL)) {
 			err = dell_smm_init_cdev(dev, i);
@@ -1414,7 +1355,6 @@ static int __init dell_smm_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, data);
 
 	if (dmi_check_system(i8k_blacklist_fan_support_dmi_table)) {
-<<<<<<< HEAD
 		if (!force) {
 			dev_notice(&pdev->dev, "Disabling fan support due to BIOS bugs\n");
 			data->disallow_fan_support = true;
@@ -1430,17 +1370,6 @@ static int __init dell_smm_probe(struct platform_device *pdev)
 		} else {
 			dev_warn(&pdev->dev, "Enabling fan type call despite BIOS bugs\n");
 		}
-=======
-		dev_warn(&pdev->dev, "broken Dell BIOS detected, disallow fan support\n");
-		if (!force)
-			data->disallow_fan_support = true;
-	}
-
-	if (dmi_check_system(i8k_blacklist_fan_type_dmi_table)) {
-		dev_warn(&pdev->dev, "broken Dell BIOS detected, disallow fan type call\n");
-		if (!force)
-			data->disallow_fan_type_call = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	strscpy(data->bios_version, i8k_get_dmi_data(DMI_BIOS_VERSION),

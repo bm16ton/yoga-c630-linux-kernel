@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
-<<<<<<< HEAD
  * Copyright (C) 2018-2022 Linaro Ltd.
-=======
- * Copyright (C) 2018-2021 Linaro Ltd.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <linux/types.h>
@@ -187,7 +183,6 @@ static void ipa_teardown(struct ipa *ipa)
 	gsi_teardown(&ipa->gsi);
 }
 
-<<<<<<< HEAD
 static void
 ipa_hardware_config_bcr(struct ipa *ipa, const struct ipa_data *data)
 {
@@ -250,8 +245,6 @@ static void ipa_hardware_config_clkon(struct ipa *ipa)
 	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Configure bus access behavior for IPA components */
 static void ipa_hardware_config_comp(struct ipa *ipa)
 {
@@ -289,10 +282,7 @@ ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
 {
 	const struct ipa_qsb_data *data0;
 	const struct ipa_qsb_data *data1;
-<<<<<<< HEAD
 	const struct ipa_reg *reg;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val;
 
 	/* QMB 0 represents DDR; QMB 1 (if present) represents PCIe */
@@ -301,7 +291,6 @@ ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
 		data1 = &data->qsb_data[IPA_QSB_MASTER_PCIE];
 
 	/* Max outstanding write accesses for QSB masters */
-<<<<<<< HEAD
 	reg = ipa_reg(ipa, QSB_MAX_WRITES);
 
 	val = ipa_reg_encode(reg, GEN_QMB_0_MAX_WRITES, data0->max_writes);
@@ -327,41 +316,6 @@ ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
 	}
 
 	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
-}
-
-/* The internal inactivity timer clock is used for the aggregation timer */
-#define TIMER_FREQUENCY	32000		/* 32 KHz inactivity timer clock */
-
-/* Compute the value to use in the COUNTER_CFG register AGGR_GRANULARITY
- * field to represent the given number of microseconds.  The value is one
- * less than the number of timer ticks in the requested period.  0 is not
- * a valid granularity value (so for example @usec must be at least 16 for
- * a TIMER_FREQUENCY of 32000).
- */
-static __always_inline u32 ipa_aggr_granularity_val(u32 usec)
-{
-	return DIV_ROUND_CLOSEST(usec * TIMER_FREQUENCY, USEC_PER_SEC) - 1;
-=======
-	val = u32_encode_bits(data0->max_writes, GEN_QMB_0_MAX_WRITES_FMASK);
-	if (data->qsb_count > 1)
-		val |= u32_encode_bits(data1->max_writes,
-				       GEN_QMB_1_MAX_WRITES_FMASK);
-	iowrite32(val, ipa->reg_virt + IPA_REG_QSB_MAX_WRITES_OFFSET);
-
-	/* Max outstanding read accesses for QSB masters */
-	val = u32_encode_bits(data0->max_reads, GEN_QMB_0_MAX_READS_FMASK);
-	if (ipa->version >= IPA_VERSION_4_0)
-		val |= u32_encode_bits(data0->max_reads_beats,
-				       GEN_QMB_0_MAX_READS_BEATS_FMASK);
-	if (data->qsb_count > 1) {
-		val |= u32_encode_bits(data1->max_reads,
-				       GEN_QMB_1_MAX_READS_FMASK);
-		if (ipa->version >= IPA_VERSION_4_0)
-			val |= u32_encode_bits(data1->max_reads_beats,
-					       GEN_QMB_1_MAX_READS_BEATS_FMASK);
-	}
-	iowrite32(val, ipa->reg_virt + IPA_REG_QSB_MAX_READS_OFFSET);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* The internal inactivity timer clock is used for the aggregation timer */
@@ -519,7 +473,6 @@ static void ipa_hardware_dcd_deconfig(struct ipa *ipa)
  */
 static void ipa_hardware_config(struct ipa *ipa, const struct ipa_data *data)
 {
-<<<<<<< HEAD
 	ipa_hardware_config_bcr(ipa, data);
 	ipa_hardware_config_tx(ipa);
 	ipa_hardware_config_clkon(ipa);
@@ -527,57 +480,6 @@ static void ipa_hardware_config(struct ipa *ipa, const struct ipa_data *data)
 	ipa_hardware_config_qsb(ipa, data);
 	ipa_hardware_config_timing(ipa);
 	ipa_hardware_config_hashing(ipa);
-=======
-	enum ipa_version version = ipa->version;
-	u32 granularity;
-	u32 val;
-
-	/* IPA v4.5+ has no backward compatibility register */
-	if (version < IPA_VERSION_4_5) {
-		val = data->backward_compat;
-		iowrite32(val, ipa->reg_virt + IPA_REG_BCR_OFFSET);
-	}
-
-	/* Implement some hardware workarounds */
-	if (version >= IPA_VERSION_4_0 && version < IPA_VERSION_4_5) {
-		/* Disable PA mask to allow HOLB drop */
-		val = ioread32(ipa->reg_virt + IPA_REG_TX_CFG_OFFSET);
-		val &= ~PA_MASK_EN_FMASK;
-		iowrite32(val, ipa->reg_virt + IPA_REG_TX_CFG_OFFSET);
-
-		/* Enable open global clocks in the CLKON configuration */
-		val = GLOBAL_FMASK | GLOBAL_2X_CLK_FMASK;
-	} else if (version == IPA_VERSION_3_1) {
-		val = MISC_FMASK;	/* Disable MISC clock gating */
-	} else {
-		val = 0;		/* No CLKON configuration needed */
-	}
-	if (val)
-		iowrite32(val, ipa->reg_virt + IPA_REG_CLKON_CFG_OFFSET);
-
-	ipa_hardware_config_comp(ipa);
-
-	/* Configure system bus limits */
-	ipa_hardware_config_qsb(ipa, data);
-
-	if (version < IPA_VERSION_4_5) {
-		/* Configure aggregation timer granularity */
-		granularity = ipa_aggr_granularity_val(IPA_AGGR_GRANULARITY);
-		val = u32_encode_bits(granularity, AGGR_GRANULARITY_FMASK);
-		iowrite32(val, ipa->reg_virt + IPA_REG_COUNTER_CFG_OFFSET);
-	} else {
-		ipa_qtime_config(ipa);
-	}
-
-	/* IPA v4.2 does not support hashed tables, so disable them */
-	if (version == IPA_VERSION_4_2) {
-		u32 offset = ipa_reg_filt_rout_hash_en_offset(version);
-
-		iowrite32(0, ipa->reg_virt + offset);
-	}
-
-	/* Enable dynamic clock division */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ipa_hardware_dcd_config(ipa);
 }
 
@@ -692,7 +594,6 @@ static int ipa_firmware_load(struct device *dev)
 
 	/* Use name from DTB if specified; use default for *any* error */
 	ret = of_property_read_string(dev->of_node, "firmware-name", &path);
-<<<<<<< HEAD
 	if (ret) {
 		dev_dbg(dev, "error %d getting \"firmware-name\" resource\n",
 			ret);
@@ -701,16 +602,6 @@ static int ipa_firmware_load(struct device *dev)
 
 	ret = request_firmware(&fw, path, dev);
 	if (ret) {
-=======
-	if (ret) {
-		dev_dbg(dev, "error %d getting \"firmware-name\" resource\n",
-			ret);
-		path = IPA_FW_PATH_DEFAULT;
-	}
-
-	ret = request_firmware(&fw, path, dev);
-	if (ret) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(dev, "error %d requesting \"%s\"\n", ret, path);
 		return ret;
 	}
@@ -803,32 +694,6 @@ static void ipa_validate_build(void)
 
 	/* Aggregation granularity value can't be 0, and must fit */
 	BUILD_BUG_ON(!ipa_aggr_granularity_val(IPA_AGGR_GRANULARITY));
-<<<<<<< HEAD
-=======
-	BUILD_BUG_ON(ipa_aggr_granularity_val(IPA_AGGR_GRANULARITY) >
-			field_max(AGGR_GRANULARITY_FMASK));
-}
-
-static bool ipa_version_valid(enum ipa_version version)
-{
-	switch (version) {
-	case IPA_VERSION_3_0:
-	case IPA_VERSION_3_1:
-	case IPA_VERSION_3_5:
-	case IPA_VERSION_3_5_1:
-	case IPA_VERSION_4_0:
-	case IPA_VERSION_4_1:
-	case IPA_VERSION_4_2:
-	case IPA_VERSION_4_5:
-	case IPA_VERSION_4_7:
-	case IPA_VERSION_4_9:
-	case IPA_VERSION_4_11:
-		return true;
-
-	default:
-		return false;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -872,13 +737,8 @@ static int ipa_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-<<<<<<< HEAD
 	if (!ipa_version_supported(data->version)) {
 		dev_err(dev, "unsupported IPA version %u\n", data->version);
-=======
-	if (!ipa_version_valid(data->version)) {
-		dev_err(dev, "invalid IPA version\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 	}
 

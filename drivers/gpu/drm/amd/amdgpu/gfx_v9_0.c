@@ -126,11 +126,8 @@ MODULE_FIRMWARE("amdgpu/green_sardine_rlc.bin");
 MODULE_FIRMWARE("amdgpu/aldebaran_mec.bin");
 MODULE_FIRMWARE("amdgpu/aldebaran_mec2.bin");
 MODULE_FIRMWARE("amdgpu/aldebaran_rlc.bin");
-<<<<<<< HEAD
 MODULE_FIRMWARE("amdgpu/aldebaran_sjt_mec.bin");
 MODULE_FIRMWARE("amdgpu/aldebaran_sjt_mec2.bin");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define mmTCP_CHAN_STEER_0_ARCT								0x0b03
 #define mmTCP_CHAN_STEER_0_ARCT_BASE_IDX							0
@@ -1381,77 +1378,21 @@ static int gfx_v9_0_init_cp_compute_microcode(struct amdgpu_device *adev,
 	amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_MEC1_JT);
 
 	if (gfx_v9_0_load_mec2_fw_bin_support(adev)) {
-<<<<<<< HEAD
 		if (amdgpu_sriov_vf(adev) && (adev->asic_type == CHIP_ALDEBARAN))
 			snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_sjt_mec2.bin", chip_name);
 		else
 			snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_mec2.bin", chip_name);
 
-=======
-		snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_mec2.bin", chip_name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = request_firmware(&adev->gfx.mec2_fw, fw_name, adev->dev);
 		if (!err) {
 			err = amdgpu_ucode_validate(adev->gfx.mec2_fw);
 			if (err)
 				goto out;
-<<<<<<< HEAD
 			amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_MEC2);
 			amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_MEC2_JT);
 		} else {
 			err = 0;
 			adev->gfx.mec2_fw = NULL;
-=======
-			cp_hdr = (const struct gfx_firmware_header_v1_0 *)
-			adev->gfx.mec2_fw->data;
-			adev->gfx.mec2_fw_version =
-			le32_to_cpu(cp_hdr->header.ucode_version);
-			adev->gfx.mec2_feature_version =
-			le32_to_cpu(cp_hdr->ucode_feature_version);
-		} else {
-			err = 0;
-			adev->gfx.mec2_fw = NULL;
-		}
-	} else {
-		adev->gfx.mec2_fw_version = adev->gfx.mec_fw_version;
-		adev->gfx.mec2_feature_version = adev->gfx.mec_feature_version;
-	}
-
-	if (adev->firmware.load_type == AMDGPU_FW_LOAD_PSP) {
-		info = &adev->firmware.ucode[AMDGPU_UCODE_ID_CP_MEC1];
-		info->ucode_id = AMDGPU_UCODE_ID_CP_MEC1;
-		info->fw = adev->gfx.mec_fw;
-		header = (const struct common_firmware_header *)info->fw->data;
-		cp_hdr = (const struct gfx_firmware_header_v1_0 *)info->fw->data;
-		adev->firmware.fw_size +=
-			ALIGN(le32_to_cpu(header->ucode_size_bytes) - le32_to_cpu(cp_hdr->jt_size) * 4, PAGE_SIZE);
-
-		info = &adev->firmware.ucode[AMDGPU_UCODE_ID_CP_MEC1_JT];
-		info->ucode_id = AMDGPU_UCODE_ID_CP_MEC1_JT;
-		info->fw = adev->gfx.mec_fw;
-		adev->firmware.fw_size +=
-			ALIGN(le32_to_cpu(cp_hdr->jt_size) * 4, PAGE_SIZE);
-
-		if (adev->gfx.mec2_fw) {
-			info = &adev->firmware.ucode[AMDGPU_UCODE_ID_CP_MEC2];
-			info->ucode_id = AMDGPU_UCODE_ID_CP_MEC2;
-			info->fw = adev->gfx.mec2_fw;
-			header = (const struct common_firmware_header *)info->fw->data;
-			cp_hdr = (const struct gfx_firmware_header_v1_0 *)info->fw->data;
-			adev->firmware.fw_size +=
-				ALIGN(le32_to_cpu(header->ucode_size_bytes) - le32_to_cpu(cp_hdr->jt_size) * 4, PAGE_SIZE);
-
-			/* TODO: Determine if MEC2 JT FW loading can be removed
-				 for all GFX V9 asic and above */
-			if (gfx_v9_0_load_mec2_fw_bin_support(adev)) {
-				info = &adev->firmware.ucode[AMDGPU_UCODE_ID_CP_MEC2_JT];
-				info->ucode_id = AMDGPU_UCODE_ID_CP_MEC2_JT;
-				info->fw = adev->gfx.mec2_fw;
-				adev->firmware.fw_size +=
-					ALIGN(le32_to_cpu(cp_hdr->jt_size) * 4,
-					PAGE_SIZE);
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	} else {
 		adev->gfx.mec2_fw_version = adev->gfx.mec_fw_version;

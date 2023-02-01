@@ -141,11 +141,7 @@ int qxl_bo_create(struct qxl_device *qdev, unsigned long size,
 	qxl_ttm_placement_from_domain(bo, domain);
 
 	bo->tbo.priority = priority;
-<<<<<<< HEAD
 	r = ttm_bo_init_reserved(&qdev->mman.bdev, &bo->tbo, type,
-=======
-	r = ttm_bo_init_reserved(&qdev->mman.bdev, &bo->tbo, size, type,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 &bo->placement, 0, &ctx, NULL, NULL,
 				 &qxl_ttm_bo_destroy);
 	if (unlikely(r != 0)) {

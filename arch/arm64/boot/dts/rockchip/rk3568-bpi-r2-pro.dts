@@ -46,11 +46,7 @@
 		};
 	};
 
-<<<<<<< HEAD
 	dc_12v: dc-12v-regulator {
-=======
-	dc_12v: dc-12v {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "regulator-fixed";
 		regulator-name = "dc_12v";
 		regulator-always-on;
@@ -70,11 +66,7 @@
 		};
 	};
 
-<<<<<<< HEAD
 	vcc3v3_sys: vcc3v3-sys-regulator {
-=======
-	vcc3v3_sys: vcc3v3-sys {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "regulator-fixed";
 		regulator-name = "vcc3v3_sys";
 		regulator-always-on;
@@ -84,11 +76,7 @@
 		vin-supply = <&dc_12v>;
 	};
 
-<<<<<<< HEAD
 	vcc5v0_sys: vcc5v0-sys-regulator {
-=======
-	vcc5v0_sys: vcc5v0-sys {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_sys";
 		regulator-always-on;
@@ -98,7 +86,6 @@
 		vin-supply = <&dc_12v>;
 	};
 
-<<<<<<< HEAD
 	pcie30_avdd0v9: pcie30-avdd0v9-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "pcie30_avdd0v9";
@@ -160,9 +147,6 @@
 	};
 
 	vcc5v0_usb: vcc5v0-usb-regulator {
-=======
-	vcc5v0_usb: vcc5v0_usb {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_usb";
 		regulator-always-on;
@@ -172,11 +156,7 @@
 		vin-supply = <&dc_12v>;
 	};
 
-<<<<<<< HEAD
 	vcc5v0_usb_host: vcc5v0-usb-host-regulator {
-=======
-	vcc5v0_usb_host: vcc5v0-usb-host {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "regulator-fixed";
 		enable-active-high;
 		gpio = <&gpio0 RK_PA6 GPIO_ACTIVE_HIGH>;
@@ -188,11 +168,7 @@
 		vin-supply = <&vcc5v0_usb>;
 	};
 
-<<<<<<< HEAD
 	vcc5v0_usb_otg: vcc5v0-usb-otg-regulator {
-=======
-	vcc5v0_usb_otg: vcc5v0-usb-otg {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "regulator-fixed";
 		enable-active-high;
 		gpio = <&gpio0 RK_PA5 GPIO_ACTIVE_HIGH>;
@@ -524,10 +500,6 @@
 		interrupt-parent = <&gpio0>;
 		interrupts = <RK_PD3 IRQ_TYPE_EDGE_FALLING>;
 		#clock-cells = <0>;
-<<<<<<< HEAD
-=======
-		clock-frequency = <32768>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		clock-output-names = "rtcic_32kout";
 		pinctrl-names = "default";
 		pinctrl-0 = <&hym8563_int>;
@@ -600,7 +572,6 @@
 	};
 };
 
-<<<<<<< HEAD
 &pcie30phy {
 	data-lanes = <1 2>;
 	phy-supply = <&vcc3v3_pi6c_05>;
@@ -627,8 +598,6 @@
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &pinctrl {
 	leds {
 		blue_led_pin: blue-led-pin {
@@ -645,7 +614,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	pcie {
 		minipcie_enable_h: minipcie-enable-h {
 			rockchip,pins = <0 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none_drv_level_5>;
@@ -664,8 +632,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pmic {
 		pmic_int: pmic_int {
 			rockchip,pins =
@@ -815,11 +781,7 @@
 };
 
 &usb_host0_xhci {
-<<<<<<< HEAD
 	dr_mode = "host";
-=======
-	extcon = <&usb2phy0>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = "okay";
 };
 
@@ -849,7 +811,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &usb2phy1 {
 	/* USB for PCIe/M2 */
 	status = "okay";
@@ -863,8 +824,6 @@
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &vop {
 	assigned-clocks = <&cru DCLK_VOP0>, <&cru DCLK_VOP1>;
 	assigned-clock-parents = <&pmucru PLL_HPLL>, <&cru PLL_VPLL>;

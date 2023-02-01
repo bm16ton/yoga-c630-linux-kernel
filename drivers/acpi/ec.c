@@ -469,7 +469,6 @@ static void acpi_ec_submit_event(struct acpi_ec *ec)
 
 	ec->events_in_progress++;
 	queue_work(ec_wq, &ec->work);
-<<<<<<< HEAD
 }
 
 static void acpi_ec_complete_event(struct acpi_ec *ec)
@@ -480,18 +479,6 @@ static void acpi_ec_complete_event(struct acpi_ec *ec)
 
 static void acpi_ec_close_event(struct acpi_ec *ec)
 {
-=======
-}
-
-static void acpi_ec_complete_event(struct acpi_ec *ec)
-{
-	if (ec->event_state == EC_EVENT_IN_PROGRESS)
-		ec->event_state = EC_EVENT_COMPLETE;
-}
-
-static void acpi_ec_close_event(struct acpi_ec *ec)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ec->event_state != EC_EVENT_READY)
 		ec_dbg_evt("Command(%s) unblocked",
 			   acpi_ec_cmd_string(ACPI_EC_COMMAND_QUERY));
@@ -1265,15 +1252,9 @@ static void acpi_ec_event_handler(struct work_struct *work)
 		spin_unlock_irq(&ec->lock);
 
 		guard_timeout = !!ec_guard(ec);
-<<<<<<< HEAD
 
 		spin_lock_irq(&ec->lock);
 
-=======
-
-		spin_lock_irq(&ec->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Take care of SCI_EVT unless someone else is doing that. */
 		if (guard_timeout && !ec->curr)
 			advance_transaction(ec, false);
@@ -1883,7 +1864,6 @@ static const struct dmi_system_id ec_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "MS-171F"),
 		},
 	},
-<<<<<<< HEAD
 	{
 		/*
 		 * HP Pavilion Gaming Laptop 15-cx0xxx
@@ -1898,21 +1878,11 @@ static const struct dmi_system_id ec_dmi_table[] __initconst = {
 	{
 		/*
 		 * HP Pavilion Gaming Laptop 15-cx0041ur
-=======
-	{
-		/*
-		 * HP Pavilion Gaming Laptop 15-cx0xxx
-		 * https://bugzilla.kernel.org/show_bug.cgi?id=209989
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 */
 		.callback = ec_honor_dsdt_gpe,
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "HP"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "HP 15-cx0041ur"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "HP Pavilion Gaming Laptop 15-cx0xxx"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		},
 	},
 	{
@@ -2090,19 +2060,11 @@ bool acpi_ec_dispatch_gpe(void)
 
 	if (acpi_ec_gpe_status_set(first_ec)) {
 		pm_pr_dbg("ACPI EC GPE status set\n");
-<<<<<<< HEAD
 
 		advance_transaction(first_ec, false);
 		work_in_progress = acpi_ec_work_in_progress(first_ec);
 	}
 
-=======
-
-		advance_transaction(first_ec, false);
-		work_in_progress = acpi_ec_work_in_progress(first_ec);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock_irq(&first_ec->lock);
 
 	if (!work_in_progress)

@@ -4,17 +4,6 @@
 #
 menu "Capacitance to digital converters"
 
-<<<<<<< HEAD
-config AD7746
-	tristate "Analog Devices AD7745, AD7746 AD7747 capacitive sensor driver"
-	depends on I2C
-	help
-	  Say yes here to build support for Analog Devices capacitive sensors.
-	  (AD7745, AD7746, AD7747) Provides direct access via sysfs.
-
-	  To compile this driver as a module, choose M here: the
-	  module will be called ad7746.
-=======
 config AD7150
 	tristate "Analog Devices ad7150/1/6 capacitive sensor driver"
 	depends on I2C
@@ -24,6 +13,15 @@ config AD7150
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called ad7150.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+config AD7746
+	tristate "Analog Devices AD7745, AD7746 AD7747 capacitive sensor driver"
+	depends on I2C
+	help
+	  Say yes here to build support for Analog Devices capacitive sensors.
+	  (AD7745, AD7746, AD7747) Provides direct access via sysfs.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called ad7746.
 
 endmenu

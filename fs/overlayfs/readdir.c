@@ -264,11 +264,7 @@ static bool ovl_fill_merge(struct dir_context *ctx, const char *name,
 		return ovl_fill_lowest(rdd, name, namelen, offset, ino, d_type);
 }
 
-<<<<<<< HEAD
 static int ovl_check_whiteouts(const struct path *path, struct ovl_readdir_data *rdd)
-=======
-static int ovl_check_whiteouts(struct path *path, struct ovl_readdir_data *rdd)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err;
 	struct ovl_cache_entry *p;
@@ -1069,11 +1065,7 @@ int ovl_check_d_type_supported(const struct path *realpath)
 
 #define OVL_INCOMPATDIR_NAME "incompat"
 
-<<<<<<< HEAD
 static int ovl_workdir_cleanup_recurse(struct ovl_fs *ofs, const struct path *path,
-=======
-static int ovl_workdir_cleanup_recurse(struct ovl_fs *ofs, struct path *path,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				       int level)
 {
 	int err;

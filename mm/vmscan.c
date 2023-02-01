@@ -134,15 +134,12 @@ struct scan_control {
 	/* Always discard instead of demoting to lower tier memory */
 	unsigned int no_demotion:1;
 
-<<<<<<< HEAD
 #ifdef CONFIG_LRU_GEN
 	/* help kswapd make better choices among multiple memcgs */
 	unsigned int memcgs_need_aging:1;
 	unsigned long last_reclaimed;
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Allocation order */
 	s8 order;
 
@@ -628,7 +625,6 @@ static int __prealloc_shrinker(struct shrinker *shrinker)
 {
 	unsigned int size;
 	int err;
-<<<<<<< HEAD
 
 	if (shrinker->flags & SHRINKER_MEMCG_AWARE) {
 		err = prealloc_memcg_shrinker(shrinker);
@@ -638,17 +634,6 @@ static int __prealloc_shrinker(struct shrinker *shrinker)
 		shrinker->flags &= ~SHRINKER_MEMCG_AWARE;
 	}
 
-=======
-
-	if (shrinker->flags & SHRINKER_MEMCG_AWARE) {
-		err = prealloc_memcg_shrinker(shrinker);
-		if (err != -ENOSYS)
-			return err;
-
-		shrinker->flags &= ~SHRINKER_MEMCG_AWARE;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size = sizeof(*shrinker->nr_deferred);
 	if (shrinker->flags & SHRINKER_NUMA_AWARE)
 		size *= nr_node_ids;
@@ -679,21 +664,12 @@ int prealloc_shrinker(struct shrinker *shrinker, const char *fmt, ...)
 	}
 
 	return err;
-<<<<<<< HEAD
 }
 #else
 int prealloc_shrinker(struct shrinker *shrinker, const char *fmt, ...)
 {
 	return __prealloc_shrinker(shrinker);
 }
-=======
-}
-#else
-int prealloc_shrinker(struct shrinker *shrinker, const char *fmt, ...)
-{
-	return __prealloc_shrinker(shrinker);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 void free_prealloced_shrinker(struct shrinker *shrinker)
@@ -1101,11 +1077,6 @@ static void handle_write_error(struct address_space *mapping,
 	if (folio_mapping(folio) == mapping)
 		mapping_set_error(mapping, error);
 	folio_unlock(folio);
-<<<<<<< HEAD
-}
-
-static bool skip_throttle_noprogress(pg_data_t *pgdat)
-=======
 }
 
 static bool skip_throttle_noprogress(pg_data_t *pgdat)
@@ -1114,153 +1085,6 @@ static bool skip_throttle_noprogress(pg_data_t *pgdat)
 	int i;
 
 	/*
-	 * If kswapd is disabled, reschedule if necessary but do not
-	 * throttle as the system is likely near OOM.
-	 */
-	if (pgdat->kswapd_failures >= MAX_RECLAIM_RETRIES)
-		return true;
-
-	/*
-	 * If there are a lot of dirty/writeback pages then do not
-	 * throttle as throttling will occur when the pages cycle
-	 * towards the end of the LRU if still under writeback.
-	 */
-	for (i = 0; i < MAX_NR_ZONES; i++) {
-		struct zone *zone = pgdat->node_zones + i;
-
-		if (!managed_zone(zone))
-			continue;
-
-		reclaimable += zone_reclaimable_pages(zone);
-		write_pending += zone_page_state_snapshot(zone,
-						  NR_ZONE_WRITE_PENDING);
-	}
-	if (2 * write_pending <= reclaimable)
-		return true;
-
-	return false;
-}
-
-void reclaim_throttle(pg_data_t *pgdat, enum vmscan_throttle_state reason)
-{
-	wait_queue_head_t *wqh = &pgdat->reclaim_wait[reason];
-	long timeout, ret;
-	DEFINE_WAIT(wait);
-
-	/*
-	 * Do not throttle IO workers, kthreads other than kswapd or
-	 * workqueues. They may be required for reclaim to make
-	 * forward progress (e.g. journalling workqueues or kthreads).
-	 */
-	if (!current_is_kswapd() &&
-	    current->flags & (PF_IO_WORKER|PF_KTHREAD)) {
-		cond_resched();
-		return;
-	}
-
-	/*
-	 * These figures are pulled out of thin air.
-	 * VMSCAN_THROTTLE_ISOLATED is a transient condition based on too many
-	 * parallel reclaimers which is a short-lived event so the timeout is
-	 * short. Failing to make progress or waiting on writeback are
-	 * potentially long-lived events so use a longer timeout. This is shaky
-	 * logic as a failure to make progress could be due to anything from
-	 * writeback to a slow device to excessive references pages at the tail
-	 * of the inactive LRU.
-	 */
-	switch(reason) {
-	case VMSCAN_THROTTLE_WRITEBACK:
-		timeout = HZ/10;
-
-		if (atomic_inc_return(&pgdat->nr_writeback_throttled) == 1) {
-			WRITE_ONCE(pgdat->nr_reclaim_start,
-				node_page_state(pgdat, NR_THROTTLED_WRITTEN));
-		}
-
-		break;
-	case VMSCAN_THROTTLE_CONGESTED:
-		fallthrough;
-	case VMSCAN_THROTTLE_NOPROGRESS:
-		if (skip_throttle_noprogress(pgdat)) {
-			cond_resched();
-			return;
-		}
-
-		timeout = 1;
-
-		break;
-	case VMSCAN_THROTTLE_ISOLATED:
-		timeout = HZ/50;
-		break;
-	default:
-		WARN_ON_ONCE(1);
-		timeout = HZ;
-		break;
-	}
-
-	prepare_to_wait(wqh, &wait, TASK_UNINTERRUPTIBLE);
-	ret = schedule_timeout(timeout);
-	finish_wait(wqh, &wait);
-
-	if (reason == VMSCAN_THROTTLE_WRITEBACK)
-		atomic_dec(&pgdat->nr_writeback_throttled);
-
-	trace_mm_vmscan_throttled(pgdat->node_id, jiffies_to_usecs(timeout),
-				jiffies_to_usecs(timeout - ret),
-				reason);
-}
-
-/*
- * Account for pages written if tasks are throttled waiting on dirty
- * pages to clean. If enough pages have been cleaned since throttling
- * started then wakeup the throttled tasks.
- */
-void __acct_reclaim_writeback(pg_data_t *pgdat, struct folio *folio,
-							int nr_throttled)
-{
-	unsigned long nr_written;
-
-	node_stat_add_folio(folio, NR_THROTTLED_WRITTEN);
-
-	/*
-	 * This is an inaccurate read as the per-cpu deltas may not
-	 * be synchronised. However, given that the system is
-	 * writeback throttled, it is not worth taking the penalty
-	 * of getting an accurate count. At worst, the throttle
-	 * timeout guarantees forward progress.
-	 */
-	nr_written = node_page_state(pgdat, NR_THROTTLED_WRITTEN) -
-		READ_ONCE(pgdat->nr_reclaim_start);
-
-	if (nr_written > SWAP_CLUSTER_MAX * nr_throttled)
-		wake_up(&pgdat->reclaim_wait[VMSCAN_THROTTLE_WRITEBACK]);
-}
-
-/* possible outcome of pageout() */
-typedef enum {
-	/* failed to write page out, page is locked */
-	PAGE_KEEP,
-	/* move page to the active list, page is locked */
-	PAGE_ACTIVATE,
-	/* page has been sent to the disk successfully, page is unlocked */
-	PAGE_SUCCESS,
-	/* page is clean and locked */
-	PAGE_CLEAN,
-} pageout_t;
-
-/*
- * pageout is called by shrink_page_list() for each dirty page.
- * Calls ->writepage().
- */
-static pageout_t pageout(struct folio *folio, struct address_space *mapping,
-			 struct swap_iocb **plug)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	int reclaimable = 0, write_pending = 0;
-	int i;
-
-	/*
-<<<<<<< HEAD
 	 * If kswapd is disabled, reschedule if necessary but do not
 	 * throttle as the system is likely near OOM.
 	 */
@@ -1418,23 +1242,6 @@ static pageout_t pageout(struct folio *folio, struct address_space *mapping,
 	 * swap_backing_dev_info is bust: it doesn't reflect the
 	 * congestion state of the swapdevs.  Easy to fix, if needed.
 	 */
-=======
-	 * If the folio is dirty, only perform writeback if that write
-	 * will be non-blocking.  To prevent this allocation from being
-	 * stalled by pagecache activity.  But note that there may be
-	 * stalls if we need to run get_block().  We could test
-	 * PagePrivate for that.
-	 *
-	 * If this process is currently in __generic_file_write_iter() against
-	 * this folio's queue, we can perform writeback even if that
-	 * will block.
-	 *
-	 * If the folio is swapcache, write it back even if that would
-	 * block, for some throttling. This happens by accident, because
-	 * swap_backing_dev_info is bust: it doesn't reflect the
-	 * congestion state of the swapdevs.  Easy to fix, if needed.
-	 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!is_page_cache_freeable(folio))
 		return PAGE_KEEP;
 	if (!mapping) {
@@ -1530,11 +1337,7 @@ static int __remove_mapping(struct address_space *mapping, struct folio *folio,
 	refcount = 1 + folio_nr_pages(folio);
 	if (!folio_ref_freeze(folio, refcount))
 		goto cannot_free;
-<<<<<<< HEAD
 	/* note: atomic_cmpxchg in folio_ref_freeze provides the smp_rmb */
-=======
-	/* note: atomic_cmpxchg in page_ref_freeze provides the smp_rmb */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(folio_test_dirty(folio))) {
 		folio_ref_unfreeze(folio, refcount);
 		goto cannot_free;
@@ -1542,7 +1345,6 @@ static int __remove_mapping(struct address_space *mapping, struct folio *folio,
 
 	if (folio_test_swapcache(folio)) {
 		swp_entry_t swap = folio_swap_entry(folio);
-<<<<<<< HEAD
 
 		/* get a shadow entry before mem_cgroup_swapout() clears folio_memcg() */
 		if (reclaimed && !mapping_exiting(mapping))
@@ -1551,14 +1353,6 @@ static int __remove_mapping(struct address_space *mapping, struct folio *folio,
 		__delete_from_swap_cache(folio, swap, shadow);
 		xa_unlock_irq(&mapping->i_pages);
 		put_swap_folio(folio, swap);
-=======
-		mem_cgroup_swapout(folio, swap);
-		if (reclaimed && !mapping_exiting(mapping))
-			shadow = workingset_eviction(folio, target_memcg);
-		__delete_from_swap_cache(folio, swap, shadow);
-		xa_unlock_irq(&mapping->i_pages);
-		put_swap_page(&folio->page, swap);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		void (*free_folio)(struct folio *);
 
@@ -1649,11 +1443,7 @@ enum folio_references {
 	FOLIOREF_ACTIVATE,
 };
 
-<<<<<<< HEAD
 static enum folio_references folio_check_references(struct folio *folio,
-=======
-static enum page_references folio_check_references(struct folio *folio,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						  struct scan_control *sc)
 {
 	int referenced_ptes, referenced_folio;
@@ -1668,19 +1458,11 @@ static enum page_references folio_check_references(struct folio *folio,
 	 * Let the folio, now marked Mlocked, be moved to the unevictable list.
 	 */
 	if (vm_flags & VM_LOCKED)
-<<<<<<< HEAD
 		return FOLIOREF_ACTIVATE;
 
 	/* rmap lock contention: rotate */
 	if (referenced_ptes == -1)
 		return FOLIOREF_KEEP;
-=======
-		return PAGEREF_ACTIVATE;
-
-	/* rmap lock contention: rotate */
-	if (referenced_ptes == -1)
-		return PAGEREF_KEEP;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (referenced_ptes) {
 		/*
@@ -1700,56 +1482,34 @@ static enum page_references folio_check_references(struct folio *folio,
 		folio_set_referenced(folio);
 
 		if (referenced_folio || referenced_ptes > 1)
-<<<<<<< HEAD
 			return FOLIOREF_ACTIVATE;
-=======
-			return PAGEREF_ACTIVATE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * Activate file-backed executable folios after first usage.
 		 */
 		if ((vm_flags & VM_EXEC) && folio_is_file_lru(folio))
-<<<<<<< HEAD
 			return FOLIOREF_ACTIVATE;
-=======
-			return PAGEREF_ACTIVATE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		return FOLIOREF_KEEP;
 	}
 
 	/* Reclaim if clean, defer dirty folios to writeback */
 	if (referenced_folio && folio_is_file_lru(folio))
-<<<<<<< HEAD
 		return FOLIOREF_RECLAIM_CLEAN;
-=======
-		return PAGEREF_RECLAIM_CLEAN;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return FOLIOREF_RECLAIM;
 }
 
-<<<<<<< HEAD
 /* Check if a folio is dirty or under writeback */
-=======
-/* Check if a page is dirty or under writeback */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void folio_check_dirty_writeback(struct folio *folio,
 				       bool *dirty, bool *writeback)
 {
 	struct address_space *mapping;
 
 	/*
-<<<<<<< HEAD
 	 * Anonymous folios are not handled by flushers and must be written
 	 * from reclaim context. Do not stall reclaim based on them.
 	 * MADV_FREE anonymous folios are put into inactive file list too.
-=======
-	 * Anonymous pages are not handled by flushers and must be written
-	 * from reclaim context. Do not stall reclaim based on them.
-	 * MADV_FREE anonymous pages are put into inactive file list too.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * They could be mistakenly treated as file lru. So further anon
 	 * test is needed.
 	 */
@@ -1773,7 +1533,6 @@ static void folio_check_dirty_writeback(struct folio *folio,
 		mapping->a_ops->is_dirty_writeback(folio, dirty, writeback);
 }
 
-<<<<<<< HEAD
 static struct page *alloc_demote_page(struct page *page, unsigned long private)
 {
 	struct page *target_page;
@@ -1809,36 +1568,10 @@ static struct page *alloc_demote_page(struct page *page, unsigned long private)
  * Folios which are not demoted are left on @demote_folios.
  */
 static unsigned int demote_folio_list(struct list_head *demote_folios,
-=======
-static struct page *alloc_demote_page(struct page *page, unsigned long node)
-{
-	struct migration_target_control mtc = {
-		/*
-		 * Allocate from 'node', or fail quickly and quietly.
-		 * When this happens, 'page' will likely just be discarded
-		 * instead of migrated.
-		 */
-		.gfp_mask = (GFP_HIGHUSER_MOVABLE & ~__GFP_RECLAIM) |
-			    __GFP_THISNODE  | __GFP_NOWARN |
-			    __GFP_NOMEMALLOC | GFP_NOWAIT,
-		.nid = node
-	};
-
-	return alloc_migration_target(page, (unsigned long)&mtc);
-}
-
-/*
- * Take pages on @demote_list and attempt to demote them to
- * another node.  Pages which are not demoted are left on
- * @demote_pages.
- */
-static unsigned int demote_page_list(struct list_head *demote_pages,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				     struct pglist_data *pgdat)
 {
 	int target_nid = next_demotion_node(pgdat->node_id);
 	unsigned int nr_succeeded;
-<<<<<<< HEAD
 	nodemask_t allowed_mask;
 
 	struct migration_target_control mtc = {
@@ -1854,28 +1587,17 @@ static unsigned int demote_page_list(struct list_head *demote_pages,
 	};
 
 	if (list_empty(demote_folios))
-=======
-
-	if (list_empty(demote_pages))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	if (target_nid == NUMA_NO_NODE)
 		return 0;
 
-<<<<<<< HEAD
 	node_get_allowed_targets(pgdat, &allowed_mask);
 
 	/* Demotion ignores all cpuset and mempolicy settings */
 	migrate_pages(demote_folios, alloc_demote_page, NULL,
 		      (unsigned long)&mtc, MIGRATE_ASYNC, MR_DEMOTION,
 		      &nr_succeeded);
-=======
-	/* Demotion ignores all cpuset and mempolicy settings */
-	migrate_pages(demote_pages, alloc_demote_page, NULL,
-			    target_nid, MIGRATE_ASYNC, MR_DEMOTION,
-			    &nr_succeeded);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (current_is_kswapd())
 		__count_vm_events(PGDEMOTE_KSWAPD, nr_succeeded);
@@ -1904,7 +1626,6 @@ static bool may_enter_fs(struct folio *folio, gfp_t gfp_mask)
 /*
  * shrink_folio_list() returns the number of reclaimed pages
  */
-<<<<<<< HEAD
 static unsigned int shrink_folio_list(struct list_head *folio_list,
 		struct pglist_data *pgdat, struct scan_control *sc,
 		struct reclaim_stat *stat, bool ignore_references)
@@ -1912,17 +1633,6 @@ static unsigned int shrink_folio_list(struct list_head *folio_list,
 	LIST_HEAD(ret_folios);
 	LIST_HEAD(free_folios);
 	LIST_HEAD(demote_folios);
-=======
-static unsigned int shrink_page_list(struct list_head *page_list,
-				     struct pglist_data *pgdat,
-				     struct scan_control *sc,
-				     struct reclaim_stat *stat,
-				     bool ignore_references)
-{
-	LIST_HEAD(ret_pages);
-	LIST_HEAD(free_pages);
-	LIST_HEAD(demote_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int nr_reclaimed = 0;
 	unsigned int pgactivate = 0;
 	bool do_demote_pass;
@@ -1933,27 +1643,16 @@ static unsigned int shrink_page_list(struct list_head *page_list,
 	do_demote_pass = can_demote(pgdat->node_id, sc);
 
 retry:
-<<<<<<< HEAD
 	while (!list_empty(folio_list)) {
 		struct address_space *mapping;
 		struct folio *folio;
 		enum folio_references references = FOLIOREF_RECLAIM;
-=======
-	while (!list_empty(page_list)) {
-		struct address_space *mapping;
-		struct folio *folio;
-		enum page_references references = PAGEREF_RECLAIM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bool dirty, writeback;
 		unsigned int nr_pages;
 
 		cond_resched();
 
-<<<<<<< HEAD
 		folio = lru_to_folio(folio_list);
-=======
-		folio = lru_to_folio(page_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		list_del(&folio->lru);
 
 		if (!folio_trylock(folio))
@@ -1972,14 +1671,11 @@ retry:
 		if (!sc->may_unmap && folio_mapped(folio))
 			goto keep_locked;
 
-<<<<<<< HEAD
 		/* folio_update_gen() tried to promote this page? */
 		if (lru_gen_enabled() && !ignore_references &&
 		    folio_mapped(folio) && folio_test_referenced(folio))
 			goto keep_locked;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * The number of dirty pages determines if a node is marked
 		 * reclaim_congested. kswapd will stall and start writing
@@ -2080,11 +1776,7 @@ retry:
 				folio_unlock(folio);
 				folio_wait_writeback(folio);
 				/* then go back and try same folio again */
-<<<<<<< HEAD
 				list_add_tail(&folio->lru, folio_list);
-=======
-				list_add_tail(&folio->lru, page_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				continue;
 			}
 		}
@@ -2098,13 +1790,8 @@ retry:
 		case FOLIOREF_KEEP:
 			stat->nr_ref_keep += nr_pages;
 			goto keep_locked;
-<<<<<<< HEAD
 		case FOLIOREF_RECLAIM:
 		case FOLIOREF_RECLAIM_CLEAN:
-=======
-		case PAGEREF_RECLAIM:
-		case PAGEREF_RECLAIM_CLEAN:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			; /* try to reclaim the folio below */
 		}
 
@@ -2114,11 +1801,7 @@ retry:
 		 */
 		if (do_demote_pass &&
 		    (thp_migration_supported() || !folio_test_large(folio))) {
-<<<<<<< HEAD
 			list_add(&folio->lru, &demote_folios);
-=======
-			list_add(&folio->lru, &demote_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			folio_unlock(folio);
 			continue;
 		}
@@ -2145,11 +1828,7 @@ retry:
 					 */
 					if (!folio_entire_mapcount(folio) &&
 					    split_folio_to_list(folio,
-<<<<<<< HEAD
 								folio_list))
-=======
-								page_list))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						goto activate_locked;
 				}
 				if (!add_to_swap(folio)) {
@@ -2157,11 +1836,7 @@ retry:
 						goto activate_locked_split;
 					/* Fallback to swap normal pages */
 					if (split_folio_to_list(folio,
-<<<<<<< HEAD
 								folio_list))
-=======
-								page_list))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						goto activate_locked;
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 					count_vm_event(THP_SWPOUT_FALLBACK);
@@ -2173,11 +1848,7 @@ retry:
 		} else if (folio_test_swapbacked(folio) &&
 			   folio_test_large(folio)) {
 			/* Split shmem folio */
-<<<<<<< HEAD
 			if (split_folio_to_list(folio, folio_list))
-=======
-			if (split_folio_to_list(folio, page_list))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				goto keep_locked;
 		}
 
@@ -2361,11 +2032,7 @@ free_it:
 		if (unlikely(folio_test_large(folio)))
 			destroy_large_folio(folio);
 		else
-<<<<<<< HEAD
 			list_add(&folio->lru, &free_folios);
-=======
-			list_add(&folio->lru, &free_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		continue;
 
 activate_locked_split:
@@ -2380,14 +2047,8 @@ activate_locked_split:
 activate_locked:
 		/* Not a candidate for swapping, so reclaim swap space. */
 		if (folio_test_swapcache(folio) &&
-<<<<<<< HEAD
 		    (mem_cgroup_swap_full(folio) || folio_test_mlocked(folio)))
 			folio_free_swap(folio);
-=======
-		    (mem_cgroup_swap_full(&folio->page) ||
-		     folio_test_mlocked(folio)))
-			try_to_free_swap(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		VM_BUG_ON_FOLIO(folio_test_active(folio), folio);
 		if (!folio_test_mlocked(folio)) {
 			int type = folio_is_file_lru(folio);
@@ -2398,7 +2059,6 @@ activate_locked:
 keep_locked:
 		folio_unlock(folio);
 keep:
-<<<<<<< HEAD
 		list_add(&folio->lru, &ret_folios);
 		VM_BUG_ON_FOLIO(folio_test_lru(folio) ||
 				folio_test_unevictable(folio), folio);
@@ -2411,20 +2071,6 @@ keep:
 	if (!list_empty(&demote_folios)) {
 		/* Folios which weren't demoted go back on @folio_list for retry: */
 		list_splice_init(&demote_folios, folio_list);
-=======
-		list_add(&folio->lru, &ret_pages);
-		VM_BUG_ON_FOLIO(folio_test_lru(folio) ||
-				folio_test_unevictable(folio), folio);
-	}
-	/* 'page_list' is always empty here */
-
-	/* Migrate folios selected for demotion */
-	nr_reclaimed += demote_page_list(&demote_pages, pgdat);
-	/* Folios that could not be demoted are still in @demote_pages */
-	if (!list_empty(&demote_pages)) {
-		/* Folios which weren't demoted go back on @page_list for retry: */
-		list_splice_init(&demote_pages, page_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		do_demote_pass = false;
 		goto retry;
 	}
@@ -2444,11 +2090,7 @@ keep:
 }
 
 unsigned int reclaim_clean_pages_from_list(struct zone *zone,
-<<<<<<< HEAD
 					   struct list_head *folio_list)
-=======
-					    struct list_head *folio_list)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct scan_control sc = {
 		.gfp_mask = GFP_KERNEL,
@@ -2476,11 +2118,7 @@ unsigned int reclaim_clean_pages_from_list(struct zone *zone,
 	 * change in the future.
 	 */
 	noreclaim_flag = memalloc_noreclaim_save();
-<<<<<<< HEAD
 	nr_reclaimed = shrink_folio_list(&clean_folios, zone->zone_pgdat, &sc,
-=======
-	nr_reclaimed = shrink_page_list(&clean_folios, zone->zone_pgdat, &sc,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					&stat, true);
 	memalloc_noreclaim_restore(noreclaim_flag);
 
@@ -2646,13 +2284,8 @@ move:
  *
  * Context:
  *
-<<<<<<< HEAD
  * (1) Must be called with an elevated refcount on the folio. This is a
  *     fundamental difference from isolate_lru_folios() (which is called
-=======
- * (1) Must be called with an elevated refcount on the page. This is a
- *     fundamental difference from isolate_lru_pages() (which is called
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *     without a stable reference).
  * (2) The lru_lock must not be held.
  * (3) Interrupts must be enabled.
@@ -2724,22 +2357,13 @@ static int too_many_isolated(struct pglist_data *pgdat, int file,
 }
 
 /*
-<<<<<<< HEAD
  * move_folios_to_lru() moves folios from private @list to appropriate LRU list.
-=======
- * move_pages_to_lru() moves folios from private @list to appropriate LRU list.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * On return, @list is reused as a list of folios to be freed by the caller.
  *
  * Returns the number of pages moved to the given lruvec.
  */
-<<<<<<< HEAD
 static unsigned int move_folios_to_lru(struct lruvec *lruvec,
 		struct list_head *list)
-=======
-static unsigned int move_pages_to_lru(struct lruvec *lruvec,
-				      struct list_head *list)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int nr_pages, nr_moved = 0;
 	LIST_HEAD(folios_to_free);
@@ -2759,11 +2383,7 @@ static unsigned int move_pages_to_lru(struct lruvec *lruvec,
 		/*
 		 * The folio_set_lru needs to be kept here for list integrity.
 		 * Otherwise:
-<<<<<<< HEAD
 		 *   #0 move_folios_to_lru             #1 release_pages
-=======
-		 *   #0 move_pages_to_lru             #1 release_pages
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 *   if (!folio_put_testzero())
 		 *				      if (folio_put_testzero())
 		 *				        !lru //skip lru_lock
@@ -2820,15 +2440,9 @@ static int current_may_throttle(void)
  * shrink_inactive_list() is a helper for shrink_node().  It returns the number
  * of reclaimed pages
  */
-<<<<<<< HEAD
 static unsigned long shrink_inactive_list(unsigned long nr_to_scan,
 		struct lruvec *lruvec, struct scan_control *sc,
 		enum lru_list lru)
-=======
-static unsigned long
-shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
-		     struct scan_control *sc, enum lru_list lru)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	LIST_HEAD(folio_list);
 	unsigned long nr_scanned;
@@ -2990,13 +2604,8 @@ static void shrink_active_list(unsigned long nr_to_scan,
 		}
 
 		if (unlikely(buffer_heads_over_limit)) {
-<<<<<<< HEAD
 			if (folio_test_private(folio) && folio_trylock(folio)) {
 				if (folio_test_private(folio))
-=======
-			if (folio_get_private(folio) && folio_trylock(folio)) {
-				if (folio_get_private(folio))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					filemap_release_folio(folio, 0);
 				folio_unlock(folio);
 			}
@@ -3031,13 +2640,8 @@ static void shrink_active_list(unsigned long nr_to_scan,
 	 */
 	spin_lock_irq(&lruvec->lru_lock);
 
-<<<<<<< HEAD
 	nr_activate = move_folios_to_lru(lruvec, &l_active);
 	nr_deactivate = move_folios_to_lru(lruvec, &l_inactive);
-=======
-	nr_activate = move_pages_to_lru(lruvec, &l_active);
-	nr_deactivate = move_pages_to_lru(lruvec, &l_inactive);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Keep all free folios in l_active list */
 	list_splice(&l_inactive, &l_active);
 
@@ -3053,11 +2657,7 @@ static void shrink_active_list(unsigned long nr_to_scan,
 			nr_deactivate, nr_rotated, sc->priority, file);
 }
 
-<<<<<<< HEAD
 static unsigned int reclaim_folio_list(struct list_head *folio_list,
-=======
-static unsigned int reclaim_page_list(struct list_head *page_list,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				      struct pglist_data *pgdat)
 {
 	struct reclaim_stat dummy_stat;
@@ -3071,15 +2671,9 @@ static unsigned int reclaim_page_list(struct list_head *page_list,
 		.no_demotion = 1,
 	};
 
-<<<<<<< HEAD
 	nr_reclaimed = shrink_folio_list(folio_list, pgdat, &sc, &dummy_stat, false);
 	while (!list_empty(folio_list)) {
 		folio = lru_to_folio(folio_list);
-=======
-	nr_reclaimed = shrink_page_list(page_list, pgdat, &sc, &dummy_stat, false);
-	while (!list_empty(page_list)) {
-		folio = lru_to_folio(page_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		list_del(&folio->lru);
 		folio_putback_lru(folio);
 	}
@@ -3109,19 +2703,11 @@ unsigned long reclaim_pages(struct list_head *folio_list)
 			continue;
 		}
 
-<<<<<<< HEAD
 		nr_reclaimed += reclaim_folio_list(&node_folio_list, NODE_DATA(nid));
 		nid = folio_nid(lru_to_folio(folio_list));
 	} while (!list_empty(folio_list));
 
 	nr_reclaimed += reclaim_folio_list(&node_folio_list, NODE_DATA(nid));
-=======
-		nr_reclaimed += reclaim_page_list(&node_folio_list, NODE_DATA(nid));
-		nid = folio_nid(lru_to_folio(folio_list));
-	} while (!list_empty(folio_list));
-
-	nr_reclaimed += reclaim_page_list(&node_folio_list, NODE_DATA(nid));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	memalloc_noreclaim_restore(noreclaim_flag);
 
@@ -3196,7 +2782,6 @@ enum scan_balance {
 	SCAN_FILE,
 };
 
-<<<<<<< HEAD
 static void prepare_scan_count(pg_data_t *pgdat, struct scan_control *sc)
 {
 	unsigned long file;
@@ -3206,33 +2791,6 @@ static void prepare_scan_count(pg_data_t *pgdat, struct scan_control *sc)
 		return;
 
 	target_lruvec = mem_cgroup_lruvec(sc->target_mem_cgroup, pgdat);
-=======
-/*
- * Determine how aggressively the anon and file LRU lists should be
- * scanned.
- *
- * nr[0] = anon inactive pages to scan; nr[1] = anon active pages to scan
- * nr[2] = file inactive pages to scan; nr[3] = file active pages to scan
- */
-static void get_scan_count(struct lruvec *lruvec, struct scan_control *sc,
-			   unsigned long *nr)
-{
-	struct pglist_data *pgdat = lruvec_pgdat(lruvec);
-	struct mem_cgroup *memcg = lruvec_memcg(lruvec);
-	unsigned long anon_cost, file_cost, total_cost;
-	int swappiness = mem_cgroup_swappiness(memcg);
-	u64 fraction[ANON_AND_FILE];
-	u64 denominator = 0;	/* gcc */
-	enum scan_balance scan_balance;
-	unsigned long ap, fp;
-	enum lru_list lru;
-
-	/* If we have no swap space, do not bother scanning anon pages. */
-	if (!sc->may_swap || !can_reclaim_anon_pages(memcg, pgdat->node_id, sc)) {
-		scan_balance = SCAN_FILE;
-		goto out;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Flush the memory cgroup stats, so that we read accurate per-memcg
@@ -3476,7 +3034,6 @@ out:
 			} else {
 				protection = min;
 			}
-<<<<<<< HEAD
 
 			/* Avoid TOCTOU with earlier protection check */
 			cgroup_size = max(cgroup_size, protection);
@@ -6217,21 +5774,14 @@ done:
 	set_task_reclaim_state(current, NULL);
 
 	kvfree(buf);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return err ? : len;
 }
 
-<<<<<<< HEAD
 static int lru_gen_seq_open(struct inode *inode, struct file *file)
 {
 	return seq_open(file, &lru_gen_seq_ops);
 }
-=======
-			scan = lruvec_size - lruvec_size * protection /
-				(cgroup_size + 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct file_operations lru_gen_rw_fops = {
 	.open = lru_gen_seq_open,
@@ -6324,21 +5874,6 @@ static void lru_gen_shrink_lruvec(struct lruvec *lruvec, struct scan_control *sc
 
 #endif /* CONFIG_LRU_GEN */
 
-/*
- * Anonymous LRU management is a waste if there is
- * ultimately no way to reclaim the memory.
- */
-static bool can_age_anon_pages(struct pglist_data *pgdat,
-			       struct scan_control *sc)
-{
-	/* Aging the anon LRU is valuable if swap is present: */
-	if (total_swap_pages > 0)
-		return true;
-
-	/* Also valuable if anon pages can be demoted: */
-	return can_demote(pgdat->node_id, sc);
-}
-
 static void shrink_lruvec(struct lruvec *lruvec, struct scan_control *sc)
 {
 	unsigned long nr[NR_LRU_LISTS];
@@ -6349,14 +5884,11 @@ static void shrink_lruvec(struct lruvec *lruvec, struct scan_control *sc)
 	unsigned long nr_to_reclaim = sc->nr_to_reclaim;
 	bool proportional_reclaim;
 	struct blk_plug plug;
-<<<<<<< HEAD
 
 	if (lru_gen_enabled()) {
 		lru_gen_shrink_lruvec(lruvec, sc);
 		return;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	get_scan_count(lruvec, sc, nr);
 
@@ -6599,12 +6131,6 @@ static void shrink_node(pg_data_t *pgdat, struct scan_control *sc)
 	target_lruvec = mem_cgroup_lruvec(sc->target_mem_cgroup, pgdat);
 
 again:
-	/*
-	 * Flush the memory cgroup stats, so that we read accurate per-memcg
-	 * lruvec stats for heuristics.
-	 */
-	mem_cgroup_flush_stats();
-
 	memset(&sc->nr, 0, sizeof(sc->nr));
 
 	nr_reclaimed = sc->nr_reclaimed;
@@ -7242,14 +6768,11 @@ static void kswapd_age_node(struct pglist_data *pgdat, struct scan_control *sc)
 	struct mem_cgroup *memcg;
 	struct lruvec *lruvec;
 
-<<<<<<< HEAD
 	if (lru_gen_enabled()) {
 		lru_gen_age_node(pgdat, sc);
 		return;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!can_age_anon_pages(pgdat, sc))
 		return;
 
@@ -7963,7 +7486,6 @@ void kswapd_run(int nid)
 {
 	pg_data_t *pgdat = NODE_DATA(nid);
 
-<<<<<<< HEAD
 	pgdat_kswapd_lock(pgdat);
 	if (!pgdat->kswapd) {
 		pgdat->kswapd = kthread_run(kswapd, pgdat, "kswapd%d", nid);
@@ -7975,18 +7497,6 @@ void kswapd_run(int nid)
 		}
 	}
 	pgdat_kswapd_unlock(pgdat);
-=======
-	if (pgdat->kswapd)
-		return;
-
-	pgdat->kswapd = kthread_run(kswapd, pgdat, "kswapd%d", nid);
-	if (IS_ERR(pgdat->kswapd)) {
-		/* failure at boot is fatal */
-		BUG_ON(system_state < SYSTEM_RUNNING);
-		pr_err("Failed to start kswapd on node %d\n", nid);
-		pgdat->kswapd = NULL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

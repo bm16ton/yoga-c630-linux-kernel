@@ -254,11 +254,6 @@ void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
 
 #else /* CONFIG_BFQ_CGROUP_DEBUG */
 
-<<<<<<< HEAD
-=======
-void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
-			      blk_opf_t opf) { }
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void bfqg_stats_update_io_remove(struct bfq_group *bfqg, blk_opf_t opf) { }
 void bfqg_stats_update_io_merged(struct bfq_group *bfqg, blk_opf_t opf) { }
 void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,

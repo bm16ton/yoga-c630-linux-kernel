@@ -47,10 +47,7 @@
 #define SOF_RT1019P_SPEAKER_AMP_PRESENT	BIT(14)
 #define SOF_MAX98373_SPEAKER_AMP_PRESENT	BIT(15)
 #define SOF_MAX98360A_SPEAKER_AMP_PRESENT	BIT(16)
-<<<<<<< HEAD
 #define SOF_RT1015P_SPEAKER_AMP_PRESENT	BIT(17)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static unsigned long sof_nau8825_quirk = SOF_NAU8825_SSP_CODEC(0);
 
@@ -85,7 +82,6 @@ static int sof_hdmi_init(struct snd_soc_pcm_runtime *rtd)
 	return 0;
 }
 
-<<<<<<< HEAD
 static struct snd_soc_jack_pin jack_pins[] = {
 	{
 		.pin    = "Headphone Jack",
@@ -97,8 +93,6 @@ static struct snd_soc_jack_pin jack_pins[] = {
 	},
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int sof_nau8825_codec_init(struct snd_soc_pcm_runtime *rtd)
 {
 	struct sof_card_private *ctx = snd_soc_card_get_drvdata(rtd->card);
@@ -111,7 +105,6 @@ static int sof_nau8825_codec_init(struct snd_soc_pcm_runtime *rtd)
 	 * Headset buttons map to the google Reference headset.
 	 * These can be configured by userspace.
 	 */
-<<<<<<< HEAD
 	ret = snd_soc_card_jack_new_pins(rtd->card, "Headset Jack",
 					 SND_JACK_HEADSET | SND_JACK_BTN_0 |
 					 SND_JACK_BTN_1 | SND_JACK_BTN_2 |
@@ -119,13 +112,6 @@ static int sof_nau8825_codec_init(struct snd_soc_pcm_runtime *rtd)
 					 &ctx->sof_headset,
 					 jack_pins,
 					 ARRAY_SIZE(jack_pins));
-=======
-	ret = snd_soc_card_jack_new(rtd->card, "Headset Jack",
-				    SND_JACK_HEADSET | SND_JACK_BTN_0 |
-				    SND_JACK_BTN_1 | SND_JACK_BTN_2 |
-				    SND_JACK_BTN_3,
-				    &ctx->sof_headset, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(rtd->dev, "Headset Jack creation failed: %d\n", ret);
 		return ret;
@@ -205,14 +191,6 @@ static int sof_card_late_probe(struct snd_soc_card *card)
 	struct sof_hdmi_pcm *pcm;
 	int err;
 
-<<<<<<< HEAD
-=======
-	if (list_empty(&ctx->hdmi_pcm_list))
-		return -EINVAL;
-
-	pcm = list_first_entry(&ctx->hdmi_pcm_list, struct sof_hdmi_pcm, head);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (sof_nau8825_quirk & SOF_MAX98373_SPEAKER_AMP_PRESENT) {
 		/* Disable Left and Right Spk pin after boot */
 		snd_soc_dapm_disable_pin(dapm, "Left Spk");
@@ -222,14 +200,11 @@ static int sof_card_late_probe(struct snd_soc_card *card)
 			return err;
 	}
 
-<<<<<<< HEAD
 	if (list_empty(&ctx->hdmi_pcm_list))
 		return -EINVAL;
 
 	pcm = list_first_entry(&ctx->hdmi_pcm_list, struct sof_hdmi_pcm, head);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return hda_dsp_hdmi_build_controls(card, pcm->codec_dai->component);
 }
 
@@ -381,17 +356,10 @@ static struct snd_soc_dai_link *sof_card_dai_links_create(struct device *dev,
 	struct snd_soc_dai_link *links;
 	int i, id = 0;
 
-<<<<<<< HEAD
 	links = devm_kcalloc(dev, sof_audio_card_nau8825.num_links,
 			    sizeof(struct snd_soc_dai_link), GFP_KERNEL);
 	cpus = devm_kcalloc(dev, sof_audio_card_nau8825.num_links,
 			    sizeof(struct snd_soc_dai_link_component), GFP_KERNEL);
-=======
-	links = devm_kzalloc(dev, sizeof(struct snd_soc_dai_link) *
-			     sof_audio_card_nau8825.num_links, GFP_KERNEL);
-	cpus = devm_kzalloc(dev, sizeof(struct snd_soc_dai_link_component) *
-			     sof_audio_card_nau8825.num_links, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!links || !cpus)
 		goto devm_err;
 
@@ -454,16 +422,10 @@ static struct snd_soc_dai_link *sof_card_dai_links_create(struct device *dev,
 
 	/* HDMI */
 	if (hdmi_num > 0) {
-<<<<<<< HEAD
 		idisp_components = devm_kcalloc(dev,
 						hdmi_num,
 						sizeof(struct snd_soc_dai_link_component),
 						GFP_KERNEL);
-=======
-		idisp_components = devm_kzalloc(dev,
-						sizeof(struct snd_soc_dai_link_component) *
-						hdmi_num, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!idisp_components)
 			goto devm_err;
 	}
@@ -522,11 +484,8 @@ static struct snd_soc_dai_link *sof_card_dai_links_create(struct device *dev,
 		} else if (sof_nau8825_quirk &
 				SOF_MAX98360A_SPEAKER_AMP_PRESENT) {
 			max_98360a_dai_link(&links[id]);
-<<<<<<< HEAD
 		} else if (sof_nau8825_quirk & SOF_RT1015P_SPEAKER_AMP_PRESENT) {
 			sof_rt1015p_dai_link(&links[id]);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			goto devm_err;
 		}
@@ -620,11 +579,8 @@ static int sof_audio_probe(struct platform_device *pdev)
 
 	if (sof_nau8825_quirk & SOF_MAX98373_SPEAKER_AMP_PRESENT)
 		max_98373_set_codec_conf(&sof_audio_card_nau8825);
-<<<<<<< HEAD
 	else if (sof_nau8825_quirk & SOF_RT1015P_SPEAKER_AMP_PRESENT)
 		sof_rt1015p_codec_conf(&sof_audio_card_nau8825);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (sof_nau8825_quirk & SOF_SSP_BT_OFFLOAD_PRESENT)
 		sof_audio_card_nau8825.num_links++;
@@ -662,11 +618,7 @@ static const struct platform_device_id board_ids[] = {
 
 	},
 	{
-<<<<<<< HEAD
 		.name = "adl_rt1019p_8825",
-=======
-		.name = "adl_rt1019p_nau8825",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.driver_data = (kernel_ulong_t)(SOF_NAU8825_SSP_CODEC(0) |
 					SOF_SPEAKER_AMP_PRESENT |
 					SOF_RT1019P_SPEAKER_AMP_PRESENT |
@@ -674,11 +626,7 @@ static const struct platform_device_id board_ids[] = {
 					SOF_NAU8825_NUM_HDMIDEV(4)),
 	},
 	{
-<<<<<<< HEAD
 		.name = "adl_max98373_8825",
-=======
-		.name = "adl_max98373_nau8825",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.driver_data = (kernel_ulong_t)(SOF_NAU8825_SSP_CODEC(0) |
 					SOF_SPEAKER_AMP_PRESENT |
 					SOF_MAX98373_SPEAKER_AMP_PRESENT |
@@ -689,11 +637,7 @@ static const struct platform_device_id board_ids[] = {
 	},
 	{
 		/* The limitation of length of char array, shorten the name */
-<<<<<<< HEAD
 		.name = "adl_mx98360a_8825",
-=======
-		.name = "adl_mx98360a_nau8825",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.driver_data = (kernel_ulong_t)(SOF_NAU8825_SSP_CODEC(0) |
 					SOF_SPEAKER_AMP_PRESENT |
 					SOF_MAX98360A_SPEAKER_AMP_PRESENT |
@@ -703,7 +647,6 @@ static const struct platform_device_id board_ids[] = {
 					SOF_SSP_BT_OFFLOAD_PRESENT),
 
 	},
-<<<<<<< HEAD
 	{
 		.name = "adl_rt1015p_8825",
 		.driver_data = (kernel_ulong_t)(SOF_NAU8825_SSP_CODEC(0) |
@@ -714,8 +657,6 @@ static const struct platform_device_id board_ids[] = {
 					SOF_BT_OFFLOAD_SSP(2) |
 					SOF_SSP_BT_OFFLOAD_PRESENT),
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 MODULE_DEVICE_TABLE(platform, board_ids);
@@ -737,7 +678,4 @@ MODULE_AUTHOR("Mac Chiang <mac.chiang@intel.com>");
 MODULE_LICENSE("GPL");
 MODULE_IMPORT_NS(SND_SOC_INTEL_HDA_DSP_COMMON);
 MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_MAXIM_COMMON);
-<<<<<<< HEAD
 MODULE_IMPORT_NS(SND_SOC_INTEL_SOF_REALTEK_COMMON);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

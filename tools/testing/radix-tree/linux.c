@@ -28,7 +28,6 @@ struct kmem_cache {
 	unsigned long nr_tallocated;
 };
 
-<<<<<<< HEAD
 void kmem_cache_set_non_kernel(struct kmem_cache *cachep, unsigned int val)
 {
 	cachep->non_kernel = val;
@@ -54,8 +53,6 @@ void kmem_cache_zero_nr_tallocated(struct kmem_cache *cachep)
 	cachep->nr_tallocated = 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void *kmem_cache_alloc_lru(struct kmem_cache *cachep, struct list_lru *lru,
 		int gfp)
 {
@@ -121,7 +118,6 @@ void kmem_cache_free(struct kmem_cache *cachep, void *objp)
 	pthread_mutex_unlock(&cachep->lock);
 }
 
-<<<<<<< HEAD
 void kmem_cache_free_bulk(struct kmem_cache *cachep, size_t size, void **list)
 {
 	if (kmalloc_verbose)
@@ -191,8 +187,6 @@ int kmem_cache_alloc_bulk(struct kmem_cache *cachep, gfp_t gfp, size_t size,
 	return size;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct kmem_cache *
 kmem_cache_create(const char *name, unsigned int size, unsigned int align,
 		unsigned int flags, void (*ctor)(void *))

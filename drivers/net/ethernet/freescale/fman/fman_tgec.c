@@ -470,12 +470,8 @@ static int tgec_accept_rx_pause_frames(struct fman_mac *tgec, bool en)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int tgec_modify_mac_address(struct fman_mac *tgec,
 				   const enet_addr_t *p_enet_addr)
-=======
-int tgec_modify_mac_address(struct fman_mac *tgec, const enet_addr_t *p_enet_addr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (!is_init_done(tgec->cfg))
 		return -EINVAL;

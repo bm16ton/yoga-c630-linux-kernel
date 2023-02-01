@@ -97,7 +97,6 @@
 			};
 		};
 
-<<<<<<< HEAD
 		spi2: spi@4000b000 {
 			compatible = "st,stm32h7-spi";
 			reg = <0x4000b000 0x400>;
@@ -126,8 +125,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		uart4: serial@40010000 {
 			compatible = "st,stm32h7-uart";
 			reg = <0x40010000 0x400>;
@@ -137,7 +134,6 @@
 			status = "disabled";
 		};
 
-<<<<<<< HEAD
 		i2c1: i2c@40012000 {
 			compatible = "st,stm32mp13-i2c";
 			reg = <0x40012000 0x400>;
@@ -188,8 +184,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dma1: dma-controller@48000000 {
 			compatible = "st,stm32-dma";
 			reg = <0x48000000 0x400>;
@@ -237,7 +231,6 @@
 			dma-channels = <16>;
 		};
 
-<<<<<<< HEAD
 		spi4: spi@4c002000 {
 			compatible = "st,stm32h7-spi";
 			reg = <0x4c002000 0x400>;
@@ -320,8 +313,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rcc: rcc@50000000 {
 			compatible = "st,stm32mp13-rcc", "syscon";
 			reg = <0x50000000 0x1000>;

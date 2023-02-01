@@ -162,18 +162,6 @@
 #define MLXBF_I2C_GPIO_SMBUS_GW_ASSERT_PINS(num, val) \
 	((val) | (0x3 << MLXBF_I2C_GPIO_SMBUS_GW_PINS(num)))
 
-<<<<<<< HEAD
-=======
-/* SMBus timing parameters. */
-#define MLXBF_I2C_SMBUS_TIMER_SCL_LOW_SCL_HIGH    0x00
-#define MLXBF_I2C_SMBUS_TIMER_FALL_RISE_SPIKE     0x04
-#define MLXBF_I2C_SMBUS_TIMER_THOLD               0x08
-#define MLXBF_I2C_SMBUS_TIMER_TSETUP_START_STOP   0x0c
-#define MLXBF_I2C_SMBUS_TIMER_TSETUP_DATA         0x10
-#define MLXBF_I2C_SMBUS_THIGH_MAX_TBUF            0x14
-#define MLXBF_I2C_SMBUS_SCL_LOW_TIMEOUT           0x18
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Defines SMBus operating frequency and core clock frequency.
  * According to ADB files, default values are compliant to 100KHz SMBus
@@ -317,7 +305,6 @@
  */
 #define MLXBF_I2C_SMBUS_TIMEOUT   (300 * 1000) /* 300ms */
 #define MLXBF_I2C_SMBUS_LOCK_POLL_TIMEOUT (300 * 1000) /* 300ms */
-<<<<<<< HEAD
 
 /* Polling frequency in microseconds. */
 #define MLXBF_I2C_POLL_FREQ_IN_USEC        200
@@ -371,8 +358,6 @@ enum {
 	MLXBF_I2C_GPIO_RES,
 	MLXBF_I2C_END_RES
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Encapsulates timing parameters. */
 struct mlxbf_i2c_timings {
@@ -555,11 +540,7 @@ static bool mlxbf_i2c_smbus_master_wait_for_idle(struct mlxbf_i2c_priv *priv)
  */
 static bool mlxbf_i2c_smbus_master_lock(struct mlxbf_i2c_priv *priv)
 {
-<<<<<<< HEAD
 	if (mlxbf_i2c_poll(priv->mst->io, MLXBF_I2C_SMBUS_MASTER_GW,
-=======
-	if (mlxbf_smbus_poll(priv->smbus->io, MLXBF_I2C_SMBUS_MASTER_GW,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			   MLXBF_I2C_MASTER_LOCK_BIT, true,
 			   MLXBF_I2C_SMBUS_LOCK_POLL_TIMEOUT))
 		return true;
@@ -570,11 +551,7 @@ static bool mlxbf_i2c_smbus_master_lock(struct mlxbf_i2c_priv *priv)
 static void mlxbf_i2c_smbus_master_unlock(struct mlxbf_i2c_priv *priv)
 {
 	/* Clear the gw to clear the lock */
-<<<<<<< HEAD
 	writel(0, priv->mst->io + MLXBF_I2C_SMBUS_MASTER_GW);
-=======
-	writel(0, priv->smbus->io + MLXBF_I2C_SMBUS_MASTER_GW);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool mlxbf_i2c_smbus_transaction_success(u32 master_status,
@@ -787,11 +764,7 @@ mlxbf_i2c_smbus_start_transaction(struct mlxbf_i2c_priv *priv,
 		return -EBUSY;
 
 	/* Check whether the HW is idle */
-<<<<<<< HEAD
 	if (WARN_ON(!mlxbf_i2c_smbus_master_wait_for_idle(priv))) {
-=======
-	if (WARN_ON(!mlxbf_smbus_master_wait_for_idle(priv))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -EBUSY;
 		goto out_unlock;
 	}

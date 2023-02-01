@@ -203,31 +203,12 @@ signed int rtw_enqueue_recvframe(union recv_frame *precvframe, struct __queue *q
 }
 
 /*
-<<<<<<< HEAD
  * caller : defrag ; recvframe_chk_defrag in recv_thread  (passive)
  * pframequeue: defrag_queue : will be accessed in recv_thread  (passive)
  *
  * using spinlock to protect
  *
  */
-=======
-signed int	rtw_enqueue_recvframe(union recv_frame *precvframe, struct __queue *queue)
-{
-	return rtw_free_recvframe(precvframe, queue);
-}
-*/
-
-
-
-
-/*
-caller : defrag ; recvframe_chk_defrag in recv_thread  (passive)
-pframequeue: defrag_queue : will be accessed in recv_thread  (passive)
-
-using spinlock to protect
-
-*/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void rtw_free_recvframe_queue(struct __queue *pframequeue,  struct __queue *pfree_recv_queue)
 {
@@ -1137,10 +1118,7 @@ static union recv_frame *recvframe_chk_defrag(struct adapter *padapter, union re
 	psta = rtw_get_stainfo(pstapriv, psta_addr);
 	if (!psta) {
 		u8 type = GetFrameType(pfhdr->rx_data);
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (type != WIFI_DATA_TYPE) {
 			psta = rtw_get_bcmc_stainfo(padapter);
 			pdefrag_q = &psta->sta_recvpriv.defrag_q;
@@ -1391,11 +1369,7 @@ static signed int validate_80211w_mgmt(struct adapter *adapter, union recv_frame
 			/* actual management data frame body */
 			data_len = pattrib->pkt_len - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len;
 			mgmt_DATA = rtw_zmalloc(data_len);
-<<<<<<< HEAD
 			if (!mgmt_DATA)
-=======
-			if (!mgmt_DATA) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				goto validate_80211w_fail;
 			precv_frame = decryptor(adapter, precv_frame);
 			/* save actual management data frame body */
@@ -1405,11 +1379,7 @@ static signed int validate_80211w_mgmt(struct adapter *adapter, union recv_frame
 			/* remove the iv and icv length */
 			pattrib->pkt_len = pattrib->pkt_len - pattrib->iv_len - pattrib->icv_len;
 			kfree(mgmt_DATA);
-<<<<<<< HEAD
 			if (!precv_frame)
-=======
-			if (!precv_frame) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				goto validate_80211w_fail;
 		} else if (IS_MCAST(GetAddr1Ptr(ptr)) &&
 			(subtype == WIFI_DEAUTH || subtype == WIFI_DISASSOC)) {
@@ -1503,10 +1473,7 @@ static signed int validate_recv_frame(struct adapter *adapter, union recv_frame 
 		retval = validate_recv_data_frame(adapter, precv_frame);
 		if (retval == _FAIL) {
 			struct recv_priv *precvpriv = &adapter->recvpriv;
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			precvpriv->rx_drop++;
 		} else if (retval == _SUCCESS) {
 #ifdef DBG_RX_DUMP_EAP
@@ -1680,16 +1647,9 @@ static int check_indicate_seq(struct recv_reorder_ctrl *preorder_ctrl, u16 seq_n
 	/*  Rx Reorder initialize condition. */
 	if (preorder_ctrl->indicate_seq == 0xFFFF)
 		preorder_ctrl->indicate_seq = seq_num;
-<<<<<<< HEAD
 
 	/*  Drop out the packet which SeqNum is smaller than WinStart */
 	if (SN_LESS(seq_num, preorder_ctrl->indicate_seq))
-=======
-	}
-
-	/*  Drop out the packet which SeqNum is smaller than WinStart */
-	if (SN_LESS(seq_num, preorder_ctrl->indicate_seq)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 
 	/*  */
@@ -2116,11 +2076,7 @@ s32 rtw_recv_entry(union recv_frame *precvframe)
 	precvpriv = &padapter->recvpriv;
 
 	ret = recv_func(padapter, precvframe);
-<<<<<<< HEAD
 	if (ret == _FAIL)
-=======
-	if (ret == _FAIL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto _recv_entry_drop;
 
 	precvpriv->rx_pkts++;

@@ -479,13 +479,10 @@ static int __ext4_ext_check(const char *function, unsigned int line,
 		error_msg = "invalid eh_entries";
 		goto corrupted;
 	}
-<<<<<<< HEAD
 	if (unlikely((eh->eh_entries == 0) && (depth > 0))) {
 		error_msg = "eh_entries is 0 but eh_depth is > 0";
 		goto corrupted;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ext4_valid_extent_entries(inode, eh, lblk, &pblk, depth)) {
 		error_msg = "invalid extent entries";
 		goto corrupted;
@@ -6048,12 +6045,7 @@ int ext4_ext_replay_set_iblocks(struct inode *inode)
 					ext4_ext_get_actual_len(ex));
 		ret = skip_hole(inode, &cur);
 		if (ret < 0) {
-<<<<<<< HEAD
 			ext4_free_ext_path(path);
-=======
-			ext4_ext_drop_refs(path);
-			kfree(path);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		}
 		path2 = ext4_find_extent(inode, cur, NULL, 0);

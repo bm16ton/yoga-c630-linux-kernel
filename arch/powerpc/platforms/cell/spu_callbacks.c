@@ -34,15 +34,9 @@
  *	mbind, mq_open, ipc, ...
  */
 
-<<<<<<< HEAD
 static const syscall_fn spu_syscall_table[] = {
 #define __SYSCALL_WITH_COMPAT(nr, entry, compat) __SYSCALL(nr, entry)
 #define __SYSCALL(nr, entry) [nr] = (void *) entry,
-=======
-static void *spu_syscall_table[] = {
-#define __SYSCALL_WITH_COMPAT(nr, entry, compat) __SYSCALL(nr, entry)
-#define __SYSCALL(nr, entry) [nr] = entry,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/syscall_table_spu.h>
 };
 

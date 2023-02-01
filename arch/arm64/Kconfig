@@ -229,10 +229,7 @@ config ARM64
 	select HAVE_ARCH_USERFAULTFD_MINOR if USERFAULTFD
 	select TRACE_IRQFLAGS_SUPPORT
 	select TRACE_IRQFLAGS_NMI_SUPPORT
-<<<<<<< HEAD
 	select HAVE_SOFTIRQ_ON_OWN_STACK
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  ARM 64-bit (AArch64) Linux support.
 
@@ -753,7 +750,6 @@ config ARM64_ERRATUM_2077057
 
 	  If unsure, say Y.
 
-<<<<<<< HEAD
 config ARM64_ERRATUM_2658417
 	bool "Cortex-A510: 2658417: remove BF16 support due to incorrect result"
 	default y
@@ -767,8 +763,6 @@ config ARM64_ERRATUM_2658417
 
 	  If unsure, say Y.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ARM64_ERRATUM_2119858
 	bool "Cortex-A710/X2: 2119858: workaround TRBE overwriting trace data in FILL mode"
 	default y
@@ -2273,9 +2267,3 @@ source "drivers/acpi/Kconfig"
 
 source "arch/arm64/kvm/Kconfig"
 
-<<<<<<< HEAD
-=======
-if CRYPTO
-source "arch/arm64/crypto/Kconfig"
-endif # CRYPTO
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

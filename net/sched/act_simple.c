@@ -88,11 +88,7 @@ static int tcf_simp_init(struct net *net, struct nlattr *nla,
 			 struct tcf_proto *tp, u32 flags,
 			 struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_simp_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, simp_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = flags & TCA_ACT_FLAGS_BIND;
 	struct nlattr *tb[TCA_DEF_MAX + 1];
 	struct tcf_chain *goto_ch = NULL;

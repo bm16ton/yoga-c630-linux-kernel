@@ -411,7 +411,6 @@ static void get_sfc_forced_lock_data(struct intel_engine_cs *engine,
 		break;
 	}
 }
-<<<<<<< HEAD
 
 static int gen11_lock_sfc(struct intel_engine_cs *engine,
 			  u32 *reset_mask,
@@ -428,24 +427,6 @@ static int gen11_lock_sfc(struct intel_engine_cs *engine,
 		if ((BIT(engine->instance) & vdbox_sfc_access) == 0)
 			return 0;
 
-=======
-
-static int gen11_lock_sfc(struct intel_engine_cs *engine,
-			  u32 *reset_mask,
-			  u32 *unlock_mask)
-{
-	struct intel_uncore *uncore = engine->uncore;
-	u8 vdbox_sfc_access = engine->gt->info.vdbox_sfc_access;
-	struct sfc_lock_data sfc_lock;
-	bool lock_obtained, lock_to_other = false;
-	int ret;
-
-	switch (engine->class) {
-	case VIDEO_DECODE_CLASS:
-		if ((BIT(engine->instance) & vdbox_sfc_access) == 0)
-			return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		fallthrough;
 	case VIDEO_ENHANCEMENT_CLASS:
 		get_sfc_forced_lock_data(engine, &sfc_lock);

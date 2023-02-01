@@ -960,10 +960,6 @@ enum emulation_result kvm_mips_emul_wait(struct kvm_vcpu *vcpu)
 		 */
 		if (kvm_arch_vcpu_runnable(vcpu))
 			vcpu->run->exit_reason = KVM_EXIT_IRQ_WINDOW_OPEN;
-<<<<<<< HEAD
-=======
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return EMULATE_DONE;

@@ -161,13 +161,8 @@ struct vc4_vec_variant {
 
 /* General VEC hardware state. */
 struct vc4_vec {
-<<<<<<< HEAD
 	struct vc4_encoder encoder;
 	struct drm_connector connector;
-=======
-	struct platform_device *pdev;
-	const struct vc4_vec_variant *variant;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct platform_device *pdev;
 	const struct vc4_vec_variant *variant;
@@ -185,27 +180,9 @@ struct vc4_vec {
 static inline struct vc4_vec *
 encoder_to_vc4_vec(struct drm_encoder *encoder)
 {
-<<<<<<< HEAD
 	return container_of(encoder, struct vc4_vec, encoder.base);
 }
 
-=======
-	return container_of(encoder, struct vc4_vec_encoder, base.base);
-}
-
-/* VC4 VEC connector KMS struct */
-struct vc4_vec_connector {
-	struct drm_connector base;
-	struct vc4_vec *vec;
-
-	/* Since the connector is attached to just the one encoder,
-	 * this is the reference to it so we can do the best_encoder()
-	 * hook.
-	 */
-	struct drm_encoder *encoder;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum vc4_vec_tv_mode_id {
 	VC4_VEC_TV_MODE_NTSC,
 	VC4_VEC_TV_MODE_NTSC_J,
@@ -503,18 +480,6 @@ static int vc4_vec_late_register(struct drm_encoder *encoder)
 
 static const struct drm_encoder_funcs vc4_vec_encoder_funcs = {
 	.late_register = vc4_vec_late_register,
-};
-
-static const struct vc4_vec_variant bcm2835_vec_variant = {
-	.dac_config = VEC_DAC_CONFIG_DAC_CTRL(0xc) |
-		      VEC_DAC_CONFIG_DRIVER_CTRL(0xc) |
-		      VEC_DAC_CONFIG_LDO_BIAS_CTRL(0x46)
-};
-
-static const struct vc4_vec_variant bcm2711_vec_variant = {
-	.dac_config = VEC_DAC_CONFIG_DAC_CTRL(0x0) |
-		      VEC_DAC_CONFIG_DRIVER_CTRL(0x80) |
-		      VEC_DAC_CONFIG_LDO_BIAS_CTRL(0x61)
 };
 
 static const struct vc4_vec_variant bcm2835_vec_variant = {

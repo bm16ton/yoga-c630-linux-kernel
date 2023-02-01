@@ -349,10 +349,6 @@ int btrfs_del_root_ref(struct btrfs_trans_handle *trans, u64 root_id,
 again:
 	ret = btrfs_search_slot(trans, tree_root, &key, path, -1, 1);
 	if (ret < 0) {
-<<<<<<< HEAD
-=======
-		err = ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out;
 	} else if (ret == 0) {
 		leaf = path->nodes[0];

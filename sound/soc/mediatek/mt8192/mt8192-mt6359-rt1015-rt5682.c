@@ -24,16 +24,12 @@
 #include "mt8192-afe-clk.h"
 #include "mt8192-afe-gpio.h"
 
-<<<<<<< HEAD
 #define DRIVER_NAME "mt8192_mt6359"
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define RT1015_CODEC_DAI	"rt1015-aif"
 #define RT1015_DEV0_NAME	"rt1015.1-0028"
 #define RT1015_DEV1_NAME	"rt1015.1-0029"
 
-<<<<<<< HEAD
 #define RT1015_RT5682_CARD_NAME "mt8192_mt6359_rt1015_rt5682"
 #define RT1015P_RT5682_CARD_NAME "mt8192_mt6359_rt1015p_rt5682"
 #define RT1015P_RT5682S_CARD_NAME "mt8192_mt6359_rt1015p_rt5682s"
@@ -41,17 +37,12 @@
 #define RT1015_RT5682_OF_NAME "mediatek,mt8192_mt6359_rt1015_rt5682"
 #define RT1015P_RT5682_OF_NAME "mediatek,mt8192_mt6359_rt1015p_rt5682"
 #define RT1015P_RT5682S_OF_NAME "mediatek,mt8192_mt6359_rt1015p_rt5682s"
-=======
-#define RT5682_CODEC_DAI	"rt5682-aif1"
-#define RT5682_DEV0_NAME	"rt5682.1-001a"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct mt8192_mt6359_priv {
 	struct snd_soc_jack headset_jack;
 	struct snd_soc_jack hdmi_jack;
 };
 
-<<<<<<< HEAD
 /* Headset jack detection DAPM pins */
 static struct snd_soc_jack_pin mt8192_jack_pins[] = {
 	{
@@ -64,8 +55,6 @@ static struct snd_soc_jack_pin mt8192_jack_pins[] = {
 	},
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int mt8192_rt1015_i2s_hw_params(struct snd_pcm_substream *substream,
 				       struct snd_pcm_hw_params *params)
 {
@@ -101,13 +90,8 @@ static int mt8192_rt1015_i2s_hw_params(struct snd_pcm_substream *substream,
 	return snd_soc_dai_set_sysclk(cpu_dai, 0, mclk_fs, SND_SOC_CLOCK_OUT);
 }
 
-<<<<<<< HEAD
 static int mt8192_rt5682x_i2s_hw_params(struct snd_pcm_substream *substream,
 					struct snd_pcm_hw_params *params)
-=======
-static int mt8192_rt5682_i2s_hw_params(struct snd_pcm_substream *substream,
-				       struct snd_pcm_hw_params *params)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct snd_soc_pcm_runtime *rtd = asoc_substream_to_rtd(substream);
 	struct snd_soc_card *card = rtd->card;
@@ -156,13 +140,8 @@ static const struct snd_soc_ops mt8192_rt1015_i2s_ops = {
 	.hw_params = mt8192_rt1015_i2s_hw_params,
 };
 
-<<<<<<< HEAD
 static const struct snd_soc_ops mt8192_rt5682x_i2s_ops = {
 	.hw_params = mt8192_rt5682x_i2s_hw_params,
-=======
-static const struct snd_soc_ops mt8192_rt5682_i2s_ops = {
-	.hw_params = mt8192_rt5682_i2s_hw_params,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int mt8192_mt6359_mtkaif_calibration(struct snd_soc_pcm_runtime *rtd)
@@ -346,19 +325,15 @@ static int mt8192_mt6359_init(struct snd_soc_pcm_runtime *rtd)
 
 static int mt8192_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 {
-<<<<<<< HEAD
 	struct snd_soc_component *cmpnt_afe =
 		snd_soc_rtdcom_lookup(rtd, AFE_PCM_NAME);
 	struct mtk_base_afe *afe = snd_soc_component_get_drvdata(cmpnt_afe);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct snd_soc_component *cmpnt_codec =
 		asoc_rtd_to_codec(rtd, 0)->component;
 	struct mt8192_mt6359_priv *priv = snd_soc_card_get_drvdata(rtd->card);
 	struct snd_soc_jack *jack = &priv->headset_jack;
 	int ret;
 
-<<<<<<< HEAD
 	ret = mt8192_dai_i2s_set_share(afe, "I2S8", "I2S9");
 	if (ret) {
 		dev_err(rtd->dev, "Failed to set up shared clocks\n");
@@ -371,13 +346,6 @@ static int mt8192_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 				    SND_JACK_BTN_3,
 				    jack, mt8192_jack_pins,
 				    ARRAY_SIZE(mt8192_jack_pins));
-=======
-	ret = snd_soc_card_jack_new(rtd->card, "Headset Jack",
-				    SND_JACK_HEADSET | SND_JACK_BTN_0 |
-				    SND_JACK_BTN_1 | SND_JACK_BTN_2 |
-				    SND_JACK_BTN_3,
-				    jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(rtd->dev, "Headset Jack creation failed: %d\n", ret);
 		return ret;
@@ -399,11 +367,7 @@ static int mt8192_mt6359_hdmi_init(struct snd_soc_pcm_runtime *rtd)
 	int ret;
 
 	ret = snd_soc_card_jack_new(rtd->card, "HDMI Jack", SND_JACK_LINEOUT,
-<<<<<<< HEAD
 				    &priv->hdmi_jack);
-=======
-				    &priv->hdmi_jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(rtd->dev, "HDMI Jack creation failed: %d\n", ret);
 		return ret;
@@ -669,23 +633,9 @@ SND_SOC_DAILINK_DEFS(i2s2,
 		     DAILINK_COMP_ARRAY(COMP_DUMMY()),
 		     DAILINK_COMP_ARRAY(COMP_EMPTY()));
 
-<<<<<<< HEAD
 SND_SOC_DAILINK_DEFS(i2s3,
 		     DAILINK_COMP_ARRAY(COMP_CPU("I2S3")),
 		     DAILINK_COMP_ARRAY(COMP_EMPTY()),
-=======
-SND_SOC_DAILINK_DEFS(i2s3_rt1015,
-		     DAILINK_COMP_ARRAY(COMP_CPU("I2S3")),
-		     DAILINK_COMP_ARRAY(COMP_CODEC(RT1015_DEV0_NAME,
-						   RT1015_CODEC_DAI),
-					COMP_CODEC(RT1015_DEV1_NAME,
-						   RT1015_CODEC_DAI)),
-		     DAILINK_COMP_ARRAY(COMP_EMPTY()));
-
-SND_SOC_DAILINK_DEFS(i2s3_rt1015p,
-		     DAILINK_COMP_ARRAY(COMP_CPU("I2S3")),
-		     DAILINK_COMP_ARRAY(COMP_CODEC("rt1015p", "HiFi")),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		     DAILINK_COMP_ARRAY(COMP_EMPTY()));
 
 SND_SOC_DAILINK_DEFS(i2s5,
@@ -705,22 +655,12 @@ SND_SOC_DAILINK_DEFS(i2s7,
 
 SND_SOC_DAILINK_DEFS(i2s8,
 		     DAILINK_COMP_ARRAY(COMP_CPU("I2S8")),
-<<<<<<< HEAD
 		     DAILINK_COMP_ARRAY(COMP_EMPTY()),
-=======
-		     DAILINK_COMP_ARRAY(COMP_CODEC(RT5682_DEV0_NAME,
-						   RT5682_CODEC_DAI)),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		     DAILINK_COMP_ARRAY(COMP_EMPTY()));
 
 SND_SOC_DAILINK_DEFS(i2s9,
 		     DAILINK_COMP_ARRAY(COMP_CPU("I2S9")),
-<<<<<<< HEAD
 		     DAILINK_COMP_ARRAY(COMP_EMPTY()),
-=======
-		     DAILINK_COMP_ARRAY(COMP_CODEC(RT5682_DEV0_NAME,
-						   RT5682_CODEC_DAI)),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		     DAILINK_COMP_ARRAY(COMP_EMPTY()));
 
 SND_SOC_DAILINK_DEFS(connsys_i2s,
@@ -1008,10 +948,7 @@ static struct snd_soc_dai_link mt8192_mt6359_dai_links[] = {
 		.dpcm_playback = 1,
 		.ignore_suspend = 1,
 		.be_hw_params_fixup = mt8192_i2s_hw_params_fixup,
-<<<<<<< HEAD
 		SND_SOC_DAILINK_REG(i2s3),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.name = "I2S5",
@@ -1045,11 +982,7 @@ static struct snd_soc_dai_link mt8192_mt6359_dai_links[] = {
 		.init = mt8192_rt5682_init,
 		.be_hw_params_fixup = mt8192_i2s_hw_params_fixup,
 		SND_SOC_DAILINK_REG(i2s8),
-<<<<<<< HEAD
 		.ops = &mt8192_rt5682x_i2s_ops,
-=======
-		.ops = &mt8192_rt5682_i2s_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.name = "I2S9",
@@ -1058,11 +991,7 @@ static struct snd_soc_dai_link mt8192_mt6359_dai_links[] = {
 		.ignore_suspend = 1,
 		.be_hw_params_fixup = mt8192_i2s_hw_params_fixup,
 		SND_SOC_DAILINK_REG(i2s9),
-<<<<<<< HEAD
 		.ops = &mt8192_rt5682x_i2s_ops,
-=======
-		.ops = &mt8192_rt5682_i2s_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.name = "CONNSYS_I2S",
@@ -1142,12 +1071,8 @@ static struct snd_soc_codec_conf rt1015_amp_conf[] = {
 };
 
 static struct snd_soc_card mt8192_mt6359_rt1015_rt5682_card = {
-<<<<<<< HEAD
 	.name = RT1015_RT5682_CARD_NAME,
 	.driver_name = DRIVER_NAME,
-=======
-	.name = "mt8192_mt6359_rt1015_rt5682",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.owner = THIS_MODULE,
 	.dai_link = mt8192_mt6359_dai_links,
 	.num_links = ARRAY_SIZE(mt8192_mt6359_dai_links),
@@ -1161,22 +1086,13 @@ static struct snd_soc_card mt8192_mt6359_rt1015_rt5682_card = {
 	.num_configs = ARRAY_SIZE(rt1015_amp_conf),
 };
 
-<<<<<<< HEAD
 static const struct snd_soc_dapm_widget mt8192_mt6359_rt1015p_rt5682x_widgets[] = {
-=======
-static const struct snd_soc_dapm_widget
-mt8192_mt6359_rt1015p_rt5682_widgets[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SND_SOC_DAPM_SPK("Speakers", NULL),
 	SND_SOC_DAPM_HP("Headphone Jack", NULL),
 	SND_SOC_DAPM_MIC("Headset Mic", NULL),
 };
 
-<<<<<<< HEAD
 static const struct snd_soc_dapm_route mt8192_mt6359_rt1015p_rt5682x_routes[] = {
-=======
-static const struct snd_soc_dapm_route mt8192_mt6359_rt1015p_rt5682_routes[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* speaker */
 	{ "Speakers", NULL, "Speaker" },
 	/* headset */
@@ -1185,17 +1101,12 @@ static const struct snd_soc_dapm_route mt8192_mt6359_rt1015p_rt5682_routes[] = {
 	{ "IN1P", NULL, "Headset Mic" },
 };
 
-<<<<<<< HEAD
 static const struct snd_kcontrol_new mt8192_mt6359_rt1015p_rt5682x_controls[] = {
-=======
-static const struct snd_kcontrol_new mt8192_mt6359_rt1015p_rt5682_controls[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SOC_DAPM_PIN_SWITCH("Speakers"),
 	SOC_DAPM_PIN_SWITCH("Headphone Jack"),
 	SOC_DAPM_PIN_SWITCH("Headset Mic"),
 };
 
-<<<<<<< HEAD
 static struct snd_soc_card mt8192_mt6359_rt1015p_rt5682x_card = {
 	.driver_name = DRIVER_NAME,
 	.owner = THIS_MODULE,
@@ -1231,30 +1142,10 @@ static int mt8192_mt6359_dev_probe(struct platform_device *pdev)
 {
 	struct snd_soc_card *card;
 	struct device_node *platform_node, *hdmi_codec, *headset_codec, *speaker_codec;
-=======
-static struct snd_soc_card mt8192_mt6359_rt1015p_rt5682_card = {
-	.name = "mt8192_mt6359_rt1015p_rt5682",
-	.owner = THIS_MODULE,
-	.dai_link = mt8192_mt6359_dai_links,
-	.num_links = ARRAY_SIZE(mt8192_mt6359_dai_links),
-	.controls = mt8192_mt6359_rt1015p_rt5682_controls,
-	.num_controls = ARRAY_SIZE(mt8192_mt6359_rt1015p_rt5682_controls),
-	.dapm_widgets = mt8192_mt6359_rt1015p_rt5682_widgets,
-	.num_dapm_widgets = ARRAY_SIZE(mt8192_mt6359_rt1015p_rt5682_widgets),
-	.dapm_routes = mt8192_mt6359_rt1015p_rt5682_routes,
-	.num_dapm_routes = ARRAY_SIZE(mt8192_mt6359_rt1015p_rt5682_routes),
-};
-
-static int mt8192_mt6359_dev_probe(struct platform_device *pdev)
-{
-	struct snd_soc_card *card;
-	struct device_node *platform_node, *hdmi_codec;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret, i;
 	struct snd_soc_dai_link *dai_link;
 	struct mt8192_mt6359_priv *priv;
 
-<<<<<<< HEAD
 	card = (struct snd_soc_card *)of_device_get_match_data(&pdev->dev);
 	if (!card)
 		return -EINVAL;
@@ -1312,49 +1203,6 @@ static int mt8192_mt6359_dev_probe(struct platform_device *pdev)
 			dev_err_probe(&pdev->dev, ret, "%s set headset_codec fail\n",
 				      dai_link->name);
 			goto err_probe;
-=======
-	platform_node = of_parse_phandle(pdev->dev.of_node,
-					 "mediatek,platform", 0);
-	if (!platform_node) {
-		dev_err(&pdev->dev, "Property 'platform' missing or invalid\n");
-		return -EINVAL;
-	}
-
-	card = (struct snd_soc_card *)of_device_get_match_data(&pdev->dev);
-	if (!card) {
-		ret = -EINVAL;
-		goto put_platform_node;
-	}
-	card->dev = &pdev->dev;
-
-	hdmi_codec = of_parse_phandle(pdev->dev.of_node,
-				      "mediatek,hdmi-codec", 0);
-
-	for_each_card_prelinks(card, i, dai_link) {
-		if (strcmp(dai_link->name, "I2S3") == 0) {
-			if (card == &mt8192_mt6359_rt1015_rt5682_card) {
-				dai_link->ops = &mt8192_rt1015_i2s_ops;
-				dai_link->cpus = i2s3_rt1015_cpus;
-				dai_link->num_cpus =
-					ARRAY_SIZE(i2s3_rt1015_cpus);
-				dai_link->codecs = i2s3_rt1015_codecs;
-				dai_link->num_codecs =
-					ARRAY_SIZE(i2s3_rt1015_codecs);
-				dai_link->platforms = i2s3_rt1015_platforms;
-				dai_link->num_platforms =
-					ARRAY_SIZE(i2s3_rt1015_platforms);
-			} else if (card == &mt8192_mt6359_rt1015p_rt5682_card) {
-				dai_link->cpus = i2s3_rt1015p_cpus;
-				dai_link->num_cpus =
-					ARRAY_SIZE(i2s3_rt1015p_cpus);
-				dai_link->codecs = i2s3_rt1015p_codecs;
-				dai_link->num_codecs =
-					ARRAY_SIZE(i2s3_rt1015p_codecs);
-				dai_link->platforms = i2s3_rt1015p_platforms;
-				dai_link->num_platforms =
-					ARRAY_SIZE(i2s3_rt1015p_platforms);
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (hdmi_codec && strcmp(dai_link->name, "TDM") == 0) {
@@ -1362,12 +1210,9 @@ static int mt8192_mt6359_dev_probe(struct platform_device *pdev)
 			dai_link->ignore = 0;
 		}
 
-<<<<<<< HEAD
 		if (strcmp(dai_link->codecs[0].dai_name, RT1015_CODEC_DAI) == 0)
 			dai_link->ops = &mt8192_rt1015_i2s_ops;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!dai_link->platforms->name)
 			dai_link->platforms->of_node = platform_node;
 	}
@@ -1375,17 +1220,12 @@ static int mt8192_mt6359_dev_probe(struct platform_device *pdev)
 	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv) {
 		ret = -ENOMEM;
-<<<<<<< HEAD
 		goto err_probe;
-=======
-		goto put_hdmi_codec;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	snd_soc_card_set_drvdata(card, priv);
 
 	ret = mt8192_afe_gpio_init(&pdev->dev);
 	if (ret) {
-<<<<<<< HEAD
 		dev_err_probe(&pdev->dev, ret, "%s init gpio error\n", __func__);
 		goto err_probe;
 	}
@@ -1402,25 +1242,12 @@ err_speaker_codec:
 	of_node_put(platform_node);
 err_platform_node:
 	of_node_put(hdmi_codec);
-=======
-		dev_err(&pdev->dev, "init gpio error %d\n", ret);
-		goto put_hdmi_codec;
-	}
-
-	ret = devm_snd_soc_register_card(&pdev->dev, card);
-
-put_hdmi_codec:
-	of_node_put(hdmi_codec);
-put_platform_node:
-	of_node_put(platform_node);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
 #ifdef CONFIG_OF
 static const struct of_device_id mt8192_mt6359_dt_match[] = {
 	{
-<<<<<<< HEAD
 		.compatible = RT1015_RT5682_OF_NAME,
 		.data = &mt8192_mt6359_rt1015_rt5682_card,
 	},
@@ -1431,14 +1258,6 @@ static const struct of_device_id mt8192_mt6359_dt_match[] = {
 	{
 		.compatible = RT1015P_RT5682S_OF_NAME,
 		.data = &mt8192_mt6359_rt1015p_rt5682x_card,
-=======
-		.compatible = "mediatek,mt8192_mt6359_rt1015_rt5682",
-		.data = &mt8192_mt6359_rt1015_rt5682_card,
-	},
-	{
-		.compatible = "mediatek,mt8192_mt6359_rt1015p_rt5682",
-		.data = &mt8192_mt6359_rt1015p_rt5682_card,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{}
 };
@@ -1451,11 +1270,7 @@ static const struct dev_pm_ops mt8192_mt6359_pm_ops = {
 
 static struct platform_driver mt8192_mt6359_driver = {
 	.driver = {
-<<<<<<< HEAD
 		.name = DRIVER_NAME,
-=======
-		.name = "mt8192_mt6359",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_OF
 		.of_match_table = mt8192_mt6359_dt_match,
 #endif

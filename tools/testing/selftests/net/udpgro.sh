@@ -36,11 +36,7 @@ cfg_veth() {
 	ip -netns "${PEER_NS}" addr add dev veth1 192.168.1.1/24
 	ip -netns "${PEER_NS}" addr add dev veth1 2001:db8::1/64 nodad
 	ip -netns "${PEER_NS}" link set dev veth1 up
-<<<<<<< HEAD
 	ip -n "${PEER_NS}" link set veth1 xdp object ${BPF_FILE} section xdp
-=======
-	ip -n "${PEER_NS}" link set veth1 xdp object ../bpf/xdp_dummy.o section xdp
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 run_one() {

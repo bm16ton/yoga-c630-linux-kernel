@@ -828,22 +828,13 @@ static void rxe_qp_do_cleanup(struct work_struct *work)
 
 	if (qp->resp.mr)
 		rxe_put(qp->resp.mr);
-<<<<<<< HEAD
-=======
-
-	if (qp_type(qp) == IB_QPT_RC)
-		sk_dst_reset(qp->sk->sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	free_rd_atomic_resources(qp);
 
 	if (qp->sk) {
-<<<<<<< HEAD
 		if (qp_type(qp) == IB_QPT_RC)
 			sk_dst_reset(qp->sk->sk);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kernel_sock_shutdown(qp->sk, SHUT_RDWR);
 		sock_release(qp->sk);
 	}

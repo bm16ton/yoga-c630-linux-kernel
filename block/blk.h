@@ -119,7 +119,6 @@ static inline bool bvec_gap_to_prev(struct queue_limits *lim,
 		struct bio_vec *bprv, unsigned int offset)
 {
 	if (!lim->virt_boundary_mask)
-<<<<<<< HEAD
 		return false;
 	return __bvec_gap_to_prev(lim, bprv, offset);
 }
@@ -134,22 +133,6 @@ static inline bool rq_mergeable(struct request *rq)
 
 	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
 		return false;
-=======
-		return false;
-	return __bvec_gap_to_prev(lim, bprv, offset);
-}
-
-static inline bool rq_mergeable(struct request *rq)
-{
-	if (blk_rq_is_passthrough(rq))
-		return false;
-
-	if (req_op(rq) == REQ_OP_FLUSH)
-		return false;
-
-	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (req_op(rq) == REQ_OP_ZONE_APPEND)
 		return false;
@@ -453,11 +436,7 @@ static inline struct kmem_cache *blk_get_queue_kmem_cache(bool srcu)
 }
 struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu);
 
-<<<<<<< HEAD
 int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner);
-=======
-int disk_scan_partitions(struct gendisk *disk, fmode_t mode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int disk_alloc_events(struct gendisk *disk);
 void disk_add_events(struct gendisk *disk);

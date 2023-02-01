@@ -35,37 +35,9 @@ struct io_uring_cmd {
 	u8		pdu[32]; /* available inline for free use */
 };
 
-enum io_uring_cmd_flags {
-	IO_URING_F_COMPLETE_DEFER	= 1,
-	IO_URING_F_UNLOCKED		= 2,
-	/* int's last bit, sign checks are usually faster than a bit test */
-	IO_URING_F_NONBLOCK		= INT_MIN,
-
-	/* ctx state flags, for URING_CMD */
-	IO_URING_F_SQE128		= 4,
-	IO_URING_F_CQE32		= 8,
-	IO_URING_F_IOPOLL		= 16,
-
-	/* the request is executed from poll, it should not be freed */
-	IO_URING_F_MULTISHOT		= 32,
-};
-
-struct io_uring_cmd {
-	struct file	*file;
-	const void	*cmd;
-	/* callback to defer completions to task context */
-	void (*task_work_cb)(struct io_uring_cmd *cmd);
-	u32		cmd_op;
-	u32		pad;
-	u8		pdu[32]; /* available inline for free use */
-};
-
 #if defined(CONFIG_IO_URING)
-<<<<<<< HEAD
 int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
 			      struct iov_iter *iter, void *ioucmd);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2);
 void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
 			void (*task_work_cb)(struct io_uring_cmd *));
@@ -93,14 +65,11 @@ static inline void io_uring_free(struct task_struct *tsk)
 		__io_uring_free(tsk);
 }
 #else
-<<<<<<< HEAD
 static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
 			      struct iov_iter *iter, void *ioucmd)
 {
 	return -EOPNOTSUPP;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
 		ssize_t ret2)
 {

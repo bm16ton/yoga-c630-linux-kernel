@@ -20,7 +20,6 @@
 #define ACP_SOFT_RESET                          0x1000
 #define ACP_CONTROL                             0x1004
 
-<<<<<<< HEAD
 #define ACP_EXTERNAL_INTR_REG_ADDR(adata, offset, ctrl) \
 	(adata->acp_base + adata->rsrc->irq_reg_offset + offset + (ctrl * 0x04))
 
@@ -28,13 +27,6 @@
 #define ACP_EXTERNAL_INTR_CNTL(adata, ctrl) ACP_EXTERNAL_INTR_REG_ADDR(adata, 0x4, ctrl)
 #define ACP_EXTERNAL_INTR_STAT(adata, ctrl) ACP_EXTERNAL_INTR_REG_ADDR(adata, \
 	(0x4 + (adata->rsrc->no_of_ctrls * 0x04)), ctrl)
-=======
-#define ACP_EXTERNAL_INTR_ENB                         0x1800
-#define ACP_EXTERNAL_INTR_CNTL                        0x1804
-#define ACP_EXTERNAL_INTR_STAT                        0x1808
-#define ACP_I2S_PIN_CONFIG                            0x1400
-#define ACP_SCRATCH_REG_0                             0x12800
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Registers from ACP_AUDIO_BUFFERS block */
 
@@ -74,7 +66,6 @@
 #define ACP_BT_TX_LINEARPOSITIONCNTR_HIGH             0x2084
 #define ACP_BT_TX_LINEARPOSITIONCNTR_LOW              0x2088
 #define ACP_BT_TX_INTR_WATERMARK_SIZE                 0x208C
-<<<<<<< HEAD
 #define ACP_HS_RX_RINGBUFADDR			      0x3A90
 #define ACP_HS_RX_RINGBUFSIZE			      0x3A94
 #define ACP_HS_RX_LINKPOSITIONCNTR		      0x3A98
@@ -93,8 +84,6 @@
 #define ACP_HS_TX_LINEARPOSITIONCNTR_HIGH	      0x3ACC
 #define ACP_HS_TX_LINEARPOSITIONCNTR_LOW	      0x3AD0
 #define ACP_HS_TX_INTR_WATERMARK_SIZE		      0x3AD4
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define ACP_I2STDM_IER                                0x2400
 #define ACP_I2STDM_IRER                               0x2404
@@ -110,7 +99,6 @@
 #define ACP_BTTDM_ITER                                0x280C
 #define ACP_BTTDM_TXFRMT                              0x2810
 
-<<<<<<< HEAD
 /* Registers from ACP_HS_TDM block */
 #define ACP_HSTDM_IER                                 0x2814
 #define ACP_HSTDM_IRER                                0x2818
@@ -118,8 +106,6 @@
 #define ACP_HSTDM_ITER                                0x2820
 #define ACP_HSTDM_TXFRMT                              0x2824
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Registers from ACP_WOV_PDM block */
 
 #define ACP_WOV_PDM_ENABLE                            0x2C04
@@ -140,10 +126,7 @@
 #define ACP_PDM_VAD_DYNAMIC_CLK_GATING_EN             0x2C64
 #define ACP_WOV_ERROR_STATUS_REGISTER                 0x2C68
 
-<<<<<<< HEAD
 #define ACP_I2STDM0_MSTRCLKGEN			      0x2414
 #define ACP_I2STDM1_MSTRCLKGEN			      0x2418
 #define ACP_I2STDM2_MSTRCLKGEN			      0x241C
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

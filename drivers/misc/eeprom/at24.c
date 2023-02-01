@@ -801,11 +801,6 @@ static void at24_remove(struct i2c_client *client)
 			regulator_disable(at24->vcc_reg);
 		pm_runtime_set_suspended(&client->dev);
 	}
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused at24_suspend(struct device *dev)

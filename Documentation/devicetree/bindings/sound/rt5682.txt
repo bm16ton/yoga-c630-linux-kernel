@@ -46,11 +46,7 @@ Optional properties:
 
 - realtek,dmic-clk-driving-high : Set the high driving of the DMIC clock out.
 
-<<<<<<< HEAD
 - #sound-dai-cells: Should be set to '<1>'.
-=======
-- #sound-dai-cells: Should be set to '<0>'.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Pins on the device (for linking into audio routes) for RT5682:
 

@@ -358,13 +358,8 @@ static int stm32_qspi_get_mode(u8 buswidth)
 
 static int stm32_qspi_send(struct spi_device *spi, const struct spi_mem_op *op)
 {
-<<<<<<< HEAD
 	struct stm32_qspi *qspi = spi_controller_get_devdata(spi->master);
 	struct stm32_qspi_flash *flash = &qspi->flash[spi->chip_select];
-=======
-	struct stm32_qspi *qspi = spi_controller_get_devdata(mem->spi->master);
-	struct stm32_qspi_flash *flash = &qspi->flash[mem->spi->chip_select];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 ccr, cr;
 	int timeout, err = 0, err_poll_status = 0;
 
@@ -471,11 +466,7 @@ static int stm32_qspi_poll_status(struct spi_mem *mem, const struct spi_mem_op *
 	qspi->fmode = CCR_FMODE_APM;
 	qspi->status_timeout = timeout_ms;
 
-<<<<<<< HEAD
 	ret = stm32_qspi_send(mem->spi, op);
-=======
-	ret = stm32_qspi_send(mem, op);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&qspi->lock);
 
 	pm_runtime_mark_last_busy(qspi->dev);
@@ -499,7 +490,6 @@ static int stm32_qspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 	else
 		qspi->fmode = CCR_FMODE_INDW;
 
-<<<<<<< HEAD
 	ret = stm32_qspi_send(mem->spi, op);
 	mutex_unlock(&qspi->lock);
 
@@ -557,9 +547,6 @@ static ssize_t stm32_qspi_dirmap_read(struct spi_mem_dirmap_desc *desc,
 		qspi->fmode = CCR_FMODE_INDR;
 
 	ret = stm32_qspi_send(desc->mem->spi, &op);
-=======
-	ret = stm32_qspi_send(mem, op);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&qspi->lock);
 
 	pm_runtime_mark_last_busy(qspi->dev);
@@ -652,62 +639,6 @@ end_of_transfer:
 	return ret;
 }
 
-static int stm32_qspi_dirmap_create(struct spi_mem_dirmap_desc *desc)
-{
-	struct stm32_qspi *qspi = spi_controller_get_devdata(desc->mem->spi->master);
-
-	if (desc->info.op_tmpl.data.dir == SPI_MEM_DATA_OUT)
-		return -EOPNOTSUPP;
-
-	/* should never happen, as mm_base == null is an error probe exit condition */
-	if (!qspi->mm_base && desc->info.op_tmpl.data.dir == SPI_MEM_DATA_IN)
-		return -EOPNOTSUPP;
-
-	if (!qspi->mm_size)
-		return -EOPNOTSUPP;
-
-	return 0;
-}
-
-static ssize_t stm32_qspi_dirmap_read(struct spi_mem_dirmap_desc *desc,
-				      u64 offs, size_t len, void *buf)
-{
-	struct stm32_qspi *qspi = spi_controller_get_devdata(desc->mem->spi->master);
-	struct spi_mem_op op;
-	u32 addr_max;
-	int ret;
-
-	ret = pm_runtime_resume_and_get(qspi->dev);
-	if (ret < 0)
-		return ret;
-
-	mutex_lock(&qspi->lock);
-	/* make a local copy of desc op_tmpl and complete dirmap rdesc
-	 * spi_mem_op template with offs, len and *buf in  order to get
-	 * all needed transfer information into struct spi_mem_op
-	 */
-	memcpy(&op, &desc->info.op_tmpl, sizeof(struct spi_mem_op));
-	dev_dbg(qspi->dev, "%s len = 0x%zx offs = 0x%llx buf = 0x%p\n", __func__, len, offs, buf);
-
-	op.data.nbytes = len;
-	op.addr.val = desc->info.offset + offs;
-	op.data.buf.in = buf;
-
-	addr_max = op.addr.val + op.data.nbytes + 1;
-	if (addr_max < qspi->mm_size && op.addr.buswidth)
-		qspi->fmode = CCR_FMODE_MM;
-	else
-		qspi->fmode = CCR_FMODE_INDR;
-
-	ret = stm32_qspi_send(desc->mem, &op);
-	mutex_unlock(&qspi->lock);
-
-	pm_runtime_mark_last_busy(qspi->dev);
-	pm_runtime_put_autosuspend(qspi->dev);
-
-	return ret ?: len;
-}
-
 static int stm32_qspi_setup(struct spi_device *spi)
 {
 	struct spi_controller *ctrl = spi->master;
@@ -722,7 +653,6 @@ static int stm32_qspi_setup(struct spi_device *spi)
 	if (!spi->max_speed_hz)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	mode = spi->mode & (SPI_TX_OCTAL | SPI_RX_OCTAL);
 	if ((mode == SPI_TX_OCTAL || mode == SPI_RX_OCTAL) ||
 	    ((mode == (SPI_TX_OCTAL | SPI_RX_OCTAL)) &&
@@ -732,11 +662,6 @@ static int stm32_qspi_setup(struct spi_device *spi)
 
 		return -EINVAL;
 	}
-=======
-	ret = pm_runtime_resume_and_get(qspi->dev);
-	if (ret < 0)
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = pm_runtime_resume_and_get(qspi->dev);
 	if (ret < 0)
@@ -750,7 +675,6 @@ static int stm32_qspi_setup(struct spi_device *spi)
 
 	mutex_lock(&qspi->lock);
 	qspi->cr_reg = CR_APMS | 3 << CR_FTHRES_SHIFT | CR_SSHIFT | CR_EN;
-<<<<<<< HEAD
 
 	/*
 	 * Dual flash mode is only enable in case SPI_TX_OCTAL and SPI_TX_OCTAL
@@ -761,8 +685,6 @@ static int stm32_qspi_setup(struct spi_device *spi)
 		dev_dbg(qspi->dev, "Dual flash mode enable");
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	writel_relaxed(qspi->cr_reg, qspi->io_base + QSPI_CR);
 
 	/* set dcr fsize to max address */

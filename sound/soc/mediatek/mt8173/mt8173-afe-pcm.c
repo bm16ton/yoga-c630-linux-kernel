@@ -1175,7 +1175,6 @@ static int mt8173_afe_pcm_dev_probe(struct platform_device *pdev)
 	if (ret)
 		goto err_cleanup_components;
 
-<<<<<<< HEAD
 	irq_id = platform_get_irq(pdev, 0);
 	if (irq_id <= 0)
 		return irq_id < 0 ? irq_id : -ENXIO;
@@ -1186,8 +1185,6 @@ static int mt8173_afe_pcm_dev_probe(struct platform_device *pdev)
 		goto err_pm_disable;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev_info(&pdev->dev, "MT8173 AFE driver initialized.\n");
 	return 0;
 

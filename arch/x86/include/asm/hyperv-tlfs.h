@@ -138,12 +138,9 @@
 #define HV_X64_NESTED_GUEST_MAPPING_FLUSH		BIT(18)
 #define HV_X64_NESTED_MSR_BITMAP			BIT(19)
 
-<<<<<<< HEAD
 /* Nested features #2. These are HYPERV_CPUID_NESTED_FEATURES.EBX bits. */
 #define HV_X64_NESTED_EVMCS1_PERF_GLOBAL_CTRL		BIT(0)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * This is specific to AMD and specifies that enlightened TLB flush is
  * supported. If guest opts in to this feature, ASID invalidations only

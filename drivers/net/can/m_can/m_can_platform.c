@@ -140,13 +140,6 @@ static int m_can_plat_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, mcan_class);
 
-<<<<<<< HEAD
-=======
-	ret = m_can_init_ram(mcan_class);
-	if (ret)
-		goto probe_fail;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pm_runtime_enable(mcan_class->dev);
 	ret = m_can_class_register(mcan_class);
 	if (ret)

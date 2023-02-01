@@ -34,22 +34,10 @@
 	/delete-node/ charger-thermistor@0;
 };
 
-<<<<<<< HEAD
 &usb_hub_2_x {
 	 vdd-supply = <&pp3300_l7c>;
 };
 
 &usb_hub_3_x {
 	 vdd-supply = <&pp3300_l7c>;
-=======
-&pp3300_hub {
-	/* pp3300_l7c is used to power the USB hub */
-	/delete-property/regulator-always-on;
-	/delete-property/regulator-boot-on;
-};
-
-&pp3300_l7c {
-	regulator-always-on;
-	regulator-boot-on;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

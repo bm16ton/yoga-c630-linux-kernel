@@ -64,10 +64,7 @@
 #include <asm/insn-eval.h>
 #include <asm/vdso.h>
 #include <asm/tdx.h>
-<<<<<<< HEAD
 #include <asm/cfi.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_X86_64
 #include <asm/x86_init.h>

@@ -297,20 +297,6 @@ static void mv88e6060_remove(struct mdio_device *mdiodev)
 		return;
 
 	dsa_unregister_switch(ds);
-
-	dev_set_drvdata(&mdiodev->dev, NULL);
-}
-
-static void mv88e6060_shutdown(struct mdio_device *mdiodev)
-{
-	struct dsa_switch *ds = dev_get_drvdata(&mdiodev->dev);
-
-	if (!ds)
-		return;
-
-	dsa_switch_shutdown(ds);
-
-	dev_set_drvdata(&mdiodev->dev, NULL);
 }
 
 static void mv88e6060_shutdown(struct mdio_device *mdiodev)

@@ -132,7 +132,6 @@ static int adsp_default_clk_init(struct snd_sof_dev *sdev, bool enable)
 			return ret;
 		}
 
-<<<<<<< HEAD
 		ret = clk_set_parent(priv->clk[CLK_TOP_AUDIO_H],
 				     priv->clk[CLK_TOP_CLK26M]);
 		if (ret) {
@@ -140,8 +139,6 @@ static int adsp_default_clk_init(struct snd_sof_dev *sdev, bool enable)
 			return ret;
 		}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = adsp_enable_all_clock(sdev);
 		if (ret) {
 			dev_err(dev, "failed to adsp_enable_clock: %d\n", ret);

@@ -103,12 +103,8 @@ structure to represent a mediated device's driver::
      struct mdev_driver {
 	     int  (*probe)  (struct mdev_device *dev);
 	     void (*remove) (struct mdev_device *dev);
-<<<<<<< HEAD
 	     unsigned int (*get_available)(struct mdev_type *mtype);
 	     ssize_t (*show_description)(struct mdev_type *mtype, char *buf);
-=======
-	     struct attribute_group **supported_type_groups;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	     struct device_driver    driver;
      };
 
@@ -130,13 +126,8 @@ vfio_device_ops.
 When a driver wants to add the GUID creation sysfs to an existing device it has
 probe'd to then it should call::
 
-<<<<<<< HEAD
     int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
 			struct mdev_driver *mdev_driver);
-=======
-    int mdev_register_device(struct device *dev,
-                             struct mdev_driver *mdev_driver);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 This will provide the 'mdev_supported_types/XX/create' files which can then be
 used to trigger the creation of a mdev_device. The created mdev_device will be
@@ -144,11 +135,7 @@ attached to the specified driver.
 
 When the driver needs to remove itself it calls::
 
-<<<<<<< HEAD
     void mdev_unregister_parent(struct mdev_parent *parent);
-=======
-    void mdev_unregister_device(struct device *dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Which will unbind and destroy all the created mdevs and remove the sysfs files.
 

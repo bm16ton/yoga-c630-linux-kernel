@@ -174,17 +174,10 @@ struct bss_ht {
 	u16 bd_ht_cap_len;
 	u8 bd_ht_info_buf[32];
 	u16 bd_ht_info_len;
-<<<<<<< HEAD
 
 	enum ht_spec_ver bd_ht_spec_ver;
 	enum ht_channel_width bd_bandwidth;
 
-=======
-
-	enum ht_spec_ver bd_ht_spec_ver;
-	enum ht_channel_width bd_bandwidth;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 bd_rt2rt_aggregation;
 	u8 bd_rt2rt_long_slot_time;
 	u8 rt2rt_ht_mode;

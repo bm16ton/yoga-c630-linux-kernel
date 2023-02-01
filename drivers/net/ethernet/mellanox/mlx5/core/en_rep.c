@@ -56,10 +56,7 @@
 #include "en_accel/ipsec.h"
 #include "en/tc/int_port.h"
 #include "en/ptp.h"
-<<<<<<< HEAD
 #include "en/fs_ethtool.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define MLX5E_REP_PARAMS_DEF_LOG_SQ_SIZE \
 	max(0x7, MLX5E_PARAMS_MINIMUM_LOG_SQ_SIZE)
@@ -796,34 +793,20 @@ static int mlx5e_create_rep_ttc_table(struct mlx5e_priv *priv)
 	struct ttc_params ttc_params = {};
 	int err;
 
-<<<<<<< HEAD
 	mlx5e_fs_set_ns(priv->fs,
 			mlx5_get_flow_namespace(priv->mdev,
 						MLX5_FLOW_NAMESPACE_KERNEL), false);
 
 	/* The inner_ttc in the ttc params is intentionally not set */
 	mlx5e_set_ttc_params(priv->fs, priv->rx_res, &ttc_params, false);
-=======
-	priv->fs->ns = mlx5_get_flow_namespace(priv->mdev,
-					       MLX5_FLOW_NAMESPACE_KERNEL);
-
-	/* The inner_ttc in the ttc params is intentionally not set */
-	mlx5e_set_ttc_params(priv, &ttc_params, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (rep->vport != MLX5_VPORT_UPLINK)
 		/* To give uplik rep TTC a lower level for chaining from root ft */
 		ttc_params.ft_attr.level = MLX5E_TTC_FT_LEVEL + 1;
 
-<<<<<<< HEAD
 	mlx5e_fs_set_ttc(priv->fs, mlx5_create_ttc_table(priv->mdev, &ttc_params), false);
 	if (IS_ERR(mlx5e_fs_get_ttc(priv->fs, false))) {
 		err = PTR_ERR(mlx5e_fs_get_ttc(priv->fs, false));
-=======
-	priv->fs->ttc = mlx5_create_ttc_table(priv->mdev, &ttc_params);
-	if (IS_ERR(priv->fs->ttc)) {
-		err = PTR_ERR(priv->fs->ttc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		netdev_err(priv->netdev, "Failed to create rep ttc table, err=%d\n",
 			   err);
 		return err;
@@ -843,11 +826,7 @@ static int mlx5e_create_rep_root_ft(struct mlx5e_priv *priv)
 		/* non uplik reps will skip any bypass tables and go directly to
 		 * their own ttc
 		 */
-<<<<<<< HEAD
 		rpriv->root_ft = mlx5_get_ttc_flow_table(mlx5e_fs_get_ttc(priv->fs, false));
-=======
-		rpriv->root_ft = mlx5_get_ttc_flow_table(priv->fs->ttc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 
@@ -962,11 +941,7 @@ static int mlx5e_init_rep_rx(struct mlx5e_priv *priv)
 err_destroy_root_ft:
 	mlx5e_destroy_rep_root_ft(priv);
 err_destroy_ttc_table:
-<<<<<<< HEAD
 	mlx5_destroy_ttc_table(mlx5e_fs_get_ttc(priv->fs, false));
-=======
-	mlx5_destroy_ttc_table(priv->fs->ttc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_destroy_rx_res:
 	mlx5e_rx_res_destroy(priv->rx_res);
 err_close_drop_rq:
@@ -983,11 +958,7 @@ static void mlx5e_cleanup_rep_rx(struct mlx5e_priv *priv)
 	mlx5e_ethtool_cleanup_steering(priv->fs);
 	rep_vport_rx_rule_destroy(priv);
 	mlx5e_destroy_rep_root_ft(priv);
-<<<<<<< HEAD
 	mlx5_destroy_ttc_table(mlx5e_fs_get_ttc(priv->fs, false));
-=======
-	mlx5_destroy_ttc_table(priv->fs->ttc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mlx5e_rx_res_destroy(priv->rx_res);
 	mlx5e_close_drop_rq(&priv->drop_rq);
 	mlx5e_rx_res_free(priv->rx_res);
@@ -1272,11 +1243,6 @@ static const struct mlx5e_profile mlx5e_uplink_rep_profile = {
 	.update_carrier	        = mlx5e_update_carrier,
 	.rx_handlers            = &mlx5e_rx_handlers_rep,
 	.max_tc			= MLX5E_MAX_NUM_TC,
-<<<<<<< HEAD
-=======
-	/* XSK is needed so we can replace profile with NIC netdev */
-	.rq_groups		= MLX5E_NUM_RQ_GROUPS(XSK),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.stats_grps		= mlx5e_ul_rep_stats_grps,
 	.stats_grps_num		= mlx5e_ul_rep_stats_grps_num,
 };

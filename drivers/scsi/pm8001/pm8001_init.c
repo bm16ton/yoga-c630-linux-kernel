@@ -81,11 +81,7 @@ LIST_HEAD(hba_list);
 
 struct workqueue_struct *pm8001_wq;
 
-<<<<<<< HEAD
 static void pm8001_map_queues(struct Scsi_Host *shost)
-=======
-static int pm8001_map_queues(struct Scsi_Host *shost)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sas_ha_struct *sha = SHOST_TO_SAS_HA(shost);
 	struct pm8001_hba_info *pm8001_ha = sha->lldd_ha;

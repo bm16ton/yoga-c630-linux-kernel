@@ -1566,15 +1566,9 @@ static int invalidate_extent_cache(struct btrfs_root *root,
 		}
 
 		/* the lock_extent waits for read_folio to complete */
-<<<<<<< HEAD
 		lock_extent(&BTRFS_I(inode)->io_tree, start, end, NULL);
 		btrfs_drop_extent_map_range(BTRFS_I(inode), start, end, true);
 		unlock_extent(&BTRFS_I(inode)->io_tree, start, end, NULL);
-=======
-		lock_extent(&BTRFS_I(inode)->io_tree, start, end);
-		btrfs_drop_extent_cache(BTRFS_I(inode), start, end, 1);
-		unlock_extent(&BTRFS_I(inode)->io_tree, start, end);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return 0;
 }
@@ -3004,11 +2998,7 @@ static int relocate_one_page(struct inode *inode, struct file_ra_state *ra,
 			goto release_page;
 
 		/* Mark the range delalloc and dirty for later writeback */
-<<<<<<< HEAD
 		lock_extent(&BTRFS_I(inode)->io_tree, clamped_start, clamped_end, NULL);
-=======
-		lock_extent(&BTRFS_I(inode)->io_tree, clamped_start, clamped_end);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = btrfs_set_extent_delalloc(BTRFS_I(inode), clamped_start,
 						clamped_end, 0, NULL);
 		if (ret) {
@@ -3041,11 +3031,7 @@ static int relocate_one_page(struct inode *inode, struct file_ra_state *ra,
 					boundary_start, boundary_end,
 					EXTENT_BOUNDARY);
 		}
-<<<<<<< HEAD
 		unlock_extent(&BTRFS_I(inode)->io_tree, clamped_start, clamped_end, NULL);
-=======
-		unlock_extent(&BTRFS_I(inode)->io_tree, clamped_start, clamped_end);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		btrfs_delalloc_release_extents(BTRFS_I(inode), clamped_len);
 		cur += clamped_len;
 
@@ -4345,11 +4331,7 @@ int btrfs_reloc_clone_csums(struct btrfs_inode *inode, u64 file_pos, u64 len)
 	disk_bytenr = file_pos + inode->index_cnt;
 	csum_root = btrfs_csum_root(fs_info, disk_bytenr);
 	ret = btrfs_lookup_csums_range(csum_root, disk_bytenr,
-<<<<<<< HEAD
 				       disk_bytenr + len - 1, &list, 0, false);
-=======
-				       disk_bytenr + len - 1, &list, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto out;
 

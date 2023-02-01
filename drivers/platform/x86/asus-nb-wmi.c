@@ -43,11 +43,7 @@ MODULE_PARM_DESC(wapf, "WAPF value");
 
 static int tablet_mode_sw = -1;
 module_param(tablet_mode_sw, uint, 0444);
-<<<<<<< HEAD
 MODULE_PARM_DESC(tablet_mode_sw, "Tablet mode detect: -1:auto 0:disable 1:kbd-dock 2:lid-flip 3:lid-flip-rog");
-=======
-MODULE_PARM_DESC(tablet_mode_sw, "Tablet mode detect: -1:auto 0:disable 1:kbd-dock 2:lid-flip");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct quirk_entry *quirks;
 
@@ -459,7 +455,6 @@ static const struct dmi_system_id asus_quirks[] = {
 		},
 		.driver_data = &quirk_asus_use_lid_flip_devid,
 	},
-<<<<<<< HEAD
 	{
 		.callback = dmi_matched,
 		.ident = "ASUS ROG FLOW X13",
@@ -478,8 +473,6 @@ static const struct dmi_system_id asus_quirks[] = {
 		},
 		.driver_data = &quirk_asus_tablet_mode,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{},
 };
 
@@ -499,25 +492,8 @@ static void asus_nb_wmi_quirks(struct asus_wmi_driver *driver)
 	else
 		wapf = quirks->wapf;
 
-<<<<<<< HEAD
 	if (tablet_mode_sw != -1)
 		quirks->tablet_switch_mode = tablet_mode_sw;
-=======
-	switch (tablet_mode_sw) {
-	case 0:
-		quirks->use_kbd_dock_devid = false;
-		quirks->use_lid_flip_devid = false;
-		break;
-	case 1:
-		quirks->use_kbd_dock_devid = true;
-		quirks->use_lid_flip_devid = false;
-		break;
-	case 2:
-		quirks->use_kbd_dock_devid = false;
-		quirks->use_lid_flip_devid = true;
-		break;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (quirks->i8042_filter) {
 		ret = i8042_install_filter(quirks->i8042_filter);
@@ -589,10 +565,7 @@ static const struct key_entry asus_nb_wmi_keymap[] = {
 	{ KE_KEY, 0xA5, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + TV + HDMI */
 	{ KE_KEY, 0xA6, { KEY_SWITCHVIDEOMODE } }, /* SDSP CRT + TV + HDMI */
 	{ KE_KEY, 0xA7, { KEY_SWITCHVIDEOMODE } }, /* SDSP LCD + CRT + TV + HDMI */
-<<<<<<< HEAD
 	{ KE_KEY, 0xAE, { KEY_FN_F5 } }, /* Fn+F5 fan mode on 2020+ */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ KE_KEY, 0xB3, { KEY_PROG4 } }, /* AURA */
 	{ KE_KEY, 0xB5, { KEY_CALC } },
 	{ KE_KEY, 0xC4, { KEY_KBDILLUMUP } },

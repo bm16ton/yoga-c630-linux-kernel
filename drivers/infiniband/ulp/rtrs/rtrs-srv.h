@@ -91,14 +91,11 @@ struct rtrs_srv_path {
 	struct rtrs_srv_stats	*stats;
 };
 
-<<<<<<< HEAD
 static inline struct rtrs_srv_path *to_srv_path(struct rtrs_path *s)
 {
 	return container_of(s, struct rtrs_srv_path, s);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct rtrs_srv_sess {
 	struct list_head	paths_list;
 	int			paths_up;

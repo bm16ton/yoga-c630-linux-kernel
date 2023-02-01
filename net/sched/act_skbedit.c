@@ -117,11 +117,7 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
 			    struct tcf_proto *tp, u32 act_flags,
 			    struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_skbedit_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, skbedit_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = act_flags & TCA_ACT_FLAGS_BIND;
 	struct tcf_skbedit_params *params_new;
 	struct nlattr *tb[TCA_SKBEDIT_MAX + 1];
@@ -415,10 +411,6 @@ static struct tc_action_ops act_skbedit_ops = {
 	.init		=	tcf_skbedit_init,
 	.cleanup	=	tcf_skbedit_cleanup,
 	.get_fill_size	=	tcf_skbedit_get_fill_size,
-<<<<<<< HEAD
-=======
-	.lookup		=	tcf_skbedit_search,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.offload_act_setup =	tcf_skbedit_offload_act_setup,
 	.size		=	sizeof(struct tcf_skbedit),
 };

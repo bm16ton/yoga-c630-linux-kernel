@@ -978,7 +978,6 @@ static int vc5_probe(struct i2c_client *client)
 	} else if (ret != -EINVAL) {
 		return dev_err_probe(&client->dev, ret,
 				     "could not read idt,shutdown\n");
-<<<<<<< HEAD
 	}
 
 	ret = of_property_read_u32(client->dev.of_node,
@@ -996,22 +995,6 @@ static int vc5_probe(struct i2c_client *client)
 				 src_val);
 	if (ret)
 		return ret;
-=======
-	}
-
-	ret = of_property_read_u32(client->dev.of_node,
-				   "idt,output-enable-active", &oe);
-	if (!ret) {
-		src_mask |= VC5_PRIM_SRC_SHDN_SP;
-		if (oe)
-			src_val |= VC5_PRIM_SRC_SHDN_SP;
-	} else if (ret != -EINVAL) {
-		return dev_err_probe(&client->dev, ret,
-				     "could not read idt,output-enable-active\n");
-	}
-
-	regmap_update_bits(vc5->regmap, VC5_PRIM_SRC_SHDN, src_mask, src_val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Register clock input mux */
 	memset(&init, 0, sizeof(init));

@@ -15,12 +15,7 @@
 #include <drm/drm_fb_dma_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
-#include <drm/drm_plane_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "rcar_du_drv.h"
 #include "rcar_du_group.h"
@@ -533,10 +528,6 @@ static void rcar_du_plane_setup_format_gen3(struct rcar_du_group *rgrp,
 	 * register to 0 to avoid this.
 	 */
 
-<<<<<<< HEAD
-=======
-	/* TODO: Check if alpha-blending should be disabled in PnMR. */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rcar_du_plane_write(rgrp, index, PnALPHAR, 0);
 }
 

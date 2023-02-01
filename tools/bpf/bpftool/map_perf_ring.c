@@ -188,12 +188,7 @@ int do_event_pipe(int argc, char **argv)
 	opts.map_keys = &ctx.idx;
 	pb = perf_buffer__new_raw(map_fd, MMAP_PAGE_CNT, &perf_attr,
 				  print_bpf_output, &ctx, &opts);
-<<<<<<< HEAD
 	if (!pb) {
-=======
-	err = libbpf_get_error(pb);
-	if (err) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		p_err("failed to create perf buffer: %s (%d)",
 		      strerror(errno), errno);
 		goto err_close_map;

@@ -933,30 +933,9 @@ void tcp_remove_empty_skb(struct sock *sk)
 		if (tcp_write_queue_empty(sk))
 			tcp_chrono_stop(sk, TCP_CHRONO_BUSY);
 		tcp_wmem_free_skb(sk, skb);
-<<<<<<< HEAD
 	}
 }
 
-/* skb changing from pure zc to mixed, must charge zc */
-static int tcp_downgrade_zcopy_pure(struct sock *sk, struct sk_buff *skb)
-{
-	if (unlikely(skb_zcopy_pure(skb))) {
-		u32 extra = skb->truesize -
-			    SKB_TRUESIZE(skb_end_offset(skb));
-
-		if (!sk_wmem_schedule(sk, extra))
-			return -ENOMEM;
-
-		sk_mem_charge(sk, extra);
-		skb_shinfo(skb)->flags &= ~SKBFL_PURE_ZEROCOPY;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-	return 0;
-}
-
-<<<<<<< HEAD
-=======
 /* skb changing from pure zc to mixed, must charge zc */
 static int tcp_downgrade_zcopy_pure(struct sock *sk, struct sk_buff *skb)
 {
@@ -973,7 +952,6 @@ static int tcp_downgrade_zcopy_pure(struct sock *sk, struct sk_buff *skb)
 	return 0;
 }
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int tcp_wmem_schedule(struct sock *sk, int copy)
 {
@@ -1261,11 +1239,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
 			}
 			zc = sk->sk_route_caps & NETIF_F_SG;
 			if (!zc)
-<<<<<<< HEAD
 				uarg_to_msgzc(uarg)->zerocopy = 0;
-=======
-				uarg->zerocopy = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -1787,7 +1761,6 @@ int tcp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
 	if (sk->sk_state == TCP_LISTEN)
 		return -ENOTCONN;
 
-<<<<<<< HEAD
 	while ((skb = tcp_recv_skb(sk, seq, &offset)) != NULL) {
 		u8 tcp_flags;
 		int used;
@@ -1810,21 +1783,6 @@ int tcp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
 			break;
 		}
 	}
-=======
-	skb = tcp_recv_skb(sk, seq, &offset);
-	if (!skb)
-		return 0;
-
-	__skb_unlink(skb, &sk->sk_receive_queue);
-	WARN_ON(!skb_set_owner_sk_safe(skb, sk));
-	copied = recv_actor(sk, skb);
-	if (copied >= 0) {
-		seq += copied;
-		if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
-			++seq;
-	}
-	consume_skb(skb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	WRITE_ONCE(tp->copied_seq, seq);
 
 	tcp_rcv_space_adjust(sk);
@@ -4798,15 +4756,12 @@ void __init tcp_init(void)
 				  SLAB_HWCACHE_ALIGN | SLAB_PANIC |
 				  SLAB_ACCOUNT,
 				  NULL);
-<<<<<<< HEAD
 	tcp_hashinfo.bind2_bucket_cachep =
 		kmem_cache_create("tcp_bind2_bucket",
 				  sizeof(struct inet_bind2_bucket), 0,
 				  SLAB_HWCACHE_ALIGN | SLAB_PANIC |
 				  SLAB_ACCOUNT,
 				  NULL);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Size and allocate the main established and bind bucket
 	 * hash tables.

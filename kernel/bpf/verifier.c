@@ -459,16 +459,9 @@ static bool reg_may_point_to_spin_lock(const struct bpf_reg_state *reg)
 
 static bool reg_type_may_be_refcounted_or_null(enum bpf_reg_type type)
 {
-<<<<<<< HEAD
 	type = base_type(type);
 	return type == PTR_TO_SOCKET || type == PTR_TO_TCP_SOCK ||
 		type == PTR_TO_MEM || type == PTR_TO_BTF_ID;
-=======
-	return base_type(type) == PTR_TO_SOCKET ||
-		base_type(type) == PTR_TO_TCP_SOCK ||
-		base_type(type) == PTR_TO_MEM ||
-		base_type(type) == PTR_TO_BTF_ID;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool type_is_rdonly_mem(u32 type)
@@ -570,10 +563,7 @@ static const char *reg_type_str(struct bpf_verifier_env *env,
 		[PTR_TO_BUF]		= "buf",
 		[PTR_TO_FUNC]		= "func",
 		[PTR_TO_MAP_KEY]	= "map_key",
-<<<<<<< HEAD
 		[PTR_TO_DYNPTR]		= "dynptr_ptr",
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	if (type & PTR_MAYBE_NULL) {
@@ -792,13 +782,8 @@ static bool is_dynptr_reg_valid_uninit(struct bpf_verifier_env *env, struct bpf_
 	return true;
 }
 
-<<<<<<< HEAD
 bool is_dynptr_reg_valid_init(struct bpf_verifier_env *env,
 			      struct bpf_reg_state *reg)
-=======
-static bool is_dynptr_reg_valid_init(struct bpf_verifier_env *env, struct bpf_reg_state *reg,
-				     enum bpf_arg_type arg_type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct bpf_func_state *state = func(env, reg);
 	int spi = get_spi(reg->off);
@@ -814,7 +799,6 @@ static bool is_dynptr_reg_valid_init(struct bpf_verifier_env *env, struct bpf_re
 			return false;
 	}
 
-<<<<<<< HEAD
 	return true;
 }
 
@@ -826,19 +810,13 @@ bool is_dynptr_type_expected(struct bpf_verifier_env *env,
 	enum bpf_dynptr_type dynptr_type;
 	int spi = get_spi(reg->off);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* ARG_PTR_TO_DYNPTR takes any type of dynptr */
 	if (arg_type == ARG_PTR_TO_DYNPTR)
 		return true;
 
-<<<<<<< HEAD
 	dynptr_type = arg_to_dynptr_type(arg_type);
 
 	return state->stack[spi].spilled_ptr.dynptr.type == dynptr_type;
-=======
-	return state->stack[spi].spilled_ptr.dynptr.type == arg_to_dynptr_type(arg_type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* The reg state of a pointer or a bounded scalar was saved when
@@ -998,7 +976,6 @@ static inline u32 vlog_alignment(u32 pos)
 {
 	return round_up(max(pos + BPF_LOG_MIN_ALIGNMENT / 2, BPF_LOG_ALIGNMENT),
 			BPF_LOG_MIN_ALIGNMENT) - pos - 1;
-<<<<<<< HEAD
 }
 
 static void print_insn_state(struct bpf_verifier_env *env,
@@ -1014,23 +991,6 @@ static void print_insn_state(struct bpf_verifier_env *env,
 	print_verifier_state(env, state, false);
 }
 
-=======
-}
-
-static void print_insn_state(struct bpf_verifier_env *env,
-			     const struct bpf_func_state *state)
-{
-	if (env->prev_log_len && env->prev_log_len == env->log.len_used) {
-		/* remove new line character */
-		bpf_vlog_reset(&env->log, env->prev_log_len - 1);
-		verbose(env, "%*c;", vlog_alignment(env->prev_insn_print_len), ' ');
-	} else {
-		verbose(env, "%d:", env->insn_idx);
-	}
-	print_verifier_state(env, state, false);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* copy array src of length n * size bytes to dst. dst is reallocated if it's too
  * small to hold src. This is different from krealloc since we don't want to preserve
  * the contents of dst.
@@ -1040,11 +1000,8 @@ static void print_insn_state(struct bpf_verifier_env *env,
  */
 static void *copy_array(void *dst, const void *src, size_t n, size_t size, gfp_t flags)
 {
-<<<<<<< HEAD
 	size_t alloc_bytes;
 	void *orig = dst;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size_t bytes;
 
 	if (ZERO_OR_NULL_PTR(src))
@@ -1053,19 +1010,11 @@ static void *copy_array(void *dst, const void *src, size_t n, size_t size, gfp_t
 	if (unlikely(check_mul_overflow(n, size, &bytes)))
 		return NULL;
 
-<<<<<<< HEAD
 	alloc_bytes = max(ksize(orig), kmalloc_size_roundup(bytes));
 	dst = krealloc(orig, alloc_bytes, flags);
 	if (!dst) {
 		kfree(orig);
 		return NULL;
-=======
-	if (ksize(dst) < bytes) {
-		kfree(dst);
-		dst = kmalloc_track_caller(bytes, flags);
-		if (!dst)
-			return NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	memcpy(dst, src, bytes);
@@ -1080,21 +1029,14 @@ out:
  */
 static void *realloc_array(void *arr, size_t old_n, size_t new_n, size_t size)
 {
-<<<<<<< HEAD
 	size_t alloc_size;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void *new_arr;
 
 	if (!new_n || old_n == new_n)
 		goto out;
 
-<<<<<<< HEAD
 	alloc_size = kmalloc_size_roundup(size_mul(new_n, size));
 	new_arr = krealloc(arr, alloc_size, GFP_KERNEL);
-=======
-	new_arr = krealloc_array(arr, new_n, size, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!new_arr) {
 		kfree(arr);
 		return NULL;
@@ -3078,17 +3020,10 @@ static void save_register_state(struct bpf_func_state *state,
 	state->stack[spi].spilled_ptr = *reg;
 	if (size == BPF_REG_SIZE)
 		state->stack[spi].spilled_ptr.live |= REG_LIVE_WRITTEN;
-<<<<<<< HEAD
 
 	for (i = BPF_REG_SIZE; i > BPF_REG_SIZE - size; i--)
 		state->stack[spi].slot_type[i - 1] = STACK_SPILL;
 
-=======
-
-	for (i = BPF_REG_SIZE; i > BPF_REG_SIZE - size; i--)
-		state->stack[spi].slot_type[i - 1] = STACK_SPILL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* size < 8 bytes spill */
 	for (; i; i--)
 		scrub_spilled_slot(&state->stack[spi].slot_type[i - 1]);
@@ -3133,19 +3068,11 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
 				break;
 			}
 		}
-<<<<<<< HEAD
 
 		if (sanitize)
 			env->insn_aux_data[insn_idx].sanitize_stack_spill = true;
 	}
 
-=======
-
-		if (sanitize)
-			env->insn_aux_data[insn_idx].sanitize_stack_spill = true;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mark_stack_slot_scratched(env, spi);
 	if (reg && !(off % BPF_REG_SIZE) && register_is_bounded(reg) &&
 	    !register_is_null(reg) && env->bpf_capable) {
@@ -3270,7 +3197,6 @@ static int check_stack_write_var_off(struct bpf_verifier_env *env,
 		stype = &state->stack[spi].slot_type[slot % BPF_REG_SIZE];
 		mark_stack_slot_scratched(env, spi);
 
-<<<<<<< HEAD
 		if (!env->allow_ptr_leaks && *stype != STACK_MISC && *stype != STACK_ZERO) {
 			/* Reject the write if range we may write to has not
 			 * been initialized beforehand. If we didn't reject
@@ -3282,16 +3208,6 @@ static int check_stack_write_var_off(struct bpf_verifier_env *env,
 			 * only allow reading possibly uninitialized memory
 			 * later for CAP_PERFMON, as the write may not happen to
 			 * that slot.
-=======
-		if (!env->allow_ptr_leaks
-				&& *stype != NOT_INIT
-				&& *stype != SCALAR_VALUE) {
-			/* Reject the write if there's are spilled pointers in
-			 * range. If we didn't reject here, the ptr status
-			 * would be erased below (even though not all slots are
-			 * actually overwritten), possibly opening the door to
-			 * leaks.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 */
 			verbose(env, "spilled ptr in range of var-offset stack write; insn %d, ptr off: %d",
 				insn_idx, i);
@@ -5258,13 +5174,6 @@ static int check_stack_range_initialized(
 		}
 
 		if (is_spilled_reg(&state->stack[spi]) &&
-<<<<<<< HEAD
-=======
-		    base_type(state->stack[spi].spilled_ptr.type) == PTR_TO_BTF_ID)
-			goto mark;
-
-		if (is_spilled_reg(&state->stack[spi]) &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		    (state->stack[spi].spilled_ptr.type == SCALAR_VALUE ||
 		     env->allow_ptr_leaks)) {
 			if (clobber) {
@@ -5389,8 +5298,6 @@ static int check_helper_mem_access(struct bpf_verifier_env *env, int regno,
 		verbose(env, "R%d type=%s ", regno,
 			reg_type_str(env, reg->type));
 		verbose(env, "expected=%s\n", reg_type_str(env, PTR_TO_STACK));
-<<<<<<< HEAD
-=======
 		return -EACCES;
 	}
 }
@@ -5440,7 +5347,6 @@ static int check_mem_size_reg(struct bpf_verifier_env *env,
 	if (reg->umax_value >= BPF_MAX_VAR_SIZ) {
 		verbose(env, "R%d unbounded memory access, use 'var &= const' or 'if (var < const)'\n",
 			regno);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EACCES;
 	}
 	err = check_helper_mem_access(env, regno - 1,
@@ -5448,118 +5354,6 @@ static int check_mem_size_reg(struct bpf_verifier_env *env,
 				      zero_size_allowed, meta);
 	if (!err)
 		err = mark_chain_precision(env, regno);
-	return err;
-}
-
-static int check_mem_size_reg(struct bpf_verifier_env *env,
-			      struct bpf_reg_state *reg, u32 regno,
-			      bool zero_size_allowed,
-			      struct bpf_call_arg_meta *meta)
-{
-<<<<<<< HEAD
-	int err;
-
-	/* This is used to refine r0 return value bounds for helpers
-	 * that enforce this value as an upper bound on return values.
-	 * See do_refine_retval_range() for helpers that can refine
-	 * the return value. C type of helper is u32 so we pull register
-	 * bound from umax_value however, if negative verifier errors
-	 * out. Only upper bounds can be learned because retval is an
-	 * int type and negative retvals are allowed.
-	 */
-	meta->msize_max_value = reg->umax_value;
-
-	/* The register is SCALAR_VALUE; the access check
-	 * happens using its boundaries.
-	 */
-	if (!tnum_is_const(reg->var_off))
-		/* For unprivileged variable accesses, disable raw
-		 * mode so that the program is required to
-		 * initialize all the memory that the helper could
-		 * just partially fill up.
-		 */
-		meta = NULL;
-
-	if (reg->smin_value < 0) {
-		verbose(env, "R%d min value is negative, either use unsigned or 'var &= const'\n",
-			regno);
-		return -EACCES;
-	}
-
-	if (reg->umin_value == 0) {
-		err = check_helper_mem_access(env, regno - 1, 0,
-					      zero_size_allowed,
-					      meta);
-		if (err)
-			return err;
-	}
-
-	if (reg->umax_value >= BPF_MAX_VAR_SIZ) {
-		verbose(env, "R%d unbounded memory access, use 'var &= const' or 'if (var < const)'\n",
-			regno);
-		return -EACCES;
-	}
-	err = check_helper_mem_access(env, regno - 1,
-				      reg->umax_value,
-				      zero_size_allowed, meta);
-	if (!err)
-		err = mark_chain_precision(env, regno);
-=======
-	bool may_be_null = type_may_be_null(reg->type);
-	struct bpf_reg_state saved_reg;
-	struct bpf_call_arg_meta meta;
-	int err;
-
-	if (register_is_null(reg))
-		return 0;
-
-	memset(&meta, 0, sizeof(meta));
-	/* Assuming that the register contains a value check if the memory
-	 * access is safe. Temporarily save and restore the register's state as
-	 * the conversion shouldn't be visible to a caller.
-	 */
-	if (may_be_null) {
-		saved_reg = *reg;
-		mark_ptr_not_null_reg(reg);
-	}
-
-	err = check_helper_mem_access(env, regno, mem_size, true, &meta);
-	/* Check access for BPF_WRITE */
-	meta.raw_mode = true;
-	err = err ?: check_helper_mem_access(env, regno, mem_size, true, &meta);
-
-	if (may_be_null)
-		*reg = saved_reg;
-
-	return err;
-}
-
-int check_kfunc_mem_size_reg(struct bpf_verifier_env *env, struct bpf_reg_state *reg,
-			     u32 regno)
-{
-	struct bpf_reg_state *mem_reg = &cur_regs(env)[regno - 1];
-	bool may_be_null = type_may_be_null(mem_reg->type);
-	struct bpf_reg_state saved_reg;
-	struct bpf_call_arg_meta meta;
-	int err;
-
-	WARN_ON_ONCE(regno < BPF_REG_2 || regno > BPF_REG_5);
-
-	memset(&meta, 0, sizeof(meta));
-
-	if (may_be_null) {
-		saved_reg = *mem_reg;
-		mark_ptr_not_null_reg(mem_reg);
-	}
-
-	err = check_mem_size_reg(env, reg, regno, true, &meta);
-	/* Check access for BPF_WRITE */
-	meta.raw_mode = true;
-	err = err ?: check_mem_size_reg(env, reg, regno, true, &meta);
-
-	if (may_be_null)
-		*mem_reg = saved_reg;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return err;
 }
 
@@ -5706,106 +5500,11 @@ static int process_spin_lock(struct bpf_verifier_env *env, int regno,
 
 static int process_timer_func(struct bpf_verifier_env *env, int regno,
 			      struct bpf_call_arg_meta *meta)
-<<<<<<< HEAD
 {
 	struct bpf_reg_state *regs = cur_regs(env), *reg = &regs[regno];
 	bool is_const = tnum_is_const(reg->var_off);
 	struct bpf_map *map = reg->map_ptr;
 	u64 val = reg->var_off.value;
-
-	if (!is_const) {
-		verbose(env,
-			"R%d doesn't have constant offset. bpf_timer has to be at the constant offset\n",
-			regno);
-		return -EINVAL;
-	}
-	if (!map->btf) {
-		verbose(env, "map '%s' has to have BTF in order to use bpf_timer\n",
-			map->name);
-		return -EINVAL;
-	}
-	if (!map_value_has_timer(map)) {
-		if (map->timer_off == -E2BIG)
-			verbose(env,
-				"map '%s' has more than one 'struct bpf_timer'\n",
-				map->name);
-		else if (map->timer_off == -ENOENT)
-			verbose(env,
-				"map '%s' doesn't have 'struct bpf_timer'\n",
-				map->name);
-		else
-			verbose(env,
-				"map '%s' is not a struct type or bpf_timer is mangled\n",
-				map->name);
-		return -EINVAL;
-	}
-	if (map->timer_off != val + reg->off) {
-		verbose(env, "off %lld doesn't point to 'struct bpf_timer' that is at %d\n",
-			val + reg->off, map->timer_off);
-		return -EINVAL;
-	}
-	if (meta->map_ptr) {
-		verbose(env, "verifier bug. Two map pointers in a timer helper\n");
-		return -EFAULT;
-	}
-	meta->map_uid = reg->map_uid;
-	meta->map_ptr = map;
-	return 0;
-}
-
-static int process_kptr_func(struct bpf_verifier_env *env, int regno,
-			     struct bpf_call_arg_meta *meta)
-{
-	struct bpf_reg_state *regs = cur_regs(env), *reg = &regs[regno];
-	struct bpf_map_value_off_desc *off_desc;
-	struct bpf_map *map_ptr = reg->map_ptr;
-	u32 kptr_off;
-	int ret;
-
-	if (!tnum_is_const(reg->var_off)) {
-		verbose(env,
-			"R%d doesn't have constant offset. kptr has to be at the constant offset\n",
-			regno);
-		return -EINVAL;
-	}
-	if (!map_ptr->btf) {
-		verbose(env, "map '%s' has to have BTF in order to use bpf_kptr_xchg\n",
-			map_ptr->name);
-		return -EINVAL;
-	}
-	if (!map_value_has_kptrs(map_ptr)) {
-		ret = PTR_ERR_OR_ZERO(map_ptr->kptr_off_tab);
-		if (ret == -E2BIG)
-			verbose(env, "map '%s' has more than %d kptr\n", map_ptr->name,
-				BPF_MAP_VALUE_OFF_MAX);
-		else if (ret == -EEXIST)
-			verbose(env, "map '%s' has repeating kptr BTF tags\n", map_ptr->name);
-		else
-			verbose(env, "map '%s' has no valid kptr\n", map_ptr->name);
-		return -EINVAL;
-	}
-
-	meta->map_ptr = map_ptr;
-	kptr_off = reg->off + reg->var_off.value;
-	off_desc = bpf_map_kptr_off_contains(map_ptr, kptr_off);
-	if (!off_desc) {
-		verbose(env, "off=%d doesn't point to kptr\n", kptr_off);
-		return -EACCES;
-	}
-	if (off_desc->type != BPF_KPTR_REF) {
-		verbose(env, "off=%d kptr isn't referenced kptr\n", kptr_off);
-		return -EACCES;
-	}
-	meta->kptr_off_desc = off_desc;
-	return 0;
-}
-=======
-{
-	struct bpf_reg_state *regs = cur_regs(env), *reg = &regs[regno];
-	bool is_const = tnum_is_const(reg->var_off);
-	struct bpf_map *map = reg->map_ptr;
-	u64 val = reg->var_off.value;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!is_const) {
 		verbose(env,
@@ -6023,15 +5722,12 @@ static const struct bpf_reg_types stack_ptr_types = { .types = { PTR_TO_STACK } 
 static const struct bpf_reg_types const_str_ptr_types = { .types = { PTR_TO_MAP_VALUE } };
 static const struct bpf_reg_types timer_types = { .types = { PTR_TO_MAP_VALUE } };
 static const struct bpf_reg_types kptr_types = { .types = { PTR_TO_MAP_VALUE } };
-<<<<<<< HEAD
 static const struct bpf_reg_types dynptr_types = {
 	.types = {
 		PTR_TO_STACK,
 		PTR_TO_DYNPTR | DYNPTR_TYPE_LOCAL,
 	}
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct bpf_reg_types *compatible_reg_types[__BPF_ARG_TYPE_MAX] = {
 	[ARG_PTR_TO_MAP_KEY]		= &map_key_value_types,
@@ -6058,11 +5754,7 @@ static const struct bpf_reg_types *compatible_reg_types[__BPF_ARG_TYPE_MAX] = {
 	[ARG_PTR_TO_CONST_STR]		= &const_str_ptr_types,
 	[ARG_PTR_TO_TIMER]		= &timer_types,
 	[ARG_PTR_TO_KPTR]		= &kptr_types,
-<<<<<<< HEAD
 	[ARG_PTR_TO_DYNPTR]		= &dynptr_types,
-=======
-	[ARG_PTR_TO_DYNPTR]		= &stack_ptr_types,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int check_reg_type(struct bpf_verifier_env *env, u32 regno,
@@ -6131,7 +5823,6 @@ found:
 		if (meta->func_id == BPF_FUNC_kptr_xchg) {
 			if (map_kptr_match_type(env, meta->kptr_off_desc, reg, regno))
 				return -EACCES;
-<<<<<<< HEAD
 		} else {
 			if (arg_btf_id == BPF_PTR_POISON) {
 				verbose(env, "verifier internal error:");
@@ -6148,15 +5839,6 @@ found:
 					kernel_type_name(btf_vmlinux, *arg_btf_id));
 				return -EACCES;
 			}
-=======
-		} else if (!btf_struct_ids_match(&env->log, reg->btf, reg->btf_id, reg->off,
-						 btf_vmlinux, *arg_btf_id,
-						 strict_type_match)) {
-			verbose(env, "R%d is of type %s but %s is expected\n",
-				regno, kernel_type_name(reg->btf, reg->btf_id),
-				kernel_type_name(btf_vmlinux, *arg_btf_id));
-			return -EACCES;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -6424,7 +6106,6 @@ skip_type_check:
 		err = check_mem_size_reg(env, reg, regno, true, meta);
 		break;
 	case ARG_PTR_TO_DYNPTR:
-<<<<<<< HEAD
 		/* We only need to check for initialized / uninitialized helper
 		 * dynptr args if the dynptr is not PTR_TO_DYNPTR, as the
 		 * assumption is that if it is, that a helper function
@@ -6432,8 +6113,6 @@ skip_type_check:
 		 */
 		if (base_type(reg->type) == PTR_TO_DYNPTR)
 			break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (arg_type & MEM_UNINIT) {
 			if (!is_dynptr_reg_valid_uninit(env, reg)) {
 				verbose(env, "Dynptr has to be an uninitialized dynptr\n");
@@ -6447,7 +6126,6 @@ skip_type_check:
 				verbose(env, "verifier internal error: multiple uninitialized dynptr args\n");
 				return -EFAULT;
 			}
-<<<<<<< HEAD
 
 			meta->uninit_dynptr_regno = regno;
 		} else if (!is_dynptr_reg_valid_init(env, reg)) {
@@ -6471,25 +6149,6 @@ skip_type_check:
 			}
 			verbose(env,
 				"Expected a dynptr of type %s as arg #%d\n",
-=======
-
-			meta->uninit_dynptr_regno = regno;
-		} else if (!is_dynptr_reg_valid_init(env, reg, arg_type)) {
-			const char *err_extra = "";
-
-			switch (arg_type & DYNPTR_TYPE_FLAG_MASK) {
-			case DYNPTR_TYPE_LOCAL:
-				err_extra = "local ";
-				break;
-			case DYNPTR_TYPE_RINGBUF:
-				err_extra = "ringbuf ";
-				break;
-			default:
-				break;
-			}
-
-			verbose(env, "Expected an initialized %sdynptr as arg #%d\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				err_extra, arg + 1);
 			return -EINVAL;
 		}
@@ -6632,13 +6291,10 @@ static int check_map_func_compatibility(struct bpf_verifier_env *env,
 		    func_id != BPF_FUNC_ringbuf_reserve_dynptr &&
 		    func_id != BPF_FUNC_ringbuf_submit_dynptr &&
 		    func_id != BPF_FUNC_ringbuf_discard_dynptr)
-<<<<<<< HEAD
 			goto error;
 		break;
 	case BPF_MAP_TYPE_USER_RINGBUF:
 		if (func_id != BPF_FUNC_user_ringbuf_drain)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto error;
 		break;
 	case BPF_MAP_TYPE_STACK_TRACE:
@@ -6760,13 +6416,10 @@ static int check_map_func_compatibility(struct bpf_verifier_env *env,
 		if (map->map_type != BPF_MAP_TYPE_RINGBUF)
 			goto error;
 		break;
-<<<<<<< HEAD
 	case BPF_FUNC_user_ringbuf_drain:
 		if (map->map_type != BPF_MAP_TYPE_USER_RINGBUF)
 			goto error;
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case BPF_FUNC_get_stackid:
 		if (map->map_type != BPF_MAP_TYPE_STACK_TRACE)
 			goto error;
@@ -6923,8 +6576,7 @@ static bool check_btf_id_ok(const struct bpf_func_proto *fn)
 	return true;
 }
 
-static int check_func_proto(const struct bpf_func_proto *fn, int func_id,
-			    struct bpf_call_arg_meta *meta)
+static int check_func_proto(const struct bpf_func_proto *fn, int func_id)
 {
 	return check_raw_mode_ok(fn) &&
 	       check_arg_pair_ok(fn) &&
@@ -7040,11 +6692,7 @@ static int __check_func_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 	func_info_aux = env->prog->aux->func_info_aux;
 	if (func_info_aux)
 		is_global = func_info_aux[subprog].linkage == BTF_FUNC_GLOBAL;
-<<<<<<< HEAD
 	err = btf_check_subprog_call(env, subprog, caller->regs);
-=======
-	err = btf_check_subprog_arg_match(env, subprog, caller->regs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err == -EFAULT)
 		return err;
 	if (is_global) {
@@ -7113,7 +6761,6 @@ static int __check_func_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 	err = copy_reference_state(callee, caller);
 	if (err)
 		goto err_out;
-<<<<<<< HEAD
 
 	err = set_callee_state_cb(env, caller, callee, *insn_idx);
 	if (err)
@@ -7291,12 +6938,6 @@ static int set_find_vma_callback_state(struct bpf_verifier_env *env,
 	 *               struct vm_area_struct *vma, void *callback_ctx);
 	 */
 	callee->regs[BPF_REG_1] = caller->regs[BPF_REG_1];
-=======
-
-	err = set_callee_state_cb(env, caller, callee, *insn_idx);
-	if (err)
-		goto err_out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	callee->regs[BPF_REG_2].type = PTR_TO_BTF_ID;
 	__mark_reg_known_zero(&callee->regs[BPF_REG_2]);
@@ -7306,7 +6947,6 @@ static int set_find_vma_callback_state(struct bpf_verifier_env *env,
 	/* pointer to stack or null */
 	callee->regs[BPF_REG_3] = caller->regs[BPF_REG_4];
 
-<<<<<<< HEAD
 	/* unused */
 	__mark_reg_not_init(env, &callee->regs[BPF_REG_4]);
 	__mark_reg_not_init(env, &callee->regs[BPF_REG_5]);
@@ -7336,185 +6976,6 @@ static int set_user_ringbuf_callback_state(struct bpf_verifier_env *env,
 
 	callee->in_callback_fn = true;
 	callee->callback_ret_range = tnum_range(0, 1);
-=======
-	/* and go analyze first insn of the callee */
-	*insn_idx = env->subprog_info[subprog].start - 1;
-
-	if (env->log.level & BPF_LOG_LEVEL) {
-		verbose(env, "caller:\n");
-		print_verifier_state(env, caller, true);
-		verbose(env, "callee:\n");
-		print_verifier_state(env, callee, true);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	return 0;
-
-err_out:
-	free_func_state(callee);
-	state->frame[state->curframe + 1] = NULL;
-	return err;
-}
-
-int map_set_for_each_callback_args(struct bpf_verifier_env *env,
-				   struct bpf_func_state *caller,
-				   struct bpf_func_state *callee)
-{
-	/* bpf_for_each_map_elem(struct bpf_map *map, void *callback_fn,
-	 *      void *callback_ctx, u64 flags);
-	 * callback_fn(struct bpf_map *map, void *key, void *value,
-	 *      void *callback_ctx);
-	 */
-	callee->regs[BPF_REG_1] = caller->regs[BPF_REG_1];
-
-	callee->regs[BPF_REG_2].type = PTR_TO_MAP_KEY;
-	__mark_reg_known_zero(&callee->regs[BPF_REG_2]);
-	callee->regs[BPF_REG_2].map_ptr = caller->regs[BPF_REG_1].map_ptr;
-
-	callee->regs[BPF_REG_3].type = PTR_TO_MAP_VALUE;
-	__mark_reg_known_zero(&callee->regs[BPF_REG_3]);
-	callee->regs[BPF_REG_3].map_ptr = caller->regs[BPF_REG_1].map_ptr;
-
-	/* pointer to stack or null */
-	callee->regs[BPF_REG_4] = caller->regs[BPF_REG_3];
-
-	/* unused */
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_5]);
-	return 0;
-}
-
-static int set_callee_state(struct bpf_verifier_env *env,
-			    struct bpf_func_state *caller,
-			    struct bpf_func_state *callee, int insn_idx)
-{
-	int i;
-
-	/* copy r1 - r5 args that callee can access.  The copy includes parent
-	 * pointers, which connects us up to the liveness chain
-	 */
-	for (i = BPF_REG_1; i <= BPF_REG_5; i++)
-		callee->regs[i] = caller->regs[i];
-	return 0;
-}
-
-static int check_func_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
-			   int *insn_idx)
-{
-	int subprog, target_insn;
-
-	target_insn = *insn_idx + insn->imm + 1;
-	subprog = find_subprog(env, target_insn);
-	if (subprog < 0) {
-		verbose(env, "verifier bug. No program starts at insn %d\n",
-			target_insn);
-		return -EFAULT;
-	}
-
-	return __check_func_call(env, insn, insn_idx, subprog, set_callee_state);
-}
-
-static int set_map_elem_callback_state(struct bpf_verifier_env *env,
-				       struct bpf_func_state *caller,
-				       struct bpf_func_state *callee,
-				       int insn_idx)
-{
-	struct bpf_insn_aux_data *insn_aux = &env->insn_aux_data[insn_idx];
-	struct bpf_map *map;
-	int err;
-
-	if (bpf_map_ptr_poisoned(insn_aux)) {
-		verbose(env, "tail_call abusing map_ptr\n");
-		return -EINVAL;
-	}
-
-	map = BPF_MAP_PTR(insn_aux->map_ptr_state);
-	if (!map->ops->map_set_for_each_callback_args ||
-	    !map->ops->map_for_each_callback) {
-		verbose(env, "callback function not allowed for map\n");
-		return -ENOTSUPP;
-	}
-
-	err = map->ops->map_set_for_each_callback_args(env, caller, callee);
-	if (err)
-		return err;
-
-	callee->in_callback_fn = true;
-	return 0;
-}
-
-static int set_loop_callback_state(struct bpf_verifier_env *env,
-				   struct bpf_func_state *caller,
-				   struct bpf_func_state *callee,
-				   int insn_idx)
-{
-	/* bpf_loop(u32 nr_loops, void *callback_fn, void *callback_ctx,
-	 *	    u64 flags);
-	 * callback_fn(u32 index, void *callback_ctx);
-	 */
-	callee->regs[BPF_REG_1].type = SCALAR_VALUE;
-	callee->regs[BPF_REG_2] = caller->regs[BPF_REG_3];
-
-	/* unused */
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_3]);
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_4]);
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_5]);
-
-	callee->in_callback_fn = true;
-	return 0;
-}
-
-static int set_timer_callback_state(struct bpf_verifier_env *env,
-				    struct bpf_func_state *caller,
-				    struct bpf_func_state *callee,
-				    int insn_idx)
-{
-	struct bpf_map *map_ptr = caller->regs[BPF_REG_1].map_ptr;
-
-	/* bpf_timer_set_callback(struct bpf_timer *timer, void *callback_fn);
-	 * callback_fn(struct bpf_map *map, void *key, void *value);
-	 */
-	callee->regs[BPF_REG_1].type = CONST_PTR_TO_MAP;
-	__mark_reg_known_zero(&callee->regs[BPF_REG_1]);
-	callee->regs[BPF_REG_1].map_ptr = map_ptr;
-
-	callee->regs[BPF_REG_2].type = PTR_TO_MAP_KEY;
-	__mark_reg_known_zero(&callee->regs[BPF_REG_2]);
-	callee->regs[BPF_REG_2].map_ptr = map_ptr;
-
-	callee->regs[BPF_REG_3].type = PTR_TO_MAP_VALUE;
-	__mark_reg_known_zero(&callee->regs[BPF_REG_3]);
-	callee->regs[BPF_REG_3].map_ptr = map_ptr;
-
-	/* unused */
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_4]);
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_5]);
-	callee->in_async_callback_fn = true;
-	return 0;
-}
-
-static int set_find_vma_callback_state(struct bpf_verifier_env *env,
-				       struct bpf_func_state *caller,
-				       struct bpf_func_state *callee,
-				       int insn_idx)
-{
-	/* bpf_find_vma(struct task_struct *task, u64 addr,
-	 *               void *callback_fn, void *callback_ctx, u64 flags)
-	 * (callback_fn)(struct task_struct *task,
-	 *               struct vm_area_struct *vma, void *callback_ctx);
-	 */
-	callee->regs[BPF_REG_1] = caller->regs[BPF_REG_1];
-
-	callee->regs[BPF_REG_2].type = PTR_TO_BTF_ID;
-	__mark_reg_known_zero(&callee->regs[BPF_REG_2]);
-	callee->regs[BPF_REG_2].btf =  btf_vmlinux;
-	callee->regs[BPF_REG_2].btf_id = btf_tracing_ids[BTF_TRACING_TYPE_VMA],
-
-	/* pointer to stack or null */
-	callee->regs[BPF_REG_3] = caller->regs[BPF_REG_4];
-
-	/* unused */
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_4]);
-	__mark_reg_not_init(env, &callee->regs[BPF_REG_5]);
-	callee->in_callback_fn = true;
 	return 0;
 }
 
@@ -7541,11 +7002,7 @@ static int prepare_func_exit(struct bpf_verifier_env *env, int *insn_idx)
 	caller = state->frame[state->curframe - 1];
 	if (callee->in_callback_fn) {
 		/* enforce R0 return value range [0, 1]. */
-<<<<<<< HEAD
 		struct tnum range = callee->callback_ret_range;
-=======
-		struct tnum range = tnum_range(0, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (r0->type != SCALAR_VALUE) {
 			verbose(env, "R0 not a scalar value\n");
@@ -7759,7 +7216,6 @@ static int check_get_func_ip(struct bpf_verifier_env *env)
 		return 0;
 	} else if (type == BPF_PROG_TYPE_KPROBE) {
 		return 0;
-<<<<<<< HEAD
 	}
 
 	verbose(env, "func %s#%d not supported for program type %d\n",
@@ -7805,53 +7261,6 @@ static void update_loop_inline_state(struct bpf_verifier_env *env, u32 subprogno
 static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
 			     int *insn_idx_p)
 {
-=======
-	}
-
-	verbose(env, "func %s#%d not supported for program type %d\n",
-		func_id_name(func_id), func_id, type);
-	return -ENOTSUPP;
-}
-
-static struct bpf_insn_aux_data *cur_aux(struct bpf_verifier_env *env)
-{
-	return &env->insn_aux_data[env->insn_idx];
-}
-
-static bool loop_flag_is_zero(struct bpf_verifier_env *env)
-{
-	struct bpf_reg_state *regs = cur_regs(env);
-	struct bpf_reg_state *reg = &regs[BPF_REG_4];
-	bool reg_is_null = register_is_null(reg);
-
-	if (reg_is_null)
-		mark_chain_precision(env, BPF_REG_4);
-
-	return reg_is_null;
-}
-
-static void update_loop_inline_state(struct bpf_verifier_env *env, u32 subprogno)
-{
-	struct bpf_loop_inline_state *state = &cur_aux(env)->loop_inline_state;
-
-	if (!state->initialized) {
-		state->initialized = 1;
-		state->fit_for_inline = loop_flag_is_zero(env);
-		state->callback_subprogno = subprogno;
-		return;
-	}
-
-	if (!state->fit_for_inline)
-		return;
-
-	state->fit_for_inline = (loop_flag_is_zero(env) &&
-				 state->callback_subprogno == subprogno);
-}
-
-static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
-			     int *insn_idx_p)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	enum bpf_prog_type prog_type = resolve_prog_type(env->prog);
 	const struct bpf_func_proto *fn = NULL;
 	enum bpf_return_type ret_type;
@@ -7900,7 +7309,7 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 	memset(&meta, 0, sizeof(meta));
 	meta.pkt_access = fn->pkt_access;
 
-	err = check_func_proto(fn, func_id, &meta);
+	err = check_func_proto(fn, func_id);
 	if (err) {
 		verbose(env, "kernel subsystem misconfigured func %s#%d\n",
 			func_id_name(func_id), func_id);
@@ -8028,26 +7437,18 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 	case BPF_FUNC_dynptr_data:
 		for (i = 0; i < MAX_BPF_FUNC_REG_ARGS; i++) {
 			if (arg_type_is_dynptr(fn->arg_type[i])) {
-<<<<<<< HEAD
 				struct bpf_reg_state *reg = &regs[BPF_REG_1 + i];
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				if (meta.ref_obj_id) {
 					verbose(env, "verifier internal error: meta.ref_obj_id already set\n");
 					return -EFAULT;
 				}
-<<<<<<< HEAD
 
 				if (base_type(reg->type) != PTR_TO_DYNPTR)
 					/* Find the id of the dynptr we're
 					 * tracking the reference of
 					 */
 					meta.ref_obj_id = stack_slot_get_id(env, reg);
-=======
-				/* Find the id of the dynptr we're tracking the reference of */
-				meta.ref_obj_id = stack_slot_get_id(env, &regs[BPF_REG_1 + i]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				break;
 			}
 		}
@@ -8056,13 +7457,10 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 			return -EFAULT;
 		}
 		break;
-<<<<<<< HEAD
 	case BPF_FUNC_user_ringbuf_drain:
 		err = __check_func_call(env, insn, insn_idx_p, meta.subprogno,
 					set_user_ringbuf_callback_state);
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (err)
@@ -8079,7 +7477,6 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 
 	/* update return register (already marked as written above) */
 	ret_type = fn->ret_type;
-<<<<<<< HEAD
 	ret_flag = type_flag(ret_type);
 
 	switch (base_type(ret_type)) {
@@ -8091,15 +7488,6 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 		regs[BPF_REG_0].type = NOT_INIT;
 		break;
 	case RET_PTR_TO_MAP_VALUE:
-=======
-	ret_flag = type_flag(fn->ret_type);
-	if (ret_type == RET_INTEGER) {
-		/* sets type to SCALAR_VALUE */
-		mark_reg_unknown(env, regs, BPF_REG_0);
-	} else if (ret_type == RET_VOID) {
-		regs[BPF_REG_0].type = NOT_INIT;
-	} else if (base_type(ret_type) == RET_PTR_TO_MAP_VALUE) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* There is no offset yet applied, variable or fixed */
 		mark_reg_known_zero(env, regs, BPF_REG_0);
 		/* remember map_ptr, so that check_map_access()
@@ -8118,7 +7506,6 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 		    map_value_has_spin_lock(meta.map_ptr)) {
 			regs[BPF_REG_0].id = ++env->id_gen;
 		}
-<<<<<<< HEAD
 		break;
 	case RET_PTR_TO_SOCKET:
 		mark_reg_known_zero(env, regs, BPF_REG_0);
@@ -8139,22 +7526,6 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 		break;
 	case RET_PTR_TO_MEM_OR_BTF_ID:
 	{
-=======
-	} else if (base_type(ret_type) == RET_PTR_TO_SOCKET) {
-		mark_reg_known_zero(env, regs, BPF_REG_0);
-		regs[BPF_REG_0].type = PTR_TO_SOCKET | ret_flag;
-	} else if (base_type(ret_type) == RET_PTR_TO_SOCK_COMMON) {
-		mark_reg_known_zero(env, regs, BPF_REG_0);
-		regs[BPF_REG_0].type = PTR_TO_SOCK_COMMON | ret_flag;
-	} else if (base_type(ret_type) == RET_PTR_TO_TCP_SOCK) {
-		mark_reg_known_zero(env, regs, BPF_REG_0);
-		regs[BPF_REG_0].type = PTR_TO_TCP_SOCK | ret_flag;
-	} else if (base_type(ret_type) == RET_PTR_TO_ALLOC_MEM) {
-		mark_reg_known_zero(env, regs, BPF_REG_0);
-		regs[BPF_REG_0].type = PTR_TO_MEM | ret_flag;
-		regs[BPF_REG_0].mem_size = meta.mem_size;
-	} else if (base_type(ret_type) == RET_PTR_TO_MEM_OR_BTF_ID) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		const struct btf_type *t;
 
 		mark_reg_known_zero(env, regs, BPF_REG_0);
@@ -8186,14 +7557,10 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 			regs[BPF_REG_0].btf = meta.ret_btf;
 			regs[BPF_REG_0].btf_id = meta.ret_btf_id;
 		}
-<<<<<<< HEAD
 		break;
 	}
 	case RET_PTR_TO_BTF_ID:
 	{
-=======
-	} else if (base_type(ret_type) == RET_PTR_TO_BTF_ID) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct btf *ret_btf;
 		int ret_btf_id;
 
@@ -8203,15 +7570,12 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 			ret_btf = meta.kptr_off_desc->kptr.btf;
 			ret_btf_id = meta.kptr_off_desc->kptr.btf_id;
 		} else {
-<<<<<<< HEAD
 			if (fn->ret_btf_id == BPF_PTR_POISON) {
 				verbose(env, "verifier internal error:");
 				verbose(env, "func %s has non-overwritten BPF_PTR_POISON return type\n",
 					func_id_name(func_id));
 				return -EINVAL;
 			}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret_btf = btf_vmlinux;
 			ret_btf_id = *fn->ret_btf_id;
 		}
@@ -8223,13 +7587,9 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 		}
 		regs[BPF_REG_0].btf = ret_btf;
 		regs[BPF_REG_0].btf_id = ret_btf_id;
-<<<<<<< HEAD
 		break;
 	}
 	default:
-=======
-	} else {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		verbose(env, "unknown return type %u of func %s#%d\n",
 			base_type(ret_type), func_id_name(func_id), func_id);
 		return -EINVAL;
@@ -8295,152 +7655,6 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 
 	if (changes_data)
 		clear_all_pkt_pointers(env);
-	return 0;
-}
-
-/* mark_btf_func_reg_size() is used when the reg size is determined by
- * the BTF func_proto's return value size and argument.
- */
-static void mark_btf_func_reg_size(struct bpf_verifier_env *env, u32 regno,
-				   size_t reg_size)
-{
-	struct bpf_reg_state *reg = &cur_regs(env)[regno];
-
-	if (regno == BPF_REG_0) {
-		/* Function return value */
-		reg->live |= REG_LIVE_WRITTEN;
-		reg->subreg_def = reg_size == sizeof(u64) ?
-			DEF_NOT_SUBREG : env->insn_idx + 1;
-	} else {
-		/* Function argument */
-		if (reg_size == sizeof(u64)) {
-			mark_insn_zext(env, reg);
-			mark_reg_read(env, reg, reg->parent, REG_LIVE_READ64);
-		} else {
-			mark_reg_read(env, reg, reg->parent, REG_LIVE_READ32);
-		}
-	}
-}
-
-static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
-			    int *insn_idx_p)
-{
-	const struct btf_type *t, *func, *func_proto, *ptr_type;
-	struct bpf_reg_state *regs = cur_regs(env);
-	const char *func_name, *ptr_type_name;
-	u32 i, nargs, func_id, ptr_type_id;
-	int err, insn_idx = *insn_idx_p;
-	const struct btf_param *args;
-	struct btf *desc_btf;
-	u32 *kfunc_flags;
-	bool acq;
-
-	/* skip for now, but return error when we find this in fixup_kfunc_call */
-	if (!insn->imm)
-		return 0;
-
-	desc_btf = find_kfunc_desc_btf(env, insn->off);
-	if (IS_ERR(desc_btf))
-		return PTR_ERR(desc_btf);
-
-	func_id = insn->imm;
-	func = btf_type_by_id(desc_btf, func_id);
-	func_name = btf_name_by_offset(desc_btf, func->name_off);
-	func_proto = btf_type_by_id(desc_btf, func->type);
-
-	kfunc_flags = btf_kfunc_id_set_contains(desc_btf, resolve_prog_type(env->prog), func_id);
-	if (!kfunc_flags) {
-		verbose(env, "calling kernel function %s is not allowed\n",
-			func_name);
-		return -EACCES;
-	}
-	acq = *kfunc_flags & KF_ACQUIRE;
-
-	/* Check the arguments */
-	err = btf_check_kfunc_arg_match(env, desc_btf, func_id, regs, *kfunc_flags);
-	if (err < 0)
-		return err;
-	/* In case of release function, we get register number of refcounted
-	 * PTR_TO_BTF_ID back from btf_check_kfunc_arg_match, do the release now
-	 */
-	if (err) {
-		err = release_reference(env, regs[err].ref_obj_id);
-		if (err) {
-			verbose(env, "kfunc %s#%d reference has not been acquired before\n",
-				func_name, func_id);
-			return err;
-		}
-	}
-
-	for (i = 0; i < CALLER_SAVED_REGS; i++)
-		mark_reg_not_init(env, regs, caller_saved[i]);
-
-	/* Check return type */
-	t = btf_type_skip_modifiers(desc_btf, func_proto->type, NULL);
-
-	if (acq && !btf_type_is_ptr(t)) {
-		verbose(env, "acquire kernel function does not return PTR_TO_BTF_ID\n");
-		return -EINVAL;
-	}
-
-	if (btf_type_is_scalar(t)) {
-		mark_reg_unknown(env, regs, BPF_REG_0);
-		mark_btf_func_reg_size(env, BPF_REG_0, t->size);
-	} else if (btf_type_is_ptr(t)) {
-		ptr_type = btf_type_skip_modifiers(desc_btf, t->type,
-						   &ptr_type_id);
-		if (!btf_type_is_struct(ptr_type)) {
-			ptr_type_name = btf_name_by_offset(desc_btf,
-							   ptr_type->name_off);
-			verbose(env, "kernel function %s returns pointer type %s %s is not supported\n",
-				func_name, btf_type_str(ptr_type),
-				ptr_type_name);
-			return -EINVAL;
-		}
-		mark_reg_known_zero(env, regs, BPF_REG_0);
-		regs[BPF_REG_0].btf = desc_btf;
-		regs[BPF_REG_0].type = PTR_TO_BTF_ID;
-		regs[BPF_REG_0].btf_id = ptr_type_id;
-		if (*kfunc_flags & KF_RET_NULL) {
-			regs[BPF_REG_0].type |= PTR_MAYBE_NULL;
-			/* For mark_ptr_or_null_reg, see 93c230e3f5bd6 */
-			regs[BPF_REG_0].id = ++env->id_gen;
-		}
-		mark_btf_func_reg_size(env, BPF_REG_0, sizeof(void *));
-		if (acq) {
-			int id = acquire_reference_state(env, insn_idx);
-
-			if (id < 0)
-				return id;
-			regs[BPF_REG_0].id = id;
-			regs[BPF_REG_0].ref_obj_id = id;
-		}
-	} /* else { add_kfunc_call() ensures it is btf_type_is_void(t) } */
-
-	nargs = btf_type_vlen(func_proto);
-	args = (const struct btf_param *)(func_proto + 1);
-	for (i = 0; i < nargs; i++) {
-		u32 regno = i + 1;
-
-		t = btf_type_skip_modifiers(desc_btf, args[i].type, NULL);
-		if (btf_type_is_ptr(t))
-			mark_btf_func_reg_size(env, regno, sizeof(void *));
-		else
-			/* scalar. ensured by btf_check_kfunc_arg_match() */
-			mark_btf_func_reg_size(env, regno, t->size);
-	}
-
-<<<<<<< HEAD
-	if (func_id == BPF_FUNC_get_func_ip) {
-		if (check_get_func_ip(env))
-			return -ENOTSUPP;
-		env->prog->call_get_func_ip = true;
-	}
-
-	if (changes_data)
-		clear_all_pkt_pointers(env);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -12669,7 +11883,6 @@ static int propagate_precision(struct bpf_verifier_env *env,
 				return err;
 		}
 
-<<<<<<< HEAD
 		for (i = 0; i < state->allocated_stack / BPF_REG_SIZE; i++) {
 			if (!is_spilled_reg(&state->stack[i]))
 				continue;
@@ -12684,21 +11897,6 @@ static int propagate_precision(struct bpf_verifier_env *env,
 			if (err < 0)
 				return err;
 		}
-=======
-	for (i = 0; i < state->allocated_stack / BPF_REG_SIZE; i++) {
-		if (!is_spilled_reg(&state->stack[i]))
-			continue;
-		state_reg = &state->stack[i].spilled_ptr;
-		if (state_reg->type != SCALAR_VALUE ||
-		    !state_reg->precise)
-			continue;
-		if (env->log.level & BPF_LOG_LEVEL2)
-			verbose(env, "propagating fp%d\n",
-				(-i - 1) * BPF_REG_SIZE);
-		err = mark_chain_precision_stack(env, i);
-		if (err < 0)
-			return err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return 0;
 }
@@ -13547,10 +12745,7 @@ static int check_map_prog_compatibility(struct bpf_verifier_env *env,
 		case BPF_MAP_TYPE_ARRAY_OF_MAPS:
 		case BPF_MAP_TYPE_HASH_OF_MAPS:
 		case BPF_MAP_TYPE_RINGBUF:
-<<<<<<< HEAD
 		case BPF_MAP_TYPE_USER_RINGBUF:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		case BPF_MAP_TYPE_INODE_STORAGE:
 		case BPF_MAP_TYPE_SK_STORAGE:
 		case BPF_MAP_TYPE_TASK_STORAGE:

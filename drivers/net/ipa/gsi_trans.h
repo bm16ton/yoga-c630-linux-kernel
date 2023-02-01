@@ -74,11 +74,7 @@ struct gsi_trans {
 
 /**
  * gsi_trans_pool_init() - Initialize a pool of structures for transactions
-<<<<<<< HEAD
  * @pool:	GSI transaction pool pointer
-=======
- * @pool:	GSI transaction poll pointer
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @size:	Size of elements in the pool
  * @count:	Minimum number of elements in the pool
  * @max_alloc:	Maximum number of elements allocated at a time from pool

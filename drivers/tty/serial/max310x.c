@@ -1616,17 +1616,9 @@ static int max310x_i2c_probe(struct i2c_client *client)
 			     regmaps, client->irq);
 }
 
-<<<<<<< HEAD
 static void max310x_i2c_remove(struct i2c_client *client)
 {
 	max310x_remove(&client->dev);
-=======
-static int max310x_i2c_remove(struct i2c_client *client)
-{
-	max310x_remove(&client->dev);
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct i2c_driver max310x_i2c_driver = {
@@ -1654,7 +1646,6 @@ static int __init max310x_uart_init(void)
 	ret = spi_register_driver(&max310x_spi_driver);
 	if (ret)
 		goto err_spi_register;
-<<<<<<< HEAD
 #endif
 
 #ifdef CONFIG_I2C
@@ -1663,16 +1654,6 @@ static int __init max310x_uart_init(void)
 		goto err_i2c_register;
 #endif
 
-=======
-#endif
-
-#ifdef CONFIG_I2C
-	ret = i2c_add_driver(&max310x_i2c_driver);
-	if (ret)
-		goto err_i2c_register;
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 #ifdef CONFIG_I2C

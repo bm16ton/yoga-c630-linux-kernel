@@ -641,17 +641,6 @@ __cmd_probe(int argc, const char **argv)
 	ret = symbol__validate_sym_arguments();
 	if (ret)
 		return ret;
-<<<<<<< HEAD
-=======
-
-	if (params.quiet) {
-		if (verbose != 0) {
-			pr_err("  Error: -v and -q are exclusive.\n");
-			return -EINVAL;
-		}
-		verbose = -1;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (probe_conf.max_probes == 0)
 		probe_conf.max_probes = MAX_PROBES;

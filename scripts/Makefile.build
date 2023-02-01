@@ -383,11 +383,7 @@ $(obj)/%.o: $(src)/%.S FORCE
 
 targets += $(filter-out $(subdir-builtin), $(real-obj-y))
 targets += $(filter-out $(subdir-modorder), $(real-obj-m))
-<<<<<<< HEAD
 targets += $(real-dtb-y) $(lib-y) $(always-y)
-=======
-targets += $(real-dtb-y) $(lib-y) $(always-y) $(MAKECMDGOALS)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # Linker scripts preprocessor (.lds.S -> .lds)
 # ---------------------------------------------------------------------------
@@ -452,7 +448,6 @@ $(obj)/lib.a: $(lib-y) FORCE
 
 quiet_cmd_ld_multi_m = LD [M]  $@
       cmd_ld_multi_m = $(LD) $(ld_flags) -r -o $@ @$(patsubst %.o,%.mod,$@) $(cmd_objtool)
-<<<<<<< HEAD
 
 define rule_ld_multi_m
 	$(call cmd_and_savecmd,ld_multi_m)
@@ -464,21 +459,6 @@ $(multi-obj-m): part-of-module := y
 $(multi-obj-m): %.o: %.mod FORCE
 	$(call if_changed_rule,ld_multi_m)
 $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
-=======
-
-define rule_ld_multi_m
-	$(call cmd_and_savecmd,ld_multi_m)
-	$(call cmd,gen_objtooldep)
-endef
-
-$(multi-obj-m): objtool-enabled := $(delay-objtool)
-$(multi-obj-m): part-of-module := y
-$(multi-obj-m): %.o: %.mod FORCE
-	$(call if_changed_rule,ld_multi_m)
-$(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
-
-targets := $(filter-out $(PHONY), $(targets))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # Add intermediate targets:
 # When building objects with specific suffix patterns, add intermediate

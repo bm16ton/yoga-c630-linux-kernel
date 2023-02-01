@@ -14,10 +14,7 @@
 #include <linux/usb/tcpci.h>
 #include <linux/usb/tcpm.h>
 #include <linux/regmap.h>
-<<<<<<< HEAD
 #include <linux/regulator/consumer.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define RT1711H_VID		0x29CF
 #define RT1711H_PID		0x1711

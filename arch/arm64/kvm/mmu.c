@@ -99,7 +99,6 @@ static bool kvm_is_device_pfn(unsigned long pfn)
 static void *stage2_memcache_zalloc_page(void *arg)
 {
 	struct kvm_mmu_memory_cache *mc = arg;
-<<<<<<< HEAD
 	void *virt;
 
 	/* Allocated with __GFP_ZERO, so no need to zero */
@@ -107,11 +106,6 @@ static void *stage2_memcache_zalloc_page(void *arg)
 	if (virt)
 		kvm_account_pgtable_pages(virt, 1);
 	return virt;
-=======
-
-	/* Allocated with __GFP_ZERO, so no need to zero */
-	return kvm_mmu_memory_cache_alloc(mc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void *kvm_host_zalloc_pages_exact(size_t size)
@@ -119,7 +113,6 @@ static void *kvm_host_zalloc_pages_exact(size_t size)
 	return alloc_pages_exact(size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
 }
 
-<<<<<<< HEAD
 static void *kvm_s2_zalloc_pages_exact(size_t size)
 {
 	void *virt = kvm_host_zalloc_pages_exact(size);
@@ -135,8 +128,6 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
 	free_pages_exact(virt, size);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void kvm_host_get_page(void *addr)
 {
 	get_page(virt_to_page(addr));
@@ -147,7 +138,6 @@ static void kvm_host_put_page(void *addr)
 	put_page(virt_to_page(addr));
 }
 
-<<<<<<< HEAD
 static void kvm_s2_put_page(void *addr)
 {
 	struct page *p = virt_to_page(addr);
@@ -157,8 +147,6 @@ static void kvm_s2_put_page(void *addr)
 	put_page(p);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int kvm_host_page_count(void *addr)
 {
 	return page_count(virt_to_page(addr));
@@ -672,17 +660,10 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
 
 static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
 	.zalloc_page		= stage2_memcache_zalloc_page,
-<<<<<<< HEAD
 	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
 	.free_pages_exact	= kvm_s2_free_pages_exact,
 	.get_page		= kvm_host_get_page,
 	.put_page		= kvm_s2_put_page,
-=======
-	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
-	.free_pages_exact	= free_pages_exact,
-	.get_page		= kvm_host_get_page,
-	.put_page		= kvm_host_put_page,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.page_count		= kvm_host_page_count,
 	.phys_to_virt		= kvm_host_va,
 	.virt_to_phys		= kvm_host_pa,

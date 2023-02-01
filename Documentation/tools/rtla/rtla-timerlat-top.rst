@@ -39,11 +39,7 @@ higher than *30 us*. It is also set to stop the session if a *Thread* timer
 latency higher than *30 us* is hit. Finally, it is set to save the trace
 buffer if the stop condition is hit::
 
-<<<<<<< HEAD
   [root@alien ~]# rtla timerlat top -s 30 -T 30 -t
-=======
-  [root@alien ~]# rtla timerlat top -s 30 -t 30 -T
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
                    Timer Latency
     0 00:00:59   |          IRQ Timer Latency (us)        |         Thread Timer Latency (us)
   CPU COUNT      |      cur       min       avg       max |      cur       min       avg       max

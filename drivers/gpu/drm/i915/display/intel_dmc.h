@@ -47,10 +47,7 @@ struct intel_dmc {
 
 void intel_dmc_ucode_init(struct drm_i915_private *i915);
 void intel_dmc_load_program(struct drm_i915_private *i915);
-<<<<<<< HEAD
 void intel_dmc_disable_program(struct drm_i915_private *i915);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void intel_dmc_ucode_fini(struct drm_i915_private *i915);
 void intel_dmc_ucode_suspend(struct drm_i915_private *i915);
 void intel_dmc_ucode_resume(struct drm_i915_private *i915);

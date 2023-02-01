@@ -24,10 +24,7 @@
 #include "../../codecs/rt5682.h"
 #include "../../codecs/rt1019.h"
 #include "../../codecs/rt5682s.h"
-<<<<<<< HEAD
 #include "../../codecs/nau8825.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "acp-mach.h"
 
 #define PCO_PLAT_CLK 48000000
@@ -75,34 +72,6 @@ static const struct snd_soc_dapm_route rt5682_map[] = {
 	{ "IN1P", NULL, "Headset Mic" },
 };
 
-<<<<<<< HEAD
-=======
-int event_spkr_handler(struct snd_soc_dapm_widget *w,
-			struct snd_kcontrol *k, int event)
-{
-	struct snd_soc_dapm_context *dapm = w->dapm;
-	struct snd_soc_card *card = dapm->card;
-	struct acp_card_drvdata *drvdata = snd_soc_card_get_drvdata(card);
-
-	if (!gpio_is_valid(drvdata->gpio_spkr_en))
-		return 0;
-
-	switch (event) {
-	case SND_SOC_DAPM_POST_PMU:
-		gpio_set_value(drvdata->gpio_spkr_en, 1);
-		break;
-	case SND_SOC_DAPM_PRE_PMD:
-		gpio_set_value(drvdata->gpio_spkr_en, 0);
-		break;
-	default:
-		dev_warn(card->dev, "%s invalid setting\n", __func__);
-		break;
-	}
-	return 0;
-}
-EXPORT_SYMBOL_NS_GPL(event_spkr_handler, SND_SOC_AMD_MACH);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Define card ops for RT5682 CODEC */
 static int acp_card_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 {
@@ -152,11 +121,7 @@ static int acp_card_rt5682_init(struct snd_soc_pcm_runtime *rtd)
 				    SND_JACK_HEADSET | SND_JACK_LINEOUT |
 				    SND_JACK_BTN_0 | SND_JACK_BTN_1 |
 				    SND_JACK_BTN_2 | SND_JACK_BTN_3,
-<<<<<<< HEAD
 				    &pco_jack);
-=======
-				    &pco_jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(card->dev, "HP jack creation failed %d\n", ret);
 		return ret;
@@ -184,7 +149,6 @@ static int acp_card_hs_startup(struct snd_pcm_substream *substream)
 	struct acp_card_drvdata *drvdata = card->drvdata;
 	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
 	int ret;
-<<<<<<< HEAD
 	unsigned int fmt;
 
 	if (drvdata->soc_mclk)
@@ -193,11 +157,6 @@ static int acp_card_hs_startup(struct snd_pcm_substream *substream)
 		fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_CBP_CFP;
 
 	ret =  snd_soc_dai_set_fmt(codec_dai, fmt);
-=======
-
-	ret =  snd_soc_dai_set_fmt(codec_dai, SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF
-				   | SND_SOC_DAIFMT_CBP_CFP);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		dev_err(rtd->card->dev, "Failed to set dai fmt: %d\n", ret);
 		return ret;
@@ -208,7 +167,6 @@ static int acp_card_hs_startup(struct snd_pcm_substream *substream)
 				      &constraints_channels);
 	snd_pcm_hw_constraint_list(runtime, 0, SNDRV_PCM_HW_PARAM_RATE,
 				      &constraints_rates);
-<<<<<<< HEAD
 	if (!drvdata->soc_mclk) {
 		ret = acp_clk_enable(drvdata);
 		if (ret < 0) {
@@ -216,12 +174,6 @@ static int acp_card_hs_startup(struct snd_pcm_substream *substream)
 			return ret;
 		}
 	}
-=======
-
-	ret = acp_clk_enable(drvdata);
-	if (ret < 0)
-		dev_err(rtd->card->dev, "Failed to enable HS clk: %d\n", ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -232,12 +184,8 @@ static void acp_card_shutdown(struct snd_pcm_substream *substream)
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
 
-<<<<<<< HEAD
 	if (!drvdata->soc_mclk)
 		clk_disable_unprepare(drvdata->wclk);
-=======
-	clk_disable_unprepare(drvdata->wclk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct snd_soc_ops acp_card_rt5682_ops = {
@@ -261,10 +209,7 @@ static int acp_card_rt5682s_init(struct snd_soc_pcm_runtime *rtd)
 	struct acp_card_drvdata *drvdata = card->drvdata;
 	struct snd_soc_dai *codec_dai = asoc_rtd_to_codec(rtd, 0);
 	struct snd_soc_component *component = codec_dai->component;
-<<<<<<< HEAD
 	unsigned int fmt;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	dev_info(rtd->dev, "codec dai name = %s\n", codec_dai->name);
@@ -272,17 +217,12 @@ static int acp_card_rt5682s_init(struct snd_soc_pcm_runtime *rtd)
 	if (drvdata->hs_codec_id != RT5682S)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	if (drvdata->soc_mclk)
 		fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_CBC_CFC;
 	else
 		fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_CBP_CFP;
 
 	ret =  snd_soc_dai_set_fmt(codec_dai, fmt);
-=======
-	ret =  snd_soc_dai_set_fmt(codec_dai, SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF
-				   | SND_SOC_DAIFMT_CBP_CFP);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		dev_err(rtd->card->dev, "Failed to set dai fmt: %d\n", ret);
 		return ret;
@@ -309,25 +249,16 @@ static int acp_card_rt5682s_init(struct snd_soc_pcm_runtime *rtd)
 		return ret;
 	}
 
-<<<<<<< HEAD
 	if (!drvdata->soc_mclk) {
 		drvdata->wclk = clk_get(component->dev, "rt5682-dai-wclk");
 		drvdata->bclk = clk_get(component->dev, "rt5682-dai-bclk");
 	}
-=======
-	drvdata->wclk = clk_get(component->dev, "rt5682-dai-wclk");
-	drvdata->bclk = clk_get(component->dev, "rt5682-dai-bclk");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = snd_soc_card_jack_new(card, "Headset Jack",
 				    SND_JACK_HEADSET | SND_JACK_LINEOUT |
 				    SND_JACK_BTN_0 | SND_JACK_BTN_1 |
 				    SND_JACK_BTN_2 | SND_JACK_BTN_3,
-<<<<<<< HEAD
 				    &pco_jack);
-=======
-				    &pco_jack, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(card->dev, "HP jack creation failed %d\n", ret);
 		return ret;
@@ -449,11 +380,7 @@ static int acp_card_amp_startup(struct snd_pcm_substream *substream)
 	struct snd_soc_pcm_runtime *rtd = asoc_substream_to_rtd(substream);
 	struct snd_soc_card *card = rtd->card;
 	struct acp_card_drvdata *drvdata = card->drvdata;
-<<<<<<< HEAD
 	int ret = 0;
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	runtime->hw.channels_max = DUAL_CHANNEL;
 	snd_pcm_hw_constraint_list(runtime, 0, SNDRV_PCM_HW_PARAM_CHANNELS,
@@ -461,7 +388,6 @@ static int acp_card_amp_startup(struct snd_pcm_substream *substream)
 	snd_pcm_hw_constraint_list(runtime, 0, SNDRV_PCM_HW_PARAM_RATE,
 				      &constraints_rates);
 
-<<<<<<< HEAD
 	if (!drvdata->soc_mclk) {
 		ret = acp_clk_enable(drvdata);
 		if (ret < 0) {
@@ -469,12 +395,6 @@ static int acp_card_amp_startup(struct snd_pcm_substream *substream)
 			return ret;
 		}
 	}
-=======
-	ret = acp_clk_enable(drvdata);
-	if (ret < 0)
-		dev_err(rtd->card->dev, "Failed to enable AMP clk: %d\n", ret);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -509,7 +429,6 @@ static const struct snd_soc_ops acp_card_maxim_ops = {
 	.shutdown = acp_card_shutdown,
 };
 
-<<<<<<< HEAD
 /* Declare nau8825 codec components */
 SND_SOC_DAILINK_DEF(nau8825,
 		    DAILINK_COMP_ARRAY(COMP_CODEC("i2c-10508825:00", "nau8825-hifi")));
@@ -608,8 +527,6 @@ static const struct snd_soc_ops acp_card_nau8825_ops = {
 	.hw_params = acp_nau8825_hw_params,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Declare DMIC codec components */
 SND_SOC_DAILINK_DEF(dmic_codec,
 		DAILINK_COMP_ARRAY(COMP_CODEC("dmic-codec", "dmic-hifi")));
@@ -628,15 +545,12 @@ static struct snd_soc_dai_link_component platform_component[] = {
 	}
 };
 
-<<<<<<< HEAD
 static struct snd_soc_dai_link_component platform_rmb_component[] = {
 	{
 		.name = "acp_asoc_rembrandt.0",
 	}
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct snd_soc_dai_link_component sof_component[] = {
 	{
 		 .name = "0000:04:00.5",
@@ -645,17 +559,12 @@ static struct snd_soc_dai_link_component sof_component[] = {
 
 SND_SOC_DAILINK_DEF(i2s_sp,
 	DAILINK_COMP_ARRAY(COMP_CPU("acp-i2s-sp")));
-<<<<<<< HEAD
 SND_SOC_DAILINK_DEF(i2s_hs,
 		    DAILINK_COMP_ARRAY(COMP_CPU("acp-i2s-hs")));
 SND_SOC_DAILINK_DEF(sof_sp,
 	DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-sp")));
 SND_SOC_DAILINK_DEF(sof_hs,
 		    DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-hs")));
-=======
-SND_SOC_DAILINK_DEF(sof_sp,
-	DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-sp")));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 SND_SOC_DAILINK_DEF(sof_dmic,
 	DAILINK_COMP_ARRAY(COMP_CPU("acp-sof-dmic")));
 SND_SOC_DAILINK_DEF(pdm_dmic,
@@ -675,11 +584,7 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 	if (drv_data->dmic_cpu_id)
 		num_links++;
 
-<<<<<<< HEAD
 	links = devm_kcalloc(dev, num_links, sizeof(struct snd_soc_dai_link), GFP_KERNEL);
-=======
-	links = devm_kzalloc(dev, sizeof(struct snd_soc_dai_link) * num_links, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!links)
 		return -ENOMEM;
 
@@ -714,7 +619,6 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-<<<<<<< HEAD
 	if (drv_data->hs_cpu_id == I2S_HS) {
 		links[i].name = "acp-headset-codec";
 		links[i].id = HEADSET_BE_ID;
@@ -746,8 +650,6 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (drv_data->amp_cpu_id == I2S_SP) {
 		links[i].name = "acp-amp-codec";
 		links[i].id = AMP_BE_ID;
@@ -780,7 +682,6 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-<<<<<<< HEAD
 	if (drv_data->amp_cpu_id == I2S_HS) {
 		links[i].name = "acp-amp-codec";
 		links[i].id = AMP_BE_ID;
@@ -813,8 +714,6 @@ int acp_sofdsp_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (drv_data->dmic_cpu_id == DMIC) {
 		links[i].name = "acp-dmic-codec";
 		links[i].id = DMIC_BE_ID;
@@ -850,11 +749,7 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 	if (drv_data->dmic_cpu_id)
 		num_links++;
 
-<<<<<<< HEAD
 	links = devm_kcalloc(dev, num_links, sizeof(struct snd_soc_dai_link), GFP_KERNEL);
-=======
-	links = devm_kzalloc(dev, sizeof(struct snd_soc_dai_link) * num_links, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!links)
 		return -ENOMEM;
 
@@ -887,7 +782,6 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-<<<<<<< HEAD
 	if (drv_data->hs_cpu_id == I2S_HS) {
 		links[i].name = "acp-headset-codec";
 		links[i].id = HEADSET_BE_ID;
@@ -922,8 +816,6 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (drv_data->amp_cpu_id == I2S_SP) {
 		links[i].name = "acp-amp-codec";
 		links[i].id = AMP_BE_ID;
@@ -954,7 +846,6 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-<<<<<<< HEAD
 	if (drv_data->amp_cpu_id == I2S_HS) {
 		links[i].name = "acp-amp-codec";
 		links[i].id = AMP_BE_ID;
@@ -990,8 +881,6 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		i++;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (drv_data->dmic_cpu_id == DMIC) {
 		links[i].name = "acp-dmic-codec";
 		links[i].id = DMIC_BE_ID;
@@ -1005,7 +894,6 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 		}
 		links[i].cpus = pdm_dmic;
 		links[i].num_cpus = ARRAY_SIZE(pdm_dmic);
-<<<<<<< HEAD
 		if (drv_data->platform == REMBRANDT) {
 			links[i].platforms = platform_rmb_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_rmb_component);
@@ -1013,10 +901,6 @@ int acp_legacy_dai_links_create(struct snd_soc_card *card)
 			links[i].platforms = platform_component;
 			links[i].num_platforms = ARRAY_SIZE(platform_component);
 		}
-=======
-		links[i].platforms = platform_component;
-		links[i].num_platforms = ARRAY_SIZE(platform_component);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		links[i].ops = &acp_card_dmic_ops;
 		links[i].dpcm_capture = 1;
 	}

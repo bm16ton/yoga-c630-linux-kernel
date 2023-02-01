@@ -478,14 +478,7 @@ static int do_read_inode(struct inode *inode)
 		}
 	}
 
-<<<<<<< HEAD
 	init_idisk_time(inode);
-=======
-	fi->i_disk_time[0] = inode->i_atime;
-	fi->i_disk_time[1] = inode->i_ctime;
-	fi->i_disk_time[2] = inode->i_mtime;
-	fi->i_disk_time[3] = fi->i_crtime;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f2fs_put_page(node_page, 1);
 
 	stat_inc_inline_xattr(inode);
@@ -530,11 +523,6 @@ struct inode *f2fs_iget(struct super_block *sb, unsigned long ino)
 
 	if (is_meta_ino(sbi, ino))
 		goto make_now;
-
-#ifdef CONFIG_F2FS_FS_COMPRESSION
-	if (ino == F2FS_COMPRESS_INO(sbi))
-		goto make_now;
-#endif
 
 	ret = do_read_inode(inode);
 	if (ret)
@@ -709,14 +697,6 @@ void f2fs_update_inode(struct inode *inode, struct page *node_page)
 	/* deleted inode */
 	if (inode->i_nlink == 0)
 		clear_page_private_inline(node_page);
-<<<<<<< HEAD
-=======
-
-	F2FS_I(inode)->i_disk_time[0] = inode->i_atime;
-	F2FS_I(inode)->i_disk_time[1] = inode->i_ctime;
-	F2FS_I(inode)->i_disk_time[2] = inode->i_mtime;
-	F2FS_I(inode)->i_disk_time[3] = F2FS_I(inode)->i_crtime;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	init_idisk_time(inode);
 #ifdef CONFIG_F2FS_CHECK_FS

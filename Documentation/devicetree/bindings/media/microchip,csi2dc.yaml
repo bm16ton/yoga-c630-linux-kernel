@@ -75,10 +75,7 @@ properties:
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/$defs/port-base
-<<<<<<< HEAD
         unevaluatedProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         description:
           Input port node, single endpoint describing the input port.
 
@@ -107,10 +104,7 @@ properties:
 
       port@1:
         $ref: /schemas/graph.yaml#/$defs/port-base
-<<<<<<< HEAD
         unevaluatedProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         description:
           Output port node, single endpoint describing the output port.
 

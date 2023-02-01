@@ -479,7 +479,6 @@ int rtas_call(int token, int nargs, int nret, int *outputs, ...)
 	if (!rtas.entry || token == RTAS_UNKNOWN_SERVICE)
 		return -1;
 
-<<<<<<< HEAD
 	if (token == ibm_open_errinjct_token || token == ibm_errinjct_token) {
 		/*
 		 * It would be nicer to not discard the error value
@@ -490,8 +489,6 @@ int rtas_call(int token, int nargs, int nret, int *outputs, ...)
 			return -1;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if ((mfmsr() & (MSR_IR|MSR_DR)) != (MSR_IR|MSR_DR)) {
 		WARN_ON_ONCE(1);
 		return -1;
@@ -1308,12 +1305,8 @@ void __init rtas_initialize(void)
 #ifdef CONFIG_RTAS_ERROR_LOGGING
 	rtas_last_error_token = rtas_token("rtas-last-error");
 #endif
-<<<<<<< HEAD
 	ibm_open_errinjct_token = rtas_token("ibm,open-errinjct");
 	ibm_errinjct_token = rtas_token("ibm,errinjct");
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rtas_syscall_filter_init();
 }
 

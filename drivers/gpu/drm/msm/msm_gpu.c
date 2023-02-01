@@ -440,11 +440,8 @@ static void recover_worker(struct kthread_work *work)
 		}
 	}
 
-<<<<<<< HEAD
 	pm_runtime_put(&gpu->pdev->dev);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&gpu->lock);
 
 	msm_gpu_retire(gpu);
@@ -667,20 +664,12 @@ static void retire_submit(struct msm_gpu *gpu, struct msm_ringbuffer *ring,
 	mutex_lock(&gpu->active_lock);
 	gpu->active_submits--;
 	WARN_ON(gpu->active_submits < 0);
-<<<<<<< HEAD
 	if (!gpu->active_submits) {
 		msm_devfreq_idle(gpu);
 		pm_runtime_put_autosuspend(&gpu->pdev->dev);
 	}
 
 	mutex_unlock(&gpu->active_lock);
-=======
-	if (!gpu->active_submits)
-		msm_devfreq_idle(gpu);
-	mutex_unlock(&gpu->active_lock);
-
-	pm_runtime_put_autosuspend(&gpu->pdev->dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	msm_gem_submit_put(submit);
 }
@@ -769,15 +758,10 @@ void msm_gpu_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 
 	/* Update devfreq on transition from idle->active: */
 	mutex_lock(&gpu->active_lock);
-<<<<<<< HEAD
 	if (!gpu->active_submits) {
 		pm_runtime_get(&gpu->pdev->dev);
 		msm_devfreq_active(gpu);
 	}
-=======
-	if (!gpu->active_submits)
-		msm_devfreq_active(gpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpu->active_submits++;
 	mutex_unlock(&gpu->active_lock);
 
@@ -866,10 +850,6 @@ int msm_gpu_init(struct drm_device *drm, struct platform_device *pdev,
 
 	sched_set_fifo_low(gpu->worker->task);
 
-<<<<<<< HEAD
-=======
-	INIT_LIST_HEAD(&gpu->active_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&gpu->active_lock);
 	mutex_init(&gpu->lock);
 	init_waitqueue_head(&gpu->retire_event);

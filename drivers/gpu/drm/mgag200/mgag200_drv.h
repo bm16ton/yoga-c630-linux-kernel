@@ -158,10 +158,6 @@
 #define MGAG200_MAX_FB_WIDTH 4096
 
 struct mga_device;
-<<<<<<< HEAD
-=======
-struct mgag200_pll;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Stores parameters for programming the PLLs
@@ -180,29 +176,12 @@ struct mgag200_pll_values {
 	unsigned int s;
 };
 
-<<<<<<< HEAD
 struct mgag200_crtc_state {
 	struct drm_crtc_state base;
 
 	/* Primary-plane format; required for modesetting and color mgmt. */
 	const struct drm_format_info *format;
 
-=======
-struct mgag200_pll_funcs {
-	int (*compute)(struct mgag200_pll *pll, long clock, struct mgag200_pll_values *pllc);
-	void (*update)(struct mgag200_pll *pll, const struct mgag200_pll_values *pllc);
-};
-
-struct mgag200_pll {
-	struct mga_device *mdev;
-
-	const struct mgag200_pll_funcs *funcs;
-};
-
-struct mgag200_crtc_state {
-	struct drm_crtc_state base;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mgag200_pll_values pixpllc;
 };
 
@@ -231,11 +210,6 @@ enum mga_type {
 	G200_EW3,
 };
 
-<<<<<<< HEAD
-=======
-#define IS_G200_SE(mdev) (mdev->type == G200_SE_A || mdev->type == G200_SE_B)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct mgag200_device_info {
 	u16 max_hdisplay;
 	u16 max_vdisplay;
@@ -275,7 +249,6 @@ struct mgag200_device_info {
 		}, \
 		.bug_no_startadd = (_bug_no_startadd), \
 	}
-<<<<<<< HEAD
 
 struct mgag200_device_funcs {
 	/*
@@ -304,17 +277,12 @@ struct mgag200_device_funcs {
 	 */
 	void (*pixpllc_atomic_update)(struct drm_crtc *crtc, struct drm_atomic_state *old_state);
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct mga_device {
 	struct drm_device base;
 
 	const struct mgag200_device_info *info;
-<<<<<<< HEAD
 	const struct mgag200_device_funcs *funcs;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct resource			*rmmio_res;
 	void __iomem			*rmmio;
@@ -324,20 +292,11 @@ struct mga_device {
 	void __iomem			*vram;
 	resource_size_t			vram_available;
 
-<<<<<<< HEAD
 	struct drm_plane primary_plane;
 	struct drm_crtc crtc;
 	struct drm_encoder encoder;
 	struct mga_i2c_chan i2c;
 	struct drm_connector connector;
-=======
-	enum mga_type			type;
-
-	struct mgag200_pll pixpll;
-	struct mga_i2c_chan i2c;
-	struct drm_connector connector;
-	struct drm_simple_display_pipe display_pipe;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct mga_device *to_mga_device(struct drm_device *dev)
@@ -376,7 +335,6 @@ int mgag200_init_pci_options(struct pci_dev *pdev, u32 option, u32 option2);
 resource_size_t mgag200_probe_vram(void __iomem *mem, resource_size_t size);
 resource_size_t mgag200_device_probe_vram(struct mga_device *mdev);
 int mgag200_device_preinit(struct mga_device *mdev);
-<<<<<<< HEAD
 int mgag200_device_init(struct mga_device *mdev,
 			const struct mgag200_device_info *info,
 			const struct mgag200_device_funcs *funcs);
@@ -485,37 +443,5 @@ void mgag200_bmc_enable_vidrst(struct mga_device *mdev);
 
 				/* mgag200_i2c.c */
 int mgag200_i2c_init(struct mga_device *mdev, struct mga_i2c_chan *i2c);
-=======
-int mgag200_device_init(struct mga_device *mdev, enum mga_type type,
-			const struct mgag200_device_info *info);
-
-				/* mgag200_<device type>.c */
-struct mga_device *mgag200_g200_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-					      enum mga_type type);
-struct mga_device *mgag200_g200se_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-						enum mga_type type);
-struct mga_device *mgag200_g200wb_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-						enum mga_type type);
-struct mga_device *mgag200_g200ev_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-						enum mga_type type);
-struct mga_device *mgag200_g200eh_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-						enum mga_type type);
-struct mga_device *mgag200_g200eh3_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-						 enum mga_type type);
-struct mga_device *mgag200_g200er_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-						enum mga_type type);
-struct mga_device *mgag200_g200ew3_device_create(struct pci_dev *pdev, const struct drm_driver *drv,
-						 enum mga_type type);
-
-				/* mgag200_mode.c */
-resource_size_t mgag200_device_probe_vram(struct mga_device *mdev);
-int mgag200_modeset_init(struct mga_device *mdev, resource_size_t vram_fb_available);
-
-				/* mgag200_i2c.c */
-int mgag200_i2c_init(struct mga_device *mdev, struct mga_i2c_chan *i2c);
-
-				/* mgag200_pll.c */
-int mgag200_pixpll_init(struct mgag200_pll *pixpll, struct mga_device *mdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif				/* __MGAG200_DRV_H__ */

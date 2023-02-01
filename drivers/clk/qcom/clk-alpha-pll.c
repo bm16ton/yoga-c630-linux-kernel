@@ -167,7 +167,6 @@ const u8 clk_alpha_pll_regs[][PLL_OFF_MAX_REGS] = {
 		[PLL_OFF_TEST_CTL] = 0x28,
 		[PLL_OFF_TEST_CTL_U] = 0x2c,
 	},
-<<<<<<< HEAD
 	[CLK_ALPHA_PLL_TYPE_DEFAULT_EVO] =  {
 		[PLL_OFF_L_VAL] = 0x04,
 		[PLL_OFF_ALPHA_VAL] = 0x08,
@@ -189,8 +188,6 @@ const u8 clk_alpha_pll_regs[][PLL_OFF_MAX_REGS] = {
 		[PLL_OFF_CONFIG_CTL] = 0x1C,
 		[PLL_OFF_STATUS] = 0x20,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_GPL(clk_alpha_pll_regs);
 
@@ -2117,11 +2114,7 @@ static int alpha_pll_lucid_evo_enable(struct clk_hw *hw)
 	return ret;
 }
 
-<<<<<<< HEAD
 static void _alpha_pll_lucid_evo_disable(struct clk_hw *hw, bool reset)
-=======
-static void alpha_pll_lucid_evo_disable(struct clk_hw *hw)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct clk_alpha_pll *pll = to_clk_alpha_pll(hw);
 	struct regmap *regmap = pll->clkr.regmap;
@@ -2150,18 +2143,12 @@ static void alpha_pll_lucid_evo_disable(struct clk_hw *hw)
 
 	/* Place the PLL mode in STANDBY */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
-<<<<<<< HEAD
 
 	if (reset)
 		regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N, 0);
 }
 
 static int _alpha_pll_lucid_evo_prepare(struct clk_hw *hw, bool reset)
-=======
-}
-
-static int alpha_pll_lucid_evo_prepare(struct clk_hw *hw)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct clk_alpha_pll *pll = to_clk_alpha_pll(hw);
 	struct clk_hw *p;
@@ -2181,16 +2168,11 @@ static int alpha_pll_lucid_evo_prepare(struct clk_hw *hw)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	_alpha_pll_lucid_evo_disable(hw, reset);
-=======
-	alpha_pll_lucid_evo_disable(hw);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
-<<<<<<< HEAD
 static void alpha_pll_lucid_evo_disable(struct clk_hw *hw)
 {
 	_alpha_pll_lucid_evo_disable(hw, false);
@@ -2211,8 +2193,6 @@ static int alpha_pll_reset_lucid_evo_prepare(struct clk_hw *hw)
 	return _alpha_pll_lucid_evo_prepare(hw, true);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static unsigned long alpha_pll_lucid_evo_recalc_rate(struct clk_hw *hw,
 						     unsigned long parent_rate)
 {
@@ -2260,7 +2240,6 @@ const struct clk_ops clk_alpha_pll_lucid_evo_ops = {
 };
 EXPORT_SYMBOL_GPL(clk_alpha_pll_lucid_evo_ops);
 
-<<<<<<< HEAD
 const struct clk_ops clk_alpha_pll_reset_lucid_evo_ops = {
 	.prepare = alpha_pll_reset_lucid_evo_prepare,
 	.enable = alpha_pll_lucid_evo_enable,
@@ -2272,8 +2251,6 @@ const struct clk_ops clk_alpha_pll_reset_lucid_evo_ops = {
 };
 EXPORT_SYMBOL_GPL(clk_alpha_pll_reset_lucid_evo_ops);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void clk_rivian_evo_pll_configure(struct clk_alpha_pll *pll, struct regmap *regmap,
 				  const struct alpha_pll_config *config)
 {

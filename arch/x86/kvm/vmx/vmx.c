@@ -1700,11 +1700,7 @@ static void vmx_inject_exception(struct kvm_vcpu *vcpu)
 
 	kvm_deliver_exception_payload(vcpu, ex);
 
-<<<<<<< HEAD
 	if (ex->has_error_code) {
-=======
-	if (has_error_code) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Despite the error code being architecturally defined as 32
 		 * bits, and the VMCS field being 32 bits, Intel CPUs and thus
@@ -1715,11 +1711,7 @@ static void vmx_inject_exception(struct kvm_vcpu *vcpu)
 		 * the upper bits to avoid VM-Fail, losing information that
 		 * does't really exist is preferable to killing the VM.
 		 */
-<<<<<<< HEAD
 		vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, (u16)ex->error_code);
-=======
-		vmcs_write32(VM_ENTRY_EXCEPTION_ERROR_CODE, (u16)error_code);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		intr_info |= INTR_INFO_DELIVER_CODE_MASK;
 	}
 
@@ -1813,7 +1805,6 @@ u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
 u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
 {
 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-<<<<<<< HEAD
 
 	if (nested_cpu_has(vmcs12, CPU_BASED_USE_TSC_OFFSETTING) &&
 	    nested_cpu_has2(vmcs12, SECONDARY_EXEC_TSC_SCALING))
@@ -1827,21 +1818,6 @@ static void vmx_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
 	vmcs_write64(TSC_OFFSET, offset);
 }
 
-=======
-
-	if (nested_cpu_has(vmcs12, CPU_BASED_USE_TSC_OFFSETTING) &&
-	    nested_cpu_has2(vmcs12, SECONDARY_EXEC_TSC_SCALING))
-		return vmcs12->tsc_multiplier;
-
-	return kvm_caps.default_tsc_scaling_ratio;
-}
-
-static void vmx_write_tsc_offset(struct kvm_vcpu *vcpu, u64 offset)
-{
-	vmcs_write64(TSC_OFFSET, offset);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 multiplier)
 {
 	vmcs_write64(TSC_MULTIPLIER, multiplier);
@@ -2048,19 +2024,11 @@ static u64 nested_vmx_truncate_sysenter_addr(struct kvm_vcpu *vcpu,
 static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated)
 {
 	u64 debugctl = 0;
-<<<<<<< HEAD
 
 	if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT) &&
 	    (host_initiated || guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT)))
 		debugctl |= DEBUGCTLMSR_BUS_LOCK_DETECT;
 
-=======
-
-	if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT) &&
-	    (host_initiated || guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT)))
-		debugctl |= DEBUGCTLMSR_BUS_LOCK_DETECT;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if ((vmx_get_perf_capabilities() & PMU_CAP_LBR_FMT) &&
 	    (host_initiated || intel_pmu_lbr_is_enabled(vcpu)))
 		debugctl |= DEBUGCTLMSR_LBR | DEBUGCTLMSR_FREEZE_LBRS_ON_PMI;
@@ -2607,10 +2575,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 	u64 _cpu_based_3rd_exec_control = 0;
 	u32 _vmexit_control = 0;
 	u32 _vmentry_control = 0;
-<<<<<<< HEAD
 	u64 misc_msr;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 
 	/*
@@ -2630,7 +2595,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 	};
 
 	memset(vmcs_conf, 0, sizeof(*vmcs_conf));
-<<<<<<< HEAD
 
 	if (adjust_vmx_controls(KVM_REQUIRED_VMX_CPU_BASED_VM_EXEC_CONTROL,
 				KVM_OPTIONAL_VMX_CPU_BASED_VM_EXEC_CONTROL,
@@ -2640,64 +2604,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS) {
 		if (adjust_vmx_controls(KVM_REQUIRED_VMX_SECONDARY_VM_EXEC_CONTROL,
 					KVM_OPTIONAL_VMX_SECONDARY_VM_EXEC_CONTROL,
-=======
-	min = CPU_BASED_HLT_EXITING |
-#ifdef CONFIG_X86_64
-	      CPU_BASED_CR8_LOAD_EXITING |
-	      CPU_BASED_CR8_STORE_EXITING |
-#endif
-	      CPU_BASED_CR3_LOAD_EXITING |
-	      CPU_BASED_CR3_STORE_EXITING |
-	      CPU_BASED_UNCOND_IO_EXITING |
-	      CPU_BASED_MOV_DR_EXITING |
-	      CPU_BASED_USE_TSC_OFFSETTING |
-	      CPU_BASED_MWAIT_EXITING |
-	      CPU_BASED_MONITOR_EXITING |
-	      CPU_BASED_INVLPG_EXITING |
-	      CPU_BASED_RDPMC_EXITING;
-
-	opt = CPU_BASED_TPR_SHADOW |
-	      CPU_BASED_USE_MSR_BITMAPS |
-	      CPU_BASED_ACTIVATE_SECONDARY_CONTROLS |
-	      CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
-	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_PROCBASED_CTLS,
-				&_cpu_based_exec_control) < 0)
-		return -EIO;
-#ifdef CONFIG_X86_64
-	if (_cpu_based_exec_control & CPU_BASED_TPR_SHADOW)
-		_cpu_based_exec_control &= ~CPU_BASED_CR8_LOAD_EXITING &
-					   ~CPU_BASED_CR8_STORE_EXITING;
-#endif
-	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS) {
-		min2 = 0;
-		opt2 = SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-			SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-			SECONDARY_EXEC_WBINVD_EXITING |
-			SECONDARY_EXEC_ENABLE_VPID |
-			SECONDARY_EXEC_ENABLE_EPT |
-			SECONDARY_EXEC_UNRESTRICTED_GUEST |
-			SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-			SECONDARY_EXEC_DESC |
-			SECONDARY_EXEC_ENABLE_RDTSCP |
-			SECONDARY_EXEC_ENABLE_INVPCID |
-			SECONDARY_EXEC_APIC_REGISTER_VIRT |
-			SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-			SECONDARY_EXEC_SHADOW_VMCS |
-			SECONDARY_EXEC_XSAVES |
-			SECONDARY_EXEC_RDSEED_EXITING |
-			SECONDARY_EXEC_RDRAND_EXITING |
-			SECONDARY_EXEC_ENABLE_PML |
-			SECONDARY_EXEC_TSC_SCALING |
-			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |
-			SECONDARY_EXEC_PT_USE_GPA |
-			SECONDARY_EXEC_PT_CONCEAL_VMX |
-			SECONDARY_EXEC_ENABLE_VMFUNC |
-			SECONDARY_EXEC_BUS_LOCK_DETECTION |
-			SECONDARY_EXEC_NOTIFY_VM_EXITING;
-		if (cpu_has_sgx())
-			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
-		if (adjust_vmx_controls(min2, opt2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					MSR_IA32_VMX_PROCBASED_CTLS2,
 					&_cpu_based_2nd_exec_control))
 			return -EIO;
@@ -2717,18 +2623,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 	rdmsr_safe(MSR_IA32_VMX_EPT_VPID_CAP,
 		&vmx_cap->ept, &vmx_cap->vpid);
 
-<<<<<<< HEAD
 	if (!(_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_EPT) &&
 	    vmx_cap->ept) {
-=======
-	if (_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_EPT) {
-		/* CR3 accesses and invlpg don't need to cause VM Exits when EPT
-		   enabled */
-		_cpu_based_exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
-					     CPU_BASED_CR3_STORE_EXITING |
-					     CPU_BASED_INVLPG_EXITING);
-	} else if (vmx_cap->ept) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_warn_once("EPT CAP should not exist if not support "
 				"1-setting enable EPT VM-execution control\n");
 
@@ -2746,16 +2642,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 			return -EIO;
 
 		vmx_cap->vpid = 0;
-<<<<<<< HEAD
-=======
-	}
-
-	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
-		u64 opt3 = TERTIARY_EXEC_IPI_VIRT;
-
-		_cpu_based_3rd_exec_control = adjust_vmx_controls64(opt3,
-					      MSR_IA32_VMX_PROCBASED_CTLS3);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!cpu_has_sgx())
@@ -2799,39 +2685,6 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
 
 		pr_warn_once("Inconsistent VM-Entry/VM-Exit pair, entry = %x, exit = %x\n",
 			     _vmentry_control & n_ctrl, _vmexit_control & x_ctrl);
-<<<<<<< HEAD
-=======
-
-		if (error_on_inconsistent_vmcs_config)
-			return -EIO;
-
-		_vmentry_control &= ~n_ctrl;
-		_vmexit_control &= ~x_ctrl;
-	}
-
-	/*
-	 * Some cpus support VM_{ENTRY,EXIT}_IA32_PERF_GLOBAL_CTRL but they
-	 * can't be used due to an errata where VM Exit may incorrectly clear
-	 * IA32_PERF_GLOBAL_CTRL[34:32].  Workaround the errata by using the
-	 * MSR load mechanism to switch IA32_PERF_GLOBAL_CTRL.
-	 */
-	if (boot_cpu_data.x86 == 0x6) {
-		switch (boot_cpu_data.x86_model) {
-		case 26: /* AAK155 */
-		case 30: /* AAP115 */
-		case 37: /* AAT100 */
-		case 44: /* BC86,AAY89,BD102 */
-		case 46: /* BA97 */
-			_vmentry_control &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-			_vmexit_control &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-			pr_warn_once("kvm: VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL "
-					"does not work properly. Using workaround\n");
-			break;
-		default:
-			break;
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (error_on_inconsistent_vmcs_config)
 			return -EIO;
@@ -3136,21 +2989,15 @@ int vmx_set_efer(struct kvm_vcpu *vcpu, u64 efer)
 		return 0;
 
 	vcpu->arch.efer = efer;
-<<<<<<< HEAD
 #ifdef CONFIG_X86_64
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (efer & EFER_LMA)
 		vm_entry_controls_setbit(vmx, VM_ENTRY_IA32E_MODE);
 	else
 		vm_entry_controls_clearbit(vmx, VM_ENTRY_IA32E_MODE);
-<<<<<<< HEAD
 #else
 	if (KVM_BUG_ON(efer & EFER_LMA, vcpu->kvm))
 		return 1;
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vmx_setup_uret_msrs(vmx);
 	return 0;
@@ -3328,7 +3175,6 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
 		 */
 		if (!kvm_register_is_available(vcpu, VCPU_EXREG_CR3))
 			vmx_cache_reg(vcpu, VCPU_EXREG_CR3);
-<<<<<<< HEAD
 
 		/*
 		 * When running with EPT but not unrestricted guest, KVM must
@@ -3361,40 +3207,6 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
 			vmx_set_cr4(vcpu, kvm_read_cr4(vcpu));
 
 		/*
-=======
-
-		/*
-		 * When running with EPT but not unrestricted guest, KVM must
-		 * intercept CR3 accesses when paging is _disabled_.  This is
-		 * necessary because restricted guests can't actually run with
-		 * paging disabled, and so KVM stuffs its own CR3 in order to
-		 * run the guest when identity mapped page tables.
-		 *
-		 * Do _NOT_ check the old CR0.PG, e.g. to optimize away the
-		 * update, it may be stale with respect to CR3 interception,
-		 * e.g. after nested VM-Enter.
-		 *
-		 * Lastly, honor L1's desires, i.e. intercept CR3 loads and/or
-		 * stores to forward them to L1, even if KVM does not need to
-		 * intercept them to preserve its identity mapped page tables.
-		 */
-		if (!(cr0 & X86_CR0_PG)) {
-			exec_controls_setbit(vmx, CR3_EXITING_BITS);
-		} else if (!is_guest_mode(vcpu)) {
-			exec_controls_clearbit(vmx, CR3_EXITING_BITS);
-		} else {
-			tmp = exec_controls_get(vmx);
-			tmp &= ~CR3_EXITING_BITS;
-			tmp |= get_vmcs12(vcpu)->cpu_based_vm_exec_control & CR3_EXITING_BITS;
-			exec_controls_set(vmx, tmp);
-		}
-
-		/* Note, vmx_set_cr4() consumes the new vcpu->arch.cr0. */
-		if ((old_cr0_pg ^ cr0) & X86_CR0_PG)
-			vmx_set_cr4(vcpu, kvm_read_cr4(vcpu));
-
-		/*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * When !CR0_PG -> CR0_PG, vcpu->arch.cr3 becomes active, but
 		 * GUEST_CR3 is still vmx->ept_identity_map_addr if EPT + !URG.
 		 */
@@ -4472,7 +4284,6 @@ static u32 vmx_vmentry_ctrl(void)
 	if (vmx_pt_mode_is_system())
 		vmentry_ctrl &= ~(VM_ENTRY_PT_CONCEAL_PIP |
 				  VM_ENTRY_LOAD_IA32_RTIT_CTL);
-<<<<<<< HEAD
 	/*
 	 * IA32e mode, and loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically.
 	 */
@@ -4484,18 +4295,12 @@ static u32 vmx_vmentry_ctrl(void)
 		vmentry_ctrl &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
 
 	return vmentry_ctrl;
-=======
-	/* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
-	return vmentry_ctrl &
-		~(VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VM_ENTRY_LOAD_IA32_EFER);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static u32 vmx_vmexit_ctrl(void)
 {
 	u32 vmexit_ctrl = vmcs_config.vmexit_ctrl;
 
-<<<<<<< HEAD
 	/*
 	 * Not used by KVM and never set in vmcs01 or vmcs02, but emulated for
 	 * nested virtualization and thus allowed to be set in vmcs12.
@@ -4510,11 +4315,6 @@ static u32 vmx_vmexit_ctrl(void)
 	if (cpu_has_perf_global_ctrl_bug())
 		vmexit_ctrl &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
 
-=======
-	if (vmx_pt_mode_is_system())
-		vmexit_ctrl &= ~(VM_EXIT_PT_CONCEAL_PIP |
-				 VM_EXIT_CLEAR_IA32_RTIT_CTL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Loading of EFER and PERF_GLOBAL_CTRL are toggled dynamically */
 	return vmexit_ctrl &
 		~(VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | VM_EXIT_LOAD_IA32_EFER);
@@ -4805,17 +4605,10 @@ static void init_vmcs(struct vcpu_vmx *vmx)
 
 	if (cpu_has_secondary_exec_ctrls())
 		secondary_exec_controls_set(vmx, vmx_secondary_exec_control(vmx));
-<<<<<<< HEAD
 
 	if (cpu_has_tertiary_exec_ctrls())
 		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
 
-=======
-
-	if (cpu_has_tertiary_exec_ctrls())
-		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (enable_apicv && lapic_in_kernel(&vmx->vcpu)) {
 		vmcs_write64(EOI_EXIT_BITMAP0, 0);
 		vmcs_write64(EOI_EXIT_BITMAP1, 0);
@@ -5356,15 +5149,10 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
 			 * instruction.  ICEBP generates a trap-like #DB, but
 			 * despite its interception control being tied to #DB,
 			 * is an instruction intercept, i.e. the VM-Exit occurs
-<<<<<<< HEAD
 			 * on the ICEBP itself.  Use the inner "skip" helper to
 			 * avoid single-step #DB and MTF updates, as ICEBP is
 			 * higher priority.  Note, skipping ICEBP still clears
 			 * STI and MOVSS blocking.
-=======
-			 * on the ICEBP itself.  Note, skipping ICEBP also
-			 * clears STI and MOVSS blocking.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 *
 			 * For all other #DBs, set vmcs.PENDING_DBG_EXCEPTIONS.BS
 			 * if single-step is enabled in RFLAGS and STI or MOVSS
@@ -5918,11 +5706,7 @@ static bool vmx_emulation_required_with_pending_exception(struct kvm_vcpu *vcpu)
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 
 	return vmx->emulation_required && !vmx->rmode.vm86_active &&
-<<<<<<< HEAD
 	       (kvm_is_exception_pending(vcpu) || vcpu->arch.exception.injected);
-=======
-	       (vcpu->arch.exception.pending || vcpu->arch.exception.injected);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
@@ -6124,7 +5908,6 @@ static int handle_encls(struct kvm_vcpu *vcpu)
 	 * SGX virtualization is disabled.  There is no software enable bit for
 	 * SGX, so KVM intercepts all ENCLS leafs and injects a #UD to prevent
 	 * the guest from executing ENCLS (when SGX is supported by hardware).
-<<<<<<< HEAD
 	 */
 	kvm_queue_exception(vcpu, UD_VECTOR);
 	return 1;
@@ -6137,22 +5920,6 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
 	 * Hardware may or may not set the BUS_LOCK_DETECTED flag on BUS_LOCK
 	 * VM-Exits. Unconditionally set the flag here and leave the handling to
 	 * vmx_handle_exit().
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	 */
-	to_vmx(vcpu)->exit_reason.bus_lock_detected = true;
-	return 1;
-}
-#endif /* CONFIG_X86_SGX_KVM */
-
-static int handle_notify(struct kvm_vcpu *vcpu)
-{
-<<<<<<< HEAD
-=======
-	/*
-	 * Hardware may or may not set the BUS_LOCK_DETECTED flag on BUS_LOCK
-	 * VM-Exits. Unconditionally set the flag here and leave the handling to
-	 * vmx_handle_exit().
 	 */
 	to_vmx(vcpu)->exit_reason.bus_lock_detected = true;
 	return 1;
@@ -6160,7 +5927,6 @@ static int handle_notify(struct kvm_vcpu *vcpu)
 
 static int handle_notify(struct kvm_vcpu *vcpu)
 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
 	bool context_invalid = exit_qual & NOTIFY_VM_CONTEXT_INVALID;
 
@@ -6326,7 +6092,6 @@ static void vmx_dump_dtsel(char *name, uint32_t limit)
 }
 
 static void vmx_dump_msrs(char *name, struct vmx_msrs *m)
-<<<<<<< HEAD
 {
 	unsigned int i;
 	struct vmx_msr_entry *e;
@@ -6338,19 +6103,6 @@ static void vmx_dump_msrs(char *name, struct vmx_msrs *m)
 
 void dump_vmcs(struct kvm_vcpu *vcpu)
 {
-=======
-{
-	unsigned int i;
-	struct vmx_msr_entry *e;
-
-	pr_err("MSR %s:\n", name);
-	for (i = 0, e = m->val; i < m->nr; ++i, ++e)
-		pr_err("  %2d: msr=0x%08x value=0x%016llx\n", i, e->index, e->value);
-}
-
-void dump_vmcs(struct kvm_vcpu *vcpu)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	u32 vmentry_ctl, vmexit_ctl;
 	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
@@ -8245,19 +7997,11 @@ static bool vmx_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
 
 	return supported & BIT(reason);
 }
-<<<<<<< HEAD
 
 static void vmx_vm_destroy(struct kvm *kvm)
 {
 	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
 
-=======
-
-static void vmx_vm_destroy(struct kvm *kvm)
-{
-	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
 }
 
@@ -8322,11 +8066,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
 	.patch_hypercall = vmx_patch_hypercall,
 	.inject_irq = vmx_inject_irq,
 	.inject_nmi = vmx_inject_nmi,
-<<<<<<< HEAD
 	.inject_exception = vmx_inject_exception,
-=======
-	.queue_exception = vmx_queue_exception,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.cancel_injection = vmx_cancel_injection,
 	.interrupt_allowed = vmx_interrupt_allowed,
 	.nmi_allowed = vmx_nmi_allowed,
@@ -8567,17 +8307,10 @@ static __init int hardware_setup(void)
 
 	if (!enable_apicv || !cpu_has_vmx_ipiv())
 		enable_ipiv = false;
-<<<<<<< HEAD
 
 	if (cpu_has_vmx_tsc_scaling())
 		kvm_caps.has_tsc_control = true;
 
-=======
-
-	if (cpu_has_vmx_tsc_scaling())
-		kvm_caps.has_tsc_control = true;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kvm_caps.max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
 	kvm_caps.tsc_scaling_ratio_frac_bits = 48;
 	kvm_caps.has_bus_lock_exit = cpu_has_vmx_bus_lock_detection();

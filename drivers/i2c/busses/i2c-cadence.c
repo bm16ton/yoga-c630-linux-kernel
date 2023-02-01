@@ -208,10 +208,7 @@ struct cdns_i2c {
 	struct notifier_block clk_rate_change_nb;
 	u32 quirks;
 	u32 ctrl_reg;
-<<<<<<< HEAD
 	struct i2c_bus_recovery_info rinfo;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if IS_ENABLED(CONFIG_I2C_SLAVE)
 	u16 ctrl_reg_diva_divb;
 	struct i2c_client *slave;

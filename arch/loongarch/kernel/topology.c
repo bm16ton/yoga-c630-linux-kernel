@@ -5,10 +5,7 @@
 #include <linux/node.h>
 #include <linux/nodemask.h>
 #include <linux/percpu.h>
-<<<<<<< HEAD
 #include <asm/bootinfo.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static DEFINE_PER_CPU(struct cpu, cpu_devices);
 
@@ -44,11 +41,7 @@ static int __init topology_init(void)
 	for_each_present_cpu(i) {
 		struct cpu *c = &per_cpu(cpu_devices, i);
 
-<<<<<<< HEAD
 		c->hotpluggable = !io_master(i);
-=======
-		c->hotpluggable = !!i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = register_cpu(c, i);
 		if (ret < 0)
 			pr_warn("topology_init: register_cpu %d failed (%d)\n", i, ret);

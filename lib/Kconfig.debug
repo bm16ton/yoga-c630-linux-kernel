@@ -226,7 +226,6 @@ menu "Compile-time checks and compiler options"
 
 config DEBUG_INFO
 	bool
-<<<<<<< HEAD
 	help
 	  A kernel debug info option other than "None" has been selected
 	  in the "Debug information" choice below, indicating that debug
@@ -241,22 +240,6 @@ choice
 	prompt "Debug information"
 	depends on DEBUG_KERNEL
 	help
-=======
-	help
-	  A kernel debug info option other than "None" has been selected
-	  in the "Debug information" choice below, indicating that debug
-	  information will be generated for build targets.
-
-# Clang is known to generate .{s,u}leb128 with symbol deltas with DWARF5, which
-# some targets may not support: https://sourceware.org/bugzilla/show_bug.cgi?id=27215
-config AS_HAS_NON_CONST_LEB128
-	def_bool $(as-instr,.uleb128 .Lexpr_end4 - .Lexpr_start3\n.Lexpr_start3:\n.Lexpr_end4:)
-
-choice
-	prompt "Debug information"
-	depends on DEBUG_KERNEL
-	help
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	  Selecting something other than "None" results in a kernel image
 	  that will include debugging info resulting in a larger kernel image.
 	  This adds debug symbols to the kernel and modules (gcc -g), and
@@ -287,15 +270,10 @@ config DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
 config DEBUG_INFO_DWARF4
 	bool "Generate DWARF Version 4 debuginfo"
 	select DEBUG_INFO
-<<<<<<< HEAD
 	depends on !CC_IS_CLANG || AS_IS_LLVM || (AS_IS_GNU && AS_VERSION >= 23502)
 	help
 	  Generate DWARF v4 debug info. This requires gcc 4.5+, binutils 2.35.2
 	  if using clang without clang's integrated assembler, and gdb 7.0+.
-=======
-	help
-	  Generate DWARF v4 debug info. This requires gcc 4.5+ and gdb 7.0+.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	  If you have consumers of DWARF debug info that are not ready for
 	  newer revisions of DWARF, you may wish to choose this or have your
@@ -2114,10 +2092,7 @@ config TEST_MIN_HEAP
 config TEST_SORT
 	tristate "Array-based sort test" if !KUNIT_ALL_TESTS
 	depends on KUNIT
-<<<<<<< HEAD
 	select STACKTRACE if ARCH_CORRECT_STACKTRACE_ON_KRETPROBE
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default KUNIT_ALL_TESTS
 	help
 	  This option enables the self-test function of 'sort()' at boot,
@@ -2275,13 +2250,10 @@ config TEST_UUID
 config TEST_XARRAY
 	tristate "Test the XArray code at runtime"
 
-<<<<<<< HEAD
 config TEST_MAPLE_TREE
 	select DEBUG_MAPLE_TREE
 	tristate "Test the Maple Tree code at runtime"
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config TEST_RHASHTABLE
 	tristate "Perform selftest on resizable hash table"
 	help
@@ -2570,7 +2542,6 @@ config MEMCPY_KUNIT_TEST
 
 	  If unsure, say N.
 
-<<<<<<< HEAD
 config IS_SIGNED_TYPE_KUNIT_TEST
 	tristate "Test is_signed_type() macro" if !KUNIT_ALL_TESTS
 	depends on KUNIT
@@ -2583,8 +2554,6 @@ config IS_SIGNED_TYPE_KUNIT_TEST
 
 	  If unsure, say N.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config OVERFLOW_KUNIT_TEST
 	tristate "Test check_*_overflow() functions at runtime" if !KUNIT_ALL_TESTS
 	depends on KUNIT
@@ -2609,7 +2578,6 @@ config STACKINIT_KUNIT_TEST
 	  CONFIG_GCC_PLUGIN_STRUCTLEAK, CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF,
 	  or CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL.
 
-<<<<<<< HEAD
 config FORTIFY_KUNIT_TEST
 	tristate "Test fortified str*() and mem*() function internals at runtime" if !KUNIT_ALL_TESTS
 	depends on KUNIT && FORTIFY_SOURCE
@@ -2629,8 +2597,6 @@ config HW_BREAKPOINT_KUNIT_TEST
 
 	  If unsure, say N.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config TEST_UDELAY
 	tristate "udelay test driver"
 	help

@@ -4,10 +4,7 @@
 #include <linux/errno.h>
 #include <linux/lockdep.h>
 #include <linux/io_uring_types.h>
-<<<<<<< HEAD
 #include <uapi/linux/eventpoll.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "io-wq.h"
 #include "slist.h"
 #include "filetable.h"
@@ -30,13 +27,9 @@ enum {
 
 struct io_uring_cqe *__io_get_cqe(struct io_ring_ctx *ctx, bool overflow);
 bool io_req_cqe_overflow(struct io_kiocb *req);
-<<<<<<< HEAD
 int io_run_task_work_sig(struct io_ring_ctx *ctx);
 int __io_run_local_work(struct io_ring_ctx *ctx, bool *locked);
 int io_run_local_work(struct io_ring_ctx *ctx);
-=======
-int io_run_task_work_sig(void);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void io_req_complete_failed(struct io_kiocb *req, s32 res);
 void __io_req_complete(struct io_kiocb *req, unsigned issue_flags);
 void io_req_complete_post(struct io_kiocb *req);
@@ -211,7 +204,6 @@ static inline void io_commit_cqring(struct io_ring_ctx *ctx)
 	smp_store_release(&ctx->rings->cq.tail, ctx->cached_cq_tail);
 }
 
-<<<<<<< HEAD
 /* requires smb_mb() prior, see wq_has_sleeper() */
 static inline void __io_cqring_wake(struct io_ring_ctx *ctx)
 {
@@ -234,17 +226,6 @@ static inline void io_cqring_wake(struct io_ring_ctx *ctx)
 {
 	smp_mb();
 	__io_cqring_wake(ctx);
-=======
-static inline void io_cqring_wake(struct io_ring_ctx *ctx)
-{
-	/*
-	 * wake_up_all() may seem excessive, but io_wake_function() and
-	 * io_should_wake() handle the termination of the loop and only
-	 * wake as many waiters as we need to.
-	 */
-	if (wq_has_sleeper(&ctx->cq_wait))
-		wake_up_all(&ctx->cq_wait);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool io_sqring_full(struct io_ring_ctx *ctx)
@@ -262,11 +243,7 @@ static inline unsigned int io_sqring_entries(struct io_ring_ctx *ctx)
 	return smp_load_acquire(&rings->sq.tail) - ctx->cached_sq_head;
 }
 
-<<<<<<< HEAD
 static inline int io_run_task_work(void)
-=======
-static inline bool io_run_task_work(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/*
 	 * Always check-and-clear the task_work notification signal. With how
@@ -281,7 +258,6 @@ static inline bool io_run_task_work(void)
 		return 1;
 	}
 
-<<<<<<< HEAD
 	return 0;
 }
 
@@ -325,9 +301,6 @@ static inline int io_run_local_work_locked(struct io_ring_ctx *ctx)
 	if (WARN_ON_ONCE(!locked))
 		mutex_lock(&ctx->uring_lock);
 	return ret;
-=======
-	return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void io_tw_lock(struct io_ring_ctx *ctx, bool *locked)
@@ -397,13 +370,10 @@ static inline struct io_kiocb *io_alloc_req(struct io_ring_ctx *ctx)
 	return container_of(node, struct io_kiocb, comp_list);
 }
 
-<<<<<<< HEAD
 static inline bool io_allowed_run_tw(struct io_ring_ctx *ctx)
 {
 	return likely(!(ctx->flags & IORING_SETUP_DEFER_TASKRUN) ||
 		      ctx->submitter_task == current);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

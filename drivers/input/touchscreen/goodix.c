@@ -788,19 +788,11 @@ error:
 static int goodix_reset(struct goodix_ts_data *ts)
 {
 	int error;
-<<<<<<< HEAD
 
 	error = goodix_reset_no_int_sync(ts);
 	if (error)
 		return error;
 
-=======
-
-	error = goodix_reset_no_int_sync(ts);
-	if (error)
-		return error;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return goodix_int_sync(ts);
 }
 

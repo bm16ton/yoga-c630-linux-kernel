@@ -554,11 +554,7 @@ M:	Michael Hennerich <michael.hennerich@analog.com>
 S:	Supported
 W:	http://wiki.analog.com/ADP5588
 W:	https://ez.analog.com/linux-software-drivers
-<<<<<<< HEAD
 F:	Documentation/devicetree/bindings/input/adi,adp5588.yaml
-=======
-F:	drivers/gpio/gpio-adp5588.c
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/input/keyboard/adp5588-keys.c
 
 ADP8860 BACKLIGHT DRIVER (ADP8860/ADP8861/ADP8863)
@@ -622,11 +618,7 @@ ADXL367 THREE-AXIS DIGITAL ACCELEROMETER DRIVER
 M:	Cosmin Tanislav <cosmin.tanislav@analog.com>
 L:	linux-iio@vger.kernel.org
 S:	Supported
-<<<<<<< HEAD
 W:	https://ez.analog.com/linux-software-drivers
-=======
-W:	http://ez.analog.com/community/linux-device-drivers
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/devicetree/bindings/iio/accel/adi,adxl367.yaml
 F:	drivers/iio/accel/adxl367*
 
@@ -756,7 +748,6 @@ S:	Supported
 F:	drivers/infiniband/hw/erdma
 F:	include/uapi/rdma/erdma-abi.h
 
-<<<<<<< HEAD
 ALIBABA PMU DRIVER
 M:	Shuai Xue <xueshuai@linux.alibaba.com>
 S:	Supported
@@ -765,16 +756,6 @@ F:	drivers/perf/alibaba_uncore_drw_pmu.c
 
 ALIENWARE WMI DRIVER
 L:	Dell.Client.Kernel@dell.com
-=======
-ALIENWARE WMI DRIVER
-L:	Dell.Client.Kernel@dell.com
-S:	Maintained
-F:	drivers/platform/x86/dell/alienware-wmi.c
-
-ALL SENSORS DLH SERIES PRESSURE SENSORS DRIVER
-M:	Tomislav Denis <tomislav.denis@avl.com>
-L:	linux-iio@vger.kernel.org
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 S:	Maintained
 F:	drivers/platform/x86/dell/alienware-wmi.c
 
@@ -1051,7 +1032,6 @@ L:	platform-driver-x86@vger.kernel.org
 S:	Maintained
 F:	drivers/platform/x86/amd/pmc.c
 
-<<<<<<< HEAD
 AMD PMF DRIVER
 M:	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
 L:	platform-driver-x86@vger.kernel.org
@@ -1059,8 +1039,6 @@ S:	Maintained
 F:	Documentation/ABI/testing/sysfs-amd-pmf
 F:	drivers/platform/x86/amd/pmf/
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 AMD HSMP DRIVER
 M:	Naveen Krishna Chatradhi <naveenkrishna.chatradhi@amd.com>
 R:	Carlos Bilbao <carlos.bilbao@amd.com>
@@ -1084,10 +1062,7 @@ L:	linux-pm@vger.kernel.org
 S:	Supported
 F:	Documentation/admin-guide/pm/amd-pstate.rst
 F:	drivers/cpufreq/amd-pstate*
-<<<<<<< HEAD
 F:	include/linux/amd-pstate.h
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	tools/power/x86/amd_pstate_tracer/amd_pstate_trace.py
 
 AMD PTDMA DRIVER
@@ -1195,11 +1170,7 @@ ANALOG DEVICES INC AD74413R DRIVER
 M:	Cosmin Tanislav <cosmin.tanislav@analog.com>
 L:	linux-iio@vger.kernel.org
 S:	Supported
-<<<<<<< HEAD
 W:	https://ez.analog.com/linux-software-drivers
-=======
-W:	http://ez.analog.com/community/linux-device-drivers
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/devicetree/bindings/iio/addac/adi,ad74413r.yaml
 F:	drivers/iio/addac/ad74413r.c
 F:	include/dt-bindings/iio/addac/adi,ad74413r.h
@@ -1374,12 +1345,8 @@ W:	https://ez.analog.com/linux-software-drivers
 F:	Documentation/ABI/testing/sysfs-bus-iio-frequency-ad9523
 F:	Documentation/ABI/testing/sysfs-bus-iio-frequency-adf4350
 F:	Documentation/devicetree/bindings/iio/*/adi,*
-<<<<<<< HEAD
 F:	Documentation/devicetree/bindings/iio/adc/lltc,ltc2496.yaml
 F:	Documentation/devicetree/bindings/iio/adc/lltc,ltc2497.yaml
-=======
-F:	Documentation/devicetree/bindings/iio/dac/adi,ad5758.yaml
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/iio/*/ad*
 F:	drivers/iio/adc/ltc249*
 F:	drivers/iio/amplifiers/hmc425a.c
@@ -1948,10 +1915,7 @@ F:	drivers/dma/apple-admac.c
 F:	drivers/i2c/busses/i2c-pasemi-core.c
 F:	drivers/i2c/busses/i2c-pasemi-platform.c
 F:	drivers/iommu/apple-dart.c
-<<<<<<< HEAD
 F:	drivers/iommu/io-pgtable-dart.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/irqchip/irq-apple-aic.c
 F:	drivers/mailbox/apple-mailbox.c
 F:	drivers/nvme/host/apple.c
@@ -1964,7 +1928,6 @@ F:	include/dt-bindings/pinctrl/apple.h
 F:	include/linux/apple-mailbox.h
 F:	include/linux/soc/apple/*
 
-<<<<<<< HEAD
 ARM/APPLE MACHINE SOUND DRIVERS
 M:	Martin Povišer <povik+lin@cutebit.org>
 L:	asahi@lists.linux.dev
@@ -1974,8 +1937,6 @@ F:	Documentation/devicetree/bindings/sound/apple,*
 F:	sound/soc/apple/*
 F:	sound/soc/codecs/cs42l83-i2c.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ARM/ARTPEC MACHINE SUPPORT
 M:	Jesper Nilsson <jesper.nilsson@axis.com>
 M:	Lars Persson <lars.persson@axis.com>
@@ -2106,10 +2067,7 @@ F:	drivers/hwtracing/coresight/*
 F:	include/dt-bindings/arm/coresight-cti-dt.h
 F:	include/linux/coresight*
 F:	samples/coresight/*
-<<<<<<< HEAD
 F:	tools/perf/tests/shell/coresight/*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	tools/perf/arch/arm/util/auxtrace.c
 F:	tools/perf/arch/arm/util/cs-etm.c
 F:	tools/perf/arch/arm/util/cs-etm.h
@@ -2661,11 +2619,7 @@ W:	http://www.armlinux.org.uk/
 
 ARM/QUALCOMM SUPPORT
 M:	Andy Gross <agross@kernel.org>
-<<<<<<< HEAD
 M:	Bjorn Andersson <andersson@kernel.org>
-=======
-M:	Bjorn Andersson <bjorn.andersson@linaro.org>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 R:	Konrad Dybcio <konrad.dybcio@somainline.org>
 L:	linux-arm-msm@vger.kernel.org
 S:	Maintained
@@ -2748,7 +2702,6 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-devel.git nex
 F:	Documentation/devicetree/bindings/arm/renesas.yaml
 F:	Documentation/devicetree/bindings/hwinfo/renesas,prr.yaml
 F:	Documentation/devicetree/bindings/soc/renesas/
-<<<<<<< HEAD
 F:	arch/arm/boot/dts/emev2*
 F:	arch/arm/boot/dts/gr-peach*
 F:	arch/arm/boot/dts/iwg20d-q7*
@@ -2759,8 +2712,6 @@ F:	arch/arm/boot/dts/sh*
 F:	arch/arm/configs/shmobile_defconfig
 F:	arch/arm/include/debug/renesas-scif.S
 F:	arch/arm/mach-shmobile/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	arch/arm64/boot/dts/renesas/
 F:	drivers/soc/renesas/
 F:	include/linux/soc/renesas/
@@ -2870,32 +2821,6 @@ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
 L:	linux-media@vger.kernel.org
 S:	Maintained
 F:	drivers/media/platform/samsung/s5p-mfc/
-<<<<<<< HEAD
-=======
-
-ARM/SHMOBILE ARM ARCHITECTURE
-M:	Geert Uytterhoeven <geert+renesas@glider.be>
-M:	Magnus Damm <magnus.damm@gmail.com>
-L:	linux-renesas-soc@vger.kernel.org
-S:	Supported
-Q:	http://patchwork.kernel.org/project/linux-renesas-soc/list/
-C:	irc://irc.libera.chat/renesas-soc
-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-devel.git next
-F:	Documentation/devicetree/bindings/arm/renesas.yaml
-F:	Documentation/devicetree/bindings/soc/renesas/
-F:	arch/arm/boot/dts/emev2*
-F:	arch/arm/boot/dts/gr-peach*
-F:	arch/arm/boot/dts/iwg20d-q7*
-F:	arch/arm/boot/dts/r7s*
-F:	arch/arm/boot/dts/r8a*
-F:	arch/arm/boot/dts/r9a*
-F:	arch/arm/boot/dts/sh*
-F:	arch/arm/configs/shmobile_defconfig
-F:	arch/arm/include/debug/renesas-scif.S
-F:	arch/arm/mach-shmobile/
-F:	drivers/soc/renesas/
-F:	include/linux/soc/renesas/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 ARM/SOCFPGA ARCHITECTURE
 M:	Dinh Nguyen <dinguyen@kernel.org>
@@ -3313,7 +3238,6 @@ L:	linux-aspeed@lists.ozlabs.org (moderated for non-subscribers)
 S:	Maintained
 F:	Documentation/devicetree/bindings/usb/aspeed,ast2600-udc.yaml
 F:	drivers/usb/gadget/udc/aspeed_udc.c
-<<<<<<< HEAD
 
 ASPEED CRYPTO DRIVER
 M:	Neal Liu <neal_liu@aspeedtech.com>
@@ -3321,8 +3245,6 @@ L:	linux-aspeed@lists.ozlabs.org (moderated for non-subscribers)
 S:	Maintained
 F:	Documentation/devicetree/bindings/crypto/aspeed,ast2500-hace.yaml
 F:	drivers/crypto/aspeed/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 ASUS NOTEBOOKS AND EEEPC ACPI/WMI EXTRAS DRIVERS
 M:	Corentin Chary <corentin.chary@gmail.com>
@@ -3347,16 +3269,6 @@ L:	linux-hwmon@vger.kernel.org
 S:	Maintained
 F:	drivers/hwmon/asus_wmi_sensors.c
 
-<<<<<<< HEAD
-=======
-ASUS WMI EC HARDWARE MONITOR DRIVER
-M:	Eugene Shalygin <eugene.shalygin@gmail.com>
-M:	Denis Pauk <pauk.denis@gmail.com>
-L:	linux-hwmon@vger.kernel.org
-S:	Maintained
-F:	drivers/hwmon/asus_wmi_ec_sensors.c
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ASUS EC HARDWARE MONITOR DRIVER
 M:	Eugene Shalygin <eugene.shalygin@gmail.com>
 L:	linux-hwmon@vger.kernel.org
@@ -3942,10 +3854,7 @@ F:	kernel/bpf/dispatcher.c
 F:	kernel/bpf/trampoline.c
 F:	include/linux/bpf*
 F:	include/linux/filter.h
-<<<<<<< HEAD
 F:	include/linux/tnum.h
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 BPF [BTF]
 M:	Martin KaFai Lau <martin.lau@linux.dev>
@@ -4071,18 +3980,11 @@ M:	William Zhang <william.zhang@broadcom.com>
 M:	Anand Gore <anand.gore@broadcom.com>
 M:	Kursad Oney <kursad.oney@broadcom.com>
 M:	Florian Fainelli <f.fainelli@gmail.com>
-<<<<<<< HEAD
 M:	Rafał Miłecki <rafal@milecki.pl>
 R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
 L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
 S:	Maintained
 T:	git https://github.com/broadcom/stblinux.git
-=======
-R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
-S:	Maintained
-T:	git git://github.com/broadcom/stblinux.git
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/devicetree/bindings/arm/bcm/brcm,bcmbca.yaml
 F:	arch/arm64/boot/dts/broadcom/bcmbca/*
 N:	bcmbca
@@ -4107,11 +4009,7 @@ R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
 L:	linux-rpi-kernel@lists.infradead.org (moderated for non-subscribers)
 L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
 S:	Maintained
-<<<<<<< HEAD
 T:	git https://github.com/broadcom/stblinux.git
-=======
-T:	git git://github.com/broadcom/stblinux.git
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/devicetree/bindings/pci/brcm,stb-pcie.yaml
 F:	drivers/pci/controller/pcie-brcmstb.c
 F:	drivers/staging/vc04_services
@@ -4364,11 +4262,7 @@ M:	Scott Branden <sbranden@broadcom.com>
 R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
 L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
 S:	Maintained
-<<<<<<< HEAD
 T:	git https://github.com/broadcom/stblinux.git
-=======
-T:	git git://github.com/broadcom/stblinux.git
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	arch/arm64/boot/dts/broadcom/northstar2/*
 F:	arch/arm64/boot/dts/broadcom/stingray/*
 F:	drivers/clk/bcm/clk-ns*
@@ -4568,14 +4462,9 @@ M:	Josef Bacik <josef@toxicpanda.com>
 M:	David Sterba <dsterba@suse.com>
 L:	linux-btrfs@vger.kernel.org
 S:	Maintained
-<<<<<<< HEAD
 W:	https://btrfs.readthedocs.io
 W:	https://btrfs.wiki.kernel.org/
 Q:	https://patchwork.kernel.org/project/linux-btrfs/list/
-=======
-W:	http://btrfs.wiki.kernel.org/
-Q:	http://patchwork.kernel.org/project/linux-btrfs/list/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 C:	irc://irc.libera.chat/btrfs
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux.git
 F:	Documentation/filesystems/btrfs.rst
@@ -5022,11 +4911,7 @@ F:	drivers/platform/chrome/
 
 CHROMEOS EC CODEC DRIVER
 M:	Cheng-Yi Chiang <cychiang@chromium.org>
-<<<<<<< HEAD
 M:	Tzung-Bi Shih <tzungbi@kernel.org>
-=======
-M:	Tzung-Bi Shih <tzungbi@google.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 R:	Guenter Roeck <groeck@chromium.org>
 L:	chrome-platform@lists.linux.dev
 S:	Maintained
@@ -5047,10 +4932,7 @@ M:	Prashant Malani <pmalani@chromium.org>
 L:	chrome-platform@lists.linux.dev
 S:	Maintained
 F:	drivers/platform/chrome/cros_ec_typec.c
-<<<<<<< HEAD
 F:	drivers/platform/chrome/cros_typec_switch.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 CHROMEOS EC USB PD NOTIFY DRIVER
 M:	Prashant Malani <pmalani@chromium.org>
@@ -5294,10 +5176,7 @@ M:	Steve French <sfrench@samba.org>
 R:	Paulo Alcantara <pc@cjr.nz> (DFS, global name space)
 R:	Ronnie Sahlberg <lsahlber@redhat.com> (directory leases, sparse files)
 R:	Shyam Prasad N <sprasad@microsoft.com> (multichannel)
-<<<<<<< HEAD
 R:	Tom Talpey <tom@talpey.com> (RDMA, smbdirect)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-cifs@vger.kernel.org
 L:	samba-technical@lists.samba.org (moderated for non-subscribers)
 S:	Supported
@@ -5420,11 +5299,7 @@ M:	Johannes Weiner <hannes@cmpxchg.org>
 M:	Michal Hocko <mhocko@kernel.org>
 M:	Roman Gushchin <roman.gushchin@linux.dev>
 M:	Shakeel Butt <shakeelb@google.com>
-<<<<<<< HEAD
 R:	Muchun Song <muchun.song@linux.dev>
-=======
-R:	Muchun Song <songmuchun@bytedance.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	cgroups@vger.kernel.org
 L:	linux-mm@kvack.org
 S:	Maintained
@@ -5458,11 +5333,7 @@ COUNTER SUBSYSTEM
 M:	William Breathitt Gray <william.gray@linaro.org>
 L:	linux-iio@vger.kernel.org
 S:	Maintained
-<<<<<<< HEAD
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/wbg/counter.git
-=======
-T:	git https://git.linaro.org/people/william.gray/counter.git
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/ABI/testing/sysfs-bus-counter
 F:	Documentation/driver-api/generic-counter.rst
 F:	drivers/counter/
@@ -6586,14 +6457,11 @@ S:	Maintained
 F:	Documentation/devicetree/bindings/display/panel/feiyang,fy07024di26a30d.yaml
 F:	drivers/gpu/drm/panel/panel-feiyang-fy07024di26a30d.c
 
-<<<<<<< HEAD
 DRM DRIVER FOR GENERIC EDP PANELS
 R:	Douglas Anderson <dianders@chromium.org>
 F:	Documentation/devicetree/bindings/display/panel/panel-edp.yaml
 F:	drivers/gpu/drm/panel/panel-edp.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 DRM DRIVER FOR GENERIC USB DISPLAY
 M:	Noralf Trønnes <noralf@tronnes.org>
 S:	Maintained
@@ -7862,10 +7730,6 @@ R:	Kees Cook <keescook@chromium.org>
 L:	linux-mm@kvack.org
 S:	Supported
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git for-next/execve
-<<<<<<< HEAD
-=======
-F:	arch/alpha/kernel/binfmt_loader.c
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	fs/*binfmt_*.c
 F:	fs/exec.c
 F:	include/linux/binfmts.h
@@ -8182,10 +8046,7 @@ L:	linux-hardening@vger.kernel.org
 S:	Supported
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git for-next/hardening
 F:	include/linux/fortify-string.h
-<<<<<<< HEAD
 F:	lib/fortify_kunit.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	lib/test_fortify/*
 F:	scripts/test_fortify.sh
 K:	\b__NO_FORTIFY\b
@@ -8592,7 +8453,6 @@ L:	platform-driver-x86@vger.kernel.org
 S:	Maintained
 F:	drivers/platform/x86/fujitsu-tablet.c
 
-<<<<<<< HEAD
 FUNCTION HOOKS (FTRACE)
 M:	Steven Rostedt <rostedt@goodmis.org>
 M:	Masami Hiramatsu <mhiramat@kernel.org>
@@ -8606,8 +8466,6 @@ F:	arch/*/*/*/*ftrace*
 F:	arch/*/*/*ftrace*
 F:	include/*/ftrace.h
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 FUNGIBLE ETHERNET DRIVERS
 M:	Dimitris Michailidis <dmichail@fungible.com>
 L:	netdev@vger.kernel.org
@@ -8849,13 +8707,8 @@ F:	drivers/input/touchscreen/goodix*
 
 GOOGLE ETHERNET DRIVERS
 M:	Jeroen de Borst <jeroendb@google.com>
-<<<<<<< HEAD
 M:	Catherine Sullivan <csully@google.com>
 R:	Shailend Chand <shailend@google.com>
-=======
-R:	Catherine Sullivan <csully@google.com>
-R:	David Awogbemila <awogbemila@google.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	netdev@vger.kernel.org
 S:	Supported
 F:	Documentation/networking/device_drivers/ethernet/google/gve.rst
@@ -9274,15 +9127,12 @@ F:	drivers/hid/hid-sensor-*
 F:	drivers/iio/*/hid-*
 F:	include/linux/hid-sensor-*
 
-<<<<<<< HEAD
 HID VRC-2 CAR CONTROLLER DRIVER
 M:	Marcus Folkesson <marcus.folkesson@gmail.com>
 L:	linux-input@vger.kernel.org
 S:	Maintained
 F:	drivers/hid/hid-vrc2.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 HID WACOM DRIVER
 M:	Ping Cheng <ping.cheng@wacom.com>
 M:	Jason Gerecke  <jason.gerecke@wacom.com>
@@ -9407,7 +9257,6 @@ S:	Supported
 F:	Documentation/admin-guide/perf/hns3-pmu.rst
 F:	drivers/perf/hisilicon/hns3_pmu.c
 
-<<<<<<< HEAD
 HISILICON PTT DRIVER
 M:	Yicong Yang <yangyicong@hisilicon.com>
 L:	linux-kernel@vger.kernel.org
@@ -9416,8 +9265,6 @@ F:	Documentation/ABI/testing/sysfs-devices-hisi_ptt
 F:	Documentation/trace/hisi-ptt.rst
 F:	drivers/hwtracing/ptt/
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 HISILICON QM DRIVER
 M:	Weili Qian <qianweili@huawei.com>
 M:	Zhou Wang <wangzhou1@hisilicon.com>
@@ -9471,7 +9318,6 @@ W:	http://www.hisilicon.com
 F:	drivers/spi/spi-hisi-kunpeng.c
 
 HISILICON SPMI CONTROLLER DRIVER FOR HIKEY 970
-<<<<<<< HEAD
 M:	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 L:	linux-kernel@vger.kernel.org
 S:	Maintained
@@ -9481,17 +9327,6 @@ F:	drivers/spmi/hisi-spmi-controller.c
 HISILICON SPMI PMIC DRIVER FOR HIKEY 6421v600
 M:	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 L:	linux-kernel@vger.kernel.org
-=======
-M:	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-L:	linux-kernel@vger.kernel.org
-S:	Maintained
-F:	Documentation/devicetree/bindings/spmi/hisilicon,hisi-spmi-controller.yaml
-F:	drivers/spmi/hisi-spmi-controller.c
-
-HISILICON SPMI PMIC DRIVER FOR HIKEY 6421v600
-M:	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-L:	linux-kernel@vger.kernel.org
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 S:	Maintained
 F:	Documentation/devicetree/bindings/mfd/hisilicon,hi6421-spmi-pmic.yaml
 F:	drivers/mfd/hi6421-spmi-pmic.c
@@ -9604,11 +9439,7 @@ F:	drivers/net/ethernet/huawei/hinic/
 
 HUGETLB SUBSYSTEM
 M:	Mike Kravetz <mike.kravetz@oracle.com>
-<<<<<<< HEAD
 M:	Muchun Song <muchun.song@linux.dev>
-=======
-M:	Muchun Song <songmuchun@bytedance.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-mm@kvack.org
 S:	Maintained
 F:	Documentation/ABI/testing/sysfs-kernel-mm-hugepages
@@ -9942,14 +9773,10 @@ S:	Supported
 F:	drivers/pci/hotplug/rpaphp*
 
 IBM Power SRIOV Virtual NIC Device Driver
-<<<<<<< HEAD
 M:	Haren Myneni <haren@linux.ibm.com>
 M:	Rick Lindsley <ricklind@linux.ibm.com>
 R:	Nick Child <nnac123@linux.ibm.com>
 R:	Dany Madden <danymadden@us.ibm.com>
-=======
-M:	Dany Madden <drt@linux.ibm.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 R:	Thomas Falcon <tlfalcon@linux.ibm.com>
 L:	netdev@vger.kernel.org
 S:	Supported
@@ -10637,10 +10464,6 @@ INTEL MENLOW THERMAL DRIVER
 M:	Sujith Thomas <sujith.thomas@intel.com>
 L:	linux-pm@vger.kernel.org
 S:	Supported
-<<<<<<< HEAD
-=======
-W:	https://01.org/linux-acpi
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/thermal/intel/intel_menlow.c
 
 INTEL P-Unit IPC DRIVER
@@ -10888,13 +10711,8 @@ L:	iommu@lists.linux.dev
 S:	Maintained
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu.git
 F:	drivers/iommu/dma-iommu.c
-<<<<<<< HEAD
 F:	drivers/iommu/dma-iommu.h
 F:	drivers/iommu/iova.c
-=======
-F:	drivers/iommu/iova.c
-F:	include/linux/dma-iommu.h
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	include/linux/iova.h
 
 IOMMU SUBSYSTEM
@@ -11271,14 +11089,9 @@ F:	fs/autofs/
 
 KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
 M:	Masahiro Yamada <masahiroy@kernel.org>
-<<<<<<< HEAD
 R:	Nathan Chancellor <nathan@kernel.org>
 R:	Nick Desaulniers <ndesaulniers@google.com>
 R:	Nicolas Schier <nicolas@fjasle.eu>
-=======
-M:	Michal Marek <michal.lkml@markovi.net>
-R:	Nick Desaulniers <ndesaulniers@google.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-kbuild@vger.kernel.org
 S:	Maintained
 Q:	https://patchwork.kernel.org/project/linux-kbuild/list/
@@ -11299,11 +11112,8 @@ M:	Kees Cook <keescook@chromium.org>
 L:	linux-hardening@vger.kernel.org
 S:	Supported
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git for-next/hardening
-<<<<<<< HEAD
 F:	Documentation/ABI/testing/sysfs-kernel-oops_count
 F:	Documentation/ABI/testing/sysfs-kernel-warn_count
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	include/linux/overflow.h
 F:	include/linux/randomize_kstack.h
 F:	mm/usercopy.c
@@ -11352,13 +11162,8 @@ F:	tools/testing/selftests/
 KERNEL SMB3 SERVER (KSMBD)
 M:	Namjae Jeon <linkinjeon@kernel.org>
 M:	Steve French <sfrench@samba.org>
-<<<<<<< HEAD
 R:	Sergey Senozhatsky <senozhatsky@chromium.org>
 R:	Tom Talpey <tom@talpey.com>
-=======
-M:	Hyunchul Lee <hyc.lee@gmail.com>
-R:	Sergey Senozhatsky <senozhatsky@chromium.org>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-cifs@vger.kernel.org
 S:	Maintained
 T:	git git://git.samba.org/ksmbd.git
@@ -11409,12 +11214,8 @@ R:	Alexandru Elisei <alexandru.elisei@arm.com>
 R:	Suzuki K Poulose <suzuki.poulose@arm.com>
 R:	Oliver Upton <oliver.upton@linux.dev>
 L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
-<<<<<<< HEAD
 L:	kvmarm@lists.linux.dev
 L:	kvmarm@lists.cs.columbia.edu (deprecated, moderated for non-subscribers)
-=======
-L:	kvmarm@lists.cs.columbia.edu (moderated for non-subscribers)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 S:	Maintained
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
 F:	arch/arm64/include/asm/kvm*
@@ -11450,11 +11251,7 @@ L:	kvm@vger.kernel.org
 L:	kvm-riscv@lists.infradead.org
 L:	linux-riscv@lists.infradead.org
 S:	Maintained
-<<<<<<< HEAD
 T:	git https://github.com/kvm-riscv/linux.git
-=======
-T:	git git://github.com/kvm-riscv/linux.git
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	arch/riscv/include/asm/kvm*
 F:	arch/riscv/include/uapi/asm/kvm*
 F:	arch/riscv/kvm/
@@ -11685,11 +11482,7 @@ M:	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>
 M:	"David S. Miller" <davem@davemloft.net>
 M:	Masami Hiramatsu <mhiramat@kernel.org>
 S:	Maintained
-<<<<<<< HEAD
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace.git
-=======
-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-trace.git
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/trace/kprobes.rst
 F:	include/asm-generic/kprobes.h
 F:	include/linux/kprobes.h
@@ -11949,10 +11742,7 @@ F:	Documentation/process/license-rules.rst
 F:	LICENSES/
 F:	scripts/spdxcheck-test.sh
 F:	scripts/spdxcheck.py
-<<<<<<< HEAD
 F:	scripts/spdxexclude
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 LINEAR RANGES HELPERS
 M:	Mark Brown <broonie@kernel.org>
@@ -12251,11 +12041,7 @@ LTC2688 IIO DAC DRIVER
 M:	Nuno Sá <nuno.sa@analog.com>
 L:	linux-iio@vger.kernel.org
 S:	Supported
-<<<<<<< HEAD
 W:	https://ez.analog.com/linux-software-drivers
-=======
-W:	http://ez.analog.com/community/linux-device-drivers
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/ABI/testing/sysfs-bus-iio-dac-ltc2688
 F:	Documentation/devicetree/bindings/iio/dac/adi,ltc2688.yaml
 F:	drivers/iio/dac/ltc2688.c
@@ -12683,7 +12469,6 @@ S:	Maintained
 F:	Documentation/devicetree/bindings/iio/proximity/maxbotix,mb1232.yaml
 F:	drivers/iio/proximity/mb1232.c
 
-<<<<<<< HEAD
 MAXIM MAX11205 DRIVER
 M:	Ramona Bolboaca <ramona.bolboaca@analog.com>
 L:	linux-iio@vger.kernel.org
@@ -12692,8 +12477,6 @@ W:	https://ez.analog.com/linux-software-drivers
 F:	Documentation/devicetree/bindings/iio/adc/maxim,max11205.yaml
 F:	drivers/iio/adc/max11205.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MAXIM MAX17040 FAMILY FUEL GAUGE DRIVERS
 R:	Iskren Chernev <iskren.chernev@gmail.com>
 R:	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
@@ -12759,10 +12542,6 @@ F:	drivers/power/supply/max77976_charger.c
 
 MAXIM MUIC CHARGER DRIVERS FOR EXYNOS BASED BOARDS
 M:	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-<<<<<<< HEAD
-=======
-M:	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-pm@vger.kernel.org
 S:	Supported
 B:	mailto:linux-samsung-soc@vger.kernel.org
@@ -12774,10 +12553,6 @@ F:	drivers/power/supply/max77693_charger.c
 MAXIM PMIC AND MUIC DRIVERS FOR EXYNOS BASED BOARDS
 M:	Chanwoo Choi <cw00.choi@samsung.com>
 M:	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-<<<<<<< HEAD
-=======
-M:	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-kernel@vger.kernel.org
 S:	Supported
 B:	mailto:linux-samsung-soc@vger.kernel.org
@@ -13172,15 +12947,12 @@ M:	Bin Liu <bin.liu@mediatek.com>
 S:	Supported
 F:	Documentation/devicetree/bindings/media/mediatek-jpeg-*.yaml
 F:	drivers/media/platform/mediatek/jpeg/
-<<<<<<< HEAD
 
 MEDIATEK KEYPAD DRIVER
 M:	Mattijs Korpershoek <mkorpershoek@baylibre.com>
 S:	Supported
 F:	Documentation/devicetree/bindings/input/mediatek,mt6779-keypad.yaml
 F:	drivers/input/keyboard/mt6779-keypad.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MEDIATEK MDP DRIVER
 M:	Minghsiu Tsai <minghsiu.tsai@mediatek.com>
@@ -13797,7 +13569,6 @@ S:	Supported
 F:	Documentation/devicetree/bindings/mtd/atmel-nand.txt
 F:	drivers/mtd/nand/raw/atmel/*
 
-<<<<<<< HEAD
 MICROCHIP PCI1XXXX GP DRIVER
 M:	Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>
 L:	linux-gpio@vger.kernel.org
@@ -13806,8 +13577,6 @@ F:	drivers/misc/mchp_pci1xxxx/mchp_pci1xxxx_gp.c
 F:	drivers/misc/mchp_pci1xxxx/mchp_pci1xxxx_gp.h
 F:	drivers/misc/mchp_pci1xxxx/mchp_pci1xxxx_gpio.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MICROCHIP OTPC DRIVER
 M:	Claudiu Beznea <claudiu.beznea@microchip.com>
 L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
@@ -13816,7 +13585,6 @@ F:	Documentation/devicetree/bindings/nvmem/microchip,sama7g5-otpc.yaml
 F:	drivers/nvmem/microchip-otpc.c
 F:	include/dt-bindings/nvmem/microchip,sama7g5-otpc.h
 
-<<<<<<< HEAD
 MICROCHIP PCI1XXXX I2C DRIVER
 M:	Tharun Kumar P <tharunkumar.pasumarthi@microchip.com>
 M:	Kumaravel Thiagarajan <kumaravel.thiagarajan@microchip.com>
@@ -13825,8 +13593,6 @@ L:	linux-i2c@vger.kernel.org
 S:	Maintained
 F:	drivers/i2c/busses/i2c-mchp-pci1xxxx.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MICROCHIP PWM DRIVER
 M:	Claudiu Beznea <claudiu.beznea@microchip.com>
 L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
@@ -14931,10 +14697,7 @@ M:	Daniel Dadap <ddadap@nvidia.com>
 L:	platform-driver-x86@vger.kernel.org
 S:	Supported
 F:	drivers/platform/x86/nvidia-wmi-ec-backlight.c
-<<<<<<< HEAD
 F:	include/linux/platform_data/x86/nvidia-wmi-ec-backlight.h
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 NVM EXPRESS DRIVER
 M:	Keith Busch <kbusch@kernel.org>
@@ -15114,7 +14877,6 @@ S:	Orphan
 F:	Documentation/devicetree/bindings/net/nfc/nxp,nci.yaml
 F:	drivers/nfc/nxp-nci
 
-<<<<<<< HEAD
 NXP i.MX 8MP DW100 V4L2 DRIVER
 M:	Xavier Roumegue <xavier.roumegue@oss.nxp.com>
 L:	linux-media@vger.kernel.org
@@ -15124,8 +14886,6 @@ F:	Documentation/userspace-api/media/drivers/dw100.rst
 F:	drivers/media/platform/nxp/dw100/
 F:	include/uapi/linux/dw100.h
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 NXP i.MX 8QXP/8QM JPEG V4L2 DRIVER
 M:	Mirela Rabulea <mirela.rabulea@nxp.com>
 R:	NXP Linux Team <linux-imx@nxp.com>
@@ -16116,16 +15876,10 @@ F:	Documentation/devicetree/bindings/pci/v3-v360epc-pci.txt
 F:	drivers/pci/controller/pci-v3-semi.c
 
 PCI ENDPOINT SUBSYSTEM
-<<<<<<< HEAD
 M:	Lorenzo Pieralisi <lpieralisi@kernel.org>
 R:	Krzysztof Wilczyński <kw@linux.com>
 R:	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 R:	Kishon Vijay Abraham I <kishon@kernel.org>
-=======
-M:	Kishon Vijay Abraham I <kishon@ti.com>
-M:	Lorenzo Pieralisi <lpieralisi@kernel.org>
-R:	Krzysztof Wilczyński <kw@linux.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-pci@vger.kernel.org
 S:	Supported
 Q:	https://patchwork.kernel.org/project/linux-pci/list/
@@ -16196,10 +15950,7 @@ Q:	https://patchwork.kernel.org/project/linux-pci/list/
 B:	https://bugzilla.kernel.org
 C:	irc://irc.oftc.net/linux-pci
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lpieralisi/pci.git
-<<<<<<< HEAD
 F:	Documentation/devicetree/bindings/pci/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/pci/controller/
 F:	drivers/pci/pci-bridge-emul.c
 F:	drivers/pci/pci-bridge-emul.h
@@ -16317,16 +16068,6 @@ M:	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 L:	linux-pci@vger.kernel.org
 L:	linux-arm-msm@vger.kernel.org
 S:	Maintained
-<<<<<<< HEAD
-=======
-F:	drivers/pci/controller/dwc/pcie-qcom.c
-
-PCIE ENDPOINT DRIVER FOR QUALCOMM
-M:	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-L:	linux-pci@vger.kernel.org
-L:	linux-arm-msm@vger.kernel.org
-S:	Maintained
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/devicetree/bindings/pci/qcom,pcie-ep.yaml
 F:	drivers/pci/controller/dwc/pcie-qcom-ep.c
 
@@ -16631,15 +16372,12 @@ W:	https://sunplus.atlassian.net/wiki/spaces/doc/overview
 F:	Documentation/devicetree/bindings/pinctrl/sunplus,*
 F:	drivers/pinctrl/sunplus/
 F:	include/dt-bindings/pinctrl/sppctl*.h
-<<<<<<< HEAD
 
 PINE64 PINEPHONE KEYBOARD DRIVER
 M:	Samuel Holland <samuel@sholland.org>
 S:	Supported
 F:	Documentation/devicetree/bindings/input/pine64,pinephone-keyboard.yaml
 F:	drivers/input/keyboard/pinephone-keyboard.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 PKTCDVD DRIVER
 M:	linux-block@vger.kernel.org
@@ -16958,13 +16696,6 @@ S:	Maintained
 F:	drivers/ptp/ptp_vclock.c
 F:	net/ethtool/phc_vclocks.c
 
-PTP VIRTUAL CLOCK SUPPORT
-M:	Yangbo Lu <yangbo.lu@nxp.com>
-L:	netdev@vger.kernel.org
-S:	Maintained
-F:	drivers/ptp/ptp_vclock.c
-F:	net/ethtool/phc_vclocks.c
-
 PTRACE SUPPORT
 M:	Oleg Nesterov <oleg@redhat.com>
 S:	Maintained
@@ -17077,12 +16808,9 @@ M:	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 M:	Banajit Goswami <bgoswami@quicinc.com>
 L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
 S:	Supported
-<<<<<<< HEAD
 F:	Documentation/devicetree/bindings/soc/qcom/qcom,apr.yaml
 F:	Documentation/devicetree/bindings/sound/qcom,*
 F:	drivers/soc/qcom/apr.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	include/dt-bindings/sound/qcom,wcd9335.h
 F:	sound/soc/codecs/lpass-rx-macro.*
 F:	sound/soc/codecs/lpass-tx-macro.*
@@ -17287,11 +17015,7 @@ F:	Documentation/devicetree/bindings/media/*camss*
 F:	drivers/media/platform/qcom/camss/
 
 QUALCOMM CLOCK DRIVERS
-<<<<<<< HEAD
 M:	Bjorn Andersson <andersson@kernel.org>
-=======
-M:	Bjorn Andersson <bjorn.andersson@linaro.org>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-arm-msm@vger.kernel.org
 S:	Supported
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git
@@ -17341,11 +17065,7 @@ M:	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 M:	Amol Maheshwari <amahesh@qti.qualcomm.com>
 L:	linux-arm-msm@vger.kernel.org
 S:	Maintained
-<<<<<<< HEAD
 F:	Documentation/devicetree/bindings/misc/qcom,fastrpc.yaml
-=======
-F:	Documentation/devicetree/bindings/misc/qcom,fastrpc.txt
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/misc/fastrpc.c
 F:	include/uapi/misc/fastrpc.h
 
@@ -17436,13 +17156,6 @@ F:	Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
 F:	drivers/net/ethernet/qualcomm/rmnet/
 F:	include/linux/if_rmnet.h
 
-QUALCOMM TRUSTED EXECUTION ENVIRONMENT DRIVER
-M:	Maximilian Luz <luzmaximilian@gmail.com>
-L:	linux-arm-msm@vger.kernel.org
-S:	Maintained
-F:	drivers/firmware/qcom_tee.c
-F:	include/linux/qcom_tee.h
-
 QUALCOMM TSENS THERMAL DRIVER
 M:	Amit Kucheria <amitk@kernel.org>
 M:	Thara Gopinath <thara.gopinath@gmail.com>
@@ -17451,13 +17164,6 @@ L:	linux-arm-msm@vger.kernel.org
 S:	Maintained
 F:	Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
 F:	drivers/thermal/qcom/
-
-QUALCOMM UEFISECAPP DRIVER
-M:	Maximilian Luz <luzmaximilian@gmail.com>
-L:	linux-arm-msm@vger.kernel.org
-S:	Maintained
-F:	Documentation/devicetree/bindings/firmware/qcom,tee-uefisecapp.yaml
-F:	drivers/firmware/qcom_tee_uefisecapp.c
 
 QUALCOMM VENUS VIDEO ACCELERATOR DRIVER
 M:	Stanimir Varbanov <stanimir.varbanov@linaro.org>
@@ -17773,16 +17479,6 @@ F:	drivers/net/wireless/realtek/rtw88/
 
 REALTEK WIRELESS DRIVER (rtw89)
 M:	Ping-Ke Shih <pkshih@realtek.com>
-<<<<<<< HEAD
-=======
-L:	linux-wireless@vger.kernel.org
-S:	Maintained
-F:	drivers/net/wireless/realtek/rtw89/
-
-REDPINE WIRELESS DRIVER
-M:	Amitkumar Karwar <amitkarwar@gmail.com>
-M:	Siva Rebbagondla <siva8118@gmail.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-wireless@vger.kernel.org
 S:	Maintained
 F:	drivers/net/wireless/realtek/rtw89/
@@ -17807,11 +17503,7 @@ S:	Supported
 F:	fs/reiserfs/
 
 REMOTE PROCESSOR (REMOTEPROC) SUBSYSTEM
-<<<<<<< HEAD
 M:	Bjorn Andersson <andersson@kernel.org>
-=======
-M:	Bjorn Andersson <bjorn.andersson@linaro.org>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 M:	Mathieu Poirier <mathieu.poirier@linaro.org>
 L:	linux-remoteproc@vger.kernel.org
 S:	Maintained
@@ -17824,11 +17516,7 @@ F:	include/linux/remoteproc.h
 F:	include/linux/remoteproc/
 
 REMOTE PROCESSOR MESSAGING (RPMSG) SUBSYSTEM
-<<<<<<< HEAD
 M:	Bjorn Andersson <andersson@kernel.org>
-=======
-M:	Bjorn Andersson <bjorn.andersson@linaro.org>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 M:	Mathieu Poirier <mathieu.poirier@linaro.org>
 L:	linux-remoteproc@vger.kernel.org
 S:	Maintained
@@ -17954,15 +17642,12 @@ S:	Maintained
 F:	Documentation/devicetree/bindings/mtd/renesas-nandc.yaml
 F:	drivers/mtd/nand/raw/renesas-nand-controller.c
 
-<<<<<<< HEAD
 RENESAS VERSACLOCK 7 CLOCK DRIVER
 M:	Alex Helms <alexander.helms.jy@renesas.com>
 S:	Maintained
 F:	Documentation/devicetree/bindings/clock/renesas,versaclock7.yaml
 F:	drivers/clk/clk-versaclock7.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 RESET CONTROLLER FRAMEWORK
 M:	Philipp Zabel <p.zabel@pengutronix.de>
 S:	Maintained
@@ -18045,36 +17730,24 @@ F:	arch/riscv/
 N:	riscv
 K:	riscv
 
-<<<<<<< HEAD
 RISC-V MICROCHIP FPGA SUPPORT
-=======
-RISC-V/MICROCHIP POLARFIRE SOC SUPPORT
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 M:	Conor Dooley <conor.dooley@microchip.com>
 M:	Daire McNamara <daire.mcnamara@microchip.com>
 L:	linux-riscv@lists.infradead.org
 S:	Supported
-<<<<<<< HEAD
 F:	Documentation/devicetree/bindings/clock/microchip,mpfs*.yaml
-=======
-F:	Documentation/devicetree/bindings/clock/microchip,mpfs.yaml
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/devicetree/bindings/gpio/microchip,mpfs-gpio.yaml
 F:	Documentation/devicetree/bindings/i2c/microchip,corei2c.yaml
 F:	Documentation/devicetree/bindings/mailbox/microchip,mpfs-mailbox.yaml
 F:	Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
 F:	Documentation/devicetree/bindings/pwm/microchip,corepwm.yaml
-<<<<<<< HEAD
 F:	Documentation/devicetree/bindings/riscv/microchip.yaml
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/devicetree/bindings/soc/microchip/microchip,mpfs-sys-controller.yaml
 F:	Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
 F:	Documentation/devicetree/bindings/usb/microchip,mpfs-musb.yaml
 F:	arch/riscv/boot/dts/microchip/
 F:	drivers/char/hw_random/mpfs-rng.c
 F:	drivers/clk/microchip/clk-mpfs.c
-<<<<<<< HEAD
 F:	drivers/i2c/busses/i2c-microchip-corei2c.c
 F:	drivers/mailbox/mailbox-mpfs.c
 F:	drivers/pci/controller/pcie-microchip-host.c
@@ -18082,18 +17755,10 @@ F:	drivers/reset/reset-mpfs.c
 F:	drivers/rtc/rtc-mpfs.c
 F:	drivers/soc/microchip/mpfs-sys-controller.c
 F:	drivers/spi/spi-microchip-core-qspi.c
-=======
-F:	drivers/i2c/busses/i2c-microchip-core.c
-F:	drivers/mailbox/mailbox-mpfs.c
-F:	drivers/pci/controller/pcie-microchip-host.c
-F:	drivers/rtc/rtc-mpfs.c
-F:	drivers/soc/microchip/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/spi/spi-microchip-core.c
 F:	drivers/usb/musb/mpfs.c
 F:	include/soc/microchip/mpfs.h
 
-<<<<<<< HEAD
 RISC-V MISC SOC SUPPORT
 M:	Conor Dooley <conor@kernel.org>
 L:	linux-riscv@lists.infradead.org
@@ -18103,8 +17768,6 @@ T:	git https://git.kernel.org/pub/scm/linux/kernel/git/conor/linux.git/
 F:	Documentation/devicetree/bindings/riscv/
 F:	arch/riscv/boot/dts/
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 RNBD BLOCK DRIVERS
 M:	Md. Haris Iqbal <haris.iqbal@ionos.com>
 M:	Jack Wang <jinpu.wang@ionos.com>
@@ -18168,11 +17831,7 @@ S:	Odd Fixes
 F:	drivers/tty/serial/rp2.*
 
 ROHM BD99954 CHARGER IC
-<<<<<<< HEAD
 M:	Matti Vaittinen <mazziesaccount@gmail.com>
-=======
-R:	Matti Vaittinen <mazziesaccount@gmail.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 S:	Supported
 F:	drivers/power/supply/bd99954-charger.c
 F:	drivers/power/supply/bd99954-charger.h
@@ -18195,11 +17854,7 @@ F:	drivers/regulator/bd9571mwv-regulator.c
 F:	include/linux/mfd/bd9571mwv.h
 
 ROHM POWER MANAGEMENT IC DEVICE DRIVERS
-<<<<<<< HEAD
 M:	Matti Vaittinen <mazziesaccount@gmail.com>
-=======
-R:	Matti Vaittinen <mazziesaccount@gmail.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 S:	Supported
 F:	drivers/clk/clk-bd718x7.c
 F:	drivers/gpio/gpio-bd71815.c
@@ -18316,7 +17971,6 @@ F:	include/rv/
 F:	kernel/trace/rv/
 F:	tools/verification/
 
-<<<<<<< HEAD
 RUST
 M:	Miguel Ojeda <ojeda@kernel.org>
 M:	Alex Gaynor <alex.gaynor@gmail.com>
@@ -18335,8 +17989,6 @@ F:	samples/rust/
 F:	scripts/*rust*
 K:	\b(?i:rust)\b
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 RXRPC SOCKETS (AF_RXRPC)
 M:	David Howells <dhowells@redhat.com>
 M:	Marc Dionne <marc.dionne@auristor.com>
@@ -18435,10 +18087,6 @@ M:	Halil Pasic <pasic@linux.ibm.com>
 M:	Jason Herne <jjherne@linux.ibm.com>
 L:	linux-s390@vger.kernel.org
 S:	Supported
-<<<<<<< HEAD
-=======
-W:	http://www.ibm.com/developerworks/linux/linux390/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	Documentation/s390/vfio-ap*
 F:	drivers/s390/crypto/vfio_ap*
 
@@ -18565,10 +18213,6 @@ F:	drivers/platform/x86/samsung-laptop.c
 
 SAMSUNG MULTIFUNCTION PMIC DEVICE DRIVERS
 M:	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-<<<<<<< HEAD
-=======
-M:	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-kernel@vger.kernel.org
 L:	linux-samsung-soc@vger.kernel.org
 S:	Supported
@@ -18595,10 +18239,6 @@ F:	include/media/drv-intf/s3c_camif.h
 
 SAMSUNG S3FWRN5 NFC DRIVER
 M:	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-<<<<<<< HEAD
-=======
-M:	Krzysztof Opasiak <k.opasiak@samsung.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-nfc@lists.01.org (subscribers-only)
 S:	Maintained
 F:	Documentation/devicetree/bindings/net/nfc/samsung,s3fwrn5.yaml
@@ -19050,10 +18690,7 @@ F:	drivers/misc/sgi-xp/
 SHARED MEMORY COMMUNICATIONS (SMC) SOCKETS
 M:	Karsten Graul <kgraul@linux.ibm.com>
 M:	Wenjia Zhang <wenjia@linux.ibm.com>
-<<<<<<< HEAD
 M:	Jan Karcher <jaka@linux.ibm.com>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 L:	linux-s390@vger.kernel.org
 S:	Supported
 F:	net/smc/
@@ -19607,15 +19244,6 @@ T:	git git://linuxtv.org/media_tree.git
 F:	Documentation/devicetree/bindings/media/i2c/sony,imx335.yaml
 F:	drivers/media/i2c/imx335.c
 
-SONY IMX335 SENSOR DRIVER
-M:	Paul J. Murphy <paul.j.murphy@intel.com>
-M:	Daniele Alessandrelli <daniele.alessandrelli@intel.com>
-L:	linux-media@vger.kernel.org
-S:	Maintained
-T:	git git://linuxtv.org/media_tree.git
-F:	Documentation/devicetree/bindings/media/i2c/sony,imx335.yaml
-F:	drivers/media/i2c/imx335.c
-
 SONY IMX355 SENSOR DRIVER
 M:	Tianshu Qiu <tian.shu.qiu@intel.com>
 L:	linux-media@vger.kernel.org
@@ -20001,14 +19629,11 @@ M:	Ion Badulescu <ionut@badula.org>
 S:	Odd Fixes
 F:	drivers/net/ethernet/adaptec/starfire*
 
-<<<<<<< HEAD
 STARFIVE DEVICETREES
 M:	Emil Renner Berthing <kernel@esmil.dk>
 S:	Maintained
 F:	arch/riscv/boot/dts/starfive/
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 STARFIVE JH7100 CLOCK DRIVERS
 M:	Emil Renner Berthing <kernel@esmil.dk>
 S:	Maintained
@@ -20021,13 +19646,8 @@ M:	Emil Renner Berthing <kernel@esmil.dk>
 L:	linux-gpio@vger.kernel.org
 S:	Maintained
 F:	Documentation/devicetree/bindings/pinctrl/starfive,jh7100-pinctrl.yaml
-<<<<<<< HEAD
 F:	drivers/pinctrl/starfive/
 F:	include/dt-bindings/pinctrl/pinctrl-starfive-jh7100.h
-=======
-F:	drivers/pinctrl/pinctrl-starfive.c
-F:	include/dt-bindings/pinctrl/pinctrl-starfive.h
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 STARFIVE JH7100 RESET CONTROLLER DRIVER
 M:	Emil Renner Berthing <kernel@esmil.dk>
@@ -20122,14 +19742,11 @@ L:	netdev@vger.kernel.org
 S:	Maintained
 F:	drivers/net/ethernet/dlink/sundance.c
 
-<<<<<<< HEAD
 SUN HAPPY MEAL ETHERNET DRIVER
 M:	Sean Anderson <seanga2@gmail.com>
 S:	Maintained
 F:	drivers/net/ethernet/sun/sunhme.*
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 SUNPLUS ETHERNET DRIVER
 M:	Wells Lu <wellslutw@gmail.com>
 L:	netdev@vger.kernel.org
@@ -20144,7 +19761,6 @@ S:	Maintained
 F:	Documentation/devicetree/bindings/nvmem/sunplus,sp7021-ocotp.yaml
 F:	drivers/nvmem/sunplus-ocotp.c
 
-<<<<<<< HEAD
 SUNPLUS USB2 PHY DRIVER
 M:	Vincent Shih <vincent.sunplus@gmail.com>
 L:	linux-usb@vger.kernel.org
@@ -20154,8 +19770,6 @@ F:	drivers/phy/sunplus/Kconfig
 F:	drivers/phy/sunplus/Makefile
 F:	drivers/phy/sunplus/phy-sunplus-usb2.c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 SUNPLUS PWM DRIVER
 M:	Hammer Hsieh <hammerh0314@gmail.com>
 S:	Maintained
@@ -20221,19 +19835,6 @@ S:	Maintained
 F:	Documentation/admin-guide/svga.rst
 F:	arch/x86/boot/video*
 
-<<<<<<< HEAD
-=======
-SWIOTLB SUBSYSTEM
-M:	Christoph Hellwig <hch@infradead.org>
-L:	iommu@lists.linux.dev
-S:	Supported
-W:	http://git.infradead.org/users/hch/dma-mapping.git
-T:	git git://git.infradead.org/users/hch/dma-mapping.git
-F:	arch/*/kernel/pci-swiotlb.c
-F:	include/linux/swiotlb.h
-F:	kernel/dma/swiotlb.c
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 SWITCHDEV
 M:	Jiri Pirko <jiri@resnulli.us>
 M:	Ivan Vecera <ivecera@redhat.com>
@@ -20916,13 +20517,6 @@ M:	Robert Richter <rric@kernel.org>
 S:	Odd Fixes
 F:	drivers/gpio/gpio-thunderx.c
 
-TI ADS131E0X ADC SERIES DRIVER
-M:	Tomislav Denis <tomislav.denis@avl.com>
-L:	linux-iio@vger.kernel.org
-S:	Maintained
-F:	Documentation/devicetree/bindings/iio/adc/ti,ads131e08.yaml
-F:	drivers/iio/adc/ti-ads131e08.c
-
 TI AM437X VPFE DRIVER
 M:	"Lad, Prabhakar" <prabhakar.csengg@gmail.com>
 L:	linux-media@vger.kernel.org
@@ -20991,10 +20585,7 @@ W:	https://linuxtv.org
 Q:	http://patchwork.linuxtv.org/project/linux-media/list/
 T:	git git://linuxtv.org/mhadli/v4l-dvb-davinci_devices.git
 F:	drivers/media/platform/ti/davinci/
-<<<<<<< HEAD
 F:	drivers/staging/media/deprecated/vpfe_capture/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	include/media/davinci/
 
 TI ENHANCED CAPTURE (eCAP) DRIVER
@@ -21279,15 +20870,8 @@ TRACING
 M:	Steven Rostedt <rostedt@goodmis.org>
 M:	Masami Hiramatsu <mhiramat@kernel.org>
 S:	Maintained
-<<<<<<< HEAD
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace.git
 F:	Documentation/trace/*
-=======
-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-trace.git
-F:	Documentation/trace/ftrace.rst
-F:	arch/*/*/*/*ftrace*
-F:	arch/*/*/*ftrace*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	fs/tracefs/
 F:	include/linux/trace*.h
 F:	include/trace/
@@ -21428,10 +21012,7 @@ U-BOOT ENVIRONMENT VARIABLES
 M:	Rafał Miłecki <rafal@milecki.pl>
 S:	Maintained
 F:	Documentation/devicetree/bindings/nvmem/u-boot,env.yaml
-<<<<<<< HEAD
 F:	drivers/nvmem/u-boot-env.c
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 UACCE ACCELERATOR FRAMEWORK
 M:	Zhangfei Gao <zhangfei.gao@linaro.org>
@@ -22407,21 +21988,12 @@ F:	drivers/ptp/ptp_vmw.c
 
 VMWARE VMCI DRIVER
 M:	Bryan Tan <bryantan@vmware.com>
-<<<<<<< HEAD
 M:	Vishnu Dasa <vdasa@vmware.com>
 R:	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
 L:	linux-kernel@vger.kernel.org
 S:	Supported
 F:	drivers/misc/vmw_vmci/
 F:	include/linux/vmw_vmci*
-=======
-M:	Rajesh Jalisatgi <rjalisatgi@vmware.com>
-M:	Vishnu Dasa <vdasa@vmware.com>
-R:	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
-L:	linux-kernel@vger.kernel.org
-S:	Maintained
-F:	drivers/misc/vmw_vmci/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 VMWARE VMMOUSE SUBDRIVER
 M:	Zack Rusin <zackr@vmware.com>
@@ -22551,17 +22123,11 @@ F:	drivers/input/tablet/wacom_serial4.c
 
 WANGXUN ETHERNET DRIVER
 M:	Jiawen Wu <jiawenwu@trustnetic.com>
-<<<<<<< HEAD
 M:	Mengyuan Lou <mengyuanlou@net-swift.com>
 W:	https://www.net-swift.com
 L:	netdev@vger.kernel.org
 S:	Maintained
 F:	Documentation/networking/device_drivers/ethernet/wangxun/*
-=======
-L:	netdev@vger.kernel.org
-S:	Maintained
-F:	Documentation/networking/device_drivers/ethernet/wangxun/txgbe.rst
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F:	drivers/net/ethernet/wangxun/
 
 WATCHDOG DEVICE DRIVERS

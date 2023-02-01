@@ -1758,11 +1758,7 @@ static int n_tty_receive_buf2(struct tty_struct *tty, const unsigned char *cp,
  *
  * Locking: Caller holds @tty->termios_rwsem
  */
-<<<<<<< HEAD
 static void n_tty_set_termios(struct tty_struct *tty, const struct ktermios *old)
-=======
-static void n_tty_set_termios(struct tty_struct *tty, struct ktermios *old)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct n_tty_data *ldata = tty->disc_data;
 

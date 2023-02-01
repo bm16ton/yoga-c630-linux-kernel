@@ -297,11 +297,7 @@ static int stm32_adfsdm_pcm_new(struct snd_soc_component *component,
 static int stm32_adfsdm_dummy_cb(const void *data, void *private)
 {
 	/*
-<<<<<<< HEAD
 	 * This dummy callback is requested by iio_channel_get_all_cb() API,
-=======
-	 * This dummmy callback is requested by iio_channel_get_all_cb() API,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * but the stm32_dfsdm_get_buff_cb() API is used instead, to optimize
 	 * DMA transfers.
 	 */

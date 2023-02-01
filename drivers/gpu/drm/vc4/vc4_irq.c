@@ -295,11 +295,7 @@ vc4_irq_disable(struct drm_device *dev)
 	V3D_WRITE(V3D_INTCTL, V3D_DRIVER_IRQS);
 
 	/* Finish any interrupt handler still in flight. */
-<<<<<<< HEAD
 	synchronize_irq(vc4->irq);
-=======
-	disable_irq(vc4->irq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	cancel_work_sync(&vc4->overflow_mem_work);
 }

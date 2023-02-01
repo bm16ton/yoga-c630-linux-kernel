@@ -27,17 +27,11 @@ static const char * const component_names[] = {
 	[INDEX_MEMCTRL]		= "MemoryControllerId",
 	[INDEX_CHANNEL]		= "ChannelId",
 	[INDEX_DIMM]		= "DimmSlotId",
-<<<<<<< HEAD
 	[INDEX_CS]		= "ChipSelect",
 	[INDEX_NM_MEMCTRL]	= "NmMemoryControllerId",
 	[INDEX_NM_CHANNEL]	= "NmChannelId",
 	[INDEX_NM_DIMM]		= "NmDimmSlotId",
 	[INDEX_NM_CS]		= "NmChipSelect",
-=======
-	[INDEX_NM_MEMCTRL]	= "NmMemoryControllerId",
-	[INDEX_NM_CHANNEL]	= "NmChannelId",
-	[INDEX_NM_DIMM]		= "NmDimmSlotId",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int component_indices[ARRAY_SIZE(component_names)];
@@ -147,19 +141,13 @@ static bool skx_adxl_decode(struct decoded_addr *res, bool error_in_1st_level_me
 			       (int)adxl_values[component_indices[INDEX_NM_CHANNEL]] : -1;
 		res->dimm    = (adxl_nm_bitmap & BIT_NM_DIMM) ?
 			       (int)adxl_values[component_indices[INDEX_NM_DIMM]] : -1;
-<<<<<<< HEAD
 		res->cs      = (adxl_nm_bitmap & BIT_NM_CS) ?
 			       (int)adxl_values[component_indices[INDEX_NM_CS]] : -1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		res->imc     = (int)adxl_values[component_indices[INDEX_MEMCTRL]];
 		res->channel = (int)adxl_values[component_indices[INDEX_CHANNEL]];
 		res->dimm    = (int)adxl_values[component_indices[INDEX_DIMM]];
-<<<<<<< HEAD
 		res->cs      = (int)adxl_values[component_indices[INDEX_CS]];
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (res->imc > NUM_IMC - 1 || res->imc < 0) {
@@ -671,15 +659,10 @@ int skx_mce_check_error(struct notifier_block *nb, unsigned long val,
 	res.mce  = mce;
 	res.addr = mce->addr;
 
-<<<<<<< HEAD
 	/* Try driver decoder first */
 	if (!(driver_decode && driver_decode(&res))) {
 		/* Then try firmware decoder (ACPI DSM methods) */
 		if (!(adxl_component_count && skx_adxl_decode(&res, skx_error_in_1st_level_mem(mce))))
-=======
-	if (adxl_component_count) {
-		if (!skx_adxl_decode(&res, skx_error_in_1st_level_mem(mce)))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return NOTIFY_DONE;
 	}
 

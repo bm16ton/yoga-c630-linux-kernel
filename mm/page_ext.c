@@ -9,10 +9,7 @@
 #include <linux/page_owner.h>
 #include <linux/page_idle.h>
 #include <linux/page_table_check.h>
-<<<<<<< HEAD
 #include <linux/rcupdate.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * struct page extension
@@ -63,13 +60,10 @@
  * can utilize this callback to initialize the state of it correctly.
  */
 
-<<<<<<< HEAD
 #ifdef CONFIG_SPARSEMEM
 #define PAGE_EXT_INVALID       (0x1)
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if defined(CONFIG_PAGE_IDLE_FLAG) && !defined(CONFIG_64BIT)
 static bool need_page_idle(void)
 {
@@ -269,13 +263,10 @@ fail:
 }
 
 #else /* CONFIG_SPARSEMEM */
-<<<<<<< HEAD
 static bool page_ext_invalid(struct page_ext *page_ext)
 {
 	return !page_ext || (((unsigned long)page_ext & PAGE_EXT_INVALID) == PAGE_EXT_INVALID);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct page_ext *lookup_page_ext(const struct page *page)
 {

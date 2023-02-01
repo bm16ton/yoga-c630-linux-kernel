@@ -1618,74 +1618,6 @@ socket_err:
 	}
 }
 
-static void dlm_connect(struct connection *con)
-{
-	struct sockaddr_storage addr;
-	int result, addr_len;
-	struct socket *sock;
-	unsigned int mark;
-
-	/* Some odd races can cause double-connects, ignore them */
-	if (con->retries++ > MAX_CONNECT_RETRIES)
-		return;
-
-	if (con->sock) {
-		log_print("node %d already connected.", con->nodeid);
-		return;
-	}
-
-	memset(&addr, 0, sizeof(addr));
-	result = nodeid_to_addr(con->nodeid, &addr, NULL,
-				dlm_proto_ops->try_new_addr, &mark);
-	if (result < 0) {
-		log_print("no address for nodeid %d", con->nodeid);
-		return;
-	}
-
-	/* Create a socket to communicate with */
-	result = sock_create_kern(&init_net, dlm_local_addr[0]->ss_family,
-				  SOCK_STREAM, dlm_proto_ops->proto, &sock);
-	if (result < 0)
-		goto socket_err;
-
-	sock_set_mark(sock->sk, mark);
-	dlm_proto_ops->sockopts(sock);
-
-	add_sock(sock, con);
-
-	result = dlm_proto_ops->bind(sock);
-	if (result < 0)
-		goto add_sock_err;
-
-	log_print_ratelimited("connecting to %d", con->nodeid);
-	make_sockaddr(&addr, dlm_config.ci_tcp_port, &addr_len);
-	result = dlm_proto_ops->connect(con, sock, (struct sockaddr *)&addr,
-					addr_len);
-	if (result < 0)
-		goto add_sock_err;
-
-	return;
-
-add_sock_err:
-	dlm_close_sock(&con->sock);
-
-socket_err:
-	/*
-	 * Some errors are fatal and this list might need adjusting. For other
-	 * errors we try again until the max number of retries is reached.
-	 */
-	if (result != -EHOSTUNREACH &&
-	    result != -ENETUNREACH &&
-	    result != -ENETDOWN &&
-	    result != -EINVAL &&
-	    result != -EPROTONOSUPPORT) {
-		log_print("connect %d try %d error %d", con->nodeid,
-			  con->retries, result);
-		msleep(1000);
-		lowcomms_connect_sock(con);
-	}
-}
-
 /* Send workqueue function */
 static void process_send_sockets(struct work_struct *work)
 {
@@ -1892,11 +1824,7 @@ static int dlm_listen_for_all(void)
 	result = sock->ops->listen(sock, 5);
 	if (result < 0) {
 		dlm_close_sock(&listen_con.sock);
-<<<<<<< HEAD
 		return result;
-=======
-		goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;

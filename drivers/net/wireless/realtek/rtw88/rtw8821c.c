@@ -1926,10 +1926,7 @@ const struct rtw_chip_info rtw8821c_hw_spec = {
 	.bfer_su_max_num = 2,
 	.bfer_mu_max_num = 1,
 	.ampdu_density = IEEE80211_HT_MPDU_DENSITY_2,
-<<<<<<< HEAD
 	.max_scan_ie_len = IEEE80211_MAX_DATA_LEN,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.coex_para_ver = 0x19092746,
 	.bt_desired_ver = 0x46,

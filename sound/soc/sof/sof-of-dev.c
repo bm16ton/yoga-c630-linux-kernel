@@ -69,20 +69,12 @@ int sof_of_probe(struct platform_device *pdev)
 	if (fw_path)
 		sof_pdata->fw_filename_prefix = fw_path;
 	else
-<<<<<<< HEAD
 		sof_pdata->fw_filename_prefix = sof_pdata->desc->default_fw_path[SOF_IPC];
-=======
-		sof_pdata->fw_filename_prefix = sof_pdata->desc->default_fw_path;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (tplg_path)
 		sof_pdata->tplg_filename_prefix = tplg_path;
 	else
-<<<<<<< HEAD
 		sof_pdata->tplg_filename_prefix = sof_pdata->desc->default_tplg_path[SOF_IPC];
-=======
-		sof_pdata->tplg_filename_prefix = sof_pdata->desc->default_tplg_path;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* set callback to be called on successful device probe to enable runtime_pm */
 	sof_pdata->sof_probe_complete = sof_of_probe_complete;
@@ -102,14 +94,11 @@ int sof_of_remove(struct platform_device *pdev)
 	return 0;
 }
 EXPORT_SYMBOL(sof_of_remove);
-<<<<<<< HEAD
 
 void sof_of_shutdown(struct platform_device *pdev)
 {
 	snd_sof_device_shutdown(&pdev->dev);
 }
 EXPORT_SYMBOL(sof_of_shutdown);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MODULE_LICENSE("Dual BSD/GPL");

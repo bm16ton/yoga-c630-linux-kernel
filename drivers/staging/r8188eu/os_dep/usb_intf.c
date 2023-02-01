@@ -4,11 +4,6 @@
 #include <linux/usb.h>
 #include "../include/osdep_service.h"
 #include "../include/drv_types.h"
-<<<<<<< HEAD
-=======
-#include "../include/recv_osdep.h"
-#include "../include/xmit_osdep.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../include/hal_intf.h"
 #include "../include/osdep_intf.h"
 #include "../include/usb_ops.h"
@@ -58,11 +53,7 @@ struct rtw_usb_drv {
 };
 
 static struct rtw_usb_drv rtl8188e_usb_drv = {
-<<<<<<< HEAD
 	.usbdrv.name = KBUILD_MODNAME,
-=======
-	.usbdrv.name = "r8188eu",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.usbdrv.probe = rtw_drv_init,
 	.usbdrv.disconnect = rtw_dev_remove,
 	.usbdrv.id_table = rtw_usb_id_tbl,
@@ -239,11 +230,7 @@ static int rtw_suspend(struct usb_interface *pusb_intf, pm_message_t message)
 	mutex_unlock(&pwrpriv->lock);
 
 	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY))
-<<<<<<< HEAD
 		rtw_indicate_scan_done(padapter);
-=======
-		rtw_indicate_scan_done(padapter, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (check_fwstate(pmlmepriv, _FW_UNDER_LINKING))
 		rtw_indicate_disconnect(padapter);
@@ -299,29 +286,17 @@ exit:
  *        We accept the new device by returning 0.
  */
 
-<<<<<<< HEAD
 static int rtw_usb_if1_init(struct dvobj_priv *dvobj, struct usb_interface *pusb_intf)
-=======
-static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
-	struct usb_interface *pusb_intf)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct adapter *padapter = NULL;
 	struct net_device *pnetdev = NULL;
 	struct io_priv *piopriv;
 	struct intf_hdl *pintf;
-<<<<<<< HEAD
 	int ret;
 
 	padapter = vzalloc(sizeof(*padapter));
 	if (!padapter)
 		return -ENOMEM;
-=======
-
-	padapter = vzalloc(sizeof(*padapter));
-	if (!padapter)
-		return NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	padapter->dvobj = dvobj;
 	dvobj->if1 = padapter;
@@ -330,7 +305,6 @@ static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 
 	padapter->hw_init_mutex = &usb_drv->hw_init_mutex;
 
-<<<<<<< HEAD
 	rtw_handle_dualmac(padapter, 1);
 
 	pnetdev = rtw_init_netdev(padapter);
@@ -338,14 +312,6 @@ static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 		ret = -ENODEV;
 		goto handle_dualmac;
 	}
-=======
-	if (rtw_handle_dualmac(padapter, 1) != _SUCCESS)
-		goto free_adapter;
-
-	pnetdev = rtw_init_netdev(padapter);
-	if (!pnetdev)
-		goto handle_dualmac;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SET_NETDEV_DEV(pnetdev, dvobj_to_dev(dvobj));
 	padapter = rtw_netdev_priv(pnetdev);
 
@@ -363,7 +329,6 @@ static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 	rtl8188e_read_chip_version(padapter);
 
 	/* step usb endpoint mapping */
-<<<<<<< HEAD
 	ret = rtl8188eu_interface_configure(padapter);
 	if (ret)
 		goto handle_dualmac;
@@ -378,16 +343,6 @@ static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 		ret = -ENODEV;
 		goto handle_dualmac;
 	}
-=======
-	rtl8188eu_interface_configure(padapter);
-
-	/* step read efuse/eeprom data and get mac_addr */
-	ReadAdapterInfo8188EU(padapter);
-
-	/* step 5. */
-	if (rtw_init_drv_sw(padapter) == _FAIL)
-		goto handle_dualmac;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_PM
 	if (padapter->pwrctrlpriv.bSupportRemoteWakeup) {
@@ -402,12 +357,8 @@ static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 	usb_autopm_get_interface(pusb_intf);
 
 	/*  alloc dev name after read efuse. */
-<<<<<<< HEAD
 	ret = rtw_init_netdev_name(pnetdev, padapter->registrypriv.ifname);
 	if (ret)
-=======
-	if (rtw_init_netdev_name(pnetdev, padapter->registrypriv.ifname) < 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto free_drv_sw;
 	rtw_macaddr_cfg(padapter->eeprompriv.mac_addr);
 	rtw_init_wifidirect_addrs(padapter, padapter->eeprompriv.mac_addr,
@@ -415,38 +366,23 @@ static struct adapter *rtw_usb_if1_init(struct dvobj_priv *dvobj,
 	eth_hw_addr_set(pnetdev, padapter->eeprompriv.mac_addr);
 
 	/* step 6. Tell the network stack we exist */
-<<<<<<< HEAD
 	ret = register_netdev(pnetdev);
 	if (ret)
 		goto free_drv_sw;
 
 	return 0;
-=======
-	if (register_netdev(pnetdev) != 0)
-		goto free_drv_sw;
-
-	return padapter;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 free_drv_sw:
 	rtw_cancel_all_timer(padapter);
 	rtw_free_drv_sw(padapter);
 handle_dualmac:
 	rtw_handle_dualmac(padapter, 0);
-<<<<<<< HEAD
-=======
-free_adapter:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (pnetdev)
 		rtw_free_netdev(pnetdev);
 	else
 		vfree(padapter);
 
-<<<<<<< HEAD
 	return ret;
-=======
-	return NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void rtw_usb_if1_deinit(struct adapter *if1)
@@ -474,18 +410,12 @@ static void rtw_usb_if1_deinit(struct adapter *if1)
 
 static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device_id *pdid)
 {
-<<<<<<< HEAD
 	struct dvobj_priv *dvobj;
 	int ret;
-=======
-	struct adapter *if1 = NULL;
-	struct dvobj_priv *dvobj;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Initialize dvobj_priv */
 	dvobj = usb_dvobj_init(pusb_intf);
 	if (!dvobj)
-<<<<<<< HEAD
 		return -ENODEV;
 
 	ret = rtw_usb_if1_init(dvobj, pusb_intf);
@@ -493,26 +423,11 @@ static int rtw_drv_init(struct usb_interface *pusb_intf, const struct usb_device
 		usb_dvobj_deinit(pusb_intf);
 		return ret;
 	}
-=======
-		goto err;
-
-	if1 = rtw_usb_if1_init(dvobj, pusb_intf);
-	if (!if1)
-		goto free_dvobj;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (ui_pid[1] != 0)
 		rtw_signal_process(ui_pid[1], SIGUSR2);
 
 	return 0;
-<<<<<<< HEAD
-=======
-
-free_dvobj:
-	usb_dvobj_deinit(pusb_intf);
-err:
-	return -ENODEV;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

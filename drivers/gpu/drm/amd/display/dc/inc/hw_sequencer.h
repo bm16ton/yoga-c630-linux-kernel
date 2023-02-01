@@ -214,7 +214,6 @@ struct hw_sequencer_funcs {
 
 	void (*set_pipe)(struct pipe_ctx *pipe_ctx);
 
-<<<<<<< HEAD
 	void (*enable_dp_link_output)(struct dc_link *link,
 			const struct link_resource *link_res,
 			enum signal_type signal,
@@ -234,8 +233,6 @@ struct hw_sequencer_funcs {
 			const struct link_resource *link_res,
 			enum signal_type signal);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*get_dcc_en_bits)(struct dc *dc, int *dcc_en_bits);
 
 	/* Idle Optimization Related */
@@ -263,13 +260,10 @@ struct hw_sequencer_funcs {
 			struct tg_color *color,
 			int mpcc_id);
 
-<<<<<<< HEAD
 	void (*update_phantom_vp_position)(struct dc *dc,
 			struct dc_state *context,
 			struct pipe_ctx *phantom_pipe);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*commit_subvp_config)(struct dc *dc, struct dc_state *context);
 	void (*subvp_pipe_control_lock)(struct dc *dc,
 			struct dc_state *context,
@@ -296,14 +290,11 @@ void get_surface_visual_confirm_color(
 		const struct pipe_ctx *pipe_ctx,
 		struct tg_color *color);
 
-<<<<<<< HEAD
 void get_subvp_visual_confirm_color(
 	struct dc *dc,
 	struct pipe_ctx *pipe_ctx,
 	struct tg_color *color);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void get_hdr_visual_confirm_color(
 		struct pipe_ctx *pipe_ctx,
 		struct tg_color *color);

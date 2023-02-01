@@ -303,16 +303,11 @@ static int sp5100_tco_timer_init(struct sp5100_tco *tco)
 	if (val & SP5100_WDT_FIRED)
 		wdd->bootstatus = WDIOF_CARDRESET;
 
-<<<<<<< HEAD
 	/* Set watchdog action */
 	if (action)
 		val |= SP5100_WDT_ACTION_RESET;
 	else
 		val &= ~SP5100_WDT_ACTION_RESET;
-=======
-	/* Set watchdog action to reset the system */
-	val &= ~SP5100_WDT_ACTION_RESET;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	writel(val, SP5100_WDT_CONTROL(tco->tcobase));
 
 	/* Set a reasonable heartbeat before we stop the timer */

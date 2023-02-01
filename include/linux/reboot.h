@@ -106,7 +106,6 @@ enum sys_off_mode {
 	SYS_OFF_MODE_POWER_OFF,
 
 	/**
-<<<<<<< HEAD
 	 * @SYS_OFF_MODE_RESTART_PREPARE:
 	 *
 	 * Handlers prepare system to be restarted. Handlers are
@@ -115,8 +114,6 @@ enum sys_off_mode {
 	SYS_OFF_MODE_RESTART_PREPARE,
 
 	/**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * @SYS_OFF_MODE_RESTART:
 	 *
 	 * Handlers restart system. Handlers are disallowed to sleep.

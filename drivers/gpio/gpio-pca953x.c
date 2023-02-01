@@ -667,11 +667,7 @@ static int pca953x_gpio_set_pull_up_down(struct pca953x_chip *chip,
 		goto exit;
 
 	/* Disable/Enable pull-up/pull-down */
-<<<<<<< HEAD
 	if (param == PIN_CONFIG_BIAS_DISABLE)
-=======
-	if (config == PIN_CONFIG_BIAS_DISABLE)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = regmap_write_bits(chip->regmap, pull_en_reg, bit, 0);
 	else
 		ret = regmap_write_bits(chip->regmap, pull_en_reg, bit, bit);
@@ -1010,21 +1006,13 @@ static int device_pca95xx_init(struct pca953x_chip *chip, u32 invert)
 	u8 regaddr;
 	int ret;
 
-<<<<<<< HEAD
 	regaddr = chip->recalc_addr(chip, chip->regs->output, 0);
-=======
-	regaddr = pca953x_recalc_addr(chip, chip->regs->output, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = regcache_sync_region(chip->regmap, regaddr,
 				   regaddr + NBANK(chip) - 1);
 	if (ret)
 		goto out;
 
-<<<<<<< HEAD
 	regaddr = chip->recalc_addr(chip, chip->regs->direction, 0);
-=======
-	regaddr = pca953x_recalc_addr(chip, chip->regs->direction, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = regcache_sync_region(chip->regmap, regaddr,
 				   regaddr + NBANK(chip) - 1);
 	if (ret)
@@ -1238,22 +1226,14 @@ static int pca953x_regcache_sync(struct device *dev)
 	 * The ordering between direction and output is important,
 	 * sync these registers first and only then sync the rest.
 	 */
-<<<<<<< HEAD
 	regaddr = chip->recalc_addr(chip, chip->regs->direction, 0);
-=======
-	regaddr = pca953x_recalc_addr(chip, chip->regs->direction, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = regcache_sync_region(chip->regmap, regaddr, regaddr + NBANK(chip) - 1);
 	if (ret) {
 		dev_err(dev, "Failed to sync GPIO dir registers: %d\n", ret);
 		return ret;
 	}
 
-<<<<<<< HEAD
 	regaddr = chip->recalc_addr(chip, chip->regs->output, 0);
-=======
-	regaddr = pca953x_recalc_addr(chip, chip->regs->output, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = regcache_sync_region(chip->regmap, regaddr, regaddr + NBANK(chip) - 1);
 	if (ret) {
 		dev_err(dev, "Failed to sync GPIO out registers: %d\n", ret);
@@ -1262,11 +1242,7 @@ static int pca953x_regcache_sync(struct device *dev)
 
 #ifdef CONFIG_GPIO_PCA953X_IRQ
 	if (chip->driver_data & PCA_PCAL) {
-<<<<<<< HEAD
 		regaddr = chip->recalc_addr(chip, PCAL953X_IN_LATCH, 0);
-=======
-		regaddr = pca953x_recalc_addr(chip, PCAL953X_IN_LATCH, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = regcache_sync_region(chip->regmap, regaddr,
 					   regaddr + NBANK(chip) - 1);
 		if (ret) {
@@ -1275,11 +1251,7 @@ static int pca953x_regcache_sync(struct device *dev)
 			return ret;
 		}
 
-<<<<<<< HEAD
 		regaddr = chip->recalc_addr(chip, PCAL953X_INT_MASK, 0);
-=======
-		regaddr = pca953x_recalc_addr(chip, PCAL953X_INT_MASK, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = regcache_sync_region(chip->regmap, regaddr,
 					   regaddr + NBANK(chip) - 1);
 		if (ret) {

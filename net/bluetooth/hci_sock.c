@@ -2062,10 +2062,7 @@ static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
 
 static void hci_sock_destruct(struct sock *sk)
 {
-<<<<<<< HEAD
 	mgmt_cleanup(sk);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	skb_queue_purge(&sk->sk_receive_queue);
 	skb_queue_purge(&sk->sk_write_queue);
 }

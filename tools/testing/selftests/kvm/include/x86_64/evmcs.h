@@ -203,16 +203,11 @@ struct hv_enlightened_vmcs {
 		u32 reserved:30;
 	} hv_enlightenments_control;
 	u32 hv_vp_id;
-<<<<<<< HEAD
 	u32 padding32_2;
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 hv_vm_id;
 	u64 partition_assist_page;
 	u64 padding64_4[4];
 	u64 guest_bndcfgs;
-<<<<<<< HEAD
 	u64 guest_ia32_perf_global_ctrl;
 	u64 guest_ia32_s_cet;
 	u64 guest_ssp;
@@ -227,11 +222,6 @@ struct hv_enlightened_vmcs {
 	u64 host_ssp;
 	u64 host_ia32_int_ssp_table_addr;
 	u64 padding64_6;
-=======
-	u64 padding64_5[7];
-	u64 xss_exit_bitmap;
-	u64 padding64_6[7];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE                     0
@@ -677,7 +667,6 @@ static inline int evmcs_vmread(uint64_t encoding, uint64_t *value)
 	case VIRTUAL_PROCESSOR_ID:
 		*value = current_evmcs->virtual_processor_id;
 		break;
-<<<<<<< HEAD
 	case HOST_IA32_PERF_GLOBAL_CTRL:
 		*value = current_evmcs->host_ia32_perf_global_ctrl;
 		break;
@@ -690,8 +679,6 @@ static inline int evmcs_vmread(uint64_t encoding, uint64_t *value)
 	case TSC_MULTIPLIER:
 		*value = current_evmcs->tsc_multiplier;
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default: return 1;
 	}
 
@@ -1205,7 +1192,6 @@ static inline int evmcs_vmwrite(uint64_t encoding, uint64_t value)
 		current_evmcs->virtual_processor_id = value;
 		current_evmcs->hv_clean_fields &= ~HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT;
 		break;
-<<<<<<< HEAD
 	case HOST_IA32_PERF_GLOBAL_CTRL:
 		current_evmcs->host_ia32_perf_global_ctrl = value;
 		current_evmcs->hv_clean_fields &= ~HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1;
@@ -1222,8 +1208,6 @@ static inline int evmcs_vmwrite(uint64_t encoding, uint64_t value)
 		current_evmcs->tsc_multiplier = value;
 		current_evmcs->hv_clean_fields &= ~HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2;
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default: return 1;
 	}
 

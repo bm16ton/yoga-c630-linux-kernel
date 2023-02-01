@@ -32,10 +32,7 @@
 #include <linux/bug.h>
 #include <linux/ratelimit.h>
 #include <linux/debugfs.h>
-<<<<<<< HEAD
 #include <linux/sysfs.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <trace/events/error_report.h>
 #include <asm/sections.h>
 
@@ -80,14 +77,9 @@ ATOMIC_NOTIFIER_HEAD(panic_notifier_list);
 
 EXPORT_SYMBOL(panic_notifier_list);
 
-<<<<<<< HEAD
 #ifdef CONFIG_SYSCTL
 static struct ctl_table kern_panic_table[] = {
 #ifdef CONFIG_SMP
-=======
-#if defined(CONFIG_SMP) && defined(CONFIG_SYSCTL)
-static struct ctl_table kern_panic_table[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{
 		.procname       = "oops_all_cpu_backtrace",
 		.data           = &sysctl_oops_all_cpu_backtrace,
@@ -97,7 +89,6 @@ static struct ctl_table kern_panic_table[] = {
 		.extra1         = SYSCTL_ZERO,
 		.extra2         = SYSCTL_ONE,
 	},
-<<<<<<< HEAD
 #endif
 	{
 		.procname       = "warn_limit",
@@ -106,8 +97,6 @@ static struct ctl_table kern_panic_table[] = {
 		.mode           = 0644,
 		.proc_handler   = proc_douintvec,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 
@@ -119,7 +108,6 @@ static __init int kernel_panic_sysctls_init(void)
 late_initcall(kernel_panic_sysctls_init);
 #endif
 
-<<<<<<< HEAD
 static atomic_t warn_count = ATOMIC_INIT(0);
 
 #ifdef CONFIG_SYSFS
@@ -139,8 +127,6 @@ static __init int kernel_panic_sysfs_init(void)
 late_initcall(kernel_panic_sysfs_init);
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static long no_blink(int state)
 {
 	return 0;
@@ -674,12 +660,7 @@ void __warn(const char *file, int line, void *caller, unsigned taint,
 	if (regs)
 		show_regs(regs);
 
-<<<<<<< HEAD
 	check_panic_on_warn("kernel");
-=======
-	if (panic_on_warn)
-		panic("panic_on_warn set ...\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!regs)
 		dump_stack();

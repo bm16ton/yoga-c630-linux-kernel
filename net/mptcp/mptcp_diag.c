@@ -81,28 +81,18 @@ static void mptcp_diag_dump_listeners(struct sk_buff *skb, struct netlink_callba
 	struct mptcp_diag_ctx *diag_ctx = (void *)cb->ctx;
 	struct nlattr *bc = cb_data->inet_diag_nla_bc;
 	struct net *net = sock_net(skb->sk);
-<<<<<<< HEAD
 	struct inet_hashinfo *hinfo;
 	int i;
 
 	hinfo = net->ipv4.tcp_death_row.hashinfo;
 
 	for (i = diag_ctx->l_slot; i <= hinfo->lhash2_mask; i++) {
-=======
-	int i;
-
-	for (i = diag_ctx->l_slot; i <= tcp_hashinfo.lhash2_mask; i++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct inet_listen_hashbucket *ilb;
 		struct hlist_nulls_node *node;
 		struct sock *sk;
 		int num = 0;
 
-<<<<<<< HEAD
 		ilb = &hinfo->lhash2[i];
-=======
-		ilb = &tcp_hashinfo.lhash2[i];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		rcu_read_lock();
 		spin_lock(&ilb->lock);

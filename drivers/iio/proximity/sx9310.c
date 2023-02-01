@@ -1013,11 +1013,7 @@ out:
 	return 0;
 }
 
-<<<<<<< HEAD
 static DEFINE_SIMPLE_DEV_PM_OPS(sx9310_pm_ops, sx9310_suspend, sx9310_resume);
-=======
-static SIMPLE_DEV_PM_OPS(sx9310_pm_ops, sx9310_suspend, sx9310_resume);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct acpi_device_id sx9310_acpi_match[] = {
 	{ "STH9310", SX9310_WHOAMI_VALUE },

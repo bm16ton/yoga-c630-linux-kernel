@@ -72,7 +72,6 @@ extern unsigned long __sw_hweight64(__u64 w);
 	static_assert(__same_type(arch_##name, generic_##name) &&	\
 		      __same_type(const_##name, generic_##name) &&	\
 		      __same_type(_##name, generic_##name))
-<<<<<<< HEAD
 
 __check_bitop_pr(__set_bit);
 __check_bitop_pr(__clear_bit);
@@ -82,17 +81,6 @@ __check_bitop_pr(__test_and_clear_bit);
 __check_bitop_pr(__test_and_change_bit);
 __check_bitop_pr(test_bit);
 
-=======
-
-__check_bitop_pr(__set_bit);
-__check_bitop_pr(__clear_bit);
-__check_bitop_pr(__change_bit);
-__check_bitop_pr(__test_and_set_bit);
-__check_bitop_pr(__test_and_clear_bit);
-__check_bitop_pr(__test_and_change_bit);
-__check_bitop_pr(test_bit);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #undef __check_bitop_pr
 
 static inline int get_bitmask_order(unsigned int count)

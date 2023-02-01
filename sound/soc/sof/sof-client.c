@@ -12,10 +12,7 @@
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/slab.h>
-<<<<<<< HEAD
 #include <sound/sof/ipc4/header.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "ops.h"
 #include "sof-client.h"
 #include "sof-priv.h"
@@ -76,12 +73,9 @@ static int sof_register_ipc_flood_test(struct snd_sof_dev *sdev)
 	int ret = 0;
 	int i;
 
-<<<<<<< HEAD
 	if (sdev->pdata->ipc_type != SOF_IPC)
 		return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < CONFIG_SND_SOC_SOF_DEBUG_IPC_FLOOD_TEST_NUM; i++) {
 		ret = sof_client_dev_register(sdev, "ipc_flood", i, NULL, 0);
 		if (ret < 0)
@@ -255,7 +249,6 @@ EXPORT_SYMBOL_NS_GPL(sof_client_dev_unregister, SND_SOC_SOF_CLIENT);
 int sof_client_ipc_tx_message(struct sof_client_dev *cdev, void *ipc_msg,
 			      void *reply_data, size_t reply_bytes)
 {
-<<<<<<< HEAD
 	if (cdev->sdev->pdata->ipc_type == SOF_IPC) {
 		struct sof_ipc_cmd_hdr *hdr = ipc_msg;
 
@@ -269,12 +262,6 @@ int sof_client_ipc_tx_message(struct sof_client_dev *cdev, void *ipc_msg,
 	}
 
 	return -EINVAL;
-=======
-	struct sof_ipc_cmd_hdr *hdr = ipc_msg;
-
-	return sof_ipc_tx_message(cdev->sdev->ipc, hdr->cmd, ipc_msg, hdr->size,
-				  reply_data, reply_bytes);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_NS_GPL(sof_client_ipc_tx_message, SND_SOC_SOF_CLIENT);
 
@@ -345,7 +332,6 @@ const struct sof_ipc_fw_version *sof_client_get_fw_version(struct sof_client_dev
 }
 EXPORT_SYMBOL_NS_GPL(sof_client_get_fw_version, SND_SOC_SOF_CLIENT);
 
-<<<<<<< HEAD
 size_t sof_client_get_ipc_max_payload_size(struct sof_client_dev *cdev)
 {
 	struct snd_sof_dev *sdev = sof_client_dev_to_sof_dev(cdev);
@@ -362,8 +348,6 @@ enum sof_ipc_type sof_client_get_ipc_type(struct sof_client_dev *cdev)
 }
 EXPORT_SYMBOL_NS_GPL(sof_client_get_ipc_type, SND_SOC_SOF_CLIENT);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* module refcount management of SOF core */
 int sof_client_core_module_get(struct sof_client_dev *cdev)
 {
@@ -387,7 +371,6 @@ EXPORT_SYMBOL_NS_GPL(sof_client_core_module_put, SND_SOC_SOF_CLIENT);
 /* IPC event handling */
 void sof_client_ipc_rx_dispatcher(struct snd_sof_dev *sdev, void *msg_buf)
 {
-<<<<<<< HEAD
 	struct sof_ipc_event_entry *event;
 	u32 msg_type;
 
@@ -404,11 +387,6 @@ void sof_client_ipc_rx_dispatcher(struct snd_sof_dev *sdev, void *msg_buf)
 			     sdev->pdata->ipc_type);
 		return;
 	}
-=======
-	struct sof_ipc_cmd_hdr *hdr = msg_buf;
-	u32 msg_type = hdr->cmd & SOF_GLB_TYPE_MASK;
-	struct sof_ipc_event_entry *event;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_lock(&sdev->client_event_handler_mutex);
 
@@ -427,7 +405,6 @@ int sof_client_register_ipc_rx_handler(struct sof_client_dev *cdev,
 	struct snd_sof_dev *sdev = sof_client_dev_to_sof_dev(cdev);
 	struct sof_ipc_event_entry *event;
 
-<<<<<<< HEAD
 	if (!callback)
 		return -EINVAL;
 
@@ -443,11 +420,6 @@ int sof_client_register_ipc_rx_handler(struct sof_client_dev *cdev,
 		return -EINVAL;
 	}
 
-=======
-	if (!callback || !(ipc_msg_type & SOF_GLB_TYPE_MASK))
-		return -EINVAL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	event = kmalloc(sizeof(*event), GFP_KERNEL);
 	if (!event)
 		return -ENOMEM;

@@ -66,11 +66,6 @@ properties:
       to the other supplies. Needed to be able to establish channel scaling
       unless there is also an internal reference available (e.g. ad7091r)
 
-<<<<<<< HEAD
-=======
-  spi-max-frequency: true
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   adi,conversion-start-gpios:
     description: A GPIO used to trigger the start of a conversion
     maxItems: 1
@@ -79,15 +74,9 @@ required:
   - compatible
   - reg
 
-<<<<<<< HEAD
 allOf:
   - $ref: /schemas/spi/spi-peripheral-props.yaml#
 
-=======
-additionalProperties: false
-
-allOf:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   # Devices where reference is vcc
   - if:
       properties:
@@ -167,11 +156,8 @@ allOf:
       properties:
         adi,conversion-start-gpios: false
 
-<<<<<<< HEAD
 unevaluatedProperties: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
     spi {

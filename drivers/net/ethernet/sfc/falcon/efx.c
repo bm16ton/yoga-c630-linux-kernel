@@ -2012,11 +2012,7 @@ static void ef4_init_napi_channel(struct ef4_channel *channel)
 	struct ef4_nic *efx = channel->efx;
 
 	channel->napi_dev = efx->net_dev;
-<<<<<<< HEAD
 	netif_napi_add(channel->napi_dev, &channel->napi_str, ef4_poll);
-=======
-	netif_napi_add(channel->napi_dev, &channel->napi_str, ef4_poll, 64);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ef4_init_napi(struct ef4_nic *efx)

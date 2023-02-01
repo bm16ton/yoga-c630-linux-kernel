@@ -2580,13 +2580,9 @@ int ip_mc_msfget(struct sock *sk, struct ip_msfilter *msf,
 		return -EFAULT;
 	}
 	if (len &&
-<<<<<<< HEAD
 	    copy_to_sockptr_offset(optval,
 				   offsetof(struct ip_msfilter, imsf_slist_flex),
 				   psl->sl_addr, len))
-=======
-	    copy_to_user(&optval->imsf_slist_flex[0], psl->sl_addr, len))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFAULT;
 	return 0;
 done:

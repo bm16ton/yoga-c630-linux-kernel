@@ -1014,13 +1014,10 @@ SYSCALL_DEFINE5(mremap, unsigned long, addr, unsigned long, old_len,
 		/* can we just expand the current mapping? */
 		if (vma_expandable(vma, new_len - old_len)) {
 			long pages = (new_len - old_len) >> PAGE_SHIFT;
-<<<<<<< HEAD
 			unsigned long extension_start = addr + old_len;
 			unsigned long extension_end = addr + new_len;
 			pgoff_t extension_pgoff = vma->vm_pgoff +
 				((extension_start - vma->vm_start) >> PAGE_SHIFT);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			if (vma->vm_flags & VM_ACCOUNT) {
 				if (security_vm_enough_memory_mm(mm, pages)) {
@@ -1029,7 +1026,6 @@ SYSCALL_DEFINE5(mremap, unsigned long, addr, unsigned long, old_len,
 				}
 			}
 
-<<<<<<< HEAD
 			/*
 			 * Function vma_merge() is called on the extension we are adding to
 			 * the already existing vma, vma_merge() will merge this extension with
@@ -1042,10 +1038,6 @@ SYSCALL_DEFINE5(mremap, unsigned long, addr, unsigned long, old_len,
 					extension_pgoff, vma_policy(vma),
 					vma->vm_userfaultfd_ctx, anon_vma_name(vma));
 			if (!vma) {
-=======
-			if (vma_adjust(vma, vma->vm_start, addr + new_len,
-				       vma->vm_pgoff, NULL)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				vm_unacct_memory(pages);
 				ret = -ENOMEM;
 				goto out;

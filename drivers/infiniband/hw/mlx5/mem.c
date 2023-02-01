@@ -30,10 +30,6 @@
  * SOFTWARE.
  */
 
-<<<<<<< HEAD
-=======
-#include <rdma/ib_umem.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <rdma/ib_umem_odp.h>
 #include "mlx5_ib.h"
 #include <linux/jiffies.h>

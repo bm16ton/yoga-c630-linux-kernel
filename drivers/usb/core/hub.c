@@ -6052,11 +6052,7 @@ re_enumerate:
  *
  * Return: The same as for usb_reset_and_verify_device().
  * However, if a reset is already in progress (for instance, if a
-<<<<<<< HEAD
  * driver doesn't have pre_reset() or post_reset() callbacks, and while
-=======
- * driver doesn't have pre_ or post_reset() callbacks, and while
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * being unbound or re-bound during the ongoing reset its disconnect()
  * or probe() routine tries to perform a second, nested reset), the
  * routine returns -EINPROGRESS.

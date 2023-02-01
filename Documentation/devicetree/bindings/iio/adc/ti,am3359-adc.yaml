@@ -11,7 +11,6 @@ maintainers:
 
 properties:
   compatible:
-<<<<<<< HEAD
     oneOf:
       - enum:
           - ti,am3359-adc
@@ -20,11 +19,6 @@ properties:
           - enum:
               - ti,am654-adc
           - const: ti,am3359-adc
-=======
-    enum:
-      - ti,am3359-adc
-      - ti,am4372-adc
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   '#io-channel-cells':
     const: 1

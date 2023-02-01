@@ -34,11 +34,7 @@ static bool prepend_char(struct prepend_buffer *p, unsigned char c)
 }
 
 /*
-<<<<<<< HEAD
  * The source of the prepend data can be an optimistic load
-=======
- * The source of the prepend data can be an optimistoc load
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * of a dentry name and length. And because we don't hold any
  * locks, the length and the pointer to the name may not be
  * in sync if a concurrent rename happens, and the kernel

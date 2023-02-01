@@ -5,10 +5,7 @@
 #include <linux/resume_user_mode.h>
 #include <linux/highmem.h>
 #include <linux/jump_label.h>
-<<<<<<< HEAD
 #include <linux/kmsan.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/livepatch.h>
 #include <linux/audit.h>
 #include <linux/tick.h>

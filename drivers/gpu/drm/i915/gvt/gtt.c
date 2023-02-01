@@ -1214,15 +1214,8 @@ static int split_2MB_gtt_entry(struct intel_vgpu *vgpu,
 	for_each_shadow_entry(sub_spt, &sub_se, sub_index) {
 		ret = intel_gvt_dma_map_guest_page(vgpu, start_gfn + sub_index,
 						   PAGE_SIZE, &dma_addr);
-<<<<<<< HEAD
 		if (ret)
 			goto err;
-=======
-		if (ret) {
-			ppgtt_invalidate_spt(spt);
-			return ret;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sub_se.val64 = se->val64;
 
 		/* Copy the PAT field from PDE. */

@@ -651,11 +651,7 @@ static struct clk_rcg2 system_mm_noc_bfdcd_clk_src = {
 	.clkr.hw.init = &(struct clk_init_data){
 		.name = "system_mm_noc_bfdcd_clk_src",
 		.parent_data = gcc_xo_gpll0_gpll6a_parent_data,
-<<<<<<< HEAD
 		.num_parents = ARRAY_SIZE(gcc_xo_gpll0_gpll6a_parent_data),
-=======
-		.num_parents = 3,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.ops = &clk_rcg2_ops,
 	},
 };
@@ -2464,13 +2460,8 @@ static struct clk_branch gcc_camss_jpeg_axi_clk = {
 		.enable_mask = BIT(0),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_camss_jpeg_axi_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -2673,13 +2664,8 @@ static struct clk_branch gcc_camss_vfe_axi_clk = {
 		.enable_mask = BIT(0),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_camss_vfe_axi_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -2834,13 +2820,8 @@ static struct clk_branch gcc_mdss_axi_clk = {
 		.enable_mask = BIT(0),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_mdss_axi_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -3231,13 +3212,8 @@ static struct clk_branch gcc_mdp_tbu_clk = {
 		.enable_mask = BIT(4),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_mdp_tbu_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -3254,13 +3230,8 @@ static struct clk_branch gcc_venus_tbu_clk = {
 		.enable_mask = BIT(5),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_venus_tbu_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -3277,13 +3248,8 @@ static struct clk_branch gcc_vfe_tbu_clk = {
 		.enable_mask = BIT(9),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_vfe_tbu_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -3300,13 +3266,8 @@ static struct clk_branch gcc_jpeg_tbu_clk = {
 		.enable_mask = BIT(10),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_jpeg_tbu_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -3542,13 +3503,8 @@ static struct clk_branch gcc_venus0_axi_clk = {
 		.enable_mask = BIT(0),
 		.hw.init = &(struct clk_init_data){
 			.name = "gcc_venus0_axi_clk",
-<<<<<<< HEAD
 			.parent_hws = (const struct clk_hw*[]){
 				&system_mm_noc_bfdcd_clk_src.clkr.hw,
-=======
-			.parent_data = &(const struct clk_parent_data){
-				.hw = &system_mm_noc_bfdcd_clk_src.clkr.hw,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,

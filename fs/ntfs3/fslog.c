@@ -1132,11 +1132,7 @@ static int read_log_page(struct ntfs_log *log, u32 vbo,
 		return -EINVAL;
 
 	if (!*buffer) {
-<<<<<<< HEAD
 		to_free = kmalloc(log->page_size, GFP_NOFS);
-=======
-		to_free = kmalloc(bytes, GFP_NOFS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!to_free)
 			return -ENOMEM;
 		*buffer = to_free;
@@ -1184,14 +1180,7 @@ static int log_read_rst(struct ntfs_log *log, u32 l_size, bool first,
 			struct restart_info *info)
 {
 	u32 skip, vbo;
-<<<<<<< HEAD
 	struct RESTART_HDR *r_page = NULL;
-=======
-	struct RESTART_HDR *r_page = kmalloc(DefaultLogPageSize, GFP_NOFS);
-
-	if (!r_page)
-		return -ENOMEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Determine which restart area we are looking for. */
 	if (first) {
@@ -1205,10 +1194,6 @@ static int log_read_rst(struct ntfs_log *log, u32 l_size, bool first,
 	/* Loop continuously until we succeed. */
 	for (; vbo < l_size; vbo = 2 * vbo + skip, skip = 0) {
 		bool usa_error;
-<<<<<<< HEAD
-=======
-		u32 sys_page_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bool brst, bchk;
 		struct RESTART_AREA *ra;
 
@@ -1262,27 +1247,6 @@ static int log_read_rst(struct ntfs_log *log, u32 l_size, bool first,
 			goto check_result;
 		}
 
-<<<<<<< HEAD
-=======
-		/* Read the entire restart area. */
-		sys_page_size = le32_to_cpu(r_page->sys_page_size);
-		if (DefaultLogPageSize != sys_page_size) {
-			kfree(r_page);
-			r_page = kzalloc(sys_page_size, GFP_NOFS);
-			if (!r_page)
-				return -ENOMEM;
-
-			if (read_log_page(log, vbo,
-					  (struct RECORD_PAGE_HDR **)&r_page,
-					  &usa_error)) {
-				/* Ignore any errors. */
-				kfree(r_page);
-				r_page = NULL;
-				continue;
-			}
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (is_client_area_valid(r_page, usa_error)) {
 			info->valid_page = true;
 			ra = Add2Ptr(r_page, le16_to_cpu(r_page->ra_off));
@@ -2741,12 +2705,9 @@ static inline bool check_attr(const struct MFT_REC *rec,
 			return false;
 		}
 
-<<<<<<< HEAD
 		if (run_off > asize)
 			return false;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (run_unpack(NULL, sbi, 0, svcn, evcn, svcn,
 			       Add2Ptr(attr, run_off), asize - run_off) < 0) {
 			return false;
@@ -3839,11 +3800,7 @@ int log_replay(struct ntfs_inode *ni, bool *initialized)
 		}
 
 		log_init_pg_hdr(log, page_size, page_size, 1, 1);
-<<<<<<< HEAD
 		log_create(log, l_size, 0, get_random_u32(), false, false);
-=======
-		log_create(log, l_size, 0, get_random_int(), false, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		log->ra = ra;
 
@@ -3917,11 +3874,7 @@ check_restart_area:
 
 		/* Do some checks based on whether we have a valid log page. */
 		if (!rst_info.valid_page) {
-<<<<<<< HEAD
 			open_log_count = get_random_u32();
-=======
-			open_log_count = get_random_int();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto init_log_instance;
 		}
 		open_log_count = le32_to_cpu(ra2->open_log_count);
@@ -4072,11 +4025,7 @@ find_oldest:
 		memcpy(ra->clients, Add2Ptr(ra2, t16),
 		       le16_to_cpu(ra2->ra_len) - t16);
 
-<<<<<<< HEAD
 		log->current_openlog_count = get_random_u32();
-=======
-		log->current_openlog_count = get_random_int();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ra->open_log_count = cpu_to_le32(log->current_openlog_count);
 		log->ra_size = offsetof(struct RESTART_AREA, clients) +
 			       sizeof(struct CLIENT_REC);
@@ -4803,15 +4752,12 @@ fake_attr:
 		u16 roff = le16_to_cpu(attr->nres.run_off);
 		CLST svcn = le64_to_cpu(attr->nres.svcn);
 
-<<<<<<< HEAD
 		if (roff > t32) {
 			kfree(oa->attr);
 			oa->attr = NULL;
 			goto fake_attr;
 		}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = run_unpack(&oa->run0, sbi, inode->i_ino, svcn,
 				 le64_to_cpu(attr->nres.evcn), svcn,
 				 Add2Ptr(attr, roff), t32 - roff);

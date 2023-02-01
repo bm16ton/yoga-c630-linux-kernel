@@ -60,15 +60,12 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
 	conn->local_nls = load_nls("utf8");
 	if (!conn->local_nls)
 		conn->local_nls = load_nls_default();
-<<<<<<< HEAD
 	if (IS_ENABLED(CONFIG_UNICODE))
 		conn->um = utf8_load(UNICODE_AGE(12, 1, 0));
 	else
 		conn->um = ERR_PTR(-EOPNOTSUPP);
 	if (IS_ERR(conn->um))
 		conn->um = NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomic_set(&conn->req_running, 0);
 	atomic_set(&conn->r_count, 0);
 	conn->total_credits = 1;
@@ -319,18 +316,12 @@ int ksmbd_conn_handler_loop(void *p)
 
 		/* 4 for rfc1002 length field */
 		size = pdu_size + 4;
-<<<<<<< HEAD
 		conn->request_buf = kvmalloc(size,
 					     GFP_KERNEL |
 					     __GFP_NOWARN |
 					     __GFP_NORETRY);
 		if (!conn->request_buf)
 			break;
-=======
-		conn->request_buf = kvmalloc(size, GFP_KERNEL);
-		if (!conn->request_buf)
-			continue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		memcpy(conn->request_buf, hdr_buf, sizeof(hdr_buf));
 		if (!ksmbd_smb_request(conn))
@@ -368,11 +359,8 @@ out:
 	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
 
 
-<<<<<<< HEAD
 	if (IS_ENABLED(CONFIG_UNICODE))
 		utf8_unload(conn->um);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unload_nls(conn->local_nls);
 	if (default_conn_ops.terminate_fn)
 		default_conn_ops.terminate_fn(conn);

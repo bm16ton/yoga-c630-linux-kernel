@@ -38,11 +38,8 @@ static inline int unregister_random_vmfork_notifier(struct notifier_block *nb) {
 #endif
 
 void get_random_bytes(void *buf, size_t len);
-<<<<<<< HEAD
 u8 get_random_u8(void);
 u16 get_random_u16(void);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 u32 get_random_u32(void);
 u64 get_random_u64(void);
 static inline unsigned long get_random_long(void)
@@ -138,12 +135,8 @@ static inline unsigned long get_random_canary(void)
 	return get_random_long() & CANARY_MASK;
 }
 
-<<<<<<< HEAD
 void __init random_init_early(const char *command_line);
 void __init random_init(void);
-=======
-int __init random_init(const char *command_line);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bool rng_is_initialized(void);
 int wait_for_random_bytes(void);
 
@@ -164,16 +157,10 @@ static inline int get_random_bytes_wait(void *buf, size_t nbytes)
 		*out = get_random_ ## name(); \
 		return 0; \
 	}
-<<<<<<< HEAD
 declare_get_random_var_wait(u8, u8)
 declare_get_random_var_wait(u16, u16)
 declare_get_random_var_wait(u32, u32)
 declare_get_random_var_wait(u64, u32)
-=======
-declare_get_random_var_wait(u32, u32)
-declare_get_random_var_wait(u64, u32)
-declare_get_random_var_wait(int, unsigned int)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 declare_get_random_var_wait(long, unsigned long)
 #undef declare_get_random_var
 

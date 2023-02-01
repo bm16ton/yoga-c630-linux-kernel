@@ -2865,11 +2865,7 @@ static __poll_t snd_pcm_oss_poll(struct file *file, poll_table * wait)
 		snd_pcm_state_t ostate;
 		poll_wait(file, &runtime->sleep, wait);
 		snd_pcm_stream_lock_irq(csubstream);
-<<<<<<< HEAD
 		ostate = runtime->state;
-=======
-		ostate = runtime->status->state;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ostate != SNDRV_PCM_STATE_RUNNING ||
 		    snd_pcm_oss_capture_ready(csubstream))
 			mask |= EPOLLIN | EPOLLRDNORM;

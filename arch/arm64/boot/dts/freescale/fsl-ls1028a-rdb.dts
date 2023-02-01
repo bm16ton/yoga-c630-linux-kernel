@@ -29,12 +29,9 @@
 		ethernet3 = &mscc_felix_port1;
 		ethernet4 = &mscc_felix_port2;
 		ethernet5 = &mscc_felix_port3;
-<<<<<<< HEAD
 		ethernet6 = &mscc_felix_port4;
 		ethernet7 = &mscc_felix_port5;
 		ethernet8 = &enetc_port3;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	chosen {
@@ -157,13 +154,10 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &enetc_port3 {
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &esdhc {
 	sd-uhs-sdr104;
 	sd-uhs-sdr50;
@@ -295,14 +289,6 @@
 };
 
 &mscc_felix_port5 {
-	status = "okay";
-};
-
-&optee {
-	status = "okay";
-};
-
-&pwm0 {
 	status = "okay";
 };
 

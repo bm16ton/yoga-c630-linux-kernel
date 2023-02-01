@@ -254,11 +254,8 @@ const struct security_class_mapping secclass_map[] = {
 	  { COMMON_FILE_PERMS, NULL } },
 	{ "io_uring",
 	  { "override_creds", "sqpoll", "cmd", NULL } },
-<<<<<<< HEAD
 	{ "user_namespace",
 	  { "create", NULL } },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ NULL }
   };
 

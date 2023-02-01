@@ -16,7 +16,6 @@ config NET_VENDOR_WANGXUN
 
 if NET_VENDOR_WANGXUN
 
-<<<<<<< HEAD
 config NGBE
 	tristate "Wangxun(R) GbE PCI Express adapters support"
 	depends on PCI
@@ -30,8 +29,6 @@ config NGBE
 	  To compile this driver as a module, choose M here. The module
 	  will be called ngbe.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config TXGBE
 	tristate "Wangxun(R) 10GbE PCI Express adapters support"
 	depends on PCI

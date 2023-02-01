@@ -781,10 +781,7 @@ int xfrm_init_replay(struct xfrm_state *x, struct netlink_ext_ack *extack)
 			if (replay_esn->replay_window == 0) {
 				NL_SET_ERR_MSG(extack, "ESN replay window must be > 0");
 				return -EINVAL;
-<<<<<<< HEAD
 			}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			x->repl_mode = XFRM_REPLAY_MODE_ESN;
 		} else {
 			x->repl_mode = XFRM_REPLAY_MODE_BMP;

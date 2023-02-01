@@ -7,12 +7,9 @@
 #include "osdep_service.h"
 #include "drv_types.h"
 
-<<<<<<< HEAD
 #define NR_XMITFRAME		256
 #define WMM_XMIT_THRESHOLD	(NR_XMITFRAME * 2 / 5)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MAX_XMITBUF_SZ	(20480)	/*  20k */
 #define NR_XMITBUFF		(4)
 
@@ -310,7 +307,6 @@ struct	xmit_priv {
 	struct submit_ctx ack_tx_ops;
 };
 
-<<<<<<< HEAD
 struct pkt_file {
 	struct sk_buff *pkt;
 	size_t pkt_len;	 /* the remainder length of the open_file */
@@ -320,8 +316,6 @@ struct pkt_file {
 	size_t buf_len;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct xmit_buf *rtw_alloc_xmitbuf_ext(struct xmit_priv *pxmitpriv);
 s32 rtw_free_xmitbuf_ext(struct xmit_priv *pxmitpriv,
 			 struct xmit_buf *pxmitbuf);
@@ -373,12 +367,7 @@ u32	rtw_get_ff_hwaddr(struct xmit_frame *pxmitframe);
 int rtw_ack_tx_wait(struct xmit_priv *pxmitpriv, u32 timeout_ms);
 void rtw_ack_tx_done(struct xmit_priv *pxmitpriv, int status);
 
-<<<<<<< HEAD
 void rtw_xmit_complete(struct adapter *padapter, struct xmit_frame *pxframe);
 netdev_tx_t rtw_xmit_entry(struct sk_buff *pkt, struct net_device *pnetdev);
-=======
-/* include after declaring struct xmit_buf, in order to avoid warning */
-#include "xmit_osdep.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif	/* _RTL871X_XMIT_H_ */

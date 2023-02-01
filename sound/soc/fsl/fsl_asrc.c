@@ -20,10 +20,7 @@
 
 #define IDEAL_RATIO_DECIMAL_DEPTH 26
 #define DIVIDER_NUM  64
-<<<<<<< HEAD
 #define INIT_RETRY_NUM 50
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define pair_err(fmt, ...) \
 	dev_err(&asrc->pdev->dev, "Pair %c: " fmt, 'A' + index, ##__VA_ARGS__)
@@ -1224,17 +1221,9 @@ static int fsl_asrc_probe(struct platform_device *pdev)
 			goto err_pm_disable;
 	}
 
-<<<<<<< HEAD
 	ret = pm_runtime_resume_and_get(&pdev->dev);
 	if (ret < 0)
 		goto err_pm_get_sync;
-=======
-	ret = pm_runtime_get_sync(&pdev->dev);
-	if (ret < 0) {
-		pm_runtime_put_noidle(&pdev->dev);
-		goto err_pm_get_sync;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = fsl_asrc_init(asrc);
 	if (ret) {

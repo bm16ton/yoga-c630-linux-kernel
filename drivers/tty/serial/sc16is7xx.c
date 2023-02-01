@@ -896,7 +896,6 @@ static void sc16is7xx_ier_clear(struct uart_port *port, u8 bit)
 
 	lockdep_assert_held_once(&port->lock);
 
-<<<<<<< HEAD
 	one->config.flags |= SC16IS7XX_RECONF_IER;
 	one->config.ier_mask |= bit;
 	one->config.ier_val &= ~bit;
@@ -912,23 +911,6 @@ static void sc16is7xx_ier_set(struct uart_port *port, u8 bit)
 
 	one->config.flags |= SC16IS7XX_RECONF_IER;
 	one->config.ier_mask |= bit;
-=======
-	one->config.flags |= SC16IS7XX_RECONF_IER;
-	one->config.ier_mask |= bit;
-	one->config.ier_val &= ~bit;
-	kthread_queue_work(&s->kworker, &one->reg_work);
-}
-
-static void sc16is7xx_ier_set(struct uart_port *port, u8 bit)
-{
-	struct sc16is7xx_port *s = dev_get_drvdata(port->dev);
-	struct sc16is7xx_one *one = to_sc16is7xx_one(port, port);
-
-	lockdep_assert_held_once(&port->lock);
-
-	one->config.flags |= SC16IS7XX_RECONF_IER;
-	one->config.ier_mask |= bit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	one->config.ier_val |= bit;
 	kthread_queue_work(&s->kworker, &one->reg_work);
 }
@@ -1710,11 +1692,6 @@ static int sc16is7xx_i2c_probe(struct i2c_client *i2c,
 static void sc16is7xx_i2c_remove(struct i2c_client *client)
 {
 	sc16is7xx_remove(&client->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id sc16is7xx_i2c_id_table[] = {

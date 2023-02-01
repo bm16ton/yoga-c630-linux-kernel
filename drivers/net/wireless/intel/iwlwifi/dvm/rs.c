@@ -2,11 +2,7 @@
 /******************************************************************************
  *
  * Copyright(c) 2005 - 2014 Intel Corporation. All rights reserved.
-<<<<<<< HEAD
  * Copyright (C) 2019 - 2020, 2022 Intel Corporation
-=======
- * Copyright (C) 2019 - 2020 Intel Corporation
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *****************************************************************************/
 #include <linux/kernel.h>
 #include <linux/skbuff.h>

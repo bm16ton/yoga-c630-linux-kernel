@@ -14,10 +14,7 @@ struct virtio_device {
 	u64 features;
 	struct list_head vqs;
 	spinlock_t vqs_list_lock;
-<<<<<<< HEAD
 	const struct virtio_config_ops *config;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct virtqueue {

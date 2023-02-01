@@ -323,11 +323,7 @@ static void s5p_mfc_handle_frame_new(struct s5p_mfc_ctx *ctx, unsigned int err)
 	}
 	ctx->sequence++;
 	/* The MFC returns address of the buffer, now we have to
-<<<<<<< HEAD
 	 * check which vb2_buffer does it correspond to */
-=======
-	 * check which videobuf does it correspond to */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(dst_buf, &ctx->dst_queue, list) {
 		u32 addr = (u32)vb2_dma_contig_plane_dma_addr(&dst_buf->b->vb2_buf, 0);
 
@@ -1580,7 +1576,6 @@ static struct s5p_mfc_variant mfc_drvdata_v7 = {
 	.port_num	= MFC_NUM_PORTS_V7,
 	.buf_size	= &buf_size_v7,
 	.fw_name[0]     = "s5p-mfc-v7.fw",
-<<<<<<< HEAD
 	.clk_names	= {"mfc"},
 	.num_clocks	= 1,
 };
@@ -1593,10 +1588,6 @@ static struct s5p_mfc_variant mfc_drvdata_v7_3250 = {
 	.fw_name[0]     = "s5p-mfc-v7.fw",
 	.clk_names      = {"mfc", "sclk_mfc"},
 	.num_clocks     = 2,
-=======
-	.clk_names	= {"mfc", "sclk_mfc"},
-	.num_clocks	= 2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct s5p_mfc_buf_size_v6 mfc_buf_size_v8 = {
@@ -1667,12 +1658,9 @@ static const struct of_device_id exynos_mfc_match[] = {
 		.compatible = "samsung,mfc-v7",
 		.data = &mfc_drvdata_v7,
 	}, {
-<<<<<<< HEAD
 		.compatible = "samsung,exynos3250-mfc",
 		.data = &mfc_drvdata_v7_3250,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.compatible = "samsung,mfc-v8",
 		.data = &mfc_drvdata_v8,
 	}, {

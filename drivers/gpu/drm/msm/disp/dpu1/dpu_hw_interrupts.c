@@ -443,7 +443,6 @@ int dpu_core_irq_register_callback(struct dpu_kms *dpu_kms, int irq_idx,
 	if (!irq_cb) {
 		DPU_ERROR("invalid ird_idx:%d irq_cb:%ps\n", irq_idx, irq_cb);
 		return -EINVAL;
-<<<<<<< HEAD
 	}
 
 	if (irq_idx < 0 || irq_idx >= dpu_kms->hw_intr->total_irqs) {
@@ -529,93 +528,6 @@ static int dpu_debugfs_core_irq_show(struct seq_file *s, void *v)
 	return 0;
 }
 
-=======
-	}
-
-	if (irq_idx < 0 || irq_idx >= dpu_kms->hw_intr->total_irqs) {
-		DPU_ERROR("invalid IRQ index: [%d]\n", irq_idx);
-		return -EINVAL;
-	}
-
-	VERB("[%pS] irq_idx=%d\n", __builtin_return_address(0), irq_idx);
-
-	spin_lock_irqsave(&dpu_kms->hw_intr->irq_lock, irq_flags);
-
-//	if (unlikely(WARN_ON(dpu_kms->hw_intr->irq_tbl[irq_idx].cb))) {
-//		spin_unlock_irqrestore(&dpu_kms->hw_intr->irq_lock, irq_flags);
-
-//		return -EBUSY;
-//	}
-
-	trace_dpu_core_irq_register_callback(irq_idx, irq_cb);
-	dpu_kms->hw_intr->irq_tbl[irq_idx].arg = irq_arg;
-	dpu_kms->hw_intr->irq_tbl[irq_idx].cb = irq_cb;
-
-	ret = dpu_hw_intr_enable_irq_locked(
-				dpu_kms->hw_intr,
-				irq_idx);
-	if (ret)
-		DPU_ERROR("Fail to enable IRQ for irq_idx:%d\n",
-					irq_idx);
-	spin_unlock_irqrestore(&dpu_kms->hw_intr->irq_lock, irq_flags);
-
-	trace_dpu_irq_register_success(irq_idx);
-
-	return 0;
-}
-
-int dpu_core_irq_unregister_callback(struct dpu_kms *dpu_kms, int irq_idx)
-{
-	unsigned long irq_flags;
-	int ret;
-
-	if (irq_idx < 0 || irq_idx >= dpu_kms->hw_intr->total_irqs) {
-		DPU_ERROR("invalid IRQ index: [%d]\n", irq_idx);
-		return -EINVAL;
-	}
-
-	VERB("[%pS] irq_idx=%d\n", __builtin_return_address(0), irq_idx);
-
-	spin_lock_irqsave(&dpu_kms->hw_intr->irq_lock, irq_flags);
-	trace_dpu_core_irq_unregister_callback(irq_idx);
-
-	ret = dpu_hw_intr_disable_irq_locked(dpu_kms->hw_intr, irq_idx);
-	if (ret)
-		DPU_ERROR("Fail to disable IRQ for irq_idx:%d: %d\n",
-					irq_idx, ret);
-
-	dpu_kms->hw_intr->irq_tbl[irq_idx].cb = NULL;
-	dpu_kms->hw_intr->irq_tbl[irq_idx].arg = NULL;
-
-	spin_unlock_irqrestore(&dpu_kms->hw_intr->irq_lock, irq_flags);
-
-	trace_dpu_irq_unregister_success(irq_idx);
-
-	return 0;
-}
-
-#ifdef CONFIG_DEBUG_FS
-static int dpu_debugfs_core_irq_show(struct seq_file *s, void *v)
-{
-	struct dpu_kms *dpu_kms = s->private;
-	unsigned long irq_flags;
-	int i, irq_count;
-	void *cb;
-
-	for (i = 0; i < dpu_kms->hw_intr->total_irqs; i++) {
-		spin_lock_irqsave(&dpu_kms->hw_intr->irq_lock, irq_flags);
-		irq_count = atomic_read(&dpu_kms->hw_intr->irq_tbl[i].count);
-		cb = dpu_kms->hw_intr->irq_tbl[i].cb;
-		spin_unlock_irqrestore(&dpu_kms->hw_intr->irq_lock, irq_flags);
-
-		if (irq_count || cb)
-			seq_printf(s, "idx:%d irq:%d cb:%ps\n", i, irq_count, cb);
-	}
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 DEFINE_SHOW_ATTRIBUTE(dpu_debugfs_core_irq);
 
 void dpu_debugfs_core_irq_init(struct dpu_kms *dpu_kms,

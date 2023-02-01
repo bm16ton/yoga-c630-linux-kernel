@@ -885,15 +885,8 @@ static int yas532_get_calibration_data(struct yas5xx *yas5xx)
 	dev_dbg(yas5xx->dev, "calibration data: %14ph\n", data);
 
 	/* Sanity check, is this all zeroes? */
-<<<<<<< HEAD
 	if (!memchr_inv(data, 0x00, 13) && !(data[13] & BIT(7)))
 		dev_warn(yas5xx->dev, "calibration is blank!\n");
-=======
-	if (memchr_inv(data, 0x00, 13) == NULL) {
-		if (!(data[13] & BIT(7)))
-			dev_warn(yas5xx->dev, "calibration is blank!\n");
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Contribute calibration data to the input pool for kernel entropy */
 	add_device_randomness(data, sizeof(data));

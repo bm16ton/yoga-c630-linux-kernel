@@ -142,10 +142,6 @@ static const struct snd_soc_component_driver dummy_codec = {
 	.idle_bias_on		= 1,
 	.use_pmdown_time	= 1,
 	.endianness		= 1,
-<<<<<<< HEAD
-=======
-	.legacy_dai_naming	= 1,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define STUB_RATES	SNDRV_PCM_RATE_8000_384000

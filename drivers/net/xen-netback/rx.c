@@ -93,12 +93,7 @@ bool xenvif_rx_queue_tail(struct xenvif_queue *queue, struct sk_buff *skb)
 		struct net_device *dev = queue->vif->dev;
 
 		netif_tx_stop_queue(netdev_get_tx_queue(dev, queue->id));
-<<<<<<< HEAD
 		ret = false;
-=======
-		kfree_skb(skb);
-		queue->vif->dev->stats.rx_dropped++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		if (skb_queue_empty(&queue->rx_queue))
 			xenvif_update_needed_slots(queue, skb);

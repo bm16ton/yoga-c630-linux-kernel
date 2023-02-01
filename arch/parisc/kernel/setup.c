@@ -70,13 +70,10 @@ void __init setup_cmdline(char **cmdline_p)
 			strlcat(p, "tty0", COMMAND_LINE_SIZE);
 	}
 
-<<<<<<< HEAD
 	/* default to use early console */
 	if (!strstr(p, "earlycon"))
 		strlcat(p, " earlycon=pdc", COMMAND_LINE_SIZE);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_BLK_DEV_INITRD
 		if (boot_args[2] != 0) /* did palo pass us a ramdisk? */
 		{

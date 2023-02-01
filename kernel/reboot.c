@@ -408,14 +408,11 @@ register_sys_off_handler(enum sys_off_mode mode,
 		handler->list = &power_off_handler_list;
 		break;
 
-<<<<<<< HEAD
 	case SYS_OFF_MODE_RESTART_PREPARE:
 		handler->list = &restart_prep_handler_list;
 		handler->blocking = true;
 		break;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case SYS_OFF_MODE_RESTART:
 		handler->list = &restart_handler_list;
 		break;

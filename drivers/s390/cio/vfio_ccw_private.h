@@ -18,10 +18,7 @@
 #include <linux/workqueue.h>
 #include <linux/vfio_ccw.h>
 #include <linux/vfio.h>
-<<<<<<< HEAD
 #include <linux/mdev.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/crw.h>
 #include <asm/debug.h>
 
@@ -76,10 +73,6 @@ struct vfio_ccw_crw {
  * @sch: pointer to the subchannel
  * @state: internal state of the device
  * @completion: synchronization helper of the I/O completion
-<<<<<<< HEAD
-=======
- * @avail: available for creating a mediated device
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @io_region: MMIO region to input/output I/O arguments/results
  * @io_mutex: protect against concurrent update of I/O regions
  * @region: additional regions for other subchannel operations
@@ -103,10 +96,6 @@ struct vfio_ccw_private {
 	struct subchannel	*sch;
 	int			state;
 	struct completion	*completion;
-<<<<<<< HEAD
-=======
-	atomic_t		avail;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ccw_io_region	*io_region;
 	struct mutex		io_mutex;
 	struct vfio_ccw_region *region;

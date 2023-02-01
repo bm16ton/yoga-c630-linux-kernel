@@ -2,11 +2,7 @@ config DRM_IMX_DCSS
 	tristate "i.MX8MQ DCSS"
 	select IMX_IRQSTEER
 	select DRM_KMS_HELPER
-<<<<<<< HEAD
 	select DRM_GEM_DMA_HELPER
-=======
-	select DRM_GEM_CMA_HELPER
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select VIDEOMODE_HELPERS
 	depends on DRM && ARCH_MXC && ARM64
 	help

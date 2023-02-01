@@ -8,10 +8,7 @@
 
 #include <linux/kvm_host.h>
 #include <asm/csr.h>
-<<<<<<< HEAD
 #include <asm/insn-def.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int gstage_page_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
 			     struct kvm_cpu_trap *trap)
@@ -66,15 +63,7 @@ unsigned long kvm_riscv_vcpu_unpriv_read(struct kvm_vcpu *vcpu,
 {
 	register unsigned long taddr asm("a0") = (unsigned long)trap;
 	register unsigned long ttmp asm("a1");
-<<<<<<< HEAD
 	unsigned long flags, val, tmp, old_stvec, old_hstatus;
-=======
-	register unsigned long val asm("t0");
-	register unsigned long tmp asm("t1");
-	register unsigned long addr asm("t2") = guest_addr;
-	unsigned long flags;
-	unsigned long old_stvec, old_hstatus;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	local_irq_save(flags);
 
@@ -90,41 +79,19 @@ unsigned long kvm_riscv_vcpu_unpriv_read(struct kvm_vcpu *vcpu,
 			".option push\n"
 			".option norvc\n"
 			"add %[ttmp], %[taddr], 0\n"
-<<<<<<< HEAD
 			HLVX_HU(%[val], %[addr])
-=======
-			/*
-			 * HLVX.HU %[val], (%[addr])
-			 * HLVX.HU t0, (t2)
-			 * 0110010 00011 00111 100 00101 1110011
-			 */
-			".word 0x6433c2f3\n"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			"andi %[tmp], %[val], 3\n"
 			"addi %[tmp], %[tmp], -3\n"
 			"bne %[tmp], zero, 2f\n"
 			"addi %[addr], %[addr], 2\n"
-<<<<<<< HEAD
 			HLVX_HU(%[tmp], %[addr])
-=======
-			/*
-			 * HLVX.HU %[tmp], (%[addr])
-			 * HLVX.HU t1, (t2)
-			 * 0110010 00011 00111 100 00110 1110011
-			 */
-			".word 0x6433c373\n"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			"sll %[tmp], %[tmp], 16\n"
 			"add %[val], %[val], %[tmp]\n"
 			"2:\n"
 			".option pop"
 		: [val] "=&r" (val), [tmp] "=&r" (tmp),
 		  [taddr] "+&r" (taddr), [ttmp] "+&r" (ttmp),
-<<<<<<< HEAD
 		  [addr] "+&r" (guest_addr) : : "memory");
-=======
-		  [addr] "+&r" (addr) : : "memory");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (trap->scause == EXC_LOAD_PAGE_FAULT)
 			trap->scause = EXC_INST_PAGE_FAULT;
@@ -141,34 +108,14 @@ unsigned long kvm_riscv_vcpu_unpriv_read(struct kvm_vcpu *vcpu,
 			".option norvc\n"
 			"add %[ttmp], %[taddr], 0\n"
 #ifdef CONFIG_64BIT
-<<<<<<< HEAD
 			HLV_D(%[val], %[addr])
 #else
 			HLV_W(%[val], %[addr])
-=======
-			/*
-			 * HLV.D %[val], (%[addr])
-			 * HLV.D t0, (t2)
-			 * 0110110 00000 00111 100 00101 1110011
-			 */
-			".word 0x6c03c2f3\n"
-#else
-			/*
-			 * HLV.W %[val], (%[addr])
-			 * HLV.W t0, (t2)
-			 * 0110100 00000 00111 100 00101 1110011
-			 */
-			".word 0x6803c2f3\n"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 			".option pop"
 		: [val] "=&r" (val),
 		  [taddr] "+&r" (taddr), [ttmp] "+&r" (ttmp)
-<<<<<<< HEAD
 		: [addr] "r" (guest_addr) : "memory");
-=======
-		: [addr] "r" (addr) : "memory");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	csr_write(CSR_STVEC, old_stvec);

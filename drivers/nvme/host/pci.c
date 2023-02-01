@@ -226,18 +226,10 @@ struct nvme_queue {
 struct nvme_iod {
 	struct nvme_request req;
 	struct nvme_command cmd;
-<<<<<<< HEAD
 	bool use_sgl;
 	bool aborted;
 	s8 nr_allocations;	/* PRP list pool allocations. 0 means small
 				   pool in use */
-=======
-	struct nvme_queue *nvmeq;
-	bool use_sgl;
-	int aborted;
-	int npages;		/* In the PRP list. 0 means small pool in use */
-	dma_addr_t first_dma;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int dma_len;	/* length of single DMA segment mapping */
 	dma_addr_t first_dma;
 	dma_addr_t meta_dma;
@@ -591,11 +583,7 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
 
 	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
 
-<<<<<<< HEAD
 	if (iod->nr_allocations == 0)
-=======
-	if (iod->npages == 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dma_pool_free(dev->prp_small_pool, nvme_pci_iod_list(req)[0],
 			      iod->first_dma);
 	else if (iod->use_sgl)
@@ -665,11 +653,7 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
 
 	prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
 	if (!prp_list) {
-<<<<<<< HEAD
 		iod->nr_allocations = -1;
-=======
-		iod->npages = -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return BLK_STS_RESOURCE;
 	}
 	list[0] = prp_list;
@@ -853,11 +837,7 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
 				return nvme_setup_prp_simple(dev, req,
 							     &cmnd->rw, &bv);
 
-<<<<<<< HEAD
 			if (nvmeq->qid && sgl_threshold &&
-=======
-			if (iod->nvmeq->qid && sgl_threshold &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			    nvme_ctrl_sgl_supported(&dev->ctrl))
 				return nvme_setup_sgl_simple(dev, req,
 							     &cmnd->rw, &bv);
@@ -915,13 +895,8 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
 	blk_status_t ret;
 
-<<<<<<< HEAD
 	iod->aborted = false;
 	iod->nr_allocations = -1;
-=======
-	iod->aborted = 0;
-	iod->npages = -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	iod->sgt.nents = 0;
 
 	ret = nvme_setup_cmd(req->q->queuedata, req);
@@ -954,95 +929,6 @@ out_free_cmd:
  */
 static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
 			 const struct blk_mq_queue_data *bd)
-<<<<<<< HEAD
-=======
-{
-	struct nvme_queue *nvmeq = hctx->driver_data;
-	struct nvme_dev *dev = nvmeq->dev;
-	struct request *req = bd->rq;
-	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-	blk_status_t ret;
-
-	/*
-	 * We should not need to do this, but we're still using this to
-	 * ensure we can drain requests on a dying queue.
-	 */
-	if (unlikely(!test_bit(NVMEQ_ENABLED, &nvmeq->flags)))
-		return BLK_STS_IOERR;
-
-	if (unlikely(!nvme_check_ready(&dev->ctrl, req, true)))
-		return nvme_fail_nonready_command(&dev->ctrl, req);
-
-	ret = nvme_prep_rq(dev, req);
-	if (unlikely(ret))
-		return ret;
-	spin_lock(&nvmeq->sq_lock);
-	nvme_sq_copy_cmd(nvmeq, &iod->cmd);
-	nvme_write_sq_db(nvmeq, bd->last);
-	spin_unlock(&nvmeq->sq_lock);
-	return BLK_STS_OK;
-}
-
-static void nvme_submit_cmds(struct nvme_queue *nvmeq, struct request **rqlist)
-{
-	spin_lock(&nvmeq->sq_lock);
-	while (!rq_list_empty(*rqlist)) {
-		struct request *req = rq_list_pop(rqlist);
-		struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-
-		nvme_sq_copy_cmd(nvmeq, &iod->cmd);
-	}
-	nvme_write_sq_db(nvmeq, true);
-	spin_unlock(&nvmeq->sq_lock);
-}
-
-static bool nvme_prep_rq_batch(struct nvme_queue *nvmeq, struct request *req)
-{
-	/*
-	 * We should not need to do this, but we're still using this to
-	 * ensure we can drain requests on a dying queue.
-	 */
-	if (unlikely(!test_bit(NVMEQ_ENABLED, &nvmeq->flags)))
-		return false;
-	if (unlikely(!nvme_check_ready(&nvmeq->dev->ctrl, req, true)))
-		return false;
-
-	req->mq_hctx->tags->rqs[req->tag] = req;
-	return nvme_prep_rq(nvmeq->dev, req) == BLK_STS_OK;
-}
-
-static void nvme_queue_rqs(struct request **rqlist)
-{
-	struct request *req, *next, *prev = NULL;
-	struct request *requeue_list = NULL;
-
-	rq_list_for_each_safe(rqlist, req, next) {
-		struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
-
-		if (!nvme_prep_rq_batch(nvmeq, req)) {
-			/* detach 'req' and add to remainder list */
-			rq_list_move(rqlist, &requeue_list, req, prev);
-
-			req = prev;
-			if (!req)
-				continue;
-		}
-
-		if (!next || req->mq_hctx != next->mq_hctx) {
-			/* detach rest of list, and submit */
-			req->rq_next = NULL;
-			nvme_submit_cmds(nvmeq, rqlist);
-			*rqlist = next;
-			prev = NULL;
-		} else
-			prev = req;
-	}
-
-	*rqlist = requeue_list;
-}
-
-static __always_inline void nvme_pci_unmap_rq(struct request *req)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct nvme_queue *nvmeq = hctx->driver_data;
 	struct nvme_dev *dev = nvmeq->dev;
@@ -2645,17 +2531,11 @@ static void nvme_pci_alloc_tag_set(struct nvme_dev *dev)
 
 	set->ops = &nvme_mq_ops;
 	set->nr_hw_queues = dev->online_queues - 1;
-<<<<<<< HEAD
 	set->nr_maps = 1;
 	if (dev->io_queues[HCTX_TYPE_READ])
 		set->nr_maps = 2;
 	if (dev->io_queues[HCTX_TYPE_POLL])
 		set->nr_maps = 3;
-=======
-	set->nr_maps = 2; /* default + read */
-	if (dev->io_queues[HCTX_TYPE_POLL])
-		set->nr_maps++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set->timeout = NVME_IO_TIMEOUT;
 	set->numa_node = dev->ctrl.numa_node;
 	set->queue_depth = min_t(unsigned, dev->q_depth, BLK_MQ_MAX_DEPTH) - 1;
@@ -3595,13 +3475,10 @@ static const struct pci_device_id nvme_id_table[] = {
 	{ PCI_DEVICE(0x1987, 0x5016),	/* Phison E16 */
 		.driver_data = NVME_QUIRK_IGNORE_DEV_SUBNQN |
 				NVME_QUIRK_BOGUS_NID, },
-<<<<<<< HEAD
 	{ PCI_DEVICE(0x1987, 0x5019),  /* phison E19 */
 		.driver_data = NVME_QUIRK_DISABLE_WRITE_ZEROES, },
 	{ PCI_DEVICE(0x1987, 0x5021),   /* Phison E21 */
 		.driver_data = NVME_QUIRK_DISABLE_WRITE_ZEROES, },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ PCI_DEVICE(0x1b4b, 0x1092),	/* Lexar 256 GB SSD */
 		.driver_data = NVME_QUIRK_NO_NS_DESC_LIST |
 				NVME_QUIRK_IGNORE_DEV_SUBNQN, },
@@ -3659,22 +3536,16 @@ static const struct pci_device_id nvme_id_table[] = {
 		.driver_data = NVME_QUIRK_BOGUS_NID, },
 	{ PCI_DEVICE(0x1dbe, 0x5236),   /* ADATA XPG GAMMIX S70 */
 		.driver_data = NVME_QUIRK_BOGUS_NID, },
-<<<<<<< HEAD
 	{ PCI_DEVICE(0x1e49, 0x0021),   /* ZHITAI TiPro5000 NVMe SSD */
 		.driver_data = NVME_QUIRK_NO_DEEPEST_PS, },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ PCI_DEVICE(0x1e49, 0x0041),   /* ZHITAI TiPro7000 NVMe SSD */
 		.driver_data = NVME_QUIRK_NO_DEEPEST_PS, },
 	{ PCI_DEVICE(0xc0a9, 0x540a),   /* Crucial P2 */
 		.driver_data = NVME_QUIRK_BOGUS_NID, },
 	{ PCI_DEVICE(0x1d97, 0x2263), /* Lexar NM610 */
 		.driver_data = NVME_QUIRK_BOGUS_NID, },
-<<<<<<< HEAD
 	{ PCI_DEVICE(0x1d97, 0x2269), /* Lexar NM760 */
 		.driver_data = NVME_QUIRK_BOGUS_NID, },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ PCI_DEVICE(PCI_VENDOR_ID_AMAZON, 0x0061),
 		.driver_data = NVME_QUIRK_DMA_ADDRESS_BITS_48, },
 	{ PCI_DEVICE(PCI_VENDOR_ID_AMAZON, 0x0065),

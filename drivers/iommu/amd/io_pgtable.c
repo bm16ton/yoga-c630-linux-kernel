@@ -388,7 +388,6 @@ static int iommu_v1_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
 		for (i = 0; i < count; ++i)
 			free_clear_pte(&pte[i], pte[i], &freelist);
 
-<<<<<<< HEAD
 		if (!list_empty(&freelist))
 			updated = true;
 
@@ -397,13 +396,6 @@ static int iommu_v1_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
 			__pte |= PM_LEVEL_ENC(7) | IOMMU_PTE_PR | IOMMU_PTE_FC;
 		} else
 			__pte = __sme_set(paddr) | IOMMU_PTE_PR | IOMMU_PTE_FC;
-=======
-	for (i = 0; i < count; ++i)
-		free_clear_pte(&pte[i], pte[i], &freelist);
-
-	if (!list_empty(&freelist))
-		updated = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (prot & IOMMU_PROT_IR)
 			__pte |= IOMMU_PTE_IR;

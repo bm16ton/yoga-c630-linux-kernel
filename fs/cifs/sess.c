@@ -292,16 +292,10 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
 			continue;
 		}
 		kref_get(&iface->refcount);
-<<<<<<< HEAD
 		break;
 	}
 
 	if (list_entry_is_head(iface, &ses->iface_list, iface_head)) {
-=======
-	}
-
-	if (!list_entry_is_head(iface, &ses->iface_list, iface_head)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rc = 1;
 		iface = NULL;
 		cifs_dbg(FYI, "unable to find a suitable iface\n");
@@ -904,7 +898,6 @@ int build_ntlmssp_negotiate_blob(unsigned char **pbuffer,
 	__u32 flags;
 	unsigned char *tmp;
 	int len;
-<<<<<<< HEAD
 
 	len = size_of_ntlmssp_blob(ses, sizeof(NEGOTIATE_MESSAGE));
 	*pbuffer = kmalloc(len, GFP_KERNEL);
@@ -916,19 +909,6 @@ int build_ntlmssp_negotiate_blob(unsigned char **pbuffer,
 	}
 	sec_blob = (NEGOTIATE_MESSAGE *)*pbuffer;
 
-=======
-
-	len = size_of_ntlmssp_blob(ses, sizeof(NEGOTIATE_MESSAGE));
-	*pbuffer = kmalloc(len, GFP_KERNEL);
-	if (!*pbuffer) {
-		rc = -ENOMEM;
-		cifs_dbg(VFS, "Error %d during NTLMSSP allocation\n", rc);
-		*buflen = 0;
-		goto setup_ntlm_neg_ret;
-	}
-	sec_blob = (NEGOTIATE_MESSAGE *)*pbuffer;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memset(*pbuffer, 0, sizeof(NEGOTIATE_MESSAGE));
 	memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
 	sec_blob->MessageType = NtLmNegotiate;
@@ -1672,11 +1652,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
 	rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
 
 out_free_ntlmsspblob:
-<<<<<<< HEAD
 	kfree_sensitive(ntlmsspblob);
-=======
-	kfree(ntlmsspblob);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	sess_free_buffer(sess_data);
 

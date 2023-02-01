@@ -844,19 +844,11 @@ static void hinic_get_stats64(struct net_device *netdev,
 
 	if (nic_dev->flags & HINIC_INTF_UP)
 		gather_nic_stats(nic_dev, &nic_rx_stats, &nic_tx_stats);
-<<<<<<< HEAD
 
 	stats->rx_bytes   = nic_rx_stats.bytes;
 	stats->rx_packets = nic_rx_stats.pkts;
 	stats->rx_errors  = nic_rx_stats.errors;
 
-=======
-
-	stats->rx_bytes   = nic_rx_stats.bytes;
-	stats->rx_packets = nic_rx_stats.pkts;
-	stats->rx_errors  = nic_rx_stats.errors;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	stats->tx_bytes   = nic_tx_stats.bytes;
 	stats->tx_packets = nic_tx_stats.pkts;
 	stats->tx_errors  = nic_tx_stats.tx_dropped;

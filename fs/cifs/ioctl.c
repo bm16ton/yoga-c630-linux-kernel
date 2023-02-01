@@ -491,7 +491,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
 				rc = -EOPNOTSUPP;
 			cifs_put_tlink(tlink);
 			break;
-<<<<<<< HEAD
 		case CIFS_IOC_NOTIFY_INFO:
 			if (!S_ISDIR(inode->i_mode)) {
 				/* Notify can only be done on directories */
@@ -514,8 +513,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
 				rc = -EOPNOTSUPP;
 			cifs_put_tlink(tlink);
 			break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		case CIFS_IOC_SHUTDOWN:
 			rc = cifs_shutdown(inode->i_sb, arg);
 			break;

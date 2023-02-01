@@ -23,10 +23,7 @@
 #include "mcdi_filters.h"
 #include "rx_common.h"
 #include "ef100_sriov.h"
-<<<<<<< HEAD
 #include "tc_bindings.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void ef100_update_name(struct efx_nic *efx)
 {

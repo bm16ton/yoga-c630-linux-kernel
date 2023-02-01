@@ -89,11 +89,7 @@ static bool rtw_pwr_unassociated_idle(struct adapter *adapter)
 	struct wifidirect_info	*pwdinfo = &adapter->wdinfo;
 	bool ret = false;
 
-<<<<<<< HEAD
 	if (time_after_eq(adapter->pwrctrlpriv.ips_deny_time, jiffies))
-=======
-	if (adapter->pwrctrlpriv.ips_deny_time >= jiffies)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto exit;
 
 	if (check_fwstate(pmlmepriv, WIFI_ASOC_STATE | WIFI_SITE_MONITOR) ||
@@ -277,11 +273,7 @@ static s32 LPS_RF_ON_check(struct adapter *padapter, u32 delay_ms)
 			err = -1;
 			break;
 		}
-<<<<<<< HEAD
 		mdelay(1);
-=======
-		msleep(1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return err;

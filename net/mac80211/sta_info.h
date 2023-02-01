@@ -622,11 +622,8 @@ struct link_sta_info {
  * @tdls_chandef: a TDLS peer can have a wider chandef that is compatible to
  *	the BSS one.
  * @frags: fragment cache
-<<<<<<< HEAD
  * @cur: storage for aggregation data
  *	&struct ieee80211_sta points either here or to deflink.agg.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @deflink: This is the default link STA information, for non MLO STA all link
  *	specific STA information is accessed through @deflink or through
  *	link[0] which points to address of @deflink. For MLO Link STA
@@ -710,10 +707,7 @@ struct sta_info {
 
 	struct ieee80211_fragment_cache frags;
 
-<<<<<<< HEAD
 	struct ieee80211_sta_aggregates cur;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct link_sta_info deflink;
 	struct link_sta_info __rcu *link[IEEE80211_MLD_MAX_NUM_LINKS];
 

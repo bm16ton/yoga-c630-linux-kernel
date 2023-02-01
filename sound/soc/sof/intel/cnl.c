@@ -332,7 +332,6 @@ void cnl_ipc_dump(struct snd_sof_dev *sdev)
 		hipcida, hipctdr, hipcctl);
 }
 
-<<<<<<< HEAD
 void cnl_ipc4_dump(struct snd_sof_dev *sdev)
 {
 	u32 hipcidr, hipcidd, hipcida, hipctdr, hipctdd, hipctda, hipcctl;
@@ -346,14 +345,6 @@ void cnl_ipc4_dump(struct snd_sof_dev *sdev)
 	hipctdd = snd_sof_dsp_read(sdev, HDA_DSP_BAR, CNL_DSP_REG_HIPCTDD);
 	hipctda = snd_sof_dsp_read(sdev, HDA_DSP_BAR, CNL_DSP_REG_HIPCTDA);
 	hipcctl = snd_sof_dsp_read(sdev, HDA_DSP_BAR, CNL_DSP_REG_HIPCCTL);
-=======
-/* cannonlake ops */
-const struct snd_sof_dsp_ops sof_cnl_ops = {
-	/* probe/remove/shutdown */
-	.probe		= hda_dsp_probe,
-	.remove		= hda_dsp_remove,
-	.shutdown	= hda_dsp_shutdown,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* dump the IPC regs */
 	/* TODO: parse the raw msg */
@@ -366,7 +357,6 @@ const struct snd_sof_dsp_ops sof_cnl_ops = {
 struct snd_sof_dsp_ops sof_cnl_ops;
 EXPORT_SYMBOL_NS(sof_cnl_ops, SND_SOC_SOF_INTEL_HDA_COMMON);
 
-<<<<<<< HEAD
 int sof_cnl_ops_init(struct snd_sof_dev *sdev)
 {
 	/* common defaults */
@@ -374,14 +364,6 @@ int sof_cnl_ops_init(struct snd_sof_dev *sdev)
 
 	/* probe/remove/shutdown */
 	sof_cnl_ops.shutdown	= hda_dsp_shutdown;
-=======
-	/* Mailbox IO */
-	.mailbox_read	= sof_mailbox_read,
-	.mailbox_write	= sof_mailbox_write,
-
-	/* doorbell */
-	.irq_thread	= cnl_ipc_irq_thread,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* ipc */
 	if (sdev->pdata->ipc_type == SOF_IPC) {
@@ -398,14 +380,9 @@ int sof_cnl_ops_init(struct snd_sof_dev *sdev)
 	if (sdev->pdata->ipc_type == SOF_INTEL_IPC4) {
 		struct sof_ipc4_fw_data *ipc4_data;
 
-<<<<<<< HEAD
 		sdev->private = devm_kzalloc(sdev->dev, sizeof(*ipc4_data), GFP_KERNEL);
 		if (!sdev->private)
 			return -ENOMEM;
-=======
-	.ipc_msg_data	= hda_ipc_msg_data,
-	.set_stream_data_offset = hda_set_stream_data_offset,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		ipc4_data = sdev->private;
 		ipc4_data->manifest_fw_hdr_offset = SOF_MAN4_FW_HDR_OFFSET;
@@ -426,7 +403,6 @@ int sof_cnl_ops_init(struct snd_sof_dev *sdev)
 	hda_set_dai_drv_ops(sdev, &sof_cnl_ops);
 
 	/* debug */
-<<<<<<< HEAD
 	sof_cnl_ops.debug_map	= cnl_dsp_debugfs;
 	sof_cnl_ops.debug_map_count	= ARRAY_SIZE(cnl_dsp_debugfs);
 
@@ -440,69 +416,6 @@ int sof_cnl_ops_init(struct snd_sof_dev *sdev)
 	sof_cnl_ops.core_get = hda_dsp_core_get;
 
 	return 0;
-=======
-	.debug_map	= cnl_dsp_debugfs,
-	.debug_map_count	= ARRAY_SIZE(cnl_dsp_debugfs),
-	.dbg_dump	= hda_dsp_dump,
-	.ipc_dump	= cnl_ipc_dump,
-	.debugfs_add_region_item = snd_sof_debugfs_add_region_item_iomem,
-
-	/* stream callbacks */
-	.pcm_open	= hda_dsp_pcm_open,
-	.pcm_close	= hda_dsp_pcm_close,
-	.pcm_hw_params	= hda_dsp_pcm_hw_params,
-	.pcm_hw_free	= hda_dsp_stream_hw_free,
-	.pcm_trigger	= hda_dsp_pcm_trigger,
-	.pcm_pointer	= hda_dsp_pcm_pointer,
-	.pcm_ack	= hda_dsp_pcm_ack,
-
-	/* firmware loading */
-	.load_firmware = snd_sof_load_firmware_raw,
-
-	/* pre/post fw run */
-	.pre_fw_run = hda_dsp_pre_fw_run,
-	.post_fw_run = hda_dsp_post_fw_run,
-
-	/* parse platform specific extended manifest */
-	.parse_platform_ext_manifest = hda_dsp_ext_man_get_cavs_config_data,
-
-	/* dsp core get/put */
-	.core_get = hda_dsp_core_get,
-
-	/* firmware run */
-	.run = hda_dsp_cl_boot_firmware,
-
-	/* trace callback */
-	.trace_init = hda_dsp_trace_init,
-	.trace_release = hda_dsp_trace_release,
-	.trace_trigger = hda_dsp_trace_trigger,
-
-	/* client ops */
-	.register_ipc_clients = hda_register_clients,
-	.unregister_ipc_clients = hda_unregister_clients,
-
-	/* DAI drivers */
-	.drv		= skl_dai,
-	.num_drv	= SOF_SKL_NUM_DAIS,
-
-	/* PM */
-	.suspend		= hda_dsp_suspend,
-	.resume			= hda_dsp_resume,
-	.runtime_suspend	= hda_dsp_runtime_suspend,
-	.runtime_resume		= hda_dsp_runtime_resume,
-	.runtime_idle		= hda_dsp_runtime_idle,
-	.set_hw_params_upon_resume = hda_dsp_set_hw_params_upon_resume,
-	.set_power_state	= hda_dsp_set_power_state,
-
-	/* ALSA HW info flags */
-	.hw_info =	SNDRV_PCM_INFO_MMAP |
-			SNDRV_PCM_INFO_MMAP_VALID |
-			SNDRV_PCM_INFO_INTERLEAVED |
-			SNDRV_PCM_INFO_PAUSE |
-			SNDRV_PCM_INFO_NO_PERIOD_WAKEUP,
-
-	.dsp_arch_ops = &sof_xtensa_arch_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(sof_cnl_ops_init, SND_SOC_SOF_INTEL_HDA_COMMON);
 
@@ -523,14 +436,11 @@ const struct sof_intel_dsp_desc cnl_chip_info = {
 	.sdw_shim_base = SDW_SHIM_BASE,
 	.sdw_alh_base = SDW_ALH_BASE,
 	.check_sdw_irq	= hda_common_check_sdw_irq,
-<<<<<<< HEAD
 	.check_ipc_irq	= hda_dsp_check_ipc_irq,
 	.cl_init = cl_dsp_init,
 	.power_down_dsp = hda_power_down_dsp,
 	.disable_interrupts = hda_dsp_disable_interrupts,
 	.hw_ip_version = SOF_INTEL_CAVS_1_8,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(cnl_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);
 
@@ -558,13 +468,10 @@ const struct sof_intel_dsp_desc jsl_chip_info = {
 	.sdw_shim_base = SDW_SHIM_BASE,
 	.sdw_alh_base = SDW_ALH_BASE,
 	.check_sdw_irq	= hda_common_check_sdw_irq,
-<<<<<<< HEAD
 	.check_ipc_irq	= hda_dsp_check_ipc_irq,
 	.cl_init = cl_dsp_init,
 	.power_down_dsp = hda_power_down_dsp,
 	.disable_interrupts = hda_dsp_disable_interrupts,
 	.hw_ip_version = SOF_INTEL_CAVS_2_0,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(jsl_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);

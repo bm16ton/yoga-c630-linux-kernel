@@ -718,7 +718,6 @@ struct clk *clk_register_divider_table(struct device *dev, const char *name,
 		void __iomem *reg, u8 shift, u8 width,
 		u8 clk_divider_flags, const struct clk_div_table *table,
 		spinlock_t *lock);
-void clk_sync_state_disable_unused(struct device *dev);
 /**
  * clk_register_divider - register a divider clock with the clock framework
  * @dev: device registering this clock
@@ -1021,7 +1020,6 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 	__clk_hw_register_mux((dev), NULL, (name), (num_parents), NULL, NULL, \
 			      (parent_data), (flags), (reg), (shift),	      \
 			      BIT((width)) - 1, (clk_mux_flags), NULL, (lock))
-<<<<<<< HEAD
 #define clk_hw_register_mux_parent_data_table(dev, name, parent_data,	      \
 					      num_parents, flags, reg, shift, \
 					      width, clk_mux_flags, table,    \
@@ -1029,8 +1027,6 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 	__clk_hw_register_mux((dev), NULL, (name), (num_parents), NULL, NULL, \
 			      (parent_data), (flags), (reg), (shift),	      \
 			      BIT((width)) - 1, (clk_mux_flags), table, (lock))
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define devm_clk_hw_register_mux(dev, name, parent_names, num_parents, flags, reg, \
 			    shift, width, clk_mux_flags, lock)		      \
 	__devm_clk_hw_register_mux((dev), NULL, (name), (num_parents),	      \
@@ -1044,7 +1040,6 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 				   (parent_hws), NULL, (flags), (reg),        \
 				   (shift), BIT((width)) - 1,		      \
 				   (clk_mux_flags), NULL, (lock))
-<<<<<<< HEAD
 #define devm_clk_hw_register_mux_parent_data_table(dev, name, parent_data,    \
 					      num_parents, flags, reg, shift, \
 					      width, clk_mux_flags, table,    \
@@ -1052,8 +1047,6 @@ struct clk *clk_register_mux_table(struct device *dev, const char *name,
 	__devm_clk_hw_register_mux((dev), NULL, (name), (num_parents), NULL,  \
 			      NULL, (parent_data), (flags), (reg), (shift),   \
 			      BIT((width)) - 1, (clk_mux_flags), table, (lock))
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int clk_mux_val_to_index(struct clk_hw *hw, const u32 *table, unsigned int flags,
 			 unsigned int val);

@@ -37,10 +37,7 @@
  *  |   |       |   - _`GUC_CTB_STATUS_OVERFLOW` = 1 (head/tail too large)     |
  *  |   |       |   - _`GUC_CTB_STATUS_UNDERFLOW` = 2 (truncated message)      |
  *  |   |       |   - _`GUC_CTB_STATUS_MISMATCH` = 4 (head/tail modified)      |
-<<<<<<< HEAD
  *  |   |       |   - _`GUC_CTB_STATUS_UNUSED` = 8 (CTB is not in use)         |
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *  +---+-------+--------------------------------------------------------------+
  *  |...|       | RESERVED = MBZ                                               |
  *  +---+-------+--------------------------------------------------------------+
@@ -53,16 +50,10 @@ struct guc_ct_buffer_desc {
 	u32 tail;
 	u32 status;
 #define GUC_CTB_STATUS_NO_ERROR				0
-<<<<<<< HEAD
 #define GUC_CTB_STATUS_OVERFLOW				BIT(0)
 #define GUC_CTB_STATUS_UNDERFLOW			BIT(1)
 #define GUC_CTB_STATUS_MISMATCH				BIT(2)
 #define GUC_CTB_STATUS_UNUSED				BIT(3)
-=======
-#define GUC_CTB_STATUS_OVERFLOW				(1 << 0)
-#define GUC_CTB_STATUS_UNDERFLOW			(1 << 1)
-#define GUC_CTB_STATUS_MISMATCH				(1 << 2)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 reserved[13];
 } __packed;
 static_assert(sizeof(struct guc_ct_buffer_desc) == 64);

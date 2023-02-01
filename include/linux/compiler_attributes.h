@@ -35,12 +35,8 @@
 
 /*
  * Note: do not use this directly. Instead, use __alloc_size() since it is conditionally
-<<<<<<< HEAD
  * available and includes other attributes. For GCC < 9.1, __alloc_size__ gets undefined
  * in compiler-gcc.h, due to misbehaviors.
-=======
- * available and includes other attributes.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  *   gcc: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-alloc_005fsize-function-attribute
  * clang: https://clang.llvm.org/docs/AttributeReference.html#alloc-size

@@ -48,13 +48,6 @@ or ``virtualenv``, depending on how your distribution packaged Python 3.
       on the Sphinx version, it should be installed separately,
       with ``pip install sphinx_rtd_theme``.
 
-<<<<<<< HEAD
-=======
-   #) Some ReST pages contain math expressions. Due to the way Sphinx works,
-      those expressions are written using LaTeX notation. It needs texlive
-      installed with amsfonts and amsmath in order to evaluate them.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 In summary, if you want to install Sphinx version 2.4.4, you should do::
 
        $ virtualenv sphinx_2.4.4
@@ -188,7 +181,6 @@ To remove the generated documentation, run ``make cleandocs``.
 	  as well would improve the quality of images embedded in PDF
 	  documents, especially for kernel releases 5.18 and later.
 
-<<<<<<< HEAD
 Choice of Math Renderer
 -----------------------
 
@@ -221,8 +213,6 @@ The choice can be overridden by setting an environment variable
 .. [#sph1_8] Fallback of math renderer requires Sphinx >=1.8.
 
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Writing Documentation
 =====================
 

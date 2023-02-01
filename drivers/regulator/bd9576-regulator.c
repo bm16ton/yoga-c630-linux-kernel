@@ -940,13 +940,8 @@ static int bd957x_probe(struct platform_device *pdev)
 	}
 
 	ic_data->regmap = regmap;
-<<<<<<< HEAD
 	vout_mode = device_property_read_bool(pdev->dev.parent,
 					      "rohm,vout1-en-low");
-=======
-	vout_mode = of_property_read_bool(pdev->dev.parent->of_node,
-					 "rohm,vout1-en-low");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (vout_mode) {
 		struct gpio_desc *en;
 
@@ -992,13 +987,8 @@ static int bd957x_probe(struct platform_device *pdev)
 	 * like DDR voltage selection.
 	 */
 	platform_set_drvdata(pdev, ic_data);
-<<<<<<< HEAD
 	ddr_sel = device_property_read_bool(pdev->dev.parent,
 					    "rohm,ddr-sel-low");
-=======
-	ddr_sel =  of_property_read_bool(pdev->dev.parent->of_node,
-					 "rohm,ddr-sel-low");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ddr_sel)
 		ic_data->regulator_data[2].desc.fixed_uV = 1350000;
 	else

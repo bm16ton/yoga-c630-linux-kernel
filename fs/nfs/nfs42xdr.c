@@ -1071,17 +1071,10 @@ static int decode_read_plus_segment(struct xdr_stream *xdr,
 	if (seg->type == NFS4_CONTENT_DATA) {
 		struct xdr_buf buf;
 		uint32_t len = be32_to_cpup(p);
-<<<<<<< HEAD
 
 		seg->data.length = len;
 		seg->data.from = xdr_stream_pos(xdr);
 
-=======
-
-		seg->data.length = len;
-		seg->data.from = xdr_stream_pos(xdr);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!xdr_stream_subsegment(xdr, &buf, xdr_align_size(len)))
 			return -EIO;
 	} else if (seg->type == NFS4_CONTENT_HOLE) {
@@ -1149,11 +1142,7 @@ static int decode_read_plus(struct xdr_stream *xdr, struct nfs_pgio_res *res)
 	if (!segs)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	xdr_set_scratch_buffer(xdr, &scratch_buf, sizeof(scratch_buf));
-=======
-	xdr_set_scratch_buffer(xdr, &scratch_buf, 32);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = -EIO;
 	for (i = 0; i < segments; i++) {
 		status = decode_read_plus_segment(xdr, &segs[i]);

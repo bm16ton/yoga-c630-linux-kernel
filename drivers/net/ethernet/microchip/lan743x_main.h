@@ -956,12 +956,7 @@ struct lan743x_tx {
 
 	struct napi_struct napi;
 	u32 frame_count;
-<<<<<<< HEAD
 	u32 rqd_descriptors;
-=======
-
-	struct sk_buff *overflow_skb;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 void lan743x_tx_set_timestamping_mode(struct lan743x_tx *tx,

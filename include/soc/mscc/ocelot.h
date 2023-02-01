@@ -392,11 +392,7 @@ enum ocelot_reg {
 	SYS_COUNT_TX_GREEN_PRIO_5,
 	SYS_COUNT_TX_GREEN_PRIO_6,
 	SYS_COUNT_TX_GREEN_PRIO_7,
-<<<<<<< HEAD
 	SYS_COUNT_TX_AGED,
-=======
-	SYS_COUNT_TX_AGING,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SYS_COUNT_DROP_LOCAL,
 	SYS_COUNT_DROP_TAIL,
 	SYS_COUNT_DROP_YELLOW_PRIO_0,
@@ -415,13 +411,10 @@ enum ocelot_reg {
 	SYS_COUNT_DROP_GREEN_PRIO_5,
 	SYS_COUNT_DROP_GREEN_PRIO_6,
 	SYS_COUNT_DROP_GREEN_PRIO_7,
-<<<<<<< HEAD
 	SYS_COUNT_SF_MATCHING_FRAMES,
 	SYS_COUNT_SF_NOT_PASSING_FRAMES,
 	SYS_COUNT_SF_NOT_PASSING_SDU,
 	SYS_COUNT_SF_RED_FRAMES,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SYS_RESET_CFG,
 	SYS_SR_ETYPE_CFG,
 	SYS_VLAN_ETYPE_CFG,
@@ -705,7 +698,6 @@ struct ocelot_stat_layout {
 	char name[ETH_GSTRING_LEN];
 };
 
-<<<<<<< HEAD
 /* 32-bit counter checked for wraparound by ocelot_port_update_stats()
  * and copied to ocelot->stats.
  */
@@ -812,8 +804,6 @@ struct ocelot_stat_layout {
 	OCELOT_STAT_ETHTOOL(DROP_GREEN_PRIO_6, "drop_green_prio_6"), \
 	OCELOT_STAT_ETHTOOL(DROP_GREEN_PRIO_7, "drop_green_prio_7")
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct ocelot_stats_region {
 	struct list_head node;
 	u32 base;
@@ -845,10 +835,7 @@ struct ocelot_ops {
 			      struct flow_stats *stats);
 	void (*cut_through_fwd)(struct ocelot *ocelot);
 	void (*tas_clock_adjust)(struct ocelot *ocelot);
-<<<<<<< HEAD
 	void (*update_stats)(struct ocelot *ocelot);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ocelot_vcap_policer {
@@ -886,11 +873,8 @@ struct ocelot_psfp_list {
 	struct list_head stream_list;
 	struct list_head sfi_list;
 	struct list_head sgi_list;
-<<<<<<< HEAD
 	/* Serialize access to the lists */
 	struct mutex lock;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum ocelot_sb {
@@ -1023,19 +1007,10 @@ struct ocelot {
 	struct ocelot_vcap_policer	vcap_pol;
 	struct vcap_props		*vcap;
 	struct ocelot_mirror		*mirror;
-<<<<<<< HEAD
 
 	struct ocelot_psfp_list		psfp;
 
 	/* Workqueue to check statistics for overflow */
-=======
-
-	struct ocelot_psfp_list		psfp;
-
-	/* Workqueue to check statistics for overflow with its lock */
-	spinlock_t			stats_lock;
-	u64				*stats;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct delayed_work		stats_work;
 	struct workqueue_struct		*stats_queue;
 	/* Lock for serializing access to the statistics array */
@@ -1044,14 +1019,6 @@ struct ocelot {
 
 	/* Lock for serializing indirect access to STAT_VIEW registers */
 	struct mutex			stat_view_lock;
-	/* Lock for serializing access to the MAC table */
-	struct mutex			mact_lock;
-	/* Lock for serializing forwarding domain changes */
-	struct mutex			fwd_domain_lock;
-
-	/* Lock for serializing Time-Aware Shaper changes */
-	struct mutex			tas_lock;
-
 	/* Lock for serializing access to the MAC table */
 	struct mutex			mact_lock;
 	/* Lock for serializing forwarding domain changes */
@@ -1172,11 +1139,8 @@ void ocelot_deinit(struct ocelot *ocelot);
 void ocelot_init_port(struct ocelot *ocelot, int port);
 void ocelot_deinit_port(struct ocelot *ocelot, int port);
 
-<<<<<<< HEAD
 void ocelot_port_setup_dsa_8021q_cpu(struct ocelot *ocelot, int cpu);
 void ocelot_port_teardown_dsa_8021q_cpu(struct ocelot *ocelot, int cpu);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void ocelot_port_assign_dsa_8021q_cpu(struct ocelot *ocelot, int port, int cpu);
 void ocelot_port_unassign_dsa_8021q_cpu(struct ocelot *ocelot, int port);
 u32 ocelot_port_assigned_dsa_8021q_cpu_mask(struct ocelot *ocelot, int port);

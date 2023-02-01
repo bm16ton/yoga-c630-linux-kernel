@@ -337,7 +337,6 @@ static int venc_op_s_ctrl(struct v4l2_ctrl *ctrl)
 		 * if we disable 8x8 transform for HP.
 		 */
 
-<<<<<<< HEAD
 
 		ctr->h264_8x8_transform = ctrl->val;
 		break;
@@ -361,13 +360,6 @@ static int venc_op_g_volatile_ctrl(struct v4l2_ctrl *ctrl)
 		if (!ret)
 			ctrl->val = HFI_BUFREQ_COUNT_MIN(&bufreq, ver);
 		break;
-=======
-		if (ctrl->val == 0)
-			return -EINVAL;
-
-		ctr->h264_8x8_transform = ctrl->val;
-		break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return -EINVAL;
 	}
@@ -389,11 +381,7 @@ int venc_ctrl_init(struct venus_inst *inst)
 	};
 	struct v4l2_ctrl_hdr10_cll_info p_hdr10_cll = { 1000, 400 };
 
-<<<<<<< HEAD
 	ret = v4l2_ctrl_handler_init(&inst->ctrl_handler, 59);
-=======
-	ret = v4l2_ctrl_handler_init(&inst->ctrl_handler, 58);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -619,19 +607,11 @@ int venc_ctrl_init(struct venus_inst *inst)
 
 	v4l2_ctrl_new_std_compound(&inst->ctrl_handler, &venc_ctrl_ops,
 				   V4L2_CID_COLORIMETRY_HDR10_CLL_INFO,
-<<<<<<< HEAD
 				   v4l2_ctrl_ptr_create(&p_hdr10_cll));
 
 	v4l2_ctrl_new_std_compound(&inst->ctrl_handler, &venc_ctrl_ops,
 				   V4L2_CID_COLORIMETRY_HDR10_MASTERING_DISPLAY,
 				   v4l2_ctrl_ptr_create((void *)&p_hdr10_mastering));
-=======
-				   v4l2_ctrl_ptr_create(NULL));
-
-	v4l2_ctrl_new_std_compound(&inst->ctrl_handler, &venc_ctrl_ops,
-				   V4L2_CID_COLORIMETRY_HDR10_MASTERING_DISPLAY,
-				   v4l2_ctrl_ptr_create(NULL));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	v4l2_ctrl_new_std_menu(&inst->ctrl_handler, &venc_ctrl_ops,
 			       V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE,

@@ -92,7 +92,6 @@
 #define KSZ9x31_LMD_VCT_DATA_HI_PULSE_MASK	GENMASK(1, 0)
 #define KSZ9x31_LMD_VCT_DATA_MASK		GENMASK(7, 0)
 
-<<<<<<< HEAD
 #define KSZPHY_WIRE_PAIR_MASK			0x3
 
 #define LAN8814_CABLE_DIAG			0x12
@@ -102,8 +101,6 @@
 
 #define LAN8814_WIRE_PAIR_MASK			0xF
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Lan8814 general Interrupt control/status reg in GPHY specific block. */
 #define LAN8814_INTC				0x18
 #define LAN8814_INTS				0x1B
@@ -327,7 +324,6 @@ struct kszphy_priv {
 
 static const struct kszphy_type lan8814_type = {
 	.led_mode_reg		= ~LAN8814_LED_CTRL_1,
-<<<<<<< HEAD
 	.cable_diag_reg		= LAN8814_CABLE_DIAG,
 	.pair_mask		= LAN8814_WIRE_PAIR_MASK,
 };
@@ -335,8 +331,6 @@ static const struct kszphy_type lan8814_type = {
 static const struct kszphy_type ksz886x_type = {
 	.cable_diag_reg		= KSZ8081_LMD,
 	.pair_mask		= KSZPHY_WIRE_PAIR_MASK,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct kszphy_type ksz8021_type = {
@@ -1820,7 +1814,6 @@ static int kszphy_probe(struct phy_device *phydev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int lan8814_cable_test_start(struct phy_device *phydev)
 {
 	/* If autoneg is enabled, we won't be able to test cross pair
@@ -1834,10 +1827,6 @@ static int lan8814_cable_test_start(struct phy_device *phydev)
 
 static int ksz886x_cable_test_start(struct phy_device *phydev)
 {
-=======
-static int ksz886x_cable_test_start(struct phy_device *phydev)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (phydev->dev_flags & MICREL_KSZ8_P1_ERRATA)
 		return -EOPNOTSUPP;
 
@@ -1849,15 +1838,9 @@ static int ksz886x_cable_test_start(struct phy_device *phydev)
 	return phy_clear_bits(phydev, MII_BMCR, BMCR_ANENABLE | BMCR_SPEED100);
 }
 
-<<<<<<< HEAD
 static __always_inline int ksz886x_cable_test_result_trans(u16 status, u16 mask)
 {
 	switch (FIELD_GET(mask, status)) {
-=======
-static int ksz886x_cable_test_result_trans(u16 status)
-{
-	switch (FIELD_GET(KSZ8081_LMD_STAT_MASK, status)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case KSZ8081_LMD_STAT_NORMAL:
 		return ETHTOOL_A_CABLE_RESULT_CODE_OK;
 	case KSZ8081_LMD_STAT_SHORT:
@@ -1871,7 +1854,6 @@ static int ksz886x_cable_test_result_trans(u16 status)
 	}
 }
 
-<<<<<<< HEAD
 static __always_inline bool ksz886x_cable_test_failed(u16 status, u16 mask)
 {
 	return FIELD_GET(mask, status) ==
@@ -1881,17 +1863,6 @@ static __always_inline bool ksz886x_cable_test_failed(u16 status, u16 mask)
 static __always_inline bool ksz886x_cable_test_fault_length_valid(u16 status, u16 mask)
 {
 	switch (FIELD_GET(mask, status)) {
-=======
-static bool ksz886x_cable_test_failed(u16 status)
-{
-	return FIELD_GET(KSZ8081_LMD_STAT_MASK, status) ==
-		KSZ8081_LMD_STAT_FAIL;
-}
-
-static bool ksz886x_cable_test_fault_length_valid(u16 status)
-{
-	switch (FIELD_GET(KSZ8081_LMD_STAT_MASK, status)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case KSZ8081_LMD_STAT_OPEN:
 		fallthrough;
 	case KSZ8081_LMD_STAT_SHORT:
@@ -1900,17 +1871,12 @@ static bool ksz886x_cable_test_fault_length_valid(u16 status)
 	return false;
 }
 
-<<<<<<< HEAD
 static __always_inline int ksz886x_cable_test_fault_length(struct phy_device *phydev,
 							   u16 status, u16 data_mask)
-=======
-static int ksz886x_cable_test_fault_length(u16 status)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int dt;
 
 	/* According to the data sheet the distance to the fault is
-<<<<<<< HEAD
 	 * DELTA_TIME * 0.4 meters for ksz phys.
 	 * (DELTA_TIME - 22) * 0.8 for lan8814 phy.
 	 */
@@ -1920,34 +1886,20 @@ static int ksz886x_cable_test_fault_length(u16 status)
 		return ((dt - 22) * 800) / 10;
 	else
 		return (dt * 400) / 10;
-=======
-	 * DELTA_TIME * 0.4 meters.
-	 */
-	dt = FIELD_GET(KSZ8081_LMD_DELTA_TIME_MASK, status);
-
-	return (dt * 400) / 10;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ksz886x_cable_test_wait_for_completion(struct phy_device *phydev)
 {
-<<<<<<< HEAD
 	const struct kszphy_type *type = phydev->drv->driver_data;
 	int val, ret;
 
 	ret = phy_read_poll_timeout(phydev, type->cable_diag_reg, val,
-=======
-	int val, ret;
-
-	ret = phy_read_poll_timeout(phydev, KSZ8081_LMD, val,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				    !(val & KSZ8081_LMD_ENABLE_TEST),
 				    30000, 100000, true);
 
 	return ret < 0 ? ret : 0;
 }
 
-<<<<<<< HEAD
 static int lan8814_cable_test_one_pair(struct phy_device *phydev, int pair)
 {
 	static const int ethtool_pair[] = { ETHTOOL_A_CABLE_PAIR_A,
@@ -1993,8 +1945,6 @@ static int lan8814_cable_test_one_pair(struct phy_device *phydev, int pair)
 	return ethnl_cable_test_fault_length(phydev, ethtool_pair[pair], fault_length);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int ksz886x_cable_test_one_pair(struct phy_device *phydev, int pair)
 {
 	static const int ethtool_pair[] = {
@@ -2002,10 +1952,7 @@ static int ksz886x_cable_test_one_pair(struct phy_device *phydev, int pair)
 		ETHTOOL_A_CABLE_PAIR_B,
 	};
 	int ret, val, mdix;
-<<<<<<< HEAD
 	u32 fault_length;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* There is no way to choice the pair, like we do one ksz9031.
 	 * We can workaround this limitation by using the MDI-X functionality.
@@ -2044,7 +1991,6 @@ static int ksz886x_cable_test_one_pair(struct phy_device *phydev, int pair)
 	if (val < 0)
 		return val;
 
-<<<<<<< HEAD
 	if (ksz886x_cable_test_failed(val, KSZ8081_LMD_STAT_MASK))
 		return -EAGAIN;
 
@@ -2059,32 +2005,13 @@ static int ksz886x_cable_test_one_pair(struct phy_device *phydev, int pair)
 	fault_length = ksz886x_cable_test_fault_length(phydev, val, KSZ8081_LMD_DELTA_TIME_MASK);
 
 	return ethnl_cable_test_fault_length(phydev, ethtool_pair[pair], fault_length);
-=======
-	if (ksz886x_cable_test_failed(val))
-		return -EAGAIN;
-
-	ret = ethnl_cable_test_result(phydev, ethtool_pair[pair],
-				      ksz886x_cable_test_result_trans(val));
-	if (ret)
-		return ret;
-
-	if (!ksz886x_cable_test_fault_length_valid(val))
-		return 0;
-
-	return ethnl_cable_test_fault_length(phydev, ethtool_pair[pair],
-					     ksz886x_cable_test_fault_length(val));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ksz886x_cable_test_get_status(struct phy_device *phydev,
 					 bool *finished)
 {
-<<<<<<< HEAD
 	const struct kszphy_type *type = phydev->drv->driver_data;
 	unsigned long pair_mask = type->pair_mask;
-=======
-	unsigned long pair_mask = 0x3;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int retries = 20;
 	int pair, ret;
 
@@ -2093,14 +2020,10 @@ static int ksz886x_cable_test_get_status(struct phy_device *phydev,
 	/* Try harder if link partner is active */
 	while (pair_mask && retries--) {
 		for_each_set_bit(pair, &pair_mask, 4) {
-<<<<<<< HEAD
 			if (type->cable_diag_reg == LAN8814_CABLE_DIAG)
 				ret = lan8814_cable_test_one_pair(phydev, pair);
 			else
 				ret = ksz886x_cable_test_one_pair(phydev, pair);
-=======
-			ret = ksz886x_cable_test_one_pair(phydev, pair);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (ret == -EAGAIN)
 				continue;
 			if (ret < 0)
@@ -2839,7 +2762,6 @@ static int lan8804_config_init(struct phy_device *phydev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static irqreturn_t lan8804_handle_interrupt(struct phy_device *phydev)
 {
 	int status;
@@ -2906,29 +2828,16 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
 	int ret = IRQ_NONE;
 
 	irq_status = phy_read(phydev, LAN8814_INTS);
-=======
-static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
-{
-	int irq_status, tsu_irq_status;
-
-	irq_status = phy_read(phydev, LAN8814_INTS);
-	if (irq_status > 0 && (irq_status & LAN8814_INT_LINK))
-		phy_trigger_machine(phydev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (irq_status < 0) {
 		phy_error(phydev);
 		return IRQ_NONE;
 	}
 
-<<<<<<< HEAD
 	if (irq_status & LAN8814_INT_LINK) {
 		phy_trigger_machine(phydev);
 		ret = IRQ_HANDLED;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (1) {
 		tsu_irq_status = lanphy_read_page_reg(phydev, 4,
 						      LAN8814_INTR_STS_REG);
@@ -2937,7 +2846,6 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
 		    (tsu_irq_status & (LAN8814_INTR_STS_REG_1588_TSU0_ |
 				       LAN8814_INTR_STS_REG_1588_TSU1_ |
 				       LAN8814_INTR_STS_REG_1588_TSU2_ |
-<<<<<<< HEAD
 				       LAN8814_INTR_STS_REG_1588_TSU3_))) {
 			lan8814_handle_ptp_interrupt(phydev);
 			ret = IRQ_HANDLED;
@@ -2947,14 +2855,6 @@ static irqreturn_t lan8814_handle_interrupt(struct phy_device *phydev)
 	}
 
 	return ret;
-=======
-				       LAN8814_INTR_STS_REG_1588_TSU3_)))
-			lan8814_handle_ptp_interrupt(phydev);
-		else
-			break;
-	}
-	return IRQ_HANDLED;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int lan8814_ack_interrupt(struct phy_device *phydev)
@@ -2981,15 +2881,9 @@ static int lan8814_config_intr(struct phy_device *phydev)
 		if (err)
 			return err;
 
-<<<<<<< HEAD
 		err = phy_write(phydev, LAN8814_INTC, LAN8814_INT_LINK);
 	} else {
 		err = phy_write(phydev, LAN8814_INTC, 0);
-=======
-		err =  phy_write(phydev, LAN8814_INTC, LAN8814_INT_LINK);
-	} else {
-		err =  phy_write(phydev, LAN8814_INTC, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (err)
 			return err;
 
@@ -3369,10 +3263,7 @@ static struct phy_driver ksphy_driver[] = {
 	.phy_id		= PHY_ID_LAN8814,
 	.phy_id_mask	= MICREL_PHY_ID_MASK,
 	.name		= "Microchip INDY Gigabit Quad PHY",
-<<<<<<< HEAD
 	.flags          = PHY_POLL_CABLE_TEST,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.config_init	= lan8814_config_init,
 	.driver_data	= &lan8814_type,
 	.probe		= lan8814_probe,
@@ -3385,11 +3276,8 @@ static struct phy_driver ksphy_driver[] = {
 	.resume		= kszphy_resume,
 	.config_intr	= lan8814_config_intr,
 	.handle_interrupt = lan8814_handle_interrupt,
-<<<<<<< HEAD
 	.cable_test_start	= lan8814_cable_test_start,
 	.cable_test_get_status	= ksz886x_cable_test_get_status,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }, {
 	.phy_id		= PHY_ID_LAN8804,
 	.phy_id_mask	= MICREL_PHY_ID_MASK,

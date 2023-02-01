@@ -59,10 +59,7 @@ static int madvise_need_mmap_write(int behavior)
 	case MADV_FREE:
 	case MADV_POPULATE_READ:
 	case MADV_POPULATE_WRITE:
-<<<<<<< HEAD
 	case MADV_COLLAPSE:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	default:
 		/* be safe, default to 1. list exceptions explicitly */
@@ -665,7 +662,6 @@ static int madvise_free_pte_range(pmd_t *pmd, unsigned long addr,
 				goto out;
 			}
 			pte_unmap_unlock(orig_pte, ptl);
-<<<<<<< HEAD
 			if (split_folio(folio)) {
 				folio_unlock(folio);
 				folio_put(folio);
@@ -674,16 +670,6 @@ static int madvise_free_pte_range(pmd_t *pmd, unsigned long addr,
 			}
 			folio_unlock(folio);
 			folio_put(folio);
-=======
-			if (split_huge_page(page)) {
-				unlock_page(page);
-				put_page(page);
-				orig_pte = pte_offset_map_lock(mm, pmd, addr, &ptl);
-				goto out;
-			}
-			unlock_page(page);
-			put_page(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			orig_pte = pte = pte_offset_map_lock(mm, pmd, addr, &ptl);
 			pte--;
 			addr -= PAGE_SIZE;
@@ -1086,11 +1072,8 @@ static int madvise_vma_behavior(struct vm_area_struct *vma,
 		if (error)
 			goto out;
 		break;
-<<<<<<< HEAD
 	case MADV_COLLAPSE:
 		return madvise_collapse(vma, prev, start, end);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	anon_name = anon_vma_name(vma);
@@ -1207,10 +1190,7 @@ static bool process_madvise_behavior_valid(int behavior)
 	case MADV_COLD:
 	case MADV_PAGEOUT:
 	case MADV_WILLNEED:
-<<<<<<< HEAD
 	case MADV_COLLAPSE:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return true;
 	default:
 		return false;
@@ -1276,11 +1256,7 @@ int madvise_walk_vmas(struct mm_struct *mm, unsigned long start,
 		if (start >= end)
 			break;
 		if (prev)
-<<<<<<< HEAD
 			vma = find_vma(mm, prev->vm_end);
-=======
-			vma = prev->vm_next;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		else	/* madvise_remove dropped mmap_lock */
 			vma = find_vma(mm, start);
 	}

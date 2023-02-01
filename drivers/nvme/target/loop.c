@@ -204,11 +204,7 @@ static int nvme_loop_init_request(struct blk_mq_tag_set *set,
 		struct request *req, unsigned int hctx_idx,
 		unsigned int numa_node)
 {
-<<<<<<< HEAD
 	struct nvme_loop_ctrl *ctrl = to_loop_ctrl(set->driver_data);
-=======
-	struct nvme_loop_ctrl *ctrl = set->driver_data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct nvme_loop_iod *iod = blk_mq_rq_to_pdu(req);
 
 	nvme_req(req)->ctrl = &ctrl->ctrl;
@@ -270,13 +266,7 @@ static void nvme_loop_destroy_admin_queue(struct nvme_loop_ctrl *ctrl)
 	if (!test_and_clear_bit(NVME_LOOP_Q_LIVE, &ctrl->queues[0].flags))
 		return;
 	nvmet_sq_destroy(&ctrl->queues[0].nvme_sq);
-<<<<<<< HEAD
 	nvme_remove_admin_tag_set(&ctrl->ctrl);
-=======
-	blk_mq_destroy_queue(ctrl->ctrl.admin_q);
-	blk_mq_destroy_queue(ctrl->ctrl.fabrics_q);
-	blk_mq_free_tag_set(&ctrl->admin_tag_set);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void nvme_loop_free_ctrl(struct nvme_ctrl *nctrl)
@@ -290,15 +280,8 @@ static void nvme_loop_free_ctrl(struct nvme_ctrl *nctrl)
 	list_del(&ctrl->list);
 	mutex_unlock(&nvme_loop_ctrl_mutex);
 
-<<<<<<< HEAD
 	if (nctrl->tagset)
 		nvme_remove_io_tag_set(nctrl);
-=======
-	if (nctrl->tagset) {
-		blk_mq_destroy_queue(ctrl->ctrl.connect_q);
-		blk_mq_free_tag_set(&ctrl->tag_set);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(ctrl->queues);
 	nvmf_free_options(nctrl->opts);
 free_ctrl:
@@ -376,14 +359,6 @@ static int nvme_loop_configure_admin_queue(struct nvme_loop_ctrl *ctrl)
 	if (error)
 		goto out_free_sq;
 
-<<<<<<< HEAD
-=======
-	ctrl->ctrl.admin_q = blk_mq_init_queue(&ctrl->admin_tag_set);
-	if (IS_ERR(ctrl->ctrl.admin_q)) {
-		error = PTR_ERR(ctrl->ctrl.admin_q);
-		goto out_cleanup_fabrics_q;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* reset stopped state for the fresh admin queue */
 	clear_bit(NVME_CTRL_ADMIN_Q_STOPPED, &ctrl->ctrl.flags);
 
@@ -410,15 +385,7 @@ static int nvme_loop_configure_admin_queue(struct nvme_loop_ctrl *ctrl)
 
 out_cleanup_tagset:
 	clear_bit(NVME_LOOP_Q_LIVE, &ctrl->queues[0].flags);
-<<<<<<< HEAD
 	nvme_remove_admin_tag_set(&ctrl->ctrl);
-=======
-	blk_mq_destroy_queue(ctrl->ctrl.admin_q);
-out_cleanup_fabrics_q:
-	blk_mq_destroy_queue(ctrl->ctrl.fabrics_q);
-out_free_tagset:
-	blk_mq_free_tag_set(&ctrl->admin_tag_set);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_free_sq:
 	nvmet_sq_destroy(&ctrl->queues[0].nvme_sq);
 	return error;
@@ -533,28 +500,14 @@ static int nvme_loop_create_io_queues(struct nvme_loop_ctrl *ctrl)
 	if (ret)
 		goto out_destroy_queues;
 
-<<<<<<< HEAD
-=======
-	ret = nvme_ctrl_init_connect_q(&(ctrl->ctrl));
-	if (ret)
-		goto out_free_tagset;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = nvme_loop_connect_io_queues(ctrl);
 	if (ret)
 		goto out_cleanup_tagset;
 
 	return 0;
 
-<<<<<<< HEAD
 out_cleanup_tagset:
 	nvme_remove_io_tag_set(&ctrl->ctrl);
-=======
-out_cleanup_connect_q:
-	blk_mq_destroy_queue(ctrl->ctrl.connect_q);
-out_free_tagset:
-	blk_mq_free_tag_set(&ctrl->tag_set);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_destroy_queues:
 	nvme_loop_destroy_io_queues(ctrl);
 	return ret;

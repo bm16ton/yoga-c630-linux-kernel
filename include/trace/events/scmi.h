@@ -27,15 +27,9 @@ TRACE_EVENT(scmi_fc_call,
 		__entry->val2 = val2;
 	),
 
-<<<<<<< HEAD
 	TP_printk("pt=%02X msg_id=%02X res_id:%u vals=%u:%u",
 		__entry->protocol_id, __entry->msg_id,
 		__entry->res_id, __entry->val1, __entry->val2)
-=======
-	TP_printk("[0x%02X]:[0x%02X]:[%08X]:%u:%u",
-		  __entry->protocol_id, __entry->msg_id,
-		  __entry->res_id, __entry->val1, __entry->val2)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 );
 
 TRACE_EVENT(scmi_xfer_begin,
@@ -92,34 +86,6 @@ TRACE_EVENT(scmi_xfer_response_wait,
 		__entry->transfer_id, __entry->timeout, __entry->poll)
 );
 
-TRACE_EVENT(scmi_xfer_response_wait,
-	TP_PROTO(int transfer_id, u8 msg_id, u8 protocol_id, u16 seq,
-		 u32 timeout, bool poll),
-	TP_ARGS(transfer_id, msg_id, protocol_id, seq, timeout, poll),
-
-	TP_STRUCT__entry(
-		__field(int, transfer_id)
-		__field(u8, msg_id)
-		__field(u8, protocol_id)
-		__field(u16, seq)
-		__field(u32, timeout)
-		__field(bool, poll)
-	),
-
-	TP_fast_assign(
-		__entry->transfer_id = transfer_id;
-		__entry->msg_id = msg_id;
-		__entry->protocol_id = protocol_id;
-		__entry->seq = seq;
-		__entry->timeout = timeout;
-		__entry->poll = poll;
-	),
-
-	TP_printk("transfer_id=%d msg_id=%u protocol_id=%u seq=%u tmo_ms=%u poll=%u",
-		__entry->transfer_id, __entry->msg_id, __entry->protocol_id,
-		__entry->seq, __entry->timeout, __entry->poll)
-);
-
 TRACE_EVENT(scmi_xfer_end,
 	TP_PROTO(int transfer_id, u8 msg_id, u8 protocol_id, u16 seq,
 		 int status),
@@ -170,37 +136,6 @@ TRACE_EVENT(scmi_rx_done,
 	TP_printk("pt=%02X msg_id=%02X seq=%04X transfer_id=%X msg_type=%u",
 		__entry->protocol_id, __entry->msg_id, __entry->seq,
 		__entry->transfer_id, __entry->msg_type)
-);
-
-TRACE_EVENT(scmi_msg_dump,
-	TP_PROTO(u8 protocol_id, u8 msg_id, unsigned char *tag, u16 seq,
-		 int status, void *buf, size_t len),
-	TP_ARGS(protocol_id, msg_id, tag, seq, status, buf, len),
-
-	TP_STRUCT__entry(
-		__field(u8, protocol_id)
-		__field(u8, msg_id)
-		__array(char, tag, 5)
-		__field(u16, seq)
-		__field(int, status)
-		__field(size_t, len)
-		__dynamic_array(unsigned char, cmd, len)
-	),
-
-	TP_fast_assign(
-		__entry->protocol_id = protocol_id;
-		__entry->msg_id = msg_id;
-		strscpy(__entry->tag, tag, 5);
-		__entry->seq = seq;
-		__entry->status = status;
-		__entry->len = len;
-		memcpy(__get_dynamic_array(cmd), buf, __entry->len);
-	),
-
-	TP_printk("pt=%02X t=%s msg_id=%02X seq=%04X s=%d pyld=%s",
-		  __entry->protocol_id, __entry->tag, __entry->msg_id,
-		  __entry->seq, __entry->status,
-		__print_hex_str(__get_dynamic_array(cmd), __entry->len))
 );
 
 TRACE_EVENT(scmi_msg_dump,

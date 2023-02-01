@@ -358,11 +358,8 @@ LIBBPF_1.0.0 {
 		bpf_obj_get_opts;
 		bpf_prog_query_opts;
 		bpf_program__attach_ksyscall;
-<<<<<<< HEAD
 		bpf_program__autoattach;
 		bpf_program__set_autoattach;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		btf__add_enum64;
 		btf__add_enum64_value;
 		libbpf_bpf_attach_type_str;
@@ -371,7 +368,6 @@ LIBBPF_1.0.0 {
 		libbpf_bpf_prog_type_str;
 		perf_buffer__buffer;
 };
-<<<<<<< HEAD
 
 LIBBPF_1.1.0 {
 	global:
@@ -382,5 +378,3 @@ LIBBPF_1.1.0 {
 		user_ring_buffer__reserve_blocking;
 		user_ring_buffer__submit;
 } LIBBPF_1.0.0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

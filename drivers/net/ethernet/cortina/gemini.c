@@ -2471,11 +2471,7 @@ static int gemini_ethernet_port_probe(struct platform_device *pdev)
 	netdev->max_mtu = 10236 - VLAN_ETH_HLEN;
 
 	port->freeq_refill = 0;
-<<<<<<< HEAD
 	netif_napi_add(netdev, &port->napi, gmac_napi_poll);
-=======
-	netif_napi_add(netdev, &port->napi, gmac_napi_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = of_get_mac_address(np, mac);
 	if (!ret) {

@@ -5,17 +5,12 @@
 
 #include "cmd.h"
 
-<<<<<<< HEAD
 enum { CQ_OK = 0, CQ_EMPTY = -1, CQ_POLL_ERR = -2 };
 
 static int mlx5vf_cmd_get_vhca_id(struct mlx5_core_dev *mdev, u16 function_id,
 				  u16 *vhca_id);
 static void
 _mlx5vf_free_page_tracker_resources(struct mlx5vf_pci_core_device *mvdev);
-=======
-static int mlx5vf_cmd_get_vhca_id(struct mlx5_core_dev *mdev, u16 function_id,
-				  u16 *vhca_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int mlx5vf_cmd_suspend_vhca(struct mlx5vf_pci_core_device *mvdev, u16 op_mod)
 {
@@ -75,7 +70,6 @@ int mlx5vf_cmd_query_vhca_migration_state(struct mlx5vf_pci_core_device *mvdev,
 	return 0;
 }
 
-<<<<<<< HEAD
 static void set_tracker_error(struct mlx5vf_pci_core_device *mvdev)
 {
 	/* Mark the tracker under an error and wake it up if it's running */
@@ -83,15 +77,12 @@ static void set_tracker_error(struct mlx5vf_pci_core_device *mvdev)
 	complete(&mvdev->tracker_comp);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int mlx5fv_vf_event(struct notifier_block *nb,
 			   unsigned long event, void *data)
 {
 	struct mlx5vf_pci_core_device *mvdev =
 		container_of(nb, struct mlx5vf_pci_core_device, nb);
 
-<<<<<<< HEAD
 	switch (event) {
 	case MLX5_PF_NOTIFY_ENABLE_VF:
 		mutex_lock(&mvdev->state_mutex);
@@ -103,25 +94,11 @@ static int mlx5fv_vf_event(struct notifier_block *nb,
 		mutex_lock(&mvdev->state_mutex);
 		mvdev->mdev_detach = true;
 		mlx5vf_state_mutex_unlock(mvdev);
-=======
-	mutex_lock(&mvdev->state_mutex);
-	switch (event) {
-	case MLX5_PF_NOTIFY_ENABLE_VF:
-		mvdev->mdev_detach = false;
-		break;
-	case MLX5_PF_NOTIFY_DISABLE_VF:
-		mlx5vf_disable_fds(mvdev);
-		mvdev->mdev_detach = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		break;
 	}
-<<<<<<< HEAD
 
-=======
-	mlx5vf_state_mutex_unlock(mvdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -130,16 +107,11 @@ void mlx5vf_cmd_close_migratable(struct mlx5vf_pci_core_device *mvdev)
 	if (!mvdev->migrate_cap)
 		return;
 
-<<<<<<< HEAD
 	/* Must be done outside the lock to let it progress */
 	set_tracker_error(mvdev);
 	mutex_lock(&mvdev->state_mutex);
 	mlx5vf_disable_fds(mvdev);
 	_mlx5vf_free_page_tracker_resources(mvdev);
-=======
-	mutex_lock(&mvdev->state_mutex);
-	mlx5vf_disable_fds(mvdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mlx5vf_state_mutex_unlock(mvdev);
 }
 
@@ -154,12 +126,8 @@ void mlx5vf_cmd_remove_migratable(struct mlx5vf_pci_core_device *mvdev)
 }
 
 void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
-<<<<<<< HEAD
 			       const struct vfio_migration_ops *mig_ops,
 			       const struct vfio_log_ops *log_ops)
-=======
-			       const struct vfio_migration_ops *mig_ops)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct pci_dev *pdev = mvdev->core_device.pdev;
 	int ret;
@@ -201,12 +169,9 @@ void mlx5vf_cmd_set_migratable(struct mlx5vf_pci_core_device *mvdev,
 		VFIO_MIGRATION_STOP_COPY |
 		VFIO_MIGRATION_P2P;
 	mvdev->core_device.vdev.mig_ops = mig_ops;
-<<<<<<< HEAD
 	init_completion(&mvdev->tracker_comp);
 	if (MLX5_CAP_GEN(mvdev->mdev, adv_virtualization))
 		mvdev->core_device.vdev.log_ops = log_ops;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 end:
 	mlx5_vf_put_core_dev(mvdev->mdev);
@@ -244,7 +209,6 @@ err_exec:
 	return ret;
 }
 
-<<<<<<< HEAD
 static int _create_mkey(struct mlx5_core_dev *mdev, u32 pdn,
 			struct mlx5_vf_migration_file *migf,
 			struct mlx5_vhca_recv_buf *recv_buf,
@@ -252,13 +216,6 @@ static int _create_mkey(struct mlx5_core_dev *mdev, u32 pdn,
 {
 	size_t npages = migf ? DIV_ROUND_UP(migf->total_length, PAGE_SIZE) :
 				recv_buf->npages;
-=======
-static int _create_state_mkey(struct mlx5_core_dev *mdev, u32 pdn,
-			      struct mlx5_vf_migration_file *migf, u32 *mkey)
-{
-	size_t npages = DIV_ROUND_UP(migf->total_length, PAGE_SIZE);
-	struct sg_dma_page_iter dma_iter;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err = 0, inlen;
 	__be64 *mtt;
 	void *mkc;
@@ -275,7 +232,6 @@ static int _create_state_mkey(struct mlx5_core_dev *mdev, u32 pdn,
 		 DIV_ROUND_UP(npages, 2));
 	mtt = (__be64 *)MLX5_ADDR_OF(create_mkey_in, in, klm_pas_mtt);
 
-<<<<<<< HEAD
 	if (migf) {
 		struct sg_dma_page_iter dma_iter;
 
@@ -287,10 +243,6 @@ static int _create_state_mkey(struct mlx5_core_dev *mdev, u32 pdn,
 		for (i = 0; i < npages; i++)
 			*mtt++ = cpu_to_be64(recv_buf->dma_addrs[i]);
 	}
-=======
-	for_each_sgtable_dma_page(&migf->table.sgt, &dma_iter, 0)
-		*mtt++ = cpu_to_be64(sg_page_iter_dma_address(&dma_iter));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mkc = MLX5_ADDR_OF(create_mkey_in, in, memory_key_mkey_entry);
 	MLX5_SET(mkc, mkc, access_mode_1_0, MLX5_MKC_ACCESS_MODE_MTT);
@@ -303,12 +255,8 @@ static int _create_state_mkey(struct mlx5_core_dev *mdev, u32 pdn,
 	MLX5_SET(mkc, mkc, qpn, 0xffffff);
 	MLX5_SET(mkc, mkc, log_page_size, PAGE_SHIFT);
 	MLX5_SET(mkc, mkc, translations_octword_size, DIV_ROUND_UP(npages, 2));
-<<<<<<< HEAD
 	MLX5_SET64(mkc, mkc, len,
 		   migf ? migf->total_length : (npages * PAGE_SIZE));
-=======
-	MLX5_SET64(mkc, mkc, len, migf->total_length);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = mlx5_core_create_mkey(mdev, mkey, in, inlen);
 	kvfree(in);
 	return err;
@@ -382,11 +330,7 @@ int mlx5vf_cmd_save_vhca_state(struct mlx5vf_pci_core_device *mvdev,
 	if (err)
 		goto err_dma_map;
 
-<<<<<<< HEAD
 	err = _create_mkey(mdev, pdn, migf, NULL, &mkey);
-=======
-	err = _create_state_mkey(mdev, pdn, migf, &mkey);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		goto err_create_mkey;
 
@@ -458,11 +402,7 @@ int mlx5vf_cmd_load_vhca_state(struct mlx5vf_pci_core_device *mvdev,
 	if (err)
 		goto err_reg;
 
-<<<<<<< HEAD
 	err = _create_mkey(mdev, pdn, migf, NULL, &mkey);
-=======
-	err = _create_state_mkey(mdev, pdn, migf, &mkey);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		goto err_mkey;
 
@@ -484,7 +424,6 @@ end:
 	mutex_unlock(&migf->lock);
 	return err;
 }
-<<<<<<< HEAD
 
 static void combine_ranges(struct rb_root_cached *root, u32 cur_nodes,
 			   u32 req_nodes)
@@ -1421,5 +1360,3 @@ end:
 	mlx5vf_state_mutex_unlock(mvdev);
 	return err;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

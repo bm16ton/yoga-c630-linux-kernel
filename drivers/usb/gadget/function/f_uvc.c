@@ -902,17 +902,10 @@ static void uvc_function_unbind(struct usb_configuration *c,
 	long wait_ret = 1;
 
 	uvcg_info(f, "%s()\n", __func__);
-<<<<<<< HEAD
 
 	if (video->async_wq)
 		destroy_workqueue(video->async_wq);
 
-=======
-
-	if (video->async_wq)
-		destroy_workqueue(video->async_wq);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * If we know we're connected via v4l2, then there should be a cleanup
 	 * of the device from userspace either via UVC_EVENT_DISCONNECT or

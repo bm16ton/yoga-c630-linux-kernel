@@ -107,10 +107,7 @@ struct smb3_notify_info {
 #define CIFS_DUMP_KEY _IOWR(CIFS_IOCTL_MAGIC, 8, struct smb3_key_debug_info)
 #define CIFS_IOC_NOTIFY _IOW(CIFS_IOCTL_MAGIC, 9, struct smb3_notify)
 #define CIFS_DUMP_FULL_KEY _IOWR(CIFS_IOCTL_MAGIC, 10, struct smb3_full_key_debug_info)
-<<<<<<< HEAD
 #define CIFS_IOC_NOTIFY_INFO _IOWR(CIFS_IOCTL_MAGIC, 11, struct smb3_notify_info)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CIFS_IOC_SHUTDOWN _IOR ('X', 125, __u32)
 
 /*

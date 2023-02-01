@@ -62,11 +62,8 @@ typedef void (*glock_examiner) (struct gfs2_glock * gl);
 
 static void do_xmote(struct gfs2_glock *gl, struct gfs2_holder *gh, unsigned int target);
 static void __gfs2_glock_dq(struct gfs2_holder *gh);
-<<<<<<< HEAD
 static void handle_callback(struct gfs2_glock *gl, unsigned int state,
 			    unsigned long delay, bool remote);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct dentry *gfs2_root;
 static struct workqueue_struct *glock_workqueue;
@@ -1509,7 +1506,6 @@ __acquires(&gl->gl_lockref.lock)
 	}
 
 	list_for_each_entry(gh2, &gl->gl_holders, gh_list) {
-<<<<<<< HEAD
 		if (likely(gh2->gh_owner_pid != gh->gh_owner_pid))
 			continue;
 		if (gh->gh_gl->gl_ops->go_type == LM_TYPE_FLOCK)
@@ -1521,12 +1517,6 @@ __acquires(&gl->gl_lockref.lock)
 		goto trap_recursive;
 	}
 	list_for_each_entry(gh2, &gl->gl_holders, gh_list) {
-=======
-		if (unlikely(gh2->gh_owner_pid == gh->gh_owner_pid &&
-		    (gh->gh_gl->gl_ops->go_type != LM_TYPE_FLOCK) &&
-		    !test_bit(HIF_MAY_DEMOTE, &gh2->gh_iflags)))
-			goto trap_recursive;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (try_futile &&
 		    !(gh2->gh_flags & (LM_FLAG_TRY | LM_FLAG_TRY_1CB))) {
 fail:
@@ -1659,7 +1649,6 @@ static void __gfs2_glock_dq(struct gfs2_holder *gh)
 				    TASK_UNINTERRUPTIBLE);
 			spin_lock(&gl->gl_lockref.lock);
 		}
-<<<<<<< HEAD
 
 		/*
 		 * This holder should not be cached, so mark it for demote.
@@ -1674,22 +1663,6 @@ static void __gfs2_glock_dq(struct gfs2_holder *gh)
 		trace_gfs2_glock_queue(gh, 0);
 
 		/*
-=======
-
-		/*
-		 * This holder should not be cached, so mark it for demote.
-		 * Note: this should be done before the check for needs_demote
-		 * below.
-		 */
-		if (gh->gh_flags & GL_NOCACHE)
-			handle_callback(gl, LM_ST_UNLOCKED, 0, false);
-
-		list_del_init(&gh->gh_list);
-		clear_bit(HIF_HOLDER, &gh->gh_iflags);
-		trace_gfs2_glock_queue(gh, 0);
-
-		/*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * If there hasn't been a demote request we are done.
 		 * (Let the remaining holders, if any, keep holding it.)
 		 */

@@ -1058,7 +1058,6 @@ cleanup:
 }
 
 /**
-<<<<<<< HEAD
  * uclogic_params_parse_ugee_v2_desc - parse the string descriptor containing
  * pen and frame parameters returned by UGEE v2 devices.
  *
@@ -1277,8 +1276,6 @@ static int uclogic_params_ugee_v2_init_battery(struct hid_device *hdev,
 }
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * uclogic_params_ugee_v2_init() - initialize a UGEE graphics tablets by
  * discovering their parameters.
  *
@@ -1306,14 +1303,8 @@ static int uclogic_params_ugee_v2_init(struct uclogic_params *params,
 	const int str_desc_len = 12;
 	__u8 *str_desc = NULL;
 	__u8 *rdesc_pen = NULL;
-<<<<<<< HEAD
 	s32 desc_params[UCLOGIC_RDESC_PH_ID_NUM];
 	enum uclogic_params_frame_type frame_type;
-=======
-	__u8 *rdesc_frame = NULL;
-	s32 desc_params[UCLOGIC_RDESC_PH_ID_NUM];
-	s32 resolution;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__u8 magic_arr[] = {
 		0x02, 0xb0, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
@@ -1327,7 +1318,6 @@ static int uclogic_params_ugee_v2_init(struct uclogic_params *params,
 
 	iface = to_usb_interface(hdev->dev.parent);
 	bInterfaceNumber = iface->cur_altsetting->desc.bInterfaceNumber;
-<<<<<<< HEAD
 
 	if (bInterfaceNumber == 0) {
 		rc = uclogic_params_ugee_v2_init_frame_mouse(&p);
@@ -1337,8 +1327,6 @@ static int uclogic_params_ugee_v2_init(struct uclogic_params *params,
 		goto output;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (bInterfaceNumber != 2) {
 		uclogic_params_init_invalid(&p);
 		goto output;
@@ -1367,7 +1355,6 @@ static int uclogic_params_ugee_v2_init(struct uclogic_params *params,
 		goto output;
 	}
 
-<<<<<<< HEAD
 	rc = uclogic_params_parse_ugee_v2_desc(str_desc, str_desc_len,
 					       desc_params,
 					       ARRAY_SIZE(desc_params),
@@ -1375,27 +1362,6 @@ static int uclogic_params_ugee_v2_init(struct uclogic_params *params,
 	if (rc)
 		goto cleanup;
 
-=======
-	desc_params[UCLOGIC_RDESC_PEN_PH_ID_X_LM] =
-		get_unaligned_le16(str_desc + 2);
-	desc_params[UCLOGIC_RDESC_PEN_PH_ID_Y_LM] =
-		get_unaligned_le16(str_desc + 4);
-	desc_params[UCLOGIC_RDESC_FRAME_PH_ID_UM] = str_desc[6];
-	desc_params[UCLOGIC_RDESC_PEN_PH_ID_PRESSURE_LM] =
-		get_unaligned_le16(str_desc + 8);
-	resolution = get_unaligned_le16(str_desc + 10);
-	if (resolution == 0) {
-		desc_params[UCLOGIC_RDESC_PEN_PH_ID_X_PM] = 0;
-		desc_params[UCLOGIC_RDESC_PEN_PH_ID_Y_PM] = 0;
-	} else {
-		desc_params[UCLOGIC_RDESC_PEN_PH_ID_X_PM] =
-			desc_params[UCLOGIC_RDESC_PEN_PH_ID_X_LM] * 1000 /
-			resolution;
-		desc_params[UCLOGIC_RDESC_PEN_PH_ID_Y_PM] =
-			desc_params[UCLOGIC_RDESC_PEN_PH_ID_Y_LM] * 1000 /
-			resolution;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(str_desc);
 	str_desc = NULL;
 
@@ -1416,7 +1382,6 @@ static int uclogic_params_ugee_v2_init(struct uclogic_params *params,
 	p.pen.subreport_list[0].id = UCLOGIC_RDESC_V1_FRAME_ID;
 
 	/* Initialize the frame interface */
-<<<<<<< HEAD
 	switch (frame_type) {
 	case UCLOGIC_PARAMS_FRAME_DIAL:
 	case UCLOGIC_PARAMS_FRAME_MOUSE:
@@ -1440,25 +1405,6 @@ static int uclogic_params_ugee_v2_init(struct uclogic_params *params,
 			hid_err(hdev, "error initializing battery: %d\n", rc);
 			goto cleanup;
 		}
-=======
-	rdesc_frame = uclogic_rdesc_template_apply(
-				uclogic_rdesc_ugee_v2_frame_btn_template_arr,
-				uclogic_rdesc_ugee_v2_frame_btn_template_size,
-				desc_params, ARRAY_SIZE(desc_params));
-	if (!rdesc_frame) {
-		rc = -ENOMEM;
-		goto cleanup;
-	}
-
-	rc = uclogic_params_frame_init_with_desc(&p.frame_list[0],
-						 rdesc_frame,
-						 uclogic_rdesc_ugee_v2_frame_btn_template_size,
-						 UCLOGIC_RDESC_V1_FRAME_ID);
-	kfree(rdesc_frame);
-	if (rc) {
-		uclogic_params_init_invalid(&p);
-		goto output;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 output:
@@ -1708,15 +1654,11 @@ int uclogic_params_init(struct uclogic_params *params,
 		}
 		break;
 	case VID_PID(USB_VENDOR_ID_UGEE,
-<<<<<<< HEAD
 		     USB_DEVICE_ID_UGEE_PARBLO_A610_PRO):
 	case VID_PID(USB_VENDOR_ID_UGEE,
 		     USB_DEVICE_ID_UGEE_XPPEN_TABLET_DECO_L):
 	case VID_PID(USB_VENDOR_ID_UGEE,
 		     USB_DEVICE_ID_UGEE_XPPEN_TABLET_DECO_PRO_S):
-=======
-		     USB_DEVICE_ID_UGEE_XPPEN_TABLET_DECO_L):
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rc = uclogic_params_ugee_v2_init(&p, hdev);
 		if (rc != 0)
 			goto cleanup;

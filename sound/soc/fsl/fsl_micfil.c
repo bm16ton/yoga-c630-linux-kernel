@@ -394,10 +394,6 @@ static int fsl_micfil_dai_probe(struct snd_soc_dai *cpu_dai)
 			FIELD_PREP(MICFIL_FIFO_CTRL_FIFOWMK, micfil->soc->fifo_depth - 1));
 	if (ret)
 		return ret;
-<<<<<<< HEAD
-=======
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -642,12 +638,9 @@ static int fsl_micfil_probe(struct platform_device *pdev)
 		return PTR_ERR(micfil->busclk);
 	}
 
-<<<<<<< HEAD
 	fsl_asoc_get_pll_clocks(&pdev->dev, &micfil->pll8k_clk,
 				&micfil->pll11k_clk);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* init regmap */
 	regs = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(regs))
@@ -721,11 +714,8 @@ static int fsl_micfil_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "failed to pcm register\n");
 		return ret;
 	}
-<<<<<<< HEAD
 
 	fsl_micfil_dai.capture.formats = micfil->soc->formats;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = devm_snd_soc_register_component(&pdev->dev, &fsl_micfil_component,
 					      &fsl_micfil_dai, 1);

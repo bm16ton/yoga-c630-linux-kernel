@@ -106,15 +106,12 @@
 /* STM32MP1 - ADC2 instance option register */
 #define STM32MP1_ADC2_OR		0xD0
 
-<<<<<<< HEAD
 /* STM32MP1 - Identification registers */
 #define STM32MP1_ADC_HWCFGR0		0x3F0
 #define STM32MP1_ADC_VERR		0x3F4
 #define STM32MP1_ADC_IPDR		0x3F8
 #define STM32MP1_ADC_SIDR		0x3FC
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* STM32H7 - common registers for all ADC instances */
 #define STM32H7_ADC_CSR			(STM32_ADCX_COMN_OFFSET + 0x00)
 #define STM32H7_ADC_CCR			(STM32_ADCX_COMN_OFFSET + 0x08)
@@ -191,7 +188,6 @@ enum stm32h7_adc_dmngt {
 /* STM32MP1_ADC2_OR - bit fields */
 #define STM32MP1_VDDCOREEN		BIT(0)
 
-<<<<<<< HEAD
 /* STM32MP1_ADC_HWCFGR0 - bit fields */
 #define STM32MP1_ADCNUM_SHIFT		0
 #define STM32MP1_ADCNUM_MASK		GENMASK(3, 0)
@@ -216,8 +212,6 @@ enum stm32h7_adc_dmngt {
 
 #define STM32MP15_IPIDR_NUMBER		0x00110005
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * struct stm32_adc_common - stm32 ADC driver common data (for all instances)
  * @base:		control registers base cpu addr

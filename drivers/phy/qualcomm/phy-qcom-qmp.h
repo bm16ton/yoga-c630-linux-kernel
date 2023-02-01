@@ -19,10 +19,7 @@
 #include "phy-qcom-qmp-qserdes-com-v5.h"
 #include "phy-qcom-qmp-qserdes-txrx-v5.h"
 #include "phy-qcom-qmp-qserdes-txrx-v5_20.h"
-<<<<<<< HEAD
 #include "phy-qcom-qmp-qserdes-txrx-v5_5nm.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "phy-qcom-qmp-qserdes-pll.h"
 
@@ -41,10 +38,7 @@
 #include "phy-qcom-qmp-pcs-pcie-v4_20.h"
 
 #include "phy-qcom-qmp-pcs-v5.h"
-<<<<<<< HEAD
 #include "phy-qcom-qmp-pcs-v5_20.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "phy-qcom-qmp-pcs-pcie-v5.h"
 #include "phy-qcom-qmp-pcs-usb-v5.h"
 #include "phy-qcom-qmp-pcs-ufs-v5.h"

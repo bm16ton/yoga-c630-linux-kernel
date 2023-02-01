@@ -519,7 +519,6 @@ enum rk809_reg_id {
 #define MIC_DIFF_DIS			(0x0 << 7)
 #define MIC_DIFF_EN			(0x1 << 7)
 
-<<<<<<< HEAD
 /* RK817 Battery Registers */
 #define RK817_GAS_GAUGE_ADC_CONFIG0	0x50
 #define RK817_GG_EN			(0x1 << 7)
@@ -591,8 +590,6 @@ enum rk809_reg_id {
 #define RK817_GAS_GAUGE_DATA5		0xa2
 #define RK817_GAS_GAUGE_CUR_ADC_K0	0xb0
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define RK817_POWER_EN_REG(i)		(0xb1 + (i))
 #define RK817_POWER_SLP_EN_REG(i)	(0xb5 + (i))
 

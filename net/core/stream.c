@@ -196,15 +196,12 @@ void sk_stream_kill_queues(struct sock *sk)
 	/* First the read buffer. */
 	__skb_queue_purge(&sk->sk_receive_queue);
 
-<<<<<<< HEAD
 	/* Next, the error queue.
 	 * We need to use queue lock, because other threads might
 	 * add packets to the queue without socket lock being held.
 	 */
 	skb_queue_purge(&sk->sk_error_queue);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Next, the write queue. */
 	WARN_ON_ONCE(!skb_queue_empty(&sk->sk_write_queue));
 

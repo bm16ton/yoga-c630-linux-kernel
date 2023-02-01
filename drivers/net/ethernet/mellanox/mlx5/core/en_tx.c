@@ -39,10 +39,7 @@
 #include "ipoib/ipoib.h"
 #include "en_accel/en_accel.h"
 #include "en_accel/ipsec_rxtx.h"
-<<<<<<< HEAD
 #include "en_accel/macsec.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "en/ptp.h"
 #include <net/ipv6.h>
 

@@ -177,10 +177,6 @@ static bool cleanup_symbol_name(char *s)
 	 * character in an identifier in C. Suffixes observed:
 	 * - foo.llvm.[0-9a-f]+
 	 * - foo.[0-9a-f]+
-<<<<<<< HEAD
-=======
-	 * - foo.[0-9a-f]+.cfi_jt
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
 	res = strchr(s, '.');
 	if (res) {
@@ -188,25 +184,6 @@ static bool cleanup_symbol_name(char *s)
 		return true;
 	}
 
-<<<<<<< HEAD
-=======
-	if (!IS_ENABLED(CONFIG_CFI_CLANG) ||
-	    !IS_ENABLED(CONFIG_LTO_CLANG_THIN) ||
-	    CONFIG_CLANG_VERSION >= 130000)
-		return false;
-
-	/*
-	 * Prior to LLVM 13, the following suffixes were observed when thinLTO
-	 * and CFI are both enabled:
-	 * - foo$[0-9]+
-	 */
-	res = strrchr(s, '$');
-	if (res) {
-		*res = '\0';
-		return true;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 

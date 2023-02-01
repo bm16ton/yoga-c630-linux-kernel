@@ -1030,7 +1030,6 @@ static const struct {
 	{ "warn",	sld_warn  },
 	{ "fatal",	sld_fatal },
 	{ "ratelimit:", sld_ratelimit },
-<<<<<<< HEAD
 };
 
 static struct ratelimit_state bld_ratelimit;
@@ -1060,13 +1059,6 @@ static int __init sld_mitigate_sysctl_init(void)
 
 late_initcall(sld_mitigate_sysctl_init);
 #endif
-=======
-};
-
-static struct ratelimit_state bld_ratelimit;
-
-static DEFINE_SEMAPHORE(buslock_sem);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline bool match_option(const char *arg, int arglen, const char *opt)
 {
@@ -1178,7 +1170,6 @@ static void split_lock_init(void)
 		split_lock_verify_msr(sld_state != sld_off);
 }
 
-<<<<<<< HEAD
 static void __split_lock_reenable_unlock(struct work_struct *work)
 {
 	sld_update_msr(true);
@@ -1192,13 +1183,6 @@ static void __split_lock_reenable(struct work_struct *work)
 	sld_update_msr(true);
 }
 static DECLARE_DELAYED_WORK(sl_reenable, __split_lock_reenable);
-=======
-static void __split_lock_reenable(struct work_struct *work)
-{
-	sld_update_msr(true);
-	up(&buslock_sem);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * If a CPU goes offline with pending delayed work to re-enable split lock
@@ -1217,16 +1201,9 @@ static int splitlock_cpu_offline(unsigned int cpu)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void split_lock_warn(unsigned long ip)
 {
 	struct delayed_work *work;
-=======
-static DECLARE_DELAYED_WORK(split_lock_reenable, __split_lock_reenable);
-
-static void split_lock_warn(unsigned long ip)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int cpu;
 
 	if (!current->reported_split_lock)
@@ -1234,7 +1211,6 @@ static void split_lock_warn(unsigned long ip)
 				    current->comm, current->pid, ip);
 	current->reported_split_lock = 1;
 
-<<<<<<< HEAD
 	if (sysctl_sld_mitigate) {
 		/*
 		 * misery factor #1:
@@ -1255,16 +1231,6 @@ static void split_lock_warn(unsigned long ip)
 
 	cpu = get_cpu();
 	schedule_delayed_work_on(cpu, work, 2);
-=======
-	/* misery factor #1, sleep 10ms before trying to execute split lock */
-	if (msleep_interruptible(10) > 0)
-		return;
-	/* Misery factor #2, only allow one buslocked disabled core at a time */
-	if (down_interruptible(&buslock_sem) == -EINTR)
-		return;
-	cpu = get_cpu();
-	schedule_delayed_work_on(cpu, &split_lock_reenable, 2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Disable split lock detection on this CPU to make progress */
 	sld_update_msr(false);

@@ -83,24 +83,16 @@ xfs_bulkstat_one_int(
 	ASSERT(ip != NULL);
 	ASSERT(ip->i_imap.im_blkno != 0);
 	inode = VFS_I(ip);
-<<<<<<< HEAD
 	vfsuid = i_uid_into_vfsuid(mnt_userns, inode);
 	vfsgid = i_gid_into_vfsgid(mnt_userns, inode);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* xfs_iget returns the following without needing
 	 * further change.
 	 */
 	buf->bs_projectid = ip->i_projid;
 	buf->bs_ino = ino;
-<<<<<<< HEAD
 	buf->bs_uid = from_kuid(sb_userns, vfsuid_into_kuid(vfsuid));
 	buf->bs_gid = from_kgid(sb_userns, vfsgid_into_kgid(vfsgid));
-=======
-	buf->bs_uid = from_kuid(sb_userns, i_uid_into_mnt(mnt_userns, inode));
-	buf->bs_gid = from_kgid(sb_userns, i_gid_into_mnt(mnt_userns, inode));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	buf->bs_size = ip->i_disk_size;
 
 	buf->bs_nlink = inode->i_nlink;

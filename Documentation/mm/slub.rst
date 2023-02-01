@@ -400,7 +400,6 @@ information:
     allocated objects. The output is sorted by frequency of each trace.
 
     Information in the output:
-<<<<<<< HEAD
     Number of objects, allocating function, possible memory wastage of
     kmalloc objects(total/per-object), minimal/average/maximal jiffies
     since alloc, pid range of the allocating processes, cpu mask of
@@ -425,23 +424,6 @@ information:
         device_for_each_child+0xb7/0x110
         acpi_dev_for_each_child+0x77/0xa0
         acpi_bus_attach+0x108/0x3f0
-=======
-    Number of objects, allocating function, minimal/average/maximal jiffies since alloc,
-    pid range of the allocating processes, cpu mask of allocating cpus, and stack trace.
-
-    Example:::
-
-    1085 populate_error_injection_list+0x97/0x110 age=166678/166680/166682 pid=1 cpus=1::
-	__slab_alloc+0x6d/0x90
-	kmem_cache_alloc_trace+0x2eb/0x300
-	populate_error_injection_list+0x97/0x110
-	init_error_injection+0x1b/0x71
-	do_one_initcall+0x5f/0x2d0
-	kernel_init_freeable+0x26f/0x2d7
-	kernel_init+0xe/0x118
-	ret_from_fork+0x22/0x30
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 2. free_traces::
 

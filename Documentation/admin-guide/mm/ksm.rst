@@ -184,7 +184,6 @@ The maximum possible ``pages_sharing/pages_shared`` ratio is limited by the
 ``max_page_sharing`` tunable. To increase the ratio ``max_page_sharing`` must
 be increased accordingly.
 
-<<<<<<< HEAD
 Monitoring KSM profit
 =====================
 
@@ -221,8 +220,6 @@ so if the ``ksm_rmap_items/ksm_merging_pages`` ratio exceeds 64 on 64-bit CPU
 or exceeds 128 on 32-bit CPU, then the app's madvise policy should be dropped,
 because the ksm profit is approximately zero or negative.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Monitoring KSM events
 =====================
 

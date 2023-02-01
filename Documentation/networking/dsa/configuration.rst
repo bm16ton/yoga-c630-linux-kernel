@@ -363,7 +363,6 @@ the ``self`` flag) has been removed. This results in the following changes:
 
 Script writers are therefore encouraged to use the ``master static`` set of
 flags when working with bridge FDB entries on DSA switch interfaces.
-<<<<<<< HEAD
 
 Affinity of user ports to CPU ports
 -----------------------------------
@@ -457,5 +456,3 @@ Physical DSA masters are allowed to join and leave at any time a LAG interface
 used as a DSA master; however, DSA will reject a LAG interface as a valid
 candidate for being a DSA master unless it has at least one physical DSA master
 as a slave device.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

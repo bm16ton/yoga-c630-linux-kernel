@@ -27,14 +27,11 @@
 #define CLK_CON_MUX_MUX_CLKCMU_CORE_BUS		0x1014
 #define CLK_CON_MUX_MUX_CLKCMU_CORE_CCI		0x1018
 #define CLK_CON_MUX_MUX_CLKCMU_CORE_G3D		0x101c
-<<<<<<< HEAD
 #define CLK_CON_MUX_MUX_CLKCMU_FSYS_BUS		0x1028
 #define CLK_CON_MUX_MUX_CLKCMU_FSYS_MMC_CARD	0x102c
 #define CLK_CON_MUX_MUX_CLKCMU_FSYS_MMC_EMBD	0x1030
 #define CLK_CON_MUX_MUX_CLKCMU_FSYS_MMC_SDIO	0x1034
 #define CLK_CON_MUX_MUX_CLKCMU_FSYS_USB30DRD	0x1038
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CLK_CON_MUX_MUX_CLKCMU_PERI_BUS		0x1058
 #define CLK_CON_MUX_MUX_CLKCMU_PERI_SPI0	0x105c
 #define CLK_CON_MUX_MUX_CLKCMU_PERI_SPI1	0x1060
@@ -47,14 +44,11 @@
 #define CLK_CON_DIV_CLKCMU_CORE_BUS		0x181c
 #define CLK_CON_DIV_CLKCMU_CORE_CCI		0x1820
 #define CLK_CON_DIV_CLKCMU_CORE_G3D		0x1824
-<<<<<<< HEAD
 #define CLK_CON_DIV_CLKCMU_FSYS_BUS		0x1844
 #define CLK_CON_DIV_CLKCMU_FSYS_MMC_CARD	0x1848
 #define CLK_CON_DIV_CLKCMU_FSYS_MMC_EMBD	0x184c
 #define CLK_CON_DIV_CLKCMU_FSYS_MMC_SDIO	0x1850
 #define CLK_CON_DIV_CLKCMU_FSYS_USB30DRD	0x1854
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CLK_CON_DIV_CLKCMU_PERI_BUS		0x1874
 #define CLK_CON_DIV_CLKCMU_PERI_SPI0		0x1878
 #define CLK_CON_DIV_CLKCMU_PERI_SPI1		0x187c
@@ -75,14 +69,11 @@
 #define CLK_CON_GAT_GATE_CLKCMU_CORE_BUS	0x201c
 #define CLK_CON_GAT_GATE_CLKCMU_CORE_CCI	0x2020
 #define CLK_CON_GAT_GATE_CLKCMU_CORE_G3D	0x2024
-<<<<<<< HEAD
 #define CLK_CON_GAT_GATE_CLKCMU_FSYS_BUS	0x2044
 #define CLK_CON_GAT_GATE_CLKCMU_FSYS_MMC_CARD	0x2048
 #define CLK_CON_GAT_GATE_CLKCMU_FSYS_MMC_EMBD	0x204c
 #define CLK_CON_GAT_GATE_CLKCMU_FSYS_MMC_SDIO	0x2050
 #define CLK_CON_GAT_GATE_CLKCMU_FSYS_USB30DRD	0x2054
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CLK_CON_GAT_GATE_CLKCMU_PERI_BUS	0x207c
 #define CLK_CON_GAT_GATE_CLKCMU_PERI_SPI0	0x2080
 #define CLK_CON_GAT_GATE_CLKCMU_PERI_SPI1	0x2084
@@ -100,14 +91,11 @@ static const unsigned long top_clk_regs[] __initconst = {
 	CLK_CON_MUX_MUX_CLKCMU_CORE_BUS,
 	CLK_CON_MUX_MUX_CLKCMU_CORE_CCI,
 	CLK_CON_MUX_MUX_CLKCMU_CORE_G3D,
-<<<<<<< HEAD
 	CLK_CON_MUX_MUX_CLKCMU_FSYS_BUS,
 	CLK_CON_MUX_MUX_CLKCMU_FSYS_MMC_CARD,
 	CLK_CON_MUX_MUX_CLKCMU_FSYS_MMC_EMBD,
 	CLK_CON_MUX_MUX_CLKCMU_FSYS_MMC_SDIO,
 	CLK_CON_MUX_MUX_CLKCMU_FSYS_USB30DRD,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	CLK_CON_MUX_MUX_CLKCMU_PERI_BUS,
 	CLK_CON_MUX_MUX_CLKCMU_PERI_SPI0,
 	CLK_CON_MUX_MUX_CLKCMU_PERI_SPI1,
@@ -120,14 +108,11 @@ static const unsigned long top_clk_regs[] __initconst = {
 	CLK_CON_DIV_CLKCMU_CORE_BUS,
 	CLK_CON_DIV_CLKCMU_CORE_CCI,
 	CLK_CON_DIV_CLKCMU_CORE_G3D,
-<<<<<<< HEAD
 	CLK_CON_DIV_CLKCMU_FSYS_BUS,
 	CLK_CON_DIV_CLKCMU_FSYS_MMC_CARD,
 	CLK_CON_DIV_CLKCMU_FSYS_MMC_EMBD,
 	CLK_CON_DIV_CLKCMU_FSYS_MMC_SDIO,
 	CLK_CON_DIV_CLKCMU_FSYS_USB30DRD,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	CLK_CON_DIV_CLKCMU_PERI_BUS,
 	CLK_CON_DIV_CLKCMU_PERI_SPI0,
 	CLK_CON_DIV_CLKCMU_PERI_SPI1,
@@ -148,14 +133,11 @@ static const unsigned long top_clk_regs[] __initconst = {
 	CLK_CON_GAT_GATE_CLKCMU_CORE_BUS,
 	CLK_CON_GAT_GATE_CLKCMU_CORE_CCI,
 	CLK_CON_GAT_GATE_CLKCMU_CORE_G3D,
-<<<<<<< HEAD
 	CLK_CON_GAT_GATE_CLKCMU_FSYS_BUS,
 	CLK_CON_GAT_GATE_CLKCMU_FSYS_MMC_CARD,
 	CLK_CON_GAT_GATE_CLKCMU_FSYS_MMC_EMBD,
 	CLK_CON_GAT_GATE_CLKCMU_FSYS_MMC_SDIO,
 	CLK_CON_GAT_GATE_CLKCMU_FSYS_USB30DRD,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	CLK_CON_GAT_GATE_CLKCMU_PERI_BUS,
 	CLK_CON_GAT_GATE_CLKCMU_PERI_SPI0,
 	CLK_CON_GAT_GATE_CLKCMU_PERI_SPI1,
@@ -194,7 +176,6 @@ PNAME(mout_peri_usi0_p)		= { "oscclk", "dout_shared0_div4" };
 PNAME(mout_peri_usi1_p)		= { "oscclk", "dout_shared0_div4" };
 PNAME(mout_peri_usi2_p)		= { "oscclk", "dout_shared0_div4" };
 
-<<<<<<< HEAD
 /* List of parent clocks for Muxes in CMU_TOP: for CMU_FSYS */
 PNAME(mout_fsys_bus_p)		= { "dout_shared0_div2", "dout_shared1_div2" };
 PNAME(mout_fsys_mmc_card_p)	= { "dout_shared0_div2", "dout_shared1_div2" };
@@ -202,8 +183,6 @@ PNAME(mout_fsys_mmc_embd_p)	= { "dout_shared0_div2", "dout_shared1_div2" };
 PNAME(mout_fsys_mmc_sdio_p)	= { "dout_shared0_div2", "dout_shared1_div2" };
 PNAME(mout_fsys_usb30drd_p)	= { "dout_shared0_div4", "dout_shared1_div4" };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct samsung_mux_clock top_mux_clks[] __initconst = {
 	/* CORE */
 	MUX(CLK_MOUT_CORE_BUS, "mout_core_bus", mout_core_bus_p,
@@ -232,7 +211,6 @@ static const struct samsung_mux_clock top_mux_clks[] __initconst = {
 	    CLK_CON_MUX_MUX_CLKCMU_PERI_USI1, 0, 1),
 	MUX(CLK_MOUT_PERI_USI2, "mout_peri_usi2", mout_peri_usi2_p,
 	    CLK_CON_MUX_MUX_CLKCMU_PERI_USI2, 0, 1),
-<<<<<<< HEAD
 
 	/* FSYS */
 	MUX(CLK_MOUT_FSYS_BUS, "mout_fsys_bus", mout_fsys_bus_p,
@@ -245,8 +223,6 @@ static const struct samsung_mux_clock top_mux_clks[] __initconst = {
 	    CLK_CON_MUX_MUX_CLKCMU_FSYS_MMC_SDIO, 0, 1),
 	MUX(CLK_MOUT_FSYS_USB30DRD, "mout_fsys_usb30drd", mout_fsys_usb30drd_p,
 	    CLK_CON_MUX_MUX_CLKCMU_FSYS_USB30DRD, 0, 1),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct samsung_div_clock top_div_clks[] __initconst = {
@@ -293,7 +269,6 @@ static const struct samsung_div_clock top_div_clks[] __initconst = {
 	    CLK_CON_DIV_CLKCMU_PERI_USI1, 0, 4),
 	DIV(CLK_DOUT_PERI_USI2, "dout_peri_usi2", "gout_peri_usi2",
 	    CLK_CON_DIV_CLKCMU_PERI_USI2, 0, 4),
-<<<<<<< HEAD
 
 	/* FSYS */
 	DIV(CLK_DOUT_FSYS_BUS, "dout_fsys_bus", "gout_fsys_bus",
@@ -306,8 +281,6 @@ static const struct samsung_div_clock top_div_clks[] __initconst = {
 	    CLK_CON_DIV_CLKCMU_FSYS_MMC_SDIO, 0, 9),
 	DIV(CLK_DOUT_FSYS_USB30DRD, "dout_fsys_usb30drd", "gout_fsys_usb30drd",
 	    CLK_CON_DIV_CLKCMU_FSYS_USB30DRD, 0, 4),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct samsung_gate_clock top_gate_clks[] __initconst = {
@@ -338,7 +311,6 @@ static const struct samsung_gate_clock top_gate_clks[] __initconst = {
 	     CLK_CON_GAT_GATE_CLKCMU_PERI_USI1, 21, 0, 0),
 	GATE(CLK_GOUT_PERI_USI2, "gout_peri_usi2", "mout_peri_usi2",
 	     CLK_CON_GAT_GATE_CLKCMU_PERI_USI2, 21, 0, 0),
-<<<<<<< HEAD
 
 	/* FSYS */
 	GATE(CLK_GOUT_FSYS_BUS, "gout_fsys_bus", "mout_fsys_bus",
@@ -351,8 +323,6 @@ static const struct samsung_gate_clock top_gate_clks[] __initconst = {
 	     CLK_CON_GAT_GATE_CLKCMU_FSYS_MMC_SDIO, 21, 0, 0),
 	GATE(CLK_GOUT_FSYS_USB30DRD, "gout_fsys_usb30drd", "mout_fsys_usb30drd",
 	     CLK_CON_GAT_GATE_CLKCMU_FSYS_USB30DRD, 21, 0, 0),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct samsung_cmu_info top_cmu_info __initconst = {
@@ -601,7 +571,6 @@ CLK_OF_DECLARE(exynos7885_cmu_peri, "samsung,exynos7885-cmu-peri",
 /* ---- CMU_CORE ------------------------------------------------------------ */
 
 /* Register Offset definitions for CMU_CORE (0x12000000) */
-<<<<<<< HEAD
 #define PLL_CON0_MUX_CLKCMU_CORE_BUS_USER		0x0100
 #define PLL_CON0_MUX_CLKCMU_CORE_CCI_USER		0x0120
 #define PLL_CON0_MUX_CLKCMU_CORE_G3D_USER		0x0140
@@ -616,15 +585,6 @@ CLK_OF_DECLARE(exynos7885_cmu_peri, "samsung,exynos7885-cmu-peri",
 #define CLK_CON_GAT_GOUT_CORE_TREX_P_CORE_CCLK_P_CORE	0x216c
 #define CLK_CON_GAT_GOUT_CORE_TREX_P_CORE_PCLK		0x2170
 #define CLK_CON_GAT_GOUT_CORE_TREX_P_CORE_PCLK_P_CORE	0x2174
-=======
-#define PLL_CON0_MUX_CLKCMU_CORE_BUS_USER	0x0100
-#define PLL_CON0_MUX_CLKCMU_CORE_CCI_USER	0x0120
-#define PLL_CON0_MUX_CLKCMU_CORE_G3D_USER	0x0140
-#define CLK_CON_MUX_MUX_CLK_CORE_GIC		0x1000
-#define CLK_CON_DIV_DIV_CLK_CORE_BUSP		0x1800
-#define CLK_CON_GAT_GOUT_CORE_CCI_550_ACLK	0x2054
-#define CLK_CON_GAT_GOUT_CORE_GIC400_CLK	0x2058
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const unsigned long core_clk_regs[] __initconst = {
 	PLL_CON0_MUX_CLKCMU_CORE_BUS_USER,
@@ -634,7 +594,6 @@ static const unsigned long core_clk_regs[] __initconst = {
 	CLK_CON_DIV_DIV_CLK_CORE_BUSP,
 	CLK_CON_GAT_GOUT_CORE_CCI_550_ACLK,
 	CLK_CON_GAT_GOUT_CORE_GIC400_CLK,
-<<<<<<< HEAD
 	CLK_CON_GAT_GOUT_CORE_TREX_D_CORE_ACLK,
 	CLK_CON_GAT_GOUT_CORE_TREX_D_CORE_GCLK,
 	CLK_CON_GAT_GOUT_CORE_TREX_D_CORE_PCLK,
@@ -642,8 +601,6 @@ static const unsigned long core_clk_regs[] __initconst = {
 	CLK_CON_GAT_GOUT_CORE_TREX_P_CORE_CCLK_P_CORE,
 	CLK_CON_GAT_GOUT_CORE_TREX_P_CORE_PCLK,
 	CLK_CON_GAT_GOUT_CORE_TREX_P_CORE_PCLK_P_CORE,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* List of parent clocks for Muxes in CMU_CORE */
@@ -675,7 +632,6 @@ static const struct samsung_gate_clock core_gate_clks[] __initconst = {
 	/* GIC (interrupt controller) clock must be always running */
 	GATE(CLK_GOUT_GIC400_CLK, "gout_gic400_clk", "mout_core_gic",
 	     CLK_CON_GAT_GOUT_CORE_GIC400_CLK, 21, CLK_IS_CRITICAL, 0),
-<<<<<<< HEAD
 	/*
 	 * TREX D and P Core (seems to be related to "bus traffic shaper")
 	 * clocks must always be running
@@ -697,8 +653,6 @@ static const struct samsung_gate_clock core_gate_clks[] __initconst = {
 	GATE(CLK_GOUT_TREX_P_CORE_PCLK_P_CORE, "gout_trex_p_core_pclk_p_core",
 	     "dout_core_busp", CLK_CON_GAT_GOUT_CORE_TREX_P_CORE_PCLK_P_CORE, 21,
 	     CLK_IS_CRITICAL, 0),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct samsung_cmu_info core_cmu_info __initconst = {
@@ -714,7 +668,6 @@ static const struct samsung_cmu_info core_cmu_info __initconst = {
 	.clk_name		= "dout_core_bus",
 };
 
-<<<<<<< HEAD
 /* ---- CMU_FSYS ------------------------------------------------------------ */
 
 /* Register Offset definitions for CMU_FSYS (0x13400000) */
@@ -797,8 +750,6 @@ static const struct samsung_cmu_info fsys_cmu_info __initconst = {
 	.clk_name		= "dout_fsys_bus",
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* ---- platform_driver ----------------------------------------------------- */
 
 static int __init exynos7885_cmu_probe(struct platform_device *pdev)
@@ -817,12 +768,9 @@ static const struct of_device_id exynos7885_cmu_of_match[] = {
 		.compatible = "samsung,exynos7885-cmu-core",
 		.data = &core_cmu_info,
 	}, {
-<<<<<<< HEAD
 		.compatible = "samsung,exynos7885-cmu-fsys",
 		.data = &fsys_cmu_info,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 };
 

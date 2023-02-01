@@ -119,11 +119,8 @@ struct spdif_mixer_control {
  * @dma_params_rx: DMA parameters for receive channel
  * @regcache_srpc: regcache for SRPC
  * @bypass: status of bypass input to output
-<<<<<<< HEAD
  * @pll8k_clk: PLL clock for the rate of multiply of 8kHz
  * @pll11k_clk: PLL clock for the rate of multiply of 11kHz
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct fsl_spdif_priv {
 	const struct fsl_spdif_soc_data *soc;
@@ -149,11 +146,8 @@ struct fsl_spdif_priv {
 	/* regcache for SRPC */
 	u32 regcache_srpc;
 	bool bypass;
-<<<<<<< HEAD
 	struct clk *pll8k_clk;
 	struct clk *pll11k_clk;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct fsl_spdif_soc_data fsl_spdif_vf610 = {
@@ -1269,7 +1263,6 @@ static int fsl_spdif_dai_probe(struct snd_soc_dai *dai)
 		snd_soc_add_dai_controls(dai, fsl_spdif_ctrls_rcm,
 					 ARRAY_SIZE(fsl_spdif_ctrls_rcm));
 
-<<<<<<< HEAD
 	spdif_private->snd_card = dai->component->card->snd_card;
 	spdif_private->rxrate_kcontrol = snd_soc_card_get_kcontrol(dai->component->card,
 								   RX_SAMPLE_RATE_KCONTROL);
@@ -1277,8 +1270,6 @@ static int fsl_spdif_dai_probe(struct snd_soc_dai *dai)
 		dev_err(&spdif_private->pdev->dev, "failed to get %s kcontrol\n",
 			RX_SAMPLE_RATE_KCONTROL);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*Clear the val bit for Tx*/
 	regmap_update_bits(spdif_private->regmap, REG_SPDIF_SCR,
 			   SCR_VAL_MASK, SCR_VAL_CLEAR);

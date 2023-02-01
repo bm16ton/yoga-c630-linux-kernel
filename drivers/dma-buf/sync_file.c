@@ -172,11 +172,7 @@ static struct sync_file *sync_file_merge(const char *name, struct sync_file *a,
 		return NULL;
 	}
 	sync_file->fence = fence;
-<<<<<<< HEAD
 	strscpy(sync_file->user_name, name, sizeof(sync_file->user_name));
-=======
-	strlcpy(sync_file->user_name, name, sizeof(sync_file->user_name));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sync_file;
 }
 

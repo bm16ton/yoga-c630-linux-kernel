@@ -636,20 +636,7 @@ ieee80211_tx_h_select_key(struct ieee80211_tx_data *tx)
 	if (tx->sta &&
 	    (key = rcu_dereference(tx->sta->ptk[tx->sta->ptk_idx])))
 		tx->key = key;
-<<<<<<< HEAD
 	else if ((key = ieee80211_select_link_key(tx)))
-=======
-	else if (ieee80211_is_group_privacy_action(tx->skb) &&
-		(key = rcu_dereference(tx->sdata->deflink.default_multicast_key)))
-		tx->key = key;
-	else if (ieee80211_is_mgmt(hdr->frame_control) &&
-		 is_multicast_ether_addr(hdr->addr1) &&
-		 ieee80211_is_robust_mgmt_frame(tx->skb) &&
-		 (key = rcu_dereference(tx->sdata->deflink.default_mgmt_key)))
-		tx->key = key;
-	else if (is_multicast_ether_addr(hdr->addr1) &&
-		 (key = rcu_dereference(tx->sdata->deflink.default_multicast_key)))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		tx->key = key;
 	else if (!is_multicast_ether_addr(hdr->addr1) &&
 		 (key = rcu_dereference(tx->sdata->default_unicast_key)))
@@ -2699,12 +2686,8 @@ static struct sk_buff *ieee80211_build_hdr(struct ieee80211_sub_if_data *sdata,
 				goto free;
 			}
 			memcpy(hdr.addr2, link->conf->addr, ETH_ALEN);
-<<<<<<< HEAD
 		} else if (link_id == IEEE80211_LINK_UNSPECIFIED ||
 			   (sta && sta->sta.mlo)) {
-=======
-		} else if (link_id == IEEE80211_LINK_UNSPECIFIED) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			memcpy(hdr.addr2, sdata->vif.addr, ETH_ALEN);
 		} else {
 			struct ieee80211_bss_conf *conf;
@@ -2998,11 +2981,7 @@ static struct sk_buff *ieee80211_build_hdr(struct ieee80211_sub_if_data *sdata,
 
 		if (pre_conf_link_id != link_id &&
 		    link_id != IEEE80211_LINK_UNSPECIFIED) {
-<<<<<<< HEAD
 #ifdef CONFIG_MAC80211_VERBOSE_DEBUG
-=======
-#ifdef CPTCFG_MAC80211_VERBOSE_DEBUG
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			net_info_ratelimited("%s: dropped frame to %pM with bad link ID request (%d vs. %d)\n",
 					     sdata->name, hdr.addr1,
 					     pre_conf_link_id, link_id);
@@ -5134,11 +5113,8 @@ ieee80211_beacon_get_finish(struct ieee80211_hw *hw,
 	rate_control_get_rate(sdata, NULL, &txrc);
 
 	info->control.vif = vif;
-<<<<<<< HEAD
 	info->control.flags |= u32_encode_bits(link->link_id,
 					       IEEE80211_TX_CTRL_MLO_LINK);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	info->flags |= IEEE80211_TX_CTL_CLEAR_PS_FILT |
 		       IEEE80211_TX_CTL_ASSIGN_SEQ |
 		       IEEE80211_TX_CTL_FIRST_FRAGMENT;
@@ -5514,37 +5490,22 @@ struct sk_buff *ieee80211_nullfunc_get(struct ieee80211_hw *hw,
 	struct ieee80211_local *local = sdata->local;
 	struct ieee80211_link_data *link = NULL;
 	struct ieee80211_hdr_3addr *nullfunc;
-<<<<<<< HEAD
-=======
-	struct ieee80211_sub_if_data *sdata;
-	struct ieee80211_local *local;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sk_buff *skb;
 	bool qos = false;
 
 	if (WARN_ON(vif->type != NL80211_IFTYPE_STATION))
 		return NULL;
 
-<<<<<<< HEAD
 	skb = dev_alloc_skb(local->hw.extra_tx_headroom +
 			    sizeof(*nullfunc) + 2);
 	if (!skb)
 		return NULL;
-=======
-	sdata = vif_to_sdata(vif);
-	local = sdata->local;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rcu_read_lock();
 	if (qos_ok) {
 		struct sta_info *sta;
 
-<<<<<<< HEAD
 		sta = sta_info_get(sdata, vif->cfg.ap_addr);
-=======
-		rcu_read_lock();
-		sta = sta_info_get(sdata, sdata->deflink.u.mgd.bssid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		qos = sta && sta->sta.wme;
 	}
 
@@ -5576,7 +5537,6 @@ struct sk_buff *ieee80211_nullfunc_get(struct ieee80211_hw *hw,
 		skb_put_data(skb, &qoshdr, sizeof(qoshdr));
 	}
 
-<<<<<<< HEAD
 	if (link) {
 		memcpy(nullfunc->addr1, link->conf->bssid, ETH_ALEN);
 		memcpy(nullfunc->addr2, link->conf->addr, ETH_ALEN);
@@ -5587,11 +5547,6 @@ struct sk_buff *ieee80211_nullfunc_get(struct ieee80211_hw *hw,
 		memcpy(nullfunc->addr3, vif->cfg.ap_addr, ETH_ALEN);
 	}
 	rcu_read_unlock();
-=======
-	memcpy(nullfunc->addr1, sdata->deflink.u.mgd.bssid, ETH_ALEN);
-	memcpy(nullfunc->addr2, vif->addr, ETH_ALEN);
-	memcpy(nullfunc->addr3, sdata->deflink.u.mgd.bssid, ETH_ALEN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return skb;
 }

@@ -15,17 +15,12 @@
 #include <time.h>
 #include <sched.h>
 #include <signal.h>
-<<<<<<< HEAD
 #include <pthread.h>
 
 #include <sys/eventfd.h>
 
 /* Defined in include/linux/kvm_types.h */
 #define GPA_INVALID		(~(ulong)0)
-=======
-
-#include <sys/eventfd.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define SHINFO_REGION_GVA	0xc0000000ULL
 #define SHINFO_REGION_GPA	0xc0000000ULL
@@ -42,15 +37,9 @@
 #define SHINFO_VADDR	(SHINFO_REGION_GVA)
 #define RUNSTATE_VADDR	(SHINFO_REGION_GVA + PAGE_SIZE + 0x20)
 #define VCPU_INFO_VADDR	(SHINFO_REGION_GVA + 0x40)
-<<<<<<< HEAD
 
 #define EVTCHN_VECTOR	0x10
 
-=======
-
-#define EVTCHN_VECTOR	0x10
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define EVTCHN_TEST1 15
 #define EVTCHN_TEST2 66
 #define EVTCHN_TIMER 13
@@ -59,11 +48,8 @@
 
 #define MIN_STEAL_TIME		50000
 
-<<<<<<< HEAD
 #define SHINFO_RACE_TIMEOUT	2	/* seconds */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define __HYPERVISOR_set_timer_op	15
 #define __HYPERVISOR_sched_op		29
 #define __HYPERVISOR_event_channel_op	32
@@ -146,11 +132,7 @@ struct {
 	struct kvm_irq_routing_entry entries[2];
 } irq_routes;
 
-<<<<<<< HEAD
 static volatile bool guest_saw_irq;
-=======
-bool guest_saw_irq;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void evtchn_handler(struct ex_regs *regs)
 {
@@ -173,16 +155,6 @@ static void guest_code(void)
 {
 	struct vcpu_runstate_info *rs = (void *)RUNSTATE_VADDR;
 	int i;
-
-	__asm__ __volatile__(
-		"sti\n"
-		"nop\n"
-	);
-
-	/* Trigger an interrupt injection */
-	GUEST_SYNC(0);
-
-	guest_wait_for_irq();
 
 	__asm__ __volatile__(
 		"sti\n"
@@ -261,7 +233,6 @@ static void guest_code(void)
 	GUEST_ASSERT(rax == 0);
 
 	guest_wait_for_irq();
-<<<<<<< HEAD
 
 	GUEST_SYNC(12);
 
@@ -294,40 +265,6 @@ static void guest_code(void)
 
 	GUEST_SYNC(15);
 
-=======
-
-	GUEST_SYNC(12);
-
-	/* Deliver "outbound" event channel to an eventfd which
-	 * happens to be one of our own irqfds. */
-	s.port = 197;
-	__asm__ __volatile__ ("vmcall" :
-			      "=a" (rax) :
-			      "a" (__HYPERVISOR_event_channel_op),
-			      "D" (EVTCHNOP_send),
-			      "S" (&s));
-
-	GUEST_ASSERT(rax == 0);
-
-	guest_wait_for_irq();
-
-	GUEST_SYNC(13);
-
-	/* Set a timer 100ms in the future. */
-	__asm__ __volatile__ ("vmcall" :
-			      "=a" (rax) :
-			      "a" (__HYPERVISOR_set_timer_op),
-			      "D" (rs->state_entry_time + 100000000));
-	GUEST_ASSERT(rax == 0);
-
-	GUEST_SYNC(14);
-
-	/* Now wait for the timer */
-	guest_wait_for_irq();
-
-	GUEST_SYNC(15);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* The host has 'restored' the timer. Just wait for it. */
 	guest_wait_for_irq();
 
@@ -395,7 +332,6 @@ static void guest_code(void)
 	guest_wait_for_irq();
 
 	GUEST_SYNC(21);
-<<<<<<< HEAD
 	/* Racing host ioctls */
 
 	guest_wait_for_irq();
@@ -439,8 +375,6 @@ wait_for_timer:
 	guest_saw_irq = false;
 
 	GUEST_SYNC(24);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int cmp_timespec(struct timespec *a, struct timespec *b)
@@ -468,7 +402,6 @@ static void handle_alrm(int sig)
 	TEST_FAIL("IRQ delivery timed out");
 }
 
-<<<<<<< HEAD
 static void *juggle_shinfo_state(void *arg)
 {
 	struct kvm_vm *vm = (struct kvm_vm *)arg;
@@ -492,19 +425,13 @@ static void *juggle_shinfo_state(void *arg)
 	return NULL;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int main(int argc, char *argv[])
 {
 	struct timespec min_ts, max_ts, vm_ts;
 	struct kvm_vm *vm;
-<<<<<<< HEAD
 	pthread_t thread;
 	bool verbose;
 	int ret;
-=======
-	bool verbose;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	verbose = argc > 1 && (!strncmp(argv[1], "-v", 3) ||
 			       !strncmp(argv[1], "--verbose", 10));
@@ -635,48 +562,8 @@ int main(int argc, char *argv[])
 		struct sigaction sa = { };
 		sa.sa_handler = handle_alrm;
 		sigaction(SIGALRM, &sa, NULL);
-<<<<<<< HEAD
 	}
 
-	struct kvm_xen_vcpu_attr tmr = {
-		.type = KVM_XEN_VCPU_ATTR_TYPE_TIMER,
-		.u.timer.port = EVTCHN_TIMER,
-		.u.timer.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL,
-		.u.timer.expires_ns = 0
-	};
-
-	if (do_evtchn_tests) {
-		struct kvm_xen_hvm_attr inj = {
-			.type = KVM_XEN_ATTR_TYPE_EVTCHN,
-			.u.evtchn.send_port = 127,
-			.u.evtchn.type = EVTCHNSTAT_interdomain,
-			.u.evtchn.flags = 0,
-			.u.evtchn.deliver.port.port = EVTCHN_TEST1,
-			.u.evtchn.deliver.port.vcpu = vcpu->id + 1,
-			.u.evtchn.deliver.port.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL,
-		};
-		vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &inj);
-
-		/* Test migration to a different vCPU */
-		inj.u.evtchn.flags = KVM_XEN_EVTCHN_UPDATE;
-		inj.u.evtchn.deliver.port.vcpu = vcpu->id;
-		vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &inj);
-
-		inj.u.evtchn.send_port = 197;
-		inj.u.evtchn.deliver.eventfd.port = 0;
-		inj.u.evtchn.deliver.eventfd.fd = irq_fd[1];
-		inj.u.evtchn.flags = 0;
-		vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &inj);
-
-		vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &tmr);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-	vinfo = addr_gpa2hva(vm, VCPU_INFO_VADDR);
-	vinfo->evtchn_upcall_pending = 0;
-
-<<<<<<< HEAD
-=======
 	struct kvm_xen_vcpu_attr tmr = {
 		.type = KVM_XEN_VCPU_ATTR_TYPE_TIMER,
 		.u.timer.port = EVTCHN_TIMER,
@@ -712,7 +599,6 @@ int main(int argc, char *argv[])
 	vinfo = addr_gpa2hva(vm, VCPU_INFO_VADDR);
 	vinfo->evtchn_upcall_pending = 0;
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vcpu_runstate_info *rs = addr_gpa2hva(vm, RUNSTATE_ADDR);
 	rs->state = 0x5a;
 
@@ -974,7 +860,6 @@ int main(int argc, char *argv[])
 			case 21:
 				TEST_ASSERT(!evtchn_irq_expected,
 					    "Expected event channel IRQ but it didn't happen");
-<<<<<<< HEAD
 				alarm(0);
 
 				if (verbose)
@@ -1040,8 +925,6 @@ int main(int argc, char *argv[])
 
 				ret = pthread_join(thread, 0);
 				TEST_ASSERT(ret == 0, "pthread_join() failed: %s", strerror(ret));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				goto done;
 
 			case 0x20:

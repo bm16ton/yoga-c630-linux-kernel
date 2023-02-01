@@ -924,11 +924,6 @@ static bool is_pppoe_ses_hdr_valid(const struct pppoe_hdr *hdr)
 	return hdr->ver == 1 && hdr->type == 1 && hdr->code == 0;
 }
 
-static bool is_pppoe_ses_hdr_valid(const struct pppoe_hdr *hdr)
-{
-	return hdr->ver == 1 && hdr->type == 1 && hdr->code == 0;
-}
-
 /**
  * __skb_flow_dissect - extract the flow_keys struct and return it
  * @net: associated network namespace, derived from @skb if NULL
@@ -1648,14 +1643,8 @@ static inline void __flow_hash_consistentify(struct flow_keys *keys)
 
 	switch (keys->control.addr_type) {
 	case FLOW_DISSECTOR_KEY_IPV4_ADDRS:
-<<<<<<< HEAD
 		if ((__force u32)keys->addrs.v4addrs.dst <
 		    (__force u32)keys->addrs.v4addrs.src)
-=======
-		addr_diff = (__force u32)keys->addrs.v4addrs.dst -
-			    (__force u32)keys->addrs.v4addrs.src;
-		if (addr_diff < 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			swap(keys->addrs.v4addrs.src, keys->addrs.v4addrs.dst);
 
 		if ((__force u16)keys->ports.dst <

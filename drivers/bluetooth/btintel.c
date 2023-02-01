@@ -449,10 +449,7 @@ static int btintel_version_info_tlv(struct hci_dev *hdev,
 	case 0x17:	/* TyP */
 	case 0x18:	/* Slr */
 	case 0x19:	/* Slr-F */
-<<<<<<< HEAD
 	case 0x1b:      /* Mgr */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		bt_dev_err(hdev, "Unsupported Intel hardware variant (0x%x)",
@@ -2334,10 +2331,7 @@ static void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
 	case 0x17:
 	case 0x18:
 	case 0x19:
-<<<<<<< HEAD
 	case 0x1b:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hci_set_msft_opcode(hdev, 0xFC1E);
 		break;
 	default:
@@ -2530,11 +2524,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
 		 */
 		err = btintel_read_version(hdev, &ver);
 		if (err)
-<<<<<<< HEAD
 			break;
-=======
-			return err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Apply the device specific HCI quirks
 		 *
@@ -2553,10 +2543,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
 	case 0x17:
 	case 0x18:
 	case 0x19:
-<<<<<<< HEAD
 	case 0x1b:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Display version information of TLV type */
 		btintel_version_info_tlv(hdev, &ver_tlv);
 
@@ -2579,12 +2566,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
 	default:
 		bt_dev_err(hdev, "Unsupported Intel hw variant (%u)",
 			   INTEL_HW_VARIANT(ver_tlv.cnvi_bt));
-<<<<<<< HEAD
 		err = -EINVAL;
 		break;
-=======
-		return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 exit_error:

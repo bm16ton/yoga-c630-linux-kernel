@@ -26,10 +26,7 @@
 #define __I915_GEM_H__
 
 #include <linux/bug.h>
-<<<<<<< HEAD
 #include <linux/types.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <drm/drm_drv.h>
 

@@ -173,7 +173,6 @@ void __thermal_zone_set_trips(struct thermal_zone_device *tz)
 		dev_err(&tz->device, "Failed to set trips: %d\n", ret);
 }
 
-<<<<<<< HEAD
 /**
  * thermal_zone_set_trips - Computes the next trip points for the driver
  * @tz: a pointer to a thermal zone device structure
@@ -193,8 +192,6 @@ void thermal_zone_set_trips(struct thermal_zone_device *tz)
 	mutex_unlock(&tz->lock);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void thermal_cdev_set_cur_state(struct thermal_cooling_device *cdev,
 				       int target)
 {

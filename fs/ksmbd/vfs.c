@@ -377,12 +377,7 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
 
 	if (work->conn->connection_type) {
 		if (!(fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
-<<<<<<< HEAD
 			pr_err("no right to read(%pD)\n", fp->filp);
-=======
-			pr_err("no right to read(%pd)\n",
-			       fp->filp->f_path.dentry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return -EACCES;
 		}
 	}
@@ -491,12 +486,7 @@ int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
 
 	if (work->conn->connection_type) {
 		if (!(fp->daccess & FILE_WRITE_DATA_LE)) {
-<<<<<<< HEAD
 			pr_err("no right to write(%pD)\n", fp->filp);
-=======
-			pr_err("no right to write(%pd)\n",
-			       fp->filp->f_path.dentry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			err = -EACCES;
 			goto out;
 		}
@@ -535,13 +525,8 @@ int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
 	if (sync) {
 		err = vfs_fsync_range(filp, offset, offset + *written, 0);
 		if (err < 0)
-<<<<<<< HEAD
 			pr_err("fsync failed for filename = %pD, err = %d\n",
 			       fp->filp, err);
-=======
-			pr_err("fsync failed for filename = %pd, err = %d\n",
-			       fp->filp->f_path.dentry, err);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 out:
@@ -556,11 +541,7 @@ out:
  *
  * Return:	0 on success, otherwise error
  */
-<<<<<<< HEAD
 int ksmbd_vfs_getattr(const struct path *path, struct kstat *stat)
-=======
-int ksmbd_vfs_getattr(struct path *path, struct kstat *stat)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err;
 
@@ -1122,11 +1103,7 @@ int ksmbd_vfs_unlink(struct user_namespace *user_ns,
 	return err;
 }
 
-<<<<<<< HEAD
 static bool __dir_empty(struct dir_context *ctx, const char *name, int namlen,
-=======
-static int __dir_empty(struct dir_context *ctx, const char *name, int namlen,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		       loff_t offset, u64 ino, unsigned int d_type)
 {
 	struct ksmbd_readdir_data *buf;
@@ -1134,13 +1111,7 @@ static int __dir_empty(struct dir_context *ctx, const char *name, int namlen,
 	buf = container_of(ctx, struct ksmbd_readdir_data, ctx);
 	buf->dirent_count++;
 
-<<<<<<< HEAD
 	return buf->dirent_count <= 2;
-=======
-	if (buf->dirent_count > 2)
-		return -ENOTEMPTY;
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1167,24 +1138,16 @@ int ksmbd_vfs_empty_dir(struct ksmbd_file *fp)
 	return err;
 }
 
-<<<<<<< HEAD
 static bool __caseless_lookup(struct dir_context *ctx, const char *name,
-=======
-static int __caseless_lookup(struct dir_context *ctx, const char *name,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			     int namlen, loff_t offset, u64 ino,
 			     unsigned int d_type)
 {
 	struct ksmbd_readdir_data *buf;
-<<<<<<< HEAD
 	int cmp = -EINVAL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	buf = container_of(ctx, struct ksmbd_readdir_data, ctx);
 
 	if (buf->used != namlen)
-<<<<<<< HEAD
 		return true;
 	if (IS_ENABLED(CONFIG_UNICODE) && buf->um) {
 		const struct qstr q_buf = {.name = buf->private,
@@ -1202,15 +1165,6 @@ static int __caseless_lookup(struct dir_context *ctx, const char *name,
 		return false;
 	}
 	return true;
-=======
-		return 0;
-	if (!strncasecmp((char *)buf->private, name, namlen)) {
-		memcpy((char *)buf->private, name, namlen);
-		buf->dirent_count = 1;
-		return -EEXIST;
-	}
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1221,12 +1175,8 @@ static int __caseless_lookup(struct dir_context *ctx, const char *name,
  *
  * Return:	0 on success, otherwise error
  */
-<<<<<<< HEAD
 static int ksmbd_vfs_lookup_in_dir(const struct path *dir, char *name,
 				   size_t namelen, struct unicode_map *um)
-=======
-static int ksmbd_vfs_lookup_in_dir(struct path *dir, char *name, size_t namelen)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 	struct file *dfilp;
@@ -1236,10 +1186,7 @@ static int ksmbd_vfs_lookup_in_dir(struct path *dir, char *name, size_t namelen)
 		.private	= name,
 		.used		= namelen,
 		.dirent_count	= 0,
-<<<<<<< HEAD
 		.um		= um,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	dfilp = dentry_open(dir, flags, current_cred());
@@ -1302,12 +1249,8 @@ int ksmbd_vfs_kern_path(struct ksmbd_work *work, char *name,
 				break;
 
 			err = ksmbd_vfs_lookup_in_dir(&parent, filename,
-<<<<<<< HEAD
 						      filename_len,
 						      work->conn->um);
-=======
-						      filename_len);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			path_put(&parent);
 			if (err)
 				goto out;
@@ -1810,19 +1753,11 @@ int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
 	*total_size_written = 0;
 
 	if (!(src_fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
-<<<<<<< HEAD
 		pr_err("no right to read(%pD)\n", src_fp->filp);
 		return -EACCES;
 	}
 	if (!(dst_fp->daccess & (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE))) {
 		pr_err("no right to write(%pD)\n", dst_fp->filp);
-=======
-		pr_err("no right to read(%pd)\n", src_fp->filp->f_path.dentry);
-		return -EACCES;
-	}
-	if (!(dst_fp->daccess & (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE))) {
-		pr_err("no right to write(%pd)\n", dst_fp->filp->f_path.dentry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EACCES;
 	}
 

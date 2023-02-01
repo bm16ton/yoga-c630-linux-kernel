@@ -97,11 +97,7 @@ static const __u8 template_params_none[] = {
 
 static struct uclogic_template_case uclogic_template_cases[] = {
 	{
-<<<<<<< HEAD
 		.name = "empty_template",
-=======
-		.name = "Empty template",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_empty,
 		.template_size = sizeof(template_empty),
 		.param_list = params_pen_all,
@@ -109,11 +105,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = template_empty,
 	},
 	{
-<<<<<<< HEAD
 		.name = "template_smaller_than_the_placeholder",
-=======
-		.name = "Template smaller than the placeholder",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_small,
 		.template_size = sizeof(template_small),
 		.param_list = params_pen_all,
@@ -121,11 +113,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = template_small,
 	},
 	{
-<<<<<<< HEAD
 		.name = "no_placeholder",
-=======
-		.name = "No placeholder",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_no_ph,
 		.template_size = sizeof(template_no_ph),
 		.param_list = params_pen_all,
@@ -133,11 +121,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = template_no_ph,
 	},
 	{
-<<<<<<< HEAD
 		.name = "pen_placeholder_at_the_end_without_id",
-=======
-		.name = "Pen placeholder at the end, without ID",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_pen_ph_end,
 		.template_size = sizeof(template_pen_ph_end),
 		.param_list = params_pen_all,
@@ -145,11 +129,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = template_pen_ph_end,
 	},
 	{
-<<<<<<< HEAD
 		.name = "frame_button_placeholder_at_the_end_without_id",
-=======
-		.name = "Frame button placeholder at the end, without ID",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_btn_ph_end,
 		.template_size = sizeof(template_btn_ph_end),
 		.param_list = params_frame_all,
@@ -157,11 +137,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = template_btn_ph_end,
 	},
 	{
-<<<<<<< HEAD
 		.name = "all_params_present_in_the_pen_template",
-=======
-		.name = "All params present in the pen template",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_pen_all_params,
 		.template_size = sizeof(template_pen_all_params),
 		.param_list = params_pen_all,
@@ -169,11 +145,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = expected_pen_all_params,
 	},
 	{
-<<<<<<< HEAD
 		.name = "all_params_present_in_the_frame_template",
-=======
-		.name = "All params present in the frame template",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_frame_all_params,
 		.template_size = sizeof(template_frame_all_params),
 		.param_list = params_frame_all,
@@ -181,11 +153,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = expected_frame_all_params,
 	},
 	{
-<<<<<<< HEAD
 		.name = "some_params_present_in_the_pen_template_with_complete_param_list",
-=======
-		.name = "Some params present in the pen template (complete param list)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_pen_some_params,
 		.template_size = sizeof(template_pen_some_params),
 		.param_list = params_pen_all,
@@ -193,11 +161,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = expected_pen_some_params,
 	},
 	{
-<<<<<<< HEAD
 		.name = "some_params_present_in_the_pen_template_with_incomplete_param_list",
-=======
-		.name = "Some params present in the pen template (incomplete param list)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_pen_some_params,
 		.template_size = sizeof(template_pen_some_params),
 		.param_list = params_pen_some,
@@ -205,11 +169,7 @@ static struct uclogic_template_case uclogic_template_cases[] = {
 		.expected = expected_pen_some_params,
 	},
 	{
-<<<<<<< HEAD
 		.name = "no_params_present_in_the_template",
-=======
-		.name = "No params present in the template",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.template = template_params_none,
 		.template_size = sizeof(template_params_none),
 		.param_list = params_pen_some,
@@ -248,11 +208,7 @@ static struct kunit_case hid_uclogic_rdesc_test_cases[] = {
 };
 
 static struct kunit_suite hid_uclogic_rdesc_test_suite = {
-<<<<<<< HEAD
 	.name = "hid_uclogic_rdesc_test",
-=======
-	.name = "hid-uclogic-rdesc-test",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.test_cases = hid_uclogic_rdesc_test_cases,
 };
 

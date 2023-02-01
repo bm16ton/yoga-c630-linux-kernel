@@ -928,7 +928,6 @@ static struct cpuidle_state adl_l_cstates[] __initdata = {
 		.enter = NULL }
 };
 
-<<<<<<< HEAD
 static struct cpuidle_state adl_n_cstates[] __initdata = {
 	{
 		.name = "C1",
@@ -974,8 +973,6 @@ static struct cpuidle_state adl_n_cstates[] __initdata = {
 		.enter = NULL }
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct cpuidle_state spr_cstates[] __initdata = {
 	{
 		.name = "C1",
@@ -1357,13 +1354,10 @@ static const struct idle_cpu idle_cpu_adl_l __initconst = {
 	.state_table = adl_l_cstates,
 };
 
-<<<<<<< HEAD
 static const struct idle_cpu idle_cpu_adl_n __initconst = {
 	.state_table = adl_n_cstates,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct idle_cpu idle_cpu_spr __initconst = {
 	.state_table = spr_cstates,
 	.disable_promotion_to_c1e = true,
@@ -1434,10 +1428,7 @@ static const struct x86_cpu_id intel_idle_ids[] __initconst = {
 	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D,		&idle_cpu_icx),
 	X86_MATCH_INTEL_FAM6_MODEL(ALDERLAKE,		&idle_cpu_adl),
 	X86_MATCH_INTEL_FAM6_MODEL(ALDERLAKE_L,		&idle_cpu_adl_l),
-<<<<<<< HEAD
 	X86_MATCH_INTEL_FAM6_MODEL(ALDERLAKE_N,		&idle_cpu_adl_n),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	X86_MATCH_INTEL_FAM6_MODEL(SAPPHIRERAPIDS_X,	&idle_cpu_spr),
 	X86_MATCH_INTEL_FAM6_MODEL(XEON_PHI_KNL,	&idle_cpu_knl),
 	X86_MATCH_INTEL_FAM6_MODEL(XEON_PHI_KNM,	&idle_cpu_knl),
@@ -1875,10 +1866,7 @@ static void __init intel_idle_init_cstates_icpu(struct cpuidle_driver *drv)
 		break;
 	case INTEL_FAM6_ALDERLAKE:
 	case INTEL_FAM6_ALDERLAKE_L:
-<<<<<<< HEAD
 	case INTEL_FAM6_ALDERLAKE_N:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adl_idle_state_table_update();
 		break;
 	}

@@ -13,7 +13,6 @@
 
 int hns_roce_fill_res_cq_entry(struct sk_buff *msg, struct ib_cq *ib_cq)
 {
-<<<<<<< HEAD
 	struct hns_roce_cq *hr_cq = to_hr_cq(ib_cq);
 	struct nlattr *table_attr;
 
@@ -102,43 +101,6 @@ int hns_roce_fill_res_qp_entry(struct sk_buff *msg, struct ib_qp *ib_qp)
 		goto err;
 
 	if (rdma_nl_put_driver_u32_hex(msg, "ext_sge_sge_cnt", hr_qp->sge.sge_cnt))
-=======
-	if (rdma_nl_put_driver_u32(msg, "state",
-				   hr_reg_read(context, CQC_ARM_ST)))
-
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "ceqn",
-				   hr_reg_read(context, CQC_CEQN)))
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "cqn",
-				   hr_reg_read(context, CQC_CQN)))
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "hopnum",
-				   hr_reg_read(context, CQC_CQE_HOP_NUM)))
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "pi",
-				   hr_reg_read(context, CQC_CQ_PRODUCER_IDX)))
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "ci",
-				   hr_reg_read(context, CQC_CQ_CONSUMER_IDX)))
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "coalesce",
-				   hr_reg_read(context, CQC_CQ_MAX_CNT)))
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "period",
-				   hr_reg_read(context, CQC_CQ_PERIOD)))
-		goto err;
-
-	if (rdma_nl_put_driver_u32(msg, "cnt",
-				   hr_reg_read(context, CQC_CQE_CNT)))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto err;
 
 	nla_nest_end(msg, table_attr);

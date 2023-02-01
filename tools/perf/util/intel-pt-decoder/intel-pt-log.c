@@ -199,11 +199,8 @@ static int intel_pt_log_open(void)
 		f = fopen(log_name, "w+");
 	else
 		f = stdout;
-<<<<<<< HEAD
 	if (f && intel_pt_dump_log_on_error)
 		f = log_buf__open(&log_buf, f, intel_pt_log_on_error_size);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!f) {
 		intel_pt_enable_logging = false;
 		return -1;

@@ -36,7 +36,6 @@ void virtual_setup_stream_attribute(struct pipe_ctx *pipe_ctx)
 void virtual_reset_stream_encoder(struct pipe_ctx *pipe_ctx)
 {
 }
-<<<<<<< HEAD
 
 static void virtual_disable_link_output(struct dc_link *link,
 	const struct link_resource *link_res,
@@ -44,16 +43,11 @@ static void virtual_disable_link_output(struct dc_link *link,
 {
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct link_hwss virtual_link_hwss = {
 	.setup_stream_encoder = virtual_setup_stream_encoder,
 	.reset_stream_encoder = virtual_reset_stream_encoder,
 	.setup_stream_attribute = virtual_setup_stream_attribute,
-<<<<<<< HEAD
 	.disable_link_output = virtual_disable_link_output,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 const struct link_hwss *get_virtual_link_hwss(void)

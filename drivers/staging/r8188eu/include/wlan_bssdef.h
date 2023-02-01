@@ -133,13 +133,6 @@ struct ndis_802_11_assoc_info {
 	u32  OffsetResponseIEs;
 };
 
-<<<<<<< HEAD
-=======
-enum ndis_802_11_reload_def {
-	Ndis802_11ReloadWEPKeys
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*  Key mapping keys require a BSSID */
 struct ndis_802_11_key {
 	u32           Length;             /*  Length of this structure */

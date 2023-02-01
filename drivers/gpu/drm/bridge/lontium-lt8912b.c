@@ -165,7 +165,6 @@ static int lt8912_write_rxlogicres_config(struct lt8912 *lt)
 	return ret;
 };
 
-<<<<<<< HEAD
 /* enable LVDS output with some hardcoded configuration, not required for the HDMI output */
 static int lt8912_write_lvds_config(struct lt8912 *lt)
 {
@@ -192,36 +191,12 @@ static int lt8912_write_lvds_config(struct lt8912 *lt)
 		{0xa8, 0x13}, // 0x13: JEIDA, 0x33: VESA
 
 		{0x02, 0xf7}, // lvds pll reset
-=======
-static int lt8912_write_lvds_config(struct lt8912 *lt)
-{
-	const struct reg_sequence seq[] = {
-		{0x44, 0x30},
-		{0x51, 0x05},
-		{0x50, 0x24},
-		{0x51, 0x2d},
-		{0x52, 0x04},
-		{0x69, 0x0e},
-		{0x69, 0x8e},
-		{0x6a, 0x00},
-		{0x6c, 0xb8},
-		{0x6b, 0x51},
-		{0x04, 0xfb},
-		{0x04, 0xff},
-		{0x7f, 0x00},
-		{0xa8, 0x13},
-		{0x02, 0xf7},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		{0x02, 0xff},
 		{0x03, 0xcf},
 		{0x03, 0xff},
 	};
 
-<<<<<<< HEAD
 	return regmap_multi_reg_write(lt->regmap[I2C_MAIN], seq, ARRAY_SIZE(seq));
-=======
-	return regmap_multi_reg_write(lt->regmap[I2C_CEC_DSI], seq, ARRAY_SIZE(seq));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct lt8912 *bridge_to_lt8912(struct drm_bridge *b)
@@ -301,11 +276,7 @@ static int lt8912_video_setup(struct lt8912 *lt)
 	u32 hactive, h_total, hpw, hfp, hbp;
 	u32 vactive, v_total, vpw, vfp, vbp;
 	u8 settle = 0x08;
-<<<<<<< HEAD
 	int ret, hsync_activehigh, vsync_activehigh;
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!lt)
 		return -EINVAL;
@@ -315,20 +286,14 @@ static int lt8912_video_setup(struct lt8912 *lt)
 	hpw = lt->mode.hsync_len;
 	hbp = lt->mode.hback_porch;
 	h_total = hactive + hfp + hpw + hbp;
-<<<<<<< HEAD
 	hsync_activehigh = lt->mode.flags & DISPLAY_FLAGS_HSYNC_HIGH;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vactive = lt->mode.vactive;
 	vfp = lt->mode.vfront_porch;
 	vpw = lt->mode.vsync_len;
 	vbp = lt->mode.vback_porch;
 	v_total = vactive + vfp + vpw + vbp;
-<<<<<<< HEAD
 	vsync_activehigh = lt->mode.flags & DISPLAY_FLAGS_VSYNC_HIGH;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (vactive <= 600)
 		settle = 0x04;
@@ -362,7 +327,6 @@ static int lt8912_video_setup(struct lt8912 *lt)
 	ret |= regmap_write(lt->regmap[I2C_CEC_DSI], 0x3e, hfp & 0xff);
 	ret |= regmap_write(lt->regmap[I2C_CEC_DSI], 0x3f, hfp >> 8);
 
-<<<<<<< HEAD
 	ret |= regmap_update_bits(lt->regmap[I2C_MAIN], 0xab, BIT(0),
 				  vsync_activehigh ? BIT(0) : 0);
 	ret |= regmap_update_bits(lt->regmap[I2C_MAIN], 0xab, BIT(1),
@@ -370,8 +334,6 @@ static int lt8912_video_setup(struct lt8912 *lt)
 	ret |= regmap_update_bits(lt->regmap[I2C_MAIN], 0xb2, BIT(0),
 				  lt->connector.display_info.is_hdmi ? BIT(0) : 0);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -769,11 +731,7 @@ err_dt_parse:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void lt8912_remove(struct i2c_client *client)
-=======
-static int lt8912_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct lt8912 *lt = i2c_get_clientdata(client);
 
@@ -781,10 +739,6 @@ static int lt8912_remove(struct i2c_client *client)
 	drm_bridge_remove(&lt->bridge);
 	lt8912_free_i2c(lt);
 	lt8912_put_dt(lt);
-<<<<<<< HEAD
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id lt8912_dt_match[] = {

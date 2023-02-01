@@ -910,7 +910,6 @@ nouveau_connector_late_register(struct drm_connector *connector)
 	ret = nouveau_backlight_init(connector);
 	if (ret)
 		return ret;
-<<<<<<< HEAD
 
 	if (connector->connector_type == DRM_MODE_CONNECTOR_eDP ||
 	    connector->connector_type == DRM_MODE_CONNECTOR_DisplayPort) {
@@ -919,16 +918,6 @@ nouveau_connector_late_register(struct drm_connector *connector)
 			goto backlight_fini;
 	}
 
-=======
-
-	if (connector->connector_type == DRM_MODE_CONNECTOR_eDP ||
-	    connector->connector_type == DRM_MODE_CONNECTOR_DisplayPort) {
-		ret = drm_dp_aux_register(&nouveau_connector(connector)->aux);
-		if (ret)
-			goto backlight_fini;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 backlight_fini:
 	nouveau_backlight_fini(connector);
@@ -1393,11 +1382,7 @@ nouveau_connector_create(struct drm_device *dev,
 			return ERR_PTR(-ENOMEM);
 		}
 		drm_dp_aux_init(&nv_connector->aux);
-<<<<<<< HEAD
 		break;
-=======
-		fallthrough;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		funcs = &nouveau_connector_funcs;
 		break;

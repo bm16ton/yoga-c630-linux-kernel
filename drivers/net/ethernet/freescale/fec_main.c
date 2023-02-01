@@ -158,7 +158,6 @@ static const struct fec_devinfo fec_imx8qm_info = {
 		  FEC_QUIRK_DELAYED_CLKS_SUPPORT,
 };
 
-<<<<<<< HEAD
 static const struct fec_devinfo fec_s32v234_info = {
 	.quirks = FEC_QUIRK_ENET_MAC | FEC_QUIRK_HAS_GBIT |
 		  FEC_QUIRK_HAS_BUFDESC_EX | FEC_QUIRK_HAS_CSUM |
@@ -166,8 +165,6 @@ static const struct fec_devinfo fec_s32v234_info = {
 		  FEC_QUIRK_ERR007885 | FEC_QUIRK_BUG_CAPTURE,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct platform_device_id fec_devtype[] = {
 	{
 		/* keep it for coldfire */
@@ -201,12 +198,9 @@ static struct platform_device_id fec_devtype[] = {
 		.name = "imx8qm-fec",
 		.driver_data = (kernel_ulong_t)&fec_imx8qm_info,
 	}, {
-<<<<<<< HEAD
 		.name = "s32v234-fec",
 		.driver_data = (kernel_ulong_t)&fec_s32v234_info,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* sentinel */
 	}
 };
@@ -222,10 +216,7 @@ enum imx_fec_type {
 	IMX6UL_FEC,
 	IMX8MQ_FEC,
 	IMX8QM_FEC,
-<<<<<<< HEAD
 	S32V234_FEC,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct of_device_id fec_dt_ids[] = {
@@ -238,10 +229,7 @@ static const struct of_device_id fec_dt_ids[] = {
 	{ .compatible = "fsl,imx6ul-fec", .data = &fec_devtype[IMX6UL_FEC], },
 	{ .compatible = "fsl,imx8mq-fec", .data = &fec_devtype[IMX8MQ_FEC], },
 	{ .compatible = "fsl,imx8qm-fec", .data = &fec_devtype[IMX8QM_FEC], },
-<<<<<<< HEAD
 	{ .compatible = "fsl,s32v234-fec", .data = &fec_devtype[S32V234_FEC], },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, fec_dt_ids);
@@ -312,11 +300,8 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
 #define FEC_MMFR_TA		(2 << 16)
 #define FEC_MMFR_DATA(v)	(v & 0xffff)
 /* FEC ECR bits definition */
-#define FEC_ECR_RESET   BIT(0)
-#define FEC_ECR_ETHEREN BIT(1)
-#define FEC_ECR_MAGICEN BIT(2)
-#define FEC_ECR_SLEEP   BIT(3)
-#define FEC_ECR_EN1588  BIT(4)
+#define FEC_ECR_MAGICEN		(1 << 2)
+#define FEC_ECR_SLEEP		(1 << 3)
 
 #define FEC_MII_TIMEOUT		30000 /* us */
 
@@ -1054,9 +1039,6 @@ fec_restart(struct net_device *ndev)
 	u32 temp_mac[2];
 	u32 rcntl = OPT_FRAME_SIZE | 0x04;
 	u32 ecntl = 0x2; /* ETHEREN */
-	struct ptp_clock_request ptp_rq = { .type = PTP_CLK_REQ_PPS };
-
-	fec_ptp_save_state(fep);
 
 	/* Whack a reset.  We should wait for this.
 	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
@@ -1210,14 +1192,7 @@ fec_restart(struct net_device *ndev)
 	}
 
 	if (fep->bufdesc_ex)
-		ecntl |= FEC_ECR_EN1588;
-
-	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
-	    fep->rgmii_txc_dly)
-		ecntl |= FEC_ENET_TXC_DLY;
-	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
-	    fep->rgmii_rxc_dly)
-		ecntl |= FEC_ENET_RXC_DLY;
+		ecntl |= (1 << 4);
 
 	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
 	    fep->rgmii_txc_dly)
@@ -1237,14 +1212,6 @@ fec_restart(struct net_device *ndev)
 
 	if (fep->bufdesc_ex)
 		fec_ptp_start_cyclecounter(ndev);
-
-	/* Restart PPS if needed */
-	if (fep->pps_enable) {
-		/* Clear flag so fec_ptp_enable_pps() doesn't return immediately */
-		fep->pps_enable = 0;
-		fec_ptp_restore_state(fep);
-		fep->ptp_caps.enable(&fep->ptp_caps, &ptp_rq, 1);
-	}
 
 	/* Enable interrupts we wish to service */
 	if (fep->link)
@@ -1326,8 +1293,6 @@ fec_stop(struct net_device *ndev)
 	struct fec_enet_private *fep = netdev_priv(ndev);
 	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
 	u32 val;
-	struct ptp_clock_request ptp_rq = { .type = PTP_CLK_REQ_PPS };
-	u32 ecntl = 0;
 
 	/* We cannot expect a graceful transmit stop without link !!! */
 	if (fep->link) {
@@ -1336,8 +1301,6 @@ fec_stop(struct net_device *ndev)
 		if (!(readl(fep->hwp + FEC_IEVENT) & FEC_ENET_GRA))
 			netdev_err(ndev, "Graceful transmit stop did not complete!\n");
 	}
-
-	fec_ptp_save_state(fep);
 
 	/* Whack a reset.  We should wait for this.
 	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
@@ -1357,31 +1320,12 @@ fec_stop(struct net_device *ndev)
 	}
 	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
 	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
-<<<<<<< HEAD
-=======
-
-	if (fep->bufdesc_ex)
-		ecntl |= FEC_ECR_EN1588;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* We have to keep ENET enabled to have MII interrupt stay working */
 	if (fep->quirks & FEC_QUIRK_ENET_MAC &&
 		!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
-		ecntl |= FEC_ECR_ETHEREN;
+		writel(2, fep->hwp + FEC_ECNTRL);
 		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
-	}
-
-	writel(ecntl, fep->hwp + FEC_ECNTRL);
-
-	if (fep->bufdesc_ex)
-		fec_ptp_start_cyclecounter(ndev);
-
-	/* Restart PPS if needed */
-	if (fep->pps_enable) {
-		/* Clear flag so fec_ptp_enable_pps() doesn't return immediately */
-		fep->pps_enable = 0;
-		fec_ptp_restore_state(fep);
-		fep->ptp_caps.enable(&fep->ptp_caps, &ptp_rq, 1);
 	}
 }
 
@@ -2144,7 +2088,6 @@ static void fec_enet_phy_reset_after_clk_enable(struct net_device *ndev)
 static int fec_enet_clk_enable(struct net_device *ndev, bool enable)
 {
 	struct fec_enet_private *fep = netdev_priv(ndev);
-	unsigned long flags;
 	int ret;
 
 	if (enable) {
@@ -2153,15 +2096,15 @@ static int fec_enet_clk_enable(struct net_device *ndev, bool enable)
 			return ret;
 
 		if (fep->clk_ptp) {
-			spin_lock_irqsave(&fep->tmreg_lock, flags);
+			mutex_lock(&fep->ptp_clk_mutex);
 			ret = clk_prepare_enable(fep->clk_ptp);
 			if (ret) {
-				spin_unlock_irqrestore(&fep->tmreg_lock, flags);
+				mutex_unlock(&fep->ptp_clk_mutex);
 				goto failed_clk_ptp;
 			} else {
 				fep->ptp_clk_on = true;
 			}
-			spin_unlock_irqrestore(&fep->tmreg_lock, flags);
+			mutex_unlock(&fep->ptp_clk_mutex);
 		}
 
 		ret = clk_prepare_enable(fep->clk_ref);
@@ -2176,10 +2119,10 @@ static int fec_enet_clk_enable(struct net_device *ndev, bool enable)
 	} else {
 		clk_disable_unprepare(fep->clk_enet_out);
 		if (fep->clk_ptp) {
-			spin_lock_irqsave(&fep->tmreg_lock, flags);
+			mutex_lock(&fep->ptp_clk_mutex);
 			clk_disable_unprepare(fep->clk_ptp);
 			fep->ptp_clk_on = false;
-			spin_unlock_irqrestore(&fep->tmreg_lock, flags);
+			mutex_unlock(&fep->ptp_clk_mutex);
 		}
 		clk_disable_unprepare(fep->clk_ref);
 		clk_disable_unprepare(fep->clk_2x_txclk);
@@ -2192,10 +2135,10 @@ failed_clk_2x_txclk:
 		clk_disable_unprepare(fep->clk_ref);
 failed_clk_ref:
 	if (fep->clk_ptp) {
-		spin_lock_irqsave(&fep->tmreg_lock, flags);
+		mutex_lock(&fep->ptp_clk_mutex);
 		clk_disable_unprepare(fep->clk_ptp);
 		fep->ptp_clk_on = false;
-		spin_unlock_irqrestore(&fep->tmreg_lock, flags);
+		mutex_unlock(&fep->ptp_clk_mutex);
 	}
 failed_clk_ptp:
 	clk_disable_unprepare(fep->clk_enet_out);
@@ -2921,22 +2864,6 @@ static int fec_enet_set_coalesce(struct net_device *ndev,
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-static void fec_enet_itr_coal_init(struct net_device *ndev)
-{
-	struct ethtool_coalesce ec;
-
-	ec.rx_coalesce_usecs = FEC_ITR_ICTT_DEFAULT;
-	ec.rx_max_coalesced_frames = FEC_ITR_ICFT_DEFAULT;
-
-	ec.tx_coalesce_usecs = FEC_ITR_ICTT_DEFAULT;
-	ec.tx_max_coalesced_frames = FEC_ITR_ICFT_DEFAULT;
-
-	fec_enet_set_coalesce(ndev, &ec, NULL, NULL);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int fec_enet_get_tunable(struct net_device *netdev,
 				const struct ethtool_tunable *tuna,
 				void *data)
@@ -3273,13 +3200,8 @@ fec_enet_alloc_rxq_buffers(struct net_device *ndev, unsigned int queue)
 	}
 
 	for (i = 0; i < rxq->bd.ring_size; i++) {
-<<<<<<< HEAD
 		page = page_pool_dev_alloc_pages(rxq->page_pool);
 		if (!page)
-=======
-		skb = __netdev_alloc_skb(ndev, FEC_ENET_RX_FRSIZE, GFP_KERNEL);
-		if (!skb)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto err_alloc;
 
 		phys_addr = page_pool_get_dma_addr(page) + FEC_ENET_XDP_HEADROOM;
@@ -4088,7 +4010,7 @@ fec_probe(struct platform_device *pdev)
 	}
 
 	fep->ptp_clk_on = false;
-	spin_lock_init(&fep->tmreg_lock);
+	mutex_init(&fep->ptp_clk_mutex);
 
 	/* clk_ref is optional, depends on board */
 	fep->clk_ref = devm_clk_get_optional(&pdev->dev, "enet_clk_ref");
@@ -4299,7 +4221,6 @@ static int __maybe_unused fec_suspend(struct device *dev)
 		}
 		/* It's safe to disable clocks since interrupts are masked */
 		fec_enet_clk_enable(ndev, false);
-<<<<<<< HEAD
 
 		fep->rpm_active = !pm_runtime_status_suspended(dev);
 		if (fep->rpm_active) {
@@ -4309,8 +4230,6 @@ static int __maybe_unused fec_suspend(struct device *dev)
 				return ret;
 			}
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	rtnl_unlock();
 

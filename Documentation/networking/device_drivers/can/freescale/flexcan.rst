@@ -5,11 +5,7 @@ Flexcan CAN Controller driver
 =============================
 
 Authors: Marc Kleine-Budde <mkl@pengutronix.de>,
-<<<<<<< HEAD
 Dario Binacchi <dario.binacchi@amarulasolutions.com>
-=======
-Dario Binacchi <dario.binacchi@amarula.solutions.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 On/off RTR frames reception
 ===========================

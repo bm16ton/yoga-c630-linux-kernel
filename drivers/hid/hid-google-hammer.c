@@ -608,10 +608,6 @@ static struct hid_driver hammer_driver = {
 	.probe = hammer_probe,
 	.remove = hammer_remove,
 	.feature_mapping = vivaldi_feature_mapping,
-<<<<<<< HEAD
-=======
-	.input_configured = vivaldi_input_configured,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.input_mapping = hammer_input_mapping,
 	.event = hammer_event,
 	.driver = {

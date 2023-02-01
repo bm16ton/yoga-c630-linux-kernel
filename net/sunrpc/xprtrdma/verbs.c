@@ -372,11 +372,7 @@ static int rpcrdma_ep_create(struct rpcrdma_xprt *r_xprt)
 	struct rpcrdma_ep *ep;
 	int rc;
 
-<<<<<<< HEAD
 	ep = kzalloc(sizeof(*ep), XPRTRDMA_GFP_FLAGS);
-=======
-	ep = kzalloc(sizeof(*ep), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ep)
 		return -ENOTCONN;
 	ep->re_xprt = &r_xprt->rx_xprt;
@@ -751,12 +747,8 @@ rpcrdma_mrs_create(struct rpcrdma_xprt *r_xprt)
 		struct rpcrdma_mr *mr;
 		int rc;
 
-<<<<<<< HEAD
 		mr = kzalloc_node(sizeof(*mr), XPRTRDMA_GFP_FLAGS,
 				  ibdev_to_node(device));
-=======
-		mr = kzalloc(sizeof(*mr), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!mr)
 			break;
 

@@ -21,10 +21,7 @@ enum m10bmc_type {
 
 static struct mfd_cell m10bmc_d5005_subdevs[] = {
 	{ .name = "d5005bmc-hwmon" },
-<<<<<<< HEAD
 	{ .name = "d5005bmc-sec-update" }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct mfd_cell m10bmc_pacn3000_subdevs[] = {

@@ -1294,10 +1294,6 @@ static bool cfg80211_ir_permissive_chan(struct wiphy *wiphy,
 
 	lockdep_assert_held(&rdev->wiphy.mtx);
 
-	return true;
-
-
-
 	if (!IS_ENABLED(CONFIG_CFG80211_REG_RELAX_NO_IR) ||
 	    !(wiphy->regulatory_flags & REGULATORY_ENABLE_RELAX_NO_IR))
 		return false;
@@ -1347,8 +1343,15 @@ static bool _cfg80211_reg_can_beacon(struct wiphy *wiphy,
 
 	trace_cfg80211_reg_can_beacon(wiphy, chandef, iftype, check_no_ir);
 
+	if (check_no_ir)
+		prohibited_flags |= IEEE80211_CHAN_NO_IR;
 
-	
+	if (cfg80211_chandef_dfs_required(wiphy, chandef, iftype) > 0 &&
+	    cfg80211_chandef_dfs_available(wiphy, chandef)) {
+		/* We can skip IEEE80211_CHAN_NO_IR if chandef dfs available */
+		prohibited_flags = IEEE80211_CHAN_DISABLED;
+	}
+
 	res = cfg80211_chandef_usable(wiphy, chandef, prohibited_flags);
 
 	trace_cfg80211_return_bool(res);

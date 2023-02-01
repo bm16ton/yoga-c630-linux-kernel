@@ -3222,48 +3222,6 @@ struct blk_mq_ops dasd_mq_ops = {
 	.exit_hctx = dasd_exit_hctx,
 };
 
-<<<<<<< HEAD
-=======
-/*
- * Allocate and initialize request queue and default I/O scheduler.
- */
-static int dasd_alloc_queue(struct dasd_block *block)
-{
-	int rc;
-
-	block->tag_set.ops = &dasd_mq_ops;
-	block->tag_set.cmd_size = sizeof(struct dasd_ccw_req);
-	block->tag_set.nr_hw_queues = nr_hw_queues;
-	block->tag_set.queue_depth = queue_depth;
-	block->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-	block->tag_set.numa_node = NUMA_NO_NODE;
-
-	rc = blk_mq_alloc_tag_set(&block->tag_set);
-	if (rc)
-		return rc;
-
-	block->request_queue = blk_mq_init_queue(&block->tag_set);
-	if (IS_ERR(block->request_queue))
-		return PTR_ERR(block->request_queue);
-
-	block->request_queue->queuedata = block;
-
-	return 0;
-}
-
-/*
- * Deactivate and free request queue.
- */
-static void dasd_free_queue(struct dasd_block *block)
-{
-	if (block->request_queue) {
-		blk_mq_destroy_queue(block->request_queue);
-		blk_mq_free_tag_set(&block->tag_set);
-		block->request_queue = NULL;
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int dasd_open(struct block_device *bdev, fmode_t mode)
 {
 	struct dasd_device *base;

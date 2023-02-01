@@ -379,21 +379,12 @@ err_remove_bridge:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void dlpc3433_remove(struct i2c_client *client)
-=======
-static int dlpc3433_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dlpc *dlpc = i2c_get_clientdata(client);
 
 	drm_bridge_remove(&dlpc->bridge);
 	of_node_put(dlpc->host_node);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id dlpc3433_id[] = {

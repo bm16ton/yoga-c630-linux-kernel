@@ -13,17 +13,10 @@
  * If there is not enough space to store Idle and Young bits in page flags, use
  * page ext flags instead.
  */
-<<<<<<< HEAD
 static inline bool folio_test_young(struct folio *folio)
 {
 	struct page_ext *page_ext = page_ext_get(&folio->page);
 	bool page_young;
-=======
-
-static inline bool folio_test_young(struct folio *folio)
-{
-	struct page_ext *page_ext = lookup_page_ext(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!page_ext))
 		return false;
@@ -36,11 +29,7 @@ static inline bool folio_test_young(struct folio *folio)
 
 static inline void folio_set_young(struct folio *folio)
 {
-<<<<<<< HEAD
 	struct page_ext *page_ext = page_ext_get(&folio->page);
-=======
-	struct page_ext *page_ext = lookup_page_ext(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!page_ext))
 		return;
@@ -51,12 +40,8 @@ static inline void folio_set_young(struct folio *folio)
 
 static inline bool folio_test_clear_young(struct folio *folio)
 {
-<<<<<<< HEAD
 	struct page_ext *page_ext = page_ext_get(&folio->page);
 	bool page_young;
-=======
-	struct page_ext *page_ext = lookup_page_ext(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!page_ext))
 		return false;
@@ -69,12 +54,8 @@ static inline bool folio_test_clear_young(struct folio *folio)
 
 static inline bool folio_test_idle(struct folio *folio)
 {
-<<<<<<< HEAD
 	struct page_ext *page_ext = page_ext_get(&folio->page);
 	bool page_idle;
-=======
-	struct page_ext *page_ext = lookup_page_ext(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!page_ext))
 		return false;
@@ -87,11 +68,7 @@ static inline bool folio_test_idle(struct folio *folio)
 
 static inline void folio_set_idle(struct folio *folio)
 {
-<<<<<<< HEAD
 	struct page_ext *page_ext = page_ext_get(&folio->page);
-=======
-	struct page_ext *page_ext = lookup_page_ext(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!page_ext))
 		return;
@@ -102,11 +79,7 @@ static inline void folio_set_idle(struct folio *folio)
 
 static inline void folio_clear_idle(struct folio *folio)
 {
-<<<<<<< HEAD
 	struct page_ext *page_ext = page_ext_get(&folio->page);
-=======
-	struct page_ext *page_ext = lookup_page_ext(&folio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!page_ext))
 		return;
@@ -128,26 +101,15 @@ static inline void folio_set_young(struct folio *folio)
 }
 
 static inline bool folio_test_clear_young(struct folio *folio)
-<<<<<<< HEAD
 {
 	return false;
 }
 
 static inline bool folio_test_idle(struct folio *folio)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return false;
 }
 
-<<<<<<< HEAD
-=======
-static inline bool folio_test_idle(struct folio *folio)
-{
-	return false;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void folio_set_idle(struct folio *folio)
 {
 }

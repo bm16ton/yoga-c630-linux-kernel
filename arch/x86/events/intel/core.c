@@ -2102,7 +2102,6 @@ static struct extra_reg intel_tnt_extra_regs[] __read_mostly = {
 	EVENT_EXTRA_END
 };
 
-<<<<<<< HEAD
 EVENT_ATTR_STR(mem-loads,	mem_ld_grt,	"event=0xd0,umask=0x5,ldlat=3");
 EVENT_ATTR_STR(mem-stores,	mem_st_grt,	"event=0xd0,umask=0x6");
 
@@ -2112,8 +2111,6 @@ static struct attribute *grt_mem_attrs[] = {
 	NULL
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct extra_reg intel_grt_extra_regs[] __read_mostly = {
 	/* must define OFFCORE_RSP_X first, see intel_fixup_er() */
 	INTEL_UEVENT_EXTRA_REG(0x01b7, MSR_OFFCORE_RSP_0, 0x3fffffffffull, RSP_0),
@@ -2538,11 +2535,8 @@ static int adl_set_topdown_event_period(struct perf_event *event)
 	return icl_set_topdown_event_period(event);
 }
 
-<<<<<<< HEAD
 DEFINE_STATIC_CALL(intel_pmu_set_topdown_event_period, x86_perf_event_set_period);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline u64 icl_get_metrics_event_value(u64 metric, u64 slots, int idx)
 {
 	u32 val;
@@ -2693,10 +2687,7 @@ static u64 adl_update_topdown_event(struct perf_event *event)
 	return icl_update_topdown_event(event);
 }
 
-<<<<<<< HEAD
 DEFINE_STATIC_CALL(intel_pmu_update_topdown_event, x86_perf_event_update);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void intel_pmu_read_topdown_event(struct perf_event *event)
 {
@@ -6390,15 +6381,9 @@ __init int intel_pmu_init(void)
 
 	case INTEL_FAM6_ALDERLAKE:
 	case INTEL_FAM6_ALDERLAKE_L:
-<<<<<<< HEAD
 	case INTEL_FAM6_RAPTORLAKE:
 	case INTEL_FAM6_RAPTORLAKE_P:
 	case INTEL_FAM6_RAPTORLAKE_S:
-=======
-	case INTEL_FAM6_ALDERLAKE_N:
-	case INTEL_FAM6_RAPTORLAKE:
-	case INTEL_FAM6_RAPTORLAKE_P:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Alder Lake has 2 types of CPU, core and atom.
 		 *
@@ -6423,15 +6408,10 @@ __init int intel_pmu_init(void)
 		intel_pmu_pebs_data_source_adl();
 		x86_pmu.pebs_latency_data = adl_latency_data_small;
 		x86_pmu.num_topdown_events = 8;
-<<<<<<< HEAD
 		static_call_update(intel_pmu_update_topdown_event,
 				   &adl_update_topdown_event);
 		static_call_update(intel_pmu_set_topdown_event_period,
 				   &adl_set_topdown_event_period);
-=======
-		x86_pmu.update_topdown_event = adl_update_topdown_event;
-		x86_pmu.set_topdown_event_period = adl_set_topdown_event_period;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		x86_pmu.filter_match = intel_pmu_filter_match;
 		x86_pmu.get_event_constraints = adl_get_event_constraints;
@@ -6566,17 +6546,10 @@ __init int intel_pmu_init(void)
 		hybrid_group_events_mem.attrs = mem_attr;
 		hybrid_group_events_tsx.attrs = tsx_attr;
 		hybrid_group_format_extra.attrs = extra_attr;
-<<<<<<< HEAD
 
 		x86_pmu.attr_update = hybrid_attr_update;
 	}
 
-=======
-
-		x86_pmu.attr_update = hybrid_attr_update;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	intel_pmu_check_num_counters(&x86_pmu.num_counters,
 				     &x86_pmu.num_counters_fixed,
 				     &x86_pmu.intel_ctrl,

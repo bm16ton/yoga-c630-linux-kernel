@@ -193,26 +193,6 @@ static int mpfs_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-static inline struct clk *mpfs_rtc_init_clk(struct device *dev)
-{
-	struct clk *clk;
-	int ret;
-
-	clk = devm_clk_get(dev, "rtc");
-	if (IS_ERR(clk))
-		return clk;
-
-	ret = clk_prepare_enable(clk);
-	if (ret)
-		return ERR_PTR(ret);
-
-	devm_add_action_or_reset(dev, (void (*) (void *))clk_disable_unprepare, clk);
-	return clk;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static irqreturn_t mpfs_rtc_wakeup_irq_handler(int irq, void *dev)
 {
 	struct mpfs_rtc_dev *rtcdev = dev;
@@ -236,11 +216,7 @@ static int mpfs_rtc_probe(struct platform_device *pdev)
 {
 	struct mpfs_rtc_dev *rtcdev;
 	struct clk *clk;
-<<<<<<< HEAD
 	unsigned long prescaler;
-=======
-	u32 prescaler;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int wakeup_irq, ret;
 
 	rtcdev = devm_kzalloc(&pdev->dev, sizeof(struct mpfs_rtc_dev), GFP_KERNEL);
@@ -258,11 +234,7 @@ static int mpfs_rtc_probe(struct platform_device *pdev)
 	/* range is capped by alarm max, lower reg is 31:0 & upper is 10:0 */
 	rtcdev->rtc->range_max = GENMASK_ULL(42, 0);
 
-<<<<<<< HEAD
 	clk = devm_clk_get_enabled(&pdev->dev, "rtc");
-=======
-	clk = mpfs_rtc_init_clk(&pdev->dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(clk))
 		return PTR_ERR(clk);
 
@@ -286,23 +258,13 @@ static int mpfs_rtc_probe(struct platform_device *pdev)
 
 	/* prescaler hardware adds 1 to reg value */
 	prescaler = clk_get_rate(devm_clk_get(&pdev->dev, "rtcref")) - 1;
-<<<<<<< HEAD
 	if (prescaler > MAX_PRESCALER_COUNT) {
 		dev_dbg(&pdev->dev, "invalid prescaler %lu\n", prescaler);
-=======
-
-	if (prescaler > MAX_PRESCALER_COUNT) {
-		dev_dbg(&pdev->dev, "invalid prescaler %d\n", prescaler);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 	}
 
 	writel(prescaler, rtcdev->base + PRESCALER_REG);
-<<<<<<< HEAD
 	dev_info(&pdev->dev, "prescaler set to: %lu\n", prescaler);
-=======
-	dev_info(&pdev->dev, "prescaler set to: 0x%X \r\n", prescaler);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	device_init_wakeup(&pdev->dev, true);
 	ret = dev_pm_set_wake_irq(&pdev->dev, wakeup_irq);

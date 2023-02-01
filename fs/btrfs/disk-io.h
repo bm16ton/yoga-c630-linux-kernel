@@ -108,11 +108,7 @@ static inline struct btrfs_root *btrfs_grab_root(struct btrfs_root *root)
 
 static inline struct btrfs_root *btrfs_block_group_root(struct btrfs_fs_info *fs_info)
 {
-<<<<<<< HEAD
 	if (btrfs_fs_compat_ro(fs_info, BLOCK_GROUP_TREE))
-=======
-	if (btrfs_fs_incompat(fs_info, EXTENT_TREE_V2))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return fs_info->block_group_root;
 	return btrfs_extent_root(fs_info, 0);
 }

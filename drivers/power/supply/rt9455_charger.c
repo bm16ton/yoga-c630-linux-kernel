@@ -1715,11 +1715,6 @@ static void rt9455_remove(struct i2c_client *client)
 	cancel_delayed_work_sync(&info->pwr_rdy_work);
 	cancel_delayed_work_sync(&info->max_charging_time_work);
 	cancel_delayed_work_sync(&info->batt_presence_work);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id rt9455_i2c_id_table[] = {

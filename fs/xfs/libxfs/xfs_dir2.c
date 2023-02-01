@@ -357,11 +357,7 @@ xfs_dir_lookup(
 {
 	struct xfs_da_args	*args;
 	int			rval;
-<<<<<<< HEAD
 	bool			v;
-=======
-	int			v;	  /* type-checking value */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int			lock_mode;
 
 	ASSERT(S_ISDIR(VFS_I(dp)->i_mode));
@@ -620,7 +616,6 @@ xfs_dir2_isblock(
 	xfs_fileoff_t		eof;
 	int			error;
 
-<<<<<<< HEAD
 	error = xfs_bmap_last_offset(args->dp, &eof, XFS_DATA_FORK);
 	if (error)
 		return error;
@@ -631,14 +626,6 @@ xfs_dir2_isblock(
 
 	*isblock = true;
 	if (XFS_IS_CORRUPT(mp, args->dp->i_disk_size != args->geo->blksize))
-=======
-	if ((rval = xfs_bmap_last_offset(args->dp, &last, XFS_DATA_FORK)))
-		return rval;
-	rval = XFS_FSB_TO_B(args->dp->i_mount, last) == args->geo->blksize;
-	if (XFS_IS_CORRUPT(args->dp->i_mount,
-			   rval != 0 &&
-			   args->dp->i_disk_size != args->geo->blksize))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFSCORRUPTED;
 	return 0;
 }

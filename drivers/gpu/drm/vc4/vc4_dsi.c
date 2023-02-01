@@ -1576,7 +1576,6 @@ static void vc4_dsi_dma_chan_release(void *ptr)
 	dsi->reg_dma_chan = NULL;
 }
 
-<<<<<<< HEAD
 static void vc4_dsi_release(struct kref *kref)
 {
 	struct vc4_dsi *dsi =
@@ -1602,14 +1601,11 @@ static void vc4_dsi_release_action(struct drm_device *drm, void *ptr)
 	vc4_dsi_put(dsi);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
 {
 	struct platform_device *pdev = to_platform_device(dev);
 	struct drm_device *drm = dev_get_drvdata(master);
 	struct vc4_dsi *dsi = dev_get_drvdata(dev);
-<<<<<<< HEAD
 	struct drm_encoder *encoder = &dsi->encoder.base;
 	int ret;
 
@@ -1618,25 +1614,12 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
 	ret = drmm_add_action_or_reset(drm, vc4_dsi_release_action, dsi);
 	if (ret)
 		return ret;
-=======
-	struct vc4_dsi_encoder *vc4_dsi_encoder;
-	int ret;
-
-	dsi->variant = of_device_get_match_data(dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dsi->variant = of_device_get_match_data(dev);
 
 	INIT_LIST_HEAD(&dsi->bridge_chain);
-<<<<<<< HEAD
 	dsi->encoder.type = dsi->variant->port ?
 		VC4_ENCODER_TYPE_DSI1 : VC4_ENCODER_TYPE_DSI0;
-=======
-	vc4_dsi_encoder->base.type = dsi->variant->port ?
-			VC4_ENCODER_TYPE_DSI1 : VC4_ENCODER_TYPE_DSI0;
-	vc4_dsi_encoder->dsi = dsi;
-	dsi->encoder = &vc4_dsi_encoder->base.base;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dsi->regs = vc4_ioremap_regs(pdev, 0);
 	if (IS_ERR(dsi->regs))
@@ -1740,11 +1723,7 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
 		return ret;
 	}
 
-<<<<<<< HEAD
 	dsi->bridge = drmm_of_get_bridge(drm, dev->of_node, 0, 0);
-=======
-	dsi->bridge = devm_drm_of_get_bridge(dev, dev->of_node, 0, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(dsi->bridge))
 		return PTR_ERR(dsi->bridge);
 
@@ -1766,7 +1745,6 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	drm_encoder_helper_add(encoder, &vc4_dsi_encoder_helper_funcs);
 
 	ret = devm_pm_runtime_enable(dev);
@@ -1774,9 +1752,6 @@ static int vc4_dsi_bind(struct device *dev, struct device *master, void *data)
 		return ret;
 
 	ret = drm_bridge_attach(encoder, dsi->bridge, NULL, 0);
-=======
-	ret = drm_bridge_attach(dsi->encoder, dsi->bridge, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 	/* Disable the atomic helper calls into the bridge.  We
@@ -1793,12 +1768,7 @@ static void vc4_dsi_unbind(struct device *dev, struct device *master,
 			   void *data)
 {
 	struct vc4_dsi *dsi = dev_get_drvdata(dev);
-<<<<<<< HEAD
 	struct drm_encoder *encoder = &dsi->encoder.base;
-=======
-
-	pm_runtime_disable(dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Restore the bridge_chain so the bridge detach procedure can happen
@@ -1837,11 +1807,8 @@ static int vc4_dsi_dev_remove(struct platform_device *pdev)
 	struct vc4_dsi *dsi = dev_get_drvdata(dev);
 
 	mipi_dsi_host_unregister(&dsi->dsi_host);
-<<<<<<< HEAD
 	vc4_dsi_put(dsi);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

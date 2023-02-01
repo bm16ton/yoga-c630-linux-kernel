@@ -16,11 +16,7 @@
 
 #include "hisi_acc_vfio_pci.h"
 
-<<<<<<< HEAD
 /* Return 0 on VM acc device ready, -ETIMEDOUT hardware timeout */
-=======
-/* return 0 on VM acc device ready, -ETIMEDOUT hardware timeout */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int qm_wait_dev_not_ready(struct hisi_qm *qm)
 {
 	u32 val;
@@ -193,11 +189,7 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
 	struct device *dev = &qm->pdev->dev;
 	int ret;
 
-<<<<<<< HEAD
 	/* Check VF state */
-=======
-	/* check VF state */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(hisi_qm_wait_mb_ready(qm))) {
 		dev_err(&qm->pdev->dev, "QM device is not ready to write\n");
 		return -EBUSY;
@@ -345,20 +337,7 @@ static int vf_qm_cache_wb(struct hisi_qm *qm)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void vf_qm_fun_reset(struct hisi_qm *qm)
-=======
-static struct hisi_acc_vf_core_device *hssi_acc_drvdata(struct pci_dev *pdev)
-{
-	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
-
-	return container_of(core_device, struct hisi_acc_vf_core_device,
-			    core_device);
-}
-
-static void vf_qm_fun_reset(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-			    struct hisi_qm *qm)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int i;
 
@@ -394,11 +373,7 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	/* VF qp num check */
-=======
-	/* vf qp num check */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = qm_get_vft(vf_qm, &vf_qm->qp_base);
 	if (ret <= 0) {
 		dev_err(dev, "failed to get vft qp nums\n");
@@ -412,11 +387,7 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 
 	vf_qm->qp_num = ret;
 
-<<<<<<< HEAD
 	/* VF isolation state check */
-=======
-	/* vf isolation state check */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = qm_read_regs(pf_qm, QM_QUE_ISO_CFG_V, &que_iso_state, 1);
 	if (ret) {
 		dev_err(dev, "failed to read QM_QUE_ISO_CFG_V\n");
@@ -425,11 +396,7 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 
 	if (vf_data->que_iso_cfg != que_iso_state) {
 		dev_err(dev, "failed to match isolation state\n");
-<<<<<<< HEAD
 		return -EINVAL;
-=======
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ret = qm_write_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state, 1);
@@ -451,17 +418,10 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 	int ret;
 
 	vf_data->acc_magic = ACC_DEV_MAGIC;
-<<<<<<< HEAD
 	/* Save device id */
 	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
 
 	/* VF qp num save from PF */
-=======
-	/* save device id */
-	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
-
-	/* vf qp num save from PF */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = pf_qm_get_qp_num(pf_qm, vf_id, &vf_data->qp_base);
 	if (ret <= 0) {
 		dev_err(dev, "failed to get vft qp nums!\n");
@@ -505,31 +465,19 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 
 	ret = qm_set_regs(qm, vf_data);
 	if (ret) {
-<<<<<<< HEAD
 		dev_err(dev, "set VF regs failed\n");
-=======
-		dev_err(dev, "Set VF regs failed\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 
 	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
 	if (ret) {
-<<<<<<< HEAD
 		dev_err(dev, "set sqc failed\n");
-=======
-		dev_err(dev, "Set sqc failed\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 
 	ret = hisi_qm_mb(qm, QM_MB_CMD_CQC_BT, qm->cqc_dma, 0, 0);
 	if (ret) {
-<<<<<<< HEAD
 		dev_err(dev, "set cqc failed\n");
-=======
-		dev_err(dev, "Set cqc failed\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 
@@ -571,21 +519,12 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 		return -EINVAL;
 
 	/* Every reg is 32 bit, the dma address is 64 bit. */
-<<<<<<< HEAD
 	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
 	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
 	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
 	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
 	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
 	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
-=======
-	vf_data->eqe_dma = vf_data->qm_eqc_dw[2];
-	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
-	vf_data->eqe_dma |= vf_data->qm_eqc_dw[1];
-	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[2];
-	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
-	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[1];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
 	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
@@ -604,7 +543,6 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 	return 0;
 }
 
-<<<<<<< HEAD
 static struct hisi_acc_vf_core_device *hisi_acc_drvdata(struct pci_dev *pdev)
 {
 	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
@@ -613,8 +551,6 @@ static struct hisi_acc_vf_core_device *hisi_acc_drvdata(struct pci_dev *pdev)
 			    core_device);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Check the PF's RAS state and Function INT state */
 static int
 hisi_acc_check_int_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
@@ -725,14 +661,10 @@ static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vd
 	if (hisi_acc_vdev->vf_qm_state != QM_READY)
 		return;
 
-<<<<<<< HEAD
 	/* Make sure the device is enabled */
 	qm_dev_cmd_init(vf_qm);
 
 	vf_qm_fun_reset(vf_qm);
-=======
-	vf_qm_fun_reset(hisi_acc_vdev, vf_qm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int hisi_acc_vf_load_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
@@ -1040,11 +972,7 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
 
 static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
 {
-<<<<<<< HEAD
 	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_drvdata(pdev);
-=======
-	struct hisi_acc_vf_core_device *hisi_acc_vdev = hssi_acc_drvdata(pdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
 				VFIO_MIGRATION_STOP_COPY)
@@ -1287,7 +1215,6 @@ static const struct vfio_migration_ops hisi_acc_vfio_pci_migrn_state_ops = {
 	.migration_get_state = hisi_acc_vfio_pci_get_device_state,
 };
 
-<<<<<<< HEAD
 static int hisi_acc_vfio_pci_migrn_init_dev(struct vfio_device *core_vdev)
 {
 	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(core_vdev,
@@ -1310,10 +1237,6 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
 	.name = "hisi-acc-vfio-pci-migration",
 	.init = hisi_acc_vfio_pci_migrn_init_dev,
 	.release = vfio_pci_core_release_dev,
-=======
-static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
-	.name = "hisi-acc-vfio-pci-migration",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.open_device = hisi_acc_vfio_pci_open_device,
 	.close_device = hisi_acc_vfio_pci_close_device,
 	.ioctl = hisi_acc_vfio_pci_ioctl,
@@ -1327,11 +1250,8 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
 
 static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
 	.name = "hisi-acc-vfio-pci",
-<<<<<<< HEAD
 	.init = vfio_pci_core_init_dev,
 	.release = vfio_pci_core_release_dev,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.open_device = hisi_acc_vfio_pci_open_device,
 	.close_device = vfio_pci_core_close_device,
 	.ioctl = vfio_pci_core_ioctl,
@@ -1343,7 +1263,6 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
 	.match = vfio_pci_core_match,
 };
 
-<<<<<<< HEAD
 static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
 	struct hisi_acc_vf_core_device *hisi_acc_vdev;
@@ -1374,82 +1293,15 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
 
 out_put_vdev:
 	vfio_put_device(&hisi_acc_vdev->core_device.vdev);
-=======
-static int
-hisi_acc_vfio_pci_migrn_init(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-			     struct pci_dev *pdev, struct hisi_qm *pf_qm)
-{
-	int vf_id;
-
-	vf_id = pci_iov_vf_id(pdev);
-	if (vf_id < 0)
-		return vf_id;
-
-	hisi_acc_vdev->vf_id = vf_id + 1;
-	hisi_acc_vdev->core_device.vdev.migration_flags =
-					VFIO_MIGRATION_STOP_COPY;
-	hisi_acc_vdev->pf_qm = pf_qm;
-	hisi_acc_vdev->vf_dev = pdev;
-	mutex_init(&hisi_acc_vdev->state_mutex);
-
-	return 0;
-}
-
-static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-{
-	struct hisi_acc_vf_core_device *hisi_acc_vdev;
-	struct hisi_qm *pf_qm;
-	int ret;
-
-	hisi_acc_vdev = kzalloc(sizeof(*hisi_acc_vdev), GFP_KERNEL);
-	if (!hisi_acc_vdev)
-		return -ENOMEM;
-
-	pf_qm = hisi_acc_get_pf_qm(pdev);
-	if (pf_qm && pf_qm->ver >= QM_HW_V3) {
-		ret = hisi_acc_vfio_pci_migrn_init(hisi_acc_vdev, pdev, pf_qm);
-		if (!ret) {
-			vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
-						  &hisi_acc_vfio_pci_migrn_ops);
-			hisi_acc_vdev->core_device.vdev.mig_ops =
-					&hisi_acc_vfio_pci_migrn_state_ops;
-		} else {
-			pci_warn(pdev, "migration support failed, continue with generic interface\n");
-			vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
-						  &hisi_acc_vfio_pci_ops);
-		}
-	} else {
-		vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
-					  &hisi_acc_vfio_pci_ops);
-	}
-
-	dev_set_drvdata(&pdev->dev, &hisi_acc_vdev->core_device);
-	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
-	if (ret)
-		goto out_free;
-	return 0;
-
-out_free:
-	vfio_pci_core_uninit_device(&hisi_acc_vdev->core_device);
-	kfree(hisi_acc_vdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
 static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
 {
-<<<<<<< HEAD
 	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_drvdata(pdev);
 
 	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
 	vfio_put_device(&hisi_acc_vdev->core_device.vdev);
-=======
-	struct hisi_acc_vf_core_device *hisi_acc_vdev = hssi_acc_drvdata(pdev);
-
-	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
-	vfio_pci_core_uninit_device(&hisi_acc_vdev->core_device);
-	kfree(hisi_acc_vdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct pci_device_id hisi_acc_vfio_pci_table[] = {

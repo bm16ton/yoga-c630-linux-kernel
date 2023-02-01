@@ -37,11 +37,7 @@ static struct msm_gem_submit *submit_create(struct drm_device *dev,
 	if (sz > SIZE_MAX)
 		return ERR_PTR(-ENOMEM);
 
-<<<<<<< HEAD
 	submit = kzalloc(sz, GFP_KERNEL);
-=======
-	submit = kzalloc(sz, GFP_KERNEL | __GFP_NOWARN | __GFP_NORETRY);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!submit)
 		return ERR_PTR(-ENOMEM);
 
@@ -57,17 +53,12 @@ static struct msm_gem_submit *submit_create(struct drm_device *dev,
 	submit->gpu = gpu;
 	submit->cmd = (void *)&submit->bos[nr_bos];
 	submit->queue = queue;
-<<<<<<< HEAD
 	submit->pid = get_pid(task_pid(current));
 	submit->ring = gpu->rb[queue->ring_nr];
 	submit->fault_dumped = false;
 
 	/* Get a unique identifier for the submission for logging purposes */
 	submit->ident = atomic_inc_return(&ident) - 1;
-=======
-	submit->ring = gpu->rb[queue->ring_nr];
-	submit->fault_dumped = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	INIT_LIST_HEAD(&submit->node);
 
@@ -81,15 +72,9 @@ void __msm_gem_submit_destroy(struct kref *kref)
 	unsigned i;
 
 	if (submit->fence_id) {
-<<<<<<< HEAD
 		mutex_lock(&submit->queue->idr_lock);
 		idr_remove(&submit->queue->fence_idr, submit->fence_id);
 		mutex_unlock(&submit->queue->idr_lock);
-=======
-		mutex_lock(&submit->queue->lock);
-		idr_remove(&submit->queue->fence_idr, submit->fence_id);
-		mutex_unlock(&submit->queue->lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	dma_fence_put(submit->user_fence);
@@ -257,7 +242,6 @@ static void submit_cleanup_bo(struct msm_gem_submit *submit, int i,
 
 	if (flags & BO_OBJ_PINNED)
 		msm_gem_unpin_locked(obj);
-<<<<<<< HEAD
 
 	if (flags & BO_LOCKED)
 		dma_resv_unlock(obj->resv);
@@ -268,22 +252,6 @@ static void submit_unlock_unpin_bo(struct msm_gem_submit *submit, int i)
 	unsigned cleanup_flags = BO_VMA_PINNED | BO_OBJ_PINNED | BO_LOCKED;
 	submit_cleanup_bo(submit, i, cleanup_flags);
 
-=======
-
-	if (flags & BO_ACTIVE)
-		msm_gem_active_put(obj);
-
-	if (flags & BO_LOCKED)
-		dma_resv_unlock(obj->resv);
-}
-
-static void submit_unlock_unpin_bo(struct msm_gem_submit *submit, int i)
-{
-	unsigned cleanup_flags = BO_VMA_PINNED | BO_OBJ_PINNED |
-				 BO_ACTIVE | BO_LOCKED;
-	submit_cleanup_bo(submit, i, cleanup_flags);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!(submit->bos[i].flags & BO_VALID))
 		submit->bos[i].iova = 0;
 }
@@ -386,23 +354,8 @@ static int submit_pin_objects(struct msm_gem_submit *submit)
 
 	submit->valid = true;
 
-	/*
-	 * Increment active_count first, so if under memory pressure, we
-	 * don't inadvertently evict a bo needed by the submit in order
-	 * to pin an earlier bo in the same submit.
-	 */
 	for (i = 0; i < submit->nr_bos; i++) {
 		struct drm_gem_object *obj = &submit->bos[i].obj->base;
-<<<<<<< HEAD
-=======
-
-		msm_gem_active_get(obj, submit->gpu);
-		submit->bos[i].flags |= BO_ACTIVE;
-	}
-
-	for (i = 0; i < submit->nr_bos; i++) {
-		struct drm_gem_object *obj = &submit->bos[i].obj->base;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct msm_gem_vma *vma;
 
 		/* if locking succeeded, pin bo: */
@@ -552,11 +505,7 @@ static void submit_cleanup(struct msm_gem_submit *submit, bool error)
 	unsigned i;
 
 	if (error)
-<<<<<<< HEAD
 		cleanup_flags |= BO_VMA_PINNED | BO_OBJ_PINNED;
-=======
-		cleanup_flags |= BO_VMA_PINNED | BO_OBJ_PINNED | BO_ACTIVE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < submit->nr_bos; i++) {
 		struct msm_gem_object *msm_obj = submit->bos[i].obj;
@@ -573,13 +522,6 @@ void msm_submit_retire(struct msm_gem_submit *submit)
 	for (i = 0; i < submit->nr_bos; i++) {
 		struct drm_gem_object *obj = &submit->bos[i].obj->base;
 
-<<<<<<< HEAD
-=======
-		msm_gem_lock(obj);
-		/* Note, VMA already fence-unpinned before submit: */
-		submit_cleanup_bo(submit, i, BO_OBJ_PINNED | BO_ACTIVE);
-		msm_gem_unlock(obj);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		drm_gem_object_put(obj);
 	}
 }
@@ -764,7 +706,7 @@ int msm_ioctl_gem_submit(struct drm_device *dev, void *data,
 	struct msm_drm_private *priv = dev->dev_private;
 	struct drm_msm_gem_submit *args = data;
 	struct msm_file_private *ctx = file->driver_priv;
-	struct msm_gem_submit *submit = NULL;
+	struct msm_gem_submit *submit;
 	struct msm_gpu *gpu = priv->gpu;
 	struct msm_gpu_submitqueue *queue;
 	struct msm_ringbuffer *ring;
@@ -773,11 +715,7 @@ int msm_ioctl_gem_submit(struct drm_device *dev, void *data,
 	int out_fence_fd = -1;
 	bool has_ww_ticket = false;
 	unsigned i;
-<<<<<<< HEAD
 	int ret;
-=======
-	int ret, submitid;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!gpu)
 		return -ENXIO;
@@ -823,40 +761,13 @@ int msm_ioctl_gem_submit(struct drm_device *dev, void *data,
 	if (IS_ERR(submit))
 		return PTR_ERR(submit);
 
-<<<<<<< HEAD
 	trace_msm_gpu_submit(pid_nr(submit->pid), ring->id, submit->ident,
-=======
-	ring = gpu->rb[queue->ring_nr];
-	trace_msm_gpu_submit(pid_nr(pid), ring->id, submitid,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		args->nr_bos, args->nr_cmds);
 
 	ret = mutex_lock_interruptible(&queue->lock);
 	if (ret)
 		goto out_post_unlock;
 
-<<<<<<< HEAD
-=======
-	if (args->flags & MSM_SUBMIT_FENCE_FD_OUT) {
-		out_fence_fd = get_unused_fd_flags(O_CLOEXEC);
-		if (out_fence_fd < 0) {
-			ret = out_fence_fd;
-			goto out_unlock;
-		}
-	}
-
-	submit = submit_create(dev, gpu, queue, args->nr_bos,
-		args->nr_cmds);
-	if (IS_ERR(submit)) {
-		ret = PTR_ERR(submit);
-		submit = NULL;
-		goto out_unlock;
-	}
-
-	submit->pid = pid;
-	submit->ident = submitid;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (args->flags & MSM_SUBMIT_SUDO)
 		submit->in_rb = true;
 
@@ -950,11 +861,8 @@ int msm_ioctl_gem_submit(struct drm_device *dev, void *data,
 
 	submit->nr_cmds = i;
 
-<<<<<<< HEAD
 	mutex_lock(&queue->idr_lock);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * If using userspace provided seqno fence, validate that the id
 	 * is available before arming sched job.  Since access to fence_idr
@@ -963,10 +871,7 @@ int msm_ioctl_gem_submit(struct drm_device *dev, void *data,
 	 */
 	if ((args->flags & MSM_SUBMIT_FENCE_SN_IN) &&
 			idr_find(&queue->fence_idr, args->fence)) {
-<<<<<<< HEAD
 		mutex_unlock(&queue->idr_lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -EINVAL;
 		goto out;
 	}
@@ -999,12 +904,9 @@ int msm_ioctl_gem_submit(struct drm_device *dev, void *data,
 						    submit->user_fence, 1,
 						    INT_MAX, GFP_KERNEL);
 	}
-<<<<<<< HEAD
 
 	mutex_unlock(&queue->idr_lock);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (submit->fence_id < 0) {
 		ret = submit->fence_id;
 		submit->fence_id = 0;
@@ -1043,11 +945,6 @@ out_unlock:
 	if (ret && (out_fence_fd >= 0))
 		put_unused_fd(out_fence_fd);
 	mutex_unlock(&queue->lock);
-<<<<<<< HEAD
-=======
-	if (submit)
-		msm_gem_submit_put(submit);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_post_unlock:
 	msm_gem_submit_put(submit);
 	if (!IS_ERR_OR_NULL(post_deps)) {

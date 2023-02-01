@@ -147,15 +147,12 @@ static int q6apm_dai_prepare(struct snd_soc_component *component,
 	cfg.num_channels = runtime->channels;
 	cfg.bit_width = prtd->bits_per_sample;
 
-<<<<<<< HEAD
 	if (prtd->state) {
 		/* clear the previous setup if any  */
 		q6apm_graph_stop(prtd->graph);
 		q6apm_unmap_memory_regions(prtd->graph, substream->stream);
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	prtd->pcm_count = snd_pcm_lib_period_bytes(substream);
 	prtd->pos = 0;
 	/* rate and channels are sent to audio driver */

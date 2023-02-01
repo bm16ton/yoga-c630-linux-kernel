@@ -248,11 +248,7 @@ int main(void)
 #ifdef CONFIG_PPC64
 	OFFSET(PACA_EXIT_SAVE_R1, paca_struct, exit_save_r1);
 #endif
-<<<<<<< HEAD
 #ifdef CONFIG_PPC_BOOK3E_64
-=======
-#ifdef CONFIG_PPC_BOOK3E
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	OFFSET(PACA_TRAP_SAVE, paca_struct, trap_save);
 #endif
 	OFFSET(PACA_SPRG_VDSO, paca_struct, sprg_vdso);

@@ -92,8 +92,6 @@ static int oui(u8 first, u8 second, u8 third)
 
 #define MICROSOFT_IEEE_OUI	0xca125c
 
-#define MICROSOFT_IEEE_OUI	0xca125c
-
 struct detailed_mode_closure {
 	struct drm_connector *connector;
 	const struct drm_edid *drm_edid;
@@ -150,15 +148,12 @@ static const struct edid_quirk {
 	/* Funai Electronics PM36B */
 	EDID_QUIRK('F', 'C', 'M', 13600, EDID_QUIRK_PREFER_LARGE_75 |
 				       EDID_QUIRK_DETAILED_IN_CM),
-<<<<<<< HEAD
 
 	/* LG 27GP950 */
 	EDID_QUIRK('G', 'S', 'M', 0x5bbf, EDID_QUIRK_CAP_DSC_15BPP),
 
 	/* LG 27GN950 */
 	EDID_QUIRK('G', 'S', 'M', 0x5b9a, EDID_QUIRK_CAP_DSC_15BPP),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* LGD panel of HP zBook 17 G2, eDP 10 bpc, but reports unknown bpc */
 	EDID_QUIRK('L', 'G', 'D', 764, EDID_QUIRK_FORCE_10BPC),
@@ -2333,7 +2328,6 @@ static struct edid *_drm_do_get_edid(struct drm_connector *connector,
 		connector_bad_edid(connector, edid, 1);
 		goto fail;
 	}
-<<<<<<< HEAD
 
 	if (!edid_extension_block_count(edid))
 		goto ok;
@@ -2389,63 +2383,6 @@ ok:
 	if (size)
 		*size = alloc_size;
 
-=======
-
-	if (!edid_extension_block_count(edid))
-		goto ok;
-
-	alloc_size = edid_size(edid);
-	new = krealloc(edid, alloc_size, GFP_KERNEL);
-	if (!new)
-		goto fail;
-	edid = new;
-
-	num_blocks = edid_block_count(edid);
-	for (i = 1; i < num_blocks; i++) {
-		void *block = (void *)edid_block_data(edid, i);
-
-		status = edid_block_read(block, i, read_block, context);
-
-		edid_block_status_print(status, block, i);
-
-		if (!edid_block_status_valid(status, edid_block_tag(block))) {
-			if (status == EDID_BLOCK_READ_FAIL)
-				goto fail;
-			invalid_blocks++;
-		} else if (i == 1) {
-			/*
-			 * If the first EDID extension is a CTA extension, and
-			 * the first Data Block is HF-EEODB, override the
-			 * extension block count.
-			 *
-			 * Note: HF-EEODB could specify a smaller extension
-			 * count too, but we can't risk allocating a smaller
-			 * amount.
-			 */
-			int eeodb = edid_hfeeodb_block_count(edid);
-
-			if (eeodb > num_blocks) {
-				num_blocks = eeodb;
-				alloc_size = edid_size_by_blocks(num_blocks);
-				new = krealloc(edid, alloc_size, GFP_KERNEL);
-				if (!new)
-					goto fail;
-				edid = new;
-			}
-		}
-	}
-
-	if (invalid_blocks) {
-		connector_bad_edid(connector, edid, num_blocks);
-
-		edid = edid_filter_invalid_blocks(edid, &alloc_size);
-	}
-
-ok:
-	if (size)
-		*size = alloc_size;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return edid;
 
 fail:
@@ -5236,7 +5173,6 @@ static void fixup_detailed_cea_mode_clock(struct drm_display_mode *mode)
 	mode->clock = clock;
 }
 
-<<<<<<< HEAD
 static void drm_calculate_luminance_range(struct drm_connector *connector)
 {
 	struct hdr_static_metadata *hdr_metadata = &connector->hdr_sink_metadata.hdmi_type1;
@@ -5282,8 +5218,6 @@ static void drm_calculate_luminance_range(struct drm_connector *connector)
 	luminance_range->max_luminance = max;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static uint8_t eotf_supported(const u8 *edid_ext)
 {
 	return edid_ext[2] &
@@ -5553,7 +5487,6 @@ static int _drm_edid_to_sad(const struct drm_edid *drm_edid,
  * Return: The number of found SADs or negative number on error.
  */
 int drm_edid_to_sad(const struct edid *edid, struct cea_sad **sads)
-<<<<<<< HEAD
 {
 	struct drm_edid drm_edid;
 
@@ -5582,36 +5515,6 @@ static int _drm_edid_to_speaker_allocation(const struct drm_edid *drm_edid,
 	}
 	cea_db_iter_end(&iter);
 
-=======
-{
-	struct drm_edid drm_edid;
-
-	return _drm_edid_to_sad(drm_edid_legacy_init(&drm_edid, edid), sads);
-}
-EXPORT_SYMBOL(drm_edid_to_sad);
-
-static int _drm_edid_to_speaker_allocation(const struct drm_edid *drm_edid,
-					   u8 **sadb)
-{
-	const struct cea_db *db;
-	struct cea_db_iter iter;
-	int count = 0;
-
-	cea_db_iter_edid_begin(drm_edid, &iter);
-	cea_db_iter_for_each(db, &iter) {
-		if (cea_db_tag(db) == CTA_DB_SPEAKER &&
-		    cea_db_payload_len(db) == 3) {
-			*sadb = kmemdup(db->data, cea_db_payload_len(db),
-					GFP_KERNEL);
-			if (!*sadb)
-				return -ENOMEM;
-			count = cea_db_payload_len(db);
-			break;
-		}
-	}
-	cea_db_iter_end(&iter);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	DRM_DEBUG_KMS("Found %d Speaker Allocation Data Blocks\n", count);
 
 	return count;
@@ -6267,17 +6170,11 @@ static void drm_reset_display_info(struct drm_connector *connector)
 
 	info->non_desktop = 0;
 	memset(&info->monitor_range, 0, sizeof(info->monitor_range));
-<<<<<<< HEAD
 	memset(&info->luminance_range, 0, sizeof(info->luminance_range));
 
 	info->mso_stream_count = 0;
 	info->mso_pixel_overlap = 0;
 	info->max_dsc_bpp = 0;
-=======
-
-	info->mso_stream_count = 0;
-	info->mso_pixel_overlap = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static u32 update_display_info(struct drm_connector *connector,
@@ -6364,12 +6261,9 @@ out:
 		info->non_desktop = true;
 	}
 
-<<<<<<< HEAD
 	if (quirks & EDID_QUIRK_CAP_DSC_15BPP)
 		info->max_dsc_bpp = 15;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return quirks;
 }
 

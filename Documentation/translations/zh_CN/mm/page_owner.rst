@@ -74,7 +74,6 @@ page owner在默认情况下是禁用的。所以，如果你想使用它，你�
 	cat /sys/kernel/debug/page_owner > page_owner_full.txt
 	./page_owner_sort page_owner_full.txt sorted_page_owner.txt
 
-<<<<<<< HEAD
    ``page_owner_full.txt`` 的一般输出情况如下::
 
 	Page allocated via order XXX, ...
@@ -88,17 +87,6 @@ page owner在默认情况下是禁用的。所以，如果你想使用它，你�
 
     FILE *fp = fopen("/sys/kernel/debug/page_owner", "r");
     fseek(fp, pfn_start, SEEK_SET);
-=======
-   ``page_owner_full.txt`` 的一般输出情况如下(输出信息无翻译价值)::
-
-	Page allocated via order XXX, ...
-	PFN XXX ...
-	// Detailed stack
-
-	Page allocated via order XXX, ...
-	PFN XXX ...
-	// Detailed stack
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
    ``page_owner_sort`` 工具忽略了 ``PFN`` 行，将剩余的行放在buf中，使用regexp提
    取页序值，计算buf的次数和页数，最后根据参数进行排序。

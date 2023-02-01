@@ -3255,12 +3255,6 @@ static int __smc_create(struct net *net, struct socket *sock, int protocol,
 	} else {
 		smc->clcsock = clcsock;
 	}
-<<<<<<< HEAD
-=======
-
-	smc->sk.sk_sndbuf = max(smc->clcsock->sk->sk_sndbuf, SMC_BUF_MIN_SIZE);
-	smc->sk.sk_rcvbuf = max(smc->clcsock->sk->sk_rcvbuf, SMC_BUF_MIN_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	return rc;

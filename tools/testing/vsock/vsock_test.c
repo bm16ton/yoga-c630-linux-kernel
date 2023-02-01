@@ -18,10 +18,7 @@
 #include <sys/socket.h>
 #include <time.h>
 #include <sys/mman.h>
-<<<<<<< HEAD
 #include <poll.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "timeout.h"
 #include "control.h"
@@ -600,7 +597,6 @@ static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opt
 	close(fd);
 }
 
-<<<<<<< HEAD
 #define RCVLOWAT_BUF_SIZE 128
 
 static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
@@ -703,8 +699,6 @@ static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
 	close(fd);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct test_case test_cases[] = {
 	{
 		.name = "SOCK_STREAM connection reset",
@@ -755,14 +749,11 @@ static struct test_case test_cases[] = {
 		.run_client = test_seqpacket_invalid_rec_buffer_client,
 		.run_server = test_seqpacket_invalid_rec_buffer_server,
 	},
-<<<<<<< HEAD
 	{
 		.name = "SOCK_STREAM poll() + SO_RCVLOWAT",
 		.run_client = test_stream_poll_rcvlowat_client,
 		.run_server = test_stream_poll_rcvlowat_server,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{},
 };
 

@@ -245,18 +245,6 @@ static int probe_map_create(enum bpf_map_type map_type)
 		key_size = 0;
 		max_entries = 1;
 		break;
-<<<<<<< HEAD
-=======
-	case BPF_MAP_TYPE_STRUCT_OPS:
-		/* we'll get -ENOTSUPP for invalid BTF type ID for struct_ops */
-		opts.btf_vmlinux_value_type_id = 1;
-		exp_err = -524; /* -ENOTSUPP */
-		break;
-	case BPF_MAP_TYPE_BLOOM_FILTER:
-		key_size = 0;
-		max_entries = 1;
-		break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case BPF_MAP_TYPE_HASH:
 	case BPF_MAP_TYPE_ARRAY:
 	case BPF_MAP_TYPE_PROG_ARRAY:

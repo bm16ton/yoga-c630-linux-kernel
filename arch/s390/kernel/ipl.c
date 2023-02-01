@@ -1649,15 +1649,10 @@ static void dump_reipl_run(struct shutdown_trigger *trigger)
 
 	csum = (__force unsigned int)
 	       csum_partial(reipl_block_actual, reipl_block_actual->hdr.len, 0);
-<<<<<<< HEAD
 	abs_lc = get_abs_lowcore(&flags);
 	abs_lc->ipib = ipib;
 	abs_lc->ipib_checksum = csum;
 	put_abs_lowcore(abs_lc, flags);
-=======
-	put_abs_lowcore(ipib, ipib);
-	put_abs_lowcore(ipib_checksum, csum);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dump_run(trigger);
 }
 

@@ -3013,14 +3013,8 @@ static int happy_meal_pci_probe(struct pci_dev *pdev,
 
 	err = devm_register_netdev(&pdev->dev, dev);
 	if (err) {
-<<<<<<< HEAD
 		dev_err(&pdev->dev, "Cannot register net device, aborting.\n");
 		goto err_out_clear_quattro;
-=======
-		printk(KERN_ERR "happymeal(PCI): Cannot register net device, "
-		       "aborting.\n");
-		goto err_out_free_coherent;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	pci_set_drvdata(pdev, hp);
@@ -3049,19 +3043,6 @@ static int happy_meal_pci_probe(struct pci_dev *pdev,
 
 	return 0;
 
-<<<<<<< HEAD
-=======
-err_out_free_coherent:
-	dma_free_coherent(hp->dma_dev, PAGE_SIZE,
-			  hp->happy_block, hp->hblock_dvma);
-
-err_out_iounmap:
-	iounmap(hp->gregs);
-
-err_out_free_res:
-	pci_release_regions(pdev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_out_clear_quattro:
 	if (qp != NULL)
 		qp->happy_meals[qfe_slot] = NULL;

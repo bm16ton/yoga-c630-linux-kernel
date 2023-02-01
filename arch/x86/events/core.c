@@ -1701,15 +1701,10 @@ int x86_pmu_handle_irq(struct pt_regs *regs)
 
 		perf_sample_data_init(&data, 0, event->hw.last_period);
 
-<<<<<<< HEAD
 		if (has_branch_stack(event)) {
 			data.br_stack = &cpuc->lbr_stack;
 			data.sample_flags |= PERF_SAMPLE_BRANCH_STACK;
 		}
-=======
-		if (has_branch_stack(event))
-			data.br_stack = &cpuc->lbr_stack;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (perf_event_overflow(event, &data, regs))
 			x86_pmu_stop(event, 0);
@@ -2041,37 +2036,6 @@ static void x86_pmu_static_call_update(void)
 static void _x86_pmu_read(struct perf_event *event)
 {
 	static_call(x86_pmu_update)(event);
-}
-
-void x86_pmu_show_pmu_cap(int num_counters, int num_counters_fixed,
-			  u64 intel_ctrl)
-{
-	pr_info("... version:                %d\n",     x86_pmu.version);
-	pr_info("... bit width:              %d\n",     x86_pmu.cntval_bits);
-	pr_info("... generic registers:      %d\n",     num_counters);
-	pr_info("... value mask:             %016Lx\n", x86_pmu.cntval_mask);
-	pr_info("... max period:             %016Lx\n", x86_pmu.max_period);
-	pr_info("... fixed-purpose events:   %lu\n",
-			hweight64((((1ULL << num_counters_fixed) - 1)
-					<< INTEL_PMC_IDX_FIXED) & intel_ctrl));
-	pr_info("... event mask:             %016Lx\n", intel_ctrl);
-}
-
-/*
- * The generic code is not hybrid friendly. The hybrid_pmu->pmu
- * of the first registered PMU is unconditionally assigned to
- * each possible cpuctx->ctx.pmu.
- * Update the correct hybrid PMU to the cpuctx->ctx.pmu.
- */
-void x86_pmu_update_cpu_context(struct pmu *pmu, int cpu)
-{
-	struct perf_cpu_context *cpuctx;
-
-	if (!pmu->pmu_cpu_context)
-		return;
-
-	cpuctx = per_cpu_ptr(pmu->pmu_cpu_context, cpu);
-	cpuctx->ctx.pmu = pmu;
 }
 
 void x86_pmu_show_pmu_cap(int num_counters, int num_counters_fixed,

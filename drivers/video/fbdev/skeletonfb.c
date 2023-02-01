@@ -96,17 +96,10 @@ static const struct fb_fix_screeninfo xxxfb_fix = {
 };
 
     /*
-<<<<<<< HEAD
      * 	Modern graphical hardware not only supports pipelines but some
      *  also support multiple monitors where each display can have
      *  its own unique data. In this case each display could be
      *  represented by a separate framebuffer device thus a separate
-=======
-     * 	Modern graphical hardware not only supports pipelines but some 
-     *  also support multiple monitors where each display can have
-     *  its own unique data. In this case each display could be  
-     *  represented by a separate framebuffer device thus a separate 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
      *  struct fb_info. Now the struct xxx_par represents the graphics
      *  hardware state thus only one exist per card. In this case the
      *  struct xxx_par for each graphics card would be shared between

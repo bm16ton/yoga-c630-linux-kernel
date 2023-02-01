@@ -43,25 +43,5 @@ unsigned long do_sdei_event(struct pt_regs *regs,
 unsigned long sdei_arch_get_entry_point(int conduit);
 #define sdei_arch_get_entry_point(x)	sdei_arch_get_entry_point(x)
 
-<<<<<<< HEAD
-=======
-struct stack_info;
-
-bool _on_sdei_stack(unsigned long sp, unsigned long size,
-		    struct stack_info *info);
-static inline bool on_sdei_stack(unsigned long sp, unsigned long size,
-				struct stack_info *info)
-{
-	if (!IS_ENABLED(CONFIG_VMAP_STACK))
-		return false;
-	if (!IS_ENABLED(CONFIG_ARM_SDE_INTERFACE))
-		return false;
-	if (in_nmi())
-		return _on_sdei_stack(sp, size, info);
-
-	return false;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __ASSEMBLY__ */
 #endif	/* __ASM_SDEI_H */

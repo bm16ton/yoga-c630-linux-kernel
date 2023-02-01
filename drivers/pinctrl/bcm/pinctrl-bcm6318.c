@@ -27,15 +27,6 @@
 #define BCM6318_PAD_REG		0x54
 #define  BCM6328_PAD_MASK	GENMASK(3, 0)
 
-<<<<<<< HEAD
-=======
-struct bcm6318_pingroup {
-	const char *name;
-	const unsigned * const pins;
-	const unsigned num_pins;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct bcm6318_function {
 	const char *name;
 	const char * const *groups;
@@ -149,7 +140,6 @@ static unsigned gpio47_pins[] = { 47 };
 static unsigned gpio48_pins[] = { 48 };
 static unsigned gpio49_pins[] = { 49 };
 
-<<<<<<< HEAD
 static struct pingroup bcm6318_groups[] = {
 	BCM_PIN_GROUP(gpio0),
 	BCM_PIN_GROUP(gpio1),
@@ -201,66 +191,6 @@ static struct pingroup bcm6318_groups[] = {
 	BCM_PIN_GROUP(gpio47),
 	BCM_PIN_GROUP(gpio48),
 	BCM_PIN_GROUP(gpio49),
-=======
-#define BCM6318_GROUP(n)					\
-	{							\
-		.name = #n,					\
-		.pins = n##_pins,				\
-		.num_pins = ARRAY_SIZE(n##_pins),		\
-	}
-
-static struct bcm6318_pingroup bcm6318_groups[] = {
-	BCM6318_GROUP(gpio0),
-	BCM6318_GROUP(gpio1),
-	BCM6318_GROUP(gpio2),
-	BCM6318_GROUP(gpio3),
-	BCM6318_GROUP(gpio4),
-	BCM6318_GROUP(gpio5),
-	BCM6318_GROUP(gpio6),
-	BCM6318_GROUP(gpio7),
-	BCM6318_GROUP(gpio8),
-	BCM6318_GROUP(gpio9),
-	BCM6318_GROUP(gpio10),
-	BCM6318_GROUP(gpio11),
-	BCM6318_GROUP(gpio12),
-	BCM6318_GROUP(gpio13),
-	BCM6318_GROUP(gpio14),
-	BCM6318_GROUP(gpio15),
-	BCM6318_GROUP(gpio16),
-	BCM6318_GROUP(gpio17),
-	BCM6318_GROUP(gpio18),
-	BCM6318_GROUP(gpio19),
-	BCM6318_GROUP(gpio20),
-	BCM6318_GROUP(gpio21),
-	BCM6318_GROUP(gpio22),
-	BCM6318_GROUP(gpio23),
-	BCM6318_GROUP(gpio24),
-	BCM6318_GROUP(gpio25),
-	BCM6318_GROUP(gpio26),
-	BCM6318_GROUP(gpio27),
-	BCM6318_GROUP(gpio28),
-	BCM6318_GROUP(gpio29),
-	BCM6318_GROUP(gpio30),
-	BCM6318_GROUP(gpio31),
-	BCM6318_GROUP(gpio32),
-	BCM6318_GROUP(gpio33),
-	BCM6318_GROUP(gpio34),
-	BCM6318_GROUP(gpio35),
-	BCM6318_GROUP(gpio36),
-	BCM6318_GROUP(gpio37),
-	BCM6318_GROUP(gpio38),
-	BCM6318_GROUP(gpio39),
-	BCM6318_GROUP(gpio40),
-	BCM6318_GROUP(gpio41),
-	BCM6318_GROUP(gpio42),
-	BCM6318_GROUP(gpio43),
-	BCM6318_GROUP(gpio44),
-	BCM6318_GROUP(gpio45),
-	BCM6318_GROUP(gpio46),
-	BCM6318_GROUP(gpio47),
-	BCM6318_GROUP(gpio48),
-	BCM6318_GROUP(gpio49),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* GPIO_MODE */
@@ -425,17 +355,10 @@ static const char *bcm6318_pinctrl_get_group_name(struct pinctrl_dev *pctldev,
 
 static int bcm6318_pinctrl_get_group_pins(struct pinctrl_dev *pctldev,
 					  unsigned group, const unsigned **pins,
-<<<<<<< HEAD
 					  unsigned *npins)
 {
 	*pins = bcm6318_groups[group].pins;
 	*npins = bcm6318_groups[group].npins;
-=======
-					  unsigned *num_pins)
-{
-	*pins = bcm6318_groups[group].pins;
-	*num_pins = bcm6318_groups[group].num_pins;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -488,11 +411,7 @@ static int bcm6318_pinctrl_set_mux(struct pinctrl_dev *pctldev,
 				   unsigned selector, unsigned group)
 {
 	struct bcm63xx_pinctrl *pc = pinctrl_dev_get_drvdata(pctldev);
-<<<<<<< HEAD
 	const struct pingroup *pg = &bcm6318_groups[group];
-=======
-	const struct bcm6318_pingroup *pg = &bcm6318_groups[group];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct bcm6318_function *f = &bcm6318_funcs[selector];
 
 	bcm6318_rmw_mux(pc, pg->pins[0], f->mode_val, f->mux_val);

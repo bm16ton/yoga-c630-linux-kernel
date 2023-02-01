@@ -202,7 +202,6 @@ void amdgpu_gtt_mgr_recover(struct amdgpu_gtt_mgr *mgr)
 	spin_unlock(&mgr->lock);
 
 	amdgpu_gart_invalidate_tlb(adev);
-<<<<<<< HEAD
 }
 
 /**
@@ -239,8 +238,6 @@ static bool amdgpu_gtt_mgr_compatible(struct ttm_resource_manager *man,
 				      size_t size)
 {
 	return !place->lpfn || amdgpu_gtt_mgr_has_gart_addr(res);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

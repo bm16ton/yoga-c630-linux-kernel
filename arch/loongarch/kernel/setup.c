@@ -19,11 +19,8 @@
 #include <linux/memblock.h>
 #include <linux/initrd.h>
 #include <linux/ioport.h>
-<<<<<<< HEAD
 #include <linux/kexec.h>
 #include <linux/crash_dump.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/root_dev.h>
 #include <linux/console.h>
 #include <linux/pfn.h>
@@ -54,17 +51,9 @@
 #define SMBIOS_CORE_PACKAGE_OFFSET	0x23
 #define LOONGSON_EFI_ENABLE		(1 << 3)
 
-<<<<<<< HEAD
 struct screen_info screen_info __section(".data");
 
 unsigned long fw_arg0, fw_arg1, fw_arg2;
-=======
-#ifdef CONFIG_VT
-struct screen_info screen_info;
-#endif
-
-unsigned long fw_arg0, fw_arg1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 DEFINE_PER_CPU(unsigned long, kernelsp);
 struct cpuinfo_loongarch cpu_data[NR_CPUS] __read_mostly;
 
@@ -133,22 +122,9 @@ static void __init parse_cpu_table(const struct dmi_header *dm)
 
 static void __init parse_bios_table(const struct dmi_header *dm)
 {
-<<<<<<< HEAD
 	char *dmi_data = (char *)dm;
 
 	b_info.bios_size = (*(dmi_data + SMBIOS_BIOSSIZE_OFFSET) + 1) << 6;
-=======
-	int bios_extern;
-	char *dmi_data = (char *)dm;
-
-	bios_extern = *(dmi_data + SMBIOS_BIOSEXTERN_OFFSET);
-	b_info.bios_size = (*(dmi_data + SMBIOS_BIOSSIZE_OFFSET) + 1) << 6;
-
-	if (bios_extern & LOONGSON_EFI_ENABLE)
-		set_bit(EFI_BOOT, &efi.flags);
-	else
-		clear_bit(EFI_BOOT, &efi.flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void __init find_tokens(const struct dmi_header *dm, void *dummy)
@@ -211,7 +187,6 @@ static int __init early_parse_mem(char *p)
 }
 early_param("mem", early_parse_mem);
 
-<<<<<<< HEAD
 static void __init arch_reserve_vmcore(void)
 {
 #ifdef CONFIG_PROC_VMCORE
@@ -276,21 +251,12 @@ void __init platform_init(void)
 	arch_reserve_vmcore();
 	arch_parse_crashkernel();
 
-=======
-void __init platform_init(void)
-{
-	efi_init();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_ACPI_TABLE_UPGRADE
 	acpi_table_upgrade();
 #endif
 #ifdef CONFIG_ACPI
 	acpi_gbl_use_default_register_widths = false;
 	acpi_boot_table_init();
-<<<<<<< HEAD
-=======
-	acpi_boot_init();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #ifdef CONFIG_NUMA
@@ -334,11 +300,7 @@ static void __init arch_mem_init(char **cmdline_p)
 	sparse_init();
 	memblock_set_bottom_up(true);
 
-<<<<<<< HEAD
 	swiotlb_init(true, SWIOTLB_VERBOSE);
-=======
-	plat_swiotlb_setup();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dma_contiguous_reserve(PFN_PHYS(max_low_pfn));
 
@@ -390,7 +352,6 @@ static void __init resource_init(void)
 		request_resource(res, &data_resource);
 		request_resource(res, &bss_resource);
 	}
-<<<<<<< HEAD
 
 #ifdef CONFIG_KEXEC
 	if (crashk_res.start < crashk_res.end) {
@@ -400,8 +361,6 @@ static void __init resource_init(void)
 			(unsigned long)(crashk_res.start  >> 20));
 	}
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __init reserve_memblock_reserved_regions(void)
@@ -449,11 +408,7 @@ static void __init prefill_possible_map(void)
 	for (; i < NR_CPUS; i++)
 		set_cpu_possible(i, false);
 
-<<<<<<< HEAD
 	set_nr_cpu_ids(possible);
-=======
-	nr_cpu_ids = possible;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 
@@ -463,7 +418,6 @@ void __init setup_arch(char **cmdline_p)
 	*cmdline_p = boot_command_line;
 
 	init_environ();
-<<<<<<< HEAD
 	efi_init();
 	memblock_init();
 	pagetable_init();
@@ -471,13 +425,6 @@ void __init setup_arch(char **cmdline_p)
 	reserve_initrd_mem();
 
 	platform_init();
-=======
-	memblock_init();
-	parse_early_param();
-
-	platform_init();
-	pagetable_init();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	arch_mem_init(cmdline_p);
 
 	resource_init();

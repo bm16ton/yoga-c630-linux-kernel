@@ -656,15 +656,9 @@ ssize_t nfs_file_write(struct kiocb *iocb, struct iov_iter *from)
 			goto out;
 	}
 	if (mntflags & NFS_MOUNT_WRITE_WAIT) {
-<<<<<<< HEAD
 		filemap_fdatawait_range(file->f_mapping,
 					iocb->ki_pos - written,
 					iocb->ki_pos - 1);
-=======
-		result = filemap_fdatawait_range(file->f_mapping,
-						 iocb->ki_pos - written,
-						 iocb->ki_pos - 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	result = generic_write_sync(iocb, written);
 	if (result < 0)

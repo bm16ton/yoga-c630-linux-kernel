@@ -755,11 +755,7 @@ mt76_dma_init(struct mt76_dev *dev,
 	dev->napi_dev.threaded = 1;
 
 	mt76_for_each_q_rx(dev, i) {
-<<<<<<< HEAD
 		netif_napi_add(&dev->napi_dev, &dev->napi[i], poll);
-=======
-		netif_napi_add(&dev->napi_dev, &dev->napi[i], poll, 64);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mt76_dma_rx_fill(dev, &dev->q_rx[i]);
 		napi_enable(&dev->napi[i]);
 	}

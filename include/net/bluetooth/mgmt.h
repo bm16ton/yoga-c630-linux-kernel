@@ -1156,7 +1156,6 @@ struct mgmt_ev_adv_monitor_device_lost {
 	__le16 monitor_handle;
 	struct mgmt_addr_info addr;
 } __packed;
-<<<<<<< HEAD
 
 #define MGMT_EV_MESH_DEVICE_FOUND	0x0031
 struct mgmt_ev_mesh_device_found {
@@ -1173,5 +1172,3 @@ struct mgmt_ev_mesh_device_found {
 struct mgmt_ev_mesh_pkt_cmplt {
 	__u8	handle;
 } __packed;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

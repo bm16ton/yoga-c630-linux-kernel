@@ -279,13 +279,7 @@ struct rftype {
 
 /**
  * struct mbm_state - status for each MBM counter in each domain
-<<<<<<< HEAD
  * @prev_bw_bytes: Previous bytes value read for bandwidth calculation
-=======
- * @chunks:	Total data moved (multiply by rdt_group.mon_scale to get bytes)
- * @prev_msr:	Value of IA32_QM_CTR for this RMID last time we read it
- * @prev_bw_msr:Value of previous IA32_QM_CTR for bandwidth counting
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @prev_bw:	The most recent bandwidth in MBps
  * @delta_bw:	Difference between the current and previous bandwidth
  * @delta_comp:	Indicates whether to compute the delta_bw
@@ -298,7 +292,6 @@ struct mbm_state {
 };
 
 /**
-<<<<<<< HEAD
  * struct arch_mbm_state - values used to compute resctrl_arch_rmid_read()s
  *			   return value.
  * @chunks:	Total data moved (multiply by rdt_group.mon_scale to get bytes)
@@ -311,30 +304,20 @@ struct arch_mbm_state {
 };
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * struct rdt_hw_domain - Arch private attributes of a set of CPUs that share
  *			  a resource
  * @d_resctrl:	Properties exposed to the resctrl file system
  * @ctrl_val:	array of cache or mem ctrl values (indexed by CLOSID)
-<<<<<<< HEAD
  * @arch_mbm_total:	arch private state for MBM total bandwidth
  * @arch_mbm_local:	arch private state for MBM local bandwidth
-=======
- * @mbps_val:	When mba_sc is enabled, this holds the bandwidth in MBps
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Members of this structure are accessed via helpers that provide abstraction.
  */
 struct rdt_hw_domain {
 	struct rdt_domain		d_resctrl;
 	u32				*ctrl_val;
-<<<<<<< HEAD
 	struct arch_mbm_state		*arch_mbm_total;
 	struct arch_mbm_state		*arch_mbm_local;
-=======
-	u32				*mbps_val;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct rdt_hw_domain *resctrl_to_arch_dom(struct rdt_domain *r)
@@ -477,17 +460,6 @@ int resctrl_arch_set_cdp_enabled(enum resctrl_res_level l, bool enable);
 	for_each_rdt_resource(r)					      \
 		if (r->mon_capable)
 
-<<<<<<< HEAD
-=======
-#define for_each_alloc_enabled_rdt_resource(r)				      \
-	for_each_rdt_resource(r)					      \
-		if (r->alloc_enabled)
-
-#define for_each_mon_enabled_rdt_resource(r)				      \
-	for_each_rdt_resource(r)					      \
-		if (r->mon_enabled)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* CPUID.(EAX=10H, ECX=ResID=1).EAX */
 union cpuid_0x10_1_eax {
 	struct {

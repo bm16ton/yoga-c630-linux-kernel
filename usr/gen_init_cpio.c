@@ -326,11 +326,7 @@ static int cpio_mkfile(const char *name, const char *location,
 	char s[256];
 	struct stat buf;
 	unsigned long size;
-<<<<<<< HEAD
 	int file;
-=======
-	int file = -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int retval;
 	int rc = -1;
 	int namesize;

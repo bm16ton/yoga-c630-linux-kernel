@@ -10,10 +10,7 @@
 #include <linux/interrupt.h>
 #include <linux/io.h>
 #include <linux/io-64-nonatomic-lo-hi.h>
-<<<<<<< HEAD
 #include <linux/iopoll.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/pm_runtime.h>
 #include <linux/timecounter.h>
 #include <sound/core.h>
@@ -566,10 +563,7 @@ int snd_hdac_stream_set_params(struct hdac_stream *azx_dev,
 				unsigned int format_val);
 void snd_hdac_stream_start(struct hdac_stream *azx_dev, bool fresh_start);
 void snd_hdac_stream_stop(struct hdac_stream *azx_dev);
-<<<<<<< HEAD
 void snd_hdac_stop_streams(struct hdac_bus *bus);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void snd_hdac_stop_streams_and_chip(struct hdac_bus *bus);
 void snd_hdac_stream_reset(struct hdac_stream *azx_dev);
 void snd_hdac_stream_sync_trigger(struct hdac_stream *azx_dev, bool set,

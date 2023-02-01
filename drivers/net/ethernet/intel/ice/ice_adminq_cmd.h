@@ -1423,7 +1423,6 @@ struct ice_aqc_set_port_id_led {
 	u8 rsvd[13];
 };
 
-<<<<<<< HEAD
 /* Get Port Options (indirect, 0x06EA) */
 struct ice_aqc_get_port_options {
 	u8 lport_num;
@@ -1474,8 +1473,6 @@ struct ice_aqc_set_port_option {
 	u8 rsvd[13];
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Set/Get GPIO (direct, 0x06EC/0x06ED) */
 struct ice_aqc_gpio {
 	__le16 gpio_ctrl_handle;
@@ -1542,15 +1539,12 @@ struct ice_aqc_nvm {
 #define ICE_AQC_NVM_PERST_FLAG		1
 #define ICE_AQC_NVM_EMPR_FLAG		2
 #define ICE_AQC_NVM_EMPR_ENA		BIT(0) /* Write Activate reply only */
-<<<<<<< HEAD
 	/* For Write Activate, several flags are sent as part of a separate
 	 * flags2 field using a separate byte. For simplicity of the software
 	 * interface, we pass the flags as a 16 bit value so these flags are
 	 * all offset by 8 bits
 	 */
 #define ICE_AQC_NVM_ACTIV_REQ_EMPR	BIT(8) /* NVM Write Activate only */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__le16 module_typeid;
 	__le16 length;
 #define ICE_AQC_NVM_ERASE_LEN	0xFFFF
@@ -2307,11 +2301,8 @@ enum ice_adminq_opc {
 	ice_aqc_opc_read_i2c				= 0x06E2,
 	ice_aqc_opc_write_i2c				= 0x06E3,
 	ice_aqc_opc_set_port_id_led			= 0x06E9,
-<<<<<<< HEAD
 	ice_aqc_opc_get_port_options			= 0x06EA,
 	ice_aqc_opc_set_port_option			= 0x06EB,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ice_aqc_opc_set_gpio				= 0x06EC,
 	ice_aqc_opc_get_gpio				= 0x06ED,
 	ice_aqc_opc_sff_eeprom				= 0x06EE,

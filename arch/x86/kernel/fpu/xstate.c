@@ -554,12 +554,7 @@ static bool __init check_xstate_against_struct(int nr)
 	    (nr >= XFEATURE_MAX) ||
 	    (nr == XFEATURE_PT_UNIMPLEMENTED_SO_FAR) ||
 	    ((nr >= XFEATURE_RSRVD_COMP_11) && (nr <= XFEATURE_RSRVD_COMP_16))) {
-<<<<<<< HEAD
 		XSTATE_WARN_ON(1, "No structure for xstate: %d\n", nr);
-=======
-		WARN_ONCE(1, "no structure for xstate: %d\n", nr);
-		XSTATE_WARN_ON(1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 	}
 	return true;
@@ -602,21 +597,13 @@ static bool __init paranoid_xstate_size_valid(unsigned int kernel_size)
 		 * XSAVES.
 		 */
 		if (!xsaves && xfeature_is_supervisor(i)) {
-<<<<<<< HEAD
 			XSTATE_WARN_ON(1, "Got supervisor feature %d, but XSAVES not advertised\n", i);
-=======
-			XSTATE_WARN_ON(1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return false;
 		}
 	}
 	size = xstate_calculate_size(fpu_kernel_cfg.max_features, compacted);
-<<<<<<< HEAD
 	XSTATE_WARN_ON(size != kernel_size,
 		       "size %u != kernel_size %u\n", size, kernel_size);
-=======
-	XSTATE_WARN_ON(size != kernel_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return size == kernel_size;
 }
 
@@ -712,17 +699,10 @@ static int __init init_xstate_size(void)
 		kernel_size = get_xsave_compacted_size();
 	else
 		kernel_size = user_size;
-<<<<<<< HEAD
 
 	kernel_default_size =
 		xstate_calculate_size(fpu_kernel_cfg.default_features, compacted);
 
-=======
-
-	kernel_default_size =
-		xstate_calculate_size(fpu_kernel_cfg.default_features, compacted);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!paranoid_xstate_size_valid(kernel_size))
 		return -EINVAL;
 
@@ -1199,7 +1179,6 @@ out:
  * to the requested @mode. UABI XSTATE is always uncompacted!
  *
  * It supports partial copy but @to.pos always starts from zero.
-<<<<<<< HEAD
  */
 void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
 			     enum xstate_copy_mode copy_mode)
@@ -1251,31 +1230,6 @@ static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
  */
 static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
 			       const void __user *ubuf, u32 *pkru)
-=======
- */
-void copy_xstate_to_uabi_buf(struct membuf to, struct task_struct *tsk,
-			     enum xstate_copy_mode copy_mode)
-{
-	__copy_xstate_to_uabi_buf(to, tsk->thread.fpu.fpstate,
-				  tsk->thread.pkru, copy_mode);
-}
-
-static int copy_from_buffer(void *dst, unsigned int offset, unsigned int size,
-			    const void *kbuf, const void __user *ubuf)
-{
-	if (kbuf) {
-		memcpy(dst, kbuf + offset, size);
-	} else {
-		if (copy_from_user(dst, ubuf + offset, size))
-			return -EFAULT;
-	}
-	return 0;
-}
-
-
-static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
-			       const void __user *ubuf)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct xregs_state *xsave = &fpstate->regs.xsave;
 	unsigned int offset, size;
@@ -1324,7 +1278,6 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
 		}
 	}
 
-<<<<<<< HEAD
 	if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
 		struct pkru_state *xpkru;
 
@@ -1339,8 +1292,6 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
 			*pkru = 0;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * The state that came in from userspace was user-state only.
 	 * Mask all the user states out of 'xfeatures':
@@ -1359,15 +1310,9 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
  * Convert from a ptrace standard-format kernel buffer to kernel XSAVE[S]
  * format and copy to the target thread. Used by ptrace and KVM.
  */
-<<<<<<< HEAD
 int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf, u32 *pkru)
 {
 	return copy_uabi_to_xstate(fpstate, kbuf, NULL, pkru);
-=======
-int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
-{
-	return copy_uabi_to_xstate(fpstate, kbuf, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1375,17 +1320,10 @@ int copy_uabi_from_kernel_to_xstate(struct fpstate *fpstate, const void *kbuf)
  * XSAVE[S] format and copy to the target thread. This is called from the
  * sigreturn() and rt_sigreturn() system calls.
  */
-<<<<<<< HEAD
 int copy_sigframe_from_user_to_xstate(struct task_struct *tsk,
 				      const void __user *ubuf)
 {
 	return copy_uabi_to_xstate(tsk->thread.fpu.fpstate, NULL, ubuf, &tsk->thread.pkru);
-=======
-int copy_sigframe_from_user_to_xstate(struct fpstate *fpstate,
-				      const void __user *ubuf)
-{
-	return copy_uabi_to_xstate(fpstate, NULL, ubuf);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool validate_independent_components(u64 mask)
@@ -1600,7 +1538,6 @@ static int fpstate_realloc(u64 xfeatures, unsigned int ksize,
 
 	if (!guest_fpu)
 		newfps->user_xfeatures = curfps->user_xfeatures | xfeatures;
-<<<<<<< HEAD
 
 	newfps->xfd = curfps->xfd & ~xfeatures;
 
@@ -1644,51 +1581,6 @@ static int validate_sigaltstack(unsigned int usize)
 	return 0;
 }
 
-=======
-
-	newfps->xfd = curfps->xfd & ~xfeatures;
-
-	/* Do the final updates within the locked region */
-	xstate_init_xcomp_bv(&newfps->regs.xsave, newfps->xfeatures);
-
-	if (guest_fpu) {
-		guest_fpu->fpstate = newfps;
-		/* If curfps is active, update the FPU fpstate pointer */
-		if (in_use)
-			fpu->fpstate = newfps;
-	} else {
-		fpu->fpstate = newfps;
-	}
-
-	if (in_use)
-		xfd_update_state(fpu->fpstate);
-	fpregs_unlock();
-
-	/* Only free valloc'ed state */
-	if (curfps && curfps->is_valloc)
-		vfree(curfps);
-
-	return 0;
-}
-
-static int validate_sigaltstack(unsigned int usize)
-{
-	struct task_struct *thread, *leader = current->group_leader;
-	unsigned long framesize = get_sigframe_size();
-
-	lockdep_assert_held(&current->sighand->siglock);
-
-	/* get_sigframe_size() is based on fpu_user_cfg.max_size */
-	framesize -= fpu_user_cfg.max_size;
-	framesize += usize;
-	for_each_thread(leader, thread) {
-		if (thread->sas_ss_size && thread->sas_ss_size < framesize)
-			return -ENOSPC;
-	}
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int __xstate_request_perm(u64 permitted, u64 requested, bool guest)
 {
 	/*

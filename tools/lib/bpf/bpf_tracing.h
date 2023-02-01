@@ -312,8 +312,6 @@ struct pt_regs;
 
 #ifndef PT_REGS_PARM1_SYSCALL
 #define PT_REGS_PARM1_SYSCALL(x) PT_REGS_PARM1(x)
-<<<<<<< HEAD
-=======
 #endif
 #define PT_REGS_PARM2_SYSCALL(x) PT_REGS_PARM2(x)
 #define PT_REGS_PARM3_SYSCALL(x) PT_REGS_PARM3(x)
@@ -381,79 +379,8 @@ struct pt_regs;
 #ifndef PT_REGS_SYSCALL_REGS
 /* By default, assume that the arch selects ARCH_HAS_SYSCALL_WRAPPER. */
 #define PT_REGS_SYSCALL_REGS(ctx) ((struct pt_regs *)PT_REGS_PARM1(ctx))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-#endif
-#define PT_REGS_PARM2_SYSCALL(x) PT_REGS_PARM2(x)
-#define PT_REGS_PARM3_SYSCALL(x) PT_REGS_PARM3(x)
-#ifndef PT_REGS_PARM4_SYSCALL
-#define PT_REGS_PARM4_SYSCALL(x) PT_REGS_PARM4(x)
-#endif
-#define PT_REGS_PARM5_SYSCALL(x) PT_REGS_PARM5(x)
-
-#ifndef PT_REGS_PARM1_CORE_SYSCALL
-#define PT_REGS_PARM1_CORE_SYSCALL(x) PT_REGS_PARM1_CORE(x)
-#endif
-#define PT_REGS_PARM2_CORE_SYSCALL(x) PT_REGS_PARM2_CORE(x)
-#define PT_REGS_PARM3_CORE_SYSCALL(x) PT_REGS_PARM3_CORE(x)
-#ifndef PT_REGS_PARM4_CORE_SYSCALL
-#define PT_REGS_PARM4_CORE_SYSCALL(x) PT_REGS_PARM4_CORE(x)
-#endif
-#define PT_REGS_PARM5_CORE_SYSCALL(x) PT_REGS_PARM5_CORE(x)
-
-#else /* defined(bpf_target_defined) */
-
-#define PT_REGS_PARM1(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM2(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM3(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM4(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM5(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_RET(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_FP(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_RC(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_SP(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_IP(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-
-#define PT_REGS_PARM1_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM2_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM3_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM4_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM5_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_RET_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_FP_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_RC_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_SP_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_IP_CORE(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-
-#define BPF_KPROBE_READ_RET_IP(ip, ctx) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define BPF_KRETPROBE_READ_RET_IP(ip, ctx) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-
-#define PT_REGS_PARM1_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM2_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM3_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM4_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM5_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-
-#define PT_REGS_PARM1_CORE_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM2_CORE_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM3_CORE_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM4_CORE_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-#define PT_REGS_PARM5_CORE_SYSCALL(x) ({ _Pragma(__BPF_TARGET_MISSING); 0l; })
-
-#endif /* defined(bpf_target_defined) */
-
-<<<<<<< HEAD
-/*
- * When invoked from a syscall handler kprobe, returns a pointer to a
- * struct pt_regs containing syscall arguments and suitable for passing to
- * PT_REGS_PARMn_SYSCALL() and PT_REGS_PARMn_CORE_SYSCALL().
- */
-#ifndef PT_REGS_SYSCALL_REGS
-/* By default, assume that the arch selects ARCH_HAS_SYSCALL_WRAPPER. */
-#define PT_REGS_SYSCALL_REGS(ctx) ((struct pt_regs *)PT_REGS_PARM1(ctx))
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifndef ___bpf_concat
 #define ___bpf_concat(a, b) a ## b
 #endif

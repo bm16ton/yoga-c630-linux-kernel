@@ -195,11 +195,8 @@ int prestera_acl_ruleset_bind(struct prestera_acl_ruleset *ruleset,
 int prestera_acl_ruleset_unbind(struct prestera_acl_ruleset *ruleset,
 				struct prestera_port *port);
 u32 prestera_acl_ruleset_index_get(const struct prestera_acl_ruleset *ruleset);
-<<<<<<< HEAD
 void prestera_acl_ruleset_prio_get(struct prestera_acl_ruleset *ruleset,
 				   u32 *prio_min, u32 *prio_max);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void
 prestera_acl_rule_keymask_pcl_id_set(struct prestera_acl_rule *rule,
 				     u16 pcl_id);

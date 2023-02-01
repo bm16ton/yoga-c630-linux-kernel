@@ -447,7 +447,6 @@ static int ak4458_hw_params(struct snd_pcm_substream *substream,
 	snd_soc_component_update_bits(component, AK4458_0B_CONTROL7,
 				      AK4458_DCHAIN_MASK, dchn);
 
-<<<<<<< HEAD
 	if (ak4458->drvdata->type == AK4497) {
 		ret = snd_soc_component_update_bits(component, AK4458_09_DSD2,
 						    0x4, (ak4458->dsd_path << 2));
@@ -455,8 +454,6 @@ static int ak4458_hw_params(struct snd_pcm_substream *substream,
 			return ret;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ak4458_rstn_control(component, 0);
 	if (ret)
 		return ret;

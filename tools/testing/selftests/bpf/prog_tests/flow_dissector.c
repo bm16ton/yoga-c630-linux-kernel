@@ -626,15 +626,11 @@ void test_flow_dissector(void)
 
 		err = bpf_prog_test_run_opts(prog_fd, &topts);
 		ASSERT_OK(err, "test_run");
-<<<<<<< HEAD
 		ASSERT_EQ(topts.retval, tests[i].retval, "test_run retval");
 
 		/* check the resulting flow_keys only if BPF_OK returned */
 		if (topts.retval != BPF_OK)
 			continue;
-=======
-		ASSERT_EQ(topts.retval, 1, "test_run retval");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ASSERT_EQ(topts.data_size_out, sizeof(flow_keys),
 			  "test_run data_size_out");
 		CHECK_FLOW_KEYS(tests[i].name, flow_keys, tests[i].keys);

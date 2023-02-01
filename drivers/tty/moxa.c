@@ -491,11 +491,7 @@ static int moxa_write(struct tty_struct *, const unsigned char *, int);
 static unsigned int moxa_write_room(struct tty_struct *);
 static void moxa_flush_buffer(struct tty_struct *);
 static unsigned int moxa_chars_in_buffer(struct tty_struct *);
-<<<<<<< HEAD
 static void moxa_set_termios(struct tty_struct *, const struct ktermios *);
-=======
-static void moxa_set_termios(struct tty_struct *, struct ktermios *);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void moxa_stop(struct tty_struct *);
 static void moxa_start(struct tty_struct *);
 static void moxa_hangup(struct tty_struct *);

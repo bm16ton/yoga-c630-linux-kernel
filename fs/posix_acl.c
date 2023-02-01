@@ -24,10 +24,7 @@
 #include <linux/user_namespace.h>
 #include <linux/namei.h>
 #include <linux/mnt_idmapping.h>
-<<<<<<< HEAD
 #include <linux/iversion.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct posix_acl **acl_by_type(struct inode *inode, int type)
 {
@@ -749,8 +746,6 @@ void posix_acl_getxattr_idmapped_mnt(struct user_namespace *mnt_userns,
 	kgid_t gid;
 
 	if (no_idmapping(mnt_userns, i_user_ns(inode)))
-<<<<<<< HEAD
-=======
 		return;
 
 	count = posix_acl_fix_xattr_common(value, size);
@@ -770,59 +765,6 @@ void posix_acl_getxattr_idmapped_mnt(struct user_namespace *mnt_userns,
 			vfsgid = make_vfsgid(mnt_userns, fs_userns, gid);
 			entry->e_id = cpu_to_le32(from_kgid(&init_user_ns,
 						vfsgid_into_kgid(vfsgid)));
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-void posix_acl_setxattr_idmapped_mnt(struct user_namespace *mnt_userns,
-				     const struct inode *inode,
-				     void *value, size_t size)
-{
-	struct posix_acl_xattr_header *header = value;
-	struct posix_acl_xattr_entry *entry = (void *)(header + 1), *end;
-	struct user_namespace *fs_userns = i_user_ns(inode);
-	int count;
-	vfsuid_t vfsuid;
-	vfsgid_t vfsgid;
-	kuid_t uid;
-	kgid_t gid;
-
-	if (no_idmapping(mnt_userns, i_user_ns(inode)))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		return;
-
-	count = posix_acl_fix_xattr_common(value, size);
-	if (count <= 0)
-		return;
-
-	for (end = entry + count; entry != end; entry++) {
-		switch (le16_to_cpu(entry->e_tag)) {
-		case ACL_USER:
-			uid = make_kuid(&init_user_ns, le32_to_cpu(entry->e_id));
-<<<<<<< HEAD
-			vfsuid = make_vfsuid(mnt_userns, fs_userns, uid);
-			entry->e_id = cpu_to_le32(from_kuid(&init_user_ns,
-						vfsuid_into_kuid(vfsuid)));
-			break;
-		case ACL_GROUP:
-			gid = make_kgid(&init_user_ns, le32_to_cpu(entry->e_id));
-			vfsgid = make_vfsgid(mnt_userns, fs_userns, gid);
-			entry->e_id = cpu_to_le32(from_kgid(&init_user_ns,
-						vfsgid_into_kgid(vfsgid)));
-=======
-			vfsuid = VFSUIDT_INIT(uid);
-			uid = from_vfsuid(mnt_userns, fs_userns, vfsuid);
-			entry->e_id = cpu_to_le32(from_kuid(&init_user_ns, uid));
-			break;
-		case ACL_GROUP:
-			gid = make_kgid(&init_user_ns, le32_to_cpu(entry->e_id));
-			vfsgid = VFSGIDT_INIT(gid);
-			gid = from_vfsgid(mnt_userns, fs_userns, vfsgid);
-			entry->e_id = cpu_to_le32(from_kgid(&init_user_ns, gid));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		default:
 			break;

@@ -181,15 +181,10 @@ struct map *get_target_map(const char *target, struct nsinfo *nsi, bool user)
 
 		map = dso__new_map(target);
 		if (map && map->dso) {
-<<<<<<< HEAD
 			mutex_lock(&map->dso->lock);
 			nsinfo__put(map->dso->nsinfo);
 			map->dso->nsinfo = nsinfo__get(nsi);
 			mutex_unlock(&map->dso->lock);
-=======
-			nsinfo__put(map->dso->nsinfo);
-			map->dso->nsinfo = nsinfo__get(nsi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		return map;
 	} else {

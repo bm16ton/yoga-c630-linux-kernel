@@ -1038,7 +1038,6 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
 	return 0;
 }
 
-<<<<<<< HEAD
 void sockopt_lock_sock(struct sock *sk)
 {
 	/* When current->bpf_ctx is set, the setsockopt is called from
@@ -1073,8 +1072,6 @@ bool sockopt_capable(int cap)
 }
 EXPORT_SYMBOL(sockopt_capable);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  *	This is meant for all protocols to use and covers goings on
  *	at the socket level. Everything here is generic.
@@ -1084,10 +1081,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
 		  sockptr_t optval, unsigned int optlen)
 {
 	struct so_timestamping timestamping;
-<<<<<<< HEAD
 	struct socket *sock = sk->sk_socket;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sock_txtime sk_txtime;
 	int val;
 	int valbool;
@@ -1206,13 +1200,8 @@ set_sndbuf:
 
 	case SO_PRIORITY:
 		if ((val >= 0 && val <= 6) ||
-<<<<<<< HEAD
 		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
 		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-=======
-		    ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
-		    ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			sk->sk_priority = val;
 		else
 			ret = -EPERM;
@@ -1357,13 +1346,8 @@ set_sndbuf:
 			clear_bit(SOCK_PASSSEC, &sock->flags);
 		break;
 	case SO_MARK:
-<<<<<<< HEAD
 		if (!sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
 		    !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-=======
-		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
-		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = -EPERM;
 			break;
 		}
@@ -1371,13 +1355,8 @@ set_sndbuf:
 		__sock_set_mark(sk, val);
 		break;
 	case SO_RCVMARK:
-<<<<<<< HEAD
 		if (!sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
 		    !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-=======
-		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
-		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = -EPERM;
 			break;
 		}
@@ -1759,11 +1738,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
 		cred_to_ucred(sk->sk_peer_pid, sk->sk_peer_cred, &peercred);
 		spin_unlock(&sk->sk_peer_lock);
 
-<<<<<<< HEAD
 		if (copy_to_sockptr(optval, &peercred, len))
-=======
-		if (copy_to_user(optval, &peercred, len))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return -EFAULT;
 		goto lenout;
 	}
@@ -1781,19 +1756,11 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
 		if (len < n * sizeof(gid_t)) {
 			len = n * sizeof(gid_t);
 			put_cred(cred);
-<<<<<<< HEAD
 			return copy_to_sockptr(optlen, &len, sizeof(int)) ? -EFAULT : -ERANGE;
 		}
 		len = n * sizeof(gid_t);
 
 		ret = groups_to_user(optval, cred->group_info);
-=======
-			return put_user(len, optlen) ? -EFAULT : -ERANGE;
-		}
-		len = n * sizeof(gid_t);
-
-		ret = groups_to_user((gid_t __user *)optval, cred->group_info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		put_cred(cred);
 		if (ret)
 			return ret;

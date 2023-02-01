@@ -473,12 +473,6 @@ patternProperties:
               Specifies whether the event is to be interpreted as a key (1)
               or a switch (5).
 
-<<<<<<< HEAD
-=======
-        required:
-          - linux,code
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         additionalProperties: false
 
     dependencies:
@@ -504,11 +498,7 @@ patternProperties:
 
       azoteq,slider-size:
         $ref: /schemas/types.yaml#/definitions/uint32
-<<<<<<< HEAD
         minimum: 1
-=======
-        minimum: 0
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         maximum: 65535
         description:
           Specifies the slider's one-dimensional resolution, equal to the
@@ -582,15 +572,9 @@ patternProperties:
           linux,code: true
 
           azoteq,gesture-max-ms:
-<<<<<<< HEAD
             multipleOf: 16
             minimum: 0
             maximum: 4080
-=======
-            multipleOf: 4
-            minimum: 0
-            maximum: 1020
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             description:
               Specifies the length of time (in ms) within which a tap, swipe
               or flick gesture must be completed in order to be acknowledged
@@ -598,15 +582,9 @@ patternProperties:
               gesture applies to all remaining swipe or flick gestures.
 
           azoteq,gesture-min-ms:
-<<<<<<< HEAD
             multipleOf: 16
             minimum: 0
             maximum: 496
-=======
-            multipleOf: 4
-            minimum: 0
-            maximum: 124
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             description:
               Specifies the length of time (in ms) for which a tap gesture must
               be held in order to be acknowledged by the device.
@@ -639,12 +617,6 @@ patternProperties:
               GPIO, they must all be of the same type (proximity, touch or
               slider gesture).
 
-<<<<<<< HEAD
-=======
-        required:
-          - linux,code
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         additionalProperties: false
 
     required:
@@ -715,10 +687,7 @@ allOf:
           properties:
             azoteq,slider-size:
               multipleOf: 16
-<<<<<<< HEAD
               minimum: 16
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               maximum: 4080
 
             azoteq,top-speed:
@@ -961,24 +930,14 @@ examples:
 
                             event-tap {
                                     linux,code = <KEY_PLAYPAUSE>;
-<<<<<<< HEAD
                                     azoteq,gesture-max-ms = <400>;
                                     azoteq,gesture-min-ms = <32>;
-=======
-                                    azoteq,gesture-max-ms = <600>;
-                                    azoteq,gesture-min-ms = <24>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
                             };
 
                             event-flick-pos {
                                     linux,code = <KEY_NEXTSONG>;
-<<<<<<< HEAD
                                     azoteq,gesture-max-ms = <800>;
                                     azoteq,gesture-dist = <800>;
-=======
-                                    azoteq,gesture-max-ms = <600>;
-                                    azoteq,gesture-dist = <816>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
                             };
 
                             event-flick-neg {

@@ -466,7 +466,6 @@ build_signing_ctxt(struct smb2_signing_capabilities *pneg_ctxt)
 	/*
 	 * Context Data length must be rounded to multiple of 8 for some servers
 	 */
-<<<<<<< HEAD
 	pneg_ctxt->DataLength = cpu_to_le16(ALIGN(sizeof(struct smb2_signing_capabilities) -
 					    sizeof(struct smb2_neg_context) +
 					    (num_algs * sizeof(u16)), 8));
@@ -475,17 +474,6 @@ build_signing_ctxt(struct smb2_signing_capabilities *pneg_ctxt)
 
 	ctxt_len += sizeof(__le16) * num_algs;
 	ctxt_len = ALIGN(ctxt_len, 8);
-=======
-	pneg_ctxt->DataLength = cpu_to_le16(DIV_ROUND_UP(
-				sizeof(struct smb2_signing_capabilities) -
-				sizeof(struct smb2_neg_context) +
-				(num_algs * 2 /* sizeof u16 */), 8) * 8);
-	pneg_ctxt->SigningAlgorithmCount = cpu_to_le16(num_algs);
-	pneg_ctxt->SigningAlgorithms[0] = cpu_to_le16(SIGNING_ALG_AES_CMAC);
-
-	ctxt_len += 2 /* sizeof le16 */ * num_algs;
-	ctxt_len = DIV_ROUND_UP(ctxt_len, 8) * 8;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ctxt_len;
 	/* TBD add SIGNING_ALG_AES_GMAC and/or SIGNING_ALG_HMAC_SHA256 */
 }
@@ -556,12 +544,7 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
 	unsigned int ctxt_len, neg_context_count;
 	struct TCP_Server_Info *pserver;
 	char *pneg_ctxt;
-<<<<<<< HEAD
 	char *hostname;
-=======
-	char *hostname = NULL;
-	unsigned int ctxt_len, neg_context_count;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (*total_len > 200) {
 		/* In case length corrupted don't want to overrun smb buffer */
@@ -592,14 +575,9 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
 	 * secondary channels don't have the hostname field populated
 	 * use the hostname field in the primary channel instead
 	 */
-<<<<<<< HEAD
 	pserver = CIFS_SERVER_IS_CHAN(server) ? server->primary_server : server;
 	cifs_server_lock(pserver);
 	hostname = pserver->hostname;
-=======
-	hostname = CIFS_SERVER_IS_CHAN(server) ?
-		server->primary_server->hostname : server->hostname;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (hostname && (hostname[0] != 0)) {
 		ctxt_len = build_netname_ctxt((struct smb2_netname_neg_context *)pneg_ctxt,
 					      hostname);
@@ -608,10 +586,7 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
 		neg_context_count = 3;
 	} else
 		neg_context_count = 2;
-<<<<<<< HEAD
 	cifs_server_unlock(pserver);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	build_posix_ctxt((struct smb2_posix_neg_context *)pneg_ctxt);
 	*total_len += sizeof(struct smb2_posix_neg_context);
@@ -1965,11 +1940,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
 	tcon->capabilities = rsp->Capabilities; /* we keep caps little endian */
 	tcon->maximal_access = le32_to_cpu(rsp->MaximalAccess);
 	tcon->tid = le32_to_cpu(rsp->hdr.Id.SyncId.TreeId);
-<<<<<<< HEAD
 	strscpy(tcon->tree_name, tree, sizeof(tcon->tree_name));
-=======
-	strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
 	    ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
@@ -2012,10 +1983,7 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
 	if (!ses || !(ses->server))
 		return -EIO;
 
-<<<<<<< HEAD
 	trace_smb3_tdis_enter(xid, tcon->tid, ses->Suid, tcon->tree_name);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_lock(&ses->chan_lock);
 	if ((tcon->need_reconnect) ||
 	    (CIFS_ALL_CHANS_NEED_RECONNECT(tcon->ses))) {
@@ -2534,11 +2502,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
 	memcpy(aclptr, &acl, sizeof(struct smb3_acl));
 
 	buf->ccontext.DataLength = cpu_to_le32(ptr - (__u8 *)&buf->sd);
-<<<<<<< HEAD
 	*len = round_up((unsigned int)(ptr - (__u8 *)buf), 8);
-=======
-	*len = roundup(ptr - (__u8 *)buf, 8);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return buf;
 }
@@ -2632,11 +2596,7 @@ alloc_path_with_tree_prefix(__le16 **out_path, int *out_size, int *out_len,
 	 * final path needs to be 8-byte aligned as specified in
 	 * MS-SMB2 2.2.13 SMB2 CREATE Request.
 	 */
-<<<<<<< HEAD
 	*out_size = round_up(*out_len * sizeof(__le16), 8);
-=======
-	*out_size = roundup(*out_len * sizeof(__le16), 8);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*out_path = kzalloc(*out_size + sizeof(__le16) /* null */, GFP_KERNEL);
 	if (!*out_path)
 		return -ENOMEM;

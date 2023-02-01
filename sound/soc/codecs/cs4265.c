@@ -623,21 +623,12 @@ static int cs4265_i2c_probe(struct i2c_client *i2c_client)
 			ARRAY_SIZE(cs4265_dai));
 }
 
-<<<<<<< HEAD
 static void cs4265_i2c_remove(struct i2c_client *i2c)
-=======
-static int cs4265_i2c_remove(struct i2c_client *i2c)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct cs4265_private *cs4265 = i2c_get_clientdata(i2c);
 
 	if (cs4265->reset_gpio)
 		gpiod_set_value_cansleep(cs4265->reset_gpio, 0);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id cs4265_of_match[] = {

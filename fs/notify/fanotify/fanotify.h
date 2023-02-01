@@ -146,7 +146,6 @@ static inline int fanotify_info_file_fh_len(struct fanotify_info *info)
 static inline struct fanotify_fh *fanotify_info_file_fh(struct fanotify_info *info)
 {
 	return (struct fanotify_fh *)FANOTIFY_FILE_FH_BUF(info);
-<<<<<<< HEAD
 }
 
 static inline char *fanotify_info_name(struct fanotify_info *info)
@@ -159,20 +158,6 @@ static inline char *fanotify_info_name(struct fanotify_info *info)
 
 static inline char *fanotify_info_name2(struct fanotify_info *info)
 {
-=======
-}
-
-static inline char *fanotify_info_name(struct fanotify_info *info)
-{
-	if (!info->name_len)
-		return NULL;
-
-	return FANOTIFY_NAME_BUF(info);
-}
-
-static inline char *fanotify_info_name2(struct fanotify_info *info)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!info->name2_len)
 		return NULL;
 
@@ -463,14 +448,6 @@ static inline struct fanotify_event *FANOTIFY_E(struct fsnotify_event *fse)
 }
 
 static inline bool fanotify_is_error_event(u32 mask)
-<<<<<<< HEAD
-=======
-{
-	return mask & FAN_FS_ERROR;
-}
-
-static inline bool fanotify_event_has_path(struct fanotify_event *event)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return mask & FAN_FS_ERROR;
 }

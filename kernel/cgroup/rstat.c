@@ -143,7 +143,6 @@ static struct cgroup *cgroup_rstat_cpu_pop_updated(struct cgroup *pos,
 
 	rstatc->updated_next = NULL;
 	return pos;
-<<<<<<< HEAD
 }
 
 /*
@@ -167,8 +166,6 @@ __diag_ignore_all("-Wmissing-prototypes",
 __weak noinline void bpf_rstat_flush(struct cgroup *cgrp,
 				     struct cgroup *parent, int cpu)
 {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 __diag_pop();
@@ -533,7 +530,6 @@ void cgroup_base_stat_cputime_show(struct seq_file *seq)
 #ifdef CONFIG_SCHED_CORE
 	seq_printf(seq, "core_sched.force_idle_usec %llu\n", forceidle_time);
 #endif
-<<<<<<< HEAD
 }
 
 /* Add bpf kfuncs for cgroup_rstat_updated() and cgroup_rstat_flush() */
@@ -551,7 +547,5 @@ static int __init bpf_rstat_kfunc_init(void)
 {
 	return register_btf_kfunc_id_set(BPF_PROG_TYPE_TRACING,
 					 &bpf_rstat_kfunc_set);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 late_initcall(bpf_rstat_kfunc_init);

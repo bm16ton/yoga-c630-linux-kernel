@@ -21,15 +21,10 @@ void hfs_bnode_read(struct hfs_bnode *node, void *buf, int off, int len)
 	int pagenum;
 	int bytes_read;
 	int bytes_to_read;
-<<<<<<< HEAD
-=======
-	void *vaddr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	off += node->page_offset;
 	pagenum = off >> PAGE_SHIFT;
 	off &= ~PAGE_MASK; /* compute page offset for the first page */
-<<<<<<< HEAD
 
 	for (bytes_read = 0; bytes_read < len; bytes_read += bytes_to_read) {
 		if (pagenum >= node->tree->pages_per_bnode)
@@ -39,19 +34,6 @@ void hfs_bnode_read(struct hfs_bnode *node, void *buf, int off, int len)
 
 		memcpy_from_page(buf + bytes_read, page, off, bytes_to_read);
 
-=======
-
-	for (bytes_read = 0; bytes_read < len; bytes_read += bytes_to_read) {
-		if (pagenum >= node->tree->pages_per_bnode)
-			break;
-		page = node->page[pagenum];
-		bytes_to_read = min_t(int, len - bytes_read, PAGE_SIZE - off);
-
-		vaddr = kmap_atomic(page);
-		memcpy(buf + bytes_read, vaddr + off, bytes_to_read);
-		kunmap_atomic(vaddr);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pagenum++;
 		off = 0; /* page offset only applies to the first page */
 	}

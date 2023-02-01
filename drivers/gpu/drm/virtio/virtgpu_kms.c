@@ -67,10 +67,7 @@ static void virtio_gpu_get_capsets(struct virtio_gpu_device *vgdev,
 {
 	int i, ret;
 	bool invalid_capset_id = false;
-<<<<<<< HEAD
 	struct drm_device *drm = vgdev->ddev;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vgdev->capsets = drmm_kcalloc(drm, num_capsets,
 				      sizeof(struct virtio_gpu_drv_capset),

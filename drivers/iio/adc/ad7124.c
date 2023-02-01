@@ -505,7 +505,6 @@ static int ad7124_prepare_read(struct ad7124_state *st, int address)
 static int __ad7124_set_channel(struct ad_sigma_delta *sd, unsigned int channel)
 {
 	struct ad7124_state *st = container_of(sd, struct ad7124_state, sd);
-<<<<<<< HEAD
 
 	return ad7124_prepare_read(st, channel);
 }
@@ -546,48 +545,6 @@ static int ad7124_disable_all(struct ad_sigma_delta *sd)
 	int ret;
 	int i;
 
-=======
-
-	return ad7124_prepare_read(st, channel);
-}
-
-static int ad7124_set_channel(struct ad_sigma_delta *sd, unsigned int channel)
-{
-	struct ad7124_state *st = container_of(sd, struct ad7124_state, sd);
-	int ret;
-
-	mutex_lock(&st->cfgs_lock);
-	ret = __ad7124_set_channel(sd, channel);
-	mutex_unlock(&st->cfgs_lock);
-
-	return ret;
-}
-
-static int ad7124_append_status(struct ad_sigma_delta *sd, bool append)
-{
-	struct ad7124_state *st = container_of(sd, struct ad7124_state, sd);
-	unsigned int adc_control = st->adc_control;
-	int ret;
-
-	adc_control &= ~AD7124_ADC_STATUS_EN_MSK;
-	adc_control |= AD7124_ADC_STATUS_EN(append);
-
-	ret = ad_sd_write_reg(&st->sd, AD7124_ADC_CONTROL, 2, adc_control);
-	if (ret < 0)
-		return ret;
-
-	st->adc_control = adc_control;
-
-	return 0;
-}
-
-static int ad7124_disable_all(struct ad_sigma_delta *sd)
-{
-	struct ad7124_state *st = container_of(sd, struct ad7124_state, sd);
-	int ret;
-	int i;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < st->num_channels; i++) {
 		ret = ad7124_spi_write_mask(st, AD7124_CHANNEL(i), AD7124_CHANNEL_EN_MSK, 0, 2);
 		if (ret < 0)
@@ -979,11 +936,6 @@ static void ad7124_reg_disable(void *r)
 	regulator_disable(r);
 }
 
-static void ad7124_clk_disable(void *c)
-{
-	clk_disable_unprepare(c);
-}
-
 static int ad7124_probe(struct spi_device *spi)
 {
 	const struct ad7124_chip_info *info;
@@ -1040,17 +992,6 @@ static int ad7124_probe(struct spi_device *spi)
 	if (IS_ERR(st->mclk))
 		return PTR_ERR(st->mclk);
 
-<<<<<<< HEAD
-=======
-	ret = clk_prepare_enable(st->mclk);
-	if (ret < 0)
-		return ret;
-
-	ret = devm_add_action_or_reset(&spi->dev, ad7124_clk_disable, st->mclk);
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ad7124_soft_reset(st);
 	if (ret < 0)
 		return ret;

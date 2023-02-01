@@ -246,10 +246,7 @@ int __must_check regulator_bulk_get(struct device *dev, int num_consumers,
 				    struct regulator_bulk_data *consumers);
 int __must_check devm_regulator_bulk_get(struct device *dev, int num_consumers,
 					 struct regulator_bulk_data *consumers);
-<<<<<<< HEAD
 void devm_regulator_bulk_put(struct regulator_bulk_data *consumers);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int __must_check devm_regulator_bulk_get_const(
 	struct device *dev, int num_consumers,
 	const struct regulator_bulk_data *in_consumers,

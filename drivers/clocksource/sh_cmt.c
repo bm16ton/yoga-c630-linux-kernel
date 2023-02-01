@@ -652,17 +652,10 @@ static u64 sh_cmt_clocksource_read(struct clocksource *cs)
 		if (unlikely(has_wrapped))
 			raw += ch->match_value + 1;
 		raw_spin_unlock_irqrestore(&ch->lock, flags);
-<<<<<<< HEAD
 
 		return value + raw;
 	}
 
-=======
-
-		return value + raw;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sh_cmt_get_counter(ch, &has_wrapped);
 }
 

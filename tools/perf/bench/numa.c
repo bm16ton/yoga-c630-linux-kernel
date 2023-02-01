@@ -34,10 +34,7 @@
 #include <linux/zalloc.h>
 
 #include "../util/header.h"
-<<<<<<< HEAD
 #include "../util/mutex.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <numa.h>
 #include <numaif.h>
 
@@ -328,7 +325,6 @@ static cpu_set_t *bind_to_node(int target_node)
 	BUG_ON(!orig_mask);
 	size = CPU_ALLOC_SIZE(nrcpus);
 	CPU_ZERO_S(size, orig_mask);
-<<<<<<< HEAD
 
 	if (sched_getaffinity(0, size, orig_mask))
 		goto err_out;
@@ -337,16 +333,6 @@ static cpu_set_t *bind_to_node(int target_node)
 	if (!mask)
 		goto err_out;
 
-=======
-
-	if (sched_getaffinity(0, size, orig_mask))
-		goto err_out;
-
-	mask = CPU_ALLOC(nrcpus);
-	if (!mask)
-		goto err_out;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	CPU_ZERO_S(size, mask);
 
 	if (target_node == NUMA_NO_NODE) {

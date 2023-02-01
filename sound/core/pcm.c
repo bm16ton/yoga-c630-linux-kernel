@@ -970,11 +970,7 @@ int snd_pcm_attach_substream(struct snd_pcm *pcm, int stream,
 	init_waitqueue_head(&runtime->sleep);
 	init_waitqueue_head(&runtime->tsleep);
 
-<<<<<<< HEAD
 	__snd_pcm_set_state(runtime, SNDRV_PCM_STATE_OPEN);
-=======
-	runtime->status->state = SNDRV_PCM_STATE_OPEN;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&runtime->buffer_mutex);
 	atomic_set(&runtime->buffer_accessing, 0);
 

@@ -19,10 +19,6 @@ static int process_event_mask(struct perf_tool *tool __maybe_unused,
 	struct perf_record_cpu_map *map_event = &event->cpu_map;
 	struct perf_record_cpu_map_data *data;
 	struct perf_cpu_map *map;
-<<<<<<< HEAD
-=======
-	int i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int long_size;
 
 	data = &map_event->data;
@@ -32,7 +28,6 @@ static int process_event_mask(struct perf_tool *tool __maybe_unused,
 	long_size = data->mask32_data.long_size;
 
 	TEST_ASSERT_VAL("wrong long_size", long_size == 4 || long_size == 8);
-<<<<<<< HEAD
 
 	TEST_ASSERT_VAL("wrong nr",   data->mask32_data.nr == 1);
 
@@ -40,27 +35,13 @@ static int process_event_mask(struct perf_tool *tool __maybe_unused,
 	TEST_ASSERT_VAL("wrong cpu", !perf_record_cpu_map_data__test_bit(1, data));
 	for (int i = 2; i <= 20; i++)
 		TEST_ASSERT_VAL("wrong cpu", perf_record_cpu_map_data__test_bit(i, data));
-=======
-
-	TEST_ASSERT_VAL("wrong nr",   data->mask32_data.nr == 1);
-
-	for (i = 0; i < 20; i++) {
-		TEST_ASSERT_VAL("wrong cpu", perf_record_cpu_map_data__test_bit(i, data));
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	map = cpu_map__new_data(data);
 	TEST_ASSERT_VAL("wrong nr",  perf_cpu_map__nr(map) == 20);
 
-<<<<<<< HEAD
 	TEST_ASSERT_VAL("wrong cpu", perf_cpu_map__cpu(map, 0).cpu == 0);
 	for (int i = 2; i <= 20; i++)
 		TEST_ASSERT_VAL("wrong cpu", perf_cpu_map__cpu(map, i - 1).cpu == i);
-=======
-	for (i = 0; i < 20; i++) {
-		TEST_ASSERT_VAL("wrong cpu", perf_cpu_map__cpu(map, i).cpu == i);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	perf_cpu_map__put(map);
 	return 0;
@@ -82,7 +63,6 @@ static int process_event_cpus(struct perf_tool *tool __maybe_unused,
 	TEST_ASSERT_VAL("wrong nr",   data->cpus_data.nr == 2);
 	TEST_ASSERT_VAL("wrong cpu",  data->cpus_data.cpu[0] == 1);
 	TEST_ASSERT_VAL("wrong cpu",  data->cpus_data.cpu[1] == 256);
-<<<<<<< HEAD
 
 	map = cpu_map__new_data(data);
 	TEST_ASSERT_VAL("wrong nr",  perf_cpu_map__nr(map) == 2);
@@ -114,13 +94,6 @@ static int process_event_range_cpus(struct perf_tool *tool __maybe_unused,
 	TEST_ASSERT_VAL("wrong nr",  perf_cpu_map__nr(map) == 256);
 	TEST_ASSERT_VAL("wrong cpu", perf_cpu_map__cpu(map, 0).cpu == 1);
 	TEST_ASSERT_VAL("wrong cpu", perf_cpu_map__max(map).cpu == 256);
-=======
-
-	map = cpu_map__new_data(data);
-	TEST_ASSERT_VAL("wrong nr",  perf_cpu_map__nr(map) == 2);
-	TEST_ASSERT_VAL("wrong cpu", perf_cpu_map__cpu(map, 0).cpu == 1);
-	TEST_ASSERT_VAL("wrong cpu", perf_cpu_map__cpu(map, 1).cpu == 256);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	TEST_ASSERT_VAL("wrong refcnt", refcount_read(&map->refcnt) == 1);
 	perf_cpu_map__put(map);
 	return 0;

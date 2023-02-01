@@ -4389,30 +4389,17 @@ int perf_event__process_event_update(struct perf_tool *tool __maybe_unused,
 	switch (ev->type) {
 	case PERF_EVENT_UPDATE__UNIT:
 		free((char *)evsel->unit);
-<<<<<<< HEAD
 		evsel->unit = strdup(ev->unit);
 		break;
 	case PERF_EVENT_UPDATE__NAME:
 		free(evsel->name);
 		evsel->name = strdup(ev->name);
-=======
-		evsel->unit = strdup(ev->data);
-		break;
-	case PERF_EVENT_UPDATE__NAME:
-		free(evsel->name);
-		evsel->name = strdup(ev->data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case PERF_EVENT_UPDATE__SCALE:
 		evsel->scale = ev->scale.scale;
 		break;
 	case PERF_EVENT_UPDATE__CPUS:
-<<<<<<< HEAD
 		map = cpu_map__new_data(&ev->cpus.cpus);
-=======
-		ev_cpus = (struct perf_record_event_update_cpus *)ev->data;
-		map = cpu_map__new_data(&ev_cpus->cpus);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (map) {
 			perf_cpu_map__put(evsel->core.own_cpus);
 			evsel->core.own_cpus = map;

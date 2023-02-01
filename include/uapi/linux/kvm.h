@@ -1177,10 +1177,7 @@ struct kvm_ppc_resize_hpt {
 #define KVM_CAP_VM_DISABLE_NX_HUGE_PAGES 220
 #define KVM_CAP_S390_ZPCI_OP 221
 #define KVM_CAP_S390_CPU_TOPOLOGY 222
-<<<<<<< HEAD
 #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef KVM_CAP_IRQ_ROUTING
 

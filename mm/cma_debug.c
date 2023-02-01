@@ -163,10 +163,6 @@ DEFINE_DEBUGFS_ATTRIBUTE(cma_alloc_fops, NULL, cma_alloc_write, "%llu\n");
 static void cma_debugfs_add_one(struct cma *cma, struct dentry *root_dentry)
 {
 	struct dentry *tmp;
-<<<<<<< HEAD
-=======
-	char name[CMA_MAX_NAME];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	tmp = debugfs_create_dir(cma->name, root_dentry);
 

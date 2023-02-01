@@ -1159,10 +1159,7 @@ static int ocfs2_fill_super(struct super_block *sb, void *data, int silent)
 out_dismount:
 	atomic_set(&osb->vol_state, VOLUME_DISABLED);
 	wake_up(&osb->osb_mount_event);
-<<<<<<< HEAD
 	ocfs2_free_replay_slots(osb);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ocfs2_dismount_volume(sb, 1);
 	goto out;
 
@@ -1768,13 +1765,7 @@ static int ocfs2_get_sector(struct super_block *sb,
 	if (!buffer_dirty(*bh))
 		clear_buffer_uptodate(*bh);
 	unlock_buffer(*bh);
-<<<<<<< HEAD
 	if (bh_read(*bh, 0) < 0) {
-=======
-	ll_rw_block(REQ_OP_READ, 1, bh);
-	wait_on_buffer(*bh);
-	if (!buffer_uptodate(*bh)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mlog_errno(-EIO);
 		brelse(*bh);
 		*bh = NULL;
@@ -1832,21 +1823,14 @@ static int ocfs2_mount_volume(struct super_block *sb)
 	status = ocfs2_truncate_log_init(osb);
 	if (status < 0) {
 		mlog_errno(status);
-<<<<<<< HEAD
 		goto out_check_volume;
-=======
-		goto out_system_inodes;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ocfs2_super_unlock(osb, 1);
 	return 0;
 
-<<<<<<< HEAD
 out_check_volume:
 	ocfs2_free_replay_slots(osb);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_system_inodes:
 	if (osb->local_alloc_state == OCFS2_LA_ENABLED)
 		ocfs2_shutdown_local_alloc(osb);

@@ -57,10 +57,7 @@ properties:
     enum:
       - mediatek,mt8192-vcodec-dec
       - mediatek,mt8186-vcodec-dec
-<<<<<<< HEAD
       - mediatek,mt8188-vcodec-dec
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - mediatek,mt8195-vcodec-dec
 
   reg:

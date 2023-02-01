@@ -33,11 +33,6 @@ enum rx_packet_type {
 	HIS_REPORT,/*  USB HISR RPT */
 };
 
-<<<<<<< HEAD
-=======
-s32 rtl8188eu_init_recv_priv(struct adapter *padapter);
-void rtl8188eu_free_recv_priv(struct adapter * padapter);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtl8188eu_recv_tasklet(unsigned long priv);
 void update_recvframe_phyinfo_88e(struct recv_frame *fra, struct phy_stat *phy);
 void update_recvframe_attrib_88e(struct recv_frame *fra, struct recv_stat *stat);

@@ -245,12 +245,9 @@ static long linehandle_ioctl_unlocked(struct file *file, unsigned int cmd,
 	unsigned int i;
 	int ret;
 
-<<<<<<< HEAD
 	if (!lh->gdev->chip)
 		return -ENODEV;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (cmd) {
 	case GPIOHANDLE_GET_LINE_VALUES_IOCTL:
 		/* NOTE: It's okay to read values of output lines */
@@ -295,7 +292,6 @@ static long linehandle_ioctl_unlocked(struct file *file, unsigned int cmd,
 	default:
 		return -EINVAL;
 	}
-<<<<<<< HEAD
 }
 
 static long linehandle_ioctl(struct file *file, unsigned int cmd,
@@ -305,8 +301,6 @@ static long linehandle_ioctl(struct file *file, unsigned int cmd,
 
 	return call_ioctl_locked(file, cmd, arg, lh->gdev,
 				 linehandle_ioctl_unlocked);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_COMPAT
@@ -1446,12 +1440,9 @@ static long linereq_ioctl_unlocked(struct file *file, unsigned int cmd,
 	struct linereq *lr = file->private_data;
 	void __user *ip = (void __user *)arg;
 
-<<<<<<< HEAD
 	if (!lr->gdev->chip)
 		return -ENODEV;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (cmd) {
 	case GPIO_V2_LINE_GET_VALUES_IOCTL:
 		return linereq_get_values(lr, ip);
@@ -1462,7 +1453,6 @@ static long linereq_ioctl_unlocked(struct file *file, unsigned int cmd,
 	default:
 		return -EINVAL;
 	}
-<<<<<<< HEAD
 }
 
 static long linereq_ioctl(struct file *file, unsigned int cmd,
@@ -1472,8 +1462,6 @@ static long linereq_ioctl(struct file *file, unsigned int cmd,
 
 	return call_ioctl_locked(file, cmd, arg, lr->gdev,
 				 linereq_ioctl_unlocked);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_COMPAT

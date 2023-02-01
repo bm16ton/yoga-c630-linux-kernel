@@ -245,19 +245,6 @@ static int catpt_acpi_probe(struct platform_device *pdev)
 
 	id = acpi_match_device(dev->driver->acpi_match_table, dev);
 	if (!id)
-<<<<<<< HEAD
-=======
-		return -ENODEV;
-
-	ret = snd_intel_acpi_dsp_driver_probe(dev, id->id);
-	if (ret != SND_INTEL_DSP_DRIVER_ANY && ret != SND_INTEL_DSP_DRIVER_SST) {
-		dev_dbg(dev, "CATPT ACPI driver not selected, aborting probe\n");
-		return -ENODEV;
-	}
-
-	spec = device_get_match_data(dev);
-	if (!spec)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENODEV;
 
 	ret = snd_intel_acpi_dsp_driver_probe(dev, id->id);

@@ -1928,14 +1928,6 @@ static void bq24190_shutdown(struct i2c_client *client)
 	bq24190_set_otg_vbus(bdi, false);
 }
 
-static void bq24190_shutdown(struct i2c_client *client)
-{
-	struct bq24190_dev_info *bdi = i2c_get_clientdata(client);
-
-	/* Turn off 5V boost regulator on shutdown */
-	bq24190_set_otg_vbus(bdi, false);
-}
-
 static __maybe_unused int bq24190_runtime_suspend(struct device *dev)
 {
 	struct i2c_client *client = to_i2c_client(dev);

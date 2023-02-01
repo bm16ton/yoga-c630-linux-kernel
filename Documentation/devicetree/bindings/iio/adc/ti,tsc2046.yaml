@@ -23,12 +23,8 @@ properties:
   interrupts:
     maxItems: 1
 
-<<<<<<< HEAD
   vref-supply:
     description: Optional supply of the reference voltage
-=======
-  spi-max-frequency: true
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   "#io-channel-cells":
     const: 1
@@ -64,14 +60,10 @@ patternProperties:
 
     additionalProperties: false
 
-<<<<<<< HEAD
 allOf:
   - $ref: /schemas/spi/spi-peripheral-props.yaml#
 
 unevaluatedProperties: false
-=======
-additionalProperties: false
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

@@ -405,14 +405,11 @@ nouveau_backlight_init(struct drm_connector *connector)
 			ret = 0;
 		goto fail_alloc;
 	}
-<<<<<<< HEAD
 
 	if (!nouveau_acpi_video_backlight_use_native()) {
 		NV_INFO(drm, "Skipping nv_backlight registration\n");
 		goto fail_alloc;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!nouveau_get_backlight_name(backlight_name, bl)) {
 		NV_ERROR(drm, "Failed to retrieve a unique name for the backlight interface\n");

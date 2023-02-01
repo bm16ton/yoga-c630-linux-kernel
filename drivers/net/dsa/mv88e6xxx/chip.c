@@ -689,20 +689,12 @@ static void mv88e6352_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 
 	/* Port 4 supports automedia if the serdes is associated with it. */
 	if (port == 4) {
-<<<<<<< HEAD
-=======
-		mv88e6xxx_reg_lock(chip);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
 		if (err < 0)
 			dev_err(chip->dev, "p%d: failed to read scratch\n",
 				port);
 		if (err <= 0)
-<<<<<<< HEAD
 			return;
-=======
-			goto unlock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		cmode = mv88e6352_get_port4_serdes_cmode(chip);
 		if (cmode < 0)
@@ -710,11 +702,6 @@ static void mv88e6352_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 				port);
 		else
 			mv88e6xxx_translate_cmode(cmode, supported);
-<<<<<<< HEAD
-=======
-unlock:
-		mv88e6xxx_reg_unlock(chip);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -826,7 +813,6 @@ static void mv88e6393x_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 				MAC_10000FD;
 		}
 	}
-<<<<<<< HEAD
 
 	if (port == 0) {
 		__set_bit(PHY_INTERFACE_MODE_RMII, supported);
@@ -835,8 +821,6 @@ static void mv88e6393x_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
 		__set_bit(PHY_INTERFACE_MODE_RGMII_RXID, supported);
 		__set_bit(PHY_INTERFACE_MODE_RGMII_TXID, supported);
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void mv88e6xxx_get_caps(struct dsa_switch *ds, int port,
@@ -844,7 +828,6 @@ static void mv88e6xxx_get_caps(struct dsa_switch *ds, int port,
 {
 	struct mv88e6xxx_chip *chip = ds->priv;
 
-<<<<<<< HEAD
 	mv88e6xxx_reg_lock(chip);
 	chip->info->ops->phylink_get_caps(chip, port, config);
 	mv88e6xxx_reg_unlock(chip);
@@ -856,14 +839,6 @@ static void mv88e6xxx_get_caps(struct dsa_switch *ds, int port,
 		__set_bit(PHY_INTERFACE_MODE_GMII,
 			  config->supported_interfaces);
 	}
-=======
-	chip->info->ops->phylink_get_caps(chip, port, config);
-
-	/* Internal ports need GMII for PHYLIB */
-	if (mv88e6xxx_phy_is_internal(ds, port))
-		__set_bit(PHY_INTERFACE_MODE_GMII,
-			  config->supported_interfaces);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void mv88e6xxx_mac_config(struct dsa_switch *ds, int port,
@@ -1783,7 +1758,6 @@ static int mv88e6xxx_vtu_walk(struct mv88e6xxx_chip *chip,
 
 	return 0;
 }
-<<<<<<< HEAD
 
 static int mv88e6xxx_vtu_loadpurge(struct mv88e6xxx_chip *chip,
 				   struct mv88e6xxx_vtu_entry *entry)
@@ -1794,18 +1768,6 @@ static int mv88e6xxx_vtu_loadpurge(struct mv88e6xxx_chip *chip,
 	return chip->info->ops->vtu_loadpurge(chip, entry);
 }
 
-=======
-
-static int mv88e6xxx_vtu_loadpurge(struct mv88e6xxx_chip *chip,
-				   struct mv88e6xxx_vtu_entry *entry)
-{
-	if (!chip->info->ops->vtu_loadpurge)
-		return -EOPNOTSUPP;
-
-	return chip->info->ops->vtu_loadpurge(chip, entry);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int mv88e6xxx_fid_map_vlan(struct mv88e6xxx_chip *chip,
 				  const struct mv88e6xxx_vtu_entry *entry,
 				  void *_fid_bitmap)
@@ -3344,11 +3306,7 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 		struct phylink_config pl_config = {};
 		unsigned long caps;
 
-<<<<<<< HEAD
 		chip->info->ops->phylink_get_caps(chip, port, &pl_config);
-=======
-		mv88e6xxx_get_caps(ds, port, &pl_config);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		caps = pl_config.mac_capabilities;
 
@@ -3417,10 +3375,6 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 	 * address lookup on user ports, disable ARP mirroring and don't
 	 * send a copy of all transmitted/received frames on this port
 	 * to the CPU.
-<<<<<<< HEAD
-	 */
-	err = mv88e6xxx_port_set_map_da(chip, port, !dsa_is_user_port(ds, port));
-=======
 	 */
 	err = mv88e6xxx_port_set_map_da(chip, port, !dsa_is_user_port(ds, port));
 	if (err)
@@ -3455,7 +3409,6 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 				dsa_is_user_port(ds, port) ?
 				MV88E6XXX_PORT_CTL2_8021Q_MODE_DISABLED :
 				MV88E6XXX_PORT_CTL2_8021Q_MODE_SECURE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -3472,50 +3425,6 @@ static int mv88e6xxx_setup_port(struct mv88e6xxx_chip *chip, int port)
 	if (err)
 		return err;
 
-<<<<<<< HEAD
-	/* On chips that support it, set all downstream DSA ports'
-	 * VLAN policy to TRAP. In combination with loading
-	 * MV88E6XXX_VID_STANDALONE as a policy entry in the VTU, this
-	 * provides a better isolation barrier between standalone
-	 * ports, as the ATU is bypassed on any intermediate switches
-	 * between the incoming port and the CPU.
-	 */
-	if (dsa_is_downstream_port(ds, port) &&
-	    chip->info->ops->port_set_policy) {
-		err = chip->info->ops->port_set_policy(chip, port,
-						MV88E6XXX_POLICY_MAPPING_VTU,
-						MV88E6XXX_POLICY_ACTION_TRAP);
-		if (err)
-			return err;
-	}
-
-	/* User ports start out in standalone mode and 802.1Q is
-	 * therefore disabled. On DSA ports, all valid VIDs are always
-	 * loaded in the VTU - therefore, enable 802.1Q in order to take
-	 * advantage of VLAN policy on chips that supports it.
-	 */
-	err = mv88e6xxx_port_set_8021q_mode(chip, port,
-				dsa_is_user_port(ds, port) ?
-				MV88E6XXX_PORT_CTL2_8021Q_MODE_DISABLED :
-				MV88E6XXX_PORT_CTL2_8021Q_MODE_SECURE);
-	if (err)
-		return err;
-
-	/* Bind MV88E6XXX_VID_STANDALONE to MV88E6XXX_FID_STANDALONE by
-	 * virtue of the fact that mv88e6xxx_atu_new() will pick it as
-	 * the first free FID. This will be used as the private PVID for
-	 * unbridged ports. Shared (DSA and CPU) ports must also be
-	 * members of this VID, in order to trap all frames assigned to
-	 * it to the CPU.
-	 */
-	err = mv88e6xxx_port_vlan_join(chip, port, MV88E6XXX_VID_STANDALONE,
-				       MV88E6XXX_G1_VTU_DATA_MEMBER_TAG_UNMODIFIED,
-				       false);
-	if (err)
-		return err;
-
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Associate MV88E6XXX_VID_BRIDGED with MV88E6XXX_FID_BRIDGED in the
 	 * ATU by virtue of the fact that mv88e6xxx_atu_new() will pick it as
 	 * the first free FID after MV88E6XXX_FID_STANDALONE. This will be used
@@ -6686,12 +6595,8 @@ out:
 
 static bool mv88e6xxx_lag_can_offload(struct dsa_switch *ds,
 				      struct dsa_lag lag,
-<<<<<<< HEAD
 				      struct netdev_lag_upper_info *info,
 				      struct netlink_ext_ack *extack)
-=======
-				      struct netdev_lag_upper_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mv88e6xxx_chip *chip = ds->priv;
 	struct dsa_port *dp;
@@ -6875,12 +6780,8 @@ static int mv88e6xxx_port_lag_change(struct dsa_switch *ds, int port)
 
 static int mv88e6xxx_port_lag_join(struct dsa_switch *ds, int port,
 				   struct dsa_lag lag,
-<<<<<<< HEAD
 				   struct netdev_lag_upper_info *info,
 				   struct netlink_ext_ack *extack)
-=======
-				   struct netdev_lag_upper_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mv88e6xxx_chip *chip = ds->priv;
 	int err, id;
@@ -6938,12 +6839,8 @@ static int mv88e6xxx_crosschip_lag_change(struct dsa_switch *ds, int sw_index,
 
 static int mv88e6xxx_crosschip_lag_join(struct dsa_switch *ds, int sw_index,
 					int port, struct dsa_lag lag,
-<<<<<<< HEAD
 					struct netdev_lag_upper_info *info,
 					struct netlink_ext_ack *extack)
-=======
-					struct netdev_lag_upper_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mv88e6xxx_chip *chip = ds->priv;
 	int err;
@@ -7290,20 +7187,6 @@ static void mv88e6xxx_remove(struct mdio_device *mdiodev)
 		mv88e6xxx_g1_irq_free(chip);
 	else
 		mv88e6xxx_irq_poll_free(chip);
-
-	dev_set_drvdata(&mdiodev->dev, NULL);
-}
-
-static void mv88e6xxx_shutdown(struct mdio_device *mdiodev)
-{
-	struct dsa_switch *ds = dev_get_drvdata(&mdiodev->dev);
-
-	if (!ds)
-		return;
-
-	dsa_switch_shutdown(ds);
-
-	dev_set_drvdata(&mdiodev->dev, NULL);
 }
 
 static void mv88e6xxx_shutdown(struct mdio_device *mdiodev)

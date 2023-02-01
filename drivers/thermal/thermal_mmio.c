@@ -33,11 +33,7 @@ static int thermal_mmio_get_temperature(struct thermal_zone_device *tz, int *tem
 	return 0;
 }
 
-<<<<<<< HEAD
 static const struct thermal_zone_device_ops thermal_mmio_ops = {
-=======
-static const struct thermal_zone_of_device_ops thermal_mmio_ops = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_temp = thermal_mmio_get_temperature,
 };
 

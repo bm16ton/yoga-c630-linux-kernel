@@ -80,34 +80,8 @@ enum mem_cgroup_events_target {
 	MEM_CGROUP_NTARGETS,
 };
 
-<<<<<<< HEAD
 struct memcg_vmstats_percpu;
 struct memcg_vmstats;
-=======
-struct memcg_vmstats_percpu {
-	/* Local (CPU and cgroup) page state & events */
-	long			state[MEMCG_NR_STAT];
-	unsigned long		events[NR_VM_EVENT_ITEMS];
-
-	/* Delta calculation for lockless upward propagation */
-	long			state_prev[MEMCG_NR_STAT];
-	unsigned long		events_prev[NR_VM_EVENT_ITEMS];
-
-	/* Cgroup1: threshold notifications & softlimit tree updates */
-	unsigned long		nr_page_events;
-	unsigned long		targets[MEM_CGROUP_NTARGETS];
-};
-
-struct memcg_vmstats {
-	/* Aggregated (CPU and subtree) page state & events */
-	long			state[MEMCG_NR_STAT];
-	unsigned long		events[NR_VM_EVENT_ITEMS];
-
-	/* Pending child counts during tree propagation */
-	long			state_pending[MEMCG_NR_STAT];
-	unsigned long		events_pending[NR_VM_EVENT_ITEMS];
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct mem_cgroup_reclaim_iter {
 	struct mem_cgroup *position;
@@ -190,18 +164,6 @@ struct mem_cgroup_thresholds {
 	struct mem_cgroup_threshold_ary *spare;
 };
 
-<<<<<<< HEAD
-=======
-#if defined(CONFIG_SMP)
-struct memcg_padding {
-	char x[0];
-} ____cacheline_internodealigned_in_smp;
-#define MEMCG_PADDING(name)      struct memcg_padding name
-#else
-#define MEMCG_PADDING(name)
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Remember four most recent foreign writebacks with dirty pages in this
  * cgroup.  Inode sharing is expected to be uncommon and, even if we miss
@@ -315,11 +277,7 @@ struct mem_cgroup {
 	CACHELINE_PADDING(_pad1_);
 
 	/* memory.stat */
-<<<<<<< HEAD
 	struct memcg_vmstats	*vmstats;
-=======
-	struct memcg_vmstats	vmstats;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* memory.events */
 	atomic_long_t		memory_events[MEMCG_NR_MEMORY_EVENTS];
@@ -362,14 +320,11 @@ struct mem_cgroup {
 	struct deferred_split deferred_split_queue;
 #endif
 
-<<<<<<< HEAD
 #ifdef CONFIG_LRU_GEN
 	/* per-memcg mm_struct list */
 	struct lru_gen_mm_list mm_list;
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mem_cgroup_per_node *nodeinfo[];
 };
 
@@ -465,10 +420,7 @@ static inline struct obj_cgroup *__folio_objcg(struct folio *folio)
  * - LRU isolation
  * - lock_page_memcg()
  * - exclusive reference
-<<<<<<< HEAD
  * - mem_cgroup_trylock_pages()
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * For a kmem folio a caller should hold an rcu read lock to protect memcg
  * associated with a kmem folio from being released.
@@ -530,10 +482,7 @@ static inline struct mem_cgroup *folio_memcg_rcu(struct folio *folio)
  * - LRU isolation
  * - lock_page_memcg()
  * - exclusive reference
-<<<<<<< HEAD
  * - mem_cgroup_trylock_pages()
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * For a kmem page a caller should hold an rcu read lock to protect memcg
  * associated with a kmem page from being released.
@@ -717,7 +666,6 @@ static inline int mem_cgroup_charge(struct folio *folio, struct mm_struct *mm,
 		return 0;
 	return __mem_cgroup_charge(folio, mm, gfp);
 }
-<<<<<<< HEAD
 
 int mem_cgroup_swapin_charge_folio(struct folio *folio, struct mm_struct *mm,
 				  gfp_t gfp, swp_entry_t entry);
@@ -743,33 +691,6 @@ static inline void mem_cgroup_uncharge_list(struct list_head *page_list)
 {
 	if (mem_cgroup_disabled())
 		return;
-=======
-
-int mem_cgroup_swapin_charge_page(struct page *page, struct mm_struct *mm,
-				  gfp_t gfp, swp_entry_t entry);
-void mem_cgroup_swapin_uncharge_swap(swp_entry_t entry);
-
-void __mem_cgroup_uncharge(struct folio *folio);
-
-/**
- * mem_cgroup_uncharge - Uncharge a folio.
- * @folio: Folio to uncharge.
- *
- * Uncharge a folio previously charged with mem_cgroup_charge().
- */
-static inline void mem_cgroup_uncharge(struct folio *folio)
-{
-	if (mem_cgroup_disabled())
-		return;
-	__mem_cgroup_uncharge(folio);
-}
-
-void __mem_cgroup_uncharge_list(struct list_head *page_list);
-static inline void mem_cgroup_uncharge_list(struct list_head *page_list)
-{
-	if (mem_cgroup_disabled())
-		return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__mem_cgroup_uncharge_list(page_list);
 }
 
@@ -1015,7 +936,6 @@ void lock_page_memcg(struct page *page);
 void unlock_page_memcg(struct page *page);
 
 void __mod_memcg_state(struct mem_cgroup *memcg, int idx, int val);
-<<<<<<< HEAD
 
 /* try to stablize folio_memcg() for all the pages in a memcg */
 static inline bool mem_cgroup_trylock_pages(struct mem_cgroup *memcg)
@@ -1033,8 +953,6 @@ static inline void mem_cgroup_unlock_pages(void)
 {
 	rcu_read_unlock();
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* idx can be of type enum memcg_stat_item or node_stat_item */
 static inline void mod_memcg_state(struct mem_cgroup *memcg,
@@ -1062,19 +980,7 @@ static inline void mod_memcg_page_state(struct page *page,
 	rcu_read_unlock();
 }
 
-<<<<<<< HEAD
 unsigned long memcg_page_state(struct mem_cgroup *memcg, int idx);
-=======
-static inline unsigned long memcg_page_state(struct mem_cgroup *memcg, int idx)
-{
-	long x = READ_ONCE(memcg->vmstats.state[idx]);
-#ifdef CONFIG_SMP
-	if (x < 0)
-		x = 0;
-#endif
-	return x;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline unsigned long lruvec_page_state(struct lruvec *lruvec,
 					      enum node_stat_item idx)
@@ -1315,28 +1221,16 @@ static inline bool mem_cgroup_below_min(struct mem_cgroup *memcg)
 
 static inline int mem_cgroup_charge(struct folio *folio,
 		struct mm_struct *mm, gfp_t gfp)
-<<<<<<< HEAD
-=======
 {
 	return 0;
 }
 
-static inline int mem_cgroup_swapin_charge_page(struct page *page,
-			struct mm_struct *mm, gfp_t gfp, swp_entry_t entry)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	return 0;
-}
-
-<<<<<<< HEAD
 static inline int mem_cgroup_swapin_charge_folio(struct folio *folio,
 			struct mm_struct *mm, gfp_t gfp, swp_entry_t entry)
 {
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void mem_cgroup_swapin_uncharge_swap(swp_entry_t entry)
 {
 }
@@ -1511,7 +1405,6 @@ mem_cgroup_print_oom_meminfo(struct mem_cgroup *memcg)
 }
 
 static inline void lock_page_memcg(struct page *page)
-<<<<<<< HEAD
 {
 }
 
@@ -1535,20 +1428,6 @@ static inline bool mem_cgroup_trylock_pages(struct mem_cgroup *memcg)
 }
 
 static inline void mem_cgroup_unlock_pages(void)
-=======
-{
-}
-
-static inline void unlock_page_memcg(struct page *page)
-{
-}
-
-static inline void folio_memcg_lock(struct folio *folio)
-{
-}
-
-static inline void folio_memcg_unlock(struct folio *folio)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	rcu_read_unlock();
 }
@@ -1676,18 +1555,7 @@ void count_memcg_event_mm(struct mm_struct *mm, enum vm_event_item idx)
 }
 
 static inline void split_page_memcg(struct page *head, unsigned int nr)
-<<<<<<< HEAD
-=======
 {
-}
-
-static inline
-unsigned long mem_cgroup_soft_limit_reclaim(pg_data_t *pgdat, int order,
-					    gfp_t gfp_mask,
-					    unsigned long *total_scanned)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	return 0;
 }
 
 static inline
@@ -1910,7 +1778,6 @@ static inline void count_objcg_event(struct obj_cgroup *objcg,
 {
 	struct mem_cgroup *memcg;
 
-<<<<<<< HEAD
 	if (!memcg_kmem_enabled())
 		return;
 
@@ -1919,53 +1786,7 @@ static inline void count_objcg_event(struct obj_cgroup *objcg,
 	count_memcg_events(memcg, idx, 1);
 	rcu_read_unlock();
 }
-=======
-	if (mem_cgroup_kmem_disabled())
-		return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	rcu_read_lock();
-	memcg = obj_cgroup_memcg(objcg);
-	count_memcg_events(memcg, idx, 1);
-	rcu_read_unlock();
-}
-
-/**
- * get_mem_cgroup_from_obj - get a memcg associated with passed kernel object.
- * @p: pointer to object from which memcg should be extracted. It can be NULL.
- *
- * Retrieves the memory group into which the memory of the pointed kernel
- * object is accounted. If memcg is found, its reference is taken.
- * If a passed kernel object is uncharged, or if proper memcg cannot be found,
- * as well as if mem_cgroup is disabled, NULL is returned.
- *
- * Return: valid memcg pointer with taken reference or NULL.
- */
-static inline struct mem_cgroup *get_mem_cgroup_from_obj(void *p)
-{
-	struct mem_cgroup *memcg;
-
-	rcu_read_lock();
-	do {
-		memcg = mem_cgroup_from_obj(p);
-	} while (memcg && !css_tryget(&memcg->css));
-	rcu_read_unlock();
-	return memcg;
-}
-
-/**
- * mem_cgroup_or_root - always returns a pointer to a valid memory cgroup.
- * @memcg: pointer to a valid memory cgroup or NULL.
- *
- * If passed argument is not NULL, returns it without any additional checks
- * and changes. Otherwise, root_mem_cgroup is returned.
- *
- * NOTE: root_mem_cgroup can be NULL during early boot.
- */
-static inline struct mem_cgroup *mem_cgroup_or_root(struct mem_cgroup *memcg)
-{
-	return memcg ? memcg : root_mem_cgroup;
-}
 #else
 static inline bool mem_cgroup_kmem_disabled(void)
 {
@@ -2022,15 +1843,6 @@ static inline void count_objcg_event(struct obj_cgroup *objcg,
 {
 }
 
-static inline struct mem_cgroup *get_mem_cgroup_from_obj(void *p)
-{
-	return NULL;
-}
-
-static inline struct mem_cgroup *mem_cgroup_or_root(struct mem_cgroup *memcg)
-{
-	return NULL;
-}
 #endif /* CONFIG_MEMCG_KMEM */
 
 #if defined(CONFIG_MEMCG_KMEM) && defined(CONFIG_ZSWAP)

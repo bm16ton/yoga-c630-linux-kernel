@@ -364,7 +364,6 @@ restart:
 	 * write.  If zeroing is needed and we are currently holding the iolock
 	 * shared, we need to update it to exclusive which implies having to
 	 * redo all checks before.
-<<<<<<< HEAD
 	 *
 	 * We need to serialise against EOF updates that occur in IO completions
 	 * here. We want to make sure that nobody is changing the size while we
@@ -374,17 +373,6 @@ restart:
 	 * XFS_IOLOCK_EXCL so we are guaranteed to see the latest EOF value and
 	 * hence be able to correctly determine if we need to run zeroing.
 	 *
-=======
-	 *
-	 * We need to serialise against EOF updates that occur in IO completions
-	 * here. We want to make sure that nobody is changing the size while we
-	 * do this check until we have placed an IO barrier (i.e.  hold the
-	 * XFS_IOLOCK_EXCL) that prevents new IO from being dispatched.  The
-	 * spinlock effectively forms a memory barrier once we have the
-	 * XFS_IOLOCK_EXCL so we are guaranteed to see the latest EOF value and
-	 * hence be able to correctly determine if we need to run zeroing.
-	 *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * We can do an unlocked check here safely as IO completion can only
 	 * extend EOF. Truncate is locked out at this point, so the EOF can
 	 * not move backwards, only forwards. Hence we only need to take the
@@ -1273,11 +1261,7 @@ xfs_file_llseek(
 }
 
 #ifdef CONFIG_FS_DAX
-<<<<<<< HEAD
 static inline vm_fault_t
-=======
-static int
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 xfs_dax_fault(
 	struct vm_fault		*vmf,
 	enum page_entry_size	pe_size,
@@ -1290,23 +1274,15 @@ xfs_dax_fault(
 				&xfs_read_iomap_ops);
 }
 #else
-<<<<<<< HEAD
 static inline vm_fault_t
-=======
-static int
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 xfs_dax_fault(
 	struct vm_fault		*vmf,
 	enum page_entry_size	pe_size,
 	bool			write_fault,
 	pfn_t			*pfn)
 {
-<<<<<<< HEAD
 	ASSERT(0);
 	return VM_FAULT_SIGBUS;
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 

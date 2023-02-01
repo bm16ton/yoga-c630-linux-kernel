@@ -19,19 +19,12 @@
 #include "chip_offset_byte.h"
 
 #define ACP3X_DEV			3
-<<<<<<< HEAD
 #define ACP6X_DEV			6
 
 #define DMIC_INSTANCE			0x00
 #define I2S_SP_INSTANCE			0x01
 #define I2S_BT_INSTANCE			0x02
 #define I2S_HS_INSTANCE			0x03
-=======
-
-#define I2S_SP_INSTANCE			0x00
-#define I2S_BT_INSTANCE			0x01
-#define DMIC_INSTANCE			0x02
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define MEM_WINDOW_START		0x4080000
 
@@ -41,7 +34,6 @@
 #define ACP3x_I2STDM_REG_END		0x1242410
 #define ACP3x_BT_TDM_REG_START		0x1242800
 #define ACP3x_BT_TDM_REG_END		0x1242810
-<<<<<<< HEAD
 
 #define THRESHOLD(bit, base)	((bit) + (base))
 #define I2S_RX_THRESHOLD(base)	THRESHOLD(7, base)
@@ -50,47 +42,29 @@
 #define BT_RX_THRESHOLD(base)	THRESHOLD(5, base)
 #define HS_TX_THRESHOLD(base)	THRESHOLD(4, base)
 #define HS_RX_THRESHOLD(base)	THRESHOLD(3, base)
-=======
-#define I2S_MODE			0x04
-#define I2S_RX_THRESHOLD		27
-#define I2S_TX_THRESHOLD		28
-#define BT_TX_THRESHOLD			26
-#define BT_RX_THRESHOLD			25
-
-#define ACP_SRAM_PTE_OFFSET		0x02052800
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define ACP_SRAM_SP_PB_PTE_OFFSET	0x0
 #define ACP_SRAM_SP_CP_PTE_OFFSET	0x100
 #define ACP_SRAM_BT_PB_PTE_OFFSET	0x200
 #define ACP_SRAM_BT_CP_PTE_OFFSET	0x300
 #define ACP_SRAM_PDM_PTE_OFFSET		0x400
-<<<<<<< HEAD
 #define ACP_SRAM_HS_PB_PTE_OFFSET       0x500
 #define ACP_SRAM_HS_CP_PTE_OFFSET       0x600
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PAGE_SIZE_4K_ENABLE		0x2
 
 #define I2S_SP_TX_MEM_WINDOW_START	0x4000000
 #define I2S_SP_RX_MEM_WINDOW_START	0x4020000
 #define I2S_BT_TX_MEM_WINDOW_START	0x4040000
 #define I2S_BT_RX_MEM_WINDOW_START	0x4060000
-<<<<<<< HEAD
 #define I2S_HS_TX_MEM_WINDOW_START      0x40A0000
 #define I2S_HS_RX_MEM_WINDOW_START      0x40C0000
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define SP_PB_FIFO_ADDR_OFFSET		0x500
 #define SP_CAPT_FIFO_ADDR_OFFSET	0x700
 #define BT_PB_FIFO_ADDR_OFFSET		0x900
 #define BT_CAPT_FIFO_ADDR_OFFSET	0xB00
-<<<<<<< HEAD
 #define HS_PB_FIFO_ADDR_OFFSET		0xD00
 #define HS_CAPT_FIFO_ADDR_OFFSET	0xF00
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PLAYBACK_MIN_NUM_PERIODS	2
 #define PLAYBACK_MAX_NUM_PERIODS	8
 #define PLAYBACK_MAX_PERIOD_SIZE	8192
@@ -108,7 +82,6 @@
 
 #define ACP3x_ITER_IRER_SAMP_LEN_MASK	0x38
 
-<<<<<<< HEAD
 #define ACP_MAX_STREAM			8
 
 #define TDM_ENABLE	1
@@ -118,9 +91,6 @@
 #define SLOT_WIDTH_16	0x10
 #define SLOT_WIDTH_24	0x18
 #define SLOT_WIDTH_32	0x20
-=======
-#define ACP_MAX_STREAM			6
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct acp_chip_info {
 	char *name;		/* Platform name */
@@ -129,25 +99,18 @@ struct acp_chip_info {
 };
 
 struct acp_stream {
-<<<<<<< HEAD
 	struct list_head list;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct snd_pcm_substream *substream;
 	int irq_bit;
 	int dai_id;
 	int id;
-<<<<<<< HEAD
 	int dir;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 bytescount;
 	u32 reg_offset;
 	u32 pte_offset;
 	u32 fifo_offset;
 };
 
-<<<<<<< HEAD
 struct acp_resource {
 	int offset;
 	int no_of_ctrls;
@@ -160,23 +123,17 @@ struct acp_resource {
 	u64 sram_pte_offset;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct acp_dev_data {
 	char *name;
 	struct device *dev;
 	void __iomem *acp_base;
 	unsigned int i2s_irq;
 
-<<<<<<< HEAD
 	bool tdm_mode;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* SOC specific dais */
 	struct snd_soc_dai_driver *dai_driver;
 	int num_dai;
 
-<<<<<<< HEAD
 	struct list_head stream_list;
 	spinlock_t acp_lock;
 
@@ -200,12 +157,6 @@ union acp_i2stdm_mstrclkgen {
 		u32:10;
 	} bitfields, bits;
 	u32  u32_all;
-=======
-	struct acp_stream *stream[ACP_MAX_STREAM];
-
-	struct snd_soc_acpi_mach *machines;
-	struct platform_device *mach_dev;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 extern const struct snd_soc_dai_ops asoc_acp_cpu_dai_ops;
@@ -234,13 +185,10 @@ static inline u64 acp_get_byte_count(struct acp_dev_data *adata, int dai_id, int
 			high = readl(adata->acp_base + ACP_I2S_TX_LINEARPOSITIONCNTR_HIGH);
 			low = readl(adata->acp_base + ACP_I2S_TX_LINEARPOSITIONCNTR_LOW);
 			break;
-<<<<<<< HEAD
 		case I2S_HS_INSTANCE:
 			high = readl(adata->acp_base + ACP_HS_TX_LINEARPOSITIONCNTR_HIGH);
 			low = readl(adata->acp_base + ACP_HS_TX_LINEARPOSITIONCNTR_LOW);
 			break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		default:
 			dev_err(adata->dev, "Invalid dai id %x\n", dai_id);
 			return -EINVAL;
@@ -255,13 +203,10 @@ static inline u64 acp_get_byte_count(struct acp_dev_data *adata, int dai_id, int
 			high = readl(adata->acp_base + ACP_I2S_RX_LINEARPOSITIONCNTR_HIGH);
 			low = readl(adata->acp_base + ACP_I2S_RX_LINEARPOSITIONCNTR_LOW);
 			break;
-<<<<<<< HEAD
 		case I2S_HS_INSTANCE:
 			high = readl(adata->acp_base + ACP_HS_RX_LINEARPOSITIONCNTR_HIGH);
 			low = readl(adata->acp_base + ACP_HS_RX_LINEARPOSITIONCNTR_LOW);
 			break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		case DMIC_INSTANCE:
 			high = readl(adata->acp_base + ACP_WOV_RX_LINEARPOSITIONCNTR_HIGH);
 			low = readl(adata->acp_base + ACP_WOV_RX_LINEARPOSITIONCNTR_LOW);
@@ -277,7 +222,6 @@ static inline u64 acp_get_byte_count(struct acp_dev_data *adata, int dai_id, int
 	return byte_count;
 }
 
-<<<<<<< HEAD
 static inline void acp_set_i2s_clk(struct acp_dev_data *adata, int dai_id)
 {
 	union acp_i2stdm_mstrclkgen mclkgen;
@@ -305,6 +249,4 @@ static inline void acp_set_i2s_clk(struct acp_dev_data *adata, int dai_id)
 	mclkgen.bits.i2stdm_lrclk_div_val = adata->lrclk_div;
 	writel(mclkgen.u32_all, adata->acp_base + master_reg);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

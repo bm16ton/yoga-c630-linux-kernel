@@ -6,16 +6,12 @@
 //          Amadeusz Slawinski <amadeuszx.slawinski@linux.intel.com>
 //
 
-<<<<<<< HEAD
 #include <linux/io-64-nonatomic-lo-hi.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/slab.h>
 #include <sound/hdaudio_ext.h>
 #include "avs.h"
 #include "messages.h"
 #include "registers.h"
-<<<<<<< HEAD
 #include "trace.h"
 
 #define AVS_IPC_TIMEOUT_MS	300
@@ -183,22 +179,15 @@ static void avs_dsp_exception_caught(struct avs_dev *adev, union avs_notify_msg 
 
 	schedule_work(&ipc->recovery_work);
 }
-=======
-
-#define AVS_IPC_TIMEOUT_MS	300
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void avs_dsp_receive_rx(struct avs_dev *adev, u64 header)
 {
 	struct avs_ipc *ipc = adev->ipc;
 	union avs_reply_msg msg = AVS_MSG(header);
-<<<<<<< HEAD
 	u64 reg;
 
 	reg = readq(avs_sram_addr(adev, AVS_FW_REGS_WINDOW));
 	trace_avs_ipc_reply_msg(header, reg);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ipc->rx.header = header;
 	/* Abort copying payload if request processing was unsuccessful. */
@@ -206,17 +195,11 @@ static void avs_dsp_receive_rx(struct avs_dev *adev, u64 header)
 		/* update size in case of LARGE_CONFIG_GET */
 		if (msg.msg_target == AVS_MOD_MSG &&
 		    msg.global_msg_type == AVS_MOD_LARGE_CONFIG_GET)
-<<<<<<< HEAD
 			ipc->rx.size = min_t(u32, AVS_MAILBOX_SIZE,
 					     msg.ext.large_config.data_off_size);
 
 		memcpy_fromio(ipc->rx.data, avs_uplink_addr(adev), ipc->rx.size);
 		trace_avs_msg_payload(ipc->rx.data, ipc->rx.size);
-=======
-			ipc->rx.size = msg.ext.large_config.data_off_size;
-
-		memcpy_fromio(ipc->rx.data, avs_uplink_addr(adev), ipc->rx.size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -226,13 +209,10 @@ static void avs_dsp_process_notification(struct avs_dev *adev, u64 header)
 	union avs_notify_msg msg = AVS_MSG(header);
 	size_t data_size = 0;
 	void *data = NULL;
-<<<<<<< HEAD
 	u64 reg;
 
 	reg = readq(avs_sram_addr(adev, AVS_FW_REGS_WINDOW));
 	trace_avs_ipc_notify_msg(header, reg);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Ignore spurious notifications until handshake is established. */
 	if (!adev->ipc->ready && msg.notify_msg_type != AVS_NOTIFY_FW_READY) {
@@ -253,13 +233,10 @@ static void avs_dsp_process_notification(struct avs_dev *adev, u64 header)
 		data_size = sizeof(struct avs_notify_res_data);
 		break;
 
-<<<<<<< HEAD
 	case AVS_NOTIFY_LOG_BUFFER_STATUS:
 	case AVS_NOTIFY_EXCEPTION_CAUGHT:
 		break;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case AVS_NOTIFY_MODULE_EVENT:
 		/* To know the total payload size, header needs to be read first. */
 		memcpy_fromio(&mod_data, avs_uplink_addr(adev), sizeof(mod_data));
@@ -277,10 +254,7 @@ static void avs_dsp_process_notification(struct avs_dev *adev, u64 header)
 			return;
 
 		memcpy_fromio(data, avs_uplink_addr(adev), data_size);
-<<<<<<< HEAD
 		trace_avs_msg_payload(data, data_size);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Perform notification-specific operations. */
@@ -291,7 +265,6 @@ static void avs_dsp_process_notification(struct avs_dev *adev, u64 header)
 		complete(&adev->fw_ready);
 		break;
 
-<<<<<<< HEAD
 	case AVS_NOTIFY_LOG_BUFFER_STATUS:
 		avs_dsp_op(adev, log_buffer_status, &msg);
 		break;
@@ -300,8 +273,6 @@ static void avs_dsp_process_notification(struct avs_dev *adev, u64 header)
 		avs_dsp_exception_caught(adev, &msg);
 		break;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		break;
 	}
@@ -467,7 +438,6 @@ static void avs_ipc_msg_init(struct avs_ipc *ipc, struct avs_ipc_msg *reply)
 	reinit_completion(&ipc->busy_completion);
 }
 
-<<<<<<< HEAD
 static void avs_dsp_send_tx(struct avs_dev *adev, struct avs_ipc_msg *tx, bool read_fwregs)
 {
 	u64 reg = ULONG_MAX;
@@ -477,11 +447,6 @@ static void avs_dsp_send_tx(struct avs_dev *adev, struct avs_ipc_msg *tx, bool r
 		reg = readq(avs_sram_addr(adev, AVS_FW_REGS_WINDOW));
 
 	trace_avs_request(tx, reg);
-=======
-static void avs_dsp_send_tx(struct avs_dev *adev, struct avs_ipc_msg *tx)
-{
-	tx->header |= SKL_ADSP_HIPCI_BUSY;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (tx->size)
 		memcpy_toio(avs_downlink_addr(adev), tx->data, tx->size);
@@ -502,26 +467,16 @@ static int avs_dsp_do_send_msg(struct avs_dev *adev, struct avs_ipc_msg *request
 
 	spin_lock(&ipc->rx_lock);
 	avs_ipc_msg_init(ipc, reply);
-<<<<<<< HEAD
 	avs_dsp_send_tx(adev, request, true);
-=======
-	avs_dsp_send_tx(adev, request);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock(&ipc->rx_lock);
 
 	ret = avs_ipc_wait_busy_completion(ipc, timeout);
 	if (ret) {
 		if (ret == -ETIMEDOUT) {
-<<<<<<< HEAD
 			union avs_notify_msg msg = AVS_NOTIFICATION(EXCEPTION_CAUGHT);
 
 			/* Same treatment as on exception, just stack_dump=0. */
 			avs_dsp_exception_caught(adev, &msg);
-=======
-			dev_crit(adev->dev, "communication severed: %d, rebooting dsp..\n", ret);
-
-			avs_ipc_block(ipc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		goto exit;
 	}
@@ -529,10 +484,7 @@ static int avs_dsp_do_send_msg(struct avs_dev *adev, struct avs_ipc_msg *request
 	ret = ipc->rx.rsp.status;
 	if (reply) {
 		reply->header = ipc->rx.header;
-<<<<<<< HEAD
 		reply->size = ipc->rx.size;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (reply->data && ipc->rx.size)
 			memcpy(reply->data, ipc->rx.data, reply->size);
 	}
@@ -542,7 +494,6 @@ exit:
 	return ret;
 }
 
-<<<<<<< HEAD
 static int avs_dsp_send_msg_sequence(struct avs_dev *adev, struct avs_ipc_msg *request,
 				     struct avs_ipc_msg *reply, int timeout, bool wake_d0i0,
 				     bool schedule_d0ix)
@@ -574,12 +525,6 @@ int avs_dsp_send_msg_timeout(struct avs_dev *adev, struct avs_ipc_msg *request,
 	bool schedule_d0ix = avs_dsp_op(adev, d0ix_toggle, request, false);
 
 	return avs_dsp_send_msg_sequence(adev, request, reply, timeout, wake_d0i0, schedule_d0ix);
-=======
-int avs_dsp_send_msg_timeout(struct avs_dev *adev, struct avs_ipc_msg *request,
-			     struct avs_ipc_msg *reply, int timeout)
-{
-	return avs_dsp_do_send_msg(adev, request, reply, timeout);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int avs_dsp_send_msg(struct avs_dev *adev, struct avs_ipc_msg *request,
@@ -588,7 +533,6 @@ int avs_dsp_send_msg(struct avs_dev *adev, struct avs_ipc_msg *request,
 	return avs_dsp_send_msg_timeout(adev, request, reply, adev->ipc->default_timeout_ms);
 }
 
-<<<<<<< HEAD
 int avs_dsp_send_pm_msg_timeout(struct avs_dev *adev, struct avs_ipc_msg *request,
 				struct avs_ipc_msg *reply, int timeout, bool wake_d0i0)
 {
@@ -602,8 +546,6 @@ int avs_dsp_send_pm_msg(struct avs_dev *adev, struct avs_ipc_msg *request,
 					   wake_d0i0);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int avs_dsp_do_send_rom_msg(struct avs_dev *adev, struct avs_ipc_msg *request, int timeout)
 {
 	struct avs_ipc *ipc = adev->ipc;
@@ -613,15 +555,11 @@ static int avs_dsp_do_send_rom_msg(struct avs_dev *adev, struct avs_ipc_msg *req
 
 	spin_lock(&ipc->rx_lock);
 	avs_ipc_msg_init(ipc, NULL);
-<<<<<<< HEAD
 	/*
 	 * with hw still stalled, memory windows may not be
 	 * configured properly so avoid accessing SRAM
 	 */
 	avs_dsp_send_tx(adev, request, false);
-=======
-	avs_dsp_send_tx(adev, request);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock(&ipc->rx_lock);
 
 	/* ROM messages must be sent before main core is unstalled */
@@ -671,11 +609,8 @@ int avs_ipc_init(struct avs_ipc *ipc, struct device *dev)
 	ipc->dev = dev;
 	ipc->ready = false;
 	ipc->default_timeout_ms = AVS_IPC_TIMEOUT_MS;
-<<<<<<< HEAD
 	INIT_WORK(&ipc->recovery_work, avs_dsp_recovery_work);
 	INIT_DELAYED_WORK(&ipc->d0ix_work, avs_dsp_d0ix_work);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	init_completion(&ipc->done_completion);
 	init_completion(&ipc->busy_completion);
 	spin_lock_init(&ipc->rx_lock);
@@ -687,10 +622,7 @@ int avs_ipc_init(struct avs_ipc *ipc, struct device *dev)
 void avs_ipc_block(struct avs_ipc *ipc)
 {
 	ipc->ready = false;
-<<<<<<< HEAD
 	cancel_work_sync(&ipc->recovery_work);
 	cancel_delayed_work_sync(&ipc->d0ix_work);
 	ipc->in_d0ix = false;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

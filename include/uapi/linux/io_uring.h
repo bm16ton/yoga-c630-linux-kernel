@@ -56,10 +56,7 @@ struct io_uring_sqe {
 		__u32		hardlink_flags;
 		__u32		xattr_flags;
 		__u32		msg_ring_flags;
-<<<<<<< HEAD
 		__u32		uring_cmd_flags;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	__u64	user_data;	/* data to be passed back at completion time */
 	/* pack this to avoid bogus arm OABI complaints */
@@ -161,7 +158,6 @@ enum {
  */
 #define IORING_SETUP_SINGLE_ISSUER	(1U << 12)
 
-<<<<<<< HEAD
 /*
  * Defer running task work to get events.
  * Rather than running bits of task work whenever the task transitions
@@ -169,8 +165,6 @@ enum {
  */
 #define IORING_SETUP_DEFER_TASKRUN	(1U << 13)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum io_uring_op {
 	IORING_OP_NOP,
 	IORING_OP_READV,
@@ -220,10 +214,7 @@ enum io_uring_op {
 	IORING_OP_SOCKET,
 	IORING_OP_URING_CMD,
 	IORING_OP_SEND_ZC,
-<<<<<<< HEAD
 	IORING_OP_SENDMSG_ZC,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* this goes last, obviously */
 	IORING_OP_LAST,
@@ -305,7 +296,6 @@ enum io_uring_op {
  *
  * IORING_RECVSEND_FIXED_BUF	Use registered buffers, the index is stored in
  *				the buf_index field.
-<<<<<<< HEAD
  *
  * IORING_SEND_ZC_REPORT_USAGE
  *				If set, SEND[MSG]_ZC should report
@@ -314,13 +304,10 @@ enum io_uring_op {
  *				0 is reported if zerocopy was actually possible.
  *				IORING_NOTIF_USAGE_ZC_COPIED if data was copied
  *				(at least partially).
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #define IORING_RECVSEND_POLL_FIRST	(1U << 0)
 #define IORING_RECV_MULTISHOT		(1U << 1)
 #define IORING_RECVSEND_FIXED_BUF	(1U << 2)
-<<<<<<< HEAD
 #define IORING_SEND_ZC_REPORT_USAGE	(1U << 3)
 
 /*
@@ -331,8 +318,6 @@ enum io_uring_op {
  * bits of cqe.res should be treated as reserved!
  */
 #define IORING_NOTIF_USAGE_ZC_COPIED    (1U << 31)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * accept flags stored in sqe->ioprio

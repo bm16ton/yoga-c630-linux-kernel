@@ -257,10 +257,6 @@ struct plat_stmmacenet_data {
 	u8 vlan_fail_q;
 	unsigned int eee_usecs_rate;
 	struct pci_dev *pdev;
-<<<<<<< HEAD
-=======
-	bool has_crossts;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int int_snapshot_num;
 	int ext_snapshot_num;
 	bool int_snapshot_en;

@@ -186,13 +186,9 @@ union avs_reply_msg {
 enum avs_notify_msg_type {
 	AVS_NOTIFY_PHRASE_DETECTED = 4,
 	AVS_NOTIFY_RESOURCE_EVENT = 5,
-<<<<<<< HEAD
 	AVS_NOTIFY_LOG_BUFFER_STATUS = 6,
 	AVS_NOTIFY_FW_READY = 8,
 	AVS_NOTIFY_EXCEPTION_CAUGHT = 10,
-=======
-	AVS_NOTIFY_FW_READY = 8,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	AVS_NOTIFY_MODULE_EVENT = 12,
 };
 
@@ -208,7 +204,6 @@ union avs_notify_msg {
 				u32 msg_direction:1;
 				u32 msg_target:1;
 			};
-<<<<<<< HEAD
 			struct {
 				u16 rsvd:12;
 				u16 core:4;
@@ -220,11 +215,6 @@ union avs_notify_msg {
 				u32 core_id:2;
 				u32 stack_dump_size:16;
 			} coredump;
-=======
-		};
-		union {
-			u32 val;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} ext;
 	};
 } __packed;
@@ -344,15 +334,11 @@ int avs_ipc_set_d0ix(struct avs_dev *adev, bool enable_pg, bool streaming);
 #define AVS_BASEFW_INST_ID	0
 
 enum avs_basefw_runtime_param {
-<<<<<<< HEAD
 	AVS_BASEFW_ENABLE_LOGS = 6,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	AVS_BASEFW_FIRMWARE_CONFIG = 7,
 	AVS_BASEFW_HARDWARE_CONFIG = 8,
 	AVS_BASEFW_MODULES_INFO = 9,
 	AVS_BASEFW_LIBRARIES_INFO = 16,
-<<<<<<< HEAD
 	AVS_BASEFW_SYSTEM_TIME = 20,
 };
 
@@ -388,10 +374,6 @@ struct apl_log_state_info {
 
 int avs_ipc_set_enable_logs(struct avs_dev *adev, u8 *log_info, size_t size);
 
-=======
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct avs_fw_version {
 	u16 major;
 	u16 minor;
@@ -559,7 +541,6 @@ static inline bool avs_module_entry_is_loaded(struct avs_module_entry *mentry)
 
 int avs_ipc_get_modules_info(struct avs_dev *adev, struct avs_mods_info **info);
 
-<<<<<<< HEAD
 struct avs_sys_time {
 	u32 val_l;
 	u32 val_u;
@@ -567,8 +548,6 @@ struct avs_sys_time {
 
 int avs_ipc_set_system_time(struct avs_dev *adev);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Module configuration */
 
 #define AVS_MIXIN_MOD_UUID \

@@ -102,11 +102,6 @@ struct msm_drm_thread {
 	struct kthread_worker *worker;
 };
 
-/* DSC config */
-struct msm_display_dsc_config {
-	struct drm_dsc_config *drm;
-};
-
 struct msm_drm_private {
 
 	struct drm_device *dev;
@@ -148,7 +143,6 @@ struct msm_drm_private {
 	struct mutex obj_lock;
 
 	/**
-<<<<<<< HEAD
 	 * lru:
 	 *
 	 * The various LRU's that a GEM object is in at various stages of
@@ -158,26 +152,11 @@ struct msm_drm_private {
 	 * unpinned, it moves into willneed or dontneed LRU depending on
 	 * madvise state.  When backing pages are evicted (willneed) or
 	 * purged (dontneed) it moves back into the unbacked LRU.
-=======
-	 * LRUs of inactive GEM objects.  Every bo is either in one of the
-	 * inactive lists (depending on whether or not it is shrinkable) or
-	 * gpu->active_list (for the gpu it is active on[1]), or transiently
-	 * on a temporary list as the shrinker is running.
-	 *
-	 * Note that inactive_willneed also contains pinned and vmap'd bos,
-	 * but the number of pinned-but-not-active objects is small (scanout
-	 * buffers, ringbuffer, etc).
-	 *
-	 * These lists are protected by mm_lock (which should be acquired
-	 * before per GEM object lock).  One should *not* hold mm_lock in
-	 * get_pages()/vmap()/etc paths, as they can trigger the shrinker.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *
 	 * The dontneed LRU is considered by the shrinker for objects
 	 * that are candidate for purging, and the willneed LRU is
 	 * considered for objects that could be evicted.
 	 */
-<<<<<<< HEAD
 	struct {
 		/**
 		 * unbacked:
@@ -187,14 +166,6 @@ struct msm_drm_private {
 		 * LRU.
 		 */
 		struct drm_gem_lru unbacked;
-=======
-	struct list_head inactive_willneed;  /* inactive + potentially unpin/evictable */
-	struct list_head inactive_dontneed;  /* inactive + shrinkable */
-	struct list_head inactive_unpinned;  /* inactive + purged or unpinned */
-	long shrinkable_count;               /* write access under mm_lock */
-	long evictable_count;                /* write access under mm_lock */
-	struct mutex mm_lock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/**
 		 * pinned:
@@ -203,7 +174,6 @@ struct msm_drm_private {
 		 */
 		struct drm_gem_lru pinned;
 
-<<<<<<< HEAD
 		/**
 		 * willneed:
 		 *
@@ -230,8 +200,6 @@ struct msm_drm_private {
 
 	struct workqueue_struct *wq;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int num_crtcs;
 	struct drm_crtc *crtcs[MAX_CRTCS];
 
@@ -355,11 +323,7 @@ void msm_dsi_snapshot(struct msm_disp_state *disp_state, struct msm_dsi *msm_dsi
 bool msm_dsi_is_cmd_mode(struct msm_dsi *msm_dsi);
 bool msm_dsi_is_bonded_dsi(struct msm_dsi *msm_dsi);
 bool msm_dsi_is_master_dsi(struct msm_dsi *msm_dsi);
-<<<<<<< HEAD
 struct drm_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi);
-=======
-struct msm_display_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline void __init msm_dsi_register(void)
 {
@@ -389,11 +353,7 @@ static inline bool msm_dsi_is_master_dsi(struct msm_dsi *msm_dsi)
 	return false;
 }
 
-<<<<<<< HEAD
 static inline struct drm_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi)
-=======
-static inline struct msm_display_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return NULL;
 }
@@ -443,7 +403,6 @@ static inline bool msm_dp_wide_bus_available(const struct msm_dp *dp_display)
 	return false;
 }
 
-<<<<<<< HEAD
 #endif
 
 #ifdef CONFIG_DRM_MSM_MDP4
@@ -470,34 +429,6 @@ static inline void msm_dpu_register(void) {}
 static inline void msm_dpu_unregister(void) {}
 #endif
 
-=======
-#endif
-
-#ifdef CONFIG_DRM_MSM_MDP4
-void msm_mdp4_register(void);
-void msm_mdp4_unregister(void);
-#else
-static inline void msm_mdp4_register(void) {}
-static inline void msm_mdp4_unregister(void) {}
-#endif
-
-#ifdef CONFIG_DRM_MSM_MDP5
-void msm_mdp_register(void);
-void msm_mdp_unregister(void);
-#else
-static inline void msm_mdp_register(void) {}
-static inline void msm_mdp_unregister(void) {}
-#endif
-
-#ifdef CONFIG_DRM_MSM_DPU
-void msm_dpu_register(void);
-void msm_dpu_unregister(void);
-#else
-static inline void msm_dpu_register(void) {}
-static inline void msm_dpu_unregister(void) {}
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_DRM_MSM_MDSS
 void msm_mdss_register(void);
 void msm_mdss_unregister(void);

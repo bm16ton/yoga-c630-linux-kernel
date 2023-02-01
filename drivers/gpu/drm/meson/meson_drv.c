@@ -95,13 +95,8 @@ DEFINE_DRM_GEM_DMA_FOPS(fops);
 static const struct drm_driver meson_driver = {
 	.driver_features	= DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
 
-<<<<<<< HEAD
 	/* DMA Ops */
 	DRM_GEM_DMA_DRIVER_OPS_WITH_DUMB_CREATE(meson_dumb_create),
-=======
-	/* CMA Ops */
-	DRM_GEM_CMA_DRIVER_OPS_WITH_DUMB_CREATE(meson_dumb_create),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Misc */
 	.fops			= &fops,

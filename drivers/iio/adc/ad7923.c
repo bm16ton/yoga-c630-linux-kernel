@@ -313,12 +313,9 @@ static int ad7923_probe(struct spi_device *spi)
 
 	st = iio_priv(indio_dev);
 
-<<<<<<< HEAD
 	if (device_property_read_bool(&spi->dev, "adi,range-double"))
 		ad7923_range = 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	st->spi = spi;
 	st->settings = AD7923_CODING | ad7923_range |
 			AD7923_PM_MODE_WRITE(AD7923_PM_MODE_OPS);

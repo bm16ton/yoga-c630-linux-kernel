@@ -691,11 +691,7 @@ static int ad74413_get_input_current_offset(struct ad74413r_state *st,
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	*val = voltage_offset * (int)AD74413R_ADC_RESULT_MAX / voltage_range;
-=======
-	*val = voltage_offset * AD74413R_ADC_RESULT_MAX / voltage_range;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return IIO_VAL_INT;
 }

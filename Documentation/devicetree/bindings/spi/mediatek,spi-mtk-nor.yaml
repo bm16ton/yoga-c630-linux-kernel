@@ -85,14 +85,9 @@ examples:
         compatible = "mediatek,mt8173-nor";
         reg = <0 0x1100d000 0 0xe0>;
         interrupts = <1>;
-<<<<<<< HEAD
         clocks = <&pericfg CLK_PERI_SPI>, <&topckgen CLK_TOP_SPINFI_IFR_SEL>,
                  <&pericfg CLK_PERI_NFI>;
         clock-names = "spi", "sf", "axi";
-=======
-        clocks = <&pericfg CLK_PERI_SPI>, <&topckgen CLK_TOP_SPINFI_IFR_SEL>;
-        clock-names = "spi", "sf";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         #address-cells = <1>;
         #size-cells = <0>;
 

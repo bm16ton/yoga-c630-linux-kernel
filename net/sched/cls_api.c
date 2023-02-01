@@ -1976,12 +1976,6 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
 	int tp_created;
 	bool rtnl_held = false;
 	u32 flags;
-<<<<<<< HEAD
-=======
-
-	if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN))
-		return -EPERM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 replay:
 	tp_created = 0;

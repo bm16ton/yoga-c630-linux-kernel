@@ -1157,14 +1157,7 @@ static int esp_init_authenc(struct xfrm_state *x,
 		err = -EINVAL;
 		if (aalg_desc->uinfo.auth.icv_fullbits / 8 !=
 		    crypto_aead_authsize(aead)) {
-<<<<<<< HEAD
 			NL_SET_ERR_MSG(extack, "Kernel was unable to initialize cryptographic operations");
-=======
-			pr_info("ESP: %s digestsize %u != %u\n",
-				x->aalg->alg_name,
-				crypto_aead_authsize(aead),
-				aalg_desc->uinfo.auth.icv_fullbits / 8);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto free_key;
 		}
 

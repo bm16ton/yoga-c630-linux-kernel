@@ -52,7 +52,6 @@
 			linux,code = <KEY_VOLUMEUP>;
 			debounce-interval = <50>;
 			wakeup-source;
-<<<<<<< HEAD
 		};
 	};
 
@@ -78,8 +77,6 @@
 			color = <LED_COLOR_ID_RED>;
 			max-brightness = <248>;
 			pwms = <&pwm3 0 50000 0>;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 	};
 
@@ -1146,11 +1143,6 @@
 };
 
 &mipi_csi1 {
-<<<<<<< HEAD
-=======
-	#address-cells = <1>;
-	#size-cells = <0>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = "okay";
 
 	ports {

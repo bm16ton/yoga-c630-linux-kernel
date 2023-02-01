@@ -727,21 +727,6 @@ static int tegra_gpio_probe(struct platform_device *pdev)
 	tgi->gc.base			= 0;
 	tgi->gc.ngpio			= tgi->bank_count * 32;
 	tgi->gc.parent			= &pdev->dev;
-<<<<<<< HEAD
-=======
-
-	tgi->ic.name			= "GPIO";
-	tgi->ic.irq_ack			= tegra_gpio_irq_ack;
-	tgi->ic.irq_mask		= tegra_gpio_irq_mask;
-	tgi->ic.irq_unmask		= tegra_gpio_irq_unmask;
-	tgi->ic.irq_set_type		= tegra_gpio_irq_set_type;
-	tgi->ic.irq_shutdown		= tegra_gpio_irq_shutdown;
-#ifdef CONFIG_PM_SLEEP
-	tgi->ic.irq_set_wake		= tegra_gpio_irq_set_wake;
-#endif
-	tgi->ic.irq_request_resources	= tegra_gpio_irq_request_resources;
-	tgi->ic.irq_release_resources	= tegra_gpio_irq_release_resources;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	platform_set_drvdata(pdev, tgi);
 

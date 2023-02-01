@@ -117,7 +117,6 @@ static const struct intel_lpss_platform_info spt_uart_info = {
 	.clk_rate = 120000000,
 	.clk_con_id = "baudclk",
 	.swnode = &uart_node,
-<<<<<<< HEAD
 };
 
 static const struct property_entry bxt_spi_properties[] = {
@@ -127,8 +126,6 @@ static const struct property_entry bxt_spi_properties[] = {
 
 static const struct software_node bxt_spi_node = {
 	.properties = bxt_spi_properties,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct intel_lpss_platform_info bxt_info = {
@@ -188,7 +185,6 @@ static const struct software_node glk_i2c_node = {
 static const struct intel_lpss_platform_info glk_i2c_info = {
 	.clk_rate = 133000000,
 	.swnode = &glk_i2c_node,
-<<<<<<< HEAD
 };
 
 static const struct property_entry cnl_spi_properties[] = {
@@ -203,8 +199,6 @@ static const struct software_node cnl_spi_node = {
 static const struct intel_lpss_platform_info cnl_info = {
 	.clk_rate = 120000000,
 	.swnode = &cnl_spi_node,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct intel_lpss_platform_info cnl_i2c_info = {
@@ -215,7 +209,6 @@ static const struct intel_lpss_platform_info cnl_i2c_info = {
 static const struct intel_lpss_platform_info ehl_i2c_info = {
 	.clk_rate = 100000000,
 	.swnode = &bxt_i2c_node,
-<<<<<<< HEAD
 };
 
 static const struct property_entry tgl_spi_properties[] = {
@@ -230,8 +223,6 @@ static const struct software_node tgl_spi_node = {
 static const struct intel_lpss_platform_info tgl_info = {
 	.clk_rate = 100000000,
 	.swnode = &tgl_spi_node,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct pci_device_id intel_lpss_pci_ids[] = {
@@ -322,11 +313,7 @@ static const struct pci_device_id intel_lpss_pci_ids[] = {
 	{ PCI_VDEVICE(INTEL, 0x34e9), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x34ea), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x34eb), (kernel_ulong_t)&bxt_i2c_info },
-<<<<<<< HEAD
 	{ PCI_VDEVICE(INTEL, 0x34fb), (kernel_ulong_t)&cnl_info },
-=======
-	{ PCI_VDEVICE(INTEL, 0x34fb), (kernel_ulong_t)&spt_info },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* ICL-N */
 	{ PCI_VDEVICE(INTEL, 0x38a8), (kernel_ulong_t)&spt_uart_info },
 	/* TGL-H */
@@ -387,21 +374,12 @@ static const struct pci_device_id intel_lpss_pci_ids[] = {
 	{ PCI_VDEVICE(INTEL, 0x51e9), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x51ea), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x51eb), (kernel_ulong_t)&bxt_i2c_info },
-<<<<<<< HEAD
 	{ PCI_VDEVICE(INTEL, 0x51fb), (kernel_ulong_t)&tgl_info },
 	/* ADL-M */
 	{ PCI_VDEVICE(INTEL, 0x54a8), (kernel_ulong_t)&bxt_uart_info },
 	{ PCI_VDEVICE(INTEL, 0x54a9), (kernel_ulong_t)&bxt_uart_info },
 	{ PCI_VDEVICE(INTEL, 0x54aa), (kernel_ulong_t)&tgl_info },
 	{ PCI_VDEVICE(INTEL, 0x54ab), (kernel_ulong_t)&tgl_info },
-=======
-	{ PCI_VDEVICE(INTEL, 0x51fb), (kernel_ulong_t)&bxt_info },
-	/* ADL-M */
-	{ PCI_VDEVICE(INTEL, 0x54a8), (kernel_ulong_t)&bxt_uart_info },
-	{ PCI_VDEVICE(INTEL, 0x54a9), (kernel_ulong_t)&bxt_uart_info },
-	{ PCI_VDEVICE(INTEL, 0x54aa), (kernel_ulong_t)&bxt_info },
-	{ PCI_VDEVICE(INTEL, 0x54ab), (kernel_ulong_t)&bxt_info },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ PCI_VDEVICE(INTEL, 0x54c5), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x54c6), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x54c7), (kernel_ulong_t)&bxt_uart_info },
@@ -409,11 +387,7 @@ static const struct pci_device_id intel_lpss_pci_ids[] = {
 	{ PCI_VDEVICE(INTEL, 0x54e9), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x54ea), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x54eb), (kernel_ulong_t)&bxt_i2c_info },
-<<<<<<< HEAD
 	{ PCI_VDEVICE(INTEL, 0x54fb), (kernel_ulong_t)&tgl_info },
-=======
-	{ PCI_VDEVICE(INTEL, 0x54fb), (kernel_ulong_t)&bxt_info },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* APL */
 	{ PCI_VDEVICE(INTEL, 0x5aac), (kernel_ulong_t)&apl_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x5aae), (kernel_ulong_t)&apl_i2c_info },
@@ -433,25 +407,15 @@ static const struct pci_device_id intel_lpss_pci_ids[] = {
 	/* RPL-S */
 	{ PCI_VDEVICE(INTEL, 0x7a28), (kernel_ulong_t)&bxt_uart_info },
 	{ PCI_VDEVICE(INTEL, 0x7a29), (kernel_ulong_t)&bxt_uart_info },
-<<<<<<< HEAD
 	{ PCI_VDEVICE(INTEL, 0x7a2a), (kernel_ulong_t)&tgl_info },
 	{ PCI_VDEVICE(INTEL, 0x7a2b), (kernel_ulong_t)&tgl_info },
-=======
-	{ PCI_VDEVICE(INTEL, 0x7a2a), (kernel_ulong_t)&bxt_info },
-	{ PCI_VDEVICE(INTEL, 0x7a2b), (kernel_ulong_t)&bxt_info },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ PCI_VDEVICE(INTEL, 0x7a4c), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7a4d), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7a4e), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7a4f), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7a5c), (kernel_ulong_t)&bxt_uart_info },
-<<<<<<< HEAD
 	{ PCI_VDEVICE(INTEL, 0x7a79), (kernel_ulong_t)&tgl_info },
 	{ PCI_VDEVICE(INTEL, 0x7a7b), (kernel_ulong_t)&tgl_info },
-=======
-	{ PCI_VDEVICE(INTEL, 0x7a79), (kernel_ulong_t)&bxt_info },
-	{ PCI_VDEVICE(INTEL, 0x7a7b), (kernel_ulong_t)&bxt_info },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ PCI_VDEVICE(INTEL, 0x7a7c), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7a7d), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7a7e), (kernel_ulong_t)&bxt_uart_info },
@@ -473,15 +437,9 @@ static const struct pci_device_id intel_lpss_pci_ids[] = {
 	/* MTL-P */
 	{ PCI_VDEVICE(INTEL, 0x7e25), (kernel_ulong_t)&bxt_uart_info },
 	{ PCI_VDEVICE(INTEL, 0x7e26), (kernel_ulong_t)&bxt_uart_info },
-<<<<<<< HEAD
 	{ PCI_VDEVICE(INTEL, 0x7e27), (kernel_ulong_t)&tgl_info },
 	{ PCI_VDEVICE(INTEL, 0x7e30), (kernel_ulong_t)&tgl_info },
 	{ PCI_VDEVICE(INTEL, 0x7e46), (kernel_ulong_t)&tgl_info },
-=======
-	{ PCI_VDEVICE(INTEL, 0x7e27), (kernel_ulong_t)&bxt_info },
-	{ PCI_VDEVICE(INTEL, 0x7e30), (kernel_ulong_t)&bxt_info },
-	{ PCI_VDEVICE(INTEL, 0x7e46), (kernel_ulong_t)&bxt_info },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ PCI_VDEVICE(INTEL, 0x7e50), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7e51), (kernel_ulong_t)&bxt_i2c_info },
 	{ PCI_VDEVICE(INTEL, 0x7e52), (kernel_ulong_t)&bxt_uart_info },

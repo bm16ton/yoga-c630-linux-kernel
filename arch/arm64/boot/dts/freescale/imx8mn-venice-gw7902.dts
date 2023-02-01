@@ -213,10 +213,6 @@
 		compatible = "microchip,mcp2515";
 		reg = <0>;
 		clocks = <&can20m>;
-<<<<<<< HEAD
-=======
-		oscillator-frequency = <20000000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		interrupt-parent = <&gpio2>;
 		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 		spi-max-frequency = <10000000>;

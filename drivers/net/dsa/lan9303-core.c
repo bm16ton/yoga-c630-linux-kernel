@@ -1094,11 +1094,7 @@ static int lan9303_port_enable(struct dsa_switch *ds, int port,
 	if (!dsa_port_is_user(dp))
 		return 0;
 
-<<<<<<< HEAD
 	vlan_vid_add(dsa_port_to_master(dp), htons(ETH_P_8021Q), port);
-=======
-	vlan_vid_add(dp->cpu_dp->master, htons(ETH_P_8021Q), port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return lan9303_enable_processing_port(chip, port);
 }
@@ -1111,11 +1107,7 @@ static void lan9303_port_disable(struct dsa_switch *ds, int port)
 	if (!dsa_port_is_user(dp))
 		return;
 
-<<<<<<< HEAD
 	vlan_vid_del(dsa_port_to_master(dp), htons(ETH_P_8021Q), port);
-=======
-	vlan_vid_del(dp->cpu_dp->master, htons(ETH_P_8021Q), port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lan9303_disable_processing_port(chip, port);
 	lan9303_phy_write(ds, chip->phy_addr_base + port, MII_BMCR, BMCR_PDOWN);

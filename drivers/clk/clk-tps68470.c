@@ -200,13 +200,9 @@ static int tps68470_clk_probe(struct platform_device *pdev)
 		.flags = CLK_SET_RATE_GATE,
 	};
 	struct tps68470_clkdata *tps68470_clkdata;
-<<<<<<< HEAD
 	struct tps68470_clk_consumer *consumer;
 	int ret;
 	int i;
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	tps68470_clkdata = devm_kzalloc(&pdev->dev, sizeof(*tps68470_clkdata),
 					GFP_KERNEL);
@@ -229,7 +225,6 @@ static int tps68470_clk_probe(struct platform_device *pdev)
 		return ret;
 
 	if (pdata) {
-<<<<<<< HEAD
 		for (i = 0; i < pdata->n_consumers; i++) {
 			consumer = &pdata->consumers[i];
 			ret = devm_clk_hw_register_clkdev(&pdev->dev,
@@ -237,12 +232,6 @@ static int tps68470_clk_probe(struct platform_device *pdev)
 							  consumer->consumer_con_id,
 							  consumer->consumer_dev_name);
 		}
-=======
-		ret = devm_clk_hw_register_clkdev(&pdev->dev,
-						  &tps68470_clkdata->clkout_hw,
-						  pdata->consumer_con_id,
-						  pdata->consumer_dev_name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return ret;

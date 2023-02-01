@@ -31,14 +31,9 @@
  * These limitations are worked around in this test by using a large enough
  * region of memory for each vCPU such that the number of translations cached in
  * the TLB and the number of pages held in pagevecs are a small fraction of the
-<<<<<<< HEAD
  * overall workload. And if either of those conditions are not true (for example
  * in nesting, where TLB size is unlimited) this test will print a warning
  * rather than silently passing.
-=======
- * overall workload. And if either of those conditions are not true this test
- * will fail rather than silently passing.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #include <inttypes.h>
 #include <limits.h>
@@ -178,7 +173,6 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
 		    vcpu_idx, no_pfn, pages);
 
 	/*
-<<<<<<< HEAD
 	 * Check that at least 90% of memory has been marked idle (the rest
 	 * might not be marked idle because the pages have not yet made it to an
 	 * LRU list or the translations are still cached in the TLB). 90% is
@@ -196,19 +190,6 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
 		       "out of %" PRIu64 "), this will affect performance results"
 		       ".\n",
 		       vcpu_idx, still_idle, pages);
-=======
-	 * Test that at least 90% of memory has been marked idle (the rest might
-	 * not be marked idle because the pages have not yet made it to an LRU
-	 * list or the translations are still cached in the TLB). 90% is
-	 * arbitrary; high enough that we ensure most memory access went through
-	 * access tracking but low enough as to not make the test too brittle
-	 * over time and across architectures.
-	 */
-	TEST_ASSERT(still_idle < pages / 10,
-		    "vCPU%d: Too many pages still idle (%"PRIu64 " out of %"
-		    PRIu64 ").\n",
-		    vcpu_idx, still_idle, pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	close(page_idle_fd);
 	close(pagemap_fd);

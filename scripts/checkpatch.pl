@@ -348,7 +348,6 @@ EOF
 		$codespellfile = $codespell_dict if (-f $codespell_dict);
 	}
 }
-<<<<<<< HEAD
 
 # $help is 1 if either -h, --help or --version is passed as option - exitcode: 0
 # $help is 2 if invalid option is passed - exitcode: 1
@@ -369,28 +368,6 @@ if ($color =~ /^[01]$/) {
 	die "$P: Invalid color mode: $color\n";
 }
 
-=======
-
-# $help is 1 if either -h, --help or --version is passed as option - exitcode: 0
-# $help is 2 if invalid option is passed - exitcode: 1
-help($help - 1) if ($help);
-
-die "$P: --git cannot be used with --file or --fix\n" if ($git && ($file || $fix));
-die "$P: --verbose cannot be used with --terse\n" if ($verbose && $terse);
-
-if ($color =~ /^[01]$/) {
-	$color = !$color;
-} elsif ($color =~ /^always$/i) {
-	$color = 1;
-} elsif ($color =~ /^never$/i) {
-	$color = 0;
-} elsif ($color =~ /^auto$/i) {
-	$color = (-t STDOUT);
-} else {
-	die "$P: Invalid color mode: $color\n";
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 load_docs() if ($verbose);
 list_types(0) if ($list_types);
 

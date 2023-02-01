@@ -12,14 +12,8 @@
 #include <linux/interrupt.h>
 #include <linux/io.h>
 #include <linux/kernel.h>
-<<<<<<< HEAD
 #include <linux/mod_devicetable.h>
 #include <linux/of.h>
-=======
-#include <linux/of_device.h>
-#include <linux/of_irq.h>
-#include <linux/of_platform.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/pinctrl/pinctrl.h>
 #include <linux/pinctrl/pinmux.h>
 #include <linux/pinctrl/pinconf.h>
@@ -3424,15 +3418,9 @@ static void ingenic_gpio_irq_enable(struct irq_data *irqd)
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(irqd);
 	struct ingenic_gpio_chip *jzgc = gpiochip_get_data(gc);
 	irq_hw_number_t irq = irqd_to_hwirq(irqd);
-<<<<<<< HEAD
 
 	gpiochip_enable_irq(gc, irq);
 
-=======
-
-	gpiochip_enable_irq(gc, irq);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (is_soc_or_above(jzgc->jzpc, ID_JZ4770))
 		ingenic_gpio_set_bit(jzgc, JZ4770_GPIO_INT, irq, true);
 	else if (is_soc_or_above(jzgc->jzpc, ID_JZ4740))
@@ -4213,10 +4201,7 @@ static int __init ingenic_gpio_probe(struct ingenic_pinctrl *jzpc,
 		return err;
 	if (!err)
 		return -EINVAL;
-<<<<<<< HEAD
 	jzgc->irq = err;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	girq = &jzgc->gc.irq;
 	gpio_irq_chip_set_chip(girq, &ingenic_gpio_irqchip);
@@ -4245,13 +4230,8 @@ static int __init ingenic_pinctrl_probe(struct platform_device *pdev)
 	struct pinctrl_desc *pctl_desc;
 	void __iomem *base;
 	const struct ingenic_chip_info *chip_info;
-<<<<<<< HEAD
 	struct regmap_config regmap_config;
 	struct fwnode_handle *fwnode;
-=======
-	struct device_node *node;
-	struct regmap_config regmap_config;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int i;
 	int err;
 
@@ -4342,19 +4322,11 @@ static int __init ingenic_pinctrl_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(dev, jzpc->map);
 
-<<<<<<< HEAD
 	device_for_each_child_node(dev, fwnode) {
 		if (of_match_node(ingenic_gpio_of_matches, to_of_node(fwnode))) {
 			err = ingenic_gpio_probe(jzpc, fwnode);
 			if (err) {
 				fwnode_handle_put(fwnode);
-=======
-	for_each_child_of_node(dev->of_node, node) {
-		if (of_match_node(ingenic_gpio_of_matches, node)) {
-			err = ingenic_gpio_probe(jzpc, node);
-			if (err) {
-				of_node_put(node);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				return err;
 			}
 		}

@@ -33,16 +33,8 @@ static struct regmap_config sparx5_reset_regmap_config = {
 	.reg_stride	= 4,
 };
 
-<<<<<<< HEAD
 static int sparx5_switch_reset(struct mchp_reset_context *ctx)
 {
-=======
-static int sparx5_switch_reset(struct reset_controller_dev *rcdev,
-			       unsigned long id)
-{
-	struct mchp_reset_context *ctx =
-		container_of(rcdev, struct mchp_reset_context, rcdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val;
 
 	/* Make sure the core is PROTECTED from reset */
@@ -59,7 +51,6 @@ static int sparx5_switch_reset(struct reset_controller_dev *rcdev,
 					1, 100);
 }
 
-<<<<<<< HEAD
 static int sparx5_reset_noop(struct reset_controller_dev *rcdev,
 			     unsigned long id)
 {
@@ -68,10 +59,6 @@ static int sparx5_reset_noop(struct reset_controller_dev *rcdev,
 
 static const struct reset_control_ops sparx5_reset_ops = {
 	.reset = sparx5_reset_noop,
-=======
-static const struct reset_control_ops sparx5_reset_ops = {
-	.reset = sparx5_switch_reset,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int mchp_sparx5_map_syscon(struct platform_device *pdev, char *name,
@@ -138,14 +125,11 @@ static int mchp_sparx5_reset_probe(struct platform_device *pdev)
 	ctx->rcdev.of_node = dn;
 	ctx->props = device_get_match_data(&pdev->dev);
 
-<<<<<<< HEAD
 	/* Issue the reset very early, our actual reset callback is a noop. */
 	err = sparx5_switch_reset(ctx);
 	if (err)
 		return err;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return devm_reset_controller_register(&pdev->dev, &ctx->rcdev);
 }
 
@@ -187,13 +171,10 @@ static int __init mchp_sparx5_reset_init(void)
 	return platform_driver_register(&mchp_sparx5_reset_driver);
 }
 
-<<<<<<< HEAD
 /*
  * Because this is a global reset, keep this postcore_initcall() to issue the
  * reset as early as possible during the kernel startup.
  */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 postcore_initcall(mchp_sparx5_reset_init);
 
 MODULE_DESCRIPTION("Microchip Sparx5 switch reset driver");

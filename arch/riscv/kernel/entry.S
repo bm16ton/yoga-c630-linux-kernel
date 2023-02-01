@@ -266,13 +266,8 @@ ret_from_exception:
 	/* Interrupts must be disabled here so flags are checked atomically */
 	REG_L s0, TASK_TI_FLAGS(tp) /* current_thread_info->flags */
 	andi s1, s0, _TIF_WORK_MASK
-<<<<<<< HEAD
 	bnez s1, resume_userspace_slow
 resume_userspace:
-=======
-	bnez s1, work_pending
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_CONTEXT_TRACKING_USER
 	call user_enter_callable
 #endif

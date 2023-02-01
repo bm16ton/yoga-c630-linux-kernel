@@ -517,13 +517,6 @@ static void cpm_uart_set_termios(struct uart_port *port,
 	cval = 0;
 	scval = 0;
 
-<<<<<<< HEAD
-=======
-	/* byte size */
-	bits = tty_get_char_size(termios->c_cflag);
-	sbits = bits - 5;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (termios->c_cflag & CSTOPB) {
 		cval |= SMCMR_SL;	/* Two stops */
 		scval |= SCU_PSMR_SL;

@@ -2164,7 +2164,6 @@ int amdgpu_ras_recovery_init(struct amdgpu_device *adev)
 	int ret;
 
 	if (!con || amdgpu_sriov_vf(adev))
-<<<<<<< HEAD
 		return 0;
 
 	/* Allow access to RAS EEPROM via debugfs, when the ASIC
@@ -2177,20 +2176,6 @@ int amdgpu_ras_recovery_init(struct amdgpu_device *adev)
 	if (!adev->ras_enabled)
 		return 0;
 
-=======
-		return 0;
-
-	/* Allow access to RAS EEPROM via debugfs, when the ASIC
-	 * supports RAS and debugfs is enabled, but when
-	 * adev->ras_enabled is unset, i.e. when "ras_enable"
-	 * module parameter is set to 0.
-	 */
-	con->adev = adev;
-
-	if (!adev->ras_enabled)
-		return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	data = &con->eh_data;
 	*data = kmalloc(sizeof(**data), GFP_KERNEL | __GFP_ZERO);
 	if (!*data) {
@@ -2282,7 +2267,6 @@ static int amdgpu_ras_recovery_fini(struct amdgpu_device *adev)
 
 static bool amdgpu_ras_asic_supported(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
 	if (amdgpu_sriov_vf(adev)) {
 		switch (adev->ip_versions[MP0_HWIP][0]) {
 		case IP_VERSION(13, 0, 2):
@@ -2302,8 +2286,6 @@ static bool amdgpu_ras_asic_supported(struct amdgpu_device *adev)
 		}
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return adev->asic_type == CHIP_VEGA10 ||
 		adev->asic_type == CHIP_VEGA20 ||
 		adev->asic_type == CHIP_ARCTURUS ||
@@ -2347,7 +2329,6 @@ static void amdgpu_ras_check_supported(struct amdgpu_device *adev)
 	    !amdgpu_ras_asic_supported(adev))
 		return;
 
-<<<<<<< HEAD
 	if (!adev->gmc.xgmi.connected_to_cpu) {
 		if (amdgpu_atomfirmware_mem_ecc_supported(adev)) {
 			dev_info(adev->dev, "MEM ECC is active.\n");
@@ -2357,22 +2338,6 @@ static void amdgpu_ras_check_supported(struct amdgpu_device *adev)
 			dev_info(adev->dev, "MEM ECC is not presented.\n");
 		}
 
-=======
-	/* If driver run on sriov guest side, only enable ras for aldebaran */
-	if (amdgpu_sriov_vf(adev) &&
-		adev->ip_versions[MP1_HWIP][0] != IP_VERSION(13, 0, 2))
-		return;
-
-	if (!adev->gmc.xgmi.connected_to_cpu) {
-		if (amdgpu_atomfirmware_mem_ecc_supported(adev)) {
-			dev_info(adev->dev, "MEM ECC is active.\n");
-			adev->ras_hw_enabled |= (1 << AMDGPU_RAS_BLOCK__UMC |
-						   1 << AMDGPU_RAS_BLOCK__DF);
-		} else {
-			dev_info(adev->dev, "MEM ECC is not presented.\n");
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (amdgpu_atomfirmware_sram_ecc_supported(adev)) {
 			dev_info(adev->dev, "SRAM ECC is active.\n");
 			if (!amdgpu_sriov_vf(adev)) {
@@ -2882,16 +2847,8 @@ static int amdgpu_bad_page_notifier(struct notifier_block *nb,
 	struct mce *m = (struct mce *)data;
 	struct amdgpu_device *adev = NULL;
 	uint32_t gpu_id = 0;
-<<<<<<< HEAD
 	uint32_t umc_inst = 0, ch_inst = 0;
 	struct ras_err_data err_data = {0, 0, 0, NULL};
-=======
-	uint32_t umc_inst = 0;
-	uint32_t ch_inst, channel_index = 0;
-	struct ras_err_data err_data = {0, 0, 0, NULL};
-	struct eeprom_table_record err_rec;
-	uint64_t retired_page;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * If the error was generated in UMC_V2, which belongs to GPU UMCs,
@@ -2930,7 +2887,6 @@ static int amdgpu_bad_page_notifier(struct notifier_block *nb,
 	dev_info(adev->dev, "Uncorrectable error detected in UMC inst: %d, chan_idx: %d",
 			     umc_inst, ch_inst);
 
-<<<<<<< HEAD
 	err_data.err_addr =
 		kcalloc(adev->umc.max_ras_err_cnt_per_query,
 			sizeof(struct eeprom_table_record), GFP_KERNEL);
@@ -2974,60 +2930,11 @@ static void amdgpu_register_bad_pages_mca_notifier(struct amdgpu_device *adev)
 	 * device on which the UMC error was reported.
 	 */
 	mce_adev_list.devs[mce_adev_list.num_gpu++] = adev;
-=======
-	/*
-	 * Translate UMC channel address to Physical address
-	 */
-	channel_index =
-		adev->umc.channel_idx_tbl[umc_inst * adev->umc.channel_inst_num
-					  + ch_inst];
-
-	retired_page = ADDR_OF_8KB_BLOCK(m->addr) |
-			ADDR_OF_256B_BLOCK(channel_index) |
-			OFFSET_IN_256B_BLOCK(m->addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	memset(&err_rec, 0x0, sizeof(struct eeprom_table_record));
-	err_data.err_addr = &err_rec;
-	amdgpu_umc_fill_error_record(&err_data, m->addr,
-			retired_page, channel_index, umc_inst);
-
-	if (amdgpu_bad_page_threshold != 0) {
-		amdgpu_ras_add_bad_pages(adev, err_data.err_addr,
-						err_data.err_addr_cnt);
-		amdgpu_ras_save_bad_pages(adev);
-	}
-
-	return NOTIFY_OK;
-}
-
-static struct notifier_block amdgpu_bad_page_nb = {
-	.notifier_call  = amdgpu_bad_page_notifier,
-	.priority       = MCE_PRIO_UC,
-};
-
-static void amdgpu_register_bad_pages_mca_notifier(struct amdgpu_device *adev)
-{
-	/*
-<<<<<<< HEAD
-	 * Register the x86 notifier only once
-	 * with MCE subsystem.
-	 */
-=======
-	 * Add the adev to the mce_adev_list.
-	 * During mode2 reset, amdgpu device is temporarily
-	 * removed from the mgpu_info list which can cause
-	 * page retirement to fail.
-	 * Use this list instead of mgpu_info to find the amdgpu
-	 * device on which the UMC error was reported.
-	 */
-	mce_adev_list.devs[mce_adev_list.num_gpu++] = adev;
 
 	/*
 	 * Register the x86 notifier only once
 	 * with MCE subsystem.
 	 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (notifier_registered == false) {
 		mce_register_decode_chain(&amdgpu_bad_page_nb);
 		notifier_registered = true;

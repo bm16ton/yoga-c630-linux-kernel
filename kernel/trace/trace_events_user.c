@@ -14,10 +14,7 @@
 #include <linux/uio.h>
 #include <linux/ioctl.h>
 #include <linux/jhash.h>
-<<<<<<< HEAD
 #include <linux/refcount.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/trace_events.h>
 #include <linux/tracefs.h>
 #include <linux/types.h>
@@ -43,18 +40,13 @@
  */
 #define MAX_PAGE_ORDER 0
 #define MAX_PAGES (1 << MAX_PAGE_ORDER)
-<<<<<<< HEAD
 #define MAX_BYTES (MAX_PAGES * PAGE_SIZE)
 #define MAX_EVENTS (MAX_BYTES * 8)
-=======
-#define MAX_EVENTS (MAX_PAGES * PAGE_SIZE)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Limit how long of an event name plus args within the subsystem. */
 #define MAX_EVENT_DESC 512
 #define EVENT_NAME(user_event) ((user_event)->tracepoint.name)
 #define MAX_FIELD_ARRAY_SIZE 1024
-<<<<<<< HEAD
 
 /*
  * The MAP_STATUS_* macros are used for taking a index and determining the
@@ -101,31 +93,16 @@ struct user_event_group {
 
 /* Group for init_user_ns mapping, top-most group */
 static struct user_event_group *init_group;
-=======
-#define MAX_FIELD_ARG_NAME 256
-
-static char *register_page_data;
-
-static DEFINE_MUTEX(reg_mutex);
-static DEFINE_HASHTABLE(register_table, 4);
-static DECLARE_BITMAP(page_bitmap, MAX_EVENTS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Stores per-event properties, as users register events
  * within a file a user_event might be created if it does not
  * already exist. These are globally used and their lifetime
  * is tied to the refcnt member. These cannot go away until the
-<<<<<<< HEAD
  * refcnt reaches one.
  */
 struct user_event {
 	struct user_event_group *group;
-=======
- * refcnt reaches zero.
- */
-struct user_event {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct tracepoint tracepoint;
 	struct trace_event_call call;
 	struct trace_event_class class;
@@ -133,18 +110,11 @@ struct user_event {
 	struct hlist_node node;
 	struct list_head fields;
 	struct list_head validators;
-<<<<<<< HEAD
 	refcount_t refcnt;
 	int index;
 	int flags;
 	int min_size;
 	char status;
-=======
-	atomic_t refcnt;
-	int index;
-	int flags;
-	int min_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*
@@ -159,14 +129,11 @@ struct user_event_refs {
 	struct user_event *events[];
 };
 
-<<<<<<< HEAD
 struct user_event_file_info {
 	struct user_event_group *group;
 	struct user_event_refs *refs;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define VALIDATOR_ENSURE_NULL (1 << 0)
 #define VALIDATOR_REL (1 << 1)
 
@@ -179,12 +146,8 @@ struct user_event_validator {
 typedef void (*user_event_func_t) (struct user_event *user, struct iov_iter *i,
 				   void *tpdata, bool *faulted);
 
-<<<<<<< HEAD
 static int user_event_parse(struct user_event_group *group, char *name,
 			    char *args, char *flags,
-=======
-static int user_event_parse(char *name, char *args, char *flags,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			    struct user_event **newuser);
 
 static u32 user_event_key(char *name)
@@ -192,7 +155,6 @@ static u32 user_event_key(char *name)
 	return jhash(name, strlen(name), 0);
 }
 
-<<<<<<< HEAD
 static void set_page_reservations(char *pages, bool set)
 {
 	int page;
@@ -331,8 +293,6 @@ bool user_event_last_ref(struct user_event *user)
 	return refcount_read(&user->refcnt) == 1;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static __always_inline __must_check
 size_t copy_nofault(void *addr, size_t bytes, struct iov_iter *i)
 {
@@ -368,12 +328,8 @@ static struct list_head *user_event_get_fields(struct trace_event_call *call)
  *
  * Upon success user_event has its ref count increased by 1.
  */
-<<<<<<< HEAD
 static int user_event_parse_cmd(struct user_event_group *group,
 				char *raw_command, struct user_event **newuser)
-=======
-static int user_event_parse_cmd(char *raw_command, struct user_event **newuser)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	char *name = raw_command;
 	char *args = strpbrk(name, " ");
@@ -387,11 +343,7 @@ static int user_event_parse_cmd(char *raw_command, struct user_event **newuser)
 	if (flags)
 		*flags++ = '\0';
 
-<<<<<<< HEAD
 	return user_event_parse(group, name, args, flags, newuser);
-=======
-	return user_event_parse(name, args, flags, newuser);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int user_field_array_size(const char *type)
@@ -513,11 +465,7 @@ static int user_event_add_field(struct user_event *user, const char *type,
 	goto add_field;
 
 add_validator:
-<<<<<<< HEAD
 	if (strstr(type, "char") != NULL)
-=======
-	if (strstr(type, "char") != 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		validator_flags |= VALIDATOR_ENSURE_NULL;
 
 	validator = kmalloc(sizeof(*validator), GFP_KERNEL);
@@ -698,11 +646,7 @@ static const char *user_field_format(const char *type)
 		return "%d";
 	if (strcmp(type, "unsigned char") == 0)
 		return "%u";
-<<<<<<< HEAD
 	if (strstr(type, "char[") != NULL)
-=======
-	if (strstr(type, "char[") != 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return "%s";
 
 	/* Unknown, likely struct, allowed treat as 64-bit */
@@ -723,7 +667,6 @@ static bool user_field_is_dyn_string(const char *type, const char **str_func)
 
 	return false;
 check:
-<<<<<<< HEAD
 	return strstr(type, "char") != NULL;
 }
 
@@ -770,12 +713,6 @@ static int user_field_set_string(struct ftrace_event_field *field,
 	return pos + 1;
 }
 
-=======
-	return strstr(type, "char") != 0;
-}
-
-#define LEN_OR_ZERO (len ? len - pos : 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int user_event_set_print_fmt(struct user_event *user, char *buf, int len)
 {
 	struct ftrace_event_field *field, *next;
@@ -893,13 +830,8 @@ static int destroy_user_event(struct user_event *user)
 
 	dyn_event_remove(&user->devent);
 
-<<<<<<< HEAD
 	user_event_register_clear(user);
 	clear_bit(user->index, user->group->page_bitmap);
-=======
-	register_page_data[user->index] = 0;
-	clear_bit(user->index, page_bitmap);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hash_del(&user->node);
 
 	user_event_destroy_validators(user);
@@ -910,27 +842,17 @@ static int destroy_user_event(struct user_event *user)
 	return ret;
 }
 
-<<<<<<< HEAD
 static struct user_event *find_user_event(struct user_event_group *group,
 					  char *name, u32 *outkey)
-=======
-static struct user_event *find_user_event(char *name, u32 *outkey)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct user_event *user;
 	u32 key = user_event_key(name);
 
 	*outkey = key;
 
-<<<<<<< HEAD
 	hash_for_each_possible(group->register_table, user, node, key)
 		if (!strcmp(EVENT_NAME(user), name)) {
 			refcount_inc(&user->refcnt);
-=======
-	hash_for_each_possible(register_table, user, node, key)
-		if (!strcmp(EVENT_NAME(user), name)) {
-			atomic_inc(&user->refcnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return user;
 		}
 
@@ -1088,16 +1010,12 @@ static void update_reg_page_for(struct user_event *user)
 		rcu_read_unlock_sched();
 	}
 
-<<<<<<< HEAD
 	if (status)
 		user_event_register_set(user);
 	else
 		user_event_register_clear(user);
 
 	user->status = status;
-=======
-	register_page_data[user->index] = status;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1153,29 +1071,18 @@ static int user_event_reg(struct trace_event_call *call,
 
 	return ret;
 inc:
-<<<<<<< HEAD
 	refcount_inc(&user->refcnt);
-=======
-	atomic_inc(&user->refcnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	update_reg_page_for(user);
 	return 0;
 dec:
 	update_reg_page_for(user);
-<<<<<<< HEAD
 	refcount_dec(&user->refcnt);
-=======
-	atomic_dec(&user->refcnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
 static int user_event_create(const char *raw_command)
 {
-<<<<<<< HEAD
 	struct user_event_group *group;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct user_event *user;
 	char *name;
 	int ret;
@@ -1191,7 +1098,6 @@ static int user_event_create(const char *raw_command)
 	if (!name)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	group = current_user_event_group();
 
 	if (!group) {
@@ -1207,16 +1113,6 @@ static int user_event_create(const char *raw_command)
 		refcount_dec(&user->refcnt);
 
 	mutex_unlock(&group->reg_mutex);
-=======
-	mutex_lock(&reg_mutex);
-
-	ret = user_event_parse_cmd(name, &user);
-
-	if (!ret)
-		atomic_dec(&user->refcnt);
-
-	mutex_unlock(&reg_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (ret)
 		kfree(name);
@@ -1258,22 +1154,14 @@ static bool user_event_is_busy(struct dyn_event *ev)
 {
 	struct user_event *user = container_of(ev, struct user_event, devent);
 
-<<<<<<< HEAD
 	return !user_event_last_ref(user);
-=======
-	return atomic_read(&user->refcnt) != 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int user_event_free(struct dyn_event *ev)
 {
 	struct user_event *user = container_of(ev, struct user_event, devent);
 
-<<<<<<< HEAD
 	if (!user_event_last_ref(user))
-=======
-	if (atomic_read(&user->refcnt) != 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBUSY;
 
 	return destroy_user_event(user);
@@ -1282,7 +1170,6 @@ static int user_event_free(struct dyn_event *ev)
 static bool user_field_match(struct ftrace_event_field *field, int argc,
 			     const char **argv, int *iout)
 {
-<<<<<<< HEAD
 	char *field_name = NULL, *dyn_field_name = NULL;
 	bool colon = false, match = false;
 	int dyn_len, len;
@@ -1312,51 +1199,6 @@ static bool user_field_match(struct ftrace_event_field *field, int argc,
 	match = strcmp(dyn_field_name, field_name) == 0;
 out:
 	kfree(dyn_field_name);
-=======
-	char *field_name, *arg_name;
-	int len, pos, i = *iout;
-	bool colon = false, match = false;
-
-	if (i >= argc)
-		return false;
-
-	len = MAX_FIELD_ARG_NAME;
-	field_name = kmalloc(len, GFP_KERNEL);
-	arg_name = kmalloc(len, GFP_KERNEL);
-
-	if (!arg_name || !field_name)
-		goto out;
-
-	pos = 0;
-
-	for (; i < argc; ++i) {
-		if (i != *iout)
-			pos += snprintf(arg_name + pos, len - pos, " ");
-
-		pos += snprintf(arg_name + pos, len - pos, argv[i]);
-
-		if (strchr(argv[i], ';')) {
-			++i;
-			colon = true;
-			break;
-		}
-	}
-
-	pos = 0;
-
-	pos += snprintf(field_name + pos, len - pos, field->type);
-	pos += snprintf(field_name + pos, len - pos, " ");
-	pos += snprintf(field_name + pos, len - pos, field->name);
-
-	if (colon)
-		pos += snprintf(field_name + pos, len - pos, ";");
-
-	*iout = i;
-
-	match = strcmp(arg_name, field_name) == 0;
-out:
-	kfree(arg_name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(field_name);
 
 	return match;
@@ -1424,12 +1266,8 @@ static int user_event_trace_register(struct user_event *user)
  * The name buffer lifetime is owned by this method for success cases only.
  * Upon success the returned user_event has its ref count increased by 1.
  */
-<<<<<<< HEAD
 static int user_event_parse(struct user_event_group *group, char *name,
 			    char *args, char *flags,
-=======
-static int user_event_parse(char *name, char *args, char *flags,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			    struct user_event **newuser)
 {
 	int ret;
@@ -1439,11 +1277,7 @@ static int user_event_parse(char *name, char *args, char *flags,
 
 	/* Prevent dyn_event from racing */
 	mutex_lock(&event_mutex);
-<<<<<<< HEAD
 	user = find_user_event(group, name, &key);
-=======
-	user = find_user_event(name, &key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&event_mutex);
 
 	if (user) {
@@ -1456,11 +1290,7 @@ static int user_event_parse(char *name, char *args, char *flags,
 		return 0;
 	}
 
-<<<<<<< HEAD
 	index = find_first_zero_bit(group->page_bitmap, MAX_EVENTS);
-=======
-	index = find_first_zero_bit(page_bitmap, MAX_EVENTS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (index == MAX_EVENTS)
 		return -EMFILE;
@@ -1474,10 +1304,7 @@ static int user_event_parse(char *name, char *args, char *flags,
 	INIT_LIST_HEAD(&user->fields);
 	INIT_LIST_HEAD(&user->validators);
 
-<<<<<<< HEAD
 	user->group = group;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	user->tracepoint.name = name;
 
 	ret = user_event_parse_fields(user, args);
@@ -1496,13 +1323,8 @@ static int user_event_parse(char *name, char *args, char *flags,
 	user->call.flags = TRACE_EVENT_FL_TRACEPOINT;
 	user->call.tp = &user->tracepoint;
 	user->call.event.funcs = &user_event_funcs;
-<<<<<<< HEAD
 	user->class.system = group->system_name;
 
-=======
-
-	user->class.system = USER_EVENTS_SYSTEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	user->class.fields_array = user_event_fields_array;
 	user->class.get_fields = user_event_get_fields;
 	user->class.reg = user_event_reg;
@@ -1520,7 +1342,6 @@ static int user_event_parse(char *name, char *args, char *flags,
 
 	user->index = index;
 
-<<<<<<< HEAD
 	/* Ensure we track self ref and caller ref (2) */
 	refcount_set(&user->refcnt, 2);
 
@@ -1528,15 +1349,6 @@ static int user_event_parse(char *name, char *args, char *flags,
 	dyn_event_add(&user->devent, &user->call);
 	set_bit(user->index, group->page_bitmap);
 	hash_add(group->register_table, &user->node, key);
-=======
-	/* Ensure we track ref */
-	atomic_inc(&user->refcnt);
-
-	dyn_event_init(&user->devent, &user_event_dops);
-	dyn_event_add(&user->devent, &user->call);
-	set_bit(user->index, page_bitmap);
-	hash_add(register_table, &user->node, key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_unlock(&event_mutex);
 
@@ -1547,10 +1359,7 @@ put_user_lock:
 put_user:
 	user_event_destroy_fields(user);
 	user_event_destroy_validators(user);
-<<<<<<< HEAD
 	kfree(user->call.print_fmt);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(user);
 	return ret;
 }
@@ -1558,48 +1367,20 @@ put_user:
 /*
  * Deletes a previously created event if it is no longer being used.
  */
-<<<<<<< HEAD
 static int delete_user_event(struct user_event_group *group, char *name)
 {
 	u32 key;
 	struct user_event *user = find_user_event(group, name, &key);
-=======
-static int delete_user_event(char *name)
-{
-	u32 key;
-	int ret;
-	struct user_event *user = find_user_event(name, &key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!user)
 		return -ENOENT;
 
-<<<<<<< HEAD
 	refcount_dec(&user->refcnt);
 
 	if (!user_event_last_ref(user))
 		return -EBUSY;
 
 	return destroy_user_event(user);
-=======
-	/* Ensure we are the last ref */
-	if (atomic_read(&user->refcnt) != 1) {
-		ret = -EBUSY;
-		goto put_ref;
-	}
-
-	ret = destroy_user_event(user);
-
-	if (ret)
-		goto put_ref;
-
-	return ret;
-put_ref:
-	/* No longer have this ref */
-	atomic_dec(&user->refcnt);
-
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1607,10 +1388,7 @@ put_ref:
  */
 static ssize_t user_events_write_core(struct file *file, struct iov_iter *i)
 {
-<<<<<<< HEAD
 	struct user_event_file_info *info = file->private_data;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct user_event_refs *refs;
 	struct user_event *user = NULL;
 	struct tracepoint *tp;
@@ -1622,11 +1400,7 @@ static ssize_t user_events_write_core(struct file *file, struct iov_iter *i)
 
 	rcu_read_lock_sched();
 
-<<<<<<< HEAD
 	refs = rcu_dereference_sched(info->refs);
-=======
-	refs = rcu_dereference_sched(file->private_data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The refs->events array is protected by RCU, and new items may be
@@ -1684,7 +1458,6 @@ static ssize_t user_events_write_core(struct file *file, struct iov_iter *i)
 	return ret;
 }
 
-<<<<<<< HEAD
 static int user_events_open(struct inode *node, struct file *file)
 {
 	struct user_event_group *group;
@@ -1707,8 +1480,6 @@ static int user_events_open(struct inode *node, struct file *file)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static ssize_t user_events_write(struct file *file, const char __user *ubuf,
 				 size_t count, loff_t *ppos)
 {
@@ -1718,12 +1489,8 @@ static ssize_t user_events_write(struct file *file, const char __user *ubuf,
 	if (unlikely(*ppos != 0))
 		return -EFAULT;
 
-<<<<<<< HEAD
 	if (unlikely(import_single_range(WRITE, (char __user *)ubuf,
 					 count, &iov, &i)))
-=======
-	if (unlikely(import_single_range(READ, (char *)ubuf, count, &iov, &i)))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFAULT;
 
 	return user_events_write_core(file, &i);
@@ -1734,7 +1501,6 @@ static ssize_t user_events_write_iter(struct kiocb *kp, struct iov_iter *i)
 	return user_events_write_core(kp->ki_filp, i);
 }
 
-<<<<<<< HEAD
 static int user_events_ref_add(struct user_event_file_info *info,
 			       struct user_event *user)
 {
@@ -1744,15 +1510,6 @@ static int user_events_ref_add(struct user_event_file_info *info,
 
 	refs = rcu_dereference_protected(info->refs,
 					 lockdep_is_held(&group->reg_mutex));
-=======
-static int user_events_ref_add(struct file *file, struct user_event *user)
-{
-	struct user_event_refs *refs, *new_refs;
-	int i, size, count = 0;
-
-	refs = rcu_dereference_protected(file->private_data,
-					 lockdep_is_held(&reg_mutex));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (refs) {
 		count = refs->count;
@@ -1776,15 +1533,9 @@ static int user_events_ref_add(struct file *file, struct user_event *user)
 
 	new_refs->events[i] = user;
 
-<<<<<<< HEAD
 	refcount_inc(&user->refcnt);
 
 	rcu_assign_pointer(info->refs, new_refs);
-=======
-	atomic_inc(&user->refcnt);
-
-	rcu_assign_pointer(file->private_data, new_refs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (refs)
 		kfree_rcu(refs, rcu);
@@ -1805,7 +1556,6 @@ static long user_reg_get(struct user_reg __user *ureg, struct user_reg *kreg)
 	if (size > PAGE_SIZE)
 		return -E2BIG;
 
-<<<<<<< HEAD
 	if (size < offsetofend(struct user_reg, write_index))
 		return -EINVAL;
 
@@ -1817,20 +1567,13 @@ static long user_reg_get(struct user_reg __user *ureg, struct user_reg *kreg)
 	kreg->size = size;
 
 	return 0;
-=======
-	return copy_struct_from_user(kreg, sizeof(*kreg), ureg, size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
  * Registers a user_event on behalf of a user process.
  */
-<<<<<<< HEAD
 static long user_events_ioctl_reg(struct user_event_file_info *info,
 				  unsigned long uarg)
-=======
-static long user_events_ioctl_reg(struct file *file, unsigned long uarg)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct user_reg __user *ureg = (struct user_reg __user *)uarg;
 	struct user_reg reg;
@@ -1851,39 +1594,24 @@ static long user_events_ioctl_reg(struct file *file, unsigned long uarg)
 		return ret;
 	}
 
-<<<<<<< HEAD
 	ret = user_event_parse_cmd(info->group, name, &user);
-=======
-	ret = user_event_parse_cmd(name, &user);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (ret) {
 		kfree(name);
 		return ret;
 	}
 
-<<<<<<< HEAD
 	ret = user_events_ref_add(info, user);
 
 	/* No longer need parse ref, ref_add either worked or not */
 	refcount_dec(&user->refcnt);
-=======
-	ret = user_events_ref_add(file, user);
-
-	/* No longer need parse ref, ref_add either worked or not */
-	atomic_dec(&user->refcnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Positive number is index and valid */
 	if (ret < 0)
 		return ret;
 
 	put_user((u32)ret, &ureg->write_index);
-<<<<<<< HEAD
 	put_user(user->index, &ureg->status_bit);
-=======
-	put_user(user->index, &ureg->status_index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1891,12 +1619,8 @@ static long user_events_ioctl_reg(struct file *file, unsigned long uarg)
 /*
  * Deletes a user_event on behalf of a user process.
  */
-<<<<<<< HEAD
 static long user_events_ioctl_del(struct user_event_file_info *info,
 				  unsigned long uarg)
-=======
-static long user_events_ioctl_del(struct file *file, unsigned long uarg)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	void __user *ubuf = (void __user *)uarg;
 	char *name;
@@ -1909,11 +1633,7 @@ static long user_events_ioctl_del(struct file *file, unsigned long uarg)
 
 	/* event_mutex prevents dyn_event from racing */
 	mutex_lock(&event_mutex);
-<<<<<<< HEAD
 	ret = delete_user_event(info->group, name);
-=======
-	ret = delete_user_event(name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&event_mutex);
 
 	kfree(name);
@@ -1927,16 +1647,12 @@ static long user_events_ioctl_del(struct file *file, unsigned long uarg)
 static long user_events_ioctl(struct file *file, unsigned int cmd,
 			      unsigned long uarg)
 {
-<<<<<<< HEAD
 	struct user_event_file_info *info = file->private_data;
 	struct user_event_group *group = info->group;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	long ret = -ENOTTY;
 
 	switch (cmd) {
 	case DIAG_IOCSREG:
-<<<<<<< HEAD
 		mutex_lock(&group->reg_mutex);
 		ret = user_events_ioctl_reg(info, uarg);
 		mutex_unlock(&group->reg_mutex);
@@ -1946,17 +1662,6 @@ static long user_events_ioctl(struct file *file, unsigned int cmd,
 		mutex_lock(&group->reg_mutex);
 		ret = user_events_ioctl_del(info, uarg);
 		mutex_unlock(&group->reg_mutex);
-=======
-		mutex_lock(&reg_mutex);
-		ret = user_events_ioctl_reg(file, uarg);
-		mutex_unlock(&reg_mutex);
-		break;
-
-	case DIAG_IOCSDEL:
-		mutex_lock(&reg_mutex);
-		ret = user_events_ioctl_del(file, uarg);
-		mutex_unlock(&reg_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 
@@ -1968,36 +1673,24 @@ static long user_events_ioctl(struct file *file, unsigned int cmd,
  */
 static int user_events_release(struct inode *node, struct file *file)
 {
-<<<<<<< HEAD
 	struct user_event_file_info *info = file->private_data;
 	struct user_event_group *group;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct user_event_refs *refs;
 	struct user_event *user;
 	int i;
 
-<<<<<<< HEAD
 	if (!info)
 		return -EINVAL;
 
 	group = info->group;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Ensure refs cannot change under any situation by taking the
 	 * register mutex during the final freeing of the references.
 	 */
-<<<<<<< HEAD
 	mutex_lock(&group->reg_mutex);
 
 	refs = info->refs;
-=======
-	mutex_lock(&reg_mutex);
-
-	refs = file->private_data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!refs)
 		goto out;
@@ -2011,41 +1704,27 @@ static int user_events_release(struct inode *node, struct file *file)
 		user = refs->events[i];
 
 		if (user)
-<<<<<<< HEAD
 			refcount_dec(&user->refcnt);
-=======
-			atomic_dec(&user->refcnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 out:
 	file->private_data = NULL;
 
-<<<<<<< HEAD
 	mutex_unlock(&group->reg_mutex);
 
 	kfree(refs);
 	kfree(info);
-=======
-	mutex_unlock(&reg_mutex);
-
-	kfree(refs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
 static const struct file_operations user_data_fops = {
-<<<<<<< HEAD
 	.open = user_events_open,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.write = user_events_write,
 	.write_iter = user_events_write_iter,
 	.unlocked_ioctl	= user_events_ioctl,
 	.release = user_events_release,
 };
 
-<<<<<<< HEAD
 static struct user_event_group *user_status_group(struct file *file)
 {
 	struct seq_file *m = file->private_data;
@@ -2056,14 +1735,11 @@ static struct user_event_group *user_status_group(struct file *file)
 	return m->private;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Maps the shared page into the user process for checking if event is enabled.
  */
 static int user_status_mmap(struct file *file, struct vm_area_struct *vma)
 {
-<<<<<<< HEAD
 	char *pages;
 	struct user_event_group *group = user_status_group(file);
 	unsigned long size = vma->vm_end - vma->vm_start;
@@ -2078,15 +1754,6 @@ static int user_status_mmap(struct file *file, struct vm_area_struct *vma)
 
 	return remap_pfn_range(vma, vma->vm_start,
 			       virt_to_phys(pages) >> PAGE_SHIFT,
-=======
-	unsigned long size = vma->vm_end - vma->vm_start;
-
-	if (size != MAX_EVENTS)
-		return -EINVAL;
-
-	return remap_pfn_range(vma, vma->vm_start,
-			       virt_to_phys(register_page_data) >> PAGE_SHIFT,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			       size, vm_get_page_prot(VM_READ));
 }
 
@@ -2110,15 +1777,11 @@ static void user_seq_stop(struct seq_file *m, void *p)
 
 static int user_seq_show(struct seq_file *m, void *p)
 {
-<<<<<<< HEAD
 	struct user_event_group *group = m->private;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct user_event *user;
 	char status;
 	int i, active = 0, busy = 0, flags;
 
-<<<<<<< HEAD
 	if (!group)
 		return -EINVAL;
 
@@ -2126,12 +1789,6 @@ static int user_seq_show(struct seq_file *m, void *p)
 
 	hash_for_each(group->register_table, i, user, node) {
 		status = user->status;
-=======
-	mutex_lock(&reg_mutex);
-
-	hash_for_each(register_table, i, user, node) {
-		status = register_page_data[user->index];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		flags = user->flags;
 
 		seq_printf(m, "%d:%s", user->index, EVENT_NAME(user));
@@ -2154,11 +1811,7 @@ static int user_seq_show(struct seq_file *m, void *p)
 		active++;
 	}
 
-<<<<<<< HEAD
 	mutex_unlock(&group->reg_mutex);
-=======
-	mutex_unlock(&reg_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	seq_puts(m, "\n");
 	seq_printf(m, "Active: %d\n", active);
@@ -2177,7 +1830,6 @@ static const struct seq_operations user_seq_ops = {
 
 static int user_status_open(struct inode *node, struct file *file)
 {
-<<<<<<< HEAD
 	struct user_event_group *group;
 	int ret;
 
@@ -2196,9 +1848,6 @@ static int user_status_open(struct inode *node, struct file *file)
 	}
 
 	return ret;
-=======
-	return seq_open(file, &user_seq_ops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct file_operations user_status_fops = {
@@ -2239,7 +1888,6 @@ err:
 	return -ENODEV;
 }
 
-<<<<<<< HEAD
 static int __init trace_events_user_init(void)
 {
 	int ret;
@@ -2248,49 +1896,13 @@ static int __init trace_events_user_init(void)
 
 	if (!init_group)
 		return -ENOMEM;
-=======
-static void set_page_reservations(bool set)
-{
-	int page;
-
-	for (page = 0; page < MAX_PAGES; ++page) {
-		void *addr = register_page_data + (PAGE_SIZE * page);
-
-		if (set)
-			SetPageReserved(virt_to_page(addr));
-		else
-			ClearPageReserved(virt_to_page(addr));
-	}
-}
-
-static int __init trace_events_user_init(void)
-{
-	struct page *pages;
-	int ret;
-
-	/* Zero all bits beside 0 (which is reserved for failures) */
-	bitmap_zero(page_bitmap, MAX_EVENTS);
-	set_bit(0, page_bitmap);
-
-	pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, MAX_PAGE_ORDER);
-	if (!pages)
-		return -ENOMEM;
-	register_page_data = page_address(pages);
-
-	set_page_reservations(true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = create_user_tracefs();
 
 	if (ret) {
 		pr_warn("user_events could not register with tracefs\n");
-<<<<<<< HEAD
 		user_event_group_destroy(init_group);
 		init_group = NULL;
-=======
-		set_page_reservations(false);
-		__free_pages(pages, MAX_PAGE_ORDER);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 

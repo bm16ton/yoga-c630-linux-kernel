@@ -747,12 +747,9 @@ void __cfg80211_connect_result(struct net_device *dev,
 			if (WARN_ON(!cr->links[link].addr))
 				goto out;
 		}
-<<<<<<< HEAD
 
 		if (WARN_ON(wdev->connect_keys))
 			goto out;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	wdev->unprot_beacon_reported = 0;

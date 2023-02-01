@@ -711,7 +711,6 @@ static void hclge_tm_update_kinfo_rss_size(struct hclge_vport *vport)
 		kinfo->rss_size = max_rss_size;
 	}
 }
-<<<<<<< HEAD
 
 static void hclge_tm_vport_tc_info_update(struct hclge_vport *vport)
 {
@@ -719,15 +718,6 @@ static void hclge_tm_vport_tc_info_update(struct hclge_vport *vport)
 	struct hclge_dev *hdev = vport->back;
 	u8 i;
 
-=======
-
-static void hclge_tm_vport_tc_info_update(struct hclge_vport *vport)
-{
-	struct hnae3_knic_private_info *kinfo = &vport->nic.kinfo;
-	struct hclge_dev *hdev = vport->back;
-	u8 i;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hclge_tm_update_kinfo_rss_size(vport);
 	kinfo->num_tqps = hclge_vport_get_tqp_num(vport);
 	vport->dwrr = 100;  /* 100 percent as init */

@@ -101,12 +101,7 @@ static int pcm030_fabric_probe(struct platform_device *op)
 	ret = snd_soc_register_card(card);
 	if (ret) {
 		dev_err(&op->dev, "snd_soc_register_card() failed: %d\n", ret);
-<<<<<<< HEAD
 		platform_device_unregister(pdata->codec_device);
-=======
-		platform_device_del(pdata->codec_device);
-		platform_device_put(pdata->codec_device);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	platform_set_drvdata(op, pdata);

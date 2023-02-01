@@ -158,7 +158,6 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
 		else
 			folio_ref_add(folio,
 					refs * (GUP_PIN_COUNTING_BIAS - 1));
-<<<<<<< HEAD
 		/*
 		 * Adjust the pincount before re-checking the PTE for changes.
 		 * This is essentially a smp_mb() and is paired with a memory
@@ -166,8 +165,6 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
 		 */
 		smp_mb__after_atomic();
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		node_stat_mod_folio(folio, NR_FOLL_PIN_ACQUIRED, refs);
 
 		return folio;
@@ -1591,7 +1588,6 @@ long populate_vma_page_range(struct vm_area_struct *vma,
 	 * not result in a stack expansion that recurses back here.
 	 */
 	ret = __get_user_pages(mm, start, nr_pages, gup_flags,
-<<<<<<< HEAD
 				NULL, NULL, locked);
 	lru_add_drain();
 	return ret;
@@ -1658,74 +1654,6 @@ long faultin_vma_page_range(struct vm_area_struct *vma, unsigned long start,
 				NULL, NULL, locked);
 	lru_add_drain();
 	return ret;
-=======
-				NULL, NULL, locked);
-	lru_add_drain();
-	return ret;
-}
-
-/*
- * faultin_vma_page_range() - populate (prefault) page tables inside the
- *			      given VMA range readable/writable
- *
- * This takes care of mlocking the pages, too, if VM_LOCKED is set.
- *
- * @vma: target vma
- * @start: start address
- * @end: end address
- * @write: whether to prefault readable or writable
- * @locked: whether the mmap_lock is still held
- *
- * Returns either number of processed pages in the vma, or a negative error
- * code on error (see __get_user_pages()).
- *
- * vma->vm_mm->mmap_lock must be held. The range must be page-aligned and
- * covered by the VMA.
- *
- * If @locked is NULL, it may be held for read or write and will be unperturbed.
- *
- * If @locked is non-NULL, it must held for read only and may be released.  If
- * it's released, *@locked will be set to 0.
- */
-long faultin_vma_page_range(struct vm_area_struct *vma, unsigned long start,
-			    unsigned long end, bool write, int *locked)
-{
-	struct mm_struct *mm = vma->vm_mm;
-	unsigned long nr_pages = (end - start) / PAGE_SIZE;
-	int gup_flags;
-	long ret;
-
-	VM_BUG_ON(!PAGE_ALIGNED(start));
-	VM_BUG_ON(!PAGE_ALIGNED(end));
-	VM_BUG_ON_VMA(start < vma->vm_start, vma);
-	VM_BUG_ON_VMA(end > vma->vm_end, vma);
-	mmap_assert_locked(mm);
-
-	/*
-	 * FOLL_TOUCH: Mark page accessed and thereby young; will also mark
-	 *	       the page dirty with FOLL_WRITE -- which doesn't make a
-	 *	       difference with !FOLL_FORCE, because the page is writable
-	 *	       in the page table.
-	 * FOLL_HWPOISON: Return -EHWPOISON instead of -EFAULT when we hit
-	 *		  a poisoned page.
-	 * !FOLL_FORCE: Require proper access permissions.
-	 */
-	gup_flags = FOLL_TOUCH | FOLL_HWPOISON;
-	if (write)
-		gup_flags |= FOLL_WRITE;
-
-	/*
-	 * We want to report -EINVAL instead of -EFAULT for any permission
-	 * problems or incompatible mappings.
-	 */
-	if (check_vma_flags(vma, gup_flags))
-		return -EINVAL;
-
-	ret = __get_user_pages(mm, start, nr_pages, gup_flags,
-				NULL, NULL, locked);
-	lru_add_drain();
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -2014,7 +1942,6 @@ struct page *get_dump_page(unsigned long addr)
 
 #ifdef CONFIG_MIGRATION
 /*
-<<<<<<< HEAD
  * Returns the number of collected pages. Return value is always >= 0.
  */
 static unsigned long collect_longterm_unpinnable_pages(
@@ -2025,22 +1952,6 @@ static unsigned long collect_longterm_unpinnable_pages(
 	unsigned long i, collected = 0;
 	struct folio *prev_folio = NULL;
 	bool drain_allow = true;
-=======
- * Check whether all pages are pinnable, if so return number of pages.  If some
- * pages are not pinnable, migrate them, and unpin all pages. Return zero if
- * pages were migrated, or if some pages were not successfully isolated.
- * Return negative error if migration fails.
- */
-static long check_and_migrate_movable_pages(unsigned long nr_pages,
-					    struct page **pages,
-					    unsigned int gup_flags)
-{
-	unsigned long isolation_error_count = 0, i;
-	struct folio *prev_folio = NULL;
-	LIST_HEAD(movable_page_list);
-	bool drain_allow = true, coherent_pages = false;
-	int ret = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < nr_pages; i++) {
 		struct folio *folio = page_folio(pages[i]);
@@ -2048,7 +1959,6 @@ static long check_and_migrate_movable_pages(unsigned long nr_pages,
 		if (folio == prev_folio)
 			continue;
 		prev_folio = folio;
-<<<<<<< HEAD
 
 		if (folio_is_longterm_pinnable(folio))
 			continue;
@@ -2072,67 +1982,11 @@ static long check_and_migrate_movable_pages(unsigned long nr_pages,
 			continue;
 
 		list_add_tail(&folio->lru, movable_page_list);
-=======
-
-		/*
-		 * Device coherent pages are managed by a driver and should not
-		 * be pinned indefinitely as it prevents the driver moving the
-		 * page. So when trying to pin with FOLL_LONGTERM instead try
-		 * to migrate the page out of device memory.
-		 */
-		if (folio_is_device_coherent(folio)) {
-			/*
-			 * We always want a new GUP lookup with device coherent
-			 * pages.
-			 */
-			pages[i] = 0;
-			coherent_pages = true;
-
-			/*
-			 * Migration will fail if the page is pinned, so convert
-			 * the pin on the source page to a normal reference.
-			 */
-			if (gup_flags & FOLL_PIN) {
-				get_page(&folio->page);
-				unpin_user_page(&folio->page);
-			}
-
-			ret = migrate_device_coherent_page(&folio->page);
-			if (ret)
-				goto unpin_pages;
-
-			continue;
-		}
-
-		if (folio_is_longterm_pinnable(folio))
-			continue;
-		/*
-		 * Try to move out any movable page before pinning the range.
-		 */
-		if (folio_test_hugetlb(folio)) {
-			if (isolate_hugetlb(&folio->page,
-						&movable_page_list))
-				isolation_error_count++;
-			continue;
-		}
-
-		if (!folio_test_lru(folio) && drain_allow) {
-			lru_add_drain_all();
-			drain_allow = false;
-		}
-
-		if (folio_isolate_lru(folio)) {
-			isolation_error_count++;
-			continue;
-		}
-		list_add_tail(&folio->lru, &movable_page_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		node_stat_mod_folio(folio,
 				    NR_ISOLATED_ANON + folio_is_file_lru(folio),
 				    folio_nr_pages(folio));
 	}
 
-<<<<<<< HEAD
 	return collected;
 }
 
@@ -2181,39 +2035,11 @@ static int migrate_longterm_unpinnable_pages(
 	}
 
 	if (!list_empty(movable_page_list)) {
-=======
-	if (!list_empty(&movable_page_list) || isolation_error_count ||
-	    coherent_pages)
-		goto unpin_pages;
-
-	/*
-	 * If list is empty, and no isolation errors, means that all pages are
-	 * in the correct zone.
-	 */
-	return nr_pages;
-
-unpin_pages:
-	/*
-	 * pages[i] might be NULL if any device coherent pages were found.
-	 */
-	for (i = 0; i < nr_pages; i++) {
-		if (!pages[i])
-			continue;
-
-		if (gup_flags & FOLL_PIN)
-			unpin_user_page(pages[i]);
-		else
-			put_page(pages[i]);
-	}
-
-	if (!list_empty(&movable_page_list)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct migration_target_control mtc = {
 			.nid = NUMA_NO_NODE,
 			.gfp_mask = GFP_USER | __GFP_NOWARN,
 		};
 
-<<<<<<< HEAD
 		if (migrate_pages(movable_page_list, alloc_migration_target,
 				  NULL, (unsigned long)&mtc, MIGRATE_SYNC,
 				  MR_LONGTERM_PIN, NULL)) {
@@ -2268,23 +2094,6 @@ static long check_and_migrate_movable_pages(unsigned long nr_pages,
 #else
 static long check_and_migrate_movable_pages(unsigned long nr_pages,
 					    struct page **pages)
-=======
-		ret = migrate_pages(&movable_page_list, alloc_migration_target,
-				    NULL, (unsigned long)&mtc, MIGRATE_SYNC,
-				    MR_LONGTERM_PIN, NULL);
-		if (ret > 0) /* number of pages not migrated */
-			ret = -ENOMEM;
-	}
-
-	if (ret && !list_empty(&movable_page_list))
-		putback_movable_pages(&movable_page_list);
-	return ret;
-}
-#else
-static long check_and_migrate_movable_pages(unsigned long nr_pages,
-					    struct page **pages,
-					    unsigned int gup_flags)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return 0;
 }
@@ -2302,16 +2111,11 @@ static long __gup_longterm_locked(struct mm_struct *mm,
 				  unsigned int gup_flags)
 {
 	unsigned int flags;
-<<<<<<< HEAD
 	long rc, nr_pinned_pages;
-=======
-	long rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!(gup_flags & FOLL_LONGTERM))
 		return __get_user_pages_locked(mm, start, nr_pages, pages, vmas,
 					       NULL, gup_flags);
-<<<<<<< HEAD
 
 	/*
 	 * If we get to this point then FOLL_LONGTERM is set, and FOLL_LONGTERM
@@ -2337,19 +2141,6 @@ static long __gup_longterm_locked(struct mm_struct *mm,
 	memalloc_pin_restore(flags);
 
 	return rc ? rc : nr_pinned_pages;
-=======
-	flags = memalloc_pin_save();
-	do {
-		rc = __get_user_pages_locked(mm, start, nr_pages, pages, vmas,
-					     NULL, gup_flags);
-		if (rc <= 0)
-			break;
-		rc = check_and_migrate_movable_pages(rc, pages, gup_flags);
-	} while (!rc);
-	memalloc_pin_restore(flags);
-
-	return rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool is_valid_gup_flags(unsigned int gup_flags)
@@ -2671,7 +2462,6 @@ static int gup_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
 
 		if (unlikely(page_is_secretmem(page))) {
 			gup_put_folio(folio, 1, flags);
-<<<<<<< HEAD
 			goto pte_unmap;
 		}
 
@@ -2681,16 +2471,6 @@ static int gup_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
 			goto pte_unmap;
 		}
 
-=======
-			goto pte_unmap;
-		}
-
-		if (unlikely(pte_val(pte) != pte_val(*ptep))) {
-			gup_put_folio(folio, 1, flags);
-			goto pte_unmap;
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!pte_write(pte) && gup_must_unshare(flags, page)) {
 			gup_put_folio(folio, 1, flags);
 			goto pte_unmap;

@@ -9,12 +9,8 @@ struct io_tctx_node {
 int io_uring_alloc_task_context(struct task_struct *task,
 				struct io_ring_ctx *ctx);
 void io_uring_del_tctx_node(unsigned long index);
-<<<<<<< HEAD
 int __io_uring_add_tctx_node(struct io_ring_ctx *ctx);
 int __io_uring_add_tctx_node_from_submit(struct io_ring_ctx *ctx);
-=======
-int __io_uring_add_tctx_node(struct io_ring_ctx *ctx, bool submitter);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void io_uring_clean_tctx(struct io_uring_task *tctx);
 
 void io_uring_unreg_ringfd(void);
@@ -32,10 +28,6 @@ static inline int io_uring_add_tctx_node(struct io_ring_ctx *ctx)
 
 	if (likely(tctx && tctx->last == ctx))
 		return 0;
-<<<<<<< HEAD
 
 	return __io_uring_add_tctx_node_from_submit(ctx);
-=======
-	return __io_uring_add_tctx_node(ctx, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

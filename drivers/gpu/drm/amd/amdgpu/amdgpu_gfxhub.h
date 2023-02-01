@@ -35,12 +35,9 @@ struct amdgpu_gfxhub_funcs {
 	void (*init)(struct amdgpu_device *adev);
 	int (*get_xgmi_info)(struct amdgpu_device *adev);
 	void (*utcl2_harvest)(struct amdgpu_device *adev);
-<<<<<<< HEAD
 	void (*mode2_save_regs)(struct amdgpu_device *adev);
 	void (*mode2_restore_regs)(struct amdgpu_device *adev);
 	void (*halt)(struct amdgpu_device *adev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct amdgpu_gfxhub {

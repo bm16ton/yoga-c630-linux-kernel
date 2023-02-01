@@ -79,11 +79,8 @@ void hubp32_phantom_hubp_post_enable(struct hubp *hubp)
 	uint32_t reg_val;
 	struct dcn20_hubp *hubp2 = TO_DCN20_HUBP(hubp);
 
-<<<<<<< HEAD
 	/* For phantom pipe enable, disable GSL */
 	REG_UPDATE(DCSURF_FLIP_CONTROL2, SURFACE_GSL_ENABLE, 0);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	REG_UPDATE(DCHUBP_CNTL, HUBP_BLANK_EN, 1);
 	reg_val = REG_READ(DCHUBP_CNTL);
 	if (reg_val) {
@@ -189,12 +186,7 @@ static struct hubp_funcs dcn32_hubp_funcs = {
 	.hubp_update_force_pstate_disallow = hubp32_update_force_pstate_disallow,
 	.phantom_hubp_post_enable = hubp32_phantom_hubp_post_enable,
 	.hubp_update_mall_sel = hubp32_update_mall_sel,
-<<<<<<< HEAD
 	.hubp_prepare_subvp_buffering = hubp32_prepare_subvp_buffering
-=======
-	.hubp_prepare_subvp_buffering = hubp32_prepare_subvp_buffering,
-	.hubp_set_flip_int = hubp1_set_flip_int
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 bool hubp32_construct(

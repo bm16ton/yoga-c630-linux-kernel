@@ -6,10 +6,6 @@
 
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
-<<<<<<< HEAD
-=======
-#include <drm/drm_plane_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "omap_dmm_tiler.h"
 #include "omap_drv.h"

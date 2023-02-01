@@ -681,12 +681,9 @@ void __init vmem_map_init(void)
 	__set_memory(__stext_amode31, (__etext_amode31 - __stext_amode31) >> PAGE_SHIFT,
 		     SET_MEMORY_RO | SET_MEMORY_X);
 
-<<<<<<< HEAD
 	/* lowcore requires 4k mapping for real addresses / prefixing */
 	set_memory_4k(0, LC_PAGES);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* lowcore must be executable for LPSWE */
 	if (!static_key_enabled(&cpu_has_bear))
 		set_memory_x(0, 1);

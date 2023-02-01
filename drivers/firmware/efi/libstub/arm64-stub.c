@@ -65,39 +65,17 @@ efi_status_t check_platform_features(void)
  */
 static bool check_image_region(u64 base, u64 size)
 {
-<<<<<<< HEAD
 	struct efi_boot_memmap *map;
-=======
-	unsigned long map_size, desc_size, buff_size;
-	efi_memory_desc_t *memory_map;
-	struct efi_boot_memmap map;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	efi_status_t status;
 	bool ret = false;
 	int map_offset;
 
-<<<<<<< HEAD
 	status = efi_get_memory_map(&map, false);
 	if (status != EFI_SUCCESS)
 		return false;
 
 	for (map_offset = 0; map_offset < map->map_size; map_offset += map->desc_size) {
 		efi_memory_desc_t *md = (void *)map->map + map_offset;
-=======
-	map.map =	&memory_map;
-	map.map_size =	&map_size;
-	map.desc_size =	&desc_size;
-	map.desc_ver =	NULL;
-	map.key_ptr =	NULL;
-	map.buff_size =	&buff_size;
-
-	status = efi_get_memory_map(&map);
-	if (status != EFI_SUCCESS)
-		return false;
-
-	for (map_offset = 0; map_offset < map_size; map_offset += desc_size) {
-		efi_memory_desc_t *md = (void *)memory_map + map_offset;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		u64 end = md->phys_addr + md->num_pages * EFI_PAGE_SIZE;
 
 		/*
@@ -110,11 +88,7 @@ static bool check_image_region(u64 base, u64 size)
 		}
 	}
 
-<<<<<<< HEAD
 	efi_bs_call(free_pool, map);
-=======
-	efi_bs_call(free_pool, memory_map);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }

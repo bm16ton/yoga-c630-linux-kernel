@@ -170,10 +170,7 @@ struct xdp_frame {
 	 */
 	struct xdp_mem_info mem;
 	struct net_device *dev_rx; /* used by cpumap */
-<<<<<<< HEAD
 	u32 frame_sz;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 flags; /* supported values defined in xdp_buff_flags */
 };
 

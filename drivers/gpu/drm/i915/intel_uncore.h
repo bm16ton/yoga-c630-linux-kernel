@@ -231,11 +231,7 @@ void intel_uncore_prune_engine_fw_domains(struct intel_uncore *uncore,
 bool intel_uncore_unclaimed_mmio(struct intel_uncore *uncore);
 bool intel_uncore_arm_unclaimed_mmio_detection(struct intel_uncore *uncore);
 void intel_uncore_cleanup_mmio(struct intel_uncore *uncore);
-<<<<<<< HEAD
 void intel_uncore_fini_mmio(struct drm_device *dev, void *data);
-=======
-void intel_uncore_fini_mmio(struct intel_uncore *uncore);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void intel_uncore_suspend(struct intel_uncore *uncore);
 void intel_uncore_resume_early(struct intel_uncore *uncore);
 void intel_uncore_runtime_resume(struct intel_uncore *uncore);

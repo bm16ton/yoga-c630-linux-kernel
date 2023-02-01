@@ -1362,11 +1362,6 @@ static void tgl_uncore_imc_freerunning_init_box(struct intel_uncore_box *box)
 	__uncore_imc_init_box(box, 0);
 }
 
-static void tgl_uncore_imc_freerunning_init_box(struct intel_uncore_box *box)
-{
-	__uncore_imc_init_box(box, 0);
-}
-
 static struct intel_uncore_ops tgl_uncore_imc_freerunning_ops = {
 	.init_box	= tgl_uncore_imc_freerunning_init_box,
 	.exit_box	= uncore_mmio_exit_box,

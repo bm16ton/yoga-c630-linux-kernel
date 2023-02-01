@@ -67,13 +67,10 @@ static bool rk817_is_volatile_reg(struct device *dev, unsigned int reg)
 	case RK817_SECONDS_REG ... RK817_WEEKS_REG:
 	case RK817_RTC_STATUS_REG:
 	case RK817_CODEC_DTOP_LPT_SRST:
-<<<<<<< HEAD
 	case RK817_GAS_GAUGE_ADC_CONFIG0 ... RK817_GAS_GAUGE_CUR_ADC_K0:
 	case RK817_PMIC_CHRG_STS:
 	case RK817_PMIC_CHRG_OUT:
 	case RK817_PMIC_CHRG_IN:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case RK817_INT_STS_REG0:
 	case RK817_INT_STS_REG1:
 	case RK817_INT_STS_REG2:
@@ -178,14 +175,11 @@ static const struct mfd_cell rk817s[] = {
 		.resources = &rk817_rtc_resources[0],
 	},
 	{ .name = "rk817-codec",},
-<<<<<<< HEAD
 	{
 		.name = "rk817-charger",
 		.num_resources = ARRAY_SIZE(rk817_charger_resources),
 		.resources = &rk817_charger_resources[0],
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct mfd_cell rk818s[] = {
@@ -812,11 +806,6 @@ static void rk808_remove(struct i2c_client *client)
 		pm_power_off = NULL;
 
 	unregister_restart_handler(&rk808_restart_handler);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused rk8xx_suspend(struct device *dev)

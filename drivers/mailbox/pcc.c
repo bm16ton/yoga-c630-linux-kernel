@@ -676,11 +676,7 @@ static int pcc_mbox_probe(struct platform_device *pdev)
 
 		if (pcct_entry->type == ACPI_PCCT_TYPE_EXT_PCC_SLAVE_SUBSPACE &&
 		    !pcc_mbox_ctrl->txdone_irq) {
-<<<<<<< HEAD
 			pr_err("Platform Interrupt flag must be set to 1");
-=======
-			pr_err("Plaform Interrupt flag must be set to 1");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			rc = -EINVAL;
 			goto err;
 		}

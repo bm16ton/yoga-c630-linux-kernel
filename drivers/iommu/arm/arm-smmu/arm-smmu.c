@@ -2052,54 +2052,6 @@ static void arm_smmu_rmr_install_bypass_smr(struct arm_smmu_device *smmu)
 	iort_put_rmr_sids(dev_fwnode(smmu->dev), &rmr_list);
 }
 
-static void arm_smmu_rmr_install_bypass_smr(struct arm_smmu_device *smmu)
-{
-	struct list_head rmr_list;
-	struct iommu_resv_region *e;
-	int idx, cnt = 0;
-	u32 reg;
-
-	INIT_LIST_HEAD(&rmr_list);
-	iort_get_rmr_sids(dev_fwnode(smmu->dev), &rmr_list);
-
-	/*
-	 * Rather than trying to look at existing mappings that
-	 * are setup by the firmware and then invalidate the ones
-	 * that do no have matching RMR entries, just disable the
-	 * SMMU until it gets enabled again in the reset routine.
-	 */
-	reg = arm_smmu_gr0_read(smmu, ARM_SMMU_GR0_sCR0);
-	reg |= ARM_SMMU_sCR0_CLIENTPD;
-	arm_smmu_gr0_write(smmu, ARM_SMMU_GR0_sCR0, reg);
-
-	list_for_each_entry(e, &rmr_list, list) {
-		struct iommu_iort_rmr_data *rmr;
-		int i;
-
-		rmr = container_of(e, struct iommu_iort_rmr_data, rr);
-		for (i = 0; i < rmr->num_sids; i++) {
-			idx = arm_smmu_find_sme(smmu, rmr->sids[i], ~0);
-			if (idx < 0)
-				continue;
-
-			if (smmu->s2crs[idx].count == 0) {
-				smmu->smrs[idx].id = rmr->sids[i];
-				smmu->smrs[idx].mask = 0;
-				smmu->smrs[idx].valid = true;
-			}
-			smmu->s2crs[idx].count++;
-			smmu->s2crs[idx].type = S2CR_TYPE_BYPASS;
-			smmu->s2crs[idx].privcfg = S2CR_PRIVCFG_DEFAULT;
-
-			cnt++;
-		}
-	}
-
-	dev_notice(smmu->dev, "\tpreserved %d boot mapping%s\n", cnt,
-		   cnt == 1 ? "" : "s");
-	iort_put_rmr_sids(dev_fwnode(smmu->dev), &rmr_list);
-}
-
 static int arm_smmu_device_probe(struct platform_device *pdev)
 {
 	struct resource *res;
@@ -2216,12 +2168,8 @@ static int arm_smmu_device_probe(struct platform_device *pdev)
 	err = iommu_device_register(&smmu->iommu, &arm_smmu_ops, dev);
 	if (err) {
 		dev_err(dev, "Failed to register iommu\n");
-<<<<<<< HEAD
 		iommu_device_sysfs_remove(&smmu->iommu);
 		return err;
-=======
-		goto err_sysfs_remove;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	platform_set_drvdata(pdev, smmu);
@@ -2243,27 +2191,7 @@ static int arm_smmu_device_probe(struct platform_device *pdev)
 		pm_runtime_enable(dev);
 	}
 
-<<<<<<< HEAD
-=======
-	/*
-	 * For ACPI and generic DT bindings, an SMMU will be probed before
-	 * any device which might need it, so we want the bus ops in place
-	 * ready to handle default domain setup as soon as any SMMU exists.
-	 */
-	if (!using_legacy_binding) {
-		err = arm_smmu_bus_init(&arm_smmu_ops);
-		if (err)
-			goto err_unregister_device;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
-
-err_unregister_device:
-	iommu_device_unregister(&smmu->iommu);
-err_sysfs_remove:
-	iommu_device_sysfs_remove(&smmu->iommu);
-	return err;
 }
 
 static void arm_smmu_device_shutdown(struct platform_device *pdev)

@@ -135,11 +135,7 @@ struct pci_controller *pcibios_alloc_controller(struct device_node *dev)
 	list_add_tail(&phb->list_node, &hose_list);
 	spin_unlock(&hose_spinlock);
 
-<<<<<<< HEAD
 	phb->dn = of_node_get(dev);
-=======
-	phb->dn = dev;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phb->is_dynamic = slab_is_available();
 #ifdef CONFIG_PPC64
 	if (dev) {

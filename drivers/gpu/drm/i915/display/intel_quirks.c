@@ -61,11 +61,7 @@ static void quirk_increase_ddi_disabled_time(struct drm_i915_private *i915)
 
 static void quirk_no_pps_backlight_power_hook(struct drm_i915_private *i915)
 {
-<<<<<<< HEAD
 	intel_set_quirk(i915, QUIRK_NO_PPS_BACKLIGHT_POWER_HOOK);
-=======
-	i915->quirks |= QUIRK_NO_PPS_BACKLIGHT_POWER_HOOK;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_info(&i915->drm, "Applying no pps backlight power quirk\n");
 }
 

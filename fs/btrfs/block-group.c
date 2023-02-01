@@ -763,10 +763,6 @@ int btrfs_cache_block_group(struct btrfs_block_group *cache, bool wait)
 	WARN_ON(cache->caching_ctl);
 	cache->caching_ctl = caching_ctl;
 	cache->cached = BTRFS_CACHE_STARTED;
-<<<<<<< HEAD
-=======
-	cache->has_caching_ctl = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock(&cache->lock);
 
 	write_lock(&fs_info->block_group_cache_lock);
@@ -984,7 +980,6 @@ int btrfs_remove_block_group(struct btrfs_trans_handle *trans,
 
 	if (block_group->cached == BTRFS_CACHE_STARTED)
 		btrfs_wait_block_group_cache_done(block_group);
-<<<<<<< HEAD
 
 	write_lock(&fs_info->block_group_cache_lock);
 	caching_ctl = btrfs_get_caching_control(block_group);
@@ -997,28 +992,6 @@ int btrfs_remove_block_group(struct btrfs_trans_handle *trans,
 				refcount_inc(&caching_ctl->count);
 				break;
 			}
-=======
-	if (block_group->has_caching_ctl) {
-		write_lock(&fs_info->block_group_cache_lock);
-		if (!caching_ctl) {
-			struct btrfs_caching_control *ctl;
-
-			list_for_each_entry(ctl,
-				    &fs_info->caching_block_groups, list)
-				if (ctl->block_group == block_group) {
-					caching_ctl = ctl;
-					refcount_inc(&caching_ctl->count);
-					break;
-				}
-		}
-		if (caching_ctl)
-			list_del_init(&caching_ctl->list);
-		write_unlock(&fs_info->block_group_cache_lock);
-		if (caching_ctl) {
-			/* Once for the caching bgs list and once for us. */
-			btrfs_put_caching_control(caching_ctl);
-			btrfs_put_caching_control(caching_ctl);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 	if (caching_ctl)
@@ -1050,21 +1023,13 @@ int btrfs_remove_block_group(struct btrfs_trans_handle *trans,
 			< block_group->zone_unusable);
 		WARN_ON(block_group->space_info->disk_total
 			< block_group->length * factor);
-<<<<<<< HEAD
 		WARN_ON(test_bit(BLOCK_GROUP_FLAG_ZONE_IS_ACTIVE,
 				 &block_group->runtime_flags) &&
-=======
-		WARN_ON(block_group->zone_is_active &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			block_group->space_info->active_total_bytes
 			< block_group->length);
 	}
 	block_group->space_info->total_bytes -= block_group->length;
-<<<<<<< HEAD
 	if (test_bit(BLOCK_GROUP_FLAG_ZONE_IS_ACTIVE, &block_group->runtime_flags))
-=======
-	if (block_group->zone_is_active)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		block_group->space_info->active_total_bytes -= block_group->length;
 	block_group->space_info->bytes_readonly -=
 		(block_group->length - block_group->zone_unusable);
@@ -1572,12 +1537,9 @@ void btrfs_reclaim_bgs_work(struct work_struct *work)
 	if (!test_bit(BTRFS_FS_OPEN, &fs_info->flags))
 		return;
 
-<<<<<<< HEAD
 	if (btrfs_fs_closing(fs_info))
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!btrfs_should_reclaim(fs_info))
 		return;
 
@@ -2118,18 +2080,7 @@ static int read_one_block_group(struct btrfs_fs_info *info,
 		goto error;
 	}
 	trace_btrfs_add_block_group(info, cache, 0);
-<<<<<<< HEAD
 	btrfs_add_bg_to_space_info(info, cache);
-=======
-	btrfs_update_space_info(info, cache->flags, cache->length,
-				cache->used, cache->bytes_super,
-				cache->zone_unusable, cache->zone_is_active,
-				&space_info);
-
-	cache->space_info = space_info;
-
-	link_block_group(cache);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	set_avail_alloc_bits(info, cache->flags);
 	if (btrfs_chunk_writeable(info, cache->start)) {
@@ -2192,14 +2143,7 @@ static int fill_dummy_bgs(struct btrfs_fs_info *fs_info)
 			break;
 		}
 
-<<<<<<< HEAD
 		btrfs_add_bg_to_space_info(fs_info, bg);
-=======
-		btrfs_update_space_info(fs_info, bg->flags, em->len, em->len,
-					0, 0, false, &space_info);
-		bg->space_info = space_info;
-		link_block_group(bg);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		set_avail_alloc_bits(fs_info, bg->flags);
 	}
@@ -2577,13 +2521,7 @@ struct btrfs_block_group *btrfs_make_block_group(struct btrfs_trans_handle *tran
 	 * the rbtree, update the space info's counters.
 	 */
 	trace_btrfs_add_block_group(fs_info, cache, 1);
-<<<<<<< HEAD
 	btrfs_add_bg_to_space_info(fs_info, cache);
-=======
-	btrfs_update_space_info(fs_info, cache->flags, size, bytes_used,
-				cache->bytes_super, cache->zone_unusable,
-				cache->zone_is_active, &cache->space_info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	btrfs_update_global_block_rsv(fs_info);
 
 #ifdef CONFIG_BTRFS_DEBUG
@@ -2910,11 +2848,7 @@ again:
 	cache_size *= fs_info->sectorsize;
 
 	ret = btrfs_check_data_free_space(BTRFS_I(inode), &data_reserved, 0,
-<<<<<<< HEAD
 					  cache_size, false);
-=======
-					  cache_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto out_put;
 

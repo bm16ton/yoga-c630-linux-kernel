@@ -90,12 +90,9 @@ static void __init bert_print_all(struct acpi_bert_region *region,
 
 	if (skipped)
 		pr_info(HW_ERR "Skipped %d error records\n", skipped);
-<<<<<<< HEAD
 
 	if (printed + skipped)
 		pr_info("Total records found: %d\n", printed + skipped);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __init setup_bert_disable(char *str)

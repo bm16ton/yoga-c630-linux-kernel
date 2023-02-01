@@ -37,15 +37,12 @@
 #define SOF_DBG_IGNORE_D3_PERSISTENT		BIT(7) /* ignore the DSP D3 persistent capability
 							* and always download firmware upon D3 exit
 							*/
-<<<<<<< HEAD
 #define SOF_DBG_PRINT_DMA_POSITION_UPDATE_LOGS	BIT(8) /* print DMA position updates
 							* in dmesg logs
 							*/
 #define SOF_DBG_PRINT_IPC_SUCCESS_LOGS		BIT(9) /* print IPC success
 							* in dmesg logs
 							*/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Flag definitions used for controlling the DSP dump behavior */
 #define SOF_DBG_DUMP_REGS		BIT(0)
@@ -115,16 +112,6 @@ struct sof_compr_stream {
 	u16 sample_container_bytes;
 };
 
-enum sof_dfsentry_type {
-	SOF_DFSENTRY_TYPE_IOMEM = 0,
-	SOF_DFSENTRY_TYPE_BUF,
-};
-
-enum sof_debugfs_access_type {
-	SOF_DEBUGFS_ACCESS_ALWAYS = 0,
-	SOF_DEBUGFS_ACCESS_D0_ONLY,
-};
-
 struct snd_sof_dev;
 struct snd_sof_ipc_msg;
 struct snd_sof_ipc;
@@ -146,10 +133,7 @@ struct snd_sof_platform_stream_params {
 	bool use_phy_address;
 	u32 phy_addr;
 	bool no_ipc_position;
-<<<<<<< HEAD
 	bool cont_update_posn;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*
@@ -288,10 +272,7 @@ struct snd_sof_dsp_ops {
 
 	/* host DMA trace (IPC3) */
 	int (*trace_init)(struct snd_sof_dev *sdev,
-<<<<<<< HEAD
 			  struct snd_dma_buffer *dmatb,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			  struct sof_ipc_dma_trace_params_ext *dtrace_params); /* optional */
 	int (*trace_release)(struct snd_sof_dev *sdev); /* optional */
 	int (*trace_trigger)(struct snd_sof_dev *sdev,
@@ -394,7 +375,6 @@ struct snd_sof_ipc_msg {
 };
 
 /**
-<<<<<<< HEAD
  * struct sof_ipc_fw_tracing_ops - IPC-specific firmware tracing ops
  * @init:	Function pointer for initialization of the tracing
  * @free:	Optional function pointer for freeing of the tracing
@@ -415,16 +395,10 @@ struct sof_ipc_fw_tracing_ops {
  * @ctx_save:		Optional function pointer for context save
  * @ctx_restore:	Optional function pointer for context restore
  * @set_core_state:	Optional function pointer for turning on/off a DSP core
-=======
- * struct sof_ipc_pm_ops - IPC-specific PM ops
- * @ctx_save:		Function pointer for context save
- * @ctx_restore:	Function pointer for context restore
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct sof_ipc_pm_ops {
 	int (*ctx_save)(struct snd_sof_dev *sdev);
 	int (*ctx_restore)(struct snd_sof_dev *sdev);
-<<<<<<< HEAD
 	int (*set_core_state)(struct snd_sof_dev *sdev, int core_idx, bool on);
 };
 
@@ -445,8 +419,6 @@ struct sof_ipc_fw_loader_ops {
 	size_t (*parse_ext_manifest)(struct snd_sof_dev *sdev);
 	int (*load_fw_to_dsp)(struct snd_sof_dev *sdev);
 	int (*query_fw_configuration)(struct snd_sof_dev *sdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct sof_ipc_tplg_ops;
@@ -457,7 +429,6 @@ struct sof_ipc_pcm_ops;
  * @tplg:	Pointer to IPC-specific topology ops
  * @pm:		Pointer to PM ops
  * @pcm:	Pointer to PCM ops
-<<<<<<< HEAD
  * @fw_loader:	Pointer to Firmware Loader ops
  * @fw_tracing:	Pointer to Firmware tracing ops
  *
@@ -474,14 +445,11 @@ struct sof_ipc_pcm_ops;
  * serialized for the duration of the instructed transfer. A large message sent
  * via @set_get_data is a single transfer even if at the hardware level it is
  * handled with multiple chunks.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct sof_ipc_ops {
 	const struct sof_ipc_tplg_ops *tplg;
 	const struct sof_ipc_pm_ops *pm;
 	const struct sof_ipc_pcm_ops *pcm;
-<<<<<<< HEAD
 	const struct sof_ipc_fw_loader_ops *fw_loader;
 	const struct sof_ipc_fw_tracing_ops *fw_tracing;
 
@@ -491,8 +459,6 @@ struct sof_ipc_ops {
 			    bool set);
 	int (*get_reply)(struct snd_sof_dev *sdev);
 	void (*rx_msg)(struct snd_sof_dev *sdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* SOF generic IPC data */
@@ -504,12 +470,9 @@ struct snd_sof_ipc {
 	/* disables further sending of ipc's */
 	bool disable_ipc_tx;
 
-<<<<<<< HEAD
 	/* Maximum allowed size of a single IPC message/reply */
 	size_t max_payload_size;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct snd_sof_ipc_msg msg;
 
 	/* IPC ops based on version */
@@ -596,22 +559,9 @@ struct snd_sof_dev {
 	int ipc_timeout;
 	int boot_timeout;
 
-<<<<<<< HEAD
 	/* firmwre tracing */
 	bool fw_trace_is_supported; /* set with Kconfig or module parameter */
 	void *fw_trace_data; /* private data used by firmware tracing implementation */
-=======
-	/* DMA for Trace */
-	struct snd_dma_buffer dmatb;
-	struct snd_dma_buffer dmatp;
-	int dma_trace_pages;
-	wait_queue_head_t trace_sleep;
-	u32 host_offset;
-	bool dtrace_is_supported; /* set with Kconfig or module parameter */
-	bool dtrace_is_enabled;
-	bool dtrace_error;
-	bool dtrace_draining;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bool msi_enabled;
 
@@ -698,7 +648,6 @@ struct snd_sof_ipc *snd_sof_ipc_init(struct snd_sof_dev *sdev);
 void snd_sof_ipc_free(struct snd_sof_dev *sdev);
 void snd_sof_ipc_get_reply(struct snd_sof_dev *sdev);
 void snd_sof_ipc_reply(struct snd_sof_dev *sdev, u32 msg_id);
-<<<<<<< HEAD
 static inline void snd_sof_ipc_msgs_rx(struct snd_sof_dev *sdev)
 {
 	sdev->ipc->ops->rx_msg(sdev);
@@ -710,17 +659,6 @@ int sof_ipc_tx_message_no_pm(struct snd_sof_ipc *ipc, void *msg_data, size_t msg
 int sof_ipc_send_msg(struct snd_sof_dev *sdev, void *msg_data, size_t msg_bytes,
 		     size_t reply_bytes);
 
-=======
-void snd_sof_ipc_msgs_rx(struct snd_sof_dev *sdev);
-int snd_sof_ipc_valid(struct snd_sof_dev *sdev);
-int sof_ipc_tx_message(struct snd_sof_ipc *ipc, u32 header,
-		       void *msg_data, size_t msg_bytes, void *reply_data,
-		       size_t reply_bytes);
-int sof_ipc_tx_message_no_pm(struct snd_sof_ipc *ipc, u32 header,
-			     void *msg_data, size_t msg_bytes,
-			     void *reply_data, size_t reply_bytes);
-int sof_ipc_init_msg_memory(struct snd_sof_dev *sdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void snd_sof_ipc_process_reply(struct snd_sof_dev *sdev, u32 msg_id)
 {
 	snd_sof_ipc_get_reply(sdev);
@@ -735,35 +673,21 @@ void snd_sof_free_debug(struct snd_sof_dev *sdev);
 int snd_sof_debugfs_buf_item(struct snd_sof_dev *sdev,
 			     void *base, size_t size,
 			     const char *name, mode_t mode);
-<<<<<<< HEAD
-=======
-int snd_sof_trace_update_pos(struct snd_sof_dev *sdev,
-			     struct sof_ipc_dma_trace_posn *posn);
-void snd_sof_trace_notify_for_error(struct snd_sof_dev *sdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void sof_print_oops_and_stack(struct snd_sof_dev *sdev, const char *level,
 			      u32 panic_code, u32 tracep_code, void *oops,
 			      struct sof_ipc_panic_info *panic_info,
 			      void *stack, size_t stack_words);
-<<<<<<< HEAD
 void snd_sof_handle_fw_exception(struct snd_sof_dev *sdev, const char *msg);
-=======
-int snd_sof_init_trace_ipc(struct snd_sof_dev *sdev);
-void snd_sof_handle_fw_exception(struct snd_sof_dev *sdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int snd_sof_dbg_memory_info_init(struct snd_sof_dev *sdev);
 int snd_sof_debugfs_add_region_item_iomem(struct snd_sof_dev *sdev,
 		enum snd_sof_fw_blk_type blk_type, u32 offset, size_t size,
 		const char *name, enum sof_debugfs_access_type access_type);
-<<<<<<< HEAD
 /* Firmware tracing */
 int sof_fw_trace_init(struct snd_sof_dev *sdev);
 void sof_fw_trace_free(struct snd_sof_dev *sdev);
 void sof_fw_trace_fw_crashed(struct snd_sof_dev *sdev);
 void sof_fw_trace_suspend(struct snd_sof_dev *sdev, pm_message_t pm_state);
 int sof_fw_trace_resume(struct snd_sof_dev *sdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * DSP Architectures.
@@ -803,7 +727,6 @@ int sof_block_write(struct snd_sof_dev *sdev, enum snd_sof_fw_blk_type blk_type,
 		    u32 offset, void *src, size_t size);
 int sof_block_read(struct snd_sof_dev *sdev, enum snd_sof_fw_blk_type blk_type,
 		   u32 offset, void *dest, size_t size);
-<<<<<<< HEAD
 
 int sof_ipc_msg_data(struct snd_sof_dev *sdev,
 		     struct snd_pcm_substream *substream,
@@ -818,8 +741,6 @@ int sof_stream_pcm_close(struct snd_sof_dev *sdev,
 			 struct snd_pcm_substream *substream);
 
 int sof_machine_check(struct snd_sof_dev *sdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* SOF client support */
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_CLIENT)
@@ -839,7 +760,6 @@ static inline int sof_client_dev_register(struct snd_sof_dev *sdev, const char *
 	return 0;
 }
 
-<<<<<<< HEAD
 static inline void sof_client_dev_unregister(struct snd_sof_dev *sdev,
 					     const char *name, u32 id)
 {
@@ -849,19 +769,6 @@ static inline int sof_register_clients(struct snd_sof_dev *sdev)
 {
 	return 0;
 }
-=======
-int sof_ipc_msg_data(struct snd_sof_dev *sdev,
-		     struct snd_pcm_substream *substream,
-		     void *p, size_t sz);
-int sof_set_stream_data_offset(struct snd_sof_dev *sdev,
-			       struct snd_pcm_substream *substream,
-			       size_t posn_offset);
-
-int sof_stream_pcm_open(struct snd_sof_dev *sdev,
-			struct snd_pcm_substream *substream);
-int sof_stream_pcm_close(struct snd_sof_dev *sdev,
-			 struct snd_pcm_substream *substream);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline  void sof_unregister_clients(struct snd_sof_dev *sdev)
 {
@@ -886,61 +793,8 @@ static inline int sof_resume_clients(struct snd_sof_dev *sdev)
 }
 #endif /* CONFIG_SND_SOC_SOF_CLIENT */
 
-<<<<<<< HEAD
 /* Main ops for IPC implementations */
 extern const struct sof_ipc_ops ipc3_ops;
 extern const struct sof_ipc_ops ipc4_ops;
-=======
-/* SOF client support */
-#if IS_ENABLED(CONFIG_SND_SOC_SOF_CLIENT)
-int sof_client_dev_register(struct snd_sof_dev *sdev, const char *name, u32 id,
-			    const void *data, size_t size);
-void sof_client_dev_unregister(struct snd_sof_dev *sdev, const char *name, u32 id);
-int sof_register_clients(struct snd_sof_dev *sdev);
-void sof_unregister_clients(struct snd_sof_dev *sdev);
-void sof_client_ipc_rx_dispatcher(struct snd_sof_dev *sdev, void *msg_buf);
-void sof_client_fw_state_dispatcher(struct snd_sof_dev *sdev);
-int sof_suspend_clients(struct snd_sof_dev *sdev, pm_message_t state);
-int sof_resume_clients(struct snd_sof_dev *sdev);
-#else /* CONFIG_SND_SOC_SOF_CLIENT */
-static inline int sof_client_dev_register(struct snd_sof_dev *sdev, const char *name,
-					  u32 id, const void *data, size_t size)
-{
-	return 0;
-}
-
-static inline void sof_client_dev_unregister(struct snd_sof_dev *sdev,
-					     const char *name, u32 id)
-{
-}
-
-static inline int sof_register_clients(struct snd_sof_dev *sdev)
-{
-	return 0;
-}
-
-static inline  void sof_unregister_clients(struct snd_sof_dev *sdev)
-{
-}
-
-static inline void sof_client_ipc_rx_dispatcher(struct snd_sof_dev *sdev, void *msg_buf)
-{
-}
-
-static inline void sof_client_fw_state_dispatcher(struct snd_sof_dev *sdev)
-{
-}
-
-static inline int sof_suspend_clients(struct snd_sof_dev *sdev, pm_message_t state)
-{
-	return 0;
-}
-
-static inline int sof_resume_clients(struct snd_sof_dev *sdev)
-{
-	return 0;
-}
-#endif /* CONFIG_SND_SOC_SOF_CLIENT */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

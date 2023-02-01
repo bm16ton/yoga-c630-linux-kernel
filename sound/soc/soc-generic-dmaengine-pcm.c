@@ -80,18 +80,12 @@ static int dmaengine_pcm_hw_params(struct snd_soc_component *component,
 	struct dmaengine_pcm *pcm = soc_component_to_pcm(component);
 	struct dma_chan *chan = snd_dmaengine_pcm_get_chan(substream);
 	struct dma_slave_config slave_config;
+	int ret;
 
 	if (!pcm->config->prepare_slave_config)
 		return 0;
 
-<<<<<<< HEAD
 	memset(&slave_config, 0, sizeof(slave_config));
-=======
-	if (prepare_slave_config) {
-		int ret = prepare_slave_config(substream, params, &slave_config);
-		if (ret)
-			return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = pcm->config->prepare_slave_config(substream, params, &slave_config);
 	if (ret)
@@ -232,20 +226,12 @@ static int dmaengine_pcm_new(struct snd_soc_component *component,
 	size_t max_buffer_size;
 	unsigned int i;
 
-<<<<<<< HEAD
 	if (config->prealloc_buffer_size)
-=======
-	if (config && config->prealloc_buffer_size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		prealloc_buffer_size = config->prealloc_buffer_size;
 	else
 		prealloc_buffer_size = prealloc_buffer_size_kbytes * 1024;
 
-<<<<<<< HEAD
 	if (config->pcm_hardware && config->pcm_hardware->buffer_bytes_max)
-=======
-	if (config && config->pcm_hardware && config->pcm_hardware->buffer_bytes_max)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		max_buffer_size = config->pcm_hardware->buffer_bytes_max;
 	else
 		max_buffer_size = SIZE_MAX;

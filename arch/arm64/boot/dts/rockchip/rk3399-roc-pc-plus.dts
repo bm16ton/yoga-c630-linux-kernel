@@ -98,20 +98,12 @@
 };
 
 &i2c0 {
-<<<<<<< HEAD
 	hym8563: rtc@51 {
-=======
-	hym8563: hym8563@51 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "haoyu,hym8563";
 		reg = <0x51>;
 		interrupt-parent = <&gpio0>;
 		interrupts = <RK_PA5 IRQ_TYPE_EDGE_FALLING>;
 		#clock-cells = <0>;
-<<<<<<< HEAD
-=======
-		clock-frequency = <32768>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		clock-output-names = "xin32k";
 		pinctrl-names = "default";
 		pinctrl-0 = <&hym8563_int>;

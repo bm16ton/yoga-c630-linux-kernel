@@ -201,12 +201,9 @@ static int max31790_read_fan(struct device *dev, u32 attr, int channel,
 						  data->target_count[channel % NR_CHANNEL] >> 8);
 		}
 		mutex_unlock(&data->update_lock);
-<<<<<<< HEAD
 		return 0;
 	case hwmon_fan_enable:
 		*val = !!(data->fan_config[channel] & MAX31790_FAN_CFG_TACH_INPUT_EN);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	default:
 		return -EOPNOTSUPP;

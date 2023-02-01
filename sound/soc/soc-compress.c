@@ -560,13 +560,8 @@ int snd_soc_new_compress(struct snd_soc_pcm_runtime *rtd, int num)
 	BUILD_BUG_ON((int)SNDRV_PCM_STREAM_PLAYBACK != (int)SND_COMPRESS_PLAYBACK);
 	BUILD_BUG_ON((int)SNDRV_PCM_STREAM_CAPTURE  != (int)SND_COMPRESS_CAPTURE);
 
-<<<<<<< HEAD
 	if (rtd->dai_link->num_cpus > 1 ||
 	    rtd->dai_link->num_codecs > 1) {
-=======
-	if (rtd->num_cpus > 1 ||
-	    rtd->num_codecs > 1) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(rtd->card->dev,
 			"Compress ASoC: Multi CPU/Codec not supported\n");
 		return -EINVAL;

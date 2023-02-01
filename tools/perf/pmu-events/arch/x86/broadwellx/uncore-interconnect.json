@@ -685,7 +685,6 @@
         "Unit": "QPI LL"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Flits Transferred - Group 0; Data Tx Flits",
         "Counter": "0,1,2,3",
         "EventName": "UNC_Q_TxL_FLITS_G0.DATA",
@@ -694,8 +693,6 @@
         "Unit": "QPI LL"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Number of data flits transmitted . Derived from unc_q_txl_flits_g0.data",
         "Counter": "0,1,2,3",
         "EventName": "QPI_DATA_BANDWIDTH_TX",
@@ -705,20 +702,11 @@
         "Unit": "QPI LL"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Flits Transferred - Group 0; Non-Data protocol Tx Flits",
         "Counter": "0,1,2,3",
         "EventName": "UNC_Q_TxL_FLITS_G0.NON_DATA",
         "PerPkg": "1",
         "UMask": "0x4",
-=======
-        "BriefDescription": "Number of data flits transmitted ",
-        "Counter": "0,1,2,3",
-        "EventName": "UNC_Q_TxL_FLITS_G0.DATA",
-        "PerPkg": "1",
-        "ScaleUnit": "8Bytes",
-        "UMask": "0x2",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "QPI LL"
     },
     {
@@ -731,18 +719,6 @@
         "Unit": "QPI LL"
     },
     {
-<<<<<<< HEAD
-=======
-        "BriefDescription": "Number of non data (control) flits transmitted ",
-        "Counter": "0,1,2,3",
-        "EventName": "UNC_Q_TxL_FLITS_G0.NON_DATA",
-        "PerPkg": "1",
-        "ScaleUnit": "8Bytes",
-        "UMask": "0x4",
-        "Unit": "QPI LL"
-    },
-    {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Flits Transferred - Group 1; SNP Flits",
         "Counter": "0,1,2,3",
         "EventName": "UNC_Q_TxL_FLITS_G1.SNP",

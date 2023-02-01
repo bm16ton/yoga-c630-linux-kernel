@@ -665,23 +665,15 @@ void *mei_cldev_dma_map(struct mei_cl_device *cldev, u8 buffer_id, size_t size)
 	if (cl->state == MEI_FILE_UNINITIALIZED) {
 		ret = mei_cl_link(cl);
 		if (ret)
-<<<<<<< HEAD
 			goto notlinked;
-=======
-			goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* update pointers */
 		cl->cldev = cldev;
 	}
 
 	ret = mei_cl_dma_alloc_and_map(cl, NULL, buffer_id, size);
-<<<<<<< HEAD
 	if (ret)
 		mei_cl_unlink(cl);
 notlinked:
-=======
-out:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&bus->device_lock);
 	if (ret)
 		return ERR_PTR(ret);

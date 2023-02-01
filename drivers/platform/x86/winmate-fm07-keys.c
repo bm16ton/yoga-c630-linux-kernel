@@ -161,11 +161,7 @@ static int __init fm07keys_init(void)
 		return ret;
 	}
 
-<<<<<<< HEAD
 	dev = platform_device_register_simple(DRV_NAME, PLATFORM_DEVID_NONE, NULL, 0);
-=======
-	dev = platform_device_register_simple(DRV_NAME, -1, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(dev)) {
 		ret = PTR_ERR(dev);
 		pr_err("fm07keys: failed to allocate device, err = %d\n", ret);

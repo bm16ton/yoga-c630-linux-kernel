@@ -606,7 +606,6 @@ noinline void bpf_kfunc_call_memb1_release(struct prog_test_member1 *p)
 	WARN_ON_ONCE(1);
 }
 
-<<<<<<< HEAD
 static int *__bpf_kfunc_call_test_get_mem(struct prog_test_ref_kfunc *p, const int size)
 {
 	if (size > 2 * sizeof(int))
@@ -639,8 +638,6 @@ noinline void bpf_kfunc_call_int_mem_release(int *p)
 {
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 noinline struct prog_test_ref_kfunc *
 bpf_kfunc_call_test_kptr_get(struct prog_test_ref_kfunc **pp, int a, int b)
 {
@@ -730,13 +727,10 @@ noinline void bpf_kfunc_call_test_ref(struct prog_test_ref_kfunc *p)
 {
 }
 
-<<<<<<< HEAD
 noinline void bpf_kfunc_call_test_destructive(void)
 {
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 __diag_pop();
 
 ALLOW_ERROR_INJECTION(bpf_modify_return_test, ERRNO);
@@ -750,13 +744,10 @@ BTF_ID_FLAGS(func, bpf_kfunc_call_memb_acquire, KF_ACQUIRE | KF_RET_NULL)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_release, KF_RELEASE)
 BTF_ID_FLAGS(func, bpf_kfunc_call_memb_release, KF_RELEASE)
 BTF_ID_FLAGS(func, bpf_kfunc_call_memb1_release, KF_RELEASE)
-<<<<<<< HEAD
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_get_rdwr_mem, KF_RET_NULL)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_get_rdonly_mem, KF_RET_NULL)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_acq_rdonly_mem, KF_ACQUIRE | KF_RET_NULL)
 BTF_ID_FLAGS(func, bpf_kfunc_call_int_mem_release, KF_RELEASE)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_kptr_get, KF_ACQUIRE | KF_RET_NULL | KF_KPTR_GET)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_pass_ctx)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_pass1)
@@ -768,10 +759,7 @@ BTF_ID_FLAGS(func, bpf_kfunc_call_test_mem_len_pass1)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_mem_len_fail1)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_mem_len_fail2)
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_ref, KF_TRUSTED_ARGS)
-<<<<<<< HEAD
 BTF_ID_FLAGS(func, bpf_kfunc_call_test_destructive, KF_DESTRUCTIVE)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 BTF_SET8_END(test_sk_check_kfunc_ids)
 
 static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size,
@@ -991,9 +979,6 @@ static inline bool range_is_zero(void *buf, size_t from, size_t to)
 static int convert___skb_to_skb(struct sk_buff *skb, struct __sk_buff *__skb)
 {
 	struct qdisc_skb_cb *cb = (struct qdisc_skb_cb *)skb->cb;
-
-	if (!skb->len)
-		return -EINVAL;
 
 	if (!__skb)
 		return 0;
@@ -1303,19 +1288,11 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
 
 	if (prog->expected_attach_type == BPF_XDP_DEVMAP ||
 	    prog->expected_attach_type == BPF_XDP_CPUMAP)
-<<<<<<< HEAD
 		return -EINVAL;
 
 	if (kattr->test.flags & ~BPF_F_TEST_XDP_LIVE_FRAMES)
 		return -EINVAL;
 
-=======
-		return -EINVAL;
-
-	if (kattr->test.flags & ~BPF_F_TEST_XDP_LIVE_FRAMES)
-		return -EINVAL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (do_live) {
 		if (!batch_size)
 			batch_size = NAPI_POLL_WEIGHT;
@@ -1691,10 +1668,7 @@ static int __init bpf_prog_test_run_init(void)
 
 	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_prog_test_kfunc_set);
 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_TRACING, &bpf_prog_test_kfunc_set);
-<<<<<<< HEAD
 	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SYSCALL, &bpf_prog_test_kfunc_set);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret ?: register_btf_id_dtor_kfuncs(bpf_prog_test_dtor_kfunc,
 						  ARRAY_SIZE(bpf_prog_test_dtor_kfunc),
 						  THIS_MODULE);

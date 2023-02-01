@@ -1358,11 +1358,6 @@ nv50_mstm_cleanup(struct drm_atomic_state *state,
 
 	NV_ATOMIC(drm, "%s: mstm cleanup\n", mstm->outp->base.base.name);
 	drm_dp_check_act_status(&mstm->mgr);
-<<<<<<< HEAD
-=======
-
-	drm_dp_update_payload_part2(&mstm->mgr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_for_each_encoder(encoder, mstm->outp->base.base.dev) {
 		if (encoder->encoder_type == DRM_MODE_ENCODER_DPMST) {
@@ -1385,10 +1380,6 @@ nv50_mstm_prepare(struct drm_atomic_state *state,
 	struct drm_encoder *encoder;
 
 	NV_ATOMIC(drm, "%s: mstm prepare\n", mstm->outp->base.base.name);
-<<<<<<< HEAD
-=======
-	drm_dp_update_payload_part1(&mstm->mgr, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Disable payloads first */
 	drm_for_each_encoder(encoder, mstm->outp->base.base.dev) {
@@ -1605,9 +1596,7 @@ nv50_mstm_new(struct nouveau_encoder *outp, struct drm_dp_aux *aux, int aux_max,
 	mstm->mgr.cbs = &nv50_mstm;
 
 	ret = drm_dp_mst_topology_mgr_init(&mstm->mgr, dev, aux, aux_max,
-					   max_payloads, outp->dcb->dpconf.link_nr,
-					   drm_dp_bw_code_to_link_rate(outp->dcb->dpconf.link_bw),
-					   conn_base_id);
+					   max_payloads, conn_base_id);
 	if (ret)
 		return ret;
 

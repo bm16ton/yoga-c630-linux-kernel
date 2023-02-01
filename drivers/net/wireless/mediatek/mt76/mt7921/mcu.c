@@ -5,23 +5,17 @@
 #include <linux/firmware.h>
 #include "mt7921.h"
 #include "mt7921_trace.h"
-<<<<<<< HEAD
 #include "eeprom.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "mcu.h"
 #include "mac.h"
 
 #define MT_STA_BFER			BIT(0)
 #define MT_STA_BFEE			BIT(1)
 
-<<<<<<< HEAD
 static bool mt7921_disable_clc;
 module_param_named(disable_clc, mt7921_disable_clc, bool, 0644);
 MODULE_PARM_DESC(disable_clc, "disable CLC support");
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int
 mt7921_mcu_parse_eeprom(struct mt76_dev *dev, struct sk_buff *skb)
 {
@@ -95,7 +89,6 @@ int mt7921_mcu_parse_response(struct mt76_dev *mdev, int cmd,
 	return ret;
 }
 EXPORT_SYMBOL_GPL(mt7921_mcu_parse_response);
-<<<<<<< HEAD
 
 static int mt7921_mcu_read_eeprom(struct mt7921_dev *dev, u32 offset, u8 *val)
 {
@@ -124,15 +117,6 @@ static int
 mt7921_mcu_set_ipv6_ns_filter(struct mt76_dev *dev,
 			      struct ieee80211_vif *vif, bool suspend)
 {
-=======
-
-#ifdef CONFIG_PM
-
-static int
-mt7921_mcu_set_ipv6_ns_filter(struct mt76_dev *dev,
-			      struct ieee80211_vif *vif, bool suspend)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mt7921_vif *mvif = (struct mt7921_vif *)vif->drv_priv;
 	struct {
 		struct {
@@ -376,7 +360,6 @@ int mt7921_mcu_uni_rx_ba(struct mt7921_dev *dev,
 static char *mt7921_patch_name(struct mt7921_dev *dev)
 {
 	char *ret;
-<<<<<<< HEAD
 
 	if (is_mt7922(&dev->mt76))
 		ret = MT7922_ROM_PATCH;
@@ -460,20 +443,12 @@ static int mt7921_load_clc(struct mt7921_dev *dev, const char *fw_name)
 		/* do not init buf again if chip reset triggered */
 		if (phy->clc[clc->idx])
 			continue;
-=======
-
-	if (is_mt7922(&dev->mt76))
-		ret = MT7922_ROM_PATCH;
-	else
-		ret = MT7921_ROM_PATCH;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* header content sanity */
 		if (clc->idx == MT7921_CLC_POWER &&
 		    u8_get_bits(clc->type, MT_EE_HW_TYPE_ENCAP) != hw_encap)
 			continue;
 
-<<<<<<< HEAD
 		phy->clc[clc->idx] = devm_kmemdup(mdev->dev, clc,
 						  le32_to_cpu(clc->len),
 						  GFP_KERNEL);
@@ -486,16 +461,6 @@ static int mt7921_load_clc(struct mt7921_dev *dev, const char *fw_name)
 	ret = mt7921_mcu_set_clc(dev, "00", ENVIRON_INDOOR);
 out:
 	release_firmware(fw);
-=======
-static char *mt7921_ram_name(struct mt7921_dev *dev)
-{
-	char *ret;
-
-	if (is_mt7922(&dev->mt76))
-		ret = MT7922_FIRMWARE_WM;
-	else
-		ret = MT7921_FIRMWARE_WM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -569,13 +534,10 @@ int mt7921_run_firmware(struct mt7921_dev *dev)
 		return err;
 
 	set_bit(MT76_STATE_MCU_RUNNING, &dev->mphy.state);
-<<<<<<< HEAD
 	err = mt7921_load_clc(dev, mt7921_ram_name(dev));
 	if (err)
 		return err;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return mt7921_mcu_fw_log_2_host(dev, 1);
 }
 EXPORT_SYMBOL_GPL(mt7921_run_firmware);
@@ -916,19 +878,11 @@ int mt7921_mcu_fw_pmctrl(struct mt7921_dev *dev)
 
 	if (mt76_connac_skip_fw_pmctrl(mphy, pm))
 		goto out;
-<<<<<<< HEAD
 
 	err = __mt7921_mcu_fw_pmctrl(dev);
 out:
 	mutex_unlock(&pm->mutex);
 
-=======
-
-	err = __mt7921_mcu_fw_pmctrl(dev);
-out:
-	mutex_unlock(&pm->mutex);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		mt7921_reset(&dev->mt76);
 
@@ -1057,7 +1011,6 @@ mt7921_mcu_uni_add_beacon_offload(struct mt7921_dev *dev,
 		},
 	};
 	struct sk_buff *skb;
-<<<<<<< HEAD
 
 	/* support enable/update process only
 	 * disable flow would be handled in bss stop handler automatically
@@ -1075,25 +1028,6 @@ mt7921_mcu_uni_add_beacon_offload(struct mt7921_dev *dev,
 		return -EINVAL;
 	}
 
-=======
-
-	/* support enable/update process only
-	 * disable flow would be handled in bss stop handler automatically
-	 */
-	if (!enable)
-		return -EOPNOTSUPP;
-
-	skb = ieee80211_beacon_get_template(mt76_hw(dev), vif, &offs, 0);
-	if (!skb)
-		return -EINVAL;
-
-	if (skb->len > 512 - MT_TXD_SIZE) {
-		dev_err(dev->mt76.dev, "beacon size limit exceed\n");
-		dev_kfree_skb(skb);
-		return -EINVAL;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mt76_connac2_mac_write_txwi(&dev->mt76, (__le32 *)(req.beacon_tlv.pkt),
 				    skb, wcid, NULL, 0, 0, BSS_CHANGED_BEACON);
 	memcpy(req.beacon_tlv.pkt + MT_TXD_SIZE, skb->data, skb->len);
@@ -1107,7 +1041,6 @@ mt7921_mcu_uni_add_beacon_offload(struct mt7921_dev *dev,
 		req.beacon_tlv.csa_ie_pos = cpu_to_le16(csa_offs);
 	}
 	dev_kfree_skb(skb);
-<<<<<<< HEAD
 
 	return mt76_mcu_send_msg(&dev->mt76, MCU_UNI_CMD(BSS_INFO_UPDATE),
 				 &req, sizeof(req), true);
@@ -1194,9 +1127,4 @@ int mt7921_mcu_set_clc(struct mt7921_dev *dev, u8 *alpha2,
 			return ret;
 	}
 	return 0;
-=======
-
-	return mt76_mcu_send_msg(&dev->mt76, MCU_UNI_CMD(BSS_INFO_UPDATE),
-				 &req, sizeof(req), true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

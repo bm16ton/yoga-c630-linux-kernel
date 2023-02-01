@@ -457,7 +457,6 @@ Description:
 
 		The file is writable if the PF is bound to a driver that
 		implements ->sriov_set_msix_vec_count().
-<<<<<<< HEAD
 
 What:		/sys/bus/pci/devices/.../resourceN_resize
 Date:		September 2022
@@ -491,5 +490,3 @@ Description:
 		console drivers from the device.  Raw users of pci-sysfs
 		resourceN attributes must be terminated prior to resizing.
 		Success of the resizing operation is not guaranteed.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

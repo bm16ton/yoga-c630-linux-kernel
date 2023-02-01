@@ -83,10 +83,7 @@ enum link_training_result {
 };
 
 enum lttpr_mode {
-<<<<<<< HEAD
 	LTTPR_MODE_UNKNOWN,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	LTTPR_MODE_NON_LTTPR,
 	LTTPR_MODE_TRANSPARENT,
 	LTTPR_MODE_NON_TRANSPARENT,

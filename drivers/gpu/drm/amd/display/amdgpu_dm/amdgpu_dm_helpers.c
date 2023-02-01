@@ -41,42 +41,6 @@
 
 #include "dm_helpers.h"
 #include "ddc_service_types.h"
-<<<<<<< HEAD
-=======
-
-struct monitor_patch_info {
-	unsigned int manufacturer_id;
-	unsigned int product_id;
-	void (*patch_func)(struct dc_edid_caps *edid_caps, unsigned int param);
-	unsigned int patch_param;
-};
-static void set_max_dsc_bpp_limit(struct dc_edid_caps *edid_caps, unsigned int param);
-
-static const struct monitor_patch_info monitor_patch_table[] = {
-{0x6D1E, 0x5BBF, set_max_dsc_bpp_limit, 15},
-{0x6D1E, 0x5B9A, set_max_dsc_bpp_limit, 15},
-};
-
-static void set_max_dsc_bpp_limit(struct dc_edid_caps *edid_caps, unsigned int param)
-{
-	if (edid_caps)
-		edid_caps->panel_patch.max_dsc_target_bpp_limit = param;
-}
-
-static int amdgpu_dm_patch_edid_caps(struct dc_edid_caps *edid_caps)
-{
-	int i, ret = 0;
-
-	for (i = 0; i < ARRAY_SIZE(monitor_patch_table); i++)
-		if ((edid_caps->manufacturer_id == monitor_patch_table[i].manufacturer_id)
-			&&  (edid_caps->product_id == monitor_patch_table[i].product_id)) {
-			monitor_patch_table[i].patch_func(edid_caps, monitor_patch_table[i].patch_param);
-			ret++;
-		}
-
-	return ret;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* dm_helpers_parse_edid_caps
  *
@@ -152,8 +116,6 @@ enum dc_edid_status dm_helpers_parse_edid_caps(
 	kfree(sads);
 	kfree(sadb);
 
-	amdgpu_dm_patch_edid_caps(edid_caps);
-
 	return result;
 }
 
@@ -199,12 +161,6 @@ bool dm_helpers_dp_mst_write_payload_allocation_table(
 	struct drm_dp_mst_topology_state *mst_state;
 	struct drm_dp_mst_atomic_payload *payload;
 	struct drm_dp_mst_topology_mgr *mst_mgr;
-<<<<<<< HEAD
-=======
-	struct drm_dp_mst_port *mst_port;
-	bool ret;
-	u8 link_coding_cap = DP_8b_10b_ENCODING;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	aconnector = (struct amdgpu_dm_connector *)stream->dm_stream_context;
 	/* Accessing the connector state is required for vcpi_slots allocation
@@ -216,7 +172,6 @@ bool dm_helpers_dp_mst_write_payload_allocation_table(
 		return false;
 
 	mst_mgr = &aconnector->mst_port->mst_mgr;
-<<<<<<< HEAD
 	mst_state = to_drm_dp_mst_topology_state(mst_mgr->base.state);
 
 	/* It's OK for this to fail */
@@ -225,32 +180,6 @@ bool dm_helpers_dp_mst_write_payload_allocation_table(
 		drm_dp_add_payload_part1(mst_mgr, mst_state, payload);
 	else
 		drm_dp_remove_payload(mst_mgr, mst_state, payload);
-=======
-
-	if (!mst_mgr->mst_state)
-		return false;
-
-	mst_port = aconnector->port;
-
-#if defined(CONFIG_DRM_AMD_DC_DCN)
-	link_coding_cap = dc_link_dp_mst_decide_link_encoding_format(aconnector->dc_link);
-#endif
-
-	if (enable) {
-
-		ret = drm_dp_mst_allocate_vcpi(mst_mgr, mst_port,
-					       dm_conn_state->pbn,
-					       dm_conn_state->vcpi_slots);
-		if (!ret)
-			return false;
-
-	} else {
-		drm_dp_mst_reset_vcpi_slots(mst_mgr, mst_port);
-	}
-
-	/* It's OK for this to fail */
-	drm_dp_update_payload_part1(mst_mgr, (link_coding_cap == DP_CAP_ANSI_128B132B) ? 0:1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* mst_mgr->->payloads are VC payload notify MST branch using DPCD or
 	 * AUX message. The sequence is slot 1-63 allocated sequence for each
@@ -315,11 +244,7 @@ bool dm_helpers_dp_mst_send_payload_allocation(
 	struct amdgpu_dm_connector *aconnector;
 	struct drm_dp_mst_topology_state *mst_state;
 	struct drm_dp_mst_topology_mgr *mst_mgr;
-<<<<<<< HEAD
 	struct drm_dp_mst_atomic_payload *payload;
-=======
-	struct drm_dp_mst_port *mst_port;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	enum mst_progress_status set_flag = MST_ALLOCATE_NEW_PAYLOAD;
 	enum mst_progress_status clr_flag = MST_CLEAR_ALLOCATED_PAYLOAD;
 
@@ -331,30 +256,11 @@ bool dm_helpers_dp_mst_send_payload_allocation(
 	mst_mgr = &aconnector->mst_port->mst_mgr;
 	mst_state = to_drm_dp_mst_topology_state(mst_mgr->base.state);
 
-<<<<<<< HEAD
 	payload = drm_atomic_get_mst_payload_state(mst_state, aconnector->port);
-=======
-	if (!mst_mgr->mst_state)
-		return false;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!enable) {
 		set_flag = MST_CLEAR_ALLOCATED_PAYLOAD;
 		clr_flag = MST_ALLOCATE_NEW_PAYLOAD;
 	}
-<<<<<<< HEAD
-=======
-
-	if (drm_dp_update_payload_part2(mst_mgr)) {
-		amdgpu_dm_set_mst_status(&aconnector->mst_status,
-			set_flag, false);
-	} else {
-		amdgpu_dm_set_mst_status(&aconnector->mst_status,
-			set_flag, true);
-		amdgpu_dm_set_mst_status(&aconnector->mst_status,
-			clr_flag, false);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (enable && drm_dp_add_payload_part2(mst_mgr, mst_state->base.state, payload)) {
 		amdgpu_dm_set_mst_status(&aconnector->mst_status,
@@ -777,7 +683,6 @@ bool dm_helpers_dp_write_dsc_enable(
 				aconnector->dsc_aux, stream, enable_dsc);
 #endif
 
-<<<<<<< HEAD
 		port = aconnector->port;
 
 		if (enable) {
@@ -811,10 +716,6 @@ bool dm_helpers_dp_write_dsc_enable(
 					  ret);
 			}
 		}
-=======
-		ret = drm_dp_dpcd_write(aconnector->dsc_aux, DP_DSC_ENABLE, &enable_dsc, 1);
-		DC_LOG_DC("Send DSC %s to MST RX\n", enable_dsc ? "enable" : "disable");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (stream->signal == SIGNAL_TYPE_DISPLAY_PORT || stream->signal == SIGNAL_TYPE_EDP) {
@@ -942,7 +843,6 @@ void dm_helpers_smu_timeout(struct dc_context *ctx, unsigned int msg_id, unsigne
 	//amdgpu_device_gpu_recover(dc_context->driver-context, NULL);
 }
 
-<<<<<<< HEAD
 void dm_helpers_init_panel_settings(
 	struct dc_context *ctx,
 	struct dc_panel_config *panel_config,
@@ -971,8 +871,6 @@ void dm_helpers_override_panel_settings(
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void *dm_helpers_allocate_gpu_mem(
 		struct dc_context *ctx,
 		enum dc_gpu_mem_alloc_type type,

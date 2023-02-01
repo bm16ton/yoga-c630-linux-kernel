@@ -5,12 +5,6 @@
 
 #include "../include/osdep_service.h"
 #include "../include/drv_types.h"
-<<<<<<< HEAD
-=======
-#include "../include/recv_osdep.h"
-#include "../include/xmit_osdep.h"
-#include "../include/mlme_osdep.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../include/sta_info.h"
 
 static void _rtw_init_stainfo(struct sta_info *psta)
@@ -144,7 +138,6 @@ void _rtw_free_sta_priv(struct	sta_priv *pstapriv)
 	}
 }
 
-<<<<<<< HEAD
 static void _rtw_reordering_ctrl_timeout_handler(struct timer_list *t)
 {
 	struct recv_reorder_ctrl *preorder_ctrl;
@@ -170,8 +163,6 @@ static void init_addba_retry_timer(struct adapter *padapter, struct sta_info *ps
 	timer_setup(&psta->addba_retry_timer, _addba_timer_hdl, 0);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct	sta_info *rtw_alloc_stainfo(struct sta_priv *pstapriv, u8 *hwaddr)
 {
 	s32	index;

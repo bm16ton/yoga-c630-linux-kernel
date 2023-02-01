@@ -74,7 +74,6 @@ static void ipi_stop(void)
 		wait_for_interrupt();
 }
 
-<<<<<<< HEAD
 #ifdef CONFIG_KEXEC_CORE
 static atomic_t waiting_for_crash_ipi = ATOMIC_INIT(0);
 
@@ -103,10 +102,6 @@ static inline void ipi_cpu_crash_stop(unsigned int cpu, struct pt_regs *regs)
 
 static const struct riscv_ipi_ops *ipi_ops __ro_after_init;
 
-=======
-static const struct riscv_ipi_ops *ipi_ops __ro_after_init;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void riscv_set_ipi_ops(const struct riscv_ipi_ops *ops)
 {
 	ipi_ops = ops;
@@ -158,14 +153,9 @@ void arch_irq_work_raise(void)
 
 void handle_IPI(struct pt_regs *regs)
 {
-<<<<<<< HEAD
 	unsigned int cpu = smp_processor_id();
 	unsigned long *pending_ipis = &ipi_data[cpu].bits;
 	unsigned long *stats = ipi_data[cpu].stats;
-=======
-	unsigned long *pending_ipis = &ipi_data[smp_processor_id()].bits;
-	unsigned long *stats = ipi_data[smp_processor_id()].stats;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	riscv_clear_ipi();
 

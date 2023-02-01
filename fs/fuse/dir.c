@@ -529,11 +529,7 @@ out_err:
  */
 static int fuse_create_open(struct inode *dir, struct dentry *entry,
 			    struct file *file, unsigned int flags,
-<<<<<<< HEAD
 			    umode_t mode, u32 opcode)
-=======
-			    umode_t mode)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err;
 	struct inode *inode;

@@ -1311,15 +1311,6 @@ fail:
 	goto out;
 }
 
-<<<<<<< HEAD
-=======
-static int
-ptp_ocp_firstchild(struct device *dev, void *data)
-{
-	return 1;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct device *
 ptp_ocp_find_flash(struct ptp_ocp *bp)
 {
@@ -1328,11 +1319,7 @@ ptp_ocp_find_flash(struct ptp_ocp *bp)
 	last = NULL;
 	dev = &bp->spi_flash->dev;
 
-<<<<<<< HEAD
 	while ((dev = device_find_any_child(dev))) {
-=======
-	while ((dev = device_find_child(dev, NULL, ptp_ocp_firstchild))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!strcmp("mtd", dev_bus_name(dev)))
 			break;
 		put_device(last);
@@ -3670,10 +3657,7 @@ ptp_ocp_detach_sysfs(struct ptp_ocp *bp)
 	struct device *dev = &bp->dev;
 
 	sysfs_remove_link(&dev->kobj, "ttyGNSS");
-<<<<<<< HEAD
 	sysfs_remove_link(&dev->kobj, "ttyGNSS2");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sysfs_remove_link(&dev->kobj, "ttyMAC");
 	sysfs_remove_link(&dev->kobj, "ptp");
 	sysfs_remove_link(&dev->kobj, "pps");

@@ -484,12 +484,7 @@ static void ks8995_remove(struct spi_device *spi)
 	sysfs_remove_bin_file(&spi->dev.kobj, &ks->regs_attr);
 
 	/* assert reset */
-<<<<<<< HEAD
 	gpiod_set_value_cansleep(ks->reset_gpio, 1);
-=======
-	if (ks->pdata && gpio_is_valid(ks->pdata->reset_gpio))
-		gpiod_set_value(gpio_to_desc(ks->pdata->reset_gpio), 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* ------------------------------------------------------------------------ */

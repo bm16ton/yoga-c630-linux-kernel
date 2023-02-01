@@ -165,10 +165,6 @@ enum intel_ppgtt_type {
 	func(has_media_ratio_mode); \
 	func(has_mslice_steering); \
 	func(has_one_eu_per_fuse_bit); \
-<<<<<<< HEAD
-=======
-	func(has_pooled_eu); \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	func(has_pxp); \
 	func(has_rc6); \
 	func(has_rc6p); \
@@ -184,17 +180,9 @@ enum intel_ppgtt_type {
 	/* Keep in alphabetical order */ \
 	func(cursor_needs_physical); \
 	func(has_cdclk_crawl); \
-<<<<<<< HEAD
 	func(has_ddi); \
 	func(has_dp_mst); \
 	func(has_dsb); \
-=======
-	func(has_dmc); \
-	func(has_ddi); \
-	func(has_dp_mst); \
-	func(has_dsb); \
-	func(has_dsc); \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	func(has_fpga_dbg); \
 	func(has_gmch); \
 	func(has_hotplug); \
@@ -212,7 +200,6 @@ struct ip_version {
 	u8 rel;
 };
 
-<<<<<<< HEAD
 struct intel_runtime_info {
 	struct {
 		struct ip_version ip;
@@ -235,11 +222,6 @@ struct intel_runtime_info {
 	u32 platform_mask[2];
 
 	u16 device_id;
-=======
-struct intel_device_info {
-	struct ip_version graphics;
-	struct ip_version media;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	intel_engine_mask_t platform_engine_mask; /* Engines supported by the HW */
 
@@ -254,7 +236,6 @@ struct intel_device_info {
 
 	u32 memory_regions; /* regions supported by the HW */
 
-<<<<<<< HEAD
 	bool has_pooled_eu;
 
 	/* display */
@@ -280,8 +261,6 @@ struct intel_device_info {
 
 	const struct intel_gt_definition *extra_gt_list;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 gt; /* GT number, 0 if undefined */
 
 #define DEFINE_FLAG(name) u8 name:1
@@ -289,15 +268,6 @@ struct intel_device_info {
 #undef DEFINE_FLAG
 
 	struct {
-<<<<<<< HEAD
-=======
-		u8 ver;
-		u8 rel;
-
-		u8 pipe_mask;
-		u8 cpu_transcoder_mask;
-		u8 fbc_mask;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		u8 abox_mask;
 
 		struct {
@@ -324,28 +294,11 @@ struct intel_device_info {
 			u32 gamma_lut_tests;
 		} color;
 	} display;
-<<<<<<< HEAD
-=======
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Initial runtime info. Do not access outside of i915_driver_create().
 	 */
-<<<<<<< HEAD
 	const struct intel_runtime_info __runtime;
-=======
-	u32 platform_mask[2];
-
-	u16 device_id;
-
-	u8 num_sprites[I915_MAX_PIPES];
-	u8 num_scalers[I915_MAX_PIPES];
-
-	u32 rawclk_freq;
-
-	struct intel_step_info step;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct intel_driver_caps {

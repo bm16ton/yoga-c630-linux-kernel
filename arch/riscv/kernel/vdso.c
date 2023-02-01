@@ -119,18 +119,11 @@ int vdso_join_timens(struct task_struct *task, struct time_namespace *ns)
 {
 	struct mm_struct *mm = task->mm;
 	struct vm_area_struct *vma;
-<<<<<<< HEAD
 	VMA_ITERATOR(vmi, mm, 0);
 
 	mmap_read_lock(mm);
 
 	for_each_vma(vmi, vma) {
-=======
-
-	mmap_read_lock(mm);
-
-	for (vma = mm->mmap; vma; vma = vma->vm_next) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		unsigned long size = vma->vm_end - vma->vm_start;
 
 		if (vma_is_special_mapping(vma, vdso_info.dm))

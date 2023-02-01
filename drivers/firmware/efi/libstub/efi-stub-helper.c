@@ -690,55 +690,9 @@ efi_status_t efi_load_initrd_cmdline(efi_loaded_image_t *image,
 				    &initrd->base, &initrd->size);
 }
 
-static const struct {
-	efi_tcg2_event_t	event_data;
-	efi_tcg2_tagged_event_t tagged_event;
-	u8			tagged_event_data[];
-} initrd_tcg2_event = {
-	{
-		sizeof(initrd_tcg2_event) + sizeof("Linux initrd"),
-		{
-			sizeof(initrd_tcg2_event.event_data.event_header),
-			EFI_TCG2_EVENT_HEADER_VERSION,
-			9,
-			EV_EVENT_TAG,
-		},
-	},
-	{
-		INITRD_EVENT_TAG_ID,
-		sizeof("Linux initrd"),
-	},
-	{ "Linux initrd" },
-};
-
-static void efi_measure_initrd(unsigned long load_addr, unsigned long load_size)
-{
-	efi_guid_t tcg2_guid = EFI_TCG2_PROTOCOL_GUID;
-	efi_tcg2_protocol_t *tcg2 = NULL;
-	efi_status_t status;
-
-	efi_bs_call(locate_protocol, &tcg2_guid, NULL, (void **)&tcg2);
-	if (tcg2) {
-		status = efi_call_proto(tcg2, hash_log_extend_event,
-					0, load_addr, load_size,
-					&initrd_tcg2_event.event_data);
-		if (status != EFI_SUCCESS)
-			efi_warn("Failed to measure initrd data: 0x%lx\n",
-				 status);
-		else
-			efi_info("Measured initrd data into PCR %d\n",
-				 initrd_tcg2_event.event_data.event_header.pcr_index);
-	}
-}
-
 /**
  * efi_load_initrd() - Load initial RAM disk
  * @image:	EFI loaded image protocol
-<<<<<<< HEAD
-=======
- * @load_addr:	pointer to loaded initrd
- * @load_size:	size of loaded initrd
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @soft_limit:	preferred address for loading the initrd
  * @hard_limit:	upper limit address for loading the initrd
  *
@@ -753,7 +707,6 @@ efi_status_t efi_load_initrd(efi_loaded_image_t *image,
 	efi_status_t status = EFI_SUCCESS;
 	struct linux_efi_initrd initrd, *tbl;
 
-<<<<<<< HEAD
 	if (!IS_ENABLED(CONFIG_BLK_DEV_INITRD) || efi_noinitrd)
 		return EFI_SUCCESS;
 
@@ -772,27 +725,6 @@ efi_status_t efi_load_initrd(efi_loaded_image_t *image,
 			return EFI_SUCCESS;
 		if (status == EFI_SUCCESS)
 			efi_info("Loaded initrd from command line option\n");
-=======
-	if (efi_noinitrd) {
-		*load_addr = *load_size = 0;
-		status = EFI_SUCCESS;
-	} else {
-		status = efi_load_initrd_dev_path(load_addr, load_size, hard_limit);
-		if (status == EFI_SUCCESS) {
-			efi_info("Loaded initrd from LINUX_EFI_INITRD_MEDIA_GUID device path\n");
-			if (*load_size > 0)
-				efi_measure_initrd(*load_addr, *load_size);
-		} else if (status == EFI_NOT_FOUND) {
-			status = efi_load_initrd_cmdline(image, load_addr, load_size,
-							 soft_limit, hard_limit);
-			if (status == EFI_SUCCESS && *load_size > 0)
-				efi_info("Loaded initrd from command line option\n");
-		}
-		if (status != EFI_SUCCESS) {
-			efi_err("Failed to load initrd: 0x%lx\n", status);
-			*load_addr = *load_size = 0;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	if (status != EFI_SUCCESS)
 		goto failed;

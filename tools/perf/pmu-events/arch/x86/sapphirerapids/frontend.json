@@ -12,7 +12,6 @@
         "UMask": "0x1"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Cycles the Microcode Sequencer is busy.",
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3",
@@ -24,8 +23,6 @@
         "UMask": "0x2"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "DSB-to-MITE switch true penalty cycles.",
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3",

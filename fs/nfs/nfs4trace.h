@@ -2097,10 +2097,7 @@ TRACE_EVENT(ff_layout_commit_error,
 		)
 );
 
-<<<<<<< HEAD
 #ifdef CONFIG_NFS_V4_2
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 TRACE_DEFINE_ENUM(NFS4_CONTENT_DATA);
 TRACE_DEFINE_ENUM(NFS4_CONTENT_HOLE);
 
@@ -2109,10 +2106,6 @@ TRACE_DEFINE_ENUM(NFS4_CONTENT_HOLE);
 		{ NFS4_CONTENT_DATA, "DATA" },		\
 		{ NFS4_CONTENT_HOLE, "HOLE" })
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_NFS_V4_2
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 TRACE_EVENT(nfs4_llseek,
 		TP_PROTO(
 			const struct inode *inode,
@@ -2503,7 +2496,6 @@ TRACE_EVENT(nfs4_offload_cancel,
 			__entry->stateid_seq, __entry->stateid_hash
 		)
 );
-<<<<<<< HEAD
 
 DECLARE_EVENT_CLASS(nfs4_xattr_event,
 		TP_PROTO(
@@ -2552,8 +2544,6 @@ DEFINE_NFS4_XATTR_EVENT(nfs4_setxattr);
 DEFINE_NFS4_XATTR_EVENT(nfs4_removexattr);
 
 DEFINE_NFS4_INODE_EVENT(nfs4_listxattr);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_NFS_V4_2 */
 
 #endif /* CONFIG_NFS_V4_1 */

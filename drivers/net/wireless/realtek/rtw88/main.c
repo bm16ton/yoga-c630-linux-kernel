@@ -342,7 +342,6 @@ void rtw_sta_remove(struct rtw_dev *rtwdev, struct ieee80211_sta *sta,
 	rtwdev->sta_cnt--;
 	rtw_dbg(rtwdev, RTW_DBG_STATE, "sta %pM with macid %d left\n",
 		sta->addr, si->mac_id);
-<<<<<<< HEAD
 }
 
 struct rtw_fwcd_hdr {
@@ -431,96 +430,6 @@ static void rtw_fwcd_free(struct rtw_dev *rtwdev, bool free_self)
 	desc->next = NULL;
 }
 
-=======
-}
-
-struct rtw_fwcd_hdr {
-	u32 item;
-	u32 size;
-	u32 padding1;
-	u32 padding2;
-} __packed;
-
-static int rtw_fwcd_prep(struct rtw_dev *rtwdev)
-{
-	struct rtw_chip_info *chip = rtwdev->chip;
-	struct rtw_fwcd_desc *desc = &rtwdev->fw.fwcd_desc;
-	const struct rtw_fwcd_segs *segs = chip->fwcd_segs;
-	u32 prep_size = chip->fw_rxff_size + sizeof(struct rtw_fwcd_hdr);
-	u8 i;
-
-	if (segs) {
-		prep_size += segs->num * sizeof(struct rtw_fwcd_hdr);
-
-		for (i = 0; i < segs->num; i++)
-			prep_size += segs->segs[i];
-	}
-
-	desc->data = vmalloc(prep_size);
-	if (!desc->data)
-		return -ENOMEM;
-
-	desc->size = prep_size;
-	desc->next = desc->data;
-
-	return 0;
-}
-
-static u8 *rtw_fwcd_next(struct rtw_dev *rtwdev, u32 item, u32 size)
-{
-	struct rtw_fwcd_desc *desc = &rtwdev->fw.fwcd_desc;
-	struct rtw_fwcd_hdr *hdr;
-	u8 *next;
-
-	if (!desc->data) {
-		rtw_dbg(rtwdev, RTW_DBG_FW, "fwcd isn't prepared successfully\n");
-		return NULL;
-	}
-
-	next = desc->next + sizeof(struct rtw_fwcd_hdr);
-	if (next - desc->data + size > desc->size) {
-		rtw_dbg(rtwdev, RTW_DBG_FW, "fwcd isn't prepared enough\n");
-		return NULL;
-	}
-
-	hdr = (struct rtw_fwcd_hdr *)(desc->next);
-	hdr->item = item;
-	hdr->size = size;
-	hdr->padding1 = 0x01234567;
-	hdr->padding2 = 0x89abcdef;
-	desc->next = next + size;
-
-	return next;
-}
-
-static void rtw_fwcd_dump(struct rtw_dev *rtwdev)
-{
-	struct rtw_fwcd_desc *desc = &rtwdev->fw.fwcd_desc;
-
-	rtw_dbg(rtwdev, RTW_DBG_FW, "dump fwcd\n");
-
-	/* Data will be freed after lifetime of device coredump. After calling
-	 * dev_coredump, data is supposed to be handled by the device coredump
-	 * framework. Note that a new dump will be discarded if a previous one
-	 * hasn't been released yet.
-	 */
-	dev_coredumpv(rtwdev->dev, desc->data, desc->size, GFP_KERNEL);
-}
-
-static void rtw_fwcd_free(struct rtw_dev *rtwdev, bool free_self)
-{
-	struct rtw_fwcd_desc *desc = &rtwdev->fw.fwcd_desc;
-
-	if (free_self) {
-		rtw_dbg(rtwdev, RTW_DBG_FW, "free fwcd by self\n");
-		vfree(desc->data);
-	}
-
-	desc->data = NULL;
-	desc->next = NULL;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int rtw_fw_dump_crash_log(struct rtw_dev *rtwdev)
 {
 	u32 size = rtwdev->chip->fw_rxff_size;
@@ -766,7 +675,6 @@ void rtw_set_dtim_period(struct rtw_dev *rtwdev, int dtim_period)
 	rtw_write8(rtwdev, REG_DTIM_COUNTER_ROOT, dtim_period - 1);
 }
 
-<<<<<<< HEAD
 void rtw_update_channel(struct rtw_dev *rtwdev, u8 center_channel,
 			u8 primary_channel, enum rtw_supported_band band,
 			enum rtw_bandwidth bandwidth)
@@ -850,8 +758,6 @@ void rtw_update_channel(struct rtw_dev *rtwdev, u8 center_channel,
 	hal->sar_band = sar_band;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtw_get_channel_params(struct cfg80211_chan_def *chandef,
 			    struct rtw_channel_params *chan_params)
 {
@@ -916,40 +822,9 @@ void rtw_set_channel(struct rtw_dev *rtwdev)
 	center_chan = ch_param.center_chan;
 	primary_chan = ch_param.primary_chan;
 	bandwidth = ch_param.bandwidth;
-<<<<<<< HEAD
 	band = ch_param.center_chan > 14 ? RTW_BAND_5G : RTW_BAND_2G;
 
 	rtw_update_channel(rtwdev, center_chan, primary_chan, band, bandwidth);
-=======
-	primary_chan_idx = ch_param.primary_chan_idx;
-
-	hal->current_band_width = bandwidth;
-	hal->current_channel = center_chan;
-	hal->current_primary_channel_index = primary_chan_idx;
-	hal->current_band_type = center_chan > 14 ? RTW_BAND_5G : RTW_BAND_2G;
-
-	switch (center_chan) {
-	case 1 ... 14:
-		hal->sar_band = RTW_SAR_BAND_0;
-		break;
-	case 36 ... 64:
-		hal->sar_band = RTW_SAR_BAND_1;
-		break;
-	case 100 ... 144:
-		hal->sar_band = RTW_SAR_BAND_3;
-		break;
-	case 149 ... 177:
-		hal->sar_band = RTW_SAR_BAND_4;
-		break;
-	default:
-		WARN(1, "unknown ch(%u) to SAR band\n", center_chan);
-		hal->sar_band = RTW_SAR_BAND_0;
-		break;
-	}
-
-	for (i = RTW_CHANNEL_WIDTH_20; i <= RTW_MAX_CHANNEL_WIDTH; i++)
-		hal->cch_by_bw[i] = ch_param.cch_by_bw[i];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	chip->ops->set_channel(rtwdev, center_chan, bandwidth,
 			       hal->current_primary_channel_index);
@@ -1625,7 +1500,6 @@ static void rtw_init_ht_cap(struct rtw_dev *rtwdev,
 {
 	const struct rtw_chip_info *chip = rtwdev->chip;
 	struct rtw_efuse *efuse = &rtwdev->efuse;
-	struct rtw_chip_info *chip = rtwdev->chip;
 
 	ht_cap->ht_supported = true;
 	ht_cap->cap = 0;
@@ -1777,11 +1651,7 @@ static void rtw_vif_smps_iter(void *data, u8 *mac,
 
 void rtw_set_txrx_1ss(struct rtw_dev *rtwdev, bool txrx_1ss)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_hal *hal = &rtwdev->hal;
 
 	if (!chip->ops->config_txrx_mode || rtwdev->hal.txrx_1ss == txrx_1ss)
@@ -2318,11 +2188,7 @@ int rtw_register_hw(struct rtw_dev *rtwdev, struct ieee80211_hw *hw)
 
 	hw->wiphy->features |= NL80211_FEATURE_SCAN_RANDOM_MAC_ADDR;
 	hw->wiphy->max_scan_ssids = RTW_SCAN_MAX_SSIDS;
-<<<<<<< HEAD
 	hw->wiphy->max_scan_ie_len = rtw_get_max_scan_ie_len(rtwdev);
-=======
-	hw->wiphy->max_scan_ie_len = RTW_SCAN_MAX_IE_LEN;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	wiphy_ext_feature_set(hw->wiphy, NL80211_EXT_FEATURE_CAN_REPLACE_PTK0);
 	wiphy_ext_feature_set(hw->wiphy, NL80211_EXT_FEATURE_SCAN_RANDOM_SN);

@@ -167,11 +167,6 @@ enum SHIFT_DIRECTION {
 #define EXT4_MB_CR0_OPTIMIZED		0x8000
 /* Avg fragment size rb tree lookup succeeded at least once for cr = 1 */
 #define EXT4_MB_CR1_OPTIMIZED		0x00010000
-<<<<<<< HEAD
-=======
-/* Perform linear traversal for one group */
-#define EXT4_MB_SEARCH_NEXT_LINEAR	0x00020000
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct ext4_allocation_request {
 	/* target inode for block we're allocating */
 	struct inode *inode;
@@ -1603,13 +1598,8 @@ struct ext4_sb_info {
 	struct list_head s_discard_list;
 	struct work_struct s_discard_work;
 	atomic_t s_retry_alloc_pending;
-<<<<<<< HEAD
 	struct list_head *s_mb_avg_fragment_size;
 	rwlock_t *s_mb_avg_fragment_size_locks;
-=======
-	struct rb_root s_mb_avg_fragment_size_root;
-	rwlock_t s_mb_rb_lock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct list_head *s_mb_largest_free_orders;
 	rwlock_t *s_mb_largest_free_orders_locks;
 
@@ -3432,11 +3422,7 @@ struct ext4_group_info {
 	void            *bb_bitmap;
 #endif
 	struct rw_semaphore alloc_sem;
-<<<<<<< HEAD
 	struct list_head bb_avg_fragment_size_node;
-=======
-	struct rb_node	bb_avg_fragment_size_rb;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct list_head bb_largest_free_order_node;
 	ext4_grpblk_t	bb_counters[];	/* Nr of free power-of-two-block
 					 * regions, index is order.
@@ -3607,12 +3593,6 @@ extern bool empty_inline_dir(struct inode *dir, int *has_inline_data);
 extern struct buffer_head *ext4_get_first_inline_block(struct inode *inode,
 					struct ext4_dir_entry_2 **parent_de,
 					int *retval);
-<<<<<<< HEAD
-=======
-extern int ext4_inline_data_fiemap(struct inode *inode,
-				   struct fiemap_extent_info *fieinfo,
-				   int *has_inline, __u64 start, __u64 len);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern void *ext4_read_inline_link(struct inode *inode);
 
 struct iomap;
@@ -3640,13 +3620,8 @@ extern void ext4_initialize_dirent_tail(struct buffer_head *bh,
 					unsigned int blocksize);
 extern int ext4_handle_dirty_dirblock(handle_t *handle, struct inode *inode,
 				      struct buffer_head *bh);
-<<<<<<< HEAD
 extern int __ext4_unlink(struct inode *dir, const struct qstr *d_name,
 			 struct inode *inode, struct dentry *dentry);
-=======
-extern int __ext4_unlink(handle_t *handle, struct inode *dir, const struct qstr *d_name,
-			 struct inode *inode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int __ext4_link(struct inode *dir, struct inode *inode,
 		       struct dentry *dentry);
 

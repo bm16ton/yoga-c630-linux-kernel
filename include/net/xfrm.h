@@ -312,14 +312,11 @@ struct km_event {
 	struct net *net;
 };
 
-<<<<<<< HEAD
 struct xfrm_if_decode_session_result {
 	struct net *net;
 	u32 if_id;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct xfrm_if_cb {
 	bool (*decode_session)(struct sk_buff *skb,
 			       unsigned short family,
@@ -1584,11 +1581,7 @@ int xfrm_dev_state_flush(struct net *net, struct net_device *dev, bool task_vali
 void xfrm_sad_getinfo(struct net *net, struct xfrmk_sadinfo *si);
 void xfrm_spd_getinfo(struct net *net, struct xfrmk_spdinfo *si);
 u32 xfrm_replay_seqhi(struct xfrm_state *x, __be32 net_seq);
-<<<<<<< HEAD
 int xfrm_init_replay(struct xfrm_state *x, struct netlink_ext_ack *extack);
-=======
-int xfrm_init_replay(struct xfrm_state *x);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 u32 xfrm_state_mtu(struct xfrm_state *x, int mtu);
 int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offload,
 		      struct netlink_ext_ack *extack);

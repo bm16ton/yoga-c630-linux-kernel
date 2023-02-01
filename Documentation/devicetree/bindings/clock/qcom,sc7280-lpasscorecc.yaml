@@ -22,11 +22,8 @@ properties:
 
   clock-names: true
 
-<<<<<<< HEAD
   reg: true
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   compatible:
     enum:
       - qcom,sc7280-lpassaoncc
@@ -43,7 +40,6 @@ properties:
   '#power-domain-cells':
     const: 1
 
-<<<<<<< HEAD
   '#reset-cells':
     const: 1
 
@@ -52,10 +48,6 @@ properties:
       Indicates if the LPASS would be brought out of reset using
       peripheral loader.
     type: boolean
-=======
-  reg:
-    maxItems: 1
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 required:
   - compatible
@@ -85,14 +77,11 @@ allOf:
           items:
             - const: bi_tcxo
             - const: lpass_aon_cc_main_rcg_clk_src
-<<<<<<< HEAD
 
         reg:
           items:
             - description: lpass core cc register
             - description: lpass audio csr register
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - if:
       properties:
         compatible:
@@ -114,11 +103,8 @@ allOf:
             - const: bi_tcxo_ao
             - const: iface
 
-<<<<<<< HEAD
         reg:
           maxItems: 1
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - if:
       properties:
         compatible:
@@ -137,11 +123,8 @@ allOf:
           items:
             - const: bi_tcxo
 
-<<<<<<< HEAD
         reg:
           maxItems: 1
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
     #include <dt-bindings/clock/qcom,rpmh.h>
@@ -150,22 +133,15 @@ examples:
     #include <dt-bindings/clock/qcom,lpasscorecc-sc7280.h>
     lpass_audiocc: clock-controller@3300000 {
       compatible = "qcom,sc7280-lpassaudiocc";
-<<<<<<< HEAD
       reg = <0x3300000 0x30000>,
             <0x32a9000 0x1000>;
-=======
-      reg = <0x3300000 0x30000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       clocks = <&rpmhcc RPMH_CXO_CLK>,
                <&lpass_aon LPASS_AON_CC_MAIN_RCG_CLK_SRC>;
       clock-names = "bi_tcxo", "lpass_aon_cc_main_rcg_clk_src";
       power-domains = <&lpass_aon LPASS_AON_CC_LPASS_AUDIO_HM_GDSC>;
       #clock-cells = <1>;
       #power-domain-cells = <1>;
-<<<<<<< HEAD
       #reset-cells = <1>;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     };
 
   - |
@@ -208,10 +184,7 @@ examples:
       clocks = <&rpmhcc RPMH_CXO_CLK>, <&rpmhcc RPMH_CXO_CLK_A>,
                <&lpasscore LPASS_CORE_CC_CORE_CLK>;
       clock-names = "bi_tcxo", "bi_tcxo_ao","iface";
-<<<<<<< HEAD
       qcom,adsp-pil-mode;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       #clock-cells = <1>;
       #power-domain-cells = <1>;
     };

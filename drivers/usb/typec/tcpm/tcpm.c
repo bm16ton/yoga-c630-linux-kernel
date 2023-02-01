@@ -4601,10 +4601,6 @@ static void run_state_machine(struct tcpm_port *port)
 		else
 			tcpm_set_roles(port, true, port->pwr_role,
 				       TYPEC_HOST);
-<<<<<<< HEAD
-=======
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		tcpm_ams_finish(port);
 		tcpm_set_state(port, ready_state(port), 0);
 		break;

@@ -342,11 +342,7 @@ static const struct iio_info mcp3911_info = {
 static int mcp3911_config(struct mcp3911 *adc)
 {
 	struct device *dev = &adc->spi->dev;
-<<<<<<< HEAD
 	u32 regval;
-=======
-	u32 configreg;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	ret = device_property_read_u32(dev, "microchip,device-addr", &adc->dev_addr);
@@ -474,7 +470,6 @@ static int mcp3911_probe(struct spi_device *spi)
 	}
 
 	ret = mcp3911_config(adc);
-<<<<<<< HEAD
 	if (ret)
 		return ret;
 
@@ -484,8 +479,6 @@ static int mcp3911_probe(struct spi_device *spi)
 	else
 		ret = mcp3911_update(adc, MCP3911_REG_STATUSCOM, MCP3911_STATUSCOM_DRHIZ,
 				MCP3911_STATUSCOM_DRHIZ, 2);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -506,18 +499,11 @@ static int mcp3911_probe(struct spi_device *spi)
 		if (!adc->trig)
 			return -ENOMEM;
 
-<<<<<<< HEAD
 		adc->trig->ops = &mcp3911_trigger_ops;
 		iio_trigger_set_drvdata(adc->trig, adc);
 		ret = devm_iio_trigger_register(&spi->dev, adc->trig);
 		if (ret)
 			return ret;
-=======
-static void mcp3911_remove(struct spi_device *spi)
-{
-	struct iio_dev *indio_dev = spi_get_drvdata(spi);
-	struct mcp3911 *adc = iio_priv(indio_dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * The device generates interrupts as long as it is powered up.
@@ -531,7 +517,6 @@ static void mcp3911_remove(struct spi_device *spi)
 			return ret;
 	}
 
-<<<<<<< HEAD
 	ret = devm_iio_triggered_buffer_setup(&spi->dev, indio_dev,
 			NULL,
 			mcp3911_trigger_handler, NULL);
@@ -539,11 +524,6 @@ static void mcp3911_remove(struct spi_device *spi)
 		return ret;
 
 	return devm_iio_device_register(&adc->spi->dev, indio_dev);
-=======
-	clk_disable_unprepare(adc->clki);
-	if (adc->vref)
-		regulator_disable(adc->vref);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id mcp3911_dt_ids[] = {

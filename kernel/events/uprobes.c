@@ -157,11 +157,7 @@ static int __replace_page(struct vm_area_struct *vma, unsigned long addr,
 	struct folio *old_folio = page_folio(old_page);
 	struct folio *new_folio;
 	struct mm_struct *mm = vma->vm_mm;
-<<<<<<< HEAD
 	DEFINE_FOLIO_VMA_WALK(pvmw, old_folio, vma, addr, 0);
-=======
-	DEFINE_FOLIO_VMA_WALK(pvmw, page_folio(old_page), vma, addr, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 	struct mmu_notifier_range range;
 
@@ -169,24 +165,14 @@ static int __replace_page(struct vm_area_struct *vma, unsigned long addr,
 				addr + PAGE_SIZE);
 
 	if (new_page) {
-<<<<<<< HEAD
 		new_folio = page_folio(new_page);
 		err = mem_cgroup_charge(new_folio, vma->vm_mm, GFP_KERNEL);
-=======
-		err = mem_cgroup_charge(page_folio(new_page), vma->vm_mm,
-					GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (err)
 			return err;
 	}
 
-<<<<<<< HEAD
 	/* For folio_free_swap() below */
 	folio_lock(old_folio);
-=======
-	/* For try_to_free_swap() below */
-	lock_page(old_page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mmu_notifier_invalidate_range_start(&range);
 	err = -EAGAIN;
@@ -195,15 +181,9 @@ static int __replace_page(struct vm_area_struct *vma, unsigned long addr,
 	VM_BUG_ON_PAGE(addr != pvmw.address, old_page);
 
 	if (new_page) {
-<<<<<<< HEAD
 		folio_get(new_folio);
 		page_add_new_anon_rmap(new_page, vma, addr);
 		folio_add_lru_vma(new_folio, vma);
-=======
-		get_page(new_page);
-		page_add_new_anon_rmap(new_page, vma, addr);
-		lru_cache_add_inactive_or_unevictable(new_page, vma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else
 		/* no new page, just dec_mm_counter for old_page */
 		dec_mm_counter(mm, MM_ANONPAGES);
@@ -220,17 +200,10 @@ static int __replace_page(struct vm_area_struct *vma, unsigned long addr,
 				  mk_pte(new_page, vma->vm_page_prot));
 
 	page_remove_rmap(old_page, vma, false);
-<<<<<<< HEAD
 	if (!folio_mapped(old_folio))
 		folio_free_swap(old_folio);
 	page_vma_mapped_walk_done(&pvmw);
 	folio_put(old_folio);
-=======
-	if (!page_mapped(old_page))
-		try_to_free_swap(old_page);
-	page_vma_mapped_walk_done(&pvmw);
-	put_page(old_page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = 0;
  unlock:

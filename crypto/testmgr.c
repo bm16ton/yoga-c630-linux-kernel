@@ -1035,11 +1035,7 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
 
 	p += scnprintf(p, end - p, "random:");
 
-<<<<<<< HEAD
 	switch (prandom_u32_max(4)) {
-=======
-	switch (prandom_u32() % 4) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case 0:
 	case 1:
 		cfg->inplace_mode = OUT_OF_PLACE;
@@ -1088,11 +1084,7 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
 					  cfg->req_flags);
 	p += scnprintf(p, end - p, "]");
 
-<<<<<<< HEAD
 	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_u32_max(2) == 0) {
-=======
-	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_u32() % 2 == 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		p += scnprintf(p, end - p, " dst_divs=[");
 		p = generate_random_sgl_divisions(cfg->dst_divs,
 						  ARRAY_SIZE(cfg->dst_divs),

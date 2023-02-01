@@ -594,11 +594,7 @@ static void serial_txx9_shutdown(struct uart_port *up)
 
 static void
 serial_txx9_set_termios(struct uart_port *up, struct ktermios *termios,
-<<<<<<< HEAD
 			const struct ktermios *old)
-=======
-		       struct ktermios *old)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned int cval, fcr = 0;
 	unsigned long flags;

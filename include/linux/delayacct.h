@@ -73,13 +73,8 @@ extern int delayacct_add_tsk(struct taskstats *, struct task_struct *);
 extern __u64 __delayacct_blkio_ticks(struct task_struct *);
 extern void __delayacct_freepages_start(void);
 extern void __delayacct_freepages_end(void);
-<<<<<<< HEAD
 extern void __delayacct_thrashing_start(bool *in_thrashing);
 extern void __delayacct_thrashing_end(bool *in_thrashing);
-=======
-extern void __delayacct_thrashing_start(void);
-extern void __delayacct_thrashing_end(void);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern void __delayacct_swapin_start(void);
 extern void __delayacct_swapin_end(void);
 extern void __delayacct_compact_start(void);
@@ -207,63 +202,6 @@ static inline void delayacct_wpcopy_start(void)
 	if (!static_branch_unlikely(&delayacct_key))
 		return;
 
-<<<<<<< HEAD
-	if (current->delays)
-		__delayacct_wpcopy_start();
-}
-
-static inline void delayacct_wpcopy_end(void)
-{
-	if (!static_branch_unlikely(&delayacct_key))
-		return;
-
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	if (current->delays)
-		__delayacct_wpcopy_end();
-}
-
-static inline void delayacct_swapin_start(void)
-{
-	if (!static_branch_unlikely(&delayacct_key))
-		return;
-
-	if (current->delays)
-		__delayacct_swapin_start();
-}
-
-static inline void delayacct_swapin_end(void)
-{
-	if (!static_branch_unlikely(&delayacct_key))
-		return;
-
-	if (current->delays)
-		__delayacct_swapin_end();
-}
-
-static inline void delayacct_compact_start(void)
-{
-	if (!static_branch_unlikely(&delayacct_key))
-		return;
-
-	if (current->delays)
-		__delayacct_compact_start();
-}
-
-static inline void delayacct_compact_end(void)
-{
-	if (!static_branch_unlikely(&delayacct_key))
-		return;
-
-	if (current->delays)
-		__delayacct_compact_end();
-}
-
-static inline void delayacct_wpcopy_start(void)
-{
-	if (!static_branch_unlikely(&delayacct_key))
-		return;
-
 	if (current->delays)
 		__delayacct_wpcopy_start();
 }
@@ -302,18 +240,6 @@ static inline void delayacct_freepages_end(void)
 static inline void delayacct_thrashing_start(bool *in_thrashing)
 {}
 static inline void delayacct_thrashing_end(bool *in_thrashing)
-{}
-static inline void delayacct_swapin_start(void)
-{}
-static inline void delayacct_swapin_end(void)
-{}
-static inline void delayacct_compact_start(void)
-{}
-static inline void delayacct_compact_end(void)
-{}
-static inline void delayacct_wpcopy_start(void)
-{}
-static inline void delayacct_wpcopy_end(void)
 {}
 static inline void delayacct_swapin_start(void)
 {}

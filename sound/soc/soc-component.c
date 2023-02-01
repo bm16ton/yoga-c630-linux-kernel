@@ -932,7 +932,6 @@ int snd_soc_pcm_component_pointer(struct snd_pcm_substream *substream)
 	return 0;
 }
 
-<<<<<<< HEAD
 static bool snd_soc_component_is_codec_on_rtd(struct snd_soc_pcm_runtime *rtd,
 					      struct snd_soc_component *component)
 {
@@ -947,8 +946,6 @@ static bool snd_soc_component_is_codec_on_rtd(struct snd_soc_pcm_runtime *rtd,
 	return false;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void snd_soc_pcm_component_delay(struct snd_pcm_substream *substream,
 				 snd_pcm_sframes_t *cpu_delay,
 				 snd_pcm_sframes_t *codec_delay)
@@ -970,11 +967,7 @@ void snd_soc_pcm_component_delay(struct snd_pcm_substream *substream,
 
 		delay = component->driver->delay(component, substream);
 
-<<<<<<< HEAD
 		if (snd_soc_component_is_codec_on_rtd(rtd, component))
-=======
-		if (snd_soc_component_is_codec(component))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			*codec_delay = max(*codec_delay, delay);
 		else
 			*cpu_delay = max(*cpu_delay, delay);

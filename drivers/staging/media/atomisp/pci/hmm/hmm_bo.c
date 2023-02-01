@@ -615,7 +615,6 @@ found:
 	return bo;
 }
 
-<<<<<<< HEAD
 static void free_pages_bulk_array(unsigned long nr_pages, struct page **page_array)
 {
 	unsigned long i;
@@ -628,30 +627,6 @@ static void free_private_bo_pages(struct hmm_buffer_object *bo)
 {
 	set_pages_array_wb(bo->pages, bo->pgnr);
 	free_pages_bulk_array(bo->pgnr, bo->pages);
-=======
-static void free_private_bo_pages(struct hmm_buffer_object *bo,
-				  int free_pgnr)
-{
-	int i, ret;
-
-	for (i = 0; i < free_pgnr; i++) {
-		ret = set_pages_wb(bo->pages[i], 1);
-		if (ret)
-			dev_err(atomisp_dev,
-				"set page to WB err ...ret = %d\n",
-				ret);
-		/*
-		W/A: set_pages_wb seldom return value = -EFAULT
-		indicate that address of page is not in valid
-		range(0xffff880000000000~0xffffc7ffffffffff)
-		then, _free_pages would panic; Do not know why page
-		address be valid,it maybe memory corruption by lowmemory
-		*/
-		if (!ret) {
-			__free_pages(bo->pages[i], 0);
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*Allocate pages which will be used only by ISP*/
@@ -660,7 +635,6 @@ static int alloc_private_pages(struct hmm_buffer_object *bo)
 	const gfp_t gfp = __GFP_NOWARN | __GFP_RECLAIM | __GFP_FS;
 	int ret;
 
-<<<<<<< HEAD
 	ret = alloc_pages_bulk_array(gfp, bo->pgnr, bo->pages);
 	if (ret != bo->pgnr) {
 		free_pages_bulk_array(ret, bo->pages);
@@ -675,102 +649,6 @@ static int alloc_private_pages(struct hmm_buffer_object *bo)
 	}
 
 	return 0;
-=======
-	pgnr = bo->pgnr;
-
-	i = 0;
-	alloc_pgnr = 0;
-
-	while (pgnr) {
-		order = nr_to_order_bottom(pgnr);
-		/*
-		 * if be short of memory, we will set order to 0
-		 * everytime.
-		 */
-		if (lack_mem)
-			order = HMM_MIN_ORDER;
-		else if (order > HMM_MAX_ORDER)
-			order = HMM_MAX_ORDER;
-retry:
-		/*
-		 * When order > HMM_MIN_ORDER, for performance reasons we don't
-		 * want alloc_pages() to sleep. In case it fails and fallbacks
-		 * to HMM_MIN_ORDER or in case the requested order is originally
-		 * the minimum value, we can allow alloc_pages() to sleep for
-		 * robustness purpose.
-		 *
-		 * REVISIT: why __GFP_FS is necessary?
-		 */
-		if (order == HMM_MIN_ORDER) {
-			gfp &= ~GFP_NOWAIT;
-			gfp |= __GFP_RECLAIM | __GFP_FS;
-		}
-
-		pages = alloc_pages(gfp, order);
-		if (unlikely(!pages)) {
-			/*
-			 * in low memory case, if allocation page fails,
-			 * we turn to try if order=0 allocation could
-			 * succeed. if order=0 fails too, that means there is
-			 * no memory left.
-			 */
-			if (order == HMM_MIN_ORDER) {
-				dev_err(atomisp_dev,
-					"%s: cannot allocate pages\n",
-					__func__);
-				goto cleanup;
-			}
-			order = HMM_MIN_ORDER;
-			failure_number++;
-			reduce_order = true;
-			/*
-			 * if fail two times continuously, we think be short
-			 * of memory now.
-			 */
-			if (failure_number == 2) {
-				lack_mem = true;
-				failure_number = 0;
-			}
-			goto retry;
-		} else {
-			blk_pgnr = order_to_nr(order);
-
-			/*
-			 * set memory to uncacheable -- UC_MINUS
-			 */
-			ret = set_pages_uc(pages, blk_pgnr);
-			if (ret) {
-				dev_err(atomisp_dev,
-					"set page uncacheablefailed.\n");
-
-				__free_pages(pages, order);
-
-				goto cleanup;
-			}
-
-			for (j = 0; j < blk_pgnr; j++, i++) {
-				bo->pages[i] = pages + j;
-			}
-
-			pgnr -= blk_pgnr;
-
-			/*
-			 * if order is not reduced this time, clear
-			 * failure_number.
-			 */
-			if (reduce_order)
-				reduce_order = false;
-			else
-				failure_number = 0;
-		}
-	}
-
-	return 0;
-cleanup:
-	alloc_pgnr = i;
-	free_private_bo_pages(bo, alloc_pgnr);
-	return -ENOMEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void free_user_pages(struct hmm_buffer_object *bo,
@@ -778,17 +656,8 @@ static void free_user_pages(struct hmm_buffer_object *bo,
 {
 	int i;
 
-<<<<<<< HEAD
 	for (i = 0; i < page_nr; i++)
 		put_page(bo->pages[i]);
-=======
-	if (bo->mem_type == HMM_BO_MEM_TYPE_PFN) {
-		unpin_user_pages(bo->pages, page_nr);
-	} else {
-		for (i = 0; i < page_nr; i++)
-			put_page(bo->pages[i]);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -798,54 +667,13 @@ static int alloc_user_pages(struct hmm_buffer_object *bo,
 			    const void __user *userptr)
 {
 	int page_nr;
-<<<<<<< HEAD
 
 	userptr = untagged_addr(userptr);
-=======
-	struct vm_area_struct *vma;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Handle frame buffer allocated in user space */
 	mutex_unlock(&bo->mutex);
-<<<<<<< HEAD
 	page_nr = get_user_pages_fast((unsigned long)userptr, bo->pgnr, 1, bo->pages);
 	mutex_lock(&bo->mutex);
-=======
-	mmap_read_lock(current->mm);
-	vma = find_vma(current->mm, (unsigned long)userptr);
-	mmap_read_unlock(current->mm);
-	if (!vma) {
-		dev_err(atomisp_dev, "find_vma failed\n");
-		mutex_lock(&bo->mutex);
-		return -EFAULT;
-	}
-	mutex_lock(&bo->mutex);
-	/*
-	 * Handle frame buffer allocated in other kerenl space driver
-	 * and map to user space
-	 */
-
-	userptr = untagged_addr(userptr);
-
-	if (vma->vm_flags & (VM_IO | VM_PFNMAP)) {
-		page_nr = pin_user_pages((unsigned long)userptr, bo->pgnr,
-					 FOLL_LONGTERM | FOLL_WRITE,
-					 bo->pages, NULL);
-		bo->mem_type = HMM_BO_MEM_TYPE_PFN;
-	} else {
-		/*Handle frame buffer allocated in user space*/
-		mutex_unlock(&bo->mutex);
-		page_nr = get_user_pages_fast((unsigned long)userptr,
-					      (int)(bo->pgnr), 1, bo->pages);
-		mutex_lock(&bo->mutex);
-		bo->mem_type = HMM_BO_MEM_TYPE_USER;
-	}
-
-	dev_dbg(atomisp_dev, "%s: %d %s pages were allocated as 0x%08x\n",
-		__func__,
-		bo->pgnr,
-		bo->mem_type == HMM_BO_MEM_TYPE_USER ? "user" : "pfn", page_nr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* can be written by caller, not forced */
 	if (page_nr != bo->pgnr) {
@@ -886,11 +714,7 @@ int hmm_bo_alloc_pages(struct hmm_buffer_object *bo,
 	mutex_lock(&bo->mutex);
 	check_bo_status_no_goto(bo, HMM_BO_PAGE_ALLOCED, status_err);
 
-<<<<<<< HEAD
 	bo->pages = kcalloc(bo->pgnr, sizeof(struct page *), GFP_KERNEL);
-=======
-	bo->pages = kmalloc_array(bo->pgnr, sizeof(struct page *), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(!bo->pages)) {
 		ret = -ENOMEM;
 		goto alloc_err;
@@ -946,11 +770,7 @@ void hmm_bo_free_pages(struct hmm_buffer_object *bo)
 	bo->status &= (~HMM_BO_PAGE_ALLOCED);
 
 	if (bo->type == HMM_BO_PRIVATE)
-<<<<<<< HEAD
 		free_private_bo_pages(bo);
-=======
-		free_private_bo_pages(bo, bo->pgnr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else if (bo->type == HMM_BO_USER)
 		free_user_pages(bo, bo->pgnr);
 	else

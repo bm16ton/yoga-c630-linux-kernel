@@ -17,11 +17,7 @@
  * Currently assumes nano seconds.
  */
 
-<<<<<<< HEAD
 struct fwnode_reference_args;
-=======
-struct of_phandle_args;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum iio_shared_by {
 	IIO_SEPARATE,

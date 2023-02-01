@@ -84,13 +84,8 @@ static void get_stack_print_output(void *ctx, int cpu, void *data, __u32 size)
 
 void test_get_stack_raw_tp(void)
 {
-<<<<<<< HEAD
 	const char *file = "./test_get_stack_rawtp.bpf.o";
 	const char *file_err = "./test_get_stack_rawtp_err.bpf.o";
-=======
-	const char *file = "./test_get_stack_rawtp.o";
-	const char *file_err = "./test_get_stack_rawtp_err.o";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const char *prog_name = "bpf_prog1";
 	int i, err, prog_fd, exp_cnt = MAX_CNT_RAWTP;
 	struct perf_buffer *pb = NULL;

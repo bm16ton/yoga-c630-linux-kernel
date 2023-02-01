@@ -123,10 +123,7 @@ static struct cmn2asic_msg_mapping smu_v13_0_7_message_map[SMU_MSG_MAX_COUNT] = 
 	MSG_MAP(SetMGpuFanBoostLimitRpm,	PPSMC_MSG_SetMGpuFanBoostLimitRpm,     0),
 	MSG_MAP(DFCstateControl,		PPSMC_MSG_SetExternalClientDfCstateAllow, 0),
 	MSG_MAP(ArmD3,				PPSMC_MSG_ArmD3,                       0),
-<<<<<<< HEAD
 	MSG_MAP(AllowGpo,			PPSMC_MSG_SetGpoAllow,           0),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct cmn2asic_mapping smu_v13_0_7_clk_map[SMU_CLK_COUNT] = {
@@ -193,12 +190,9 @@ static struct cmn2asic_mapping smu_v13_0_7_feature_mask_map[SMU_FEATURE_COUNT] =
 	FEA_MAP(MEM_TEMP_READ),
 	FEA_MAP(ATHUB_MMHUB_PG),
 	FEA_MAP(SOC_PCC),
-<<<<<<< HEAD
 	[SMU_FEATURE_DPM_VCLK_BIT] = {1, FEATURE_MM_DPM_BIT},
 	[SMU_FEATURE_DPM_DCLK_BIT] = {1, FEATURE_MM_DPM_BIT},
 	[SMU_FEATURE_PPT_BIT] = {1, FEATURE_THROTTLERS_BIT},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct cmn2asic_mapping smu_v13_0_7_table_map[SMU_TABLE_COUNT] = {
@@ -1369,7 +1363,6 @@ static int smu_v13_0_7_populate_umd_state_clk(struct smu_context *smu)
 static int smu_v13_0_7_get_fan_speed_pwm(struct smu_context *smu,
 					 uint32_t *speed)
 {
-<<<<<<< HEAD
 	int ret;
 
 	if (!speed)
@@ -1387,14 +1380,6 @@ static int smu_v13_0_7_get_fan_speed_pwm(struct smu_context *smu,
 	*speed = MIN(*speed * 255 / 100, 255);
 
 	return 0;
-=======
-	if (!speed)
-		return -EINVAL;
-
-	return smu_v13_0_7_get_smu_metrics_data(smu,
-						METRICS_CURR_FANPWM,
-						speed);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int smu_v13_0_7_get_fan_speed_rpm(struct smu_context *smu,
@@ -1466,11 +1451,7 @@ static int smu_v13_0_7_get_power_limit(struct smu_context *smu,
 
 static int smu_v13_0_7_get_power_profile_mode(struct smu_context *smu, char *buf)
 {
-<<<<<<< HEAD
 	DpmActivityMonitorCoeffIntExternal_t *activity_monitor_external;
-=======
-	DpmActivityMonitorCoeffIntExternal_t activity_monitor_external[PP_SMC_POWER_PROFILE_COUNT];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	uint32_t i, j, size = 0;
 	int16_t workload_type = 0;
 	int result = 0;
@@ -1478,15 +1459,12 @@ static int smu_v13_0_7_get_power_profile_mode(struct smu_context *smu, char *buf
 	if (!buf)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	activity_monitor_external = kcalloc(PP_SMC_POWER_PROFILE_COUNT,
 					    sizeof(*activity_monitor_external),
 					    GFP_KERNEL);
 	if (!activity_monitor_external)
 		return -ENOMEM;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size += sysfs_emit_at(buf, size, "                              ");
 	for (i = 0; i <= PP_SMC_POWER_PROFILE_WINDOW3D; i++)
 		size += sysfs_emit_at(buf, size, "%-14s%s", amdgpu_pp_profile_name[i],
@@ -1499,26 +1477,17 @@ static int smu_v13_0_7_get_power_profile_mode(struct smu_context *smu, char *buf
 		workload_type = smu_cmn_to_asic_specific_index(smu,
 							       CMN2ASIC_MAPPING_WORKLOAD,
 							       i);
-<<<<<<< HEAD
 		if (workload_type < 0) {
 			result = -EINVAL;
 			goto out;
 		}
-=======
-		if (workload_type < 0)
-			return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		result = smu_cmn_update_table(smu,
 					  SMU_TABLE_ACTIVITY_MONITOR_COEFF, workload_type,
 					  (void *)(&activity_monitor_external[i]), false);
 		if (result) {
 			dev_err(smu->adev->dev, "[%s] Failed to get activity monitor!", __func__);
-<<<<<<< HEAD
 			goto out;
-=======
-			return result;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -1546,14 +1515,10 @@ do {													\
 	PRINT_DPM_MONITOR(Fclk_BoosterFreq);
 #undef PRINT_DPM_MONITOR
 
-<<<<<<< HEAD
 	result = size;
 out:
 	kfree(activity_monitor_external);
 	return result;
-=======
-	return size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int smu_v13_0_7_set_power_profile_mode(struct smu_context *smu, long *input, uint32_t size)
@@ -1748,10 +1713,7 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
 	.mode1_reset = smu_v13_0_mode1_reset,
 	.set_mp1_state = smu_v13_0_7_set_mp1_state,
 	.set_df_cstate = smu_v13_0_7_set_df_cstate,
-<<<<<<< HEAD
 	.gpo_control = smu_v13_0_gpo_control,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)

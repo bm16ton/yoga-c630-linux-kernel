@@ -1,10 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
-<<<<<<< HEAD
  * Copyright (c) 2014-2022, NVIDIA CORPORATION.  All rights reserved.
-=======
- * Copyright (c) 2014-2020, NVIDIA CORPORATION.  All rights reserved.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Copyright (c) 2015, Google Inc.
  */
 

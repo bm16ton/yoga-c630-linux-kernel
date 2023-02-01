@@ -13,10 +13,7 @@
 #include "pmk8350.dtsi"
 
 #include "sc7280-chrome-common.dtsi"
-<<<<<<< HEAD
 #include "sc7280-herobrine-lte-sku.dtsi"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 / {
 	aliases {
@@ -24,7 +21,6 @@
 		serial1 = &uart7;
 	};
 
-<<<<<<< HEAD
 	max98360a: audio-codec-0 {
 		compatible = "maxim,max98360a";
 		pinctrl-names = "default";
@@ -61,8 +57,6 @@
 		#sound-dai-cells = <1>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpio-keys {
 		compatible = "gpio-keys";
 		label = "gpio-keys";
@@ -92,7 +86,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&nvme_pwren>;
 	};
-<<<<<<< HEAD
 
 	sound: sound {
 		compatible = "google,sc7280-herobrine";
@@ -191,8 +184,6 @@
 			};
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &apps_rsc {
@@ -390,7 +381,6 @@
 	modem-init;
 };
 
-<<<<<<< HEAD
 &lpass_cpu {
 	status = "okay";
 
@@ -435,11 +425,6 @@
 &pcie1 {
 	status = "okay";
 	perst-gpios = <&tlmm 2 GPIO_ACTIVE_LOW>;
-=======
-&pcie1 {
-	status = "okay";
-	perst-gpio = <&tlmm 2 GPIO_ACTIVE_LOW>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vddpe-3v3-supply = <&nvme_3v3_regulator>;
 
@@ -497,7 +482,6 @@
 	cd-gpios = <&tlmm 91 GPIO_ACTIVE_LOW>;
 };
 
-<<<<<<< HEAD
 &swr0 {
 	status = "okay";
 
@@ -520,8 +504,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &uart5 {
 	compatible = "qcom,geni-debug-uart";
 	status = "okay";
@@ -766,7 +748,6 @@
 };
 
 &tlmm {
-<<<<<<< HEAD
 	amp_en: amp-en {
 		pins = "gpio63";
 		bias-pull-down;
@@ -774,28 +755,17 @@
 	};
 
 	bt_en: bt-en-pins {
-=======
-	bt_en: bt-en {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio85";
 		function = "gpio";
 		output-low;
 		bias-disable;
 	};
 
-<<<<<<< HEAD
 	nvme_pwren: nvme-pwren-pins {
 		function = "gpio";
 	};
 
 	pcie1_reset_n: pcie1-reset-n-pins {
-=======
-	nvme_pwren: nvme-pwren {
-		function = "gpio";
-	};
-
-	pcie1_reset_n: pcie1-reset-n {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio2";
 		function = "gpio";
 
@@ -804,11 +774,7 @@
 		bias-disable;
 	};
 
-<<<<<<< HEAD
 	pcie1_wake_n: pcie1-wake-n-pins {
-=======
-	pcie1_wake_n: pcie1-wake-n {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio3";
 		function = "gpio";
 
@@ -816,11 +782,7 @@
 		bias-pull-up;
 	};
 
-<<<<<<< HEAD
 	qup_uart7_sleep_cts: qup-uart7-sleep-cts-pins {
-=======
-	qup_uart7_sleep_cts: qup-uart7-sleep-cts {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio28";
 		function = "gpio";
 		/*
@@ -833,11 +795,7 @@
 		bias-bus-hold;
 	};
 
-<<<<<<< HEAD
 	qup_uart7_sleep_rts: qup-uart7-sleep-rts-pins {
-=======
-	qup_uart7_sleep_rts: qup-uart7-sleep-rts {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio29";
 		function = "gpio";
 		/*
@@ -849,11 +807,7 @@
 		bias-pull-down;
 	};
 
-<<<<<<< HEAD
 	qup_uart7_sleep_tx: qup-uart7-sleep-tx-pins {
-=======
-	qup_uart7_sleep_tx: qup-uart7-sleep-tx {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio30";
 		function = "gpio";
 		/*
@@ -863,11 +817,7 @@
 		bias-pull-up;
 	};
 
-<<<<<<< HEAD
 	qup_uart7_sleep_rx: qup-uart7-sleep-rx-pins {
-=======
-	qup_uart7_sleep_rx: qup-uart7-sleep-rx {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio31";
 		function = "gpio";
 		/*
@@ -878,26 +828,17 @@
 		bias-pull-up;
 	};
 
-<<<<<<< HEAD
 	sd_cd: sd-cd-pins {
-=======
-	sd_cd: sd-cd {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio91";
 		function = "gpio";
 		bias-pull-up;
 	};
 
-<<<<<<< HEAD
 	sw_ctrl: sw-ctrl-pins {
-=======
-	sw_ctrl: sw-ctrl {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio86";
 		function = "gpio";
 		bias-pull-down;
 	};
-<<<<<<< HEAD
 
 	wcd_reset_n: wcd-reset-n {
 		pins = "gpio83";
@@ -911,6 +852,4 @@
 		drive-strength = <8>;
 		bias-disable;
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

@@ -779,13 +779,6 @@ static void _rtl92e_dm_tx_power_tracking_cb_thermal(struct net_device *dev)
 		for (i = 0; i < OFDM_Table_Length; i++) {
 			if (tmpRegA == OFDMSwingTable[i]) {
 				priv->OFDM_index[0] = i;
-<<<<<<< HEAD
-=======
-				RT_TRACE(COMP_POWER_TRACKING,
-					 "Initial reg0x%x = 0x%x, OFDM_index = 0x%x\n",
-					 rOFDM0_XATxIQImbalance, tmpRegA,
-					 priv->OFDM_index[0]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 		}
 
@@ -793,13 +786,6 @@ static void _rtl92e_dm_tx_power_tracking_cb_thermal(struct net_device *dev)
 		for (i = 0; i < CCK_Table_length; i++) {
 			if (TempCCk == (u32)CCKSwingTable_Ch1_Ch13[i][0]) {
 				priv->CCK_index = i;
-<<<<<<< HEAD
-=======
-				RT_TRACE(COMP_POWER_TRACKING,
-					 "Initial reg0x%x = 0x%x, CCK_index = 0x%x\n",
-					 rCCK0_TxFilter1, TempCCk,
-					 priv->CCK_index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				break;
 			}
 		}

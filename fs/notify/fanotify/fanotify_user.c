@@ -619,11 +619,7 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 				  char __user *buf, size_t count)
 {
 	struct fanotify_event_metadata metadata;
-<<<<<<< HEAD
 	const struct path *path = fanotify_event_path(event);
-=======
-	struct path *path = fanotify_event_path(event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct fanotify_info *info = fanotify_event_info(event);
 	unsigned int info_mode = FAN_GROUP_FLAG(group, FANOTIFY_INFO_MODES);
 	unsigned int pidfd_mode = info_mode & FAN_REPORT_PIDFD;
@@ -1557,11 +1553,7 @@ static int fanotify_test_fid(struct dentry *dentry)
 }
 
 static int fanotify_events_supported(struct fsnotify_group *group,
-<<<<<<< HEAD
 				     const struct path *path, __u64 mask,
-=======
-				     struct path *path, __u64 mask,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				     unsigned int flags)
 {
 	unsigned int mark_type = flags & FANOTIFY_MARK_TYPE_BITS;

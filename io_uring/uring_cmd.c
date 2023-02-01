@@ -4,18 +4,12 @@
 #include <linux/file.h>
 #include <linux/io_uring.h>
 #include <linux/security.h>
-<<<<<<< HEAD
 #include <linux/nospec.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <uapi/linux/io_uring.h>
 
 #include "io_uring.h"
-<<<<<<< HEAD
 #include "rsrc.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "uring_cmd.h"
 
 static void io_uring_cmd_work(struct io_kiocb *req, bool *locked)
@@ -58,15 +52,11 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2)
 	io_req_set_res(req, ret, 0);
 	if (req->ctx->flags & IORING_SETUP_CQE32)
 		io_req_set_cqe32_extra(req, res2, 0);
-<<<<<<< HEAD
 	if (req->ctx->flags & IORING_SETUP_IOPOLL)
 		/* order with io_iopoll_req_issued() checking ->iopoll_complete */
 		smp_store_release(&req->iopoll_completed, 1);
 	else
 		__io_req_complete(req, 0);
-=======
-	__io_req_complete(req, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(io_uring_cmd_done);
 
@@ -88,7 +78,6 @@ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
 
-<<<<<<< HEAD
 	if (sqe->__pad1)
 		return -EINVAL;
 
@@ -107,10 +96,6 @@ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 		req->imu = ctx->user_bufs[index];
 		io_req_set_rsrc_node(req, ctx, 0);
 	}
-=======
-	if (sqe->rw_flags || sqe->__pad1)
-		return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ioucmd->cmd = sqe->cmd;
 	ioucmd->cmd_op = READ_ONCE(sqe->cmd_op);
 	return 0;
@@ -134,16 +119,11 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
 		issue_flags |= IO_URING_F_SQE128;
 	if (ctx->flags & IORING_SETUP_CQE32)
 		issue_flags |= IO_URING_F_CQE32;
-<<<<<<< HEAD
 	if (ctx->flags & IORING_SETUP_IOPOLL) {
 		issue_flags |= IO_URING_F_IOPOLL;
 		req->iopoll_completed = 0;
 		WRITE_ONCE(ioucmd->cookie, NULL);
 	}
-=======
-	if (ctx->flags & IORING_SETUP_IOPOLL)
-		issue_flags |= IO_URING_F_IOPOLL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (req_has_async_data(req))
 		ioucmd->cmd = req->async_data;
@@ -167,7 +147,6 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
 
 	return IOU_ISSUE_SKIP_COMPLETE;
 }
-<<<<<<< HEAD
 
 int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
 			      struct iov_iter *iter, void *ioucmd)
@@ -177,5 +156,3 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
 	return io_import_fixed(rw, iter, req->imu, ubuf, len);
 }
 EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

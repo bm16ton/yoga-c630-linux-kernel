@@ -383,11 +383,7 @@ static int vdpasim_blk_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
 	dev_attr.work_fn = vdpasim_blk_work;
 	dev_attr.buffer_size = VDPASIM_BLK_CAPACITY << SECTOR_SHIFT;
 
-<<<<<<< HEAD
 	simdev = vdpasim_create(&dev_attr, config);
-=======
-	simdev = vdpasim_create(&dev_attr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(simdev))
 		return PTR_ERR(simdev);
 
@@ -431,15 +427,10 @@ static int __init vdpasim_blk_init(void)
 	int ret;
 
 	ret = device_register(&vdpasim_blk_mgmtdev);
-<<<<<<< HEAD
 	if (ret) {
 		put_device(&vdpasim_blk_mgmtdev);
 		return ret;
 	}
-=======
-	if (ret)
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = vdpa_mgmtdev_register(&mgmt_dev);
 	if (ret)

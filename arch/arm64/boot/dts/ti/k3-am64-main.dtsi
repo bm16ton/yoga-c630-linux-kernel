@@ -550,11 +550,7 @@
 		};
 	};
 
-<<<<<<< HEAD
 	main_cpts0: cpts@39000000 {
-=======
-	cpts@39000000 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "ti,j721e-cpts";
 		reg = <0x0 0x39000000 0x0 0x400>;
 		reg-names = "cpts";
@@ -1312,7 +1308,6 @@
 		interrupt-names = "int0", "int1";
 		bosch,mram-cfg = <0x0 128 64 64 64 64 32 32>;
 	};
-<<<<<<< HEAD
 
 	crypto: crypto@40900000 {
 		compatible = "ti,am64-sa2ul";
@@ -1361,6 +1356,4 @@
 		clocks = <&k3_clks 54 0>;
 		clock-names = "fck";
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

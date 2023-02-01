@@ -124,11 +124,7 @@ static int sun8i_ss_setup_ivs(struct skcipher_request *areq)
 	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
 	struct sun8i_ss_flow *sf = &ss->flows[rctx->flow];
 	int i = 0;
-<<<<<<< HEAD
 	dma_addr_t a;
-=======
-	u32 a;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	rctx->ivlen = ivsize;

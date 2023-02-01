@@ -33,36 +33,22 @@ properties:
   compatible:
     items:
       - enum:
-<<<<<<< HEAD
           - qcom,pm6150
           - qcom,pm6150l
           - qcom,pm6350
           - qcom,pm660
           - qcom,pm660l
           - qcom,pm7250b
-=======
-          - qcom,pm660
-          - qcom,pm660l
-          - qcom,pm6150
-          - qcom,pm6150l
-          - qcom,pm6350
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - qcom,pm7325
           - qcom,pm8004
           - qcom,pm8005
           - qcom,pm8009
           - qcom,pm8019
-<<<<<<< HEAD
           - qcom,pm8028
           - qcom,pm8110
           - qcom,pm8150
           - qcom,pm8150b
           - qcom,pm8150c
-=======
-          - qcom,pm8110
-          - qcom,pm8150
-          - qcom,pm8150b
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - qcom,pm8150l
           - qcom,pm8226
           - qcom,pm8350
@@ -73,10 +59,7 @@ properties:
           - qcom,pm8916
           - qcom,pm8941
           - qcom,pm8950
-<<<<<<< HEAD
           - qcom,pm8953
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - qcom,pm8994
           - qcom,pm8998
           - qcom,pma8084
@@ -85,15 +68,10 @@ properties:
           - qcom,pmi8962
           - qcom,pmi8994
           - qcom,pmi8998
-<<<<<<< HEAD
           - qcom,pmk8002
           - qcom,pmk8350
           - qcom,pmm8155au
           - qcom,pmp8074
-=======
-          - qcom,pmk8350
-          - qcom,pmm8155au
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - qcom,pmr735a
           - qcom,pmr735b
           - qcom,pms405
@@ -118,15 +96,11 @@ properties:
 
   regulators:
     type: object
-<<<<<<< HEAD
     $ref: /schemas/regulator/qcom,spmi-regulator.yaml#
 
   pwm:
     type: object
     $ref: /schemas/leds/leds-qcom-lpg.yaml#
-=======
-    $ref: /schemas/regulator/regulator.yaml#
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 patternProperties:
   "^adc@[0-9a-f]+$":
@@ -135,11 +109,7 @@ patternProperties:
 
   "^adc-tm@[0-9a-f]+$":
     type: object
-<<<<<<< HEAD
     # ref depends on compatible, see allOf below
-=======
-    $ref: /schemas/thermal/qcom-spmi-adc-tm5.yaml#
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   "^audio-codec@[0-9a-f]+$":
     type: object
@@ -157,13 +127,6 @@ patternProperties:
     type: object
     $ref: /schemas/power/reset/qcom,pon.yaml#
 
-<<<<<<< HEAD
-=======
-  "pwm@[0-9a-f]+$":
-    type: object
-    $ref: /schemas/leds/leds-qcom-lpg.yaml#
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   "^rtc@[0-9a-f]+$":
     type: object
     $ref: /schemas/rtc/qcom-pm8xxx-rtc.yaml#
@@ -189,7 +152,6 @@ required:
   - compatible
   - reg
 
-<<<<<<< HEAD
 allOf:
   - if:
       properties:
@@ -206,8 +168,6 @@ allOf:
         "^adc-tm@[0-9a-f]+$":
           $ref: /schemas/thermal/qcom-spmi-adc-tm5.yaml#
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 additionalProperties: false
 
 examples:
@@ -250,7 +210,6 @@ examples:
             };
         };
     };
-<<<<<<< HEAD
 
   - |
     #include <dt-bindings/input/input.h>
@@ -335,5 +294,3 @@ examples:
             #interrupt-cells = <2>;
         };
     };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -54,7 +54,6 @@ static struct perf_event_attr make_event_attr(void)
 	return attr;
 }
 
-<<<<<<< HEAD
 #ifdef HAVE_BPF_SKEL
 #include <bpf/btf.h>
 
@@ -112,8 +111,6 @@ static bool attr_has_sigtrap(void)
 }
 #endif  /* HAVE_BPF_SKEL */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void
 sigtrap_handler(int signum __maybe_unused, siginfo_t *info, void *ucontext __maybe_unused)
 {
@@ -199,7 +196,6 @@ static int test__sigtrap(struct test_suite *test __maybe_unused, int subtest __m
 
 	fd = sys_perf_event_open(&attr, 0, -1, -1, perf_event_open_cloexec_flag());
 	if (fd < 0) {
-<<<<<<< HEAD
 		if (attr_has_sigtrap()) {
 			pr_debug("FAILED sys_perf_event_open(): %s\n",
 				 str_error_r(errno, sbuf, sizeof(sbuf)));
@@ -207,9 +203,6 @@ static int test__sigtrap(struct test_suite *test __maybe_unused, int subtest __m
 			pr_debug("perf_event_attr doesn't have sigtrap\n");
 			ret = TEST_SKIP;
 		}
-=======
-		pr_debug("FAILED sys_perf_event_open(): %s\n", str_error_r(errno, sbuf, sizeof(sbuf)));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_restore_sigaction;
 	}
 

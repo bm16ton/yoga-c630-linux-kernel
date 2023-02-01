@@ -289,16 +289,6 @@ struct scsi_host_template {
 	int (* mq_poll)(struct Scsi_Host *shost, unsigned int queue_num);
 
 	/*
-	 * SCSI interface of blk_poll - poll for IO completions.
-	 * Only applicable if SCSI LLD exposes multiple h/w queues.
-	 *
-	 * Return value: Number of completed entries found.
-	 *
-	 * Status: OPTIONAL
-	 */
-	int (* mq_poll)(struct Scsi_Host *shost, unsigned int queue_num);
-
-	/*
 	 * Check if scatterlists need to be padded for DMA draining.
 	 *
 	 * Status: OPTIONAL

@@ -29,11 +29,7 @@ struct rescale_tc_data {
 	const char *expected_off;
 };
 
-<<<<<<< HEAD
 static const struct rescale_tc_data scale_cases[] = {
-=======
-const struct rescale_tc_data scale_cases[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Typical use cases
 	 */
@@ -481,11 +477,7 @@ const struct rescale_tc_data scale_cases[] = {
 	},
 };
 
-<<<<<<< HEAD
 static const struct rescale_tc_data offset_cases[] = {
-=======
-const struct rescale_tc_data offset_cases[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Typical use cases
 	 */

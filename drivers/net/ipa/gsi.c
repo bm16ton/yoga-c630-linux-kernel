@@ -712,7 +712,6 @@ static struct gsi_trans *gsi_channel_trans_last(struct gsi_channel *channel)
 	struct gsi_trans_info *trans_info = &channel->trans_info;
 	u32 pending_id = trans_info->pending_id;
 	struct gsi_trans *trans;
-<<<<<<< HEAD
 	u16 trans_id;
 
 	if (channel->toward_ipa && pending_id != trans_info->free_id) {
@@ -732,24 +731,6 @@ static struct gsi_trans *gsi_channel_trans_last(struct gsi_channel *channel)
 		trans_id = pending_id - 1;
 	} else {
 		return NULL;
-=======
-
-	spin_lock_bh(&trans_info->spinlock);
-
-	/* There is a small chance a TX transaction got allocated just
-	 * before we disabled transmits, so check for that.
-	 */
-	if (channel->toward_ipa) {
-		list = &trans_info->alloc;
-		if (!list_empty(list))
-			goto done;
-		list = &trans_info->committed;
-		if (!list_empty(list))
-			goto done;
-		list = &trans_info->pending;
-		if (!list_empty(list))
-			goto done;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Caller will wait for this, so take a reference */
@@ -1004,7 +985,6 @@ void gsi_resume(struct gsi *gsi)
 }
 
 void gsi_trans_tx_committed(struct gsi_trans *trans)
-<<<<<<< HEAD
 {
 	struct gsi_channel *channel = &trans->gsi->channel[trans->channel_id];
 
@@ -1017,20 +997,6 @@ void gsi_trans_tx_committed(struct gsi_trans *trans)
 
 void gsi_trans_tx_queued(struct gsi_trans *trans)
 {
-=======
-{
-	struct gsi_channel *channel = &trans->gsi->channel[trans->channel_id];
-
-	channel->trans_count++;
-	channel->byte_count += trans->len;
-
-	trans->trans_count = channel->trans_count;
-	trans->byte_count = channel->byte_count;
-}
-
-void gsi_trans_tx_queued(struct gsi_trans *trans)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 channel_id = trans->channel_id;
 	struct gsi *gsi = trans->gsi;
 	struct gsi_channel *channel;
@@ -1381,13 +1347,8 @@ gsi_event_trans(struct gsi *gsi, struct gsi_event *event)
  * we update transactions to record their actual received lengths.
  *
  * When an event for a TX channel arrives we use information in the
-<<<<<<< HEAD
  * transaction to report the number of requests and bytes that have
  * been transferred.
-=======
- * transaction to report the number of requests and bytes have been
- * transferred.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * This function is called whenever we learn that the GSI hardware has filled
  * new events since the last time we checked.  The ring's index field tells
@@ -1538,11 +1499,7 @@ void gsi_channel_update(struct gsi_channel *channel)
 	/* Get the transaction for the latest completed event. */
 	trans = gsi_event_trans(gsi, gsi_ring_virt(ring, index - 1));
 	if (!trans)
-<<<<<<< HEAD
 		return;
-=======
-		return NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* For RX channels, update each completed transaction with the number
 	 * of bytes that were actually received.  For TX channels, report
@@ -1550,11 +1507,6 @@ void gsi_channel_update(struct gsi_channel *channel)
 	 * up the network stack.
 	 */
 	gsi_evt_ring_update(gsi, evt_ring_id, index);
-<<<<<<< HEAD
-=======
-
-	return gsi_channel_trans_complete(channel);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

@@ -719,11 +719,7 @@ int ata_build_rw_tf(struct ata_queued_cmd *qc, u64 block, u32 n_block,
 		if (tf->flags & ATA_TFLAG_FUA)
 			tf->device |= 1 << 7;
 
-<<<<<<< HEAD
 		if (dev->flags & ATA_DFLAG_NCQ_PRIO_ENABLED &&
-=======
-		if (dev->flags & ATA_DFLAG_NCQ_PRIO_ENABLE &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		    class == IOPRIO_CLASS_RT)
 			tf->hob_nsect |= ATA_PRIO_HIGH << ATA_SHIFT_PRIO;
 	} else if (dev->flags & ATA_DFLAG_LBA) {
@@ -1582,13 +1578,8 @@ static unsigned ata_exec_internal_sg(struct ata_device *dev,
 			else
 				ata_qc_complete(qc);
 
-<<<<<<< HEAD
 			ata_dev_warn(dev, "qc timeout after %u msecs (cmd 0x%x)\n",
 				     timeout, command);
-=======
-			ata_dev_warn(dev, "qc timeout (cmd 0x%x)\n",
-				     command);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		spin_unlock_irqrestore(ap->lock, flags);
@@ -2180,11 +2171,7 @@ static void ata_dev_config_ncq_prio(struct ata_device *dev)
 	return;
 
 not_supported:
-<<<<<<< HEAD
 	dev->flags &= ~ATA_DFLAG_NCQ_PRIO_ENABLED;
-=======
-	dev->flags &= ~ATA_DFLAG_NCQ_PRIO_ENABLE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev->flags &= ~ATA_DFLAG_NCQ_PRIO;
 }
 
@@ -4334,18 +4321,11 @@ static unsigned int ata_dev_set_xfermode(struct ata_device *dev)
 	else /* In the ancient relic department - skip all of this */
 		return 0;
 
-<<<<<<< HEAD
 	/*
 	 * On some disks, this command causes spin-up, so we need longer
 	 * timeout.
 	 */
 	return ata_exec_internal(dev, &tf, NULL, DMA_NONE, NULL, 0, 15000);
-=======
-	/* On some disks, this command causes spin-up, so we need longer timeout */
-	err_mask = ata_exec_internal(dev, &tf, NULL, DMA_NONE, NULL, 0, 15000);
-
-	return err_mask;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -4365,18 +4345,10 @@ static unsigned int ata_dev_set_xfermode(struct ata_device *dev)
 unsigned int ata_dev_set_feature(struct ata_device *dev, u8 subcmd, u8 action)
 {
 	struct ata_taskfile tf;
-<<<<<<< HEAD
 	unsigned int timeout = 0;
 
 	/* set up set-features taskfile */
 	ata_dev_dbg(dev, "set features\n");
-=======
-	unsigned int err_mask;
-	unsigned int timeout = 0;
-
-	/* set up set-features taskfile */
-	ata_dev_dbg(dev, "set features - SATA features\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ata_tf_init(dev, &tf);
 	tf.command = ATA_CMD_SET_FEATURES;
@@ -4389,11 +4361,7 @@ unsigned int ata_dev_set_feature(struct ata_device *dev, u8 subcmd, u8 action)
 		timeout = ata_probe_timeout ?
 			  ata_probe_timeout * 1000 : SETFEATURES_SPINUP_TIMEOUT;
 
-<<<<<<< HEAD
 	return ata_exec_internal(dev, &tf, NULL, DMA_NONE, NULL, 0, timeout);
-=======
-	return err_mask;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(ata_dev_set_feature);
 

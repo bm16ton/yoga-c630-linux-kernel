@@ -629,15 +629,12 @@ enum pq_init_status {
  * CPUCP_PACKET_ENGINE_CORE_ASID_SET -
  *       Packet to perform engine core ASID configuration
  *
-<<<<<<< HEAD
  * CPUCP_PACKET_SEC_ATTEST_GET -
  *       Get the attestaion data that is collected during various stages of the
  *       boot sequence. the attestation data is also hashed with some unique
  *       number (nonce) provided by the host to prevent replay attacks.
  *       public key and certificate also provided as part of the FW response.
  *
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * CPUCP_PACKET_MONITOR_DUMP_GET -
  *       Get monitors registers dump from the CpuCP kernel.
  *       The CPU will put the registers dump in the a buffer allocated by the driver
@@ -645,13 +642,10 @@ enum pq_init_status {
  *       passes the max size it allows the CpuCP to write to the structure, to prevent
  *       data corruption in case of mismatched driver/FW versions.
  *       Relevant only to Gaudi.
-<<<<<<< HEAD
  *
  * CPUCP_PACKET_ACTIVE_STATUS_SET -
  *       LKD sends FW indication whether device is free or in use, this indication is reported
  *       also to the BMC.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 enum cpucp_packet_id {
@@ -703,7 +697,6 @@ enum cpucp_packet_id {
 	CPUCP_PACKET_RESERVED,			/* not used */
 	CPUCP_PACKET_ENGINE_CORE_ASID_SET,	/* internal */
 	CPUCP_PACKET_RESERVED2,			/* not used */
-<<<<<<< HEAD
 	CPUCP_PACKET_SEC_ATTEST_GET,		/* internal */
 	CPUCP_PACKET_RESERVED3,			/* not used */
 	CPUCP_PACKET_RESERVED4,			/* not used */
@@ -715,12 +708,6 @@ enum cpucp_packet_id {
 	CPUCP_PACKET_RESERVED9,			/* not used */
 	CPUCP_PACKET_ACTIVE_STATUS_SET,		/* internal */
 	CPUCP_PACKET_ID_MAX			/* must be last */
-=======
-	CPUCP_PACKET_RESERVED3,			/* not used */
-	CPUCP_PACKET_RESERVED4,			/* not used */
-	CPUCP_PACKET_RESERVED5,			/* not used */
-	CPUCP_PACKET_MONITOR_DUMP_GET,		/* debugfs */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define CPUCP_PACKET_FENCE_VAL	0xFE8CE7A5
@@ -813,12 +800,9 @@ struct cpucp_packet {
 		 * result cannot be used to hold general purpose data.
 		 */
 		__le32 status_mask;
-<<<<<<< HEAD
 
 		/* random, used once number, for security packets */
 		__le32 nonce;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	/* For NIC requests */
@@ -829,27 +813,6 @@ struct cpucp_unmask_irq_arr_packet {
 	struct cpucp_packet cpucp_pkt;
 	__le32 length;
 	__le32 irqs[];
-<<<<<<< HEAD
-=======
-};
-
-struct cpucp_nic_status_packet {
-	struct cpucp_packet cpucp_pkt;
-	__le32 length;
-	__le32 data[];
-};
-
-struct cpucp_array_data_packet {
-	struct cpucp_packet cpucp_pkt;
-	__le32 length;
-	__le32 data[];
-};
-
-enum cpucp_led_index {
-	CPUCP_LED0_INDEX = 0,
-	CPUCP_LED1_INDEX,
-	CPUCP_LED2_INDEX
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct cpucp_nic_status_packet {
@@ -1265,7 +1228,6 @@ enum cpu_reset_status {
 	CPU_RST_STATUS_SOFT_RST_DONE = 1,
 };
 
-<<<<<<< HEAD
 #define SEC_PCR_DATA_BUF_SZ	256
 #define SEC_PCR_QUOTE_BUF_SZ	510	/* (512 - 2) 2 bytes used for size */
 #define SEC_SIGNATURE_BUF_SZ	255	/* (256 - 1) 1 byte used for size */
@@ -1330,8 +1292,6 @@ struct cpucp_dev_info_signed {
 	__u8 certificate[SEC_CERTIFICATE_BUF_SZ];
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * struct dcore_monitor_regs_data - DCORE monitor regs data.
  * the structure follows sync manager block layout. relevant only to Gaudi.

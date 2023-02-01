@@ -3178,7 +3178,6 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
 	if (IS_ERR(bdev))
 		return PTR_ERR(bdev);
 
-<<<<<<< HEAD
 	disk = bdev->bd_disk;
 	ioc = q_to_ioc(disk->queue);
 	if (!ioc) {
@@ -3186,14 +3185,6 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
 		if (ret)
 			goto err;
 		ioc = q_to_ioc(disk->queue);
-=======
-	ioc = q_to_ioc(bdev_get_queue(bdev));
-	if (!ioc) {
-		ret = blk_iocost_init(bdev_get_queue(bdev));
-		if (ret)
-			goto err;
-		ioc = q_to_ioc(bdev_get_queue(bdev));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	spin_lock_irq(&ioc->lock);
@@ -3357,11 +3348,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
 
 	ioc = q_to_ioc(bdev_get_queue(bdev));
 	if (!ioc) {
-<<<<<<< HEAD
 		ret = blk_iocost_init(bdev->bd_disk);
-=======
-		ret = blk_iocost_init(bdev_get_queue(bdev));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret)
 			goto err;
 		ioc = q_to_ioc(bdev_get_queue(bdev));

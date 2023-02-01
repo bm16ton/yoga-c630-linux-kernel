@@ -683,7 +683,6 @@ static int __cgroup_bpf_attach(struct cgroup *cgrp,
 	pl->link = link;
 	bpf_cgroup_storages_assign(pl->storage, storage);
 	cgrp->bpf.flags[atype] = saved_flags;
-<<<<<<< HEAD
 
 	if (type == BPF_LSM_CGROUP) {
 		err = bpf_trampoline_link_cgroup_shim(new_prog, atype);
@@ -691,15 +690,6 @@ static int __cgroup_bpf_attach(struct cgroup *cgrp,
 			goto cleanup;
 	}
 
-=======
-
-	if (type == BPF_LSM_CGROUP) {
-		err = bpf_trampoline_link_cgroup_shim(new_prog, atype);
-		if (err)
-			goto cleanup;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = update_effective_progs(cgrp, atype);
 	if (err)
 		goto cleanup_trampoline;
@@ -1039,7 +1029,6 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, const union bpf_attr *attr,
 	int cnt, ret = 0, i;
 	int total_cnt = 0;
 	u32 flags;
-<<<<<<< HEAD
 
 	if (effective_query && prog_attach_flags)
 		return -EINVAL;
@@ -1049,17 +1038,6 @@ static int __cgroup_bpf_query(struct cgroup *cgrp, const union bpf_attr *attr,
 		    prog_ids && !prog_attach_flags)
 			return -EINVAL;
 
-=======
-
-	if (effective_query && prog_attach_flags)
-		return -EINVAL;
-
-	if (type == BPF_LSM_CGROUP) {
-		if (!effective_query && attr->query.prog_cnt &&
-		    prog_ids && !prog_attach_flags)
-			return -EINVAL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		from_atype = CGROUP_LSM_START;
 		to_atype = CGROUP_LSM_END;
 		flags = 0;
@@ -1559,7 +1537,6 @@ int __cgroup_bpf_check_dev_permission(short dev_type, u32 major, u32 minor,
 	return ret;
 }
 
-<<<<<<< HEAD
 BPF_CALL_2(bpf_get_local_storage, struct bpf_map *, map, u64, flags)
 {
 	/* flags argument is not used now,
@@ -1592,28 +1569,10 @@ const struct bpf_func_proto bpf_get_local_storage_proto = {
 };
 
 BPF_CALL_0(bpf_get_retval)
-=======
-BPF_CALL_0(bpf_get_retval)
 {
 	struct bpf_cg_run_ctx *ctx =
 		container_of(current->bpf_ctx, struct bpf_cg_run_ctx, run_ctx);
 
-	return ctx->retval;
-}
-
-const struct bpf_func_proto bpf_get_retval_proto = {
-	.func		= bpf_get_retval,
-	.gpl_only	= false,
-	.ret_type	= RET_INTEGER,
-};
-
-BPF_CALL_1(bpf_set_retval, int, retval)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	struct bpf_cg_run_ctx *ctx =
-		container_of(current->bpf_ctx, struct bpf_cg_run_ctx, run_ctx);
-
-<<<<<<< HEAD
 	return ctx->retval;
 }
 
@@ -1632,12 +1591,6 @@ BPF_CALL_1(bpf_set_retval, int, retval)
 	return 0;
 }
 
-=======
-	ctx->retval = retval;
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct bpf_func_proto bpf_set_retval_proto = {
 	.func		= bpf_set_retval,
 	.gpl_only	= false,
@@ -1661,10 +1614,6 @@ cgroup_dev_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 	switch (func_id) {
 	case BPF_FUNC_perf_event_output:
 		return &bpf_event_output_data_proto;
-	case BPF_FUNC_get_retval:
-		return &bpf_get_retval_proto;
-	case BPF_FUNC_set_retval:
-		return &bpf_set_retval_proto;
 	default:
 		return bpf_base_func_proto(func_id);
 	}
@@ -2203,11 +2152,8 @@ sysctl_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 		return &bpf_sysctl_set_new_value_proto;
 	case BPF_FUNC_ktime_get_coarse_ns:
 		return &bpf_ktime_get_coarse_ns_proto;
-<<<<<<< HEAD
 	case BPF_FUNC_perf_event_output:
 		return &bpf_event_output_data_proto;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return bpf_base_func_proto(func_id);
 	}

@@ -407,15 +407,12 @@ config BLK_DEV_UBLK
 	  has been working well, but interface with userspace or command data
 	  definition isn't finalized yet, and might change according to future
 	  requirement, so mark is as experimental now.
-<<<<<<< HEAD
 
 	  Say Y if you want to get better performance because task_work_add()
 	  can be used in IO path for replacing io_uring cmd, which will become
 	  shared between IO tasks and ubq daemon, meantime task_work_add() can
 	  can handle batch more effectively, but task_work_add() isn't exported
 	  for module, so ublk has to be built to kernel.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 source "drivers/block/rnbd/Kconfig"
 

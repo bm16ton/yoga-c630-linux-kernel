@@ -53,10 +53,6 @@ struct amdgpu_ctx {
 	bool				preamble_presented;
 	int32_t				init_priority;
 	int32_t				override_priority;
-<<<<<<< HEAD
-=======
-	struct mutex			lock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomic_t			guilty;
 	unsigned long			ras_counter_ce;
 	unsigned long			ras_counter_ue;

@@ -158,7 +158,6 @@ enum {
 
 #define MT_TXS4_TIMESTAMP		GENMASK(31, 0)
 
-<<<<<<< HEAD
 /* PPDU based TXS */
 #define MT_TXS5_MPDU_TX_BYTE		GENMASK(22, 0)
 #define MT_TXS5_MPDU_TX_CNT		GENMASK(31, 23)
@@ -167,8 +166,6 @@ enum {
 
 #define MT_TXS7_MPDU_RETRY_CNT		GENMASK(31, 23)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* RXD DW1 */
 #define MT_RXD1_NORMAL_WLAN_IDX		GENMASK(9, 0)
 #define MT_RXD1_NORMAL_GROUP_1		BIT(11)

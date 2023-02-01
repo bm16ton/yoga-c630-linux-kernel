@@ -199,7 +199,6 @@ void call_rcu(struct rcu_head *head, rcu_callback_t func)
 EXPORT_SYMBOL_GPL(call_rcu);
 
 /*
-<<<<<<< HEAD
  * Store a grace-period-counter "cookie".  For more information,
  * see the Tree RCU header comment.
  */
@@ -210,8 +209,6 @@ void get_completed_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp)
 EXPORT_SYMBOL_GPL(get_completed_synchronize_rcu_full);
 
 /*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Return a grace-period-counter "cookie".  For more information,
  * see the Tree RCU header comment.
  */

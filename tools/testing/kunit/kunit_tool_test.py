@@ -217,12 +217,6 @@ class KUnitParserTest(unittest.TestCase):
 		print_mock.assert_any_call(StrContains('could not find any KTAP output!'))
 		print_mock.stop()
 		self.assertEqual(0, len(result.subtests))
-<<<<<<< HEAD
-
-	def test_skipped_test(self):
-		skipped_log = test_data_path('test_skip_tests.log')
-		with open(skipped_log) as file:
-=======
 
 	def test_skipped_test(self):
 		skipped_log = test_data_path('test_skip_tests.log')
@@ -233,34 +227,6 @@ class KUnitParserTest(unittest.TestCase):
 		self.assertEqual(
 			kunit_parser.TestStatus.SUCCESS,
 			result.status)
-
-	def test_skipped_all_tests(self):
-		skipped_log = test_data_path('test_skip_all_tests.log')
-		with open(skipped_log) as file:
-			result = kunit_parser.parse_run_tests(file.readlines())
-
-		self.assertEqual(
-			kunit_parser.TestStatus.SKIPPED,
-			result.status)
-
-	def test_ignores_hyphen(self):
-		hyphen_log = test_data_path('test_strip_hyphen.log')
-		with open(hyphen_log) as file:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-			result = kunit_parser.parse_run_tests(file.readlines())
-
-		# A skipped test does not fail the whole suite.
-		self.assertEqual(
-			kunit_parser.TestStatus.SUCCESS,
-			result.status)
-		self.assertEqual(
-			"sysctl_test",
-			result.subtests[0].name)
-		self.assertEqual(
-			"example",
-			result.subtests[1].name)
-		file.close()
-
 
 	def test_skipped_all_tests(self):
 		skipped_log = test_data_path('test_skip_all_tests.log')
@@ -583,11 +549,7 @@ class KUnitMainTest(unittest.TestCase):
 	def test_build_passes_args_pass(self):
 		kunit.main(['build'])
 		self.assertEqual(self.linux_source_mock.build_reconfig.call_count, 1)
-<<<<<<< HEAD
 		self.linux_source_mock.build_kernel.assert_called_once_with(kunit.get_default_jobs(), '.kunit', None)
-=======
-		self.linux_source_mock.build_kernel.assert_called_once_with(False, kunit.get_default_jobs(), '.kunit', None)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		self.assertEqual(self.linux_source_mock.run_kernel.call_count, 0)
 
 	def test_exec_passes_args_pass(self):
@@ -702,11 +664,7 @@ class KUnitMainTest(unittest.TestCase):
 		build_dir = '.kunit'
 		jobs = kunit.get_default_jobs()
 		kunit.main(['build', '--build_dir', build_dir])
-<<<<<<< HEAD
 		self.linux_source_mock.build_kernel.assert_called_once_with(jobs, build_dir, None)
-=======
-		self.linux_source_mock.build_kernel.assert_called_once_with(False, jobs, build_dir, None)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	def test_exec_builddir(self):
 		build_dir = '.kunit'
@@ -736,7 +694,6 @@ class KUnitMainTest(unittest.TestCase):
 						cross_compile=None,
 						qemu_config_path=None,
 						extra_qemu_args=[])
-<<<<<<< HEAD
 
 	def test_config_alltests(self):
 		kunit.main(['config', '--kunitconfig=mykunitconfig', '--alltests'])
@@ -749,8 +706,6 @@ class KUnitMainTest(unittest.TestCase):
 						qemu_config_path=None,
 						extra_qemu_args=[])
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	@mock.patch.object(kunit_kernel, 'LinuxSourceTree')
 	def test_run_multiple_kunitconfig(self, mock_linux_init):
@@ -769,11 +724,7 @@ class KUnitMainTest(unittest.TestCase):
 		kunit.main(['run', '--kconfig_add=CONFIG_KASAN=y', '--kconfig_add=CONFIG_KCSAN=y'])
 		# Just verify that we parsed and initialized it correctly here.
 		self.mock_linux_init.assert_called_once_with('.kunit',
-<<<<<<< HEAD
 						kunitconfig_paths=[],
-=======
-						kunitconfig_paths=None,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						kconfig_add=['CONFIG_KASAN=y', 'CONFIG_KCSAN=y'],
 						arch='um',
 						cross_compile=None,
@@ -784,11 +735,7 @@ class KUnitMainTest(unittest.TestCase):
 		kunit.main(['run', '--arch=x86_64', '--qemu_args', '-m 2048'])
 		# Just verify that we parsed and initialized it correctly here.
 		self.mock_linux_init.assert_called_once_with('.kunit',
-<<<<<<< HEAD
 						kunitconfig_paths=[],
-=======
-						kunitconfig_paths=None,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						kconfig_add=None,
 						arch='x86_64',
 						cross_compile=None,
@@ -807,11 +754,7 @@ class KUnitMainTest(unittest.TestCase):
 		self.linux_source_mock.run_kernel.return_value = ['TAP version 14', 'init: random output'] + want
 
 		got = kunit._list_tests(self.linux_source_mock,
-<<<<<<< HEAD
 				     kunit.KunitExecRequest(None, None, '.kunit', 300, 'suite*', None, 'suite'))
-=======
-				     kunit.KunitExecRequest(None, None, '.kunit', 300, False, 'suite*', None, 'suite'))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		self.assertEqual(got, want)
 		# Should respect the user's filter glob when listing tests.
@@ -826,11 +769,7 @@ class KUnitMainTest(unittest.TestCase):
 
 		# Should respect the user's filter glob when listing tests.
 		mock_tests.assert_called_once_with(mock.ANY,
-<<<<<<< HEAD
 				     kunit.KunitExecRequest(None, None, '.kunit', 300, 'suite*.test*', None, 'suite'))
-=======
-				     kunit.KunitExecRequest(None, None, '.kunit', 300, False, 'suite*.test*', None, 'suite'))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		self.linux_source_mock.run_kernel.assert_has_calls([
 			mock.call(args=None, build_dir='.kunit', filter_glob='suite.test*', timeout=300),
 			mock.call(args=None, build_dir='.kunit', filter_glob='suite2.test*', timeout=300),
@@ -843,11 +782,7 @@ class KUnitMainTest(unittest.TestCase):
 
 		# Should respect the user's filter glob when listing tests.
 		mock_tests.assert_called_once_with(mock.ANY,
-<<<<<<< HEAD
 				     kunit.KunitExecRequest(None, None, '.kunit', 300, 'suite*', None, 'test'))
-=======
-				     kunit.KunitExecRequest(None, None, '.kunit', 300, False, 'suite*', None, 'test'))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		self.linux_source_mock.run_kernel.assert_has_calls([
 			mock.call(args=None, build_dir='.kunit', filter_glob='suite.test1', timeout=300),
 			mock.call(args=None, build_dir='.kunit', filter_glob='suite.test2', timeout=300),

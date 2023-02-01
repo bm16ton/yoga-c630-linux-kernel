@@ -145,10 +145,7 @@ perf-y += branch.o
 perf-y += mem2node.o
 perf-y += clockid.o
 perf-y += list_sort.o
-<<<<<<< HEAD
 perf-y += mutex.o
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 perf-$(CONFIG_LIBBPF) += bpf-loader.o
 perf-$(CONFIG_LIBBPF) += bpf_map.o

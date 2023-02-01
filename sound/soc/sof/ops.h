@@ -348,17 +348,6 @@ static inline u64 snd_sof_dsp_read64(struct snd_sof_dev *sdev, u32 bar,
 static inline int snd_sof_dsp_block_read(struct snd_sof_dev *sdev,
 					 enum snd_sof_fw_blk_type blk_type,
 					 u32 offset, void *dest, size_t bytes)
-<<<<<<< HEAD
-{
-	return sof_ops(sdev)->block_read(sdev, blk_type, offset, dest, bytes);
-}
-
-static inline int snd_sof_dsp_block_write(struct snd_sof_dev *sdev,
-					  enum snd_sof_fw_blk_type blk_type,
-					  u32 offset, void *src, size_t bytes)
-{
-	return sof_ops(sdev)->block_write(sdev, blk_type, offset, src, bytes);
-=======
 {
 	return sof_ops(sdev)->block_read(sdev, blk_type, offset, dest, bytes);
 }
@@ -383,33 +372,6 @@ static inline void snd_sof_dsp_mailbox_write(struct snd_sof_dev *sdev,
 {
 	if (sof_ops(sdev)->mailbox_write)
 		sof_ops(sdev)->mailbox_write(sdev, offset, src, bytes);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-}
-
-/* mailbox IO */
-static inline void snd_sof_dsp_mailbox_read(struct snd_sof_dev *sdev,
-					    u32 offset, void *dest, size_t bytes)
-{
-	if (sof_ops(sdev)->mailbox_read)
-		sof_ops(sdev)->mailbox_read(sdev, offset, dest, bytes);
-}
-
-<<<<<<< HEAD
-static inline void snd_sof_dsp_mailbox_write(struct snd_sof_dev *sdev,
-					     u32 offset, void *src, size_t bytes)
-{
-	if (sof_ops(sdev)->mailbox_write)
-		sof_ops(sdev)->mailbox_write(sdev, offset, src, bytes);
-=======
-/* host DMA trace */
-static inline int snd_sof_dma_trace_init(struct snd_sof_dev *sdev,
-					 struct sof_ipc_dma_trace_params_ext *dtrace_params)
-{
-	if (sof_ops(sdev)->trace_init)
-		return sof_ops(sdev)->trace_init(sdev, dtrace_params);
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* ipc */

@@ -87,24 +87,7 @@ void populate_pvinfo_page(struct intel_vgpu *vgpu)
 #define VGPU_WEIGHT(vgpu_num)	\
 	(VGPU_MAX_WEIGHT / (vgpu_num))
 
-<<<<<<< HEAD
 static const struct intel_vgpu_config intel_vgpu_configs[] = {
-=======
-static const struct {
-	unsigned int low_mm;
-	unsigned int high_mm;
-	unsigned int fence;
-
-	/* A vGPU with a weight of 8 will get twice as much GPU as a vGPU
-	 * with a weight of 4 on a contended host, different vGPU type has
-	 * different weight set. Legal weights range from 1 to 16.
-	 */
-	unsigned int weight;
-	enum intel_vgpu_edid edid;
-	const char *name;
-} vgpu_types[] = {
-/* Fixed vGPU type table */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ MB_TO_BYTES(64), MB_TO_BYTES(384), 4, VGPU_WEIGHT(8), GVT_EDID_1024_768, "8" },
 	{ MB_TO_BYTES(128), MB_TO_BYTES(512), 4, VGPU_WEIGHT(4), GVT_EDID_1920_1200, "4" },
 	{ MB_TO_BYTES(256), MB_TO_BYTES(1024), 4, VGPU_WEIGHT(2), GVT_EDID_1920_1200, "2" },
@@ -143,18 +126,9 @@ int intel_gvt_init_vgpu_types(struct intel_gvt *gvt)
 		if (conf->weight < 1 || conf->weight > VGPU_MAX_WEIGHT)
 			goto out_free_mdev_types;
 
-<<<<<<< HEAD
 		sprintf(gvt->types[i].name, "GVTg_V%u_%s",
 			GRAPHICS_VER(gvt->gt->i915) == 8 ? 4 : 5, conf->name);
 		gvt->types[i].conf = conf;
-=======
-		if (GRAPHICS_VER(gvt->gt->i915) == 8)
-			sprintf(gvt->types[i].name, "GVTg_V4_%s",
-				vgpu_types[i].name);
-		else if (GRAPHICS_VER(gvt->gt->i915) == 9)
-			sprintf(gvt->types[i].name, "GVTg_V5_%s",
-				vgpu_types[i].name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		gvt_dbg_core("type[%d]: %s avail %u low %u high %u fence %u weight %u res %s\n",
 			     i, gvt->types[i].name,
@@ -277,15 +251,6 @@ void intel_gvt_destroy_vgpu(struct intel_vgpu *vgpu)
 	intel_vgpu_clean_mmio(vgpu);
 	intel_vgpu_dmabuf_cleanup(vgpu);
 	mutex_unlock(&vgpu->vgpu_lock);
-<<<<<<< HEAD
-=======
-
-	mutex_lock(&gvt->lock);
-	intel_gvt_update_vgpu_types(gvt);
-	mutex_unlock(&gvt->lock);
-
-	vfree(vgpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #define IDLE_VGPU_IDR 0
@@ -352,19 +317,9 @@ int intel_gvt_create_vgpu(struct intel_vgpu *vgpu,
 	struct drm_i915_private *dev_priv = gvt->gt->i915;
 	int ret;
 
-<<<<<<< HEAD
 	gvt_dbg_core("low %u MB high %u MB fence %u\n",
 			BYTES_TO_MB(conf->low_mm), BYTES_TO_MB(conf->high_mm),
 			conf->fence);
-=======
-	gvt_dbg_core("low %llu MB high %llu MB fence %llu\n",
-			param->low_gm_sz, param->high_gm_sz,
-			param->fence_sz);
-
-	vgpu = vzalloc(sizeof(*vgpu));
-	if (!vgpu)
-		return ERR_PTR(-ENOMEM);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_lock(&gvt->lock);
 	ret = idr_alloc(&gvt->vgpu_idr, vgpu, IDLE_VGPU_IDR + 1, GVT_MAX_VGPU,
@@ -373,12 +328,7 @@ int intel_gvt_create_vgpu(struct intel_vgpu *vgpu,
 		goto out_unlock;;
 
 	vgpu->id = ret;
-<<<<<<< HEAD
 	vgpu->sched_ctl.weight = conf->weight;
-=======
-	vgpu->gvt = gvt;
-	vgpu->sched_ctl.weight = param->weight;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&vgpu->vgpu_lock);
 	mutex_init(&vgpu->dmabuf_lock);
 	INIT_LIST_HEAD(&vgpu->dmabuf_obj_list_head);
@@ -450,49 +400,7 @@ out_clean_vgpu_mmio:
 	intel_vgpu_clean_mmio(vgpu);
 out_clean_idr:
 	idr_remove(&gvt->vgpu_idr, vgpu->id);
-<<<<<<< HEAD
 out_unlock:
-=======
-out_free_vgpu:
-	vfree(vgpu);
-	return ERR_PTR(ret);
-}
-
-/**
- * intel_gvt_create_vgpu - create a virtual GPU
- * @gvt: GVT device
- * @type: type of the vGPU to create
- *
- * This function is called when user wants to create a virtual GPU.
- *
- * Returns:
- * pointer to intel_vgpu, error pointer if failed.
- */
-struct intel_vgpu *intel_gvt_create_vgpu(struct intel_gvt *gvt,
-				struct intel_vgpu_type *type)
-{
-	struct intel_vgpu_creation_params param;
-	struct intel_vgpu *vgpu;
-
-	param.primary = 1;
-	param.low_gm_sz = type->low_gm_size;
-	param.high_gm_sz = type->high_gm_size;
-	param.fence_sz = type->fence;
-	param.weight = type->weight;
-	param.resolution = type->resolution;
-
-	/* XXX current param based on MB */
-	param.low_gm_sz = BYTES_TO_MB(param.low_gm_sz);
-	param.high_gm_sz = BYTES_TO_MB(param.high_gm_sz);
-
-	mutex_lock(&gvt->lock);
-	vgpu = __intel_gvt_create_vgpu(gvt, &param);
-	if (!IS_ERR(vgpu)) {
-		/* calculate left instance change for types */
-		intel_gvt_update_vgpu_types(gvt);
-		intel_gvt_update_reg_whitelist(vgpu);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&gvt->lock);
 	return ret;
 }

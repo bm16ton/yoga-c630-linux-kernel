@@ -15,12 +15,9 @@ int proc_resctrl_show(struct seq_file *m,
 
 #endif
 
-<<<<<<< HEAD
 /* max value for struct rdt_domain's mbps_val */
 #define MBA_MAX_MBPS   U32_MAX
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * enum resctrl_conf_type - The type of configuration.
  * @CDP_NONE:	No prioritisation, both code and data are controlled or monitored.
@@ -35,7 +32,6 @@ enum resctrl_conf_type {
 
 #define CDP_NUM_TYPES	(CDP_DATA + 1)
 
-<<<<<<< HEAD
 /*
  * Event IDs, the values match those used to program IA32_QM_EVTSEL before
  * reading IA32_QM_CTR on RDT systems.
@@ -46,8 +42,6 @@ enum resctrl_event_id {
 	QOS_L3_MBM_LOCAL_EVENT_ID	= 0x03,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * struct resctrl_staged_config - parsed configuration to be applied
  * @new_ctrl:		new ctrl value to be loaded
@@ -72,12 +66,9 @@ struct resctrl_staged_config {
  * @cqm_work_cpu:	worker CPU for CQM h/w counters
  * @plr:		pseudo-locked region (if any) associated with domain
  * @staged_config:	parsed configuration to be applied
-<<<<<<< HEAD
  * @mbps_val:		When mba_sc is enabled, this holds the array of user
  *			specified control values for mba_sc in MBps, indexed
  *			by closid
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct rdt_domain {
 	struct list_head		list;
@@ -92,10 +83,7 @@ struct rdt_domain {
 	int				cqm_work_cpu;
 	struct pseudo_lock_region	*plr;
 	struct resctrl_staged_config	staged_config[CDP_NUM_TYPES];
-<<<<<<< HEAD
 	u32				*mbps_val;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -159,11 +147,6 @@ struct resctrl_schema;
 /**
  * struct rdt_resource - attributes of a resctrl resource
  * @rid:		The index of the resource
-<<<<<<< HEAD
-=======
- * @alloc_enabled:	Is allocation enabled on this machine
- * @mon_enabled:	Is monitoring enabled for this feature
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @alloc_capable:	Is allocation available on this machine
  * @mon_capable:	Is monitor feature available on this machine
  * @num_rmid:		Number of RMIDs available
@@ -182,11 +165,6 @@ struct resctrl_schema;
  */
 struct rdt_resource {
 	int			rid;
-<<<<<<< HEAD
-=======
-	bool			alloc_enabled;
-	bool			mon_enabled;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool			alloc_capable;
 	bool			mon_capable;
 	int			num_rmid;
@@ -229,7 +207,6 @@ struct resctrl_schema {
 /* The number of closid supported by this resource regardless of CDP */
 u32 resctrl_arch_get_num_closid(struct rdt_resource *r);
 int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid);
-<<<<<<< HEAD
 
 /*
  * Update the ctrl_val and apply this config right now.
@@ -275,9 +252,5 @@ void resctrl_arch_reset_rmid(struct rdt_resource *r, struct rdt_domain *d,
 
 extern unsigned int resctrl_rmid_realloc_threshold;
 extern unsigned int resctrl_rmid_realloc_limit;
-=======
-u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_domain *d,
-			    u32 closid, enum resctrl_conf_type type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _RESCTRL_H */

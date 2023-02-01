@@ -1114,27 +1114,18 @@ int ice_nvm_validate_checksum(struct ice_hw *hw)
  * Update the control word with the required banks' validity bits
  * and dumps the Shadow RAM to flash (0x0707)
  *
-<<<<<<< HEAD
  * cmd_flags controls which banks to activate, the preservation level to use
  * when activating the NVM bank, and whether an EMP reset is required for
  * activation.
  *
  * Note that the 16bit cmd_flags value is split between two separate 1 byte
  * flag values in the descriptor.
-=======
- * cmd_flags controls which banks to activate, and the preservation level to
- * use when activating the NVM bank.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * On successful return of the firmware command, the response_flags variable
  * is updated with the flags reported by firmware indicating certain status,
  * such as whether EMP reset is enabled.
  */
-<<<<<<< HEAD
 int ice_nvm_write_activate(struct ice_hw *hw, u16 cmd_flags, u8 *response_flags)
-=======
-int ice_nvm_write_activate(struct ice_hw *hw, u8 cmd_flags, u8 *response_flags)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ice_aqc_nvm *cmd;
 	struct ice_aq_desc desc;

@@ -147,10 +147,7 @@ static int ieee80211_set_ap_mbssid_options(struct ieee80211_sub_if_data *sdata,
 	link_conf->bssid_index = 0;
 	link_conf->nontransmitted = false;
 	link_conf->ema_ap = false;
-<<<<<<< HEAD
 	link_conf->bssid_indicator = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (sdata->vif.type != NL80211_IFTYPE_AP || !params.tx_wdev)
 		return -EINVAL;
@@ -230,13 +227,10 @@ static int ieee80211_change_iface(struct wiphy *wiphy,
 		if (params->use_4addr == ifmgd->use_4addr)
 			return 0;
 
-<<<<<<< HEAD
 		/* FIXME: no support for 4-addr MLO yet */
 		if (sdata->vif.valid_links)
 			return -EOPNOTSUPP;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sdata->u.mgd.use_4addr = params->use_4addr;
 		if (!ifmgd->associated)
 			return 0;
@@ -571,11 +565,7 @@ static int ieee80211_add_key(struct wiphy *wiphy, struct net_device *dev,
 		break;
 	}
 
-<<<<<<< HEAD
 	err = ieee80211_key_link(key, link, sta);
-=======
-	err = ieee80211_key_link(key, sdata, sta);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
  out_unlock:
 	mutex_unlock(&local->sta_mtx);
@@ -584,63 +574,12 @@ static int ieee80211_add_key(struct wiphy *wiphy, struct net_device *dev,
 }
 
 static struct ieee80211_key *
-<<<<<<< HEAD
 ieee80211_lookup_key(struct ieee80211_sub_if_data *sdata, int link_id,
 		     u8 key_idx, bool pairwise, const u8 *mac_addr)
 {
 	struct ieee80211_local *local __maybe_unused = sdata->local;
 	struct ieee80211_link_data *link = &sdata->deflink;
 	struct ieee80211_key *key;
-=======
-ieee80211_lookup_key(struct ieee80211_sub_if_data *sdata,
-		     u8 key_idx, bool pairwise, const u8 *mac_addr)
-{
-	struct ieee80211_local *local = sdata->local;
-	struct ieee80211_key *key;
-	struct sta_info *sta;
-
-	if (mac_addr) {
-		sta = sta_info_get_bss(sdata, mac_addr);
-		if (!sta)
-			return NULL;
-
-		if (pairwise && key_idx < NUM_DEFAULT_KEYS)
-			return rcu_dereference_check_key_mtx(local,
-							     sta->ptk[key_idx]);
-
-		if (!pairwise &&
-		    key_idx < NUM_DEFAULT_KEYS +
-			      NUM_DEFAULT_MGMT_KEYS +
-			      NUM_DEFAULT_BEACON_KEYS)
-			return rcu_dereference_check_key_mtx(local,
-							     sta->deflink.gtk[key_idx]);
-
-		return NULL;
-	}
-
-	if (pairwise && key_idx < NUM_DEFAULT_KEYS)
-		return rcu_dereference_check_key_mtx(local,
-						     sdata->keys[key_idx]);
-
-	key = rcu_dereference_check_key_mtx(local, sdata->deflink.gtk[key_idx]);
-	if (key)
-		return key;
-
-	/* or maybe it was a WEP key */
-	if (key_idx < NUM_DEFAULT_KEYS)
-		return rcu_dereference_check_key_mtx(local, sdata->keys[key_idx]);
-
-	return NULL;
-}
-
-static int ieee80211_del_key(struct wiphy *wiphy, struct net_device *dev,
-			     u8 key_idx, bool pairwise, const u8 *mac_addr)
-{
-	struct ieee80211_sub_if_data *sdata = IEEE80211_DEV_TO_SUB_IF(dev);
-	struct ieee80211_local *local = sdata->local;
-	struct ieee80211_key *key;
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (link_id >= 0) {
 		link = rcu_dereference_check(sdata->link[link_id],
@@ -649,7 +588,6 @@ static int ieee80211_del_key(struct wiphy *wiphy, struct net_device *dev,
 			return NULL;
 	}
 
-<<<<<<< HEAD
 	if (mac_addr) {
 		struct sta_info *sta;
 		struct link_sta_info *link_sta;
@@ -709,9 +647,6 @@ static int ieee80211_del_key(struct wiphy *wiphy, struct net_device *dev,
 	mutex_lock(&local->key_mtx);
 
 	key = ieee80211_lookup_key(sdata, link_id, key_idx, pairwise, mac_addr);
-=======
-	key = ieee80211_lookup_key(sdata, key_idx, pairwise, mac_addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!key) {
 		ret = -ENOENT;
 		goto out_unlock;
@@ -747,11 +682,7 @@ static int ieee80211_get_key(struct wiphy *wiphy, struct net_device *dev,
 
 	rcu_read_lock();
 
-<<<<<<< HEAD
 	key = ieee80211_lookup_key(sdata, link_id, key_idx, pairwise, mac_addr);
-=======
-	key = ieee80211_lookup_key(sdata, key_idx, pairwise, mac_addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!key)
 		goto out;
 
@@ -1300,7 +1231,6 @@ static int ieee80211_start_ap(struct wiphy *wiphy, struct net_device *dev,
 	unsigned int link_id = params->beacon.link_id;
 	struct ieee80211_link_data *link;
 	struct ieee80211_bss_conf *link_conf;
-<<<<<<< HEAD
 
 	link = sdata_dereference(sdata->link[link_id], sdata);
 	if (!link)
@@ -1308,15 +1238,6 @@ static int ieee80211_start_ap(struct wiphy *wiphy, struct net_device *dev,
 
 	link_conf = link->conf;
 
-=======
-
-	link = sdata_dereference(sdata->link[link_id], sdata);
-	if (!link)
-		return -ENOLINK;
-
-	link_conf = link->conf;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	old = sdata_dereference(link->u.ap.beacon, sdata);
 	if (old)
 		return -EALREADY;
@@ -1590,15 +1511,12 @@ static int ieee80211_stop_ap(struct wiphy *wiphy, struct net_device *dev,
 
 	kfree(link_conf->ftmr_params);
 	link_conf->ftmr_params = NULL;
-<<<<<<< HEAD
 
 	sdata->vif.mbssid_tx_vif = NULL;
 	link_conf->bssid_index = 0;
 	link_conf->nontransmitted = false;
 	link_conf->ema_ap = false;
 	link_conf->bssid_indicator = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	__sta_info_flush(sdata, true);
 	ieee80211_free_keys(sdata, true);
@@ -2729,12 +2647,8 @@ static int ieee80211_set_txq_params(struct wiphy *wiphy,
 {
 	struct ieee80211_local *local = wiphy_priv(wiphy);
 	struct ieee80211_sub_if_data *sdata = IEEE80211_DEV_TO_SUB_IF(dev);
-<<<<<<< HEAD
 	struct ieee80211_link_data *link =
 		ieee80211_link_or_deflink(sdata, params->link_id, true);
-=======
-	struct ieee80211_link_data *link = &sdata->deflink;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ieee80211_tx_queue_params p;
 
 	if (!local->ops->conf_tx)
@@ -3219,18 +3133,6 @@ static int ieee80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *dev,
 	sdata_lock(sdata);
 	for (link_id = 0; link_id < ARRAY_SIZE(sdata->link); link_id++) {
 		struct ieee80211_link_data *link;
-<<<<<<< HEAD
-=======
-
-		link = sdata_dereference(sdata->link[link_id], sdata);
-
-		if (!link)
-			continue;
-		__ieee80211_request_smps_mgd(sdata, link,
-					     link->u.mgd.req_smps);
-	}
-	sdata_unlock(sdata);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		link = sdata_dereference(sdata->link[link_id], sdata);
 
@@ -3924,11 +3826,7 @@ __ieee80211_channel_switch(struct wiphy *wiphy, struct net_device *dev,
 					  IEEE80211_QUEUE_STOP_REASON_CSA);
 
 	cfg80211_ch_switch_started_notify(sdata->dev,
-<<<<<<< HEAD
 					  &sdata->deflink.csa_chandef, 0,
-=======
-					  &sdata->deflink.csa_chandef,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					  params->count, params->block_tx);
 
 	if (changed) {
@@ -4810,12 +4708,9 @@ static int ieee80211_add_intf_link(struct wiphy *wiphy,
 {
 	struct ieee80211_sub_if_data *sdata = IEEE80211_WDEV_TO_SUB_IF(wdev);
 
-<<<<<<< HEAD
 	if (wdev->use_4addr)
 		return -EOPNOTSUPP;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ieee80211_vif_set_links(sdata, wdev->valid_links);
 }
 

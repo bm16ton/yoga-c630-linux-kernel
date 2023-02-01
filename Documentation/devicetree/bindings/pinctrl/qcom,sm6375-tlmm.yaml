@@ -44,14 +44,9 @@ patternProperties:
     oneOf:
       - $ref: "#/$defs/qcom-sm6375-tlmm-state"
       - patternProperties:
-<<<<<<< HEAD
           "-pins$":
             $ref: "#/$defs/qcom-sm6375-tlmm-state"
         additionalProperties: false
-=======
-          ".*":
-            $ref: "#/$defs/qcom-sm6375-tlmm-state"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 $defs:
   qcom-sm6375-tlmm-state:
@@ -59,10 +54,6 @@ $defs:
     description:
       Pinctrl node's client devices use subnodes for desired pin configuration.
       Client device subnodes use below standard properties.
-<<<<<<< HEAD
-=======
-    $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     properties:
       pins:
@@ -128,7 +119,6 @@ $defs:
 
     required:
       - pins
-<<<<<<< HEAD
 
     allOf:
       - $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
@@ -139,15 +129,11 @@ $defs:
         then:
           required:
             - function
-=======
-      - function
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     additionalProperties: false
 
 examples:
   - |
-<<<<<<< HEAD
     #include <dt-bindings/interrupt-controller/arm-gic.h>
     pinctrl@500000 {
         compatible = "qcom,sm6375-tlmm";
@@ -178,36 +164,4 @@ examples:
             };
         };
     };
-=======
-        #include <dt-bindings/interrupt-controller/arm-gic.h>
-        pinctrl@500000 {
-                compatible = "qcom,sm6375-tlmm";
-                reg = <0x00500000 0x800000>;
-                interrupts = <GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
-                gpio-controller;
-                #gpio-cells = <2>;
-                interrupt-controller;
-                #interrupt-cells = <2>;
-                gpio-ranges = <&tlmm 0 0 157>;
-
-                gpio-wo-subnode-state {
-                        pins = "gpio1";
-                        function = "gpio";
-                };
-
-                uart-w-subnodes-state {
-                        rx {
-                                pins = "gpio18";
-                                function = "qup13_f2";
-                                bias-pull-up;
-                        };
-
-                        tx {
-                                pins = "gpio19";
-                                function = "qup13_f2";
-                                bias-disable;
-                        };
-                };
-        };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ...

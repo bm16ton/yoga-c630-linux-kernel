@@ -8,7 +8,6 @@
  * Copyright (C) 2008-2010 Analog Devices Inc.
  */
 
-<<<<<<< HEAD
 #include <linux/bits.h>
 #include <linux/delay.h>
 #include <linux/errno.h>
@@ -17,18 +16,10 @@
 #include <linux/i2c.h>
 #include <linux/input.h>
 #include <linux/input/matrix_keypad.h>
-=======
-#include <linux/delay.h>
-#include <linux/errno.h>
-#include <linux/gpio/driver.h>
-#include <linux/i2c.h>
-#include <linux/input.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/interrupt.h>
 #include <linux/irq.h>
 #include <linux/ktime.h>
 #include <linux/module.h>
-<<<<<<< HEAD
 #include <linux/mod_devicetable.h>
 #include <linux/pinctrl/pinconf-generic.h>
 #include <linux/platform_device.h>
@@ -130,12 +121,6 @@
 #define ADP5588_BIT(offs)	(1u << ((offs) & 0x7))
 
 /* Put one of these structures in i2c_board_info platform_data */
-=======
-#include <linux/platform_device.h>
-#include <linux/pm.h>
-#include <linux/slab.h>
-#include <linux/timekeeping.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * 128 so it fits matrix-keymap maximum number of keys when the full
@@ -190,11 +175,8 @@
  */
 #define WA_DELAYED_READOUT_REVID(rev)		((rev) < 4)
 #define WA_DELAYED_READOUT_TIME			25
-<<<<<<< HEAD
 
 #define ADP5588_INVALID_HWIRQ	(~0UL)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct adp5588_kpad {
 	struct i2c_client *client;
@@ -373,7 +355,6 @@ static int adp5588_build_gpiomap(struct adp5588_kpad *kpad)
 	return n_unused;
 }
 
-<<<<<<< HEAD
 static void adp5588_irq_bus_lock(struct irq_data *d)
 {
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
@@ -441,23 +422,6 @@ static const struct irq_chip adp5588_irq_chip = {
 	GPIOCHIP_IRQ_RESOURCE_HELPERS,
 };
 
-=======
-static void adp5588_gpio_do_teardown(void *_kpad)
-{
-	struct adp5588_kpad *kpad = _kpad;
-	struct device *dev = &kpad->client->dev;
-	const struct adp5588_kpad_platform_data *pdata = dev_get_platdata(dev);
-	const struct adp5588_gpio_platform_data *gpio_data = pdata->gpio_data;
-	int error;
-
-	error = gpio_data->teardown(kpad->client,
-				    kpad->gc.base, kpad->gc.ngpio,
-				    gpio_data->context);
-	if (error)
-		dev_warn(&kpad->client->dev, "teardown failed %d\n", error);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int adp5588_gpio_add(struct adp5588_kpad *kpad)
 {
 	struct device *dev = &kpad->client->dev;
@@ -470,10 +434,7 @@ static int adp5588_gpio_add(struct adp5588_kpad *kpad)
 		return 0;
 	}
 
-<<<<<<< HEAD
 	kpad->gc.parent = &kpad->client->dev;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kpad->gc.direction_input = adp5588_gpio_direction_input;
 	kpad->gc.direction_output = adp5588_gpio_direction_output;
 	kpad->gc.get = adp5588_gpio_get_value;
@@ -502,7 +463,6 @@ static int adp5588_gpio_add(struct adp5588_kpad *kpad)
 		kpad->dat_out[i] = adp5588_read(kpad->client,
 						GPIO_DAT_OUT1 + i);
 		kpad->dir[i] = adp5588_read(kpad->client, GPIO_DIR1 + i);
-<<<<<<< HEAD
 		kpad->pull_dis[i] = adp5588_read(kpad->client, GPIO_PULL1 + i);
 	}
 
@@ -560,34 +520,6 @@ static void adp5588_gpio_irq_handle(struct adp5588_kpad *kpad, int key_val,
 	    (irq_type & IRQ_TYPE_EDGE_FALLING && key_press))
 		handle_nested_irq(irq);
 }
-=======
-	}
-
-	if (gpio_data->setup) {
-		error = gpio_data->setup(kpad->client,
-					 kpad->gc.base, kpad->gc.ngpio,
-					 gpio_data->context);
-		if (error)
-			dev_warn(dev, "setup failed: %d\n", error);
-	}
-
-	if (gpio_data->teardown) {
-		error = devm_add_action(dev, adp5588_gpio_do_teardown, kpad);
-		if (error)
-			dev_warn(dev, "failed to schedule teardown: %d\n",
-				 error);
-	}
-
-	return 0;
-}
-
-#else
-static inline int adp5588_gpio_add(struct adp5588_kpad *kpad)
-{
-	return 0;
-}
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void adp5588_report_events(struct adp5588_kpad *kpad, int ev_cnt)
 {
@@ -617,7 +549,6 @@ static void adp5588_report_events(struct adp5588_kpad *kpad, int ev_cnt)
 }
 
 static irqreturn_t adp5588_hard_irq(int irq, void *handle)
-<<<<<<< HEAD
 {
 	struct adp5588_kpad *kpad = handle;
 
@@ -629,19 +560,6 @@ static irqreturn_t adp5588_hard_irq(int irq, void *handle)
 static irqreturn_t adp5588_thread_irq(int irq, void *handle)
 {
 	struct adp5588_kpad *kpad = handle;
-=======
-{
-	struct adp5588_kpad *kpad = handle;
-
-	kpad->irq_time = ktime_get();
-
-	return IRQ_WAKE_THREAD;
-}
-
-static irqreturn_t adp5588_thread_irq(int irq, void *handle)
-{
-	struct adp5588_kpad *kpad = handle;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct i2c_client *client = kpad->client;
 	ktime_t target_time, now;
 	unsigned long delay;
@@ -849,26 +767,12 @@ static int adp5588_probe(struct i2c_client *client,
 	if (IS_ERR(gpio))
 		return PTR_ERR(gpio);
 
-<<<<<<< HEAD
 	if (gpio) {
 		fsleep(30);
 		gpiod_set_value_cansleep(gpio, 0);
 		fsleep(60);
 	}
 
-=======
-	kpad = devm_kzalloc(&client->dev, sizeof(*kpad), GFP_KERNEL);
-	if (!kpad)
-		return -ENOMEM;
-
-	input = devm_input_allocate_device(&client->dev);
-	if (!input)
-		return -ENOMEM;
-
-	kpad->client = client;
-	kpad->input = input;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = adp5588_read(client, DEV_ID);
 	if (ret < 0)
 		return ret;
@@ -892,35 +796,15 @@ static int adp5588_probe(struct i2c_client *client,
 		dev_err(&client->dev, "unable to register input device: %d\n",
 			error);
 		return error;
-<<<<<<< HEAD
-=======
-	}
-
-	error = devm_request_threaded_irq(&client->dev, client->irq,
-					  adp5588_hard_irq, adp5588_thread_irq,
-					  IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
-					  client->dev.driver->name, kpad);
-	if (error) {
-		dev_err(&client->dev, "failed to request irq %d: %d\n",
-			client->irq, error);
-		return error;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	error = adp5588_setup(kpad);
 	if (error)
 		return error;
-<<<<<<< HEAD
-=======
-
-	if (kpad->gpimapsize)
-		adp5588_report_switch_state(kpad);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	error = adp5588_gpio_add(kpad);
 	if (error)
 		return error;
-<<<<<<< HEAD
 
 	error = devm_request_threaded_irq(&client->dev, client->irq,
 					  adp5588_hard_irq, adp5588_thread_irq,
@@ -931,8 +815,6 @@ static int adp5588_probe(struct i2c_client *client,
 			client->irq, error);
 		return error;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev_info(&client->dev, "Rev.%d keypad, irq %d\n", revid, client->irq);
 	return 0;
@@ -943,16 +825,9 @@ static void adp5588_remove(struct i2c_client *client)
 	adp5588_write(client, CFG, 0);
 
 	/* all resources will be freed by devm */
-<<<<<<< HEAD
 }
 
 static int adp5588_suspend(struct device *dev)
-=======
-	return 0;
-}
-
-static int __maybe_unused adp5588_suspend(struct device *dev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct i2c_client *client = to_i2c_client(dev);
 
@@ -961,7 +836,7 @@ static int __maybe_unused adp5588_suspend(struct device *dev)
 	return 0;
 }
 
-static int __maybe_unused adp5588_resume(struct device *dev)
+static int adp5588_resume(struct device *dev)
 {
 	struct i2c_client *client = to_i2c_client(dev);
 
@@ -970,11 +845,7 @@ static int __maybe_unused adp5588_resume(struct device *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static DEFINE_SIMPLE_DEV_PM_OPS(adp5588_dev_pm_ops, adp5588_suspend, adp5588_resume);
-=======
-static SIMPLE_DEV_PM_OPS(adp5588_dev_pm_ops, adp5588_suspend, adp5588_resume);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct i2c_device_id adp5588_id[] = {
 	{ "adp5588-keys", 0 },
@@ -993,12 +864,8 @@ MODULE_DEVICE_TABLE(of, adp5588_of_match);
 static struct i2c_driver adp5588_driver = {
 	.driver = {
 		.name = KBUILD_MODNAME,
-<<<<<<< HEAD
 		.of_match_table = adp5588_of_match,
 		.pm   = pm_sleep_ptr(&adp5588_dev_pm_ops),
-=======
-		.pm   = &adp5588_dev_pm_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	.probe    = adp5588_probe,
 	.remove   = adp5588_remove,

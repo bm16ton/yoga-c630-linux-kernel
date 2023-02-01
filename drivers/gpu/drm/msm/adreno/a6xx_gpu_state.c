@@ -813,12 +813,9 @@ static struct msm_gpu_state_bo *a6xx_snapshot_gmu_bo(
 {
 	struct msm_gpu_state_bo *snapshot;
 
-<<<<<<< HEAD
 	if (!bo->size)
 		return NULL;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snapshot = state_kcalloc(a6xx_state, 1, sizeof(*snapshot));
 	if (!snapshot)
 		return NULL;
@@ -958,12 +955,6 @@ static void a6xx_get_indexed_registers(struct msm_gpu *gpu,
 	a6xx_get_indexed_regs(gpu, a6xx_state, &a6xx_cp_mempool_indexed,
 		&a6xx_state->indexed_regs[i]);
 
-	if (!a6xx_state->indexed_regs[i].data) {
-		gpu_write(gpu, REG_A6XX_CP_MEM_POOL_SIZE, mempool_size);
-		a6xx_state->nr_indexed_regs = count - 1;
-		return;
-	}
-
 	/*
 	 * Offset 0x2000 in the mempool is the size - copy the saved size over
 	 * so the data is consistent
@@ -1021,21 +1012,12 @@ struct msm_gpu_state *a6xx_gpu_state_get(struct msm_gpu *gpu)
 	}
 
 	a6xx_get_registers(gpu, a6xx_state, dumper);
-<<<<<<< HEAD
 
 	if (dumper) {
 		a6xx_get_shaders(gpu, a6xx_state, dumper);
 		a6xx_get_clusters(gpu, a6xx_state, dumper);
 		a6xx_get_dbgahb_clusters(gpu, a6xx_state, dumper);
 
-=======
-
-	if (dumper) {
-		a6xx_get_shaders(gpu, a6xx_state, dumper);
-		a6xx_get_clusters(gpu, a6xx_state, dumper);
-		a6xx_get_dbgahb_clusters(gpu, a6xx_state, dumper);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		msm_gem_kernel_put(dumper->bo, gpu->aspace);
 	}
 
@@ -1061,7 +1043,6 @@ static void a6xx_gpu_state_destroy(struct kref *kref)
 	if (a6xx_state->gmu_hfi)
 		kvfree(a6xx_state->gmu_hfi->data);
 
-<<<<<<< HEAD
 	if (a6xx_state->gmu_debug)
 		kvfree(a6xx_state->gmu_debug->data);
 
@@ -1069,10 +1050,6 @@ static void a6xx_gpu_state_destroy(struct kref *kref)
 		list_del(&obj->node);
 		kvfree(obj);
 	}
-=======
-	list_for_each_entry_safe(obj, tmp, &a6xx_state->objs, node)
-		kfree(obj);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	adreno_gpu_state_destroy(state);
 	kfree(a6xx_state);

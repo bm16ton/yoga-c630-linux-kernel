@@ -36,7 +36,6 @@ void arch_dma_prep_coherent(struct page *page, size_t size)
 {
 	unsigned long start = (unsigned long)page_address(page);
 
-<<<<<<< HEAD
 	/*
 	 * The architecture only requires a clean to the PoC here in order to
 	 * meet the requirements of the DMA API. However, some vendors (i.e.
@@ -52,8 +51,6 @@ void arch_dma_prep_coherent(struct page *page, size_t size)
 	 * of the cache maintenance we use. Once the drivers are fixed, we can
 	 * relax this to a clean operation.
 	 */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dcache_clean_inval_poc(start, start + size);
 }
 

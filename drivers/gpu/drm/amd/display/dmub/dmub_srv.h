@@ -248,10 +248,7 @@ struct dmub_srv_hw_params {
 	bool disable_dpia;
 	bool usb4_cm_version;
 	bool fw_in_system_memory;
-<<<<<<< HEAD
 	bool dpia_hpd_int_enable_supported;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -446,27 +443,6 @@ struct dmub_srv {
 	/* Feature capabilities reported by fw */
 	struct dmub_feature_caps feature_caps;
 	struct dmub_visual_confirm_color visual_confirm_color;
-};
-
-/**
- * struct dmub_notification - dmub notification data
- * @type: dmub notification type
- * @link_index: link index to identify aux connection
- * @result: USB4 status returned from dmub
- * @pending_notification: Indicates there are other pending notifications
- * @aux_reply: aux reply
- * @hpd_status: hpd status
- */
-struct dmub_notification {
-	enum dmub_notification_type type;
-	uint8_t link_index;
-	uint8_t result;
-	bool pending_notification;
-	union {
-		struct aux_reply_data aux_reply;
-		enum dp_hpd_status hpd_status;
-		enum set_config_status sc_status;
-	};
 };
 
 /**

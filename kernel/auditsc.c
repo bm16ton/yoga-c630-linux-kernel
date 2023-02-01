@@ -965,11 +965,7 @@ static void audit_reset_context(struct audit_context *ctx)
 	if (!ctx)
 		return;
 
-<<<<<<< HEAD
 	/* if ctx is non-null, reset the "ctx->context" regardless */
-=======
-	/* if ctx is non-null, reset the "ctx->state" regardless */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ctx->context = AUDIT_CTX_UNUSED;
 	if (ctx->dummy)
 		return;
@@ -1006,11 +1002,7 @@ static void audit_reset_context(struct audit_context *ctx)
 	kfree(ctx->sockaddr);
 	ctx->sockaddr = NULL;
 	ctx->sockaddr_len = 0;
-<<<<<<< HEAD
 	ctx->ppid = 0;
-=======
-	ctx->pid = ctx->ppid = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ctx->uid = ctx->euid = ctx->suid = ctx->fsuid = KUIDT_INIT(0);
 	ctx->gid = ctx->egid = ctx->sgid = ctx->fsgid = KGIDT_INIT(0);
 	ctx->personality = 0;

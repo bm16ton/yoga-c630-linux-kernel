@@ -78,10 +78,7 @@ int lpfc_init_iocb_list(struct lpfc_hba *phba, int cnt);
 void lpfc_free_iocb_list(struct lpfc_hba *phba);
 int lpfc_post_rq_buffer(struct lpfc_hba *phba, struct lpfc_queue *hrq,
 			struct lpfc_queue *drq, int count, int idx);
-<<<<<<< HEAD
 int lpfc_read_lds_params(struct lpfc_hba *phba);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 uint32_t lpfc_calc_cmf_latency(struct lpfc_hba *phba);
 void lpfc_cmf_signal_init(struct lpfc_hba *phba);
 void lpfc_cmf_start(struct lpfc_hba *phba);

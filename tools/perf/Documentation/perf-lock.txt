@@ -98,14 +98,11 @@ REPORT OPTIONS
          EventManager_De       1845          1             636
          futex-default-S       1609          0               0
 
-<<<<<<< HEAD
 -E::
 --entries=<value>::
 	Display this many entries.
 
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 INFO OPTIONS
 ------------
 
@@ -117,10 +114,7 @@ INFO OPTIONS
 --map::
 	dump map of lock instances (address:name table)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 CONTENTION OPTIONS
 --------------
 
@@ -164,7 +158,6 @@ CONTENTION OPTIONS
 --map-nr-entries::
 	Maximum number of BPF map entries (default: 10240).
 
-<<<<<<< HEAD
 --max-stack::
 	Maximum stack depth when collecting lock contention (default: 8).
 
@@ -175,8 +168,6 @@ CONTENTION OPTIONS
 --entries=<value>::
 	Display this many entries.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 SEE ALSO
 --------

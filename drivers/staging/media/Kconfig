@@ -22,13 +22,6 @@ if STAGING_MEDIA && MEDIA_SUPPORT
 # Please keep them in alphabetic order
 source "drivers/staging/media/atomisp/Kconfig"
 
-<<<<<<< HEAD
-=======
-source "drivers/staging/media/av7110/Kconfig"
-
-source "drivers/staging/media/hantro/Kconfig"
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/staging/media/imx/Kconfig"
 
 source "drivers/staging/media/ipu3/Kconfig"
@@ -41,7 +34,6 @@ source "drivers/staging/media/omap4iss/Kconfig"
 
 source "drivers/staging/media/rkvdec/Kconfig"
 
-<<<<<<< HEAD
 source "drivers/staging/media/sunxi/Kconfig"
 
 source "drivers/staging/media/tegra-video/Kconfig"
@@ -55,15 +47,9 @@ menuconfig STAGING_MEDIA_DEPRECATED
 
 	  If you wish to work on these drivers to prevent their removal,
 	  then contact the linux-media@vger.kernel.org mailing list.
-=======
-source "drivers/staging/media/stkwebcam/Kconfig"
-
-source "drivers/staging/media/sunxi/Kconfig"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	  If in doubt, say N here.
 
-<<<<<<< HEAD
 if STAGING_MEDIA_DEPRECATED
 source "drivers/staging/media/deprecated/cpia2/Kconfig"
 source "drivers/staging/media/deprecated/fsl-viu/Kconfig"
@@ -74,8 +60,5 @@ source "drivers/staging/media/deprecated/tm6000/Kconfig"
 source "drivers/staging/media/deprecated/vpfe_capture/Kconfig"
 source "drivers/staging/media/deprecated/zr364xx/Kconfig"
 endif
-=======
-source "drivers/staging/media/zoran/Kconfig"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 endif

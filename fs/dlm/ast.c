@@ -288,16 +288,10 @@ void dlm_callback_stop(struct dlm_ls *ls)
 
 void dlm_callback_suspend(struct dlm_ls *ls)
 {
-<<<<<<< HEAD
 	if (ls->ls_callback_wq) {
 		mutex_lock(&ls->ls_cb_mutex);
 		set_bit(LSFL_CB_DELAY, &ls->ls_flags);
 		mutex_unlock(&ls->ls_cb_mutex);
-=======
-	mutex_lock(&ls->ls_cb_mutex);
-	set_bit(LSFL_CB_DELAY, &ls->ls_flags);
-	mutex_unlock(&ls->ls_cb_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		flush_workqueue(ls->ls_callback_wq);
 	}
@@ -310,11 +304,6 @@ void dlm_callback_resume(struct dlm_ls *ls)
 	struct dlm_lkb *lkb, *safe;
 	int count = 0, sum = 0;
 	bool empty;
-<<<<<<< HEAD
-=======
-
-	clear_bit(LSFL_CB_DELAY, &ls->ls_flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!ls->ls_callback_wq)
 		return;

@@ -570,28 +570,6 @@ static struct attribute *node_dev_attrs[] = {
 	&dev_attr_vmstat.attr,
 	NULL
 };
-<<<<<<< HEAD
-=======
-
-static struct bin_attribute *node_dev_bin_attrs[] = {
-	&bin_attr_cpumap,
-	&bin_attr_cpulist,
-	NULL
-};
-
-static const struct attribute_group node_dev_group = {
-	.attrs = node_dev_attrs,
-	.bin_attrs = node_dev_bin_attrs
-};
-
-static const struct attribute_group *node_dev_groups[] = {
-	&node_dev_group,
-#ifdef CONFIG_HAVE_ARCH_NODE_DEV_GROUP
-	&arch_node_dev_group,
-#endif
-	NULL
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct bin_attribute *node_dev_bin_attrs[] = {
 	&bin_attr_cpumap,
@@ -614,25 +592,7 @@ static const struct attribute_group *node_dev_groups[] = {
 
 static void node_device_release(struct device *dev)
 {
-<<<<<<< HEAD
 	kfree(to_node(dev));
-=======
-	struct node *node = to_node(dev);
-
-#if defined(CONFIG_MEMORY_HOTPLUG) && defined(CONFIG_HUGETLBFS)
-	/*
-	 * We schedule the work only when a memory section is
-	 * onlined/offlined on this node. When we come here,
-	 * all the memory on this node has been offlined,
-	 * so we won't enqueue new work to this work.
-	 *
-	 * The work is using node->node_work, so we should
-	 * flush work before freeing the memory.
-	 */
-	flush_work(&node->node_work);
-#endif
-	kfree(node);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -670,13 +630,8 @@ static int register_node(struct node *node, int num)
  */
 void unregister_node(struct node *node)
 {
-<<<<<<< HEAD
 	hugetlb_unregister_node(node);
 	compaction_unregister_node(node);
-=======
-	compaction_unregister_node(node);
-	hugetlb_unregister_node(node);		/* no-op, if memoryless node */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	node_remove_accesses(node);
 	node_remove_caches(node);
 	device_unregister(&node->dev);
@@ -898,77 +853,7 @@ void register_memory_blocks_under_node(int nid, unsigned long start_pfn,
 			   (void *)&nid, func);
 	return;
 }
-<<<<<<< HEAD
 #endif /* CONFIG_MEMORY_HOTPLUG */
-=======
-
-#ifdef CONFIG_HUGETLBFS
-/*
- * Handle per node hstate attribute [un]registration on transistions
- * to/from memoryless state.
- */
-static void node_hugetlb_work(struct work_struct *work)
-{
-	struct node *node = container_of(work, struct node, node_work);
-
-	/*
-	 * We only get here when a node transitions to/from memoryless state.
-	 * We can detect which transition occurred by examining whether the
-	 * node has memory now.  hugetlb_register_node() already check this
-	 * so we try to register the attributes.  If that fails, then the
-	 * node has transitioned to memoryless, try to unregister the
-	 * attributes.
-	 */
-	if (!hugetlb_register_node(node))
-		hugetlb_unregister_node(node);
-}
-
-static void init_node_hugetlb_work(int nid)
-{
-	INIT_WORK(&node_devices[nid]->node_work, node_hugetlb_work);
-}
-
-static int node_memory_callback(struct notifier_block *self,
-				unsigned long action, void *arg)
-{
-	struct memory_notify *mnb = arg;
-	int nid = mnb->status_change_nid;
-
-	switch (action) {
-	case MEM_ONLINE:
-	case MEM_OFFLINE:
-		/*
-		 * offload per node hstate [un]registration to a work thread
-		 * when transitioning to/from memoryless state.
-		 */
-		if (nid != NUMA_NO_NODE)
-			schedule_work(&node_devices[nid]->node_work);
-		break;
-
-	case MEM_GOING_ONLINE:
-	case MEM_GOING_OFFLINE:
-	case MEM_CANCEL_ONLINE:
-	case MEM_CANCEL_OFFLINE:
-	default:
-		break;
-	}
-
-	return NOTIFY_OK;
-}
-#endif	/* CONFIG_HUGETLBFS */
-#endif /* CONFIG_MEMORY_HOTPLUG */
-
-#if !defined(CONFIG_MEMORY_HOTPLUG) || !defined(CONFIG_HUGETLBFS)
-static inline int node_memory_callback(struct notifier_block *self,
-				unsigned long action, void *arg)
-{
-	return NOTIFY_OK;
-}
-
-static void init_node_hugetlb_work(int nid) { }
-
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int __register_one_node(int nid)
 {
@@ -1058,18 +943,8 @@ static const struct attribute_group *cpu_root_attr_groups[] = {
 	NULL,
 };
 
-<<<<<<< HEAD
 void __init node_dev_init(void)
 {
-=======
-#define NODE_CALLBACK_PRI	2	/* lower than SLAB */
-void __init node_dev_init(void)
-{
-	static struct notifier_block node_memory_callback_nb = {
-		.notifier_call = node_memory_callback,
-		.priority = NODE_CALLBACK_PRI,
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret, i;
 
  	BUILD_BUG_ON(ARRAY_SIZE(node_state_attr) != NR_NODE_STATES);
@@ -1078,11 +953,6 @@ void __init node_dev_init(void)
 	ret = subsys_system_register(&node_subsys, cpu_root_attr_groups);
 	if (ret)
 		panic("%s() failed to register subsystem: %d\n", __func__, ret);
-<<<<<<< HEAD
-=======
-
-	register_hotmemory_notifier(&node_memory_callback_nb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Create all node devices, which will properly link the node

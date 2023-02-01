@@ -12,10 +12,7 @@ ipa-y			:=	ipa_main.o ipa_power.o ipa_reg.o ipa_mem.o \
 				ipa_endpoint.o ipa_cmd.o ipa_modem.o \
 				ipa_resource.o ipa_qmi.o ipa_qmi_msg.o \
 				ipa_sysfs.o
-<<<<<<< HEAD
 
 ipa-y			+=	$(IPA_VERSIONS:%=reg/ipa_reg-v%.o)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 ipa-y			+=	$(IPA_VERSIONS:%=data/ipa_data-v%.o)

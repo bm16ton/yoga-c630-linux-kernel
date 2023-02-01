@@ -70,7 +70,6 @@ struct link_mst_stream_allocation_table {
 struct edp_trace_power_timestamps {
 	uint64_t poweroff;
 	uint64_t poweron;
-<<<<<<< HEAD
 };
 
 struct dp_trace_lt_counts {
@@ -78,15 +77,6 @@ struct dp_trace_lt_counts {
 	unsigned int fail;
 };
 
-=======
-};
-
-struct dp_trace_lt_counts {
-	unsigned int total;
-	unsigned int fail;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dp_trace_lt {
 	struct dp_trace_lt_counts counts;
 	struct dp_trace_timestamps {
@@ -171,10 +161,6 @@ struct dc_link {
 	bool link_state_valid;
 	bool aux_access_disabled;
 	bool sync_lt_in_progress;
-<<<<<<< HEAD
-=======
-	enum lttpr_mode lttpr_mode;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool is_internal_display;
 
 	/* TODO: Rename. Flag an endpoint as having a programmable mapping to a
@@ -267,10 +253,7 @@ struct dc_link {
 		bool dpia_mst_dsc_always_on;
 		/* Forced DPIA into TBT3 compatibility mode. */
 		bool dpia_forced_tbt3_mode;
-<<<<<<< HEAD
 		bool dongle_mode_timing_override;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} wa_flags;
 	struct link_mst_stream_allocation_table mst_stream_alloc_table;
 

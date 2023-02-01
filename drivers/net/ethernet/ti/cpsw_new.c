@@ -1416,13 +1416,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
 			 * accordingly.
 			 */
 			netif_napi_add(ndev, &cpsw->napi_rx,
-<<<<<<< HEAD
 				       cpsw->quirk_irq ? cpsw_rx_poll : cpsw_rx_mq_poll);
-=======
-				       cpsw->quirk_irq ?
-				       cpsw_rx_poll : cpsw_rx_mq_poll,
-				       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			netif_napi_add_tx(ndev, &cpsw->napi_tx,
 					  cpsw->quirk_irq ?
 					  cpsw_tx_poll : cpsw_tx_mq_poll);

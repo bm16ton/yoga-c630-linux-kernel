@@ -16,11 +16,7 @@
 
 #include "wip.h"
 
-<<<<<<< HEAD
 static struct rv_monitor rv_wip;
-=======
-struct rv_monitor rv_wip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 DECLARE_DA_MON_PER_CPU(wip, unsigned char);
 
 static void handle_preempt_disable(void *data, unsigned long ip, unsigned long parent_ip)
@@ -64,11 +60,7 @@ static void disable_wip(void)
 	da_monitor_destroy_wip();
 }
 
-<<<<<<< HEAD
 static struct rv_monitor rv_wip = {
-=======
-struct rv_monitor rv_wip = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.name = "wip",
 	.description = "wakeup in preemptive per-cpu testing monitor.",
 	.enable = enable_wip,
@@ -77,21 +69,13 @@ struct rv_monitor rv_wip = {
 	.enabled = 0,
 };
 
-<<<<<<< HEAD
 static int __init register_wip(void)
-=======
-static int register_wip(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	rv_register_monitor(&rv_wip);
 	return 0;
 }
 
-<<<<<<< HEAD
 static void __exit unregister_wip(void)
-=======
-static void unregister_wip(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	rv_unregister_monitor(&rv_wip);
 }

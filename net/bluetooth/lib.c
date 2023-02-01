@@ -170,11 +170,7 @@ __u8 bt_status(int err)
 	case -EMLINK:
 		return 0x09;
 
-<<<<<<< HEAD
 	case -EALREADY:
-=======
-	case EALREADY:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0x0b;
 
 	case -EBUSY:
@@ -195,11 +191,7 @@ __u8 bt_status(int err)
 	case -ECONNABORTED:
 		return 0x16;
 
-<<<<<<< HEAD
 	case -ELOOP:
-=======
-	case ELOOP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0x17;
 
 	case -EPROTONOSUPPORT:

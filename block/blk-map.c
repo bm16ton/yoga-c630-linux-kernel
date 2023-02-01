@@ -274,16 +274,9 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
 	if (!iov_iter_count(iter))
 		return -EINVAL;
 
-<<<<<<< HEAD
 	bio = blk_rq_map_bio_alloc(rq, nr_vecs, gfp_mask);
 	if (bio == NULL)
 		return -ENOMEM;
-=======
-	bio = bio_kmalloc(nr_vecs, gfp_mask);
-	if (!bio)
-		return -ENOMEM;
-	bio_init(bio, NULL, bio->bi_inline_vecs, nr_vecs, req_op(rq));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	while (iov_iter_count(iter)) {
 		struct page **pages, *stack_pages[UIO_FASTIOV];
@@ -291,7 +284,6 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
 		size_t offs;
 		int npages;
 
-<<<<<<< HEAD
 		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
 			pages = stack_pages;
 			bytes = iov_iter_get_pages2(iter, pages, LONG_MAX,
@@ -300,9 +292,6 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
 			bytes = iov_iter_get_pages_alloc2(iter, &pages,
 							LONG_MAX, &offs);
 		}
-=======
-		bytes = iov_iter_get_pages_alloc2(iter, &pages, LONG_MAX, &offs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (unlikely(bytes <= 0)) {
 			ret = bytes ? bytes : -EFAULT;
 			goto out_unmap;
@@ -353,12 +342,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
 
  out_unmap:
 	bio_release_pages(bio, false);
-<<<<<<< HEAD
 	blk_mq_map_bio_put(bio);
-=======
-	bio_uninit(bio);
-	kfree(bio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -766,12 +750,7 @@ int blk_rq_unmap_user(struct bio *bio)
 
 		next_bio = bio;
 		bio = bio->bi_next;
-<<<<<<< HEAD
 		blk_mq_map_bio_put(next_bio);
-=======
-		bio_uninit(next_bio);
-		kfree(next_bio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return ret;

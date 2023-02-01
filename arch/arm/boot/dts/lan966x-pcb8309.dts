@@ -42,7 +42,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	leds {
 		compatible = "gpio-leds";
 
@@ -71,8 +70,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mux: mux-controller {
 		compatible = "gpio-mux";
 		#mux-control-cells = <0>;
@@ -100,13 +97,10 @@
 	};
 };
 
-<<<<<<< HEAD
 &aes {
 	status = "disabled"; /* Reserved by secure OS */
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &flx3 {
 	atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_USART>;
 	status = "okay";

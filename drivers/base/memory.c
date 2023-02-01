@@ -739,7 +739,6 @@ static int add_memory_block(unsigned long block_id, unsigned long state,
 	mem->nid = NUMA_NO_NODE;
 	mem->nr_vmemmap_pages = nr_vmemmap_pages;
 	INIT_LIST_HEAD(&mem->group_next);
-<<<<<<< HEAD
 
 #ifndef CONFIG_NUMA
 	if (state == MEM_ONLINE)
@@ -756,24 +755,6 @@ static int add_memory_block(unsigned long block_id, unsigned long state,
 	if (ret)
 		return ret;
 
-=======
-
-#ifndef CONFIG_NUMA
-	if (state == MEM_ONLINE)
-		/*
-		 * MEM_ONLINE at this point implies early memory. With NUMA,
-		 * we'll determine the zone when setting the node id via
-		 * memory_block_add_nid(). Memory hotplug updated the zone
-		 * manually when memory onlining/offlining succeeds.
-		 */
-		mem->zone = early_node_zone_for_memory_block(mem, NUMA_NO_NODE);
-#endif /* CONFIG_NUMA */
-
-	ret = __add_memory_block(mem);
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (group) {
 		mem->group = group;
 		list_add(&mem->group_next, &group->memory_blocks);

@@ -99,11 +99,7 @@ static int acpi_parking_protocol_cpu_boot(unsigned int cpu)
 	 * that read this address need to convert this address to the
 	 * Boot-Loader's endianness before jumping.
 	 */
-<<<<<<< HEAD
 	writeq_relaxed(__pa_symbol(secondary_entry),
-=======
-	writeq_relaxed(__pa_symbol(function_nocfi(secondary_entry)),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		       &mailbox->entry_point);
 	writel_relaxed(cpu_entry->gic_cpu_id, &mailbox->cpu_id);
 

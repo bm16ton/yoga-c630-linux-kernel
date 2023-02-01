@@ -308,11 +308,7 @@ static const struct dmi_system_id acpi_quirk_skip_dmi_ids[] = {
 					ACPI_QUIRK_SKIP_ACPI_AC_AND_BATTERY),
 	},
 	{
-<<<<<<< HEAD
 		/* Lenovo Yoga Tablet 2 1050F/L */
-=======
-		/* Lenovo Yoga Tablet 1050F/L */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corp."),
 			DMI_MATCH(DMI_PRODUCT_NAME, "VALLEYVIEW C0 PLATFORM"),
@@ -324,7 +320,6 @@ static const struct dmi_system_id acpi_quirk_skip_dmi_ids[] = {
 					ACPI_QUIRK_SKIP_ACPI_AC_AND_BATTERY),
 	},
 	{
-<<<<<<< HEAD
 		/* Lenovo Yoga Tab 3 Pro X90F */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
@@ -346,8 +341,6 @@ static const struct dmi_system_id acpi_quirk_skip_dmi_ids[] = {
 					ACPI_QUIRK_SKIP_ACPI_AC_AND_BATTERY),
 	},
 	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Nextbook Ares 8 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Insyde"),
@@ -376,10 +369,7 @@ static const struct acpi_device_id i2c_acpi_known_good_ids[] = {
 	{ "10EC5640", 0 }, /* RealTek ALC5640 audio codec */
 	{ "INT33F4", 0 },  /* X-Powers AXP288 PMIC */
 	{ "INT33FD", 0 },  /* Intel Crystal Cove PMIC */
-<<<<<<< HEAD
 	{ "INT34D3", 0 },  /* Intel Whiskey Cove PMIC */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ "NPCE69A", 0 },  /* Asus Transformer keyboard dock */
 	{}
 };
@@ -406,7 +396,6 @@ int acpi_quirk_skip_serdev_enumeration(struct device *controller_parent, bool *s
 	struct acpi_device *adev = ACPI_COMPANION(controller_parent);
 	const struct dmi_system_id *dmi_id;
 	long quirks = 0;
-<<<<<<< HEAD
 	u64 uid;
 	int ret;
 
@@ -418,13 +407,6 @@ int acpi_quirk_skip_serdev_enumeration(struct device *controller_parent, bool *s
 
 	/* to not match on PNP enumerated debug UARTs */
 	if (!dev_is_platform(controller_parent))
-=======
-
-	*skip = false;
-
-	/* !dev_is_platform() to not match on PNP enumerated debug UARTs */
-	if (!adev || !adev->pnp.unique_id || !dev_is_platform(controller_parent))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	dmi_id = dmi_first_match(acpi_quirk_skip_dmi_ids);
@@ -432,17 +414,10 @@ int acpi_quirk_skip_serdev_enumeration(struct device *controller_parent, bool *s
 		quirks = (unsigned long)dmi_id->driver_data;
 
 	if (quirks & ACPI_QUIRK_UART1_TTY_UART2_SKIP) {
-<<<<<<< HEAD
 		if (uid == 1)
 			return -ENODEV; /* Create tty cdev instead of serdev */
 
 		if (uid == 2)
-=======
-		if (!strcmp(adev->pnp.unique_id, "1"))
-			return -ENODEV; /* Create tty cdev instead of serdev */
-
-		if (!strcmp(adev->pnp.unique_id, "2"))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			*skip = true;
 	}
 

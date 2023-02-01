@@ -1146,15 +1146,11 @@ static int wmi_create_device(struct device *wmi_bus_dev,
 	wblock->dev.dev.bus = &wmi_bus_type;
 	wblock->dev.dev.parent = wmi_bus_dev;
 
-<<<<<<< HEAD
 	count = guid_count(&wblock->gblock.guid);
 	if (count)
 		dev_set_name(&wblock->dev.dev, "%pUL-%d", &wblock->gblock.guid, count);
 	else
 		dev_set_name(&wblock->dev.dev, "%pUL", &wblock->gblock.guid);
-=======
-	dev_set_name(&wblock->dev.dev, "%pUL", &wblock->gblock.guid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	device_initialize(&wblock->dev.dev);
 
@@ -1174,16 +1170,11 @@ static void wmi_free_devices(struct acpi_device *device)
 	}
 }
 
-<<<<<<< HEAD
 static bool guid_already_parsed_for_legacy(struct acpi_device *device, const guid_t *guid)
-=======
-static bool guid_already_parsed(struct acpi_device *device, const guid_t *guid)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct wmi_block *wblock;
 
 	list_for_each_entry(wblock, &wmi_block_list, list) {
-<<<<<<< HEAD
 		/* skip warning and register if we know the driver will use struct wmi_driver */
 		for (int i = 0; allow_duplicates[i] != NULL; i++) {
 			guid_t tmp;
@@ -1193,8 +1184,6 @@ static bool guid_already_parsed(struct acpi_device *device, const guid_t *guid)
 			if (guid_equal(&tmp, guid))
 				return false;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (guid_equal(&wblock->gblock.guid, guid)) {
 			/*
 			 * Because we historically didn't track the relationship
@@ -1244,17 +1233,7 @@ static int parse_wdg(struct device *wmi_bus_dev, struct acpi_device *device)
 		if (debug_dump_wdg)
 			wmi_dump_wdg(&gblock[i]);
 
-<<<<<<< HEAD
 		if (guid_already_parsed_for_legacy(device, &gblock[i].guid))
-=======
-		/*
-		 * Some WMI devices, like those for nVidia hooks, have a
-		 * duplicate GUID. It's not clear what we should do in this
-		 * case yet, so for now, we'll just ignore the duplicate
-		 * for device creation.
-		 */
-		if (guid_already_parsed(device, &gblock[i].guid))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			continue;
 
 		wblock = kzalloc(sizeof(*wblock), GFP_KERNEL);

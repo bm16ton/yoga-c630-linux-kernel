@@ -739,19 +739,10 @@ unsigned long nfs_io_size(unsigned long iosize, enum xprt_transports proto)
 		iosize = NFS_DEF_FILE_IO_SIZE;
 	else if (iosize >= NFS_MAX_FILE_IO_SIZE)
 		iosize = NFS_MAX_FILE_IO_SIZE;
-<<<<<<< HEAD
 
 	if (proto == XPRT_TRANSPORT_UDP || iosize < PAGE_SIZE)
 		return nfs_block_bits(iosize, NULL);
 	return iosize & PAGE_MASK;
-=======
-	else
-		iosize = iosize & PAGE_MASK;
-
-	if (proto == XPRT_TRANSPORT_UDP)
-		return nfs_block_bits(iosize, NULL);
-	return iosize;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -907,11 +898,7 @@ static inline void nfs_set_port(struct sockaddr_storage *sap, int *port,
 	if (*port == NFS_UNSPEC_PORT)
 		*port = default_port;
 
-<<<<<<< HEAD
 	rpc_set_port((struct sockaddr *)sap, *port);
-=======
-	rpc_set_port(sap, *port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 struct nfs_direct_req {

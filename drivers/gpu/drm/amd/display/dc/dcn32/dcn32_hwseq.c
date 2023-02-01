@@ -206,12 +206,7 @@ static bool dcn32_check_no_memory_request_for_cab(struct dc *dc)
  */
 static uint32_t dcn32_calculate_cab_allocation(struct dc *dc, struct dc_state *ctx)
 {
-<<<<<<< HEAD
 	int i, j;
-=======
-	uint8_t i;
-	int j;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dc_stream_state *stream = NULL;
 	struct dc_plane_state *plane = NULL;
 	uint32_t cursor_size = 0;
@@ -247,11 +242,7 @@ static uint32_t dcn32_calculate_cab_allocation(struct dc *dc, struct dc_state *c
 		 * mall_alloc_width_blk_aligned_l/c = full_vp_width_blk_aligned_l/c
 		 */
 		mall_alloc_width_blk_aligned = ((pipe->plane_res.scl_data.viewport.x +
-<<<<<<< HEAD
 				pipe->plane_res.scl_data.viewport.width + mblk_width - 1) / mblk_width * mblk_width) -
-=======
-				pipe->plane_res.scl_data.viewport.width + mblk_width - 1) / mblk_width * mblk_width) +
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						(pipe->plane_res.scl_data.viewport.x / mblk_width * mblk_width);
 
 		/* full_vp_height_blk_aligned = FLOOR(vp_y_start + full_vp_height + blk_height - 1, blk_height) -
@@ -260,11 +251,7 @@ static uint32_t dcn32_calculate_cab_allocation(struct dc *dc, struct dc_state *c
 		 * mall_alloc_height_blk_aligned_l/c = full_vp_height_blk_aligned_l/c
 		 */
 		mall_alloc_height_blk_aligned = ((pipe->plane_res.scl_data.viewport.y +
-<<<<<<< HEAD
 				pipe->plane_res.scl_data.viewport.height + mblk_height - 1) / mblk_height * mblk_height) -
-=======
-				pipe->plane_res.scl_data.viewport.height + mblk_height - 1) / mblk_height * mblk_height) +
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						(pipe->plane_res.scl_data.viewport.y / mblk_height * mblk_height);
 
 		num_mblks = ((mall_alloc_width_blk_aligned + mblk_width - 1) / mblk_width) *
@@ -367,11 +354,7 @@ bool dcn32_apply_idle_power_optimizations(struct dc *dc, bool enable)
 	union dmub_rb_cmd cmd;
 	uint8_t ways, i;
 	int j;
-<<<<<<< HEAD
 	bool mall_ss_unsupported = false;
-=======
-	bool stereo_in_use = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dc_plane_state *plane = NULL;
 
 	if (!dc->ctx->dmub_srv)
@@ -402,19 +385,13 @@ bool dcn32_apply_idle_power_optimizations(struct dc *dc, bool enable)
 			 */
 			ways = dcn32_calculate_cab_allocation(dc, dc->current_state);
 
-<<<<<<< HEAD
 			/* MALL not supported with Stereo3D or TMZ surface. If any plane is using stereo,
 			 * or TMZ surface, don't try to enter MALL.
-=======
-			/* MALL not supported with Stereo3D. If any plane is using stereo,
-			 * don't try to enter MALL.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 */
 			for (i = 0; i < dc->current_state->stream_count; i++) {
 				for (j = 0; j < dc->current_state->stream_status[i].plane_count; j++) {
 					plane = dc->current_state->stream_status[i].plane_states[j];
 
-<<<<<<< HEAD
 					if (plane->address.type == PLN_ADDR_TYPE_GRPH_STEREO ||
 							plane->address.tmz_surface) {
 						mall_ss_unsupported = true;
@@ -425,17 +402,6 @@ bool dcn32_apply_idle_power_optimizations(struct dc *dc, bool enable)
 					break;
 			}
 			if (ways <= dc->caps.cache_num_ways && !mall_ss_unsupported) {
-=======
-					if (plane->address.type == PLN_ADDR_TYPE_GRPH_STEREO) {
-						stereo_in_use = true;
-						break;
-					}
-				}
-				if (stereo_in_use)
-					break;
-			}
-			if (ways <= dc->caps.cache_num_ways && !stereo_in_use) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				memset(&cmd, 0, sizeof(cmd));
 				cmd.cab.header.type = DMUB_CMD__CAB_FOR_SS;
 				cmd.cab.header.sub_type = DMUB_CMD__CAB_DCN_SS_FIT_IN_CAB;
@@ -473,10 +439,6 @@ bool dcn32_apply_idle_power_optimizations(struct dc *dc, bool enable)
  */
 void dcn32_commit_subvp_config(struct dc *dc, struct dc_state *context)
 {
-<<<<<<< HEAD
-=======
-/*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 	bool enable_subvp = false;
 
@@ -494,10 +456,6 @@ void dcn32_commit_subvp_config(struct dc *dc, struct dc_state *context)
 		}
 	}
 	dc_dmub_setup_subvp_dmub_command(dc, context, enable_subvp);
-<<<<<<< HEAD
-=======
-*/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Sub-Viewport DMUB lock needs to be acquired by driver whenever SubVP is active and:
@@ -670,16 +628,9 @@ bool dcn32_set_input_transfer_func(struct dc *dc,
 			params = &dpp_base->degamma_params;
 	}
 
-<<<<<<< HEAD
 	dpp_base->funcs->dpp_program_gamcor_lut(dpp_base, params);
 
 	if (pipe_ctx->stream_res.opp &&
-=======
-	result = dpp_base->funcs->dpp_program_gamcor_lut(dpp_base, params);
-
-	if (result &&
-			pipe_ctx->stream_res.opp &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pipe_ctx->stream_res.opp->ctx &&
 			hws->funcs.set_mcm_luts)
 		result = hws->funcs.set_mcm_luts(pipe_ctx, plane_state);
@@ -709,15 +660,9 @@ bool dcn32_set_output_transfer_func(struct dc *dc,
 					stream->out_transfer_func,
 					&mpc->blender_params, false))
 				params = &mpc->blender_params;
-<<<<<<< HEAD
 			/* there are no ROM LUTs in OUTGAM */
 			if (stream->out_transfer_func->type == TF_TYPE_PREDEFINED)
 				BREAK_TO_DEBUGGER();
-=======
-		 /* there are no ROM LUTs in OUTGAM */
-		if (stream->out_transfer_func->type == TF_TYPE_PREDEFINED)
-			BREAK_TO_DEBUGGER();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -810,12 +755,8 @@ void dcn32_update_mall_sel(struct dc *dc, struct dc_state *context)
 				hubp->funcs->hubp_update_mall_sel(hubp,
 					num_ways <= dc->caps.cache_num_ways &&
 					pipe->stream->link->psr_settings.psr_version == DC_PSR_VERSION_UNSUPPORTED &&
-<<<<<<< HEAD
 					pipe->plane_state->address.type !=  PLN_ADDR_TYPE_GRPH_STEREO &&
 					!pipe->plane_state->address.tmz_surface ? 2 : 0,
-=======
-					pipe->plane_state->address.type !=  PLN_ADDR_TYPE_GRPH_STEREO ? 2 : 0,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 							cache_cursor);
 			}
 		}
@@ -925,10 +866,7 @@ void dcn32_init_hw(struct dc *dc)
 		if (link->link_enc->funcs->is_dig_enabled &&
 			link->link_enc->funcs->is_dig_enabled(link->link_enc)) {
 			link->link_status.link_active = true;
-<<<<<<< HEAD
 			link->phy_state.symclk_state = SYMCLK_ON_TX_ON;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (link->link_enc->funcs->fec_is_active &&
 					link->link_enc->funcs->fec_is_active(link->link_enc))
 				link->fec_state = dc_link_fec_enabled;
@@ -1205,7 +1143,6 @@ void dcn32_update_odm(struct dc *dc, struct dc_state *context, struct pipe_ctx *
 				true);
 	}
 
-<<<<<<< HEAD
 	if (pipe_ctx->stream_res.dsc) {
 		struct pipe_ctx *current_pipe_ctx = &dc->current_state->res_ctx.pipe_ctx[pipe_ctx->pipe_idx];
 
@@ -1219,28 +1156,12 @@ void dcn32_update_odm(struct dc *dc, struct dc_state *context, struct pipe_ctx *
 			dsc->funcs->dsc_disconnect(dsc);
 		}
 	}
-=======
-	// Don't program pixel clock after link is already enabled
-/*	if (false == pipe_ctx->clock_source->funcs->program_pix_clk(
-			pipe_ctx->clock_source,
-			&pipe_ctx->stream_res.pix_clk_params,
-			&pipe_ctx->pll_settings)) {
-		BREAK_TO_DEBUGGER();
-	}*/
-
-	if (pipe_ctx->stream_res.dsc)
-		update_dsc_on_stream(pipe_ctx, pipe_ctx->stream->timing.flags.DSC);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 unsigned int dcn32_calculate_dccg_k1_k2_values(struct pipe_ctx *pipe_ctx, unsigned int *k1_div, unsigned int *k2_div)
 {
 	struct dc_stream_state *stream = pipe_ctx->stream;
 	unsigned int odm_combine_factor = 0;
-<<<<<<< HEAD
-=======
-	struct dc *dc = pipe_ctx->stream->ctx->dc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool two_pix_per_container = false;
 
 	// For phantom pipes, use the same programming as the main pipes
@@ -1251,10 +1172,7 @@ unsigned int dcn32_calculate_dccg_k1_k2_values(struct pipe_ctx *pipe_ctx, unsign
 	odm_combine_factor = get_odm_config(pipe_ctx, NULL);
 
 	if (is_dp_128b_132b_signal(pipe_ctx)) {
-<<<<<<< HEAD
 		*k1_div = PIXEL_RATE_DIV_BY_1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*k2_div = PIXEL_RATE_DIV_BY_1;
 	} else if (dc_is_hdmi_tmds_signal(pipe_ctx->stream->signal) || dc_is_dvi_signal(pipe_ctx->stream->signal)) {
 		*k1_div = PIXEL_RATE_DIV_BY_1;
@@ -1269,11 +1187,7 @@ unsigned int dcn32_calculate_dccg_k1_k2_values(struct pipe_ctx *pipe_ctx, unsign
 		} else {
 			*k1_div = PIXEL_RATE_DIV_BY_1;
 			*k2_div = PIXEL_RATE_DIV_BY_4;
-<<<<<<< HEAD
 			if ((odm_combine_factor == 2) || dcn32_is_dp_dig_pixel_rate_div_policy(pipe_ctx))
-=======
-			if ((odm_combine_factor == 2) || dc->debug.enable_dp_dig_pixel_rate_div_policy)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				*k2_div = PIXEL_RATE_DIV_BY_2;
 		}
 	}
@@ -1310,10 +1224,6 @@ void dcn32_unblank_stream(struct pipe_ctx *pipe_ctx,
 	struct dc_link *link = stream->link;
 	struct dce_hwseq *hws = link->dc->hwseq;
 	struct pipe_ctx *odm_pipe;
-<<<<<<< HEAD
-=======
-	struct dc *dc = pipe_ctx->stream->ctx->dc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	uint32_t pix_per_cycle = 1;
 
 	params.opp_cnt = 1;
@@ -1332,11 +1242,7 @@ void dcn32_unblank_stream(struct pipe_ctx *pipe_ctx,
 				pipe_ctx->stream_res.tg->inst);
 	} else if (dc_is_dp_signal(pipe_ctx->stream->signal)) {
 		if (optc2_is_two_pixels_per_containter(&stream->timing) || params.opp_cnt > 1
-<<<<<<< HEAD
 			|| dcn32_is_dp_dig_pixel_rate_div_policy(pipe_ctx)) {
-=======
-			|| dc->debug.enable_dp_dig_pixel_rate_div_policy) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			params.timing.pix_clk_100hz /= 2;
 			pix_per_cycle = 2;
 		}
@@ -1353,18 +1259,14 @@ bool dcn32_is_dp_dig_pixel_rate_div_policy(struct pipe_ctx *pipe_ctx)
 {
 	struct dc *dc = pipe_ctx->stream->ctx->dc;
 
-<<<<<<< HEAD
 	if (!is_h_timing_divisible_by_2(pipe_ctx->stream))
 		return false;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (dc_is_dp_signal(pipe_ctx->stream->signal) && !is_dp_128b_132b_signal(pipe_ctx) &&
 		dc->debug.enable_dp_dig_pixel_rate_div_policy)
 		return true;
 	return false;
 }
-<<<<<<< HEAD
 
 static void apply_symclk_on_tx_off_wa(struct dc_link *link)
 {
@@ -1517,5 +1419,3 @@ void dcn32_update_dsc_pg(struct dc *dc,
 		}
 	}
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

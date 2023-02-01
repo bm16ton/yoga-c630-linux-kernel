@@ -523,11 +523,7 @@ static bool __oom_reap_task_mm(struct mm_struct *mm)
 	 */
 	set_bit(MMF_UNSTABLE, &mm->flags);
 
-<<<<<<< HEAD
 	for_each_vma(vmi, vma) {
-=======
-	for (vma = mm->mmap ; vma; vma = vma->vm_next) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (vma->vm_flags & (VM_HUGETLB|VM_PFNMAP))
 			continue;
 

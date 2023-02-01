@@ -1444,11 +1444,7 @@ kvaser_usb_hydra_frame_to_cmd_ext(const struct kvaser_usb_net_priv *priv,
 	u32 kcan_id;
 	u32 kcan_header;
 
-<<<<<<< HEAD
 	cmd = kzalloc(sizeof(*cmd), GFP_ATOMIC);
-=======
-	cmd = kcalloc(1, sizeof(struct kvaser_cmd_ext), GFP_ATOMIC);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!cmd)
 		return NULL;
 
@@ -1522,11 +1518,7 @@ kvaser_usb_hydra_frame_to_cmd_std(const struct kvaser_usb_net_priv *priv,
 	u32 flags;
 	u32 id;
 
-<<<<<<< HEAD
 	cmd = kzalloc(sizeof(*cmd), GFP_ATOMIC);
-=======
-	cmd = kcalloc(1, sizeof(struct kvaser_cmd), GFP_ATOMIC);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!cmd)
 		return NULL;
 

@@ -31,10 +31,7 @@
 #define TBNET_RING_SIZE		256
 #define TBNET_LOGIN_RETRIES	60
 #define TBNET_LOGOUT_RETRIES	10
-<<<<<<< HEAD
 #define TBNET_E2E		BIT(0)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define TBNET_MATCH_FRAGS_ID	BIT(1)
 #define TBNET_64K_FRAMES	BIT(2)
 #define TBNET_MAX_MTU		SZ_64K
@@ -882,10 +879,7 @@ static int tbnet_open(struct net_device *dev)
 	struct tb_xdomain *xd = net->xd;
 	u16 sof_mask, eof_mask;
 	struct tb_ring *ring;
-<<<<<<< HEAD
 	unsigned int flags;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int hopid;
 
 	netif_carrier_off(dev);
@@ -1391,25 +1385,15 @@ static int __init tbnet_init(void)
 	tb_property_add_immediate(tbnet_dir, "prtcid", 1);
 	tb_property_add_immediate(tbnet_dir, "prtcvers", 1);
 	tb_property_add_immediate(tbnet_dir, "prtcrevs", 1);
-<<<<<<< HEAD
 
 	flags = TBNET_MATCH_FRAGS_ID | TBNET_64K_FRAMES;
 	if (tbnet_e2e)
 		flags |= TBNET_E2E;
 	tb_property_add_immediate(tbnet_dir, "prtcstns", flags);
-=======
-	/* Currently only announce support for match frags ID (bit 1). Bit 0
-	 * is reserved for full E2E flow control which we do not support at
-	 * the moment.
-	 */
-	tb_property_add_immediate(tbnet_dir, "prtcstns",
-				  TBNET_MATCH_FRAGS_ID | TBNET_64K_FRAMES);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = tb_register_property_dir("network", tbnet_dir);
 	if (ret)
 		goto err_free_dir;
-<<<<<<< HEAD
 
 	ret = tb_register_service_driver(&tbnet_driver);
 	if (ret)
@@ -1417,15 +1401,6 @@ static int __init tbnet_init(void)
 
 	return 0;
 
-=======
-
-	ret = tb_register_service_driver(&tbnet_driver);
-	if (ret)
-		goto err_unregister;
-
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_unregister:
 	tb_unregister_property_dir("network", tbnet_dir);
 err_free_dir:

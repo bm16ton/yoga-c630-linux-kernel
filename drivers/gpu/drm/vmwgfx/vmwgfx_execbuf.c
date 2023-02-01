@@ -1153,15 +1153,9 @@ static int vmw_translate_mob_ptr(struct vmw_private *dev_priv,
 	int ret;
 
 	vmw_validation_preload_bo(sw_context->ctx);
-<<<<<<< HEAD
 	ret = vmw_user_bo_lookup(sw_context->filp, handle, &vmw_bo);
 	if (ret != 0) {
 		drm_dbg(&dev_priv->drm, "Could not find or use MOB buffer.\n");
-=======
-	vmw_bo = vmw_user_bo_noref_lookup(sw_context->filp, handle);
-	if (IS_ERR_OR_NULL(vmw_bo)) {
-		VMW_DEBUG_USER("Could not find or use MOB buffer.\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return PTR_ERR(vmw_bo);
 	}
 	ret = vmw_validation_add_bo(sw_context->ctx, vmw_bo, true, false);
@@ -1213,15 +1207,9 @@ static int vmw_translate_guest_ptr(struct vmw_private *dev_priv,
 	int ret;
 
 	vmw_validation_preload_bo(sw_context->ctx);
-<<<<<<< HEAD
 	ret = vmw_user_bo_lookup(sw_context->filp, handle, &vmw_bo);
 	if (ret != 0) {
 		drm_dbg(&dev_priv->drm, "Could not find or use GMR region.\n");
-=======
-	vmw_bo = vmw_user_bo_noref_lookup(sw_context->filp, handle);
-	if (IS_ERR_OR_NULL(vmw_bo)) {
-		VMW_DEBUG_USER("Could not find or use GMR region.\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return PTR_ERR(vmw_bo);
 	}
 	ret = vmw_validation_add_bo(sw_context->ctx, vmw_bo, false, false);
@@ -4101,11 +4089,7 @@ int vmw_execbuf_process(struct drm_file *file_priv,
 	int ret;
 	int32_t out_fence_fd = -1;
 	struct sync_file *sync_file = NULL;
-<<<<<<< HEAD
 	DECLARE_VAL_CONTEXT(val_ctx, sw_context, 1);
-=======
-	DECLARE_VAL_CONTEXT(val_ctx, &sw_context->res_ht, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (flags & DRM_VMW_EXECBUF_FLAG_EXPORT_FENCE_FD) {
 		out_fence_fd = get_unused_fd_flags(O_CLOEXEC);
@@ -4168,17 +4152,6 @@ int vmw_execbuf_process(struct drm_file *file_priv,
 	if (sw_context->staged_bindings)
 		vmw_binding_state_reset(sw_context->staged_bindings);
 
-<<<<<<< HEAD
-=======
-	if (!sw_context->res_ht_initialized) {
-		ret = vmwgfx_ht_create(&sw_context->res_ht, VMW_RES_HT_ORDER);
-		if (unlikely(ret != 0))
-			goto out_unlock;
-
-		sw_context->res_ht_initialized = true;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INIT_LIST_HEAD(&sw_context->staged_cmd_res);
 	sw_context->ctx = &val_ctx;
 	ret = vmw_execbuf_tie_context(dev_priv, sw_context, dx_context_handle);

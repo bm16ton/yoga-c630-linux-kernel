@@ -157,7 +157,6 @@ int intel_nhlt_ssp_endpoint_mask(struct nhlt_acpi_table *nhlt, u8 device_type)
 }
 EXPORT_SYMBOL(intel_nhlt_ssp_endpoint_mask);
 
-<<<<<<< HEAD
 #define SSP_BLOB_V1_0_SIZE		84
 #define SSP_BLOB_V1_0_MDIVC_OFFSET	19 /* offset in u32 */
 
@@ -237,8 +236,6 @@ int intel_nhlt_ssp_mclk_mask(struct nhlt_acpi_table *nhlt, int ssp_num)
 }
 EXPORT_SYMBOL(intel_nhlt_ssp_mclk_mask);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct nhlt_specific_cfg *
 nhlt_get_specific_cfg(struct device *dev, struct nhlt_fmt *fmt, u8 num_ch,
 		      u32 rate, u8 vbps, u8 bps)

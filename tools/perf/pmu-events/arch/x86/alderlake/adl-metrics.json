@@ -1,6 +1,5 @@
 [
     {
-<<<<<<< HEAD
         "BriefDescription": "This category represents fraction of slots where the processor's Frontend undersupplies its Backend",
         "MetricExpr": "topdown\\-fe\\-bound / (topdown\\-fe\\-bound + topdown\\-bad\\-spec + topdown\\-retiring + topdown\\-be\\-bound) - INT_MISC.UOP_DROPPING / SLOTS",
         "MetricGroup": "PGO;TopdownL1;tma_L1_group",
@@ -805,16 +804,11 @@
     {
         "BriefDescription": "Total pipeline cost of branch related instructions (used for program control-flow including function calls)",
         "MetricExpr": "100 * ((BR_INST_RETIRED.COND + 3 * BR_INST_RETIRED.NEAR_CALL + (BR_INST_RETIRED.NEAR_TAKEN - BR_INST_RETIRED.COND_TAKEN - 2 * BR_INST_RETIRED.NEAR_CALL)) / SLOTS)",
-=======
-        "BriefDescription": "Total pipeline cost of branch related instructions (used for program control-flow including function calls)",
-        "MetricExpr": "100 * (( BR_INST_RETIRED.COND + 3 * BR_INST_RETIRED.NEAR_CALL + (BR_INST_RETIRED.NEAR_TAKEN - BR_INST_RETIRED.COND_TAKEN - 2 * BR_INST_RETIRED.NEAR_CALL) ) / TOPDOWN.SLOTS)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Ret",
         "MetricName": "Branching_Overhead",
         "Unit": "cpu_core"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Total pipeline cost of instruction fetch related bottlenecks by large code footprint programs (i-side cache; TLB and BTB misses)",
         "MetricExpr": "100 * tma_fetch_latency * (tma_itlb_misses + tma_icache_misses + tma_unknown_branches) / (tma_branch_resteers + tma_dsb_switches + tma_icache_misses + tma_itlb_misses + tma_lcp + tma_ms_switches)",
         "MetricGroup": "BigFoot;Fed;Frontend;IcMiss;MemoryTLB",
@@ -831,16 +825,11 @@
     {
         "BriefDescription": "Instructions Per Cycle (per Logical Processor)",
         "MetricExpr": "INST_RETIRED.ANY / CLKS",
-=======
-        "BriefDescription": "Instructions Per Cycle (per Logical Processor)",
-        "MetricExpr": "INST_RETIRED.ANY / CPU_CLK_UNHALTED.THREAD",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Ret;Summary",
         "MetricName": "IPC",
         "Unit": "cpu_core"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Uops Per Instruction",
         "MetricExpr": "(tma_retiring * SLOTS) / INST_RETIRED.ANY",
         "MetricGroup": "Pipeline;Ret;Retire",
@@ -858,11 +847,6 @@
         "BriefDescription": "Cycles Per Instruction (per Logical Processor)",
         "MetricExpr": "1 / IPC",
         "MetricGroup": "Mem;Pipeline",
-=======
-        "BriefDescription": "Cycles Per Instruction (per Logical Processor)",
-        "MetricExpr": "1 / (INST_RETIRED.ANY / CPU_CLK_UNHALTED.THREAD)",
-        "MetricGroup": "Pipeline;Mem",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "CPI",
         "Unit": "cpu_core"
     },
@@ -876,23 +860,14 @@
     {
         "BriefDescription": "Total issue-pipeline slots (per-Physical Core till ICL; per-Logical Processor ICL onward)",
         "MetricExpr": "TOPDOWN.SLOTS",
-<<<<<<< HEAD
         "MetricGroup": "tma_L1_group",
-=======
-        "MetricGroup": "TmaL1",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "SLOTS",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Fraction of Physical Core issue-slots utilized by this Logical Processor",
-<<<<<<< HEAD
         "MetricExpr": "SLOTS / (TOPDOWN.SLOTS / 2) if #SMT_on else 1",
         "MetricGroup": "SMT;tma_L1_group",
-=======
-        "MetricExpr": "TOPDOWN.SLOTS / ( TOPDOWN.SLOTS / 2 ) if #SMT_on else 1",
-        "MetricGroup": "SMT;TmaL1",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "Slots_Utilization",
         "Unit": "cpu_core"
     },
@@ -906,35 +881,21 @@
     },
     {
         "BriefDescription": "Instructions Per Cycle across hyper-threads (per physical core)",
-<<<<<<< HEAD
         "MetricExpr": "INST_RETIRED.ANY / CORE_CLKS",
         "MetricGroup": "Ret;SMT;tma_L1_group",
-=======
-        "MetricExpr": "INST_RETIRED.ANY / CPU_CLK_UNHALTED.DISTRIBUTED",
-        "MetricGroup": "Ret;SMT;TmaL1",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "CoreIPC",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Floating Point Operations Per Cycle",
-<<<<<<< HEAD
         "MetricExpr": "(1 * (FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE) + 2 * FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + 4 * (FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE) + 8 * FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE) / CORE_CLKS",
         "MetricGroup": "Flops;Ret",
-=======
-        "MetricExpr": "( 1 * ( FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE ) + 2 * FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + 4 * ( FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE ) + 8 * FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE ) / CPU_CLK_UNHALTED.DISTRIBUTED",
-        "MetricGroup": "Ret;Flops",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "FLOPc",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Actual per-core usage of the Floating Point non-X87 execution units (regardless of precision or vector-width)",
-<<<<<<< HEAD
         "MetricExpr": "(FP_ARITH_DISPATCHED.PORT_0 + FP_ARITH_DISPATCHED.PORT_1 + FP_ARITH_DISPATCHED.PORT_5) / (2 * CORE_CLKS)",
-=======
-        "MetricExpr": "( FP_ARITH_DISPATCHED.PORT_0 + FP_ARITH_DISPATCHED.PORT_1 + FP_ARITH_DISPATCHED.PORT_5 ) / ( 2 * CPU_CLK_UNHALTED.DISTRIBUTED )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Cor;Flops;HPC",
         "MetricName": "FP_Arith_Utilization",
         "PublicDescription": "Actual per-core usage of the Floating Point non-X87 execution units (regardless of precision or vector-width). Values > 1 are possible due to ([BDW+] Fused-Multiply Add (FMA) counting - common; [ADL+] use all of ADD/MUL/FMA in Scalar or 128/256-bit vectors - less common).",
@@ -942,17 +903,12 @@
     },
     {
         "BriefDescription": "Instruction-Level-Parallelism (average number of uops executed when there is execution) per-core",
-<<<<<<< HEAD
         "MetricExpr": "UOPS_EXECUTED.THREAD / ((UOPS_EXECUTED.CORE_CYCLES_GE_1 / 2) if #SMT_on else UOPS_EXECUTED.CORE_CYCLES_GE_1)",
-=======
-        "MetricExpr": "UOPS_EXECUTED.THREAD / (( UOPS_EXECUTED.CORE_CYCLES_GE_1 / 2 ) if #SMT_on else UOPS_EXECUTED.CORE_CYCLES_GE_1)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Backend;Cor;Pipeline;PortsUtil",
         "MetricName": "ILP",
         "Unit": "cpu_core"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Probability of Core Bound bottleneck hidden by SMT-profiling artifacts",
         "MetricExpr": "(1 - tma_core_bound / tma_ports_utilization if tma_core_bound < tma_ports_utilization else 1) if SMT_2T_Utilization > 0.5 else 0",
         "MetricGroup": "Cor;SMT",
@@ -960,8 +916,6 @@
         "Unit": "cpu_core"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Core actual clocks when any Logical Processor is active on the Physical Core",
         "MetricExpr": "CPU_CLK_UNHALTED.DISTRIBUTED",
         "MetricGroup": "SMT",
@@ -1012,22 +966,14 @@
     },
     {
         "BriefDescription": "Instructions per Floating Point (FP) Operation (lower number means higher occurrence rate)",
-<<<<<<< HEAD
         "MetricExpr": "INST_RETIRED.ANY / (1 * (FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE) + 2 * FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + 4 * (FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE) + 8 * FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE)",
-=======
-        "MetricExpr": "INST_RETIRED.ANY / ( 1 * ( FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE ) + 2 * FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + 4 * ( FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE ) + 8 * FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Flops;InsType",
         "MetricName": "IpFLOP",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Instructions per FP Arithmetic instruction (lower number means higher occurrence rate)",
-<<<<<<< HEAD
         "MetricExpr": "INST_RETIRED.ANY / ((FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE) + (FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE))",
-=======
-        "MetricExpr": "INST_RETIRED.ANY / ( (FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE) + (FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE) )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Flops;InsType",
         "MetricName": "IpArith",
         "PublicDescription": "Instructions per FP Arithmetic instruction (lower number means higher occurrence rate). May undercount due to FMA double counting. Approximated prior to BDW.",
@@ -1051,11 +997,7 @@
     },
     {
         "BriefDescription": "Instructions per FP Arithmetic AVX/SSE 128-bit instruction (lower number means higher occurrence rate)",
-<<<<<<< HEAD
         "MetricExpr": "INST_RETIRED.ANY / (FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE)",
-=======
-        "MetricExpr": "INST_RETIRED.ANY / ( FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Flops;FpVector;InsType",
         "MetricName": "IpArith_AVX128",
         "PublicDescription": "Instructions per FP Arithmetic AVX/SSE 128-bit instruction (lower number means higher occurrence rate). May undercount due to FMA double counting.",
@@ -1063,11 +1005,7 @@
     },
     {
         "BriefDescription": "Instructions per FP Arithmetic AVX* 256-bit instruction (lower number means higher occurrence rate)",
-<<<<<<< HEAD
         "MetricExpr": "INST_RETIRED.ANY / (FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE)",
-=======
-        "MetricExpr": "INST_RETIRED.ANY / ( FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE + FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Flops;FpVector;InsType",
         "MetricName": "IpArith_AVX256",
         "PublicDescription": "Instructions per FP Arithmetic AVX* 256-bit instruction (lower number means higher occurrence rate). May undercount due to FMA double counting.",
@@ -1081,20 +1019,13 @@
         "Unit": "cpu_core"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Total number of retired Instructions Sample with: INST_RETIRED.PREC_DIST",
         "MetricExpr": "INST_RETIRED.ANY",
         "MetricGroup": "Summary;tma_L1_group",
-=======
-        "BriefDescription": "Total number of retired Instructions, Sample with: INST_RETIRED.PREC_DIST",
-        "MetricExpr": "INST_RETIRED.ANY",
-        "MetricGroup": "Summary;TmaL1",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "Instructions",
         "Unit": "cpu_core"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Average number of Uops retired in cycles where at least one uop has retired.",
         "MetricExpr": "(tma_retiring * SLOTS) / cpu_core@UOPS_RETIRED.SLOTS\\,cmask\\=1@",
         "MetricGroup": "Pipeline;Ret",
@@ -1102,8 +1033,6 @@
         "Unit": "cpu_core"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Estimated fraction of retirement-cycles dealing with repeat instructions",
         "MetricExpr": "INST_RETIRED.REP_ITERATION / cpu_core@UOPS_RETIRED.SLOTS\\,cmask\\=1@",
         "MetricGroup": "Pipeline;Ret",
@@ -1153,7 +1082,6 @@
         "Unit": "cpu_core"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Total penalty related to DSB (uop cache) misses - subset of the Instruction_Fetch_BW Bottleneck.",
         "MetricExpr": "100 * (tma_fetch_latency * tma_dsb_switches / (tma_branch_resteers + tma_dsb_switches + tma_icache_misses + tma_itlb_misses + tma_lcp + tma_ms_switches) + tma_fetch_bandwidth * tma_mite / (tma_dsb + tma_lsd + tma_mite))",
         "MetricGroup": "DSBmiss;Fed",
@@ -1161,8 +1089,6 @@
         "Unit": "cpu_core"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Number of Instructions per non-speculative DSB miss (lower number means higher occurrence rate)",
         "MetricExpr": "INST_RETIRED.ANY / FRONTEND_RETIRED.ANY_DSB_MISS",
         "MetricGroup": "DSBmiss;Fed",
@@ -1177,7 +1103,6 @@
         "Unit": "cpu_core"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Branch Misprediction Cost: Fraction of TMA slots wasted per non-speculative branch misprediction (retired JEClear)",
         "MetricExpr": " (tma_branch_mispredicts + tma_fetch_latency * tma_mispredicts_resteers / (tma_branch_resteers + tma_dsb_switches + tma_icache_misses + tma_itlb_misses + tma_lcp + tma_ms_switches)) * SLOTS / BR_MISP_RETIRED.ALL_BRANCHES",
         "MetricGroup": "Bad;BrMispredicts",
@@ -1185,8 +1110,6 @@
         "Unit": "cpu_core"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Fraction of branches that are non-taken conditionals",
         "MetricExpr": "BR_INST_RETIRED.COND_NTAKEN / BR_INST_RETIRED.ALL_BRANCHES",
         "MetricGroup": "Bad;Branches;CodeGen;PGO",
@@ -1202,11 +1125,7 @@
     },
     {
         "BriefDescription": "Fraction of branches that are CALL or RET",
-<<<<<<< HEAD
         "MetricExpr": "(BR_INST_RETIRED.NEAR_CALL + BR_INST_RETIRED.NEAR_RETURN) / BR_INST_RETIRED.ALL_BRANCHES",
-=======
-        "MetricExpr": "( BR_INST_RETIRED.NEAR_CALL + BR_INST_RETIRED.NEAR_RETURN ) / BR_INST_RETIRED.ALL_BRANCHES",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Bad;Branches",
         "MetricName": "CallRet",
         "Unit": "cpu_core"
@@ -1220,11 +1139,7 @@
     },
     {
         "BriefDescription": "Fraction of branches of other types (not individually covered by other metrics in Info.Branches group)",
-<<<<<<< HEAD
         "MetricExpr": "1 - (Cond_NT + Cond_TK + CallRet + Jump)",
-=======
-        "MetricExpr": "1 - ( (BR_INST_RETIRED.COND_NTAKEN / BR_INST_RETIRED.ALL_BRANCHES) + (BR_INST_RETIRED.COND_TAKEN / BR_INST_RETIRED.ALL_BRANCHES) + (( BR_INST_RETIRED.NEAR_CALL + BR_INST_RETIRED.NEAR_RETURN ) / BR_INST_RETIRED.ALL_BRANCHES) + ((BR_INST_RETIRED.NEAR_TAKEN - BR_INST_RETIRED.COND_TAKEN - 2 * BR_INST_RETIRED.NEAR_CALL) / BR_INST_RETIRED.ALL_BRANCHES) )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Bad;Branches",
         "MetricName": "Other_Branches",
         "Unit": "cpu_core"
@@ -1239,122 +1154,77 @@
     {
         "BriefDescription": "Memory-Level-Parallelism (average number of L1 miss demand load when there is at least one such miss. Per-Logical Processor)",
         "MetricExpr": "L1D_PEND_MISS.PENDING / L1D_PEND_MISS.PENDING_CYCLES",
-<<<<<<< HEAD
         "MetricGroup": "Mem;MemoryBW;MemoryBound",
-=======
-        "MetricGroup": "Mem;MemoryBound;MemoryBW",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "MLP",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L1 cache true misses per kilo instruction for retired demand loads",
         "MetricExpr": "1000 * MEM_LOAD_RETIRED.L1_MISS / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "CacheMisses;Mem",
-=======
-        "MetricGroup": "Mem;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L1MPKI",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L1 cache true misses per kilo instruction for all demand loads (including speculative)",
         "MetricExpr": "1000 * L2_RQSTS.ALL_DEMAND_DATA_RD / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "CacheMisses;Mem",
-=======
-        "MetricGroup": "Mem;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L1MPKI_Load",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L2 cache true misses per kilo instruction for retired demand loads",
         "MetricExpr": "1000 * MEM_LOAD_RETIRED.L2_MISS / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "Backend;CacheMisses;Mem",
-=======
-        "MetricGroup": "Mem;Backend;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L2MPKI",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L2 cache ([RKL+] true) misses per kilo instruction for all request types (including speculative)",
         "MetricExpr": "1000 * L2_RQSTS.MISS / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "CacheMisses;Mem;Offcore",
-=======
-        "MetricGroup": "Mem;CacheMisses;Offcore",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L2MPKI_All",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L2 cache ([RKL+] true) misses per kilo instruction for all demand loads  (including speculative)",
         "MetricExpr": "1000 * L2_RQSTS.DEMAND_DATA_RD_MISS / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "CacheMisses;Mem",
-=======
-        "MetricGroup": "Mem;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L2MPKI_Load",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L2 cache hits per kilo instruction for all request types (including speculative)",
-<<<<<<< HEAD
         "MetricExpr": "1000 * (L2_RQSTS.REFERENCES - L2_RQSTS.MISS) / INST_RETIRED.ANY",
         "MetricGroup": "CacheMisses;Mem",
-=======
-        "MetricExpr": "1000 * ( L2_RQSTS.REFERENCES - L2_RQSTS.MISS ) / INST_RETIRED.ANY",
-        "MetricGroup": "Mem;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L2HPKI_All",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L2 cache hits per kilo instruction for all demand loads  (including speculative)",
         "MetricExpr": "1000 * L2_RQSTS.DEMAND_DATA_RD_HIT / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "CacheMisses;Mem",
-=======
-        "MetricGroup": "Mem;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L2HPKI_Load",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "L3 cache true misses per kilo instruction for retired demand loads",
         "MetricExpr": "1000 * MEM_LOAD_RETIRED.L3_MISS / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "CacheMisses;Mem",
-=======
-        "MetricGroup": "Mem;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "L3MPKI",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Fill Buffer (FB) hits per kilo instructions for retired demand loads (L1D misses that merge into ongoing miss-handling entries)",
         "MetricExpr": "1000 * MEM_LOAD_RETIRED.FB_HIT / INST_RETIRED.ANY",
-<<<<<<< HEAD
         "MetricGroup": "CacheMisses;Mem",
-=======
-        "MetricGroup": "Mem;CacheMisses",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "FB_HPKI",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Utilization of the core's Page Walker(s) serving STLB misses triggered by instruction/Load/Store accesses",
         "MetricConstraint": "NO_NMI_WATCHDOG",
-<<<<<<< HEAD
         "MetricExpr": "(ITLB_MISSES.WALK_PENDING + DTLB_LOAD_MISSES.WALK_PENDING + DTLB_STORE_MISSES.WALK_PENDING) / (4 * CORE_CLKS)",
-=======
-        "MetricExpr": "( ITLB_MISSES.WALK_PENDING + DTLB_LOAD_MISSES.WALK_PENDING + DTLB_STORE_MISSES.WALK_PENDING ) / ( 4 * CPU_CLK_UNHALTED.DISTRIBUTED )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Mem;MemoryTLB",
         "MetricName": "Page_Walks_Utilization",
         "Unit": "cpu_core"
@@ -1389,44 +1259,28 @@
     },
     {
         "BriefDescription": "Average per-thread data fill bandwidth to the L1 data cache [GB / sec]",
-<<<<<<< HEAD
         "MetricExpr": "L1D_Cache_Fill_BW",
-=======
-        "MetricExpr": "(64 * L1D.REPLACEMENT / 1000000000 / duration_time)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Mem;MemoryBW",
         "MetricName": "L1D_Cache_Fill_BW_1T",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Average per-thread data fill bandwidth to the L2 cache [GB / sec]",
-<<<<<<< HEAD
         "MetricExpr": "L2_Cache_Fill_BW",
-=======
-        "MetricExpr": "(64 * L2_LINES_IN.ALL / 1000000000 / duration_time)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Mem;MemoryBW",
         "MetricName": "L2_Cache_Fill_BW_1T",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Average per-thread data fill bandwidth to the L3 cache [GB / sec]",
-<<<<<<< HEAD
         "MetricExpr": "L3_Cache_Fill_BW",
-=======
-        "MetricExpr": "(64 * LONGEST_LAT_CACHE.MISS / 1000000000 / duration_time)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Mem;MemoryBW",
         "MetricName": "L3_Cache_Fill_BW_1T",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Average per-thread data access bandwidth to the L3 cache [GB / sec]",
-<<<<<<< HEAD
         "MetricExpr": "L3_Cache_Access_BW",
-=======
-        "MetricExpr": "(64 * OFFCORE_REQUESTS.ALL_REQUESTS / 1000000000 / duration_time)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Mem;MemoryBW;Offcore",
         "MetricName": "L3_Cache_Access_BW_1T",
         "Unit": "cpu_core"
@@ -1440,23 +1294,14 @@
     },
     {
         "BriefDescription": "Measured Average Frequency for unhalted processors [GHz]",
-<<<<<<< HEAD
         "MetricExpr": "Turbo_Utilization * msr@tsc@ / 1000000000 / duration_time",
         "MetricGroup": "Power;Summary",
-=======
-        "MetricExpr": "(CPU_CLK_UNHALTED.THREAD / CPU_CLK_UNHALTED.REF_TSC) * msr@tsc@ / 1000000000 / duration_time",
-        "MetricGroup": "Summary;Power",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "Average_Frequency",
         "Unit": "cpu_core"
     },
     {
         "BriefDescription": "Giga Floating Point Operations Per Second",
-<<<<<<< HEAD
         "MetricExpr": "((1 * (FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE) + 2 * FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + 4 * (FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE) + 8 * FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE) / 1000000000) / duration_time",
-=======
-        "MetricExpr": "( ( 1 * ( FP_ARITH_INST_RETIRED.SCALAR_SINGLE + FP_ARITH_INST_RETIRED.SCALAR_DOUBLE ) + 2 * FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE + 4 * ( FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE + FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE ) + 8 * FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE ) / 1000000000 ) / duration_time",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Cor;Flops;HPC",
         "MetricName": "GFLOPs",
         "PublicDescription": "Giga Floating Point Operations Per Second. Aggregate across all supported options of: FP precisions, scalar and vector instructions, vector-width and AMX engine.",
@@ -1464,11 +1309,7 @@
     },
     {
         "BriefDescription": "Average Frequency Utilization relative nominal frequency",
-<<<<<<< HEAD
         "MetricExpr": "CLKS / CPU_CLK_UNHALTED.REF_TSC",
-=======
-        "MetricExpr": "CPU_CLK_UNHALTED.THREAD / CPU_CLK_UNHALTED.REF_TSC",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "Power",
         "MetricName": "Turbo_Utilization",
         "Unit": "cpu_core"
@@ -1496,11 +1337,7 @@
     },
     {
         "BriefDescription": "Average external Memory Bandwidth Use for reads and writes [GB / sec]",
-<<<<<<< HEAD
         "MetricExpr": "64 * (arb@event\\=0x81\\,umask\\=0x1@ + arb@event\\=0x84\\,umask\\=0x1@) / 1000000 / duration_time / 1000",
-=======
-        "MetricExpr": "64 * ( arb@event\\=0x81\\,umask\\=0x1@ + arb@event\\=0x84\\,umask\\=0x1@ ) / 1000000 / duration_time / 1000",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricGroup": "HPC;Mem;MemoryBW;SoC",
         "MetricName": "DRAM_BW_Use",
         "Unit": "cpu_core"
@@ -1521,7 +1358,6 @@
     },
     {
         "BriefDescription": "Counts the number of issue slots  that were not consumed by the backend due to frontend stalls.",
-<<<<<<< HEAD
         "MetricExpr": "TOPDOWN_FE_BOUND.ALL / SLOTS",
         "MetricGroup": "TopdownL1",
         "MetricName": "tma_frontend_bound",
@@ -1607,16 +1443,10 @@
         "MetricGroup": "TopdownL3;tma_frontend_bandwidth_group",
         "MetricName": "tma_other_fb",
         "ScaleUnit": "100%",
-=======
-        "MetricExpr": "TOPDOWN_FE_BOUND.ALL / (5 * CPU_CLK_UNHALTED.CORE)",
-        "MetricGroup": "TopdownL1",
-        "MetricName": "Frontend_Bound",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Counts the total number of issue slots that were not consumed by the backend because allocation is stalled due to a mispredicted jump or a machine clear",
-<<<<<<< HEAD
         "MetricExpr": "(SLOTS - (TOPDOWN_FE_BOUND.ALL + TOPDOWN_BE_BOUND.ALL + TOPDOWN_RETIRING.ALL)) / SLOTS",
         "MetricGroup": "TopdownL1",
         "MetricName": "tma_bad_speculation",
@@ -1694,17 +1524,10 @@
         "MetricGroup": "TopdownL3;tma_machine_clears_group",
         "MetricName": "tma_fast_nuke",
         "ScaleUnit": "100%",
-=======
-        "MetricExpr": "TOPDOWN_BAD_SPECULATION.ALL / (5 * CPU_CLK_UNHALTED.CORE)",
-        "MetricGroup": "TopdownL1",
-        "MetricName": "Bad_Speculation",
-        "PublicDescription": "Counts the total number of issue slots that were not consumed by the backend because allocation is stalled due to a mispredicted jump or a machine clear. Only issue slots wasted due to fast nukes such as memory ordering nukes are counted. Other nukes are not accounted for. Counts all issue slots blocked during this recovery window including relevant microcode flows and while uops are not yet available in the instruction queue (IQ). Also includes the issue slots that were consumed by the backend but were thrown away because they were younger than the mispredict or machine clear.",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Counts the total number of issue slots  that were not consumed by the backend due to backend stalls",
-<<<<<<< HEAD
         "MetricExpr": "TOPDOWN_BE_BOUND.ALL / SLOTS",
         "MetricGroup": "TopdownL1",
         "MetricName": "tma_backend_bound",
@@ -1806,18 +1629,10 @@
         "MetricGroup": "TopdownL3;tma_load_store_bound_group",
         "MetricName": "tma_other_load_store",
         "ScaleUnit": "100%",
-=======
-        "MetricConstraint": "NO_NMI_WATCHDOG",
-        "MetricExpr": "TOPDOWN_BE_BOUND.ALL / (5 * CPU_CLK_UNHALTED.CORE)",
-        "MetricGroup": "TopdownL1",
-        "MetricName": "Backend_Bound",
-        "PublicDescription": "Counts the total number of issue slots  that were not consumed by the backend due to backend stalls.  Note that uops must be available for consumption in order for this event to count.  If a uop is not available (IQ is empty), this event will not count.   The rest of these subevents count backend stalls, in cycles, due to an outstanding request which is memory bound vs core bound.   The subevents are not slot based events and therefore can not be precisely added or subtracted from the Backend_Bound_Aux subevents which are slot based.",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Counts the total number of issue slots  that were not consumed by the backend due to backend stalls",
-<<<<<<< HEAD
         "MetricExpr": "tma_backend_bound",
         "MetricGroup": "TopdownL1",
         "MetricName": "tma_backend_bound_aux",
@@ -1904,17 +1719,10 @@
         "MetricGroup": "TopdownL3;tma_resource_bound_group",
         "MetricName": "tma_serialization",
         "ScaleUnit": "100%",
-=======
-        "MetricExpr": "(TOPDOWN_BE_BOUND.ALL / (5 * CPU_CLK_UNHALTED.CORE))",
-        "MetricGroup": "TopdownL1",
-        "MetricName": "Backend_Bound_Aux",
-        "PublicDescription": "Counts the total number of issue slots  that were not consumed by the backend due to backend stalls.  Note that UOPS must be available for consumption in order for this event to count.  If a uop is not available (IQ is empty), this event will not count.  All of these subevents count backend stalls, in slots, due to a resource limitation.   These are not cycle based events and therefore can not be precisely added or subtracted from the Backend_Bound subevents which are cycle based.  These subevents are supplementary to Backend_Bound and can be used to analyze results from a resource perspective at allocation.  ",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Counts the numer of issue slots  that result in retirement slots. ",
-<<<<<<< HEAD
         "MetricExpr": "TOPDOWN_RETIRING.ALL / SLOTS",
         "MetricGroup": "TopdownL1",
         "MetricName": "tma_retiring",
@@ -1952,11 +1760,6 @@
         "MetricName": "tma_ms_uops",
         "PublicDescription": "Counts the number of uops that are from the complex flows issued by the micro-sequencer (MS).  This includes uops from flows due to complex instructions, faults, assists, and inserted flows.",
         "ScaleUnit": "100%",
-=======
-        "MetricExpr": "TOPDOWN_RETIRING.ALL / (5 * CPU_CLK_UNHALTED.CORE)",
-        "MetricGroup": "TopdownL1",
-        "MetricName": "Retiring",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "cpu_atom"
     },
     {
@@ -1973,31 +1776,19 @@
     },
     {
         "BriefDescription": "",
-<<<<<<< HEAD
         "MetricExpr": "5 * CLKS",
-=======
-        "MetricExpr": "5 * CPU_CLK_UNHALTED.CORE",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "SLOTS",
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Instructions Per Cycle",
-<<<<<<< HEAD
         "MetricExpr": "INST_RETIRED.ANY / CLKS",
-=======
-        "MetricExpr": "INST_RETIRED.ANY / CPU_CLK_UNHALTED.CORE",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "IPC",
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Cycles Per Instruction",
-<<<<<<< HEAD
         "MetricExpr": "CLKS / INST_RETIRED.ANY",
-=======
-        "MetricExpr": "CPU_CLK_UNHALTED.CORE / INST_RETIRED.ANY",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "CPI",
         "Unit": "cpu_atom"
     },
@@ -2057,11 +1848,7 @@
     },
     {
         "BriefDescription": "Instructions per Far Branch",
-<<<<<<< HEAD
         "MetricExpr": "INST_RETIRED.ANY / (BR_INST_RETIRED.FAR_BRANCH / 2)",
-=======
-        "MetricExpr": "INST_RETIRED.ANY / ( BR_INST_RETIRED.FAR_BRANCH / 2 )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "IpFarBranch",
         "Unit": "cpu_atom"
     },
@@ -2103,11 +1890,7 @@
     },
     {
         "BriefDescription": "Average Frequency Utilization relative nominal frequency",
-<<<<<<< HEAD
         "MetricExpr": "CLKS / CPU_CLK_UNHALTED.REF_TSC",
-=======
-        "MetricExpr": "CPU_CLK_UNHALTED.CORE / CPU_CLK_UNHALTED.REF_TSC",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "Turbo_Utilization",
         "Unit": "cpu_atom"
     },
@@ -2124,15 +1907,6 @@
         "Unit": "cpu_atom"
     },
     {
-<<<<<<< HEAD
-=======
-        "BriefDescription": "Estimated Pause cost. In percent",
-        "MetricExpr": "100 * SERIALIZATION.NON_C01_MS_SCB / (5 * CPU_CLK_UNHALTED.CORE)",
-        "MetricName": "Estimated_Pause_Cost",
-        "Unit": "cpu_atom"
-    },
-    {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Cycle cost per L2 hit",
         "MetricExpr": "MEM_BOUND_STALLS.LOAD_L2_HIT / MEM_LOAD_UOPS_RETIRED.L2_HIT",
         "MetricName": "Cycles_per_Demand_Load_L2_Hit",
@@ -2152,31 +1926,19 @@
     },
     {
         "BriefDescription": "Percent of instruction miss cost that hit in the L2",
-<<<<<<< HEAD
         "MetricExpr": "100 * MEM_BOUND_STALLS.IFETCH_L2_HIT / (MEM_BOUND_STALLS.IFETCH)",
-=======
-        "MetricExpr": "100 * MEM_BOUND_STALLS.IFETCH_L2_HIT / ( MEM_BOUND_STALLS.IFETCH )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "Inst_Miss_Cost_L2Hit_Percent",
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Percent of instruction miss cost that hit in the L3",
-<<<<<<< HEAD
         "MetricExpr": "100 * MEM_BOUND_STALLS.IFETCH_LLC_HIT / (MEM_BOUND_STALLS.IFETCH)",
-=======
-        "MetricExpr": "100 * MEM_BOUND_STALLS.IFETCH_LLC_HIT / ( MEM_BOUND_STALLS.IFETCH )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "Inst_Miss_Cost_L3Hit_Percent",
         "Unit": "cpu_atom"
     },
     {
         "BriefDescription": "Percent of instruction miss cost that hit in DRAM",
-<<<<<<< HEAD
         "MetricExpr": "100 * MEM_BOUND_STALLS.IFETCH_DRAM_HIT / (MEM_BOUND_STALLS.IFETCH)",
-=======
-        "MetricExpr": "100 * MEM_BOUND_STALLS.IFETCH_DRAM_HIT / ( MEM_BOUND_STALLS.IFETCH )",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "MetricName": "Inst_Miss_Cost_DRAMHit_Percent",
         "Unit": "cpu_atom"
     },

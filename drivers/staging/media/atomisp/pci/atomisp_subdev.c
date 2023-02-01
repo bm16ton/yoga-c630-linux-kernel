@@ -379,11 +379,6 @@ int atomisp_subdev_set_selection(struct v4l2_subdev *sd,
 	unsigned int padding_w = pad_w;
 	unsigned int padding_h = pad_h;
 
-<<<<<<< HEAD
-=======
-	stream_id = atomisp_source_pad_to_stream_id(isp_sd, vdev_pad);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	isp_get_fmt_rect(sd, sd_state, which, ffmt, crop, comp);
 
 	dev_dbg(isp->dev,
@@ -622,11 +617,6 @@ void atomisp_subdev_set_ffmt(struct v4l2_subdev *sd,
 	struct atomisp_device *isp = isp_sd->isp;
 	struct v4l2_mbus_framefmt *__ffmt =
 	    atomisp_subdev_get_ffmt(sd, sd_state, which, pad);
-<<<<<<< HEAD
-=======
-	u16 vdev_pad = atomisp_subdev_source_pad(sd->devnode);
-	enum atomisp_input_stream_id stream_id;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev_dbg(isp->dev, "ffmt: pad %s w %d h %d code 0x%8.8x which %s\n",
 		atomisp_pad_str(pad), ffmt->width, ffmt->height, ffmt->code,
@@ -1084,16 +1074,6 @@ static void atomisp_init_subdev_pipe(struct atomisp_sub_device *asd,
 	       sizeof(struct atomisp_css_params_with_list *));
 }
 
-<<<<<<< HEAD
-=======
-static void atomisp_init_acc_pipe(struct atomisp_sub_device *asd,
-				  struct atomisp_acc_pipe *pipe)
-{
-	pipe->asd = asd;
-	pipe->isp = asd->isp;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * isp_subdev_init_entities - Initialize V4L2 subdev and media entity
  * @asd: ISP CCDC module
@@ -1149,16 +1129,6 @@ static int isp_subdev_init_entities(struct atomisp_sub_device *asd)
 	atomisp_init_subdev_pipe(asd, &asd->video_out_video_capture,
 				 V4L2_BUF_TYPE_VIDEO_CAPTURE);
 
-<<<<<<< HEAD
-=======
-	atomisp_init_acc_pipe(asd, &asd->video_acc);
-
-	ret = atomisp_video_init(&asd->video_in, "MEMORY",
-				 ATOMISP_RUN_MODE_SDV);
-	if (ret < 0)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = atomisp_video_init(&asd->video_out_capture, "CAPTURE",
 				 ATOMISP_RUN_MODE_STILL_CAPTURE);
 	if (ret < 0)
@@ -1328,14 +1298,6 @@ int atomisp_subdev_register_video_nodes(struct atomisp_sub_device *asd,
 
 	asd->video_out_preview.vdev.v4l2_dev = vdev;
 	asd->video_out_preview.vdev.device_caps = V4L2_CAP_VIDEO_CAPTURE | V4L2_CAP_STREAMING;
-	ret = video_register_device(&asd->video_out_preview.vdev,
-				    VFL_TYPE_VIDEO, -1);
-	if (ret < 0)
-		goto error;
-
-	asd->video_out_preview.vdev.v4l2_dev = vdev;
-	asd->video_out_preview.vdev.device_caps = device_caps |
-						  V4L2_CAP_VIDEO_OUTPUT;
 	ret = video_register_device(&asd->video_out_preview.vdev,
 				    VFL_TYPE_VIDEO, -1);
 	if (ret < 0)

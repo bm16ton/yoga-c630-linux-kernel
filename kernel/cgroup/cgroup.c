@@ -235,22 +235,6 @@ static const char *cgroup_opt_feature_names[OPT_FEATURE_COUNT] = {
 
 static u16 cgroup_feature_disable_mask __read_mostly;
 
-/* cgroup optional features */
-enum cgroup_opt_features {
-#ifdef CONFIG_PSI
-	OPT_FEATURE_PRESSURE,
-#endif
-	OPT_FEATURE_COUNT
-};
-
-static const char *cgroup_opt_feature_names[OPT_FEATURE_COUNT] = {
-#ifdef CONFIG_PSI
-	"pressure",
-#endif
-};
-
-static u16 cgroup_feature_disable_mask __read_mostly;
-
 static int cgroup_apply_control(struct cgroup *cgrp);
 static void cgroup_finalize_control(struct cgroup *cgrp, int ret);
 static void css_task_iter_skip(struct css_task_iter *it,
@@ -1408,31 +1392,6 @@ static void cgroup_destroy_root(struct cgroup_root *root)
 	cgroup_free_root(root);
 }
 
-static inline struct cgroup *__cset_cgroup_from_root(struct css_set *cset,
-					    struct cgroup_root *root)
-{
-	struct cgroup *res_cgroup = NULL;
-
-	if (cset == &init_css_set) {
-		res_cgroup = &root->cgrp;
-	} else if (root == &cgrp_dfl_root) {
-		res_cgroup = cset->dfl_cgrp;
-	} else {
-		struct cgrp_cset_link *link;
-
-		list_for_each_entry(link, &cset->cgrp_links, cgrp_link) {
-			struct cgroup *c = link->cgrp;
-
-			if (c->root == root) {
-				res_cgroup = c;
-				break;
-			}
-		}
-	}
-
-	return res_cgroup;
-}
-
 /*
  * Returned cgroup is without refcount but it's valid as long as cset pins it.
  */
@@ -1441,7 +1400,6 @@ static inline struct cgroup *__cset_cgroup_from_root(struct css_set *cset,
 {
 	struct cgroup *res_cgroup = NULL;
 
-<<<<<<< HEAD
 	if (cset == &init_css_set) {
 		res_cgroup = &root->cgrp;
 	} else if (root == &cgrp_dfl_root) {
@@ -1459,14 +1417,6 @@ static inline struct cgroup *__cset_cgroup_from_root(struct css_set *cset,
 			}
 		}
 	}
-=======
-	rcu_read_lock();
-
-	cset = current->nsproxy->cgroup_ns->root_cset;
-	res = __cset_cgroup_from_root(cset, root);
-
-	rcu_read_unlock();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	BUG_ON(!res_cgroup);
 	return res_cgroup;
@@ -1484,16 +1434,12 @@ current_cgns_cgroup_from_root(struct cgroup_root *root)
 
 	lockdep_assert_held(&css_set_lock);
 
-<<<<<<< HEAD
 	rcu_read_lock();
 
 	cset = current->nsproxy->cgroup_ns->root_cset;
 	res = __cset_cgroup_from_root(cset, root);
 
 	rcu_read_unlock();
-=======
-	res = __cset_cgroup_from_root(cset, root);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return res;
 }
@@ -2478,11 +2424,7 @@ EXPORT_SYMBOL_GPL(task_cgroup_path);
  * write-locking cgroup_threadgroup_rwsem. This allows ->attach() to assume that
  * CPU hotplug is disabled on entry.
  */
-<<<<<<< HEAD
 void cgroup_attach_lock(bool lock_threadgroup)
-=======
-static void cgroup_attach_lock(bool lock_threadgroup)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	cpus_read_lock();
 	if (lock_threadgroup)
@@ -2493,11 +2435,7 @@ static void cgroup_attach_lock(bool lock_threadgroup)
  * cgroup_attach_unlock - Undo cgroup_attach_lock()
  * @lock_threadgroup: whether to up_write cgroup_threadgroup_rwsem
  */
-<<<<<<< HEAD
 void cgroup_attach_unlock(bool lock_threadgroup)
-=======
-static void cgroup_attach_unlock(bool lock_threadgroup)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (lock_threadgroup)
 		percpu_up_write(&cgroup_threadgroup_rwsem);
@@ -3778,33 +3716,21 @@ static int cpu_stat_show(struct seq_file *seq, void *v)
 static int cgroup_io_pressure_show(struct seq_file *seq, void *v)
 {
 	struct cgroup *cgrp = seq_css(seq)->cgroup;
-<<<<<<< HEAD
 	struct psi_group *psi = cgroup_psi(cgrp);
-=======
-	struct psi_group *psi = cgroup_ino(cgrp) == 1 ? &psi_system : cgrp->psi;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return psi_show(seq, psi, PSI_IO);
 }
 static int cgroup_memory_pressure_show(struct seq_file *seq, void *v)
 {
 	struct cgroup *cgrp = seq_css(seq)->cgroup;
-<<<<<<< HEAD
 	struct psi_group *psi = cgroup_psi(cgrp);
-=======
-	struct psi_group *psi = cgroup_ino(cgrp) == 1 ? &psi_system : cgrp->psi;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return psi_show(seq, psi, PSI_MEM);
 }
 static int cgroup_cpu_pressure_show(struct seq_file *seq, void *v)
 {
 	struct cgroup *cgrp = seq_css(seq)->cgroup;
-<<<<<<< HEAD
 	struct psi_group *psi = cgroup_psi(cgrp);
-=======
-	struct psi_group *psi = cgroup_ino(cgrp) == 1 ? &psi_system : cgrp->psi;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return psi_show(seq, psi, PSI_CPU);
 }
@@ -3830,11 +3756,7 @@ static ssize_t pressure_write(struct kernfs_open_file *of, char *buf,
 		return -EBUSY;
 	}
 
-<<<<<<< HEAD
 	psi = cgroup_psi(cgrp);
-=======
-	psi = cgroup_ino(cgrp) == 1 ? &psi_system : cgrp->psi;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	new = psi_trigger_create(psi, buf, res);
 	if (IS_ERR(new)) {
 		cgroup_put(cgrp);
@@ -3950,12 +3872,9 @@ static void cgroup_pressure_release(struct kernfs_open_file *of)
 
 bool cgroup_psi_enabled(void)
 {
-<<<<<<< HEAD
 	if (static_branch_likely(&psi_disabled))
 		return false;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return (cgroup_feature_disable_mask & (1 << OPT_FEATURE_PRESSURE)) == 0;
 }
 
@@ -4308,8 +4227,6 @@ static int cgroup_addrm_files(struct cgroup_subsys_state *css,
 restart:
 	for (cft = cfts; cft != cft_end && cft->name[0] != '\0'; cft++) {
 		/* does cft->flags tell us to skip this file on @cgrp? */
-		if ((cft->flags & CFTYPE_PRESSURE) && !cgroup_psi_enabled())
-			continue;
 		if ((cft->flags & __CFTYPE_ONLY_ON_DFL) && !cgroup_on_dfl(cgrp))
 			continue;
 		if ((cft->flags & __CFTYPE_NOT_ON_DFL) && cgroup_on_dfl(cgrp))
@@ -4389,15 +4306,10 @@ static int cgroup_init_cftypes(struct cgroup_subsys *ss, struct cftype *cfts)
 
 		WARN_ON(cft->ss || cft->kf_ops);
 
-<<<<<<< HEAD
 		if (cft->flags & __CFTYPE_ADDED) {
 			ret = -EBUSY;
 			break;
 		}
-=======
-		if ((cft->flags & CFTYPE_PRESSURE) && !cgroup_psi_enabled())
-			continue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (cft->seq_start)
 			kf_ops = &cgroup_kf_ops;
@@ -5349,11 +5261,7 @@ static struct cftype cgroup_psi_files[] = {
 #ifdef CONFIG_PSI
 	{
 		.name = "io.pressure",
-<<<<<<< HEAD
 		.file_offset = offsetof(struct cgroup, psi_files[PSI_IO]),
-=======
-		.flags = CFTYPE_PRESSURE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.seq_show = cgroup_io_pressure_show,
 		.write = cgroup_io_pressure_write,
 		.poll = cgroup_pressure_poll,
@@ -5361,11 +5269,7 @@ static struct cftype cgroup_psi_files[] = {
 	},
 	{
 		.name = "memory.pressure",
-<<<<<<< HEAD
 		.file_offset = offsetof(struct cgroup, psi_files[PSI_MEM]),
-=======
-		.flags = CFTYPE_PRESSURE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.seq_show = cgroup_memory_pressure_show,
 		.write = cgroup_memory_pressure_write,
 		.poll = cgroup_pressure_poll,
@@ -5373,11 +5277,7 @@ static struct cftype cgroup_psi_files[] = {
 	},
 	{
 		.name = "cpu.pressure",
-<<<<<<< HEAD
 		.file_offset = offsetof(struct cgroup, psi_files[PSI_CPU]),
-=======
-		.flags = CFTYPE_PRESSURE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.seq_show = cgroup_cpu_pressure_show,
 		.write = cgroup_cpu_pressure_write,
 		.poll = cgroup_pressure_poll,
@@ -6280,17 +6180,12 @@ void cgroup_path_from_kernfs_id(u64 id, char *buf, size_t buflen)
 /*
  * cgroup_get_from_id : get the cgroup associated with cgroup id
  * @id: cgroup id
-<<<<<<< HEAD
  * On success return the cgrp or ERR_PTR on failure
  * Only cgroups within current task's cgroup NS are valid.
-=======
- * On success return the cgrp, on failure return NULL
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct cgroup *cgroup_get_from_id(u64 id)
 {
 	struct kernfs_node *kn;
-<<<<<<< HEAD
 	struct cgroup *cgrp, *root_cgrp;
 
 	kn = kernfs_find_and_get_node_by_id(cgrp_dfl_root.kf_root, id);
@@ -6301,13 +6196,6 @@ struct cgroup *cgroup_get_from_id(u64 id)
 		kernfs_put(kn);
 		return ERR_PTR(-ENOENT);
 	}
-=======
-	struct cgroup *cgrp = NULL;
-
-	kn = kernfs_find_and_get_node_by_id(cgrp_dfl_root.kf_root, id);
-	if (!kn)
-		goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rcu_read_lock();
 
@@ -6316,7 +6204,6 @@ struct cgroup *cgroup_get_from_id(u64 id)
 		cgrp = NULL;
 
 	rcu_read_unlock();
-<<<<<<< HEAD
 	kernfs_put(kn);
 
 	if (!cgrp)
@@ -6328,11 +6215,6 @@ struct cgroup *cgroup_get_from_id(u64 id)
 		return ERR_PTR(-ENOENT);
 	}
 
-=======
-
-	kernfs_put(kn);
-out:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return cgrp;
 }
 EXPORT_SYMBOL_GPL(cgroup_get_from_id);
@@ -6932,15 +6814,8 @@ struct cgroup *cgroup_get_from_path(const char *path)
 	struct cgroup *cgrp = ERR_PTR(-ENOENT);
 	struct cgroup *root_cgrp;
 
-<<<<<<< HEAD
 	root_cgrp = current_cgns_cgroup_dfl();
 	kn = kernfs_walk_and_get(root_cgrp->kn, path);
-=======
-	spin_lock_irq(&css_set_lock);
-	root_cgrp = current_cgns_cgroup_from_root(&cgrp_dfl_root);
-	kn = kernfs_walk_and_get(root_cgrp->kn, path);
-	spin_unlock_irq(&css_set_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!kn)
 		goto out;
 
@@ -7115,9 +6990,6 @@ static ssize_t show_delegatable_files(struct cftype *files, char *buf,
 
 	for (cft = files; cft && cft->name[0] != '\0'; cft++) {
 		if (!(cft->flags & CFTYPE_NS_DELEGATABLE))
-			continue;
-
-		if ((cft->flags & CFTYPE_PRESSURE) && !cgroup_psi_enabled())
 			continue;
 
 		if (prefix)

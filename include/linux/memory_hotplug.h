@@ -11,10 +11,6 @@ struct page;
 struct zone;
 struct pglist_data;
 struct mem_section;
-<<<<<<< HEAD
-=======
-struct memory_block;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct memory_group;
 struct resource;
 struct vmem_altmap;
@@ -32,15 +28,9 @@ struct dev_pagemap;
  */
 extern pg_data_t *arch_alloc_nodedata(int nid);
 extern void arch_refresh_nodedata(int nid, pg_data_t *pgdat);
-<<<<<<< HEAD
 
 #else /* CONFIG_HAVE_ARCH_NODEDATA_EXTENSION */
 
-=======
-
-#else /* CONFIG_HAVE_ARCH_NODEDATA_EXTENSION */
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define arch_alloc_nodedata(nid)	generic_alloc_nodedata(nid)
 
 #ifdef CONFIG_NUMA
@@ -53,14 +43,6 @@ extern void arch_refresh_nodedata(int nid, pg_data_t *pgdat);
 ({								\
 	memblock_alloc(sizeof(*pgdat), SMP_CACHE_BYTES);	\
 })
-<<<<<<< HEAD
-=======
-/*
- * This definition is just for error path in node hotadd.
- * For node hotremove, we have to replace this.
- */
-#define generic_free_nodedata(pgdat)	kfree(pgdat)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 extern pg_data_t *node_data[];
 static inline void arch_refresh_nodedata(int nid, pg_data_t *pgdat)
@@ -76,12 +58,6 @@ static inline pg_data_t *generic_alloc_nodedata(int nid)
 	BUG();
 	return NULL;
 }
-<<<<<<< HEAD
-=======
-static inline void generic_free_nodedata(pg_data_t *pgdat)
-{
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void arch_refresh_nodedata(int nid, pg_data_t *pgdat)
 {
 }
@@ -230,7 +206,6 @@ void put_online_mems(void);
 
 void mem_hotplug_begin(void);
 void mem_hotplug_done(void);
-<<<<<<< HEAD
 
 /* See kswapd_is_running() */
 static inline void pgdat_kswapd_lock(pg_data_t *pgdat)
@@ -247,8 +222,6 @@ static inline void pgdat_kswapd_lock_init(pg_data_t *pgdat)
 {
 	mutex_init(&pgdat->kswapd_lock);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #else /* ! CONFIG_MEMORY_HOTPLUG */
 #define pfn_to_online_page(pfn)			\

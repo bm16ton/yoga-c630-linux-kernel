@@ -190,7 +190,6 @@ int kunit_run_all_tests(void)
 {
 	struct suite_set suite_set = {__kunit_suites_start, __kunit_suites_end};
 	int err = 0;
-<<<<<<< HEAD
 	if (!kunit_enabled()) {
 		pr_info("kunit: disabled\n");
 		goto out;
@@ -215,28 +214,6 @@ int kunit_run_all_tests(void)
 		kunit_free_suite_set(suite_set);
 	}
 
-=======
-
-	if (filter_glob_param) {
-		suite_set = kunit_filter_suites(&suite_set, filter_glob_param, &err);
-		if (err) {
-			pr_err("kunit executor: error filtering suites: %d\n", err);
-			goto out;
-		}
-	}
-
-	if (!action_param)
-		kunit_exec_run_tests(&suite_set);
-	else if (strcmp(action_param, "list") == 0)
-		kunit_exec_list_tests(&suite_set);
-	else
-		pr_err("kunit executor: unknown action '%s'\n", action_param);
-
-	if (filter_glob_param) { /* a copy was made of each suite */
-		kunit_free_suite_set(suite_set);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	kunit_handle_shutdown();
 	return err;

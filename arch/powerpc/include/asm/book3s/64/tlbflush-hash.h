@@ -118,20 +118,11 @@ static inline void hash__flush_tlb_kernel_range(unsigned long start,
 
 struct mmu_gather;
 extern void hash__tlb_flush(struct mmu_gather *tlb);
-<<<<<<< HEAD
-=======
-void flush_tlb_pmd_range(struct mm_struct *mm, pmd_t *pmd, unsigned long addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_PPC_64S_HASH_MMU
 /* Private function for use by PCI IO mapping code */
 extern void __flush_hash_table_range(unsigned long start, unsigned long end);
-<<<<<<< HEAD
 void flush_hash_table_pmd_range(struct mm_struct *mm, pmd_t *pmd, unsigned long addr);
-=======
-extern void flush_tlb_pmd_range(struct mm_struct *mm, pmd_t *pmd,
-				unsigned long addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline void __flush_hash_table_range(unsigned long start, unsigned long end) { }
 #endif

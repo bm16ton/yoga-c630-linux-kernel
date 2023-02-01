@@ -19,15 +19,12 @@
 #include "cn10k.h"
 
 #define CQE_ADDR(CQ, idx) ((CQ)->cqe_base + ((CQ)->cqe_size * (idx)))
-<<<<<<< HEAD
 #define PTP_PORT	        0x13F
 /* PTPv2 header Original Timestamp starts at byte offset 34 and
  * contains 6 byte seconds field and 4 byte nano seconds field.
  */
 #define PTP_SYNC_SEC_OFFSET	34
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
 				     struct bpf_prog *prog,
 				     struct nix_cqe_rx_s *cqe,
@@ -219,7 +216,6 @@ static bool otx2_skb_add_frag(struct otx2_nic *pfvf, struct sk_buff *skb,
 		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, page,
 				va - page_address(page) + off,
 				len - off, pfvf->rbsize);
-<<<<<<< HEAD
 
 		otx2_dma_unmap_page(pfvf, iova - OTX2_HEAD_ROOM,
 				    pfvf->rbsize, DMA_FROM_DEVICE);
@@ -231,19 +227,6 @@ static bool otx2_skb_add_frag(struct otx2_nic *pfvf, struct sk_buff *skb,
 	 */
 	pfvf->hw_ops->aura_freeptr(pfvf, qidx, iova & ~0x07ULL);
 
-=======
-
-		otx2_dma_unmap_page(pfvf, iova - OTX2_HEAD_ROOM,
-				    pfvf->rbsize, DMA_FROM_DEVICE);
-		return true;
-	}
-
-	/* If more than MAX_SKB_FRAGS fragments are received then
-	 * give back those buffer pointers to hardware for reuse.
-	 */
-	pfvf->hw_ops->aura_freeptr(pfvf, qidx, iova & ~0x07ULL);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 

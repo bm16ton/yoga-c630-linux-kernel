@@ -62,11 +62,8 @@ static struct perf_event_attr make_event_attr(bool enabled, volatile void *addr,
 		.remove_on_exec = 1, /* Required by sigtrap. */
 		.sigtrap	= 1, /* Request synchronous SIGTRAP on event. */
 		.sig_data	= TEST_SIG_DATA(addr, id),
-<<<<<<< HEAD
 		.exclude_kernel = 1, /* To allow */
 		.exclude_hv     = 1, /* running as !root */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	return attr;
 }
@@ -98,7 +95,6 @@ static void *test_thread(void *arg)
 
 	__atomic_fetch_add(&ctx.tids_want_signal, tid, __ATOMIC_RELAXED);
 	iter = ctx.iterate_on; /* read */
-<<<<<<< HEAD
 	if (iter >= 0) {
 		for (i = 0; i < iter - 1; i++) {
 			__atomic_fetch_add(&ctx.tids_want_signal, tid, __ATOMIC_RELAXED);
@@ -106,11 +102,6 @@ static void *test_thread(void *arg)
 		}
 	} else {
 		while (ctx.iterate_on);
-=======
-	for (i = 0; i < iter - 1; i++) {
-		__atomic_fetch_add(&ctx.tids_want_signal, tid, __ATOMIC_RELAXED);
-		ctx.iterate_on = iter; /* idempotent write */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return NULL;
@@ -223,7 +214,6 @@ TEST_F(sigtrap_threads, signal_stress)
 	EXPECT_EQ(ctx.first_siginfo.si_perf_data, TEST_SIG_DATA(&ctx.iterate_on, 0));
 }
 
-<<<<<<< HEAD
 TEST_F(sigtrap_threads, signal_stress_with_disable)
 {
 	const int target_count = NUM_THREADS * 3000;
@@ -247,6 +237,4 @@ TEST_F(sigtrap_threads, signal_stress_with_disable)
 	EXPECT_EQ(ctx.first_siginfo.si_perf_data, TEST_SIG_DATA(&ctx.iterate_on, 0));
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 TEST_HARNESS_MAIN

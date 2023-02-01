@@ -20,7 +20,6 @@ struct mm_struct;
 #include <asm/nohash/pgtable.h>
 #endif /* !CONFIG_PPC_BOOK3S */
 
-<<<<<<< HEAD
 /*
  * Protection used for kernel text. We want the debuggers to be able to
  * set breakpoints anywhere, so don't write protect the kernel text
@@ -40,8 +39,6 @@ struct mm_struct;
 #define PAGE_AGP		(PAGE_KERNEL_NC)
 #define HAVE_PAGE_AGP
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifndef __ASSEMBLY__
 
 #ifndef MAX_PTRS_PER_PGD

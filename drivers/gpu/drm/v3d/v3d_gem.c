@@ -1092,11 +1092,7 @@ v3d_gem_init(struct drm_device *dev)
 	if (!v3d->pt) {
 		drm_mm_takedown(&v3d->mm);
 		dev_err(v3d->drm.dev,
-<<<<<<< HEAD
 			"Failed to allocate page tables. Please ensure you have DMA enabled.\n");
-=======
-			"Failed to allocate page tables. Please ensure you have CMA enabled.\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENOMEM;
 	}
 

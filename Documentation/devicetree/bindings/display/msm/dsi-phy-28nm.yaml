@@ -34,13 +34,10 @@ properties:
   vddio-supply:
     description: Phandle to vdd-io regulator device node.
 
-<<<<<<< HEAD
   qcom,dsi-phy-regulator-ldo-mode:
     type: boolean
     description: Indicates if the LDO mode PHY regulator is wanted.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg

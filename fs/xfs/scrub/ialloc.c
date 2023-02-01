@@ -108,14 +108,8 @@ xchk_iallocbt_chunk(
 	xfs_agblock_t			bno;
 
 	bno = XFS_AGINO_TO_AGBNO(mp, agino);
-<<<<<<< HEAD
 
 	if (!xfs_verify_agbext(pag, bno, len))
-=======
-	if (bno + len <= bno ||
-	    !xfs_verify_agbno(pag, bno) ||
-	    !xfs_verify_agbno(pag, bno + len - 1))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		xchk_btree_set_corrupt(bs->sc, bs->cur, 0);
 
 	xchk_iallocbt_chunk_xref(bs->sc, irec, agino, bno, len);

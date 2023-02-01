@@ -572,11 +572,8 @@ static inline bool is_pow_of_2(size_t x)
 {
 	return x && (x & (x - 1)) == 0;
 }
-<<<<<<< HEAD
 
 #define PROG_LOAD_ATTEMPTS 5
 int sys_bpf_prog_load(union bpf_attr *attr, unsigned int size, int attempts);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* __LIBBPF_LIBBPF_INTERNAL_H */

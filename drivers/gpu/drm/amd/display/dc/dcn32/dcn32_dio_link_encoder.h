@@ -53,11 +53,4 @@ void dcn32_link_encoder_enable_dp_output(
 	const struct dc_link_settings *link_settings,
 	enum clock_source_id clock_source);
 
-<<<<<<< HEAD
-=======
-void enc32_set_dig_output_mode(
-		struct link_encoder *enc,
-		uint8_t pix_per_container);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __DC_LINK_ENCODER__DCN32_H__ */

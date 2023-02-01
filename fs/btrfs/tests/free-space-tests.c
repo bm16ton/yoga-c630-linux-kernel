@@ -868,11 +868,7 @@ static int test_bytes_index(struct btrfs_block_group *cache, u32 sectorsize)
 	}
 
 	/* Now validate bitmaps do the correct thing. */
-<<<<<<< HEAD
 	btrfs_remove_free_space_cache(cache);
-=======
-	__btrfs_remove_free_space_cache(cache->free_space_ctl);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < 2; i++) {
 		offset = i * BITS_PER_BITMAP * sectorsize;
 		bytes = (i + 1) * SZ_1M;
@@ -895,11 +891,7 @@ static int test_bytes_index(struct btrfs_block_group *cache, u32 sectorsize)
 	}
 
 	/* Now validate bitmaps with different ->max_extent_size. */
-<<<<<<< HEAD
 	btrfs_remove_free_space_cache(cache);
-=======
-	__btrfs_remove_free_space_cache(cache->free_space_ctl);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	orig_free_space_ops = cache->free_space_ctl->op;
 	cache->free_space_ctl->op = &test_free_space_ops;
 
@@ -1006,11 +998,7 @@ static int test_bytes_index(struct btrfs_block_group *cache, u32 sectorsize)
 	}
 
 	cache->free_space_ctl->op = orig_free_space_ops;
-<<<<<<< HEAD
 	btrfs_remove_free_space_cache(cache);
-=======
-	__btrfs_remove_free_space_cache(cache->free_space_ctl);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

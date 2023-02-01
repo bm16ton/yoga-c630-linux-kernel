@@ -111,10 +111,7 @@ struct mlx5e_rep_priv {
 	struct list_head       vport_sqs_list;
 	struct mlx5_rep_uplink_priv uplink_priv; /* valid for uplink rep */
 	struct rtnl_link_stats64 prev_vf_vport_stats;
-<<<<<<< HEAD
 	struct mlx5_flow_handle *send_to_vport_meta_rule;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rhashtable tc_ht;
 };
 

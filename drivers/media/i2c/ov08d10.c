@@ -1415,11 +1415,7 @@ check_hwcfg_error:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void ov08d10_remove(struct i2c_client *client)
-=======
-static int ov08d10_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct ov08d10 *ov08d10 = to_ov08d10(sd);
@@ -1429,11 +1425,6 @@ static int ov08d10_remove(struct i2c_client *client)
 	v4l2_ctrl_handler_free(sd->ctrl_handler);
 	pm_runtime_disable(&client->dev);
 	mutex_destroy(&ov08d10->mutex);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ov08d10_probe(struct i2c_client *client)

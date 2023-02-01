@@ -35,7 +35,6 @@
  * HDMI 2.0 specification. It is a point-to-point protocol that allows the
  * HDMI source and HDMI sink to exchange data. The same I2C interface that
  * is used to access EDID serves as the transport mechanism for SCDC.
-<<<<<<< HEAD
  *
  * Note: The SCDC status is going to be lost when the display is
  * disconnected. This can happen physically when the user disconnects
@@ -49,8 +48,6 @@
  * restore the SCDC status. The typical solution for this is to trigger an
  * empty modeset in drm_connector_helper_funcs.detect_ctx(), like what vc4 does
  * in vc4_hdmi_reset_link().
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #define SCDC_I2C_SLAVE_ADDRESS 0x54

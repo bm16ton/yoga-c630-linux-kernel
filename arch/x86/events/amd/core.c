@@ -330,20 +330,10 @@ static inline bool amd_is_pair_event_code(struct hw_perf_event *hwc)
 	}
 }
 
-<<<<<<< HEAD
 DEFINE_STATIC_CALL_RET0(amd_pmu_branch_hw_config, *x86_pmu.hw_config);
-=======
-#define AMD_FAM19H_BRS_EVENT 0xc4 /* RETIRED_TAKEN_BRANCH_INSTRUCTIONS */
-static inline int amd_is_brs_event(struct perf_event *e)
-{
-	return (e->hw.config & AMD64_RAW_EVENT_MASK) == AMD_FAM19H_BRS_EVENT;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int amd_core_hw_config(struct perf_event *event)
 {
-	int ret = 0;
-
 	if (event->attr.exclude_host && event->attr.exclude_guest)
 		/*
 		 * When HO == GO == 1 the hardware treats that as GO == HO == 0
@@ -360,73 +350,10 @@ static int amd_core_hw_config(struct perf_event *event)
 	if ((x86_pmu.flags & PMU_FL_PAIR) && amd_is_pair_event_code(&event->hw))
 		event->hw.flags |= PERF_X86_EVENT_PAIR;
 
-<<<<<<< HEAD
 	if (has_branch_stack(event))
 		return static_call(amd_pmu_branch_hw_config)(event);
 
 	return 0;
-=======
-	/*
-	 * if branch stack is requested
-	 */
-	if (has_branch_stack(event)) {
-		/*
-		 * Due to interrupt holding, BRS is not recommended in
-		 * counting mode.
-		 */
-		if (!is_sampling_event(event))
-			return -EINVAL;
-
-		/*
-		 * Due to the way BRS operates by holding the interrupt until
-		 * lbr_nr entries have been captured, it does not make sense
-		 * to allow sampling on BRS with an event that does not match
-		 * what BRS is capturing, i.e., retired taken branches.
-		 * Otherwise the correlation with the event's period is even
-		 * more loose:
-		 *
-		 * With retired taken branch:
-		 *   Effective P = P + 16 + X
-		 * With any other event:
-		 *   Effective P = P + Y + X
-		 *
-		 * Where X is the number of taken branches due to interrupt
-		 * skid. Skid is large.
-		 *
-		 * Where Y is the occurences of the event while BRS is
-		 * capturing the lbr_nr entries.
-		 *
-		 * By using retired taken branches, we limit the impact on the
-		 * Y variable. We know it cannot be more than the depth of
-		 * BRS.
-		 */
-		if (!amd_is_brs_event(event))
-			return -EINVAL;
-
-		/*
-		 * BRS implementation does not work with frequency mode
-		 * reprogramming of the period.
-		 */
-		if (event->attr.freq)
-			return -EINVAL;
-		/*
-		 * The kernel subtracts BRS depth from period, so it must
-		 * be big enough.
-		 */
-		if (event->attr.sample_period <= x86_pmu.lbr_nr)
-			return -EINVAL;
-
-		/*
-		 * Check if we can allow PERF_SAMPLE_BRANCH_STACK
-		 */
-		ret = amd_brs_setup_filter(event);
-
-		/* only set in case of success */
-		if (!ret)
-			event->hw.flags |= PERF_X86_EVENT_AMD_BRS;
-	}
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline int amd_is_nb_event(struct hw_perf_event *hwc)
@@ -593,7 +520,6 @@ static struct amd_nb *amd_alloc_nb(int cpu)
 	return nb;
 }
 
-<<<<<<< HEAD
 typedef void (amd_pmu_branch_reset_t)(void);
 DEFINE_STATIC_CALL_NULL(amd_pmu_branch_reset, amd_pmu_branch_reset_t);
 
@@ -602,10 +528,6 @@ static void amd_pmu_cpu_reset(int cpu)
 	if (x86_pmu.lbr_nr)
 		static_call(amd_pmu_branch_reset)();
 
-=======
-static void amd_pmu_cpu_reset(int cpu)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (x86_pmu.version < 2)
 		return;
 
@@ -670,10 +592,6 @@ static void amd_pmu_cpu_starting(int cpu)
 	cpuc->amd_nb->nb_id = nb_id;
 	cpuc->amd_nb->refcnt++;
 
-<<<<<<< HEAD
-=======
-	amd_brs_reset();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	amd_pmu_cpu_reset(cpu);
 }
 
@@ -697,7 +615,6 @@ static void amd_pmu_cpu_dead(int cpu)
 	}
 
 	amd_pmu_cpu_reset(cpu);
-<<<<<<< HEAD
 }
 
 static inline void amd_pmu_set_global_ctl(u64 ctl)
@@ -705,15 +622,6 @@ static inline void amd_pmu_set_global_ctl(u64 ctl)
 	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, ctl);
 }
 
-=======
-}
-
-static inline void amd_pmu_set_global_ctl(u64 ctl)
-{
-	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, ctl);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline u64 amd_pmu_get_global_status(void)
 {
 	u64 status;
@@ -721,11 +629,7 @@ static inline u64 amd_pmu_get_global_status(void)
 	/* PerfCntrGlobalStatus is read-only */
 	rdmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS, status);
 
-<<<<<<< HEAD
 	return status;
-=======
-	return status & amd_pmu_global_cntr_mask;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void amd_pmu_ack_global_status(u64 status)
@@ -736,11 +640,6 @@ static inline void amd_pmu_ack_global_status(u64 status)
 	 * clears the same bit in PerfCntrGlobalStatus
 	 */
 
-<<<<<<< HEAD
-=======
-	/* Only allow modifications to PerfCntrGlobalStatus.PerfCntrOvfl */
-	status &= amd_pmu_global_cntr_mask;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wrmsrl(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, status);
 }
 
@@ -850,7 +749,6 @@ static void amd_pmu_v2_enable_event(struct perf_event *event)
 	__x86_pmu_enable_event(hwc, ARCH_PERFMON_EVENTSEL_ENABLE);
 }
 
-<<<<<<< HEAD
 static __always_inline void amd_pmu_core_enable_all(void)
 {
 	amd_pmu_set_global_ctl(amd_pmu_global_cntr_mask);
@@ -860,11 +758,6 @@ static void amd_pmu_v2_enable_all(int added)
 {
 	amd_pmu_lbr_enable_all();
 	amd_pmu_core_enable_all();
-=======
-static void amd_pmu_v2_enable_all(int added)
-{
-	amd_pmu_set_global_ctl(amd_pmu_global_cntr_mask);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void amd_pmu_disable_event(struct perf_event *event)
@@ -891,7 +784,6 @@ static void amd_pmu_disable_all(void)
 	amd_pmu_check_overflow();
 }
 
-<<<<<<< HEAD
 static __always_inline void amd_pmu_core_disable_all(void)
 {
 	amd_pmu_set_global_ctl(0);
@@ -918,25 +810,6 @@ static void amd_pmu_del_event(struct perf_event *event)
 {
 	if (needs_branch_stack(event))
 		static_call(amd_pmu_branch_del)(event);
-=======
-static void amd_pmu_v2_disable_all(void)
-{
-	/* Disable all PMCs */
-	amd_pmu_set_global_ctl(0);
-	amd_pmu_check_overflow();
-}
-
-static void amd_pmu_add_event(struct perf_event *event)
-{
-	if (needs_branch_stack(event))
-		amd_pmu_brs_add(event);
-}
-
-static void amd_pmu_del_event(struct perf_event *event)
-{
-	if (needs_branch_stack(event))
-		amd_pmu_brs_del(event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1021,13 +894,8 @@ static int amd_pmu_v2_handle_irq(struct pt_regs *regs)
 	pmu_enabled = cpuc->enabled;
 	cpuc->enabled = 0;
 
-<<<<<<< HEAD
 	/* Stop counting but do not disable LBR */
 	amd_pmu_core_disable_all();
-=======
-	/* Stop counting */
-	amd_pmu_v2_disable_all();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	status = amd_pmu_get_global_status();
 
@@ -1035,15 +903,12 @@ static int amd_pmu_v2_handle_irq(struct pt_regs *regs)
 	if (!status)
 		goto done;
 
-<<<<<<< HEAD
 	/* Read branch records before unfreezing */
 	if (status & GLOBAL_STATUS_LBRS_FROZEN) {
 		amd_pmu_lbr_read();
 		status &= ~GLOBAL_STATUS_LBRS_FROZEN;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (idx = 0; idx < x86_pmu.num_counters; idx++) {
 		if (!test_bit(idx, cpuc->active_mask))
 			continue;
@@ -1063,14 +928,11 @@ static int amd_pmu_v2_handle_irq(struct pt_regs *regs)
 		if (!x86_perf_event_set_period(event))
 			continue;
 
-<<<<<<< HEAD
 		if (has_branch_stack(event)) {
 			data.br_stack = &cpuc->lbr_stack;
 			data.sample_flags |= PERF_SAMPLE_BRANCH_STACK;
 		}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (perf_event_overflow(event, &data, regs))
 			x86_pmu_stop(event, 0);
 
@@ -1084,11 +946,7 @@ static int amd_pmu_v2_handle_irq(struct pt_regs *regs)
 	 */
 	WARN_ON(status > 0);
 
-<<<<<<< HEAD
 	/* Clear overflow and freeze bits */
-=======
-	/* Clear overflow bits */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	amd_pmu_ack_global_status(~status);
 
 	/*
@@ -1102,11 +960,7 @@ done:
 
 	/* Resume counting only if PMU is active */
 	if (pmu_enabled)
-<<<<<<< HEAD
 		amd_pmu_core_enable_all();
-=======
-		amd_pmu_v2_enable_all(0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return amd_pmu_adjust_nmi_window(handled);
 }
@@ -1369,32 +1223,14 @@ static ssize_t amd_event_sysfs_show(char *page, u64 config)
 	return x86_event_sysfs_show(page, config, event);
 }
 
-<<<<<<< HEAD
 static void amd_pmu_limit_period(struct perf_event *event, s64 *left)
-=======
-static void amd_pmu_sched_task(struct perf_event_context *ctx,
-				 bool sched_in)
-{
-	if (sched_in && x86_pmu.lbr_nr)
-		amd_pmu_brs_sched_task(ctx, sched_in);
-}
-
-static u64 amd_pmu_limit_period(struct perf_event *event, u64 left)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/*
 	 * Decrease period by the depth of the BRS feature to get the last N
 	 * taken branches and approximate the desired period
 	 */
-<<<<<<< HEAD
 	if (has_branch_stack(event) && *left > x86_pmu.lbr_nr)
 		*left -= x86_pmu.lbr_nr;
-=======
-	if (has_branch_stack(event) && left > x86_pmu.lbr_nr)
-		left -= x86_pmu.lbr_nr;
-
-	return left;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static __initconst const struct x86_pmu amd_pmu = {
@@ -1441,26 +1277,17 @@ static ssize_t branches_show(struct device *cdev,
 
 static DEVICE_ATTR_RO(branches);
 
-<<<<<<< HEAD
 static struct attribute *amd_pmu_branches_attrs[] = {
-=======
-static struct attribute *amd_pmu_brs_attrs[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&dev_attr_branches.attr,
 	NULL,
 };
 
 static umode_t
-<<<<<<< HEAD
 amd_branches_is_visible(struct kobject *kobj, struct attribute *attr, int i)
-=======
-amd_brs_is_visible(struct kobject *kobj, struct attribute *attr, int i)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return x86_pmu.lbr_nr ? attr->mode : 0;
 }
 
-<<<<<<< HEAD
 static struct attribute_group group_caps_amd_branches = {
 	.name  = "caps",
 	.attrs = amd_pmu_branches_attrs,
@@ -1469,14 +1296,6 @@ static struct attribute_group group_caps_amd_branches = {
 
 #ifdef CONFIG_PERF_EVENTS_AMD_BRS
 
-=======
-static struct attribute_group group_caps_amd_brs = {
-	.name  = "caps",
-	.attrs = amd_pmu_brs_attrs,
-	.is_visible = amd_brs_is_visible,
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EVENT_ATTR_STR(branch-brs, amd_branch_brs,
 	       "event=" __stringify(AMD_FAM19H_BRS_EVENT)"\n");
 
@@ -1485,7 +1304,6 @@ static struct attribute *amd_brs_events_attrs[] = {
 	NULL,
 };
 
-<<<<<<< HEAD
 static umode_t
 amd_brs_is_visible(struct kobject *kobj, struct attribute *attr, int i)
 {
@@ -1493,15 +1311,12 @@ amd_brs_is_visible(struct kobject *kobj, struct attribute *attr, int i)
 	       attr->mode : 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct attribute_group group_events_amd_brs = {
 	.name       = "events",
 	.attrs      = amd_brs_events_attrs,
 	.is_visible = amd_brs_is_visible,
 };
 
-<<<<<<< HEAD
 #endif	/* CONFIG_PERF_EVENTS_AMD_BRS */
 
 static const struct attribute_group *amd_attr_update[] = {
@@ -1509,11 +1324,6 @@ static const struct attribute_group *amd_attr_update[] = {
 #ifdef CONFIG_PERF_EVENTS_AMD_BRS
 	&group_events_amd_brs,
 #endif
-=======
-static const struct attribute_group *amd_attr_update[] = {
-	&group_caps_amd_brs,
-	&group_events_amd_brs,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	NULL,
 };
 
@@ -1590,7 +1400,6 @@ static int __init amd_core_pmu_init(void)
 		x86_pmu.flags |= PMU_FL_PAIR;
 	}
 
-<<<<<<< HEAD
 	/* LBR and BRS are mutually exclusive features */
 	if (!amd_pmu_lbr_init()) {
 		/* LBR requires flushing on context switch */
@@ -1612,15 +1421,6 @@ static int __init amd_core_pmu_init(void)
 		static_call_update(amd_pmu_branch_add, amd_pmu_brs_add);
 		static_call_update(amd_pmu_branch_del, amd_pmu_brs_del);
 
-=======
-	/*
-	 * BRS requires special event constraints and flushing on ctxsw.
-	 */
-	if (boot_cpu_data.x86 >= 0x19 && !amd_brs_init()) {
-		x86_pmu.get_event_constraints = amd_get_event_constraints_f19h;
-		x86_pmu.sched_task = amd_pmu_sched_task;
-		x86_pmu.limit_period = amd_pmu_limit_period;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * put_event_constraints callback same as Fam17h, set above
 		 */

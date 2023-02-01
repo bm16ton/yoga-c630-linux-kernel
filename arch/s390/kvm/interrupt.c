@@ -3324,11 +3324,7 @@ static void aen_host_forward(unsigned long si)
 	if (gaite->count == 0)
 		return;
 	if (gaite->aisb != 0)
-<<<<<<< HEAD
 		set_bit_inv(gaite->aisbo, phys_to_virt(gaite->aisb));
-=======
-		set_bit_inv(gaite->aisbo, (unsigned long *)gaite->aisb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	kvm = kvm_s390_pci_si_to_kvm(aift, si);
 	if (!kvm)

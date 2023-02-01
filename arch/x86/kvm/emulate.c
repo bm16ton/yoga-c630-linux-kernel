@@ -3704,12 +3704,6 @@ static int em_rdmsr(struct x86_emulate_ctxt *ctxt)
 	int r;
 
 	r = ctxt->ops->get_msr_with_filter(ctxt, msr_index, &msr_data);
-<<<<<<< HEAD
-=======
-
-	if (r == X86EMUL_IO_NEEDED)
-		return r;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (r == X86EMUL_PROPAGATE_FAULT)
 		return emulate_gp(ctxt, 0);

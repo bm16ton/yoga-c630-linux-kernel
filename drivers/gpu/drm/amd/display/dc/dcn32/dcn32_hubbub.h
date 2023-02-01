@@ -161,7 +161,6 @@
 	HUBBUB_SF(DCN_VM_FAULT_STATUS, DCN_VM_ERROR_PIPE, mask_sh), \
 	HUBBUB_SF(DCN_VM_FAULT_STATUS, DCN_VM_ERROR_INTERRUPT_STATUS, mask_sh)
 
-<<<<<<< HEAD
 bool hubbub32_program_urgent_watermarks(
 		struct hubbub *hubbub,
 		struct dcn_watermark_set *watermarks,
@@ -191,8 +190,6 @@ void hubbub32_force_usr_retraining_allow(struct hubbub *hubbub, bool allow);
 void hubbub32_force_wm_propagate_to_pipes(struct hubbub *hubbub);
 
 void dcn32_program_det_size(struct hubbub *hubbub, int hubp_inst, unsigned int det_buffer_size_in_kbyte);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void hubbub32_construct(struct dcn20_hubbub *hubbub2,
 	struct dc_context *ctx,

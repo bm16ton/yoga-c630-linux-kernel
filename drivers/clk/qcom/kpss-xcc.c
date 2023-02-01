@@ -32,10 +32,6 @@ MODULE_DEVICE_TABLE(of, kpss_xcc_match_table);
 static int kpss_xcc_driver_probe(struct platform_device *pdev)
 {
 	const struct of_device_id *id;
-<<<<<<< HEAD
-=======
-	struct clk *clk;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void __iomem *base;
 	struct clk_hw *hw;
 	const char *name;

@@ -192,10 +192,7 @@ struct sys_stat_struct {
 __asm__ (".section .text\n"
     ".weak __start\n"
     ".set nomips16\n"
-<<<<<<< HEAD
     ".set push\n"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     ".set    noreorder\n"
     ".option pic0\n"
     ".ent __start\n"
@@ -214,10 +211,7 @@ __asm__ (".section .text\n"
     "li $v0, 4001\n"              // NR_exit == 4001
     "syscall\n"
     ".end __start\n"
-<<<<<<< HEAD
     ".set pop\n"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     "");
 
 #endif // _NOLIBC_ARCH_MIPS_H

@@ -666,11 +666,7 @@ static int __init dma_alloc_cpu_table_caches(void)
 
 int __init zpci_dma_init(void)
 {
-<<<<<<< HEAD
 	s390_iommu_aperture = (u64)virt_to_phys(high_memory);
-=======
-	s390_iommu_aperture = (u64)high_memory;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!s390_iommu_aperture_factor)
 		s390_iommu_aperture = ULONG_MAX;
 	else

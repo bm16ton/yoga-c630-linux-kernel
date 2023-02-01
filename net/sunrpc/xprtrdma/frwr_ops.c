@@ -134,13 +134,6 @@ int frwr_mr_init(struct rpcrdma_xprt *r_xprt, struct rpcrdma_mr *mr)
 	if (IS_ERR(frmr))
 		goto out_mr_err;
 
-<<<<<<< HEAD
-=======
-	sg = kmalloc_array(depth, sizeof(*sg), GFP_KERNEL);
-	if (!sg)
-		goto out_list_err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mr->mr_xprt = r_xprt;
 	mr->mr_ibmr = frmr;
 	mr->mr_device = NULL;

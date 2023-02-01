@@ -20,48 +20,14 @@ properties:
     const: qcom,smd
 
 patternProperties:
-<<<<<<< HEAD
   "^smd-edge|rpm$":
     $ref: /schemas/remoteproc/qcom,smd-edge.yaml#
     unevaluatedProperties: false
-=======
-  "^.*-edge|rpm$":
-    $ref: /schemas/remoteproc/qcom,smd-edge.yaml#
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     description:
       Each subnode of the SMD node represents a remote subsystem or a remote
       processor of some sort - or in SMD language an "edge". The name of the
       edges are not important.
 
-<<<<<<< HEAD
-=======
-    properties:
-      rpm-requests:
-        type: object
-        description:
-          In turn, subnodes of the "edges" represent devices tied to SMD
-          channels on that "edge". The names of the devices are not
-          important. The properties of these nodes are defined by the
-          individual bindings for the SMD devices.
-
-        properties:
-          qcom,smd-channels:
-            $ref: /schemas/types.yaml#/definitions/string-array
-            minItems: 1
-            maxItems: 32
-            description:
-              A list of channels tied to this device, used for matching the
-              device to channels.
-
-        required:
-          - compatible
-          - qcom,smd-channels
-
-        additionalProperties: true
-
-    unevaluatedProperties: false
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
 

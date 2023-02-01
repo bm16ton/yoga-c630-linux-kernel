@@ -152,11 +152,7 @@ static int imx_drm_dumb_create(struct drm_file *file_priv,
 
 	args->width = ALIGN(width, 8);
 
-<<<<<<< HEAD
 	ret = drm_gem_dma_dumb_create(file_priv, drm, args);
-=======
-	ret = drm_gem_cma_dumb_create(file_priv, drm, args);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -166,11 +162,7 @@ static int imx_drm_dumb_create(struct drm_file *file_priv,
 
 static const struct drm_driver imx_drm_driver = {
 	.driver_features	= DRIVER_MODESET | DRIVER_GEM | DRIVER_ATOMIC,
-<<<<<<< HEAD
 	DRM_GEM_DMA_DRIVER_OPS_WITH_DUMB_CREATE(imx_drm_dumb_create),
-=======
-	DRM_GEM_CMA_DRIVER_OPS_WITH_DUMB_CREATE(imx_drm_dumb_create),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ioctls			= imx_drm_ioctls,
 	.num_ioctls		= ARRAY_SIZE(imx_drm_ioctls),
 	.fops			= &imx_drm_driver_fops,

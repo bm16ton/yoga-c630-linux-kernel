@@ -122,19 +122,11 @@ static inline void ebitmap_node_clr_bit(struct ebitmap_node *n,
 	     (bit) < ebitmap_length(e);			\
 	     (bit) = ebitmap_next_positive(e, &(n), bit))	\
 
-<<<<<<< HEAD
 int ebitmap_cmp(const struct ebitmap *e1, const struct ebitmap *e2);
 int ebitmap_cpy(struct ebitmap *dst, const struct ebitmap *src);
 int ebitmap_and(struct ebitmap *dst, const struct ebitmap *e1, const struct ebitmap *e2);
 int ebitmap_contains(const struct ebitmap *e1, const struct ebitmap *e2, u32 last_e2bit);
 int ebitmap_get_bit(const struct ebitmap *e, unsigned long bit);
-=======
-int ebitmap_cmp(struct ebitmap *e1, struct ebitmap *e2);
-int ebitmap_cpy(struct ebitmap *dst, struct ebitmap *src);
-int ebitmap_and(struct ebitmap *dst, struct ebitmap *e1, struct ebitmap *e2);
-int ebitmap_contains(struct ebitmap *e1, struct ebitmap *e2, u32 last_e2bit);
-int ebitmap_get_bit(struct ebitmap *e, unsigned long bit);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ebitmap_set_bit(struct ebitmap *e, unsigned long bit, int value);
 void ebitmap_destroy(struct ebitmap *e);
 int ebitmap_read(struct ebitmap *e, void *fp);

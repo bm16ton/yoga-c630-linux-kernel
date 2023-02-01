@@ -334,7 +334,6 @@ static void serial_omap_stop_rx(struct uart_port *port)
 	up->ier &= ~(UART_IER_RLSI | UART_IER_RDI);
 	up->port.read_status_mask &= ~UART_LSR_DR;
 	serial_out(up, UART_IER, up->ier);
-<<<<<<< HEAD
 }
 
 static void serial_omap_put_char(struct uart_omap_port *up, unsigned char ch)
@@ -344,8 +343,6 @@ static void serial_omap_put_char(struct uart_omap_port *up, unsigned char ch)
 	if ((up->port.rs485.flags & SER_RS485_ENABLED) &&
 			!(up->port.rs485.flags & SER_RS485_RX_DURING_TX))
 		up->rs485_tx_filter_count++;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void transmit_chars(struct uart_omap_port *up, unsigned int lsr)
@@ -1340,21 +1337,11 @@ serial_omap_config_rs485(struct uart_port *port, struct ktermios *termios,
 	up->ier = 0;
 	serial_out(up, UART_IER, 0);
 
-<<<<<<< HEAD
 	/* enable / disable rts */
 	val = (rs485->flags & SER_RS485_ENABLED) ?
 	      SER_RS485_RTS_AFTER_SEND : SER_RS485_RTS_ON_SEND;
 	val = (rs485->flags & val) ? 1 : 0;
 	gpiod_set_value(up->rts_gpiod, val);
-=======
-	if (up->rts_gpiod) {
-		/* enable / disable rts */
-		val = (rs485->flags & SER_RS485_ENABLED) ?
-			SER_RS485_RTS_AFTER_SEND : SER_RS485_RTS_ON_SEND;
-		val = (rs485->flags & val) ? 1 : 0;
-		gpiod_set_value(up->rts_gpiod, val);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Enable interrupts */
 	up->ier = mode;

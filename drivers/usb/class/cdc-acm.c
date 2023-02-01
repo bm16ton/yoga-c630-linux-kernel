@@ -1931,9 +1931,7 @@ static const struct usb_device_id acm_ids[] = {
 	{ USB_DEVICE(0x058b, 0x0041),
 	.driver_info = IGNORE_DEVICE,
 	},
-//	{ USB_DEVICE(0x0483, 0x374b),
-//	.driver_info = IGNORE_DEVICE,
-//	},
+
 	/* Exclude ETAS ES58x */
 	{ USB_DEVICE(0x108c, 0x0159), /* ES581.4 */
 	.driver_info = IGNORE_DEVICE,
@@ -2051,10 +2049,6 @@ static int __init acm_init(void)
 	acm_tty_driver->init_termios = tty_std_termios;
 	acm_tty_driver->init_termios.c_cflag = B9600 | CS8 | CREAD |
 								HUPCL | CLOCAL;
-//    acm_tty_driver->init_termios.c_cflag |= -ICRNL;
-	acm_tty_driver->init_termios.c_oflag &= ~OPOST;
-	acm_tty_driver->init_termios.c_iflag &= ~ICRNL;
-    
 	tty_set_operations(acm_tty_driver, &acm_ops);
 
 	retval = tty_register_driver(acm_tty_driver);

@@ -139,12 +139,9 @@ static int rt711_sdca_rtd_init(struct snd_soc_pcm_runtime *rtd)
 int sof_sdw_rt711_sdca_exit(struct snd_soc_card *card, struct snd_soc_dai_link *dai_link)
 {
 	struct mc_private *ctx = snd_soc_card_get_drvdata(card);
-<<<<<<< HEAD
 
 	if (!ctx->headset_codec_dev)
 		return 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	device_remove_software_node(ctx->headset_codec_dev);
 	put_device(ctx->headset_codec_dev);

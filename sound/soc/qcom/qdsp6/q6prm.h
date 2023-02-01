@@ -64,7 +64,6 @@
 #define Q6PRM_LPASS_CLK_ID_RX_CORE_MCLK				0x30e
 #define Q6PRM_LPASS_CLK_ID_RX_CORE_NPL_MCLK			0x30f
 
-<<<<<<< HEAD
 /* Clock ID for MCLK for WSA2 core */
 #define Q6PRM_LPASS_CLK_ID_WSA2_CORE_MCLK 0x310
 /* Clock ID for NPL MCLK for WSA2 core */
@@ -84,8 +83,6 @@
 /* Clock ID for RX CORE MCLK2 2X  MCLK */
 #define Q6PRM_LPASS_CLK_ID_RX_CORE_MCLK2_2X_MCLK 0x318
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define Q6PRM_LPASS_CLK_SRC_INTERNAL	1
 #define Q6PRM_LPASS_CLK_ROOT_DEFAULT	0
 #define Q6PRM_HW_CORE_ID_LPASS		1

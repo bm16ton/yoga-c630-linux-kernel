@@ -17,7 +17,6 @@ import os
 import sphinx
 import shutil
 
-<<<<<<< HEAD
 # helper
 # ------
 
@@ -29,8 +28,6 @@ def have_command(cmd):
     """
     return shutil.which(cmd) is not None
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # Get Sphinx version
 major, minor, patch = sphinx.version_info[:3]
 
@@ -431,7 +428,6 @@ latex_elements = {
 
     # The font size ('10pt', '11pt' or '12pt').
     'pointsize': '11pt',
-<<<<<<< HEAD
 
     # Latex figure (float) alignment
     #'figure_align': 'htbp',
@@ -450,26 +446,6 @@ latex_elements = {
     # For CJK One-half spacing, need to be in front of hyperref
     'extrapackages': r'\usepackage{setspace}',
 
-=======
-
-    # Latex figure (float) alignment
-    #'figure_align': 'htbp',
-
-    # Don't mangle with UTF-8 chars
-    'inputenc': '',
-    'utf8extra': '',
-
-    # Set document margins
-    'sphinxsetup': '''
-        hmargin=0.5in, vmargin=1in,
-        parsedliteralwraps=true,
-        verbatimhintsturnover=false,
-    ''',
-
-    # For CJK One-half spacing, need to be in front of hyperref
-    'extrapackages': r'\usepackage{setspace}',
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     # Additional stuff for the LaTeX preamble.
     'preamble': '''
         % Use some font with UTF-8 support with XeLaTeX

@@ -164,10 +164,7 @@ char * nfs4_recoverydir(void);
 bool nfsd4_spo_must_allow(struct svc_rqst *rqstp);
 int nfsd4_create_laundry_wq(void);
 void nfsd4_destroy_laundry_wq(void);
-<<<<<<< HEAD
 bool nfsd_wait_for_delegreturn(struct svc_rqst *rqstp, struct inode *inode);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline int nfsd4_init_slabs(void) { return 0; }
 static inline void nfsd4_free_slabs(void) { }
@@ -183,14 +180,11 @@ static inline bool nfsd4_spo_must_allow(struct svc_rqst *rqstp)
 }
 static inline int nfsd4_create_laundry_wq(void) { return 0; };
 static inline void nfsd4_destroy_laundry_wq(void) {};
-<<<<<<< HEAD
 static inline bool nfsd_wait_for_delegreturn(struct svc_rqst *rqstp,
 					      struct inode *inode)
 {
 	return false;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 /*
@@ -355,10 +349,7 @@ void		nfsd_lockd_shutdown(void);
 #define	NFSD_COURTESY_CLIENT_TIMEOUT	(24 * 60 * 60)	/* seconds */
 #define	NFSD_CLIENT_MAX_TRIM_PER_RUN	128
 #define	NFS4_CLIENTS_PER_GB		1024
-<<<<<<< HEAD
 #define NFSD_DELEGRETURN_TIMEOUT	(HZ / 34)	/* 30ms */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * The following attributes are currently not supported by the NFSv4 server:
@@ -514,12 +505,8 @@ extern void unregister_cld_notifier(void);
 extern void nfsd4_ssc_init_umount_work(struct nfsd_net *nn);
 #endif
 
-<<<<<<< HEAD
 extern int nfsd4_init_leases_net(struct nfsd_net *nn);
 extern void nfsd4_leases_net_shutdown(struct nfsd_net *nn);
-=======
-extern void nfsd4_init_leases_net(struct nfsd_net *nn);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #else /* CONFIG_NFSD_V4 */
 static inline int nfsd4_is_junction(struct dentry *dentry)
@@ -527,12 +514,8 @@ static inline int nfsd4_is_junction(struct dentry *dentry)
 	return 0;
 }
 
-<<<<<<< HEAD
 static inline int nfsd4_init_leases_net(struct nfsd_net *nn) { return 0; };
 static inline void nfsd4_leases_net_shutdown(struct nfsd_net *nn) {};
-=======
-static inline void nfsd4_init_leases_net(struct nfsd_net *nn) {};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define register_cld_notifier() 0
 #define unregister_cld_notifier() do { } while(0)

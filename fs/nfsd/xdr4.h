@@ -732,10 +732,6 @@ struct nfsd4_compoundres {
 	struct svc_rqst *		rqstp;
 
 	__be32				*statusp;
-<<<<<<< HEAD
-=======
-	u32				taglen;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	char *				tag;
 	u32				taglen;
 	u32				opcnt;

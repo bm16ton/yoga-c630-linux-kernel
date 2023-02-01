@@ -127,7 +127,6 @@ static void icmpv6_error_log(const struct sk_buff *skb,
 			     const char *msg)
 {
 	nf_l4proto_log_invalid(skb, state, IPPROTO_ICMPV6, "%s", msg);
-<<<<<<< HEAD
 }
 
 static noinline_for_stack int
@@ -178,8 +177,6 @@ nf_conntrack_icmpv6_redirect(struct nf_conn *tmpl, struct sk_buff *skb,
 	dataoff += 8;
 	return nf_conntrack_inet_error(tmpl, skb, dataoff, state,
 				       IPPROTO_ICMPV6, &outer_daddr);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int nf_conntrack_icmpv6_error(struct nf_conn *tmpl,

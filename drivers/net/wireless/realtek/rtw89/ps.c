@@ -59,16 +59,11 @@ static void rtw89_ps_power_mode_change(struct rtw89_dev *rtwdev, bool enter)
 		rtw89_mac_power_mode_change(rtwdev, enter);
 }
 
-<<<<<<< HEAD
 static void __rtw89_enter_ps_mode(struct rtw89_dev *rtwdev, struct rtw89_vif *rtwvif)
 {
 	if (rtwvif->wifi_role == RTW89_WIFI_ROLE_P2P_CLIENT)
 		return;
 
-=======
-static void __rtw89_enter_ps_mode(struct rtw89_dev *rtwdev)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!rtwdev->ps_mode)
 		return;
 
@@ -119,39 +114,23 @@ void rtw89_leave_ps_mode(struct rtw89_dev *rtwdev)
 	__rtw89_leave_ps_mode(rtwdev);
 }
 
-<<<<<<< HEAD
 void rtw89_enter_lps(struct rtw89_dev *rtwdev, struct rtw89_vif *rtwvif)
-=======
-void rtw89_enter_lps(struct rtw89_dev *rtwdev, u8 mac_id)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	lockdep_assert_held(&rtwdev->mutex);
 
 	if (test_and_set_bit(RTW89_FLAG_LEISURE_PS, rtwdev->flags))
 		return;
 
-<<<<<<< HEAD
 	__rtw89_enter_lps(rtwdev, rtwvif->mac_id);
 	__rtw89_enter_ps_mode(rtwdev, rtwvif);
-=======
-	__rtw89_enter_lps(rtwdev, mac_id);
-	__rtw89_enter_ps_mode(rtwdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void rtw89_leave_lps_vif(struct rtw89_dev *rtwdev, struct rtw89_vif *rtwvif)
 {
-<<<<<<< HEAD
 	if (rtwvif->wifi_role != RTW89_WIFI_ROLE_STATION &&
 	    rtwvif->wifi_role != RTW89_WIFI_ROLE_P2P_CLIENT)
 		return;
 
-=======
-	if (rtwvif->wifi_role != RTW89_WIFI_ROLE_STATION)
-		return;
-
-	__rtw89_leave_ps_mode(rtwdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__rtw89_leave_lps(rtwdev, rtwvif->mac_id);
 }
 
@@ -164,11 +143,8 @@ void rtw89_leave_lps(struct rtw89_dev *rtwdev)
 	if (!test_and_clear_bit(RTW89_FLAG_LEISURE_PS, rtwdev->flags))
 		return;
 
-<<<<<<< HEAD
 	__rtw89_leave_ps_mode(rtwdev);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rtw89_for_each_rtwvif(rtwdev, rtwvif)
 		rtw89_leave_lps_vif(rtwdev, rtwvif);
 }
@@ -207,7 +183,6 @@ void rtw89_set_coex_ctrl_lps(struct rtw89_dev *rtwdev, bool btc_ctrl)
 	if (btc_ctrl)
 		rtw89_leave_lps(rtwdev);
 }
-<<<<<<< HEAD
 
 static void rtw89_tsf32_toggle(struct rtw89_dev *rtwdev, struct rtw89_vif *rtwvif,
 			       enum rtw89_p2pps_action act)
@@ -269,5 +244,3 @@ void rtw89_process_p2p_ps(struct rtw89_dev *rtwdev, struct ieee80211_vif *vif)
 	rtw89_p2p_disable_all_noa(rtwdev, vif);
 	rtw89_p2p_update_noa(rtwdev, vif);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

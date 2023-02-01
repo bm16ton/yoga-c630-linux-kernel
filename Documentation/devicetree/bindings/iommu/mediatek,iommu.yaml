@@ -180,10 +180,7 @@ allOf:
           contains:
             enum:
               - mediatek,mt2712-m4u
-<<<<<<< HEAD
               - mediatek,mt6795-m4u
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - mediatek,mt8173-m4u
 
     then:

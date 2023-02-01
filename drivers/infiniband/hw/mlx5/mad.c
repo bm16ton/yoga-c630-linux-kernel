@@ -147,7 +147,6 @@ static void pma_cnt_assign(struct ib_pma_portcounters *pma_cnt,
 			     vl_15_dropped);
 }
 
-<<<<<<< HEAD
 static int query_ib_ppcnt(struct mlx5_core_dev *dev, u8 port_num, void *out,
 			  size_t sz)
 {
@@ -170,8 +169,6 @@ static int query_ib_ppcnt(struct mlx5_core_dev *dev, u8 port_num, void *out,
 	return err;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int process_pma_cmd(struct mlx5_ib_dev *dev, u32 port_num,
 			   const struct ib_mad *in_mad, struct ib_mad *out_mad)
 {

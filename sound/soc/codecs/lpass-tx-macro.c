@@ -259,11 +259,7 @@ struct tx_macro {
 	struct tx_mute_work tx_mute_dwork[NUM_DECIMATORS];
 	unsigned long active_ch_mask[TX_MACRO_MAX_DAIS];
 	unsigned long active_ch_cnt[TX_MACRO_MAX_DAIS];
-<<<<<<< HEAD
 	int active_decimator[TX_MACRO_MAX_DAIS];
-=======
-	unsigned long active_decimator[TX_MACRO_MAX_DAIS];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct regmap *regmap;
 	struct clk *mclk;
 	struct clk *npl;
@@ -272,10 +268,6 @@ struct tx_macro {
 	struct clk *fsgen;
 	struct clk_hw hw;
 	bool dec_active[NUM_DECIMATORS];
-<<<<<<< HEAD
-=======
-	bool reset_swr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int tx_mclk_users;
 	u16 dmic_clk_div;
 	bool bcs_enable;
@@ -1134,13 +1126,10 @@ static int tx_macro_digital_mute(struct snd_soc_dai *dai, int mute, int stream)
 	struct tx_macro *tx = snd_soc_component_get_drvdata(component);
 	u16 decimator;
 
-<<<<<<< HEAD
 	/* active decimator not set yet */
 	if (tx->active_decimator[dai->id] == -1)
 		return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	decimator = tx->active_decimator[dai->id];
 
 	if (mute)
@@ -1725,28 +1714,14 @@ static int swclk_gate_enable(struct clk_hw *hw)
 	}
 
 	tx_macro_mclk_enable(tx, true);
-<<<<<<< HEAD
 	regmap_update_bits(regmap, CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
 			   CDC_TX_SWR_RESET_MASK, CDC_TX_SWR_RESET_ENABLE);
-=======
-	if (tx->reset_swr)
-		regmap_update_bits(regmap, CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
-				   CDC_TX_SWR_RESET_MASK,
-				   CDC_TX_SWR_RESET_ENABLE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	regmap_update_bits(regmap, CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
 			   CDC_TX_SWR_CLK_EN_MASK,
 			   CDC_TX_SWR_CLK_ENABLE);
-<<<<<<< HEAD
 	regmap_update_bits(regmap, CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
 			   CDC_TX_SWR_RESET_MASK, 0x0);
-=======
-	if (tx->reset_swr)
-		regmap_update_bits(regmap, CDC_TX_CLK_RST_CTRL_SWR_CONTROL,
-				   CDC_TX_SWR_RESET_MASK, 0x0);
-	tx->reset_swr = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1888,10 +1863,6 @@ static int tx_macro_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(dev, tx);
 
-<<<<<<< HEAD
-=======
-	tx->reset_swr = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tx->dev = dev;
 
 	/* set MCLK and NPL rates */
@@ -2006,10 +1977,6 @@ static int __maybe_unused tx_macro_runtime_resume(struct device *dev)
 
 	regcache_cache_only(tx->regmap, false);
 	regcache_sync(tx->regmap);
-<<<<<<< HEAD
-=======
-	tx->reset_swr = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 err_fsgen:
@@ -2027,11 +1994,8 @@ static const struct dev_pm_ops tx_macro_pm_ops = {
 static const struct of_device_id tx_macro_dt_match[] = {
 	{ .compatible = "qcom,sc7280-lpass-tx-macro" },
 	{ .compatible = "qcom,sm8250-lpass-tx-macro" },
-<<<<<<< HEAD
 	{ .compatible = "qcom,sm8450-lpass-tx-macro" },
 	{ .compatible = "qcom,sc8280xp-lpass-tx-macro" },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 MODULE_DEVICE_TABLE(of, tx_macro_dt_match);

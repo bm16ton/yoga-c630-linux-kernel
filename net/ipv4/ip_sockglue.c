@@ -888,13 +888,8 @@ static int compat_ip_mcast_join_leave(struct sock *sk, int optname,
 
 DEFINE_STATIC_KEY_FALSE(ip4_min_ttl);
 
-<<<<<<< HEAD
 int do_ip_setsockopt(struct sock *sk, int level, int optname,
 		     sockptr_t optval, unsigned int optlen)
-=======
-static int do_ip_setsockopt(struct sock *sk, int level, int optname,
-		sockptr_t optval, unsigned int optlen)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct inet_sock *inet = inet_sk(sk);
 	struct net *net = sock_net(sk);
@@ -1471,10 +1466,6 @@ static int ip_get_mcast_msfilter(struct sock *sk, sockptr_t optval,
 				 sockptr_t optlen, int len)
 {
 	const int size0 = offsetof(struct group_filter, gf_slist_flex);
-<<<<<<< HEAD
-=======
-	struct group_filter __user *p = optval;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct group_filter gsf;
 	int num, gsf_size;
 	int err;
@@ -1485,12 +1476,8 @@ static int ip_get_mcast_msfilter(struct sock *sk, sockptr_t optval,
 		return -EFAULT;
 
 	num = gsf.gf_numsrc;
-<<<<<<< HEAD
 	err = ip_mc_gsfget(sk, &gsf, optval,
 			   offsetof(struct group_filter, gf_slist_flex));
-=======
-	err = ip_mc_gsfget(sk, &gsf, p->gf_slist_flex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 	if (gsf.gf_numsrc < num)
@@ -1506,10 +1493,6 @@ static int compat_ip_get_mcast_msfilter(struct sock *sk, sockptr_t optval,
 					sockptr_t optlen, int len)
 {
 	const int size0 = offsetof(struct compat_group_filter, gf_slist_flex);
-<<<<<<< HEAD
-=======
-	struct compat_group_filter __user *p = optval;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct compat_group_filter gf32;
 	struct group_filter gf;
 	int num;
@@ -1525,12 +1508,8 @@ static int compat_ip_get_mcast_msfilter(struct sock *sk, sockptr_t optval,
 	num = gf.gf_numsrc = gf32.gf_numsrc;
 	gf.gf_group = gf32.gf_group;
 
-<<<<<<< HEAD
 	err = ip_mc_gsfget(sk, &gf, optval,
 			   offsetof(struct compat_group_filter, gf_slist_flex));
-=======
-	err = ip_mc_gsfget(sk, &gf, p->gf_slist_flex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 	if (gf.gf_numsrc < num)

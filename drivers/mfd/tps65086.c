@@ -117,11 +117,6 @@ static void tps65086_remove(struct i2c_client *client)
 
 	if (tps->irq > 0)
 		regmap_del_irq_chip(tps->irq, tps->irq_data);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tps65086_id_table[] = {

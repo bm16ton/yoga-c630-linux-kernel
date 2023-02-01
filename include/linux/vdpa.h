@@ -104,10 +104,7 @@ struct vdpa_iova_range {
 };
 
 struct vdpa_dev_set_config {
-<<<<<<< HEAD
 	u64 device_features;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct {
 		u8 mac[ETH_ALEN];
 		u16 mtu;

@@ -147,11 +147,7 @@ static void cedrus_h265_frame_info_write_dpb(struct cedrus_ctx *ctx,
 			dpb[i].pic_order_cnt_val
 		};
 
-<<<<<<< HEAD
 		if (!buf)
-=======
-		if (buffer_index < 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			continue;
 
 		cedrus_h265_frame_info_write_single(ctx, i, dpb[i].field_pic,
@@ -246,7 +242,6 @@ static void cedrus_h265_skip_bits(struct cedrus_dev *dev, int num)
 	}
 }
 
-<<<<<<< HEAD
 static u32 cedrus_h265_show_bits(struct cedrus_dev *dev, int num)
 {
 	cedrus_write(dev, VE_DEC_H265_TRIGGER,
@@ -259,8 +254,6 @@ static u32 cedrus_h265_show_bits(struct cedrus_dev *dev, int num)
 	return cedrus_read(dev, VE_DEC_H265_BITS_READ);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void cedrus_h265_write_scaling_list(struct cedrus_ctx *ctx,
 					   struct cedrus_run *run)
 {
@@ -425,11 +418,7 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 	u32 num_entry_point_offsets;
 	u32 output_pic_list_index;
 	u32 pic_order_cnt[2];
-<<<<<<< HEAD
 	u8 padding;
-=======
-	u8 *padding;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int count;
 	u32 reg;
 
@@ -543,7 +532,6 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 	if (slice_params->data_byte_offset == 0)
 		return -EOPNOTSUPP;
 
-<<<<<<< HEAD
 	cedrus_h265_skip_bits(dev, (slice_params->data_byte_offset - 1) * 8);
 
 	padding = cedrus_h265_show_bits(dev, 8);
@@ -554,27 +542,12 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 
 	for (count = 0; count < 8; count++)
 		if (padding & (1 << count))
-=======
-	padding = (u8 *)vb2_plane_vaddr(&run->src->vb2_buf, 0) +
-		slice_params->data_byte_offset - 1;
-
-	/* at least one bit must be set in that byte */
-	if (*padding == 0)
-		return -EINVAL;
-
-	for (count = 0; count < 8; count++)
-		if (*padding & (1 << count))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 
 	/* Include the one bit. */
 	count++;
 
-<<<<<<< HEAD
 	cedrus_h265_skip_bits(dev, 8 - count);
-=======
-	cedrus_h265_skip_bits(dev, slice_params->data_byte_offset * 8 - count);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Bitstream parameters. */
 

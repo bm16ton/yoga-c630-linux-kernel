@@ -45,11 +45,8 @@ static int sanitycheck(void *arg)
 	if (!f)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	dma_fence_enable_sw_signaling(f);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_fence_signal(f);
 	dma_fence_put(f);
 
@@ -74,11 +71,8 @@ static int test_signaling(void *arg)
 	if (!f)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	dma_fence_enable_sw_signaling(f);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_resv_init(&resv);
 	r = dma_resv_lock(&resv, NULL);
 	if (r) {
@@ -124,11 +118,8 @@ static int test_for_each(void *arg)
 	if (!f)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	dma_fence_enable_sw_signaling(f);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_resv_init(&resv);
 	r = dma_resv_lock(&resv, NULL);
 	if (r) {
@@ -188,11 +179,8 @@ static int test_for_each_unlocked(void *arg)
 	if (!f)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	dma_fence_enable_sw_signaling(f);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_resv_init(&resv);
 	r = dma_resv_lock(&resv, NULL);
 	if (r) {
@@ -264,11 +252,8 @@ static int test_get_fences(void *arg)
 	if (!f)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	dma_fence_enable_sw_signaling(f);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_resv_init(&resv);
 	r = dma_resv_lock(&resv, NULL);
 	if (r) {

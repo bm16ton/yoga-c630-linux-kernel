@@ -745,7 +745,6 @@ static int __igt_reset_engine(struct intel_gt *gt, bool active)
 			struct i915_request *rq = NULL;
 			struct intel_selftest_saved_policy saved;
 			int err2;
-<<<<<<< HEAD
 
 			err = intel_selftest_modify_policy(engine, &saved,
 							   SELFTEST_SCHEDULER_MODIFY_FAST_RESET);
@@ -754,16 +753,6 @@ static int __igt_reset_engine(struct intel_gt *gt, bool active)
 				break;
 			}
 
-=======
-
-			err = intel_selftest_modify_policy(engine, &saved,
-							   SELFTEST_SCHEDULER_MODIFY_FAST_RESET);
-			if (err) {
-				pr_err("[%s] Modify policy failed: %d!\n", engine->name, err);
-				break;
-			}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (active) {
 				rq = hang_create_request(&h, engine);
 				if (IS_ERR(rq)) {
@@ -1099,7 +1088,6 @@ static int __igt_reset_engines(struct intel_gt *gt,
 					i915_request_put(rq);
 					err = -EIO;
 					goto restore;
-<<<<<<< HEAD
 				}
 			} else {
 				intel_engine_pm_get(engine);
@@ -1111,25 +1099,9 @@ static int __igt_reset_engines(struct intel_gt *gt,
 					pr_err("i915_reset_engine(%s:%s): failed, err=%d\n",
 					       engine->name, test_name, err);
 					goto restore;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-				}
-			} else {
-				intel_engine_pm_get(engine);
-			}
-
-<<<<<<< HEAD
-=======
-			if (!using_guc) {
-				err = intel_engine_reset(engine, NULL);
-				if (err) {
-					pr_err("i915_reset_engine(%s:%s): failed, err=%d\n",
-					       engine->name, test_name, err);
-					goto restore;
 				}
 			}
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (rq) {
 				/* Ensure the reset happens and kills the engine */
 				err = intel_selftest_wait_for_rq(rq);

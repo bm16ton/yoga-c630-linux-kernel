@@ -126,7 +126,6 @@ const struct regmap_config bmp280_regmap_config = {
 	.volatile_reg = bmp280_is_volatile_reg,
 };
 EXPORT_SYMBOL_NS(bmp280_regmap_config, IIO_BMP280);
-<<<<<<< HEAD
 
 const struct regmap_config bmp380_regmap_config = {
 	.reg_bits = 8,
@@ -139,5 +138,3 @@ const struct regmap_config bmp380_regmap_config = {
 	.volatile_reg = bmp380_is_volatile_reg,
 };
 EXPORT_SYMBOL_NS(bmp380_regmap_config, IIO_BMP280);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

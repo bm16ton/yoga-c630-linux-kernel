@@ -25,18 +25,10 @@
 #include <drm/drm_drv.h>
 #include <drm/drm_edid.h>
 #include <drm/drm_encoder.h>
-<<<<<<< HEAD
 #include <drm/drm_file.h>
 #include <drm/drm_managed.h>
 #include <drm/drm_panel.h>
 #include <drm/drm_print.h>
-=======
-#include <drm/drm_panel.h>
-#include <drm/drm_utils.h>
-#include <drm/drm_print.h>
-#include <drm/drm_drv.h>
-#include <drm/drm_file.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_privacy_screen_consumer.h>
 #include <drm/drm_sysfs.h>
 #include <drm/drm_utils.h>
@@ -275,12 +267,9 @@ static int __drm_connector_init(struct drm_device *dev,
 		goto out_put_type_id;
 	}
 
-<<<<<<< HEAD
 	/* provide ddc symlink in sysfs */
 	connector->ddc = ddc;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INIT_LIST_HEAD(&connector->global_connector_list_entry);
 	INIT_LIST_HEAD(&connector->probed_modes);
 	INIT_LIST_HEAD(&connector->modes);

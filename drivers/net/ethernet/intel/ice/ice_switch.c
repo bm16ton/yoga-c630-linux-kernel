@@ -42,10 +42,7 @@ enum {
 	ICE_PKT_GTP_NOPAY	= BIT(8),
 	ICE_PKT_KMALLOC		= BIT(9),
 	ICE_PKT_PPPOE		= BIT(10),
-<<<<<<< HEAD
 	ICE_PKT_L2TPV3		= BIT(11),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ice_dummy_pkt_offsets {
@@ -1262,7 +1259,6 @@ ICE_DECLARE_PKT_TEMPLATE(pppoe_ipv6_udp) = {
 	0x00, 0x00,		/* 2 bytes for 4 bytes alignment */
 };
 
-<<<<<<< HEAD
 ICE_DECLARE_PKT_OFFSETS(ipv4_l2tpv3) = {
 	{ ICE_MAC_OFOS,		0 },
 	{ ICE_ETYPE_OL,		12 },
@@ -1322,8 +1318,6 @@ ICE_DECLARE_PKT_TEMPLATE(ipv6_l2tpv3) = {
 	0x00, 0x00,		/* 2 bytes for 4 bytes alignment */
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct ice_dummy_pkt_profile ice_dummy_pkt_profiles[] = {
 	ICE_PKT_PROFILE(ipv6_gtp, ICE_PKT_TUN_GTPU | ICE_PKT_OUTER_IPV6 |
 				  ICE_PKT_GTP_NOPAY),
@@ -1363,11 +1357,8 @@ static const struct ice_dummy_pkt_profile ice_dummy_pkt_profiles[] = {
 	ICE_PKT_PROFILE(udp_tun_ipv6_tcp, ICE_PKT_TUN_UDP |
 					  ICE_PKT_INNER_IPV6 |
 					  ICE_PKT_INNER_TCP),
-<<<<<<< HEAD
 	ICE_PKT_PROFILE(ipv6_l2tpv3, ICE_PKT_L2TPV3 | ICE_PKT_OUTER_IPV6),
 	ICE_PKT_PROFILE(ipv4_l2tpv3, ICE_PKT_L2TPV3),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ICE_PKT_PROFILE(udp_tun_tcp, ICE_PKT_TUN_UDP | ICE_PKT_INNER_TCP),
 	ICE_PKT_PROFILE(udp_tun_ipv6_udp, ICE_PKT_TUN_UDP |
 					  ICE_PKT_INNER_IPV6),
@@ -3397,8 +3388,6 @@ exit:
 
 /**
  * ice_mac_fltr_exist - does this MAC filter exist for given VSI
-<<<<<<< HEAD
-=======
  * @hw: pointer to the hardware structure
  * @mac: MAC address to be checked (for MAC filter)
  * @vsi_handle: check MAC filter for this VSI
@@ -3509,231 +3498,6 @@ bool ice_vlan_fltr_exist(struct ice_hw *hw, u16 vlan_id, u16 vsi_handle)
 		if (vlan_id == entry_vlan_id) {
 			mutex_unlock(rule_lock);
 			return true;
-		}
-	}
-	mutex_unlock(rule_lock);
-
-	return false;
-}
-
-/**
- * ice_add_mac - Add a MAC address based filter rule
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
- * @hw: pointer to the hardware structure
- * @mac: MAC address to be checked (for MAC filter)
- * @vsi_handle: check MAC filter for this VSI
- */
-<<<<<<< HEAD
-bool ice_mac_fltr_exist(struct ice_hw *hw, u8 *mac, u16 vsi_handle)
-{
-	struct ice_fltr_mgmt_list_entry *entry;
-=======
-int ice_add_mac(struct ice_hw *hw, struct list_head *m_list)
-{
-	struct ice_sw_rule_lkup_rx_tx *s_rule, *r_iter;
-	struct ice_fltr_list_entry *m_list_itr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	struct list_head *rule_head;
-	struct ice_switch_info *sw;
-	struct mutex *rule_lock; /* Lock to protect filter rule list */
-<<<<<<< HEAD
-	u16 hw_vsi_id;
-
-	if (!ice_is_vsi_valid(hw, vsi_handle))
-		return false;
-=======
-	u16 num_unicast = 0;
-	int status = 0;
-	u8 elem_sent;
-
-	if (!m_list || !hw)
-		return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	hw_vsi_id = ice_get_hw_vsi_num(hw, vsi_handle);
-	sw = hw->switch_info;
-	rule_head = &sw->recp_list[ICE_SW_LKUP_MAC].filt_rules;
-	if (!rule_head)
-		return false;
-
-	rule_lock = &sw->recp_list[ICE_SW_LKUP_MAC].filt_rule_lock;
-	mutex_lock(rule_lock);
-	list_for_each_entry(entry, rule_head, list_entry) {
-		struct ice_fltr_info *f_info = &entry->fltr_info;
-		u8 *mac_addr = &f_info->l_data.mac.mac_addr[0];
-
-<<<<<<< HEAD
-		if (is_zero_ether_addr(mac_addr))
-			continue;
-
-		if (f_info->flag != ICE_FLTR_TX ||
-		    f_info->src_id != ICE_SRC_ID_VSI ||
-		    f_info->lkup_type != ICE_SW_LKUP_MAC ||
-		    f_info->fltr_act != ICE_FWD_TO_VSI ||
-		    hw_vsi_id != f_info->fwd_id.hw_vsi_id)
-			continue;
-
-		if (ether_addr_equal(mac, mac_addr)) {
-=======
-		m_list_itr->fltr_info.flag = ICE_FLTR_TX;
-		vsi_handle = m_list_itr->fltr_info.vsi_handle;
-		if (!ice_is_vsi_valid(hw, vsi_handle))
-			return -EINVAL;
-		hw_vsi_id = ice_get_hw_vsi_num(hw, vsi_handle);
-		m_list_itr->fltr_info.fwd_id.hw_vsi_id = hw_vsi_id;
-		/* update the src in case it is VSI num */
-		if (m_list_itr->fltr_info.src_id != ICE_SRC_ID_VSI)
-			return -EINVAL;
-		m_list_itr->fltr_info.src = hw_vsi_id;
-		if (m_list_itr->fltr_info.lkup_type != ICE_SW_LKUP_MAC ||
-		    is_zero_ether_addr(add))
-			return -EINVAL;
-		if (is_unicast_ether_addr(add) && !hw->ucast_shared) {
-			/* Don't overwrite the unicast address */
-			mutex_lock(rule_lock);
-			if (ice_find_rule_entry(hw, ICE_SW_LKUP_MAC,
-						&m_list_itr->fltr_info)) {
-				mutex_unlock(rule_lock);
-				return -EEXIST;
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-			mutex_unlock(rule_lock);
-			return true;
-		}
-	}
-	mutex_unlock(rule_lock);
-	return false;
-}
-
-/**
- * ice_vlan_fltr_exist - does this VLAN filter exist for given VSI
- * @hw: pointer to the hardware structure
- * @vlan_id: VLAN ID
- * @vsi_handle: check MAC filter for this VSI
- */
-bool ice_vlan_fltr_exist(struct ice_hw *hw, u16 vlan_id, u16 vsi_handle)
-{
-	struct ice_fltr_mgmt_list_entry *entry;
-	struct list_head *rule_head;
-	struct ice_switch_info *sw;
-	struct mutex *rule_lock; /* Lock to protect filter rule list */
-	u16 hw_vsi_id;
-
-	if (vlan_id > ICE_MAX_VLAN_ID)
-		return false;
-
-<<<<<<< HEAD
-	if (!ice_is_vsi_valid(hw, vsi_handle))
-		return false;
-=======
-	/* Allocate switch rule buffer for the bulk update for unicast */
-	s_rule_size = ICE_SW_RULE_RX_TX_ETH_HDR_SIZE(s_rule);
-	s_rule = devm_kcalloc(ice_hw_to_dev(hw), num_unicast, s_rule_size,
-			      GFP_KERNEL);
-	if (!s_rule) {
-		status = -ENOMEM;
-		goto ice_add_mac_exit;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	hw_vsi_id = ice_get_hw_vsi_num(hw, vsi_handle);
-	sw = hw->switch_info;
-	rule_head = &sw->recp_list[ICE_SW_LKUP_VLAN].filt_rules;
-	if (!rule_head)
-		return false;
-
-<<<<<<< HEAD
-	rule_lock = &sw->recp_list[ICE_SW_LKUP_VLAN].filt_rule_lock;
-	mutex_lock(rule_lock);
-	list_for_each_entry(entry, rule_head, list_entry) {
-		struct ice_fltr_info *f_info = &entry->fltr_info;
-		u16 entry_vlan_id = f_info->l_data.vlan.vlan_id;
-		struct ice_vsi_list_map_info *map_info;
-
-		if (entry_vlan_id > ICE_MAX_VLAN_ID)
-			continue;
-
-		if (f_info->flag != ICE_FLTR_TX ||
-		    f_info->src_id != ICE_SRC_ID_VSI ||
-		    f_info->lkup_type != ICE_SW_LKUP_VLAN)
-			continue;
-
-		/* Only allowed filter action are FWD_TO_VSI/_VSI_LIST */
-		if (f_info->fltr_act != ICE_FWD_TO_VSI &&
-		    f_info->fltr_act != ICE_FWD_TO_VSI_LIST)
-			continue;
-
-		if (f_info->fltr_act == ICE_FWD_TO_VSI) {
-			if (hw_vsi_id != f_info->fwd_id.hw_vsi_id)
-				continue;
-		} else if (f_info->fltr_act == ICE_FWD_TO_VSI_LIST) {
-			/* If filter_action is FWD_TO_VSI_LIST, make sure
-			 * that VSI being checked is part of VSI list
-=======
-		if (is_unicast_ether_addr(mac_addr)) {
-			ice_fill_sw_rule(hw, &m_list_itr->fltr_info, r_iter,
-					 ice_aqc_opc_add_sw_rules);
-			r_iter = (typeof(s_rule))((u8 *)r_iter + s_rule_size);
-		}
-	}
-
-	/* Call AQ bulk switch rule update for all unicast addresses */
-	r_iter = s_rule;
-	/* Call AQ switch rule in AQ_MAX chunk */
-	for (total_elem_left = num_unicast; total_elem_left > 0;
-	     total_elem_left -= elem_sent) {
-		struct ice_sw_rule_lkup_rx_tx *entry = r_iter;
-
-		elem_sent = min_t(u8, total_elem_left,
-				  (ICE_AQ_MAX_BUF_LEN / s_rule_size));
-		status = ice_aq_sw_rules(hw, entry, elem_sent * s_rule_size,
-					 elem_sent, ice_aqc_opc_add_sw_rules,
-					 NULL);
-		if (status)
-			goto ice_add_mac_exit;
-		r_iter = (typeof(s_rule))
-			((u8 *)r_iter + (elem_sent * s_rule_size));
-	}
-
-	/* Fill up rule ID based on the value returned from FW */
-	r_iter = s_rule;
-	list_for_each_entry(m_list_itr, m_list, list_entry) {
-		struct ice_fltr_info *f_info = &m_list_itr->fltr_info;
-		u8 *mac_addr = &f_info->l_data.mac.mac_addr[0];
-		struct ice_fltr_mgmt_list_entry *fm_entry;
-
-		if (is_unicast_ether_addr(mac_addr)) {
-			f_info->fltr_rule_id = le16_to_cpu(r_iter->index);
-			f_info->fltr_act = ICE_FWD_TO_VSI;
-			/* Create an entry to track this MAC address */
-			fm_entry = devm_kzalloc(ice_hw_to_dev(hw),
-						sizeof(*fm_entry), GFP_KERNEL);
-			if (!fm_entry) {
-				status = -ENOMEM;
-				goto ice_add_mac_exit;
-			}
-			fm_entry->fltr_info = *f_info;
-			fm_entry->vsi_count = 1;
-			/* The book keeping entries will get removed when
-			 * base driver calls remove filter AQ command
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-			 */
-			if (entry->vsi_count == 1 &&
-			    entry->vsi_list_info) {
-				map_info = entry->vsi_list_info;
-				if (!test_bit(vsi_handle, map_info->vsi_map))
-					continue;
-			}
-		}
-
-<<<<<<< HEAD
-		if (vlan_id == entry_vlan_id) {
-			mutex_unlock(rule_lock);
-			return true;
-=======
-			list_add(&fm_entry->list_entry, rule_head);
-			r_iter = (typeof(s_rule))((u8 *)r_iter + s_rule_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 	mutex_unlock(rule_lock);
@@ -3746,31 +3510,14 @@ bool ice_vlan_fltr_exist(struct ice_hw *hw, u16 vlan_id, u16 vsi_handle)
  * @hw: pointer to the hardware structure
  * @m_list: list of MAC addresses and forwarding information
  */
-<<<<<<< HEAD
 int ice_add_mac(struct ice_hw *hw, struct list_head *m_list)
 {
 	struct ice_fltr_list_entry *m_list_itr;
 	int status = 0;
-=======
-static int
-ice_add_vlan_internal(struct ice_hw *hw, struct ice_fltr_list_entry *f_entry)
-{
-	struct ice_switch_info *sw = hw->switch_info;
-	struct ice_fltr_mgmt_list_entry *v_list_itr;
-	struct ice_fltr_info *new_fltr, *cur_fltr;
-	enum ice_sw_lkup_type lkup_type;
-	u16 vsi_list_id = 0, vsi_handle;
-	struct mutex *rule_lock; /* Lock to protect filter rule list */
-	int status = 0;
-
-	if (!ice_is_vsi_valid(hw, f_entry->fltr_info.vsi_handle))
-		return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!m_list || !hw)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	list_for_each_entry(m_list_itr, m_list, list_entry) {
 		u8 *add = &m_list_itr->fltr_info.l_data.mac.mac_addr[0];
 		u16 vsi_handle;
@@ -3822,8 +3569,6 @@ ice_add_vlan_internal(struct ice_hw *hw, struct ice_fltr_list_entry *f_entry)
 		ice_get_hw_vsi_num(hw, f_entry->fltr_info.vsi_handle);
 	new_fltr = &f_entry->fltr_info;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* VLAN ID should only be 12 bits */
 	if (new_fltr->l_data.vlan.vlan_id > ICE_MAX_VLAN_ID)
 		return -EINVAL;
@@ -4149,53 +3894,6 @@ ice_vsi_uses_fltr(struct ice_fltr_mgmt_list_entry *fm_entry, u16 vsi_handle)
  * @pi: pointer to the port_info structure
  * @vsi_handle: vsi handle to check for in filter list
  * @rule_exists: indicates if there are any VSI's in the rule list
-<<<<<<< HEAD
-=======
- *
- * checks if the VSI is in a default VSI list, and also indicates
- * if the default VSI list is empty
- */
-bool
-ice_check_if_dflt_vsi(struct ice_port_info *pi, u16 vsi_handle,
-		      bool *rule_exists)
-{
-	struct ice_fltr_mgmt_list_entry *fm_entry;
-	struct ice_sw_recipe *recp_list;
-	struct list_head *rule_head;
-	struct mutex *rule_lock; /* Lock to protect filter rule list */
-	bool ret = false;
-
-	recp_list = &pi->hw->switch_info->recp_list[ICE_SW_LKUP_DFLT];
-	rule_lock = &recp_list->filt_rule_lock;
-	rule_head = &recp_list->filt_rules;
-
-	mutex_lock(rule_lock);
-
-	if (rule_exists && !list_empty(rule_head))
-		*rule_exists = true;
-
-	list_for_each_entry(fm_entry, rule_head, list_entry) {
-		if (ice_vsi_uses_fltr(fm_entry, vsi_handle)) {
-			ret = true;
-			break;
-		}
-	}
-
-	mutex_unlock(rule_lock);
-
-	return ret;
-}
-
-/**
- * ice_find_ucast_rule_entry - Search for a unicast MAC filter rule entry
- * @hw: pointer to the hardware structure
- * @recp_id: lookup type for which the specified rule needs to be searched
- * @f_info: rule information
- *
- * Helper function to search for a unicast rule entry - this is to be used
- * to remove unicast MAC filter that is not shared with other VSIs on the
- * PF switch.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * checks if the VSI is in a default VSI list, and also indicates
  * if the default VSI list is empty
@@ -4264,23 +3962,7 @@ int ice_remove_mac(struct ice_hw *hw, struct list_head *m_list)
 
 		list_itr->fltr_info.fwd_id.hw_vsi_id =
 					ice_get_hw_vsi_num(hw, vsi_handle);
-<<<<<<< HEAD
 
-=======
-		if (is_unicast_ether_addr(add) && !hw->ucast_shared) {
-			/* Don't remove the unicast address that belongs to
-			 * another VSI on the switch, since it is not being
-			 * shared...
-			 */
-			mutex_lock(rule_lock);
-			if (!ice_find_ucast_rule_entry(hw, ICE_SW_LKUP_MAC,
-						       &list_itr->fltr_info)) {
-				mutex_unlock(rule_lock);
-				return -ENOENT;
-			}
-			mutex_unlock(rule_lock);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		list_itr->status = ice_remove_rule_internal(hw,
 							    ICE_SW_LKUP_MAC,
 							    list_itr);
@@ -4870,10 +4552,7 @@ static const struct ice_prot_ext_tbl_entry ice_prot_ext[ICE_PROTOCOL_LAST] = {
 	{ ICE_GTP,		{ 8, 10, 12, 14, 16, 18, 20, 22 } },
 	{ ICE_GTP_NO_PAY,	{ 8, 10, 12, 14 } },
 	{ ICE_PPPOE,		{ 0, 2, 4, 6 } },
-<<<<<<< HEAD
 	{ ICE_L2TPV3,		{ 0, 2, 4, 6, 8, 10 } },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ ICE_VLAN_EX,          { 2, 0 } },
 	{ ICE_VLAN_IN,          { 2, 0 } },
 };
@@ -4897,10 +4576,7 @@ static struct ice_protocol_entry ice_prot_id_tbl[ICE_PROTOCOL_LAST] = {
 	{ ICE_GTP,		ICE_UDP_OF_HW },
 	{ ICE_GTP_NO_PAY,	ICE_UDP_ILOS_HW },
 	{ ICE_PPPOE,		ICE_PPPOE_HW },
-<<<<<<< HEAD
 	{ ICE_L2TPV3,		ICE_L2TPV3_HW },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ ICE_VLAN_EX,          ICE_VLAN_OF_HW },
 	{ ICE_VLAN_IN,          ICE_VLAN_OL_HW },
 };
@@ -5984,12 +5660,8 @@ ice_find_dummy_packet(struct ice_adv_lkup_elem *lkups, u16 lkups_cnt,
 			if (lkups[i].h_u.pppoe_hdr.ppp_prot_id ==
 			    htons(PPP_IPV6))
 				match |= ICE_PKT_OUTER_IPV6;
-<<<<<<< HEAD
 		} else if (lkups[i].type == ICE_L2TPV3)
 			match |= ICE_PKT_L2TPV3;
-=======
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	while (ret->match && (match & ret->match) != ret->match)
@@ -6090,12 +5762,9 @@ ice_fill_adv_dummy_packet(struct ice_adv_lkup_elem *lkups, u16 lkups_cnt,
 		case ICE_PPPOE:
 			len = sizeof(struct ice_pppoe_hdr);
 			break;
-<<<<<<< HEAD
 		case ICE_L2TPV3:
 			len = sizeof(struct ice_l2tpv3_sess_hdr);
 			break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		default:
 			return -EINVAL;
 		}

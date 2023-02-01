@@ -28,9 +28,6 @@
 #define EHCI_INSNREG(index)			((index) * 4 + 0x90)
 #define EHCI_INSNREG08_HSIC_EN			BIT(2)
 
-#define EHCI_INSNREG(index)			((index) * 4 + 0x90)
-#define EHCI_INSNREG08_HSIC_EN			BIT(2)
-
 /* interface and function clocks */
 #define hcd_to_atmel_ehci_priv(h) \
 	((struct atmel_ehci_priv *)hcd_to_ehci(h)->priv)

@@ -50,17 +50,10 @@ static u32 get_cpu_asid_bits(void)
 		pr_warn("CPU%d: Unknown ASID size (%d); assuming 8-bit\n",
 					smp_processor_id(),  fld);
 		fallthrough;
-<<<<<<< HEAD
 	case ID_AA64MMFR0_EL1_ASIDBITS_8:
 		asid = 8;
 		break;
 	case ID_AA64MMFR0_EL1_ASIDBITS_16:
-=======
-	case ID_AA64MMFR0_ASID_8:
-		asid = 8;
-		break;
-	case ID_AA64MMFR0_ASID_16:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		asid = 16;
 	}
 

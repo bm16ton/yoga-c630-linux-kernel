@@ -17,10 +17,7 @@ if SND_SOC_SOF_AMD_TOPLEVEL
 config SND_SOC_SOF_AMD_COMMON
 	tristate
 	select SND_SOC_SOF
-<<<<<<< HEAD
 	select SND_SOC_SOF_IPC3
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select SND_SOC_SOF_PCI_DEV
 	select SND_AMD_ACP_CONFIG
 	select SND_SOC_ACPI if ACPI
@@ -34,7 +31,6 @@ config SND_SOC_SOF_AMD_RENOIR
 	select SND_SOC_SOF_AMD_COMMON
 	help
 	  Select this option for SOF support on AMD Renoir platform
-<<<<<<< HEAD
 
 config SND_SOC_SOF_AMD_REMBRANDT
 	tristate "SOF support for REMBRANDT"
@@ -45,6 +41,4 @@ config SND_SOC_SOF_AMD_REMBRANDT
 	  Say Y if you want to enable SOF on Rembrandt.
 	  If unsure select "N".
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endif

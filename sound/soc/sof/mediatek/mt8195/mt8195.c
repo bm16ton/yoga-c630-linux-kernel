@@ -24,7 +24,6 @@
 #include "../../sof-of-dev.h"
 #include "../../sof-audio.h"
 #include "../adsp_helper.h"
-<<<<<<< HEAD
 #include "../mtk-adsp-common.h"
 #include "mt8195.h"
 #include "mt8195-clk.h"
@@ -122,11 +121,6 @@ static struct mtk_adsp_ipc_ops dsp_ops = {
 	.handle_request		= mt8195_dsp_handle_request,
 };
 
-=======
-#include "mt8195.h"
-#include "mt8195-clk.h"
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int platform_parse_resource(struct platform_device *pdev, void *data)
 {
 	struct resource *mmio;
@@ -151,7 +145,6 @@ static int platform_parse_resource(struct platform_device *pdev, void *data)
 
 	dev_dbg(dev, "DMA %pR\n", &res);
 
-<<<<<<< HEAD
 	adsp->pa_shared_dram = (phys_addr_t)res.start;
 	adsp->shared_size = resource_size(&res);
 	if (adsp->pa_shared_dram & DRAM_REMAP_MASK) {
@@ -160,8 +153,6 @@ static int platform_parse_resource(struct platform_device *pdev, void *data)
 		return -EINVAL;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = of_reserved_mem_device_init(dev);
 	if (ret) {
 		dev_err(dev, "of_reserved_mem_device_init failed\n");
@@ -290,7 +281,6 @@ static int adsp_shared_base_ioremap(struct platform_device *pdev, void *data)
 {
 	struct device *dev = &pdev->dev;
 	struct mtk_adsp_chip_info *adsp = data;
-<<<<<<< HEAD
 
 	/* remap shared-dram base to be non-cachable */
 	adsp->shared_dram = devm_ioremap(dev, adsp->pa_shared_dram,
@@ -303,25 +293,6 @@ static int adsp_shared_base_ioremap(struct platform_device *pdev, void *data)
 
 	dev_dbg(dev, "shared-dram vbase=%p, phy addr :%pa,  size=%#x\n",
 		adsp->shared_dram, &adsp->pa_shared_dram, adsp->shared_size);
-=======
-	u32 shared_size;
-
-	/* remap shared-dram base to be non-cachable */
-	shared_size = TOTAL_SIZE_SHARED_DRAM_FROM_TAIL;
-	adsp->pa_shared_dram = adsp->pa_dram + adsp->dramsize - shared_size;
-	if (adsp->va_dram) {
-		adsp->shared_dram = adsp->va_dram + DSP_DRAM_SIZE - shared_size;
-	} else {
-		adsp->shared_dram = devm_ioremap(dev, adsp->pa_shared_dram,
-						 shared_size);
-		if (!adsp->shared_dram) {
-			dev_err(dev, "ioremap failed for shared DRAM\n");
-			return -ENOMEM;
-		}
-	}
-	dev_dbg(dev, "shared-dram vbase=%p, phy addr :%pa,  size=%#x\n",
-		adsp->shared_dram, &adsp->pa_shared_dram, shared_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -393,17 +364,11 @@ static int mt8195_dsp_probe(struct snd_sof_dev *sdev)
 		goto err_adsp_sram_power_off;
 	}
 
-<<<<<<< HEAD
 	priv->adsp->va_sram = sdev->bar[SOF_FW_BLK_TYPE_IRAM];
 
 	sdev->bar[SOF_FW_BLK_TYPE_SRAM] = devm_ioremap(sdev->dev,
 						       priv->adsp->pa_dram,
 						       priv->adsp->dramsize);
-=======
-	sdev->bar[SOF_FW_BLK_TYPE_SRAM] = devm_ioremap_wc(sdev->dev,
-							  priv->adsp->pa_dram,
-							  priv->adsp->dramsize);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!sdev->bar[SOF_FW_BLK_TYPE_SRAM]) {
 		dev_err(sdev->dev, "failed to ioremap base %pa size %#x\n",
 			&priv->adsp->pa_dram, priv->adsp->dramsize);
@@ -419,17 +384,10 @@ static int mt8195_dsp_probe(struct snd_sof_dev *sdev)
 	}
 
 	sdev->bar[DSP_REG_BAR] = priv->adsp->va_cfgreg;
-<<<<<<< HEAD
-=======
-	sdev->bar[DSP_MBOX0_BAR] =  priv->adsp->va_mboxreg[0];
-	sdev->bar[DSP_MBOX1_BAR] =  priv->adsp->va_mboxreg[1];
-	sdev->bar[DSP_MBOX2_BAR] =  priv->adsp->va_mboxreg[2];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	sdev->mmio_bar = SOF_FW_BLK_TYPE_SRAM;
 	sdev->mailbox_bar = SOF_FW_BLK_TYPE_SRAM;
 
-<<<<<<< HEAD
 	/* set default mailbox offset for FW ready message */
 	sdev->dsp_box.offset = mt8195_get_mailbox_offset(sdev);
 
@@ -456,10 +414,6 @@ static int mt8195_dsp_probe(struct snd_sof_dev *sdev)
 
 exit_pdev_unregister:
 	platform_device_unregister(priv->ipc_dev);
-=======
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_adsp_sram_power_off:
 	adsp_sram_power_on(&pdev->dev, false);
 exit_clk_disable:
@@ -468,7 +422,6 @@ exit_clk_disable:
 	return ret;
 }
 
-<<<<<<< HEAD
 static int mt8195_dsp_shutdown(struct snd_sof_dev *sdev)
 {
 	return snd_sof_suspend(sdev->dev);
@@ -480,12 +433,6 @@ static int mt8195_dsp_remove(struct snd_sof_dev *sdev)
 	struct adsp_priv *priv = sdev->pdata->hw_pdata;
 
 	platform_device_unregister(priv->ipc_dev);
-=======
-static int mt8195_dsp_remove(struct snd_sof_dev *sdev)
-{
-	struct platform_device *pdev = container_of(sdev->dev, struct platform_device, dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	adsp_sram_power_on(&pdev->dev, false);
 	adsp_clock_off(sdev);
 
@@ -496,7 +443,6 @@ static int mt8195_dsp_suspend(struct snd_sof_dev *sdev, u32 target_state)
 {
 	struct platform_device *pdev = container_of(sdev->dev, struct platform_device, dev);
 	int ret;
-<<<<<<< HEAD
 	u32 reset_sw, dbg_pc;
 
 	/* wait dsp enter idle, timeout is 1 second */
@@ -510,8 +456,6 @@ static int mt8195_dsp_suspend(struct snd_sof_dev *sdev, u32 target_state)
 		dev_warn(sdev->dev, "dsp not idle, powering off anyway : swrest %#x, pc %#x, ret %d\n",
 			 reset_sw, dbg_pc, ret);
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* stall and reset dsp */
 	sof_hifixdsp_shutdown(sdev);
@@ -552,7 +496,6 @@ static int mt8195_get_bar_index(struct snd_sof_dev *sdev, u32 type)
 	return type;
 }
 
-<<<<<<< HEAD
 static int mt8195_pcm_hw_params(struct snd_sof_dev *sdev,
 				struct snd_pcm_substream *substream,
 				struct snd_pcm_hw_params *params,
@@ -620,8 +563,6 @@ static void mt8195_adsp_dump(struct snd_sof_dev *sdev, u32 flags)
 	mtk_adsp_dump(sdev, flags);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct snd_soc_dai_driver mt8195_dai[] = {
 {
 	.name = "SOF_DL2",
@@ -654,18 +595,11 @@ static struct snd_soc_dai_driver mt8195_dai[] = {
 };
 
 /* mt8195 ops */
-<<<<<<< HEAD
 static struct snd_sof_dsp_ops sof_mt8195_ops = {
 	/* probe and remove */
 	.probe		= mt8195_dsp_probe,
 	.remove		= mt8195_dsp_remove,
 	.shutdown	= mt8195_dsp_shutdown,
-=======
-static const struct snd_sof_dsp_ops sof_mt8195_ops = {
-	/* probe and remove */
-	.probe		= mt8195_dsp_probe,
-	.remove		= mt8195_dsp_remove,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* DSP core boot */
 	.run		= mt8195_run,
@@ -674,20 +608,16 @@ static const struct snd_sof_dsp_ops sof_mt8195_ops = {
 	.block_read	= sof_block_read,
 	.block_write	= sof_block_write,
 
-<<<<<<< HEAD
 	/* Mailbox IO */
 	.mailbox_read	= sof_mailbox_read,
 	.mailbox_write	= sof_mailbox_write,
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Register IO */
 	.write		= sof_io_write,
 	.read		= sof_io_read,
 	.write64	= sof_io_write64,
 	.read64		= sof_io_read64,
 
-<<<<<<< HEAD
 	/* ipc */
 	.send_msg		= mt8195_send_msg,
 	.get_mailbox_offset	= mt8195_get_mailbox_offset,
@@ -704,25 +634,15 @@ static const struct snd_sof_dsp_ops sof_mt8195_ops = {
 	.pcm_pointer	= mt8195_pcm_pointer,
 	.pcm_close	= sof_stream_pcm_close,
 
-=======
-	/* misc */
-	.get_bar_index	= mt8195_get_bar_index,
-
-	/* module loading */
-	.load_module	= snd_sof_parse_module_memcpy,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* firmware loading */
 	.load_firmware	= snd_sof_load_firmware_memcpy,
 
 	/* Firmware ops */
 	.dsp_arch_ops = &sof_xtensa_arch_ops,
 
-<<<<<<< HEAD
 	/* Debug information */
 	.dbg_dump = mt8195_adsp_dump,
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* DAI drivers */
 	.drv = mt8195_dai,
 	.num_drv = ARRAY_SIZE(mt8195_dai),
@@ -739,7 +659,6 @@ static const struct snd_sof_dsp_ops sof_mt8195_ops = {
 			SNDRV_PCM_INFO_NO_PERIOD_WAKEUP,
 };
 
-<<<<<<< HEAD
 static struct snd_sof_of_mach sof_mt8195_machs[] = {
 	{
 		.compatible = "google,tomato",
@@ -768,14 +687,6 @@ static const struct sof_dev_desc sof_of_mt8195_desc = {
 	.nocodec_tplg_filename = "sof-mt8195-nocodec.tplg",
 	.ops = &sof_mt8195_ops,
 	.ipc_timeout = 1000,
-=======
-static const struct sof_dev_desc sof_of_mt8195_desc = {
-	.default_fw_path = "mediatek/sof",
-	.default_tplg_path = "mediatek/sof-tplg",
-	.default_fw_filename = "sof-mt8195.ri",
-	.nocodec_tplg_filename = "sof-mt8195-nocodec.tplg",
-	.ops = &sof_mt8195_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct of_device_id sof_of_mt8195_ids[] = {
@@ -788,10 +699,7 @@ MODULE_DEVICE_TABLE(of, sof_of_mt8195_ids);
 static struct platform_driver snd_sof_of_mt8195_driver = {
 	.probe = sof_of_probe,
 	.remove = sof_of_remove,
-<<<<<<< HEAD
 	.shutdown = sof_of_shutdown,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.driver = {
 	.name = "sof-audio-of-mt8195",
 		.pm = &sof_of_pm,

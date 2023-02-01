@@ -247,11 +247,7 @@ static int mip6_destopt_reject(struct xfrm_state *x, struct sk_buff *skb,
 	return err;
 }
 
-<<<<<<< HEAD
 static int mip6_destopt_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
-=======
-static int mip6_destopt_init_state(struct xfrm_state *x)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (x->id.spi) {
 		NL_SET_ERR_MSG(extack, "SPI must be 0");
@@ -336,11 +332,7 @@ static int mip6_rthdr_output(struct xfrm_state *x, struct sk_buff *skb)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int mip6_rthdr_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
-=======
-static int mip6_rthdr_init_state(struct xfrm_state *x)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (x->id.spi) {
 		NL_SET_ERR_MSG(extack, "SPI must be 0");

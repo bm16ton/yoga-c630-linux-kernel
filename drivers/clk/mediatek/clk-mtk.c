@@ -18,7 +18,6 @@
 #include "clk-mtk.h"
 #include "clk-gate.h"
 
-<<<<<<< HEAD
 static void mtk_init_clk_data(struct clk_hw_onecell_data *clk_data,
 			      unsigned int clk_num)
 {
@@ -55,21 +54,6 @@ struct clk_hw_onecell_data *mtk_alloc_clk_data(unsigned int clk_num)
 		return NULL;
 
 	mtk_init_clk_data(clk_data, clk_num);
-=======
-struct clk_hw_onecell_data *mtk_alloc_clk_data(unsigned int clk_num)
-{
-	int i;
-	struct clk_hw_onecell_data *clk_data;
-
-	clk_data = kzalloc(struct_size(clk_data, hws, clk_num), GFP_KERNEL);
-	if (!clk_data)
-		return NULL;
-
-	clk_data->num = clk_num;
-
-	for (i = 0; i < clk_num; i++)
-		clk_data->hws[i] = ERR_PTR(-ENOENT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return clk_data;
 }
@@ -108,7 +92,6 @@ int mtk_clk_register_fixed_clks(const struct mtk_fixed_clk *clks, int num,
 		}
 
 		clk_data->hws[rc->id] = hw;
-<<<<<<< HEAD
 	}
 
 	return 0;
@@ -124,23 +107,6 @@ err:
 		clk_data->hws[rc->id] = ERR_PTR(-ENOENT);
 	}
 
-=======
-	}
-
-	return 0;
-
-err:
-	while (--i >= 0) {
-		const struct mtk_fixed_clk *rc = &clks[i];
-
-		if (IS_ERR_OR_NULL(clk_data->hws[rc->id]))
-			continue;
-
-		clk_hw_unregister_fixed_rate(clk_data->hws[rc->id]);
-		clk_data->hws[rc->id] = ERR_PTR(-ENOENT);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return PTR_ERR(hw);
 }
 EXPORT_SYMBOL_GPL(mtk_clk_register_fixed_clks);
@@ -370,8 +336,6 @@ int mtk_clk_register_composites(const struct mtk_composite *mcs, int num,
 		}
 
 		clk_data->hws[mc->id] = hw;
-<<<<<<< HEAD
-=======
 	}
 
 	return 0;
@@ -407,43 +371,6 @@ void mtk_clk_unregister_composites(const struct mtk_composite *mcs, int num,
 
 		mtk_clk_unregister_composite(clk_data->hws[mc->id]);
 		clk_data->hws[mc->id] = ERR_PTR(-ENOENT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-
-	return 0;
-
-err:
-	while (--i >= 0) {
-		const struct mtk_composite *mc = &mcs[i];
-
-		if (IS_ERR_OR_NULL(clk_data->hws[mcs->id]))
-			continue;
-
-		mtk_clk_unregister_composite(clk_data->hws[mc->id]);
-		clk_data->hws[mc->id] = ERR_PTR(-ENOENT);
-	}
-
-	return PTR_ERR(hw);
-}
-<<<<<<< HEAD
-EXPORT_SYMBOL_GPL(mtk_clk_register_composites);
-
-void mtk_clk_unregister_composites(const struct mtk_composite *mcs, int num,
-				   struct clk_hw_onecell_data *clk_data)
-{
-	int i;
-
-	if (!clk_data)
-		return;
-
-	for (i = num; i > 0; i--) {
-		const struct mtk_composite *mc = &mcs[i - 1];
-
-		if (IS_ERR_OR_NULL(clk_data->hws[mc->id]))
-			continue;
-
-		mtk_clk_unregister_composite(clk_data->hws[mc->id]);
-		clk_data->hws[mc->id] = ERR_PTR(-ENOENT);
 	}
 }
 EXPORT_SYMBOL_GPL(mtk_clk_unregister_composites);
@@ -456,18 +383,6 @@ int mtk_clk_register_dividers(const struct mtk_clk_divider *mcds, int num,
 	int i;
 
 	if (!clk_data)
-=======
-EXPORT_SYMBOL_GPL(mtk_clk_unregister_composites);
-
-int mtk_clk_register_dividers(const struct mtk_clk_divider *mcds, int num,
-			      void __iomem *base, spinlock_t *lock,
-			      struct clk_hw_onecell_data *clk_data)
-{
-	struct clk_hw *hw;
-	int i;
-
-	if (!clk_data)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENOMEM;
 
 	for (i = 0; i <  num; i++) {
@@ -503,7 +418,6 @@ err:
 
 		clk_hw_unregister_divider(clk_data->hws[mcd->id]);
 		clk_data->hws[mcd->id] = ERR_PTR(-ENOENT);
-<<<<<<< HEAD
 	}
 
 	return PTR_ERR(hw);
@@ -586,84 +500,5 @@ int mtk_clk_simple_remove(struct platform_device *pdev)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(mtk_clk_simple_remove);
-=======
-	}
-
-	return PTR_ERR(hw);
-}
-
-void mtk_clk_unregister_dividers(const struct mtk_clk_divider *mcds, int num,
-				 struct clk_hw_onecell_data *clk_data)
-{
-	int i;
-
-	if (!clk_data)
-		return;
-
-	for (i = num; i > 0; i--) {
-		const struct mtk_clk_divider *mcd = &mcds[i - 1];
-
-		if (IS_ERR_OR_NULL(clk_data->hws[mcd->id]))
-			continue;
-
-		clk_hw_unregister_divider(clk_data->hws[mcd->id]);
-		clk_data->hws[mcd->id] = ERR_PTR(-ENOENT);
-	}
-}
-
-int mtk_clk_simple_probe(struct platform_device *pdev)
-{
-	const struct mtk_clk_desc *mcd;
-	struct clk_hw_onecell_data *clk_data;
-	struct device_node *node = pdev->dev.of_node;
-	int r;
-
-	mcd = of_device_get_match_data(&pdev->dev);
-	if (!mcd)
-		return -EINVAL;
-
-	clk_data = mtk_alloc_clk_data(mcd->num_clks);
-	if (!clk_data)
-		return -ENOMEM;
-
-	r = mtk_clk_register_gates(node, mcd->clks, mcd->num_clks, clk_data);
-	if (r)
-		goto free_data;
-
-	r = of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_data);
-	if (r)
-		goto unregister_clks;
-
-	platform_set_drvdata(pdev, clk_data);
-
-	if (mcd->rst_desc) {
-		r = mtk_register_reset_controller_with_dev(&pdev->dev,
-							   mcd->rst_desc);
-		if (r)
-			goto unregister_clks;
-	}
-
-	return r;
-
-unregister_clks:
-	mtk_clk_unregister_gates(mcd->clks, mcd->num_clks, clk_data);
-free_data:
-	mtk_free_clk_data(clk_data);
-	return r;
-}
-
-int mtk_clk_simple_remove(struct platform_device *pdev)
-{
-	const struct mtk_clk_desc *mcd = of_device_get_match_data(&pdev->dev);
-	struct clk_hw_onecell_data *clk_data = platform_get_drvdata(pdev);
-	struct device_node *node = pdev->dev.of_node;
-
-	of_clk_del_provider(node);
-	mtk_clk_unregister_gates(mcd->clks, mcd->num_clks, clk_data);
-	mtk_free_clk_data(clk_data);
-
-	return 0;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MODULE_LICENSE("GPL");

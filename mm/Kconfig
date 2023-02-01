@@ -23,11 +23,7 @@ menuconfig SWAP
 	  in your computer.  If unsure say Y.
 
 config ZSWAP
-<<<<<<< HEAD
 	bool "Compressed cache for swap pages"
-=======
-	bool "Compressed cache for swap pages (EXPERIMENTAL)"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on SWAP
 	select FRONTSWAP
 	select CRYPTO
@@ -40,15 +36,6 @@ config ZSWAP
 	  in the case where decompressing from RAM is faster than swap device
 	  reads, can also improve workload performance.
 
-<<<<<<< HEAD
-=======
-	  This is marked experimental because it is a new feature (as of
-	  v3.11) that interacts heavily with memory reclaim.  While these
-	  interactions don't cause any known issues on simple memory setups,
-	  they have not be fully explored on the large set of potential
-	  configurations and workloads that exist.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ZSWAP_DEFAULT_ON
 	bool "Enable the compressed cache for swap pages by default"
 	depends on ZSWAP
@@ -819,7 +806,6 @@ config NEED_PER_CPU_KM
 
 config NEED_PER_CPU_EMBED_FIRST_CHUNK
 	bool
-<<<<<<< HEAD
 
 config NEED_PER_CPU_PAGE_FIRST_CHUNK
 	bool
@@ -827,15 +813,6 @@ config NEED_PER_CPU_PAGE_FIRST_CHUNK
 config USE_PERCPU_NUMA_NODE_ID
 	bool
 
-=======
-
-config NEED_PER_CPU_PAGE_FIRST_CHUNK
-	bool
-
-config USE_PERCPU_NUMA_NODE_ID
-	bool
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config HAVE_SETUP_PER_CPU_AREA
 	bool
 
@@ -1147,7 +1124,6 @@ config PTE_MARKER_UFFD_WP
 	  purposes.  It is required to enable userfaultfd write protection on
 	  file-backed memory types like shmem and hugetlbfs.
 
-<<<<<<< HEAD
 # multi-gen LRU {
 config LRU_GEN
 	bool "Multi-Gen LRU"
@@ -1174,8 +1150,6 @@ config LRU_GEN_STATS
 	  This option has a per-memcg and per-node memory overhead.
 # }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "mm/damon/Kconfig"
 
 endmenu

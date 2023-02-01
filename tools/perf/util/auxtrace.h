@@ -61,10 +61,7 @@ enum itrace_period_type {
 #define AUXTRACE_ERR_FLG_DATA_LOST	(1 << ('l' - 'a'))
 
 #define AUXTRACE_LOG_FLG_ALL_PERF_EVTS	(1 << ('a' - 'a'))
-<<<<<<< HEAD
 #define AUXTRACE_LOG_FLG_ON_ERROR	(1 << ('e' - 'a'))
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define AUXTRACE_LOG_FLG_USE_STDOUT	(1 << ('o' - 'a'))
 
 /**

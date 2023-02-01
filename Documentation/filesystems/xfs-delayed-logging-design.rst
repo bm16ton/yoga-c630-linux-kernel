@@ -100,11 +100,7 @@ transactions together::
 
 	ntp = xfs_trans_dup(tp);
 	xfs_trans_commit(tp);
-<<<<<<< HEAD
 	xfs_trans_reserve(ntp);
-=======
-	xfs_log_reserve(ntp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 This results in a series of "rolling transactions" where the inode is locked
 across the entire chain of transactions.  Hence while this series of rolling
@@ -195,11 +191,7 @@ transaction rolling mechanism to re-reserve space on every transaction roll. We
 know from the implementation of the permanent transactions how many transaction
 rolls are likely for the common modifications that need to be made.
 
-<<<<<<< HEAD
 For example, an inode allocation is typically two transactions - one to
-=======
-For example, and inode allocation is typically two transactions - one to
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 physically allocate a free inode chunk on disk, and another to allocate an inode
 from an inode chunk that has free inodes in it.  Hence for an inode allocation
 transaction, we might set the reservation log count to a value of 2 to indicate
@@ -208,11 +200,7 @@ chain. Each time a permanent transaction rolls, it consumes an entire unit
 reservation.
 
 Hence when the permanent transaction is first allocated, the log space
-<<<<<<< HEAD
 reservation is increased from a single unit reservation to multiple unit
-=======
-reservation is increases from a single unit reservation to multiple unit
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 reservations. That multiple is defined by the reservation log count, and this
 means we can roll the transaction multiple times before we have to re-reserve
 log space when we roll the transaction. This ensures that the common
@@ -271,11 +259,7 @@ the next transaction in the sequeunce, but we have none remaining. We cannot
 sleep during the transaction commit process waiting for new log space to become
 available, as we may end up on the end of the FIFO queue and the items we have
 locked while we sleep could end up pinning the tail of the log before there is
-<<<<<<< HEAD
 enough free space in the log to fulfill all of the pending reservations and
-=======
-enough free space in the log to fulfil all of the pending reservations and
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 then wake up transaction commit in progress.
 
 To take a new reservation without sleeping requires us to be able to take a

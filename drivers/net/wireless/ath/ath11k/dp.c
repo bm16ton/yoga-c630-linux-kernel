@@ -370,10 +370,7 @@ static int ath11k_dp_srng_common_setup(struct ath11k_base *ab)
 	struct ath11k_dp *dp = &ab->dp;
 	struct hal_srng *srng;
 	int i, ret;
-<<<<<<< HEAD
 	u8 tcl_num, wbm_num;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = ath11k_dp_srng_setup(ab, &dp->wbm_desc_rel_ring,
 				   HAL_SW2WBM_RELEASE, 0, 0,
@@ -399,12 +396,9 @@ static int ath11k_dp_srng_common_setup(struct ath11k_base *ab)
 	}
 
 	for (i = 0; i < ab->hw_params.max_tx_ring; i++) {
-<<<<<<< HEAD
 		tcl_num = ab->hw_params.hal_params->tcl2wbm_rbm_map[i].tcl_ring_num;
 		wbm_num = ab->hw_params.hal_params->tcl2wbm_rbm_map[i].wbm_ring_num;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = ath11k_dp_srng_setup(ab, &dp->tx_ring[i].tcl_data_ring,
 					   HAL_TCL_DATA, tcl_num, 0,
 					   ab->hw_params.tx_ring_size);
@@ -783,16 +777,10 @@ int ath11k_dp_service_srng(struct ath11k_base *ab,
 	int i, j;
 	int tot_work_done = 0;
 
-<<<<<<< HEAD
 	for (i = 0; i < ab->hw_params.max_tx_ring; i++) {
 		if (BIT(ab->hw_params.hal_params->tcl2wbm_rbm_map[i].wbm_ring_num) &
 		    ab->hw_params.ring_mask->tx[grp_id])
 			ath11k_dp_tx_completion_handler(ab, i);
-=======
-	if (ab->hw_params.ring_mask->tx[grp_id]) {
-		i = __fls(ab->hw_params.ring_mask->tx[grp_id]);
-		ath11k_dp_tx_completion_handler(ab, i);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (ab->hw_params.ring_mask->rx_err[grp_id]) {

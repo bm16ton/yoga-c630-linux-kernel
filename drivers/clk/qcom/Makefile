@@ -72,10 +72,7 @@ obj-$(CONFIG_SC_GCC_8180X) += gcc-sc8180x.o
 obj-$(CONFIG_SC_GCC_8280XP) += gcc-sc8280xp.o
 obj-$(CONFIG_SC_GPUCC_7180) += gpucc-sc7180.o
 obj-$(CONFIG_SC_GPUCC_7280) += gpucc-sc7280.o
-<<<<<<< HEAD
 obj-$(CONFIG_SC_GPUCC_8280XP) += gpucc-sc8280xp.o
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 obj-$(CONFIG_SC_LPASSCC_7280) += lpasscc-sc7280.o
 obj-$(CONFIG_SC_LPASS_CORECC_7180) += lpasscorecc-sc7180.o
 obj-$(CONFIG_SC_LPASS_CORECC_7280) += lpasscorecc-sc7280.o lpassaudiocc-sc7280.o
@@ -95,7 +92,6 @@ obj-$(CONFIG_SDX_GCC_55) += gcc-sdx55.o
 obj-$(CONFIG_SDX_GCC_65) += gcc-sdx65.o
 obj-$(CONFIG_SM_CAMCC_8250) += camcc-sm8250.o
 obj-$(CONFIG_SM_CAMCC_8450) += camcc-sm8450.o
-<<<<<<< HEAD
 obj-$(CONFIG_SM_DISPCC_6115) += dispcc-sm6115.o
 obj-$(CONFIG_SM_DISPCC_6125) += dispcc-sm6125.o
 obj-$(CONFIG_SM_DISPCC_6350) += dispcc-sm6350.o
@@ -105,14 +101,6 @@ obj-$(CONFIG_SM_GCC_6115) += gcc-sm6115.o
 obj-$(CONFIG_SM_GCC_6125) += gcc-sm6125.o
 obj-$(CONFIG_SM_GCC_6350) += gcc-sm6350.o
 obj-$(CONFIG_SM_GCC_6375) += gcc-sm6375.o
-=======
-obj-$(CONFIG_SM_DISPCC_6125) += dispcc-sm6125.o
-obj-$(CONFIG_SM_DISPCC_6350) += dispcc-sm6350.o
-obj-$(CONFIG_SM_DISPCC_8250) += dispcc-sm8250.o
-obj-$(CONFIG_SM_GCC_6115) += gcc-sm6115.o
-obj-$(CONFIG_SM_GCC_6125) += gcc-sm6125.o
-obj-$(CONFIG_SM_GCC_6350) += gcc-sm6350.o
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 obj-$(CONFIG_SM_GCC_8150) += gcc-sm8150.o
 obj-$(CONFIG_SM_GCC_8250) += gcc-sm8250.o
 obj-$(CONFIG_SM_GCC_8350) += gcc-sm8350.o

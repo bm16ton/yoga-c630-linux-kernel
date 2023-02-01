@@ -333,7 +333,6 @@ bool __bitmap_subset(const unsigned long *bitmap1,
 }
 EXPORT_SYMBOL(__bitmap_subset);
 
-<<<<<<< HEAD
 #define BITMAP_WEIGHT(FETCH, bits)	\
 ({										\
 	unsigned int __bits = (bits), idx, w = 0;				\
@@ -350,19 +349,6 @@ EXPORT_SYMBOL(__bitmap_subset);
 unsigned int __bitmap_weight(const unsigned long *bitmap, unsigned int bits)
 {
 	return BITMAP_WEIGHT(bitmap[idx], bits);
-=======
-unsigned int __bitmap_weight(const unsigned long *bitmap, unsigned int bits)
-{
-	unsigned int k, lim = bits/BITS_PER_LONG, w = 0;
-
-	for (k = 0; k < lim; k++)
-		w += hweight_long(bitmap[k]);
-
-	if (bits % BITS_PER_LONG)
-		w += hweight_long(bitmap[k] & BITMAP_LAST_WORD_MASK(bits));
-
-	return w;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(__bitmap_weight);
 

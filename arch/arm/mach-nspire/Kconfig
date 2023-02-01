@@ -1,11 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 config ARCH_NSPIRE
 	bool "TI-NSPIRE based"
-<<<<<<< HEAD
 	depends on ARCH_MULTI_V4T
-=======
-	depends on ARCH_MULTI_V4_V5
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on CPU_LITTLE_ENDIAN
 	select CPU_ARM926T
 	select GENERIC_IRQ_CHIP

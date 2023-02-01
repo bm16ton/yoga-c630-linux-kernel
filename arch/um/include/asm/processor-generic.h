@@ -55,13 +55,6 @@ struct thread_struct {
 	.request		= { 0 } \
 }
 
-<<<<<<< HEAD
-=======
-static inline void release_thread(struct task_struct *task)
-{
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * User space process size: 3GB (default).
  */

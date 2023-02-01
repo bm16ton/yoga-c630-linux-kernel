@@ -168,14 +168,8 @@ static inline bool file_thp_enabled(struct vm_area_struct *vma)
 	       !inode_is_open_for_write(inode) && S_ISREG(inode->i_mode);
 }
 
-<<<<<<< HEAD
 bool hugepage_vma_check(struct vm_area_struct *vma, unsigned long vm_flags,
 			bool smaps, bool in_pf, bool enforce_sysfs);
-=======
-bool hugepage_vma_check(struct vm_area_struct *vma,
-			unsigned long vm_flags,
-			bool smaps, bool in_pf);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define transparent_hugepage_use_zero_page()				\
 	(transparent_hugepage_flags &					\
@@ -329,13 +323,8 @@ static inline bool transhuge_vma_suitable(struct vm_area_struct *vma,
 }
 
 static inline bool hugepage_vma_check(struct vm_area_struct *vma,
-<<<<<<< HEAD
 				      unsigned long vm_flags, bool smaps,
 				      bool in_pf, bool enforce_sysfs)
-=======
-				       unsigned long vm_flags,
-				       bool smaps, bool in_pf)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return false;
 }
@@ -455,14 +444,11 @@ static inline int split_folio_to_list(struct folio *folio,
 	return split_huge_page_to_list(&folio->page, list);
 }
 
-<<<<<<< HEAD
 static inline int split_folio(struct folio *folio)
 {
 	return split_folio_to_list(folio, NULL);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * archs that select ARCH_WANTS_THP_SWAP but don't support THP_SWP due to
  * limitations in the implementation like arm64 MTE can override this to

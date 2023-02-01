@@ -302,7 +302,6 @@ These frames are then queued for transmission using the master network device
 ``ndo_start_xmit()`` function. Since they contain the appropriate switch tag, the
 Ethernet switch will be able to process these incoming frames from the
 management interface and deliver them to the physical switch port.
-<<<<<<< HEAD
 
 When using multiple CPU ports, it is possible to stack a LAG (bonding/team)
 device between the DSA slave devices and the physical DSA masters. The LAG
@@ -317,8 +316,6 @@ On the other hand, TX takes place linearly: ``dsa_slave_xmit`` calls
 The latter calls ``dev_queue_xmit`` towards one physical DSA master or the
 other, and in both cases, the packet exits the system through a hardware path
 towards the switch.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Graphical representation
 ------------------------
@@ -557,15 +554,9 @@ behavior when set is documented through comments in ``include/net/dsa.h``.
 - ``ds->configure_vlan_while_not_filtering``
 
 - ``ds->untag_bridge_pvid``
-<<<<<<< HEAD
 
 - ``ds->assisted_learning_on_cpu_port``
 
-=======
-
-- ``ds->assisted_learning_on_cpu_port``
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 - ``ds->mtu_enforcement_ingress``
 
 - ``ds->fdb_isolation``
@@ -651,7 +642,6 @@ Switch configuration
   probing only to be torn down immediately afterwards, for example in case its
   PHY cannot be found. In this case, probing of the DSA switch continues
   without that particular port.
-<<<<<<< HEAD
 
 - ``port_change_master``: method through which the affinity (association used
   for traffic termination purposes) between a user port and a CPU port can be
@@ -670,8 +660,6 @@ Switch configuration
   separately for the physical CPU ports associated with the physical DSA
   masters, requesting them to create a hardware LAG associated with the LAG
   interface.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 PHY devices and link management
 -------------------------------
@@ -1139,12 +1127,3 @@ capable hardware, but does not enforce a strict switch device driver model. On
 the other DSA enforces a fairly strict device driver model, and deals with most
 of the switch specific. At some point we should envision a merger between these
 two subsystems and get the best of both worlds.
-<<<<<<< HEAD
-=======
-
-Other hanging fruits
---------------------
-
-- allowing more than one CPU/management interface:
-  http://comments.gmane.org/gmane.linux.network/365657
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

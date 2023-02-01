@@ -70,10 +70,7 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 			.summary_pad_sz = 0,
 			.fft_hdr_len = 16,
 			.max_fft_bins = 512,
-<<<<<<< HEAD
 			.fragment_160mhz = true,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		},
 
 		.interface_modes = BIT(NL80211_IFTYPE_STATION) |
@@ -85,10 +82,7 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.idle_ps = false,
 		.supports_sta_ps = false,
 		.cold_boot_calib = true,
-<<<<<<< HEAD
 		.cbcal_restart_fw = true,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.fw_mem_mode = 0,
 		.num_vdevs = 16 + 1,
 		.num_peers = 512,
@@ -114,7 +108,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.hybrid_bus_type = false,
 		.fixed_fw_mem = false,
 		.support_off_channel_tx = false,
-<<<<<<< HEAD
 		.supports_multi_bssid = false,
 
 		.sram_dump = {},
@@ -122,8 +115,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.tcl_ring_retry = true,
 		.tx_ring_size = DP_TCL_DATA_RING_SIZE,
 		.smp2p_wow_exit = false,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.hw_rev = ATH11K_HW_IPQ6018_HW10,
@@ -159,10 +150,7 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 			.summary_pad_sz = 0,
 			.fft_hdr_len = 16,
 			.max_fft_bins = 512,
-<<<<<<< HEAD
 			.fragment_160mhz = true,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		},
 
 		.interface_modes = BIT(NL80211_IFTYPE_STATION) |
@@ -174,10 +162,7 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.idle_ps = false,
 		.supports_sta_ps = false,
 		.cold_boot_calib = true,
-<<<<<<< HEAD
 		.cbcal_restart_fw = true,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.fw_mem_mode = 0,
 		.num_vdevs = 16 + 1,
 		.num_peers = 512,
@@ -203,7 +188,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.hybrid_bus_type = false,
 		.fixed_fw_mem = false,
 		.support_off_channel_tx = false,
-<<<<<<< HEAD
 		.supports_multi_bssid = false,
 
 		.sram_dump = {},
@@ -211,8 +195,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.tcl_ring_retry = true,
 		.tx_ring_size = DP_TCL_DATA_RING_SIZE,
 		.smp2p_wow_exit = false,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.name = "qca6390 hw2.0",
@@ -229,8 +211,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.internal_sleep_clock = true,
 		.regs = &qca6390_regs,
 		.qmi_service_ins_id = ATH11K_QMI_WLFW_SERVICE_INS_ID_V01_QCA6390,
-<<<<<<< HEAD
-=======
 		.host_ce_config = ath11k_host_ce_config_qca6390,
 		.ce_count = 9,
 		.target_ce_config = ath11k_target_ce_config_wlan_qca6390,
@@ -250,218 +230,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 			.summary_pad_sz = 0,
 			.fft_hdr_len = 0,
 			.max_fft_bins = 0,
-		},
-
-		.interface_modes = BIT(NL80211_IFTYPE_STATION) |
-					BIT(NL80211_IFTYPE_AP),
-		.supports_monitor = false,
-		.full_monitor_mode = false,
-		.supports_shadow_regs = true,
-		.idle_ps = true,
-		.supports_sta_ps = true,
-		.cold_boot_calib = false,
-		.fw_mem_mode = 0,
-		.num_vdevs = 16 + 1,
-		.num_peers = 512,
-		.supports_suspend = true,
-		.hal_desc_sz = sizeof(struct hal_rx_desc_ipq8074),
-		.supports_regdb = false,
-		.fix_l1ss = true,
-		.credit_flow = true,
-		.max_tx_ring = DP_TCL_NUM_RING_MAX_QCA6390,
-		.hal_params = &ath11k_hw_hal_params_qca6390,
-		.supports_dynamic_smps_6ghz = false,
-		.alloc_cacheable_memory = false,
-		.supports_rssi_stats = true,
-		.fw_wmi_diag_event = true,
-		.current_cc_support = true,
-		.dbr_debug_support = false,
-		.global_reset = true,
-		.bios_sar_capa = NULL,
-		.m3_fw_support = true,
-		.fixed_bdf_addr = false,
-		.fixed_mem_region = false,
-		.static_window_map = false,
-		.hybrid_bus_type = false,
-		.fixed_fw_mem = false,
-		.support_off_channel_tx = true,
-	},
-	{
-		.name = "qcn9074 hw1.0",
-		.hw_rev = ATH11K_HW_QCN9074_HW10,
-		.fw = {
-			.dir = "QCN9074/hw1.0",
-			.board_size = 256 * 1024,
-			.cal_offset = 128 * 1024,
-		},
-		.max_radios = 1,
-		.single_pdev_only = false,
-		.qmi_service_ins_id = ATH11K_QMI_WLFW_SERVICE_INS_ID_V01_QCN9074,
-		.hw_ops = &qcn9074_ops,
-		.ring_mask = &ath11k_hw_ring_mask_qcn9074,
-		.internal_sleep_clock = false,
-		.regs = &qcn9074_regs,
-		.host_ce_config = ath11k_host_ce_config_qcn9074,
-		.ce_count = 6,
-		.target_ce_config = ath11k_target_ce_config_wlan_qcn9074,
-		.target_ce_count = 9,
-		.svc_to_ce_map = ath11k_target_service_to_ce_map_wlan_qcn9074,
-		.svc_to_ce_map_len = 18,
-		.rxdma1_enable = true,
-		.num_rxmda_per_pdev = 1,
-		.rx_mac_buf_ring = false,
-		.vdev_start_delay = false,
-		.htt_peer_map_v2 = true,
-
-		.spectral = {
-			.fft_sz = 2,
-			.fft_pad_sz = 0,
-			.summary_pad_sz = 16,
-			.fft_hdr_len = 24,
-			.max_fft_bins = 1024,
-		},
-
-		.interface_modes = BIT(NL80211_IFTYPE_STATION) |
-					BIT(NL80211_IFTYPE_AP) |
-					BIT(NL80211_IFTYPE_MESH_POINT),
-		.supports_monitor = true,
-		.full_monitor_mode = true,
-		.supports_shadow_regs = false,
-		.idle_ps = false,
-		.supports_sta_ps = false,
-		.cold_boot_calib = false,
-		.fw_mem_mode = 2,
-		.num_vdevs = 8,
-		.num_peers = 128,
-		.supports_suspend = false,
-		.hal_desc_sz = sizeof(struct hal_rx_desc_qcn9074),
-		.supports_regdb = false,
-		.fix_l1ss = true,
-		.credit_flow = false,
-		.max_tx_ring = DP_TCL_NUM_RING_MAX,
-		.hal_params = &ath11k_hw_hal_params_ipq8074,
-		.supports_dynamic_smps_6ghz = true,
-		.alloc_cacheable_memory = true,
-		.supports_rssi_stats = false,
-		.fw_wmi_diag_event = false,
-		.current_cc_support = false,
-		.dbr_debug_support = true,
-		.global_reset = false,
-		.bios_sar_capa = NULL,
-		.m3_fw_support = true,
-		.fixed_bdf_addr = false,
-		.fixed_mem_region = false,
-		.static_window_map = true,
-		.hybrid_bus_type = false,
-		.fixed_fw_mem = false,
-		.support_off_channel_tx = false,
-	},
-	{
-		.name = "wcn6855 hw2.0",
-		.hw_rev = ATH11K_HW_WCN6855_HW20,
-		.fw = {
-			.dir = "WCN6855/hw2.0",
-			.board_size = 256 * 1024,
-			.cal_offset = 128 * 1024,
-		},
-		.max_radios = 3,
-		.bdf_addr = 0x4B0C0000,
-		.hw_ops = &wcn6855_ops,
-		.ring_mask = &ath11k_hw_ring_mask_qca6390,
-		.internal_sleep_clock = true,
-		.regs = &wcn6855_regs,
-		.qmi_service_ins_id = ATH11K_QMI_WLFW_SERVICE_INS_ID_V01_QCA6390,
-		.host_ce_config = ath11k_host_ce_config_qca6390,
-		.ce_count = 9,
-		.target_ce_config = ath11k_target_ce_config_wlan_qca6390,
-		.target_ce_count = 9,
-		.svc_to_ce_map = ath11k_target_service_to_ce_map_wlan_qca6390,
-		.svc_to_ce_map_len = 14,
-		.single_pdev_only = true,
-		.rxdma1_enable = false,
-		.num_rxmda_per_pdev = 2,
-		.rx_mac_buf_ring = true,
-		.vdev_start_delay = true,
-		.htt_peer_map_v2 = false,
-
-		.spectral = {
-			.fft_sz = 0,
-			.fft_pad_sz = 0,
-			.summary_pad_sz = 0,
-			.fft_hdr_len = 0,
-			.max_fft_bins = 0,
-		},
-
-		.interface_modes = BIT(NL80211_IFTYPE_STATION) |
-					BIT(NL80211_IFTYPE_AP),
-		.supports_monitor = false,
-		.full_monitor_mode = false,
-		.supports_shadow_regs = true,
-		.idle_ps = true,
-		.supports_sta_ps = true,
-		.cold_boot_calib = false,
-		.fw_mem_mode = 0,
-		.num_vdevs = 16 + 1,
-		.num_peers = 512,
-		.supports_suspend = true,
-		.hal_desc_sz = sizeof(struct hal_rx_desc_wcn6855),
-		.supports_regdb = true,
-		.fix_l1ss = false,
-		.credit_flow = true,
-		.max_tx_ring = DP_TCL_NUM_RING_MAX_QCA6390,
-		.hal_params = &ath11k_hw_hal_params_qca6390,
-		.supports_dynamic_smps_6ghz = false,
-		.alloc_cacheable_memory = false,
-		.supports_rssi_stats = true,
-		.fw_wmi_diag_event = true,
-		.current_cc_support = true,
-		.dbr_debug_support = false,
-		.global_reset = true,
-		.bios_sar_capa = &ath11k_hw_sar_capa_wcn6855,
-		.m3_fw_support = true,
-		.fixed_bdf_addr = false,
-		.fixed_mem_region = false,
-		.static_window_map = false,
-		.hybrid_bus_type = false,
-		.fixed_fw_mem = false,
-		.support_off_channel_tx = true,
-	},
-	{
-		.name = "wcn6855 hw2.1",
-		.hw_rev = ATH11K_HW_WCN6855_HW21,
-		.fw = {
-			.dir = "WCN6855/hw2.1",
-			.board_size = 256 * 1024,
-			.cal_offset = 128 * 1024,
-		},
-		.max_radios = 3,
-		.bdf_addr = 0x4B0C0000,
-		.hw_ops = &wcn6855_ops,
-		.ring_mask = &ath11k_hw_ring_mask_qca6390,
-		.internal_sleep_clock = true,
-		.regs = &wcn6855_regs,
-		.qmi_service_ins_id = ATH11K_QMI_WLFW_SERVICE_INS_ID_V01_QCA6390,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		.host_ce_config = ath11k_host_ce_config_qca6390,
-		.ce_count = 9,
-		.target_ce_config = ath11k_target_ce_config_wlan_qca6390,
-		.target_ce_count = 9,
-		.svc_to_ce_map = ath11k_target_service_to_ce_map_wlan_qca6390,
-		.svc_to_ce_map_len = 14,
-		.single_pdev_only = true,
-		.rxdma1_enable = false,
-		.num_rxmda_per_pdev = 2,
-		.rx_mac_buf_ring = true,
-		.vdev_start_delay = true,
-		.htt_peer_map_v2 = false,
-
-		.spectral = {
-			.fft_sz = 0,
-			.fft_pad_sz = 0,
-			.summary_pad_sz = 0,
-			.fft_hdr_len = 0,
-			.max_fft_bins = 0,
-<<<<<<< HEAD
 			.fragment_160mhz = false,
 		},
 
@@ -706,8 +474,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 			.fft_hdr_len = 0,
 			.max_fft_bins = 0,
 			.fragment_160mhz = false,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		},
 
 		.interface_modes = BIT(NL80211_IFTYPE_STATION) |
@@ -717,10 +483,7 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.idle_ps = true,
 		.supports_sta_ps = true,
 		.cold_boot_calib = false,
-<<<<<<< HEAD
 		.cbcal_restart_fw = false,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.fw_mem_mode = 0,
 		.num_vdevs = 16 + 1,
 		.num_peers = 512,
@@ -746,7 +509,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.hybrid_bus_type = false,
 		.fixed_fw_mem = false,
 		.support_off_channel_tx = true,
-<<<<<<< HEAD
 		.supports_multi_bssid = true,
 
 		.sram_dump = {
@@ -757,8 +519,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.tcl_ring_retry = true,
 		.tx_ring_size = DP_TCL_DATA_RING_SIZE,
 		.smp2p_wow_exit = false,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.name = "wcn6750 hw1.0",
@@ -771,11 +531,7 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.max_radios = 1,
 		.bdf_addr = 0x4B0C0000,
 		.hw_ops = &wcn6750_ops,
-<<<<<<< HEAD
 		.ring_mask = &ath11k_hw_ring_mask_wcn6750,
-=======
-		.ring_mask = &ath11k_hw_ring_mask_qca6390,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.internal_sleep_clock = false,
 		.regs = &wcn6750_regs,
 		.qmi_service_ins_id = ATH11K_QMI_WLFW_SERVICE_INS_ID_V01_WCN6750,
@@ -798,10 +554,7 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 			.summary_pad_sz = 0,
 			.fft_hdr_len = 0,
 			.max_fft_bins = 0,
-<<<<<<< HEAD
 			.fragment_160mhz = false,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		},
 
 		.interface_modes = BIT(NL80211_IFTYPE_STATION) |
@@ -810,12 +563,8 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.supports_shadow_regs = true,
 		.idle_ps = true,
 		.supports_sta_ps = true,
-<<<<<<< HEAD
 		.cold_boot_calib = true,
 		.cbcal_restart_fw = false,
-=======
-		.cold_boot_calib = false,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.fw_mem_mode = 0,
 		.num_vdevs = 16 + 1,
 		.num_peers = 512,
@@ -824,13 +573,8 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.supports_regdb = true,
 		.fix_l1ss = false,
 		.credit_flow = true,
-<<<<<<< HEAD
 		.max_tx_ring = DP_TCL_NUM_RING_MAX,
 		.hal_params = &ath11k_hw_hal_params_wcn6750,
-=======
-		.max_tx_ring = DP_TCL_NUM_RING_MAX_QCA6390,
-		.hal_params = &ath11k_hw_hal_params_qca6390,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.supports_dynamic_smps_6ghz = false,
 		.alloc_cacheable_memory = false,
 		.supports_rssi_stats = true,
@@ -845,7 +589,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.static_window_map = true,
 		.hybrid_bus_type = true,
 		.fixed_fw_mem = true,
-<<<<<<< HEAD
 		.support_off_channel_tx = true,
 		.supports_multi_bssid = true,
 
@@ -854,9 +597,6 @@ static const struct ath11k_hw_params ath11k_hw_params[] = {
 		.tcl_ring_retry = false,
 		.tx_ring_size = DP_TCL_DATA_RING_SIZE_WCN6750,
 		.smp2p_wow_exit = true,
-=======
-		.support_off_channel_tx = false,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 };
 
@@ -867,7 +607,6 @@ static inline struct ath11k_pdev *ath11k_core_get_single_pdev(struct ath11k_base
 	return &ab->pdevs[0];
 }
 
-<<<<<<< HEAD
 void ath11k_fw_stats_pdevs_free(struct list_head *head)
 {
 	struct ath11k_fw_stats_pdev *i, *tmp;
@@ -914,8 +653,6 @@ void ath11k_fw_stats_free(struct ath11k_fw_stats *stats)
 	ath11k_fw_stats_bcn_free(&stats->bcn);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ath11k_core_suspend(struct ath11k_base *ab)
 {
 	int ret;
@@ -1925,11 +1662,7 @@ static void ath11k_core_pre_reconfigure_recovery(struct ath11k_base *ab)
 		ar->state_11d = ATH11K_11D_IDLE;
 		complete(&ar->completed_11d_scan);
 		complete(&ar->scan.started);
-<<<<<<< HEAD
 		complete_all(&ar->scan.completed);
-=======
-		complete(&ar->scan.completed);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		complete(&ar->scan.on_channel);
 		complete(&ar->peer_assoc_done);
 		complete(&ar->peer_delete_done);

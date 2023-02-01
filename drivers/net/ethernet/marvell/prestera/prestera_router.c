@@ -7,19 +7,15 @@
 #include <net/inet_dscp.h>
 #include <net/switchdev.h>
 #include <linux/rhashtable.h>
-<<<<<<< HEAD
 #include <net/nexthop.h>
 #include <net/arp.h>
 #include <linux/if_vlan.h>
 #include <linux/if_macvlan.h>
 #include <net/netevent.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "prestera.h"
 #include "prestera_router_hw.h"
 
-<<<<<<< HEAD
 #define PRESTERA_IMPLICITY_RESOLVE_DEAD_NEIGH
 #define PRESTERA_NH_PROBE_INTERVAL 5000 /* ms */
 
@@ -40,8 +36,6 @@ struct prestera_kern_neigh_cache {
 	bool in_kernel;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct prestera_kern_fib_cache_key {
 	struct prestera_ip_addr addr;
 	u32 prefix_len;
@@ -54,7 +48,6 @@ struct prestera_kern_fib_cache {
 	struct {
 		struct prestera_fib_key fib_key;
 		enum prestera_fib_type fib_type;
-<<<<<<< HEAD
 		struct prestera_nexthop_group_key nh_grp_key;
 	} lpm_info; /* hold prepared lpm info */
 	/* Indicate if route is not overlapped by another table */
@@ -78,17 +71,6 @@ static const struct rhashtable_params __prestera_kern_neigh_cache_ht_params = {
 	.automatic_shrinking = true,
 };
 
-=======
-	} lpm_info; /* hold prepared lpm info */
-	/* Indicate if route is not overlapped by another table */
-	struct rhash_head ht_node; /* node of prestera_router */
-	struct fib_info *fi;
-	dscp_t kern_dscp;
-	u8 kern_type;
-	bool reachable;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct rhashtable_params __prestera_kern_fib_cache_ht_params = {
 	.key_offset  = offsetof(struct prestera_kern_fib_cache, key),
 	.head_offset = offsetof(struct prestera_kern_fib_cache, ht_node),
@@ -108,7 +90,6 @@ static u32 prestera_fix_tb_id(u32 tb_id)
 }
 
 static void
-<<<<<<< HEAD
 prestera_util_fen_info2fib_cache_key(struct fib_notifier_info *info,
 				     struct prestera_kern_fib_cache_key *key)
 {
@@ -117,18 +98,11 @@ prestera_util_fen_info2fib_cache_key(struct fib_notifier_info *info,
 
 	memset(key, 0, sizeof(*key));
 	key->addr.v = PRESTERA_IPV4;
-=======
-prestera_util_fen_info2fib_cache_key(struct fib_entry_notifier_info *fen_info,
-				     struct prestera_kern_fib_cache_key *key)
-{
-	memset(key, 0, sizeof(*key));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	key->addr.u.ipv4 = cpu_to_be32(fen_info->dst);
 	key->prefix_len = fen_info->dst_len;
 	key->kern_tb_id = fen_info->tb_id;
 }
 
-<<<<<<< HEAD
 static int prestera_util_nhc2nc_key(struct prestera_switch *sw,
 				    struct fib_nh_common *nhc,
 				    struct prestera_kern_neigh_cache_key *nk)
@@ -560,8 +534,6 @@ prestera_kern_neigh_cache_put(struct prestera_switch *sw,
 	return n_cache;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct prestera_kern_fib_cache *
 prestera_kern_fib_cache_find(struct prestera_switch *sw,
 			     struct prestera_kern_fib_cache_key *key)
@@ -575,7 +547,6 @@ prestera_kern_fib_cache_find(struct prestera_switch *sw,
 }
 
 static void
-<<<<<<< HEAD
 __prestera_kern_fib_cache_destruct(struct prestera_switch *sw,
 				   struct prestera_kern_fib_cache *fib_cache)
 {
@@ -639,33 +610,16 @@ __prestera_kern_fib_cache_create_nhs(struct prestera_switch *sw,
 	return 0;
 }
 
-=======
-prestera_kern_fib_cache_destroy(struct prestera_switch *sw,
-				struct prestera_kern_fib_cache *fib_cache)
-{
-	fib_info_put(fib_cache->fi);
-	rhashtable_remove_fast(&sw->router->kern_fib_cache_ht,
-			       &fib_cache->ht_node,
-			       __prestera_kern_fib_cache_ht_params);
-	kfree(fib_cache);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Operations on fi (offload, etc) must be wrapped in utils.
  * This function just create storage.
  */
 static struct prestera_kern_fib_cache *
 prestera_kern_fib_cache_create(struct prestera_switch *sw,
 			       struct prestera_kern_fib_cache_key *key,
-<<<<<<< HEAD
 			       struct fib_notifier_info *info)
 {
 	struct fib_entry_notifier_info *fen_info =
 		container_of(info, struct fib_entry_notifier_info, info);
-=======
-			       struct fib_info *fi, dscp_t dscp, u8 type)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct prestera_kern_fib_cache *fib_cache;
 	int err;
 
@@ -674,15 +628,8 @@ prestera_kern_fib_cache_create(struct prestera_switch *sw,
 		goto err_kzalloc;
 
 	memcpy(&fib_cache->key, key, sizeof(*key));
-<<<<<<< HEAD
 	fib_info_hold(fen_info->fi);
 	memcpy(&fib_cache->fen4_info, fen_info, sizeof(*fen_info));
-=======
-	fib_info_hold(fi);
-	fib_cache->fi = fi;
-	fib_cache->kern_dscp = dscp;
-	fib_cache->kern_type = type;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = rhashtable_insert_fast(&sw->router->kern_fib_cache_ht,
 				     &fib_cache->ht_node,
@@ -690,7 +637,6 @@ prestera_kern_fib_cache_create(struct prestera_switch *sw,
 	if (err)
 		goto err_ht_insert;
 
-<<<<<<< HEAD
 	/* Handle nexthops */
 	err = __prestera_kern_fib_cache_create_nhs(sw, fib_cache);
 	if (err)
@@ -701,19 +647,12 @@ out:
 
 err_ht_insert:
 	fib_info_put(fen_info->fi);
-=======
-	return fib_cache;
-
-err_ht_insert:
-	fib_info_put(fi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(fib_cache);
 err_kzalloc:
 	return NULL;
 }
 
 static void
-<<<<<<< HEAD
 __prestera_k_arb_fib_nh_offload_set(struct prestera_switch *sw,
 				    struct prestera_kern_fib_cache *fibc,
 				    struct prestera_kern_neigh_cache *nc,
@@ -754,15 +693,12 @@ __prestera_k_arb_n_offload_set(struct prestera_switch *sw,
 }
 
 static void
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 __prestera_k_arb_fib_lpm_offload_set(struct prestera_switch *sw,
 				     struct prestera_kern_fib_cache *fc,
 				     bool fail, bool offload, bool trap)
 {
 	struct fib_rt_info fri;
 
-<<<<<<< HEAD
 	switch (fc->key.addr.v) {
 	case PRESTERA_IPV4:
 		fri.fi = fc->fen4_info.fi;
@@ -915,30 +851,12 @@ out:
 						    nc->in_kernel,
 						    !nc->in_kernel);
 	}
-=======
-	if (fc->key.addr.v != PRESTERA_IPV4)
-		return;
-
-	fri.fi = fc->fi;
-	fri.tb_id = fc->key.kern_tb_id;
-	fri.dst = fc->key.addr.u.ipv4;
-	fri.dst_len = fc->key.prefix_len;
-	fri.dscp = fc->kern_dscp;
-	fri.type = fc->kern_type;
-	/* flags begin */
-	fri.offload = offload;
-	fri.trap = trap;
-	fri.offload_failed = fail;
-	/* flags end */
-	fib_alias_hw_flags_set(&init_net, &fri);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int
 __prestera_pr_k_arb_fc_lpm_info_calc(struct prestera_switch *sw,
 				     struct prestera_kern_fib_cache *fc)
 {
-<<<<<<< HEAD
 	struct fib_nh_common *nhc;
 	int nh_cnt;
 
@@ -983,13 +901,6 @@ __prestera_pr_k_arb_fc_lpm_info_calc(struct prestera_switch *sw,
 		fc->lpm_info.fib_type = nh_cnt ?
 					PRESTERA_FIB_TYPE_UC_NH :
 					PRESTERA_FIB_TYPE_TRAP;
-=======
-	memset(&fc->lpm_info, 0, sizeof(fc->lpm_info));
-
-	switch (fc->fi->fib_type) {
-	case RTN_UNICAST:
-		fc->lpm_info.fib_type = PRESTERA_FIB_TYPE_TRAP;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	/* Unsupported. Leave it for kernel: */
 	case RTN_BROADCAST:
@@ -1029,12 +940,8 @@ static int __prestera_k_arb_f_lpm_set(struct prestera_switch *sw,
 		return 0;
 
 	fib_node = prestera_fib_node_create(sw, &fc->lpm_info.fib_key,
-<<<<<<< HEAD
 					    fc->lpm_info.fib_type,
 					    &fc->lpm_info.nh_grp_key);
-=======
-					    fc->lpm_info.fib_type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!fib_node) {
 		dev_err(sw->dev->dev, "fib_node=NULL %pI4n/%d kern_tb_id = %d",
@@ -1063,13 +970,10 @@ static int __prestera_k_arb_fc_apply(struct prestera_switch *sw,
 	}
 
 	switch (fc->lpm_info.fib_type) {
-<<<<<<< HEAD
 	case PRESTERA_FIB_TYPE_UC_NH:
 		__prestera_k_arb_fib_lpm_offload_set(sw, fc, false,
 						     fc->reachable, false);
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case PRESTERA_FIB_TYPE_TRAP:
 		__prestera_k_arb_fib_lpm_offload_set(sw, fc, false,
 						     false, fc->reachable);
@@ -1121,7 +1025,6 @@ __prestera_k_arb_util_fib_overlapped(struct prestera_switch *sw,
 	return rfc;
 }
 
-<<<<<<< HEAD
 static void __prestera_k_arb_hw_state_upd(struct prestera_switch *sw,
 					  struct prestera_kern_neigh_cache *nc)
 {
@@ -1249,23 +1152,13 @@ static int
 prestera_k_arb_fib_evt(struct prestera_switch *sw,
 		       bool replace, /* replace or del */
 		       struct fib_notifier_info *info)
-=======
-static int
-prestera_k_arb_fib_evt(struct prestera_switch *sw,
-		       bool replace, /* replace or del */
-		       struct fib_entry_notifier_info *fen_info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct prestera_kern_fib_cache *tfib_cache, *bfib_cache; /* top/btm */
 	struct prestera_kern_fib_cache_key fc_key;
 	struct prestera_kern_fib_cache *fib_cache;
 	int err;
 
-<<<<<<< HEAD
 	prestera_util_fen_info2fib_cache_key(info, &fc_key);
-=======
-	prestera_util_fen_info2fib_cache_key(fen_info, &fc_key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fib_cache = prestera_kern_fib_cache_find(sw, &fc_key);
 	if (fib_cache) {
 		fib_cache->reachable = false;
@@ -1288,14 +1181,7 @@ prestera_k_arb_fib_evt(struct prestera_switch *sw,
 	}
 
 	if (replace) {
-<<<<<<< HEAD
 		fib_cache = prestera_kern_fib_cache_create(sw, &fc_key, info);
-=======
-		fib_cache = prestera_kern_fib_cache_create(sw, &fc_key,
-							   fen_info->fi,
-							   fen_info->dscp,
-							   fen_info->type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!fib_cache) {
 			dev_err(sw->dev->dev, "fib_cache == NULL");
 			return -ENOENT;
@@ -1319,7 +1205,6 @@ prestera_k_arb_fib_evt(struct prestera_switch *sw,
 			dev_err(sw->dev->dev, "Applying fib_cache failed");
 	}
 
-<<<<<<< HEAD
 	/* Update all neighs to resolve overlapped and apply related */
 	__prestera_k_arb_fib_evt2nc(sw);
 
@@ -1379,11 +1264,6 @@ static void prestera_k_arb_abort(struct prestera_switch *sw)
 				    sw);
 }
 
-=======
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int __prestera_inetaddr_port_event(struct net_device *port_dev,
 					  unsigned long event,
 					  struct netlink_ext_ack *extack)
@@ -1519,23 +1399,15 @@ static void __prestera_router_fib_event_work(struct work_struct *work)
 
 	switch (fib_work->event) {
 	case FIB_EVENT_ENTRY_REPLACE:
-<<<<<<< HEAD
 		err = prestera_k_arb_fib_evt(sw, true,
 					     &fib_work->fen_info.info);
-=======
-		err = prestera_k_arb_fib_evt(sw, true, &fib_work->fen_info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (err)
 			goto err_out;
 
 		break;
 	case FIB_EVENT_ENTRY_DEL:
-<<<<<<< HEAD
 		err = prestera_k_arb_fib_evt(sw, false,
 					     &fib_work->fen_info.info);
-=======
-		err = prestera_k_arb_fib_evt(sw, false, &fib_work->fen_info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (err)
 			goto err_out;
 
@@ -1594,7 +1466,6 @@ static int __prestera_router_fib_event(struct notifier_block *nb,
 	return NOTIFY_DONE;
 }
 
-<<<<<<< HEAD
 struct prestera_netevent_work {
 	struct work_struct work;
 	struct prestera_switch *sw;
@@ -1678,12 +1549,6 @@ int prestera_router_init(struct prestera_switch *sw)
 {
 	struct prestera_router *router;
 	int err, nhgrp_cache_bytes;
-=======
-int prestera_router_init(struct prestera_switch *sw)
-{
-	struct prestera_router *router;
-	int err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	router = kzalloc(sizeof(*sw->router), GFP_KERNEL);
 	if (!router)
@@ -1701,7 +1566,6 @@ int prestera_router_init(struct prestera_switch *sw)
 	if (err)
 		goto err_kern_fib_cache_ht_init;
 
-<<<<<<< HEAD
 	err = rhashtable_init(&router->kern_neigh_cache_ht,
 			      &__prestera_kern_neigh_cache_ht_params);
 	if (err)
@@ -1718,8 +1582,6 @@ int prestera_router_init(struct prestera_switch *sw)
 	if (err)
 		goto err_neigh_work_init;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	router->inetaddr_valid_nb.notifier_call = __prestera_inetaddr_valid_cb;
 	err = register_inetaddr_validator_notifier(&router->inetaddr_valid_nb);
 	if (err)
@@ -1730,14 +1592,11 @@ int prestera_router_init(struct prestera_switch *sw)
 	if (err)
 		goto err_register_inetaddr_notifier;
 
-<<<<<<< HEAD
 	router->netevent_nb.notifier_call = prestera_router_netevent_event;
 	err = register_netevent_notifier(&router->netevent_nb);
 	if (err)
 		goto err_register_netevent_notifier;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	router->fib_nb.notifier_call = __prestera_router_fib_event;
 	err = register_fib_notifier(&init_net, &router->fib_nb,
 				    /* TODO: flush fib entries */ NULL, NULL);
@@ -1747,24 +1606,18 @@ int prestera_router_init(struct prestera_switch *sw)
 	return 0;
 
 err_register_fib_notifier:
-<<<<<<< HEAD
 	unregister_netevent_notifier(&router->netevent_nb);
 err_register_netevent_notifier:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unregister_inetaddr_notifier(&router->inetaddr_nb);
 err_register_inetaddr_notifier:
 	unregister_inetaddr_validator_notifier(&router->inetaddr_valid_nb);
 err_register_inetaddr_validator_notifier:
-<<<<<<< HEAD
 	prestera_neigh_work_fini(sw);
 err_neigh_work_init:
 	kfree(router->nhgrp_hw_state_cache);
 err_nh_state_cache_alloc:
 	rhashtable_destroy(&router->kern_neigh_cache_ht);
 err_kern_neigh_cache_ht_init:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rhashtable_destroy(&router->kern_fib_cache_ht);
 err_kern_fib_cache_ht_init:
 	prestera_router_hw_fini(sw);
@@ -1776,7 +1629,6 @@ err_router_lib_init:
 void prestera_router_fini(struct prestera_switch *sw)
 {
 	unregister_fib_notifier(&init_net, &sw->router->fib_nb);
-<<<<<<< HEAD
 	unregister_netevent_notifier(&sw->router->netevent_nb);
 	unregister_inetaddr_notifier(&sw->router->inetaddr_nb);
 	unregister_inetaddr_validator_notifier(&sw->router->inetaddr_valid_nb);
@@ -1786,10 +1638,6 @@ void prestera_router_fini(struct prestera_switch *sw)
 	prestera_k_arb_abort(sw);
 
 	kfree(sw->router->nhgrp_hw_state_cache);
-=======
-	unregister_inetaddr_notifier(&sw->router->inetaddr_nb);
-	unregister_inetaddr_validator_notifier(&sw->router->inetaddr_valid_nb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rhashtable_destroy(&sw->router->kern_fib_cache_ht);
 	prestera_router_hw_fini(sw);
 	kfree(sw->router);

@@ -11,7 +11,6 @@
 #include "disp/msm_disp_snapshot.h"
 
 struct msm_dp {
-	struct device *dev;
 	struct drm_device *drm_dev;
 	struct device *codec_dev;
 	struct drm_bridge *bridge;

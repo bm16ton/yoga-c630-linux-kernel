@@ -158,11 +158,7 @@ static unsigned long __init __mmu_mapin_ram(unsigned long base, unsigned long to
 unsigned long __init mmu_mapin_ram(unsigned long base, unsigned long top)
 {
 	unsigned long done;
-<<<<<<< HEAD
 	unsigned long border = (unsigned long)__srwx_boundary - PAGE_OFFSET;
-=======
-	unsigned long border = (unsigned long)__init_begin - PAGE_OFFSET;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long size;
 
 	size = roundup_pow_of_two((unsigned long)_einittext - PAGE_OFFSET);

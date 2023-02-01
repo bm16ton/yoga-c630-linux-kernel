@@ -567,15 +567,12 @@ struct sk_filter {
 
 DECLARE_STATIC_KEY_FALSE(bpf_stats_enabled_key);
 
-<<<<<<< HEAD
 extern struct mutex nf_conn_btf_access_lock;
 extern int (*nfct_btf_struct_access)(struct bpf_verifier_log *log, const struct btf *btf,
 				     const struct btf_type *t, int off, int size,
 				     enum bpf_access_type atype, u32 *next_btf_id,
 				     enum bpf_type_flag *flag);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 typedef unsigned int (*bpf_dispatcher_fn)(const void *ctx,
 					  const struct bpf_insn *insnsi,
 					  unsigned int (*bpf_func)(const void *,

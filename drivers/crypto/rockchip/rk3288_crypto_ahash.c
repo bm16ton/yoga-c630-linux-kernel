@@ -76,12 +76,9 @@ static int zero_message_process(struct ahash_request *req)
 static void rk_ahash_reg_init(struct ahash_request *req)
 {
 	struct rk_ahash_rctx *rctx = ahash_request_ctx(req);
-<<<<<<< HEAD
 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
 	struct rk_ahash_ctx *tctx = crypto_ahash_ctx(tfm);
 	struct rk_crypto_info *dev = tctx->dev;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int reg_status;
 
 	reg_status = CRYPTO_READ(dev, RK_CRYPTO_CTRL) |

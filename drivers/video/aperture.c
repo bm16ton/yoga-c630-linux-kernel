@@ -2,10 +2,6 @@
 
 #include <linux/aperture.h>
 #include <linux/device.h>
-<<<<<<< HEAD
-=======
-#include <linux/fb.h> /* for old fbdev helpers */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/list.h>
 #include <linux/mutex.h>
 #include <linux/pci.h>
@@ -15,11 +11,8 @@
 #include <linux/types.h>
 #include <linux/vgaarb.h>
 
-<<<<<<< HEAD
 #include <video/vga.h>
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * DOC: overview
  *
@@ -292,14 +285,6 @@ static void aperture_detach_devices(resource_size_t base, resource_size_t size)
 int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t size,
 					bool primary, const char *name)
 {
-<<<<<<< HEAD
-=======
-#if IS_REACHABLE(CONFIG_FB)
-	struct apertures_struct *a;
-	int ret;
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * If a driver asked to unregister a platform device registered by
 	 * sysfb, then can be assumed that this is a driver for a display
@@ -311,7 +296,6 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 	 */
 	sysfb_disable();
 
-<<<<<<< HEAD
 	aperture_detach_devices(base, size);
 
 	/*
@@ -321,24 +305,6 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 	 */
 	if (primary)
 		aperture_detach_devices(VGA_FB_PHYS_BASE, VGA_FB_PHYS_SIZE);
-=======
-#if IS_REACHABLE(CONFIG_FB)
-	a = alloc_apertures(1);
-	if (!a)
-		return -ENOMEM;
-
-	a->ranges[0].base = base;
-	a->ranges[0].size = size;
-
-	ret = remove_conflicting_framebuffers(a, name, primary);
-	kfree(a);
-
-	if (ret)
-		return ret;
-#endif
-
-	aperture_detach_devices(base, size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -378,20 +344,6 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 	}
 
 	/*
-<<<<<<< HEAD
-=======
-	 * If a driver asked to unregister a platform device registered by
-	 * sysfb, then can be assumed that this is a driver for a display
-	 * that is set up by the system firmware and has a generic driver.
-	 *
-	 * Drivers for devices that don't have a generic driver will never
-	 * ask for this, so let's assume that a real driver for the display
-	 * was already probed and prevent sysfb to register devices later.
-	 */
-	sysfb_disable();
-
-	/*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * WARNING: Apparently we must kick fbdev drivers before vgacon,
 	 * otherwise the vga fbdev driver falls over.
 	 */

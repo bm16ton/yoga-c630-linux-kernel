@@ -3155,11 +3155,7 @@ static int vega10_get_pp_table_entry_callback_func(struct pp_hwmgr *hwmgr,
 			return -1);
 
 	PP_ASSERT_WITH_CODE(
-<<<<<<< HEAD
 			(vega10_ps->performance_level_count <
-=======
-			(vega10_ps->performance_level_count <=
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					hwmgr->platform_descriptor.
 					hardwareActivityPerformanceLevels),
 			"Performance levels exceeds Driver limit!",

@@ -1063,12 +1063,6 @@ static int ext4_ioctl_checkpoint(struct file *filp, unsigned long arg)
 	if (!EXT4_SB(sb)->s_journal)
 		return -ENODEV;
 
-<<<<<<< HEAD
-=======
-	if (flags & ~EXT4_IOC_CHECKPOINT_FLAG_VALID)
-		return -EINVAL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if ((flags & JBD2_JOURNAL_FLUSH_DISCARD) &&
 	    !bdev_max_discard_sectors(EXT4_SB(sb)->s_journal->j_dev))
 		return -EOPNOTSUPP;
@@ -1160,7 +1154,6 @@ static int ext4_ioctl_getuuid(struct ext4_sb_info *sbi,
 
 	if (fsuuid.fsu_len == 0) {
 		fsuuid.fsu_len = UUID_SIZE;
-<<<<<<< HEAD
 		if (copy_to_user(&ufsuuid->fsu_len, &fsuuid.fsu_len,
 					sizeof(fsuuid.fsu_len)))
 			return -EFAULT;
@@ -1168,27 +1161,15 @@ static int ext4_ioctl_getuuid(struct ext4_sb_info *sbi,
 	}
 
 	if (fsuuid.fsu_len < UUID_SIZE || fsuuid.fsu_flags != 0)
-=======
-		if (copy_to_user(ufsuuid, &fsuuid, sizeof(fsuuid.fsu_len)))
-			return -EFAULT;
-		return -EINVAL;
-	}
-
-	if (fsuuid.fsu_len != UUID_SIZE || fsuuid.fsu_flags != 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	lock_buffer(sbi->s_sbh);
 	memcpy(uuid, sbi->s_es->s_uuid, UUID_SIZE);
 	unlock_buffer(sbi->s_sbh);
 
-<<<<<<< HEAD
 	fsuuid.fsu_len = UUID_SIZE;
 	if (copy_to_user(ufsuuid, &fsuuid, sizeof(fsuuid)) ||
 	    copy_to_user(&ufsuuid->fsu_uuid[0], uuid, UUID_SIZE))
-=======
-	if (copy_to_user(&ufsuuid->fsu_uuid[0], uuid, UUID_SIZE))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFAULT;
 	return 0;
 }

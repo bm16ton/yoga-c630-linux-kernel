@@ -673,7 +673,6 @@ Bit assignments shown below:-
     Set to enable branch broadcast if supported in hardware [IDR0]. The primary use for this feature
     is when code is patched dynamically at run time and the full program flow may not be able to be
     reconstructed using only conditional branches.
-<<<<<<< HEAD
 
     There is currently no support in Perf for supplying modified binaries to the decoder, so this
     feature is only inteded to be used for debugging purposes or with a 3rd party tool.
@@ -684,18 +683,6 @@ Bit assignments shown below:-
     broadcast range overlaps a return stack range, return stacks will not be available for that
     range.
 
-=======
-
-    There is currently no support in Perf for supplying modified binaries to the decoder, so this
-    feature is only inteded to be used for debugging purposes or with a 3rd party tool.
-
-    Choosing this option will result in a significant increase in the amount of trace generated -
-    possible danger of overflows, or fewer instructions covered. Note, that this option also
-    overrides any setting of :ref:`ETM_MODE_RETURNSTACK <coresight-return-stack>`, so where a branch
-    broadcast range overlaps a return stack range, return stacks will not be available for that
-    range.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 .. _coresight-cycle-accurate:
 
 **bit (5):**

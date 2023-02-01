@@ -667,7 +667,6 @@
 		>;
 	};
 
-<<<<<<< HEAD
 	pinctrl_ipu1_lcdif: ipu1-lcdif-grp {
 		fsl,pins = <
 			MX6QDL_PAD_DI0_DISP_CLK__IPU1_DI0_DISP_CLK	0x38
@@ -701,8 +700,6 @@
 		>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pinctrl_pcie: pcie-grp {
 		fsl,pins = <
 			MX6QDL_PAD_CSI0_DATA_EN__GPIO5_IO20	0x1b0b1 /* Wake */

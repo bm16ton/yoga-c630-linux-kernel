@@ -237,7 +237,6 @@ enum {
 	/* compile out MSI infrastructure */
 	AHCI_HFLAG_MULTI_MSI		= 0,
 #endif
-<<<<<<< HEAD
 	AHCI_HFLAG_WAKE_BEFORE_STOP	= BIT(22), /* wake before DMA stop */
 	AHCI_HFLAG_YES_ALPM		= BIT(23), /* force ALPM cap on */
 	AHCI_HFLAG_NO_WRITE_TO_RO	= BIT(24), /* don't write to read
@@ -248,18 +247,6 @@ enum {
 	AHCI_HFLAG_SUSPEND_PHYS		= BIT(26), /* handle PHYs during
 						      suspend/resume */
 	AHCI_HFLAG_NO_SXS		= BIT(28), /* SXS not supported */
-=======
-	AHCI_HFLAG_WAKE_BEFORE_STOP	= (1 << 22), /* wake before DMA stop */
-	AHCI_HFLAG_YES_ALPM		= (1 << 23), /* force ALPM cap on */
-	AHCI_HFLAG_NO_WRITE_TO_RO	= (1 << 24), /* don't write to read
-							only registers */
-	AHCI_HFLAG_USE_LPM_POLICY	= (1 << 25), /* chipset that should use
-							SATA_MOBILE_LPM_POLICY
-							as default lpm_policy */
-	AHCI_HFLAG_SUSPEND_PHYS		= (1 << 26), /* handle PHYs during
-							suspend/resume */
-	AHCI_HFLAG_NO_SXS		= (1 << 28), /* SXS not supported */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* ap->flags bits */
 

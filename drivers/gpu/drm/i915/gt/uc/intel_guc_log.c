@@ -13,7 +13,6 @@
 #include "intel_guc_capture.h"
 #include "intel_guc_log.h"
 
-<<<<<<< HEAD
 #if defined(CONFIG_DRM_I915_DEBUG_GUC)
 #define GUC_LOG_DEFAULT_CRASH_BUFFER_SIZE	SZ_2M
 #define GUC_LOG_DEFAULT_DEBUG_BUFFER_SIZE	SZ_16M
@@ -170,9 +169,6 @@ static u32 intel_guc_log_size(struct intel_guc_log *log)
 		intel_guc_log_section_size_debug(log) +
 		intel_guc_log_section_size_capture(log);
 }
-=======
-static void guc_log_copy_debuglogs_for_relay(struct intel_guc_log *log);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * DOC: GuC firmware log
@@ -298,12 +294,8 @@ static void guc_move_to_next_buf(struct intel_guc_log *log)
 	smp_wmb();
 
 	/* All data has been written, so now move the offset of sub buffer. */
-<<<<<<< HEAD
 	relay_reserve(log->relay.channel, log->vma->obj->base.size -
 					  intel_guc_log_section_size_capture(log));
-=======
-	relay_reserve(log->relay.channel, log->vma->obj->base.size - CAPTURE_BUFFER_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Switch to the next sub buffer */
 	relay_flush(log->relay.channel);
@@ -348,7 +340,6 @@ bool intel_guc_check_log_buf_overflow(struct intel_guc_log *log,
 	return overflow;
 }
 
-<<<<<<< HEAD
 unsigned int intel_guc_get_log_buffer_size(struct intel_guc_log *log,
 					   enum guc_log_buffer_type type)
 {
@@ -359,17 +350,6 @@ unsigned int intel_guc_get_log_buffer_size(struct intel_guc_log *log,
 		return intel_guc_log_section_size_crash(log);
 	case GUC_CAPTURE_LOG_BUFFER:
 		return intel_guc_log_section_size_capture(log);
-=======
-unsigned int intel_guc_get_log_buffer_size(enum guc_log_buffer_type type)
-{
-	switch (type) {
-	case GUC_DEBUG_LOG_BUFFER:
-		return DEBUG_BUFFER_SIZE;
-	case GUC_CRASH_DUMP_LOG_BUFFER:
-		return CRASH_BUFFER_SIZE;
-	case GUC_CAPTURE_LOG_BUFFER:
-		return CAPTURE_BUFFER_SIZE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		MISSING_CASE(type);
 	}
@@ -377,12 +357,8 @@ unsigned int intel_guc_get_log_buffer_size(enum guc_log_buffer_type type)
 	return 0;
 }
 
-<<<<<<< HEAD
 size_t intel_guc_get_log_buffer_offset(struct intel_guc_log *log,
 				       enum guc_log_buffer_type type)
-=======
-size_t intel_guc_get_log_buffer_offset(enum guc_log_buffer_type type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	enum guc_log_buffer_type i;
 	size_t offset = PAGE_SIZE;/* for the log_buffer_states */
@@ -390,11 +366,7 @@ size_t intel_guc_get_log_buffer_offset(enum guc_log_buffer_type type)
 	for (i = GUC_DEBUG_LOG_BUFFER; i < GUC_MAX_LOG_BUFFER; ++i) {
 		if (i == type)
 			break;
-<<<<<<< HEAD
 		offset += intel_guc_get_log_buffer_size(log, i);
-=======
-		offset += intel_guc_get_log_buffer_size(i);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return offset;
@@ -445,11 +417,7 @@ static void _guc_log_copy_debuglogs_for_relay(struct intel_guc_log *log)
 		 */
 		memcpy(&log_buf_state_local, log_buf_state,
 		       sizeof(struct guc_log_buffer_state));
-<<<<<<< HEAD
 		buffer_size = intel_guc_get_log_buffer_size(log, type);
-=======
-		buffer_size = intel_guc_get_log_buffer_size(type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		read_offset = log_buf_state_local.read_ptr;
 		write_offset = log_buf_state_local.sampled_write_ptr;
 		full_cnt = log_buf_state_local.buffer_full_cnt;
@@ -564,11 +532,7 @@ static int guc_log_relay_create(struct intel_guc_log *log)
 	  * Keep the size of sub buffers same as shared log buffer
 	  * but GuC log-events excludes the error-state-capture logs
 	  */
-<<<<<<< HEAD
 	subbuf_size = log->vma->size - intel_guc_log_section_size_capture(log);
-=======
-	subbuf_size = log->vma->size - CAPTURE_BUFFER_SIZE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Store up to 8 snapshots, which is large enough to buffer sufficient
@@ -655,36 +619,7 @@ int intel_guc_log_create(struct intel_guc_log *log)
 
 	GEM_BUG_ON(log->vma);
 
-<<<<<<< HEAD
 	guc_log_size = intel_guc_log_size(log);
-=======
-	/*
-	 *  GuC Log buffer Layout
-	 * (this ordering must follow "enum guc_log_buffer_type" definition)
-	 *
-	 *  +===============================+ 00B
-	 *  |      Debug state header       |
-	 *  +-------------------------------+ 32B
-	 *  |    Crash dump state header    |
-	 *  +-------------------------------+ 64B
-	 *  |     Capture state header      |
-	 *  +-------------------------------+ 96B
-	 *  |                               |
-	 *  +===============================+ PAGE_SIZE (4KB)
-	 *  |          Debug logs           |
-	 *  +===============================+ + DEBUG_SIZE
-	 *  |        Crash Dump logs        |
-	 *  +===============================+ + CRASH_SIZE
-	 *  |         Capture logs          |
-	 *  +===============================+ + CAPTURE_SIZE
-	 */
-	if (intel_guc_capture_output_min_size_est(guc) > CAPTURE_BUFFER_SIZE)
-		DRM_WARN("GuC log buffer for state_capture maybe too small. %d < %d\n",
-			 CAPTURE_BUFFER_SIZE, intel_guc_capture_output_min_size_est(guc));
-
-	guc_log_size = PAGE_SIZE + CRASH_BUFFER_SIZE + DEBUG_BUFFER_SIZE +
-		       CAPTURE_BUFFER_SIZE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vma = intel_guc_allocate_vma(guc, guc_log_size);
 	if (IS_ERR(vma)) {
@@ -962,15 +897,12 @@ int intel_guc_log_dump(struct intel_guc_log *log, struct drm_printer *p,
 	if (!obj)
 		return 0;
 
-<<<<<<< HEAD
 	page = (u32 *)__get_free_page(GFP_KERNEL);
 	if (!page)
 		return -ENOMEM;
 
 	intel_guc_dump_time_info(guc, p);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	map = i915_gem_object_pin_map_unlocked(obj, I915_MAP_WC);
 	if (IS_ERR(map)) {
 		DRM_DEBUG("Failed to pin object\n");

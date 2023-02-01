@@ -427,16 +427,10 @@ static int intel_pt_track_switches(struct evlist *evlist)
 	if (!evlist__can_select_event(evlist, sched_switch))
 		return -EPERM;
 
-<<<<<<< HEAD
 	evsel = evlist__add_sched_switch(evlist, true);
 	if (IS_ERR(evsel)) {
 		err = PTR_ERR(evsel);
 		pr_debug2("%s: failed to create %s, error = %d\n",
-=======
-	err = parse_event(evlist, sched_switch);
-	if (err) {
-		pr_debug2("%s: failed to parse %s, error %d\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			  __func__, sched_switch, err);
 		return err;
 	}

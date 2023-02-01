@@ -126,7 +126,6 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, fmode_t mode,
 	uint64_t start, len;
 	uint64_t range[2];
 	int err;
-<<<<<<< HEAD
 
 	if (!(mode & FMODE_WRITE))
 		return -EBADF;
@@ -135,16 +134,6 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, fmode_t mode,
 	if (copy_from_user(range, argp, sizeof(range)))
 		return -EFAULT;
 
-=======
-
-	if (!(mode & FMODE_WRITE))
-		return -EBADF;
-	if (!bdev_max_secure_erase_sectors(bdev))
-		return -EOPNOTSUPP;
-	if (copy_from_user(range, argp, sizeof(range)))
-		return -EFAULT;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	start = range[0];
 	len = range[1];
 	if ((start & 511) || (len & 511))
@@ -539,12 +528,8 @@ static int blkdev_common_ioctl(struct file *file, fmode_t mode, unsigned cmd,
 			return -EACCES;
 		if (bdev_is_partition(bdev))
 			return -EINVAL;
-<<<<<<< HEAD
 		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL,
 					    file);
-=======
-		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case BLKTRACESTART:
 	case BLKTRACESTOP:
 	case BLKTRACETEARDOWN:

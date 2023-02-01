@@ -73,7 +73,6 @@ static void init_irq_stacks(void)
 }
 #endif
 
-<<<<<<< HEAD
 #ifndef CONFIG_PREEMPT_RT
 static void ____do_softirq(struct pt_regs *regs)
 {
@@ -86,8 +85,6 @@ void do_softirq_own_stack(void)
 }
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void default_handle_irq(struct pt_regs *regs)
 {
 	panic("IRQ taken without a root IRQ handler\n");

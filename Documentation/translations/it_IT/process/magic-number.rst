@@ -76,32 +76,9 @@ Nome magico           Numero           Struttura                File
 ===================== ================ ======================== ==========================================
 PG_MAGIC              'P'              pg_{read,write}_hdr      ``include/linux/pg.h``
 APM_BIOS_MAGIC        0x4101           apm_user                 ``arch/x86/kernel/apm_32.c``
-<<<<<<< HEAD
 FASYNC_MAGIC          0x4601           fasync_struct            ``include/linux/fs.h``
-=======
-DB_MAGIC              0x4442           fc_info                  ``drivers/net/iph5526_novram.c``
-DL_MAGIC              0x444d           fc_info                  ``drivers/net/iph5526_novram.c``
-FASYNC_MAGIC          0x4601           fasync_struct            ``include/linux/fs.h``
-FF_MAGIC              0x4646           fc_info                  ``drivers/net/iph5526_novram.c``
-PTY_MAGIC             0x5001                                    ``drivers/char/pty.c``
-PPP_MAGIC             0x5002           ppp                      ``include/linux/if_pppvar.h``
-SSTATE_MAGIC          0x5302           serial_state             ``include/linux/serial.h``
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 SLIP_MAGIC            0x5302           slip                     ``drivers/net/slip.h``
 MGSLPC_MAGIC          0x5402           mgslpc_info              ``drivers/char/pcmcia/synclink_cs.c``
-<<<<<<< HEAD
-=======
-USB_SERIAL_MAGIC      0x6702           usb_serial               ``drivers/usb/serial/usb-serial.h``
-FULL_DUPLEX_MAGIC     0x6969                                    ``drivers/net/ethernet/dec/tulip/de2104x.c``
-USB_BLUETOOTH_MAGIC   0x6d02           usb_bluetooth            ``drivers/usb/class/bluetty.c``
-RFCOMM_TTY_MAGIC      0x6d02                                    ``net/bluetooth/rfcomm/tty.c``
-USB_SERIAL_PORT_MAGIC 0x7301           usb_serial_port          ``drivers/usb/serial/usb-serial.h``
-CG_MAGIC              0x00090255       ufs_cylinder_group       ``include/linux/ufs_fs.h``
-LSEMAGIC              0x05091998       lse                      ``drivers/fc4/fc.c``
-RIEBL_MAGIC           0x09051990                                ``drivers/net/atarilance.c``
-NBD_REQUEST_MAGIC     0x12560953       nbd_request              ``include/linux/nbd.h``
-RED_MAGIC2            0x170fc2a5       (any)                    ``mm/slab.c``
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/net/baycom_epp.c``
 HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/linux/hdlcdrv.h``
 KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mips/include/asm/sn/klkernvars.h``

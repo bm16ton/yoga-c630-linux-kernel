@@ -208,13 +208,6 @@ DEFINE_SHOW_ATTRIBUTE(nfsd_reply_cache_stats);
 
 DEFINE_SHOW_ATTRIBUTE(nfsd_file_cache_stats);
 
-static const struct file_operations filecache_ops = {
-	.open		= nfsd_file_cache_stats_open,
-	.read		= seq_read,
-	.llseek		= seq_lseek,
-	.release	= single_release,
-};
-
 /*----------------------------------------------------------------------------*/
 /*
  * payload - write methods
@@ -1357,11 +1350,7 @@ static int nfsd_fill_super(struct super_block *sb, struct fs_context *fc)
 		[NFSD_Ports] = {"portlist", &transaction_ops, S_IWUSR|S_IRUGO},
 		[NFSD_MaxBlkSize] = {"max_block_size", &transaction_ops, S_IWUSR|S_IRUGO},
 		[NFSD_MaxConnections] = {"max_connections", &transaction_ops, S_IWUSR|S_IRUGO},
-<<<<<<< HEAD
 		[NFSD_Filecache] = {"filecache", &nfsd_file_cache_stats_fops, S_IRUGO},
-=======
-		[NFSD_Filecache] = {"filecache", &filecache_ops, S_IRUGO},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if defined(CONFIG_SUNRPC_GSS) || defined(CONFIG_SUNRPC_GSS_MODULE)
 		[NFSD_SupportedEnctypes] = {"supported_krb5_enctypes",
 					&supported_enctypes_fops, S_IRUGO},
@@ -1467,14 +1456,9 @@ static __net_init int nfsd_init_net(struct net *net)
 	retval = nfsd4_init_leases_net(nn);
 	if (retval)
 		goto out_drc_error;
-<<<<<<< HEAD
 	retval = nfsd_reply_cache_init(nn);
 	if (retval)
 		goto out_cache_error;
-=======
-	nfsd4_init_leases_net(nn);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	get_random_bytes(&nn->siphash_key, sizeof(nn->siphash_key));
 	seqlock_init(&nn->writeverf_lock);
 

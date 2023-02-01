@@ -14,7 +14,6 @@
 
 #include <asm/param.h> /* for HZ */
 
-<<<<<<< HEAD
 struct rcu_gp_oldstate {
 	unsigned long rgos_norm;
 };
@@ -52,25 +51,11 @@ bool poll_state_synchronize_rcu(unsigned long oldstate);
 static inline bool poll_state_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp)
 {
 	return poll_state_synchronize_rcu(rgosp->rgos_norm);
-=======
-unsigned long get_state_synchronize_rcu(void);
-unsigned long start_poll_synchronize_rcu(void);
-bool poll_state_synchronize_rcu(unsigned long oldstate);
+}
 
 static inline void cond_synchronize_rcu(unsigned long oldstate)
 {
 	might_sleep();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-}
-
-static inline unsigned long start_poll_synchronize_rcu_expedited(void)
-{
-	return start_poll_synchronize_rcu();
-}
-
-static inline void cond_synchronize_rcu_expedited(unsigned long oldstate)
-{
-	cond_synchronize_rcu(oldstate);
 }
 
 static inline void cond_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp)

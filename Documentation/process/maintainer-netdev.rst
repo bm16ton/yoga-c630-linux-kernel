@@ -319,7 +319,6 @@ unpatched tree to confirm infrastructure didn't mangle it.
 Finally, go back and read
 :ref:`Documentation/process/submitting-patches.rst <submittingpatches>`
 to be sure you are not repeating some common mistake documented there.
-<<<<<<< HEAD
 
 My company uses peer feedback in employee performance reviews. Can I ask netdev maintainers for feedback?
 ---------------------------------------------------------------------------------------------------------
@@ -330,5 +329,3 @@ and go out of your way to improve shared infrastructure.
 The feedback must be requested by you, the contributor, and will always
 be shared with you (even if you request for it to be submitted to your
 manager).
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

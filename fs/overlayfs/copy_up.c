@@ -44,11 +44,7 @@ static bool ovl_must_copy_xattr(const char *name)
 	       !strncmp(name, XATTR_SECURITY_PREFIX, XATTR_SECURITY_PREFIX_LEN);
 }
 
-<<<<<<< HEAD
 int ovl_copy_xattr(struct super_block *sb, const struct path *oldpath, struct dentry *new)
-=======
-int ovl_copy_xattr(struct super_block *sb, struct path *oldpath, struct dentry *new)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dentry *old = oldpath->dentry;
 	ssize_t list_size, size, value_size = 0;
@@ -136,74 +132,8 @@ out:
 	return error;
 }
 
-<<<<<<< HEAD
 static int ovl_copy_fileattr(struct inode *inode, const struct path *old,
 			     const struct path *new)
-=======
-static int ovl_copy_fileattr(struct inode *inode, struct path *old,
-			     struct path *new)
-{
-	struct fileattr oldfa = { .flags_valid = true };
-	struct fileattr newfa = { .flags_valid = true };
-	int err;
-
-	err = ovl_real_fileattr_get(old, &oldfa);
-	if (err) {
-		/* Ntfs-3g returns -EINVAL for "no fileattr support" */
-		if (err == -ENOTTY || err == -EINVAL)
-			return 0;
-		pr_warn("failed to retrieve lower fileattr (%pd2, err=%i)\n",
-			old->dentry, err);
-		return err;
-	}
-
-	/*
-	 * We cannot set immutable and append-only flags on upper inode,
-	 * because we would not be able to link upper inode to upper dir
-	 * not set overlay private xattr on upper inode.
-	 * Store these flags in overlay.protattr xattr instead.
-	 */
-	if (oldfa.flags & OVL_PROT_FS_FLAGS_MASK) {
-		err = ovl_set_protattr(inode, new->dentry, &oldfa);
-		if (err == -EPERM)
-			pr_warn_once("copying fileattr: no xattr on upper\n");
-		else if (err)
-			return err;
-	}
-
-	/* Don't bother copying flags if none are set */
-	if (!(oldfa.flags & OVL_COPY_FS_FLAGS_MASK))
-		return 0;
-
-	err = ovl_real_fileattr_get(new, &newfa);
-	if (err) {
-		/*
-		 * Returning an error if upper doesn't support fileattr will
-		 * result in a regression, so revert to the old behavior.
-		 */
-		if (err == -ENOTTY || err == -EINVAL) {
-			pr_warn_once("copying fileattr: no support on upper\n");
-			return 0;
-		}
-		pr_warn("failed to retrieve upper fileattr (%pd2, err=%i)\n",
-			new->dentry, err);
-		return err;
-	}
-
-	BUILD_BUG_ON(OVL_COPY_FS_FLAGS_MASK & ~FS_COMMON_FL);
-	newfa.flags &= ~OVL_COPY_FS_FLAGS_MASK;
-	newfa.flags |= (oldfa.flags & OVL_COPY_FS_FLAGS_MASK);
-
-	BUILD_BUG_ON(OVL_COPY_FSX_FLAGS_MASK & ~FS_XFLAG_COMMON);
-	newfa.fsx_xflags &= ~OVL_COPY_FSX_FLAGS_MASK;
-	newfa.fsx_xflags |= (oldfa.fsx_xflags & OVL_COPY_FSX_FLAGS_MASK);
-
-	return ovl_real_fileattr_set(new, &newfa);
-}
-
-static int ovl_copy_up_data(struct ovl_fs *ofs, struct path *old,
-			    struct path *new, loff_t len)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct fileattr oldfa = { .flags_valid = true };
 	struct fileattr newfa = { .flags_valid = true };
@@ -622,7 +552,6 @@ static int ovl_link_up(struct ovl_copy_up_ctx *c)
 static int ovl_copy_up_data(struct ovl_copy_up_ctx *c, const struct path *temp)
 {
 	struct ovl_fs *ofs = OVL_FS(c->dentry->d_sb);
-<<<<<<< HEAD
 	struct file *new_file;
 	int err;
 
@@ -646,30 +575,6 @@ static int ovl_copy_up_metadata(struct ovl_copy_up_ctx *c, struct dentry *temp)
 	struct path upperpath = { .mnt = ovl_upper_mnt(ofs), .dentry = temp };
 	int err;
 
-=======
-	struct inode *inode = d_inode(c->dentry);
-	struct path upperpath, datapath;
-	int err;
-
-	ovl_path_upper(c->dentry, &upperpath);
-	if (WARN_ON(upperpath.dentry != NULL))
-		return -EIO;
-
-	upperpath.dentry = temp;
-
-	/*
-	 * Copy up data first and then xattrs. Writing data after
-	 * xattrs will remove security.capability xattr automatically.
-	 */
-	if (S_ISREG(c->stat.mode) && !c->metacopy) {
-		ovl_path_lowerdata(c->dentry, &datapath);
-		err = ovl_copy_up_data(ofs, &datapath, &upperpath,
-				       c->stat.size);
-		if (err)
-			return err;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = ovl_copy_xattr(c->dentry->d_sb, &c->lowerpath, temp);
 	if (err)
 		return err;
@@ -839,11 +744,7 @@ static int ovl_copy_up_tmpfile(struct ovl_copy_up_ctx *c)
 	if (err)
 		return err;
 
-<<<<<<< HEAD
 	tmpfile = ovl_do_tmpfile(ofs, c->workdir, c->stat.mode);
-=======
-	temp = ovl_do_tmpfile(ofs, c->workdir, c->stat.mode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ovl_revert_cu_creds(&cc);
 
 	if (IS_ERR(tmpfile))
@@ -981,11 +882,7 @@ static bool ovl_need_meta_copy_up(struct dentry *dentry, umode_t mode,
 	return true;
 }
 
-<<<<<<< HEAD
 static ssize_t ovl_getxattr_value(const struct path *path, char *name, char **value)
-=======
-static ssize_t ovl_getxattr_value(struct path *path, char *name, char **value)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	ssize_t res;
 	char *buf;

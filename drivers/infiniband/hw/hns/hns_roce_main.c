@@ -365,7 +365,6 @@ static int hns_roce_alloc_ucontext(struct ib_ucontext *uctx,
 
 	resp.qp_tab_size = hr_dev->caps.num_qps;
 	resp.srq_tab_size = hr_dev->caps.num_srqs;
-<<<<<<< HEAD
 
 	ret = ib_copy_from_udata(&ucmd, udata,
 				 min(udata->inlen, sizeof(ucmd)));
@@ -379,8 +378,6 @@ static int hns_roce_alloc_ucontext(struct ib_ucontext *uctx,
 		resp.config |= HNS_ROCE_RSP_EXSGE_FLAGS;
 		resp.max_inline_data = hr_dev->caps.max_sq_inline;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = hns_roce_uar_alloc(hr_dev, &context->uar);
 	if (ret)
@@ -419,15 +416,9 @@ static void hns_roce_dealloc_ucontext(struct ib_ucontext *ibcontext)
 {
 	struct hns_roce_ucontext *context = to_hr_ucontext(ibcontext);
 	struct hns_roce_dev *hr_dev = to_hr_dev(ibcontext->device);
-<<<<<<< HEAD
 
 	hns_roce_dealloc_uar_entry(context);
 
-=======
-
-	hns_roce_dealloc_uar_entry(context);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ida_free(&hr_dev->uar_ida.ida, (int)context->uar.logic_idx);
 }
 
@@ -442,17 +433,10 @@ static int hns_roce_mmap(struct ib_ucontext *uctx, struct vm_area_struct *vma)
 	rdma_entry = rdma_user_mmap_entry_get_pgoff(uctx, vma->vm_pgoff);
 	if (!rdma_entry)
 		return -EINVAL;
-<<<<<<< HEAD
 
 	entry = to_hns_mmap(rdma_entry);
 	pfn = entry->address >> PAGE_SHIFT;
 
-=======
-
-	entry = to_hns_mmap(rdma_entry);
-	pfn = entry->address >> PAGE_SHIFT;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (entry->mmap_type) {
 	case HNS_ROCE_MMAP_TYPE_DB:
 	case HNS_ROCE_MMAP_TYPE_DWQE:
@@ -468,7 +452,6 @@ static int hns_roce_mmap(struct ib_ucontext *uctx, struct vm_area_struct *vma)
 	rdma_user_mmap_entry_put(rdma_entry);
 
 	return ret;
-<<<<<<< HEAD
 }
 
 static void hns_roce_free_mmap(struct rdma_user_mmap_entry *rdma_entry)
@@ -478,17 +461,6 @@ static void hns_roce_free_mmap(struct rdma_user_mmap_entry *rdma_entry)
 	kfree(entry);
 }
 
-=======
-}
-
-static void hns_roce_free_mmap(struct rdma_user_mmap_entry *rdma_entry)
-{
-	struct hns_user_mmap_entry *entry = to_hns_mmap(rdma_entry);
-
-	kfree(entry);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int hns_roce_port_immutable(struct ib_device *ib_dev, u32 port_num,
 				   struct ib_port_immutable *immutable)
 {
@@ -607,7 +579,6 @@ static const struct ib_device_ops hns_roce_dev_xrcd_ops = {
 	INIT_RDMA_OBJ_SIZE(ib_xrcd, hns_roce_xrcd, ibxrcd),
 };
 
-<<<<<<< HEAD
 static const struct ib_device_ops hns_roce_dev_restrack_ops = {
 	.fill_res_cq_entry = hns_roce_fill_res_cq_entry,
 	.fill_res_cq_entry_raw = hns_roce_fill_res_cq_entry_raw,
@@ -617,8 +588,6 @@ static const struct ib_device_ops hns_roce_dev_restrack_ops = {
 	.fill_res_mr_entry_raw = hns_roce_fill_res_mr_entry_raw,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int hns_roce_register_device(struct hns_roce_dev *hr_dev)
 {
 	int ret;
@@ -779,11 +748,7 @@ static int hns_roce_init_hem(struct hns_roce_dev *hr_dev)
 		ret = hns_roce_init_hem_table(hr_dev, &hr_dev->qpc_timer_table,
 					      HEM_TYPE_QPC_TIMER,
 					      hr_dev->caps.qpc_timer_entry_sz,
-<<<<<<< HEAD
 					      hr_dev->caps.qpc_timer_bt_num);
-=======
-					      hr_dev->caps.qpc_timer_bt_num, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret) {
 			dev_err(dev,
 				"failed to init QPC timer memory, aborting.\n");
@@ -795,11 +760,7 @@ static int hns_roce_init_hem(struct hns_roce_dev *hr_dev)
 		ret = hns_roce_init_hem_table(hr_dev, &hr_dev->cqc_timer_table,
 					      HEM_TYPE_CQC_TIMER,
 					      hr_dev->caps.cqc_timer_entry_sz,
-<<<<<<< HEAD
 					      hr_dev->caps.cqc_timer_bt_num);
-=======
-					      hr_dev->caps.cqc_timer_bt_num, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret) {
 			dev_err(dev,
 				"failed to init CQC timer memory, aborting.\n");
@@ -886,35 +847,15 @@ static int hns_roce_setup_hca(struct hns_roce_dev *hr_dev)
 
 	ret = hns_roce_init_qp_table(hr_dev);
 	if (ret) {
-<<<<<<< HEAD
 		dev_err(dev, "failed to init qp_table.\n");
 		goto err_uar_table_free;
 	}
 
 	hns_roce_init_pd_table(hr_dev);
-=======
-		dev_err(dev, "Failed to init qp_table.\n");
-		goto err_uar_table_free;
-	}
-
-	hns_roce_init_pd_table(hr_dev);
 
 	if (hr_dev->caps.flags & HNS_ROCE_CAP_FLAG_XRC)
 		hns_roce_init_xrcd_table(hr_dev);
 
-	hns_roce_init_mr_table(hr_dev);
-
-	hns_roce_init_cq_table(hr_dev);
-
-	if (hr_dev->caps.flags & HNS_ROCE_CAP_FLAG_SRQ) {
-		hns_roce_init_srq_table(hr_dev);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	if (hr_dev->caps.flags & HNS_ROCE_CAP_FLAG_XRC)
-		hns_roce_init_xrcd_table(hr_dev);
-
-<<<<<<< HEAD
 	hns_roce_init_mr_table(hr_dev);
 
 	hns_roce_init_cq_table(hr_dev);
@@ -924,8 +865,6 @@ static int hns_roce_setup_hca(struct hns_roce_dev *hr_dev)
 
 	return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_uar_table_free:
 	ida_destroy(&hr_dev->uar_ida.ida);
 	return ret;
@@ -985,11 +924,7 @@ int hns_roce_init(struct hns_roce_dev *hr_dev)
 	if (hr_dev->hw->cmq_init) {
 		ret = hr_dev->hw->cmq_init(hr_dev);
 		if (ret) {
-<<<<<<< HEAD
 			dev_err(dev, "init RoCE Command Queue failed!\n");
-=======
-			dev_err(dev, "Init RoCE Command Queue failed!\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return ret;
 		}
 	}

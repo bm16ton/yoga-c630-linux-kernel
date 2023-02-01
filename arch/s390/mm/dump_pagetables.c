@@ -8,10 +8,7 @@
 #include <linux/kasan.h>
 #include <asm/ptdump.h>
 #include <asm/kasan.h>
-<<<<<<< HEAD
 #include <asm/abs_lowcore.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/nospec-branch.h>
 #include <asm/sections.h>
 #include <asm/maccess.h>

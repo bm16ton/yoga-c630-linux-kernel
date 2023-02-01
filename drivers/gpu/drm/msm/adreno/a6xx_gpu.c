@@ -10,10 +10,7 @@
 
 #include <linux/bitfield.h>
 #include <linux/devfreq.h>
-<<<<<<< HEAD
 #include <linux/reset.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/soc/qcom/llcc-qcom.h>
 
 #define GPU_PAS_ID 13
@@ -911,8 +908,6 @@ static bool a6xx_ucode_check_version(struct a6xx_gpu *a6xx_gpu,
 			"a650 SQE ucode is too old. Have version %x need at least %x\n",
 			buf[0] & 0xfff, 0x095);
 	} else if (!strcmp(sqe_name, "a660_sqe.fw")) {
-		ret = true;
-	} else if (!strcmp(sqe_name, "a680_sqe.fw")) {
 		ret = true;
 	} else {
 		DRM_DEV_ERROR(&gpu->pdev->dev,
@@ -1921,11 +1916,7 @@ static u32 fuse_to_supp_hw(struct device *dev, struct adreno_rev rev, u32 fuse)
 
 static int a6xx_set_supported_hw(struct device *dev, struct adreno_rev rev)
 {
-<<<<<<< HEAD
 	u32 supp_hw;
-=======
-	u32 supp_hw = UINT_MAX;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 speedbin;
 	int ret;
 
@@ -1944,10 +1935,6 @@ static int a6xx_set_supported_hw(struct device *dev, struct adreno_rev rev)
 
 	supp_hw = fuse_to_supp_hw(dev, rev, speedbin);
 
-<<<<<<< HEAD
-=======
-done:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = devm_pm_opp_set_supported_hw(dev, &supp_hw, 1);
 	if (ret)
 		return ret;

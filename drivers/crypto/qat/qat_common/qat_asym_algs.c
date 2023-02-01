@@ -332,21 +332,13 @@ static int qat_dh_compute_value(struct kpp_request *req)
 	qat_req->in.dh.in_tab[n_input_params] = 0;
 	qat_req->out.dh.out_tab[1] = 0;
 	/* Mapping in.in.b or in.in_g2.xa is the same */
-<<<<<<< HEAD
 	qat_req->phy_in = dma_map_single(dev, &qat_req->in.dh,
-=======
-	qat_req->phy_in = dma_map_single(dev, &qat_req->in.dh.in.b,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 sizeof(struct qat_dh_input_params),
 					 DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, qat_req->phy_in)))
 		goto unmap_dst;
 
-<<<<<<< HEAD
 	qat_req->phy_out = dma_map_single(dev, &qat_req->out.dh,
-=======
-	qat_req->phy_out = dma_map_single(dev, &qat_req->out.dh.r,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					  sizeof(struct qat_dh_output_params),
 					  DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, qat_req->phy_out)))
@@ -737,21 +729,13 @@ static int qat_rsa_enc(struct akcipher_request *req)
 
 	qat_req->in.rsa.in_tab[3] = 0;
 	qat_req->out.rsa.out_tab[1] = 0;
-<<<<<<< HEAD
 	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa,
-=======
-	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa.enc.m,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 sizeof(struct qat_rsa_input_params),
 					 DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, qat_req->phy_in)))
 		goto unmap_dst;
 
-<<<<<<< HEAD
 	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa,
-=======
-	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa.enc.c,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					  sizeof(struct qat_rsa_output_params),
 					  DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, qat_req->phy_out)))
@@ -891,21 +875,13 @@ static int qat_rsa_dec(struct akcipher_request *req)
 	else
 		qat_req->in.rsa.in_tab[3] = 0;
 	qat_req->out.rsa.out_tab[1] = 0;
-<<<<<<< HEAD
 	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa,
-=======
-	qat_req->phy_in = dma_map_single(dev, &qat_req->in.rsa.dec.c,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 sizeof(struct qat_rsa_input_params),
 					 DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, qat_req->phy_in)))
 		goto unmap_dst;
 
-<<<<<<< HEAD
 	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa,
-=======
-	qat_req->phy_out = dma_map_single(dev, &qat_req->out.rsa.dec.m,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					  sizeof(struct qat_rsa_output_params),
 					  DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, qat_req->phy_out)))

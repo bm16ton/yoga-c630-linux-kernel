@@ -19,7 +19,6 @@
 		device_type = "memory";
 		reg = <0x0 0x80000000 0 0x80000000>;
 	};
-<<<<<<< HEAD
 
 	clock_ext_rmii: clock-ext-rmii {
 		compatible = "fixed-clock";
@@ -35,8 +34,6 @@
 		clock-output-names = "ext_ts_clk";
 		#clock-cells = <0>;
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &lpuart5 {
@@ -56,7 +53,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &fec {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_enet>;
@@ -100,9 +96,6 @@
 		>;
 	};
 
-=======
-&iomuxc1 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pinctrl_lpuart5: lpuart5grp {
 		fsl,pins = <
 			MX8ULP_PAD_PTF14__LPUART5_TX	0x3

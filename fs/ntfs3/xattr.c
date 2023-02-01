@@ -107,11 +107,7 @@ static int ntfs_read_ea(struct ntfs_inode *ni, struct EA_FULL **ea,
 		return -EFBIG;
 
 	/* Allocate memory for packed Ea. */
-<<<<<<< HEAD
 	ea_p = kmalloc(size_add(size, add_bytes), GFP_NOFS);
-=======
-	ea_p = kmalloc(size + add_bytes, GFP_NOFS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ea_p)
 		return -ENOMEM;
 

@@ -480,7 +480,6 @@ static int fsl_esai_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 
 	/* DAI clock provider masks */
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FC:
 		esai_priv->consumer_mode = true;
 		break;
@@ -491,18 +490,6 @@ static int fsl_esai_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		xccr |= ESAI_xCCR_xFSD;
 		break;
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	case SND_SOC_DAIFMT_CBP_CFP:
-		esai_priv->consumer_mode = true;
-		break;
-	case SND_SOC_DAIFMT_CBC_CFP:
-		xccr |= ESAI_xCCR_xCKD;
-		break;
-	case SND_SOC_DAIFMT_CBP_CFC:
-		xccr |= ESAI_xCCR_xFSD;
-		break;
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		xccr |= ESAI_xCCR_xFSD | ESAI_xCCR_xCKD;
 		break;
 	default:
@@ -1064,17 +1051,9 @@ static int fsl_esai_probe(struct platform_device *pdev)
 			goto err_pm_disable;
 	}
 
-<<<<<<< HEAD
 	ret = pm_runtime_resume_and_get(&pdev->dev);
 	if (ret < 0)
 		goto err_pm_get_sync;
-=======
-	ret = pm_runtime_get_sync(&pdev->dev);
-	if (ret < 0) {
-		pm_runtime_put_noidle(&pdev->dev);
-		goto err_pm_get_sync;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = fsl_esai_hw_init(esai_priv);
 	if (ret)

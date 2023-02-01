@@ -692,20 +692,12 @@ void *sys_mmap(void *addr, size_t length, int prot, int flags, int fd,
 {
 #ifndef my_syscall6
 	/* Function not implemented. */
-<<<<<<< HEAD
 	return (void *)-ENOSYS;
-=======
-	return -ENOSYS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 
 	int n;
 
-<<<<<<< HEAD
 #if defined(__NR_mmap2)
-=======
-#if defined(__i386__)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	n = __NR_mmap2;
 	offset >>= 12;
 #else

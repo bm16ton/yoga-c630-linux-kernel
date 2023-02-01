@@ -559,10 +559,7 @@ static bool mptcp_supported_sockopt(int level, int optname)
 		case TCP_NOTSENT_LOWAT:
 		case TCP_TX_DELAY:
 		case TCP_INQ:
-<<<<<<< HEAD
 		case TCP_FASTOPEN_CONNECT:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return true;
 		}
 
@@ -571,11 +568,7 @@ static bool mptcp_supported_sockopt(int level, int optname)
 		/* TCP_REPAIR, TCP_REPAIR_QUEUE, TCP_QUEUE_SEQ, TCP_REPAIR_OPTIONS,
 		 * TCP_REPAIR_WINDOW are not supported, better avoid this mess
 		 */
-<<<<<<< HEAD
 		/* TCP_FASTOPEN_KEY, TCP_FASTOPEN, TCP_FASTOPEN_NO_COOKIE,
-=======
-		/* TCP_FASTOPEN_KEY, TCP_FASTOPEN TCP_FASTOPEN_CONNECT, TCP_FASTOPEN_NO_COOKIE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * are not supported fastopen is currently unsupported
 		 */
 	}
@@ -776,7 +769,6 @@ static int mptcp_setsockopt_sol_tcp_defer(struct mptcp_sock *msk, sockptr_t optv
 	return tcp_setsockopt(listener->sk, SOL_TCP, TCP_DEFER_ACCEPT, optval, optlen);
 }
 
-<<<<<<< HEAD
 static int mptcp_setsockopt_sol_tcp_fastopen_connect(struct mptcp_sock *msk, sockptr_t optval,
 						     unsigned int optlen)
 {
@@ -790,8 +782,6 @@ static int mptcp_setsockopt_sol_tcp_fastopen_connect(struct mptcp_sock *msk, soc
 	return tcp_setsockopt(sock->sk, SOL_TCP, TCP_FASTOPEN_CONNECT, optval, optlen);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int mptcp_setsockopt_sol_tcp(struct mptcp_sock *msk, int optname,
 				    sockptr_t optval, unsigned int optlen)
 {
@@ -820,11 +810,8 @@ static int mptcp_setsockopt_sol_tcp(struct mptcp_sock *msk, int optname,
 		return mptcp_setsockopt_sol_tcp_nodelay(msk, optval, optlen);
 	case TCP_DEFER_ACCEPT:
 		return mptcp_setsockopt_sol_tcp_defer(msk, optval, optlen);
-<<<<<<< HEAD
 	case TCP_FASTOPEN_CONNECT:
 		return mptcp_setsockopt_sol_tcp_fastopen_connect(msk, optval, optlen);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return -EOPNOTSUPP;
@@ -1186,10 +1173,7 @@ static int mptcp_getsockopt_sol_tcp(struct mptcp_sock *msk, int optname,
 	case TCP_INFO:
 	case TCP_CC_INFO:
 	case TCP_DEFER_ACCEPT:
-<<<<<<< HEAD
 	case TCP_FASTOPEN_CONNECT:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return mptcp_getsockopt_first_sf_only(msk, SOL_TCP, optname,
 						      optval, optlen);
 	case TCP_INQ:

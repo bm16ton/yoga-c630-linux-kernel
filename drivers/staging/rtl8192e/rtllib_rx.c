@@ -591,11 +591,7 @@ static void RxReorderIndicatePacket(struct rtllib_device *ieee,
 		netdev_dbg(ieee->dev,
 			   "Packet Drop! IndicateSeq: %d, NewSeq: %d\n",
 			   pTS->rx_indicate_seq, SeqNum);
-<<<<<<< HEAD
 		pHTInfo->rx_reorder_drop_counter++;
-=======
-		pHTInfo->RxReorderDropCounter++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		{
 			int i;
 
@@ -759,11 +755,7 @@ static void RxReorderIndicatePacket(struct rtllib_device *ieee,
 		netdev_dbg(ieee->dev, "%s(): SET rx timeout timer\n", __func__);
 		pTS->rx_timeout_indicate_seq = pTS->rx_indicate_seq;
 		mod_timer(&pTS->rx_pkt_pending_timer, jiffies +
-<<<<<<< HEAD
 			  msecs_to_jiffies(pHTInfo->rx_reorder_pending_time));
-=======
-			  msecs_to_jiffies(pHTInfo->RxReorderPendingTime));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	spin_unlock_irqrestore(&(ieee->reorder_spinlock), flags);
 }

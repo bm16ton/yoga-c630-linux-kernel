@@ -6,7 +6,4 @@ source "drivers/media/platform/mediatek/jpeg/Kconfig"
 source "drivers/media/platform/mediatek/mdp/Kconfig"
 source "drivers/media/platform/mediatek/vcodec/Kconfig"
 source "drivers/media/platform/mediatek/vpu/Kconfig"
-<<<<<<< HEAD
 source "drivers/media/platform/mediatek/mdp3/Kconfig"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

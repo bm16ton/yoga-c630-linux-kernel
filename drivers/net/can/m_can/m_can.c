@@ -1022,7 +1022,6 @@ static int m_can_echo_tx_event(struct net_device *dev)
 
 		/* retrieve get index */
 		fgi = FIELD_GET(TXEFS_EFGI_MASK, m_can_read(cdev, M_CAN_TXEFS));
-<<<<<<< HEAD
 
 		/* get message marker, timestamp */
 		err = m_can_txe_fifo_read(cdev, fgi, 4, &txe);
@@ -1031,16 +1030,6 @@ static int m_can_echo_tx_event(struct net_device *dev)
 			return err;
 		}
 
-=======
-
-		/* get message marker, timestamp */
-		err = m_can_txe_fifo_read(cdev, fgi, 4, &txe);
-		if (err) {
-			netdev_err(dev, "TXE FIFO read returned %d\n", err);
-			return err;
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		msg_mark = FIELD_GET(TX_EVENT_MM_MASK, txe);
 		timestamp = FIELD_GET(TX_EVENT_TXTS_MASK, txe) << 16;
 
@@ -1492,12 +1481,7 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
 	}
 
 	if (!cdev->is_peripheral)
-<<<<<<< HEAD
 		netif_napi_add(dev, &cdev->napi, m_can_poll);
-=======
-		netif_napi_add(dev, &cdev->napi,
-			       m_can_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Shared properties of all M_CAN versions */
 	cdev->version = m_can_version;
@@ -1829,13 +1813,9 @@ static int m_can_open(struct net_device *dev)
 	}
 
 	/* start the m_can controller */
-<<<<<<< HEAD
 	err = m_can_start(dev);
 	if (err)
 		goto exit_irq_fail;
-=======
-	m_can_start(dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!cdev->is_peripheral)
 		napi_enable(&cdev->napi);

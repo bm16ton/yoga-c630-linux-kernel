@@ -319,7 +319,6 @@ static void do_signal(struct pt_regs *regs)
 asmlinkage __visible void do_work_pending(struct pt_regs *regs,
 					  unsigned long thread_info_flags)
 {
-<<<<<<< HEAD
 	do {
 		if (thread_info_flags & _TIF_NEED_RESCHED) {
 			schedule();
@@ -337,15 +336,4 @@ asmlinkage __visible void do_work_pending(struct pt_regs *regs,
 		local_irq_disable();
 		thread_info_flags = read_thread_flags();
 	} while (thread_info_flags & _TIF_WORK_MASK);
-=======
-	if (thread_info_flags & _TIF_UPROBE)
-		uprobe_notify_resume(regs);
-
-	/* Handle pending signal delivery */
-	if (thread_info_flags & (_TIF_SIGPENDING | _TIF_NOTIFY_SIGNAL))
-		do_signal(regs);
-
-	if (thread_info_flags & _TIF_NOTIFY_RESUME)
-		resume_user_mode_work(regs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

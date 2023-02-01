@@ -843,17 +843,10 @@
 					port@0 {
 						reg = <0>;
 					};
-<<<<<<< HEAD
 
 					port@1 {
 						reg = <1>;
 
-=======
-
-					port@1 {
-						reg = <1>;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						mipi_vc0_to_csi_mux: endpoint {
 							remote-endpoint = <&csi_mux_from_mipi_vc0>;
 						};
@@ -1277,10 +1270,10 @@
 			clocks = <&clks IMX7D_NAND_USDHC_BUS_RAWNAND_CLK>;
 		};
 
-		gpmi: nand-controller@33002000 {
+		gpmi: nand-controller@33002000{
 			compatible = "fsl,imx7d-gpmi-nand";
 			#address-cells = <1>;
-			#size-cells = <0>;
+			#size-cells = <1>;
 			reg = <0x33002000 0x2000>, <0x33004000 0x4000>;
 			reg-names = "gpmi-nand", "bch";
 			interrupts = <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>;

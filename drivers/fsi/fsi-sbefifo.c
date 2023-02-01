@@ -477,12 +477,8 @@ static int sbefifo_wait(struct sbefifo *sbefifo, bool up,
 	if (!ready) {
 		sysfs_notify(&sbefifo->dev.kobj, NULL, dev_attr_timeout.attr.name);
 		sbefifo->timed_out = true;
-<<<<<<< HEAD
 		dev_err(dev, "%s FIFO Timeout (%u ms)! status=%08x\n",
 			up ? "UP" : "DOWN", jiffies_to_msecs(timeout), sts);
-=======
-		dev_err(dev, "%s FIFO Timeout ! status=%08x\n", up ? "UP" : "DOWN", sts);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ETIMEDOUT;
 	}
 	dev_vdbg(dev, "End of wait status: %08x\n", sts);

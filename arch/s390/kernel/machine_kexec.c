@@ -232,13 +232,9 @@ void arch_crash_save_vmcoreinfo(void)
 	vmcoreinfo_append_str("SAMODE31=%lx\n", __samode31);
 	vmcoreinfo_append_str("EAMODE31=%lx\n", __eamode31);
 	vmcoreinfo_append_str("KERNELOFFSET=%lx\n", kaslr_offset());
-<<<<<<< HEAD
 	abs_lc = get_abs_lowcore(&flags);
 	abs_lc->vmcore_info = paddr_vmcoreinfo_note();
 	put_abs_lowcore(abs_lc, flags);
-=======
-	put_abs_lowcore(vmcore_info, paddr_vmcoreinfo_note());
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void machine_shutdown(void)

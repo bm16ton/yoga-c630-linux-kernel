@@ -93,11 +93,7 @@ struct mlx5e_ktls_offload_context_tx {
 	bool ctx_post_pending;
 	/* control / resync */
 	struct list_head list_node; /* member of the pool */
-<<<<<<< HEAD
 	union mlx5e_crypto_info crypto_info;
-=======
-	struct tls12_crypto_info_aes_gcm_128 crypto_info;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct tls_offload_context_tx *tx_ctx;
 	struct mlx5_core_dev *mdev;
 	struct mlx5e_tls_sw_stats *sw_stats;

@@ -645,11 +645,7 @@ qh_urb_transaction (
 		token |= (1 /* "in" */ << 8);
 	/* else it's already initted to "out" pid (0 << 8) */
 
-<<<<<<< HEAD
 	maxpacket = usb_endpoint_maxp(&urb->ep->desc);
-=======
-	maxpacket = usb_maxpacket(urb->dev, urb->pipe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * buffer gets wrapped in one or more qtds;
@@ -1222,11 +1218,7 @@ static int ehci_submit_single_step_set_feature(
 
 	token |= (1 /* "in" */ << 8);  /*This is IN stage*/
 
-<<<<<<< HEAD
 	maxpacket = usb_endpoint_maxp(&urb->ep->desc);
-=======
-	maxpacket = usb_maxpacket(urb->dev, urb->pipe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	qtd_fill(ehci, qtd, buf, len, token, maxpacket);
 

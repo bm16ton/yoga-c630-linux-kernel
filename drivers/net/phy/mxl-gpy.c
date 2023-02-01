@@ -9,10 +9,7 @@
 #include <linux/module.h>
 #include <linux/bitfield.h>
 #include <linux/hwmon.h>
-<<<<<<< HEAD
 #include <linux/mutex.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/phy.h>
 #include <linux/polynomial.h>
 #include <linux/netdevice.h>
@@ -74,7 +71,6 @@
 #define VPSPEC1_TEMP_STA	0x0E
 #define VPSPEC1_TEMP_STA_DATA	GENMASK(9, 0)
 
-<<<<<<< HEAD
 /* Mailbox */
 #define VSPEC1_MBOX_DATA	0x5
 #define VSPEC1_MBOX_ADDRLO	0x6
@@ -83,8 +79,6 @@
 #define VSPEC1_MBOX_CMD_RD	(0 << 8)
 #define VSPEC1_MBOX_CMD_READY	BIT(15)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* WoL */
 #define VPSPEC2_WOL_CTL		0x0E06
 #define VPSPEC2_WOL_AD01	0x0E08
@@ -92,7 +86,6 @@
 #define VPSPEC2_WOL_AD45	0x0E0A
 #define WOL_EN			BIT(0)
 
-<<<<<<< HEAD
 /* Internal registers, access via mbox */
 #define REG_GPIO0_OUT		0xd3ce00
 
@@ -100,9 +93,6 @@ struct gpy_priv {
 	/* serialize mailbox acesses */
 	struct mutex mbox_lock;
 
-=======
-struct gpy_priv {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 fw_major;
 	u8 fw_minor;
 };
@@ -212,7 +202,6 @@ static int gpy_hwmon_register(struct phy_device *phydev)
 }
 #endif
 
-<<<<<<< HEAD
 static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
 {
 	struct gpy_priv *priv = phydev->priv;
@@ -252,8 +241,6 @@ out:
 	return ret;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int gpy_config_init(struct phy_device *phydev)
 {
 	int ret;
@@ -268,7 +255,6 @@ static int gpy_config_init(struct phy_device *phydev)
 	return ret < 0 ? ret : 0;
 }
 
-<<<<<<< HEAD
 static bool gpy_has_broken_mdint(struct phy_device *phydev)
 {
 	/* At least these PHYs are known to have broken interrupt handling */
@@ -276,8 +262,6 @@ static bool gpy_has_broken_mdint(struct phy_device *phydev)
 	       phydev->drv->phy_id == PHY_ID_GPY215C;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int gpy_probe(struct phy_device *phydev)
 {
 	struct device *dev = &phydev->mdio.dev;
@@ -295,10 +279,7 @@ static int gpy_probe(struct phy_device *phydev)
 	if (!priv)
 		return -ENOMEM;
 	phydev->priv = priv;
-<<<<<<< HEAD
 	mutex_init(&priv->mbox_lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	fw_version = phy_read(phydev, PHY_FWV);
 	if (fw_version < 0)
@@ -573,7 +554,6 @@ static irqreturn_t gpy_handle_interrupt(struct phy_device *phydev)
 	if (!(reg & PHY_IMASK_MASK))
 		return IRQ_NONE;
 
-<<<<<<< HEAD
 	/* The PHY might leave the interrupt line asserted even after PHY_ISTAT
 	 * is read. To avoid interrupt storms, delay the interrupt handling as
 	 * long as the PHY drives the interrupt line. An internal bus read will
@@ -597,8 +577,6 @@ static irqreturn_t gpy_handle_interrupt(struct phy_device *phydev)
 		}
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phy_trigger_machine(phydev);
 
 	return IRQ_HANDLED;

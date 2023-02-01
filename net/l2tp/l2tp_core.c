@@ -1484,10 +1484,6 @@ int l2tp_tunnel_register(struct l2tp_tunnel *tunnel, struct net *net,
 	tunnel->l2tp_net = net;
 	pn = l2tp_pernet(net);
 
-<<<<<<< HEAD
-=======
-	sk = sock->sk;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sock_hold(sk);
 	tunnel->sock = sk;
 

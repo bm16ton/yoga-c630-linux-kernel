@@ -1015,11 +1015,7 @@ check_hwcfg_error:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void og01a1b_remove(struct i2c_client *client)
-=======
-static int og01a1b_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct og01a1b *og01a1b = to_og01a1b(sd);
@@ -1029,11 +1025,6 @@ static int og01a1b_remove(struct i2c_client *client)
 	v4l2_ctrl_handler_free(sd->ctrl_handler);
 	pm_runtime_disable(&client->dev);
 	mutex_destroy(&og01a1b->mutex);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int og01a1b_probe(struct i2c_client *client)

@@ -67,10 +67,7 @@
 #include <linux/io_uring.h>
 #include <linux/kprobes.h>
 #include <linux/rethook.h>
-<<<<<<< HEAD
 #include <linux/sysfs.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <linux/uaccess.h>
 #include <asm/unistd.h>
@@ -429,17 +426,10 @@ static void coredump_task_exit(struct task_struct *tsk)
 			complete(&core_state->startup);
 
 		for (;;) {
-<<<<<<< HEAD
 			set_current_state(TASK_UNINTERRUPTIBLE|TASK_FREEZABLE);
 			if (!self.task) /* see coredump_finish() */
 				break;
 			schedule();
-=======
-			set_current_state(TASK_UNINTERRUPTIBLE);
-			if (!self.task) /* see coredump_finish() */
-				break;
-			freezable_schedule();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		__set_current_state(TASK_RUNNING);
 	}
@@ -817,11 +807,8 @@ void __noreturn do_exit(long code)
 	struct task_struct *tsk = current;
 	int group_dead;
 
-<<<<<<< HEAD
 	synchronize_group_exit(tsk, code);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	WARN_ON(tsk->plug);
 
 	kcov_task_exit(tsk);
@@ -944,10 +931,7 @@ void __noreturn make_task_dead(int signr)
 	 * Then do everything else.
 	 */
 	struct task_struct *tsk = current;
-<<<<<<< HEAD
 	unsigned int limit;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(in_interrupt()))
 		panic("Aiee, killing interrupt handler!");
@@ -960,7 +944,6 @@ void __noreturn make_task_dead(int signr)
 			preempt_count());
 		preempt_count_set(PREEMPT_ENABLED);
 	}
-<<<<<<< HEAD
 
 	/*
 	 * Every time the system oopses, if the oops happens while a reference
@@ -988,21 +971,6 @@ void __noreturn make_task_dead(int signr)
 		do_task_dead();
 	}
 
-=======
-
-	/*
-	 * We're taking recursive faults here in make_task_dead. Safest is to just
-	 * leave this task alone and wait for reboot.
-	 */
-	if (unlikely(tsk->flags & PF_EXITING)) {
-		pr_alert("Fixing recursive fault but reboot is needed!\n");
-		futex_exit_recursive(tsk);
-		tsk->exit_state = EXIT_DEAD;
-		refcount_inc(&tsk->rcu_users);
-		do_task_dead();
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	do_exit(signr);
 }
 
@@ -1024,11 +992,7 @@ do_group_exit(int exit_code)
 		exit_code = sig->group_exit_code;
 	else if (sig->group_exec_task)
 		exit_code = 0;
-<<<<<<< HEAD
 	else {
-=======
-	else if (!thread_group_empty(current)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct sighand_struct *const sighand = current->sighand;
 
 		spin_lock_irq(&sighand->siglock);
@@ -1636,7 +1600,6 @@ repeat:
 			goto end;
 	} else {
 		struct task_struct *tsk = current;
-<<<<<<< HEAD
 
 		do {
 			retval = do_wait_thread(wo, tsk);
@@ -1647,18 +1610,6 @@ repeat:
 			if (retval)
 				goto end;
 
-=======
-
-		do {
-			retval = do_wait_thread(wo, tsk);
-			if (retval)
-				goto end;
-
-			retval = ptrace_do_wait(wo, tsk);
-			if (retval)
-				goto end;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (wo->wo_flags & __WNOTHREAD)
 				break;
 		} while_each_thread(current, tsk);

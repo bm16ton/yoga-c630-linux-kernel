@@ -2815,15 +2815,8 @@ static void phy_bcast_v2_hw(int phy_no, struct hisi_hba *hisi_hba)
 
 	hisi_sas_phy_write32(hisi_hba, phy_no, SL_RX_BCAST_CHK_MSK, 1);
 	bcast_status = hisi_sas_phy_read32(hisi_hba, phy_no, RX_PRIMS_STATUS);
-<<<<<<< HEAD
 	if (bcast_status & RX_BCAST_CHG_MSK)
 		hisi_sas_phy_bcast(phy);
-=======
-	if ((bcast_status & RX_BCAST_CHG_MSK) &&
-	    !test_bit(HISI_SAS_RESETTING_BIT, &hisi_hba->flags))
-		sas_notify_port_event(sas_phy, PORTE_BROADCAST_RCVD,
-				      GFP_ATOMIC);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hisi_sas_phy_write32(hisi_hba, phy_no, CHL_INT0,
 			     CHL_INT0_SL_RX_BCST_ACK_MSK);
 	hisi_sas_phy_write32(hisi_hba, phy_no, SL_RX_BCAST_CHK_MSK, 0);
@@ -3541,11 +3534,7 @@ static struct attribute *host_v2_hw_attrs[] = {
 
 ATTRIBUTE_GROUPS(host_v2_hw);
 
-<<<<<<< HEAD
 static void map_queues_v2_hw(struct Scsi_Host *shost)
-=======
-static int map_queues_v2_hw(struct Scsi_Host *shost)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct hisi_hba *hisi_hba = shost_priv(shost);
 	struct blk_mq_queue_map *qmap = &shost->tag_set.map[HCTX_TYPE_DEFAULT];

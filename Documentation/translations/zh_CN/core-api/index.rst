@@ -44,25 +44,15 @@
    assoc_array
    xarray
    rbtree
-<<<<<<< HEAD
    idr
    circular-buffers
    generic-radix-tree
    packing
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Todolist:
 
 
 
-<<<<<<< HEAD
-=======
-   idr
-   circular-buffers
-   generic-radix-tree
-   packing
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
    this_cpu_ops
    timekeeping
    errseq

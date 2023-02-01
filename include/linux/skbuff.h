@@ -164,17 +164,10 @@
  *
  * Checksumming on transmit for non-GSO
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-<<<<<<< HEAD
  *
  * The stack requests checksum offload in the &sk_buff.ip_summed for a packet.
  * Values are:
  *
-=======
- *
- * The stack requests checksum offload in the &sk_buff.ip_summed for a packet.
- * Values are:
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * - %CHECKSUM_PARTIAL
  *
  *   The driver is required to checksum the packet as seen by hard_start_xmit()
@@ -1211,12 +1204,8 @@ static inline bool skb_unref(struct sk_buff *skb)
 	return true;
 }
 
-<<<<<<< HEAD
 void __fix_address
 kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason);
-=======
-void kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  *	kfree_skb - free an sk_buff with 'NOT_SPECIFIED' reason
@@ -2626,20 +2615,6 @@ static inline void *skb_pull_inline(struct sk_buff *skb, unsigned int len)
 }
 
 void *skb_pull_data(struct sk_buff *skb, size_t len);
-<<<<<<< HEAD
-=======
-
-void *__pskb_pull_tail(struct sk_buff *skb, int delta);
-
-static inline void *__pskb_pull(struct sk_buff *skb, unsigned int len)
-{
-	if (len > skb_headlen(skb) &&
-	    !__pskb_pull_tail(skb, len - skb_headlen(skb)))
-		return NULL;
-	skb->len -= len;
-	return skb->data += len;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void *__pskb_pull_tail(struct sk_buff *skb, int delta);
 
@@ -4157,7 +4132,6 @@ static inline void skb_clear_delivery_time(struct sk_buff *skb)
 }
 
 static inline void skb_clear_tstamp(struct sk_buff *skb)
-<<<<<<< HEAD
 {
 	if (skb->mono_delivery_time)
 		return;
@@ -4168,18 +4142,6 @@ static inline void skb_clear_tstamp(struct sk_buff *skb)
 static inline ktime_t skb_tstamp(const struct sk_buff *skb)
 {
 	if (skb->mono_delivery_time)
-=======
-{
-	if (skb->mono_delivery_time)
-		return;
-
-	skb->tstamp = 0;
-}
-
-static inline ktime_t skb_tstamp(const struct sk_buff *skb)
-{
-	if (skb->mono_delivery_time)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	return skb->tstamp;

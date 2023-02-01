@@ -544,7 +544,6 @@ void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
 	__nested_map(vmx, vm, addr, addr, size, PG_LEVEL_1G);
 }
 
-<<<<<<< HEAD
 bool kvm_vm_has_ept(struct kvm_vm *vm)
 {
 	struct kvm_vcpu *vcpu;
@@ -566,11 +565,6 @@ void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
 {
 	TEST_REQUIRE(kvm_vm_has_ept(vm));
 
-=======
-void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
-		  uint32_t eptp_memslot)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vmx->eptp = (void *)vm_vaddr_alloc_page(vm);
 	vmx->eptp_hva = addr_gva2hva(vm, (uintptr_t)vmx->eptp);
 	vmx->eptp_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->eptp);

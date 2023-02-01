@@ -1469,11 +1469,8 @@ static void __update_context_time(struct perf_event_context *ctx, bool adv)
 {
 	u64 now = perf_clock();
 
-<<<<<<< HEAD
 	lockdep_assert_held(&ctx->lock);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (adv)
 		ctx->time += now - ctx->timestamp;
 	ctx->timestamp = now;
@@ -2294,10 +2291,7 @@ event_sched_out(struct perf_event *event,
 		    !event->pending_work) {
 			event->pending_work = 1;
 			dec = false;
-<<<<<<< HEAD
 			WARN_ON_ONCE(!atomic_long_inc_not_zero(&event->refcount));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			task_work_add(current, &event->pending_task, TWA_RESUME);
 		}
 		if (dec)
@@ -4296,64 +4290,6 @@ static void perf_event_enable_on_exec(int ctxn)
 out:
 	local_irq_restore(flags);
 
-	if (clone_ctx)
-		put_ctx(clone_ctx);
-}
-
-static void perf_remove_from_owner(struct perf_event *event);
-static void perf_event_exit_event(struct perf_event *event,
-				  struct perf_event_context *ctx);
-
-/*
- * Removes all events from the current task that have been marked
- * remove-on-exec, and feeds their values back to parent events.
- */
-static void perf_event_remove_on_exec(int ctxn)
-{
-	struct perf_event_context *ctx, *clone_ctx = NULL;
-	struct perf_event *event, *next;
-	unsigned long flags;
-	bool modified = false;
-
-	ctx = perf_pin_task_context(current, ctxn);
-	if (!ctx)
-		return;
-
-	mutex_lock(&ctx->mutex);
-
-	if (WARN_ON_ONCE(ctx->task != current))
-		goto unlock;
-
-	list_for_each_entry_safe(event, next, &ctx->event_list, event_entry) {
-		if (!event->attr.remove_on_exec)
-			continue;
-
-		if (!is_kernel_event(event))
-			perf_remove_from_owner(event);
-
-		modified = true;
-
-		perf_event_exit_event(event, ctx);
-	}
-
-	raw_spin_lock_irqsave(&ctx->lock, flags);
-	if (modified)
-		clone_ctx = unclone_ctx(ctx);
-<<<<<<< HEAD
-		ctx_resched(cpuctx, ctx, event_type);
-	} else {
-		ctx_sched_in(ctx, cpuctx, EVENT_TIME);
-	}
-	perf_ctx_unlock(cpuctx, ctx);
-=======
-	--ctx->pin_count;
-	raw_spin_unlock_irqrestore(&ctx->lock, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-unlock:
-	mutex_unlock(&ctx->mutex);
-
-	put_ctx(ctx);
 	if (clone_ctx)
 		put_ctx(clone_ctx);
 }
@@ -6648,28 +6584,17 @@ static void perf_pending_task(struct callback_head *head)
 	if (rctx >= 0)
 		perf_swevent_put_recursion_context(rctx);
 	preempt_enable_notrace();
-<<<<<<< HEAD
 
 	put_event(event);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_GUEST_PERF_EVENTS
 struct perf_guest_info_callbacks __rcu *perf_guest_cbs;
-<<<<<<< HEAD
 
 DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
 DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
 DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
 
-=======
-
-DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
-DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
-DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
 {
 	if (WARN_ON_ONCE(rcu_access_pointer(perf_guest_cbs)))
@@ -7050,10 +6975,7 @@ static void perf_output_read_group(struct perf_output_handle *handle,
 {
 	struct perf_event *leader = event->group_leader, *sub;
 	u64 read_format = event->attr.read_format;
-<<<<<<< HEAD
 	unsigned long flags;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 values[6];
 	int n = 0;
 
@@ -9406,7 +9328,6 @@ static int __perf_event_overflow(struct perf_event *event,
 	}
 
 	if (event->attr.sigtrap) {
-<<<<<<< HEAD
 		/*
 		 * The desired behaviour of sigtrap vs invalid samples is a bit
 		 * tricky; on the one hand, one should not loose the SIGTRAP if
@@ -9414,8 +9335,6 @@ static int __perf_event_overflow(struct perf_event *event,
 		 * trigger the WARN or override the data address.
 		 */
 		bool valid_sample = sample_is_allowed(event, regs);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		unsigned int pending_id = 1;
 
 		if (regs)
@@ -9423,11 +9342,7 @@ static int __perf_event_overflow(struct perf_event *event,
 		if (!event->pending_sigtrap) {
 			event->pending_sigtrap = pending_id;
 			local_inc(&event->ctx->nr_pending);
-<<<<<<< HEAD
 		} else if (event->attr.exclude_kernel && valid_sample) {
-=======
-		} else if (event->attr.exclude_kernel) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			/*
 			 * Should not be able to return to user space without
 			 * consuming pending_sigtrap; with exceptions:
@@ -9442,14 +9357,10 @@ static int __perf_event_overflow(struct perf_event *event,
 			 */
 			WARN_ON_ONCE(event->pending_sigtrap != pending_id);
 		}
-<<<<<<< HEAD
 
 		event->pending_addr = 0;
 		if (valid_sample && (data->sample_flags & PERF_SAMPLE_ADDR))
 			event->pending_addr = data->addr;
-=======
-		event->pending_addr = data->addr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		irq_work_queue(&event->pending_irq);
 	}
 
@@ -10235,7 +10146,6 @@ static void bpf_overflow_handler(struct perf_event *event,
 		goto out;
 	rcu_read_lock();
 	prog = READ_ONCE(event->prog);
-<<<<<<< HEAD
 	if (prog) {
 		if (prog->call_get_stack &&
 		    (event->attr.sample_type & PERF_SAMPLE_CALLCHAIN) &&
@@ -10246,10 +10156,6 @@ static void bpf_overflow_handler(struct perf_event *event,
 
 		ret = bpf_prog_run(prog, &ctx);
 	}
-=======
-	if (prog)
-		ret = bpf_prog_run(prog, &ctx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rcu_read_unlock();
 out:
 	__this_cpu_dec(bpf_prog_active);
@@ -11970,11 +11876,7 @@ err_pmu:
 err_ns:
 	if (event->hw.target)
 		put_task_struct(event->hw.target);
-<<<<<<< HEAD
 	call_rcu(&event->rcu_head, free_event_rcu);
-=======
-	kmem_cache_free(perf_event_cache, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ERR_PTR(err);
 }

@@ -7,10 +7,7 @@
 
 /dts-v1/;
 #include "r9a09g011.dtsi"
-<<<<<<< HEAD
 #include <dt-bindings/pinctrl/rzv2m-pinctrl.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 / {
 	model = "RZ/V2M Evaluation Kit 2.0";
@@ -57,7 +54,6 @@
 	clock-frequency = <48000000>;
 };
 
-<<<<<<< HEAD
 &i2c0 {
 	pinctrl-0 = <&i2c0_pins>;
 	pinctrl-names = "default";
@@ -84,8 +80,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &uart0 {
 	status = "okay";
 };

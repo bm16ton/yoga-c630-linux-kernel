@@ -525,12 +525,8 @@ static int __print_txpwr_map(struct seq_file *m, struct rtw89_dev *rtwdev,
 
 static void __print_regd(struct seq_file *m, struct rtw89_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw89_chan *chan = rtw89_chan_get(rtwdev, RTW89_SUB_ENTITY_0);
 	u8 band = chan->band_type;
-=======
-	u8 band = rtwdev->hal.current_band_type;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 regd = rtw89_regd_get(rtwdev, band);
 
 	switch (regd) {
@@ -2194,7 +2190,6 @@ out:
 	return count;
 }
 
-<<<<<<< HEAD
 static int rtw89_dbg_trigger_ctrl_error(struct rtw89_dev *rtwdev)
 {
 	struct rtw89_cpuio_ctrl ctrl_para = {0};
@@ -2226,8 +2221,6 @@ static int rtw89_dbg_trigger_ctrl_error(struct rtw89_dev *rtwdev)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int
 rtw89_debug_priv_fw_crash_get(struct seq_file *m, void *v)
 {
@@ -2235,7 +2228,6 @@ rtw89_debug_priv_fw_crash_get(struct seq_file *m, void *v)
 	struct rtw89_dev *rtwdev = debugfs_priv->rtwdev;
 
 	seq_printf(m, "%d\n",
-<<<<<<< HEAD
 		   test_bit(RTW89_FLAG_CRASH_SIMULATING, rtwdev->flags));
 	return 0;
 }
@@ -2245,12 +2237,6 @@ enum rtw89_dbg_crash_simulation_type {
 	RTW89_DBG_SIM_CTRL_ERROR = 2,
 };
 
-=======
-		   test_bit(RTW89_FLAG_RESTART_TRIGGER, rtwdev->flags));
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static ssize_t
 rtw89_debug_priv_fw_crash_set(struct file *filp, const char __user *user_buf,
 			      size_t count, loff_t *loff)
@@ -2258,7 +2244,6 @@ rtw89_debug_priv_fw_crash_set(struct file *filp, const char __user *user_buf,
 	struct seq_file *m = (struct seq_file *)filp->private_data;
 	struct rtw89_debugfs_priv *debugfs_priv = m->private;
 	struct rtw89_dev *rtwdev = debugfs_priv->rtwdev;
-<<<<<<< HEAD
 	int (*sim)(struct rtw89_dev *rtwdev);
 	u8 crash_type;
 	int ret;
@@ -2283,24 +2268,6 @@ rtw89_debug_priv_fw_crash_set(struct file *filp, const char __user *user_buf,
 	mutex_lock(&rtwdev->mutex);
 	set_bit(RTW89_FLAG_CRASH_SIMULATING, rtwdev->flags);
 	ret = sim(rtwdev);
-=======
-	bool fw_crash;
-	int ret;
-
-	if (!RTW89_CHK_FW_FEATURE(CRASH_TRIGGER, &rtwdev->fw))
-		return -EOPNOTSUPP;
-
-	ret = kstrtobool_from_user(user_buf, count, &fw_crash);
-	if (ret)
-		return -EINVAL;
-
-	if (!fw_crash)
-		return -EINVAL;
-
-	mutex_lock(&rtwdev->mutex);
-	set_bit(RTW89_FLAG_RESTART_TRIGGER, rtwdev->flags);
-	ret = rtw89_fw_h2c_trigger_cpu_exception(rtwdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&rtwdev->mutex);
 
 	if (ret)
@@ -2367,14 +2334,10 @@ static void rtw89_sta_info_get_iter(void *data, struct ieee80211_sta *sta)
 	struct rate_info *rate = &rtwsta->ra_report.txrate;
 	struct ieee80211_rx_status *status = &rtwsta->rx_status;
 	struct seq_file *m = (struct seq_file *)data;
-<<<<<<< HEAD
 	struct rtw89_dev *rtwdev = rtwsta->rtwdev;
 	struct rtw89_hal *hal = &rtwdev->hal;
 	u8 rssi;
 	int i;
-=======
-	u8 rssi;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	seq_printf(m, "TX rate [%d]: ", rtwsta->mac_id);
 
@@ -2390,16 +2353,10 @@ static void rtw89_sta_info_get_iter(void *data, struct ieee80211_sta *sta)
 			   he_gi_str[rate->he_gi] : "N/A");
 	else
 		seq_printf(m, "Legacy %d", rate->legacy);
-<<<<<<< HEAD
 	seq_printf(m, "%s", rtwsta->ra_report.might_fallback_legacy ? " FB_G" : "");
 	seq_printf(m, "\t(hw_rate=0x%x)", rtwsta->ra_report.hw_rate);
 	seq_printf(m, "\t==> agg_wait=%d (%d)\n", rtwsta->max_agg_wait,
 		   sta->deflink.agg.max_rc_amsdu_len);
-=======
-	seq_printf(m, "\t(hw_rate=0x%x)", rtwsta->ra_report.hw_rate);
-	seq_printf(m, "\t==> agg_wait=%d (%d)\n", rtwsta->max_agg_wait,
-		   sta->max_rc_amsdu_len);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	seq_printf(m, "RX rate [%d]: ", rtwsta->mac_id);
 
@@ -2425,7 +2382,6 @@ static void rtw89_sta_info_get_iter(void *data, struct ieee80211_sta *sta)
 	seq_printf(m, "\t(hw_rate=0x%x)\n", rtwsta->rx_hw_rate);
 
 	rssi = ewma_rssi_read(&rtwsta->avg_rssi);
-<<<<<<< HEAD
 	seq_printf(m, "RSSI: %d dBm (raw=%d, prev=%d) [",
 		   RTW89_RSSI_RAW_TO_DBM(rssi), rssi, rtwsta->prev_rssi);
 	for (i = 0; i < rtwdev->chip->rf_path_num; i++) {
@@ -2435,10 +2391,6 @@ static void rtw89_sta_info_get_iter(void *data, struct ieee80211_sta *sta)
 			   i + 1 == rtwdev->chip->rf_path_num ? "" : ", ");
 	}
 	seq_puts(m, "]\n");
-=======
-	seq_printf(m, "RSSI: %d dBm (raw=%d, prev=%d)\n",
-		   RTW89_RSSI_RAW_TO_DBM(rssi), rssi, rtwsta->prev_rssi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void
@@ -2537,7 +2489,6 @@ void rtw89_vif_ids_get_iter(void *data, u8 *mac, struct ieee80211_vif *vif)
 	rtw89_dump_addr_cam(m, &rtwvif->addr_cam);
 }
 
-<<<<<<< HEAD
 static void rtw89_dump_ba_cam(struct seq_file *m, struct rtw89_sta *rtwsta)
 {
 	struct rtw89_vif *rtwvif = rtwsta->rtwvif;
@@ -2558,8 +2509,6 @@ static void rtw89_dump_ba_cam(struct seq_file *m, struct rtw89_sta *rtwsta)
 	seq_puts(m, "\n");
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtw89_sta_ids_get_iter(void *data, struct ieee80211_sta *sta)
 {
 	struct rtw89_sta *rtwsta = (struct rtw89_sta *)sta->drv_priv;
@@ -2568,10 +2517,7 @@ static void rtw89_sta_ids_get_iter(void *data, struct ieee80211_sta *sta)
 	seq_printf(m, "STA [%d] %pM %s\n", rtwsta->mac_id, sta->addr,
 		   sta->tdls ? "(TDLS)" : "");
 	rtw89_dump_addr_cam(m, &rtwsta->addr_cam);
-<<<<<<< HEAD
 	rtw89_dump_ba_cam(m, rtwsta);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int rtw89_debug_priv_stations_get(struct seq_file *m, void *v)
@@ -2580,11 +2526,8 @@ static int rtw89_debug_priv_stations_get(struct seq_file *m, void *v)
 	struct rtw89_dev *rtwdev = debugfs_priv->rtwdev;
 	struct rtw89_cam_info *cam_info = &rtwdev->cam_info;
 
-<<<<<<< HEAD
 	mutex_lock(&rtwdev->mutex);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	seq_puts(m, "map:\n");
 	seq_printf(m, "\tmac_id:    %*ph\n", (int)sizeof(rtwdev->mac_id_map),
 		   rtwdev->mac_id_map);
@@ -2594,22 +2537,16 @@ static int rtw89_debug_priv_stations_get(struct seq_file *m, void *v)
 		   cam_info->bssid_cam_map);
 	seq_printf(m, "\tsec_cam:   %*ph\n", (int)sizeof(cam_info->sec_cam_map),
 		   cam_info->sec_cam_map);
-<<<<<<< HEAD
 	seq_printf(m, "\tba_cam:    %*ph\n", (int)sizeof(cam_info->ba_cam_map),
 		   cam_info->ba_cam_map);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ieee80211_iterate_active_interfaces_atomic(rtwdev->hw,
 		IEEE80211_IFACE_ITER_NORMAL, rtw89_vif_ids_get_iter, m);
 
 	ieee80211_iterate_stations_atomic(rtwdev->hw, rtw89_sta_ids_get_iter, m);
 
-<<<<<<< HEAD
 	mutex_unlock(&rtwdev->mutex);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

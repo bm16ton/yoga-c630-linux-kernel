@@ -3199,7 +3199,6 @@ static int proc_pid_ksm_merging_pages(struct seq_file *m, struct pid_namespace *
 
 	return 0;
 }
-<<<<<<< HEAD
 static int proc_pid_ksm_stat(struct seq_file *m, struct pid_namespace *ns,
 				struct pid *pid, struct task_struct *task)
 {
@@ -3213,8 +3212,6 @@ static int proc_pid_ksm_stat(struct seq_file *m, struct pid_namespace *ns,
 
 	return 0;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_KSM */
 
 #ifdef CONFIG_STACKLEAK_METRICS
@@ -3350,10 +3347,7 @@ static const struct pid_entry tgid_base_stuff[] = {
 #endif
 #ifdef CONFIG_KSM
 	ONE("ksm_merging_pages",  S_IRUSR, proc_pid_ksm_merging_pages),
-<<<<<<< HEAD
 	ONE("ksm_stat",  S_IRUSR, proc_pid_ksm_stat),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 };
 
@@ -3691,10 +3685,7 @@ static const struct pid_entry tid_base_stuff[] = {
 #endif
 #ifdef CONFIG_KSM
 	ONE("ksm_merging_pages",  S_IRUSR, proc_pid_ksm_merging_pages),
-<<<<<<< HEAD
 	ONE("ksm_stat",  S_IRUSR, proc_pid_ksm_stat),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 };
 

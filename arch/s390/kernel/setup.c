@@ -477,7 +477,6 @@ static void __init setup_lowcore_dat_off(void)
 	lc->restart_data = 0;
 	lc->restart_source = -1U;
 
-<<<<<<< HEAD
 	abs_lc = get_abs_lowcore(&flags);
 	abs_lc->restart_stack = lc->restart_stack;
 	abs_lc->restart_fn = lc->restart_fn;
@@ -486,14 +485,6 @@ static void __init setup_lowcore_dat_off(void)
 	abs_lc->restart_psw = lc->restart_psw;
 	abs_lc->mcesad = lc->mcesad;
 	put_abs_lowcore(abs_lc, flags);
-=======
-	put_abs_lowcore(restart_stack, lc->restart_stack);
-	put_abs_lowcore(restart_fn, lc->restart_fn);
-	put_abs_lowcore(restart_data, lc->restart_data);
-	put_abs_lowcore(restart_source, lc->restart_source);
-	put_abs_lowcore(restart_psw, lc->restart_psw);
-	put_abs_lowcore(mcesad, lc->mcesad);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mcck_stack = (unsigned long)memblock_alloc(THREAD_SIZE, THREAD_SIZE);
 	if (!mcck_stack)
@@ -514,13 +505,8 @@ static void __init setup_lowcore_dat_off(void)
 
 static void __init setup_lowcore_dat_on(void)
 {
-<<<<<<< HEAD
 	struct lowcore *abs_lc;
 	unsigned long flags;
-=======
-	struct lowcore *lc = lowcore_ptr[0];
-	int cr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	__ctl_clear_bit(0, 28);
 	S390_lowcore.external_new_psw.mask |= PSW_MASK_DAT;
@@ -529,7 +515,6 @@ static void __init setup_lowcore_dat_on(void)
 	S390_lowcore.io_new_psw.mask |= PSW_MASK_DAT;
 	__ctl_set_bit(0, 28);
 	__ctl_store(S390_lowcore.cregs_save_area, 0, 15);
-<<<<<<< HEAD
 	if (abs_lowcore_map(0, lowcore_ptr[0], true))
 		panic("Couldn't setup absolute lowcore");
 	abs_lowcore_mapped = true;
@@ -539,12 +524,6 @@ static void __init setup_lowcore_dat_on(void)
 	memcpy(abs_lc->cregs_save_area, S390_lowcore.cregs_save_area,
 	       sizeof(abs_lc->cregs_save_area));
 	put_abs_lowcore(abs_lc, flags);
-=======
-	put_abs_lowcore(restart_flags, RESTART_FLAG_CTLREGS);
-	put_abs_lowcore(program_new_psw, lc->program_new_psw);
-	for (cr = 0; cr < ARRAY_SIZE(lc->cregs_save_area); cr++)
-		put_abs_lowcore(cregs_save_area[cr], lc->cregs_save_area[cr]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct resource code_resource = {
@@ -859,21 +838,12 @@ static void __init relocate_amode31_section(void)
 	long *ptr;
 
 	pr_info("Relocating AMODE31 section of size 0x%08lx\n", amode31_size);
-<<<<<<< HEAD
 
 	/* Move original AMODE31 section to the new one */
 	memmove((void *)__amode31_base, (void *)__samode31, amode31_size);
 	/* Zero out the old AMODE31 section to catch invalid accesses within it */
 	memset((void *)__samode31, 0, amode31_size);
 
-=======
-
-	/* Move original AMODE31 section to the new one */
-	memmove((void *)__amode31_base, (void *)__samode31, amode31_size);
-	/* Zero out the old AMODE31 section to catch invalid accesses within it */
-	memset((void *)__samode31, 0, amode31_size);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Update all AMODE31 region references */
 	for (ptr = _start_amode31_refs; ptr != _end_amode31_refs; ptr++)
 		*ptr += amode31_offset;

@@ -94,12 +94,6 @@ static int hda_setup_bdle(struct snd_sof_dev *sdev,
 		bdl++;
 		hstream->frags++;
 		offset += chunk;
-<<<<<<< HEAD
-=======
-
-		dev_vdbg(sdev->dev, "bdl, frags:%d, chunk size:0x%x;\n",
-			 hstream->frags, chunk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	*bdlp = bdl;
@@ -120,17 +114,13 @@ int hda_dsp_stream_setup_bdl(struct snd_sof_dev *sdev,
 	int remain, ioc;
 
 	period_bytes = hstream->period_bytes;
-<<<<<<< HEAD
 	dev_dbg(sdev->dev, "period_bytes:0x%x\n", period_bytes);
-=======
-	dev_dbg(sdev->dev, "%s: period_bytes:0x%x\n", __func__, period_bytes);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!period_bytes)
 		period_bytes = hstream->bufsize;
 
 	periods = hstream->bufsize / period_bytes;
 
-	dev_dbg(sdev->dev, "%s: periods:%d\n", __func__, periods);
+	dev_dbg(sdev->dev, "periods:%d\n", periods);
 
 	remain = hstream->bufsize % period_bytes;
 	if (remain)
@@ -279,11 +269,7 @@ int hda_dsp_stream_put(struct snd_sof_dev *sdev, int direction, int stream_tag)
 					HDA_VS_INTEL_EM2_L1SEN, HDA_VS_INTEL_EM2_L1SEN);
 
 	if (!found) {
-<<<<<<< HEAD
 		dev_err(sdev->dev, "%s: stream_tag %d not opened!\n",
-=======
-		dev_dbg(sdev->dev, "%s: stream_tag %d not opened!\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__func__, stream_tag);
 		return -ENODEV;
 	}

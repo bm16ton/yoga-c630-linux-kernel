@@ -22,28 +22,15 @@ properties:
   reg:
     maxItems: 1
 
-<<<<<<< HEAD
   vref-supply:
     description: If not supplied, internal reference will be used.
 
-=======
-  spi-max-frequency: true
-
-  vref-supply:
-    description: If not supplied, internal reference will be used.
-
-additionalProperties: false
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg
 
 allOf:
-<<<<<<< HEAD
   - $ref: /schemas/spi/spi-peripheral-props.yaml#
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - if:
       properties:
         compatible:
@@ -55,11 +42,8 @@ allOf:
       required:
         - vref-supply
 
-<<<<<<< HEAD
 unevaluatedProperties: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
     spi {

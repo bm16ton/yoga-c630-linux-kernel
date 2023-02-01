@@ -75,10 +75,7 @@ static struct audioreach_graph *q6apm_get_audioreach_graph(struct q6apm *apm, ui
 	id = idr_alloc(&apm->graph_idr, graph, graph_id, graph_id + 1, GFP_KERNEL);
 	if (id < 0) {
 		dev_err(apm->dev, "Unable to allocate graph id (%d)\n", graph_id);
-<<<<<<< HEAD
 		kfree(graph->graph);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(graph);
 		mutex_unlock(&apm->lock);
 		return ERR_PTR(id);

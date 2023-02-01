@@ -3091,11 +3091,7 @@ static int iwl_mvm_scan_stop_wait(struct iwl_mvm *mvm, int type)
 				     1 * HZ);
 }
 
-<<<<<<< HEAD
 static size_t iwl_scan_req_umac_get_size(u8 scan_ver)
-=======
-static int iwl_scan_req_umac_get_size(u8 scan_ver)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	switch (scan_ver) {
 	case 12:

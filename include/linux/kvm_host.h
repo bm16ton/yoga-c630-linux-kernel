@@ -156,10 +156,6 @@ static inline bool is_error_page(struct page *page)
 #define KVM_REQ_TLB_FLUSH         (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
 #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
 #define KVM_REQ_UNBLOCK           2
-<<<<<<< HEAD
-=======
-#define KVM_REQ_UNHALT            3
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define KVM_REQUEST_ARCH_BASE     8
 
 /*
@@ -1001,7 +997,6 @@ struct kvm_memslot_iter {
 	struct rb_node *node;
 	struct kvm_memory_slot *slot;
 };
-<<<<<<< HEAD
 
 static inline void kvm_memslot_iter_next(struct kvm_memslot_iter *iter)
 {
@@ -1084,90 +1079,6 @@ static inline bool kvm_memslot_iter_is_valid(struct kvm_memslot_iter *iter, gfn_
 	return iter->slot->base_gfn < end;
 }
 
-=======
-
-static inline void kvm_memslot_iter_next(struct kvm_memslot_iter *iter)
-{
-	iter->node = rb_next(iter->node);
-	if (!iter->node)
-		return;
-
-	iter->slot = container_of(iter->node, struct kvm_memory_slot, gfn_node[iter->slots->node_idx]);
-}
-
-static inline void kvm_memslot_iter_start(struct kvm_memslot_iter *iter,
-					  struct kvm_memslots *slots,
-					  gfn_t start)
-{
-	int idx = slots->node_idx;
-	struct rb_node *tmp;
-	struct kvm_memory_slot *slot;
-
-	iter->slots = slots;
-
-	/*
-	 * Find the so called "upper bound" of a key - the first node that has
-	 * its key strictly greater than the searched one (the start gfn in our case).
-	 */
-	iter->node = NULL;
-	for (tmp = slots->gfn_tree.rb_node; tmp; ) {
-		slot = container_of(tmp, struct kvm_memory_slot, gfn_node[idx]);
-		if (start < slot->base_gfn) {
-			iter->node = tmp;
-			tmp = tmp->rb_left;
-		} else {
-			tmp = tmp->rb_right;
-		}
-	}
-
-	/*
-	 * Find the slot with the lowest gfn that can possibly intersect with
-	 * the range, so we'll ideally have slot start <= range start
-	 */
-	if (iter->node) {
-		/*
-		 * A NULL previous node means that the very first slot
-		 * already has a higher start gfn.
-		 * In this case slot start > range start.
-		 */
-		tmp = rb_prev(iter->node);
-		if (tmp)
-			iter->node = tmp;
-	} else {
-		/* a NULL node below means no slots */
-		iter->node = rb_last(&slots->gfn_tree);
-	}
-
-	if (iter->node) {
-		iter->slot = container_of(iter->node, struct kvm_memory_slot, gfn_node[idx]);
-
-		/*
-		 * It is possible in the slot start < range start case that the
-		 * found slot ends before or at range start (slot end <= range start)
-		 * and so it does not overlap the requested range.
-		 *
-		 * In such non-overlapping case the next slot (if it exists) will
-		 * already have slot start > range start, otherwise the logic above
-		 * would have found it instead of the current slot.
-		 */
-		if (iter->slot->base_gfn + iter->slot->npages <= start)
-			kvm_memslot_iter_next(iter);
-	}
-}
-
-static inline bool kvm_memslot_iter_is_valid(struct kvm_memslot_iter *iter, gfn_t end)
-{
-	if (!iter->node)
-		return false;
-
-	/*
-	 * If this slot starts beyond or at the end of the range so does
-	 * every next one
-	 */
-	return iter->slot->base_gfn < end;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Iterate over each memslot at least partially intersecting [start, end) range */
 #define kvm_for_each_memslot_in_gfn_range(iter, slots, start, end)	\
 	for (kvm_memslot_iter_start(iter, slots, start);		\
@@ -1559,21 +1470,12 @@ static inline struct kvm *kvm_arch_alloc_vm(void)
 	return kzalloc(sizeof(struct kvm), GFP_KERNEL);
 }
 #endif
-<<<<<<< HEAD
 
 static inline void __kvm_arch_free_vm(struct kvm *kvm)
 {
 	kvfree(kvm);
 }
 
-=======
-
-static inline void __kvm_arch_free_vm(struct kvm *kvm)
-{
-	kvfree(kvm);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifndef __KVM_HAVE_ARCH_VM_FREE
 static inline void kvm_arch_free_vm(struct kvm *kvm)
 {
@@ -1724,7 +1626,6 @@ try_get_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
 	else
 		return NULL;
 }
-<<<<<<< HEAD
 
 /*
  * Returns a pointer to the memslot that contains gfn. Otherwise returns NULL.
@@ -1759,42 +1660,6 @@ ____gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn, bool approx)
 {
 	struct kvm_memory_slot *slot;
 
-=======
-
-/*
- * Returns a pointer to the memslot that contains gfn. Otherwise returns NULL.
- *
- * With "approx" set returns the memslot also when the address falls
- * in a hole. In that case one of the memslots bordering the hole is
- * returned.
- */
-static inline struct kvm_memory_slot *
-search_memslots(struct kvm_memslots *slots, gfn_t gfn, bool approx)
-{
-	struct kvm_memory_slot *slot;
-	struct rb_node *node;
-	int idx = slots->node_idx;
-
-	slot = NULL;
-	for (node = slots->gfn_tree.rb_node; node; ) {
-		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
-		if (gfn >= slot->base_gfn) {
-			if (gfn < slot->base_gfn + slot->npages)
-				return slot;
-			node = node->rb_right;
-		} else
-			node = node->rb_left;
-	}
-
-	return approx ? slot : NULL;
-}
-
-static inline struct kvm_memory_slot *
-____gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn, bool approx)
-{
-	struct kvm_memory_slot *slot;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	slot = (struct kvm_memory_slot *)atomic_long_read(&slots->last_used_slot);
 	slot = try_get_memslot(slot, gfn);
 	if (slot)

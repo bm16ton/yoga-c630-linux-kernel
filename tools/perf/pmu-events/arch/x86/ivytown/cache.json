@@ -21,11 +21,7 @@
         "UMask": "0x2"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "L1D miss outstanding duration in cycles",
-=======
-        "BriefDescription": "L1D miss oustandings duration in cycles",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "2",
         "CounterHTOff": "2",
         "EventCode": "0x48",
@@ -164,7 +160,6 @@
         "PublicDescription": "Dirty L2 cache lines filling the L2.",
         "SampleAfterValue": "100003",
         "UMask": "0xa"
-<<<<<<< HEAD
     },
     {
         "BriefDescription": "Clean L2 cache lines evicted by L2 prefetch",
@@ -377,220 +372,6 @@
         "UMask": "0x10"
     },
     {
-=======
-    },
-    {
-        "BriefDescription": "Clean L2 cache lines evicted by L2 prefetch",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0xF2",
-        "EventName": "L2_LINES_OUT.PF_CLEAN",
-        "PublicDescription": "Clean L2 cache lines evicted by the MLC prefetcher.",
-        "SampleAfterValue": "100003",
-        "UMask": "0x4"
-    },
-    {
-        "BriefDescription": "Dirty L2 cache lines evicted by L2 prefetch",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0xF2",
-        "EventName": "L2_LINES_OUT.PF_DIRTY",
-        "PublicDescription": "Dirty L2 cache lines evicted by the MLC prefetcher.",
-        "SampleAfterValue": "100003",
-        "UMask": "0x8"
-    },
-    {
-        "BriefDescription": "L2 code requests",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.ALL_CODE_RD",
-        "PublicDescription": "Counts all L2 code requests.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x30"
-    },
-    {
-        "BriefDescription": "Demand Data Read requests",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.ALL_DEMAND_DATA_RD",
-        "PublicDescription": "Counts any demand and L1 HW prefetch data load requests to L2.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x3"
-    },
-    {
-        "BriefDescription": "Requests from L2 hardware prefetchers",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.ALL_PF",
-        "PublicDescription": "Counts all L2 HW prefetcher requests.",
-        "SampleAfterValue": "200003",
-        "UMask": "0xc0"
-    },
-    {
-        "BriefDescription": "RFO requests to L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.ALL_RFO",
-        "PublicDescription": "Counts all L2 store RFO requests.",
-        "SampleAfterValue": "200003",
-        "UMask": "0xc"
-    },
-    {
-        "BriefDescription": "L2 cache hits when fetching instructions, code reads.",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.CODE_RD_HIT",
-        "PublicDescription": "Number of instruction fetches that hit the L2 cache.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x10"
-    },
-    {
-        "BriefDescription": "L2 cache misses when fetching instructions",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.CODE_RD_MISS",
-        "PublicDescription": "Number of instruction fetches that missed the L2 cache.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x20"
-    },
-    {
-        "BriefDescription": "Demand Data Read requests that hit L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.DEMAND_DATA_RD_HIT",
-        "PublicDescription": "Demand Data Read requests that hit L2 cache.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x1"
-    },
-    {
-        "BriefDescription": "Requests from the L2 hardware prefetchers that hit L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.PF_HIT",
-        "PublicDescription": "Counts all L2 HW prefetcher requests that hit L2.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x40"
-    },
-    {
-        "BriefDescription": "Requests from the L2 hardware prefetchers that miss L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.PF_MISS",
-        "PublicDescription": "Counts all L2 HW prefetcher requests that missed L2.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x80"
-    },
-    {
-        "BriefDescription": "RFO requests that hit L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.RFO_HIT",
-        "PublicDescription": "RFO requests that hit L2 cache.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x4"
-    },
-    {
-        "BriefDescription": "RFO requests that miss L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x24",
-        "EventName": "L2_RQSTS.RFO_MISS",
-        "PublicDescription": "Counts the number of store RFO requests that miss the L2 cache.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x8"
-    },
-    {
-        "BriefDescription": "RFOs that access cache lines in any state",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x27",
-        "EventName": "L2_STORE_LOCK_RQSTS.ALL",
-        "PublicDescription": "RFOs that access cache lines in any state.",
-        "SampleAfterValue": "200003",
-        "UMask": "0xf"
-    },
-    {
-        "BriefDescription": "RFOs that hit cache lines in M state",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x27",
-        "EventName": "L2_STORE_LOCK_RQSTS.HIT_M",
-        "PublicDescription": "RFOs that hit cache lines in M state.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x8"
-    },
-    {
-        "BriefDescription": "RFOs that miss cache lines",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0x27",
-        "EventName": "L2_STORE_LOCK_RQSTS.MISS",
-        "PublicDescription": "RFOs that miss cache lines.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x1"
-    },
-    {
-        "BriefDescription": "L2 or LLC HW prefetches that access L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0xF0",
-        "EventName": "L2_TRANS.ALL_PF",
-        "PublicDescription": "Any MLC or LLC HW prefetch accessing L2, including rejects.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x8"
-    },
-    {
-        "BriefDescription": "Transactions accessing L2 pipe",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0xF0",
-        "EventName": "L2_TRANS.ALL_REQUESTS",
-        "PublicDescription": "Transactions accessing L2 pipe.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x80"
-    },
-    {
-        "BriefDescription": "L2 cache accesses when fetching instructions",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0xF0",
-        "EventName": "L2_TRANS.CODE_RD",
-        "PublicDescription": "L2 cache accesses when fetching instructions.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x4"
-    },
-    {
-        "BriefDescription": "Demand Data Read requests that access L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0xF0",
-        "EventName": "L2_TRANS.DEMAND_DATA_RD",
-        "PublicDescription": "Demand Data Read requests that access L2 cache.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x1"
-    },
-    {
-        "BriefDescription": "L1D writebacks that access L2 cache",
-        "Counter": "0,1,2,3",
-        "CounterHTOff": "0,1,2,3,4,5,6,7",
-        "EventCode": "0xF0",
-        "EventName": "L2_TRANS.L1D_WB",
-        "PublicDescription": "L1D writebacks that access L2 cache.",
-        "SampleAfterValue": "200003",
-        "UMask": "0x10"
-    },
-    {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "L2 fill requests that access L2 cache",
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
@@ -877,11 +658,7 @@
         "UMask": "0x8"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Cacheable and noncacheable code read requests",
-=======
-        "BriefDescription": "Cacheable and noncachaeble code read requests",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "CounterHTOff": "0,1,2,3,4,5,6,7",
         "EventCode": "0xB0",

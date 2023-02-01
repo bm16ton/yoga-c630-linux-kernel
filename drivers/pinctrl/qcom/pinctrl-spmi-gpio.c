@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2012-2014, 2016-2021 The Linux Foundation. All rights reserved.
-<<<<<<< HEAD
  * Copyright (c) 2021-2022 Qualcomm Innovation Center, Inc. All rights reserved.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <linux/gpio/driver.h>
@@ -1023,7 +1020,6 @@ static int pmic_gpio_populate_parent_fwspec(struct gpio_chip *chip,
 	return 0;
 }
 
-<<<<<<< HEAD
 static void pmic_gpio_irq_mask(struct irq_data *data)
 {
 	struct gpio_chip *gc = irq_data_get_irq_chip_data(data);
@@ -1045,13 +1041,6 @@ static const struct irq_chip spmi_gpio_irq_chip = {
 	.irq_ack	= irq_chip_ack_parent,
 	.irq_mask	= pmic_gpio_irq_mask,
 	.irq_unmask	= pmic_gpio_irq_unmask,
-=======
-static const struct irq_chip spmi_gpio_irq_chip = {
-	.name		= "spmi-gpio",
-	.irq_ack	= irq_chip_ack_parent,
-	.irq_mask	= irq_chip_mask_parent,
-	.irq_unmask	= irq_chip_unmask_parent,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.irq_set_type	= irq_chip_set_type_parent,
 	.irq_set_wake	= irq_chip_set_wake_parent,
 	.flags		= IRQCHIP_IMMUTABLE | IRQCHIP_MASK_ON_SUSPEND,
@@ -1212,10 +1201,7 @@ static const struct of_device_id pmic_gpio_of_match[] = {
 	{ .compatible = "qcom,pm6150-gpio", .data = (void *) 10 },
 	{ .compatible = "qcom,pm6150l-gpio", .data = (void *) 12 },
 	{ .compatible = "qcom,pm6350-gpio", .data = (void *) 9 },
-<<<<<<< HEAD
 	{ .compatible = "qcom,pm7250b-gpio", .data = (void *) 12 },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ .compatible = "qcom,pm7325-gpio", .data = (void *) 10 },
 	{ .compatible = "qcom,pm8005-gpio", .data = (void *) 4 },
 	{ .compatible = "qcom,pm8008-gpio", .data = (void *) 2 },

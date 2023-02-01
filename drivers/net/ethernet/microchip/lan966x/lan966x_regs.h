@@ -90,7 +90,6 @@ enum lan966x_target {
 #define ANA_AUTOAGE_AGE_PERIOD_GET(x)\
 	FIELD_GET(ANA_AUTOAGE_AGE_PERIOD, x)
 
-<<<<<<< HEAD
 /*      ANA:ANA:MIRRORPORTS */
 #define ANA_MIRRORPORTS           __REG(TARGET_ANA, 0, 1, 29824, 0, 1, 244, 60, 0, 1, 4)
 
@@ -109,8 +108,6 @@ enum lan966x_target {
 #define ANA_EMIRRORPORTS_EMIRRORPORTS_GET(x)\
 	FIELD_GET(ANA_EMIRRORPORTS_EMIRRORPORTS, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*      ANA:ANA:FLOODING */
 #define ANA_FLOODING(r)           __REG(TARGET_ANA, 0, 1, 29824, 0, 1, 244, 68, r, 8, 4)
 
@@ -351,15 +348,12 @@ enum lan966x_target {
 /*      ANA:PORT:PORT_CFG */
 #define ANA_PORT_CFG(g)           __REG(TARGET_ANA, 0, 1, 28672, g, 9, 128, 112, 0, 1, 4)
 
-<<<<<<< HEAD
 #define ANA_PORT_CFG_SRC_MIRROR_ENA              BIT(13)
 #define ANA_PORT_CFG_SRC_MIRROR_ENA_SET(x)\
 	FIELD_PREP(ANA_PORT_CFG_SRC_MIRROR_ENA, x)
 #define ANA_PORT_CFG_SRC_MIRROR_ENA_GET(x)\
 	FIELD_GET(ANA_PORT_CFG_SRC_MIRROR_ENA, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define ANA_PORT_CFG_LEARNAUTO                   BIT(6)
 #define ANA_PORT_CFG_LEARNAUTO_SET(x)\
 	FIELD_PREP(ANA_PORT_CFG_LEARNAUTO, x)
@@ -384,7 +378,6 @@ enum lan966x_target {
 #define ANA_PORT_CFG_PORTID_VAL_GET(x)\
 	FIELD_GET(ANA_PORT_CFG_PORTID_VAL, x)
 
-<<<<<<< HEAD
 /*      ANA:PORT:POL_CFG */
 #define ANA_POL_CFG(g)            __REG(TARGET_ANA, 0, 1, 28672, g, 9, 128, 116, 0, 1, 4)
 
@@ -400,8 +393,6 @@ enum lan966x_target {
 #define ANA_POL_CFG_POL_ORDER_GET(x)\
 	FIELD_GET(ANA_POL_CFG_POL_ORDER, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*      ANA:PFC:PFC_CFG */
 #define ANA_PFC_CFG(g)            __REG(TARGET_ANA, 0, 1, 30720, g, 8, 64, 0, 0, 1, 4)
 
@@ -411,7 +402,6 @@ enum lan966x_target {
 #define ANA_PFC_CFG_FC_LINK_SPEED_GET(x)\
 	FIELD_GET(ANA_PFC_CFG_FC_LINK_SPEED, x)
 
-<<<<<<< HEAD
 /*      ANA:COMMON:AGGR_CFG */
 #define ANA_AGGR_CFG              __REG(TARGET_ANA, 0, 1, 31232, 0, 1, 552, 0, 0, 1, 4)
 
@@ -514,8 +504,6 @@ enum lan966x_target {
 #define ANA_POL_PIR_STATE_PIR_LVL_GET(x)\
 	FIELD_GET(ANA_POL_PIR_STATE_PIR_LVL, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*      CHIP_TOP:CUPHY_CFG:CUPHY_PORT_CFG */
 #define CHIP_TOP_CUPHY_PORT_CFG(r) __REG(TARGET_CHIP_TOP, 0, 1, 16, 0, 1, 20, 8, r, 2, 4)
 
@@ -672,15 +660,12 @@ enum lan966x_target {
 #define DEV_PCS1G_MODE_CFG_SGMII_MODE_ENA_GET(x)\
 	FIELD_GET(DEV_PCS1G_MODE_CFG_SGMII_MODE_ENA, x)
 
-<<<<<<< HEAD
 #define DEV_PCS1G_MODE_CFG_SAVE_PREAMBLE_ENA        BIT(1)
 #define DEV_PCS1G_MODE_CFG_SAVE_PREAMBLE_ENA_SET(x)\
 	FIELD_PREP(DEV_PCS1G_MODE_CFG_SAVE_PREAMBLE_ENA, x)
 #define DEV_PCS1G_MODE_CFG_SAVE_PREAMBLE_ENA_GET(x)\
 	FIELD_GET(DEV_PCS1G_MODE_CFG_SAVE_PREAMBLE_ENA, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*      DEV:PCS1G_CFG_STATUS:PCS1G_SD_CFG */
 #define DEV_PCS1G_SD_CFG(t)       __REG(TARGET_DEV, t, 8, 72, 0, 1, 68, 8, 0, 1, 4)
 
@@ -1144,7 +1129,6 @@ enum lan966x_target {
 /*      QSYS:RES_CTRL:RES_CFG */
 #define QSYS_RES_CFG(g)           __REG(TARGET_QSYS, 0, 1, 32768, g, 1024, 8, 0, 0, 1, 4)
 
-<<<<<<< HEAD
 /*      QSYS:HSCH:CIR_CFG */
 #define QSYS_CIR_CFG(g)           __REG(TARGET_QSYS, 0, 1, 16384, g, 90, 128, 0, 0, 1, 4)
 
@@ -1354,8 +1338,6 @@ enum lan966x_target {
 #define QSYS_TAS_GATE_STATE_TAS_GATE_STATE_GET(x)\
 	FIELD_GET(QSYS_TAS_GATE_STATE_TAS_GATE_STATE, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*      REW:PORT:PORT_VLAN_CFG */
 #define REW_PORT_VLAN_CFG(g)      __REG(TARGET_REW, 0, 1, 0, g, 10, 128, 0, 0, 1, 4)
 

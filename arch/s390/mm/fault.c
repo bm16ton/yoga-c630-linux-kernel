@@ -268,12 +268,7 @@ static noinline void do_sigbus(struct pt_regs *regs)
 			(void __user *)(regs->int_parm_long & __FAIL_ADDR_MASK));
 }
 
-<<<<<<< HEAD
 static noinline void do_fault_error(struct pt_regs *regs, vm_fault_t fault)
-=======
-static noinline void do_fault_error(struct pt_regs *regs, int access,
-					vm_fault_t fault)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int si_code;
 
@@ -807,11 +802,7 @@ void do_secure_storage_access(struct pt_regs *regs)
 		addr = __gmap_translate(gmap, addr);
 		mmap_read_unlock(mm);
 		if (IS_ERR_VALUE(addr)) {
-<<<<<<< HEAD
 			do_fault_error(regs, VM_FAULT_BADMAP);
-=======
-			do_fault_error(regs, VM_ACCESS_FLAGS, VM_FAULT_BADMAP);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		}
 		fallthrough;

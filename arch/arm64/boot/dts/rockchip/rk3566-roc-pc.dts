@@ -4,10 +4,7 @@
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pinctrl/rockchip.h>
-<<<<<<< HEAD
 #include <dt-bindings/soc/rockchip,vop2.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "rk3566.dtsi"
 
 / {
@@ -31,7 +28,6 @@
 		#clock-cells = <0>;
 	};
 
-<<<<<<< HEAD
 	hdmi-con {
 		compatible = "hdmi-connector";
 		type = "a";
@@ -43,8 +39,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	leds {
 		compatible = "gpio-leds";
 
@@ -148,11 +142,7 @@
 	assigned-clocks = <&cru SCLK_GMAC1_RX_TX>, <&cru SCLK_GMAC1_RGMII_SPEED>, <&cru SCLK_GMAC1>;
 	assigned-clock-parents = <&cru SCLK_GMAC1_RGMII_SPEED>, <&cru SCLK_GMAC1>, <&gmac1_clkin>;
 	clock_in_out = "input";
-<<<<<<< HEAD
 	phy-mode = "rgmii";
-=======
-	phy-mode = "rgmii-id";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phy-supply = <&vcc_3v3>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&gmac1m0_miim
@@ -171,7 +161,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &gpu {
 	mali-supply = <&vdd_gpu>;
 	status = "okay";
@@ -195,8 +184,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &i2c0 {
 	status = "okay";
 
@@ -445,15 +432,7 @@
 
 &i2c3 {
 	pinctrl-names = "default";
-<<<<<<< HEAD
 	pinctrl-0 = <&i2c3m0_xfer>;
-=======
-	pinctrl-0 = <&i2c3m1_xfer>;
-	status = "okay";
-};
-
-&i2c5 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = "okay";
 };
 
@@ -629,7 +608,6 @@
 &usb_host0_ohci {
 	status = "okay";
 };
-<<<<<<< HEAD
 
 &vop {
 	assigned-clocks = <&cru DCLK_VOP0>, <&cru DCLK_VOP1>;
@@ -647,5 +625,3 @@
 		remote-endpoint = <&hdmi_in_vp0>;
 	};
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

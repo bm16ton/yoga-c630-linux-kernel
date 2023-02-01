@@ -805,11 +805,7 @@ sparse_alloc:
 	 * number from being easily guessable.
 	 */
 	error = xfs_ialloc_inode_init(args.mp, tp, NULL, newlen, pag->pag_agno,
-<<<<<<< HEAD
 			args.agbno, args.len, get_random_u32());
-=======
-			args.agbno, args.len, prandom_u32());
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (error)
 		return error;

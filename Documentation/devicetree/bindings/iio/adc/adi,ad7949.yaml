@@ -44,18 +44,10 @@ properties:
 
       If no supplies are defined, the reference selection will default to
       4096mV internal reference.
-<<<<<<< HEAD
-=======
 
     enum: [2500000, 4096000]
     default: 4096000
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-    enum: [2500000, 4096000]
-    default: 4096000
-
-<<<<<<< HEAD
 
   '#io-channel-cells':
     const: 1
@@ -63,14 +55,6 @@ properties:
   '#address-cells':
     const: 1
 
-=======
-  '#io-channel-cells':
-    const: 1
-
-  '#address-cells':
-    const: 1
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#size-cells':
     const: 0
 

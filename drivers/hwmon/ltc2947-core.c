@@ -982,11 +982,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
 		return ret;
 
 	/* check external clock presence */
-<<<<<<< HEAD
 	extclk = devm_clk_get_optional_enabled(st->dev, NULL);
-=======
-	extclk = devm_clk_get_optional(st->dev, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(extclk))
 		return dev_err_probe(st->dev, PTR_ERR(extclk),
 				     "Failed to get external clock\n");

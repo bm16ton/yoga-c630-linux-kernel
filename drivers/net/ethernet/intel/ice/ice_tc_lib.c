@@ -36,13 +36,10 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
 		     ICE_TC_FLWR_FIELD_ENC_DEST_IPV6))
 		lkups_cnt++;
 
-<<<<<<< HEAD
 	if (flags & (ICE_TC_FLWR_FIELD_ENC_IP_TOS |
 		     ICE_TC_FLWR_FIELD_ENC_IP_TTL))
 		lkups_cnt++;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (flags & ICE_TC_FLWR_FIELD_ENC_DEST_L4_PORT)
 		lkups_cnt++;
 
@@ -54,19 +51,11 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
 		lkups_cnt++;
 
 	/* is VLAN specified? */
-<<<<<<< HEAD
 	if (flags & (ICE_TC_FLWR_FIELD_VLAN | ICE_TC_FLWR_FIELD_VLAN_PRIO))
 		lkups_cnt++;
 
 	/* is CVLAN specified? */
 	if (flags & (ICE_TC_FLWR_FIELD_CVLAN | ICE_TC_FLWR_FIELD_CVLAN_PRIO))
-=======
-	if (flags & ICE_TC_FLWR_FIELD_VLAN)
-		lkups_cnt++;
-
-	/* is CVLAN specified? */
-	if (flags & ICE_TC_FLWR_FIELD_CVLAN)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		lkups_cnt++;
 
 	/* are PPPoE options specified? */
@@ -79,7 +68,6 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
 		     ICE_TC_FLWR_FIELD_DEST_IPV6 | ICE_TC_FLWR_FIELD_SRC_IPV6))
 		lkups_cnt++;
 
-<<<<<<< HEAD
 	if (flags & (ICE_TC_FLWR_FIELD_IP_TOS | ICE_TC_FLWR_FIELD_IP_TTL))
 		lkups_cnt++;
 
@@ -87,8 +75,6 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
 	if (flags & ICE_TC_FLWR_FIELD_L2TPV3_SESSID)
 		lkups_cnt++;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* is L4 (TCP/UDP/any other L4 protocol fields) specified? */
 	if (flags & (ICE_TC_FLWR_FIELD_DEST_L4_PORT |
 		     ICE_TC_FLWR_FIELD_SRC_L4_PORT))
@@ -282,7 +268,6 @@ ice_tc_fill_tunnel_outer(u32 flags, struct ice_tc_flower_fltr *fltr,
 		i++;
 	}
 
-<<<<<<< HEAD
 	if (fltr->inner_headers.l2_key.n_proto == htons(ETH_P_IP) &&
 	    (flags & (ICE_TC_FLWR_FIELD_ENC_IP_TOS |
 		      ICE_TC_FLWR_FIELD_ENC_IP_TTL))) {
@@ -327,8 +312,6 @@ ice_tc_fill_tunnel_outer(u32 flags, struct ice_tc_flower_fltr *fltr,
 		i++;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if ((flags & ICE_TC_FLWR_FIELD_ENC_DEST_L4_PORT) &&
 	    hdr->l3_key.ip_proto == IPPROTO_UDP) {
 		list[i].type = ICE_UDP_OF;
@@ -406,11 +389,7 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
 	}
 
 	/* copy VLAN info */
-<<<<<<< HEAD
 	if (flags & (ICE_TC_FLWR_FIELD_VLAN | ICE_TC_FLWR_FIELD_VLAN_PRIO)) {
-=======
-	if (flags & ICE_TC_FLWR_FIELD_VLAN) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vlan_tpid = be16_to_cpu(headers->vlan_hdr.vlan_tpid);
 		rule_info->vlan_type =
 				ice_check_supported_vlan_tpid(vlan_tpid);
@@ -419,7 +398,6 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
 			list[i].type = ICE_VLAN_EX;
 		else
 			list[i].type = ICE_VLAN_OFOS;
-<<<<<<< HEAD
 
 		if (flags & ICE_TC_FLWR_FIELD_VLAN) {
 			list[i].h_u.vlan_hdr.vlan = headers->vlan_hdr.vlan_id;
@@ -459,17 +437,6 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
 				headers->cvlan_hdr.vlan_prio;
 		}
 
-=======
-		list[i].h_u.vlan_hdr.vlan = headers->vlan_hdr.vlan_id;
-		list[i].m_u.vlan_hdr.vlan = cpu_to_be16(0xFFFF);
-		i++;
-	}
-
-	if (flags & ICE_TC_FLWR_FIELD_CVLAN) {
-		list[i].type = ICE_VLAN_IN;
-		list[i].h_u.vlan_hdr.vlan = headers->cvlan_hdr.vlan_id;
-		list[i].m_u.vlan_hdr.vlan = cpu_to_be16(0xFFFF);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		i++;
 	}
 
@@ -538,7 +505,6 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
 		i++;
 	}
 
-<<<<<<< HEAD
 	if (headers->l2_key.n_proto == htons(ETH_P_IP) &&
 	    (flags & (ICE_TC_FLWR_FIELD_IP_TOS | ICE_TC_FLWR_FIELD_IP_TTL))) {
 		list[i].type = ice_proto_type_from_ipv4(inner);
@@ -594,8 +560,6 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
 		i++;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* copy L4 (src, dest) port */
 	if (flags & (ICE_TC_FLWR_FIELD_DEST_L4_PORT |
 		     ICE_TC_FLWR_FIELD_SRC_L4_PORT)) {
@@ -1015,7 +979,6 @@ ice_tc_set_ipv6(struct flow_match_ipv6_addrs *match,
 }
 
 /**
-<<<<<<< HEAD
  * ice_tc_set_tos_ttl - Parse IP ToS/TTL from TC flower filter
  * @match: Pointer to flow match structure
  * @fltr: Pointer to filter structure
@@ -1050,8 +1013,6 @@ ice_tc_set_tos_ttl(struct flow_match_ip *match,
 }
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * ice_tc_set_port - Parse ports from TC flower filter
  * @match: Flow match structure
  * @fltr: Pointer to filter structure
@@ -1180,14 +1141,7 @@ ice_parse_tunnel_attr(struct net_device *dev, struct flow_rule *rule,
 		struct flow_match_ip match;
 
 		flow_rule_match_enc_ip(rule, &match);
-<<<<<<< HEAD
 		ice_tc_set_tos_ttl(&match, fltr, headers, true);
-=======
-		headers->l3_key.tos = match.key->tos;
-		headers->l3_key.ttl = match.key->ttl;
-		headers->l3_mask.tos = match.mask->tos;
-		headers->l3_mask.ttl = match.mask->ttl;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ENC_PORTS) &&
@@ -1256,17 +1210,11 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 	      BIT(FLOW_DISSECTOR_KEY_ENC_IPV6_ADDRS) |
 	      BIT(FLOW_DISSECTOR_KEY_ENC_PORTS) |
 	      BIT(FLOW_DISSECTOR_KEY_ENC_OPTS) |
-<<<<<<< HEAD
 	      BIT(FLOW_DISSECTOR_KEY_IP) |
 	      BIT(FLOW_DISSECTOR_KEY_ENC_IP) |
 	      BIT(FLOW_DISSECTOR_KEY_PORTS) |
 	      BIT(FLOW_DISSECTOR_KEY_PPPOE) |
 	      BIT(FLOW_DISSECTOR_KEY_L2TPV3))) {
-=======
-	      BIT(FLOW_DISSECTOR_KEY_ENC_IP) |
-	      BIT(FLOW_DISSECTOR_KEY_PORTS) |
-	      BIT(FLOW_DISSECTOR_KEY_PPPOE))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		NL_SET_ERR_MSG_MOD(fltr->extack, "Unsupported key used");
 		return -EOPNOTSUPP;
 	}
@@ -1362,19 +1310,15 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 		if (match.mask->vlan_id) {
 			if (match.mask->vlan_id == VLAN_VID_MASK) {
 				fltr->flags |= ICE_TC_FLWR_FIELD_VLAN;
-<<<<<<< HEAD
 				headers->vlan_hdr.vlan_id =
 					cpu_to_be16(match.key->vlan_id &
 						    VLAN_VID_MASK);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			} else {
 				NL_SET_ERR_MSG_MOD(fltr->extack, "Bad VLAN mask");
 				return -EINVAL;
 			}
 		}
 
-<<<<<<< HEAD
 		if (match.mask->vlan_priority) {
 			fltr->flags |= ICE_TC_FLWR_FIELD_VLAN_PRIO;
 			headers->vlan_hdr.vlan_prio =
@@ -1382,12 +1326,6 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 					     VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK);
 		}
 
-=======
-		headers->vlan_hdr.vlan_id =
-				cpu_to_be16(match.key->vlan_id & VLAN_VID_MASK);
-		if (match.mask->vlan_priority)
-			headers->vlan_hdr.vlan_prio = match.key->vlan_priority;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (match.mask->vlan_tpid)
 			headers->vlan_hdr.vlan_tpid = match.key->vlan_tpid;
 	}
@@ -1405,12 +1343,9 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 		if (match.mask->vlan_id) {
 			if (match.mask->vlan_id == VLAN_VID_MASK) {
 				fltr->flags |= ICE_TC_FLWR_FIELD_CVLAN;
-<<<<<<< HEAD
 				headers->cvlan_hdr.vlan_id =
 					cpu_to_be16(match.key->vlan_id &
 						    VLAN_VID_MASK);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			} else {
 				NL_SET_ERR_MSG_MOD(fltr->extack,
 						   "Bad CVLAN mask");
@@ -1418,19 +1353,12 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 			}
 		}
 
-<<<<<<< HEAD
 		if (match.mask->vlan_priority) {
 			fltr->flags |= ICE_TC_FLWR_FIELD_CVLAN_PRIO;
 			headers->cvlan_hdr.vlan_prio =
 				cpu_to_be16((match.key->vlan_priority <<
 					     VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK);
 		}
-=======
-		headers->cvlan_hdr.vlan_id =
-				cpu_to_be16(match.key->vlan_id & VLAN_VID_MASK);
-		if (match.mask->vlan_priority)
-			headers->cvlan_hdr.vlan_prio = match.key->vlan_priority;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PPPOE)) {
@@ -1473,7 +1401,6 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 			return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IP)) {
 		struct flow_match_ip match;
 
@@ -1490,8 +1417,6 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
 		headers->l2tpv3_hdr.session_id = match.key->session_id;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_PORTS)) {
 		struct flow_match_ports match;
 

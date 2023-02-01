@@ -281,11 +281,7 @@ BEGIN_FTR_SECTION
 	mfspr	r9,SPRN_PPR
 END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	HMT_MEDIUM
-<<<<<<< HEAD
 	std	r10,IAREA+EX_R10(r13)		/* save r10 */
-=======
-	std	r10,IAREA+EX_R10(r13)		/* save r10 - r12 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.if ICFAR
 BEGIN_FTR_SECTION
 	mfspr	r10,SPRN_CFAR
@@ -614,11 +610,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
 .macro SEARCH_RESTART_TABLE
 #ifdef CONFIG_RELOCATABLE
 	mr	r12,r2
-<<<<<<< HEAD
 	LOAD_PACA_TOC()
-=======
-	ld	r2,PACATOC(r13)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	LOAD_REG_ADDR(r9, __start___restart_table)
 	LOAD_REG_ADDR(r10, __stop___restart_table)
 	mr	r2,r12
@@ -648,11 +640,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
 .macro SEARCH_SOFT_MASK_TABLE
 #ifdef CONFIG_RELOCATABLE
 	mr	r12,r2
-<<<<<<< HEAD
 	LOAD_PACA_TOC()
-=======
-	ld	r2,PACATOC(r13)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	LOAD_REG_ADDR(r9, __start___soft_mask_table)
 	LOAD_REG_ADDR(r10, __stop___soft_mask_table)
 	mr	r2,r12
@@ -715,7 +703,6 @@ END_FTR_SECTION_IFSET(CPU_FTR_CFAR)
 .endm
 
 /*
-<<<<<<< HEAD
  * EARLY_BOOT_FIXUP - Fix real-mode interrupt with wrong endian in early boot.
  *
  * There's a short window during boot where although the kernel is running
@@ -781,8 +768,6 @@ END_FTR_SECTION(0, 1)     // nop out after boot
 .endm
 
 /*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * There are a few constraints to be concerned with.
  * - Real mode exceptions code/data must be located at their physical location.
  * - Virtual mode exceptions must be mapped at their 0xc000... location.
@@ -2372,7 +2357,6 @@ EXC_VIRT_END(performance_monitor, 0x4f00, 0x20)
 EXC_COMMON_BEGIN(performance_monitor_common)
 	GEN_COMMON performance_monitor
 	addi	r3,r1,STACK_FRAME_OVERHEAD
-<<<<<<< HEAD
 	lbz	r4,PACAIRQSOFTMASK(r13)
 	cmpdi	r4,IRQS_ENABLED
 	bne	1f
@@ -2385,10 +2369,6 @@ EXC_COMMON_BEGIN(performance_monitor_common)
 	mtmsrd	r9,1
 
 	kuap_kernel_restore r9, r10
-=======
-	bl	performance_monitor_exception
-	b	interrupt_return_srr
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	EXCEPTION_RESTORE_REGS hsrr=0
 	RFI_TO_KERNEL
@@ -2851,7 +2831,6 @@ masked_Hinterrupt:
 masked_interrupt:
 	.endif
 	stw	r9,PACA_EXGEN+EX_CCR(r13)
-<<<<<<< HEAD
 #ifdef CONFIG_PPC_IRQ_SOFT_MASK_DEBUG
 	/*
 	 * Ensure there was no previous MUST_HARD_MASK interrupt or
@@ -2866,8 +2845,6 @@ masked_interrupt:
 0:	tdnei	r9,0
 	EMIT_WARN_ENTRY 0b,__FILE__,__LINE__,(BUGFLAG_WARNING | BUGFLAG_ONCE)
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lbz	r9,PACAIRQHAPPENED(r13)
 	or	r9,r9,r10
 	stb	r9,PACAIRQHAPPENED(r13)
@@ -3108,25 +3085,6 @@ EXPORT_SYMBOL(do_uaccess_flush)
 MASKED_INTERRUPT
 MASKED_INTERRUPT hsrr=1
 
-<<<<<<< HEAD
-=======
-	/*
-	 * Relocation-on interrupts: A subset of the interrupts can be delivered
-	 * with IR=1/DR=1, if AIL==2 and MSR.HV won't be changed by delivering
-	 * it.  Addresses are the same as the original interrupt addresses, but
-	 * offset by 0xc000000000004000.
-	 * It's impossible to receive interrupts below 0x300 via this mechanism.
-	 * KVM: None of these traps are from the guest ; anything that escalated
-	 * to HV=1 from HV=0 is delivered via real mode handlers.
-	 */
-
-	/*
-	 * This uses the standard macro, since the original 0x300 vector
-	 * only has extra guff for STAB-based processors -- which never
-	 * come here.
-	 */
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 USE_FIXED_SECTION(virt_trampolines)
 	/*
 	 * All code below __end_soft_masked is treated as soft-masked. If

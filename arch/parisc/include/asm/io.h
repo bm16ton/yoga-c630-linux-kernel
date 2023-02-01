@@ -193,13 +193,9 @@ static inline int inl(unsigned long addr)
 	BUG();
 	return -1;
 }
-<<<<<<< HEAD
 #define inb inb
 #define inw inw
 #define inl inl
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define outb(x, y)	({(void)(x); (void)(y); BUG(); 0;})
 #define outw(x, y)	({(void)(x); (void)(y); BUG(); 0;})
 #define outl(x, y)	({(void)(x); (void)(y); BUG(); 0;})

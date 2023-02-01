@@ -576,7 +576,6 @@ static void gfxhub_v2_1_utcl2_harvest(struct amdgpu_device *adev)
 	}
 }
 
-<<<<<<< HEAD
 static void gfxhub_v2_1_save_regs(struct amdgpu_device *adev)
 {
 	int i;
@@ -682,8 +681,6 @@ static void gfxhub_v2_1_halt(struct amdgpu_device *adev)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct amdgpu_gfxhub_funcs gfxhub_v2_1_funcs = {
 	.get_fb_location = gfxhub_v2_1_get_fb_location,
 	.get_mc_fb_offset = gfxhub_v2_1_get_mc_fb_offset,
@@ -694,10 +691,7 @@ const struct amdgpu_gfxhub_funcs gfxhub_v2_1_funcs = {
 	.init = gfxhub_v2_1_init,
 	.get_xgmi_info = gfxhub_v2_1_get_xgmi_info,
 	.utcl2_harvest = gfxhub_v2_1_utcl2_harvest,
-<<<<<<< HEAD
 	.mode2_save_regs = gfxhub_v2_1_save_regs,
 	.mode2_restore_regs = gfxhub_v2_1_restore_regs,
 	.halt = gfxhub_v2_1_halt,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

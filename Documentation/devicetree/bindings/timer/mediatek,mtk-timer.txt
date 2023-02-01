@@ -25,10 +25,7 @@ Required properties:
 	For those SoCs that use SYST
 	* "mediatek,mt8183-timer" for MT8183 compatible timers (SYST)
 	* "mediatek,mt8186-timer" for MT8186 compatible timers (SYST)
-<<<<<<< HEAD
 	* "mediatek,mt8188-timer" for MT8188 compatible timers (SYST)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	* "mediatek,mt8192-timer" for MT8192 compatible timers (SYST)
 	* "mediatek,mt8195-timer" for MT8195 compatible timers (SYST)
 	* "mediatek,mt7629-timer" for MT7629 compatible timers (SYST)

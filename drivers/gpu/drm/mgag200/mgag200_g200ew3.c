@@ -2,7 +2,6 @@
 
 #include <linux/pci.h>
 
-<<<<<<< HEAD
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_drv.h>
@@ -176,12 +175,6 @@ static int mgag200_g200ew3_pipeline_init(struct mga_device *mdev)
 	return 0;
 }
 
-=======
-#include <drm/drm_drv.h>
-
-#include "mgag200_drv.h"
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * DRM device
  */
@@ -189,7 +182,6 @@ static int mgag200_g200ew3_pipeline_init(struct mga_device *mdev)
 static const struct mgag200_device_info mgag200_g200ew3_device_info =
 	MGAG200_DEVICE_INFO_INIT(2048, 2048, 0, true, 0, 1, false);
 
-<<<<<<< HEAD
 static const struct mgag200_device_funcs mgag200_g200ew3_device_funcs = {
 	.disable_vidrst = mgag200_bmc_disable_vidrst,
 	.enable_vidrst = mgag200_bmc_enable_vidrst,
@@ -197,8 +189,6 @@ static const struct mgag200_device_funcs mgag200_g200ew3_device_funcs = {
 	.pixpllc_atomic_update = mgag200_g200wb_pixpllc_atomic_update, // same as G200WB
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static resource_size_t mgag200_g200ew3_device_probe_vram(struct mga_device *mdev)
 {
 	resource_size_t vram_size = resource_size(mdev->vram_res);
@@ -209,12 +199,7 @@ static resource_size_t mgag200_g200ew3_device_probe_vram(struct mga_device *mdev
 }
 
 struct mga_device *mgag200_g200ew3_device_create(struct pci_dev *pdev,
-<<<<<<< HEAD
 						 const struct drm_driver *drv)
-=======
-						 const struct drm_driver *drv,
-						 enum mga_type type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mga_device *mdev;
 	struct drm_device *dev;
@@ -236,7 +221,6 @@ struct mga_device *mgag200_g200ew3_device_create(struct pci_dev *pdev,
 	if (ret)
 		return ERR_PTR(ret);
 
-<<<<<<< HEAD
 	ret = mgag200_device_init(mdev, &mgag200_g200ew3_device_info,
 				  &mgag200_g200ew3_device_funcs);
 	if (ret)
@@ -256,17 +240,5 @@ struct mga_device *mgag200_g200ew3_device_create(struct pci_dev *pdev,
 
 	drm_mode_config_reset(dev);
 
-=======
-	ret = mgag200_device_init(mdev, type, &mgag200_g200ew3_device_info);
-	if (ret)
-		return ERR_PTR(ret);
-
-	vram_available = mgag200_g200ew3_device_probe_vram(mdev);
-
-	ret = mgag200_modeset_init(mdev, vram_available);
-	if (ret)
-		return ERR_PTR(ret);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return mdev;
 }

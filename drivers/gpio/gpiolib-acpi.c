@@ -1079,12 +1079,9 @@ int acpi_dev_gpio_irq_wake_get_by(struct acpi_device *adev, const char *name, in
 			} else {
 				dev_dbg(&adev->dev, "IRQ %d already in use\n", irq);
 			}
-<<<<<<< HEAD
 
 			if (wake_capable)
 				*wake_capable = info.wake_capable;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			return irq;
 		}

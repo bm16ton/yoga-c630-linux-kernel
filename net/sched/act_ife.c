@@ -481,11 +481,7 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
 			struct tcf_proto *tp, u32 flags,
 			struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_ife_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, ife_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = flags & TCA_ACT_FLAGS_BIND;
 	struct nlattr *tb[TCA_IFE_MAX + 1];
 	struct nlattr *tb2[IFE_META_MAX + 1];

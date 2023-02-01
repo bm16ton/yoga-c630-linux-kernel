@@ -164,46 +164,29 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 	{
 	 /* https://bugzilla.redhat.com/show_bug.cgi?id=1128309 */
 	 .callback = video_detect_force_vendor,
-<<<<<<< HEAD
 	 /* Acer KAV80 */
-=======
-	 /* X360 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 .matches = {
 		DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
 		DMI_MATCH(DMI_PRODUCT_NAME, "KAV80"),
 		},
 	},
 	{
-<<<<<<< HEAD
 	 .callback = video_detect_force_vendor,
 	 /* Asus UL30VT */
 	 .matches = {
-=======
-	.callback = video_detect_force_vendor,
-	/* Asus UL30VT */
-	.matches = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK Computer Inc."),
 		DMI_MATCH(DMI_PRODUCT_NAME, "UL30VT"),
 		},
 	},
 	{
-<<<<<<< HEAD
 	 .callback = video_detect_force_vendor,
 	 /* Asus UL30A */
 	 .matches = {
-=======
-	.callback = video_detect_force_vendor,
-	/* Asus UL30A */
-	.matches = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK Computer Inc."),
 		DMI_MATCH(DMI_PRODUCT_NAME, "UL30A"),
 		},
 	},
 	{
-<<<<<<< HEAD
 	 .callback = video_detect_force_vendor,
 	 /* Asus X55U */
 	 .matches = {
@@ -287,19 +270,6 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 	 .callback = video_detect_force_vendor,
 	 /* Sony Vaio PCG-FRV35 */
 	 .matches = {
-=======
-	.callback = video_detect_force_vendor,
-	/* GIGABYTE GB-BXBT-2807 */
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "GIGABYTE"),
-		DMI_MATCH(DMI_PRODUCT_NAME, "GB-BXBT-2807"),
-		},
-	},
-	{
-	.callback = video_detect_force_vendor,
-	/* Sony VPCEH3U1E */
-	.matches = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DMI_MATCH(DMI_SYS_VENDOR, "Sony Corporation"),
 		DMI_MATCH(DMI_PRODUCT_NAME, "PCG-FRV35"),
 		},
@@ -321,14 +291,6 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 	 .matches = {
 		DMI_MATCH(DMI_SYS_VENDOR, "TOSHIBA"),
 		DMI_MATCH(DMI_PRODUCT_NAME, "PORTEGE R600"),
-		},
-	},
-	{
-	.callback = video_detect_force_vendor,
-	/* Xiaomi Mi Pad 2 */
-	.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Xiaomi Inc"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "Mipad2"),
 		},
 	},
 
@@ -606,7 +568,6 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 		},
 	},
 	{
-<<<<<<< HEAD
 	 /* https://bugzilla.kernel.org/show_bug.cgi?id=36322 */
 	 .callback = video_detect_force_native,
 	 /* Acer TravelMate 5760 */
@@ -619,44 +580,26 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 	 .callback = video_detect_force_native,
 	 /* ASUSTeK COMPUTER INC. GA401 */
 	 .matches = {
-=======
-	.callback = video_detect_force_native,
-	/* ASUSTeK COMPUTER INC. GA401 */
-	.matches = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
 		DMI_MATCH(DMI_PRODUCT_NAME, "GA401"),
 		},
 	},
 	{
-<<<<<<< HEAD
 	 .callback = video_detect_force_native,
 	 /* ASUSTeK COMPUTER INC. GA502 */
 	 .matches = {
-=======
-	.callback = video_detect_force_native,
-	/* ASUSTeK COMPUTER INC. GA502 */
-	.matches = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
 		DMI_MATCH(DMI_PRODUCT_NAME, "GA502"),
 		},
 	},
 	{
-<<<<<<< HEAD
 	 .callback = video_detect_force_native,
 	 /* ASUSTeK COMPUTER INC. GA503 */
 	 .matches = {
-=======
-	.callback = video_detect_force_native,
-	/* ASUSTeK COMPUTER INC. GA503 */
-	.matches = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
 		DMI_MATCH(DMI_PRODUCT_NAME, "GA503"),
 		},
 	},
-<<<<<<< HEAD
 	{
 	 .callback = video_detect_force_native,
 	 /* Asus UX303UB */
@@ -745,163 +688,6 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 		},
 	},
 
-=======
-	/*
-	 * Clevo NL5xRU and NL5xNU/TUXEDO Aura 15 Gen1 and Gen2 have both a
-	 * working native and video interface. However the default detection
-	 * mechanism first registers the video interface before unregistering
-	 * it again and switching to the native interface during boot. This
-	 * results in a dangling SBIOS request for backlight change for some
-	 * reason, causing the backlight to switch to ~2% once per boot on the
-	 * first power cord connect or disconnect event. Setting the native
-	 * interface explicitly circumvents this buggy behaviour, by avoiding
-	 * the unregistering process.
-	 */
-	{
-	.callback = video_detect_force_native,
-	.ident = "Clevo NL5xRU",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "NL5xRU"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "Clevo NL5xRU",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "AURA1501"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "Clevo NL5xRU",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "EDUBOOK1502"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "Clevo NL5xNU",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "NL5xNU"),
-		},
-	},
-	/*
-	 * The TongFang PF5PU1G, PF4NU1F, PF5NU1G, and PF5LUXG/TUXEDO BA15 Gen10,
-	 * Pulse 14/15 Gen1, and Pulse 15 Gen2 have the same problem as the Clevo
-	 * NL5xRU and NL5xNU/TUXEDO Aura 15 Gen1 and Gen2. See the description
-	 * above.
-	 */
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang PF5PU1G",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "PF5PU1G"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang PF4NU1F",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "PF4NU1F"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang PF4NU1F",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "PULSE1401"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang PF5NU1G",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "PF5NU1G"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang PF5NU1G",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "PULSE1501"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang PF5LUXG",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "PF5LUXG"),
-		},
-	},
-	/*
-	 * More Tongfang devices with the same issue as the Clevo NL5xRU and
-	 * NL5xNU/TUXEDO Aura 15 Gen1 and Gen2. See the description above.
-	 */
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GKxNRxx",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "GKxNRxx"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GKxNRxx",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "POLARIS1501A1650TI"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GKxNRxx",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "POLARIS1501A2060"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GKxNRxx",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "POLARIS1701A1650TI"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GKxNRxx",
-	.matches = {
-		DMI_MATCH(DMI_SYS_VENDOR, "TUXEDO"),
-		DMI_MATCH(DMI_BOARD_NAME, "POLARIS1701A2060"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GMxNGxx",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "GMxNGxx"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GMxZGxx",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "GMxZGxx"),
-		},
-	},
-	{
-	.callback = video_detect_force_native,
-	.ident = "TongFang GMxRGxx",
-	.matches = {
-		DMI_MATCH(DMI_BOARD_NAME, "GMxRGxx"),
-		},
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Models which have nvidia-ec-wmi support, but should not use it.
 	 * Note this indicates a likely firmware bug on these models and should
@@ -930,7 +716,6 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 	},
 	{
 	 .callback = video_detect_force_none,
-<<<<<<< HEAD
 	 /* GIGABYTE GB-BXBT-2807 */
 	 .matches = {
 		DMI_MATCH(DMI_SYS_VENDOR, "GIGABYTE"),
@@ -939,8 +724,6 @@ static const struct dmi_system_id video_detect_dmi_table[] = {
 	},
 	{
 	 .callback = video_detect_force_none,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 /* MSI MS-7721 */
 	 .matches = {
 		DMI_MATCH(DMI_SYS_VENDOR, "MSI"),

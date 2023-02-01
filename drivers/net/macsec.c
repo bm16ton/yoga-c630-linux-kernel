@@ -246,17 +246,6 @@ static struct macsec_cb *macsec_skb_cb(struct sk_buff *skb)
 #define DEFAULT_ENCODING_SA 0
 #define MACSEC_XPN_MAX_REPLAY_WINDOW (((1 << 30) - 1))
 
-<<<<<<< HEAD
-=======
-static bool send_sci(const struct macsec_secy *secy)
-{
-	const struct macsec_tx_sc *tx_sc = &secy->tx_sc;
-
-	return tx_sc->send_sci ||
-		(secy->n_rx_sc > 1 && !tx_sc->end_station && !tx_sc->scb);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static sci_t make_sci(const u8 *addr, __be16 port)
 {
 	sci_t sci;

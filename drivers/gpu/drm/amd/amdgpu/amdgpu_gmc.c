@@ -548,11 +548,8 @@ void amdgpu_gmc_tmz_set(struct amdgpu_device *adev)
 	case IP_VERSION(10, 3, 1):
 	/* YELLOW_CARP*/
 	case IP_VERSION(10, 3, 3):
-<<<<<<< HEAD
 	case IP_VERSION(11, 0, 1):
 	case IP_VERSION(11, 0, 4):
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Don't enable it by default yet.
 		 */
 		if (amdgpu_tmz < 1) {
@@ -583,7 +580,6 @@ void amdgpu_gmc_tmz_set(struct amdgpu_device *adev)
 void amdgpu_gmc_noretry_set(struct amdgpu_device *adev)
 {
 	struct amdgpu_gmc *gmc = &adev->gmc;
-<<<<<<< HEAD
 	uint32_t gc_ver = adev->ip_versions[GC_HWIP][0];
 	bool noretry_default = (gc_ver == IP_VERSION(9, 0, 1) ||
 				gc_ver == IP_VERSION(9, 3, 0) ||
@@ -593,47 +589,6 @@ void amdgpu_gmc_noretry_set(struct amdgpu_device *adev)
 				gc_ver >= IP_VERSION(10, 3, 0));
 
 	gmc->noretry = (amdgpu_noretry == -1) ? noretry_default : amdgpu_noretry;
-=======
-
-	switch (adev->ip_versions[GC_HWIP][0]) {
-	case IP_VERSION(9, 0, 1):
-	case IP_VERSION(9, 3, 0):
-	case IP_VERSION(9, 4, 0):
-	case IP_VERSION(9, 4, 1):
-	case IP_VERSION(9, 4, 2):
-	case IP_VERSION(10, 3, 3):
-	case IP_VERSION(10, 3, 4):
-	case IP_VERSION(10, 3, 5):
-	case IP_VERSION(10, 3, 6):
-	case IP_VERSION(10, 3, 7):
-		/*
-		 * noretry = 0 will cause kfd page fault tests fail
-		 * for some ASICs, so set default to 1 for these ASICs.
-		 */
-		if (amdgpu_noretry == -1)
-			gmc->noretry = 1;
-		else
-			gmc->noretry = amdgpu_noretry;
-		break;
-	default:
-		/* Raven currently has issues with noretry
-		 * regardless of what we decide for other
-		 * asics, we should leave raven with
-		 * noretry = 0 until we root cause the
-		 * issues.
-		 *
-		 * default this to 0 for now, but we may want
-		 * to change this in the future for certain
-		 * GPUs as it can increase performance in
-		 * certain cases.
-		 */
-		if (amdgpu_noretry == -1)
-			gmc->noretry = 0;
-		else
-			gmc->noretry = amdgpu_noretry;
-		break;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void amdgpu_gmc_set_vm_fault_masks(struct amdgpu_device *adev, int hub_type,

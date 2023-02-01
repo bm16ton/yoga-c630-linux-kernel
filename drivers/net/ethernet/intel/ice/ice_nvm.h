@@ -34,11 +34,7 @@ ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
 int
 ice_aq_erase_nvm(struct ice_hw *hw, u16 module_typeid, struct ice_sq_cd *cd);
 int ice_nvm_validate_checksum(struct ice_hw *hw);
-<<<<<<< HEAD
 int ice_nvm_write_activate(struct ice_hw *hw, u16 cmd_flags, u8 *response_flags);
-=======
-int ice_nvm_write_activate(struct ice_hw *hw, u8 cmd_flags, u8 *response_flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ice_aq_nvm_update_empr(struct ice_hw *hw);
 int
 ice_nvm_set_pkg_data(struct ice_hw *hw, bool del_pkg_data_flag, u8 *data,

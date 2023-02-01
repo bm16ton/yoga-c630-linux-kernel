@@ -12,10 +12,7 @@
 #include "sm7225.dtsi"
 #include "pm6150l.dtsi"
 #include "pm6350.dtsi"
-<<<<<<< HEAD
 #include "pm7250b.dtsi"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 / {
 	model = "Fairphone 4";
@@ -74,7 +71,6 @@
 			qcom,vmid = <15>;
 		};
 	};
-<<<<<<< HEAD
 
 	thermal-zones {
 		chg-skin-thermal {
@@ -105,8 +101,6 @@
 			};
 		};
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &adsp {
@@ -390,7 +384,6 @@
 	linux,code = <KEY_VOLUMEDOWN>;
 };
 
-<<<<<<< HEAD
 &pm7250b_adc {
 	adc-chan@4d {
 		reg = <ADC5_AMUX_THM1_100K_PU>;
@@ -427,8 +420,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &qupv3_id_1 {
 	status = "okay";
 };

@@ -401,11 +401,7 @@ static void setup_default_ctrlval(struct rdt_resource *r, u32 *dc)
 	 * For Cache Allocation: Set all bits in cbm
 	 * For Memory Allocation: Set b/w requested to 100%
 	 */
-<<<<<<< HEAD
 	for (i = 0; i < hw_res->num_closid; i++, dc++)
-=======
-	for (i = 0; i < hw_res->num_closid; i++, dc++, dm++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*dc = r->default_ctrl;
 }
 
@@ -429,21 +425,8 @@ static int domain_setup_ctrlval(struct rdt_resource *r, struct rdt_domain *d)
 	if (!dc)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	hw_dom->ctrl_val = dc;
 	setup_default_ctrlval(r, dc);
-=======
-	dm = kmalloc_array(hw_res->num_closid, sizeof(*hw_dom->mbps_val),
-			   GFP_KERNEL);
-	if (!dm) {
-		kfree(dc);
-		return -ENOMEM;
-	}
-
-	hw_dom->ctrl_val = dc;
-	hw_dom->mbps_val = dm;
-	setup_default_ctrlval(r, dc, dm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	m.low = 0;
 	m.high = hw_res->num_closid;
@@ -524,23 +507,12 @@ static void domain_add_cpu(int cpu, struct rdt_resource *r)
 	rdt_domain_reconfigure_cdp(r);
 
 	if (r->alloc_capable && domain_setup_ctrlval(r, d)) {
-<<<<<<< HEAD
 		domain_free(hw_dom);
 		return;
 	}
 
 	if (r->mon_capable && arch_domain_mbm_alloc(r->num_rmid, hw_dom)) {
 		domain_free(hw_dom);
-=======
-		kfree(hw_dom);
-		return;
-	}
-
-	if (r->mon_capable && domain_setup_mon_state(r, d)) {
-		kfree(hw_dom->ctrl_val);
-		kfree(hw_dom->mbps_val);
-		kfree(hw_dom);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 	}
 
@@ -579,15 +551,6 @@ static void domain_remove_cpu(int cpu, struct rdt_resource *r)
 			d->plr->d = NULL;
 		domain_free(hw_dom);
 
-<<<<<<< HEAD
-=======
-		kfree(hw_dom->ctrl_val);
-		kfree(hw_dom->mbps_val);
-		bitmap_free(d->rmid_busy_llc);
-		kfree(d->mbm_total);
-		kfree(d->mbm_local);
-		kfree(hw_dom);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 	}
 

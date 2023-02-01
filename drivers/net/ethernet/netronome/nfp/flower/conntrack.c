@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /* Copyright (C) 2021 Corigine, Inc. */
 
-<<<<<<< HEAD
 #include <net/tc_act/tc_csum.h>
 #include <net/tc_act/tc_ct.h>
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "conntrack.h"
 #include "../nfp_port.h"
 
@@ -62,7 +59,6 @@ bool is_pre_ct_flow(struct flow_cls_offload *flow)
 	int i;
 
 	flow_action_for_each(i, act, &flow->rule->action) {
-<<<<<<< HEAD
 		if (act->id == FLOW_ACTION_CT) {
 			/* The pre_ct rule only have the ct or ct nat action, cannot
 			 * contains other ct action e.g ct commit and so on.
@@ -74,11 +70,6 @@ bool is_pre_ct_flow(struct flow_cls_offload *flow)
 		}
 	}
 
-=======
-		if (act->id == FLOW_ACTION_CT && !act->ct.action)
-			return true;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 
@@ -86,7 +77,6 @@ bool is_post_ct_flow(struct flow_cls_offload *flow)
 {
 	struct flow_rule *rule = flow_cls_offload_flow_rule(flow);
 	struct flow_dissector *dissector = rule->match.dissector;
-<<<<<<< HEAD
 	struct flow_action_entry *act;
 	bool exist_ct_clear = false;
 	struct flow_match_ct ct;
@@ -104,15 +94,11 @@ bool is_post_ct_flow(struct flow_cls_offload *flow)
 			return false;
 		}
 	}
-=======
-	struct flow_match_ct ct;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (dissector->used_keys & BIT(FLOW_DISSECTOR_KEY_CT)) {
 		flow_rule_match_ct(rule, &ct);
 		if (ct.key->ct_state & TCA_FLOWER_KEY_CT_FLAGS_ESTABLISHED)
 			return true;
-<<<<<<< HEAD
 	} else {
 		/* when do nat with ct, the post ct entry ignore the ct status,
 		 * will match the nat field(sip/dip) instead. In this situation,
@@ -122,9 +108,6 @@ bool is_post_ct_flow(struct flow_cls_offload *flow)
 			return true;
 	}
 
-=======
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 
@@ -220,7 +203,6 @@ static void *get_mangled_tos_ttl(struct flow_rule *rule, void *buf,
 	return buf;
 }
 
-<<<<<<< HEAD
 /* Note entry1 and entry2 are not swappable. only skip ip and
  * tport merge check for pre_ct and post_ct when pre_ct do nat.
  */
@@ -235,8 +217,6 @@ static bool nfp_ct_merge_check_cannot_skip(struct nfp_fl_ct_flow_entry *entry1,
 	return true;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Note entry1 and entry2 are not swappable, entry1 should be
  * the former flow whose mangle action need be taken into account
  * if existed, and entry2 should be the latter flow whose action
@@ -294,16 +274,12 @@ static int nfp_ct_merge_check(struct nfp_fl_ct_flow_entry *entry1,
 			goto check_failed;
 	}
 
-<<<<<<< HEAD
 	/* if pre ct entry do nat, the nat ip exists in nft entry,
 	 * will be do merge check when do nft and post ct merge,
 	 * so skip this ip merge check here.
 	 */
 	if ((ovlp_keys & BIT(FLOW_DISSECTOR_KEY_IPV4_ADDRS)) &&
 	    nfp_ct_merge_check_cannot_skip(entry1, entry2)) {
-=======
-	if (ovlp_keys & BIT(FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct flow_match_ipv4_addrs match1, match2;
 
 		flow_rule_match_ipv4_addrs(entry1->rule, &match1);
@@ -320,16 +296,12 @@ static int nfp_ct_merge_check(struct nfp_fl_ct_flow_entry *entry1,
 			goto check_failed;
 	}
 
-<<<<<<< HEAD
 	/* if pre ct entry do nat, the nat ip exists in nft entry,
 	 * will be do merge check when do nft and post ct merge,
 	 * so skip this ip merge check here.
 	 */
 	if ((ovlp_keys & BIT(FLOW_DISSECTOR_KEY_IPV6_ADDRS)) &&
 	    nfp_ct_merge_check_cannot_skip(entry1, entry2)) {
-=======
-	if (ovlp_keys & BIT(FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct flow_match_ipv6_addrs match1, match2;
 
 		flow_rule_match_ipv6_addrs(entry1->rule, &match1);
@@ -346,16 +318,12 @@ static int nfp_ct_merge_check(struct nfp_fl_ct_flow_entry *entry1,
 			goto check_failed;
 	}
 
-<<<<<<< HEAD
 	/* if pre ct entry do nat, the nat tport exists in nft entry,
 	 * will be do merge check when do nft and post ct merge,
 	 * so skip this tport merge check here.
 	 */
 	if ((ovlp_keys & BIT(FLOW_DISSECTOR_KEY_PORTS)) &&
 	    nfp_ct_merge_check_cannot_skip(entry1, entry2)) {
-=======
-	if (ovlp_keys & BIT(FLOW_DISSECTOR_KEY_PORTS)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		enum flow_action_mangle_base htype = FLOW_ACT_MANGLE_UNSPEC;
 		struct flow_match_ports match1, match2;
 
@@ -500,7 +468,6 @@ check_failed:
 	return -EINVAL;
 }
 
-<<<<<<< HEAD
 static int nfp_ct_check_vlan_merge(struct flow_action_entry *a_in,
 				   struct flow_rule *rule)
 {
@@ -544,18 +511,12 @@ static int nfp_ct_check_vlan_merge(struct flow_action_entry *a_in,
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int nfp_ct_merge_act_check(struct nfp_fl_ct_flow_entry *pre_ct_entry,
 				  struct nfp_fl_ct_flow_entry *post_ct_entry,
 				  struct nfp_fl_ct_flow_entry *nft_entry)
 {
 	struct flow_action_entry *act;
-<<<<<<< HEAD
 	int i, err;
-=======
-	int i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Check for pre_ct->action conflicts */
 	flow_action_for_each(i, act, &pre_ct_entry->rule->action) {
@@ -563,13 +524,10 @@ static int nfp_ct_merge_act_check(struct nfp_fl_ct_flow_entry *pre_ct_entry,
 		case FLOW_ACTION_VLAN_PUSH:
 		case FLOW_ACTION_VLAN_POP:
 		case FLOW_ACTION_VLAN_MANGLE:
-<<<<<<< HEAD
 			err = nfp_ct_check_vlan_merge(act, post_ct_entry->rule);
 			if (err)
 				return err;
 			break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		case FLOW_ACTION_MPLS_PUSH:
 		case FLOW_ACTION_MPLS_POP:
 		case FLOW_ACTION_MPLS_MANGLE:
@@ -621,15 +579,12 @@ static int nfp_ct_check_meta(struct nfp_fl_ct_flow_entry *post_ct_entry,
 			return -EINVAL;
 
 		return 0;
-<<<<<<< HEAD
 	} else {
 		/* post_ct with ct clear action will not match the
 		 * ct status when nft is nat entry.
 		 */
 		if (nft_entry->flags & NFP_FL_ACTION_DO_MANGLE)
 			return 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return -EINVAL;
@@ -699,7 +654,6 @@ nfp_fl_calc_key_layers_sz(struct nfp_fl_key_ls in_key_ls, uint16_t *map)
 	return key_size;
 }
 
-<<<<<<< HEAD
 /* get the csum flag according the ip proto and mangle action. */
 static void nfp_fl_get_csum_flag(struct flow_action_entry *a_in, u8 ip_proto, u32 *csum)
 {
@@ -725,17 +679,12 @@ static void nfp_fl_get_csum_flag(struct flow_action_entry *a_in, u8 ip_proto, u3
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int nfp_fl_merge_actions_offload(struct flow_rule **rules,
 					struct nfp_flower_priv *priv,
 					struct net_device *netdev,
 					struct nfp_fl_payload *flow_pay)
 {
-<<<<<<< HEAD
 	enum flow_action_hw_stats tmp_stats = FLOW_ACTION_HW_STATS_DONT_CARE;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct flow_action_entry *a_in;
 	int i, j, num_actions, id;
 	struct flow_rule *a_rule;
@@ -745,20 +694,15 @@ static int nfp_fl_merge_actions_offload(struct flow_rule **rules,
 		      rules[CT_TYPE_NFT]->action.num_entries +
 		      rules[CT_TYPE_POST_CT]->action.num_entries;
 
-<<<<<<< HEAD
 	/* Add one action to make sure there is enough room to add an checksum action
 	 * when do nat.
 	 */
 	a_rule = flow_rule_alloc(num_actions + 1);
-=======
-	a_rule = flow_rule_alloc(num_actions);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!a_rule)
 		return -ENOMEM;
 
 	/* Actions need a BASIC dissector. */
 	a_rule->match = rules[CT_TYPE_PRE_CT]->match;
-<<<<<<< HEAD
 	/* post_ct entry have one action at least. */
 	if (rules[CT_TYPE_POST_CT]->action.num_entries != 0) {
 		tmp_stats = rules[CT_TYPE_POST_CT]->action.entries[0].hw_stats;
@@ -769,11 +713,6 @@ static int nfp_fl_merge_actions_offload(struct flow_rule **rules,
 		u32 csum_updated = 0;
 		u8 ip_proto = 0;
 
-=======
-
-	/* Copy actions */
-	for (j = 0; j < _CT_TYPE_MAX; j++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (flow_rule_match_key(rules[j], FLOW_DISSECTOR_KEY_BASIC)) {
 			struct flow_match_basic match;
 
@@ -785,15 +724,10 @@ static int nfp_fl_merge_actions_offload(struct flow_rule **rules,
 			 * through the subflows and assign the proper subflow to a_rule
 			 */
 			flow_rule_match_basic(rules[j], &match);
-<<<<<<< HEAD
 			if (match.mask->ip_proto) {
 				a_rule->match = rules[j]->match;
 				ip_proto = match.key->ip_proto;
 			}
-=======
-			if (match.mask->ip_proto)
-				a_rule->match = rules[j]->match;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		for (i = 0; i < rules[j]->action.num_entries; i++) {
@@ -810,7 +744,6 @@ static int nfp_fl_merge_actions_offload(struct flow_rule **rules,
 			case FLOW_ACTION_CT_METADATA:
 				continue;
 			default:
-<<<<<<< HEAD
 				/* nft entry is generated by tc ct, which mangle action do not care
 				 * the stats, inherit the post entry stats to meet the
 				 * flow_action_hw_stats_check.
@@ -820,14 +753,11 @@ static int nfp_fl_merge_actions_offload(struct flow_rule **rules,
 						a_in->hw_stats = tmp_stats;
 					nfp_fl_get_csum_flag(a_in, ip_proto, &csum_updated);
 				}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				memcpy(&a_rule->action.entries[offset++],
 				       a_in, sizeof(struct flow_action_entry));
 				break;
 			}
 		}
-<<<<<<< HEAD
 		/* nft entry have mangle action, but do not have checksum action when do NAT,
 		 * hardware will automatically fix IPv4 and TCP/UDP checksum. so add an csum action
 		 * to meet csum action check.
@@ -840,8 +770,6 @@ static int nfp_fl_merge_actions_offload(struct flow_rule **rules,
 			csum_action->csum_flags = csum_updated;
 			csum_action->hw_stats = tmp_stats;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Some actions would have been ignored, so update the num_entries field */
@@ -1439,7 +1367,6 @@ static struct net_device *get_netdev_from_rule(struct flow_rule *rule)
 	return NULL;
 }
 
-<<<<<<< HEAD
 static void nfp_nft_ct_translate_mangle_action(struct flow_action_entry *mangle_action)
 {
 	if (mangle_action->id != FLOW_ACTION_MANGLE)
@@ -1483,8 +1410,6 @@ static int nfp_nft_ct_set_flow_flag(struct flow_action_entry *act,
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct
 nfp_fl_ct_flow_entry *nfp_fl_ct_add_flow(struct nfp_fl_ct_zone_entry *zt,
 					 struct net_device *netdev,
@@ -1551,7 +1476,6 @@ nfp_fl_ct_flow_entry *nfp_fl_ct_add_flow(struct nfp_fl_ct_zone_entry *zt,
 
 		new_act = &entry->rule->action.entries[i];
 		memcpy(new_act, act, sizeof(struct flow_action_entry));
-<<<<<<< HEAD
 		/* nft entry mangle field is host byte order, need translate to
 		 * network byte order.
 		 */
@@ -1559,8 +1483,6 @@ nfp_fl_ct_flow_entry *nfp_fl_ct_add_flow(struct nfp_fl_ct_zone_entry *zt,
 			nfp_nft_ct_translate_mangle_action(new_act);
 
 		nfp_nft_ct_set_flow_flag(new_act, entry);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Entunnel is a special case, need to allocate and copy
 		 * tunnel info.
 		 */

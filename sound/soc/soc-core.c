@@ -1213,10 +1213,6 @@ int snd_soc_runtime_set_dai_fmt(struct snd_soc_pcm_runtime *rtd,
 {
 	struct snd_soc_dai *cpu_dai;
 	struct snd_soc_dai *codec_dai;
-<<<<<<< HEAD
-=======
-	unsigned int inv_dai_fmt;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int i;
 	int ret;
 
@@ -1229,26 +1225,11 @@ int snd_soc_runtime_set_dai_fmt(struct snd_soc_pcm_runtime *rtd,
 			return ret;
 	}
 
-<<<<<<< HEAD
 	/* Flip the polarity for the "CPU" end of link */
 	dai_fmt = snd_soc_daifmt_clock_provider_flipped(dai_fmt);
 
 	for_each_rtd_cpu_dais(rtd, i, cpu_dai) {
 		ret = snd_soc_dai_set_fmt(cpu_dai, dai_fmt);
-=======
-	/*
-	 * Flip the polarity for the "CPU" end of a CODEC<->CODEC link
-	 */
-	inv_dai_fmt = snd_soc_daifmt_clock_provider_fliped(dai_fmt);
-
-	for_each_rtd_cpu_dais(rtd, i, cpu_dai) {
-		unsigned int fmt = dai_fmt;
-
-		if (snd_soc_component_is_codec(cpu_dai->component))
-			fmt = inv_dai_fmt;
-
-		ret = snd_soc_dai_set_fmt(cpu_dai, fmt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret != 0 && ret != -ENOTSUPP)
 			return ret;
 	}
@@ -2512,11 +2493,7 @@ static int snd_soc_register_dais(struct snd_soc_component *component,
 
 	for (i = 0; i < count; i++) {
 		dai = snd_soc_register_dai(component, dai_drv + i, count == 1 &&
-<<<<<<< HEAD
 					   component->driver->legacy_dai_naming);
-=======
-					   !snd_soc_component_is_codec(component));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (dai == NULL) {
 			ret = -ENOMEM;
 			goto err;
@@ -3054,11 +3031,7 @@ int snd_soc_of_parse_aux_devs(struct snd_soc_card *card, const char *propname)
 }
 EXPORT_SYMBOL_GPL(snd_soc_of_parse_aux_devs);
 
-<<<<<<< HEAD
 unsigned int snd_soc_daifmt_clock_provider_flipped(unsigned int dai_fmt)
-=======
-unsigned int snd_soc_daifmt_clock_provider_fliped(unsigned int dai_fmt)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned int inv_dai_fmt = dai_fmt & ~SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK;
 
@@ -3079,11 +3052,7 @@ unsigned int snd_soc_daifmt_clock_provider_fliped(unsigned int dai_fmt)
 
 	return inv_dai_fmt;
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_GPL(snd_soc_daifmt_clock_provider_flipped);
-=======
-EXPORT_SYMBOL_GPL(snd_soc_daifmt_clock_provider_fliped);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 unsigned int snd_soc_daifmt_clock_provider_from_bitmap(unsigned int bit_frame)
 {

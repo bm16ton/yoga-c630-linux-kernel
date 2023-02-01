@@ -2993,7 +2993,6 @@ enum sparx5_target {
 #define GCB_SIO_CLOCK_SYS_CLK_PERIOD_GET(x)\
 	FIELD_GET(GCB_SIO_CLOCK_SYS_CLK_PERIOD, x)
 
-<<<<<<< HEAD
 /*      HSCH:HSCH_CFG:CIR_CFG */
 #define HSCH_CIR_CFG(g)           __REG(TARGET_HSCH, 0, 1, 0, g, 5040, 32, 0, 0, 1, 4)
 
@@ -3135,8 +3134,6 @@ enum sparx5_target {
 #define HSCH_HSCH_CFG_CFG_CSR_GRANT_GET(x)\
 	FIELD_GET(HSCH_HSCH_CFG_CFG_CSR_GRANT, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*      HSCH:HSCH_MISC:SYS_CLK_PER */
 #define HSCH_SYS_CLK_PER          __REG(TARGET_HSCH, 0, 1, 163104, 0, 1, 648, 640, 0, 1, 4)
 
@@ -3146,7 +3143,6 @@ enum sparx5_target {
 #define HSCH_SYS_CLK_PER_SYS_CLK_PER_100PS_GET(x)\
 	FIELD_GET(HSCH_SYS_CLK_PER_SYS_CLK_PER_100PS, x)
 
-<<<<<<< HEAD
 /*      HSCH:HSCH_LEAK_LISTS:HSCH_TIMER_CFG */
 #define HSCH_HSCH_TIMER_CFG(g, r) __REG(TARGET_HSCH, 0, 1, 161664, g, 4, 32, 0, r, 4, 4)
 
@@ -3171,8 +3167,6 @@ enum sparx5_target {
 #define HSCH_HSCH_LEAK_CFG_LEAK_ERR_GET(x)\
 	FIELD_GET(HSCH_HSCH_LEAK_CFG_LEAK_ERR, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*      HSCH:SYSTEM:FLUSH_CTRL */
 #define HSCH_FLUSH_CTRL           __REG(TARGET_HSCH, 0, 1, 184000, 0, 1, 312, 4, 0, 1, 4)
 

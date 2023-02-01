@@ -1165,13 +1165,6 @@ static int samsung_pinctrl_probe(struct platform_device *pdev)
 	ret = samsung_pinctrl_register(pdev, drvdata);
 	if (ret)
 		goto err_put_banks;
-<<<<<<< HEAD
-=======
-
-	ret = samsung_gpiolib_register(pdev, drvdata);
-	if (ret)
-		goto err_unregister;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (ctrl->eint_gpio_init)
 		ctrl->eint_gpio_init(drvdata);

@@ -64,7 +64,6 @@ properties:
       - const: isp
       - const: phy
 
-<<<<<<< HEAD
   interconnects:
     maxItems: 8
 
@@ -79,8 +78,6 @@ properties:
       - const: isp1
       - const: dwe
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg

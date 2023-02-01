@@ -369,11 +369,7 @@ retry:
 		if (vma == ERR_PTR(-ENOSPC)) {
 			ret = mutex_lock_interruptible(&ggtt->vm.mutex);
 			if (!ret) {
-<<<<<<< HEAD
 				ret = i915_gem_evict_vm(&ggtt->vm, &ww, NULL);
-=======
-				ret = i915_gem_evict_vm(&ggtt->vm, &ww);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				mutex_unlock(&ggtt->vm.mutex);
 			}
 			if (ret)
@@ -417,11 +413,7 @@ retry:
 	vma->mmo = mmo;
 
 	if (CONFIG_DRM_I915_USERFAULT_AUTOSUSPEND)
-<<<<<<< HEAD
 		intel_wakeref_auto(&i915->runtime_pm.userfault_wakeref,
-=======
-		intel_wakeref_auto(&to_gt(i915)->ggtt->userfault_wakeref,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   msecs_to_jiffies_timeout(CONFIG_DRM_I915_USERFAULT_AUTOSUSPEND));
 
 	if (write) {

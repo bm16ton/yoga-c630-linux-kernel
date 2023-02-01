@@ -3961,11 +3961,7 @@ static void test_fs_location_for_trunking(struct nfs4_fs_location *location,
 
 	for (i = 0; i < location->nservers; i++) {
 		struct nfs4_string *srv_loc = &location->servers[i];
-<<<<<<< HEAD
 		struct sockaddr_storage addr;
-=======
-		struct sockaddr addr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		size_t addrlen;
 		struct xprt_create xprt_args = {
 			.ident = 0,
@@ -3988,11 +3984,7 @@ static void test_fs_location_for_trunking(struct nfs4_fs_location *location,
 						clp->cl_net, server->port);
 		if (!addrlen)
 			return;
-<<<<<<< HEAD
 		xprt_args.dstaddr = (struct sockaddr *)&addr;
-=======
-		xprt_args.dstaddr = &addr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		xprt_args.addrlen = addrlen;
 		servername = kmalloc(srv_loc->len + 1, GFP_KERNEL);
 		if (!servername)
@@ -4031,11 +4023,7 @@ static int _nfs4_discover_trunking(struct nfs_server *server,
 
 	page = alloc_page(GFP_KERNEL);
 	if (!page)
-<<<<<<< HEAD
 		goto out_put_cred;
-=======
-		return -ENOMEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	locations = kmalloc(sizeof(struct nfs4_fs_locations), GFP_KERNEL);
 	if (!locations)
 		goto out_free;
@@ -4057,11 +4045,8 @@ out_free_2:
 	kfree(locations);
 out_free:
 	__free_page(page);
-<<<<<<< HEAD
 out_put_cred:
 	put_cred(cred);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return status;
 }
 
@@ -7505,15 +7490,8 @@ nfs4_retry_setlk(struct nfs4_state *state, int cmd, struct file_lock *request)
 			break;
 
 		status = -ERESTARTSYS;
-<<<<<<< HEAD
 		wait_woken(&waiter.wait, TASK_INTERRUPTIBLE|TASK_FREEZABLE,
 			   NFS4_LOCK_MAXTIMEOUT);
-=======
-		freezer_do_not_count();
-		wait_woken(&waiter.wait, TASK_INTERRUPTIBLE,
-			   NFS4_LOCK_MAXTIMEOUT);
-		freezer_count();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} while (!signalled());
 
 	remove_wait_queue(q, &waiter.wait);
@@ -7749,7 +7727,6 @@ static int nfs4_xattr_set_nfs4_dacl(const struct xattr_handler *handler,
 				    size_t buflen, int flags)
 {
 	return nfs4_proc_set_acl(inode, buf, buflen, NFS4ACL_DACL);
-<<<<<<< HEAD
 }
 
 static int nfs4_xattr_get_nfs4_dacl(const struct xattr_handler *handler,
@@ -7759,17 +7736,6 @@ static int nfs4_xattr_get_nfs4_dacl(const struct xattr_handler *handler,
 	return nfs4_proc_get_acl(inode, buf, buflen, NFS4ACL_DACL);
 }
 
-=======
-}
-
-static int nfs4_xattr_get_nfs4_dacl(const struct xattr_handler *handler,
-				    struct dentry *unused, struct inode *inode,
-				    const char *key, void *buf, size_t buflen)
-{
-	return nfs4_proc_get_acl(inode, buf, buflen, NFS4ACL_DACL);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool nfs4_xattr_list_nfs4_dacl(struct dentry *dentry)
 {
 	return nfs4_server_supports_acls(NFS_SB(dentry->d_sb), NFS4ACL_DACL);

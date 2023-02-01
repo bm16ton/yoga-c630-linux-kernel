@@ -222,11 +222,7 @@
 &tlmm {
 	gpio-reserved-ranges = <44 4>;
 
-<<<<<<< HEAD
 	ts_int_default: ts-int-default-state {
-=======
-	ts_int_default: ts-int-default {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio23";
 		function = "gpio";
 		drive-strength = <2>;

@@ -87,20 +87,11 @@ static void test_sockmap_create_update_free(enum bpf_map_type map_type)
 	int s, map, err;
 
 	s = connected_socket_v4();
-<<<<<<< HEAD
 	if (!ASSERT_GE(s, 0, "connected_socket_v4"))
 		return;
 
 	map = bpf_map_create(map_type, NULL, sizeof(int), sizeof(int), 1, NULL);
 	if (!ASSERT_GE(map, 0, "bpf_map_create"))
-=======
-	if (CHECK_FAIL(s < 0))
-		return;
-
-	map = bpf_map_create(map_type, NULL, sizeof(int), sizeof(int), 1, NULL);
-	if (CHECK_FAIL(map < 0)) {
-		perror("bpf_cmap_create");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out;
 
 	err = bpf_map_update_elem(map, &zero, &s, BPF_NOEXIST);
@@ -137,11 +128,7 @@ out:
 
 static void test_sockmap_update(enum bpf_map_type map_type)
 {
-<<<<<<< HEAD
 	int err, prog, src;
-=======
-	int err, prog, src, duration = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct test_sockmap_update *skel;
 	struct bpf_map *dst_map;
 	const __u32 zero = 0;
@@ -286,43 +273,22 @@ static void test_sockmap_skb_verdict_attach(enum bpf_attach_type first,
 	int err, map, verdict;
 
 	skel = test_sockmap_skb_verdict_attach__open_and_load();
-<<<<<<< HEAD
 	if (!ASSERT_OK_PTR(skel, "open_and_load"))
 		return;
-=======
-	if (CHECK_FAIL(!skel)) {
-		perror("test_sockmap_skb_verdict_attach__open_and_load");
-		return;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	verdict = bpf_program__fd(skel->progs.prog_skb_verdict);
 	map = bpf_map__fd(skel->maps.sock_map);
 
 	err = bpf_prog_attach(verdict, map, first, 0);
-<<<<<<< HEAD
 	if (!ASSERT_OK(err, "bpf_prog_attach"))
 		goto out;
-=======
-	if (CHECK_FAIL(err)) {
-		perror("bpf_prog_attach");
-		goto out;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = bpf_prog_attach(verdict, map, second, 0);
 	ASSERT_EQ(err, -EBUSY, "prog_attach_fail");
 
 	err = bpf_prog_detach2(verdict, map, first);
-<<<<<<< HEAD
 	if (!ASSERT_OK(err, "bpf_prog_detach2"))
 		goto out;
-=======
-	if (CHECK_FAIL(err)) {
-		perror("bpf_prog_detach2");
-		goto out;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	test_sockmap_skb_verdict_attach__destroy(skel);
 }

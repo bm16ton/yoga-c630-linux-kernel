@@ -112,26 +112,13 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 {
 	struct kvm_vcpu *vcpu;
 	struct kvm_vm *vm;
-<<<<<<< HEAD
 	uint64_t nr_bytes;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void *hva;
 	int r;
 
 	vm = vm_create(1);
 
 	if (disable_nx_huge_pages) {
-<<<<<<< HEAD
-=======
-		/*
-		 * Cannot run the test without NX huge pages if the kernel
-		 * does not support it.
-		 */
-		if (!kvm_check_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES))
-			return;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		r = __vm_disable_nx_huge_pages(vm);
 		if (reboot_permissions) {
 			TEST_ASSERT(!r, "Disabling NX huge pages should succeed if process has reboot permissions");
@@ -148,7 +135,6 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 				    HPAGE_GPA, HPAGE_SLOT,
 				    HPAGE_SLOT_NPAGES, 0);
 
-<<<<<<< HEAD
 	nr_bytes = HPAGE_SLOT_NPAGES * vm->page_size;
 
 	/*
@@ -167,12 +153,6 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 
 	hva = addr_gpa2hva(vm, HPAGE_GPA);
 	memset(hva, RETURN_OPCODE, nr_bytes);
-=======
-	virt_map(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_NPAGES);
-
-	hva = addr_gpa2hva(vm, HPAGE_GPA);
-	memset(hva, RETURN_OPCODE, HPAGE_SLOT_NPAGES * PAGE_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	check_2m_page_count(vm, 0);
 	check_split_count(vm, 0);
@@ -276,7 +256,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-<<<<<<< HEAD
 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES));
 	TEST_REQUIRE(reclaim_period_ms > 0);
 
@@ -284,20 +263,6 @@ int main(int argc, char **argv)
 		       "This test must be run with the magic token %d.\n"
 		       "This is done by nx_huge_pages_test.sh, which\n"
 		       "also handles environment setup for the test.");
-=======
-	if (token != MAGIC_TOKEN) {
-		print_skip("This test must be run with the magic token %d.\n"
-			   "This is done by nx_huge_pages_test.sh, which\n"
-			   "also handles environment setup for the test.",
-			   MAGIC_TOKEN);
-		exit(KSFT_SKIP);
-	}
-
-	if (!reclaim_period_ms) {
-		print_skip("The NX reclaim period must be specified and non-zero");
-		exit(KSFT_SKIP);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	run_test(reclaim_period_ms, false, reboot_permissions);
 	run_test(reclaim_period_ms, true, reboot_permissions);

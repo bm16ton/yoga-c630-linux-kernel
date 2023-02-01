@@ -115,10 +115,7 @@
 
 /* Quirks for specific BWMON types */
 #define BWMON_HAS_GLOBAL_IRQ			BIT(0)
-<<<<<<< HEAD
 #define BWMON_NEEDS_FORCE_CLEAR			BIT(1)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum bwmon_fields {
 	F_GLOBAL_IRQ_CLEAR,
@@ -347,11 +344,8 @@ static void bwmon_clear_counters(struct icc_bwmon *bwmon, bool clear_all)
 	 * before we try to clear the IRQ or do any other counter operations.
 	 */
 	regmap_field_force_write(bwmon->regs[F_CLEAR], val);
-<<<<<<< HEAD
 	if (bwmon->data->quirks & BWMON_NEEDS_FORCE_CLEAR)
 		regmap_field_force_write(bwmon->regs[F_CLEAR], 0);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void bwmon_clear_irq(struct icc_bwmon *bwmon)
@@ -373,11 +367,8 @@ static void bwmon_clear_irq(struct icc_bwmon *bwmon)
 	 * interrupt is cleared.
 	 */
 	regmap_field_force_write(bwmon->regs[F_IRQ_CLEAR], BWMON_IRQ_ENABLE_MASK);
-<<<<<<< HEAD
 	if (bwmon->data->quirks & BWMON_NEEDS_FORCE_CLEAR)
 		regmap_field_force_write(bwmon->regs[F_IRQ_CLEAR], 0);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (bwmon->data->quirks & BWMON_HAS_GLOBAL_IRQ)
 		regmap_field_force_write(bwmon->regs[F_GLOBAL_IRQ_CLEAR],
 					 BWMON_V4_GLOBAL_IRQ_ENABLE_ENABLE);
@@ -668,7 +659,6 @@ static const struct icc_bwmon_data sdm845_llcc_bwmon_data = {
 	.regmap_cfg = &sdm845_llcc_bwmon_regmap_cfg,
 };
 
-<<<<<<< HEAD
 static const struct icc_bwmon_data sc7280_llcc_bwmon_data = {
 	.sample_ms = 4,
 	.count_unit_kb = 64,
@@ -682,8 +672,6 @@ static const struct icc_bwmon_data sc7280_llcc_bwmon_data = {
 	.regmap_cfg = &sdm845_llcc_bwmon_regmap_cfg,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct of_device_id bwmon_of_match[] = {
 	{
 		.compatible = "qcom,msm8998-bwmon",
@@ -691,12 +679,9 @@ static const struct of_device_id bwmon_of_match[] = {
 	}, {
 		.compatible = "qcom,sdm845-llcc-bwmon",
 		.data = &sdm845_llcc_bwmon_data
-<<<<<<< HEAD
 	}, {
 		.compatible = "qcom,sc7280-llcc-bwmon",
 		.data = &sc7280_llcc_bwmon_data
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{}
 };

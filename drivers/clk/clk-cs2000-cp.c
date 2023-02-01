@@ -133,7 +133,6 @@ static int cs2000_enable_dev_config(struct cs2000_priv *priv, bool enable)
 
 	ret = regmap_update_bits(priv->regmap, DEVICE_CFG1, ENDEV1,
 				 enable ? ENDEV1 : 0);
-<<<<<<< HEAD
 	if (ret < 0)
 		return ret;
 
@@ -142,16 +141,6 @@ static int cs2000_enable_dev_config(struct cs2000_priv *priv, bool enable)
 	if (ret < 0)
 		return ret;
 
-=======
-	if (ret < 0)
-		return ret;
-
-	ret = regmap_update_bits(priv->regmap, GLOBAL_CFG,  ENDEV2,
-				 enable ? ENDEV2 : 0);
-	if (ret < 0)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = regmap_update_bits(priv->regmap, FUNC_CFG1, CLKSKIPEN,
 				 (enable && priv->clk_skip) ? CLKSKIPEN : 0);
 	if (ret < 0)
@@ -489,7 +478,6 @@ static int cs2000_clk_register(struct cs2000_priv *priv)
 	of_property_read_u32(np, "cirrus,aux-output-source", &aux_out);
 	ret = regmap_update_bits(priv->regmap, DEVICE_CFG1,
 				 AUXOUTSRC_MASK, AUXOUTSRC(aux_out));
-<<<<<<< HEAD
 	if (ret < 0)
 		return ret;
 
@@ -500,18 +488,6 @@ static int cs2000_clk_register(struct cs2000_priv *priv)
 	if (ret < 0)
 		return ret;
 
-=======
-	if (ret < 0)
-		return ret;
-
-	priv->clk_skip = of_property_read_bool(np, "cirrus,clock-skip");
-
-	ref_clk_rate = clk_get_rate(priv->ref_clk);
-	ret = cs2000_ref_clk_bound_rate(priv, ref_clk_rate);
-	if (ret < 0)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (priv->dynamic_mode) {
 		/* Default to low-frequency mode to allow for large ratios */
 		priv->lf_ratio = true;

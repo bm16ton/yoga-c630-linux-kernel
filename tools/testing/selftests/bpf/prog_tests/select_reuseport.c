@@ -91,15 +91,9 @@ static int prepare_bpf_obj(void)
 	struct bpf_map *map;
 	int err;
 
-<<<<<<< HEAD
 	obj = bpf_object__open("test_select_reuseport_kern.bpf.o");
 	err = libbpf_get_error(obj);
 	RET_ERR(err, "open test_select_reuseport_kern.bpf.o",
-=======
-	obj = bpf_object__open("test_select_reuseport_kern.o");
-	err = libbpf_get_error(obj);
-	RET_ERR(err, "open test_select_reuseport_kern.o",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		"obj:%p PTR_ERR(obj):%d\n", obj, err);
 
 	map = bpf_object__find_map_by_name(obj, "outer_map");

@@ -468,9 +468,9 @@ static u64 perout_conf_internal_timer(struct mlx5_core_dev *mdev, s64 sec)
 	return find_target_cycles(mdev, target_ns);
 }
 
-static u64 perout_conf_real_time(s64 sec)
+static u64 perout_conf_real_time(s64 sec, u32 nsec)
 {
-	return (u64)sec << 32;
+	return (u64)nsec | (u64)sec << 32;
 }
 
 static int perout_conf_1pps(struct mlx5_core_dev *mdev, struct ptp_clock_request *rq,
@@ -595,13 +595,6 @@ static int mlx5_perout_configure(struct ptp_clock_info *ptp,
 
 	if (on) {
 		bool rt_mode = mlx5_real_time_mode(mdev);
-<<<<<<< HEAD
-=======
-		s64 sec = rq->perout.start.sec;
-
-		if (rq->perout.start.nsec)
-			return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		pin_mode = MLX5_PIN_MODE_OUT;
 		pattern = MLX5_OUT_PATTERN_PERIODIC;
@@ -609,15 +602,6 @@ static int mlx5_perout_configure(struct ptp_clock_info *ptp,
 		if (rt_mode &&  rq->perout.start.sec > U32_MAX)
 			return -EINVAL;
 
-<<<<<<< HEAD
-=======
-		if (rt_mode && sec > U32_MAX)
-			return -EINVAL;
-
-		time_stamp = rt_mode ? perout_conf_real_time(sec) :
-				       perout_conf_internal_timer(mdev, sec);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		field_select |= MLX5_MTPPS_FS_PIN_MODE |
 				MLX5_MTPPS_FS_PATTERN |
 				MLX5_MTPPS_FS_TIME_STAMP;

@@ -507,10 +507,7 @@ got_it:
 	if (ofs_in_node >= max_addrs) {
 		f2fs_err(sbi, "Inconsistent ofs_in_node:%u in summary, ino:%lu, nid:%u, max:%u",
 			ofs_in_node, dn->inode->i_ino, nid, max_addrs);
-<<<<<<< HEAD
 		f2fs_handle_error(sbi, ERROR_INCONSISTENT_SUMMARY);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFSCORRUPTED;
 	}
 
@@ -719,11 +716,8 @@ retry_prev:
 				f2fs_err(sbi, "Inconsistent dest blkaddr:%u, ino:%lu, ofs:%u",
 					dest, inode->i_ino, dn.ofs_in_node);
 				err = -EFSCORRUPTED;
-<<<<<<< HEAD
 				f2fs_handle_error(sbi,
 						ERROR_INVALID_BLKADDR);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				goto err;
 			}
 

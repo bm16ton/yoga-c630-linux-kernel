@@ -66,14 +66,10 @@ static int ksz_spi_probe(struct spi_device *spi)
 	for (i = 0; i < ARRAY_SIZE(ksz8795_regmap_config); i++) {
 		rc = regmap_config[i];
 		rc.lock_arg = &dev->regmap_mutex;
-<<<<<<< HEAD
 		rc.wr_table = chip->wr_table;
 		rc.rd_table = chip->rd_table;
 		dev->regmap[i] = devm_regmap_init_spi(spi, &rc);
 
-=======
-		dev->regmap[i] = devm_regmap_init_spi(spi, &rc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (IS_ERR(dev->regmap[i])) {
 			ret = PTR_ERR(dev->regmap[i]);
 			dev_err(&spi->dev,
@@ -92,11 +88,8 @@ static int ksz_spi_probe(struct spi_device *spi)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	dev->irq = spi->irq;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ksz_switch_register(dev);
 
 	/* Main DSA driver may not be started yet. */
@@ -114,11 +107,6 @@ static void ksz_spi_remove(struct spi_device *spi)
 
 	if (dev)
 		ksz_switch_remove(dev);
-<<<<<<< HEAD
-=======
-
-	spi_set_drvdata(spi, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ksz_spi_shutdown(struct spi_device *spi)
@@ -162,13 +150,10 @@ static const struct of_device_id ksz_dt_ids[] = {
 		.data = &ksz_switch_chips[KSZ9477]
 	},
 	{
-<<<<<<< HEAD
 		.compatible = "microchip,ksz9896",
 		.data = &ksz_switch_chips[KSZ9896]
 	},
 	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.compatible = "microchip,ksz9897",
 		.data = &ksz_switch_chips[KSZ9897]
 	},
@@ -182,11 +167,7 @@ static const struct of_device_id ksz_dt_ids[] = {
 	},
 	{
 		.compatible = "microchip,ksz8563",
-<<<<<<< HEAD
 		.data = &ksz_switch_chips[KSZ8563]
-=======
-		.data = &ksz_switch_chips[KSZ9893]
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.compatible = "microchip,ksz9567",
@@ -223,10 +204,7 @@ static const struct spi_device_id ksz_spi_ids[] = {
 	{ "ksz8863" },
 	{ "ksz8873" },
 	{ "ksz9477" },
-<<<<<<< HEAD
 	{ "ksz9896" },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ "ksz9897" },
 	{ "ksz9893" },
 	{ "ksz9563" },
@@ -256,10 +234,7 @@ static struct spi_driver ksz_spi_driver = {
 module_spi_driver(ksz_spi_driver);
 
 MODULE_ALIAS("spi:ksz9477");
-<<<<<<< HEAD
 MODULE_ALIAS("spi:ksz9896");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_ALIAS("spi:ksz9897");
 MODULE_ALIAS("spi:ksz9893");
 MODULE_ALIAS("spi:ksz9563");

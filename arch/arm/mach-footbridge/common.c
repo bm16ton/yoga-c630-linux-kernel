@@ -195,11 +195,6 @@ static void __init __fb_init_irq(void)
 void __init footbridge_init_irq(void)
 {
 	set_handle_irq(dc21285_handle_irq);
-<<<<<<< HEAD
-=======
-
-	__fb_init_irq();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	__fb_init_irq();
 
@@ -286,52 +281,3 @@ void footbridge_restart(enum reboot_mode mode, const char *cmd)
 		*CSR_SA110_CNTL |= (1 << 13);
 	}
 }
-<<<<<<< HEAD
-=======
-
-#ifdef CONFIG_FOOTBRIDGE_ADDIN
-
-static inline unsigned long fb_bus_sdram_offset(void)
-{
-	return *CSR_PCISDRAMBASE & 0xfffffff0;
-}
-
-/*
- * These two functions convert virtual addresses to PCI addresses and PCI
- * addresses to virtual addresses.  Note that it is only legal to use these
- * on memory obtained via get_zeroed_page or kmalloc.
- */
-unsigned long __virt_to_bus(unsigned long res)
-{
-	WARN_ON(res < PAGE_OFFSET || res >= (unsigned long)high_memory);
-
-	return res + (fb_bus_sdram_offset() - PAGE_OFFSET);
-}
-EXPORT_SYMBOL(__virt_to_bus);
-
-unsigned long __bus_to_virt(unsigned long res)
-{
-	res = res - (fb_bus_sdram_offset() - PAGE_OFFSET);
-
-	WARN_ON(res < PAGE_OFFSET || res >= (unsigned long)high_memory);
-
-	return res;
-}
-EXPORT_SYMBOL(__bus_to_virt);
-#else
-static inline unsigned long fb_bus_sdram_offset(void)
-{
-	return BUS_OFFSET;
-}
-#endif /* CONFIG_FOOTBRIDGE_ADDIN */
-
-dma_addr_t phys_to_dma(struct device *dev, phys_addr_t paddr)
-{
-	return paddr + (fb_bus_sdram_offset() - PHYS_OFFSET);
-}
-
-phys_addr_t dma_to_phys(struct device *dev, dma_addr_t dev_addr)
-{
-	return dev_addr - (fb_bus_sdram_offset() - PHYS_OFFSET);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

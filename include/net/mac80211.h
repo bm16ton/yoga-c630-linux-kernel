@@ -1800,12 +1800,9 @@ struct ieee80211_vif_cfg {
  * @link_conf: in case of MLD, the per-link BSS configuration,
  *	indexed by link ID
  * @valid_links: bitmap of valid links, or 0 for non-MLO.
-<<<<<<< HEAD
  * @active_links: The bitmap of active links, or 0 for non-MLO.
  *	The driver shouldn't change this directly, but use the
  *	API calls meant for that purpose.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @addr: address of this interface
  * @p2p: indicates whether this AP or STA interface is a p2p
  *	interface, i.e. a GO or p2p-sta respectively
@@ -1841,11 +1838,7 @@ struct ieee80211_vif {
 	struct ieee80211_vif_cfg cfg;
 	struct ieee80211_bss_conf bss_conf;
 	struct ieee80211_bss_conf __rcu *link_conf[IEEE80211_MLD_MAX_NUM_LINKS];
-<<<<<<< HEAD
 	u16 valid_links, active_links;
-=======
-	u16 valid_links;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 addr[ETH_ALEN] __aligned(2);
 	bool p2p;
 
@@ -1872,20 +1865,11 @@ struct ieee80211_vif {
 	u8 drv_priv[] __aligned(sizeof(void *));
 };
 
-<<<<<<< HEAD
 #define for_each_vif_active_link(vif, link, link_id)				\
 	for (link_id = 0; link_id < ARRAY_SIZE((vif)->link_conf); link_id++)	\
 		if ((!(vif)->active_links ||					\
 		     (vif)->active_links & BIT(link_id)) &&			\
 		    (link = rcu_dereference((vif)->link_conf[link_id])))
-=======
-/* FIXME: for now loop over all the available links; later will be changed
- * to loop only over the active links.
- */
-#define for_each_vif_active_link(vif, link, link_id)			     \
-	for (link_id = 0; link_id < ARRAY_SIZE((vif)->link_conf); link_id++) \
-		if ((link = rcu_dereference((vif)->link_conf[link_id])))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline bool ieee80211_vif_is_mesh(struct ieee80211_vif *vif)
 {
@@ -2160,7 +2144,6 @@ struct ieee80211_sta_txpwr {
 };
 
 /**
-<<<<<<< HEAD
  * struct ieee80211_sta_aggregates - info that is aggregated from active links
  *
  * Used for any per-link data that needs to be aggregated and updated in the
@@ -2189,8 +2172,6 @@ struct ieee80211_sta_aggregates {
 };
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * struct ieee80211_link_sta - station Link specific info
  * All link specific info for a STA link for a non MLD STA(single)
  * or a MLD STA(multiple entries) are stored here.
@@ -2198,11 +2179,8 @@ struct ieee80211_sta_aggregates {
  * @addr: MAC address of the Link STA. For non-MLO STA this is same as the addr
  *	in ieee80211_sta. For MLO Link STA this addr can be same or different
  *	from addr in ieee80211_sta (representing MLD STA addr)
-<<<<<<< HEAD
  * @link_id: the link ID for this link STA (0 for deflink)
  * @smps_mode: current SMPS mode (off, static or dynamic)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @supp_rates: Bitmap of supported rates
  * @ht_cap: HT capabilities of this STA; restricted to our own capabilities
  * @vht_cap: VHT capabilities of this STA; restricted to our own capabilities
@@ -2219,11 +2197,8 @@ struct ieee80211_sta_aggregates {
  */
 struct ieee80211_link_sta {
 	u8 addr[ETH_ALEN];
-<<<<<<< HEAD
 	u8 link_id;
 	enum ieee80211_smps_mode smps_mode;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	u32 supp_rates[NUM_NL80211_BANDS];
 	struct ieee80211_sta_ht_cap ht_cap;
@@ -2232,11 +2207,8 @@ struct ieee80211_link_sta {
 	struct ieee80211_he_6ghz_capa he_6ghz_capa;
 	struct ieee80211_sta_eht_cap eht_cap;
 
-<<<<<<< HEAD
 	struct ieee80211_sta_aggregates agg;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 rx_nss;
 	enum ieee80211_sta_rx_bandwidth bandwidth;
 	struct ieee80211_sta_txpwr txpwr;
@@ -2267,10 +2239,6 @@ struct ieee80211_link_sta {
  *	if wme is supported. The bits order is like in
  *	IEEE80211_WMM_IE_STA_QOSINFO_AC_*.
  * @max_sp: max Service Period. Only valid if wme is supported.
-<<<<<<< HEAD
-=======
- * @smps_mode: current SMPS mode (off, static or dynamic)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @rates: rate control selection table
  * @tdls: indicates whether the STA is a TDLS peer
  * @tdls_initiator: indicates the STA is an initiator of the TDLS link. Only
@@ -2284,11 +2252,6 @@ struct ieee80211_link_sta {
  *	For non MLO STA it will point to the deflink data. For MLO STA
  *	ieee80211_sta_recalc_aggregates() must be called to update it.
  * @support_p2p_ps: indicates whether the STA supports P2P PS mechanism or not.
-<<<<<<< HEAD
-=======
- * @max_rc_amsdu_len: Maximum A-MSDU size in bytes recommended by rate control.
- * @max_tid_amsdu_len: Maximum A-MSDU size in bytes for this TID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @txq: per-TID data TX queues (if driver uses the TXQ abstraction); note that
  *	the last entry (%IEEE80211_NUM_TIDS) is used for non-data frames
  * @deflink: This holds the default link STA information, for non MLO STA all link
@@ -2311,10 +2274,6 @@ struct ieee80211_sta {
 	bool wme;
 	u8 uapsd_queues;
 	u8 max_sp;
-<<<<<<< HEAD
-=======
-	enum ieee80211_smps_mode smps_mode;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ieee80211_sta_rates __rcu *rates;
 	bool tdls;
 	bool tdls_initiator;
@@ -2325,11 +2284,6 @@ struct ieee80211_sta {
 	struct ieee80211_sta_aggregates *cur;
 
 	bool support_p2p_ps;
-<<<<<<< HEAD
-=======
-	u16 max_rc_amsdu_len;
-	u16 max_tid_amsdu_len[IEEE80211_NUM_TIDS];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct ieee80211_txq *txq[IEEE80211_NUM_TIDS + 1];
 
@@ -2341,7 +2295,6 @@ struct ieee80211_sta {
 	u8 drv_priv[] __aligned(sizeof(void *));
 };
 
-<<<<<<< HEAD
 #ifdef CONFIG_LOCKDEP
 bool lockdep_sta_mutex_held(struct ieee80211_sta *pubsta);
 #else
@@ -2360,15 +2313,6 @@ static inline bool lockdep_sta_mutex_held(struct ieee80211_sta *pubsta)
 		if ((!(vif)->active_links ||					\
 		     (vif)->active_links & BIT(link_id)) &&			\
 		    ((link_sta) = link_sta_dereference_protected(sta, link_id)))
-=======
-/* FIXME: need to loop only over links which are active and check the actual
- * lock
- */
-#define for_each_sta_active_link(sta, link_sta, link_id)		         \
-	for (link_id = 0; link_id < ARRAY_SIZE((sta)->link); link_id++)	         \
-		if (((link_sta) = rcu_dereference_protected((sta)->link[link_id],\
-							    1)))	         \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * enum sta_notify_cmd - sta notify command
@@ -7240,7 +7184,6 @@ static inline bool ieee80211_is_tx_data(struct sk_buff *skb)
 	       ieee80211_is_data(hdr->frame_control);
 }
 
-<<<<<<< HEAD
 /**
  * ieee80211_set_active_links - set active links in client mode
  * @vif: interface to set active links on
@@ -7282,6 +7225,4 @@ int ieee80211_set_active_links(struct ieee80211_vif *vif, u16 active_links);
 void ieee80211_set_active_links_async(struct ieee80211_vif *vif,
 				      u16 active_links);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* MAC80211_H */

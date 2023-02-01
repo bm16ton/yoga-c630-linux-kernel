@@ -2,11 +2,7 @@
 /*
  * Microchip PolarFire SoC (MPFS) system controller/mailbox controller driver
  *
-<<<<<<< HEAD
  * Copyright (c) 2020-2022 Microchip Corporation. All rights reserved.
-=======
- * Copyright (c) 2020 Microchip Corporation. All rights reserved.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Author: Conor Dooley <conor.dooley@microchip.com>
  *
@@ -60,11 +56,7 @@
 #define SCB_STATUS_NOTIFY_MASK BIT(SCB_STATUS_NOTIFY)
 
 #define SCB_STATUS_POS (16)
-<<<<<<< HEAD
 #define SCB_STATUS_MASK GENMASK(SCB_STATUS_POS + SCB_MASK_WIDTH - 1, SCB_STATUS_POS)
-=======
-#define SCB_STATUS_MASK GENMASK_ULL(SCB_STATUS_POS + SCB_MASK_WIDTH, SCB_STATUS_POS)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct mpfs_mbox {
 	struct mbox_controller controller;
@@ -138,18 +130,13 @@ static void mpfs_mbox_rx_data(struct mbox_chan *chan)
 	struct mpfs_mbox *mbox = (struct mpfs_mbox *)chan->con_priv;
 	struct mpfs_mss_response *response = mbox->response;
 	u16 num_words = ALIGN((response->resp_size), (4)) / 4U;
-<<<<<<< HEAD
 	u32 i, status;
-=======
-	u32 i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!response->resp_msg) {
 		dev_err(mbox->dev, "failed to assign memory for response %d\n", -ENOMEM);
 		return;
 	}
 
-<<<<<<< HEAD
 	/*
 	 * The status is stored in bits 31:16 of the SERVICES_SR register.
 	 * It is only valid when BUSY == 0.
@@ -175,8 +162,6 @@ static void mpfs_mbox_rx_data(struct mbox_chan *chan)
 	if (response->resp_status)
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!mpfs_mbox_busy(mbox)) {
 		for (i = 0; i < num_words; i++) {
 			response->resp_msg[i] =

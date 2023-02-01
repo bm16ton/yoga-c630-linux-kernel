@@ -58,10 +58,7 @@ enum riscv_isa_ext_id {
 	RISCV_ISA_EXT_ZICBOM,
 	RISCV_ISA_EXT_ZIHINTPAUSE,
 	RISCV_ISA_EXT_SSTC,
-<<<<<<< HEAD
 	RISCV_ISA_EXT_SVINVAL,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	RISCV_ISA_EXT_ID_MAX = RISCV_ISA_EXT_MAX,
 };
 
@@ -73,10 +70,7 @@ enum riscv_isa_ext_id {
 enum riscv_isa_ext_key {
 	RISCV_ISA_EXT_KEY_FPU,		/* For 'F' and 'D' */
 	RISCV_ISA_EXT_KEY_ZIHINTPAUSE,
-<<<<<<< HEAD
 	RISCV_ISA_EXT_KEY_SVINVAL,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	RISCV_ISA_EXT_KEY_MAX,
 };
 
@@ -98,11 +92,8 @@ static __always_inline int riscv_isa_ext2key(int num)
 		return RISCV_ISA_EXT_KEY_FPU;
 	case RISCV_ISA_EXT_ZIHINTPAUSE:
 		return RISCV_ISA_EXT_KEY_ZIHINTPAUSE;
-<<<<<<< HEAD
 	case RISCV_ISA_EXT_SVINVAL:
 		return RISCV_ISA_EXT_KEY_SVINVAL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return -EINVAL;
 	}

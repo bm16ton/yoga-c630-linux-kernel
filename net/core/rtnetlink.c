@@ -1928,10 +1928,7 @@ static const struct nla_policy ifla_policy[IFLA_MAX+1] = {
 	[IFLA_GRO_MAX_SIZE]	= { .type = NLA_U32 },
 	[IFLA_TSO_MAX_SIZE]	= { .type = NLA_REJECT },
 	[IFLA_TSO_MAX_SEGS]	= { .type = NLA_REJECT },
-<<<<<<< HEAD
 	[IFLA_ALLMULTI]		= { .type = NLA_REJECT },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct nla_policy ifla_info_policy[IFLA_INFO_MAX+1] = {
@@ -5251,7 +5248,6 @@ rtnl_offload_xstats_fill_hw_s_info_one(struct sk_buff *skb, int attr_id,
 
 	if (nla_put_u8(skb, IFLA_OFFLOAD_XSTATS_HW_S_INFO_REQUEST, ru->request))
 		goto nla_put_failure;
-<<<<<<< HEAD
 
 	if (nla_put_u8(skb, IFLA_OFFLOAD_XSTATS_HW_S_INFO_USED, ru->used))
 		goto nla_put_failure;
@@ -5334,90 +5330,6 @@ static int rtnl_offload_xstats_fill(struct sk_buff *skb, struct net_device *dev,
 		unsigned int size_l3;
 		struct nlattr *attr;
 
-=======
-
-	if (nla_put_u8(skb, IFLA_OFFLOAD_XSTATS_HW_S_INFO_USED, ru->used))
-		goto nla_put_failure;
-
-	nla_nest_end(skb, nest);
-	return 0;
-
-nla_put_failure:
-	nla_nest_cancel(skb, nest);
-	return -EMSGSIZE;
-}
-
-static int
-rtnl_offload_xstats_fill_hw_s_info(struct sk_buff *skb, struct net_device *dev,
-				   struct netlink_ext_ack *extack)
-{
-	enum netdev_offload_xstats_type t_l3 = NETDEV_OFFLOAD_XSTATS_TYPE_L3;
-	struct rtnl_offload_xstats_request_used ru_l3;
-	struct nlattr *nest;
-	int err;
-
-	err = rtnl_offload_xstats_get_stats(dev, t_l3, &ru_l3, NULL, extack);
-	if (err)
-		return err;
-
-	nest = nla_nest_start(skb, IFLA_OFFLOAD_XSTATS_HW_S_INFO);
-	if (!nest)
-		return -EMSGSIZE;
-
-	if (rtnl_offload_xstats_fill_hw_s_info_one(skb,
-						   IFLA_OFFLOAD_XSTATS_L3_STATS,
-						   &ru_l3))
-		goto nla_put_failure;
-
-	nla_nest_end(skb, nest);
-	return 0;
-
-nla_put_failure:
-	nla_nest_cancel(skb, nest);
-	return -EMSGSIZE;
-}
-
-static int rtnl_offload_xstats_fill(struct sk_buff *skb, struct net_device *dev,
-				    int *prividx, u32 off_filter_mask,
-				    struct netlink_ext_ack *extack)
-{
-	enum netdev_offload_xstats_type t_l3 = NETDEV_OFFLOAD_XSTATS_TYPE_L3;
-	int attr_id_hw_s_info = IFLA_OFFLOAD_XSTATS_HW_S_INFO;
-	int attr_id_l3_stats = IFLA_OFFLOAD_XSTATS_L3_STATS;
-	int attr_id_cpu_hit = IFLA_OFFLOAD_XSTATS_CPU_HIT;
-	bool have_data = false;
-	int err;
-
-	if (*prividx <= attr_id_cpu_hit &&
-	    (off_filter_mask &
-	     IFLA_STATS_FILTER_BIT(attr_id_cpu_hit))) {
-		err = rtnl_offload_xstats_fill_ndo(dev, attr_id_cpu_hit, skb);
-		if (!err) {
-			have_data = true;
-		} else if (err != -ENODATA) {
-			*prividx = attr_id_cpu_hit;
-			return err;
-		}
-	}
-
-	if (*prividx <= attr_id_hw_s_info &&
-	    (off_filter_mask & IFLA_STATS_FILTER_BIT(attr_id_hw_s_info))) {
-		*prividx = attr_id_hw_s_info;
-
-		err = rtnl_offload_xstats_fill_hw_s_info(skb, dev, extack);
-		if (err)
-			return err;
-
-		have_data = true;
-		*prividx = 0;
-	}
-
-	if (*prividx <= attr_id_l3_stats &&
-	    (off_filter_mask & IFLA_STATS_FILTER_BIT(attr_id_l3_stats))) {
-		unsigned int size_l3;
-		struct nlattr *attr;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*prividx = attr_id_l3_stats;
 
 		size_l3 = rtnl_offload_xstats_get_size_stats(dev, t_l3);
@@ -5875,19 +5787,11 @@ static int rtnl_stats_get(struct sk_buff *skb, struct nlmsghdr *nlh,
 		NL_SET_ERR_MSG(extack, "Filter mask must be set for stats get");
 		return -EINVAL;
 	}
-<<<<<<< HEAD
 
 	err = rtnl_stats_get_parse(nlh, ifsm->filter_mask, &filters, extack);
 	if (err)
 		return err;
 
-=======
-
-	err = rtnl_stats_get_parse(nlh, ifsm->filter_mask, &filters, extack);
-	if (err)
-		return err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nskb = nlmsg_new(if_nlmsg_stats_size(dev, &filters), GFP_KERNEL);
 	if (!nskb)
 		return -ENOBUFS;

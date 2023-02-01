@@ -43,12 +43,8 @@ static bool unwind_by_prologue(struct unwind_state *state)
 {
 	struct stack_info *info = &state->stack_info;
 	union loongarch_instruction *ip, *ip_end;
-<<<<<<< HEAD
 	long frame_ra = -1;
 	unsigned long frame_size = 0;
-=======
-	unsigned long frame_size = 0, frame_ra = -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long size, offset, pc = state->pc;
 
 	if (state->sp >= info->end || state->sp < info->begin)

@@ -425,12 +425,6 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
 	if (unlikely(sk->sk_family != AF_INET6))
 		goto unlock;
 
-	/* Another thread has converted the socket into IPv4 with
-	 * IPV6_ADDRFORM concurrently.
-	 */
-	if (unlikely(sk->sk_family != AF_INET6))
-		goto unlock;
-
 	switch (optname) {
 
 	case IPV6_ADDRFORM:
@@ -483,16 +477,10 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
 				sock_prot_inuse_add(net, sk->sk_prot, -1);
 				sock_prot_inuse_add(net, &tcp_prot, 1);
 
-<<<<<<< HEAD
 				/* Paired with READ_ONCE(sk->sk_prot) in inet6_stream_ops */
 				WRITE_ONCE(sk->sk_prot, &tcp_prot);
 				/* Paired with READ_ONCE() in tcp_(get|set)sockopt() */
 				WRITE_ONCE(icsk->icsk_af_ops, &ipv4_specific);
-=======
-				/* Paired with READ_ONCE(sk->sk_prot) in net/ipv6/af_inet6.c */
-				WRITE_ONCE(sk->sk_prot, &tcp_prot);
-				icsk->icsk_af_ops = &ipv4_specific;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				sk->sk_socket->ops = &inet_stream_ops;
 				sk->sk_family = PF_INET;
 				tcp_sync_mss(sk, icsk->icsk_pmtu_cookie);
@@ -505,11 +493,7 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
 				sock_prot_inuse_add(net, sk->sk_prot, -1);
 				sock_prot_inuse_add(net, prot, 1);
 
-<<<<<<< HEAD
 				/* Paired with READ_ONCE(sk->sk_prot) in inet6_dgram_ops */
-=======
-				/* Paired with READ_ONCE(sk->sk_prot) in net/ipv6/af_inet6.c */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				WRITE_ONCE(sk->sk_prot, prot);
 				sk->sk_socket->ops = &inet_dgram_ops;
 				sk->sk_family = PF_INET;
@@ -1014,11 +998,7 @@ done:
 	}
 
 unlock:
-<<<<<<< HEAD
 	sockopt_release_sock(sk);
-=======
-	release_sock(sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (needs_rtnl)
 		rtnl_unlock();
 
@@ -1091,10 +1071,6 @@ static int ipv6_get_msfilter(struct sock *sk, sockptr_t optval,
 			     sockptr_t optlen, int len)
 {
 	const int size0 = offsetof(struct group_filter, gf_slist_flex);
-<<<<<<< HEAD
-=======
-	struct group_filter __user *p = optval;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct group_filter gsf;
 	int num;
 	int err;
@@ -1106,13 +1082,8 @@ static int ipv6_get_msfilter(struct sock *sk, sockptr_t optval,
 	if (gsf.gf_group.ss_family != AF_INET6)
 		return -EADDRNOTAVAIL;
 	num = gsf.gf_numsrc;
-<<<<<<< HEAD
 	sockopt_lock_sock(sk);
 	err = ip6_mc_msfget(sk, &gsf, optval, size0);
-=======
-	lock_sock(sk);
-	err = ip6_mc_msfget(sk, &gsf, p->gf_slist_flex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!err) {
 		if (num > gsf.gf_numsrc)
 			num = gsf.gf_numsrc;
@@ -1129,10 +1100,6 @@ static int compat_ipv6_get_msfilter(struct sock *sk, sockptr_t optval,
 				    sockptr_t optlen, int len)
 {
 	const int size0 = offsetof(struct compat_group_filter, gf_slist_flex);
-<<<<<<< HEAD
-=======
-	struct compat_group_filter __user *p = optval;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct compat_group_filter gf32;
 	struct group_filter gf;
 	int err;
@@ -1151,15 +1118,9 @@ static int compat_ipv6_get_msfilter(struct sock *sk, sockptr_t optval,
 	if (gf.gf_group.ss_family != AF_INET6)
 		return -EADDRNOTAVAIL;
 
-<<<<<<< HEAD
 	sockopt_lock_sock(sk);
 	err = ip6_mc_msfget(sk, &gf, optval, size0);
 	sockopt_release_sock(sk);
-=======
-	lock_sock(sk);
-	err = ip6_mc_msfget(sk, &gf, p->gf_slist_flex);
-	release_sock(sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 	if (num > gf.gf_numsrc)

@@ -58,13 +58,6 @@ static u32 flow_type_mask(u32 flow_type)
 	return flow_type & ~(FLOW_EXT | FLOW_MAC_EXT | FLOW_RSS);
 }
 
-static int flow_type_to_traffic_type(u32 flow_type);
-
-static u32 flow_type_mask(u32 flow_type)
-{
-	return flow_type & ~(FLOW_EXT | FLOW_MAC_EXT | FLOW_RSS);
-}
-
 struct mlx5e_ethtool_rule {
 	struct list_head             list;
 	struct ethtool_rx_flow_spec  flow_spec;
@@ -105,30 +98,18 @@ static struct mlx5e_ethtool_table *get_flow_table(struct mlx5e_priv *priv,
 	case UDP_V6_FLOW:
 		max_tuples = ETHTOOL_NUM_L3_L4_FTS;
 		prio = MLX5E_ETHTOOL_L3_L4_PRIO + (max_tuples - num_tuples);
-<<<<<<< HEAD
 		eth_ft = &ethtool->l3_l4_ft[prio];
-=======
-		eth_ft = &priv->fs->ethtool.l3_l4_ft[prio];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case IP_USER_FLOW:
 	case IPV6_USER_FLOW:
 		max_tuples = ETHTOOL_NUM_L3_L4_FTS;
 		prio = MLX5E_ETHTOOL_L3_L4_PRIO + (max_tuples - num_tuples);
-<<<<<<< HEAD
 		eth_ft = &ethtool->l3_l4_ft[prio];
-=======
-		eth_ft = &priv->fs->ethtool.l3_l4_ft[prio];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case ETHER_FLOW:
 		max_tuples = ETHTOOL_NUM_L2_FTS;
 		prio = max_tuples - num_tuples;
-<<<<<<< HEAD
 		eth_ft = &ethtool->l2_ft[prio];
-=======
-		eth_ft = &priv->fs->ethtool.l2_ft[prio];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		prio += MLX5E_ETHTOOL_L2_PRIO;
 		break;
 	default:
@@ -421,23 +402,13 @@ static void add_rule_to_list(struct mlx5e_priv *priv,
 	struct mlx5e_ethtool_steering *ethtool = mlx5e_fs_get_ethtool(priv->fs);
 	struct list_head *head = &ethtool->rules;
 	struct mlx5e_ethtool_rule *iter;
-<<<<<<< HEAD
 
 	list_for_each_entry(iter, &ethtool->rules, list) {
-=======
-	struct list_head *head = &priv->fs->ethtool.rules;
-
-	list_for_each_entry(iter, &priv->fs->ethtool.rules, list) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (iter->flow_spec.location > rule->flow_spec.location)
 			break;
 		head = &iter->list;
 	}
-<<<<<<< HEAD
 	ethtool->tot_num_rules++;
-=======
-	priv->fs->ethtool.tot_num_rules++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_add(&rule->list, head);
 }
 
@@ -480,19 +451,7 @@ static int flow_get_tirn(struct mlx5e_priv *priv,
 		eth_rule->rss = rss;
 		mlx5e_rss_refcnt_inc(eth_rule->rss);
 	} else {
-<<<<<<< HEAD
 		*tirn = mlx5e_rx_res_get_tirn_direct(priv->rx_res, fs->ring_cookie);
-=======
-		struct mlx5e_params *params = &priv->channels.params;
-		enum mlx5e_rq_group group;
-		u16 ix;
-
-		mlx5e_qid_get_ch_and_group(params, fs->ring_cookie, &ix, &group);
-
-		*tirn = group == MLX5E_RQ_GROUP_XSK ?
-			mlx5e_rx_res_get_tirn_xsk(priv->rx_res, ix) :
-			mlx5e_rx_res_get_tirn_direct(priv->rx_res, ix);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -559,11 +518,7 @@ static void del_ethtool_rule(struct mlx5e_flow_steering *fs,
 	if (eth_rule->rss)
 		mlx5e_rss_refcnt_dec(eth_rule->rss);
 	list_del(&eth_rule->list);
-<<<<<<< HEAD
 	ethtool->tot_num_rules--;
-=======
-	priv->fs->ethtool.tot_num_rules--;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	put_flow_table(eth_rule->eth_ft);
 	kfree(eth_rule);
 }
@@ -574,11 +529,7 @@ static struct mlx5e_ethtool_rule *find_ethtool_rule(struct mlx5e_priv *priv,
 	struct mlx5e_ethtool_steering *ethtool = mlx5e_fs_get_ethtool(priv->fs);
 	struct mlx5e_ethtool_rule *iter;
 
-<<<<<<< HEAD
 	list_for_each_entry(iter, &ethtool->rules, list) {
-=======
-	list_for_each_entry(iter, &priv->fs->ethtool.rules, list) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (iter->flow_spec.location == location)
 			return iter;
 	}
@@ -849,11 +800,7 @@ mlx5e_ethtool_get_flow(struct mlx5e_priv *priv,
 	if (location < 0 || location >= MAX_NUM_OF_ETHTOOL_RULES)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	list_for_each_entry(eth_rule, &ethtool->rules, list) {
-=======
-	list_for_each_entry(eth_rule, &priv->fs->ethtool.rules, list) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		int index;
 
 		if (eth_rule->flow_spec.location != location)
@@ -910,24 +857,15 @@ void mlx5e_ethtool_cleanup_steering(struct mlx5e_flow_steering *fs)
 	struct mlx5e_ethtool_rule *iter;
 	struct mlx5e_ethtool_rule *temp;
 
-<<<<<<< HEAD
 	list_for_each_entry_safe(iter, temp, &ethtool->rules, list)
 		del_ethtool_rule(fs, iter);
-=======
-	list_for_each_entry_safe(iter, temp, &priv->fs->ethtool.rules, list)
-		del_ethtool_rule(priv, iter);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void mlx5e_ethtool_init_steering(struct mlx5e_flow_steering *fs)
 {
-<<<<<<< HEAD
 	struct mlx5e_ethtool_steering *ethtool = mlx5e_fs_get_ethtool(fs);
 
 	INIT_LIST_HEAD(&ethtool->rules);
-=======
-	INIT_LIST_HEAD(&priv->fs->ethtool.rules);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int flow_type_to_traffic_type(u32 flow_type)
@@ -1049,19 +987,12 @@ int mlx5e_ethtool_set_rxnfc(struct mlx5e_priv *priv, struct ethtool_rxnfc *cmd)
 int mlx5e_ethtool_get_rxnfc(struct mlx5e_priv *priv,
 			    struct ethtool_rxnfc *info, u32 *rule_locs)
 {
-<<<<<<< HEAD
 	struct mlx5e_ethtool_steering *ethtool = mlx5e_fs_get_ethtool(priv->fs);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err = 0;
 
 	switch (info->cmd) {
 	case ETHTOOL_GRXCLSRLCNT:
-<<<<<<< HEAD
 		info->rule_cnt = ethtool->tot_num_rules;
-=======
-		info->rule_cnt = priv->fs->ethtool.tot_num_rules;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case ETHTOOL_GRXCLSRULE:
 		err = mlx5e_ethtool_get_flow(priv, info, info->fs.location);

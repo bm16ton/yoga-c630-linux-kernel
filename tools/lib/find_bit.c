@@ -24,7 +24,6 @@
  * @MUNGE: The expression that post-processes a word containing found bit (may be empty)
  * @size: The bitmap size in bits
  */
-<<<<<<< HEAD
 #define FIND_FIRST_BIT(FETCH, MUNGE, size)					\
 ({										\
 	unsigned long idx, val, sz = (size);					\
@@ -75,56 +74,6 @@ out:										\
 unsigned long _find_first_bit(const unsigned long *addr, unsigned long size)
 {
 	return FIND_FIRST_BIT(addr[idx], /* nop */, size);
-=======
-unsigned long _find_next_bit(const unsigned long *addr1,
-		const unsigned long *addr2, unsigned long nbits,
-		unsigned long start, unsigned long invert, unsigned long le)
-{
-	unsigned long tmp, mask;
-	(void) le;
-
-	if (unlikely(start >= nbits))
-		return nbits;
-
-	tmp = addr1[start / BITS_PER_LONG];
-	if (addr2)
-		tmp &= addr2[start / BITS_PER_LONG];
-	tmp ^= invert;
-
-	/* Handle 1st word. */
-	mask = BITMAP_FIRST_WORD_MASK(start);
-
-	/*
-	 * Due to the lack of swab() in tools, and the fact that it doesn't
-	 * need little-endian support, just comment it out
-	 */
-#if (0)
-	if (le)
-		mask = swab(mask);
-#endif
-
-	tmp &= mask;
-
-	start = round_down(start, BITS_PER_LONG);
-
-	while (!tmp) {
-		start += BITS_PER_LONG;
-		if (start >= nbits)
-			return nbits;
-
-		tmp = addr1[start / BITS_PER_LONG];
-		if (addr2)
-			tmp &= addr2[start / BITS_PER_LONG];
-		tmp ^= invert;
-	}
-
-#if (0)
-	if (le)
-		tmp = swab(tmp);
-#endif
-
-	return min(start + __ffs(tmp), nbits);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 
@@ -132,23 +81,18 @@ unsigned long _find_next_bit(const unsigned long *addr1,
 /*
  * Find the first set bit in two memory regions.
  */
-<<<<<<< HEAD
 unsigned long _find_first_and_bit(const unsigned long *addr1,
 				  const unsigned long *addr2,
 				  unsigned long size)
-=======
-unsigned long _find_first_bit(const unsigned long *addr, unsigned long size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return FIND_FIRST_BIT(addr1[idx] & addr2[idx], /* nop */, size);
 }
 #endif
 
-#ifndef find_first_and_bit
+#ifndef find_first_zero_bit
 /*
- * Find the first set bit in two memory regions.
+ * Find the first cleared bit in a memory region.
  */
-<<<<<<< HEAD
 unsigned long _find_first_zero_bit(const unsigned long *addr, unsigned long size)
 {
 	return FIND_FIRST_BIT(~addr[idx], /* nop */, size);
@@ -175,37 +119,5 @@ unsigned long _find_next_zero_bit(const unsigned long *addr, unsigned long nbits
 					 unsigned long start)
 {
 	return FIND_NEXT_BIT(~addr[idx], /* nop */, nbits, start);
-=======
-unsigned long _find_first_and_bit(const unsigned long *addr1,
-				  const unsigned long *addr2,
-				  unsigned long size)
-{
-	unsigned long idx, val;
-
-	for (idx = 0; idx * BITS_PER_LONG < size; idx++) {
-		val = addr1[idx] & addr2[idx];
-		if (val)
-			return min(idx * BITS_PER_LONG + __ffs(val), size);
-	}
-
-	return size;
-}
-#endif
-
-#ifndef find_first_zero_bit
-/*
- * Find the first cleared bit in a memory region.
- */
-unsigned long _find_first_zero_bit(const unsigned long *addr, unsigned long size)
-{
-	unsigned long idx;
-
-	for (idx = 0; idx * BITS_PER_LONG < size; idx++) {
-		if (addr[idx] != ~0UL)
-			return min(idx * BITS_PER_LONG + ffz(addr[idx]), size);
-	}
-
-	return size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif

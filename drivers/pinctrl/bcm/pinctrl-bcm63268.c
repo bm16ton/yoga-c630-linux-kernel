@@ -40,15 +40,6 @@ enum bcm63268_pinctrl_reg {
 	BCM63268_BASEMODE,
 };
 
-<<<<<<< HEAD
-=======
-struct bcm63268_pingroup {
-	const char *name;
-	const unsigned * const pins;
-	const unsigned num_pins;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct bcm63268_function {
 	const char *name;
 	const char * const *groups;
@@ -188,7 +179,6 @@ static unsigned vdsl_phy1_grp_pins[] = { 12, 13 };
 static unsigned vdsl_phy2_grp_pins[] = { 24, 25 };
 static unsigned vdsl_phy3_grp_pins[] = { 26, 27 };
 
-<<<<<<< HEAD
 static struct pingroup bcm63268_groups[] = {
 	BCM_PIN_GROUP(gpio0),
 	BCM_PIN_GROUP(gpio1),
@@ -250,76 +240,6 @@ static struct pingroup bcm63268_groups[] = {
 	BCM_PIN_GROUP(vdsl_phy1_grp),
 	BCM_PIN_GROUP(vdsl_phy2_grp),
 	BCM_PIN_GROUP(vdsl_phy3_grp),
-=======
-#define BCM63268_GROUP(n)					\
-	{							\
-		.name = #n,					\
-		.pins = n##_pins,				\
-		.num_pins = ARRAY_SIZE(n##_pins),		\
-	}
-
-static struct bcm63268_pingroup bcm63268_groups[] = {
-	BCM63268_GROUP(gpio0),
-	BCM63268_GROUP(gpio1),
-	BCM63268_GROUP(gpio2),
-	BCM63268_GROUP(gpio3),
-	BCM63268_GROUP(gpio4),
-	BCM63268_GROUP(gpio5),
-	BCM63268_GROUP(gpio6),
-	BCM63268_GROUP(gpio7),
-	BCM63268_GROUP(gpio8),
-	BCM63268_GROUP(gpio9),
-	BCM63268_GROUP(gpio10),
-	BCM63268_GROUP(gpio11),
-	BCM63268_GROUP(gpio12),
-	BCM63268_GROUP(gpio13),
-	BCM63268_GROUP(gpio14),
-	BCM63268_GROUP(gpio15),
-	BCM63268_GROUP(gpio16),
-	BCM63268_GROUP(gpio17),
-	BCM63268_GROUP(gpio18),
-	BCM63268_GROUP(gpio19),
-	BCM63268_GROUP(gpio20),
-	BCM63268_GROUP(gpio21),
-	BCM63268_GROUP(gpio22),
-	BCM63268_GROUP(gpio23),
-	BCM63268_GROUP(gpio24),
-	BCM63268_GROUP(gpio25),
-	BCM63268_GROUP(gpio26),
-	BCM63268_GROUP(gpio27),
-	BCM63268_GROUP(gpio28),
-	BCM63268_GROUP(gpio29),
-	BCM63268_GROUP(gpio30),
-	BCM63268_GROUP(gpio31),
-	BCM63268_GROUP(gpio32),
-	BCM63268_GROUP(gpio33),
-	BCM63268_GROUP(gpio34),
-	BCM63268_GROUP(gpio35),
-	BCM63268_GROUP(gpio36),
-	BCM63268_GROUP(gpio37),
-	BCM63268_GROUP(gpio38),
-	BCM63268_GROUP(gpio39),
-	BCM63268_GROUP(gpio40),
-	BCM63268_GROUP(gpio41),
-	BCM63268_GROUP(gpio42),
-	BCM63268_GROUP(gpio43),
-	BCM63268_GROUP(gpio44),
-	BCM63268_GROUP(gpio45),
-	BCM63268_GROUP(gpio46),
-	BCM63268_GROUP(gpio47),
-	BCM63268_GROUP(gpio48),
-	BCM63268_GROUP(gpio49),
-	BCM63268_GROUP(gpio50),
-	BCM63268_GROUP(gpio51),
-
-	/* multi pin groups */
-	BCM63268_GROUP(nand_grp),
-	BCM63268_GROUP(dectpd_grp),
-	BCM63268_GROUP(vdsl_phy0_grp),
-	BCM63268_GROUP(vdsl_phy1_grp),
-	BCM63268_GROUP(vdsl_phy2_grp),
-	BCM63268_GROUP(vdsl_phy3_grp),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const char * const led_groups[] = {
@@ -554,17 +474,10 @@ static const char *bcm63268_pinctrl_get_group_name(struct pinctrl_dev *pctldev,
 static int bcm63268_pinctrl_get_group_pins(struct pinctrl_dev *pctldev,
 					   unsigned group,
 					   const unsigned **pins,
-<<<<<<< HEAD
 					   unsigned *npins)
 {
 	*pins = bcm63268_groups[group].pins;
 	*npins = bcm63268_groups[group].npins;
-=======
-					   unsigned *num_pins)
-{
-	*pins = bcm63268_groups[group].pins;
-	*num_pins = bcm63268_groups[group].num_pins;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -619,21 +532,13 @@ static int bcm63268_pinctrl_set_mux(struct pinctrl_dev *pctldev,
 				    unsigned selector, unsigned group)
 {
 	struct bcm63xx_pinctrl *pc = pinctrl_dev_get_drvdata(pctldev);
-<<<<<<< HEAD
 	const struct pingroup *pg = &bcm63268_groups[group];
-=======
-	const struct bcm63268_pingroup *pg = &bcm63268_groups[group];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct bcm63268_function *f = &bcm63268_funcs[selector];
 	unsigned i;
 	unsigned int reg;
 	unsigned int val, mask;
 
-<<<<<<< HEAD
 	for (i = 0; i < pg->npins; i++)
-=======
-	for (i = 0; i < pg->num_pins; i++)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bcm63268_set_gpio(pc, pg->pins[i]);
 
 	switch (f->reg) {

@@ -33,14 +33,11 @@ properties:
 
       - items:
           - enum:
-<<<<<<< HEAD
               - renesas,r9a09g011-wdt    # RZ/V2M
           - const: renesas,rzv2m-wdt     # RZ/V2M
 
       - items:
           - enum:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - renesas,r8a7742-wdt      # RZ/G1H
               - renesas,r8a7743-wdt      # RZ/G1M
               - renesas,r8a7744-wdt      # RZ/G1N
@@ -73,16 +70,12 @@ properties:
           - enum:
               - renesas,r8a779a0-wdt     # R-Car V3U
               - renesas,r8a779f0-wdt     # R-Car S4-8
-<<<<<<< HEAD
               - renesas,r8a779g0-wdt     # R-Car V4H
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - const: renesas,rcar-gen4-wdt # R-Car Gen4
 
   reg:
     maxItems: 1
 
-<<<<<<< HEAD
   interrupts:
     minItems: 1
     items:
@@ -106,15 +99,6 @@ properties:
     items:
       - const: pclk
       - const: oscclk
-=======
-  interrupts: true
-
-  interrupt-names: true
-
-  clocks: true
-
-  clock-names: true
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   power-domains:
     maxItems: 1
@@ -152,7 +136,6 @@ allOf:
           contains:
             enum:
               - renesas,rzg2l-wdt
-<<<<<<< HEAD
               - renesas,rzv2m-wdt
     then:
       properties:
@@ -180,36 +163,11 @@ allOf:
         interrupt-names:
           minItems: 2
       required:
-=======
-    then:
-      properties:
-        interrupts:
-          maxItems: 2
-        interrupt-names:
-          items:
-            - const: wdt
-            - const: perrout
-        clocks:
-          items:
-            - description: Register access clock
-            - description: Main clock
-        clock-names:
-          items:
-            - const: pclk
-            - const: oscclk
-      required:
-        - clock-names
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         - interrupt-names
     else:
       properties:
         interrupts:
           maxItems: 1
-<<<<<<< HEAD
-=======
-        clocks:
-          maxItems: 1
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 additionalProperties: false
 

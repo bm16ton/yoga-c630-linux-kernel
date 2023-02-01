@@ -524,19 +524,11 @@ static irqreturn_t pcf2127_rtc_irq(int irq, void *dev)
 
 	if (ctrl1 & PCF2127_BIT_CTRL1_TSF1 || ctrl2 & PCF2127_BIT_CTRL2_TSF2)
 		pcf2127_rtc_ts_snapshot(dev);
-<<<<<<< HEAD
 
 	if (ctrl1 & PCF2127_CTRL1_IRQ_MASK)
 		regmap_write(pcf2127->regmap, PCF2127_REG_CTRL1,
 			ctrl1 & ~PCF2127_CTRL1_IRQ_MASK);
 
-=======
-
-	if (ctrl1 & PCF2127_CTRL1_IRQ_MASK)
-		regmap_write(pcf2127->regmap, PCF2127_REG_CTRL1,
-			ctrl1 & ~PCF2127_CTRL1_IRQ_MASK);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ctrl2 & PCF2127_CTRL2_IRQ_MASK)
 		regmap_write(pcf2127->regmap, PCF2127_REG_CTRL2,
 			ctrl2 & ~PCF2127_CTRL2_IRQ_MASK);
@@ -608,7 +600,6 @@ static ssize_t timestamp0_show(struct device *dev,
 		ret = regmap_read(pcf2127->regmap, PCF2127_REG_CTRL1, &ctrl1);
 		if (ret)
 			return 0;
-<<<<<<< HEAD
 
 		ret = regmap_read(pcf2127->regmap, PCF2127_REG_CTRL2, &ctrl2);
 		if (ret)
@@ -618,17 +609,6 @@ static ssize_t timestamp0_show(struct device *dev,
 		    !(ctrl2 & PCF2127_BIT_CTRL2_TSF2))
 			return 0;
 
-=======
-
-		ret = regmap_read(pcf2127->regmap, PCF2127_REG_CTRL2, &ctrl2);
-		if (ret)
-			return 0;
-
-		if (!(ctrl1 & PCF2127_BIT_CTRL1_TSF1) &&
-		    !(ctrl2 & PCF2127_BIT_CTRL2_TSF2))
-			return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = pcf2127_rtc_ts_read(dev->parent, &ts);
 		if (ret)
 			return 0;

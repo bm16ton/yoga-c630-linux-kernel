@@ -1623,22 +1623,13 @@ static int it66121_probe(struct i2c_client *client,
 	return 0;
 }
 
-<<<<<<< HEAD
 static void it66121_remove(struct i2c_client *client)
-=======
-static int it66121_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct it66121_ctx *ctx = i2c_get_clientdata(client);
 
 	ite66121_power_off(ctx);
 	drm_bridge_remove(&ctx->bridge);
 	mutex_destroy(&ctx->lock);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id it66121_dt_match[] = {

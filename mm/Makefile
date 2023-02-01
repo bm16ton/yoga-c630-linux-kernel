@@ -93,10 +93,7 @@ obj-$(CONFIG_KMSAN)	+= kmsan/
 obj-$(CONFIG_FAILSLAB) += failslab.o
 obj-$(CONFIG_MEMTEST)		+= memtest.o
 obj-$(CONFIG_MIGRATION) += migrate.o
-<<<<<<< HEAD
 obj-$(CONFIG_NUMA) += memory-tiers.o
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 obj-$(CONFIG_DEVICE_MIGRATION) += migrate_device.o
 obj-$(CONFIG_TRANSPARENT_HUGEPAGE) += huge_memory.o khugepaged.o
 obj-$(CONFIG_PAGE_COUNTER) += page_counter.o

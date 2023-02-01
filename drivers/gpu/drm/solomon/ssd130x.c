@@ -18,17 +18,10 @@
 #include <linux/pwm.h>
 #include <linux/regulator/consumer.h>
 
-<<<<<<< HEAD
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_damage_helper.h>
 #include <drm/drm_edid.h>
-=======
-#include <drm/drm_atomic_helper.h>
-#include <drm/drm_damage_helper.h>
-#include <drm/drm_edid.h>
-#include <drm/drm_fb_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_format_helper.h>
 #include <drm/drm_framebuffer.h>
@@ -544,19 +537,11 @@ static void ssd130x_clear_screen(struct ssd130x_device *ssd130x)
 	kfree(buf);
 }
 
-<<<<<<< HEAD
 static int ssd130x_fb_blit_rect(struct drm_framebuffer *fb, const struct iosys_map *vmap,
 				struct drm_rect *rect)
 {
 	struct ssd130x_device *ssd130x = drm_to_ssd130x(fb->dev);
 	struct iosys_map dst;
-=======
-static int ssd130x_fb_blit_rect(struct drm_framebuffer *fb, const struct iosys_map *map,
-				struct drm_rect *rect)
-{
-	struct ssd130x_device *ssd130x = drm_to_ssd130x(fb->dev);
-	void *vmap = map->vaddr; /* TODO: Use mapping abstraction properly */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int dst_pitch;
 	int ret = 0;
 	u8 *buf = NULL;
@@ -570,7 +555,6 @@ static int ssd130x_fb_blit_rect(struct drm_framebuffer *fb, const struct iosys_m
 	if (!buf)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	ret = drm_gem_fb_begin_cpu_access(fb, DMA_FROM_DEVICE);
 	if (ret)
 		goto out_free;
@@ -583,18 +567,11 @@ static int ssd130x_fb_blit_rect(struct drm_framebuffer *fb, const struct iosys_m
 	ssd130x_update_rect(ssd130x, buf, rect);
 
 out_free:
-=======
-	drm_fb_xrgb8888_to_mono(buf, dst_pitch, vmap, fb, rect);
-
-	ssd130x_update_rect(ssd130x, buf, rect);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(buf);
 
 	return ret;
 }
 
-<<<<<<< HEAD
 static void ssd130x_primary_plane_helper_atomic_update(struct drm_plane *plane,
 						       struct drm_atomic_state *state)
 {
@@ -746,120 +723,6 @@ static const struct drm_encoder_funcs ssd130x_encoder_funcs = {
 };
 
 static int ssd130x_connector_helper_get_modes(struct drm_connector *connector)
-=======
-static int ssd130x_display_pipe_mode_valid(struct drm_simple_display_pipe *pipe,
-					   const struct drm_display_mode *mode)
-{
-	struct ssd130x_device *ssd130x = drm_to_ssd130x(pipe->crtc.dev);
-
-	if (mode->hdisplay != ssd130x->mode.hdisplay &&
-	    mode->vdisplay != ssd130x->mode.vdisplay)
-		return MODE_ONE_SIZE;
-
-	if (mode->hdisplay != ssd130x->mode.hdisplay)
-		return MODE_ONE_WIDTH;
-
-	if (mode->vdisplay != ssd130x->mode.vdisplay)
-		return MODE_ONE_HEIGHT;
-
-	return MODE_OK;
-}
-
-static void ssd130x_display_pipe_enable(struct drm_simple_display_pipe *pipe,
-					struct drm_crtc_state *crtc_state,
-					struct drm_plane_state *plane_state)
-{
-	struct ssd130x_device *ssd130x = drm_to_ssd130x(pipe->crtc.dev);
-	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(plane_state);
-	struct drm_device *drm = &ssd130x->drm;
-	int idx, ret;
-
-	ret = ssd130x_power_on(ssd130x);
-	if (ret)
-		return;
-
-	ret = ssd130x_init(ssd130x);
-	if (ret)
-		goto out_power_off;
-
-	if (!drm_dev_enter(drm, &idx))
-		goto out_power_off;
-
-	ssd130x_fb_blit_rect(plane_state->fb, &shadow_plane_state->data[0], &plane_state->dst);
-
-	ssd130x_write_cmd(ssd130x, 1, SSD130X_DISPLAY_ON);
-
-	backlight_enable(ssd130x->bl_dev);
-
-	drm_dev_exit(idx);
-
-	return;
-out_power_off:
-	ssd130x_power_off(ssd130x);
-}
-
-static void ssd130x_display_pipe_disable(struct drm_simple_display_pipe *pipe)
-{
-	struct ssd130x_device *ssd130x = drm_to_ssd130x(pipe->crtc.dev);
-	struct drm_device *drm = &ssd130x->drm;
-	int idx;
-
-	if (!drm_dev_enter(drm, &idx))
-		return;
-
-	ssd130x_clear_screen(ssd130x);
-
-	backlight_disable(ssd130x->bl_dev);
-
-	ssd130x_write_cmd(ssd130x, 1, SSD130X_DISPLAY_OFF);
-
-	ssd130x_power_off(ssd130x);
-
-	drm_dev_exit(idx);
-}
-
-static void ssd130x_display_pipe_update(struct drm_simple_display_pipe *pipe,
-					struct drm_plane_state *old_plane_state)
-{
-	struct ssd130x_device *ssd130x = drm_to_ssd130x(pipe->crtc.dev);
-	struct drm_plane_state *plane_state = pipe->plane.state;
-	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(plane_state);
-	struct drm_framebuffer *fb = plane_state->fb;
-	struct drm_device *drm = &ssd130x->drm;
-	struct drm_rect src_clip, dst_clip;
-	int idx;
-
-	if (!fb)
-		return;
-
-	if (!pipe->crtc.state->active)
-		return;
-
-	if (!drm_atomic_helper_damage_merged(old_plane_state, plane_state, &src_clip))
-		return;
-
-	dst_clip = plane_state->dst;
-	if (!drm_rect_intersect(&dst_clip, &src_clip))
-		return;
-
-	if (!drm_dev_enter(drm, &idx))
-		return;
-
-	ssd130x_fb_blit_rect(plane_state->fb, &shadow_plane_state->data[0], &dst_clip);
-
-	drm_dev_exit(idx);
-}
-
-static const struct drm_simple_display_pipe_funcs ssd130x_pipe_funcs = {
-	.mode_valid = ssd130x_display_pipe_mode_valid,
-	.enable = ssd130x_display_pipe_enable,
-	.disable = ssd130x_display_pipe_disable,
-	.update = ssd130x_display_pipe_update,
-	DRM_GEM_SIMPLE_DISPLAY_PIPE_SHADOW_PLANE_FUNCS,
-};
-
-static int ssd130x_connector_get_modes(struct drm_connector *connector)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ssd130x_device *ssd130x = drm_to_ssd130x(connector->dev);
 	struct drm_display_mode *mode;
@@ -879,11 +742,7 @@ static int ssd130x_connector_get_modes(struct drm_connector *connector)
 }
 
 static const struct drm_connector_helper_funcs ssd130x_connector_helper_funcs = {
-<<<<<<< HEAD
 	.get_modes = ssd130x_connector_helper_get_modes,
-=======
-	.get_modes = ssd130x_connector_get_modes,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct drm_connector_funcs ssd130x_connector_funcs = {
@@ -994,7 +853,6 @@ static int ssd130x_init_modeset(struct ssd130x_device *ssd130x)
 	struct device *dev = ssd130x->dev;
 	struct drm_device *drm = &ssd130x->drm;
 	unsigned long max_width, max_height;
-<<<<<<< HEAD
 	struct drm_plane *primary_plane;
 	struct drm_crtc *crtc;
 	struct drm_encoder *encoder;
@@ -1005,10 +863,6 @@ static int ssd130x_init_modeset(struct ssd130x_device *ssd130x)
 	 * Modesetting
 	 */
 
-=======
-	int ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = drmm_mode_config_init(drm);
 	if (ret) {
 		dev_err(dev, "DRM mode config init failed: %d\n", ret);
@@ -1034,7 +888,6 @@ static int ssd130x_init_modeset(struct ssd130x_device *ssd130x)
 	drm->mode_config.preferred_depth = 32;
 	drm->mode_config.funcs = &ssd130x_mode_config_funcs;
 
-<<<<<<< HEAD
 	/* Primary plane */
 
 	primary_plane = &ssd130x->primary_plane;
@@ -1080,16 +933,12 @@ static int ssd130x_init_modeset(struct ssd130x_device *ssd130x)
 
 	connector = &ssd130x->connector;
 	ret = drm_connector_init(drm, connector, &ssd130x_connector_funcs,
-=======
-	ret = drm_connector_init(drm, &ssd130x->connector, &ssd130x_connector_funcs,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 DRM_MODE_CONNECTOR_Unknown);
 	if (ret) {
 		dev_err(dev, "DRM connector init failed: %d\n", ret);
 		return ret;
 	}
 
-<<<<<<< HEAD
 	drm_connector_helper_add(connector, &ssd130x_connector_helper_funcs);
 
 	ret = drm_connector_attach_encoder(connector, encoder);
@@ -1098,20 +947,6 @@ static int ssd130x_init_modeset(struct ssd130x_device *ssd130x)
 		return ret;
 	}
 
-=======
-	drm_connector_helper_add(&ssd130x->connector, &ssd130x_connector_helper_funcs);
-
-	ret = drm_simple_display_pipe_init(drm, &ssd130x->pipe, &ssd130x_pipe_funcs,
-					   ssd130x_formats, ARRAY_SIZE(ssd130x_formats),
-					   NULL, &ssd130x->connector);
-	if (ret) {
-		dev_err(dev, "DRM simple display pipeline init failed: %d\n", ret);
-		return ret;
-	}
-
-	drm_plane_enable_fb_damage_clips(&ssd130x->pipe.plane);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_mode_config_reset(drm);
 
 	return 0;

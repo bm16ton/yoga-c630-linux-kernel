@@ -32,7 +32,6 @@
 	.Lreg=.Lreg+1
 	.endr
 .endm
-<<<<<<< HEAD
 
 /*
  * This expands to a sequence of register clears for regs start to end
@@ -47,8 +46,6 @@
 	.Lreg=.Lreg+1
 	.endr
 .endm
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Macros for storing registers into and loading registers from
@@ -59,7 +56,6 @@
 #define REST_GPRS(start, end, base)	OP_REGS ld, 8, start, end, base, GPR0
 #define SAVE_NVGPRS(base)		SAVE_GPRS(14, 31, base)
 #define REST_NVGPRS(base)		REST_GPRS(14, 31, base)
-<<<<<<< HEAD
 #else
 #define SAVE_GPRS(start, end, base)	OP_REGS stw, 4, start, end, base, GPR0
 #define REST_GPRS(start, end, base)	OP_REGS lwz, 4, start, end, base, GPR0
@@ -72,13 +68,6 @@
 #define	ZEROIZE_NVGPRS()		ZEROIZE_GPRS(14, 31)
 #else
 #define	ZEROIZE_NVGPRS()		ZEROIZE_GPRS(13, 31)
-=======
-#else
-#define SAVE_GPRS(start, end, base)	OP_REGS stw, 4, start, end, base, GPR0
-#define REST_GPRS(start, end, base)	OP_REGS lwz, 4, start, end, base, GPR0
-#define SAVE_NVGPRS(base)		SAVE_GPRS(13, 31, base)
-#define REST_NVGPRS(base)		REST_GPRS(13, 31, base)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 #define	ZEROIZE_GPR(n)			ZEROIZE_GPRS(n, n)
 

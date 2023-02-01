@@ -69,7 +69,6 @@ static struct clk_alpha_pll gpll4 = {
 	},
 };
 
-<<<<<<< HEAD
 static struct clk_alpha_pll gpll6 = {
 	.offset = 0x13000,
 	.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_FABIA],
@@ -87,8 +86,6 @@ static struct clk_alpha_pll gpll6 = {
 	},
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct clk_div_table post_div_table_fabia_even[] = {
 	{ 0x0, 1 },
 	{ 0x1, 2 },
@@ -206,7 +203,6 @@ static const struct parent_map gcc_parent_map_10[] = {
 	{ P_GPLL0_OUT_MAIN, 1 },
 	{ P_GPLL4_OUT_MAIN, 5 },
 	{ P_GPLL0_OUT_EVEN, 6 },
-<<<<<<< HEAD
 };
 
 static const struct clk_parent_data gcc_parent_data_10[] = {
@@ -229,17 +225,6 @@ static const struct clk_parent_data gcc_parent_data_11[] = {
 	{ .hw = &gpll6.clkr.hw },
 	{ .hw = &gpll0_out_even.clkr.hw },
 };
-=======
-};
-
-static const struct clk_parent_data gcc_parent_data_10[] = {
-	{ .fw_name = "bi_tcxo", .name = "bi_tcxo" },
-	{ .hw = &gpll0.clkr.hw },
-	{ .hw = &gpll4.clkr.hw },
-	{ .hw = &gpll0_out_even.clkr.hw },
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct freq_tbl ftbl_gcc_cpuss_ahb_clk_src[] = {
 	F(19200000, P_BI_TCXO, 1, 0, 0),
@@ -275,7 +260,6 @@ static struct clk_rcg2 gcc_cpuss_rbcpr_clk_src = {
 		.name = "gcc_cpuss_rbcpr_clk_src",
 		.parent_data = gcc_parent_data_8_ao,
 		.num_parents = ARRAY_SIZE(gcc_parent_data_8_ao),
-<<<<<<< HEAD
 		.ops = &clk_rcg2_ops,
 	},
 };
@@ -296,8 +280,6 @@ static struct clk_rcg2 gcc_sdm670_cpuss_rbcpr_clk_src = {
 		.name = "gcc_cpuss_rbcpr_clk_src",
 		.parent_data = gcc_parent_data_8_ao,
 		.num_parents = ARRAY_SIZE(gcc_parent_data_8_ao),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.ops = &clk_rcg2_ops,
 	},
 };
@@ -818,7 +800,6 @@ static struct clk_rcg2 gcc_sdcc4_apps_clk_src = {
 		.name = "gcc_sdcc4_apps_clk_src",
 		.parent_data = gcc_parent_data_0,
 		.num_parents = ARRAY_SIZE(gcc_parent_data_0),
-<<<<<<< HEAD
 		.ops = &clk_rcg2_floor_ops,
 	},
 };
@@ -844,8 +825,6 @@ static struct clk_rcg2 gcc_sdm670_sdcc4_apps_clk_src = {
 		.name = "gcc_sdcc4_apps_clk_src",
 		.parent_data = gcc_parent_data_0,
 		.num_parents = ARRAY_SIZE(gcc_parent_data_0),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.ops = &clk_rcg2_floor_ops,
 	},
 };
@@ -1420,7 +1399,6 @@ static struct clk_branch gcc_cpuss_rbcpr_clk = {
 			.name = "gcc_cpuss_rbcpr_clk",
 			.parent_hws = (const struct clk_hw*[]){
 				&gcc_cpuss_rbcpr_clk_src.clkr.hw,
-<<<<<<< HEAD
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -1443,8 +1421,6 @@ static struct clk_branch gcc_sdm670_cpuss_rbcpr_clk = {
 			.name = "gcc_cpuss_rbcpr_clk",
 			.parent_hws = (const struct clk_hw*[]){
 				&gcc_sdm670_cpuss_rbcpr_clk_src.clkr.hw,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -2626,7 +2602,6 @@ static struct clk_branch gcc_sdcc4_apps_clk = {
 			.name = "gcc_sdcc4_apps_clk",
 			.parent_hws = (const struct clk_hw*[]){
 				&gcc_sdcc4_apps_clk_src.clkr.hw,
-<<<<<<< HEAD
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -2649,8 +2624,6 @@ static struct clk_branch gcc_sdm670_sdcc4_apps_clk = {
 			.name = "gcc_sdcc4_apps_clk",
 			.parent_hws = (const struct clk_hw*[]){
 				&gcc_sdm670_sdcc4_apps_clk_src.clkr.hw,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			},
 			.num_parents = 1,
 			.flags = CLK_SET_RATE_PARENT,
@@ -4047,7 +4020,6 @@ static struct platform_driver gcc_sdm845_driver = {
 	.driver		= {
 		.name	= "gcc-sdm845",
 		.of_match_table = gcc_sdm845_match_table,
-		.sync_state = clk_sync_state_disable_unused,
 	},
 };
 

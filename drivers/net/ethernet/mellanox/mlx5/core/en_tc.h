@@ -54,10 +54,7 @@
 			    ESW_FLOW_ATTR_SZ :\
 			    NIC_FLOW_ATTR_SZ)
 
-<<<<<<< HEAD
 struct mlx5_fs_chains *mlx5e_nic_chains(struct mlx5e_tc_table *tc);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int mlx5e_tc_num_filters(struct mlx5e_priv *priv, unsigned long flags);
 
 struct mlx5e_tc_update_priv {

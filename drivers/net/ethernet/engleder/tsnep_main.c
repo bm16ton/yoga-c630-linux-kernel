@@ -27,17 +27,10 @@
 #include <linux/phy.h>
 #include <linux/iopoll.h>
 
-<<<<<<< HEAD
 #define TSNEP_SKB_PAD (NET_SKB_PAD + NET_IP_ALIGN)
 #define TSNEP_HEADROOM ALIGN(TSNEP_SKB_PAD, 4)
 #define TSNEP_MAX_RX_BUF_SIZE (PAGE_SIZE - TSNEP_HEADROOM - \
 			       SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
-=======
-#define RX_SKB_LENGTH (round_up(TSNEP_RX_INLINE_METADATA_SIZE + ETH_HLEN + \
-				TSNEP_MAX_FRAME_SIZE + ETH_FCS_LEN, 4))
-#define RX_SKB_RESERVE ((16 - TSNEP_RX_INLINE_METADATA_SIZE) + NET_IP_ALIGN)
-#define RX_SKB_ALLOC_LENGTH (RX_SKB_RESERVE + RX_SKB_LENGTH)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
 #define DMA_ADDR_HIGH(dma_addr) ((u32)(((dma_addr) >> 32) & 0xFFFFFFFF))
@@ -67,7 +60,6 @@ static irqreturn_t tsnep_irq(int irq, void *arg)
 		iowrite32(active, adapter->addr + ECM_INT_ACKNOWLEDGE);
 
 	/* handle link interrupt */
-<<<<<<< HEAD
 	if ((active & ECM_INT_LINK) != 0)
 		phy_mac_interrupt(adapter->netdev->phydev);
 
@@ -75,25 +67,11 @@ static irqreturn_t tsnep_irq(int irq, void *arg)
 	if ((active & adapter->queue[0].irq_mask) != 0) {
 		tsnep_disable_irq(adapter, adapter->queue[0].irq_mask);
 		napi_schedule(&adapter->queue[0].napi);
-=======
-	if ((active & ECM_INT_LINK) != 0) {
-		if (adapter->netdev->phydev)
-			phy_mac_interrupt(adapter->netdev->phydev);
-	}
-
-	/* handle TX/RX queue 0 interrupt */
-	if ((active & adapter->queue[0].irq_mask) != 0) {
-		if (adapter->netdev) {
-			tsnep_disable_irq(adapter, adapter->queue[0].irq_mask);
-			napi_schedule(&adapter->queue[0].napi);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return IRQ_HANDLED;
 }
 
-<<<<<<< HEAD
 static irqreturn_t tsnep_irq_txrx(int irq, void *arg)
 {
 	struct tsnep_queue *queue = arg;
@@ -105,8 +83,6 @@ static irqreturn_t tsnep_irq_txrx(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tsnep_mdiobus_read(struct mii_bus *bus, int addr, int regnum)
 {
 	struct tsnep_adapter *adapter = bus->priv;
@@ -155,7 +131,6 @@ static int tsnep_mdiobus_write(struct mii_bus *bus, int addr, int regnum,
 	return 0;
 }
 
-<<<<<<< HEAD
 static void tsnep_set_link_mode(struct tsnep_adapter *adapter)
 {
 	u32 mode;
@@ -174,39 +149,17 @@ static void tsnep_set_link_mode(struct tsnep_adapter *adapter)
 	iowrite32(mode, adapter->addr + ECM_STATUS);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void tsnep_phy_link_status_change(struct net_device *netdev)
 {
 	struct tsnep_adapter *adapter = netdev_priv(netdev);
 	struct phy_device *phydev = netdev->phydev;
-<<<<<<< HEAD
 
 	if (phydev->link)
 		tsnep_set_link_mode(adapter);
-=======
-	u32 mode;
-
-	if (phydev->link) {
-		switch (phydev->speed) {
-		case SPEED_100:
-			mode = ECM_LINK_MODE_100;
-			break;
-		case SPEED_1000:
-			mode = ECM_LINK_MODE_1000;
-			break;
-		default:
-			mode = ECM_LINK_MODE_OFF;
-			break;
-		}
-		iowrite32(mode, adapter->addr + ECM_STATUS);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	phy_print_status(netdev->phydev);
 }
 
-<<<<<<< HEAD
 static int tsnep_phy_loopback(struct tsnep_adapter *adapter, bool enable)
 {
 	int retval;
@@ -223,8 +176,6 @@ static int tsnep_phy_loopback(struct tsnep_adapter *adapter, bool enable)
 	return retval;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tsnep_phy_open(struct tsnep_adapter *adapter)
 {
 	struct phy_device *phydev;
@@ -318,23 +269,14 @@ alloc_failed:
 	return retval;
 }
 
-<<<<<<< HEAD
 static void tsnep_tx_activate(struct tsnep_tx *tx, int index, int length,
 			      bool last)
-=======
-static void tsnep_tx_activate(struct tsnep_tx *tx, int index, bool last)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct tsnep_tx_entry *entry = &tx->entry[index];
 
 	entry->properties = 0;
 	if (entry->skb) {
-<<<<<<< HEAD
 		entry->properties = length & TSNEP_DESC_LENGTH_MASK;
-=======
-		entry->properties =
-			skb_pagelen(entry->skb) & TSNEP_DESC_LENGTH_MASK;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		entry->properties |= TSNEP_DESC_INTERRUPT_FLAG;
 		if (skb_shinfo(entry->skb)->tx_flags & SKBTX_IN_PROGRESS)
 			entry->properties |= TSNEP_DESC_EXTENDED_WRITEBACK_FLAG;
@@ -399,10 +341,7 @@ static int tsnep_tx_map(struct sk_buff *skb, struct tsnep_tx *tx, int count)
 	struct tsnep_tx_entry *entry;
 	unsigned int len;
 	dma_addr_t dma;
-<<<<<<< HEAD
 	int map_len = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 
 	for (i = 0; i < count; i++) {
@@ -425,7 +364,6 @@ static int tsnep_tx_map(struct sk_buff *skb, struct tsnep_tx *tx, int count)
 		dma_unmap_addr_set(entry, dma, dma);
 
 		entry->desc->tx = __cpu_to_le64(dma);
-<<<<<<< HEAD
 
 		map_len += len;
 	}
@@ -438,17 +376,6 @@ static int tsnep_tx_unmap(struct tsnep_tx *tx, int index, int count)
 	struct device *dmadev = tx->adapter->dmadev;
 	struct tsnep_tx_entry *entry;
 	int map_len = 0;
-=======
-	}
-
-	return 0;
-}
-
-static void tsnep_tx_unmap(struct tsnep_tx *tx, int index, int count)
-{
-	struct device *dmadev = tx->adapter->dmadev;
-	struct tsnep_tx_entry *entry;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 
 	for (i = 0; i < count; i++) {
@@ -465,18 +392,12 @@ static void tsnep_tx_unmap(struct tsnep_tx *tx, int index, int count)
 					       dma_unmap_addr(entry, dma),
 					       dma_unmap_len(entry, len),
 					       DMA_TO_DEVICE);
-<<<<<<< HEAD
 			map_len += entry->len;
 			entry->len = 0;
 		}
 	}
 
 	return map_len;
-=======
-			entry->len = 0;
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static netdev_tx_t tsnep_xmit_frame_ring(struct sk_buff *skb,
@@ -485,10 +406,7 @@ static netdev_tx_t tsnep_xmit_frame_ring(struct sk_buff *skb,
 	unsigned long flags;
 	int count = 1;
 	struct tsnep_tx_entry *entry;
-<<<<<<< HEAD
 	int length;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 	int retval;
 
@@ -512,11 +430,7 @@ static netdev_tx_t tsnep_xmit_frame_ring(struct sk_buff *skb,
 	entry->skb = skb;
 
 	retval = tsnep_tx_map(skb, tx, count);
-<<<<<<< HEAD
 	if (retval < 0) {
-=======
-	if (retval != 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		tsnep_tx_unmap(tx, tx->write, count);
 		dev_kfree_skb_any(entry->skb);
 		entry->skb = NULL;
@@ -529,20 +443,13 @@ static netdev_tx_t tsnep_xmit_frame_ring(struct sk_buff *skb,
 
 		return NETDEV_TX_OK;
 	}
-<<<<<<< HEAD
 	length = retval;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)
 		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 
 	for (i = 0; i < count; i++)
-<<<<<<< HEAD
 		tsnep_tx_activate(tx, (tx->write + i) % TSNEP_RING_SIZE, length,
-=======
-		tsnep_tx_activate(tx, (tx->write + i) % TSNEP_RING_SIZE,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				  i == (count - 1));
 	tx->write = (tx->write + count) % TSNEP_RING_SIZE;
 
@@ -558,12 +465,6 @@ static netdev_tx_t tsnep_xmit_frame_ring(struct sk_buff *skb,
 		netif_stop_queue(tx->adapter->netdev);
 	}
 
-<<<<<<< HEAD
-=======
-	tx->packets++;
-	tx->bytes += skb_pagelen(entry->skb) + ETH_FCS_LEN;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock_irqrestore(&tx->lock, flags);
 
 	return NETDEV_TX_OK;
@@ -575,10 +476,7 @@ static bool tsnep_tx_poll(struct tsnep_tx *tx, int napi_budget)
 	int budget = 128;
 	struct tsnep_tx_entry *entry;
 	int count;
-<<<<<<< HEAD
 	int length;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	spin_lock_irqsave(&tx->lock, flags);
 
@@ -601,11 +499,7 @@ static bool tsnep_tx_poll(struct tsnep_tx *tx, int napi_budget)
 		if (skb_shinfo(entry->skb)->nr_frags > 0)
 			count += skb_shinfo(entry->skb)->nr_frags;
 
-<<<<<<< HEAD
 		length = tsnep_tx_unmap(tx, tx->read, count);
-=======
-		tsnep_tx_unmap(tx, tx->read, count);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if ((skb_shinfo(entry->skb)->tx_flags & SKBTX_IN_PROGRESS) &&
 		    (__le32_to_cpu(entry->desc_wb->properties) &
@@ -632,12 +526,9 @@ static bool tsnep_tx_poll(struct tsnep_tx *tx, int napi_budget)
 
 		tx->read = (tx->read + count) % TSNEP_RING_SIZE;
 
-<<<<<<< HEAD
 		tx->packets++;
 		tx->bytes += length + ETH_FCS_LEN;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		budget--;
 	} while (likely(budget));
 
@@ -673,11 +564,7 @@ static bool tsnep_tx_pending(struct tsnep_tx *tx)
 }
 
 static int tsnep_tx_open(struct tsnep_adapter *adapter, void __iomem *addr,
-<<<<<<< HEAD
 			 int queue_index, struct tsnep_tx *tx)
-=======
-			 struct tsnep_tx *tx)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	dma_addr_t dma;
 	int retval;
@@ -685,10 +572,7 @@ static int tsnep_tx_open(struct tsnep_adapter *adapter, void __iomem *addr,
 	memset(tx, 0, sizeof(*tx));
 	tx->adapter = adapter;
 	tx->addr = addr;
-<<<<<<< HEAD
 	tx->queue_index = queue_index;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	retval = tsnep_tx_ring_init(tx);
 	if (retval)
@@ -724,7 +608,6 @@ static void tsnep_rx_ring_cleanup(struct tsnep_rx *rx)
 
 	for (i = 0; i < TSNEP_RING_SIZE; i++) {
 		entry = &rx->entry[i];
-<<<<<<< HEAD
 		if (entry->page)
 			page_pool_put_full_page(rx->page_pool, entry->page,
 						false);
@@ -734,16 +617,6 @@ static void tsnep_rx_ring_cleanup(struct tsnep_rx *rx)
 	if (rx->page_pool)
 		page_pool_destroy(rx->page_pool);
 
-=======
-		if (dma_unmap_addr(entry, dma))
-			dma_unmap_single(dmadev, dma_unmap_addr(entry, dma),
-					 dma_unmap_len(entry, len),
-					 DMA_FROM_DEVICE);
-		if (entry->skb)
-			dev_kfree_skb(entry->skb);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memset(rx->entry, 0, sizeof(rx->entry));
 
 	for (i = 0; i < TSNEP_RING_PAGE_COUNT; i++) {
@@ -756,7 +629,6 @@ static void tsnep_rx_ring_cleanup(struct tsnep_rx *rx)
 	}
 }
 
-<<<<<<< HEAD
 static int tsnep_rx_alloc_buffer(struct tsnep_rx *rx,
 				 struct tsnep_rx_entry *entry)
 {
@@ -770,33 +642,6 @@ static int tsnep_rx_alloc_buffer(struct tsnep_rx *rx,
 	entry->len = TSNEP_MAX_RX_BUF_SIZE;
 	entry->dma = page_pool_get_dma_addr(entry->page);
 	entry->desc->rx = __cpu_to_le64(entry->dma + TSNEP_SKB_PAD);
-=======
-static int tsnep_rx_alloc_and_map_skb(struct tsnep_rx *rx,
-				      struct tsnep_rx_entry *entry)
-{
-	struct device *dmadev = rx->adapter->dmadev;
-	struct sk_buff *skb;
-	dma_addr_t dma;
-
-	skb = __netdev_alloc_skb(rx->adapter->netdev, RX_SKB_ALLOC_LENGTH,
-				 GFP_ATOMIC | GFP_DMA);
-	if (!skb)
-		return -ENOMEM;
-
-	skb_reserve(skb, RX_SKB_RESERVE);
-
-	dma = dma_map_single(dmadev, skb->data, RX_SKB_LENGTH,
-			     DMA_FROM_DEVICE);
-	if (dma_mapping_error(dmadev, dma)) {
-		dev_kfree_skb(skb);
-		return -ENOMEM;
-	}
-
-	entry->skb = skb;
-	entry->len = RX_SKB_LENGTH;
-	dma_unmap_addr_set(entry, dma, dma);
-	entry->desc->rx = __cpu_to_le64(dma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -805,10 +650,7 @@ static int tsnep_rx_ring_init(struct tsnep_rx *rx)
 {
 	struct device *dmadev = rx->adapter->dmadev;
 	struct tsnep_rx_entry *entry;
-<<<<<<< HEAD
 	struct page_pool_params pp_params = { 0 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct tsnep_rx_entry *next_entry;
 	int i, j;
 	int retval;
@@ -830,7 +672,6 @@ static int tsnep_rx_ring_init(struct tsnep_rx *rx)
 			entry->desc_dma = rx->page_dma[i] + TSNEP_DESC_SIZE * j;
 		}
 	}
-<<<<<<< HEAD
 
 	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
 	pp_params.order = 0;
@@ -847,18 +688,12 @@ static int tsnep_rx_ring_init(struct tsnep_rx *rx)
 		goto failed;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < TSNEP_RING_SIZE; i++) {
 		entry = &rx->entry[i];
 		next_entry = &rx->entry[(i + 1) % TSNEP_RING_SIZE];
 		entry->desc->next = __cpu_to_le64(next_entry->desc_dma);
 
-<<<<<<< HEAD
 		retval = tsnep_rx_alloc_buffer(rx, entry);
-=======
-		retval = tsnep_rx_alloc_and_map_skb(rx, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (retval)
 			goto failed;
 	}
@@ -874,11 +709,7 @@ static void tsnep_rx_activate(struct tsnep_rx *rx, int index)
 {
 	struct tsnep_rx_entry *entry = &rx->entry[index];
 
-<<<<<<< HEAD
 	/* TSNEP_MAX_RX_BUF_SIZE is a multiple of 4 */
-=======
-	/* RX_SKB_LENGTH is a multiple of 4 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	entry->properties = entry->len & TSNEP_DESC_LENGTH_MASK;
 	entry->properties |= TSNEP_DESC_INTERRUPT_FLAG;
 	if (index == rx->increment_owner_counter) {
@@ -901,7 +732,6 @@ static void tsnep_rx_activate(struct tsnep_rx *rx, int index)
 	entry->desc->properties = __cpu_to_le32(entry->properties);
 }
 
-<<<<<<< HEAD
 static struct sk_buff *tsnep_build_skb(struct tsnep_rx *rx, struct page *page,
 				       int length)
 {
@@ -933,33 +763,21 @@ static struct sk_buff *tsnep_build_skb(struct tsnep_rx *rx, struct page *page,
 	return skb;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tsnep_rx_poll(struct tsnep_rx *rx, struct napi_struct *napi,
 			 int budget)
 {
 	struct device *dmadev = rx->adapter->dmadev;
 	int done = 0;
-<<<<<<< HEAD
 	enum dma_data_direction dma_dir;
 	struct tsnep_rx_entry *entry;
 	struct page *page;
 	struct sk_buff *skb;
-=======
-	struct tsnep_rx_entry *entry;
-	struct sk_buff *skb;
-	size_t len;
-	dma_addr_t dma;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int length;
 	bool enable = false;
 	int retval;
 
-<<<<<<< HEAD
 	dma_dir = page_pool_get_dma_dir(rx->page_pool);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (likely(done < budget)) {
 		entry = &rx->entry[rx->read];
 		if ((__le32_to_cpu(entry->desc_wb->properties) &
@@ -972,7 +790,6 @@ static int tsnep_rx_poll(struct tsnep_rx *rx, struct napi_struct *napi,
 		 */
 		dma_rmb();
 
-<<<<<<< HEAD
 		prefetch(page_address(entry->page) + TSNEP_SKB_PAD);
 		length = __le32_to_cpu(entry->desc_wb->properties) &
 			 TSNEP_DESC_LENGTH_MASK;
@@ -1001,44 +818,6 @@ static int tsnep_rx_poll(struct tsnep_rx *rx, struct napi_struct *napi,
 
 				rx->dropped++;
 			}
-=======
-		skb = entry->skb;
-		len = dma_unmap_len(entry, len);
-		dma = dma_unmap_addr(entry, dma);
-
-		/* forward skb only if allocation is successful, otherwise
-		 * skb is reused and frame dropped
-		 */
-		retval = tsnep_rx_alloc_and_map_skb(rx, entry);
-		if (!retval) {
-			dma_unmap_single(dmadev, dma, len, DMA_FROM_DEVICE);
-
-			length = __le32_to_cpu(entry->desc_wb->properties) &
-				 TSNEP_DESC_LENGTH_MASK;
-			skb_put(skb, length - ETH_FCS_LEN);
-			if (rx->adapter->hwtstamp_config.rx_filter ==
-			    HWTSTAMP_FILTER_ALL) {
-				struct skb_shared_hwtstamps *hwtstamps =
-					skb_hwtstamps(skb);
-				struct tsnep_rx_inline *rx_inline =
-					(struct tsnep_rx_inline *)skb->data;
-
-				skb_shinfo(skb)->tx_flags |=
-					SKBTX_HW_TSTAMP_NETDEV;
-				memset(hwtstamps, 0, sizeof(*hwtstamps));
-				hwtstamps->netdev_data = rx_inline;
-			}
-			skb_pull(skb, TSNEP_RX_INLINE_METADATA_SIZE);
-			skb->protocol = eth_type_trans(skb,
-						       rx->adapter->netdev);
-
-			rx->packets++;
-			rx->bytes += length - TSNEP_RX_INLINE_METADATA_SIZE;
-			if (skb->pkt_type == PACKET_MULTICAST)
-				rx->multicast++;
-
-			napi_gro_receive(napi, skb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			done++;
 		} else {
 			rx->dropped++;
@@ -1077,11 +856,7 @@ static bool tsnep_rx_pending(struct tsnep_rx *rx)
 }
 
 static int tsnep_rx_open(struct tsnep_adapter *adapter, void __iomem *addr,
-<<<<<<< HEAD
 			 int queue_index, struct tsnep_rx *rx)
-=======
-			 struct tsnep_rx *rx)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	dma_addr_t dma;
 	int i;
@@ -1090,10 +865,7 @@ static int tsnep_rx_open(struct tsnep_adapter *adapter, void __iomem *addr,
 	memset(rx, 0, sizeof(*rx));
 	rx->adapter = adapter;
 	rx->addr = addr;
-<<<<<<< HEAD
 	rx->queue_index = queue_index;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	retval = tsnep_rx_ring_init(rx);
 	if (retval)
@@ -1175,7 +947,6 @@ static int tsnep_poll(struct napi_struct *napi, int budget)
 	return min(done, budget - 1);
 }
 
-<<<<<<< HEAD
 static int tsnep_request_irq(struct tsnep_queue *queue, bool first)
 {
 	const char *name = netdev_name(queue->adapter->netdev);
@@ -1226,8 +997,6 @@ static void tsnep_free_irq(struct tsnep_queue *queue, bool first)
 	memset(queue->name, 0, sizeof(queue->name));
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tsnep_netdev_open(struct net_device *netdev)
 {
 	struct tsnep_adapter *adapter = netdev_priv(netdev);
@@ -1237,22 +1006,11 @@ static int tsnep_netdev_open(struct net_device *netdev)
 	int rx_queue_index = 0;
 	int retval;
 
-<<<<<<< HEAD
-=======
-	retval = tsnep_phy_open(adapter);
-	if (retval)
-		return retval;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < adapter->num_queues; i++) {
 		adapter->queue[i].adapter = adapter;
 		if (adapter->queue[i].tx) {
 			addr = adapter->addr + TSNEP_QUEUE(tx_queue_index);
-<<<<<<< HEAD
 			retval = tsnep_tx_open(adapter, addr, tx_queue_index,
-=======
-			retval = tsnep_tx_open(adapter, addr,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					       adapter->queue[i].tx);
 			if (retval)
 				goto failed;
@@ -1261,16 +1019,12 @@ static int tsnep_netdev_open(struct net_device *netdev)
 		if (adapter->queue[i].rx) {
 			addr = adapter->addr + TSNEP_QUEUE(rx_queue_index);
 			retval = tsnep_rx_open(adapter, addr,
-<<<<<<< HEAD
 					       rx_queue_index,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					       adapter->queue[i].rx);
 			if (retval)
 				goto failed;
 			rx_queue_index++;
 		}
-<<<<<<< HEAD
 
 		retval = tsnep_request_irq(&adapter->queue[i], i == 0);
 		if (retval) {
@@ -1279,8 +1033,6 @@ static int tsnep_netdev_open(struct net_device *netdev)
 				  adapter->queue[i].irq);
 			goto failed;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	retval = netif_set_real_num_tx_queues(adapter->netdev,
@@ -1292,7 +1044,6 @@ static int tsnep_netdev_open(struct net_device *netdev)
 	if (retval)
 		goto failed;
 
-<<<<<<< HEAD
 	tsnep_enable_irq(adapter, ECM_INT_LINK);
 	retval = tsnep_phy_open(adapter);
 	if (retval)
@@ -1301,11 +1052,6 @@ static int tsnep_netdev_open(struct net_device *netdev)
 	for (i = 0; i < adapter->num_queues; i++) {
 		netif_napi_add(adapter->netdev, &adapter->queue[i].napi,
 			       tsnep_poll);
-=======
-	for (i = 0; i < adapter->num_queues; i++) {
-		netif_napi_add(adapter->netdev, &adapter->queue[i].napi,
-			       tsnep_poll, 64);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		napi_enable(&adapter->queue[i].napi);
 
 		tsnep_enable_irq(adapter, adapter->queue[i].irq_mask);
@@ -1313,7 +1059,6 @@ static int tsnep_netdev_open(struct net_device *netdev)
 
 	return 0;
 
-<<<<<<< HEAD
 phy_failed:
 	tsnep_disable_irq(adapter, ECM_INT_LINK);
 	tsnep_phy_close(adapter);
@@ -1321,19 +1066,11 @@ failed:
 	for (i = 0; i < adapter->num_queues; i++) {
 		tsnep_free_irq(&adapter->queue[i], i == 0);
 
-=======
-failed:
-	for (i = 0; i < adapter->num_queues; i++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (adapter->queue[i].rx)
 			tsnep_rx_close(adapter->queue[i].rx);
 		if (adapter->queue[i].tx)
 			tsnep_tx_close(adapter->queue[i].tx);
 	}
-<<<<<<< HEAD
-=======
-	tsnep_phy_close(adapter);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return retval;
 }
 
@@ -1342,34 +1079,23 @@ static int tsnep_netdev_close(struct net_device *netdev)
 	struct tsnep_adapter *adapter = netdev_priv(netdev);
 	int i;
 
-<<<<<<< HEAD
 	tsnep_disable_irq(adapter, ECM_INT_LINK);
 	tsnep_phy_close(adapter);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < adapter->num_queues; i++) {
 		tsnep_disable_irq(adapter, adapter->queue[i].irq_mask);
 
 		napi_disable(&adapter->queue[i].napi);
 		netif_napi_del(&adapter->queue[i].napi);
 
-<<<<<<< HEAD
 		tsnep_free_irq(&adapter->queue[i], i == 0);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (adapter->queue[i].rx)
 			tsnep_rx_close(adapter->queue[i].rx);
 		if (adapter->queue[i].tx)
 			tsnep_tx_close(adapter->queue[i].tx);
 	}
 
-<<<<<<< HEAD
-=======
-	tsnep_phy_close(adapter);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1484,7 +1210,6 @@ static int tsnep_netdev_set_mac_address(struct net_device *netdev, void *addr)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int tsnep_netdev_set_features(struct net_device *netdev,
 				     netdev_features_t features)
 {
@@ -1501,8 +1226,6 @@ static int tsnep_netdev_set_features(struct net_device *netdev,
 	return retval;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static ktime_t tsnep_netdev_get_tstamp(struct net_device *netdev,
 				       const struct skb_shared_hwtstamps *hwtstamps,
 				       bool cycles)
@@ -1524,15 +1247,9 @@ static const struct net_device_ops tsnep_netdev_ops = {
 	.ndo_start_xmit = tsnep_netdev_xmit_frame,
 	.ndo_eth_ioctl = tsnep_netdev_ioctl,
 	.ndo_set_rx_mode = tsnep_netdev_set_multicast,
-<<<<<<< HEAD
 	.ndo_get_stats64 = tsnep_netdev_get_stats64,
 	.ndo_set_mac_address = tsnep_netdev_set_mac_address,
 	.ndo_set_features = tsnep_netdev_set_features,
-=======
-
-	.ndo_get_stats64 = tsnep_netdev_get_stats64,
-	.ndo_set_mac_address = tsnep_netdev_set_mac_address,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ndo_get_tstamp = tsnep_netdev_get_tstamp,
 	.ndo_setup_tc = tsnep_tc_setup,
 };
@@ -1633,7 +1350,6 @@ static int tsnep_phy_init(struct tsnep_adapter *adapter)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int tsnep_queue_init(struct tsnep_adapter *adapter, int queue_count)
 {
 	u32 irq_mask = ECM_INT_TX_0 | ECM_INT_RX_0;
@@ -1680,8 +1396,6 @@ static int tsnep_queue_init(struct tsnep_adapter *adapter, int queue_count)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tsnep_probe(struct platform_device *pdev)
 {
 	struct tsnep_adapter *adapter;
@@ -1690,10 +1404,7 @@ static int tsnep_probe(struct platform_device *pdev)
 	u32 type;
 	int revision;
 	int version;
-<<<<<<< HEAD
 	int queue_count;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int retval;
 
 	netdev = devm_alloc_etherdev_mqs(&pdev->dev,
@@ -1715,30 +1426,19 @@ static int tsnep_probe(struct platform_device *pdev)
 	netdev->max_mtu = TSNEP_MAX_FRAME_SIZE;
 
 	mutex_init(&adapter->gate_control_lock);
-<<<<<<< HEAD
 	mutex_init(&adapter->rxnfc_lock);
 	INIT_LIST_HEAD(&adapter->rxnfc_rules);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	io = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	adapter->addr = devm_ioremap_resource(&pdev->dev, io);
 	if (IS_ERR(adapter->addr))
 		return PTR_ERR(adapter->addr);
-<<<<<<< HEAD
 	netdev->mem_start = io->start;
 	netdev->mem_end = io->end;
-=======
-	adapter->irq = platform_get_irq(pdev, 0);
-	netdev->mem_start = io->start;
-	netdev->mem_end = io->end;
-	netdev->irq = adapter->irq;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	type = ioread32(adapter->addr + ECM_TYPE);
 	revision = (type & ECM_REVISION_MASK) >> ECM_REVISION_SHIFT;
 	version = (type & ECM_VERSION_MASK) >> ECM_VERSION_SHIFT;
-<<<<<<< HEAD
 	queue_count = (type & ECM_QUEUE_COUNT_MASK) >> ECM_QUEUE_COUNT_SHIFT;
 	adapter->gate_control = type & ECM_GATE_CONTROL;
 	adapter->rxnfc_max = TSNEP_RX_ASSIGN_ETHER_TYPE_COUNT;
@@ -1759,30 +1459,6 @@ static int tsnep_probe(struct platform_device *pdev)
 	retval = tsnep_mac_init(adapter);
 	if (retval)
 		return retval;
-=======
-	adapter->gate_control = type & ECM_GATE_CONTROL;
-
-	adapter->num_tx_queues = TSNEP_QUEUES;
-	adapter->num_rx_queues = TSNEP_QUEUES;
-	adapter->num_queues = TSNEP_QUEUES;
-	adapter->queue[0].tx = &adapter->tx[0];
-	adapter->queue[0].rx = &adapter->rx[0];
-	adapter->queue[0].irq_mask = ECM_INT_TX_0 | ECM_INT_RX_0;
-
-	tsnep_disable_irq(adapter, ECM_INT_ALL);
-	retval = devm_request_irq(&adapter->pdev->dev, adapter->irq, tsnep_irq,
-				  0, TSNEP, adapter);
-	if (retval != 0) {
-		dev_err(&adapter->pdev->dev, "can't get assigned irq %d.\n",
-			adapter->irq);
-		return retval;
-	}
-	tsnep_enable_irq(adapter, ECM_INT_LINK);
-
-	retval = tsnep_mac_init(adapter);
-	if (retval)
-		goto mac_init_failed;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	retval = tsnep_mdio_init(adapter);
 	if (retval)
@@ -1800,7 +1476,6 @@ static int tsnep_probe(struct platform_device *pdev)
 	if (retval)
 		goto tc_init_failed;
 
-<<<<<<< HEAD
 	retval = tsnep_rxnfc_init(adapter);
 	if (retval)
 		goto rxnfc_init_failed;
@@ -1809,12 +1484,6 @@ static int tsnep_probe(struct platform_device *pdev)
 	netdev->ethtool_ops = &tsnep_ethtool_ops;
 	netdev->features = NETIF_F_SG;
 	netdev->hw_features = netdev->features | NETIF_F_LOOPBACK;
-=======
-	netdev->netdev_ops = &tsnep_netdev_ops;
-	netdev->ethtool_ops = &tsnep_ethtool_ops;
-	netdev->features = NETIF_F_SG;
-	netdev->hw_features = netdev->features;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* carrier off reporting is important to ethtool even BEFORE open */
 	netif_carrier_off(netdev);
@@ -1831,11 +1500,8 @@ static int tsnep_probe(struct platform_device *pdev)
 	return 0;
 
 register_failed:
-<<<<<<< HEAD
 	tsnep_rxnfc_cleanup(adapter);
 rxnfc_init_failed:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tsnep_tc_cleanup(adapter);
 tc_init_failed:
 	tsnep_ptp_cleanup(adapter);
@@ -1844,11 +1510,6 @@ phy_init_failed:
 	if (adapter->mdiobus)
 		mdiobus_unregister(adapter->mdiobus);
 mdio_init_failed:
-<<<<<<< HEAD
-=======
-mac_init_failed:
-	tsnep_disable_irq(adapter, ECM_INT_ALL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return retval;
 }
 
@@ -1858,11 +1519,8 @@ static int tsnep_remove(struct platform_device *pdev)
 
 	unregister_netdev(adapter->netdev);
 
-<<<<<<< HEAD
 	tsnep_rxnfc_cleanup(adapter);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tsnep_tc_cleanup(adapter);
 
 	tsnep_ptp_cleanup(adapter);

@@ -156,7 +156,6 @@ static const char *phylink_an_mode_str(unsigned int mode)
 	return mode < ARRAY_SIZE(modestr) ? modestr[mode] : "unknown";
 }
 
-<<<<<<< HEAD
 /**
  * phylink_interface_max_speed() - get the maximum speed of a phy interface
  * @interface: phy interface mode defined by &typedef phy_interface_t
@@ -235,10 +234,6 @@ static int phylink_interface_max_speed(phy_interface_t interface)
  * supported by the @caps. @linkmodes must have been initialised previously.
  */
 void phylink_caps_to_linkmodes(unsigned long *linkmodes, unsigned long caps)
-=======
-static void phylink_caps_to_linkmodes(unsigned long *linkmodes,
-				      unsigned long caps)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (caps & MAC_SYM_PAUSE)
 		__set_bit(ETHTOOL_LINK_MODE_Pause_BIT, linkmodes);
@@ -377,7 +372,6 @@ static void phylink_caps_to_linkmodes(unsigned long *linkmodes,
 		__set_bit(ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT, linkmodes);
 	}
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_GPL(phylink_caps_to_linkmodes);
 
 static struct {
@@ -600,127 +594,6 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
 					unsigned long *supported,
 					struct phylink_link_state *state)
 {
-=======
-
-/**
- * phylink_get_linkmodes() - get acceptable link modes
- * @linkmodes: ethtool linkmode mask (must be already initialised)
- * @interface: phy interface mode defined by &typedef phy_interface_t
- * @mac_capabilities: bitmask of MAC capabilities
- *
- * Set all possible pause, speed and duplex linkmodes in @linkmodes that
- * are supported by the @interface mode and @mac_capabilities. @linkmodes
- * must have been initialised previously.
- */
-void phylink_get_linkmodes(unsigned long *linkmodes, phy_interface_t interface,
-			   unsigned long mac_capabilities)
-{
-	unsigned long caps = MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
-
-	switch (interface) {
-	case PHY_INTERFACE_MODE_USXGMII:
-		caps |= MAC_10000FD | MAC_5000FD | MAC_2500FD;
-		fallthrough;
-
-	case PHY_INTERFACE_MODE_RGMII_TXID:
-	case PHY_INTERFACE_MODE_RGMII_RXID:
-	case PHY_INTERFACE_MODE_RGMII_ID:
-	case PHY_INTERFACE_MODE_RGMII:
-	case PHY_INTERFACE_MODE_QSGMII:
-	case PHY_INTERFACE_MODE_SGMII:
-	case PHY_INTERFACE_MODE_GMII:
-		caps |= MAC_1000HD | MAC_1000FD;
-		fallthrough;
-
-	case PHY_INTERFACE_MODE_REVRMII:
-	case PHY_INTERFACE_MODE_RMII:
-	case PHY_INTERFACE_MODE_SMII:
-	case PHY_INTERFACE_MODE_REVMII:
-	case PHY_INTERFACE_MODE_MII:
-		caps |= MAC_10HD | MAC_10FD;
-		fallthrough;
-
-	case PHY_INTERFACE_MODE_100BASEX:
-		caps |= MAC_100HD | MAC_100FD;
-		break;
-
-	case PHY_INTERFACE_MODE_TBI:
-	case PHY_INTERFACE_MODE_MOCA:
-	case PHY_INTERFACE_MODE_RTBI:
-	case PHY_INTERFACE_MODE_1000BASEX:
-		caps |= MAC_1000HD;
-		fallthrough;
-	case PHY_INTERFACE_MODE_TRGMII:
-		caps |= MAC_1000FD;
-		break;
-
-	case PHY_INTERFACE_MODE_2500BASEX:
-		caps |= MAC_2500FD;
-		break;
-
-	case PHY_INTERFACE_MODE_5GBASER:
-		caps |= MAC_5000FD;
-		break;
-
-	case PHY_INTERFACE_MODE_XGMII:
-	case PHY_INTERFACE_MODE_RXAUI:
-	case PHY_INTERFACE_MODE_XAUI:
-	case PHY_INTERFACE_MODE_10GBASER:
-	case PHY_INTERFACE_MODE_10GKR:
-		caps |= MAC_10000FD;
-		break;
-
-	case PHY_INTERFACE_MODE_25GBASER:
-		caps |= MAC_25000FD;
-		break;
-
-	case PHY_INTERFACE_MODE_XLGMII:
-		caps |= MAC_40000FD;
-		break;
-
-	case PHY_INTERFACE_MODE_INTERNAL:
-		caps |= ~0;
-		break;
-
-	case PHY_INTERFACE_MODE_NA:
-	case PHY_INTERFACE_MODE_MAX:
-		break;
-	}
-
-	phylink_caps_to_linkmodes(linkmodes, caps & mac_capabilities);
-}
-EXPORT_SYMBOL_GPL(phylink_get_linkmodes);
-
-/**
- * phylink_generic_validate() - generic validate() callback implementation
- * @config: a pointer to a &struct phylink_config.
- * @supported: ethtool bitmask for supported link modes.
- * @state: a pointer to a &struct phylink_link_state.
- *
- * Generic implementation of the validate() callback that MAC drivers can
- * use when they pass the range of supported interfaces and MAC capabilities.
- * This makes use of phylink_get_linkmodes().
- */
-void phylink_generic_validate(struct phylink_config *config,
-			      unsigned long *supported,
-			      struct phylink_link_state *state)
-{
-	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
-
-	phylink_set_port_modes(mask);
-	phylink_set(mask, Autoneg);
-	phylink_get_linkmodes(mask, state->interface, config->mac_capabilities);
-
-	linkmode_and(supported, supported, mask);
-	linkmode_and(state->advertising, state->advertising, mask);
-}
-EXPORT_SYMBOL_GPL(phylink_generic_validate);
-
-static int phylink_validate_mac_and_pcs(struct phylink *pl,
-					unsigned long *supported,
-					struct phylink_link_state *state)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct phylink_pcs *pcs;
 	int ret;
 
@@ -765,14 +638,9 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
 	return phylink_is_empty_linkmode(supported) ? -EINVAL : 0;
 }
 
-<<<<<<< HEAD
 static int phylink_validate_mask(struct phylink *pl, unsigned long *supported,
 				 struct phylink_link_state *state,
 				 const unsigned long *interfaces)
-=======
-static int phylink_validate_any(struct phylink *pl, unsigned long *supported,
-				struct phylink_link_state *state)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	__ETHTOOL_DECLARE_LINK_MODE_MASK(all_adv) = { 0, };
 	__ETHTOOL_DECLARE_LINK_MODE_MASK(all_s) = { 0, };
@@ -781,11 +649,7 @@ static int phylink_validate_any(struct phylink *pl, unsigned long *supported,
 	int intf;
 
 	for (intf = 0; intf < PHY_INTERFACE_MODE_MAX; intf++) {
-<<<<<<< HEAD
 		if (test_bit(intf, interfaces)) {
-=======
-		if (test_bit(intf, pl->config->supported_interfaces)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			linkmode_copy(s, supported);
 
 			t = *state;
@@ -806,7 +670,6 @@ static int phylink_validate_any(struct phylink *pl, unsigned long *supported,
 static int phylink_validate(struct phylink *pl, unsigned long *supported,
 			    struct phylink_link_state *state)
 {
-<<<<<<< HEAD
 	const unsigned long *interfaces = pl->config->supported_interfaces;
 
 	if (!phy_interface_empty(interfaces)) {
@@ -815,14 +678,6 @@ static int phylink_validate(struct phylink *pl, unsigned long *supported,
 						     interfaces);
 
 		if (!test_bit(state->interface, interfaces))
-=======
-	if (!phy_interface_empty(pl->config->supported_interfaces)) {
-		if (state->interface == PHY_INTERFACE_MODE_NA)
-			return phylink_validate_any(pl, supported, state);
-
-		if (!test_bit(state->interface,
-			      pl->config->supported_interfaces))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return -EINVAL;
 	}
 
@@ -1250,12 +1105,8 @@ static void phylink_mac_pcs_get_state(struct phylink *pl,
 	linkmode_zero(state->lp_advertising);
 	state->interface = pl->link_config.interface;
 	state->an_enabled = pl->link_config.an_enabled;
-<<<<<<< HEAD
 	state->rate_matching = pl->link_config.rate_matching;
 	if (state->an_enabled) {
-=======
-	if  (state->an_enabled) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		state->speed = SPEED_UNKNOWN;
 		state->duplex = DUPLEX_UNKNOWN;
 		state->pause = MLO_PAUSE_NONE;
@@ -1370,12 +1221,7 @@ static void phylink_link_up(struct phylink *pl,
 
 	if (pl->pcs && pl->pcs->ops->pcs_link_up)
 		pl->pcs->ops->pcs_link_up(pl->pcs, pl->cur_link_an_mode,
-<<<<<<< HEAD
 					  pl->cur_interface, speed, duplex);
-=======
-					 pl->cur_interface,
-					 link_state.speed, link_state.duplex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pl->mac_ops->mac_link_up(pl->config, pl->phydev, pl->cur_link_an_mode,
 				 pl->cur_interface, speed, duplex,
@@ -1728,18 +1574,11 @@ static void phylink_phy_change(struct phy_device *phydev, bool up)
 
 	phylink_run_resolve(pl);
 
-<<<<<<< HEAD
 	phylink_dbg(pl, "phy link %s %s/%s/%s/%s/%s\n", up ? "up" : "down",
 		    phy_modes(phydev->interface),
 		    phy_speed_to_str(phydev->speed),
 		    phy_duplex_to_str(phydev->duplex),
 		    phy_rate_matching_to_str(phydev->rate_matching),
-=======
-	phylink_dbg(pl, "phy link %s %s/%s/%s/%s\n", up ? "up" : "down",
-		    phy_modes(phydev->interface),
-		    phy_speed_to_str(phydev->speed),
-		    phy_duplex_to_str(phydev->duplex),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		    phylink_pause_to_str(pl->phy_state.pause));
 }
 
@@ -3123,7 +2962,6 @@ static int phylink_sfp_config_optical(struct phylink *pl)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	memset(&config, 0, sizeof(config));
 	linkmode_copy(support, pl->sfp_support);
 	linkmode_copy(config.advertising, pl->sfp_support);
@@ -3140,14 +2978,6 @@ static int phylink_sfp_config_optical(struct phylink *pl)
 		phylink_err(pl, "unsupported SFP module: validation with support %*pb failed\n",
 			    __ETHTOOL_LINK_MODE_MASK_NBITS, support);
 		return ret;
-=======
-	changed = !linkmode_equal(pl->supported, support) ||
-		  !linkmode_equal(pl->link_config.advertising,
-				  config.advertising);
-	if (changed) {
-		linkmode_copy(pl->supported, support);
-		linkmode_copy(pl->link_config.advertising, config.advertising);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	interface = phylink_choose_sfp_interface(pl, interfaces);

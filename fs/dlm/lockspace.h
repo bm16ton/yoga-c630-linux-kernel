@@ -28,14 +28,11 @@ struct dlm_ls *dlm_find_lockspace_device(int minor);
 void dlm_put_lockspace(struct dlm_ls *ls);
 void dlm_stop_lockspaces(void);
 void dlm_stop_lockspaces_check(void);
-<<<<<<< HEAD
 int dlm_new_user_lockspace(const char *name, const char *cluster,
 			   uint32_t flags, int lvblen,
 			   const struct dlm_lockspace_ops *ops,
 			   void *ops_arg, int *ops_result,
 			   dlm_lockspace_t **lockspace);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif				/* __LOCKSPACE_DOT_H__ */
 

@@ -71,16 +71,10 @@
 &port00 {
 	bus-range = <1 1>;
 	wifi0: network@0,0 {
-<<<<<<< HEAD
 		compatible = "pci14e4,4425";
 		reg = <0x10000 0x0 0x0 0x0 0x0>;
 		/* To be filled by the loader */
 		local-mac-address = [00 00 00 00 00 00];
 		apple,antenna-sku = "XX";
-=======
-		reg = <0x10000 0x0 0x0 0x0 0x0>;
-		/* To be filled by the loader */
-		local-mac-address = [00 00 00 00 00 00];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };

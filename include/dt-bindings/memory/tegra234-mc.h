@@ -34,7 +34,6 @@
 #define TEGRA234_SID_HOST1X	0x27
 #define TEGRA234_SID_VIC	0x34
 
-<<<<<<< HEAD
 /* Shared stream IDs */
 #define TEGRA234_SID_HOST1X_CTX0	0x35
 #define TEGRA234_SID_HOST1X_CTX1	0x36
@@ -45,8 +44,6 @@
 #define TEGRA234_SID_HOST1X_CTX6	0x3b
 #define TEGRA234_SID_HOST1X_CTX7	0x3c
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * memory client IDs
  */

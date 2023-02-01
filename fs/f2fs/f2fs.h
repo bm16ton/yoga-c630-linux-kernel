@@ -1735,17 +1735,9 @@ struct f2fs_sb_info {
 	unsigned int gc_mode;			/* current GC state */
 	unsigned int next_victim_seg[2];	/* next segment in victim section */
 	spinlock_t gc_urgent_high_lock;
-<<<<<<< HEAD
 	unsigned int gc_urgent_high_remaining;	/* remaining trial count for GC_URGENT_HIGH */
 
 	/* for skip statistic */
-=======
-	bool gc_urgent_high_limited;		/* indicates having limited trial count */
-	unsigned int gc_urgent_high_remaining;	/* remaining trial count for GC_URGENT_HIGH */
-
-	/* for skip statistic */
-	unsigned int atomic_files;		/* # of opened atomic file */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long long skipped_gc_rwsem;		/* FG_GC only */
 
 	/* threshold for gc trials on pinned files */
@@ -1776,11 +1768,8 @@ struct f2fs_sb_info {
 	atomic_t inline_dir;			/* # of inline_dentry inodes */
 	atomic_t compr_inode;			/* # of compressed inodes */
 	atomic64_t compr_blocks;		/* # of compressed blocks */
-<<<<<<< HEAD
 	atomic_t swapfile_inode;		/* # of swapfile inodes */
 	atomic_t atomic_files;			/* # of opened atomic file */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomic_t max_aw_cnt;			/* max # of atomic writes */
 	unsigned int io_skip_bggc;		/* skip background gc for in-flight IO */
 	unsigned int other_skip_bggc;		/* skip background gc for other reasons */
@@ -2177,7 +2166,6 @@ static inline int f2fs_rwsem_is_locked(struct f2fs_rwsem *sem)
 {
 	return rwsem_is_locked(&sem->internal_rwsem);
 }
-<<<<<<< HEAD
 
 static inline int f2fs_rwsem_is_contended(struct f2fs_rwsem *sem)
 {
@@ -2212,42 +2200,6 @@ static inline void f2fs_up_read(struct f2fs_rwsem *sem)
 	up_read(&sem->internal_rwsem);
 }
 
-=======
-
-static inline int f2fs_rwsem_is_contended(struct f2fs_rwsem *sem)
-{
-	return rwsem_is_contended(&sem->internal_rwsem);
-}
-
-static inline void f2fs_down_read(struct f2fs_rwsem *sem)
-{
-#ifdef CONFIG_F2FS_UNFAIR_RWSEM
-	wait_event(sem->read_waiters, down_read_trylock(&sem->internal_rwsem));
-#else
-	down_read(&sem->internal_rwsem);
-#endif
-}
-
-static inline int f2fs_down_read_trylock(struct f2fs_rwsem *sem)
-{
-	return down_read_trylock(&sem->internal_rwsem);
-}
-
-#ifdef CONFIG_DEBUG_LOCK_ALLOC
-static inline void f2fs_down_read_nested(struct f2fs_rwsem *sem, int subclass)
-{
-	down_read_nested(&sem->internal_rwsem, subclass);
-}
-#else
-#define f2fs_down_read_nested(sem, subclass) f2fs_down_read(sem)
-#endif
-
-static inline void f2fs_up_read(struct f2fs_rwsem *sem)
-{
-	up_read(&sem->internal_rwsem);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void f2fs_down_write(struct f2fs_rwsem *sem)
 {
 	down_write(&sem->internal_rwsem);
@@ -3769,12 +3721,8 @@ static inline bool f2fs_need_rand_seg(struct f2fs_sb_info *sbi)
 /*
  * checkpoint.c
  */
-<<<<<<< HEAD
 void f2fs_stop_checkpoint(struct f2fs_sb_info *sbi, bool end_io,
 							unsigned char reason);
-=======
-void f2fs_stop_checkpoint(struct f2fs_sb_info *sbi, bool end_io);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void f2fs_flush_ckpt_thread(struct f2fs_sb_info *sbi);
 struct page *f2fs_grab_meta_page(struct f2fs_sb_info *sbi, pgoff_t index);
 struct page *f2fs_get_meta_page(struct f2fs_sb_info *sbi, pgoff_t index);
@@ -4556,62 +4504,11 @@ static inline void f2fs_i_compr_blocks_update(struct inode *inode,
 static inline bool f2fs_allow_multi_device_dio(struct f2fs_sb_info *sbi,
 								int flag)
 {
-<<<<<<< HEAD
-=======
-	unsigned int i_blkbits = READ_ONCE(inode->i_blkbits);
-	unsigned int blocksize_mask = (1 << i_blkbits) - 1;
-	loff_t offset = iocb->ki_pos;
-	unsigned long align = offset | iov_iter_alignment(iter);
-
-	return align & blocksize_mask;
-}
-
-static inline bool f2fs_allow_multi_device_dio(struct f2fs_sb_info *sbi,
-								int flag)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!f2fs_is_multi_device(sbi))
 		return false;
 	if (flag != F2FS_GET_BLOCK_DIO)
 		return false;
 	return sbi->aligned_blksize;
-<<<<<<< HEAD
-=======
-}
-
-static inline bool f2fs_force_buffered_io(struct inode *inode,
-				struct kiocb *iocb, struct iov_iter *iter)
-{
-	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
-	int rw = iov_iter_rw(iter);
-
-	if (!fscrypt_dio_supported(iocb, iter))
-		return true;
-	if (fsverity_active(inode))
-		return true;
-	if (f2fs_compressed_file(inode))
-		return true;
-
-	/* disallow direct IO if any of devices has unaligned blksize */
-	if (f2fs_is_multi_device(sbi) && !sbi->aligned_blksize)
-		return true;
-	/*
-	 * for blkzoned device, fallback direct IO to buffered IO, so
-	 * all IOs can be serialized by log-structured write.
-	 */
-	if (f2fs_sb_has_blkzoned(sbi) && (rw == WRITE))
-		return true;
-	if (f2fs_lfs_mode(sbi) && (rw == WRITE)) {
-		if (block_unaligned_IO(inode, iocb, iter))
-			return true;
-		if (F2FS_IO_ALIGNED(sbi))
-			return true;
-	}
-	if (is_sbi_flag_set(F2FS_I_SB(inode), SBI_CP_DISABLED))
-		return true;
-
-	return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool f2fs_need_verity(const struct inode *inode, pgoff_t idx)

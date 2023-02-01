@@ -302,17 +302,9 @@ static void rt5682_i2c_shutdown(struct i2c_client *client)
 	rt5682_reset(rt5682);
 }
 
-<<<<<<< HEAD
 static void rt5682_i2c_remove(struct i2c_client *client)
 {
 	rt5682_i2c_shutdown(client);
-=======
-static int rt5682_i2c_remove(struct i2c_client *client)
-{
-	rt5682_i2c_shutdown(client);
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id rt5682_of_match[] = {

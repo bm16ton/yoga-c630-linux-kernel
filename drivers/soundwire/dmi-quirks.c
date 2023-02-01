@@ -55,7 +55,6 @@ static const struct adr_remap dell_sku_0A3E[] = {
 	{}
 };
 
-<<<<<<< HEAD
 /*
  * The HP Omen 16-k0005TX does not expose the correct version of RT711 on link0
  * and does not expose a RT1316 on link3
@@ -76,9 +75,6 @@ static const struct adr_remap hp_omen_16[] = {
 
 static const struct dmi_system_id adr_remap_quirk_table[] = {
 	/* TGL devices */
-=======
-static const struct dmi_system_id adr_remap_quirk_table[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "HP"),
@@ -95,7 +91,6 @@ static const struct dmi_system_id adr_remap_quirk_table[] = {
 		.driver_data = (void *)intel_tgl_bios,
 	},
 	{
-<<<<<<< HEAD
 		/* quirk used for NUC15 LAPBC710 skew */
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "Intel Corporation"),
@@ -104,15 +99,12 @@ static const struct dmi_system_id adr_remap_quirk_table[] = {
 		.driver_data = (void *)intel_tgl_bios,
 	},
 	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A3E")
 		},
 		.driver_data = (void *)dell_sku_0A3E,
 	},
-<<<<<<< HEAD
 	/* ADL devices */
 	{
 		.matches = {
@@ -121,8 +113,6 @@ static const struct dmi_system_id adr_remap_quirk_table[] = {
 		},
 		.driver_data = (void *)hp_omen_16,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{}
 };
 

@@ -59,11 +59,6 @@ LDFLAGS += -EL
 
 KBUILD_AFLAGS += $(KBUILD_CFLAGS)
 
-<<<<<<< HEAD
-=======
-head-y := arch/csky/kernel/head.o
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 core-y += arch/csky/$(CSKYABI)/
 
 libs-y += arch/csky/lib/ \

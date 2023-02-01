@@ -138,11 +138,7 @@ static int tcf_pedit_init(struct net *net, struct nlattr *nla,
 			  struct tcf_proto *tp, u32 flags,
 			  struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_pedit_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, pedit_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = flags & TCA_ACT_FLAGS_BIND;
 	struct nlattr *tb[TCA_PEDIT_MAX + 1];
 	struct tcf_chain *goto_ch = NULL;
@@ -530,41 +526,6 @@ static int tcf_pedit_offload_act_setup(struct tc_action *act, void *entry_data,
 	return 0;
 }
 
-static int tcf_pedit_offload_act_setup(struct tc_action *act, void *entry_data,
-				       u32 *index_inc, bool bind,
-				       struct netlink_ext_ack *extack)
-{
-	if (bind) {
-		struct flow_action_entry *entry = entry_data;
-		int k;
-
-		for (k = 0; k < tcf_pedit_nkeys(act); k++) {
-			switch (tcf_pedit_cmd(act, k)) {
-			case TCA_PEDIT_KEY_EX_CMD_SET:
-				entry->id = FLOW_ACTION_MANGLE;
-				break;
-			case TCA_PEDIT_KEY_EX_CMD_ADD:
-				entry->id = FLOW_ACTION_ADD;
-				break;
-			default:
-				NL_SET_ERR_MSG_MOD(extack, "Unsupported pedit command offload");
-				return -EOPNOTSUPP;
-			}
-			entry->mangle.htype = tcf_pedit_htype(act, k);
-			entry->mangle.mask = tcf_pedit_mask(act, k);
-			entry->mangle.val = tcf_pedit_val(act, k);
-			entry->mangle.offset = tcf_pedit_offset(act, k);
-			entry->hw_stats = tc_act_hw_stats(act->hw_stats);
-			entry++;
-		}
-		*index_inc = k;
-	} else {
-		return -EOPNOTSUPP;
-	}
-
-	return 0;
-}
-
 static struct tc_action_ops act_pedit_ops = {
 	.kind		=	"pedit",
 	.id		=	TCA_ID_PEDIT,
@@ -574,11 +535,6 @@ static struct tc_action_ops act_pedit_ops = {
 	.dump		=	tcf_pedit_dump,
 	.cleanup	=	tcf_pedit_cleanup,
 	.init		=	tcf_pedit_init,
-<<<<<<< HEAD
-=======
-	.walk		=	tcf_pedit_walker,
-	.lookup		=	tcf_pedit_search,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.offload_act_setup =	tcf_pedit_offload_act_setup,
 	.size		=	sizeof(struct tcf_pedit),
 };

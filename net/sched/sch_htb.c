@@ -1419,7 +1419,6 @@ static void htb_offload_move_qdisc(struct Qdisc *sch, struct htb_class *cl_old,
 
 	if (!destroying) {
 		struct Qdisc *qdisc;
-<<<<<<< HEAD
 
 		if (dev->flags & IFF_UP)
 			dev_deactivate(dev);
@@ -1431,19 +1430,6 @@ static void htb_offload_move_qdisc(struct Qdisc *sch, struct htb_class *cl_old,
 		cl_old->leaf.q->dev_queue = queue_new;
 	cl_old->leaf.offload_queue = queue_new;
 
-=======
-
-		if (dev->flags & IFF_UP)
-			dev_deactivate(dev);
-		qdisc = dev_graft_qdisc(queue_old, NULL);
-		WARN_ON(qdisc != cl_old->leaf.q);
-	}
-
-	if (!(cl_old->leaf.q->flags & TCQ_F_BUILTIN))
-		cl_old->leaf.q->dev_queue = queue_new;
-	cl_old->leaf.offload_queue = queue_new;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!destroying) {
 		struct Qdisc *qdisc;
 

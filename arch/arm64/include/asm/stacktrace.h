@@ -22,17 +22,11 @@ extern void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk,
 
 DECLARE_PER_CPU(unsigned long *, irq_stack_ptr);
 
-<<<<<<< HEAD
 static inline struct stack_info stackinfo_get_irq(void)
-=======
-static inline bool on_irq_stack(unsigned long sp, unsigned long size,
-				struct stack_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long low = (unsigned long)raw_cpu_read(irq_stack_ptr);
 	unsigned long high = low + IRQ_STACK_SIZE;
 
-<<<<<<< HEAD
 	return (struct stack_info) {
 		.low = low,
 		.high = high,
@@ -46,19 +40,10 @@ static inline bool on_irq_stack(unsigned long sp, unsigned long size)
 }
 
 static inline struct stack_info stackinfo_get_task(const struct task_struct *tsk)
-=======
-	return on_stack(sp, size, low, high, STACK_TYPE_IRQ, info);
-}
-
-static inline bool on_task_stack(const struct task_struct *tsk,
-				 unsigned long sp, unsigned long size,
-				 struct stack_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long low = (unsigned long)task_stack_page(tsk);
 	unsigned long high = low + THREAD_SIZE;
 
-<<<<<<< HEAD
 	return (struct stack_info) {
 		.low = low,
 		.high = high,
@@ -70,25 +55,16 @@ static inline bool on_task_stack(const struct task_struct *tsk,
 {
 	struct stack_info info = stackinfo_get_task(tsk);
 	return stackinfo_on_stack(&info, sp, size);
-=======
-	return on_stack(sp, size, low, high, STACK_TYPE_TASK, info);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_VMAP_STACK
 DECLARE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)], overflow_stack);
 
-<<<<<<< HEAD
 static inline struct stack_info stackinfo_get_overflow(void)
-=======
-static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
-				struct stack_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long low = (unsigned long)raw_cpu_ptr(overflow_stack);
 	unsigned long high = low + OVERFLOW_STACK_SIZE;
 
-<<<<<<< HEAD
 	return (struct stack_info) {
 		.low = low,
 		.high = high,
@@ -128,13 +104,4 @@ static inline struct stack_info stackinfo_get_sdei_critical(void)
 #define stackinfo_get_sdei_critical()	stackinfo_get_unknown()
 #endif
 
-=======
-	return on_stack(sp, size, low, high, STACK_TYPE_OVERFLOW, info);
-}
-#else
-static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
-			struct stack_info *info) { return false; }
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif	/* __ASM_STACKTRACE_H */

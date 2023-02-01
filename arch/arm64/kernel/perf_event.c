@@ -398,11 +398,6 @@ static inline bool armv8pmu_event_has_user_read(struct perf_event *event)
 	return event->hw.flags & PERF_EVENT_FLAG_USER_READ_CNT;
 }
 
-static inline bool armv8pmu_event_has_user_read(struct perf_event *event)
-{
-	return event->hw.flags & PERF_EVENT_FLAG_USER_READ_CNT;
-}
-
 /*
  * We must chain two programmable counters for 64 bit events,
  * except when we have allocated the 64bit cycle counter (for CPU
@@ -1150,13 +1145,8 @@ static void __armv8pmu_probe_pmu(void *info)
 
 	dfr0 = read_sysreg(id_aa64dfr0_el1);
 	pmuver = cpuid_feature_extract_unsigned_field(dfr0,
-<<<<<<< HEAD
 			ID_AA64DFR0_EL1_PMUVer_SHIFT);
 	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF || pmuver == 0)
-=======
-			ID_AA64DFR0_PMUVER_SHIFT);
-	if (pmuver == ID_AA64DFR0_PMUVER_IMP_DEF || pmuver == 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	cpu_pmu->pmuver = pmuver;

@@ -1312,7 +1312,6 @@ int zynqmp_pm_get_feature_config(enum pm_feature_config_id id,
 }
 
 /**
-<<<<<<< HEAD
  * zynqmp_pm_set_sd_config - PM call to set value of SD config registers
  * @node:	SD node ID
  * @config:	The config type of SD registers
@@ -1344,8 +1343,6 @@ int zynqmp_pm_set_gem_config(u32 node, enum pm_gem_config_type config,
 EXPORT_SYMBOL_GPL(zynqmp_pm_set_gem_config);
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * struct zynqmp_pm_shutdown_scope - Struct for shutdown scope
  * @subtype:	Shutdown subtype
  * @name:	Matching string for scope argument

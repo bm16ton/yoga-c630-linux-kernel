@@ -17,11 +17,7 @@
 struct regmap_mmio_context {
 	void __iomem *regs;
 	unsigned int val_bytes;
-<<<<<<< HEAD
 	bool big_endian;
-=======
-	bool relaxed_mmio;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bool attached_clk;
 	struct clk *clk;

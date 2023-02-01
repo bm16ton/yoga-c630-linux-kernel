@@ -976,7 +976,6 @@ All cgroup core files are prefixed with "cgroup."
 	killing cgroups is a process directed operation, i.e. it affects
 	the whole thread-group.
 
-<<<<<<< HEAD
   cgroup.pressure
 	A read-write single value file that allowed values are "0" and "1".
 	The default is "1".
@@ -1000,8 +999,6 @@ All cgroup core files are prefixed with "cgroup."
 	Shows pressure stall information for IRQ/SOFTIRQ. See
 	:ref:`Documentation/accounting/psi.rst <psi>` for details.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Controllers
 ===========
 

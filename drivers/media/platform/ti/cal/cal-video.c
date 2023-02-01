@@ -191,11 +191,7 @@ static int cal_legacy_try_fmt_vid_cap(struct file *file, void *priv,
 	struct cal_ctx *ctx = video_drvdata(file);
 	const struct cal_format_info *fmtinfo;
 	struct v4l2_subdev_frame_size_enum fse;
-<<<<<<< HEAD
 	int found;
-=======
-	int ret, found;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	fmtinfo = find_format_by_pix(ctx, f->fmt.pix.pixelformat);
 	if (!fmtinfo) {
@@ -210,20 +206,13 @@ static int cal_legacy_try_fmt_vid_cap(struct file *file, void *priv,
 	f->fmt.pix.field = ctx->v_fmt.fmt.pix.field;
 
 	/* check for/find a valid width/height */
-<<<<<<< HEAD
-=======
-	ret = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	found = false;
 	fse.pad = 0;
 	fse.code = fmtinfo->code;
 	fse.which = V4L2_SUBDEV_FORMAT_ACTIVE;
 	for (fse.index = 0; ; fse.index++) {
-<<<<<<< HEAD
 		int ret;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = v4l2_subdev_call(ctx->phy->source, pad, enum_frame_size,
 				       NULL, &fse);
 		if (ret)
@@ -719,11 +708,7 @@ static int cal_start_streaming(struct vb2_queue *vq, unsigned int count)
 	dma_addr_t addr;
 	int ret;
 
-<<<<<<< HEAD
 	ret = video_device_pipeline_alloc_start(&ctx->vdev);
-=======
-	ret = media_pipeline_start(&ctx->vdev.entity, &ctx->phy->pipe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		ctx_err(ctx, "Failed to start media pipeline: %d\n", ret);
 		goto error_release_buffers;
@@ -776,11 +761,7 @@ error_stop:
 	cal_ctx_unprepare(ctx);
 
 error_pipeline:
-<<<<<<< HEAD
 	video_device_pipeline_stop(&ctx->vdev);
-=======
-	media_pipeline_stop(&ctx->vdev.entity);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 error_release_buffers:
 	cal_release_buffers(ctx, VB2_BUF_STATE_QUEUED);
 
@@ -801,11 +782,7 @@ static void cal_stop_streaming(struct vb2_queue *vq)
 
 	cal_release_buffers(ctx, VB2_BUF_STATE_ERROR);
 
-<<<<<<< HEAD
 	video_device_pipeline_stop(&ctx->vdev);
-=======
-	media_pipeline_stop(&ctx->vdev.entity);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct vb2_ops cal_video_qops = {

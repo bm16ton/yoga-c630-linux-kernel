@@ -1407,7 +1407,6 @@ static int __init adv7511_init(void)
 		if (ret)
 			return ret;
 	}
-<<<<<<< HEAD
 
 	ret = i2c_add_driver(&adv7511_driver);
 	if (ret) {
@@ -1415,15 +1414,6 @@ static int __init adv7511_init(void)
 			mipi_dsi_driver_unregister(&adv7533_dsi_driver);
 	}
 
-=======
-
-	ret = i2c_add_driver(&adv7511_driver);
-	if (ret) {
-		if (IS_ENABLED(CONFIG_DRM_MIPI_DSI))
-			mipi_dsi_driver_unregister(&adv7533_dsi_driver);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 module_init(adv7511_init);

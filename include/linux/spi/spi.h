@@ -208,11 +208,6 @@ struct spi_device {
 
 	/* The statistics */
 	struct spi_statistics __percpu	*pcpu_statistics;
-<<<<<<< HEAD
-=======
-
-	struct list_head	userspace_device;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * likely need more hooks for more protocol options affecting how
@@ -383,11 +378,8 @@ extern struct spi_device *spi_new_ancillary_device(struct spi_device *spi, u8 ch
  * @cleanup: frees controller-specific state
  * @can_dma: determine whether this controller supports DMA
  * @dma_map_dev: device which can be used for DMA mapping
-<<<<<<< HEAD
  * @cur_rx_dma_dev: device which is currently used for RX DMA mapping
  * @cur_tx_dma_dev: device which is currently used for TX DMA mapping
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @queued: whether this controller is providing an internal message queue
  * @kworker: pointer to thread struct for message pump
  * @pump_messages: work struct for scheduling work to the message pump
@@ -496,7 +488,6 @@ struct spi_controller {
 	struct device	dev;
 
 	struct list_head list;
-	struct list_head userspace_devices;
 
 	/* Other than negative (== assign one dynamically), bus_num is fully
 	 * board-specific.  usually that simplifies to being SOC-specific.
@@ -621,11 +612,8 @@ struct spi_controller {
 					   struct spi_device *spi,
 					   struct spi_transfer *xfer);
 	struct device *dma_map_dev;
-<<<<<<< HEAD
 	struct device *cur_rx_dma_dev;
 	struct device *cur_tx_dma_dev;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * These hooks are for drivers that want to use the generic

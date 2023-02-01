@@ -42,11 +42,7 @@ struct ksmbd_session;
 
 struct ksmbd_tree_conn_status
 ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
-<<<<<<< HEAD
 			const char *share_name);
-=======
-			char *share_name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int ksmbd_tree_conn_disconnect(struct ksmbd_session *sess,
 			       struct ksmbd_tree_connect *tree_conn);

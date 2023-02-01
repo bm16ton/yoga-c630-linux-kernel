@@ -312,26 +312,6 @@ static __always_inline void __noreturn disabled_wait(void)
 
 #define ARCH_LOW_ADDRESS_LIMIT	0x7fffffffUL
 
-<<<<<<< HEAD
-=======
-extern int memcpy_real(void *, unsigned long, size_t);
-extern void memcpy_absolute(void *, void *, size_t);
-
-#define put_abs_lowcore(member, x) do {					\
-	unsigned long __abs_address = offsetof(struct lowcore, member);	\
-	__typeof__(((struct lowcore *)0)->member) __tmp = (x);		\
-									\
-	memcpy_absolute(__va(__abs_address), &__tmp, sizeof(__tmp));	\
-} while (0)
-
-#define get_abs_lowcore(x, member) do {					\
-	unsigned long __abs_address = offsetof(struct lowcore, member);	\
-	__typeof__(((struct lowcore *)0)->member) *__ptr = &(x);	\
-									\
-	memcpy_absolute(__ptr, __va(__abs_address), sizeof(*__ptr));	\
-} while (0)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int s390_isolate_bp(void);
 extern int s390_isolate_bp_guest(void);
 

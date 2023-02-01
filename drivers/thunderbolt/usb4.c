@@ -1406,7 +1406,6 @@ bool usb4_port_clx_supported(struct tb_port *port)
 	return !!(val & PORT_CS_18_CPS);
 }
 
-<<<<<<< HEAD
 /**
  * usb4_port_margining_caps() - Read USB4 port marginig capabilities
  * @port: USB4 port
@@ -1527,8 +1526,6 @@ int usb4_port_sw_margin_errors(struct tb_port *port, u32 *errors)
 				 USB4_SB_METADATA, errors, sizeof(*errors));
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline int usb4_port_retimer_op(struct tb_port *port, u8 index,
 				       enum usb4_sb_opcode opcode,
 				       int timeout_msec)

@@ -625,7 +625,6 @@ mlxsw_sp_port_module_info_get(struct mlxsw_sp *mlxsw_sp, u16 local_port,
 {
 	char pmlp_pl[MLXSW_REG_PMLP_LEN];
 	int err;
-<<<<<<< HEAD
 
 	mlxsw_reg_pmlp_pack(pmlp_pl, local_port);
 	err = mlxsw_reg_query(mlxsw_sp->core, MLXSW_REG(pmlp), pmlp_pl);
@@ -635,17 +634,6 @@ mlxsw_sp_port_module_info_get(struct mlxsw_sp *mlxsw_sp, u16 local_port,
 					       pmlp_pl, port_mapping);
 }
 
-=======
-
-	mlxsw_reg_pmlp_pack(pmlp_pl, local_port);
-	err = mlxsw_reg_query(mlxsw_sp->core, MLXSW_REG(pmlp), pmlp_pl);
-	if (err)
-		return err;
-	return mlxsw_sp_port_module_info_parse(mlxsw_sp, local_port,
-					       pmlp_pl, port_mapping);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int
 mlxsw_sp_port_module_map(struct mlxsw_sp *mlxsw_sp, u16 local_port,
 			 const struct mlxsw_sp_port_mapping *port_mapping)
@@ -945,19 +933,11 @@ mlxsw_sp_port_get_hw_xstats(struct net_device *dev,
 						  i, ppcnt_pl);
 		if (err)
 			goto tc_cnt;
-<<<<<<< HEAD
 
 		xstats->wred_drop[i] =
 			mlxsw_reg_ppcnt_wred_discard_get(ppcnt_pl);
 		xstats->tc_ecn[i] = mlxsw_reg_ppcnt_ecn_marked_tc_get(ppcnt_pl);
 
-=======
-
-		xstats->wred_drop[i] =
-			mlxsw_reg_ppcnt_wred_discard_get(ppcnt_pl);
-		xstats->tc_ecn[i] = mlxsw_reg_ppcnt_ecn_marked_tc_get(ppcnt_pl);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 tc_cnt:
 		err = mlxsw_sp_port_get_stats_raw(dev, MLXSW_REG_PPCNT_TC_CNT,
 						  i, ppcnt_pl);
@@ -1978,21 +1958,12 @@ static void mlxsw_sp_cpu_port_remove(struct mlxsw_sp *mlxsw_sp)
 }
 
 static bool mlxsw_sp_local_port_valid(u16 local_port)
-<<<<<<< HEAD
 {
 	return local_port != MLXSW_PORT_CPU_PORT;
 }
 
 static bool mlxsw_sp_port_created(struct mlxsw_sp *mlxsw_sp, u16 local_port)
 {
-=======
-{
-	return local_port != MLXSW_PORT_CPU_PORT;
-}
-
-static bool mlxsw_sp_port_created(struct mlxsw_sp *mlxsw_sp, u16 local_port)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!mlxsw_sp_local_port_valid(local_port))
 		return false;
 	return mlxsw_sp->ports[local_port] != NULL;
@@ -2720,342 +2691,6 @@ static void mlxsw_sp_traps_fini(struct mlxsw_sp *mlxsw_sp)
 static int mlxsw_sp_lag_init(struct mlxsw_sp *mlxsw_sp)
 {
 	char slcr_pl[MLXSW_REG_SLCR_LEN];
-	u32 seed;
-	int err;
-
-	seed = jhash(mlxsw_sp->base_mac, sizeof(mlxsw_sp->base_mac),
-		     MLXSW_SP_LAG_SEED_INIT);
-	mlxsw_reg_slcr_pack(slcr_pl, MLXSW_REG_SLCR_LAG_HASH_SMAC |
-				     MLXSW_REG_SLCR_LAG_HASH_DMAC |
-				     MLXSW_REG_SLCR_LAG_HASH_ETHERTYPE |
-				     MLXSW_REG_SLCR_LAG_HASH_VLANID |
-				     MLXSW_REG_SLCR_LAG_HASH_SIP |
-				     MLXSW_REG_SLCR_LAG_HASH_DIP |
-				     MLXSW_REG_SLCR_LAG_HASH_SPORT |
-				     MLXSW_REG_SLCR_LAG_HASH_DPORT |
-				     MLXSW_REG_SLCR_LAG_HASH_IPPROTO, seed);
-	err = mlxsw_reg_write(mlxsw_sp->core, MLXSW_REG(slcr), slcr_pl);
-	if (err)
-		return err;
-
-	if (!MLXSW_CORE_RES_VALID(mlxsw_sp->core, MAX_LAG) ||
-	    !MLXSW_CORE_RES_VALID(mlxsw_sp->core, MAX_LAG_MEMBERS))
-		return -EIO;
-
-	mlxsw_sp->lags = kcalloc(MLXSW_CORE_RES_GET(mlxsw_sp->core, MAX_LAG),
-				 sizeof(struct mlxsw_sp_upper),
-				 GFP_KERNEL);
-	if (!mlxsw_sp->lags)
-		return -ENOMEM;
-
-	return 0;
-}
-
-static void mlxsw_sp_lag_fini(struct mlxsw_sp *mlxsw_sp)
-{
-	kfree(mlxsw_sp->lags);
-}
-
-static const struct mlxsw_sp_ptp_ops mlxsw_sp1_ptp_ops = {
-	.clock_init	= mlxsw_sp1_ptp_clock_init,
-	.clock_fini	= mlxsw_sp1_ptp_clock_fini,
-	.init		= mlxsw_sp1_ptp_init,
-	.fini		= mlxsw_sp1_ptp_fini,
-	.receive	= mlxsw_sp1_ptp_receive,
-	.transmitted	= mlxsw_sp1_ptp_transmitted,
-	.hwtstamp_get	= mlxsw_sp1_ptp_hwtstamp_get,
-	.hwtstamp_set	= mlxsw_sp1_ptp_hwtstamp_set,
-	.shaper_work	= mlxsw_sp1_ptp_shaper_work,
-	.get_ts_info	= mlxsw_sp1_ptp_get_ts_info,
-	.get_stats_count = mlxsw_sp1_get_stats_count,
-	.get_stats_strings = mlxsw_sp1_get_stats_strings,
-	.get_stats	= mlxsw_sp1_get_stats,
-	.txhdr_construct = mlxsw_sp_ptp_txhdr_construct,
-};
-
-static const struct mlxsw_sp_ptp_ops mlxsw_sp2_ptp_ops = {
-	.clock_init	= mlxsw_sp2_ptp_clock_init,
-	.clock_fini	= mlxsw_sp2_ptp_clock_fini,
-	.init		= mlxsw_sp2_ptp_init,
-	.fini		= mlxsw_sp2_ptp_fini,
-	.receive	= mlxsw_sp2_ptp_receive,
-	.transmitted	= mlxsw_sp2_ptp_transmitted,
-	.hwtstamp_get	= mlxsw_sp2_ptp_hwtstamp_get,
-	.hwtstamp_set	= mlxsw_sp2_ptp_hwtstamp_set,
-	.shaper_work	= mlxsw_sp2_ptp_shaper_work,
-	.get_ts_info	= mlxsw_sp2_ptp_get_ts_info,
-	.get_stats_count = mlxsw_sp2_get_stats_count,
-	.get_stats_strings = mlxsw_sp2_get_stats_strings,
-	.get_stats	= mlxsw_sp2_get_stats,
-	.txhdr_construct = mlxsw_sp2_ptp_txhdr_construct,
-};
-
-static const struct mlxsw_sp_ptp_ops mlxsw_sp4_ptp_ops = {
-	.clock_init	= mlxsw_sp2_ptp_clock_init,
-	.clock_fini	= mlxsw_sp2_ptp_clock_fini,
-	.init		= mlxsw_sp2_ptp_init,
-	.fini		= mlxsw_sp2_ptp_fini,
-	.receive	= mlxsw_sp2_ptp_receive,
-	.transmitted	= mlxsw_sp2_ptp_transmitted,
-	.hwtstamp_get	= mlxsw_sp2_ptp_hwtstamp_get,
-	.hwtstamp_set	= mlxsw_sp2_ptp_hwtstamp_set,
-	.shaper_work	= mlxsw_sp2_ptp_shaper_work,
-	.get_ts_info	= mlxsw_sp2_ptp_get_ts_info,
-	.get_stats_count = mlxsw_sp2_get_stats_count,
-	.get_stats_strings = mlxsw_sp2_get_stats_strings,
-	.get_stats	= mlxsw_sp2_get_stats,
-	.txhdr_construct = mlxsw_sp_ptp_txhdr_construct,
-};
-
-struct mlxsw_sp_sample_trigger_node {
-	struct mlxsw_sp_sample_trigger trigger;
-	struct mlxsw_sp_sample_params params;
-	struct rhash_head ht_node;
-	struct rcu_head rcu;
-	refcount_t refcount;
-};
-
-static const struct rhashtable_params mlxsw_sp_sample_trigger_ht_params = {
-	.key_offset = offsetof(struct mlxsw_sp_sample_trigger_node, trigger),
-	.head_offset = offsetof(struct mlxsw_sp_sample_trigger_node, ht_node),
-	.key_len = sizeof(struct mlxsw_sp_sample_trigger),
-	.automatic_shrinking = true,
-};
-
-static void
-mlxsw_sp_sample_trigger_key_init(struct mlxsw_sp_sample_trigger *key,
-				 const struct mlxsw_sp_sample_trigger *trigger)
-{
-	memset(key, 0, sizeof(*key));
-	key->type = trigger->type;
-	key->local_port = trigger->local_port;
-}
-
-/* RCU read lock must be held */
-struct mlxsw_sp_sample_params *
-mlxsw_sp_sample_trigger_params_lookup(struct mlxsw_sp *mlxsw_sp,
-				      const struct mlxsw_sp_sample_trigger *trigger)
-{
-	struct mlxsw_sp_sample_trigger_node *trigger_node;
-	struct mlxsw_sp_sample_trigger key;
-
-	mlxsw_sp_sample_trigger_key_init(&key, trigger);
-	trigger_node = rhashtable_lookup(&mlxsw_sp->sample_trigger_ht, &key,
-					 mlxsw_sp_sample_trigger_ht_params);
-	if (!trigger_node)
-		return NULL;
-
-	return &trigger_node->params;
-}
-
-static int
-mlxsw_sp_sample_trigger_node_init(struct mlxsw_sp *mlxsw_sp,
-				  const struct mlxsw_sp_sample_trigger *trigger,
-				  const struct mlxsw_sp_sample_params *params)
-{
-	struct mlxsw_sp_sample_trigger_node *trigger_node;
-	int err;
-
-	trigger_node = kzalloc(sizeof(*trigger_node), GFP_KERNEL);
-	if (!trigger_node)
-		return -ENOMEM;
-
-	trigger_node->trigger = *trigger;
-	trigger_node->params = *params;
-	refcount_set(&trigger_node->refcount, 1);
-
-	err = rhashtable_insert_fast(&mlxsw_sp->sample_trigger_ht,
-				     &trigger_node->ht_node,
-				     mlxsw_sp_sample_trigger_ht_params);
-	if (err)
-		goto err_rhashtable_insert;
-
-	return 0;
-
-err_rhashtable_insert:
-	kfree(trigger_node);
-	return err;
-}
-
-static void
-mlxsw_sp_sample_trigger_node_fini(struct mlxsw_sp *mlxsw_sp,
-				  struct mlxsw_sp_sample_trigger_node *trigger_node)
-{
-	rhashtable_remove_fast(&mlxsw_sp->sample_trigger_ht,
-			       &trigger_node->ht_node,
-			       mlxsw_sp_sample_trigger_ht_params);
-	kfree_rcu(trigger_node, rcu);
-}
-
-int
-mlxsw_sp_sample_trigger_params_set(struct mlxsw_sp *mlxsw_sp,
-				   const struct mlxsw_sp_sample_trigger *trigger,
-				   const struct mlxsw_sp_sample_params *params,
-				   struct netlink_ext_ack *extack)
-{
-	struct mlxsw_sp_sample_trigger_node *trigger_node;
-	struct mlxsw_sp_sample_trigger key;
-
-	ASSERT_RTNL();
-
-	mlxsw_sp_sample_trigger_key_init(&key, trigger);
-
-	trigger_node = rhashtable_lookup_fast(&mlxsw_sp->sample_trigger_ht,
-					      &key,
-					      mlxsw_sp_sample_trigger_ht_params);
-	if (!trigger_node)
-		return mlxsw_sp_sample_trigger_node_init(mlxsw_sp, &key,
-							 params);
-
-	if (trigger_node->trigger.local_port) {
-		NL_SET_ERR_MSG_MOD(extack, "Sampling already enabled on port");
-		return -EINVAL;
-	}
-
-	if (trigger_node->params.psample_group != params->psample_group ||
-	    trigger_node->params.truncate != params->truncate ||
-	    trigger_node->params.rate != params->rate ||
-	    trigger_node->params.trunc_size != params->trunc_size) {
-		NL_SET_ERR_MSG_MOD(extack, "Sampling parameters do not match for an existing sampling trigger");
-		return -EINVAL;
-	}
-
-	refcount_inc(&trigger_node->refcount);
-
-	return 0;
-}
-
-void
-mlxsw_sp_sample_trigger_params_unset(struct mlxsw_sp *mlxsw_sp,
-				     const struct mlxsw_sp_sample_trigger *trigger)
-{
-	struct mlxsw_sp_sample_trigger_node *trigger_node;
-	struct mlxsw_sp_sample_trigger key;
-
-	ASSERT_RTNL();
-
-	mlxsw_sp_sample_trigger_key_init(&key, trigger);
-
-	trigger_node = rhashtable_lookup_fast(&mlxsw_sp->sample_trigger_ht,
-					      &key,
-					      mlxsw_sp_sample_trigger_ht_params);
-	if (!trigger_node)
-		return;
-
-	if (!refcount_dec_and_test(&trigger_node->refcount))
-		return;
-
-	mlxsw_sp_sample_trigger_node_fini(mlxsw_sp, trigger_node);
-}
-
-static int mlxsw_sp_netdevice_event(struct notifier_block *unused,
-				    unsigned long event, void *ptr);
-
-#define MLXSW_SP_DEFAULT_PARSING_DEPTH 96
-#define MLXSW_SP_INCREASED_PARSING_DEPTH 128
-#define MLXSW_SP_DEFAULT_VXLAN_UDP_DPORT 4789
-
-static void mlxsw_sp_parsing_init(struct mlxsw_sp *mlxsw_sp)
-{
-	mlxsw_sp->parsing.parsing_depth = MLXSW_SP_DEFAULT_PARSING_DEPTH;
-	mlxsw_sp->parsing.vxlan_udp_dport = MLXSW_SP_DEFAULT_VXLAN_UDP_DPORT;
-	mutex_init(&mlxsw_sp->parsing.lock);
-}
-
-static void mlxsw_sp_parsing_fini(struct mlxsw_sp *mlxsw_sp)
-{
-	mutex_destroy(&mlxsw_sp->parsing.lock);
-}
-
-struct mlxsw_sp_ipv6_addr_node {
-	struct in6_addr key;
-	struct rhash_head ht_node;
-	u32 kvdl_index;
-	refcount_t refcount;
-};
-
-static const struct rhashtable_params mlxsw_sp_ipv6_addr_ht_params = {
-	.key_offset = offsetof(struct mlxsw_sp_ipv6_addr_node, key),
-	.head_offset = offsetof(struct mlxsw_sp_ipv6_addr_node, ht_node),
-	.key_len = sizeof(struct in6_addr),
-	.automatic_shrinking = true,
-};
-
-static int
-mlxsw_sp_ipv6_addr_init(struct mlxsw_sp *mlxsw_sp, const struct in6_addr *addr6,
-			u32 *p_kvdl_index)
-{
-	struct mlxsw_sp_ipv6_addr_node *node;
-	char rips_pl[MLXSW_REG_RIPS_LEN];
-	int err;
-
-	err = mlxsw_sp_kvdl_alloc(mlxsw_sp,
-				  MLXSW_SP_KVDL_ENTRY_TYPE_IPV6_ADDRESS, 1,
-				  p_kvdl_index);
-	if (err)
-		return err;
-
-<<<<<<< HEAD
-	err = mlxsw_core_traps_register(mlxsw_sp->core, mlxsw_sp_listener,
-					ARRAY_SIZE(mlxsw_sp_listener),
-					mlxsw_sp);
-=======
-	mlxsw_reg_rips_pack(rips_pl, *p_kvdl_index, addr6);
-	err = mlxsw_reg_write(mlxsw_sp->core, MLXSW_REG(rips), rips_pl);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	if (err)
-		goto err_rips_write;
-
-	node = kzalloc(sizeof(*node), GFP_KERNEL);
-	if (!node) {
-		err = -ENOMEM;
-		goto err_node_alloc;
-	}
-
-<<<<<<< HEAD
-	err = mlxsw_core_traps_register(mlxsw_sp->core, mlxsw_sp->listeners,
-					mlxsw_sp->listeners_count, mlxsw_sp);
-=======
-	node->key = *addr6;
-	node->kvdl_index = *p_kvdl_index;
-	refcount_set(&node->refcount, 1);
-
-	err = rhashtable_insert_fast(&mlxsw_sp->ipv6_addr_ht,
-				     &node->ht_node,
-				     mlxsw_sp_ipv6_addr_ht_params);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	if (err)
-		goto err_rhashtable_insert;
-
-	return 0;
-
-<<<<<<< HEAD
-err_extra_traps_init:
-	mlxsw_core_traps_unregister(mlxsw_sp->core, mlxsw_sp_listener,
-				    ARRAY_SIZE(mlxsw_sp_listener),
-				    mlxsw_sp);
-err_traps_register:
-err_trap_groups_set:
-err_cpu_policers_set:
-	kfree(trap);
-	return err;
-}
-
-static void mlxsw_sp_traps_fini(struct mlxsw_sp *mlxsw_sp)
-{
-	mlxsw_core_traps_unregister(mlxsw_sp->core, mlxsw_sp->listeners,
-				    mlxsw_sp->listeners_count,
-				    mlxsw_sp);
-	mlxsw_core_traps_unregister(mlxsw_sp->core, mlxsw_sp_listener,
-				    ARRAY_SIZE(mlxsw_sp_listener), mlxsw_sp);
-	kfree(mlxsw_sp->trap);
-}
-
-#define MLXSW_SP_LAG_SEED_INIT 0xcafecafe
-
-static int mlxsw_sp_lag_init(struct mlxsw_sp *mlxsw_sp)
-{
-	char slcr_pl[MLXSW_REG_SLCR_LEN];
 	u16 max_lag;
 	u32 seed;
 	int err;
@@ -3366,17 +3001,6 @@ err_rips_write:
 	return err;
 }
 
-=======
-err_rhashtable_insert:
-	kfree(node);
-err_node_alloc:
-err_rips_write:
-	mlxsw_sp_kvdl_free(mlxsw_sp, MLXSW_SP_KVDL_ENTRY_TYPE_IPV6_ADDRESS, 1,
-			   *p_kvdl_index);
-	return err;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void mlxsw_sp_ipv6_addr_fini(struct mlxsw_sp *mlxsw_sp,
 				    struct mlxsw_sp_ipv6_addr_node *node)
 {
@@ -3872,7 +3496,6 @@ static const struct mlxsw_config_profile mlxsw_sp1_config_profile = {
 static const struct mlxsw_config_profile mlxsw_sp2_config_profile = {
 	.used_flood_mode                = 1,
 	.flood_mode                     = MLXSW_CMD_MBOX_CONFIG_PROFILE_FLOOD_MODE_CONTROLLED,
-<<<<<<< HEAD
 	.used_max_ib_mc			= 1,
 	.max_ib_mc			= 0,
 	.used_max_pkey			= 1,
@@ -3900,8 +3523,6 @@ static const struct mlxsw_config_profile mlxsw_sp4_config_profile = {
 	.max_lag			= MLXSW_SP4_CONFIG_PROFILE_MAX_LAG,
 	.used_flood_mode                = 1,
 	.flood_mode                     = MLXSW_CMD_MBOX_CONFIG_PROFILE_FLOOD_MODE_CONTROLLED,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.used_max_ib_mc			= 1,
 	.max_ib_mc			= 0,
 	.used_max_pkey			= 1,
@@ -4386,8 +4007,6 @@ static struct mlxsw_driver mlxsw_sp3_driver = {
 	.port_split			= mlxsw_sp_port_split,
 	.port_unsplit			= mlxsw_sp_port_unsplit,
 	.ports_remove_selected		= mlxsw_sp_ports_remove_selected,
-<<<<<<< HEAD
-=======
 	.sb_pool_get			= mlxsw_sp_sb_pool_get,
 	.sb_pool_set			= mlxsw_sp_sb_pool_set,
 	.sb_port_pool_get		= mlxsw_sp_sb_port_pool_get,
@@ -4415,45 +4034,6 @@ static struct mlxsw_driver mlxsw_sp3_driver = {
 	.txhdr_len			= MLXSW_TXHDR_LEN,
 	.profile			= &mlxsw_sp2_config_profile,
 	.sdq_supports_cqe_v2		= true,
-};
-
-static struct mlxsw_driver mlxsw_sp4_driver = {
-	.kind				= mlxsw_sp4_driver_name,
-	.priv_size			= sizeof(struct mlxsw_sp),
-	.init				= mlxsw_sp4_init,
-	.fini				= mlxsw_sp_fini,
-	.port_split			= mlxsw_sp_port_split,
-	.port_unsplit			= mlxsw_sp_port_unsplit,
-	.ports_remove_selected		= mlxsw_sp_ports_remove_selected,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	.sb_pool_get			= mlxsw_sp_sb_pool_get,
-	.sb_pool_set			= mlxsw_sp_sb_pool_set,
-	.sb_port_pool_get		= mlxsw_sp_sb_port_pool_get,
-	.sb_port_pool_set		= mlxsw_sp_sb_port_pool_set,
-	.sb_tc_pool_bind_get		= mlxsw_sp_sb_tc_pool_bind_get,
-	.sb_tc_pool_bind_set		= mlxsw_sp_sb_tc_pool_bind_set,
-	.sb_occ_snapshot		= mlxsw_sp_sb_occ_snapshot,
-	.sb_occ_max_clear		= mlxsw_sp_sb_occ_max_clear,
-	.sb_occ_port_pool_get		= mlxsw_sp_sb_occ_port_pool_get,
-	.sb_occ_tc_port_bind_get	= mlxsw_sp_sb_occ_tc_port_bind_get,
-	.trap_init			= mlxsw_sp_trap_init,
-	.trap_fini			= mlxsw_sp_trap_fini,
-	.trap_action_set		= mlxsw_sp_trap_action_set,
-	.trap_group_init		= mlxsw_sp_trap_group_init,
-	.trap_group_set			= mlxsw_sp_trap_group_set,
-	.trap_policer_init		= mlxsw_sp_trap_policer_init,
-	.trap_policer_fini		= mlxsw_sp_trap_policer_fini,
-	.trap_policer_set		= mlxsw_sp_trap_policer_set,
-	.trap_policer_counter_get	= mlxsw_sp_trap_policer_counter_get,
-	.txhdr_construct		= mlxsw_sp_txhdr_construct,
-	.resources_register		= mlxsw_sp2_resources_register,
-	.params_register		= mlxsw_sp2_params_register,
-	.params_unregister		= mlxsw_sp2_params_unregister,
-	.ptp_transmitted		= mlxsw_sp_ptp_transmitted,
-	.txhdr_len			= MLXSW_TXHDR_LEN,
-	.profile			= &mlxsw_sp2_config_profile,
-	.sdq_supports_cqe_v2		= true,
-<<<<<<< HEAD
 };
 
 static struct mlxsw_driver mlxsw_sp4_driver = {
@@ -4491,8 +4071,6 @@ static struct mlxsw_driver mlxsw_sp4_driver = {
 	.txhdr_len			= MLXSW_TXHDR_LEN,
 	.profile			= &mlxsw_sp4_config_profile,
 	.sdq_supports_cqe_v2		= true,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 bool mlxsw_sp_port_dev_check(const struct net_device *dev)

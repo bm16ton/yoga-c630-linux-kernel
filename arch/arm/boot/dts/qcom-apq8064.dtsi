@@ -816,13 +816,10 @@
 			#clock-cells = <1>;
 			#power-domain-cells = <1>;
 			#reset-cells = <1>;
-<<<<<<< HEAD
 			clocks = <&cxo_board>,
 				 <&pxo_board>,
 				 <&lcc PLL4>;
 			clock-names = "cxo", "pxo", "pll4";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			tsens: thermal-sensor {
 				compatible = "qcom,msm8960-tsens";

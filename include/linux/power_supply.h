@@ -374,7 +374,6 @@ struct power_supply_vbat_ri_table {
  *   These timers should be chosen to align with the typical discharge curve
  *   for the battery.
  *
-<<<<<<< HEAD
  * Ordinary CC/CV charging will stop charging when the charge current goes
  * below charge_term_current_ua, and then restart it (if the device is still
  * plugged into the charger) at charge_restart_voltage_uv. This happens in most
@@ -406,11 +405,6 @@ struct power_supply_vbat_ri_table {
  *
  * Maintenance charging uses the voltages from this table: a table of settings
  * is traversed using a slightly lower current and voltage than what is used for
-=======
- * When the main CC/CV charging is complete the battery can optionally be
- * maintenance charged at the voltages from this table: a table of settings is
- * traversed using a slightly lower current and voltage than what is used for
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * CC/CV charging. The maintenance charging will for safety reasons not go on
  * indefinately: we lower the current and voltage with successive maintenance
  * settings, then disable charging completely after we reach the last one,
@@ -419,19 +413,13 @@ struct power_supply_vbat_ri_table {
  * ordinary CC/CV charging from there.
  *
  * As an example, a Samsung EB425161LA Lithium-Ion battery is CC/CV charged
-<<<<<<< HEAD
  * at 900mA to 4340mV, then maintenance charged at 600mA and 4150mV for up to
  * 60 hours, then maintenance charged at 600mA and 4100mV for up to 200 hours.
-=======
- * at 900mA to 4340mV, then maintenance charged at 600mA and 4150mV for
- * 60 hours, then maintenance charged at 600mA and 4100mV for 200 hours.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * After this the charge cycle is restarted waiting for
  * charge_restart_voltage_uv.
  *
  * For most mobile electronics this type of maintenance charging is enough for
  * the user to disconnect the device and make use of it before both maintenance
-<<<<<<< HEAD
  * charging cycles are complete, if the current and voltage has been chosen
  * appropriately. These need to be determined from battery discharge curves
  * and expected standby current.
@@ -441,9 +429,6 @@ struct power_supply_vbat_ri_table {
  * device is e.g. actively used during charging, so more current is drawn than
  * the expected stand-by current. Also overvoltage protection will be applied
  * as usual.
-=======
- * charging cycles are complete.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct power_supply_maintenance_charge_table {
 	int charge_current_max_ua;

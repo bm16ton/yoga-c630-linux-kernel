@@ -638,17 +638,6 @@ static int ibmveth_open(struct net_device *netdev)
 	}
 
 	rc = -ENOMEM;
-<<<<<<< HEAD
-=======
-
-	adapter->bounce_buffer = dma_alloc_coherent(&adapter->vdev->dev,
-						    netdev->mtu + IBMVETH_BUFF_OH,
-						    &adapter->bounce_buffer_dma, GFP_KERNEL);
-	if (!adapter->bounce_buffer) {
-		netdev_err(netdev, "unable to alloc bounce buffer\n");
-		goto out_free_irq;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	netdev_dbg(netdev, "initial replenish cycle\n");
 	ibmveth_interrupt(netdev->irq, netdev);
@@ -659,11 +648,6 @@ static int ibmveth_open(struct net_device *netdev)
 
 	return 0;
 
-<<<<<<< HEAD
-=======
-out_free_irq:
-	free_irq(netdev->irq, netdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_free_buffer_pools:
 	while (--i >= 0) {
 		if (adapter->rx_buff_pool[i].active)
@@ -741,14 +725,8 @@ static int ibmveth_close(struct net_device *netdev)
 			ibmveth_free_buffer_pool(adapter,
 						 &adapter->rx_buff_pool[i]);
 
-<<<<<<< HEAD
 	for (i = 0; i < netdev->real_num_tx_queues; i++)
 		ibmveth_free_tx_ltb(adapter, i);
-=======
-	dma_free_coherent(&adapter->vdev->dev,
-			  adapter->netdev->mtu + IBMVETH_BUFF_OH,
-			  adapter->bounce_buffer, adapter->bounce_buffer_dma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	netdev_dbg(netdev, "close complete\n");
 

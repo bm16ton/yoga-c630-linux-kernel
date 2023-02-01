@@ -1672,21 +1672,12 @@ static ssize_t analogix_dpaux_transfer(struct drm_dp_aux *aux,
 	ret = analogix_dp_detect_hpd(dp);
 	if (ret)
 		goto out;
-<<<<<<< HEAD
 
 	ret = analogix_dp_transfer(dp, msg);
 out:
 	pm_runtime_mark_last_busy(dp->dev);
 	pm_runtime_put_autosuspend(dp->dev);
 
-=======
-
-	ret = analogix_dp_transfer(dp, msg);
-out:
-	pm_runtime_mark_last_busy(dp->dev);
-	pm_runtime_put_autosuspend(dp->dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 

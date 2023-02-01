@@ -580,30 +580,6 @@ err_unregister_switch:
 	return ret;
 }
 
-<<<<<<< HEAD
-/* IOM ACPI IDs and IOM_PORT_STATUS_OFFSET */
-static const struct acpi_device_id iom_acpi_ids[] = {
-	/* TigerLake */
-	{ "INTC1072", 0x560, },
-
-	/* AlderLake */
-	{ "INTC1079", 0x160, },
-
-	/* Meteor Lake */
-	{ "INTC107A", 0x160, },
-	{}
-};
-=======
-static int is_memory(struct acpi_resource *res, void *data)
-{
-	struct resource_win win = {};
-	struct resource *r = &win.res;
-
-	return !(acpi_dev_resource_memory(res, r) ||
-		 acpi_dev_resource_address_space(res, &win));
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
 /* IOM ACPI IDs and IOM_PORT_STATUS_OFFSET */
 static const struct acpi_device_id iom_acpi_ids[] = {
 	/* TigerLake */

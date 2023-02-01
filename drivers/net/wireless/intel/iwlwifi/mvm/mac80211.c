@@ -1833,13 +1833,8 @@ static void iwl_mvm_parse_ppe(struct iwl_mvm *mvm,
 	* If nss < MAX: we can set zeros in other streams
 	*/
 	if (nss > MAX_HE_SUPP_NSS) {
-<<<<<<< HEAD
 		IWL_DEBUG_INFO(mvm, "Got NSS = %d - trimming to %d\n", nss,
 			       MAX_HE_SUPP_NSS);
-=======
-		IWL_INFO(mvm, "Got NSS = %d - trimming to %d\n", nss,
-			 MAX_HE_SUPP_NSS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		nss = MAX_HE_SUPP_NSS;
 	}
 
@@ -3381,7 +3376,6 @@ static int iwl_mvm_mac_conf_tx(struct ieee80211_hw *hw,
 static void iwl_mvm_mac_mgd_prepare_tx(struct ieee80211_hw *hw,
 				       struct ieee80211_vif *vif,
 				       struct ieee80211_prep_tx_info *info)
-<<<<<<< HEAD
 {
 	struct iwl_mvm *mvm = IWL_MAC80211_GET_MVM(hw);
 
@@ -3396,22 +3390,6 @@ static void iwl_mvm_mac_mgd_complete_tx(struct ieee80211_hw *hw,
 {
 	struct iwl_mvm *mvm = IWL_MAC80211_GET_MVM(hw);
 
-=======
-{
-	struct iwl_mvm *mvm = IWL_MAC80211_GET_MVM(hw);
-
-	mutex_lock(&mvm->mutex);
-	iwl_mvm_protect_assoc(mvm, vif, info->duration);
-	mutex_unlock(&mvm->mutex);
-}
-
-static void iwl_mvm_mac_mgd_complete_tx(struct ieee80211_hw *hw,
-					struct ieee80211_vif *vif,
-					struct ieee80211_prep_tx_info *info)
-{
-	struct iwl_mvm *mvm = IWL_MAC80211_GET_MVM(hw);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* for successful cases (auth/assoc), don't cancel session protection */
 	if (info->success)
 		return;
@@ -4971,10 +4949,7 @@ static int iwl_mvm_mac_get_survey(struct ieee80211_hw *hw, int idx,
 static void iwl_mvm_set_sta_rate(u32 rate_n_flags, struct rate_info *rinfo)
 {
 	u32 format = rate_n_flags & RATE_MCS_MOD_TYPE_MSK;
-<<<<<<< HEAD
 	u32 gi_ltf;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (rate_n_flags & RATE_MCS_CHAN_WIDTH_MSK) {
 	case RATE_MCS_CHAN_WIDTH_20:
@@ -5045,18 +5020,12 @@ static void iwl_mvm_set_sta_rate(u32 rate_n_flags, struct rate_info *rinfo)
 		RATE_HT_MCS_INDEX(rate_n_flags) :
 		u32_get_bits(rate_n_flags, RATE_MCS_CODE_MSK);
 
-<<<<<<< HEAD
 	if (rate_n_flags & RATE_MCS_SGI_MSK)
 		rinfo->flags |= RATE_INFO_FLAGS_SHORT_GI;
 
 	switch (format) {
 	case RATE_MCS_HE_MSK:
 		gi_ltf = u32_get_bits(rate_n_flags, RATE_MCS_HE_GI_LTF_MSK);
-=======
-	if (format == RATE_MCS_HE_MSK) {
-		u32 gi_ltf = u32_get_bits(rate_n_flags,
-					  RATE_MCS_HE_GI_LTF_MSK);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		rinfo->flags |= RATE_INFO_FLAGS_HE_MCS;
 
@@ -5095,7 +5064,6 @@ static void iwl_mvm_set_sta_rate(u32 rate_n_flags, struct rate_info *rinfo)
 
 		if (rate_n_flags & RATE_HE_DUAL_CARRIER_MODE_MSK)
 			rinfo->he_dcm = 1;
-<<<<<<< HEAD
 		break;
 	case RATE_MCS_HT_MSK:
 		rinfo->flags |= RATE_INFO_FLAGS_MCS;
@@ -5103,21 +5071,7 @@ static void iwl_mvm_set_sta_rate(u32 rate_n_flags, struct rate_info *rinfo)
 	case RATE_MCS_VHT_MSK:
 		rinfo->flags |= RATE_INFO_FLAGS_VHT_MCS;
 		break;
-=======
-		return;
 	}
-
-	if (rate_n_flags & RATE_MCS_SGI_MSK)
-		rinfo->flags |= RATE_INFO_FLAGS_SHORT_GI;
-
-	if (format == RATE_MCS_HT_MSK) {
-		rinfo->flags |= RATE_INFO_FLAGS_MCS;
-
-	} else if (format == RATE_MCS_VHT_MSK) {
-		rinfo->flags |= RATE_INFO_FLAGS_VHT_MCS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-
 }
 
 static void iwl_mvm_mac_sta_statistics(struct ieee80211_hw *hw,

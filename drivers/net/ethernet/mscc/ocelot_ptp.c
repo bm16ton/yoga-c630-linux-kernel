@@ -6,11 +6,8 @@
  */
 #include <linux/time64.h>
 
-<<<<<<< HEAD
 #include <linux/dsa/ocelot.h>
 #include <linux/ptp_classify.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <soc/mscc/ocelot_ptp.h>
 #include <soc/mscc/ocelot_sys.h>
 #include <soc/mscc/ocelot_vcap.h>

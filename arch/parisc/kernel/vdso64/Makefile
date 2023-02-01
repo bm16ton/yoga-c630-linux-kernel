@@ -26,11 +26,7 @@ $(obj)/vdso64_wrapper.o : $(obj)/vdso64.so FORCE
 
 # Force dependency (incbin is bad)
 # link rule for the .so file, .lds has to be first
-<<<<<<< HEAD
 $(obj)/vdso64.so: $(src)/vdso64.lds $(obj-vdso64) $(VDSO_LIBGCC) FORCE
-=======
-$(obj)/vdso64.so: $(src)/vdso64.lds $(obj-vdso64) $(VDSO_LIBGCC)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	$(call if_changed,vdso64ld)
 
 # assembly rules for the .S files
@@ -39,11 +35,7 @@ $(obj-vdso64): %.o: %.S FORCE
 
 # actual build commands
 quiet_cmd_vdso64ld = VDSO64L $@
-<<<<<<< HEAD
       cmd_vdso64ld = $(CC) $(c_flags) -Wl,-T $(filter-out FORCE, $^) -o $@
-=======
-      cmd_vdso64ld = $(CC) $(c_flags) -Wl,-T $^ -o $@
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 quiet_cmd_vdso64as = VDSO64A $@
       cmd_vdso64as = $(CC) $(a_flags) -c -o $@ $<
 

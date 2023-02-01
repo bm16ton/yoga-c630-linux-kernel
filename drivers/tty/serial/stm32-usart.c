@@ -37,11 +37,7 @@
 
 
 /* Register offsets */
-<<<<<<< HEAD
 static struct stm32_usart_info __maybe_unused stm32f4_info = {
-=======
-static struct stm32_usart_info stm32f4_info = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ofs = {
 		.isr	= 0x00,
 		.rdr	= 0x04,
@@ -62,11 +58,7 @@ static struct stm32_usart_info stm32f4_info = {
 	}
 };
 
-<<<<<<< HEAD
 static struct stm32_usart_info __maybe_unused stm32f7_info = {
-=======
-static struct stm32_usart_info stm32f7_info = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ofs = {
 		.cr1	= 0x00,
 		.cr2	= 0x04,
@@ -88,11 +80,7 @@ static struct stm32_usart_info stm32f7_info = {
 	}
 };
 
-<<<<<<< HEAD
 static struct stm32_usart_info __maybe_unused stm32h7_info = {
-=======
-static struct stm32_usart_info stm32h7_info = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ofs = {
 		.cr1	= 0x00,
 		.cr2	= 0x04,
@@ -452,7 +440,6 @@ static unsigned int stm32_usart_receive_chars_dma(struct uart_port *port)
 	dma_size = stm32_port->last_res - stm32_port->rx_dma_state.residue;
 	stm32_usart_push_buffer_dma(port, dma_size);
 	size += dma_size;
-<<<<<<< HEAD
 
 	return size;
 }
@@ -520,75 +507,6 @@ static bool stm32_usart_tx_dma_enabled(struct stm32_port *stm32_port)
 {
 	const struct stm32_usart_offsets *ofs = &stm32_port->info->ofs;
 
-=======
-
-	return size;
-}
-
-static unsigned int stm32_usart_receive_chars(struct uart_port *port, bool force_dma_flush)
-{
-	struct stm32_port *stm32_port = to_stm32_port(port);
-	const struct stm32_usart_offsets *ofs = &stm32_port->info->ofs;
-	enum dma_status rx_dma_status;
-	u32 sr;
-	unsigned int size = 0;
-
-	if (stm32_usart_rx_dma_enabled(port) || force_dma_flush) {
-		rx_dma_status = dmaengine_tx_status(stm32_port->rx_ch,
-						    stm32_port->rx_ch->cookie,
-						    &stm32_port->rx_dma_state);
-		if (rx_dma_status == DMA_IN_PROGRESS) {
-			/* Empty DMA buffer */
-			size = stm32_usart_receive_chars_dma(port);
-			sr = readl_relaxed(port->membase + ofs->isr);
-			if (sr & USART_SR_ERR_MASK) {
-				/* Disable DMA request line */
-				stm32_usart_clr_bits(port, ofs->cr3, USART_CR3_DMAR);
-
-				/* Switch to PIO mode to handle the errors */
-				size += stm32_usart_receive_chars_pio(port);
-
-				/* Switch back to DMA mode */
-				stm32_usart_set_bits(port, ofs->cr3, USART_CR3_DMAR);
-			}
-		} else {
-			/* Disable RX DMA */
-			dmaengine_terminate_async(stm32_port->rx_ch);
-			stm32_usart_clr_bits(port, ofs->cr3, USART_CR3_DMAR);
-			/* Fall back to interrupt mode */
-			dev_dbg(port->dev, "DMA error, fallback to irq mode\n");
-			size = stm32_usart_receive_chars_pio(port);
-		}
-	} else {
-		size = stm32_usart_receive_chars_pio(port);
-	}
-
-	return size;
-}
-
-static void stm32_usart_tx_dma_terminate(struct stm32_port *stm32_port)
-{
-	dmaengine_terminate_async(stm32_port->tx_ch);
-	stm32_port->tx_dma_busy = false;
-}
-
-static bool stm32_usart_tx_dma_started(struct stm32_port *stm32_port)
-{
-	/*
-	 * We cannot use the function "dmaengine_tx_status" to know the
-	 * status of DMA. This function does not show if the "dma complete"
-	 * callback of the DMA transaction has been called. So we prefer
-	 * to use "tx_dma_busy" flag to prevent dual DMA transaction at the
-	 * same time.
-	 */
-	return stm32_port->tx_dma_busy;
-}
-
-static bool stm32_usart_tx_dma_enabled(struct stm32_port *stm32_port)
-{
-	const struct stm32_usart_offsets *ofs = &stm32_port->info->ofs;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return !!(readl_relaxed(stm32_port->port.membase + ofs->cr3) & USART_CR3_DMAT);
 }
 
@@ -1790,27 +1708,6 @@ static int stm32_usart_serial_probe(struct platform_device *pdev)
 		if (ret)
 			goto err_deinit_port;
 	}
-<<<<<<< HEAD
-=======
-
-	stm32port->rx_ch = dma_request_chan(&pdev->dev, "rx");
-	if (PTR_ERR(stm32port->rx_ch) == -EPROBE_DEFER) {
-		ret = -EPROBE_DEFER;
-		goto err_wakeirq;
-	}
-	/* Fall back in interrupt mode for any non-deferral error */
-	if (IS_ERR(stm32port->rx_ch))
-		stm32port->rx_ch = NULL;
-
-	stm32port->tx_ch = dma_request_chan(&pdev->dev, "tx");
-	if (PTR_ERR(stm32port->tx_ch) == -EPROBE_DEFER) {
-		ret = -EPROBE_DEFER;
-		goto err_dma_rx;
-	}
-	/* Fall back in interrupt mode for any non-deferral error */
-	if (IS_ERR(stm32port->tx_ch))
-		stm32port->tx_ch = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (stm32port->rx_ch && stm32_usart_of_dma_rx_probe(stm32port, pdev)) {
 		/* Fall back in interrupt mode */
@@ -1848,27 +1745,11 @@ err_port:
 	pm_runtime_set_suspended(&pdev->dev);
 	pm_runtime_put_noidle(&pdev->dev);
 
-<<<<<<< HEAD
 	if (stm32port->tx_ch)
 		stm32_usart_of_dma_tx_remove(stm32port, pdev);
 	if (stm32port->rx_ch)
 		stm32_usart_of_dma_rx_remove(stm32port, pdev);
 
-=======
-	if (stm32port->tx_ch) {
-		stm32_usart_of_dma_tx_remove(stm32port, pdev);
-		dma_release_channel(stm32port->tx_ch);
-	}
-
-	if (stm32port->rx_ch)
-		stm32_usart_of_dma_rx_remove(stm32port, pdev);
-
-err_dma_rx:
-	if (stm32port->rx_ch)
-		dma_release_channel(stm32port->rx_ch);
-
-err_wakeirq:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (stm32port->wakeup_src)
 		dev_pm_clear_wake_irq(&pdev->dev);
 

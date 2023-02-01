@@ -108,11 +108,8 @@ config X86
 	select ARCH_SUPPORTS_PAGE_TABLE_CHECK	if X86_64
 	select ARCH_SUPPORTS_NUMA_BALANCING	if X86_64
 	select ARCH_SUPPORTS_KMAP_LOCAL_FORCE_MAP	if NR_CPUS <= 4096
-<<<<<<< HEAD
 	select ARCH_SUPPORTS_CFI_CLANG		if X86_64
 	select ARCH_USES_CFI_TRAPS		if X86_64 && CFI_CLANG
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select ARCH_SUPPORTS_LTO_CLANG
 	select ARCH_SUPPORTS_LTO_CLANG_THIN
 	select ARCH_USE_BUILTIN_BSWAP
@@ -134,13 +131,9 @@ config X86
 	select CLKEVT_I8253
 	select CLOCKSOURCE_VALIDATE_LAST_CYCLE
 	select CLOCKSOURCE_WATCHDOG
-<<<<<<< HEAD
 	# Word-size accesses may read uninitialized data past the trailing \0
 	# in strings and cause false KMSAN reports.
 	select DCACHE_WORD_ACCESS		if !KMSAN
-=======
-	select DCACHE_WORD_ACCESS
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select DYNAMIC_SIGFRAME
 	select EDAC_ATOMIC_SCRUB
 	select EDAC_SUPPORT
@@ -469,13 +462,8 @@ config X86_X2APIC
 
 	  Some Intel systems circa 2022 and later are locked into x2APIC mode
 	  and can not fall back to the legacy APIC modes if SGX or TDX are
-<<<<<<< HEAD
 	  enabled in the BIOS. They will boot with very reduced functionality
 	  without enabling this option.
-=======
-	  enabled in the BIOS.  They will be unable to boot without enabling
-	  this option.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	  If you don't know what to do here, say N.
 
@@ -2475,7 +2463,6 @@ config PAGE_TABLE_ISOLATION
 	  This feature reduces the number of hardware side channels by
 	  ensuring that the majority of kernel addresses are not mapped
 	  into userspace.
-<<<<<<< HEAD
 
 	  See Documentation/x86/pti.rst for more details.
 
@@ -2523,55 +2510,6 @@ config CPU_IBRS_ENTRY
 	  This mitigates both spectre_v2 and retbleed at great cost to
 	  performance.
 
-=======
-
-	  See Documentation/x86/pti.rst for more details.
-
-config RETPOLINE
-	bool "Avoid speculative indirect branches in kernel"
-	select OBJTOOL if HAVE_OBJTOOL
-	default y
-	help
-	  Compile kernel with the retpoline compiler options to guard against
-	  kernel-to-user data leaks by avoiding speculative indirect
-	  branches. Requires a compiler with -mindirect-branch=thunk-extern
-	  support for full protection. The kernel may run slower.
-
-config RETHUNK
-	bool "Enable return-thunks"
-	depends on RETPOLINE && CC_HAS_RETURN_THUNK
-	select OBJTOOL if HAVE_OBJTOOL
-	default y if X86_64
-	help
-	  Compile the kernel with the return-thunks compiler option to guard
-	  against kernel-to-user data leaks by avoiding return speculation.
-	  Requires a compiler with -mfunction-return=thunk-extern
-	  support for full protection. The kernel may run slower.
-
-config CPU_UNRET_ENTRY
-	bool "Enable UNRET on kernel entry"
-	depends on CPU_SUP_AMD && RETHUNK && X86_64
-	default y
-	help
-	  Compile the kernel with support for the retbleed=unret mitigation.
-
-config CPU_IBPB_ENTRY
-	bool "Enable IBPB on kernel entry"
-	depends on CPU_SUP_AMD && X86_64
-	default y
-	help
-	  Compile the kernel with support for the retbleed=ibpb mitigation.
-
-config CPU_IBRS_ENTRY
-	bool "Enable IBRS on kernel entry"
-	depends on CPU_SUP_INTEL && X86_64
-	default y
-	help
-	  Compile the kernel with support for the spectre_v2=ibrs mitigation.
-	  This mitigates both spectre_v2 and retbleed at great cost to
-	  performance.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config SLS
 	bool "Mitigate Straight-Line-Speculation"
 	depends on CC_HAS_SLS && X86_64

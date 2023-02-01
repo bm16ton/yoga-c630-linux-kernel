@@ -106,14 +106,8 @@ err_nvm:
 
 static int tb_retimer_nvm_validate_and_write(struct tb_retimer *rt)
 {
-<<<<<<< HEAD
 	unsigned int image_size;
 	const u8 *buf;
-=======
-	unsigned int image_size, hdr_size;
-	const u8 *buf = rt->nvm->buf;
-	u16 ds_size, device;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	ret = tb_nvm_validate(rt->nvm);
@@ -160,45 +154,6 @@ static int tb_retimer_nvm_authenticate(struct tb_retimer *rt, bool auth_only)
 		return status ? -EINVAL : 0;
 	}
 
-<<<<<<< HEAD
-=======
-	ret = usb4_port_retimer_nvm_write(rt->port, rt->index, 0, buf,
-					 image_size);
-	if (!ret)
-		rt->nvm->flushed = true;
-
-	return ret;
-}
-
-static int tb_retimer_nvm_authenticate(struct tb_retimer *rt, bool auth_only)
-{
-	u32 status;
-	int ret;
-
-	if (auth_only) {
-		ret = usb4_port_retimer_nvm_set_offset(rt->port, rt->index, 0);
-		if (ret)
-			return ret;
-	}
-
-	ret = usb4_port_retimer_nvm_authenticate(rt->port, rt->index);
-	if (ret)
-		return ret;
-
-	usleep_range(100, 150);
-
-	/*
-	 * Check the status now if we still can access the retimer. It
-	 * is expected that the below fails.
-	 */
-	ret = usb4_port_retimer_nvm_authenticate_status(rt->port, rt->index,
-							&status);
-	if (!ret) {
-		rt->auth_status = status;
-		return status ? -EINVAL : 0;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -472,31 +427,14 @@ int tb_retimer_scan(struct tb_port *port, bool add)
 {
 	u32 status[TB_MAX_RETIMER_INDEX + 1] = {};
 	int ret, i, last_idx = 0;
-	struct usb4_port *usb4;
 
-<<<<<<< HEAD
-=======
-	usb4 = port->usb4;
-	if (!usb4)
-		return 0;
-
-	pm_runtime_get_sync(&usb4->dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Send broadcast RT to make sure retimer indices facing this
 	 * port are set.
 	 */
 	ret = usb4_port_enumerate_retimers(port);
 	if (ret)
-		goto out;
-
-	/*
-	 * Enable sideband channel for each retimer. We can do this
-	 * regardless whether there is device connected or not.
-	 */
-	for (i = 1; i <= TB_MAX_RETIMER_INDEX; i++)
-		usb4_port_retimer_set_inbound_sbtx(port, i);
+		return ret;
 
 	/*
 	 * Enable sideband channel for each retimer. We can do this
@@ -526,10 +464,8 @@ int tb_retimer_scan(struct tb_port *port, bool add)
 			break;
 	}
 
-	if (!last_idx) {
-		ret = 0;
-		goto out;
-	}
+	if (!last_idx)
+		return 0;
 
 	/* Add on-board retimers if they do not exist already */
 	ret = 0;
@@ -546,13 +482,6 @@ int tb_retimer_scan(struct tb_port *port, bool add)
 		}
 	}
 
-<<<<<<< HEAD
-=======
-out:
-	pm_runtime_mark_last_busy(&usb4->dev);
-	pm_runtime_put_autosuspend(&usb4->dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 

@@ -23,16 +23,12 @@
 #define CDC_VA_MCLK_CONTROL_EN			BIT(0)
 #define CDC_VA_CLK_RST_CTRL_FS_CNT_CONTROL	(0x0004)
 #define CDC_VA_FS_CONTROL_EN			BIT(0)
-<<<<<<< HEAD
 #define CDC_VA_FS_COUNTER_CLR			BIT(1)
 #define CDC_VA_CLK_RST_CTRL_SWR_CONTROL		(0x0008)
 #define CDC_VA_SWR_RESET_MASK		BIT(1)
 #define CDC_VA_SWR_RESET_ENABLE		BIT(1)
 #define CDC_VA_SWR_CLK_EN_MASK		BIT(0)
 #define CDC_VA_SWR_CLK_ENABLE		BIT(0)
-=======
-#define CDC_VA_CLK_RST_CTRL_SWR_CONTROL		(0x0008)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CDC_VA_TOP_CSR_TOP_CFG0			(0x0080)
 #define CDC_VA_FS_BROADCAST_EN			BIT(1)
 #define CDC_VA_TOP_CSR_DMIC0_CTL		(0x0084)
@@ -74,11 +70,8 @@
 #define CDC_VA_TOP_CSR_SWR_MIC_CTL0		(0x00D0)
 #define CDC_VA_TOP_CSR_SWR_MIC_CTL1		(0x00D4)
 #define CDC_VA_TOP_CSR_SWR_MIC_CTL2		(0x00D8)
-<<<<<<< HEAD
 #define CDC_VA_SWR_MIC_CLK_SEL_0_1_MASK		(0xEE)
 #define CDC_VA_SWR_MIC_CLK_SEL_0_1_DIV1		(0xCC)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CDC_VA_TOP_CSR_SWR_CTRL			(0x00DC)
 #define CDC_VA_INP_MUX_ADC_MUX0_CFG0		(0x0100)
 #define CDC_VA_INP_MUX_ADC_MUX0_CFG1		(0x0104)
@@ -207,10 +200,7 @@ struct va_macro {
 	unsigned long active_ch_mask[VA_MACRO_MAX_DAIS];
 	unsigned long active_ch_cnt[VA_MACRO_MAX_DAIS];
 	u16 dmic_clk_div;
-<<<<<<< HEAD
 	bool has_swr_master;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	int dec_mode[VA_MACRO_NUM_DECIMATORS];
 	struct regmap *regmap;
@@ -233,7 +223,6 @@ struct va_macro {
 
 #define to_va_macro(_hw) container_of(_hw, struct va_macro, hw)
 
-<<<<<<< HEAD
 struct va_macro_data {
 	bool has_swr_master;
 };
@@ -246,8 +235,6 @@ static const struct va_macro_data sm8450_va_data = {
 	.has_swr_master = true,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool va_is_volatile_register(struct device *dev, unsigned int reg)
 {
 	switch (reg) {
@@ -357,12 +344,9 @@ static bool va_is_rw_register(struct device *dev, unsigned int reg)
 	case CDC_VA_TOP_CSR_DMIC2_CTL:
 	case CDC_VA_TOP_CSR_DMIC3_CTL:
 	case CDC_VA_TOP_CSR_DMIC_CFG:
-<<<<<<< HEAD
 	case CDC_VA_TOP_CSR_SWR_MIC_CTL0:
 	case CDC_VA_TOP_CSR_SWR_MIC_CTL1:
 	case CDC_VA_TOP_CSR_SWR_MIC_CTL2:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case CDC_VA_TOP_CSR_DEBUG_BUS:
 	case CDC_VA_TOP_CSR_DEBUG_EN:
 	case CDC_VA_TOP_CSR_TX_I2S_CTL:
@@ -462,18 +446,12 @@ static int va_clk_rsc_fs_gen_request(struct va_macro *va, bool enable)
 		regmap_update_bits(regmap, CDC_VA_CLK_RST_CTRL_MCLK_CONTROL,
 				   CDC_VA_MCLK_CONTROL_EN,
 				   CDC_VA_MCLK_CONTROL_EN);
-<<<<<<< HEAD
 		/* clear the fs counter */
 		regmap_update_bits(regmap, CDC_VA_CLK_RST_CTRL_FS_CNT_CONTROL,
 				   CDC_VA_FS_CONTROL_EN | CDC_VA_FS_COUNTER_CLR,
 				   CDC_VA_FS_CONTROL_EN | CDC_VA_FS_COUNTER_CLR);
 		regmap_update_bits(regmap, CDC_VA_CLK_RST_CTRL_FS_CNT_CONTROL,
 				   CDC_VA_FS_CONTROL_EN | CDC_VA_FS_COUNTER_CLR,
-=======
-
-		regmap_update_bits(regmap, CDC_VA_CLK_RST_CTRL_FS_CNT_CONTROL,
-				   CDC_VA_FS_CONTROL_EN,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   CDC_VA_FS_CONTROL_EN);
 
 		regmap_update_bits(regmap, CDC_VA_TOP_CSR_TOP_CFG0,
@@ -1350,7 +1328,6 @@ static const struct snd_soc_component_driver va_macro_component_drv = {
 
 static int fsgen_gate_enable(struct clk_hw *hw)
 {
-<<<<<<< HEAD
 	struct va_macro *va = to_va_macro(hw);
 	struct regmap *regmap = va->regmap;
 	int ret;
@@ -1369,14 +1346,10 @@ static int fsgen_gate_enable(struct clk_hw *hw)
 			   CDC_VA_SWR_RESET_MASK, 0x0);
 
 	return ret;
-=======
-	return va_macro_mclk_enable(to_va_macro(hw), true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void fsgen_gate_disable(struct clk_hw *hw)
 {
-<<<<<<< HEAD
 	struct va_macro *va = to_va_macro(hw);
 	struct regmap *regmap = va->regmap;
 
@@ -1385,9 +1358,6 @@ static void fsgen_gate_disable(struct clk_hw *hw)
 			   CDC_VA_SWR_CLK_EN_MASK, 0x0);
 
 	va_macro_mclk_enable(va, false);
-=======
-	va_macro_mclk_enable(to_va_macro(hw), false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int fsgen_gate_is_enabled(struct clk_hw *hw)
@@ -1481,10 +1451,7 @@ undefined_rate:
 static int va_macro_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
-<<<<<<< HEAD
 	const struct va_macro_data *data;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct va_macro *va;
 	void __iomem *base;
 	u32 sample_rate = 0;
@@ -1539,12 +1506,9 @@ static int va_macro_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(dev, va);
 
-<<<<<<< HEAD
 	data = of_device_get_match_data(dev);
 	va->has_swr_master = data->has_swr_master;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* mclk rate */
 	clk_set_rate(va->mclk, 2 * VA_MACRO_MCLK_FREQ);
 
@@ -1570,7 +1534,6 @@ static int va_macro_probe(struct platform_device *pdev)
 		goto err_clkout;
 	}
 
-<<<<<<< HEAD
 	if (va->has_swr_master) {
 		/* Set default CLK div to 1 */
 		regmap_update_bits(va->regmap, CDC_VA_TOP_CSR_SWR_MIC_CTL0,
@@ -1585,8 +1548,6 @@ static int va_macro_probe(struct platform_device *pdev)
 
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = devm_snd_soc_register_component(dev, &va_macro_component_drv,
 					      va_macro_dais,
 					      ARRAY_SIZE(va_macro_dais));
@@ -1661,15 +1622,10 @@ static const struct dev_pm_ops va_macro_pm_ops = {
 };
 
 static const struct of_device_id va_macro_dt_match[] = {
-<<<<<<< HEAD
 	{ .compatible = "qcom,sc7280-lpass-va-macro", .data = &sm8250_va_data },
 	{ .compatible = "qcom,sm8250-lpass-va-macro", .data = &sm8250_va_data },
 	{ .compatible = "qcom,sm8450-lpass-va-macro", .data = &sm8450_va_data },
 	{ .compatible = "qcom,sc8280xp-lpass-va-macro", .data = &sm8450_va_data },
-=======
-	{ .compatible = "qcom,sc7280-lpass-va-macro" },
-	{ .compatible = "qcom,sm8250-lpass-va-macro" },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{}
 };
 MODULE_DEVICE_TABLE(of, va_macro_dt_match);

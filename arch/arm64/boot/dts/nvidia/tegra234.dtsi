@@ -23,10 +23,6 @@
 
 		gpcdma: dma-controller@2600000 {
 			compatible = "nvidia,tegra234-gpcdma",
-<<<<<<< HEAD
-=======
-				     "nvidia,tegra194-gpcdma",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				     "nvidia,tegra186-gpcdma";
 			reg = <0x2600000 0x210000>;
 			resets = <&bpmp TEGRA234_RESET_GPCDMA>;
@@ -573,7 +569,6 @@
 			interconnect-names = "dma-mem";
 			iommus = <&smmu_niso1 TEGRA234_SID_HOST1X>;
 
-<<<<<<< HEAD
 			/* Context isolation domains */
 			iommu-map = <0 &smmu_niso0 TEGRA234_SID_HOST1X_CTX0 1>,
 				    <1 &smmu_niso0 TEGRA234_SID_HOST1X_CTX1 1>,
@@ -592,8 +587,6 @@
 				    <14 &smmu_niso1 TEGRA234_SID_HOST1X_CTX6 1>,
 				    <15 &smmu_niso1 TEGRA234_SID_HOST1X_CTX7 1>;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			vic@15340000 {
 				compatible = "nvidia,tegra234-vic";
 				reg = <0x15340000 0x00040000>;
@@ -761,13 +754,10 @@
 			clock-names = "div-clk", "parent";
 			resets = <&bpmp TEGRA234_RESET_I2C1>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 21>, <&gpcdma 21>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		cam_i2c: i2c@3180000 {
@@ -783,13 +773,10 @@
 			clock-names = "div-clk", "parent";
 			resets = <&bpmp TEGRA234_RESET_I2C3>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 23>, <&gpcdma 23>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		dp_aux_ch1_i2c: i2c@3190000 {
@@ -805,13 +792,10 @@
 			clock-names = "div-clk", "parent";
 			resets = <&bpmp TEGRA234_RESET_I2C4>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 26>, <&gpcdma 26>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		dp_aux_ch0_i2c: i2c@31b0000 {
@@ -827,13 +811,10 @@
 			clock-names = "div-clk", "parent";
 			resets = <&bpmp TEGRA234_RESET_I2C6>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 30>, <&gpcdma 30>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		dp_aux_ch2_i2c: i2c@31c0000 {
@@ -849,13 +830,10 @@
 			clock-names = "div-clk", "parent";
 			resets = <&bpmp TEGRA234_RESET_I2C7>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 27>, <&gpcdma 27>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		dp_aux_ch3_i2c: i2c@31e0000 {
@@ -871,13 +849,10 @@
 			clock-names = "div-clk", "parent";
 			resets = <&bpmp TEGRA234_RESET_I2C9>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 31>, <&gpcdma 31>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		spi@3270000 {
@@ -963,10 +938,7 @@
 			interconnects = <&mc TEGRA234_MEMORY_CLIENT_HDAR &emc>,
 					<&mc TEGRA234_MEMORY_CLIENT_HDAW &emc>;
 			interconnect-names = "dma-mem", "write";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_HDA>;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			status = "disabled";
 		};
 
@@ -995,7 +967,6 @@
 			#mbox-cells = <2>;
 		};
 
-<<<<<<< HEAD
 		ethernet@6800000 {
 			compatible = "nvidia,tegra234-mgbe";
 			reg = <0x06800000 0x10000>,
@@ -1132,8 +1103,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		smmu_niso1: iommu@8000000 {
 			compatible = "nvidia,tegra234-smmu", "nvidia,smmu-500";
 			reg = <0x8000000 0x1000000>,
@@ -1290,7 +1259,6 @@
 			status = "okay";
 		};
 
-<<<<<<< HEAD
 		p2u_hsio_0: phy@3e00000 {
 			compatible = "nvidia,tegra234-p2u";
 			reg = <0x03e00000 0x10000>;
@@ -1483,8 +1451,6 @@
 			#phy-cells = <0>;
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hsp_aon: hsp@c150000 {
 			compatible = "nvidia,tegra234-hsp", "nvidia,tegra194-hsp";
 			reg = <0x0c150000 0x90000>;
@@ -1513,13 +1479,10 @@
 			assigned-clock-parents = <&bpmp TEGRA234_CLK_PLLP_OUT0>;
 			resets = <&bpmp TEGRA234_RESET_I2C2>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 22>, <&gpcdma 22>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		gen8_i2c: i2c@c250000 {
@@ -1536,13 +1499,10 @@
 			assigned-clock-parents = <&bpmp TEGRA234_CLK_PLLP_OUT0>;
 			resets = <&bpmp TEGRA234_RESET_I2C8>;
 			reset-names = "i2c";
-<<<<<<< HEAD
 			iommus = <&smmu_niso0 TEGRA234_SID_GPCDMA>;
 			dma-coherent;
 			dmas = <&gpcdma 0>, <&gpcdma 0>;
 			dma-names = "rx", "tx";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		rtc@c2a0000 {
@@ -1615,290 +1575,6 @@
 			#interrupt-cells = <3>;
 			interrupt-controller;
 		};
-<<<<<<< HEAD
-
-		smmu_iso: iommu@10000000{
-			compatible = "nvidia,tegra234-smmu", "nvidia,smmu-500";
-			reg = <0x10000000 0x1000000>;
-			interrupts = <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 240 IRQ_TYPE_LEVEL_HIGH>;
-			stream-match-mask = <0x7f80>;
-			#global-interrupts = <1>;
-			#iommu-cells = <1>;
-
-			nvidia,memory-controller = <&mc>;
-			status = "okay";
-		};
-
-		smmu_niso0: iommu@12000000 {
-			compatible = "nvidia,tegra234-smmu", "nvidia,smmu-500";
-			reg = <0x12000000 0x1000000>,
-			      <0x11000000 0x1000000>;
-			interrupts = <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 232 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 232 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>,
-				     <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>;
-			stream-match-mask = <0x7f80>;
-			#global-interrupts = <2>;
-			#iommu-cells = <1>;
-
-			nvidia,memory-controller = <&mc>;
-			status = "okay";
-		};
-=======
 
 		smmu_iso: iommu@10000000{
 			compatible = "nvidia,tegra234-smmu", "nvidia,smmu-500";
@@ -2197,59 +1873,6 @@
 		status = "okay";
 	};
 
-	sram@40000000 {
-		compatible = "nvidia,tegra234-sysram", "mmio-sram";
-		reg = <0x0 0x40000000 0x0 0x80000>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges = <0x0 0x0 0x40000000 0x80000>;
-		no-memory-wc;
-
-		cpu_bpmp_tx: sram@70000 {
-			reg = <0x70000 0x1000>;
-			label = "cpu-bpmp-tx";
-			pool;
-		};
-
-		cpu_bpmp_rx: sram@71000 {
-			reg = <0x71000 0x1000>;
-			label = "cpu-bpmp-rx";
-			pool;
-		};
-	};
-
-	bpmp: bpmp {
-		compatible = "nvidia,tegra234-bpmp", "nvidia,tegra186-bpmp";
-		mboxes = <&hsp_top0 TEGRA_HSP_MBOX_TYPE_DB
-				    TEGRA_HSP_DB_MASTER_BPMP>;
-		shmem = <&cpu_bpmp_tx>, <&cpu_bpmp_rx>;
-		#clock-cells = <1>;
-		#reset-cells = <1>;
-		#power-domain-cells = <1>;
-		interconnects = <&mc TEGRA234_MEMORY_CLIENT_BPMPR &emc>,
-				<&mc TEGRA234_MEMORY_CLIENT_BPMPW &emc>,
-				<&mc TEGRA234_MEMORY_CLIENT_BPMPDMAR &emc>,
-				<&mc TEGRA234_MEMORY_CLIENT_BPMPDMAW &emc>;
-		interconnect-names = "read", "write", "dma-mem", "dma-write";
-		iommus = <&smmu_niso1 TEGRA234_SID_BPMP>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-		cbb-fabric@13a00000 {
-			compatible = "nvidia,tegra234-cbb-fabric";
-			reg = <0x13a00000 0x400000>;
-			interrupts = <GIC_SPI 231 IRQ_TYPE_LEVEL_HIGH>;
-			status = "okay";
-		};
-	};
-
-	ccplex@e000000 {
-		compatible = "nvidia,tegra234-ccplex-cluster";
-		reg = <0x0 0x0e000000 0x0 0x5ffff>;
-		nvidia,bpmp = <&bpmp>;
-		status = "okay";
-	};
-
-<<<<<<< HEAD
 	pcie@140a0000 {
 		compatible = "nvidia,tegra234-pcie";
 		power-domains = <&bpmp TEGRA234_POWER_DOMAIN_PCIEX4CA>;
@@ -3037,11 +2660,6 @@
 			compatible = "arm,cortex-a78";
 			device_type = "cpu";
 			reg = <0x00000>;
-=======
-		cpu0_0: cpu@0 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x00000>;
 
 			enable-method = "psci";
 
@@ -3116,333 +2734,6 @@
 			d-cache-line-size = <64>;
 			d-cache-sets = <256>;
 			next-level-cache = <&l2c1_0>;
-		};
-
-		cpu1_1: cpu@10100 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x10100>;
-
-			enable-method = "psci";
-
-			i-cache-size = <65536>;
-			i-cache-line-size = <64>;
-			i-cache-sets = <256>;
-			d-cache-size = <65536>;
-			d-cache-line-size = <64>;
-			d-cache-sets = <256>;
-			next-level-cache = <&l2c1_1>;
-		};
-
-		cpu1_2: cpu@10200 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x10200>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-			enable-method = "psci";
-
-			i-cache-size = <65536>;
-			i-cache-line-size = <64>;
-			i-cache-sets = <256>;
-			d-cache-size = <65536>;
-			d-cache-line-size = <64>;
-			d-cache-sets = <256>;
-<<<<<<< HEAD
-			next-level-cache = <&l2c0_0>;
-		};
-
-		cpu0_1: cpu@100 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x00100>;
-=======
-			next-level-cache = <&l2c1_2>;
-		};
-
-		cpu1_3: cpu@10300 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x10300>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-			enable-method = "psci";
-
-			i-cache-size = <65536>;
-			i-cache-line-size = <64>;
-			i-cache-sets = <256>;
-			d-cache-size = <65536>;
-			d-cache-line-size = <64>;
-			d-cache-sets = <256>;
-<<<<<<< HEAD
-			next-level-cache = <&l2c0_1>;
-		};
-
-		cpu0_2: cpu@200 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x00200>;
-=======
-			next-level-cache = <&l2c1_3>;
-		};
-
-		cpu2_0: cpu@20000 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x20000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-			enable-method = "psci";
-
-			i-cache-size = <65536>;
-			i-cache-line-size = <64>;
-			i-cache-sets = <256>;
-			d-cache-size = <65536>;
-			d-cache-line-size = <64>;
-			d-cache-sets = <256>;
-<<<<<<< HEAD
-			next-level-cache = <&l2c0_2>;
-		};
-
-		cpu0_3: cpu@300 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x00300>;
-=======
-			next-level-cache = <&l2c2_0>;
-		};
-
-		cpu2_1: cpu@20100 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x20100>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-			enable-method = "psci";
-
-			i-cache-size = <65536>;
-			i-cache-line-size = <64>;
-			i-cache-sets = <256>;
-			d-cache-size = <65536>;
-			d-cache-line-size = <64>;
-			d-cache-sets = <256>;
-<<<<<<< HEAD
-			next-level-cache = <&l2c0_3>;
-		};
-
-		cpu1_0: cpu@10000 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x10000>;
-=======
-			next-level-cache = <&l2c2_1>;
-		};
-
-		cpu2_2: cpu@20200 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x20200>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-			enable-method = "psci";
-
-			i-cache-size = <65536>;
-			i-cache-line-size = <64>;
-			i-cache-sets = <256>;
-			d-cache-size = <65536>;
-			d-cache-line-size = <64>;
-			d-cache-sets = <256>;
-<<<<<<< HEAD
-			next-level-cache = <&l2c1_0>;
-=======
-			next-level-cache = <&l2c2_2>;
-		};
-
-		cpu2_3: cpu@20300 {
-			compatible = "arm,cortex-a78";
-			device_type = "cpu";
-			reg = <0x20300>;
-
-			enable-method = "psci";
-
-			i-cache-size = <65536>;
-			i-cache-line-size = <64>;
-			i-cache-sets = <256>;
-			d-cache-size = <65536>;
-			d-cache-line-size = <64>;
-			d-cache-sets = <256>;
-			next-level-cache = <&l2c2_3>;
-		};
-
-		cpu-map {
-			cluster0 {
-				core0 {
-					cpu = <&cpu0_0>;
-				};
-
-				core1 {
-					cpu = <&cpu0_1>;
-				};
-
-				core2 {
-					cpu = <&cpu0_2>;
-				};
-
-				core3 {
-					cpu = <&cpu0_3>;
-				};
-			};
-
-			cluster1 {
-				core0 {
-					cpu = <&cpu1_0>;
-				};
-
-				core1 {
-					cpu = <&cpu1_1>;
-				};
-
-				core2 {
-					cpu = <&cpu1_2>;
-				};
-
-				core3 {
-					cpu = <&cpu1_3>;
-				};
-			};
-
-			cluster2 {
-				core0 {
-					cpu = <&cpu2_0>;
-				};
-
-				core1 {
-					cpu = <&cpu2_1>;
-				};
-
-				core2 {
-					cpu = <&cpu2_2>;
-				};
-
-				core3 {
-					cpu = <&cpu2_3>;
-				};
-			};
-		};
-
-		l2c0_0: l2-cache00 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c0>;
-		};
-
-		l2c0_1: l2-cache01 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c0>;
-		};
-
-		l2c0_2: l2-cache02 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c0>;
-		};
-
-		l2c0_3: l2-cache03 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c0>;
-		};
-
-		l2c1_0: l2-cache10 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c1>;
-		};
-
-		l2c1_1: l2-cache11 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c1>;
-		};
-
-		l2c1_2: l2-cache12 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c1>;
-		};
-
-		l2c1_3: l2-cache13 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c1>;
-		};
-
-		l2c2_0: l2-cache20 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c2>;
-		};
-
-		l2c2_1: l2-cache21 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c2>;
-		};
-
-		l2c2_2: l2-cache22 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c2>;
-		};
-
-		l2c2_3: l2-cache23 {
-			cache-size = <262144>;
-			cache-line-size = <64>;
-			cache-sets = <512>;
-			cache-unified;
-			next-level-cache = <&l3c2>;
-		};
-
-		l3c0: l3-cache0 {
-			cache-size = <2097152>;
-			cache-line-size = <64>;
-			cache-sets = <2048>;
-		};
-
-		l3c1: l3-cache1 {
-			cache-size = <2097152>;
-			cache-line-size = <64>;
-			cache-sets = <2048>;
-		};
-
-		l3c2: l3-cache2 {
-			cache-size = <2097152>;
-			cache-line-size = <64>;
-			cache-sets = <2048>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		cpu1_1: cpu@10100 {
@@ -3726,12 +3017,6 @@
 			cache-line-size = <64>;
 			cache-sets = <2048>;
 		};
-	};
-
-	pmu {
-		compatible = "arm,cortex-a78-pmu";
-		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_HIGH>;
-		status = "okay";
 	};
 
 	pmu {

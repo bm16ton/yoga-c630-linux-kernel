@@ -61,10 +61,7 @@ struct perf_guest_info_callbacks {
 #include <linux/refcount.h>
 #include <linux/security.h>
 #include <linux/static_call.h>
-<<<<<<< HEAD
 #include <linux/lockdep.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/local.h>
 
 struct perf_callchain_entry {
@@ -142,17 +139,11 @@ struct hw_perf_event_extra {
  * PERF_EVENT_FLAG_ARCH bits are reserved for architecture-specific
  * usage.
  */
-<<<<<<< HEAD
 #define PERF_EVENT_FLAG_ARCH			0x000fffff
 #define PERF_EVENT_FLAG_USER_READ_CNT		0x80000000
 
 static_assert((PERF_EVENT_FLAG_USER_READ_CNT & PERF_EVENT_FLAG_ARCH) == 0);
 
-=======
-#define PERF_EVENT_FLAG_ARCH			0x0000ffff
-#define PERF_EVENT_FLAG_USER_READ_CNT		0x80000000
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * struct hw_perf_event - performance event hardware details:
  */
@@ -1124,22 +1115,6 @@ static inline void perf_clear_branch_entry_bitfields(struct perf_branch_entry *b
 	br->reserved = 0;
 }
 
-/*
- * Clear all bitfields in the perf_branch_entry.
- * The to and from fields are not cleared because they are
- * systematically modified by caller.
- */
-static inline void perf_clear_branch_entry_bitfields(struct perf_branch_entry *br)
-{
-	br->mispred = 0;
-	br->predicted = 0;
-	br->in_tx = 0;
-	br->abort = 0;
-	br->cycles = 0;
-	br->type = 0;
-	br->reserved = 0;
-}
-
 extern void perf_output_sample(struct perf_output_handle *handle,
 			       struct perf_event_header *header,
 			       struct perf_sample_data *data,
@@ -1743,7 +1718,6 @@ static inline void perf_lopwr_cb(bool mode)
 }
 #endif
 
-<<<<<<< HEAD
 #ifdef CONFIG_PERF_EVENTS
 static inline bool branch_sample_no_flags(const struct perf_event *event)
 {
@@ -1770,6 +1744,4 @@ static inline bool branch_sample_priv(const struct perf_event *event)
 	return event->attr.branch_sample_type & PERF_SAMPLE_BRANCH_PRIV_SAVE;
 }
 #endif /* CONFIG_PERF_EVENTS */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _LINUX_PERF_EVENT_H */

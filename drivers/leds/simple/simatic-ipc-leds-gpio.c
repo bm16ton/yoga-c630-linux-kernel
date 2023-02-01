@@ -13,7 +13,6 @@
 #include <linux/leds.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
-<<<<<<< HEAD
 #include <linux/platform_data/x86/simatic-ipc-base.h>
 
 static struct gpiod_lookup_table *simatic_ipc_led_gpio_table;
@@ -27,24 +26,11 @@ static struct gpiod_lookup_table simatic_ipc_led_gpio_table_127e = {
 		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 58, NULL, 3, GPIO_ACTIVE_LOW),
 		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 60, NULL, 4, GPIO_ACTIVE_LOW),
 		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 51, NULL, 5, GPIO_ACTIVE_LOW),
-=======
-
-static struct gpiod_lookup_table simatic_ipc_led_gpio_table = {
-	.dev_id = "leds-gpio",
-	.table = {
-		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 51, NULL, 0, GPIO_ACTIVE_LOW),
-		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 52, NULL, 1, GPIO_ACTIVE_LOW),
-		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 53, NULL, 2, GPIO_ACTIVE_LOW),
-		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 57, NULL, 3, GPIO_ACTIVE_LOW),
-		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 58, NULL, 4, GPIO_ACTIVE_LOW),
-		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 60, NULL, 5, GPIO_ACTIVE_LOW),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 56, NULL, 6, GPIO_ACTIVE_LOW),
 		GPIO_LOOKUP_IDX("apollolake-pinctrl.0", 59, NULL, 7, GPIO_ACTIVE_HIGH),
 	},
 };
 
-<<<<<<< HEAD
 static struct gpiod_lookup_table simatic_ipc_led_gpio_table_227g = {
 	.dev_id = "leds-gpio",
 	.table = {
@@ -60,19 +46,12 @@ static struct gpiod_lookup_table simatic_ipc_led_gpio_table_227g = {
 };
 
 static const struct gpio_led simatic_ipc_gpio_leds[] = {
-=======
-static const struct gpio_led simatic_ipc_gpio_leds[] = {
-	{ .name = "green:" LED_FUNCTION_STATUS "-3" },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ .name = "red:" LED_FUNCTION_STATUS "-1" },
 	{ .name = "green:" LED_FUNCTION_STATUS "-1" },
 	{ .name = "red:" LED_FUNCTION_STATUS "-2" },
 	{ .name = "green:" LED_FUNCTION_STATUS "-2" },
 	{ .name = "red:" LED_FUNCTION_STATUS "-3" },
-<<<<<<< HEAD
 	{ .name = "green:" LED_FUNCTION_STATUS "-3" },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct gpio_led_platform_data simatic_ipc_gpio_leds_pdata = {
@@ -84,11 +63,7 @@ static struct platform_device *simatic_leds_pdev;
 
 static int simatic_ipc_leds_gpio_remove(struct platform_device *pdev)
 {
-<<<<<<< HEAD
 	gpiod_remove_lookup_table(simatic_ipc_led_gpio_table);
-=======
-	gpiod_remove_lookup_table(&simatic_ipc_led_gpio_table);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	platform_device_unregister(simatic_leds_pdev);
 
 	return 0;
@@ -96,7 +71,6 @@ static int simatic_ipc_leds_gpio_remove(struct platform_device *pdev)
 
 static int simatic_ipc_leds_gpio_probe(struct platform_device *pdev)
 {
-<<<<<<< HEAD
 	const struct simatic_ipc_platform *plat = pdev->dev.platform_data;
 	struct gpio_desc *gpiod;
 	int err;
@@ -116,12 +90,6 @@ static int simatic_ipc_leds_gpio_probe(struct platform_device *pdev)
 	}
 
 	gpiod_add_lookup_table(simatic_ipc_led_gpio_table);
-=======
-	struct gpio_desc *gpiod;
-	int err;
-
-	gpiod_add_lookup_table(&simatic_ipc_led_gpio_table);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	simatic_leds_pdev = platform_device_register_resndata(NULL,
 		"leds-gpio", PLATFORM_DEVID_NONE, NULL, 0,
 		&simatic_ipc_gpio_leds_pdata,

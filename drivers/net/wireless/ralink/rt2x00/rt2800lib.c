@@ -4431,7 +4431,6 @@ static void rt2800_config_channel(struct rt2x00_dev *rt2x00dev,
 
 		if (rt2x00_rt(rt2x00dev, RT5592))
 			rt2800_iq_calibrate(rt2x00dev, rf->channel);
-<<<<<<< HEAD
 	}
 
 	if (rt2x00_rt(rt2x00dev, RT6352)) {
@@ -4469,8 +4468,6 @@ static void rt2800_config_channel(struct rt2x00_dev *rt2x00dev,
 			rt2800_register_write(rt2x00dev, TX1_RF_GAIN_ATTEN,
 					      0x6C6C6B6C);
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	bbp = rt2800_bbp_read(rt2x00dev, 4);

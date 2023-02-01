@@ -143,7 +143,6 @@ struct mdev_state {
 	int nr_ports;
 };
 
-<<<<<<< HEAD
 static struct mtty_type {
 	struct mdev_type type;
 	int nr_ports;
@@ -159,8 +158,6 @@ static struct mdev_type *mtty_mdev_types[] = {
 	&mtty_types[1].type,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static atomic_t mdev_avail_ports = ATOMIC_INIT(MAX_MTTYS);
 
 static const struct file_operations vd_fops = {
@@ -720,7 +717,6 @@ accessfailed:
 	return ret;
 }
 
-<<<<<<< HEAD
 static int mtty_init_dev(struct vfio_device *vdev)
 {
 	struct mdev_state *mdev_state =
@@ -728,36 +724,15 @@ static int mtty_init_dev(struct vfio_device *vdev)
 	struct mdev_device *mdev = to_mdev_device(vdev->dev);
 	struct mtty_type *type =
 		container_of(mdev->type, struct mtty_type, type);
-=======
-static int mtty_probe(struct mdev_device *mdev)
-{
-	struct mdev_state *mdev_state;
-	int nr_ports = mdev_get_type_group_id(mdev) + 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int avail_ports = atomic_read(&mdev_avail_ports);
 	int ret;
 
 	do {
-<<<<<<< HEAD
 		if (avail_ports < type->nr_ports)
 			return -ENOSPC;
 	} while (!atomic_try_cmpxchg(&mdev_avail_ports,
 				     &avail_ports,
 				     avail_ports - type->nr_ports));
-=======
-		if (avail_ports < nr_ports)
-			return -ENOSPC;
-	} while (!atomic_try_cmpxchg(&mdev_avail_ports,
-				     &avail_ports, avail_ports - nr_ports));
-
-	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
-	if (mdev_state == NULL) {
-		ret = -ENOMEM;
-		goto err_nr_ports;
-	}
-
-	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mtty_dev_ops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mdev_state->nr_ports = type->nr_ports;
 	mdev_state->irq_index = -1;
@@ -765,21 +740,14 @@ static int mtty_probe(struct mdev_device *mdev)
 	mdev_state->s[1].max_fifo_size = MAX_FIFO_SIZE;
 	mutex_init(&mdev_state->rxtx_lock);
 
-<<<<<<< HEAD
 	mdev_state->vconfig = kzalloc(MTTY_CONFIG_SPACE_SIZE, GFP_KERNEL);
 	if (!mdev_state->vconfig) {
 		ret = -ENOMEM;
 		goto err_nr_ports;
-=======
-	if (mdev_state->vconfig == NULL) {
-		ret = -ENOMEM;
-		goto err_state;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	mutex_init(&mdev_state->ops_lock);
 	mdev_state->mdev = mdev;
-<<<<<<< HEAD
 	mtty_create_config_space(mdev_state);
 	return 0;
 
@@ -827,40 +795,6 @@ static void mtty_remove(struct mdev_device *mdev)
 	vfio_put_device(&mdev_state->vdev);
 }
 
-=======
-
-	mtty_create_config_space(mdev_state);
-
-	ret = vfio_register_emulated_iommu_dev(&mdev_state->vdev);
-	if (ret)
-		goto err_vconfig;
-	dev_set_drvdata(&mdev->dev, mdev_state);
-	return 0;
-
-err_vconfig:
-	kfree(mdev_state->vconfig);
-err_state:
-	vfio_uninit_group_dev(&mdev_state->vdev);
-	kfree(mdev_state);
-err_nr_ports:
-	atomic_add(nr_ports, &mdev_avail_ports);
-	return ret;
-}
-
-static void mtty_remove(struct mdev_device *mdev)
-{
-	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
-	int nr_ports = mdev_state->nr_ports;
-
-	vfio_unregister_group_dev(&mdev_state->vdev);
-
-	kfree(mdev_state->vconfig);
-	vfio_uninit_group_dev(&mdev_state->vdev);
-	kfree(mdev_state);
-	atomic_add(nr_ports, &mdev_avail_ports);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int mtty_reset(struct mdev_state *mdev_state)
 {
 	pr_info("%s: called\n", __func__);
@@ -1322,7 +1256,6 @@ static const struct attribute_group *mdev_dev_groups[] = {
 	NULL,
 };
 
-<<<<<<< HEAD
 static unsigned int mtty_get_available(struct mdev_type *mtype)
 {
 	struct mtty_type *type = container_of(mtype, struct mtty_type, type);
@@ -1341,70 +1274,6 @@ static const struct vfio_device_ops mtty_dev_ops = {
 
 static struct mdev_driver mtty_driver = {
 	.device_api = VFIO_DEVICE_API_PCI_STRING,
-=======
-static ssize_t name_show(struct mdev_type *mtype,
-			 struct mdev_type_attribute *attr, char *buf)
-{
-	static const char *name_str[2] = { "Single port serial",
-					   "Dual port serial" };
-
-	return sysfs_emit(buf, "%s\n",
-			  name_str[mtype_get_type_group_id(mtype)]);
-}
-
-static MDEV_TYPE_ATTR_RO(name);
-
-static ssize_t available_instances_show(struct mdev_type *mtype,
-					struct mdev_type_attribute *attr,
-					char *buf)
-{
-	unsigned int ports = mtype_get_type_group_id(mtype) + 1;
-
-	return sprintf(buf, "%d\n", atomic_read(&mdev_avail_ports) / ports);
-}
-
-static MDEV_TYPE_ATTR_RO(available_instances);
-
-static ssize_t device_api_show(struct mdev_type *mtype,
-			       struct mdev_type_attribute *attr, char *buf)
-{
-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_PCI_STRING);
-}
-
-static MDEV_TYPE_ATTR_RO(device_api);
-
-static struct attribute *mdev_types_attrs[] = {
-	&mdev_type_attr_name.attr,
-	&mdev_type_attr_device_api.attr,
-	&mdev_type_attr_available_instances.attr,
-	NULL,
-};
-
-static struct attribute_group mdev_type_group1 = {
-	.name  = "1",
-	.attrs = mdev_types_attrs,
-};
-
-static struct attribute_group mdev_type_group2 = {
-	.name  = "2",
-	.attrs = mdev_types_attrs,
-};
-
-static struct attribute_group *mdev_type_groups[] = {
-	&mdev_type_group1,
-	&mdev_type_group2,
-	NULL,
-};
-
-static const struct vfio_device_ops mtty_dev_ops = {
-	.name = "vfio-mtty",
-	.read = mtty_read,
-	.write = mtty_write,
-	.ioctl = mtty_ioctl,
-};
-
-static struct mdev_driver mtty_driver = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.driver = {
 		.name = "mtty",
 		.owner = THIS_MODULE,
@@ -1413,11 +1282,7 @@ static struct mdev_driver mtty_driver = {
 	},
 	.probe = mtty_probe,
 	.remove	= mtty_remove,
-<<<<<<< HEAD
 	.get_available = mtty_get_available,
-=======
-	.supported_type_groups = mdev_type_groups,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void mtty_device_release(struct device *dev)
@@ -1468,13 +1333,9 @@ static int __init mtty_dev_init(void)
 	if (ret)
 		goto err_class;
 
-<<<<<<< HEAD
 	ret = mdev_register_parent(&mtty_dev.parent, &mtty_dev.dev,
 				   &mtty_driver, mtty_mdev_types,
 				   ARRAY_SIZE(mtty_mdev_types));
-=======
-	ret = mdev_register_device(&mtty_dev.dev, &mtty_driver);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto err_device;
 	return 0;

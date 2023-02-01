@@ -1211,17 +1211,7 @@ struct buffer_head *udf_bread(struct inode *inode, udf_pblk_t block,
 	if (!bh)
 		return NULL;
 
-<<<<<<< HEAD
 	if (bh_read(bh, 0) >= 0)
-=======
-	if (buffer_uptodate(bh))
-		return bh;
-
-	ll_rw_block(REQ_OP_READ, 1, &bh);
-
-	wait_on_buffer(bh);
-	if (buffer_uptodate(bh))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return bh;
 
 	brelse(bh);

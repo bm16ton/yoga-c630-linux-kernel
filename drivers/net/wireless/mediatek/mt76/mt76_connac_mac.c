@@ -490,13 +490,10 @@ void mt76_connac2_mac_write_txwi(struct mt76_dev *dev, __le32 *txwi,
 		p_fmt = mt76_is_mmio(dev) ? MT_TX_TYPE_CT : MT_TX_TYPE_SF;
 		q_idx = wmm_idx * MT76_CONNAC_MAX_WMM_SETS +
 			mt76_connac_lmac_mapping(skb_get_queue_mapping(skb));
-<<<<<<< HEAD
 
 		/* counting non-offloading skbs */
 		wcid->stats.tx_bytes += skb->len;
 		wcid->stats.tx_packets++;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	val = FIELD_PREP(MT_TXD0_TX_BYTES, skb->len + sz_txd) |
@@ -557,7 +554,6 @@ void mt76_connac2_mac_write_txwi(struct mt76_dev *dev, __le32 *txwi,
 }
 EXPORT_SYMBOL_GPL(mt76_connac2_mac_write_txwi);
 
-<<<<<<< HEAD
 bool mt76_connac2_mac_fill_txs(struct mt76_dev *dev, struct mt76_wcid *wcid,
 			       __le32 *txs_data)
 {
@@ -581,37 +577,6 @@ bool mt76_connac2_mac_fill_txs(struct mt76_dev *dev, struct mt76_wcid *wcid,
 		stats->tx_retries +=
 			le32_get_bits(txs_data[7], MT_TXS7_MPDU_RETRY_CNT);
 	}
-=======
-bool mt76_connac2_mac_add_txs_skb(struct mt76_dev *dev, struct mt76_wcid *wcid,
-				  int pid, __le32 *txs_data,
-				  struct mt76_sta_stats *stats)
-{
-	struct ieee80211_supported_band *sband;
-	struct mt76_phy *mphy;
-	struct ieee80211_tx_info *info;
-	struct sk_buff_head list;
-	struct rate_info rate = {};
-	struct sk_buff *skb;
-	bool cck = false;
-	u32 txrate, txs, mode;
-
-	mt76_tx_status_lock(dev, &list);
-	skb = mt76_tx_status_skb_get(dev, wcid, pid, &list);
-	if (!skb)
-		goto out;
-
-	txs = le32_to_cpu(txs_data[0]);
-
-	info = IEEE80211_SKB_CB(skb);
-	if (!(txs & MT_TXS0_ACK_ERROR_MASK))
-		info->flags |= IEEE80211_TX_STAT_ACK;
-
-	info->status.ampdu_len = 1;
-	info->status.ampdu_ack_len = !!(info->flags &
-					IEEE80211_TX_STAT_ACK);
-
-	info->status.rates[0].idx = -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	txrate = FIELD_GET(MT_TXS0_TX_RATE, txs);
 
@@ -646,11 +611,7 @@ bool mt76_connac2_mac_add_txs_skb(struct mt76_dev *dev, struct mt76_wcid *wcid,
 	case MT_PHY_TYPE_HT:
 	case MT_PHY_TYPE_HT_GF:
 		if (rate.mcs > 31)
-<<<<<<< HEAD
 			return false;
-=======
-			goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		rate.flags = RATE_INFO_FLAGS_MCS;
 		if (wcid->rate.flags & RATE_INFO_FLAGS_SHORT_GI)
@@ -658,11 +619,7 @@ bool mt76_connac2_mac_add_txs_skb(struct mt76_dev *dev, struct mt76_wcid *wcid,
 		break;
 	case MT_PHY_TYPE_VHT:
 		if (rate.mcs > 9)
-<<<<<<< HEAD
 			return false;
-=======
-			goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		rate.flags = RATE_INFO_FLAGS_VHT_MCS;
 		break;
@@ -671,22 +628,14 @@ bool mt76_connac2_mac_add_txs_skb(struct mt76_dev *dev, struct mt76_wcid *wcid,
 	case MT_PHY_TYPE_HE_TB:
 	case MT_PHY_TYPE_HE_MU:
 		if (rate.mcs > 11)
-<<<<<<< HEAD
 			return false;
-=======
-			goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		rate.he_gi = wcid->rate.he_gi;
 		rate.he_dcm = FIELD_GET(MT_TX_RATE_DCM, txrate);
 		rate.flags = RATE_INFO_FLAGS_HE_MCS;
 		break;
 	default:
-<<<<<<< HEAD
 		return false;
-=======
-		goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	stats->tx_mode[mode]++;
@@ -711,7 +660,6 @@ bool mt76_connac2_mac_add_txs_skb(struct mt76_dev *dev, struct mt76_wcid *wcid,
 	}
 	wcid->rate = rate;
 
-<<<<<<< HEAD
 	return true;
 }
 EXPORT_SYMBOL_GPL(mt76_connac2_mac_fill_txs);
@@ -740,12 +688,6 @@ bool mt76_connac2_mac_add_txs_skb(struct mt76_dev *dev, struct mt76_wcid *wcid,
 		mt76_connac2_mac_fill_txs(dev, wcid, txs_data);
 		mt76_tx_status_skb_done(dev, skb, &list);
 	}
-=======
-out:
-	if (skb)
-		mt76_tx_status_skb_done(dev, skb, &list);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mt76_tx_status_unlock(dev, &list);
 
 	return !!skb;

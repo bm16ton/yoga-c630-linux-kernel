@@ -771,13 +771,7 @@ nfp_net_napi_add(struct nfp_net_dp *dp, struct nfp_net_r_vector *r_vec, int idx)
 {
 	if (dp->netdev)
 		netif_napi_add(dp->netdev, &r_vec->napi,
-<<<<<<< HEAD
 			       nfp_net_has_xsk_pool_slow(dp, idx) ? dp->ops->xsk_poll : dp->ops->poll);
-=======
-			       nfp_net_has_xsk_pool_slow(dp, idx) ?
-			       dp->ops->xsk_poll : dp->ops->poll,
-			       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		tasklet_enable(&r_vec->tasklet);
 }

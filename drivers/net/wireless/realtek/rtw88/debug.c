@@ -623,19 +623,12 @@ static int rtw_debugfs_get_tx_pwr_tbl(struct seq_file *m, void *v)
 	struct rtw_hal *hal = &rtwdev->hal;
 	u8 path, rate, bw, ch, regd;
 	struct rtw_power_params pwr_param = {0};
-<<<<<<< HEAD
 
 	mutex_lock(&rtwdev->mutex);
 	bw = hal->current_band_width;
 	ch = hal->current_channel;
 	regd = rtw_regd_get(rtwdev);
 
-=======
-	u8 bw = hal->current_band_width;
-	u8 ch = hal->current_channel;
-	u8 regd = rtw_regd_get(rtwdev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	seq_printf(m, "channel: %u\n", ch);
 	seq_printf(m, "bandwidth: %u\n", bw);
 	seq_printf(m, "regulatory: %s\n", rtw_get_regd_string(regd));

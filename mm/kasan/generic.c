@@ -328,7 +328,6 @@ DEFINE_ASAN_SET_SHADOW(f3);
 DEFINE_ASAN_SET_SHADOW(f5);
 DEFINE_ASAN_SET_SHADOW(f8);
 
-<<<<<<< HEAD
 /* Only allow cache merging when no per-object metadata is present. */
 slab_flags_t kasan_never_merge(void)
 {
@@ -464,10 +463,6 @@ size_t kasan_metadata_size(struct kmem_cache *cache)
 
 static void __kasan_record_aux_stack(void *addr, bool can_alloc)
 {
-=======
-static void __kasan_record_aux_stack(void *addr, bool can_alloc)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct slab *slab = kasan_addr_to_slab(addr);
 	struct kmem_cache *cache;
 	struct kasan_alloc_meta *alloc_meta;
@@ -484,19 +479,6 @@ static void __kasan_record_aux_stack(void *addr, bool can_alloc)
 
 	alloc_meta->aux_stack[1] = alloc_meta->aux_stack[0];
 	alloc_meta->aux_stack[0] = kasan_save_stack(GFP_NOWAIT, can_alloc);
-<<<<<<< HEAD
-=======
-}
-
-void kasan_record_aux_stack(void *addr)
-{
-	return __kasan_record_aux_stack(addr, true);
-}
-
-void kasan_record_aux_stack_noalloc(void *addr)
-{
-	return __kasan_record_aux_stack(addr, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void kasan_record_aux_stack(void *addr)
@@ -529,16 +511,4 @@ void kasan_save_free_info(struct kmem_cache *cache, void *object)
 	kasan_set_track(&free_meta->free_track, GFP_NOWAIT);
 	/* The object was freed and has free track set. */
 	*(u8 *)kasan_mem_to_shadow(object) = KASAN_SLAB_FREETRACK;
-<<<<<<< HEAD
-=======
-}
-
-struct kasan_track *kasan_get_free_track(struct kmem_cache *cache,
-				void *object, u8 tag)
-{
-	if (*(u8 *)kasan_mem_to_shadow(object) != KASAN_SLAB_FREETRACK)
-		return NULL;
-	/* Free meta must be present with KASAN_SLAB_FREETRACK. */
-	return &kasan_get_free_meta(cache, object)->free_track;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

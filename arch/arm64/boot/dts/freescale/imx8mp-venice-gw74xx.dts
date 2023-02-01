@@ -8,10 +8,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/linux-event-codes.h>
 #include <dt-bindings/leds/common.h>
-<<<<<<< HEAD
 #include <dt-bindings/phy/phy-imx8-pcie.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "imx8mp.dtsi"
 
@@ -104,15 +101,12 @@
 		};
 	};
 
-<<<<<<< HEAD
 	pcie0_refclk: pcie0-refclk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <100000000>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pps {
 		compatible = "pps-gpio";
 		pinctrl-names = "default";
@@ -136,12 +130,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_can>;
 		regulator-name = "can2_stby";
-<<<<<<< HEAD
 		gpio = <&gpio3 19 GPIO_ACTIVE_LOW>;
-=======
-		gpio = <&gpio3 19 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
@@ -152,7 +141,6 @@
 		compatible = "regulator-fixed";
 		regulator-name = "wl";
 		gpio = <&gpio3 9 GPIO_ACTIVE_HIGH>;
-<<<<<<< HEAD
 		startup-delay-us = <70000>;
 		enable-active-high;
 		regulator-min-microvolt = <3300000>;
@@ -176,15 +164,6 @@
 	cpu-supply = <&reg_arm>;
 };
 
-=======
-		startup-delay-us = <100>;
-		enable-active-high;
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-	};
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* off-board header */
 &ecspi2 {
 	pinctrl-names = "default";
@@ -243,13 +222,8 @@
 &gpio2 {
 	gpio-line-names =
 		"", "", "", "", "", "", "", "",
-<<<<<<< HEAD
 		"", "", "", "", "", "", "pcie3_wdis#", "",
 		"", "", "pcie2_wdis#", "", "", "", "", "",
-=======
-		"", "", "", "", "", "", "", "",
-		"pcie3_wdis#", "", "", "pcie1_wdis@", "pcie2_wdis#", "", "", "",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		"", "", "", "", "", "", "", "";
 };
 
@@ -410,11 +384,7 @@
 				regulator-ramp-delay = <3125>;
 			};
 
-<<<<<<< HEAD
 			reg_arm: BUCK2 {
-=======
-			BUCK2 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				regulator-name = "BUCK2";
 				regulator-min-microvolt = <720000>;
 				regulator-max-microvolt = <1025000>;
@@ -536,60 +506,40 @@
 			lan1: port@0 {
 				reg = <0>;
 				label = "lan1";
-<<<<<<< HEAD
 				phy-mode = "internal";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				local-mac-address = [00 00 00 00 00 00];
 			};
 
 			lan2: port@1 {
 				reg = <1>;
 				label = "lan2";
-<<<<<<< HEAD
 				phy-mode = "internal";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				local-mac-address = [00 00 00 00 00 00];
 			};
 
 			lan3: port@2 {
 				reg = <2>;
 				label = "lan3";
-<<<<<<< HEAD
 				phy-mode = "internal";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				local-mac-address = [00 00 00 00 00 00];
 			};
 
 			lan4: port@3 {
 				reg = <3>;
 				label = "lan4";
-<<<<<<< HEAD
 				phy-mode = "internal";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				local-mac-address = [00 00 00 00 00 00];
 			};
 
 			lan5: port@4 {
 				reg = <4>;
 				label = "lan5";
-<<<<<<< HEAD
 				phy-mode = "internal";
 				local-mac-address = [00 00 00 00 00 00];
 			};
 
 			port@5 {
 				reg = <5>;
-=======
-				local-mac-address = [00 00 00 00 00 00];
-			};
-
-			port@6 {
-				reg = <6>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				label = "cpu";
 				ethernet = <&fec>;
 				phy-mode = "rgmii-id";
@@ -619,7 +569,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &pcie_phy {
 	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
 	fsl,clkreq-unsupported;
@@ -642,8 +591,6 @@
 	status = "okay";
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* GPS / off-board header */
 &uart1 {
 	pinctrl-names = "default";
@@ -658,7 +605,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 /* bluetooth HCI */
 &uart3 {
 	pinctrl-names = "default";
@@ -674,8 +620,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &uart4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4>;
@@ -683,7 +627,6 @@
 };
 
 /* USB1 - Type C front panel */
-<<<<<<< HEAD
 &usb3_0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb1>;
@@ -692,21 +635,10 @@
 };
 
 &usb3_phy0 {
-=======
-&usb3_phy0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_usb1>;
-	status = "okay";
-};
-
-&usb3_0 {
-	fsl,over-current-active-low;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = "okay";
 };
 
 &usb_dwc3_0 {
-<<<<<<< HEAD
 	/* dual role is implemented but not a full featured OTG */
 	adp-disable;
 	hnp-disable;
@@ -724,10 +656,6 @@
 		label = "Type-C";
 		id-gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
 	};
-=======
-	dr_mode = "host";
-	status = "okay";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* USB2 - USB3.0 Hub */
@@ -747,7 +675,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 /* SDIO WiFi */
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
@@ -767,8 +694,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* eMMC */
 &usdhc3 {
 	assigned-clocks = <&clk IMX8MP_CLK_USDHC3>;
@@ -798,10 +723,6 @@
 			MX8MP_IOMUXC_GPIO1_IO09__GPIO1_IO09	0x40000040 /* DIO0 */
 			MX8MP_IOMUXC_GPIO1_IO11__GPIO1_IO11	0x40000040 /* DIO1 */
 			MX8MP_IOMUXC_NAND_DQS__GPIO3_IO14	0x40000040 /* M2SKT_OFF# */
-<<<<<<< HEAD
-=======
-			MX8MP_IOMUXC_SD2_DATA2__GPIO2_IO17	0x40000150 /* PCIE1_WDIS# */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			MX8MP_IOMUXC_SD2_DATA3__GPIO2_IO18	0x40000150 /* PCIE2_WDIS# */
 			MX8MP_IOMUXC_SD2_CMD__GPIO2_IO14	0x40000150 /* PCIE3_WDIS# */
 			MX8MP_IOMUXC_NAND_DATA00__GPIO3_IO06	0x40000040 /* M2SKT_RST# */
@@ -914,15 +835,12 @@
 		>;
 	};
 
-<<<<<<< HEAD
 	pinctrl_pcie0: pciegrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD2_DATA2__GPIO2_IO17	0x110
 		>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pinctrl_pmic: pmicgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_NAND_DATA01__GPIO3_IO07	0x140
@@ -1010,16 +928,12 @@
 	pinctrl_usb1: usb1grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO13__USB1_OTG_OC	0x140
-<<<<<<< HEAD
 		>;
 	};
 
 	pinctrl_usbcon1: usb1congrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10	0x140
-=======
-			MX8MP_IOMUXC_GPIO1_IO10__USB1_OTG_ID	0x140
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		>;
 	};
 
@@ -1034,7 +948,6 @@
 		>;
 	};
 
-<<<<<<< HEAD
 	pinctrl_usdhc1_100mhz: usdhc1-100mhzgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD1_CLK__USDHC1_CLK	0x194
@@ -1057,8 +970,6 @@
 		>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pinctrl_usdhc3: usdhc3grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_NAND_WE_B__USDHC3_CLK	0x190

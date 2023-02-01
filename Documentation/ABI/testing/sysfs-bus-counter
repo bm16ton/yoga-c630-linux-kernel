@@ -209,7 +209,6 @@ Description:
 		both edges:
 			Any state transition.
 
-<<<<<<< HEAD
 What:		/sys/bus/counter/devices/counterX/countY/num_overflows
 KernelVersion:	6.1
 Contact:	linux-iio@vger.kernel.org
@@ -217,8 +216,6 @@ Description:
 		This attribute indicates the number of overflows of count Y.
 
 What:		/sys/bus/counter/devices/counterX/countY/capture_component_id
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 What:		/sys/bus/counter/devices/counterX/countY/ceiling_component_id
 What:		/sys/bus/counter/devices/counterX/countY/floor_component_id
 What:		/sys/bus/counter/devices/counterX/countY/count_mode_component_id
@@ -229,21 +226,14 @@ What:		/sys/bus/counter/devices/counterX/countY/prescaler_component_id
 What:		/sys/bus/counter/devices/counterX/countY/preset_component_id
 What:		/sys/bus/counter/devices/counterX/countY/preset_enable_component_id
 What:		/sys/bus/counter/devices/counterX/countY/signalZ_action_component_id
-<<<<<<< HEAD
 What:		/sys/bus/counter/devices/counterX/countY/num_overflows_component_id
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 What:		/sys/bus/counter/devices/counterX/signalY/cable_fault_component_id
 What:		/sys/bus/counter/devices/counterX/signalY/cable_fault_enable_component_id
 What:		/sys/bus/counter/devices/counterX/signalY/filter_clock_prescaler_component_id
 What:		/sys/bus/counter/devices/counterX/signalY/index_polarity_component_id
-<<<<<<< HEAD
 What:		/sys/bus/counter/devices/counterX/signalY/polarity_component_id
 What:		/sys/bus/counter/devices/counterX/signalY/synchronous_mode_component_id
 What:		/sys/bus/counter/devices/counterX/signalY/frequency_component_id
-=======
-What:		/sys/bus/counter/devices/counterX/signalY/synchronous_mode_component_id
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 KernelVersion:	5.16
 Contact:	linux-iio@vger.kernel.org
 Description:
@@ -328,7 +318,6 @@ Contact:	linux-iio@vger.kernel.org
 Description:
 		Discrete set of available values for the respective Signal Y
 		configuration are listed in this file.
-<<<<<<< HEAD
 
 What:		/sys/bus/counter/devices/counterX/signalY/polarity
 KernelVersion:	6.1
@@ -342,8 +331,6 @@ Description:
 
 		negative:
 			Signal low state considered active level (falling edge).
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 What:		/sys/bus/counter/devices/counterX/signalY/name
 KernelVersion:	5.2
@@ -387,12 +374,9 @@ Description:
 			via index_polarity. The index function (as enabled via
 			preset_enable) is performed synchronously with the
 			quadrature clock on the active level of the index input.
-<<<<<<< HEAD
 
 What:		/sys/bus/counter/devices/counterX/signalY/frequency
 KernelVersion:	6.1
 Contact:	linux-iio@vger.kernel.org
 Description:
 		Read-only attribute that indicates the signal Y frequency, in Hz.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

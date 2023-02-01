@@ -174,11 +174,7 @@ static void ptp_clock_release(struct device *dev)
 	mutex_destroy(&ptp->tsevq_mux);
 	mutex_destroy(&ptp->pincfg_mux);
 	mutex_destroy(&ptp->n_vclocks_mux);
-<<<<<<< HEAD
 	ida_free(&ptp_clocks_map, ptp->index);
-=======
-	ida_simple_remove(&ptp_clocks_map, ptp->index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(ptp);
 }
 
@@ -336,11 +332,7 @@ kworker_err:
 	mutex_destroy(&ptp->tsevq_mux);
 	mutex_destroy(&ptp->pincfg_mux);
 	mutex_destroy(&ptp->n_vclocks_mux);
-<<<<<<< HEAD
 	ida_free(&ptp_clocks_map, index);
-=======
-	ida_simple_remove(&ptp_clocks_map, index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 no_slot:
 	kfree(ptp);
 no_memory:

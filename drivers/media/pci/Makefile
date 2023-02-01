@@ -5,12 +5,7 @@
 
 # Please keep it alphabetically sorted by directory
 # (e. g. LC_ALL=C sort Makefile)
-<<<<<<< HEAD
 obj-y        +=	b2c2/		\
-=======
-obj-y        +=	ttpci/		\
-		b2c2/		\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pluto2/		\
 		dm1105/		\
 		pt1/		\
@@ -35,17 +30,10 @@ obj-$(CONFIG_VIDEO_CX25821) += cx25821/
 obj-$(CONFIG_VIDEO_CX88) += cx88/
 obj-$(CONFIG_VIDEO_DT3155) += dt3155/
 obj-$(CONFIG_VIDEO_IVTV) += ivtv/
-<<<<<<< HEAD
-=======
-obj-$(CONFIG_VIDEO_MEYE) += meye/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 obj-$(CONFIG_VIDEO_SAA7134) += saa7134/
 obj-$(CONFIG_VIDEO_SAA7164) += saa7164/
 obj-$(CONFIG_VIDEO_SOLO6X10) += solo6x10/
 obj-$(CONFIG_VIDEO_TW5864) += tw5864/
 obj-$(CONFIG_VIDEO_TW686X) += tw686x/
 obj-$(CONFIG_VIDEO_TW68) += tw68/
-<<<<<<< HEAD
 obj-$(CONFIG_VIDEO_ZORAN) += zoran/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

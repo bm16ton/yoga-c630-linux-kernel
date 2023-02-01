@@ -15,11 +15,7 @@
 #include <linux/uaccess.h>
 #include <linux/vfio.h>
 
-<<<<<<< HEAD
 #include "vfio_pci_priv.h"
-=======
-#include <linux/vfio_pci_core.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define OPREGION_SIGNATURE	"IntelGraphicsMem"
 #define OPREGION_SIZE		(8 * 1024)

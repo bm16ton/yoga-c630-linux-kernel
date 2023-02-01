@@ -216,14 +216,7 @@ static int inet_csk_bind_conflict(const struct sock *sk,
 				  const struct inet_bind2_bucket *tb2, /* may be null */
 				  bool relax, bool reuseport_ok)
 {
-<<<<<<< HEAD
 	bool reuseport_cb_ok;
-=======
-	struct sock *sk2;
-	bool reuseport_cb_ok;
-	bool reuse = sk->sk_reuse;
-	bool reuseport = !!sk->sk_reuseport;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sock_reuseport *reuseport_cb;
 	kuid_t uid = sock_i_uid((struct sock *)sk);
 
@@ -240,7 +233,6 @@ static int inet_csk_bind_conflict(const struct sock *sk,
 	 * to the same net - the one this bucket belongs to.
 	 */
 
-<<<<<<< HEAD
 	if (!inet_use_bhash2_on_bind(sk)) {
 		struct sock *sk2;
 
@@ -296,36 +288,6 @@ static bool inet_bhash2_addr_any_conflict(const struct sock *sk, int port, int l
 					reuseport_ok)) {
 		spin_unlock(&head2->lock);
 		return true;
-=======
-	sk_for_each_bound(sk2, &tb->owners) {
-		int bound_dev_if2;
-
-		if (sk == sk2)
-			continue;
-		bound_dev_if2 = READ_ONCE(sk2->sk_bound_dev_if);
-		if ((!sk->sk_bound_dev_if ||
-		     !bound_dev_if2 ||
-		     sk->sk_bound_dev_if == bound_dev_if2)) {
-			if (reuse && sk2->sk_reuse &&
-			    sk2->sk_state != TCP_LISTEN) {
-				if ((!relax ||
-				     (!reuseport_ok &&
-				      reuseport && sk2->sk_reuseport &&
-				      reuseport_cb_ok &&
-				      (sk2->sk_state == TCP_TIME_WAIT ||
-				       uid_eq(uid, sock_i_uid(sk2))))) &&
-				    inet_rcv_saddr_equal(sk, sk2, true))
-					break;
-			} else if (!reuseport_ok ||
-				   !reuseport || !sk2->sk_reuseport ||
-				   !reuseport_cb_ok ||
-				   (sk2->sk_state != TCP_TIME_WAIT &&
-				    !uid_eq(uid, sock_i_uid(sk2)))) {
-				if (inet_rcv_saddr_equal(sk, sk2, true))
-					break;
-			}
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	spin_unlock(&head2->lock);
@@ -1013,19 +975,11 @@ static void reqsk_timer_handler(struct timer_list *t)
 		nsk = reuseport_migrate_sock(sk_listener, req_to_sk(req), NULL);
 		if (!nsk)
 			goto drop;
-<<<<<<< HEAD
 
 		nreq = inet_reqsk_clone(req, nsk);
 		if (!nreq)
 			goto drop;
 
-=======
-
-		nreq = inet_reqsk_clone(req, nsk);
-		if (!nreq)
-			goto drop;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* The new timer for the cloned req can decrease the 2
 		 * by calling inet_csk_reqsk_queue_drop_and_put(), so
 		 * hold another count to prevent use-after-free and
@@ -1246,7 +1200,6 @@ void inet_csk_prepare_forced_close(struct sock *sk)
 }
 EXPORT_SYMBOL(inet_csk_prepare_forced_close);
 
-<<<<<<< HEAD
 static int inet_ulp_can_listen(const struct sock *sk)
 {
 	const struct inet_connection_sock *icsk = inet_csk(sk);
@@ -1257,8 +1210,6 @@ static int inet_ulp_can_listen(const struct sock *sk)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int inet_csk_listen_start(struct sock *sk)
 {
 	struct inet_connection_sock *icsk = inet_csk(sk);

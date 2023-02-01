@@ -88,16 +88,6 @@ static bool acpi_dev_has_children(struct acpi_device *adev)
 	return acpi_dev_for_each_child(adev, match_any, NULL) > 0;
 }
 
-static int match_any(struct acpi_device *adev, void *not_used)
-{
-	return 1;
-}
-
-static bool acpi_dev_has_children(struct acpi_device *adev)
-{
-	return acpi_dev_for_each_child(adev, match_any, NULL) > 0;
-}
-
 static int find_child_checks(struct acpi_device *adev, bool check_children)
 {
 	unsigned long long sta;
@@ -105,7 +95,6 @@ static int find_child_checks(struct acpi_device *adev, bool check_children)
 
 	if (check_children && !acpi_dev_has_children(adev))
 		return -ENODEV;
-<<<<<<< HEAD
 
 	status = acpi_evaluate_integer(adev->handle, "_STA", NULL, &sta);
 	if (status == AE_NOT_FOUND) {
@@ -120,13 +109,6 @@ static int find_child_checks(struct acpi_device *adev, bool check_children)
 		return FIND_CHILD_MIN_SCORE;
 	}
 
-=======
-
-	status = acpi_evaluate_integer(adev->handle, "_STA", NULL, &sta);
-	if (status == AE_NOT_FOUND)
-		return FIND_CHILD_MIN_SCORE;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ACPI_FAILURE(status) || !(sta & ACPI_STA_DEVICE_ENABLED))
 		return -ENODEV;
 

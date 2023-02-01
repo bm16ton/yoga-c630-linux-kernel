@@ -435,15 +435,6 @@
 	pinctrl-0 = <&spi1_pins_a>;
 	cs-gpios = <&gpioz 3 0>;
 	status = "disabled";
-<<<<<<< HEAD
-=======
-
-	spidev@0  {
-		compatible = "spidev";
-		reg = <0>;
-		spi-max-frequency = <100000>;
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &timers1 {

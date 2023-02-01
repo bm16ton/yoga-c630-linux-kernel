@@ -1069,13 +1069,8 @@ config SERIAL_TIMBERDALE
 config SERIAL_BCM63XX
 	tristate "Broadcom BCM63xx/BCM33xx UART support"
 	select SERIAL_CORE
-<<<<<<< HEAD
 	depends on ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
 	default ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC
-=======
-	depends on ARCH_BCM4908 || ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
-	default ARCH_BCM4908 || ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  This enables the driver for the onchip UART core found on
 	  the following chipsets:

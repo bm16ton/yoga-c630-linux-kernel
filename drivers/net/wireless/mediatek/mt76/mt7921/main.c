@@ -1046,11 +1046,7 @@ mt7921_ethtool_worker(void *wi_data, struct ieee80211_sta *sta)
 	if (msta->vif->mt76.idx != wi->idx)
 		return;
 
-<<<<<<< HEAD
 	mt76_ethtool_worker(wi, &msta->wcid.stats);
-=======
-	mt76_ethtool_worker(wi, &msta->stats);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static
@@ -1508,7 +1504,6 @@ static int mt7921_set_sar_specs(struct ieee80211_hw *hw,
 	int err;
 
 	mt7921_mutex_acquire(dev);
-<<<<<<< HEAD
 	err = mt7921_mcu_set_clc(dev, dev->mt76.alpha2,
 				 dev->country_ie_env);
 	if (err < 0)
@@ -1516,9 +1511,6 @@ static int mt7921_set_sar_specs(struct ieee80211_hw *hw,
 
 	err = mt7921_set_tx_sar_pwr(hw, sar);
 out:
-=======
-	err = mt7921_set_tx_sar_pwr(hw, sar);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mt7921_mutex_release(dev);
 
 	return err;

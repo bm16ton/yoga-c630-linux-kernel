@@ -1702,13 +1702,7 @@ static int read_super_block(struct super_block *s, int offset)
 /* after journal replay, reread all bitmap and super blocks */
 static int reread_meta_blocks(struct super_block *s)
 {
-<<<<<<< HEAD
 	if (bh_read(SB_BUFFER_WITH_SB(s), 0) < 0) {
-=======
-	ll_rw_block(REQ_OP_READ, 1, &SB_BUFFER_WITH_SB(s));
-	wait_on_buffer(SB_BUFFER_WITH_SB(s));
-	if (!buffer_uptodate(SB_BUFFER_WITH_SB(s))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		reiserfs_warning(s, "reiserfs-2504", "error reading the super");
 		return 1;
 	}

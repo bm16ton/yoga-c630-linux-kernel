@@ -799,7 +799,6 @@ struct pid_namespace *ipc_seq_pid_ns(struct seq_file *s)
  */
 static struct kern_ipc_perm *sysvipc_find_ipc(struct ipc_ids *ids, loff_t *pos)
 {
-<<<<<<< HEAD
 	int tmpidx;
 	struct kern_ipc_perm *ipc;
 
@@ -813,21 +812,6 @@ static struct kern_ipc_perm *sysvipc_find_ipc(struct ipc_ids *ids, loff_t *pos)
 
 		/* convert from idr index to position  -> "+1" */
 		*pos = tmpidx + 1;
-=======
-	struct kern_ipc_perm *ipc = NULL;
-	int max_idx = ipc_get_maxidx(ids);
-
-	if (max_idx == -1 || pos > max_idx)
-		goto out;
-
-	for (; pos <= max_idx; pos++) {
-		ipc = idr_find(&ids->ipcs_idr, pos);
-		if (ipc != NULL) {
-			rcu_read_lock();
-			ipc_lock_object(ipc);
-			break;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return ipc;
 }

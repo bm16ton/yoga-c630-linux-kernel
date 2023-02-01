@@ -43,7 +43,6 @@
 
 static DEFINE_RAW_SPINLOCK(native_tlbie_lock);
 
-<<<<<<< HEAD
 #ifdef CONFIG_LOCKDEP
 static struct lockdep_map hpte_lock_map =
 	STATIC_LOCKDEP_MAP_INIT("hpte_lock", &hpte_lock_map);
@@ -67,8 +66,6 @@ static void release_hpte_lock(void)
 }
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline unsigned long  ___tlbie(unsigned long vpn, int psize,
 						int apsize, int ssize)
 {

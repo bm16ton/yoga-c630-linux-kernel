@@ -20,12 +20,9 @@ properties:
       - qcom,apr-v2
       - qcom,gpr
 
-<<<<<<< HEAD
   power-domains:
     maxItems: 1
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   qcom,apr-domain:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2, 3, 4, 5, 6, 7]
@@ -58,7 +55,6 @@ properties:
         2 = Audio DSP Domain
         3 = Application Processor Domain
 
-<<<<<<< HEAD
   qcom,glink-channels:
     $ref: /schemas/types.yaml#/definitions/string-array
     description: Channel name used for the communication
@@ -79,8 +75,6 @@ properties:
     items:
       - const: apr_audio_svc
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#address-cells':
     const: 1
 
@@ -126,7 +120,6 @@ patternProperties:
             3 = AMDB Service.
             4 = Voice processing manager.
 
-<<<<<<< HEAD
       clock-controller:
         $ref: /schemas/sound/qcom,q6dsp-lpass-clocks.yaml#
         description: Qualcomm DSP LPASS clock controller
@@ -147,8 +140,6 @@ patternProperties:
         unevaluatedProperties: false
         description: Qualcomm DSP LPASS audio routing
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       qcom,protection-domain:
         $ref: /schemas/types.yaml#/definitions/string-array
         description: protection domain service name and path for apr service
@@ -159,7 +150,6 @@ patternProperties:
           "tms/servreg", "msm/modem/wlan_pd".
           "tms/servreg", "msm/slpi/sensor_pd".
 
-<<<<<<< HEAD
     allOf:
       - if:
           properties:
@@ -198,19 +188,6 @@ patternProperties:
               properties:
                 compatible:
                   const: qcom,q6asm-dais
-=======
-      '#address-cells':
-        const: 1
-
-      '#size-cells':
-        const: 0
-
-    patternProperties:
-      "^.*@[0-9a-f]+$":
-        type: object
-        description:
-          Service based devices like clock controllers or digital audio interfaces.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     additionalProperties: false
 
@@ -218,7 +195,6 @@ required:
   - compatible
   - qcom,domain
 
-<<<<<<< HEAD
 allOf:
   - if:
       properties:
@@ -243,8 +219,6 @@ allOf:
       properties:
         qcom,glink-channels: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 additionalProperties: false
 
 examples:

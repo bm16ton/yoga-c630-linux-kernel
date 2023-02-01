@@ -10,7 +10,6 @@
 #include <linux/printk.h>
 #include <../selftests/kselftest.h>
 
-<<<<<<< HEAD
 #define MEM_SIZE		SZ_16K
 #define NUMA_NODES		8
 
@@ -20,20 +19,13 @@ enum test_flags {
 	/* Perform raw allocations (no zeroing of memory). */
 	TEST_F_RAW = 0x1,
 };
-=======
-#define MEM_SIZE SZ_16K
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * ASSERT_EQ():
  * Check the condition
  * @_expected == @_seen
-<<<<<<< HEAD
  * If false, print failed test message (if running with --verbose) and then
  * assert.
-=======
- * If false, print failed test message (if in VERBOSE mode) and then assert
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #define ASSERT_EQ(_expected, _seen) do { \
 	if ((_expected) != (_seen)) \
@@ -45,12 +37,8 @@ enum test_flags {
  * ASSERT_NE():
  * Check the condition
  * @_expected != @_seen
-<<<<<<< HEAD
  * If false, print failed test message (if running with --verbose) and then
  * assert.
-=======
- * If false, print failed test message (if in VERBOSE mode) and then assert
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #define ASSERT_NE(_expected, _seen) do { \
 	if ((_expected) == (_seen)) \
@@ -62,12 +50,8 @@ enum test_flags {
  * ASSERT_LT():
  * Check the condition
  * @_expected < @_seen
-<<<<<<< HEAD
  * If false, print failed test message (if running with --verbose) and then
  * assert.
-=======
- * If false, print failed test message (if in VERBOSE mode) and then assert
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #define ASSERT_LT(_expected, _seen) do { \
 	if ((_expected) >= (_seen)) \
@@ -75,7 +59,6 @@ enum test_flags {
 	assert((_expected) < (_seen)); \
 } while (0)
 
-<<<<<<< HEAD
 /**
  * ASSERT_LE():
  * Check the condition
@@ -113,8 +96,6 @@ enum test_flags {
 	} \
 } while (0)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PREFIX_PUSH() prefix_push(__func__)
 
 /*
@@ -132,7 +113,6 @@ struct region {
 	phys_addr_t size;
 };
 
-<<<<<<< HEAD
 static inline phys_addr_t __maybe_unused region_end(struct memblock_region *rgn)
 {
 	return rgn->base + rgn->size;
@@ -142,11 +122,6 @@ void reset_memblock_regions(void);
 void reset_memblock_attributes(void);
 void setup_memblock(void);
 void setup_numa_memblock(const unsigned int node_fracs[]);
-=======
-void reset_memblock_regions(void);
-void reset_memblock_attributes(void);
-void setup_memblock(void);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void dummy_physical_memory_init(void);
 void dummy_physical_memory_cleanup(void);
 void parse_args(int argc, char **argv);
@@ -164,7 +139,6 @@ static inline void test_pass_pop(void)
 	prefix_pop();
 }
 
-<<<<<<< HEAD
 static inline void run_top_down(int (*func)())
 {
 	memblock_set_bottom_up(false);
@@ -189,6 +163,4 @@ static inline void assert_mem_content(void *mem, int size, int flags)
 		ASSERT_MEM_EQ(mem, 0, size);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

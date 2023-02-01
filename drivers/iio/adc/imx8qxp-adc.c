@@ -202,11 +202,7 @@ static int imx8qxp_adc_read_raw(struct iio_dev *indio_dev,
 	struct imx8qxp_adc *adc = iio_priv(indio_dev);
 	struct device *dev = adc->dev;
 
-<<<<<<< HEAD
 	u32 ctrl;
-=======
-	u32 ctrl, vref_uv;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	long ret;
 
 	switch (mask) {
@@ -249,15 +245,10 @@ static int imx8qxp_adc_read_raw(struct iio_dev *indio_dev,
 		return IIO_VAL_INT;
 
 	case IIO_CHAN_INFO_SCALE:
-<<<<<<< HEAD
 		ret = regulator_get_voltage(adc->vref);
 		if (ret < 0)
 			return ret;
 		*val = ret / 1000;
-=======
-		vref_uv = regulator_get_voltage(adc->vref);
-		*val = vref_uv / 1000;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*val2 = 12;
 		return IIO_VAL_FRACTIONAL_LOG2;
 

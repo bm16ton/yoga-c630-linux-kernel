@@ -376,7 +376,6 @@ static irqreturn_t vu_req_read_message(struct virtio_uml_device *vu_dev,
 	int rc;
 	irqreturn_t irq_rc = IRQ_NONE;
 
-<<<<<<< HEAD
 	while (1) {
 		rc = vhost_user_recv_req(vu_dev, &msg.msg,
 					 sizeof(msg.msg.payload) +
@@ -396,27 +395,6 @@ static irqreturn_t vu_req_read_message(struct virtio_uml_device *vu_dev,
 					vu_dev->vq_irq_vq_map |= BIT_ULL(vq->index);
 					break;
 				}
-=======
-	rc = vhost_user_recv_req(vu_dev, &msg.msg,
-				 sizeof(msg.msg.payload) +
-				 sizeof(msg.extra_payload));
-
-	vu_dev->recv_rc = rc;
-	if (rc)
-		return IRQ_NONE;
-
-	switch (msg.msg.header.request) {
-	case VHOST_USER_SLAVE_CONFIG_CHANGE_MSG:
-		vu_dev->config_changed_irq = true;
-		response = 0;
-		break;
-	case VHOST_USER_SLAVE_VRING_CALL:
-		virtio_device_for_each_vq((&vu_dev->vdev), vq) {
-			if (vq->index == msg.msg.payload.vring_state.index) {
-				response = 0;
-				vu_dev->vq_irq_vq_map |= BIT_ULL(vq->index);
-				break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			break;
 		case VHOST_USER_SLAVE_IOTLB_MSG:
@@ -1432,17 +1410,10 @@ static int virtio_uml_resume(struct platform_device *pdev)
 
 	if (!vu_dev->no_vq_suspend) {
 		struct virtqueue *vq;
-<<<<<<< HEAD
 
 		virtio_device_for_each_vq((&vu_dev->vdev), vq) {
 			struct virtio_uml_vq_info *info = vq->priv;
 
-=======
-
-		virtio_device_for_each_vq((&vu_dev->vdev), vq) {
-			struct virtio_uml_vq_info *info = vq->priv;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			info->suspended = false;
 			vhost_user_set_vring_enable(vu_dev, vq->index, true);
 		}

@@ -1298,7 +1298,6 @@ int dax_zero_range(struct inode *inode, loff_t pos, loff_t len, bool *did_zero,
 	while ((ret = iomap_iter(&iter, ops)) > 0)
 		iter.processed = dax_zero_iter(&iter, did_zero);
 	return ret;
-<<<<<<< HEAD
 }
 EXPORT_SYMBOL_GPL(dax_zero_range);
 
@@ -1318,27 +1317,6 @@ EXPORT_SYMBOL_GPL(dax_truncate_page);
 static loff_t dax_iomap_iter(const struct iomap_iter *iomi,
 		struct iov_iter *iter)
 {
-=======
-}
-EXPORT_SYMBOL_GPL(dax_zero_range);
-
-int dax_truncate_page(struct inode *inode, loff_t pos, bool *did_zero,
-		const struct iomap_ops *ops)
-{
-	unsigned int blocksize = i_blocksize(inode);
-	unsigned int off = pos & (blocksize - 1);
-
-	/* Block boundary? Nothing to do */
-	if (!off)
-		return 0;
-	return dax_zero_range(inode, pos, blocksize - off, did_zero, ops);
-}
-EXPORT_SYMBOL_GPL(dax_truncate_page);
-
-static loff_t dax_iomap_iter(const struct iomap_iter *iomi,
-		struct iov_iter *iter)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct iomap *iomap = &iomi->iomap;
 	const struct iomap *srcmap = &iomi->srcmap;
 	loff_t length = iomap_length(iomi);
@@ -1466,12 +1444,9 @@ dax_iomap_rw(struct kiocb *iocb, struct iov_iter *iter,
 	};
 	loff_t done = 0;
 	int ret;
-<<<<<<< HEAD
 
 	if (!iomi.len)
 		return 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (iov_iter_rw(iter) == WRITE) {
 		lockdep_assert_held_write(&iomi.inode->i_rwsem);

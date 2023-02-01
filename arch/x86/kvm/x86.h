@@ -82,7 +82,6 @@ static inline unsigned int __shrink_ple_window(unsigned int val,
 void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu);
 int kvm_check_nested_events(struct kvm_vcpu *vcpu);
 
-<<<<<<< HEAD
 static inline bool kvm_is_exception_pending(struct kvm_vcpu *vcpu)
 {
 	return vcpu->arch.exception.pending ||
@@ -90,8 +89,6 @@ static inline bool kvm_is_exception_pending(struct kvm_vcpu *vcpu)
 	       kvm_test_request(KVM_REQ_TRIPLE_FAULT, vcpu);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void kvm_clear_exception_queue(struct kvm_vcpu *vcpu)
 {
 	vcpu->arch.exception.pending = false;
@@ -278,14 +275,6 @@ static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
 	return !(kvm->arch.disabled_quirks & quirk);
 }
 
-<<<<<<< HEAD
-=======
-static inline bool kvm_vcpu_latch_init(struct kvm_vcpu *vcpu)
-{
-	return is_smm(vcpu) || static_call(kvm_x86_apic_init_signal_blocked)(vcpu);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
 
 u64 get_kvmclock_ns(struct kvm *kvm);
@@ -385,7 +374,6 @@ static inline bool kvm_notify_vmexit_enabled(struct kvm *kvm)
 {
 	return kvm->arch.notify_vmexit_flags & KVM_X86_NOTIFY_VMEXIT_ENABLED;
 }
-<<<<<<< HEAD
 
 enum kvm_intr_type {
 	/* Values are arbitrary, but must be non-zero. */
@@ -393,15 +381,6 @@ enum kvm_intr_type {
 	KVM_HANDLING_NMI,
 };
 
-=======
-
-enum kvm_intr_type {
-	/* Values are arbitrary, but must be non-zero. */
-	KVM_HANDLING_IRQ = 1,
-	KVM_HANDLING_NMI,
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu,
 					enum kvm_intr_type intr)
 {

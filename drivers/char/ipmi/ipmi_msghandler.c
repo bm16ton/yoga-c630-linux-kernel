@@ -4534,7 +4534,6 @@ static int handle_one_recv_msg(struct ipmi_smi *intf,
 	int chan;
 	unsigned char cc;
 	bool is_cmd = !((msg->rsp[0] >> 2) & 1);
-<<<<<<< HEAD
 
 	dev_dbg(intf->si_dev, "Recv: %*ph\n", msg->rsp_size, msg->rsp);
 
@@ -4544,17 +4543,6 @@ static int handle_one_recv_msg(struct ipmi_smi *intf,
 			 "BMC returned too small a message for netfn %x cmd %x, got %d bytes\n",
 			 (msg->data[0] >> 2) | 1, msg->data[1], msg->rsp_size);
 
-=======
-
-	dev_dbg(intf->si_dev, "Recv: %*ph\n", msg->rsp_size, msg->rsp);
-
-	if (msg->rsp_size < 2) {
-		/* Message is too small to be correct. */
-		dev_warn(intf->si_dev,
-			 "BMC returned too small a message for netfn %x cmd %x, got %d bytes\n",
-			 (msg->data[0] >> 2) | 1, msg->data[1], msg->rsp_size);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 return_unspecified:
 		/* Generate an error response for the message. */
 		msg->rsp[0] = msg->data[0] | (1 << 2);

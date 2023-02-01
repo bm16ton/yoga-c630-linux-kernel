@@ -820,7 +820,6 @@ static bool ath11k_hw_wcn6855_rx_desc_get_ldpc_support(struct hal_rx_desc *desc)
 			 __le32_to_cpu(desc->u.wcn6855.msdu_start.info2));
 }
 
-<<<<<<< HEAD
 static u32 ath11k_hw_ipq8074_get_tcl_ring_selector(struct sk_buff *skb)
 {
 	/* Let the default ring selection be based on current processor
@@ -845,8 +844,6 @@ static u32 ath11k_hw_wcn6750_get_tcl_ring_selector(struct sk_buff *skb)
 	return skb_get_hash(skb);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct ath11k_hw_ops ipq8074_ops = {
 	.get_hw_mac_from_pdev_id = ath11k_hw_ipq8074_mac_from_pdev_id,
 	.wmi_init_config = ath11k_init_wmi_config_ipq8074,
@@ -884,10 +881,7 @@ const struct ath11k_hw_ops ipq8074_ops = {
 	.mpdu_info_get_peerid = ath11k_hw_ipq8074_mpdu_info_get_peerid,
 	.rx_desc_mac_addr2_valid = ath11k_hw_ipq8074_rx_desc_mac_addr2_valid,
 	.rx_desc_mpdu_start_addr2 = ath11k_hw_ipq8074_rx_desc_mpdu_start_addr2,
-<<<<<<< HEAD
 	.get_ring_selector = ath11k_hw_ipq8074_get_tcl_ring_selector,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 const struct ath11k_hw_ops ipq6018_ops = {
@@ -927,10 +921,7 @@ const struct ath11k_hw_ops ipq6018_ops = {
 	.mpdu_info_get_peerid = ath11k_hw_ipq8074_mpdu_info_get_peerid,
 	.rx_desc_mac_addr2_valid = ath11k_hw_ipq8074_rx_desc_mac_addr2_valid,
 	.rx_desc_mpdu_start_addr2 = ath11k_hw_ipq8074_rx_desc_mpdu_start_addr2,
-<<<<<<< HEAD
 	.get_ring_selector = ath11k_hw_ipq8074_get_tcl_ring_selector,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 const struct ath11k_hw_ops qca6390_ops = {
@@ -970,127 +961,7 @@ const struct ath11k_hw_ops qca6390_ops = {
 	.mpdu_info_get_peerid = ath11k_hw_ipq8074_mpdu_info_get_peerid,
 	.rx_desc_mac_addr2_valid = ath11k_hw_ipq8074_rx_desc_mac_addr2_valid,
 	.rx_desc_mpdu_start_addr2 = ath11k_hw_ipq8074_rx_desc_mpdu_start_addr2,
-<<<<<<< HEAD
 	.get_ring_selector = ath11k_hw_ipq8074_get_tcl_ring_selector,
-=======
-};
-
-const struct ath11k_hw_ops qcn9074_ops = {
-	.get_hw_mac_from_pdev_id = ath11k_hw_ipq6018_mac_from_pdev_id,
-	.wmi_init_config = ath11k_init_wmi_config_ipq8074,
-	.mac_id_to_pdev_id = ath11k_hw_mac_id_to_pdev_id_ipq8074,
-	.mac_id_to_srng_id = ath11k_hw_mac_id_to_srng_id_ipq8074,
-	.tx_mesh_enable = ath11k_hw_qcn9074_tx_mesh_enable,
-	.rx_desc_get_first_msdu = ath11k_hw_qcn9074_rx_desc_get_first_msdu,
-	.rx_desc_get_last_msdu = ath11k_hw_qcn9074_rx_desc_get_last_msdu,
-	.rx_desc_get_l3_pad_bytes = ath11k_hw_qcn9074_rx_desc_get_l3_pad_bytes,
-	.rx_desc_get_hdr_status = ath11k_hw_qcn9074_rx_desc_get_hdr_status,
-	.rx_desc_encrypt_valid = ath11k_hw_qcn9074_rx_desc_encrypt_valid,
-	.rx_desc_get_encrypt_type = ath11k_hw_qcn9074_rx_desc_get_encrypt_type,
-	.rx_desc_get_decap_type = ath11k_hw_qcn9074_rx_desc_get_decap_type,
-	.rx_desc_get_mesh_ctl = ath11k_hw_qcn9074_rx_desc_get_mesh_ctl,
-	.rx_desc_get_ldpc_support = ath11k_hw_qcn9074_rx_desc_get_ldpc_support,
-	.rx_desc_get_mpdu_seq_ctl_vld = ath11k_hw_qcn9074_rx_desc_get_mpdu_seq_ctl_vld,
-	.rx_desc_get_mpdu_fc_valid = ath11k_hw_qcn9074_rx_desc_get_mpdu_fc_valid,
-	.rx_desc_get_mpdu_start_seq_no = ath11k_hw_qcn9074_rx_desc_get_mpdu_start_seq_no,
-	.rx_desc_get_msdu_len = ath11k_hw_qcn9074_rx_desc_get_msdu_len,
-	.rx_desc_get_msdu_sgi = ath11k_hw_qcn9074_rx_desc_get_msdu_sgi,
-	.rx_desc_get_msdu_rate_mcs = ath11k_hw_qcn9074_rx_desc_get_msdu_rate_mcs,
-	.rx_desc_get_msdu_rx_bw = ath11k_hw_qcn9074_rx_desc_get_msdu_rx_bw,
-	.rx_desc_get_msdu_freq = ath11k_hw_qcn9074_rx_desc_get_msdu_freq,
-	.rx_desc_get_msdu_pkt_type = ath11k_hw_qcn9074_rx_desc_get_msdu_pkt_type,
-	.rx_desc_get_msdu_nss = ath11k_hw_qcn9074_rx_desc_get_msdu_nss,
-	.rx_desc_get_mpdu_tid = ath11k_hw_qcn9074_rx_desc_get_mpdu_tid,
-	.rx_desc_get_mpdu_peer_id = ath11k_hw_qcn9074_rx_desc_get_mpdu_peer_id,
-	.rx_desc_copy_attn_end_tlv = ath11k_hw_qcn9074_rx_desc_copy_attn_end,
-	.rx_desc_get_mpdu_start_tag = ath11k_hw_qcn9074_rx_desc_get_mpdu_start_tag,
-	.rx_desc_get_mpdu_ppdu_id = ath11k_hw_qcn9074_rx_desc_get_mpdu_ppdu_id,
-	.rx_desc_set_msdu_len = ath11k_hw_qcn9074_rx_desc_set_msdu_len,
-	.rx_desc_get_attention = ath11k_hw_qcn9074_rx_desc_get_attention,
-	.rx_desc_get_msdu_payload = ath11k_hw_qcn9074_rx_desc_get_msdu_payload,
-	.reo_setup = ath11k_hw_ipq8074_reo_setup,
-	.mpdu_info_get_peerid = ath11k_hw_ipq8074_mpdu_info_get_peerid,
-	.rx_desc_mac_addr2_valid = ath11k_hw_ipq9074_rx_desc_mac_addr2_valid,
-	.rx_desc_mpdu_start_addr2 = ath11k_hw_ipq9074_rx_desc_mpdu_start_addr2,
-};
-
-const struct ath11k_hw_ops wcn6855_ops = {
-	.get_hw_mac_from_pdev_id = ath11k_hw_ipq8074_mac_from_pdev_id,
-	.wmi_init_config = ath11k_init_wmi_config_qca6390,
-	.mac_id_to_pdev_id = ath11k_hw_mac_id_to_pdev_id_qca6390,
-	.mac_id_to_srng_id = ath11k_hw_mac_id_to_srng_id_qca6390,
-	.tx_mesh_enable = ath11k_hw_wcn6855_tx_mesh_enable,
-	.rx_desc_get_first_msdu = ath11k_hw_wcn6855_rx_desc_get_first_msdu,
-	.rx_desc_get_last_msdu = ath11k_hw_wcn6855_rx_desc_get_last_msdu,
-	.rx_desc_get_l3_pad_bytes = ath11k_hw_wcn6855_rx_desc_get_l3_pad_bytes,
-	.rx_desc_get_hdr_status = ath11k_hw_wcn6855_rx_desc_get_hdr_status,
-	.rx_desc_encrypt_valid = ath11k_hw_wcn6855_rx_desc_encrypt_valid,
-	.rx_desc_get_encrypt_type = ath11k_hw_wcn6855_rx_desc_get_encrypt_type,
-	.rx_desc_get_decap_type = ath11k_hw_wcn6855_rx_desc_get_decap_type,
-	.rx_desc_get_mesh_ctl = ath11k_hw_wcn6855_rx_desc_get_mesh_ctl,
-	.rx_desc_get_ldpc_support = ath11k_hw_wcn6855_rx_desc_get_ldpc_support,
-	.rx_desc_get_mpdu_seq_ctl_vld = ath11k_hw_wcn6855_rx_desc_get_mpdu_seq_ctl_vld,
-	.rx_desc_get_mpdu_fc_valid = ath11k_hw_wcn6855_rx_desc_get_mpdu_fc_valid,
-	.rx_desc_get_mpdu_start_seq_no = ath11k_hw_wcn6855_rx_desc_get_mpdu_start_seq_no,
-	.rx_desc_get_msdu_len = ath11k_hw_wcn6855_rx_desc_get_msdu_len,
-	.rx_desc_get_msdu_sgi = ath11k_hw_wcn6855_rx_desc_get_msdu_sgi,
-	.rx_desc_get_msdu_rate_mcs = ath11k_hw_wcn6855_rx_desc_get_msdu_rate_mcs,
-	.rx_desc_get_msdu_rx_bw = ath11k_hw_wcn6855_rx_desc_get_msdu_rx_bw,
-	.rx_desc_get_msdu_freq = ath11k_hw_wcn6855_rx_desc_get_msdu_freq,
-	.rx_desc_get_msdu_pkt_type = ath11k_hw_wcn6855_rx_desc_get_msdu_pkt_type,
-	.rx_desc_get_msdu_nss = ath11k_hw_wcn6855_rx_desc_get_msdu_nss,
-	.rx_desc_get_mpdu_tid = ath11k_hw_wcn6855_rx_desc_get_mpdu_tid,
-	.rx_desc_get_mpdu_peer_id = ath11k_hw_wcn6855_rx_desc_get_mpdu_peer_id,
-	.rx_desc_copy_attn_end_tlv = ath11k_hw_wcn6855_rx_desc_copy_attn_end,
-	.rx_desc_get_mpdu_start_tag = ath11k_hw_wcn6855_rx_desc_get_mpdu_start_tag,
-	.rx_desc_get_mpdu_ppdu_id = ath11k_hw_wcn6855_rx_desc_get_mpdu_ppdu_id,
-	.rx_desc_set_msdu_len = ath11k_hw_wcn6855_rx_desc_set_msdu_len,
-	.rx_desc_get_attention = ath11k_hw_wcn6855_rx_desc_get_attention,
-	.rx_desc_get_msdu_payload = ath11k_hw_wcn6855_rx_desc_get_msdu_payload,
-	.reo_setup = ath11k_hw_wcn6855_reo_setup,
-	.mpdu_info_get_peerid = ath11k_hw_wcn6855_mpdu_info_get_peerid,
-	.rx_desc_mac_addr2_valid = ath11k_hw_wcn6855_rx_desc_mac_addr2_valid,
-	.rx_desc_mpdu_start_addr2 = ath11k_hw_wcn6855_rx_desc_mpdu_start_addr2,
-};
-
-const struct ath11k_hw_ops wcn6750_ops = {
-	.get_hw_mac_from_pdev_id = ath11k_hw_ipq8074_mac_from_pdev_id,
-	.wmi_init_config = ath11k_init_wmi_config_qca6390,
-	.mac_id_to_pdev_id = ath11k_hw_mac_id_to_pdev_id_qca6390,
-	.mac_id_to_srng_id = ath11k_hw_mac_id_to_srng_id_qca6390,
-	.tx_mesh_enable = ath11k_hw_qcn9074_tx_mesh_enable,
-	.rx_desc_get_first_msdu = ath11k_hw_qcn9074_rx_desc_get_first_msdu,
-	.rx_desc_get_last_msdu = ath11k_hw_qcn9074_rx_desc_get_last_msdu,
-	.rx_desc_get_l3_pad_bytes = ath11k_hw_qcn9074_rx_desc_get_l3_pad_bytes,
-	.rx_desc_get_hdr_status = ath11k_hw_qcn9074_rx_desc_get_hdr_status,
-	.rx_desc_encrypt_valid = ath11k_hw_qcn9074_rx_desc_encrypt_valid,
-	.rx_desc_get_encrypt_type = ath11k_hw_qcn9074_rx_desc_get_encrypt_type,
-	.rx_desc_get_decap_type = ath11k_hw_qcn9074_rx_desc_get_decap_type,
-	.rx_desc_get_mesh_ctl = ath11k_hw_qcn9074_rx_desc_get_mesh_ctl,
-	.rx_desc_get_ldpc_support = ath11k_hw_qcn9074_rx_desc_get_ldpc_support,
-	.rx_desc_get_mpdu_seq_ctl_vld = ath11k_hw_qcn9074_rx_desc_get_mpdu_seq_ctl_vld,
-	.rx_desc_get_mpdu_fc_valid = ath11k_hw_qcn9074_rx_desc_get_mpdu_fc_valid,
-	.rx_desc_get_mpdu_start_seq_no = ath11k_hw_qcn9074_rx_desc_get_mpdu_start_seq_no,
-	.rx_desc_get_msdu_len = ath11k_hw_qcn9074_rx_desc_get_msdu_len,
-	.rx_desc_get_msdu_sgi = ath11k_hw_qcn9074_rx_desc_get_msdu_sgi,
-	.rx_desc_get_msdu_rate_mcs = ath11k_hw_qcn9074_rx_desc_get_msdu_rate_mcs,
-	.rx_desc_get_msdu_rx_bw = ath11k_hw_qcn9074_rx_desc_get_msdu_rx_bw,
-	.rx_desc_get_msdu_freq = ath11k_hw_qcn9074_rx_desc_get_msdu_freq,
-	.rx_desc_get_msdu_pkt_type = ath11k_hw_qcn9074_rx_desc_get_msdu_pkt_type,
-	.rx_desc_get_msdu_nss = ath11k_hw_qcn9074_rx_desc_get_msdu_nss,
-	.rx_desc_get_mpdu_tid = ath11k_hw_qcn9074_rx_desc_get_mpdu_tid,
-	.rx_desc_get_mpdu_peer_id = ath11k_hw_qcn9074_rx_desc_get_mpdu_peer_id,
-	.rx_desc_copy_attn_end_tlv = ath11k_hw_qcn9074_rx_desc_copy_attn_end,
-	.rx_desc_get_mpdu_start_tag = ath11k_hw_qcn9074_rx_desc_get_mpdu_start_tag,
-	.rx_desc_get_mpdu_ppdu_id = ath11k_hw_qcn9074_rx_desc_get_mpdu_ppdu_id,
-	.rx_desc_set_msdu_len = ath11k_hw_qcn9074_rx_desc_set_msdu_len,
-	.rx_desc_get_attention = ath11k_hw_qcn9074_rx_desc_get_attention,
-	.rx_desc_get_msdu_payload = ath11k_hw_qcn9074_rx_desc_get_msdu_payload,
-	.reo_setup = ath11k_hw_wcn6855_reo_setup,
-	.mpdu_info_get_peerid = ath11k_hw_ipq8074_mpdu_info_get_peerid,
-	.rx_desc_mac_addr2_valid = ath11k_hw_ipq9074_rx_desc_mac_addr2_valid,
-	.rx_desc_mpdu_start_addr2 = ath11k_hw_ipq9074_rx_desc_mpdu_start_addr2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 const struct ath11k_hw_ops qcn9074_ops = {
@@ -1805,184 +1676,6 @@ const struct service_to_pipe ath11k_target_service_to_ce_map_wlan_qca6390[] = {
 		__cpu_to_le32(0),
 	},
 	{
-<<<<<<< HEAD
-		.service_id = __cpu_to_le32(ATH11K_HTC_SVC_ID_HTT_DATA_MSG),
-		.pipedir = __cpu_to_le32(PIPEDIR_OUT),	/* out = UL = host -> target */
-		.pipenum = __cpu_to_le32(4),
-	},
-	{
-		.service_id = __cpu_to_le32(ATH11K_HTC_SVC_ID_HTT_DATA_MSG),
-		.pipedir = __cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
-		.pipenum = __cpu_to_le32(1),
-	},
-	{
-		.service_id = __cpu_to_le32(ATH11K_HTC_SVC_ID_PKT_LOG),
-		.pipedir = __cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
-		.pipenum = __cpu_to_le32(5),
-	},
-
-	/* (Additions here) */
-
-	{ /* terminator entry */ }
-};
-
-/* Target firmware's Copy Engine configuration. */
-const struct ce_pipe_config ath11k_target_ce_config_wlan_qca6390[] = {
-	/* CE0: host->target HTC control and raw streams */
-	{
-		.pipenum = __cpu_to_le32(0),
-		.pipedir = __cpu_to_le32(PIPEDIR_OUT),
-		.nentries = __cpu_to_le32(32),
-		.nbytes_max = __cpu_to_le32(2048),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE1: target->host HTT + HTC control */
-	{
-		.pipenum = __cpu_to_le32(1),
-		.pipedir = __cpu_to_le32(PIPEDIR_IN),
-		.nentries = __cpu_to_le32(32),
-		.nbytes_max = __cpu_to_le32(2048),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE2: target->host WMI */
-	{
-		.pipenum = __cpu_to_le32(2),
-		.pipedir = __cpu_to_le32(PIPEDIR_IN),
-		.nentries = __cpu_to_le32(32),
-		.nbytes_max = __cpu_to_le32(2048),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE3: host->target WMI */
-	{
-		.pipenum = __cpu_to_le32(3),
-		.pipedir = __cpu_to_le32(PIPEDIR_OUT),
-		.nentries = __cpu_to_le32(32),
-		.nbytes_max = __cpu_to_le32(2048),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE4: host->target HTT */
-	{
-		.pipenum = __cpu_to_le32(4),
-		.pipedir = __cpu_to_le32(PIPEDIR_OUT),
-		.nentries = __cpu_to_le32(256),
-		.nbytes_max = __cpu_to_le32(256),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS | CE_ATTR_DIS_INTR),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE5: target->host Pktlog */
-	{
-		.pipenum = __cpu_to_le32(5),
-		.pipedir = __cpu_to_le32(PIPEDIR_IN),
-		.nentries = __cpu_to_le32(32),
-		.nbytes_max = __cpu_to_le32(2048),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE6: Reserved for target autonomous hif_memcpy */
-	{
-		.pipenum = __cpu_to_le32(6),
-		.pipedir = __cpu_to_le32(PIPEDIR_INOUT),
-		.nentries = __cpu_to_le32(32),
-		.nbytes_max = __cpu_to_le32(16384),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE7 used only by Host */
-	{
-		.pipenum = __cpu_to_le32(7),
-		.pipedir = __cpu_to_le32(PIPEDIR_INOUT_H2H),
-		.nentries = __cpu_to_le32(0),
-		.nbytes_max = __cpu_to_le32(0),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS | CE_ATTR_DIS_INTR),
-		.reserved = __cpu_to_le32(0),
-	},
-
-	/* CE8 target->host used only by IPA */
-	{
-		.pipenum = __cpu_to_le32(8),
-		.pipedir = __cpu_to_le32(PIPEDIR_INOUT),
-		.nentries = __cpu_to_le32(32),
-		.nbytes_max = __cpu_to_le32(16384),
-		.flags = __cpu_to_le32(CE_ATTR_FLAGS),
-		.reserved = __cpu_to_le32(0),
-	},
-	/* CE 9, 10, 11 are used by MHI driver */
-};
-
-/* Map from service/endpoint to Copy Engine.
- * This table is derived from the CE_PCI TABLE, above.
- * It is passed to the Target at startup for use by firmware.
- */
-const struct service_to_pipe ath11k_target_service_to_ce_map_wlan_qca6390[] = {
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_VO),
-		__cpu_to_le32(PIPEDIR_OUT),	/* out = UL = host -> target */
-		__cpu_to_le32(3),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_VO),
-		__cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
-		__cpu_to_le32(2),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_BK),
-		__cpu_to_le32(PIPEDIR_OUT),	/* out = UL = host -> target */
-		__cpu_to_le32(3),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_BK),
-		__cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
-		__cpu_to_le32(2),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_BE),
-		__cpu_to_le32(PIPEDIR_OUT),	/* out = UL = host -> target */
-		__cpu_to_le32(3),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_BE),
-		__cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
-		__cpu_to_le32(2),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_VI),
-		__cpu_to_le32(PIPEDIR_OUT),	/* out = UL = host -> target */
-		__cpu_to_le32(3),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_DATA_VI),
-		__cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
-		__cpu_to_le32(2),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_CONTROL),
-		__cpu_to_le32(PIPEDIR_OUT),	/* out = UL = host -> target */
-		__cpu_to_le32(3),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_WMI_CONTROL),
-		__cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
-		__cpu_to_le32(2),
-	},
-	{
-		__cpu_to_le32(ATH11K_HTC_SVC_ID_RSVD_CTRL),
-		__cpu_to_le32(PIPEDIR_OUT),	/* out = UL = host -> target */
-		__cpu_to_le32(0),
-	},
-	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		__cpu_to_le32(ATH11K_HTC_SVC_ID_RSVD_CTRL),
 		__cpu_to_le32(PIPEDIR_IN),	/* in = DL = target -> host */
 		__cpu_to_le32(2),
@@ -2242,7 +1935,6 @@ const struct ath11k_hw_ring_mask ath11k_hw_ring_mask_qcn9074 = {
 	},
 };
 
-<<<<<<< HEAD
 const struct ath11k_hw_ring_mask ath11k_hw_ring_mask_wcn6750 = {
 	.tx  = {
 		ATH11K_TX_RING_MASK_0,
@@ -2280,8 +1972,6 @@ const struct ath11k_hw_ring_mask ath11k_hw_ring_mask_wcn6750 = {
 	},
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct ath11k_hw_regs ipq8074_regs = {
 	/* SW2TCL(x) R0 ring configuration address */
 	.hal_tcl1_ring_base_lsb = 0x00000510,
@@ -2711,7 +2401,6 @@ const struct ath11k_hw_regs wcn6750_regs = {
 	.hal_reo1_misc_ctl = 0x000005d8,
 };
 
-<<<<<<< HEAD
 static const struct ath11k_hw_tcl2wbm_rbm_map ath11k_hw_tcl2wbm_rbm_map_ipq8074[] = {
 	{
 		.tcl_ring_num = 0,
@@ -2751,23 +2440,16 @@ static const struct ath11k_hw_tcl2wbm_rbm_map ath11k_hw_tcl2wbm_rbm_map_wcn6750[
 const struct ath11k_hw_hal_params ath11k_hw_hal_params_ipq8074 = {
 	.rx_buf_rbm = HAL_RX_BUF_RBM_SW3_BM,
 	.tcl2wbm_rbm_map = ath11k_hw_tcl2wbm_rbm_map_ipq8074,
-=======
-const struct ath11k_hw_hal_params ath11k_hw_hal_params_ipq8074 = {
-	.rx_buf_rbm = HAL_RX_BUF_RBM_SW3_BM,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 const struct ath11k_hw_hal_params ath11k_hw_hal_params_qca6390 = {
 	.rx_buf_rbm = HAL_RX_BUF_RBM_SW1_BM,
-<<<<<<< HEAD
 	.tcl2wbm_rbm_map = ath11k_hw_tcl2wbm_rbm_map_ipq8074,
 };
 
 const struct ath11k_hw_hal_params ath11k_hw_hal_params_wcn6750 = {
 	.rx_buf_rbm = HAL_RX_BUF_RBM_SW1_BM,
 	.tcl2wbm_rbm_map = ath11k_hw_tcl2wbm_rbm_map_wcn6750,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct cfg80211_sar_freq_ranges ath11k_hw_sar_freq_ranges_wcn6855[] = {

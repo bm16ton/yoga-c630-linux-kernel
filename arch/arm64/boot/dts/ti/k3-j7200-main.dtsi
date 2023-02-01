@@ -748,7 +748,6 @@
 		clock-names = "gpio";
 	};
 
-<<<<<<< HEAD
 	watchdog0: watchdog@2200000 {
 		compatible = "ti,j7-rti-wdt";
 		reg = <0x0 0x2200000 0x0 0x100>;
@@ -767,8 +766,6 @@
 		assigned-clock-parents = <&k3_clks 253 5>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	main_r5fss0: r5fss@5c00000 {
 		compatible = "ti,j7200-r5fss";
 		ti,cluster-mode = <1>;

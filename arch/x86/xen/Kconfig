@@ -92,7 +92,6 @@ config XEN_DOM0
 	select X86_X2APIC if XEN_PVH && X86_64
 	help
 	  Support running as a Xen Dom0 guest.
-<<<<<<< HEAD
 
 config XEN_PV_MSR_SAFE
 	bool "Always use safe MSR accesses in PV guests"
@@ -102,5 +101,3 @@ config XEN_PV_MSR_SAFE
 	  Use safe (not faulting) MSR access functions even if the MSR access
 	  should not fault anyway.
 	  The default can be changed by using the "xen_msr_safe" boot parameter.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

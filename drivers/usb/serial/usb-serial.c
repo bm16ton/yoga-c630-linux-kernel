@@ -1346,8 +1346,6 @@ static int __init usb_serial_init(void)
 							| HUPCL | CLOCAL;
 	usb_serial_tty_driver->init_termios.c_ispeed = 9600;
 	usb_serial_tty_driver->init_termios.c_ospeed = 9600;
-//    usb_serial_tty_driver->init_termios.c_oflag &= ~OPOST;
-//    usb_serial_tty_driver->init_termios.c_iflag &= ~ICRNL;
 	tty_set_operations(usb_serial_tty_driver, &serial_ops);
 	result = tty_register_driver(usb_serial_tty_driver);
 	if (result) {

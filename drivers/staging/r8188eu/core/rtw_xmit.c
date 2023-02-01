@@ -33,7 +33,6 @@ void	_rtw_init_sta_xmit_priv(struct sta_xmit_priv *psta_xmitpriv)
 	INIT_LIST_HEAD(&psta_xmitpriv->apsd);
 }
 
-<<<<<<< HEAD
 static int rtw_xmit_resource_alloc(struct adapter *padapter, struct xmit_buf *pxmitbuf,
 				   u32 alloc_sz)
 {
@@ -60,8 +59,6 @@ static void rtw_xmit_resource_free(struct adapter *padapter, struct xmit_buf *px
 	kfree(pxmitbuf->pallocated_buf);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 s32	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 {
 	int i;
@@ -137,11 +134,7 @@ s32	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 
 	if (!pxmitpriv->pallocated_xmitbuf) {
 		res = _FAIL;
-<<<<<<< HEAD
 		goto free_frame_buf;
-=======
-		goto exit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	pxmitpriv->pxmitbuf = (u8 *)ALIGN((size_t)(pxmitpriv->pallocated_xmitbuf), 4);
@@ -158,21 +151,12 @@ s32	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 		pxmitbuf->ext_tag = false;
 
 		/* Tx buf allocation may fail sometimes, so sleep and retry. */
-<<<<<<< HEAD
 		res = rtw_xmit_resource_alloc(padapter, pxmitbuf, (MAX_XMITBUF_SZ + XMITBUF_ALIGN_SZ));
 		if (res == _FAIL) {
 			msleep(10);
 			res = rtw_xmit_resource_alloc(padapter, pxmitbuf, (MAX_XMITBUF_SZ + XMITBUF_ALIGN_SZ));
 			if (res == _FAIL)
 				goto free_xmitbuf;
-=======
-		res = rtw_os_xmit_resource_alloc(padapter, pxmitbuf, (MAX_XMITBUF_SZ + XMITBUF_ALIGN_SZ));
-		if (res == _FAIL) {
-			msleep(10);
-			res = rtw_os_xmit_resource_alloc(padapter, pxmitbuf, (MAX_XMITBUF_SZ + XMITBUF_ALIGN_SZ));
-			if (res == _FAIL)
-				goto exit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		pxmitbuf->flags = XMIT_VO_QUEUE;
@@ -190,11 +174,7 @@ s32	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 
 	if (!pxmitpriv->pallocated_xmit_extbuf) {
 		res = _FAIL;
-<<<<<<< HEAD
 		goto free_xmitbuf;
-=======
-		goto exit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	pxmitpriv->pxmit_extbuf = (u8 *)ALIGN((size_t)(pxmitpriv->pallocated_xmit_extbuf), 4);
@@ -208,17 +188,10 @@ s32	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 		pxmitbuf->padapter = padapter;
 		pxmitbuf->ext_tag = true;
 
-<<<<<<< HEAD
 		res = rtw_xmit_resource_alloc(padapter, pxmitbuf, max_xmit_extbuf_size + XMITBUF_ALIGN_SZ);
 		if (res == _FAIL) {
 			res = _FAIL;
 			goto free_xmit_extbuf;
-=======
-		res = rtw_os_xmit_resource_alloc(padapter, pxmitbuf, max_xmit_extbuf_size + XMITBUF_ALIGN_SZ);
-		if (res == _FAIL) {
-			res = _FAIL;
-			goto exit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		list_add_tail(&pxmitbuf->list, &pxmitpriv->free_xmit_extbuf_queue.queue);
@@ -229,11 +202,7 @@ s32	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 
 	if (rtw_alloc_hwxmits(padapter)) {
 		res = _FAIL;
-<<<<<<< HEAD
 		goto free_xmit_extbuf;
-=======
-		goto exit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	rtw_init_hwxmits(pxmitpriv->hwxmits, pxmitpriv->hwxmit_entry);
@@ -257,7 +226,6 @@ s32	_rtw_init_xmit_priv(struct xmit_priv *pxmitpriv, struct adapter *padapter)
 
 	rtl8188eu_init_xmit_priv(padapter);
 
-<<<<<<< HEAD
 	return _SUCCESS;
 
 free_xmit_extbuf:
@@ -304,11 +272,6 @@ void rtw_xmit_complete(struct adapter *padapter, struct xmit_frame *pxframe)
 	if (pxframe->pkt)
 		rtw_pkt_complete(padapter, pxframe->pkt);
 	pxframe->pkt = NULL;
-=======
-exit:
-
-	return res;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
@@ -324,21 +287,13 @@ void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 		return;
 
 	for (i = 0; i < NR_XMITFRAME; i++) {
-<<<<<<< HEAD
 		rtw_xmit_complete(padapter, pxmitframe);
-=======
-		rtw_os_xmit_complete(padapter, pxmitframe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		pxmitframe++;
 	}
 
 	for (i = 0; i < NR_XMITBUFF; i++) {
-<<<<<<< HEAD
 		rtw_xmit_resource_free(padapter, pxmitbuf, (MAX_XMITBUF_SZ + XMITBUF_ALIGN_SZ));
-=======
-		rtw_os_xmit_resource_free(padapter, pxmitbuf, (MAX_XMITBUF_SZ + XMITBUF_ALIGN_SZ));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pxmitbuf++;
 	}
 
@@ -348,11 +303,7 @@ void _rtw_free_xmit_priv(struct xmit_priv *pxmitpriv)
 
 	pxmitbuf = (struct xmit_buf *)pxmitpriv->pxmit_extbuf;
 	for (i = 0; i < num_xmit_extbuf; i++) {
-<<<<<<< HEAD
 		rtw_xmit_resource_free(padapter, pxmitbuf, (max_xmit_extbuf_size + XMITBUF_ALIGN_SZ));
-=======
-		rtw_os_xmit_resource_free(padapter, pxmitbuf, (max_xmit_extbuf_size + XMITBUF_ALIGN_SZ));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pxmitbuf++;
 	}
 
@@ -496,7 +447,6 @@ u8	qos_acm(u8 acm_mask, u8 priority)
 	return change_priority;
 }
 
-<<<<<<< HEAD
 static void rtw_open_pktfile(struct sk_buff *pktptr, struct pkt_file *pfile)
 {
 	if (!pktptr) {
@@ -538,29 +488,18 @@ static uint rtw_pktfile_read(struct pkt_file *pfile, u8 *rmem, uint rlen)
 	return len;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void set_qos(struct pkt_file *ppktfile, struct pkt_attrib *pattrib)
 {
 	struct ethhdr etherhdr;
 	struct iphdr ip_hdr;
 	s32 user_prio = 0;
 
-<<<<<<< HEAD
 	rtw_open_pktfile(ppktfile->pkt, ppktfile);
 	rtw_pktfile_read(ppktfile, (unsigned char *)&etherhdr, ETH_HLEN);
 
 	/*  get user_prio from IP hdr */
 	if (pattrib->ether_type == 0x0800) {
 		rtw_pktfile_read(ppktfile, (u8 *)&ip_hdr, sizeof(ip_hdr));
-=======
-	_rtw_open_pktfile(ppktfile->pkt, ppktfile);
-	_rtw_pktfile_read(ppktfile, (unsigned char *)&etherhdr, ETH_HLEN);
-
-	/*  get user_prio from IP hdr */
-	if (pattrib->ether_type == 0x0800) {
-		_rtw_pktfile_read(ppktfile, (u8 *)&ip_hdr, sizeof(ip_hdr));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* 		user_prio = (ntohs(ip_hdr.tos) >> 5) & 0x3; */
 		user_prio = ip_hdr.tos >> 5;
 	} else if (pattrib->ether_type == 0x888e) {
@@ -589,13 +528,8 @@ static s32 update_attrib(struct adapter *padapter, struct sk_buff *pkt, struct p
 
 
 
-<<<<<<< HEAD
 	rtw_open_pktfile(pkt, &pktfile);
 	rtw_pktfile_read(&pktfile, (u8 *)&etherhdr, ETH_HLEN);
-=======
-	_rtw_open_pktfile(pkt, &pktfile);
-	_rtw_pktfile_read(&pktfile, (u8 *)&etherhdr, ETH_HLEN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pattrib->ether_type = ntohs(etherhdr.h_proto);
 
@@ -623,11 +557,7 @@ static s32 update_attrib(struct adapter *padapter, struct sk_buff *pkt, struct p
 		/*  to prevent DHCP protocol fail */
 		u8 tmp[24];
 
-<<<<<<< HEAD
 		rtw_pktfile_read(&pktfile, &tmp[0], 24);
-=======
-		_rtw_pktfile_read(&pktfile, &tmp[0], 24);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pattrib->dhcp_pkt = 0;
 		if (pktfile.pkt_len > 282) {/* MINIMUM_DHCP_PACKET_SIZE) { */
 			if (((tmp[21] == 68) && (tmp[23] == 67)) ||
@@ -640,12 +570,6 @@ static s32 update_attrib(struct adapter *padapter, struct sk_buff *pkt, struct p
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	if ((pattrib->ether_type == 0x888e) || (pattrib->dhcp_pkt == 1))
-		rtw_set_scan_deny(padapter, 3000);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*  If EAPOL , ARP , OR DHCP packet, driver must be in active mode. */
 	if ((pattrib->ether_type == 0x0806) || (pattrib->ether_type == 0x888e) || (pattrib->dhcp_pkt == 1))
 		rtw_lps_ctrl_wk_cmd(padapter, LPS_CTRL_SPECIAL_PACKET, 1);
@@ -1080,13 +1004,8 @@ s32 rtw_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, struct
 		goto exit;
 	}
 
-<<<<<<< HEAD
 	rtw_open_pktfile(pkt, &pktfile);
 	rtw_pktfile_read(&pktfile, NULL, pattrib->pkt_hdrlen);
-=======
-	_rtw_open_pktfile(pkt, &pktfile);
-	_rtw_pktfile_read(&pktfile, NULL, pattrib->pkt_hdrlen);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	frg_inx = 0;
 	frg_len = pxmitpriv->frag_len - 4;/* 2346-4 = 2342 */
@@ -1144,15 +1063,9 @@ s32 rtw_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, struct
 
 		if (bmcst) {
 			/*  don't do fragment to broadcast/multicast packets */
-<<<<<<< HEAD
 			mem_sz = rtw_pktfile_read(&pktfile, pframe, pattrib->pktlen);
 		} else {
 			mem_sz = rtw_pktfile_read(&pktfile, pframe, mpdu_len);
-=======
-			mem_sz = _rtw_pktfile_read(&pktfile, pframe, pattrib->pktlen);
-		} else {
-			mem_sz = _rtw_pktfile_read(&pktfile, pframe, mpdu_len);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		pframe += mem_sz;
@@ -1164,11 +1077,7 @@ s32 rtw_xmitframe_coalesce(struct adapter *padapter, struct sk_buff *pkt, struct
 
 		frg_inx++;
 
-<<<<<<< HEAD
 		if (bmcst || pktfile.pkt_len == 0) {
-=======
-		if (bmcst || rtw_endofpktfile(&pktfile)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pattrib->nr_frags = frg_inx;
 
 			pattrib->last_txcmdsz = pattrib->hdrlen + pattrib->iv_len + ((pattrib->nr_frags == 1) ? llc_sz : 0) +
@@ -1484,11 +1393,7 @@ s32 rtw_free_xmitframe(struct xmit_priv *pxmitpriv, struct xmit_frame *pxmitfram
 	spin_unlock_bh(&pfree_xmit_queue->lock);
 
 	if (pndis_pkt)
-<<<<<<< HEAD
 		rtw_pkt_complete(padapter, pndis_pkt);
-=======
-		rtw_os_pkt_complete(padapter, pndis_pkt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 exit:
 
@@ -2147,11 +2052,7 @@ void wakeup_sta_to_xmit(struct adapter *padapter, struct sta_info *psta)
 
 		spin_unlock_bh(&psta->sleep_q.lock);
 		if (rtl8188eu_hal_xmit(padapter, pxmitframe))
-<<<<<<< HEAD
 			rtw_xmit_complete(padapter, pxmitframe);
-=======
-			rtw_os_xmit_complete(padapter, pxmitframe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		spin_lock_bh(&psta->sleep_q.lock);
 	}
 
@@ -2201,11 +2102,7 @@ void wakeup_sta_to_xmit(struct adapter *padapter, struct sta_info *psta)
 
 			spin_unlock_bh(&psta_bmc->sleep_q.lock);
 			if (rtl8188eu_hal_xmit(padapter, pxmitframe))
-<<<<<<< HEAD
 				rtw_xmit_complete(padapter, pxmitframe);
-=======
-				rtw_os_xmit_complete(padapter, pxmitframe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			spin_lock_bh(&psta_bmc->sleep_q.lock);
 		}
 
@@ -2279,11 +2176,7 @@ void xmit_delivery_enabled_frames(struct adapter *padapter, struct sta_info *pst
 		pxmitframe->attrib.triggered = 1;
 
 		if (rtl8188eu_hal_xmit(padapter, pxmitframe))
-<<<<<<< HEAD
 			rtw_xmit_complete(padapter, pxmitframe);
-=======
-			rtw_os_xmit_complete(padapter, pxmitframe);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if ((psta->sleepq_ac_len == 0) && (!psta->has_legacy_ac) && (wmmps_ac)) {
 			pstapriv->tim_bitmap &= ~BIT(psta->aid);
@@ -2350,7 +2243,6 @@ void rtw_ack_tx_done(struct xmit_priv *pxmitpriv, int status)
 	if (pxmitpriv->ack_tx)
 		rtw_sctx_done_err(&pack_tx_ops, status);
 }
-<<<<<<< HEAD
 
 static void rtw_check_xmit_resource(struct adapter *padapter, struct sk_buff *pkt)
 {
@@ -2453,5 +2345,3 @@ drop_packet:
 exit:
 	return NETDEV_TX_OK;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

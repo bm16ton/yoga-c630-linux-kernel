@@ -43,7 +43,6 @@
 #include "ttm_object.h"
 
 #include "vmwgfx_fence.h"
-#include "vmwgfx_hashtab.h"
 #include "vmwgfx_reg.h"
 #include "vmwgfx_validation.h"
 
@@ -95,9 +94,6 @@
 #define VMW_RES_FENCE ttm_driver_type3
 #define VMW_RES_SHADER ttm_driver_type4
 #define VMW_RES_HT_ORDER 12
-
-#define MKSSTAT_CAPACITY_LOG2 5U
-#define MKSSTAT_CAPACITY (1U << MKSSTAT_CAPACITY_LOG2)
 
 #define MKSSTAT_CAPACITY_LOG2 5U
 #define MKSSTAT_CAPACITY (1U << MKSSTAT_CAPACITY_LOG2)
@@ -435,12 +431,7 @@ struct vmw_ctx_validation_info;
  * @ctx: The validation context
  */
 struct vmw_sw_context{
-<<<<<<< HEAD
 	DECLARE_HASHTABLE(res_ht, VMW_RES_HT_ORDER);
-=======
-	struct vmwgfx_open_hash res_ht;
-	bool res_ht_initialized;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool kernel;
 	struct vmw_fpriv *fp;
 	struct drm_file *filp;
@@ -877,7 +868,6 @@ static inline bool vmw_resource_mob_attached(const struct vmw_resource *res)
 /**
  * Buffer object helper functions - vmwgfx_bo.c
  */
-extern bool vmw_bo_is_vmw_bo(struct ttm_buffer_object *bo);
 extern int vmw_bo_pin_in_placement(struct vmw_private *vmw_priv,
 				   struct vmw_buffer_object *bo,
 				   struct ttm_placement *placement,
@@ -926,11 +916,6 @@ extern void vmw_bo_unmap(struct vmw_buffer_object *vbo);
 extern void vmw_bo_move_notify(struct ttm_buffer_object *bo,
 			       struct ttm_resource *mem);
 extern void vmw_bo_swap_notify(struct ttm_buffer_object *bo);
-<<<<<<< HEAD
-=======
-extern struct vmw_buffer_object *
-vmw_user_bo_noref_lookup(struct drm_file *filp, u32 handle);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * vmw_bo_adjust_prio - Adjust the buffer object eviction priority

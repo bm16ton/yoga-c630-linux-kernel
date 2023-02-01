@@ -224,13 +224,8 @@ static int tcan4x5x_init(struct m_can_classdev *cdev)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	ret = tcan4x5x_write_tcan_reg(cdev, TCAN4X5X_ERROR_STATUS_MASK,
 				      TCAN4X5X_CLEAR_ALL_INT);
-=======
-	/* Zero out the MCAN buffers */
-	ret = m_can_init_ram(cdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 

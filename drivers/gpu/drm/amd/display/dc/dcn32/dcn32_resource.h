@@ -28,22 +28,16 @@
 
 #include "core_types.h"
 
-<<<<<<< HEAD
 #define DCN3_2_DEFAULT_DET_SIZE 256
 #define DCN3_2_MAX_DET_SIZE 1152
 #define DCN3_2_MIN_DET_SIZE 128
 #define DCN3_2_MIN_COMPBUF_SIZE_KB 128
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define DCN3_2_DET_SEG_SIZE 64
 #define DCN3_2_MALL_MBLK_SIZE_BYTES 65536 // 64 * 1024
 #define DCN3_2_MBLK_WIDTH 128
 #define DCN3_2_MBLK_HEIGHT_4BPE 128
 #define DCN3_2_MBLK_HEIGHT_8BPE 64
-<<<<<<< HEAD
 #define DCN3_2_VMIN_DISPCLK_HZ 717000000
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define TO_DCN32_RES_POOL(pool)\
 	container_of(pool, struct dcn32_resource_pool, base)
@@ -51,7 +45,6 @@
 extern struct _vcs_dpi_ip_params_st dcn3_2_ip;
 extern struct _vcs_dpi_soc_bounding_box_st dcn3_2_soc;
 
-<<<<<<< HEAD
 /* Temp struct used to save and restore MALL config
  * during validation.
  *
@@ -63,8 +56,6 @@ struct mall_temp_config {
 	bool is_phantom_plane[MAX_PIPES];
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dcn32_resource_pool {
 	struct resource_pool base;
 };
@@ -128,18 +119,14 @@ bool dcn32_subvp_in_use(struct dc *dc,
 
 bool dcn32_mpo_in_use(struct dc_state *context);
 
-<<<<<<< HEAD
 bool dcn32_any_surfaces_rotated(struct dc *dc, struct dc_state *context);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct pipe_ctx *dcn32_acquire_idle_pipe_for_head_pipe_in_layer(
 		struct dc_state *state,
 		const struct resource_pool *pool,
 		struct dc_stream_state *stream,
 		struct pipe_ctx *head_pipe);
 
-<<<<<<< HEAD
 void dcn32_determine_det_override(struct dc *dc,
 		struct dc_state *context,
 		display_e2e_pipe_params_st *pipes);
@@ -1311,9 +1298,5 @@ void dcn32_restore_mall_state(struct dc *dc,
       I2C_HW_ENGINE_COMMON_REG_LIST_RI(id), SR_ARR_I2C(DIO_MEM_PWR_CTRL, id),  \
       SR_ARR_I2C(DIO_MEM_PWR_STATUS, id)                                           \
   )
-=======
-void dcn32_determine_det_override(struct dc_state *context, display_e2e_pipe_params_st *pipes,
-		bool *is_pipe_split_expected, int pipe_cnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _DCN32_RESOURCE_H_ */

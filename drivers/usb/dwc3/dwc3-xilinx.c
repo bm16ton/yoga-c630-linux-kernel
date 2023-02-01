@@ -13,10 +13,7 @@
 #include <linux/of.h>
 #include <linux/platform_device.h>
 #include <linux/dma-mapping.h>
-<<<<<<< HEAD
 #include <linux/gpio/consumer.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/of_gpio.h>
 #include <linux/of_platform.h>
 #include <linux/pm_runtime.h>
@@ -51,10 +48,7 @@ struct dwc3_xlnx {
 	struct device			*dev;
 	void __iomem			*regs;
 	int				(*pltfm_init)(struct dwc3_xlnx *data);
-<<<<<<< HEAD
 	struct phy			*usb3_phy;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void dwc3_xlnx_mask_phy_rst(struct dwc3_xlnx *priv_data, bool mask)
@@ -108,22 +102,12 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
 	struct device		*dev = priv_data->dev;
 	struct reset_control	*crst, *hibrst, *apbrst;
 	struct gpio_desc	*reset_gpio;
-<<<<<<< HEAD
 	int			ret = 0;
 	u32			reg;
 
 	priv_data->usb3_phy = devm_phy_optional_get(dev, "usb3-phy");
 	if (IS_ERR(priv_data->usb3_phy)) {
 		ret = PTR_ERR(priv_data->usb3_phy);
-=======
-	struct phy		*usb3_phy;
-	int			ret = 0;
-	u32			reg;
-
-	usb3_phy = devm_phy_optional_get(dev, "usb3-phy");
-	if (IS_ERR(usb3_phy)) {
-		ret = PTR_ERR(usb3_phy);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err_probe(dev, ret,
 			      "failed to get USB3 PHY\n");
 		goto err;
@@ -138,11 +122,7 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
 	 * in use but the usb3-phy entry is missing from the device tree.
 	 * Therefore, skip these operations in this case.
 	 */
-<<<<<<< HEAD
 	if (!priv_data->usb3_phy)
-=======
-	if (!usb3_phy)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto skip_usb3_phy;
 
 	crst = devm_reset_control_get_exclusive(dev, "usb_crst");
@@ -187,15 +167,9 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
 		goto err;
 	}
 
-<<<<<<< HEAD
 	ret = phy_init(priv_data->usb3_phy);
 	if (ret < 0) {
 		phy_exit(priv_data->usb3_phy);
-=======
-	ret = phy_init(usb3_phy);
-	if (ret < 0) {
-		phy_exit(usb3_phy);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto err;
 	}
 
@@ -223,15 +197,9 @@ static int dwc3_xlnx_init_zynqmp(struct dwc3_xlnx *priv_data)
 		goto err;
 	}
 
-<<<<<<< HEAD
 	ret = phy_power_on(priv_data->usb3_phy);
 	if (ret < 0) {
 		phy_exit(priv_data->usb3_phy);
-=======
-	ret = phy_power_on(usb3_phy);
-	if (ret < 0) {
-		phy_exit(usb3_phy);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto err;
 	}
 
@@ -355,11 +323,7 @@ static int dwc3_xlnx_remove(struct platform_device *pdev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int __maybe_unused dwc3_xlnx_runtime_suspend(struct device *dev)
-=======
-static int __maybe_unused dwc3_xlnx_suspend_common(struct device *dev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dwc3_xlnx *priv_data = dev_get_drvdata(dev);
 
@@ -368,11 +332,7 @@ static int __maybe_unused dwc3_xlnx_suspend_common(struct device *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int __maybe_unused dwc3_xlnx_runtime_resume(struct device *dev)
-=======
-static int __maybe_unused dwc3_xlnx_resume_common(struct device *dev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dwc3_xlnx *priv_data = dev_get_drvdata(dev);
 
@@ -387,7 +347,6 @@ static int __maybe_unused dwc3_xlnx_runtime_idle(struct device *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int __maybe_unused dwc3_xlnx_suspend(struct device *dev)
 {
 	struct dwc3_xlnx *priv_data = dev_get_drvdata(dev);
@@ -427,10 +386,6 @@ static const struct dev_pm_ops dwc3_xlnx_dev_pm_ops = {
 	SET_RUNTIME_PM_OPS(dwc3_xlnx_runtime_suspend,
 			   dwc3_xlnx_runtime_resume, dwc3_xlnx_runtime_idle)
 };
-=======
-static UNIVERSAL_DEV_PM_OPS(dwc3_xlnx_dev_pm_ops, dwc3_xlnx_suspend_common,
-			    dwc3_xlnx_resume_common, dwc3_xlnx_runtime_idle);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct platform_driver dwc3_xlnx_driver = {
 	.probe		= dwc3_xlnx_probe,

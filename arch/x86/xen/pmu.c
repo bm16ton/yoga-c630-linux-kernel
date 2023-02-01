@@ -438,15 +438,9 @@ static unsigned int xen_guest_state(void)
 
 	if (!xen_initial_domain() || (xenpmu_data->domain_id >= DOMID_SELF))
 		return state;
-<<<<<<< HEAD
 
 	state |= PERF_GUEST_ACTIVE;
 
-=======
-
-	state |= PERF_GUEST_ACTIVE;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_PV) {
 		if (xenpmu_data->pmu.pmu_flags & PMU_SAMPLE_USER)
 			state |= PERF_GUEST_USER;

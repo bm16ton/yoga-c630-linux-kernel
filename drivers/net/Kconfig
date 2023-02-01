@@ -499,11 +499,8 @@ config NET_SB1000
 
 source "drivers/net/phy/Kconfig"
 
-<<<<<<< HEAD
 source "drivers/net/pse-pd/Kconfig"
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/net/can/Kconfig"
 
 source "drivers/net/mctp/Kconfig"

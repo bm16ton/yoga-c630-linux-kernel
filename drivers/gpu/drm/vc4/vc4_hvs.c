@@ -67,17 +67,12 @@ static const struct debugfs_reg32 hvs_regs[] = {
 
 void vc4_hvs_dump_state(struct vc4_hvs *hvs)
 {
-<<<<<<< HEAD
 	struct drm_device *drm = &hvs->vc4->base;
 	struct drm_printer p = drm_info_printer(&hvs->pdev->dev);
 	int idx, i;
 
 	if (!drm_dev_enter(drm, &idx))
 		return;
-=======
-	struct drm_printer p = drm_info_printer(&hvs->pdev->dev);
-	int i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_print_regset32(&p, &hvs->regset);
 
@@ -216,10 +211,7 @@ static int vc4_hvs_upload_linear_kernel(struct vc4_hvs *hvs,
 static void vc4_hvs_lut_load(struct vc4_hvs *hvs,
 			     struct vc4_crtc *vc4_crtc)
 {
-<<<<<<< HEAD
 	struct drm_device *drm = &hvs->vc4->base;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct drm_crtc *crtc = &vc4_crtc->base;
 	struct vc4_crtc_state *vc4_state = to_vc4_crtc_state(crtc->state);
 	int idx;
@@ -265,16 +257,12 @@ static void vc4_hvs_update_gamma_lut(struct vc4_hvs *hvs,
 
 u8 vc4_hvs_get_fifo_frame_count(struct vc4_hvs *hvs, unsigned int fifo)
 {
-<<<<<<< HEAD
 	struct drm_device *drm = &hvs->vc4->base;
 	u8 field = 0;
 	int idx;
 
 	if (!drm_dev_enter(drm, &idx))
 		return 0;
-=======
-	u8 field = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (fifo) {
 	case 0:
@@ -291,10 +279,7 @@ u8 vc4_hvs_get_fifo_frame_count(struct vc4_hvs *hvs, unsigned int fifo)
 		break;
 	}
 
-<<<<<<< HEAD
 	drm_dev_exit(idx);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return field;
 }
 
@@ -361,10 +346,7 @@ static int vc4_hvs_init_channel(struct vc4_hvs *hvs, struct drm_crtc *crtc,
 				struct drm_display_mode *mode, bool oneshot)
 {
 	struct vc4_dev *vc4 = hvs->vc4;
-<<<<<<< HEAD
 	struct drm_device *drm = &vc4->base;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vc4_crtc *vc4_crtc = to_vc4_crtc(crtc);
 	struct vc4_crtc_state *vc4_crtc_state = to_vc4_crtc_state(crtc->state);
 	unsigned int chan = vc4_crtc_state->assigned_channel;
@@ -415,25 +397,18 @@ static int vc4_hvs_init_channel(struct vc4_hvs *hvs, struct drm_crtc *crtc,
 	 * all CRTCs had SCALER_DISPBKGND_GAMMA unset at once.
 	 */
 	vc4_hvs_lut_load(hvs, vc4_crtc);
-<<<<<<< HEAD
 
 	drm_dev_exit(idx);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
 void vc4_hvs_stop_channel(struct vc4_hvs *hvs, unsigned int chan)
 {
-<<<<<<< HEAD
 	struct drm_device *drm = &hvs->vc4->base;
 	int idx;
 
 	if (!drm_dev_enter(drm, &idx))
-=======
-	if (HVS_READ(SCALER_DISPCTRLX(chan)) & SCALER_DISPCTRLX_ENABLE)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	if (HVS_READ(SCALER_DISPCTRLX(chan)) & SCALER_DISPCTRLX_ENABLE)
@@ -498,7 +473,6 @@ static void vc4_hvs_install_dlist(struct drm_crtc *crtc)
 	struct vc4_dev *vc4 = to_vc4_dev(dev);
 	struct vc4_hvs *hvs = vc4->hvs;
 	struct vc4_crtc_state *vc4_state = to_vc4_crtc_state(crtc->state);
-<<<<<<< HEAD
 	int idx;
 
 	if (!drm_dev_enter(dev, &idx))
@@ -508,11 +482,6 @@ static void vc4_hvs_install_dlist(struct drm_crtc *crtc)
 		  vc4_state->mm.start);
 
 	drm_dev_exit(idx);
-=======
-
-	HVS_WRITE(SCALER_DISPLISTX(vc4_state->assigned_channel),
-		  vc4_state->mm.start);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void vc4_hvs_update_dlist(struct drm_crtc *crtc)
@@ -679,13 +648,9 @@ void vc4_hvs_atomic_flush(struct drm_crtc *crtc,
 
 void vc4_hvs_mask_underrun(struct vc4_hvs *hvs, int channel)
 {
-<<<<<<< HEAD
 	struct drm_device *drm = &hvs->vc4->base;
 	u32 dispctrl;
 	int idx;
-=======
-	u32 dispctrl = HVS_READ(SCALER_DISPCTRL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!drm_dev_enter(drm, &idx))
 		return;
@@ -700,16 +665,12 @@ void vc4_hvs_mask_underrun(struct vc4_hvs *hvs, int channel)
 
 void vc4_hvs_unmask_underrun(struct vc4_hvs *hvs, int channel)
 {
-<<<<<<< HEAD
 	struct drm_device *drm = &hvs->vc4->base;
 	u32 dispctrl;
 	int idx;
 
 	if (!drm_dev_enter(drm, &idx))
 		return;
-=======
-	u32 dispctrl = HVS_READ(SCALER_DISPCTRL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dispctrl = HVS_READ(SCALER_DISPCTRL);
 	dispctrl |= SCALER_DISPCTRL_DSPEISLUR(channel);
@@ -818,10 +779,6 @@ static int vc4_hvs_bind(struct device *dev, struct device *master, void *data)
 	hvs = drmm_kzalloc(drm, sizeof(*hvs), GFP_KERNEL);
 	if (!hvs)
 		return -ENOMEM;
-<<<<<<< HEAD
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hvs->vc4 = vc4;
 	hvs->pdev = pdev;
 
@@ -934,15 +891,6 @@ static int vc4_hvs_bind(struct device *dev, struct device *master, void *data)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-=======
-	vc4_debugfs_add_regset32(drm, "hvs_regs", &hvs->regset);
-	vc4_debugfs_add_file(drm, "hvs_underrun", vc4_hvs_debugfs_underrun,
-			     NULL);
-	vc4_debugfs_add_file(drm, "hvs_dlists", vc4_hvs_debugfs_dlist,
-			     NULL);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

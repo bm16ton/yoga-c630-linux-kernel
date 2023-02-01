@@ -1363,15 +1363,12 @@ void optc1_read_otg_state(struct optc *optc1,
 	REG_GET(OPTC_INPUT_GLOBAL_CONTROL,
 			OPTC_UNDERFLOW_OCCURRED_STATUS, &s->underflow_occurred_status);
 
-<<<<<<< HEAD
 	REG_GET(OTG_VERTICAL_INTERRUPT1_CONTROL,
 			OTG_VERTICAL_INTERRUPT1_INT_ENABLE, &s->vertical_interrupt1_en);
 
 	REG_GET(OTG_VERTICAL_INTERRUPT1_POSITION,
 				OTG_VERTICAL_INTERRUPT1_LINE_START, &s->vertical_interrupt1_line);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	REG_GET(OTG_VERTICAL_INTERRUPT2_CONTROL,
 			OTG_VERTICAL_INTERRUPT2_INT_ENABLE, &s->vertical_interrupt2_en);
 
@@ -1560,10 +1557,7 @@ static const struct timing_generator_funcs dcn10_tg_funcs = {
 		.enable_optc_clock = optc1_enable_optc_clock,
 		.set_drr = optc1_set_drr,
 		.get_last_used_drr_vtotal = NULL,
-<<<<<<< HEAD
 		.set_vtotal_min_max = optc1_set_vtotal_min_max,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.set_static_screen_control = optc1_set_static_screen_control,
 		.set_test_pattern = optc1_set_test_pattern,
 		.program_stereo = optc1_program_stereo,

@@ -286,11 +286,7 @@ src		mac addr4
 start		1
 count		5
 src_delta	2000
-<<<<<<< HEAD
 tools		sendip socat nc bash
-=======
-tools		sendip nc bash
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 proto		udp
 
 race_repeat	0
@@ -367,11 +363,7 @@ src		mac
 start		1
 count		1
 src_delta	2000
-<<<<<<< HEAD
 tools		sendip socat nc bash
-=======
-tools		sendip nc bash
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 proto		udp
 
 race_repeat	0

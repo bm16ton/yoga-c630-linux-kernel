@@ -575,19 +575,7 @@ static void nfsd3_init_dirlist_pages(struct svc_rqst *rqstp,
 	buf->pages = rqstp->rq_next_page;
 	rqstp->rq_next_page += (buf->buflen + PAGE_SIZE - 1) >> PAGE_SHIFT;
 
-<<<<<<< HEAD
 	xdr_init_encode_pages(xdr, buf, buf->pages,  NULL);
-=======
-	/* This is xdr_init_encode(), but it assumes that
-	 * the head kvec has already been consumed. */
-	xdr_set_scratch_buffer(xdr, NULL, 0);
-	xdr->buf = buf;
-	xdr->page_ptr = buf->pages;
-	xdr->iov = NULL;
-	xdr->p = page_address(*buf->pages);
-	xdr->end = (void *)xdr->p + min_t(u32, buf->buflen, PAGE_SIZE);
-	xdr->rqst = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -790,11 +778,8 @@ nfsd3_proc_commit(struct svc_rqst *rqstp)
 		goto out;
 	resp->status = nfsd_commit(rqstp, &resp->fh, nf, argp->offset,
 				   argp->count, resp->verf);
-<<<<<<< HEAD
 	nfsd_file_put(nf);
 out:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return rpc_success;
 }
 

@@ -187,7 +187,6 @@ bool f2fs_need_SSR(struct f2fs_sb_info *sbi)
 
 void f2fs_abort_atomic_write(struct inode *inode, bool clean)
 {
-<<<<<<< HEAD
 	struct f2fs_inode_info *fi = F2FS_I(inode);
 
 	if (!f2fs_is_atomic_file(inode))
@@ -201,25 +200,6 @@ void f2fs_abort_atomic_write(struct inode *inode, bool clean)
 	release_atomic_write_cnt(inode);
 	clear_inode_flag(inode, FI_ATOMIC_FILE);
 	stat_dec_atomic_inode(inode);
-=======
-	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
-	struct f2fs_inode_info *fi = F2FS_I(inode);
-
-	if (!f2fs_is_atomic_file(inode))
-		return;
-
-	if (clean)
-		truncate_inode_pages_final(inode->i_mapping);
-	clear_inode_flag(fi->cow_inode, FI_COW_FILE);
-	iput(fi->cow_inode);
-	fi->cow_inode = NULL;
-	release_atomic_write_cnt(inode);
-	clear_inode_flag(inode, FI_ATOMIC_FILE);
-
-	spin_lock(&sbi->inode_lock[ATOMIC_FILE]);
-	sbi->atomic_files--;
-	spin_unlock(&sbi->inode_lock[ATOMIC_FILE]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __replace_atomic_write_block(struct inode *inode, pgoff_t index,
@@ -328,11 +308,8 @@ static int __f2fs_commit_atomic_write(struct inode *inode)
 					DATA_GENERIC_ENHANCE)) {
 				f2fs_put_dnode(&dn);
 				ret = -EFSCORRUPTED;
-<<<<<<< HEAD
 				f2fs_handle_error(sbi,
 						ERROR_INVALID_BLKADDR);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				goto out;
 			}
 
@@ -715,12 +692,8 @@ int f2fs_flush_device_cache(struct f2fs_sb_info *sbi)
 		} while (ret && --count);
 
 		if (ret) {
-<<<<<<< HEAD
 			f2fs_stop_checkpoint(sbi, false,
 					STOP_CP_REASON_FLUSH_FAIL);
-=======
-			f2fs_stop_checkpoint(sbi, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		}
 
@@ -2052,15 +2025,10 @@ int f2fs_start_discard_thread(struct f2fs_sb_info *sbi)
 
 	dcc->f2fs_issue_discard = kthread_run(issue_discard_thread, sbi,
 				"f2fs_discard-%u:%u", MAJOR(dev), MINOR(dev));
-<<<<<<< HEAD
 	if (IS_ERR(dcc->f2fs_issue_discard)) {
 		err = PTR_ERR(dcc->f2fs_issue_discard);
 		dcc->f2fs_issue_discard = NULL;
 	}
-=======
-	if (IS_ERR(dcc->f2fs_issue_discard))
-		err = PTR_ERR(dcc->f2fs_issue_discard);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return err;
 }
@@ -2568,11 +2536,7 @@ static unsigned int __get_next_segno(struct f2fs_sb_info *sbi, int type)
 
 	sanity_check_seg_type(sbi, seg_type);
 	if (f2fs_need_rand_seg(sbi))
-<<<<<<< HEAD
 		return prandom_u32_max(MAIN_SECS(sbi) * sbi->segs_per_sec);
-=======
-		return prandom_u32() % (MAIN_SECS(sbi) * sbi->segs_per_sec);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* if segs_per_sec is large than 1, we need to keep original policy. */
 	if (__is_large_section(sbi))
@@ -2626,11 +2590,7 @@ static void new_curseg(struct f2fs_sb_info *sbi, int type, bool new_sec)
 	curseg->alloc_type = LFS;
 	if (F2FS_OPTION(sbi).fs_mode == FS_MODE_FRAGMENT_BLK)
 		curseg->fragment_remained_chunk =
-<<<<<<< HEAD
 				prandom_u32_max(sbi->max_fragment_chunk) + 1;
-=======
-				prandom_u32() % sbi->max_fragment_chunk + 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __next_free_blkoff(struct f2fs_sb_info *sbi,
@@ -2667,15 +2627,9 @@ static void __refresh_next_blkoff(struct f2fs_sb_info *sbi,
 			/* To allocate block chunks in different sizes, use random number */
 			if (--seg->fragment_remained_chunk <= 0) {
 				seg->fragment_remained_chunk =
-<<<<<<< HEAD
 				   prandom_u32_max(sbi->max_fragment_chunk) + 1;
 				seg->next_blkoff +=
 				   prandom_u32_max(sbi->max_fragment_hole) + 1;
-=======
-				   prandom_u32() % sbi->max_fragment_chunk + 1;
-				seg->next_blkoff +=
-				   prandom_u32() % sbi->max_fragment_hole + 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 		}
 	}
@@ -3479,10 +3433,7 @@ int f2fs_inplace_write_data(struct f2fs_io_info *fio)
 		f2fs_warn(sbi, "%s: incorrect segment(%u) type, run fsck to fix.",
 			  __func__, segno);
 		err = -EFSCORRUPTED;
-<<<<<<< HEAD
 		f2fs_handle_error(sbi, ERROR_INCONSISTENT_SUM_TYPE);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto drop_bio;
 	}
 
@@ -3504,12 +3455,8 @@ int f2fs_inplace_write_data(struct f2fs_io_info *fio)
 	if (!err) {
 		f2fs_update_device_state(fio->sbi, fio->ino,
 						fio->new_blkaddr, 1);
-<<<<<<< HEAD
 		f2fs_update_iostat(fio->sbi, fio->page->mapping->host,
 						fio->io_type, F2FS_BLKSIZE);
-=======
-		f2fs_update_iostat(fio->sbi, fio->io_type, F2FS_BLKSIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return err;
@@ -4435,11 +4382,8 @@ static int build_sit_entries(struct f2fs_sb_info *sbi)
 			if (se->type >= NR_PERSISTENT_LOG) {
 				f2fs_err(sbi, "Invalid segment type: %u, segno: %u",
 							se->type, start);
-<<<<<<< HEAD
 				f2fs_handle_error(sbi,
 						ERROR_INCONSISTENT_SUM_TYPE);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				return -EFSCORRUPTED;
 			}
 
@@ -4496,10 +4440,7 @@ static int build_sit_entries(struct f2fs_sb_info *sbi)
 			f2fs_err(sbi, "Invalid segment type: %u, segno: %u",
 							se->type, start);
 			err = -EFSCORRUPTED;
-<<<<<<< HEAD
 			f2fs_handle_error(sbi, ERROR_INCONSISTENT_SUM_TYPE);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		}
 
@@ -4531,10 +4472,7 @@ static int build_sit_entries(struct f2fs_sb_info *sbi)
 	if (sit_valid_blocks[NODE] != valid_node_count(sbi)) {
 		f2fs_err(sbi, "SIT is corrupted node# %u vs %u",
 			 sit_valid_blocks[NODE], valid_node_count(sbi));
-<<<<<<< HEAD
 		f2fs_handle_error(sbi, ERROR_INCONSISTENT_NODE_COUNT);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFSCORRUPTED;
 	}
 
@@ -4543,10 +4481,7 @@ static int build_sit_entries(struct f2fs_sb_info *sbi)
 		f2fs_err(sbi, "SIT is corrupted data# %u %u vs %u",
 			 sit_valid_blocks[DATA], sit_valid_blocks[NODE],
 			 valid_user_blocks(sbi));
-<<<<<<< HEAD
 		f2fs_handle_error(sbi, ERROR_INCONSISTENT_BLOCK_COUNT);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFSCORRUPTED;
 	}
 
@@ -4697,10 +4632,7 @@ static int sanity_check_curseg(struct f2fs_sb_info *sbi)
 			f2fs_err(sbi,
 				 "Current segment has invalid alloc_type:%d",
 				 curseg->alloc_type);
-<<<<<<< HEAD
 			f2fs_handle_error(sbi, ERROR_INVALID_CURSEG);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return -EFSCORRUPTED;
 		}
 

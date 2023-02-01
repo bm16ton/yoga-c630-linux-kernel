@@ -621,12 +621,9 @@ ice_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
 		xdp_ring = vsi->xdp_rings[queue_index];
 		spin_lock(&xdp_ring->tx_lock);
 	} else {
-<<<<<<< HEAD
 		/* Generally, should not happen */
 		if (unlikely(queue_index >= vsi->num_xdp_txq))
 			return -ENXIO;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		xdp_ring = vsi->xdp_rings[queue_index];
 	}
 
@@ -1335,7 +1332,6 @@ static void ice_net_dim(struct ice_q_vector *q_vector)
 
 	if (ITR_IS_DYNAMIC(tx)) {
 		struct dim_sample dim_sample;
-<<<<<<< HEAD
 
 		__ice_update_sample(q_vector, tx, &dim_sample, true);
 		net_dim(&tx->dim, dim_sample);
@@ -1347,19 +1343,6 @@ static void ice_net_dim(struct ice_q_vector *q_vector)
 		__ice_update_sample(q_vector, rx, &dim_sample, false);
 		net_dim(&rx->dim, dim_sample);
 	}
-=======
-
-		__ice_update_sample(q_vector, tx, &dim_sample, true);
-		net_dim(&tx->dim, dim_sample);
-	}
-
-	if (ITR_IS_DYNAMIC(rx)) {
-		struct dim_sample dim_sample;
-
-		__ice_update_sample(q_vector, rx, &dim_sample, false);
-		net_dim(&rx->dim, dim_sample);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1484,11 +1467,7 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
 		bool wd;
 
 		if (tx_ring->xsk_pool)
-<<<<<<< HEAD
 			wd = ice_xmit_zc(tx_ring);
-=======
-			wd = ice_xmit_zc(tx_ring, ICE_DESC_UNUSED(tx_ring), budget);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		else if (ice_ring_is_xdp(tx_ring))
 			wd = true;
 		else
@@ -2279,15 +2258,10 @@ ice_tstamp(struct ice_tx_ring *tx_ring, struct sk_buff *skb,
 
 	/* Grab an open timestamp slot */
 	idx = ice_ptp_request_ts(tx_ring->tx_tstamps, skb);
-<<<<<<< HEAD
 	if (idx < 0) {
 		tx_ring->vsi->back->ptp.tx_hwtstamp_skipped++;
 		return;
 	}
-=======
-	if (idx < 0)
-		return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	off->cd_qw1 |= (u64)(ICE_TX_DESC_DTYPE_CTX |
 			     (ICE_TX_CTX_DESC_TSYN << ICE_TXD_CTX_QW1_CMD_S) |

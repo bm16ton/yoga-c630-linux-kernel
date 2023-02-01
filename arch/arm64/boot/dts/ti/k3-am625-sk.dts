@@ -502,7 +502,6 @@
 &main_mcan0 {
 	status = "disabled";
 };
-<<<<<<< HEAD
 
 &epwm0 {
 	status = "disabled";
@@ -515,5 +514,3 @@
 &epwm2 {
 	status = "disabled";
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

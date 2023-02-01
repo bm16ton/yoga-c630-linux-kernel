@@ -393,14 +393,11 @@ static int __maybe_unused ps8640_resume(struct device *dev)
 	gpiod_set_value(ps_bridge->gpio_reset, 1);
 	usleep_range(2000, 2500);
 	gpiod_set_value(ps_bridge->gpio_reset, 0);
-<<<<<<< HEAD
 	/* Double reset for T4 and T5 */
 	msleep(50);
 	gpiod_set_value(ps_bridge->gpio_reset, 1);
 	msleep(50);
 	gpiod_set_value(ps_bridge->gpio_reset, 0);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* We just reset things, so we need a delay after the first HPD */
 	ps_bridge->need_post_hpd_delay = true;
@@ -449,7 +446,6 @@ static void ps8640_pre_enable(struct drm_bridge *bridge)
 	ret = _ps8640_wait_hpd_asserted(ps_bridge, 200 * 1000);
 	if (ret < 0)
 		dev_warn(dev, "HPD didn't go high: %d\n", ret);
-<<<<<<< HEAD
 
 	/*
 	 * The Manufacturer Command Set (MCS) is a device dependent interface
@@ -468,26 +464,6 @@ static void ps8640_pre_enable(struct drm_bridge *bridge)
 	if (ret < 0)
 		dev_warn(dev, "failed write PAGE2_MCS_EN: %d\n", ret);
 
-=======
-
-	/*
-	 * The Manufacturer Command Set (MCS) is a device dependent interface
-	 * intended for factory programming of the display module default
-	 * parameters. Once the display module is configured, the MCS shall be
-	 * disabled by the manufacturer. Once disabled, all MCS commands are
-	 * ignored by the display interface.
-	 */
-
-	ret = regmap_update_bits(map, PAGE2_MCS_EN, MCS_EN, 0);
-	if (ret < 0)
-		dev_warn(dev, "failed write PAGE2_MCS_EN: %d\n", ret);
-
-	/* Switch access edp panel's edid through i2c */
-	ret = regmap_write(map, PAGE2_I2C_BYPASS, I2C_BYPASS_EN);
-	if (ret < 0)
-		dev_warn(dev, "failed write PAGE2_MCS_EN: %d\n", ret);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ps8640_bridge_vdo_control(ps_bridge, ENABLE);
 
 	ps_bridge->pre_enabled = true;

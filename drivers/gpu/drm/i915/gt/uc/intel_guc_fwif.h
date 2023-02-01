@@ -304,7 +304,6 @@ struct guc_update_context_policy {
 #define GLOBAL_POLICY_DISABLE_ENGINE_RESET				BIT(0)
 
 #define GLOBAL_POLICY_DEFAULT_DPC_PROMOTE_TIME_US 500000
-<<<<<<< HEAD
 
 /*
  * GuC converts the timeout to clock ticks internally. Different platforms have
@@ -326,8 +325,6 @@ static inline u32 guc_policy_max_preempt_timeout_ms(void)
 	BUILD_BUG_ON(GUC_POLICY_MAX_PREEMPT_TIMEOUT_US >= UINT_MAX);
 	return GUC_POLICY_MAX_PREEMPT_TIMEOUT_US / 1000;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct guc_policies {
 	u32 submission_queue_depth[GUC_MAX_ENGINE_CLASSES];

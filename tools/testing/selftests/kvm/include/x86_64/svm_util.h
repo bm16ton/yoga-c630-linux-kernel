@@ -15,14 +15,6 @@
 #include "svm.h"
 #include "processor.h"
 
-<<<<<<< HEAD
-=======
-#define SVM_EXIT_EXCP_BASE	0x040
-#define SVM_EXIT_HLT		0x078
-#define SVM_EXIT_MSR		0x07c
-#define SVM_EXIT_VMMCALL	0x081
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct svm_test_data {
 	/* VMCB */
 	struct vmcb *vmcb; /* gva */

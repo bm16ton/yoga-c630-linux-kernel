@@ -396,24 +396,6 @@ static int jz4740_i2s_resume(struct snd_soc_component *component)
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-static void jz4740_i2s_init_pcm_config(struct jz4740_i2s *i2s)
-{
-	struct snd_dmaengine_dai_dma_data *dma_data;
-
-	/* Playback */
-	dma_data = &i2s->playback_dma_data;
-	dma_data->maxburst = 16;
-	dma_data->addr = i2s->phys_base + JZ_REG_AIC_FIFO;
-
-	/* Capture */
-	dma_data = &i2s->capture_dma_data;
-	dma_data->maxburst = 16;
-	dma_data->addr = i2s->phys_base + JZ_REG_AIC_FIFO;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int jz4740_i2s_dai_probe(struct snd_soc_dai *dai)
 {
 	struct jz4740_i2s *i2s = snd_soc_dai_get_drvdata(dai);
@@ -424,10 +406,6 @@ static int jz4740_i2s_dai_probe(struct snd_soc_dai *dai)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-=======
-	jz4740_i2s_init_pcm_config(i2s);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snd_soc_dai_init_dma_data(dai, &i2s->playback_dma_data,
 		&i2s->capture_dma_data);
 

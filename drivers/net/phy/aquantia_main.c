@@ -804,10 +804,7 @@ static struct phy_driver aqr_driver[] = {
 	PHY_ID_MATCH_MODEL(PHY_ID_AQR113C),
 	.name           = "Aquantia AQR113C",
 	.probe          = aqr107_probe,
-<<<<<<< HEAD
 	.get_rate_matching = aqr107_get_rate_matching,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.config_init    = aqr107_config_init,
 	.config_aneg    = aqr_config_aneg,
 	.config_intr    = aqr_config_intr,

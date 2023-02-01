@@ -599,11 +599,7 @@ static int ucsi_stm32g0_probe_bootloader(struct ucsi *ucsi)
 		g0->i2c_bl = i2c_new_dummy_device(g0->client->adapter, STM32G0_I2C_BL_ADDR);
 		if (IS_ERR(g0->i2c_bl)) {
 			ret = dev_err_probe(g0->dev, PTR_ERR(g0->i2c_bl),
-<<<<<<< HEAD
 					    "Failed to register bootloader I2C address\n");
-=======
-					    "Failed to register booloader I2C address\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return ret;
 		}
 	}
@@ -692,11 +688,7 @@ destroy:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void ucsi_stm32g0_remove(struct i2c_client *client)
-=======
-static int ucsi_stm32g0_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ucsi_stm32g0 *g0 = i2c_get_clientdata(client);
 
@@ -705,11 +697,6 @@ static int ucsi_stm32g0_remove(struct i2c_client *client)
 	if (g0->fw_name)
 		i2c_unregister_device(g0->i2c_bl);
 	ucsi_destroy(g0->ucsi);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ucsi_stm32g0_suspend(struct device *dev)

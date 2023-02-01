@@ -57,17 +57,10 @@ config ARCH_HAS_STRNLEN_USER
 
 config GENERIC_STRNCPY_FROM_USER
 	def_bool !ARCH_HAS_STRNCPY_FROM_USER
-<<<<<<< HEAD
 
 config GENERIC_STRNLEN_USER
 	def_bool !ARCH_HAS_STRNLEN_USER
 
-=======
-
-config GENERIC_STRNLEN_USER
-	def_bool !ARCH_HAS_STRNLEN_USER
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config GENERIC_NET_UTILS
 	bool
 
@@ -134,12 +127,6 @@ config TRACE_MMIO_ACCESS
 
 source "lib/crypto/Kconfig"
 
-<<<<<<< HEAD
-=======
-config LIB_MEMNEQ
-	bool
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config CRC_CCITT
 	tristate "CRC-CCITT functions"
 	help

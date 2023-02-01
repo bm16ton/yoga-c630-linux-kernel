@@ -979,7 +979,6 @@ _uverbs_get_const_unsigned(u64 *to,
 				type_min(typeof(*(_to))),                      \
 				type_max(typeof(*(_to))), &_def_val);          \
 		(*(_to)) = _val;                                               \
-<<<<<<< HEAD
 		_ret;                                                          \
 	})
 
@@ -994,22 +993,6 @@ _uverbs_get_const_unsigned(u64 *to,
 		_ret;                                                          \
 	})
 
-=======
-		_ret;                                                          \
-	})
-
-#define uverbs_get_const_default_unsigned(_to, _attrs_bundle, _idx, _default)  \
-	({                                                                     \
-		u64 _val;                                                      \
-		u64 _def_val = _default;                                       \
-		int _ret =                                                     \
-			_uverbs_get_const_unsigned(&_val, _attrs_bundle, _idx, \
-				type_max(typeof(*(_to))), &_def_val);          \
-		(*(_to)) = _val;                                               \
-		_ret;                                                          \
-	})
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define uverbs_get_const(_to, _attrs_bundle, _idx)                             \
 	(is_signed_type(typeof(*(_to))) ?                                      \
 		 uverbs_get_const_signed(_to, _attrs_bundle, _idx) :           \
@@ -1022,7 +1005,6 @@ _uverbs_get_const_unsigned(u64 *to,
 		 uverbs_get_const_default_unsigned(_to, _attrs_bundle, _idx,   \
 						    _default))
 
-<<<<<<< HEAD
 static inline int
 uverbs_get_raw_fd(int *to, const struct uverbs_attr_bundle *attrs_bundle,
 		  size_t idx)
@@ -1030,6 +1012,4 @@ uverbs_get_raw_fd(int *to, const struct uverbs_attr_bundle *attrs_bundle,
 	return uverbs_get_const_signed(to, attrs_bundle, idx);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

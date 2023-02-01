@@ -65,14 +65,6 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
 extern void start_thread(struct pt_regs *regs,
 			unsigned long pc, unsigned long sp);
 
-<<<<<<< HEAD
-=======
-/* Free all resources held by a thread. */
-static inline void release_thread(struct task_struct *dead_task)
-{
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern unsigned long __get_wchan(struct task_struct *p);
 
 

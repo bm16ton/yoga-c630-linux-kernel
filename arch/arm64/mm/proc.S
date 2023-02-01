@@ -256,11 +256,7 @@ SYM_FUNC_END(idmap_cpu_replace_ttbr1)
 SYM_DATA(__idmap_kpti_flag, .long 1)
 	.popsection
 
-<<<<<<< HEAD
 SYM_TYPED_FUNC_START(idmap_kpti_install_ng_mappings)
-=======
-SYM_FUNC_START(idmap_kpti_install_ng_mappings)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cpu		.req	w0
 	temp_pte	.req	x0
 	num_cpus	.req	w1

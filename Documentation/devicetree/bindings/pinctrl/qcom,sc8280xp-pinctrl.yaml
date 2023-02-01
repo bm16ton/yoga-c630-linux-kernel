@@ -43,14 +43,9 @@ patternProperties:
     oneOf:
       - $ref: "#/$defs/qcom-sc8280xp-tlmm-state"
       - patternProperties:
-<<<<<<< HEAD
           "-pins$":
             $ref: "#/$defs/qcom-sc8280xp-tlmm-state"
         additionalProperties: false
-=======
-          ".*":
-            $ref: "#/$defs/qcom-sc8280xp-tlmm-state"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 '$defs':
   qcom-sc8280xp-tlmm-state:
@@ -58,10 +53,6 @@ patternProperties:
     description:
       Pinctrl node's client devices use subnodes for desired pin configuration.
       Client device subnodes use below standard properties.
-<<<<<<< HEAD
-=======
-    $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     properties:
       pins:
@@ -121,7 +112,6 @@ patternProperties:
 
     required:
       - pins
-<<<<<<< HEAD
 
     allOf:
       - $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
@@ -132,15 +122,11 @@ patternProperties:
         then:
           required:
             - function
-=======
-      - function
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     additionalProperties: false
 
 examples:
   - |
-<<<<<<< HEAD
     #include <dt-bindings/interrupt-controller/arm-gic.h>
     pinctrl@f100000 {
         compatible = "qcom,sc8280xp-tlmm";
@@ -171,36 +157,4 @@ examples:
             };
         };
     };
-=======
-        #include <dt-bindings/interrupt-controller/arm-gic.h>
-        pinctrl@f100000 {
-                compatible = "qcom,sc8280xp-tlmm";
-                reg = <0x0f100000 0x300000>;
-                interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
-                gpio-controller;
-                #gpio-cells = <2>;
-                interrupt-controller;
-                #interrupt-cells = <2>;
-                gpio-ranges = <&tlmm 0 0 230>;
-
-                gpio-wo-subnode-state {
-                        pins = "gpio1";
-                        function = "gpio";
-                };
-
-                uart-w-subnodes-state {
-                        rx {
-                                pins = "gpio4";
-                                function = "qup14";
-                                bias-pull-up;
-                        };
-
-                        tx {
-                                pins = "gpio5";
-                                function = "qup14";
-                                bias-disable;
-                        };
-                };
-        };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ...

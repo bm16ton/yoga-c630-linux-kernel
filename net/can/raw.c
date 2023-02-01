@@ -832,7 +832,6 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 	if (err < 0)
 		goto free_skb;
 
-<<<<<<< HEAD
 	err = -EINVAL;
 	if (ro->xl_frames && can_is_canxl_dev_mtu(dev->mtu)) {
 		/* CAN XL, CAN FD and Classical CAN */
@@ -849,8 +848,6 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
 			goto free_skb;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sockcm_init(&sockc, sk);
 	if (msg->msg_controllen) {
 		err = sock_cmsg_send(sk, msg, &sockc);

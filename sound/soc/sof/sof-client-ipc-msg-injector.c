@@ -15,10 +15,7 @@
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <sound/sof/header.h>
-<<<<<<< HEAD
 #include <sound/sof/ipc4/header.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "sof-client.h"
 
@@ -26,11 +23,8 @@
 
 struct sof_msg_inject_priv {
 	struct dentry *dfs_file;
-<<<<<<< HEAD
 	size_t max_msg_size;
 	enum sof_ipc_type ipc_type;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	void *tx_buffer;
 	void *rx_buffer;
@@ -75,7 +69,6 @@ static ssize_t sof_msg_inject_dfs_read(struct file *file, char __user *buffer,
 	return count;
 }
 
-<<<<<<< HEAD
 static ssize_t sof_msg_inject_ipc4_dfs_read(struct file *file,
 					    char __user *buffer,
 					    size_t count, loff_t *ppos)
@@ -135,50 +128,20 @@ static int sof_msg_inject_send_message(struct sof_client_dev *cdev)
 	ret = pm_runtime_resume_and_get(dev);
 	if (ret < 0 && ret != -EACCES) {
 		dev_err_ratelimited(dev, "debugfs write failed to resume %d\n", ret);
-=======
-static ssize_t sof_msg_inject_dfs_write(struct file *file, const char __user *buffer,
-					size_t count, loff_t *ppos)
-{
-	struct sof_client_dev *cdev = file->private_data;
-	struct sof_msg_inject_priv *priv = cdev->data;
-	struct device *dev = &cdev->auxdev.dev;
-	int ret, err;
-	size_t size;
-
-	if (*ppos)
-		return 0;
-
-	size = simple_write_to_buffer(priv->tx_buffer, SOF_IPC_MSG_MAX_SIZE,
-				      ppos, buffer, count);
-	if (size != count)
-		return size > 0 ? -EFAULT : size;
-
-	ret = pm_runtime_get_sync(dev);
-	if (ret < 0 && ret != -EACCES) {
-		dev_err_ratelimited(dev, "debugfs write failed to resume %d\n", ret);
-		pm_runtime_put_noidle(dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 
 	/* send the message */
-<<<<<<< HEAD
 	ret = sof_client_ipc_tx_message(cdev, priv->tx_buffer, priv->rx_buffer,
 					priv->max_msg_size);
 	if (ret)
 		dev_err(dev, "IPC message send failed: %d\n", ret);
 
-=======
-	memset(priv->rx_buffer, 0, SOF_IPC_MSG_MAX_SIZE);
-	ret = sof_client_ipc_tx_message(cdev, priv->tx_buffer, priv->rx_buffer,
-					SOF_IPC_MSG_MAX_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pm_runtime_mark_last_busy(dev);
 	err = pm_runtime_put_autosuspend(dev);
 	if (err < 0)
 		dev_err_ratelimited(dev, "debugfs write failed to idle %d\n", err);
 
-<<<<<<< HEAD
 	return ret;
 }
 
@@ -256,13 +219,6 @@ static ssize_t sof_msg_inject_ipc4_dfs_write(struct file *file,
 		return ret;
 
 	return count;
-=======
-	/* return size if test is successful */
-	if (ret >= 0)
-		ret = size;
-
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int sof_msg_inject_dfs_release(struct inode *inode, struct file *file)
@@ -282,7 +238,6 @@ static const struct file_operations sof_msg_inject_fops = {
 	.owner = THIS_MODULE,
 };
 
-<<<<<<< HEAD
 static const struct file_operations sof_msg_inject_ipc4_fops = {
 	.open = sof_msg_inject_dfs_open,
 	.read = sof_msg_inject_ipc4_dfs_read,
@@ -293,29 +248,21 @@ static const struct file_operations sof_msg_inject_ipc4_fops = {
 	.owner = THIS_MODULE,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int sof_msg_inject_probe(struct auxiliary_device *auxdev,
 				const struct auxiliary_device_id *id)
 {
 	struct sof_client_dev *cdev = auxiliary_dev_to_sof_client_dev(auxdev);
 	struct dentry *debugfs_root = sof_client_get_debugfs_root(cdev);
-<<<<<<< HEAD
 	static const struct file_operations *fops;
 	struct device *dev = &auxdev->dev;
 	struct sof_msg_inject_priv *priv;
 	size_t alloc_size;
-=======
-	struct device *dev = &auxdev->dev;
-	struct sof_msg_inject_priv *priv;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* allocate memory for client data */
 	priv = devm_kzalloc(&auxdev->dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	priv->ipc_type = sof_client_get_ipc_type(cdev);
 	priv->max_msg_size = sof_client_get_ipc_max_payload_size(cdev);
 	alloc_size = priv->max_msg_size;
@@ -346,17 +293,6 @@ static int sof_msg_inject_probe(struct auxiliary_device *auxdev,
 
 	priv->dfs_file = debugfs_create_file("ipc_msg_inject", 0644, debugfs_root,
 					     cdev, fops);
-=======
-	priv->tx_buffer = devm_kmalloc(dev, SOF_IPC_MSG_MAX_SIZE, GFP_KERNEL);
-	priv->rx_buffer = devm_kzalloc(dev, SOF_IPC_MSG_MAX_SIZE, GFP_KERNEL);
-	if (!priv->tx_buffer || !priv->rx_buffer)
-		return -ENOMEM;
-
-	cdev->data = priv;
-
-	priv->dfs_file = debugfs_create_file("ipc_msg_inject", 0644, debugfs_root,
-					     cdev, &sof_msg_inject_fops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* enable runtime PM */
 	pm_runtime_set_autosuspend_delay(dev, SOF_IPC_CLIENT_SUSPEND_DELAY_MS);

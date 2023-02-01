@@ -167,14 +167,11 @@
 /* I2C_WRITE_BYTE_COUNT + 1 when TX_BUF_BYTE_x is only accessible I2C_WRITE_BYTE_COUNT */
 #define TCPC_TRANSMIT_BUFFER_MAX_LEN		31
 
-<<<<<<< HEAD
 #define tcpc_presenting_rd(reg, cc) \
 	(!(TCPC_ROLE_CTRL_DRP & (reg)) && \
 	 (((reg) & (TCPC_ROLE_CTRL_## cc ##_MASK << TCPC_ROLE_CTRL_## cc ##_SHIFT)) == \
 	  (TCPC_ROLE_CTRL_CC_RD << TCPC_ROLE_CTRL_## cc ##_SHIFT)))
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct tcpci;
 
 /*
@@ -215,7 +212,6 @@ irqreturn_t tcpci_irq(struct tcpci *tcpci);
 
 struct tcpm_port;
 struct tcpm_port *tcpci_get_tcpm_port(struct tcpci *tcpci);
-<<<<<<< HEAD
 
 static inline enum typec_cc_status tcpci_to_typec_cc(unsigned int cc, bool sink)
 {
@@ -233,6 +229,4 @@ static inline enum typec_cc_status tcpci_to_typec_cc(unsigned int cc, bool sink)
 		return TYPEC_CC_OPEN;
 	}
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __LINUX_USB_TCPCI_H */

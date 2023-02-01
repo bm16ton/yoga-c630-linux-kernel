@@ -22,15 +22,7 @@
 
 #define PCI_BRIDGE_CONF_END	PCI_STD_HEADER_SIZEOF
 #define PCI_CAP_SSID_SIZEOF	(PCI_SSVID_DEVICE_ID + 2)
-<<<<<<< HEAD
 #define PCI_CAP_PCIE_SIZEOF	(PCI_EXP_SLTSTA2 + 2)
-=======
-#define PCI_CAP_SSID_START	PCI_BRIDGE_CONF_END
-#define PCI_CAP_SSID_END	(PCI_CAP_SSID_START + PCI_CAP_SSID_SIZEOF)
-#define PCI_CAP_PCIE_SIZEOF	(PCI_EXP_SLTSTA2 + 2)
-#define PCI_CAP_PCIE_START	PCI_CAP_SSID_END
-#define PCI_CAP_PCIE_END	(PCI_CAP_PCIE_START + PCI_CAP_PCIE_SIZEOF)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * struct pci_bridge_reg_behavior - register bits behaviors
@@ -328,11 +320,7 @@ pci_bridge_emul_read_ssid(struct pci_bridge_emul *bridge, int reg, u32 *value)
 	switch (reg) {
 	case PCI_CAP_LIST_ID:
 		*value = PCI_CAP_ID_SSVID |
-<<<<<<< HEAD
 			((bridge->pcie_start > bridge->ssid_start) ? (bridge->pcie_start << 8) : 0);
-=======
-			(bridge->has_pcie ? (PCI_CAP_PCIE_START << 8) : 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return PCI_BRIDGE_EMUL_HANDLED;
 
 	case PCI_SSVID_VENDOR_ID:
@@ -373,7 +361,6 @@ int pci_bridge_emul_init(struct pci_bridge_emul *bridge,
 	if (!bridge->pci_regs_behavior)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	/* If ssid_start and pcie_start were not specified then choose the lowest possible value. */
 	if (!bridge->ssid_start && !bridge->pcie_start) {
 		if (bridge->subsystem_vendor_id)
@@ -393,25 +380,14 @@ int pci_bridge_emul_init(struct pci_bridge_emul *bridge,
 	}
 
 	bridge->conf.capabilities_pointer = min(bridge->ssid_start, bridge->pcie_start);
-=======
-	if (bridge->subsystem_vendor_id)
-		bridge->conf.capabilities_pointer = PCI_CAP_SSID_START;
-	else if (bridge->has_pcie)
-		bridge->conf.capabilities_pointer = PCI_CAP_PCIE_START;
-	else
-		bridge->conf.capabilities_pointer = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (bridge->conf.capabilities_pointer)
 		bridge->conf.status |= cpu_to_le16(PCI_STATUS_CAP_LIST);
 
 	if (bridge->has_pcie) {
 		bridge->pcie_conf.cap_id = PCI_CAP_ID_EXP;
-<<<<<<< HEAD
 		bridge->pcie_conf.next = (bridge->ssid_start > bridge->pcie_start) ?
 					 bridge->ssid_start : 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bridge->pcie_conf.cap |= cpu_to_le16(PCI_EXP_TYPE_ROOT_PORT << 4);
 		bridge->pcie_cap_regs_behavior =
 			kmemdup(pcie_cap_regs_behavior,
@@ -494,7 +470,6 @@ int pci_bridge_emul_conf_read(struct pci_bridge_emul *bridge, int where,
 		read_op = bridge->ops->read_base;
 		cfgspace = (__le32 *) &bridge->conf;
 		behavior = bridge->pci_regs_behavior;
-<<<<<<< HEAD
 	} else if (reg >= bridge->ssid_start && reg < bridge->ssid_start + PCI_CAP_SSID_SIZEOF &&
 		   bridge->subsystem_vendor_id) {
 		/* Emulated PCI Bridge Subsystem Vendor ID capability */
@@ -506,17 +481,6 @@ int pci_bridge_emul_conf_read(struct pci_bridge_emul *bridge, int where,
 		   bridge->has_pcie) {
 		/* Our emulated PCIe capability */
 		reg -= bridge->pcie_start;
-=======
-	} else if (reg >= PCI_CAP_SSID_START && reg < PCI_CAP_SSID_END && bridge->subsystem_vendor_id) {
-		/* Emulated PCI Bridge Subsystem Vendor ID capability */
-		reg -= PCI_CAP_SSID_START;
-		read_op = pci_bridge_emul_read_ssid;
-		cfgspace = NULL;
-		behavior = NULL;
-	} else if (reg >= PCI_CAP_PCIE_START && reg < PCI_CAP_PCIE_END && bridge->has_pcie) {
-		/* Our emulated PCIe capability */
-		reg -= PCI_CAP_PCIE_START;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		read_op = bridge->ops->read_pcie;
 		cfgspace = (__le32 *) &bridge->pcie_conf;
 		behavior = bridge->pcie_cap_regs_behavior;
@@ -587,16 +551,10 @@ int pci_bridge_emul_conf_write(struct pci_bridge_emul *bridge, int where,
 		write_op = bridge->ops->write_base;
 		cfgspace = (__le32 *) &bridge->conf;
 		behavior = bridge->pci_regs_behavior;
-<<<<<<< HEAD
 	} else if (reg >= bridge->pcie_start && reg < bridge->pcie_start + PCI_CAP_PCIE_SIZEOF &&
 		   bridge->has_pcie) {
 		/* Our emulated PCIe capability */
 		reg -= bridge->pcie_start;
-=======
-	} else if (reg >= PCI_CAP_PCIE_START && reg < PCI_CAP_PCIE_END && bridge->has_pcie) {
-		/* Our emulated PCIe capability */
-		reg -= PCI_CAP_PCIE_START;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		write_op = bridge->ops->write_pcie;
 		cfgspace = (__le32 *) &bridge->pcie_conf;
 		behavior = bridge->pcie_cap_regs_behavior;

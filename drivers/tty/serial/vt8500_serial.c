@@ -185,7 +185,6 @@ static void handle_rx(struct uart_port *port)
 	}
 
 	tty_flip_buffer_push(tport);
-<<<<<<< HEAD
 }
 
 static unsigned int vt8500_tx_empty(struct uart_port *port)
@@ -193,8 +192,6 @@ static unsigned int vt8500_tx_empty(struct uart_port *port)
 	unsigned int idx = vt8500_read(port, VT8500_URFIDX) & 0x1f;
 
 	return idx < 16 ? TIOCSER_TEMT : 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void handle_tx(struct uart_port *port)

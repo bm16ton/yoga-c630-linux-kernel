@@ -12,7 +12,6 @@
 #ifndef __CS42L42_H__
 #define __CS42L42_H__
 
-<<<<<<< HEAD
 #include <dt-bindings/sound/cs42l42.h>
 #include <linux/device.h>
 #include <linux/gpio.h>
@@ -23,19 +22,6 @@
 #include <sound/cs42l42.h>
 #include <sound/soc-component.h>
 #include <sound/soc-dai.h>
-=======
-#include <linux/mutex.h>
-#include <sound/jack.h>
-#include <sound/cs42l42.h>
-
-static const char *const cs42l42_supply_names[CS42L42_NUM_SUPPLIES] = {
-	"VA",
-	"VP",
-	"VCP",
-	"VD_FILT",
-	"VL",
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct  cs42l42_private {
 	struct regmap *regmap;
@@ -45,14 +31,9 @@ struct  cs42l42_private {
 	struct completion pdn_done;
 	struct snd_soc_jack *jack;
 	struct mutex irq_lock;
-<<<<<<< HEAD
 	int devid;
 	int irq;
 	int pll_config;
-=======
-	int pll_config;
-	int bclk;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 sclk;
 	u32 bclk_ratio;
 	u32 srate;
@@ -70,10 +51,7 @@ struct  cs42l42_private {
 	u8 stream_use;
 	bool hp_adc_up_pending;
 	bool suspended;
-<<<<<<< HEAD
 	bool init_done;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 extern const struct regmap_range_cfg cs42l42_page_range;

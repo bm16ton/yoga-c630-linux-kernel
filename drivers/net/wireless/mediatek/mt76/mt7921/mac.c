@@ -230,10 +230,7 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 	struct mt76_phy *mphy = &dev->mt76.phy;
 	struct mt7921_phy *phy = &dev->phy;
 	struct ieee80211_supported_band *sband;
-<<<<<<< HEAD
 	u32 csum_status = *(u32 *)skb->cb;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 rxd0 = le32_to_cpu(rxd[0]);
 	u32 rxd1 = le32_to_cpu(rxd[1]);
 	u32 rxd2 = le32_to_cpu(rxd[2]);
@@ -294,12 +291,8 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 	if (!sband->channels)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	if (mt76_is_mmio(&dev->mt76) && (rxd0 & csum_mask) == csum_mask &&
 	    !(csum_status & (BIT(0) | BIT(2) | BIT(3))))
-=======
-	if ((rxd0 & csum_mask) == csum_mask)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		skb->ip_summed = CHECKSUM_UNNECESSARY;
 
 	if (rxd1 & MT_RXD1_NORMAL_FCS_ERR)
@@ -438,7 +431,6 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 			status->signal = max(status->signal,
 					     status->chain_signal[i]);
 		}
-<<<<<<< HEAD
 	}
 
 	amsdu_info = FIELD_GET(MT_RXD4_NORMAL_PAYLOAD_FORMAT, rxd4);
@@ -448,28 +440,6 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 		status->last_amsdu = amsdu_info == MT_RXD4_LAST_AMSDU_FRAME;
 	}
 
-=======
-
-		ret = mt76_connac2_mac_fill_rx_rate(&dev->mt76, status, sband,
-						    rxv, &mode);
-		if (ret < 0)
-			return ret;
-
-		if (rxd1 & MT_RXD1_NORMAL_GROUP_5) {
-			rxd += 18;
-			if ((u8 *)rxd - skb->data >= skb->len)
-				return -EINVAL;
-		}
-	}
-
-	amsdu_info = FIELD_GET(MT_RXD4_NORMAL_PAYLOAD_FORMAT, rxd4);
-	status->amsdu = !!amsdu_info;
-	if (status->amsdu) {
-		status->first_amsdu = amsdu_info == MT_RXD4_FIRST_AMSDU_FRAME;
-		status->last_amsdu = amsdu_info == MT_RXD4_LAST_AMSDU_FRAME;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hdr_gap = (u8 *)rxd - skb->data + 2 * remove_pad;
 	if (hdr_trans && ieee80211_has_morefrags(fc)) {
 		struct ieee80211_vif *vif;
@@ -493,7 +463,6 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 			skb_pull(skb, 2);
 		}
 	}
-<<<<<<< HEAD
 
 	if (!hdr_trans) {
 		struct ieee80211_hdr *hdr;
@@ -501,15 +470,6 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 		if (insert_ccmp_hdr) {
 			u8 key_id = FIELD_GET(MT_RXD1_NORMAL_KEY_ID, rxd1);
 
-=======
-
-	if (!hdr_trans) {
-		struct ieee80211_hdr *hdr;
-
-		if (insert_ccmp_hdr) {
-			u8 key_id = FIELD_GET(MT_RXD1_NORMAL_KEY_ID, rxd1);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mt76_insert_ccmp_hdr(skb, key_id);
 		}
 
@@ -522,21 +482,12 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 	} else {
 		status->flag |= RX_FLAG_8023;
 	}
-<<<<<<< HEAD
 
 	mt7921_mac_assoc_rssi(dev, skb);
 
 	if (rxv && mode >= MT_PHY_TYPE_HE_SU && !(status->flag & RX_FLAG_8023))
 		mt76_connac2_mac_decode_he_radiotap(&dev->mt76, skb, rxv, mode);
 
-=======
-
-	mt7921_mac_assoc_rssi(dev, skb);
-
-	if (rxv && mode >= MT_PHY_TYPE_HE_SU && !(status->flag & RX_FLAG_8023))
-		mt76_connac2_mac_decode_he_radiotap(&dev->mt76, skb, rxv, mode);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!status->wcid || !ieee80211_is_data_qos(fc))
 		return 0;
 
@@ -547,11 +498,7 @@ mt7921_mac_fill_rx(struct mt7921_dev *dev, struct sk_buff *skb)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void mt7921_tx_check_aggr(struct ieee80211_sta *sta, __le32 *txwi)
-=======
-void mt7921_tx_check_aggr(struct ieee80211_sta *sta, __le32 *txwi)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mt7921_sta *msta;
 	u16 fc, tid;
@@ -574,7 +521,6 @@ void mt7921_tx_check_aggr(struct ieee80211_sta *sta, __le32 *txwi)
 	if (!test_and_set_bit(tid, &msta->ampdu_state))
 		ieee80211_start_tx_ba_session(sta, tid, 0);
 }
-EXPORT_SYMBOL_GPL(mt7921_tx_check_aggr);
 
 void mt7921_mac_add_txs(struct mt7921_dev *dev, void *data)
 {
@@ -583,7 +529,6 @@ void mt7921_mac_add_txs(struct mt7921_dev *dev, void *data)
 	__le32 *txs_data = data;
 	u16 wcidx;
 	u8 pid;
-<<<<<<< HEAD
 
 	if (le32_get_bits(txs_data[0], MT_TXS0_TXS_FORMAT) > 1)
 		return;
@@ -749,47 +694,6 @@ EXPORT_SYMBOL_GPL(mt7921_rx_check);
 void mt7921_queue_rx_skb(struct mt76_dev *mdev, enum mt76_rxq_id q,
 			 struct sk_buff *skb)
 {
-=======
-
-	if (le32_get_bits(txs_data[0], MT_TXS0_TXS_FORMAT) > 1)
-		return;
-
-	wcidx = le32_get_bits(txs_data[2], MT_TXS2_WCID);
-	pid = le32_get_bits(txs_data[3], MT_TXS3_PID);
-
-	if (pid < MT_PACKET_ID_FIRST)
-		return;
-
-	if (wcidx >= MT7921_WTBL_SIZE)
-		return;
-
-	rcu_read_lock();
-
-	wcid = rcu_dereference(dev->mt76.wcid[wcidx]);
-	if (!wcid)
-		goto out;
-
-	msta = container_of(wcid, struct mt7921_sta, wcid);
-
-	mt76_connac2_mac_add_txs_skb(&dev->mt76, wcid, pid, txs_data,
-				     &msta->stats);
-	if (!wcid->sta)
-		goto out;
-
-	spin_lock_bh(&dev->sta_poll_lock);
-	if (list_empty(&msta->poll_list))
-		list_add_tail(&msta->poll_list, &dev->sta_poll_list);
-	spin_unlock_bh(&dev->sta_poll_lock);
-
-out:
-	rcu_read_unlock();
-}
-EXPORT_SYMBOL_GPL(mt7921_mac_add_txs);
-
-void mt7921_queue_rx_skb(struct mt76_dev *mdev, enum mt76_rxq_id q,
-			 struct sk_buff *skb)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mt7921_dev *dev = container_of(mdev, struct mt7921_dev, mt76);
 	__le32 *rxd = (__le32 *)skb->data;
 	__le32 *end = (__le32 *)&skb->data[skb->len];
@@ -803,14 +707,11 @@ void mt7921_queue_rx_skb(struct mt76_dev *mdev, enum mt76_rxq_id q,
 		type = PKT_TYPE_NORMAL_MCU;
 
 	switch (type) {
-<<<<<<< HEAD
 	case PKT_TYPE_TXRX_NOTIFY:
 		/* PKT_TYPE_TXRX_NOTIFY can be received only by mmio devices */
 		mt7921_mac_tx_free(dev, skb->data, skb->len);
 		napi_consume_skb(skb, 1);
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case PKT_TYPE_RX_EVENT:
 		mt7921_mcu_rx_event(dev, skb);
 		break;
@@ -1083,11 +984,7 @@ void mt7921_mac_update_mib_stats(struct mt7921_phy *phy)
 		mib->tx_amsdu_cnt += val;
 	}
 
-<<<<<<< HEAD
 	for (i = 0, aggr1 = aggr0 + 8; i < 4; i++) {
-=======
-	for (i = 0, aggr1 = aggr0 + 4; i < 4; i++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		u32 val2;
 
 		val = mt76_rr(dev, MT_TX_AGG_CNT(0, i));

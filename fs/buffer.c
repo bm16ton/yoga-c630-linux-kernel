@@ -52,13 +52,8 @@
 #include "internal.h"
 
 static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
-<<<<<<< HEAD
 static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
 			  struct writeback_control *wbc);
-=======
-static int submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
-			 struct writeback_control *wbc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
 
@@ -567,11 +562,7 @@ void write_boundary_block(struct block_device *bdev,
 	struct buffer_head *bh = __find_get_block(bdev, bblock + 1, blocksize);
 	if (bh) {
 		if (buffer_dirty(bh))
-<<<<<<< HEAD
 			write_dirty_buffer(bh, 0);
-=======
-			ll_rw_block(REQ_OP_WRITE, 1, &bh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		put_bh(bh);
 	}
 }
@@ -1351,30 +1342,12 @@ void __breadahead(struct block_device *bdev, sector_t block, unsigned size)
 {
 	struct buffer_head *bh = __getblk(bdev, block, size);
 	if (likely(bh)) {
-<<<<<<< HEAD
 		bh_readahead(bh, REQ_RAHEAD);
-=======
-		ll_rw_block(REQ_OP_READ | REQ_RAHEAD, 1, &bh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		brelse(bh);
 	}
 }
 EXPORT_SYMBOL(__breadahead);
 
-<<<<<<< HEAD
-=======
-void __breadahead_gfp(struct block_device *bdev, sector_t block, unsigned size,
-		      gfp_t gfp)
-{
-	struct buffer_head *bh = __getblk_gfp(bdev, block, size, gfp);
-	if (likely(bh)) {
-		ll_rw_block(REQ_OP_READ | REQ_RAHEAD, 1, &bh);
-		brelse(bh);
-	}
-}
-EXPORT_SYMBOL(__breadahead_gfp);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  *  __bread_gfp() - reads a specified block and returns the bh
  *  @bdev: the block_device to read from
@@ -2045,11 +2018,7 @@ int __block_write_begin_int(struct folio *folio, loff_t pos, unsigned len,
 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
 		    !buffer_unwritten(bh) &&
 		     (block_start < from || block_end > to)) {
-<<<<<<< HEAD
 			bh_read_nowait(bh, 0);
-=======
-			ll_rw_block(REQ_OP_READ, 1, &bh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			*wait_bh++=bh;
 		}
 	}
@@ -2276,15 +2245,9 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
 	int nr, i;
 	int fully_mapped = 1;
 	bool page_error = false;
-<<<<<<< HEAD
 
 	VM_BUG_ON_FOLIO(folio_test_large(folio), folio);
 
-=======
-
-	VM_BUG_ON_FOLIO(folio_test_large(folio), folio);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	head = create_page_buffers(&folio->page, inode, 0);
 	blocksize = head->b_size;
 	bbits = block_size_bits(blocksize);
@@ -2615,13 +2578,7 @@ int block_truncate_page(struct address_space *mapping,
 		set_buffer_uptodate(bh);
 
 	if (!buffer_uptodate(bh) && !buffer_delay(bh) && !buffer_unwritten(bh)) {
-<<<<<<< HEAD
 		err = bh_read(bh, 0);
-=======
-		err = -EIO;
-		ll_rw_block(REQ_OP_READ, 1, &bh);
-		wait_on_buffer(bh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Uhhuh. Read error. Complain and punt. */
 		if (err < 0)
 			goto unlock;
@@ -2699,13 +2656,8 @@ static void end_bio_bh_io_sync(struct bio *bio)
 	bio_put(bio);
 }
 
-<<<<<<< HEAD
 static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
 			  struct writeback_control *wbc)
-=======
-static int submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
-			 struct writeback_control *wbc)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const enum req_op op = opf & REQ_OP_MASK;
 	struct bio *bio;
@@ -2750,76 +2702,12 @@ static int submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
 	submit_bio(bio);
 }
 
-<<<<<<< HEAD
 void submit_bh(blk_opf_t opf, struct buffer_head *bh)
 {
 	submit_bh_wbc(opf, bh, NULL);
 }
 EXPORT_SYMBOL(submit_bh);
 
-=======
-int submit_bh(blk_opf_t opf, struct buffer_head *bh)
-{
-	return submit_bh_wbc(opf, bh, NULL);
-}
-EXPORT_SYMBOL(submit_bh);
-
-/**
- * ll_rw_block: low-level access to block devices (DEPRECATED)
- * @opf: block layer request operation and flags.
- * @nr: number of &struct buffer_heads in the array
- * @bhs: array of pointers to &struct buffer_head
- *
- * ll_rw_block() takes an array of pointers to &struct buffer_heads, and
- * requests an I/O operation on them, either a %REQ_OP_READ or a %REQ_OP_WRITE.
- * @opf contains flags modifying the detailed I/O behavior, most notably
- * %REQ_RAHEAD.
- *
- * This function drops any buffer that it cannot get a lock on (with the
- * BH_Lock state bit), any buffer that appears to be clean when doing a write
- * request, and any buffer that appears to be up-to-date when doing read
- * request.  Further it marks as clean buffers that are processed for
- * writing (the buffer cache won't assume that they are actually clean
- * until the buffer gets unlocked).
- *
- * ll_rw_block sets b_end_io to simple completion handler that marks
- * the buffer up-to-date (if appropriate), unlocks the buffer and wakes
- * any waiters. 
- *
- * All of the buffers must be for the same device, and must also be a
- * multiple of the current approved size for the device.
- */
-void ll_rw_block(const blk_opf_t opf, int nr, struct buffer_head *bhs[])
-{
-	const enum req_op op = opf & REQ_OP_MASK;
-	int i;
-
-	for (i = 0; i < nr; i++) {
-		struct buffer_head *bh = bhs[i];
-
-		if (!trylock_buffer(bh))
-			continue;
-		if (op == REQ_OP_WRITE) {
-			if (test_clear_buffer_dirty(bh)) {
-				bh->b_end_io = end_buffer_write_sync;
-				get_bh(bh);
-				submit_bh(opf, bh);
-				continue;
-			}
-		} else {
-			if (!buffer_uptodate(bh)) {
-				bh->b_end_io = end_buffer_read_sync;
-				get_bh(bh);
-				submit_bh(opf, bh);
-				continue;
-			}
-		}
-		unlock_buffer(bh);
-	}
-}
-EXPORT_SYMBOL(ll_rw_block);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void write_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
 {
 	lock_buffer(bh);
@@ -2854,11 +2742,7 @@ int __sync_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
 
 		get_bh(bh);
 		bh->b_end_io = end_buffer_write_sync;
-<<<<<<< HEAD
 		submit_bh(REQ_OP_WRITE | op_flags, bh);
-=======
-		ret = submit_bh(REQ_OP_WRITE | op_flags, bh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		wait_on_buffer(bh);
 		if (!buffer_uptodate(bh))
 			return -EIO;
@@ -3085,7 +2969,6 @@ int __bh_read(struct buffer_head *bh, blk_opf_t op_flags, bool wait)
 
 	get_bh(bh);
 	bh->b_end_io = end_buffer_read_sync;
-<<<<<<< HEAD
 	submit_bh(REQ_OP_READ | op_flags, bh);
 	if (wait) {
 		wait_on_buffer(bh);
@@ -3132,13 +3015,6 @@ void __bh_read_batch(int nr, struct buffer_head *bhs[],
 		get_bh(bh);
 		submit_bh(REQ_OP_READ | op_flags, bh);
 	}
-=======
-	submit_bh(REQ_OP_READ, bh);
-	wait_on_buffer(bh);
-	if (buffer_uptodate(bh))
-		return 0;
-	return -EIO;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(__bh_read_batch);
 

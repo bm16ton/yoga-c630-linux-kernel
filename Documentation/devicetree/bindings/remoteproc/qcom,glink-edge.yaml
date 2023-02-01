@@ -19,26 +19,17 @@ properties:
 
   apr:
     $ref: /schemas/soc/qcom/qcom,apr.yaml#
-<<<<<<< HEAD
     required:
       - qcom,glink-channels
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     description:
       Qualcomm APR/GPR (Asynchronous/Generic Packet Router)
 
   fastrpc:
-<<<<<<< HEAD
     $ref: /schemas/misc/qcom,fastrpc.yaml#
     required:
       - qcom,glink-channels
     description:
       Qualcomm FastRPC
-=======
-    type: object
-    description:
-      See Documentation/devicetree/bindings/misc/qcom,fastrpc.txt
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   interrupts:
     maxItems: 1

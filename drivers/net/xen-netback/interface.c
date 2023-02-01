@@ -725,12 +725,7 @@ int xenvif_connect_data(struct xenvif_queue *queue,
 	init_waitqueue_head(&queue->dealloc_wq);
 	atomic_set(&queue->inflight_packets, 0);
 
-<<<<<<< HEAD
 	netif_napi_add(queue->vif->dev, &queue->napi, xenvif_poll);
-=======
-	netif_napi_add(queue->vif->dev, &queue->napi, xenvif_poll,
-			NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	queue->stalled = true;
 

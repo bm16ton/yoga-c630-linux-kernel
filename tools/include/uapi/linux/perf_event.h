@@ -255,12 +255,9 @@ enum {
 	PERF_BR_COND_RET	= 10,	/* conditional function return */
 	PERF_BR_ERET		= 11,	/* exception return */
 	PERF_BR_IRQ		= 12,	/* irq */
-<<<<<<< HEAD
 	PERF_BR_SERROR		= 13,	/* system error */
 	PERF_BR_NO_TX		= 14,	/* not in transaction */
 	PERF_BR_EXTEND_ABI	= 15,	/* extend ABI */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	PERF_BR_MAX,
 };
 

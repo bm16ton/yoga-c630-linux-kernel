@@ -83,13 +83,6 @@ static inline void node_set_perf_attrs(unsigned int nid,
 struct node {
 	struct device	dev;
 	struct list_head access_list;
-<<<<<<< HEAD
-=======
-
-#if defined(CONFIG_MEMORY_HOTPLUG) && defined(CONFIG_HUGETLBFS)
-	struct work_struct	node_work;
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_HMEM_REPORTING
 	struct list_head cache_attrs;
 	struct device *cache_dev;
@@ -175,10 +168,5 @@ static inline void unregister_memory_block_under_nodes(struct memory_block *mem_
 #endif
 
 #define to_node(device) container_of(device, struct node, dev)
-
-static inline bool node_is_toptier(int node)
-{
-	return node_state(node, N_CPU);
-}
 
 #endif /* _LINUX_NODE_H_ */

@@ -37,7 +37,6 @@
 		power-supply = <&reg_3v3>;
 	};
 
-<<<<<<< HEAD
 	/* only for backwards compatibility with old HW */
 	backlight_isb: backlight-isb {
 		compatible = "pwm-backlight";
@@ -48,8 +47,6 @@
 		power-supply = <&reg_3v3>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	connector {
 		compatible = "composite-video-connector";
 		label = "Composite0";
@@ -68,7 +65,6 @@
 		pinctrl-0 = <&pinctrl_counter0>;
 		gpios = <&gpio2 0 GPIO_ACTIVE_LOW>;
 	};
-<<<<<<< HEAD
 
 	counter-1 {
 		compatible = "interrupt-counter";
@@ -77,16 +73,6 @@
 		gpios = <&gpio2 1 GPIO_ACTIVE_LOW>;
 	};
 
-=======
-
-	counter-1 {
-		compatible = "interrupt-counter";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_counter1>;
-		gpios = <&gpio2 1 GPIO_ACTIVE_LOW>;
-	};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	counter-2 {
 		compatible = "interrupt-counter";
 		pinctrl-names = "default";
@@ -394,7 +380,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &pwm2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm2>;
@@ -403,10 +388,6 @@
 
 &pwm3 {
 	pinctrl-names = "default";
-=======
-&pwm3 {
-	pinctrl-names = "default";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pinctrl-0 = <&pinctrl_pwm3>;
 	status = "okay";
 };
@@ -636,7 +617,6 @@
 		>;
 	};
 
-<<<<<<< HEAD
 	pinctrl_pwm2: pwm2grp {
 		fsl,pins = <
 			MX6QDL_PAD_DISP0_DAT9__PWM2_OUT			0x1b0b0
@@ -652,17 +632,6 @@
 	/* YaCO AUX Uart */
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
-=======
-	pinctrl_pwm3: pwm3grp {
-		fsl,pins = <
-			MX6QDL_PAD_SD4_DAT1__PWM3_OUT			0x1b0b0
-		>;
-	};
-
-	/* YaCO AUX Uart */
-	pinctrl_uart1: uart1grp {
-		fsl,pins = <
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			MX6QDL_PAD_CSI0_DAT10__UART1_TX_DATA		0x1b0b1
 			MX6QDL_PAD_CSI0_DAT11__UART1_RX_DATA		0x1b0b1
 		>;

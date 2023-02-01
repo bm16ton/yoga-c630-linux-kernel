@@ -312,18 +312,6 @@ struct hid_item {
 #define HID_DG_LATENCYMODE	0x000d0060
 
 #define HID_BAT_ABSOLUTESTATEOFCHARGE	0x00850065
-<<<<<<< HEAD
-=======
-
-#define HID_VD_ASUS_CUSTOM_MEDIA_KEYS	0xff310076
-/*
- * HID report types --- Ouch! HID spec says 1 2 3!
- */
-
-#define HID_INPUT_REPORT	0
-#define HID_OUTPUT_REPORT	1
-#define HID_FEATURE_REPORT	2
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define HID_VD_ASUS_CUSTOM_MEDIA_KEYS	0xff310076
 
@@ -929,12 +917,8 @@ extern int hidinput_connect(struct hid_device *hid, unsigned int force);
 extern void hidinput_disconnect(struct hid_device *);
 
 int hid_set_field(struct hid_field *, unsigned, __s32);
-<<<<<<< HEAD
 int hid_input_report(struct hid_device *hid, enum hid_report_type type, u8 *data, u32 size,
 		     int interrupt);
-=======
-int hid_input_report(struct hid_device *, int type, u8 *, u32, int);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct hid_field *hidinput_get_led_field(struct hid_device *hid);
 unsigned int hidinput_count_leds(struct hid_device *hid);
 __s32 hidinput_calc_abs_res(const struct hid_field *field, __u16 code);
@@ -1116,18 +1100,11 @@ void hid_hw_stop(struct hid_device *hdev);
 int __must_check hid_hw_open(struct hid_device *hdev);
 void hid_hw_close(struct hid_device *hdev);
 void hid_hw_request(struct hid_device *hdev,
-<<<<<<< HEAD
 		    struct hid_report *report, enum hid_class_request reqtype);
 int hid_hw_raw_request(struct hid_device *hdev,
 		       unsigned char reportnum, __u8 *buf,
 		       size_t len, enum hid_report_type rtype,
 		       enum hid_class_request reqtype);
-=======
-		    struct hid_report *report, int reqtype);
-int hid_hw_raw_request(struct hid_device *hdev,
-		       unsigned char reportnum, __u8 *buf,
-		       size_t len, unsigned char rtype, int reqtype);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int hid_hw_output_report(struct hid_device *hdev, __u8 *buf, size_t len);
 
 /**
@@ -1155,11 +1132,7 @@ static inline int hid_hw_power(struct hid_device *hdev, int level)
  * @reqtype: hid request type
  */
 static inline int hid_hw_idle(struct hid_device *hdev, int report, int idle,
-<<<<<<< HEAD
 		enum hid_class_request reqtype)
-=======
-		int reqtype)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (hdev->ll_driver->idle)
 		return hdev->ll_driver->idle(hdev, report, idle, reqtype);
@@ -1176,17 +1149,10 @@ static inline bool hid_hw_may_wakeup(struct hid_device *hdev)
 {
 	if (hdev->ll_driver->may_wakeup)
 		return hdev->ll_driver->may_wakeup(hdev);
-<<<<<<< HEAD
 
 	if (hdev->dev.parent)
 		return device_may_wakeup(hdev->dev.parent);
 
-=======
-
-	if (hdev->dev.parent)
-		return device_may_wakeup(hdev->dev.parent);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 

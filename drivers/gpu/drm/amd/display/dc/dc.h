@@ -47,11 +47,7 @@ struct aux_payload;
 struct set_config_cmd_payload;
 struct dmub_notification;
 
-<<<<<<< HEAD
 #define DC_VER "3.2.207"
-=======
-#define DC_VER "3.2.198"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define MAX_SURFACES 3
 #define MAX_PLANES 6
@@ -405,20 +401,14 @@ struct dc_config {
 	uint8_t  vblank_alignment_max_frame_time_diff;
 	bool is_asymmetric_memory;
 	bool is_single_rank_dimm;
-<<<<<<< HEAD
 	bool is_vmin_only_asic;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool use_pipe_ctx_sync_logic;
 	bool ignore_dpref_ss;
 	bool enable_mipi_converter_optimization;
 	bool use_default_clock_table;
-<<<<<<< HEAD
 	bool force_bios_enable_lttpr;
 	uint8_t force_bios_fixed_vs;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum visual_confirm {
@@ -430,10 +420,7 @@ enum visual_confirm {
 	VISUAL_CONFIRM_SWAPCHAIN = 6,
 	VISUAL_CONFIRM_FAMS = 7,
 	VISUAL_CONFIRM_SWIZZLE = 9,
-<<<<<<< HEAD
 	VISUAL_CONFIRM_SUBVP = 14,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum dc_psr_power_opts {
@@ -608,7 +595,6 @@ union mem_low_power_enable_options {
 		bool optc: 1;
 		bool vpg: 1;
 		bool afmt: 1;
-<<<<<<< HEAD
 	} bits;
 	uint32_t u32All;
 };
@@ -626,32 +612,10 @@ union root_clock_optimization_options {
 		bool physymclk: 1;
 		bool dpiasymclk: 1;
 		uint32_t reserved: 22;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} bits;
 	uint32_t u32All;
 };
 
-<<<<<<< HEAD
-=======
-union root_clock_optimization_options {
-	struct {
-		bool dpp: 1;
-		bool dsc: 1;
-		bool hdmistream: 1;
-		bool hdmichar: 1;
-		bool dpstream: 1;
-		bool symclk32_se: 1;
-		bool symclk32_le: 1;
-		bool symclk_fe: 1;
-		bool physymclk: 1;
-		bool dpiasymclk: 1;
-		uint32_t reserved: 22;
-	} bits;
-	uint32_t u32All;
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 union dpia_debug_options {
 	struct {
 		uint32_t disable_dpia:1; /* bit 0 */
@@ -737,7 +701,6 @@ struct dc_state;
 struct resource_pool;
 struct dce_hwseq;
 
-<<<<<<< HEAD
 /**
  * struct dc_debug_options - DC debug struct
  *
@@ -746,8 +709,6 @@ struct dce_hwseq;
  * This can be very handy to narrow down whether some specific feature is
  * causing an issue or not.
  */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dc_debug_options {
 	bool native422_support;
 	bool disable_dsc;
@@ -845,11 +806,6 @@ struct dc_debug_options {
 	bool validate_dml_output;
 	bool enable_dmcub_surface_flip;
 	bool usbc_combo_phy_reset_wa;
-<<<<<<< HEAD
-=======
-	bool disable_dsc_edp;
-	unsigned int  force_dsc_edp_policy;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool enable_dram_clock_change_one_display_vactive;
 	/* TODO - remove once tested */
 	bool legacy_dp2_lt;
@@ -865,10 +821,6 @@ struct dc_debug_options {
 	/* Enable dmub aux for legacy ddc */
 	bool enable_dmub_aux_for_legacy_ddc;
 	bool disable_fams;
-<<<<<<< HEAD
-=======
-	bool optimize_edp_link_rate; /* eDP ILR */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* FEC/PSR1 sequence enable delay in 100us */
 	uint8_t fec_enable_delay_in100us;
 	bool enable_driver_sequence_debug;
@@ -876,10 +828,6 @@ struct dc_debug_options {
 	int crb_alloc_policy_min_disp_count;
 	bool disable_z10;
 	bool enable_z9_disable_interface;
-<<<<<<< HEAD
-=======
-	bool enable_sw_cntl_psr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	union dpia_debug_options dpia_debug;
 	bool disable_fixed_vs_aux_timeout_wa;
 	bool force_disable_subvp;
@@ -901,15 +849,11 @@ struct dc_debug_options {
 	bool use_legacy_soc_bb_mechanism;
 	bool exit_idle_opt_for_cursor_updates;
 	bool enable_single_display_2to1_odm_policy;
-<<<<<<< HEAD
 	bool enable_double_buffered_dsc_pg_support;
 	bool enable_dp_dig_pixel_rate_div_policy;
 	enum lttpr_mode lttpr_mode_override;
 	unsigned int dsc_delay_factor_wa_x1000;
 	unsigned int min_prefetch_in_strobe_ns;
-=======
-	bool enable_dp_dig_pixel_rate_div_policy;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct gpu_info_soc_bounding_box_v1_0;
@@ -965,7 +909,6 @@ struct dc {
 
 	uint32_t *dcn_reg_offsets;
 	uint32_t *nbio_reg_offsets;
-<<<<<<< HEAD
 
 	/* Scratch memory */
 	struct {
@@ -977,8 +920,6 @@ struct dc {
 			struct _vcs_dpi_voltage_scaling_st clock_limits[DC__VOLTAGE_STATES];
 		} update_bw_bounding_box;
 	} scratch;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum frame_buffer_mode {
@@ -1182,10 +1123,7 @@ union surface_update_flags {
 		uint32_t clock_change:1;
 		uint32_t stereo_format_change:1;
 		uint32_t lut_3d:1;
-<<<<<<< HEAD
 		uint32_t tmz_changed:1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		uint32_t full_update:1;
 	} bits;
 
@@ -1675,12 +1613,9 @@ enum dc_status dc_process_dmub_set_mst_slots(const struct dc *dc,
 				uint32_t link_index,
 				uint8_t mst_alloc_slots,
 				uint8_t *mst_slots_in_use);
-<<<<<<< HEAD
 
 void dc_process_dmub_dpia_hpd_int_enable(const struct dc *dc,
 				uint32_t hpd_int_enable);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*******************************************************************************
  * DSC Interfaces

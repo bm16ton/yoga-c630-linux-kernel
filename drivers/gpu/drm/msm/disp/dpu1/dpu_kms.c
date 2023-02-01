@@ -897,18 +897,10 @@ static void dpu_kms_mdp_snapshot(struct msm_disp_state *disp_state, struct msm_k
 	int i;
 	struct dpu_kms *dpu_kms;
 	const struct dpu_mdss_cfg *cat;
-<<<<<<< HEAD
-=======
-	struct dpu_hw_mdp *top;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dpu_kms = to_dpu_kms(kms);
 
 	cat = dpu_kms->catalog;
-<<<<<<< HEAD
-=======
-	top = dpu_kms->hw_mdp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pm_runtime_get_sync(&dpu_kms->pdev->dev);
 

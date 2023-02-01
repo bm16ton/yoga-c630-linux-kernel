@@ -324,7 +324,6 @@ static void with_runs(struct dm_space_map *sm, const __le64 *value_le, unsigned 
 	uint32_t t;
 	bool in_run = false;
 	unsigned i;
-<<<<<<< HEAD
 
 	for (i = 0; i < count; i++, value_le++) {
 		/* We know value_le is 8 byte aligned */
@@ -345,28 +344,6 @@ static void with_runs(struct dm_space_map *sm, const __le64 *value_le, unsigned 
 		}
 	}
 
-=======
-
-	for (i = 0; i < count; i++, value_le++) {
-		/* We know value_le is 8 byte aligned */
-		unpack_block_time(le64_to_cpu(*value_le), &b, &t);
-
-		if (in_run) {
-			if (b == end) {
-				end++;
-			} else {
-				fn(sm, begin, end);
-				begin = b;
-				end = b + 1;
-			}
-		} else {
-			in_run = true;
-			begin = b;
-			end = b + 1;
-		}
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (in_run)
 		fn(sm, begin, end);
 }

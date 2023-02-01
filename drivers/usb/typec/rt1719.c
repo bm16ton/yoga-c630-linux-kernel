@@ -930,21 +930,12 @@ err_fwnode_put:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void rt1719_remove(struct i2c_client *i2c)
-=======
-static int rt1719_remove(struct i2c_client *i2c)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct rt1719_data *data = i2c_get_clientdata(i2c);
 
 	typec_unregister_port(data->port);
 	usb_role_switch_put(data->role_sw);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id __maybe_unused rt1719_device_table[] = {

@@ -9,19 +9,9 @@
 
 #include <linux/export.h>
 #include <linux/of.h>
-<<<<<<< HEAD
 
 #include <drm/drm_bridge.h>
 #include <drm/drm_bridge_connector.h>
-=======
-#include <linux/slab.h>
-
-#include <drm/drm_bridge.h>
-#include <drm/drm_bridge_connector.h>
-#include <drm/drm_crtc.h>
-#include <drm/drm_managed.h>
-#include <drm/drm_modeset_helper_vtables.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_panel.h>
 
 #include "rcar_du_drv.h"

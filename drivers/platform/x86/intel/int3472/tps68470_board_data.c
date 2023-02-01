@@ -30,7 +30,6 @@ static struct regulator_consumer_supply int347a_vcm_consumer_supplies[] = {
 static struct regulator_consumer_supply int347a_vsio_consumer_supplies[] = {
 	REGULATOR_SUPPLY("dovdd", "i2c-INT347A:00"),
 	REGULATOR_SUPPLY("vsio", "i2c-INT347A:00-VCM"),
-<<<<<<< HEAD
 	REGULATOR_SUPPLY("vddd", "i2c-INT347E:00"),
 };
 
@@ -40,8 +39,6 @@ static struct regulator_consumer_supply int347a_aux1_consumer_supplies[] = {
 
 static struct regulator_consumer_supply int347a_aux2_consumer_supplies[] = {
 	REGULATOR_SUPPLY("vdddo", "i2c-INT347E:00"),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct regulator_init_data surface_go_tps68470_core_reg_init_data = {
@@ -98,7 +95,6 @@ static const struct regulator_init_data surface_go_tps68470_vsio_reg_init_data =
 	.consumer_supplies = int347a_vsio_consumer_supplies,
 };
 
-<<<<<<< HEAD
 static const struct regulator_init_data surface_go_tps68470_aux1_reg_init_data = {
 	.constraints = {
 		.min_uV = 2815200,
@@ -121,8 +117,6 @@ static const struct regulator_init_data surface_go_tps68470_aux2_reg_init_data =
 	.consumer_supplies = int347a_aux2_consumer_supplies,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct tps68470_regulator_platform_data surface_go_tps68470_pdata = {
 	.reg_init_data = {
 		[TPS68470_CORE] = &surface_go_tps68470_core_reg_init_data,
@@ -130,19 +124,12 @@ static const struct tps68470_regulator_platform_data surface_go_tps68470_pdata =
 		[TPS68470_VCM]  = &surface_go_tps68470_vcm_reg_init_data,
 		[TPS68470_VIO] = &surface_go_tps68470_vio_reg_init_data,
 		[TPS68470_VSIO] = &surface_go_tps68470_vsio_reg_init_data,
-<<<<<<< HEAD
 		[TPS68470_AUX1] = &surface_go_tps68470_aux1_reg_init_data,
 		[TPS68470_AUX2] = &surface_go_tps68470_aux2_reg_init_data,
 	},
 };
 
 static struct gpiod_lookup_table surface_go_int347a_gpios = {
-=======
-	},
-};
-
-static struct gpiod_lookup_table surface_go_tps68470_gpios = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.dev_id = "i2c-INT347A:00",
 	.table = {
 		GPIO_LOOKUP("tps68470-gpio", 9, "reset", GPIO_ACTIVE_LOW),
@@ -151,7 +138,6 @@ static struct gpiod_lookup_table surface_go_tps68470_gpios = {
 	}
 };
 
-<<<<<<< HEAD
 static struct gpiod_lookup_table surface_go_int347e_gpios = {
 	.dev_id = "i2c-INT347E:00",
 	.table = {
@@ -168,26 +154,15 @@ static const struct int3472_tps68470_board_data surface_go_tps68470_board_data =
 		&surface_go_int347a_gpios,
 		&surface_go_int347e_gpios,
 	},
-=======
-static const struct int3472_tps68470_board_data surface_go_tps68470_board_data = {
-	.dev_name = "i2c-INT3472:05",
-	.tps68470_gpio_lookup_table = &surface_go_tps68470_gpios,
-	.tps68470_regulator_pdata = &surface_go_tps68470_pdata,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct int3472_tps68470_board_data surface_go3_tps68470_board_data = {
 	.dev_name = "i2c-INT3472:01",
-<<<<<<< HEAD
 	.tps68470_regulator_pdata = &surface_go_tps68470_pdata,
 	.n_gpiod_lookups = 1,
 	.tps68470_gpio_lookup_tables = {
 		&surface_go_int347a_gpios
 	},
-=======
-	.tps68470_gpio_lookup_table = &surface_go_tps68470_gpios,
-	.tps68470_regulator_pdata = &surface_go_tps68470_pdata,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct dmi_system_id int3472_tps68470_board_data_table[] = {

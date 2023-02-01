@@ -39,31 +39,10 @@ static const struct mtk_gate cam_clks[] = {
 	GATE_CAM(CLK_CAM_CCU, "cam_ccu", "mm_ck", 12),
 };
 
-<<<<<<< HEAD
 static const struct mtk_clk_desc cam_desc = {
 	.clks = cam_clks,
 	.num_clks = ARRAY_SIZE(cam_clks),
 };
-=======
-static int clk_mt6765_cam_probe(struct platform_device *pdev)
-{
-	struct clk_hw_onecell_data *clk_data;
-	int r;
-	struct device_node *node = pdev->dev.of_node;
-
-	clk_data = mtk_alloc_clk_data(CLK_CAM_NR_CLK);
-
-	mtk_clk_register_gates(node, cam_clks, ARRAY_SIZE(cam_clks), clk_data);
-
-	r = of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_data);
-
-	if (r)
-		pr_err("%s(): could not register clock provider: %d\n",
-		       __func__, r);
-
-	return r;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct of_device_id of_match_clk_mt6765_cam[] = {
 	{

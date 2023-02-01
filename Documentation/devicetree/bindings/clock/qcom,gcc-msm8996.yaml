@@ -48,25 +48,6 @@ properties:
       - const: ufs_rx_symbol_0_clk_src
       - const: ufs_rx_symbol_1_clk_src
       - const: ufs_tx_symbol_0_clk_src
-<<<<<<< HEAD
-=======
-
-  '#clock-cells':
-    const: 1
-
-  '#reset-cells':
-    const: 1
-
-  '#power-domain-cells':
-    const: 1
-
-  reg:
-    maxItems: 1
-
-  protected-clocks:
-    description:
-      Protected clock specifier list as per common clock binding.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 required:
   - compatible

@@ -23,10 +23,7 @@
 #include "intel_display_power_well.h"
 #include "intel_display_types.h"
 #include "intel_hdcp.h"
-<<<<<<< HEAD
 #include "intel_hdcp_regs.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "intel_pcode.h"
 
 #define KEY_LOAD_TRIES	5
@@ -1135,13 +1132,8 @@ static void intel_hdcp_prop_work(struct work_struct *work)
 
 bool is_hdcp_supported(struct drm_i915_private *dev_priv, enum port port)
 {
-<<<<<<< HEAD
 	return RUNTIME_INFO(dev_priv)->has_hdcp &&
 		(DISPLAY_VER(dev_priv) >= 12 || port < PORT_E);
-=======
-	return INTEL_INFO(dev_priv)->display.has_hdcp &&
-			(DISPLAY_VER(dev_priv) >= 12 || port < PORT_E);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int

@@ -18,10 +18,7 @@
 #include <linux/property.h>
 #include <linux/regmap.h>
 #include <linux/reset.h>
-<<<<<<< HEAD
 #include <linux/slab.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/units.h>
 
 /* PVT Common register */
@@ -181,7 +178,6 @@ struct pvt_device {
 	u32			t_num;
 	u32			p_num;
 	u32			v_num;
-	u32			c_num;
 	u32			ip_freq;
 };
 
@@ -315,7 +311,6 @@ static int pvt_read_in(struct device *dev, u32 attr, int channel, long *val)
 {
 	struct pvt_device *pvt = dev_get_drvdata(dev);
 	struct regmap *v_map = pvt->v_map;
-<<<<<<< HEAD
 	u32 n, stat, pre_scaler;
 	u8 vm_idx, ch_idx;
 	int ret;
@@ -325,17 +320,6 @@ static int pvt_read_in(struct device *dev, u32 attr, int channel, long *val)
 
 	vm_idx = pvt->vd[channel].vm_map;
 	ch_idx = pvt->vd[channel].ch_map;
-=======
-	u8 vm_idx, ch_idx;
-	u32 n, stat;
-	int ret;
-
-	if (channel >= pvt->v_num * pvt->c_num)
-		return -EINVAL;
-
-	vm_idx = pvt->vm_idx[channel / pvt->c_num];
-	ch_idx = channel % pvt->c_num;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (attr) {
 	case hwmon_in_input:
@@ -347,18 +331,11 @@ static int pvt_read_in(struct device *dev, u32 attr, int channel, long *val)
 			return ret;
 
 		ret = regmap_read(v_map, VM_SDIF_DATA(vm_idx, ch_idx), &n);
-<<<<<<< HEAD
 		if (ret < 0)
 			return ret;
 
 		n &= SAMPLE_DATA_MSK;
 		pre_scaler = pvt->vd[channel].pre_scaler;
-=======
-		if(ret < 0)
-			return ret;
-
-		n &= SAMPLE_DATA_MSK;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Convert the N bitstream count into voltage.
 		 * To support negative voltage calculation for 64bit machines
@@ -370,12 +347,8 @@ static int pvt_read_in(struct device *dev, u32 attr, int channel, long *val)
 		 * BIT(x) may not be used instead of (1 << x) because it's
 		 * unsigned.
 		 */
-<<<<<<< HEAD
 		*val = pre_scaler * (PVT_N_CONST * (long)n - PVT_R_CONST) /
 			(1 << PVT_CONV_BITS);
-=======
-		*val = (PVT_N_CONST * (long)n - PVT_R_CONST) / (1 << PVT_CONV_BITS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		return 0;
 	default:
@@ -549,19 +522,6 @@ static int pvt_init(struct pvt_device *pvt)
 			return ret;
 
 		val = (BIT(pvt->vm_channels.max) - 1) | VM_CH_INIT |
-		      IP_POLL << SDIF_ADDR_SFT | SDIF_WRN_W | SDIF_PROG;
-		ret = regmap_write(v_map, SDIF_W, val);
-		if (ret < 0)
-			return ret;
-
-		ret = regmap_read_poll_timeout(v_map, SDIF_STAT,
-					       val, !(val & SDIF_BUSY),
-					       PVT_POLL_DELAY_US,
-					       PVT_POLL_TIMEOUT_US);
-		if (ret)
-			return ret;
-
-		val = (BIT(pvt->c_num) - 1) | VM_CH_INIT |
 		      IP_POLL << SDIF_ADDR_SFT | SDIF_WRN_W | SDIF_PROG;
 		ret = regmap_write(v_map, SDIF_W, val);
 		if (ret < 0)
@@ -848,7 +808,6 @@ static int mr75203_probe(struct platform_device *pdev)
 	pvt->t_num = ts_num;
 	pvt->p_num = pd_num;
 	pvt->v_num = vm_num;
-	pvt->c_num = ch_num;
 	val = 0;
 	if (ts_num)
 		val++;
@@ -891,11 +850,7 @@ static int mr75203_probe(struct platform_device *pdev)
 	}
 
 	if (vm_num) {
-<<<<<<< HEAD
 		u8 vm_idx[VM_NUM_MAX];
-=======
-		u32 total_ch;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		ret = pvt_get_regmap(pdev, "vm", pvt);
 		if (ret)
@@ -909,25 +864,16 @@ static int mr75203_probe(struct platform_device *pdev)
 			 * assume incremental channel numbers.
 			 */
 			for (i = 0; i < vm_num; i++)
-<<<<<<< HEAD
 				vm_idx[i] = i;
 		} else {
 			for (i = 0; i < vm_num; i++)
 				if (vm_idx[i] >= vm_num || vm_idx[i] == 0xff) {
-=======
-				pvt->vm_idx[i] = i;
-		} else {
-			for (i = 0; i < vm_num; i++)
-				if (pvt->vm_idx[i] >= vm_num ||
-				    pvt->vm_idx[i] == 0xff) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pvt->v_num = i;
 					vm_num = i;
 					break;
 				}
 		}
 
-<<<<<<< HEAD
 		ret = pvt_get_active_channel(dev, pvt, vm_num, ch_num, vm_idx);
 		if (ret)
 			return ret;
@@ -937,21 +883,12 @@ static int mr75203_probe(struct platform_device *pdev)
 			return ret;
 
 		in_config = devm_kcalloc(dev, pvt->vm_channels.total + 1,
-=======
-		total_ch = ch_num * vm_num;
-		in_config = devm_kcalloc(dev, total_ch + 1,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 sizeof(*in_config), GFP_KERNEL);
 		if (!in_config)
 			return -ENOMEM;
 
-<<<<<<< HEAD
 		memset32(in_config, HWMON_I_INPUT, pvt->vm_channels.total);
 		in_config[pvt->vm_channels.total] = 0;
-=======
-		memset32(in_config, HWMON_I_INPUT, total_ch);
-		in_config[total_ch] = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pvt_in.config = in_config;
 
 		pvt_info[index++] = &pvt_in;

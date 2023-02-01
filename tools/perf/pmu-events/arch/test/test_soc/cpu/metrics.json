@@ -34,7 +34,6 @@
     "MetricName": "DCache_L2_All_Miss"
   },
   {
-<<<<<<< HEAD
     "MetricExpr": "DCache_L2_All_Hits + DCache_L2_All_Miss",
     "MetricName": "DCache_L2_All"
   },
@@ -44,17 +43,6 @@
   },
   {
     "MetricExpr": "d_ratio(DCache_L2_All_Miss, DCache_L2_All)",
-=======
-    "MetricExpr": "dcache_l2_all_hits + dcache_l2_all_miss",
-    "MetricName": "DCache_L2_All"
-  },
-  {
-    "MetricExpr": "d_ratio(dcache_l2_all_hits, dcache_l2_all)",
-    "MetricName": "DCache_L2_Hits"
-  },
-  {
-    "MetricExpr": "d_ratio(dcache_l2_all_miss, dcache_l2_all)",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     "MetricName": "DCache_L2_Misses"
   },
   {

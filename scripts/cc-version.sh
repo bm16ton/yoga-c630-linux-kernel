@@ -6,13 +6,8 @@
 
 set -e
 
-<<<<<<< HEAD
 # Print the C compiler name and some version components.
 get_c_compiler_info()
-=======
-# Print the compiler name and some version components.
-get_compiler_info()
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	cat <<- EOF | "$@" -E -P -x c - 2>/dev/null
 	#if defined(__clang__)

@@ -265,7 +265,6 @@ config CHROMEOS_PRIVACY_SCREEN
 	  this should probably always be built into the kernel to avoid or
 	  minimize drm probe deferral.
 
-<<<<<<< HEAD
 config CROS_TYPEC_SWITCH
 	tristate "ChromeOS EC Type-C Switch Control"
 	depends on MFD_CROS_EC_DEV && TYPEC && ACPI
@@ -277,8 +276,6 @@ config CROS_TYPEC_SWITCH
 	  To compile this driver as a module, choose M here: the module will be
 	  called cros_typec_switch.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/platform/chrome/wilco_ec/Kconfig"
 
 # Kunit test cases

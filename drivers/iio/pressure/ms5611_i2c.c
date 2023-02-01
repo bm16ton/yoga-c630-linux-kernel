@@ -108,11 +108,6 @@ static int ms5611_i2c_probe(struct i2c_client *client,
 static void ms5611_i2c_remove(struct i2c_client *client)
 {
 	ms5611_remove(i2c_get_clientdata(client));
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id ms5611_i2c_matches[] = {

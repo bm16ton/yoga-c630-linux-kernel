@@ -594,15 +594,11 @@ static int aries_audio_probe(struct platform_device *pdev)
 		return dev_err_probe(dev, PTR_ERR(priv->adc),
 				     "Failed to get ADC channel");
 
-<<<<<<< HEAD
 	ret = iio_get_channel_type(priv->adc, &channel_type);
 	if (ret)
 		return dev_err_probe(dev, ret,
 				     "Failed to get ADC channel type");
 	if (channel_type != IIO_VOLTAGE)
-=======
-	if (priv->adc->channel->type != IIO_VOLTAGE)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	priv->gpio_headset_key = devm_gpiod_get(dev, "headset-key",

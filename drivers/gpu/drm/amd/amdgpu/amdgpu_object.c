@@ -451,11 +451,7 @@ static bool amdgpu_bo_validate_size(struct amdgpu_device *adev,
 	if (domain & AMDGPU_GEM_DOMAIN_GTT) {
 		man = ttm_manager_type(&adev->mman.bdev, TTM_PL_TT);
 
-<<<<<<< HEAD
 		if (man && size < man->size)
-=======
-		if (size < man->size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return true;
 		else if (!man)
 			WARN_ON_ONCE("GTT domain requested but GTT mem manager uninitialized");
@@ -463,11 +459,7 @@ static bool amdgpu_bo_validate_size(struct amdgpu_device *adev,
 	} else if (domain & AMDGPU_GEM_DOMAIN_VRAM) {
 		man = ttm_manager_type(&adev->mman.bdev, TTM_PL_VRAM);
 
-<<<<<<< HEAD
 		if (man && size < man->size)
-=======
-		if (size < man->size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return true;
 		goto fail;
 	}
@@ -476,14 +468,9 @@ static bool amdgpu_bo_validate_size(struct amdgpu_device *adev,
 	return true;
 
 fail:
-<<<<<<< HEAD
 	if (man)
 		DRM_DEBUG("BO size %lu > total memory in domain: %llu\n", size,
 			  man->size);
-=======
-	DRM_DEBUG("BO size %lu > total memory in domain: %llu\n", size,
-		  man->size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 
@@ -602,11 +589,7 @@ int amdgpu_bo_create(struct amdgpu_device *adev,
 	if (!bp->destroy)
 		bp->destroy = &amdgpu_bo_destroy;
 
-<<<<<<< HEAD
 	r = ttm_bo_init_reserved(&adev->mman.bdev, &bo->tbo, bp->type,
-=======
-	r = ttm_bo_init_reserved(&adev->mman.bdev, &bo->tbo, size, bp->type,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 &bo->placement, page_align, &ctx,  NULL,
 				 bp->resv, bp->destroy);
 	if (unlikely(r != 0))
@@ -703,23 +686,16 @@ int amdgpu_bo_create_vm(struct amdgpu_device *adev,
 	 * num of amdgpu_vm_pt entries.
 	 */
 	BUG_ON(bp->bo_ptr_size < sizeof(struct amdgpu_bo_vm));
-<<<<<<< HEAD
-=======
-	bp->destroy = &amdgpu_bo_vm_destroy;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	r = amdgpu_bo_create(adev, bp, &bo_ptr);
 	if (r)
 		return r;
 
 	*vmbo_ptr = to_amdgpu_bo_vm(bo_ptr);
 	INIT_LIST_HEAD(&(*vmbo_ptr)->shadow_list);
-<<<<<<< HEAD
 	/* Set destroy callback to amdgpu_bo_vm_destroy after vmbo->shadow_list
 	 * is initialized.
 	 */
 	bo_ptr->tbo.destroy = &amdgpu_bo_vm_destroy;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return r;
 }
 
@@ -1334,11 +1310,7 @@ void amdgpu_bo_release_notify(struct ttm_buffer_object *bo)
 	if (bo->base.resv == &bo->base._resv)
 		amdgpu_amdkfd_remove_fence_on_pt_pd_bos(abo);
 
-<<<<<<< HEAD
 	if (!bo->resource || bo->resource->mem_type != TTM_PL_VRAM ||
-=======
-	if (bo->resource->mem_type != TTM_PL_VRAM ||
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    !(abo->flags & AMDGPU_GEM_CREATE_VRAM_WIPE_ON_RELEASE) ||
 	    adev->in_suspend || adev->shutdown)
 		return;

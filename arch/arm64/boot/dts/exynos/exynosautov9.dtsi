@@ -207,7 +207,6 @@
 				      "dout_clkcmu_peric1_ip";
 		};
 
-<<<<<<< HEAD
 		cmu_fsys1: clock-controller@17040000 {
 			compatible = "samsung,exynosautov9-cmu-fsys1";
 			reg = <0x17040000 0x8000>;
@@ -236,8 +235,6 @@
 				      "dout_clkcmu_fsys0_pcie";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		cmu_fsys2: clock-controller@17c00000 {
 			compatible = "samsung,exynosautov9-cmu-fsys2";
 			reg = <0x17c00000 0x8000>;

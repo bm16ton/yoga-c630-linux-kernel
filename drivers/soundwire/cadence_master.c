@@ -961,15 +961,12 @@ static void cdns_update_slave_status_work(struct work_struct *work)
 	u64 slave_intstat;
 	u32 device0_status;
 	int retry_count = 0;
-<<<<<<< HEAD
 
 	/*
 	 * Clear main interrupt first so we don't lose any assertions
 	 * that happen during this function.
 	 */
 	cdns_writel(cdns, CDNS_MCP_INTSTAT, CDNS_MCP_INT_SLAVE_MASK);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	slave0 = cdns_readl(cdns, CDNS_MCP_SLAVE_INTSTAT0);
 	slave1 = cdns_readl(cdns, CDNS_MCP_SLAVE_INTSTAT1);
@@ -1004,14 +1001,11 @@ update_status:
 	 * attention with PING commands. There is no need to check for
 	 * ALERTS since they are not allowed until a non-zero
 	 * device_number is assigned.
-<<<<<<< HEAD
 	 *
 	 * Do not clear the INTSTAT0/1. While looping to enumerate devices on
 	 * #0 there could be status changes on other devices - these must
 	 * be kept in the INTSTAT so they can be handled when all #0 devices
 	 * have been handled.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
 
 	device0_status = cdns_readl(cdns, CDNS_MCP_SLAVE_STAT);
@@ -1031,12 +1025,7 @@ update_status:
 		}
 	}
 
-<<<<<<< HEAD
 	/* unmask Slave interrupt now */
-=======
-	/* clear and unmask Slave interrupt now */
-	cdns_writel(cdns, CDNS_MCP_INTSTAT, CDNS_MCP_INT_SLAVE_MASK);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cdns_updatel(cdns, CDNS_MCP_INTMASK,
 		     CDNS_MCP_INT_SLAVE_MASK, CDNS_MCP_INT_SLAVE_MASK);
 

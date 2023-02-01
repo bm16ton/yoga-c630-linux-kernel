@@ -5,10 +5,7 @@
 #include "en/params.h"
 #include "en/txrx.h"
 #include "en/health.h"
-<<<<<<< HEAD
 #include <net/xdp_sock_drv.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* The limitation of 2048 can be altered, but shouldn't go beyond the minimal
  * stride size of striding RQ.
@@ -69,11 +66,7 @@ static int mlx5e_init_xsk_rq(struct mlx5e_channel *c,
 	rq->xsk_pool     = pool;
 	rq->stats        = &c->priv->channel_stats[c->ix]->xskrq;
 	rq->ptp_cyc2time = mlx5_rq_ts_translator(mdev);
-<<<<<<< HEAD
 	rq_xdp_ix        = c->ix;
-=======
-	rq_xdp_ix        = c->ix + params->num_channels * MLX5E_RQ_GROUP_XSK;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = mlx5e_rq_set_handlers(rq, params, xsk);
 	if (err)
 		return err;

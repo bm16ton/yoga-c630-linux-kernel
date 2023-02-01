@@ -11,12 +11,8 @@ LF='
 '
 
 #
-<<<<<<< HEAD
 # Use version from kernel Makefile unless not in a git repository and
 # PERF-VERSION-FILE exists
-=======
-# Always try first to get the version from the kernel Makefile
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #
 CID=
 TAG=
@@ -24,16 +20,14 @@ if test -d ../../.git -o -f ../../.git
 then
 	TAG=$(MAKEFLAGS= make -sC ../.. kernelversion)
 	CID=$(git log -1 --abbrev=12 --pretty=format:"%h" 2>/dev/null) && CID="-g$CID"
-else
+elif test -f ../../PERF-VERSION-FILE
+then
 	TAG=$(cut -d' ' -f3 ../../PERF-VERSION-FILE | sed -e 's/\"//g')
 fi
-<<<<<<< HEAD
 if test -z "$TAG"
 then
 	TAG=$(MAKEFLAGS= make -sC ../.. kernelversion)
 fi
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 VN="$TAG$CID"
 if test -n "$CID"

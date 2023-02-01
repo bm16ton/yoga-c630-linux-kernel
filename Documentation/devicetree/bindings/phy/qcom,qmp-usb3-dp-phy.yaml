@@ -16,10 +16,7 @@ properties:
       - qcom,sc7180-qmp-usb3-dp-phy
       - qcom,sc7280-qmp-usb3-dp-phy
       - qcom,sc8180x-qmp-usb3-dp-phy
-<<<<<<< HEAD
       - qcom,sc8280xp-qmp-usb43dp-phy
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - qcom,sdm845-qmp-usb3-dp-phy
       - qcom,sm8250-qmp-usb3-dp-phy
   reg:

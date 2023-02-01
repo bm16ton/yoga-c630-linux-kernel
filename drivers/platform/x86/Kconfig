@@ -93,10 +93,7 @@ config PEAQ_WMI
 
 config NVIDIA_WMI_EC_BACKLIGHT
 	tristate "EC Backlight Driver for Hybrid Graphics Notebook Systems"
-<<<<<<< HEAD
 	depends on ACPI_VIDEO
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on ACPI_WMI
 	depends on BACKLIGHT_CLASS_DEVICE
 	help
@@ -199,7 +196,6 @@ config ACER_WMI
 	  here.
 
 source "drivers/platform/x86/amd/Kconfig"
-<<<<<<< HEAD
 
 config ADV_SWBUTTON
 	tristate "Advantech ACPI Software Button Driver"
@@ -209,17 +205,6 @@ config ADV_SWBUTTON
 	  button feature. More information can be found at
 	  <http://www.advantech.com.tw/products/>
 
-=======
-
-config ADV_SWBUTTON
-	tristate "Advantech ACPI Software Button Driver"
-	depends on ACPI && INPUT
-	help
-	  Say Y here to enable support for Advantech software defined
-	  button feature. More information can be found at
-	  <http://www.advantech.com.tw/products/>
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	  To compile this driver as a module, choose M here. The module will
 	  be called adv_swbutton.
 

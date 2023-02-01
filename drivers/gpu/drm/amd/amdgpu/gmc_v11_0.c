@@ -39,10 +39,7 @@
 #include "soc15_common.h"
 #include "nbio_v4_3.h"
 #include "gfxhub_v3_0.h"
-<<<<<<< HEAD
 #include "gfxhub_v3_0_3.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "mmhub_v3_0.h"
 #include "mmhub_v3_0_1.h"
 #include "mmhub_v3_0_2.h"
@@ -241,12 +238,8 @@ static void gmc_v11_0_flush_vm_hub(struct amdgpu_device *adev, uint32_t vmid,
 
 	/* Issue additional private vm invalidation to MMHUB */
 	if ((vmhub != AMDGPU_GFXHUB_0) &&
-<<<<<<< HEAD
 	    (hub->vm_l2_bank_select_reserved_cid2) &&
 		!amdgpu_sriov_vf(adev)) {
-=======
-	    (hub->vm_l2_bank_select_reserved_cid2)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		inv_req = RREG32_NO_KIQ(hub->vm_l2_bank_select_reserved_cid2);
 		/* bit 25: RSERVED_CACHE_PRIVATE_INVALIDATION */
 		inv_req |= (1 << 25);
@@ -603,7 +596,6 @@ static void gmc_v11_0_set_mmhub_funcs(struct amdgpu_device *adev)
 
 static void gmc_v11_0_set_gfxhub_funcs(struct amdgpu_device *adev)
 {
-<<<<<<< HEAD
 	switch (adev->ip_versions[GC_HWIP][0]) {
 	case IP_VERSION(11, 0, 3):
 		adev->gfxhub.funcs = &gfxhub_v3_0_3_funcs;
@@ -612,9 +604,6 @@ static void gmc_v11_0_set_gfxhub_funcs(struct amdgpu_device *adev)
 		adev->gfxhub.funcs = &gfxhub_v3_0_funcs;
 		break;
 	}
-=======
-	adev->gfxhub.funcs = &gfxhub_v3_0_funcs;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int gmc_v11_0_early_init(void *handle)
@@ -664,14 +653,10 @@ static void gmc_v11_0_vram_gtt_location(struct amdgpu_device *adev,
 	amdgpu_gmc_gart_location(adev, mc);
 
 	/* base offset of vram pages */
-<<<<<<< HEAD
 	if (amdgpu_sriov_vf(adev))
 		adev->vm_manager.vram_base_offset = 0;
 	else
 		adev->vm_manager.vram_base_offset = adev->mmhub.funcs->get_mc_fb_offset(adev);
-=======
-	adev->vm_manager.vram_base_offset = adev->mmhub.funcs->get_mc_fb_offset(adev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -763,11 +748,8 @@ static int gmc_v11_0_sw_init(void *handle)
 	case IP_VERSION(11, 0, 0):
 	case IP_VERSION(11, 0, 1):
 	case IP_VERSION(11, 0, 2):
-<<<<<<< HEAD
 	case IP_VERSION(11, 0, 3):
 	case IP_VERSION(11, 0, 4):
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adev->num_vmhubs = 2;
 		/*
 		 * To fulfill 4-level page support,

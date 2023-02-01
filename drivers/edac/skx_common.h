@@ -10,10 +10,7 @@
 #define _SKX_COMM_EDAC_H
 
 #include <linux/bits.h>
-<<<<<<< HEAD
 #include <asm/mce.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define MSG_SIZE		1024
 
@@ -89,10 +86,7 @@ struct skx_dev {
 			struct pci_dev	*edev;
 			u32 retry_rd_err_log_s;
 			u32 retry_rd_err_log_d;
-<<<<<<< HEAD
 			u32 retry_rd_err_log_d2;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			struct skx_dimm {
 				u8 close_pg;
 				u8 bank_xor_enable;
@@ -119,28 +113,19 @@ enum {
 	INDEX_MEMCTRL,
 	INDEX_CHANNEL,
 	INDEX_DIMM,
-<<<<<<< HEAD
 	INDEX_CS,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INDEX_NM_FIRST,
 	INDEX_NM_MEMCTRL = INDEX_NM_FIRST,
 	INDEX_NM_CHANNEL,
 	INDEX_NM_DIMM,
-<<<<<<< HEAD
 	INDEX_NM_CS,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INDEX_MAX
 };
 
 #define BIT_NM_MEMCTRL	BIT_ULL(INDEX_NM_MEMCTRL)
 #define BIT_NM_CHANNEL	BIT_ULL(INDEX_NM_CHANNEL)
 #define BIT_NM_DIMM	BIT_ULL(INDEX_NM_DIMM)
-<<<<<<< HEAD
 #define BIT_NM_CS	BIT_ULL(INDEX_NM_CS)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct decoded_addr {
 	struct mce *mce;
@@ -180,16 +165,12 @@ struct res_config {
 	int sad_all_offset;
 	/* Offsets of retry_rd_err_log registers */
 	u32 *offsets_scrub;
-<<<<<<< HEAD
 	u32 *offsets_scrub_hbm0;
 	u32 *offsets_scrub_hbm1;
 	u32 *offsets_demand;
 	u32 *offsets_demand2;
 	u32 *offsets_demand_hbm0;
 	u32 *offsets_demand_hbm1;
-=======
-	u32 *offsets_demand;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 typedef int (*get_dimm_config_f)(struct mem_ctl_info *mci,

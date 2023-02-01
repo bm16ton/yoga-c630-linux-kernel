@@ -37,13 +37,8 @@ static struct page *has_unmovable_pages(unsigned long start_pfn, unsigned long e
 	struct zone *zone = page_zone(page);
 	unsigned long pfn;
 
-<<<<<<< HEAD
 	VM_BUG_ON(pageblock_start_pfn(start_pfn) !=
 		  pageblock_start_pfn(end_pfn - 1));
-=======
-	VM_BUG_ON(ALIGN_DOWN(start_pfn, pageblock_nr_pages) !=
-		  ALIGN_DOWN(end_pfn - 1, pageblock_nr_pages));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (is_migrate_cma_page(page)) {
 		/*
@@ -177,11 +172,7 @@ static int set_migratetype_isolate(struct page *page, int migratetype, int isol_
 	 * to avoid redundant checks.
 	 */
 	check_unmovable_start = max(page_to_pfn(page), start_pfn);
-<<<<<<< HEAD
 	check_unmovable_end = min(pageblock_end_pfn(page_to_pfn(page)),
-=======
-	check_unmovable_end = min(ALIGN(page_to_pfn(page) + 1, pageblock_nr_pages),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				  end_pfn);
 
 	unmovable = has_unmovable_pages(check_unmovable_start, check_unmovable_end,
@@ -297,10 +288,7 @@ __first_valid_page(unsigned long pfn, unsigned long nr_pages)
  * @isolate_before:	isolate the pageblock before the boundary_pfn
  * @skip_isolation:	the flag to skip the pageblock isolation in second
  *			isolate_single_pageblock()
-<<<<<<< HEAD
  * @migratetype:	migrate type to set in error recovery.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Free and in-use pages can be as big as MAX_ORDER-1 and contain more than one
  * pageblock. When not all pageblocks within a page are isolated at the same
@@ -315,26 +303,16 @@ __first_valid_page(unsigned long pfn, unsigned long nr_pages)
  * the in-use page then splitting the free page.
  */
 static int isolate_single_pageblock(unsigned long boundary_pfn, int flags,
-<<<<<<< HEAD
 			gfp_t gfp_flags, bool isolate_before, bool skip_isolation,
 			int migratetype)
 {
-=======
-			gfp_t gfp_flags, bool isolate_before, bool skip_isolation)
-{
-	unsigned char saved_mt;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long start_pfn;
 	unsigned long isolate_pageblock;
 	unsigned long pfn;
 	struct zone *zone;
 	int ret;
 
-<<<<<<< HEAD
 	VM_BUG_ON(!pageblock_aligned(boundary_pfn));
-=======
-	VM_BUG_ON(!IS_ALIGNED(boundary_pfn, pageblock_nr_pages));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (isolate_before)
 		isolate_pageblock = boundary_pfn - pageblock_nr_pages;
@@ -351,7 +329,6 @@ static int isolate_single_pageblock(unsigned long boundary_pfn, int flags,
 	start_pfn  = max(ALIGN_DOWN(isolate_pageblock, MAX_ORDER_NR_PAGES),
 				      zone->zone_start_pfn);
 
-<<<<<<< HEAD
 	if (skip_isolation) {
 		int mt __maybe_unused = get_pageblock_migratetype(pfn_to_page(isolate_pageblock));
 
@@ -359,15 +336,6 @@ static int isolate_single_pageblock(unsigned long boundary_pfn, int flags,
 	} else {
 		ret = set_migratetype_isolate(pfn_to_page(isolate_pageblock), migratetype,
 				flags, isolate_pageblock, isolate_pageblock + pageblock_nr_pages);
-=======
-	saved_mt = get_pageblock_migratetype(pfn_to_page(isolate_pageblock));
-
-	if (skip_isolation)
-		VM_BUG_ON(!is_migrate_isolate(saved_mt));
-	else {
-		ret = set_migratetype_isolate(pfn_to_page(isolate_pageblock), saved_mt, flags,
-				isolate_pageblock, isolate_pageblock + pageblock_nr_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (ret)
 			return ret;
@@ -508,11 +476,7 @@ static int isolate_single_pageblock(unsigned long boundary_pfn, int flags,
 failed:
 	/* restore the original migratetype */
 	if (!skip_isolation)
-<<<<<<< HEAD
 		unset_migratetype_isolate(pfn_to_page(isolate_pageblock), migratetype);
-=======
-		unset_migratetype_isolate(pfn_to_page(isolate_pageblock), saved_mt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return -EBUSY;
 }
 
@@ -568,23 +532,14 @@ int start_isolate_page_range(unsigned long start_pfn, unsigned long end_pfn,
 	unsigned long pfn;
 	struct page *page;
 	/* isolation is done at page block granularity */
-<<<<<<< HEAD
 	unsigned long isolate_start = pageblock_start_pfn(start_pfn);
 	unsigned long isolate_end = pageblock_align(end_pfn);
-=======
-	unsigned long isolate_start = ALIGN_DOWN(start_pfn, pageblock_nr_pages);
-	unsigned long isolate_end = ALIGN(end_pfn, pageblock_nr_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 	bool skip_isolation = false;
 
 	/* isolate [isolate_start, isolate_start + pageblock_nr_pages) pageblock */
-<<<<<<< HEAD
 	ret = isolate_single_pageblock(isolate_start, flags, gfp_flags, false,
 			skip_isolation, migratetype);
-=======
-	ret = isolate_single_pageblock(isolate_start, flags, gfp_flags, false, skip_isolation);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -592,12 +547,8 @@ int start_isolate_page_range(unsigned long start_pfn, unsigned long end_pfn,
 		skip_isolation = true;
 
 	/* isolate [isolate_end - pageblock_nr_pages, isolate_end) pageblock */
-<<<<<<< HEAD
 	ret = isolate_single_pageblock(isolate_end, flags, gfp_flags, true,
 			skip_isolation, migratetype);
-=======
-	ret = isolate_single_pageblock(isolate_end, flags, gfp_flags, true, skip_isolation);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		unset_migratetype_isolate(pfn_to_page(isolate_start), migratetype);
 		return ret;
@@ -628,16 +579,9 @@ void undo_isolate_page_range(unsigned long start_pfn, unsigned long end_pfn,
 {
 	unsigned long pfn;
 	struct page *page;
-<<<<<<< HEAD
 	unsigned long isolate_start = pageblock_start_pfn(start_pfn);
 	unsigned long isolate_end = pageblock_align(end_pfn);
 
-=======
-	unsigned long isolate_start = ALIGN_DOWN(start_pfn, pageblock_nr_pages);
-	unsigned long isolate_end = ALIGN(end_pfn, pageblock_nr_pages);
-
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (pfn = isolate_start;
 	     pfn < isolate_end;
 	     pfn += pageblock_nr_pages) {

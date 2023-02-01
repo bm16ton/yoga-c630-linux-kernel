@@ -3215,12 +3215,7 @@ static void ath10k_pci_free_irq(struct ath10k *ar)
 
 void ath10k_pci_init_napi(struct ath10k *ar)
 {
-<<<<<<< HEAD
 	netif_napi_add(&ar->napi_dev, &ar->napi, ath10k_pci_napi_poll);
-=======
-	netif_napi_add(&ar->napi_dev, &ar->napi, ath10k_pci_napi_poll,
-		       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ath10k_pci_init_irq(struct ath10k *ar)

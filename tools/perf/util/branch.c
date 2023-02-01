@@ -86,14 +86,10 @@ const char *branch_type_name(int type)
 		"COND_CALL",
 		"COND_RET",
 		"ERET",
-<<<<<<< HEAD
 		"IRQ",
 		"SERROR",
 		"NO_TX",
 		"", // Needed for PERF_BR_EXTEND_ABI that ends up triggering some compiler warnings about NULL deref
-=======
-		"IRQ"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	if (type >= 0 && type < PERF_BR_MAX)

@@ -18,11 +18,7 @@
 #include <drm/drm_drv.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_gem_atomic_helper.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_managed.h>
 #include <drm/drm_mipi_dbi.h>
 #include <drm/drm_modeset_helper.h>

@@ -40,7 +40,6 @@ bool rcu_eqs_special_set(int cpu);
 void rcu_momentary_dyntick_idle(void);
 void kfree_rcu_scheduler_running(void);
 bool rcu_gp_might_be_stalled(void);
-<<<<<<< HEAD
 
 struct rcu_gp_oldstate {
 	unsigned long rgos_norm;
@@ -85,13 +84,6 @@ unsigned long start_poll_synchronize_rcu(void);
 void start_poll_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp);
 bool poll_state_synchronize_rcu(unsigned long oldstate);
 bool poll_state_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp);
-=======
-unsigned long start_poll_synchronize_rcu_expedited(void);
-void cond_synchronize_rcu_expedited(unsigned long oldstate);
-unsigned long get_state_synchronize_rcu(void);
-unsigned long start_poll_synchronize_rcu(void);
-bool poll_state_synchronize_rcu(unsigned long oldstate);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void cond_synchronize_rcu(unsigned long oldstate);
 void cond_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp);
 

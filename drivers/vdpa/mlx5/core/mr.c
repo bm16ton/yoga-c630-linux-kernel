@@ -511,7 +511,6 @@ out:
 	mutex_unlock(&mr->mkey_mtx);
 }
 
-<<<<<<< HEAD
 static int _mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev,
 				struct vhost_iotlb *iotlb, unsigned int asid)
 {
@@ -558,46 +557,6 @@ int mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev, struct vhost_iotlb *iotlb,
 
 	mutex_lock(&mvdev->mr.mkey_mtx);
 	err = _mlx5_vdpa_create_mr(mvdev, iotlb, asid);
-=======
-static int _mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev, struct vhost_iotlb *iotlb)
-{
-	struct mlx5_vdpa_mr *mr = &mvdev->mr;
-	int err;
-
-	if (mr->initialized)
-		return 0;
-
-	if (iotlb)
-		err = create_user_mr(mvdev, iotlb);
-	else
-		err = create_dma_mr(mvdev, mr);
-
-	if (err)
-		return err;
-
-	err = dup_iotlb(mvdev, iotlb);
-	if (err)
-		goto out_err;
-
-	mr->initialized = true;
-	return 0;
-
-out_err:
-	if (iotlb)
-		destroy_user_mr(mvdev, mr);
-	else
-		destroy_dma_mr(mvdev, mr);
-
-	return err;
-}
-
-int mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev, struct vhost_iotlb *iotlb)
-{
-	int err;
-
-	mutex_lock(&mvdev->mr.mkey_mtx);
-	err = _mlx5_vdpa_create_mr(mvdev, iotlb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&mvdev->mr.mkey_mtx);
 	return err;
 }

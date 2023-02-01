@@ -285,11 +285,7 @@ efx_mcdi_mon_add_attr(struct efx_nic *efx, const char *name,
 	struct efx_mcdi_mon *hwmon = efx_mcdi_mon(efx);
 	struct efx_mcdi_mon_attribute *attr = &hwmon->attrs[hwmon->n_attrs];
 
-<<<<<<< HEAD
 	strscpy(attr->name, name, sizeof(attr->name));
-=======
-	strlcpy(attr->name, name, sizeof(attr->name));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	attr->index = index;
 	attr->type = type;
 	if (type < ARRAY_SIZE(efx_mcdi_sensor_type))

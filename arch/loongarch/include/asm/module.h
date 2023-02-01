@@ -17,21 +17,15 @@ struct mod_section {
 };
 
 struct mod_arch_specific {
-<<<<<<< HEAD
 	struct mod_section got;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mod_section plt;
 	struct mod_section plt_idx;
 };
 
-<<<<<<< HEAD
 struct got_entry {
 	Elf_Addr symbol_addr;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct plt_entry {
 	u32 inst_lu12iw;
 	u32 inst_lu32id;
@@ -40,7 +34,6 @@ struct plt_entry {
 };
 
 struct plt_idx_entry {
-<<<<<<< HEAD
 	Elf_Addr symbol_addr;
 };
 
@@ -51,12 +44,6 @@ static inline struct got_entry emit_got_entry(Elf_Addr val)
 {
 	return (struct got_entry) { val };
 }
-=======
-	unsigned long symbol_addr;
-};
-
-Elf_Addr module_emit_plt_entry(struct module *mod, unsigned long val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline struct plt_entry emit_plt_entry(unsigned long val)
 {
@@ -101,7 +88,6 @@ static inline struct plt_entry *get_plt_entry(unsigned long val,
 	return plt + plt_idx;
 }
 
-<<<<<<< HEAD
 static inline struct got_entry *get_got_entry(Elf_Addr val,
 					      const struct mod_section *sec)
 {
@@ -114,6 +100,4 @@ static inline struct got_entry *get_got_entry(Elf_Addr val,
 	return NULL;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _ASM_MODULE_H */

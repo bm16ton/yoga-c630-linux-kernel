@@ -21,11 +21,7 @@
 #include <drm/drm_fb_dma_helper.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_framebuffer.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_of.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_vblank.h>
@@ -255,13 +251,8 @@ static int hdlcd_plane_atomic_check(struct drm_plane *plane,
 			return -EINVAL;
 		return drm_atomic_helper_check_plane_state(new_plane_state,
 							   crtc_state,
-<<<<<<< HEAD
 							   DRM_PLANE_NO_SCALING,
 							   DRM_PLANE_NO_SCALING,
-=======
-							   DRM_PLANE_HELPER_NO_SCALING,
-							   DRM_PLANE_HELPER_NO_SCALING,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 							   false, true);
 	}
 
@@ -282,11 +273,7 @@ static void hdlcd_plane_atomic_update(struct drm_plane *plane,
 		return;
 
 	dest_h = drm_rect_height(&new_plane_state->dst);
-<<<<<<< HEAD
 	scanout_start = drm_fb_dma_get_gem_addr(fb, new_plane_state, 0);
-=======
-	scanout_start = drm_fb_cma_get_gem_addr(fb, new_plane_state, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hdlcd = plane->dev->dev_private;
 	hdlcd_write(hdlcd, HDLCD_REG_FB_LINE_LENGTH, fb->pitches[0]);

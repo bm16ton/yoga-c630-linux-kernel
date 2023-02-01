@@ -17,13 +17,9 @@ struct qpaci_info_block {
 	struct {
 		u64 : 8;
 		u64 num_cc : 8;	/* # of supported crypto counters */
-<<<<<<< HEAD
 		u64 : 9;
 		u64 num_nnpa : 7;	/* # of supported NNPA counters */
 		u64 : 32;
-=======
-		u64 : 48;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 
@@ -48,11 +44,8 @@ static inline int qpaci(struct qpaci_info_block *info)
 #define PAI_CRYPTO_BASE			0x1000	/* First event number */
 #define PAI_CRYPTO_MAXCTR		256	/* Max # of event counters */
 #define PAI_CRYPTO_KERNEL_OFFSET	2048
-<<<<<<< HEAD
 #define PAI_NNPA_BASE			0x1800	/* First event number */
 #define PAI_NNPA_MAXCTR			128	/* Max # of event counters */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 DECLARE_STATIC_KEY_FALSE(pai_key);
 

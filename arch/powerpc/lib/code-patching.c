@@ -92,7 +92,6 @@ void __init poking_init(void)
 		"powerpc/text_poke:online", text_area_cpu_up,
 		text_area_cpu_down));
 	static_branch_enable(&poking_init_done);
-<<<<<<< HEAD
 }
 
 static unsigned long get_patch_pfn(void *addr)
@@ -101,8 +100,6 @@ static unsigned long get_patch_pfn(void *addr)
 		return vmalloc_to_pfn(addr);
 	else
 		return __pa_symbol(addr) >> PAGE_SHIFT;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -110,18 +107,8 @@ static unsigned long get_patch_pfn(void *addr)
  */
 static int map_patch_area(void *addr, unsigned long text_poke_addr)
 {
-<<<<<<< HEAD
 	unsigned long pfn = get_patch_pfn(addr);
 
-=======
-	unsigned long pfn;
-
-	if (IS_ENABLED(CONFIG_MODULES) && is_vmalloc_or_module_addr(addr))
-		pfn = vmalloc_to_pfn(addr);
-	else
-		pfn = __pa_symbol(addr) >> PAGE_SHIFT;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return map_kernel_page(text_poke_addr, (pfn << PAGE_SHIFT), PAGE_KERNEL);
 }
 
@@ -165,7 +152,6 @@ static int __do_patch_instruction(u32 *addr, ppc_inst_t instr)
 	int err;
 	u32 *patch_addr;
 	unsigned long text_poke_addr;
-<<<<<<< HEAD
 	pte_t *pte;
 	unsigned long pfn = get_patch_pfn(addr);
 
@@ -182,19 +168,6 @@ static int __do_patch_instruction(u32 *addr, ppc_inst_t instr)
 
 	pte_clear(&init_mm, text_poke_addr, pte);
 	flush_tlb_kernel_range(text_poke_addr, text_poke_addr + PAGE_SIZE);
-=======
-
-	text_poke_addr = (unsigned long)__this_cpu_read(text_poke_area)->addr;
-	patch_addr = (u32 *)(text_poke_addr + offset_in_page(addr));
-
-	err = map_patch_area(addr, text_poke_addr);
-	if (err)
-		return err;
-
-	err = __patch_instruction(addr, instr, patch_addr);
-
-	unmap_patch_area(text_poke_addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return err;
 }

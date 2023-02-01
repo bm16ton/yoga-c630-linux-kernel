@@ -228,11 +228,7 @@ static irqreturn_t gma_irq_handler(int irq, void *arg)
 	vdc_stat &= dev_priv->vdc_irq_mask;
 	spin_unlock(&dev_priv->irqmask_lock);
 
-<<<<<<< HEAD
 	if (dsp_int) {
-=======
-	if (dsp_int && gma_power_is_on(dev)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gma_vdc_interrupt(dev, vdc_stat);
 		handled = 1;
 	}

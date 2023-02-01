@@ -412,12 +412,6 @@ static int process_counter_maps(struct perf_stat_config *config,
 	int nthreads = perf_thread_map__nr(counter->core.threads);
 	int ncpus = evsel__nr_cpus(counter);
 	int idx, thread;
-<<<<<<< HEAD
-=======
-
-	if (counter->core.system_wide)
-		nthreads = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (thread = 0; thread < nthreads; thread++) {
 		for (idx = 0; idx < ncpus; idx++) {

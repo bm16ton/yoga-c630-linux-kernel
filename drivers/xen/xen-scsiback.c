@@ -333,21 +333,6 @@ static int32_t scsiback_result(int32_t result)
 	case DID_TRANSPORT_FAILFAST:
 		host_status = XEN_VSCSIIF_RSLT_HOST_TRANSPORT_FAILFAST;
 		break;
-<<<<<<< HEAD
-=======
-	case DID_TARGET_FAILURE:
-		host_status = XEN_VSCSIIF_RSLT_HOST_TARGET_FAILURE;
-		break;
-	case DID_NEXUS_FAILURE:
-		host_status = XEN_VSCSIIF_RSLT_HOST_NEXUS_FAILURE;
-		break;
-	case DID_ALLOC_FAILURE:
-		host_status = XEN_VSCSIIF_RSLT_HOST_ALLOC_FAILURE;
-		break;
-	case DID_MEDIUM_ERROR:
-		host_status = XEN_VSCSIIF_RSLT_HOST_MEDIUM_ERROR;
-		break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case DID_TRANSPORT_MARGINAL:
 		host_status = XEN_VSCSIIF_RSLT_HOST_TRANSPORT_MARGINAL;
 		break;

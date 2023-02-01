@@ -8,10 +8,6 @@
 #include <linux/efi.h>
 #include <linux/export.h>
 #include <linux/memblock.h>
-<<<<<<< HEAD
-=======
-#include <linux/of_fdt.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/early_ioremap.h>
 #include <asm/bootinfo.h>
 #include <asm/loongson.h>
@@ -23,32 +19,17 @@ EXPORT_SYMBOL(loongson_sysconf);
 void __init init_environ(void)
 {
 	int efi_boot = fw_arg0;
-<<<<<<< HEAD
 	char *cmdline = early_memremap_ro(fw_arg1, COMMAND_LINE_SIZE);
-=======
-	struct efi_memory_map_data data;
-	void *fdt_ptr = early_memremap_ro(fw_arg1, SZ_64K);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (efi_boot)
 		set_bit(EFI_BOOT, &efi.flags);
 	else
 		clear_bit(EFI_BOOT, &efi.flags);
 
-<<<<<<< HEAD
 	strscpy(boot_command_line, cmdline, COMMAND_LINE_SIZE);
 	early_memunmap(cmdline, COMMAND_LINE_SIZE);
 
 	efi_system_table = fw_arg2;
-=======
-	early_init_dt_scan(fdt_ptr);
-	early_init_fdt_reserve_self();
-	efi_system_table = efi_get_fdt_params(&data);
-
-	efi_memmap_init_early(&data);
-	memblock_reserve(data.phys_map & PAGE_MASK,
-			 PAGE_ALIGN(data.size + (data.phys_map & ~PAGE_MASK)));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __init init_cpu_fullname(void)

@@ -669,12 +669,7 @@ static int admv1014_init(struct admv1014_state *st)
 	chip_id = FIELD_GET(ADMV1014_CHIP_ID_MSK, chip_id);
 	if (chip_id != ADMV1014_CHIP_ID) {
 		dev_err(&spi->dev, "Invalid Chip ID.\n");
-<<<<<<< HEAD
 		return -EINVAL;
-=======
-		ret = -EINVAL;
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ret = __admv1014_spi_update_bits(st, ADMV1014_REG_QUAD,

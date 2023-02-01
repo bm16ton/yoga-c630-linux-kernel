@@ -701,25 +701,17 @@ int bpf_iter_run_prog(struct bpf_prog *prog, void *ctx)
 		rcu_read_lock_trace();
 		migrate_disable();
 		might_fault();
-<<<<<<< HEAD
 		old_run_ctx = bpf_set_run_ctx(&run_ctx);
 		ret = bpf_prog_run(prog, ctx);
 		bpf_reset_run_ctx(old_run_ctx);
-=======
-		ret = bpf_prog_run(prog, ctx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		migrate_enable();
 		rcu_read_unlock_trace();
 	} else {
 		rcu_read_lock();
 		migrate_disable();
-<<<<<<< HEAD
 		old_run_ctx = bpf_set_run_ctx(&run_ctx);
 		ret = bpf_prog_run(prog, ctx);
 		bpf_reset_run_ctx(old_run_ctx);
-=======
-		ret = bpf_prog_run(prog, ctx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		migrate_enable();
 		rcu_read_unlock();
 	}

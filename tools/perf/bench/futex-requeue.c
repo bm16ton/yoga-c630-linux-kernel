@@ -35,13 +35,8 @@ static u_int32_t futex1 = 0, futex2 = 0;
 
 static pthread_t *worker;
 static bool done = false;
-<<<<<<< HEAD
 static struct mutex thread_lock;
 static struct cond thread_parent, thread_worker;
-=======
-static pthread_mutex_t thread_lock;
-static pthread_cond_t thread_parent, thread_worker;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct stats requeuetime_stats, requeued_stats;
 static unsigned int threads_starting;
 static int futex_flag = 0;
@@ -88,11 +83,7 @@ static void *workerfn(void *arg __maybe_unused)
 {
 	int ret;
 
-<<<<<<< HEAD
 	mutex_lock(&thread_lock);
-=======
-	pthread_mutex_lock(&thread_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	threads_starting--;
 	if (!threads_starting)
 		cond_signal(&thread_parent);
@@ -127,37 +118,6 @@ static void *workerfn(void *arg __maybe_unused)
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	while (1) {
-		if (!params.pi) {
-			ret = futex_wait(&futex1, 0, NULL, futex_flag);
-			if (!ret)
-				break;
-
-			if (ret && errno != EAGAIN) {
-				if (!params.silent)
-					warnx("futex_wait");
-				break;
-			}
-		} else {
-			ret = futex_wait_requeue_pi(&futex1, 0, &futex2,
-						    NULL, futex_flag);
-			if (!ret) {
-				/* got the lock at futex2 */
-				futex_unlock_pi(&futex2, futex_flag);
-				break;
-			}
-
-			if (ret && errno != EAGAIN) {
-				if (!params.silent)
-					warnx("futex_wait_requeue_pi");
-				break;
-			}
-		}
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return NULL;
 }
 

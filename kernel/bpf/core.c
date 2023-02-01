@@ -1094,11 +1094,7 @@ bpf_jit_binary_pack_alloc(unsigned int proglen, u8 **image_ptr,
 
 	hole = min_t(unsigned int, size - (proglen + sizeof(*ro_header)),
 		     BPF_PROG_CHUNK_SIZE - sizeof(*ro_header));
-<<<<<<< HEAD
 	start = prandom_u32_max(hole) & ~(alignment - 1);
-=======
-	start = (get_random_int() % hole) & ~(alignment - 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	*image_ptr = &ro_header->image[start];
 	*rw_image = &(*rw_header)->image[start];
@@ -2092,10 +2088,7 @@ static unsigned int __bpf_prog_ret0_warn(const void *ctx,
 bool bpf_prog_map_compatible(struct bpf_map *map,
 			     const struct bpf_prog *fp)
 {
-<<<<<<< HEAD
 	enum bpf_prog_type prog_type = resolve_prog_type(fp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool ret;
 
 	if (fp->kprobe_override)
@@ -2106,20 +2099,12 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
 		/* There's no owner yet where we could check for
 		 * compatibility.
 		 */
-<<<<<<< HEAD
 		map->owner.type  = prog_type;
-=======
-		map->owner.type  = fp->type;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		map->owner.jited = fp->jited;
 		map->owner.xdp_has_frags = fp->aux->xdp_has_frags;
 		ret = true;
 	} else {
-<<<<<<< HEAD
 		ret = map->owner.type  == prog_type &&
-=======
-		ret = map->owner.type  == fp->type &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		      map->owner.jited == fp->jited &&
 		      map->owner.xdp_has_frags == fp->aux->xdp_has_frags;
 	}

@@ -179,18 +179,10 @@ struct _vcs_dpi_voltage_scaling_st {
  */
 struct _vcs_dpi_soc_bounding_box_st {
 	struct _vcs_dpi_voltage_scaling_st clock_limits[DC__VOLTAGE_STATES];
-<<<<<<< HEAD
 	/**
 	 * @num_states: It represents the total of Display Power Management
 	 * (DPM) supported by the specific ASIC.
 	 */
-=======
-	/*
-	 * This is a temporary stash for updating @clock_limits with the PMFW
-	 * clock table. Do not use outside of *update_bw_boudning_box functions.
-	 */
-	struct _vcs_dpi_voltage_scaling_st _clock_tmp[DC__VOLTAGE_STATES];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int num_states;
 	double sr_exit_time_us;
 	double sr_enter_plus_exit_time_us;
@@ -372,13 +364,10 @@ struct _vcs_dpi_ip_params_st {
 	unsigned int max_num_dp2p0_outputs;
 	unsigned int max_num_dp2p0_streams;
 	unsigned int VBlankNomDefaultUS;
-<<<<<<< HEAD
 
 	/* DM workarounds */
 	double dsc_delay_factor_wa; // TODO: Remove after implementing root cause fix
 	double min_prefetch_in_strobe_us;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct _vcs_dpi_display_xfc_params_st {

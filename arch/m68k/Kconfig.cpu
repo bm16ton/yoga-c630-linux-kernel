@@ -397,11 +397,7 @@ config SINGLE_MEMORY_CHUNK
 	  order" to save memory that could be wasted for unused memory map.
 	  Say N if not sure.
 
-<<<<<<< HEAD
 config ARCH_FORCE_MAX_ORDER
-=======
-config FORCE_MAX_ZONEORDER
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int "Maximum zone order" if ADVANCED
 	depends on !SINGLE_MEMORY_CHUNK
 	default "11"

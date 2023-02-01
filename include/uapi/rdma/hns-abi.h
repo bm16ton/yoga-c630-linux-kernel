@@ -83,7 +83,6 @@ enum hns_roce_qp_cap_flags {
 struct hns_roce_ib_create_qp_resp {
 	__aligned_u64 cap_flags;
 	__aligned_u64 dwqe_mmap_key;
-<<<<<<< HEAD
 };
 
 enum {
@@ -92,8 +91,6 @@ enum {
 
 enum {
 	HNS_ROCE_RSP_EXSGE_FLAGS = 1 << 0,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct hns_roce_ib_alloc_ucontext_resp {
@@ -101,7 +98,6 @@ struct hns_roce_ib_alloc_ucontext_resp {
 	__u32	cqe_size;
 	__u32	srq_tab_size;
 	__u32	reserved;
-<<<<<<< HEAD
 	__u32	config;
 	__u32	max_inline_data;
 };
@@ -109,8 +105,6 @@ struct hns_roce_ib_alloc_ucontext_resp {
 struct hns_roce_ib_alloc_ucontext {
 	__u32 config;
 	__u32 reserved;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct hns_roce_ib_alloc_pd_resp {

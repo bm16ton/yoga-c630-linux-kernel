@@ -210,11 +210,7 @@ static int atmel_ssc_hw_rule_rate(struct snd_pcm_hw_params *params,
 		return frame_size;
 
 	switch (ssc_p->daifmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FP:
-=======
-	case SND_SOC_DAIFMT_CBP_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if ((ssc_p->dir_mask & SSC_DIR_MASK_CAPTURE)
 		    && ssc->clk_from_rk_pin)
 			/* Receiver Frame Synchro (i.e. capture)
@@ -224,11 +220,7 @@ static int atmel_ssc_hw_rule_rate(struct snd_pcm_hw_params *params,
 			mck_div = 3;
 		break;
 
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FC:
-=======
-	case SND_SOC_DAIFMT_CBP_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if ((ssc_p->dir_mask & SSC_DIR_MASK_PLAYBACK)
 		    && !ssc->clk_from_rk_pin)
 			/* Transmit Frame Synchro (i.e. playback)
@@ -241,11 +233,7 @@ static int atmel_ssc_hw_rule_rate(struct snd_pcm_hw_params *params,
 	}
 
 	switch (ssc_p->daifmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		r.num = ssc_p->mck_rate / mck_div / frame_size;
 
 		ret = snd_interval_ratnum(i, 1, &r, &num, &den);
@@ -255,13 +243,8 @@ static int atmel_ssc_hw_rule_rate(struct snd_pcm_hw_params *params,
 		}
 		break;
 
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FP:
 	case SND_SOC_DAIFMT_BC_FC:
-=======
-	case SND_SOC_DAIFMT_CBP_CFC:
-	case SND_SOC_DAIFMT_CBP_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		t.min = 8000;
 		t.max = ssc_p->mck_rate / mck_div / frame_size;
 		t.openmin = t.openmax = 0;
@@ -450,13 +433,8 @@ static int atmel_ssc_set_dai_clkdiv(struct snd_soc_dai *cpu_dai,
 static int atmel_ssc_cfs(struct atmel_ssc_info *ssc_p)
 {
 	switch (ssc_p->daifmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BC_FP:
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	case SND_SOC_DAIFMT_CBP_CFC:
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 1;
 	}
 	return 0;
@@ -466,13 +444,8 @@ static int atmel_ssc_cfs(struct atmel_ssc_info *ssc_p)
 static int atmel_ssc_cbs(struct atmel_ssc_info *ssc_p)
 {
 	switch (ssc_p->daifmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FC:
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	case SND_SOC_DAIFMT_CBC_CFP:
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 1;
 	}
 	return 0;

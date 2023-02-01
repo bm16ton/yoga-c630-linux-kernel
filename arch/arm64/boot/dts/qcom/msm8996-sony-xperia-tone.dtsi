@@ -196,13 +196,8 @@
 
 &pcie0 {
 	status = "okay";
-<<<<<<< HEAD
 	perst-gpios = <&tlmm 35 GPIO_ACTIVE_LOW>;
 	wake-gpios = <&tlmm 37 GPIO_ACTIVE_HIGH>;
-=======
-	perst-gpio = <&tlmm 35 GPIO_ACTIVE_LOW>;
-	wake-gpio = <&tlmm 37 GPIO_ACTIVE_HIGH>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vddpe-3v3-supply = <&wlan_en>;
 	vdda-supply = <&pm8994_l28>;
 };

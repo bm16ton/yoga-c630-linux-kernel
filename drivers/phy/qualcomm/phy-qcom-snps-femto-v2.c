@@ -478,14 +478,10 @@ static const struct phy_ops qcom_snps_hsphy_gen_ops = {
 static const struct of_device_id qcom_snps_hsphy_of_match_table[] = {
 	{ .compatible	= "qcom,sm8150-usb-hs-phy", },
 	{ .compatible	= "qcom,usb-snps-hs-5nm-phy", },
-<<<<<<< HEAD
 	{
 		.compatible	= "qcom,usb-snps-hs-7nm-phy",
 		.data		= &sc7280_snps_7nm_phy,
 	},
-=======
-	{ .compatible	= "qcom,usb-snps-hs-7nm-phy", },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ .compatible	= "qcom,usb-snps-femto-v2-phy",	},
 	{ }
 };

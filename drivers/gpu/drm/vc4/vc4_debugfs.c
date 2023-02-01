@@ -24,14 +24,7 @@ vc4_debugfs_init(struct drm_minor *minor)
 	struct vc4_dev *vc4 = to_vc4_dev(minor->dev);
 	struct drm_device *drm = &vc4->base;
 
-<<<<<<< HEAD
 	drm_WARN_ON(drm, vc4_hvs_debugfs_init(minor));
-=======
-	if (!of_device_is_compatible(vc4->hvs->pdev->dev.of_node,
-				     "brcm,bcm2711-vc5"))
-		debugfs_create_bool("hvs_load_tracker", S_IRUGO | S_IWUSR,
-				    minor->debugfs_root, &vc4->load_tracker_enabled);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (vc4->v3d) {
 		drm_WARN_ON(drm, vc4_bo_debugfs_init(minor));

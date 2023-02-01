@@ -634,13 +634,8 @@ static void btrfs_double_extent_lock(struct inode *inode1, u64 loff1,
 		swap(range1_end, range2_end);
 	}
 
-<<<<<<< HEAD
 	lock_extent(&BTRFS_I(inode1)->io_tree, loff1, range1_end, NULL);
 	lock_extent(&BTRFS_I(inode2)->io_tree, loff2, range2_end, NULL);
-=======
-	lock_extent(&BTRFS_I(inode1)->io_tree, loff1, range1_end);
-	lock_extent(&BTRFS_I(inode2)->io_tree, loff2, range2_end);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	btrfs_assert_inode_range_clean(BTRFS_I(inode1), loff1, range1_end);
 	btrfs_assert_inode_range_clean(BTRFS_I(inode2), loff2, range2_end);

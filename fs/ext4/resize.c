@@ -1168,12 +1168,8 @@ static void update_backups(struct super_block *sb, sector_t blk_off, char *data,
 	while (group < sbi->s_groups_count) {
 		struct buffer_head *bh;
 		ext4_fsblk_t backup_block;
-<<<<<<< HEAD
 		int has_super = ext4_bg_has_super(sb, group);
 		ext4_fsblk_t first_block = ext4_group_first_block_no(sb, group);
-=======
-		struct ext4_super_block *es;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Out of journal space, and can't get more - abort - so sad */
 		err = ext4_resize_ensure_credits_batch(handle, 1);
@@ -1201,15 +1197,8 @@ static void update_backups(struct super_block *sb, sector_t blk_off, char *data,
 		memcpy(bh->b_data, data, size);
 		if (rest)
 			memset(bh->b_data + size, 0, rest);
-<<<<<<< HEAD
 		if (has_super && (backup_block == first_block))
 			ext4_set_block_group_nr(sb, bh->b_data, group);
-=======
-		es = (struct ext4_super_block *) bh->b_data;
-		es->s_block_group_nr = cpu_to_le16(group);
-		if (ext4_has_metadata_csum(sb))
-			es->s_checksum = ext4_superblock_csum(sb, es);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		set_buffer_uptodate(bh);
 		unlock_buffer(bh);
 		err = ext4_handle_dirty_metadata(handle, NULL, bh);

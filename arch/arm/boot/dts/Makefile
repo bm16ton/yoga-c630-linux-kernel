@@ -61,10 +61,7 @@ dtb-$(CONFIG_SOC_SAM_V7) += \
 	at91-sama5d2_icp.dtb \
 	at91-sama5d2_ptc_ek.dtb \
 	at91-sama5d2_xplained.dtb \
-<<<<<<< HEAD
 	at91-sama5d3_eds.dtb \
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	at91-sama5d3_ksz9477_evb.dtb \
 	at91-sama5d3_xplained.dtb \
 	at91-dvk_som60.dtb \
@@ -740,10 +737,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ull-colibri-wifi-iris.dtb \
 	imx6ull-colibri-wifi-iris-v2.dtb \
 	imx6ull-jozacp.dtb \
-<<<<<<< HEAD
 	imx6ull-kontron-bl.dtb \
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	imx6ull-myir-mys-6ulx-eval.dtb \
 	imx6ull-opos6uldev.dtb \
 	imx6ull-phytec-segin-ff-rdk-nand.dtb \
@@ -796,10 +790,7 @@ dtb-$(CONFIG_SOC_IMXRT) += \
 dtb-$(CONFIG_SOC_LAN966) += \
 	lan966x-kontron-kswitch-d10-mmt-6g-2gs.dtb \
 	lan966x-kontron-kswitch-d10-mmt-8g.dtb \
-<<<<<<< HEAD
 	lan966x-pcb8290.dtb \
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lan966x-pcb8291.dtb \
 	lan966x-pcb8309.dtb
 dtb-$(CONFIG_SOC_LS1021A) += \
@@ -1059,12 +1050,9 @@ dtb-$(CONFIG_ARCH_QCOM) += \
 	qcom-ipq8064-rb3011.dtb \
 	qcom-msm8226-samsung-s3ve3g.dtb \
 	qcom-msm8660-surf.dtb \
-<<<<<<< HEAD
 	qcom-msm8916-samsung-e5.dtb \
 	qcom-msm8916-samsung-e7.dtb \
 	qcom-msm8916-samsung-grandmax.dtb \
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qcom-msm8916-samsung-serranove.dtb \
 	qcom-msm8960-cdp.dtb \
 	qcom-msm8974-lge-nexus5-hammerhead.dtb \
@@ -1595,10 +1583,7 @@ dtb-$(CONFIG_ARCH_ASPEED) += \
 	aspeed-bmc-amd-daytonax.dtb \
 	aspeed-bmc-amd-ethanolx.dtb \
 	aspeed-bmc-ampere-mtjade.dtb \
-<<<<<<< HEAD
 	aspeed-bmc-ampere-mtmitchell.dtb \
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	aspeed-bmc-arm-stardragon4800-rep2.dtb \
 	aspeed-bmc-asrock-e3c246d4i.dtb \
 	aspeed-bmc-asrock-romed8hm3.dtb \

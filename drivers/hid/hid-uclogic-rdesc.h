@@ -153,7 +153,6 @@ extern const size_t uclogic_rdesc_v2_frame_touch_strip_size;
 
 /* Report ID for tweaked v2 frame dial reports */
 #define UCLOGIC_RDESC_V2_FRAME_DIAL_ID 0xf9
-<<<<<<< HEAD
 
 /* Fixed report descriptor for (tweaked) v2 frame dial reports */
 extern const __u8 uclogic_rdesc_v2_frame_dial_arr[];
@@ -184,23 +183,6 @@ extern const size_t uclogic_rdesc_ugee_v2_frame_mouse_template_size;
 /* Fixed report descriptor template for UGEE v2 battery reports */
 extern const __u8 uclogic_rdesc_ugee_v2_battery_template_arr[];
 extern const size_t uclogic_rdesc_ugee_v2_battery_template_size;
-=======
-
-/* Fixed report descriptor for (tweaked) v2 frame dial reports */
-extern const __u8 uclogic_rdesc_v2_frame_dial_arr[];
-extern const size_t uclogic_rdesc_v2_frame_dial_size;
-
-/* Device ID byte offset in v2 frame dial reports */
-#define UCLOGIC_RDESC_V2_FRAME_DIAL_DEV_ID_BYTE	0x4
-
-/* Fixed report descriptor template for UGEE v2 pen reports */
-extern const __u8 uclogic_rdesc_ugee_v2_pen_template_arr[];
-extern const size_t uclogic_rdesc_ugee_v2_pen_template_size;
-
-/* Fixed report descriptor template for UGEE v2 frame reports (buttons only) */
-extern const __u8 uclogic_rdesc_ugee_v2_frame_btn_template_arr[];
-extern const size_t uclogic_rdesc_ugee_v2_frame_btn_template_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Fixed report descriptor for Ugee EX07 frame */
 extern const __u8 uclogic_rdesc_ugee_ex07_frame_arr[];

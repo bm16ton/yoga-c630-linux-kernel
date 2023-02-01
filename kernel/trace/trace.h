@@ -308,12 +308,7 @@ struct trace_array {
 	struct array_buffer	max_buffer;
 	bool			allocated_snapshot;
 #endif
-<<<<<<< HEAD
 #ifdef CONFIG_TRACER_MAX_TRACE
-=======
-#if defined(CONFIG_TRACER_MAX_TRACE) || defined(CONFIG_HWLAT_TRACER) \
-	|| defined(CONFIG_OSNOISE_TRACER)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long		max_latency;
 #ifdef CONFIG_FSNOTIFY
 	struct dentry		*d_max_latency;
@@ -693,17 +688,10 @@ void update_max_tr(struct trace_array *tr, struct task_struct *tsk, int cpu,
 void update_max_tr_single(struct trace_array *tr,
 			  struct task_struct *tsk, int cpu);
 
-<<<<<<< HEAD
 #ifdef CONFIG_FSNOTIFY
 #define LATENCY_FS_NOTIFY
 #endif
 #endif /* CONFIG_TRACER_MAX_TRACE */
-=======
-#if (defined(CONFIG_TRACER_MAX_TRACE) || defined(CONFIG_HWLAT_TRACER) \
-	|| defined(CONFIG_OSNOISE_TRACER)) && defined(CONFIG_FSNOTIFY)
-#define LATENCY_FS_NOTIFY
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef LATENCY_FS_NOTIFY
 void latency_fsnotify(struct trace_array *tr);
@@ -1978,7 +1966,6 @@ static inline bool __is_good_name(const char *name, bool hash_ok)
 	return true;
 }
 
-<<<<<<< HEAD
 /* Check the name is good for event/group/fields */
 static inline bool is_good_name(const char *name)
 {
@@ -1991,8 +1978,6 @@ static inline bool is_good_system_name(const char *name)
 	return __is_good_name(name, true);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Convert certain expected symbols into '_' when generating event names */
 static inline void sanitize_event_name(char *name)
 {

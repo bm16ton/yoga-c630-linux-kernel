@@ -1277,22 +1277,12 @@ static void intel_dsi_get_config(struct intel_encoder *encoder,
 		pclk = vlv_dsi_get_pclk(encoder, pipe_config);
 	}
 
-<<<<<<< HEAD
 	pipe_config->port_clock = pclk;
 
 	/* FIXME definitely not right for burst/cmd mode/pixel overlap */
 	pipe_config->hw.adjusted_mode.crtc_clock = pclk;
 	if (intel_dsi->dual_link)
 		pipe_config->hw.adjusted_mode.crtc_clock *= 2;
-=======
-	if (intel_dsi->dual_link)
-		pclk *= 2;
-
-	if (pclk) {
-		pipe_config->hw.adjusted_mode.crtc_clock = pclk;
-		pipe_config->port_clock = pclk;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* return txclkesc cycles in terms of divider and duration in us */
@@ -1881,11 +1871,7 @@ void vlv_dsi_init(struct drm_i915_private *dev_priv)
 		return;
 
 	if (IS_GEMINILAKE(dev_priv) || IS_BROXTON(dev_priv))
-<<<<<<< HEAD
 		dev_priv->display.dsi.mmio_base = BXT_MIPI_BASE;
-=======
-		dev_priv->mipi_mmio_base = BXT_MIPI_BASE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		dev_priv->display.dsi.mmio_base = VLV_MIPI_BASE;
 
@@ -1949,17 +1935,8 @@ void vlv_dsi_init(struct drm_i915_private *dev_priv)
 	if (drm_WARN_ON(&dev_priv->drm, intel_connector->panel.vbt.dsi.bl_ports & ~intel_dsi->ports))
 		intel_connector->panel.vbt.dsi.bl_ports &= intel_dsi->ports;
 
-<<<<<<< HEAD
 	if (drm_WARN_ON(&dev_priv->drm, intel_connector->panel.vbt.dsi.cabc_ports & ~intel_dsi->ports))
 		intel_connector->panel.vbt.dsi.cabc_ports &= intel_dsi->ports;
-=======
-	intel_dsi->dcs_backlight_ports = intel_connector->panel.vbt.dsi.bl_ports;
-
-	if (drm_WARN_ON(&dev_priv->drm, intel_connector->panel.vbt.dsi.cabc_ports & ~intel_dsi->ports))
-		intel_connector->panel.vbt.dsi.cabc_ports &= intel_dsi->ports;
-
-	intel_dsi->dcs_cabc_ports = intel_connector->panel.vbt.dsi.cabc_ports;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Create a DSI host (and a device) for each port. */
 	for_each_dsi_port(port, intel_dsi->ports) {

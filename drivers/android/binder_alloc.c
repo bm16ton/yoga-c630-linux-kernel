@@ -309,41 +309,13 @@ err_no_vma:
 	return vma ? -ENOMEM : -ESRCH;
 }
 
-<<<<<<< HEAD
-=======
-
-static inline void binder_alloc_set_vma(struct binder_alloc *alloc,
-		struct vm_area_struct *vma)
-{
-	unsigned long vm_start = 0;
-
-	/*
-	 * Allow clearing the vma with holding just the read lock to allow
-	 * munmapping downgrade of the write lock before freeing and closing the
-	 * file using binder_alloc_vma_close().
-	 */
-	if (vma) {
-		vm_start = vma->vm_start;
-		mmap_assert_write_locked(alloc->vma_vm_mm);
-	} else {
-		mmap_assert_locked(alloc->vma_vm_mm);
-	}
-
-	alloc->vma_addr = vm_start;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct vm_area_struct *binder_alloc_get_vma(
 		struct binder_alloc *alloc)
 {
 	struct vm_area_struct *vma = NULL;
 
 	if (alloc->vma_addr)
-<<<<<<< HEAD
 		vma = vma_lookup(alloc->mm, alloc->vma_addr);
-=======
-		vma = vma_lookup(alloc->vma_vm_mm, alloc->vma_addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return vma;
 }
@@ -408,25 +380,15 @@ static struct binder_buffer *binder_alloc_new_buf_locked(
 	size_t size, data_offsets_size;
 	int ret;
 
-<<<<<<< HEAD
 	mmap_read_lock(alloc->mm);
 	if (!binder_alloc_get_vma(alloc)) {
 		mmap_read_unlock(alloc->mm);
-=======
-	mmap_read_lock(alloc->vma_vm_mm);
-	if (!binder_alloc_get_vma(alloc)) {
-		mmap_read_unlock(alloc->vma_vm_mm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		binder_alloc_debug(BINDER_DEBUG_USER_ERROR,
 				   "%d: binder_alloc_buf, no vma\n",
 				   alloc->pid);
 		return ERR_PTR(-ESRCH);
 	}
-<<<<<<< HEAD
 	mmap_read_unlock(alloc->mm);
-=======
-	mmap_read_unlock(alloc->vma_vm_mm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	data_offsets_size = ALIGN(data_size, sizeof(void *)) +
 		ALIGN(offsets_size, sizeof(void *));
@@ -777,11 +739,7 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 	const char *failure_string;
 	struct binder_buffer *buffer;
 
-<<<<<<< HEAD
 	if (unlikely(vma->vm_mm != alloc->mm)) {
-=======
-	if (unlikely(vma->vm_mm != alloc->vma_vm_mm)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -EINVAL;
 		failure_string = "invalid vma->vm_mm";
 		goto err_invalid_mm;
@@ -820,11 +778,7 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 	buffer->free = 1;
 	binder_insert_free_buffer(alloc, buffer);
 	alloc->free_async_space = alloc->buffer_size / 2;
-<<<<<<< HEAD
 	alloc->vma_addr = vma->vm_start;
-=======
-	binder_alloc_set_vma(alloc, vma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 
@@ -855,11 +809,7 @@ void binder_alloc_deferred_release(struct binder_alloc *alloc)
 	buffers = 0;
 	mutex_lock(&alloc->mutex);
 	BUG_ON(alloc->vma_addr &&
-<<<<<<< HEAD
 	       vma_lookup(alloc->mm, alloc->vma_addr));
-=======
-	       vma_lookup(alloc->vma_vm_mm, alloc->vma_addr));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	while ((n = rb_first(&alloc->allocated_buffers))) {
 		buffer = rb_entry(n, struct binder_buffer, rb_node);
@@ -967,7 +917,6 @@ void binder_alloc_print_pages(struct seq_file *m,
 	 * read inconsistent state.
 	 */
 
-<<<<<<< HEAD
 	mmap_read_lock(alloc->mm);
 	if (binder_alloc_get_vma(alloc) == NULL) {
 		mmap_read_unlock(alloc->mm);
@@ -975,15 +924,6 @@ void binder_alloc_print_pages(struct seq_file *m,
 	}
 
 	mmap_read_unlock(alloc->mm);
-=======
-	mmap_read_lock(alloc->vma_vm_mm);
-	if (binder_alloc_get_vma(alloc) == NULL) {
-		mmap_read_unlock(alloc->vma_vm_mm);
-		goto uninitialized;
-	}
-
-	mmap_read_unlock(alloc->vma_vm_mm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < alloc->buffer_size / PAGE_SIZE; i++) {
 		page = &alloc->pages[i];
 		if (!page->page_ptr)
@@ -1135,13 +1075,8 @@ static struct shrinker binder_shrinker = {
 void binder_alloc_init(struct binder_alloc *alloc)
 {
 	alloc->pid = current->group_leader->pid;
-<<<<<<< HEAD
 	alloc->mm = current->mm;
 	mmgrab(alloc->mm);
-=======
-	alloc->vma_vm_mm = current->mm;
-	mmgrab(alloc->vma_vm_mm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&alloc->mutex);
 	INIT_LIST_HEAD(&alloc->buffers);
 }

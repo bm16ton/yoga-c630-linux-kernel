@@ -211,10 +211,7 @@ static int sof_suspend(struct device *dev, bool runtime_suspend)
 
 	/* Skip to platform-specific suspend if DSP is entering D0 */
 	if (target_state == SOF_DSP_PM_D0) {
-<<<<<<< HEAD
 		sof_fw_trace_suspend(sdev, pm_state);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Notify clients not managed by pm framework about core suspend */
 		sof_suspend_clients(sdev, pm_state);
 		goto suspend;
@@ -225,9 +222,6 @@ static int sof_suspend(struct device *dev, bool runtime_suspend)
 
 	/* suspend DMA trace */
 	sof_fw_trace_suspend(sdev, pm_state);
-
-	/* Notify clients not managed by pm framework about core suspend */
-	sof_suspend_clients(sdev, pm_state);
 
 	/* Notify clients not managed by pm framework about core suspend */
 	sof_suspend_clients(sdev, pm_state);

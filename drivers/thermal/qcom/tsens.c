@@ -510,14 +510,10 @@ static irqreturn_t tsens_irq_thread(int irq, void *data)
 		spin_unlock_irqrestore(&priv->ul_lock, flags);
 
 		if (trigger) {
-			if (s->tzd->mode == THERMAL_DEVICE_ENABLED) {
-				dev_dbg(priv->dev, "[%u] %s: TZ update trigger (%d mC)\n",
-					hw_id, __func__, temp);
-				thermal_zone_device_update(s->tzd, THERMAL_EVENT_UNSPECIFIED);
-			} else {
-				dev_info_ratelimited(priv->dev, "[%u] %s: TZ update trigger (%d mC) skipped - zone disabled, operating outside of safety limits!\n",
-					hw_id, __func__, temp);
-			}
+			dev_dbg(priv->dev, "[%u] %s: TZ update trigger (%d mC)\n",
+				hw_id, __func__, temp);
+			thermal_zone_device_update(s->tzd,
+						   THERMAL_EVENT_UNSPECIFIED);
 		} else {
 			dev_dbg(priv->dev, "[%u] %s: no violation:  %d\n",
 				hw_id, __func__, temp);

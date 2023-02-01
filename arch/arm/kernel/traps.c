@@ -920,15 +920,9 @@ asmlinkage void handle_bad_stack(struct pt_regs *regs)
 {
 	unsigned long tsk_stk = (unsigned long)current->stack;
 #ifdef CONFIG_IRQSTACKS
-<<<<<<< HEAD
 	unsigned long irq_stk = (unsigned long)raw_cpu_read(irq_stack_ptr);
 #endif
 	unsigned long ovf_stk = (unsigned long)raw_cpu_read(overflow_stack_ptr);
-=======
-	unsigned long irq_stk = (unsigned long)this_cpu_read(irq_stack_ptr);
-#endif
-	unsigned long ovf_stk = (unsigned long)this_cpu_read(overflow_stack_ptr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	console_verbose();
 	pr_emerg("Insufficient stack space to handle exception!");

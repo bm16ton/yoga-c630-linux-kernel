@@ -1,9 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 TARGETS += alsa
-<<<<<<< HEAD
 TARGETS += amd-pstate
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 TARGETS += arm64
 TARGETS += bpf
 TARGETS += breakpoints
@@ -17,10 +14,7 @@ TARGETS += damon
 TARGETS += drivers/dma-buf
 TARGETS += drivers/s390x/uvdevice
 TARGETS += drivers/net/bonding
-<<<<<<< HEAD
 TARGETS += drivers/net/team
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 TARGETS += efivarfs
 TARGETS += exec
 TARGETS += filesystems

@@ -603,11 +603,7 @@ static inline void axienet_dma_out_addr(struct axienet_local *lp, off_t reg,
 #else /* CONFIG_64BIT */
 
 static inline void axienet_dma_out_addr(struct axienet_local *lp, off_t reg,
-<<<<<<< HEAD
 					dma_addr_t addr)
-=======
-				 dma_addr_t addr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	axienet_dma_out32(lp, reg, lower_32_bits(addr));
 }

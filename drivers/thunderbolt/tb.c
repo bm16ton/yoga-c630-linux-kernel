@@ -106,7 +106,6 @@ static void tb_remove_dp_resources(struct tb_switch *sw)
 }
 
 static void tb_discover_dp_resource(struct tb *tb, struct tb_port *port)
-<<<<<<< HEAD
 {
 	struct tb_cm *tcm = tb_priv(tb);
 	struct tb_port *p;
@@ -124,25 +123,6 @@ static void tb_discover_dp_resource(struct tb *tb, struct tb_port *port)
 static void tb_discover_dp_resources(struct tb *tb)
 {
 	struct tb_cm *tcm = tb_priv(tb);
-=======
-{
-	struct tb_cm *tcm = tb_priv(tb);
-	struct tb_port *p;
-
-	list_for_each_entry(p, &tcm->dp_resources, list) {
-		if (p == port)
-			return;
-	}
-
-	tb_port_dbg(port, "DP %s resource available discovered\n",
-		    tb_port_is_dpin(port) ? "IN" : "OUT");
-	list_add_tail(&port->list, &tcm->dp_resources);
-}
-
-static void tb_discover_dp_resources(struct tb *tb)
-{
-	struct tb_cm *tcm = tb_priv(tb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct tb_tunnel *tunnel;
 
 	list_for_each_entry(tunnel, &tcm->tunnel_list, list) {
@@ -196,7 +176,6 @@ static void tb_switch_discover_tunnels(struct tb_switch *sw,
 		}
 	}
 }
-<<<<<<< HEAD
 
 static void tb_discover_tunnels(struct tb *tb)
 {
@@ -205,16 +184,6 @@ static void tb_discover_tunnels(struct tb *tb)
 
 	tb_switch_discover_tunnels(tb->root_switch, &tcm->tunnel_list, true);
 
-=======
-
-static void tb_discover_tunnels(struct tb *tb)
-{
-	struct tb_cm *tcm = tb_priv(tb);
-	struct tb_tunnel *tunnel;
-
-	tb_switch_discover_tunnels(tb->root_switch, &tcm->tunnel_list, true);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(tunnel, &tcm->tunnel_list, list) {
 		if (tb_tunnel_is_pci(tunnel)) {
 			struct tb_switch *parent = tunnel->dst_port->sw;

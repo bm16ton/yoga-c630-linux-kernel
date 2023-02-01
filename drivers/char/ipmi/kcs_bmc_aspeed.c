@@ -152,23 +152,6 @@ static void aspeed_kcs_outb(struct kcs_bmc_device *kcs_bmc, u32 reg, u8 data)
 
 	rc = regmap_write(priv->map, reg, data);
 	WARN(rc != 0, "regmap_write() failed: %d\n", rc);
-<<<<<<< HEAD
-
-	/* Trigger the upstream IRQ on ODR writes, if enabled */
-
-	switch (reg) {
-	case LPC_ODR1:
-	case LPC_ODR2:
-	case LPC_ODR3:
-	case LPC_ODR4:
-		break;
-	default:
-		return;
-	}
-
-	if (priv->upstream_irq.mode != aspeed_kcs_irq_serirq)
-		return;
-=======
 
 	/* Trigger the upstream IRQ on ODR writes, if enabled */
 
@@ -214,126 +197,6 @@ static void aspeed_kcs_outb(struct kcs_bmc_device *kcs_bmc, u32 reg, u8 data)
 	}
 }
 
-static void aspeed_kcs_updateb(struct kcs_bmc_device *kcs_bmc, u32 reg, u8 mask, u8 val)
-{
-	struct aspeed_kcs_bmc *priv = to_aspeed_kcs_bmc(kcs_bmc);
-	int rc;
-
-	rc = regmap_update_bits(priv->map, reg, mask, val);
-	WARN(rc != 0, "regmap_update_bits() failed: %d\n", rc);
-}
-
-/*
- * AST_usrGuide_KCS.pdf
- * 2. Background:
- *   we note D for Data, and C for Cmd/Status, default rules are
- *     A. KCS1 / KCS2 ( D / C:X / X+4 )
- *        D / C : CA0h / CA4h
- *        D / C : CA8h / CACh
- *     B. KCS3 ( D / C:XX2h / XX3h )
- *        D / C : CA2h / CA3h
- *        D / C : CB2h / CB3h
- *     C. KCS4
- *        D / C : CA4h / CA5h
- */
-static int aspeed_kcs_set_address(struct kcs_bmc_device *kcs_bmc, u32 addrs[2], int nr_addrs)
-{
-	struct aspeed_kcs_bmc *priv = to_aspeed_kcs_bmc(kcs_bmc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	if (WARN_ON(nr_addrs < 1 || nr_addrs > 2))
-		return -EINVAL;
-
-	switch (priv->kcs_bmc.channel) {
-	case 1:
-<<<<<<< HEAD
-		switch (priv->upstream_irq.id) {
-		case 12:
-			regmap_update_bits(priv->map, LPC_SIRQCR0, LPC_SIRQCR0_IRQ12E1,
-					   LPC_SIRQCR0_IRQ12E1);
-			break;
-		case 1:
-			regmap_update_bits(priv->map, LPC_SIRQCR0, LPC_SIRQCR0_IRQ1E1,
-					   LPC_SIRQCR0_IRQ1E1);
-			break;
-		default:
-			break;
-=======
-		regmap_update_bits(priv->map, LPC_HICR4, LPC_HICR4_LADR12AS, 0);
-		regmap_write(priv->map, LPC_LADR12H, addrs[0] >> 8);
-		regmap_write(priv->map, LPC_LADR12L, addrs[0] & 0xFF);
-		if (nr_addrs == 2) {
-			regmap_update_bits(priv->map, LPC_LSADR12, LPC_LSADR12_LSADR1_MASK,
-					   addrs[1] << LPC_LSADR12_LSADR1_SHIFT);
-
-			regmap_update_bits(priv->map, LPC_HICRB, LPC_HICRB_EN16LADR1,
-					   LPC_HICRB_EN16LADR1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		}
-		break;
-	case 2:
-<<<<<<< HEAD
-		regmap_update_bits(priv->map, LPC_HICR5, LPC_HICR5_IRQXE2, LPC_HICR5_IRQXE2);
-=======
-		regmap_update_bits(priv->map, LPC_HICR4, LPC_HICR4_LADR12AS, LPC_HICR4_LADR12AS);
-		regmap_write(priv->map, LPC_LADR12H, addrs[0] >> 8);
-		regmap_write(priv->map, LPC_LADR12L, addrs[0] & 0xFF);
-		if (nr_addrs == 2) {
-			regmap_update_bits(priv->map, LPC_LSADR12, LPC_LSADR12_LSADR2_MASK,
-					   addrs[1] << LPC_LSADR12_LSADR2_SHIFT);
-
-			regmap_update_bits(priv->map, LPC_HICRB, LPC_HICRB_EN16LADR2,
-					   LPC_HICRB_EN16LADR2);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		break;
-	case 3:
-<<<<<<< HEAD
-		regmap_update_bits(priv->map, LPC_HICR5, LPC_HICR5_IRQXE3, LPC_HICR5_IRQXE3);
-=======
-		if (nr_addrs == 2) {
-			dev_err(priv->kcs_bmc.dev,
-				"Channel 3 only supports inferred status IO address\n");
-			return -EINVAL;
-		}
-
-		regmap_write(priv->map, LPC_LADR3H, addrs[0] >> 8);
-		regmap_write(priv->map, LPC_LADR3L, addrs[0] & 0xFF);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		break;
-	case 4:
-<<<<<<< HEAD
-		regmap_update_bits(priv->map, LPC_HICRC, LPC_HICRC_IRQXE4, LPC_HICRC_IRQXE4);
-=======
-		if (nr_addrs == 1)
-			regmap_write(priv->map, LPC_LADR4, ((addrs[0] + 1) << 16) | addrs[0]);
-		else
-			regmap_write(priv->map, LPC_LADR4, (addrs[1] << 16) | addrs[0]);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		break;
-	default:
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
-static inline int aspeed_kcs_map_serirq_type(u32 dt_type)
-{
-	switch (dt_type) {
-	case IRQ_TYPE_EDGE_RISING:
-		return LPC_TYIRQX_RISING;
-	case IRQ_TYPE_LEVEL_HIGH:
-		return LPC_TYIRQX_HIGH;
-	case IRQ_TYPE_LEVEL_LOW:
-		return LPC_TYIRQX_LOW;
-	default:
-		return -EINVAL;
-	}
-}
-
-<<<<<<< HEAD
 static void aspeed_kcs_updateb(struct kcs_bmc_device *kcs_bmc, u32 reg, u8 mask, u8 val)
 {
 	struct aspeed_kcs_bmc *priv = to_aspeed_kcs_bmc(kcs_bmc);
@@ -382,30 +245,9 @@ static int aspeed_kcs_set_address(struct kcs_bmc_device *kcs_bmc, u32 addrs[2], 
 			regmap_update_bits(priv->map, LPC_HICRB, LPC_HICRB_EN16LADR1,
 					   LPC_HICRB_EN16LADR1);
 		}
-=======
-static int aspeed_kcs_config_upstream_irq(struct aspeed_kcs_bmc *priv, u32 id, u32 dt_type)
-{
-	unsigned int mask, val, hw_type;
-	int ret;
-
-	if (id > 15)
-		return -EINVAL;
-
-	ret = aspeed_kcs_map_serirq_type(dt_type);
-	if (ret < 0)
-		return ret;
-	hw_type = ret;
-
-	priv->upstream_irq.mode = aspeed_kcs_irq_serirq;
-	priv->upstream_irq.id = id;
-
-	switch (priv->kcs_bmc.channel) {
-	case 1:
-		/* Needs IRQxE1 rather than (ID1IRQX, SEL1IRQX, IRQXE1) before AST2600 A3 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
+
 	case 2:
-<<<<<<< HEAD
 		regmap_update_bits(priv->map, LPC_HICR4, LPC_HICR4_LADR12AS, LPC_HICR4_LADR12AS);
 		regmap_write(priv->map, LPC_LADR12H, addrs[0] >> 8);
 		regmap_write(priv->map, LPC_LADR12L, addrs[0] & 0xFF);
@@ -427,82 +269,23 @@ static int aspeed_kcs_config_upstream_irq(struct aspeed_kcs_bmc *priv, u32 id, u
 
 		regmap_write(priv->map, LPC_LADR3H, addrs[0] >> 8);
 		regmap_write(priv->map, LPC_LADR3L, addrs[0] & 0xFF);
-=======
-		if (!(hw_type == LPC_TYIRQX_LOW || hw_type == LPC_TYIRQX_HIGH))
-			return -EINVAL;
-
-		mask = LPC_HICR5_SEL2IRQX | LPC_HICR5_ID2IRQX_MASK;
-		val = (id << LPC_HICR5_ID2IRQX_SHIFT);
-		val |= (hw_type == LPC_TYIRQX_HIGH) ? LPC_HICR5_SEL2IRQX : 0;
-		regmap_update_bits(priv->map, LPC_HICR5, mask, val);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
-	case 3:
-		if (!(hw_type == LPC_TYIRQX_LOW || hw_type == LPC_TYIRQX_HIGH))
-			return -EINVAL;
 
-		mask = LPC_HICR5_SEL3IRQX | LPC_HICR5_ID3IRQX_MASK;
-		val = (id << LPC_HICR5_ID3IRQX_SHIFT);
-		val |= (hw_type == LPC_TYIRQX_HIGH) ? LPC_HICR5_SEL3IRQX : 0;
-		regmap_update_bits(priv->map, LPC_HICR5, mask, val);
-
-		break;
 	case 4:
-<<<<<<< HEAD
 		if (nr_addrs == 1)
 			regmap_write(priv->map, LPC_LADR4, ((addrs[0] + 1) << 16) | addrs[0]);
 		else
 			regmap_write(priv->map, LPC_LADR4, (addrs[1] << 16) | addrs[0]);
 
-=======
-		mask = LPC_HICRC_ID4IRQX_MASK | LPC_HICRC_TY4IRQX_MASK | LPC_HICRC_OBF4_AUTO_CLR;
-		val = (id << LPC_HICRC_ID4IRQX_SHIFT) | (hw_type << LPC_HICRC_TY4IRQX_SHIFT);
-		regmap_update_bits(priv->map, LPC_HICRC, mask, val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
+
 	default:
-		dev_warn(priv->kcs_bmc.dev,
-			 "SerIRQ configuration not supported on KCS channel %d\n",
-			 priv->kcs_bmc.channel);
 		return -EINVAL;
 	}
 
 	return 0;
 }
 
-static void aspeed_kcs_enable_channel(struct kcs_bmc_device *kcs_bmc, bool enable)
-{
-	struct aspeed_kcs_bmc *priv = to_aspeed_kcs_bmc(kcs_bmc);
-
-	switch (kcs_bmc->channel) {
-	case 1:
-		regmap_update_bits(priv->map, LPC_HICR0, LPC_HICR0_LPC1E, enable * LPC_HICR0_LPC1E);
-		return;
-	case 2:
-		regmap_update_bits(priv->map, LPC_HICR0, LPC_HICR0_LPC2E, enable * LPC_HICR0_LPC2E);
-		return;
-	case 3:
-		regmap_update_bits(priv->map, LPC_HICR0, LPC_HICR0_LPC3E, enable * LPC_HICR0_LPC3E);
-		regmap_update_bits(priv->map, LPC_HICR4,
-				   LPC_HICR4_KCSENBL, enable * LPC_HICR4_KCSENBL);
-		return;
-	case 4:
-		regmap_update_bits(priv->map, LPC_HICRB, LPC_HICRB_LPC4E, enable * LPC_HICRB_LPC4E);
-		return;
-	default:
-<<<<<<< HEAD
-		return -EINVAL;
-=======
-		pr_warn("%s: Unsupported channel: %d", __func__, kcs_bmc->channel);
-		return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-
-	return 0;
-}
-
-<<<<<<< HEAD
 static inline int aspeed_kcs_map_serirq_type(u32 dt_type)
 {
 	switch (dt_type) {
@@ -518,86 +301,6 @@ static inline int aspeed_kcs_map_serirq_type(u32 dt_type)
 }
 
 static int aspeed_kcs_config_upstream_irq(struct aspeed_kcs_bmc *priv, u32 id, u32 dt_type)
-=======
-static void aspeed_kcs_check_obe(struct timer_list *timer)
-{
-	struct aspeed_kcs_bmc *priv = container_of(timer, struct aspeed_kcs_bmc, obe.timer);
-	unsigned long flags;
-	u8 str;
-
-	spin_lock_irqsave(&priv->obe.lock, flags);
-	if (priv->obe.remove) {
-		spin_unlock_irqrestore(&priv->obe.lock, flags);
-		return;
-	}
-
-	str = aspeed_kcs_inb(&priv->kcs_bmc, priv->kcs_bmc.ioreg.str);
-	if (str & KCS_BMC_STR_OBF) {
-		mod_timer(timer, jiffies + OBE_POLL_PERIOD);
-		spin_unlock_irqrestore(&priv->obe.lock, flags);
-		return;
-	}
-	spin_unlock_irqrestore(&priv->obe.lock, flags);
-
-	kcs_bmc_handle_event(&priv->kcs_bmc);
-}
-
-static void aspeed_kcs_irq_mask_update(struct kcs_bmc_device *kcs_bmc, u8 mask, u8 state)
-{
-	struct aspeed_kcs_bmc *priv = to_aspeed_kcs_bmc(kcs_bmc);
-
-	/* We don't have an OBE IRQ, emulate it */
-	if (mask & KCS_BMC_EVENT_TYPE_OBE) {
-		if (KCS_BMC_EVENT_TYPE_OBE & state)
-			mod_timer(&priv->obe.timer, jiffies + OBE_POLL_PERIOD);
-		else
-			del_timer(&priv->obe.timer);
-	}
-
-	if (mask & KCS_BMC_EVENT_TYPE_IBF) {
-		const bool enable = !!(state & KCS_BMC_EVENT_TYPE_IBF);
-
-		switch (kcs_bmc->channel) {
-		case 1:
-			regmap_update_bits(priv->map, LPC_HICR2, LPC_HICR2_IBFIE1,
-					   enable * LPC_HICR2_IBFIE1);
-			return;
-		case 2:
-			regmap_update_bits(priv->map, LPC_HICR2, LPC_HICR2_IBFIE2,
-					   enable * LPC_HICR2_IBFIE2);
-			return;
-		case 3:
-			regmap_update_bits(priv->map, LPC_HICR2, LPC_HICR2_IBFIE3,
-					   enable * LPC_HICR2_IBFIE3);
-			return;
-		case 4:
-			regmap_update_bits(priv->map, LPC_HICRB, LPC_HICRB_IBFIE4,
-					   enable * LPC_HICRB_IBFIE4);
-			return;
-		default:
-			pr_warn("%s: Unsupported channel: %d", __func__, kcs_bmc->channel);
-			return;
-		}
-	}
-}
-
-static const struct kcs_bmc_device_ops aspeed_kcs_ops = {
-	.irq_mask_update = aspeed_kcs_irq_mask_update,
-	.io_inputb = aspeed_kcs_inb,
-	.io_outputb = aspeed_kcs_outb,
-	.io_updateb = aspeed_kcs_updateb,
-};
-
-static irqreturn_t aspeed_kcs_irq(int irq, void *arg)
-{
-	struct kcs_bmc_device *kcs_bmc = arg;
-
-	return kcs_bmc_handle_event(kcs_bmc);
-}
-
-static int aspeed_kcs_config_downstream_irq(struct kcs_bmc_device *kcs_bmc,
-			struct platform_device *pdev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned int mask, val, hw_type;
 	int ret;
@@ -613,7 +316,6 @@ static int aspeed_kcs_config_downstream_irq(struct kcs_bmc_device *kcs_bmc,
 	priv->upstream_irq.mode = aspeed_kcs_irq_serirq;
 	priv->upstream_irq.id = id;
 
-<<<<<<< HEAD
 	switch (priv->kcs_bmc.channel) {
 	case 1:
 		/* Needs IRQxE1 rather than (ID1IRQX, SEL1IRQX, IRQXE1) before AST2600 A3 */
@@ -793,8 +495,6 @@ static const struct kcs_ioreg ast_kcs_bmc_ioregs[KCS_CHANNEL_MAX] = {
 	{ .idr = LPC_IDR4, .odr = LPC_ODR4, .str = LPC_STR4 },
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int aspeed_kcs_of_get_channel(struct platform_device *pdev)
 {
 	struct device_node *np;

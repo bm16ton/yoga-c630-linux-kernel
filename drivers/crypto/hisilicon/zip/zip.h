@@ -81,14 +81,8 @@ struct hisi_zip_sqe {
 	u32 rsvd1[4];
 };
 
-<<<<<<< HEAD
 int zip_create_qps(struct hisi_qp **qps, int qp_num, int node);
 int hisi_zip_register_to_crypto(struct hisi_qm *qm);
 void hisi_zip_unregister_from_crypto(struct hisi_qm *qm);
 bool hisi_zip_alg_support(struct hisi_qm *qm, u32 alg);
-=======
-int zip_create_qps(struct hisi_qp **qps, int ctx_num, int node);
-int hisi_zip_register_to_crypto(struct hisi_qm *qm);
-void hisi_zip_unregister_from_crypto(struct hisi_qm *qm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

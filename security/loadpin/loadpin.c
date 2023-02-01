@@ -20,11 +20,8 @@
 #include <linux/string_helpers.h>
 #include <linux/dm-verity-loadpin.h>
 #include <uapi/linux/loadpin.h>
-<<<<<<< HEAD
 
 #define VERITY_DIGEST_FILE_HEADER "# LOADPIN_TRUSTED_VERITY_ROOT_DIGESTS"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void report_load(const char *origin, struct file *file, char *operation)
 {
@@ -303,7 +300,6 @@ static int read_trusted_verity_root_digests(unsigned int fd)
 
 	p = strim(data);
 	while ((d = strsep(&p, "\n")) != NULL) {
-<<<<<<< HEAD
 		int len;
 		struct dm_verity_loadpin_trusted_root_digest *trd;
 
@@ -319,11 +315,6 @@ static int read_trusted_verity_root_digests(unsigned int fd)
 
 		len = strlen(d);
 
-=======
-		int len = strlen(d);
-		struct dm_verity_loadpin_trusted_root_digest *trd;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (len % 2) {
 			rc = -EPROTO;
 			goto err;

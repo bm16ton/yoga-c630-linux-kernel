@@ -50,11 +50,7 @@
  * @irq_rx_name: irq rx name
  * @irq_tx: virtual tx interrupt number
  * @irq_tx_name: irq tx name
-<<<<<<< HEAD
  * @cts_gpiod: clear to send GPIO
-=======
- * @cts_gpio: clear to send gpio
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @dev: device descriptor
  **/
 struct pic32_sport {
@@ -69,83 +65,18 @@ struct pic32_sport {
 	const char *irq_tx_name;
 	bool enable_tx_irq;
 
-<<<<<<< HEAD
 	struct gpio_desc *cts_gpiod;
-=======
-	bool hw_flow_ctrl;
-	int cts_gpio;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct clk *clk;
 
 	struct device *dev;
 };
-<<<<<<< HEAD
 
 static inline struct pic32_sport *to_pic32_sport(struct uart_port *port)
 {
 	return container_of(port, struct pic32_sport, port);
 }
 
-static inline void pic32_uart_writel(struct pic32_sport *sport,
-					u32 reg, u32 val)
-{
-	__raw_writel(val, sport->port.membase + reg);
-}
-
-static inline u32 pic32_uart_readl(struct pic32_sport *sport, u32 reg)
-{
-	return	__raw_readl(sport->port.membase + reg);
-}
-
-/* pic32 uart mode register bits */
-#define PIC32_UART_MODE_ON        BIT(15)
-#define PIC32_UART_MODE_FRZ       BIT(14)
-#define PIC32_UART_MODE_SIDL      BIT(13)
-#define PIC32_UART_MODE_IREN      BIT(12)
-#define PIC32_UART_MODE_RTSMD     BIT(11)
-#define PIC32_UART_MODE_RESV1     BIT(10)
-#define PIC32_UART_MODE_UEN1      BIT(9)
-#define PIC32_UART_MODE_UEN0      BIT(8)
-#define PIC32_UART_MODE_WAKE      BIT(7)
-#define PIC32_UART_MODE_LPBK      BIT(6)
-#define PIC32_UART_MODE_ABAUD     BIT(5)
-#define PIC32_UART_MODE_RXINV     BIT(4)
-#define PIC32_UART_MODE_BRGH      BIT(3)
-#define PIC32_UART_MODE_PDSEL1    BIT(2)
-#define PIC32_UART_MODE_PDSEL0    BIT(1)
-#define PIC32_UART_MODE_STSEL     BIT(0)
-
-/* pic32 uart status register bits */
-#define PIC32_UART_STA_UTXISEL1   BIT(15)
-#define PIC32_UART_STA_UTXISEL0   BIT(14)
-#define PIC32_UART_STA_UTXINV     BIT(13)
-#define PIC32_UART_STA_URXEN      BIT(12)
-#define PIC32_UART_STA_UTXBRK     BIT(11)
-#define PIC32_UART_STA_UTXEN      BIT(10)
-#define PIC32_UART_STA_UTXBF      BIT(9)
-#define PIC32_UART_STA_TRMT       BIT(8)
-#define PIC32_UART_STA_URXISEL1   BIT(7)
-#define PIC32_UART_STA_URXISEL0   BIT(6)
-#define PIC32_UART_STA_ADDEN      BIT(5)
-#define PIC32_UART_STA_RIDLE      BIT(4)
-#define PIC32_UART_STA_PERR       BIT(3)
-#define PIC32_UART_STA_FERR       BIT(2)
-#define PIC32_UART_STA_OERR       BIT(1)
-#define PIC32_UART_STA_URXDA      BIT(0)
-
-/* pic32_sport pointer for console use */
-static struct pic32_sport *pic32_sports[PIC32_MAX_UARTS];
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-static inline struct pic32_sport *to_pic32_sport(struct uart_port *port)
-{
-	return container_of(port, struct pic32_sport, port);
-}
-
-<<<<<<< HEAD
-=======
 static inline void pic32_uart_writel(struct pic32_sport *sport,
 					u32 reg, u32 val)
 {
@@ -203,7 +134,6 @@ static inline void pic32_wait_deplete_txbuf(struct pic32_sport *sport)
 		udelay(1);
 }
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* serial core request to check if uart tx buffer is empty */
 static unsigned int pic32_uart_tx_empty(struct uart_port *port)
 {

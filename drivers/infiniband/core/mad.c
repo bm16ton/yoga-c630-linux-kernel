@@ -59,12 +59,6 @@ static void create_mad_addr_info(struct ib_mad_send_wr_private *mad_send_wr,
 			  struct ib_mad_qp_info *qp_info,
 			  struct trace_event_raw_ib_mad_send_template *entry)
 {
-<<<<<<< HEAD
-=======
-	u16 pkey;
-	struct ib_device *dev = qp_info->port_priv->device;
-	u32 pnum = qp_info->port_priv->port_num;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ib_ud_wr *wr = &mad_send_wr->send_wr;
 	struct rdma_ah_attr attr = {};
 

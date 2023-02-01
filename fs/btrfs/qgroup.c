@@ -275,11 +275,7 @@ static int __add_relation_rb(struct btrfs_qgroup *member, struct btrfs_qgroup *p
 }
 
 /*
-<<<<<<< HEAD
  * Add relation specified by two qgroup ids.
-=======
- * Add relation specified by two qgoup ids.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Must be called with qgroup_lock held.
  *
@@ -1819,7 +1815,6 @@ int btrfs_qgroup_trace_extent_post(struct btrfs_trans_handle *trans,
 	 */
 	ASSERT(trans != NULL);
 
-<<<<<<< HEAD
 	if (trans->fs_info->qgroup_flags & BTRFS_QGROUP_RUNTIME_FLAG_NO_ACCOUNTING)
 		return 0;
 
@@ -1827,12 +1822,6 @@ int btrfs_qgroup_trace_extent_post(struct btrfs_trans_handle *trans,
 				   true);
 	if (ret < 0) {
 		qgroup_mark_inconsistent(trans->fs_info);
-=======
-	ret = btrfs_find_all_roots(NULL, trans->fs_info, bytenr, 0, &old_root,
-				   true);
-	if (ret < 0) {
-		trans->fs_info->qgroup_flags |= BTRFS_QGROUP_STATUS_FLAG_INCONSISTENT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		btrfs_warn(trans->fs_info,
 "error accounting new delayed refs extent (err code: %d), quota inconsistent",
 			ret);
@@ -3346,12 +3335,8 @@ static bool rescan_should_stop(struct btrfs_fs_info *fs_info)
 {
 	return btrfs_fs_closing(fs_info) ||
 		test_bit(BTRFS_FS_STATE_REMOUNTING, &fs_info->fs_state) ||
-<<<<<<< HEAD
 		!test_bit(BTRFS_FS_QUOTA_ENABLED, &fs_info->flags) ||
 			  fs_info->qgroup_flags & BTRFS_QGROUP_RUNTIME_FLAG_CANCEL_RESCAN;
-=======
-		!test_bit(BTRFS_FS_QUOTA_ENABLED, &fs_info->flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void btrfs_qgroup_rescan_worker(struct btrfs_work *work)
@@ -3384,10 +3369,7 @@ static void btrfs_qgroup_rescan_worker(struct btrfs_work *work)
 		}
 
 		err = qgroup_rescan_leaf(trans, path);
-<<<<<<< HEAD
 		did_leaf_rescans = true;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (err > 0)
 			btrfs_commit_transaction(trans);

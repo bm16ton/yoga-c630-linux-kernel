@@ -113,11 +113,7 @@ void intel_fdi_link_train(struct intel_crtc *crtc,
 {
 	struct drm_i915_private *dev_priv = to_i915(crtc->base.dev);
 
-<<<<<<< HEAD
 	dev_priv->display.funcs.fdi->fdi_link_train(crtc, crtc_state);
-=======
-	dev_priv->fdi_funcs->fdi_link_train(crtc, crtc_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* units of 100MHz */
@@ -214,24 +210,14 @@ void intel_fdi_pll_freq_update(struct drm_i915_private *i915)
 		u32 fdi_pll_clk =
 			intel_de_read(i915, FDI_PLL_BIOS_0) & FDI_PLL_FB_CLOCK_MASK;
 
-<<<<<<< HEAD
 		i915->display.fdi.pll_freq = (fdi_pll_clk + 2) * 10000;
 	} else if (IS_SANDYBRIDGE(i915) || IS_IVYBRIDGE(i915)) {
 		i915->display.fdi.pll_freq = 270000;
-=======
-		i915->fdi_pll_freq = (fdi_pll_clk + 2) * 10000;
-	} else if (IS_SANDYBRIDGE(i915) || IS_IVYBRIDGE(i915)) {
-		i915->fdi_pll_freq = 270000;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		return;
 	}
 
-<<<<<<< HEAD
 	drm_dbg(&i915->drm, "FDI PLL freq=%d\n", i915->display.fdi.pll_freq);
-=======
-	drm_dbg(&i915->drm, "FDI PLL freq=%d\n", i915->fdi_pll_freq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int intel_fdi_link_freq(struct drm_i915_private *i915,
@@ -240,11 +226,7 @@ int intel_fdi_link_freq(struct drm_i915_private *i915,
 	if (HAS_DDI(i915))
 		return pipe_config->port_clock; /* SPLL */
 	else
-<<<<<<< HEAD
 		return i915->display.fdi.pll_freq;
-=======
-		return i915->fdi_pll_freq;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int ilk_fdi_compute_config(struct intel_crtc *crtc,
@@ -807,11 +789,7 @@ void hsw_fdi_link_train(struct intel_encoder *encoder,
 		       FDI_RX_PWRDN_LANE1_VAL(2) | FDI_RX_PWRDN_LANE0_VAL(2) | FDI_RX_TP1_TO_TP2_48 | FDI_RX_FDI_DELAY_90);
 
 	/* Enable the PCH Receiver FDI PLL */
-<<<<<<< HEAD
 	rx_ctl_val = dev_priv->display.fdi.rx_config | FDI_RX_ENHANCE_FRAME_ENABLE |
-=======
-	rx_ctl_val = dev_priv->fdi_rx_config | FDI_RX_ENHANCE_FRAME_ENABLE |
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		     FDI_RX_PLL_ENABLE |
 		     FDI_DP_PORT_WIDTH(crtc_state->fdi_lanes);
 	intel_de_write(dev_priv, FDI_RX_CTL(PIPE_A), rx_ctl_val);
@@ -1088,20 +1066,11 @@ void
 intel_fdi_init_hook(struct drm_i915_private *dev_priv)
 {
 	if (IS_IRONLAKE(dev_priv)) {
-<<<<<<< HEAD
 		dev_priv->display.funcs.fdi = &ilk_funcs;
 	} else if (IS_SANDYBRIDGE(dev_priv)) {
 		dev_priv->display.funcs.fdi = &gen6_funcs;
 	} else if (IS_IVYBRIDGE(dev_priv)) {
 		/* FIXME: detect B0+ stepping and use auto training */
 		dev_priv->display.funcs.fdi = &ivb_funcs;
-=======
-		dev_priv->fdi_funcs = &ilk_funcs;
-	} else if (IS_SANDYBRIDGE(dev_priv)) {
-		dev_priv->fdi_funcs = &gen6_funcs;
-	} else if (IS_IVYBRIDGE(dev_priv)) {
-		/* FIXME: detect B0+ stepping and use auto training */
-		dev_priv->fdi_funcs = &ivb_funcs;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }

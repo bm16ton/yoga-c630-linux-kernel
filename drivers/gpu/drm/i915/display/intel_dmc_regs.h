@@ -28,11 +28,8 @@
 #define _DMC_REG(i915, dmc_id, reg) \
 	((reg) - __DMC_REG_MMIO_BASE + _DMC_REG_MMIO_BASE(i915, dmc_id))
 
-<<<<<<< HEAD
 #define DMC_EVENT_HANDLER_COUNT_GEN12	8
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define _DMC_EVT_HTP_0			0x8f004
 
 #define DMC_EVT_HTP(i915, dmc_id, handler) \

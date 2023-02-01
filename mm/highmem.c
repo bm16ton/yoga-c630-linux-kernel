@@ -163,7 +163,6 @@ struct page *__kmap_to_page(void *vaddr)
 			 addr < PKMAP_ADDR(LAST_PKMAP)))
 		return pte_page(pkmap_page_table[PKMAP_NR(addr)]);
 
-<<<<<<< HEAD
 	/* kmap_local_page() mappings */
 	if (WARN_ON_ONCE(base >= __fix_to_virt(FIX_KMAP_END) &&
 			 base < __fix_to_virt(FIX_KMAP_BEGIN))) {
@@ -177,12 +176,6 @@ struct page *__kmap_to_page(void *vaddr)
 			if (base_addr == base)
 				return pte_page(kctrl->pteval[i]);
 		}
-=======
-	if (addr >= PKMAP_ADDR(0) && addr < PKMAP_ADDR(LAST_PKMAP)) {
-		int i = PKMAP_NR(addr);
-
-		return pte_page(pkmap_page_table[i]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return virt_to_page(vaddr);

@@ -158,21 +158,12 @@ of_pwm_single_xlate(struct pwm_chip *pc, const struct of_phandle_args *args)
 	struct pwm_device *pwm;
 
 	if (pc->of_pwm_n_cells < 1)
-<<<<<<< HEAD
 		return ERR_PTR(-EINVAL);
 
 	/* validate that one cell is specified, optionally with flags */
 	if (args->args_count != 1 && args->args_count != 2)
 		return ERR_PTR(-EINVAL);
 
-=======
-		return ERR_PTR(-EINVAL);
-
-	/* validate that one cell is specified, optionally with flags */
-	if (args->args_count != 1 && args->args_count != 2)
-		return ERR_PTR(-EINVAL);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pwm = pwm_request_from_chip(pc, 0, NULL);
 	if (IS_ERR(pwm))
 		return pwm;
@@ -582,19 +573,11 @@ int pwm_apply_state(struct pwm_device *pwm, const struct pwm_state *state)
 	err = chip->ops->apply(chip, pwm, state);
 	if (err)
 		return err;
-<<<<<<< HEAD
 
 	trace_pwm_apply(pwm, state);
 
 	pwm->state = *state;
 
-=======
-
-	trace_pwm_apply(pwm, state);
-
-	pwm->state = *state;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * only do this after pwm->state was applied as some
 	 * implementations of .get_state depend on this
@@ -695,11 +678,7 @@ static struct pwm_chip *fwnode_to_pwmchip(struct fwnode_handle *fwnode)
 	mutex_lock(&pwm_lock);
 
 	list_for_each_entry(chip, &pwm_chips, list)
-<<<<<<< HEAD
 		if (chip->dev && device_match_fwnode(chip->dev, fwnode)) {
-=======
-		if (chip->dev && dev_fwnode(chip->dev) == fwnode) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mutex_unlock(&pwm_lock);
 			return chip;
 		}
@@ -818,10 +797,6 @@ put:
 
 	return pwm;
 }
-<<<<<<< HEAD
-=======
-EXPORT_SYMBOL_GPL(of_pwm_get);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * acpi_pwm_get() - request a PWM via parsing "pwms" property in ACPI
@@ -1085,41 +1060,7 @@ struct pwm_device *devm_pwm_get(struct device *dev, const char *con_id)
 	pwm = pwm_get(dev, con_id);
 	if (IS_ERR(pwm))
 		return pwm;
-<<<<<<< HEAD
 
-=======
-
-	ret = devm_add_action_or_reset(dev, devm_pwm_release, pwm);
-	if (ret)
-		return ERR_PTR(ret);
-
-	return pwm;
-}
-EXPORT_SYMBOL_GPL(devm_pwm_get);
-
-/**
- * devm_of_pwm_get() - resource managed of_pwm_get()
- * @dev: device for PWM consumer
- * @np: device node to get the PWM from
- * @con_id: consumer name
- *
- * This function performs like of_pwm_get() but the acquired PWM device will
- * automatically be released on driver detach.
- *
- * Returns: A pointer to the requested PWM device or an ERR_PTR()-encoded
- * error code on failure.
- */
-struct pwm_device *devm_of_pwm_get(struct device *dev, struct device_node *np,
-				   const char *con_id)
-{
-	struct pwm_device *pwm;
-	int ret;
-
-	pwm = of_pwm_get(dev, np, con_id);
-	if (IS_ERR(pwm))
-		return pwm;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = devm_add_action_or_reset(dev, devm_pwm_release, pwm);
 	if (ret)
 		return ERR_PTR(ret);

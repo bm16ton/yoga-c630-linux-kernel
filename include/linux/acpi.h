@@ -287,12 +287,9 @@ static inline void acpi_arch_dma_setup(struct device *dev) { }
 
 #ifdef CONFIG_ARM64
 void acpi_numa_gicc_affinity_init(struct acpi_srat_gicc_affinity *pa);
-void acpi_arch_dma_setup(struct device *dev, u64 *dma_addr, u64 *dma_size);
 #else
 static inline void
 acpi_numa_gicc_affinity_init(struct acpi_srat_gicc_affinity *pa) { }
-static inline void
-acpi_arch_dma_setup(struct device *dev, u64 *dma_addr, u64 *dma_size) { }
 #endif
 
 int acpi_numa_memory_affinity_init (struct acpi_srat_mem_affinity *ma);
@@ -1086,10 +1083,7 @@ acpi_status acpi_os_prepare_extended_sleep(u8 sleep_state,
 struct acpi_s2idle_dev_ops {
 	struct list_head list_node;
 	void (*prepare)(void);
-<<<<<<< HEAD
 	void (*check)(void);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*restore)(void);
 };
 int acpi_register_lps0_dev(struct acpi_s2idle_dev_ops *arg);
@@ -1217,12 +1211,8 @@ bool acpi_gpio_get_irq_resource(struct acpi_resource *ares,
 				struct acpi_resource_gpio **agpio);
 bool acpi_gpio_get_io_resource(struct acpi_resource *ares,
 			       struct acpi_resource_gpio **agpio);
-<<<<<<< HEAD
 int acpi_dev_gpio_irq_wake_get_by(struct acpi_device *adev, const char *name, int index,
 				  bool *wake_capable);
-=======
-int acpi_dev_gpio_irq_get_by(struct acpi_device *adev, const char *name, int index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline bool acpi_gpio_get_irq_resource(struct acpi_resource *ares,
 					      struct acpi_resource_gpio **agpio)
@@ -1234,13 +1224,8 @@ static inline bool acpi_gpio_get_io_resource(struct acpi_resource *ares,
 {
 	return false;
 }
-<<<<<<< HEAD
 static inline int acpi_dev_gpio_irq_wake_get_by(struct acpi_device *adev, const char *name,
 						int index, bool *wake_capable)
-=======
-static inline int acpi_dev_gpio_irq_get_by(struct acpi_device *adev,
-					   const char *name, int index)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return -ENXIO;
 }

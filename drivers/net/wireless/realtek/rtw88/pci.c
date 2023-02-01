@@ -1483,11 +1483,7 @@ static void rtw_pci_interface_cfg(struct rtw_dev *rtwdev)
 static void rtw_pci_phy_cfg(struct rtw_dev *rtwdev)
 {
 	struct rtw_pci *rtwpci = (struct rtw_pci *)rtwdev->priv;
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct pci_dev *pdev = rtwpci->pdev;
 	const struct rtw_intf_phy_para *para;
 	u16 cut;
@@ -1542,11 +1538,7 @@ static int __maybe_unused rtw_pci_suspend(struct device *dev)
 {
 	struct ieee80211_hw *hw = dev_get_drvdata(dev);
 	struct rtw_dev *rtwdev = hw->priv;
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_efuse *efuse = &rtwdev->efuse;
 
 	if (chip->id == RTW_CHIP_TYPE_8822C && efuse->rfe_option == 6)
@@ -1558,11 +1550,7 @@ static int __maybe_unused rtw_pci_resume(struct device *dev)
 {
 	struct ieee80211_hw *hw = dev_get_drvdata(dev);
 	struct rtw_dev *rtwdev = hw->priv;
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_efuse *efuse = &rtwdev->efuse;
 
 	if (chip->id == RTW_CHIP_TYPE_8822C && efuse->rfe_option == 6)
@@ -1729,12 +1717,7 @@ static void rtw_pci_napi_init(struct rtw_dev *rtwdev)
 	struct rtw_pci *rtwpci = (struct rtw_pci *)rtwdev->priv;
 
 	init_dummy_netdev(&rtwpci->netdev);
-<<<<<<< HEAD
 	netif_napi_add(&rtwpci->netdev, &rtwpci->napi, rtw_pci_napi_poll);
-=======
-	netif_napi_add(&rtwpci->netdev, &rtwpci->napi, rtw_pci_napi_poll,
-		       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void rtw_pci_napi_deinit(struct rtw_dev *rtwdev)

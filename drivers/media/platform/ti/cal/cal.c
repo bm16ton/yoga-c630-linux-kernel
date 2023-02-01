@@ -543,7 +543,6 @@ void cal_ctx_unprepare(struct cal_ctx *ctx)
 
 void cal_ctx_start(struct cal_ctx *ctx)
 {
-<<<<<<< HEAD
 	struct cal_camerarx *phy = ctx->phy;
 
 	/*
@@ -560,9 +559,6 @@ void cal_ctx_start(struct cal_ctx *ctx)
 
 	spin_unlock(&phy->vc_lock);
 
-=======
-	ctx->sequence = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ctx->dma.state = CAL_DMA_RUNNING;
 
 	/* Configure the CSI-2, pixel processing and write DMA contexts. */
@@ -582,7 +578,6 @@ void cal_ctx_start(struct cal_ctx *ctx)
 
 void cal_ctx_stop(struct cal_ctx *ctx)
 {
-<<<<<<< HEAD
 	struct cal_camerarx *phy = ctx->phy;
 	long timeout;
 
@@ -592,10 +587,6 @@ void cal_ctx_stop(struct cal_ctx *ctx)
 	phy->vc_enable_count[ctx->vc]--;
 	spin_unlock(&phy->vc_lock);
 
-=======
-	long timeout;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Request DMA stop and wait until it completes. If completion times
 	 * out, forcefully disable the DMA.
@@ -632,7 +623,6 @@ void cal_ctx_stop(struct cal_ctx *ctx)
  * ------------------------------------------------------------------
  */
 
-<<<<<<< HEAD
 /*
  * Track a sequence number for each virtual channel, which is shared by
  * all contexts using the same virtual channel. This is done using the
@@ -661,8 +651,6 @@ static void cal_update_seq_number(struct cal_ctx *ctx)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void cal_irq_wdma_start(struct cal_ctx *ctx)
 {
 	spin_lock(&ctx->dma.lock);
@@ -693,11 +681,8 @@ static inline void cal_irq_wdma_start(struct cal_ctx *ctx)
 	}
 
 	spin_unlock(&ctx->dma.lock);
-<<<<<<< HEAD
 
 	cal_update_seq_number(ctx);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void cal_irq_wdma_end(struct cal_ctx *ctx)
@@ -724,17 +709,12 @@ static inline void cal_irq_wdma_end(struct cal_ctx *ctx)
 	if (buf) {
 		buf->vb.vb2_buf.timestamp = ktime_get_ns();
 		buf->vb.field = ctx->v_fmt.fmt.pix.field;
-<<<<<<< HEAD
 		buf->vb.sequence = ctx->phy->vc_sequence[ctx->vc];
 
-=======
-		buf->vb.sequence = ctx->sequence++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_DONE);
 	}
 }
 
-<<<<<<< HEAD
 static void cal_irq_handle_wdma(struct cal_ctx *ctx, bool start, bool end)
 {
 	/*
@@ -785,24 +765,6 @@ static irqreturn_t cal_irq(int irq_cal, void *data)
 
 		for (i = 0; i < cal->data->num_csi2_phy; ++i) {
 			if (status[0] & CAL_HL_IRQ_CIO_MASK(i)) {
-=======
-static irqreturn_t cal_irq(int irq_cal, void *data)
-{
-	struct cal_dev *cal = data;
-	u32 status;
-
-	status = cal_read(cal, CAL_HL_IRQSTATUS(0));
-	if (status) {
-		unsigned int i;
-
-		cal_write(cal, CAL_HL_IRQSTATUS(0), status);
-
-		if (status & CAL_HL_IRQ_OCPO_ERR_MASK)
-			dev_err_ratelimited(cal->dev, "OCPO ERROR\n");
-
-		for (i = 0; i < cal->data->num_csi2_phy; ++i) {
-			if (status & CAL_HL_IRQ_CIO_MASK(i)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				u32 cio_stat = cal_read(cal,
 							CAL_CSI2_COMPLEXIO_IRQSTATUS(i));
 
@@ -813,11 +775,7 @@ static irqreturn_t cal_irq(int irq_cal, void *data)
 					  cio_stat);
 			}
 
-<<<<<<< HEAD
 			if (status[0] & CAL_HL_IRQ_VC_MASK(i)) {
-=======
-			if (status & CAL_HL_IRQ_VC_MASK(i)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				u32 vc_stat = cal_read(cal, CAL_CSI2_VC_IRQSTATUS(i));
 
 				dev_err_ratelimited(cal->dev,
@@ -829,41 +787,12 @@ static irqreturn_t cal_irq(int irq_cal, void *data)
 		}
 	}
 
-<<<<<<< HEAD
 	for (i = 0; i < cal->num_contexts; ++i) {
 		bool end = !!(status[1] & CAL_HL_IRQ_WDMA_END_MASK(i));
 		bool start = !!(status[2] & CAL_HL_IRQ_WDMA_START_MASK(i));
 
 		if (start || end)
 			cal_irq_handle_wdma(cal->ctx[i], start, end);
-=======
-	/* Check which DMA just finished */
-	status = cal_read(cal, CAL_HL_IRQSTATUS(1));
-	if (status) {
-		unsigned int i;
-
-		/* Clear Interrupt status */
-		cal_write(cal, CAL_HL_IRQSTATUS(1), status);
-
-		for (i = 0; i < cal->num_contexts; ++i) {
-			if (status & CAL_HL_IRQ_WDMA_END_MASK(i))
-				cal_irq_wdma_end(cal->ctx[i]);
-		}
-	}
-
-	/* Check which DMA just started */
-	status = cal_read(cal, CAL_HL_IRQSTATUS(2));
-	if (status) {
-		unsigned int i;
-
-		/* Clear Interrupt status */
-		cal_write(cal, CAL_HL_IRQSTATUS(2), status);
-
-		for (i = 0; i < cal->num_contexts; ++i) {
-			if (status & CAL_HL_IRQ_WDMA_START_MASK(i))
-				cal_irq_wdma_start(cal->ctx[i]);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return IRQ_HANDLED;

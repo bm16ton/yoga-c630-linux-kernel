@@ -1014,13 +1014,10 @@ ssize_t crash_get_memory_size(void)
 	if (crashk_res.end != crashk_res.start)
 		size = resource_size(&crashk_res);
 
-<<<<<<< HEAD
 	kexec_unlock();
 	return size;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int crash_shrink_memory(unsigned long new_size)
 {
 	int ret = 0;

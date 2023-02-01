@@ -126,13 +126,8 @@ static void u2_phy_slew_rate_calibrate(struct mtk_xsphy *xsphy,
 	mtk_phy_set_bits(pbase + XSP_U2FREQ_FMMONR1, P2F_RG_FRCK_EN);
 
 	/* set cycle count as 1024 */
-<<<<<<< HEAD
 	mtk_phy_update_field(pbase + XSP_U2FREQ_FMCR0, P2F_RG_CYCLECNT,
 			     XSP_FM_DET_CYCLE_CNT);
-=======
-	mtk_phy_update_bits(pbase + XSP_U2FREQ_FMCR0, P2F_RG_CYCLECNT,
-			    P2F_RG_CYCLECNT_VAL(XSP_FM_DET_CYCLE_CNT));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* enable frequency meter */
 	mtk_phy_set_bits(pbase + XSP_U2FREQ_FMCR0, P2F_RG_FREQDET_EN);
@@ -163,12 +158,7 @@ static void u2_phy_slew_rate_calibrate(struct mtk_xsphy *xsphy,
 		xsphy->src_ref_clk, xsphy->src_coef);
 
 	/* set HS slew rate */
-<<<<<<< HEAD
 	mtk_phy_update_field(pbase + XSP_USBPHYACR5, P2A5_RG_HSTX_SRCTRL, calib_val);
-=======
-	mtk_phy_update_bits(pbase + XSP_USBPHYACR5, P2A5_RG_HSTX_SRCTRL,
-			    P2A5_RG_HSTX_SRCTRL_VAL(calib_val));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* disable USB ring oscillator */
 	mtk_phy_clear_bits(pbase + XSP_USBPHYACR5, P2A5_RG_HSTX_SRCAL_EN);
@@ -281,7 +271,6 @@ static void u2_phy_props_set(struct mtk_xsphy *xsphy,
 	void __iomem *pbase = inst->port_base;
 
 	if (inst->efuse_intr)
-<<<<<<< HEAD
 		mtk_phy_update_field(pbase + XSP_USBPHYACR1, P2A1_RG_INTR_CAL,
 				     inst->efuse_intr);
 
@@ -296,22 +285,6 @@ static void u2_phy_props_set(struct mtk_xsphy *xsphy,
 	if (inst->eye_term)
 		mtk_phy_update_field(pbase + XSP_USBPHYACR1, P2A1_RG_TERM_SEL,
 				     inst->eye_term);
-=======
-		mtk_phy_update_bits(pbase + XSP_USBPHYACR1, P2A1_RG_INTR_CAL,
-				    P2A1_RG_INTR_CAL_VAL(inst->efuse_intr));
-
-	if (inst->eye_src)
-		mtk_phy_update_bits(pbase + XSP_USBPHYACR5, P2A5_RG_HSTX_SRCTRL,
-				    P2A5_RG_HSTX_SRCTRL_VAL(inst->eye_src));
-
-	if (inst->eye_vrt)
-		mtk_phy_update_bits(pbase + XSP_USBPHYACR1, P2A1_RG_VRT_SEL,
-				    P2A1_RG_VRT_SEL_VAL(inst->eye_vrt));
-
-	if (inst->eye_term)
-		mtk_phy_update_bits(pbase + XSP_USBPHYACR1, P2A1_RG_TERM_SEL,
-				    P2A1_RG_TERM_SEL_VAL(inst->eye_term));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void u3_phy_props_set(struct mtk_xsphy *xsphy,
@@ -320,7 +293,6 @@ static void u3_phy_props_set(struct mtk_xsphy *xsphy,
 	void __iomem *pbase = inst->port_base;
 
 	if (inst->efuse_intr)
-<<<<<<< HEAD
 		mtk_phy_update_field(xsphy->glb_base + SSPXTP_PHYA_GLB_00,
 				     RG_XTP_GLB_BIAS_INTR_CTRL, inst->efuse_intr);
 
@@ -331,21 +303,6 @@ static void u3_phy_props_set(struct mtk_xsphy *xsphy,
 	if (inst->efuse_rx_imp)
 		mtk_phy_update_field(pbase + SSPXTP_PHYA_LN_14,
 				     RG_XTP_LN0_RX_IMPSEL, inst->efuse_rx_imp);
-=======
-		mtk_phy_update_bits(xsphy->glb_base + SSPXTP_PHYA_GLB_00,
-				    RG_XTP_GLB_BIAS_INTR_CTRL,
-				    RG_XTP_GLB_BIAS_INTR_CTRL_VAL(inst->efuse_intr));
-
-	if (inst->efuse_tx_imp)
-		mtk_phy_update_bits(pbase + SSPXTP_PHYA_LN_04,
-				    RG_XTP_LN0_TX_IMPSEL,
-				    RG_XTP_LN0_TX_IMPSEL_VAL(inst->efuse_tx_imp));
-
-	if (inst->efuse_rx_imp)
-		mtk_phy_update_bits(pbase + SSPXTP_PHYA_LN_14,
-				    RG_XTP_LN0_RX_IMPSEL,
-				    RG_XTP_LN0_RX_IMPSEL_VAL(inst->efuse_rx_imp));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int mtk_phy_init(struct phy *phy)

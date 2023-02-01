@@ -736,7 +736,6 @@ static int pseries_migrate_partition(u64 handle)
 {
 	int ret;
 	unsigned int factor = 0;
-<<<<<<< HEAD
 
 #ifdef CONFIG_PPC_WATCHDOG
 	factor = nmi_wd_lpm_factor;
@@ -750,20 +749,10 @@ static int pseries_migrate_partition(u64 handle)
 	 * by closing VAS windows at the beginning of this function.
 	 */
 	vas_migration_handler(VAS_SUSPEND);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-#ifdef CONFIG_PPC_WATCHDOG
-	factor = nmi_wd_lpm_factor;
-#endif
 	ret = wait_for_vasi_session_suspending(handle);
 	if (ret)
 		goto out;
-
-	if (factor)
-		watchdog_nmi_set_timeout_pct(factor);
-
-	vas_migration_handler(VAS_SUSPEND);
 
 	if (factor)
 		watchdog_nmi_set_timeout_pct(factor);
@@ -784,10 +773,7 @@ static int pseries_migrate_partition(u64 handle)
 	if (factor)
 		watchdog_nmi_set_timeout_pct(0);
 
-<<<<<<< HEAD
 out:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vas_migration_handler(VAS_RESUME);
 
 	return ret;

@@ -632,17 +632,12 @@ bool filemap_range_has_writeback(struct address_space *mapping,
 {
 	XA_STATE(xas, &mapping->i_pages, start_byte >> PAGE_SHIFT);
 	pgoff_t max = end_byte >> PAGE_SHIFT;
-<<<<<<< HEAD
 	struct folio *folio;
-=======
-	struct page *page;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (end_byte < start_byte)
 		return false;
 
 	rcu_read_lock();
-<<<<<<< HEAD
 	xas_for_each(&xas, folio, max) {
 		if (xas_retry(&xas, folio))
 			continue;
@@ -654,18 +649,6 @@ bool filemap_range_has_writeback(struct address_space *mapping,
 	}
 	rcu_read_unlock();
 	return folio != NULL;
-=======
-	xas_for_each(&xas, page, max) {
-		if (xas_retry(&xas, page))
-			continue;
-		if (xa_is_value(page))
-			continue;
-		if (PageDirty(page) || PageLocked(page) || PageWriteback(page))
-			break;
-	}
-	rcu_read_unlock();
-	return page != NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(filemap_range_has_writeback);
 
@@ -1244,14 +1227,7 @@ static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
 
 	if (bit_nr == PG_locked &&
 	    !folio_test_uptodate(folio) && folio_test_workingset(folio)) {
-<<<<<<< HEAD
 		delayacct_thrashing_start(&in_thrashing);
-=======
-		if (!folio_test_swapbacked(folio)) {
-			delayacct_thrashing_start();
-			delayacct = true;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		psi_memstall_enter(&pflags);
 		thrashing = true;
 	}
@@ -1399,26 +1375,14 @@ void migration_entry_wait_on_locked(swp_entry_t entry, pte_t *ptep,
 	struct wait_page_queue wait_page;
 	wait_queue_entry_t *wait = &wait_page.wait;
 	bool thrashing = false;
-<<<<<<< HEAD
 	unsigned long pflags;
 	bool in_thrashing;
-=======
-	bool delayacct = false;
-	unsigned long pflags;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wait_queue_head_t *q;
 	struct folio *folio = page_folio(pfn_swap_entry_to_page(entry));
 
 	q = folio_waitqueue(folio);
 	if (!folio_test_uptodate(folio) && folio_test_workingset(folio)) {
-<<<<<<< HEAD
 		delayacct_thrashing_start(&in_thrashing);
-=======
-		if (!folio_test_swapbacked(folio)) {
-			delayacct_thrashing_start();
-			delayacct = true;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		psi_memstall_enter(&pflags);
 		thrashing = true;
 	}
@@ -1465,7 +1429,6 @@ void migration_entry_wait_on_locked(swp_entry_t entry, pte_t *ptep,
 	finish_wait(q, wait);
 
 	if (thrashing) {
-<<<<<<< HEAD
 		delayacct_thrashing_end(&in_thrashing);
 		psi_memstall_leave(&pflags);
 	}
@@ -1482,25 +1445,6 @@ int folio_wait_bit_killable(struct folio *folio, int bit_nr)
 {
 	return folio_wait_bit_common(folio, bit_nr, TASK_KILLABLE, SHARED);
 }
-=======
-		if (delayacct)
-			delayacct_thrashing_end();
-		psi_memstall_leave(&pflags);
-	}
-}
-#endif
-
-void folio_wait_bit(struct folio *folio, int bit_nr)
-{
-	folio_wait_bit_common(folio, bit_nr, TASK_UNINTERRUPTIBLE, SHARED);
-}
-EXPORT_SYMBOL(folio_wait_bit);
-
-int folio_wait_bit_killable(struct folio *folio, int bit_nr)
-{
-	return folio_wait_bit_common(folio, bit_nr, TASK_KILLABLE, SHARED);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EXPORT_SYMBOL(folio_wait_bit_killable);
 
 /**
@@ -1516,11 +1460,7 @@ EXPORT_SYMBOL(folio_wait_bit_killable);
  *
  * Return: 0 if the folio was unlocked or -EINTR if interrupted by a signal.
  */
-<<<<<<< HEAD
 static int folio_put_wait_locked(struct folio *folio, int state)
-=======
-int folio_put_wait_locked(struct folio *folio, int state)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return folio_wait_bit_common(folio, PG_locked, state, DROP);
 }
@@ -1584,7 +1524,6 @@ void folio_unlock(struct folio *folio)
 	VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
 	if (clear_bit_unlock_is_negative_byte(PG_locked, folio_flags(folio, 0)))
 		folio_wake_bit(folio, PG_locked);
-<<<<<<< HEAD
 }
 EXPORT_SYMBOL(folio_unlock);
 
@@ -1650,73 +1589,6 @@ EXPORT_SYMBOL(folio_wait_private_2_killable);
  * folio_end_writeback - End writeback against a folio.
  * @folio: The folio.
  */
-=======
-}
-EXPORT_SYMBOL(folio_unlock);
-
-/**
- * folio_end_private_2 - Clear PG_private_2 and wake any waiters.
- * @folio: The folio.
- *
- * Clear the PG_private_2 bit on a folio and wake up any sleepers waiting for
- * it.  The folio reference held for PG_private_2 being set is released.
- *
- * This is, for example, used when a netfs folio is being written to a local
- * disk cache, thereby allowing writes to the cache for the same folio to be
- * serialised.
- */
-void folio_end_private_2(struct folio *folio)
-{
-	VM_BUG_ON_FOLIO(!folio_test_private_2(folio), folio);
-	clear_bit_unlock(PG_private_2, folio_flags(folio, 0));
-	folio_wake_bit(folio, PG_private_2);
-	folio_put(folio);
-}
-EXPORT_SYMBOL(folio_end_private_2);
-
-/**
- * folio_wait_private_2 - Wait for PG_private_2 to be cleared on a folio.
- * @folio: The folio to wait on.
- *
- * Wait for PG_private_2 (aka PG_fscache) to be cleared on a folio.
- */
-void folio_wait_private_2(struct folio *folio)
-{
-	while (folio_test_private_2(folio))
-		folio_wait_bit(folio, PG_private_2);
-}
-EXPORT_SYMBOL(folio_wait_private_2);
-
-/**
- * folio_wait_private_2_killable - Wait for PG_private_2 to be cleared on a folio.
- * @folio: The folio to wait on.
- *
- * Wait for PG_private_2 (aka PG_fscache) to be cleared on a folio or until a
- * fatal signal is received by the calling task.
- *
- * Return:
- * - 0 if successful.
- * - -EINTR if a fatal signal was encountered.
- */
-int folio_wait_private_2_killable(struct folio *folio)
-{
-	int ret = 0;
-
-	while (folio_test_private_2(folio)) {
-		ret = folio_wait_bit_killable(folio, PG_private_2);
-		if (ret < 0)
-			break;
-	}
-
-	return ret;
-}
-EXPORT_SYMBOL(folio_wait_private_2_killable);
-
-/**
- * folio_end_writeback - End writeback against a folio.
- * @folio: The folio.
- */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void folio_end_writeback(struct folio *folio)
 {
 	/*
@@ -2324,28 +2196,13 @@ bool folio_more_pages(struct folio *folio, pgoff_t index, pgoff_t max)
  * @end:	The final page index (inclusive)
  * @fbatch:	The batch to fill
  *
-<<<<<<< HEAD
  * filemap_get_folios_contig() works exactly like filemap_get_folios(),
  * except the returned folios are guaranteed to be contiguous. This may
  * not return all contiguous folios if the batch gets filled up.
-=======
- * find_get_pages_contig() works exactly like find_get_pages_range(),
- * except that the returned number of pages are guaranteed to be
- * contiguous.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Return: The number of folios found.
  * Also update @start to be positioned for traversal of the next folio.
  */
-<<<<<<< HEAD
-=======
-unsigned find_get_pages_contig(struct address_space *mapping, pgoff_t index,
-			       unsigned int nr_pages, struct page **pages)
-{
-	XA_STATE(xas, &mapping->i_pages, index);
-	struct folio *folio;
-	unsigned int ret = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 unsigned filemap_get_folios_contig(struct address_space *mapping,
 		pgoff_t *start, pgoff_t end, struct folio_batch *fbatch)
@@ -2355,13 +2212,9 @@ unsigned filemap_get_folios_contig(struct address_space *mapping,
 	struct folio *folio;
 
 	rcu_read_lock();
-<<<<<<< HEAD
 
 	for (folio = xas_load(&xas); folio && xas.xa_index <= end;
 			folio = xas_next(&xas)) {
-=======
-	for (folio = xas_load(&xas); folio; folio = xas_next(&xas)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (xas_retry(&xas, folio))
 			continue;
 		/*
@@ -2369,17 +2222,12 @@ unsigned filemap_get_folios_contig(struct address_space *mapping,
 		 * No current caller is looking for DAX entries.
 		 */
 		if (xa_is_value(folio))
-<<<<<<< HEAD
 			goto update_start;
-=======
-			break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (!folio_try_get_rcu(folio))
 			goto retry;
 
 		if (unlikely(folio != xas_reload(&xas)))
-<<<<<<< HEAD
 			goto put_folio;
 
 		if (!folio_batch_add(fbatch, folio)) {
@@ -2394,22 +2242,6 @@ unsigned filemap_get_folios_contig(struct address_space *mapping,
 put_folio:
 		folio_put(folio);
 
-=======
-			goto put_page;
-
-again:
-		pages[ret] = folio_file_page(folio, xas.xa_index);
-		if (++ret == nr_pages)
-			break;
-		if (folio_more_pages(folio, xas.xa_index, ULONG_MAX)) {
-			xas.xa_index++;
-			folio_ref_inc(folio);
-			goto again;
-		}
-		continue;
-put_page:
-		folio_put(folio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 retry:
 		xas_reset(&xas);
 	}
@@ -2568,7 +2400,6 @@ static int filemap_read_folio(struct file *file, filler_t filler,
 	 * fails.
 	 */
 	folio_clear_error(folio);
-<<<<<<< HEAD
 
 	/* Start the actual read. The read will unlock the page. */
 	if (unlikely(workingset))
@@ -2576,10 +2407,6 @@ static int filemap_read_folio(struct file *file, filler_t filler,
 	error = filler(file, folio);
 	if (unlikely(workingset))
 		psi_memstall_leave(&pflags);
-=======
-	/* Start the actual read. The read will unlock the page. */
-	error = filler(file, folio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (error)
 		return error;
 

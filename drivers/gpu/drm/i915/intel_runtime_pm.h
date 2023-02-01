@@ -52,7 +52,6 @@ struct intel_runtime_pm {
 	bool suspended;
 	bool irqs_enabled;
 	bool no_wakeref_tracking;
-<<<<<<< HEAD
 
 	/*
 	 *  Protects access to lmem usefault list.
@@ -75,8 +74,6 @@ struct intel_runtime_pm {
 
 	/* Manual runtime pm autosuspend delay for user GGTT/lmem mmaps */
 	struct intel_wakeref_auto userfault_wakeref;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
 	/*

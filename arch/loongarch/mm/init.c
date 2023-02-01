@@ -152,7 +152,6 @@ EXPORT_SYMBOL_GPL(memory_add_physaddr_to_nid);
 #endif
 #endif
 
-<<<<<<< HEAD
 static pte_t *fixmap_pte(unsigned long addr)
 {
 	pgd_t *pgd;
@@ -217,8 +216,6 @@ void __init __set_fixmap(enum fixed_addresses idx,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Align swapper_pg_dir in to 64K, allows its address to be loaded
  * with a single LUI instruction in the TLB handlers.  If we used

@@ -107,10 +107,7 @@ static void lif_configure_stream(struct vsp1_entity *entity,
 
 	case VI6_IP_VERSION_MODEL_VSPDL_GEN3:
 	case VI6_IP_VERSION_MODEL_VSPD_V3:
-<<<<<<< HEAD
 	case VI6_IP_VERSION_MODEL_VSPD_RZG2L:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hbth = 0;
 		obth = 1500;
 		lbth = 0;
@@ -134,22 +131,12 @@ static void lif_configure_stream(struct vsp1_entity *entity,
 			VI6_LIF_CTRL_REQSEL | VI6_LIF_CTRL_LIF_EN);
 
 	/*
-<<<<<<< HEAD
 	 * On R-Car V3M and RZ/G2L the LIF0 buffer attribute register has to be
 	 * set to a non-default value to guarantee proper operation (otherwise
 	 * artifacts may appear on the output). The value required by the
 	 * manual is not explained but is likely a buffer size or threshold.
 	 */
 	if (vsp1_feature(entity->vsp1, VSP1_HAS_NON_ZERO_LBA))
-=======
-	 * On R-Car V3M the LIF0 buffer attribute register has to be set to a
-	 * non-default value to guarantee proper operation (otherwise artifacts
-	 * may appear on the output). The value required by the manual is not
-	 * explained but is likely a buffer size or threshold.
-	 */
-	if ((entity->vsp1->version & VI6_IP_VERSION_MASK) ==
-	    (VI6_IP_VERSION_MODEL_VSPD_V3 | VI6_IP_VERSION_SOC_V3M))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vsp1_lif_write(lif, dlb, VI6_LIF_LBA,
 			       VI6_LIF_LBA_LBA0 |
 			       (1536 << VI6_LIF_LBA_LBA1_SHIFT));

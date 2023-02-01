@@ -199,7 +199,6 @@ static bool ath_reg_dyn_country_user_allow(struct ath_regulatory *reg)
 
 	if (!IS_ENABLED(CONFIG_ATH_REG_DYNAMIC_USER_REG_HINTS))
 		return false;
-
 	if (!dynamic_country_user_possible(reg))
 		return false;
 	return true;

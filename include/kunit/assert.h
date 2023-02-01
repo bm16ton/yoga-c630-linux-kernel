@@ -32,7 +32,6 @@ enum kunit_assert_type {
  * struct kunit_loc - Identifies the source location of a line of code.
  * @line: the line number in the file.
  * @file: the file name.
-<<<<<<< HEAD
  */
 struct kunit_loc {
 	int line;
@@ -53,29 +52,6 @@ typedef void (*assert_format_t)(const struct kunit_assert *assert,
 				const struct va_format *message,
 				struct string_stream *stream);
 
-=======
- */
-struct kunit_loc {
-	int line;
-	const char *file;
-};
-
-#define KUNIT_CURRENT_LOC { .file = __FILE__, .line = __LINE__ }
-
-/**
- * struct kunit_assert - Data for printing a failed assertion or expectation.
- * @format: a function which formats the data in this kunit_assert to a string.
- *
- * Represents a failed expectation/assertion. Contains all the data necessary to
- * format a string to a user reporting the failure.
- */
-struct kunit_assert {
-	void (*format)(const struct kunit_assert *assert,
-		       const struct va_format *message,
-		       struct string_stream *stream);
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void kunit_assert_prologue(const struct kunit_loc *loc,
 			   enum kunit_assert_type type,
 			   struct string_stream *stream);
@@ -95,19 +71,6 @@ void kunit_fail_assert_format(const struct kunit_assert *assert,
 			      struct string_stream *stream);
 
 /**
-<<<<<<< HEAD
-=======
- * KUNIT_INIT_FAIL_ASSERT_STRUCT - Initializer for &struct kunit_fail_assert.
- *
- * Initializes a &struct kunit_fail_assert. Intended to be used in
- * KUNIT_EXPECT_* and KUNIT_ASSERT_* macros.
- */
-#define KUNIT_INIT_FAIL_ASSERT_STRUCT {					\
-	.assert = { .format = kunit_fail_assert_format },		\
-}
-
-/**
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * struct kunit_unary_assert - Represents a KUNIT_{EXPECT|ASSERT}_{TRUE|FALSE}
  * @assert: The parent of this type.
  * @condition: A string representation of a conditional expression.
@@ -136,10 +99,6 @@ void kunit_unary_assert_format(const struct kunit_assert *assert,
  * KUNIT_EXPECT_* and KUNIT_ASSERT_* macros.
  */
 #define KUNIT_INIT_UNARY_ASSERT_STRUCT(cond, expect_true) {		       \
-<<<<<<< HEAD
-=======
-	.assert = { .format = kunit_unary_assert_format },		       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.condition = cond,						       \
 	.expected_true = expect_true					       \
 }
@@ -174,10 +133,6 @@ void kunit_ptr_not_err_assert_format(const struct kunit_assert *assert,
  * KUNIT_EXPECT_* and KUNIT_ASSERT_* macros.
  */
 #define KUNIT_INIT_PTR_NOT_ERR_STRUCT(txt, val) {			       \
-<<<<<<< HEAD
-=======
-	.assert = { .format = kunit_ptr_not_err_assert_format },	       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.text = txt,							       \
 	.value = val							       \
 }
@@ -222,10 +177,6 @@ void kunit_binary_assert_format(const struct kunit_assert *assert,
  * KUNIT_INIT_BINARY_ASSERT_STRUCT() - Initializes a binary assert like
  *	kunit_binary_assert, kunit_binary_ptr_assert, etc.
  *
-<<<<<<< HEAD
-=======
- * @format_func: a function which formats the assert to a string.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @text_: Pointer to a kunit_binary_assert_text.
  * @left_val: The actual evaluated value of the expression in the left slot.
  * @right_val: The actual evaluated value of the expression in the right slot.
@@ -235,17 +186,9 @@ void kunit_binary_assert_format(const struct kunit_assert *assert,
  * fields but with different types for left_val/right_val.
  * This is ultimately used by binary assertion macros like KUNIT_EXPECT_EQ, etc.
  */
-<<<<<<< HEAD
 #define KUNIT_INIT_BINARY_ASSERT_STRUCT(text_,				       \
 					left_val,			       \
 					right_val) {			       \
-=======
-#define KUNIT_INIT_BINARY_ASSERT_STRUCT(format_func,			       \
-					text_,				       \
-					left_val,			       \
-					right_val) {			       \
-	.assert = { .format = format_func },				       \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.text = text_,							       \
 	.left_value = left_val,						       \
 	.right_value = right_val					       \

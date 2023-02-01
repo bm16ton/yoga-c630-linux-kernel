@@ -2066,7 +2066,6 @@ Description:
 		Available range for the forced calibration value, expressed as:
 
 		- a range specified as "[min step max]"
-<<<<<<< HEAD
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_voltageX_sampling_frequency
 What:		/sys/bus/iio/devices/iio:deviceX/in_powerY_sampling_frequency
@@ -2163,5 +2162,3 @@ Contact:	linux-iio@vger.kernel.org
 Description:
 		An example format is 16-bytes, 2-digits-per-byte, HEX-string
 		representing the sensor unique ID number.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

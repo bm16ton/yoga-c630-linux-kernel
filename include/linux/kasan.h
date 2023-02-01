@@ -89,22 +89,6 @@ static inline void kasan_disable_current(void) {}
 #else /* CONFIG_KASAN_HW_TAGS */
 
 #endif /* CONFIG_KASAN_HW_TAGS */
-<<<<<<< HEAD
-=======
-
-static inline bool kasan_has_integrated_init(void)
-{
-	return kasan_hw_tags_enabled();
-}
-
-#ifdef CONFIG_KASAN
-
-struct kasan_cache {
-	int alloc_meta_offset;
-	int free_meta_offset;
-	bool is_kmalloc;
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline bool kasan_has_integrated_init(void)
 {
@@ -142,18 +126,6 @@ static __always_inline void kasan_unpoison_pages(struct page *page,
 {
 	if (kasan_enabled())
 		__kasan_unpoison_pages(page, order, init);
-<<<<<<< HEAD
-=======
-}
-
-void __kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
-				slab_flags_t *flags);
-static __always_inline void kasan_cache_create(struct kmem_cache *cache,
-				unsigned int *size, slab_flags_t *flags)
-{
-	if (kasan_enabled())
-		__kasan_cache_create(cache, size, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void __kasan_cache_create_kmalloc(struct kmem_cache *cache);
@@ -163,17 +135,6 @@ static __always_inline void kasan_cache_create_kmalloc(struct kmem_cache *cache)
 		__kasan_cache_create_kmalloc(cache);
 }
 
-<<<<<<< HEAD
-=======
-size_t __kasan_metadata_size(struct kmem_cache *cache);
-static __always_inline size_t kasan_metadata_size(struct kmem_cache *cache)
-{
-	if (kasan_enabled())
-		return __kasan_metadata_size(cache);
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void __kasan_poison_slab(struct slab *slab);
 static __always_inline void kasan_poison_slab(struct slab *slab)
 {
@@ -285,27 +246,12 @@ static __always_inline bool kasan_check_byte(const void *addr)
 
 #else /* CONFIG_KASAN */
 
-<<<<<<< HEAD
-=======
-static inline slab_flags_t kasan_never_merge(void)
-{
-	return 0;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void kasan_unpoison_range(const void *address, size_t size) {}
 static inline void kasan_poison_pages(struct page *page, unsigned int order,
 				      bool init) {}
 static inline void kasan_unpoison_pages(struct page *page, unsigned int order,
 					bool init) {}
-<<<<<<< HEAD
 static inline void kasan_cache_create_kmalloc(struct kmem_cache *cache) {}
-=======
-static inline void kasan_cache_create(struct kmem_cache *cache,
-				      unsigned int *size,
-				      slab_flags_t *flags) {}
-static inline void kasan_cache_create_kmalloc(struct kmem_cache *cache) {}
-static inline size_t kasan_metadata_size(struct kmem_cache *cache) { return 0; }
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void kasan_poison_slab(struct slab *slab) {}
 static inline void kasan_unpoison_object_data(struct kmem_cache *cache,
 					void *object) {}

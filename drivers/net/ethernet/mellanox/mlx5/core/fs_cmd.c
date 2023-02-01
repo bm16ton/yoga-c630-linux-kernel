@@ -929,12 +929,8 @@ static int mlx5_cmd_modify_header_alloc(struct mlx5_flow_root_namespace *ns,
 		table_type = FS_FT_NIC_RX;
 		break;
 	case MLX5_FLOW_NAMESPACE_EGRESS:
-<<<<<<< HEAD
 	case MLX5_FLOW_NAMESPACE_EGRESS_IPSEC:
 	case MLX5_FLOW_NAMESPACE_EGRESS_MACSEC:
-=======
-	case MLX5_FLOW_NAMESPACE_EGRESS_KERNEL:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		max_actions = MLX5_CAP_FLOWTABLE_NIC_TX(dev, max_modify_header_actions);
 		table_type = FS_FT_NIC_TX;
 		break;

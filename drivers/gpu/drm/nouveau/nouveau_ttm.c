@@ -38,7 +38,6 @@
 static void
 nouveau_manager_del(struct ttm_resource_manager *man,
 		    struct ttm_resource *reg)
-<<<<<<< HEAD
 {
 	nouveau_mem_del(man, reg);
 }
@@ -59,10 +58,6 @@ nouveau_manager_compatible(struct ttm_resource_manager *man,
 			   size_t size)
 {
 	return nouveau_mem_compatible(res, place, size);
-=======
-{
-	nouveau_mem_del(man, reg);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int

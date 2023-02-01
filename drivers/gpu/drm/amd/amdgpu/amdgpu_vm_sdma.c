@@ -112,12 +112,8 @@ static int amdgpu_vm_sdma_commit(struct amdgpu_vm_update_params *p,
 		swap(p->vm->last_unlocked, tmp);
 		dma_fence_put(tmp);
 	} else {
-<<<<<<< HEAD
 		dma_resv_add_fence(p->vm->root.bo->tbo.base.resv, f,
 				   DMA_RESV_USAGE_BOOKKEEP);
-=======
-		amdgpu_bo_fence(p->vm->root.bo, f, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (fence && !p->immediate) {

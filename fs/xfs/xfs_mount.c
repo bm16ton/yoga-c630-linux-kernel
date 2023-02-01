@@ -302,7 +302,6 @@ xfs_validate_new_dalign(
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	/*
 	 * Convert the stripe unit and width to FSBs.
 	 */
@@ -323,8 +322,6 @@ xfs_validate_new_dalign(
 
 	mp->m_swidth = XFS_BB_TO_FSBT(mp, mp->m_swidth);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!xfs_has_dalign(mp)) {
 		xfs_warn(mp,
 "cannot change alignment: superblock does not support data alignment");

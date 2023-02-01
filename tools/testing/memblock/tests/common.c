@@ -9,33 +9,22 @@
 #define INIT_MEMBLOCK_RESERVED_REGIONS		INIT_MEMBLOCK_REGIONS
 #define PREFIXES_MAX				15
 #define DELIM					": "
-<<<<<<< HEAD
 #define BASIS					10000
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct test_memory memory_block;
 static const char __maybe_unused *prefixes[PREFIXES_MAX];
 static int __maybe_unused nr_prefixes;
 
-<<<<<<< HEAD
 static const char *short_opts = "hmv";
 static const struct option long_opts[] = {
 	{"help", 0, NULL, 'h'},
-=======
-static const char *short_opts = "mv";
-static const struct option long_opts[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{"movable-node", 0, NULL, 'm'},
 	{"verbose", 0, NULL, 'v'},
 	{NULL, 0, NULL, 0}
 };
 
 static const char * const help_opts[] = {
-<<<<<<< HEAD
 	"display this help message and exit",
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	"disallow allocations from regions marked as hotplugged\n\t\t\t"
 		"by simulating enabling the \"movable_node\" kernel\n\t\t\t"
 		"parameter",
@@ -72,19 +61,15 @@ void reset_memblock_attributes(void)
 	memblock.current_limit	= MEMBLOCK_ALLOC_ANYWHERE;
 }
 
-<<<<<<< HEAD
 static inline void fill_memblock(void)
 {
 	memset(memory_block.base, 1, MEM_SIZE);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void setup_memblock(void)
 {
 	reset_memblock_regions();
 	memblock_add((phys_addr_t)memory_block.base, MEM_SIZE);
-<<<<<<< HEAD
 	fill_memblock();
 }
 
@@ -116,18 +101,13 @@ void setup_numa_memblock(const unsigned int node_fracs[])
 		base += size;
 	}
 	fill_memblock();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void dummy_physical_memory_init(void)
 {
 	memory_block.base = malloc(MEM_SIZE);
 	assert(memory_block.base);
-<<<<<<< HEAD
 	fill_memblock();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void dummy_physical_memory_cleanup(void)

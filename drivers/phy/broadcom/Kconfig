@@ -97,11 +97,7 @@ config PHY_BRCM_USB
 	depends on OF
 	select GENERIC_PHY
 	select SOC_BRCMSTB if ARCH_BRCMSTB
-<<<<<<< HEAD
 	default ARCH_BCMBCA || ARCH_BRCMSTB
-=======
-	default ARCH_BCM4908 || ARCH_BRCMSTB
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Enable this to support the Broadcom STB USB PHY.
 	  This driver is required by the USB XHCI, EHCI and OHCI

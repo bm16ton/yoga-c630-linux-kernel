@@ -28,13 +28,6 @@ properties:
   vref1-supply: true
   vref2-supply: true
 
-<<<<<<< HEAD
-=======
-  spi-max-frequency: true
-
-additionalProperties: false
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg
@@ -42,10 +35,7 @@ required:
   - vref1-supply
 
 allOf:
-<<<<<<< HEAD
   - $ref: /schemas/spi/spi-peripheral-props.yaml#
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - if:
       properties:
         compatible:
@@ -70,11 +60,8 @@ allOf:
       required:
         - vref2-supply
 
-<<<<<<< HEAD
 unevaluatedProperties: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
     spi {

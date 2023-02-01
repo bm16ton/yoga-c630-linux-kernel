@@ -168,14 +168,10 @@ int efa_com_create_cq(struct efa_com_dev *edev,
 			EFA_ADMIN_CREATE_CQ_CMD_INTERRUPT_MODE_ENABLED, 1);
 		create_cmd.eqn = params->eqn;
 	}
-<<<<<<< HEAD
 	if (params->set_src_addr) {
 		EFA_SET(&create_cmd.cq_caps_2,
 			EFA_ADMIN_CREATE_CQ_CMD_SET_SRC_ADDR, 1);
 	}
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	efa_com_set_dma_addr(params->dma_addr,
 			     &create_cmd.cq_ba.mem_addr_high,
 			     &create_cmd.cq_ba.mem_addr_low);

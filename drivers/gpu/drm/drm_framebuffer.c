@@ -177,13 +177,8 @@ static int framebuffer_check(struct drm_device *dev,
 
 	/* check if the format is supported at all */
 	if (!__drm_format_info(r->pixel_format)) {
-<<<<<<< HEAD
 		drm_dbg_kms(dev, "bad framebuffer format %p4cc\n",
 			    &r->pixel_format);
-=======
-		DRM_DEBUG_KMS("bad framebuffer format %p4cc\n",
-			      &r->pixel_format);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 	}
 
@@ -315,11 +310,7 @@ drm_internal_framebuffer_create(struct drm_device *dev,
 
 	if (r->flags & DRM_MODE_FB_MODIFIERS &&
 	    dev->mode_config.fb_modifiers_not_supported) {
-<<<<<<< HEAD
 		drm_dbg_kms(dev, "driver does not support fb modifiers\n");
-=======
-		DRM_DEBUG_KMS("driver does not support fb modifiers\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ERR_PTR(-EINVAL);
 	}
 

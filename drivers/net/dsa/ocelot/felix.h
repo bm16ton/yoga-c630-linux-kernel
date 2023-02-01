@@ -60,21 +60,6 @@ struct felix_info {
 	void	(*tas_guard_bands_update)(struct ocelot *ocelot, int port);
 	void	(*port_sched_speed_set)(struct ocelot *ocelot, int port,
 					u32 speed);
-	struct regmap *(*init_regmap)(struct ocelot *ocelot,
-				      struct resource *res);
-};
-
-/* Methods for initializing the hardware resources specific to a tagging
- * protocol (like the NPI port, for "ocelot" or "seville", or the VCAP TCAMs,
- * for "ocelot-8021q").
- * It is important that the resources configured here do not have side effects
- * for the other tagging protocols. If that is the case, their configuration
- * needs to go to felix_tag_proto_setup_shared().
- */
-struct felix_tag_proto_ops {
-	int (*setup)(struct dsa_switch *ds);
-	void (*teardown)(struct dsa_switch *ds);
-	unsigned long (*get_host_fwd_mask)(struct dsa_switch *ds);
 };
 
 /* Methods for initializing the hardware resources specific to a tagging
@@ -103,10 +88,6 @@ struct felix {
 	struct mii_bus			*imdio;
 	struct phylink_pcs		**pcs;
 	resource_size_t			switch_base;
-<<<<<<< HEAD
-=======
-	resource_size_t			imdio_base;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	enum dsa_tag_protocol		tag_proto;
 	const struct felix_tag_proto_ops *tag_proto_ops;
 	struct kthread_worker		*xmit_worker;

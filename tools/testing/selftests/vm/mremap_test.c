@@ -119,7 +119,6 @@ static unsigned long long get_mmap_min_addr(void)
 }
 
 /*
-<<<<<<< HEAD
  * This test validates that merge is called when expanding a mapping.
  * Mapping containing three pages is created, middle page is unmapped
  * and then the mapping containing the first page is expanded so that
@@ -164,8 +163,6 @@ static void mremap_expand_merge(unsigned long page_size)
 }
 
 /*
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Returns the start address of the mapping on success, else returns
  * NULL on failure.
  */
@@ -383,10 +380,7 @@ int main(int argc, char **argv)
 	int i, run_perf_tests;
 	unsigned int threshold_mb = VALIDATION_DEFAULT_THRESHOLD;
 	unsigned int pattern_seed;
-<<<<<<< HEAD
 	int num_expand_tests = 1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct test test_cases[MAX_TEST];
 	struct test perf_test_cases[MAX_PERF_TEST];
 	int page_size;

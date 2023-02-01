@@ -1607,7 +1607,6 @@ static int hns3_handle_csum_partial(struct hns3_enet_ring *ring,
 {
 	u8 ol4_proto, il4_proto;
 	int ret;
-<<<<<<< HEAD
 
 	if (hns3_check_hw_tx_csum(skb)) {
 		/* set checksum start and offset, defined in 2 Bytes */
@@ -1652,52 +1651,6 @@ static int hns3_fill_skb_desc(struct hns3_enet_ring *ring,
 	struct hns3_desc_param param;
 	int ret;
 
-=======
-
-	if (hns3_check_hw_tx_csum(skb)) {
-		/* set checksum start and offset, defined in 2 Bytes */
-		hns3_set_field(param->type_cs_vlan_tso, HNS3_TXD_CSUM_START_S,
-			       skb_checksum_start_offset(skb) >> 1);
-		hns3_set_field(param->ol_type_vlan_len_msec,
-			       HNS3_TXD_CSUM_OFFSET_S,
-			       skb->csum_offset >> 1);
-		param->mss_hw_csum |= BIT(HNS3_TXD_HW_CS_B);
-		return 0;
-	}
-
-	skb_reset_mac_len(skb);
-
-	ret = hns3_get_l4_protocol(skb, &ol4_proto, &il4_proto);
-	if (unlikely(ret < 0)) {
-		hns3_ring_stats_update(ring, tx_l4_proto_err);
-		return ret;
-	}
-
-	ret = hns3_set_l2l3l4(skb, ol4_proto, il4_proto,
-			      &param->type_cs_vlan_tso,
-			      &param->ol_type_vlan_len_msec);
-	if (unlikely(ret < 0)) {
-		hns3_ring_stats_update(ring, tx_l2l3l4_err);
-		return ret;
-	}
-
-	ret = hns3_set_tso(skb, &param->paylen_ol4cs, &param->mss_hw_csum,
-			   &param->type_cs_vlan_tso, &desc_cb->send_bytes);
-	if (unlikely(ret < 0)) {
-		hns3_ring_stats_update(ring, tx_tso_err);
-		return ret;
-	}
-	return 0;
-}
-
-static int hns3_fill_skb_desc(struct hns3_enet_ring *ring,
-			      struct sk_buff *skb, struct hns3_desc *desc,
-			      struct hns3_desc_cb *desc_cb)
-{
-	struct hns3_desc_param param;
-	int ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hns3_init_desc_data(skb, &param);
 	ret = hns3_handle_vlan_info(ring, skb, &param);
 	if (unlikely(ret < 0))
@@ -2062,8 +2015,6 @@ static int hns3_fill_skb_to_desc(struct hns3_enet_ring *ring,
 	ret = hns3_map_and_fill_desc(ring, skb, type);
 	if (unlikely(ret < 0))
 		return ret;
-<<<<<<< HEAD
-=======
 
 	bd_num += ret;
 
@@ -2073,9 +2024,9 @@ static int hns3_fill_skb_to_desc(struct hns3_enet_ring *ring,
 		ret = hns3_map_and_fill_desc(ring, frag, DESC_TYPE_PAGE);
 		if (unlikely(ret < 0))
 			return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	bd_num += ret;
+		bd_num += ret;
+	}
 
 	skb_walk_frags(skb, frag_skb) {
 		ret = hns3_fill_skb_to_desc(ring, frag_skb,
@@ -2083,9 +2034,6 @@ static int hns3_fill_skb_to_desc(struct hns3_enet_ring *ring,
 		if (unlikely(ret < 0))
 			return ret;
 
-<<<<<<< HEAD
-		ret = hns3_map_and_fill_desc(ring, frag, DESC_TYPE_PAGE);
-=======
 		bd_num += ret;
 	}
 
@@ -2174,254 +2122,6 @@ static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
 
 	ring->pending_buf = 0;
 	WRITE_ONCE(ring->last_to_use, ring->next_to_use);
-}
-
-static void hns3_tsyn(struct net_device *netdev, struct sk_buff *skb,
-		      struct hns3_desc *desc)
-{
-	struct hnae3_handle *h = hns3_get_handle(netdev);
-
-	if (!(h->ae_algo->ops->set_tx_hwts_info &&
-	      h->ae_algo->ops->set_tx_hwts_info(h, skb)))
-		return;
-
-	desc->tx.bdtp_fe_sc_vld_ra_ri |= cpu_to_le16(BIT(HNS3_TXD_TSYN_B));
-}
-
-static int hns3_handle_tx_bounce(struct hns3_enet_ring *ring,
-				 struct sk_buff *skb)
-{
-	struct hns3_desc_cb *desc_cb = &ring->desc_cb[ring->next_to_use];
-	unsigned int type = DESC_TYPE_BOUNCE_HEAD;
-	unsigned int size = skb_headlen(skb);
-	dma_addr_t dma;
-	int bd_num = 0;
-	u32 cb_len;
-	void *buf;
-	int ret;
-
-	if (skb->len <= ring->tx_copybreak) {
-		size = skb->len;
-		type = DESC_TYPE_BOUNCE_ALL;
-	}
-
-	/* hns3_can_use_tx_bounce() is called to ensure the below
-	 * function can always return the tx buffer.
-	 */
-	buf = hns3_tx_spare_alloc(ring, size, &dma, &cb_len);
-
-	ret = skb_copy_bits(skb, 0, buf, size);
-	if (unlikely(ret < 0)) {
-		hns3_tx_spare_rollback(ring, cb_len);
-		hns3_ring_stats_update(ring, copy_bits_err);
-		return ret;
-	}
-
-	desc_cb->priv = skb;
-	desc_cb->length = cb_len;
-	desc_cb->dma = dma;
-	desc_cb->type = type;
-
-	bd_num += hns3_fill_desc(ring, dma, size);
-
-	if (type == DESC_TYPE_BOUNCE_HEAD) {
-		ret = hns3_fill_skb_to_desc(ring, skb,
-					    DESC_TYPE_BOUNCE_HEAD);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		if (unlikely(ret < 0))
-			return ret;
-
-		bd_num += ret;
-	}
-
-	dma_sync_single_for_device(ring_to_dev(ring), dma, size,
-				   DMA_TO_DEVICE);
-
-	hns3_ring_stats_update(ring, tx_bounce);
-
-	return bd_num;
-}
-
-static int hns3_handle_tx_sgl(struct hns3_enet_ring *ring,
-			      struct sk_buff *skb)
-{
-	struct hns3_desc_cb *desc_cb = &ring->desc_cb[ring->next_to_use];
-	u32 nfrag = skb_shinfo(skb)->nr_frags + 1;
-	struct sg_table *sgt;
-	int i, bd_num = 0;
-	dma_addr_t dma;
-	u32 cb_len;
-	int nents;
-
-	if (skb_has_frag_list(skb))
-		nfrag = HNS3_MAX_TSO_BD_NUM;
-
-	/* hns3_can_use_tx_sgl() is called to ensure the below
-	 * function can always return the tx buffer.
-	 */
-	sgt = hns3_tx_spare_alloc(ring, HNS3_SGL_SIZE(nfrag),
-				  &dma, &cb_len);
-
-	/* scatterlist follows by the sg table */
-	sgt->sgl = (struct scatterlist *)(sgt + 1);
-	sg_init_table(sgt->sgl, nfrag);
-	nents = skb_to_sgvec(skb, sgt->sgl, 0, skb->len);
-	if (unlikely(nents < 0)) {
-		hns3_tx_spare_rollback(ring, cb_len);
-		hns3_ring_stats_update(ring, skb2sgl_err);
-		return -ENOMEM;
-	}
-
-	sgt->orig_nents = nents;
-	sgt->nents = dma_map_sg(ring_to_dev(ring), sgt->sgl, sgt->orig_nents,
-				DMA_TO_DEVICE);
-	if (unlikely(!sgt->nents)) {
-		hns3_tx_spare_rollback(ring, cb_len);
-		hns3_ring_stats_update(ring, map_sg_err);
-		return -ENOMEM;
-	}
-
-	desc_cb->priv = skb;
-	desc_cb->length = cb_len;
-	desc_cb->dma = dma;
-	desc_cb->type = DESC_TYPE_SGL_SKB;
-
-	for (i = 0; i < sgt->nents; i++)
-		bd_num += hns3_fill_desc(ring, sg_dma_address(sgt->sgl + i),
-					 sg_dma_len(sgt->sgl + i));
-	hns3_ring_stats_update(ring, tx_sgl);
-
-	return bd_num;
-}
-
-static int hns3_handle_desc_filling(struct hns3_enet_ring *ring,
-				    struct sk_buff *skb)
-{
-	u32 space;
-
-	if (!ring->tx_spare)
-		goto out;
-
-	space = hns3_tx_spare_space(ring);
-
-	if (hns3_can_use_tx_sgl(ring, skb, space))
-		return hns3_handle_tx_sgl(ring, skb);
-
-	if (hns3_can_use_tx_bounce(ring, skb, space))
-		return hns3_handle_tx_bounce(ring, skb);
-
-out:
-	return hns3_fill_skb_to_desc(ring, skb, DESC_TYPE_SKB);
-}
-
-<<<<<<< HEAD
-static void hns3_tx_push_bd(struct hns3_enet_ring *ring, int num)
-{
-#define HNS3_BYTES_PER_64BIT		8
-
-	struct hns3_desc desc[HNS3_MAX_PUSH_BD_NUM] = {};
-	int offset = 0;
-
-	/* make sure everything is visible to device before
-	 * excuting tx push or updating doorbell
-	 */
-	dma_wmb();
-
-	do {
-		int idx = (ring->next_to_use - num + ring->desc_num) %
-			  ring->desc_num;
-
-		u64_stats_update_begin(&ring->syncp);
-		ring->stats.tx_push++;
-		u64_stats_update_end(&ring->syncp);
-		memcpy(&desc[offset], &ring->desc[idx],
-		       sizeof(struct hns3_desc));
-		offset++;
-	} while (--num);
-
-	__iowrite64_copy(ring->tqp->mem_base, desc,
-			 (sizeof(struct hns3_desc) * HNS3_MAX_PUSH_BD_NUM) /
-			 HNS3_BYTES_PER_64BIT);
-
-	io_stop_wc();
-}
-
-static void hns3_tx_mem_doorbell(struct hns3_enet_ring *ring)
-{
-#define HNS3_MEM_DOORBELL_OFFSET	64
-
-	__le64 bd_num = cpu_to_le64((u64)ring->pending_buf);
-
-	/* make sure everything is visible to device before
-	 * excuting tx push or updating doorbell
-	 */
-	dma_wmb();
-
-	__iowrite64_copy(ring->tqp->mem_base + HNS3_MEM_DOORBELL_OFFSET,
-			 &bd_num, 1);
-	u64_stats_update_begin(&ring->syncp);
-	ring->stats.tx_mem_doorbell += ring->pending_buf;
-	u64_stats_update_end(&ring->syncp);
-
-	io_stop_wc();
-}
-
-static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
-			     bool doorbell)
-{
-	struct net_device *netdev = ring_to_netdev(ring);
-	struct hns3_nic_priv *priv = netdev_priv(netdev);
-
-	/* when tx push is enabled, the packet whose number of BD below
-	 * HNS3_MAX_PUSH_BD_NUM can be pushed directly.
-	 */
-	if (test_bit(HNS3_NIC_STATE_TX_PUSH_ENABLE, &priv->state) && num &&
-	    !ring->pending_buf && num <= HNS3_MAX_PUSH_BD_NUM && doorbell) {
-		hns3_tx_push_bd(ring, num);
-		WRITE_ONCE(ring->last_to_use, ring->next_to_use);
-		return;
-	}
-
-	ring->pending_buf += num;
-
-	if (!doorbell) {
-		hns3_ring_stats_update(ring, tx_more);
-		return;
-	}
-
-	if (ring->tqp->mem_base)
-		hns3_tx_mem_doorbell(ring);
-	else
-		writel(ring->pending_buf,
-		       ring->tqp->io_base + HNS3_RING_TX_RING_TAIL_REG);
-
-	ring->pending_buf = 0;
-	WRITE_ONCE(ring->last_to_use, ring->next_to_use);
-=======
-static int hns3_handle_skb_desc(struct hns3_enet_ring *ring,
-				struct sk_buff *skb,
-				struct hns3_desc_cb *desc_cb,
-				int next_to_use_head)
-{
-	int ret;
-
-	ret = hns3_fill_skb_desc(ring, skb, &ring->desc[ring->next_to_use],
-				 desc_cb);
-	if (unlikely(ret < 0))
-		goto fill_err;
-
-	/* 'ret < 0' means filling error, 'ret == 0' means skb->len is
-	 * zero, which is unlikely, and 'ret > 0' means how many tx desc
-	 * need to be notified to the hw.
-	 */
-	ret = hns3_handle_desc_filling(ring, skb);
-	if (likely(ret > 0))
-		return ret;
-
-fill_err:
-	hns3_clear_desc(ring, next_to_use_head);
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void hns3_tsyn(struct net_device *netdev, struct sk_buff *skb,
@@ -3616,20 +3316,11 @@ static void hns3_set_default_feature(struct net_device *netdev)
 		NETIF_F_GSO_GRE_CSUM | NETIF_F_GSO_UDP_TUNNEL |
 		NETIF_F_SCTP_CRC | NETIF_F_FRAGLIST;
 
-<<<<<<< HEAD
 	if (hnae3_ae_dev_gro_supported(ae_dev))
 		netdev->features |= NETIF_F_GRO_HW;
 
 	if (hnae3_ae_dev_fd_supported(ae_dev))
 		netdev->features |= NETIF_F_NTUPLE;
-=======
-	if (ae_dev->dev_version >= HNAE3_DEVICE_VERSION_V2) {
-		netdev->features |= NETIF_F_GRO_HW;
-
-		if (!(h->flags & HNAE3_SUPPORT_VF))
-			netdev->features |= NETIF_F_NTUPLE;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (test_bit(HNAE3_DEV_SUPPORT_UDP_GSO_B, ae_dev->caps))
 		netdev->features |= NETIF_F_GSO_UDP_L4;
@@ -4164,29 +3855,16 @@ static int hns3_gro_complete(struct sk_buff *skb, u32 l234info)
 	return 0;
 }
 
-<<<<<<< HEAD
 static void hns3_checksum_complete(struct hns3_enet_ring *ring,
-=======
-static bool hns3_checksum_complete(struct hns3_enet_ring *ring,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   struct sk_buff *skb, u32 ptype, u16 csum)
 {
 	if (ptype == HNS3_INVALID_PTYPE ||
 	    hns3_rx_ptype_tbl[ptype].ip_summed != CHECKSUM_COMPLETE)
-<<<<<<< HEAD
 		return;
-=======
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hns3_ring_stats_update(ring, csum_complete);
 	skb->ip_summed = CHECKSUM_COMPLETE;
 	skb->csum = csum_unfold((__force __sum16)csum);
-<<<<<<< HEAD
-=======
-
-	return true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void hns3_rx_handle_csum(struct sk_buff *skb, u32 l234info,
@@ -4198,8 +3876,6 @@ static void hns3_rx_handle_csum(struct sk_buff *skb, u32 l234info,
 	if (ptype != HNS3_INVALID_PTYPE) {
 		skb->csum_level = hns3_rx_ptype_tbl[ptype].csum_level;
 		skb->ip_summed = hns3_rx_ptype_tbl[ptype].ip_summed;
-<<<<<<< HEAD
-=======
 
 		return;
 	}
@@ -4227,70 +3903,6 @@ static void hns3_rx_handle_csum(struct sk_buff *skb, u32 l234info,
 	default:
 		break;
 	}
-}
-
-static void hns3_rx_checksum(struct hns3_enet_ring *ring, struct sk_buff *skb,
-			     u32 l234info, u32 bd_base_info, u32 ol_info,
-			     u16 csum)
-{
-	struct net_device *netdev = ring_to_netdev(ring);
-	struct hns3_nic_priv *priv = netdev_priv(netdev);
-	u32 ptype = HNS3_INVALID_PTYPE;
-
-	skb->ip_summed = CHECKSUM_NONE;
-
-	skb_checksum_none_assert(skb);
-
-	if (!(netdev->features & NETIF_F_RXCSUM))
-		return;
-
-	if (test_bit(HNS3_NIC_STATE_RXD_ADV_LAYOUT_ENABLE, &priv->state))
-		ptype = hnae3_get_field(ol_info, HNS3_RXD_PTYPE_M,
-					HNS3_RXD_PTYPE_S);
-
-	if (hns3_checksum_complete(ring, skb, ptype, csum))
-		return;
-
-	/* check if hardware has done checksum */
-	if (!(bd_base_info & BIT(HNS3_RXD_L3L4P_B)))
-		return;
-
-	if (unlikely(l234info & (BIT(HNS3_RXD_L3E_B) | BIT(HNS3_RXD_L4E_B) |
-				 BIT(HNS3_RXD_OL3E_B) |
-				 BIT(HNS3_RXD_OL4E_B)))) {
-		hns3_ring_stats_update(ring, l3l4_csum_err);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-		return;
-	}
-
-<<<<<<< HEAD
-	ol4_type = hnae3_get_field(ol_info, HNS3_RXD_OL4ID_M,
-				   HNS3_RXD_OL4ID_S);
-	switch (ol4_type) {
-	case HNS3_OL4_TYPE_MAC_IN_UDP:
-	case HNS3_OL4_TYPE_NVGRE:
-		skb->csum_level = 1;
-		fallthrough;
-	case HNS3_OL4_TYPE_NO_TUN:
-		l3_type = hnae3_get_field(l234info, HNS3_RXD_L3ID_M,
-					  HNS3_RXD_L3ID_S);
-		l4_type = hnae3_get_field(l234info, HNS3_RXD_L4ID_M,
-					  HNS3_RXD_L4ID_S);
-		/* Can checksum ipv4 or ipv6 + UDP/TCP/SCTP packets */
-		if ((l3_type == HNS3_L3_TYPE_IPV4 ||
-		     l3_type == HNS3_L3_TYPE_IPV6) &&
-		    (l4_type == HNS3_L4_TYPE_UDP ||
-		     l4_type == HNS3_L4_TYPE_TCP ||
-		     l4_type == HNS3_L4_TYPE_SCTP))
-			skb->ip_summed = CHECKSUM_UNNECESSARY;
-		break;
-	default:
-		break;
-	}
-=======
-	hns3_rx_handle_csum(skb, l234info, ol_info, ptype);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void hns3_rx_checksum(struct hns3_enet_ring *ring, struct sk_buff *skb,

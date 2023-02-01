@@ -129,7 +129,6 @@ int hda_dsp_pcm_hw_params(struct snd_sof_dev *sdev,
 		hda_dsp_stream_spib_config(sdev, hext_stream, HDA_DSP_SPIB_ENABLE, 0);
 	else
 		hda_dsp_stream_spib_config(sdev, hext_stream, HDA_DSP_SPIB_DISABLE, 0);
-<<<<<<< HEAD
 
 	if (hda)
 		platform_params->no_ipc_position = hda->no_ipc_position;
@@ -153,31 +152,6 @@ int hda_dsp_pcm_ack(struct snd_sof_dev *sdev, struct snd_pcm_substream *substrea
 
 	spib = appl_pos % buf_size;
 
-=======
-
-	if (hda)
-		platform_params->no_ipc_position = hda->no_ipc_position;
-
-	platform_params->stream_tag = hstream->stream_tag;
-
-	return 0;
-}
-
-/* update SPIB register with appl position */
-int hda_dsp_pcm_ack(struct snd_sof_dev *sdev, struct snd_pcm_substream *substream)
-{
-	struct hdac_stream *hstream = substream->runtime->private_data;
-	struct hdac_ext_stream *hext_stream = stream_to_hdac_ext_stream(hstream);
-	struct snd_pcm_runtime *runtime = substream->runtime;
-	ssize_t appl_pos, buf_size;
-	u32 spib;
-
-	appl_pos = frames_to_bytes(runtime, runtime->control->appl_ptr);
-	buf_size = frames_to_bytes(runtime, runtime->buffer_size);
-
-	spib = appl_pos % buf_size;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Allowable value for SPIB is 1 byte to max buffer size */
 	if (!spib)
 		spib = buf_size;
@@ -219,83 +193,7 @@ snd_pcm_uframes_t hda_dsp_pcm_pointer(struct snd_sof_dev *sdev,
 		goto found;
 	}
 
-<<<<<<< HEAD
 	pos = hda_dsp_stream_get_position(hstream, substream->stream, true);
-=======
-	switch (sof_hda_position_quirk) {
-	case SOF_HDA_POSITION_QUIRK_USE_SKYLAKE_LEGACY:
-		/*
-		 * This legacy code, inherited from the Skylake driver,
-		 * mixes DPIB registers and DPIB DDR updates and
-		 * does not seem to follow any known hardware recommendations.
-		 * It's not clear e.g. why there is a different flow
-		 * for capture and playback, the only information that matters is
-		 * what traffic class is used, and on all SOF-enabled platforms
-		 * only VC0 is supported so the work-around was likely not necessary
-		 * and quite possibly wrong.
-		 */
-
-		/* DPIB/posbuf position mode:
-		 * For Playback, Use DPIB register from HDA space which
-		 * reflects the actual data transferred.
-		 * For Capture, Use the position buffer for pointer, as DPIB
-		 * is not accurate enough, its update may be completed
-		 * earlier than the data written to DDR.
-		 */
-		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
-			pos = snd_sof_dsp_read(sdev, HDA_DSP_HDA_BAR,
-					       AZX_REG_VS_SDXDPIB_XBASE +
-					       (AZX_REG_VS_SDXDPIB_XINTERVAL *
-						hstream->index));
-		} else {
-			/*
-			 * For capture stream, we need more workaround to fix the
-			 * position incorrect issue:
-			 *
-			 * 1. Wait at least 20us before reading position buffer after
-			 * the interrupt generated(IOC), to make sure position update
-			 * happens on frame boundary i.e. 20.833uSec for 48KHz.
-			 * 2. Perform a dummy Read to DPIB register to flush DMA
-			 * position value.
-			 * 3. Read the DMA Position from posbuf. Now the readback
-			 * value should be >= period boundary.
-			 */
-			usleep_range(20, 21);
-			snd_sof_dsp_read(sdev, HDA_DSP_HDA_BAR,
-					 AZX_REG_VS_SDXDPIB_XBASE +
-					 (AZX_REG_VS_SDXDPIB_XINTERVAL *
-					  hstream->index));
-			pos = snd_hdac_stream_get_pos_posbuf(hstream);
-		}
-		break;
-	case SOF_HDA_POSITION_QUIRK_USE_DPIB_REGISTERS:
-		/*
-		 * In case VC1 traffic is disabled this is the recommended option
-		 */
-		pos = snd_sof_dsp_read(sdev, HDA_DSP_HDA_BAR,
-				       AZX_REG_VS_SDXDPIB_XBASE +
-				       (AZX_REG_VS_SDXDPIB_XINTERVAL *
-					hstream->index));
-		break;
-	case SOF_HDA_POSITION_QUIRK_USE_DPIB_DDR_UPDATE:
-		/*
-		 * This is the recommended option when VC1 is enabled.
-		 * While this isn't needed for SOF platforms it's added for
-		 * consistency and debug.
-		 */
-		pos = snd_hdac_stream_get_pos_posbuf(hstream);
-		break;
-	default:
-		dev_err_once(sdev->dev, "hda_position_quirk value %d not supported\n",
-			     sof_hda_position_quirk);
-		pos = 0;
-		break;
-	}
-
-	if (pos >= hstream->bufsize)
-		pos = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 found:
 	pos = bytes_to_frames(substream->runtime, pos);
 

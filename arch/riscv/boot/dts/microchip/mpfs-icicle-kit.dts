@@ -11,12 +11,8 @@
 
 / {
 	model = "Microchip PolarFire-SoC Icicle Kit";
-<<<<<<< HEAD
 	compatible = "microchip,mpfs-icicle-reference-rtlv2210", "microchip,mpfs-icicle-kit",
 		     "microchip,mpfs";
-=======
-	compatible = "microchip,mpfs-icicle-kit", "microchip,mpfs";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	aliases {
 		ethernet0 = &mac1;
@@ -37,7 +33,6 @@
 
 	ddrc_cache_lo: memory@80000000 {
 		device_type = "memory";
-<<<<<<< HEAD
 		reg = <0x0 0x80000000 0x0 0x40000000>;
 		status = "okay";
 	};
@@ -58,17 +53,6 @@
 			no-map;
 		};
 	};
-=======
-		reg = <0x0 0x80000000 0x0 0x2e000000>;
-		status = "okay";
-	};
-
-	ddrc_cache_hi: memory@1000000000 {
-		device_type = "memory";
-		reg = <0x10 0x0 0x0 0x40000000>;
-		status = "okay";
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &core_pwm0 {

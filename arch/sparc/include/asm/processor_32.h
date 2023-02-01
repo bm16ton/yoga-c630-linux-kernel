@@ -80,12 +80,6 @@ static inline void start_thread(struct pt_regs * regs, unsigned long pc,
 			     : "memory");
 }
 
-<<<<<<< HEAD
-=======
-/* Free all resources held by a thread. */
-#define release_thread(tsk)		do { } while(0)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned long __get_wchan(struct task_struct *);
 
 #define task_pt_regs(tsk) ((tsk)->thread.kregs)

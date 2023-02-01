@@ -876,12 +876,7 @@ static struct nfs4_lock_state *nfs4_alloc_lock_state(struct nfs4_state *state, f
 	refcount_set(&lsp->ls_count, 1);
 	lsp->ls_state = state;
 	lsp->ls_owner = fl_owner;
-<<<<<<< HEAD
 	lsp->ls_seqid.owner_id = ida_alloc(&server->lockowner_id, GFP_KERNEL_ACCOUNT);
-=======
-	lsp->ls_seqid.owner_id = ida_simple_get(&server->lockowner_id,
-						0, 0, GFP_KERNEL_ACCOUNT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (lsp->ls_seqid.owner_id < 0)
 		goto out_free;
 	INIT_LIST_HEAD(&lsp->ls_locks);

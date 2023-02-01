@@ -431,13 +431,8 @@ static void _dpu_crtc_blend_setup_mixer(struct drm_crtc *crtc,
 		pstate = to_dpu_plane_state(state);
 		fb = state->fb;
 
-<<<<<<< HEAD
 		sspp_idx = dpu_plane_pipe(plane);
 		set_bit(sspp_idx, fetch_active);
-=======
-		dpu_plane_get_ctl_flush(plane, ctl, &flush_mask);
-		set_bit(dpu_plane_pipe(plane), fetch_active);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		DRM_DEBUG_ATOMIC("crtc %d stage:%d - plane %d sspp %d fb %d\n",
 				crtc->base.id,
@@ -523,11 +518,7 @@ static void _dpu_crtc_blend_setup(struct drm_crtc *crtc)
 		ctl->ops.update_pending_flush_mixer(ctl,
 			mixer[i].hw_lm->idx);
 
-<<<<<<< HEAD
 		DRM_DEBUG_ATOMIC("lm %d, op_mode 0x%X, ctl %d\n",
-=======
-		DRM_DEBUG_ATOMIC("lm %d, op_mode 0x%X, ctl %d, flush mask 0x%x\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mixer[i].hw_lm->idx - LM_0,
 			mixer[i].mixer_op_mode,
 			ctl->idx - CTL_0);
@@ -775,17 +766,8 @@ static void _dpu_crtc_setup_cp_blocks(struct drm_crtc *crtc)
 		}
 
 		/* stage config flush mask */
-<<<<<<< HEAD
 		ctl->ops.update_pending_flush_dspp(ctl,
 			mixer[i].hw_dspp->idx);
-=======
-		ctl->ops.update_pending_flush(ctl, mixer[i].flush_mask);
-
-		DRM_DEBUG_ATOMIC("lm %d, ctl %d, flush mask 0x%x\n",
-			mixer[i].hw_lm->idx - DSPP_0,
-			ctl->idx - CTL_0,
-			mixer[i].flush_mask);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 

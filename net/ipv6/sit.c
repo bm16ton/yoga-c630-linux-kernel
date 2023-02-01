@@ -970,11 +970,7 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
 		mtu = dst_mtu(&rt->dst) - t_hlen;
 
 		if (mtu < IPV4_MIN_MTU) {
-<<<<<<< HEAD
 			DEV_STATS_INC(dev, collisions);
-=======
-			dev->stats.collisions++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ip_rt_put(rt);
 			goto tx_error;
 		}

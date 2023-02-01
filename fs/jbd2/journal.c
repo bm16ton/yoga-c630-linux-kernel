@@ -1642,11 +1642,7 @@ static int jbd2_write_superblock(journal_t *journal, blk_opf_t write_flags)
 		sb->s_checksum = jbd2_superblock_csum(journal, sb);
 	get_bh(bh);
 	bh->b_end_io = end_buffer_write_sync;
-<<<<<<< HEAD
 	submit_bh(REQ_OP_WRITE | write_flags, bh);
-=======
-	ret = submit_bh(REQ_OP_WRITE | write_flags, bh);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wait_on_buffer(bh);
 	if (buffer_write_io_error(bh)) {
 		clear_buffer_write_io_error(bh);
@@ -1907,22 +1903,11 @@ static int journal_get_superblock(journal_t *journal)
 	bh = journal->j_sb_buffer;
 
 	J_ASSERT(bh != NULL);
-<<<<<<< HEAD
 	err = bh_read(bh, 0);
 	if (err < 0) {
 		printk(KERN_ERR
 			"JBD2: IO error reading journal superblock\n");
 		goto out;
-=======
-	if (!buffer_uptodate(bh)) {
-		ll_rw_block(REQ_OP_READ, 1, &bh);
-		wait_on_buffer(bh);
-		if (!buffer_uptodate(bh)) {
-			printk(KERN_ERR
-				"JBD2: IO error reading journal superblock\n");
-			goto out;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (buffer_verified(bh))

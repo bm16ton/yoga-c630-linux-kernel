@@ -179,13 +179,6 @@
  * FTRACE_CALLSITE_SECTION. We capture all of them here to avoid header
  * dependencies for FTRACE_CALLSITE_SECTION's definition.
  *
-<<<<<<< HEAD
-=======
- * Need to also make ftrace_stub_graph point to ftrace_stub
- * so that the same stub location may have different protocols
- * and not mess up with C verifiers.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * ftrace_ops_list_func will be defined as arch_ftrace_ops_list_func
  * as some archs will have a different prototype for that function
  * but ftrace_ops_list_func() will have a single prototype.
@@ -195,19 +188,11 @@
 			KEEP(*(__mcount_loc))			\
 			KEEP_PATCHABLE				\
 			__stop_mcount_loc = .;			\
-<<<<<<< HEAD
 			FTRACE_STUB_HACK			\
 			ftrace_ops_list_func = arch_ftrace_ops_list_func;
 #else
 # ifdef CONFIG_FUNCTION_TRACER
 #  define MCOUNT_REC()	FTRACE_STUB_HACK			\
-=======
-			ftrace_stub_graph = ftrace_stub;	\
-			ftrace_ops_list_func = arch_ftrace_ops_list_func;
-#else
-# ifdef CONFIG_FUNCTION_TRACER
-#  define MCOUNT_REC()	ftrace_stub_graph = ftrace_stub;	\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ftrace_ops_list_func = arch_ftrace_ops_list_func;
 # else
 #  define MCOUNT_REC()
@@ -588,24 +573,6 @@
 	__end_rodata = .;
 
 
-<<<<<<< HEAD
-=======
-/*
- * .text..L.cfi.jumptable.* contain Control-Flow Integrity (CFI)
- * jump table entries.
- */
-#ifdef CONFIG_CFI_CLANG
-#define TEXT_CFI_JT							\
-		. = ALIGN(PMD_SIZE);					\
-		__cfi_jt_start = .;					\
-		*(.text..L.cfi.jumptable .text..L.cfi.jumptable.*)	\
-		. = ALIGN(PMD_SIZE);					\
-		__cfi_jt_end = .;
-#else
-#define TEXT_CFI_JT
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Non-instrumentable text section
  */
@@ -633,10 +600,6 @@
 		*(.text..refcount)					\
 		*(.ref.text)						\
 		*(.text.asan.* .text.tsan.*)				\
-<<<<<<< HEAD
-=======
-		TEXT_CFI_JT						\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	MEM_KEEP(init.text*)						\
 	MEM_KEEP(exit.text*)						\
 
@@ -1064,8 +1027,7 @@
  * keep any .init_array.* sections.
  * https://bugs.llvm.org/show_bug.cgi?id=46478
  */
-#if defined(CONFIG_GCOV_KERNEL) || defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KCSAN) || \
-	defined(CONFIG_CFI_CLANG)
+#if defined(CONFIG_GCOV_KERNEL) || defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KCSAN)
 # ifdef CONFIG_CONSTRUCTORS
 #  define SANITIZER_DISCARDS						\
 	*(.eh_frame)

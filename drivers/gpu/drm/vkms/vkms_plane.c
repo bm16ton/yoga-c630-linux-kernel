@@ -7,10 +7,6 @@
 #include <drm/drm_fourcc.h>
 #include <drm/drm_gem_atomic_helper.h>
 #include <drm/drm_gem_framebuffer_helper.h>
-<<<<<<< HEAD
-=======
-#include <drm/drm_plane_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "vkms_drv.h"
 #include "vkms_formats.h"
@@ -23,14 +19,10 @@ static const u32 vkms_formats[] = {
 
 static const u32 vkms_plane_formats[] = {
 	DRM_FORMAT_ARGB8888,
-<<<<<<< HEAD
 	DRM_FORMAT_XRGB8888,
 	DRM_FORMAT_XRGB16161616,
 	DRM_FORMAT_ARGB16161616,
 	DRM_FORMAT_RGB565
-=======
-	DRM_FORMAT_XRGB8888
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct drm_plane_state *
@@ -112,17 +104,12 @@ static void vkms_plane_atomic_update(struct drm_plane *plane,
 	struct vkms_plane_state *vkms_plane_state;
 	struct drm_shadow_plane_state *shadow_plane_state;
 	struct drm_framebuffer *fb = new_state->fb;
-<<<<<<< HEAD
 	struct vkms_frame_info *frame_info;
 	u32 fmt;
-=======
-	struct vkms_composer *composer;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!new_state->crtc || !fb)
 		return;
 
-<<<<<<< HEAD
 	fmt = fb->format->format;
 	vkms_plane_state = to_vkms_plane_state(new_state);
 	shadow_plane_state = &vkms_plane_state->base;
@@ -137,20 +124,6 @@ static void vkms_plane_atomic_update(struct drm_plane *plane,
 	frame_info->pitch = fb->pitches[0];
 	frame_info->cpp = fb->format->cpp[0];
 	vkms_plane_state->plane_read = get_frame_to_line_function(fmt);
-=======
-	vkms_plane_state = to_vkms_plane_state(new_state);
-	shadow_plane_state = &vkms_plane_state->base;
-
-	composer = vkms_plane_state->composer;
-	memcpy(&composer->src, &new_state->src, sizeof(struct drm_rect));
-	memcpy(&composer->dst, &new_state->dst, sizeof(struct drm_rect));
-	memcpy(&composer->fb, fb, sizeof(struct drm_framebuffer));
-	memcpy(&composer->map, &shadow_plane_state->data, sizeof(composer->map));
-	drm_framebuffer_get(&composer->fb);
-	composer->offset = fb->offsets[0];
-	composer->pitch = fb->pitches[0];
-	composer->cpp = fb->format->cpp[0];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int vkms_plane_atomic_check(struct drm_plane *plane,
@@ -174,13 +147,8 @@ static int vkms_plane_atomic_check(struct drm_plane *plane,
 		can_position = true;
 
 	ret = drm_atomic_helper_check_plane_state(new_plane_state, crtc_state,
-<<<<<<< HEAD
 						  DRM_PLANE_NO_SCALING,
 						  DRM_PLANE_NO_SCALING,
-=======
-						  DRM_PLANE_HELPER_NO_SCALING,
-						  DRM_PLANE_HELPER_NO_SCALING,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						  can_position, true);
 	if (ret != 0)
 		return ret;

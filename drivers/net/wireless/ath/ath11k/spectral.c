@@ -588,10 +588,7 @@ int ath11k_spectral_process_fft(struct ath11k *ar,
 	u8 chan_width_mhz, bin_sz;
 	int ret;
 	u32 check_length;
-<<<<<<< HEAD
 	bool fragment_sample = false;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lockdep_assert_held(&ar->spectral.lock);
 

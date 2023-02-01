@@ -266,10 +266,7 @@
 #define NIX_AF_TX_NPC_CAPTURE_CONFIG	(0x0660)
 #define NIX_AF_TX_NPC_CAPTURE_INFO	(0x0670)
 #define NIX_AF_SEB_CFG			(0x05F0)
-<<<<<<< HEAD
 #define NIX_PTP_1STEP_EN		BIT_ULL(2)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define NIX_AF_DEBUG_NPC_RESP_DATAX(a)          (0x680 | (a) << 3)
 #define NIX_AF_SMQX_CFG(a)                      (0x700 | (a) << 16)

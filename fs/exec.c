@@ -64,10 +64,6 @@
 #include <linux/io_uring.h>
 #include <linux/syscall_user_dispatch.h>
 #include <linux/coredump.h>
-<<<<<<< HEAD
-=======
-#include <linux/time_namespace.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <linux/uaccess.h>
 #include <asm/mmu_context.h>
@@ -983,12 +979,10 @@ static int exec_mmap(struct mm_struct *mm)
 {
 	struct task_struct *tsk;
 	struct mm_struct *old_mm, *active_mm;
-	bool vfork;
 	int ret;
 
 	/* Notify parent that we're no longer interested in the old VM */
 	tsk = current;
-	vfork = !!tsk->vfork_done;
 	old_mm = current->mm;
 	exec_mm_release(tsk, old_mm);
 	if (old_mm)
@@ -1032,14 +1026,7 @@ static int exec_mmap(struct mm_struct *mm)
 		local_irq_enable();
 	lru_gen_add_mm(mm);
 	task_unlock(tsk);
-<<<<<<< HEAD
 	lru_gen_use_mm(mm);
-=======
-
-	if (vfork)
-		timens_on_fork(tsk->nsproxy, tsk);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (old_mm) {
 		mmap_read_unlock(old_mm);
 		BUG_ON(active_mm != old_mm);
@@ -1894,11 +1881,7 @@ static int do_execveat_common(int fd, struct filename *filename,
 	 * whether NPROC limit is still exceeded.
 	 */
 	if ((current->flags & PF_NPROC_EXCEEDED) &&
-<<<<<<< HEAD
 	    is_rlimit_overlimit(current_ucounts(), UCOUNT_RLIMIT_NPROC, rlimit(RLIMIT_NPROC))) {
-=======
-	    is_ucounts_overlimit(current_ucounts(), UCOUNT_RLIMIT_NPROC, rlimit(RLIMIT_NPROC))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		retval = -EAGAIN;
 		goto out_ret;
 	}

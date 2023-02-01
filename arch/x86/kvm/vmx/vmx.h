@@ -477,7 +477,6 @@ static inline u8 vmx_get_rvi(void)
 	return vmcs_read16(GUEST_INTR_STATUS) & 0xff;
 }
 
-<<<<<<< HEAD
 #define __KVM_REQUIRED_VMX_VM_ENTRY_CONTROLS				\
 	(VM_ENTRY_LOAD_DEBUG_CONTROLS)
 #ifdef CONFIG_X86_64
@@ -617,31 +616,6 @@ static __always_inline void lname##_controls_clearbit(struct vcpu_vmx *vmx, u##b
 {												\
 	BUILD_BUG_ON(!(val & (KVM_REQUIRED_VMX_##uname | KVM_OPTIONAL_VMX_##uname)));		\
 	lname##_controls_set(vmx, lname##_controls_get(vmx) & ~val);				\
-=======
-#define BUILD_CONTROLS_SHADOW(lname, uname, bits)				\
-static inline void lname##_controls_set(struct vcpu_vmx *vmx, u##bits val)	\
-{										\
-	if (vmx->loaded_vmcs->controls_shadow.lname != val) {			\
-		vmcs_write##bits(uname, val);					\
-		vmx->loaded_vmcs->controls_shadow.lname = val;			\
-	}									\
-}										\
-static inline u##bits __##lname##_controls_get(struct loaded_vmcs *vmcs)	\
-{										\
-	return vmcs->controls_shadow.lname;					\
-}										\
-static inline u##bits lname##_controls_get(struct vcpu_vmx *vmx)		\
-{										\
-	return __##lname##_controls_get(vmx->loaded_vmcs);			\
-}										\
-static inline void lname##_controls_setbit(struct vcpu_vmx *vmx, u##bits val)	\
-{										\
-	lname##_controls_set(vmx, lname##_controls_get(vmx) | val);		\
-}										\
-static inline void lname##_controls_clearbit(struct vcpu_vmx *vmx, u##bits val)	\
-{										\
-	lname##_controls_set(vmx, lname##_controls_get(vmx) & ~val);		\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS, 32)
 BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS, 32)
@@ -649,7 +623,6 @@ BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL, 32)
 BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL, 32)
 BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL, 32)
 BUILD_CONTROLS_SHADOW(tertiary_exec, TERTIARY_VM_EXEC_CONTROL, 64)
-<<<<<<< HEAD
 
 /*
  * VMX_REGS_LAZY_LOAD_SET - The set of registers that will be updated in the
@@ -667,25 +640,6 @@ BUILD_CONTROLS_SHADOW(tertiary_exec, TERTIARY_VM_EXEC_CONTROL, 64)
 				(1 << VCPU_EXREG_EXIT_INFO_1) | \
 				(1 << VCPU_EXREG_EXIT_INFO_2))
 
-=======
-
-/*
- * VMX_REGS_LAZY_LOAD_SET - The set of registers that will be updated in the
- * cache on demand.  Other registers not listed here are synced to
- * the cache immediately after VM-Exit.
- */
-#define VMX_REGS_LAZY_LOAD_SET	((1 << VCPU_REGS_RIP) |         \
-				(1 << VCPU_REGS_RSP) |          \
-				(1 << VCPU_EXREG_RFLAGS) |      \
-				(1 << VCPU_EXREG_PDPTR) |       \
-				(1 << VCPU_EXREG_SEGMENTS) |    \
-				(1 << VCPU_EXREG_CR0) |         \
-				(1 << VCPU_EXREG_CR3) |         \
-				(1 << VCPU_EXREG_CR4) |         \
-				(1 << VCPU_EXREG_EXIT_INFO_1) | \
-				(1 << VCPU_EXREG_EXIT_INFO_2))
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
 {
 	return container_of(kvm, struct kvm_vmx, kvm);
@@ -787,7 +741,6 @@ static inline bool vmx_can_use_ipiv(struct kvm_vcpu *vcpu)
 {
 	return  lapic_in_kernel(vcpu) && enable_ipiv;
 }
-<<<<<<< HEAD
 
 static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
 {
@@ -798,7 +751,5 @@ static inline bool guest_cpuid_has_evmcs(struct kvm_vcpu *vcpu)
 	return vcpu->arch.hyperv_enabled &&
 	       to_vmx(vcpu)->nested.enlightened_vmcs_enabled;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* __KVM_X86_VMX_H */

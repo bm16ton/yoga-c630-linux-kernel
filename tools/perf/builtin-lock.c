@@ -51,25 +51,6 @@ static struct hlist_head lockhash_table[LOCKHASH_SIZE];
 #define lockhashentry(key)	(lockhash_table + __lockhashfn((key)))
 
 static struct rb_root		thread_stats;
-<<<<<<< HEAD
-=======
-
-static bool combine_locks;
-static bool show_thread_stats;
-static bool use_bpf;
-static unsigned long bpf_map_entries = 10240;
-
-static enum {
-	LOCK_AGGR_ADDR,
-	LOCK_AGGR_TASK,
-	LOCK_AGGR_CALLER,
-} aggr_mode = LOCK_AGGR_ADDR;
-
-static u64 sched_text_start;
-static u64 sched_text_end;
-static u64 lock_text_start;
-static u64 lock_text_end;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static bool combine_locks;
 static bool show_thread_stats;
@@ -336,7 +317,6 @@ static int select_key(bool contention)
 	pr_err("Unknown compare key: %s\n", sort_key);
 	return -1;
 }
-<<<<<<< HEAD
 
 static int add_output_field(bool contention, char *name)
 {
@@ -350,21 +330,6 @@ static int add_output_field(bool contention, char *name)
 		if (strcmp(keys[i].name, name))
 			continue;
 
-=======
-
-static int add_output_field(bool contention, char *name)
-{
-	int i;
-	struct lock_key *keys = report_keys;
-
-	if (contention)
-		keys = contention_keys;
-
-	for (i = 0; keys[i].name; i++) {
-		if (strcmp(keys[i].name, name))
-			continue;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* prevent double link */
 		if (list_empty(&keys[i].list))
 			list_add_tail(&keys[i].list, &lock_keys);
@@ -493,7 +458,6 @@ static struct lock_stat *pop_from_result(void)
 }
 
 static struct lock_stat *lock_stat_find(u64 addr)
-<<<<<<< HEAD
 {
 	struct hlist_head *entry = lockhashentry(addr);
 	struct lock_stat *ret;
@@ -508,22 +472,6 @@ static struct lock_stat *lock_stat_find(u64 addr)
 static struct lock_stat *lock_stat_findnew(u64 addr, const char *name, int flags)
 {
 	struct hlist_head *entry = lockhashentry(addr);
-=======
-{
-	struct hlist_head *entry = lockhashentry(addr);
-	struct lock_stat *ret;
-
-	hlist_for_each_entry(ret, entry, hash_entry) {
-		if (ret->addr == addr)
-			return ret;
-	}
-	return NULL;
-}
-
-static struct lock_stat *lock_stat_findnew(u64 addr, const char *name, int flags)
-{
-	struct hlist_head *entry = lockhashentry(addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct lock_stat *ret, *new;
 
 	hlist_for_each_entry(ret, entry, hash_entry) {
@@ -654,27 +602,11 @@ static int report_lock_acquire_event(struct evsel *evsel,
 	u64 addr = evsel__intval(evsel, sample, "lockdep_addr");
 	int flag = evsel__intval(evsel, sample, "flags");
 	u64 key;
-<<<<<<< HEAD
 	int ret;
 
 	ret = get_key_by_aggr_mode_simple(&key, addr, sample->tid);
 	if (ret < 0)
 		return ret;
-=======
-
-	switch (aggr_mode) {
-	case LOCK_AGGR_ADDR:
-		key = addr;
-		break;
-	case LOCK_AGGR_TASK:
-		key = sample->tid;
-		break;
-	case LOCK_AGGR_CALLER:
-	default:
-		pr_err("Invalid aggregation mode: %d\n", aggr_mode);
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ls = lock_stat_findnew(key, name, 0);
 	if (!ls)
@@ -745,27 +677,11 @@ static int report_lock_acquired_event(struct evsel *evsel,
 	const char *name = evsel__strval(evsel, sample, "name");
 	u64 addr = evsel__intval(evsel, sample, "lockdep_addr");
 	u64 key;
-<<<<<<< HEAD
 	int ret;
 
 	ret = get_key_by_aggr_mode_simple(&key, addr, sample->tid);
 	if (ret < 0)
 		return ret;
-=======
-
-	switch (aggr_mode) {
-	case LOCK_AGGR_ADDR:
-		key = addr;
-		break;
-	case LOCK_AGGR_TASK:
-		key = sample->tid;
-		break;
-	case LOCK_AGGR_CALLER:
-	default:
-		pr_err("Invalid aggregation mode: %d\n", aggr_mode);
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ls = lock_stat_findnew(key, name, 0);
 	if (!ls)
@@ -826,27 +742,11 @@ static int report_lock_contended_event(struct evsel *evsel,
 	const char *name = evsel__strval(evsel, sample, "name");
 	u64 addr = evsel__intval(evsel, sample, "lockdep_addr");
 	u64 key;
-<<<<<<< HEAD
 	int ret;
 
 	ret = get_key_by_aggr_mode_simple(&key, addr, sample->tid);
 	if (ret < 0)
 		return ret;
-=======
-
-	switch (aggr_mode) {
-	case LOCK_AGGR_ADDR:
-		key = addr;
-		break;
-	case LOCK_AGGR_TASK:
-		key = sample->tid;
-		break;
-	case LOCK_AGGR_CALLER:
-	default:
-		pr_err("Invalid aggregation mode: %d\n", aggr_mode);
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ls = lock_stat_findnew(key, name, 0);
 	if (!ls)
@@ -900,27 +800,11 @@ static int report_lock_release_event(struct evsel *evsel,
 	const char *name = evsel__strval(evsel, sample, "name");
 	u64 addr = evsel__intval(evsel, sample, "lockdep_addr");
 	u64 key;
-<<<<<<< HEAD
 	int ret;
 
 	ret = get_key_by_aggr_mode_simple(&key, addr, sample->tid);
 	if (ret < 0)
 		return ret;
-=======
-
-	switch (aggr_mode) {
-	case LOCK_AGGR_ADDR:
-		key = addr;
-		break;
-	case LOCK_AGGR_TASK:
-		key = sample->tid;
-		break;
-	case LOCK_AGGR_CALLER:
-	default:
-		pr_err("Invalid aggregation mode: %d\n", aggr_mode);
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ls = lock_stat_findnew(key, name, 0);
 	if (!ls)
@@ -1018,7 +902,6 @@ bool is_lock_function(struct machine *machine, u64 addr)
 	return false;
 }
 
-<<<<<<< HEAD
 static int get_symbol_name_offset(struct map *map, struct symbol *sym, u64 ip,
 				  char *buf, int size)
 {
@@ -1036,8 +919,6 @@ static int get_symbol_name_offset(struct map *map, struct symbol *sym, u64 ip,
 	else
 		return strlcpy(buf, sym->name, size);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int lock_contention_caller(struct evsel *evsel, struct perf_sample *sample,
 				  char *buf, int size)
 {
@@ -1058,11 +939,7 @@ static int lock_contention_caller(struct evsel *evsel, struct perf_sample *sampl
 
 	/* use caller function name from the callchain */
 	ret = thread__resolve_callchain(thread, cursor, evsel, sample,
-<<<<<<< HEAD
 					NULL, NULL, max_stack_depth);
-=======
-					NULL, NULL, CONTENTION_STACK_DEPTH);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret != 0) {
 		thread__put(thread);
 		return -1;
@@ -1079,29 +956,13 @@ static int lock_contention_caller(struct evsel *evsel, struct perf_sample *sampl
 			break;
 
 		/* skip first few entries - for lock functions */
-<<<<<<< HEAD
 		if (++skip <= stack_skip)
-=======
-		if (++skip <= CONTENTION_STACK_SKIP)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto next;
 
 		sym = node->ms.sym;
 		if (sym && !is_lock_function(machine, node->ip)) {
-<<<<<<< HEAD
 			get_symbol_name_offset(node->ms.map, sym, node->ip,
 					       buf, size);
-=======
-			struct map *map = node->ms.map;
-			u64 offset;
-
-			offset = map->map_ip(map, node->ip) - sym->start;
-
-			if (offset)
-				scnprintf(buf, size, "%s+%#lx", sym->name, offset);
-			else
-				strlcpy(buf, sym->name, size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 0;
 		}
 
@@ -1126,11 +987,7 @@ static u64 callchain_id(struct evsel *evsel, struct perf_sample *sample)
 
 	/* use caller function name from the callchain */
 	ret = thread__resolve_callchain(thread, cursor, evsel, sample,
-<<<<<<< HEAD
 					NULL, NULL, max_stack_depth);
-=======
-					NULL, NULL, CONTENTION_STACK_DEPTH);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	thread__put(thread);
 
 	if (ret != 0)
@@ -1146,11 +1003,7 @@ static u64 callchain_id(struct evsel *evsel, struct perf_sample *sample)
 			break;
 
 		/* skip first few entries - for lock functions */
-<<<<<<< HEAD
 		if (++skip <= stack_skip)
-=======
-		if (++skip <= CONTENTION_STACK_SKIP)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto next;
 
 		if (node->ms.sym && is_lock_function(machine, node->ip))
@@ -1164,7 +1017,6 @@ next:
 	return hash;
 }
 
-<<<<<<< HEAD
 static u64 *get_callstack(struct perf_sample *sample, int max_stack)
 {
 	u64 *callstack;
@@ -1186,8 +1038,6 @@ static u64 *get_callstack(struct perf_sample *sample, int max_stack)
 	return callstack;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int report_lock_contention_begin_event(struct evsel *evsel,
 					      struct perf_sample *sample)
 {
@@ -1196,29 +1046,11 @@ static int report_lock_contention_begin_event(struct evsel *evsel,
 	struct lock_seq_stat *seq;
 	u64 addr = evsel__intval(evsel, sample, "lock_addr");
 	u64 key;
-<<<<<<< HEAD
 	int ret;
 
 	ret = get_key_by_aggr_mode(&key, addr, evsel, sample);
 	if (ret < 0)
 		return ret;
-=======
-
-	switch (aggr_mode) {
-	case LOCK_AGGR_ADDR:
-		key = addr;
-		break;
-	case LOCK_AGGR_TASK:
-		key = sample->tid;
-		break;
-	case LOCK_AGGR_CALLER:
-		key = callchain_id(evsel, sample);
-		break;
-	default:
-		pr_err("Invalid aggregation mode: %d\n", aggr_mode);
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ls = lock_stat_find(key);
 	if (!ls) {
@@ -1232,15 +1064,12 @@ static int report_lock_contention_begin_event(struct evsel *evsel,
 		ls = lock_stat_findnew(key, caller, flags);
 		if (!ls)
 			return -ENOMEM;
-<<<<<<< HEAD
 
 		if (aggr_mode == LOCK_AGGR_CALLER && verbose) {
 			ls->callstack = get_callstack(sample, max_stack_depth);
 			if (ls->callstack == NULL)
 				return -ENOMEM;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ts = thread_stat_findnew(sample->tid);
@@ -1296,29 +1125,11 @@ static int report_lock_contention_end_event(struct evsel *evsel,
 	u64 contended_term;
 	u64 addr = evsel__intval(evsel, sample, "lock_addr");
 	u64 key;
-<<<<<<< HEAD
 	int ret;
 
 	ret = get_key_by_aggr_mode(&key, addr, evsel, sample);
 	if (ret < 0)
 		return ret;
-=======
-
-	switch (aggr_mode) {
-	case LOCK_AGGR_ADDR:
-		key = addr;
-		break;
-	case LOCK_AGGR_TASK:
-		key = sample->tid;
-		break;
-	case LOCK_AGGR_CALLER:
-		key = callchain_id(evsel, sample);
-		break;
-	default:
-		pr_err("Invalid aggregation mode: %d\n", aggr_mode);
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ls = lock_stat_find(key);
 	if (!ls)
@@ -1439,11 +1250,7 @@ static void print_bad_events(int bad, int total)
 	for (i = 0; i < BROKEN_MAX; i++)
 		broken += bad_hist[i];
 
-<<<<<<< HEAD
 	if (quiet || (broken == 0 && !verbose))
-=======
-	if (broken == 0 && !verbose)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	pr_info("\n=== output for debug===\n\n");
@@ -1460,7 +1267,6 @@ static void print_result(void)
 	struct lock_stat *st;
 	struct lock_key *key;
 	char cut_name[20];
-<<<<<<< HEAD
 	int bad, total, printed;
 
 	if (!quiet) {
@@ -1469,14 +1275,6 @@ static void print_result(void)
 			pr_info("%*s ", key->len, key->header);
 		pr_info("\n\n");
 	}
-=======
-	int bad, total;
-
-	pr_info("%20s ", "Name");
-	list_for_each_entry(key, &lock_keys, list)
-		pr_info("%*s ", key->len, key->header);
-	pr_info("\n\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bad = total = printed = 0;
 	while ((st = pop_from_result())) {
@@ -1680,7 +1478,6 @@ static void sort_contention_result(void)
 	sort_result();
 }
 
-<<<<<<< HEAD
 static void print_contention_result(struct lock_contention *con)
 {
 	struct lock_stat *st;
@@ -1698,23 +1495,6 @@ static void print_contention_result(struct lock_contention *con)
 	}
 
 	bad = total = printed = 0;
-=======
-static void print_contention_result(void)
-{
-	struct lock_stat *st;
-	struct lock_key *key;
-	int bad, total;
-
-	list_for_each_entry(key, &lock_keys, list)
-		pr_info("%*s ", key->len, key->header);
-
-	if (show_thread_stats)
-		pr_info("  %10s   %s\n\n", "pid", "comm");
-	else
-		pr_info("  %10s   %s\n\n", "type", "caller");
-
-	bad = total = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (use_bpf)
 		bad = bad_hist[BROKEN_CONTENDED];
 
@@ -1735,7 +1515,6 @@ static void print_contention_result(void)
 			/* st->addr contains tid of thread */
 			t = perf_session__findnew(session, pid);
 			pr_info("  %10d   %s\n", pid, thread__comm_str(t));
-<<<<<<< HEAD
 			goto next;
 		}
 
@@ -1760,12 +1539,6 @@ static void print_contention_result(void)
 next:
 		if (++printed >= print_nr_entries)
 			break;
-=======
-			continue;
-		}
-
-		pr_info("  %10s   %s\n", get_type_str(st), st->name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	print_bad_events(bad, total);
@@ -1809,10 +1582,7 @@ static int __cmd_report(bool display_info)
 
 	/* for lock function check */
 	symbol_conf.sort_by_name = true;
-<<<<<<< HEAD
 	symbol_conf.allow_aliases = true;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	symbol__init(&session->header.env);
 
 	if (!perf_session__has_traces(session, "lock record"))
@@ -1829,19 +1599,11 @@ static int __cmd_report(bool display_info)
 	}
 
 	if (setup_output_field(false, output_fields))
-<<<<<<< HEAD
 		goto out_delete;
 
 	if (select_key(false))
 		goto out_delete;
 
-=======
-		goto out_delete;
-
-	if (select_key(false))
-		goto out_delete;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (show_thread_stats)
 		aggr_mode = LOCK_AGGR_TASK;
 
@@ -1885,11 +1647,8 @@ static int __cmd_contention(int argc, const char **argv)
 		.target = &target,
 		.result = &lockhash_table[0],
 		.map_nr_entries = bpf_map_entries,
-<<<<<<< HEAD
 		.max_stack = max_stack_depth,
 		.stack_skip = stack_skip,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	session = perf_session__new(use_bpf ? NULL : &data, &eops);
@@ -1898,16 +1657,11 @@ static int __cmd_contention(int argc, const char **argv)
 		return PTR_ERR(session);
 	}
 
-<<<<<<< HEAD
 	con.machine = &session->machines.host;
 
 	/* for lock function check */
 	symbol_conf.sort_by_name = true;
 	symbol_conf.allow_aliases = true;
-=======
-	/* for lock function check */
-	symbol_conf.sort_by_name = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	symbol__init(&session->header.env);
 
 	if (use_bpf) {
@@ -1924,11 +1678,6 @@ static int __cmd_contention(int argc, const char **argv)
 		signal(SIGCHLD, sighandler);
 		signal(SIGTERM, sighandler);
 
-<<<<<<< HEAD
-=======
-		con.machine = &session->machines.host;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		con.evlist = evlist__new();
 		if (con.evlist == NULL) {
 			err = -ENOMEM;
@@ -2000,11 +1749,7 @@ static int __cmd_contention(int argc, const char **argv)
 	setup_pager();
 
 	sort_contention_result();
-<<<<<<< HEAD
 	print_contention_result(&con);
-=======
-	print_contention_result();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out_delete:
 	evlist__delete(con.evlist);
@@ -2126,10 +1871,7 @@ int cmd_lock(int argc, const char **argv)
 		   "file", "vmlinux pathname"),
 	OPT_STRING(0, "kallsyms", &symbol_conf.kallsyms_name,
 		   "file", "kallsyms pathname"),
-<<<<<<< HEAD
 	OPT_BOOLEAN('q', "quiet", &quiet, "Do not show any warnings or messages"),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	OPT_END()
 	};
 
@@ -2151,10 +1893,7 @@ int cmd_lock(int argc, const char **argv)
 		    "combine locks in the same class"),
 	OPT_BOOLEAN('t', "threads", &show_thread_stats,
 		    "show per-thread lock stats"),
-<<<<<<< HEAD
 	OPT_INTEGER('E', "entries", &print_nr_entries, "display this many functions"),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	OPT_PARENT(lock_options)
 	};
 
@@ -2176,7 +1915,6 @@ int cmd_lock(int argc, const char **argv)
 		   "Trace on existing thread id (exclusive to --pid)"),
 	OPT_CALLBACK(0, "map-nr-entries", &bpf_map_entries, "num",
 		     "Max number of BPF map entries", parse_map_entry),
-<<<<<<< HEAD
 	OPT_INTEGER(0, "max-stack", &max_stack_depth,
 		    "Set the maximum stack depth when collecting lock contention, "
 		    "Default: " __stringify(CONTENTION_STACK_DEPTH)),
@@ -2184,8 +1922,6 @@ int cmd_lock(int argc, const char **argv)
 		    "Set the number of stack depth to skip when finding a lock caller, "
 		    "Default: " __stringify(CONTENTION_STACK_SKIP)),
 	OPT_INTEGER('E', "entries", &print_nr_entries, "display this many functions"),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	OPT_PARENT(lock_options)
 	};
 

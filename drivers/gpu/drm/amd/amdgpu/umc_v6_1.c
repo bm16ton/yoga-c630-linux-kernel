@@ -327,11 +327,7 @@ static void umc_v6_1_query_error_address(struct amdgpu_device *adev,
 		return;
 	}
 
-<<<<<<< HEAD
 	/* calculate error address if ue error is detected */
-=======
-	/* calculate error address if ue/ce error is detected */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Val) == 1 &&
 	    REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, UECC) == 1) {
 
@@ -346,14 +342,7 @@ static void umc_v6_1_query_error_address(struct amdgpu_device *adev,
 				ADDR_OF_256B_BLOCK(channel_index) |
 				OFFSET_IN_256B_BLOCK(err_addr);
 
-<<<<<<< HEAD
 		amdgpu_umc_fill_error_record(err_data, err_addr,
-=======
-		/* we only save ue error information currently, ce is skipped */
-		if (REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, UECC)
-				== 1)
-			amdgpu_umc_fill_error_record(err_data, err_addr,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					retired_page, channel_index, umc_inst);
 	}
 

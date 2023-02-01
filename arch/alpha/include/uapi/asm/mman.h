@@ -76,11 +76,8 @@
 
 #define MADV_DONTNEED_LOCKED	24	/* like DONTNEED, but drop locked pages too */
 
-<<<<<<< HEAD
 #define MADV_COLLAPSE	25		/* Synchronous hugepage collapse */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* compatibility flags */
 #define MAP_FILE	0
 

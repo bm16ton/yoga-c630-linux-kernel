@@ -321,11 +321,8 @@
 			force_enable - Force enable the IOMMU on platforms known
 				       to be buggy with IOMMU enabled. Use this
 				       option with care.
-<<<<<<< HEAD
 			pgtbl_v1     - Use v1 page table for DMA-API (Default).
 			pgtbl_v2     - Use v2 page table for DMA-API.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	amd_iommu_dump=	[HW,X86-64]
 			Enable AMD IOMMU driver option to dump the ACPI table
@@ -2303,7 +2300,6 @@
 			Provide an override to the IOAPIC-ID<->DEVICE-ID
 			mapping provided in the IVRS ACPI table.
 			By default, PCI segment is 0, and can be omitted.
-<<<<<<< HEAD
 
 			For example, to map IOAPIC-ID decimal 10 to
 			PCI segment 0x1 and PCI device 00:14.0,
@@ -2311,9 +2307,6 @@
 				ivrs_ioapic=10@0001:00:14.0
 
 			Deprecated formats:
-=======
-			For example:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			* To map IOAPIC-ID decimal 10 to PCI device 00:14.0
 			  write the parameter as:
 				ivrs_ioapic[10]=00:14.0
@@ -2325,7 +2318,6 @@
 			Provide an override to the HPET-ID<->DEVICE-ID
 			mapping provided in the IVRS ACPI table.
 			By default, PCI segment is 0, and can be omitted.
-<<<<<<< HEAD
 
 			For example, to map HPET-ID decimal 10 to
 			PCI segment 0x1 and PCI device 00:14.0,
@@ -2333,9 +2325,6 @@
 				ivrs_hpet=10@0001:00:14.0
 
 			Deprecated formats:
-=======
-			For example:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			* To map HPET-ID decimal 0 to PCI device 00:14.0
 			  write the parameter as:
 				ivrs_hpet[0]=00:14.0
@@ -2346,26 +2335,16 @@
 	ivrs_acpihid	[HW,X86-64]
 			Provide an override to the ACPI-HID:UID<->DEVICE-ID
 			mapping provided in the IVRS ACPI table.
-<<<<<<< HEAD
 			By default, PCI segment is 0, and can be omitted.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			For example, to map UART-HID:UID AMD0020:0 to
 			PCI segment 0x1 and PCI device ID 00:14.5,
 			write the parameter as:
-<<<<<<< HEAD
 				ivrs_acpihid=AMD0020:0@0001:00:14.5
 
 			Deprecated formats:
 			* To map UART-HID:UID AMD0020:0 to PCI segment is 0,
 			  PCI device ID 00:14.5, write the parameter as:
-=======
-				ivrs_acpihid[0001:00:14.5]=AMD0020:0
-
-			By default, PCI segment is 0, and can be omitted.
-			For example, PCI device 00:14.5 write the parameter as:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				ivrs_acpihid[00:14.5]=AMD0020:0
 			* To map UART-HID:UID AMD0020:0 to PCI segment 0x1 and
 			  PCI device ID 00:14.5, write the parameter as:
@@ -2788,7 +2767,6 @@
 			* [no]ncqtrim: Enable or disable queued DSM TRIM.
 
 			* [no]ncqati: Enable or disable NCQ trim on ATI chipset.
-<<<<<<< HEAD
 
 			* [no]trim: Enable or disable (unqueued) TRIM.
 
@@ -2798,17 +2776,6 @@
 
 			* [no]dma: Turn on or off DMA transfers.
 
-=======
-
-			* [no]trim: Enable or disable (unqueued) TRIM.
-
-			* trim_zero: Indicate that TRIM command zeroes data.
-
-			* max_trim_128m: Set 128M maximum trim size limit.
-
-			* [no]dma: Turn on or off DMA transfers.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			* atapi_dmadir: Enable ATAPI DMADIR bridge support.
 
 			* atapi_mod16_dma: Enable the use of ATAPI DMA for
@@ -3676,11 +3643,7 @@
 
 	nohugeiomap	[KNL,X86,PPC,ARM64] Disable kernel huge I/O mappings.
 
-<<<<<<< HEAD
 	nohugevmalloc	[KNL,X86,PPC,ARM64] Disable kernel huge vmalloc mappings.
-=======
-	nohugevmalloc	[PPC] Disable kernel huge vmalloc mappings.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	nosmt		[KNL,S390] Disable symmetric multithreading (SMT).
 			Equivalent to smt=1.
@@ -6103,15 +6066,6 @@
 			This parameter controls use of the Protected
 			Execution Facility on pSeries.
 
-<<<<<<< HEAD
-=======
-	swapaccount=	[KNL]
-			Format: [0|1]
-			Enable accounting of swap in memory resource
-			controller if no parameter or 1 is given or disable
-			it if 0 is given (See Documentation/admin-guide/cgroup-v1/memory.rst)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	swiotlb=	[ARM,IA-64,PPC,MIPS,X86]
 			Format: { <int> [,<int>] | force | noforce }
 			<int> -- Number of I/O TLB slabs

@@ -26,11 +26,7 @@ SYM_FUNC_START(__switch_to)
 	move	tp, a2
 	cpu_restore_nonscratch a1
 
-<<<<<<< HEAD
 	li.w		t0, _THREAD_SIZE
-=======
-	li.w		t0, _THREAD_SIZE - 32
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	PTR_ADD		t0, t0, tp
 	set_saved_sp	t0, t1, t2
 

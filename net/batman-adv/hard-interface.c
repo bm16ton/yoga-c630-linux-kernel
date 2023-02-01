@@ -10,10 +10,7 @@
 #include <linux/atomic.h>
 #include <linux/byteorder/generic.h>
 #include <linux/container_of.h>
-<<<<<<< HEAD
 #include <linux/errno.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/gfp.h>
 #include <linux/if.h>
 #include <linux/if_arp.h>

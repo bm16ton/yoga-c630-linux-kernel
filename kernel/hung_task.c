@@ -200,7 +200,6 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
 				goto unlock;
 			last_break = jiffies;
 		}
-<<<<<<< HEAD
 		/*
 		 * skip the TASK_KILLABLE tasks -- these can be killed
 		 * skip the TASK_IDLE tasks -- those are genuinely idle
@@ -209,10 +208,6 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
 		if ((state & TASK_UNINTERRUPTIBLE) &&
 		    !(state & TASK_WAKEKILL) &&
 		    !(state & TASK_NOLOAD))
-=======
-		/* use "==" to skip the TASK_KILLABLE tasks waiting on NFS */
-		if (READ_ONCE(t->__state) == TASK_UNINTERRUPTIBLE)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			check_hung_task(t, timeout);
 	}
  unlock:

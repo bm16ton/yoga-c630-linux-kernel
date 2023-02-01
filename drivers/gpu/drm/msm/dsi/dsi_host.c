@@ -21,10 +21,7 @@
 
 #include <video/mipi_display.h>
 
-<<<<<<< HEAD
 #include <drm/display/drm_dsc_helper.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_of.h>
 
 #include "dsi.h"
@@ -37,11 +34,7 @@
 
 #define DSI_RESET_TOGGLE_DELAY_MS 20
 
-<<<<<<< HEAD
 static int dsi_populate_dsc_params(struct msm_dsi_host *msm_host, struct drm_dsc_config *dsc);
-=======
-static int dsi_populate_dsc_params(struct msm_display_dsc_config *dsc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int dsi_get_version(const void __iomem *base, u32 *major, u32 *minor)
 {
@@ -116,11 +109,7 @@ struct msm_dsi_host {
 
 	void __iomem *ctrl_base;
 	phys_addr_t ctrl_size;
-<<<<<<< HEAD
 	struct regulator_bulk_data *supplies;
-=======
-	struct regulator_bulk_data supplies[DSI_DEV_REGULATOR_MAX];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	int num_bus_clks;
 	struct clk_bulk_data bus_clks[DSI_BUS_CLK_MAX];
@@ -172,11 +161,7 @@ struct msm_dsi_host {
 	struct regmap *sfpb;
 
 	struct drm_display_mode *mode;
-<<<<<<< HEAD
 	struct drm_dsc_config *dsc;
-=======
-	struct msm_display_dsc_config *dsc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* connected device info */
 	unsigned int channel;
@@ -857,35 +842,21 @@ static void dsi_ctrl_config(struct msm_dsi_host *msm_host, bool enable,
 
 static void dsi_update_dsc_timing(struct msm_dsi_host *msm_host, bool is_cmd_mode, u32 hdisplay)
 {
-<<<<<<< HEAD
 	struct drm_dsc_config *dsc = msm_host->dsc;
 	u32 reg, reg_ctrl, reg_ctrl2;
 	u32 slice_per_intf, total_bytes_per_intf;
 	u32 pkt_per_line;
-=======
-	struct msm_display_dsc_config *dsc = msm_host->dsc;
-	u32 reg, intf_width, reg_ctrl, reg_ctrl2;
-	u32 slice_per_intf, total_bytes_per_intf;
-	u32 pkt_per_line;
-	u32 bytes_in_slice;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 eol_byte_num;
 
 	/* first calculate dsc parameters and then program
 	 * compress mode registers
 	 */
-<<<<<<< HEAD
 	slice_per_intf = DIV_ROUND_UP(hdisplay, dsc->slice_width);
-=======
-	intf_width = hdisplay;
-	slice_per_intf = DIV_ROUND_UP(intf_width, dsc->drm->slice_width);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* If slice_per_pkt is greater than slice_per_intf
 	 * then default to 1. This can happen during partial
 	 * update.
 	 */
-<<<<<<< HEAD
 	if (slice_per_intf > dsc->slice_count)
 		dsc->slice_count = 1;
 
@@ -893,20 +864,6 @@ static void dsi_update_dsc_timing(struct msm_dsi_host *msm_host, bool is_cmd_mod
 
 	eol_byte_num = total_bytes_per_intf % 3;
 	pkt_per_line = slice_per_intf / dsc->slice_count;
-=======
-	if (slice_per_intf > dsc->drm->slice_count)
-		dsc->drm->slice_count = 1;
-
-	slice_per_intf = DIV_ROUND_UP(hdisplay, dsc->drm->slice_width);
-	bytes_in_slice = DIV_ROUND_UP(dsc->drm->slice_width * dsc->drm->bits_per_pixel, 8);
-
-	dsc->drm->slice_chunk_size = bytes_in_slice;
-
-	total_bytes_per_intf = bytes_in_slice * slice_per_intf;
-
-	eol_byte_num = total_bytes_per_intf % 3;
-	pkt_per_line = slice_per_intf / dsc->drm->slice_count;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (is_cmd_mode) /* packet data type */
 		reg = DSI_COMMAND_COMPRESSION_MODE_CTRL_STREAM0_DATATYPE(MIPI_DSI_DCS_LONG_WRITE);
@@ -929,11 +886,7 @@ static void dsi_update_dsc_timing(struct msm_dsi_host *msm_host, bool is_cmd_mod
 		reg_ctrl |= reg;
 
 		reg_ctrl2 &= ~DSI_COMMAND_COMPRESSION_MODE_CTRL2_STREAM0_SLICE_WIDTH__MASK;
-<<<<<<< HEAD
 		reg_ctrl2 |= DSI_COMMAND_COMPRESSION_MODE_CTRL2_STREAM0_SLICE_WIDTH(dsc->slice_chunk_size);
-=======
-		reg_ctrl2 |= DSI_COMMAND_COMPRESSION_MODE_CTRL2_STREAM0_SLICE_WIDTH(bytes_in_slice);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		dsi_write(msm_host, REG_DSI_COMMAND_COMPRESSION_MODE_CTRL, reg_ctrl);
 		dsi_write(msm_host, REG_DSI_COMMAND_COMPRESSION_MODE_CTRL2, reg_ctrl2);
@@ -976,11 +929,7 @@ static void dsi_timing_setup(struct msm_dsi_host *msm_host, bool is_bonded_dsi)
 	}
 
 	if (msm_host->dsc) {
-<<<<<<< HEAD
 		struct drm_dsc_config *dsc = msm_host->dsc;
-=======
-		struct msm_display_dsc_config *dsc = msm_host->dsc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* update dsc params with timing params */
 		if (!dsc || !mode->hdisplay || !mode->vdisplay) {
@@ -989,26 +938,16 @@ static void dsi_timing_setup(struct msm_dsi_host *msm_host, bool is_bonded_dsi)
 			return;
 		}
 
-<<<<<<< HEAD
 		dsc->pic_width = mode->hdisplay;
 		dsc->pic_height = mode->vdisplay;
 		DBG("Mode %dx%d\n", dsc->pic_width, dsc->pic_height);
-=======
-		dsc->drm->pic_width = mode->hdisplay;
-		dsc->drm->pic_height = mode->vdisplay;
-		DBG("Mode %dx%d\n", dsc->drm->pic_width, dsc->drm->pic_height);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* we do the calculations for dsc parameters here so that
 		 * panel can use these parameters
 		 */
-<<<<<<< HEAD
 		ret = dsi_populate_dsc_params(msm_host, dsc);
 		if (ret)
 			return;
-=======
-		dsi_populate_dsc_params(dsc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Divide the display by 3 but keep back/font porch and
 		 * pulse width same
@@ -1483,17 +1422,6 @@ static int dsi_cmds2buf_tx(struct msm_dsi_host *msm_host,
 	return len;
 }
 
-<<<<<<< HEAD
-=======
-static void dsi_hpd_worker(struct work_struct *work)
-{
-	struct msm_dsi_host *msm_host =
-		container_of(work, struct msm_dsi_host, hpd_work);
-
-	drm_helper_hpd_irq_event(msm_host->dev);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void dsi_err_worker(struct work_struct *work)
 {
 	struct msm_dsi_host *msm_host =
@@ -1672,22 +1600,8 @@ static int dsi_host_attach(struct mipi_dsi_host *host,
 	msm_host->lanes = dsi->lanes;
 	msm_host->format = dsi->format;
 	msm_host->mode_flags = dsi->mode_flags;
-<<<<<<< HEAD
 	if (dsi->dsc)
 		msm_host->dsc = dsi->dsc;
-=======
-	if (dsi->dsc) {
-		struct msm_display_dsc_config *dsc = msm_host->dsc;
-
-		if (!dsc) {
-			dsc = devm_kzalloc(&msm_host->pdev->dev, sizeof(*dsc), GFP_KERNEL);
-			if (!dsc)
-				return -ENOMEM;
-			dsc->drm = dsi->dsc;
-			msm_host->dsc = dsc;
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Some gpios defined in panel DT need to be controlled by host */
 	ret = dsi_host_init_panel_gpios(msm_host, &dsi->dev);
@@ -1837,7 +1751,6 @@ static char bpg_offset[DSC_NUM_BUF_RANGES] = {
 	2, 0, 0, -2, -4, -6, -8, -8, -8, -10, -10, -12, -12, -12, -12
 };
 
-<<<<<<< HEAD
 static int dsi_populate_dsc_params(struct msm_dsi_host *msm_host, struct drm_dsc_config *dsc)
 {
 	int i;
@@ -1897,115 +1810,6 @@ static int dsi_populate_dsc_params(struct msm_dsi_host *msm_host, struct drm_dsc
 	dsc->rc_quant_incr_limit1 = 11;
 
 	return drm_dsc_compute_rc_parameters(dsc);
-=======
-static int dsi_populate_dsc_params(struct msm_display_dsc_config *dsc)
-{
-	int mux_words_size;
-	int groups_per_line, groups_total;
-	int min_rate_buffer_size;
-	int hrd_delay;
-	int pre_num_extra_mux_bits, num_extra_mux_bits;
-	int slice_bits;
-	int target_bpp_x16;
-	int data;
-	int final_value, final_scale;
-	int i;
-
-	dsc->drm->rc_model_size = 8192;
-	dsc->drm->first_line_bpg_offset = 12;
-	dsc->drm->rc_edge_factor = 6;
-	dsc->drm->rc_tgt_offset_high = 3;
-	dsc->drm->rc_tgt_offset_low = 3;
-	dsc->drm->simple_422 = 0;
-	dsc->drm->convert_rgb = 1;
-	dsc->drm->vbr_enable = 0;
-
-	/* handle only bpp = bpc = 8 */
-	for (i = 0; i < DSC_NUM_BUF_RANGES - 1 ; i++)
-		dsc->drm->rc_buf_thresh[i] = dsi_dsc_rc_buf_thresh[i];
-
-	for (i = 0; i < DSC_NUM_BUF_RANGES; i++) {
-		dsc->drm->rc_range_params[i].range_min_qp = min_qp[i];
-		dsc->drm->rc_range_params[i].range_max_qp = max_qp[i];
-		dsc->drm->rc_range_params[i].range_bpg_offset = bpg_offset[i];
-	}
-
-	dsc->drm->initial_offset = 6144; /* Not bpp 12 */
-	if (dsc->drm->bits_per_pixel != 8)
-		dsc->drm->initial_offset = 2048;	/* bpp = 12 */
-
-	mux_words_size = 48;		/* bpc == 8/10 */
-	if (dsc->drm->bits_per_component == 12)
-		mux_words_size = 64;
-
-	dsc->drm->initial_xmit_delay = 512;
-	dsc->drm->initial_scale_value = 32;
-	dsc->drm->first_line_bpg_offset = 12;
-	dsc->drm->line_buf_depth = dsc->drm->bits_per_component + 1;
-
-	/* bpc 8 */
-	dsc->drm->flatness_min_qp = 3;
-	dsc->drm->flatness_max_qp = 12;
-	dsc->drm->rc_quant_incr_limit0 = 11;
-	dsc->drm->rc_quant_incr_limit1 = 11;
-	dsc->drm->mux_word_size = DSC_MUX_WORD_SIZE_8_10_BPC;
-
-	/* FIXME: need to call drm_dsc_compute_rc_parameters() so that rest of
-	 * params are calculated
-	 */
-	groups_per_line = DIV_ROUND_UP(dsc->drm->slice_width, 3);
-	dsc->drm->slice_chunk_size = dsc->drm->slice_width * dsc->drm->bits_per_pixel / 8;
-	if ((dsc->drm->slice_width * dsc->drm->bits_per_pixel) % 8)
-		dsc->drm->slice_chunk_size++;
-
-	/* rbs-min */
-	min_rate_buffer_size =  dsc->drm->rc_model_size - dsc->drm->initial_offset +
-				dsc->drm->initial_xmit_delay * dsc->drm->bits_per_pixel +
-				groups_per_line * dsc->drm->first_line_bpg_offset;
-
-	hrd_delay = DIV_ROUND_UP(min_rate_buffer_size, dsc->drm->bits_per_pixel);
-
-	dsc->drm->initial_dec_delay = hrd_delay - dsc->drm->initial_xmit_delay;
-
-	dsc->drm->initial_scale_value = 8 * dsc->drm->rc_model_size /
-				       (dsc->drm->rc_model_size - dsc->drm->initial_offset);
-
-	slice_bits = 8 * dsc->drm->slice_chunk_size * dsc->drm->slice_height;
-
-	groups_total = groups_per_line * dsc->drm->slice_height;
-
-	data = dsc->drm->first_line_bpg_offset * 2048;
-
-	dsc->drm->nfl_bpg_offset = DIV_ROUND_UP(data, (dsc->drm->slice_height - 1));
-
-	pre_num_extra_mux_bits = 3 * (mux_words_size + (4 * dsc->drm->bits_per_component + 4) - 2);
-
-	num_extra_mux_bits = pre_num_extra_mux_bits - (mux_words_size -
-			     ((slice_bits - pre_num_extra_mux_bits) % mux_words_size));
-
-	data = 2048 * (dsc->drm->rc_model_size - dsc->drm->initial_offset + num_extra_mux_bits);
-	dsc->drm->slice_bpg_offset = DIV_ROUND_UP(data, groups_total);
-
-	/* bpp * 16 + 0.5 */
-	data = dsc->drm->bits_per_pixel * 16;
-	data *= 2;
-	data++;
-	data /= 2;
-	target_bpp_x16 = data;
-
-	data = (dsc->drm->initial_xmit_delay * target_bpp_x16) / 16;
-	final_value =  dsc->drm->rc_model_size - data + num_extra_mux_bits;
-	dsc->drm->final_offset = final_value;
-
-	final_scale = 8 * dsc->drm->rc_model_size / (dsc->drm->rc_model_size - final_value);
-
-	data = (final_scale - 9) * (dsc->drm->nfl_bpg_offset + dsc->drm->slice_bpg_offset);
-	dsc->drm->scale_increment_interval = (2048 * dsc->drm->final_offset) / data;
-
-	dsc->drm->scale_decrement_interval = groups_per_line / (dsc->drm->initial_scale_value - 8);
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int dsi_host_parse_dt(struct msm_dsi_host *msm_host)
@@ -2695,18 +2499,13 @@ enum drm_mode_status msm_dsi_host_check_dsc(struct mipi_dsi_host *host,
 					    const struct drm_display_mode *mode)
 {
 	struct msm_dsi_host *msm_host = to_msm_dsi_host(host);
-<<<<<<< HEAD
 	struct drm_dsc_config *dsc = msm_host->dsc;
-=======
-	struct msm_display_dsc_config *dsc = msm_host->dsc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int pic_width = mode->hdisplay;
 	int pic_height = mode->vdisplay;
 
 	if (!msm_host->dsc)
 		return MODE_OK;
 
-<<<<<<< HEAD
 	if (pic_width % dsc->slice_width) {
 		pr_err("DSI: pic_width %d has to be multiple of slice %d\n",
 		       pic_width, dsc->slice_width);
@@ -2716,17 +2515,6 @@ enum drm_mode_status msm_dsi_host_check_dsc(struct mipi_dsi_host *host,
 	if (pic_height % dsc->slice_height) {
 		pr_err("DSI: pic_height %d has to be multiple of slice %d\n",
 		       pic_height, dsc->slice_height);
-=======
-	if (pic_width % dsc->drm->slice_width) {
-		pr_err("DSI: pic_width %d has to be multiple of slice %d\n",
-		       pic_width, dsc->drm->slice_width);
-		return MODE_H_ILLEGAL;
-	}
-
-	if (pic_height % dsc->drm->slice_height) {
-		pr_err("DSI: pic_height %d has to be multiple of slice %d\n",
-		       pic_height, dsc->drm->slice_height);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return MODE_V_ILLEGAL;
 	}
 
@@ -2811,11 +2599,7 @@ void msm_dsi_host_test_pattern_en(struct mipi_dsi_host *host)
 				DSI_TEST_PATTERN_GEN_CMD_STREAM0_TRIGGER_SW_TRIGGER);
 }
 
-<<<<<<< HEAD
 struct drm_dsc_config *msm_dsi_host_get_dsc_config(struct mipi_dsi_host *host)
-=======
-struct msm_display_dsc_config *msm_dsi_host_get_dsc_config(struct mipi_dsi_host *host)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct msm_dsi_host *msm_host = to_msm_dsi_host(host);
 

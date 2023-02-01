@@ -543,11 +543,7 @@ static int gsm_register_devices(struct tty_driver *driver, unsigned int index)
 		 */
 		dev = tty_register_device(gsm_tty_driver, base + i, NULL);
 		if (IS_ERR(dev)) {
-<<<<<<< HEAD
 			if (debug & DBG_ERRORS)
-=======
-			if (debug & 8)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pr_info("%s failed to register device minor %u",
 					__func__, base + i);
 			for (i--; i >= 1; i--)
@@ -705,7 +701,6 @@ static int gsm_send(struct gsm_mux *gsm, int addr, int cr, int control)
 	u8 *dp;
 	int ocr;
 	unsigned long flags;
-<<<<<<< HEAD
 
 	msg = gsm_data_alloc(gsm, addr, 0, control);
 	if (!msg)
@@ -733,35 +728,6 @@ static int gsm_send(struct gsm_mux *gsm, int addr, int cr, int control)
 	spin_unlock_irqrestore(&gsm->tx_lock, flags);
 	gsmld_write_trigger(gsm);
 
-=======
-
-	msg = gsm_data_alloc(gsm, addr, 0, control);
-	if (!msg)
-		return -ENOMEM;
-
-	/* toggle C/R coding if not initiator */
-	ocr = cr ^ (gsm->initiator ? 0 : 1);
-
-	msg->data -= 3;
-	dp = msg->data;
-	*dp++ = (addr << 2) | (ocr << 1) | EA;
-	*dp++ = control;
-
-	if (gsm->encoding == 0)
-		*dp++ = EA; /* Length of data = 0 */
-
-	*dp = 0xFF - gsm_fcs_add_block(INIT_FCS, msg->data, dp - msg->data);
-	msg->len = (dp - msg->data) + 1;
-
-	gsm_print_packet("Q->", addr, cr, control, NULL, 0);
-
-	spin_lock_irqsave(&gsm->tx_lock, flags);
-	list_add_tail(&msg->list, &gsm->tx_ctrl_list);
-	gsm->tx_bytes += msg->len;
-	spin_unlock_irqrestore(&gsm->tx_lock, flags);
-	gsmld_write_trigger(gsm);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -867,11 +833,7 @@ static int gsm_send_packet(struct gsm_mux *gsm, struct gsm_msg *msg)
 	int len, ret;
 
 
-<<<<<<< HEAD
 	if (gsm->encoding == GSM_BASIC_OPT) {
-=======
-	if (gsm->encoding == 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gsm->txframe[0] = GSM0_SOF;
 		memcpy(gsm->txframe + 1, msg->data, msg->len);
 		gsm->txframe[msg->len + 1] = GSM0_SOF;
@@ -883,11 +845,7 @@ static int gsm_send_packet(struct gsm_mux *gsm, struct gsm_msg *msg)
 		len += 2;
 	}
 
-<<<<<<< HEAD
 	if (debug & DBG_DATA)
-=======
-	if (debug & 4)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gsm_hex_dump_bytes(__func__, gsm->txframe, len);
 	gsm_print_packet("-->", msg->addr, gsm->initiator, msg->ctrl, msg->data,
 			 msg->len);
@@ -914,7 +872,6 @@ static bool gsm_is_flow_ctrl_msg(struct gsm_msg *msg)
 
 	if (msg->addr > 0)
 		return false;
-<<<<<<< HEAD
 
 	switch (msg->ctrl & ~PF) {
 	case UI:
@@ -933,26 +890,6 @@ static bool gsm_is_flow_ctrl_msg(struct gsm_msg *msg)
 	return false;
 }
 
-=======
-
-	switch (msg->ctrl & ~PF) {
-	case UI:
-	case UIH:
-		cmd = 0;
-		if (gsm_read_ea_val(&cmd, msg->data + 2, msg->len - 2) < 1)
-			break;
-		switch (cmd & ~PF) {
-		case CMD_FCOFF:
-		case CMD_FCON:
-			return true;
-		}
-		break;
-	}
-
-	return false;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  *	gsm_data_kick	-	poke the queue
  *	@gsm: GSM Mux
@@ -1518,11 +1455,7 @@ static void gsm_control_modem(struct gsm_mux *gsm, const u8 *data, int clen)
 	unsigned int modem = 0;
 	struct gsm_dlci *dlci;
 	int len = clen;
-<<<<<<< HEAD
 	int cl = clen;
-=======
-	int slen;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const u8 *dp = data;
 	struct tty_struct *tty;
 
@@ -1536,7 +1469,6 @@ static void gsm_control_modem(struct gsm_mux *gsm, const u8 *data, int clen)
 		return;
 	dlci = gsm->dlci[addr];
 
-<<<<<<< HEAD
 	/* Must be at least one byte following the EA */
 	if ((cl - len) < 1)
 		return;
@@ -1551,17 +1483,6 @@ static void gsm_control_modem(struct gsm_mux *gsm, const u8 *data, int clen)
 
 	tty = tty_port_tty_get(&dlci->port);
 	gsm_process_modem(tty, dlci, modem, cl);
-=======
-	slen = len;
-	while (gsm_read_ea(&modem, *dp++) == 0) {
-		len--;
-		if (len == 0)
-			return;
-	}
-	len--;
-	tty = tty_port_tty_get(&dlci->port);
-	gsm_process_modem(tty, dlci, modem, slen - len);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (tty) {
 		tty_wakeup(tty);
 		tty_kref_put(tty);
@@ -1737,17 +1658,7 @@ static void gsm_control_response(struct gsm_mux *gsm, unsigned int command,
 
 static void gsm_control_transmit(struct gsm_mux *gsm, struct gsm_control *ctrl)
 {
-<<<<<<< HEAD
 	gsm_control_command(gsm, ctrl->cmd, ctrl->data, ctrl->len);
-=======
-	struct gsm_msg *msg = gsm_data_alloc(gsm, 0, ctrl->len + 2, gsm->ftype);
-	if (msg == NULL)
-		return;
-	msg->data[0] = (ctrl->cmd << 1) | CR | EA;	/* command */
-	msg->data[1] = (ctrl->len << 1) | EA;
-	memcpy(msg->data + 2, ctrl->data, ctrl->len);
-	gsm_data_queue(gsm->dlci[0], msg);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1901,11 +1812,7 @@ static void gsm_dlci_open(struct gsm_dlci *dlci)
 	/* This will let a tty open continue */
 	dlci->state = DLCI_OPEN;
 	dlci->constipated = false;
-<<<<<<< HEAD
 	if (debug & DBG_ERRORS)
-=======
-	if (debug & 8)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_debug("DLCI %d goes open.\n", dlci->addr);
 	/* Send current modem state */
 	if (dlci->addr)
@@ -2044,12 +1951,7 @@ static void gsm_dlci_data(struct gsm_dlci *dlci, const u8 *data, int clen)
 	struct tty_port *port = &dlci->port;
 	struct tty_struct *tty;
 	unsigned int modem = 0;
-<<<<<<< HEAD
 	int len;
-=======
-	int len = clen;
-	int slen = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (debug & DBG_TTY)
 		pr_debug("%d bytes for tty\n", clen);
@@ -2060,26 +1962,12 @@ static void gsm_dlci_data(struct gsm_dlci *dlci, const u8 *data, int clen)
 	case 3:		/* Packetised uininterruptible voice/data */
 		break;
 	case 2:		/* Asynchronous serial with line state in each frame */
-<<<<<<< HEAD
 		len = gsm_read_ea_val(&modem, data, clen);
 		if (len < 1)
 			return;
 		tty = tty_port_tty_get(port);
 		if (tty) {
 			gsm_process_modem(tty, dlci, modem, len);
-=======
-		while (gsm_read_ea(&modem, *data++) == 0) {
-			len--;
-			slen++;
-			if (len == 0)
-				return;
-		}
-		len--;
-		slen++;
-		tty = tty_port_tty_get(port);
-		if (tty) {
-			gsm_process_modem(tty, dlci, modem, slen);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			tty_wakeup(tty);
 			tty_kref_put(tty);
 		}
@@ -2154,30 +2042,6 @@ static void gsm_kick_timer(struct timer_list *t)
 	spin_unlock_irqrestore(&gsm->tx_lock, flags);
 
 	if (sent && debug & DBG_DATA)
-		pr_info("%s TX queue stalled\n", __func__);
-}
-
-/**
- *	gsm_kick_timer	-	transmit if possible
- *	@t: timer contained in our gsm object
- *
- *	Transmit data from DLCIs if the queue is empty. We can't rely on
- *	a tty wakeup except when we filled the pipe so we need to fire off
- *	new data ourselves in other cases.
- */
-static void gsm_kick_timer(struct timer_list *t)
-{
-	struct gsm_mux *gsm = from_timer(gsm, t, kick_timer);
-	unsigned long flags;
-	int sent = 0;
-
-	spin_lock_irqsave(&gsm->tx_lock, flags);
-	/* If we have nothing running then we need to fire up */
-	if (gsm->tx_bytes < TX_THRESH_LO)
-		sent = gsm_dlci_data_sweep(gsm);
-	spin_unlock_irqrestore(&gsm->tx_lock, flags);
-
-	if (sent && debug & 4)
 		pr_info("%s TX queue stalled\n", __func__);
 }
 
@@ -2936,11 +2800,7 @@ static int gsmld_output(struct gsm_mux *gsm, u8 *data, int len)
 		set_bit(TTY_DO_WRITE_WAKEUP, &gsm->tty->flags);
 		return -ENOSPC;
 	}
-<<<<<<< HEAD
 	if (debug & DBG_DATA)
-=======
-	if (debug & 4)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gsm_hex_dump_bytes(__func__, data, len);
 	return gsm->tty->ops->write(gsm->tty, data, len);
 }
@@ -3027,11 +2887,7 @@ static void gsmld_receive_buf(struct tty_struct *tty, const unsigned char *cp,
 	struct gsm_mux *gsm = tty->disc_data;
 	char flags = TTY_NORMAL;
 
-<<<<<<< HEAD
 	if (debug & DBG_DATA)
-=======
-	if (debug & 4)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gsm_hex_dump_bytes(__func__, cp, count);
 
 	for (; count; count--, cp++) {
@@ -3127,11 +2983,6 @@ static int gsmld_open(struct tty_struct *tty)
 	gsm->encoding = GSM_ADV_OPT;
 	gsmld_attach_gsm(tty, gsm);
 
-<<<<<<< HEAD
-=======
-	gsmld_attach_gsm(tty, gsm);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -3527,11 +3378,7 @@ static int gsm_modem_upd_via_msc(struct gsm_dlci *dlci, u8 brk)
 	struct gsm_control *ctrl;
 	int len = 2;
 
-<<<<<<< HEAD
 	if (dlci->gsm->encoding != GSM_BASIC_OPT)
-=======
-	if (dlci->gsm->encoding != 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	modembits[0] = (dlci->addr << 2) | 2 | EA;  /* DLCI, Valid, EA */
@@ -3560,11 +3407,7 @@ static int gsm_modem_update(struct gsm_dlci *dlci, u8 brk)
 		/* Send convergence layer type 2 empty data frame. */
 		gsm_modem_upd_via_data(dlci, brk);
 		return 0;
-<<<<<<< HEAD
 	} else if (dlci->gsm->encoding == GSM_BASIC_OPT) {
-=======
-	} else if (dlci->gsm->encoding == 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Send as MSC control message. */
 		return gsm_modem_upd_via_msc(dlci, brk);
 	}
@@ -3936,11 +3779,7 @@ static int __init gsm_init(void)
 		return status;
 	}
 
-<<<<<<< HEAD
 	gsm_tty_driver = tty_alloc_driver(GSM_TTY_MINORS, TTY_DRIVER_REAL_RAW |
-=======
-	gsm_tty_driver = tty_alloc_driver(256, TTY_DRIVER_REAL_RAW |
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			TTY_DRIVER_DYNAMIC_DEV | TTY_DRIVER_HARDWARE_BREAK);
 	if (IS_ERR(gsm_tty_driver)) {
 		pr_err("gsm_init: tty allocation failed.\n");

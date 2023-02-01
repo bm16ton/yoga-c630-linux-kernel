@@ -346,14 +346,7 @@ static int st_uvis25_resume(struct device *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
 EXPORT_NS_SIMPLE_DEV_PM_OPS(st_uvis25_pm_ops, st_uvis25_suspend, st_uvis25_resume, IIO_UVIS25);
-=======
-const struct dev_pm_ops st_uvis25_pm_ops = {
-	SET_SYSTEM_SLEEP_PM_OPS(st_uvis25_suspend, st_uvis25_resume)
-};
-EXPORT_SYMBOL_NS(st_uvis25_pm_ops, IIO_UVIS25);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MODULE_AUTHOR("Lorenzo Bianconi <lorenzo.bianconi83@gmail.com>");
 MODULE_DESCRIPTION("STMicroelectronics uvis25 sensor driver");

@@ -925,10 +925,7 @@ static int configure_channels(struct c8sectpfei *fei)
 		if (ret) {
 			dev_err(fei->dev,
 				"configure_memdma_and_inputblock failed\n");
-<<<<<<< HEAD
 			of_node_put(child);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto err_unmap;
 		}
 		index++;

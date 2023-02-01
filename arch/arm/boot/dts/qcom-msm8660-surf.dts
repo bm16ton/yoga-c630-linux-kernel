@@ -25,7 +25,6 @@
 	};
 };
 
-<<<<<<< HEAD
 &gsbi12 {
 	qcom,mode = <GSBI_PROT_I2C_UART>;
 	status = "okay";
@@ -33,22 +32,6 @@
 
 &gsbi12_serial {
 	status = "okay";
-=======
-		amba {
-			/* eMMC */
-			sdcc1: mmc@12400000 {
-				status = "okay";
-				vmmc-supply = <&vsdcc_fixed>;
-			};
-
-			/* External micro SD card */
-			sdcc3: mmc@12180000 {
-				status = "okay";
-				vmmc-supply = <&vsdcc_fixed>;
-			};
-		};
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &pm8058 {

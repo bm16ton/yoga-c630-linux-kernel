@@ -62,7 +62,6 @@
 			reg = <0 0x8c400000 0 0x100000>;
 			no-map;
 		};
-<<<<<<< HEAD
 
 		gpu_mem: memory@8c515000 {
 			reg = <0 0x8c515000 0 0x2000>;
@@ -74,19 +73,6 @@
 			no-map;
 		};
 
-=======
-
-		gpu_mem: memory@8c515000 {
-			reg = <0 0x8c515000 0 0x2000>;
-			no-map;
-		};
-
-		ipa_fw_mem: memory@8c517000 {
-			reg = <0 0x8c517000 0 0x5a000>;
-			no-map;
-		};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adsp_mem: memory@8c600000 {
 			reg = <0 0x8c600000 0 0x1a00000>;
 			no-map;
@@ -396,10 +382,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				port@1 {
-<<<<<<< HEAD
 				    status = "disabled";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					reg = <1>;
 					lenovo_ec_dp_in: endpoint {
 						remote-endpoint = <&mdss_dp_out>;
@@ -416,30 +399,20 @@
 	/* Overwrite pinctrl-0 from sdm845.dtsi */
 	pinctrl-0 = <&qup_i2c3_default &i2c3_hid_active>;
 
-	touchpad@15 {
+	tsel: hid@15 {
 		compatible = "hid-over-i2c";
 		reg = <0x15>;
-
 		hid-descr-addr = <0x1>;
-		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
-<<<<<<< HEAD
-=======
 
-		wakeup-source;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
-	touchpad@2c {
+	tsc2: hid@2c {
 		compatible = "hid-over-i2c";
 		reg = <0x2c>;
-
 		hid-descr-addr = <0x20>;
-		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
-<<<<<<< HEAD
-=======
 
-		wakeup-source;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		interrupts-extended = <&tlmm 37 IRQ_TYPE_LEVEL_HIGH>;
 	};
 };
 
@@ -447,17 +420,15 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	touchscreen@10 {
+	tsc1: hid@10 {
 		compatible = "hid-over-i2c";
 		reg = <0x10>;
-
 		hid-descr-addr = <0x1>;
+
 		interrupts-extended = <&tlmm 125 IRQ_TYPE_LEVEL_LOW>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&i2c5_hid_active>;
-
-		wakeup-source;
 	};
 };
 
@@ -520,49 +491,25 @@
 	status = "okay";
 	clock-frequency = <400000>;
 
-	keyboard@5c {
+	ecsh: hid@5c {
 		compatible = "hid-over-i2c";
 		reg = <0x5c>;
-
 		hid-descr-addr = <0x1>;
+
 		interrupts-extended = <&tlmm 92 IRQ_TYPE_LEVEL_LOW>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&i2c11_hid_active>;
-
-		wakeup-source;
 	};
 };
 
 &ipa {
-<<<<<<< HEAD
-=======
 	status = "okay";
 	memory-region = <&ipa_fw_mem>;
 };
 
 &mdss {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = "okay";
-	memory-region = <&ipa_fw_mem>;
-};
-
-<<<<<<< HEAD
-&mdss {
-=======
-&mdss_dp {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	status = "okay";
-	data-lanes = <0 1>;
-
-	ports {
-		port@1 {
-			reg = <1>;
-			mdss_dp_out: endpoint {
-				remote-endpoint = <&lenovo_ec_dp_in>;
-			};
-		};
-	};
 };
 
 &mdss_dp {
@@ -830,7 +777,7 @@
 };
 
 &usb_1_dwc3 {
-	dr_mode = "otg";
+	dr_mode = "host";
 };
 
 &usb_1_hsphy {

@@ -155,25 +155,16 @@ int mgag200_device_preinit(struct mga_device *mdev)
 	return 0;
 }
 
-<<<<<<< HEAD
 int mgag200_device_init(struct mga_device *mdev,
 			const struct mgag200_device_info *info,
 			const struct mgag200_device_funcs *funcs)
-=======
-int mgag200_device_init(struct mga_device *mdev, enum mga_type type,
-			const struct mgag200_device_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct drm_device *dev = &mdev->base;
 	u8 crtcext3, misc;
 	int ret;
 
 	mdev->info = info;
-<<<<<<< HEAD
 	mdev->funcs = funcs;
-=======
-	mdev->type = type;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = drmm_mutex_init(dev, &mdev->rmmio_lock);
 	if (ret)
@@ -236,18 +227,13 @@ mgag200_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	switch (type) {
 	case G200_PCI:
 	case G200_AGP:
-<<<<<<< HEAD
 		mdev = mgag200_g200_device_create(pdev, &mgag200_driver);
-=======
-		mdev = mgag200_g200_device_create(pdev, &mgag200_driver, type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case G200_SE_A:
 	case G200_SE_B:
 		mdev = mgag200_g200se_device_create(pdev, &mgag200_driver, type);
 		break;
 	case G200_WB:
-<<<<<<< HEAD
 		mdev = mgag200_g200wb_device_create(pdev, &mgag200_driver);
 		break;
 	case G200_EV:
@@ -264,24 +250,6 @@ mgag200_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		break;
 	case G200_EW3:
 		mdev = mgag200_g200ew3_device_create(pdev, &mgag200_driver);
-=======
-		mdev = mgag200_g200wb_device_create(pdev, &mgag200_driver, type);
-		break;
-	case G200_EV:
-		mdev = mgag200_g200ev_device_create(pdev, &mgag200_driver, type);
-		break;
-	case G200_EH:
-		mdev = mgag200_g200eh_device_create(pdev, &mgag200_driver, type);
-		break;
-	case G200_EH3:
-		mdev = mgag200_g200eh3_device_create(pdev, &mgag200_driver, type);
-		break;
-	case G200_ER:
-		mdev = mgag200_g200er_device_create(pdev, &mgag200_driver, type);
-		break;
-	case G200_EW3:
-		mdev = mgag200_g200ew3_device_create(pdev, &mgag200_driver, type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		dev_err(&pdev->dev, "Device type %d is unsupported\n", type);

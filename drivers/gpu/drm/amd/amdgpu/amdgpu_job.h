@@ -50,10 +50,7 @@ struct amdgpu_job {
 	struct amdgpu_sync	sync;
 	struct amdgpu_sync	sched_sync;
 	struct dma_fence	hw_fence;
-<<<<<<< HEAD
 	struct dma_fence	*gang_submit;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	uint32_t		preamble_status;
 	uint32_t                preemption_status;
 	bool                    vm_needs_flush;

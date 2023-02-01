@@ -415,7 +415,6 @@ void rpm_lmac_ptp_config(void *rpmd, int lmac_id, bool enable)
 		return;
 
 	cfg = rpm_read(rpm, lmac_id, RPMX_CMRX_CFG);
-<<<<<<< HEAD
 	if (enable) {
 		cfg |= RPMX_RX_TS_PREPEND;
 		cfg |= RPMX_TX_PTP_1S_SUPPORT;
@@ -436,13 +435,6 @@ void rpm_lmac_ptp_config(void *rpmd, int lmac_id, bool enable)
 	}
 
 	rpm_write(rpm, lmac_id, RPMX_MTI_MAC100X_XIF_MODE, cfg);
-=======
-	if (enable)
-		cfg |= RPMX_RX_TS_PREPEND;
-	else
-		cfg &= ~RPMX_RX_TS_PREPEND;
-	rpm_write(rpm, lmac_id, RPMX_CMRX_CFG, cfg);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int rpm_lmac_pfc_config(void *rpmd, int lmac_id, u8 tx_pause, u8 rx_pause, u16 pfc_en)

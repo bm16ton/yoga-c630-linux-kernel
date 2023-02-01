@@ -6316,7 +6316,6 @@ int igb_xmit_xdp_ring(struct igb_adapter *adapter,
 
 		tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
 		tx_desc->read.buffer_addr = cpu_to_le64(dma);
-<<<<<<< HEAD
 
 		tx_buffer->protocol = 0;
 
@@ -6330,21 +6329,6 @@ int igb_xmit_xdp_ring(struct igb_adapter *adapter,
 		tx_desc = IGB_TX_DESC(tx_ring, index);
 		tx_desc->read.olinfo_status = 0;
 
-=======
-
-		tx_buffer->protocol = 0;
-
-		if (++index == tx_ring->count)
-			index = 0;
-
-		if (i == nr_frags)
-			break;
-
-		tx_buffer = &tx_ring->tx_buffer_info[index];
-		tx_desc = IGB_TX_DESC(tx_ring, index);
-		tx_desc->read.olinfo_status = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		data = skb_frag_address(&sinfo->frags[i]);
 		len = skb_frag_size(&sinfo->frags[i]);
 		i++;

@@ -1541,7 +1541,6 @@ static bool dcn10_resource_construct(
 			&& pool->base.pp_smu->rv_funcs.set_pme_wa_enable != NULL)
 		dc->debug.az_endpoint_mute_only = false;
 
-<<<<<<< HEAD
 
 	if (!dc->debug.disable_pplib_clock_request) {
 		/*
@@ -1579,11 +1578,6 @@ static bool dcn10_resource_construct(
 		DC_FP_END();
 	}
 
-=======
-	DC_FP_START();
-	if (!dc->debug.disable_pplib_clock_request)
-		dcn_bw_update_from_pplib(dc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dcn_bw_sync_calcs_and_dml(dc);
 	if (!dc->debug.disable_pplib_wm_range) {
 		dc->res_pool = &pool->base;
@@ -1594,7 +1588,6 @@ static bool dcn10_resource_construct(
 		dcn_bw_notify_pplib_of_wm_ranges(
 			dc, min_fclk_khz, min_dcfclk_khz, socclk_khz);
 	}
-	DC_FP_END();
 
 	{
 		struct irq_service_init_data init_data;

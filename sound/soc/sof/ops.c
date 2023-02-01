@@ -177,11 +177,7 @@ void snd_sof_dsp_panic(struct snd_sof_dev *sdev, u32 offset, bool non_recoverabl
 		snd_sof_dsp_dbg_dump(sdev, "DSP panic!",
 				     SOF_DBG_DUMP_REGS | SOF_DBG_DUMP_MBOX);
 		sof_set_fw_state(sdev, SOF_FW_CRASHED);
-<<<<<<< HEAD
 		sof_fw_trace_fw_crashed(sdev);
-=======
-		snd_sof_trace_notify_for_error(sdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		snd_sof_dsp_dbg_dump(sdev,
 				     "DSP panic (recovery will be attempted)",

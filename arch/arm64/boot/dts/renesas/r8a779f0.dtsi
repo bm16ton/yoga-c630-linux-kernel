@@ -301,7 +301,6 @@
 			#interrupt-cells = <2>;
 		};
 
-<<<<<<< HEAD
 		cmt0: timer@e60f0000 {
 			compatible = "renesas,r8a779f0-cmt0",
 				     "renesas,rcar-gen4-cmt0";
@@ -372,8 +371,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		cpg: clock-controller@e6150000 {
 			compatible = "renesas,r8a779f0-cpg-mssr";
 			reg = <0 0xe6150000 0 0x4000>;
@@ -407,7 +404,6 @@
 			#thermal-sensor-cells = <1>;
 		};
 
-<<<<<<< HEAD
 		tmu0: timer@e61e0000 {
 			compatible = "renesas,tmu-r8a779f0", "renesas,tmu";
 			reg = <0 0xe61e0000 0 0x30>;
@@ -473,8 +469,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		i2c0: i2c@e6500000 {
 			compatible = "renesas,i2c-r8a779f0",
 				     "renesas,rcar-gen4-i2c";
@@ -583,11 +577,7 @@
 			reg = <0 0xe6540000 0 0x60>;
 			interrupts = <GIC_SPI 245 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 514>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x31>, <&dmac0 0x30>,
@@ -604,11 +594,7 @@
 			reg = <0 0xe6550000 0 0x60>;
 			interrupts = <GIC_SPI 246 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 515>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x33>, <&dmac0 0x32>,
@@ -625,11 +611,7 @@
 			reg = <0 0xe6560000 0 0x60>;
 			interrupts = <GIC_SPI 247 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 516>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x35>, <&dmac0 0x34>,
@@ -646,11 +628,7 @@
 			reg = <0 0xe66a0000 0 0x60>;
 			interrupts = <GIC_SPI 248 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 517>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x37>, <&dmac0 0x36>,
@@ -679,11 +657,7 @@
 			reg = <0 0xe6e60000 0 64>;
 			interrupts = <GIC_SPI 249 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 702>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3_PER>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x51>, <&dmac0 0x50>,
@@ -700,11 +674,7 @@
 			reg = <0 0xe6e68000 0 64>;
 			interrupts = <GIC_SPI 250 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 703>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3_PER>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x53>, <&dmac0 0x52>,
@@ -721,11 +691,7 @@
 			reg = <0 0xe6c50000 0 64>;
 			interrupts = <GIC_SPI 252 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 704>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3_PER>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x57>, <&dmac0 0x56>,
@@ -742,11 +708,7 @@
 			reg = <0 0xe6c40000 0 64>;
 			interrupts = <GIC_SPI 253 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 705>,
-<<<<<<< HEAD
 				 <&cpg CPG_CORE R8A779F0_CLK_SASYNCPERD1>,
-=======
-				 <&cpg CPG_CORE R8A779F0_CLK_S0D3_PER>,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 <&scif_clk>;
 			clock-names = "fck", "brg_int", "scif_clk";
 			dmas = <&dmac0 0x59>, <&dmac0 0x58>,
@@ -757,7 +719,6 @@
 			status = "disabled";
 		};
 
-<<<<<<< HEAD
 		msiof0: spi@e6e90000 {
 			compatible = "renesas,msiof-r8a779f0",
 				     "renesas,rcar-gen4-msiof";
@@ -822,8 +783,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dmac0: dma-controller@e7350000 {
 			compatible = "renesas,dmac-r8a779f0",
 				     "renesas,rcar-gen4-dmac";
@@ -910,7 +869,6 @@
 				 <&ipmmu_ds0 30>, <&ipmmu_ds0 31>;
 		};
 
-<<<<<<< HEAD
 		mmc0: mmc@ee140000 {
 			compatible = "renesas,sdhi-r8a779f0",
 				     "renesas,rcar-gen4-sdhi";
@@ -924,8 +882,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ipmmu_rt0: iommu@ee480000 {
 			compatible = "renesas,ipmmu-r8a779f0",
 				     "renesas,rcar-gen4-ipmmu-vmsa";

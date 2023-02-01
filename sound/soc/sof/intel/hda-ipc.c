@@ -111,7 +111,6 @@ void hda_dsp_ipc_get_reply(struct snd_sof_dev *sdev)
 		reply.hdr.cmd = SOF_IPC_GLB_REPLY;
 		reply.hdr.size = sizeof(reply);
 		memcpy(msg->reply_data, &reply, sizeof(reply));
-<<<<<<< HEAD
 
 		msg->reply_error = 0;
 	} else {
@@ -188,13 +187,6 @@ irqreturn_t hda_dsp_ipc4_irq_thread(int irq, void *context)
 		dev_dbg_ratelimited(sdev->dev, "nothing to do in IPC IRQ thread\n");
 
 	return IRQ_HANDLED;
-=======
-
-		msg->reply_error = 0;
-	} else {
-		snd_sof_ipc_get_reply(sdev);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* IPC handler thread */

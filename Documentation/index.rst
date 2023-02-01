@@ -71,7 +71,6 @@ developers seeking information on the kernel's user-space APIs.
 .. toctree::
    :maxdepth: 1
 
-<<<<<<< HEAD
    admin-guide/index
    The kernel build system <kbuild/index>
    admin-guide/reporting-issues.rst
@@ -85,52 +84,6 @@ Firmware-related documentation
 ------------------------------
 The following holds information on the kernel's expectations regarding the
 platform firmwares.
-=======
-   driver-api/index
-   core-api/index
-   locking/index
-   accounting/index
-   block/index
-   cdrom/index
-   cpu-freq/index
-   fb/index
-   fpga/index
-   hid/index
-   i2c/index
-   iio/index
-   isdn/index
-   infiniband/index
-   leds/index
-   netlabel/index
-   networking/index
-   pcmcia/index
-   power/index
-   target/index
-   timers/index
-   spi/index
-   w1/index
-   watchdog/index
-   virt/index
-   input/index
-   hwmon/index
-   gpu/index
-   security/index
-   sound/index
-   crypto/index
-   filesystems/index
-   mm/index
-   bpf/index
-   usb/index
-   PCI/index
-   scsi/index
-   misc-devices/index
-   scheduler/index
-   mhi/index
-   peci/index
-
-Architecture-agnostic documentation
------------------------------------
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 .. toctree::
    :maxdepth: 1
@@ -158,7 +111,6 @@ to ReStructured Text format, or are simply too old.
 .. toctree::
    :maxdepth: 1
 
-   tools/index
    staging/index
 
 

@@ -1970,11 +1970,7 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image,
 				u32 flags, struct bpf_tramp_links *tlinks,
 				void *orig_call)
 {
-<<<<<<< HEAD
 	int i, ret;
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int nargs = m->nr_args;
 	int max_insns = ((long)image_end - (long)image) / AARCH64_INSN_SIZE;
 	struct jit_ctx ctx = {
@@ -1986,15 +1982,12 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image,
 	if (nargs > 8)
 		return -ENOTSUPP;
 
-<<<<<<< HEAD
 	/* don't support struct argument */
 	for (i = 0; i < MAX_BPF_FUNC_ARGS; i++) {
 		if (m->arg_flags[i] & BTF_FMODEL_STRUCT_ARG)
 			return -ENOTSUPP;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = prepare_trampoline(&ctx, im, tlinks, orig_call, nargs, flags);
 	if (ret < 0)
 		return ret;

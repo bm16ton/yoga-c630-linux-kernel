@@ -37,12 +37,6 @@
 #include <linux/mutex.h>
 #include <linux/pm_runtime.h>
 
-<<<<<<< HEAD
-=======
-static struct mutex power_mutex;	/* Serialize power ops */
-static DEFINE_SPINLOCK(power_ctrl_lock);	/* Serialize power claim */
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  *	gma_power_init		-	initialise power manager
  *	@dev: our device
@@ -57,14 +51,6 @@ void gma_power_init(struct drm_device *dev)
 	dev_priv->apm_base = dev_priv->apm_reg & 0xffff;
 	dev_priv->ospm_base &= 0xffff;
 
-<<<<<<< HEAD
-=======
-	dev_priv->display_power = true;	/* We start active */
-	dev_priv->display_count = 0;	/* Currently no users */
-	dev_priv->suspended = false;	/* And not suspended */
-	mutex_init(&power_mutex);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (dev_priv->ops->init_pm)
 		dev_priv->ops->init_pm(dev);
 
@@ -172,22 +158,11 @@ static int gma_resume_pci(struct pci_dev *pdev)
 {
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-<<<<<<< HEAD
-=======
-	int ret;
-
-	if (!dev_priv->suspended)
-		return true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pci_set_power_state(pdev, PCI_D0);
 	pci_restore_state(pdev);
 	pci_write_config_dword(pdev, 0x5c, dev_priv->regs.saveBSM);
 	pci_write_config_dword(pdev, 0xFC, dev_priv->regs.saveVBT);
-<<<<<<< HEAD
-=======
-	ret = pci_enable_device(pdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return pci_enable_device(pdev);
 }
@@ -204,27 +179,10 @@ int gma_power_suspend(struct device *_dev)
 {
 	struct pci_dev *pdev = to_pci_dev(_dev);
 	struct drm_device *dev = pci_get_drvdata(pdev);
-<<<<<<< HEAD
 
 	gma_irq_uninstall(dev);
 	gma_suspend_display(dev);
 	gma_suspend_pci(pdev);
-=======
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-
-	mutex_lock(&power_mutex);
-	if (!dev_priv->suspended) {
-		if (dev_priv->display_count) {
-			mutex_unlock(&power_mutex);
-			dev_err(dev->dev, "GPU hardware busy, cannot suspend\n");
-			return -EBUSY;
-		}
-		gma_irq_uninstall(dev);
-		gma_suspend_display(dev);
-		gma_suspend_pci(pdev);
-	}
-	mutex_unlock(&power_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -242,29 +200,10 @@ int gma_power_resume(struct device *_dev)
 	gma_resume_pci(pdev);
 	gma_resume_display(pdev);
 	gma_irq_install(dev);
-<<<<<<< HEAD
-=======
-	mutex_unlock(&power_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
 /**
-<<<<<<< HEAD
-=======
- *	gma_power_is_on		-	returne true if power is on
- *	@dev: our DRM device
- *
- *	Returns true if the display island power is on at this moment
- */
-bool gma_power_is_on(struct drm_device *dev)
-{
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	return dev_priv->display_power;
-}
-
-/**
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *	gma_power_begin		-	begin requiring power
  *	@dev: our DRM device
  *	@force_on: true to force power on
@@ -274,42 +213,10 @@ bool gma_power_is_on(struct drm_device *dev)
  */
 bool gma_power_begin(struct drm_device *dev, bool force_on)
 {
-<<<<<<< HEAD
 	if (force_on)
 		return pm_runtime_resume_and_get(dev->dev) == 0;
 	else
 		return pm_runtime_get_if_in_use(dev->dev) == 1;
-=======
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	struct pci_dev *pdev = to_pci_dev(dev->dev);
-	int ret;
-	unsigned long flags;
-
-	spin_lock_irqsave(&power_ctrl_lock, flags);
-	/* Power already on ? */
-	if (dev_priv->display_power) {
-		dev_priv->display_count++;
-		pm_runtime_get(dev->dev);
-		spin_unlock_irqrestore(&power_ctrl_lock, flags);
-		return true;
-	}
-	if (force_on == false)
-		goto out_false;
-
-	/* Ok power up needed */
-	ret = gma_resume_pci(pdev);
-	if (ret == 0) {
-		gma_irq_preinstall(dev);
-		gma_irq_postinstall(dev);
-		pm_runtime_get(dev->dev);
-		dev_priv->display_count++;
-		spin_unlock_irqrestore(&power_ctrl_lock, flags);
-		return true;
-	}
-out_false:
-	spin_unlock_irqrestore(&power_ctrl_lock, flags);
-	return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -321,51 +228,5 @@ out_false:
  */
 void gma_power_end(struct drm_device *dev)
 {
-<<<<<<< HEAD
 	pm_runtime_put(dev->dev);
 }
-=======
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	unsigned long flags;
-	spin_lock_irqsave(&power_ctrl_lock, flags);
-	dev_priv->display_count--;
-	WARN_ON(dev_priv->display_count < 0);
-	spin_unlock_irqrestore(&power_ctrl_lock, flags);
-	pm_runtime_put(dev->dev);
-}
-
-int psb_runtime_suspend(struct device *dev)
-{
-	return gma_power_suspend(dev);
-}
-
-int psb_runtime_resume(struct device *dev)
-{
-	return gma_power_resume(dev);
-}
-
-int psb_runtime_idle(struct device *dev)
-{
-	struct drm_device *drmdev = pci_get_drvdata(to_pci_dev(dev));
-	struct drm_psb_private *dev_priv = to_drm_psb_private(drmdev);
-	if (dev_priv->display_count)
-		return 0;
-	else
-		return 1;
-}
-
-int gma_power_thaw(struct device *_dev)
-{
-	return gma_power_resume(_dev);
-}
-
-int gma_power_freeze(struct device *_dev)
-{
-	return gma_power_suspend(_dev);
-}
-
-int gma_power_restore(struct device *_dev)
-{
-	return gma_power_resume(_dev);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

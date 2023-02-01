@@ -61,7 +61,6 @@ static bool check_y_limit(struct vkms_frame_info *frame_info, int y)
 	return false;
 }
 
-<<<<<<< HEAD
 static void fill_background(const struct pixel_argb_u16 *background_color,
 			    struct line_buffer *output_buffer)
 {
@@ -103,88 +102,6 @@ static void blend(struct vkms_writeback_job *wb,
 			plane[i]->plane_read(stage_buffer, plane[i]->frame_info, y);
 			pre_mul_alpha_blend(plane[i]->frame_info, stage_buffer,
 					    output_buffer);
-=======
-/**
- * alpha_blend - alpha blending equation
- * @argb_src: src pixel on premultiplied alpha mode
- * @argb_dst: dst pixel completely opaque
- *
- * blend pixels using premultiplied blend formula. The current DRM assumption
- * is that pixel color values have been already pre-multiplied with the alpha
- * channel values. See more drm_plane_create_blend_mode_property(). Also, this
- * formula assumes a completely opaque background.
- */
-static void alpha_blend(const u8 *argb_src, u8 *argb_dst)
-{
-	u8 alpha;
-
-	alpha = argb_src[3];
-	argb_dst[0] = blend_channel(argb_src[0], argb_dst[0], alpha);
-	argb_dst[1] = blend_channel(argb_src[1], argb_dst[1], alpha);
-	argb_dst[2] = blend_channel(argb_src[2], argb_dst[2], alpha);
-}
-
-/**
- * x_blend - blending equation that ignores the pixel alpha
- *
- * overwrites RGB color value from src pixel to dst pixel.
- */
-static void x_blend(const u8 *xrgb_src, u8 *xrgb_dst)
-{
-	memcpy(xrgb_dst, xrgb_src, sizeof(u8) * 3);
-}
-
-/**
- * blend - blend value at vaddr_src with value at vaddr_dst
- * @vaddr_dst: destination address
- * @vaddr_src: source address
- * @dst_composer: destination framebuffer's metadata
- * @src_composer: source framebuffer's metadata
- * @pixel_blend: blending equation based on plane format
- *
- * Blend the vaddr_src value with the vaddr_dst value using a pixel blend
- * equation according to the supported plane formats DRM_FORMAT_(A/XRGB8888)
- * and clearing alpha channel to an completely opaque background. This function
- * uses buffer's metadata to locate the new composite values at vaddr_dst.
- *
- * TODO: completely clear the primary plane (a = 0xff) before starting to blend
- * pixel color values
- */
-static void blend(void *vaddr_dst, void *vaddr_src,
-		  struct vkms_composer *dst_composer,
-		  struct vkms_composer *src_composer,
-		  void (*pixel_blend)(const u8 *, u8 *))
-{
-	int i, j, j_dst, i_dst;
-	int offset_src, offset_dst;
-	u8 *pixel_dst, *pixel_src;
-
-	int x_src = src_composer->src.x1 >> 16;
-	int y_src = src_composer->src.y1 >> 16;
-
-	int x_dst = src_composer->dst.x1;
-	int y_dst = src_composer->dst.y1;
-	int h_dst = drm_rect_height(&src_composer->dst);
-	int w_dst = drm_rect_width(&src_composer->dst);
-
-	int y_limit = y_src + h_dst;
-	int x_limit = x_src + w_dst;
-
-	for (i = y_src, i_dst = y_dst; i < y_limit; ++i) {
-		for (j = x_src, j_dst = x_dst; j < x_limit; ++j) {
-			offset_dst = dst_composer->offset
-				     + (i_dst * dst_composer->pitch)
-				     + (j_dst++ * dst_composer->cpp);
-			offset_src = src_composer->offset
-				     + (i * src_composer->pitch)
-				     + (j * src_composer->cpp);
-
-			pixel_src = (u8 *)(vaddr_src + offset_src);
-			pixel_dst = (u8 *)(vaddr_dst + offset_dst);
-			pixel_blend(pixel_src, pixel_dst);
-			/* clearing alpha channel (0xff)*/
-			pixel_dst[3] = 0xff;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		*crc32 = crc32_le(*crc32, (void *)output_buffer->pixels, row_size);
@@ -194,7 +111,6 @@ static void blend(void *vaddr_dst, void *vaddr_src,
 	}
 }
 
-<<<<<<< HEAD
 static int check_format_funcs(struct vkms_crtc_state *crtc_state,
 			      struct vkms_writeback_job *active_wb)
 {
@@ -248,61 +164,6 @@ static int compose_active_planes(struct vkms_writeback_job *active_wb,
 	line_width = crtc_state->base.crtc->mode.hdisplay;
 	stage_buffer.n_pixels = line_width;
 	output_buffer.n_pixels = line_width;
-=======
-static void compose_plane(struct vkms_composer *primary_composer,
-			  struct vkms_composer *plane_composer,
-			  void *vaddr_out)
-{
-	struct drm_framebuffer *fb = &plane_composer->fb;
-	void *vaddr;
-	void (*pixel_blend)(const u8 *p_src, u8 *p_dst);
-
-	if (WARN_ON(iosys_map_is_null(&plane_composer->map[0])))
-		return;
-
-	vaddr = plane_composer->map[0].vaddr;
-
-	if (fb->format->format == DRM_FORMAT_ARGB8888)
-		pixel_blend = &alpha_blend;
-	else
-		pixel_blend = &x_blend;
-
-	blend(vaddr_out, vaddr, primary_composer, plane_composer, pixel_blend);
-}
-
-static int compose_active_planes(void **vaddr_out,
-				 struct vkms_composer *primary_composer,
-				 struct vkms_crtc_state *crtc_state)
-{
-	struct drm_framebuffer *fb = &primary_composer->fb;
-	struct drm_gem_object *gem_obj = drm_gem_fb_get_obj(fb, 0);
-	const void *vaddr;
-	int i;
-
-	if (!*vaddr_out) {
-		*vaddr_out = kvzalloc(gem_obj->size, GFP_KERNEL);
-		if (!*vaddr_out) {
-			DRM_ERROR("Cannot allocate memory for output frame.");
-			return -ENOMEM;
-		}
-	}
-
-	if (WARN_ON(iosys_map_is_null(&primary_composer->map[0])))
-		return -EINVAL;
-
-	vaddr = primary_composer->map[0].vaddr;
-
-	memcpy(*vaddr_out, vaddr, gem_obj->size);
-
-	/* If there are other planes besides primary, we consider the active
-	 * planes should be in z-order and compose them associatively:
-	 * ((primary <- overlay) <- cursor)
-	 */
-	for (i = 1; i < crtc_state->num_active_planes; i++)
-		compose_plane(primary_composer,
-			      crtc_state->active_planes[i]->composer,
-			      *vaddr_out);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	stage_buffer.pixels = kvmalloc(line_width * pixel_size, GFP_KERNEL);
 	if (!stage_buffer.pixels) {
@@ -344,11 +205,6 @@ void vkms_composer_worker(struct work_struct *work)
 	struct drm_crtc *crtc = crtc_state->base.crtc;
 	struct vkms_writeback_job *active_wb = crtc_state->active_writeback;
 	struct vkms_output *out = drm_crtc_to_vkms_output(crtc);
-<<<<<<< HEAD
-=======
-	struct vkms_composer *primary_composer = NULL;
-	struct vkms_plane_state *act_plane = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool crc_pending, wb_pending;
 	u64 frame_start, frame_end;
 	u32 crc32 = 0;
@@ -371,32 +227,12 @@ void vkms_composer_worker(struct work_struct *work)
 	if (!crc_pending)
 		return;
 
-<<<<<<< HEAD
 	if (wb_pending)
 		ret = compose_active_planes(active_wb, crtc_state, &crc32);
 	else
 		ret = compose_active_planes(NULL, crtc_state, &crc32);
 
 	if (ret)
-=======
-	if (crtc_state->num_active_planes >= 1) {
-		act_plane = crtc_state->active_planes[0];
-		if (act_plane->base.base.plane->type == DRM_PLANE_TYPE_PRIMARY)
-			primary_composer = act_plane->composer;
-	}
-
-	if (!primary_composer)
-		return;
-
-	if (wb_pending)
-		vaddr_out = crtc_state->active_writeback->data[0].vaddr;
-
-	ret = compose_active_planes(&vaddr_out, primary_composer,
-				    crtc_state);
-	if (ret) {
-		if (ret == -EINVAL && !wb_pending)
-			kvfree(vaddr_out);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	if (wb_pending) {
@@ -404,11 +240,6 @@ void vkms_composer_worker(struct work_struct *work)
 		spin_lock_irq(&out->composer_lock);
 		crtc_state->wb_pending = false;
 		spin_unlock_irq(&out->composer_lock);
-<<<<<<< HEAD
-=======
-	} else {
-		kvfree(vaddr_out);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/*

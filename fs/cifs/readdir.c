@@ -844,7 +844,6 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
 				struct dir_context *ctx)
 {
 	struct cached_dirent *dirent;
-<<<<<<< HEAD
 	bool rc;
 
 	list_for_each_entry(dirent, &cde->entries, entry) {
@@ -866,23 +865,13 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
 		 * we now emit them with the same ->pos value as in the
 		 * initial scan.
 		 */
-=======
-	int rc;
-
-	list_for_each_entry(dirent, &cde->entries, entry) {
-		if (ctx->pos >= dirent->pos)
-			continue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ctx->pos = dirent->pos;
 		rc = dir_emit(ctx, dirent->name, dirent->namelen,
 			      dirent->fattr.cf_uniqueid,
 			      dirent->fattr.cf_dtype);
 		if (!rc)
 			return rc;
-<<<<<<< HEAD
 		ctx->pos++;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return true;
 }
@@ -1088,61 +1077,9 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
 	full_path = build_path_from_dentry(file_dentry(file), page);
 	if (IS_ERR(full_path)) {
 		rc = PTR_ERR(full_path);
-<<<<<<< HEAD
 		goto rddir2_exit;
 	}
 
-	if (file->private_data == NULL) {
-		tlink = cifs_sb_tlink(cifs_sb);
-		if (IS_ERR(tlink))
-			goto cache_not_found;
-		tcon = tlink_tcon(tlink);
-	} else {
-		cifsFile = file->private_data;
-		tcon = tlink_tcon(cifsFile->tlink);
-	}
-
-	rc = open_cached_dir(xid, tcon, full_path, cifs_sb, false, &cfid);
-	cifs_put_tlink(tlink);
-	if (rc)
-		goto cache_not_found;
-
-	mutex_lock(&cfid->dirents.de_mutex);
-	/*
-	 * If this was reading from the start of the directory
-	 * we need to initialize scanning and storing the
-	 * directory content.
-	 */
-	if (ctx->pos == 0 && cfid->dirents.ctx == NULL) {
-		cfid->dirents.ctx = ctx;
-		cfid->dirents.pos = 2;
-	}
-	/*
-	 * If we already have the entire directory cached then
-	 * we can just serve the cache.
-	 */
-	if (cfid->dirents.is_valid) {
-		if (!dir_emit_dots(file, ctx)) {
-			mutex_unlock(&cfid->dirents.de_mutex);
-			goto rddir2_exit;
-		}
-		emit_cached_dirents(&cfid->dirents, ctx);
-		mutex_unlock(&cfid->dirents.de_mutex);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		goto rddir2_exit;
-	}
-	mutex_unlock(&cfid->dirents.de_mutex);
-
-	/* Drop the cache while calling initiate_cifs_search and
-	 * find_cifs_entry in case there will be reconnects during
-	 * query_directory.
-	 */
-	close_cached_dir(cfid);
-	cfid = NULL;
-
-<<<<<<< HEAD
-=======
 	if (file->private_data == NULL) {
 		tlink = cifs_sb_tlink(cifs_sb);
 		if (IS_ERR(tlink))
@@ -1190,7 +1127,6 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
 	close_cached_dir(cfid);
 	cfid = NULL;
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  cache_not_found:
 	/*
 	 * Ensure FindFirst doesn't fail before doing filldir() for '.' and

@@ -14,16 +14,12 @@ struct blk_flush_queue;
 #define BLKDEV_MIN_RQ	4
 #define BLKDEV_DEFAULT_RQ	128
 
-<<<<<<< HEAD
 enum rq_end_io_ret {
 	RQ_END_IO_NONE,
 	RQ_END_IO_FREE,
 };
 
 typedef enum rq_end_io_ret (rq_end_io_fn)(struct request *, blk_status_t);
-=======
-typedef void (rq_end_io_fn)(struct request *, blk_status_t);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * request flags */
@@ -857,15 +853,10 @@ static inline bool blk_mq_add_to_batch(struct request *req,
 				       struct io_comp_batch *iob, int ioerror,
 				       void (*complete)(struct io_comp_batch *))
 {
-<<<<<<< HEAD
 	if (!iob || (req->rq_flags & RQF_ELV) || ioerror ||
 			(req->end_io && !blk_rq_is_passthrough(req)))
 		return false;
 
-=======
-	if (!iob || (req->rq_flags & RQF_ELV) || req->end_io || ioerror)
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!iob->complete)
 		iob->complete = complete;
 	else if (iob->complete != complete)
@@ -986,28 +977,17 @@ blk_status_t blk_insert_cloned_request(struct request *rq);
 
 struct rq_map_data {
 	struct page **pages;
-<<<<<<< HEAD
 	unsigned long offset;
 	unsigned short page_order;
 	unsigned short nr_entries;
 	bool null_mapped;
 	bool from_user;
-=======
-	int page_order;
-	int nr_entries;
-	unsigned long offset;
-	int null_mapped;
-	int from_user;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 int blk_rq_map_user(struct request_queue *, struct request *,
 		struct rq_map_data *, void __user *, unsigned long, gfp_t);
-<<<<<<< HEAD
 int blk_rq_map_user_io(struct request *, struct rq_map_data *,
 		void __user *, unsigned long, gfp_t, bool, int, bool, int);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int blk_rq_map_user_iov(struct request_queue *, struct request *,
 		struct rq_map_data *, const struct iov_iter *, gfp_t);
 int blk_rq_unmap_user(struct bio *);
@@ -1016,10 +996,7 @@ int blk_rq_map_kern(struct request_queue *, struct request *, void *,
 int blk_rq_append_bio(struct request *rq, struct bio *bio);
 void blk_execute_rq_nowait(struct request *rq, bool at_head);
 blk_status_t blk_execute_rq(struct request *rq, bool at_head);
-<<<<<<< HEAD
 bool blk_rq_is_poll(struct request *rq);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct req_iterator {
 	struct bvec_iter iter;

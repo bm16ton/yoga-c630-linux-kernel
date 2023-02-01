@@ -3124,7 +3124,6 @@ int ath11k_wmi_send_twt_enable_cmd(struct ath11k *ar, u32 pdev_id,
 	cmd->tlv_header = FIELD_PREP(WMI_TLV_TAG, WMI_TAG_TWT_ENABLE_CMD) |
 			  FIELD_PREP(WMI_TLV_LEN, len - TLV_HDR_SIZE);
 	cmd->pdev_id = pdev_id;
-<<<<<<< HEAD
 	cmd->sta_cong_timer_ms = params->sta_cong_timer_ms;
 	cmd->default_slot_size = params->default_slot_size;
 	cmd->congestion_thresh_setup = params->congestion_thresh_setup;
@@ -3141,30 +3140,6 @@ int ath11k_wmi_send_twt_enable_cmd(struct ath11k *ar, u32 pdev_id,
 	cmd->add_sta_slot_interval = params->add_sta_slot_interval;
 	cmd->remove_sta_slot_interval = params->remove_sta_slot_interval;
 	cmd->mbss_support = params->mbss_support;
-=======
-	cmd->sta_cong_timer_ms = ATH11K_TWT_DEF_STA_CONG_TIMER_MS;
-	cmd->default_slot_size = ATH11K_TWT_DEF_DEFAULT_SLOT_SIZE;
-	cmd->congestion_thresh_setup = ATH11K_TWT_DEF_CONGESTION_THRESH_SETUP;
-	cmd->congestion_thresh_teardown =
-		ATH11K_TWT_DEF_CONGESTION_THRESH_TEARDOWN;
-	cmd->congestion_thresh_critical =
-		ATH11K_TWT_DEF_CONGESTION_THRESH_CRITICAL;
-	cmd->interference_thresh_teardown =
-		ATH11K_TWT_DEF_INTERFERENCE_THRESH_TEARDOWN;
-	cmd->interference_thresh_setup =
-		ATH11K_TWT_DEF_INTERFERENCE_THRESH_SETUP;
-	cmd->min_no_sta_setup = ATH11K_TWT_DEF_MIN_NO_STA_SETUP;
-	cmd->min_no_sta_teardown = ATH11K_TWT_DEF_MIN_NO_STA_TEARDOWN;
-	cmd->no_of_bcast_mcast_slots = ATH11K_TWT_DEF_NO_OF_BCAST_MCAST_SLOTS;
-	cmd->min_no_twt_slots = ATH11K_TWT_DEF_MIN_NO_TWT_SLOTS;
-	cmd->max_no_sta_twt = ATH11K_TWT_DEF_MAX_NO_STA_TWT;
-	cmd->mode_check_interval = ATH11K_TWT_DEF_MODE_CHECK_INTERVAL;
-	cmd->add_sta_slot_interval = ATH11K_TWT_DEF_ADD_STA_SLOT_INTERVAL;
-	cmd->remove_sta_slot_interval =
-		ATH11K_TWT_DEF_REMOVE_STA_SLOT_INTERVAL;
-	/* TODO add MBSSID support */
-	cmd->mbss_support = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = ath11k_wmi_cmd_send(wmi, skb, WMI_TWT_ENABLE_CMDID);
 	if (ret) {
@@ -3202,178 +3177,6 @@ ath11k_wmi_send_twt_disable_cmd(struct ath11k *ar, u32 pdev_id)
 		dev_kfree_skb(skb);
 	} else {
 		ar->twt_enabled = 0;
-<<<<<<< HEAD
-=======
-	}
-	return ret;
-}
-
-int ath11k_wmi_send_twt_add_dialog_cmd(struct ath11k *ar,
-				       struct wmi_twt_add_dialog_params *params)
-{
-	struct ath11k_pdev_wmi *wmi = ar->wmi;
-	struct ath11k_base *ab = wmi->wmi_ab->ab;
-	struct wmi_twt_add_dialog_params_cmd *cmd;
-	struct sk_buff *skb;
-	int ret, len;
-
-	len = sizeof(*cmd);
-
-	skb = ath11k_wmi_alloc_skb(wmi->wmi_ab, len);
-	if (!skb)
-		return -ENOMEM;
-
-	cmd = (struct wmi_twt_add_dialog_params_cmd *)skb->data;
-	cmd->tlv_header = FIELD_PREP(WMI_TLV_TAG, WMI_TAG_TWT_ADD_DIALOG_CMD) |
-			  FIELD_PREP(WMI_TLV_LEN, len - TLV_HDR_SIZE);
-
-	cmd->vdev_id = params->vdev_id;
-	ether_addr_copy(cmd->peer_macaddr.addr, params->peer_macaddr);
-	cmd->dialog_id = params->dialog_id;
-	cmd->wake_intvl_us = params->wake_intvl_us;
-	cmd->wake_intvl_mantis = params->wake_intvl_mantis;
-	cmd->wake_dura_us = params->wake_dura_us;
-	cmd->sp_offset_us = params->sp_offset_us;
-	cmd->flags = params->twt_cmd;
-	if (params->flag_bcast)
-		cmd->flags |= WMI_TWT_ADD_DIALOG_FLAG_BCAST;
-	if (params->flag_trigger)
-		cmd->flags |= WMI_TWT_ADD_DIALOG_FLAG_TRIGGER;
-	if (params->flag_flow_type)
-		cmd->flags |= WMI_TWT_ADD_DIALOG_FLAG_FLOW_TYPE;
-	if (params->flag_protection)
-		cmd->flags |= WMI_TWT_ADD_DIALOG_FLAG_PROTECTION;
-
-	ath11k_dbg(ar->ab, ATH11K_DBG_WMI,
-		   "wmi add twt dialog vdev %u dialog id %u wake interval %u mantissa %u wake duration %u service period offset %u flags 0x%x\n",
-		   cmd->vdev_id, cmd->dialog_id, cmd->wake_intvl_us,
-		   cmd->wake_intvl_mantis, cmd->wake_dura_us, cmd->sp_offset_us,
-		   cmd->flags);
-
-	ret = ath11k_wmi_cmd_send(wmi, skb, WMI_TWT_ADD_DIALOG_CMDID);
-
-	if (ret) {
-		ath11k_warn(ab,
-			    "failed to send wmi command to add twt dialog: %d",
-			    ret);
-		dev_kfree_skb(skb);
-	}
-	return ret;
-}
-
-int ath11k_wmi_send_twt_del_dialog_cmd(struct ath11k *ar,
-				       struct wmi_twt_del_dialog_params *params)
-{
-	struct ath11k_pdev_wmi *wmi = ar->wmi;
-	struct ath11k_base *ab = wmi->wmi_ab->ab;
-	struct wmi_twt_del_dialog_params_cmd *cmd;
-	struct sk_buff *skb;
-	int ret, len;
-
-	len = sizeof(*cmd);
-
-	skb = ath11k_wmi_alloc_skb(wmi->wmi_ab, len);
-	if (!skb)
-		return -ENOMEM;
-
-	cmd = (struct wmi_twt_del_dialog_params_cmd *)skb->data;
-	cmd->tlv_header = FIELD_PREP(WMI_TLV_TAG, WMI_TAG_TWT_DEL_DIALOG_CMD) |
-			  FIELD_PREP(WMI_TLV_LEN, len - TLV_HDR_SIZE);
-
-	cmd->vdev_id = params->vdev_id;
-	ether_addr_copy(cmd->peer_macaddr.addr, params->peer_macaddr);
-	cmd->dialog_id = params->dialog_id;
-
-	ath11k_dbg(ar->ab, ATH11K_DBG_WMI,
-		   "wmi delete twt dialog vdev %u dialog id %u\n",
-		   cmd->vdev_id, cmd->dialog_id);
-
-	ret = ath11k_wmi_cmd_send(wmi, skb, WMI_TWT_DEL_DIALOG_CMDID);
-	if (ret) {
-		ath11k_warn(ab,
-			    "failed to send wmi command to delete twt dialog: %d",
-			    ret);
-		dev_kfree_skb(skb);
-	}
-	return ret;
-}
-
-int ath11k_wmi_send_twt_pause_dialog_cmd(struct ath11k *ar,
-					 struct wmi_twt_pause_dialog_params *params)
-{
-	struct ath11k_pdev_wmi *wmi = ar->wmi;
-	struct ath11k_base *ab = wmi->wmi_ab->ab;
-	struct wmi_twt_pause_dialog_params_cmd *cmd;
-	struct sk_buff *skb;
-	int ret, len;
-
-	len = sizeof(*cmd);
-
-	skb = ath11k_wmi_alloc_skb(wmi->wmi_ab, len);
-	if (!skb)
-		return -ENOMEM;
-
-	cmd = (struct wmi_twt_pause_dialog_params_cmd *)skb->data;
-	cmd->tlv_header = FIELD_PREP(WMI_TLV_TAG,
-				     WMI_TAG_TWT_PAUSE_DIALOG_CMD) |
-			  FIELD_PREP(WMI_TLV_LEN, len - TLV_HDR_SIZE);
-
-	cmd->vdev_id = params->vdev_id;
-	ether_addr_copy(cmd->peer_macaddr.addr, params->peer_macaddr);
-	cmd->dialog_id = params->dialog_id;
-
-	ath11k_dbg(ar->ab, ATH11K_DBG_WMI,
-		   "wmi pause twt dialog vdev %u dialog id %u\n",
-		   cmd->vdev_id, cmd->dialog_id);
-
-	ret = ath11k_wmi_cmd_send(wmi, skb, WMI_TWT_PAUSE_DIALOG_CMDID);
-	if (ret) {
-		ath11k_warn(ab,
-			    "failed to send wmi command to pause twt dialog: %d",
-			    ret);
-		dev_kfree_skb(skb);
-	}
-	return ret;
-}
-
-int ath11k_wmi_send_twt_resume_dialog_cmd(struct ath11k *ar,
-					  struct wmi_twt_resume_dialog_params *params)
-{
-	struct ath11k_pdev_wmi *wmi = ar->wmi;
-	struct ath11k_base *ab = wmi->wmi_ab->ab;
-	struct wmi_twt_resume_dialog_params_cmd *cmd;
-	struct sk_buff *skb;
-	int ret, len;
-
-	len = sizeof(*cmd);
-
-	skb = ath11k_wmi_alloc_skb(wmi->wmi_ab, len);
-	if (!skb)
-		return -ENOMEM;
-
-	cmd = (struct wmi_twt_resume_dialog_params_cmd *)skb->data;
-	cmd->tlv_header = FIELD_PREP(WMI_TLV_TAG,
-				     WMI_TAG_TWT_RESUME_DIALOG_CMD) |
-			  FIELD_PREP(WMI_TLV_LEN, len - TLV_HDR_SIZE);
-
-	cmd->vdev_id = params->vdev_id;
-	ether_addr_copy(cmd->peer_macaddr.addr, params->peer_macaddr);
-	cmd->dialog_id = params->dialog_id;
-	cmd->sp_offset_us = params->sp_offset_us;
-	cmd->next_twt_size = params->next_twt_size;
-
-	ath11k_dbg(ar->ab, ATH11K_DBG_WMI,
-		   "wmi resume twt dialog vdev %u dialog id %u service period offset %u next twt subfield size %u\n",
-		   cmd->vdev_id, cmd->dialog_id, cmd->sp_offset_us,
-		   cmd->next_twt_size);
-
-	ret = ath11k_wmi_cmd_send(wmi, skb, WMI_TWT_RESUME_DIALOG_CMDID);
-	if (ret) {
-		ath11k_warn(ab,
-			    "failed to send wmi command to resume twt dialog: %d",
-			    ret);
-		dev_kfree_skb(skb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return ret;
 }
@@ -4020,61 +3823,6 @@ int ath11k_wmi_fils_discovery(struct ath11k *ar, u32 vdev_id, u32 interval,
 
 static void
 ath11k_wmi_obss_color_collision_event(struct ath11k_base *ab, struct sk_buff *skb)
-<<<<<<< HEAD
-{
-	const void **tb;
-	const struct wmi_obss_color_collision_event *ev;
-	struct ath11k_vif *arvif;
-	int ret;
-
-	tb = ath11k_wmi_tlv_parse_alloc(ab, skb->data, skb->len, GFP_ATOMIC);
-	if (IS_ERR(tb)) {
-		ret = PTR_ERR(tb);
-		ath11k_warn(ab, "failed to parse tlv: %d\n", ret);
-		return;
-	}
-
-	rcu_read_lock();
-
-	ev = tb[WMI_TAG_OBSS_COLOR_COLLISION_EVT];
-	if (!ev) {
-		ath11k_warn(ab, "failed to fetch obss color collision ev");
-		goto exit;
-	}
-
-	arvif = ath11k_mac_get_arvif_by_vdev_id(ab, ev->vdev_id);
-	if (!arvif) {
-		ath11k_warn(ab, "failed to find arvif with vedv id %d in obss_color_collision_event\n",
-			    ev->vdev_id);
-		goto exit;
-	}
-
-	switch (ev->evt_type) {
-	case WMI_BSS_COLOR_COLLISION_DETECTION:
-		ieeee80211_obss_color_collision_notify(arvif->vif, ev->obss_color_bitmap,
-						       GFP_KERNEL);
-		ath11k_dbg(ab, ATH11K_DBG_WMI,
-			   "OBSS color collision detected vdev:%d, event:%d, bitmap:%08llx\n",
-			   ev->vdev_id, ev->evt_type, ev->obss_color_bitmap);
-		break;
-	case WMI_BSS_COLOR_COLLISION_DISABLE:
-	case WMI_BSS_COLOR_FREE_SLOT_TIMER_EXPIRY:
-	case WMI_BSS_COLOR_FREE_SLOT_AVAILABLE:
-		break;
-	default:
-		ath11k_warn(ab, "received unknown obss color collision detection event\n");
-	}
-
-exit:
-	kfree(tb);
-	rcu_read_unlock();
-}
-
-static void
-ath11k_fill_band_to_mac_param(struct ath11k_base  *soc,
-			      struct wmi_host_pdev_band_to_mac *band_to_mac)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const void **tb;
 	const struct wmi_obss_color_collision_event *ev;
@@ -6240,67 +5988,6 @@ static int ath11k_wmi_tlv_fw_stats_data_parse(struct ath11k_base *ab,
 exit:
 	rcu_read_unlock();
 	return ret;
-<<<<<<< HEAD
-=======
-}
-
-static int ath11k_wmi_tlv_fw_stats_parse(struct ath11k_base *ab,
-					 u16 tag, u16 len,
-					 const void *ptr, void *data)
-{
-	struct wmi_tlv_fw_stats_parse *parse = data;
-	int ret = 0;
-
-	switch (tag) {
-	case WMI_TAG_STATS_EVENT:
-		parse->ev = (struct wmi_stats_event *)ptr;
-		parse->stats->pdev_id = parse->ev->pdev_id;
-		break;
-	case WMI_TAG_ARRAY_BYTE:
-		ret = ath11k_wmi_tlv_fw_stats_data_parse(ab, parse, ptr, len);
-		break;
-	case WMI_TAG_PER_CHAIN_RSSI_STATS:
-		parse->rssi = (struct wmi_per_chain_rssi_stats *)ptr;
-
-		if (parse->ev->stats_id & WMI_REQUEST_RSSI_PER_CHAIN_STAT)
-			parse->rssi_num = parse->rssi->num_per_chain_rssi_stats;
-
-		ath11k_dbg(ab, ATH11K_DBG_WMI,
-			   "wmi stats id 0x%x num chain %d\n",
-			   parse->ev->stats_id,
-			   parse->rssi_num);
-		break;
-	case WMI_TAG_ARRAY_STRUCT:
-		if (parse->rssi_num && !parse->chain_rssi_done) {
-			ret = ath11k_wmi_tlv_iter(ab, ptr, len,
-						  ath11k_wmi_tlv_rssi_chain_parse,
-						  parse);
-			if (ret) {
-				ath11k_warn(ab, "failed to parse rssi chain %d\n",
-					    ret);
-				return ret;
-			}
-			parse->chain_rssi_done = true;
-		}
-		break;
-	default:
-		break;
-	}
-	return ret;
-}
-
-int ath11k_wmi_pull_fw_stats(struct ath11k_base *ab, struct sk_buff *skb,
-			     struct ath11k_fw_stats *stats)
-{
-	struct wmi_tlv_fw_stats_parse parse = { };
-
-	stats->stats_id = 0;
-	parse.stats = stats;
-
-	return ath11k_wmi_tlv_iter(ab, skb->data, skb->len,
-				   ath11k_wmi_tlv_fw_stats_parse,
-				   &parse);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ath11k_wmi_tlv_fw_stats_parse(struct ath11k_base *ab,
@@ -6452,15 +6139,9 @@ ath11k_wmi_fw_pdev_tx_stats_fill(const struct ath11k_fw_stats_pdev *pdev,
 			 "PPDUs cleaned", pdev->tx_abort);
 	len += scnprintf(buf + len, buf_len - len, "%30s %10d\n",
 			 "MPDUs requeued", pdev->mpdus_requeued);
-<<<<<<< HEAD
 	len += scnprintf(buf + len, buf_len - len, "%30s %10u\n",
 			 "PPDU OK", pdev->tx_ko);
 	len += scnprintf(buf + len, buf_len - len, "%30s %10u\n",
-=======
-	len += scnprintf(buf + len, buf_len - len, "%30s %10u\n",
-			 "PPDU OK", pdev->tx_ko);
-	len += scnprintf(buf + len, buf_len - len, "%30s %10u\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 "Excessive retries", pdev->tx_xretry);
 	len += scnprintf(buf + len, buf_len - len, "%30s %10u\n",
 			 "HW rate", pdev->data_rc);
@@ -7119,7 +6800,6 @@ static void ath11k_bcn_tx_status_event(struct ath11k_base *ab, struct sk_buff *s
 	}
 	ath11k_mac_bcn_tx_event(arvif);
 	rcu_read_unlock();
-<<<<<<< HEAD
 }
 
 static void ath11k_wmi_event_peer_sta_ps_state_chg(struct ath11k_base *ab,
@@ -7221,8 +6901,6 @@ out:
 exit:
 	rcu_read_unlock();
 	kfree(tb);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ath11k_vdev_stopped_event(struct ath11k_base *ab, struct sk_buff *skb)
@@ -8253,7 +7931,6 @@ static const char *ath11k_wmi_twt_add_dialog_event_status(u32 status)
 		return "unknown error";
 	}
 }
-<<<<<<< HEAD
 
 static void ath11k_wmi_twt_add_dialog_event(struct ath11k_base *ab,
 					    struct sk_buff *skb)
@@ -8261,103 +7938,6 @@ static void ath11k_wmi_twt_add_dialog_event(struct ath11k_base *ab,
 	const void **tb;
 	const struct wmi_twt_add_dialog_event *ev;
 	int ret;
-=======
-
-static void ath11k_wmi_twt_add_dialog_event(struct ath11k_base *ab,
-					    struct sk_buff *skb)
-{
-	const void **tb;
-	const struct wmi_twt_add_dialog_event *ev;
-	int ret;
-
-	tb = ath11k_wmi_tlv_parse_alloc(ab, skb->data, skb->len, GFP_ATOMIC);
-	if (IS_ERR(tb)) {
-		ret = PTR_ERR(tb);
-		ath11k_warn(ab,
-			    "failed to parse wmi twt add dialog status event tlv: %d\n",
-			    ret);
-		return;
-	}
-
-	ev = tb[WMI_TAG_TWT_ADD_DIALOG_COMPLETE_EVENT];
-	if (!ev) {
-		ath11k_warn(ab, "failed to fetch twt add dialog wmi event\n");
-		goto exit;
-	}
-
-	if (ev->status)
-		ath11k_warn(ab,
-			    "wmi add twt dialog event vdev %d dialog id %d status %s\n",
-			    ev->vdev_id, ev->dialog_id,
-			    ath11k_wmi_twt_add_dialog_event_status(ev->status));
-
-exit:
-	kfree(tb);
-}
-
-static void ath11k_wmi_gtk_offload_status_event(struct ath11k_base *ab,
-						struct sk_buff *skb)
-{
-	const void **tb;
-	const struct wmi_gtk_offload_status_event *ev;
-	struct ath11k_vif *arvif;
-	__be64 replay_ctr_be;
-	u64    replay_ctr;
-	int ret;
-
-	tb = ath11k_wmi_tlv_parse_alloc(ab, skb->data, skb->len, GFP_ATOMIC);
-	if (IS_ERR(tb)) {
-		ret = PTR_ERR(tb);
-		ath11k_warn(ab, "failed to parse tlv: %d\n", ret);
-		return;
-	}
-
-	ev = tb[WMI_TAG_GTK_OFFLOAD_STATUS_EVENT];
-	if (!ev) {
-		ath11k_warn(ab, "failed to fetch gtk offload status ev");
-		kfree(tb);
-		return;
-	}
-
-	arvif = ath11k_mac_get_arvif_by_vdev_id(ab, ev->vdev_id);
-	if (!arvif) {
-		ath11k_warn(ab, "failed to get arvif for vdev_id:%d\n",
-			    ev->vdev_id);
-		kfree(tb);
-		return;
-	}
-
-	ath11k_dbg(ab, ATH11K_DBG_WMI, "wmi gtk offload event refresh_cnt %d\n",
-		   ev->refresh_cnt);
-	ath11k_dbg_dump(ab, ATH11K_DBG_WMI, "replay_cnt",
-			NULL, ev->replay_ctr.counter, GTK_REPLAY_COUNTER_BYTES);
-
-	replay_ctr =  ev->replay_ctr.word1;
-	replay_ctr = (replay_ctr << 32) | ev->replay_ctr.word0;
-	arvif->rekey_data.replay_ctr = replay_ctr;
-
-	/* supplicant expects big-endian replay counter */
-	replay_ctr_be = cpu_to_be64(replay_ctr);
-
-	ieee80211_gtk_rekey_notify(arvif->vif, arvif->bssid,
-				   (void *)&replay_ctr_be, GFP_ATOMIC);
-
-	kfree(tb);
-}
-
-static void ath11k_wmi_tlv_op_rx(struct ath11k_base *ab, struct sk_buff *skb)
-{
-	struct wmi_cmd_hdr *cmd_hdr;
-	enum wmi_tlv_event_id id;
-
-	cmd_hdr = (struct wmi_cmd_hdr *)skb->data;
-	id = FIELD_GET(WMI_CMD_HDR_CMD_ID, (cmd_hdr->cmd_id));
-
-	trace_ath11k_wmi_event(ab, id, skb->data, skb->len);
-
-	if (skb_pull(skb, sizeof(struct wmi_cmd_hdr)) == NULL)
-		goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	tb = ath11k_wmi_tlv_parse_alloc(ab, skb->data, skb->len, GFP_ATOMIC);
 	if (IS_ERR(tb)) {
@@ -8562,12 +8142,9 @@ static void ath11k_wmi_tlv_op_rx(struct ath11k_base *ab, struct sk_buff *skb)
 	case WMI_DIAG_EVENTID:
 		ath11k_wmi_diag_event(ab, skb);
 		break;
-<<<<<<< HEAD
 	case WMI_PEER_STA_PS_STATECHG_EVENTID:
 		ath11k_wmi_event_peer_sta_ps_state_chg(ab, skb);
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case WMI_GTK_OFFLOAD_STATUS_EVENTID:
 		ath11k_wmi_gtk_offload_status_event(ab, skb);
 		break;

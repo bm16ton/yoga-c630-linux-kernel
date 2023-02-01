@@ -490,17 +490,6 @@ static inline struct pwm_device *pwm_get(struct device *dev,
 					 const char *consumer)
 {
 	might_sleep();
-<<<<<<< HEAD
-=======
-	return ERR_PTR(-ENODEV);
-}
-
-static inline struct pwm_device *of_pwm_get(struct device *dev,
-					    struct device_node *np,
-					    const char *con_id)
-{
-	might_sleep();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ERR_PTR(-ENODEV);
 }
 
@@ -513,17 +502,6 @@ static inline struct pwm_device *devm_pwm_get(struct device *dev,
 					      const char *consumer)
 {
 	might_sleep();
-<<<<<<< HEAD
-=======
-	return ERR_PTR(-ENODEV);
-}
-
-static inline struct pwm_device *devm_of_pwm_get(struct device *dev,
-						 struct device_node *np,
-						 const char *con_id)
-{
-	might_sleep();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ERR_PTR(-ENODEV);
 }
 

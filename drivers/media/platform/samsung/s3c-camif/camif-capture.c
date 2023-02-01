@@ -848,21 +848,13 @@ static int s3c_camif_streamon(struct file *file, void *priv,
 	if (s3c_vp_active(vp))
 		return 0;
 
-<<<<<<< HEAD
 	ret = media_pipeline_start(sensor->pads, camif->m_pipeline);
-=======
-	ret = media_pipeline_start(sensor, camif->m_pipeline);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		return ret;
 
 	ret = camif_pipeline_validate(camif);
 	if (ret < 0) {
-<<<<<<< HEAD
 		media_pipeline_stop(sensor->pads);
-=======
-		media_pipeline_stop(sensor);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 
@@ -886,11 +878,7 @@ static int s3c_camif_streamoff(struct file *file, void *priv,
 
 	ret = vb2_streamoff(&vp->vb_queue, type);
 	if (ret == 0)
-<<<<<<< HEAD
 		media_pipeline_stop(camif->sensor.sd->entity.pads);
-=======
-		media_pipeline_stop(&camif->sensor.sd->entity);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 

@@ -25,7 +25,6 @@
 
 #include "dasd_int.h"
 
-<<<<<<< HEAD
 static unsigned int queue_depth = 32;
 static unsigned int nr_hw_queues = 4;
 
@@ -34,9 +33,6 @@ MODULE_PARM_DESC(queue_depth, "Default queue depth for new DASD devices");
 
 module_param(nr_hw_queues, uint, 0444);
 MODULE_PARM_DESC(nr_hw_queues, "Default number of hardware queues for new DASD devices");
-=======
-static struct lock_class_key dasd_bio_compl_lkclass;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Allocate and register gendisk structure for device.
@@ -52,7 +48,6 @@ int dasd_gendisk_alloc(struct dasd_block *block)
 	if (base->devindex >= DASD_PER_MAJOR)
 		return -EBUSY;
 
-<<<<<<< HEAD
 	block->tag_set.ops = &dasd_mq_ops;
 	block->tag_set.cmd_size = sizeof(struct dasd_ccw_req);
 	block->tag_set.nr_hw_queues = nr_hw_queues;
@@ -68,12 +63,6 @@ int dasd_gendisk_alloc(struct dasd_block *block)
 		blk_mq_free_tag_set(&block->tag_set);
 		return PTR_ERR(gdp);
 	}
-=======
-	gdp = blk_mq_alloc_disk_for_queue(block->request_queue,
-					  &dasd_bio_compl_lkclass);
-	if (!gdp)
-		return -ENOMEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Initialize gendisk structure. */
 	gdp->major = DASD_MAJOR;

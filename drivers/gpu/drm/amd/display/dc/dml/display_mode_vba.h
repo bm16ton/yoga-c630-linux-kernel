@@ -1154,11 +1154,7 @@ struct vba_vars_st {
 	double UrgBurstFactorLumaPre[DC__NUM_DPP__MAX];
 	double UrgBurstFactorChromaPre[DC__NUM_DPP__MAX];
 	bool NotUrgentLatencyHidingPre[DC__NUM_DPP__MAX];
-<<<<<<< HEAD
 	bool LinkCapacitySupport[DC__VOLTAGE_STATES];
-=======
-	bool LinkCapacitySupport[DC__NUM_DPP__MAX];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool VREADY_AT_OR_AFTER_VSYNC[DC__NUM_DPP__MAX];
 	unsigned int MIN_DST_Y_NEXT_START[DC__NUM_DPP__MAX];
 	unsigned int VFrontPorch[DC__NUM_DPP__MAX];
@@ -1229,10 +1225,7 @@ struct vba_vars_st {
 	unsigned int BlockWidthC[DC__NUM_DPP__MAX];
 	unsigned int SubViewportLinesNeededInMALL[DC__NUM_DPP__MAX];
 	bool VActiveBandwithSupport[DC__VOLTAGE_STATES][2];
-<<<<<<< HEAD
 	bool NotEnoughDETSwathFillLatencyHidingPerState[DC__VOLTAGE_STATES][2];
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dummy_vars dummy_vars;
 };
 

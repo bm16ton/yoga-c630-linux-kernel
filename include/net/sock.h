@@ -348,10 +348,7 @@ struct sk_filter;
   *	@sk_txtime_report_errors: set report errors mode for SO_TXTIME
   *	@sk_txtime_unused: unused txtime flags
   *	@ns_tracker: tracker for netns reference
-<<<<<<< HEAD
   *	@sk_bind2_node: bind node in the bhash2 table
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   */
 struct sock {
 	/*
@@ -541,10 +538,7 @@ struct sock {
 #endif
 	struct rcu_head		sk_rcu;
 	netns_tracker		ns_tracker;
-<<<<<<< HEAD
 	struct hlist_node	sk_bind2_node;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum sk_pacing {

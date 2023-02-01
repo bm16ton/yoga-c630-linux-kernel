@@ -290,7 +290,6 @@ static int sun4i_usb_phy_init(struct phy *_phy)
 		return ret;
 	}
 
-<<<<<<< HEAD
 	/* Some PHYs on some SoCs need the help of PHY2 to work. */
 	if (data->cfg->needs_phy2_siddq && phy->index != 2) {
 		struct sun4i_usb_phy *phy2 = &data->phys[2];
@@ -335,8 +334,6 @@ static int sun4i_usb_phy_init(struct phy *_phy)
 		clk_disable_unprepare(phy->clk2);
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (phy->pmu && data->cfg->hci_phy_ctl_clear) {
 		val = readl(phy->pmu + REG_HCI_PHY_CTL);
 		val &= ~data->cfg->hci_phy_ctl_clear;

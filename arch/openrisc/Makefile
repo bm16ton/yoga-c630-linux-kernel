@@ -54,11 +54,6 @@ endif
 ifeq ($(CONFIG_OPENRISC_HAVE_INST_SEXT),y)
 	KBUILD_CFLAGS += $(call cc-option,-msext)
 endif
-<<<<<<< HEAD
-=======
-
-head-y 		:= arch/openrisc/kernel/head.o
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 libs-y		+= $(LIBGCC)
 

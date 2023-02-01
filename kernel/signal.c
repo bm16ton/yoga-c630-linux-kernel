@@ -2305,11 +2305,7 @@ static int ptrace_stop(int exit_code, int why, unsigned long message,
 	read_unlock(&tasklist_lock);
 	cgroup_enter_frozen();
 	preempt_enable_no_resched();
-<<<<<<< HEAD
 	schedule();
-=======
-	freezable_schedule();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cgroup_leave_frozen(true);
 
 	/*

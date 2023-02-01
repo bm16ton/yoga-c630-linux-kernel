@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Copyright (C) 2021, Intel Corporation. */
 
-<<<<<<< HEAD
 #include <linux/delay.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "ice_common.h"
 #include "ice_ptp_hw.h"
 #include "ice_ptp_consts.h"
@@ -2591,7 +2588,6 @@ static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
 }
 
 /**
-<<<<<<< HEAD
  * ice_read_phy_tstamp_ll_e810 - Read a PHY timestamp registers through the FW
  * @hw: pointer to the HW struct
  * @idx: the timestamp index to read
@@ -2655,45 +2651,19 @@ ice_read_phy_tstamp_sbq_e810(struct ice_hw *hw, u8 lport, u8 idx, u8 *hi,
 	int err;
 
 	err = ice_read_phy_reg_e810(hw, lo_addr, &lo_val);
-=======
- * ice_read_phy_tstamp_e810 - Read a PHY timestamp out of the external PHY
- * @hw: pointer to the HW struct
- * @lport: the lport to read from
- * @idx: the timestamp index to read
- * @tstamp: on return, the 40bit timestamp value
- *
- * Read a 40bit timestamp value out of the timestamp block of the external PHY
- * on the E810 device.
- */
-static int
-ice_read_phy_tstamp_e810(struct ice_hw *hw, u8 lport, u8 idx, u64 *tstamp)
-{
-	u32 lo_addr, hi_addr, lo, hi;
-	int err;
-
-	lo_addr = TS_EXT(LOW_TX_MEMORY_BANK_START, lport, idx);
-	hi_addr = TS_EXT(HIGH_TX_MEMORY_BANK_START, lport, idx);
-
-	err = ice_read_phy_reg_e810(hw, lo_addr, &lo);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err) {
 		ice_debug(hw, ICE_DBG_PTP, "Failed to read low PTP timestamp register, err %d\n",
 			  err);
 		return err;
 	}
 
-<<<<<<< HEAD
 	err = ice_read_phy_reg_e810(hw, hi_addr, &hi_val);
-=======
-	err = ice_read_phy_reg_e810(hw, hi_addr, &hi);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err) {
 		ice_debug(hw, ICE_DBG_PTP, "Failed to read high PTP timestamp register, err %d\n",
 			  err);
 		return err;
 	}
 
-<<<<<<< HEAD
 	*lo = lo_val;
 	*hi = (u8)hi_val;
 
@@ -2725,8 +2695,6 @@ ice_read_phy_tstamp_e810(struct ice_hw *hw, u8 lport, u8 idx, u64 *tstamp)
 	if (err)
 		return err;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* For E810 devices, the timestamp is reported with the lower 32 bits
 	 * in the low register, and the upper 8 bits in the high register.
 	 */

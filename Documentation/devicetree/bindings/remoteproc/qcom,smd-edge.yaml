@@ -13,20 +13,16 @@ description:
   Qualcomm SMD subnode represents a remote subsystem or a remote processor of
   some sort - or in SMD language an "edge". The name of the edges are not
   important.
-<<<<<<< HEAD
 
   In turn, subnodes of the "edges" represent devices tied to SMD channels on
   that "edge". The names of the devices are not important. The properties of
   these nodes are defined by the individual bindings for the SMD devices.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   See also Documentation/devicetree/bindings/soc/qcom/qcom,smd.yaml
 
 properties:
   $nodename:
     const: "smd-edge"
 
-<<<<<<< HEAD
   apr:
     $ref: /schemas/soc/qcom/qcom,apr.yaml#
     required:
@@ -41,8 +37,6 @@ properties:
     description:
       Qualcomm FastRPC
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   interrupts:
     maxItems: 1
 
@@ -80,7 +74,6 @@ properties:
       The identifier for the remote processor as known by the rest of the
       system.
 
-<<<<<<< HEAD
   rpm-requests:
     $ref: /schemas/soc/qcom/qcom,smd-rpm.yaml#
     required:
@@ -95,8 +88,6 @@ properties:
     description:
       Qualcomm WCNSS for Bluetooth, WiFi and FM radio.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - interrupts
   - qcom,smd-edge
@@ -107,11 +98,7 @@ oneOf:
   - required:
       - qcom,ipc
 
-<<<<<<< HEAD
 additionalProperties: false
-=======
-additionalProperties: true
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

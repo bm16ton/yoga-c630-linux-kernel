@@ -41,17 +41,11 @@
 
 #include "i915_drv.h"
 #include "i915_reg.h"
-<<<<<<< HEAD
 #include "intel_de.h"
 #include "intel_display_types.h"
 #include "intel_dsi.h"
 #include "intel_dsi_vbt.h"
 #include "intel_gmbus_regs.h"
-=======
-#include "intel_display_types.h"
-#include "intel_dsi.h"
-#include "intel_dsi_vbt.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "vlv_dsi.h"
 #include "vlv_dsi_regs.h"
 #include "vlv_sideband.h"
@@ -145,15 +139,9 @@ static enum port intel_dsi_seq_port_to_port(struct intel_dsi *intel_dsi,
 		return ffs(intel_dsi->ports) - 1;
 
 	if (seq_port) {
-<<<<<<< HEAD
 		if (intel_dsi->ports & BIT(PORT_B))
 			return PORT_B;
 		else if (intel_dsi->ports & BIT(PORT_C))
-=======
-		if (intel_dsi->ports & PORT_B)
-			return PORT_B;
-		else if (intel_dsi->ports & PORT_C)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return PORT_C;
 	}
 
@@ -479,11 +467,6 @@ static const u8 *mipi_exec_gpio(struct intel_dsi *intel_dsi, const u8 *data)
 	bool value;
 	bool native = DISPLAY_VER(dev_priv) >= 11;
 
-<<<<<<< HEAD
-=======
-	drm_dbg_kms(&dev_priv->drm, "\n");
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (connector->panel.vbt.dsi.seq_version >= 3)
 		gpio_index = *data++;
 
@@ -501,16 +484,12 @@ static const u8 *mipi_exec_gpio(struct intel_dsi *intel_dsi, const u8 *data)
 	/* pull up/down */
 	value = *data++ & 1;
 
-<<<<<<< HEAD
 	drm_dbg_kms(&dev_priv->drm, "GPIO index %u, number %u, source %u, native %s, set to %s\n",
 		    gpio_index, gpio_number, gpio_source, str_yes_no(native), str_on_off(value));
 
 	if (native)
 		icl_native_gpio_set_value(dev_priv, gpio_number, value);
 	else if (DISPLAY_VER(dev_priv) >= 11)
-=======
-	if (DISPLAY_VER(dev_priv) >= 11)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		icl_exec_gpio(connector, gpio_source, gpio_index, value);
 	else if (IS_VALLEYVIEW(dev_priv))
 		vlv_exec_gpio(connector, gpio_source, gpio_number, value);

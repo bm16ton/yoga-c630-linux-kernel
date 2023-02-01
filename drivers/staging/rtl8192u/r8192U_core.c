@@ -4639,7 +4639,6 @@ static int __init rtl8192_usb_module_init(void)
 	RT_TRACE(COMP_INIT, "Initializing module");
 	RT_TRACE(COMP_INIT, "Wireless extensions version %d", WIRELESS_EXT);
 
-<<<<<<< HEAD
 	ret = register_netdevice_notifier(&rtl8192_usb_netdev_notifier);
 	if (ret) {
 		pr_err("register_netdevice_notifier failed %d\n", ret);
@@ -4647,8 +4646,6 @@ static int __init rtl8192_usb_module_init(void)
 	}
 
 	rtl8192_debugfs_init();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ieee80211_debug_init();
 	if (ret) {
 		pr_err("ieee80211_debug_init() failed %d\n", ret);
@@ -4679,23 +4676,12 @@ static int __init rtl8192_usb_module_init(void)
 		goto crypto_ccmp_exit;
 	}
 
-<<<<<<< HEAD
 	ret = usb_register(&rtl8192_usb_driver);
 	if (ret)
 		goto crypto_wep_exit;
 	return ret;
 
 crypto_wep_exit:
-=======
-	rtl8192_proc_module_init();
-	ret = usb_register(&rtl8192_usb_driver);
-	if (ret)
-		goto rtl8192_proc_module_exit;
-	return ret;
-
-rtl8192_proc_module_exit:
-	remove_proc_entry(RTL819XU_MODULE_NAME, init_net.proc_net);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ieee80211_crypto_wep_exit();
 crypto_ccmp_exit:
 	ieee80211_crypto_ccmp_exit();
@@ -4705,32 +4691,22 @@ crypto_exit:
 	ieee80211_crypto_deinit();
 debug_exit:
 	ieee80211_debug_exit();
-<<<<<<< HEAD
 debugfs_exit:
 	rtl8192_debugfs_exit();
 	unregister_netdevice_notifier(&rtl8192_usb_netdev_notifier);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
 static void __exit rtl8192_usb_module_exit(void)
 {
 	usb_deregister(&rtl8192_usb_driver);
-<<<<<<< HEAD
-=======
-	remove_proc_entry(RTL819XU_MODULE_NAME, init_net.proc_net);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ieee80211_crypto_wep_exit();
 	ieee80211_crypto_ccmp_exit();
 	ieee80211_crypto_tkip_exit();
 	ieee80211_crypto_deinit();
 	ieee80211_debug_exit();
-<<<<<<< HEAD
 	rtl8192_debugfs_exit();
 	unregister_netdevice_notifier(&rtl8192_usb_netdev_notifier);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	RT_TRACE(COMP_DOWN, "Exiting");
 }
 

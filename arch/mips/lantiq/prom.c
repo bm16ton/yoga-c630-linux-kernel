@@ -92,7 +92,6 @@ void __init plat_mem_setup(void)
 	__dt_setup_arch(dtb);
 }
 
-<<<<<<< HEAD
 #if defined(CONFIG_MIPS_MT_SMP)
 static void lantiq_init_secondary(void)
 {
@@ -104,8 +103,6 @@ static void lantiq_init_secondary(void)
 }
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void __init prom_init(void)
 {
 	/* call the soc specific detetcion code and get it to fill soc_info */

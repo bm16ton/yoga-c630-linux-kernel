@@ -203,7 +203,6 @@ static inline bool is_cxl(struct acpi_pci_root *root)
 
 static u8 pci_osc_uuid_str[] = "33DB4D5B-1FF7-401C-9657-7441C03DD766";
 static u8 cxl_osc_uuid_str[] = "68F2D50B-C469-4d8A-BD3D-941A103FD3FC";
-<<<<<<< HEAD
 
 static char *to_uuid(struct acpi_pci_root *root)
 {
@@ -212,16 +211,6 @@ static char *to_uuid(struct acpi_pci_root *root)
 	return pci_osc_uuid_str;
 }
 
-=======
-
-static char *to_uuid(struct acpi_pci_root *root)
-{
-	if (is_cxl(root))
-		return cxl_osc_uuid_str;
-	return pci_osc_uuid_str;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int cap_length(struct acpi_pci_root *root)
 {
 	if (is_cxl(root))

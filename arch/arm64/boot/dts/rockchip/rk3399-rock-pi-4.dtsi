@@ -74,11 +74,7 @@
 		};
 	};
 
-<<<<<<< HEAD
 	vbus_typec: vbus-typec-regulator {
-=======
-	vcc12v_dcin: dc-12v {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		compatible = "regulator-fixed";
 		enable-active-high;
 		gpio = <&gpio1 RK_PA3 GPIO_ACTIVE_HIGH>;
@@ -522,11 +518,6 @@
 &io_domains {
 	audio-supply = <&vcca1v8_codec>;
 	bt656-supply = <&vcc_3v0>;
-<<<<<<< HEAD
-=======
-	audio-supply = <&vcc1v8_codec>;
-	sdmmc-supply = <&vcc_sdio>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpio1830-supply = <&vcc_3v0>;
 	sdmmc-supply = <&vcc_sdio>;
 	status = "okay";
@@ -565,19 +556,6 @@
 	es8316 {
 		hp_detect: hp-detect {
 			rockchip,pins = <1 RK_PA0 RK_FUNC_GPIO &pcfg_pull_none>;
-<<<<<<< HEAD
-=======
-		};
-
-		hp_int: hp-int {
-			rockchip,pins = <1 RK_PA1 RK_FUNC_GPIO &pcfg_pull_up>;
-		};
-	};
-
-	pcie {
-		pcie_pwr_en: pcie-pwr-en {
-			rockchip,pins = <2 RK_PD2 RK_FUNC_GPIO &pcfg_pull_none>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		hp_int: hp-int {
@@ -699,15 +677,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdmmc_clk &sdmmc_cd &sdmmc_cmd &sdmmc_bus4>;
 	status = "okay";
-};
-
-&spdif {
-
-	spdif_p0: port {
-		spdif_p0_0: endpoint {
-			remote-endpoint = <&dit_p0_0>;
-		};
-	};
 };
 
 &spdif {

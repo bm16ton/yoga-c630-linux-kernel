@@ -619,10 +619,6 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
 #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
 #define blk_queue_pm_only(q)	atomic_read(&(q)->pm_only)
 #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
-<<<<<<< HEAD
-=======
-#define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
 
 extern void blk_set_pm_only(struct request_queue *q);
@@ -1043,7 +1039,6 @@ static inline void blk_start_plug_nr_ios(struct blk_plug *plug,
 }
 
 static inline void blk_start_plug(struct blk_plug *plug)
-<<<<<<< HEAD
 {
 }
 
@@ -1055,19 +1050,6 @@ static inline void blk_flush_plug(struct blk_plug *plug, bool async)
 {
 }
 
-=======
-{
-}
-
-static inline void blk_finish_plug(struct blk_plug *plug)
-{
-}
-
-static inline void blk_flush_plug(struct blk_plug *plug, bool async)
-{
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline int blkdev_issue_flush(struct block_device *bdev)
 {
 	return 0;
@@ -1249,7 +1231,6 @@ bdev_zone_write_granularity(struct block_device *bdev)
 
 int bdev_alignment_offset(struct block_device *bdev);
 unsigned int bdev_discard_alignment(struct block_device *bdev);
-<<<<<<< HEAD
 
 static inline unsigned int bdev_max_discard_sectors(struct block_device *bdev)
 {
@@ -1301,54 +1282,6 @@ static inline bool bdev_fua(struct block_device *bdev)
 static inline bool bdev_nowait(struct block_device *bdev)
 {
 	return test_bit(QUEUE_FLAG_NOWAIT, &bdev_get_queue(bdev)->queue_flags);
-=======
-
-static inline unsigned int bdev_max_discard_sectors(struct block_device *bdev)
-{
-	return bdev_get_queue(bdev)->limits.max_discard_sectors;
-}
-
-static inline unsigned int bdev_discard_granularity(struct block_device *bdev)
-{
-	return bdev_get_queue(bdev)->limits.discard_granularity;
-}
-
-static inline unsigned int
-bdev_max_secure_erase_sectors(struct block_device *bdev)
-{
-	return bdev_get_queue(bdev)->limits.max_secure_erase_sectors;
-}
-
-static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev)
-{
-	struct request_queue *q = bdev_get_queue(bdev);
-
-	if (q)
-		return q->limits.max_write_zeroes_sectors;
-
-	return 0;
-}
-
-static inline bool bdev_nonrot(struct block_device *bdev)
-{
-	return blk_queue_nonrot(bdev_get_queue(bdev));
-}
-
-static inline bool bdev_stable_writes(struct block_device *bdev)
-{
-	return test_bit(QUEUE_FLAG_STABLE_WRITES,
-			&bdev_get_queue(bdev)->queue_flags);
-}
-
-static inline bool bdev_write_cache(struct block_device *bdev)
-{
-	return test_bit(QUEUE_FLAG_WC, &bdev_get_queue(bdev)->queue_flags);
-}
-
-static inline bool bdev_fua(struct block_device *bdev)
-{
-	return test_bit(QUEUE_FLAG_FUA, &bdev_get_queue(bdev)->queue_flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
@@ -1377,7 +1310,6 @@ static inline bool bdev_op_is_zoned_write(struct block_device *bdev,
 	if (!bdev_is_zoned(bdev))
 		return false;
 
-<<<<<<< HEAD
 	return op == REQ_OP_WRITE || op == REQ_OP_WRITE_ZEROES;
 }
 
@@ -1397,20 +1329,6 @@ static inline int queue_dma_alignment(const struct request_queue *q)
 
 static inline unsigned int bdev_dma_alignment(struct block_device *bdev)
 {
-=======
-	if (!blk_queue_is_zoned(q))
-		return 0;
-	return q->limits.chunk_sectors;
-}
-
-static inline int queue_dma_alignment(const struct request_queue *q)
-{
-	return q ? q->limits.dma_alignment : 511;
-}
-
-static inline unsigned int bdev_dma_alignment(struct block_device *bdev)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return queue_dma_alignment(bdev_get_queue(bdev));
 }
 
@@ -1593,10 +1511,7 @@ int sync_blockdev(struct block_device *bdev);
 int sync_blockdev_range(struct block_device *bdev, loff_t lstart, loff_t lend);
 int sync_blockdev_nowait(struct block_device *bdev);
 void sync_bdevs(bool wait);
-<<<<<<< HEAD
 void bdev_statx_dioalign(struct inode *inode, struct kstat *stat);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void printk_all_partitions(void);
 #else
 static inline void invalidate_bdev(struct block_device *bdev)
@@ -1613,12 +1528,9 @@ static inline int sync_blockdev_nowait(struct block_device *bdev)
 static inline void sync_bdevs(bool wait)
 {
 }
-<<<<<<< HEAD
 static inline void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
 {
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void printk_all_partitions(void)
 {
 }

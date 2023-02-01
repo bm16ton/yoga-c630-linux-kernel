@@ -672,13 +672,6 @@ static void create_tasks(struct perf_sched *sched)
 	BUG_ON(err);
 	err = pthread_attr_setstacksize(&attr,
 			(size_t) max(16 * 1024, (int)PTHREAD_STACK_MIN));
-<<<<<<< HEAD
-=======
-	BUG_ON(err);
-	err = pthread_mutex_lock(&sched->start_work_mutex);
-	BUG_ON(err);
-	err = pthread_mutex_lock(&sched->work_done_wait_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	BUG_ON(err);
 	mutex_lock(&sched->start_work_mutex);
 	mutex_lock(&sched->work_done_wait_mutex);
@@ -3589,11 +3582,7 @@ int cmd_sched(int argc, const char **argv)
 		.fork_event	    = replay_fork_event,
 	};
 	unsigned int i;
-<<<<<<< HEAD
 	int ret = 0;
-=======
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_init(&sched.start_work_mutex);
 	mutex_init(&sched.work_done_wait_mutex);
@@ -3608,18 +3597,10 @@ int cmd_sched(int argc, const char **argv)
 	/*
 	 * Aliased to 'perf script' for now:
 	 */
-<<<<<<< HEAD
 	if (!strcmp(argv[0], "script")) {
 		ret = cmd_script(argc, argv);
 	} else if (strlen(argv[0]) > 2 && strstarts("record", argv[0])) {
 		ret = __cmd_record(argc, argv);
-=======
-	if (!strcmp(argv[0], "script"))
-		return cmd_script(argc, argv);
-
-	if (strlen(argv[0]) > 2 && strstarts("record", argv[0])) {
-		return __cmd_record(argc, argv);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (strlen(argv[0]) > 2 && strstarts("latency", argv[0])) {
 		sched.tp_handler = &lat_ops;
 		if (argc > 1) {
@@ -3637,11 +3618,7 @@ int cmd_sched(int argc, const char **argv)
 		}
 		sched.tp_handler = &map_ops;
 		setup_sorting(&sched, latency_options, latency_usage);
-<<<<<<< HEAD
 		ret = perf_sched__map(&sched);
-=======
-		return perf_sched__map(&sched);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (strlen(argv[0]) > 2 && strstarts("replay", argv[0])) {
 		sched.tp_handler = &replay_ops;
 		if (argc) {
@@ -3670,11 +3647,7 @@ int cmd_sched(int argc, const char **argv)
 		}
 		ret = symbol__validate_sym_arguments();
 		if (ret)
-<<<<<<< HEAD
 			goto out;
-=======
-			return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		ret = perf_sched__timehist(&sched);
 	} else {

@@ -242,13 +242,9 @@ static int imx8mp_icc_probe(struct platform_device *pdev)
 
 static int imx8mp_icc_remove(struct platform_device *pdev)
 {
-<<<<<<< HEAD
 	imx_icc_unregister(pdev);
 
 	return 0;
-=======
-	return imx_icc_unregister(pdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct platform_driver imx8mp_icc_driver = {

@@ -65,11 +65,7 @@
 
 .Lskip_spe_\@:
 	/* Trace buffer */
-<<<<<<< HEAD
 	ubfx	x0, x1, #ID_AA64DFR0_EL1_TraceBuffer_SHIFT, #4
-=======
-	ubfx	x0, x1, #ID_AA64DFR0_TRBE_SHIFT, #4
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cbz	x0, .Lskip_trace_\@		// Skip if TraceBuffer is not present
 
 	mrs_s	x0, SYS_TRBIDR_EL1
@@ -136,20 +132,12 @@
 /* Disable any fine grained traps */
 .macro __init_el2_fgt
 	mrs	x1, id_aa64mmfr0_el1
-<<<<<<< HEAD
 	ubfx	x1, x1, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
-=======
-	ubfx	x1, x1, #ID_AA64MMFR0_FGT_SHIFT, #4
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cbz	x1, .Lskip_fgt_\@
 
 	mov	x0, xzr
 	mrs	x1, id_aa64dfr0_el1
-<<<<<<< HEAD
 	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMSVer_SHIFT, #4
-=======
-	ubfx	x1, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cmp	x1, #3
 	b.lt	.Lset_debug_fgt_\@
 	/* Disable PMSNEVFR_EL1 read and write traps */
@@ -161,11 +149,7 @@
 
 	mov	x0, xzr
 	mrs	x1, id_aa64pfr1_el1
-<<<<<<< HEAD
 	ubfx	x1, x1, #ID_AA64PFR1_EL1_SME_SHIFT, #4
-=======
-	ubfx	x1, x1, #ID_AA64PFR1_SME_SHIFT, #4
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cbz	x1, .Lset_fgt_\@
 
 	/* Disable nVHE traps of TPIDR2 and SMPRI */
@@ -178,11 +162,7 @@
 	msr_s	SYS_HFGITR_EL2, xzr
 
 	mrs	x1, id_aa64pfr0_el1		// AMU traps UNDEF without AMU
-<<<<<<< HEAD
 	ubfx	x1, x1, #ID_AA64PFR0_EL1_AMU_SHIFT, #4
-=======
-	ubfx	x1, x1, #ID_AA64PFR0_AMU_SHIFT, #4
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cbz	x1, .Lskip_fgt_\@
 
 	msr_s	SYS_HAFGRTR_EL2, xzr

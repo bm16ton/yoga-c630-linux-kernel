@@ -15,11 +15,7 @@
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_managed.h>
 #include <drm/drm_vblank.h>
 
@@ -235,11 +231,7 @@ int rcar_du_vsp_map_fb(struct rcar_du_vsp *vsp, struct drm_framebuffer *fb,
 			}
 		} else {
 			ret = dma_get_sgtable(rcdu->dev, sgt, gem->vaddr,
-<<<<<<< HEAD
 					      gem->dma_addr, gem->base.size);
-=======
-					      gem->paddr, gem->base.size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (ret)
 				goto fail;
 		}
@@ -462,14 +454,11 @@ int rcar_du_vsp_init(struct rcar_du_vsp *vsp, struct device_node *np,
 		drm_plane_create_alpha_property(&plane->plane);
 		drm_plane_create_zpos_property(&plane->plane, i, 0,
 					       num_planes - 1);
-<<<<<<< HEAD
 
 		drm_plane_create_blend_mode_property(&plane->plane,
 					BIT(DRM_MODE_BLEND_PIXEL_NONE) |
 					BIT(DRM_MODE_BLEND_PREMULTI) |
 					BIT(DRM_MODE_BLEND_COVERAGE));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		vsp->num_planes++;
 	}

@@ -1028,21 +1028,12 @@ static void srp_del_scsi_host_attr(struct Scsi_Host *shost)
 {
 	const struct attribute_group **g;
 	struct attribute **attr;
-<<<<<<< HEAD
 
 	for (g = shost->hostt->shost_groups; *g; ++g) {
 		for (attr = (*g)->attrs; *attr; ++attr) {
 			struct device_attribute *dev_attr =
 				container_of(*attr, typeof(*dev_attr), attr);
 
-=======
-
-	for (g = shost->hostt->shost_groups; *g; ++g) {
-		for (attr = (*g)->attrs; *attr; ++attr) {
-			struct device_attribute *dev_attr =
-				container_of(*attr, typeof(*dev_attr), attr);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			device_remove_file(&shost->shost_dev, dev_attr);
 		}
 	}

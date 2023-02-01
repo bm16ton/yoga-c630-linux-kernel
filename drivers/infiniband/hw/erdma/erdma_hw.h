@@ -153,10 +153,7 @@ enum CMDQ_COMMON_OPCODE {
 	CMDQ_OPCODE_CREATE_EQ = 0,
 	CMDQ_OPCODE_DESTROY_EQ = 1,
 	CMDQ_OPCODE_QUERY_FW_INFO = 2,
-<<<<<<< HEAD
 	CMDQ_OPCODE_CONF_MTU = 3,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* cmdq-SQE HDR */
@@ -194,14 +191,11 @@ struct erdma_cmdq_destroy_eq_req {
 	u8 qtype;
 };
 
-<<<<<<< HEAD
 struct erdma_cmdq_config_mtu_req {
 	u64 hdr;
 	u32 mtu;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* create_cq cfg0 */
 #define ERDMA_CMD_CREATE_CQ_DEPTH_MASK GENMASK(31, 24)
 #define ERDMA_CMD_CREATE_CQ_PAGESIZE_MASK GENMASK(23, 20)
@@ -462,7 +456,6 @@ enum erdma_opcode {
 	ERDMA_OP_RECV_IMM = 5,
 	ERDMA_OP_RECV_INV = 6,
 
-<<<<<<< HEAD
 	ERDMA_OP_RSVD0 = 7,
 	ERDMA_OP_RSVD1 = 8,
 	ERDMA_OP_WRITE_WITH_IMM = 9,
@@ -470,15 +463,6 @@ enum erdma_opcode {
 	ERDMA_OP_RSVD2 = 10,
 	ERDMA_OP_RSVD3 = 11,
 
-=======
-	ERDMA_OP_REQ_ERR = 7,
-	ERDMA_OP_READ_RESPONSE = 8,
-	ERDMA_OP_WRITE_WITH_IMM = 9,
-
-	ERDMA_OP_RECV_ERR = 10,
-
-	ERDMA_OP_INVALIDATE = 11,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ERDMA_OP_RSP_SEND_IMM = 12,
 	ERDMA_OP_SEND_WITH_INV = 13,
 

@@ -671,13 +671,7 @@ int register_sja1000dev(struct net_device *dev)
 	set_reset_mode(dev);
 	chipset_init(dev);
 
-<<<<<<< HEAD
 	return register_candev(dev);
-=======
-	ret =  register_candev(dev);
-
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(register_sja1000dev);
 

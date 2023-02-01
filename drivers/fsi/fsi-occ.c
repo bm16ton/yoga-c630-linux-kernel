@@ -44,10 +44,7 @@ struct occ {
 	struct device *sbefifo;
 	char name[32];
 	int idx;
-<<<<<<< HEAD
 	bool platform_hwmon;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 sequence_number;
 	void *buffer;
 	void *client_buffer;
@@ -252,11 +249,7 @@ static int occ_verify_checksum(struct occ *occ, struct occ_response *resp,
 	if (checksum != checksum_resp) {
 		dev_err(occ->dev, "Bad checksum: %04x!=%04x\n", checksum,
 			checksum_resp);
-<<<<<<< HEAD
 		return -EBADE;
-=======
-		return -EBADMSG;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -502,7 +495,6 @@ int fsi_occ_submit(struct device *dev, const void *request, size_t req_len,
 	/* Checksum the request, ignoring first byte (sequence number). */
 	for (i = 1; i < req_len - 2; ++i)
 		checksum += byte_request[i];
-<<<<<<< HEAD
 
 	rc = mutex_lock_interruptible(&occ->occ_lock);
 	if (rc)
@@ -530,35 +522,6 @@ int fsi_occ_submit(struct device *dev, const void *request, size_t req_len,
 		occ->sequence_number = 1;
 	checksum += seq_no;
 
-=======
-
-	rc = mutex_lock_interruptible(&occ->occ_lock);
-	if (rc)
-		return rc;
-
-	occ->client_buffer = response;
-	occ->client_buffer_size = user_resp_len;
-	occ->client_response_size = 0;
-
-	if (!occ->buffer) {
-		rc = -ENOENT;
-		goto done;
-	}
-
-	/*
-	 * Get a sequence number and update the counter. Avoid a sequence
-	 * number of 0 which would pass the response check below even if the
-	 * OCC response is uninitialized. Any sequence number the user is
-	 * trying to send is overwritten since this function is the only common
-	 * interface to the OCC and therefore the only place we can guarantee
-	 * unique sequence numbers.
-	 */
-	seq_no = occ->sequence_number++;
-	if (!occ->sequence_number)
-		occ->sequence_number = 1;
-	checksum += seq_no;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = occ_putsram(occ, request, req_len, seq_no, checksum);
 	if (rc)
 		goto done;
@@ -622,16 +585,11 @@ int fsi_occ_submit(struct device *dev, const void *request, size_t req_len,
 	dev_dbg(dev, "resp_status=%02x resp_data_len=%d\n",
 		resp->return_status, resp_data_length);
 
-<<<<<<< HEAD
 	rc = occ_verify_checksum(occ, resp, resp_data_length);
 	if (rc)
 		goto done;
 
 	occ->client_response_size = resp_data_length + 7;
-=======
-	occ->client_response_size = resp_data_length + 7;
-	rc = occ_verify_checksum(occ, resp, resp_data_length);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
  done:
 	*resp_len = occ->client_response_size;
@@ -756,14 +714,10 @@ static int occ_remove(struct platform_device *pdev)
 	occ->buffer = NULL;
 	mutex_unlock(&occ->occ_lock);
 
-<<<<<<< HEAD
 	if (occ->platform_hwmon)
 		device_for_each_child(&pdev->dev, NULL, occ_unregister_platform_child);
 	else
 		device_for_each_child(&pdev->dev, NULL, occ_unregister_of_child);
-=======
-	device_for_each_child(&pdev->dev, NULL, occ_unregister_child);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ida_simple_remove(&occ_ida, occ->idx);
 

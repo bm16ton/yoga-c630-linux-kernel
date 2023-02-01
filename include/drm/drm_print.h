@@ -488,11 +488,7 @@ void __drm_dev_dbg(struct _ddebug *desc, const struct device *dev,
 
 #define drm_dbg_core(drm, fmt, ...)					\
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_CORE, fmt, ##__VA_ARGS__)
-<<<<<<< HEAD
 #define drm_dbg_driver(drm, fmt, ...)						\
-=======
-#define drm_dbg(drm, fmt, ...)						\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_DRIVER, fmt, ##__VA_ARGS__)
 #define drm_dbg_kms(drm, fmt, ...)					\
 	drm_dev_dbg((drm) ? (drm)->dev : NULL, DRM_UT_KMS, fmt, ##__VA_ARGS__)

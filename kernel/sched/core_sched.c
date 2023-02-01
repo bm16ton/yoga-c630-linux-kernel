@@ -88,11 +88,7 @@ static unsigned long sched_core_update_cookie(struct task_struct *p,
 	 * core has now entered/left forced idle state. Defer accounting to the
 	 * next scheduling edge, rather than always forcing a reschedule here.
 	 */
-<<<<<<< HEAD
 	if (task_on_cpu(rq, p))
-=======
-	if (task_running(rq, p))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		resched_curr(rq);
 
 	task_rq_unlock(rq, p, &rf);
@@ -209,11 +205,7 @@ int sched_core_share_pid(unsigned int cmd, pid_t pid, enum pid_type type,
 	default:
 		err = -EINVAL;
 		goto out;
-<<<<<<< HEAD
 	}
-=======
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (type == PIDTYPE_PID) {
 		__sched_core_set(task, cookie);

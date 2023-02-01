@@ -179,11 +179,7 @@ void dcn20_update_clocks_update_dentist(struct clk_mgr_internal *clk_mgr, struct
 	} else if (dispclk_wdivider == 127 && current_dispclk_wdivider != 127) {
 		REG_UPDATE(DENTIST_DISPCLK_CNTL,
 				DENTIST_DISPCLK_WDIVIDER, 126);
-<<<<<<< HEAD
 		REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_CHG_DONE, 1, 50, 2000);
-=======
-		REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_CHG_DONE, 1, 50, 100);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		for (i = 0; i < clk_mgr->base.ctx->dc->res_pool->pipe_count; i++) {
 			struct pipe_ctx *pipe_ctx = &context->res_ctx.pipe_ctx[i];
 			struct dccg *dccg = clk_mgr->base.ctx->dc->res_pool->dccg;
@@ -210,11 +206,7 @@ void dcn20_update_clocks_update_dentist(struct clk_mgr_internal *clk_mgr, struct
 
 	REG_UPDATE(DENTIST_DISPCLK_CNTL,
 			DENTIST_DISPCLK_WDIVIDER, dispclk_wdivider);
-<<<<<<< HEAD
 	REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_CHG_DONE, 1, 50, 2000);
-=======
-	REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_CHG_DONE, 1, 50, 1000);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	REG_UPDATE(DENTIST_DISPCLK_CNTL,
 			DENTIST_DPPCLK_WDIVIDER, dppclk_wdivider);
 	REG_WAIT(DENTIST_DISPCLK_CNTL, DENTIST_DPPCLK_CHG_DONE, 1, 5, 100);

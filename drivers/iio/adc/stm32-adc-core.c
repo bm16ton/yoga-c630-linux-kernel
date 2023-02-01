@@ -359,11 +359,7 @@ static void stm32_adc_irq_handler(struct irq_desc *desc)
 	 * before invoking the interrupt handler (e.g. call ISR only for
 	 * IRQ-enabled ADCs).
 	 */
-<<<<<<< HEAD
 	for (i = 0; i < priv->nb_adc_max; i++) {
-=======
-	for (i = 0; i < priv->cfg->num_adcs; i++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if ((status & priv->cfg->regs->eoc_msk[i] &&
 		     stm32_adc_eoc_enabled(priv, i)) ||
 		     (status & priv->cfg->regs->ovr_msk[i]))
@@ -713,10 +709,7 @@ static int stm32_adc_probe(struct platform_device *pdev)
 
 	priv->cfg = (const struct stm32_adc_priv_cfg *)
 		of_match_device(dev->driver->of_match_table, dev)->data;
-<<<<<<< HEAD
 	priv->nb_adc_max = priv->cfg->num_adcs;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_lock_init(&priv->common.lock);
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
@@ -873,7 +866,6 @@ static const struct stm32_adc_priv_cfg stm32mp1_adc_priv_cfg = {
 	.has_syscfg = HAS_VBOOSTER | HAS_ANASWVDD,
 	.ipid = STM32MP15_IPIDR_NUMBER,
 	.num_irqs = 2,
-	.num_adcs = 2,
 };
 
 static const struct of_device_id stm32_adc_of_match[] = {

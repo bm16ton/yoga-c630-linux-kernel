@@ -65,7 +65,6 @@ gfp_t rpc_task_gfp_mask(void)
 }
 EXPORT_SYMBOL_GPL(rpc_task_gfp_mask);
 
-<<<<<<< HEAD
 bool rpc_task_set_rpc_status(struct rpc_task *task, int rpc_status)
 {
 	if (cmpxchg(&task->tk_rpc_status, 0, rpc_status) == 0)
@@ -73,8 +72,6 @@ bool rpc_task_set_rpc_status(struct rpc_task *task, int rpc_status)
 	return false;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned long
 rpc_task_timeout(const struct rpc_task *task)
 {
@@ -289,7 +286,6 @@ static int rpc_wait_bit_killable(struct wait_bit_key *key, int mode)
 static void rpc_task_set_debuginfo(struct rpc_task *task)
 {
 	struct rpc_clnt *clnt = task->tk_client;
-<<<<<<< HEAD
 
 	/* Might be a task carrying a reverse-direction operation */
 	if (!clnt) {
@@ -299,17 +295,6 @@ static void rpc_task_set_debuginfo(struct rpc_task *task)
 		return;
 	}
 
-=======
-
-	/* Might be a task carrying a reverse-direction operation */
-	if (!clnt) {
-		static atomic_t rpc_pid;
-
-		task->tk_pid = atomic_inc_return(&rpc_pid);
-		return;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	task->tk_pid = atomic_inc_return(&clnt->cl_pid);
 }
 #else
@@ -969,17 +954,6 @@ static void __rpc_execute(struct rpc_task *task)
 		if (!RPC_IS_QUEUED(task)) {
 			cond_resched();
 			continue;
-<<<<<<< HEAD
-=======
-		}
-
-		/*
-		 * Signalled tasks should exit rather than sleep.
-		 */
-		if (RPC_SIGNALLED(task)) {
-			task->tk_rpc_status = -ERESTARTSYS;
-			rpc_exit(task, -ERESTARTSYS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		/*

@@ -112,11 +112,7 @@ choice
 
 	config IMA_DEFAULT_HASH_SM3
 		bool "SM3"
-<<<<<<< HEAD
 		depends on CRYPTO_SM3_GENERIC=y
-=======
-		depends on CRYPTO_SM3=y
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endchoice
 
 config IMA_DEFAULT_HASH

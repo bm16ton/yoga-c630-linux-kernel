@@ -561,47 +561,6 @@ static void sdma_v4_0_setup_ulv(struct amdgpu_device *adev)
 	}
 }
 
-<<<<<<< HEAD
-=======
-static int sdma_v4_0_init_inst_ctx(struct amdgpu_sdma_instance *sdma_inst)
-{
-	int err = 0;
-	const struct sdma_firmware_header_v1_0 *hdr;
-
-	err = amdgpu_ucode_validate(sdma_inst->fw);
-	if (err)
-		return err;
-
-	hdr = (const struct sdma_firmware_header_v1_0 *)sdma_inst->fw->data;
-	sdma_inst->fw_version = le32_to_cpu(hdr->header.ucode_version);
-	sdma_inst->feature_version = le32_to_cpu(hdr->ucode_feature_version);
-
-	if (sdma_inst->feature_version >= 20)
-		sdma_inst->burst_nop = true;
-
-	return 0;
-}
-
-static void sdma_v4_0_destroy_inst_ctx(struct amdgpu_device *adev)
-{
-	int i;
-
-	for (i = 0; i < adev->sdma.num_instances; i++) {
-		release_firmware(adev->sdma.instance[i].fw);
-		adev->sdma.instance[i].fw = NULL;
-
-		/* arcturus shares the same FW memory across
-		   all SDMA isntances */
-		if (adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(4, 2, 2) ||
-		    adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(4, 4, 0))
-			break;
-	}
-
-	memset((void *)adev->sdma.instance, 0,
-		sizeof(struct amdgpu_sdma_instance) * AMDGPU_MAX_SDMA_INSTANCES);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * sdma_v4_0_init_microcode - load ucode images from disk
  *
@@ -657,33 +616,10 @@ static int sdma_v4_0_init_microcode(struct amdgpu_device *adev)
 		BUG();
 	}
 
-<<<<<<< HEAD
 	for (i = 0; i < adev->sdma.num_instances; i++) {
 		if (i == 0)
 			snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_sdma.bin", chip_name);
 		else
-=======
-	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_sdma.bin", chip_name);
-
-	err = request_firmware(&adev->sdma.instance[0].fw, fw_name, adev->dev);
-	if (err)
-		goto out;
-
-	err = sdma_v4_0_init_inst_ctx(&adev->sdma.instance[0]);
-	if (err)
-		goto out;
-
-	for (i = 1; i < adev->sdma.num_instances; i++) {
-		if (adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(4, 2, 2) ||
-                    adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(4, 4, 0)) {
-			/* Acturus & Aldebaran will leverage the same FW memory
-			   for every SDMA instance */
-			memcpy((void *)&adev->sdma.instance[i],
-			       (void *)&adev->sdma.instance[0],
-			       sizeof(struct amdgpu_sdma_instance));
-		}
-		else {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_sdma%d.bin", chip_name, i);
 		if (adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(4, 2, 2) ||
                     adev->ip_versions[SDMA0_HWIP][0] == IP_VERSION(4, 4, 0)) {
@@ -2024,15 +1960,10 @@ static int sdma_v4_0_suspend(void *handle)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* SMU saves SDMA state for us */
-<<<<<<< HEAD
 	if (adev->in_s0ix) {
 		sdma_v4_0_gfx_enable(adev, false);
 		return 0;
 	}
-=======
-	if (adev->in_s0ix)
-		return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return sdma_v4_0_hw_fini(adev);
 }
@@ -2042,17 +1973,12 @@ static int sdma_v4_0_resume(void *handle)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* SMU restores SDMA state for us */
-<<<<<<< HEAD
 	if (adev->in_s0ix) {
 		sdma_v4_0_enable(adev, true);
 		sdma_v4_0_gfx_enable(adev, true);
 		amdgpu_ttm_set_buffer_funcs_status(adev, true);
 		return 0;
 	}
-=======
-	if (adev->in_s0ix)
-		return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return sdma_v4_0_hw_init(adev);
 }
@@ -2577,7 +2503,6 @@ static const struct amdgpu_irq_src_funcs sdma_v4_0_ecc_irq_funcs = {
 static const struct amdgpu_irq_src_funcs sdma_v4_0_vm_hole_irq_funcs = {
 	.process = sdma_v4_0_process_vm_hole_irq,
 };
-<<<<<<< HEAD
 
 static const struct amdgpu_irq_src_funcs sdma_v4_0_doorbell_invalid_irq_funcs = {
 	.process = sdma_v4_0_process_doorbell_invalid_irq,
@@ -2587,17 +2512,6 @@ static const struct amdgpu_irq_src_funcs sdma_v4_0_pool_timeout_irq_funcs = {
 	.process = sdma_v4_0_process_pool_timeout_irq,
 };
 
-=======
-
-static const struct amdgpu_irq_src_funcs sdma_v4_0_doorbell_invalid_irq_funcs = {
-	.process = sdma_v4_0_process_doorbell_invalid_irq,
-};
-
-static const struct amdgpu_irq_src_funcs sdma_v4_0_pool_timeout_irq_funcs = {
-	.process = sdma_v4_0_process_pool_timeout_irq,
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct amdgpu_irq_src_funcs sdma_v4_0_srbm_write_irq_funcs = {
 	.process = sdma_v4_0_process_srbm_write_irq,
 };

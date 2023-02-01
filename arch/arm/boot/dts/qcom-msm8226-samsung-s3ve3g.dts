@@ -18,13 +18,6 @@
 	};
 };
 
-<<<<<<< HEAD
 &blsp1_uart3 {
 	status = "ok";
-=======
-&soc {
-	serial@f991f000 {
-		status = "ok";
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

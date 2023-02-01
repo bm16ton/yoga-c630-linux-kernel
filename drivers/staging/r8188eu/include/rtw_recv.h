@@ -243,12 +243,9 @@ struct recv_frame {
 	struct recv_reorder_ctrl *preorder_ctrl;
 };
 
-<<<<<<< HEAD
 int _rtw_init_recv_priv(struct recv_priv *precvpriv, struct adapter *padapter);
 void _rtw_free_recv_priv(struct recv_priv *precvpriv);
 s32 rtw_recv_entry(struct recv_frame *precv_frame);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct recv_frame *_rtw_alloc_recvframe(struct __queue *pfree_recv_queue);
 struct recv_frame *rtw_alloc_recvframe(struct __queue *pfree_recv_queue);
 int  rtw_free_recvframe(struct recv_frame *precvframe,

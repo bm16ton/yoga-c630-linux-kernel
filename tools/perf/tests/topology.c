@@ -147,11 +147,7 @@ static int check_cpu_topology(char *path, struct perf_cpu_map *map)
 		TEST_ASSERT_VAL("Cpu map - Die ID doesn't match",
 			session->header.env.cpu[perf_cpu_map__cpu(map, i).cpu].die_id == id.die);
 		TEST_ASSERT_VAL("Cpu map - Node ID is set", id.node == -1);
-<<<<<<< HEAD
 		TEST_ASSERT_VAL("Cpu map - Thread IDX is set", id.thread_idx == -1);
-=======
-		TEST_ASSERT_VAL("Cpu map - Thread is set", id.thread == -1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	// Test that core ID contains socket, die and core
@@ -183,11 +179,7 @@ static int check_cpu_topology(char *path, struct perf_cpu_map *map)
 		TEST_ASSERT_VAL("Die map - Node ID is set", id.node == -1);
 		TEST_ASSERT_VAL("Die map - Core is set", id.core == -1);
 		TEST_ASSERT_VAL("Die map - CPU is set", id.cpu.cpu == -1);
-<<<<<<< HEAD
 		TEST_ASSERT_VAL("Die map - Thread IDX is set", id.thread_idx == -1);
-=======
-		TEST_ASSERT_VAL("Die map - Thread is set", id.thread == -1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	// Test that socket ID contains only socket
@@ -201,11 +193,7 @@ static int check_cpu_topology(char *path, struct perf_cpu_map *map)
 		TEST_ASSERT_VAL("Socket map - Die ID is set", id.die == -1);
 		TEST_ASSERT_VAL("Socket map - Core is set", id.core == -1);
 		TEST_ASSERT_VAL("Socket map - CPU is set", id.cpu.cpu == -1);
-<<<<<<< HEAD
 		TEST_ASSERT_VAL("Socket map - Thread IDX is set", id.thread_idx == -1);
-=======
-		TEST_ASSERT_VAL("Socket map - Thread is set", id.thread == -1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	// Test that node ID contains only node
@@ -217,11 +205,7 @@ static int check_cpu_topology(char *path, struct perf_cpu_map *map)
 		TEST_ASSERT_VAL("Node map - Die ID is set", id.die == -1);
 		TEST_ASSERT_VAL("Node map - Core is set", id.core == -1);
 		TEST_ASSERT_VAL("Node map - CPU is set", id.cpu.cpu == -1);
-<<<<<<< HEAD
 		TEST_ASSERT_VAL("Node map - Thread IDX is set", id.thread_idx == -1);
-=======
-		TEST_ASSERT_VAL("Node map - Thread is set", id.thread == -1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	perf_session__delete(session);
 

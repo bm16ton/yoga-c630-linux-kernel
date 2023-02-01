@@ -41,17 +41,6 @@ union defer_reg_writes {
 	uint32_t raw;
 };
 
-union defer_reg_writes {
-	struct {
-		bool disable_blnd_lut:1;
-		bool disable_3dlut:1;
-		bool disable_shaper:1;
-		bool disable_gamcor:1;
-		bool disable_dscl:1;
-	} bits;
-	uint32_t raw;
-};
-
 struct dpp {
 	const struct dpp_funcs *funcs;
 	struct dc_context *ctx;

@@ -293,7 +293,6 @@ M(NIX_BANDPROF_ALLOC,	0x801d, nix_bandprof_alloc, nix_bandprof_alloc_req, \
 M(NIX_BANDPROF_FREE,	0x801e, nix_bandprof_free, nix_bandprof_free_req,   \
 				msg_rsp)				    \
 M(NIX_BANDPROF_GET_HWINFO, 0x801f, nix_bandprof_get_hwinfo, msg_req,		\
-<<<<<<< HEAD
 				nix_bandprof_get_hwinfo_rsp)		    \
 /* MCS mbox IDs (range 0xA000 - 0xBFFF) */					\
 M(MCS_ALLOC_RESOURCES,	0xa000, mcs_alloc_resources, mcs_alloc_rsrc_req,	\
@@ -347,32 +346,21 @@ M(MCS_CUSTOM_TAG_CFG_GET, 0xa021, mcs_custom_tag_cfg_get,			\
 				  mcs_custom_tag_cfg_get_rsp)
 
 /* Messages initiated by AF (range 0xC00 - 0xEFF) */
-=======
-				nix_bandprof_get_hwinfo_rsp)
-
-/* Messages initiated by AF (range 0xC00 - 0xDFF) */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MBOX_UP_CGX_MESSAGES						\
 M(CGX_LINK_EVENT,	0xC00, cgx_link_event, cgx_link_info_msg, msg_rsp)
 
 #define MBOX_UP_CPT_MESSAGES						\
 M(CPT_INST_LMTST,	0xD00, cpt_inst_lmtst, cpt_inst_lmtst_req, msg_rsp)
 
-<<<<<<< HEAD
 #define MBOX_UP_MCS_MESSAGES						\
 M(MCS_INTR_NOTIFY,	0xE00, mcs_intr_notify, mcs_intr_info, msg_rsp)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum {
 #define M(_name, _id, _1, _2, _3) MBOX_MSG_ ## _name = _id,
 MBOX_MESSAGES
 MBOX_UP_CGX_MESSAGES
 MBOX_UP_CPT_MESSAGES
-<<<<<<< HEAD
 MBOX_UP_MCS_MESSAGES
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #undef M
 };
 
@@ -1537,10 +1525,7 @@ enum ptp_op {
 	PTP_OP_GET_CLOCK = 1,
 	PTP_OP_GET_TSTMP = 2,
 	PTP_OP_SET_THRESH = 3,
-<<<<<<< HEAD
 	PTP_OP_EXTTS_ON = 4,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ptp_req {
@@ -1548,10 +1533,7 @@ struct ptp_req {
 	u8 op;
 	s64 scaled_ppm;
 	u64 thresh;
-<<<<<<< HEAD
 	int extts_on;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ptp_rsp {
@@ -1729,7 +1711,6 @@ enum cgx_af_status {
 	LMAC_AF_ERR_EXACT_MATCH_TBL_LOOK_UP_FAILED = -1110,
 };
 
-<<<<<<< HEAD
 enum mcs_direction {
 	MCS_RX,
 	MCS_TX,
@@ -2141,6 +2122,4 @@ struct mcs_intr_info {
 	u64 rsvd;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* MBOX_H */

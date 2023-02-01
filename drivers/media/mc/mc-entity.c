@@ -46,7 +46,6 @@ static inline const char *intf_type(struct media_interface *intf)
 };
 
 static inline const char *link_type_name(struct media_link *link)
-<<<<<<< HEAD
 {
 	switch (link->flags & MEDIA_LNK_FL_LINK_TYPE) {
 	case MEDIA_LNK_FL_DATA_LINK:
@@ -66,25 +65,6 @@ __must_check int media_entity_enum_init(struct media_entity_enum *ent_enum,
 	int idx_max;
 
 	idx_max = ALIGN(mdev->entity_internal_idx_max + 1, BITS_PER_LONG);
-=======
-{
-	switch (link->flags & MEDIA_LNK_FL_LINK_TYPE) {
-	case MEDIA_LNK_FL_DATA_LINK:
-		return "data";
-	case MEDIA_LNK_FL_INTERFACE_LINK:
-		return "interface";
-	case MEDIA_LNK_FL_ANCILLARY_LINK:
-		return "ancillary";
-	default:
-		return "unknown";
-	}
-}
-
-__must_check int __media_entity_enum_init(struct media_entity_enum *ent_enum,
-					  int idx_max)
-{
-	idx_max = ALIGN(idx_max, BITS_PER_LONG);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ent_enum->bmap = bitmap_zalloc(idx_max, GFP_KERNEL);
 	if (!ent_enum->bmap)
 		return -ENOMEM;
@@ -674,7 +654,6 @@ static int media_pipeline_populate(struct media_pipeline *pipe,
 	struct media_pipeline_pad *ppad;
 	int ret;
 
-<<<<<<< HEAD
 	/*
 	 * Populate the media pipeline by walking the media graph, starting
 	 * from @pad.
@@ -703,24 +682,11 @@ static int media_pipeline_populate(struct media_pipeline *pipe,
 
 	dev_dbg(pad->graph_obj.mdev->dev,
 		"media pipeline populated, found pads:\n");
-=======
-	if (pipe->streaming_count) {
-		pipe->streaming_count++;
-		return 0;
-	}
-
-	ret = media_graph_walk_init(&pipe->graph, mdev);
-	if (ret)
-		return ret;
-
-	media_graph_walk_start(&pipe->graph, entity);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	list_for_each_entry(ppad, &pipe->pads, list)
 		dev_dbg(pad->graph_obj.mdev->dev, "- '%s':%u\n",
 			ppad->pad->entity->name, ppad->pad->index);
 
-<<<<<<< HEAD
 	WARN_ON(walk.stack.top != -1);
 
 	ret = 0;
@@ -741,39 +707,15 @@ __must_check int __media_pipeline_start(struct media_pad *pad,
 	struct media_pipeline_pad *err_ppad;
 	struct media_pipeline_pad *ppad;
 	int ret;
-=======
-		if (entity->pipe && entity->pipe != pipe) {
-			pr_err("Pipe active for %s. Can't start for %s\n",
-				entity->name,
-				entity_err->name);
-			ret = -EBUSY;
-			goto error;
-		}
-
-		/* Already streaming --- no need to check. */
-		if (entity->pipe)
-			continue;
-
-		entity->pipe = pipe;
-
-		if (!entity->ops || !entity->ops->link_validate)
-			continue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lockdep_assert_held(&mdev->graph_mutex);
 
-<<<<<<< HEAD
 	/*
 	 * If the entity is already part of a pipeline, that pipeline must
 	 * be the same as the pipe given to media_pipeline_start().
 	 */
 	if (WARN_ON(pad->pipe && pad->pipe != pipe))
 		return -EINVAL;
-=======
-		for_each_media_entity_data_link(entity, link) {
-			struct media_pad *pad = link->sink->entity == entity
-						? link->sink : link->source;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * If the pipeline has already been started, it is guaranteed to be
@@ -883,11 +825,7 @@ __must_check int __media_pipeline_start(struct media_pad *pad,
 		pad->pipe = pipe;
 	}
 
-<<<<<<< HEAD
 	pipe->start_count++;
-=======
-	pipe->streaming_count++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 
@@ -896,32 +834,15 @@ error:
 	 * Link validation on graph failed. We revert what we did and
 	 * return the error.
 	 */
-<<<<<<< HEAD
 
 	list_for_each_entry(err_ppad, &pipe->pads, list) {
 		if (err_ppad == ppad)
-=======
-	media_graph_walk_start(graph, entity_err);
-
-	while ((entity_err = media_graph_walk_next(graph))) {
-		entity_err->pipe = NULL;
-
-		/*
-		 * We haven't started entities further than this so we quit
-		 * here.
-		 */
-		if (entity_err == entity)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 
 		err_ppad->pad->pipe = NULL;
 	}
 
-<<<<<<< HEAD
 	media_pipeline_cleanup(pipe);
-=======
-	media_graph_walk_cleanup(graph);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -952,7 +873,6 @@ void __media_pipeline_stop(struct media_pad *pad)
 	if (WARN_ON(!pipe))
 		return;
 
-<<<<<<< HEAD
 	if (--pipe->start_count)
 		return;
 
@@ -960,17 +880,6 @@ void __media_pipeline_stop(struct media_pad *pad)
 		ppad->pad->pipe = NULL;
 
 	media_pipeline_cleanup(pipe);
-=======
-	if (--pipe->streaming_count)
-		return;
-
-	media_graph_walk_start(graph, entity);
-
-	while ((entity = media_graph_walk_next(graph)))
-		entity->pipe = NULL;
-
-	media_graph_walk_cleanup(graph);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (pipe->allocated)
 		kfree(pipe);
@@ -1297,12 +1206,7 @@ int __media_entity_setup_link(struct media_link *link, u32 flags)
 	sink = link->sink;
 
 	if (!(link->flags & MEDIA_LNK_FL_DYNAMIC) &&
-<<<<<<< HEAD
 	    (media_pad_is_streaming(source) || media_pad_is_streaming(sink)))
-=======
-	    (media_entity_is_streaming(source) ||
-	     media_entity_is_streaming(sink)))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBUSY;
 
 	mdev = source->graph_obj.mdev;
@@ -1442,7 +1346,6 @@ struct media_pad *media_pad_remote_pad_unique(const struct media_pad *pad)
 	return found_pad;
 }
 EXPORT_SYMBOL_GPL(media_pad_remote_pad_unique);
-<<<<<<< HEAD
 
 int media_entity_get_fwnode_pad(struct media_entity *entity,
 				struct fwnode_handle *fwnode,
@@ -1497,8 +1400,6 @@ struct media_pipeline *media_pad_pipeline(struct media_pad *pad)
 	return pad->pipe;
 }
 EXPORT_SYMBOL_GPL(media_pad_pipeline);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void media_interface_init(struct media_device *mdev,
 				 struct media_interface *intf,

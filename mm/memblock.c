@@ -2006,11 +2006,7 @@ static void __init free_unused_memmap(void)
 		 * presume that there are no holes in the memory map inside
 		 * a pageblock
 		 */
-<<<<<<< HEAD
 		start = pageblock_start_pfn(start);
-=======
-		start = round_down(start, pageblock_nr_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * If we had a previous bank, and there is a space
@@ -2024,20 +2020,12 @@ static void __init free_unused_memmap(void)
 		 * presume that there are no holes in the memory map inside
 		 * a pageblock
 		 */
-<<<<<<< HEAD
 		prev_end = pageblock_align(end);
-=======
-		prev_end = ALIGN(end, pageblock_nr_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 #ifdef CONFIG_SPARSEMEM
 	if (!IS_ALIGNED(prev_end, PAGES_PER_SECTION)) {
-<<<<<<< HEAD
 		prev_end = pageblock_align(end);
-=======
-		prev_end = ALIGN(end, pageblock_nr_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		free_memmap(prev_end, ALIGN(prev_end, PAGES_PER_SECTION));
 	}
 #endif

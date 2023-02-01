@@ -19,14 +19,9 @@ config INTEL_IOMMU
 	select DMAR_TABLE
 	select SWIOTLB
 	select IOASID
-<<<<<<< HEAD
 	select PCI_ATS
 	select PCI_PRI
 	select PCI_PASID
-=======
-	select IOMMU_DMA
-	select PCI_ATS
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  DMA remapping (DMAR) devices support enables independent address
 	  translations for Direct Memory Access (DMA) from devices.
@@ -54,14 +49,7 @@ config INTEL_IOMMU_DEBUGFS
 config INTEL_IOMMU_SVM
 	bool "Support for Shared Virtual Memory with Intel IOMMU"
 	depends on X86_64
-<<<<<<< HEAD
 	select MMU_NOTIFIER
-=======
-	select PCI_PASID
-	select PCI_PRI
-	select MMU_NOTIFIER
-	select IOASID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select IOMMU_SVA
 	help
 	  Shared Virtual Memory (SVM) provides a facility for devices

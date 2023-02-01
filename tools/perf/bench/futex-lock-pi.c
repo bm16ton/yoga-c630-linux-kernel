@@ -44,10 +44,6 @@ static struct bench_futex_parameters params = {
 	.runtime  = 10,
 };
 
-static struct bench_futex_parameters params = {
-	.runtime  = 10,
-};
-
 static const struct option options[] = {
 	OPT_UINTEGER('t', "threads", &params.nthreads, "Specify amount of threads"),
 	OPT_UINTEGER('r', "runtime", &params.runtime, "Specify runtime (in seconds)"),

@@ -22,14 +22,11 @@ const char *enable_file = "/sys/kernel/debug/tracing/events/user_events/__test_e
 const char *trace_file = "/sys/kernel/debug/tracing/trace";
 const char *fmt_file = "/sys/kernel/debug/tracing/events/user_events/__test_event/format";
 
-<<<<<<< HEAD
 static inline int status_check(char *status_page, int status_bit)
 {
 	return status_page[status_bit >> 3] & (1 << (status_bit & 7));
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int trace_bytes(void)
 {
 	int fd = open(trace_file, O_RDONLY);
@@ -205,20 +202,12 @@ TEST_F(user, register_events) {
 	/* Register should work */
 	ASSERT_EQ(0, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
 	ASSERT_EQ(0, reg.write_index);
-<<<<<<< HEAD
 	ASSERT_NE(0, reg.status_bit);
-=======
-	ASSERT_NE(0, reg.status_index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Multiple registers should result in same index */
 	ASSERT_EQ(0, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
 	ASSERT_EQ(0, reg.write_index);
-<<<<<<< HEAD
 	ASSERT_NE(0, reg.status_bit);
-=======
-	ASSERT_NE(0, reg.status_index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Ensure disabled */
 	self->enable_fd = open(enable_file, O_RDWR);
@@ -228,7 +217,6 @@ TEST_F(user, register_events) {
 	/* MMAP should work and be zero'd */
 	ASSERT_NE(MAP_FAILED, status_page);
 	ASSERT_NE(NULL, status_page);
-<<<<<<< HEAD
 	ASSERT_EQ(0, status_check(status_page, reg.status_bit));
 
 	/* Enable event and ensure bits updated in status */
@@ -238,17 +226,6 @@ TEST_F(user, register_events) {
 	/* Disable event and ensure bits updated in status */
 	ASSERT_NE(-1, write(self->enable_fd, "0", sizeof("0")))
 	ASSERT_EQ(0, status_check(status_page, reg.status_bit));
-=======
-	ASSERT_EQ(0, status_page[reg.status_index]);
-
-	/* Enable event and ensure bits updated in status */
-	ASSERT_NE(-1, write(self->enable_fd, "1", sizeof("1")))
-	ASSERT_EQ(EVENT_STATUS_FTRACE, status_page[reg.status_index]);
-
-	/* Disable event and ensure bits updated in status */
-	ASSERT_NE(-1, write(self->enable_fd, "0", sizeof("0")))
-	ASSERT_EQ(0, status_page[reg.status_index]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* File still open should return -EBUSY for delete */
 	ASSERT_EQ(-1, ioctl(self->data_fd, DIAG_IOCSDEL, "__test_event"));
@@ -268,11 +245,8 @@ TEST_F(user, write_events) {
 	struct iovec io[3];
 	__u32 field1, field2;
 	int before = 0, after = 0;
-<<<<<<< HEAD
 	int page_size = sysconf(_SC_PAGESIZE);
 	char *status_page;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	reg.size = sizeof(reg);
 	reg.name_args = (__u64)"__test_event u32 field1; u32 field2";
@@ -287,7 +261,6 @@ TEST_F(user, write_events) {
 	io[2].iov_base = &field2;
 	io[2].iov_len = sizeof(field2);
 
-<<<<<<< HEAD
 	status_page = mmap(NULL, page_size, PROT_READ, MAP_SHARED,
 			   self->status_fd, 0);
 
@@ -300,12 +273,6 @@ TEST_F(user, write_events) {
 	ASSERT_NE(MAP_FAILED, status_page);
 	ASSERT_NE(NULL, status_page);
 	ASSERT_EQ(0, status_check(status_page, reg.status_bit));
-=======
-	/* Register should work */
-	ASSERT_EQ(0, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
-	ASSERT_EQ(0, reg.write_index);
-	ASSERT_NE(0, reg.status_index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Write should fail on invalid slot with ENOENT */
 	io[0].iov_base = &field2;
@@ -319,12 +286,9 @@ TEST_F(user, write_events) {
 	self->enable_fd = open(enable_file, O_RDWR);
 	ASSERT_NE(-1, write(self->enable_fd, "1", sizeof("1")))
 
-<<<<<<< HEAD
 	/* Event should now be enabled */
 	ASSERT_NE(0, status_check(status_page, reg.status_bit));
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Write should make it out to ftrace buffers */
 	before = trace_bytes();
 	ASSERT_NE(-1, writev(self->data_fd, (const struct iovec *)io, 3));
@@ -352,11 +316,7 @@ TEST_F(user, write_fault) {
 	/* Register should work */
 	ASSERT_EQ(0, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
 	ASSERT_EQ(0, reg.write_index);
-<<<<<<< HEAD
 	ASSERT_NE(0, reg.status_bit);
-=======
-	ASSERT_NE(0, reg.status_index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Write should work normally */
 	ASSERT_NE(-1, writev(self->data_fd, (const struct iovec *)io, 2));
@@ -373,14 +333,11 @@ TEST_F(user, write_validator) {
 	int loc, bytes;
 	char data[8];
 	int before = 0, after = 0;
-<<<<<<< HEAD
 	int page_size = sysconf(_SC_PAGESIZE);
 	char *status_page;
 
 	status_page = mmap(NULL, page_size, PROT_READ, MAP_SHARED,
 			   self->status_fd, 0);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	reg.size = sizeof(reg);
 	reg.name_args = (__u64)"__test_event __rel_loc char[] data";
@@ -388,16 +345,12 @@ TEST_F(user, write_validator) {
 	/* Register should work */
 	ASSERT_EQ(0, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
 	ASSERT_EQ(0, reg.write_index);
-<<<<<<< HEAD
 	ASSERT_NE(0, reg.status_bit);
 
 	/* MMAP should work and be zero'd */
 	ASSERT_NE(MAP_FAILED, status_page);
 	ASSERT_NE(NULL, status_page);
 	ASSERT_EQ(0, status_check(status_page, reg.status_bit));
-=======
-	ASSERT_NE(0, reg.status_index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	io[0].iov_base = &reg.write_index;
 	io[0].iov_len = sizeof(reg.write_index);
@@ -415,12 +368,9 @@ TEST_F(user, write_validator) {
 	self->enable_fd = open(enable_file, O_RDWR);
 	ASSERT_NE(-1, write(self->enable_fd, "1", sizeof("1")))
 
-<<<<<<< HEAD
 	/* Event should now be enabled */
 	ASSERT_NE(0, status_check(status_page, reg.status_bit));
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Full in-bounds write should work */
 	before = trace_bytes();
 	loc = DYN_LOC(0, bytes);

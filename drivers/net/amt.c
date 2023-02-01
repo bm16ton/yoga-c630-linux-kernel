@@ -2894,12 +2894,7 @@ static void amt_event_work(struct work_struct *work)
 			amt_event_send_request(amt);
 			break;
 		default:
-<<<<<<< HEAD
 			kfree_skb(skb);
-=======
-			if (skb)
-				kfree_skb(skb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		}
 	}
@@ -3037,12 +3032,7 @@ static int amt_dev_stop(struct net_device *dev)
 	cancel_work_sync(&amt->event_wq);
 	for (i = 0; i < AMT_MAX_EVENTS; i++) {
 		skb = amt->events[i].skb;
-<<<<<<< HEAD
 		kfree_skb(skb);
-=======
-		if (skb)
-			kfree_skb(skb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		amt->events[i].event = AMT_EVENT_NONE;
 		amt->events[i].skb = NULL;
 	}

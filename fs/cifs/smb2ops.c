@@ -530,10 +530,6 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 	p = buf;
 
 	spin_lock(&ses->iface_lock);
-<<<<<<< HEAD
-=======
-	ses->iface_count = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Go through iface_list and do kref_put to remove
 	 * any unused ifaces. ifaces in use will be removed
@@ -543,10 +539,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 				 iface_head) {
 		iface->is_active = 0;
 		kref_put(&iface->refcount, release_iface);
-<<<<<<< HEAD
 		ses->iface_count--;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	spin_unlock(&ses->iface_lock);
 
@@ -558,12 +551,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 		/* avoid spamming logs every 10 minutes, so log only in mount */
 		if ((ses->chan_max > 1) && in_mount)
 			cifs_dbg(VFS,
-<<<<<<< HEAD
 				 "multichannel not available\n"
 				 "Empty network interface list returned by server %s\n",
-=======
-				 "empty network interface list returned by server %s\n",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 ses->server->hostname);
 		rc = -EINVAL;
 		goto out;
@@ -629,10 +618,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
 				/* just get a ref so that it doesn't get picked/freed */
 				iface->is_active = 1;
 				kref_get(&iface->refcount);
-<<<<<<< HEAD
 				ses->iface_count++;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				spin_unlock(&ses->iface_lock);
 				goto next_iface;
 			} else if (ret < 0) {
@@ -819,11 +805,7 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
 
 	rc = open_cached_dir(xid, tcon, full_path, cifs_sb, true, &cfid);
 	if (!rc) {
-<<<<<<< HEAD
 		if (cfid->has_lease) {
-=======
-		if (cfid->is_valid) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			close_cached_dir(cfid);
 			return 0;
 		}
@@ -1377,11 +1359,7 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
 			CIFSMaxBufSize, (char **)&res_key, &ret_data_len);
 
 	if (rc == -EOPNOTSUPP) {
-<<<<<<< HEAD
 		pr_warn_once("Server share %s does not support copy range\n", tcon->tree_name);
-=======
-		pr_warn_once("Server share %s does not support copy range\n", tcon->treeName);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto req_res_key_exit;
 	} else if (rc) {
 		cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
@@ -1529,19 +1507,11 @@ smb2_ioctl_query_info(const unsigned int xid,
 		if (!capable(CAP_SYS_ADMIN)) {
 			rc = -EPERM;
 			goto free_open_req;
-<<<<<<< HEAD
 		}
 		if (qi.output_buffer_length < 8) {
 			rc = -EINVAL;
 			goto free_open_req;
 		}
-=======
-		}
-		if (qi.output_buffer_length < 8) {
-			rc = -EINVAL;
-			goto free_open_req;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rqst[1].rq_iov = &vars->si_iov[0];
 		rqst[1].rq_nvec = 1;
 
@@ -2085,10 +2055,7 @@ smb3_notify(const unsigned int xid, struct file *pfile,
 	struct cifs_fid fid;
 	struct cifs_tcon *tcon;
 	const unsigned char *path;
-<<<<<<< HEAD
 	char *returned_ioctl_info = NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void *page = alloc_dentry_path();
 	__le16 *utf16_path = NULL;
 	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
@@ -4334,7 +4301,6 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
 	pserver = CIFS_SERVER_IS_CHAN(server) ? server->primary_server : server;
 
 	spin_lock(&cifs_tcp_ses_lock);
-<<<<<<< HEAD
 	list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
 		if (ses->Suid == ses_id) {
 			spin_lock(&ses->ses_lock);
@@ -4344,19 +4310,6 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
 			spin_unlock(&ses->ses_lock);
 			spin_unlock(&cifs_tcp_ses_lock);
 			return 0;
-=======
-	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-			if (ses->Suid == ses_id) {
-				spin_lock(&ses->ses_lock);
-				ses_enc_key = enc ? ses->smb3encryptionkey :
-					ses->smb3decryptionkey;
-				memcpy(key, ses_enc_key, SMB3_ENC_DEC_KEY_SIZE);
-				spin_unlock(&ses->ses_lock);
-				spin_unlock(&cifs_tcp_ses_lock);
-				return 0;
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 	spin_unlock(&cifs_tcp_ses_lock);

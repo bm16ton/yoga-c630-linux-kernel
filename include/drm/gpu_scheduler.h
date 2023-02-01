@@ -32,7 +32,6 @@
 
 #define MAX_WAIT_SCHED_ENTITY_Q_EMPTY msecs_to_jiffies(1000)
 
-<<<<<<< HEAD
 /**
  * DRM_SCHED_FENCE_DONT_PIPELINE - Prefent dependency pipelining
  *
@@ -42,8 +41,6 @@
  */
 #define DRM_SCHED_FENCE_DONT_PIPELINE	DMA_FENCE_FLAG_USER_BITS
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct drm_gem_object;
 
 struct drm_gpu_scheduler;

@@ -278,11 +278,7 @@ static void svm_range_free(struct svm_range *prange, bool update_mem_usage)
 	svm_range_free_dma_mappings(prange);
 
 	if (update_mem_usage && !p->xnack_enabled) {
-<<<<<<< HEAD
 		pr_debug("unreserve prange 0x%p size: 0x%llx\n", prange, size);
-=======
-		pr_debug("unreserve mem limit: %lld\n", size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		amdgpu_amdkfd_unreserve_mem_limit(NULL, size,
 					KFD_IOC_ALLOC_MEM_FLAGS_USERPTR);
 	}
@@ -2917,23 +2913,15 @@ retry_write_locked:
 				 */
 				if (prange->actual_loc)
 					r = svm_migrate_vram_to_ram(prange, mm,
-<<<<<<< HEAD
 					   KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU,
 					   NULL);
-=======
-					   KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				else
 					r = 0;
 			}
 		} else {
 			r = svm_migrate_vram_to_ram(prange, mm,
-<<<<<<< HEAD
 					KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU,
 					NULL);
-=======
-					KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		if (r) {
 			pr_debug("failed %d to migrate svms %p [0x%lx 0x%lx]\n",
@@ -2970,7 +2958,6 @@ out:
 	return r;
 }
 
-<<<<<<< HEAD
 int
 svm_range_switch_xnack_reserve_mem(struct kfd_process *p, bool xnack_enabled)
 {
@@ -3029,8 +3016,6 @@ out_unlock:
 	return r;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void svm_range_list_fini(struct kfd_process *p)
 {
 	struct svm_range *prange;
@@ -3256,31 +3241,6 @@ out:
 	return best_loc;
 }
 
-<<<<<<< HEAD
-=======
-/* FIXME: This is a workaround for page locking bug when some pages are
- * invalid during migration to VRAM
- */
-void svm_range_prefault(struct svm_range *prange, struct mm_struct *mm,
-			void *owner)
-{
-	struct hmm_range *hmm_range;
-	int r;
-
-	if (prange->validated_once)
-		return;
-
-	r = amdgpu_hmm_range_get_pages(&prange->notifier, mm, NULL,
-				       prange->start << PAGE_SHIFT,
-				       prange->npages, &hmm_range,
-				       false, true, owner);
-	if (!r) {
-		amdgpu_hmm_range_get_pages_done(hmm_range);
-		prange->validated_once = true;
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* svm_range_trigger_migration - start page migration if prefetch loc changed
  * @mm: current process mm_struct
  * @prange: svm range structure
@@ -3320,12 +3280,8 @@ svm_range_trigger_migration(struct mm_struct *mm, struct svm_range *prange,
 		return 0;
 
 	if (!best_loc) {
-<<<<<<< HEAD
 		r = svm_migrate_vram_to_ram(prange, mm,
 					KFD_MIGRATE_TRIGGER_PREFETCH, NULL);
-=======
-		r = svm_migrate_vram_to_ram(prange, mm, KFD_MIGRATE_TRIGGER_PREFETCH);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*migrated = !r;
 		return r;
 	}
@@ -3386,11 +3342,7 @@ static void svm_range_evict_svm_bo_worker(struct work_struct *work)
 		mutex_lock(&prange->migrate_mutex);
 		do {
 			r = svm_migrate_vram_to_ram(prange, mm,
-<<<<<<< HEAD
 					KFD_MIGRATE_TRIGGER_TTM_EVICTION, NULL);
-=======
-						KFD_MIGRATE_TRIGGER_TTM_EVICTION);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} while (!r && prange->actual_loc && --retries);
 
 		if (!r && prange->actual_loc)

@@ -143,7 +143,6 @@ static inline int sgpio_addr_to_pin(struct sgpio_priv *priv, int port, int bit)
 }
 
 static inline u32 sgpio_get_addr(struct sgpio_priv *priv, u32 rno, u32 off)
-<<<<<<< HEAD
 {
 	return (priv->properties->regoff[rno] + off) *
 		regmap_get_reg_stride(priv->regs);
@@ -158,22 +157,6 @@ static u32 sgpio_readl(struct sgpio_priv *priv, u32 rno, u32 off)
 	ret = regmap_read(priv->regs, addr, &val);
 	WARN_ONCE(ret, "error reading sgpio reg %d\n", ret);
 
-=======
-{
-	return (priv->properties->regoff[rno] + off) *
-		regmap_get_reg_stride(priv->regs);
-}
-
-static u32 sgpio_readl(struct sgpio_priv *priv, u32 rno, u32 off)
-{
-	u32 addr = sgpio_get_addr(priv, rno, off);
-	u32 val = 0;
-	int ret;
-
-	ret = regmap_read(priv->regs, addr, &val);
-	WARN_ONCE(ret, "error reading sgpio reg %d\n", ret);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return val;
 }
 
@@ -923,7 +906,6 @@ static int microchip_sgpio_probe(struct platform_device *pdev)
 	struct reset_control *reset;
 	struct sgpio_priv *priv;
 	struct clk *clk;
-	u32 __iomem *regs;
 	u32 val;
 	struct regmap_config regmap_config = {
 		.reg_bits = 32,
@@ -956,15 +938,7 @@ static int microchip_sgpio_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	priv->regs = ocelot_regmap_from_resource(pdev, 0, &regmap_config);
-=======
-	regs = devm_platform_ioremap_resource(pdev, 0);
-	if (IS_ERR(regs))
-		return PTR_ERR(regs);
-
-	priv->regs = devm_regmap_init_mmio(dev, regs, &regmap_config);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(priv->regs))
 		return PTR_ERR(priv->regs);
 

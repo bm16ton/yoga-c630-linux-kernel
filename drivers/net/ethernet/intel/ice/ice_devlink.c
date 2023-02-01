@@ -429,7 +429,6 @@ ice_devlink_reload_empr_start(struct devlink *devlink, bool netns_change,
 		dev_err(dev, "Failed to trigger EMP device reset to reload firmware, err %d aq_err %s\n",
 			err, ice_aq_str(hw->adminq.sq_last_status));
 		NL_SET_ERR_MSG_MOD(extack, "Failed to trigger EMP device reset to reload firmware");
-<<<<<<< HEAD
 		return err;
 	}
 
@@ -712,45 +711,6 @@ ice_devlink_port_unsplit(struct devlink *devlink, struct devlink_port *port,
 			 struct netlink_ext_ack *extack)
 {
 	return ice_devlink_port_split(devlink, port, 1, extack);
-=======
-		return err;
-	}
-
-	return 0;
-}
-
-/**
- * ice_devlink_reload_empr_finish - Wait for EMP reset to finish
- * @devlink: pointer to the devlink instance reloading
- * @action: the action requested
- * @limit: limits imposed by userspace, such as not resetting
- * @actions_performed: on return, indicate what actions actually performed
- * @extack: netlink extended ACK structure
- *
- * Wait for driver to finish rebuilding after EMP reset is completed. This
- * includes time to wait for both the actual device reset as well as the time
- * for the driver's rebuild to complete.
- */
-static int
-ice_devlink_reload_empr_finish(struct devlink *devlink,
-			       enum devlink_reload_action action,
-			       enum devlink_reload_limit limit,
-			       u32 *actions_performed,
-			       struct netlink_ext_ack *extack)
-{
-	struct ice_pf *pf = devlink_priv(devlink);
-	int err;
-
-	*actions_performed = BIT(DEVLINK_RELOAD_ACTION_FW_ACTIVATE);
-
-	err = ice_wait_for_reset(pf, 60 * HZ);
-	if (err) {
-		NL_SET_ERR_MSG_MOD(extack, "Device still resetting after 1 minute");
-		return err;
-	}
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct devlink_ops ice_devlink_ops = {
@@ -759,11 +719,8 @@ static const struct devlink_ops ice_devlink_ops = {
 	/* The ice driver currently does not support driver reinit */
 	.reload_down = ice_devlink_reload_empr_start,
 	.reload_up = ice_devlink_reload_empr_finish,
-<<<<<<< HEAD
 	.port_split = ice_devlink_port_split,
 	.port_unsplit = ice_devlink_port_unsplit,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.eswitch_mode_get = ice_eswitch_mode_get,
 	.eswitch_mode_set = ice_eswitch_mode_set,
 	.info_get = ice_devlink_info_get,
@@ -960,7 +917,6 @@ int ice_devlink_register_params(struct ice_pf *pf)
 {
 	struct devlink *devlink = priv_to_devlink(pf);
 	union devlink_param_value value;
-<<<<<<< HEAD
 	int err;
 
 	err = devlink_params_register(devlink, ice_devlink_params,
@@ -1037,51 +993,6 @@ int ice_devlink_create_pf_port(struct ice_pf *pf)
 	struct device *dev;
 	int err;
 
-=======
-	int err;
-
-	err = devlink_params_register(devlink, ice_devlink_params,
-				      ARRAY_SIZE(ice_devlink_params));
-	if (err)
-		return err;
-
-	value.vbool = false;
-	devlink_param_driverinit_value_set(devlink,
-					   DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
-					   value);
-
-	value.vbool = test_bit(ICE_FLAG_RDMA_ENA, pf->flags) ? true : false;
-	devlink_param_driverinit_value_set(devlink,
-					   DEVLINK_PARAM_GENERIC_ID_ENABLE_ROCE,
-					   value);
-
-	return 0;
-}
-
-void ice_devlink_unregister_params(struct ice_pf *pf)
-{
-	devlink_params_unregister(priv_to_devlink(pf), ice_devlink_params,
-				  ARRAY_SIZE(ice_devlink_params));
-}
-
-/**
- * ice_devlink_create_pf_port - Create a devlink port for this PF
- * @pf: the PF to create a devlink port for
- *
- * Create and register a devlink_port for this PF.
- *
- * Return: zero on success or an error code on failure.
- */
-int ice_devlink_create_pf_port(struct ice_pf *pf)
-{
-	struct devlink_port_attrs attrs = {};
-	struct devlink_port *devlink_port;
-	struct devlink *devlink;
-	struct ice_vsi *vsi;
-	struct device *dev;
-	int err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev = ice_pf_to_dev(pf);
 
 	devlink_port = &pf->devlink_port;
@@ -1093,15 +1004,12 @@ int ice_devlink_create_pf_port(struct ice_pf *pf)
 	attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
 	attrs.phys.port_number = pf->hw.bus.func;
 
-<<<<<<< HEAD
 	/* As FW supports only port split options for whole device,
 	 * set port split options only for first PF.
 	 */
 	if (pf->hw.pf_id == 0)
 		ice_devlink_set_port_split_options(pf, &attrs);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ice_devlink_set_switch_id(pf, &attrs.switch_id);
 
 	devlink_port_attrs_set(devlink_port, &attrs);

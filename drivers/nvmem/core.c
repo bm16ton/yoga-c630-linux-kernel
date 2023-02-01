@@ -1367,17 +1367,10 @@ EXPORT_SYMBOL(devm_nvmem_cell_put);
 void nvmem_cell_put(struct nvmem_cell *cell)
 {
 	struct nvmem_device *nvmem = cell->entry->nvmem;
-<<<<<<< HEAD
 
 	if (cell->id)
 		kfree_const(cell->id);
 
-=======
-
-	if (cell->id)
-		kfree_const(cell->id);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(cell);
 	__nvmem_device_put(nvmem);
 }

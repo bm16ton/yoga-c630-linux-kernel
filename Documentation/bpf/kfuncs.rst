@@ -137,7 +137,6 @@ KF_ACQUIRE and KF_RET_NULL flags.
 --------------------------
 
 The KF_TRUSTED_ARGS flag is used for kfuncs taking pointer arguments. It
-<<<<<<< HEAD
 indicates that the all pointer arguments will always have a guaranteed lifetime,
 and pointers to kernel objects are always passed to helpers in their unmodified
 form (as obtained from acquire kfuncs).
@@ -169,16 +168,6 @@ destructive to the system. For example such a call can result in system
 rebooting or panicking. Due to this additional restrictions apply to these
 calls. At the moment they only require CAP_SYS_BOOT capability, but more can be
 added later.
-=======
-indicates that the all pointer arguments will always be refcounted, and have
-their offset set to 0. It can be used to enforce that a pointer to a refcounted
-object acquired from a kfunc or BPF helper is passed as an argument to this
-kfunc without any modifications (e.g. pointer arithmetic) such that it is
-trusted and points to the original object. This flag is often used for kfuncs
-that operate (change some property, perform some operation) on an object that
-was obtained using an acquire kfunc. Such kfuncs need an unchanged pointer to
-ensure the integrity of the operation being performed on the expected object.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 2.5 Registering the kfuncs
 --------------------------

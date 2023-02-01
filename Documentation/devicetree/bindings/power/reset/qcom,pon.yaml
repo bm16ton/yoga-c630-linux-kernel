@@ -15,19 +15,12 @@ description: |
 
   This DT node has pwrkey and resin as sub nodes.
 
-<<<<<<< HEAD
-=======
-allOf:
-  - $ref: reboot-mode.yaml#
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 properties:
   compatible:
     enum:
       - qcom,pm8916-pon
       - qcom,pms405-pon
       - qcom,pm8998-pon
-<<<<<<< HEAD
       - qcom,pmk8350-pon
 
   reg:
@@ -43,11 +36,6 @@ properties:
   reg-names:
     minItems: 1
     maxItems: 2
-=======
-
-  reg:
-    maxItems: 1
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   pwrkey:
     type: object
@@ -67,7 +55,6 @@ required:
 
 unevaluatedProperties: false
 
-<<<<<<< HEAD
 allOf:
   - $ref: reboot-mode.yaml#
   - if:
@@ -101,8 +88,6 @@ allOf:
             - const: hlos
             - const: pbs
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
    #include <dt-bindings/interrupt-controller/irq.h>

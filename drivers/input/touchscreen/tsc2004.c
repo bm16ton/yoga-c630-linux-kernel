@@ -46,11 +46,6 @@ static int tsc2004_probe(struct i2c_client *i2c,
 static void tsc2004_remove(struct i2c_client *i2c)
 {
 	tsc200x_remove(&i2c->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tsc2004_idtable[] = {

@@ -1395,11 +1395,7 @@ static u32 calc_plane_remap_info(const struct intel_framebuffer *fb, int color_p
 			       plane_view_height_tiles(fb, color_plane, dims, y));
 	}
 
-<<<<<<< HEAD
 	if (view->gtt.type == I915_GTT_VIEW_ROTATED) {
-=======
-	if (view->gtt.type == I915_GGTT_VIEW_ROTATED) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		drm_WARN_ON(&i915->drm, remap_info->linear);
 		check_array_bounds(i915, view->gtt.rotated.plane, color_plane);
 
@@ -1424,11 +1420,7 @@ static u32 calc_plane_remap_info(const struct intel_framebuffer *fb, int color_p
 		/* rotate the tile dimensions to match the GTT view */
 		swap(tile_width, tile_height);
 	} else {
-<<<<<<< HEAD
 		drm_WARN_ON(&i915->drm, view->gtt.type != I915_GTT_VIEW_REMAPPED);
-=======
-		drm_WARN_ON(&i915->drm, view->gtt.type != I915_GGTT_VIEW_REMAPPED);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		check_array_bounds(i915, view->gtt.remapped.plane, color_plane);
 
@@ -1511,20 +1503,12 @@ calc_plane_normal_size(const struct intel_framebuffer *fb, int color_plane,
 }
 
 static void intel_fb_view_init(struct drm_i915_private *i915, struct intel_fb_view *view,
-<<<<<<< HEAD
 			       enum i915_gtt_view_type view_type)
-=======
-			       enum i915_ggtt_view_type view_type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	memset(view, 0, sizeof(*view));
 	view->gtt.type = view_type;
 
-<<<<<<< HEAD
 	if (view_type == I915_GTT_VIEW_REMAPPED && IS_ALDERLAKE_P(i915))
-=======
-	if (view_type == I915_GGTT_VIEW_REMAPPED && IS_ALDERLAKE_P(i915))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		view->gtt.remapped.plane_alignment = SZ_2M / PAGE_SIZE;
 }
 
@@ -1546,26 +1530,16 @@ int intel_fill_fb_info(struct drm_i915_private *i915, struct intel_framebuffer *
 	int i, num_planes = fb->base.format->num_planes;
 	unsigned int tile_size = intel_tile_size(i915);
 
-<<<<<<< HEAD
 	intel_fb_view_init(i915, &fb->normal_view, I915_GTT_VIEW_NORMAL);
-=======
-	intel_fb_view_init(i915, &fb->normal_view, I915_GGTT_VIEW_NORMAL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_WARN_ON(&i915->drm,
 		    intel_fb_supports_90_270_rotation(fb) &&
 		    intel_fb_needs_pot_stride_remap(fb));
 
 	if (intel_fb_supports_90_270_rotation(fb))
-<<<<<<< HEAD
 		intel_fb_view_init(i915, &fb->rotated_view, I915_GTT_VIEW_ROTATED);
 	if (intel_fb_needs_pot_stride_remap(fb))
 		intel_fb_view_init(i915, &fb->remapped_view, I915_GTT_VIEW_REMAPPED);
-=======
-		intel_fb_view_init(i915, &fb->rotated_view, I915_GGTT_VIEW_ROTATED);
-	if (intel_fb_needs_pot_stride_remap(fb))
-		intel_fb_view_init(i915, &fb->remapped_view, I915_GGTT_VIEW_REMAPPED);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < num_planes; i++) {
 		struct fb_plane_view_dims view_dims;
@@ -1646,13 +1620,8 @@ static void intel_plane_remap_gtt(struct intel_plane_state *plane_state)
 	u32 gtt_offset = 0;
 
 	intel_fb_view_init(i915, &plane_state->view,
-<<<<<<< HEAD
 			   drm_rotation_90_or_270(rotation) ? I915_GTT_VIEW_ROTATED :
 							      I915_GTT_VIEW_REMAPPED);
-=======
-			   drm_rotation_90_or_270(rotation) ? I915_GGTT_VIEW_ROTATED :
-							      I915_GGTT_VIEW_REMAPPED);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	src_x = plane_state->uapi.src.x1 >> 16;
 	src_y = plane_state->uapi.src.y1 >> 16;

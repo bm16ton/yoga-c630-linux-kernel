@@ -38,12 +38,9 @@ properties:
   clock-names:
     maxItems: 2
 
-<<<<<<< HEAD
   resets:
     maxItems: 1
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
 
@@ -73,10 +70,7 @@ required:
   - reg
   - clocks
   - clock-names
-<<<<<<< HEAD
   - resets
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - interrupts
   - ports
 
@@ -95,10 +89,7 @@ examples:
         clocks = <&cpg CPG_CORE R8A7795_CLK_S0D4>, <&cpg CPG_MOD 729>;
         clock-names = "iahb", "isfr";
         power-domains = <&sysc R8A7795_PD_ALWAYS_ON>;
-<<<<<<< HEAD
         resets = <&cpg 729>;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
         ports {
             #address-cells = <1>;

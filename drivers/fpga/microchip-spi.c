@@ -395,8 +395,5 @@ static struct spi_driver mpf_driver = {
 module_spi_driver(mpf_driver);
 
 MODULE_DESCRIPTION("Microchip Polarfire SPI FPGA Manager");
-<<<<<<< HEAD
 MODULE_AUTHOR("Ivan Bornyakov <i.bornyakov@metrotek.ru>");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_LICENSE("GPL");

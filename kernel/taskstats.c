@@ -688,10 +688,7 @@ static struct genl_family family __ro_after_init = {
 	.module		= THIS_MODULE,
 	.ops		= taskstats_ops,
 	.n_ops		= ARRAY_SIZE(taskstats_ops),
-<<<<<<< HEAD
 	.resv_start_op	= CGROUPSTATS_CMD_GET + 1,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.netnsok	= true,
 };
 

@@ -108,13 +108,8 @@ struct dmirror_chunk {
  */
 struct dmirror_device {
 	struct cdev		cdevice;
-<<<<<<< HEAD
 	unsigned int            zone_device_type;
 	struct device		device;
-=======
-	struct hmm_devmem	*devmem;
-	unsigned int            zone_device_type;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	unsigned int		devmem_capacity;
 	unsigned int		devmem_count;
@@ -639,10 +634,6 @@ static struct page *dmirror_devmem_alloc_page(struct dmirror_device *mdevice)
 
 	zone_device_page_init(dpage);
 	dpage->zone_device_data = rpage;
-<<<<<<< HEAD
-=======
-	lock_page(dpage);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return dpage;
 
 error:
@@ -914,7 +905,6 @@ dmirror_successful_migrated_pages(struct migrate_vma *migrate)
 
 static int dmirror_migrate_to_system(struct dmirror *dmirror,
 				     struct hmm_dmirror_cmd *cmd)
-<<<<<<< HEAD
 {
 	unsigned long start, end, addr;
 	unsigned long size = cmd->npages << PAGE_SHIFT;
@@ -975,8 +965,6 @@ out:
 
 static int dmirror_migrate_to_device(struct dmirror *dmirror,
 				struct hmm_dmirror_cmd *cmd)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long start, end, addr;
 	unsigned long size = cmd->npages << PAGE_SHIFT;
@@ -984,69 +972,6 @@ static int dmirror_migrate_to_device(struct dmirror *dmirror,
 	struct vm_area_struct *vma;
 	unsigned long src_pfns[64] = { 0 };
 	unsigned long dst_pfns[64] = { 0 };
-<<<<<<< HEAD
-=======
-	struct migrate_vma args;
-	unsigned long next;
-	int ret;
-
-	start = cmd->addr;
-	end = start + size;
-	if (end < start)
-		return -EINVAL;
-
-	/* Since the mm is for the mirrored process, get a reference first. */
-	if (!mmget_not_zero(mm))
-		return -EINVAL;
-
-	cmd->cpages = 0;
-	mmap_read_lock(mm);
-	for (addr = start; addr < end; addr = next) {
-		vma = vma_lookup(mm, addr);
-		if (!vma || !(vma->vm_flags & VM_READ)) {
-			ret = -EINVAL;
-			goto out;
-		}
-		next = min(end, addr + (ARRAY_SIZE(src_pfns) << PAGE_SHIFT));
-		if (next > vma->vm_end)
-			next = vma->vm_end;
-
-		args.vma = vma;
-		args.src = src_pfns;
-		args.dst = dst_pfns;
-		args.start = addr;
-		args.end = next;
-		args.pgmap_owner = dmirror->mdevice;
-		args.flags = dmirror_select_device(dmirror);
-
-		ret = migrate_vma_setup(&args);
-		if (ret)
-			goto out;
-
-		pr_debug("Migrating from device mem to sys mem\n");
-		dmirror_devmem_fault_alloc_and_copy(&args, dmirror);
-
-		migrate_vma_pages(&args);
-		cmd->cpages += dmirror_successful_migrated_pages(&args);
-		migrate_vma_finalize(&args);
-	}
-out:
-	mmap_read_unlock(mm);
-	mmput(mm);
-
-	return ret;
-}
-
-static int dmirror_migrate_to_device(struct dmirror *dmirror,
-				struct hmm_dmirror_cmd *cmd)
-{
-	unsigned long start, end, addr;
-	unsigned long size = cmd->npages << PAGE_SHIFT;
-	struct mm_struct *mm = dmirror->notifier.mm;
-	struct vm_area_struct *vma;
-	unsigned long src_pfns[64] = { 0 };
-	unsigned long dst_pfns[64] = { 0 };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dmirror_bounce bounce;
 	struct migrate_vma args = { 0 };
 	unsigned long next;
@@ -1490,7 +1415,6 @@ static void dmirror_devmem_free(struct page *page)
 
 	mdevice = dmirror_page_to_device(page);
 	spin_lock(&mdevice->lock);
-<<<<<<< HEAD
 
 	/* Return page to our allocator if not freeing the chunk */
 	if (!dmirror_page_to_chunk(page)->remove) {
@@ -1498,21 +1422,12 @@ static void dmirror_devmem_free(struct page *page)
 		page->zone_device_data = mdevice->free_pages;
 		mdevice->free_pages = page;
 	}
-=======
-	mdevice->cfree++;
-	page->zone_device_data = mdevice->free_pages;
-	mdevice->free_pages = page;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock(&mdevice->lock);
 }
 
 static vm_fault_t dmirror_devmem_fault(struct vm_fault *vmf)
 {
-<<<<<<< HEAD
 	struct migrate_vma args = { 0 };
-=======
-	struct migrate_vma args;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long src_pfns = 0;
 	unsigned long dst_pfns = 0;
 	struct page *rpage;
@@ -1535,10 +1450,7 @@ static vm_fault_t dmirror_devmem_fault(struct vm_fault *vmf)
 	args.dst = &dst_pfns;
 	args.pgmap_owner = dmirror->mdevice;
 	args.flags = dmirror_select_device(dmirror);
-<<<<<<< HEAD
 	args.fault_page = vmf->page;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (migrate_vma_setup(&args))
 		return VM_FAULT_SIGBUS;
@@ -1579,41 +1491,18 @@ static int dmirror_device_init(struct dmirror_device *mdevice, int id)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
 	ret = cdev_device_add(&mdevice->cdevice, &mdevice->device);
 	if (ret)
 		return ret;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Build a list of free ZONE_DEVICE struct pages */
 	return dmirror_allocate_chunk(mdevice, NULL);
 }
 
 static void dmirror_device_remove(struct dmirror_device *mdevice)
 {
-<<<<<<< HEAD
 	dmirror_device_remove_chunks(mdevice);
 	cdev_device_del(&mdevice->cdevice, &mdevice->device);
-=======
-	unsigned int i;
-
-	if (mdevice->devmem_chunks) {
-		for (i = 0; i < mdevice->devmem_count; i++) {
-			struct dmirror_chunk *devmem =
-				mdevice->devmem_chunks[i];
-
-			memunmap_pages(&devmem->pagemap);
-			if (devmem->pagemap.type == MEMORY_DEVICE_PRIVATE)
-				release_mem_region(devmem->pagemap.range.start,
-						   range_len(&devmem->pagemap.range));
-			kfree(devmem);
-		}
-		kfree(mdevice->devmem_chunks);
-	}
-
-	cdev_del(&mdevice->cdevice);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __init hmm_dmirror_init(void)

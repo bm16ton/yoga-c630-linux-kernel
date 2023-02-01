@@ -898,11 +898,7 @@ void mt76_connac_mcu_wtbl_smps_tlv(struct sk_buff *skb,
 	tlv = mt76_connac_mcu_add_nested_tlv(skb, WTBL_SMPS, sizeof(*smps),
 					     wtbl_tlv, sta_wtbl);
 	smps = (struct wtbl_smps *)tlv;
-<<<<<<< HEAD
 	smps->smps = (sta->deflink.smps_mode == IEEE80211_SMPS_DYNAMIC);
-=======
-	smps->smps = (sta->smps_mode == IEEE80211_SMPS_DYNAMIC);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(mt76_connac_mcu_wtbl_smps_tlv);
 
@@ -2654,11 +2650,7 @@ int mt76_connac_mcu_add_key(struct mt76_dev *dev, struct ieee80211_vif *vif,
 }
 EXPORT_SYMBOL_GPL(mt76_connac_mcu_add_key);
 
-<<<<<<< HEAD
 /* SIFS 20us + 512 byte beacon transmitted by 1Mbps (3906us) */
-=======
-/* SIFS 20us + 512 byte beacon tranmitted by 1Mbps (3906us) */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define BCN_TX_ESTIMATE_TIME (4096 + 20)
 void mt76_connac_mcu_bss_ext_tlv(struct sk_buff *skb, struct mt76_vif *mvif)
 {
@@ -2842,12 +2834,9 @@ mt76_connac_mcu_send_ram_firmware(struct mt76_dev *dev,
 		len = le32_to_cpu(region->len);
 		addr = le32_to_cpu(region->addr);
 
-<<<<<<< HEAD
 		if (region->feature_set & FW_FEATURE_NON_DL)
 			goto next;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (region->feature_set & FW_FEATURE_OVERRIDE_ADDR)
 			override = addr;
 
@@ -2864,10 +2853,7 @@ mt76_connac_mcu_send_ram_firmware(struct mt76_dev *dev,
 			return err;
 		}
 
-<<<<<<< HEAD
 next:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		offset += len;
 	}
 

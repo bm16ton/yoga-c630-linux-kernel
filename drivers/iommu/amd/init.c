@@ -165,19 +165,11 @@ static int amd_iommu_target_ivhd_type;
 /* Global EFR and EFR2 registers */
 u64 amd_iommu_efr;
 u64 amd_iommu_efr2;
-<<<<<<< HEAD
 
 /* SNP is enabled on the system? */
 bool amd_iommu_snp_en;
 EXPORT_SYMBOL(amd_iommu_snp_en);
 
-=======
-
-/* SNP is enabled on the system? */
-bool amd_iommu_snp_en;
-EXPORT_SYMBOL(amd_iommu_snp_en);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 LIST_HEAD(amd_iommu_pci_seg_list);	/* list of all PCI segments */
 LIST_HEAD(amd_iommu_list);		/* list of all AMD IOMMUs in the
 					   system */
@@ -1026,17 +1018,10 @@ static int __get_dev_entry_bit(struct dev_table_entry *dev_table,
 static int get_dev_entry_bit(struct amd_iommu *iommu, u16 devid, u8 bit)
 {
 	struct dev_table_entry *dev_table = get_dev_table(iommu);
-<<<<<<< HEAD
 
 	return __get_dev_entry_bit(dev_table, devid, bit);
 }
 
-=======
-
-	return __get_dev_entry_bit(dev_table, devid, bit);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool __copy_device_table(struct amd_iommu *iommu)
 {
 	u64 int_ctl, int_tab_len, entry = 0;
@@ -2201,16 +2186,6 @@ static int __init amd_iommu_init_pci(void)
 	 * of all IOMMUs to make sure the changes to the device table are
 	 * active.
 	 */
-<<<<<<< HEAD
-=======
-	ret = amd_iommu_init_api();
-	if (ret) {
-		pr_err("IOMMU: Failed to initialize IOMMU-API interface (error=%d)!\n",
-		       ret);
-		goto out;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for_each_pci_segment(pci_seg)
 		init_device_table_dma(pci_seg);
 
@@ -3395,7 +3370,6 @@ static int __init parse_amd_iommu_intr(char *str)
 
 static int __init parse_amd_iommu_options(char *str)
 {
-<<<<<<< HEAD
 	if (!str)
 		return -EINVAL;
 
@@ -3406,16 +3380,6 @@ static int __init parse_amd_iommu_options(char *str)
 		} else if (strncmp(str, "force_enable", 12) == 0) {
 			amd_iommu_force_enable = true;
 		} else if (strncmp(str, "off", 3) == 0) {
-=======
-	for (; *str; ++str) {
-		if (strncmp(str, "fullflush", 9) == 0) {
-			pr_warn("amd_iommu=fullflush deprecated; use iommu.strict=1 instead\n");
-			iommu_set_dma_strict();
-		}
-		if (strncmp(str, "force_enable", 12) == 0)
-			amd_iommu_force_enable = true;
-		if (strncmp(str, "off", 3) == 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			amd_iommu_disabled = true;
 		} else if (strncmp(str, "force_isolation", 15) == 0) {
 			amd_iommu_force_isolation = true;
@@ -3438,7 +3402,6 @@ static int __init parse_amd_iommu_options(char *str)
 static int __init parse_ivrs_ioapic(char *str)
 {
 	u32 seg = 0, bus, dev, fn;
-<<<<<<< HEAD
 	int id, i;
 	u32 devid;
 
@@ -3451,18 +3414,6 @@ static int __init parse_ivrs_ioapic(char *str)
 		pr_warn("ivrs_ioapic%s option format deprecated; use ivrs_ioapic=%d@%04x:%02x:%02x.%d instead\n",
 			str, id, seg, bus, dev, fn);
 		goto found;
-=======
-	int ret, id, i;
-	u32 devid;
-
-	ret = sscanf(str, "[%d]=%x:%x.%x", &id, &bus, &dev, &fn);
-	if (ret != 4) {
-		ret = sscanf(str, "[%d]=%x:%x:%x.%x", &id, &seg, &bus, &dev, &fn);
-		if (ret != 5) {
-			pr_err("Invalid command line: ivrs_ioapic%s\n", str);
-			return 1;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	pr_err("Invalid command line: ivrs_ioapic%s\n", str);
@@ -3489,7 +3440,6 @@ found:
 static int __init parse_ivrs_hpet(char *str)
 {
 	u32 seg = 0, bus, dev, fn;
-<<<<<<< HEAD
 	int id, i;
 	u32 devid;
 
@@ -3502,18 +3452,6 @@ static int __init parse_ivrs_hpet(char *str)
 		pr_warn("ivrs_hpet%s option format deprecated; use ivrs_hpet=%d@%04x:%02x:%02x.%d instead\n",
 			str, id, seg, bus, dev, fn);
 		goto found;
-=======
-	int ret, id, i;
-	u32 devid;
-
-	ret = sscanf(str, "[%d]=%x:%x.%x", &id, &bus, &dev, &fn);
-	if (ret != 4) {
-		ret = sscanf(str, "[%d]=%x:%x:%x.%x", &id, &seg, &bus, &dev, &fn);
-		if (ret != 5) {
-			pr_err("Invalid command line: ivrs_hpet%s\n", str);
-			return 1;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	pr_err("Invalid command line: ivrs_hpet%s\n", str);
@@ -3540,15 +3478,10 @@ found:
 static int __init parse_ivrs_acpihid(char *str)
 {
 	u32 seg = 0, bus, dev, fn;
-<<<<<<< HEAD
 	char *hid, *uid, *p, *addr;
-=======
-	char *hid, *uid, *p;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	char acpiid[ACPIHID_UID_LEN + ACPIHID_HID_LEN] = {0};
 	int i;
 
-<<<<<<< HEAD
 	addr = strchr(str, '@');
 	if (!addr) {
 		if (sscanf(str, "[%x:%x.%x]=%s", &bus, &dev, &fn, acpiid) == 4 ||
@@ -3558,15 +3491,6 @@ static int __init parse_ivrs_acpihid(char *str)
 			goto found;
 		}
 		goto not_found;
-=======
-	ret = sscanf(str, "[%x:%x.%x]=%s", &bus, &dev, &fn, acpiid);
-	if (ret != 4) {
-		ret = sscanf(str, "[%x:%x:%x.%x]=%s", &seg, &bus, &dev, &fn, acpiid);
-		if (ret != 5) {
-			pr_err("Invalid command line: ivrs_acpihid(%s)\n", str);
-			return 1;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* We have the '@', make it the terminator to get just the acpiid */

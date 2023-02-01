@@ -912,7 +912,6 @@ static int vt8231_remove(struct platform_device *pdev)
 }
 
 
-<<<<<<< HEAD
 static struct platform_driver vt8231_driver = {
 	.driver = {
 		.name	= DRIVER_NAME,
@@ -920,70 +919,6 @@ static struct platform_driver vt8231_driver = {
 	.probe	= vt8231_probe,
 	.remove	= vt8231_remove,
 };
-=======
-static struct vt8231_data *vt8231_update_device(struct device *dev)
-{
-	struct vt8231_data *data = dev_get_drvdata(dev);
-	int i;
-	u16 low;
-
-	mutex_lock(&data->update_lock);
-
-	if (time_after(jiffies, data->last_updated + HZ + HZ / 2)
-	    || !data->valid) {
-		for (i = 0; i < 6; i++) {
-			if (ISVOLT(i, data->uch_config)) {
-				data->in[i] = vt8231_read_value(data,
-						regvolt[i]);
-				data->in_min[i] = vt8231_read_value(data,
-						regvoltmin[i]);
-				data->in_max[i] = vt8231_read_value(data,
-						regvoltmax[i]);
-			}
-		}
-		for (i = 0; i < 2; i++) {
-			data->fan[i] = vt8231_read_value(data,
-						VT8231_REG_FAN(i));
-			data->fan_min[i] = vt8231_read_value(data,
-						VT8231_REG_FAN_MIN(i));
-		}
-
-		low = vt8231_read_value(data, VT8231_REG_TEMP_LOW01);
-		low = (low >> 6) | ((low & 0x30) >> 2)
-		    | (vt8231_read_value(data, VT8231_REG_TEMP_LOW25) << 4);
-		for (i = 0; i < 6; i++) {
-			if (ISTEMP(i, data->uch_config)) {
-				data->temp[i] = (vt8231_read_value(data,
-						       regtemp[i]) << 2)
-						| ((low >> (2 * i)) & 0x03);
-				data->temp_max[i] = vt8231_read_value(data,
-						      regtempmax[i]);
-				data->temp_min[i] = vt8231_read_value(data,
-						      regtempmin[i]);
-			}
-		}
-
-		i = vt8231_read_value(data, VT8231_REG_FANDIV);
-		data->fan_div[0] = (i >> 4) & 0x03;
-		data->fan_div[1] = i >> 6;
-		data->alarms = vt8231_read_value(data, VT8231_REG_ALARM1) |
-			(vt8231_read_value(data, VT8231_REG_ALARM2) << 8);
-
-		/* Set alarm flags correctly */
-		if (!data->fan[0] && data->fan_min[0])
-			data->alarms |= 0x40;
-		else if (data->fan[0] && !data->fan_min[0])
-			data->alarms &= ~0x40;
-
-		if (!data->fan[1] && data->fan_min[1])
-			data->alarms |= 0x80;
-		else if (data->fan[1] && !data->fan_min[1])
-			data->alarms &= ~0x80;
-
-		data->last_updated = jiffies;
-		data->valid = true;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct pci_device_id vt8231_pci_ids[] = {
 	{ PCI_DEVICE(PCI_VENDOR_ID_VIA, PCI_DEVICE_ID_VIA_8231_4) },

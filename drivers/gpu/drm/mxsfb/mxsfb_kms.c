@@ -24,11 +24,7 @@
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_plane.h>
 #include <drm/drm_vblank.h>
 
@@ -356,11 +352,7 @@ static void mxsfb_crtc_atomic_enable(struct drm_crtc *crtc,
 	struct drm_bridge_state *bridge_state = NULL;
 	struct drm_device *drm = mxsfb->drm;
 	u32 bus_format = 0;
-<<<<<<< HEAD
 	dma_addr_t dma_addr;
-=======
-	dma_addr_t paddr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pm_runtime_get_sync(drm->dev);
 	mxsfb_enable_axi_clk(mxsfb);
@@ -396,17 +388,10 @@ static void mxsfb_crtc_atomic_enable(struct drm_crtc *crtc,
 	mxsfb_crtc_mode_set_nofb(mxsfb, bridge_state, bus_format);
 
 	/* Write cur_buf as well to avoid an initial corrupt frame */
-<<<<<<< HEAD
 	dma_addr = drm_fb_dma_get_gem_addr(new_pstate->fb, new_pstate, 0);
 	if (dma_addr) {
 		writel(dma_addr, mxsfb->base + mxsfb->devdata->cur_buf);
 		writel(dma_addr, mxsfb->base + mxsfb->devdata->next_buf);
-=======
-	paddr = drm_fb_cma_get_gem_addr(new_pstate->fb, new_pstate, 0);
-	if (paddr) {
-		writel(paddr, mxsfb->base + mxsfb->devdata->cur_buf);
-		writel(paddr, mxsfb->base + mxsfb->devdata->next_buf);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	mxsfb_enable_controller(mxsfb);
@@ -556,19 +541,11 @@ static void mxsfb_plane_primary_atomic_update(struct drm_plane *plane,
 	struct mxsfb_drm_private *mxsfb = to_mxsfb_drm_private(plane->dev);
 	struct drm_plane_state *new_pstate = drm_atomic_get_new_plane_state(state,
 									    plane);
-<<<<<<< HEAD
 	dma_addr_t dma_addr;
 
 	dma_addr = drm_fb_dma_get_gem_addr(new_pstate->fb, new_pstate, 0);
 	if (dma_addr)
 		writel(dma_addr, mxsfb->base + mxsfb->devdata->next_buf);
-=======
-	dma_addr_t paddr;
-
-	paddr = drm_fb_cma_get_gem_addr(new_pstate->fb, new_pstate, 0);
-	if (paddr)
-		writel(paddr, mxsfb->base + mxsfb->devdata->next_buf);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void mxsfb_plane_overlay_atomic_update(struct drm_plane *plane,
@@ -579,19 +556,11 @@ static void mxsfb_plane_overlay_atomic_update(struct drm_plane *plane,
 	struct mxsfb_drm_private *mxsfb = to_mxsfb_drm_private(plane->dev);
 	struct drm_plane_state *new_pstate = drm_atomic_get_new_plane_state(state,
 									    plane);
-<<<<<<< HEAD
 	dma_addr_t dma_addr;
 	u32 ctrl;
 
 	dma_addr = drm_fb_dma_get_gem_addr(new_pstate->fb, new_pstate, 0);
 	if (!dma_addr) {
-=======
-	dma_addr_t paddr;
-	u32 ctrl;
-
-	paddr = drm_fb_cma_get_gem_addr(new_pstate->fb, new_pstate, 0);
-	if (!paddr) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		writel(0, mxsfb->base + LCDC_AS_CTRL);
 		return;
 	}

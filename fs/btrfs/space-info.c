@@ -293,15 +293,8 @@ out:
 	return ret;
 }
 
-<<<<<<< HEAD
 void btrfs_add_bg_to_space_info(struct btrfs_fs_info *info,
 				struct btrfs_block_group *block_group)
-=======
-void btrfs_update_space_info(struct btrfs_fs_info *info, u64 flags,
-			     u64 total_bytes, u64 bytes_used,
-			     u64 bytes_readonly, u64 bytes_zone_unusable,
-			     bool active, struct btrfs_space_info **space_info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct btrfs_space_info *found;
 	int factor, index;
@@ -311,7 +304,6 @@ void btrfs_update_space_info(struct btrfs_fs_info *info, u64 flags,
 	found = btrfs_find_space_info(info, block_group->flags);
 	ASSERT(found);
 	spin_lock(&found->lock);
-<<<<<<< HEAD
 	found->total_bytes += block_group->length;
 	if (test_bit(BLOCK_GROUP_FLAG_ZONE_IS_ACTIVE, &block_group->runtime_flags))
 		found->active_total_bytes += block_group->length;
@@ -321,17 +313,6 @@ void btrfs_update_space_info(struct btrfs_fs_info *info, u64 flags,
 	found->bytes_readonly += block_group->bytes_super;
 	found->bytes_zone_unusable += block_group->zone_unusable;
 	if (block_group->length > 0)
-=======
-	found->total_bytes += total_bytes;
-	if (active)
-		found->active_total_bytes += total_bytes;
-	found->disk_total += total_bytes * factor;
-	found->bytes_used += bytes_used;
-	found->disk_used += bytes_used * factor;
-	found->bytes_readonly += bytes_readonly;
-	found->bytes_zone_unusable += bytes_zone_unusable;
-	if (total_bytes > 0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		found->full = 0;
 	btrfs_try_granting_tickets(info, found);
 	spin_unlock(&found->lock);
@@ -527,13 +508,8 @@ static void __btrfs_dump_space_info(struct btrfs_fs_info *fs_info,
 	lockdep_assert_held(&info->lock);
 
 	/* The free space could be negative in case of overcommit */
-<<<<<<< HEAD
 	btrfs_info(fs_info, "space_info %s has %lld free, is %sfull",
 		   flag_str,
-=======
-	btrfs_info(fs_info, "space_info %llu has %lld free, is %sfull",
-		   info->flags,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		   (s64)(info->total_bytes - btrfs_space_info_used(info, true)),
 		   info->full ? "" : "not ");
 	btrfs_info(fs_info,

@@ -85,7 +85,6 @@ struct bpf_lpm_trie_key {
 struct bpf_cgroup_storage_key {
 	__u64	cgroup_inode_id;	/* cgroup inode id */
 	__u32	attach_type;		/* program attach type (enum bpf_attach_type) */
-<<<<<<< HEAD
 };
 
 enum bpf_cgroup_iter_order {
@@ -94,8 +93,6 @@ enum bpf_cgroup_iter_order {
 	BPF_CGROUP_ITER_DESCENDANTS_PRE,	/* walk descendants in pre-order. */
 	BPF_CGROUP_ITER_DESCENDANTS_POST,	/* walk descendants in post-order. */
 	BPF_CGROUP_ITER_ANCESTORS_UP,		/* walk ancestors upward. */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 union bpf_iter_link_info {
@@ -937,10 +934,7 @@ enum bpf_map_type {
 	BPF_MAP_TYPE_INODE_STORAGE,
 	BPF_MAP_TYPE_TASK_STORAGE,
 	BPF_MAP_TYPE_BLOOM_FILTER,
-<<<<<<< HEAD
 	BPF_MAP_TYPE_USER_RINGBUF,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Note that tracing related programs such as
@@ -5378,14 +5372,8 @@ union bpf_attr {
  *
  * long bpf_tcp_raw_check_syncookie_ipv6(struct ipv6hdr *iph, struct tcphdr *th)
  *	Description
-<<<<<<< HEAD
  *		Check whether *iph* and *th* contain a valid SYN cookie ACK
  *		without depending on a listening socket.
-=======
- *		Check packet size against exceeding MTU of net device (based
- *		on *ifindex*).  This helper will likely be used in combination
- *		with helpers that adjust/change the packet size.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  *		*iph* points to the IPv6 header.
  *
@@ -5393,22 +5381,7 @@ union bpf_attr {
  *	Return
  *		0 if *iph* and *th* are a valid SYN cookie ACK.
  *
-<<<<<<< HEAD
  *		On failure, the returned value is one of the following:
-=======
- *		On input *mtu_len* must be a valid pointer, else verifier will
- *		reject BPF program.  If the value *mtu_len* is initialized to
- *		zero then the ctx packet size is use.  When value *mtu_len* is
- *		provided as input this specify the L3 length that the MTU check
- *		is done against. Remember XDP and TC length operate at L2, but
- *		this value is L3 as this correlate to MTU and IP-header tot_len
- *		values which are L3 (similar behavior as bpf_fib_lookup).
- *
- *		The Linux kernel route table can configure MTUs on a more
- *		specific per route level, which is not provided by this helper.
- *		For route level MTU checks use the **bpf_fib_lookup**\ ()
- *		helper.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  *		**-EACCES** if the SYN cookie is not valid.
  *
@@ -5421,17 +5394,9 @@ union bpf_attr {
  *		discontinuities and backwards jumps caused by NTP inserting leap
  *		seconds as CLOCK_REALTIME does.
  *
-<<<<<<< HEAD
  *		See: **clock_gettime**\ (**CLOCK_TAI**)
  *	Return
  *		Current *ktime*.
-=======
- *		On return *mtu_len* pointer contains the MTU value of the net
- *		device.  Remember the net device configured MTU is the L3 size,
- *		which is returned here and XDP and TC length operate at L2.
- *		Helper take this into account for you, but remember when using
- *		MTU value in your BPF-code.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * long bpf_user_ringbuf_drain(struct bpf_map *map, void *callback_fn, void *ctx, u64 flags)
  *	Description
@@ -5467,568 +5432,9 @@ union bpf_attr {
  *		bytes, a sample not being aligned to 8 bytes, or the producer
  *		position not matching the advertised length of a sample.
  *
-<<<<<<< HEAD
  *		**-E2BIG** if user-space has tried to publish a sample which is
  *		larger than the size of the ring buffer, or which cannot fit
  *		within a struct bpf_dynptr.
-=======
- * long bpf_for_each_map_elem(struct bpf_map *map, void *callback_fn, void *callback_ctx, u64 flags)
- *	Description
- *		For each element in **map**, call **callback_fn** function with
- *		**map**, **callback_ctx** and other map-specific parameters.
- *		The **callback_fn** should be a static function and
- *		the **callback_ctx** should be a pointer to the stack.
- *		The **flags** is used to control certain aspects of the helper.
- *		Currently, the **flags** must be 0.
- *
- *		The following are a list of supported map types and their
- *		respective expected callback signatures:
- *
- *		BPF_MAP_TYPE_HASH, BPF_MAP_TYPE_PERCPU_HASH,
- *		BPF_MAP_TYPE_LRU_HASH, BPF_MAP_TYPE_LRU_PERCPU_HASH,
- *		BPF_MAP_TYPE_ARRAY, BPF_MAP_TYPE_PERCPU_ARRAY
- *
- *		long (\*callback_fn)(struct bpf_map \*map, const void \*key, void \*value, void \*ctx);
- *
- *		For per_cpu maps, the map_value is the value on the cpu where the
- *		bpf_prog is running.
- *
- *		If **callback_fn** return 0, the helper will continue to the next
- *		element. If return value is 1, the helper will skip the rest of
- *		elements and return. Other return values are not used now.
- *
- *	Return
- *		The number of traversed map elements for success, **-EINVAL** for
- *		invalid **flags**.
- *
- * long bpf_snprintf(char *str, u32 str_size, const char *fmt, u64 *data, u32 data_len)
- *	Description
- *		Outputs a string into the **str** buffer of size **str_size**
- *		based on a format string stored in a read-only map pointed by
- *		**fmt**.
- *
- *		Each format specifier in **fmt** corresponds to one u64 element
- *		in the **data** array. For strings and pointers where pointees
- *		are accessed, only the pointer values are stored in the *data*
- *		array. The *data_len* is the size of *data* in bytes - must be
- *		a multiple of 8.
- *
- *		Formats **%s** and **%p{i,I}{4,6}** require to read kernel
- *		memory. Reading kernel memory may fail due to either invalid
- *		address or valid address but requiring a major memory fault. If
- *		reading kernel memory fails, the string for **%s** will be an
- *		empty string, and the ip address for **%p{i,I}{4,6}** will be 0.
- *		Not returning error to bpf program is consistent with what
- *		**bpf_trace_printk**\ () does for now.
- *
- *	Return
- *		The strictly positive length of the formatted string, including
- *		the trailing zero character. If the return value is greater than
- *		**str_size**, **str** contains a truncated string, guaranteed to
- *		be zero-terminated except when **str_size** is 0.
- *
- *		Or **-EBUSY** if the per-CPU memory copy buffer is busy.
- *
- * long bpf_sys_bpf(u32 cmd, void *attr, u32 attr_size)
- * 	Description
- * 		Execute bpf syscall with given arguments.
- * 	Return
- * 		A syscall result.
- *
- * long bpf_btf_find_by_name_kind(char *name, int name_sz, u32 kind, int flags)
- * 	Description
- * 		Find BTF type with given name and kind in vmlinux BTF or in module's BTFs.
- * 	Return
- * 		Returns btf_id and btf_obj_fd in lower and upper 32 bits.
- *
- * long bpf_sys_close(u32 fd)
- * 	Description
- * 		Execute close syscall for given FD.
- * 	Return
- * 		A syscall result.
- *
- * long bpf_timer_init(struct bpf_timer *timer, struct bpf_map *map, u64 flags)
- *	Description
- *		Initialize the timer.
- *		First 4 bits of *flags* specify clockid.
- *		Only CLOCK_MONOTONIC, CLOCK_REALTIME, CLOCK_BOOTTIME are allowed.
- *		All other bits of *flags* are reserved.
- *		The verifier will reject the program if *timer* is not from
- *		the same *map*.
- *	Return
- *		0 on success.
- *		**-EBUSY** if *timer* is already initialized.
- *		**-EINVAL** if invalid *flags* are passed.
- *		**-EPERM** if *timer* is in a map that doesn't have any user references.
- *		The user space should either hold a file descriptor to a map with timers
- *		or pin such map in bpffs. When map is unpinned or file descriptor is
- *		closed all timers in the map will be cancelled and freed.
- *
- * long bpf_timer_set_callback(struct bpf_timer *timer, void *callback_fn)
- *	Description
- *		Configure the timer to call *callback_fn* static function.
- *	Return
- *		0 on success.
- *		**-EINVAL** if *timer* was not initialized with bpf_timer_init() earlier.
- *		**-EPERM** if *timer* is in a map that doesn't have any user references.
- *		The user space should either hold a file descriptor to a map with timers
- *		or pin such map in bpffs. When map is unpinned or file descriptor is
- *		closed all timers in the map will be cancelled and freed.
- *
- * long bpf_timer_start(struct bpf_timer *timer, u64 nsecs, u64 flags)
- *	Description
- *		Set timer expiration N nanoseconds from the current time. The
- *		configured callback will be invoked in soft irq context on some cpu
- *		and will not repeat unless another bpf_timer_start() is made.
- *		In such case the next invocation can migrate to a different cpu.
- *		Since struct bpf_timer is a field inside map element the map
- *		owns the timer. The bpf_timer_set_callback() will increment refcnt
- *		of BPF program to make sure that callback_fn code stays valid.
- *		When user space reference to a map reaches zero all timers
- *		in a map are cancelled and corresponding program's refcnts are
- *		decremented. This is done to make sure that Ctrl-C of a user
- *		process doesn't leave any timers running. If map is pinned in
- *		bpffs the callback_fn can re-arm itself indefinitely.
- *		bpf_map_update/delete_elem() helpers and user space sys_bpf commands
- *		cancel and free the timer in the given map element.
- *		The map can contain timers that invoke callback_fn-s from different
- *		programs. The same callback_fn can serve different timers from
- *		different maps if key/value layout matches across maps.
- *		Every bpf_timer_set_callback() can have different callback_fn.
- *
- *	Return
- *		0 on success.
- *		**-EINVAL** if *timer* was not initialized with bpf_timer_init() earlier
- *		or invalid *flags* are passed.
- *
- * long bpf_timer_cancel(struct bpf_timer *timer)
- *	Description
- *		Cancel the timer and wait for callback_fn to finish if it was running.
- *	Return
- *		0 if the timer was not active.
- *		1 if the timer was active.
- *		**-EINVAL** if *timer* was not initialized with bpf_timer_init() earlier.
- *		**-EDEADLK** if callback_fn tried to call bpf_timer_cancel() on its
- *		own timer which would have led to a deadlock otherwise.
- *
- * u64 bpf_get_func_ip(void *ctx)
- * 	Description
- * 		Get address of the traced function (for tracing and kprobe programs).
- * 	Return
- * 		Address of the traced function.
- *
- * u64 bpf_get_attach_cookie(void *ctx)
- * 	Description
- * 		Get bpf_cookie value provided (optionally) during the program
- * 		attachment. It might be different for each individual
- * 		attachment, even if BPF program itself is the same.
- * 		Expects BPF program context *ctx* as a first argument.
- *
- * 		Supported for the following program types:
- *			- kprobe/uprobe;
- *			- tracepoint;
- *			- perf_event.
- * 	Return
- *		Value specified by user at BPF link creation/attachment time
- *		or 0, if it was not specified.
- *
- * long bpf_task_pt_regs(struct task_struct *task)
- *	Description
- *		Get the struct pt_regs associated with **task**.
- *	Return
- *		A pointer to struct pt_regs.
- *
- * long bpf_get_branch_snapshot(void *entries, u32 size, u64 flags)
- *	Description
- *		Get branch trace from hardware engines like Intel LBR. The
- *		hardware engine is stopped shortly after the helper is
- *		called. Therefore, the user need to filter branch entries
- *		based on the actual use case. To capture branch trace
- *		before the trigger point of the BPF program, the helper
- *		should be called at the beginning of the BPF program.
- *
- *		The data is stored as struct perf_branch_entry into output
- *		buffer *entries*. *size* is the size of *entries* in bytes.
- *		*flags* is reserved for now and must be zero.
- *
- *	Return
- *		On success, number of bytes written to *buf*. On error, a
- *		negative value.
- *
- *		**-EINVAL** if *flags* is not zero.
- *
- *		**-ENOENT** if architecture does not support branch records.
- *
- * long bpf_trace_vprintk(const char *fmt, u32 fmt_size, const void *data, u32 data_len)
- *	Description
- *		Behaves like **bpf_trace_printk**\ () helper, but takes an array of u64
- *		to format and can handle more format args as a result.
- *
- *		Arguments are to be used as in **bpf_seq_printf**\ () helper.
- *	Return
- *		The number of bytes written to the buffer, or a negative error
- *		in case of failure.
- *
- * struct unix_sock *bpf_skc_to_unix_sock(void *sk)
- * 	Description
- *		Dynamically cast a *sk* pointer to a *unix_sock* pointer.
- *	Return
- *		*sk* if casting is valid, or **NULL** otherwise.
- *
- * long bpf_kallsyms_lookup_name(const char *name, int name_sz, int flags, u64 *res)
- *	Description
- *		Get the address of a kernel symbol, returned in *res*. *res* is
- *		set to 0 if the symbol is not found.
- *	Return
- *		On success, zero. On error, a negative value.
- *
- *		**-EINVAL** if *flags* is not zero.
- *
- *		**-EINVAL** if string *name* is not the same size as *name_sz*.
- *
- *		**-ENOENT** if symbol is not found.
- *
- *		**-EPERM** if caller does not have permission to obtain kernel address.
- *
- * long bpf_find_vma(struct task_struct *task, u64 addr, void *callback_fn, void *callback_ctx, u64 flags)
- *	Description
- *		Find vma of *task* that contains *addr*, call *callback_fn*
- *		function with *task*, *vma*, and *callback_ctx*.
- *		The *callback_fn* should be a static function and
- *		the *callback_ctx* should be a pointer to the stack.
- *		The *flags* is used to control certain aspects of the helper.
- *		Currently, the *flags* must be 0.
- *
- *		The expected callback signature is
- *
- *		long (\*callback_fn)(struct task_struct \*task, struct vm_area_struct \*vma, void \*callback_ctx);
- *
- *	Return
- *		0 on success.
- *		**-ENOENT** if *task->mm* is NULL, or no vma contains *addr*.
- *		**-EBUSY** if failed to try lock mmap_lock.
- *		**-EINVAL** for invalid **flags**.
- *
- * long bpf_loop(u32 nr_loops, void *callback_fn, void *callback_ctx, u64 flags)
- *	Description
- *		For **nr_loops**, call **callback_fn** function
- *		with **callback_ctx** as the context parameter.
- *		The **callback_fn** should be a static function and
- *		the **callback_ctx** should be a pointer to the stack.
- *		The **flags** is used to control certain aspects of the helper.
- *		Currently, the **flags** must be 0. Currently, nr_loops is
- *		limited to 1 << 23 (~8 million) loops.
- *
- *		long (\*callback_fn)(u32 index, void \*ctx);
- *
- *		where **index** is the current index in the loop. The index
- *		is zero-indexed.
- *
- *		If **callback_fn** returns 0, the helper will continue to the next
- *		loop. If return value is 1, the helper will skip the rest of
- *		the loops and return. Other return values are not used now,
- *		and will be rejected by the verifier.
- *
- *	Return
- *		The number of loops performed, **-EINVAL** for invalid **flags**,
- *		**-E2BIG** if **nr_loops** exceeds the maximum number of loops.
- *
- * long bpf_strncmp(const char *s1, u32 s1_sz, const char *s2)
- *	Description
- *		Do strncmp() between **s1** and **s2**. **s1** doesn't need
- *		to be null-terminated and **s1_sz** is the maximum storage
- *		size of **s1**. **s2** must be a read-only string.
- *	Return
- *		An integer less than, equal to, or greater than zero
- *		if the first **s1_sz** bytes of **s1** is found to be
- *		less than, to match, or be greater than **s2**.
- *
- * long bpf_get_func_arg(void *ctx, u32 n, u64 *value)
- *	Description
- *		Get **n**-th argument (zero based) of the traced function (for tracing programs)
- *		returned in **value**.
- *
- *	Return
- *		0 on success.
- *		**-EINVAL** if n >= arguments count of traced function.
- *
- * long bpf_get_func_ret(void *ctx, u64 *value)
- *	Description
- *		Get return value of the traced function (for tracing programs)
- *		in **value**.
- *
- *	Return
- *		0 on success.
- *		**-EOPNOTSUPP** for tracing programs other than BPF_TRACE_FEXIT or BPF_MODIFY_RETURN.
- *
- * long bpf_get_func_arg_cnt(void *ctx)
- *	Description
- *		Get number of arguments of the traced function (for tracing programs).
- *
- *	Return
- *		The number of arguments of the traced function.
- *
- * int bpf_get_retval(void)
- *	Description
- *		Get the syscall's return value that will be returned to userspace.
- *
- *		This helper is currently supported by cgroup programs only.
- *	Return
- *		The syscall's return value.
- *
- * int bpf_set_retval(int retval)
- *	Description
- *		Set the syscall's return value that will be returned to userspace.
- *
- *		This helper is currently supported by cgroup programs only.
- *	Return
- *		0 on success, or a negative error in case of failure.
- *
- * u64 bpf_xdp_get_buff_len(struct xdp_buff *xdp_md)
- *	Description
- *		Get the total size of a given xdp buff (linear and paged area)
- *	Return
- *		The total size of a given xdp buffer.
- *
- * long bpf_xdp_load_bytes(struct xdp_buff *xdp_md, u32 offset, void *buf, u32 len)
- *	Description
- *		This helper is provided as an easy way to load data from a
- *		xdp buffer. It can be used to load *len* bytes from *offset* from
- *		the frame associated to *xdp_md*, into the buffer pointed by
- *		*buf*.
- *	Return
- *		0 on success, or a negative error in case of failure.
- *
- * long bpf_xdp_store_bytes(struct xdp_buff *xdp_md, u32 offset, void *buf, u32 len)
- *	Description
- *		Store *len* bytes from buffer *buf* into the frame
- *		associated to *xdp_md*, at *offset*.
- *	Return
- *		0 on success, or a negative error in case of failure.
- *
- * long bpf_copy_from_user_task(void *dst, u32 size, const void *user_ptr, struct task_struct *tsk, u64 flags)
- *	Description
- *		Read *size* bytes from user space address *user_ptr* in *tsk*'s
- *		address space, and stores the data in *dst*. *flags* is not
- *		used yet and is provided for future extensibility. This helper
- *		can only be used by sleepable programs.
- *	Return
- *		0 on success, or a negative error in case of failure. On error
- *		*dst* buffer is zeroed out.
- *
- * long bpf_skb_set_tstamp(struct sk_buff *skb, u64 tstamp, u32 tstamp_type)
- *	Description
- *		Change the __sk_buff->tstamp_type to *tstamp_type*
- *		and set *tstamp* to the __sk_buff->tstamp together.
- *
- *		If there is no need to change the __sk_buff->tstamp_type,
- *		the tstamp value can be directly written to __sk_buff->tstamp
- *		instead.
- *
- *		BPF_SKB_TSTAMP_DELIVERY_MONO is the only tstamp that
- *		will be kept during bpf_redirect_*().  A non zero
- *		*tstamp* must be used with the BPF_SKB_TSTAMP_DELIVERY_MONO
- *		*tstamp_type*.
- *
- *		A BPF_SKB_TSTAMP_UNSPEC *tstamp_type* can only be used
- *		with a zero *tstamp*.
- *
- *		Only IPv4 and IPv6 skb->protocol are supported.
- *
- *		This function is most useful when it needs to set a
- *		mono delivery time to __sk_buff->tstamp and then
- *		bpf_redirect_*() to the egress of an iface.  For example,
- *		changing the (rcv) timestamp in __sk_buff->tstamp at
- *		ingress to a mono delivery time and then bpf_redirect_*()
- *		to sch_fq@phy-dev.
- *	Return
- *		0 on success.
- *		**-EINVAL** for invalid input
- *		**-EOPNOTSUPP** for unsupported protocol
- *
- * long bpf_ima_file_hash(struct file *file, void *dst, u32 size)
- *	Description
- *		Returns a calculated IMA hash of the *file*.
- *		If the hash is larger than *size*, then only *size*
- *		bytes will be copied to *dst*
- *	Return
- *		The **hash_algo** is returned on success,
- *		**-EOPNOTSUP** if the hash calculation failed or **-EINVAL** if
- *		invalid arguments are passed.
- *
- * void *bpf_kptr_xchg(void *map_value, void *ptr)
- *	Description
- *		Exchange kptr at pointer *map_value* with *ptr*, and return the
- *		old value. *ptr* can be NULL, otherwise it must be a referenced
- *		pointer which will be released when this helper is called.
- *	Return
- *		The old value of kptr (which can be NULL). The returned pointer
- *		if not NULL, is a reference which must be released using its
- *		corresponding release function, or moved into a BPF map before
- *		program exit.
- *
- * void *bpf_map_lookup_percpu_elem(struct bpf_map *map, const void *key, u32 cpu)
- * 	Description
- * 		Perform a lookup in *percpu map* for an entry associated to
- * 		*key* on *cpu*.
- * 	Return
- * 		Map value associated to *key* on *cpu*, or **NULL** if no entry
- * 		was found or *cpu* is invalid.
- *
- * struct mptcp_sock *bpf_skc_to_mptcp_sock(void *sk)
- *	Description
- *		Dynamically cast a *sk* pointer to a *mptcp_sock* pointer.
- *	Return
- *		*sk* if casting is valid, or **NULL** otherwise.
- *
- * long bpf_dynptr_from_mem(void *data, u32 size, u64 flags, struct bpf_dynptr *ptr)
- *	Description
- *		Get a dynptr to local memory *data*.
- *
- *		*data* must be a ptr to a map value.
- *		The maximum *size* supported is DYNPTR_MAX_SIZE.
- *		*flags* is currently unused.
- *	Return
- *		0 on success, -E2BIG if the size exceeds DYNPTR_MAX_SIZE,
- *		-EINVAL if flags is not 0.
- *
- * long bpf_ringbuf_reserve_dynptr(void *ringbuf, u32 size, u64 flags, struct bpf_dynptr *ptr)
- *	Description
- *		Reserve *size* bytes of payload in a ring buffer *ringbuf*
- *		through the dynptr interface. *flags* must be 0.
- *
- *		Please note that a corresponding bpf_ringbuf_submit_dynptr or
- *		bpf_ringbuf_discard_dynptr must be called on *ptr*, even if the
- *		reservation fails. This is enforced by the verifier.
- *	Return
- *		0 on success, or a negative error in case of failure.
- *
- * void bpf_ringbuf_submit_dynptr(struct bpf_dynptr *ptr, u64 flags)
- *	Description
- *		Submit reserved ring buffer sample, pointed to by *data*,
- *		through the dynptr interface. This is a no-op if the dynptr is
- *		invalid/null.
- *
- *		For more information on *flags*, please see
- *		'bpf_ringbuf_submit'.
- *	Return
- *		Nothing. Always succeeds.
- *
- * void bpf_ringbuf_discard_dynptr(struct bpf_dynptr *ptr, u64 flags)
- *	Description
- *		Discard reserved ring buffer sample through the dynptr
- *		interface. This is a no-op if the dynptr is invalid/null.
- *
- *		For more information on *flags*, please see
- *		'bpf_ringbuf_discard'.
- *	Return
- *		Nothing. Always succeeds.
- *
- * long bpf_dynptr_read(void *dst, u32 len, struct bpf_dynptr *src, u32 offset, u64 flags)
- *	Description
- *		Read *len* bytes from *src* into *dst*, starting from *offset*
- *		into *src*.
- *		*flags* is currently unused.
- *	Return
- *		0 on success, -E2BIG if *offset* + *len* exceeds the length
- *		of *src*'s data, -EINVAL if *src* is an invalid dynptr or if
- *		*flags* is not 0.
- *
- * long bpf_dynptr_write(struct bpf_dynptr *dst, u32 offset, void *src, u32 len, u64 flags)
- *	Description
- *		Write *len* bytes from *src* into *dst*, starting from *offset*
- *		into *dst*.
- *		*flags* is currently unused.
- *	Return
- *		0 on success, -E2BIG if *offset* + *len* exceeds the length
- *		of *dst*'s data, -EINVAL if *dst* is an invalid dynptr or if *dst*
- *		is a read-only dynptr or if *flags* is not 0.
- *
- * void *bpf_dynptr_data(struct bpf_dynptr *ptr, u32 offset, u32 len)
- *	Description
- *		Get a pointer to the underlying dynptr data.
- *
- *		*len* must be a statically known value. The returned data slice
- *		is invalidated whenever the dynptr is invalidated.
- *	Return
- *		Pointer to the underlying dynptr data, NULL if the dynptr is
- *		read-only, if the dynptr is invalid, or if the offset and length
- *		is out of bounds.
- *
- * s64 bpf_tcp_raw_gen_syncookie_ipv4(struct iphdr *iph, struct tcphdr *th, u32 th_len)
- *	Description
- *		Try to issue a SYN cookie for the packet with corresponding
- *		IPv4/TCP headers, *iph* and *th*, without depending on a
- *		listening socket.
- *
- *		*iph* points to the IPv4 header.
- *
- *		*th* points to the start of the TCP header, while *th_len*
- *		contains the length of the TCP header (at least
- *		**sizeof**\ (**struct tcphdr**)).
- *	Return
- *		On success, lower 32 bits hold the generated SYN cookie in
- *		followed by 16 bits which hold the MSS value for that cookie,
- *		and the top 16 bits are unused.
- *
- *		On failure, the returned value is one of the following:
- *
- *		**-EINVAL** if *th_len* is invalid.
- *
- * s64 bpf_tcp_raw_gen_syncookie_ipv6(struct ipv6hdr *iph, struct tcphdr *th, u32 th_len)
- *	Description
- *		Try to issue a SYN cookie for the packet with corresponding
- *		IPv6/TCP headers, *iph* and *th*, without depending on a
- *		listening socket.
- *
- *		*iph* points to the IPv6 header.
- *
- *		*th* points to the start of the TCP header, while *th_len*
- *		contains the length of the TCP header (at least
- *		**sizeof**\ (**struct tcphdr**)).
- *	Return
- *		On success, lower 32 bits hold the generated SYN cookie in
- *		followed by 16 bits which hold the MSS value for that cookie,
- *		and the top 16 bits are unused.
- *
- *		On failure, the returned value is one of the following:
- *
- *		**-EINVAL** if *th_len* is invalid.
- *
- *		**-EPROTONOSUPPORT** if CONFIG_IPV6 is not builtin.
- *
- * long bpf_tcp_raw_check_syncookie_ipv4(struct iphdr *iph, struct tcphdr *th)
- *	Description
- *		Check whether *iph* and *th* contain a valid SYN cookie ACK
- *		without depending on a listening socket.
- *
- *		*iph* points to the IPv4 header.
- *
- *		*th* points to the TCP header.
- *	Return
- *		0 if *iph* and *th* are a valid SYN cookie ACK.
- *
- *		On failure, the returned value is one of the following:
- *
- *		**-EACCES** if the SYN cookie is not valid.
- *
- * long bpf_tcp_raw_check_syncookie_ipv6(struct ipv6hdr *iph, struct tcphdr *th)
- *	Description
- *		Check whether *iph* and *th* contain a valid SYN cookie ACK
- *		without depending on a listening socket.
- *
- *		*iph* points to the IPv6 header.
- *
- *		*th* points to the TCP header.
- *	Return
- *		0 if *iph* and *th* are a valid SYN cookie ACK.
- *
- *		On failure, the returned value is one of the following:
- *
- *		**-EACCES** if the SYN cookie is not valid.
- *
- *		**-EPROTONOSUPPORT** if CONFIG_IPV6 is not builtin.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -6239,11 +5645,8 @@ union bpf_attr {
 	FN(tcp_raw_gen_syncookie_ipv6),	\
 	FN(tcp_raw_check_syncookie_ipv4),	\
 	FN(tcp_raw_check_syncookie_ipv6),	\
-<<<<<<< HEAD
 	FN(ktime_get_tai_ns),		\
 	FN(user_ringbuf_drain),		\
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* */
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper

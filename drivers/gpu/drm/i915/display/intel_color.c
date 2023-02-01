@@ -26,10 +26,7 @@
 #include "intel_de.h"
 #include "intel_display_types.h"
 #include "intel_dpll.h"
-<<<<<<< HEAD
 #include "intel_dsb.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "vlv_dsi_pll.h"
 
 struct intel_color_funcs {
@@ -1171,35 +1168,22 @@ void intel_color_load_luts(const struct intel_crtc_state *crtc_state)
 {
 	struct drm_i915_private *dev_priv = to_i915(crtc_state->uapi.crtc->dev);
 
-<<<<<<< HEAD
 	dev_priv->display.funcs.color->load_luts(crtc_state);
-=======
-	dev_priv->color_funcs->load_luts(crtc_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void intel_color_commit_noarm(const struct intel_crtc_state *crtc_state)
 {
 	struct drm_i915_private *dev_priv = to_i915(crtc_state->uapi.crtc->dev);
 
-<<<<<<< HEAD
 	if (dev_priv->display.funcs.color->color_commit_noarm)
 		dev_priv->display.funcs.color->color_commit_noarm(crtc_state);
-=======
-	if (dev_priv->color_funcs->color_commit_noarm)
-		dev_priv->color_funcs->color_commit_noarm(crtc_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void intel_color_commit_arm(const struct intel_crtc_state *crtc_state)
 {
 	struct drm_i915_private *dev_priv = to_i915(crtc_state->uapi.crtc->dev);
 
-<<<<<<< HEAD
 	dev_priv->display.funcs.color->color_commit_arm(crtc_state);
-=======
-	dev_priv->color_funcs->color_commit_arm(crtc_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool intel_can_preload_luts(const struct intel_crtc_state *new_crtc_state)
@@ -1255,24 +1239,15 @@ int intel_color_check(struct intel_crtc_state *crtc_state)
 {
 	struct drm_i915_private *dev_priv = to_i915(crtc_state->uapi.crtc->dev);
 
-<<<<<<< HEAD
 	return dev_priv->display.funcs.color->color_check(crtc_state);
-=======
-	return dev_priv->color_funcs->color_check(crtc_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void intel_color_get_config(struct intel_crtc_state *crtc_state)
 {
 	struct drm_i915_private *dev_priv = to_i915(crtc_state->uapi.crtc->dev);
 
-<<<<<<< HEAD
 	if (dev_priv->display.funcs.color->read_luts)
 		dev_priv->display.funcs.color->read_luts(crtc_state);
-=======
-	if (dev_priv->color_funcs->read_luts)
-		dev_priv->color_funcs->read_luts(crtc_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool need_plane_update(struct intel_plane *plane,
@@ -2251,7 +2226,6 @@ void intel_color_init(struct intel_crtc *crtc)
 
 	if (HAS_GMCH(dev_priv)) {
 		if (IS_CHERRYVIEW(dev_priv)) {
-<<<<<<< HEAD
 			dev_priv->display.funcs.color = &chv_color_funcs;
 		} else if (DISPLAY_VER(dev_priv) >= 4) {
 			dev_priv->display.funcs.color = &i965_color_funcs;
@@ -2274,30 +2248,6 @@ void intel_color_init(struct intel_crtc *crtc)
 				dev_priv->display.funcs.color = &ivb_color_funcs;
 		} else
 			dev_priv->display.funcs.color = &ilk_color_funcs;
-=======
-			dev_priv->color_funcs = &chv_color_funcs;
-		} else if (DISPLAY_VER(dev_priv) >= 4) {
-			dev_priv->color_funcs = &i965_color_funcs;
-		} else {
-			dev_priv->color_funcs = &i9xx_color_funcs;
-		}
-	} else {
-		if (DISPLAY_VER(dev_priv) >= 11)
-			dev_priv->color_funcs = &icl_color_funcs;
-		else if (DISPLAY_VER(dev_priv) == 10)
-			dev_priv->color_funcs = &glk_color_funcs;
-		else if (DISPLAY_VER(dev_priv) == 9)
-			dev_priv->color_funcs = &skl_color_funcs;
-		else if (DISPLAY_VER(dev_priv) == 8)
-			dev_priv->color_funcs = &bdw_color_funcs;
-		else if (DISPLAY_VER(dev_priv) == 7) {
-			if (IS_HASWELL(dev_priv))
-				dev_priv->color_funcs = &hsw_color_funcs;
-			else
-				dev_priv->color_funcs = &ivb_color_funcs;
-		} else
-			dev_priv->color_funcs = &ilk_color_funcs;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	drm_crtc_enable_color_mgmt(&crtc->base,

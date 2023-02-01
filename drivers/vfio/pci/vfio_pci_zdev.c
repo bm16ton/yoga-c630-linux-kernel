@@ -15,11 +15,7 @@
 #include <asm/pci_clp.h>
 #include <asm/pci_io.h>
 
-<<<<<<< HEAD
 #include "vfio_pci_priv.h"
-=======
-#include <linux/vfio_pci_core.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Add the Base PCI Function information to the device info region.

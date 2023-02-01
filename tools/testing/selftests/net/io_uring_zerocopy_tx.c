@@ -400,10 +400,6 @@ static void do_tx(int domain, int type, int protocol)
 						   cfg_payload_len, msg_flags);
 				sqe->user_data = NONZC_TAG;
 			} else {
-<<<<<<< HEAD
-=======
-				compl_cqes++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				io_uring_prep_sendzc(sqe, fd, payload,
 						     cfg_payload_len,
 						     msg_flags, zc_flags);
@@ -433,7 +429,6 @@ static void do_tx(int domain, int type, int protocol)
 			if (cqe->flags & IORING_CQE_F_NOTIF) {
 				if (cqe->flags & IORING_CQE_F_MORE)
 					error(1, -EINVAL, "invalid notif flags");
-<<<<<<< HEAD
 				if (compl_cqes <= 0)
 					error(1, -EINVAL, "notification mismatch");
 				compl_cqes--;
@@ -451,20 +446,6 @@ static void do_tx(int domain, int type, int protocol)
 				bytes += cqe->res;
 			} else if (cqe->res != -EAGAIN) {
 				error(1, cqe->res, "send failed");
-=======
-				compl_cqes--;
-				i--;
-			} else if (cqe->res <= 0) {
-				if (cqe->flags & IORING_CQE_F_MORE)
-					error(1, cqe->res, "more with a failed send");
-				error(1, cqe->res, "send failed");
-			} else {
-				if (cqe->user_data == ZC_TAG &&
-				    !(cqe->flags & IORING_CQE_F_MORE))
-					error(1, cqe->res, "missing more flag");
-				packets++;
-				bytes += cqe->res;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			io_uring_cqe_seen(&ring);
 		}

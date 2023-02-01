@@ -108,7 +108,6 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
 	entry->method = method;
 	entry->id = ksmbd_ipc_id_alloc();
 	if (entry->id < 0)
-<<<<<<< HEAD
 		goto free_entry;
 
 	resp = ksmbd_rpc_open(sess, entry->id);
@@ -120,17 +119,6 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
 free_id:
 	ksmbd_rpc_id_free(entry->id);
 free_entry:
-=======
-		goto error;
-
-	resp = ksmbd_rpc_open(sess, entry->id);
-	if (!resp)
-		goto error;
-
-	kvfree(resp);
-	return entry->id;
-error:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_del(&entry->list);
 	kfree(entry);
 	return -EINVAL;

@@ -854,16 +854,6 @@ static void qe_uart_set_termios(struct uart_port *port,
 	u16 upsmr = ioread16be(&uccp->upsmr);
 	struct ucc_uart_pram __iomem *uccup = qe_port->uccup;
 	u16 supsmr = ioread16be(&uccup->supsmr);
-<<<<<<< HEAD
-=======
-	u8 char_length = 2; /* 1 + CL + PEN + 1 + SL */
-
-	/* Character length programmed into the mode register is the
-	 * sum of: 1 start bit, number of data bits, 0 or 1 parity bit,
-	 * 1 or 2 stop bits, minus 1.
-	 * The value 'bits' counts this for us.
-	 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* byte size */
 	upsmr &= UCC_UART_UPSMR_CL_MASK;
@@ -951,11 +941,7 @@ static void qe_uart_set_termios(struct uart_port *port,
 	iowrite16be(upsmr, &uccp->upsmr);
 	if (soft_uart) {
 		iowrite16be(supsmr, &uccup->supsmr);
-<<<<<<< HEAD
 		iowrite8(tty_get_frame_size(termios->c_cflag), &uccup->rx_length);
-=======
-		iowrite8(char_length, &uccup->rx_length);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Soft-UART requires a 1X multiplier for TX */
 		qe_setbrg(qe_port->us_info.rx_clock, baud, 16);

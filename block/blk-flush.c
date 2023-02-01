@@ -277,11 +277,6 @@ bool is_flush_rq(struct request *rq)
 	return rq->end_io == flush_end_io;
 }
 
-bool is_flush_rq(struct request *rq)
-{
-	return rq->end_io == flush_end_io;
-}
-
 /**
  * blk_kick_flush - consider issuing flush request
  * @q: request_queue being kicked

@@ -39,10 +39,7 @@
 #include "en_accel/ipsec_rxtx.h"
 #include "en_accel/ktls.h"
 #include "en_accel/ktls_txrx.h"
-<<<<<<< HEAD
 #include <en_accel/macsec.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "en.h"
 #include "en/txrx.h"
 
@@ -145,7 +142,6 @@ static inline bool mlx5e_accel_tx_begin(struct net_device *dev,
 	if (unlikely(mlx5e_macsec_skb_is_offload(skb))) {
 		struct mlx5e_priv *priv = netdev_priv(dev);
 
-<<<<<<< HEAD
 		if (unlikely(!mlx5e_macsec_handle_tx_skb(priv->macsec, skb)))
 			return false;
 	}
@@ -154,8 +150,6 @@ static inline bool mlx5e_accel_tx_begin(struct net_device *dev,
 	return true;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline unsigned int mlx5e_accel_tx_ids_len(struct mlx5e_txqsq *sq,
 						  struct mlx5e_accel_tx_state *state)
 {

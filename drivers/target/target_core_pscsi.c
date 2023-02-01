@@ -1030,10 +1030,7 @@ static enum rq_end_io_ret pscsi_req_done(struct request *req,
 	}
 
 	blk_mq_free_request(req);
-<<<<<<< HEAD
 	return RQ_END_IO_NONE;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct target_backend_ops pscsi_ops = {

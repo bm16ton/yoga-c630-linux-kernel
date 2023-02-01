@@ -42,7 +42,6 @@
 		reg = <0x0 0xfe190200 0x0 0x20>;
 	};
 
-<<<<<<< HEAD
 	pcie30_phy_grf: syscon@fdcb8000 {
 		compatible = "rockchip,rk3568-pcie3-phy-grf", "syscon";
 		reg = <0x0 0xfdcb8000 0x0 0x10000>;
@@ -165,8 +164,6 @@
 		};
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gmac0: ethernet@fe2a0000 {
 		compatible = "rockchip,rk3568-gmac", "snps,dwmac-4.20a";
 		reg = <0x0 0xfe2a0000 0x0 0x10000>;

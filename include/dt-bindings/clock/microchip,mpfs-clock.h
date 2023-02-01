@@ -45,7 +45,6 @@
 #define CLK_RTCREF	33
 #define CLK_MSSPLL	34
 
-<<<<<<< HEAD
 /* Clock Conditioning Circuitry Clock IDs */
 
 #define CLK_CCC_PLL0		0
@@ -69,6 +68,4 @@
 #define CLK_CCC_DLL1_OUT0	14
 #define CLK_CCC_DLL1_OUT1	15
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif	/* _DT_BINDINGS_CLK_MICROCHIP_MPFS_H_ */

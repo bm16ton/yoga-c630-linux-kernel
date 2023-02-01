@@ -61,11 +61,7 @@ static const struct amdgpu_video_codecs vcn_4_0_0_video_codecs_encode =
 
 static const struct amdgpu_video_codec_info vcn_4_0_0_video_codecs_decode_array[] =
 {
-<<<<<<< HEAD
 	{codec_info_build(AMDGPU_INFO_VIDEO_CAPS_CODEC_IDX_MPEG4_AVC, 4096, 4096, 52)},
-=======
-	{codec_info_build(AMDGPU_INFO_VIDEO_CAPS_CODEC_IDX_MPEG4_AVC, 4096, 4906, 52)},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{codec_info_build(AMDGPU_INFO_VIDEO_CAPS_CODEC_IDX_HEVC, 8192, 4352, 186)},
 	{codec_info_build(AMDGPU_INFO_VIDEO_CAPS_CODEC_IDX_JPEG, 4096, 4096, 0)},
 	{codec_info_build(AMDGPU_INFO_VIDEO_CAPS_CODEC_IDX_VP9, 8192, 4352, 0)},
@@ -183,11 +179,7 @@ void soc21_grbm_select(struct amdgpu_device *adev,
 	grbm_gfx_cntl = REG_SET_FIELD(grbm_gfx_cntl, GRBM_GFX_CNTL, VMID, vmid);
 	grbm_gfx_cntl = REG_SET_FIELD(grbm_gfx_cntl, GRBM_GFX_CNTL, QUEUEID, queue);
 
-<<<<<<< HEAD
 	WREG32_SOC15(GC, 0, regGRBM_GFX_CNTL, grbm_gfx_cntl);
-=======
-	WREG32(SOC15_REG_OFFSET(GC, 0, regGRBM_GFX_CNTL), grbm_gfx_cntl);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void soc21_vga_set_state(struct amdgpu_device *adev, bool state)
@@ -330,15 +322,10 @@ soc21_asic_reset_method(struct amdgpu_device *adev)
 	switch (adev->ip_versions[MP1_HWIP][0]) {
 	case IP_VERSION(13, 0, 0):
 	case IP_VERSION(13, 0, 7):
-<<<<<<< HEAD
 	case IP_VERSION(13, 0, 10):
 		return AMD_RESET_METHOD_MODE1;
 	case IP_VERSION(13, 0, 4):
 	case IP_VERSION(13, 0, 11):
-=======
-		return AMD_RESET_METHOD_MODE1;
-	case IP_VERSION(13, 0, 4):
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return AMD_RESET_METHOD_MODE2;
 	default:
 		if (amdgpu_dpm_is_baco_supported(adev))
@@ -438,10 +425,7 @@ static bool soc21_need_full_reset(struct amdgpu_device *adev)
 	case IP_VERSION(11, 0, 0):
 		return amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__UMC);
 	case IP_VERSION(11, 0, 2):
-<<<<<<< HEAD
 	case IP_VERSION(11, 0, 3):
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 	default:
 		return true;
@@ -648,7 +632,6 @@ static int soc21_common_early_init(void *handle)
 			AMD_CG_SUPPORT_JPEG_MGCG;
 		adev->pg_flags =
 			AMD_PG_SUPPORT_GFX_PG |
-<<<<<<< HEAD
 			AMD_PG_SUPPORT_VCN |
 			AMD_PG_SUPPORT_VCN_DPG |
 			AMD_PG_SUPPORT_JPEG;
@@ -697,11 +680,6 @@ static int soc21_common_early_init(void *handle)
 		adev->external_rev_id = adev->rev_id + 0x1;
 		break;
 
-=======
-			AMD_PG_SUPPORT_JPEG;
-		adev->external_rev_id = adev->rev_id + 0x1;
-		break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		/* FIXME: not supported yet */
 		return -EINVAL;

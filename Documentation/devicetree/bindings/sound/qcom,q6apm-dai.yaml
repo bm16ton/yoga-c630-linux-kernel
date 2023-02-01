@@ -16,22 +16,12 @@ properties:
   compatible:
     const: qcom,q6apm-dais
 
-<<<<<<< HEAD
-=======
-  reg:
-    maxItems: 1
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   iommus:
     maxItems: 1
 
 required:
   - compatible
   - iommus
-<<<<<<< HEAD
-=======
-  - reg
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 additionalProperties: false
 
@@ -43,7 +33,6 @@ examples:
         #address-cells = <1>;
         #size-cells = <0>;
         qcom,domain = <GPR_DOMAIN_ID_ADSP>;
-<<<<<<< HEAD
 
         service@1 {
             compatible = "qcom,q6apm";
@@ -53,19 +42,5 @@ examples:
                 compatible = "qcom,q6apm-dais";
                 iommus = <&apps_smmu 0x1801 0x0>;
             };
-=======
-        service@1 {
-          compatible = "qcom,q6apm";
-          reg = <1>;
-
-          #address-cells = <1>;
-          #size-cells = <0>;
-
-          apm-dai@1 {
-            compatible = "qcom,q6apm-dais";
-            iommus = <&apps_smmu 0x1801 0x0>;
-            reg = <1>;
-          };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         };
     };

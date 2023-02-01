@@ -3,11 +3,8 @@
  * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
  */
 #include <linux/export.h>
-<<<<<<< HEAD
 #include <linux/io.h>
 #include <linux/memblock.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/mm.h>
 #include <linux/mman.h>
 
@@ -121,7 +118,6 @@ int __virt_addr_valid(volatile void *kaddr)
 	return pfn_valid(PFN_DOWN(PHYSADDR(kaddr)));
 }
 EXPORT_SYMBOL_GPL(__virt_addr_valid);
-<<<<<<< HEAD
 
 /*
  * You really shouldn't be using read() or write() on /dev/mem.  This might go
@@ -149,5 +145,3 @@ int valid_mmap_phys_addr_range(unsigned long pfn, size_t size)
 {
 	return !(((pfn << PAGE_SHIFT) + size) & ~(GENMASK_ULL(cpu_pabits, 0)));
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

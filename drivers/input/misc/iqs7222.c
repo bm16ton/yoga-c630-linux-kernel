@@ -86,13 +86,9 @@ enum iqs7222_reg_key_id {
 	IQS7222_REG_KEY_TOUCH,
 	IQS7222_REG_KEY_DEBOUNCE,
 	IQS7222_REG_KEY_TAP,
-<<<<<<< HEAD
 	IQS7222_REG_KEY_TAP_LEGACY,
 	IQS7222_REG_KEY_AXIAL,
 	IQS7222_REG_KEY_AXIAL_LEGACY,
-=======
-	IQS7222_REG_KEY_AXIAL,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	IQS7222_REG_KEY_WHEEL,
 	IQS7222_REG_KEY_NO_WHEEL,
 	IQS7222_REG_KEY_RESERVED
@@ -111,22 +107,14 @@ enum iqs7222_reg_grp_id {
 	IQS7222_NUM_REG_GRPS
 };
 
-<<<<<<< HEAD
 static const char * const iqs7222_reg_grp_names[IQS7222_NUM_REG_GRPS] = {
-=======
-static const char * const iqs7222_reg_grp_names[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	[IQS7222_REG_GRP_CYCLE] = "cycle",
 	[IQS7222_REG_GRP_CHAN] = "channel",
 	[IQS7222_REG_GRP_SLDR] = "slider",
 	[IQS7222_REG_GRP_GPIO] = "gpio",
 };
 
-<<<<<<< HEAD
 static const unsigned int iqs7222_max_cols[IQS7222_NUM_REG_GRPS] = {
-=======
-static const unsigned int iqs7222_max_cols[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	[IQS7222_REG_GRP_STAT] = IQS7222_MAX_COLS_STAT,
 	[IQS7222_REG_GRP_CYCLE] = IQS7222_MAX_COLS_CYCLE,
 	[IQS7222_REG_GRP_GLBL] = IQS7222_MAX_COLS_GLBL,
@@ -216,10 +204,7 @@ struct iqs7222_dev_desc {
 	int allow_offset;
 	int event_offset;
 	int comms_offset;
-<<<<<<< HEAD
 	bool legacy_gesture;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct iqs7222_reg_grp_desc reg_grps[IQS7222_NUM_REG_GRPS];
 };
 
@@ -227,7 +212,6 @@ static const struct iqs7222_dev_desc iqs7222_devs[] = {
 	{
 		.prod_num = IQS7222_PROD_NUM_A,
 		.fw_major = 1,
-<<<<<<< HEAD
 		.fw_minor = 13,
 		.sldr_res = U8_MAX * 16,
 		.touch_link = 1768,
@@ -285,18 +269,13 @@ static const struct iqs7222_dev_desc iqs7222_devs[] = {
 	{
 		.prod_num = IQS7222_PROD_NUM_A,
 		.fw_major = 1,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.fw_minor = 12,
 		.sldr_res = U8_MAX * 16,
 		.touch_link = 1768,
 		.allow_offset = 9,
 		.event_offset = 10,
 		.comms_offset = 12,
-<<<<<<< HEAD
 		.legacy_gesture = true,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.reg_grps = {
 			[IQS7222_REG_GRP_STAT] = {
 				.base = IQS7222_SYS_STATUS,
@@ -956,7 +935,6 @@ static const struct iqs7222_prop_desc iqs7222_props[] = {
 		.reg_offset = 9,
 		.reg_shift = 8,
 		.reg_width = 8,
-<<<<<<< HEAD
 		.val_pitch = 16,
 		.label = "maximum gesture time",
 	},
@@ -967,8 +945,6 @@ static const struct iqs7222_prop_desc iqs7222_props[] = {
 		.reg_offset = 9,
 		.reg_shift = 8,
 		.reg_width = 8,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.val_pitch = 4,
 		.label = "maximum gesture time",
 	},
@@ -979,7 +955,6 @@ static const struct iqs7222_prop_desc iqs7222_props[] = {
 		.reg_offset = 9,
 		.reg_shift = 3,
 		.reg_width = 5,
-<<<<<<< HEAD
 		.val_pitch = 16,
 		.label = "minimum gesture time",
 	},
@@ -990,8 +965,6 @@ static const struct iqs7222_prop_desc iqs7222_props[] = {
 		.reg_offset = 9,
 		.reg_shift = 3,
 		.reg_width = 5,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.val_pitch = 4,
 		.label = "minimum gesture time",
 	},
@@ -1006,7 +979,6 @@ static const struct iqs7222_prop_desc iqs7222_props[] = {
 		.label = "gesture distance",
 	},
 	{
-<<<<<<< HEAD
 		.name = "azoteq,gesture-dist",
 		.reg_grp = IQS7222_REG_GRP_SLDR,
 		.reg_key = IQS7222_REG_KEY_AXIAL_LEGACY,
@@ -1017,15 +989,12 @@ static const struct iqs7222_prop_desc iqs7222_props[] = {
 		.label = "gesture distance",
 	},
 	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.name = "azoteq,gesture-max-ms",
 		.reg_grp = IQS7222_REG_GRP_SLDR,
 		.reg_key = IQS7222_REG_KEY_AXIAL,
 		.reg_offset = 10,
 		.reg_shift = 0,
 		.reg_width = 8,
-<<<<<<< HEAD
 		.val_pitch = 16,
 		.label = "maximum gesture time",
 	},
@@ -1036,8 +1005,6 @@ static const struct iqs7222_prop_desc iqs7222_props[] = {
 		.reg_offset = 10,
 		.reg_shift = 0,
 		.reg_width = 8,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.val_pitch = 4,
 		.label = "maximum gesture time",
 	},
@@ -1211,11 +1178,7 @@ static int iqs7222_hard_reset(struct iqs7222_private *iqs7222)
 
 static int iqs7222_force_comms(struct iqs7222_private *iqs7222)
 {
-<<<<<<< HEAD
 	u8 msg_buf[] = { 0xFF, };
-=======
-	u8 msg_buf[] = { 0xFF, 0x00, };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	/*
@@ -1705,7 +1668,6 @@ static int iqs7222_gpio_select(struct iqs7222_private *iqs7222,
 }
 
 static int iqs7222_parse_props(struct iqs7222_private *iqs7222,
-<<<<<<< HEAD
 			       struct fwnode_handle *reg_grp_node,
 			       int reg_grp_index,
 			       enum iqs7222_reg_grp_id reg_grp,
@@ -1717,58 +1679,6 @@ static int iqs7222_parse_props(struct iqs7222_private *iqs7222,
 
 	if (!setup)
 		return 0;
-=======
-			       struct fwnode_handle **child_node,
-			       int child_index,
-			       enum iqs7222_reg_grp_id reg_grp,
-			       enum iqs7222_reg_key_id reg_key)
-{
-	u16 *setup = iqs7222_setup(iqs7222, reg_grp, child_index);
-	struct i2c_client *client = iqs7222->client;
-	struct fwnode_handle *reg_grp_node;
-	char reg_grp_name[16];
-	int i;
-
-	switch (reg_grp) {
-	case IQS7222_REG_GRP_CYCLE:
-	case IQS7222_REG_GRP_CHAN:
-	case IQS7222_REG_GRP_SLDR:
-	case IQS7222_REG_GRP_GPIO:
-	case IQS7222_REG_GRP_BTN:
-		/*
-		 * These groups derive a child node and return it to the caller
-		 * for additional group-specific processing. In some cases, the
-		 * child node may have already been derived.
-		 */
-		reg_grp_node = *child_node;
-		if (reg_grp_node)
-			break;
-
-		snprintf(reg_grp_name, sizeof(reg_grp_name), "%s-%d",
-			 iqs7222_reg_grp_names[reg_grp], child_index);
-
-		reg_grp_node = device_get_named_child_node(&client->dev,
-							   reg_grp_name);
-		if (!reg_grp_node)
-			return 0;
-
-		*child_node = reg_grp_node;
-		break;
-
-	case IQS7222_REG_GRP_GLBL:
-	case IQS7222_REG_GRP_FILT:
-	case IQS7222_REG_GRP_SYS:
-		/*
-		 * These groups are not organized beneath a child node, nor are
-		 * they subject to any additional processing by the caller.
-		 */
-		reg_grp_node = dev_fwnode(&client->dev);
-		break;
-
-	default:
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < ARRAY_SIZE(iqs7222_props); i++) {
 		const char *name = iqs7222_props[i].name;
@@ -1838,7 +1748,6 @@ static int iqs7222_parse_props(struct iqs7222_private *iqs7222,
 	return 0;
 }
 
-<<<<<<< HEAD
 static int iqs7222_parse_event(struct iqs7222_private *iqs7222,
 			       struct fwnode_handle *event_node,
 			       int reg_grp_index,
@@ -1899,13 +1808,6 @@ static int iqs7222_parse_cycle(struct iqs7222_private *iqs7222,
 {
 	u16 *cycle_setup = iqs7222->cycle_setup[cycle_index];
 	struct i2c_client *client = iqs7222->client;
-=======
-static int iqs7222_parse_cycle(struct iqs7222_private *iqs7222, int cycle_index)
-{
-	u16 *cycle_setup = iqs7222->cycle_setup[cycle_index];
-	struct i2c_client *client = iqs7222->client;
-	struct fwnode_handle *cycle_node = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int pins[9];
 	int error, count, i;
 
@@ -1913,21 +1815,7 @@ static int iqs7222_parse_cycle(struct iqs7222_private *iqs7222, int cycle_index)
 	 * Each channel shares a cycle with one other channel; the mapping of
 	 * channels to cycles is fixed. Properties defined for a cycle impact
 	 * both channels tied to the cycle.
-<<<<<<< HEAD
 	 *
-=======
-	 */
-	error = iqs7222_parse_props(iqs7222, &cycle_node, cycle_index,
-				    IQS7222_REG_GRP_CYCLE,
-				    IQS7222_REG_KEY_NONE);
-	if (error)
-		return error;
-
-	if (!cycle_node)
-		return 0;
-
-	/*
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * Unlike channels which are restricted to a select range of CRx pins
 	 * based on channel number, any cycle can claim any of the device's 9
 	 * CTx pins (CTx0-8).
@@ -1969,19 +1857,11 @@ static int iqs7222_parse_cycle(struct iqs7222_private *iqs7222, int cycle_index)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int iqs7222_parse_chan(struct iqs7222_private *iqs7222,
 			      struct fwnode_handle *chan_node, int chan_index)
 {
 	const struct iqs7222_dev_desc *dev_desc = iqs7222->dev_desc;
 	struct i2c_client *client = iqs7222->client;
-=======
-static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
-{
-	const struct iqs7222_dev_desc *dev_desc = iqs7222->dev_desc;
-	struct i2c_client *client = iqs7222->client;
-	struct fwnode_handle *chan_node = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int num_chan = dev_desc->reg_grps[IQS7222_REG_GRP_CHAN].num_row;
 	int ext_chan = rounddown(num_chan, 10);
 	int error, i;
@@ -1989,26 +1869,9 @@ static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
 	u16 *sys_setup = iqs7222->sys_setup;
 	unsigned int val;
 
-<<<<<<< HEAD
 	if (dev_desc->allow_offset &&
 	    fwnode_property_present(chan_node, "azoteq,ulp-allow"))
 		sys_setup[dev_desc->allow_offset] &= ~BIT(chan_index);
-=======
-	error = iqs7222_parse_props(iqs7222, &chan_node, chan_index,
-				    IQS7222_REG_GRP_CHAN,
-				    IQS7222_REG_KEY_NONE);
-	if (error)
-		return error;
-
-	if (!chan_node)
-		return 0;
-
-	if (dev_desc->allow_offset) {
-		sys_setup[dev_desc->allow_offset] |= BIT(chan_index);
-		if (fwnode_property_present(chan_node, "azoteq,ulp-allow"))
-			sys_setup[dev_desc->allow_offset] &= ~BIT(chan_index);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	chan_setup[0] |= IQS7222_CHAN_SETUP_0_CHAN_EN;
 
@@ -2045,14 +1908,9 @@ static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
 		chan_setup[0] |= IQS7222_CHAN_SETUP_0_REF_MODE_FOLLOW;
 		chan_setup[4] = val * 42 + 1048;
 
-<<<<<<< HEAD
 		error = fwnode_property_read_u32(chan_node, "azoteq,ref-weight",
 						 &val);
 		if (!error) {
-=======
-		if (!fwnode_property_read_u32(chan_node, "azoteq,ref-weight",
-					      &val)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (val > U16_MAX) {
 				dev_err(&client->dev,
 					"Invalid %s reference weight: %u\n",
@@ -2061,14 +1919,11 @@ static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
 			}
 
 			chan_setup[5] = val;
-<<<<<<< HEAD
 		} else if (error != -EINVAL) {
 			dev_err(&client->dev,
 				"Failed to read %s reference weight: %d\n",
 				fwnode_get_name(chan_node), error);
 			return error;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		/*
@@ -2141,28 +1996,10 @@ static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
 		if (!event_node)
 			continue;
 
-<<<<<<< HEAD
 		error = fwnode_property_read_u32(event_node,
 						 "azoteq,timeout-press-ms",
 						 &val);
 		if (!error) {
-=======
-		error = iqs7222_parse_props(iqs7222, &event_node, chan_index,
-					    IQS7222_REG_GRP_BTN,
-					    iqs7222_kp_events[i].reg_key);
-		if (error)
-			return error;
-
-		error = iqs7222_gpio_select(iqs7222, event_node,
-					    BIT(chan_index),
-					    dev_desc->touch_link - (i ? 0 : 2));
-		if (error)
-			return error;
-
-		if (!fwnode_property_read_u32(event_node,
-					      "azoteq,timeout-press-ms",
-					      &val)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			/*
 			 * The IQS7222B employs a global pair of press timeout
 			 * registers as opposed to channel-specific registers.
@@ -2175,18 +2012,13 @@ static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
 			if (val > U8_MAX * 500) {
 				dev_err(&client->dev,
 					"Invalid %s press timeout: %u\n",
-<<<<<<< HEAD
 					fwnode_get_name(event_node), val);
 				fwnode_handle_put(event_node);
-=======
-					fwnode_get_name(chan_node), val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				return -EINVAL;
 			}
 
 			*setup &= ~(U8_MAX << i * 8);
 			*setup |= (val / 500 << i * 8);
-<<<<<<< HEAD
 		} else if (error != -EINVAL) {
 			dev_err(&client->dev,
 				"Failed to read %s press timeout: %d\n",
@@ -2205,53 +2037,6 @@ static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
 		fwnode_handle_put(event_node);
 		if (error)
 			return error;
-=======
-		}
-
-		error = fwnode_property_read_u32(event_node, "linux,code",
-						 &val);
-		if (error) {
-			dev_err(&client->dev, "Failed to read %s code: %d\n",
-				fwnode_get_name(chan_node), error);
-			return error;
-		}
-
-		iqs7222->kp_code[chan_index][i] = val;
-		iqs7222->kp_type[chan_index][i] = EV_KEY;
-
-		if (fwnode_property_present(event_node, "linux,input-type")) {
-			error = fwnode_property_read_u32(event_node,
-							 "linux,input-type",
-							 &val);
-			if (error) {
-				dev_err(&client->dev,
-					"Failed to read %s input type: %d\n",
-					fwnode_get_name(chan_node), error);
-				return error;
-			}
-
-			if (val != EV_KEY && val != EV_SW) {
-				dev_err(&client->dev,
-					"Invalid %s input type: %u\n",
-					fwnode_get_name(chan_node), val);
-				return -EINVAL;
-			}
-
-			iqs7222->kp_type[chan_index][i] = val;
-		}
-
-		/*
-		 * Reference channels can opt out of event reporting by using
-		 * KEY_RESERVED in place of a true key or switch code.
-		 */
-		if (iqs7222->kp_type[chan_index][i] == EV_KEY &&
-		    iqs7222->kp_code[chan_index][i] == KEY_RESERVED)
-			continue;
-
-		input_set_capability(iqs7222->keypad,
-				     iqs7222->kp_type[chan_index][i],
-				     iqs7222->kp_code[chan_index][i]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (!dev_desc->event_offset)
 			continue;
@@ -2263,28 +2048,16 @@ static int iqs7222_parse_chan(struct iqs7222_private *iqs7222, int chan_index)
 	 * The following call handles a special pair of properties that apply
 	 * to a channel node, but reside within the button (event) group.
 	 */
-<<<<<<< HEAD
 	return iqs7222_parse_props(iqs7222, chan_node, chan_index,
-=======
-	return iqs7222_parse_props(iqs7222, &chan_node, chan_index,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   IQS7222_REG_GRP_BTN,
 				   IQS7222_REG_KEY_DEBOUNCE);
 }
 
-<<<<<<< HEAD
 static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222,
 			      struct fwnode_handle *sldr_node, int sldr_index)
 {
 	const struct iqs7222_dev_desc *dev_desc = iqs7222->dev_desc;
 	struct i2c_client *client = iqs7222->client;
-=======
-static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
-{
-	const struct iqs7222_dev_desc *dev_desc = iqs7222->dev_desc;
-	struct i2c_client *client = iqs7222->client;
-	struct fwnode_handle *sldr_node = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int num_chan = dev_desc->reg_grps[IQS7222_REG_GRP_CHAN].num_row;
 	int ext_chan = rounddown(num_chan, 10);
 	int count, error, reg_offset, i;
@@ -2292,18 +2065,6 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 	u16 *sldr_setup = iqs7222->sldr_setup[sldr_index];
 	unsigned int chan_sel[4], val;
 
-<<<<<<< HEAD
-=======
-	error = iqs7222_parse_props(iqs7222, &sldr_node, sldr_index,
-				    IQS7222_REG_GRP_SLDR,
-				    IQS7222_REG_KEY_NONE);
-	if (error)
-		return error;
-
-	if (!sldr_node)
-		return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Each slider can be spread across 3 to 4 channels. It is possible to
 	 * select only 2 channels, but doing so prevents the slider from using
@@ -2362,14 +2123,9 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 	if (fwnode_property_present(sldr_node, "azoteq,use-prox"))
 		sldr_setup[4 + reg_offset] -= 2;
 
-<<<<<<< HEAD
 	error = fwnode_property_read_u32(sldr_node, "azoteq,slider-size", &val);
 	if (!error) {
 		if (val > dev_desc->sldr_res) {
-=======
-	if (!fwnode_property_read_u32(sldr_node, "azoteq,slider-size", &val)) {
-		if (!val || val > dev_desc->sldr_res) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			dev_err(&client->dev, "Invalid %s size: %u\n",
 				fwnode_get_name(sldr_node), val);
 			return -EINVAL;
@@ -2382,7 +2138,6 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 			sldr_setup[2] |= (val / 16 <<
 					  IQS7222_SLDR_SETUP_2_RES_SHIFT);
 		}
-<<<<<<< HEAD
 	} else if (error != -EINVAL) {
 		dev_err(&client->dev, "Failed to read %s size: %d\n",
 			fwnode_get_name(sldr_node), error);
@@ -2398,11 +2153,6 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 
 	error = fwnode_property_read_u32(sldr_node, "azoteq,top-speed", &val);
 	if (!error) {
-=======
-	}
-
-	if (!fwnode_property_read_u32(sldr_node, "azoteq,top-speed", &val)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (val > (reg_offset ? U16_MAX : U8_MAX * 4)) {
 			dev_err(&client->dev, "Invalid %s top speed: %u\n",
 				fwnode_get_name(sldr_node), val);
@@ -2415,7 +2165,6 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 			sldr_setup[2] &= ~IQS7222_SLDR_SETUP_2_TOP_SPEED_MASK;
 			sldr_setup[2] |= (val / 4);
 		}
-<<<<<<< HEAD
 	} else if (error != -EINVAL) {
 		dev_err(&client->dev, "Failed to read %s top speed: %d\n",
 			fwnode_get_name(sldr_node), error);
@@ -2424,11 +2173,6 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 
 	error = fwnode_property_read_u32(sldr_node, "linux,axis", &val);
 	if (!error) {
-=======
-	}
-
-	if (!fwnode_property_read_u32(sldr_node, "linux,axis", &val)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		u16 sldr_max = sldr_setup[3] - 1;
 
 		if (!reg_offset) {
@@ -2442,13 +2186,10 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 
 		input_set_abs_params(iqs7222->keypad, val, 0, sldr_max, 0, 0);
 		iqs7222->sl_axis[sldr_index] = val;
-<<<<<<< HEAD
 	} else if (error != -EINVAL) {
 		dev_err(&client->dev, "Failed to read %s axis: %d\n",
 			fwnode_get_name(sldr_node), error);
 		return error;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (dev_desc->wheel_enable) {
@@ -2469,16 +2210,12 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 	for (i = 0; i < ARRAY_SIZE(iqs7222_sl_events); i++) {
 		const char *event_name = iqs7222_sl_events[i].name;
 		struct fwnode_handle *event_node;
-<<<<<<< HEAD
 		enum iqs7222_reg_key_id reg_key;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		event_node = fwnode_get_named_child_node(sldr_node, event_name);
 		if (!event_node)
 			continue;
 
-<<<<<<< HEAD
 		/*
 		 * Depending on the device, gestures are either offered using
 		 * one of two timing resolutions, or are not supported at all.
@@ -2493,22 +2230,12 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 			reg_key = IQS7222_REG_KEY_AXIAL_LEGACY;
 		else
 			reg_key = iqs7222_sl_events[i].reg_key;
-=======
-		error = iqs7222_parse_props(iqs7222, &event_node, sldr_index,
-					    IQS7222_REG_GRP_SLDR,
-					    reg_offset ?
-					    IQS7222_REG_KEY_RESERVED :
-					    iqs7222_sl_events[i].reg_key);
-		if (error)
-			return error;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * The press/release event does not expose a direct GPIO link,
 		 * but one can be emulated by tying each of the participating
 		 * channels to the same GPIO.
 		 */
-<<<<<<< HEAD
 		error = iqs7222_parse_event(iqs7222, event_node, sldr_index,
 					    IQS7222_REG_GRP_SLDR, reg_key,
 					    i ? iqs7222_sl_events[i].enable
@@ -2518,33 +2245,12 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 					    NULL,
 					    &iqs7222->sl_code[sldr_index][i]);
 		fwnode_handle_put(event_node);
-=======
-		error = iqs7222_gpio_select(iqs7222, event_node,
-					    i ? iqs7222_sl_events[i].enable
-					      : sldr_setup[3 + reg_offset],
-					    i ? 1568 + sldr_index * 30
-					      : sldr_setup[4 + reg_offset]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (error)
 			return error;
 
 		if (!reg_offset)
 			sldr_setup[9] |= iqs7222_sl_events[i].enable;
 
-<<<<<<< HEAD
-=======
-		error = fwnode_property_read_u32(event_node, "linux,code",
-						 &val);
-		if (error) {
-			dev_err(&client->dev, "Failed to read %s code: %d\n",
-				fwnode_get_name(sldr_node), error);
-			return error;
-		}
-
-		iqs7222->sl_code[sldr_index][i] = val;
-		input_set_capability(iqs7222->keypad, EV_KEY, val);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!dev_desc->event_offset)
 			continue;
 
@@ -2565,18 +2271,13 @@ static int iqs7222_parse_sldr(struct iqs7222_private *iqs7222, int sldr_index)
 	 * The following call handles a special pair of properties that shift
 	 * to make room for a wheel enable control in the case of IQS7222C.
 	 */
-<<<<<<< HEAD
 	return iqs7222_parse_props(iqs7222, sldr_node, sldr_index,
-=======
-	return iqs7222_parse_props(iqs7222, &sldr_node, sldr_index,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   IQS7222_REG_GRP_SLDR,
 				   dev_desc->wheel_enable ?
 				   IQS7222_REG_KEY_WHEEL :
 				   IQS7222_REG_KEY_NO_WHEEL);
 }
 
-<<<<<<< HEAD
 static int (*iqs7222_parse_extra[IQS7222_NUM_REG_GRPS])
 				(struct iqs7222_private *iqs7222,
 				 struct fwnode_handle *reg_grp_node,
@@ -2621,59 +2322,26 @@ static int iqs7222_parse_reg_grp(struct iqs7222_private *iqs7222,
 	return error;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int iqs7222_parse_all(struct iqs7222_private *iqs7222)
 {
 	const struct iqs7222_dev_desc *dev_desc = iqs7222->dev_desc;
 	const struct iqs7222_reg_grp_desc *reg_grps = dev_desc->reg_grps;
 	u16 *sys_setup = iqs7222->sys_setup;
-<<<<<<< HEAD
 	int error, i, j;
 
 	if (dev_desc->allow_offset)
 		sys_setup[dev_desc->allow_offset] = U16_MAX;
-=======
-	int error, i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (dev_desc->event_offset)
 		sys_setup[dev_desc->event_offset] = IQS7222_EVENT_MASK_ATI;
 
-<<<<<<< HEAD
 	for (i = 0; i < reg_grps[IQS7222_REG_GRP_GPIO].num_row; i++) {
 		u16 *gpio_setup = iqs7222->gpio_setup[i];
-=======
-	for (i = 0; i < reg_grps[IQS7222_REG_GRP_CYCLE].num_row; i++) {
-		error = iqs7222_parse_cycle(iqs7222, i);
-		if (error)
-			return error;
-	}
-
-	error = iqs7222_parse_props(iqs7222, NULL, 0, IQS7222_REG_GRP_GLBL,
-				    IQS7222_REG_KEY_NONE);
-	if (error)
-		return error;
-
-	for (i = 0; i < reg_grps[IQS7222_REG_GRP_GPIO].num_row; i++) {
-		struct fwnode_handle *gpio_node = NULL;
-		u16 *gpio_setup = iqs7222->gpio_setup[i];
-		int j;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		gpio_setup[0] &= ~IQS7222_GPIO_SETUP_0_GPIO_EN;
 		gpio_setup[1] = 0;
 		gpio_setup[2] = 0;
 
-<<<<<<< HEAD
-=======
-		error = iqs7222_parse_props(iqs7222, &gpio_node, i,
-					    IQS7222_REG_GRP_GPIO,
-					    IQS7222_REG_KEY_NONE);
-		if (error)
-			return error;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (reg_grps[IQS7222_REG_GRP_GPIO].num_row == 1)
 			continue;
 
@@ -2696,25 +2364,10 @@ static int iqs7222_parse_all(struct iqs7222_private *iqs7222)
 		chan_setup[5] = 0;
 	}
 
-<<<<<<< HEAD
-=======
-	for (i = 0; i < reg_grps[IQS7222_REG_GRP_CHAN].num_row; i++) {
-		error = iqs7222_parse_chan(iqs7222, i);
-		if (error)
-			return error;
-	}
-
-	error = iqs7222_parse_props(iqs7222, NULL, 0, IQS7222_REG_GRP_FILT,
-				    IQS7222_REG_KEY_NONE);
-	if (error)
-		return error;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < reg_grps[IQS7222_REG_GRP_SLDR].num_row; i++) {
 		u16 *sldr_setup = iqs7222->sldr_setup[i];
 
 		sldr_setup[0] &= ~IQS7222_SLDR_SETUP_0_CHAN_CNT_MASK;
-<<<<<<< HEAD
 	}
 
 	for (i = 0; i < IQS7222_NUM_REG_GRPS; i++) {
@@ -2726,16 +2379,6 @@ static int iqs7222_parse_all(struct iqs7222_private *iqs7222)
 	}
 
 	return 0;
-=======
-
-		error = iqs7222_parse_sldr(iqs7222, i);
-		if (error)
-			return error;
-	}
-
-	return iqs7222_parse_props(iqs7222, NULL, 0, IQS7222_REG_GRP_SYS,
-				   IQS7222_REG_KEY_NONE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int iqs7222_report(struct iqs7222_private *iqs7222)
@@ -2782,12 +2425,9 @@ static int iqs7222_report(struct iqs7222_private *iqs7222)
 			int k = 2 + j * (num_chan > 16 ? 2 : 1);
 			u16 state = le16_to_cpu(status[k + i / 16]);
 
-<<<<<<< HEAD
 			if (!iqs7222->kp_type[i][j])
 				continue;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			input_event(iqs7222->keypad,
 				    iqs7222->kp_type[i][j],
 				    iqs7222->kp_code[i][j],

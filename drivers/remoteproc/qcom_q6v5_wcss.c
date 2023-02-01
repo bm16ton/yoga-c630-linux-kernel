@@ -351,11 +351,7 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	if (ret) {
 		dev_err(wcss->dev,
 			"xo cbcr enabling timed out (rc:%d)\n", ret);
-<<<<<<< HEAD
 		goto disable_xo_cbcr_clk;
-=======
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	writel(0, wcss->reg_base + Q6SS_CGC_OVERRIDE);
@@ -421,10 +417,7 @@ disable_sleep_cbcr_clk:
 	val = readl(wcss->reg_base + Q6SS_SLEEP_CBCR);
 	val &= ~Q6SS_CLK_ENABLE;
 	writel(val, wcss->reg_base + Q6SS_SLEEP_CBCR);
-<<<<<<< HEAD
 disable_xo_cbcr_clk:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	val = readl(wcss->reg_base + Q6SS_XO_CBCR);
 	val &= ~Q6SS_CLK_ENABLE;
 	writel(val, wcss->reg_base + Q6SS_XO_CBCR);
@@ -835,7 +828,6 @@ static int q6v5_wcss_init_mmio(struct q6v5_wcss *wcss,
 	int ret;
 
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "qdsp6");
-<<<<<<< HEAD
 	if (!res)
 		return -EINVAL;
 
@@ -851,20 +843,6 @@ static int q6v5_wcss_init_mmio(struct q6v5_wcss *wcss,
 			return PTR_ERR(wcss->rmb_base);
 	}
 
-=======
-	wcss->reg_base = devm_ioremap(&pdev->dev, res->start,
-				      resource_size(res));
-	if (!wcss->reg_base)
-		return -ENOMEM;
-
-	if (wcss->version == WCSS_IPQ8074) {
-		res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "rmb");
-		wcss->rmb_base = devm_ioremap_resource(&pdev->dev, res);
-		if (IS_ERR(wcss->rmb_base))
-			return PTR_ERR(wcss->rmb_base);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	syscon = of_parse_phandle(pdev->dev.of_node,
 				  "qcom,halt-regs", 0);
 	if (!syscon) {

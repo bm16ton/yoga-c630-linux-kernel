@@ -87,11 +87,6 @@ static void mpu3050_i2c_remove(struct i2c_client *client)
 		i2c_mux_del_adapters(mpu3050->i2cmux);
 
 	mpu3050_common_remove(&client->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

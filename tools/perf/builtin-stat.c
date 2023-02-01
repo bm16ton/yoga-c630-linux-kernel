@@ -522,19 +522,6 @@ static int enable_counters(void)
 	evlist__for_each_entry(evsel_list, evsel) {
 		if (!evsel__is_bpf(evsel))
 			continue;
-<<<<<<< HEAD
-=======
-
-		err = bpf_counter__enable(evsel);
-		if (err)
-			return err;
-	}
-
-	if (stat_config.initial_delay < 0) {
-		pr_info(EVLIST_DISABLED_MSG);
-		return 0;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		err = bpf_counter__enable(evsel);
 		if (err)
@@ -546,17 +533,9 @@ static int enable_counters(void)
 	 * - we don't have tracee (attaching to task or cpu)
 	 * - we have initial delay configured
 	 */
-<<<<<<< HEAD
 	if (!target__none(&target)) {
 		if (!all_counters_use_bpf)
 			evlist__enable(evsel_list);
-=======
-	if (!target__none(&target) || stat_config.initial_delay) {
-		if (!all_counters_use_bpf)
-			evlist__enable(evsel_list);
-		if (stat_config.initial_delay > 0)
-			pr_info(EVLIST_ENABLED_MSG);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return 0;
 }
@@ -863,15 +842,8 @@ try_again:
 		evlist__for_each_cpu(evlist_cpu_itr, evsel_list, affinity) {
 			counter = evlist_cpu_itr.evsel;
 
-<<<<<<< HEAD
 			if (!counter->reset_group)
 				continue;
-=======
-			if (!counter->reset_group && !counter->errored)
-				continue;
-			if (!counter->reset_group)
-				continue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 try_again_reset:
 			pr_debug2("reopening weak %s\n", evsel__name(counter));
 			if (create_perf_stat_counter(counter, &stat_config, &target,
@@ -934,7 +906,6 @@ try_again_reset:
 			return err;
 	}
 
-<<<<<<< HEAD
 	if (stat_config.initial_delay) {
 		pr_info(EVLIST_DISABLED_MSG);
 	} else {
@@ -959,19 +930,6 @@ try_again_reset:
 	t0 = rdclock();
 	clock_gettime(CLOCK_MONOTONIC, &ref_time);
 
-=======
-	err = enable_counters();
-	if (err)
-		return -1;
-
-	/* Exec the command, if any */
-	if (forks)
-		evlist__start_workload(evsel_list);
-
-	t0 = rdclock();
-	clock_gettime(CLOCK_MONOTONIC, &ref_time);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (forks) {
 		if (interval || timeout || evlist__ctlfd_initialized(evsel_list))
 			status = dispatch_events(forks, timeout, interval, &times);
@@ -1316,13 +1274,8 @@ static struct option stat_options[] = {
 		       "print summary for interval mode"),
 	OPT_BOOLEAN(0, "no-csv-summary", &stat_config.no_csv_summary,
 		       "don't print 'summary' for CSV summary output"),
-<<<<<<< HEAD
 	OPT_BOOLEAN(0, "quiet", &quiet,
 			"don't print any output, messages or warnings (useful with record)"),
-=======
-	OPT_BOOLEAN(0, "quiet", &stat_config.quiet,
-			"don't print output (useful with record)"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	OPT_CALLBACK(0, "cputype", &evsel_list, "hybrid cpu type",
 		     "Only enable events on applying cpu with this type "
 		     "for hybrid platform (e.g. core or atom)",
@@ -1382,17 +1335,10 @@ static struct aggr_cpu_id perf_stat__get_aggr(struct perf_stat_config *config,
 					      aggr_get_id_t get_id, struct perf_cpu cpu)
 {
 	struct aggr_cpu_id id = aggr_cpu_id__empty();
-<<<<<<< HEAD
 
 	if (aggr_cpu_id__is_empty(&config->cpus_aggr_map->map[cpu.cpu]))
 		config->cpus_aggr_map->map[cpu.cpu] = get_id(config, cpu);
 
-=======
-
-	if (aggr_cpu_id__is_empty(&config->cpus_aggr_map->map[cpu.cpu]))
-		config->cpus_aggr_map->map[cpu.cpu] = get_id(config, cpu);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	id = config->cpus_aggr_map->map[cpu.cpu];
 	return id;
 }
@@ -1659,17 +1605,10 @@ static int perf_stat_init_aggr_mode_file(struct perf_stat *st)
 {
 	struct perf_env *env = &st->session->header.env;
 	aggr_cpu_id_get_t get_id = aggr_mode__get_aggr_file(stat_config.aggr_mode);
-<<<<<<< HEAD
 
 	if (!get_id)
 		return 0;
 
-=======
-
-	if (!get_id)
-		return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	stat_config.aggr_map = cpu_aggr_map__new(evsel_list->core.user_requested_cpus, get_id, env);
 	if (!stat_config.aggr_map) {
 		pr_err("cannot build %s map", aggr_mode__string[stat_config.aggr_mode]);
@@ -2451,7 +2390,6 @@ int cmd_stat(int argc, const char **argv)
 			target.system_wide = true;
 	}
 
-<<<<<<< HEAD
 	if ((stat_config.aggr_mode == AGGR_THREAD) && (target.system_wide))
 		target.per_thread = true;
 
@@ -2480,8 +2418,6 @@ int cmd_stat(int argc, const char **argv)
 	perf_stat__collect_metric_expr(evsel_list);
 	perf_stat__init_shadow_stats();
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (add_default_attributes())
 		goto out;
 
@@ -2506,14 +2442,6 @@ int cmd_stat(int argc, const char **argv)
 		goto out;
 	}
 
-<<<<<<< HEAD
-=======
-	if (evlist__fix_hybrid_cpus(evsel_list, target.cpu_list)) {
-		pr_err("failed to use cpu list %s\n", target.cpu_list);
-		goto out;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	target.hybrid = perf_pmu__has_hybrid();
 	if (evlist__create_maps(evsel_list, &target) < 0) {
 		if (target__has_task(&target)) {

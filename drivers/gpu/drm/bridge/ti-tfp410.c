@@ -397,11 +397,6 @@ static int tfp410_i2c_probe(struct i2c_client *client,
 static void tfp410_i2c_remove(struct i2c_client *client)
 {
 	tfp410_fini(&client->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tfp410_i2c_ids[] = {

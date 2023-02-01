@@ -34,10 +34,7 @@ struct snd_sof_dev;
 #define ADSP_DRESET_SW			BIT(1)
 #define ADSP_RUNSTALL			BIT(3)
 #define STATVECTOR_SEL			BIT(4)
-<<<<<<< HEAD
 #define ADSP_PWAIT			BIT(16)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define DSP_PFAULTBUS			0x0028
 #define DSP_PFAULTINFO			0x002c
 #define DSP_GPR00			0x0030
@@ -157,13 +154,10 @@ struct snd_sof_dev;
 #define DRAM_REMAP_SHIFT	12
 #define DRAM_REMAP_MASK		(BIT(DRAM_REMAP_SHIFT) - 1)
 
-<<<<<<< HEAD
 /* suspend dsp idle check interval and timeout */
 #define SUSPEND_DSP_IDLE_TIMEOUT_US		1000000	/* timeout to wait dsp idle, 1 sec */
 #define SUSPEND_DSP_IDLE_POLL_INTERVAL_US	500	/* 0.5 msec */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void sof_hifixdsp_boot_sequence(struct snd_sof_dev *sdev, u32 boot_addr);
 void sof_hifixdsp_shutdown(struct snd_sof_dev *sdev);
 #endif

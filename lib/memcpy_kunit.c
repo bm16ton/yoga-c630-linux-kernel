@@ -29,14 +29,8 @@ struct some_bytes {
 };
 
 #define check(instance, v) do {	\
-<<<<<<< HEAD
 	BUILD_BUG_ON(sizeof(instance.data) != 32);	\
 	for (size_t i = 0; i < sizeof(instance.data); i++) {	\
-=======
-	int i;	\
-	BUILD_BUG_ON(sizeof(instance.data) != 32);	\
-	for (i = 0; i < sizeof(instance.data); i++) {	\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		KUNIT_ASSERT_EQ_MSG(test, instance.data[i], v, \
 			"line %d: '%s' not initialized to 0x%02x @ %d (saw 0x%02x)\n", \
 			__LINE__, #instance, v, i, instance.data[i]);	\
@@ -44,14 +38,8 @@ struct some_bytes {
 } while (0)
 
 #define compare(name, one, two) do { \
-<<<<<<< HEAD
 	BUILD_BUG_ON(sizeof(one) != sizeof(two)); \
 	for (size_t i = 0; i < sizeof(one); i++) {	\
-=======
-	int i; \
-	BUILD_BUG_ON(sizeof(one) != sizeof(two)); \
-	for (i = 0; i < sizeof(one); i++) {	\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		KUNIT_EXPECT_EQ_MSG(test, one.data[i], two.data[i], \
 			"line %d: %s.data[%d] (0x%02x) != %s.data[%d] (0x%02x)\n", \
 			__LINE__, #one, i, one.data[i], #two, i, two.data[i]); \
@@ -282,7 +270,6 @@ static void memset_test(struct kunit *test)
 #undef TEST_OP
 }
 
-<<<<<<< HEAD
 static void strtomem_test(struct kunit *test)
 {
 	static const char input[sizeof(unsigned long)] = "hi";
@@ -335,16 +322,11 @@ static void strtomem_test(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, wrap.canary2, ULONG_MAX);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct kunit_case memcpy_test_cases[] = {
 	KUNIT_CASE(memset_test),
 	KUNIT_CASE(memcpy_test),
 	KUNIT_CASE(memmove_test),
-<<<<<<< HEAD
 	KUNIT_CASE(strtomem_test),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{}
 };
 

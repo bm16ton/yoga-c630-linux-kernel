@@ -435,11 +435,7 @@ static const struct sp_dev_vdata dev_vdata[] = {
 	{	/* 5 */
 		.bar = 2,
 #ifdef CONFIG_CRYPTO_DEV_SP_PSP
-<<<<<<< HEAD
 		.psp_vdata = &pspv4,
-=======
-		.psp_vdata = &pspv2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 	},
 	{	/* 6 */

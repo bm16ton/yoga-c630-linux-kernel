@@ -201,7 +201,6 @@ struct napi_alloc_cache {
 static DEFINE_PER_CPU(struct page_frag_cache, netdev_alloc_cache);
 static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache);
 
-<<<<<<< HEAD
 /* Double check that napi_get_frags() allocates skbs with
  * skb->head being backed by slab, not a page fragment.
  * This is to make sure bug fixed in 3226b158e67c
@@ -209,13 +208,9 @@ static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache);
  * does not accidentally come back.
  */
 void napi_get_frags_check(struct napi_struct *napi)
-=======
-void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sk_buff *skb;
 
-<<<<<<< HEAD
 	local_bh_disable();
 	skb = napi_get_frags(napi);
 	WARN_ON_ONCE(!NAPI_HAS_SMALL_PAGE_FRAG && skb && skb->head_frag);
@@ -227,8 +222,6 @@ void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
 {
 	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fragsz = SKB_DATA_ALIGN(fragsz);
 
 	return page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC, align_mask);
@@ -886,12 +879,8 @@ EXPORT_SYMBOL(__kfree_skb);
  *	hit zero. Meanwhile, pass the drop reason to 'kfree_skb'
  *	tracepoint.
  */
-<<<<<<< HEAD
 void __fix_address
 kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason)
-=======
-void kfree_skb_reason(struct sk_buff *skb, enum skb_drop_reason reason)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (unlikely(!skb_unref(skb)))
 		return;
@@ -1320,13 +1309,8 @@ static struct ubuf_info *msg_zerocopy_alloc(struct sock *sk, size_t size)
 	uarg->len = 1;
 	uarg->bytelen = size;
 	uarg->zerocopy = 1;
-<<<<<<< HEAD
 	uarg->ubuf.flags = SKBFL_ZEROCOPY_FRAG | SKBFL_DONT_ORPHAN;
 	refcount_set(&uarg->ubuf.refcnt, 1);
-=======
-	uarg->flags = SKBFL_ZEROCOPY_FRAG | SKBFL_DONT_ORPHAN;
-	refcount_set(&uarg->refcnt, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sock_hold(sk);
 
 	return &uarg->ubuf;

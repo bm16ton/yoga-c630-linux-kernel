@@ -100,11 +100,7 @@ struct binder_lru_page {
 struct binder_alloc {
 	struct mutex mutex;
 	unsigned long vma_addr;
-<<<<<<< HEAD
 	struct mm_struct *mm;
-=======
-	struct mm_struct *vma_vm_mm;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void __user *buffer;
 	struct list_head buffers;
 	struct rb_root free_buffers;

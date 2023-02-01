@@ -10,12 +10,9 @@
 #include "../../codecs/cs35l41.h"
 #include "sof_cirrus_common.h"
 
-<<<<<<< HEAD
 #define CS35L41_HID "CSC3541"
 #define CS35L41_MAX_AMPS 4
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Cirrus Logic CS35L41/CS35L53
  */
@@ -41,52 +38,12 @@ static const struct snd_soc_dapm_route cs35l41_dapm_routes[] = {
 	{"TR Spk", NULL, "TR SPK"},
 };
 
-<<<<<<< HEAD
 static struct snd_soc_dai_link_component cs35l41_components[CS35L41_MAX_AMPS];
 
 /*
  * Mapping between ACPI instance id and speaker position.
  */
 static struct snd_soc_codec_conf cs35l41_codec_conf[CS35L41_MAX_AMPS];
-=======
-static struct snd_soc_dai_link_component cs35l41_components[] = {
-	{
-		.name = CS35L41_DEV0_NAME,
-		.dai_name = CS35L41_CODEC_DAI,
-	},
-	{
-		.name = CS35L41_DEV1_NAME,
-		.dai_name = CS35L41_CODEC_DAI,
-	},
-	{
-		.name = CS35L41_DEV2_NAME,
-		.dai_name = CS35L41_CODEC_DAI,
-	},
-	{
-		.name = CS35L41_DEV3_NAME,
-		.dai_name = CS35L41_CODEC_DAI,
-	},
-};
-
-static struct snd_soc_codec_conf cs35l41_codec_conf[] = {
-	{
-		.dlc = COMP_CODEC_CONF(CS35L41_DEV0_NAME),
-		.name_prefix = "WL",
-	},
-	{
-		.dlc = COMP_CODEC_CONF(CS35L41_DEV1_NAME),
-		.name_prefix = "WR",
-	},
-	{
-		.dlc = COMP_CODEC_CONF(CS35L41_DEV2_NAME),
-		.name_prefix = "TL",
-	},
-	{
-		.dlc = COMP_CODEC_CONF(CS35L41_DEV3_NAME),
-		.name_prefix = "TR",
-	},
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int cs35l41_init(struct snd_soc_pcm_runtime *rtd)
 {
@@ -116,7 +73,6 @@ static int cs35l41_init(struct snd_soc_pcm_runtime *rtd)
 	return ret;
 }
 
-<<<<<<< HEAD
 /*
  * Channel map:
  *
@@ -132,8 +88,6 @@ static const struct {
 	{.rx = {1, 0}}, /* TR */
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int cs35l41_hw_params(struct snd_pcm_substream *substream,
 			     struct snd_pcm_hw_params *params)
 {
@@ -167,7 +121,6 @@ static int cs35l41_hw_params(struct snd_pcm_substream *substream,
 				ret);
 			return ret;
 		}
-<<<<<<< HEAD
 
 		/* setup channel map */
 		ret = snd_soc_dai_set_channel_map(codec_dai, 0, NULL,
@@ -178,8 +131,6 @@ static int cs35l41_hw_params(struct snd_pcm_substream *substream,
 				ret);
 			return ret;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -189,7 +140,6 @@ static const struct snd_soc_ops cs35l41_ops = {
 	.hw_params = cs35l41_hw_params,
 };
 
-<<<<<<< HEAD
 static const char * const cs35l41_name_prefixes[] = { "WL", "WR", "TL", "TR" };
 
 /*
@@ -235,12 +185,6 @@ void cs35l41_set_dai_link(struct snd_soc_dai_link *link)
 {
 	link->num_codecs = cs35l41_compute_codec_conf();
 	link->codecs = cs35l41_components;
-=======
-void cs35l41_set_dai_link(struct snd_soc_dai_link *link)
-{
-	link->codecs = cs35l41_components;
-	link->num_codecs = ARRAY_SIZE(cs35l41_components);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	link->init = cs35l41_init;
 	link->ops = &cs35l41_ops;
 }

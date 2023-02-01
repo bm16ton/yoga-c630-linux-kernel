@@ -162,7 +162,6 @@ config PINCTRL_MT8186
 	default ARM64 && ARCH_MEDIATEK
 	select PINCTRL_MTK_PARIS
 
-<<<<<<< HEAD
 config PINCTRL_MT8188
 	bool "MediaTek MT8188 pin control"
 	depends on OF
@@ -175,8 +174,6 @@ config PINCTRL_MT8188
 	  In MTK platform, we support virtual gpio and use it to
 	  map specific eint which doesn't have real gpio pin.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config PINCTRL_MT8192
 	bool "Mediatek MT8192 pin control"
 	depends on OF

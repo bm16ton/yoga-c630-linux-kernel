@@ -189,10 +189,7 @@ enum ravb_reg {
 	PSR	= 0x0528,
 	PIPR	= 0x052c,
 	CXR31	= 0x0530,	/* RZ/G2L only */
-<<<<<<< HEAD
 	CXR35	= 0x0540,	/* RZ/G2L only */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	MPR	= 0x0558,
 	PFTCR	= 0x055c,
 	PFRCR	= 0x0560,
@@ -969,7 +966,6 @@ enum CXR31_BIT {
 	CXR31_SEL_LINK1	= 0x00000008,
 };
 
-<<<<<<< HEAD
 enum CXR35_BIT {
 	CXR35_SEL_XMII		= 0x00000003,
 	CXR35_SEL_XMII_RGMII	= 0x00000000,
@@ -977,8 +973,6 @@ enum CXR35_BIT {
 	CXR35_HALFCYC_CLKSW	= 0xffff0000,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum CSR0_BIT {
 	CSR0_TPE	= 0x00000010,
 	CSR0_RPE	= 0x00000020,

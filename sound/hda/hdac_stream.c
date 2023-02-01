@@ -175,7 +175,6 @@ void snd_hdac_stream_stop(struct hdac_stream *azx_dev)
 EXPORT_SYMBOL_GPL(snd_hdac_stream_stop);
 
 /**
-<<<<<<< HEAD
  * snd_hdac_stop_streams - stop all streams
  * @bus: HD-audio core bus
  */
@@ -189,24 +188,14 @@ void snd_hdac_stop_streams(struct hdac_bus *bus)
 EXPORT_SYMBOL_GPL(snd_hdac_stop_streams);
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * snd_hdac_stop_streams_and_chip - stop all streams and chip if running
  * @bus: HD-audio core bus
  */
 void snd_hdac_stop_streams_and_chip(struct hdac_bus *bus)
 {
-<<<<<<< HEAD
 
 	if (bus->chip_init) {
 		snd_hdac_stop_streams(bus);
-=======
-	struct hdac_stream *stream;
-
-	if (bus->chip_init) {
-		list_for_each_entry(stream, &bus->stream_list, list)
-			snd_hdac_stream_stop(stream);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		snd_hdac_bus_stop_chip(bus);
 	}
 }

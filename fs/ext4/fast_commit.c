@@ -340,12 +340,7 @@ void ext4_fc_mark_ineligible(struct super_block *sb, int reason, handle_t *handl
 	struct ext4_sb_info *sbi = EXT4_SB(sb);
 	tid_t tid;
 
-<<<<<<< HEAD
 	if (ext4_fc_disabled(sb))
-=======
-	if (!test_opt2(sb, JOURNAL_FAST_COMMIT) ||
-	    (EXT4_SB(sb)->s_mount_state & EXT4_FC_REPLAY))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	ext4_set_mount_flag(sb, EXT4_MF_FC_INELIGIBLE);
@@ -440,11 +435,7 @@ static int __track_dentry_update(struct inode *inode, void *arg, bool update)
 
 	node = kmem_cache_alloc(ext4_fc_dentry_cachep, GFP_NOFS);
 	if (!node) {
-<<<<<<< HEAD
 		ext4_fc_mark_ineligible(sb, EXT4_FC_REASON_NOMEM, NULL);
-=======
-		ext4_fc_mark_ineligible(inode->i_sb, EXT4_FC_REASON_NOMEM, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mutex_lock(&ei->i_fc_lock);
 		return -ENOMEM;
 	}
@@ -456,12 +447,7 @@ static int __track_dentry_update(struct inode *inode, void *arg, bool update)
 		node->fcd_name.name = kmalloc(dentry->d_name.len, GFP_NOFS);
 		if (!node->fcd_name.name) {
 			kmem_cache_free(ext4_fc_dentry_cachep, node);
-<<<<<<< HEAD
 			ext4_fc_mark_ineligible(sb, EXT4_FC_REASON_NOMEM, NULL);
-=======
-			ext4_fc_mark_ineligible(inode->i_sb,
-				EXT4_FC_REASON_NOMEM, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mutex_lock(&ei->i_fc_lock);
 			return -ENOMEM;
 		}
@@ -518,15 +504,8 @@ void __ext4_fc_track_unlink(handle_t *handle,
 void ext4_fc_track_unlink(handle_t *handle, struct dentry *dentry)
 {
 	struct inode *inode = d_inode(dentry);
-<<<<<<< HEAD
 
 	if (ext4_fc_disabled(inode->i_sb))
-=======
-	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
-
-	if (!test_opt2(inode->i_sb, JOURNAL_FAST_COMMIT) ||
-	    (sbi->s_mount_state & EXT4_FC_REPLAY))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	if (ext4_test_mount_flag(inode->i_sb, EXT4_MF_FC_INELIGIBLE))
@@ -552,15 +531,8 @@ void __ext4_fc_track_link(handle_t *handle,
 void ext4_fc_track_link(handle_t *handle, struct dentry *dentry)
 {
 	struct inode *inode = d_inode(dentry);
-<<<<<<< HEAD
 
 	if (ext4_fc_disabled(inode->i_sb))
-=======
-	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
-
-	if (!test_opt2(inode->i_sb, JOURNAL_FAST_COMMIT) ||
-	    (sbi->s_mount_state & EXT4_FC_REPLAY))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	if (ext4_test_mount_flag(inode->i_sb, EXT4_MF_FC_INELIGIBLE))
@@ -586,15 +558,8 @@ void __ext4_fc_track_create(handle_t *handle, struct inode *inode,
 void ext4_fc_track_create(handle_t *handle, struct dentry *dentry)
 {
 	struct inode *inode = d_inode(dentry);
-<<<<<<< HEAD
 
 	if (ext4_fc_disabled(inode->i_sb))
-=======
-	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
-
-	if (!test_opt2(inode->i_sb, JOURNAL_FAST_COMMIT) ||
-	    (sbi->s_mount_state & EXT4_FC_REPLAY))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	if (ext4_test_mount_flag(inode->i_sb, EXT4_MF_FC_INELIGIBLE))
@@ -616,7 +581,6 @@ static int __track_inode(struct inode *inode, void *arg, bool update)
 
 void ext4_fc_track_inode(handle_t *handle, struct inode *inode)
 {
-	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
 	int ret;
 
 	if (S_ISDIR(inode->i_mode))
@@ -631,13 +595,6 @@ void ext4_fc_track_inode(handle_t *handle, struct inode *inode)
 		return;
 	}
 
-<<<<<<< HEAD
-=======
-	if (!test_opt2(inode->i_sb, JOURNAL_FAST_COMMIT) ||
-	    (sbi->s_mount_state & EXT4_FC_REPLAY))
-		return;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ext4_test_mount_flag(inode->i_sb, EXT4_MF_FC_INELIGIBLE))
 		return;
 
@@ -680,19 +637,13 @@ static int __track_range(struct inode *inode, void *arg, bool update)
 void ext4_fc_track_range(handle_t *handle, struct inode *inode, ext4_lblk_t start,
 			 ext4_lblk_t end)
 {
-	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
 	struct __track_range_args args;
 	int ret;
 
 	if (S_ISDIR(inode->i_mode))
 		return;
 
-<<<<<<< HEAD
 	if (ext4_fc_disabled(inode->i_sb))
-=======
-	if (!test_opt2(inode->i_sb, JOURNAL_FAST_COMMIT) ||
-	    (sbi->s_mount_state & EXT4_FC_REPLAY))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	if (ext4_test_mount_flag(inode->i_sb, EXT4_MF_FC_INELIGIBLE))
@@ -770,7 +721,6 @@ static u8 *ext4_fc_reserve_space(struct super_block *sb, int len, u32 *crc)
 	 * If 'len' is too long to fit in any block alongside a PAD tlv, then we
 	 * cannot fulfill the request.
 	 */
-<<<<<<< HEAD
 	if (len > bsize - EXT4_FC_TAG_BASE_LEN)
 		return NULL;
 
@@ -788,26 +738,9 @@ static u8 *ext4_fc_reserve_space(struct super_block *sb, int len, u32 *crc)
 	 */
 	remaining = bsize - EXT4_FC_TAG_BASE_LEN - off;
 	if (len <= remaining) {
-=======
-	if (len + EXT4_FC_TAG_BASE_LEN > bsize)
-		return NULL;
-
-	if (bsize - off - 1 > len + EXT4_FC_TAG_BASE_LEN) {
-		/*
-		 * Only allocate from current buffer if we have enough space for
-		 * this request AND we have space to add a zero byte padding.
-		 */
-		if (!sbi->s_fc_bh) {
-			ret = jbd2_fc_get_buf(EXT4_SB(sb)->s_journal, &bh);
-			if (ret)
-				return NULL;
-			sbi->s_fc_bh = bh;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sbi->s_fc_bytes += len;
 		return dst;
 	}
-<<<<<<< HEAD
 
 	/*
 	 * Else, terminate the current block with a PAD tlv, then allocate a new
@@ -819,17 +752,6 @@ static u8 *ext4_fc_reserve_space(struct super_block *sb, int len, u32 *crc)
 	ext4_fc_memcpy(sb, dst, &tl, EXT4_FC_TAG_BASE_LEN, crc);
 	ext4_fc_memzero(sb, dst + EXT4_FC_TAG_BASE_LEN, remaining, crc);
 
-=======
-	/* Need to add PAD tag */
-	tl = (struct ext4_fc_tl *)(sbi->s_fc_bh->b_data + off);
-	tl->fc_tag = cpu_to_le16(EXT4_FC_TAG_PAD);
-	pad_len = bsize - off - 1 - EXT4_FC_TAG_BASE_LEN;
-	tl->fc_len = cpu_to_le16(pad_len);
-	if (crc)
-		*crc = ext4_chksum(sbi, *crc, tl, EXT4_FC_TAG_BASE_LEN);
-	if (pad_len > 0)
-		ext4_fc_memzero(sb, tl + 1, pad_len, crc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ext4_fc_submit_bh(sb, false);
 
 	ret = jbd2_fc_get_buf(EXT4_SB(sb)->s_journal, &bh);
@@ -1872,12 +1794,7 @@ static int ext4_fc_replay_add_range(struct super_block *sb,
 			ret = ext4_ext_insert_extent(
 				NULL, inode, &path, &newex, 0);
 			up_write((&EXT4_I(inode)->i_data_sem));
-<<<<<<< HEAD
 			ext4_free_ext_path(path);
-=======
-			ext4_ext_drop_refs(path);
-			kfree(path);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (ret)
 				goto out;
 			goto next;
@@ -2077,7 +1994,6 @@ void ext4_fc_replay_cleanup(struct super_block *sb)
 	kfree(sbi->s_fc_replay_state.fc_modified_inodes);
 }
 
-<<<<<<< HEAD
 static bool ext4_fc_value_len_isvalid(struct ext4_sb_info *sbi,
 				      int tag, int len)
 {
@@ -2103,34 +2019,6 @@ static bool ext4_fc_value_len_isvalid(struct ext4_sb_info *sbi,
 		return len == sizeof(struct ext4_fc_head);
 	}
 	return false;
-=======
-static inline bool ext4_fc_tag_len_isvalid(struct ext4_fc_tl *tl,
-					   u8 *val, u8 *end)
-{
-	if (val + tl->fc_len > end)
-		return false;
-
-	/* Here only check ADD_RANGE/TAIL/HEAD which will read data when do
-	 * journal rescan before do CRC check. Other tags length check will
-	 * rely on CRC check.
-	 */
-	switch (tl->fc_tag) {
-	case EXT4_FC_TAG_ADD_RANGE:
-		return (sizeof(struct ext4_fc_add_range) == tl->fc_len);
-	case EXT4_FC_TAG_TAIL:
-		return (sizeof(struct ext4_fc_tail) <= tl->fc_len);
-	case EXT4_FC_TAG_HEAD:
-		return (sizeof(struct ext4_fc_head) == tl->fc_len);
-	case EXT4_FC_TAG_DEL_RANGE:
-	case EXT4_FC_TAG_LINK:
-	case EXT4_FC_TAG_UNLINK:
-	case EXT4_FC_TAG_CREAT:
-	case EXT4_FC_TAG_INODE:
-	case EXT4_FC_TAG_PAD:
-	default:
-		return true;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -2189,20 +2077,12 @@ static int ext4_fc_replay_scan(journal_t *journal,
 	}
 
 	state->fc_replay_expected_off++;
-<<<<<<< HEAD
 	for (cur = start; cur <= end - EXT4_FC_TAG_BASE_LEN;
 	     cur = cur + EXT4_FC_TAG_BASE_LEN + tl.fc_len) {
 		ext4_fc_get_tl(&tl, cur);
 		val = cur + EXT4_FC_TAG_BASE_LEN;
 		if (tl.fc_len > end - val ||
 		    !ext4_fc_value_len_isvalid(sbi, tl.fc_tag, tl.fc_len)) {
-=======
-	for (cur = start; cur < end - EXT4_FC_TAG_BASE_LEN;
-	     cur = cur + EXT4_FC_TAG_BASE_LEN + tl.fc_len) {
-		ext4_fc_get_tl(&tl, cur);
-		val = cur + EXT4_FC_TAG_BASE_LEN;
-		if (!ext4_fc_tag_len_isvalid(&tl, val, end)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = state->fc_replay_num_tags ?
 				JBD2_FC_REPLAY_STOP : -ECANCELED;
 			goto out_err;
@@ -2317,11 +2197,7 @@ static int ext4_fc_replay(journal_t *journal, struct buffer_head *bh,
 	start = (u8 *)bh->b_data;
 	end = start + journal->j_blocksize;
 
-<<<<<<< HEAD
 	for (cur = start; cur <= end - EXT4_FC_TAG_BASE_LEN;
-=======
-	for (cur = start; cur < end - EXT4_FC_TAG_BASE_LEN;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	     cur = cur + EXT4_FC_TAG_BASE_LEN + tl.fc_len) {
 		ext4_fc_get_tl(&tl, cur);
 		val = cur + EXT4_FC_TAG_BASE_LEN;

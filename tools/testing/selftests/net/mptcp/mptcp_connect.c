@@ -72,11 +72,8 @@ static int cfg_wait;
 static uint32_t cfg_mark;
 static char *cfg_input;
 static int cfg_repeat = 1;
-<<<<<<< HEAD
 static int cfg_truncate;
 static int cfg_rcv_trunc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct cfg_cmsg_types {
 	unsigned int cmsg_enabled:1;
@@ -100,22 +97,15 @@ static struct cfg_sockopt_types cfg_sockopt_types;
 
 static void die_usage(void)
 {
-<<<<<<< HEAD
 	fprintf(stderr, "Usage: mptcp_connect [-6] [-c cmsg] [-f offset] [-i file] [-I num] [-j] [-l] "
-=======
-	fprintf(stderr, "Usage: mptcp_connect [-6] [-c cmsg] [-i file] [-I num] [-j] [-l] "
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		"[-m mode] [-M mark] [-o option] [-p port] [-P mode] [-j] [-l] [-r num] "
 		"[-s MPTCP|TCP] [-S num] [-r num] [-t num] [-T num] [-u] [-w sec] connect_address\n");
 	fprintf(stderr, "\t-6 use ipv6\n");
 	fprintf(stderr, "\t-c cmsg -- test cmsg type <cmsg>\n");
-<<<<<<< HEAD
 	fprintf(stderr, "\t-f offset -- stop the I/O after receiving and sending the specified amount "
 		"of bytes. If there are unread bytes in the receive queue, that will cause a MPTCP "
 		"fastclose at close/shutdown. If offset is negative, expect the peer to close before "
 		"all the local data as been sent, thus toleration errors on write and EPIPE signals\n");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fprintf(stderr, "\t-i file -- read the data to send from the given file instead of stdin");
 	fprintf(stderr, "\t-I num -- repeat the transfer 'num' times. In listen mode accepts num "
 		"incoming connections, in client mode, disconnect and reconnect to the server\n");
@@ -567,7 +557,6 @@ static void set_nonblock(int fd, bool nonblock)
 		fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 	else
 		fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
-<<<<<<< HEAD
 }
 
 static void shut_wr(int fd)
@@ -582,22 +571,6 @@ static void shut_wr(int fd)
 	shutdown(fd, SHUT_WR);
 }
 
-=======
-}
-
-static void shut_wr(int fd)
-{
-	/* Close our write side, ev. give some time
-	 * for address notification and/or checking
-	 * the current status
-	 */
-	if (cfg_wait)
-		usleep(cfg_wait);
-
-	shutdown(fd, SHUT_WR);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int copyfd_io_poll(int infd, int peerfd, int outfd, bool *in_closed_after_out)
 {
 	struct pollfd fds = {
@@ -1218,7 +1191,6 @@ again:
 		if (fd < 0)
 			xerror("can't open %s:%d", cfg_input, errno);
 	}
-<<<<<<< HEAD
 
 	/* close the client socket open only if we are not going to reconnect */
 	ret = copyfd_io(fd_in, fd, 1, 0);
@@ -1243,27 +1215,6 @@ again:
 		close(fd);
 	}
 
-=======
-
-	/* close the client socket open only if we are not going to reconnect */
-	ret = copyfd_io(fd_in, fd, 1, cfg_repeat == 1);
-	if (ret)
-		return ret;
-
-	if (--cfg_repeat > 0) {
-		xdisconnect(fd, peer->ai_addrlen);
-
-		/* the socket could be unblocking at this point, we need the
-		 * connect to be blocking
-		 */
-		set_nonblock(fd, false);
-		if (connect(fd, peer->ai_addr, peer->ai_addrlen))
-			xerror("can't reconnect: %d", errno);
-		if (cfg_input)
-			close(fd_in);
-		goto again;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1349,11 +1300,7 @@ static void parse_opts(int argc, char **argv)
 {
 	int c;
 
-<<<<<<< HEAD
 	while ((c = getopt(argc, argv, "6c:f:hi:I:jlm:M:o:p:P:r:R:s:S:t:T:w:")) != -1) {
-=======
-	while ((c = getopt(argc, argv, "6c:hi:I:jlm:M:o:p:P:r:R:s:S:t:T:w:")) != -1) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		switch (c) {
 		case 'f':
 			cfg_truncate = atoi(optarg);

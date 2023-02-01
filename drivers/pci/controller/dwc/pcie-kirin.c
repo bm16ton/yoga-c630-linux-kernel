@@ -367,19 +367,11 @@ static int kirin_pcie_get_gpio_enable(struct kirin_pcie *pcie,
 				      struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
-<<<<<<< HEAD
-=======
-	struct device_node *np = dev->of_node;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	char name[32];
 	int ret, i;
 
 	/* This is an optional property */
-<<<<<<< HEAD
 	ret = gpiod_count(dev, "hisilicon,clken");
-=======
-	ret = of_gpio_named_count(np, "hisilicon,clken-gpios");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		return 0;
 

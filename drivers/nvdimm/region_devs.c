@@ -1094,11 +1094,7 @@ int nvdimm_flush(struct nd_region *nd_region, struct bio *bio)
 	return rc;
 }
 /**
-<<<<<<< HEAD
  * generic_nvdimm_flush() - flush any posted write queues between the cpu and pmem media
-=======
- * nvdimm_flush - flush any posted write queues between the cpu and pmem media
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @nd_region: interleaved pmem region
  */
 int generic_nvdimm_flush(struct nd_region *nd_region)

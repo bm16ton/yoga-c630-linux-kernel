@@ -4001,15 +4001,11 @@ static void xhci_free_dev(struct usb_hcd *hcd, struct usb_device *udev)
 		virt_dev->eps[i].ep_state &= ~EP_STOP_CMD_PENDING;
 	virt_dev->udev = NULL;
 	xhci_disable_slot(xhci, udev->slot_id);
-<<<<<<< HEAD
 
 	spin_lock_irqsave(&xhci->lock, flags);
 	xhci_free_virt_device(xhci, udev->slot_id);
 	spin_unlock_irqrestore(&xhci->lock, flags);
 
-=======
-	xhci_free_virt_device(xhci, udev->slot_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int xhci_disable_slot(struct xhci_hcd *xhci, u32 slot_id)
@@ -5070,7 +5066,6 @@ static int xhci_enable_usb3_lpm_timeout(struct usb_hcd *hcd,
 	if (xhci_check_tier_policy(xhci, udev, state) < 0)
 		return USB3_LPM_DISABLED;
 
-<<<<<<< HEAD
 	/* If connected to root port then check port can handle lpm */
 	if (udev->parent && !udev->parent->parent) {
 		port = xhci->usb3_rhub.ports[udev->portnum - 1];
@@ -5078,8 +5073,6 @@ static int xhci_enable_usb3_lpm_timeout(struct usb_hcd *hcd,
 			return USB3_LPM_DISABLED;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hub_encoded_timeout = xhci_calculate_lpm_timeout(hcd, udev, state);
 	mel = calculate_max_exit_latency(udev, state, hub_encoded_timeout);
 	if (mel < 0) {

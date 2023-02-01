@@ -9,10 +9,7 @@
 #include <linux/crypto.h>
 #include <linux/io.h>
 #include <linux/iopoll.h>
-<<<<<<< HEAD
 #include <linux/kernel.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>

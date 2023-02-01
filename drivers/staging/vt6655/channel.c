@@ -116,20 +116,12 @@ bool set_channel(struct vnt_private *priv, struct ieee80211_channel *ch)
 		spin_lock_irqsave(&priv->lock, flags);
 
 		/* set HW default power register */
-<<<<<<< HEAD
 		VT6655_MAC_SELECT_PAGE1(priv->port_offset);
-=======
-		MACvSelectPage1(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		RFbSetPower(priv, RATE_1M, priv->byCurrentCh);
 		iowrite8(priv->byCurPwr, priv->port_offset + MAC_REG_PWRCCK);
 		RFbSetPower(priv, RATE_6M, priv->byCurrentCh);
 		iowrite8(priv->byCurPwr, priv->port_offset + MAC_REG_PWROFDM);
-<<<<<<< HEAD
 		VT6655_MAC_SELECT_PAGE0(priv->port_offset);
-=======
-		MACvSelectPage0(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		spin_unlock_irqrestore(&priv->lock, flags);
 	}

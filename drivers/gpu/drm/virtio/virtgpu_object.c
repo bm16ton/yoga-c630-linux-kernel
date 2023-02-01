@@ -67,24 +67,6 @@ void virtio_gpu_cleanup_object(struct virtio_gpu_object *bo)
 
 	virtio_gpu_resource_id_put(vgdev, bo->hw_res_handle);
 	if (virtio_gpu_is_shmem(bo)) {
-<<<<<<< HEAD
-=======
-		struct virtio_gpu_object_shmem *shmem = to_virtio_gpu_shmem(bo);
-
-		if (shmem->pages) {
-			if (shmem->mapped) {
-				dma_unmap_sgtable(vgdev->vdev->dev.parent,
-					     shmem->pages, DMA_TO_DEVICE, 0);
-				shmem->mapped = 0;
-			}
-
-			sg_free_table(shmem->pages);
-			kfree(shmem->pages);
-			shmem->pages = NULL;
-			drm_gem_shmem_unpin(&bo->base);
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		drm_gem_shmem_free(&bo->base);
 	} else if (virtio_gpu_is_vram(bo)) {
 		struct virtio_gpu_object_vram *vram = to_virtio_gpu_vram(bo);
@@ -160,28 +142,9 @@ static int virtio_gpu_object_shmem_init(struct virtio_gpu_device *vgdev,
 	struct sg_table *pages;
 	int si;
 
-<<<<<<< HEAD
 	pages = drm_gem_shmem_get_pages_sgt(&bo->base);
 	if (IS_ERR(pages))
 		return PTR_ERR(pages);
-=======
-	ret = drm_gem_shmem_pin(&bo->base);
-	if (ret < 0)
-		return -EINVAL;
-
-	/*
-	 * virtio_gpu uses drm_gem_shmem_get_sg_table instead of
-	 * drm_gem_shmem_get_pages_sgt because virtio has it's own set of
-	 * dma-ops. This is discouraged for other drivers, but should be fine
-	 * since virtio_gpu doesn't support dma-buf import from other devices.
-	 */
-	shmem->pages = drm_gem_shmem_get_sg_table(&bo->base);
-	if (IS_ERR(shmem->pages)) {
-		drm_gem_shmem_unpin(&bo->base);
-		shmem->pages = NULL;
-		return PTR_ERR(shmem->pages);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (use_dma_api)
 		*nents = pages->nents;
@@ -255,18 +218,6 @@ int virtio_gpu_object_create(struct virtio_gpu_device *vgdev,
 			goto err_put_objs;
 	}
 
-<<<<<<< HEAD
-=======
-	ret = virtio_gpu_object_shmem_init(vgdev, bo, &ents, &nents);
-	if (ret != 0) {
-		if (fence)
-			virtio_gpu_array_unlock_resv(objs);
-		virtio_gpu_array_put_free(objs);
-		virtio_gpu_free_object(&shmem_obj->base);
-		return ret;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (params->blob) {
 		if (params->blob_mem == VIRTGPU_BLOB_MEM_GUEST)
 			bo->guest_blob = true;

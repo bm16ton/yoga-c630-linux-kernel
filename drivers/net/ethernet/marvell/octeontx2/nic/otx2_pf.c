@@ -1746,12 +1746,7 @@ int otx2_open(struct net_device *netdev)
 		cq_poll->dev = (void *)pf;
 		cq_poll->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_CQE;
 		INIT_WORK(&cq_poll->dim.work, otx2_dim_work);
-<<<<<<< HEAD
 		netif_napi_add(netdev, &cq_poll->napi, otx2_napi_handler);
-=======
-		netif_napi_add(netdev, &cq_poll->napi,
-			       otx2_napi_handler, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		napi_enable(&cq_poll->napi);
 	}
 
@@ -1969,23 +1964,8 @@ static netdev_tx_t otx2_xmit(struct sk_buff *skb, struct net_device *netdev)
 	return NETDEV_TX_OK;
 }
 
-<<<<<<< HEAD
 static u16 otx2_select_queue(struct net_device *netdev, struct sk_buff *skb,
 			     struct net_device *sb_dev)
-=======
-static netdev_features_t otx2_fix_features(struct net_device *dev,
-					   netdev_features_t features)
-{
-	if (features & NETIF_F_HW_VLAN_CTAG_RX)
-		features |= NETIF_F_HW_VLAN_STAG_RX;
-	else
-		features &= ~NETIF_F_HW_VLAN_STAG_RX;
-
-	return features;
-}
-
-static void otx2_set_rx_mode(struct net_device *netdev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 #ifdef CONFIG_DCB
 	struct otx2_nic *pf = netdev_priv(netdev);
@@ -1996,7 +1976,6 @@ static void otx2_set_rx_mode(struct net_device *netdev)
 	if (!skb->vlan_present)
 		goto pick_tx;
 
-<<<<<<< HEAD
 	vlan_prio = skb->vlan_tci >> 13;
 	if ((vlan_prio > pf->hw.tx_queues - 1) ||
 	    !pf->pfc_alloc_status[vlan_prio])
@@ -2031,12 +2010,6 @@ static void otx2_rx_mode_wrk_handler(struct work_struct *work)
 {
 	struct otx2_nic *pf = container_of(work, struct otx2_nic, rx_mode_work);
 
-=======
-static void otx2_rx_mode_wrk_handler(struct work_struct *work)
-{
-	struct otx2_nic *pf = container_of(work, struct otx2_nic, rx_mode_work);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	otx2_do_set_rx_mode(pf);
 }
 
@@ -2465,7 +2438,6 @@ static int otx2_xdp_xmit_tx(struct otx2_nic *pf, struct xdp_frame *xdpf,
 	struct page *page;
 	u64 dma_addr;
 	int err = 0;
-<<<<<<< HEAD
 
 	dma_addr = otx2_dma_map_page(pf, virt_to_page(xdpf->data),
 				     offset_in_page(xdpf->data), xdpf->len,
@@ -2473,15 +2445,6 @@ static int otx2_xdp_xmit_tx(struct otx2_nic *pf, struct xdp_frame *xdpf,
 	if (dma_mapping_error(pf->dev, dma_addr))
 		return -ENOMEM;
 
-=======
-
-	dma_addr = otx2_dma_map_page(pf, virt_to_page(xdpf->data),
-				     offset_in_page(xdpf->data), xdpf->len,
-				     DMA_TO_DEVICE);
-	if (dma_mapping_error(pf->dev, dma_addr))
-		return -ENOMEM;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = otx2_xdp_sq_append_pkt(pf, dma_addr, xdpf->len, qidx);
 	if (!err) {
 		otx2_dma_unmap_page(pf, dma_addr, xdpf->len, DMA_TO_DEVICE);
@@ -2630,10 +2593,7 @@ static const struct net_device_ops otx2_netdev_ops = {
 	.ndo_open		= otx2_open,
 	.ndo_stop		= otx2_stop,
 	.ndo_start_xmit		= otx2_xmit,
-<<<<<<< HEAD
 	.ndo_select_queue	= otx2_select_queue,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ndo_fix_features	= otx2_fix_features,
 	.ndo_set_mac_address    = otx2_set_mac_address,
 	.ndo_change_mtu		= otx2_change_mtu,
@@ -3109,11 +3069,8 @@ static void otx2_remove(struct pci_dev *pdev)
 		otx2_config_pause_frm(pf);
 	}
 
-<<<<<<< HEAD
 	cn10k_mcs_free(pf);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_DCB
 	/* Disable PFC config */
 	if (pf->pfc_en) {

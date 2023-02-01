@@ -44,10 +44,6 @@
 #include <linux/fs.h>
 #include <linux/mm.h>
 #include <linux/mm_inline.h>
-<<<<<<< HEAD
-=======
-#include <linux/vmacache.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/nsproxy.h>
 #include <linux/capability.h>
 #include <linux/cpu.h>
@@ -101,10 +97,6 @@
 #include <linux/scs.h>
 #include <linux/io_uring.h>
 #include <linux/bpf.h>
-<<<<<<< HEAD
-=======
-#include <linux/sched/mm.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <asm/pgalloc.h>
 #include <linux/uaccess.h>
@@ -380,17 +372,10 @@ static void free_thread_stack(struct task_struct *tsk)
 	thread_stack_delayed_free(tsk);
 	tsk->stack = NULL;
 }
-<<<<<<< HEAD
 
 #  endif /* CONFIG_VMAP_STACK */
 # else /* !(THREAD_SIZE >= PAGE_SIZE || defined(CONFIG_VMAP_STACK)) */
 
-=======
-
-#  endif /* CONFIG_VMAP_STACK */
-# else /* !(THREAD_SIZE >= PAGE_SIZE || defined(CONFIG_VMAP_STACK)) */
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct kmem_cache *thread_stack_cache;
 
 static void thread_stack_free_rcu(struct rcu_head *rh)
@@ -489,10 +474,6 @@ struct vm_area_struct *vm_area_dup(struct vm_area_struct *orig)
 		 */
 		*new = data_race(*orig);
 		INIT_LIST_HEAD(&new->anon_vma_chain);
-<<<<<<< HEAD
-=======
-		new->vm_next = new->vm_prev = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dup_anon_vma_name(orig, new);
 	}
 	return new;
@@ -554,12 +535,9 @@ void put_task_stack(struct task_struct *tsk)
 
 void free_task(struct task_struct *tsk)
 {
-<<<<<<< HEAD
 #ifdef CONFIG_SECCOMP
 	WARN_ON_ONCE(tsk->seccomp.filter);
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	release_user_cpus_ptr(tsk);
 	scs_release(tsk);
 
@@ -634,13 +612,10 @@ static __latent_entropy int dup_mmap(struct mm_struct *mm,
 	if (retval)
 		goto out;
 	khugepaged_fork(mm, oldmm);
-<<<<<<< HEAD
 
 	retval = mas_expected_entries(&mas, oldmm->map_count);
 	if (retval)
 		goto out;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mas_for_each(&old_mas, mpnt, ULONG_MAX) {
 		struct file *file;
@@ -950,20 +925,13 @@ void __init fork_init(void)
 	init_task.signal->rlim[RLIMIT_SIGPENDING] =
 		init_task.signal->rlim[RLIMIT_NPROC];
 
-	for (i = 0; i < MAX_PER_NAMESPACE_UCOUNTS; i++)
+	for (i = 0; i < UCOUNT_COUNTS; i++)
 		init_user_ns.ucount_max[i] = max_threads/2;
 
-<<<<<<< HEAD
 	set_userns_rlimit_max(&init_user_ns, UCOUNT_RLIMIT_NPROC,      RLIM_INFINITY);
 	set_userns_rlimit_max(&init_user_ns, UCOUNT_RLIMIT_MSGQUEUE,   RLIM_INFINITY);
 	set_userns_rlimit_max(&init_user_ns, UCOUNT_RLIMIT_SIGPENDING, RLIM_INFINITY);
 	set_userns_rlimit_max(&init_user_ns, UCOUNT_RLIMIT_MEMLOCK,    RLIM_INFINITY);
-=======
-	set_rlimit_ucount_max(&init_user_ns, UCOUNT_RLIMIT_NPROC,      RLIM_INFINITY);
-	set_rlimit_ucount_max(&init_user_ns, UCOUNT_RLIMIT_MSGQUEUE,   RLIM_INFINITY);
-	set_rlimit_ucount_max(&init_user_ns, UCOUNT_RLIMIT_SIGPENDING, RLIM_INFINITY);
-	set_rlimit_ucount_max(&init_user_ns, UCOUNT_RLIMIT_MEMLOCK,    RLIM_INFINITY);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_VMAP_STACK
 	cpuhp_setup_state(CPUHP_BP_PREPARE_DYN, "fork:vm_stack_cache",
@@ -1296,7 +1264,6 @@ int set_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file)
 	rcu_assign_pointer(mm->exe_file, new_exe_file);
 	if (old_exe_file) {
 		allow_write_access(old_exe_file);
-<<<<<<< HEAD
 		fput(old_exe_file);
 	}
 	return 0;
@@ -1352,60 +1319,6 @@ int replace_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file)
 		mmap_read_lock(mm);
 		allow_write_access(old_exe_file);
 		fput(old_exe_file);
-=======
-		fput(old_exe_file);
-	}
-	return 0;
-}
-
-/**
- * replace_mm_exe_file - replace a reference to the mm's executable file
- *
- * This changes mm's executable file (shown as symlink /proc/[pid]/exe),
- * dealing with concurrent invocation and without grabbing the mmap lock in
- * write mode.
- *
- * Main user is sys_prctl(PR_SET_MM_MAP/EXE_FILE).
- */
-int replace_mm_exe_file(struct mm_struct *mm, struct file *new_exe_file)
-{
-	struct vm_area_struct *vma;
-	struct file *old_exe_file;
-	int ret = 0;
-
-	/* Forbid mm->exe_file change if old file still mapped. */
-	old_exe_file = get_mm_exe_file(mm);
-	if (old_exe_file) {
-		mmap_read_lock(mm);
-		for (vma = mm->mmap; vma && !ret; vma = vma->vm_next) {
-			if (!vma->vm_file)
-				continue;
-			if (path_equal(&vma->vm_file->f_path,
-				       &old_exe_file->f_path))
-				ret = -EBUSY;
-		}
-		mmap_read_unlock(mm);
-		fput(old_exe_file);
-		if (ret)
-			return ret;
-	}
-
-	/* set the new file, lockless */
-	ret = deny_write_access(new_exe_file);
-	if (ret)
-		return -EACCES;
-	get_file(new_exe_file);
-
-	old_exe_file = xchg(&mm->exe_file, new_exe_file);
-	if (old_exe_file) {
-		/*
-		 * Don't race with dup_mmap() getting the file and disallowing
-		 * write access while someone might open the file writable.
-		 */
-		mmap_read_lock(mm);
-		allow_write_access(old_exe_file);
-		fput(old_exe_file);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mmap_read_unlock(mm);
 	}
 	return 0;
@@ -2136,11 +2049,8 @@ static __latent_entropy struct task_struct *copy_process(
 	/*
 	 * If the new process will be in a different time namespace
 	 * do not allow it to share VM or a thread group with the forking task.
-	 *
-	 * On vfork, the child process enters the target time namespace only
-	 * after exec.
 	 */
-	if ((clone_flags & (CLONE_VM | CLONE_VFORK)) == CLONE_VM) {
+	if (clone_flags & (CLONE_THREAD | CLONE_VM)) {
 		if (nsp->time_ns != nsp->time_ns_for_children)
 			return ERR_PTR(-EINVAL);
 	}
@@ -2208,11 +2118,7 @@ static __latent_entropy struct task_struct *copy_process(
 		goto bad_fork_free;
 
 	retval = -EAGAIN;
-<<<<<<< HEAD
 	if (is_rlimit_overlimit(task_ucounts(p), UCOUNT_RLIMIT_NPROC, rlimit(RLIMIT_NPROC))) {
-=======
-	if (is_ucounts_overlimit(task_ucounts(p), UCOUNT_RLIMIT_NPROC, rlimit(RLIMIT_NPROC))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (p->real_cred->user != INIT_USER &&
 		    !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN))
 			goto bad_fork_cleanup_count;
@@ -2505,8 +2411,6 @@ static __latent_entropy struct task_struct *copy_process(
 
 	rv_task_fork(p);
 
-	rv_task_fork(p);
-
 	rseq_fork(p, clone_flags);
 
 	/* Don't start children in a dying pid namespace */
@@ -2521,7 +2425,6 @@ static __latent_entropy struct task_struct *copy_process(
 		goto bad_fork_cancel_cgroup;
 	}
 
-<<<<<<< HEAD
 	/* No more failure paths after this point. */
 
 	/*
@@ -2530,8 +2433,6 @@ static __latent_entropy struct task_struct *copy_process(
 	 */
 	copy_seccomp(p);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	init_task_pid_links(p);
 	if (likely(p->pid)) {
 		ptrace_init_task(p, (clone_flags & CLONE_PTRACE) || trace);

@@ -252,11 +252,6 @@ static void s3fwrn5_i2c_remove(struct i2c_client *client)
 
 	s3fwrn5_remove(phy->common.ndev);
 	clk_disable_unprepare(phy->clk);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id s3fwrn5_i2c_id_table[] = {

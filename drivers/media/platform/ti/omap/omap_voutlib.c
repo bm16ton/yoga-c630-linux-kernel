@@ -107,11 +107,7 @@ EXPORT_SYMBOL_GPL(omap_vout_try_window);
 /* Given a new render window in new_win, adjust the window to the
  * nearest supported configuration.  The image cropping window in crop
  * will also be adjusted if necessary.  Preference is given to keeping the
-<<<<<<< HEAD
  * window as close to the requested configuration as possible.  If
-=======
- * the window as close to the requested configuration as possible.  If
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * successful, new_win, vout->win, and crop are updated.
  * Returns zero if successful, or -EINVAL if the requested preview window is
  * impossible and cannot reasonably be adjusted.

@@ -261,7 +261,6 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
 		    int pad);
 
 /**
-<<<<<<< HEAD
  * strtomem_pad - Copy NUL-terminated string to non-NUL-terminated buffer
  *
  * @dest: Pointer of destination character array (marked as __nonstring)
@@ -313,16 +312,6 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
  *
  * This is good for clearing padding following the given member.
  */
-=======
- * memset_after - Set a value after a struct member to the end of a struct
- *
- * @obj: Address of target struct instance
- * @v: Byte value to repeatedly write
- * @member: after which struct member to start writing bytes
- *
- * This is good for clearing padding following the given member.
- */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define memset_after(obj, v, member)					\
 ({									\
 	u8 *__ptr = (u8 *)(obj);					\

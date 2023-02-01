@@ -196,7 +196,6 @@ static void afs_dir_dump(struct afs_vnode *dvnode, struct afs_read *req)
 	pr_warn("DIR %llx %x %zx %zx\n",
 		req->pos, req->nr_pages,
 		req->iter->iov_offset,  iov_iter_count(req->iter));
-<<<<<<< HEAD
 
 	xas_for_each(&xas, folio, last) {
 		if (xas_retry(&xas, folio))
@@ -204,15 +203,6 @@ static void afs_dir_dump(struct afs_vnode *dvnode, struct afs_read *req)
 
 		BUG_ON(folio_file_mapping(folio) != mapping);
 
-=======
-
-	xas_for_each(&xas, folio, last) {
-		if (xas_retry(&xas, folio))
-			continue;
-
-		BUG_ON(folio_file_mapping(folio) != mapping);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		size = min_t(loff_t, folio_size(folio), req->actual_len - folio_pos(folio));
 		for (offset = 0; offset < size; offset += sizeof(*block)) {
 			block = kmap_local_folio(folio, offset);
@@ -284,15 +274,9 @@ static struct afs_read *afs_read_dir(struct afs_vnode *dvnode, struct key *key)
 	loff_t i_size;
 	int nr_pages, i;
 	int ret;
-<<<<<<< HEAD
 
 	_enter("");
 
-=======
-
-	_enter("");
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	req = kzalloc(sizeof(*req), GFP_KERNEL);
 	if (!req)
 		return ERR_PTR(-ENOMEM);
@@ -543,19 +527,11 @@ static int afs_dir_iterate(struct inode *dir, struct dir_context *ctx,
 			ret = afs_bad(dvnode, afs_file_error_dir_missing_page);
 			break;
 		}
-<<<<<<< HEAD
 
 		offset = round_down(ctx->pos, sizeof(*dblock)) - folio_file_pos(folio);
 		size = min_t(loff_t, folio_size(folio),
 			     req->actual_len - folio_file_pos(folio));
 
-=======
-
-		offset = round_down(ctx->pos, sizeof(*dblock)) - folio_file_pos(folio);
-		size = min_t(loff_t, folio_size(folio),
-			     req->actual_len - folio_file_pos(folio));
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		do {
 			dblock = kmap_local_folio(folio, offset);
 			ret = afs_dir_iterate_block(dvnode, ctx, dblock,

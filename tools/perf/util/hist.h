@@ -79,10 +79,7 @@ enum hist_column {
 	HISTC_GLOBAL_P_STAGE_CYC,
 	HISTC_ADDR_FROM,
 	HISTC_ADDR_TO,
-<<<<<<< HEAD
 	HISTC_ADDR,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	HISTC_NR_COLS, /* Last entry */
 };
 
@@ -102,11 +99,7 @@ struct hists {
 	const struct dso	*dso_filter;
 	const char		*uid_filter_str;
 	const char		*symbol_filter_str;
-<<<<<<< HEAD
 	struct mutex		lock;
-=======
-	pthread_mutex_t		lock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct hists_stats	stats;
 	u64			event_stream;
 	u16			col_len[HISTC_NR_COLS];

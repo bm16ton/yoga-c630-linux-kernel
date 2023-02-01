@@ -524,7 +524,6 @@ static int do_tls_getsockopt_conf(struct sock *sk, char __user *optval,
 			rc = -EFAULT;
 		break;
 	}
-<<<<<<< HEAD
 	case TLS_CIPHER_ARIA_GCM_128: {
 		struct tls12_crypto_info_aria_gcm_128 *
 		  crypto_info_aria_gcm_128 =
@@ -573,8 +572,6 @@ static int do_tls_getsockopt_conf(struct sock *sk, char __user *optval,
 			rc = -EFAULT;
 		break;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		rc = -EINVAL;
 	}
@@ -736,7 +733,6 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
 	case TLS_CIPHER_SM4_CCM:
 		optsize = sizeof(struct tls12_crypto_info_sm4_ccm);
 		break;
-<<<<<<< HEAD
 	case TLS_CIPHER_ARIA_GCM_128:
 		if (crypto_info->version != TLS_1_2_VERSION) {
 			rc = -EINVAL;
@@ -751,8 +747,6 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
 		}
 		optsize = sizeof(struct tls12_crypto_info_aria_gcm_256);
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		rc = -EINVAL;
 		goto err_crypto_info;

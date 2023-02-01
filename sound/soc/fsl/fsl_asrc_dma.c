@@ -454,9 +454,6 @@ struct snd_soc_component_driver fsl_asrc_component = {
 	.close		= fsl_asrc_dma_shutdown,
 	.pointer	= fsl_asrc_dma_pcm_pointer,
 	.pcm_construct	= fsl_asrc_dma_pcm_new,
-<<<<<<< HEAD
 	.legacy_dai_naming = 1,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_GPL(fsl_asrc_component);

@@ -1043,7 +1043,6 @@ err:
 }
 
 /**
-<<<<<<< HEAD
  * amdgpu_debugfs_gfxoff_residency_read - Read GFXOFF residency
  *
  * @f: open file handle
@@ -1195,8 +1194,6 @@ out:
 }
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * amdgpu_debugfs_gfxoff_write - Enable/disable GFXOFF
  *
  * @f: open file handle
@@ -1403,7 +1400,6 @@ static const struct file_operations amdgpu_debugfs_gfxoff_status_fops = {
 	.llseek = default_llseek
 };
 
-<<<<<<< HEAD
 static const struct file_operations amdgpu_debugfs_gfxoff_count_fops = {
 	.owner = THIS_MODULE,
 	.read = amdgpu_debugfs_gfxoff_count_read,
@@ -1417,8 +1413,6 @@ static const struct file_operations amdgpu_debugfs_gfxoff_residency_fops = {
 	.llseek = default_llseek
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct file_operations *debugfs_regs[] = {
 	&amdgpu_debugfs_regs_fops,
 	&amdgpu_debugfs_regs2_fops,
@@ -1431,11 +1425,8 @@ static const struct file_operations *debugfs_regs[] = {
 	&amdgpu_debugfs_gpr_fops,
 	&amdgpu_debugfs_gfxoff_fops,
 	&amdgpu_debugfs_gfxoff_status_fops,
-<<<<<<< HEAD
 	&amdgpu_debugfs_gfxoff_count_fops,
 	&amdgpu_debugfs_gfxoff_residency_fops,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const char *debugfs_regs_names[] = {
@@ -1450,11 +1441,8 @@ static const char *debugfs_regs_names[] = {
 	"amdgpu_gpr",
 	"amdgpu_gfxoff",
 	"amdgpu_gfxoff_status",
-<<<<<<< HEAD
 	"amdgpu_gfxoff_count",
 	"amdgpu_gfxoff_residency",
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -1932,7 +1920,6 @@ error_free:
 	kfree(new);
 	return ret;
 }
-<<<<<<< HEAD
 
 static const struct file_operations amdgpu_reset_dump_register_list = {
 	.owner = THIS_MODULE,
@@ -1950,25 +1937,6 @@ int amdgpu_debugfs_init(struct amdgpu_device *adev)
 	if (!debugfs_initialized())
 		return 0;
 
-=======
-
-static const struct file_operations amdgpu_reset_dump_register_list = {
-	.owner = THIS_MODULE,
-	.read = amdgpu_reset_dump_register_list_read,
-	.write = amdgpu_reset_dump_register_list_write,
-	.llseek = default_llseek
-};
-
-int amdgpu_debugfs_init(struct amdgpu_device *adev)
-{
-	struct dentry *root = adev_to_drm(adev)->primary->debugfs_root;
-	struct dentry *ent;
-	int r, i;
-
-	if (!debugfs_initialized())
-		return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	debugfs_create_x32("amdgpu_smu_debug", 0600, root,
 			   &adev->pm.smu_debug_mask);
 

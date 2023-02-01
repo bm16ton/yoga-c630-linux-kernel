@@ -92,12 +92,6 @@ extern void mapin_ram(void);
 extern void setbat(int index, unsigned long virt, phys_addr_t phys,
 		   unsigned int size, pgprot_t prot);
 
-<<<<<<< HEAD
-=======
-extern unsigned int rtas_data, rtas_size;
-
-struct hash_pte;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern u8 early_hash[];
 
 #endif /* CONFIG_PPC32 */
@@ -120,11 +114,6 @@ unsigned long mmu_mapin_ram(unsigned long base, unsigned long top);
 #ifdef CONFIG_PPC_E500
 extern unsigned long map_mem_in_cams(unsigned long ram, int max_cam_idx,
 				     bool dryrun, bool init);
-<<<<<<< HEAD
-=======
-extern unsigned long calc_cam_sz(unsigned long ram, unsigned long virt,
-				 phys_addr_t phys);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_PPC32
 extern void adjust_total_lowmem(void);
 extern int switch_to_as1(void);
@@ -168,11 +157,7 @@ static inline phys_addr_t v_block_mapped(unsigned long va) { return 0; }
 static inline unsigned long p_block_mapped(phys_addr_t pa) { return 0; }
 #endif
 
-<<<<<<< HEAD
 #if defined(CONFIG_PPC_BOOK3S_32) || defined(CONFIG_PPC_8xx) || defined(CONFIG_PPC_E500)
-=======
-#if defined(CONFIG_PPC_BOOK3S_32) || defined(CONFIG_PPC_8xx) || defined(CONFIG_PPC_FSL_BOOK3E)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void mmu_mark_initmem_nx(void);
 void mmu_mark_rodata_ro(void);
 #else

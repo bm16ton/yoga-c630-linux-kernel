@@ -234,10 +234,7 @@ struct resource_funcs {
             unsigned int index);
 
 	bool (*remove_phantom_pipes)(struct dc *dc, struct dc_state *context);
-<<<<<<< HEAD
 	void (*get_panel_config_defaults)(struct dc_panel_config *panel_config);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct audio_support{
@@ -457,17 +454,6 @@ struct link_enc_cfg_context {
 	struct link_enc_assignment transient_assignments[MAX_PIPES];
 };
 
-/* Data used for dynamic link encoder assignment.
- * Tracks current and future assignments; available link encoders;
- * and mode of operation (whether to use current or future assignments).
- */
-struct link_enc_cfg_context {
-	enum link_enc_cfg_mode mode;
-	struct link_enc_assignment link_enc_assignments[MAX_PIPES];
-	enum engine_id link_enc_avail[MAX_DIG_LINK_ENCODERS];
-	struct link_enc_assignment transient_assignments[MAX_PIPES];
-};
-
 struct resource_context {
 	struct pipe_ctx pipe_ctx[MAX_PIPES];
 	bool is_stream_enc_acquired[MAX_PIPES * 2];
@@ -508,11 +494,8 @@ struct dcn_bw_output {
 	struct dcn_watermark_set watermarks;
 	struct dcn_bw_writeback bw_writeback;
 	int compbuf_size_kb;
-<<<<<<< HEAD
 	unsigned int legacy_svp_drr_stream_index;
 	bool legacy_svp_drr_stream_index_valid;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 union bw_output {

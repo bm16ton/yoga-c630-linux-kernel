@@ -65,11 +65,7 @@ static int get_map_val_dynptr(struct bpf_dynptr *ptr)
 /* Every bpf_ringbuf_reserve_dynptr call must have a corresponding
  * bpf_ringbuf_submit/discard_dynptr call
  */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ringbuf_missing_release1(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -81,11 +77,7 @@ int ringbuf_missing_release1(void *ctx)
 	return 0;
 }
 
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ringbuf_missing_release2(void *ctx)
 {
 	struct bpf_dynptr ptr1, ptr2;
@@ -120,11 +112,7 @@ static int missing_release_callback_fn(__u32 index, void *data)
 }
 
 /* Any dynptr initialized within a callback must have bpf_dynptr_put called */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ringbuf_missing_release_callback(void *ctx)
 {
 	bpf_loop(10, missing_release_callback_fn, NULL, 0);
@@ -132,11 +120,7 @@ int ringbuf_missing_release_callback(void *ctx)
 }
 
 /* Can't call bpf_ringbuf_submit/discard_dynptr on a non-initialized dynptr */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ringbuf_release_uninit_dynptr(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -148,11 +132,7 @@ int ringbuf_release_uninit_dynptr(void *ctx)
 }
 
 /* A dynptr can't be used after it has been invalidated */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int use_after_invalid(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -171,11 +151,7 @@ int use_after_invalid(void *ctx)
 }
 
 /* Can't call non-dynptr ringbuf APIs on a dynptr ringbuf sample */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ringbuf_invalid_api(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -197,11 +173,7 @@ done:
 }
 
 /* Can't add a dynptr to a map */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int add_dynptr_to_map1(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -218,11 +190,7 @@ int add_dynptr_to_map1(void *ctx)
 }
 
 /* Can't add a struct with an embedded dynptr to a map */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int add_dynptr_to_map2(void *ctx)
 {
 	struct test_info x;
@@ -239,11 +207,7 @@ int add_dynptr_to_map2(void *ctx)
 }
 
 /* A data slice can't be accessed out of bounds */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int data_slice_out_of_bounds_ringbuf(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -263,11 +227,7 @@ done:
 	return 0;
 }
 
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int data_slice_out_of_bounds_map_value(void *ctx)
 {
 	__u32 key = 0, map_val;
@@ -287,13 +247,8 @@ int data_slice_out_of_bounds_map_value(void *ctx)
 }
 
 /* A data slice can't be used after it has been released */
-<<<<<<< HEAD
 SEC("?raw_tp")
 int data_slice_use_after_release1(void *ctx)
-=======
-SEC("?raw_tp/sys_nanosleep")
-int data_slice_use_after_release(void *ctx)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct bpf_dynptr ptr;
 	struct sample *sample;
@@ -317,7 +272,6 @@ done:
 	return 0;
 }
 
-<<<<<<< HEAD
 /* A data slice can't be used after it has been released.
  *
  * This tests the case where the data slice tracks a dynptr (ptr2)
@@ -356,10 +310,6 @@ done:
 
 /* A data slice must be first checked for NULL */
 SEC("?raw_tp")
-=======
-/* A data slice must be first checked for NULL */
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int data_slice_missing_null_check1(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -379,11 +329,7 @@ int data_slice_missing_null_check1(void *ctx)
 }
 
 /* A data slice can't be dereferenced if it wasn't checked for null */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int data_slice_missing_null_check2(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -405,11 +351,7 @@ done:
 /* Can't pass in a dynptr as an arg to a helper function that doesn't take in a
  * dynptr argument
  */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_helper1(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -423,11 +365,7 @@ int invalid_helper1(void *ctx)
 }
 
 /* A dynptr can't be passed into a helper function at a non-zero offset */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_helper2(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -442,11 +380,7 @@ int invalid_helper2(void *ctx)
 }
 
 /* A bpf_dynptr is invalidated if it's been written into */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_write1(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -467,11 +401,7 @@ int invalid_write1(void *ctx)
  * A bpf_dynptr can't be used as a dynptr if it has been written into at a fixed
  * offset
  */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_write2(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -494,11 +424,7 @@ int invalid_write2(void *ctx)
  * A bpf_dynptr can't be used as a dynptr if it has been written into at a
  * non-const offset
  */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_write3(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -529,11 +455,7 @@ static int invalid_write4_callback(__u32 index, void *data)
 /* If the dynptr is written into in a callback function, it should
  * be invalidated as a dynptr
  */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_write4(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -550,11 +472,7 @@ int invalid_write4(void *ctx)
 
 /* A globally-defined bpf_dynptr can't be used (it must reside as a stack frame) */
 struct bpf_dynptr global_dynptr;
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int global(void *ctx)
 {
 	/* this should fail */
@@ -566,11 +484,7 @@ int global(void *ctx)
 }
 
 /* A direct read should fail */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_read1(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -586,11 +500,7 @@ int invalid_read1(void *ctx)
 }
 
 /* A direct read at an offset should fail */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_read2(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -605,11 +515,7 @@ int invalid_read2(void *ctx)
 }
 
 /* A direct read at an offset into the lower stack slot should fail */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_read3(void *ctx)
 {
 	struct bpf_dynptr ptr1, ptr2;
@@ -635,11 +541,7 @@ static int invalid_read4_callback(__u32 index, void *data)
 }
 
 /* A direct read within a callback function should fail */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_read4(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -654,11 +556,7 @@ int invalid_read4(void *ctx)
 }
 
 /* Initializing a dynptr on an offset should fail */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int invalid_offset(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -672,11 +570,7 @@ int invalid_offset(void *ctx)
 }
 
 /* Can't release a dynptr twice */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int release_twice(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -702,11 +596,7 @@ static int release_twice_callback_fn(__u32 index, void *data)
 /* Test that releasing a dynptr twice, where one of the releases happens
  * within a calback function, fails
  */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int release_twice_callback(void *ctx)
 {
 	struct bpf_dynptr ptr;
@@ -721,11 +611,7 @@ int release_twice_callback(void *ctx)
 }
 
 /* Reject unsupported local mem types for dynptr_from_mem API */
-<<<<<<< HEAD
 SEC("?raw_tp")
-=======
-SEC("?raw_tp/sys_nanosleep")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int dynptr_from_mem_invalid_api(void *ctx)
 {
 	struct bpf_dynptr ptr;

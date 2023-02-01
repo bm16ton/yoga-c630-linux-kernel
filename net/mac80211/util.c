@@ -301,11 +301,8 @@ static void __ieee80211_wake_txqs(struct ieee80211_sub_if_data *sdata, int ac)
 	local_bh_disable();
 	spin_lock(&fq->lock);
 
-<<<<<<< HEAD
 	sdata->vif.txqs_stopped[ac] = false;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!test_bit(SDATA_STATE_RUNNING, &sdata->state))
 		goto out;
 
@@ -1018,12 +1015,8 @@ ieee80211_parse_extension_element(u32 *crc,
 		break;
 	case WLAN_EID_EXT_EHT_CAPABILITY:
 		if (ieee80211_eht_capa_size_ok(elems->he_cap,
-<<<<<<< HEAD
 					       data, len,
 					       params->from_ap)) {
-=======
-					       data, len)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			elems->eht_cap = data;
 			elems->eht_cap_len = len;
 		}
@@ -2026,7 +2019,6 @@ static int ieee80211_build_preq_ies_band(struct ieee80211_sub_if_data *sdata,
 	    cfg80211_any_usable_channels(local->hw.wiphy, BIT(sband->band),
 					 IEEE80211_CHAN_NO_HE)) {
 		pos = ieee80211_ie_build_he_cap(0, pos, he_cap, end);
-<<<<<<< HEAD
 		if (!pos)
 			goto out_err;
 	}
@@ -2053,33 +2045,6 @@ static int ieee80211_build_preq_ies_band(struct ieee80211_sub_if_data *sdata,
 		he_cap = ieee80211_get_he_iftype_cap(sband6,
 				ieee80211_vif_type_p2p(&sdata->vif));
 
-=======
-		if (!pos)
-			goto out_err;
-	}
-
-	eht_cap = ieee80211_get_eht_iftype_cap(sband,
-					       ieee80211_vif_type_p2p(&sdata->vif));
-
-	if (eht_cap &&
-	    cfg80211_any_usable_channels(local->hw.wiphy, BIT(sband->band),
-					 IEEE80211_CHAN_NO_HE |
-					 IEEE80211_CHAN_NO_EHT)) {
-		pos = ieee80211_ie_build_eht_cap(pos, he_cap, eht_cap, end);
-		if (!pos)
-			goto out_err;
-	}
-
-	if (cfg80211_any_usable_channels(local->hw.wiphy,
-					 BIT(NL80211_BAND_6GHZ),
-					 IEEE80211_CHAN_NO_HE)) {
-		struct ieee80211_supported_band *sband6;
-
-		sband6 = local->hw.wiphy->bands[NL80211_BAND_6GHZ];
-		he_cap = ieee80211_get_he_iftype_cap(sband6,
-				ieee80211_vif_type_p2p(&sdata->vif));
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (he_cap) {
 			enum nl80211_iftype iftype =
 				ieee80211_vif_type_p2p(&sdata->vif);
@@ -2567,10 +2532,6 @@ int ieee80211_reconfig(struct ieee80211_local *local)
 			if (link)
 				ieee80211_assign_chanctx(local, sdata, link);
 		}
-<<<<<<< HEAD
-=======
-		sdata_unlock(sdata);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		switch (sdata->vif.type) {
 		case NL80211_IFTYPE_AP_VLAN:
@@ -2941,11 +2902,7 @@ void ieee80211_recalc_min_chandef(struct ieee80211_sub_if_data *sdata,
 		 */
 		rcu_read_unlock();
 
-<<<<<<< HEAD
 		if (!chanctx_conf)
-=======
-		if (WARN_ON_ONCE(!chanctx_conf))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto unlock;
 
 		chanctx = container_of(chanctx_conf, struct ieee80211_chanctx,
@@ -3154,11 +3111,7 @@ void ieee80211_ie_build_he_6ghz_cap(struct ieee80211_sub_if_data *sdata,
 	cap = le16_to_cpu(iftd->he_6ghz_capa.capa);
 	cap &= ~IEEE80211_HE_6GHZ_CAP_SM_PS;
 
-<<<<<<< HEAD
 	switch (smps_mode) {
-=======
-	switch (sdata->deflink.smps_mode) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case IEEE80211_SMPS_AUTOMATIC:
 	case IEEE80211_SMPS_NUM_MODES:
 		WARN_ON(1);
@@ -3559,12 +3512,7 @@ bool ieee80211_chandef_vht_oper(struct ieee80211_hw *hw, u32 vht_cap_info,
 	return true;
 }
 
-<<<<<<< HEAD
 void ieee80211_chandef_eht_oper(const struct ieee80211_eht_operation *eht_oper,
-=======
-void ieee80211_chandef_eht_oper(struct ieee80211_sub_if_data *sdata,
-				const struct ieee80211_eht_operation *eht_oper,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				bool support_160, bool support_320,
 				struct cfg80211_chan_def *chandef)
 {
@@ -3740,11 +3688,7 @@ bool ieee80211_chandef_he_6ghz_oper(struct ieee80211_sub_if_data *sdata,
 		support_320 =
 			eht_phy_cap & IEEE80211_EHT_PHY_CAP0_320MHZ_IN_6GHZ;
 
-<<<<<<< HEAD
 		ieee80211_chandef_eht_oper(eht_oper, support_160,
-=======
-		ieee80211_chandef_eht_oper(sdata, eht_oper, support_160,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					   support_320, &he_chandef);
 	}
 
@@ -4830,10 +4774,7 @@ u8 ieee80211_ie_len_eht_cap(struct ieee80211_sub_if_data *sdata, u8 iftype)
 	const struct ieee80211_sta_he_cap *he_cap;
 	const struct ieee80211_sta_eht_cap *eht_cap;
 	struct ieee80211_supported_band *sband;
-<<<<<<< HEAD
 	bool is_ap;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 n;
 
 	sband = ieee80211_get_sband(sdata);
@@ -4845,17 +4786,12 @@ u8 ieee80211_ie_len_eht_cap(struct ieee80211_sub_if_data *sdata, u8 iftype)
 	if (!he_cap || !eht_cap)
 		return 0;
 
-<<<<<<< HEAD
 	is_ap = iftype == NL80211_IFTYPE_AP ||
 		iftype == NL80211_IFTYPE_P2P_GO;
 
 	n = ieee80211_eht_mcs_nss_size(&he_cap->he_cap_elem,
 				       &eht_cap->eht_cap_elem,
 				       is_ap);
-=======
-	n = ieee80211_eht_mcs_nss_size(&he_cap->he_cap_elem,
-				       &eht_cap->eht_cap_elem);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 2 + 1 +
 	       sizeof(he_cap->he_cap_elem) + n +
 	       ieee80211_eht_ppe_size(eht_cap->eht_ppe_thres[0],
@@ -4866,12 +4802,8 @@ u8 ieee80211_ie_len_eht_cap(struct ieee80211_sub_if_data *sdata, u8 iftype)
 u8 *ieee80211_ie_build_eht_cap(u8 *pos,
 			       const struct ieee80211_sta_he_cap *he_cap,
 			       const struct ieee80211_sta_eht_cap *eht_cap,
-<<<<<<< HEAD
 			       u8 *end,
 			       bool for_ap)
-=======
-			       u8 *end)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u8 mcs_nss_len, ppet_len;
 	u8 ie_len;
@@ -4882,12 +4814,8 @@ u8 *ieee80211_ie_build_eht_cap(u8 *pos,
 		return orig_pos;
 
 	mcs_nss_len = ieee80211_eht_mcs_nss_size(&he_cap->he_cap_elem,
-<<<<<<< HEAD
 						 &eht_cap->eht_cap_elem,
 						 for_ap);
-=======
-						 &eht_cap->eht_cap_elem);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ppet_len = ieee80211_eht_ppe_size(eht_cap->eht_ppe_thres[0],
 					  eht_cap->eht_cap_elem.phy_cap_info);
 

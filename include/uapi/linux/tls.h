@@ -100,7 +100,6 @@
 #define TLS_CIPHER_SM4_CCM_TAG_SIZE		16
 #define TLS_CIPHER_SM4_CCM_REC_SEQ_SIZE		8
 
-<<<<<<< HEAD
 #define TLS_CIPHER_ARIA_GCM_128				57
 #define TLS_CIPHER_ARIA_GCM_128_IV_SIZE			8
 #define TLS_CIPHER_ARIA_GCM_128_KEY_SIZE		16
@@ -115,8 +114,6 @@
 #define TLS_CIPHER_ARIA_GCM_256_TAG_SIZE		16
 #define TLS_CIPHER_ARIA_GCM_256_REC_SEQ_SIZE		8
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define TLS_SET_RECORD_TYPE	1
 #define TLS_GET_RECORD_TYPE	2
 
@@ -173,7 +170,6 @@ struct tls12_crypto_info_sm4_ccm {
 	unsigned char rec_seq[TLS_CIPHER_SM4_CCM_REC_SEQ_SIZE];
 };
 
-<<<<<<< HEAD
 struct tls12_crypto_info_aria_gcm_128 {
 	struct tls_crypto_info info;
 	unsigned char iv[TLS_CIPHER_ARIA_GCM_128_IV_SIZE];
@@ -190,8 +186,6 @@ struct tls12_crypto_info_aria_gcm_256 {
 	unsigned char rec_seq[TLS_CIPHER_ARIA_GCM_256_REC_SEQ_SIZE];
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum {
 	TLS_INFO_UNSPEC,
 	TLS_INFO_VERSION,

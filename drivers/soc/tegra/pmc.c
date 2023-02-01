@@ -2946,42 +2946,6 @@ static int tegra_pmc_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * PMC should be last resort for restarting since it soft-resets
-	 * CPU without resetting everything else.
-	 */
-	err = devm_register_reboot_notifier(&pdev->dev,
-					    &tegra_pmc_reboot_notifier);
-	if (err) {
-		dev_err(&pdev->dev, "unable to register reboot notifier, %d\n",
-			err);
-		return err;
-	}
-
-	err = devm_register_sys_off_handler(&pdev->dev,
-					    SYS_OFF_MODE_RESTART,
-					    SYS_OFF_PRIO_LOW,
-					    tegra_pmc_restart_handler, NULL);
-	if (err) {
-		dev_err(&pdev->dev, "failed to register sys-off handler: %d\n",
-			err);
-		return err;
-	}
-
-	/*
-	 * PMC should be primary power-off method if it soft-resets CPU,
-	 * asking bootloader to shutdown hardware.
-	 */
-	err = devm_register_sys_off_handler(&pdev->dev,
-					    SYS_OFF_MODE_POWER_OFF,
-					    SYS_OFF_PRIO_FIRMWARE,
-					    tegra_pmc_power_off_handler, NULL);
-	if (err) {
-		dev_err(&pdev->dev, "failed to register sys-off handler: %d\n",
-			err);
-		return err;
-	}
-
-	/*
 	 * PCLK clock rate can't be retrieved using CLK API because it
 	 * causes lockup if CPU enters LP2 idle state from some other
 	 * CLK notifier, hence we're caching the rate's value locally.

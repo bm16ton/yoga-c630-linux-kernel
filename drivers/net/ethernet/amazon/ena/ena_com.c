@@ -2400,27 +2400,12 @@ int ena_com_fill_hash_function(struct ena_com_dev *ena_dev,
 		return -EOPNOTSUPP;
 	}
 
-<<<<<<< HEAD
 	if ((func == ENA_ADMIN_TOEPLITZ) && key) {
 		if (key_len != sizeof(hash_key->key)) {
 			netdev_err(ena_dev->net_device,
 				   "key len (%u) doesn't equal the supported size (%zu)\n",
 				   key_len, sizeof(hash_key->key));
 			return -EINVAL;
-=======
-	switch (func) {
-	case ENA_ADMIN_TOEPLITZ:
-		if (key) {
-			if (key_len != sizeof(hash_key->key)) {
-				netdev_err(ena_dev->net_device,
-					   "key len (%u) doesn't equal the supported size (%zu)\n",
-					   key_len, sizeof(hash_key->key));
-				return -EINVAL;
-			}
-			memcpy(hash_key->key, key, key_len);
-			rss->hash_init_val = init_val;
-			hash_key->key_parts = key_len / sizeof(hash_key->key[0]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		memcpy(hash_key->key, key, key_len);
 		hash_key->key_parts = key_len / sizeof(hash_key->key[0]);

@@ -58,10 +58,7 @@ patternProperties:
       cpu:
         description: Holds subnode which indicates cpu dai.
         type: object
-<<<<<<< HEAD
         additionalProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         properties:
           sound-dai:
             maxItems: 1
@@ -69,10 +66,7 @@ patternProperties:
       codec:
         description: Holds subnode which indicates codec dai.
         type: object
-<<<<<<< HEAD
         additionalProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         properties:
           sound-dai:
             minItems: 1

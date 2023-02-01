@@ -7,7 +7,6 @@
 
 #include <linux/auxiliary_bus.h>
 
-<<<<<<< HEAD
 /**
  * struct mei_aux_device - mei auxiliary device
  * @aux_dev: - auxiliary device object
@@ -18,17 +17,12 @@
  * @slow_firmware: The device has slow underlying firmware.
  *                 Such firmware will require to use larger operation timeouts.
  */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct mei_aux_device {
 	struct auxiliary_device aux_dev;
 	int irq;
 	struct resource bar;
-<<<<<<< HEAD
 	struct resource ext_op_mem;
 	bool slow_firmware;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define auxiliary_dev_to_mei_aux_dev(auxiliary_dev) \

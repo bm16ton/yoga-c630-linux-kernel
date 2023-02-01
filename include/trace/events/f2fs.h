@@ -940,19 +940,14 @@ TRACE_EVENT(f2fs_direct_IO_enter,
 	TP_STRUCT__entry(
 		__field(dev_t,	dev)
 		__field(ino_t,	ino)
-<<<<<<< HEAD
 		__field(loff_t,	ki_pos)
 		__field(int,	ki_flags)
 		__field(u16,	ki_ioprio)
-=======
-		__field(struct kiocb *,	iocb)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		__field(unsigned long,	len)
 		__field(int,	rw)
 	),
 
 	TP_fast_assign(
-<<<<<<< HEAD
 		__entry->dev		= inode->i_sb->s_dev;
 		__entry->ino		= inode->i_ino;
 		__entry->ki_pos		= iocb->ki_pos;
@@ -960,28 +955,14 @@ TRACE_EVENT(f2fs_direct_IO_enter,
 		__entry->ki_ioprio	= iocb->ki_ioprio;
 		__entry->len		= len;
 		__entry->rw		= rw;
-=======
-		__entry->dev	= inode->i_sb->s_dev;
-		__entry->ino	= inode->i_ino;
-		__entry->iocb	= iocb;
-		__entry->len	= len;
-		__entry->rw	= rw;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	),
 
 	TP_printk("dev = (%d,%d), ino = %lu pos = %lld len = %lu ki_flags = %x ki_ioprio = %x rw = %d",
 		show_dev_ino(__entry),
-<<<<<<< HEAD
 		__entry->ki_pos,
 		__entry->len,
 		__entry->ki_flags,
 		__entry->ki_ioprio,
-=======
-		__entry->iocb->ki_pos,
-		__entry->len,
-		__entry->iocb->ki_flags,
-		__entry->iocb->ki_ioprio,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		__entry->rw)
 );
 

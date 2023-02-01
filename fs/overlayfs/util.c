@@ -578,11 +578,7 @@ void ovl_copy_up_end(struct dentry *dentry)
 	ovl_inode_unlock(d_inode(dentry));
 }
 
-<<<<<<< HEAD
 bool ovl_path_check_origin_xattr(struct ovl_fs *ofs, const struct path *path)
-=======
-bool ovl_path_check_origin_xattr(struct ovl_fs *ofs, struct path *path)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int res;
 
@@ -595,11 +591,7 @@ bool ovl_path_check_origin_xattr(struct ovl_fs *ofs, struct path *path)
 	return false;
 }
 
-<<<<<<< HEAD
 bool ovl_path_check_dir_xattr(struct ovl_fs *ofs, const struct path *path,
-=======
-bool ovl_path_check_dir_xattr(struct ovl_fs *ofs, struct path *path,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			       enum ovl_xattr ox)
 {
 	int res;
@@ -979,11 +971,7 @@ err:
 }
 
 /* err < 0, 0 if no metacopy xattr, 1 if metacopy xattr found */
-<<<<<<< HEAD
 int ovl_check_metacopy_xattr(struct ovl_fs *ofs, const struct path *path)
-=======
-int ovl_check_metacopy_xattr(struct ovl_fs *ofs, struct path *path)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int res;
 
@@ -1027,11 +1015,7 @@ bool ovl_is_metacopy_dentry(struct dentry *dentry)
 	return (oe->numlower > 1);
 }
 
-<<<<<<< HEAD
 char *ovl_get_redirect_xattr(struct ovl_fs *ofs, const struct path *path, int padding)
-=======
-char *ovl_get_redirect_xattr(struct ovl_fs *ofs, struct path *path, int padding)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int res;
 	char *s, *next, *buf = NULL;

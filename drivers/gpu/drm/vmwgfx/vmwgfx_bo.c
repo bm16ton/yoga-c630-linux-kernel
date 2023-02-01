@@ -429,15 +429,9 @@ int vmw_bo_create_kernel(struct vmw_private *dev_priv, unsigned long size,
 
 	drm_gem_private_object_init(vdev, &bo->base, size);
 
-<<<<<<< HEAD
 	ret = ttm_bo_init_reserved(&dev_priv->bdev, bo, ttm_bo_type_kernel,
 				   placement, 0, &ctx, NULL, NULL,
 				   vmw_bo_default_destroy);
-=======
-	ret = ttm_bo_init_reserved(&dev_priv->bdev, bo, size,
-				   ttm_bo_type_kernel, placement, 0,
-				   &ctx, NULL, NULL, vmw_bo_default_destroy);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(ret))
 		goto error_free;
 
@@ -518,15 +512,8 @@ int vmw_bo_init(struct vmw_private *dev_priv,
 	size = ALIGN(size, PAGE_SIZE);
 	drm_gem_private_object_init(vdev, &vmw_bo->base.base, size);
 
-<<<<<<< HEAD
 	ret = ttm_bo_init_reserved(bdev, &vmw_bo->base, ttm_bo_type_device,
 				   placement, 0, &ctx, NULL, NULL, bo_free);
-=======
-	ret = ttm_bo_init_reserved(bdev, &vmw_bo->base, size,
-				   ttm_bo_type_device,
-				   placement,
-				   0, &ctx, NULL, NULL, bo_free);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(ret)) {
 		return ret;
 	}
@@ -729,47 +716,6 @@ int vmw_user_bo_lookup(struct drm_file *filp,
 }
 
 /**
-<<<<<<< HEAD
-=======
- * vmw_user_bo_noref_lookup - Look up a vmw user buffer object without reference
- * @filp: The TTM object file the handle is registered with.
- * @handle: The user buffer object handle.
- *
- * This function looks up a struct vmw_bo and returns a pointer to the
- * struct vmw_buffer_object it derives from without refcounting the pointer.
- * The returned pointer is only valid until vmw_user_bo_noref_release() is
- * called, and the object pointed to by the returned pointer may be doomed.
- * Any persistent usage of the object requires a refcount to be taken using
- * ttm_bo_reference_unless_doomed(). Iff this function returns successfully it
- * needs to be paired with vmw_user_bo_noref_release() and no sleeping-
- * or scheduling functions may be called inbetween these function calls.
- *
- * Return: A struct vmw_buffer_object pointer if successful or negative
- * error pointer on failure.
- */
-struct vmw_buffer_object *
-vmw_user_bo_noref_lookup(struct drm_file *filp, u32 handle)
-{
-	struct vmw_buffer_object *vmw_bo;
-	struct ttm_buffer_object *bo;
-	struct drm_gem_object *gobj = drm_gem_object_lookup(filp, handle);
-
-	if (!gobj) {
-		DRM_ERROR("Invalid buffer object handle 0x%08lx.\n",
-			  (unsigned long)handle);
-		return ERR_PTR(-ESRCH);
-	}
-	vmw_bo = gem_to_vmw_bo(gobj);
-	bo = ttm_bo_get_unless_zero(&vmw_bo->base);
-	vmw_bo = vmw_buffer_object(bo);
-	drm_gem_object_put(gobj);
-
-	return vmw_bo;
-}
-
-
-/**
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * vmw_bo_fence_single - Utility function to fence a single TTM buffer
  *                       object without unreserving it.
  *

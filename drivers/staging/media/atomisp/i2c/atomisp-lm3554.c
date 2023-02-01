@@ -886,7 +886,6 @@ static int lm3554_probe(struct i2c_client *client)
 	if (err) {
 		dev_err(&client->dev, "gpio request/direction_output fail.\n");
 		goto cleanup_media;
-<<<<<<< HEAD
 	}
 
 	err = atomisp_register_i2c_module(&flash->sd, NULL, LED_FLASH);
@@ -895,16 +894,6 @@ static int lm3554_probe(struct i2c_client *client)
 		goto uninit_gpio;
 	}
 
-=======
-	}
-
-	err = atomisp_register_i2c_module(&flash->sd, NULL, LED_FLASH);
-	if (err) {
-		dev_err(&client->dev, "fail to register atomisp i2c module.\n");
-		goto uninit_gpio;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 uninit_gpio:
@@ -937,11 +926,6 @@ static void lm3554_remove(struct i2c_client *client)
 	lm3554_gpio_uninit(client);
 
 	kfree(flash);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct dev_pm_ops lm3554_pm_ops = {

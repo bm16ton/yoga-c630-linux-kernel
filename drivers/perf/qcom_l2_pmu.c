@@ -840,23 +840,14 @@ static int l2_cache_pmu_probe_cluster(struct device *dev, void *data)
 {
 	struct platform_device *pdev = to_platform_device(dev->parent);
 	struct platform_device *sdev = to_platform_device(dev);
-	struct acpi_device *adev = ACPI_COMPANION(dev);
 	struct l2cache_pmu *l2cache_pmu = data;
 	struct cluster_pmu *cluster;
-<<<<<<< HEAD
 	u64 fw_cluster_id;
 	int err;
 	int irq;
 
 	err = acpi_dev_uid_to_integer(ACPI_COMPANION(dev), &fw_cluster_id);
 	if (err) {
-=======
-	unsigned long fw_cluster_id;
-	int err;
-	int irq;
-
-	if (!adev || kstrtoul(adev->pnp.unique_id, 10, &fw_cluster_id) < 0) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(&pdev->dev, "unable to read ACPI uid\n");
 		return err;
 	}

@@ -208,7 +208,6 @@ alloc_pages_bulk_array_node(gfp_t gfp, int nid, unsigned long nr_pages, struct p
 		nid = numa_mem_id();
 
 	return __alloc_pages_bulk(gfp, nid, NULL, nr_pages, NULL, page_array);
-<<<<<<< HEAD
 }
 
 static inline void warn_if_node_offline(int this_node, gfp_t gfp_mask)
@@ -223,8 +222,6 @@ static inline void warn_if_node_offline(int this_node, gfp_t gfp_mask)
 
 	pr_warn("%pGg allocation from offline node %d\n", &gfp_mask, this_node);
 	dump_stack();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -244,11 +241,7 @@ static inline
 struct folio *__folio_alloc_node(gfp_t gfp, unsigned int order, int nid)
 {
 	VM_BUG_ON(nid < 0 || nid >= MAX_NUMNODES);
-<<<<<<< HEAD
 	warn_if_node_offline(nid, gfp);
-=======
-	VM_WARN_ON((gfp & __GFP_THISNODE) && !node_online(nid));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return __folio_alloc(gfp, order, nid, NULL);
 }

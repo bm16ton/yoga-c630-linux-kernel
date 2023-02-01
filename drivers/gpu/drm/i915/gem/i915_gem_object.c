@@ -293,7 +293,6 @@ void __i915_gem_object_pages_fini(struct drm_i915_gem_object *obj)
 	__i915_gem_object_put_pages(obj);
 	GEM_BUG_ON(i915_gem_object_has_pages(obj));
 }
-<<<<<<< HEAD
 
 void __i915_gem_free_object(struct drm_i915_gem_object *obj)
 {
@@ -314,28 +313,6 @@ void __i915_gem_free_object(struct drm_i915_gem_object *obj)
 	if (obj->mm.n_placements > 1)
 		kfree(obj->mm.placements);
 
-=======
-
-void __i915_gem_free_object(struct drm_i915_gem_object *obj)
-{
-	trace_i915_gem_object_destroy(obj);
-
-	GEM_BUG_ON(!list_empty(&obj->lut_list));
-
-	bitmap_free(obj->bit_17);
-
-	if (obj->base.import_attach)
-		drm_prime_gem_destroy(&obj->base, NULL);
-
-	drm_gem_free_mmap_offset(&obj->base);
-
-	if (obj->ops->release)
-		obj->ops->release(obj);
-
-	if (obj->mm.n_placements > 1)
-		kfree(obj->mm.placements);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (obj->shares_resv_from)
 		i915_vm_resv_put(obj->shares_resv_from);
 
@@ -676,7 +653,6 @@ int i915_gem_object_migrate(struct drm_i915_gem_object *obj,
 			    struct i915_gem_ww_ctx *ww,
 			    enum intel_region_id id)
 {
-<<<<<<< HEAD
 	return __i915_gem_object_migrate(obj, ww, id, obj->flags);
 }
 
@@ -802,95 +778,6 @@ bool i915_gem_object_needs_ccs_pages(struct drm_i915_gem_object *obj)
 
 void i915_gem_init__objects(struct drm_i915_private *i915)
 {
-=======
-	struct drm_i915_private *i915 = to_i915(obj->base.dev);
-	struct intel_memory_region *mr;
-
-	GEM_BUG_ON(id >= INTEL_REGION_UNKNOWN);
-	GEM_BUG_ON(obj->mm.madv != I915_MADV_WILLNEED);
-	assert_object_held(obj);
-
-	mr = i915->mm.regions[id];
-	GEM_BUG_ON(!mr);
-
-	if (!i915_gem_object_can_migrate(obj, id))
-		return -EINVAL;
-
-	if (!obj->ops->migrate) {
-		if (GEM_WARN_ON(obj->mm.region != mr))
-			return -EINVAL;
-		return 0;
-	}
-
-	return obj->ops->migrate(obj, mr);
-}
-
-/**
- * i915_gem_object_placement_possible - Check whether the object can be
- * placed at certain memory type
- * @obj: Pointer to the object
- * @type: The memory type to check
- *
- * Return: True if the object can be placed in @type. False otherwise.
- */
-bool i915_gem_object_placement_possible(struct drm_i915_gem_object *obj,
-					enum intel_memory_type type)
-{
-	unsigned int i;
-
-	if (!obj->mm.n_placements) {
-		switch (type) {
-		case INTEL_MEMORY_LOCAL:
-			return i915_gem_object_has_iomem(obj);
-		case INTEL_MEMORY_SYSTEM:
-			return i915_gem_object_has_pages(obj);
-		default:
-			/* Ignore stolen for now */
-			GEM_BUG_ON(1);
-			return false;
-		}
-	}
-
-	for (i = 0; i < obj->mm.n_placements; i++) {
-		if (obj->mm.placements[i]->type == type)
-			return true;
-	}
-
-	return false;
-}
-
-/**
- * i915_gem_object_needs_ccs_pages - Check whether the object requires extra
- * pages when placed in system-memory, in order to save and later restore the
- * flat-CCS aux state when the object is moved between local-memory and
- * system-memory
- * @obj: Pointer to the object
- *
- * Return: True if the object needs extra ccs pages. False otherwise.
- */
-bool i915_gem_object_needs_ccs_pages(struct drm_i915_gem_object *obj)
-{
-	bool lmem_placement = false;
-	int i;
-
-	if (!HAS_FLAT_CCS(to_i915(obj->base.dev)))
-		return false;
-
-	for (i = 0; i < obj->mm.n_placements; i++) {
-		/* Compression is not allowed for the objects with smem placement */
-		if (obj->mm.placements[i]->type == INTEL_MEMORY_SYSTEM)
-			return false;
-		if (!lmem_placement &&
-		    obj->mm.placements[i]->type == INTEL_MEMORY_LOCAL)
-			lmem_placement = true;
-	}
-
-	return lmem_placement;
-}
-
-void i915_gem_init__objects(struct drm_i915_private *i915)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INIT_WORK(&i915->mm.free_work, __i915_gem_free_work);
 }
 

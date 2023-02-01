@@ -1017,15 +1017,12 @@ ok:
 		err = 0;
 	}
 
-<<<<<<< HEAD
 	/* check for index header length */
 	if (offsetof(struct INDEX_BUFFER, ihdr) + ib->ihdr.used > bytes) {
 		err = -EINVAL;
 		goto out;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	in->index = ib;
 	*node = in;
 

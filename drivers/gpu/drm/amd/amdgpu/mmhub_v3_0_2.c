@@ -268,11 +268,7 @@ static void mmhub_v3_0_2_init_cache_regs(struct amdgpu_device *adev)
 
 	tmp = regMMVM_L2_CNTL5_DEFAULT;
 	tmp = REG_SET_FIELD(tmp, MMVM_L2_CNTL5, L2_CACHE_SMALLK_FRAGMENT_SIZE, 0);
-<<<<<<< HEAD
 	WREG32_SOC15(MMHUB, 0, regMMVM_L2_CNTL5, tmp);
-=======
-	WREG32_SOC15(GC, 0, regMMVM_L2_CNTL5, tmp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void mmhub_v3_0_2_enable_system_domain(struct amdgpu_device *adev)

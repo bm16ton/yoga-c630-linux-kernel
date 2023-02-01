@@ -27,7 +27,6 @@ static const struct sof_dev_desc bxt_desc = {
 	.resindex_imr_base	= -1,
 	.irqindex_host_ipc	= -1,
 	.chip_info = &apl_chip_info,
-<<<<<<< HEAD
 	.ipc_supported_mask	= BIT(SOF_IPC) | BIT(SOF_INTEL_IPC4),
 	.ipc_default		= SOF_IPC,
 	.default_fw_path = {
@@ -46,13 +45,6 @@ static const struct sof_dev_desc bxt_desc = {
 	.ops = &sof_apl_ops,
 	.ops_init = sof_apl_ops_init,
 	.ops_free = hda_ops_free,
-=======
-	.default_fw_path = "intel/sof",
-	.default_tplg_path = "intel/sof-tplg",
-	.default_fw_filename = "sof-apl.ri",
-	.nocodec_tplg_filename = "sof-apl-nocodec.tplg",
-	.ops = &sof_apl_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct sof_dev_desc glk_desc = {
@@ -63,7 +55,6 @@ static const struct sof_dev_desc glk_desc = {
 	.resindex_imr_base	= -1,
 	.irqindex_host_ipc	= -1,
 	.chip_info = &apl_chip_info,
-<<<<<<< HEAD
 	.ipc_supported_mask	= BIT(SOF_IPC) | BIT(SOF_INTEL_IPC4),
 	.ipc_default		= SOF_IPC,
 	.default_fw_path = {
@@ -81,13 +72,6 @@ static const struct sof_dev_desc glk_desc = {
 	.nocodec_tplg_filename = "sof-glk-nocodec.tplg",
 	.ops = &sof_apl_ops,
 	.ops_init = sof_apl_ops_init,
-=======
-	.default_fw_path = "intel/sof",
-	.default_tplg_path = "intel/sof-tplg",
-	.default_fw_filename = "sof-glk.ri",
-	.nocodec_tplg_filename = "sof-glk-nocodec.tplg",
-	.ops = &sof_apl_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* PCI IDs */

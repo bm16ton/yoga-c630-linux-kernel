@@ -51,7 +51,6 @@ config X86_AMD_PSTATE
 
 	  If in doubt, say N.
 
-<<<<<<< HEAD
 config X86_AMD_PSTATE_UT
 	tristate "selftest for AMD Processor P-State driver"
 	depends on X86 && ACPI_PROCESSOR
@@ -67,8 +66,6 @@ config X86_AMD_PSTATE_UT
 	  disabled and set acpi-cpufreq enabled to run test cases, then compare
 	  the test results.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config X86_ACPI_CPUFREQ
 	tristate "ACPI Processor P-States driver"
 	depends on ACPI_PROCESSOR

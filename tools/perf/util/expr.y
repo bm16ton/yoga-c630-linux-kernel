@@ -156,11 +156,7 @@ start: if_expr
 }
 ;
 
-<<<<<<< HEAD
 if_expr: expr IF expr ELSE if_expr
-=======
-if_expr: expr IF expr ELSE expr
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (fpclassify($3.val) == FP_ZERO) {
 		/*

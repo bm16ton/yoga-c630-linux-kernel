@@ -117,13 +117,8 @@ tconInfoAlloc(void)
 	ret_buf = kzalloc(sizeof(*ret_buf), GFP_KERNEL);
 	if (!ret_buf)
 		return NULL;
-<<<<<<< HEAD
 	ret_buf->cfids = init_cached_dirs();
 	if (!ret_buf->cfids) {
-=======
-	ret_buf->cfid = init_cached_dir();
-	if (!ret_buf->cfid) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(ret_buf);
 		return NULL;
 	}
@@ -149,11 +144,7 @@ tconInfoFree(struct cifs_tcon *tcon)
 		cifs_dbg(FYI, "Null buffer passed to tconInfoFree\n");
 		return;
 	}
-<<<<<<< HEAD
 	free_cached_dirs(tcon->cfids);
-=======
-	free_cached_dir(tcon);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomic_dec(&tconInfoAllocCount);
 	kfree(tcon->nativeFileSystem);
 	kfree_sensitive(tcon->password);
@@ -837,11 +828,7 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
 	free_dentry_path(page);
 }
 
-<<<<<<< HEAD
 /* parses DFS referral V3 structure
-=======
-/* parses DFS refferal V3 structure
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * caller is responsible for freeing target_nodes
  * returns:
  * - on success - 0
@@ -1088,12 +1075,7 @@ setup_aio_ctx_iter(struct cifs_aio_ctx *ctx, struct iov_iter *iter, int rw)
 /**
  * cifs_alloc_hash - allocate hash and hash context together
  * @name: The name of the crypto hash algo
-<<<<<<< HEAD
  * @sdesc: SHASH descriptor where to put the pointer to the hash TFM
-=======
- * @shash: Where to put the pointer to the hash algo
- * @sdesc: Where to put the pointer to the hash descriptor
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * The caller has to make sure @sdesc is initialized to either NULL or
  * a valid context. It can be freed via cifs_free_hash().
@@ -1128,12 +1110,7 @@ cifs_alloc_hash(const char *name, struct shash_desc **sdesc)
 
 /**
  * cifs_free_hash - free hash and hash context together
-<<<<<<< HEAD
  * @sdesc: Where to find the pointer to the hash TFM
-=======
- * @shash: Where to find the pointer to the hash algo
- * @sdesc: Where to find the pointer to the hash descriptor
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Freeing a NULL descriptor is safe.
  */
@@ -1336,53 +1313,5 @@ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix)
 
 	cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_USE_PREFIX_PATH;
 	return 0;
-<<<<<<< HEAD
-=======
-}
-
-/** cifs_dfs_query_info_nonascii_quirk
- * Handle weird Windows SMB server behaviour. It responds with
- * STATUS_OBJECT_NAME_INVALID code to SMB2 QUERY_INFO request
- * for "\<server>\<dfsname>\<linkpath>" DFS reference,
- * where <dfsname> contains non-ASCII unicode symbols.
- *
- * Check such DFS reference.
- */
-int cifs_dfs_query_info_nonascii_quirk(const unsigned int xid,
-				       struct cifs_tcon *tcon,
-				       struct cifs_sb_info *cifs_sb,
-				       const char *linkpath)
-{
-	char *treename, *dfspath, sep;
-	int treenamelen, linkpathlen, rc;
-
-	treename = tcon->treeName;
-	/* MS-DFSC: All paths in REQ_GET_DFS_REFERRAL and RESP_GET_DFS_REFERRAL
-	 * messages MUST be encoded with exactly one leading backslash, not two
-	 * leading backslashes.
-	 */
-	sep = CIFS_DIR_SEP(cifs_sb);
-	if (treename[0] == sep && treename[1] == sep)
-		treename++;
-	linkpathlen = strlen(linkpath);
-	treenamelen = strnlen(treename, MAX_TREE_SIZE + 1);
-	dfspath = kzalloc(treenamelen + linkpathlen + 1, GFP_KERNEL);
-	if (!dfspath)
-		return -ENOMEM;
-	if (treenamelen)
-		memcpy(dfspath, treename, treenamelen);
-	memcpy(dfspath + treenamelen, linkpath, linkpathlen);
-	rc = dfs_cache_find(xid, tcon->ses, cifs_sb->local_nls,
-			    cifs_remap(cifs_sb), dfspath, NULL, NULL);
-	if (rc == 0) {
-		cifs_dbg(FYI, "DFS ref '%s' is found, emulate -EREMOTE\n",
-			 dfspath);
-		rc = -EREMOTE;
-	} else {
-		cifs_dbg(FYI, "%s: dfs_cache_find returned %d\n", __func__, rc);
-	}
-	kfree(dfspath);
-	return rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif

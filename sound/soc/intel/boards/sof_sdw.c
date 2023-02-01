@@ -48,7 +48,6 @@ static int sof_sdw_quirk_cb(const struct dmi_system_id *id)
 
 static const struct dmi_system_id sof_sdw_quirk_table[] = {
 	/* CometLake devices */
-<<<<<<< HEAD
 	{
 		.callback = sof_sdw_quirk_cb,
 		.matches = {
@@ -175,15 +174,6 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
 					SOF_SDW_PCH_DMIC |
 					SOF_SDW_FOUR_SPK),
-=======
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "CometLake Client"),
-		},
-		.driver_data = (void *)SOF_SDW_PCH_DMIC,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		/*
@@ -230,13 +220,9 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A32")
 		},
-<<<<<<< HEAD
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
 					RT711_JD2 |
 					SOF_SDW_FOUR_SPK),
-=======
-		.driver_data = (void *)RT711_JD2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.callback = sof_sdw_quirk_cb,
@@ -254,7 +240,6 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "Alder Lake Client Platform"),
 		},
-<<<<<<< HEAD
 		.driver_data = (void *)(RT711_JD2_100K |
 					SOF_SDW_TGL_HDMI |
 					SOF_BT_OFFLOAD_SSP(2) |
@@ -271,9 +256,6 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 					SOF_SDW_FOUR_SPK |
 					SOF_BT_OFFLOAD_SSP(2) |
 					SOF_SSP_BT_OFFLOAD_PRESENT),
-=======
-		.driver_data = (void *)RT711_JD2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.callback = sof_sdw_quirk_cb,
@@ -281,12 +263,8 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0AF0")
 		},
-<<<<<<< HEAD
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
 					RT711_JD2 |
-=======
-		.driver_data = (void *)(RT711_JD2 |
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					SOF_SDW_FOUR_SPK),
 	},
 	{
@@ -295,24 +273,10 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0AF3"),
 		},
-<<<<<<< HEAD
 		/* No Jack */
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-=======
-		.driver_data = (void *)(RT711_JD2 |
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					SOF_SDW_FOUR_SPK),
 	},
-	/* IceLake devices */
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "Ice Lake Client"),
-		},
-		.driver_data = (void *)SOF_SDW_PCH_DMIC,
-	},
-	/* TigerLake devices */
 	{
 		.callback = sof_sdw_quirk_cb,
 		.matches = {
@@ -320,66 +284,26 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0AFF")
 		},
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-<<<<<<< HEAD
 					RT711_JD2 |
 					SOF_SDW_FOUR_SPK),
-=======
-					RT711_JD1 |
-					SOF_SDW_PCH_DMIC |
-					SOF_SSP_PORT(SOF_I2S_SSP2)),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.callback = sof_sdw_quirk_cb,
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-<<<<<<< HEAD
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B00")
 		},
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
 					RT711_JD2 |
 					SOF_SDW_FOUR_SPK),
-=======
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A3E")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
-		/* another SKU of Dell Latitude 9520 */
 		.callback = sof_sdw_quirk_cb,
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-<<<<<<< HEAD
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B01")
 		},
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-=======
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A3F")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2),
-	},
-	{
-		/* Dell XPS 9710 */
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A5D")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2 |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A5E")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					RT711_JD2 |
 					SOF_SDW_FOUR_SPK),
 	},
@@ -390,15 +314,8 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B11")
 		},
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-<<<<<<< HEAD
 					RT711_JD2 |
 					SOF_SDW_FOUR_SPK),
-=======
-					SOF_SDW_PCH_DMIC |
-					SOF_SDW_FOUR_SPK |
-					SOF_BT_OFFLOAD_SSP(2) |
-					SOF_SSP_BT_OFFLOAD_PRESENT),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.callback = sof_sdw_quirk_cb,
@@ -407,7 +324,6 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B12")
 		},
 		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-<<<<<<< HEAD
 					RT711_JD2 |
 					SOF_SDW_FOUR_SPK),
 	},
@@ -447,162 +363,6 @@ static const struct dmi_system_id sof_sdw_quirk_table[] = {
 		},
 		.driver_data = (void *)(RT711_JD1 | SOF_SDW_TGL_HDMI),
 	},
-=======
-					SOF_SDW_PCH_DMIC |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		/*
-		 * this entry covers multiple HP SKUs. The family name
-		 * does not seem robust enough, so we use a partial
-		 * match that ignores the product name suffix
-		 * (e.g. 15-eb1xxx, 14t-ea000 or 13-aw2xxx)
-		 */
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "HP"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "HP Spectre x360 Conv"),
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					SOF_SDW_PCH_DMIC |
-					RT711_JD1),
-	},
-	{
-		/* NUC15 'Bishop County' LAPBC510 and LAPBC710 skews */
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Intel(R) Client Systems"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "LAPBC"),
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					SOF_SDW_PCH_DMIC |
-					RT711_JD1),
-	},
-	{
-		/* NUC15 LAPBC710 skews */
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_BOARD_VENDOR, "Intel Corporation"),
-			DMI_MATCH(DMI_BOARD_NAME, "LAPBC710"),
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					SOF_SDW_PCH_DMIC |
-					RT711_JD1),
-	},
-	/* TigerLake-SDCA devices */
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A32")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2 |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0A45")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2),
-	},
-	/* AlderLake devices */
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "Alder Lake Client Platform"),
-		},
-		.driver_data = (void *)(RT711_JD2_100K |
-					SOF_SDW_TGL_HDMI |
-					SOF_BT_OFFLOAD_SSP(2) |
-					SOF_SSP_BT_OFFLOAD_PRESENT),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Google"),
-			DMI_MATCH(DMI_PRODUCT_NAME, "Brya"),
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					SOF_SDW_PCH_DMIC |
-					SOF_SDW_FOUR_SPK |
-					SOF_BT_OFFLOAD_SSP(2) |
-					SOF_SSP_BT_OFFLOAD_PRESENT),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0AF3"),
-		},
-		/* No Jack */
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B00")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2 |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B01")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2 |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B11")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2 |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B12")
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2 |
-					SOF_SDW_FOUR_SPK),
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B13"),
-		},
-		/* No Jack */
-		.driver_data = (void *)SOF_SDW_TGL_HDMI,
-	},
-	{
-		.callback = sof_sdw_quirk_cb,
-		.matches = {
-			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "0B29"),
-		},
-		.driver_data = (void *)(SOF_SDW_TGL_HDMI |
-					RT711_JD2 |
-					SOF_SDW_FOUR_SPK),
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{}
 };
 
@@ -1796,29 +1556,7 @@ static int mc_remove(struct platform_device *pdev)
 {
 	struct snd_soc_card *card = platform_get_drvdata(pdev);
 
-<<<<<<< HEAD
 	mc_dailink_exit_loop(card);
-=======
-	for (i = 0; i < ARRAY_SIZE(codec_info_list); i++) {
-		if (!codec_info_list[i].exit)
-			continue;
-		/*
-		 * We don't need to call .exit function if there is no matched
-		 * dai link found.
-		 */
-		for_each_card_prelinks(card, j, link) {
-			if (!strcmp(link->codecs[0].dai_name,
-				    codec_info_list[i].dai_name)) {
-				ret = codec_info_list[i].exit(card, link);
-				if (ret)
-					dev_warn(&pdev->dev,
-						 "codec exit failed %d\n",
-						 ret);
-				break;
-			}
-		}
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

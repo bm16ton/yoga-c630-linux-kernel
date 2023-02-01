@@ -59,11 +59,7 @@ int main(int argc, char **argv)
 		return 2;
 	}
 
-<<<<<<< HEAD
 	ret = bpf_prog_test_load("test_lirc_mode2_kern.bpf.o",
-=======
-	ret = bpf_prog_test_load("test_lirc_mode2_kern.o",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 BPF_PROG_TYPE_LIRC_MODE2, &obj, &progfd);
 	if (ret) {
 		printf("Failed to load bpf program\n");

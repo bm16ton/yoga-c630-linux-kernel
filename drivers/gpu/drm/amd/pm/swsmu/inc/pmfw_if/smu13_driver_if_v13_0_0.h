@@ -522,15 +522,9 @@ typedef enum  {
   TEMP_HOTSPOT_M,
   TEMP_MEM,
   TEMP_VR_GFX,
-<<<<<<< HEAD
   TEMP_VR_SOC,
   TEMP_VR_MEM0,
   TEMP_VR_MEM1,
-=======
-  TEMP_VR_MEM0,
-  TEMP_VR_MEM1,
-  TEMP_VR_SOC,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   TEMP_VR_U,
   TEMP_LIQUID0,
   TEMP_LIQUID1,

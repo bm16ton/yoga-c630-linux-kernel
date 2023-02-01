@@ -23,7 +23,6 @@
 		gpios = <&gpio 56 GPIO_ACTIVE_LOW>;
 		priority = <200>;
 	};
-<<<<<<< HEAD
 
 	leds {
 		compatible = "gpio-leds";
@@ -56,8 +55,6 @@
 
 &aes {
 	status = "disabled"; /* Reserved by secure OS */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &gpio {
@@ -72,15 +69,12 @@
 		pins = "GPIO_35", "GPIO_36";
 		function = "can0_b";
 	};
-<<<<<<< HEAD
 
 	sgpio_a_pins: sgpio-a-pins {
 		/* SCK, D0, D1, LD */
 		pins = "GPIO_32", "GPIO_33", "GPIO_34", "GPIO_35";
 		function = "sgpio_a";
 	};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &can0 {
@@ -130,7 +124,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &sgpio {
 	pinctrl-0 = <&sgpio_a_pins>;
 	pinctrl-names = "default";
@@ -145,8 +138,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &switch {
 	status = "okay";
 };

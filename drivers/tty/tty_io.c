@@ -170,10 +170,6 @@ static void free_tty_struct(struct tty_struct *tty)
 	tty_ldisc_deinit(tty);
 	put_device(tty->dev);
 	kvfree(tty->write_buf);
-<<<<<<< HEAD
-=======
-	tty->magic = 0xDEADDEAD;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(tty);
 }
 
@@ -558,7 +554,6 @@ static struct file *tty_release_redirect(struct tty_struct *tty)
  * __tty_hangup		-	actual handler for hangup events
  * @tty: tty device
  * @exit_session: if non-zero, signal all foreground group processes
-<<<<<<< HEAD
  *
  * This can be called by a "kworker" kernel thread. That is process synchronous
  * but doesn't hold any locks, so we need to make sure we have the appropriate
@@ -571,20 +566,6 @@ static struct file *tty_release_redirect(struct tty_struct *tty)
  * Locking:
  *  * BTM
  *
-=======
- *
- * This can be called by a "kworker" kernel thread. That is process synchronous
- * but doesn't hold any locks, so we need to make sure we have the appropriate
- * locks for what we're doing.
- *
- * The hangup event clears any pending redirections onto the hung up device. It
- * ensures future writes will error and it does the needed line discipline
- * hangup and signal delivery. The tty object itself remains intact.
- *
- * Locking:
- *  * BTM
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *   * redirect lock for undoing redirection
  *   * file list lock for manipulating list of ttys
  *   * tty_ldiscs_lock from called functions
@@ -3139,7 +3120,6 @@ struct tty_struct *alloc_tty_struct(struct tty_driver *driver, int idx)
  * tty_put_char	- write one character to a tty
  * @tty: tty
  * @ch: character to write
-<<<<<<< HEAD
  *
  * Write one byte to the @tty using the provided @tty->ops->put_char() method
  * if present.
@@ -3147,15 +3127,6 @@ struct tty_struct *alloc_tty_struct(struct tty_driver *driver, int idx)
  * Note: the specific put_char operation in the driver layer may go
  * away soon. Don't call it directly, use this method
  *
-=======
- *
- * Write one byte to the @tty using the provided @tty->ops->put_char() method
- * if present.
- *
- * Note: the specific put_char operation in the driver layer may go
- * away soon. Don't call it directly, use this method
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Return: the number of characters successfully output.
  */
 int tty_put_char(struct tty_struct *tty, unsigned char ch)

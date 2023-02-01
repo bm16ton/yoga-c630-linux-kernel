@@ -523,7 +523,4 @@ MODULE_AUTHOR("Jarkko Nikula <jarkko.nikula@linux.intel.com>");
 MODULE_AUTHOR("Raymond Tan <raymond.tan@intel.com>");
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Intel Quadrature Encoder Peripheral driver");
-<<<<<<< HEAD
 MODULE_IMPORT_NS(COUNTER);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

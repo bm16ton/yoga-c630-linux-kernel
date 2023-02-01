@@ -146,22 +146,7 @@ struct settings {
 	enum shmem_enabled shmem_enabled;
 	bool use_zero_page;
 	struct khugepaged_settings khugepaged;
-<<<<<<< HEAD
 	unsigned long read_ahead_kb;
-=======
-};
-
-static struct settings default_settings = {
-	.thp_enabled = THP_MADVISE,
-	.thp_defrag = THP_DEFRAG_ALWAYS,
-	.shmem_enabled = SHMEM_NEVER,
-	.use_zero_page = 0,
-	.khugepaged = {
-		.defrag = 1,
-		.alloc_sleep_millisecs = 10,
-		.scan_sleep_millisecs = 10,
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct settings saved_settings;

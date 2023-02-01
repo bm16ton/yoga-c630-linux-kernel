@@ -20,7 +20,6 @@ properties:
     maxItems: 1
 
   interrupts:
-<<<<<<< HEAD
     minItems: 1
     maxItems: 8
 
@@ -41,9 +40,6 @@ properties:
       queue pairs.
 
   dma-coherent: true
-=======
-    maxItems: 1
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   local-mac-address: true
 
@@ -81,11 +77,7 @@ examples:
     axi {
         #address-cells = <2>;
         #size-cells = <2>;
-<<<<<<< HEAD
         tsnep0: ethernet@a0000000 {
-=======
-        tnsep0: ethernet@a0000000 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             compatible = "engleder,tsnep";
             reg = <0x0 0xa0000000 0x0 0x10000>;
             interrupts = <0 89 1>;
@@ -103,7 +95,6 @@ examples:
                 };
             };
         };
-<<<<<<< HEAD
 
         tsnep1: ethernet@a0010000 {
             compatible = "engleder,tsnep";
@@ -124,6 +115,4 @@ examples:
                 };
             };
         };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     };

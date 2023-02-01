@@ -252,11 +252,7 @@ struct opregion_asle_ext {
 
 static int check_swsci_function(struct drm_i915_private *i915, u32 function)
 {
-<<<<<<< HEAD
 	struct opregion_swsci *swsci = i915->display.opregion.swsci;
-=======
-	struct opregion_swsci *swsci = i915->opregion.swsci;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 main_function, sub_function;
 
 	if (!swsci)
@@ -269,19 +265,11 @@ static int check_swsci_function(struct drm_i915_private *i915, u32 function)
 
 	/* Check if we can call the function. See swsci_setup for details. */
 	if (main_function == SWSCI_SBCB) {
-<<<<<<< HEAD
 		if ((i915->display.opregion.swsci_sbcb_sub_functions &
 		     (1 << sub_function)) == 0)
 			return -EINVAL;
 	} else if (main_function == SWSCI_GBDA) {
 		if ((i915->display.opregion.swsci_gbda_sub_functions &
-=======
-		if ((i915->opregion.swsci_sbcb_sub_functions &
-		     (1 << sub_function)) == 0)
-			return -EINVAL;
-	} else if (main_function == SWSCI_GBDA) {
-		if ((i915->opregion.swsci_gbda_sub_functions &
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		     (1 << sub_function)) == 0)
 			return -EINVAL;
 	}
@@ -292,11 +280,7 @@ static int check_swsci_function(struct drm_i915_private *i915, u32 function)
 static int swsci(struct drm_i915_private *dev_priv,
 		 u32 function, u32 parm, u32 *parm_out)
 {
-<<<<<<< HEAD
 	struct opregion_swsci *swsci = dev_priv->display.opregion.swsci;
-=======
-	struct opregion_swsci *swsci = dev_priv->opregion.swsci;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
 	u32 scic, dslp;
 	u16 swsci_val;
@@ -895,11 +879,7 @@ static int intel_load_vbt_firmware(struct drm_i915_private *dev_priv)
 
 int intel_opregion_setup(struct drm_i915_private *dev_priv)
 {
-<<<<<<< HEAD
 	struct intel_opregion *opregion = &dev_priv->display.opregion;
-=======
-	struct intel_opregion *opregion = &dev_priv->opregion;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct pci_dev *pdev = to_pci_dev(dev_priv->drm.dev);
 	u32 asls, mboxes;
 	char buf[sizeof(OPREGION_SIGNATURE)];
@@ -1126,11 +1106,7 @@ struct edid *intel_opregion_get_edid(struct intel_connector *intel_connector)
 {
 	struct drm_connector *connector = &intel_connector->base;
 	struct drm_i915_private *i915 = to_i915(connector->dev);
-<<<<<<< HEAD
 	struct intel_opregion *opregion = &i915->display.opregion;
-=======
-	struct intel_opregion *opregion = &i915->opregion;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const void *in_edid;
 	const struct edid *edid;
 	struct edid *new_edid;
@@ -1165,11 +1141,7 @@ struct edid *intel_opregion_get_edid(struct intel_connector *intel_connector)
 
 bool intel_opregion_headless_sku(struct drm_i915_private *i915)
 {
-<<<<<<< HEAD
 	struct intel_opregion *opregion = &i915->display.opregion;
-=======
-	struct intel_opregion *opregion = &i915->opregion;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct opregion_header *header = opregion->header;
 
 	if (!header || header->over.major < 2 ||

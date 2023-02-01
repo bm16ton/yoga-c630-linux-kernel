@@ -32,10 +32,6 @@ r8723bs-y = \
 		hal/odm_DynamicTxPower.o \
 		hal/odm_EdcaTurboCheck.o \
 		hal/odm_HWConfig.o \
-<<<<<<< HEAD
-=======
-		hal/odm_NoiseMonitor.o \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hal/odm_RegConfig8723B.o \
 		hal/rtl8723b_cmd.o \
 		hal/rtl8723b_dm.o \

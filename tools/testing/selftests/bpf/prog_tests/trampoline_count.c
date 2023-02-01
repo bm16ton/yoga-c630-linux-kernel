@@ -35,11 +35,7 @@ static struct bpf_program *load_prog(char *file, char *name, struct inst *inst)
 /* TODO: use different target function to run in concurrent mode */
 void serial_test_trampoline_count(void)
 {
-<<<<<<< HEAD
 	char *file = "test_trampoline_count.bpf.o";
-=======
-	char *file = "test_trampoline_count.o";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	char *const progs[] = { "fentry_test", "fmod_ret_test", "fexit_test" };
 	struct inst inst[MAX_TRAMP_PROGS + 1] = {};
 	struct bpf_program *prog;

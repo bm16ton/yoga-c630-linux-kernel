@@ -144,12 +144,8 @@ void kvm_hv_request_tsc_page_update(struct kvm *kvm);
 
 void kvm_hv_init_vm(struct kvm *kvm);
 void kvm_hv_destroy_vm(struct kvm *kvm);
-<<<<<<< HEAD
 int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu);
 void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu, bool hyperv_enabled);
-=======
-void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int kvm_hv_set_enforce_cpuid(struct kvm_vcpu *vcpu, bool enforce);
 int kvm_vm_ioctl_hv_eventfd(struct kvm *kvm, struct kvm_hyperv_eventfd *args);
 int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,

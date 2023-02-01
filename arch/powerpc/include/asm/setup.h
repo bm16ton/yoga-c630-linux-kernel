@@ -69,11 +69,7 @@ void do_barrier_nospec_fixups_range(bool enable, void *start, void *end);
 static inline void do_barrier_nospec_fixups_range(bool enable, void *start, void *end) { }
 #endif
 
-<<<<<<< HEAD
 #ifdef CONFIG_PPC_E500
-=======
-#ifdef CONFIG_PPC_FSL_BOOK3E
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void __init setup_spectre_v2(void);
 #else
 static inline void setup_spectre_v2(void) {}
@@ -91,11 +87,8 @@ void early_setup_secondary(void);
 unsigned long __init prom_init(unsigned long r3, unsigned long r4,
 			       unsigned long pp, unsigned long r6,
 			       unsigned long r7, unsigned long kbase);
-<<<<<<< HEAD
 
 extern struct seq_buf ppc_hw_desc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* !__ASSEMBLY__ */
 

@@ -206,7 +206,6 @@ static void __init pnv_setup_arch(void)
 	/* XXX PMCS */
 
 	pnv_rng_init();
-<<<<<<< HEAD
 }
 
 static void __init pnv_add_hw_description(void)
@@ -226,8 +225,6 @@ static void __init pnv_add_hw_description(void)
 		seq_buf_printf(&ppc_hw_desc, "mi:%s ", s);
 
 	of_node_put(dn);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void __init pnv_init(void)

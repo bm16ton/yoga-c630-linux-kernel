@@ -220,11 +220,8 @@ Userspace to kernel:
   ``ETHTOOL_MSG_PHC_VCLOCKS_GET``       get PHC virtual clocks info
   ``ETHTOOL_MSG_MODULE_SET``            set transceiver module parameters
   ``ETHTOOL_MSG_MODULE_GET``            get transceiver module parameters
-<<<<<<< HEAD
   ``ETHTOOL_MSG_PSE_SET``               set PSE parameters
   ``ETHTOOL_MSG_PSE_GET``               get PSE parameters
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   ===================================== =================================
 
 Kernel to userspace:
@@ -265,10 +262,7 @@ Kernel to userspace:
   ``ETHTOOL_MSG_STATS_GET_REPLY``          standard statistics
   ``ETHTOOL_MSG_PHC_VCLOCKS_GET_REPLY``    PHC virtual clocks info
   ``ETHTOOL_MSG_MODULE_GET_REPLY``         transceiver module parameters
-<<<<<<< HEAD
   ``ETHTOOL_MSG_PSE_GET_REPLY``            PSE parameters
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   ======================================== =================================
 
 ``GET`` requests are sent by userspace applications to retrieve device
@@ -1636,7 +1630,6 @@ For SFF-8636 modules, low power mode is forced by the host according to table
 For CMIS modules, low power mode is forced by the host according to table 6-12
 in revision 5.0 of the specification.
 
-<<<<<<< HEAD
 PSE_GET
 =======
 
@@ -1693,8 +1686,6 @@ to control PoDL PSE Admin functions. This option is implementing
 ``IEEE 802.3-2018`` 30.15.1.2.1 acPoDLPSEAdminControl. See
 ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` for supported values.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Request translation
 ===================
 

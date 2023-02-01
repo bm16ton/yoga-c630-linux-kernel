@@ -137,7 +137,6 @@ static struct attribute *ahci_sdev_attrs[] = {
 	&dev_attr_unload_heads.attr,
 	&dev_attr_ncq_prio_supported.attr,
 	&dev_attr_ncq_prio_enable.attr,
-<<<<<<< HEAD
 	NULL
 };
 
@@ -149,19 +148,6 @@ const struct attribute_group *ahci_sdev_groups[] = {
 	&ahci_sdev_attr_group,
 	NULL
 };
-=======
-	NULL
-};
-
-static const struct attribute_group ahci_sdev_attr_group = {
-	.attrs = ahci_sdev_attrs
-};
-
-const struct attribute_group *ahci_sdev_groups[] = {
-	&ahci_sdev_attr_group,
-	NULL
-};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EXPORT_SYMBOL_GPL(ahci_sdev_groups);
 
 struct ata_port_operations ahci_ops = {

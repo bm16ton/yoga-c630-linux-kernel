@@ -928,7 +928,6 @@ const __u8 uclogic_rdesc_ugee_v2_pen_template_arr[] = {
 	0x81, 0x02,         /*          Input (Variable),               */
 	0xc0,               /*      End Collection,                     */
 	0xc0,               /*  End Collection                          */
-<<<<<<< HEAD
 };
 const size_t uclogic_rdesc_ugee_v2_pen_template_size =
 			sizeof(uclogic_rdesc_ugee_v2_pen_template_arr);
@@ -1069,40 +1068,6 @@ const __u8 uclogic_rdesc_ugee_v2_battery_template_arr[] = {
 };
 const size_t uclogic_rdesc_ugee_v2_battery_template_size =
 			sizeof(uclogic_rdesc_ugee_v2_battery_template_arr);
-=======
-};
-const size_t uclogic_rdesc_ugee_v2_pen_template_size =
-			sizeof(uclogic_rdesc_ugee_v2_pen_template_arr);
-
-/* Fixed report descriptor template for UGEE v2 frame reports (buttons only) */
-const __u8 uclogic_rdesc_ugee_v2_frame_btn_template_arr[] = {
-	0x05, 0x01,         /*  Usage Page (Desktop),                   */
-	0x09, 0x07,         /*  Usage (Keypad),                         */
-	0xA1, 0x01,         /*  Collection (Application),               */
-	0x85, UCLOGIC_RDESC_V1_FRAME_ID,
-			    /*      Report ID,                          */
-	0x05, 0x0D,         /*      Usage Page (Digitizer),             */
-	0x09, 0x39,         /*      Usage (Tablet Function Keys),       */
-	0xA0,               /*      Collection (Physical),              */
-	0x75, 0x01,         /*          Report Size (1),                */
-	0x95, 0x08,         /*          Report Count (8),               */
-	0x81, 0x01,         /*          Input (Constant),               */
-	0x05, 0x09,         /*          Usage Page (Button),            */
-	0x19, 0x01,         /*          Usage Minimum (01h),            */
-	UCLOGIC_RDESC_FRAME_PH_BTN,
-			    /*          Usage Maximum (PLACEHOLDER),    */
-	0x95, 0x0A,         /*          Report Count (10),              */
-	0x14,               /*          Logical Minimum (0),            */
-	0x25, 0x01,         /*          Logical Maximum (1),            */
-	0x81, 0x02,         /*          Input (Variable),               */
-	0x95, 0x46,         /*          Report Count (70),              */
-	0x81, 0x01,         /*          Input (Constant),               */
-	0xC0,               /*      End Collection,                     */
-	0xC0                /*  End Collection                          */
-};
-const size_t uclogic_rdesc_ugee_v2_frame_btn_template_size =
-			sizeof(uclogic_rdesc_ugee_v2_frame_btn_template_arr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Fixed report descriptor for Ugee EX07 frame */
 const __u8 uclogic_rdesc_ugee_ex07_frame_arr[] = {
@@ -1262,11 +1227,7 @@ __u8 *uclogic_rdesc_template_apply(const __u8 *template_ptr,
 			   p[sizeof(btn_head)] < param_num) {
 			v = param_list[p[sizeof(btn_head)]];
 			put_unaligned((__u8)0x2A, p); /* Usage Maximum */
-<<<<<<< HEAD
 			put_unaligned((__force u16)cpu_to_le16(v), (s16 *)(p + 1));
-=======
-			put_unaligned_le16((__force u16)cpu_to_le16(v), p + 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			p += sizeof(btn_head) + 1;
 		} else {
 			p++;

@@ -63,10 +63,6 @@ bool __refrigerator(bool check_kthr_stop)
 {
 	unsigned int state = get_current_state();
 	bool was_frozen = false;
-<<<<<<< HEAD
-=======
-	unsigned int save = get_current_state();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pr_debug("%s entered refrigerator\n", current->comm);
 

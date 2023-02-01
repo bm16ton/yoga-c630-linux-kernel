@@ -354,11 +354,7 @@ static int zap_process(struct task_struct *start, int exit_code)
 	struct task_struct *t;
 	int nr = 0;
 
-<<<<<<< HEAD
 	/* Allow SIGKILL, see prepare_signal() */
-=======
-	/* ignore all signals except SIGKILL, see prepare_signal() */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	start->signal->flags = SIGNAL_GROUP_EXIT;
 	start->signal->group_exit_code = exit_code;
 	start->signal->group_stop_count = 0;
@@ -797,7 +793,7 @@ fail:
 static int __dump_emit(struct coredump_params *cprm, const void *addr, int nr)
 {
 	struct file *file = cprm->file;
-	loff_t pos;
+	loff_t pos = file->f_pos;
 	ssize_t n;
 	if (cprm->written + nr > cprm->limit)
 		return 0;
@@ -835,7 +831,6 @@ static int __dump_skip(struct coredump_params *cprm, size_t nr)
 	}
 }
 
-<<<<<<< HEAD
 static int dump_emit_page(struct coredump_params *cprm, struct page *page)
 {
 	struct bio_vec bvec = {
@@ -869,8 +864,6 @@ static int dump_emit_page(struct coredump_params *cprm, struct page *page)
 	return 1;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int dump_emit(struct coredump_params *cprm, const void *addr, int nr)
 {
 	if (cprm->to_skip) {
@@ -1146,12 +1139,8 @@ static bool dump_vma_snapshot(struct coredump_params *cprm)
 {
 	struct vm_area_struct *gate_vma, *vma = NULL;
 	struct mm_struct *mm = current->mm;
-<<<<<<< HEAD
 	MA_STATE(mas, &mm->mm_mt, 0, 0);
 	int i = 0;
-=======
-	int i;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Once the stack expansion code is fixed to not change VMA bounds
@@ -1171,12 +1160,7 @@ static bool dump_vma_snapshot(struct coredump_params *cprm)
 		return false;
 	}
 
-<<<<<<< HEAD
 	while ((vma = coredump_next_vma(&mas, vma, gate_vma)) != NULL) {
-=======
-	for (i = 0, vma = first_vma(current, gate_vma); vma != NULL;
-			vma = next_vma(vma, gate_vma), i++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct core_vma_metadata *m = cprm->vma_meta + i;
 
 		m->start = vma->vm_start;
@@ -1184,17 +1168,10 @@ static bool dump_vma_snapshot(struct coredump_params *cprm)
 		m->flags = vma->vm_flags;
 		m->dump_size = vma_dump_size(vma, cprm->mm_flags);
 		m->pgoff = vma->vm_pgoff;
-<<<<<<< HEAD
 		m->file = vma->vm_file;
 		if (m->file)
 			get_file(m->file);
 		i++;
-=======
-
-		m->file = vma->vm_file;
-		if (m->file)
-			get_file(m->file);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	mmap_write_unlock(mm);

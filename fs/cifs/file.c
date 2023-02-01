@@ -209,16 +209,9 @@ posix_open_ret:
 }
 #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
 
-<<<<<<< HEAD
 static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
 			struct cifs_tcon *tcon, unsigned int f_flags, __u32 *oplock,
 			struct cifs_fid *fid, unsigned int xid, struct cifs_open_info_data *buf)
-=======
-static int
-cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
-	     struct cifs_tcon *tcon, unsigned int f_flags, __u32 *oplock,
-	     struct cifs_fid *fid, unsigned int xid)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int rc;
 	int desired_access;
@@ -2441,7 +2434,6 @@ cifs_writev_complete(struct work_struct *work)
 struct cifs_writedata *
 cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
 {
-<<<<<<< HEAD
 	struct cifs_writedata *writedata = NULL;
 	struct page **pages =
 		kcalloc(nr_pages, sizeof(struct page *), GFP_NOFS);
@@ -2452,14 +2444,6 @@ cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
 	}
 
 	return writedata;
-=======
-	struct page **pages =
-		kcalloc(nr_pages, sizeof(struct page *), GFP_NOFS);
-	if (pages)
-		return cifs_writedata_direct_alloc(pages, complete);
-
-	return NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 struct cifs_writedata *

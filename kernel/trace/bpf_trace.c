@@ -20,11 +20,8 @@
 #include <linux/fprobe.h>
 #include <linux/bsearch.h>
 #include <linux/sort.h>
-<<<<<<< HEAD
 #include <linux/key.h>
 #include <linux/verification.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <net/bpf_sk_storage.h>
 
@@ -1053,14 +1050,10 @@ BPF_CALL_1(bpf_get_func_ip_kprobe, struct pt_regs *, regs)
 {
 	struct kprobe *kp = kprobe_running();
 
-<<<<<<< HEAD
 	if (!kp || !(kp->flags & KPROBE_FLAG_ON_FUNC_ENTRY))
 		return 0;
 
 	return get_entry_ip((uintptr_t)kp->addr);
-=======
-	return kp ? (uintptr_t)kp->addr : 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct bpf_func_proto bpf_get_func_ip_proto_kprobe = {
@@ -1211,7 +1204,6 @@ static const struct bpf_func_proto bpf_get_func_arg_cnt_proto = {
 	.arg1_type	= ARG_PTR_TO_CTX,
 };
 
-<<<<<<< HEAD
 #ifdef CONFIG_KEYS
 __diag_push();
 __diag_ignore_all("-Wmissing-prototypes",
@@ -1390,8 +1382,6 @@ static int __init bpf_key_sig_kfuncs_init(void)
 late_initcall(bpf_key_sig_kfuncs_init);
 #endif /* CONFIG_KEYS */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct bpf_func_proto *
 bpf_tracing_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 {

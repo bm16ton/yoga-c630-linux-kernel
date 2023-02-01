@@ -14,12 +14,9 @@
 
 #include <linux/types.h>
 
-<<<<<<< HEAD
 /* 64-bit per app capabilities */
 #define NFP_NET_APP_CAP_SP_INDIFF	BIT_ULL(0) /* indifferent to port speed */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Configuration BAR size.
  *
  * The configuration BAR is 8K in size, but due to

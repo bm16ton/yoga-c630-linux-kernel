@@ -32,11 +32,7 @@
  * immediate command's opcode.  The payload for a command resides in AP
  * memory and is described by a single scatterlist entry in its transaction.
  * Commands do not require a transaction completion callback, and are
-<<<<<<< HEAD
  * always issued using gsi_trans_commit_wait().
-=======
- * (currently) always issued using gsi_trans_commit_wait().
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 /* Some commands can wait until indicated pipeline stages are clear */

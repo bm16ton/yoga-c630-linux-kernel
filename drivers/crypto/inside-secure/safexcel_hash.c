@@ -2100,18 +2100,9 @@ static int safexcel_xcbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
 	for (i = 0; i < 3 * AES_BLOCK_SIZE / sizeof(u32); i++)
 		ctx->base.ipad.word[i] = swab32(key_tmp[i]);
 
-<<<<<<< HEAD
 	ret = aes_expandkey(ctx->aes,
 			    (u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
 			    AES_MIN_KEY_SIZE);
-=======
-	crypto_cipher_clear_flags(ctx->kaes, CRYPTO_TFM_REQ_MASK);
-	crypto_cipher_set_flags(ctx->kaes, crypto_ahash_get_flags(tfm) &
-				CRYPTO_TFM_REQ_MASK);
-	ret = crypto_cipher_setkey(ctx->kaes,
-				   (u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
-				   AES_MIN_KEY_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -2186,19 +2177,7 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
 		return ret;
 
 	for (i = 0; i < len / sizeof(u32); i++)
-<<<<<<< HEAD
 		ctx->base.ipad.word[i + 8] = swab32(ctx->aes->key_enc[i]);
-=======
-		ctx->base.ipad.word[i + 8] = swab32(aes.key_enc[i]);
-
-	/* precompute the CMAC key material */
-	crypto_cipher_clear_flags(ctx->kaes, CRYPTO_TFM_REQ_MASK);
-	crypto_cipher_set_flags(ctx->kaes, crypto_ahash_get_flags(tfm) &
-				CRYPTO_TFM_REQ_MASK);
-	ret = crypto_cipher_setkey(ctx->kaes, key, len);
-	if (ret)
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* code below borrowed from crypto/cmac.c */
 	/* encrypt the zero block */

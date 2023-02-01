@@ -488,7 +488,6 @@ const struct amdgpu_nbio_funcs nbio_v4_3_funcs = {
 	.get_rom_offset = nbio_v4_3_get_rom_offset,
 	.program_aspm = nbio_v4_3_program_aspm,
 };
-<<<<<<< HEAD
 
 
 static void nbio_v4_3_sriov_ih_doorbell_range(struct amdgpu_device *adev,
@@ -533,5 +532,3 @@ const struct amdgpu_nbio_funcs nbio_v4_3_sriov_funcs = {
 	.remap_hdp_registers = nbio_v4_3_remap_hdp_registers,
 	.get_rom_offset = nbio_v4_3_get_rom_offset,
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

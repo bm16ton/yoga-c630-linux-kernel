@@ -106,7 +106,6 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
 		return;
 
 	if (pmc->perf_event && pmc->perf_event->attr.precise_ip) {
-<<<<<<< HEAD
 		if (!in_pmi) {
 			/*
 			 * TODO: KVM is currently _choosing_ to not generate records
@@ -120,11 +119,6 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
 			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
 						      (unsigned long *)&pmu->global_status);
 		}
-=======
-		/* Indicate PEBS overflow PMI to guest. */
-		skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
-					      (unsigned long *)&pmu->global_status);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
 	}
@@ -243,13 +237,8 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
 			      get_sample_period(pmc, pmc->counter)))
 		return false;
 
-<<<<<<< HEAD
 	if (test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) !=
 	    (!!pmc->perf_event->attr.precise_ip))
-=======
-	if (!test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) &&
-	    pmc->perf_event->attr.precise_ip)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 
 	/* reuse perf_event to serve as pmc_reprogram_counter() does*/

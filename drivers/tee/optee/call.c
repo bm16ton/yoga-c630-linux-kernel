@@ -269,19 +269,11 @@ void optee_free_msg_arg(struct tee_context *ctx,
 	bit = offs / sz;
 
 	mutex_lock(&optee->shm_arg_cache.mutex);
-<<<<<<< HEAD
 
 	if (!test_bit(bit, entry->map))
 		pr_err("Bit pos %lu is already free\n", bit);
 	clear_bit(bit, entry->map);
 
-=======
-
-	if (!test_bit(bit, entry->map))
-		pr_err("Bit pos %lu is already free\n", bit);
-	clear_bit(bit, entry->map);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&optee->shm_arg_cache.mutex);
 }
 

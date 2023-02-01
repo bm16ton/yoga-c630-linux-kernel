@@ -58,10 +58,7 @@ properties:
       - rockchip,rk3568-pmu-io-voltage-domain
       - rockchip,rv1108-io-voltage-domain
       - rockchip,rv1108-pmu-io-voltage-domain
-<<<<<<< HEAD
       - rockchip,rv1126-pmu-io-voltage-domain
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 required:
   - compatible
@@ -82,10 +79,7 @@ allOf:
   - $ref: "#/$defs/rk3568-pmu"
   - $ref: "#/$defs/rv1108"
   - $ref: "#/$defs/rv1108-pmu"
-<<<<<<< HEAD
   - $ref: "#/$defs/rv1126-pmu"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 $defs:
   px30:
@@ -352,7 +346,6 @@ $defs:
         pmu-supply:
           description: The supply connected to PMUIO_VDD.
 
-<<<<<<< HEAD
   rv1126-pmu:
     if:
       properties:
@@ -381,8 +374,6 @@ $defs:
         pmuio1-supply:
           description: The supply connected to PMUIO1.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
     io-domains {

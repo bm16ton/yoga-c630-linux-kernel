@@ -458,7 +458,6 @@ static void tcp_init_sender(struct ip_ct_tcp_state *sender,
 			    unsigned int dataoff,
 			    const struct tcphdr *tcph,
 			    u32 end, u32 win)
-<<<<<<< HEAD
 {
 	/* SYN-ACK in reply to a SYN
 	 * or SYN from reply direction in simultaneous open.
@@ -512,39 +511,6 @@ tcp_in_window(struct nf_conn *ct, enum ip_conntrack_dir dir,
 	      const struct nf_hook_state *hook_state)
 {
 	struct ip_ct_tcp *state = &ct->proto.tcp;
-=======
-{
-	/* SYN-ACK in reply to a SYN
-	 * or SYN from reply direction in simultaneous open.
-	 */
-	sender->td_end =
-	sender->td_maxend = end;
-	sender->td_maxwin = (win == 0 ? 1 : win);
-
-	tcp_options(skb, dataoff, tcph, sender);
-	/* RFC 1323:
-	 * Both sides must send the Window Scale option
-	 * to enable window scaling in either direction.
-	 */
-	if (!(sender->flags & IP_CT_TCP_FLAG_WINDOW_SCALE &&
-	      receiver->flags & IP_CT_TCP_FLAG_WINDOW_SCALE)) {
-		sender->td_scale = 0;
-		receiver->td_scale = 0;
-	}
-}
-
-static bool tcp_in_window(struct nf_conn *ct,
-			  enum ip_conntrack_dir dir,
-			  unsigned int index,
-			  const struct sk_buff *skb,
-			  unsigned int dataoff,
-			  const struct tcphdr *tcph,
-			  const struct nf_hook_state *hook_state)
-{
-	struct ip_ct_tcp *state = &ct->proto.tcp;
-	struct net *net = nf_ct_net(ct);
-	struct nf_tcp_net *tn = nf_tcp_pernet(net);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ip_ct_tcp_state *sender = &state->seen[dir];
 	struct ip_ct_tcp_state *receiver = &state->seen[!dir];
 	__u32 seq, ack, sack, end, win, swin;
@@ -622,11 +588,7 @@ static bool tcp_in_window(struct nf_conn *ct,
 				end, win);
 
 		if (dir == IP_CT_DIR_REPLY && !tcph->ack)
-<<<<<<< HEAD
 			return NFCT_TCP_ACCEPT;
-=======
-			return true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!(tcph->ack)) {
@@ -650,7 +612,6 @@ static bool tcp_in_window(struct nf_conn *ct,
 		 */
 		seq = end = sender->td_end;
 
-<<<<<<< HEAD
 	seq_ok = before(seq, sender->td_maxend + 1);
 	if (!seq_ok) {
 		u32 overshot = end - sender->td_maxend + 1;
@@ -691,8 +652,6 @@ static bool tcp_in_window(struct nf_conn *ct,
 					  "ACK is over upper bound %u (ACKed data not seen yet)",
 					  receiver->td_end + 1);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Is the ending sequence in the receive window (if available)? */
 	in_recv_win = !receiver->td_maxwin ||
 		      after(end, sender->td_end - receiver->td_maxwin - 1);
@@ -726,7 +685,6 @@ static bool tcp_in_window(struct nf_conn *ct,
 		}
 	}
 
-<<<<<<< HEAD
 	/* Update receiver data. */
 	if (receiver->td_maxwin != 0 && after(end, sender->td_maxend))
 		receiver->td_maxwin += end - sender->td_maxend;
@@ -758,17 +716,6 @@ static bool tcp_in_window(struct nf_conn *ct,
 
 	return NFCT_TCP_ACCEPT;
 }
-=======
-	if (before(seq, sender->td_maxend + 1) &&
-	    in_recv_win &&
-	    before(sack, receiver->td_end + 1) &&
-	    after(sack, receiver->td_end - MAXACKWINDOW(sender) - 1)) {
-		/*
-		 * Take into account window scaling (RFC 1323).
-		 */
-		if (!tcph->syn)
-			win <<= sender->td_scale;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void __cold nf_tcp_handle_invalid(struct nf_conn *ct,
 					 enum ip_conntrack_dir dir,
@@ -785,7 +732,6 @@ static void __cold nf_tcp_handle_invalid(struct nf_conn *ct,
 	    test_bit(IPS_FIXED_TIMEOUT_BIT, &ct->status))
 		return;
 
-<<<<<<< HEAD
 	/* We don't want to have connections hanging around in ESTABLISHED
 	 * state for long time 'just because' conntrack deemed a FIN/RST
 	 * out-of-window.
@@ -826,79 +772,6 @@ static void __cold nf_tcp_handle_invalid(struct nf_conn *ct,
 		ct->proto.tcp.last_index = index;
 		ct->proto.tcp.last_dir = dir;
 	}
-=======
-		/*
-		 * Check retransmissions.
-		 */
-		if (index == TCP_ACK_SET) {
-			if (state->last_dir == dir
-			    && state->last_seq == seq
-			    && state->last_ack == ack
-			    && state->last_end == end
-			    && state->last_win == win_raw)
-				state->retrans++;
-			else {
-				state->last_dir = dir;
-				state->last_seq = seq;
-				state->last_ack = ack;
-				state->last_end = end;
-				state->last_win = win_raw;
-				state->retrans = 0;
-			}
-		}
-		res = true;
-	} else {
-		res = false;
-		if (sender->flags & IP_CT_TCP_FLAG_BE_LIBERAL ||
-		    tn->tcp_be_liberal)
-			res = true;
-		if (!res) {
-			bool seq_ok = before(seq, sender->td_maxend + 1);
-
-			if (!seq_ok) {
-				u32 overshot = end - sender->td_maxend + 1;
-				bool ack_ok;
-
-				ack_ok = after(sack, receiver->td_end - MAXACKWINDOW(sender) - 1);
-
-				if (in_recv_win &&
-				    ack_ok &&
-				    overshot <= receiver->td_maxwin &&
-				    before(sack, receiver->td_end + 1)) {
-					/* Work around TCPs that send more bytes than allowed by
-					 * the receive window.
-					 *
-					 * If the (marked as invalid) packet is allowed to pass by
-					 * the ruleset and the peer acks this data, then its possible
-					 * all future packets will trigger 'ACK is over upper bound' check.
-					 *
-					 * Thus if only the sequence check fails then do update td_end so
-					 * possible ACK for this data can update internal state.
-					 */
-					sender->td_end = end;
-					sender->flags |= IP_CT_TCP_FLAG_DATA_UNACKNOWLEDGED;
-
-					nf_ct_l4proto_log_invalid(skb, ct, hook_state,
-								  "%u bytes more than expected", overshot);
-					return res;
-				}
-			}
-
-			nf_ct_l4proto_log_invalid(skb, ct, hook_state,
-			"%s",
-			before(seq, sender->td_maxend + 1) ?
-			in_recv_win ?
-			before(sack, receiver->td_end + 1) ?
-			after(sack, receiver->td_end - MAXACKWINDOW(sender) - 1) ? "BUG"
-			: "ACK is under the lower bound (possible overly delayed ACK)"
-			: "ACK is over the upper bound (ACKed data not seen yet)"
-			: "SEQ is under the lower bound (already ACKed data retransmitted)"
-			: "SEQ is over the upper bound (over the window of the receiver)");
-		}
-	}
-
-	return res;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* table of valid flag combinations - PUSH, ECE and CWR are always valid */
@@ -1326,7 +1199,6 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 		break;
 	}
 
-<<<<<<< HEAD
 	res = tcp_in_window(ct, dir, index,
 			    skb, dataoff, th, state);
 	switch (res) {
@@ -1335,10 +1207,6 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 		return NF_ACCEPT;
 	case NFCT_TCP_INVALID:
 		nf_tcp_handle_invalid(ct, dir, index, skb, state);
-=======
-	if (!tcp_in_window(ct, dir, index,
-			   skb, dataoff, th, state)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		spin_unlock_bh(&ct->lock);
 		return -NF_ACCEPT;
 	case NFCT_TCP_ACCEPT:

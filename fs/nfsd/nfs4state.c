@@ -176,10 +176,7 @@ static __be32 get_client_locked(struct nfs4_client *clp)
 	if (is_client_expired(clp))
 		return nfserr_expired;
 	atomic_inc(&clp->cl_rpc_users);
-<<<<<<< HEAD
 	nfsd4_dec_courtesy_client_count(nn, clp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	clp->cl_state = NFSD4_ACTIVE;
 	return nfs_ok;
 }
@@ -201,10 +198,7 @@ renew_client_locked(struct nfs4_client *clp)
 
 	list_move_tail(&clp->cl_lru, &nn->client_lru);
 	clp->cl_time = ktime_get_boottime_seconds();
-<<<<<<< HEAD
 	nfsd4_dec_courtesy_client_count(nn, clp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	clp->cl_state = NFSD4_ACTIVE;
 }
 
@@ -848,9 +842,9 @@ static void __nfs4_file_put_access(struct nfs4_file *fp, int oflag)
 			swap(f2, fp->fi_fds[O_RDWR]);
 		spin_unlock(&fp->fi_lock);
 		if (f1)
-			nfsd_file_close(f1);
+			nfsd_file_put(f1);
 		if (f2)
-			nfsd_file_close(f2);
+			nfsd_file_put(f2);
 	}
 }
 
@@ -1077,16 +1071,12 @@ static struct nfs4_ol_stateid * nfs4_alloc_open_stateid(struct nfs4_client *clp)
 
 static void nfs4_free_deleg(struct nfs4_stid *stid)
 {
-<<<<<<< HEAD
 	struct nfs4_delegation *dp = delegstateid(stid);
 
 	WARN_ON_ONCE(!list_empty(&stid->sc_cp_list));
 	WARN_ON_ONCE(!list_empty(&dp->dl_perfile));
 	WARN_ON_ONCE(!list_empty(&dp->dl_perclnt));
 	WARN_ON_ONCE(!list_empty(&dp->dl_recall_lru));
-=======
-	WARN_ON(!list_empty(&stid->sc_cp_list));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kmem_cache_free(deleg_slab, stid);
 	atomic_long_dec(&num_delegations);
 }
@@ -2272,10 +2262,7 @@ __destroy_client(struct nfs4_client *clp)
 	if (clp->cl_cb_conn.cb_xprt)
 		svc_xprt_put(clp->cl_cb_conn.cb_xprt);
 	atomic_add_unless(&nn->nfs4_client_count, -1, 0);
-<<<<<<< HEAD
 	nfsd4_dec_courtesy_client_count(nn, clp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	free_client(clp);
 	wake_up_all(&expiry_wq);
 }
@@ -4374,7 +4361,6 @@ out:
 	return -ENOMEM;
 }
 
-<<<<<<< HEAD
 static unsigned long
 nfsd_courtesy_client_count(struct shrinker *shrink, struct shrink_control *sc)
 {
@@ -4396,9 +4382,6 @@ nfsd_courtesy_client_scan(struct shrinker *shrink, struct shrink_control *sc)
 
 int
 nfsd4_init_leases_net(struct nfsd_net *nn)
-=======
-void nfsd4_init_leases_net(struct nfsd_net *nn)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sysinfo si;
 	u64 max_clients;
@@ -4407,13 +4390,8 @@ void nfsd4_init_leases_net(struct nfsd_net *nn)
 	nn->nfsd4_grace = 90;
 	nn->somebody_reclaimed = false;
 	nn->track_reclaim_completes = false;
-<<<<<<< HEAD
 	nn->clverifier_counter = get_random_u32();
 	nn->clientid_base = get_random_u32();
-=======
-	nn->clverifier_counter = prandom_u32();
-	nn->clientid_base = prandom_u32();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nn->clientid_counter = nn->clientid_base + 1;
 	nn->s2s_cp_cl_id = nn->clientid_counter++;
 
@@ -4422,7 +4400,6 @@ void nfsd4_init_leases_net(struct nfsd_net *nn)
 	max_clients = (u64)si.totalram * si.mem_unit / (1024 * 1024 * 1024);
 	max_clients *= NFS4_CLIENTS_PER_GB;
 	nn->nfs4_max_clients = max_t(int, max_clients, NFS4_CLIENTS_PER_GB);
-<<<<<<< HEAD
 
 	atomic_set(&nn->nfsd_courtesy_clients, 0);
 	nn->nfsd_client_shrinker.scan_objects = nfsd_courtesy_client_scan;
@@ -4435,8 +4412,6 @@ void
 nfsd4_leases_net_shutdown(struct nfsd_net *nn)
 {
 	unregister_shrinker(&nn->nfsd_client_shrinker);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void init_nfs4_replay(struct nfs4_replay *rp)
@@ -5236,25 +5211,10 @@ static __be32 nfs4_get_vfs_file(struct svc_rqst *rqstp, struct nfs4_file *fp,
 	if (!fp->fi_fds[oflag]) {
 		spin_unlock(&fp->fi_lock);
 
-<<<<<<< HEAD
 		status = nfsd_file_acquire_opened(rqstp, cur_fh, access,
 						  open->op_filp, &nf);
 		if (status != nfs_ok)
 			goto out_put_access;
-=======
-		if (!open->op_filp) {
-			status = nfsd_file_acquire(rqstp, cur_fh, access, &nf);
-			if (status != nfs_ok)
-				goto out_put_access;
-		} else {
-			status = nfsd_file_create(rqstp, cur_fh, access, &nf);
-			if (status != nfs_ok)
-				goto out_put_access;
-			nf->nf_file = open->op_filp;
-			open->op_filp = NULL;
-			trace_nfsd_file_create(rqstp, access, nf);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		spin_lock(&fp->fi_lock);
 		if (!fp->fi_fds[oflag]) {
@@ -5997,16 +5957,11 @@ nfs4_get_client_reaplist(struct nfsd_net *nn, struct list_head *reaplist,
 			goto exp_client;
 		if (!state_expired(lt, clp->cl_time))
 			break;
-<<<<<<< HEAD
 		if (!atomic_read(&clp->cl_rpc_users)) {
 			if (clp->cl_state == NFSD4_ACTIVE)
 				atomic_inc(&nn->nfsd_courtesy_clients);
 			clp->cl_state = NFSD4_COURTESY;
 		}
-=======
-		if (!atomic_read(&clp->cl_rpc_users))
-			clp->cl_state = NFSD4_COURTESY;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!client_has_state(clp))
 			goto exp_client;
 		if (!nfs4_anylock_blockers(clp))
@@ -6021,7 +5976,6 @@ exp_client:
 	spin_unlock(&nn->client_lock);
 }
 
-<<<<<<< HEAD
 static void
 nfs4_get_courtesy_client_reaplist(struct nfsd_net *nn,
 				struct list_head *reaplist)
@@ -6062,8 +6016,6 @@ nfs4_process_client_reaplist(struct list_head *reaplist)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static time64_t
 nfs4_laundromat(struct nfsd_net *nn)
 {
@@ -6089,27 +6041,14 @@ nfs4_laundromat(struct nfsd_net *nn)
 	spin_lock(&nn->s2s_cp_lock);
 	idr_for_each_entry(&nn->s2s_cp_stateids, cps_t, i) {
 		cps = container_of(cps_t, struct nfs4_cpntf_state, cp_stateid);
-<<<<<<< HEAD
 		if (cps->cp_stateid.cs_type == NFS4_COPYNOTIFY_STID &&
-=======
-		if (cps->cp_stateid.sc_type == NFS4_COPYNOTIFY_STID &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				state_expired(&lt, cps->cpntf_time))
 			_free_cpntf_state_locked(nn, cps);
 	}
 	spin_unlock(&nn->s2s_cp_lock);
 	nfs4_get_client_reaplist(nn, &reaplist, &lt);
-<<<<<<< HEAD
 	nfs4_process_client_reaplist(&reaplist);
 
-=======
-	list_for_each_safe(pos, next, &reaplist) {
-		clp = list_entry(pos, struct nfs4_client, cl_lru);
-		trace_nfsd_clid_purged(&clp->cl_clientid);
-		list_del_init(&clp->cl_lru);
-		expire_client(clp);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_lock(&state_lock);
 	list_for_each_safe(pos, next, &nn->del_recall_lru) {
 		dp = list_entry (pos, struct nfs4_delegation, dl_recall_lru);
@@ -6200,7 +6139,6 @@ courtesy_client_reaper(struct work_struct *reaper)
 	struct nfsd_net *nn = container_of(dwork, struct nfsd_net,
 					nfsd_shrinker_work);
 
-<<<<<<< HEAD
 	nfs4_get_courtesy_client_reaplist(nn, &reaplist);
 	nfs4_process_client_reaplist(&reaplist);
 }
@@ -6212,8 +6150,6 @@ static inline __be32 nfs4_check_fh(struct svc_fh *fhp, struct nfs4_stid *stp)
 	return nfs_ok;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static
 __be32 nfs4_check_openmode(struct nfs4_ol_stateid *stp, int flags)
 {

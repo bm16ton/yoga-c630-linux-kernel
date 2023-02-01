@@ -75,16 +75,8 @@ static int scmi_hwmon_read_scaled_value(const struct scmi_protocol_handle *ph,
 {
 	int ret;
 	u64 value;
-<<<<<<< HEAD
 
 	ret = sensor_ops->reading_get(ph, sensor->id, &value);
-=======
-	const struct scmi_sensor_info *sensor;
-	struct scmi_sensors *scmi_sensors = dev_get_drvdata(dev);
-
-	sensor = *(scmi_sensors->info[type] + channel);
-	ret = sensor_ops->reading_get(scmi_sensors->ph, sensor->id, &value);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 

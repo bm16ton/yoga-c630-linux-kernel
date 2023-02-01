@@ -192,16 +192,6 @@ __secondary_hold:
 #endif
 CLOSE_FIXED_SECTION(first_256B)
 
-<<<<<<< HEAD
-=======
-/* This value is used to mark exception frames on the stack. */
-	.section ".toc","aw"
-/* This value is used to mark exception frames on the stack. */
-exception_marker:
-	.tc	ID_EXC_MARKER[TC],STACK_FRAME_REGS_MARKER
-	.previous
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * On server, we include the exception vectors code here as it
  * relies on absolute addressing which is only possible within
@@ -217,11 +207,7 @@ USE_TEXT_SECTION()
 
 #include "interrupt_64.S"
 
-<<<<<<< HEAD
 #ifdef CONFIG_PPC_BOOK3E_64
-=======
-#ifdef CONFIG_PPC_BOOK3E
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * The booting_thread_hwid holds the thread id we want to boot in cpu
  * hotplug case. It is set by cpu hotplug code, and is invalid by default.

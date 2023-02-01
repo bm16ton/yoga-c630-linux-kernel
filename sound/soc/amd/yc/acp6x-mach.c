@@ -12,10 +12,7 @@
 #include <sound/pcm_params.h>
 #include <linux/io.h>
 #include <linux/dmi.h>
-<<<<<<< HEAD
 #include <linux/acpi.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "acp6x.h"
 
@@ -129,110 +126,70 @@ static const struct dmi_system_id yc_acp_quirk_table[] = {
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21CM"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21AW"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21CN"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21AX"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21CH"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21BN"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21CJ"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21BQ"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21CK"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21CH"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21CL"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21CJ"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21EM"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21CK"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21EN"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21CL"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21J5"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21D8"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
 			DMI_MATCH(DMI_BOARD_VENDOR, "LENOVO"),
-<<<<<<< HEAD
 			DMI_MATCH(DMI_PRODUCT_NAME, "21J6"),
-=======
-			DMI_MATCH(DMI_PRODUCT_NAME, "21D9"),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	},
 	{
@@ -256,7 +213,6 @@ static const struct dmi_system_id yc_acp_quirk_table[] = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "Alienware m17 R5 AMD"),
 		}
 	},
-<<<<<<< HEAD
 	{
 		.driver_data = &acp6x_card,
 		.matches = {
@@ -264,8 +220,6 @@ static const struct dmi_system_id yc_acp_quirk_table[] = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "Redmi Book Pro 14 2022"),
 		}
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{}
 };
 
@@ -274,7 +228,6 @@ static int acp6x_probe(struct platform_device *pdev)
 	const struct dmi_system_id *dmi_id;
 	struct acp6x_pdm *machine = NULL;
 	struct snd_soc_card *card;
-<<<<<<< HEAD
 	struct acpi_device *adev;
 	int ret;
 
@@ -288,10 +241,6 @@ static int acp6x_probe(struct platform_device *pdev)
 			platform_set_drvdata(pdev, &acp6x_card);
 	}
 
-=======
-	int ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* check for any DMI overrides */
 	dmi_id = dmi_first_match(yc_acp_quirk_table);
 	if (dmi_id)
@@ -300,10 +249,7 @@ static int acp6x_probe(struct platform_device *pdev)
 	card = platform_get_drvdata(pdev);
 	if (!card)
 		return -ENODEV;
-<<<<<<< HEAD
 	dev_info(&pdev->dev, "Enabling ACP DMIC support via %s", dmi_id ? "DMI" : "ACPI");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	acp6x_card.dev = &pdev->dev;
 
 	snd_soc_card_set_drvdata(card, machine);

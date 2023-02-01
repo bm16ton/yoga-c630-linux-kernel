@@ -320,11 +320,7 @@ Examples
   :#> ddcmd 'format "nfsd: READ" +p'
 
   // enable messages in files of which the paths include string "usb"
-<<<<<<< HEAD
   :#> ddcmd 'file *usb* +p' > /proc/dynamic_debug/control
-=======
-  nullarbor:~ # echo -n 'file *usb* +p' > <debugfs>/dynamic_debug/control
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   // enable all messages
   :#> ddcmd '+p' > /proc/dynamic_debug/control

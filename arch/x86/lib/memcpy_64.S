@@ -28,11 +28,7 @@
  * Output:
  * rax original destination
  */
-<<<<<<< HEAD
 SYM_TYPED_FUNC_START(__memcpy)
-=======
-SYM_FUNC_START(__memcpy)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ALTERNATIVE_2 "jmp memcpy_orig", "", X86_FEATURE_REP_GOOD, \
 		      "jmp memcpy_erms", X86_FEATURE_ERMS
 

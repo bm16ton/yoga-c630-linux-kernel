@@ -492,11 +492,6 @@ static inline u8 *myid(struct eeprom_priv *peepriv)
 
 #include <rtw_btcoex.h>
 
-<<<<<<< HEAD
-=======
-int rtw_change_ifname(struct adapter *padapter, const char *ifname);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern char *rtw_initmac;
 extern int rtw_mc2u_disable;
 extern int rtw_ht_enable;

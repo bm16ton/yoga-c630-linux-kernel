@@ -337,11 +337,6 @@ static struct regmap_config sunxi_sram_regmap_config = {
 
 static int __init sunxi_sram_probe(struct platform_device *pdev)
 {
-<<<<<<< HEAD
-=======
-	struct dentry *d;
-	struct regmap *emac_clock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct sunxi_sramc_variant *variant;
 	struct device *dev = &pdev->dev;
 	struct regmap *regmap;
@@ -352,11 +347,8 @@ static int __init sunxi_sram_probe(struct platform_device *pdev)
 	if (!variant)
 		return -EINVAL;
 
-<<<<<<< HEAD
 	dev_set_drvdata(dev, (struct sunxi_sramc_variant *)variant);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base))
 		return PTR_ERR(base);

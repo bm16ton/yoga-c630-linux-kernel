@@ -66,14 +66,11 @@ properties:
           - enum:
               - allwinner,sun20i-d1-plic
           - const: thead,c900-plic
-<<<<<<< HEAD
       - items:
           - const: sifive,plic-1.0.0
           - const: riscv,plic0
         deprecated: true
         description: For the QEMU virt machine only
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   reg:
     maxItems: 1

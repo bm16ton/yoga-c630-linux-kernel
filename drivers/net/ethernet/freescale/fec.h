@@ -17,10 +17,7 @@
 #include <linux/clocksource.h>
 #include <linux/net_tstamp.h>
 #include <linux/pm_qos.h>
-<<<<<<< HEAD
 #include <linux/bpf.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/ptp_clock_kernel.h>
 #include <linux/timecounter.h>
 #include <dt-bindings/firmware/imx/rsrc.h>
@@ -583,6 +580,7 @@ struct fec_enet_private {
 	struct clk *clk_2x_txclk;
 
 	bool ptp_clk_on;
+	struct mutex ptp_clk_mutex;
 	unsigned int num_tx_queues;
 	unsigned int num_rx_queues;
 
@@ -604,10 +602,7 @@ struct fec_enet_private {
 	struct device_node *phy_node;
 	bool	rgmii_txc_dly;
 	bool	rgmii_rxc_dly;
-<<<<<<< HEAD
 	bool	rpm_active;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int	link;
 	int	full_duplex;
 	int	speed;
@@ -664,16 +659,7 @@ struct fec_enet_private {
 	int pps_enable;
 	unsigned int next_counter;
 
-<<<<<<< HEAD
 	struct imx_sc_ipc *ipc_handle;
-=======
-	struct {
-		struct timespec64 ts_phc;
-		u64 ns_sys;
-		u32 at_corr;
-		u8 at_inc_corr;
-	} ptp_saved_state;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	u64 ethtool_stats[];
 };
@@ -684,9 +670,6 @@ void fec_ptp_start_cyclecounter(struct net_device *ndev);
 void fec_ptp_disable_hwts(struct net_device *ndev);
 int fec_ptp_set(struct net_device *ndev, struct ifreq *ifr);
 int fec_ptp_get(struct net_device *ndev, struct ifreq *ifr);
-
-void fec_ptp_save_state(struct fec_enet_private *fep);
-int fec_ptp_restore_state(struct fec_enet_private *fep);
 
 /****************************************************************************/
 #endif /* FEC_H */

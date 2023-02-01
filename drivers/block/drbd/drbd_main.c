@@ -2773,11 +2773,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
 
 	err = add_disk(disk);
 	if (err)
-<<<<<<< HEAD
 		goto out_destroy_workqueue;
-=======
-		goto out_idr_remove_from_resource;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* inherit the connection state */
 	device->state.conn = first_connection(resource)->cstate;
@@ -2791,11 +2787,8 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
 	drbd_debugfs_device_add(device);
 	return NO_ERROR;
 
-<<<<<<< HEAD
 out_destroy_workqueue:
 	destroy_workqueue(device->submit.wq);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_idr_remove_from_resource:
 	for_each_connection_safe(connection, n, resource) {
 		peer_device = idr_remove(&connection->peer_devices, vnr);

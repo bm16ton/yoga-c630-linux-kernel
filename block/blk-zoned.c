@@ -63,13 +63,7 @@ bool blk_req_needs_zone_write_lock(struct request *rq)
 	if (!rq->q->disk->seq_zones_wlock)
 		return false;
 
-<<<<<<< HEAD
 	if (bdev_op_is_zoned_write(rq->q->disk->part0, req_op(rq)))
-=======
-	switch (req_op(rq)) {
-	case REQ_OP_WRITE_ZEROES:
-	case REQ_OP_WRITE:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return blk_rq_zone_is_seq(rq);
 
 	return false;

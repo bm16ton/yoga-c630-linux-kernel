@@ -490,9 +490,6 @@ extern MLX5E_DECLARE_STATS_GRP(channels);
 extern MLX5E_DECLARE_STATS_GRP(per_port_buff_congest);
 extern MLX5E_DECLARE_STATS_GRP(ipsec_sw);
 extern MLX5E_DECLARE_STATS_GRP(ptp);
-<<<<<<< HEAD
 extern MLX5E_DECLARE_STATS_GRP(macsec_hw);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* __MLX5_EN_STATS_H__ */

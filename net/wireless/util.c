@@ -631,7 +631,6 @@ int ieee80211_data_to_8023_exthdr(struct sk_buff *skb, struct ethhdr *ehdr,
 		break;
 	}
 
-<<<<<<< HEAD
 	if (likely(skb_copy_bits(skb, hdrlen, &payload, sizeof(payload)) == 0 &&
 	           ((!is_amsdu && ether_addr_equal(payload.hdr, rfc1042_header) &&
 		     payload.proto != htons(ETH_P_AARP) &&
@@ -641,18 +640,6 @@ int ieee80211_data_to_8023_exthdr(struct sk_buff *skb, struct ethhdr *ehdr,
 		 * replace EtherType */
 		hdrlen += ETH_ALEN + 2;
 		tmp.h_proto = payload.proto;
-=======
-	skb_copy_bits(skb, hdrlen, &payload, sizeof(payload));
-	tmp.h_proto = payload.proto;
-
-	if (likely((!is_amsdu && ether_addr_equal(payload.hdr, rfc1042_header) &&
-		    tmp.h_proto != htons(ETH_P_AARP) &&
-		    tmp.h_proto != htons(ETH_P_IPX)) ||
-		   ether_addr_equal(payload.hdr, bridge_tunnel_header))) {
-		/* remove RFC1042 or Bridge-Tunnel encapsulation and
-		 * replace EtherType */
-		hdrlen += ETH_ALEN + 2;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		skb_postpull_rcsum(skb, &payload, ETH_ALEN + 2);
 	} else {
 		tmp.h_proto = htons(skb->len - hdrlen);
@@ -1459,11 +1446,7 @@ static u32 cfg80211_calculate_bitrate_eht(struct rate_info *rate)
 		 25599, /*  4.166666... */
 		 17067, /*  2.777777... */
 		 12801, /*  2.083333... */
-<<<<<<< HEAD
 		 11377, /*  1.851725... */
-=======
-		 11769, /*  1.851851... */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 10239, /*  1.666666... */
 		  8532, /*  1.388888... */
 		  7680, /*  1.250000... */

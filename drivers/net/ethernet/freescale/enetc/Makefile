@@ -13,9 +13,6 @@ fsl-enetc-vf-y := enetc_vf.o $(common-objs)
 obj-$(CONFIG_FSL_ENETC_IERB) += fsl-enetc-ierb.o
 fsl-enetc-ierb-y := enetc_ierb.o
 
-obj-$(CONFIG_FSL_ENETC_IERB) += fsl-enetc-ierb.o
-fsl-enetc-ierb-y := enetc_ierb.o
-
 obj-$(CONFIG_FSL_ENETC_MDIO) += fsl-enetc-mdio.o
 fsl-enetc-mdio-y := enetc_pci_mdio.o enetc_mdio.o
 

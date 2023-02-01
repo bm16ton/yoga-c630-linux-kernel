@@ -117,7 +117,6 @@ static int ttm_bo_handle_move_mem(struct ttm_buffer_object *bo,
 				  struct ttm_operation_ctx *ctx,
 				  struct ttm_place *hop)
 {
-<<<<<<< HEAD
 	struct ttm_device *bdev = bo->bdev;
 	bool old_use_tt, new_use_tt;
 	int ret;
@@ -125,14 +124,6 @@ static int ttm_bo_handle_move_mem(struct ttm_buffer_object *bo,
 	old_use_tt = bo->resource &&
 		ttm_manager_type(bdev, bo->resource->mem_type)->use_tt;
 	new_use_tt = ttm_manager_type(bdev, mem->mem_type)->use_tt;
-=======
-	struct ttm_resource_manager *old_man, *new_man;
-	struct ttm_device *bdev = bo->bdev;
-	int ret;
-
-	old_man = ttm_manager_type(bdev, bo->resource->mem_type);
-	new_man = ttm_manager_type(bdev, mem->mem_type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ttm_bo_unmap_virtual(bo);
 
@@ -170,12 +161,7 @@ static int ttm_bo_handle_move_mem(struct ttm_buffer_object *bo,
 	return 0;
 
 out_err:
-<<<<<<< HEAD
 	if (!old_use_tt)
-=======
-	new_man = ttm_manager_type(bdev, bo->resource->mem_type);
-	if (!new_man->use_tt)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ttm_bo_tt_destroy(bo);
 
 	return ret;
@@ -532,12 +518,9 @@ out:
 bool ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 			      const struct ttm_place *place)
 {
-<<<<<<< HEAD
 	struct ttm_resource *res = bo->resource;
 	struct ttm_device *bdev = bo->bdev;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_resv_assert_held(bo->base.resv);
 	if (bo->resource->mem_type == TTM_PL_SYSTEM)
 		return true;
@@ -545,15 +528,7 @@ bool ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 	/* Don't evict this BO if it's outside of the
 	 * requested placement range
 	 */
-<<<<<<< HEAD
 	return ttm_resource_intersects(bdev, res, place, bo->base.size);
-=======
-	if (place->fpfn >= (bo->resource->start + bo->resource->num_pages) ||
-	    (place->lpfn && place->lpfn <= bo->resource->start))
-		return false;
-
-	return true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(ttm_bo_eviction_valuable);
 
@@ -928,11 +903,7 @@ int ttm_bo_validate(struct ttm_buffer_object *bo,
 	/*
 	 * Check whether we need to move buffer.
 	 */
-<<<<<<< HEAD
 	if (!bo->resource || !ttm_resource_compat(bo->resource, placement)) {
-=======
-	if (!ttm_resource_compat(bo->resource, placement)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = ttm_bo_move_buffer(bo, placement, ctx);
 		if (ret)
 			return ret;
@@ -949,7 +920,6 @@ int ttm_bo_validate(struct ttm_buffer_object *bo,
 }
 EXPORT_SYMBOL(ttm_bo_validate);
 
-<<<<<<< HEAD
 /**
  * ttm_bo_init_reserved
  *
@@ -990,42 +960,18 @@ int ttm_bo_init_reserved(struct ttm_device *bdev, struct ttm_buffer_object *bo,
 			 void (*destroy) (struct ttm_buffer_object *))
 {
 	static const struct ttm_place sys_mem = { .mem_type = TTM_PL_SYSTEM };
-=======
-int ttm_bo_init_reserved(struct ttm_device *bdev,
-			 struct ttm_buffer_object *bo,
-			 size_t size,
-			 enum ttm_bo_type type,
-			 struct ttm_placement *placement,
-			 uint32_t page_alignment,
-			 struct ttm_operation_ctx *ctx,
-			 struct sg_table *sg,
-			 struct dma_resv *resv,
-			 void (*destroy) (struct ttm_buffer_object *))
-{
-	static const struct ttm_place sys_mem = { .mem_type = TTM_PL_SYSTEM };
-	bool locked;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
-	bo->destroy = destroy;
 	kref_init(&bo->kref);
 	INIT_LIST_HEAD(&bo->ddestroy);
 	bo->bdev = bdev;
 	bo->type = type;
-<<<<<<< HEAD
 	bo->page_alignment = alignment;
 	bo->destroy = destroy;
 	bo->pin_count = 0;
 	bo->sg = sg;
 	bo->bulk_move = NULL;
 	if (resv)
-=======
-	bo->page_alignment = page_alignment;
-	bo->pin_count = 0;
-	bo->sg = sg;
-	bo->bulk_move = NULL;
-	if (resv) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bo->base.resv = resv;
 	else
 		bo->base.resv = &bo->base._resv;
@@ -1036,16 +982,6 @@ int ttm_bo_init_reserved(struct ttm_device *bdev,
 		ttm_bo_put(bo);
 		return ret;
 	}
-<<<<<<< HEAD
-=======
-	atomic_inc(&ttm_glob.bo_count);
-
-	ret = ttm_resource_alloc(bo, &sys_mem, &bo->resource);
-	if (unlikely(ret)) {
-		ttm_bo_put(bo);
-		return ret;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * For ttm_bo_type_device buffers, allocate
@@ -1053,14 +989,10 @@ int ttm_bo_init_reserved(struct ttm_device *bdev,
 	 */
 	if (bo->type == ttm_bo_type_device || bo->type == ttm_bo_type_sg) {
 		ret = drm_vma_offset_add(bdev->vma_manager, &bo->base.vma_node,
-<<<<<<< HEAD
 					 PFN_UP(bo->base.size));
 		if (ret)
 			goto err_put;
 	}
-=======
-					 bo->resource->num_pages);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* passed reservation objects should already be locked,
 	 * since otherwise lockdep will be angered in radeon.
@@ -1076,20 +1008,16 @@ int ttm_bo_init_reserved(struct ttm_device *bdev,
 
 	return 0;
 
-<<<<<<< HEAD
 err_unlock:
 	if (!resv)
 		dma_resv_unlock(bo->base.resv);
 
 err_put:
 	ttm_bo_put(bo);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 EXPORT_SYMBOL(ttm_bo_init_reserved);
 
-<<<<<<< HEAD
 /**
  * ttm_bo_init_validate
  *
@@ -1131,29 +1059,12 @@ int ttm_bo_init_validate(struct ttm_device *bdev, struct ttm_buffer_object *bo,
 			 uint32_t alignment, bool interruptible,
 			 struct sg_table *sg, struct dma_resv *resv,
 			 void (*destroy) (struct ttm_buffer_object *))
-=======
-int ttm_bo_init(struct ttm_device *bdev,
-		struct ttm_buffer_object *bo,
-		size_t size,
-		enum ttm_bo_type type,
-		struct ttm_placement *placement,
-		uint32_t page_alignment,
-		bool interruptible,
-		struct sg_table *sg,
-		struct dma_resv *resv,
-		void (*destroy) (struct ttm_buffer_object *))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ttm_operation_ctx ctx = { interruptible, false };
 	int ret;
 
-<<<<<<< HEAD
 	ret = ttm_bo_init_reserved(bdev, bo, type, placement, alignment, &ctx,
 				   sg, resv, destroy);
-=======
-	ret = ttm_bo_init_reserved(bdev, bo, size, type, placement,
-				   page_alignment, &ctx, sg, resv, destroy);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -1162,11 +1073,7 @@ int ttm_bo_init(struct ttm_device *bdev,
 
 	return 0;
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL(ttm_bo_init_validate);
-=======
-EXPORT_SYMBOL(ttm_bo_init);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * buffer object vm functions.

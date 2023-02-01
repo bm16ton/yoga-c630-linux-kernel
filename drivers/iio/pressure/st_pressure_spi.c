@@ -101,10 +101,7 @@ static const struct spi_device_id st_press_id_table[] = {
 	{ LPS33HW_PRESS_DEV_NAME },
 	{ LPS35HW_PRESS_DEV_NAME },
 	{ LPS22HH_PRESS_DEV_NAME },
-<<<<<<< HEAD
 	{ LPS22DF_PRESS_DEV_NAME },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ "lps001wp-press" },
 	{ "lps25h-press", },
 	{ "lps331ap-press" },

@@ -56,11 +56,6 @@ struct vmci_guest_device {
 
 	bool exclusive_vectors;
 
-<<<<<<< HEAD
-=======
-	struct tasklet_struct datagram_tasklet;
-	struct tasklet_struct bm_tasklet;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct wait_queue_head inout_wq;
 
 	void *data_buffer;
@@ -638,13 +633,6 @@ static int vmci_guest_probe_device(struct pci_dev *pdev,
 	vmci_dev->iobase = iobase;
 	vmci_dev->mmio_base = mmio_base;
 
-<<<<<<< HEAD
-=======
-	tasklet_init(&vmci_dev->datagram_tasklet,
-		     vmci_dispatch_dgs, (unsigned long)vmci_dev);
-	tasklet_init(&vmci_dev->bm_tasklet,
-		     vmci_process_bitmap, (unsigned long)vmci_dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	init_waitqueue_head(&vmci_dev->inout_wq);
 
 	if (mmio_base != NULL) {
@@ -837,17 +825,11 @@ static int vmci_guest_probe_device(struct pci_dev *pdev,
 			goto err_free_irq;
 		}
 		if (caps_in_use & VMCI_CAPS_DMA_DATAGRAM) {
-<<<<<<< HEAD
 			error = request_threaded_irq(pci_irq_vector(pdev, 2),
 						     NULL,
 						    vmci_interrupt_dma_datagram,
 						     0, KBUILD_MODNAME,
 						     vmci_dev);
-=======
-			error = request_irq(pci_irq_vector(pdev, 2),
-					    vmci_interrupt_dma_datagram,
-					    0, KBUILD_MODNAME, vmci_dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (error) {
 				dev_err(&pdev->dev,
 					"Failed to allocate irq %u: %d\n",

@@ -2788,20 +2788,10 @@ lpfc_fdmi_port_attr_fc4type(struct lpfc_vport *vport, void *attr)
 static int
 lpfc_fdmi_port_attr_support_speed(struct lpfc_vport *vport, void *attr)
 {
-<<<<<<< HEAD
 	struct lpfc_hba *phba = vport->phba;
 	u32 speeds = 0;
 	u32 tcfg;
 	u8 i, cnt;
-=======
-	struct lpfc_hba   *phba = vport->phba;
-	struct lpfc_fdmi_attr_entry *ae;
-	uint32_t size;
-	u32 tcfg;
-	u8 i, cnt;
-
-	ae = &ad->AttrValue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!(phba->hba_flag & HBA_FCOE_MODE)) {
 		cnt = 0;
@@ -2814,7 +2804,6 @@ lpfc_fdmi_port_attr_support_speed(struct lpfc_vport *vport, void *attr)
 
 		if (cnt > 2) { /* 4 lane trunk group */
 			if (phba->lmt & LMT_64Gb)
-<<<<<<< HEAD
 				speeds |= HBA_PORTSPEED_256GFC;
 			if (phba->lmt & LMT_32Gb)
 				speeds |= HBA_PORTSPEED_128GFC;
@@ -2850,43 +2839,6 @@ lpfc_fdmi_port_attr_support_speed(struct lpfc_vport *vport, void *attr)
 				speeds |= HBA_PORTSPEED_2GFC;
 			if (phba->lmt & LMT_1Gb)
 				speeds |= HBA_PORTSPEED_1GFC;
-=======
-				ae->un.AttrInt |= HBA_PORTSPEED_256GFC;
-			if (phba->lmt & LMT_32Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_128GFC;
-			if (phba->lmt & LMT_16Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_64GFC;
-		} else if (cnt) { /* 2 lane trunk group */
-			if (phba->lmt & LMT_128Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_256GFC;
-			if (phba->lmt & LMT_64Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_128GFC;
-			if (phba->lmt & LMT_32Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_64GFC;
-			if (phba->lmt & LMT_16Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_32GFC;
-		} else {
-			if (phba->lmt & LMT_256Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_256GFC;
-			if (phba->lmt & LMT_128Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_128GFC;
-			if (phba->lmt & LMT_64Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_64GFC;
-			if (phba->lmt & LMT_32Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_32GFC;
-			if (phba->lmt & LMT_16Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_16GFC;
-			if (phba->lmt & LMT_10Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_10GFC;
-			if (phba->lmt & LMT_8Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_8GFC;
-			if (phba->lmt & LMT_4Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_4GFC;
-			if (phba->lmt & LMT_2Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_2GFC;
-			if (phba->lmt & LMT_1Gb)
-				ae->un.AttrInt |= HBA_PORTSPEED_1GFC;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	} else {
 		/* FCoE links support only one speed */
@@ -2946,9 +2898,6 @@ lpfc_fdmi_port_attr_speed(struct lpfc_vport *vport, void *attr)
 			break;
 		case LPFC_LINK_SPEED_256GHZ:
 			speeds = HBA_PORTSPEED_256GFC;
-			break;
-		case LPFC_LINK_SPEED_256GHZ:
-			ae->un.AttrInt = HBA_PORTSPEED_256GFC;
 			break;
 		default:
 			speeds = HBA_PORTSPEED_UNKNOWN;
@@ -3062,26 +3011,14 @@ static int
 lpfc_fdmi_port_attr_active_fc4type(struct lpfc_vport *vport, void *attr)
 {
 	struct lpfc_hba *phba = vport->phba;
-<<<<<<< HEAD
 	u32 fc4types;
-=======
-	struct lpfc_fdmi_attr_entry *ae;
-	uint32_t size;
-
-	ae = &ad->AttrValue;
-	memset(ae, 0, sizeof(*ae));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	fc4types = (ATTR_FC4_CT | ATTR_FC4_FCP);
 
 	/* Check to see if NVME is configured or not */
 	if (vport == phba->pport &&
 	    phba->cfg_enable_fc4_type & LPFC_ENABLE_NVME)
-<<<<<<< HEAD
 		fc4types |= ATTR_FC4_NVME;
-=======
-		ae->un.AttrTypes[6] = 0x1; /* Type 0x28 - NVME */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return lpfc_fdmi_set_attr_fc4types(attr, RPRT_ACTIVE_FC4_TYPES,
 			fc4types);
@@ -3165,29 +3102,11 @@ static int
 lpfc_fdmi_vendor_attr_mi(struct lpfc_vport *vport, void *attr)
 {
 	struct lpfc_hba *phba = vport->phba;
-<<<<<<< HEAD
 	char buf[32] = { 0 };
 
 	sprintf(buf, "ELXE2EM:%04d", phba->sli4_hba.pc_sli4_params.mi_ver);
 
 	return lpfc_fdmi_set_attr_string(attr, RPRT_VENDOR_MI, buf);
-=======
-	struct lpfc_fdmi_attr_entry *ae;
-	uint32_t len, size;
-	char mibrevision[16];
-
-	ae = (struct lpfc_fdmi_attr_entry *)&ad->AttrValue;
-	memset(ae, 0, 256);
-	sprintf(mibrevision, "ELXE2EM:%04d",
-		phba->sli4_hba.pc_sli4_params.mi_ver);
-	strncpy(ae->un.AttrString, &mibrevision[0], sizeof(ae->un.AttrString));
-	len = strnlen(ae->un.AttrString, sizeof(ae->un.AttrString));
-	len += (len & 3) ? (4 - (len & 3)) : 4;
-	size = FOURBYTES + len;
-	ad->AttrLen = cpu_to_be16(size);
-	ad->AttrType = cpu_to_be16(RPRT_VENDOR_MI);
-	return size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* RHBA attribute jump table */
@@ -3310,11 +3229,7 @@ lpfc_fdmi_cmd(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 			 cmdcode, new_mask, vport->fdmi_port_mask,
 			 vport->fc_flag, vport->port_state);
 
-<<<<<<< HEAD
 	CtReq = (struct lpfc_sli_ct_request *)rq->virt;
-=======
-	CtReq = (struct lpfc_sli_ct_request *)mp->virt;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* First populate the CT_IU preamble */
 	CtReq->RevisionId.bits.Revision = SLI_CT_REVISION;
@@ -3657,10 +3572,7 @@ lpfc_cmpl_ct_cmd_vmid(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 	struct lpfc_sli_ct_request *ctrsp = outp->virt;
 	u16 rsp = ctrsp->CommandResponse.bits.CmdRsp;
 	struct app_id_object *app;
-<<<<<<< HEAD
 	struct lpfc_nodelist *ndlp = cmdiocb->ndlp;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 cmd, hash, bucket;
 	struct lpfc_vmid *vmp, *cur;
 	u8 *data = outp->virt;
@@ -3672,11 +3584,7 @@ lpfc_cmpl_ct_cmd_vmid(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 
 	if (lpfc_els_chk_latt(vport) || get_job_ulpstatus(phba, rspiocb)) {
 		if (cmd != SLI_CTAS_DALLAPP_ID)
-<<<<<<< HEAD
 			goto free_res;
-=======
-			return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	/* Check for a CT LS_RJT response */
 	if (rsp == be16_to_cpu(SLI_CT_RESPONSE_FS_RJT)) {
@@ -3691,11 +3599,7 @@ lpfc_cmpl_ct_cmd_vmid(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 			/* If DALLAPP_ID failed retry later */
 			if (cmd == SLI_CTAS_DALLAPP_ID)
 				vport->load_flag |= FC_DEREGISTER_ALL_APP_ID;
-<<<<<<< HEAD
 			goto free_res;
-=======
-			return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -3709,11 +3613,7 @@ lpfc_cmpl_ct_cmd_vmid(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 				 app->obj.entity_id_len);
 
 		if (app->obj.entity_id_len == 0 || app->port_id == 0)
-<<<<<<< HEAD
 			goto free_res;
-=======
-			return;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		hash = lpfc_vmid_hash_fn(app->obj.entity_id,
 					 app->obj.entity_id_len);
@@ -3760,12 +3660,9 @@ lpfc_cmpl_ct_cmd_vmid(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 		lpfc_printf_vlog(vport, KERN_DEBUG, LOG_DISCOVERY,
 				 "8857 Invalid command code\n");
 	}
-<<<<<<< HEAD
 free_res:
 	lpfc_ct_free_iocb(phba, cmdiocb);
 	lpfc_nlp_put(ndlp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

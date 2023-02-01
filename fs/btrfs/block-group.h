@@ -44,7 +44,6 @@ enum btrfs_chunk_alloc_enum {
 	CHUNK_ALLOC_LIMITED,
 	CHUNK_ALLOC_FORCE,
 	CHUNK_ALLOC_FORCE_FOR_EXTENT,
-<<<<<<< HEAD
 };
 
 /* Block group flags set at runtime */
@@ -63,8 +62,6 @@ enum btrfs_caching_type {
 	BTRFS_CACHE_STARTED,
 	BTRFS_CACHE_FINISHED,
 	BTRFS_CACHE_ERROR,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct btrfs_caching_control {
@@ -126,17 +123,6 @@ struct btrfs_block_group {
 	unsigned long runtime_flags;
 
 	unsigned int ro;
-<<<<<<< HEAD
-=======
-	unsigned int iref:1;
-	unsigned int has_caching_ctl:1;
-	unsigned int removed:1;
-	unsigned int to_copy:1;
-	unsigned int relocating_repair:1;
-	unsigned int chunk_item_inserted:1;
-	unsigned int zone_is_active:1;
-	unsigned int zoned_data_reloc_ongoing:1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	int disk_cache_state;
 

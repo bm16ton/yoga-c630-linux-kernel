@@ -253,7 +253,6 @@ int devm_regulator_bulk_get_const(struct device *dev, int num_consumers,
 }
 EXPORT_SYMBOL_GPL(devm_regulator_bulk_get_const);
 
-<<<<<<< HEAD
 static int devm_regulator_bulk_match(struct device *dev, void *res,
 				     void *data)
 {
@@ -359,8 +358,6 @@ unwind:
 }
 EXPORT_SYMBOL_GPL(devm_regulator_bulk_get_enable);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void devm_rdev_release(struct device *dev, void *res)
 {
 	regulator_unregister(*(struct regulator_dev **)res);

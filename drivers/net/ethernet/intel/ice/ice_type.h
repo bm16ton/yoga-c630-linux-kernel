@@ -347,10 +347,7 @@ struct ice_ts_func_info {
 #define ICE_TS_DEV_ENA_M		BIT(24)
 #define ICE_TS_TMR0_ENA_M		BIT(25)
 #define ICE_TS_TMR1_ENA_M		BIT(26)
-<<<<<<< HEAD
 #define ICE_TS_LL_TX_TS_READ_M		BIT(28)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct ice_ts_dev_info {
 	/* Device specific info */
@@ -363,10 +360,7 @@ struct ice_ts_dev_info {
 	u8 ena;
 	u8 tmr0_ena;
 	u8 tmr1_ena;
-<<<<<<< HEAD
 	u8 ts_ll_read;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Function specific capabilities */
@@ -894,14 +888,6 @@ struct ice_hw {
 #define ICE_INTRL_GRAN_MAX_25	8
 	/* INTRL granularity in 1 us */
 	u8 intrl_gran;
-
-#define ICE_PHY_PER_NAC		1
-#define ICE_MAX_QUAD		2
-#define ICE_NUM_QUAD_TYPE	2
-#define ICE_PORTS_PER_QUAD	4
-#define ICE_PHY_0_LAST_QUAD	1
-#define ICE_PORTS_PER_PHY	8
-#define ICE_NUM_EXTERNAL_PORTS		ICE_PORTS_PER_PHY
 
 #define ICE_PHY_PER_NAC		1
 #define ICE_MAX_QUAD		2

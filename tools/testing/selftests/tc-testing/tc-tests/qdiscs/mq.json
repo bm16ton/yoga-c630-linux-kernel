@@ -133,7 +133,6 @@
 	    "teardown": [
 		    "echo \"1\" > /sys/bus/netdevsim/del_device"
 	    ]
-<<<<<<< HEAD
 	},
         {
             "id": "1023",
@@ -157,7 +156,4 @@
                 "echo \"1\" > /sys/bus/netdevsim/del_device"
             ]
         }
-=======
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ]

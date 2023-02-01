@@ -21,11 +21,8 @@
 
 #define PROG(F) PROG_(F, _##F)
 #define PROG_(NUM, NAME) SEC("flow_dissector") int flow_dissector_##NUM
-<<<<<<< HEAD
 
 #define FLOW_CONTINUE_SADDR 0x7f00007f /* 127.0.0.127 */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* These are the identifiers of the BPF programs that will be used in tail
  * calls. Name is limited to 16 characters, with the terminating character and

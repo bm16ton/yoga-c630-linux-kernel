@@ -1986,10 +1986,7 @@ nfsd4_decode_copy_notify(struct nfsd4_compoundargs *argp,
 {
 	__be32 status;
 
-<<<<<<< HEAD
 	memset(cn, 0, sizeof(*cn));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cn->cpn_src = svcxdr_tmpalloc(argp, sizeof(*cn->cpn_src));
 	if (cn->cpn_src == NULL)
 		return nfserr_jukebox;
@@ -2410,10 +2407,6 @@ nfsd4_decode_compound(struct nfsd4_compoundargs *argp)
 		argp->ops = vcalloc(argp->opcnt, sizeof(*argp->ops));
 		if (!argp->ops) {
 			argp->ops = argp->iops;
-<<<<<<< HEAD
-=======
-			dprintk("nfsd: couldn't allocate room for COMPOUND\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return false;
 		}
 	}
@@ -2471,7 +2464,7 @@ nfsd4_decode_compound(struct nfsd4_compoundargs *argp)
 	argp->rqstp->rq_cachetype = cachethis ? RC_REPLBUFF : RC_NOCACHE;
 
 	if (readcount > 1 || max_reply > PAGE_SIZE - auth_slack)
-		__clear_bit(RQ_SPLICE_OK, &argp->rqstp->rq_flags);
+		clear_bit(RQ_SPLICE_OK, &argp->rqstp->rq_flags);
 
 	return true;
 }
@@ -5477,10 +5470,6 @@ bool
 nfs4svc_encode_compoundres(struct svc_rqst *rqstp, struct xdr_stream *xdr)
 {
 	struct nfsd4_compoundres *resp = rqstp->rq_resp;
-<<<<<<< HEAD
-=======
-	struct xdr_buf *buf = xdr->buf;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__be32 *p;
 
 	/*
@@ -5489,15 +5478,6 @@ nfs4svc_encode_compoundres(struct svc_rqst *rqstp, struct xdr_stream *xdr)
 	 */
 	p = resp->statusp;
 
-<<<<<<< HEAD
-=======
-	/*
-	 * Send buffer space for the following items is reserved
-	 * at the top of nfsd4_proc_compound().
-	 */
-	p = resp->statusp;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*p++ = resp->cstate.status;
 
 	rqstp->rq_next_page = xdr->page_ptr + 1;

@@ -160,15 +160,10 @@ struct ufs_pm_lvl_states {
  * @task_tag: Task tag of the command
  * @lun: LUN of the command
  * @intr_cmd: Interrupt command (doesn't participate in interrupt aggregation)
-<<<<<<< HEAD
  * @issue_time_stamp: time stamp for debug purposes (CLOCK_MONOTONIC)
  * @issue_time_stamp_local_clock: time stamp for debug purposes (local_clock)
  * @compl_time_stamp: time stamp for statistics (CLOCK_MONOTONIC)
  * @compl_time_stamp_local_clock: time stamp for debug purposes (local_clock)
-=======
- * @issue_time_stamp: time stamp for debug purposes
- * @compl_time_stamp: time stamp for statistics
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @crypto_key_slot: the key slot to use for inline crypto (-1 if none)
  * @data_unit_num: the data unit number for the first block for inline crypto
  * @req_abort_skip: skip request abort task flag
@@ -192,13 +187,9 @@ struct ufshcd_lrb {
 	u8 lun; /* UPIU LUN id field is only 8-bit wide */
 	bool intr_cmd;
 	ktime_t issue_time_stamp;
-<<<<<<< HEAD
 	u64 issue_time_stamp_local_clock;
 	ktime_t compl_time_stamp;
 	u64 compl_time_stamp_local_clock;
-=======
-	ktime_t compl_time_stamp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_SCSI_UFS_CRYPTO
 	int crypto_key_slot;
 	u64 data_unit_num;
@@ -443,11 +434,7 @@ struct ufs_clk_scaling {
 struct ufs_event_hist {
 	int pos;
 	u32 val[UFS_EVENT_HIST_LENGTH];
-<<<<<<< HEAD
 	u64 tstamp[UFS_EVENT_HIST_LENGTH];
-=======
-	ktime_t tstamp[UFS_EVENT_HIST_LENGTH];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long long cnt;
 };
 
@@ -463,17 +450,10 @@ struct ufs_event_hist {
  */
 struct ufs_stats {
 	u32 last_intr_status;
-<<<<<<< HEAD
 	u64 last_intr_ts;
 
 	u32 hibern8_exit_cnt;
 	u64 last_hibern8_exit_tstamp;
-=======
-	ktime_t last_intr_ts;
-
-	u32 hibern8_exit_cnt;
-	ktime_t last_hibern8_exit_tstamp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ufs_event_hist event[UFS_EVT_CNT];
 };
 
@@ -684,15 +664,12 @@ enum ufshcd_caps {
 	 * notification if it is supported by the UFS device.
 	 */
 	UFSHCD_CAP_TEMP_NOTIF				= 1 << 11,
-<<<<<<< HEAD
 
 	/*
 	 * Enable WriteBooster when scaling up the clock and disable
 	 * WriteBooster when scaling the clock down.
 	 */
 	UFSHCD_CAP_WB_WITH_CLK_SCALING			= 1 << 12,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct ufs_hba_variant_params {
@@ -1050,14 +1027,11 @@ static inline bool ufshcd_is_wb_allowed(struct ufs_hba *hba)
 	return hba->caps & UFSHCD_CAP_WB_EN;
 }
 
-<<<<<<< HEAD
 static inline bool ufshcd_enable_wb_if_scaling_up(struct ufs_hba *hba)
 {
 	return hba->caps & UFSHCD_CAP_WB_WITH_CLK_SCALING;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define ufshcd_writel(hba, val, reg)	\
 	writel((val), (hba)->mmio_base + (reg))
 #define ufshcd_readl(hba, reg)	\
@@ -1201,29 +1175,6 @@ static inline int ufshcd_disable_host_tx_lcc(struct ufs_hba *hba)
 	return ufshcd_dme_set(hba, UIC_ARG_MIB(PA_LOCAL_TX_LCC_ENABLE), 0);
 }
 
-<<<<<<< HEAD
-=======
-/* Expose Query-Request API */
-int ufshcd_query_descriptor_retry(struct ufs_hba *hba,
-				  enum query_opcode opcode,
-				  enum desc_idn idn, u8 index,
-				  u8 selector,
-				  u8 *desc_buf, int *buf_len);
-int ufshcd_read_desc_param(struct ufs_hba *hba,
-			   enum desc_idn desc_id,
-			   int desc_index,
-			   u8 param_offset,
-			   u8 *param_read_buf,
-			   u8 param_size);
-int ufshcd_query_attr_retry(struct ufs_hba *hba, enum query_opcode opcode,
-			    enum attr_idn idn, u8 index, u8 selector,
-			    u32 *attr_val);
-int ufshcd_query_attr(struct ufs_hba *hba, enum query_opcode opcode,
-		      enum attr_idn idn, u8 index, u8 selector, u32 *attr_val);
-int ufshcd_query_flag(struct ufs_hba *hba, enum query_opcode opcode,
-	enum flag_idn idn, u8 index, bool *flag_res);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void ufshcd_auto_hibern8_enable(struct ufs_hba *hba);
 void ufshcd_auto_hibern8_update(struct ufs_hba *hba, u32 ahit);
 void ufshcd_fixup_dev_quirks(struct ufs_hba *hba,
@@ -1255,10 +1206,7 @@ int ufshcd_exec_raw_upiu_cmd(struct ufs_hba *hba,
 			     enum query_opcode desc_op);
 
 int ufshcd_wb_toggle(struct ufs_hba *hba, bool enable);
-<<<<<<< HEAD
 int ufshcd_wb_toggle_buf_flush(struct ufs_hba *hba, bool enable);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ufshcd_suspend_prepare(struct device *dev);
 int __ufshcd_suspend_prepare(struct device *dev, bool rpm_ok_for_spm);
 void ufshcd_resume_complete(struct device *dev);

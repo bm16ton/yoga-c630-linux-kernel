@@ -689,16 +689,12 @@ static void err_print_uc(struct drm_i915_error_state_buf *m,
 
 	intel_uc_fw_dump(&error_uc->guc_fw, &p);
 	intel_uc_fw_dump(&error_uc->huc_fw, &p);
-<<<<<<< HEAD
 	err_printf(m, "GuC timestamp: 0x%08x\n", error_uc->guc.timestamp);
 	intel_gpu_error_print_vma(m, NULL, error_uc->guc.vma_log);
 	err_printf(m, "GuC CTB fence: %d\n", error_uc->guc.last_fence);
 	err_print_guc_ctb(m, "Send", error_uc->guc.ctb + 0);
 	err_print_guc_ctb(m, "Recv", error_uc->guc.ctb + 1);
 	intel_gpu_error_print_vma(m, NULL, error_uc->guc.vma_ctb);
-=======
-	intel_gpu_error_print_vma(m, NULL, error_uc->guc_log);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void err_free_sgl(struct scatterlist *sgl)
@@ -740,11 +736,8 @@ static void err_print_gt_global_nonguc(struct drm_i915_error_state_buf *m,
 	int i;
 
 	err_printf(m, "GT awake: %s\n", str_yes_no(gt->awake));
-<<<<<<< HEAD
 	err_printf(m, "CS timestamp frequency: %u Hz, %d ns\n",
 		   gt->clock_frequency, gt->clock_period_ns);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err_printf(m, "EIR: 0x%08x\n", gt->eir);
 	err_printf(m, "PGTBL_ER: 0x%08x\n", gt->pgtbl_er);
 
@@ -876,11 +869,7 @@ static void __err_print_to_sgl(struct drm_i915_error_state_buf *m,
 	if (error->gt) {
 		bool print_guc_capture = false;
 
-<<<<<<< HEAD
 		if (error->gt->uc && error->gt->uc->guc.is_guc_capture)
-=======
-		if (error->gt->uc && error->gt->uc->is_guc_capture)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			print_guc_capture = true;
 
 		err_print_gt_display(m, error->gt);
@@ -1728,7 +1717,6 @@ gt_record_uc(struct intel_gt_coredump *gt,
 	 * log times to system times (in conjunction with the error->boottime and
 	 * gt->clock_frequency fields saved elsewhere).
 	 */
-<<<<<<< HEAD
 	error_uc->guc.timestamp = intel_uncore_read(gt->_gt->uncore, GUCPMTIMESTAMP);
 	error_uc->guc.vma_log = create_vma_coredump(gt->_gt, uc->guc.log.vma,
 						    "GuC log buffer", compress);
@@ -1739,12 +1727,6 @@ gt_record_uc(struct intel_gt_coredump *gt,
 			  uc->guc.ct.ctbs.send.desc, (struct intel_guc *)&uc->guc);
 	gt_record_guc_ctb(error_uc->guc.ctb + 1, &uc->guc.ct.ctbs.recv,
 			  uc->guc.ct.ctbs.send.desc, (struct intel_guc *)&uc->guc);
-=======
-	error_uc->guc_fw.path = kstrdup(uc->guc.fw.path, ALLOW_FAIL);
-	error_uc->huc_fw.path = kstrdup(uc->huc.fw.path, ALLOW_FAIL);
-	error_uc->guc_log = create_vma_coredump(gt->_gt, uc->guc.log.vma,
-						"GuC log buffer", compress);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return error_uc;
 }
@@ -2097,15 +2079,9 @@ __i915_gpu_coredump(struct intel_gt *gt, intel_engine_mask_t engine_mask, u32 du
 			error->gt->uc = gt_record_uc(error->gt, compress);
 			if (error->gt->uc) {
 				if (dump_flags & CORE_DUMP_FLAG_IS_GUC_CAPTURE)
-<<<<<<< HEAD
 					error->gt->uc->guc.is_guc_capture = true;
 				else
 					GEM_BUG_ON(error->gt->uc->guc.is_guc_capture);
-=======
-					error->gt->uc->is_guc_capture = true;
-				else
-					GEM_BUG_ON(error->gt->uc->is_guc_capture);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 		}
 

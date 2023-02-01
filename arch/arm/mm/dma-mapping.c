@@ -1775,15 +1775,8 @@ void arch_setup_dma_ops(struct device *dev, u64 dma_base, u64 size,
 	 * here, but instead have to make sure we only set but never clear it
 	 * for now.
 	 */
-<<<<<<< HEAD
 	if (coherent)
 		dev->dma_coherent = true;
-=======
-	if (coherent) {
-		dev->archdata.dma_coherent = true;
-		dev->dma_coherent = true;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Don't override the dma_ops if they have already been set. Ideally

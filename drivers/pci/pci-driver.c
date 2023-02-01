@@ -1340,10 +1340,7 @@ static int pci_pm_runtime_resume(struct device *dev)
 	 * D3cold when the bridge above it runtime suspended.
 	 */
 	pci_pm_default_resume_early(pci_dev);
-<<<<<<< HEAD
 	pci_resume_ptm(pci_dev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!pci_dev->driver)
 		return 0;

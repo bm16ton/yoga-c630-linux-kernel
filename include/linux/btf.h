@@ -49,7 +49,6 @@
  * for this case.
  */
 #define KF_TRUSTED_ARGS (1 << 4) /* kfunc only takes trusted pointer arguments */
-<<<<<<< HEAD
 #define KF_SLEEPABLE    (1 << 5) /* kfunc may sleep */
 #define KF_DESTRUCTIVE  (1 << 6) /* kfunc performs destructive actions */
 
@@ -61,8 +60,6 @@
 #define stringify_struct(x)			\
 	({ BUILD_BUG_ON(sizeof(struct x) < 0);	\
 	   __stringify(x); })
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct btf;
 struct btf_member;

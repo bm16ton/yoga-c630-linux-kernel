@@ -49,10 +49,6 @@
 #define U3P_USBPHYACR0		0x000
 #define PA0_RG_U2PLL_FORCE_ON		BIT(15)
 #define PA0_USB20_PLL_PREDIV		GENMASK(7, 6)
-<<<<<<< HEAD
-=======
-#define PA0_USB20_PLL_PREDIV_VAL(x)	((0x3 & (x)) << 6)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PA0_RG_USB20_INTR_EN		BIT(5)
 
 #define U3P_USBPHYACR1		0x004
@@ -62,10 +58,6 @@
 
 #define U3P_USBPHYACR2		0x008
 #define PA2_RG_U2PLL_BW			GENMASK(21, 19)
-<<<<<<< HEAD
-=======
-#define PA2_RG_U2PLL_BW_VAL(x)		((0x7 & (x)) << 19)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PA2_RG_SIF_U2PLL_FORCE_EN	BIT(18)
 
 #define U3P_USBPHYACR5		0x014
@@ -138,10 +130,6 @@
 
 #define U3P_U3_PHYA_REG0	0x000
 #define P3A_RG_IEXT_INTR		GENMASK(15, 10)
-<<<<<<< HEAD
-=======
-#define P3A_RG_IEXT_INTR_VAL(x)		((0x3f & (x)) << 10)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define P3A_RG_CLKDRV_OFF		GENMASK(3, 2)
 
 #define U3P_U3_PHYA_REG1	0x004
@@ -188,19 +176,6 @@
 #define U3P_U3_PHYD_IMPCAL1		0x014
 #define P3D_RG_FORCE_RX_IMPEL		BIT(31)
 #define P3D_RG_RX_IMPEL			GENMASK(28, 24)
-
-#define U3P_U3_PHYD_RSV			0x054
-#define P3D_RG_EFUSE_AUTO_LOAD_DIS	BIT(12)
-
-#define U3P_U3_PHYD_IMPCAL0		0x010
-#define P3D_RG_FORCE_TX_IMPEL		BIT(31)
-#define P3D_RG_TX_IMPEL			GENMASK(28, 24)
-#define P3D_RG_TX_IMPEL_VAL(x)		((0x1f & (x)) << 24)
-
-#define U3P_U3_PHYD_IMPCAL1		0x014
-#define P3D_RG_FORCE_RX_IMPEL		BIT(31)
-#define P3D_RG_RX_IMPEL			GENMASK(28, 24)
-#define P3D_RG_RX_IMPEL_VAL(x)		((0x1f & (x)) << 24)
 
 #define U3P_U3_PHYD_RSV			0x054
 #define P3D_RG_EFUSE_AUTO_LOAD_DIS	BIT(12)
@@ -278,16 +253,6 @@
 
 #define ANA_EQ_EYE_CTRL_SIGNAL5		0xdc
 #define RG_CDR_BIRLTD0_GEN3_MSK		GENMASK(4, 0)
-
-/* PHY switch between pcie/usb3/sgmii/sata */
-#define USB_PHY_SWITCH_CTRL	0x0
-#define RG_PHY_SW_TYPE		GENMASK(3, 0)
-#define RG_PHY_SW_PCIE		0x0
-#define RG_PHY_SW_USB3		0x1
-#define RG_PHY_SW_SGMII		0x2
-#define RG_PHY_SW_SATA		0x3
-
-#define TPHY_CLKS_CNT	2
 
 /* PHY switch between pcie/usb3/sgmii/sata */
 #define USB_PHY_SWITCH_CTRL	0x0
@@ -434,13 +399,8 @@ static void hs_slew_rate_calibrate(struct mtk_tphy *tphy,
 		tphy->src_ref_clk, tphy->src_coef);
 
 	/* set HS slew rate */
-<<<<<<< HEAD
 	mtk_phy_update_field(com + U3P_USBPHYACR5, PA5_RG_U2_HSTX_SRCTRL,
 			     calibration_val);
-=======
-	mtk_phy_update_bits(com + U3P_USBPHYACR5, PA5_RG_U2_HSTX_SRCTRL,
-			    PA5_RG_U2_HSTX_SRCTRL_VAL(calibration_val));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* disable USB ring oscillator */
 	mtk_phy_clear_bits(com + U3P_USBPHYACR5, PA5_RG_U2_HSTX_SRCAL_EN);
@@ -450,18 +410,14 @@ static void u3_phy_instance_init(struct mtk_tphy *tphy,
 	struct mtk_phy_instance *instance)
 {
 	struct u3phy_banks *u3_banks = &instance->u3_banks;
-<<<<<<< HEAD
 	void __iomem *phya = u3_banks->phya;
 	void __iomem *phyd = u3_banks->phyd;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* gating PCIe Analog XTAL clock */
 	mtk_phy_set_bits(u3_banks->spllc + U3P_SPLLC_XTALCTL3,
 			 XC3_RG_U3_XTAL_RX_PWD | XC3_RG_U3_FRC_XTAL_RX_PWD);
 
 	/* gating XSQ */
-<<<<<<< HEAD
 	mtk_phy_update_field(phya + U3P_U3_PHYA_DA_REG0, P3A_RG_XTAL_EXT_EN_U3, 2);
 
 	mtk_phy_update_field(phya + U3P_U3_PHYA_REG9, P3A_RG_RX_DAC_MUX, 4);
@@ -478,29 +434,6 @@ static void u3_phy_instance_init(struct mtk_tphy *tphy,
 	mtk_phy_update_field(phyd + U3P_U3_PHYD_RXDET1, P3D_RG_RXDET_STB2_SET, 0x10);
 
 	mtk_phy_update_field(phyd + U3P_U3_PHYD_RXDET2, P3D_RG_RXDET_STB2_SET_P3, 0x10);
-=======
-	mtk_phy_update_bits(u3_banks->phya + U3P_U3_PHYA_DA_REG0,
-			    P3A_RG_XTAL_EXT_EN_U3, P3A_RG_XTAL_EXT_EN_U3_VAL(2));
-
-	mtk_phy_update_bits(u3_banks->phya + U3P_U3_PHYA_REG9,
-			    P3A_RG_RX_DAC_MUX, P3A_RG_RX_DAC_MUX_VAL(4));
-
-	mtk_phy_update_bits(u3_banks->phya + U3P_U3_PHYA_REG6,
-			    P3A_RG_TX_EIDLE_CM, P3A_RG_TX_EIDLE_CM_VAL(0xe));
-
-	mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_CDR1,
-			    P3D_RG_CDR_BIR_LTD0 | P3D_RG_CDR_BIR_LTD1,
-			    P3D_RG_CDR_BIR_LTD0_VAL(0xc) | P3D_RG_CDR_BIR_LTD1_VAL(0x3));
-
-	mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_LFPS1,
-			    P3D_RG_FWAKE_TH, P3D_RG_FWAKE_TH_VAL(0x34));
-
-	mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_RXDET1,
-			    P3D_RG_RXDET_STB2_SET, P3D_RG_RXDET_STB2_SET_VAL(0x10));
-
-	mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_RXDET2,
-			    P3D_RG_RXDET_STB2_SET_P3, P3D_RG_RXDET_STB2_SET_P3_VAL(0x10));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev_dbg(tphy->dev, "%s(%d)\n", __func__, instance->index);
 }
@@ -514,17 +447,9 @@ static void u2_phy_pll_26m_set(struct mtk_tphy *tphy,
 	if (!tphy->pdata->sw_pll_48m_to_26m)
 		return;
 
-<<<<<<< HEAD
 	mtk_phy_update_field(com + U3P_USBPHYACR0, PA0_USB20_PLL_PREDIV, 0);
 
 	mtk_phy_update_field(com + U3P_USBPHYACR2, PA2_RG_U2PLL_BW, 3);
-=======
-	mtk_phy_update_bits(com + U3P_USBPHYACR0, PA0_USB20_PLL_PREDIV,
-			    PA0_USB20_PLL_PREDIV_VAL(0));
-
-	mtk_phy_update_bits(com + U3P_USBPHYACR2, PA2_RG_U2PLL_BW,
-			    PA2_RG_U2PLL_BW_VAL(3));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	writel(P2R_RG_U2PLL_FBDIV_26M, com + U3P_U2PHYA_RESV);
 
@@ -541,32 +466,18 @@ static void u2_phy_instance_init(struct mtk_tphy *tphy,
 
 	/* switch to USB function, and enable usb pll */
 	mtk_phy_clear_bits(com + U3P_U2PHYDTM0, P2C_FORCE_UART_EN | P2C_FORCE_SUSPENDM);
-<<<<<<< HEAD
 
 	mtk_phy_clear_bits(com + U3P_U2PHYDTM0,
 			   P2C_RG_XCVRSEL | P2C_RG_DATAIN | P2C_DTM0_PART_MASK);
 
 	mtk_phy_clear_bits(com + U3P_U2PHYDTM1, P2C_RG_UART_EN);
 
-=======
-
-	mtk_phy_update_bits(com + U3P_U2PHYDTM0, P2C_RG_XCVRSEL | P2C_RG_DATAIN,
-			    P2C_RG_XCVRSEL_VAL(1) | P2C_RG_DATAIN_VAL(0));
-
-	mtk_phy_clear_bits(com + U3P_U2PHYDTM1, P2C_RG_UART_EN);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mtk_phy_set_bits(com + U3P_USBPHYACR0, PA0_RG_USB20_INTR_EN);
 
 	/* disable switch 100uA current to SSUSB */
 	mtk_phy_clear_bits(com + U3P_USBPHYACR5, PA5_RG_U2_HS_100U_U3_EN);
 
-<<<<<<< HEAD
 	mtk_phy_clear_bits(com + U3P_U2PHYACR4, P2C_U2_GPIO_CTR_MSK);
-=======
-	if (!index)
-		mtk_phy_clear_bits(com + U3P_U2PHYACR4, P2C_U2_GPIO_CTR_MSK);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (tphy->pdata->avoid_rx_sen_degradation) {
 		if (!index) {
@@ -584,11 +495,7 @@ static void u2_phy_instance_init(struct mtk_tphy *tphy,
 	/* DP/DM BC1.1 path Disable */
 	mtk_phy_clear_bits(com + U3P_USBPHYACR6, PA6_RG_U2_BC11_SW_EN);
 
-<<<<<<< HEAD
 	mtk_phy_update_field(com + U3P_USBPHYACR6, PA6_RG_U2_SQTH, 2);
-=======
-	mtk_phy_update_bits(com + U3P_USBPHYACR6, PA6_RG_U2_SQTH, PA6_RG_U2_SQTH_VAL(2));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Workaround only for mt8195, HW fix it for others (V3) */
 	u2_phy_pll_26m_set(tphy, instance);
@@ -602,12 +509,6 @@ static void u2_phy_instance_power_on(struct mtk_tphy *tphy,
 	struct u2phy_banks *u2_banks = &instance->u2_banks;
 	void __iomem *com = u2_banks->com;
 	u32 index = instance->index;
-<<<<<<< HEAD
-=======
-
-	mtk_phy_clear_bits(com + U3P_U2PHYDTM0,
-			   P2C_RG_XCVRSEL | P2C_RG_DATAIN | P2C_DTM0_PART_MASK);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* OTG Enable */
 	mtk_phy_set_bits(com + U3P_USBPHYACR6, PA6_RG_U2_OTG_VBUSCMP_EN);
@@ -630,23 +531,12 @@ static void u2_phy_instance_power_off(struct mtk_tphy *tphy,
 	struct u2phy_banks *u2_banks = &instance->u2_banks;
 	void __iomem *com = u2_banks->com;
 	u32 index = instance->index;
-<<<<<<< HEAD
 
 	/* OTG Disable */
 	mtk_phy_clear_bits(com + U3P_USBPHYACR6, PA6_RG_U2_OTG_VBUSCMP_EN);
 
 	mtk_phy_clear_bits(com + U3P_U2PHYDTM1, P2C_RG_VBUSVALID | P2C_RG_AVALID);
 
-=======
-
-	mtk_phy_clear_bits(com + U3P_U2PHYDTM0, P2C_RG_XCVRSEL | P2C_RG_DATAIN);
-
-	/* OTG Disable */
-	mtk_phy_clear_bits(com + U3P_USBPHYACR6, PA6_RG_U2_OTG_VBUSCMP_EN);
-
-	mtk_phy_clear_bits(com + U3P_U2PHYDTM1, P2C_RG_VBUSVALID | P2C_RG_AVALID);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mtk_phy_set_bits(com + U3P_U2PHYDTM1, P2C_RG_SESSEND);
 
 	if (tphy->pdata->avoid_rx_sen_degradation && index) {
@@ -708,7 +598,6 @@ static void pcie_phy_instance_init(struct mtk_tphy *tphy,
 
 	mtk_phy_update_bits(phya + U3P_U3_PHYA_DA_REG0,
 			    P3A_RG_XTAL_EXT_PE1H | P3A_RG_XTAL_EXT_PE2H,
-<<<<<<< HEAD
 			    FIELD_PREP(P3A_RG_XTAL_EXT_PE1H, 0x2) |
 			    FIELD_PREP(P3A_RG_XTAL_EXT_PE2H, 0x2));
 
@@ -721,28 +610,10 @@ static void pcie_phy_instance_init(struct mtk_tphy *tphy,
 	mtk_phy_update_field(phya + U3P_U3_PHYA_DA_REG20, P3A_RG_PLL_DELTA1_PE2H, 0x3c);
 
 	mtk_phy_update_field(phya + U3P_U3_PHYA_DA_REG25, P3A_RG_PLL_DELTA_PE2H, 0x36);
-=======
-			    P3A_RG_XTAL_EXT_PE1H_VAL(0x2) | P3A_RG_XTAL_EXT_PE2H_VAL(0x2));
-
-	/* ref clk drive */
-	mtk_phy_update_bits(phya + U3P_U3_PHYA_REG1, P3A_RG_CLKDRV_AMP,
-			    P3A_RG_CLKDRV_AMP_VAL(0x4));
-
-	mtk_phy_update_bits(phya + U3P_U3_PHYA_REG0, P3A_RG_CLKDRV_OFF,
-			    P3A_RG_CLKDRV_OFF_VAL(0x1));
-
-	/* SSC delta -5000ppm */
-	mtk_phy_update_bits(phya + U3P_U3_PHYA_DA_REG20, P3A_RG_PLL_DELTA1_PE2H,
-			    P3A_RG_PLL_DELTA1_PE2H_VAL(0x3c));
-
-	mtk_phy_update_bits(phya + U3P_U3_PHYA_DA_REG25, P3A_RG_PLL_DELTA_PE2H,
-			    P3A_RG_PLL_DELTA_PE2H_VAL(0x36));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* change pll BW 0.6M */
 	mtk_phy_update_bits(phya + U3P_U3_PHYA_DA_REG5,
 			    P3A_RG_PLL_BR_PE2H | P3A_RG_PLL_IC_PE2H,
-<<<<<<< HEAD
 			    FIELD_PREP(P3A_RG_PLL_BR_PE2H, 0x1) |
 			    FIELD_PREP(P3A_RG_PLL_IC_PE2H, 0x1));
 
@@ -760,26 +631,6 @@ static void pcie_phy_instance_init(struct mtk_tphy *tphy,
 
 	mtk_phy_update_field(u3_banks->phyd + U3P_U3_PHYD_RXDET2,
 			     P3D_RG_RXDET_STB2_SET_P3, 0x10);
-=======
-			    P3A_RG_PLL_BR_PE2H_VAL(0x1) | P3A_RG_PLL_IC_PE2H_VAL(0x1));
-
-	mtk_phy_update_bits(phya + U3P_U3_PHYA_DA_REG4,
-			    P3A_RG_PLL_DIVEN_PE2H | P3A_RG_PLL_BC_PE2H,
-			    P3A_RG_PLL_BC_PE2H_VAL(0x3));
-
-	mtk_phy_update_bits(phya + U3P_U3_PHYA_DA_REG6, P3A_RG_PLL_IR_PE2H,
-			    P3A_RG_PLL_IR_PE2H_VAL(0x2));
-
-	mtk_phy_update_bits(phya + U3P_U3_PHYA_DA_REG7, P3A_RG_PLL_BP_PE2H,
-			    P3A_RG_PLL_BP_PE2H_VAL(0xa));
-
-	/* Tx Detect Rx Timing: 10us -> 5us */
-	mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_RXDET1,
-			    P3D_RG_RXDET_STB2_SET, P3D_RG_RXDET_STB2_SET_VAL(0x10));
-
-	mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_RXDET2,
-			    P3D_RG_RXDET_STB2_SET_P3, P3D_RG_RXDET_STB2_SET_P3_VAL(0x10));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* wait for PCIe subsys register to active */
 	usleep_range(2500, 3000);
@@ -820,7 +671,6 @@ static void sata_phy_instance_init(struct mtk_tphy *tphy,
 	/* charge current adjustment */
 	mtk_phy_update_bits(phyd + ANA_RG_CTRL_SIGNAL6,
 			    RG_CDR_BIRLTR_GEN1_MSK | RG_CDR_BC_GEN1_MSK,
-<<<<<<< HEAD
 			    FIELD_PREP(RG_CDR_BIRLTR_GEN1_MSK, 0x6) |
 			    FIELD_PREP(RG_CDR_BC_GEN1_MSK, 0x1a));
 
@@ -853,40 +703,6 @@ static void sata_phy_instance_init(struct mtk_tphy *tphy,
 	mtk_phy_update_field(phyd + ANA_RG_CTRL_SIGNAL1, RG_IDRV_0DB_GEN1_MSK, 0x20);
 
 	mtk_phy_update_field(phyd + ANA_EQ_EYE_CTRL_SIGNAL1, RG_EQ_DLEQ_LFI_GEN1_MSK, 0x03);
-=======
-			    RG_CDR_BIRLTR_GEN1_VAL(0x6) | RG_CDR_BC_GEN1_VAL(0x1a));
-
-	mtk_phy_update_bits(phyd + ANA_EQ_EYE_CTRL_SIGNAL4, RG_CDR_BIRLTD0_GEN1_MSK,
-			    RG_CDR_BIRLTD0_GEN1_VAL(0x18));
-
-	mtk_phy_update_bits(phyd + ANA_EQ_EYE_CTRL_SIGNAL5, RG_CDR_BIRLTD0_GEN3_MSK,
-			    RG_CDR_BIRLTD0_GEN3_VAL(0x06));
-
-	mtk_phy_update_bits(phyd + ANA_RG_CTRL_SIGNAL4,
-			    RG_CDR_BICLTR_GEN1_MSK | RG_CDR_BR_GEN2_MSK,
-			    RG_CDR_BICLTR_GEN1_VAL(0x0c) | RG_CDR_BR_GEN2_VAL(0x07));
-
-	mtk_phy_update_bits(phyd + PHYD_CTRL_SIGNAL_MODE4,
-			    RG_CDR_BICLTD0_GEN1_MSK | RG_CDR_BICLTD1_GEN1_MSK,
-			    RG_CDR_BICLTD0_GEN1_VAL(0x08) | RG_CDR_BICLTD1_GEN1_VAL(0x02));
-
-	mtk_phy_update_bits(phyd + PHYD_DESIGN_OPTION2, RG_LOCK_CNT_SEL_MSK,
-			    RG_LOCK_CNT_SEL_VAL(0x02));
-
-	mtk_phy_update_bits(phyd + PHYD_DESIGN_OPTION9,
-			    RG_T2_MIN_MSK | RG_TG_MIN_MSK,
-			    RG_T2_MIN_VAL(0x12) | RG_TG_MIN_VAL(0x04));
-
-	mtk_phy_update_bits(phyd + PHYD_DESIGN_OPTION9,
-			    RG_T2_MAX_MSK | RG_TG_MAX_MSK,
-			    RG_T2_MAX_VAL(0x31) | RG_TG_MAX_VAL(0x0e));
-
-	mtk_phy_update_bits(phyd + ANA_RG_CTRL_SIGNAL1, RG_IDRV_0DB_GEN1_MSK,
-			    RG_IDRV_0DB_GEN1_VAL(0x20));
-
-	mtk_phy_update_bits(phyd + ANA_EQ_EYE_CTRL_SIGNAL1, RG_EQ_DLEQ_LFI_GEN1_MSK,
-			    RG_EQ_DLEQ_LFI_GEN1_VAL(0x03));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev_dbg(tphy->dev, "%s(%d)\n", __func__, instance->index);
 }
@@ -980,7 +796,6 @@ static void u2_phy_props_set(struct mtk_tphy *tphy,
 
 	if (instance->bc12_en) /* BC1.2 path Enable */
 		mtk_phy_set_bits(com + U3P_U2PHYBC12C, P2C_RG_CHGDT_EN);
-<<<<<<< HEAD
 
 	if (tphy->pdata->version < MTK_PHY_V3 && instance->eye_src)
 		mtk_phy_update_field(com + U3P_USBPHYACR5, PA5_RG_U2_HSTX_SRCTRL,
@@ -1019,37 +834,6 @@ static int phy_type_syscon_get(struct mtk_phy_instance *instance,
 	struct of_phandle_args args;
 	int ret;
 
-=======
-
-	if (tphy->pdata->version < MTK_PHY_V3 && instance->eye_src)
-		mtk_phy_update_bits(com + U3P_USBPHYACR5, PA5_RG_U2_HSTX_SRCTRL,
-				    PA5_RG_U2_HSTX_SRCTRL_VAL(instance->eye_src));
-
-	if (instance->eye_vrt)
-		mtk_phy_update_bits(com + U3P_USBPHYACR1, PA1_RG_VRT_SEL,
-				    PA1_RG_VRT_SEL_VAL(instance->eye_vrt));
-
-	if (instance->eye_term)
-		mtk_phy_update_bits(com + U3P_USBPHYACR1, PA1_RG_TERM_SEL,
-				    PA1_RG_TERM_SEL_VAL(instance->eye_term));
-
-	if (instance->intr)
-		mtk_phy_update_bits(com + U3P_USBPHYACR1, PA1_RG_INTR_CAL,
-				    PA1_RG_INTR_CAL_VAL(instance->intr));
-
-	if (instance->discth)
-		mtk_phy_update_bits(com + U3P_USBPHYACR6, PA6_RG_U2_DISCTH,
-				    PA6_RG_U2_DISCTH_VAL(instance->discth));
-}
-
-/* type switch for usb3/pcie/sgmii/sata */
-static int phy_type_syscon_get(struct mtk_phy_instance *instance,
-			       struct device_node *dn)
-{
-	struct of_phandle_args args;
-	int ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* type switch function is optional */
 	if (!of_property_read_bool(dn, "mediatek,syscon-type"))
 		return 0;
@@ -1189,19 +973,13 @@ static void phy_efuse_set(struct mtk_phy_instance *instance)
 	case PHY_TYPE_USB2:
 		mtk_phy_set_bits(u2_banks->misc + U3P_MISC_REG1, MR1_EFUSE_AUTO_LOAD_DIS);
 
-<<<<<<< HEAD
 		mtk_phy_update_field(u2_banks->com + U3P_USBPHYACR1, PA1_RG_INTR_CAL,
 				     instance->efuse_intr);
-=======
-		mtk_phy_update_bits(u2_banks->com + U3P_USBPHYACR1, PA1_RG_INTR_CAL,
-				    PA1_RG_INTR_CAL_VAL(instance->efuse_intr));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case PHY_TYPE_USB3:
 	case PHY_TYPE_PCIE:
 		mtk_phy_set_bits(u3_banks->phyd + U3P_U3_PHYD_RSV, P3D_RG_EFUSE_AUTO_LOAD_DIS);
 
-<<<<<<< HEAD
 		mtk_phy_update_field(u3_banks->phyd + U3P_U3_PHYD_IMPCAL0, P3D_RG_TX_IMPEL,
 				    instance->efuse_tx_imp);
 		mtk_phy_set_bits(u3_banks->phyd + U3P_U3_PHYD_IMPCAL0, P3D_RG_FORCE_TX_IMPEL);
@@ -1212,18 +990,6 @@ static void phy_efuse_set(struct mtk_phy_instance *instance)
 
 		mtk_phy_update_field(u3_banks->phya + U3P_U3_PHYA_REG0, P3A_RG_IEXT_INTR,
 				    instance->efuse_intr);
-=======
-		mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_IMPCAL0, P3D_RG_TX_IMPEL,
-				    P3D_RG_TX_IMPEL_VAL(instance->efuse_tx_imp));
-		mtk_phy_set_bits(u3_banks->phyd + U3P_U3_PHYD_IMPCAL0, P3D_RG_FORCE_TX_IMPEL);
-
-		mtk_phy_update_bits(u3_banks->phyd + U3P_U3_PHYD_IMPCAL1, P3D_RG_RX_IMPEL,
-				    P3D_RG_RX_IMPEL_VAL(instance->efuse_rx_imp));
-		mtk_phy_set_bits(u3_banks->phyd + U3P_U3_PHYD_IMPCAL1, P3D_RG_FORCE_RX_IMPEL);
-
-		mtk_phy_update_bits(u3_banks->phya + U3P_U3_PHYA_REG0, P3A_RG_IEXT_INTR,
-				    P3A_RG_IEXT_INTR_VAL(instance->efuse_intr));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		dev_warn(dev, "no sw efuse for type %d\n", instance->type);

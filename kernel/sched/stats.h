@@ -206,10 +206,7 @@ static inline void psi_ttwu_dequeue(struct task_struct *p) {}
 static inline void psi_sched_switch(struct task_struct *prev,
 				    struct task_struct *next,
 				    bool sleep) {}
-<<<<<<< HEAD
 static inline void psi_account_irqtime(struct task_struct *task, u32 delta) {}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_PSI */
 
 #ifdef CONFIG_SCHED_INFO

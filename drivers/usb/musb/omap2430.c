@@ -401,7 +401,6 @@ static int omap2430_probe(struct platform_device *pdev)
 	if (ret) {
 		dev_err(&pdev->dev, "failed to add resources\n");
 		goto err2;
-<<<<<<< HEAD
 	}
 
 	if (populate_irqs) {
@@ -444,8 +443,6 @@ static int omap2430_probe(struct platform_device *pdev)
 			dev_err(&pdev->dev, "failed to add IRQ resources\n");
 			goto err2;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ret = platform_device_add_data(musb, pdata, sizeof(*pdata));

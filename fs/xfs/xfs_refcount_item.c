@@ -538,12 +538,8 @@ xfs_cui_item_recover(
 				&new_fsb, &new_len, &rcur);
 		if (error == -EFSCORRUPTED)
 			XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, mp,
-<<<<<<< HEAD
 					&cuip->cui_format,
 					sizeof(cuip->cui_format));
-=======
-					refc, sizeof(*refc));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (error)
 			goto abort_error;
 

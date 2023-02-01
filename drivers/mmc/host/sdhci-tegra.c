@@ -1801,8 +1801,6 @@ static int sdhci_tegra_remove(struct platform_device *pdev)
 }
 
 static int __maybe_unused sdhci_tegra_runtime_suspend(struct device *dev)
-<<<<<<< HEAD
-=======
 {
 	struct sdhci_host *host = dev_get_drvdata(dev);
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
@@ -1813,24 +1811,10 @@ static int __maybe_unused sdhci_tegra_runtime_suspend(struct device *dev)
 }
 
 static int __maybe_unused sdhci_tegra_runtime_resume(struct device *dev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sdhci_host *host = dev_get_drvdata(dev);
 	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
 
-<<<<<<< HEAD
-	clk_disable_unprepare(pltfm_host->clk);
-
-	return 0;
-}
-
-static int __maybe_unused sdhci_tegra_runtime_resume(struct device *dev)
-{
-	struct sdhci_host *host = dev_get_drvdata(dev);
-	struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
-
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return clk_prepare_enable(pltfm_host->clk);
 }
 

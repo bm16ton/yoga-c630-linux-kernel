@@ -93,19 +93,11 @@ static void gen9_enable_guc_interrupts(struct intel_guc *guc)
 
 	assert_rpm_wakelock_held(&gt->i915->runtime_pm);
 
-<<<<<<< HEAD
 	spin_lock_irq(gt->irq_lock);
 	WARN_ON_ONCE(intel_uncore_read(gt->uncore, GEN8_GT_IIR(2)) &
 		     gt->pm_guc_events);
 	gen6_gt_pm_enable_irq(gt, gt->pm_guc_events);
 	spin_unlock_irq(gt->irq_lock);
-=======
-	spin_lock_irq(&gt->irq_lock);
-	WARN_ON_ONCE(intel_uncore_read(gt->uncore, GEN8_GT_IIR(2)) &
-		     gt->pm_guc_events);
-	gen6_gt_pm_enable_irq(gt, gt->pm_guc_events);
-	spin_unlock_irq(&gt->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void gen9_disable_guc_interrupts(struct intel_guc *guc)
@@ -114,11 +106,7 @@ static void gen9_disable_guc_interrupts(struct intel_guc *guc)
 
 	assert_rpm_wakelock_held(&gt->i915->runtime_pm);
 
-<<<<<<< HEAD
 	spin_lock_irq(gt->irq_lock);
-=======
-	spin_lock_irq(&gt->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	gen6_gt_pm_disable_irq(gt, gt->pm_guc_events);
 
@@ -142,32 +130,20 @@ static void gen11_enable_guc_interrupts(struct intel_guc *guc)
 	struct intel_gt *gt = guc_to_gt(guc);
 	u32 events = REG_FIELD_PREP(ENGINE1_MASK, GUC_INTR_GUC2HOST);
 
-<<<<<<< HEAD
 	spin_lock_irq(gt->irq_lock);
-=======
-	spin_lock_irq(&gt->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	WARN_ON_ONCE(gen11_gt_reset_one_iir(gt, 0, GEN11_GUC));
 	intel_uncore_write(gt->uncore,
 			   GEN11_GUC_SG_INTR_ENABLE, events);
 	intel_uncore_write(gt->uncore,
 			   GEN11_GUC_SG_INTR_MASK, ~events);
-<<<<<<< HEAD
 	spin_unlock_irq(gt->irq_lock);
-=======
-	spin_unlock_irq(&gt->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void gen11_disable_guc_interrupts(struct intel_guc *guc)
 {
 	struct intel_gt *gt = guc_to_gt(guc);
 
-<<<<<<< HEAD
 	spin_lock_irq(gt->irq_lock);
-=======
-	spin_lock_irq(&gt->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	intel_uncore_write(gt->uncore, GEN11_GUC_SG_INTR_MASK, ~0);
 	intel_uncore_write(gt->uncore, GEN11_GUC_SG_INTR_ENABLE, 0);
@@ -248,7 +224,6 @@ static u32 guc_ctl_feature_flags(struct intel_guc *guc)
 
 static u32 guc_ctl_log_params_flags(struct intel_guc *guc)
 {
-<<<<<<< HEAD
 	struct intel_guc_log *log = &guc->log;
 	u32 offset, flags;
 
@@ -265,55 +240,6 @@ static u32 guc_ctl_log_params_flags(struct intel_guc *guc)
 		(log->sizes[GUC_LOG_SECTIONS_CAPTURE].count << GUC_LOG_CAPTURE_SHIFT) |
 		(offset << GUC_LOG_BUF_ADDR_SHIFT);
 
-=======
-	u32 offset = intel_guc_ggtt_offset(guc, guc->log.vma) >> PAGE_SHIFT;
-	u32 flags;
-
-	#if (((CRASH_BUFFER_SIZE) % SZ_1M) == 0)
-	#define LOG_UNIT SZ_1M
-	#define LOG_FLAG GUC_LOG_LOG_ALLOC_UNITS
-	#else
-	#define LOG_UNIT SZ_4K
-	#define LOG_FLAG 0
-	#endif
-
-	#if (((CAPTURE_BUFFER_SIZE) % SZ_1M) == 0)
-	#define CAPTURE_UNIT SZ_1M
-	#define CAPTURE_FLAG GUC_LOG_CAPTURE_ALLOC_UNITS
-	#else
-	#define CAPTURE_UNIT SZ_4K
-	#define CAPTURE_FLAG 0
-	#endif
-
-	BUILD_BUG_ON(!CRASH_BUFFER_SIZE);
-	BUILD_BUG_ON(!IS_ALIGNED(CRASH_BUFFER_SIZE, LOG_UNIT));
-	BUILD_BUG_ON(!DEBUG_BUFFER_SIZE);
-	BUILD_BUG_ON(!IS_ALIGNED(DEBUG_BUFFER_SIZE, LOG_UNIT));
-	BUILD_BUG_ON(!CAPTURE_BUFFER_SIZE);
-	BUILD_BUG_ON(!IS_ALIGNED(CAPTURE_BUFFER_SIZE, CAPTURE_UNIT));
-
-	BUILD_BUG_ON((CRASH_BUFFER_SIZE / LOG_UNIT - 1) >
-			(GUC_LOG_CRASH_MASK >> GUC_LOG_CRASH_SHIFT));
-	BUILD_BUG_ON((DEBUG_BUFFER_SIZE / LOG_UNIT - 1) >
-			(GUC_LOG_DEBUG_MASK >> GUC_LOG_DEBUG_SHIFT));
-	BUILD_BUG_ON((CAPTURE_BUFFER_SIZE / CAPTURE_UNIT - 1) >
-			(GUC_LOG_CAPTURE_MASK >> GUC_LOG_CAPTURE_SHIFT));
-
-	flags = GUC_LOG_VALID |
-		GUC_LOG_NOTIFY_ON_HALF_FULL |
-		CAPTURE_FLAG |
-		LOG_FLAG |
-		((CRASH_BUFFER_SIZE / LOG_UNIT - 1) << GUC_LOG_CRASH_SHIFT) |
-		((DEBUG_BUFFER_SIZE / LOG_UNIT - 1) << GUC_LOG_DEBUG_SHIFT) |
-		((CAPTURE_BUFFER_SIZE / CAPTURE_UNIT - 1) << GUC_LOG_CAPTURE_SHIFT) |
-		(offset << GUC_LOG_BUF_ADDR_SHIFT);
-
-	#undef LOG_UNIT
-	#undef LOG_FLAG
-	#undef CAPTURE_UNIT
-	#undef CAPTURE_FLAG
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return flags;
 }
 

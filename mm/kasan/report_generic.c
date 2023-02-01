@@ -109,11 +109,7 @@ static const char *get_wild_bug_type(struct kasan_report_info *info)
 	return bug_type;
 }
 
-<<<<<<< HEAD
 static const char *get_bug_type(struct kasan_report_info *info)
-=======
-const char *kasan_get_bug_type(struct kasan_report_info *info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/*
 	 * If access_size is a negative number, then it has reason to be

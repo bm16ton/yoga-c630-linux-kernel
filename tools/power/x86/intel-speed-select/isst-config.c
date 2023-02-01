@@ -15,11 +15,7 @@ struct process_cmd_struct {
 	int arg;
 };
 
-<<<<<<< HEAD
 static const char *version_str = "v1.13";
-=======
-static const char *version_str = "v1.12";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const int supported_api_ver = 1;
 static struct isst_if_platform_info isst_platform_info;
@@ -458,11 +454,7 @@ static void force_all_cpus_online(void)
 	unlink("/var/run/isst_cpu_topology.dat");
 }
 
-<<<<<<< HEAD
 void for_each_online_package_in_set(void (*callback)(struct isst_id *, void *, void *,
-=======
-void for_each_online_package_in_set(void (*callback)(int, void *, void *,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						     void *, void *),
 				    void *arg1, void *arg2, void *arg3,
 				    void *arg4)
@@ -1006,11 +998,7 @@ static void isst_print_extended_platform_info(void)
 	else
 		fprintf(outf, "Intel(R) SST-BF (feature base-freq) is not supported\n");
 
-<<<<<<< HEAD
 	ret = isst_read_pm_config(&id, &cp_state, &cp_cap);
-=======
-	ret = isst_read_pm_config(i, &cp_state, &cp_cap);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		fprintf(outf, "Intel(R) SST-CP (feature core-power) status is unknown\n");
 		return;
@@ -1907,11 +1895,7 @@ static void set_fact_for_cpu(struct isst_id *id, void *arg1, void *arg2, void *a
 		goto disp_results;
 	}
 
-<<<<<<< HEAD
 	ret = isst_get_ctdp_levels(id, &pkg_dev);
-=======
-	ret = isst_get_ctdp_levels(cpu, &pkg_dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		isst_display_error_info_message(1, "Failed to get number of levels", 0, 0);
 		goto disp_results;
@@ -2976,17 +2960,6 @@ static void cmdline(int argc, char **argv)
 	create_cpu_map();
 
 	if (oob_mode) {
-		if (debug_flag)
-			fprintf(stderr, "OOB mode is enabled in debug mode\n");
-
-		ret = isst_daemon(debug_flag, poll_interval, no_daemon);
-		if (ret)
-			fprintf(stderr, "OOB mode enable failed\n");
-		goto out;
-	}
-
-	if (oob_mode) {
-		create_cpu_map();
 		if (debug_flag)
 			fprintf(stderr, "OOB mode is enabled in debug mode\n");
 

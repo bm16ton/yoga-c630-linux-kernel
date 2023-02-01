@@ -122,11 +122,7 @@ void kvm_arch_exit(void)
 {
 }
 
-<<<<<<< HEAD
 static int __init riscv_kvm_init(void)
-=======
-static int riscv_kvm_init(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
 }

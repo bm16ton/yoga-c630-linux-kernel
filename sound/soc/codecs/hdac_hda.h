@@ -23,11 +23,7 @@ struct hdac_hda_pcm {
 };
 
 struct hdac_hda_priv {
-<<<<<<< HEAD
 	struct hda_codec *codec;
-=======
-	struct hda_codec codec;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct hdac_hda_pcm pcm[HDAC_DAI_ID_NUM];
 	bool need_display_power;
 };

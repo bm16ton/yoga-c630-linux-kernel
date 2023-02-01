@@ -1235,11 +1235,7 @@ struct ib_cm_id *ib_cm_insert_listen(struct ib_device *device,
 	if (IS_ERR(cm_id_priv))
 		return ERR_CAST(cm_id_priv);
 
-<<<<<<< HEAD
 	err = cm_init_listen(cm_id_priv, service_id);
-=======
-	err = cm_init_listen(cm_id_priv, service_id, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err) {
 		ib_destroy_cm_id(&cm_id_priv->id);
 		return ERR_PTR(err);
@@ -1270,15 +1266,9 @@ EXPORT_SYMBOL(ib_cm_insert_listen);
 static __be64 cm_form_tid(struct cm_id_private *cm_id_priv)
 {
 	u64 hi_tid = 0, low_tid;
-<<<<<<< HEAD
 
 	lockdep_assert_held(&cm_id_priv->lock);
 
-=======
-
-	lockdep_assert_held(&cm_id_priv->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	low_tid = (u64)cm_id_priv->id.local_id;
 	if (!cm_id_priv->av.port)
 		return cpu_to_be64(low_tid);
@@ -1539,7 +1529,6 @@ int ib_send_cm_req(struct ib_cm_id *cm_id,
 	spin_lock_irqsave(&cm_id_priv->lock, flags);
 
 	cm_move_av_from_path(&cm_id_priv->av, &av);
-<<<<<<< HEAD
 	if (param->primary_path_outbound)
 		cm_id_priv->av.dlid_datapath =
 			be16_to_cpu(param->primary_path_outbound->ib.dlid);
@@ -1553,17 +1542,6 @@ int ib_send_cm_req(struct ib_cm_id *cm_id,
 		goto out_unlock;
 	}
 
-=======
-	if (param->alternate_path)
-		cm_move_av_from_path(&cm_id_priv->alt_av, &alt_av);
-
-	msg = cm_alloc_priv_msg(cm_id_priv);
-	if (IS_ERR(msg)) {
-		ret = PTR_ERR(msg);
-		goto out_unlock;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	req_msg = (struct cm_req_msg *)msg->mad;
 	cm_format_req(req_msg, cm_id_priv, param);
 	cm_id_priv->tid = req_msg->hdr.tid;

@@ -72,10 +72,6 @@ struct thread_struct {
 
 
 void start_thread(struct pt_regs *regs, unsigned long nip, unsigned long sp);
-<<<<<<< HEAD
-=======
-void release_thread(struct task_struct *);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned long __get_wchan(struct task_struct *p);
 
 #define cpu_relax()     barrier()

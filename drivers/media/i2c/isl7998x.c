@@ -8,11 +8,7 @@
 
 #include <linux/bitfield.h>
 #include <linux/delay.h>
-<<<<<<< HEAD
 #include <linux/gpio/consumer.h>
-=======
-#include <linux/gpio.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/i2c.h>
 #include <linux/module.h>
 #include <linux/of_graph.h>
@@ -1548,11 +1544,7 @@ err_entity_cleanup:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void isl7998x_remove(struct i2c_client *client)
-=======
-static int isl7998x_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct isl7998x *isl7998x = i2c_to_isl7998x(client);
 
@@ -1560,11 +1552,6 @@ static int isl7998x_remove(struct i2c_client *client)
 	v4l2_async_unregister_subdev(&isl7998x->subdev);
 	isl7998x_remove_controls(isl7998x);
 	media_entity_cleanup(&isl7998x->subdev.entity);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id isl7998x_of_match[] = {

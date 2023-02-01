@@ -26,18 +26,10 @@
 /*
  * Max IB immediate data size is 2^28 (MAX_IMM_PAYL_BITS)
  * and the minimum chunk size is 4096 (2^12).
-<<<<<<< HEAD
  * So the maximum sess_queue_depth is 65535 (2^16 - 1) in theory
  * since queue_depth in rtrs_msg_conn_rsp is defined as le16.
  * Therefore the pratical max value of sess_queue_depth is
  * somewhere between 1 and 65535 and it depends on the system.
-=======
- * So the maximum sess_queue_depth is 65536 (2^16) in theory.
- * But mempool_create, create_qp and ib_post_send fail with
- * "cannot allocate memory" error if sess_queue_depth is too big.
- * Therefore the pratical max value of sess_queue_depth is
- * somewhere between 1 and 65534 and it depends on the system.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #define MAX_SESS_QUEUE_DEPTH 65535
 

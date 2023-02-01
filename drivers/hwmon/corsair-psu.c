@@ -55,10 +55,7 @@
 #define SECONDS_PER_DAY		(SECONDS_PER_HOUR * 24)
 #define RAIL_COUNT		3 /* 3v3 + 5v + 12v */
 #define TEMP_COUNT		2
-<<<<<<< HEAD
 #define OCP_MULTI_RAIL		0x02
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define PSU_CMD_SELECT_RAIL	0x00 /* expects length 2 */
 #define PSU_CMD_RAIL_VOLTS_HCRIT 0x40 /* the rest of the commands expect length 3 */

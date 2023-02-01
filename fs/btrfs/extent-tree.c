@@ -2494,7 +2494,6 @@ static u64 first_logical_byte(struct btrfs_fs_info *fs_info)
 {
 	struct rb_node *leftmost;
 	u64 bytenr = 0;
-<<<<<<< HEAD
 
 	read_lock(&fs_info->block_group_cache_lock);
 	/* Get the block group with the lowest logical start address. */
@@ -2502,15 +2501,6 @@ static u64 first_logical_byte(struct btrfs_fs_info *fs_info)
 	if (leftmost) {
 		struct btrfs_block_group *bg;
 
-=======
-
-	read_lock(&fs_info->block_group_cache_lock);
-	/* Get the block group with the lowest logical start address. */
-	leftmost = rb_first_cached(&fs_info->block_group_cache_tree);
-	if (leftmost) {
-		struct btrfs_block_group *bg;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bg = rb_entry(leftmost, struct btrfs_block_group, cache_node);
 		bytenr = bg->start;
 	}
@@ -3819,12 +3809,8 @@ static int do_allocation_zoned(struct btrfs_block_group *block_group,
 	       block_group->start == fs_info->data_reloc_bg ||
 	       fs_info->data_reloc_bg == 0);
 
-<<<<<<< HEAD
 	if (block_group->ro ||
 	    test_bit(BLOCK_GROUP_FLAG_ZONED_DATA_RELOC, &block_group->runtime_flags)) {
-=======
-	if (block_group->ro || block_group->zoned_data_reloc_ongoing) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = 1;
 		goto out;
 	}
@@ -3901,11 +3887,7 @@ out:
 		 * regular extents) at the same time to the same zone, which
 		 * easily break the write pointer.
 		 */
-<<<<<<< HEAD
 		set_bit(BLOCK_GROUP_FLAG_ZONED_DATA_RELOC, &block_group->runtime_flags);
-=======
-		block_group->zoned_data_reloc_ongoing = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		fs_info->data_reloc_bg = 0;
 	}
 	spin_unlock(&fs_info->relocation_bg_lock);

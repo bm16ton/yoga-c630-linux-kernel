@@ -657,10 +657,6 @@ static const struct dc_debug_options debug_defaults_drv = {
 		.usbc_combo_phy_reset_wa = true,
 		.dmub_command_table = true,
 		.use_max_lb = true,
-<<<<<<< HEAD
-=======
-		.optimize_edp_link_rate = true
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct dc_debug_options debug_defaults_diags = {
@@ -678,15 +674,12 @@ static const struct dc_debug_options debug_defaults_diags = {
 		.disable_psr = true,
 		.enable_tri_buf = true,
 		.use_max_lb = true
-<<<<<<< HEAD
 };
 
 static const struct dc_panel_config panel_config_defaults = {
 		.ilr = {
 			.optimize_edp_link_rate = true,
 		},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum dcn20_clk_src_array_id {
@@ -1425,10 +1418,7 @@ static const struct resource_funcs dcn21_res_pool_funcs = {
 	.set_mcif_arb_params = dcn20_set_mcif_arb_params,
 	.find_first_free_match_stream_enc_for_link = dcn10_find_first_free_match_stream_enc_for_link,
 	.update_bw_bounding_box = dcn21_update_bw_bounding_box,
-<<<<<<< HEAD
 	.get_panel_config_defaults = dcn21_get_panel_config_defaults,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static bool dcn21_resource_construct(

@@ -298,10 +298,7 @@ static enum rq_end_io_ret end_clone_request(struct request *clone,
 	struct dm_rq_target_io *tio = clone->end_io_data;
 
 	dm_complete_request(tio->orig, error);
-<<<<<<< HEAD
 	return RQ_END_IO_NONE;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int dm_rq_bio_constructor(struct bio *bio, struct bio *bio_orig,

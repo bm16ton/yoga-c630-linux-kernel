@@ -8,15 +8,11 @@
 #include <asm/addrspace.h>
 #include <asm/asm.h>
 #include <asm/asmmacro.h>
-<<<<<<< HEAD
 #include <asm/bug.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/regdef.h>
 #include <asm/loongarch.h>
 #include <asm/stackframe.h>
 
-<<<<<<< HEAD
 #ifdef CONFIG_EFI_STUB
 
 #include "efi-header.S"
@@ -45,10 +41,6 @@ SYM_DATA(kernel_offset, .long kernel_offset - _text);
 
 	.align 12
 
-=======
-	__REF
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 SYM_CODE_START(kernel_entry)			# kernel entry point
 
 	/* Config direct window and set PG */
@@ -70,40 +62,26 @@ SYM_CODE_START(kernel_entry)			# kernel entry point
 	li.w		t0, 0x00		# FPE=0, SXE=0, ASXE=0, BTE=0
 	csrwr		t0, LOONGARCH_CSR_EUEN
 
-<<<<<<< HEAD
 	la.pcrel	t0, __bss_start		# clear .bss
 	st.d		zero, t0, 0
 	la.pcrel	t1, __bss_stop - LONGSIZE
-=======
-	la		t0, __bss_start		# clear .bss
-	st.d		zero, t0, 0
-	la		t1, __bss_stop - LONGSIZE
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 1:
 	addi.d		t0, t0, LONGSIZE
 	st.d		zero, t0, 0
 	bne		t0, t1, 1b
 
-<<<<<<< HEAD
 	la.pcrel	t0, fw_arg0
 	st.d		a0, t0, 0		# firmware arguments
 	la.pcrel	t0, fw_arg1
 	st.d		a1, t0, 0
 	la.pcrel	t0, fw_arg2
 	st.d		a2, t0, 0
-=======
-	la		t0, fw_arg0
-	st.d		a0, t0, 0		# firmware arguments
-	la		t0, fw_arg1
-	st.d		a1, t0, 0
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* KSave3 used for percpu base, initialized as 0 */
 	csrwr		zero, PERCPU_BASE_KS
 	/* GPR21 used for percpu base (runtime), initialized as 0 */
 	move		u0, zero
 
-<<<<<<< HEAD
 	la.pcrel	tp, init_thread_union
 	/* Set the SP after an empty pt_regs.  */
 	PTR_LI		sp, (_THREAD_SIZE - PT_SIZE)
@@ -112,16 +90,6 @@ SYM_CODE_START(kernel_entry)			# kernel entry point
 
 	bl		start_kernel
 	ASM_BUG()
-=======
-	la		tp, init_thread_union
-	/* Set the SP after an empty pt_regs.  */
-	PTR_LI		sp, (_THREAD_SIZE - 32 - PT_SIZE)
-	PTR_ADD		sp, sp, tp
-	set_saved_sp	sp, t0, t1
-	PTR_ADDI	sp, sp, -4 * SZREG	# init stack pointer
-
-	bl		start_kernel
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 SYM_CODE_END(kernel_entry)
 
@@ -153,11 +121,8 @@ SYM_CODE_START(smpboot_entry)
 	ld.d		tp, t0, CPU_BOOT_TINFO
 
 	bl		start_secondary
-<<<<<<< HEAD
 	ASM_BUG()
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 SYM_CODE_END(smpboot_entry)
 
 #endif /* CONFIG_SMP */

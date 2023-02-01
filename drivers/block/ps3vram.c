@@ -587,11 +587,8 @@ static void ps3vram_submit_bio(struct bio *bio)
 	dev_dbg(&dev->core, "%s\n", __func__);
 
 	bio = bio_split_to_limits(bio);
-<<<<<<< HEAD
 	if (!bio)
 		return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	spin_lock_irq(&priv->lock);
 	busy = !bio_list_empty(&priv->list);

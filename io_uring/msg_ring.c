@@ -164,20 +164,10 @@ int io_msg_ring(struct io_kiocb *req, unsigned int issue_flags)
 	}
 
 done:
-<<<<<<< HEAD
 	if (ret == -EAGAIN)
 		return -EAGAIN;
 	if (ret < 0)
 		req_set_fail(req);
 	io_req_set_res(req, ret, 0);
-=======
-	if (ret < 0)
-		req_set_fail(req);
-	io_req_set_res(req, ret, 0);
-	/* put file to avoid an attempt to IOPOLL the req */
-	if (!(req->flags & REQ_F_FIXED_FILE))
-		io_put_file(req->file);
-	req->file = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return IOU_OK;
 }

@@ -222,18 +222,11 @@ int vpu_enc_set_param(struct venc_vpu_inst *vpu,
 	return 0;
 }
 
-<<<<<<< HEAD
 static int vpu_enc_encode_32bits(struct venc_vpu_inst *vpu,
 				 unsigned int bs_mode,
 				 struct venc_frm_buf *frm_buf,
 				 struct mtk_vcodec_mem *bs_buf,
 				 struct venc_frame_info *frame_info)
-=======
-int vpu_enc_encode(struct venc_vpu_inst *vpu, unsigned int bs_mode,
-		   struct venc_frm_buf *frm_buf,
-		   struct mtk_vcodec_mem *bs_buf,
-		   struct venc_frame_info *frame_info)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const bool is_ext = MTK_ENC_CTX_IS_EXT(vpu->ctx);
 	size_t msg_size = is_ext ?
@@ -275,7 +268,6 @@ int vpu_enc_encode(struct venc_vpu_inst *vpu, unsigned int bs_mode,
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	return 0;
 }
 
@@ -343,8 +335,6 @@ int vpu_enc_encode(struct venc_vpu_inst *vpu, unsigned int bs_mode,
 	if (ret)
 		return ret;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mtk_vcodec_debug(vpu, "bs_mode %d state %d size %d key_frm %d <-",
 			 bs_mode, vpu->state, vpu->bs_size, vpu->is_key_frm);
 

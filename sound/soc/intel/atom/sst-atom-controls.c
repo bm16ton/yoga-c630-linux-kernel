@@ -831,15 +831,9 @@ static int sst_get_ssp_mode(struct snd_soc_dai *dai, unsigned int fmt)
 	dev_dbg(dai->dev, "Enter:%s, format=%x\n", __func__, format);
 
 	switch (format) {
-<<<<<<< HEAD
 	case SND_SOC_DAIFMT_BP_FP:
 		return SSP_MODE_PROVIDER;
 	case SND_SOC_DAIFMT_BC_FC:
-=======
-	case SND_SOC_DAIFMT_CBC_CFC:
-		return SSP_MODE_PROVIDER;
-	case SND_SOC_DAIFMT_CBP_CFP:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return SSP_MODE_CONSUMER;
 	default:
 		dev_err(dai->dev, "Invalid ssp protocol: %d\n", format);

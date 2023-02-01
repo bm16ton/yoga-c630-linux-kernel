@@ -864,7 +864,6 @@ static void slcan_close(struct tty_struct *tty)
 {
 	struct slcan *sl = (struct slcan *)tty->disc_data;
 
-<<<<<<< HEAD
 	unregister_candev(sl->dev);
 
 	/*
@@ -872,13 +871,6 @@ static void slcan_close(struct tty_struct *tty)
 	 * sure this is not running before freeing it up.
 	 */
 	flush_work(&sl->tx_work);
-=======
-	/* unregister_netdev() calls .ndo_stop() so we don't have to.
-	 * Our .ndo_stop() also flushes the TTY write wakeup handler,
-	 * so we can safely set sl->tty = NULL after this.
-	 */
-	unregister_candev(sl->dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Mark channel as dead */
 	spin_lock_bh(&sl->lock);

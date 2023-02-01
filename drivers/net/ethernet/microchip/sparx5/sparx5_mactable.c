@@ -186,13 +186,8 @@ bool sparx5_mact_getnext(struct sparx5 *sparx5,
 	return ret == 0;
 }
 
-<<<<<<< HEAD
 int sparx5_mact_find(struct sparx5 *sparx5,
 		     const unsigned char mac[ETH_ALEN], u16 vid, u32 *pcfg2)
-=======
-bool sparx5_mact_find(struct sparx5 *sparx5,
-		      const unsigned char mac[ETH_ALEN], u16 vid, u32 *pcfg2)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 	u32 cfg2;

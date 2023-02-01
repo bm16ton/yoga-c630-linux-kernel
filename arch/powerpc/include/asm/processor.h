@@ -366,15 +366,11 @@ static inline unsigned long __pack_fe01(unsigned int fpmode)
 		PPC_WAIT(2, 0),	/* aka pause_short */			\
 		%0) :: "i" (CPU_FTR_ARCH_31) : "memory")
 
-<<<<<<< HEAD
 #define spin_end()							\
 	asm volatile(ASM_FTR_IFCLR(					\
 		"or 2,2,2", /* HMT_MEDIUM */				\
 		"nop",							\
 		%0) :: "i" (CPU_FTR_ARCH_31) : "memory")
-=======
-#define spin_end()	HMT_medium()
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif
 
@@ -441,11 +437,8 @@ extern int fix_alignment(struct pt_regs *);
 #endif
 
 int do_mathemu(struct pt_regs *regs);
-<<<<<<< HEAD
 int do_spe_mathemu(struct pt_regs *regs);
 int speround_handler(struct pt_regs *regs);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* VMX copying */
 int enter_vmx_usercopy(void);

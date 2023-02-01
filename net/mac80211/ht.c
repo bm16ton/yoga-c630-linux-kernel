@@ -249,7 +249,6 @@ bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
 
  apply:
 	changed = memcmp(&link_sta->pub->ht_cap, &ht_cap, sizeof(ht_cap));
-<<<<<<< HEAD
 
 	memcpy(&link_sta->pub->ht_cap, &ht_cap, sizeof(ht_cap));
 
@@ -260,18 +259,6 @@ bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
 	else
 		width = link_conf->chandef.width;
 
-=======
-
-	memcpy(&link_sta->pub->ht_cap, &ht_cap, sizeof(ht_cap));
-
-	rcu_read_lock();
-	link_conf = rcu_dereference(sdata->vif.link_conf[link_sta->link_id]);
-	if (WARN_ON(!link_conf))
-		width = NL80211_CHAN_WIDTH_20_NOHT;
-	else
-		width = link_conf->chandef.width;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (width) {
 	default:
 		WARN_ON_ONCE(1);

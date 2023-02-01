@@ -103,10 +103,7 @@ FEATURE_TESTS_EXTRA :=                  \
          libbpf-bpf_prog_load           \
          libbpf-bpf_object__next_program \
          libbpf-bpf_object__next_map    \
-<<<<<<< HEAD
          libbpf-bpf_program__set_insns  \
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
          libbpf-bpf_create_map		\
          libpfm4                        \
          libdebuginfod			\
@@ -140,15 +137,12 @@ FEATURE_DISPLAY ?=              \
          bpf			\
          libaio			\
          libzstd
-<<<<<<< HEAD
 
 #
 # Declare group members of a feature to display the logical OR of the detection
 # result instead of each member result.
 #
 FEATURE_GROUP_MEMBERS-libbfd = libbfd-liberty libbfd-liberty-z
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # Set FEATURE_CHECK_(C|LD)FLAGS-all for all FEATURE_TESTS features.
 # If in the future we need per-feature checks/flags for features not
@@ -266,7 +260,6 @@ ifeq ($(VF),1)
   feature_verbose := 1
 endif
 
-<<<<<<< HEAD
 ifneq ($(feature_verbose),1)
   #
   # Determine the features to omit from the displayed message, as only the
@@ -286,30 +279,10 @@ define feature_display_entries_code
   ifeq ($(feature_verbose),1)
     $(eval TMP := $(filter-out $(FEATURE_DISPLAY),$(FEATURE_TESTS)))
     $(foreach feat,$(TMP),$(call feature_print_status,$(feat),) $$(info $(MSG)))
-=======
-feature_display_entries = $(eval $(feature_display_entries_code))
-define feature_display_entries_code
-  ifeq ($(feature_display),1)
-    $(info )
-    $(info Auto-detecting system features:)
-    $(foreach feat,$(FEATURE_DISPLAY),$(call feature_print_status,$(feat),))
-    ifneq ($(feature_verbose),1)
-      $(info )
-    endif
-  endif
-
-  ifeq ($(feature_verbose),1)
-    TMP := $(filter-out $(FEATURE_DISPLAY),$(FEATURE_TESTS))
-    $(foreach feat,$(TMP),$(call feature_print_status,$(feat),))
-    $(info )
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   endif
 endef
 
 ifeq ($(FEATURE_DISPLAY_DEFERRED),)
   $(call feature_display_entries)
-<<<<<<< HEAD
   $(info )
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endif

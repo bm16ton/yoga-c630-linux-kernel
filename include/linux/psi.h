@@ -7,10 +7,7 @@
 #include <linux/sched.h>
 #include <linux/poll.h>
 #include <linux/cgroup-defs.h>
-<<<<<<< HEAD
 #include <linux/cgroup.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct seq_file;
 struct css_set;
@@ -22,13 +19,6 @@ extern struct psi_group psi_system;
 
 void psi_init(void);
 
-<<<<<<< HEAD
-=======
-void psi_task_change(struct task_struct *task, int clear, int set);
-void psi_task_switch(struct task_struct *prev, struct task_struct *next,
-		     bool sleep);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void psi_memstall_enter(unsigned long *flags);
 void psi_memstall_leave(unsigned long *flags);
 
@@ -49,10 +39,7 @@ static inline struct psi_group *cgroup_psi(struct cgroup *cgrp)
 int psi_cgroup_alloc(struct cgroup *cgrp);
 void psi_cgroup_free(struct cgroup *cgrp);
 void cgroup_move_task(struct task_struct *p, struct css_set *to);
-<<<<<<< HEAD
 void psi_cgroup_restart(struct psi_group *group);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #else /* CONFIG_PSI */

@@ -587,13 +587,10 @@ void *kvmalloc_node(size_t size, gfp_t flags, int node)
 	if (ret || size <= PAGE_SIZE)
 		return ret;
 
-<<<<<<< HEAD
 	/* non-sleeping allocations are not supported by vmalloc */
 	if (!gfpflags_allow_blocking(flags))
 		return NULL;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Don't even allow crazy sizes */
 	if (unlikely(size > INT_MAX)) {
 		WARN_ON_ONCE(!(flags & __GFP_NOWARN));
@@ -671,7 +668,6 @@ EXPORT_SYMBOL(kvrealloc);
  * @flags: the type of memory to allocate (see kmalloc).
  */
 void *__vmalloc_array(size_t n, size_t size, gfp_t flags)
-<<<<<<< HEAD
 {
 	size_t bytes;
 
@@ -713,49 +709,6 @@ void *vcalloc(size_t n, size_t size)
 {
 	return __vmalloc_array(n, size, GFP_KERNEL | __GFP_ZERO);
 }
-=======
-{
-	size_t bytes;
-
-	if (unlikely(check_mul_overflow(n, size, &bytes)))
-		return NULL;
-	return __vmalloc(bytes, flags);
-}
-EXPORT_SYMBOL(__vmalloc_array);
-
-/**
- * vmalloc_array - allocate memory for a virtually contiguous array.
- * @n: number of elements.
- * @size: element size.
- */
-void *vmalloc_array(size_t n, size_t size)
-{
-	return __vmalloc_array(n, size, GFP_KERNEL);
-}
-EXPORT_SYMBOL(vmalloc_array);
-
-/**
- * __vcalloc - allocate and zero memory for a virtually contiguous array.
- * @n: number of elements.
- * @size: element size.
- * @flags: the type of memory to allocate (see kmalloc).
- */
-void *__vcalloc(size_t n, size_t size, gfp_t flags)
-{
-	return __vmalloc_array(n, size, flags | __GFP_ZERO);
-}
-EXPORT_SYMBOL(__vcalloc);
-
-/**
- * vcalloc - allocate and zero memory for a virtually contiguous array.
- * @n: number of elements.
- * @size: element size.
- */
-void *vcalloc(size_t n, size_t size)
-{
-	return __vmalloc_array(n, size, GFP_KERNEL | __GFP_ZERO);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EXPORT_SYMBOL(vcalloc);
 
 /* Neutral page->mapping pointer to address_space or anon_vma or other */
@@ -869,17 +822,10 @@ int folio_mapcount(struct folio *folio)
 		return atomic_read(&folio->_mapcount) + 1;
 
 	compound = folio_entire_mapcount(folio);
-<<<<<<< HEAD
 	if (folio_test_hugetlb(folio))
 		return compound;
 	ret = compound;
 	nr = folio_nr_pages(folio);
-=======
-	nr = folio_nr_pages(folio);
-	if (folio_test_hugetlb(folio))
-		return compound;
-	ret = compound;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < nr; i++)
 		ret += atomic_read(&folio_page(folio, i)->_mapcount) + 1;
 	/* File pages has compound_mapcount included in _mapcount */
@@ -1191,7 +1137,6 @@ void mem_dump_obj(void *object)
 		type = "non-paged memory";
 
 	pr_cont(" %s\n", type);
-<<<<<<< HEAD
 }
 EXPORT_SYMBOL_GPL(mem_dump_obj);
 #endif
@@ -1218,34 +1163,6 @@ void page_offline_freeze(void)
 {
 	down_read(&page_offline_rwsem);
 }
-=======
-}
-EXPORT_SYMBOL_GPL(mem_dump_obj);
-#endif
-
-/*
- * A driver might set a page logically offline -- PageOffline() -- and
- * turn the page inaccessible in the hypervisor; after that, access to page
- * content can be fatal.
- *
- * Some special PFN walkers -- i.e., /proc/kcore -- read content of random
- * pages after checking PageOffline(); however, these PFN walkers can race
- * with drivers that set PageOffline().
- *
- * page_offline_freeze()/page_offline_thaw() allows for a subsystem to
- * synchronize with such drivers, achieving that a page cannot be set
- * PageOffline() while frozen.
- *
- * page_offline_begin()/page_offline_end() is used by drivers that care about
- * such races when setting a page PageOffline().
- */
-static DECLARE_RWSEM(page_offline_rwsem);
-
-void page_offline_freeze(void)
-{
-	down_read(&page_offline_rwsem);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void page_offline_thaw(void)
 {

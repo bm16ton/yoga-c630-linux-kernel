@@ -1050,11 +1050,7 @@ static int read_partial_msg_data_bounce(struct ceph_connection *con)
 			continue;
 		}
 
-<<<<<<< HEAD
 		page = ceph_msg_data_next(cursor, &off, &len);
-=======
-		page = ceph_msg_data_next(cursor, &off, &len, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = ceph_tcp_recvpage(con->sock, con->bounce_page, 0, len);
 		if (ret <= 0) {
 			con->in_data_crc = crc;

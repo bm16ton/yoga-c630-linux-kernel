@@ -817,16 +817,7 @@ static bool _log_error_deferred(unsigned int bank, u32 misc)
  */
 static void log_error_deferred(unsigned int bank)
 {
-<<<<<<< HEAD
 	if (_log_error_deferred(bank, 0))
-=======
-	bool defrd;
-
-	defrd = _log_error_bank(bank, mca_msr_reg(bank, MCA_STATUS),
-				mca_msr_reg(bank, MCA_ADDR), 0);
-
-	if (!mce_flags.smca)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	/*
@@ -848,11 +839,7 @@ static void amd_deferred_error_interrupt(void)
 
 static void log_error_thresholding(unsigned int bank, u64 misc)
 {
-<<<<<<< HEAD
 	_log_error_deferred(bank, misc);
-=======
-	_log_error_bank(bank, mca_msr_reg(bank, MCA_STATUS), mca_msr_reg(bank, MCA_ADDR), misc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void log_and_reset_block(struct threshold_block *block)

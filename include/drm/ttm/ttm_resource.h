@@ -87,7 +87,6 @@ struct ttm_resource_manager_func {
 	 */
 	void (*free)(struct ttm_resource_manager *man,
 		     struct ttm_resource *res);
-<<<<<<< HEAD
 
 	/**
 	 * struct ttm_resource_manager_func member intersects
@@ -120,8 +119,6 @@ struct ttm_resource_manager_func {
 			   struct ttm_resource *res,
 			   const struct ttm_place *place,
 			   size_t size);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/**
 	 * struct ttm_resource_manager_func member debug
@@ -364,7 +361,6 @@ int ttm_resource_alloc(struct ttm_buffer_object *bo,
 		       const struct ttm_place *place,
 		       struct ttm_resource **res);
 void ttm_resource_free(struct ttm_buffer_object *bo, struct ttm_resource **res);
-<<<<<<< HEAD
 bool ttm_resource_intersects(struct ttm_device *bdev,
 			     struct ttm_resource *res,
 			     const struct ttm_place *place,
@@ -373,8 +369,6 @@ bool ttm_resource_compatible(struct ttm_device *bdev,
 			     struct ttm_resource *res,
 			     const struct ttm_place *place,
 			     size_t size);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bool ttm_resource_compat(struct ttm_resource *res,
 			 struct ttm_placement *placement);
 void ttm_resource_set_bo(struct ttm_resource *res,

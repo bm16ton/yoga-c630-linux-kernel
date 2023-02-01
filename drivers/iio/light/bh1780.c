@@ -216,11 +216,6 @@ static void bh1780_remove(struct i2c_client *client)
 	if (ret < 0)
 		dev_err(&client->dev, "failed to power off (%pe)\n",
 			ERR_PTR(ret));
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int bh1780_runtime_suspend(struct device *dev)

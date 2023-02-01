@@ -393,11 +393,6 @@ static int vc4_v3d_runtime_resume(struct device *dev)
 
 	vc4_v3d_init_hw(&vc4->base);
 
-<<<<<<< HEAD
-=======
-	/* We disabled the IRQ as part of vc4_irq_uninstall in suspend. */
-	enable_irq(vc4->irq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vc4_irq_enable(&vc4->base);
 
 	return 0;
@@ -494,16 +489,6 @@ static int vc4_v3d_bind(struct device *dev, struct device *master, void *data)
 	V3D_WRITE(V3D_BPOA, 0);
 	V3D_WRITE(V3D_BPOS, 0);
 
-<<<<<<< HEAD
-=======
-	vc4_v3d_init_hw(drm);
-
-	ret = platform_get_irq(pdev, 0);
-	if (ret < 0)
-		return ret;
-	vc4->irq = ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = vc4_irq_install(drm, vc4->irq);
 	if (ret) {
 		DRM_ERROR("Failed to install IRQ handler\n");
@@ -527,11 +512,6 @@ static void vc4_v3d_unbind(struct device *dev, struct device *master,
 	struct drm_device *drm = dev_get_drvdata(master);
 	struct vc4_dev *vc4 = to_vc4_dev(drm);
 
-<<<<<<< HEAD
-=======
-	pm_runtime_disable(dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vc4_irq_uninstall(drm);
 
 	/* Disable the binner's overflow memory address, so the next

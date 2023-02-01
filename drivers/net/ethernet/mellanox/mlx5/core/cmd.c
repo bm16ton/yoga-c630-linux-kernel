@@ -812,7 +812,6 @@ int mlx5_cmd_check(struct mlx5_core_dev *dev, int err, void *in, void *out)
 		if (!err)
 			return 0;
 	}
-<<<<<<< HEAD
 
 	/* driver or FW delivery error */
 	if (err != -EREMOTEIO && err)
@@ -823,18 +822,6 @@ int mlx5_cmd_check(struct mlx5_core_dev *dev, int err, void *in, void *out)
 	if (err)
 		cmd_status_print(dev, in, out);
 
-=======
-
-	/* driver or FW delivery error */
-	if (err != -EREMOTEIO && err)
-		return err;
-
-	/* check outbox status */
-	err = cmd_status_to_err(MLX5_GET(mbox_out, out, status));
-	if (err)
-		cmd_status_print(dev, in, out);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return err;
 }
 EXPORT_SYMBOL(mlx5_cmd_check);
@@ -2190,13 +2177,6 @@ int mlx5_cmd_init(struct mlx5_core_dev *dev)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
-=======
-	cmd->stats = kvcalloc(MLX5_CMD_OP_MAX, sizeof(*cmd->stats), GFP_KERNEL);
-	if (!cmd->stats)
-		return -ENOMEM;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
 	if (!cmd->pool)
 		return -ENOMEM;

@@ -14,10 +14,7 @@
 #include <linux/pid.h>
 #include <linux/sem.h>
 #include <linux/shm.h>
-<<<<<<< HEAD
 #include <linux/kmsan_types.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/mutex.h>
 #include <linux/plist.h>
 #include <linux/hrtimer.h>
@@ -95,7 +92,6 @@ struct task_group;
 #define EXIT_ZOMBIE			0x00000020
 #define EXIT_TRACE			(EXIT_ZOMBIE | EXIT_DEAD)
 /* Used in tsk->state again: */
-<<<<<<< HEAD
 #define TASK_PARKED			0x00000040
 #define TASK_DEAD			0x00000080
 #define TASK_WAKEKILL			0x00000100
@@ -114,17 +110,6 @@ struct task_group;
  * DO NOT ADD ANY NEW USERS !
  */
 #define TASK_FREEZABLE_UNSAFE		(TASK_FREEZABLE | __TASK_FREEZABLE_UNSAFE)
-=======
-#define TASK_PARKED			0x0040
-#define TASK_DEAD			0x0080
-#define TASK_WAKEKILL			0x0100
-#define TASK_WAKING			0x0200
-#define TASK_NOLOAD			0x0400
-#define TASK_NEW			0x0800
-/* RT specific auxilliary flag to mark RT lock waiters */
-#define TASK_RTLOCK_WAIT		0x1000
-#define TASK_STATE_MAX			0x2000
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Convenience macros for the sake of set_current_state: */
 #define TASK_KILLABLE			(TASK_WAKEKILL | TASK_UNINTERRUPTIBLE)
@@ -970,13 +955,10 @@ struct task_struct {
 #ifdef	CONFIG_CPU_SUP_INTEL
 	unsigned			reported_split_lock:1;
 #endif
-<<<<<<< HEAD
 #ifdef CONFIG_TASK_DELAY_ACCT
 	/* delay due to memory thrashing */
 	unsigned                        in_thrashing:1;
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	unsigned long			atomic_flags; /* Flags requiring atomic access. */
 
@@ -1386,13 +1368,10 @@ struct task_struct {
 #ifdef CONFIG_KCSAN_WEAK_MEMORY
 	int				kcsan_stack_depth;
 #endif
-<<<<<<< HEAD
 #endif
 
 #ifdef CONFIG_KMSAN
 	struct kmsan_ctx		kmsan_ctx;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #if IS_ENABLED(CONFIG_KUNIT)
@@ -1750,10 +1729,7 @@ extern struct pid *cad_pid;
 #define PF_MEMALLOC		0x00000800	/* Allocating memory */
 #define PF_NPROC_EXCEEDED	0x00001000	/* set_user() noticed that RLIMIT_NPROC was exceeded */
 #define PF_USED_MATH		0x00002000	/* If unset the fpu must be initialized before use */
-<<<<<<< HEAD
 #define PF__HOLE__00004000	0x00004000
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PF_NOFREEZE		0x00008000	/* This thread should not be frozen */
 #define PF__HOLE__00010000	0x00010000
 #define PF_KSWAPD		0x00020000	/* I am kswapd */
@@ -1763,7 +1739,6 @@ extern struct pid *cad_pid;
 						 * I am cleaning dirty pages from some other bdi. */
 #define PF_KTHREAD		0x00200000	/* I am a kernel thread */
 #define PF_RANDOMIZE		0x00400000	/* Randomize virtual address space */
-<<<<<<< HEAD
 #define PF__HOLE__00800000	0x00800000
 #define PF__HOLE__01000000	0x01000000
 #define PF__HOLE__02000000	0x02000000
@@ -1772,12 +1747,6 @@ extern struct pid *cad_pid;
 #define PF_MEMALLOC_PIN		0x10000000	/* Allocation context constrained to zones which allow long term pinning. */
 #define PF__HOLE__20000000	0x20000000
 #define PF__HOLE__40000000	0x40000000
-=======
-#define PF_NO_SETAFFINITY	0x04000000	/* Userland is not allowed to meddle with cpus_mask */
-#define PF_MCE_EARLY		0x08000000      /* Early kill for mce process policy */
-#define PF_MEMALLOC_PIN		0x10000000	/* Allocation context constrained to zones which allow long term pinning. */
-#define PF_FREEZER_SKIP		0x40000000	/* Freezer should not count it as freezable */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PF_SUSPEND_TASK		0x80000000      /* This thread called freeze_processes() and should not be frozen */
 
 /*

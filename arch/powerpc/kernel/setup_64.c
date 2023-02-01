@@ -34,10 +34,7 @@
 #include <linux/of.h>
 #include <linux/of_fdt.h>
 
-<<<<<<< HEAD
 #include <asm/asm-prototypes.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/kvm_guest.h>
 #include <asm/io.h>
 #include <asm/kdump.h>
@@ -195,17 +192,10 @@ static void __init fixup_boot_paca(struct paca_struct *boot_paca)
 		(THREAD_SIZE/2);
 #endif
 	/* Allow percpu accesses to work until we setup percpu data */
-<<<<<<< HEAD
 	boot_paca->data_offset = 0;
 	/* Mark interrupts soft and hard disabled in PACA */
 	boot_paca->irq_soft_mask = IRQS_DISABLED;
 	boot_paca->irq_happened = PACA_IRQ_HARD_DIS;
-=======
-	get_paca()->data_offset = 0;
-	/* Mark interrupts soft and hard disabled in PACA */
-	irq_soft_mask_set(IRQS_DISABLED);
-	get_paca()->irq_happened = PACA_IRQ_HARD_DIS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	WARN_ON(mfmsr() & MSR_EE);
 }
 
@@ -852,11 +842,7 @@ void __init setup_per_cpu_areas(void)
 	/*
 	 * BookE and BookS radix are historical values and should be revisited.
 	 */
-<<<<<<< HEAD
 	if (IS_ENABLED(CONFIG_PPC_BOOK3E_64)) {
-=======
-	if (IS_ENABLED(CONFIG_PPC_BOOK3E)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		atom_size = SZ_1M;
 	} else if (radix_enabled()) {
 		atom_size = PAGE_SIZE;

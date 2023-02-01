@@ -1615,15 +1615,11 @@ void usbnet_disconnect (struct usb_interface *intf)
 	net = dev->net;
 	unregister_netdev (net);
 
-<<<<<<< HEAD
 	while ((urb = usb_get_from_anchor(&dev->deferred))) {
 		dev_kfree_skb(urb->context);
 		kfree(urb->sg);
 		usb_free_urb(urb);
 	}
-=======
-	usb_scuttle_anchored_urbs(&dev->deferred);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (dev->driver_info->unbind)
 		dev->driver_info->unbind(dev, intf);

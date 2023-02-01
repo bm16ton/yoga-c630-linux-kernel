@@ -51,10 +51,7 @@ above structured documentation, or deleted if it has served its purpose.
    ksm
    memory-model
    mmu_notifier
-<<<<<<< HEAD
    multigen_lru
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
    numa
    overcommit-accounting
    page_migration

@@ -165,13 +165,10 @@ struct dma_fence *dma_fence_allocate_private_stub(void)
 		       &dma_fence_stub_ops,
 		       &dma_fence_stub_lock,
 		       0, 0);
-<<<<<<< HEAD
 
 	set_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT,
 		&dma_fence_stub.flags);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_fence_signal(fence);
 
 	return fence;

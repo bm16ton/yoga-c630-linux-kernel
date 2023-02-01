@@ -61,10 +61,7 @@ int parse_bw(struct rdt_parse_data *data, struct resctrl_schema *s,
 	     struct rdt_domain *d)
 {
 	struct resctrl_staged_config *cfg;
-<<<<<<< HEAD
 	u32 closid = data->rdtgrp->closid;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rdt_resource *r = s->res;
 	unsigned long bw_val;
 
@@ -76,15 +73,12 @@ int parse_bw(struct rdt_parse_data *data, struct resctrl_schema *s,
 
 	if (!bw_validate(data->buf, &bw_val, r))
 		return -EINVAL;
-<<<<<<< HEAD
 
 	if (is_mba_sc(r)) {
 		d->mbps_val[closid] = bw_val;
 		return 0;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cfg->new_ctrl = bw_val;
 	cfg->have_new_ctrl = true;
 
@@ -260,7 +254,6 @@ next:
 }
 
 static u32 get_config_index(u32 closid, enum resctrl_conf_type type)
-<<<<<<< HEAD
 {
 	switch (type) {
 	default:
@@ -312,59 +305,18 @@ int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_domain *d,
 
 int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
 {
-=======
-{
-	switch (type) {
-	default:
-	case CDP_NONE:
-		return closid;
-	case CDP_CODE:
-		return closid * 2 + 1;
-	case CDP_DATA:
-		return closid * 2;
-	}
-}
-
-static bool apply_config(struct rdt_hw_domain *hw_dom,
-			 struct resctrl_staged_config *cfg, u32 idx,
-			 cpumask_var_t cpu_mask, bool mba_sc)
-{
-	struct rdt_domain *dom = &hw_dom->d_resctrl;
-	u32 *dc = !mba_sc ? hw_dom->ctrl_val : hw_dom->mbps_val;
-
-	if (cfg->new_ctrl != dc[idx]) {
-		cpumask_set_cpu(cpumask_any(&dom->cpu_mask), cpu_mask);
-		dc[idx] = cfg->new_ctrl;
-
-		return true;
-	}
-
-	return false;
-}
-
-int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct resctrl_staged_config *cfg;
 	struct rdt_hw_domain *hw_dom;
 	struct msr_param msr_param;
 	enum resctrl_conf_type t;
 	cpumask_var_t cpu_mask;
 	struct rdt_domain *d;
-<<<<<<< HEAD
-=======
-	bool mba_sc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int cpu;
 	u32 idx;
 
 	if (!zalloc_cpumask_var(&cpu_mask, GFP_KERNEL))
 		return -ENOMEM;
 
-<<<<<<< HEAD
-=======
-	mba_sc = is_mba_sc(r);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	msr_param.res = NULL;
 	list_for_each_entry(d, &r->domains, list) {
 		hw_dom = resctrl_to_arch_dom(d);
@@ -374,11 +326,7 @@ int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
 				continue;
 
 			idx = get_config_index(closid, t);
-<<<<<<< HEAD
 			if (!apply_config(hw_dom, cfg, idx, cpu_mask))
-=======
-			if (!apply_config(hw_dom, cfg, idx, cpu_mask, mba_sc))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				continue;
 
 			if (!msr_param.res) {
@@ -479,7 +427,6 @@ ssize_t rdtgroup_schemata_write(struct kernfs_open_file *of,
 
 	list_for_each_entry(s, &resctrl_schema_all, list) {
 		r = s->res;
-<<<<<<< HEAD
 
 		/*
 		 * Writes to mba_sc resources update the software controller,
@@ -488,8 +435,6 @@ ssize_t rdtgroup_schemata_write(struct kernfs_open_file *of,
 		if (is_mba_sc(r))
 			continue;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = resctrl_arch_update_domains(r, rdtgrp->closid);
 		if (ret)
 			goto out;
@@ -513,7 +458,6 @@ out:
 
 u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_domain *d,
 			    u32 closid, enum resctrl_conf_type type)
-<<<<<<< HEAD
 {
 	struct rdt_hw_domain *hw_dom = resctrl_to_arch_dom(d);
 	u32 idx = get_config_index(closid, type);
@@ -523,19 +467,6 @@ u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_domain *d,
 
 static void show_doms(struct seq_file *s, struct resctrl_schema *schema, int closid)
 {
-=======
-{
-	struct rdt_hw_domain *hw_dom = resctrl_to_arch_dom(d);
-	u32 idx = get_config_index(closid, type);
-
-	if (!is_mba_sc(r))
-		return hw_dom->ctrl_val[idx];
-	return hw_dom->mbps_val[idx];
-}
-
-static void show_doms(struct seq_file *s, struct resctrl_schema *schema, int closid)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rdt_resource *r = schema->res;
 	struct rdt_domain *dom;
 	bool sep = false;
@@ -546,17 +477,12 @@ static void show_doms(struct seq_file *s, struct resctrl_schema *schema, int clo
 		if (sep)
 			seq_puts(s, ";");
 
-<<<<<<< HEAD
 		if (is_mba_sc(r))
 			ctrl_val = dom->mbps_val[closid];
 		else
 			ctrl_val = resctrl_arch_get_config(r, dom, closid,
 							   schema->conf_type);
 
-=======
-		ctrl_val = resctrl_arch_get_config(r, dom, closid,
-						   schema->conf_type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		seq_printf(s, r->format_str, dom->id, max_data_width,
 			   ctrl_val);
 		sep = true;
@@ -623,7 +549,6 @@ void mon_event_read(struct rmid_read *rr, struct rdt_resource *r,
 int rdtgroup_mondata_show(struct seq_file *m, void *arg)
 {
 	struct kernfs_open_file *of = m->private;
-	struct rdt_hw_resource *hw_res;
 	u32 resid, evtid, domid;
 	struct rdtgroup *rdtgrp;
 	struct rdt_resource *r;
@@ -643,12 +568,7 @@ int rdtgroup_mondata_show(struct seq_file *m, void *arg)
 	domid = md.u.domid;
 	evtid = md.u.evtid;
 
-<<<<<<< HEAD
 	r = &rdt_resources_all[resid].r_resctrl;
-=======
-	hw_res = &rdt_resources_all[resid];
-	r = &hw_res->r_resctrl;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	d = rdt_find_domain(r, domid, NULL);
 	if (IS_ERR_OR_NULL(d)) {
 		ret = -ENOENT;
@@ -662,11 +582,7 @@ int rdtgroup_mondata_show(struct seq_file *m, void *arg)
 	else if (rr.err == -EINVAL)
 		seq_puts(m, "Unavailable\n");
 	else
-<<<<<<< HEAD
 		seq_printf(m, "%llu\n", rr.val);
-=======
-		seq_printf(m, "%llu\n", rr.val * hw_res->mon_scale);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	rdtgroup_kn_unlock(of->kn);

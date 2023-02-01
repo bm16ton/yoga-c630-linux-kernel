@@ -4,10 +4,7 @@ menuconfig ARCH_OMAP1
 	depends on ARCH_MULTI_V4T || ARCH_MULTI_V5
 	depends on CPU_LITTLE_ENDIAN
 	depends on ATAGS
-<<<<<<< HEAD
 	select ARCH_OMAP
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select ARCH_HAS_HOLES_MEMORYMODEL
 	select ARCH_OMAP
 	select CLKSRC_MMIO
@@ -49,13 +46,6 @@ config ARCH_OMAP16XX
 	select CPU_ARM926T
 	select OMAP_DM_TIMER
 
-<<<<<<< HEAD
-=======
-config ARCH_OMAP1_ANY
-	select ARCH_OMAP
-	def_bool ARCH_OMAP730 || ARCH_OMAP850 || ARCH_OMAP15XX || ARCH_OMAP16XX
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ARCH_OMAP
 	bool
 

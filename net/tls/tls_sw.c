@@ -1502,21 +1502,12 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
 	switch (prot->cipher_type) {
 	case TLS_CIPHER_AES_CCM_128:
 		dctx->iv[0] = TLS_AES_CCM_IV_B0_BYTE;
-<<<<<<< HEAD
 		iv_offset = 1;
 		break;
 	case TLS_CIPHER_SM4_CCM:
 		dctx->iv[0] = TLS_SM4_CCM_IV_B0_BYTE;
 		iv_offset = 1;
 		break;
-=======
-		iv_offset = 1;
-		break;
-	case TLS_CIPHER_SM4_CCM:
-		dctx->iv[0] = TLS_SM4_CCM_IV_B0_BYTE;
-		iv_offset = 1;
-		break;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Prepare IV */
@@ -1590,17 +1581,10 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
 			__skb_queue_tail(&ctx->async_hold, darg->skb);
 		return err;
 	}
-<<<<<<< HEAD
 
 	if (prot->tail_size)
 		darg->tail = dctx->tail;
 
-=======
-
-	if (prot->tail_size)
-		darg->tail = dctx->tail;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exit_free_pages:
 	/* Release the pages in case iov was mapped to pages */
 	for (; pages > 0; pages--)
@@ -1720,17 +1704,10 @@ static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
 	rxm->offset += prot->prepend_size;
 	rxm->full_len -= prot->overhead_size;
 	tls_advance_record_sn(sk, prot, &tls_ctx->rx);
-<<<<<<< HEAD
 
 	return 0;
 }
 
-=======
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int decrypt_skb(struct sock *sk, struct scatterlist *sgout)
 {
 	struct tls_decrypt_arg darg = { .zc = true, };
@@ -2081,17 +2058,10 @@ put_on_rx_list:
 						    msg, chunk);
 			if (err < 0)
 				goto put_on_rx_list_err;
-<<<<<<< HEAD
 
 			if (is_peek)
 				goto put_on_rx_list;
 
-=======
-
-			if (is_peek)
-				goto put_on_rx_list;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (partially_consumed) {
 				rxm->offset += chunk;
 				rxm->full_len -= chunk;
@@ -2661,7 +2631,6 @@ int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx, int tx)
 		cipher_name = "ccm(sm4)";
 		break;
 	}
-<<<<<<< HEAD
 	case TLS_CIPHER_ARIA_GCM_128: {
 		struct tls12_crypto_info_aria_gcm_128 *aria_gcm_128_info;
 
@@ -2696,8 +2665,6 @@ int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx, int tx)
 		cipher_name = "gcm(aria)";
 		break;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		rc = -EINVAL;
 		goto free_priv;

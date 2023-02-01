@@ -156,7 +156,6 @@ static int help(struct sk_buff *skb, unsigned int protoff,
 
 	data = ib_ptr;
 	data_limit = ib_ptr + datalen;
-<<<<<<< HEAD
 
 	/* Skip any whitespace */
 	while (data < data_limit - 10) {
@@ -172,8 +171,6 @@ static int help(struct sk_buff *skb, unsigned int protoff,
 			goto out;
 		data += 8;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* strlen(" :\1DCC SENT t AAAAAAAA P\1\n")=26
 	 * 7+MINMATCHLEN+strlen("t AAAAAAAA P\1\n")=26

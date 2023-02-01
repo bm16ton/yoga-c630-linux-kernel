@@ -141,11 +141,7 @@ void __reset_page_owner(struct page *page, unsigned short order)
 	struct page_owner *page_owner;
 	u64 free_ts_nsec = local_clock();
 
-<<<<<<< HEAD
 	page_ext = page_ext_get(page);
-=======
-	page_ext = lookup_page_ext(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(!page_ext))
 		return;
 
@@ -196,14 +192,8 @@ noinline void __set_page_owner(struct page *page, unsigned short order,
 	page_ext = page_ext_get(page);
 	if (unlikely(!page_ext))
 		return;
-<<<<<<< HEAD
 	__set_page_owner_handle(page_ext, handle, order, gfp_mask);
 	page_ext_put(page_ext);
-=======
-
-	handle = save_stack(gfp_mask);
-	__set_page_owner_handle(page_ext, handle, order, gfp_mask);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void __set_page_owner_migrate_reason(struct page *page, int reason)
@@ -238,13 +228,8 @@ void __split_page_owner(struct page *page, unsigned int nr)
 
 void __folio_copy_owner(struct folio *newfolio, struct folio *old)
 {
-<<<<<<< HEAD
 	struct page_ext *old_ext;
 	struct page_ext *new_ext;
-=======
-	struct page_ext *old_ext = lookup_page_ext(&old->page);
-	struct page_ext *new_ext = lookup_page_ext(&newfolio->page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct page_owner *old_page_owner, *new_page_owner;
 
 	old_ext = page_ext_get(&old->page);

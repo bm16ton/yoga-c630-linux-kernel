@@ -230,23 +230,12 @@ static void iblock_unplug_device(struct se_dev_plug *se_plug)
 	clear_bit(IBD_PLUGF_PLUGGED, &ib_dev_plug->flags);
 }
 
-<<<<<<< HEAD
 static sector_t iblock_get_blocks(struct se_device *dev)
 {
 	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
 	u32 block_size = bdev_logical_block_size(ib_dev->ibd_bd);
 	unsigned long long blocks_long =
 		div_u64(bdev_nr_bytes(ib_dev->ibd_bd), block_size) - 1;
-=======
-static unsigned long long iblock_emulate_read_cap_with_block_size(
-	struct se_device *dev,
-	struct block_device *bd,
-	struct request_queue *q)
-{
-	u32 block_size = bdev_logical_block_size(bd);
-	unsigned long long blocks_long =
-		div_u64(bdev_nr_bytes(bd), block_size) - 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (block_size == dev->dev_attrib.block_size)
 		return blocks_long;

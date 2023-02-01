@@ -79,10 +79,7 @@ MODULE_LICENSE("GPL");
 struct rtl821x_priv {
 	u16 phycr1;
 	u16 phycr2;
-<<<<<<< HEAD
 	bool has_phycr2;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int rtl821x_read_page(struct phy_device *phydev)
@@ -99,10 +96,7 @@ static int rtl821x_probe(struct phy_device *phydev)
 {
 	struct device *dev = &phydev->mdio.dev;
 	struct rtl821x_priv *priv;
-<<<<<<< HEAD
 	u32 phy_id = phydev->drv->phy_id;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
@@ -117,7 +111,6 @@ static int rtl821x_probe(struct phy_device *phydev)
 	if (of_property_read_bool(dev->of_node, "realtek,aldps-enable"))
 		priv->phycr1 |= RTL8211F_ALDPS_PLL_OFF | RTL8211F_ALDPS_ENABLE | RTL8211F_ALDPS_XTAL_OFF;
 
-<<<<<<< HEAD
 	priv->has_phycr2 = !(phy_id == RTL_8211FVD_PHYID);
 	if (priv->has_phycr2) {
 		ret = phy_read_paged(phydev, 0xa43, RTL8211F_PHYCR2);
@@ -128,15 +121,6 @@ static int rtl821x_probe(struct phy_device *phydev)
 		if (of_property_read_bool(dev->of_node, "realtek,clkout-disable"))
 			priv->phycr2 &= ~RTL8211F_CLKOUT_EN;
 	}
-=======
-	ret = phy_read_paged(phydev, 0xa43, RTL8211F_PHYCR2);
-	if (ret < 0)
-		return ret;
-
-	priv->phycr2 = ret & RTL8211F_CLKOUT_EN;
-	if (of_property_read_bool(dev->of_node, "realtek,clkout-disable"))
-		priv->phycr2 &= ~RTL8211F_CLKOUT_EN;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	phydev->priv = priv;
 
@@ -422,7 +406,6 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 			val_rxdly ? "enabled" : "disabled");
 	}
 
-<<<<<<< HEAD
 	if (priv->has_phycr2) {
 		ret = phy_modify_paged(phydev, 0xa43, RTL8211F_PHYCR2,
 				       RTL8211F_CLKOUT_EN, priv->phycr2);
@@ -431,14 +414,6 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 				ERR_PTR(ret));
 			return ret;
 		}
-=======
-	ret = phy_modify_paged(phydev, 0xa43, RTL8211F_PHYCR2,
-			       RTL8211F_CLKOUT_EN, priv->phycr2);
-	if (ret < 0) {
-		dev_err(dev, "clkout configuration failed: %pe\n",
-			ERR_PTR(ret));
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return genphy_soft_reset(phydev);
@@ -948,7 +923,6 @@ static struct phy_driver realtek_drvs[] = {
 		PHY_ID_MATCH_EXACT(0x001cc916),
 		.name		= "RTL8211F Gigabit Ethernet",
 		.probe		= rtl821x_probe,
-<<<<<<< HEAD
 		.config_init	= &rtl8211f_config_init,
 		.read_status	= rtlgen_read_status,
 		.config_intr	= &rtl8211f_config_intr,
@@ -961,8 +935,6 @@ static struct phy_driver realtek_drvs[] = {
 		PHY_ID_MATCH_EXACT(RTL_8211FVD_PHYID),
 		.name		= "RTL8211F-VD Gigabit Ethernet",
 		.probe		= rtl821x_probe,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.config_init	= &rtl8211f_config_init,
 		.read_status	= rtlgen_read_status,
 		.config_intr	= &rtl8211f_config_intr,

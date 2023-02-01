@@ -825,7 +825,6 @@ struct gpu_metrics_v2_2 {
 	uint64_t			indep_throttle_status;
 };
 
-<<<<<<< HEAD
 struct gpu_metrics_v2_3 {
 	struct metrics_table_header	common_header;
 
@@ -884,6 +883,4 @@ struct gpu_metrics_v2_3 {
 	uint16_t			average_temperature_core[8]; // average CPU core temperature on APUs
 	uint16_t			average_temperature_l3[2];
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

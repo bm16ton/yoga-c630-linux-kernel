@@ -14,7 +14,6 @@
 // foundation of this driver
 //
 
-<<<<<<< HEAD
 #include <linux/module.h>
 #include <linux/pci.h>
 #include <sound/hda_codec.h>
@@ -27,11 +26,6 @@
 #include "../../codecs/hda.h"
 #include "avs.h"
 #include "cldma.h"
-=======
-#include <linux/pci.h>
-#include <sound/hdaudio.h>
-#include "avs.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void
 avs_hda_update_config_dword(struct hdac_bus *bus, u32 reg, u32 mask, u32 value)
@@ -74,7 +68,6 @@ void avs_hda_l1sen_enable(struct avs_dev *adev, bool enable)
 	value = enable ? AZX_VS_EM2_L1SEN : 0;
 	snd_hdac_chip_updatel(&adev->base.core, VS_EM2, AZX_VS_EM2_L1SEN, value);
 }
-<<<<<<< HEAD
 
 static int avs_hdac_bus_init_streams(struct hdac_bus *bus)
 {
@@ -696,5 +689,3 @@ MODULE_AUTHOR("Cezary Rojewski <cezary.rojewski@intel.com>");
 MODULE_AUTHOR("Amadeusz Slawinski <amadeuszx.slawinski@linux.intel.com>");
 MODULE_DESCRIPTION("Intel cAVS sound driver");
 MODULE_LICENSE("GPL");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

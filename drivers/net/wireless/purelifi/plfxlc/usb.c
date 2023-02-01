@@ -247,10 +247,7 @@ error:
 		for (i = 0; i < RX_URBS_COUNT; i++)
 			free_rx_urb(urbs[i]);
 	}
-<<<<<<< HEAD
 	kfree(urbs);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return r;
 }
 

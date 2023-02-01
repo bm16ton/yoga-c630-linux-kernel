@@ -644,11 +644,8 @@ exar_pci_probe(struct pci_dev *pcidev, const struct pci_device_id *ent)
 		nr_ports = BIT(((pcidev->device & 0x38) >> 3) - 1);
 	else if (board->num_ports)
 		nr_ports = board->num_ports;
-<<<<<<< HEAD
 	else if (pcidev->vendor == PCI_VENDOR_ID_SEALEVEL)
 		nr_ports = pcidev->device & 0xff;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		nr_ports = pcidev->device & 0x0f;
 

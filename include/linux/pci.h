@@ -1678,18 +1678,12 @@ bool pci_ats_disabled(void);
 
 #ifdef CONFIG_PCIE_PTM
 int pci_enable_ptm(struct pci_dev *dev, u8 *granularity);
-<<<<<<< HEAD
 void pci_disable_ptm(struct pci_dev *dev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bool pcie_ptm_enabled(struct pci_dev *dev);
 #else
 static inline int pci_enable_ptm(struct pci_dev *dev, u8 *granularity)
 { return -EINVAL; }
-<<<<<<< HEAD
 static inline void pci_disable_ptm(struct pci_dev *dev) { }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool pcie_ptm_enabled(struct pci_dev *dev)
 { return false; }
 #endif
@@ -2028,8 +2022,8 @@ enum pci_fixup_pass {
 #ifdef CONFIG_LTO_CLANG
 #define __DECLARE_PCI_FIXUP_SECTION(sec, name, vendor, device, class,	\
 				  class_shift, hook, stub)		\
-	void __cficanonical stub(struct pci_dev *dev);			\
-	void __cficanonical stub(struct pci_dev *dev)			\
+	void stub(struct pci_dev *dev);					\
+	void stub(struct pci_dev *dev)					\
 	{ 								\
 		hook(dev); 						\
 	}								\

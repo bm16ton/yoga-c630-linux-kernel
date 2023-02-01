@@ -182,16 +182,9 @@ extern int cifs_unlock_range(struct cifsFileInfo *cfile,
 extern int cifs_push_mandatory_locks(struct cifsFileInfo *cfile);
 
 extern void cifs_down_write(struct rw_semaphore *sem);
-<<<<<<< HEAD
 struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
 				       struct tcon_link *tlink, __u32 oplock,
 				       const char *symlink_target);
-=======
-extern struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fid *fid,
-					      struct file *file,
-					      struct tcon_link *tlink,
-					      __u32 oplock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int cifs_posix_open(const char *full_path, struct inode **inode,
 			   struct super_block *sb, int mode,
 			   unsigned int f_flags, __u32 *oplock, __u16 *netfid,

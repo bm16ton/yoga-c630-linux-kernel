@@ -434,7 +434,6 @@ static const struct rpmpd_desc sm6125_desc = {
 	.max_state = RPM_SMD_LEVEL_BINNING,
 };
 
-<<<<<<< HEAD
 DEFINE_RPMPD_PAIR(sm6375, vddgx, vddgx_ao, RWGX, LEVEL, 0);
 static struct rpmpd *sm6375_rpmpds[] = {
 	[SM6375_VDDCX] = &sm6125_vddcx,
@@ -455,8 +454,6 @@ static const struct rpmpd_desc sm6375_desc = {
 	.max_state = RPM_SMD_LEVEL_TURBO_NO_CPR,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct rpmpd *qcm2290_rpmpds[] = {
 	[QCM2290_VDDCX] = &sm6115_vddcx,
 	[QCM2290_VDDCX_AO] = &sm6115_vddcx_ao,
@@ -490,10 +487,7 @@ static const struct of_device_id rpmpd_match_table[] = {
 	{ .compatible = "qcom,sdm660-rpmpd", .data = &sdm660_desc },
 	{ .compatible = "qcom,sm6115-rpmpd", .data = &sm6115_desc },
 	{ .compatible = "qcom,sm6125-rpmpd", .data = &sm6125_desc },
-<<<<<<< HEAD
 	{ .compatible = "qcom,sm6375-rpmpd", .data = &sm6375_desc },
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 MODULE_DEVICE_TABLE(of, rpmpd_match_table);

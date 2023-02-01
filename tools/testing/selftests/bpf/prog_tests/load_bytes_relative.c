@@ -27,13 +27,8 @@ void test_load_bytes_relative(void)
 	if (CHECK_FAIL(server_fd < 0))
 		goto close_cgroup_fd;
 
-<<<<<<< HEAD
 	err = bpf_prog_test_load("./load_bytes_relative.bpf.o", BPF_PROG_TYPE_CGROUP_SKB,
 				 &obj, &prog_fd);
-=======
-	err = bpf_prog_test_load("./load_bytes_relative.o", BPF_PROG_TYPE_CGROUP_SKB,
-			    &obj, &prog_fd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (CHECK_FAIL(err))
 		goto close_server_fd;
 

@@ -2,7 +2,6 @@
 //
 // Copyright (C) 2020 Pengutronix, Ulrich Oelmann <kernel@pengutronix.de>
 
-<<<<<<< HEAD
 / {
 	touchscreen {
 		compatible = "resistive-adc-touch";
@@ -16,15 +15,12 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &ecspi4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi4>;
 	cs-gpios = <&gpio3 20 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
-<<<<<<< HEAD
 	adc_ts: adc@0 {
 		compatible = "ti,tsc2046e-adc";
 		reg = <0>;
@@ -60,31 +56,6 @@
 			settling-time-us = <700>;
 			oversampling-ratio = <5>;
 		};
-=======
-	touchscreen@0 {
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_touch>;
-		compatible = "ti,tsc2046";
-		reg = <0>;
-		spi-max-frequency = <1000000>;
-		interrupts-extended = <&gpio3 19 IRQ_TYPE_LEVEL_LOW>;
-		vcc-supply = <&reg_3v3>;
-		pendown-gpio = <&gpio3 19 GPIO_ACTIVE_LOW>;
-		ti,x-plate-ohms = /bits/ 16 <850>;
-		ti,y-plate-ohms = /bits/ 16 <295>;
-		ti,pressure-min = /bits/ 16 <2>;
-		ti,pressure-max = /bits/ 16 <1500>;
-		ti,vref-mv = /bits/ 16 <3300>;
-		ti,settle-delay-usec = /bits/ 16 <15>;
-		ti,vref-delay-usecs = /bits/ 16 <0>;
-		ti,penirq-recheck-delay-usecs = /bits/ 16 <100>;
-		ti,debounce-max = /bits/ 16 <100>;
-		ti,debounce-tol = /bits/ 16 <(~0)>;
-		ti,debounce-rep = /bits/ 16 <4>;
-		touchscreen-swapped-x-y;
-		touchscreen-inverted-y;
-		wakeup-source;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 

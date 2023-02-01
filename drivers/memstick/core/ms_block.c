@@ -2130,19 +2130,12 @@ static int msb_init_disk(struct memstick_dev *card)
 	msb_start(card);
 	rc = device_add_disk(&card->dev, msb->disk, NULL);
 	if (rc)
-<<<<<<< HEAD
 		goto out_destroy_workqueue;
 	dbg("Disk added");
 	return 0;
 
 out_destroy_workqueue:
 	destroy_workqueue(msb->io_queue);
-=======
-		goto out_cleanup_disk;
-	dbg("Disk added");
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_cleanup_disk:
 	put_disk(msb->disk);
 out_free_tag_set:

@@ -445,21 +445,12 @@ static inline struct obj_cgroup **slab_objcgs(struct slab *slab)
 
 	return (struct obj_cgroup **)(memcg_data & ~MEMCG_DATA_FLAGS_MASK);
 }
-<<<<<<< HEAD
 
 int memcg_alloc_slab_cgroups(struct slab *slab, struct kmem_cache *s,
 				 gfp_t gfp, bool new_slab);
 void mod_objcg_state(struct obj_cgroup *objcg, struct pglist_data *pgdat,
 		     enum node_stat_item idx, int nr);
 
-=======
-
-int memcg_alloc_slab_cgroups(struct slab *slab, struct kmem_cache *s,
-				 gfp_t gfp, bool new_slab);
-void mod_objcg_state(struct obj_cgroup *objcg, struct pglist_data *pgdat,
-		     enum node_stat_item idx, int nr);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void memcg_free_slab_cgroups(struct slab *slab)
 {
 	kfree(slab_objcgs(slab));
@@ -672,7 +663,6 @@ static inline struct kmem_cache *cache_from_obj(struct kmem_cache *s, void *x)
 		print_tracking(cachep, x);
 	return cachep;
 }
-#endif /* CONFIG_SLOB */
 
 void free_large_kmalloc(struct folio *folio, void *object);
 

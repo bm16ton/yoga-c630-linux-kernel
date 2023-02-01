@@ -41,17 +41,9 @@ static int aic3x_i2c_probe(struct i2c_client *i2c)
 	return aic3x_probe(&i2c->dev, regmap, id->driver_data);
 }
 
-<<<<<<< HEAD
 static void aic3x_i2c_remove(struct i2c_client *i2c)
 {
 	aic3x_remove(&i2c->dev);
-=======
-static int aic3x_i2c_remove(struct i2c_client *i2c)
-{
-	aic3x_remove(&i2c->dev);
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id aic3x_of_id[] = {

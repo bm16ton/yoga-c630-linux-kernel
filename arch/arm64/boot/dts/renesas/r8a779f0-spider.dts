@@ -12,18 +12,6 @@
 / {
 	model = "Renesas Spider CPU and Breakout boards based on r8a779f0";
 	compatible = "renesas,spider-breakout", "renesas,spider-cpu", "renesas,r8a779f0";
-<<<<<<< HEAD
-=======
-
-	aliases {
-		serial0 = &scif3;
-		serial1 = &scif0;
-	};
-
-	chosen {
-		stdout-path = "serial0:115200n8";
-	};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &i2c4 {

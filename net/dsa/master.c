@@ -363,7 +363,6 @@ int dsa_master_setup(struct net_device *dev, struct dsa_port *cpu_dp)
 	mtu = ETH_DATA_LEN + dsa_tag_protocol_overhead(tag_ops);
 
 	/* The DSA master must use SET_NETDEV_DEV for this to work. */
-<<<<<<< HEAD
 	if (!netif_is_lag_master(dev)) {
 		consumer_link = device_link_add(ds->dev, dev->dev.parent,
 						DL_FLAG_AUTOREMOVE_CONSUMER);
@@ -372,14 +371,6 @@ int dsa_master_setup(struct net_device *dev, struct dsa_port *cpu_dp)
 				   "Failed to create a device link to DSA switch %s\n",
 				   dev_name(ds->dev));
 	}
-=======
-	consumer_link = device_link_add(ds->dev, dev->dev.parent,
-					DL_FLAG_AUTOREMOVE_CONSUMER);
-	if (!consumer_link)
-		netdev_err(dev,
-			   "Failed to create a device link to DSA switch %s\n",
-			   dev_name(ds->dev));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* The switch driver may not implement ->port_change_mtu(), case in
 	 * which dsa_slave_change_mtu() will not update the master MTU either,

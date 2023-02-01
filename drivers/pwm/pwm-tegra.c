@@ -145,7 +145,6 @@ static int tegra_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		 * source clock rate as required_clk_rate, PWM controller will
 		 * be able to configure the requested period.
 		 */
-<<<<<<< HEAD
 		required_clk_rate = DIV_ROUND_UP_ULL((u64)NSEC_PER_SEC << PWM_DUTY_WIDTH,
 						     period_ns);
 
@@ -159,10 +158,6 @@ static int tegra_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 			 * the requested period.
 			 */
 			required_clk_rate *= 2;
-=======
-		required_clk_rate =
-			(NSEC_PER_SEC / period_ns) << PWM_DUTY_WIDTH;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		err = dev_pm_opp_set_rate(pc->dev, required_clk_rate);
 		if (err < 0)
@@ -288,7 +283,6 @@ static int tegra_pwm_probe(struct platform_device *pdev)
 
 	pc->soc = of_device_get_match_data(&pdev->dev);
 	pc->dev = &pdev->dev;
-<<<<<<< HEAD
 
 	pc->regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(pc->regs))
@@ -300,19 +294,6 @@ static int tegra_pwm_probe(struct platform_device *pdev)
 	if (IS_ERR(pc->clk))
 		return PTR_ERR(pc->clk);
 
-=======
-
-	pc->regs = devm_platform_ioremap_resource(pdev, 0);
-	if (IS_ERR(pc->regs))
-		return PTR_ERR(pc->regs);
-
-	platform_set_drvdata(pdev, pc);
-
-	pc->clk = devm_clk_get(&pdev->dev, NULL);
-	if (IS_ERR(pc->clk))
-		return PTR_ERR(pc->clk);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = devm_tegra_core_dev_init_opp_table_common(&pdev->dev);
 	if (ret)
 		return ret;

@@ -540,17 +540,10 @@ void enetc_reset_ptcmsdur(struct enetc_hw *hw)
 
 static void enetc_configure_port_mac(struct enetc_hw *hw)
 {
-	int tc;
-
 	enetc_port_wr(hw, ENETC_PM0_MAXFRM,
 		      ENETC_SET_MAXFRM(ENETC_RX_MAXFRM_SIZE));
 
-<<<<<<< HEAD
 	enetc_reset_ptcmsdur(hw);
-=======
-	for (tc = 0; tc < 8; tc++)
-		enetc_port_wr(hw, ENETC_PTCMSDUR(tc), ENETC_MAC_MAXFRM_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	enetc_port_wr(hw, ENETC_PM0_CMD_CFG, ENETC_PM0_CMD_PHY_TX_EN |
 		      ENETC_PM0_CMD_TXP	| ENETC_PM0_PROMISC);
@@ -795,11 +788,7 @@ static const struct net_device_ops enetc_ndev_ops = {
 	.ndo_set_vf_spoofchk	= enetc_pf_set_vf_spoofchk,
 	.ndo_set_features	= enetc_pf_set_features,
 	.ndo_eth_ioctl		= enetc_ioctl,
-<<<<<<< HEAD
 	.ndo_setup_tc		= enetc_pf_setup_tc,
-=======
-	.ndo_setup_tc		= enetc_setup_tc,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ndo_bpf		= enetc_setup_bpf,
 	.ndo_xdp_xmit		= enetc_xdp_xmit,
 };
@@ -1098,7 +1087,6 @@ static void enetc_pl_mac_link_up(struct phylink_config *config,
 	enetc_port_wr(hw, ENETC_PM1_PAUSE_THRESH, refresh_quanta);
 	enetc_port_wr(hw, ENETC_PPAUONTR, pause_on_thresh);
 	enetc_port_wr(hw, ENETC_PPAUOFFTR, pause_off_thresh);
-<<<<<<< HEAD
 
 	cmd_cfg = enetc_port_rd(hw, ENETC_PM0_CMD_CFG);
 
@@ -1107,16 +1095,6 @@ static void enetc_pl_mac_link_up(struct phylink_config *config,
 	else
 		cmd_cfg |= ENETC_PM0_PAUSE_IGN;
 
-=======
-
-	cmd_cfg = enetc_port_rd(hw, ENETC_PM0_CMD_CFG);
-
-	if (rx_pause)
-		cmd_cfg &= ~ENETC_PM0_PAUSE_IGN;
-	else
-		cmd_cfg |= ENETC_PM0_PAUSE_IGN;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	enetc_port_wr(hw, ENETC_PM0_CMD_CFG, cmd_cfg);
 	enetc_port_wr(hw, ENETC_PM1_CMD_CFG, cmd_cfg);
 
@@ -1233,7 +1211,6 @@ static int enetc_pf_register_with_ierb(struct pci_dev *pdev)
 	/* Don't register with the IERB if the PF itself is disabled */
 	if (!node || !of_device_is_available(node))
 		return 0;
-<<<<<<< HEAD
 
 	ierb_node = of_find_compatible_node(NULL, NULL,
 					    "fsl,ls1028a-enetc-ierb");
@@ -1246,20 +1223,6 @@ static int enetc_pf_register_with_ierb(struct pci_dev *pdev)
 	if (!ierb_pdev)
 		return -EPROBE_DEFER;
 
-=======
-
-	ierb_node = of_find_compatible_node(NULL, NULL,
-					    "fsl,ls1028a-enetc-ierb");
-	if (!ierb_node || !of_device_is_available(ierb_node))
-		return -ENODEV;
-
-	ierb_pdev = of_find_device_by_node(ierb_node);
-	of_node_put(ierb_node);
-
-	if (!ierb_pdev)
-		return -EPROBE_DEFER;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return enetc_ierb_register_pf(ierb_pdev, pdev);
 }
 

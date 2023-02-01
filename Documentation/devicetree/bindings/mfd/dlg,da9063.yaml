@@ -71,14 +71,9 @@ properties:
 
   regulators:
     type: object
-<<<<<<< HEAD
     additionalProperties: false
     patternProperties:
       "^(ldo([1-9]|1[01])|bcore([1-2]|s-merged)|b(pro|mem|io|peri)|bmem-bio-merged)$":
-=======
-    patternProperties:
-      "^(ldo[1-11]|bcore[1-2]|bpro|bmem|bio|bperi)$":
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         $ref: /schemas/regulator/regulator.yaml
         unevaluatedProperties: false
 
@@ -118,11 +113,7 @@ examples:
         };
 
         regulators {
-<<<<<<< HEAD
           bcore1 {
-=======
-          regulator-bcore1 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             regulator-name = "BCORE1";
             regulator-min-microvolt = <300000>;
             regulator-max-microvolt = <1570000>;
@@ -130,11 +121,7 @@ examples:
             regulator-max-microamp = <2000000>;
             regulator-boot-on;
           };
-<<<<<<< HEAD
           ldo11 {
-=======
-          regulator-ldo11 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             regulator-name = "LDO_11";
             regulator-min-microvolt = <900000>;
             regulator-max-microvolt = <3600000>;

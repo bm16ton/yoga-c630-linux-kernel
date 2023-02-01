@@ -1125,17 +1125,12 @@
 #define MBUS_DBOX_REGULATE_B2B_TRANSACTIONS_EN	REG_BIT(16) /* tgl+ */
 #define MBUS_DBOX_BW_CREDIT_MASK		REG_GENMASK(15, 14)
 #define MBUS_DBOX_BW_CREDIT(x)			REG_FIELD_PREP(MBUS_DBOX_BW_CREDIT_MASK, x)
-<<<<<<< HEAD
 #define MBUS_DBOX_BW_4CREDITS_MTL		REG_FIELD_PREP(MBUS_DBOX_BW_CREDIT_MASK, 0x2)
 #define MBUS_DBOX_BW_8CREDITS_MTL		REG_FIELD_PREP(MBUS_DBOX_BW_CREDIT_MASK, 0x3)
 #define MBUS_DBOX_B_CREDIT_MASK			REG_GENMASK(12, 8)
 #define MBUS_DBOX_B_CREDIT(x)			REG_FIELD_PREP(MBUS_DBOX_B_CREDIT_MASK, x)
 #define MBUS_DBOX_I_CREDIT_MASK			REG_GENMASK(7, 5)
 #define MBUS_DBOX_I_CREDIT(x)			REG_FIELD_PREP(MBUS_DBOX_I_CREDIT_MASK, x)
-=======
-#define MBUS_DBOX_B_CREDIT_MASK			REG_GENMASK(12, 8)
-#define MBUS_DBOX_B_CREDIT(x)			REG_FIELD_PREP(MBUS_DBOX_B_CREDIT_MASK, x)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MBUS_DBOX_A_CREDIT_MASK			REG_GENMASK(3, 0)
 #define MBUS_DBOX_A_CREDIT(x)			REG_FIELD_PREP(MBUS_DBOX_A_CREDIT_MASK, x)
 
@@ -1469,72 +1464,6 @@
 #define MSG_FBC_REND_STATE(fbc_id)	_MMIO_PIPE((fbc_id), 0x50380, 0x50384)
 #define   FBC_REND_NUKE			REG_BIT(2)
 #define   FBC_REND_CACHE_CLEAN		REG_BIT(1)
-<<<<<<< HEAD
-=======
-
-/*
- * GPIO regs
- */
-#define GPIO(gpio)		_MMIO(dev_priv->gpio_mmio_base + 0x5010 + \
-				      4 * (gpio))
-
-# define GPIO_CLOCK_DIR_MASK		(1 << 0)
-# define GPIO_CLOCK_DIR_IN		(0 << 1)
-# define GPIO_CLOCK_DIR_OUT		(1 << 1)
-# define GPIO_CLOCK_VAL_MASK		(1 << 2)
-# define GPIO_CLOCK_VAL_OUT		(1 << 3)
-# define GPIO_CLOCK_VAL_IN		(1 << 4)
-# define GPIO_CLOCK_PULLUP_DISABLE	(1 << 5)
-# define GPIO_DATA_DIR_MASK		(1 << 8)
-# define GPIO_DATA_DIR_IN		(0 << 9)
-# define GPIO_DATA_DIR_OUT		(1 << 9)
-# define GPIO_DATA_VAL_MASK		(1 << 10)
-# define GPIO_DATA_VAL_OUT		(1 << 11)
-# define GPIO_DATA_VAL_IN		(1 << 12)
-# define GPIO_DATA_PULLUP_DISABLE	(1 << 13)
-
-#define GMBUS0			_MMIO(dev_priv->gpio_mmio_base + 0x5100) /* clock/port select */
-#define   GMBUS_AKSV_SELECT	(1 << 11)
-#define   GMBUS_RATE_100KHZ	(0 << 8)
-#define   GMBUS_RATE_50KHZ	(1 << 8)
-#define   GMBUS_RATE_400KHZ	(2 << 8) /* reserved on Pineview */
-#define   GMBUS_RATE_1MHZ	(3 << 8) /* reserved on Pineview */
-#define   GMBUS_HOLD_EXT	(1 << 7) /* 300ns hold time, rsvd on Pineview */
-#define   GMBUS_BYTE_CNT_OVERRIDE (1 << 6)
-
-#define GMBUS1			_MMIO(dev_priv->gpio_mmio_base + 0x5104) /* command/status */
-#define   GMBUS_SW_CLR_INT	(1 << 31)
-#define   GMBUS_SW_RDY		(1 << 30)
-#define   GMBUS_ENT		(1 << 29) /* enable timeout */
-#define   GMBUS_CYCLE_NONE	(0 << 25)
-#define   GMBUS_CYCLE_WAIT	(1 << 25)
-#define   GMBUS_CYCLE_INDEX	(2 << 25)
-#define   GMBUS_CYCLE_STOP	(4 << 25)
-#define   GMBUS_BYTE_COUNT_SHIFT 16
-#define   GMBUS_BYTE_COUNT_MAX   256U
-#define   GEN9_GMBUS_BYTE_COUNT_MAX 511U
-#define   GMBUS_SLAVE_INDEX_SHIFT 8
-#define   GMBUS_SLAVE_ADDR_SHIFT 1
-#define   GMBUS_SLAVE_READ	(1 << 0)
-#define   GMBUS_SLAVE_WRITE	(0 << 0)
-#define GMBUS2			_MMIO(dev_priv->gpio_mmio_base + 0x5108) /* status */
-#define   GMBUS_INUSE		(1 << 15)
-#define   GMBUS_HW_WAIT_PHASE	(1 << 14)
-#define   GMBUS_STALL_TIMEOUT	(1 << 13)
-#define   GMBUS_INT		(1 << 12)
-#define   GMBUS_HW_RDY		(1 << 11)
-#define   GMBUS_SATOER		(1 << 10)
-#define   GMBUS_ACTIVE		(1 << 9)
-#define GMBUS3			_MMIO(dev_priv->gpio_mmio_base + 0x510c) /* data buffer bytes 3-0 */
-#define GMBUS4			_MMIO(dev_priv->gpio_mmio_base + 0x5110) /* interrupt mask (Pineview+) */
-#define   GMBUS_SLAVE_TIMEOUT_EN (1 << 4)
-#define   GMBUS_NAK_EN		(1 << 3)
-#define   GMBUS_IDLE_EN		(1 << 2)
-#define   GMBUS_HW_WAIT_EN	(1 << 1)
-#define   GMBUS_HW_RDY_EN	(1 << 0)
-#define GMBUS5			_MMIO(dev_priv->gpio_mmio_base + 0x5120) /* byte index */
-#define   GMBUS_2BYTE_INDEX_EN	(1 << 31)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Clock control & power management
@@ -1928,7 +1857,6 @@
 #define CLKGATE_DIS_PSL(pipe) \
 	_MMIO_PIPE(pipe, _CLKGATE_DIS_PSL_A, _CLKGATE_DIS_PSL_B)
 
-<<<<<<< HEAD
 #define _CLKGATE_DIS_PSL_EXT_A		0x4654C
 #define _CLKGATE_DIS_PSL_EXT_B		0x46550
 #define   PIPEDMC_GATING_DIS		REG_BIT(12)
@@ -1936,8 +1864,6 @@
 #define CLKGATE_DIS_PSL_EXT(pipe) \
 	_MMIO_PIPE(pipe, _CLKGATE_DIS_PSL_EXT_A, _CLKGATE_DIS_PSL_EXT_B)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Display engine regs
  */
@@ -2231,7 +2157,6 @@
 #define TRANS_PSR_IIR(tran)			_MMIO_TRANS2(tran, _PSR_IIR_A)
 #define   _EDP_PSR_TRANS_SHIFT(trans)		((trans) == TRANSCODER_EDP ? \
 						 0 : ((trans) - TRANSCODER_A + 1) * 8)
-<<<<<<< HEAD
 #define   TGL_PSR_MASK			REG_GENMASK(2, 0)
 #define   TGL_PSR_ERROR			REG_BIT(2)
 #define   TGL_PSR_POST_EXIT		REG_BIT(1)
@@ -2244,12 +2169,6 @@
 					 _EDP_PSR_TRANS_SHIFT(trans))
 #define   EDP_PSR_PRE_ENTRY(trans)	(TGL_PSR_PRE_ENTRY <<		\
 					 _EDP_PSR_TRANS_SHIFT(trans))
-=======
-#define   EDP_PSR_TRANS_MASK(trans)		(0x7 << _EDP_PSR_TRANS_SHIFT(trans))
-#define   EDP_PSR_ERROR(trans)			(0x4 << _EDP_PSR_TRANS_SHIFT(trans))
-#define   EDP_PSR_POST_EXIT(trans)		(0x2 << _EDP_PSR_TRANS_SHIFT(trans))
-#define   EDP_PSR_PRE_ENTRY(trans)		(0x1 << _EDP_PSR_TRANS_SHIFT(trans))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define _SRD_AUX_DATA_A				0x60814
 #define _SRD_AUX_DATA_EDP			0x6f814
@@ -5817,7 +5736,6 @@
 					    [TRANSCODER_B] = _CHICKEN_TRANS_B, \
 					    [TRANSCODER_C] = _CHICKEN_TRANS_C, \
 					    [TRANSCODER_D] = _CHICKEN_TRANS_D))
-<<<<<<< HEAD
 
 #define _MTL_CHICKEN_TRANS_A	0x604e0
 #define _MTL_CHICKEN_TRANS_B	0x614e0
@@ -5825,8 +5743,6 @@
 						    _MTL_CHICKEN_TRANS_A, \
 						    _MTL_CHICKEN_TRANS_B)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define  HSW_FRAME_START_DELAY_MASK	REG_GENMASK(28, 27)
 #define  HSW_FRAME_START_DELAY(x)	REG_FIELD_PREP(HSW_FRAME_START_DELAY_MASK, x)
 #define  VSC_DATA_SEL_SOFTWARE_CONTROL	REG_BIT(25) /* GLK */
@@ -5891,12 +5807,8 @@
 							 _BW_BUDDY1_PAGE_MASK))
 
 #define HSW_NDE_RSTWRN_OPT	_MMIO(0x46408)
-<<<<<<< HEAD
 #define  MTL_RESET_PICA_HANDSHAKE_EN	REG_BIT(6)
 #define  RESET_PCH_HANDSHAKE_ENABLE	REG_BIT(4)
-=======
-#define  RESET_PCH_HANDSHAKE_ENABLE	(1 << 4)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define GEN8_CHICKEN_DCPR_1			_MMIO(0x46430)
 #define   SKL_SELECT_ALTERNATE_DC_EXIT		REG_BIT(30)
@@ -6908,268 +6820,6 @@ enum skl_power_gate {
 #define   ICL_AUX_ANAOVRD1_LDO_BYPASS	(1 << 7)
 #define   ICL_AUX_ANAOVRD1_ENABLE	(1 << 0)
 
-<<<<<<< HEAD
-=======
-/* HDCP Key Registers */
-#define HDCP_KEY_CONF			_MMIO(0x66c00)
-#define  HDCP_AKSV_SEND_TRIGGER		BIT(31)
-#define  HDCP_CLEAR_KEYS_TRIGGER	BIT(30)
-#define  HDCP_KEY_LOAD_TRIGGER		BIT(8)
-#define HDCP_KEY_STATUS			_MMIO(0x66c04)
-#define  HDCP_FUSE_IN_PROGRESS		BIT(7)
-#define  HDCP_FUSE_ERROR		BIT(6)
-#define  HDCP_FUSE_DONE			BIT(5)
-#define  HDCP_KEY_LOAD_STATUS		BIT(1)
-#define  HDCP_KEY_LOAD_DONE		BIT(0)
-#define HDCP_AKSV_LO			_MMIO(0x66c10)
-#define HDCP_AKSV_HI			_MMIO(0x66c14)
-
-/* HDCP Repeater Registers */
-#define HDCP_REP_CTL			_MMIO(0x66d00)
-#define  HDCP_TRANSA_REP_PRESENT	BIT(31)
-#define  HDCP_TRANSB_REP_PRESENT	BIT(30)
-#define  HDCP_TRANSC_REP_PRESENT	BIT(29)
-#define  HDCP_TRANSD_REP_PRESENT	BIT(28)
-#define  HDCP_DDIB_REP_PRESENT		BIT(30)
-#define  HDCP_DDIA_REP_PRESENT		BIT(29)
-#define  HDCP_DDIC_REP_PRESENT		BIT(28)
-#define  HDCP_DDID_REP_PRESENT		BIT(27)
-#define  HDCP_DDIF_REP_PRESENT		BIT(26)
-#define  HDCP_DDIE_REP_PRESENT		BIT(25)
-#define  HDCP_TRANSA_SHA1_M0		(1 << 20)
-#define  HDCP_TRANSB_SHA1_M0		(2 << 20)
-#define  HDCP_TRANSC_SHA1_M0		(3 << 20)
-#define  HDCP_TRANSD_SHA1_M0		(4 << 20)
-#define  HDCP_DDIB_SHA1_M0		(1 << 20)
-#define  HDCP_DDIA_SHA1_M0		(2 << 20)
-#define  HDCP_DDIC_SHA1_M0		(3 << 20)
-#define  HDCP_DDID_SHA1_M0		(4 << 20)
-#define  HDCP_DDIF_SHA1_M0		(5 << 20)
-#define  HDCP_DDIE_SHA1_M0		(6 << 20) /* Bspec says 5? */
-#define  HDCP_SHA1_BUSY			BIT(16)
-#define  HDCP_SHA1_READY		BIT(17)
-#define  HDCP_SHA1_COMPLETE		BIT(18)
-#define  HDCP_SHA1_V_MATCH		BIT(19)
-#define  HDCP_SHA1_TEXT_32		(1 << 1)
-#define  HDCP_SHA1_COMPLETE_HASH	(2 << 1)
-#define  HDCP_SHA1_TEXT_24		(4 << 1)
-#define  HDCP_SHA1_TEXT_16		(5 << 1)
-#define  HDCP_SHA1_TEXT_8		(6 << 1)
-#define  HDCP_SHA1_TEXT_0		(7 << 1)
-#define HDCP_SHA_V_PRIME_H0		_MMIO(0x66d04)
-#define HDCP_SHA_V_PRIME_H1		_MMIO(0x66d08)
-#define HDCP_SHA_V_PRIME_H2		_MMIO(0x66d0C)
-#define HDCP_SHA_V_PRIME_H3		_MMIO(0x66d10)
-#define HDCP_SHA_V_PRIME_H4		_MMIO(0x66d14)
-#define HDCP_SHA_V_PRIME(h)		_MMIO((0x66d04 + (h) * 4))
-#define HDCP_SHA_TEXT			_MMIO(0x66d18)
-
-/* HDCP Auth Registers */
-#define _PORTA_HDCP_AUTHENC		0x66800
-#define _PORTB_HDCP_AUTHENC		0x66500
-#define _PORTC_HDCP_AUTHENC		0x66600
-#define _PORTD_HDCP_AUTHENC		0x66700
-#define _PORTE_HDCP_AUTHENC		0x66A00
-#define _PORTF_HDCP_AUTHENC		0x66900
-#define _PORT_HDCP_AUTHENC(port, x)	_MMIO(_PICK(port, \
-					  _PORTA_HDCP_AUTHENC, \
-					  _PORTB_HDCP_AUTHENC, \
-					  _PORTC_HDCP_AUTHENC, \
-					  _PORTD_HDCP_AUTHENC, \
-					  _PORTE_HDCP_AUTHENC, \
-					  _PORTF_HDCP_AUTHENC) + (x))
-#define PORT_HDCP_CONF(port)		_PORT_HDCP_AUTHENC(port, 0x0)
-#define _TRANSA_HDCP_CONF		0x66400
-#define _TRANSB_HDCP_CONF		0x66500
-#define TRANS_HDCP_CONF(trans)		_MMIO_TRANS(trans, _TRANSA_HDCP_CONF, \
-						    _TRANSB_HDCP_CONF)
-#define HDCP_CONF(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_CONF(trans) : \
-					 PORT_HDCP_CONF(port))
-
-#define  HDCP_CONF_CAPTURE_AN		BIT(0)
-#define  HDCP_CONF_AUTH_AND_ENC		(BIT(1) | BIT(0))
-#define PORT_HDCP_ANINIT(port)		_PORT_HDCP_AUTHENC(port, 0x4)
-#define _TRANSA_HDCP_ANINIT		0x66404
-#define _TRANSB_HDCP_ANINIT		0x66504
-#define TRANS_HDCP_ANINIT(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP_ANINIT, \
-						    _TRANSB_HDCP_ANINIT)
-#define HDCP_ANINIT(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_ANINIT(trans) : \
-					 PORT_HDCP_ANINIT(port))
-
-#define PORT_HDCP_ANLO(port)		_PORT_HDCP_AUTHENC(port, 0x8)
-#define _TRANSA_HDCP_ANLO		0x66408
-#define _TRANSB_HDCP_ANLO		0x66508
-#define TRANS_HDCP_ANLO(trans)		_MMIO_TRANS(trans, _TRANSA_HDCP_ANLO, \
-						    _TRANSB_HDCP_ANLO)
-#define HDCP_ANLO(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_ANLO(trans) : \
-					 PORT_HDCP_ANLO(port))
-
-#define PORT_HDCP_ANHI(port)		_PORT_HDCP_AUTHENC(port, 0xC)
-#define _TRANSA_HDCP_ANHI		0x6640C
-#define _TRANSB_HDCP_ANHI		0x6650C
-#define TRANS_HDCP_ANHI(trans)		_MMIO_TRANS(trans, _TRANSA_HDCP_ANHI, \
-						    _TRANSB_HDCP_ANHI)
-#define HDCP_ANHI(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_ANHI(trans) : \
-					 PORT_HDCP_ANHI(port))
-
-#define PORT_HDCP_BKSVLO(port)		_PORT_HDCP_AUTHENC(port, 0x10)
-#define _TRANSA_HDCP_BKSVLO		0x66410
-#define _TRANSB_HDCP_BKSVLO		0x66510
-#define TRANS_HDCP_BKSVLO(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP_BKSVLO, \
-						    _TRANSB_HDCP_BKSVLO)
-#define HDCP_BKSVLO(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_BKSVLO(trans) : \
-					 PORT_HDCP_BKSVLO(port))
-
-#define PORT_HDCP_BKSVHI(port)		_PORT_HDCP_AUTHENC(port, 0x14)
-#define _TRANSA_HDCP_BKSVHI		0x66414
-#define _TRANSB_HDCP_BKSVHI		0x66514
-#define TRANS_HDCP_BKSVHI(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP_BKSVHI, \
-						    _TRANSB_HDCP_BKSVHI)
-#define HDCP_BKSVHI(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_BKSVHI(trans) : \
-					 PORT_HDCP_BKSVHI(port))
-
-#define PORT_HDCP_RPRIME(port)		_PORT_HDCP_AUTHENC(port, 0x18)
-#define _TRANSA_HDCP_RPRIME		0x66418
-#define _TRANSB_HDCP_RPRIME		0x66518
-#define TRANS_HDCP_RPRIME(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP_RPRIME, \
-						    _TRANSB_HDCP_RPRIME)
-#define HDCP_RPRIME(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_RPRIME(trans) : \
-					 PORT_HDCP_RPRIME(port))
-
-#define PORT_HDCP_STATUS(port)		_PORT_HDCP_AUTHENC(port, 0x1C)
-#define _TRANSA_HDCP_STATUS		0x6641C
-#define _TRANSB_HDCP_STATUS		0x6651C
-#define TRANS_HDCP_STATUS(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP_STATUS, \
-						    _TRANSB_HDCP_STATUS)
-#define HDCP_STATUS(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP_STATUS(trans) : \
-					 PORT_HDCP_STATUS(port))
-
-#define  HDCP_STATUS_STREAM_A_ENC	BIT(31)
-#define  HDCP_STATUS_STREAM_B_ENC	BIT(30)
-#define  HDCP_STATUS_STREAM_C_ENC	BIT(29)
-#define  HDCP_STATUS_STREAM_D_ENC	BIT(28)
-#define  HDCP_STATUS_AUTH		BIT(21)
-#define  HDCP_STATUS_ENC		BIT(20)
-#define  HDCP_STATUS_RI_MATCH		BIT(19)
-#define  HDCP_STATUS_R0_READY		BIT(18)
-#define  HDCP_STATUS_AN_READY		BIT(17)
-#define  HDCP_STATUS_CIPHER		BIT(16)
-#define  HDCP_STATUS_FRAME_CNT(x)	(((x) >> 8) & 0xff)
-
-/* HDCP2.2 Registers */
-#define _PORTA_HDCP2_BASE		0x66800
-#define _PORTB_HDCP2_BASE		0x66500
-#define _PORTC_HDCP2_BASE		0x66600
-#define _PORTD_HDCP2_BASE		0x66700
-#define _PORTE_HDCP2_BASE		0x66A00
-#define _PORTF_HDCP2_BASE		0x66900
-#define _PORT_HDCP2_BASE(port, x)	_MMIO(_PICK((port), \
-					  _PORTA_HDCP2_BASE, \
-					  _PORTB_HDCP2_BASE, \
-					  _PORTC_HDCP2_BASE, \
-					  _PORTD_HDCP2_BASE, \
-					  _PORTE_HDCP2_BASE, \
-					  _PORTF_HDCP2_BASE) + (x))
-
-#define PORT_HDCP2_AUTH(port)		_PORT_HDCP2_BASE(port, 0x98)
-#define _TRANSA_HDCP2_AUTH		0x66498
-#define _TRANSB_HDCP2_AUTH		0x66598
-#define TRANS_HDCP2_AUTH(trans)		_MMIO_TRANS(trans, _TRANSA_HDCP2_AUTH, \
-						    _TRANSB_HDCP2_AUTH)
-#define   AUTH_LINK_AUTHENTICATED	BIT(31)
-#define   AUTH_LINK_TYPE		BIT(30)
-#define   AUTH_FORCE_CLR_INPUTCTR	BIT(19)
-#define   AUTH_CLR_KEYS			BIT(18)
-#define HDCP2_AUTH(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP2_AUTH(trans) : \
-					 PORT_HDCP2_AUTH(port))
-
-#define PORT_HDCP2_CTL(port)		_PORT_HDCP2_BASE(port, 0xB0)
-#define _TRANSA_HDCP2_CTL		0x664B0
-#define _TRANSB_HDCP2_CTL		0x665B0
-#define TRANS_HDCP2_CTL(trans)		_MMIO_TRANS(trans, _TRANSA_HDCP2_CTL, \
-						    _TRANSB_HDCP2_CTL)
-#define   CTL_LINK_ENCRYPTION_REQ	BIT(31)
-#define HDCP2_CTL(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP2_CTL(trans) : \
-					 PORT_HDCP2_CTL(port))
-
-#define PORT_HDCP2_STATUS(port)		_PORT_HDCP2_BASE(port, 0xB4)
-#define _TRANSA_HDCP2_STATUS		0x664B4
-#define _TRANSB_HDCP2_STATUS		0x665B4
-#define TRANS_HDCP2_STATUS(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP2_STATUS, \
-						    _TRANSB_HDCP2_STATUS)
-#define   LINK_TYPE_STATUS		BIT(22)
-#define   LINK_AUTH_STATUS		BIT(21)
-#define   LINK_ENCRYPTION_STATUS	BIT(20)
-#define HDCP2_STATUS(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP2_STATUS(trans) : \
-					 PORT_HDCP2_STATUS(port))
-
-#define _PIPEA_HDCP2_STREAM_STATUS	0x668C0
-#define _PIPEB_HDCP2_STREAM_STATUS	0x665C0
-#define _PIPEC_HDCP2_STREAM_STATUS	0x666C0
-#define _PIPED_HDCP2_STREAM_STATUS	0x667C0
-#define PIPE_HDCP2_STREAM_STATUS(pipe)		_MMIO(_PICK((pipe), \
-						      _PIPEA_HDCP2_STREAM_STATUS, \
-						      _PIPEB_HDCP2_STREAM_STATUS, \
-						      _PIPEC_HDCP2_STREAM_STATUS, \
-						      _PIPED_HDCP2_STREAM_STATUS))
-
-#define _TRANSA_HDCP2_STREAM_STATUS		0x664C0
-#define _TRANSB_HDCP2_STREAM_STATUS		0x665C0
-#define TRANS_HDCP2_STREAM_STATUS(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP2_STREAM_STATUS, \
-						    _TRANSB_HDCP2_STREAM_STATUS)
-#define   STREAM_ENCRYPTION_STATUS	BIT(31)
-#define   STREAM_TYPE_STATUS		BIT(30)
-#define HDCP2_STREAM_STATUS(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP2_STREAM_STATUS(trans) : \
-					 PIPE_HDCP2_STREAM_STATUS(pipe))
-
-#define _PORTA_HDCP2_AUTH_STREAM		0x66F00
-#define _PORTB_HDCP2_AUTH_STREAM		0x66F04
-#define PORT_HDCP2_AUTH_STREAM(port)	_MMIO_PORT(port, \
-						   _PORTA_HDCP2_AUTH_STREAM, \
-						   _PORTB_HDCP2_AUTH_STREAM)
-#define _TRANSA_HDCP2_AUTH_STREAM		0x66F00
-#define _TRANSB_HDCP2_AUTH_STREAM		0x66F04
-#define TRANS_HDCP2_AUTH_STREAM(trans)	_MMIO_TRANS(trans, \
-						    _TRANSA_HDCP2_AUTH_STREAM, \
-						    _TRANSB_HDCP2_AUTH_STREAM)
-#define   AUTH_STREAM_TYPE		BIT(31)
-#define HDCP2_AUTH_STREAM(dev_priv, trans, port) \
-					(GRAPHICS_VER(dev_priv) >= 12 ? \
-					 TRANS_HDCP2_AUTH_STREAM(trans) : \
-					 PORT_HDCP2_AUTH_STREAM(port))
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Per-pipe DDI Function Control */
 #define _TRANS_DDI_FUNC_CTL_A		0x60400
 #define _TRANS_DDI_FUNC_CTL_B		0x61400
@@ -8694,7 +8344,6 @@ enum skl_power_gate {
 #define GEN12_CULLBIT1			_MMIO(0x6100)
 #define GEN12_CULLBIT2			_MMIO(0x7030)
 #define GEN12_STATE_ACK_DEBUG		_MMIO(0x20BC)
-<<<<<<< HEAD
 
 #define MTL_LATENCY_LP0_LP1		_MMIO(0x45780)
 #define MTL_LATENCY_LP2_LP3		_MMIO(0x45784)
@@ -8718,7 +8367,5 @@ enum skl_power_gate {
 #define MTL_MEM_SS_INFO_QGV_POINT_HIGH(point)	 _MMIO(0x45714 + (point) * 2)
 #define   MTL_TRAS_MASK			REG_GENMASK(16, 8)
 #define   MTL_TRDPRE_MASK		REG_GENMASK(7, 0)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _I915_REG_H_ */

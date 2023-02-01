@@ -423,7 +423,6 @@ static unsigned int iTCO_wdt_get_timeleft(struct watchdog_device *wd_dev)
 	return time_left;
 }
 
-<<<<<<< HEAD
 /* Returns true if the watchdog was running */
 static bool iTCO_wdt_set_running(struct iTCO_wdt_private *p)
 {
@@ -436,16 +435,6 @@ static bool iTCO_wdt_set_running(struct iTCO_wdt_private *p)
 		return true;
 	}
 	return false;
-=======
-static void iTCO_wdt_set_running(struct iTCO_wdt_private *p)
-{
-	u16 val;
-
-	/* Bit 11: TCO Timer Halt -> 0 = The TCO timer is * enabled */
-	val = inw(TCO1_CNT(p));
-	if (!(val & BIT(11)))
-		set_bit(WDOG_HW_RUNNING, &p->wddev.status);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -584,7 +573,6 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 	watchdog_set_drvdata(&p->wddev, p);
 	platform_set_drvdata(pdev, p);
 
-<<<<<<< HEAD
 	if (!iTCO_wdt_set_running(p)) {
 		/*
 		 * If the watchdog was not running set NO_REBOOT now to
@@ -592,9 +580,6 @@ static int iTCO_wdt_probe(struct platform_device *pdev)
 		 */
 		p->update_no_reboot_bit(p->no_reboot_priv, true);
 	}
-=======
-	iTCO_wdt_set_running(p);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Check that the heartbeat value is within it's range;
 	   if not reset to the default */

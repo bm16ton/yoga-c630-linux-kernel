@@ -278,11 +278,7 @@ int rtllib_rx_ADDBAReq(struct rtllib_device *ieee, struct sk_buff *skb)
 	pBA->ba_start_seq_ctrl = *pBaStartSeqCtrl;
 
 	if (ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev) ||
-<<<<<<< HEAD
 	   (ieee->pHTInfo->iot_action & HT_IOT_ACT_ALLOW_PEER_AGG_ONE_PKT))
-=======
-	   (ieee->pHTInfo->IOTAction & HT_IOT_ACT_ALLOW_PEER_AGG_ONE_PKT))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pBA->ba_param_set.field.buffer_size = 1;
 	else
 		pBA->ba_param_set.field.buffer_size = 32;

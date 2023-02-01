@@ -92,7 +92,6 @@ extern struct page *shmem_read_mapping_page_gfp(struct address_space *mapping,
 extern void shmem_truncate_range(struct inode *inode, loff_t start, loff_t end);
 int shmem_unuse(unsigned int type);
 
-<<<<<<< HEAD
 extern bool shmem_is_huge(struct vm_area_struct *vma, struct inode *inode,
 			  pgoff_t index, bool shmem_huge_force);
 static inline bool shmem_huge_enabled(struct vm_area_struct *vma,
@@ -100,13 +99,6 @@ static inline bool shmem_huge_enabled(struct vm_area_struct *vma,
 {
 	return shmem_is_huge(vma, file_inode(vma->vm_file), vma->vm_pgoff,
 			     shmem_huge_force);
-=======
-extern bool shmem_is_huge(struct vm_area_struct *vma,
-			  struct inode *inode, pgoff_t index);
-static inline bool shmem_huge_enabled(struct vm_area_struct *vma)
-{
-	return shmem_is_huge(vma, file_inode(vma->vm_file), vma->vm_pgoff);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 extern unsigned long shmem_swap_usage(struct vm_area_struct *vma);
 extern unsigned long shmem_partial_swap_usage(struct address_space *mapping,

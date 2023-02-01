@@ -29,9 +29,4 @@ properties:
     minimum: 0
     maximum: 255
 
-<<<<<<< HEAD
 additionalProperties: true
-=======
-unevaluatedProperties: true
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

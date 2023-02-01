@@ -674,22 +674,7 @@ static int sun6i_csi_fwnode_parse(struct device *dev,
 	}
 }
 
-<<<<<<< HEAD
 static int sun6i_csi_v4l2_setup(struct sun6i_csi_device *csi_dev)
-=======
-static void sun6i_csi_v4l2_cleanup(struct sun6i_csi *csi)
-{
-	media_device_unregister(&csi->media_dev);
-	v4l2_async_nf_unregister(&csi->notifier);
-	v4l2_async_nf_cleanup(&csi->notifier);
-	sun6i_video_cleanup(&csi->video);
-	v4l2_device_unregister(&csi->v4l2_dev);
-	v4l2_ctrl_handler_free(&csi->ctrl_handler);
-	media_device_cleanup(&csi->media_dev);
-}
-
-static int sun6i_csi_v4l2_init(struct sun6i_csi *csi)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sun6i_csi_v4l2 *v4l2 = &csi_dev->v4l2;
 	struct media_device *media_dev = &v4l2->media_dev;
@@ -698,7 +683,6 @@ static int sun6i_csi_v4l2_init(struct sun6i_csi *csi)
 	struct device *dev = csi_dev->dev;
 	int ret;
 
-<<<<<<< HEAD
 	/* Media Device */
 
 	strscpy(media_dev->model, SUN6I_CSI_DESCRIPTION,
@@ -708,15 +692,6 @@ static int sun6i_csi_v4l2_init(struct sun6i_csi *csi)
 	media_dev->dev = dev;
 
 	media_device_init(media_dev);
-=======
-	csi->media_dev.dev = csi->dev;
-	strscpy(csi->media_dev.model, "Allwinner Video Capture Device",
-		sizeof(csi->media_dev.model));
-	csi->media_dev.hw_revision = 0;
-
-	media_device_init(&csi->media_dev);
-	v4l2_async_nf_init(&csi->notifier);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = media_device_register(media_dev);
 	if (ret) {
@@ -736,21 +711,12 @@ static int sun6i_csi_v4l2_init(struct sun6i_csi *csi)
 
 	/* Video */
 
-<<<<<<< HEAD
 	ret = sun6i_video_setup(csi_dev);
-=======
-	ret = v4l2_async_nf_parse_fwnode_endpoints(csi->dev,
-						   &csi->notifier,
-						   sizeof(struct
-							  v4l2_async_subdev),
-						   sun6i_csi_fwnode_parse);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto error_v4l2_device;
 
 	/* V4L2 Async */
 
-<<<<<<< HEAD
 	v4l2_async_nf_init(notifier);
 	notifier->ops = &sun6i_csi_async_ops;
 
@@ -762,9 +728,6 @@ static int sun6i_csi_v4l2_init(struct sun6i_csi *csi)
 		goto error_video;
 
 	ret = v4l2_async_nf_register(v4l2_dev, notifier);
-=======
-	ret = v4l2_async_nf_register(&csi->v4l2_dev, &csi->notifier);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret) {
 		dev_err(dev, "failed to register v4l2 async notifier: %d\n",
 			ret);
@@ -773,7 +736,6 @@ static int sun6i_csi_v4l2_init(struct sun6i_csi *csi)
 
 	return 0;
 
-<<<<<<< HEAD
 error_v4l2_async_notifier:
 	v4l2_async_nf_cleanup(notifier);
 
@@ -786,17 +748,6 @@ error_v4l2_device:
 error_media:
 	media_device_unregister(media_dev);
 	media_device_cleanup(media_dev);
-=======
-clean_video:
-	sun6i_video_cleanup(&csi->video);
-unreg_v4l2:
-	v4l2_device_unregister(&csi->v4l2_dev);
-free_ctrl:
-	v4l2_ctrl_handler_free(&csi->ctrl_handler);
-clean_media:
-	v4l2_async_nf_cleanup(&csi->notifier);
-	media_device_cleanup(&csi->media_dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -905,16 +856,12 @@ static const struct regmap_config sun6i_csi_regmap_config = {
 static int sun6i_csi_resources_setup(struct sun6i_csi_device *csi_dev,
 				     struct platform_device *platform_dev)
 {
-<<<<<<< HEAD
 	struct device *dev = csi_dev->dev;
 	const struct sun6i_csi_variant *variant;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void __iomem *io_base;
 	int ret;
 	int irq;
 
-<<<<<<< HEAD
 	variant = of_device_get_match_data(dev);
 	if (!variant)
 		return -EINVAL;
@@ -922,9 +869,6 @@ static int sun6i_csi_resources_setup(struct sun6i_csi_device *csi_dev,
 	/* Registers */
 
 	io_base = devm_platform_ioremap_resource(platform_dev, 0);
-=======
-	io_base = devm_platform_ioremap_resource(pdev, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(io_base))
 		return PTR_ERR(io_base);
 

@@ -229,10 +229,7 @@ static inline void hwsim_clear_magic(struct ieee80211_vif *vif)
 struct hwsim_sta_priv {
 	u32 magic;
 	unsigned int last_link;
-<<<<<<< HEAD
 	u16 active_links_rx;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define HWSIM_STA_MAGIC	0x6d537749
@@ -1515,17 +1512,10 @@ static void mac80211_hwsim_tx_iter(void *_data, u8 *addr,
 		chanctx = rcu_dereference(conf->chanctx_conf);
 		if (!chanctx)
 			continue;
-<<<<<<< HEAD
 
 		if (!hwsim_chans_compat(data->channel, chanctx->def.chan))
 			continue;
 
-=======
-
-		if (!hwsim_chans_compat(data->channel, chanctx->def.chan))
-			continue;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		data->receive = true;
 		return;
 	}
@@ -1761,16 +1751,7 @@ mac80211_hwsim_select_tx_link(struct mac80211_hwsim_data *data,
 	if (!vif->valid_links)
 		return &vif->bss_conf;
 
-<<<<<<< HEAD
 	WARN_ON(is_multicast_ether_addr(hdr->addr1));
-=======
-	/* FIXME: handle multicast TX properly */
-	if (is_multicast_ether_addr(hdr->addr1) || WARN_ON_ONCE(!sta)) {
-		unsigned int first_link = ffs(vif->valid_links) - 1;
-
-		return rcu_dereference(vif->link_conf[first_link]);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (WARN_ON_ONCE(!sta->valid_links))
 		return &vif->bss_conf;
@@ -1782,15 +1763,12 @@ mac80211_hwsim_select_tx_link(struct mac80211_hwsim_data *data,
 		/* round-robin the available link IDs */
 		link_id = (sp->last_link + i + 1) % ARRAY_SIZE(vif->link_conf);
 
-<<<<<<< HEAD
 		if (!(vif->active_links & BIT(link_id)))
 			continue;
 
 		if (!(sp->active_links_rx & BIT(link_id)))
 			continue;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*link_sta = rcu_dereference(sta->link[link_id]);
 		if (!*link_sta)
 			continue;
@@ -1799,13 +1777,10 @@ mac80211_hwsim_select_tx_link(struct mac80211_hwsim_data *data,
 		if (WARN_ON_ONCE(!bss_conf))
 			continue;
 
-<<<<<<< HEAD
 		/* can happen while switching links */
 		if (!rcu_access_pointer(bss_conf->chanctx_conf))
 			continue;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sp->last_link = link_id;
 		return bss_conf;
 	}
@@ -2260,7 +2235,6 @@ static int mac80211_hwsim_config(struct ieee80211_hw *hw, u32 changed)
 	for (idx = 0; idx < ARRAY_SIZE(data->link_data); idx++) {
 		struct mac80211_hwsim_link_data *link_data =
 			&data->link_data[idx];
-<<<<<<< HEAD
 
 		if (!data->started || !link_data->beacon_int) {
 			hrtimer_cancel(&link_data->beacon_timer);
@@ -2269,16 +2243,6 @@ static int mac80211_hwsim_config(struct ieee80211_hw *hw, u32 changed)
 			u32 bcn_int = link_data->beacon_int;
 			u64 until_tbtt = bcn_int - do_div(tsf, bcn_int);
 
-=======
-
-		if (!data->started || !link_data->beacon_int) {
-			hrtimer_cancel(&link_data->beacon_timer);
-		} else if (!hrtimer_is_queued(&link_data->beacon_timer)) {
-			u64 tsf = mac80211_hwsim_get_tsf(hw, NULL);
-			u32 bcn_int = link_data->beacon_int;
-			u64 until_tbtt = bcn_int - do_div(tsf, bcn_int);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			hrtimer_start(&link_data->beacon_timer,
 				      ns_to_ktime(until_tbtt * NSEC_PER_USEC),
 				      HRTIMER_MODE_REL_SOFT);
@@ -2484,7 +2448,6 @@ static int mac80211_hwsim_sta_add(struct ieee80211_hw *hw,
 	hwsim_check_magic(vif);
 	hwsim_set_sta_magic(sta);
 	mac80211_hwsim_sta_rc_update(hw, vif, sta, 0);
-<<<<<<< HEAD
 
 	if (sta->valid_links) {
 		WARN(hweight16(sta->valid_links) > 1,
@@ -2492,8 +2455,6 @@ static int mac80211_hwsim_sta_add(struct ieee80211_hw *hw,
 		     sta->valid_links);
 		sp->active_links_rx = sta->valid_links;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -2520,7 +2481,6 @@ static int mac80211_hwsim_sta_state(struct ieee80211_hw *hw,
 	if (old_state == IEEE80211_STA_NOTEXIST)
 		return mac80211_hwsim_sta_add(hw, vif, sta);
 
-<<<<<<< HEAD
 	/*
 	 * when client is authorized (AP station marked as such),
 	 * enable all links
@@ -2529,8 +2489,6 @@ static int mac80211_hwsim_sta_state(struct ieee80211_hw *hw,
 	    new_state == IEEE80211_STA_AUTHORIZED && !sta->tdls)
 		ieee80211_set_active_links_async(vif, vif->valid_links);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -3124,12 +3082,7 @@ static int mac80211_hwsim_change_vif_links(struct ieee80211_hw *hw,
 	for_each_set_bit(i, &add, IEEE80211_MLD_MAX_NUM_LINKS) {
 		struct ieee80211_bss_conf *link_conf;
 
-<<<<<<< HEAD
 		link_conf = link_conf_dereference_protected(vif, i);
-=======
-		/* FIXME: figure out how to get the locking here */
-		link_conf = rcu_dereference_protected(vif->link_conf[i], 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (WARN_ON(!link_conf))
 			continue;
 
@@ -3144,7 +3097,6 @@ static int mac80211_hwsim_change_sta_links(struct ieee80211_hw *hw,
 					   struct ieee80211_sta *sta,
 					   u16 old_links, u16 new_links)
 {
-<<<<<<< HEAD
 	struct hwsim_sta_priv *sp = (void *)sta->drv_priv;
 
 	hwsim_check_sta_magic(sta);
@@ -3152,8 +3104,6 @@ static int mac80211_hwsim_change_sta_links(struct ieee80211_hw *hw,
 	if (vif->type == NL80211_IFTYPE_STATION)
 		sp->active_links_rx = new_links;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -3341,12 +3291,7 @@ out_err:
 
 static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 	{
-<<<<<<< HEAD
 		.types_mask = BIT(NL80211_IFTYPE_STATION),
-=======
-		.types_mask = BIT(NL80211_IFTYPE_STATION) |
-			      BIT(NL80211_IFTYPE_AP),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.he_cap = {
 			.has_he = true,
 			.he_cap_elem = {
@@ -3450,7 +3395,6 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 			/* PPE threshold information is not supported */
 		},
 	},
-<<<<<<< HEAD
 	{
 		.types_mask = BIT(NL80211_IFTYPE_AP),
 		.he_cap = {
@@ -3556,8 +3500,6 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 			/* PPE threshold information is not supported */
 		},
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_MAC80211_MESH
 	{
 		.types_mask = BIT(NL80211_IFTYPE_MESH_POINT),
@@ -3600,7 +3542,6 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 };
 
 static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
-<<<<<<< HEAD
 	{
 		/* TODO: should we support other types, e.g., P2P? */
 		.types_mask = BIT(NL80211_IFTYPE_STATION),
@@ -4043,8 +3984,6 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 			/* PPE threshold information is not supported */
 		},
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{
 		.types_mask = BIT(NL80211_IFTYPE_AP),
 		.he_6ghz_capa = {
@@ -4110,238 +4049,6 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 					IEEE80211_EHT_MAC_CAP0_OM_CONTROL |
 					IEEE80211_EHT_MAC_CAP0_TRIG_TXOP_SHARING_MODE1,
 				.phy_cap_info[0] =
-<<<<<<< HEAD
-					IEEE80211_EHT_PHY_CAP0_320MHZ_IN_6GHZ |
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-					IEEE80211_EHT_PHY_CAP0_242_TONE_RU_GT20MHZ |
-					IEEE80211_EHT_PHY_CAP0_NDP_4_EHT_LFT_32_GI |
-					IEEE80211_EHT_PHY_CAP0_PARTIAL_BW_UL_MU_MIMO |
-					IEEE80211_EHT_PHY_CAP0_SU_BEAMFORMER |
-					IEEE80211_EHT_PHY_CAP0_SU_BEAMFORMEE |
-					IEEE80211_EHT_PHY_CAP0_BEAMFORMEE_SS_80MHZ_MASK,
-				.phy_cap_info[1] =
-					IEEE80211_EHT_PHY_CAP1_BEAMFORMEE_SS_80MHZ_MASK |
-<<<<<<< HEAD
-					IEEE80211_EHT_PHY_CAP1_BEAMFORMEE_SS_160MHZ_MASK |
-					IEEE80211_EHT_PHY_CAP1_BEAMFORMEE_SS_320MHZ_MASK,
-				.phy_cap_info[2] =
-					IEEE80211_EHT_PHY_CAP2_SOUNDING_DIM_80MHZ_MASK |
-					IEEE80211_EHT_PHY_CAP2_SOUNDING_DIM_160MHZ_MASK |
-					IEEE80211_EHT_PHY_CAP2_SOUNDING_DIM_320MHZ_MASK,
-=======
-					IEEE80211_EHT_PHY_CAP1_BEAMFORMEE_SS_160MHZ_MASK,
-				.phy_cap_info[2] =
-					IEEE80211_EHT_PHY_CAP2_SOUNDING_DIM_80MHZ_MASK |
-					IEEE80211_EHT_PHY_CAP2_SOUNDING_DIM_160MHZ_MASK,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-				.phy_cap_info[3] =
-					IEEE80211_EHT_PHY_CAP3_NG_16_SU_FEEDBACK |
-					IEEE80211_EHT_PHY_CAP3_NG_16_MU_FEEDBACK |
-					IEEE80211_EHT_PHY_CAP3_CODEBOOK_4_2_SU_FDBK |
-					IEEE80211_EHT_PHY_CAP3_CODEBOOK_7_5_MU_FDBK |
-					IEEE80211_EHT_PHY_CAP3_TRIG_SU_BF_FDBK |
-					IEEE80211_EHT_PHY_CAP3_TRIG_MU_BF_PART_BW_FDBK |
-					IEEE80211_EHT_PHY_CAP3_TRIG_CQI_FDBK,
-				.phy_cap_info[4] =
-					IEEE80211_EHT_PHY_CAP4_PART_BW_DL_MU_MIMO |
-					IEEE80211_EHT_PHY_CAP4_PSR_SR_SUPP |
-					IEEE80211_EHT_PHY_CAP4_POWER_BOOST_FACT_SUPP |
-					IEEE80211_EHT_PHY_CAP4_EHT_MU_PPDU_4_EHT_LTF_08_GI |
-					IEEE80211_EHT_PHY_CAP4_MAX_NC_MASK,
-				.phy_cap_info[5] =
-					IEEE80211_EHT_PHY_CAP5_NON_TRIG_CQI_FEEDBACK |
-					IEEE80211_EHT_PHY_CAP5_TX_LESS_242_TONE_RU_SUPP |
-					IEEE80211_EHT_PHY_CAP5_RX_LESS_242_TONE_RU_SUPP |
-					IEEE80211_EHT_PHY_CAP5_PPE_THRESHOLD_PRESENT |
-					IEEE80211_EHT_PHY_CAP5_COMMON_NOMINAL_PKT_PAD_MASK |
-					IEEE80211_EHT_PHY_CAP5_MAX_NUM_SUPP_EHT_LTF_MASK,
-				.phy_cap_info[6] =
-					IEEE80211_EHT_PHY_CAP6_MAX_NUM_SUPP_EHT_LTF_MASK |
-<<<<<<< HEAD
-					IEEE80211_EHT_PHY_CAP6_MCS15_SUPP_MASK |
-					IEEE80211_EHT_PHY_CAP6_EHT_DUP_6GHZ_SUPP,
-=======
-					IEEE80211_EHT_PHY_CAP6_MCS15_SUPP_MASK,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-				.phy_cap_info[7] =
-					IEEE80211_EHT_PHY_CAP7_20MHZ_STA_RX_NDP_WIDER_BW |
-					IEEE80211_EHT_PHY_CAP7_NON_OFDMA_UL_MU_MIMO_80MHZ |
-					IEEE80211_EHT_PHY_CAP7_NON_OFDMA_UL_MU_MIMO_160MHZ |
-<<<<<<< HEAD
-					IEEE80211_EHT_PHY_CAP7_NON_OFDMA_UL_MU_MIMO_320MHZ |
-					IEEE80211_EHT_PHY_CAP7_MU_BEAMFORMER_80MHZ |
-					IEEE80211_EHT_PHY_CAP7_MU_BEAMFORMER_160MHZ |
-					IEEE80211_EHT_PHY_CAP7_MU_BEAMFORMER_320MHZ,
-=======
-					IEEE80211_EHT_PHY_CAP7_MU_BEAMFORMER_80MHZ |
-					IEEE80211_EHT_PHY_CAP7_MU_BEAMFORMER_160MHZ,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-			},
-
-			/* For all MCS and bandwidth, set 8 NSS for both Tx and
-			 * Rx
-			 */
-			.eht_mcs_nss_supp = {
-				/*
-				 * As B1 and B2 are set in the supported
-				 * channel width set field in the HE PHY
-<<<<<<< HEAD
-				 * capabilities information field and 320MHz in
-				 * 6GHz is supported include all the following
-				 * MCS/NSS.
-=======
-				 * capabilities information field include all
-				 * the following MCS/NSS.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-				 */
-				.bw._80 = {
-					.rx_tx_mcs9_max_nss = 0x88,
-					.rx_tx_mcs11_max_nss = 0x88,
-					.rx_tx_mcs13_max_nss = 0x88,
-				},
-				.bw._160 = {
-					.rx_tx_mcs9_max_nss = 0x88,
-					.rx_tx_mcs11_max_nss = 0x88,
-					.rx_tx_mcs13_max_nss = 0x88,
-				},
-<<<<<<< HEAD
-				.bw._320 = {
-					.rx_tx_mcs9_max_nss = 0x88,
-					.rx_tx_mcs11_max_nss = 0x88,
-					.rx_tx_mcs13_max_nss = 0x88,
-				},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-			},
-			/* PPE threshold information is not supported */
-		},
-	},
-#ifdef CONFIG_MAC80211_MESH
-	{
-		/* TODO: should we support other types, e.g., IBSS?*/
-		.types_mask = BIT(NL80211_IFTYPE_MESH_POINT),
-		.he_6ghz_capa = {
-			.capa = cpu_to_le16(IEEE80211_HE_6GHZ_CAP_MIN_MPDU_START |
-					    IEEE80211_HE_6GHZ_CAP_MAX_AMPDU_LEN_EXP |
-					    IEEE80211_HE_6GHZ_CAP_MAX_MPDU_LEN |
-					    IEEE80211_HE_6GHZ_CAP_SM_PS |
-					    IEEE80211_HE_6GHZ_CAP_RD_RESPONDER |
-					    IEEE80211_HE_6GHZ_CAP_TX_ANTPAT_CONS |
-					    IEEE80211_HE_6GHZ_CAP_RX_ANTPAT_CONS),
-		},
-		.he_cap = {
-			.has_he = true,
-			.he_cap_elem = {
-				.mac_cap_info[0] =
-					IEEE80211_HE_MAC_CAP0_HTC_HE,
-				.mac_cap_info[1] =
-					IEEE80211_HE_MAC_CAP1_MULTI_TID_AGG_RX_QOS_8,
-				.mac_cap_info[2] =
-					IEEE80211_HE_MAC_CAP2_ACK_EN,
-				.mac_cap_info[3] =
-					IEEE80211_HE_MAC_CAP3_OMI_CONTROL |
-					IEEE80211_HE_MAC_CAP3_MAX_AMPDU_LEN_EXP_EXT_3,
-				.mac_cap_info[4] = IEEE80211_HE_MAC_CAP4_AMSDU_IN_AMPDU,
-				.phy_cap_info[0] =
-					IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_40MHZ_80MHZ_IN_5G |
-					IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_160MHZ_IN_5G |
-					IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_80PLUS80_MHZ_IN_5G,
-				.phy_cap_info[1] =
-					IEEE80211_HE_PHY_CAP1_PREAMBLE_PUNC_RX_MASK |
-					IEEE80211_HE_PHY_CAP1_DEVICE_CLASS_A |
-					IEEE80211_HE_PHY_CAP1_LDPC_CODING_IN_PAYLOAD |
-					IEEE80211_HE_PHY_CAP1_MIDAMBLE_RX_TX_MAX_NSTS,
-				.phy_cap_info[2] = 0,
-
-				/* Leave all the other PHY capability bytes
-				 * unset, as DCM, beam forming, RU and PPE
-				 * threshold information are not supported
-				 */
-			},
-			.he_mcs_nss_supp = {
-				.rx_mcs_80 = cpu_to_le16(0xfffa),
-				.tx_mcs_80 = cpu_to_le16(0xfffa),
-				.rx_mcs_160 = cpu_to_le16(0xfffa),
-				.tx_mcs_160 = cpu_to_le16(0xfffa),
-				.rx_mcs_80p80 = cpu_to_le16(0xfffa),
-				.tx_mcs_80p80 = cpu_to_le16(0xfffa),
-			},
-		},
-	},
-#endif
-};
-
-<<<<<<< HEAD
-=======
-static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
-	{
-		/* TODO: should we support other types, e.g., P2P?*/
-		.types_mask = BIT(NL80211_IFTYPE_STATION) |
-			      BIT(NL80211_IFTYPE_AP),
-		.he_6ghz_capa = {
-			.capa = cpu_to_le16(IEEE80211_HE_6GHZ_CAP_MIN_MPDU_START |
-					    IEEE80211_HE_6GHZ_CAP_MAX_AMPDU_LEN_EXP |
-					    IEEE80211_HE_6GHZ_CAP_MAX_MPDU_LEN |
-					    IEEE80211_HE_6GHZ_CAP_SM_PS |
-					    IEEE80211_HE_6GHZ_CAP_RD_RESPONDER |
-					    IEEE80211_HE_6GHZ_CAP_TX_ANTPAT_CONS |
-					    IEEE80211_HE_6GHZ_CAP_RX_ANTPAT_CONS),
-		},
-		.he_cap = {
-			.has_he = true,
-			.he_cap_elem = {
-				.mac_cap_info[0] =
-					IEEE80211_HE_MAC_CAP0_HTC_HE,
-				.mac_cap_info[1] =
-					IEEE80211_HE_MAC_CAP1_TF_MAC_PAD_DUR_16US |
-					IEEE80211_HE_MAC_CAP1_MULTI_TID_AGG_RX_QOS_8,
-				.mac_cap_info[2] =
-					IEEE80211_HE_MAC_CAP2_BSR |
-					IEEE80211_HE_MAC_CAP2_MU_CASCADING |
-					IEEE80211_HE_MAC_CAP2_ACK_EN,
-				.mac_cap_info[3] =
-					IEEE80211_HE_MAC_CAP3_OMI_CONTROL |
-					IEEE80211_HE_MAC_CAP3_MAX_AMPDU_LEN_EXP_EXT_3,
-				.mac_cap_info[4] = IEEE80211_HE_MAC_CAP4_AMSDU_IN_AMPDU,
-				.phy_cap_info[0] =
-					IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_40MHZ_80MHZ_IN_5G |
-					IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_160MHZ_IN_5G |
-					IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_80PLUS80_MHZ_IN_5G,
-				.phy_cap_info[1] =
-					IEEE80211_HE_PHY_CAP1_PREAMBLE_PUNC_RX_MASK |
-					IEEE80211_HE_PHY_CAP1_DEVICE_CLASS_A |
-					IEEE80211_HE_PHY_CAP1_LDPC_CODING_IN_PAYLOAD |
-					IEEE80211_HE_PHY_CAP1_MIDAMBLE_RX_TX_MAX_NSTS,
-				.phy_cap_info[2] =
-					IEEE80211_HE_PHY_CAP2_NDP_4x_LTF_AND_3_2US |
-					IEEE80211_HE_PHY_CAP2_STBC_TX_UNDER_80MHZ |
-					IEEE80211_HE_PHY_CAP2_STBC_RX_UNDER_80MHZ |
-					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
-					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
-
-				/* Leave all the other PHY capability bytes
-				 * unset, as DCM, beam forming, RU and PPE
-				 * threshold information are not supported
-				 */
-			},
-			.he_mcs_nss_supp = {
-				.rx_mcs_80 = cpu_to_le16(0xfffa),
-				.tx_mcs_80 = cpu_to_le16(0xfffa),
-				.rx_mcs_160 = cpu_to_le16(0xfffa),
-				.tx_mcs_160 = cpu_to_le16(0xfffa),
-				.rx_mcs_80p80 = cpu_to_le16(0xfffa),
-				.tx_mcs_80p80 = cpu_to_le16(0xfffa),
-			},
-		},
-		.eht_cap = {
-			.has_eht = true,
-			.eht_cap_elem = {
-				.mac_cap_info[0] =
-					IEEE80211_EHT_MAC_CAP0_EPCS_PRIO_ACCESS |
-					IEEE80211_EHT_MAC_CAP0_OM_CONTROL |
-					IEEE80211_EHT_MAC_CAP0_TRIG_TXOP_SHARING_MODE1,
-				.phy_cap_info[0] =
 					IEEE80211_EHT_PHY_CAP0_320MHZ_IN_6GHZ |
 					IEEE80211_EHT_PHY_CAP0_242_TONE_RU_GT20MHZ |
 					IEEE80211_EHT_PHY_CAP0_NDP_4_EHT_LFT_32_GI |
@@ -4477,7 +4184,6 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 #endif
 };
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void mac80211_hwsim_sband_capab(struct ieee80211_supported_band *sband)
 {
 	u16 n_iftype_data;
@@ -5251,10 +4957,7 @@ static int hwsim_cloned_frame_received_nl(struct sk_buff *skb_2,
 							  rx_status.freq);
 		if (!iter_data.channel)
 			goto out;
-<<<<<<< HEAD
 		rx_status.band = iter_data.channel->band;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		mutex_lock(&data2->mutex);
 		if (!hwsim_chans_compat(iter_data.channel, channel)) {

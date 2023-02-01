@@ -322,21 +322,6 @@ Contact: Daniel Vetter, Noralf Tronnes
 
 Level: Advanced
 
-<<<<<<< HEAD
-=======
-idr_init_base()
----------------
-
-DRM core&drivers uses a lot of idr (integer lookup directories) for mapping
-userspace IDs to internal objects, and in most places ID=0 means NULL and hence
-is never used. Switching to idr_init_base() for these would make the idr more
-efficient.
-
-Contact: Daniel Vetter
-
-Level: Starter
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct drm_gem_object_funcs
 ---------------------------
 
@@ -346,22 +331,6 @@ converted, except for struct drm_driver.gem_prime_mmap.
 
 Level: Intermediate
 
-<<<<<<< HEAD
-=======
-Rename CMA helpers to DMA helpers
----------------------------------
-
-CMA (standing for contiguous memory allocator) is really a bit an accident of
-what these were used for first, a much better name would be DMA helpers. In the
-text these should even be called coherent DMA memory helpers (so maybe CDM, but
-no one knows what that means) since underneath they just use dma_alloc_coherent.
-
-Contact: Laurent Pinchart, Daniel Vetter
-
-Level: Intermediate (mostly because it is a huge tasks without good partial
-milestones, not technically itself that challenging)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 connector register/unregister fixes
 -----------------------------------
 
@@ -566,7 +535,6 @@ Level: Intermediate
 
 Object lifetime fixes
 ---------------------
-<<<<<<< HEAD
 
 There's two related issues here
 
@@ -578,19 +546,6 @@ There's two related issues here
   trouble even for drivers for hardware integrated on the SoC due to
   EPROBE_DEFERRED backoff.
 
-=======
-
-There's two related issues here
-
-- Cleanup up the various ->destroy callbacks, which often are all the same
-  simple code.
-
-- Lots of drivers erroneously allocate DRM modeset objects using devm_kzalloc,
-  which results in use-after free issues on driver unload. This can be serious
-  trouble even for drivers for hardware integrated on the SoC due to
-  EPROBE_DEFERRED backoff.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Both these problems can be solved by switching over to drmm_kzalloc(), and the
 various convenience wrappers provided, e.g. drmm_crtc_alloc_with_planes(),
 drmm_universal_plane_alloc(), ... and so on.
@@ -637,20 +592,6 @@ Contact: Javier Martinez Canillas <javierm@redhat.com>
 
 Level: Intermediate
 
-<<<<<<< HEAD
-=======
-Convert Kernel Selftests (kselftest) to KUnit tests when appropriate
---------------------------------------------------------------------
-
-Many of the `Kselftest <https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html>`_
-tests in DRM could be converted to Kunit tests instead, since that framework
-is more suitable for unit testing.
-
-Contact: Javier Martinez Canillas <javierm@redhat.com>
-
-Level: Starter
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Enable trinity for DRM
 ----------------------
 
@@ -709,17 +650,6 @@ a bunch of progress cleaning it up but there's still plenty of work to be done.
 See drivers/gpu/drm/amd/display/TODO for tasks.
 
 Contact: Harry Wentland, Alex Deucher
-
-vmwgfx: Replace hashtable with Linux' implementation
-----------------------------------------------------
-
-The vmwgfx driver uses its own hashtable implementation. Replace the
-code with Linux' implementation and update the callers. It's mostly a
-refactoring task, but the interfaces are different.
-
-Contact: Zack Rusin, Thomas Zimmermann <tzimmermann@suse.de>
-
-Level: Intermediate
 
 Bootsplash
 ==========

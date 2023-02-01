@@ -2456,7 +2456,6 @@ int ssam_controller_event_enable(struct ssam_controller *ctrl,
 	return 0;
 }
 EXPORT_SYMBOL_GPL(ssam_controller_event_enable);
-<<<<<<< HEAD
 
 /**
  * ssam_controller_event_disable() - Disable the specified event.
@@ -2489,40 +2488,6 @@ int ssam_controller_event_disable(struct ssam_controller *ctrl,
 	if (!ssh_rqid_is_event(rqid))
 		return -EINVAL;
 
-=======
-
-/**
- * ssam_controller_event_disable() - Disable the specified event.
- * @ctrl:  The controller to disable the event for.
- * @reg:   The event registry to use for disabling the event.
- * @id:    The event ID specifying the event to be disabled.
- * @flags: The flags used when enabling the event.
- *
- * Decrement the reference count of the specified event. If the reference count
- * reaches zero, the event will be disabled.
- *
- * Note: In general, ssam_notifier_register()/ssam_notifier_unregister() with a
- * non-observer notifier should be preferred for enabling/disabling events, as
- * this will guarantee proper ordering and event forwarding in case of errors
- * during event enabling/disabling.
- *
- * Return: Returns zero on success, %-ENOENT if the given event has not been
- * enabled on the controller. If the reference count of the event reaches zero
- * during this call, returns the status of the event-disable EC-command.
- */
-int ssam_controller_event_disable(struct ssam_controller *ctrl,
-				  struct ssam_event_registry reg,
-				  struct ssam_event_id id, u8 flags)
-{
-	u16 rqid = ssh_tc_to_rqid(id.target_category);
-	struct ssam_nf *nf = &ctrl->cplt.event.notif;
-	struct ssam_nf_refcount_entry *entry;
-	int status;
-
-	if (!ssh_rqid_is_event(rqid))
-		return -EINVAL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&nf->lock);
 
 	entry = ssam_nf_refcount_dec(nf, reg, id);

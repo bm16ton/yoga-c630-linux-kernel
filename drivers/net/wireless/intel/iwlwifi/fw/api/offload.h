@@ -3,11 +3,7 @@
  * Copyright (C) 2012-2014 Intel Corporation
  * Copyright (C) 2013-2015 Intel Mobile Communications GmbH
  * Copyright (C) 2016-2017 Intel Deutschland GmbH
-<<<<<<< HEAD
  * Copyright (C) 2021-2022 Intel Corporation
-=======
- * Copyright (C) 2021 Intel Corporation
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #ifndef __iwl_fw_api_offload_h__
 #define __iwl_fw_api_offload_h__

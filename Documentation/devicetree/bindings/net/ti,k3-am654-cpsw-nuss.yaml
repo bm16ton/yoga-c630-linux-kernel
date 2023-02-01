@@ -55,10 +55,7 @@ properties:
   compatible:
     enum:
       - ti,am654-cpsw-nuss
-<<<<<<< HEAD
       - ti,j7200-cpswxg-nuss
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - ti,j721e-cpsw-nuss
       - ti,am642-cpsw-nuss
 

@@ -97,12 +97,8 @@ static int um_pci_send_cmd(struct um_pci_device *dev,
 	}
 
 	buf = get_cpu_var(um_pci_msg_bufs);
-<<<<<<< HEAD
 	if (buf)
 		memcpy(buf, cmd, cmd_size);
-=======
-	memcpy(buf, cmd, cmd_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (posted) {
 		u8 *ncmd = kmalloc(cmd_size + extra_size, GFP_ATOMIC);
@@ -187,10 +183,7 @@ static unsigned long um_pci_cfgspace_read(void *priv, unsigned int offset,
 	struct um_pci_message_buffer *buf;
 	u8 *data;
 	unsigned long ret = ULONG_MAX;
-<<<<<<< HEAD
 	size_t bytes = sizeof(buf->data);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!dev)
 		return ULONG_MAX;
@@ -198,12 +191,8 @@ static unsigned long um_pci_cfgspace_read(void *priv, unsigned int offset,
 	buf = get_cpu_var(um_pci_msg_bufs);
 	data = buf->data;
 
-<<<<<<< HEAD
 	if (buf)
 		memset(data, 0xff, bytes);
-=======
-	memset(buf->data, 0xff, sizeof(buf->data));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (size) {
 	case 1:
@@ -218,11 +207,7 @@ static unsigned long um_pci_cfgspace_read(void *priv, unsigned int offset,
 		goto out;
 	}
 
-<<<<<<< HEAD
 	if (um_pci_send_cmd(dev, &hdr, sizeof(hdr), NULL, 0, data, bytes))
-=======
-	if (um_pci_send_cmd(dev, &hdr, sizeof(hdr), NULL, 0, data, 8))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out;
 
 	switch (size) {
@@ -875,11 +860,7 @@ void *pci_root_bus_fwnode(struct pci_bus *bus)
 	return um_pci_fwnode;
 }
 
-<<<<<<< HEAD
 static int __init um_pci_init(void)
-=======
-static int um_pci_init(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err, i;
 
@@ -962,11 +943,7 @@ free:
 }
 module_init(um_pci_init);
 
-<<<<<<< HEAD
 static void __exit um_pci_exit(void)
-=======
-static void um_pci_exit(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unregister_virtio_driver(&um_pci_virtio_driver);
 	irq_domain_remove(um_pci_msi_domain);

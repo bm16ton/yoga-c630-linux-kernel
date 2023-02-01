@@ -79,7 +79,6 @@
 #define MAX_PACKAGE_COUNT 8
 #define MAX_DIE_PER_PACKAGE 2
 
-<<<<<<< HEAD
 /* Unified structure to specific a CPU or a Power Domain */
 struct isst_id {
 	int cpu;
@@ -87,8 +86,6 @@ struct isst_id {
 	int die;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct isst_clos_config {
 	unsigned char epp;
 	unsigned char clos_prop_prio;
@@ -265,26 +262,15 @@ extern void isst_display_error_info_message(int error, char *msg, int arg_valid,
 extern int is_skx_based_platform(void);
 extern int is_spr_platform(void);
 extern int is_icx_platform(void);
-<<<<<<< HEAD
 extern void isst_trl_display_information(struct isst_id *id, FILE *outf, unsigned long long trl);
 
 extern void set_cpu_online_offline(int cpu, int state);
 extern void for_each_online_package_in_set(void (*callback)(struct isst_id *, void *, void *,
-=======
-extern void isst_trl_display_information(int cpu, FILE *outf, unsigned long long trl);
-
-extern void set_cpu_online_offline(int cpu, int state);
-extern void for_each_online_package_in_set(void (*callback)(int, void *, void *,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 							    void *, void *),
 					   void *arg1, void *arg2, void *arg3,
 					   void *arg4);
 extern int isst_daemon(int debug_mode, int poll_interval, int no_daemon);
-<<<<<<< HEAD
 extern void process_level_change(struct isst_id *id);
-=======
-extern void process_level_change(int cpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int hfi_main(void);
 extern void hfi_exit(void);
 #endif

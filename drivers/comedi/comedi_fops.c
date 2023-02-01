@@ -396,11 +396,7 @@ static ssize_t max_read_buffer_kb_show(struct device *csdev,
 	mutex_unlock(&dev->mutex);
 
 	comedi_dev_put(dev);
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%u\n", size);
-=======
-	return snprintf(buf, PAGE_SIZE, "%u\n", size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static ssize_t max_read_buffer_kb_store(struct device *csdev,
@@ -456,11 +452,7 @@ static ssize_t read_buffer_kb_show(struct device *csdev,
 	mutex_unlock(&dev->mutex);
 
 	comedi_dev_put(dev);
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%u\n", size);
-=======
-	return snprintf(buf, PAGE_SIZE, "%u\n", size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static ssize_t read_buffer_kb_store(struct device *csdev,
@@ -517,11 +509,7 @@ static ssize_t max_write_buffer_kb_show(struct device *csdev,
 	mutex_unlock(&dev->mutex);
 
 	comedi_dev_put(dev);
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%u\n", size);
-=======
-	return snprintf(buf, PAGE_SIZE, "%u\n", size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static ssize_t max_write_buffer_kb_store(struct device *csdev,
@@ -577,11 +565,7 @@ static ssize_t write_buffer_kb_show(struct device *csdev,
 	mutex_unlock(&dev->mutex);
 
 	comedi_dev_put(dev);
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%u\n", size);
-=======
-	return snprintf(buf, PAGE_SIZE, "%u\n", size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static ssize_t write_buffer_kb_store(struct device *csdev,

@@ -269,14 +269,6 @@ extern struct workqueue_struct *rpciod_workqueue;
 extern struct workqueue_struct *xprtiod_workqueue;
 void		rpc_prepare_task(struct rpc_task *task);
 gfp_t		rpc_task_gfp_mask(void);
-<<<<<<< HEAD
-=======
-
-static inline int rpc_wait_for_completion_task(struct rpc_task *task)
-{
-	return __rpc_wait_for_completion_task(task, NULL);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if IS_ENABLED(CONFIG_SUNRPC_DEBUG) || IS_ENABLED(CONFIG_TRACEPOINTS)
 static inline const char * rpc_qname(const struct rpc_wait_queue *q)

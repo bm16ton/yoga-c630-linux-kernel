@@ -1147,7 +1147,6 @@ cpt:
 	err = rvu_nix_init(rvu);
 	if (err) {
 		dev_err(rvu->dev, "%s: Failed to initialize nix\n", __func__);
-<<<<<<< HEAD
 		goto nix_err;
 	}
 
@@ -1156,16 +1155,6 @@ cpt:
 		dev_err(rvu->dev, "%s: Failed to initialize sdp\n", __func__);
 		goto nix_err;
 	}
-=======
-		goto nix_err;
-	}
-
-	err = rvu_sdp_init(rvu);
-	if (err) {
-		dev_err(rvu->dev, "%s: Failed to initialize sdp\n", __func__);
-		goto nix_err;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rvu_program_channels(rvu);
 

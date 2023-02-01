@@ -21,11 +21,7 @@ static int init_alloc_hint(struct sbitmap *sb, gfp_t flags)
 		int i;
 
 		for_each_possible_cpu(i)
-<<<<<<< HEAD
 			*per_cpu_ptr(sb->alloc_hint, i) = prandom_u32_max(depth);
-=======
-			*per_cpu_ptr(sb->alloc_hint, i) = prandom_u32() % depth;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return 0;
 }
@@ -37,11 +33,7 @@ static inline unsigned update_alloc_hint_before_get(struct sbitmap *sb,
 
 	hint = this_cpu_read(*sb->alloc_hint);
 	if (unlikely(hint >= depth)) {
-<<<<<<< HEAD
 		hint = depth ? prandom_u32_max(depth) : 0;
-=======
-		hint = depth ? prandom_u32() % depth : 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		this_cpu_write(*sb->alloc_hint, hint);
 	}
 
@@ -541,7 +533,6 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
 		nr = find_first_zero_bit(&map->word, map_depth);
 		if (nr + nr_tags <= map_depth) {
 			atomic_long_t *ptr = (atomic_long_t *) &map->word;
-<<<<<<< HEAD
 			unsigned long val;
 
 			get_mask = ((1UL << nr_tags) - 1) << nr;
@@ -556,23 +547,6 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
 				*offset = nr + (index << sb->shift);
 				update_alloc_hint_after_get(sb, depth, hint,
 							*offset + nr_tags - 1);
-=======
-			int map_tags = min_t(int, nr_tags, map_depth);
-			unsigned long val, ret;
-
-			get_mask = ((1UL << map_tags) - 1) << nr;
-			do {
-				val = READ_ONCE(map->word);
-				if ((val & ~get_mask) != val)
-					goto next;
-				ret = atomic_long_cmpxchg(ptr, val, get_mask | val);
-			} while (ret != val);
-			get_mask = (get_mask & ~ret) >> nr;
-			if (get_mask) {
-				*offset = nr + (index << sb->shift);
-				update_alloc_hint_after_get(sb, depth, hint,
-							*offset + map_tags - 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				return get_mask;
 			}
 		}
@@ -740,11 +714,7 @@ void sbitmap_queue_clear_batch(struct sbitmap_queue *sbq, int offset,
 		atomic_long_andnot(mask, (atomic_long_t *) addr);
 
 	smp_mb__after_atomic();
-<<<<<<< HEAD
 	sbitmap_queue_wake_up(sbq, nr_tags);
-=======
-	sbitmap_queue_wake_up(sbq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sbitmap_update_cpu_hint(&sbq->sb, raw_smp_processor_id(),
 					tags[nr_tags - 1] - offset);
 }
@@ -772,11 +742,7 @@ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
 	 * waiter. See the comment on waitqueue_active().
 	 */
 	smp_mb__after_atomic();
-<<<<<<< HEAD
 	sbitmap_queue_wake_up(sbq, 1);
-=======
-	sbitmap_queue_wake_up(sbq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sbitmap_update_cpu_hint(&sbq->sb, cpu, nr);
 }
 EXPORT_SYMBOL_GPL(sbitmap_queue_clear);

@@ -26,10 +26,7 @@
 #include <linux/namei.h>
 #include <linux/part_stat.h>
 #include <linux/uaccess.h>
-<<<<<<< HEAD
 #include <linux/stat.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../fs/internal.h"
 #include "blk.h"
 
@@ -1073,7 +1070,6 @@ void sync_bdevs(bool wait)
 	spin_unlock(&blockdev_superblock->s_inode_list_lock);
 	iput(old_inode);
 }
-<<<<<<< HEAD
 
 /*
  * Handle STATX_DIOALIGN for block devices.
@@ -1096,5 +1092,3 @@ void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
 
 	blkdev_put_no_open(bdev);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

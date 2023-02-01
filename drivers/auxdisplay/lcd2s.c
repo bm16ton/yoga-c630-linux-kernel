@@ -346,10 +346,6 @@ static void lcd2s_i2c_remove(struct i2c_client *i2c)
 
 	charlcd_unregister(lcd2s->charlcd);
 	charlcd_free(lcd2s->charlcd);
-<<<<<<< HEAD
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id lcd2s_i2c_id[] = {

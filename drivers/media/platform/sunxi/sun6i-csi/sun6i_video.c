@@ -86,16 +86,12 @@ static bool sun6i_video_format_check(u32 format)
 
 /* Video */
 
-<<<<<<< HEAD
 static void sun6i_video_buffer_configure(struct sun6i_csi_device *csi_dev,
 					 struct sun6i_csi_buffer *csi_buffer)
 {
 	csi_buffer->queued_to_csi = true;
 	sun6i_csi_update_buf_addr(csi_dev, csi_buffer->dma_addr);
 }
-=======
-	remote = media_pad_remote_pad_first(&video->pad);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void sun6i_video_configure(struct sun6i_csi_device *csi_dev)
 {
@@ -400,20 +396,9 @@ static int sun6i_video_format_try(struct sun6i_video *video,
 	else
 		pix_format->colorspace = V4L2_COLORSPACE_SRGB;
 
-<<<<<<< HEAD
 	pix_format->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
 	pix_format->quantization = V4L2_QUANTIZATION_DEFAULT;
 	pix_format->xfer_func = V4L2_XFER_FUNC_DEFAULT;
-=======
-	if (pixfmt->pixelformat == V4L2_PIX_FMT_JPEG)
-		pixfmt->colorspace = V4L2_COLORSPACE_JPEG;
-	else
-		pixfmt->colorspace = V4L2_COLORSPACE_SRGB;
-
-	pixfmt->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
-	pixfmt->quantization = V4L2_QUANTIZATION_DEFAULT;
-	pixfmt->xfer_func = V4L2_XFER_FUNC_DEFAULT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -509,12 +494,8 @@ static const struct v4l2_ioctl_ops sun6i_video_ioctl_ops = {
 
 static int sun6i_video_open(struct file *file)
 {
-<<<<<<< HEAD
 	struct sun6i_csi_device *csi_dev = video_drvdata(file);
 	struct sun6i_video *video = &csi_dev->video;
-=======
-	struct sun6i_video *video = video_drvdata(file);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret = 0;
 
 	if (mutex_lock_interruptible(&video->lock))
@@ -608,13 +589,8 @@ static int sun6i_video_link_validate(struct media_link *link)
 	video->mbus_code = 0;
 
 	if (!media_pad_remote_pad_first(link->sink->entity->pads)) {
-<<<<<<< HEAD
 		dev_info(csi_dev->dev, "video node %s pad not connected\n",
 			 vdev->name);
-=======
-		dev_info(video->csi->dev,
-			 "video node %s pad not connected\n", vdev->name);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENOLINK;
 	}
 

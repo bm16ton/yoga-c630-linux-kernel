@@ -1884,8 +1884,6 @@
 		pins1 {
 			pinmux = <STM32_PINMUX('B', 10, AF5)>, /* SPI2_SCK */
 				 <STM32_PINMUX('I', 3, AF5)>; /* SPI2_MOSI */
-<<<<<<< HEAD
-=======
 			bias-disable;
 			drive-push-pull;
 			slew-rate = <1>;
@@ -1901,7 +1899,6 @@
 		pins1 {
 			pinmux = <STM32_PINMUX('I', 1, AF5)>, /* SPI2_SCK */
 				 <STM32_PINMUX('I', 3, AF5)>; /* SPI2_MOSI */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			bias-disable;
 			drive-push-pull;
 			slew-rate = <1>;
@@ -1909,24 +1906,6 @@
 
 		pins2 {
 			pinmux = <STM32_PINMUX('I', 2, AF5)>; /* SPI2_MISO */
-<<<<<<< HEAD
-			bias-disable;
-		};
-	};
-
-	spi2_pins_b: spi2-1 {
-		pins1 {
-			pinmux = <STM32_PINMUX('I', 1, AF5)>, /* SPI2_SCK */
-				 <STM32_PINMUX('I', 3, AF5)>; /* SPI2_MOSI */
-			bias-disable;
-			drive-push-pull;
-			slew-rate = <1>;
-		};
-
-		pins2 {
-			pinmux = <STM32_PINMUX('I', 2, AF5)>; /* SPI2_MISO */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			bias-disable;
 		};
 	};

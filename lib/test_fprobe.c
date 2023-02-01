@@ -145,11 +145,7 @@ static unsigned long get_ftrace_location(void *func)
 static int fprobe_test_init(struct kunit *test)
 {
 	do {
-<<<<<<< HEAD
 		rand1 = get_random_u32();
-=======
-		rand1 = prandom_u32();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} while (rand1 <= div_factor);
 
 	target = fprobe_selftest_target;

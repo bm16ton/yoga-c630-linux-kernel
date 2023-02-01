@@ -4,7 +4,6 @@
  * Copyright (c) 2020 Google, Inc.
  */
 
-<<<<<<< HEAD
 #include <linux/atomic.h>
 
 #include "kasan.h"
@@ -13,40 +12,6 @@ extern struct kasan_stack_ring stack_ring;
 
 static const char *get_common_bug_type(struct kasan_report_info *info)
 {
-=======
-#include "kasan.h"
-#include "../slab.h"
-
-const char *kasan_get_bug_type(struct kasan_report_info *info)
-{
-#ifdef CONFIG_KASAN_TAGS_IDENTIFY
-	struct kasan_alloc_meta *alloc_meta;
-	struct kmem_cache *cache;
-	struct slab *slab;
-	const void *addr;
-	void *object;
-	u8 tag;
-	int i;
-
-	tag = get_tag(info->access_addr);
-	addr = kasan_reset_tag(info->access_addr);
-	slab = kasan_addr_to_slab(addr);
-	if (slab) {
-		cache = slab->slab_cache;
-		object = nearest_obj(cache, slab, (void *)addr);
-		alloc_meta = kasan_get_alloc_meta(cache, object);
-
-		if (alloc_meta) {
-			for (i = 0; i < KASAN_NR_FREE_STACKS; i++) {
-				if (alloc_meta->free_pointer_tag[i] == tag)
-					return "use-after-free";
-			}
-		}
-		return "out-of-bounds";
-	}
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * If access_size is a negative number, then it has reason to be
 	 * defined as out-of-bounds bug type.
@@ -60,7 +25,6 @@ const char *kasan_get_bug_type(struct kasan_report_info *info)
 
 	return "invalid-access";
 }
-<<<<<<< HEAD
 
 void kasan_complete_mode_report_info(struct kasan_report_info *info)
 {
@@ -150,5 +114,3 @@ void kasan_complete_mode_report_info(struct kasan_report_info *info)
 	if (!info->bug_type)
 		info->bug_type = get_common_bug_type(info);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -3,7 +3,6 @@
  * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
  *     Author: Alex Williamson <alex.williamson@redhat.com>
  */
-<<<<<<< HEAD
 #ifndef __VFIO_VFIO_H__
 #define __VFIO_VFIO_H__
 
@@ -14,8 +13,6 @@
 struct iommu_group;
 struct vfio_device;
 struct vfio_container;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum vfio_group_type {
 	/*
@@ -41,7 +38,6 @@ enum vfio_group_type {
 	VFIO_NO_IOMMU,
 };
 
-<<<<<<< HEAD
 struct vfio_group {
 	struct device 			dev;
 	struct cdev			cdev;
@@ -66,8 +62,6 @@ struct vfio_group {
 	struct blocking_notifier_head	notifier;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* events for the backend driver notify callback */
 enum vfio_iommu_notify_type {
 	VFIO_IOMMU_CONTAINER_CLOSE = 0,
@@ -107,7 +101,6 @@ struct vfio_iommu_driver_ops {
 				  enum vfio_iommu_notify_type event);
 };
 
-<<<<<<< HEAD
 struct vfio_iommu_driver {
 	const struct vfio_iommu_driver_ops	*ops;
 	struct list_head			vfio_next;
@@ -138,7 +131,3 @@ enum { vfio_noiommu = false };
 #endif
 
 #endif
-=======
-int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
-void vfio_unregister_iommu_driver(const struct vfio_iommu_driver_ops *ops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -17,10 +17,7 @@
  */
 
 #include <linux/apple-mailbox.h>
-<<<<<<< HEAD
 #include <linux/delay.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/device.h>
 #include <linux/gfp.h>
 #include <linux/interrupt.h>
@@ -29,10 +26,7 @@
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>
-<<<<<<< HEAD
 #include <linux/spinlock.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/types.h>
 
 #define APPLE_ASC_MBOX_CONTROL_FULL  BIT(16)
@@ -108,10 +102,7 @@ struct apple_mbox {
 
 	struct device *dev;
 	struct mbox_controller controller;
-<<<<<<< HEAD
 	spinlock_t rx_lock;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct of_device_id apple_mbox_of_match[];
@@ -124,7 +115,6 @@ static bool apple_mbox_hw_can_send(struct apple_mbox *apple_mbox)
 	return !(mbox_ctrl & apple_mbox->hw->control_full);
 }
 
-<<<<<<< HEAD
 static bool apple_mbox_hw_send_empty(struct apple_mbox *apple_mbox)
 {
 	u32 mbox_ctrl =
@@ -133,8 +123,6 @@ static bool apple_mbox_hw_send_empty(struct apple_mbox *apple_mbox)
 	return mbox_ctrl & apple_mbox->hw->control_empty;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int apple_mbox_hw_send(struct apple_mbox *apple_mbox,
 			      struct apple_mbox_msg *msg)
 {
@@ -218,7 +206,6 @@ static irqreturn_t apple_mbox_send_empty_irq(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-<<<<<<< HEAD
 static int apple_mbox_poll(struct apple_mbox *apple_mbox)
 {
 	struct apple_mbox_msg msg;
@@ -228,15 +215,6 @@ static int apple_mbox_poll(struct apple_mbox *apple_mbox)
 		mbox_chan_received_data(&apple_mbox->chan, (void *)&msg);
 		ret++;
 	}
-=======
-static irqreturn_t apple_mbox_recv_irq(int irq, void *data)
-{
-	struct apple_mbox *apple_mbox = data;
-	struct apple_mbox_msg msg;
-
-	while (apple_mbox_hw_recv(apple_mbox, &msg) == 0)
-		mbox_chan_received_data(&apple_mbox->chan, (void *)&msg);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The interrupt will keep firing even if there are no more messages
@@ -251,7 +229,6 @@ static irqreturn_t apple_mbox_recv_irq(int irq, void *data)
 			       apple_mbox->regs + apple_mbox->hw->irq_ack);
 	}
 
-<<<<<<< HEAD
 	return ret;
 }
 
@@ -296,11 +273,6 @@ static int apple_mbox_chan_flush(struct mbox_chan *chan, unsigned long timeout)
 	return -ETIME;
 }
 
-=======
-	return IRQ_HANDLED;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int apple_mbox_chan_startup(struct mbox_chan *chan)
 {
 	struct apple_mbox *apple_mbox = chan->con_priv;
@@ -332,11 +304,8 @@ static void apple_mbox_chan_shutdown(struct mbox_chan *chan)
 
 static const struct mbox_chan_ops apple_mbox_ops = {
 	.send_data = apple_mbox_chan_send_data,
-<<<<<<< HEAD
 	.peek_data = apple_mbox_chan_peek_data,
 	.flush = apple_mbox_chan_flush,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.startup = apple_mbox_chan_startup,
 	.shutdown = apple_mbox_chan_shutdown,
 };
@@ -391,10 +360,7 @@ static int apple_mbox_probe(struct platform_device *pdev)
 	mbox->controller.txdone_irq = true;
 	mbox->controller.of_xlate = apple_mbox_of_xlate;
 	mbox->chan.con_priv = mbox;
-<<<<<<< HEAD
 	spin_lock_init(&mbox->rx_lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	irqname = devm_kasprintf(dev, GFP_KERNEL, "%s-recv", dev_name(dev));
 	if (!irqname)

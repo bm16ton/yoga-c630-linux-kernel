@@ -9,7 +9,6 @@
 
 #include "sof-priv.h"
 #include "sof-audio.h"
-<<<<<<< HEAD
 #include "ipc3-priv.h"
 
 /* IPC set()/get() for kcontrols. */
@@ -89,28 +88,6 @@ static int sof_ipc3_set_get_kcontrol_data(struct snd_sof_control *scontrol, bool
 	cdata->elems_remaining = 0;
 
 	return iops->set_get_data(sdev, cdata, cdata->rhdr.hdr.size, set);
-=======
-#include "ipc3-ops.h"
-
-static inline u32 mixer_to_ipc(unsigned int value, u32 *volume_map, int size)
-{
-	if (value >= size)
-		return volume_map[size - 1];
-
-	return volume_map[value];
-}
-
-static inline u32 ipc_to_mixer(u32 value, u32 *volume_map, int size)
-{
-	int i;
-
-	for (i = 0; i < size; i++) {
-		if (volume_map[i] >= value)
-			return i;
-	}
-
-	return i - 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void snd_sof_refresh_control(struct snd_sof_control *scontrol)
@@ -131,11 +108,7 @@ static void snd_sof_refresh_control(struct snd_sof_control *scontrol)
 
 	/* refresh the component data from DSP */
 	scontrol->comp_data_dirty = false;
-<<<<<<< HEAD
 	ret = sof_ipc3_set_get_kcontrol_data(scontrol, false);
-=======
-	ret = snd_sof_ipc_set_get_comp_data(scontrol, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		dev_err(scomp->dev, "Failed to get control data: %d\n", ret);
 
@@ -183,11 +156,7 @@ static bool sof_ipc3_volume_put(struct snd_sof_control *scontrol,
 
 	/* notify DSP of mixer updates */
 	if (pm_runtime_active(scomp->dev)) {
-<<<<<<< HEAD
 		int ret = sof_ipc3_set_get_kcontrol_data(scontrol, true);
-=======
-		int ret = snd_sof_ipc_set_get_comp_data(scontrol, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (ret < 0) {
 			dev_err(scomp->dev, "Failed to set mixer updates for %s\n",
@@ -235,11 +204,7 @@ static bool sof_ipc3_switch_put(struct snd_sof_control *scontrol,
 
 	/* notify DSP of mixer updates */
 	if (pm_runtime_active(scomp->dev)) {
-<<<<<<< HEAD
 		int ret = sof_ipc3_set_get_kcontrol_data(scontrol, true);
-=======
-		int ret = snd_sof_ipc_set_get_comp_data(scontrol, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (ret < 0) {
 			dev_err(scomp->dev, "Failed to set mixer updates for %s\n",
@@ -287,11 +252,7 @@ static bool sof_ipc3_enum_put(struct snd_sof_control *scontrol,
 
 	/* notify DSP of enum updates */
 	if (pm_runtime_active(scomp->dev)) {
-<<<<<<< HEAD
 		int ret = sof_ipc3_set_get_kcontrol_data(scontrol, true);
-=======
-		int ret = snd_sof_ipc_set_get_comp_data(scontrol, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (ret < 0) {
 			dev_err(scomp->dev, "Failed to set enum updates for %s\n",
@@ -363,11 +324,7 @@ static int sof_ipc3_bytes_put(struct snd_sof_control *scontrol,
 
 	/* notify DSP of byte control updates */
 	if (pm_runtime_active(scomp->dev))
-<<<<<<< HEAD
 		return sof_ipc3_set_get_kcontrol_data(scontrol, true);
-=======
-		return snd_sof_ipc_set_get_comp_data(scontrol, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -481,11 +438,7 @@ static int sof_ipc3_bytes_ext_put(struct snd_sof_control *scontrol,
 
 	/* notify DSP of byte control updates */
 	if (pm_runtime_active(scomp->dev))
-<<<<<<< HEAD
 		return sof_ipc3_set_get_kcontrol_data(scontrol, true);
-=======
-		return snd_sof_ipc_set_get_comp_data(scontrol, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -515,11 +468,7 @@ static int sof_ipc3_bytes_ext_volatile_get(struct snd_sof_control *scontrol,
 	cdata->data->abi = SOF_ABI_VERSION;
 
 	/* get all the component data from DSP */
-<<<<<<< HEAD
 	ret = sof_ipc3_set_get_kcontrol_data(scontrol, false);
-=======
-	ret = snd_sof_ipc_set_get_comp_data(scontrol, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		return ret;
 
@@ -688,7 +637,6 @@ static void sof_ipc3_control_update(struct snd_sof_dev *sdev, void *ipc_control_
 	snd_ctl_notify_one(swidget->scomp->card->snd_card, SNDRV_CTL_EVENT_MASK_VALUE, kc, 0);
 }
 
-<<<<<<< HEAD
 static int sof_ipc3_widget_kcontrol_setup(struct snd_sof_dev *sdev,
 					  struct snd_sof_widget *swidget)
 {
@@ -743,8 +691,6 @@ sof_ipc3_set_up_volume_table(struct snd_sof_control *scontrol, int tlv[SOF_TLV_I
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct sof_ipc_tplg_control_ops tplg_ipc3_control_ops = {
 	.volume_put = sof_ipc3_volume_put,
 	.volume_get = sof_ipc3_volume_get,
@@ -758,9 +704,6 @@ const struct sof_ipc_tplg_control_ops tplg_ipc3_control_ops = {
 	.bytes_ext_get = sof_ipc3_bytes_ext_get,
 	.bytes_ext_volatile_get = sof_ipc3_bytes_ext_volatile_get,
 	.update = sof_ipc3_control_update,
-<<<<<<< HEAD
 	.widget_kcontrol_setup = sof_ipc3_widget_kcontrol_setup,
 	.set_up_volume_table = sof_ipc3_set_up_volume_table,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

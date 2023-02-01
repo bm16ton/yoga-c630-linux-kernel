@@ -154,15 +154,9 @@ hugetlb_cgroup_css_alloc(struct cgroup_subsys_state *parent_css)
 	 * function.
 	 */
 	for_each_node(node) {
-<<<<<<< HEAD
 		/* Set node_to_alloc to NUMA_NO_NODE for offline nodes. */
 		int node_to_alloc =
 			node_state(node, N_NORMAL_MEMORY) ? node : NUMA_NO_NODE;
-=======
-		/* Set node_to_alloc to -1 for offline nodes. */
-		int node_to_alloc =
-			node_state(node, N_NORMAL_MEMORY) ? node : -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		h_cgroup->nodeinfo[node] =
 			kzalloc_node(sizeof(struct hugetlb_cgroup_per_node),
 				     GFP_KERNEL, node_to_alloc);
@@ -239,10 +233,6 @@ static void hugetlb_cgroup_css_offline(struct cgroup_subsys_state *css)
 				hugetlb_cgroup_move_parent(hstate_index(h), h_cg, page);
 
 			spin_unlock_irq(&hugetlb_lock);
-<<<<<<< HEAD
-=======
-			idx++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		cond_resched();
 	} while (hugetlb_cgroup_have_usage(h_cg));

@@ -156,10 +156,6 @@ static int nouveau_dmem_copy_one(struct nouveau_drm *drm, struct page *spage,
 		return -EIO;
 	}
 
-<<<<<<< HEAD
-=======
-	args->dst[0] = migrate_pfn(page_to_pfn(dpage));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -329,11 +325,7 @@ nouveau_dmem_page_alloc_locked(struct nouveau_drm *drm)
 			return NULL;
 	}
 
-<<<<<<< HEAD
 	zone_device_page_init(page);
-=======
-	lock_page(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return page;
 }
 

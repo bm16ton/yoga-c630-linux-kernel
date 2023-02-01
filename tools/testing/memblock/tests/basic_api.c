@@ -8,10 +8,7 @@
 #define FUNC_RESERVE					"memblock_reserve"
 #define FUNC_REMOVE					"memblock_remove"
 #define FUNC_FREE					"memblock_free"
-<<<<<<< HEAD
 #define FUNC_TRIM					"memblock_trim_memory"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int memblock_initialization_check(void)
 {
@@ -330,7 +327,6 @@ static int memblock_add_twice_check(void)
 	return 0;
 }
 
-<<<<<<< HEAD
 /*
  * A test that tries to add two memory blocks that don't overlap with one
  * another and then add a third memory block in the space between the first two:
@@ -427,8 +423,6 @@ static int memblock_add_near_max_check(void)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int memblock_add_checks(void)
 {
 	prefix_reset();
@@ -442,11 +436,8 @@ static int memblock_add_checks(void)
 	memblock_add_overlap_bottom_check();
 	memblock_add_within_check();
 	memblock_add_twice_check();
-<<<<<<< HEAD
 	memblock_add_between_check();
 	memblock_add_near_max_check();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	prefix_pop();
 
@@ -712,7 +703,6 @@ static int memblock_reserve_twice_check(void)
 	return 0;
 }
 
-<<<<<<< HEAD
 /*
  * A test that tries to mark two memory blocks that don't overlap as reserved
  * and then reserve a third memory block in the space between the first two:
@@ -809,8 +799,6 @@ static int memblock_reserve_near_max_check(void)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int memblock_reserve_checks(void)
 {
 	prefix_reset();
@@ -823,11 +811,8 @@ static int memblock_reserve_checks(void)
 	memblock_reserve_overlap_bottom_check();
 	memblock_reserve_within_check();
 	memblock_reserve_twice_check();
-<<<<<<< HEAD
 	memblock_reserve_between_check();
 	memblock_reserve_near_max_check();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	prefix_pop();
 
@@ -1099,7 +1084,6 @@ static int memblock_remove_within_check(void)
 	return 0;
 }
 
-<<<<<<< HEAD
 /*
  * A simple test that tries to remove a region r1 from the array of
  * available memory regions when r1 is the only available region.
@@ -1249,8 +1233,6 @@ static int memblock_remove_overlap_two_check(void)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int memblock_remove_checks(void)
 {
 	prefix_reset();
@@ -1262,12 +1244,9 @@ static int memblock_remove_checks(void)
 	memblock_remove_overlap_top_check();
 	memblock_remove_overlap_bottom_check();
 	memblock_remove_within_check();
-<<<<<<< HEAD
 	memblock_remove_only_region_check();
 	memblock_remove_near_max_check();
 	memblock_remove_overlap_two_check();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	prefix_pop();
 
@@ -1533,7 +1512,6 @@ static int memblock_free_within_check(void)
 	return 0;
 }
 
-<<<<<<< HEAD
 /*
  * A simple test that tries to free a memory block r1 that was marked
  * earlier as reserved when r1 is the only available region.
@@ -1682,8 +1660,6 @@ static int memblock_free_overlap_two_check(void)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int memblock_free_checks(void)
 {
 	prefix_reset();
@@ -1695,7 +1671,6 @@ static int memblock_free_checks(void)
 	memblock_free_overlap_top_check();
 	memblock_free_overlap_bottom_check();
 	memblock_free_within_check();
-<<<<<<< HEAD
 	memblock_free_only_region_check();
 	memblock_free_near_max_check();
 	memblock_free_overlap_two_check();
@@ -1964,8 +1939,6 @@ static int memblock_trim_memory_checks(void)
 	memblock_trim_memory_too_small_check();
 	memblock_trim_memory_unaligned_base_check();
 	memblock_trim_memory_unaligned_end_check();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	prefix_pop();
 
@@ -1979,11 +1952,8 @@ int memblock_basic_checks(void)
 	memblock_reserve_checks();
 	memblock_remove_checks();
 	memblock_free_checks();
-<<<<<<< HEAD
 	memblock_bottom_up_checks();
 	memblock_trim_memory_checks();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

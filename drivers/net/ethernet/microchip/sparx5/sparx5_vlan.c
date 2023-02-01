@@ -138,7 +138,6 @@ void sparx5_pgid_update_mask(struct sparx5_port *port, int pgid, bool enable)
 	}
 }
 
-<<<<<<< HEAD
 void sparx5_pgid_clear(struct sparx5 *spx5, int pgid)
 {
 	spx5_wr(0, spx5, ANA_AC_PGID_CFG(pgid));
@@ -146,8 +145,6 @@ void sparx5_pgid_clear(struct sparx5 *spx5, int pgid)
 	spx5_wr(0, spx5, ANA_AC_PGID_CFG2(pgid));
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void sparx5_pgid_read_mask(struct sparx5 *spx5, int pgid, u32 portmask[3])
 {
 	portmask[0] = spx5_rd(spx5, ANA_AC_PGID_CFG(pgid));

@@ -1054,11 +1054,7 @@ static void cpu_detect_trace_filtering(struct etmv4_drvdata *drvdata)
 	u64 trfcr;
 
 	drvdata->trfcr = 0;
-<<<<<<< HEAD
 	if (!cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT))
-=======
-	if (!cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_TRACE_FILT_SHIFT))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	/*

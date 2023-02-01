@@ -15,23 +15,6 @@
 
 struct intel_guc;
 
-<<<<<<< HEAD
-=======
-#if defined(CONFIG_DRM_I915_DEBUG_GUC)
-#define CRASH_BUFFER_SIZE	SZ_2M
-#define DEBUG_BUFFER_SIZE	SZ_16M
-#define CAPTURE_BUFFER_SIZE	SZ_4M
-#elif defined(CONFIG_DRM_I915_DEBUG_GEM)
-#define CRASH_BUFFER_SIZE	SZ_1M
-#define DEBUG_BUFFER_SIZE	SZ_2M
-#define CAPTURE_BUFFER_SIZE	SZ_1M
-#else
-#define CRASH_BUFFER_SIZE	SZ_8K
-#define DEBUG_BUFFER_SIZE	SZ_64K
-#define CAPTURE_BUFFER_SIZE	SZ_16K
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * While we're using plain log level in i915, GuC controls are much more...
  * "elaborate"? We have a couple of bits for verbosity, separate bit for actual
@@ -71,11 +54,8 @@ struct intel_guc_log {
 	/* Combined buffer allocation */
 	struct i915_vma *vma;
 	void *buf_addr;
-<<<<<<< HEAD
 
 	/* RelayFS support */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct {
 		bool buf_in_use;
 		bool started;
@@ -96,14 +76,9 @@ struct intel_guc_log {
 void intel_guc_log_init_early(struct intel_guc_log *log);
 bool intel_guc_check_log_buf_overflow(struct intel_guc_log *log, enum guc_log_buffer_type type,
 				      unsigned int full_cnt);
-<<<<<<< HEAD
 unsigned int intel_guc_get_log_buffer_size(struct intel_guc_log *log,
 					   enum guc_log_buffer_type type);
 size_t intel_guc_get_log_buffer_offset(struct intel_guc_log *log, enum guc_log_buffer_type type);
-=======
-unsigned int intel_guc_get_log_buffer_size(enum guc_log_buffer_type type);
-size_t intel_guc_get_log_buffer_offset(enum guc_log_buffer_type type);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int intel_guc_log_create(struct intel_guc_log *log);
 void intel_guc_log_destroy(struct intel_guc_log *log);
 

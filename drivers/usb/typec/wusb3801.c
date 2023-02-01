@@ -364,11 +364,7 @@ static int wusb3801_probe(struct i2c_client *client)
 	/* Initialize the hardware with the devicetree settings. */
 	ret = wusb3801_hw_init(wusb3801);
 	if (ret)
-<<<<<<< HEAD
 		goto err_put_connector;
-=======
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	wusb3801->cap.revision		= USB_TYPEC_REV_1_2;
 	wusb3801->cap.accessory[0]	= TYPEC_ACCESSORY_AUDIO;
@@ -403,11 +399,7 @@ err_put_connector:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void wusb3801_remove(struct i2c_client *client)
-=======
-static int wusb3801_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct wusb3801 *wusb3801 = i2c_get_clientdata(client);
 
@@ -419,11 +411,6 @@ static int wusb3801_remove(struct i2c_client *client)
 
 	if (wusb3801->vbus_on)
 		regulator_disable(wusb3801->vbus_supply);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id wusb3801_of_match[] = {

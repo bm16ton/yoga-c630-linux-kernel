@@ -1826,10 +1826,6 @@ struct xhci_hcd {
 	/* Host controller watchdog timer structures */
 	unsigned int		xhc_state;
 	unsigned long		run_graceperiod;
-<<<<<<< HEAD
-=======
-	u32			command;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct s3_save		s3;
 /* Host controller is dying - not responding to commands. "I'm not dead yet!"
  *

@@ -392,16 +392,6 @@ int ice_xsk_pool_setup(struct ice_vsi *vsi, struct xsk_buff_pool *pool, u16 qid)
 		goto failure;
 	}
 
-<<<<<<< HEAD
-=======
-	if (!is_power_of_2(vsi->rx_rings[qid]->count) ||
-	    !is_power_of_2(vsi->tx_rings[qid]->count)) {
-		netdev_err(vsi->netdev, "Please align ring sizes to power of 2\n");
-		pool_failure = -EINVAL;
-		goto failure;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if_running = netif_running(vsi->netdev) && ice_is_xdp_ena_vsi(vsi);
 
 	if (if_running) {
@@ -470,7 +460,6 @@ static u16 ice_fill_rx_descs(struct xsk_buff_pool *pool, struct xdp_buff **xdp,
 		rx_desc++;
 		xdp++;
 	}
-<<<<<<< HEAD
 
 	return buffs;
 }
@@ -494,31 +483,6 @@ static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
 	u16 total_count = count;
 	struct xdp_buff **xdp;
 
-=======
-
-	return buffs;
-}
-
-/**
- * __ice_alloc_rx_bufs_zc - allocate a number of Rx buffers
- * @rx_ring: Rx ring
- * @count: The number of buffers to allocate
- *
- * Place the @count of descriptors onto Rx ring. Handle the ring wrap
- * for case where space from next_to_use up to the end of ring is less
- * than @count. Finally do a tail bump.
- *
- * Returns true if all allocations were successful, false if any fail.
- */
-static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-{
-	u32 nb_buffs_extra = 0, nb_buffs = 0;
-	union ice_32b_rx_flex_desc *rx_desc;
-	u16 ntu = rx_ring->next_to_use;
-	u16 total_count = count;
-	struct xdp_buff **xdp;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rx_desc = ICE_RX_DESC(rx_ring, ntu);
 	xdp = ice_xdp_buf(rx_ring, ntu);
 
@@ -563,18 +527,10 @@ exit:
 bool ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
 {
 	u16 rx_thresh = ICE_RING_QUARTER(rx_ring);
-<<<<<<< HEAD
 	u16 leftover, i, tail_bumps;
 
 	tail_bumps = count / rx_thresh;
 	leftover = count - (tail_bumps * rx_thresh);
-=======
-	u16 batched, leftover, i, tail_bumps;
-
-	batched = ALIGN_DOWN(count, rx_thresh);
-	tail_bumps = batched / rx_thresh;
-	leftover = count & (rx_thresh - 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < tail_bumps; i++)
 		if (!__ice_alloc_rx_bufs_zc(rx_ring, rx_thresh))
@@ -812,7 +768,6 @@ construct_skb:
  * ice_clean_xdp_tx_buf - Free and unmap XDP Tx buffer
  * @xdp_ring: XDP Tx ring
  * @tx_buf: Tx buffer to clean
-<<<<<<< HEAD
  */
 static void
 ice_clean_xdp_tx_buf(struct ice_tx_ring *xdp_ring, struct ice_tx_buf *tx_buf)
@@ -997,213 +952,6 @@ bool ice_xmit_zc(struct ice_tx_ring *xdp_ring)
 			    &total_bytes);
 
 	ice_set_rs_bit(xdp_ring);
-=======
- */
-static void
-ice_clean_xdp_tx_buf(struct ice_tx_ring *xdp_ring, struct ice_tx_buf *tx_buf)
-{
-	xdp_return_frame((struct xdp_frame *)tx_buf->raw_buf);
-	xdp_ring->xdp_tx_active--;
-	dma_unmap_single(xdp_ring->dev, dma_unmap_addr(tx_buf, dma),
-			 dma_unmap_len(tx_buf, len), DMA_TO_DEVICE);
-	dma_unmap_len_set(tx_buf, len, 0);
-}
-
-/**
- * ice_clean_xdp_irq_zc - Reclaim resources after transmit completes on XDP ring
- * @xdp_ring: XDP ring to clean
- * @napi_budget: amount of descriptors that NAPI allows us to clean
- *
- * Returns count of cleaned descriptors
- */
-static u16 ice_clean_xdp_irq_zc(struct ice_tx_ring *xdp_ring, int napi_budget)
-{
-	u16 tx_thresh = ICE_RING_QUARTER(xdp_ring);
-	int budget = napi_budget / tx_thresh;
-	u16 next_dd = xdp_ring->next_dd;
-	u16 ntc, cleared_dds = 0;
-
-	do {
-		struct ice_tx_desc *next_dd_desc;
-		u16 desc_cnt = xdp_ring->count;
-		struct ice_tx_buf *tx_buf;
-		u32 xsk_frames;
-		u16 i;
-
-		next_dd_desc = ICE_TX_DESC(xdp_ring, next_dd);
-		if (!(next_dd_desc->cmd_type_offset_bsz &
-		    cpu_to_le64(ICE_TX_DESC_DTYPE_DESC_DONE)))
-			break;
-
-		cleared_dds++;
-		xsk_frames = 0;
-		if (likely(!xdp_ring->xdp_tx_active)) {
-			xsk_frames = tx_thresh;
-			goto skip;
-		}
-
-		ntc = xdp_ring->next_to_clean;
-
-		for (i = 0; i < tx_thresh; i++) {
-			tx_buf = &xdp_ring->tx_buf[ntc];
-
-			if (tx_buf->raw_buf) {
-				ice_clean_xdp_tx_buf(xdp_ring, tx_buf);
-				tx_buf->raw_buf = NULL;
-			} else {
-				xsk_frames++;
-			}
-
-			ntc++;
-			if (ntc >= xdp_ring->count)
-				ntc = 0;
-		}
-skip:
-		xdp_ring->next_to_clean += tx_thresh;
-		if (xdp_ring->next_to_clean >= desc_cnt)
-			xdp_ring->next_to_clean -= desc_cnt;
-		if (xsk_frames)
-			xsk_tx_completed(xdp_ring->xsk_pool, xsk_frames);
-		next_dd_desc->cmd_type_offset_bsz = 0;
-		next_dd = next_dd + tx_thresh;
-		if (next_dd >= desc_cnt)
-			next_dd = tx_thresh - 1;
-	} while (--budget);
-
-	xdp_ring->next_dd = next_dd;
-
-	return cleared_dds * tx_thresh;
-}
-
-/**
- * ice_xmit_pkt - produce a single HW Tx descriptor out of AF_XDP descriptor
- * @xdp_ring: XDP ring to produce the HW Tx descriptor on
- * @desc: AF_XDP descriptor to pull the DMA address and length from
- * @total_bytes: bytes accumulator that will be used for stats update
- */
-static void ice_xmit_pkt(struct ice_tx_ring *xdp_ring, struct xdp_desc *desc,
-			 unsigned int *total_bytes)
-{
-	struct ice_tx_desc *tx_desc;
-	dma_addr_t dma;
-
-	dma = xsk_buff_raw_get_dma(xdp_ring->xsk_pool, desc->addr);
-	xsk_buff_raw_dma_sync_for_device(xdp_ring->xsk_pool, dma, desc->len);
-
-	tx_desc = ICE_TX_DESC(xdp_ring, xdp_ring->next_to_use++);
-	tx_desc->buf_addr = cpu_to_le64(dma);
-	tx_desc->cmd_type_offset_bsz = ice_build_ctob(ICE_TX_DESC_CMD_EOP,
-						      0, desc->len, 0);
-
-	*total_bytes += desc->len;
-}
-
-/**
- * ice_xmit_pkt_batch - produce a batch of HW Tx descriptors out of AF_XDP descriptors
- * @xdp_ring: XDP ring to produce the HW Tx descriptors on
- * @descs: AF_XDP descriptors to pull the DMA addresses and lengths from
- * @total_bytes: bytes accumulator that will be used for stats update
- */
-static void ice_xmit_pkt_batch(struct ice_tx_ring *xdp_ring, struct xdp_desc *descs,
-			       unsigned int *total_bytes)
-{
-	u16 tx_thresh = ICE_RING_QUARTER(xdp_ring);
-	u16 ntu = xdp_ring->next_to_use;
-	struct ice_tx_desc *tx_desc;
-	u32 i;
-
-	loop_unrolled_for(i = 0; i < PKTS_PER_BATCH; i++) {
-		dma_addr_t dma;
-
-		dma = xsk_buff_raw_get_dma(xdp_ring->xsk_pool, descs[i].addr);
-		xsk_buff_raw_dma_sync_for_device(xdp_ring->xsk_pool, dma, descs[i].len);
-
-		tx_desc = ICE_TX_DESC(xdp_ring, ntu++);
-		tx_desc->buf_addr = cpu_to_le64(dma);
-		tx_desc->cmd_type_offset_bsz = ice_build_ctob(ICE_TX_DESC_CMD_EOP,
-							      0, descs[i].len, 0);
-
-		*total_bytes += descs[i].len;
-	}
-
-	xdp_ring->next_to_use = ntu;
-
-	if (xdp_ring->next_to_use > xdp_ring->next_rs) {
-		tx_desc = ICE_TX_DESC(xdp_ring, xdp_ring->next_rs);
-		tx_desc->cmd_type_offset_bsz |=
-			cpu_to_le64(ICE_TX_DESC_CMD_RS << ICE_TXD_QW1_CMD_S);
-		xdp_ring->next_rs += tx_thresh;
-	}
-}
-
-/**
- * ice_fill_tx_hw_ring - produce the number of Tx descriptors onto ring
- * @xdp_ring: XDP ring to produce the HW Tx descriptors on
- * @descs: AF_XDP descriptors to pull the DMA addresses and lengths from
- * @nb_pkts: count of packets to be send
- * @total_bytes: bytes accumulator that will be used for stats update
- */
-static void ice_fill_tx_hw_ring(struct ice_tx_ring *xdp_ring, struct xdp_desc *descs,
-				u32 nb_pkts, unsigned int *total_bytes)
-{
-	u16 tx_thresh = ICE_RING_QUARTER(xdp_ring);
-	u32 batched, leftover, i;
-
-	batched = ALIGN_DOWN(nb_pkts, PKTS_PER_BATCH);
-	leftover = nb_pkts & (PKTS_PER_BATCH - 1);
-	for (i = 0; i < batched; i += PKTS_PER_BATCH)
-		ice_xmit_pkt_batch(xdp_ring, &descs[i], total_bytes);
-	for (; i < batched + leftover; i++)
-		ice_xmit_pkt(xdp_ring, &descs[i], total_bytes);
-
-	if (xdp_ring->next_to_use > xdp_ring->next_rs) {
-		struct ice_tx_desc *tx_desc;
-
-		tx_desc = ICE_TX_DESC(xdp_ring, xdp_ring->next_rs);
-		tx_desc->cmd_type_offset_bsz |=
-			cpu_to_le64(ICE_TX_DESC_CMD_RS << ICE_TXD_QW1_CMD_S);
-		xdp_ring->next_rs += tx_thresh;
-	}
-}
-
-/**
- * ice_xmit_zc - take entries from XSK Tx ring and place them onto HW Tx ring
- * @xdp_ring: XDP ring to produce the HW Tx descriptors on
- * @budget: number of free descriptors on HW Tx ring that can be used
- * @napi_budget: amount of descriptors that NAPI allows us to clean
- *
- * Returns true if there is no more work that needs to be done, false otherwise
- */
-bool ice_xmit_zc(struct ice_tx_ring *xdp_ring, u32 budget, int napi_budget)
-{
-	struct xdp_desc *descs = xdp_ring->xsk_pool->tx_descs;
-	u16 tx_thresh = ICE_RING_QUARTER(xdp_ring);
-	u32 nb_pkts, nb_processed = 0;
-	unsigned int total_bytes = 0;
-
-	if (budget < tx_thresh)
-		budget += ice_clean_xdp_irq_zc(xdp_ring, napi_budget);
-
-	nb_pkts = xsk_tx_peek_release_desc_batch(xdp_ring->xsk_pool, budget);
-	if (!nb_pkts)
-		return true;
-
-	if (xdp_ring->next_to_use + nb_pkts >= xdp_ring->count) {
-		struct ice_tx_desc *tx_desc;
-
-		nb_processed = xdp_ring->count - xdp_ring->next_to_use;
-		ice_fill_tx_hw_ring(xdp_ring, descs, nb_processed, &total_bytes);
-		tx_desc = ICE_TX_DESC(xdp_ring, xdp_ring->next_rs);
-		tx_desc->cmd_type_offset_bsz |=
-			cpu_to_le64(ICE_TX_DESC_CMD_RS << ICE_TXD_QW1_CMD_S);
-		xdp_ring->next_rs = tx_thresh - 1;
-		xdp_ring->next_to_use = 0;
-	}
-
-	ice_fill_tx_hw_ring(xdp_ring, &descs[nb_processed], nb_pkts - nb_processed,
-			    &total_bytes);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ice_xdp_ring_update_tail(xdp_ring);
 	ice_update_tx_ring_stats(xdp_ring, nb_pkts, total_bytes);
 
@@ -1281,7 +1029,6 @@ bool ice_xsk_any_rx_ring_ena(struct ice_vsi *vsi)
  */
 void ice_xsk_clean_rx_ring(struct ice_rx_ring *rx_ring)
 {
-<<<<<<< HEAD
 	u16 ntc = rx_ring->next_to_clean;
 	u16 ntu = rx_ring->next_to_use;
 
@@ -1292,16 +1039,6 @@ void ice_xsk_clean_rx_ring(struct ice_rx_ring *rx_ring)
 		ntc++;
 		if (ntc >= rx_ring->count)
 			ntc = 0;
-=======
-	u16 count_mask = rx_ring->count - 1;
-	u16 ntc = rx_ring->next_to_clean;
-	u16 ntu = rx_ring->next_to_use;
-
-	for ( ; ntc != ntu; ntc = (ntc + 1) & count_mask) {
-		struct xdp_buff *xdp = *ice_xdp_buf(rx_ring, ntc);
-
-		xsk_buff_free(xdp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 

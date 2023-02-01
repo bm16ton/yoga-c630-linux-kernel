@@ -481,11 +481,7 @@ int amdgpu_gfx_disable_kcq(struct amdgpu_device *adev)
 		kiq->pmf->kiq_unmap_queues(kiq_ring, &adev->gfx.compute_ring[i],
 					   RESET_QUEUES, 0, 0);
 
-<<<<<<< HEAD
 	if (adev->gfx.kiq.ring.sched.ready && !adev->job_hang)
-=======
-	if (adev->gfx.kiq.ring.sched.ready)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		r = amdgpu_ring_test_helper(kiq_ring);
 	spin_unlock(&adev->gfx.kiq.ring_lock);
 
@@ -615,7 +611,6 @@ void amdgpu_gfx_off_ctrl(struct amdgpu_device *adev, bool enable)
 	}
 
 unlock:
-<<<<<<< HEAD
 	mutex_unlock(&adev->gfx.gfx_off_mutex);
 }
 
@@ -653,8 +648,6 @@ int amdgpu_get_gfx_off_entrycount(struct amdgpu_device *adev, u64 *value)
 
 	r = amdgpu_dpm_get_entrycount_gfxoff(adev, value);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&adev->gfx.gfx_off_mutex);
 
 	return r;
@@ -817,15 +810,7 @@ void amdgpu_kiq_wreg(struct amdgpu_device *adev, uint32_t reg, uint32_t v)
 	BUG_ON(!ring->funcs->emit_wreg);
 
 	if (amdgpu_device_skip_hw_access(adev))
-<<<<<<< HEAD
 		return;
-
-	if (adev->mes.ring.sched.ready) {
-		amdgpu_mes_wreg(adev, reg, v);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		return;
-	}
 
 	if (adev->mes.ring.sched.ready) {
 		amdgpu_mes_wreg(adev, reg, v);
@@ -884,7 +869,6 @@ int amdgpu_gfx_get_num_kcq(struct amdgpu_device *adev)
 	}
 	return amdgpu_num_kcq;
 }
-<<<<<<< HEAD
 
 void amdgpu_gfx_cp_init_microcode(struct amdgpu_device *adev,
 				  uint32_t ucode_id)
@@ -1024,5 +1008,3 @@ void amdgpu_gfx_cp_init_microcode(struct amdgpu_device *adev,
 		adev->firmware.fw_size += ALIGN(fw_size, PAGE_SIZE);
 	}
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

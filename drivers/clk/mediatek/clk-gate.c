@@ -261,10 +261,7 @@ err:
 
 	return PTR_ERR(hw);
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_GPL(mtk_clk_register_gates_with_dev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int mtk_clk_register_gates(struct device_node *node,
 			   const struct mtk_gate *clks, int num,

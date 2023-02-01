@@ -175,7 +175,6 @@ struct inet_hashinfo {
 	/* The 2nd listener table hashed by local port and address */
 	unsigned int			lhash2_mask;
 	struct inet_listen_hashbucket	*lhash2;
-<<<<<<< HEAD
 
 	bool				pernet;
 };
@@ -190,10 +189,6 @@ static inline struct inet_hashinfo *tcp_or_dccp_get_hashinfo(const struct sock *
 #endif
 }
 
-=======
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct inet_listen_hashbucket *
 inet_lhash2_bucket(struct inet_hashinfo *h, u32 hash)
 {
@@ -228,13 +223,10 @@ static inline void inet_ehash_locks_free(struct inet_hashinfo *hashinfo)
 	hashinfo->ehash_locks = NULL;
 }
 
-<<<<<<< HEAD
 struct inet_hashinfo *inet_pernet_hashinfo_alloc(struct inet_hashinfo *hashinfo,
 						 unsigned int ehash_entries);
 void inet_pernet_hashinfo_free(struct inet_hashinfo *hashinfo);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct inet_bind_bucket *
 inet_bind_bucket_create(struct kmem_cache *cachep, struct net *net,
 			struct inet_bind_hashbucket *head,
@@ -271,7 +263,6 @@ static inline u32 inet_bhashfn(const struct net *net, const __u16 lport,
 	return (lport + net_hash_mix(net)) & (bhash_size - 1);
 }
 
-<<<<<<< HEAD
 static inline struct inet_bind_hashbucket *
 inet_bhashfn_portaddr(const struct inet_hashinfo *hinfo, const struct sock *sk,
 		      const struct net *net, unsigned short port)
@@ -299,10 +290,6 @@ void inet_bhash2_reset_saddr(struct sock *sk);
 
 void inet_bind_hash(struct sock *sk, struct inet_bind_bucket *tb,
 		    struct inet_bind2_bucket *tb2, unsigned short port);
-=======
-void inet_bind_hash(struct sock *sk, struct inet_bind_bucket *tb,
-		    const unsigned short snum);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Caller must disable local BH processing. */
 int __inet_inherit_port(const struct sock *sk, struct sock *child);

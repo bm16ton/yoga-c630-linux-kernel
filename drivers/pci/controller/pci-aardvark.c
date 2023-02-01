@@ -1054,32 +1054,6 @@ static int advk_sw_pci_bridge_init(struct advk_pcie *pcie)
 
 	/* Support interrupt A for MSI feature */
 	bridge->conf.intpin = PCI_INTERRUPT_INTA;
-<<<<<<< HEAD
-=======
-
-	/*
-	 * Aardvark HW provides PCIe Capability structure in version 2 and
-	 * indicate slot support, which is emulated.
-	 */
-	bridge->pcie_conf.cap = cpu_to_le16(2 | PCI_EXP_FLAGS_SLOT);
-
-	/*
-	 * Set Presence Detect State bit permanently since there is no support
-	 * for unplugging the card nor detecting whether it is plugged. (If a
-	 * platform exists in the future that supports it, via a GPIO for
-	 * example, it should be implemented via this bit.)
-	 *
-	 * Set physical slot number to 1 since there is only one port and zero
-	 * value is reserved for ports within the same silicon as Root Port
-	 * which is not our case.
-	 */
-	bridge->pcie_conf.slotcap = cpu_to_le32(FIELD_PREP(PCI_EXP_SLTCAP_PSN,
-							   1));
-	bridge->pcie_conf.slotsta = cpu_to_le16(PCI_EXP_SLTSTA_PDS);
-
-	/* Indicates supports for Completion Retry Status */
-	bridge->pcie_conf.rootcap = cpu_to_le16(PCI_EXP_RTCAP_CRSVIS);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Aardvark HW provides PCIe Capability structure in version 2 and

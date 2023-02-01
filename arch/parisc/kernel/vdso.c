@@ -75,11 +75,7 @@ int arch_setup_additional_pages(struct linux_binprm *bprm,
 
 	map_base = mm->mmap_base;
 	if (current->flags & PF_RANDOMIZE)
-<<<<<<< HEAD
 		map_base -= prandom_u32_max(0x20) * PAGE_SIZE;
-=======
-		map_base -= (get_random_int() & 0x1f) * PAGE_SIZE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vdso_text_start = get_unmapped_area(NULL, map_base, vdso_text_len, 0, 0);
 

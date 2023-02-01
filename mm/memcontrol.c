@@ -87,16 +87,6 @@ static bool cgroup_memory_nosocket __ro_after_init;
 
 /* Kernel memory accounting disabled? */
 static bool cgroup_memory_nokmem __ro_after_init;
-<<<<<<< HEAD
-=======
-
-/* Whether the swap controller is active */
-#ifdef CONFIG_MEMCG_SWAP
-static bool cgroup_memory_noswap __ro_after_init;
-#else
-#define cgroup_memory_noswap		1
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_CGROUP_WRITEBACK
 static DECLARE_WAIT_QUEUE_HEAD(memcg_cgwb_frn_waitq);
@@ -257,21 +247,12 @@ struct mem_cgroup *vmpressure_to_memcg(struct vmpressure *vmpr)
 
 #ifdef CONFIG_MEMCG_KMEM
 static DEFINE_SPINLOCK(objcg_lock);
-<<<<<<< HEAD
 
 bool mem_cgroup_kmem_disabled(void)
 {
 	return cgroup_memory_nokmem;
 }
 
-=======
-
-bool mem_cgroup_kmem_disabled(void)
-{
-	return cgroup_memory_nokmem;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void obj_cgroup_uncharge_pages(struct obj_cgroup *objcg,
 				      unsigned int nr_pages);
 
@@ -609,38 +590,18 @@ static u64 flush_next_time;
  */
 static void memcg_stats_lock(void)
 {
-<<<<<<< HEAD
 	preempt_disable_nested();
 	VM_WARN_ON_IRQS_ENABLED();
-=======
-#ifdef CONFIG_PREEMPT_RT
-      preempt_disable();
-#else
-      VM_BUG_ON(!irqs_disabled());
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void __memcg_stats_lock(void)
 {
-<<<<<<< HEAD
 	preempt_disable_nested();
-=======
-#ifdef CONFIG_PREEMPT_RT
-      preempt_disable();
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void memcg_stats_unlock(void)
 {
-<<<<<<< HEAD
 	preempt_enable_nested();
-=======
-#ifdef CONFIG_PREEMPT_RT
-      preempt_enable();
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
@@ -694,7 +655,6 @@ static void flush_memcg_stats_dwork(struct work_struct *w)
 	queue_delayed_work(system_unbound_wq, &stats_flush_dwork, FLUSH_TIME);
 }
 
-<<<<<<< HEAD
 /* Subset of vm_event_item to report for memcg event stats */
 static const unsigned int memcg_vm_event_stat[] = {
 	PGPGIN,
@@ -770,8 +730,6 @@ unsigned long memcg_page_state(struct mem_cgroup *memcg, int idx)
 	return x;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * __mod_memcg_state - update cgroup memory statistics
  * @memcg: the memory cgroup
@@ -818,11 +776,7 @@ void __mod_memcg_lruvec_state(struct lruvec *lruvec, enum node_stat_item idx,
 	 * interrupt context while other caller need to have disabled interrupt.
 	 */
 	__memcg_stats_lock();
-<<<<<<< HEAD
 	if (IS_ENABLED(CONFIG_DEBUG_VM)) {
-=======
-	if (IS_ENABLED(CONFIG_DEBUG_VM) && !IS_ENABLED(CONFIG_PREEMPT_RT)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		switch (idx) {
 		case NR_ANON_MAPPED:
 		case NR_FILE_MAPPED:
@@ -832,11 +786,7 @@ void __mod_memcg_lruvec_state(struct lruvec *lruvec, enum node_stat_item idx,
 			WARN_ON_ONCE(!in_task());
 			break;
 		default:
-<<<<<<< HEAD
 			VM_WARN_ON_IRQS_ENABLED();
-=======
-			WARN_ON_ONCE(!irqs_disabled());
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -927,7 +877,6 @@ void __mod_lruvec_kmem_state(void *p, enum node_stat_item idx, int val)
 void __count_memcg_events(struct mem_cgroup *memcg, enum vm_event_item idx,
 			  unsigned long count)
 {
-<<<<<<< HEAD
 	int index = memcg_events_index(idx);
 
 	if (mem_cgroup_disabled() || index < 0)
@@ -935,28 +884,17 @@ void __count_memcg_events(struct mem_cgroup *memcg, enum vm_event_item idx,
 
 	memcg_stats_lock();
 	__this_cpu_add(memcg->vmstats_percpu->events[index], count);
-=======
-	if (mem_cgroup_disabled())
-		return;
-
-	memcg_stats_lock();
-	__this_cpu_add(memcg->vmstats_percpu->events[idx], count);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memcg_rstat_updated(memcg, count);
 	memcg_stats_unlock();
 }
 
 static unsigned long memcg_events(struct mem_cgroup *memcg, int event)
 {
-<<<<<<< HEAD
 	int index = memcg_events_index(event);
 
 	if (index < 0)
 		return 0;
 	return READ_ONCE(memcg->vmstats->events[index]);
-=======
-	return READ_ONCE(memcg->vmstats.events[event]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static unsigned long memcg_events_local(struct mem_cgroup *memcg, int event)
@@ -969,11 +907,7 @@ static unsigned long memcg_events_local(struct mem_cgroup *memcg, int event)
 		return 0;
 
 	for_each_possible_cpu(cpu)
-<<<<<<< HEAD
 		x += per_cpu(memcg->vmstats_percpu->events[index], cpu);
-=======
-		x += per_cpu(memcg->vmstats_percpu->events[event], cpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return x;
 }
 
@@ -1605,32 +1539,6 @@ static inline unsigned long memcg_page_state_output(struct mem_cgroup *memcg,
 	return memcg_page_state(memcg, item) * memcg_page_state_unit(item);
 }
 
-<<<<<<< HEAD
-=======
-/* Subset of vm_event_item to report for memcg event stats */
-static const unsigned int memcg_vm_event_stat[] = {
-	PGSCAN_KSWAPD,
-	PGSCAN_DIRECT,
-	PGSTEAL_KSWAPD,
-	PGSTEAL_DIRECT,
-	PGFAULT,
-	PGMAJFAULT,
-	PGREFILL,
-	PGACTIVATE,
-	PGDEACTIVATE,
-	PGLAZYFREE,
-	PGLAZYFREED,
-#if defined(CONFIG_MEMCG_KMEM) && defined(CONFIG_ZSWAP)
-	ZSWPIN,
-	ZSWPOUT,
-#endif
-#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-	THP_FAULT_ALLOC,
-	THP_COLLAPSE_ALLOC,
-#endif
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void memory_stat_format(struct mem_cgroup *memcg, char *buf, int bufsize)
 {
 	struct seq_buf s;
@@ -1671,7 +1579,6 @@ static void memory_stat_format(struct mem_cgroup *memcg, char *buf, int bufsize)
 		       memcg_events(memcg, PGSTEAL_KSWAPD) +
 		       memcg_events(memcg, PGSTEAL_DIRECT));
 
-<<<<<<< HEAD
 	for (i = 0; i < ARRAY_SIZE(memcg_vm_event_stat); i++) {
 		if (memcg_vm_event_stat[i] == PGPGIN ||
 		    memcg_vm_event_stat[i] == PGPGOUT)
@@ -1681,12 +1588,6 @@ static void memory_stat_format(struct mem_cgroup *memcg, char *buf, int bufsize)
 			       vm_event_name(memcg_vm_event_stat[i]),
 			       memcg_events(memcg, memcg_vm_event_stat[i]));
 	}
-=======
-	for (i = 0; i < ARRAY_SIZE(memcg_vm_event_stat); i++)
-		seq_buf_printf(&s, "%s %lu\n",
-			       vm_event_name(memcg_vm_event_stat[i]),
-			       memcg_events(memcg, memcg_vm_event_stat[i]));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* The above should easily fit into one page */
 	WARN_ON_ONCE(seq_buf_has_overflowed(&s));
@@ -2962,7 +2863,6 @@ static void commit_charge(struct folio *folio, struct mem_cgroup *memcg)
 static inline void mod_objcg_mlstate(struct obj_cgroup *objcg,
 				     struct pglist_data *pgdat,
 				     enum node_stat_item idx, int nr)
-<<<<<<< HEAD
 {
 	struct mem_cgroup *memcg;
 	struct lruvec *lruvec;
@@ -2977,22 +2877,6 @@ static inline void mod_objcg_mlstate(struct obj_cgroup *objcg,
 int memcg_alloc_slab_cgroups(struct slab *slab, struct kmem_cache *s,
 				 gfp_t gfp, bool new_slab)
 {
-=======
-{
-	struct mem_cgroup *memcg;
-	struct lruvec *lruvec;
-
-	rcu_read_lock();
-	memcg = obj_cgroup_memcg(objcg);
-	lruvec = mem_cgroup_lruvec(memcg, pgdat);
-	mod_memcg_lruvec_state(lruvec, idx, nr);
-	rcu_read_unlock();
-}
-
-int memcg_alloc_slab_cgroups(struct slab *slab, struct kmem_cache *s,
-				 gfp_t gfp, bool new_slab)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int objects = objs_per_slab(s, slab);
 	unsigned long memcg_data;
 	void *vec;
@@ -3135,7 +3019,6 @@ __always_inline struct obj_cgroup *get_obj_cgroup_from_current(void)
 		memcg = mem_cgroup_from_task(current);
 	objcg = __get_obj_cgroup_from_memcg(memcg);
 	rcu_read_unlock();
-<<<<<<< HEAD
 	return objcg;
 }
 
@@ -3217,89 +3100,6 @@ static int obj_cgroup_charge_pages(struct obj_cgroup *objcg, gfp_t gfp,
 out:
 	css_put(&memcg->css);
 
-=======
-	return objcg;
-}
-
-struct obj_cgroup *get_obj_cgroup_from_page(struct page *page)
-{
-	struct obj_cgroup *objcg;
-
-	if (!memcg_kmem_enabled())
-		return NULL;
-
-	if (PageMemcgKmem(page)) {
-		objcg = __folio_objcg(page_folio(page));
-		obj_cgroup_get(objcg);
-	} else {
-		struct mem_cgroup *memcg;
-
-		rcu_read_lock();
-		memcg = __folio_memcg(page_folio(page));
-		if (memcg)
-			objcg = __get_obj_cgroup_from_memcg(memcg);
-		else
-			objcg = NULL;
-		rcu_read_unlock();
-	}
-	return objcg;
-}
-
-static void memcg_account_kmem(struct mem_cgroup *memcg, int nr_pages)
-{
-	mod_memcg_state(memcg, MEMCG_KMEM, nr_pages);
-	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys)) {
-		if (nr_pages > 0)
-			page_counter_charge(&memcg->kmem, nr_pages);
-		else
-			page_counter_uncharge(&memcg->kmem, -nr_pages);
-	}
-}
-
-
-/*
- * obj_cgroup_uncharge_pages: uncharge a number of kernel pages from a objcg
- * @objcg: object cgroup to uncharge
- * @nr_pages: number of pages to uncharge
- */
-static void obj_cgroup_uncharge_pages(struct obj_cgroup *objcg,
-				      unsigned int nr_pages)
-{
-	struct mem_cgroup *memcg;
-
-	memcg = get_mem_cgroup_from_objcg(objcg);
-
-	memcg_account_kmem(memcg, -nr_pages);
-	refill_stock(memcg, nr_pages);
-
-	css_put(&memcg->css);
-}
-
-/*
- * obj_cgroup_charge_pages: charge a number of kernel pages to a objcg
- * @objcg: object cgroup to charge
- * @gfp: reclaim mode
- * @nr_pages: number of pages to charge
- *
- * Returns 0 on success, an error code on failure.
- */
-static int obj_cgroup_charge_pages(struct obj_cgroup *objcg, gfp_t gfp,
-				   unsigned int nr_pages)
-{
-	struct mem_cgroup *memcg;
-	int ret;
-
-	memcg = get_mem_cgroup_from_objcg(objcg);
-
-	ret = try_charge_memcg(memcg, gfp, nr_pages);
-	if (ret)
-		goto out;
-
-	memcg_account_kmem(memcg, nr_pages);
-out:
-	css_put(&memcg->css);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -3536,19 +3336,11 @@ static void refill_obj_stock(struct obj_cgroup *objcg, unsigned int nr_bytes,
 		nr_pages = stock->nr_bytes >> PAGE_SHIFT;
 		stock->nr_bytes &= (PAGE_SIZE - 1);
 	}
-<<<<<<< HEAD
 
 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
 	if (old)
 		obj_cgroup_put(old);
 
-=======
-
-	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
-	if (old)
-		obj_cgroup_put(old);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (nr_pages)
 		obj_cgroup_uncharge_pages(objcg, nr_pages);
 }
@@ -5389,13 +5181,8 @@ struct mem_cgroup *mem_cgroup_get_from_ino(unsigned long ino)
 	struct mem_cgroup *memcg;
 
 	cgrp = cgroup_get_from_id(ino);
-<<<<<<< HEAD
 	if (IS_ERR(cgrp))
 		return ERR_CAST(cgrp);
-=======
-	if (!cgrp)
-		return ERR_PTR(-ENOENT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	css = cgroup_get_e_css(cgrp, &memory_cgrp_subsys);
 	if (css)
@@ -5478,13 +5265,10 @@ static struct mem_cgroup *mem_cgroup_alloc(void)
 		goto fail;
 	}
 
-<<<<<<< HEAD
 	memcg->vmstats = kzalloc(sizeof(struct memcg_vmstats), GFP_KERNEL);
 	if (!memcg->vmstats)
 		goto fail;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memcg->vmstats_percpu = alloc_percpu_gfp(struct memcg_vmstats_percpu,
 						 GFP_KERNEL_ACCOUNT);
 	if (!memcg->vmstats_percpu)
@@ -5705,15 +5489,9 @@ static void mem_cgroup_css_rstat_flush(struct cgroup_subsys_state *css, int cpu)
 		 * below us. We're in a per-cpu loop here and this is
 		 * a global counter, so the first cycle will get them.
 		 */
-<<<<<<< HEAD
 		delta = memcg->vmstats->state_pending[i];
 		if (delta)
 			memcg->vmstats->state_pending[i] = 0;
-=======
-		delta = memcg->vmstats.state_pending[i];
-		if (delta)
-			memcg->vmstats.state_pending[i] = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Add CPU changes on this level since the last flush */
 		v = READ_ONCE(statc->state[i]);
@@ -5726,7 +5504,6 @@ static void mem_cgroup_css_rstat_flush(struct cgroup_subsys_state *css, int cpu)
 			continue;
 
 		/* Aggregate counts on this level and propagate upwards */
-<<<<<<< HEAD
 		memcg->vmstats->state[i] += delta;
 		if (parent)
 			parent->vmstats->state_pending[i] += delta;
@@ -5736,17 +5513,6 @@ static void mem_cgroup_css_rstat_flush(struct cgroup_subsys_state *css, int cpu)
 		delta = memcg->vmstats->events_pending[i];
 		if (delta)
 			memcg->vmstats->events_pending[i] = 0;
-=======
-		memcg->vmstats.state[i] += delta;
-		if (parent)
-			parent->vmstats.state_pending[i] += delta;
-	}
-
-	for (i = 0; i < NR_VM_EVENT_ITEMS; i++) {
-		delta = memcg->vmstats.events_pending[i];
-		if (delta)
-			memcg->vmstats.events_pending[i] = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		v = READ_ONCE(statc->events[i]);
 		if (v != statc->events_prev[i]) {
@@ -5757,15 +5523,9 @@ static void mem_cgroup_css_rstat_flush(struct cgroup_subsys_state *css, int cpu)
 		if (!delta)
 			continue;
 
-<<<<<<< HEAD
 		memcg->vmstats->events[i] += delta;
 		if (parent)
 			parent->vmstats->events_pending[i] += delta;
-=======
-		memcg->vmstats.events[i] += delta;
-		if (parent)
-			parent->vmstats.events_pending[i] += delta;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	for_each_node_state(nid, N_MEMORY) {
@@ -6563,14 +6323,6 @@ static u64 memory_peak_read(struct cgroup_subsys_state *css,
 	return (u64)memcg->memory.watermark * PAGE_SIZE;
 }
 
-static u64 memory_peak_read(struct cgroup_subsys_state *css,
-			    struct cftype *cft)
-{
-	struct mem_cgroup *memcg = mem_cgroup_from_css(css);
-
-	return (u64)memcg->memory.watermark * PAGE_SIZE;
-}
-
 static int memory_min_show(struct seq_file *m, void *v)
 {
 	return seq_puts_memcg_tunable(m,
@@ -7163,7 +6915,6 @@ int __mem_cgroup_charge(struct folio *folio, struct mm_struct *mm, gfp_t gfp)
 }
 
 /**
-<<<<<<< HEAD
  * mem_cgroup_swapin_charge_folio - Charge a newly allocated folio for swapin.
  * @folio: folio to charge.
  * @mm: mm context of the victim
@@ -7178,23 +6929,6 @@ int __mem_cgroup_charge(struct folio *folio, struct mm_struct *mm, gfp_t gfp)
 int mem_cgroup_swapin_charge_folio(struct folio *folio, struct mm_struct *mm,
 				  gfp_t gfp, swp_entry_t entry)
 {
-=======
- * mem_cgroup_swapin_charge_page - charge a newly allocated page for swapin
- * @page: page to charge
- * @mm: mm context of the victim
- * @gfp: reclaim mode
- * @entry: swap entry for which the page is allocated
- *
- * This function charges a page allocated for swapin. Please call this before
- * adding the page to the swapcache.
- *
- * Returns 0 on success. Otherwise, an error code is returned.
- */
-int mem_cgroup_swapin_charge_page(struct page *page, struct mm_struct *mm,
-				  gfp_t gfp, swp_entry_t entry)
-{
-	struct folio *folio = page_folio(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mem_cgroup *memcg;
 	unsigned short id;
 	int ret;
@@ -7670,11 +7404,7 @@ int __mem_cgroup_try_charge_swap(struct folio *folio, swp_entry_t entry)
 	struct mem_cgroup *memcg;
 	unsigned short oldid;
 
-<<<<<<< HEAD
 	if (do_memsw_account())
-=======
-	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	memcg = folio_memcg(folio);
@@ -7986,78 +7716,6 @@ void obj_cgroup_charge_zswap(struct obj_cgroup *objcg, size_t size)
  * @size: size of compressed object
  *
  * Uncharges zswap memory on page in.
-<<<<<<< HEAD
-=======
- */
-void obj_cgroup_uncharge_zswap(struct obj_cgroup *objcg, size_t size)
-{
-	struct mem_cgroup *memcg;
-
-	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
-		return;
-
-	obj_cgroup_uncharge(objcg, size);
-
-	rcu_read_lock();
-	memcg = obj_cgroup_memcg(objcg);
-	mod_memcg_state(memcg, MEMCG_ZSWAP_B, -size);
-	mod_memcg_state(memcg, MEMCG_ZSWAPPED, -1);
-	rcu_read_unlock();
-}
-
-static u64 zswap_current_read(struct cgroup_subsys_state *css,
-			      struct cftype *cft)
-{
-	cgroup_rstat_flush(css->cgroup);
-	return memcg_page_state(mem_cgroup_from_css(css), MEMCG_ZSWAP_B);
-}
-
-static int zswap_max_show(struct seq_file *m, void *v)
-{
-	return seq_puts_memcg_tunable(m,
-		READ_ONCE(mem_cgroup_from_seq(m)->zswap_max));
-}
-
-static ssize_t zswap_max_write(struct kernfs_open_file *of,
-			       char *buf, size_t nbytes, loff_t off)
-{
-	struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
-	unsigned long max;
-	int err;
-
-	buf = strstrip(buf);
-	err = page_counter_memparse(buf, "max", &max);
-	if (err)
-		return err;
-
-	xchg(&memcg->zswap_max, max);
-
-	return nbytes;
-}
-
-static struct cftype zswap_files[] = {
-	{
-		.name = "zswap.current",
-		.flags = CFTYPE_NOT_ON_ROOT,
-		.read_u64 = zswap_current_read,
-	},
-	{
-		.name = "zswap.max",
-		.flags = CFTYPE_NOT_ON_ROOT,
-		.seq_show = zswap_max_show,
-		.write = zswap_max_write,
-	},
-	{ }	/* terminate */
-};
-#endif /* CONFIG_MEMCG_KMEM && CONFIG_ZSWAP */
-
-/*
- * If mem_cgroup_swap_init() is implemented as a subsys_initcall()
- * instead of a core_initcall(), this could mean cgroup_memory_noswap still
- * remains set to false even when memcg is disabled via "cgroup_disable=memory"
- * boot parameter. This may result in premature OOPS inside
- * mem_cgroup_get_nr_swap_pages() function in corner cases.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 void obj_cgroup_uncharge_zswap(struct obj_cgroup *objcg, size_t size)
 {

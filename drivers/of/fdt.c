@@ -590,15 +590,9 @@ static int __init fdt_scan_reserved_mem(void)
 
 		if (!of_fdt_device_is_available(fdt, child))
 			continue;
-<<<<<<< HEAD
 
 		uname = fdt_get_name(fdt, child, NULL);
 
-=======
-
-		uname = fdt_get_name(fdt, child, NULL);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = __reserved_mem_reserve_reg(child, uname);
 		if (err == -ENOENT && of_get_flat_dt_prop(child, "size", NULL))
 			fdt_reserved_mem_save_node(child, uname, 0, 0);
@@ -949,7 +943,6 @@ static void __init early_init_dt_check_for_initrd(unsigned long node)
  * @node: reference to node containing elfcorehdr location ('chosen')
  */
 static void __init early_init_dt_check_for_elfcorehdr(unsigned long node)
-<<<<<<< HEAD
 {
 	const __be32 *prop;
 	int len;
@@ -987,45 +980,6 @@ static unsigned long chosen_node_offset = -FDT_ERR_NOTFOUND;
  */
 void __init early_init_dt_check_for_usable_mem_range(void)
 {
-=======
-{
-	const __be32 *prop;
-	int len;
-
-	if (!IS_ENABLED(CONFIG_CRASH_DUMP))
-		return;
-
-	pr_debug("Looking for elfcorehdr property... ");
-
-	prop = of_get_flat_dt_prop(node, "linux,elfcorehdr", &len);
-	if (!prop || (len < (dt_root_addr_cells + dt_root_size_cells)))
-		return;
-
-	elfcorehdr_addr = dt_mem_next_cell(dt_root_addr_cells, &prop);
-	elfcorehdr_size = dt_mem_next_cell(dt_root_size_cells, &prop);
-
-	pr_debug("elfcorehdr_start=0x%llx elfcorehdr_size=0x%llx\n",
-		 elfcorehdr_addr, elfcorehdr_size);
-}
-
-static unsigned long chosen_node_offset = -FDT_ERR_NOTFOUND;
-
-/*
- * The main usage of linux,usable-memory-range is for crash dump kernel.
- * Originally, the number of usable-memory regions is one. Now there may
- * be two regions, low region and high region.
- * To make compatibility with existing user-space and older kdump, the low
- * region is always the last range of linux,usable-memory-range if exist.
- */
-#define MAX_USABLE_RANGES		2
-
-/**
- * early_init_dt_check_for_usable_mem_range - Decode usable memory range
- * location from flat tree
- */
-void __init early_init_dt_check_for_usable_mem_range(void)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct memblock_region rgn[MAX_USABLE_RANGES] = {0};
 	const __be32 *prop, *endp;
 	int len, i;
@@ -1145,11 +1099,7 @@ u64 __init dt_mem_next_cell(int s, const __be32 **cellp)
  */
 int __init early_init_dt_scan_memory(void)
 {
-<<<<<<< HEAD
 	int node, found_memory = 0;
-=======
-	int node;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const void *fdt = initial_boot_params;
 
 	fdt_for_each_subnode(node, fdt, 0) {
@@ -1189,11 +1139,8 @@ int __init early_init_dt_scan_memory(void)
 
 			early_init_dt_add_memory_arch(base, size);
 
-<<<<<<< HEAD
 			found_memory = 1;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (!hotpluggable)
 				continue;
 
@@ -1202,11 +1149,7 @@ int __init early_init_dt_scan_memory(void)
 					base, base + size);
 		}
 	}
-<<<<<<< HEAD
 	return found_memory;
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int __init early_init_dt_scan_chosen(char *cmdline)
@@ -1220,18 +1163,13 @@ int __init early_init_dt_scan_chosen(char *cmdline)
 	if (node < 0)
 		node = fdt_path_offset(fdt, "/chosen@0");
 	if (node < 0)
-<<<<<<< HEAD
 		/* Handle the cmdline config options even if no /chosen node */
 		goto handle_cmdline;
-=======
-		return -ENOENT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	chosen_node_offset = node;
 
 	early_init_dt_check_for_initrd(node);
 	early_init_dt_check_for_elfcorehdr(node);
-<<<<<<< HEAD
 
 	rng_seed = of_get_flat_dt_prop(node, "rng-seed", &l);
 	if (rng_seed && l > 0) {
@@ -1244,17 +1182,11 @@ int __init early_init_dt_scan_chosen(char *cmdline)
 		of_fdt_crc32 = crc32_be(~0, initial_boot_params,
 				fdt_totalsize(initial_boot_params));
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Retrieve command line */
 	p = of_get_flat_dt_prop(node, "bootargs", &l);
 	if (p != NULL && l > 0)
-<<<<<<< HEAD
 		strscpy(cmdline, p, min(l, COMMAND_LINE_SIZE));
-=======
-		strlcpy(cmdline, p, min(l, COMMAND_LINE_SIZE));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 handle_cmdline:
 	/*
@@ -1267,39 +1199,16 @@ handle_cmdline:
 	strlcat(cmdline, " ", COMMAND_LINE_SIZE);
 	strlcat(cmdline, CONFIG_CMDLINE, COMMAND_LINE_SIZE);
 #elif defined(CONFIG_CMDLINE_FORCE)
-<<<<<<< HEAD
 	strscpy(cmdline, CONFIG_CMDLINE, COMMAND_LINE_SIZE);
 #else
 	/* No arguments from boot loader, use kernel's  cmdl*/
 	if (!((char *)cmdline)[0])
 		strscpy(cmdline, CONFIG_CMDLINE, COMMAND_LINE_SIZE);
-=======
-	strlcpy(cmdline, CONFIG_CMDLINE, COMMAND_LINE_SIZE);
-#else
-	/* No arguments from boot loader, use kernel's  cmdl*/
-	if (!((char *)cmdline)[0])
-		strlcpy(cmdline, CONFIG_CMDLINE, COMMAND_LINE_SIZE);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 #endif /* CONFIG_CMDLINE */
 
 	pr_debug("Command line is: %s\n", (char *)cmdline);
 
-<<<<<<< HEAD
-=======
-	rng_seed = of_get_flat_dt_prop(node, "rng-seed", &l);
-	if (rng_seed && l > 0) {
-		add_bootloader_randomness(rng_seed, l);
-
-		/* try to clear seed so it won't be found. */
-		fdt_nop_property(initial_boot_params, node, "rng-seed");
-
-		/* update CRC check value */
-		of_fdt_crc32 = crc32_be(~0, initial_boot_params,
-				fdt_totalsize(initial_boot_params));
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

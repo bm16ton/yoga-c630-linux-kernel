@@ -106,10 +106,7 @@ enum scmi_optee_pta_cmd {
  * @channel_id: OP-TEE channel ID used for this transport
  * @tee_session: TEE session identifier
  * @caps: OP-TEE SCMI channel capabilities
-<<<<<<< HEAD
  * @rx_len: Response size
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @mu: Mutex protection on channel access
  * @cinfo: SCMI channel information
  * @shmem: Virtual base address of the shared memory

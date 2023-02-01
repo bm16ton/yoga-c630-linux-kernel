@@ -997,12 +997,7 @@ struct htt_rx_ring_tlv_filter {
 #define HTT_RX_FULL_MON_MODE_CFG_CMD_CFG_NON_ZERO_MPDUS_END	BIT(2)
 #define HTT_RX_FULL_MON_MODE_CFG_CMD_CFG_RELEASE_RING		GENMASK(10, 3)
 
-<<<<<<< HEAD
 /* Enumeration for full monitor mode destination ring select
-=======
-/**
- * Enumeration for full monitor mode destination ring select
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * 0 - REO destination ring select
  * 1 - FW destination ring select
  * 2 - SW destination ring select

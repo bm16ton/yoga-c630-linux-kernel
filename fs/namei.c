@@ -3601,18 +3601,12 @@ static int vfs_tmpfile(struct user_namespace *mnt_userns,
 		return -EOPNOTSUPP;
 	child = d_alloc(parentpath->dentry, &slash_name);
 	if (unlikely(!child))
-<<<<<<< HEAD
 		return -ENOMEM;
 	file->f_path.mnt = parentpath->mnt;
 	file->f_path.dentry = child;
 	mode = vfs_prepare_mode(mnt_userns, dir, mode, mode, mode);
 	error = dir->i_op->tmpfile(mnt_userns, dir, file, mode);
 	dput(child);
-=======
-		goto out_err;
-	mode = vfs_prepare_mode(mnt_userns, dir, mode, mode, mode);
-	error = dir->i_op->tmpfile(mnt_userns, dir, child, mode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (error)
 		return error;
 	/* Don't check for other permissions, the inode was just created */

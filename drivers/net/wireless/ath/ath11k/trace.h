@@ -305,7 +305,6 @@ TRACE_EVENT(ath11k_wmi_diag,
 	)
 );
 
-<<<<<<< HEAD
 TRACE_EVENT(ath11k_ps_timekeeper,
 	    TP_PROTO(struct ath11k *ar, const void *peer_addr,
 		     u32 peer_ps_timestamp, u8 peer_ps_state),
@@ -334,8 +333,6 @@ TRACE_EVENT(ath11k_ps_timekeeper,
 	)
 );
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _TRACE_H_ || TRACE_HEADER_MULTI_READ*/
 
 /* we don't want to use include/trace/events */

@@ -823,11 +823,7 @@ static int davinci_i2c_probe(struct platform_device *pdev)
 	r = pm_runtime_resume_and_get(dev->dev);
 	if (r < 0) {
 		dev_err(dev->dev, "failed to runtime_get device: %d\n", r);
-<<<<<<< HEAD
 		goto err_pm;
-=======
-		return r;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	i2c_davinci_init(dev);

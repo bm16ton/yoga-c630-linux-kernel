@@ -52,32 +52,19 @@ static const struct rhashtable_params mtk_flow_ht_params = {
 };
 
 static int
-<<<<<<< HEAD
 mtk_flow_set_ipv4_addr(struct mtk_eth *eth, struct mtk_foe_entry *foe,
 		       struct mtk_flow_data *data, bool egress)
 {
 	return mtk_foe_entry_set_ipv4_tuple(eth, foe, egress,
-=======
-mtk_flow_set_ipv4_addr(struct mtk_foe_entry *foe, struct mtk_flow_data *data,
-		       bool egress)
-{
-	return mtk_foe_entry_set_ipv4_tuple(foe, egress,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					    data->v4.src_addr, data->src_port,
 					    data->v4.dst_addr, data->dst_port);
 }
 
 static int
-<<<<<<< HEAD
 mtk_flow_set_ipv6_addr(struct mtk_eth *eth, struct mtk_foe_entry *foe,
 		       struct mtk_flow_data *data)
 {
 	return mtk_foe_entry_set_ipv6_tuple(eth, foe,
-=======
-mtk_flow_set_ipv6_addr(struct mtk_foe_entry *foe, struct mtk_flow_data *data)
-{
-	return mtk_foe_entry_set_ipv6_tuple(foe,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					    data->v6.src_addr.s6_addr32, data->src_port,
 					    data->v6.dst_addr.s6_addr32, data->dst_port);
 }
@@ -187,11 +174,7 @@ mtk_flow_get_dsa_port(struct net_device **dev)
 	if (dp->cpu_dp->tag_ops->proto != DSA_TAG_PROTO_MTK)
 		return -ENODEV;
 
-<<<<<<< HEAD
 	*dev = dsa_port_to_master(dp);
-=======
-	*dev = dp->cpu_dp->master;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return dp->index;
 #else
@@ -208,7 +191,6 @@ mtk_flow_set_output_device(struct mtk_eth *eth, struct mtk_foe_entry *foe,
 	int pse_port, dsa_port;
 
 	if (mtk_flow_get_wdma_info(dev, dest_mac, &info) == 0) {
-<<<<<<< HEAD
 		mtk_foe_entry_set_wdma(eth, foe, info.wdma_idx, info.queue,
 				       info.bss, info.wcid);
 		if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2)) {
@@ -225,22 +207,13 @@ mtk_flow_set_output_device(struct mtk_eth *eth, struct mtk_foe_entry *foe,
 		} else {
 			pse_port = 3;
 		}
-=======
-		mtk_foe_entry_set_wdma(foe, info.wdma_idx, info.queue, info.bss,
-				       info.wcid);
-		pse_port = 3;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*wed_index = info.wdma_idx;
 		goto out;
 	}
 
 	dsa_port = mtk_flow_get_dsa_port(&dev);
 	if (dsa_port >= 0)
-<<<<<<< HEAD
 		mtk_foe_entry_set_dsa(eth, foe, dsa_port);
-=======
-		mtk_foe_entry_set_dsa(foe, dsa_port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (dev == eth->netdev[0])
 		pse_port = 1;
@@ -250,11 +223,7 @@ mtk_flow_set_output_device(struct mtk_eth *eth, struct mtk_foe_entry *foe,
 		return -EOPNOTSUPP;
 
 out:
-<<<<<<< HEAD
 	mtk_foe_entry_set_pse_port(eth, foe, pse_port);
-=======
-	mtk_foe_entry_set_pse_port(foe, pse_port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -378,14 +347,8 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
 	    !is_valid_ether_addr(data.eth.h_dest))
 		return -EINVAL;
 
-<<<<<<< HEAD
 	err = mtk_foe_entry_prepare(eth, &foe, offload_type, l4proto, 0,
 				    data.eth.h_source, data.eth.h_dest);
-=======
-	err = mtk_foe_entry_prepare(&foe, offload_type, l4proto, 0,
-				    data.eth.h_source,
-				    data.eth.h_dest);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -410,11 +373,7 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
 		data.v4.src_addr = addrs.key->src;
 		data.v4.dst_addr = addrs.key->dst;
 
-<<<<<<< HEAD
 		mtk_flow_set_ipv4_addr(eth, &foe, &data, false);
-=======
-		mtk_flow_set_ipv4_addr(&foe, &data, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (addr_type == FLOW_DISSECTOR_KEY_IPV6_ADDRS) {
@@ -425,11 +384,7 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
 		data.v6.src_addr = addrs.key->src;
 		data.v6.dst_addr = addrs.key->dst;
 
-<<<<<<< HEAD
 		mtk_flow_set_ipv6_addr(eth, &foe, &data);
-=======
-		mtk_flow_set_ipv6_addr(&foe, &data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	flow_action_for_each(i, act, &rule->action) {
@@ -459,11 +414,7 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
 	}
 
 	if (addr_type == FLOW_DISSECTOR_KEY_IPV4_ADDRS) {
-<<<<<<< HEAD
 		err = mtk_flow_set_ipv4_addr(eth, &foe, &data, true);
-=======
-		err = mtk_flow_set_ipv4_addr(&foe, &data, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (err)
 			return err;
 	}
@@ -475,17 +426,10 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
 		if (data.vlan.proto != htons(ETH_P_8021Q))
 			return -EOPNOTSUPP;
 
-<<<<<<< HEAD
 		mtk_foe_entry_set_vlan(eth, &foe, data.vlan.id);
 	}
 	if (data.pppoe.num == 1)
 		mtk_foe_entry_set_pppoe(eth, &foe, data.pppoe.sid);
-=======
-		mtk_foe_entry_set_vlan(&foe, data.vlan.id);
-	}
-	if (data.pppoe.num == 1)
-		mtk_foe_entry_set_pppoe(&foe, data.pppoe.sid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = mtk_flow_set_output_device(eth, &foe, odev, data.eth.h_dest,
 					 &wed_index);
@@ -503,11 +447,7 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
 	memcpy(&entry->data, &foe, sizeof(entry->data));
 	entry->wed_index = wed_index;
 
-<<<<<<< HEAD
 	err = mtk_foe_entry_commit(eth->ppe[entry->ppe_index], entry);
-=======
-	err = mtk_foe_entry_commit(eth->ppe, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err < 0)
 		goto free;
 
@@ -519,11 +459,7 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
 	return 0;
 
 clear:
-<<<<<<< HEAD
 	mtk_foe_entry_clear(eth->ppe[entry->ppe_index], entry);
-=======
-	mtk_foe_entry_clear(eth->ppe, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 free:
 	kfree(entry);
 	if (wed_index >= 0)
@@ -541,11 +477,7 @@ mtk_flow_offload_destroy(struct mtk_eth *eth, struct flow_cls_offload *f)
 	if (!entry)
 		return -ENOENT;
 
-<<<<<<< HEAD
 	mtk_foe_entry_clear(eth->ppe[entry->ppe_index], entry);
-=======
-	mtk_foe_entry_clear(eth->ppe, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rhashtable_remove_fast(&eth->flow_table, &entry->node,
 			       mtk_flow_ht_params);
 	if (entry->wed_index >= 0)
@@ -566,11 +498,7 @@ mtk_flow_offload_stats(struct mtk_eth *eth, struct flow_cls_offload *f)
 	if (!entry)
 		return -ENOENT;
 
-<<<<<<< HEAD
 	idle = mtk_foe_entry_idle_time(eth->ppe[entry->ppe_index], entry);
-=======
-	idle = mtk_foe_entry_idle_time(eth->ppe, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f->stats.lastused = jiffies - idle * HZ;
 
 	return 0;
@@ -622,11 +550,7 @@ mtk_eth_setup_tc_block(struct net_device *dev, struct flow_block_offload *f)
 	struct flow_block_cb *block_cb;
 	flow_setup_cb_t *cb;
 
-<<<<<<< HEAD
 	if (!eth->soc->offload_version)
-=======
-	if (!eth->ppe || !eth->ppe->foe_table)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EOPNOTSUPP;
 
 	if (f->binder_type != FLOW_BLOCK_BINDER_TYPE_CLSACT_INGRESS)
@@ -678,11 +602,5 @@ int mtk_eth_setup_tc(struct net_device *dev, enum tc_setup_type type,
 
 int mtk_eth_offload_init(struct mtk_eth *eth)
 {
-<<<<<<< HEAD
-=======
-	if (!eth->ppe || !eth->ppe->foe_table)
-		return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return rhashtable_init(&eth->flow_table, &mtk_flow_ht_params);
 }

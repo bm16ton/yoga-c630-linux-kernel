@@ -1399,10 +1399,6 @@ lpfc_linkup(struct lpfc_hba *phba)
 
 	/* reinitialize initial HBA flag */
 	phba->hba_flag &= ~(HBA_FLOGI_ISSUED | HBA_RHBA_CMPL);
-<<<<<<< HEAD
-=======
-	phba->defer_flogi_acc_flag = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -3800,12 +3796,9 @@ lpfc_mbx_cmpl_read_topology(struct lpfc_hba *phba, LPFC_MBOXQ_t *pmb)
 		if (phba->cmf_active_mode != LPFC_CFG_OFF)
 			lpfc_cmf_signal_init(phba);
 
-<<<<<<< HEAD
 		if (phba->lmt & LMT_64Gb)
 			lpfc_read_lds_params(phba);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (attn_type == LPFC_ATT_LINK_DOWN ||
 		   attn_type == LPFC_ATT_UNEXP_WWPN) {
 		phba->fc_stat.LinkDown++;
@@ -4405,16 +4398,11 @@ out:
 			rc = lpfc_issue_els_edc(vport, 0);
 			lpfc_printf_log(phba, KERN_INFO,
 					LOG_INIT | LOG_ELS | LOG_DISCOVERY,
-<<<<<<< HEAD
 					"4220 Issue EDC status x%x Data x%x\n",
 					rc, phba->cgn_init_reg_signal);
 		} else if (phba->lmt & LMT_64Gb) {
 			/* may send link fault capability descriptor */
 			lpfc_issue_els_edc(vport, 0);
-=======
-					"4220 EDC issue error x%x, Data: x%x\n",
-					rc, phba->cgn_init_reg_signal);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			lpfc_issue_els_rdf(vport, 0);
 		}
@@ -4811,19 +4799,6 @@ lpfc_nlp_state_cleanup(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 	if (new_state ==  NLP_STE_MAPPED_NODE ||
 	    new_state == NLP_STE_UNMAPPED_NODE)
 		lpfc_nlp_reg_node(vport, ndlp);
-<<<<<<< HEAD
-=======
-
-	if ((new_state ==  NLP_STE_MAPPED_NODE) &&
-		(vport->stat_data_enabled)) {
-		/*
-		 * A new target is discovered, if there is no buffer for
-		 * statistical data collection allocate buffer.
-		 */
-		ndlp->lat_data = kcalloc(LPFC_MAX_BUCKET_COUNT,
-					 sizeof(struct lpfc_scsicmd_bkt),
-					 GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * If the node just added to Mapped list was an FCP target,

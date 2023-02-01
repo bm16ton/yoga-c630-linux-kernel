@@ -1289,14 +1289,7 @@ static int ice_set_priv_flags(struct net_device *netdev, u32 flags)
 	}
 	if (test_bit(ICE_FLAG_LEGACY_RX, change_flags)) {
 		/* down and up VSI so that changes of Rx cfg are reflected. */
-<<<<<<< HEAD
 		ice_down_up(vsi);
-=======
-		if (!test_and_set_bit(ICE_VSI_DOWN, vsi->state)) {
-			ice_down(vsi);
-			ice_up(vsi);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	/* don't allow modification of this flag when a single VF is in
 	 * promiscuous mode because it's not supported
@@ -1542,12 +1535,8 @@ ice_phy_type_to_ethtool(struct net_device *netdev,
 		phy_types_low = le64_to_cpu(pf->nvm_phy_type_lo);
 		phy_types_high = le64_to_cpu(pf->nvm_phy_type_hi);
 
-<<<<<<< HEAD
 		ice_mask_min_supported_speeds(&pf->hw, phy_types_high,
 					      &phy_types_low);
-=======
-		ice_mask_min_supported_speeds(phy_types_high, &phy_types_low);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* determine advertised modes based on link override only
 		 * if it's supported and if the FW doesn't abstract the
 		 * driver from having to account for link overrides

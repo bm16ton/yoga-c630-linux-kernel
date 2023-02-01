@@ -1537,13 +1537,8 @@ void intel_guc_submission_reset_prepare(struct intel_guc *guc)
 	__reset_guc_busyness_stats(guc);
 
 	/* Flush IRQ handler */
-<<<<<<< HEAD
 	spin_lock_irq(guc_to_gt(guc)->irq_lock);
 	spin_unlock_irq(guc_to_gt(guc)->irq_lock);
-=======
-	spin_lock_irq(&guc_to_gt(guc)->irq_lock);
-	spin_unlock_irq(&guc_to_gt(guc)->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	guc_flush_submissions(guc);
 	guc_flush_destroyed_contexts(guc);
@@ -1878,11 +1873,7 @@ int intel_guc_submission_init(struct intel_guc *guc)
 	if (guc->submission_initialized)
 		return 0;
 
-<<<<<<< HEAD
 	if (GET_UC_VER(guc) < MAKE_UC_VER(70, 0, 0)) {
-=======
-	if (guc->fw.major_ver_found < 70) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = guc_lrc_desc_pool_create_v69(guc);
 		if (ret)
 			return ret;
@@ -2317,11 +2308,7 @@ static int register_context(struct intel_context *ce, bool loop)
 	GEM_BUG_ON(intel_context_is_child(ce));
 	trace_intel_context_register(ce);
 
-<<<<<<< HEAD
 	if (GET_UC_VER(guc) >= MAKE_UC_VER(70, 0, 0))
-=======
-	if (guc->fw.major_ver_found >= 70)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = register_context_v70(guc, ce, loop);
 	else
 		ret = register_context_v69(guc, ce, loop);
@@ -2333,11 +2320,7 @@ static int register_context(struct intel_context *ce, bool loop)
 		set_context_registered(ce);
 		spin_unlock_irqrestore(&ce->guc_state.lock, flags);
 
-<<<<<<< HEAD
 		if (GET_UC_VER(guc) >= MAKE_UC_VER(70, 0, 0))
-=======
-		if (guc->fw.major_ver_found >= 70)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			guc_context_policy_init_v70(ce, loop);
 	}
 
@@ -2442,21 +2425,14 @@ static int guc_context_policy_init_v70(struct intel_context *ce, bool loop)
 	struct context_policy policy;
 	u32 execution_quantum;
 	u32 preemption_timeout;
-<<<<<<< HEAD
-=======
-	bool missing = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long flags;
 	int ret;
 
 	/* NB: For both of these, zero means disabled. */
-<<<<<<< HEAD
 	GEM_BUG_ON(overflows_type(engine->props.timeslice_duration_ms * 1000,
 				  execution_quantum));
 	GEM_BUG_ON(overflows_type(engine->props.preempt_timeout_ms * 1000,
 				  preemption_timeout));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	execution_quantum = engine->props.timeslice_duration_ms * 1000;
 	preemption_timeout = engine->props.preempt_timeout_ms * 1000;
 
@@ -2470,38 +2446,9 @@ static int guc_context_policy_init_v70(struct intel_context *ce, bool loop)
 		__guc_context_policy_add_preempt_to_idle(&policy, 1);
 
 	ret = __guc_context_set_context_policies(guc, &policy, loop);
-<<<<<<< HEAD
 
 	spin_lock_irqsave(&ce->guc_state.lock, flags);
 	if (ret != 0)
-=======
-	missing = ret != 0;
-
-	if (!missing && intel_context_is_parent(ce)) {
-		struct intel_context *child;
-
-		for_each_child(ce, child) {
-			__guc_context_policy_start_klv(&policy, child->guc_id.id);
-
-			if (engine->flags & I915_ENGINE_WANT_FORCED_PREEMPTION)
-				__guc_context_policy_add_preempt_to_idle(&policy, 1);
-
-			child->guc_state.prio = ce->guc_state.prio;
-			__guc_context_policy_add_priority(&policy, ce->guc_state.prio);
-			__guc_context_policy_add_execution_quantum(&policy, execution_quantum);
-			__guc_context_policy_add_preemption_timeout(&policy, preemption_timeout);
-
-			ret = __guc_context_set_context_policies(guc, &policy, loop);
-			if (ret) {
-				missing = true;
-				break;
-			}
-		}
-	}
-
-	spin_lock_irqsave(&ce->guc_state.lock, flags);
-	if (missing)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		set_context_policy_required(ce);
 	else
 		clr_context_policy_required(ce);
@@ -2519,13 +2466,10 @@ static void guc_context_policy_init_v69(struct intel_engine_cs *engine,
 		desc->policy_flags |= CONTEXT_POLICY_FLAG_PREEMPT_TO_IDLE_V69;
 
 	/* NB: For both of these, zero means disabled. */
-<<<<<<< HEAD
 	GEM_BUG_ON(overflows_type(engine->props.timeslice_duration_ms * 1000,
 				  desc->execution_quantum));
 	GEM_BUG_ON(overflows_type(engine->props.preempt_timeout_ms * 1000,
 				  desc->preemption_timeout));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	desc->execution_quantum = engine->props.timeslice_duration_ms * 1000;
 	desc->preemption_timeout = engine->props.preempt_timeout_ms * 1000;
 }
@@ -2990,11 +2934,7 @@ static void __guc_context_set_preemption_timeout(struct intel_guc *guc,
 						 u16 guc_id,
 						 u32 preemption_timeout)
 {
-<<<<<<< HEAD
 	if (GET_UC_VER(guc) >= MAKE_UC_VER(70, 0, 0)) {
-=======
-	if (guc->fw.major_ver_found >= 70) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct context_policy policy;
 
 		__guc_context_policy_start_klv(&policy, guc_id);
@@ -3259,11 +3199,7 @@ static int guc_context_alloc(struct intel_context *ce)
 static void __guc_context_set_prio(struct intel_guc *guc,
 				   struct intel_context *ce)
 {
-<<<<<<< HEAD
 	if (GET_UC_VER(guc) >= MAKE_UC_VER(70, 0, 0)) {
-=======
-	if (guc->fw.major_ver_found >= 70) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct context_policy policy;
 
 		__guc_context_policy_start_klv(&policy, ce->guc_id.id);
@@ -4251,7 +4187,6 @@ int intel_guc_submission_setup(struct intel_engine_cs *engine)
 
 void intel_guc_submission_enable(struct intel_guc *guc)
 {
-<<<<<<< HEAD
 	struct intel_gt *gt = guc_to_gt(guc);
 
 	/* Enable and route to GuC */
@@ -4260,15 +4195,12 @@ void intel_guc_submission_enable(struct intel_guc *guc)
 				   GUC_SEM_INTR_ROUTE_TO_GUC |
 				   GUC_SEM_INTR_ENABLE_ALL);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	guc_init_lrc_mapping(guc);
 	guc_init_engine_stats(guc);
 }
 
 void intel_guc_submission_disable(struct intel_guc *guc)
 {
-<<<<<<< HEAD
 	struct intel_gt *gt = guc_to_gt(guc);
 
 	/* Note: By the time we're here, GuC may have already been reset */
@@ -4276,9 +4208,6 @@ void intel_guc_submission_disable(struct intel_guc *guc)
 	/* Disable and route to host */
 	if (GRAPHICS_VER(gt->i915) >= 12)
 		intel_uncore_write(gt->uncore, GEN12_GUC_SEM_INTR_ENABLES, 0x0);
-=======
-	/* Note: By the time we're here, GuC may have already been reset */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool __guc_submission_supported(struct intel_guc *guc)
@@ -5244,8 +5173,5 @@ bool intel_guc_virtual_engine_has_heartbeat(const struct intel_engine_cs *ve)
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)
 #include "selftest_guc.c"
 #include "selftest_guc_multi_lrc.c"
-<<<<<<< HEAD
 #include "selftest_guc_hangcheck.c"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

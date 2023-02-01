@@ -518,7 +518,6 @@ static const struct intel_mpllb_state dg2_hdmi_148_5 = {
 };
 
 /* values in the below table are calculted using the algo */
-<<<<<<< HEAD
 static const struct intel_mpllb_state dg2_hdmi_25200 = {
 	.clock = 25200,
 	.ref_control =
@@ -1599,8 +1598,6 @@ static const struct intel_mpllb_state dg2_hdmi_593407 = {
 		REG_FIELD_PREP(SNPS_PHY_MPLLB_SSC_UP_SPREAD, 1),
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct intel_mpllb_state dg2_hdmi_297 = {
 	.clock = 297000,
 	.ref_control =
@@ -1667,7 +1664,6 @@ static const struct intel_mpllb_state * const dg2_hdmi_tables[] = {
 	&dg2_hdmi_148_5,
 	&dg2_hdmi_297,
 	&dg2_hdmi_594,
-<<<<<<< HEAD
 	&dg2_hdmi_25200,
 	&dg2_hdmi_27027,
 	&dg2_hdmi_28320,
@@ -1704,8 +1700,6 @@ static const struct intel_mpllb_state * const dg2_hdmi_tables[] = {
 	&dg2_hdmi_497750,
 	&dg2_hdmi_592000,
 	&dg2_hdmi_593407,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	NULL,
 };
 

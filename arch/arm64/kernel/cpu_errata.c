@@ -234,15 +234,6 @@ static const struct arm64_cpu_capabilities arm64_repeat_tlbi_list[] = {
 	{
 		ERRATA_MIDR_ALL_VERSIONS(MIDR_CORTEX_A55),
 	},
-<<<<<<< HEAD
-=======
-#endif
-#ifdef CONFIG_ARM64_ERRATUM_2441009
-	{
-		/* Cortex-A510 r0p0 -> r1p1. Fixed in r1p2 */
-		ERRATA_MIDR_RANGE(MIDR_CORTEX_A510, 0, 0, 1, 1),
-	},
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 #ifdef CONFIG_ARM64_ERRATUM_2441009
 	{
@@ -250,21 +241,6 @@ static const struct arm64_cpu_capabilities arm64_repeat_tlbi_list[] = {
 		ERRATA_MIDR_RANGE(MIDR_CORTEX_A510, 0, 0, 1, 1),
 	},
 #endif
-	{},
-};
-#endif
-
-#ifdef CONFIG_CAVIUM_ERRATUM_23154
-static const struct midr_range cavium_erratum_23154_cpus[] = {
-	MIDR_ALL_VERSIONS(MIDR_THUNDERX),
-	MIDR_ALL_VERSIONS(MIDR_THUNDERX_81XX),
-	MIDR_ALL_VERSIONS(MIDR_THUNDERX_83XX),
-	MIDR_ALL_VERSIONS(MIDR_OCTX2_98XX),
-	MIDR_ALL_VERSIONS(MIDR_OCTX2_96XX),
-	MIDR_ALL_VERSIONS(MIDR_OCTX2_95XX),
-	MIDR_ALL_VERSIONS(MIDR_OCTX2_95XXN),
-	MIDR_ALL_VERSIONS(MIDR_OCTX2_95XXMM),
-	MIDR_ALL_VERSIONS(MIDR_OCTX2_95XXO),
 	{},
 };
 #endif
@@ -737,7 +713,6 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
 	},
 #endif
-<<<<<<< HEAD
 #ifdef CONFIG_ARM64_ERRATUM_2658417
 	{
 		.desc = "ARM erratum 2658417",
@@ -748,8 +723,6 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		.cpu_enable = cpu_clear_bf16_from_user_emulation,
 	},
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{
 	}
 };

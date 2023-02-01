@@ -31,13 +31,9 @@ you probably needn't concern yourself with pcmciautils.
 ====================== ===============  ========================================
 GNU C                  5.1              gcc --version
 Clang/LLVM (optional)  11.0.0           clang --version
-<<<<<<< HEAD
 Rust (optional)        1.62.0           rustc --version
 bindgen (optional)     0.56.0           bindgen --version
 GNU make               3.82             make --version
-=======
-GNU make               3.81             make --version
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bash                   4.2              bash --version
 binutils               2.23             ld -v
 flex                   2.5.35           flex --version
@@ -113,12 +109,6 @@ Make
 ----
 
 You will need GNU make 3.82 or later to build the kernel.
-
-Bash
-----
-
-Some bash scripts are used for the kernel build.
-Bash 4.2 or newer is needed.
 
 Bash
 ----

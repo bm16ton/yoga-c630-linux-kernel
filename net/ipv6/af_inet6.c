@@ -1091,8 +1091,6 @@ static int __init inet6_init(void)
 		goto out;
 	}
 
-	raw_hashinfo_init(&raw_v6_hashinfo);
-
 	err = proto_register(&tcpv6_prot, 1);
 	if (err)
 		goto out;

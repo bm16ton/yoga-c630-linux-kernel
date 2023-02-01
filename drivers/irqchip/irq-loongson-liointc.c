@@ -163,7 +163,6 @@ static const char *const core_reg_names[] = {"isr0", "isr1", "isr2", "isr3"};
 static int liointc_domain_xlate(struct irq_domain *d, struct device_node *ctrlr,
 			     const u32 *intspec, unsigned int intsize,
 			     unsigned long *out_hwirq, unsigned int *out_type)
-<<<<<<< HEAD
 {
 	if (WARN_ON(intsize < 1))
 		return -EINVAL;
@@ -181,25 +180,6 @@ static const struct irq_domain_ops acpi_irq_gc_ops = {
 static int liointc_init(phys_addr_t addr, unsigned long size, int revision,
 		struct fwnode_handle *domain_handle, struct device_node *node)
 {
-=======
-{
-	if (WARN_ON(intsize < 1))
-		return -EINVAL;
-	*out_hwirq = intspec[0] - GSI_MIN_CPU_IRQ;
-	*out_type = IRQ_TYPE_NONE;
-	return 0;
-}
-
-static const struct irq_domain_ops acpi_irq_gc_ops = {
-	.map	= irq_map_generic_chip,
-	.unmap  = irq_unmap_generic_chip,
-	.xlate	= liointc_domain_xlate,
-};
-
-static int liointc_init(phys_addr_t addr, unsigned long size, int revision,
-		struct fwnode_handle *domain_handle, struct device_node *node)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i, err;
 	void __iomem *base;
 	struct irq_chip_type *ct;
@@ -227,7 +207,6 @@ static int liointc_init(phys_addr_t addr, unsigned long size, int revision,
 					"reg-names", core_reg_names[i]);
 
 			if (index < 0)
-<<<<<<< HEAD
 				continue;
 
 			priv->core_isr[i] = of_iomap(node, index);
@@ -235,12 +214,6 @@ static int liointc_init(phys_addr_t addr, unsigned long size, int revision,
 
 		if (!priv->core_isr[0])
 			goto out_iounmap;
-=======
-				goto out_iounmap;
-
-			priv->core_isr[i] = of_iomap(node, index);
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Setup IRQ domain */

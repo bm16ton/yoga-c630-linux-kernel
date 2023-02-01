@@ -5,7 +5,6 @@
 #include "common.h"
 
 int memblock_alloc_nid_checks(void);
-<<<<<<< HEAD
 int __memblock_alloc_nid_numa_checks(void);
 
 #ifdef CONFIG_NUMA
@@ -22,7 +21,5 @@ static inline int memblock_alloc_nid_numa_checks(void)
 }
 
 #endif /* CONFIG_NUMA */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

@@ -170,24 +170,12 @@ EXPORT_SYMBOL(nvdimm_namespace_disk_name);
 
 const uuid_t *nd_dev_to_uuid(struct device *dev)
 {
-<<<<<<< HEAD
 	if (dev && is_namespace_pmem(dev)) {
 		struct nd_namespace_pmem *nspm = to_nd_namespace_pmem(dev);
 
 		return nspm->uuid;
 	}
 	return &uuid_null;
-=======
-	if (!dev)
-		return &uuid_null;
-
-	if (is_namespace_pmem(dev)) {
-		struct nd_namespace_pmem *nspm = to_nd_namespace_pmem(dev);
-
-		return nspm->uuid;
-	} else
-		return &uuid_null;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(nd_dev_to_uuid);
 
@@ -848,10 +836,6 @@ static ssize_t size_store(struct device *dev,
 {
 	struct nd_region *nd_region = to_nd_region(dev->parent);
 	unsigned long long val;
-<<<<<<< HEAD
-=======
-	uuid_t **uuid = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int rc;
 
 	rc = kstrtoull(buf, 0, &val);
@@ -869,18 +853,8 @@ static ssize_t size_store(struct device *dev,
 	if (rc == 0 && val == 0 && is_namespace_pmem(dev)) {
 		struct nd_namespace_pmem *nspm = to_nd_namespace_pmem(dev);
 
-<<<<<<< HEAD
 		kfree(nspm->uuid);
 		nspm->uuid = NULL;
-=======
-		uuid = &nspm->uuid;
-	}
-
-	if (rc == 0 && val == 0 && uuid) {
-		/* setting size zero == 'delete namespace' */
-		kfree(*uuid);
-		*uuid = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	dev_dbg(dev, "%llx %s (%d)\n", val, rc < 0 ? "fail" : "success", rc);
@@ -1730,11 +1704,6 @@ static struct device *create_namespace_pmem(struct nd_region *nd_region,
 	res->flags = IORESOURCE_MEM;
 
 	for (i = 0; i < nd_region->ndr_mappings; i++) {
-<<<<<<< HEAD
-=======
-		uuid_t uuid;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		nsl_get_uuid(ndd, nd_label, &uuid);
 		if (has_uuid_at_pos(nd_region, &uuid, cookie, i))
 			continue;

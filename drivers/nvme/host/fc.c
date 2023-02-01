@@ -2383,15 +2383,8 @@ nvme_fc_ctrl_free(struct kref *ref)
 		container_of(ref, struct nvme_fc_ctrl, ref);
 	unsigned long flags;
 
-<<<<<<< HEAD
 	if (ctrl->ctrl.tagset)
 		nvme_remove_io_tag_set(&ctrl->ctrl);
-=======
-	if (ctrl->ctrl.tagset) {
-		blk_mq_destroy_queue(ctrl->ctrl.connect_q);
-		blk_mq_free_tag_set(&ctrl->tag_set);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* remove from rport list */
 	spin_lock_irqsave(&ctrl->rport->lock, flags);
@@ -2399,13 +2392,7 @@ nvme_fc_ctrl_free(struct kref *ref)
 	spin_unlock_irqrestore(&ctrl->rport->lock, flags);
 
 	nvme_start_admin_queue(&ctrl->ctrl);
-<<<<<<< HEAD
 	nvme_remove_admin_tag_set(&ctrl->ctrl);
-=======
-	blk_mq_destroy_queue(ctrl->ctrl.admin_q);
-	blk_mq_destroy_queue(ctrl->ctrl.fabrics_q);
-	blk_mq_free_tag_set(&ctrl->admin_tag_set);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	kfree(ctrl->queues);
 
@@ -2861,15 +2848,9 @@ nvme_fc_complete_rq(struct request *rq)
 	nvme_fc_ctrl_put(ctrl);
 }
 
-<<<<<<< HEAD
 static void nvme_fc_map_queues(struct blk_mq_tag_set *set)
 {
 	struct nvme_fc_ctrl *ctrl = to_fc_ctrl(set->driver_data);
-=======
-static int nvme_fc_map_queues(struct blk_mq_tag_set *set)
-{
-	struct nvme_fc_ctrl *ctrl = set->driver_data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 
 	for (i = 0; i < set->nr_maps; i++) {
@@ -2887,10 +2868,6 @@ static int nvme_fc_map_queues(struct blk_mq_tag_set *set)
 		else
 			blk_mq_map_queues(map);
 	}
-<<<<<<< HEAD
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct blk_mq_ops nvme_fc_mq_ops = {
@@ -2932,15 +2909,6 @@ nvme_fc_create_io_queues(struct nvme_fc_ctrl *ctrl)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-=======
-	ctrl->ctrl.tagset = &ctrl->tag_set;
-
-	ret = nvme_ctrl_init_connect_q(&(ctrl->ctrl));
-	if (ret)
-		goto out_free_tag_set;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = nvme_fc_create_hw_io_queues(ctrl, ctrl->ctrl.sqsize + 1);
 	if (ret)
 		goto out_cleanup_tagset;
@@ -2955,15 +2923,8 @@ nvme_fc_create_io_queues(struct nvme_fc_ctrl *ctrl)
 
 out_delete_hw_queues:
 	nvme_fc_delete_hw_io_queues(ctrl);
-<<<<<<< HEAD
 out_cleanup_tagset:
 	nvme_remove_io_tag_set(&ctrl->ctrl);
-=======
-out_cleanup_blk_queue:
-	blk_mq_destroy_queue(ctrl->ctrl.connect_q);
-out_free_tag_set:
-	blk_mq_free_tag_set(&ctrl->tag_set);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nvme_fc_free_io_queues(ctrl);
 
 	/* force put free routine to ignore io queues */
@@ -3618,17 +3579,8 @@ fail_ctrl:
 
 	return ERR_PTR(-EIO);
 
-<<<<<<< HEAD
 out_cleanup_tagset:
 	nvme_remove_admin_tag_set(&ctrl->ctrl);
-=======
-out_cleanup_admin_q:
-	blk_mq_destroy_queue(ctrl->ctrl.admin_q);
-out_cleanup_fabrics_q:
-	blk_mq_destroy_queue(ctrl->ctrl.fabrics_q);
-out_free_admin_tag_set:
-	blk_mq_free_tag_set(&ctrl->admin_tag_set);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_free_queues:
 	kfree(ctrl->queues);
 out_free_ida:

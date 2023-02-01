@@ -38,17 +38,10 @@ static int cb_map_mem(struct hl_ctx *ctx, struct hl_cb *cb)
 
 	cb->roundup_size = roundup(cb->size, page_size);
 
-<<<<<<< HEAD
 	cb->virtual_addr = (u64) gen_pool_alloc(ctx->cb_va_pool, cb->roundup_size);
 	if (!cb->virtual_addr) {
 		dev_err(hdev->dev, "Failed to allocate device virtual address for CB\n");
 		return -ENOMEM;
-=======
-		va_block->start = virt_addr;
-		va_block->end = virt_addr + page_size - 1;
-		va_block->size = page_size;
-		list_add_tail(&va_block->node, &cb->va_block_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	mutex_lock(&hdev->mmu_lock);
@@ -57,7 +50,6 @@ static int cb_map_mem(struct hl_ctx *ctx, struct hl_cb *cb)
 		dev_err(hdev->dev, "Failed to map VA %#llx to CB\n", cb->virtual_addr);
 		goto err_va_umap;
 	}
-<<<<<<< HEAD
 	rc = hl_mmu_invalidate_cache(hdev, false, MMU_OP_USERPTR | MMU_OP_SKIP_LOW_CACHE_INV);
 	mutex_unlock(&hdev->mmu_lock);
 
@@ -67,37 +59,6 @@ static int cb_map_mem(struct hl_ctx *ctx, struct hl_cb *cb)
 err_va_umap:
 	mutex_unlock(&hdev->mmu_lock);
 	gen_pool_free(ctx->cb_va_pool, cb->virtual_addr, cb->roundup_size);
-=======
-
-	rc = hl_mmu_invalidate_cache(hdev, false, MMU_OP_USERPTR | MMU_OP_SKIP_LOW_CACHE_INV);
-
-	mutex_unlock(&ctx->mmu_lock);
-
-	cb->is_mmu_mapped = true;
-
-	return rc;
-
-err_va_umap:
-	list_for_each_entry(va_block, &cb->va_block_list, node) {
-		if (offset <= 0)
-			break;
-		hl_mmu_unmap_page(ctx, va_block->start, va_block->size,
-				offset <= va_block->size);
-		offset -= va_block->size;
-	}
-
-	rc = hl_mmu_invalidate_cache(hdev, true, MMU_OP_USERPTR);
-
-	mutex_unlock(&ctx->mmu_lock);
-
-err_va_pool_free:
-	list_for_each_entry_safe(va_block, tmp, &cb->va_block_list, node) {
-		gen_pool_free(ctx->cb_va_pool, va_block->start, va_block->size);
-		list_del(&va_block->node);
-		kfree(va_block);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return rc;
 }
 
@@ -110,19 +71,7 @@ static void cb_unmap_mem(struct hl_ctx *ctx, struct hl_cb *cb)
 	hl_mmu_invalidate_cache(hdev, true, MMU_OP_USERPTR);
 	mutex_unlock(&hdev->mmu_lock);
 
-<<<<<<< HEAD
 	gen_pool_free(ctx->cb_va_pool, cb->virtual_addr, cb->roundup_size);
-=======
-	hl_mmu_invalidate_cache(hdev, true, MMU_OP_USERPTR);
-
-	mutex_unlock(&ctx->mmu_lock);
-
-	list_for_each_entry_safe(va_block, tmp, &cb->va_block_list, node) {
-		gen_pool_free(ctx->cb_va_pool, va_block->start, va_block->size);
-		list_del(&va_block->node);
-		kfree(va_block);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void cb_fini(struct hl_device *hdev, struct hl_cb *cb)
@@ -225,7 +174,6 @@ static void hl_cb_mmap_mem_release(struct hl_mmap_mem_buf *buf)
 
 	cb_do_release(cb->hdev, cb);
 }
-<<<<<<< HEAD
 
 static int hl_cb_mmap_mem_alloc(struct hl_mmap_mem_buf *buf, gfp_t gfp, void *args)
 {
@@ -234,16 +182,6 @@ static int hl_cb_mmap_mem_alloc(struct hl_mmap_mem_buf *buf, gfp_t gfp, void *ar
 	int rc, ctx_id = cb_args->ctx->asid;
 	bool alloc_new_cb = true;
 
-=======
-
-static int hl_cb_mmap_mem_alloc(struct hl_mmap_mem_buf *buf, gfp_t gfp, void *args)
-{
-	struct hl_cb_mmap_mem_alloc_args *cb_args = args;
-	struct hl_cb *cb;
-	int rc, ctx_id = cb_args->ctx->asid;
-	bool alloc_new_cb = true;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!cb_args->internal_cb) {
 		/* Minimum allocation must be PAGE SIZE */
 		if (cb_args->cb_size < PAGE_SIZE)
@@ -365,7 +303,6 @@ int hl_cb_destroy(struct hl_mem_mgr *mmg, u64 cb_handle)
 	rc = hl_mmap_mem_buf_put_handle(mmg, cb_handle);
 	if (rc < 0)
 		return rc; /* Invalid handle */
-<<<<<<< HEAD
 
 	if (rc == 0)
 		dev_dbg(mmg->dev, "CB 0x%llx is destroyed while still in use\n", cb_handle);
@@ -376,19 +313,6 @@ int hl_cb_destroy(struct hl_mem_mgr *mmg, u64 cb_handle)
 static int hl_cb_info(struct hl_mem_mgr *mmg,
 			u64 handle, u32 flags, u32 *usage_cnt, u64 *device_va)
 {
-=======
-
-	if (rc == 0)
-		dev_dbg(mmg->dev, "CB 0x%llx is destroyed while still in use\n", cb_handle);
-
-	return 0;
-}
-
-static int hl_cb_info(struct hl_mem_mgr *mmg,
-			u64 handle, u32 flags, u32 *usage_cnt, u64 *device_va)
-{
-	struct hl_vm_va_block *va_block;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct hl_cb *cb;
 	int rc = 0;
 
@@ -400,14 +324,8 @@ static int hl_cb_info(struct hl_mem_mgr *mmg,
 	}
 
 	if (flags & HL_CB_FLAGS_GET_DEVICE_VA) {
-<<<<<<< HEAD
 		if (cb->is_mmu_mapped) {
 			*device_va = cb->virtual_addr;
-=======
-		va_block = list_first_entry(&cb->va_block_list, struct hl_vm_va_block, node);
-		if (va_block) {
-			*device_va = va_block->start;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			dev_err(mmg->dev, "CB is not mapped to the device's MMU\n");
 			rc = -EINVAL;
@@ -468,15 +386,9 @@ int hl_cb_ioctl(struct hl_fpriv *hpriv, void *data)
 				&device_va);
 		if (rc)
 			break;
-<<<<<<< HEAD
 
 		memset(&args->out, 0, sizeof(args->out));
 
-=======
-
-		memset(&args->out, 0, sizeof(args->out));
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (args->in.flags & HL_CB_FLAGS_GET_DEVICE_VA)
 			args->out.device_va = device_va;
 		else

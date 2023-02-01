@@ -1608,11 +1608,6 @@ static void smb347_shutdown(struct i2c_client *client)
 	smb347_remove(client);
 }
 
-static void smb347_shutdown(struct i2c_client *client)
-{
-	smb347_remove(client);
-}
-
 static const struct i2c_device_id smb347_id[] = {
 	{ "smb345", SMB345 },
 	{ "smb347", SMB347 },

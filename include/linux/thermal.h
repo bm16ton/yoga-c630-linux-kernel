@@ -294,36 +294,6 @@ struct thermal_zone_params {
 	int offset;
 };
 
-<<<<<<< HEAD
-=======
-/**
- * struct thermal_zone_of_device_ops - callbacks for handling DT based zones
- *
- * Mandatory:
- * @get_temp: a pointer to a function that reads the sensor temperature.
- *
- * Optional:
- * @get_trend: a pointer to a function that reads the sensor temperature trend.
- * @set_trips: a pointer to a function that sets a temperature window. When
- *	       this window is left the driver must inform the thermal core via
- *	       thermal_zone_device_update.
- * @set_emul_temp: a pointer to a function that sets sensor emulated
- *		   temperature.
- * @set_trip_temp: a pointer to a function that sets the trip temperature on
- *		   hardware.
- * @change_mode: a pointer to a function that notifies the thermal zone
- *		   mode change.
- */
-struct thermal_zone_of_device_ops {
-	int (*get_temp)(void *, int *);
-	int (*get_trend)(void *, int, enum thermal_trend *);
-	int (*set_trips)(void *, int, int);
-	int (*set_emul_temp)(void *, int);
-	int (*set_trip_temp)(void *, int, int);
-	int (*change_mode) (void *, enum thermal_device_mode);
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Function declarations */
 #ifdef CONFIG_THERMAL_OF
 struct thermal_zone_device *thermal_of_zone_register(struct device_node *sensor, int id, void *data,

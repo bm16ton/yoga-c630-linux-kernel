@@ -8,14 +8,10 @@
 #include <linux/pwm.h>
 #include <linux/string_helpers.h>
 
-<<<<<<< HEAD
 #include <acpi/video.h>
 
 #include "intel_backlight.h"
 #include "intel_backlight_regs.h"
-=======
-#include "intel_backlight.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "intel_connector.h"
 #include "intel_de.h"
 #include "intel_display_types.h"
@@ -24,10 +20,7 @@
 #include "intel_panel.h"
 #include "intel_pci_config.h"
 #include "intel_pps.h"
-<<<<<<< HEAD
 #include "intel_quirks.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * scale - scale values from one range to another
@@ -98,11 +91,7 @@ u32 intel_backlight_invert_pwm_level(struct intel_connector *connector, u32 val)
 		return val;
 
 	if (dev_priv->params.invert_brightness > 0 ||
-<<<<<<< HEAD
 	    intel_has_quirk(dev_priv, QUIRK_INVERT_BRIGHTNESS)) {
-=======
-	    dev_priv->quirks & QUIRK_INVERT_BRIGHTNESS) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return panel->backlight.pwm_level_max - val + panel->backlight.pwm_level_min;
 	}
 
@@ -142,11 +131,7 @@ u32 intel_backlight_level_from_pwm(struct intel_connector *connector, u32 val)
 			 panel->backlight.max == 0 || panel->backlight.pwm_level_max == 0);
 
 	if (dev_priv->params.invert_brightness > 0 ||
-<<<<<<< HEAD
 	    (dev_priv->params.invert_brightness == 0 && intel_has_quirk(dev_priv, QUIRK_INVERT_BRIGHTNESS)))
-=======
-	    (dev_priv->params.invert_brightness == 0 && dev_priv->quirks & QUIRK_INVERT_BRIGHTNESS))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		val = panel->backlight.pwm_level_max - (val - panel->backlight.pwm_level_min);
 
 	return scale(val, panel->backlight.pwm_level_min, panel->backlight.pwm_level_max,
@@ -323,11 +308,7 @@ void intel_backlight_set_acpi(const struct drm_connector_state *conn_state,
 	if (!panel->backlight.present || !conn_state->crtc)
 		return;
 
-<<<<<<< HEAD
 	mutex_lock(&dev_priv->display.backlight.lock);
-=======
-	mutex_lock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_WARN_ON(&dev_priv->drm, panel->backlight.max == 0);
 
@@ -343,11 +324,7 @@ void intel_backlight_set_acpi(const struct drm_connector_state *conn_state,
 	if (panel->backlight.enabled)
 		intel_panel_actually_set_backlight(conn_state, hw_level);
 
-<<<<<<< HEAD
 	mutex_unlock(&dev_priv->display.backlight.lock);
-=======
-	mutex_unlock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void lpt_disable_backlight(const struct drm_connector_state *old_conn_state, u32 level)
@@ -491,22 +468,14 @@ void intel_backlight_disable(const struct drm_connector_state *old_conn_state)
 		return;
 	}
 
-<<<<<<< HEAD
 	mutex_lock(&dev_priv->display.backlight.lock);
-=======
-	mutex_lock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (panel->backlight.device)
 		panel->backlight.device->props.power = FB_BLANK_POWERDOWN;
 	panel->backlight.enabled = false;
 	panel->backlight.funcs->disable(old_conn_state, 0);
 
-<<<<<<< HEAD
 	mutex_unlock(&dev_priv->display.backlight.lock);
-=======
-	mutex_unlock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void lpt_enable_backlight(const struct intel_crtc_state *crtc_state,
@@ -849,19 +818,11 @@ void intel_backlight_enable(const struct intel_crtc_state *crtc_state,
 
 	drm_dbg_kms(&dev_priv->drm, "pipe %c\n", pipe_name(pipe));
 
-<<<<<<< HEAD
 	mutex_lock(&dev_priv->display.backlight.lock);
 
 	__intel_backlight_enable(crtc_state, conn_state);
 
 	mutex_unlock(&dev_priv->display.backlight.lock);
-=======
-	mutex_lock(&dev_priv->backlight_lock);
-
-	__intel_backlight_enable(crtc_state, conn_state);
-
-	mutex_unlock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #if IS_ENABLED(CONFIG_BACKLIGHT_CLASS_DEVICE)
@@ -871,20 +832,12 @@ static u32 intel_panel_get_backlight(struct intel_connector *connector)
 	struct intel_panel *panel = &connector->panel;
 	u32 val = 0;
 
-<<<<<<< HEAD
 	mutex_lock(&dev_priv->display.backlight.lock);
-=======
-	mutex_lock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (panel->backlight.enabled)
 		val = panel->backlight.funcs->get(connector, intel_connector_get_pipe(connector));
 
-<<<<<<< HEAD
 	mutex_unlock(&dev_priv->display.backlight.lock);
-=======
-	mutex_unlock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_dbg_kms(&dev_priv->drm, "get backlight PWM = %d\n", val);
 	return val;
@@ -912,11 +865,7 @@ static void intel_panel_set_backlight(const struct drm_connector_state *conn_sta
 	if (!panel->backlight.present)
 		return;
 
-<<<<<<< HEAD
 	mutex_lock(&dev_priv->display.backlight.lock);
-=======
-	mutex_lock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_WARN_ON(&dev_priv->drm, panel->backlight.max == 0);
 
@@ -926,11 +875,7 @@ static void intel_panel_set_backlight(const struct drm_connector_state *conn_sta
 	if (panel->backlight.enabled)
 		intel_panel_actually_set_backlight(conn_state, hw_level);
 
-<<<<<<< HEAD
 	mutex_unlock(&dev_priv->display.backlight.lock);
-=======
-	mutex_unlock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int intel_backlight_device_update_status(struct backlight_device *bd)
@@ -1010,14 +955,11 @@ int intel_backlight_device_register(struct intel_connector *connector)
 
 	WARN_ON(panel->backlight.max == 0);
 
-<<<<<<< HEAD
 	if (!acpi_video_backlight_use_native()) {
 		drm_info(&i915->drm, "Skipping intel_backlight registration\n");
 		return 0;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memset(&props, 0, sizeof(props));
 	props.type = BACKLIGHT_RAW;
 
@@ -1179,11 +1121,7 @@ static u32 i9xx_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 	if (IS_PINEVIEW(dev_priv))
 		clock = KHz(RUNTIME_INFO(dev_priv)->rawclk_freq);
 	else
-<<<<<<< HEAD
 		clock = KHz(dev_priv->display.cdclk.hw.cdclk);
-=======
-		clock = KHz(dev_priv->cdclk.hw.cdclk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return DIV_ROUND_CLOSEST(clock, pwm_freq_hz * 32);
 }
@@ -1201,11 +1139,7 @@ static u32 i965_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 	if (IS_G4X(dev_priv))
 		clock = KHz(RUNTIME_INFO(dev_priv)->rawclk_freq);
 	else
-<<<<<<< HEAD
 		clock = KHz(dev_priv->display.cdclk.hw.cdclk);
-=======
-		clock = KHz(dev_priv->cdclk.hw.cdclk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return DIV_ROUND_CLOSEST(clock, pwm_freq_hz * 128);
 }
@@ -1665,19 +1599,11 @@ void intel_backlight_update(struct intel_atomic_state *state,
 	if (!panel->backlight.present)
 		return;
 
-<<<<<<< HEAD
 	mutex_lock(&dev_priv->display.backlight.lock);
 	if (!panel->backlight.enabled)
 		__intel_backlight_enable(crtc_state, conn_state);
 
 	mutex_unlock(&dev_priv->display.backlight.lock);
-=======
-	mutex_lock(&dev_priv->backlight_lock);
-	if (!panel->backlight.enabled)
-		__intel_backlight_enable(crtc_state, conn_state);
-
-	mutex_unlock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int intel_backlight_setup(struct intel_connector *connector, enum pipe pipe)
@@ -1687,11 +1613,7 @@ int intel_backlight_setup(struct intel_connector *connector, enum pipe pipe)
 	int ret;
 
 	if (!connector->panel.vbt.backlight.present) {
-<<<<<<< HEAD
 		if (intel_has_quirk(dev_priv, QUIRK_BACKLIGHT_PRESENT)) {
-=======
-		if (dev_priv->quirks & QUIRK_BACKLIGHT_PRESENT) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			drm_dbg_kms(&dev_priv->drm,
 				    "no backlight present per VBT, but present per quirk\n");
 		} else {
@@ -1706,15 +1628,9 @@ int intel_backlight_setup(struct intel_connector *connector, enum pipe pipe)
 		return -ENODEV;
 
 	/* set level and max in panel struct */
-<<<<<<< HEAD
 	mutex_lock(&dev_priv->display.backlight.lock);
 	ret = panel->backlight.funcs->setup(connector, pipe);
 	mutex_unlock(&dev_priv->display.backlight.lock);
-=======
-	mutex_lock(&dev_priv->backlight_lock);
-	ret = panel->backlight.funcs->setup(connector, pipe);
-	mutex_unlock(&dev_priv->backlight_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (ret) {
 		drm_dbg_kms(&dev_priv->drm,
@@ -1869,11 +1785,7 @@ void intel_backlight_init_funcs(struct intel_panel *panel)
 		if (intel_dp_aux_init_backlight_funcs(connector) == 0)
 			return;
 
-<<<<<<< HEAD
 		if (!intel_has_quirk(dev_priv, QUIRK_NO_PPS_BACKLIGHT_POWER_HOOK))
-=======
-		if (!(dev_priv->quirks & QUIRK_NO_PPS_BACKLIGHT_POWER_HOOK))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			connector->panel.backlight.power = intel_pps_backlight_power;
 	}
 

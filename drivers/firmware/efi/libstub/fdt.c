@@ -259,7 +259,6 @@ efi_status_t allocate_new_fdt_and_exit_boot(void *handle,
 		}
 	}
 
-<<<<<<< HEAD
 	if (fdt_addr) {
 		efi_info("Using DTB from command line\n");
 	} else {
@@ -272,8 +271,6 @@ efi_status_t allocate_new_fdt_and_exit_boot(void *handle,
 	if (!fdt_addr)
 		efi_info("Generating empty DTB\n");
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	efi_info("Exiting boot services...\n");
 
 	status = efi_allocate_pages(MAX_FDT_SIZE, new_fdt_addr, ULONG_MAX);

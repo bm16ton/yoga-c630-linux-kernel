@@ -133,11 +133,7 @@ struct hugepage_subpool *hugepage_new_subpool(struct hstate *h, long max_hpages,
 						long min_hpages);
 void hugepage_put_subpool(struct hugepage_subpool *spool);
 
-<<<<<<< HEAD
 void hugetlb_dup_vma_private(struct vm_area_struct *vma);
-=======
-void reset_vma_resv_huge_pages(struct vm_area_struct *vma);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void clear_vma_resv_huge_pages(struct vm_area_struct *vma);
 int hugetlb_sysctl_handler(struct ctl_table *, int, void *, size_t *, loff_t *);
 int hugetlb_overcommit_handler(struct ctl_table *, int, void *, size_t *,
@@ -245,10 +241,6 @@ void hugetlb_unshare_all_pmds(struct vm_area_struct *vma);
 #else /* !CONFIG_HUGETLB_PAGE */
 
 static inline void hugetlb_dup_vma_private(struct vm_area_struct *vma)
-{
-}
-
-static inline void clear_vma_resv_huge_pages(struct vm_area_struct *vma)
 {
 }
 
@@ -1160,7 +1152,6 @@ static inline pte_t huge_ptep_clear_flush(struct vm_area_struct *vma,
 
 static inline void set_huge_pte_at(struct mm_struct *mm, unsigned long addr,
 				   pte_t *ptep, pte_t pte)
-<<<<<<< HEAD
 {
 }
 
@@ -1169,8 +1160,6 @@ static inline void hugetlb_register_node(struct node *node)
 }
 
 static inline void hugetlb_unregister_node(struct node *node)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 }
 #endif	/* CONFIG_HUGETLB_PAGE */
@@ -1191,16 +1180,6 @@ extern void __init hugetlb_cma_reserve(int order);
 static inline __init void hugetlb_cma_reserve(int order)
 {
 }
-#endif
-
-bool want_pmd_share(struct vm_area_struct *vma, unsigned long addr);
-
-#ifndef __HAVE_ARCH_FLUSH_HUGETLB_TLB_RANGE
-/*
- * ARCHes with special requirements for evicting HUGETLB backing TLB entries can
- * implement this.
- */
-#define flush_hugetlb_tlb_range(vma, addr, end)	flush_tlb_range(vma, addr, end)
 #endif
 
 bool want_pmd_share(struct vm_area_struct *vma, unsigned long addr);

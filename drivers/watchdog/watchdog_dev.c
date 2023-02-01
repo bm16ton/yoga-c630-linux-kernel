@@ -47,11 +47,8 @@
 #include "watchdog_core.h"
 #include "watchdog_pretimeout.h"
 
-<<<<<<< HEAD
 #include <trace/events/watchdog.h>
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* the dev_t structure to store the dynamically allocated watchdog devices */
 static dev_t watchdog_devt;
 /* Reference to watchdog device behind /dev/watchdog */
@@ -169,9 +166,6 @@ static int __watchdog_ping(struct watchdog_device *wdd)
 		err = wdd->ops->start(wdd); /* restart watchdog */
 		trace_watchdog_start(wdd, err);
 	}
-
-	if (err == 0)
-		watchdog_hrtimer_pretimeout_start(wdd);
 
 	if (err == 0)
 		watchdog_hrtimer_pretimeout_start(wdd);
@@ -1134,19 +1128,11 @@ static void watchdog_cdev_unregister(struct watchdog_device *wdd)
 /**
  * watchdog_dev_register - register a watchdog device
  * @wdd: Watchdog device
-<<<<<<< HEAD
  *
  * Register a watchdog device including handling the legacy
  * /dev/watchdog node. /dev/watchdog is actually a miscdevice and
  * thus we set it up like that.
  *
-=======
- *
- * Register a watchdog device including handling the legacy
- * /dev/watchdog node. /dev/watchdog is actually a miscdevice and
- * thus we set it up like that.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Return: 0 if successful, error otherwise.
  */
 int watchdog_dev_register(struct watchdog_device *wdd)
@@ -1181,7 +1167,6 @@ void watchdog_dev_unregister(struct watchdog_device *wdd)
  * watchdog_set_last_hw_keepalive - set last HW keepalive time for watchdog
  * @wdd:		Watchdog device
  * @last_ping_ms:	Time since last HW heartbeat
-<<<<<<< HEAD
  *
  * Adjusts the last known HW keepalive time for a watchdog timer.
  * This is needed if the watchdog is already running when the probe
@@ -1189,15 +1174,6 @@ void watchdog_dev_unregister(struct watchdog_device *wdd)
  * function must be called immediately after watchdog registration,
  * and min_hw_heartbeat_ms must be set for this to be useful.
  *
-=======
- *
- * Adjusts the last known HW keepalive time for a watchdog timer.
- * This is needed if the watchdog is already running when the probe
- * function is called, and it can't be pinged immediately. This
- * function must be called immediately after watchdog registration,
- * and min_hw_heartbeat_ms must be set for this to be useful.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Return: 0 if successful, error otherwise.
  */
 int watchdog_set_last_hw_keepalive(struct watchdog_device *wdd,

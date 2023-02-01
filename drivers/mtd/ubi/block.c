@@ -409,19 +409,7 @@ int ubiblock_create(struct ubi_volume_info *vi)
 	ret = blk_mq_alloc_tag_set(&dev->tag_set);
 	if (ret) {
 		dev_err(disk_to_dev(dev->gd), "blk_mq_alloc_tag_set failed");
-<<<<<<< HEAD
 		goto out_free_dev;
-=======
-		goto out_free_dev;;
-	}
-
-
-	/* Initialize the gendisk of this ubiblock device */
-	gd = blk_mq_alloc_disk(&dev->tag_set, dev);
-	if (IS_ERR(gd)) {
-		ret = PTR_ERR(gd);
-		goto out_free_tags;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 

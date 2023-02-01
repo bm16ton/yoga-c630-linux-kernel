@@ -114,25 +114,15 @@ static int rxe_check_bind_mw(struct rxe_qp *qp, struct rxe_send_wqe *wqe,
 
 	/* C10-75 */
 	if (mw->access & IB_ZERO_BASED) {
-<<<<<<< HEAD
 		if (unlikely(wqe->wr.wr.mw.length > mr->ibmr.length)) {
-=======
-		if (unlikely(wqe->wr.wr.mw.length > mr->length)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pr_err_once(
 				"attempt to bind a ZB MW outside of the MR\n");
 			return -EINVAL;
 		}
 	} else {
-<<<<<<< HEAD
 		if (unlikely((wqe->wr.wr.mw.addr < mr->ibmr.iova) ||
 			     ((wqe->wr.wr.mw.addr + wqe->wr.wr.mw.length) >
 			      (mr->ibmr.iova + mr->ibmr.length)))) {
-=======
-		if (unlikely((wqe->wr.wr.mw.addr < mr->iova) ||
-			     ((wqe->wr.wr.mw.addr + wqe->wr.wr.mw.length) >
-			      (mr->iova + mr->length)))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pr_err_once(
 				"attempt to bind a VA MW outside of the MR\n");
 			return -EINVAL;

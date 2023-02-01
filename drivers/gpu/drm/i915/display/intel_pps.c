@@ -1181,7 +1181,6 @@ static void pps_init_delays_bios(struct intel_dp *intel_dp,
 
 	if (!pps_delays_valid(&intel_dp->pps.bios_pps_delays))
 		intel_pps_readout_hw_state(intel_dp, &intel_dp->pps.bios_pps_delays);
-<<<<<<< HEAD
 
 	*bios = intel_dp->pps.bios_pps_delays;
 
@@ -1196,22 +1195,6 @@ static void pps_init_delays_vbt(struct intel_dp *intel_dp,
 
 	*vbt = connector->panel.vbt.edp.pps;
 
-=======
-
-	*bios = intel_dp->pps.bios_pps_delays;
-
-	intel_pps_dump_state(intel_dp, "bios", bios);
-}
-
-static void pps_init_delays_vbt(struct intel_dp *intel_dp,
-				struct edp_power_seq *vbt)
-{
-	struct drm_i915_private *dev_priv = dp_to_i915(intel_dp);
-	struct intel_connector *connector = intel_dp->attached_connector;
-
-	*vbt = connector->panel.vbt.edp.pps;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!pps_delays_valid(vbt))
 		return;
 
@@ -1220,11 +1203,7 @@ static void pps_init_delays_vbt(struct intel_dp *intel_dp,
 	 * just fails to power back on. Increasing the delay to 800ms
 	 * seems sufficient to avoid this problem.
 	 */
-<<<<<<< HEAD
 	if (intel_has_quirk(dev_priv, QUIRK_INCREASE_T12_DELAY)) {
-=======
-	if (dev_priv->quirks & QUIRK_INCREASE_T12_DELAY) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vbt->t11_t12 = max_t(u16, vbt->t11_t12, 1300 * 10);
 		drm_dbg_kms(&dev_priv->drm,
 			    "Increasing T12 panel delay as per the quirk to %d\n",
@@ -1245,11 +1224,7 @@ static void pps_init_delays_spec(struct intel_dp *intel_dp,
 {
 	struct drm_i915_private *dev_priv = dp_to_i915(intel_dp);
 
-<<<<<<< HEAD
 	lockdep_assert_held(&dev_priv->display.pps.mutex);
-=======
-	lockdep_assert_held(&dev_priv->pps_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Upper limits from eDP 1.3 spec. Note that we use the clunky units of
 	 * our hw here, which are all in 100usec. */
@@ -1265,7 +1240,6 @@ static void pps_init_delays_spec(struct intel_dp *intel_dp,
 
 	intel_pps_dump_state(intel_dp, "spec", spec);
 }
-<<<<<<< HEAD
 
 static void pps_init_delays(struct intel_dp *intel_dp)
 {
@@ -1279,21 +1253,6 @@ static void pps_init_delays(struct intel_dp *intel_dp)
 	if (pps_delays_valid(final))
 		return;
 
-=======
-
-static void pps_init_delays(struct intel_dp *intel_dp)
-{
-	struct drm_i915_private *dev_priv = dp_to_i915(intel_dp);
-	struct edp_power_seq cur, vbt, spec,
-		*final = &intel_dp->pps.pps_delays;
-
-	lockdep_assert_held(&dev_priv->pps_mutex);
-
-	/* already initialized? */
-	if (pps_delays_valid(final))
-		return;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pps_init_delays_bios(intel_dp, &cur);
 	pps_init_delays_vbt(intel_dp, &vbt);
 	pps_init_delays_spec(intel_dp, &spec);
@@ -1529,73 +1488,11 @@ void intel_pps_unlock_regs_wa(struct drm_i915_private *dev_priv)
 void intel_pps_setup(struct drm_i915_private *i915)
 {
 	if (HAS_PCH_SPLIT(i915) || IS_GEMINILAKE(i915) || IS_BROXTON(i915))
-<<<<<<< HEAD
 		i915->display.pps.mmio_base = PCH_PPS_BASE;
-=======
-		i915->pps_mmio_base = PCH_PPS_BASE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else if (IS_VALLEYVIEW(i915) || IS_CHERRYVIEW(i915))
 		i915->display.pps.mmio_base = VLV_PPS_BASE;
 	else
 		i915->display.pps.mmio_base = PPS_BASE;
-}
-
-void assert_pps_unlocked(struct drm_i915_private *dev_priv, enum pipe pipe)
-{
-	i915_reg_t pp_reg;
-	u32 val;
-	enum pipe panel_pipe = INVALID_PIPE;
-	bool locked = true;
-
-	if (drm_WARN_ON(&dev_priv->drm, HAS_DDI(dev_priv)))
-		return;
-
-	if (HAS_PCH_SPLIT(dev_priv)) {
-		u32 port_sel;
-
-		pp_reg = PP_CONTROL(0);
-		port_sel = intel_de_read(dev_priv, PP_ON_DELAYS(0)) & PANEL_PORT_SELECT_MASK;
-
-		switch (port_sel) {
-		case PANEL_PORT_SELECT_LVDS:
-			intel_lvds_port_enabled(dev_priv, PCH_LVDS, &panel_pipe);
-			break;
-		case PANEL_PORT_SELECT_DPA:
-			g4x_dp_port_enabled(dev_priv, DP_A, PORT_A, &panel_pipe);
-			break;
-		case PANEL_PORT_SELECT_DPC:
-			g4x_dp_port_enabled(dev_priv, PCH_DP_C, PORT_C, &panel_pipe);
-			break;
-		case PANEL_PORT_SELECT_DPD:
-			g4x_dp_port_enabled(dev_priv, PCH_DP_D, PORT_D, &panel_pipe);
-			break;
-		default:
-			MISSING_CASE(port_sel);
-			break;
-		}
-	} else if (IS_VALLEYVIEW(dev_priv) || IS_CHERRYVIEW(dev_priv)) {
-		/* presumably write lock depends on pipe, not port select */
-		pp_reg = PP_CONTROL(pipe);
-		panel_pipe = pipe;
-	} else {
-		u32 port_sel;
-
-		pp_reg = PP_CONTROL(0);
-		port_sel = intel_de_read(dev_priv, PP_ON_DELAYS(0)) & PANEL_PORT_SELECT_MASK;
-
-		drm_WARN_ON(&dev_priv->drm,
-			    port_sel != PANEL_PORT_SELECT_LVDS);
-		intel_lvds_port_enabled(dev_priv, LVDS, &panel_pipe);
-	}
-
-	val = intel_de_read(dev_priv, pp_reg);
-	if (!(val & PANEL_POWER_ON) ||
-	    ((val & PANEL_UNLOCK_MASK) == PANEL_UNLOCK_REGS))
-		locked = false;
-
-	I915_STATE_WARN(panel_pipe == pipe && locked,
-			"panel assertion failure, pipe %c regs locked\n",
-			pipe_name(pipe));
 }
 
 void assert_pps_unlocked(struct drm_i915_private *dev_priv, enum pipe pipe)

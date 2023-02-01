@@ -133,10 +133,7 @@ static void vc4_dpi_encoder_enable(struct drm_encoder *encoder)
 	struct drm_connector_list_iter conn_iter;
 	struct drm_connector *connector = NULL, *connector_scan;
 	u32 dpi_c = DPI_ENABLE;
-<<<<<<< HEAD
 	int idx;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	/* Look up the connector attached to DPI so we can get the
@@ -204,7 +201,6 @@ static void vc4_dpi_encoder_enable(struct drm_encoder *encoder)
 			dpi_c |= DPI_OUTPUT_ENABLE_INVERT;
 	} else {
 		dpi_c |= DPI_OUTPUT_ENABLE_MODE;
-<<<<<<< HEAD
 
 		if (mode->flags & DRM_MODE_FLAG_NHSYNC)
 			dpi_c |= DPI_HSYNC_INVERT;
@@ -219,19 +215,6 @@ static void vc4_dpi_encoder_enable(struct drm_encoder *encoder)
 
 	if (!drm_dev_enter(dev, &idx))
 		return;
-=======
-
-		if (mode->flags & DRM_MODE_FLAG_NHSYNC)
-			dpi_c |= DPI_HSYNC_INVERT;
-		else if (!(mode->flags & DRM_MODE_FLAG_PHSYNC))
-			dpi_c |= DPI_HSYNC_DISABLE;
-
-		if (mode->flags & DRM_MODE_FLAG_NVSYNC)
-			dpi_c |= DPI_VSYNC_INVERT;
-		else if (!(mode->flags & DRM_MODE_FLAG_PVSYNC))
-			dpi_c |= DPI_VSYNC_DISABLE;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	DPI_WRITE(DPI_C, dpi_c);
 
@@ -292,11 +275,7 @@ static int vc4_dpi_init_bridge(struct vc4_dpi *dpi)
 	struct device *dev = &dpi->pdev->dev;
 	struct drm_bridge *bridge;
 
-<<<<<<< HEAD
 	bridge = drmm_of_get_bridge(drm, dev->of_node, 0, 0);
-=======
-	bridge = devm_drm_of_get_bridge(dev, dev->of_node, 0, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(bridge)) {
 		/* If nothing was connected in the DT, that's not an
 		 * error.
@@ -307,7 +286,6 @@ static int vc4_dpi_init_bridge(struct vc4_dpi *dpi)
 			return PTR_ERR(bridge);
 	}
 
-<<<<<<< HEAD
 	return drm_bridge_attach(&dpi->encoder.base, bridge, NULL, 0);
 }
 
@@ -316,9 +294,6 @@ static void vc4_dpi_disable_clock(void *ptr)
 	struct vc4_dpi *dpi = ptr;
 
 	clk_disable_unprepare(dpi->core_clock);
-=======
-	return drm_bridge_attach(dpi->encoder, bridge, NULL, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int vc4_dpi_bind(struct device *dev, struct device *master, void *data)

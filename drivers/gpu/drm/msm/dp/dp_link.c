@@ -964,10 +964,6 @@ static int dp_link_process_link_status_update(struct dp_link_private *link)
 
 	if (channel_eq_done && clock_recovery_done)
 		return -EINVAL;
-<<<<<<< HEAD
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

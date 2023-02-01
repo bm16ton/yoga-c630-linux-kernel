@@ -128,29 +128,10 @@ static void cdv_set_brightness(struct drm_device *dev, int level)
 static int cdv_backlight_init(struct drm_device *dev)
 {
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-<<<<<<< HEAD
 
 	dev_priv->backlight_level = cdv_get_brightness(dev);
 	cdv_set_brightness(dev, dev_priv->backlight_level);
 
-=======
-	struct backlight_properties props;
-
-	memset(&props, 0, sizeof(struct backlight_properties));
-	props.max_brightness = 100;
-	props.type = BACKLIGHT_PLATFORM;
-
-	cdv_backlight_device = backlight_device_register("psb-bl",
-					NULL, (void *)dev, &cdv_ops, &props);
-	if (IS_ERR(cdv_backlight_device))
-		return PTR_ERR(cdv_backlight_device);
-
-	cdv_backlight_device->props.brightness =
-			cdv_get_brightness(cdv_backlight_device);
-	backlight_update_status(cdv_backlight_device);
-	dev_priv->backlight_device = cdv_backlight_device;
-	dev_priv->backlight_enabled = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

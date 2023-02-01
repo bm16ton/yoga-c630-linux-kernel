@@ -15,51 +15,24 @@
 #include "intel_bios.h"
 #include "power.h"
 
-<<<<<<< HEAD
 void gma_backlight_enable(struct drm_device *dev)
 {
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
 
-=======
-#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
-static void do_gma_backlight_set(struct drm_device *dev)
-{
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	backlight_update_status(dev_priv->backlight_device);
-}
-#endif
-
-void gma_backlight_enable(struct drm_device *dev)
-{
-#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev_priv->backlight_enabled = true;
 	dev_priv->ops->backlight_set(dev, dev_priv->backlight_level);
 }
 
 void gma_backlight_disable(struct drm_device *dev)
 {
-<<<<<<< HEAD
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
 
 	dev_priv->backlight_enabled = false;
 	dev_priv->ops->backlight_set(dev, 0);
-=======
-#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	dev_priv->backlight_enabled = false;
-	if (dev_priv->backlight_device) {
-		dev_priv->backlight_device->props.brightness = 0;
-		do_gma_backlight_set(dev);
-	}
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void gma_backlight_set(struct drm_device *dev, int v)
 {
-<<<<<<< HEAD
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
 
 	dev_priv->backlight_level = v;
@@ -76,16 +49,6 @@ static int gma_backlight_get_brightness(struct backlight_device *bd)
 		return dev_priv->ops->backlight_get(dev);
 
 	return dev_priv->backlight_level;
-=======
-#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	dev_priv->backlight_level = v;
-	if (dev_priv->backlight_device && dev_priv->backlight_enabled) {
-		dev_priv->backlight_device->props.brightness = v;
-		do_gma_backlight_set(dev);
-	}
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int gma_backlight_update_status(struct backlight_device *bd)
@@ -108,15 +71,10 @@ static const struct backlight_ops gma_backlight_ops __maybe_unused = {
 
 int gma_backlight_init(struct drm_device *dev)
 {
-<<<<<<< HEAD
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
 	struct backlight_properties props __maybe_unused = {};
 	int ret;
 
-=======
-#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev_priv->backlight_enabled = true;
 	dev_priv->backlight_level = 100;
 
@@ -150,14 +108,8 @@ void gma_backlight_exit(struct drm_device *dev)
 {
 #ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-<<<<<<< HEAD
 
 	if (dev_priv->backlight_device)
-=======
-	if (dev_priv->backlight_device) {
-		dev_priv->backlight_device->props.brightness = 0;
-		backlight_update_status(dev_priv->backlight_device);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		backlight_device_unregister(dev_priv->backlight_device);
 #endif
 }

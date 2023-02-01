@@ -973,11 +973,6 @@ done:
 scan:
 	spin_unlock(&si->lock);
 	while (++offset <= READ_ONCE(si->highest_bit)) {
-<<<<<<< HEAD
-=======
-		if (swap_offset_available_and_locked(si, offset))
-			goto checks;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (unlikely(--latency_ration < 0)) {
 			cond_resched();
 			latency_ration = LATENCY_LIMIT;
@@ -988,11 +983,6 @@ scan:
 	}
 	offset = si->lowest_bit;
 	while (offset < scan_base) {
-<<<<<<< HEAD
-=======
-		if (swap_offset_available_and_locked(si, offset))
-			goto checks;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (unlikely(--latency_ration < 0)) {
 			cond_resched();
 			latency_ration = LATENCY_LIMIT;
@@ -1441,33 +1431,6 @@ void swapcache_free_entries(swp_entry_t *entries, int n)
 		spin_unlock(&p->lock);
 }
 
-<<<<<<< HEAD
-=======
-/*
- * How many references to page are currently swapped out?
- * This does not give an exact answer when swap count is continued,
- * but does include the high COUNT_CONTINUED flag to allow for that.
- */
-static int page_swapcount(struct page *page)
-{
-	int count = 0;
-	struct swap_info_struct *p;
-	struct swap_cluster_info *ci;
-	swp_entry_t entry;
-	unsigned long offset;
-
-	entry.val = page_private(page);
-	p = _swap_info_get(entry);
-	if (p) {
-		offset = swp_offset(entry);
-		ci = lock_cluster_or_swap_info(p, offset);
-		count = swap_count(p->swap_map[offset]);
-		unlock_cluster_or_swap_info(p, ci);
-	}
-	return count;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int __swap_count(swp_entry_t entry)
 {
 	struct swap_info_struct *si;
@@ -1592,7 +1555,6 @@ unlock_out:
 
 static bool folio_swapped(struct folio *folio)
 {
-<<<<<<< HEAD
 	swp_entry_t entry = folio_swap_entry(folio);
 	struct swap_info_struct *si = _swap_info_get(entry);
 
@@ -1624,36 +1586,6 @@ bool folio_free_swap(struct folio *folio)
 		return false;
 	if (folio_swapped(folio))
 		return false;
-=======
-	swp_entry_t entry;
-	struct swap_info_struct *si;
-
-	if (!IS_ENABLED(CONFIG_THP_SWAP) || likely(!folio_test_large(folio)))
-		return page_swapcount(&folio->page) != 0;
-
-	entry = folio_swap_entry(folio);
-	si = _swap_info_get(entry);
-	if (si)
-		return swap_page_trans_huge_swapped(si, entry);
-	return false;
-}
-
-/*
- * If swap is getting full, or if there are no more mappings of this page,
- * then try_to_free_swap is called to free its swap space.
- */
-int try_to_free_swap(struct page *page)
-{
-	struct folio *folio = page_folio(page);
-	VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
-
-	if (!folio_test_swapcache(folio))
-		return 0;
-	if (folio_test_writeback(folio))
-		return 0;
-	if (folio_swapped(folio))
-		return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Once hibernation has begun to create its image of memory,
@@ -1675,11 +1607,7 @@ int try_to_free_swap(struct page *page)
 
 	delete_from_swap_cache(folio);
 	folio_set_dirty(folio);
-<<<<<<< HEAD
 	return true;
-=======
-	return 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1956,15 +1884,9 @@ static int unuse_pte_range(struct vm_area_struct *vma, pmd_t *pmd,
 			goto out;
 		}
 
-<<<<<<< HEAD
 		folio_free_swap(folio);
 		folio_unlock(folio);
 		folio_put(folio);
-=======
-		try_to_free_swap(page);
-		unlock_page(page);
-		put_page(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 try_next:
 		pte = pte_offset_map(pmd, addr);
 	} while (pte++, addr += PAGE_SIZE, addr != end);
@@ -2175,19 +2097,11 @@ retry:
 		 * might even be back in swap cache on another swap area. But
 		 * that is okay, folio_free_swap() only removes stale folios.
 		 */
-<<<<<<< HEAD
 		folio_lock(folio);
 		folio_wait_writeback(folio);
 		folio_free_swap(folio);
 		folio_unlock(folio);
 		folio_put(folio);
-=======
-		lock_page(page);
-		wait_on_page_writeback(page);
-		try_to_free_swap(page);
-		unlock_page(page);
-		put_page(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/*

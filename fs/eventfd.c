@@ -64,11 +64,7 @@ __u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, unsigned mask)
 		n = ULLONG_MAX - ctx->count;
 	ctx->count += n;
 	if (waitqueue_active(&ctx->wqh))
-<<<<<<< HEAD
 		wake_up_locked_poll(&ctx->wqh, EPOLLIN | mask);
-=======
-		wake_up_locked_poll(&ctx->wqh, EPOLLIN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	current->in_eventfd = 0;
 	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
 

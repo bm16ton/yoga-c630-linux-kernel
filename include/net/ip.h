@@ -743,11 +743,8 @@ void ip_cmsg_recv_offset(struct msghdr *msg, struct sock *sk,
 int ip_cmsg_send(struct sock *sk, struct msghdr *msg,
 		 struct ipcm_cookie *ipc, bool allow_ipv6);
 DECLARE_STATIC_KEY_FALSE(ip4_min_ttl);
-<<<<<<< HEAD
 int do_ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
 		     unsigned int optlen);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ip_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
 		  unsigned int optlen);
 int do_ip_getsockopt(struct sock *sk, int level, int optname,

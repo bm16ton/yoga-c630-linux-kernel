@@ -755,7 +755,6 @@ struct drm_amdgpu_cs_chunk_data {
 	#define AMDGPU_INFO_FW_TOC		0x15
 	/* Subquery id: Query CAP firmware version */
 	#define AMDGPU_INFO_FW_CAP		0x16
-<<<<<<< HEAD
 	/* Subquery id: Query GFX RLCP firmware version */
 	#define AMDGPU_INFO_FW_GFX_RLCP		0x17
 	/* Subquery id: Query GFX RLCV firmware version */
@@ -766,8 +765,6 @@ struct drm_amdgpu_cs_chunk_data {
 	#define AMDGPU_INFO_FW_MES		0x1a
 	/* Subquery id: Query IMU firmware version */
 	#define AMDGPU_INFO_FW_IMU		0x1b
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* number of bytes moved for TTM migration */
 #define AMDGPU_INFO_NUM_BYTES_MOVED		0x0f

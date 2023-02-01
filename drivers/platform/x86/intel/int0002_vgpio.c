@@ -125,12 +125,7 @@ static irqreturn_t int0002_irq(int irq, void *data)
 	if (!(gpe_sts_reg & GPE0A_PME_B0_STS_BIT))
 		return IRQ_NONE;
 
-<<<<<<< HEAD
 	generic_handle_domain_irq_safe(chip->irq.domain, GPE0A_PME_B0_VIRT_GPIO_PIN);
-=======
-	generic_handle_irq(irq_find_mapping(chip->irq.domain,
-					    GPE0A_PME_B0_VIRT_GPIO_PIN));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pm_wakeup_hard_event(chip->parent);
 

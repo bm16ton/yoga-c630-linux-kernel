@@ -57,21 +57,13 @@
 		switch-1 {
 			label = "S12";
 			linux,code = <BTN_0>;
-<<<<<<< HEAD
 			gpios = <&gpio5 27 GPIO_ACTIVE_LOW>;
-=======
-			gpios = <&gpio5 26 GPIO_ACTIVE_LOW>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		switch-2 {
 			label = "S13";
 			linux,code = <BTN_1>;
-<<<<<<< HEAD
 			gpios = <&gpio5 26 GPIO_ACTIVE_LOW>;
-=======
-			gpios = <&gpio5 27 GPIO_ACTIVE_LOW>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 	};
 
@@ -147,7 +139,6 @@
 		regulator-max-microvolt = <3300000>;
 	};
 
-<<<<<<< HEAD
 	reg_vcc_5v0: regulator-5v0 {
 		compatible = "regulator-fixed";
 		regulator-name = "VCC_5V0";
@@ -155,8 +146,6 @@
 		regulator-max-microvolt = <5000000>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -412,11 +401,8 @@
 
 &pcf85063 {
 	/* RTC_EVENT# is connected on MBa8MPxL */
-<<<<<<< HEAD
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcf85063>;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	interrupt-parent = <&gpio4>;
 	interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
 };
@@ -468,7 +454,6 @@
 	status = "okay";
 };
 
-<<<<<<< HEAD
 &usb3_0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usb0>;
@@ -501,8 +486,6 @@
 	};
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &usdhc2 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
@@ -688,13 +671,10 @@
 		fsl,pins = <MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20		0x10>; /* Power enable */
 	};
 
-<<<<<<< HEAD
 	pinctrl_pcf85063: pcf85063grp {
 		fsl,pins = <MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28		0x80>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* LVDS Backlight */
 	pinctrl_pwm2: pwm2grp {
 		fsl,pins = <MX8MP_IOMUXC_SAI5_RXD0__PWM2_OUT		0x14>;
@@ -731,7 +711,6 @@
 			   <MX8MP_IOMUXC_UART4_TXD__UART4_DCE_TX	0x140>;
 	};
 
-<<<<<<< HEAD
 	pinctrl_usb0: usb0grp {
 		fsl,pins = <MX8MP_IOMUXC_GPIO1_IO13__USB1_OTG_OC	0x1c0>,
 			   <MX8MP_IOMUXC_GPIO1_IO12__USB1_OTG_PWR	0x1c0>;
@@ -741,8 +720,6 @@
 		fsl,pins = <MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10		0x1c0>;
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pinctrl_usdhc2: usdhc2grp {
 		fsl,pins = <MX8MP_IOMUXC_SD2_CLK__USDHC2_CLK		0x192>,
 			   <MX8MP_IOMUXC_SD2_CMD__USDHC2_CMD		0x1d2>,

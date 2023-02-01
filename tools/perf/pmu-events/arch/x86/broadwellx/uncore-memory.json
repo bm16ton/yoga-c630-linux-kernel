@@ -72,7 +72,6 @@
         "Unit": "iMC"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "DRAM RD_CAS and WR_CAS Commands.; All DRAM Reads (RD_CAS + Underfills)",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
@@ -82,8 +81,6 @@
         "Unit": "iMC"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "read requests to memory controller. Derived from unc_m_cas_count.rd",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
@@ -94,7 +91,6 @@
         "Unit": "iMC"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "DRAM RD_CAS and WR_CAS Commands.; DRAM WR_CAS (w/ and w/out auto-pre) in Write Major Mode",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
@@ -119,33 +115,6 @@
         "EventName": "UNC_M_CAS_COUNT.WR",
         "PerPkg": "1",
         "UMask": "0xC",
-=======
-        "BriefDescription": "read requests to memory controller",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x4",
-        "EventName": "UNC_M_CAS_COUNT.RD",
-        "PerPkg": "1",
-        "ScaleUnit": "64Bytes",
-        "UMask": "0x3",
-        "Unit": "iMC"
-    },
-    {
-        "BriefDescription": "DRAM RD_CAS and WR_CAS Commands.; DRAM WR_CAS (w/ and w/out auto-pre) in Write Major Mode",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x4",
-        "EventName": "UNC_M_CAS_COUNT.WR_WMM",
-        "PerPkg": "1",
-        "UMask": "0x4",
-        "Unit": "iMC"
-    },
-    {
-        "BriefDescription": "DRAM RD_CAS and WR_CAS Commands.; DRAM WR_CAS (w/ and w/out auto-pre) in Read Major Mode",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x4",
-        "EventName": "UNC_M_CAS_COUNT.WR_RMM",
-        "PerPkg": "1",
-        "UMask": "0x8",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "iMC"
     },
     {
@@ -159,25 +128,9 @@
         "Unit": "iMC"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "DRAM RD_CAS and WR_CAS Commands.; All DRAM WR_CAS (w/ and w/out auto-pre)",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
-=======
-        "BriefDescription": "write requests to memory controller",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x4",
-        "EventName": "UNC_M_CAS_COUNT.WR",
-        "PerPkg": "1",
-        "ScaleUnit": "64Bytes",
-        "UMask": "0xC",
-        "Unit": "iMC"
-    },
-    {
-        "BriefDescription": "DRAM RD_CAS and WR_CAS Commands.; All DRAM WR_CAS (w/ and w/out auto-pre)",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x4",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "EventName": "UNC_M_CAS_COUNT.ALL",
         "PerPkg": "1",
         "UMask": "0xF",
@@ -256,7 +209,6 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x7",
         "EventName": "UNC_M_MAJOR_MODES.WRITE",
-<<<<<<< HEAD
         "PerPkg": "1",
         "UMask": "0x2",
         "Unit": "iMC"
@@ -284,42 +236,10 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x84",
         "EventName": "UNC_M_POWER_CHANNEL_DLLOFF",
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-        "PerPkg": "1",
-        "UMask": "0x2",
-        "Unit": "iMC"
-    },
-    {
-<<<<<<< HEAD
-=======
-        "BriefDescription": "Cycles in a Major Mode; Partial Major Mode",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x7",
-        "EventName": "UNC_M_MAJOR_MODES.PARTIAL",
-        "PerPkg": "1",
-        "UMask": "0x4",
-        "Unit": "iMC"
-    },
-    {
-        "BriefDescription": "Cycles in a Major Mode; Isoch Major Mode",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x7",
-        "EventName": "UNC_M_MAJOR_MODES.ISOCH",
-        "PerPkg": "1",
-        "UMask": "0x8",
-        "Unit": "iMC"
-    },
-    {
-        "BriefDescription": "Channel DLLOFF Cycles",
-        "Counter": "0,1,2,3",
-        "EventCode": "0x84",
-        "EventName": "UNC_M_POWER_CHANNEL_DLLOFF",
         "PerPkg": "1",
         "Unit": "iMC"
     },
     {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Channel PPD Cycles",
         "Counter": "0,1,2,3",
         "EventCode": "0x85",

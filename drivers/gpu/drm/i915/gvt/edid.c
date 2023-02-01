@@ -32,12 +32,7 @@
  *
  */
 
-<<<<<<< HEAD
 #include "display/intel_gmbus_regs.h"
-=======
-#include "i915_drv.h"
-#include "i915_reg.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "gvt.h"
 #include "i915_drv.h"
 #include "i915_reg.h"

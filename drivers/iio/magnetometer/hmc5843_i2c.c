@@ -68,11 +68,6 @@ static int hmc5843_i2c_probe(struct i2c_client *cli,
 static void hmc5843_i2c_remove(struct i2c_client *client)
 {
 	hmc5843_common_remove(&client->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id hmc5843_id[] = {

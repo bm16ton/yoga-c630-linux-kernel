@@ -3469,11 +3469,7 @@ int dlm_lock(dlm_lockspace_t *lockspace,
 	if (error == -EINPROGRESS)
 		error = 0;
  out_put:
-<<<<<<< HEAD
 	trace_dlm_lock_end(ls, lkb, name, namelen, mode, flags, error, true);
-=======
-	trace_dlm_lock_end(ls, lkb, name, namelen, mode, flags, error);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (convert || error)
 		__put_lkb(ls, lkb);

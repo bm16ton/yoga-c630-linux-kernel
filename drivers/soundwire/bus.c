@@ -1145,7 +1145,6 @@ int sdw_bus_exit_clk_stop(struct sdw_bus *bus)
 						  SDW_CLK_PRE_DEPREPARE);
 		if (ret < 0)
 			dev_warn(&slave->dev, "clock stop pre-deprepare cb failed:%d\n", ret);
-<<<<<<< HEAD
 
 		/* Only de-prepare a Slave device if needed */
 		if (!slave->prop.simple_clk_stop_capable) {
@@ -1154,16 +1153,6 @@ int sdw_bus_exit_clk_stop(struct sdw_bus *bus)
 			ret = sdw_slave_clk_stop_prepare(slave, SDW_CLK_STOP_MODE0,
 							 false);
 
-=======
-
-		/* Only de-prepare a Slave device if needed */
-		if (!slave->prop.simple_clk_stop_capable) {
-			simple_clk_stop = false;
-
-			ret = sdw_slave_clk_stop_prepare(slave, SDW_CLK_STOP_MODE0,
-							 false);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (ret < 0)
 				dev_warn(&slave->dev, "clock stop deprepare failed:%d\n", ret);
 		}
@@ -1821,7 +1810,6 @@ int sdw_handle_slave_status(struct sdw_bus *bus,
 
 		if (status[i] == SDW_SLAVE_UNATTACHED &&
 		    slave->status != SDW_SLAVE_UNATTACHED) {
-<<<<<<< HEAD
 		    
 			    printk_once("SOUNDWIRE Slave %d state check1: UNATTACHED, status was %d\n",
 				    i, slave->status);
@@ -1831,23 +1819,12 @@ int sdw_handle_slave_status(struct sdw_bus *bus,
 			ret = sdw_update_slave_status(slave, status[i]);
 			if (ret < 0)
 				dev_warn(&slave->dev, "Update Slave status failed:%d\n", ret);
-=======
-			dev_warn(&slave->dev, "Slave %d state check1: UNATTACHED, status was %d\n",
-				 i, slave->status);
-			sdw_modify_slave_status(slave, SDW_SLAVE_UNATTACHED);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
 	if (status[0] == SDW_SLAVE_ATTACHED) {
 		dev_dbg(bus->dev, "Slave attached, programming device number\n");
-<<<<<<< HEAD
 
-=======
-		ret = sdw_program_device_num(bus);
-		if (ret < 0)
-			dev_err(bus->dev, "Slave attach failed: %d\n", ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Programming a device number will have side effects,
 		 * so we deal with other devices at a later time.

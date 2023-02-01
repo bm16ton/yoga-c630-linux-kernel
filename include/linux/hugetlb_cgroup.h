@@ -103,10 +103,6 @@ static inline void __set_hugetlb_cgroup(struct page *page,
 	else
 		set_page_private(page + SUBPAGE_INDEX_CGROUP,
 				 (unsigned long)h_cg);
-<<<<<<< HEAD
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void set_hugetlb_cgroup(struct page *page,

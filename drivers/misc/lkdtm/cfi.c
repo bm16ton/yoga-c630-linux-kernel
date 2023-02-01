@@ -68,7 +68,6 @@ static void lkdtm_CFI_FORWARD_PROTO(void)
 #define no_pac_addr(addr)      \
 	((__force __typeof__(addr))((uintptr_t)(addr) | PAGE_OFFSET))
 
-<<<<<<< HEAD
 /* The ultimate ROP gadget. */
 static noinline __no_ret_protection
 void set_return_addr_unchecked(unsigned long *expected, unsigned long *addr)
@@ -85,46 +84,6 @@ void set_return_addr_unchecked(unsigned long *expected, unsigned long *addr)
 			*ret_addr, addr);
 }
 
-=======
-	pr_err("FAIL: survived mismatched prototype function call!\n");
-	pr_expected_config(CONFIG_CFI_CLANG);
-}
-
-/*
- * This can stay local to LKDTM, as there should not be a production reason
- * to disable PAC && SCS.
- */
-#ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
-# ifdef CONFIG_ARM64_BTI_KERNEL
-#  define __no_pac             "branch-protection=bti"
-# else
-#  define __no_pac             "branch-protection=none"
-# endif
-# define __no_ret_protection   __noscs __attribute__((__target__(__no_pac)))
-#else
-# define __no_ret_protection   __noscs
-#endif
-
-#define no_pac_addr(addr)      \
-	((__force __typeof__(addr))((uintptr_t)(addr) | PAGE_OFFSET))
-
-/* The ultimate ROP gadget. */
-static noinline __no_ret_protection
-void set_return_addr_unchecked(unsigned long *expected, unsigned long *addr)
-{
-	/* Use of volatile is to make sure final write isn't seen as a dead store. */
-	unsigned long * volatile *ret_addr = (unsigned long **)__builtin_frame_address(0) + 1;
-
-	/* Make sure we've found the right place on the stack before writing it. */
-	if (no_pac_addr(*ret_addr) == expected)
-		*ret_addr = (addr);
-	else
-		/* Check architecture, stack layout, or compiler behavior... */
-		pr_warn("Eek: return address mismatch! %px != %px\n",
-			*ret_addr, addr);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static noinline
 void set_return_addr(unsigned long *expected, unsigned long *addr)
 {

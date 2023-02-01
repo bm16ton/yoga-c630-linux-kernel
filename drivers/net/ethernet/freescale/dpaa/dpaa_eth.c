@@ -249,11 +249,7 @@ static int dpaa_netdev_init(struct net_device *net_dev,
 		eth_hw_addr_set(net_dev, mac_addr);
 	} else {
 		eth_hw_addr_random(net_dev);
-<<<<<<< HEAD
 		err = mac_dev->change_addr(mac_dev->fman_mac,
-=======
-		err = priv->mac_dev->change_addr(priv->mac_dev->fman_mac,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			(const enet_addr_t *)net_dev->dev_addr);
 		if (err) {
 			dev_err(dev, "Failed to set random MAC address\n");

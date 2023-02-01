@@ -110,15 +110,9 @@ ip link set dev veth1 xdp pinned $BPF_DIR/progs/xdp_redirect_map_0
 ip link set dev veth2 xdp pinned $BPF_DIR/progs/xdp_redirect_map_1
 ip link set dev veth3 xdp pinned $BPF_DIR/progs/xdp_redirect_map_2
 
-<<<<<<< HEAD
 ip -n ${NS1} link set dev veth11 xdp obj xdp_dummy.bpf.o sec xdp
 ip -n ${NS2} link set dev veth22 xdp obj xdp_tx.bpf.o sec xdp
 ip -n ${NS3} link set dev veth33 xdp obj xdp_dummy.bpf.o sec xdp
-=======
-ip -n ${NS1} link set dev veth11 xdp obj xdp_dummy.o sec xdp
-ip -n ${NS2} link set dev veth22 xdp obj xdp_tx.o sec xdp
-ip -n ${NS3} link set dev veth33 xdp obj xdp_dummy.o sec xdp
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 trap cleanup EXIT
 

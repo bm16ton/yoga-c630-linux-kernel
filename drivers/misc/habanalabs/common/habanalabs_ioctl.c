@@ -104,10 +104,7 @@ static int hw_ip_info(struct hl_device *hdev, struct hl_info_args *args)
 
 	hw_ip.edma_enabled_mask = prop->edma_enabled_mask;
 	hw_ip.server_type = prop->server_type;
-<<<<<<< HEAD
 	hw_ip.security_enabled = prop->fw_security_enabled;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return copy_to_user(out, &hw_ip,
 		min((size_t) size, sizeof(hw_ip))) ? -EFAULT : 0;
@@ -596,13 +593,8 @@ static int cs_timeout_info(struct hl_fpriv *hpriv, struct hl_info_args *args)
 	if ((!max_size) || (!out))
 		return -EINVAL;
 
-<<<<<<< HEAD
 	info.seq = hdev->captured_err_info.cs_timeout.seq;
 	info.timestamp = ktime_to_ns(hdev->captured_err_info.cs_timeout.timestamp);
-=======
-	info.seq = hdev->last_error.cs_timeout.seq;
-	info.timestamp = ktime_to_ns(hdev->last_error.cs_timeout.timestamp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return copy_to_user(out, &info, min_t(size_t, max_size, sizeof(info))) ? -EFAULT : 0;
 }
@@ -617,21 +609,12 @@ static int razwi_info(struct hl_fpriv *hpriv, struct hl_info_args *args)
 	if ((!max_size) || (!out))
 		return -EINVAL;
 
-<<<<<<< HEAD
 	info.timestamp = ktime_to_ns(hdev->captured_err_info.razwi.timestamp);
 	info.addr = hdev->captured_err_info.razwi.addr;
 	info.engine_id_1 = hdev->captured_err_info.razwi.engine_id_1;
 	info.engine_id_2 = hdev->captured_err_info.razwi.engine_id_2;
 	info.no_engine_id = hdev->captured_err_info.razwi.non_engine_initiator;
 	info.error_type = hdev->captured_err_info.razwi.type;
-=======
-	info.timestamp = ktime_to_ns(hdev->last_error.razwi.timestamp);
-	info.addr = hdev->last_error.razwi.addr;
-	info.engine_id_1 = hdev->last_error.razwi.engine_id_1;
-	info.engine_id_2 = hdev->last_error.razwi.engine_id_2;
-	info.no_engine_id = hdev->last_error.razwi.non_engine_initiator;
-	info.error_type = hdev->last_error.razwi.type;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return copy_to_user(out, &info, min_t(size_t, max_size, sizeof(info))) ? -EFAULT : 0;
 }
@@ -646,7 +629,6 @@ static int undefined_opcode_info(struct hl_fpriv *hpriv, struct hl_info_args *ar
 	if ((!max_size) || (!out))
 		return -EINVAL;
 
-<<<<<<< HEAD
 	info.timestamp = ktime_to_ns(hdev->captured_err_info.undef_opcode.timestamp);
 	info.engine_id = hdev->captured_err_info.undef_opcode.engine_id;
 	info.cq_addr = hdev->captured_err_info.undef_opcode.cq_addr;
@@ -654,15 +636,6 @@ static int undefined_opcode_info(struct hl_fpriv *hpriv, struct hl_info_args *ar
 	info.stream_id = hdev->captured_err_info.undef_opcode.stream_id;
 	info.cb_addr_streams_len = hdev->captured_err_info.undef_opcode.cb_addr_streams_len;
 	memcpy(info.cb_addr_streams, hdev->captured_err_info.undef_opcode.cb_addr_streams,
-=======
-	info.timestamp = ktime_to_ns(hdev->last_error.undef_opcode.timestamp);
-	info.engine_id = hdev->last_error.undef_opcode.engine_id;
-	info.cq_addr = hdev->last_error.undef_opcode.cq_addr;
-	info.cq_size = hdev->last_error.undef_opcode.cq_size;
-	info.stream_id = hdev->last_error.undef_opcode.stream_id;
-	info.cb_addr_streams_len = hdev->last_error.undef_opcode.cb_addr_streams_len;
-	memcpy(info.cb_addr_streams, hdev->last_error.undef_opcode.cb_addr_streams,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			sizeof(info.cb_addr_streams));
 
 	return copy_to_user(out, &info, min_t(size_t, max_size, sizeof(info))) ? -EFAULT : 0;
@@ -689,7 +662,6 @@ static int dev_mem_alloc_page_sizes_info(struct hl_fpriv *hpriv, struct hl_info_
 	return copy_to_user(out, &info, min_t(size_t, max_size, sizeof(info))) ? -EFAULT : 0;
 }
 
-<<<<<<< HEAD
 static int sec_attest_info(struct hl_fpriv *hpriv, struct hl_info_args *args)
 {
 	void __user *out = (void __user *) (uintptr_t) args->return_pointer;
@@ -739,8 +711,6 @@ free_sec_attest_info:
 	return rc;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int eventfd_register(struct hl_fpriv *hpriv, struct hl_info_args *args)
 {
 	int rc;
@@ -778,7 +748,6 @@ static int eventfd_unregister(struct hl_fpriv *hpriv, struct hl_info_args *args)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int engine_status_info(struct hl_fpriv *hpriv, struct hl_info_args *args)
 {
 	void __user *out = (void __user *) (uintptr_t) args->return_pointer;
@@ -815,8 +784,6 @@ static int engine_status_info(struct hl_fpriv *hpriv, struct hl_info_args *args)
 	return rc;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int _hl_info_ioctl(struct hl_fpriv *hpriv, void *data,
 				struct device *dev)
 {
@@ -926,24 +893,18 @@ static int _hl_info_ioctl(struct hl_fpriv *hpriv, void *data,
 	case HL_INFO_DRAM_PENDING_ROWS:
 		return dram_pending_rows_info(hpriv, args);
 
-<<<<<<< HEAD
 	case HL_INFO_SECURED_ATTESTATION:
 		return sec_attest_info(hpriv, args);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case HL_INFO_REGISTER_EVENTFD:
 		return eventfd_register(hpriv, args);
 
 	case HL_INFO_UNREGISTER_EVENTFD:
 		return eventfd_unregister(hpriv, args);
 
-<<<<<<< HEAD
 	case HL_INFO_ENGINE_STATUS:
 		return engine_status_info(hpriv, args);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		dev_err(dev, "Invalid request %d\n", args->op);
 		rc = -EINVAL;

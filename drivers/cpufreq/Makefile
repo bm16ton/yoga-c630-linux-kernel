@@ -30,10 +30,7 @@ amd_pstate-y				:= amd-pstate.o amd-pstate-trace.o
 
 obj-$(CONFIG_X86_ACPI_CPUFREQ)		+= acpi-cpufreq.o
 obj-$(CONFIG_X86_AMD_PSTATE)		+= amd_pstate.o
-<<<<<<< HEAD
 obj-$(CONFIG_X86_AMD_PSTATE_UT)		+= amd-pstate-ut.o
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 obj-$(CONFIG_X86_POWERNOW_K8)		+= powernow-k8.o
 obj-$(CONFIG_X86_PCC_CPUFREQ)		+= pcc-cpufreq.o
 obj-$(CONFIG_X86_POWERNOW_K6)		+= powernow-k6.o

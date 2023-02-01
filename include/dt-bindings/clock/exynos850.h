@@ -58,7 +58,6 @@
 #define CLK_MOUT_CLKCMU_APM_BUS		46
 #define CLK_DOUT_CLKCMU_APM_BUS		47
 #define CLK_GOUT_CLKCMU_APM_BUS		48
-<<<<<<< HEAD
 #define CLK_MOUT_AUD			49
 #define CLK_GOUT_AUD			50
 #define CLK_DOUT_AUD			51
@@ -87,9 +86,6 @@
 #define CLK_DOUT_MFCMSCL_MCSC		74
 #define CLK_DOUT_MFCMSCL_JPEG		75
 #define TOP_NR_CLK			76
-=======
-#define TOP_NR_CLK			49
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* CMU_APM */
 #define CLK_RCO_I3C_PMIC		1
@@ -118,7 +114,6 @@
 #define CLK_GOUT_SYSREG_APM_PCLK	24
 #define APM_NR_CLK			25
 
-<<<<<<< HEAD
 /* CMU_AUD */
 #define CLK_DOUT_AUD_AUDIF		1
 #define CLK_DOUT_AUD_BUSD		2
@@ -182,8 +177,6 @@
 #define TICK_USB			60
 #define AUD_NR_CLK			61
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* CMU_CMGP */
 #define CLK_RCO_CMGP			1
 #define CLK_MOUT_CMGP_ADC		2
@@ -218,7 +211,6 @@
 #define CLK_GOUT_SYSREG_HSI_PCLK	13
 #define HSI_NR_CLK			14
 
-<<<<<<< HEAD
 /* CMU_IS */
 #define CLK_MOUT_IS_BUS_USER		1
 #define CLK_MOUT_IS_ITP_USER		2
@@ -263,8 +255,6 @@
 #define CLK_GOUT_MFCMSCL_SYSREG_PCLK		15
 #define MFCMSCL_NR_CLK				16
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* CMU_PERI */
 #define CLK_MOUT_PERI_BUS_USER		1
 #define CLK_MOUT_PERI_UART_USER		2

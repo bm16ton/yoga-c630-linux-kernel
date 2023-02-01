@@ -497,11 +497,7 @@ static void flag_nproc_exceeded(struct cred *new)
 	 * for programs doing set*uid()+execve() by harmlessly deferring the
 	 * failure to the execve() stage.
 	 */
-<<<<<<< HEAD
 	if (is_rlimit_overlimit(new->ucounts, UCOUNT_RLIMIT_NPROC, rlimit(RLIMIT_NPROC)) &&
-=======
-	if (is_ucounts_overlimit(new->ucounts, UCOUNT_RLIMIT_NPROC, rlimit(RLIMIT_NPROC)) &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			new->user != INIT_USER)
 		current->flags |= PF_NPROC_EXCEEDED;
 	else
@@ -1446,11 +1442,8 @@ static int do_prlimit(struct task_struct *tsk, unsigned int resource,
 
 	if (resource >= RLIM_NLIMITS)
 		return -EINVAL;
-<<<<<<< HEAD
 	resource = array_index_nospec(resource, RLIM_NLIMITS);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (new_rlim) {
 		if (new_rlim->rlim_cur > new_rlim->rlim_max)
 			return -EINVAL;

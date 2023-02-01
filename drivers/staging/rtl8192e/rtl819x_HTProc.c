@@ -254,17 +254,10 @@ static void HTIOTActDetermineRaFunc(struct rtllib_device *ieee, bool bPeerRx2ss)
 	pHTInfo->iot_ra_func &= HT_IOT_RAFUNC_DISABLE_ALL;
 
 	if (pHTInfo->IOTPeer == HT_IOT_PEER_RALINK && !bPeerRx2ss)
-<<<<<<< HEAD
 		pHTInfo->iot_ra_func |= HT_IOT_RAFUNC_PEER_1R;
 
 	if (pHTInfo->iot_action & HT_IOT_ACT_AMSDU_ENABLE)
 		pHTInfo->iot_ra_func |= HT_IOT_RAFUNC_TX_AMSDU;
-=======
-		pHTInfo->IOTRaFunc |= HT_IOT_RAFUNC_PEER_1R;
-
-	if (pHTInfo->IOTAction & HT_IOT_ACT_AMSDU_ENABLE)
-		pHTInfo->IOTRaFunc |= HT_IOT_RAFUNC_TX_AMSDU;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void HTResetIOTSetting(struct rt_hi_throughput *pHTInfo)
@@ -720,17 +713,10 @@ void HTResetSelfAndSavePeerSetting(struct rtllib_device *ieee,
 			       pNetwork->bssht.bd_ht_info_buf,
 			       pNetwork->bssht.bd_ht_info_len);
 
-<<<<<<< HEAD
 		if (pHTInfo->reg_rt2rt_aggregation) {
 			pHTInfo->current_rt2rt_aggregation =
 				 pNetwork->bssht.bd_rt2rt_aggregation;
 			pHTInfo->current_rt2rt_long_slot_time =
-=======
-		if (pHTInfo->bRegRT2RTAggregation) {
-			pHTInfo->bCurrentRT2RTAggregation =
-				 pNetwork->bssht.bd_rt2rt_aggregation;
-			pHTInfo->bCurrentRT2RTLongSlotTime =
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 pNetwork->bssht.bd_rt2rt_long_slot_time;
 			pHTInfo->RT2RT_HT_Mode = pNetwork->bssht.rt2rt_ht_mode;
 		} else {
@@ -752,11 +738,7 @@ void HTResetSelfAndSavePeerSetting(struct rtllib_device *ieee,
 
 		bIOTAction = HTIOTActIsDisableMCSTwoSpatialStream(ieee);
 		if (bIOTAction)
-<<<<<<< HEAD
 			pHTInfo->iot_action |= HT_IOT_ACT_DISABLE_ALL_2SS;
-=======
-			pHTInfo->IOTAction |= HT_IOT_ACT_DISABLE_ALL_2SS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		bIOTAction = HTIOTActIsDisableEDCATurbo(ieee, pNetwork->bssid);
 		if (bIOTAction)
@@ -788,11 +770,7 @@ void HT_update_self_and_peer_setting(struct rtllib_device *ieee,
 
 	if (pHTInfo->bCurrentHTSupport) {
 		if (pNetwork->bssht.bd_ht_info_len != 0)
-<<<<<<< HEAD
 			pHTInfo->current_op_mode = pPeerHTInfo->OptMode;
-=======
-			pHTInfo->CurrentOpMode = pPeerHTInfo->OptMode;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 EXPORT_SYMBOL(HT_update_self_and_peer_setting);

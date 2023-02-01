@@ -957,17 +957,10 @@ static void lpuart32_rxint(struct lpuart_port *sport)
 		 * thus we assume it is a break if the received data is zero.
 		 */
 		is_break = (sr & UARTSTAT_FE) && !rx;
-<<<<<<< HEAD
 
 		if (is_break && uart_handle_break(&sport->port))
 			continue;
 
-=======
-
-		if (is_break && uart_handle_break(&sport->port))
-			continue;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (uart_prepare_sysrq_char(&sport->port, rx))
 			continue;
 
@@ -1413,19 +1406,11 @@ static unsigned int lpuart_get_mctrl(struct uart_port *port)
 {
 	unsigned int mctrl = 0;
 	u8 reg;
-<<<<<<< HEAD
 
 	reg = readb(port->membase + UARTCR1);
 	if (reg & UARTCR1_LOOPS)
 		mctrl |= TIOCM_LOOP;
 
-=======
-
-	reg = readb(port->membase + UARTCR1);
-	if (reg & UARTCR1_LOOPS)
-		mctrl |= TIOCM_LOOP;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return mctrl;
 }
 
@@ -1444,7 +1429,6 @@ static unsigned int lpuart32_get_mctrl(struct uart_port *port)
 static void lpuart_set_mctrl(struct uart_port *port, unsigned int mctrl)
 {
 	u8 reg;
-<<<<<<< HEAD
 
 	reg = readb(port->membase + UARTCR1);
 
@@ -1453,16 +1437,6 @@ static void lpuart_set_mctrl(struct uart_port *port, unsigned int mctrl)
 	if (mctrl & TIOCM_LOOP)
 		reg |= UARTCR1_LOOPS;
 
-=======
-
-	reg = readb(port->membase + UARTCR1);
-
-	/* for internal loopback we need LOOPS=1 and RSRC=0 */
-	reg &= ~(UARTCR1_LOOPS | UARTCR1_RSRC);
-	if (mctrl & TIOCM_LOOP)
-		reg |= UARTCR1_LOOPS;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	writeb(reg, port->membase + UARTCR1);
 }
 
@@ -1471,21 +1445,12 @@ static void lpuart32_set_mctrl(struct uart_port *port, unsigned int mctrl)
 	u32 reg;
 
 	reg = lpuart32_read(port, UARTCTRL);
-<<<<<<< HEAD
 
 	/* for internal loopback we need LOOPS=1 and RSRC=0 */
 	reg &= ~(UARTCTRL_LOOPS | UARTCTRL_RSRC);
 	if (mctrl & TIOCM_LOOP)
 		reg |= UARTCTRL_LOOPS;
 
-=======
-
-	/* for internal loopback we need LOOPS=1 and RSRC=0 */
-	reg &= ~(UARTCTRL_LOOPS | UARTCTRL_RSRC);
-	if (mctrl & TIOCM_LOOP)
-		reg |= UARTCTRL_LOOPS;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lpuart32_write(port, reg, UARTCTRL);
 }
 
@@ -2778,16 +2743,6 @@ static int lpuart_probe(struct platform_device *pdev)
 		lpuart_reg.cons = LPUART_CONSOLE;
 		handler = lpuart_int;
 	}
-<<<<<<< HEAD
-
-	ret = lpuart_global_reset(sport);
-	if (ret)
-		goto failed_reset;
-=======
-	ret = uart_add_one_port(&lpuart_reg, &sport->port);
-	if (ret)
-		goto failed_attach_port;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = lpuart_global_reset(sport);
 	if (ret)

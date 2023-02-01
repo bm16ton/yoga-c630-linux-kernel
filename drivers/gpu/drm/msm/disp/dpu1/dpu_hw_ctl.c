@@ -673,15 +673,9 @@ static void _setup_ctl_ops(struct dpu_hw_ctl_ops *ops,
 	ops->wait_reset_status = dpu_hw_ctl_wait_reset_status;
 	ops->clear_all_blendstages = dpu_hw_ctl_clear_all_blendstages;
 	ops->setup_blendstage = dpu_hw_ctl_setup_blendstage;
-<<<<<<< HEAD
 	ops->update_pending_flush_sspp = dpu_hw_ctl_update_pending_flush_sspp;
 	ops->update_pending_flush_mixer = dpu_hw_ctl_update_pending_flush_mixer;
 	ops->update_pending_flush_dspp = dpu_hw_ctl_update_pending_flush_dspp;
-=======
-	ops->get_bitmask_sspp = dpu_hw_ctl_get_bitmask_sspp;
-	ops->get_bitmask_mixer = dpu_hw_ctl_get_bitmask_mixer;
-	ops->get_bitmask_dspp = dpu_hw_ctl_get_bitmask_dspp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (cap & BIT(DPU_CTL_FETCH_ACTIVE))
 		ops->set_active_pipes = dpu_hw_ctl_set_fetch_pipe_active;
 };

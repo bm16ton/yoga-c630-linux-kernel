@@ -397,11 +397,7 @@ static int brd_alloc(int i)
 	disk->minors		= max_part;
 	disk->fops		= &brd_fops;
 	disk->private_data	= brd;
-<<<<<<< HEAD
 	strscpy(disk->disk_name, buf, DISK_NAME_LEN);
-=======
-	strlcpy(disk->disk_name, buf, DISK_NAME_LEN);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_capacity(disk, rd_size * 2);
 	
 	/*

@@ -193,14 +193,11 @@ int ksz9477_reset_switch(struct ksz_device *dev)
 	ksz_write32(dev, REG_SW_PORT_INT_MASK__4, 0x7F);
 	ksz_read32(dev, REG_SW_PORT_INT_STATUS__4, &data32);
 
-<<<<<<< HEAD
 	/* KSZ9893 compatible chips do not support refclk configuration */
 	if (dev->chip_id == KSZ9893_CHIP_ID ||
 	    dev->chip_id == KSZ8563_CHIP_ID)
 		return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	data8 = SW_ENABLE_REFCLKO;
 	if (dev->synclko_disable)
 		data8 = 0;
@@ -272,7 +269,6 @@ void ksz9477_port_init_cnt(struct ksz_device *dev, int port)
 	mutex_unlock(&mib->cnt_mutex);
 }
 
-<<<<<<< HEAD
 static void ksz9477_r_phy_quirks(struct ksz_device *dev, u16 addr, u16 reg,
 				 u16 *data)
 {
@@ -285,10 +281,6 @@ static void ksz9477_r_phy_quirks(struct ksz_device *dev, u16 addr, u16 reg,
 
 int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
 {
-=======
-void ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 val = 0xffff;
 	int ret;
 
@@ -335,7 +327,6 @@ void ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
 		if (ret)
 			return ret;
 
-<<<<<<< HEAD
 		ksz9477_r_phy_quirks(dev, addr, reg, &val);
 	}
 
@@ -351,22 +342,6 @@ int ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
 		return 0;
 
 	return ksz_pwrite16(dev, addr, 0x100 + (reg << 1), val);
-=======
-	*data = val;
-}
-
-void ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
-{
-	/* No real PHY after this. */
-	if (addr >= dev->phy_port_cnt)
-		return;
-
-	/* No gigabit support.  Do not write to this register. */
-	if (!(dev->features & GBIT_SUPPORT) && reg == MII_CTRL1000)
-		return;
-
-	ksz_pwrite16(dev, addr, 0x100 + (reg << 1), val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void ksz9477_cfg_port_member(struct ksz_device *dev, int port, u8 member)
@@ -890,19 +865,11 @@ void ksz9477_port_mirror_del(struct ksz_device *dev, int port,
 	else
 		ksz_port_cfg(dev, port, P_MIRROR_CTRL, PORT_MIRROR_TX, false);
 
-<<<<<<< HEAD
 
 	/* Check if any of the port is still referring to sniffer port */
 	for (p = 0; p < dev->info->port_cnt; p++) {
 		ksz_pread8(dev, p, P_MIRROR_CTRL, &data);
 
-=======
-
-	/* Check if any of the port is still referring to sniffer port */
-	for (p = 0; p < dev->info->port_cnt; p++) {
-		ksz_pread8(dev, p, P_MIRROR_CTRL, &data);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if ((data & (PORT_MIRROR_RX | PORT_MIRROR_TX))) {
 			in_use = true;
 			break;
@@ -992,7 +959,6 @@ void ksz9477_get_caps(struct ksz_device *dev, int port,
 	config->mac_capabilities = MAC_10 | MAC_100 | MAC_ASYM_PAUSE |
 				   MAC_SYM_PAUSE;
 
-<<<<<<< HEAD
 	if (dev->info->gbit_capable[port])
 		config->mac_capabilities |= MAC_1000FD;
 }
@@ -1022,12 +988,6 @@ int ksz9477_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
 	return ksz_write8(dev, REG_SW_LUE_CTRL_0, value);
 }
 
-=======
-	if (dev->features & GBIT_SUPPORT)
-		config->mac_capabilities |= MAC_1000FD;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
 {
 	struct dsa_switch *ds = dev->ds;
@@ -1134,32 +1094,13 @@ void ksz9477_config_cpu_port(struct dsa_switch *ds)
 
 			/* enable cpu port */
 			ksz9477_port_setup(dev, i, true);
-<<<<<<< HEAD
-=======
-			p->on = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
 	for (i = 0; i < dev->info->port_cnt; i++) {
 		if (i == dev->cpu_port)
 			continue;
-<<<<<<< HEAD
 		ksz_port_stp_state_set(ds, i, BR_STATE_DISABLED);
-=======
-		p = &dev->ports[i];
-
-		ksz_port_stp_state_set(ds, i, BR_STATE_DISABLED);
-		p->on = 1;
-		if (i < dev->phy_port_cnt)
-			p->phy = 1;
-		if (dev->chip_id == 0x00947700 && i == 6) {
-			p->sgmii = 1;
-
-			/* SGMII PHY detection code is not implemented yet. */
-			p->phy = 0;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -1248,32 +1189,6 @@ int ksz9477_switch_init(struct ksz_device *dev)
 	if (ret)
 		return ret;
 
-<<<<<<< HEAD
-=======
-	ret = ksz_read8(dev, REG_GLOBAL_OPTIONS, &data8);
-	if (ret)
-		return ret;
-
-	/* Number of ports can be reduced depending on chip. */
-	dev->phy_port_cnt = 5;
-
-	/* Default capability is gigabit capable. */
-	dev->features = GBIT_SUPPORT;
-
-	if (dev->chip_id == KSZ9893_CHIP_ID) {
-		dev->features |= IS_9893;
-
-		/* Chip does not support gigabit. */
-		if (data8 & SW_QW_ABLE)
-			dev->features &= ~GBIT_SUPPORT;
-		dev->phy_port_cnt = 2;
-	} else {
-		/* Chip does not support gigabit. */
-		if (!(data8 & SW_GIGABIT_ABLE))
-			dev->features &= ~GBIT_SUPPORT;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

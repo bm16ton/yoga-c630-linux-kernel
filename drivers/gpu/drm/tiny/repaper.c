@@ -30,11 +30,7 @@
 #include <drm/drm_format_helper.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_managed.h>
 #include <drm/drm_modes.h>
@@ -515,11 +511,7 @@ static void repaper_get_temperature(struct repaper_epd *epd)
 
 static int repaper_fb_dirty(struct drm_framebuffer *fb)
 {
-<<<<<<< HEAD
 	struct drm_gem_dma_object *dma_obj = drm_fb_dma_get_gem_obj(fb, 0);
-=======
-	struct drm_gem_cma_object *cma_obj = drm_fb_cma_get_gem_obj(fb, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct repaper_epd *epd = drm_to_epd(fb->dev);
 	unsigned int dst_pitch = 0;
 	struct iosys_map dst, vmap;
@@ -551,13 +543,9 @@ static int repaper_fb_dirty(struct drm_framebuffer *fb)
 	if (ret)
 		goto out_free;
 
-<<<<<<< HEAD
 	iosys_map_set_vaddr(&dst, buf);
 	iosys_map_set_vaddr(&vmap, dma_obj->vaddr);
 	drm_fb_xrgb8888_to_mono(&dst, &dst_pitch, &vmap, fb, &clip);
-=======
-	drm_fb_xrgb8888_to_mono(buf, 0, cma_obj->vaddr, fb, &clip);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_gem_fb_end_cpu_access(fb, DMA_FROM_DEVICE);
 

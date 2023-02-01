@@ -453,11 +453,7 @@ late_initcall(psci_debugfs_init)
 static int psci_suspend_finisher(unsigned long state)
 {
 	u32 power_state = state;
-<<<<<<< HEAD
 	phys_addr_t pa_cpu_resume = __pa_symbol(cpu_resume);
-=======
-	phys_addr_t pa_cpu_resume = __pa_symbol(function_nocfi(cpu_resume));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return psci_ops.cpu_suspend(power_state, pa_cpu_resume);
 }
@@ -482,11 +478,7 @@ int psci_cpu_suspend_enter(u32 state)
 
 static int psci_system_suspend(unsigned long unused)
 {
-<<<<<<< HEAD
 	phys_addr_t pa_cpu_resume = __pa_symbol(cpu_resume);
-=======
-	phys_addr_t pa_cpu_resume = __pa_symbol(function_nocfi(cpu_resume));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return invoke_psci_fn(PSCI_FN_NATIVE(1_0, SYSTEM_SUSPEND),
 			      pa_cpu_resume, 0, 0);

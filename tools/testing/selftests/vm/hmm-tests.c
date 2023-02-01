@@ -31,13 +31,8 @@
  * This is a private UAPI to the kernel test module so it isn't exported
  * in the usual include/uapi/... directory.
  */
-<<<<<<< HEAD
 #include <lib/test_hmm_uapi.h>
 #include <mm/gup_test.h>
-=======
-#include "../../../../lib/test_hmm_uapi.h"
-#include "../../../../mm/gup_test.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct hmm_buffer {
 	void		*ptr;
@@ -1049,7 +1044,6 @@ TEST_F(hmm, migrate_fault)
 
 	/* Migrate memory to the device again. */
 	ret = hmm_migrate_sys_to_dev(self->fd, buffer, npages);
-<<<<<<< HEAD
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
@@ -1091,8 +1085,6 @@ TEST_F(hmm, migrate_release)
 
 	/* Migrate memory to device. */
 	ret = hmm_migrate_sys_to_dev(self->fd, buffer, npages);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
@@ -1936,7 +1928,6 @@ TEST_F(hmm, hmm_gup_test)
 
 	/* Migrate memory to device. */
 	ret = hmm_migrate_sys_to_dev(self->fd, buffer, npages);
-<<<<<<< HEAD
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 	/* Check what the device read. */
@@ -1977,48 +1968,6 @@ TEST_F(hmm, hmm_gup_test)
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
-=======
-	ASSERT_EQ(ret, 0);
-	ASSERT_EQ(buffer->cpages, npages);
-	/* Check what the device read. */
-	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
-		ASSERT_EQ(ptr[i], i);
-
-	ASSERT_EQ(gup_test_exec(gup_fd,
-				(unsigned long)buffer->ptr,
-				GUP_BASIC_TEST, 1, self->page_size, 0), 0);
-	ASSERT_EQ(gup_test_exec(gup_fd,
-				(unsigned long)buffer->ptr + 1 * self->page_size,
-				GUP_FAST_BENCHMARK, 1, self->page_size, 0), 0);
-	ASSERT_EQ(gup_test_exec(gup_fd,
-				(unsigned long)buffer->ptr + 2 * self->page_size,
-				PIN_FAST_BENCHMARK, 1, self->page_size, FOLL_LONGTERM), 0);
-	ASSERT_EQ(gup_test_exec(gup_fd,
-				(unsigned long)buffer->ptr + 3 * self->page_size,
-				PIN_LONGTERM_BENCHMARK, 1, self->page_size, 0), 0);
-
-	/* Take snapshot to CPU pagetables */
-	ret = hmm_dmirror_cmd(self->fd, HMM_DMIRROR_SNAPSHOT, buffer, npages);
-	ASSERT_EQ(ret, 0);
-	ASSERT_EQ(buffer->cpages, npages);
-	m = buffer->mirror;
-	if (hmm_is_coherent_type(variant->device_number)) {
-		ASSERT_EQ(HMM_DMIRROR_PROT_DEV_COHERENT_LOCAL | HMM_DMIRROR_PROT_WRITE, m[0]);
-		ASSERT_EQ(HMM_DMIRROR_PROT_DEV_COHERENT_LOCAL | HMM_DMIRROR_PROT_WRITE, m[1]);
-	} else {
-		ASSERT_EQ(HMM_DMIRROR_PROT_WRITE, m[0]);
-		ASSERT_EQ(HMM_DMIRROR_PROT_WRITE, m[1]);
-	}
-	ASSERT_EQ(HMM_DMIRROR_PROT_WRITE, m[2]);
-	ASSERT_EQ(HMM_DMIRROR_PROT_WRITE, m[3]);
-	/*
-	 * Check again the content on the pages. Make sure there's no
-	 * corrupted data.
-	 */
-	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
-		ASSERT_EQ(ptr[i], i);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	close(gup_fd);
 	hmm_buffer_free(buffer);
 }

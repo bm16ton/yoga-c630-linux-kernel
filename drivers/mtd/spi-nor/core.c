@@ -2416,7 +2416,6 @@ static void spi_nor_init_flags(struct spi_nor *nor)
 
 	if (flags & SPI_NOR_HAS_LOCK)
 		nor->flags |= SNOR_F_HAS_LOCK;
-<<<<<<< HEAD
 
 	if (flags & SPI_NOR_HAS_TB) {
 		nor->flags |= SNOR_F_HAS_SR_TB;
@@ -2424,15 +2423,6 @@ static void spi_nor_init_flags(struct spi_nor *nor)
 			nor->flags |= SNOR_F_HAS_SR_TB_BIT6;
 	}
 
-=======
-
-	if (flags & SPI_NOR_HAS_TB) {
-		nor->flags |= SNOR_F_HAS_SR_TB;
-		if (flags & SPI_NOR_TB_SR_BIT6)
-			nor->flags |= SNOR_F_HAS_SR_TB_BIT6;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (flags & SPI_NOR_4BIT_BP) {
 		nor->flags |= SNOR_F_HAS_4BIT_BP;
 		if (flags & SPI_NOR_BP3_SR_BIT6)
@@ -3032,7 +3022,6 @@ int spi_nor_scan(struct spi_nor *nor, const char *name,
 				mtd->eraseregions[i].erasesize,
 				mtd->eraseregions[i].erasesize / 1024,
 				mtd->eraseregions[i].numblocks);
-
 	return 0;
 }
 EXPORT_SYMBOL_GPL(spi_nor_scan);

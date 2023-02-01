@@ -37,10 +37,6 @@
 #include <linux/t10-pi.h>
 #include <linux/debugfs.h>
 #include <linux/bpf.h>
-<<<<<<< HEAD
-=======
-#include <linux/psi.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/part_stat.h>
 #include <linux/sched/sysctl.h>
 #include <linux/blk-crypto.h>
@@ -493,11 +489,7 @@ static inline void bio_check_ro(struct bio *bio)
 {
 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
-<<<<<<< HEAD
 			return;
-=======
-			return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_warn("Trying to write to read-only block-device %pg\n",
 			bio->bi_bdev);
 		/* Older lvm-tools actually trigger this */
@@ -816,18 +808,13 @@ EXPORT_SYMBOL(submit_bio_noacct);
  *
  * The success/failure status of the request, along with notification of
  * completion, is delivered asynchronously through the ->bi_end_io() callback
-<<<<<<< HEAD
  * in @bio.  The bio must NOT be touched by the caller until ->bi_end_io() has
-=======
- * in @bio.  The bio must NOT be touched by thecaller until ->bi_end_io() has
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * been called.
  */
 void submit_bio(struct bio *bio)
 {
 	if (blkcg_punt_bio_submit(bio))
 		return;
-<<<<<<< HEAD
 
 	if (bio_op(bio) == REQ_OP_READ) {
 		task_io_account_read(bio->bi_iter.bi_size);
@@ -885,75 +872,6 @@ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
 }
 EXPORT_SYMBOL_GPL(bio_poll);
 
-=======
-
-	if (bio_op(bio) == REQ_OP_READ) {
-		task_io_account_read(bio->bi_iter.bi_size);
-		count_vm_events(PGPGIN, bio_sectors(bio));
-	} else if (bio_op(bio) == REQ_OP_WRITE) {
-		count_vm_events(PGPGOUT, bio_sectors(bio));
-	}
-
-	/*
-	 * If we're reading data that is part of the userspace workingset, count
-	 * submission time as memory stall.  When the device is congested, or
-	 * the submitting cgroup IO-throttled, submission can be a significant
-	 * part of overall IO time.
-	 */
-	if (unlikely(bio_op(bio) == REQ_OP_READ &&
-	    bio_flagged(bio, BIO_WORKINGSET))) {
-		unsigned long pflags;
-
-		psi_memstall_enter(&pflags);
-		submit_bio_noacct(bio);
-		psi_memstall_leave(&pflags);
-		return;
-	}
-
-	submit_bio_noacct(bio);
-}
-EXPORT_SYMBOL(submit_bio);
-
-/**
- * bio_poll - poll for BIO completions
- * @bio: bio to poll for
- * @iob: batches of IO
- * @flags: BLK_POLL_* flags that control the behavior
- *
- * Poll for completions on queue associated with the bio. Returns number of
- * completed entries found.
- *
- * Note: the caller must either be the context that submitted @bio, or
- * be in a RCU critical section to prevent freeing of @bio.
- */
-int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
-{
-	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-	blk_qc_t cookie = READ_ONCE(bio->bi_cookie);
-	int ret = 0;
-
-	if (cookie == BLK_QC_T_NONE ||
-	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-		return 0;
-
-	blk_flush_plug(current->plug, false);
-
-	if (bio_queue_enter(bio))
-		return 0;
-	if (queue_is_mq(q)) {
-		ret = blk_mq_poll(q, cookie, iob, flags);
-	} else {
-		struct gendisk *disk = q->disk;
-
-		if (disk && disk->fops->poll_bio)
-			ret = disk->fops->poll_bio(bio, iob, flags);
-	}
-	blk_queue_exit(q);
-	return ret;
-}
-EXPORT_SYMBOL_GPL(bio_poll);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Helper to implement file_operations.iopoll.  Requires the bio to be stored
  * in iocb->private, and cleared before freeing the bio.

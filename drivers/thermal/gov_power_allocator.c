@@ -701,11 +701,8 @@ static int power_allocator_throttle(struct thermal_zone_device *tz, int trip)
 	int switch_on_temp, control_temp;
 	struct power_allocator_params *params = tz->governor_data;
 	bool update;
-<<<<<<< HEAD
 
 	lockdep_assert_held(&tz->lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * We get called for every trip point but we only need to do

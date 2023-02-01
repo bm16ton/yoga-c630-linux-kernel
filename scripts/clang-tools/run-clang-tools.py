@@ -50,15 +50,9 @@ def run_analysis(entry):
     if args.type == "clang-tidy":
         checks.append("linuxkernel-*")
     else:
-<<<<<<< HEAD
         checks.append("clang-analyzer-*")
         checks.append("-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling")
     p = subprocess.run(["clang-tidy", "-p", args.path, ",".join(checks), entry["file"]],
-=======
-        checks += "clang-analyzer-*"
-        checks += ",-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling"
-    p = subprocess.run(["clang-tidy", "-p", args.path, checks, entry["file"]],
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
                        stdout=subprocess.PIPE,
                        stderr=subprocess.STDOUT,
                        cwd=entry["directory"])

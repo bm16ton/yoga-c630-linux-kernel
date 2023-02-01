@@ -604,14 +604,8 @@ static int __save_stack_trace(unsigned long *trace)
  * memory block and add it to the object_list and object_tree_root (or
  * object_phys_tree_root).
  */
-<<<<<<< HEAD
 static void __create_object(unsigned long ptr, size_t size,
 			    int min_count, gfp_t gfp, bool is_phys)
-=======
-static struct kmemleak_object *__create_object(unsigned long ptr, size_t size,
-					     int min_count, gfp_t gfp,
-					     bool is_phys)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long flags;
 	struct kmemleak_object *object, *parent;
@@ -716,20 +710,6 @@ static void create_object_phys(unsigned long ptr, size_t size,
 			       int min_count, gfp_t gfp)
 {
 	__create_object(ptr, size, min_count, gfp, true);
-}
-
-/* Create kmemleak object which allocated with virtual address. */
-static struct kmemleak_object *create_object(unsigned long ptr, size_t size,
-					     int min_count, gfp_t gfp)
-{
-	return __create_object(ptr, size, min_count, gfp, false);
-}
-
-/* Create kmemleak object which allocated with physical address. */
-static struct kmemleak_object *create_object_phys(unsigned long ptr, size_t size,
-					     int min_count, gfp_t gfp)
-{
-	return __create_object(ptr, size, min_count, gfp, true);
 }
 
 /*

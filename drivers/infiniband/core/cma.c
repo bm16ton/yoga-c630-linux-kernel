@@ -2819,7 +2819,6 @@ int rdma_set_min_rnr_timer(struct rdma_cm_id *id, u8 min_rnr_timer)
 }
 EXPORT_SYMBOL(rdma_set_min_rnr_timer);
 
-<<<<<<< HEAD
 static void route_set_path_rec_inbound(struct cma_work *work,
 				       struct sa_path_rec *path_rec)
 {
@@ -2850,8 +2849,6 @@ static void route_set_path_rec_outbound(struct cma_work *work,
 	*route->path_rec_outbound = *path_rec;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void cma_query_handler(int status, struct sa_path_rec *path_rec,
 			      int num_prs, void *context)
 {

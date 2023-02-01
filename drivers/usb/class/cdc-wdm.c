@@ -958,11 +958,7 @@ static void wdm_wwan_rx(struct wdm_device *desc, int length)
 	if (!skb)
 		return;
 
-<<<<<<< HEAD
 	skb_put_data(skb, desc->inbuf, length);
-=======
-	memcpy(skb_put(skb, length), desc->inbuf, length);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wwan_port_rx(port, skb);
 
 	/* inbuf has been copied, it is safe to check for outstanding data */

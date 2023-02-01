@@ -2006,10 +2006,7 @@ static enum rq_end_io_ret eh_lock_door_done(struct request *req,
 					    blk_status_t status)
 {
 	blk_mq_free_request(req);
-<<<<<<< HEAD
 	return RQ_END_IO_NONE;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

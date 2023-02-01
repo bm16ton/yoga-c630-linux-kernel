@@ -76,7 +76,6 @@ enum intel_submission_method {
 	INTEL_SUBMISSION_GUC,
 };
 
-<<<<<<< HEAD
 struct gt_defaults {
 	u32 min_freq;
 	u32 max_freq;
@@ -88,8 +87,6 @@ enum intel_gt_type {
 	GT_MEDIA,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct intel_gt {
 	struct drm_i915_private *i915;
 	const char *name;
@@ -268,7 +265,6 @@ struct intel_gt {
 
 	/* gt/gtN sysfs */
 	struct kobject sysfs_gt;
-<<<<<<< HEAD
 
 	/* sysfs defaults per gt */
 	struct gt_defaults defaults;
@@ -281,8 +277,6 @@ struct intel_gt_definition {
 	u32 mapping_base;
 	u32 gsi_offset;
 	intel_engine_mask_t engine_mask;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum intel_gt_scratch_field {

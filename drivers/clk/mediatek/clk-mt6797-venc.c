@@ -39,7 +39,6 @@ static const struct mtk_clk_desc venc_desc = {
 	.num_clks = ARRAY_SIZE(venc_clks),
 };
 
-<<<<<<< HEAD
 static const struct of_device_id of_match_clk_mt6797_venc[] = {
 	{
 		.compatible = "mediatek,mt6797-vencsys",
@@ -48,27 +47,6 @@ static const struct of_device_id of_match_clk_mt6797_venc[] = {
 		/* sentinel */
 	}
 };
-=======
-static int clk_mt6797_venc_probe(struct platform_device *pdev)
-{
-	struct clk_hw_onecell_data *clk_data;
-	int r;
-	struct device_node *node = pdev->dev.of_node;
-
-	clk_data = mtk_alloc_clk_data(CLK_VENC_NR);
-
-	mtk_clk_register_gates(node, venc_clks, ARRAY_SIZE(venc_clks),
-			       clk_data);
-
-	r = of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_data);
-	if (r)
-		dev_err(&pdev->dev,
-			"could not register clock provider: %s: %d\n",
-			pdev->name, r);
-
-	return r;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct platform_driver clk_mt6797_venc_drv = {
 	.probe = mtk_clk_simple_probe,

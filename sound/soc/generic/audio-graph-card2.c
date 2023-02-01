@@ -90,21 +90,12 @@ links indicates connection part of CPU side (= A).
 			ports@0 {
 (X) (A)			mcpu:	port@0 { mcpu0_ep: endpoint { remote-endpoint = <&mcodec0_ep>; }; };
 (y)				port@1 { mcpu1_ep: endpoint { remote-endpoint = <&cpu1_ep>; }; };
-<<<<<<< HEAD
 (y)				port@2 { mcpu2_ep: endpoint { remote-endpoint = <&cpu2_ep>; }; };
 			};
 			ports@1 {
 (X)				port@0 { mcodec0_ep: endpoint { remote-endpoint = <&mcpu0_ep>; }; };
 (y)				port@1 { mcodec1_ep: endpoint { remote-endpoint = <&codec1_ep>; }; };
 (y)				port@2 { mcodec2_ep: endpoint { remote-endpoint = <&codec2_ep>; }; };
-=======
-(y)				port@1 { mcpu2_ep: endpoint { remote-endpoint = <&cpu2_ep>; }; };
-			};
-			ports@1 {
-(X)				port@0 { mcodec0_ep: endpoint { remote-endpoint = <&mcpu0_ep>; }; };
-(y)				port@0 { mcodec1_ep: endpoint { remote-endpoint = <&codec1_ep>; }; };
-(y)				port@1 { mcodec2_ep: endpoint { remote-endpoint = <&codec2_ep>; }; };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			};
 		};
 	};
@@ -238,12 +229,8 @@ enum graph_type {
 
 static enum graph_type __graph_get_type(struct device_node *lnk)
 {
-<<<<<<< HEAD
 	struct device_node *np, *parent_np;
 	enum graph_type ret;
-=======
-	struct device_node *np;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * target {
@@ -254,7 +241,6 @@ static enum graph_type __graph_get_type(struct device_node *lnk)
 	 * };
 	 */
 	np = of_get_parent(lnk);
-<<<<<<< HEAD
 	if (of_node_name_eq(np, "ports")) {
 		parent_np = of_get_parent(np);
 		of_node_put(np);
@@ -282,21 +268,6 @@ out_put:
 	of_node_put(np);
 	return ret;
 
-=======
-	if (of_node_name_eq(np, "ports"))
-		np = of_get_parent(np);
-
-	if (of_node_name_eq(np, GRAPH_NODENAME_MULTI))
-		return GRAPH_MULTI;
-
-	if (of_node_name_eq(np, GRAPH_NODENAME_DPCM))
-		return GRAPH_DPCM;
-
-	if (of_node_name_eq(np, GRAPH_NODENAME_C2C))
-		return GRAPH_C2C;
-
-	return GRAPH_NORMAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static enum graph_type graph_get_type(struct asoc_simple_priv *priv,
@@ -474,15 +445,10 @@ static int asoc_simple_parse_dai(struct device_node *ep,
 	 *    if he unbinded CPU or Codec.
 	 */
 	ret = snd_soc_get_dai_name(&args, &dlc->dai_name);
-<<<<<<< HEAD
 	if (ret < 0) {
 		of_node_put(node);
 		return ret;
 	}
-=======
-	if (ret < 0)
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dlc->of_node = node;
 
@@ -762,11 +728,7 @@ static void graph_link_init(struct asoc_simple_priv *priv,
 	 */
 	daiclk = snd_soc_daifmt_clock_provider_from_bitmap(bit_frame);
 	if (is_cpu_node)
-<<<<<<< HEAD
 		daiclk = snd_soc_daifmt_clock_provider_flipped(daiclk);
-=======
-		daiclk = snd_soc_daifmt_clock_provider_fliped(daiclk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dai_link->dai_fmt	= daifmt | daiclk;
 	dai_link->init		= asoc_simple_dai_init;
@@ -906,19 +868,10 @@ int audio_graph2_link_c2c(struct asoc_simple_priv *priv,
 			  struct link_info *li)
 {
 	struct snd_soc_dai_link *dai_link = simple_priv_to_link(priv, li->link);
-<<<<<<< HEAD
 	struct device_node *port0, *port1, *ports;
 	struct device_node *codec0_port, *codec1_port;
 	struct device_node *ep0, *ep1;
 	u32 val = 0;
-=======
-	struct simple_dai_props *dai_props = simple_priv_to_props(priv, li->link);
-	struct snd_soc_pcm_stream *c2c_conf = dai_props->c2c_conf;
-	struct device_node *port0, *port1, *ports;
-	struct device_node *codec0_port, *codec1_port;
-	struct device_node *ep0, *ep1;
-	u32 val;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret = -EINVAL;
 
 	/*
@@ -942,7 +895,6 @@ int audio_graph2_link_c2c(struct asoc_simple_priv *priv,
 	ports = of_get_parent(port0);
 	port1 = of_get_next_child(ports, lnk);
 
-<<<<<<< HEAD
 	/*
 	 * Card2 can use original Codec2Codec settings if DT has.
 	 * It will use default settings if no settings on DT.
@@ -971,22 +923,6 @@ int audio_graph2_link_c2c(struct asoc_simple_priv *priv,
 		dai_link->num_params	= 1;
 	}
 
-=======
-	if (!of_get_property(ports, "rate", &val)) {
-		struct device *dev = simple_priv_to_dev(priv);
-
-		dev_err(dev, "Codec2Codec needs rate settings\n");
-		goto err1;
-	}
-
-	c2c_conf->formats	= SNDRV_PCM_FMTBIT_S32_LE; /* update ME */
-	c2c_conf->rate_min	=
-	c2c_conf->rate_max	= val;
-	c2c_conf->channels_min	=
-	c2c_conf->channels_max	= 2; /* update ME */
-	dai_link->params	= c2c_conf;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ep0 = port_to_endpoint(port0);
 	ep1 = port_to_endpoint(port1);
 
@@ -1179,10 +1115,6 @@ static int graph_count_c2c(struct asoc_simple_priv *priv,
 	li->num[li->link].cpus		=
 	li->num[li->link].platforms	= graph_counter(codec0);
 	li->num[li->link].codecs	= graph_counter(codec1);
-<<<<<<< HEAD
-=======
-	li->num[li->link].c2c		= 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	of_node_put(ports);
 	of_node_put(port1);
@@ -1274,11 +1206,6 @@ int audio_graph2_parse_of(struct asoc_simple_priv *priv, struct device *dev,
 	struct link_info *li;
 	int ret;
 
-<<<<<<< HEAD
-=======
-	dev_warn(dev, "Audio Graph Card2 is still under Experimental stage\n");
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	li = devm_kzalloc(dev, sizeof(*li), GFP_KERNEL);
 	if (!li)
 		return -ENOMEM;
@@ -1344,12 +1271,9 @@ err:
 	if (ret < 0)
 		dev_err_probe(dev, ret, "parse error\n");
 
-<<<<<<< HEAD
 	if (ret == 0)
 		dev_warn(dev, "Audio Graph Card2 is still under Experimental stage\n");
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 EXPORT_SYMBOL_GPL(audio_graph2_parse_of);

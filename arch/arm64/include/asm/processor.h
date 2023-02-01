@@ -325,11 +325,6 @@ struct task_struct;
 
 unsigned long __get_wchan(struct task_struct *p);
 
-<<<<<<< HEAD
-=======
-unsigned long __get_wchan(struct task_struct *p);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void update_sctlr_el1(u64 sctlr);
 
 /* Thread switching */
@@ -412,11 +407,7 @@ long get_tagged_addr_ctrl(struct task_struct *task);
  * The top of the current task's task stack
  */
 #define current_top_of_stack()	((unsigned long)current->stack + THREAD_SIZE)
-<<<<<<< HEAD
 #define on_thread_stack()	(on_task_stack(current, current_stack_pointer, 1))
-=======
-#define on_thread_stack()	(on_task_stack(current, current_stack_pointer, 1, NULL))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* __ASSEMBLY__ */
 #endif /* __ASM_PROCESSOR_H */

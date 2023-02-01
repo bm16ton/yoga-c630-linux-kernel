@@ -144,11 +144,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-<<<<<<< HEAD
 		pm8941_lpg: pwm {
-=======
-		pm8941_lpg: lpg {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,pm8941-lpg";
 
 			#address-cells = <1>;

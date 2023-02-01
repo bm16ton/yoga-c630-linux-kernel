@@ -413,7 +413,6 @@ enum ena_xdp_errors_t {
 	ENA_XDP_NO_ENOUGH_QUEUES,
 };
 
-<<<<<<< HEAD
 enum ENA_XDP_ACTIONS {
 	ENA_XDP_PASS		= 0,
 	ENA_XDP_TX		= BIT(0),
@@ -423,8 +422,6 @@ enum ENA_XDP_ACTIONS {
 
 #define ENA_XDP_FORWARDED (ENA_XDP_TX | ENA_XDP_REDIRECT)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool ena_xdp_present(struct ena_adapter *adapter)
 {
 	return !!adapter->xdp_bpf_prog;

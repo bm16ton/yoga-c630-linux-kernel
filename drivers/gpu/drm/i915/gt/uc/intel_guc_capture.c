@@ -165,11 +165,7 @@ static const struct __guc_mmio_reg_descr empty_regs_list[] = {
 	}
 
 /* List of lists */
-<<<<<<< HEAD
 static const struct __guc_mmio_reg_descr_group default_lists[] = {
-=======
-static struct __guc_mmio_reg_descr_group default_lists[] = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	MAKE_REGLIST(default_global_regs, PF, GLOBAL, 0),
 	MAKE_REGLIST(default_rc_class_regs, PF, ENGINE_CLASS, GUC_RENDER_CLASS),
 	MAKE_REGLIST(xe_lpd_rc_inst_regs, PF, ENGINE_INSTANCE, GUC_RENDER_CLASS),
@@ -423,7 +419,6 @@ guc_capture_get_device_reglist(struct intel_guc *guc)
 	return default_lists;
 }
 
-<<<<<<< HEAD
 static const char *
 __stringify_type(u32 type)
 {
@@ -462,8 +457,6 @@ __stringify_engclass(u32 class)
 	return "unknown";
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int
 guc_capture_list_init(struct intel_guc *guc, u32 owner, u32 type, u32 classid,
 		      struct guc_mmio_reg *ptr, u16 num_entries)
@@ -527,7 +520,6 @@ guc_cap_list_num_regs(struct intel_guc_state_capture *gc, u32 owner, u32 type, u
 	return num_regs;
 }
 
-<<<<<<< HEAD
 static int
 guc_capture_getlistsize(struct intel_guc *guc, u32 owner, u32 type, u32 classid,
 			size_t *size, bool is_purpose_est)
@@ -541,25 +533,12 @@ guc_capture_getlistsize(struct intel_guc *guc, u32 owner, u32 type, u32 classid,
 		drm_warn(&i915->drm, "GuC-capture: No reglist on this device\n");
 		return -ENODEV;
 	}
-=======
-int
-intel_guc_capture_getlistsize(struct intel_guc *guc, u32 owner, u32 type, u32 classid,
-			      size_t *size)
-{
-	struct intel_guc_state_capture *gc = guc->capture;
-	struct __guc_capture_ads_cache *cache = &gc->ads_cache[owner][type][classid];
-	int num_regs;
-
-	if (!gc->reglists)
-		return -ENODEV;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (cache->is_valid) {
 		*size = cache->size;
 		return cache->status;
 	}
 
-<<<<<<< HEAD
 	if (!is_purpose_est && owner == GUC_CAPTURE_LIST_INDEX_PF &&
 	    !guc_capture_get_one_list(gc->reglists, owner, type, classid)) {
 		if (type == GUC_CAPTURE_LIST_TYPE_GLOBAL)
@@ -579,19 +558,10 @@ intel_guc_capture_getlistsize(struct intel_guc *guc, u32 owner, u32 type, u32 cl
 	if (size)
 		*size = PAGE_ALIGN((sizeof(struct guc_debug_capture_list)) +
 				   (num_regs * sizeof(struct guc_mmio_reg)));
-=======
-	num_regs = guc_cap_list_num_regs(gc, owner, type, classid);
-	if (!num_regs)
-		return -ENODATA;
-
-	*size = PAGE_ALIGN((sizeof(struct guc_debug_capture_list)) +
-			   (num_regs * sizeof(struct guc_mmio_reg)));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
-<<<<<<< HEAD
 int
 intel_guc_capture_getlistsize(struct intel_guc *guc, u32 owner, u32 type, u32 classid,
 			      size_t *size)
@@ -599,8 +569,6 @@ intel_guc_capture_getlistsize(struct intel_guc *guc, u32 owner, u32 type, u32 cl
 	return guc_capture_getlistsize(guc, owner, type, classid, size, false);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void guc_capture_create_prealloc_nodes(struct intel_guc *guc);
 
 int
@@ -693,24 +661,13 @@ intel_guc_capture_getnullheader(struct intel_guc *guc,
 	return 0;
 }
 
-<<<<<<< HEAD
 static int
 guc_capture_output_min_size_est(struct intel_guc *guc)
-=======
-#define GUC_CAPTURE_OVERBUFFER_MULTIPLIER 3
-
-int
-intel_guc_capture_output_min_size_est(struct intel_guc *guc)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct intel_gt *gt = guc_to_gt(guc);
 	struct intel_engine_cs *engine;
 	enum intel_engine_id id;
-<<<<<<< HEAD
 	int worst_min_size = 0;
-=======
-	int worst_min_size = 0, num_regs = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size_t tmp = 0;
 
 	if (!guc->capture)
@@ -725,23 +682,12 @@ intel_guc_capture_output_min_size_est(struct intel_guc *guc)
 	 * For each engine instance, there would be 1 x guc_state_capture_group_t output
 	 * followed by 3 x guc_state_capture_t lists. The latter is how the register
 	 * dumps are split across different register types (where the '3' are global vs class
-<<<<<<< HEAD
 	 * vs instance).
 	 */
-=======
-	 * vs instance). Finally, let's multiply the whole thing by 3x (just so we are
-	 * not limited to just 1 round of data in a worst case full register dump log)
-	 *
-	 * NOTE: intel_guc_log that allocates the log buffer would round this size up to
-	 * a power of two.
-	 */
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for_each_engine(engine, gt, id) {
 		worst_min_size += sizeof(struct guc_state_capture_group_header_t) +
 					 (3 * sizeof(struct guc_state_capture_header_t));
 
-<<<<<<< HEAD
 		if (!guc_capture_getlistsize(guc, 0, GUC_CAPTURE_LIST_TYPE_GLOBAL, 0, &tmp, true))
 			worst_min_size += tmp;
 
@@ -788,24 +734,6 @@ static void check_guc_capture_size(struct intel_guc *guc)
 	else if (spare_size > buffer_size)
 		drm_dbg(&i915->drm, "GuC error state capture buffer lacks spare size: %d < %d (min = %d)\n",
 			buffer_size, spare_size, min_size);
-=======
-		if (!intel_guc_capture_getlistsize(guc, 0, GUC_CAPTURE_LIST_TYPE_GLOBAL, 0, &tmp))
-			num_regs += tmp;
-
-		if (!intel_guc_capture_getlistsize(guc, 0, GUC_CAPTURE_LIST_TYPE_ENGINE_CLASS,
-						   engine->class, &tmp)) {
-			num_regs += tmp;
-		}
-		if (!intel_guc_capture_getlistsize(guc, 0, GUC_CAPTURE_LIST_TYPE_ENGINE_INSTANCE,
-						   engine->class, &tmp)) {
-			num_regs += tmp;
-		}
-	}
-
-	worst_min_size += (num_regs * sizeof(struct guc_mmio_reg));
-
-	return (worst_min_size * GUC_CAPTURE_OVERBUFFER_MULTIPLIER);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1434,12 +1362,8 @@ static void __guc_capture_process_output(struct intel_guc *guc)
 
 	log_buf_state = guc->log.buf_addr +
 			(sizeof(struct guc_log_buffer_state) * GUC_CAPTURE_LOG_BUFFER);
-<<<<<<< HEAD
 	src_data = guc->log.buf_addr +
 		   intel_guc_get_log_buffer_offset(&guc->log, GUC_CAPTURE_LOG_BUFFER);
-=======
-	src_data = guc->log.buf_addr + intel_guc_get_log_buffer_offset(GUC_CAPTURE_LOG_BUFFER);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Make a copy of the state structure, inside GuC log buffer
@@ -1447,11 +1371,7 @@ static void __guc_capture_process_output(struct intel_guc *guc)
 	 * from it multiple times.
 	 */
 	memcpy(&log_buf_state_local, log_buf_state, sizeof(struct guc_log_buffer_state));
-<<<<<<< HEAD
 	buffer_size = intel_guc_get_log_buffer_size(&guc->log, GUC_CAPTURE_LOG_BUFFER);
-=======
-	buffer_size = intel_guc_get_log_buffer_size(GUC_CAPTURE_LOG_BUFFER);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	read_offset = log_buf_state_local.read_ptr;
 	write_offset = log_buf_state_local.sampled_write_ptr;
 	full_count = log_buf_state_local.buffer_full_cnt;
@@ -1530,7 +1450,6 @@ guc_capture_reg_to_str(const struct intel_guc *guc, u32 owner, u32 type,
 	return NULL;
 }
 
-<<<<<<< HEAD
 #define GCAP_PRINT_INTEL_ENG_INFO(ebuf, eng) \
 	do { \
 		i915_error_printf(ebuf, "    i915-Eng-Name: %s command stream\n", \
@@ -1539,42 +1458,14 @@ guc_capture_reg_to_str(const struct intel_guc *guc, u32 owner, u32 type,
 		i915_error_printf(ebuf, "    i915-Eng-Inst-Id: 0x%02x\n", (eng)->instance); \
 		i915_error_printf(ebuf, "    i915-Eng-LogicalMask: 0x%08x\n", \
 				  (eng)->logical_mask); \
-=======
-#ifdef CONFIG_DRM_I915_DEBUG_GUC
-#define __out(a, ...) \
-	do { \
-		drm_warn((&(a)->i915->drm), __VA_ARGS__); \
-		i915_error_printf((a), __VA_ARGS__); \
-	} while (0)
-#else
-#define __out(a, ...) \
-	i915_error_printf(a, __VA_ARGS__)
-#endif
-
-#define GCAP_PRINT_INTEL_ENG_INFO(ebuf, eng) \
-	do { \
-		__out(ebuf, "    i915-Eng-Name: %s command stream\n", \
-		      (eng)->name); \
-		__out(ebuf, "    i915-Eng-Inst-Class: 0x%02x\n", (eng)->class); \
-		__out(ebuf, "    i915-Eng-Inst-Id: 0x%02x\n", (eng)->instance); \
-		__out(ebuf, "    i915-Eng-LogicalMask: 0x%08x\n", \
-		      (eng)->logical_mask); \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} while (0)
 
 #define GCAP_PRINT_GUC_INST_INFO(ebuf, node) \
 	do { \
-<<<<<<< HEAD
 		i915_error_printf(ebuf, "    GuC-Engine-Inst-Id: 0x%08x\n", \
 				  (node)->eng_inst); \
 		i915_error_printf(ebuf, "    GuC-Context-Id: 0x%08x\n", (node)->guc_id); \
 		i915_error_printf(ebuf, "    LRCA: 0x%08x\n", (node)->lrca); \
-=======
-		__out(ebuf, "    GuC-Engine-Inst-Id: 0x%08x\n", \
-		      (node)->eng_inst); \
-		__out(ebuf, "    GuC-Context-Id: 0x%08x\n", (node)->guc_id); \
-		__out(ebuf, "    LRCA: 0x%08x\n", (node)->lrca); \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} while (0)
 
 int intel_guc_capture_print_engine_node(struct drm_i915_error_state_buf *ebuf,
@@ -1606,7 +1497,6 @@ int intel_guc_capture_print_engine_node(struct drm_i915_error_state_buf *ebuf,
 
 	guc = &ee->engine->gt->uc.guc;
 
-<<<<<<< HEAD
 	i915_error_printf(ebuf, "global --- GuC Error Capture on %s command stream:\n",
 			  ee->engine->name);
 
@@ -1622,66 +1512,34 @@ int intel_guc_capture_print_engine_node(struct drm_i915_error_state_buf *ebuf,
 		i915_error_printf(ebuf, "  RegListType: %s\n",
 				  datatype[i % GUC_CAPTURE_LIST_TYPE_MAX]);
 		i915_error_printf(ebuf, "    Owner-Id: %d\n", node->reginfo[i].vfid);
-=======
-	__out(ebuf, "global --- GuC Error Capture on %s command stream:\n",
-	      ee->engine->name);
-
-	node = ee->guc_capture_node;
-	if (!node) {
-		__out(ebuf, "  No matching ee-node\n");
-		return 0;
-	}
-
-	__out(ebuf, "Coverage:  %s\n", grptype[node->is_partial]);
-
-	for (i = GUC_CAPTURE_LIST_TYPE_GLOBAL; i < GUC_CAPTURE_LIST_TYPE_MAX; ++i) {
-		__out(ebuf, "  RegListType: %s\n",
-		      datatype[i % GUC_CAPTURE_LIST_TYPE_MAX]);
-		__out(ebuf, "    Owner-Id: %d\n", node->reginfo[i].vfid);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		switch (i) {
 		case GUC_CAPTURE_LIST_TYPE_GLOBAL:
 		default:
 			break;
 		case GUC_CAPTURE_LIST_TYPE_ENGINE_CLASS:
-<<<<<<< HEAD
 			i915_error_printf(ebuf, "    GuC-Eng-Class: %d\n", node->eng_class);
 			i915_error_printf(ebuf, "    i915-Eng-Class: %d\n",
 					  guc_class_to_engine_class(node->eng_class));
-=======
-			__out(ebuf, "    GuC-Eng-Class: %d\n", node->eng_class);
-			__out(ebuf, "    i915-Eng-Class: %d\n",
-			      guc_class_to_engine_class(node->eng_class));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		case GUC_CAPTURE_LIST_TYPE_ENGINE_INSTANCE:
 			eng = intel_guc_lookup_engine(guc, node->eng_class, node->eng_inst);
 			if (eng)
 				GCAP_PRINT_INTEL_ENG_INFO(ebuf, eng);
 			else
-<<<<<<< HEAD
 				i915_error_printf(ebuf, "    i915-Eng-Lookup Fail!\n");
-=======
-				__out(ebuf, "    i915-Eng-Lookup Fail!\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			GCAP_PRINT_GUC_INST_INFO(ebuf, node);
 			break;
 		}
 
 		numregs = node->reginfo[i].num_regs;
-<<<<<<< HEAD
 		i915_error_printf(ebuf, "    NumRegs: %d\n", numregs);
-=======
-		__out(ebuf, "    NumRegs: %d\n", numregs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		j = 0;
 		while (numregs--) {
 			regs = node->reginfo[i].regs;
 			str = guc_capture_reg_to_str(guc, GUC_CAPTURE_LIST_INDEX_PF, i,
 						     node->eng_class, 0, regs[j].offset, &is_ext);
 			if (!str)
-<<<<<<< HEAD
 				i915_error_printf(ebuf, "      REG-0x%08x", regs[j].offset);
 			else
 				i915_error_printf(ebuf, "      %s", str);
@@ -1690,16 +1548,6 @@ int intel_guc_capture_print_engine_node(struct drm_i915_error_state_buf *ebuf,
 					FIELD_GET(GUC_REGSET_STEERING_GROUP, regs[j].flags),
 					FIELD_GET(GUC_REGSET_STEERING_INSTANCE, regs[j].flags));
 			i915_error_printf(ebuf, ":  0x%08x\n", regs[j].value);
-=======
-				__out(ebuf, "      REG-0x%08x", regs[j].offset);
-			else
-				__out(ebuf, "      %s", str);
-			if (is_ext)
-				__out(ebuf, "[%ld][%ld]",
-				      FIELD_GET(GUC_REGSET_STEERING_GROUP, regs[j].flags),
-				      FIELD_GET(GUC_REGSET_STEERING_INSTANCE, regs[j].flags));
-			__out(ebuf, ":  0x%08x\n", regs[j].value);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			++j;
 		}
 	}
@@ -1806,10 +1654,7 @@ int intel_guc_capture_init(struct intel_guc *guc)
 	INIT_LIST_HEAD(&guc->capture->outlist);
 	INIT_LIST_HEAD(&guc->capture->cachelist);
 
-<<<<<<< HEAD
 	check_guc_capture_size(guc);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }

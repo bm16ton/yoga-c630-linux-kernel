@@ -997,7 +997,6 @@ static void flow_offload_queue_work(struct flow_offload_work *offload)
 	struct net *net = read_pnet(&offload->flowtable->net);
 
 	if (offload->cmd == FLOW_CLS_REPLACE) {
-<<<<<<< HEAD
 		NF_FLOW_TABLE_STAT_INC_ATOMIC(net, count_wq_add);
 		queue_work(nf_flow_offload_add_wq, &offload->work);
 	} else if (offload->cmd == FLOW_CLS_DESTROY) {
@@ -1005,15 +1004,6 @@ static void flow_offload_queue_work(struct flow_offload_work *offload)
 		queue_work(nf_flow_offload_del_wq, &offload->work);
 	} else {
 		NF_FLOW_TABLE_STAT_INC_ATOMIC(net, count_wq_stats);
-=======
-		NF_FLOW_TABLE_STAT_INC(net, count_wq_add);
-		queue_work(nf_flow_offload_add_wq, &offload->work);
-	} else if (offload->cmd == FLOW_CLS_DESTROY) {
-		NF_FLOW_TABLE_STAT_INC(net, count_wq_del);
-		queue_work(nf_flow_offload_del_wq, &offload->work);
-	} else {
-		NF_FLOW_TABLE_STAT_INC(net, count_wq_stats);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		queue_work(nf_flow_offload_stats_wq, &offload->work);
 	}
 }

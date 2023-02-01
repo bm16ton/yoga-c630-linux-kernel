@@ -193,7 +193,6 @@
 #define LPASS_CLK_ID_RX_CORE_MCLK	59
 #define LPASS_CLK_ID_RX_CORE_NPL_MCLK	60
 #define LPASS_CLK_ID_VA_CORE_2X_MCLK	61
-<<<<<<< HEAD
 /* Clock ID for MCLK for WSA2 core */
 #define LPASS_CLK_ID_WSA2_CORE_MCLK	62
 /* Clock ID for NPL MCLK for WSA2 core */
@@ -212,8 +211,6 @@
 #define LPASS_CLK_ID_WSA2_CORE_TX_2X_MCLK	69
 /* Clock ID for RX CORE MCLK2 2X  MCLK */
 #define LPASS_CLK_ID_RX_CORE_MCLK2_2X_MCLK	70
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define LPASS_HW_AVTIMER_VOTE		101
 #define LPASS_HW_MACRO_VOTE		102

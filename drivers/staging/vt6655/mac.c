@@ -62,46 +62,8 @@ void vt6655_mac_reg_bits_off(void __iomem *iobase, const u8 reg_offset, const u8
 }
 
 void vt6655_mac_word_reg_bits_off(void __iomem *iobase, const u8 reg_offset, const u16 bit_mask)
-<<<<<<< HEAD
 {
 	unsigned short reg_value;
-=======
-{
-	unsigned short reg_value;
-
-	reg_value = ioread16(iobase + reg_offset);
-	iowrite16(reg_value & ~(bit_mask), iobase + reg_offset);
-}
-
-static void vt6655_mac_clear_stck_ds(void __iomem *iobase)
-{
-	u8 reg_value;
-
-	reg_value = ioread8(iobase + MAC_REG_STICKHW);
-	reg_value = reg_value & 0xFC;
-	iowrite8(reg_value, iobase + MAC_REG_STICKHW);
-}
-
-/*
- * Description:
- *      Test if all test bits off
- *
- * Parameters:
- *  In:
- *      io_base    - Base Address for MAC
- *      byRegOfs    - Offset of MAC Register
- *      byTestBits  - Test bits
- *  Out:
- *      none
- *
- * Return Value: true if all test bits Off; otherwise false
- *
- */
-bool MACbIsRegBitsOff(struct vnt_private *priv, unsigned char byRegOfs,
-		      unsigned char byTestBits)
-{
-	void __iomem *io_base = priv->port_offset;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	reg_value = ioread16(iobase + reg_offset);
 	iowrite16(reg_value & ~(bit_mask), iobase + reg_offset);
@@ -136,12 +98,6 @@ static bool vt6655_mac_is_reg_bits_off(struct vnt_private *priv,
 				       unsigned char mask)
 {
 	void __iomem *io_base = priv->port_offset;
-<<<<<<< HEAD
-=======
-
-	if (ioread32(io_base + MAC_REG_IMR))
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return !(ioread8(io_base + reg_offset) & mask);
 }
@@ -516,11 +472,7 @@ bool MACbShutdown(struct vnt_private *priv)
 	void __iomem *io_base = priv->port_offset;
 	/* disable MAC IMR */
 	iowrite32(0, io_base + MAC_REG_IMR);
-<<<<<<< HEAD
 	vt6655_mac_set_loopback_mode(priv, MAC_LB_INTERNAL);
-=======
-	MACvSetLoopbackMode(priv, MAC_LB_INTERNAL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* stop the adapter */
 	if (!vt6655_mac_safe_stop(priv)) {
 		vt6655_mac_set_loopback_mode(priv, MAC_LB_NONE);

@@ -7,7 +7,6 @@
 
 #include "otx2_common.h"
 
-<<<<<<< HEAD
 static int otx2_check_pfc_config(struct otx2_nic *pfvf)
 {
 	u8 tx_queues = pfvf->hw.tx_queues, prio;
@@ -291,8 +290,6 @@ int otx2_pfc_txschq_stop(struct otx2_nic *pfvf)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int otx2_config_priority_flow_ctrl(struct otx2_nic *pfvf)
 {
 	struct cgx_pfc_cfg *req;
@@ -414,7 +411,6 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
 	/* Save PFC configuration to interface */
 	pfvf->pfc_en = pfc->pfc_en;
 
-<<<<<<< HEAD
 	if (pfvf->hw.tx_queues >= NIX_PF_PFC_PRIO_MAX)
 		goto process_pfc;
 
@@ -426,8 +422,6 @@ static int otx2_dcbnl_ieee_setpfc(struct net_device *dev, struct ieee_pfc *pfc)
 		return err;
 
 process_pfc:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = otx2_config_priority_flow_ctrl(pfvf);
 	if (err)
 		return err;
@@ -436,15 +430,12 @@ process_pfc:
 	if (pfc->pfc_en)
 		otx2_nix_config_bp(pfvf, true);
 
-<<<<<<< HEAD
 	err = otx2_pfc_txschq_update(pfvf);
 	if (err) {
 		dev_err(pfvf->dev, "%s failed to update TX schedulers\n", __func__);
 		return err;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

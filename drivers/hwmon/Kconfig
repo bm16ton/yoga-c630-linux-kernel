@@ -257,23 +257,14 @@ config SENSORS_AHT10
 	  will be called aht10.
 
 config SENSORS_AQUACOMPUTER_D5NEXT
-<<<<<<< HEAD
 	tristate "Aquacomputer D5 Next, Octo, Quadro, Farbwerk, Farbwerk 360, High Flow Next"
-=======
-	tristate "Aquacomputer D5 Next, Octo, Quadro, Farbwerk, and Farbwerk 360"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on USB_HID
 	select CRC16
 	help
 	  If you say yes here you get support for sensors and fans of
 	  the Aquacomputer D5 Next watercooling pump, Octo and Quadro fan
-<<<<<<< HEAD
 	  controllers, Farbwerk and Farbwerk 360 RGB controllers, High Flow
 	  Next sensor, where available.
-=======
-	  controllers, Farbwerk and Farbwerk 360 RGB controllers, where
-	  available.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	  This driver can also be built as a module. If so, the module
 	  will be called aquacomputer_d5next.
@@ -1077,7 +1068,6 @@ config SENSORS_MAX31730
 	  This driver can also be built as a module. If so, the module
 	  will be called max31730.
 
-<<<<<<< HEAD
 config SENSORS_MAX31760
 	tristate "MAX31760 fan speed controller"
 	depends on I2C
@@ -1090,8 +1080,6 @@ config SENSORS_MAX31760
 	  This driver can also be built as a module. If so, the module
 	  will be called max31760.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config SENSORS_MAX6620
 	tristate "Maxim MAX6620 fan controller"
 	depends on I2C
@@ -1771,10 +1759,7 @@ config SENSORS_SIS5595
 
 config SENSORS_SY7636A
 	tristate "Silergy SY7636A"
-<<<<<<< HEAD
 	depends on MFD_SY7636A
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  If you say yes here you get support for the thermistor readout of
 	  the Silergy SY7636A PMIC.
@@ -2384,24 +2369,6 @@ config SENSORS_ASUS_WMI
 	  This driver can also be built as a module. If so, the module
 	  will be called asus_wmi_sensors.
 
-<<<<<<< HEAD
-=======
-config SENSORS_ASUS_WMI_EC
-	tristate "ASUS WMI B550/X570"
-	depends on ACPI_WMI && SENSORS_ASUS_EC=n
-	help
-	  If you say yes here you get support for the ACPI embedded controller
-	  hardware monitoring interface found in B550/X570 ASUS motherboards.
-	  This driver will provide readings of fans, voltages and temperatures
-	  through the system firmware.
-
-	  This driver is deprecated in favor of the ASUS EC Sensors driver
-	  which provides fully compatible output.
-
-	  This driver can also be built as a module. If so, the module
-	  will be called asus_wmi_sensors_ec.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config SENSORS_ASUS_EC
 	tristate "ASUS EC Sensors"
 	depends on X86

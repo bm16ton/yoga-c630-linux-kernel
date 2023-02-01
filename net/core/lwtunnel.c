@@ -48,12 +48,9 @@ static const char *lwtunnel_encap_str(enum lwtunnel_encap_types encap_type)
 		return "RPL";
 	case LWTUNNEL_ENCAP_IOAM6:
 		return "IOAM6";
-<<<<<<< HEAD
 	case LWTUNNEL_ENCAP_XFRM:
 		/* module autoload not supported for encap type */
 		return NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case LWTUNNEL_ENCAP_IP6:
 	case LWTUNNEL_ENCAP_IP:
 	case LWTUNNEL_ENCAP_NONE:

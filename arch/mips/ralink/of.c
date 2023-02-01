@@ -64,11 +64,7 @@ void __init plat_mem_setup(void)
 	dtb = get_fdt();
 	__dt_setup_arch(dtb);
 
-<<<<<<< HEAD
 	if (early_init_dt_scan_memory())
-=======
-	if (!early_init_dt_scan_memory())
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	if (soc_info.mem_detect)

@@ -11,14 +11,8 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_device.h>
-<<<<<<< HEAD
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_fb_cma_helper.h>
-#include <drm/drm_framebuffer.h>
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_managed.h>
 #include <drm/drm_probe_helper.h>
@@ -333,21 +327,12 @@ const struct rcar_du_format_info *rcar_du_format_info(u32 fourcc)
  */
 
 static const struct drm_gem_object_funcs rcar_du_gem_funcs = {
-<<<<<<< HEAD
 	.free = drm_gem_dma_object_free,
 	.print_info = drm_gem_dma_object_print_info,
 	.get_sg_table = drm_gem_dma_object_get_sg_table,
 	.vmap = drm_gem_dma_object_vmap,
 	.mmap = drm_gem_dma_object_mmap,
 	.vm_ops = &drm_gem_dma_vm_ops,
-=======
-	.free = drm_gem_cma_object_free,
-	.print_info = drm_gem_cma_object_print_info,
-	.get_sg_table = drm_gem_cma_object_get_sg_table,
-	.vmap = drm_gem_cma_object_vmap,
-	.mmap = drm_gem_cma_object_mmap,
-	.vm_ops = &drm_gem_cma_vm_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct drm_gem_object *rcar_du_gem_prime_import_sg_table(struct drm_device *dev,
@@ -355,16 +340,11 @@ struct drm_gem_object *rcar_du_gem_prime_import_sg_table(struct drm_device *dev,
 				struct sg_table *sgt)
 {
 	struct rcar_du_device *rcdu = to_rcar_du_device(dev);
-<<<<<<< HEAD
 	struct drm_gem_dma_object *dma_obj;
-=======
-	struct drm_gem_cma_object *cma_obj;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct drm_gem_object *gem_obj;
 	int ret;
 
 	if (!rcar_du_has(rcdu, RCAR_DU_FEATURE_VSP1_SOURCE))
-<<<<<<< HEAD
 		return drm_gem_dma_prime_import_sg_table(dev, attach, sgt);
 
 	/* Create a DMA GEM buffer. */
@@ -377,39 +357,16 @@ struct drm_gem_object *rcar_du_gem_prime_import_sg_table(struct drm_device *dev,
 
 	drm_gem_private_object_init(dev, gem_obj, attach->dmabuf->size);
 	dma_obj->map_noncoherent = false;
-=======
-		return drm_gem_cma_prime_import_sg_table(dev, attach, sgt);
-
-	/* Create a CMA GEM buffer. */
-	cma_obj = kzalloc(sizeof(*cma_obj), GFP_KERNEL);
-	if (!cma_obj)
-		return ERR_PTR(-ENOMEM);
-
-	gem_obj = &cma_obj->base;
-	gem_obj->funcs = &rcar_du_gem_funcs;
-
-	drm_gem_private_object_init(dev, gem_obj, attach->dmabuf->size);
-	cma_obj->map_noncoherent = false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = drm_gem_create_mmap_offset(gem_obj);
 	if (ret) {
 		drm_gem_object_release(gem_obj);
-<<<<<<< HEAD
 		kfree(dma_obj);
 		return ERR_PTR(ret);
 	}
 
 	dma_obj->dma_addr = 0;
 	dma_obj->sgt = sgt;
-=======
-		kfree(cma_obj);
-		return ERR_PTR(ret);
-	}
-
-	cma_obj->paddr = 0;
-	cma_obj->sgt = sgt;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return gem_obj;
 }

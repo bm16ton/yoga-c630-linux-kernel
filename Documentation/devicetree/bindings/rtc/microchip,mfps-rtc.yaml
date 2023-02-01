@@ -5,11 +5,7 @@ $id: http://devicetree.org/schemas/rtc/microchip,mfps-rtc.yaml#
 
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-<<<<<<< HEAD
 title: Microchip PolarFire Soc (MPFS) RTC
-=======
-title: Microchip PolarFire Soc (MPFS) RTC Device Tree Bindings
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 allOf:
   - $ref: rtc.yaml#

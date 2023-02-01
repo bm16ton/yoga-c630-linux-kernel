@@ -592,11 +592,8 @@ enum {
 	TCA_FLOWER_KEY_PPPOE_SID,	/* be16 */
 	TCA_FLOWER_KEY_PPP_PROTO,	/* be16 */
 
-<<<<<<< HEAD
 	TCA_FLOWER_KEY_L2TPV3_SID,	/* be32 */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__TCA_FLOWER_MAX,
 };
 

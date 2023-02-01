@@ -13,15 +13,9 @@ void __do_once_done(bool *done, struct static_key_true *once_key,
 		    unsigned long *flags, struct module *mod);
 
 /* Variant for process contexts only. */
-<<<<<<< HEAD
 bool __do_once_sleepable_start(bool *done);
 void __do_once_sleepable_done(bool *done, struct static_key_true *once_key,
 			      struct module *mod);
-=======
-bool __do_once_slow_start(bool *done);
-void __do_once_slow_done(bool *done, struct static_key_true *once_key,
-			 struct module *mod);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Call a function exactly once. The idea of DO_ONCE() is to perform
  * a function call such as initialization of random seeds, etc, only
@@ -61,26 +55,6 @@ void __do_once_slow_done(bool *done, struct static_key_true *once_key,
 				func(__VA_ARGS__);			     \
 				__do_once_done(&___done, &___once_key,	     \
 					       &___flags, THIS_MODULE);	     \
-<<<<<<< HEAD
-=======
-			}						     \
-		}							     \
-		___ret;							     \
-	})
-
-/* Variant of DO_ONCE() for process/sleepable contexts. */
-#define DO_ONCE_SLOW(func, ...)						     \
-	({								     \
-		bool ___ret = false;					     \
-		static bool __section(".data.once") ___done = false;	     \
-		static DEFINE_STATIC_KEY_TRUE(___once_key);		     \
-		if (static_branch_unlikely(&___once_key)) {		     \
-			___ret = __do_once_slow_start(&___done);	     \
-			if (unlikely(___ret)) {				     \
-				func(__VA_ARGS__);			     \
-				__do_once_slow_done(&___done, &___once_key,  \
-						    THIS_MODULE);	     \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}						     \
 		}							     \
 		___ret;							     \
@@ -106,12 +80,7 @@ void __do_once_slow_done(bool *done, struct static_key_true *once_key,
 #define get_random_once(buf, nbytes)					     \
 	DO_ONCE(get_random_bytes, (buf), (nbytes))
 
-<<<<<<< HEAD
 #define get_random_sleepable_once(buf, nbytes)				     \
 	DO_ONCE_SLEEPABLE(get_random_bytes, (buf), (nbytes))
-=======
-#define get_random_slow_once(buf, nbytes)				     \
-	DO_ONCE_SLOW(get_random_bytes, (buf), (nbytes))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _LINUX_ONCE_H */

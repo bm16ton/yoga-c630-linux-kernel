@@ -72,11 +72,7 @@ void test_test_overhead(void)
 	if (CHECK_FAIL(prctl(PR_GET_NAME, comm, 0L, 0L, 0L)))
 		return;
 
-<<<<<<< HEAD
 	obj = bpf_object__open_file("./test_overhead.bpf.o", NULL);
-=======
-	obj = bpf_object__open_file("./test_overhead.o", NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ASSERT_OK_PTR(obj, "obj_open_file"))
 		return;
 

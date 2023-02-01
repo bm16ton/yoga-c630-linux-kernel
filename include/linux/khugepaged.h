@@ -46,14 +46,12 @@ static inline void khugepaged_exit(struct mm_struct *mm)
 }
 static inline void khugepaged_enter_vma(struct vm_area_struct *vma,
 					unsigned long vm_flags)
-<<<<<<< HEAD
 {
 }
 static inline int collapse_pte_mapped_thp(struct mm_struct *mm,
 					  unsigned long addr, bool install_pmd)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
+	return 0;
 }
 
 static inline void khugepaged_min_free_kbytes_update(void)

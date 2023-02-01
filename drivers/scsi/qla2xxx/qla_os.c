@@ -15,11 +15,8 @@
 #include <linux/blk-mq-pci.h>
 #include <linux/refcount.h>
 #include <linux/crash_dump.h>
-<<<<<<< HEAD
 #include <linux/trace_events.h>
 #include <linux/trace.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <scsi/scsi_tcq.h>
 #include <scsi/scsicam.h>
@@ -345,11 +342,7 @@ MODULE_PARM_DESC(ql2xabts_wait_nvme,
 		 "To wait for ABTS response on I/O timeouts for NVMe. (default: 1)");
 
 
-<<<<<<< HEAD
 static u32 ql2xdelay_before_pci_error_handling = 5;
-=======
-u32 ql2xdelay_before_pci_error_handling = 5;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 module_param(ql2xdelay_before_pci_error_handling, uint, 0644);
 MODULE_PARM_DESC(ql2xdelay_before_pci_error_handling,
 	"Number of seconds delayed before qla begin PCI error self-handling (default: 5).\n");
@@ -1403,30 +1396,7 @@ __qla2x00_eh_wait_for_pending_commands(struct qla_qpair *qpair, unsigned int t,
 		spin_lock_irqsave(qpair->qp_lock_ptr, flags);
 	}
 	spin_unlock_irqrestore(qpair->qp_lock_ptr, flags);
-<<<<<<< HEAD
-=======
 
-	return status;
-}
-
-int
-qla2x00_eh_wait_for_pending_commands(scsi_qla_host_t *vha, unsigned int t,
-				     uint64_t l, enum nexus_wait_type type)
-{
-	struct qla_qpair *qpair;
-	struct qla_hw_data *ha = vha->hw;
-	int i, status = QLA_SUCCESS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	status = __qla2x00_eh_wait_for_pending_commands(ha->base_qpair, t, l,
-							type);
-	for (i = 0; status == QLA_SUCCESS && i < ha->max_qpairs; i++) {
-		qpair = ha->queue_pair_map[i];
-		if (!qpair)
-			continue;
-		status = __qla2x00_eh_wait_for_pending_commands(qpair, t, l,
-								type);
-	}
 	return status;
 }
 

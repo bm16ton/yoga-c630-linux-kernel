@@ -182,10 +182,7 @@ to the ``struct sugov_cpu`` that the utilization update belongs to.
 Then, ``amd-pstate`` updates the desired performance according to the CPU
 scheduler assigned.
 
-<<<<<<< HEAD
 .. _processor_support:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Processor Support
 =======================
@@ -286,7 +283,6 @@ efficiency frequency management method on AMD processors.
 Kernel Module Options for ``amd-pstate``
 =========================================
 
-<<<<<<< HEAD
 Passive Mode
 ------------
 
@@ -300,23 +296,6 @@ desired performance expresses the average performance level of the processor sub
 to the Performance Reduction Tolerance register. Above the nominal performance level,
 processor must provide at least nominal performance requested and go higher if current
 operating conditions allow.
-=======
-``shared_mem``
-Use a module param (shared_mem) to enable related processors manually with
-**amd_pstate.shared_mem=1**.
-Due to the performance issue on the processors with `Shared Memory Support
-<perf_cap_>`_, we disable it presently and will re-enable this by default
-once we address performance issue with this solution.
-
-To check whether the current processor is using `Full MSR Support <perf_cap_>`_
-or `Shared Memory Support <perf_cap_>`_ : ::
-
-  ray@hr-test1:~$ lscpu | grep cppc
-  Flags:                           fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm
-
-If the CPU flags have ``cppc``, then this processor supports `Full MSR Support
-<perf_cap_>`_. Otherwise, it supports `Shared Memory Support <perf_cap_>`_.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 
 ``cpupower`` tool support for ``amd-pstate``
@@ -413,7 +392,6 @@ about part of the output. ::
  CPU_005     712          116384        39        49        166       0.7565  9645075 2214891 38431470  25.1   11.646       469         2.496         kworker/5:0-40
  CPU_006     712          116408        39        49        166       0.6769  8950227 1839034 37192089  24.06  11.272       470         2.496         kworker/6:0-1264
 
-<<<<<<< HEAD
 Unit Tests for amd-pstate
 -------------------------
 
@@ -484,8 +462,6 @@ Unit Tests for amd-pstate
          [12977.570673] amd_pstate_ut: 2    amd_pstate_ut_check_enabled   success!
          [12977.571207] amd_pstate_ut: 3    amd_pstate_ut_check_perf      success!
          [12977.571212] amd_pstate_ut: 4    amd_pstate_ut_check_freq      success!
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Reference
 ===========
@@ -498,9 +474,6 @@ Reference
 
 .. [3] Processor Programming Reference (PPR) for AMD Family 19h Model 51h, Revision A1 Processors
        https://www.amd.com/system/files/TechDocs/56569-A1-PUB.zip
-<<<<<<< HEAD
 
 .. [4] Linux Kernel Selftests,
        https://www.kernel.org/doc/html/latest/dev-tools/kselftest.html
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

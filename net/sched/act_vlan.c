@@ -116,11 +116,7 @@ static int tcf_vlan_init(struct net *net, struct nlattr *nla,
 			 struct tcf_proto *tp, u32 flags,
 			 struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_vlan_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, vlan_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = flags & TCA_ACT_FLAGS_BIND;
 	struct nlattr *tb[TCA_VLAN_MAX + 1];
 	struct tcf_chain *goto_ch = NULL;
@@ -426,10 +422,6 @@ static struct tc_action_ops act_vlan_ops = {
 	.cleanup	=	tcf_vlan_cleanup,
 	.stats_update	=	tcf_vlan_stats_update,
 	.get_fill_size	=	tcf_vlan_get_fill_size,
-<<<<<<< HEAD
-=======
-	.lookup		=	tcf_vlan_search,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.offload_act_setup =	tcf_vlan_offload_act_setup,
 	.size		=	sizeof(struct tcf_vlan),
 };

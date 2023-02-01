@@ -1592,11 +1592,7 @@ static void zs_object_copy(struct size_class *class, unsigned long dst,
 static unsigned long find_alloced_obj(struct size_class *class,
 					struct page *page, int *obj_idx)
 {
-<<<<<<< HEAD
 	unsigned int offset;
-=======
-	int offset = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int index = *obj_idx;
 	unsigned long handle = 0;
 	void *addr = kmap_atomic(page);
@@ -1850,11 +1846,7 @@ static int zs_page_migrate(struct page *newpage, struct page *page,
 	struct zspage *zspage;
 	struct page *dummy;
 	void *s_addr, *d_addr, *addr;
-<<<<<<< HEAD
 	unsigned int offset;
-=======
-	int offset;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long handle;
 	unsigned long old_obj, new_obj;
 	unsigned int obj_idx;

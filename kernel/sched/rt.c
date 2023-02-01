@@ -1059,11 +1059,6 @@ static void update_curr_rt(struct rq *rq)
 
 	schedstat_set(curr->stats.exec_max,
 		      max(curr->stats.exec_max, delta_exec));
-<<<<<<< HEAD
-=======
-
-	trace_sched_stat_runtime(curr, delta_exec, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	trace_sched_stat_runtime(curr, delta_exec, 0);
 

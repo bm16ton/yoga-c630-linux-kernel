@@ -235,24 +235,7 @@ struct atomisp_device {
 
 	/* Purpose of mutex is to protect and serialize use of isp data
 	 * structures and css API calls. */
-<<<<<<< HEAD
 	struct mutex mutex;
-=======
-	struct rt_mutex mutex;
-	/*
-	 * This mutex ensures that we don't allow an open to succeed while
-	 * the initialization process is incomplete
-	 */
-	struct rt_mutex loading;
-	/* Set once the ISP is ready to allow opens */
-	bool ready;
-	/*
-	 * Serialise streamoff: mutex is dropped during streamoff to
-	 * cancel the watchdog queue. MUST be acquired BEFORE
-	 * "mutex".
-	 */
-	struct mutex streamoff_mutex;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	unsigned int input_cnt;
 	struct atomisp_input_subdev inputs[ATOM_ISP_MAX_INPUTS];

@@ -340,15 +340,6 @@ static inline void
 intel_engine_clear_hung_context(struct intel_engine_cs *engine)
 {
 	intel_engine_set_hung_context(engine, NULL);
-<<<<<<< HEAD
-=======
-}
-
-static inline struct intel_context *
-intel_engine_get_hung_context(struct intel_engine_cs *engine)
-{
-	return engine->hung_ce;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline struct intel_context *

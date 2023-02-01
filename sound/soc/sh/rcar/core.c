@@ -755,19 +755,11 @@ static int rsnd_soc_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	struct rsnd_dai *rdai = rsnd_dai_to_rdai(dai);
 
 	/* set clock master for audio interface */
-<<<<<<< HEAD
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
 	case SND_SOC_DAIFMT_BC_FC:
 		rdai->clk_master = 0;
 		break;
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
-	case SND_SOC_DAIFMT_CBP_CFP:
-		rdai->clk_master = 0;
-		break;
-	case SND_SOC_DAIFMT_CBC_CFC:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rdai->clk_master = 1; /* cpu is master */
 		break;
 	default:
@@ -1821,20 +1813,12 @@ int rsnd_kctrl_new(struct rsnd_mod *mod,
  *		snd_soc_component
  */
 static const struct snd_soc_component_driver rsnd_soc_component = {
-<<<<<<< HEAD
 	.name			= "rsnd",
 	.probe			= rsnd_debugfs_probe,
 	.hw_params		= rsnd_hw_params,
 	.hw_free		= rsnd_hw_free,
 	.pointer		= rsnd_pointer,
 	.legacy_dai_naming	= 1,
-=======
-	.name		= "rsnd",
-	.probe		= rsnd_debugfs_probe,
-	.hw_params	= rsnd_hw_params,
-	.hw_free	= rsnd_hw_free,
-	.pointer	= rsnd_pointer,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int rsnd_rdai_continuance_probe(struct rsnd_priv *priv,

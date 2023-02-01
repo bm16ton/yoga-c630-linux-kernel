@@ -2903,11 +2903,7 @@ check_hwcfg_error:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void hi847_remove(struct i2c_client *client)
-=======
-static int hi847_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct hi847 *hi847 = to_hi847(sd);
@@ -2917,11 +2913,6 @@ static int hi847_remove(struct i2c_client *client)
 	v4l2_ctrl_handler_free(sd->ctrl_handler);
 	pm_runtime_disable(&client->dev);
 	mutex_destroy(&hi847->mutex);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int hi847_probe(struct i2c_client *client)

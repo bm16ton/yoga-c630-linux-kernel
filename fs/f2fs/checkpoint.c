@@ -461,12 +461,7 @@ static bool f2fs_dirty_meta_folio(struct address_space *mapping,
 
 	if (!folio_test_uptodate(folio))
 		folio_mark_uptodate(folio);
-<<<<<<< HEAD
 	if (filemap_dirty_folio(mapping, folio)) {
-=======
-	if (!folio_test_dirty(folio)) {
-		filemap_dirty_folio(mapping, folio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		inc_page_count(F2FS_M_SB(mapping), F2FS_DIRTY_META);
 		set_page_private_reference(&folio->page);
 		return true;
@@ -488,7 +483,6 @@ static void __add_ino_entry(struct f2fs_sb_info *sbi, nid_t ino,
 {
 	struct inode_management *im = &sbi->im[type];
 	struct ino_entry *e = NULL, *new = NULL;
-<<<<<<< HEAD
 
 	if (type == FLUSH_INO) {
 		rcu_read_lock();
@@ -496,15 +490,6 @@ static void __add_ino_entry(struct f2fs_sb_info *sbi, nid_t ino,
 		rcu_read_unlock();
 	}
 
-=======
-
-	if (type == FLUSH_INO) {
-		rcu_read_lock();
-		e = radix_tree_lookup(&im->ino_root, ino);
-		rcu_read_unlock();
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 retry:
 	if (!e)
 		new = f2fs_kmem_cache_alloc(ino_entry_slab,

@@ -386,15 +386,12 @@ static void bfq_put_stable_ref(struct bfq_queue *bfqq);
 
 void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync)
 {
-<<<<<<< HEAD
 	struct bfq_queue *old_bfqq = bic->bfqq[is_sync];
 
 	/* Clear bic pointer if bfqq is detached from this bic */
 	if (old_bfqq && old_bfqq->bic == bic)
 		old_bfqq->bic = NULL;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * If bfqq != NULL, then a non-stable queue merge between
 	 * bic->bfqq and bfqq is happening here. This causes troubles
@@ -3108,8 +3105,6 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
 	if (bfq_bfqq_busy(bfqq) && RB_EMPTY_ROOT(&bfqq->sort_list) &&
 	    bfqq != bfqd->in_service_queue)
 		bfq_del_bfqq_busy(bfqq, false);
-
-	bfq_reassign_last_bfqq(bfqq, NULL);
 
 	bfq_reassign_last_bfqq(bfqq, NULL);
 
@@ -6794,24 +6789,8 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
 				bfqq = bfq_get_bfqq_handle_split(bfqd, bic, bio,
 								 true, is_sync,
 								 NULL);
-<<<<<<< HEAD
 				if (unlikely(bfqq == &bfqd->oom_bfqq))
 					bfqq_already_existing = true;
-=======
-				bfqq->waker_bfqq = old_bfqq->waker_bfqq;
-				bfqq->tentative_waker_bfqq = NULL;
-
-				/*
-				 * If the waker queue disappears, then
-				 * new_bfqq->waker_bfqq must be
-				 * reset. So insert new_bfqq into the
-				 * woken_list of the waker. See
-				 * bfq_check_waker for details.
-				 */
-				if (bfqq->waker_bfqq)
-					hlist_add_head(&bfqq->woken_list_node,
-						       &bfqq->waker_bfqq->woken_list);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			} else
 				bfqq_already_existing = true;
 

@@ -60,17 +60,13 @@ mt76_tx_status_unlock(struct mt76_dev *dev, struct sk_buff_head *list)
 			.skb = skb,
 			.info = IEEE80211_SKB_CB(skb),
 		};
-<<<<<<< HEAD
 		struct ieee80211_rate_status rs = {};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct mt76_tx_cb *cb = mt76_tx_skb_cb(skb);
 		struct mt76_wcid *wcid;
 
 		wcid = rcu_dereference(dev->wcid[cb->wcid]);
 		if (wcid) {
 			status.sta = wcid_to_sta(wcid);
-<<<<<<< HEAD
 			if (status.sta && (wcid->rate.flags || wcid->rate.legacy)) {
 				rs.rate_idx = wcid->rate;
 				status.rates = &rs;
@@ -78,10 +74,6 @@ mt76_tx_status_unlock(struct mt76_dev *dev, struct sk_buff_head *list)
 			} else {
 				status.n_rates = 0;
 			}
-=======
-			status.rates = NULL;
-			status.n_rates = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		hw = mt76_tx_status_get_hw(dev, skb);
@@ -177,7 +169,6 @@ mt76_tx_status_skb_get(struct mt76_dev *dev, struct mt76_wcid *wcid, int pktid,
 	skb = idr_remove(&wcid->pktid, pktid);
 	if (skb)
 		goto out;
-<<<<<<< HEAD
 
 	/* look for stale entries in the wcid idr queue */
 	idr_for_each_entry(&wcid->pktid, skb, id) {
@@ -192,22 +183,6 @@ mt76_tx_status_skb_get(struct mt76_dev *dev, struct mt76_wcid *wcid, int pktid,
 				continue;
 		}
 
-=======
-
-	/* look for stale entries in the wcid idr queue */
-	idr_for_each_entry(&wcid->pktid, skb, id) {
-		struct mt76_tx_cb *cb = mt76_tx_skb_cb(skb);
-
-		if (pktid >= 0) {
-			if (!(cb->flags & MT_TX_CB_DMA_DONE))
-				continue;
-
-			if (time_is_after_jiffies(cb->jiffies +
-						   MT_TX_STATUS_SKB_TIMEOUT))
-				continue;
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* It has been too long since DMA_DONE, time out this packet
 		 * and stop waiting for TXS callback.
 		 */

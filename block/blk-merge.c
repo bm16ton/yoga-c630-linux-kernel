@@ -333,19 +333,11 @@ split:
  * @bio:     bio to be split
  * @lim:     queue limits to split based on
  * @nr_segs: returns the number of segments in the returned bio
-<<<<<<< HEAD
  *
  * Check if @bio needs splitting based on the queue limits, and if so split off
  * a bio fitting the limits from the beginning of @bio and return it.  @bio is
  * shortened to the remainder and re-submitted.
  *
-=======
- *
- * Check if @bio needs splitting based on the queue limits, and if so split off
- * a bio fitting the limits from the beginning of @bio and return it.  @bio is
- * shortened to the remainder and re-submitted.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * The split bio is allocated from @q->bio_split, which is provided by the
  * block layer.
  */
@@ -366,11 +358,8 @@ struct bio *__bio_split_to_limits(struct bio *bio, struct queue_limits *lim,
 	default:
 		split = bio_split_rw(bio, lim, nr_segs, bs,
 				get_max_io_size(bio, lim) << SECTOR_SHIFT);
-<<<<<<< HEAD
 		if (IS_ERR(split))
 			return NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 

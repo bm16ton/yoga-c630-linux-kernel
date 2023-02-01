@@ -87,7 +87,6 @@
 
 #define SMI_COMMON_INIT_REGS_NR		6
 #define SMI_LARB_PORT_NR_MAX		32
-<<<<<<< HEAD
 
 #define MTK_SMI_FLAG_THRT_UPDATE	BIT(0)
 #define MTK_SMI_FLAG_SW_FLAG		BIT(1)
@@ -95,14 +94,6 @@
 #define MTK_SMI_FLAG_CFG_PORT_SEC_CTL	BIT(3)
 #define MTK_SMI_CAPS(flags, _x)		(!!((flags) & (_x)))
 
-=======
-
-#define MTK_SMI_FLAG_THRT_UPDATE	BIT(0)
-#define MTK_SMI_FLAG_SW_FLAG		BIT(1)
-#define MTK_SMI_FLAG_SLEEP_CTL		BIT(2)
-#define MTK_SMI_CAPS(flags, _x)		(!!((flags) & (_x)))
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct mtk_smi_reg_pair {
 	unsigned int		offset;
 	u32			value;
@@ -229,30 +220,19 @@ static int mtk_smi_larb_config_port_gen1(struct device *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int mtk_smi_larb_config_port_mt8167(struct device *dev)
-=======
-static void mtk_smi_larb_config_port_mt8167(struct device *dev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mtk_smi_larb *larb = dev_get_drvdata(dev);
 
 	writel(*larb->mmu, larb->base + MT8167_SMI_LARB_MMU_EN);
-<<<<<<< HEAD
 	return 0;
 }
 
 static int mtk_smi_larb_config_port_mt8173(struct device *dev)
-=======
-}
-
-static void mtk_smi_larb_config_port_mt8173(struct device *dev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct mtk_smi_larb *larb = dev_get_drvdata(dev);
 
 	writel(*larb->mmu, larb->base + MT8173_SMI_LARB_MMU_EN);
-<<<<<<< HEAD
 	return 0;
 }
 
@@ -352,41 +332,6 @@ static const u8 mtk_smi_larb_mt8188_ostd[][SMI_LARB_PORT_NR_MAX] = {
 	[25] = {0x01},
 };
 
-=======
-}
-
-static void mtk_smi_larb_config_port_gen2_general(struct device *dev)
-{
-	struct mtk_smi_larb *larb = dev_get_drvdata(dev);
-	u32 reg, flags_general = larb->larb_gen->flags_general;
-	const u8 *larbostd = larb->larb_gen->ostd ? larb->larb_gen->ostd[larb->larbid] : NULL;
-	int i;
-
-	if (BIT(larb->larbid) & larb->larb_gen->larb_direct_to_common_mask)
-		return;
-
-	if (MTK_SMI_CAPS(flags_general, MTK_SMI_FLAG_THRT_UPDATE)) {
-		reg = readl_relaxed(larb->base + SMI_LARB_CMD_THRT_CON);
-		reg &= ~SMI_LARB_THRT_RD_NU_LMT_MSK;
-		reg |= SMI_LARB_THRT_RD_NU_LMT;
-		writel_relaxed(reg, larb->base + SMI_LARB_CMD_THRT_CON);
-	}
-
-	if (MTK_SMI_CAPS(flags_general, MTK_SMI_FLAG_SW_FLAG))
-		writel_relaxed(SMI_LARB_SW_FLAG_1, larb->base + SMI_LARB_SW_FLAG);
-
-	for (i = 0; i < SMI_LARB_PORT_NR_MAX && larbostd && !!larbostd[i]; i++)
-		writel_relaxed(larbostd[i], larb->base + SMI_LARB_OSTDL_PORTx(i));
-
-	for_each_set_bit(i, (unsigned long *)larb->mmu, 32) {
-		reg = readl_relaxed(larb->base + SMI_LARB_NONSEC_CON(i));
-		reg |= F_MMU_EN;
-		reg |= BANK_SEL(larb->bank[i]);
-		writel(reg, larb->base + SMI_LARB_NONSEC_CON(i));
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const u8 mtk_smi_larb_mt8195_ostd[][SMI_LARB_PORT_NR_MAX] = {
 	[0] = {0x0a, 0xc, 0x22, 0x22, 0x01, 0x0a,}, /* larb0 */
 	[1] = {0x0a, 0xc, 0x22, 0x22, 0x01, 0x0a,}, /* larb1 */
@@ -473,7 +418,6 @@ static const struct mtk_smi_larb_gen mtk_smi_larb_mt8186 = {
 	.flags_general	            = MTK_SMI_FLAG_SLEEP_CTL,
 };
 
-<<<<<<< HEAD
 static const struct mtk_smi_larb_gen mtk_smi_larb_mt8188 = {
 	.config_port                = mtk_smi_larb_config_port_gen2_general,
 	.flags_general	            = MTK_SMI_FLAG_THRT_UPDATE | MTK_SMI_FLAG_SW_FLAG |
@@ -481,8 +425,6 @@ static const struct mtk_smi_larb_gen mtk_smi_larb_mt8188 = {
 	.ostd		            = mtk_smi_larb_mt8188_ostd,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct mtk_smi_larb_gen mtk_smi_larb_mt8192 = {
 	.config_port                = mtk_smi_larb_config_port_gen2_general,
 };
@@ -503,10 +445,7 @@ static const struct of_device_id mtk_smi_larb_of_ids[] = {
 	{.compatible = "mediatek,mt8173-smi-larb", .data = &mtk_smi_larb_mt8173},
 	{.compatible = "mediatek,mt8183-smi-larb", .data = &mtk_smi_larb_mt8183},
 	{.compatible = "mediatek,mt8186-smi-larb", .data = &mtk_smi_larb_mt8186},
-<<<<<<< HEAD
 	{.compatible = "mediatek,mt8188-smi-larb", .data = &mtk_smi_larb_mt8188},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{.compatible = "mediatek,mt8192-smi-larb", .data = &mtk_smi_larb_mt8192},
 	{.compatible = "mediatek,mt8195-smi-larb", .data = &mtk_smi_larb_mt8195},
 	{}
@@ -735,7 +674,6 @@ static const struct mtk_smi_common_plat mtk_smi_common_mt8186 = {
 	.bus_sel  = F_MMU1_LARB(1) | F_MMU1_LARB(4) | F_MMU1_LARB(7),
 };
 
-<<<<<<< HEAD
 static const struct mtk_smi_common_plat mtk_smi_common_mt8188_vdo = {
 	.type     = MTK_SMI_GEN2,
 	.bus_sel  = F_MMU1_LARB(1) | F_MMU1_LARB(5) | F_MMU1_LARB(7),
@@ -748,8 +686,6 @@ static const struct mtk_smi_common_plat mtk_smi_common_mt8188_vpp = {
 	.init     = mtk_smi_common_mt8195_init,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct mtk_smi_common_plat mtk_smi_common_mt8192 = {
 	.type     = MTK_SMI_GEN2,
 	.has_gals = true,
@@ -786,11 +722,8 @@ static const struct of_device_id mtk_smi_common_of_ids[] = {
 	{.compatible = "mediatek,mt8173-smi-common", .data = &mtk_smi_common_gen2},
 	{.compatible = "mediatek,mt8183-smi-common", .data = &mtk_smi_common_mt8183},
 	{.compatible = "mediatek,mt8186-smi-common", .data = &mtk_smi_common_mt8186},
-<<<<<<< HEAD
 	{.compatible = "mediatek,mt8188-smi-common-vdo", .data = &mtk_smi_common_mt8188_vdo},
 	{.compatible = "mediatek,mt8188-smi-common-vpp", .data = &mtk_smi_common_mt8188_vpp},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{.compatible = "mediatek,mt8192-smi-common", .data = &mtk_smi_common_mt8192},
 	{.compatible = "mediatek,mt8195-smi-common-vdo", .data = &mtk_smi_common_mt8195_vdo},
 	{.compatible = "mediatek,mt8195-smi-common-vpp", .data = &mtk_smi_common_mt8195_vpp},

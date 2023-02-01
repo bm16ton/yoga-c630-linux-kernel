@@ -18,11 +18,7 @@ Description:
 		on the signal from which time of flight measurements are
 		taken.
 		The appropriate values to take is dependent on both the
-<<<<<<< HEAD
 		sensor and its operating environment:
-=======
-		sensor and it's operating environment:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		* as3935 (0-31 range)
 		18 = indoors (default)
 		14 = outdoors

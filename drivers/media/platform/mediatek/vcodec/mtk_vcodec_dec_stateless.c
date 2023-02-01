@@ -138,7 +138,6 @@ static void mtk_vdec_stateless_cap_to_disp(struct mtk_vcodec_ctx *ctx, int error
 		state = VB2_BUF_STATE_DONE;
 
 	vb2_dst = v4l2_m2m_dst_buf_remove(ctx->m2m_ctx);
-<<<<<<< HEAD
 	if (vb2_dst) {
 		v4l2_m2m_buf_done(vb2_dst, state);
 		mtk_v4l2_debug(2, "free frame buffer id:%d to done list",
@@ -146,12 +145,6 @@ static void mtk_vdec_stateless_cap_to_disp(struct mtk_vcodec_ctx *ctx, int error
 	} else {
 		mtk_v4l2_err("dst buffer is NULL");
 	}
-=======
-	v4l2_m2m_buf_done(vb2_dst, state);
-
-	mtk_v4l2_debug(2, "free frame buffer id:%d to done list",
-		       vb2_dst->vb2_buf.index);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (src_buf_req)
 		v4l2_ctrl_request_complete(src_buf_req, &ctx->ctrl_hdl);
@@ -260,11 +253,7 @@ static void mtk_vdec_worker(struct work_struct *work)
 
 	state = ret ? VB2_BUF_STATE_ERROR : VB2_BUF_STATE_DONE;
 	if (!IS_VDEC_LAT_ARCH(dev->vdec_pdata->hw_arch) ||
-<<<<<<< HEAD
 	    ctx->current_codec == V4L2_PIX_FMT_VP8_FRAME) {
-=======
-	    ctx->current_codec == V4L2_PIX_FMT_VP8_FRAME || ret) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		v4l2_m2m_buf_done_and_job_finish(dev->m2m_dev_dec, ctx->m2m_ctx, state);
 		if (src_buf_req)
 			v4l2_ctrl_request_complete(src_buf_req, &ctx->ctrl_hdl);

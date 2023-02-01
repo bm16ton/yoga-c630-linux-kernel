@@ -677,13 +677,8 @@ static int meson_pinctrl_parse_dt(struct meson_pinctrl *pc)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	pc->fwnode = gpiochip_node_get_first(pc->dev);
 	gpio_np = to_of_node(pc->fwnode);
-=======
-	gpio_np = to_of_node(gpiochip_node_get_first(pc->dev));
-	pc->of_node = gpio_np;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pc->reg_mux = meson_map_resource(pc, gpio_np, "mux");
 	if (IS_ERR_OR_NULL(pc->reg_mux)) {

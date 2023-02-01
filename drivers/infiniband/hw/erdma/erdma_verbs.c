@@ -9,30 +9,14 @@
 
 /* Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved. */
 
-<<<<<<< HEAD
-=======
-#include <linux/errno.h>
-#include <linux/pci.h>
-#include <linux/types.h>
-#include <linux/uaccess.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/vmalloc.h>
 #include <net/addrconf.h>
 #include <rdma/erdma-abi.h>
 #include <rdma/ib_umem.h>
-<<<<<<< HEAD
-=======
-#include <rdma/ib_user_verbs.h>
-#include <rdma/ib_verbs.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <rdma/uverbs_ioctl.h>
 
 #include "erdma.h"
 #include "erdma_cm.h"
-<<<<<<< HEAD
-=======
-#include "erdma_hw.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "erdma_verbs.h"
 
 static int create_qp_cmd(struct erdma_dev *dev, struct erdma_qp *qp)
@@ -111,11 +95,7 @@ static int create_qp_cmd(struct erdma_dev *dev, struct erdma_qp *qp)
 		req.rq_db_info_dma_addr = user_qp->rq_db_info_dma_addr;
 	}
 
-<<<<<<< HEAD
 	err = erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), &resp0,
-=======
-	err = erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), &resp0,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				  &resp1);
 	if (!err)
 		qp->attrs.cookie =
@@ -164,12 +144,7 @@ static int regmr_cmd(struct erdma_dev *dev, struct erdma_mr *mr)
 	}
 
 post_cmd:
-<<<<<<< HEAD
 	return erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
-=======
-	return erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
-				   NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int create_cq_cmd(struct erdma_dev *dev, struct erdma_cq *cq)
@@ -219,12 +194,7 @@ static int create_cq_cmd(struct erdma_dev *dev, struct erdma_cq *cq)
 		req.cq_db_info_addr = cq->user_cq.db_info_dma_addr;
 	}
 
-<<<<<<< HEAD
 	return erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
-=======
-	return erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
-				   NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int erdma_alloc_idx(struct erdma_resource_cb *res_cb)
@@ -997,12 +967,7 @@ int erdma_dereg_mr(struct ib_mr *ibmr, struct ib_udata *udata)
 	req.cfg = FIELD_PREP(ERDMA_CMD_MR_MPT_IDX_MASK, ibmr->lkey >> 8) |
 		  FIELD_PREP(ERDMA_CMD_MR_KEY_MASK, ibmr->lkey & 0xFF);
 
-<<<<<<< HEAD
 	ret = erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
-=======
-	ret = erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
-				  NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -1027,12 +992,7 @@ int erdma_destroy_cq(struct ib_cq *ibcq, struct ib_udata *udata)
 				CMDQ_OPCODE_DESTROY_CQ);
 	req.cqn = cq->cqn;
 
-<<<<<<< HEAD
 	err = erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
-=======
-	err = erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
-				  NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -1069,12 +1029,7 @@ int erdma_destroy_qp(struct ib_qp *ibqp, struct ib_udata *udata)
 				CMDQ_OPCODE_DESTROY_QP);
 	req.qpn = QP_ID(qp);
 
-<<<<<<< HEAD
 	err = erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
-=======
-	err = erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
-				  NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -1481,7 +1436,6 @@ err_out_xa:
 	return ret;
 }
 
-<<<<<<< HEAD
 void erdma_set_mtu(struct erdma_dev *dev, u32 mtu)
 {
 	struct erdma_cmdq_config_mtu_req req;
@@ -1493,8 +1447,6 @@ void erdma_set_mtu(struct erdma_dev *dev, u32 mtu)
 	erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void erdma_port_event(struct erdma_dev *dev, enum ib_event_type reason)
 {
 	struct ib_event event;

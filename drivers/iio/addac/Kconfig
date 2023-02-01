@@ -17,7 +17,6 @@ config AD74413R
 	  To compile this driver as a module, choose M here: the
 	  module will be called ad74413r.
 
-<<<<<<< HEAD
 config STX104
 	tristate "Apex Embedded Systems STX104 driver"
 	depends on PC104 && X86
@@ -34,6 +33,4 @@ config STX104
 	  The base port addresses for the devices may be configured via the base
 	  array module parameter.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endmenu

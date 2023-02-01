@@ -33,19 +33,13 @@ properties:
     enum:
       - samsung,exynos850-cmu-top
       - samsung,exynos850-cmu-apm
-<<<<<<< HEAD
       - samsung,exynos850-cmu-aud
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - samsung,exynos850-cmu-cmgp
       - samsung,exynos850-cmu-core
       - samsung,exynos850-cmu-dpu
       - samsung,exynos850-cmu-hsi
-<<<<<<< HEAD
       - samsung,exynos850-cmu-is
       - samsung,exynos850-cmu-mfcmscl
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - samsung,exynos850-cmu-peri
 
   clocks:
@@ -101,7 +95,6 @@ allOf:
       properties:
         compatible:
           contains:
-<<<<<<< HEAD
             const: samsung,exynos850-cmu-aud
 
     then:
@@ -120,8 +113,6 @@ allOf:
       properties:
         compatible:
           contains:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             const: samsung,exynos850-cmu-cmgp
 
     then:
@@ -206,7 +197,6 @@ allOf:
       properties:
         compatible:
           contains:
-<<<<<<< HEAD
             const: samsung,exynos850-cmu-is
 
     then:
@@ -255,8 +245,6 @@ allOf:
       properties:
         compatible:
           contains:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             const: samsung,exynos850-cmu-peri
 
     then:

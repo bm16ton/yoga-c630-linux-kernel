@@ -202,19 +202,6 @@ config MTD_NAND_TMIO
 
 source "drivers/mtd/nand/raw/brcmnand/Kconfig"
 
-if MTD_NAND_BRCMNAND
-
-config MTD_NAND_BRCMNAND_BCMA
-	tristate "Broadcom BCMA NAND controller"
-	depends on BCMA_NFLASH
-	depends on BCMA
-	help
-	  Enables the BRCMNAND controller over BCMA on BCM47186/BCM5358 SoCs.
-	  The glue driver will take care of performing the low-level I/O
-	  operations to interface the BRCMNAND controller over the BCMA bus.
-
-endif # MTD_NAND_BRCMNAND
-
 config MTD_NAND_BCM47XXNFLASH
 	tristate "BCM4706 BCMA NAND controller"
 	depends on BCMA_NFLASH

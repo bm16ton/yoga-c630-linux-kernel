@@ -1171,10 +1171,7 @@ static int renoir_get_smu_metrics_data(struct smu_context *smu,
 	int ret = 0;
 	uint32_t apu_percent = 0;
 	uint32_t dgpu_percent = 0;
-<<<<<<< HEAD
 	struct amdgpu_device *adev = smu->adev;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 
 	ret = smu_cmn_get_metrics_table(smu,

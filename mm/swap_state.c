@@ -118,13 +118,8 @@ int add_to_swap_cache(struct folio *folio, swp_entry_t entry,
 			xas_next(&xas);
 		}
 		address_space->nrpages += nr;
-<<<<<<< HEAD
 		__node_stat_mod_folio(folio, NR_FILE_PAGES, nr);
 		__lruvec_stat_mod_folio(folio, NR_SWAPCACHE, nr);
-=======
-		__mod_node_page_state(page_pgdat(page), NR_FILE_PAGES, nr);
-		__mod_lruvec_page_state(page, NR_SWAPCACHE, nr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unlock:
 		xas_unlock_irq(&xas);
 	} while (xas_nomem(&xas, gfp));
@@ -156,11 +151,7 @@ void __delete_from_swap_cache(struct folio *folio,
 
 	for (i = 0; i < nr; i++) {
 		void *entry = xas_store(&xas, shadow);
-<<<<<<< HEAD
 		VM_BUG_ON_PAGE(entry != folio, entry);
-=======
-		VM_BUG_ON_FOLIO(entry != folio, folio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		set_page_private(folio_page(folio, i), 0);
 		xas_next(&xas);
 	}
@@ -203,11 +194,7 @@ bool add_to_swap(struct folio *folio)
 	/*
 	 * Add it to the swap cache.
 	 */
-<<<<<<< HEAD
 	err = add_to_swap_cache(folio, entry,
-=======
-	err = add_to_swap_cache(&folio->page, entry,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__GFP_HIGH|__GFP_NOMEMALLOC|__GFP_NOWARN, NULL);
 	if (err)
 		/*
@@ -231,11 +218,7 @@ bool add_to_swap(struct folio *folio)
 	return true;
 
 fail:
-<<<<<<< HEAD
 	put_swap_folio(folio, entry);
-=======
-	put_swap_page(&folio->page, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 
@@ -254,11 +237,7 @@ void delete_from_swap_cache(struct folio *folio)
 	__delete_from_swap_cache(folio, entry, NULL);
 	xa_unlock_irq(&address_space->i_pages);
 
-<<<<<<< HEAD
 	put_swap_folio(folio, entry);
-=======
-	put_swap_page(&folio->page, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	folio_ref_sub(folio, folio_nr_pages(folio));
 }
 
@@ -358,11 +337,7 @@ struct folio *swap_cache_get_folio(swp_entry_t entry,
 	folio = filemap_get_folio(swap_address_space(entry), swp_offset(entry));
 	put_swap_device(si);
 
-<<<<<<< HEAD
 	if (folio) {
-=======
-	if (page) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bool vma_ra = swap_use_vma_readahead();
 		bool readahead;
 
@@ -508,29 +483,17 @@ struct page *__read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 	__folio_set_locked(folio);
 	__folio_set_swapbacked(folio);
 
-<<<<<<< HEAD
 	if (mem_cgroup_swapin_charge_folio(folio, NULL, gfp_mask, entry))
 		goto fail_unlock;
 
 	/* May fail (-ENOMEM) if XArray node allocation failed. */
 	if (add_to_swap_cache(folio, entry, gfp_mask & GFP_RECLAIM_MASK, &shadow))
-=======
-	if (mem_cgroup_swapin_charge_page(page, NULL, gfp_mask, entry))
-		goto fail_unlock;
-
-	/* May fail (-ENOMEM) if XArray node allocation failed. */
-	if (add_to_swap_cache(page, entry, gfp_mask & GFP_RECLAIM_MASK, &shadow))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto fail_unlock;
 
 	mem_cgroup_swapin_uncharge_swap(entry);
 
 	if (shadow)
-<<<<<<< HEAD
 		workingset_refault(folio, shadow);
-=======
-		workingset_refault(page_folio(page), shadow);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Caller will initiate read into locked folio */
 	folio_add_lru(folio);
@@ -538,15 +501,9 @@ struct page *__read_swap_cache_async(swp_entry_t entry, gfp_t gfp_mask,
 	return &folio->page;
 
 fail_unlock:
-<<<<<<< HEAD
 	put_swap_folio(folio, entry);
 	folio_unlock(folio);
 	folio_put(folio);
-=======
-	put_swap_page(page, entry);
-	unlock_page(page);
-	put_page(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return NULL;
 }
 

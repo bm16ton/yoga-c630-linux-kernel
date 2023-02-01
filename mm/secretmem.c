@@ -276,7 +276,6 @@ static struct file_system_type secretmem_fs = {
 	.kill_sb	= kill_anon_super,
 };
 
-<<<<<<< HEAD
 static int __init secretmem_init(void)
 {
 	if (!secretmem_enable)
@@ -285,26 +284,10 @@ static int __init secretmem_init(void)
 	secretmem_mnt = kern_mount(&secretmem_fs);
 	if (IS_ERR(secretmem_mnt))
 		return PTR_ERR(secretmem_mnt);
-=======
-static int secretmem_init(void)
-{
-	int ret = 0;
-
-	if (!secretmem_enable)
-		return ret;
-
-	secretmem_mnt = kern_mount(&secretmem_fs);
-	if (IS_ERR(secretmem_mnt))
-		ret = PTR_ERR(secretmem_mnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* prevent secretmem mappings from ever getting PROT_EXEC */
 	secretmem_mnt->mnt_flags |= MNT_NOEXEC;
 
-<<<<<<< HEAD
 	return 0;
-=======
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 fs_initcall(secretmem_init);

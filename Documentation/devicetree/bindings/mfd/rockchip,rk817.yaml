@@ -87,10 +87,7 @@ properties:
     patternProperties:
       "^(LDO_REG[1-9]|DCDC_REG[1-4]|BOOST|OTG_SWITCH)$":
         type: object
-<<<<<<< HEAD
         unevaluatedProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         $ref: ../regulator/regulator.yaml#
     unevaluatedProperties: false
 
@@ -115,17 +112,13 @@ properties:
       additional properties are required for the codec, this node can be
       omitted.
     type: object
-<<<<<<< HEAD
     additionalProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     properties:
       rockchip,mic-in-differential:
         type: boolean
         description:
           Describes if the microphone uses differential mode.
 
-<<<<<<< HEAD
   charger:
     description: |
       The child node for the charger to hold additional properties. If a
@@ -169,8 +162,6 @@ properties:
 
     additionalProperties: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 allOf:
   - if:
       properties:
@@ -377,7 +368,6 @@ examples:
                 };
             };
 
-<<<<<<< HEAD
             rk817_charger: charger {
                 monitored-battery = <&battery>;
                 rockchip,resistor-sense-micro-ohms = <10000>;
@@ -385,8 +375,6 @@ examples:
                 rockchip,sleep-filter-current-microamp = <100000>;
             };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             rk817_codec: codec {
                 rockchip,mic-in-differential;
             };

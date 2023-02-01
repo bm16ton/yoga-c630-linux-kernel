@@ -367,13 +367,9 @@ int dwc3_send_gadget_ep_cmd(struct dwc3_ep *dep, unsigned int cmd,
 
 	dwc3_writel(dep->regs, DWC3_DEPCMD, cmd);
 
-<<<<<<< HEAD
 	if (!(cmd & DWC3_DEPCMD_CMDACT) ||
 		(DWC3_DEPCMD_CMD(cmd) == DWC3_DEPCMD_ENDTRANSFER &&
 		!(cmd & DWC3_DEPCMD_CMDIOC))) {
-=======
-	if (!(cmd & DWC3_DEPCMD_CMDACT)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = 0;
 		goto skip_status;
 	}
@@ -972,11 +968,7 @@ out:
 	return 0;
 }
 
-<<<<<<< HEAD
 void dwc3_remove_requests(struct dwc3 *dwc, struct dwc3_ep *dep, int status)
-=======
-static void dwc3_remove_requests(struct dwc3 *dwc, struct dwc3_ep *dep, int status)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dwc3_request		*req;
 
@@ -1036,7 +1028,6 @@ static int __dwc3_gadget_ep_disable(struct dwc3_ep *dep)
 
 	dep->stream_capable = false;
 	dep->type = 0;
-<<<<<<< HEAD
 	mask = DWC3_EP_TXFIFO_RESIZED;
 	/*
 	 * dwc3_remove_requests() can exit early if DWC3 EP delayed stop is
@@ -1046,9 +1037,6 @@ static int __dwc3_gadget_ep_disable(struct dwc3_ep *dep)
 	if (dep->flags & DWC3_EP_DELAY_STOP)
 		mask |= (DWC3_EP_DELAY_STOP | DWC3_EP_TRANSFER_STARTED);
 	dep->flags &= mask;
-=======
-	dep->flags &= DWC3_EP_TXFIFO_RESIZED;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Clear out the ep descriptors for non-ep0 */
 	if (dep->number > 1) {
@@ -1729,10 +1717,7 @@ static int __dwc3_stop_active_transfer(struct dwc3_ep *dep, bool force, bool int
 	else if (!ret)
 		dep->flags |= DWC3_EP_END_TRANSFER_PENDING;
 
-<<<<<<< HEAD
 	dep->flags &= ~DWC3_EP_DELAY_STOP;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -2613,11 +2598,8 @@ static int dwc3_gadget_pullup(struct usb_gadget *g, int is_on)
 		pm_runtime_put(dwc->dev);
 		return 0;
 	}
-<<<<<<< HEAD
 
 	synchronize_irq(dwc->irq_gadget);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!is_on) {
 		ret = dwc3_gadget_soft_disconnect(dwc);
@@ -3740,15 +3722,11 @@ void dwc3_stop_active_transfer(struct dwc3_ep *dep, bool force,
 	 */
 	if (dep->number <= 1 && dwc->ep0state != EP0_DATA_PHASE)
 		return;
-<<<<<<< HEAD
 
 	if (interrupt && (dep->flags & DWC3_EP_DELAY_STOP))
 		return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!(dep->flags & DWC3_EP_TRANSFER_STARTED) ||
-	    (dep->flags & DWC3_EP_DELAY_STOP) ||
 	    (dep->flags & DWC3_EP_END_TRANSFER_PENDING))
 		return;
 

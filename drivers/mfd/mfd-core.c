@@ -105,11 +105,7 @@ static void mfd_acpi_add_device(const struct mfd_cell *cell,
 				.ids = ids,
 			};
 
-<<<<<<< HEAD
 			strscpy(ids[0].id, match->pnpid, sizeof(ids[0].id));
-=======
-			strlcpy(ids[0].id, match->pnpid, sizeof(ids[0].id));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			acpi_dev_for_each_child(parent, match_device_ids, &wd);
 			adev = wd.adev;
 		} else {
@@ -387,15 +383,12 @@ static int mfd_remove_devices_fn(struct device *dev, void *data)
 	if (cell->swnode)
 		device_remove_software_node(&pdev->dev);
 
-<<<<<<< HEAD
 	list_for_each_entry_safe(of_entry, tmp, &mfd_of_node_list, list)
 		if (of_entry->dev == &pdev->dev) {
 			list_del(&of_entry->list);
 			kfree(of_entry);
 		}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	regulator_bulk_unregister_supply_alias(dev, cell->parent_supplies,
 					       cell->num_parent_supplies);
 

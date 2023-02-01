@@ -274,7 +274,6 @@ static void __serial_lpc32xx_rx(struct uart_port *port)
 	}
 
 	tty_flip_buffer_push(tport);
-<<<<<<< HEAD
 }
 
 static void serial_lpc32xx_stop_tx(struct uart_port *port);
@@ -284,11 +283,7 @@ static bool serial_lpc32xx_tx_ready(struct uart_port *port)
 	u32 level = readl(LPC32XX_HSUART_LEVEL(port->membase));
 
 	return LPC32XX_HSU_TX_LEV(level) < 64;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
-
-static void serial_lpc32xx_stop_tx(struct uart_port *port);
 
 static void __serial_lpc32xx_tx(struct uart_port *port)
 {

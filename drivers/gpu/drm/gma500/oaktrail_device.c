@@ -44,13 +44,7 @@ static int oaktrail_output_init(struct drm_device *dev)
 
 static void oaktrail_set_brightness(struct drm_device *dev, int level)
 {
-<<<<<<< HEAD
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-=======
-	struct drm_device *dev = bl_get_data(oaktrail_backlight_device);
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	int level = bd->props.brightness;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 blc_pwm_ctl;
 	u32 max_pwm_blc;
 
@@ -108,35 +102,7 @@ static int oaktrail_backlight_init(struct drm_device *dev)
 		gma_power_end(dev);
 	}
 
-<<<<<<< HEAD
 	oaktrail_set_brightness(dev, PSB_MAX_BRIGHTNESS);
-=======
-static int oaktrail_backlight_init(struct drm_device *dev)
-{
-	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
-	int ret;
-	struct backlight_properties props;
-
-	memset(&props, 0, sizeof(struct backlight_properties));
-	props.max_brightness = 100;
-	props.type = BACKLIGHT_PLATFORM;
-
-	oaktrail_backlight_device = backlight_device_register("oaktrail-bl",
-				NULL, (void *)dev, &oaktrail_ops, &props);
-
-	if (IS_ERR(oaktrail_backlight_device))
-		return PTR_ERR(oaktrail_backlight_device);
-
-	ret = device_backlight_init(dev);
-	if (ret < 0) {
-		backlight_device_unregister(oaktrail_backlight_device);
-		return ret;
-	}
-	oaktrail_backlight_device->props.brightness = 100;
-	oaktrail_backlight_device->props.max_brightness = 100;
-	backlight_update_status(oaktrail_backlight_device);
-	dev_priv->backlight_device = oaktrail_backlight_device;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

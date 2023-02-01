@@ -571,11 +571,6 @@ static void st21nfca_hci_i2c_remove(struct i2c_client *client)
 	if (phy->powered)
 		st21nfca_hci_i2c_disable(phy);
 	kfree_skb(phy->pending_skb);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id st21nfca_hci_i2c_id_table[] = {

@@ -685,46 +685,23 @@ static int mtk_iommu_v1_probe(struct platform_device *pdev)
 	ret = iommu_device_sysfs_add(&data->iommu, &pdev->dev, NULL,
 				     dev_name(&pdev->dev));
 	if (ret)
-<<<<<<< HEAD
 		goto out_clk_unprepare;
-=======
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = iommu_device_register(&data->iommu, &mtk_iommu_v1_ops, dev);
 	if (ret)
 		goto out_sysfs_remove;
 
-<<<<<<< HEAD
 	ret = component_master_add_with_match(dev, &mtk_iommu_v1_com_ops, match);
 	if (ret)
 		goto out_dev_unreg;
 	return ret;
 
-=======
-	if (!iommu_present(&platform_bus_type)) {
-		ret = bus_set_iommu(&platform_bus_type,  &mtk_iommu_v1_ops);
-		if (ret)
-			goto out_dev_unreg;
-	}
-
-	ret = component_master_add_with_match(dev, &mtk_iommu_v1_com_ops, match);
-	if (ret)
-		goto out_bus_set_null;
-	return ret;
-
-out_bus_set_null:
-	bus_set_iommu(&platform_bus_type, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_dev_unreg:
 	iommu_device_unregister(&data->iommu);
 out_sysfs_remove:
 	iommu_device_sysfs_remove(&data->iommu);
-<<<<<<< HEAD
 out_clk_unprepare:
 	clk_disable_unprepare(data->bclk);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 

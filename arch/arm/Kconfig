@@ -131,7 +131,6 @@ config ARM
 	select PCI_SYSCALL if PCI
 	select PERF_USE_VMALLOC
 	select RTC_LIB
-<<<<<<< HEAD
 	select SPARSE_IRQ if !(ARCH_FOOTBRIDGE || ARCH_RPC)
 	select SYS_SUPPORTS_APM_EMULATION
 	select THREAD_INFO_IN_TASK
@@ -139,12 +138,6 @@ config ARM
 	select HAVE_ARCH_VMAP_STACK if MMU && ARM_HAS_GROUP_RELOCS
 	select TRACE_IRQFLAGS_SUPPORT if !CPU_V7M
 	select USE_OF if !(ARCH_FOOTBRIDGE || ARCH_RPC || ARCH_SA1100)
-=======
-	select SYS_SUPPORTS_APM_EMULATION
-	select THREAD_INFO_IN_TASK
-	select HAVE_ARCH_VMAP_STACK if MMU && ARM_HAS_GROUP_RELOCS
-	select TRACE_IRQFLAGS_SUPPORT if !CPU_V7M
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	# Above selects are sorted alphabetically; please add new ones
 	# according to that.  Thanks.
 	help
@@ -165,12 +158,6 @@ config ARM_HAS_GROUP_RELOCS
 	  supported in LLD until version 14. The combined range is -/+ 256 MiB,
 	  which is usually sufficient, but not for allyesconfig, so we disable
 	  this feature when doing compile testing.
-<<<<<<< HEAD
-=======
-
-config ARM_HAS_SG_CHAIN
-	bool
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config ARM_DMA_USE_IOMMU
 	bool
@@ -321,18 +308,8 @@ config MMU
 config ARM_SINGLE_ARMV7M
 	def_bool !MMU
 	select ARM_NVIC
-<<<<<<< HEAD
 	select CPU_V7M
 	select NO_IOPORT_MAP
-=======
-	select AUTO_ZRELADDR
-	select TIMER_OF
-	select COMMON_CLK
-	select CPU_V7M
-	select NO_IOPORT_MAP
-	select SPARSE_IRQ
-	select USE_OF
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config ARCH_MMAP_RND_BITS_MIN
 	default 8
@@ -342,7 +319,6 @@ config ARCH_MMAP_RND_BITS_MAX
 	default 15 if PAGE_OFFSET=0x80000000
 	default 16
 
-<<<<<<< HEAD
 config ARCH_MULTIPLATFORM
 	bool "Require kernel to be portable to multiple machines" if EXPERT
 	depends on MMU && !(ARCH_FOOTBRIDGE || ARCH_RPC || ARCH_SA1100)
@@ -360,88 +336,6 @@ config ARCH_MULTIPLATFORM
 
 menu "Platform selection"
 	depends on MMU
-=======
-#
-# The "ARM system type" choice list is ordered alphabetically by option
-# text.  Please add new entries in the option alphabetic order.
-#
-choice
-	prompt "ARM system type"
-	depends on MMU
-	default ARCH_MULTIPLATFORM
-
-config ARCH_MULTIPLATFORM
-	bool "Allow multiple platforms to be selected"
-	select ARCH_FLATMEM_ENABLE
-	select ARCH_SPARSEMEM_ENABLE
-	select ARCH_SELECT_MEMORY_MODEL
-	select ARM_HAS_SG_CHAIN
-	select ARM_PATCH_PHYS_VIRT
-	select AUTO_ZRELADDR
-	select TIMER_OF
-	select COMMON_CLK
-	select HAVE_PCI
-	select PCI_DOMAINS_GENERIC if PCI
-	select SPARSE_IRQ
-	select USE_OF
-
-config ARCH_FOOTBRIDGE
-	bool "FootBridge"
-	depends on CPU_LITTLE_ENDIAN
-	depends on ATAGS
-	select CPU_SA110
-	select FOOTBRIDGE
-	select NEED_MACH_MEMORY_H
-	help
-	  Support for systems based on the DC21285 companion chip
-	  ("FootBridge"), such as the Simtec CATS and the Rebel NetWinder.
-
-config ARCH_RPC
-	bool "RiscPC"
-	depends on !CC_IS_CLANG && GCC_VERSION < 90100 && GCC_VERSION >= 60000
-	depends on CPU_LITTLE_ENDIAN
-	depends on ATAGS
-	select ARCH_ACORN
-	select ARCH_MAY_HAVE_PC_FDC
-	select ARCH_SPARSEMEM_ENABLE
-	select ARM_HAS_SG_CHAIN
-	select CPU_SA110
-	select FIQ
-	select HAVE_PATA_PLATFORM
-	select ISA_DMA_API
-	select LEGACY_TIMER_TICK
-	select NEED_MACH_IO_H
-	select NEED_MACH_MEMORY_H
-	select NO_IOPORT_MAP
-	help
-	  On the Acorn Risc-PC, Linux can support the internal IDE disk and
-	  CD-ROM interface, serial and parallel port, and the floppy drive.
-
-config ARCH_SA1100
-	bool "SA1100-based"
-	depends on CPU_LITTLE_ENDIAN
-	depends on ATAGS
-	select ARCH_MTD_XIP
-	select ARCH_SPARSEMEM_ENABLE
-	select CLKSRC_MMIO
-	select CLKSRC_PXA
-	select TIMER_OF if OF
-	select COMMON_CLK
-	select CPU_FREQ
-	select CPU_SA1100
-	select GPIOLIB
-	select IRQ_DOMAIN
-	select ISA
-	select NEED_MACH_MEMORY_H
-	select SPARSE_IRQ
-	help
-	  Support for StrongARM 11x0 based boards.
-
-endchoice
-
-menu "Multiple platform selection"
-	depends on ARCH_MULTIPLATFORM
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 comment "CPU Core family selection"
 
@@ -511,10 +405,6 @@ config ARCH_AIROHA
 	select ARM_GIC_V3
 	select ARM_PSCI
 	select HAVE_ARM_ARCH_TIMER
-<<<<<<< HEAD
-=======
-	select COMMON_CLK
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Support for Airoha EN7523 SoCs
 
@@ -615,11 +505,8 @@ source "arch/arm/mach-rda/Kconfig"
 
 source "arch/arm/mach-realtek/Kconfig"
 
-<<<<<<< HEAD
 source "arch/arm/mach-rpc/Kconfig"
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "arch/arm/mach-rockchip/Kconfig"
 
 source "arch/arm/mach-s3c/Kconfig"
@@ -1963,11 +1850,4 @@ config ARCH_HIBERNATION_POSSIBLE
 
 endmenu
 
-<<<<<<< HEAD
-=======
-if CRYPTO
-source "arch/arm/crypto/Kconfig"
-endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "arch/arm/Kconfig.assembler"

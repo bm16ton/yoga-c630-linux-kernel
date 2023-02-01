@@ -310,11 +310,7 @@ static ssize_t bonding_show_missed_max(struct device *d,
 {
 	struct bonding *bond = to_bond(d);
 
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%u\n", bond->params.missed_max);
-=======
-	return sprintf(buf, "%u\n", bond->params.missed_max);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 static DEVICE_ATTR(arp_missed_max, 0644,
 		   bonding_show_missed_max, bonding_sysfs_store_option);
@@ -365,11 +361,7 @@ static ssize_t bonding_show_lacp_active(struct device *d,
 
 	val = bond_opt_get_val(BOND_OPT_LACP_ACTIVE, bond->params.lacp_active);
 
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%s %d\n", val->string, bond->params.lacp_active);
-=======
-	return sprintf(buf, "%s %d\n", val->string, bond->params.lacp_active);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 static DEVICE_ATTR(lacp_active, 0644,
 		   bonding_show_lacp_active, bonding_sysfs_store_option);
@@ -420,11 +412,7 @@ static ssize_t bonding_show_num_peer_notif(struct device *d,
 {
 	struct bonding *bond = to_bond(d);
 
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%d\n", bond->params.num_peer_notif);
-=======
-	return sprintf(buf, "%d\n", bond->params.num_peer_notif);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 static DEVICE_ATTR(num_grat_arp, 0644,
 		   bonding_show_num_peer_notif, bonding_sysfs_store_option);
@@ -536,15 +524,9 @@ static ssize_t bonding_show_ad_aggregator(struct device *d,
 	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
 		struct ad_info ad_info;
 
-<<<<<<< HEAD
 		count = sysfs_emit(buf, "%d\n",
 				   bond_3ad_get_active_agg_info(bond, &ad_info)
 				   ?  0 : ad_info.aggregator_id);
-=======
-		count = sprintf(buf, "%d\n",
-				bond_3ad_get_active_agg_info(bond, &ad_info)
-				?  0 : ad_info.aggregator_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return count;
@@ -563,15 +545,9 @@ static ssize_t bonding_show_ad_num_ports(struct device *d,
 	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
 		struct ad_info ad_info;
 
-<<<<<<< HEAD
 		count = sysfs_emit(buf, "%d\n",
 				   bond_3ad_get_active_agg_info(bond, &ad_info)
 				   ?  0 : ad_info.ports);
-=======
-		count = sprintf(buf, "%d\n",
-				bond_3ad_get_active_agg_info(bond, &ad_info)
-				?  0 : ad_info.ports);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return count;
@@ -590,15 +566,9 @@ static ssize_t bonding_show_ad_actor_key(struct device *d,
 	if (BOND_MODE(bond) == BOND_MODE_8023AD && capable(CAP_NET_ADMIN)) {
 		struct ad_info ad_info;
 
-<<<<<<< HEAD
 		count = sysfs_emit(buf, "%d\n",
 				   bond_3ad_get_active_agg_info(bond, &ad_info)
 				   ?  0 : ad_info.actor_key);
-=======
-		count = sprintf(buf, "%d\n",
-				bond_3ad_get_active_agg_info(bond, &ad_info)
-				?  0 : ad_info.actor_key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return count;
@@ -617,15 +587,9 @@ static ssize_t bonding_show_ad_partner_key(struct device *d,
 	if (BOND_MODE(bond) == BOND_MODE_8023AD && capable(CAP_NET_ADMIN)) {
 		struct ad_info ad_info;
 
-<<<<<<< HEAD
 		count = sysfs_emit(buf, "%d\n",
 				   bond_3ad_get_active_agg_info(bond, &ad_info)
 				   ?  0 : ad_info.partner_key);
-=======
-		count = sprintf(buf, "%d\n",
-				bond_3ad_get_active_agg_info(bond, &ad_info)
-				?  0 : ad_info.partner_key);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return count;
@@ -729,11 +693,7 @@ static ssize_t bonding_show_tlb_dynamic_lb(struct device *d,
 {
 	struct bonding *bond = to_bond(d);
 
-<<<<<<< HEAD
 	return sysfs_emit(buf, "%d\n", bond->params.tlb_dynamic_lb);
-=======
-	return sprintf(buf, "%d\n", bond->params.tlb_dynamic_lb);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 static DEVICE_ATTR(tlb_dynamic_lb, 0644,
 		   bonding_show_tlb_dynamic_lb, bonding_sysfs_store_option);

@@ -1,13 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 config VIDEO_SUN6I_CSI
-<<<<<<< HEAD
 	tristate "Allwinner A31 Camera Sensor Interface (CSI) Driver"
 	depends on V4L_PLATFORM_DRIVERS && VIDEO_DEV
-=======
-	tristate "Allwinner V3s Camera Sensor Interface driver"
-	depends on V4L_PLATFORM_DRIVERS
-	depends on VIDEO_DEV && COMMON_CLK && RESET_CONTROLLER && HAS_DMA
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on ARCH_SUNXI || COMPILE_TEST
 	depends on PM && COMMON_CLK && RESET_CONTROLLER && HAS_DMA
 	select MEDIA_CONTROLLER

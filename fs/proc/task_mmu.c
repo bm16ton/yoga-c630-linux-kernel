@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
 #include <linux/pagewalk.h>
-<<<<<<< HEAD
-=======
-#include <linux/vmacache.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/mm_inline.h>
 #include <linux/hugetlb.h>
 #include <linux/huge_mm.h>
@@ -871,11 +867,7 @@ static int show_smap(struct seq_file *m, void *v)
 	__show_smap(m, &mss, false);
 
 	seq_printf(m, "THPeligible:    %d\n",
-<<<<<<< HEAD
 		   hugepage_vma_check(vma, vma->vm_flags, true, false, true));
-=======
-		   hugepage_vma_check(vma, vma->vm_flags, true, false));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (arch_pkeys_enabled())
 		seq_printf(m, "ProtectionKey:  %8u\n", vma_pkey(vma));
@@ -985,13 +977,8 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
 		/* Case 2 above */
 	} while ((vma = mas_find(&mas, ULONG_MAX)) != NULL);
 
-<<<<<<< HEAD
 empty_set:
 	show_vma_header_prefix(m, vma_start, last_vma_end, 0, 0, 0, 0);
-=======
-	show_vma_header_prefix(m, priv->mm->mmap ? priv->mm->mmap->vm_start : 0,
-			       last_vma_end, 0, 0, 0, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	seq_pad(m, ' ');
 	seq_puts(m, "[rollup]\n");
 

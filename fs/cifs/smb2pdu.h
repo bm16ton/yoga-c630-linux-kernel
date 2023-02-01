@@ -56,12 +56,9 @@ struct smb2_rdma_crypto_transform {
 
 #define COMPOUND_FID 0xFFFFFFFFFFFFFFFFULL
 
-<<<<<<< HEAD
 #define SMB2_SYMLINK_STRUCT_SIZE \
 	(sizeof(struct smb2_err_rsp) - 1 + sizeof(struct smb2_symlink_err_rsp))
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define SYMLINK_ERROR_TAG 0x4c4d5953
 
 struct smb2_symlink_err_rsp {

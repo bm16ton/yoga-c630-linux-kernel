@@ -315,7 +315,6 @@ int asoc_simple_startup(struct snd_pcm_substream *substream)
 		if (ret)
 			goto cpu_err;
 	}
-<<<<<<< HEAD
 
 	for_each_prop_dai_codec(props, i2, dai) {
 		ret = asoc_simple_clk_enable(dai);
@@ -340,32 +339,6 @@ int asoc_simple_startup(struct snd_pcm_substream *substream)
 			goto codec_err;
 	}
 
-=======
-
-	for_each_prop_dai_codec(props, i2, dai) {
-		ret = asoc_simple_clk_enable(dai);
-		if (ret)
-			goto codec_err;
-		ret = asoc_simple_check_fixed_sysclk(rtd->dev, dai, &fixed_sysclk);
-		if (ret)
-			goto codec_err;
-	}
-
-	if (fixed_sysclk && props->mclk_fs) {
-		unsigned int fixed_rate = fixed_sysclk / props->mclk_fs;
-
-		if (fixed_sysclk % props->mclk_fs) {
-			dev_err(rtd->dev, "fixed sysclk %u not divisible by mclk_fs %u\n",
-				fixed_sysclk, props->mclk_fs);
-			return -EINVAL;
-		}
-		ret = snd_pcm_hw_constraint_minmax(substream->runtime, SNDRV_PCM_HW_PARAM_RATE,
-			fixed_rate, fixed_rate);
-		if (ret)
-			goto codec_err;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 codec_err:
@@ -602,7 +575,6 @@ static int asoc_simple_init_for_codec2codec(struct snd_soc_pcm_runtime *rtd,
 	struct snd_pcm_hardware hw;
 	int i, ret, stream;
 
-<<<<<<< HEAD
 	/* Do nothing if it already has Codec2Codec settings */
 	if (dai_link->params)
 		return 0;
@@ -614,11 +586,6 @@ static int asoc_simple_init_for_codec2codec(struct snd_soc_pcm_runtime *rtd,
 	/* Only Codecs */
 	for_each_rtd_components(rtd, i, component) {
 		if (!asoc_simple_component_is_codec(component))
-=======
-	/* Only Codecs */
-	for_each_rtd_components(rtd, i, component) {
-		if (!snd_soc_component_is_codec(component))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 0;
 	}
 
@@ -669,11 +636,7 @@ int asoc_simple_dai_init(struct snd_soc_pcm_runtime *rtd)
 			return ret;
 	}
 
-<<<<<<< HEAD
 	ret = asoc_simple_init_for_codec2codec(rtd, props);
-=======
-	ret = asoc_simple_init_dai_link_params(rtd, props);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		return ret;
 
@@ -842,12 +805,7 @@ int asoc_simple_init_priv(struct asoc_simple_priv *priv,
 	struct asoc_simple_dai *dais;
 	struct snd_soc_dai_link_component *dlcs;
 	struct snd_soc_codec_conf *cconf = NULL;
-<<<<<<< HEAD
 	int i, dai_num = 0, dlc_num = 0, cnf_num = 0;
-=======
-	struct snd_soc_pcm_stream *c2c_conf = NULL;
-	int i, dai_num = 0, dlc_num = 0, cnf_num = 0, c2c_num = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dai_props = devm_kcalloc(dev, li->link, sizeof(*dai_props), GFP_KERNEL);
 	dai_link  = devm_kcalloc(dev, li->link, sizeof(*dai_link),  GFP_KERNEL);
@@ -866,11 +824,6 @@ int asoc_simple_init_priv(struct asoc_simple_priv *priv,
 
 		if (!li->num[i].cpus)
 			cnf_num += li->num[i].codecs;
-<<<<<<< HEAD
-=======
-
-		c2c_num += li->num[i].c2c;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	dais = devm_kcalloc(dev, dai_num, sizeof(*dais), GFP_KERNEL);
@@ -882,15 +835,6 @@ int asoc_simple_init_priv(struct asoc_simple_priv *priv,
 		cconf = devm_kcalloc(dev, cnf_num, sizeof(*cconf), GFP_KERNEL);
 		if (!cconf)
 			return -ENOMEM;
-<<<<<<< HEAD
-=======
-	}
-
-	if (c2c_num) {
-		c2c_conf = devm_kcalloc(dev, c2c_num, sizeof(*c2c_conf), GFP_KERNEL);
-		if (!c2c_conf)
-			return -ENOMEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	dev_dbg(dev, "link %d, dais %d, ccnf %d\n",
@@ -906,7 +850,6 @@ int asoc_simple_init_priv(struct asoc_simple_priv *priv,
 	priv->dais		= dais;
 	priv->dlcs		= dlcs;
 	priv->codec_conf	= cconf;
-	priv->c2c_conf		= c2c_conf;
 
 	card->dai_link		= priv->dai_link;
 	card->num_links		= li->link;
@@ -924,15 +867,6 @@ int asoc_simple_init_priv(struct asoc_simple_priv *priv,
 
 			dlcs += li->num[i].cpus;
 			dais += li->num[i].cpus;
-<<<<<<< HEAD
-=======
-
-			if (li->num[i].c2c) {
-				/* Codec2Codec */
-				dai_props[i].c2c_conf = c2c_conf;
-				c2c_conf += li->num[i].c2c;
-			}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			/* DPCM Be's CPU = dummy */
 			dai_props[i].cpus	=
@@ -990,13 +924,9 @@ int asoc_simple_remove(struct platform_device *pdev)
 {
 	struct snd_soc_card *card = platform_get_drvdata(pdev);
 
-<<<<<<< HEAD
 	asoc_simple_clean_reference(card);
 
 	return 0;
-=======
-	return asoc_simple_clean_reference(card);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(asoc_simple_remove);
 

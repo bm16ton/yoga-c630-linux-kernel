@@ -613,7 +613,6 @@ static int bq25890_power_supply_get_property(struct power_supply *psy,
 	return 0;
 }
 
-<<<<<<< HEAD
 static int bq25890_power_supply_set_property(struct power_supply *psy,
 					     enum power_supply_property psp,
 					     const union power_supply_propval *val)
@@ -641,8 +640,6 @@ static int bq25890_power_supply_property_is_writeable(struct power_supply *psy,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* On the BQ25892 try to get charger-type info from our supplier */
 static void bq25890_charger_external_power_changed(struct power_supply *psy)
 {
@@ -904,11 +901,8 @@ static const struct power_supply_desc bq25890_power_supply_desc = {
 	.properties = bq25890_power_supply_props,
 	.num_properties = ARRAY_SIZE(bq25890_power_supply_props),
 	.get_property = bq25890_power_supply_get_property,
-<<<<<<< HEAD
 	.set_property = bq25890_power_supply_set_property,
 	.property_is_writeable = bq25890_power_supply_property_is_writeable,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.external_power_changed	= bq25890_charger_external_power_changed,
 };
 
@@ -981,10 +975,7 @@ static void bq25890_pump_express_work(struct work_struct *data)
 
 	return;
 error_print:
-<<<<<<< HEAD
 	bq25890_field_write(bq, F_PUMPX_EN, 0);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev_err(bq->dev, "Failed to request hi-voltage charging\n");
 }
 
@@ -1058,7 +1049,6 @@ static const struct regulator_desc bq25890_vbus_desc = {
 	.fixed_uV = 5000000,
 	.n_voltages = 1,
 };
-<<<<<<< HEAD
 
 static int bq25890_register_regulator(struct bq25890_device *bq)
 {
@@ -1089,8 +1079,6 @@ bq25890_register_regulator(struct bq25890_device *bq)
 {
 	return 0;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 static int bq25890_get_chip_version(struct bq25890_device *bq)
@@ -1310,28 +1298,6 @@ static int bq25890_probe(struct i2c_client *client)
 		bq->usb_nb.notifier_call = bq25890_usb_notifier;
 		usb_register_notifier(bq->usb_phy, &bq->usb_nb);
 	}
-#ifdef CONFIG_REGULATOR
-	else {
-		struct bq25890_platform_data *pdata = dev_get_platdata(dev);
-		struct regulator_config cfg = { };
-		struct regulator_dev *reg;
-
-		cfg.dev = dev;
-		cfg.driver_data = bq;
-		if (pdata)
-			cfg.init_data = pdata->regulator_init_data;
-
-		reg = devm_regulator_register(dev, &bq25890_vbus_desc, &cfg);
-		if (IS_ERR(reg))
-			return dev_err_probe(dev, PTR_ERR(reg), "registering regulator");
-	}
-#endif
-
-	ret = bq25890_power_supply_init(bq);
-	if (ret < 0) {
-		dev_err(dev, "Failed to register power supply\n");
-		goto err_unregister_usb_notifier;
-	}
 
 	ret = bq25890_power_supply_init(bq);
 	if (ret < 0) {
@@ -1366,31 +1332,6 @@ static void bq25890_remove(struct i2c_client *client)
 		/* reset all registers to default values */
 		bq25890_chip_reset(bq);
 	}
-<<<<<<< HEAD
-}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-static void bq25890_shutdown(struct i2c_client *client)
-{
-	struct bq25890_device *bq = i2c_get_clientdata(client);
-
-	/*
-	 * TODO this if + return should probably be removed, but that would
-	 * introduce a function change for boards using the usb-phy framework.
-	 * This needs to be tested on such a board before making this change.
-	 */
-	if (!IS_ERR_OR_NULL(bq->usb_phy))
-		return;
-
-	/*
-	 * Turn off the 5v Boost regulator which outputs Vbus to the device's
-	 * Micro-USB or Type-C USB port. Leaving this on drains power and
-	 * this avoids the PMIC on some device-models seeing this as Vbus
-	 * getting inserted after shutdown, causing the device to immediately
-	 * power-up again.
-	 */
-	bq25890_set_otg_cfg(bq, 0);
 }
 
 static void bq25890_shutdown(struct i2c_client *client)

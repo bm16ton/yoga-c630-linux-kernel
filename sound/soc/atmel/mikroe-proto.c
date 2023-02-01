@@ -144,13 +144,8 @@ static int snd_proto_probe(struct platform_device *pdev)
 	if (ret)
 		dev_err_probe(&pdev->dev, ret,
 			"snd_soc_register_card() failed\n");
-<<<<<<< HEAD
 
 
-=======
-
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 put_cpu_node:
 	of_node_put(bitclkmaster);
 	of_node_put(framemaster);

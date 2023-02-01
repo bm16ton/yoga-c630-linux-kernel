@@ -58,11 +58,7 @@ static int zpci_setup_aipb(u8 nisc)
 	if (!zpci_aipb)
 		return -ENOMEM;
 
-<<<<<<< HEAD
 	aift->sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC, NULL);
-=======
-	aift->sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!aift->sbv) {
 		rc = -ENOMEM;
 		goto free_aipb;
@@ -75,11 +71,7 @@ static int zpci_setup_aipb(u8 nisc)
 		rc = -ENOMEM;
 		goto free_sbv;
 	}
-<<<<<<< HEAD
 	aift->gait = (struct zpci_gaite *)page_to_virt(page);
-=======
-	aift->gait = (struct zpci_gaite *)page_to_phys(page);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	zpci_aipb->aipb.faisb = virt_to_phys(aift->sbv->vector);
 	zpci_aipb->aipb.gait = virt_to_phys(aift->gait);
@@ -381,11 +373,7 @@ static int kvm_s390_pci_aif_disable(struct zpci_dev *zdev, bool force)
 		gaite->gisc = 0;
 		gaite->aisbo = 0;
 		gaite->gisa = 0;
-<<<<<<< HEAD
 		aift->kzdev[zdev->aisb] = NULL;
-=======
-		aift->kzdev[zdev->aisb] = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Clear zdev info */
 		airq_iv_free_bit(aift->sbv, zdev->aisb);
 		airq_iv_release(zdev->aibv);
@@ -684,33 +672,24 @@ out:
 
 int kvm_s390_pci_init(void)
 {
-<<<<<<< HEAD
 	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
 	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
 
 	if (!kvm_s390_pci_interp_allowed())
 		return 0;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	aift = kzalloc(sizeof(struct zpci_aift), GFP_KERNEL);
 	if (!aift)
 		return -ENOMEM;
 
 	spin_lock_init(&aift->gait_lock);
 	mutex_init(&aift->aift_lock);
-<<<<<<< HEAD
-=======
-	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
-	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
 void kvm_s390_pci_exit(void)
 {
-<<<<<<< HEAD
 	zpci_kvm_hook.kvm_register = NULL;
 	zpci_kvm_hook.kvm_unregister = NULL;
 
@@ -719,11 +698,5 @@ void kvm_s390_pci_exit(void)
 
 	mutex_destroy(&aift->aift_lock);
 
-=======
-	mutex_destroy(&aift->aift_lock);
-	zpci_kvm_hook.kvm_register = NULL;
-	zpci_kvm_hook.kvm_unregister = NULL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(aift);
 }

@@ -711,7 +711,6 @@ struct dm_connector_state {
 	uint64_t pbn;
 };
 
-<<<<<<< HEAD
 /**
  * struct amdgpu_hdmi_vsdb_info - Keep track of the VSDB info
  *
@@ -740,13 +739,6 @@ struct amdgpu_hdmi_vsdb_info {
 	 * @max_refresh_rate_hz: FreeSync Maximum Refresh Rate in Hz
 	 */
 	unsigned int max_refresh_rate_hz;
-=======
-struct amdgpu_hdmi_vsdb_info {
-	unsigned int amd_vsdb_version;		/* VSDB version, should be used to determine which VSIF to send */
-	bool freesync_supported;		/* FreeSync Supported */
-	unsigned int min_refresh_rate_hz;	/* FreeSync Minimum Refresh Rate in Hz */
-	unsigned int max_refresh_rate_hz;	/* FreeSync Maximum Refresh Rate in Hz */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 

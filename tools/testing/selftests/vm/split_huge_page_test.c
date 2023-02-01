@@ -92,10 +92,6 @@ void split_pmd_thp(void)
 {
 	char *one_page;
 	size_t len = 4 * pmd_pagesize;
-<<<<<<< HEAD
-=======
-	uint64_t thp_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size_t i;
 
 	one_page = memalign(pmd_pagesize, len);
@@ -110,12 +106,7 @@ void split_pmd_thp(void)
 	for (i = 0; i < len; i++)
 		one_page[i] = (char)i;
 
-<<<<<<< HEAD
 	if (!check_huge_anon(one_page, 1, pmd_pagesize)) {
-=======
-	thp_size = check_huge(one_page);
-	if (!thp_size) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		printf("No THP is allocated\n");
 		exit(EXIT_FAILURE);
 	}
@@ -131,14 +122,8 @@ void split_pmd_thp(void)
 		}
 
 
-<<<<<<< HEAD
 	if (check_huge_anon(one_page, 0, pmd_pagesize)) {
 		printf("Still AnonHugePages not split\n");
-=======
-	thp_size = check_huge(one_page);
-	if (thp_size) {
-		printf("Still %ld kB AnonHugePages not split\n", thp_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		exit(EXIT_FAILURE);
 	}
 
@@ -184,12 +169,7 @@ void split_pte_mapped_thp(void)
 	for (i = 0; i < len; i++)
 		one_page[i] = (char)i;
 
-<<<<<<< HEAD
 	if (!check_huge_anon(one_page, 1, pmd_pagesize)) {
-=======
-	thp_size = check_huge(one_page);
-	if (!thp_size) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		printf("No THP is allocated\n");
 		exit(EXIT_FAILURE);
 	}

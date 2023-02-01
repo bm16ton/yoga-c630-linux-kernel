@@ -142,11 +142,6 @@ static int hyperv_vmbus_probe(struct hv_device *hdev,
 	if (ret)
 		drm_warn(dev, "Failed to update vram location.\n");
 
-<<<<<<< HEAD
-=======
-	hv->dirt_needed = true;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = hyperv_mode_config_init(hv);
 	if (ret)
 		goto err_free_mmio;

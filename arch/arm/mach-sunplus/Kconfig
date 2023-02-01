@@ -18,13 +18,8 @@ config SOC_SP7021
 	select ARM_PSCI
 	select PINCTRL
 	select PINCTRL_SPPCTL
-<<<<<<< HEAD
 	select SERIAL_SUNPLUS if TTY
 	select SERIAL_SUNPLUS_CONSOLE if TTY
-=======
-	select SERIAL_SUNPLUS
-	select SERIAL_SUNPLUS_CONSOLE
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Support for Sunplus SP7021 SoC. It is based on ARM 4-core
 	  Cortex-A7 with various peripherals (e.g.: I2C, SPI, SDIO,

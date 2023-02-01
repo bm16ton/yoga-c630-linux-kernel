@@ -50,13 +50,8 @@ static u_int32_t futex = 0;
 
 static pthread_t *blocked_worker;
 static bool done = false;
-<<<<<<< HEAD
 static struct mutex thread_lock;
 static struct cond thread_parent, thread_worker;
-=======
-static pthread_mutex_t thread_lock;
-static pthread_cond_t thread_parent, thread_worker;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static pthread_barrier_t barrier;
 static struct stats waketime_stats, wakeup_stats;
 static unsigned int threads_starting;

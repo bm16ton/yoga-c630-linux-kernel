@@ -77,10 +77,7 @@ static const struct dc_debug_options debug_defaults_drv = {
 		.underflow_assert_delay_us = 0xFFFFFFFF,
 		.dwb_fi_phase = -1, // -1 = disable,
 		.dmub_command_table = true,
-<<<<<<< HEAD
 		.exit_idle_opt_for_cursor_updates = true,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.disable_idle_power_optimizations = false,
 };
 

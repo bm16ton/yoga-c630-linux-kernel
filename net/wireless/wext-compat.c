@@ -509,11 +509,7 @@ static int __cfg80211_set_encryption(struct cfg80211_registered_device *rdev,
 	if (wdev->connected ||
 	    (wdev->iftype == NL80211_IFTYPE_ADHOC &&
 	     wdev->u.ibss.current_bss))
-<<<<<<< HEAD
 		err = rdev_add_key(rdev, dev, -1, idx, pairwise, addr, params);
-=======
-		err = rdev_add_key(rdev, dev, idx, pairwise, addr, params);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else if (params->cipher != WLAN_CIPHER_SUITE_WEP40 &&
 		 params->cipher != WLAN_CIPHER_SUITE_WEP104)
 		return -EINVAL;
@@ -566,11 +562,7 @@ static int __cfg80211_set_encryption(struct cfg80211_registered_device *rdev,
 		if (wdev->connected ||
 		    (wdev->iftype == NL80211_IFTYPE_ADHOC &&
 		     wdev->u.ibss.current_bss))
-<<<<<<< HEAD
 			err = rdev_set_default_mgmt_key(rdev, dev, -1, idx);
-=======
-			err = rdev_set_default_mgmt_key(rdev, dev, idx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!err)
 			wdev->wext.default_mgmt_key = idx;
 		return err;
@@ -641,11 +633,7 @@ static int cfg80211_wext_siwencode(struct net_device *dev,
 		if (wdev->connected ||
 		    (wdev->iftype == NL80211_IFTYPE_ADHOC &&
 		     wdev->u.ibss.current_bss))
-<<<<<<< HEAD
 			err = rdev_set_default_key(rdev, dev, -1, idx, true,
-=======
-			err = rdev_set_default_key(rdev, dev, idx, true,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						   true);
 		if (!err)
 			wdev->wext.default_key = idx;

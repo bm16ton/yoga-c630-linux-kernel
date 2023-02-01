@@ -16,10 +16,7 @@
 #include "bpf_iter_udp4.skel.h"
 #include "bpf_iter_udp6.skel.h"
 #include "bpf_iter_unix.skel.h"
-<<<<<<< HEAD
 #include "bpf_iter_vma_offset.skel.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "bpf_iter_test_kern1.skel.h"
 #include "bpf_iter_test_kern2.skel.h"
 #include "bpf_iter_test_kern3.skel.h"
@@ -55,11 +52,7 @@ static void do_dummy_read_opts(struct bpf_program *prog, struct bpf_iter_attach_
 	char buf[16] = {};
 	int iter_fd, len;
 
-<<<<<<< HEAD
 	link = bpf_program__attach_iter(prog, opts);
-=======
-	link = bpf_program__attach_iter(prog, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ASSERT_OK_PTR(link, "attach_iter"))
 		return;
 
@@ -78,14 +71,11 @@ free_link:
 	bpf_link__destroy(link);
 }
 
-<<<<<<< HEAD
 static void do_dummy_read(struct bpf_program *prog)
 {
 	do_dummy_read_opts(prog, NULL);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void do_read_map_iter_fd(struct bpf_object_skeleton **skel, struct bpf_program *prog,
 				struct bpf_map *map)
 {
@@ -337,24 +327,6 @@ static void test_task_sleepable(void)
 	bpf_iter_task__destroy(skel);
 }
 
-static void test_task_sleepable(void)
-{
-	struct bpf_iter_task *skel;
-
-	skel = bpf_iter_task__open_and_load();
-	if (!ASSERT_OK_PTR(skel, "bpf_iter_task__open_and_load"))
-		return;
-
-	do_dummy_read(skel->progs.dump_task_sleepable);
-
-	ASSERT_GT(skel->bss->num_expected_failure_copy_from_user_task, 0,
-		  "num_expected_failure_copy_from_user_task");
-	ASSERT_GT(skel->bss->num_success_copy_from_user_task, 0,
-		  "num_success_copy_from_user_task");
-
-	bpf_iter_task__destroy(skel);
-}
-
 static void test_task_stack(void)
 {
 	struct bpf_iter_task_stack *skel;
@@ -383,7 +355,6 @@ static void test_task_file(void)
 
 	skel->bss->tgid = getpid();
 
-<<<<<<< HEAD
 	ASSERT_OK(pthread_mutex_lock(&do_nothing_mutex), "pthread_mutex_lock");
 
 	ASSERT_OK(pthread_create(&thread_id, NULL, &do_nothing_wait, NULL),
@@ -413,19 +384,6 @@ static void test_task_file(void)
 	ASSERT_OK(pthread_mutex_unlock(&do_nothing_mutex), "pthread_mutex_unlock");
 	ASSERT_OK(pthread_join(thread_id, &ret), "pthread_join");
 	ASSERT_NULL(ret, "pthread_join");
-=======
-	if (!ASSERT_OK(pthread_create(&thread_id, NULL, &do_nothing, NULL),
-		  "pthread_create"))
-		goto done;
-
-	do_dummy_read(skel->progs.dump_task_file);
-
-	if (!ASSERT_FALSE(pthread_join(thread_id, &ret) || ret != NULL,
-		  "pthread_join"))
-		goto done;
-
-	ASSERT_EQ(skel->bss->count, 0, "check_count");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bpf_iter_task_file__destroy(skel);
 }
@@ -1434,11 +1392,7 @@ static void str_strip_first_line(char *str)
 	*dst = '\0';
 }
 
-<<<<<<< HEAD
 static void test_task_vma_common(struct bpf_iter_attach_opts *opts)
-=======
-static void test_task_vma(void)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err, iter_fd = -1, proc_maps_fd = -1;
 	struct bpf_iter_task_vma *skel;
@@ -1498,12 +1452,9 @@ static void test_task_vma(void)
 	str_strip_first_line(proc_maps_output);
 
 	ASSERT_STREQ(task_vma_output, proc_maps_output, "compare_output");
-<<<<<<< HEAD
 
 	check_bpf_link_info(skel->progs.proc_maps);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	close(proc_maps_fd);
 	close(iter_fd);
@@ -1523,7 +1474,6 @@ void test_bpf_sockmap_map_iter_fd(void)
 	bpf_iter_sockmap__destroy(skel);
 }
 
-<<<<<<< HEAD
 static void test_task_vma(void)
 {
 	LIBBPF_OPTS(bpf_iter_attach_opts, opts);
@@ -1606,8 +1556,6 @@ static void test_task_vma_offset(void)
 	test_task_vma_offset_common(NULL, false);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void test_bpf_iter(void)
 {
 	ASSERT_OK(pthread_mutex_init(&do_nothing_mutex, NULL), "pthread_mutex_init");
@@ -1620,17 +1568,12 @@ void test_bpf_iter(void)
 		test_netlink();
 	if (test__start_subtest("bpf_map"))
 		test_bpf_map();
-<<<<<<< HEAD
 	if (test__start_subtest("task_tid"))
 		test_task_tid();
 	if (test__start_subtest("task_pid"))
 		test_task_pid();
 	if (test__start_subtest("task_pidfd"))
 		test_task_pidfd();
-=======
-	if (test__start_subtest("task"))
-		test_task();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (test__start_subtest("task_sleepable"))
 		test_task_sleepable();
 	if (test__start_subtest("task_stack"))
@@ -1691,9 +1634,6 @@ void test_bpf_iter(void)
 		test_ksym_iter();
 	if (test__start_subtest("bpf_sockmap_map_iter_fd"))
 		test_bpf_sockmap_map_iter_fd();
-<<<<<<< HEAD
 	if (test__start_subtest("vma_offset"))
 		test_task_vma_offset();
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

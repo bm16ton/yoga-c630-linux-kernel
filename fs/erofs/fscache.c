@@ -1,22 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (C) 2022, Alibaba Cloud
-<<<<<<< HEAD
  * Copyright (C) 2022, Bytedance Inc. All rights reserved.
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #include <linux/fscache.h>
 #include "internal.h"
 
-<<<<<<< HEAD
 static DEFINE_MUTEX(erofs_domain_list_lock);
 static DEFINE_MUTEX(erofs_domain_cookies_lock);
 static LIST_HEAD(erofs_domain_list);
 static struct vfsmount *erofs_pseudo_mnt;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct netfs_io_request *erofs_fscache_alloc_request(struct address_space *mapping,
 					     loff_t start, size_t len)
 {
@@ -393,7 +387,6 @@ const struct address_space_operations erofs_fscache_access_aops = {
 	.readahead = erofs_fscache_readahead,
 };
 
-<<<<<<< HEAD
 static void erofs_fscache_domain_put(struct erofs_domain *domain)
 {
 	if (!domain)
@@ -503,11 +496,6 @@ static
 struct erofs_fscache *erofs_fscache_acquire_cookie(struct super_block *sb,
 						   char *name,
 						   unsigned int flags)
-=======
-int erofs_fscache_register_cookie(struct super_block *sb,
-				  struct erofs_fscache **fscache,
-				  char *name, bool need_inode)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct fscache_volume *volume = EROFS_SB(sb)->volume;
 	struct erofs_fscache *ctx;
@@ -516,11 +504,7 @@ int erofs_fscache_register_cookie(struct super_block *sb,
 
 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
 	if (!ctx)
-<<<<<<< HEAD
 		return ERR_PTR(-ENOMEM);
-=======
-		return -ENOMEM;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	cookie = fscache_acquire_cookie(volume, FSCACHE_ADV_WANT_CACHE_SIZE,
 					name, strlen(name), NULL, 0, 0);
@@ -533,11 +517,7 @@ int erofs_fscache_register_cookie(struct super_block *sb,
 	fscache_use_cookie(cookie, false);
 	ctx->cookie = cookie;
 
-<<<<<<< HEAD
 	if (flags & EROFS_REG_COOKIE_NEED_INODE) {
-=======
-	if (need_inode) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct inode *const inode = new_inode(sb);
 
 		if (!inode) {
@@ -554,17 +534,11 @@ int erofs_fscache_register_cookie(struct super_block *sb,
 		ctx->inode = inode;
 	}
 
-<<<<<<< HEAD
 	return ctx;
-=======
-	*fscache = ctx;
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 err_cookie:
 	fscache_unuse_cookie(ctx->cookie, NULL, NULL);
 	fscache_relinquish_cookie(ctx->cookie, false);
-<<<<<<< HEAD
 err:
 	kfree(ctx);
 	return ERR_PTR(ret);
@@ -676,35 +650,10 @@ void erofs_fscache_unregister_cookie(struct erofs_fscache *ctx)
 
 	erofs_fscache_relinquish_cookie(ctx);
 	erofs_fscache_domain_put(domain);
-=======
-	ctx->cookie = NULL;
-err:
-	kfree(ctx);
-	return ret;
-}
-
-void erofs_fscache_unregister_cookie(struct erofs_fscache **fscache)
-{
-	struct erofs_fscache *ctx = *fscache;
-
-	if (!ctx)
-		return;
-
-	fscache_unuse_cookie(ctx->cookie, NULL, NULL);
-	fscache_relinquish_cookie(ctx->cookie, false);
-	ctx->cookie = NULL;
-
-	iput(ctx->inode);
-	ctx->inode = NULL;
-
-	kfree(ctx);
-	*fscache = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int erofs_fscache_register_fs(struct super_block *sb)
 {
-<<<<<<< HEAD
 	int ret;
 	struct erofs_sb_info *sbi = EROFS_SB(sb);
 	struct erofs_fscache *fscache;
@@ -736,34 +685,12 @@ int erofs_fscache_register_fs(struct super_block *sb)
 
 	sbi->s_fscache = fscache;
 	return 0;
-=======
-	struct erofs_sb_info *sbi = EROFS_SB(sb);
-	struct fscache_volume *volume;
-	char *name;
-	int ret = 0;
-
-	name = kasprintf(GFP_KERNEL, "erofs,%s", sbi->opt.fsid);
-	if (!name)
-		return -ENOMEM;
-
-	volume = fscache_acquire_volume(name, NULL, NULL, 0);
-	if (IS_ERR_OR_NULL(volume)) {
-		erofs_err(sb, "failed to register volume for %s", name);
-		ret = volume ? PTR_ERR(volume) : -EOPNOTSUPP;
-		volume = NULL;
-	}
-
-	sbi->volume = volume;
-	kfree(name);
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void erofs_fscache_unregister_fs(struct super_block *sb)
 {
 	struct erofs_sb_info *sbi = EROFS_SB(sb);
 
-<<<<<<< HEAD
 	erofs_fscache_unregister_cookie(sbi->s_fscache);
 
 	if (sbi->domain)
@@ -774,8 +701,4 @@ void erofs_fscache_unregister_fs(struct super_block *sb)
 	sbi->s_fscache = NULL;
 	sbi->volume = NULL;
 	sbi->domain = NULL;
-=======
-	fscache_relinquish_volume(sbi->volume, NULL, false);
-	sbi->volume = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

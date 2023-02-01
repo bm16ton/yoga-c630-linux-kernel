@@ -232,7 +232,6 @@ static inline u16 irdma_fw_minor_ver(struct irdma_sc_dev *dev)
 	return (u16)FIELD_GET(IRDMA_FW_VER_MINOR, dev->feature_info[IRDMA_FEATURE_FW_INFO]);
 }
 
-<<<<<<< HEAD
 static inline void set_ib_wc_op_sq(struct irdma_cq_poll_info *cq_poll_info,
 				   struct ib_wc *entry)
 {
@@ -286,8 +285,6 @@ static inline void set_ib_wc_op_rq(struct irdma_cq_poll_info *cq_poll_info,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void irdma_mcast_mac(u32 *ip_addr, u8 *mac, bool ipv4);
 int irdma_ib_register_device(struct irdma_device *iwdev);
 void irdma_ib_unregister_device(struct irdma_device *iwdev);

@@ -1882,13 +1882,6 @@ static int s3c2410_udc_remove(struct platform_device *pdev)
 
 	usb_del_gadget_udc(&udc->gadget);
 	debugfs_remove(debugfs_lookup("registers", s3c2410_udc_debugfs_root));
-<<<<<<< HEAD
-=======
-
-	if (udc_info && !udc_info->udc_command &&
-		gpio_is_valid(udc_info->pullup_pin))
-		gpio_free(udc_info->pullup_pin);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (udc->vbus_gpiod)
 		free_irq(gpiod_to_irq(udc->vbus_gpiod), udc);

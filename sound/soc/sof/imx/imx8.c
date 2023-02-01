@@ -487,11 +487,7 @@ static int imx8_dsp_set_power_state(struct snd_sof_dev *sdev,
 }
 
 /* i.MX8 ops */
-<<<<<<< HEAD
 static struct snd_sof_dsp_ops sof_imx8_ops = {
-=======
-static const struct snd_sof_dsp_ops sof_imx8_ops = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* probe and remove */
 	.probe		= imx8_probe,
 	.remove		= imx8_remove,
@@ -552,11 +548,7 @@ static const struct snd_sof_dsp_ops sof_imx8_ops = {
 };
 
 /* i.MX8X ops */
-<<<<<<< HEAD
 static struct snd_sof_dsp_ops sof_imx8x_ops = {
-=======
-static const struct snd_sof_dsp_ops sof_imx8x_ops = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* probe and remove */
 	.probe		= imx8_probe,
 	.remove		= imx8_remove,
@@ -617,7 +609,6 @@ static const struct snd_sof_dsp_ops sof_imx8x_ops = {
 };
 
 static struct sof_dev_desc sof_of_imx8qxp_desc = {
-<<<<<<< HEAD
 	.ipc_supported_mask	= BIT(SOF_IPC),
 	.ipc_default		= SOF_IPC,
 	.default_fw_path = {
@@ -629,17 +620,11 @@ static struct sof_dev_desc sof_of_imx8qxp_desc = {
 	.default_fw_filename = {
 		[SOF_IPC] = "sof-imx8x.ri",
 	},
-=======
-	.default_fw_path = "imx/sof",
-	.default_tplg_path = "imx/sof-tplg",
-	.default_fw_filename = "sof-imx8x.ri",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.nocodec_tplg_filename = "sof-imx8-nocodec.tplg",
 	.ops = &sof_imx8x_ops,
 };
 
 static struct sof_dev_desc sof_of_imx8qm_desc = {
-<<<<<<< HEAD
 	.ipc_supported_mask	= BIT(SOF_IPC),
 	.ipc_default		= SOF_IPC,
 	.default_fw_path = {
@@ -651,11 +636,6 @@ static struct sof_dev_desc sof_of_imx8qm_desc = {
 	.default_fw_filename = {
 		[SOF_IPC] = "sof-imx8.ri",
 	},
-=======
-	.default_fw_path = "imx/sof",
-	.default_tplg_path = "imx/sof-tplg",
-	.default_fw_filename = "sof-imx8.ri",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.nocodec_tplg_filename = "sof-imx8-nocodec.tplg",
 	.ops = &sof_imx8_ops,
 };

@@ -125,12 +125,9 @@ void frontswap_init(unsigned type, unsigned long *map)
 	 * p->frontswap set to something valid to work properly.
 	 */
 	frontswap_map_set(sis, map);
-<<<<<<< HEAD
 
 	if (!frontswap_enabled())
 		return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	frontswap_ops->init(type);
 }
 

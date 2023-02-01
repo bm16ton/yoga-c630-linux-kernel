@@ -61,13 +61,6 @@ xfs_efi_release(
 	ASSERT(atomic_read(&efip->efi_refcount) > 0);
 	if (!atomic_dec_and_test(&efip->efi_refcount))
 		return;
-<<<<<<< HEAD
-=======
-
-	xfs_trans_ail_delete(&efip->efi_item, 0);
-	xfs_efi_item_free(efip);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	xfs_trans_ail_delete(&efip->efi_item, 0);
 	xfs_efi_item_free(efip);
@@ -182,18 +175,9 @@ xfs_efi_copy_format(xfs_log_iovec_t *buf, xfs_efi_log_format_t *dst_efi_fmt)
 {
 	xfs_efi_log_format_t *src_efi_fmt = buf->i_addr;
 	uint i;
-<<<<<<< HEAD
 	uint len = xfs_efi_log_format_sizeof(src_efi_fmt->efi_nextents);
 	uint len32 = xfs_efi_log_format32_sizeof(src_efi_fmt->efi_nextents);
 	uint len64 = xfs_efi_log_format64_sizeof(src_efi_fmt->efi_nextents);
-=======
-	uint len = sizeof(xfs_efi_log_format_t) +
-		(src_efi_fmt->efi_nextents - 1) * sizeof(xfs_extent_t);
-	uint len32 = sizeof(xfs_efi_log_format_32_t) +
-		(src_efi_fmt->efi_nextents - 1) * sizeof(xfs_extent_32_t);
-	uint len64 = sizeof(xfs_efi_log_format_64_t) +
-		(src_efi_fmt->efi_nextents - 1) * sizeof(xfs_extent_64_t);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (buf->i_len == len) {
 		memcpy(dst_efi_fmt, src_efi_fmt,
@@ -250,22 +234,6 @@ xfs_efd_item_free(struct xfs_efd_log_item *efdp)
 		kmem_free(efdp);
 	else
 		kmem_cache_free(xfs_efd_cache, efdp);
-<<<<<<< HEAD
-=======
-}
-
-/*
- * This returns the number of iovecs needed to log the given efd item.
- * We only need 1 iovec for an efd item.  It just logs the efd_log_format
- * structure.
- */
-static inline int
-xfs_efd_item_sizeof(
-	struct xfs_efd_log_item *efdp)
-{
-	return sizeof(xfs_efd_log_format_t) +
-	       (efdp->efd_format.efd_nextents - 1) * sizeof(xfs_extent_t);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 STATIC void

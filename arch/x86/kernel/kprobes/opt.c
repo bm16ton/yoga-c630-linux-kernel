@@ -322,11 +322,7 @@ static int can_optimize(unsigned long paddr)
 		ret = insn_decode_kernel(&insn, (void *)recovered_insn);
 		if (ret < 0)
 			return 0;
-<<<<<<< HEAD
 #ifdef CONFIG_KGDB
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * If there is a dynamically installed kgdb sw breakpoint,
 		 * this function should not be probed.

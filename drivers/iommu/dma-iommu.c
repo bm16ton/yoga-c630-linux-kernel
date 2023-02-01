@@ -13,10 +13,6 @@
 #include <linux/crash_dump.h>
 #include <linux/device.h>
 #include <linux/dma-direct.h>
-<<<<<<< HEAD
-=======
-#include <linux/dma-iommu.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/dma-map-ops.h>
 #include <linux/gfp.h>
 #include <linux/huge_mm.h>
@@ -32,11 +28,8 @@
 #include <linux/spinlock.h>
 #include <linux/swiotlb.h>
 #include <linux/vmalloc.h>
-<<<<<<< HEAD
 
 #include "dma-iommu.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct iommu_dma_msi_page {
 	struct list_head	list;
@@ -118,7 +111,6 @@ static inline bool fq_full(struct iova_fq *fq)
 	assert_spin_locked(&fq->lock);
 	return (((fq->tail + 1) % IOVA_FQ_SIZE) == fq->head);
 }
-<<<<<<< HEAD
 
 static inline unsigned int fq_ring_add(struct iova_fq *fq)
 {
@@ -248,137 +240,6 @@ static void iommu_dma_free_fq(struct iommu_dma_cookie *cookie)
 /* sysfs updates are serialised by the mutex of the group owning @domain */
 int iommu_dma_init_fq(struct iommu_domain *domain)
 {
-=======
-
-static inline unsigned int fq_ring_add(struct iova_fq *fq)
-{
-	unsigned int idx = fq->tail;
-
-	assert_spin_locked(&fq->lock);
-
-	fq->tail = (idx + 1) % IOVA_FQ_SIZE;
-
-	return idx;
-}
-
-static void fq_ring_free(struct iommu_dma_cookie *cookie, struct iova_fq *fq)
-{
-	u64 counter = atomic64_read(&cookie->fq_flush_finish_cnt);
-	unsigned int idx;
-
-	assert_spin_locked(&fq->lock);
-
-	fq_ring_for_each(idx, fq) {
-
-		if (fq->entries[idx].counter >= counter)
-			break;
-
-		put_pages_list(&fq->entries[idx].freelist);
-		free_iova_fast(&cookie->iovad,
-			       fq->entries[idx].iova_pfn,
-			       fq->entries[idx].pages);
-
-		fq->head = (fq->head + 1) % IOVA_FQ_SIZE;
-	}
-}
-
-static void fq_flush_iotlb(struct iommu_dma_cookie *cookie)
-{
-	atomic64_inc(&cookie->fq_flush_start_cnt);
-	cookie->fq_domain->ops->flush_iotlb_all(cookie->fq_domain);
-	atomic64_inc(&cookie->fq_flush_finish_cnt);
-}
-
-static void fq_flush_timeout(struct timer_list *t)
-{
-	struct iommu_dma_cookie *cookie = from_timer(cookie, t, fq_timer);
-	int cpu;
-
-	atomic_set(&cookie->fq_timer_on, 0);
-	fq_flush_iotlb(cookie);
-
-	for_each_possible_cpu(cpu) {
-		unsigned long flags;
-		struct iova_fq *fq;
-
-		fq = per_cpu_ptr(cookie->fq, cpu);
-		spin_lock_irqsave(&fq->lock, flags);
-		fq_ring_free(cookie, fq);
-		spin_unlock_irqrestore(&fq->lock, flags);
-	}
-}
-
-static void queue_iova(struct iommu_dma_cookie *cookie,
-		unsigned long pfn, unsigned long pages,
-		struct list_head *freelist)
-{
-	struct iova_fq *fq;
-	unsigned long flags;
-	unsigned int idx;
-
-	/*
-	 * Order against the IOMMU driver's pagetable update from unmapping
-	 * @pte, to guarantee that fq_flush_iotlb() observes that if called
-	 * from a different CPU before we release the lock below. Full barrier
-	 * so it also pairs with iommu_dma_init_fq() to avoid seeing partially
-	 * written fq state here.
-	 */
-	smp_mb();
-
-	fq = raw_cpu_ptr(cookie->fq);
-	spin_lock_irqsave(&fq->lock, flags);
-
-	/*
-	 * First remove all entries from the flush queue that have already been
-	 * flushed out on another CPU. This makes the fq_full() check below less
-	 * likely to be true.
-	 */
-	fq_ring_free(cookie, fq);
-
-	if (fq_full(fq)) {
-		fq_flush_iotlb(cookie);
-		fq_ring_free(cookie, fq);
-	}
-
-	idx = fq_ring_add(fq);
-
-	fq->entries[idx].iova_pfn = pfn;
-	fq->entries[idx].pages    = pages;
-	fq->entries[idx].counter  = atomic64_read(&cookie->fq_flush_start_cnt);
-	list_splice(freelist, &fq->entries[idx].freelist);
-
-	spin_unlock_irqrestore(&fq->lock, flags);
-
-	/* Avoid false sharing as much as possible. */
-	if (!atomic_read(&cookie->fq_timer_on) &&
-	    !atomic_xchg(&cookie->fq_timer_on, 1))
-		mod_timer(&cookie->fq_timer,
-			  jiffies + msecs_to_jiffies(IOVA_FQ_TIMEOUT));
-}
-
-static void iommu_dma_free_fq(struct iommu_dma_cookie *cookie)
-{
-	int cpu, idx;
-
-	if (!cookie->fq)
-		return;
-
-	del_timer_sync(&cookie->fq_timer);
-	/* The IOVAs will be torn down separately, so just free our queued pages */
-	for_each_possible_cpu(cpu) {
-		struct iova_fq *fq = per_cpu_ptr(cookie->fq, cpu);
-
-		fq_ring_for_each(idx, fq)
-			put_pages_list(&fq->entries[idx].freelist);
-	}
-
-	free_percpu(cookie->fq);
-}
-
-/* sysfs updates are serialised by the mutex of the group owning @domain */
-int iommu_dma_init_fq(struct iommu_domain *domain)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct iommu_dma_cookie *cookie = domain->iova_cookie;
 	struct iova_fq __percpu *queue;
 	int i, cpu;
@@ -394,7 +255,6 @@ int iommu_dma_init_fq(struct iommu_domain *domain)
 		pr_warn("iova flush queue initialization failed\n");
 		return -ENOMEM;
 	}
-<<<<<<< HEAD
 
 	for_each_possible_cpu(cpu) {
 		struct iova_fq *fq = per_cpu_ptr(queue, cpu);
@@ -404,17 +264,6 @@ int iommu_dma_init_fq(struct iommu_domain *domain)
 
 		spin_lock_init(&fq->lock);
 
-=======
-
-	for_each_possible_cpu(cpu) {
-		struct iova_fq *fq = per_cpu_ptr(queue, cpu);
-
-		fq->head = 0;
-		fq->tail = 0;
-
-		spin_lock_init(&fq->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		for (i = 0; i < IOVA_FQ_SIZE; i++)
 			INIT_LIST_HEAD(&fq->entries[i].freelist);
 	}
@@ -1166,17 +1015,10 @@ static dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
 			padding_start += size;
 			padding_size -= size;
 		}
-<<<<<<< HEAD
 
 		memset(padding_start, 0, padding_size);
 	}
 
-=======
-
-		memset(padding_start, 0, padding_size);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
 		arch_sync_dma_for_device(phys, size, dir);
 

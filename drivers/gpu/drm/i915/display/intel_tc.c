@@ -77,17 +77,10 @@ tc_cold_block_in_mode(struct intel_digital_port *dig_port, enum tc_port_mode mod
 	struct drm_i915_private *i915 = to_i915(dig_port->base.base.dev);
 
 	*domain = tc_cold_get_power_domain(dig_port, mode);
-<<<<<<< HEAD
 
 	return intel_display_power_get(i915, *domain);
 }
 
-=======
-
-	return intel_display_power_get(i915, *domain);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static intel_wakeref_t
 tc_cold_block(struct intel_digital_port *dig_port, enum intel_display_power_domain *domain)
 {
@@ -286,11 +279,7 @@ static u32 adl_tc_port_live_status_mask(struct intel_digital_port *dig_port)
 {
 	struct drm_i915_private *i915 = to_i915(dig_port->base.base.dev);
 	enum tc_port tc_port = intel_port_to_tc(i915, dig_port->base.port);
-<<<<<<< HEAD
 	u32 isr_bit = i915->display.hotplug.pch_hpd[dig_port->base.hpd_pin];
-=======
-	u32 isr_bit = i915->hotplug.pch_hpd[dig_port->base.hpd_pin];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct intel_uncore *uncore = &i915->uncore;
 	u32 val, mask = 0;
 

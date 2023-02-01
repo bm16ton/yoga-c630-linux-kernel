@@ -5064,7 +5064,6 @@ _scsih_setup_eedp(struct MPT3SAS_ADAPTER *ioc, struct scsi_cmnd *scmd,
 
 	if (scmd->prot_flags & SCSI_PROT_GUARD_CHECK)
 		eedp_flags |= MPI2_SCSIIO_EEDPFLAGS_CHECK_GUARD;
-<<<<<<< HEAD
 
 	if (scmd->prot_flags & SCSI_PROT_REF_CHECK)
 		eedp_flags |= MPI2_SCSIIO_EEDPFLAGS_CHECK_REFTAG;
@@ -5072,15 +5071,6 @@ _scsih_setup_eedp(struct MPT3SAS_ADAPTER *ioc, struct scsi_cmnd *scmd,
 	if (scmd->prot_flags & SCSI_PROT_REF_INCREMENT) {
 		eedp_flags |= MPI2_SCSIIO_EEDPFLAGS_INC_PRI_REFTAG;
 
-=======
-
-	if (scmd->prot_flags & SCSI_PROT_REF_CHECK)
-		eedp_flags |= MPI2_SCSIIO_EEDPFLAGS_CHECK_REFTAG;
-
-	if (scmd->prot_flags & SCSI_PROT_REF_INCREMENT) {
-		eedp_flags |= MPI2_SCSIIO_EEDPFLAGS_INC_PRI_REFTAG;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mpi_request->CDB.EEDP32.PrimaryReferenceTag =
 			cpu_to_be32(scsi_prot_ref_tag(scmd));
 	}
@@ -11905,11 +11895,7 @@ static void scsih_map_queues(struct Scsi_Host *shost)
 	int iopoll_q_count = ioc->reply_queue_count - nr_msix_vectors;
 
 	if (shost->nr_hw_queues == 1)
-<<<<<<< HEAD
 		return;
-=======
-		return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0, qoff = 0; i < shost->nr_maps; i++) {
 		map = &shost->tag_set.map[i];
@@ -11937,10 +11923,6 @@ static void scsih_map_queues(struct Scsi_Host *shost)
 
 		qoff += map->nr_queues;
 	}
-<<<<<<< HEAD
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* shost template for SAS 2.0 HBA devices */
@@ -12005,11 +11987,7 @@ static struct scsi_host_template mpt3sas_driver_template = {
 	.sg_tablesize			= MPT3SAS_SG_DEPTH,
 	.max_sectors			= 32767,
 	.max_segment_size		= 0xffffffff,
-<<<<<<< HEAD
 	.cmd_per_lun			= 128,
-=======
-	.cmd_per_lun			= 7,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.shost_groups			= mpt3sas_host_groups,
 	.sdev_groups			= mpt3sas_dev_groups,
 	.track_queue_depth		= 1,

@@ -28,10 +28,7 @@
 #include <linux/platform_device.h>
 
 #include "arm-smmu-v3.h"
-<<<<<<< HEAD
 #include "../../dma-iommu.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../../iommu-sva-lib.h"
 
 static bool disable_bypass = true;
@@ -865,7 +862,6 @@ static int __arm_smmu_cmdq_issue_cmd(struct arm_smmu_device *smmu,
 	}
 
 	return arm_smmu_cmdq_issue_cmdlist(smmu, cmd, 1, sync);
-<<<<<<< HEAD
 }
 
 static int arm_smmu_cmdq_issue_cmd(struct arm_smmu_device *smmu,
@@ -877,19 +873,6 @@ static int arm_smmu_cmdq_issue_cmd(struct arm_smmu_device *smmu,
 static int arm_smmu_cmdq_issue_cmd_with_sync(struct arm_smmu_device *smmu,
 					     struct arm_smmu_cmdq_ent *ent)
 {
-=======
-}
-
-static int arm_smmu_cmdq_issue_cmd(struct arm_smmu_device *smmu,
-				   struct arm_smmu_cmdq_ent *ent)
-{
-	return __arm_smmu_cmdq_issue_cmd(smmu, ent, false);
-}
-
-static int arm_smmu_cmdq_issue_cmd_with_sync(struct arm_smmu_device *smmu,
-					     struct arm_smmu_cmdq_ent *ent)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return __arm_smmu_cmdq_issue_cmd(smmu, ent, true);
 }
 
@@ -3850,28 +3833,11 @@ static int arm_smmu_device_probe(struct platform_device *pdev)
 	ret = iommu_device_register(&smmu->iommu, &arm_smmu_ops, dev);
 	if (ret) {
 		dev_err(dev, "Failed to register iommu\n");
-<<<<<<< HEAD
 		iommu_device_sysfs_remove(&smmu->iommu);
 		return ret;
 	}
 
 	return 0;
-=======
-		goto err_sysfs_remove;
-	}
-
-	ret = arm_smmu_set_bus_ops(&arm_smmu_ops);
-	if (ret)
-		goto err_unregister_device;
-
-	return 0;
-
-err_unregister_device:
-	iommu_device_unregister(&smmu->iommu);
-err_sysfs_remove:
-	iommu_device_sysfs_remove(&smmu->iommu);
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int arm_smmu_device_remove(struct platform_device *pdev)

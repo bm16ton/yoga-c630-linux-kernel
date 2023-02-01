@@ -127,7 +127,6 @@ struct dev_table_entry *get_dev_table(struct amd_iommu *iommu)
 	BUG_ON(pci_seg == NULL);
 	dev_table = pci_seg->dev_table;
 	BUG_ON(dev_table == NULL);
-<<<<<<< HEAD
 
 	return dev_table;
 }
@@ -173,53 +172,6 @@ static struct amd_iommu *rlookup_amd_iommu(struct device *dev)
 	u16 seg = get_device_segment(dev);
 	int devid = get_device_sbdf_id(dev);
 
-=======
-
-	return dev_table;
-}
-
-static inline u16 get_device_segment(struct device *dev)
-{
-	u16 seg;
-
-	if (dev_is_pci(dev)) {
-		struct pci_dev *pdev = to_pci_dev(dev);
-
-		seg = pci_domain_nr(pdev->bus);
-	} else {
-		u32 devid = get_acpihid_device_id(dev, NULL);
-
-		seg = PCI_SBDF_TO_SEGID(devid);
-	}
-
-	return seg;
-}
-
-/* Writes the specific IOMMU for a device into the PCI segment rlookup table */
-void amd_iommu_set_rlookup_table(struct amd_iommu *iommu, u16 devid)
-{
-	struct amd_iommu_pci_seg *pci_seg = iommu->pci_seg;
-
-	pci_seg->rlookup_table[devid] = iommu;
-}
-
-static struct amd_iommu *__rlookup_amd_iommu(u16 seg, u16 devid)
-{
-	struct amd_iommu_pci_seg *pci_seg;
-
-	for_each_pci_segment(pci_seg) {
-		if (pci_seg->id == seg)
-			return pci_seg->rlookup_table[devid];
-	}
-	return NULL;
-}
-
-static struct amd_iommu *rlookup_amd_iommu(struct device *dev)
-{
-	u16 seg = get_device_segment(dev);
-	int devid = get_device_sbdf_id(dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (devid < 0)
 		return NULL;
 	return __rlookup_amd_iommu(seg, PCI_SBDF_TO_DEVID(devid));
@@ -1668,21 +1620,12 @@ static void clear_dte_entry(struct amd_iommu *iommu, u16 devid)
 
 	/* remove entry from the device table seen by the hardware */
 	dev_table[devid].data[0]  = DTE_FLAG_V;
-<<<<<<< HEAD
 
 	if (!amd_iommu_snp_en)
 		dev_table[devid].data[0] |= DTE_FLAG_TV;
 
 	dev_table[devid].data[1] &= DTE_FLAG_MASK;
 
-=======
-
-	if (!amd_iommu_snp_en)
-		dev_table[devid].data[0] |= DTE_FLAG_TV;
-
-	dev_table[devid].data[1] &= DTE_FLAG_MASK;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	amd_iommu_apply_erratum_63(iommu, devid);
 }
 
@@ -1753,11 +1696,7 @@ static void pdev_iommuv2_disable(struct pci_dev *pdev)
 	pci_disable_pasid(pdev);
 }
 
-<<<<<<< HEAD
 static int pdev_pri_ats_enable(struct pci_dev *pdev)
-=======
-static int pdev_iommuv2_enable(struct pci_dev *pdev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 
@@ -1922,13 +1861,10 @@ static struct iommu_device *amd_iommu_probe_device(struct device *dev)
 	iommu = rlookup_amd_iommu(dev);
 	if (!iommu)
 		return ERR_PTR(-ENODEV);
-<<<<<<< HEAD
 
 	/* Not registered yet? */
 	if (!iommu->iommu.ops)
 		return ERR_PTR(-ENODEV);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (dev_iommu_priv_get(dev))
 		return &iommu->iommu;
@@ -2016,28 +1952,6 @@ void amd_iommu_domain_update(struct protection_domain *domain)
 	amd_iommu_domain_flush_complete(domain);
 }
 
-<<<<<<< HEAD
-=======
-int __init amd_iommu_init_api(void)
-{
-	int err;
-
-	err = bus_set_iommu(&pci_bus_type, &amd_iommu_ops);
-	if (err)
-		return err;
-#ifdef CONFIG_ARM_AMBA
-	err = bus_set_iommu(&amba_bustype, &amd_iommu_ops);
-	if (err)
-		return err;
-#endif
-	err = bus_set_iommu(&platform_bus_type, &amd_iommu_ops);
-	if (err)
-		return err;
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*****************************************************************************
  *
  * The following functions belong to the exported interface of AMD IOMMU
@@ -2281,7 +2195,6 @@ static void amd_iommu_iotlb_sync_map(struct iommu_domain *dom,
 	struct protection_domain *domain = to_pdomain(dom);
 	struct io_pgtable_ops *ops = &domain->iop.iop.ops;
 
-<<<<<<< HEAD
 	if (ops->map_pages)
 		domain_flush_np_cache(domain, iova, size);
 }
@@ -2289,15 +2202,6 @@ static void amd_iommu_iotlb_sync_map(struct iommu_domain *dom,
 static int amd_iommu_map_pages(struct iommu_domain *dom, unsigned long iova,
 			       phys_addr_t paddr, size_t pgsize, size_t pgcount,
 			       int iommu_prot, gfp_t gfp, size_t *mapped)
-=======
-	if (ops->map)
-		domain_flush_np_cache(domain, iova, size);
-}
-
-static int amd_iommu_map(struct iommu_domain *dom, unsigned long iova,
-			 phys_addr_t paddr, size_t page_size, int iommu_prot,
-			 gfp_t gfp)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct protection_domain *domain = to_pdomain(dom);
 	struct io_pgtable_ops *ops = &domain->iop.iop.ops;
@@ -2313,15 +2217,10 @@ static int amd_iommu_map(struct iommu_domain *dom, unsigned long iova,
 	if (iommu_prot & IOMMU_WRITE)
 		prot |= IOMMU_PROT_IW;
 
-<<<<<<< HEAD
 	if (ops->map_pages) {
 		ret = ops->map_pages(ops, iova, paddr, pgsize,
 				     pgcount, prot, gfp, mapped);
 	}
-=======
-	if (ops->map)
-		ret = ops->map(ops, iova, paddr, page_size, prot, gfp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -2347,15 +2246,9 @@ static void amd_iommu_iotlb_gather_add_page(struct iommu_domain *domain,
 	iommu_iotlb_gather_add_range(gather, iova, size);
 }
 
-<<<<<<< HEAD
 static size_t amd_iommu_unmap_pages(struct iommu_domain *dom, unsigned long iova,
 				    size_t pgsize, size_t pgcount,
 				    struct iommu_iotlb_gather *gather)
-=======
-static size_t amd_iommu_unmap(struct iommu_domain *dom, unsigned long iova,
-			      size_t page_size,
-			      struct iommu_iotlb_gather *gather)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct protection_domain *domain = to_pdomain(dom);
 	struct io_pgtable_ops *ops = &domain->iop.iop.ops;
@@ -2365,16 +2258,10 @@ static size_t amd_iommu_unmap(struct iommu_domain *dom, unsigned long iova,
 	    (domain->iop.mode == PAGE_MODE_NONE))
 		return 0;
 
-<<<<<<< HEAD
 	r = (ops->unmap_pages) ? ops->unmap_pages(ops, iova, pgsize, pgcount, NULL) : 0;
 
 	if (r)
 		amd_iommu_iotlb_gather_add_page(dom, gather, iova, r);
-=======
-	r = (ops->unmap) ? ops->unmap(ops, iova, page_size, gather) : 0;
-
-	amd_iommu_iotlb_gather_add_page(dom, gather, iova, page_size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return r;
 }
@@ -2417,26 +2304,14 @@ static void amd_iommu_get_resv_regions(struct device *dev,
 
 	sbdf = get_device_sbdf_id(dev);
 	if (sbdf < 0)
-<<<<<<< HEAD
 		return;
 
-	devid = PCI_SBDF_TO_DEVID(sbdf);
-	iommu = rlookup_amd_iommu(dev);
-	if (!iommu)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		return;
-	pci_seg = iommu->pci_seg;
-
-<<<<<<< HEAD
-=======
 	devid = PCI_SBDF_TO_DEVID(sbdf);
 	iommu = rlookup_amd_iommu(dev);
 	if (!iommu)
 		return;
 	pci_seg = iommu->pci_seg;
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(entry, &pci_seg->unity_map, list) {
 		int type, prot = 0;
 		size_t length;
@@ -2549,13 +2424,8 @@ const struct iommu_ops amd_iommu_ops = {
 	.default_domain_ops = &(const struct iommu_domain_ops) {
 		.attach_dev	= amd_iommu_attach_device,
 		.detach_dev	= amd_iommu_detach_device,
-<<<<<<< HEAD
 		.map_pages	= amd_iommu_map_pages,
 		.unmap_pages	= amd_iommu_unmap_pages,
-=======
-		.map		= amd_iommu_map,
-		.unmap		= amd_iommu_unmap,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.iotlb_sync_map	= amd_iommu_iotlb_sync_map,
 		.iova_to_phys	= amd_iommu_iova_to_phys,
 		.flush_iotlb_all = amd_iommu_flush_iotlb_all,
@@ -2605,13 +2475,7 @@ EXPORT_SYMBOL(amd_iommu_domain_direct_map);
 /* Note: This function expects iommu_domain->lock to be held prior calling the function. */
 static int domain_enable_v2(struct protection_domain *domain, int pasids)
 {
-<<<<<<< HEAD
 	int levels;
-=======
-	struct protection_domain *domain = to_pdomain(dom);
-	unsigned long flags;
-	int levels, ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Number of GCR3 table levels required */
 	for (levels = 0; (pasids - 1) & ~0x1ff; pasids >>= 9)

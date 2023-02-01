@@ -130,7 +130,6 @@ static u32 Array_RadioA_1T_8188E[] = {
 		0x000, 0x00033E60,
 };
 
-<<<<<<< HEAD
 static void odm_ConfigRFReg_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr,
 				  u32 Data, u32 RegAddr)
 {
@@ -162,9 +161,6 @@ static void odm_ConfigRF_RadioA_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr, u
 }
 
 int ODM_ReadAndConfig_RadioA_1T_8188E(struct odm_dm_struct *pDM_Odm)
-=======
-enum HAL_STATUS ODM_ReadAndConfig_RadioA_1T_8188E(struct odm_dm_struct *pDM_Odm)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	#define READ_NEXT_PAIR(v1, v2, i) do	\
 		 { i += 2; v1 = Array[i];	\
@@ -178,10 +174,6 @@ enum HAL_STATUS ODM_ReadAndConfig_RadioA_1T_8188E(struct odm_dm_struct *pDM_Odm)
 	struct adapter *Adapter =  pDM_Odm->Adapter;
 	struct xmit_frame *pxmit_frame = NULL;
 	u8 bndy_cnt = 1;
-<<<<<<< HEAD
-=======
-	enum HAL_STATUS rst = HAL_STATUS_SUCCESS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hex += ODM_ITRF_USB << 8;
 	hex += ODM_CE << 16;
@@ -192,11 +184,7 @@ enum HAL_STATUS ODM_ReadAndConfig_RadioA_1T_8188E(struct odm_dm_struct *pDM_Odm)
 		pxmit_frame = rtw_IOL_accquire_xmit_frame(Adapter);
 		if (!pxmit_frame) {
 			pr_info("rtw_IOL_accquire_xmit_frame failed\n");
-<<<<<<< HEAD
 			return -ENOMEM;
-=======
-			return HAL_STATUS_FAILURE;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -273,17 +261,9 @@ enum HAL_STATUS ODM_ReadAndConfig_RadioA_1T_8188E(struct odm_dm_struct *pDM_Odm)
 	}
 	if (biol) {
 		if (!rtl8188e_IOL_exec_cmds_sync(pDM_Odm->Adapter, pxmit_frame, 1000, bndy_cnt)) {
-<<<<<<< HEAD
 			pr_info("~~~ IOL Config %s Failed !!!\n", __func__);
 			return -1;
 		}
 	}
 	return 0;
-=======
-			rst = HAL_STATUS_FAILURE;
-			pr_info("~~~ IOL Config %s Failed !!!\n", __func__);
-		}
-	}
-	return rst;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

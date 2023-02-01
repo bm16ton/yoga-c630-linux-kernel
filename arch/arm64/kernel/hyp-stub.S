@@ -98,11 +98,7 @@ SYM_CODE_START_LOCAL(elx_sync)
 SYM_CODE_END(elx_sync)
 
 SYM_CODE_START_LOCAL(__finalise_el2)
-<<<<<<< HEAD
 	check_override id_aa64pfr0 ID_AA64PFR0_EL1_SVE_SHIFT .Linit_sve .Lskip_sve
-=======
-	check_override id_aa64pfr0 ID_AA64PFR0_SVE_SHIFT .Linit_sve .Lskip_sve
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 .Linit_sve:	/* SVE register access */
 	mrs	x0, cptr_el2			// Disable SVE traps
@@ -113,11 +109,7 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 	msr_s	SYS_ZCR_EL2, x1			// length for EL1.
 
 .Lskip_sve:
-<<<<<<< HEAD
 	check_override id_aa64pfr1 ID_AA64PFR1_EL1_SME_SHIFT .Linit_sme .Lskip_sme
-=======
-	check_override id_aa64pfr1 ID_AA64PFR1_SME_SHIFT .Linit_sme .Lskip_sme
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 .Linit_sme:	/* SME register access and priority mapping */
 	mrs	x0, cptr_el2			// Disable SME traps
@@ -150,11 +142,7 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 	msr_s	SYS_SMPRIMAP_EL2, xzr		// Make all priorities equal
 
 	mrs	x1, id_aa64mmfr1_el1		// HCRX_EL2 present?
-<<<<<<< HEAD
 	ubfx	x1, x1, #ID_AA64MMFR1_EL1_HCX_SHIFT, #4
-=======
-	ubfx	x1, x1, #ID_AA64MMFR1_HCX_SHIFT, #4
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cbz	x1, .Lskip_sme
 
 	mrs_s	x1, SYS_HCRX_EL2
@@ -169,11 +157,7 @@ SYM_CODE_START_LOCAL(__finalise_el2)
 	tbnz	x1, #0, 1f
 
 	// Needs to be VHE capable, obviously
-<<<<<<< HEAD
 	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 2f 1f
-=======
-	check_override id_aa64mmfr1 ID_AA64MMFR1_VHE_SHIFT 2f 1f
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 1:	mov_q	x0, HVC_STUB_ERR
 	eret

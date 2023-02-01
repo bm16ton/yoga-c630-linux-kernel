@@ -1993,11 +1993,7 @@ int set_mce_nospec(unsigned long pfn)
 	return rc;
 }
 
-<<<<<<< HEAD
 static int set_memory_p(unsigned long *addr, int numpages)
-=======
-static int set_memory_present(unsigned long *addr, int numpages)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return change_page_attr_set(addr, numpages, __pgprot(_PAGE_PRESENT), 0);
 }
@@ -2007,11 +2003,7 @@ int clear_mce_nospec(unsigned long pfn)
 {
 	unsigned long addr = (unsigned long) pfn_to_kaddr(pfn);
 
-<<<<<<< HEAD
 	return set_memory_p(&addr, 1);
-=======
-	return set_memory_present(&addr, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(clear_mce_nospec);
 #endif /* CONFIG_X86_64 */

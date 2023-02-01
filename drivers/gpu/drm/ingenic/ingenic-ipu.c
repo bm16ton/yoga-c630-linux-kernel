@@ -26,11 +26,7 @@
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
-<<<<<<< HEAD
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_plane.h>
 #include <drm/drm_property.h>
@@ -366,7 +362,6 @@ static void ingenic_ipu_plane_atomic_update(struct drm_plane *plane,
 	}
 
 	if (ingenic_drm_map_noncoherent(ipu->master))
-<<<<<<< HEAD
 		drm_fb_dma_sync_non_coherent(ipu->drm, oldstate, newstate);
 
 	/* New addresses will be committed in vblank handler... */
@@ -376,17 +371,6 @@ static void ingenic_ipu_plane_atomic_update(struct drm_plane *plane,
 						      1);
 	if (finfo->num_planes > 2)
 		ipu->addr_v = drm_fb_dma_get_gem_addr(newstate->fb, newstate,
-=======
-		drm_fb_cma_sync_non_coherent(ipu->drm, oldstate, newstate);
-
-	/* New addresses will be committed in vblank handler... */
-	ipu->addr_y = drm_fb_cma_get_gem_addr(newstate->fb, newstate, 0);
-	if (finfo->num_planes > 1)
-		ipu->addr_u = drm_fb_cma_get_gem_addr(newstate->fb, newstate,
-						      1);
-	if (finfo->num_planes > 2)
-		ipu->addr_v = drm_fb_cma_get_gem_addr(newstate->fb, newstate,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						      2);
 
 	if (!needs_modeset)

@@ -558,10 +558,7 @@ config SND_SOC_INTEL_SOF_NAU8825_MACH
 	select SND_SOC_HDAC_HDMI
 	select SND_SOC_INTEL_HDA_DSP_COMMON
 	select SND_SOC_INTEL_SOF_MAXIM_COMMON
-<<<<<<< HEAD
 	select SND_SOC_INTEL_SOF_REALTEK_COMMON
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	   This adds support for ASoC machine driver for SOF platforms
 	   with nau8825 codec.

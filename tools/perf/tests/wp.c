@@ -139,12 +139,7 @@ static int test__wp_rw(struct test_suite *test __maybe_unused,
 #endif
 }
 
-<<<<<<< HEAD
 static int test__wp_modify(struct test_suite *test __maybe_unused, int subtest __maybe_unused)
-=======
-static int test__wp_modify(struct test_suite *test __maybe_unused,
-			   int subtest __maybe_unused)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 #if defined(__s390x__)
 	return TEST_SKIP;

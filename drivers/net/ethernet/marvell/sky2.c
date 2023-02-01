@@ -4937,11 +4937,7 @@ static int sky2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		}
 	}
 
-<<<<<<< HEAD
 	netif_napi_add(dev, &hw->napi, sky2_poll);
-=======
-	netif_napi_add(dev, &hw->napi, sky2_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = register_netdev(dev);
 	if (err) {

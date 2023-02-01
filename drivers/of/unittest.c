@@ -1914,19 +1914,11 @@ static const char *overlay_name_from_nr(int nr)
 static const char *bus_path = "/testcase-data/overlay-node/test-bus";
 
 #define MAX_TRACK_OVCS_IDS 256
-<<<<<<< HEAD
 
 static int track_ovcs_id[MAX_TRACK_OVCS_IDS];
 static int track_ovcs_id_overlay_nr[MAX_TRACK_OVCS_IDS];
 static int track_ovcs_id_cnt;
 
-=======
-
-static int track_ovcs_id[MAX_TRACK_OVCS_IDS];
-static int track_ovcs_id_overlay_nr[MAX_TRACK_OVCS_IDS];
-static int track_ovcs_id_cnt;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void of_unittest_track_overlay(int ovcs_id, int overlay_nr)
 {
 	if (WARN_ON(track_ovcs_id_cnt >= MAX_TRACK_OVCS_IDS))

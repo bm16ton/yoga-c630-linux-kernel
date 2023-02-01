@@ -673,17 +673,10 @@ struct fwnode_handle *fwnode_get_nth_parent(struct fwnode_handle *fwnode,
 					    unsigned int depth)
 {
 	struct fwnode_handle *parent;
-<<<<<<< HEAD
 
 	if (depth == 0)
 		return fwnode_handle_get(fwnode);
 
-=======
-
-	if (depth == 0)
-		return fwnode_handle_get(fwnode);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fwnode_for_each_parent_node(fwnode, parent) {
 		if (--depth == 0)
 			return parent;
@@ -1163,7 +1156,6 @@ fwnode_graph_get_endpoint_by_id(const struct fwnode_handle *fwnode,
 	return best_ep;
 }
 EXPORT_SYMBOL_GPL(fwnode_graph_get_endpoint_by_id);
-<<<<<<< HEAD
 
 /**
  * fwnode_graph_get_endpoint_count - Count endpoints on a device node
@@ -1186,30 +1178,6 @@ unsigned int fwnode_graph_get_endpoint_count(struct fwnode_handle *fwnode,
 			count++;
 	}
 
-=======
-
-/**
- * fwnode_graph_get_endpoint_count - Count endpoints on a device node
- * @fwnode: The node related to a device
- * @flags: fwnode lookup flags
- * Count endpoints in a device node.
- *
- * If FWNODE_GRAPH_DEVICE_DISABLED flag is specified, also unconnected endpoints
- * and endpoints connected to disabled devices are counted.
- */
-unsigned int fwnode_graph_get_endpoint_count(struct fwnode_handle *fwnode,
-					     unsigned long flags)
-{
-	struct fwnode_handle *ep;
-	unsigned int count = 0;
-
-	fwnode_graph_for_each_endpoint(fwnode, ep) {
-		if (flags & FWNODE_GRAPH_DEVICE_DISABLED ||
-		    fwnode_graph_remote_available(ep))
-			count++;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return count;
 }
 EXPORT_SYMBOL_GPL(fwnode_graph_get_endpoint_count);

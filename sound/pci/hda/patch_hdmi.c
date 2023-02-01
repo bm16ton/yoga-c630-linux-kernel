@@ -167,18 +167,11 @@ struct hdmi_spec {
 	struct hdmi_ops ops;
 
 	bool dyn_pin_out;
-<<<<<<< HEAD
 	bool static_pcm_mapping;
 	/* hdmi interrupt trigger control flag for Nvidia codec */
 	bool hdmi_intr_trig_ctrl;
 	bool nv_dp_workaround; /* workaround DP audio infoframe for Nvidia */
 
-=======
-	bool dyn_pcm_assign;
-	bool dyn_pcm_no_legacy;
-	/* hdmi interrupt trigger control flag for Nvidia codec */
-	bool hdmi_intr_trig_ctrl;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool intel_hsw_fixup;	/* apply Intel platform-specific fixups */
 	/*
 	 * Non-generic VIA/NVIDIA specific
@@ -1277,11 +1270,7 @@ static int hdmi_pcm_open(struct hda_pcm_stream *hinfo,
 	per_cvt = get_cvt(spec, cvt_idx);
 	/* Claim converter */
 	per_cvt->assigned = true;
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_bit(pcm_idx, &spec->pcm_in_use);
 	per_pin = get_pin(spec, pin_idx);
 	per_pin->cvt_nid = per_cvt->cvt_nid;
@@ -1376,46 +1365,6 @@ static int hdmi_find_pcm_slot(struct hdmi_spec *spec,
 {
 	int i;
 
-<<<<<<< HEAD
-=======
-	/* on the new machines, try to assign the pcm slot dynamically,
-	 * not use the preferred fixed map (legacy way) anymore.
-	 */
-	if (spec->dyn_pcm_no_legacy)
-		goto last_try;
-
-	/*
-	 * generic_hdmi_build_pcms() may allocate extra PCMs on some
-	 * platforms (with maximum of 'num_nids + dev_num - 1')
-	 *
-	 * The per_pin of pin_nid_idx=n and dev_id=m prefers to get pcm-n
-	 * if m==0. This guarantees that dynamic pcm assignments are compatible
-	 * with the legacy static per_pin-pcm assignment that existed in the
-	 * days before DP-MST.
-	 *
-	 * Intel DP-MST prefers this legacy behavior for compatibility, too.
-	 *
-	 * per_pin of m!=0 prefers to get pcm=(num_nids + (m - 1)).
-	 */
-
-	if (per_pin->dev_id == 0 || spec->intel_hsw_fixup) {
-		if (!test_bit(per_pin->pin_nid_idx, &spec->pcm_bitmap))
-			return per_pin->pin_nid_idx;
-	} else {
-		i = spec->num_nids + (per_pin->dev_id - 1);
-		if (i < spec->pcm_used && !(test_bit(i, &spec->pcm_bitmap)))
-			return i;
-	}
-
-	/* have a second try; check the area over num_nids */
-	for (i = spec->num_nids; i < spec->pcm_used; i++) {
-		if (!test_bit(i, &spec->pcm_bitmap))
-			return i;
-	}
-
- last_try:
-	/* the last try; check the empty slots in pins */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < spec->pcm_used; i++) {
 		if (!test_bit(i, &spec->pcm_bitmap))
 			return i;
@@ -1793,10 +1742,7 @@ static void silent_stream_enable(struct hda_codec *codec,
 
 	switch (spec->silent_stream_type) {
 	case SILENT_STREAM_KAE:
-<<<<<<< HEAD
 		silent_stream_enable_i915(codec, per_pin);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		silent_stream_set_kae(codec, per_pin, true);
 		break;
 	case SILENT_STREAM_I915:
@@ -2034,11 +1980,8 @@ static int hdmi_add_cvt(struct hda_codec *codec, hda_nid_t cvt_nid)
 static const struct snd_pci_quirk force_connect_list[] = {
 	SND_PCI_QUIRK(0x103c, 0x870f, "HP", 1),
 	SND_PCI_QUIRK(0x103c, 0x871a, "HP", 1),
-<<<<<<< HEAD
 	SND_PCI_QUIRK(0x103c, 0x8711, "HP", 1),
 	SND_PCI_QUIRK(0x103c, 0x8715, "HP", 1),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SND_PCI_QUIRK(0x1462, 0xec94, "MS-7C94", 1),
 	SND_PCI_QUIRK(0x8086, 0x2081, "Intel NUC 10", 1),
 	{}
@@ -2343,26 +2286,8 @@ static int generic_hdmi_build_pcms(struct hda_codec *codec)
 	struct hdmi_spec *spec = codec->spec;
 	int idx, pcm_num;
 
-<<<<<<< HEAD
 	/* limit the PCM devices to the codec converters or available PINs */
 	pcm_num = min(spec->num_cvts, spec->num_pins);
-=======
-	/*
-	 * for non-mst mode, pcm number is the same as before
-	 * for DP MST mode without extra PCM, pcm number is same
-	 * for DP MST mode with extra PCMs, pcm number is
-	 *  (nid number + dev_num - 1)
-	 * dev_num is the device entry number in a pin
-	 */
-
-	if (spec->dyn_pcm_no_legacy && codec->mst_no_extra_pcms)
-		pcm_num = spec->num_cvts;
-	else if (codec->mst_no_extra_pcms)
-		pcm_num = spec->num_nids;
-	else
-		pcm_num = spec->num_nids + spec->dev_num - 1;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	codec_dbg(codec, "hdmi: pcm_num set to %d\n", pcm_num);
 
 	for (idx = 0; idx < pcm_num; idx++) {
@@ -3210,7 +3135,6 @@ static int patch_i915_tgl_hdmi(struct hda_codec *codec)
 	 */
 	static const int map[] = {0x4, 0x6, 0x8, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
 
-<<<<<<< HEAD
 	return intel_hsw_common_init(codec, 0x02, map, ARRAY_SIZE(map), 4,
 				     enable_silent_stream);
 }
@@ -3219,12 +3143,6 @@ static int patch_i915_adlp_hdmi(struct hda_codec *codec)
 {
 	struct hdmi_spec *spec;
 	int res;
-=======
-	ret = intel_hsw_common_init(codec, 0x02, map, ARRAY_SIZE(map), 4,
-				    enable_silent_stream);
-	if (!ret) {
-		struct hdmi_spec *spec = codec->spec;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	res = patch_i915_tgl_hdmi(codec);
 	if (!res) {
@@ -3238,22 +3156,6 @@ static int patch_i915_adlp_hdmi(struct hda_codec *codec)
 			codec->patch_ops.suspend = i915_adlp_hdmi_suspend;
 #endif
 		}
-	}
-
-	return res;
-}
-
-static int patch_i915_adlp_hdmi(struct hda_codec *codec)
-{
-	struct hdmi_spec *spec;
-	int res;
-
-	res = patch_i915_tgl_hdmi(codec);
-	if (!res) {
-		spec = codec->spec;
-
-		if (spec->silent_stream_type)
-			spec->silent_stream_type = SILENT_STREAM_KAE;
 	}
 
 	return res;
@@ -4126,13 +4028,6 @@ static int tegra_hdmi_init(struct hda_codec *codec)
 
 	codec->depop_delay = 10;
 	codec->patch_ops.build_pcms = tegra_hdmi_build_pcms;
-<<<<<<< HEAD
-=======
-	spec->chmap.ops.chmap_cea_alloc_validate_get_type =
-		nvhdmi_chmap_cea_alloc_validate_get_type;
-	spec->chmap.ops.chmap_validate = nvhdmi_chmap_validate;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spec->chmap.ops.chmap_cea_alloc_validate_get_type =
 		nvhdmi_chmap_cea_alloc_validate_get_type;
 	spec->chmap.ops.chmap_validate = nvhdmi_chmap_validate;
@@ -4166,15 +4061,8 @@ static int patch_tegra234_hdmi(struct hda_codec *codec)
 		return err;
 
 	codec->dp_mst = true;
-<<<<<<< HEAD
 	spec = codec->spec;
 	spec->dyn_pin_out = true;
-=======
-	codec->mst_no_extra_pcms = true;
-	spec = codec->spec;
-	spec->dyn_pin_out = true;
-	spec->dyn_pcm_assign = true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spec->hdmi_intr_trig_ctrl = true;
 
 	return tegra_hdmi_init(codec);

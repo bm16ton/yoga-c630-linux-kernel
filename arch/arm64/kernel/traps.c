@@ -507,7 +507,6 @@ void do_el0_bti(struct pt_regs *regs)
 	force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
 }
 
-<<<<<<< HEAD
 void do_el1_bti(struct pt_regs *regs, unsigned long esr)
 {
 	die("Oops - BTI", regs, esr);
@@ -520,9 +519,6 @@ void do_el0_fpac(struct pt_regs *regs, unsigned long esr)
 }
 
 void do_el1_fpac(struct pt_regs *regs, unsigned long esr)
-=======
-void do_ptrauth_fault(struct pt_regs *regs, unsigned long esr)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/*
 	 * Unexpected FPAC exception in the kernel: kill the task before it
@@ -1006,7 +1002,6 @@ static struct break_hook bug_break_hook = {
 	.imm = BUG_BRK_IMM,
 };
 
-<<<<<<< HEAD
 #ifdef CONFIG_CFI_CLANG
 static int cfi_handler(struct pt_regs *regs, unsigned long esr)
 {
@@ -1039,8 +1034,6 @@ static struct break_hook cfi_break_hook = {
 };
 #endif /* CONFIG_CFI_CLANG */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int reserved_fault_handler(struct pt_regs *regs, unsigned long esr)
 {
 	pr_err("%s generated an invalid instruction at %pS!\n",
@@ -1117,13 +1110,7 @@ int __init early_brk64(unsigned long addr, unsigned long esr,
 		return cfi_handler(regs, esr) != DBG_HOOK_HANDLED;
 #endif
 #ifdef CONFIG_KASAN_SW_TAGS
-<<<<<<< HEAD
 	if ((esr_comment(esr) & ~KASAN_BRK_MASK) == KASAN_BRK_IMM)
-=======
-	unsigned long comment = esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
-
-	if ((comment & ~KASAN_BRK_MASK) == KASAN_BRK_IMM)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return kasan_handler(regs, esr) != DBG_HOOK_HANDLED;
 #endif
 	return bug_handler(regs, esr) != DBG_HOOK_HANDLED;

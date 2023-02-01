@@ -227,11 +227,8 @@ static int mtk_vcodec_dec_get_chip_name(void *priv)
 		return 8195;
 	else if (of_device_is_compatible(dev->of_node, "mediatek,mt8186-vcodec-dec"))
 		return 8186;
-<<<<<<< HEAD
 	else if (of_device_is_compatible(dev->of_node, "mediatek,mt8188-vcodec-dec"))
 		return 8188;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		return 8173;
 }

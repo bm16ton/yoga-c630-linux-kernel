@@ -1268,7 +1268,6 @@ nau8825_get_osr(struct nau8825 *nau8825, int stream)
 		return &osr_adc_sel[osr];
 	}
 }
-<<<<<<< HEAD
 
 static int nau8825_dai_startup(struct snd_pcm_substream *substream,
 			       struct snd_soc_dai *dai)
@@ -1277,16 +1276,6 @@ static int nau8825_dai_startup(struct snd_pcm_substream *substream,
 	struct nau8825 *nau8825 = snd_soc_component_get_drvdata(component);
 	const struct nau8825_osr_attr *osr;
 
-=======
-
-static int nau8825_dai_startup(struct snd_pcm_substream *substream,
-			       struct snd_soc_dai *dai)
-{
-	struct snd_soc_component *component = dai->component;
-	struct nau8825 *nau8825 = snd_soc_component_get_drvdata(component);
-	const struct nau8825_osr_attr *osr;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	osr = nau8825_get_osr(nau8825, substream->stream);
 	if (!osr || !osr->osr)
 		return -EINVAL;

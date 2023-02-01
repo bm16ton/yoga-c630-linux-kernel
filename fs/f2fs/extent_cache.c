@@ -676,11 +676,7 @@ void f2fs_update_extent_tree_range_compressed(struct inode *inode,
 	struct rb_node **insert_p = NULL, *insert_parent = NULL;
 	bool leftmost = false;
 
-<<<<<<< HEAD
 	trace_f2fs_update_extent_tree_range(inode, fofs, blkaddr, llen, c_len);
-=======
-	trace_f2fs_update_extent_tree_range(inode, fofs, blkaddr, llen);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* it is safe here to check FI_NO_EXTENT w/o et->lock in ro image */
 	if (is_inode_flag_set(inode, FI_NO_EXTENT))

@@ -67,11 +67,7 @@ KVM_X86_OP(get_interrupt_shadow)
 KVM_X86_OP(patch_hypercall)
 KVM_X86_OP(inject_irq)
 KVM_X86_OP(inject_nmi)
-<<<<<<< HEAD
 KVM_X86_OP(inject_exception)
-=======
-KVM_X86_OP(queue_exception)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 KVM_X86_OP(cancel_injection)
 KVM_X86_OP(interrupt_allowed)
 KVM_X86_OP(nmi_allowed)

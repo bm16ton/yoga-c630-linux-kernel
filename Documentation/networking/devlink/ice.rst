@@ -139,7 +139,6 @@ EMP firmware image.
 The driver does not currently support reloading the driver via
 ``DEVLINK_RELOAD_ACTION_DRIVER_REINIT``.
 
-<<<<<<< HEAD
 Port split
 ==========
 
@@ -176,8 +175,6 @@ the same port split count will be selected.
 ``devlink port unsplit`` will select the option with a split count of 1. If
 there is no FW option available with split count 1, you will receive an error.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Regions
 =======
 

@@ -170,7 +170,6 @@ try_again:
 		 * before vma destruction, it won't race us here,
 		 * and destroy the vma from under us.
 		 */
-<<<<<<< HEAD
 
 		ret = -EBUSY;
 		if (flags & I915_GEM_OBJECT_UNBIND_ASYNC) {
@@ -190,27 +189,6 @@ try_again:
 			}
 		}
 
-=======
-
-		ret = -EBUSY;
-		if (flags & I915_GEM_OBJECT_UNBIND_ASYNC) {
-			assert_object_held(vma->obj);
-			ret = i915_vma_unbind_async(vma, vm_trylock);
-		}
-
-		if (ret == -EBUSY && (flags & I915_GEM_OBJECT_UNBIND_ACTIVE ||
-				      !i915_vma_is_active(vma))) {
-			if (vm_trylock) {
-				if (mutex_trylock(&vma->vm->mutex)) {
-					ret = __i915_vma_unbind(vma);
-					mutex_unlock(&vma->vm->mutex);
-				}
-			} else {
-				ret = i915_vma_unbind(vma);
-			}
-		}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		i915_vm_put(vma->vm);
 		spin_lock(&obj->vma.lock);
 	}
@@ -1013,11 +991,7 @@ new_vma:
 
 struct i915_vma * __must_check
 i915_gem_object_ggtt_pin(struct drm_i915_gem_object *obj,
-<<<<<<< HEAD
 			 const struct i915_gtt_view *view,
-=======
-			 const struct i915_ggtt_view *view,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 u64 size, u64 alignment, u64 flags)
 {
 	struct i915_gem_ww_ctx ww;
@@ -1186,17 +1160,11 @@ int i915_gem_init(struct drm_i915_private *dev_priv)
 	 */
 	intel_init_clock_gating(dev_priv);
 
-<<<<<<< HEAD
 	for_each_gt(gt, dev_priv, i) {
 		ret = intel_gt_init(gt);
 		if (ret)
 			goto err_unlock;
 	}
-=======
-	ret = intel_gt_init(to_gt(dev_priv));
-	if (ret)
-		goto err_unlock;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 
@@ -1209,7 +1177,6 @@ int i915_gem_init(struct drm_i915_private *dev_priv)
 err_unlock:
 	i915_gem_drain_workqueue(dev_priv);
 
-<<<<<<< HEAD
 	if (ret != -EIO) {
 		for_each_gt(gt, dev_priv, i) {
 			intel_gt_driver_remove(gt);
@@ -1217,10 +1184,6 @@ err_unlock:
 			intel_uc_cleanup_firmwares(&gt->uc);
 		}
 	}
-=======
-	if (ret != -EIO)
-		intel_uc_cleanup_firmwares(&to_gt(dev_priv)->uc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (ret == -EIO) {
 		/*
@@ -1228,19 +1191,12 @@ err_unlock:
 		 * as wedged. But we only want to do this when the GPU is angry,
 		 * for all other failure, such as an allocation failure, bail.
 		 */
-<<<<<<< HEAD
 		for_each_gt(gt, dev_priv, i) {
 			if (!intel_gt_is_wedged(gt)) {
 				i915_probe_error(dev_priv,
 						 "Failed to initialize GPU, declaring it wedged!\n");
 				intel_gt_set_wedged(gt);
 			}
-=======
-		if (!intel_gt_is_wedged(to_gt(dev_priv))) {
-			i915_probe_error(dev_priv,
-					 "Failed to initialize GPU, declaring it wedged!\n");
-			intel_gt_set_wedged(to_gt(dev_priv));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		/* Minimal basic recovery for KMS */
@@ -1268,19 +1224,12 @@ void i915_gem_driver_unregister(struct drm_i915_private *i915)
 
 void i915_gem_driver_remove(struct drm_i915_private *dev_priv)
 {
-<<<<<<< HEAD
 	struct intel_gt *gt;
 	unsigned int i;
 
 	i915_gem_suspend_late(dev_priv);
 	for_each_gt(gt, dev_priv, i)
 		intel_gt_driver_remove(gt);
-=======
-	intel_wakeref_auto_fini(&to_gt(dev_priv)->ggtt->userfault_wakeref);
-
-	i915_gem_suspend_late(dev_priv);
-	intel_gt_driver_remove(to_gt(dev_priv));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev_priv->uabi_engines = RB_ROOT;
 
 	/* Flush any outstanding unpin_work. */
@@ -1291,7 +1240,6 @@ void i915_gem_driver_remove(struct drm_i915_private *dev_priv)
 
 void i915_gem_driver_release(struct drm_i915_private *dev_priv)
 {
-<<<<<<< HEAD
 	struct intel_gt *gt;
 	unsigned int i;
 
@@ -1299,11 +1247,6 @@ void i915_gem_driver_release(struct drm_i915_private *dev_priv)
 		intel_gt_driver_release(gt);
 		intel_uc_cleanup_firmwares(&gt->uc);
 	}
-=======
-	intel_gt_driver_release(to_gt(dev_priv));
-
-	intel_uc_cleanup_firmwares(&to_gt(dev_priv)->uc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Flush any outstanding work, including i915_gem_context.release_work. */
 	i915_gem_drain_workqueue(dev_priv);

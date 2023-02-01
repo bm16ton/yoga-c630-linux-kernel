@@ -47,10 +47,7 @@ int task_work_add(struct task_struct *task, struct callback_head *work,
 	/* record the work call stack in order to print it in KASAN reports */
 	kasan_record_aux_stack(work);
 
-<<<<<<< HEAD
 	head = READ_ONCE(task->task_works);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	do {
 		if (unlikely(head == &work_exited))
 			return -ESRCH;
@@ -103,14 +100,9 @@ task_work_cancel_match(struct task_struct *task,
 	 * we raced with task_work_run(), *pprev == NULL/exited.
 	 */
 	raw_spin_lock_irqsave(&task->pi_lock, flags);
-<<<<<<< HEAD
 	work = READ_ONCE(*pprev);
 	while (work) {
 		if (!match(work, data)) {
-=======
-	while ((work = READ_ONCE(*pprev))) {
-		if (!match(work, data))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pprev = &work->next;
 			work = READ_ONCE(*pprev);
 		} else if (try_cmpxchg(pprev, &work, work->next))

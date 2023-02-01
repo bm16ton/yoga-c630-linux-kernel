@@ -26,10 +26,7 @@
 #include <linux/iio/iio.h>
 #include <linux/iio/buffer.h>
 #include <linux/iio/events.h>
-<<<<<<< HEAD
 #include <linux/iio/sysfs.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/iio/trigger.h>
 #include <linux/iio/trigger_consumer.h>
 #include <linux/iio/triggered_buffer.h>
@@ -113,10 +110,7 @@ struct bma400_data {
 	bool step_event_en;
 	bool activity_event_en;
 	unsigned int generic_event_en;
-<<<<<<< HEAD
 	unsigned int tap_event_en_bitmask;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Correct time stamp alignment */
 	struct {
 		__le16 buff[3];
@@ -245,7 +239,6 @@ static const struct iio_event_spec bma400_accel_event[] = {
 				       BIT(IIO_EV_INFO_HYSTERESIS) |
 				       BIT(IIO_EV_INFO_ENABLE),
 	},
-<<<<<<< HEAD
 	{
 		.type = IIO_EV_TYPE_GESTURE,
 		.dir = IIO_EV_DIR_SINGLETAP,
@@ -355,8 +348,6 @@ static struct attribute *bma400_event_attributes[] = {
 
 static const struct attribute_group bma400_event_attribute_group = {
 	.attrs = bma400_event_attributes,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define BMA400_ACC_CHANNEL(_index, _axis) { \
@@ -1155,15 +1146,12 @@ static int bma400_read_event_config(struct iio_dev *indio_dev,
 		case IIO_EV_DIR_FALLING:
 			return FIELD_GET(BMA400_INT_GEN2_MSK,
 					 data->generic_event_en);
-<<<<<<< HEAD
 		case IIO_EV_DIR_SINGLETAP:
 			return FIELD_GET(BMA400_S_TAP_MSK,
 					 data->tap_event_en_bitmask);
 		case IIO_EV_DIR_DOUBLETAP:
 			return FIELD_GET(BMA400_D_TAP_MSK,
 					 data->tap_event_en_bitmask);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		default:
 			return -EINVAL;
 		}
@@ -1171,7 +1159,6 @@ static int bma400_read_event_config(struct iio_dev *indio_dev,
 		return data->step_event_en;
 	case IIO_ACTIVITY:
 		return data->activity_event_en;
-<<<<<<< HEAD
 	default:
 		return -EINVAL;
 	}
@@ -1470,193 +1457,11 @@ static int bma400_read_event_value(struct iio_dev *indio_dev,
 		default:
 			return -EINVAL;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return -EINVAL;
 	}
 }
 
-<<<<<<< HEAD
-=======
-static int bma400_steps_event_enable(struct bma400_data *data, int state)
-{
-	int ret;
-
-	ret = bma400_enable_steps(data, 1);
-	if (ret)
-		return ret;
-
-	ret = regmap_update_bits(data->regmap, BMA400_INT12_MAP_REG,
-				 BMA400_STEP_INT_MSK,
-				 FIELD_PREP(BMA400_STEP_INT_MSK,
-					    state));
-	if (ret)
-		return ret;
-	data->step_event_en = state;
-	return 0;
-}
-
-static int bma400_activity_event_en(struct bma400_data *data,
-				    enum iio_event_direction dir,
-				    int state)
-{
-	int ret, reg, msk, value, field_value;
-
-	switch (dir) {
-	case IIO_EV_DIR_RISING:
-		reg = BMA400_GEN1INT_CONFIG0;
-		msk = BMA400_INT_GEN1_MSK;
-		value = 2;
-		set_mask_bits(&field_value, BMA400_INT_GEN1_MSK,
-			      FIELD_PREP(BMA400_INT_GEN1_MSK, state));
-		break;
-	case IIO_EV_DIR_FALLING:
-		reg = BMA400_GEN2INT_CONFIG0;
-		msk = BMA400_INT_GEN2_MSK;
-		value = 0;
-		set_mask_bits(&field_value, BMA400_INT_GEN2_MSK,
-			      FIELD_PREP(BMA400_INT_GEN2_MSK, state));
-		break;
-	default:
-		return -EINVAL;
-	}
-
-	/* Enabling all axis for interrupt evaluation */
-	ret = regmap_write(data->regmap, reg, 0xF8);
-	if (ret)
-		return ret;
-
-	/* OR combination of all axis for interrupt evaluation */
-	ret = regmap_write(data->regmap, reg + BMA400_GEN_CONFIG1_OFF, value);
-	if (ret)
-		return ret;
-
-	/* Initial value to avoid interrupts while enabling*/
-	ret = regmap_write(data->regmap, reg + BMA400_GEN_CONFIG2_OFF, 0x0A);
-	if (ret)
-		return ret;
-
-	/* Initial duration value to avoid interrupts while enabling*/
-	ret = regmap_write(data->regmap, reg + BMA400_GEN_CONFIG31_OFF, 0x0F);
-	if (ret)
-		return ret;
-
-	ret = regmap_update_bits(data->regmap, BMA400_INT1_MAP_REG, msk,
-				 field_value);
-	if (ret)
-		return ret;
-
-	ret = regmap_update_bits(data->regmap, BMA400_INT_CONFIG0_REG, msk,
-				 field_value);
-	if (ret)
-		return ret;
-
-	set_mask_bits(&data->generic_event_en, msk, field_value);
-	return 0;
-}
-
-static int bma400_write_event_config(struct iio_dev *indio_dev,
-				     const struct iio_chan_spec *chan,
-				     enum iio_event_type type,
-				     enum iio_event_direction dir, int state)
-{
-	struct bma400_data *data = iio_priv(indio_dev);
-	int ret;
-
-	switch (chan->type) {
-	case IIO_ACCEL:
-		mutex_lock(&data->mutex);
-		ret = bma400_activity_event_en(data, dir, state);
-		mutex_unlock(&data->mutex);
-		return ret;
-	case IIO_STEPS:
-		mutex_lock(&data->mutex);
-		ret = bma400_steps_event_enable(data, state);
-		mutex_unlock(&data->mutex);
-		return ret;
-	case IIO_ACTIVITY:
-		mutex_lock(&data->mutex);
-		if (!data->step_event_en) {
-			ret = bma400_steps_event_enable(data, true);
-			if (ret) {
-				mutex_unlock(&data->mutex);
-				return ret;
-			}
-		}
-		data->activity_event_en = state;
-		mutex_unlock(&data->mutex);
-		return 0;
-	default:
-		return -EINVAL;
-	}
-}
-
-static int get_gen_config_reg(enum iio_event_direction dir)
-{
-	switch (dir) {
-	case IIO_EV_DIR_FALLING:
-		return BMA400_GEN2INT_CONFIG0;
-	case IIO_EV_DIR_RISING:
-		return BMA400_GEN1INT_CONFIG0;
-	default:
-		return -EINVAL;
-	}
-}
-
-static int bma400_read_event_value(struct iio_dev *indio_dev,
-				   const struct iio_chan_spec *chan,
-				   enum iio_event_type type,
-				   enum iio_event_direction dir,
-				   enum iio_event_info info,
-				   int *val, int *val2)
-{
-	struct bma400_data *data = iio_priv(indio_dev);
-	int ret, reg;
-
-	switch (chan->type) {
-	case IIO_ACCEL:
-		reg = get_gen_config_reg(dir);
-		if (reg < 0)
-			return -EINVAL;
-
-		*val2 = 0;
-		switch (info) {
-		case IIO_EV_INFO_VALUE:
-			ret = regmap_read(data->regmap,
-					  reg + BMA400_GEN_CONFIG2_OFF,
-					  val);
-			if (ret)
-				return ret;
-			return IIO_VAL_INT;
-		case IIO_EV_INFO_PERIOD:
-			mutex_lock(&data->mutex);
-			ret = regmap_bulk_read(data->regmap,
-					       reg + BMA400_GEN_CONFIG3_OFF,
-					       &data->duration,
-					       sizeof(data->duration));
-			if (ret) {
-				mutex_unlock(&data->mutex);
-				return ret;
-			}
-			*val = be16_to_cpu(data->duration);
-			mutex_unlock(&data->mutex);
-			return IIO_VAL_INT;
-		case IIO_EV_INFO_HYSTERESIS:
-			ret = regmap_read(data->regmap, reg, val);
-			if (ret)
-				return ret;
-			*val = FIELD_GET(BMA400_GEN_HYST_MSK, *val);
-			return IIO_VAL_INT;
-		default:
-			return -EINVAL;
-		}
-	default:
-		return -EINVAL;
-	}
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int bma400_write_event_value(struct iio_dev *indio_dev,
 				    const struct iio_chan_spec *chan,
 				    enum iio_event_type type,
@@ -1665,7 +1470,6 @@ static int bma400_write_event_value(struct iio_dev *indio_dev,
 				    int val, int val2)
 {
 	struct bma400_data *data = iio_priv(indio_dev);
-<<<<<<< HEAD
 	int reg, ret, raw;
 
 	if (chan->type != IIO_ACCEL)
@@ -1673,12 +1477,6 @@ static int bma400_write_event_value(struct iio_dev *indio_dev,
 
 	switch (type) {
 	case IIO_EV_TYPE_MAG:
-=======
-	int reg, ret;
-
-	switch (chan->type) {
-	case IIO_ACCEL:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		reg = get_gen_config_reg(dir);
 		if (reg < 0)
 			return -EINVAL;
@@ -1714,7 +1512,6 @@ static int bma400_write_event_value(struct iio_dev *indio_dev,
 		default:
 			return -EINVAL;
 		}
-<<<<<<< HEAD
 	case IIO_EV_TYPE_GESTURE:
 		switch (info) {
 		case IIO_EV_INFO_VALUE:
@@ -1749,8 +1546,6 @@ static int bma400_write_event_value(struct iio_dev *indio_dev,
 		default:
 			return -EINVAL;
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return -EINVAL;
 	}
@@ -1790,10 +1585,7 @@ static const struct iio_info bma400_info = {
 	.write_event_config = bma400_write_event_config,
 	.write_event_value = bma400_write_event_value,
 	.read_event_value = bma400_read_event_value,
-<<<<<<< HEAD
 	.event_attrs = &bma400_event_attribute_group,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct iio_trigger_ops bma400_trigger_ops = {
@@ -1857,7 +1649,6 @@ static irqreturn_t bma400_interrupt(int irq, void *private)
 	if (ret || !data->status)
 		goto unlock_err;
 
-<<<<<<< HEAD
 	/*
 	 * Disable all advance interrupts if interrupt engine overrun occurs.
 	 * See section 4.7 "Interrupt engine overrun" in datasheet v1.2.
@@ -1884,8 +1675,6 @@ static irqreturn_t bma400_interrupt(int irq, void *private)
 						  IIO_EV_DIR_DOUBLETAP),
 			       timestamp);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (FIELD_GET(BMA400_INT_GEN1_MSK, le16_to_cpu(data->status)))
 		ev_dir = IIO_EV_DIR_RISING;
 

@@ -104,12 +104,8 @@ static int xr21v141x_uart_enable(struct usb_serial_port *port);
 static int xr21v141x_uart_disable(struct usb_serial_port *port);
 static int xr21v141x_fifo_reset(struct usb_serial_port *port);
 static void xr21v141x_set_line_settings(struct tty_struct *tty,
-<<<<<<< HEAD
 					struct usb_serial_port *port,
 					const struct ktermios *old_termios);
-=======
-		struct usb_serial_port *port, struct ktermios *old_termios);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct xr_type {
 	int reg_width;
@@ -138,13 +134,8 @@ struct xr_type {
 	int (*disable)(struct usb_serial_port *port);
 	int (*fifo_reset)(struct usb_serial_port *port);
 	void (*set_line_settings)(struct tty_struct *tty,
-<<<<<<< HEAD
 				  struct usb_serial_port *port,
 				  const struct ktermios *old_termios);
-=======
-			struct usb_serial_port *port,
-			struct ktermios *old_termios);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum xr_type_id {
@@ -523,15 +514,9 @@ static void xr_break_ctl(struct tty_struct *tty, int break_state)
 		state = 0;
 	else
 		state = GENMASK(type->reg_width - 1, 0);
-<<<<<<< HEAD
 
 	dev_dbg(&port->dev, "Turning break %s\n", state == 0 ? "off" : "on");
 
-=======
-
-	dev_dbg(&port->dev, "Turning break %s\n", state == 0 ? "off" : "on");
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	xr_set_reg_uart(port, type->tx_break, state);
 }
 
@@ -690,12 +675,8 @@ static void xr_set_flow_mode(struct tty_struct *tty,
 }
 
 static void xr21v141x_set_line_settings(struct tty_struct *tty,
-<<<<<<< HEAD
 				        struct usb_serial_port *port,
 				        const struct ktermios *old_termios)
-=======
-		struct usb_serial_port *port, struct ktermios *old_termios)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ktermios *termios = &tty->termios;
 	u8 bits = 0;
@@ -753,12 +734,8 @@ static void xr21v141x_set_line_settings(struct tty_struct *tty,
 }
 
 static void xr_cdc_set_line_coding(struct tty_struct *tty,
-<<<<<<< HEAD
 				   struct usb_serial_port *port,
 				   const struct ktermios *old_termios)
-=======
-		struct usb_serial_port *port, struct ktermios *old_termios)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct xr_data *data = usb_get_serial_port_data(port);
 	struct usb_host_interface *alt = port->serial->interface->cur_altsetting;
@@ -835,12 +812,8 @@ static void xr_cdc_set_line_coding(struct tty_struct *tty,
 }
 
 static void xr_set_termios(struct tty_struct *tty,
-<<<<<<< HEAD
 			   struct usb_serial_port *port,
 			   const struct ktermios *old_termios)
-=======
-		struct usb_serial_port *port, struct ktermios *old_termios)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct xr_data *data = usb_get_serial_port_data(port);
 
@@ -917,7 +890,6 @@ static int xr_probe(struct usb_serial *serial, const struct usb_device_id *id)
 
 	usb_set_serial_data(serial, (void *)id->driver_info);
 
-<<<<<<< HEAD
 	return 0;
 }
 
@@ -953,43 +925,6 @@ static int xr_gpio_init(struct usb_serial_port *port, const struct xr_type *type
 	return 0;
 }
 
-=======
-	return 0;
-}
-
-static int xr_gpio_init(struct usb_serial_port *port, const struct xr_type *type)
-{
-	u16 mask, mode;
-	int ret;
-
-	/*
-	 * Configure all pins as GPIO except for Receive and Transmit Toggle.
-	 */
-	mode = 0;
-	if (type->have_xmit_toggle)
-		mode |= XR_GPIO_MODE_RX_TOGGLE | XR_GPIO_MODE_TX_TOGGLE;
-
-	ret = xr_set_reg_uart(port, type->gpio_mode, mode);
-	if (ret)
-		return ret;
-
-	/*
-	 * Configure DTR and RTS as outputs and make sure they are deasserted
-	 * (active low), and configure RI, CD, DSR and CTS as inputs.
-	 */
-	mask = XR_GPIO_DTR | XR_GPIO_RTS;
-	ret = xr_set_reg_uart(port, type->gpio_direction, mask);
-	if (ret)
-		return ret;
-
-	ret = xr_set_reg_uart(port, type->gpio_set, mask);
-	if (ret)
-		return ret;
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int xr_port_probe(struct usb_serial_port *port)
 {
 	struct usb_interface_descriptor *desc;

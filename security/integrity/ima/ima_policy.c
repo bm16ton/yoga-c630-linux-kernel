@@ -631,11 +631,7 @@ retry:
 		case LSM_SUBJ_TYPE:
 			rc = ima_filter_rule_match(secid, lsm_rule->lsm[i].type,
 						   Audit_equal,
-<<<<<<< HEAD
 						   lsm_rule->lsm[i].rule);
-=======
-						   rule->lsm[i].rule);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		default:
 			break;

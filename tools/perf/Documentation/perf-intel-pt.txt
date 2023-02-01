@@ -989,13 +989,9 @@ must be preceded by either '+' or '-'. The flags support by Intel PT are:
 
 		-a	Suppress logging of perf events
 		+a	Log all perf events
-<<<<<<< HEAD
 		+e	Output only on decoding errors (size configurable)
 		+o	Output to stdout instead of "intel_pt.log"
 
-=======
-		+o	Output to stdout instead of "intel_pt.log"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 By default, logged perf events are filtered by any specified time ranges, but
 flag +a overrides that.  The +e flag can be useful for analyzing errors.  By
 default, the log size in that case is 16384 bytes, but can be altered by

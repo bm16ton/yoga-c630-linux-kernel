@@ -6,10 +6,7 @@
 #include <dt-bindings/clock/qcom,gcc-msm8994.h>
 #include <dt-bindings/clock/qcom,mmcc-msm8994.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
-<<<<<<< HEAD
 #include <dt-bindings/gpio/gpio.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <dt-bindings/power/qcom-rpmpd.h>
 
 / {
@@ -166,15 +163,6 @@
 		device_type = "memory";
 		/* We expect the bootloader to fill in the reg */
 		reg = <0 0x80000000 0 0>;
-<<<<<<< HEAD
-=======
-	};
-
-	tcsr_mutex: hwlock {
-		compatible = "qcom,tcsr-mutex";
-		syscon = <&tcsr_mutex_regs 0 0x80>;
-		#hwlock-cells = <1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	pmu {

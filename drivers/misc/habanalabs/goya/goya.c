@@ -916,57 +916,11 @@ int goya_late_init(struct hl_device *hdev)
  */
 void goya_late_fini(struct hl_device *hdev)
 {
-<<<<<<< HEAD
 	struct goya_device *goya = hdev->asic_specific;
-=======
-	const struct hwmon_channel_info **channel_info_arr;
-	struct goya_device *goya = hdev->asic_specific;
-	int i = 0;
-
-	cancel_delayed_work_sync(&goya->goya_work->work_freq);
-
-	if (!hdev->hl_chip_info->info)
-		return;
-
-	channel_info_arr = hdev->hl_chip_info->info;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	cancel_delayed_work_sync(&goya->goya_work->work_freq);
 
 	hl_hwmon_release_resources(hdev);
-}
-
-static void goya_set_pci_memory_regions(struct hl_device *hdev)
-{
-	struct asic_fixed_properties *prop = &hdev->asic_prop;
-	struct pci_mem_region *region;
-
-	/* CFG */
-	region = &hdev->pci_mem_region[PCI_REGION_CFG];
-	region->region_base = CFG_BASE;
-	region->region_size = CFG_SIZE;
-	region->offset_in_bar = CFG_BASE - SRAM_BASE_ADDR;
-	region->bar_size = CFG_BAR_SIZE;
-	region->bar_id = SRAM_CFG_BAR_ID;
-	region->used = 1;
-
-	/* SRAM */
-	region = &hdev->pci_mem_region[PCI_REGION_SRAM];
-	region->region_base = SRAM_BASE_ADDR;
-	region->region_size = SRAM_SIZE;
-	region->offset_in_bar = 0;
-	region->bar_size = CFG_BAR_SIZE;
-	region->bar_id = SRAM_CFG_BAR_ID;
-	region->used = 1;
-
-	/* DRAM */
-	region = &hdev->pci_mem_region[PCI_REGION_DRAM];
-	region->region_base = DRAM_PHYS_BASE;
-	region->region_size = hdev->asic_prop.dram_size;
-	region->offset_in_bar = 0;
-	region->bar_size = prop->dram_pci_bar_size;
-	region->bar_id = DDR_BAR_ID;
-	region->used = 1;
 }
 
 static void goya_set_pci_memory_regions(struct hl_device *hdev)
@@ -1071,10 +1025,7 @@ static int goya_sw_init(struct hl_device *hdev)
 	hdev->asic_prop.supports_compute_reset = true;
 	hdev->asic_prop.allow_inference_soft_reset = true;
 	hdev->supports_wait_for_multi_cs = false;
-<<<<<<< HEAD
 	hdev->supports_ctx_switch = true;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hdev->asic_funcs->set_pci_memory_regions(hdev);
 
@@ -4594,11 +4545,7 @@ static int goya_unmask_irq_arr(struct hl_device *hdev, u32 *irq_arr,
 	return rc;
 }
 
-<<<<<<< HEAD
 static int goya_compute_reset_late_init(struct hl_device *hdev)
-=======
-static int goya_non_hard_reset_late_init(struct hl_device *hdev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/*
 	 * Unmask all IRQs since some could have been received
@@ -5176,13 +5123,8 @@ int goya_cpucp_info_get(struct hl_device *hdev)
 	return 0;
 }
 
-<<<<<<< HEAD
 static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr, u8 mask_len,
 				struct engines_data *e)
-=======
-static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr,
-					u8 mask_len, struct seq_file *s)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const char *fmt = "%-5d%-9s%#-14x%#-16x%#x\n";
 	const char *dma_fmt = "%-5d%-9s%#-14x%#x\n";
@@ -5478,14 +5420,11 @@ static int goya_scrub_device_dram(struct hl_device *hdev, u64 val)
 	return -EOPNOTSUPP;
 }
 
-<<<<<<< HEAD
 static int goya_send_device_activity(struct hl_device *hdev, bool open)
 {
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct hl_asic_funcs goya_funcs = {
 	.early_init = goya_early_init,
 	.early_fini = goya_early_fini,
@@ -5530,15 +5469,9 @@ static const struct hl_asic_funcs goya_funcs = {
 	.send_heartbeat = goya_send_heartbeat,
 	.debug_coresight = goya_debug_coresight,
 	.is_device_idle = goya_is_device_idle,
-<<<<<<< HEAD
 	.compute_reset_late_init = goya_compute_reset_late_init,
-=======
-	.non_hard_reset_late_init = goya_non_hard_reset_late_init,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.hw_queues_lock = goya_hw_queues_lock,
 	.hw_queues_unlock = goya_hw_queues_unlock,
-	.kdma_lock = NULL,
-	.kdma_unlock = NULL,
 	.get_pci_id = goya_get_pci_id,
 	.get_eeprom_data = goya_get_eeprom_data,
 	.get_monitor_dump = goya_get_monitor_dump,
@@ -5584,10 +5517,7 @@ static const struct hl_asic_funcs goya_funcs = {
 	.mmu_get_real_page_size = hl_mmu_get_real_page_size,
 	.access_dev_mem = hl_access_dev_mem,
 	.set_dram_bar_base = goya_set_ddr_bar_base,
-<<<<<<< HEAD
 	.send_device_activity = goya_send_device_activity,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*

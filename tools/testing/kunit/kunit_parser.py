@@ -218,11 +218,7 @@ TAP_START = re.compile(r'TAP version ([0-9]+)$')
 KTAP_END = re.compile('(List of all partitions:|'
 	'Kernel panic - not syncing: VFS:|reboot: System halted)')
 
-<<<<<<< HEAD
 def extract_tap_lines(kernel_output: Iterable[str], lstrip=True) -> LineStream:
-=======
-def extract_tap_lines(kernel_output: Iterable[str]) -> LineStream:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	"""Extracts KTAP lines from the kernel output."""
 	def isolate_ktap_output(kernel_output: Iterable[str]) \
 			-> Iterator[Tuple[int, str]]:
@@ -248,17 +244,11 @@ def extract_tap_lines(kernel_output: Iterable[str]) -> LineStream:
 				# stop extracting KTAP lines
 				break
 			elif started:
-<<<<<<< HEAD
 				# remove the prefix and optionally any leading
 				# whitespace. Our parsing logic relies on this.
 				line = line[prefix_len:]
 				if lstrip:
 					line = line.lstrip()
-=======
-				# remove prefix and any indention and yield
-				# line with line number
-				line = line[prefix_len:].lstrip()
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				yield line_num, line
 	return LineStream(lines=isolate_ktap_output(kernel_output))
 

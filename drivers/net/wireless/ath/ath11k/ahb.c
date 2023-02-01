@@ -16,11 +16,8 @@
 #include "hif.h"
 #include <linux/remoteproc.h>
 #include "pcic.h"
-<<<<<<< HEAD
 #include <linux/soc/qcom/smem.h>
 #include <linux/soc/qcom/smem_state.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct of_device_id ath11k_ahb_of_match[] = {
 	/* TODO: Should we change the compatible string to something similar
@@ -364,10 +361,7 @@ static void ath11k_ahb_ext_irq_enable(struct ath11k_base *ab)
 		struct ath11k_ext_irq_grp *irq_grp = &ab->ext_irq_grp[i];
 
 		if (!irq_grp->napi_enabled) {
-<<<<<<< HEAD
 			dev_set_threaded(&irq_grp->napi_ndev, true);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			napi_enable(&irq_grp->napi);
 			irq_grp->napi_enabled = true;
 		}
@@ -695,7 +689,6 @@ static int ath11k_ahb_map_service_to_pipe(struct ath11k_base *ab, u16 service_id
 	return 0;
 }
 
-<<<<<<< HEAD
 static int ath11k_ahb_hif_suspend(struct ath11k_base *ab)
 {
 	struct ath11k_ahb *ab_ahb = ath11k_ahb_priv(ab);
@@ -774,8 +767,6 @@ static int ath11k_ahb_hif_resume(struct ath11k_base *ab)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct ath11k_hif_ops ath11k_ahb_hif_ops_ipq8074 = {
 	.start = ath11k_ahb_start,
 	.stop = ath11k_ahb_stop,
@@ -794,10 +785,7 @@ static const struct ath11k_hif_ops ath11k_ahb_hif_ops_wcn6750 = {
 	.stop = ath11k_pcic_stop,
 	.read32 = ath11k_pcic_read32,
 	.write32 = ath11k_pcic_write32,
-<<<<<<< HEAD
 	.read = NULL,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.irq_enable = ath11k_pcic_ext_irq_enable,
 	.irq_disable = ath11k_pcic_ext_irq_disable,
 	.get_msi_address =  ath11k_pcic_get_msi_address,
@@ -805,13 +793,10 @@ static const struct ath11k_hif_ops ath11k_ahb_hif_ops_wcn6750 = {
 	.map_service_to_pipe = ath11k_pcic_map_service_to_pipe,
 	.power_down = ath11k_ahb_power_down,
 	.power_up = ath11k_ahb_power_up,
-<<<<<<< HEAD
 	.suspend = ath11k_ahb_hif_suspend,
 	.resume = ath11k_ahb_hif_resume,
 	.ce_irq_enable = ath11k_pci_enable_ce_irqs_except_wake_irq,
 	.ce_irq_disable = ath11k_pci_disable_ce_irqs_except_wake_irq,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int ath11k_core_get_rproc(struct ath11k_base *ab)
@@ -886,7 +871,6 @@ static int ath11k_ahb_setup_msi_resources(struct ath11k_base *ab)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int ath11k_ahb_setup_smp2p_handle(struct ath11k_base *ab)
 {
 	struct ath11k_ahb *ab_ahb = ath11k_ahb_priv(ab);
@@ -915,8 +899,6 @@ static void ath11k_ahb_release_smp2p_handle(struct ath11k_base *ab)
 	qcom_smem_state_put(ab_ahb->smp2p_info.smem_state);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int ath11k_ahb_setup_resources(struct ath11k_base *ab)
 {
 	struct platform_device *pdev = ab->pdev;
@@ -1165,7 +1147,6 @@ static int ath11k_ahb_probe(struct platform_device *pdev)
 		goto err_core_free;
 
 	ret = ath11k_ahb_setup_resources(ab);
-<<<<<<< HEAD
 	if (ret)
 		goto err_core_free;
 
@@ -1180,18 +1161,6 @@ static int ath11k_ahb_probe(struct platform_device *pdev)
 	ret = ath11k_hal_srng_init(ab);
 	if (ret)
 		goto err_release_smp2p_handle;
-=======
-	if (ret)
-		goto err_core_free;
-
-	ret = ath11k_ahb_fw_resources_init(ab);
-	if (ret)
-		goto err_core_free;
-
-	ret = ath11k_hal_srng_init(ab);
-	if (ret)
-		goto err_fw_deinit;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = ath11k_ce_alloc_pipes(ab);
 	if (ret) {
@@ -1229,12 +1198,9 @@ err_ce_free:
 err_hal_srng_deinit:
 	ath11k_hal_srng_deinit(ab);
 
-<<<<<<< HEAD
 err_release_smp2p_handle:
 	ath11k_ahb_release_smp2p_handle(ab);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_fw_deinit:
 	ath11k_ahb_fw_resource_deinit(ab);
 
@@ -1267,10 +1233,7 @@ static void ath11k_ahb_free_resources(struct ath11k_base *ab)
 
 	ath11k_ahb_free_irq(ab);
 	ath11k_hal_srng_deinit(ab);
-<<<<<<< HEAD
 	ath11k_ahb_release_smp2p_handle(ab);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ath11k_ahb_fw_resource_deinit(ab);
 	ath11k_ce_free_pipes(ab);
 	ath11k_core_free(ab);

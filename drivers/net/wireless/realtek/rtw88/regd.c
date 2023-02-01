@@ -479,10 +479,7 @@ void rtw_regd_notifier(struct wiphy *wiphy, struct regulatory_request *request)
 	rtw_dbg(rtwdev, RTW_DBG_REGD, "regd state: %d -> %d\n",
 		rtwdev->regd.state, next_regd.state);
 
-<<<<<<< HEAD
 	mutex_lock(&rtwdev->mutex);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rtwdev->regd = next_regd;
 	rtw_dbg_regd_dump(rtwdev, "get alpha2 %c%c from initiator %d: ",
 			  request->alpha2[0],
@@ -492,45 +489,6 @@ void rtw_regd_notifier(struct wiphy *wiphy, struct regulatory_request *request)
 	rtw_phy_adaptivity_set_mode(rtwdev);
 	rtw_phy_set_tx_power_level(rtwdev, hal->current_channel);
 	mutex_unlock(&rtwdev->mutex);
-}
-
-u8 rtw_regd_get(struct rtw_dev *rtwdev)
-{
-	struct rtw_hal *hal = &rtwdev->hal;
-	u8 band = hal->current_band_type;
-
-	return band == RTW_BAND_2G ?
-	       rtwdev->regd.regulatory->txpwr_regd_2g :
-	       rtwdev->regd.regulatory->txpwr_regd_5g;
-}
-EXPORT_SYMBOL(rtw_regd_get);
-
-struct rtw_regd_alternative_t {
-	bool set;
-	u8 alt;
-};
-
-#define DECL_REGD_ALT(_regd, _regd_alt) \
-	[(_regd)] = {.set = true, .alt = (_regd_alt)}
-
-static const struct rtw_regd_alternative_t
-rtw_regd_alt[RTW_REGD_MAX] = {
-	DECL_REGD_ALT(RTW_REGD_IC, RTW_REGD_FCC),
-	DECL_REGD_ALT(RTW_REGD_KCC, RTW_REGD_ETSI),
-	DECL_REGD_ALT(RTW_REGD_ACMA, RTW_REGD_ETSI),
-	DECL_REGD_ALT(RTW_REGD_CHILE, RTW_REGD_FCC),
-	DECL_REGD_ALT(RTW_REGD_UKRAINE, RTW_REGD_ETSI),
-	DECL_REGD_ALT(RTW_REGD_MEXICO, RTW_REGD_FCC),
-	DECL_REGD_ALT(RTW_REGD_CN, RTW_REGD_ETSI),
-};
-
-bool rtw_regd_has_alt(u8 regd, u8 *regd_alt)
-{
-	if (!rtw_regd_alt[regd].set)
-		return false;
-
-	*regd_alt = rtw_regd_alt[regd].alt;
-	return true;
 }
 
 u8 rtw_regd_get(struct rtw_dev *rtwdev)

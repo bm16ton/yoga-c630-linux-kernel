@@ -341,7 +341,6 @@ nfsd_get_write_access(struct svc_rqst *rqstp, struct svc_fh *fhp,
 			return err;
 	}
 	return nfserrno(get_write_access(inode));
-<<<<<<< HEAD
 }
 
 static int __nfsd_setattr(struct dentry *dentry, struct iattr *iap)
@@ -383,8 +382,6 @@ static int __nfsd_setattr(struct dentry *dentry, struct iattr *iap)
 
 	iap->ia_valid |= ATTR_CTIME;
 	return notify_change(&init_user_ns, dentry, iap, NULL);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -413,7 +410,7 @@ nfsd_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 	int		accmode = NFSD_MAY_SATTR;
 	umode_t		ftype = 0;
 	__be32		err;
-	int		host_err = 0;
+	int		host_err;
 	bool		get_write_count;
 	bool		size_change = (iap->ia_valid & ATTR_SIZE);
 	int		retries;
@@ -471,7 +468,6 @@ nfsd_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 	}
 
 	inode_lock(inode);
-<<<<<<< HEAD
 	for (retries = 1;;) {
 		host_err = __nfsd_setattr(dentry, iap);
 		if (host_err != -EAGAIN || !retries--)
@@ -479,45 +475,6 @@ nfsd_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 		if (!nfsd_wait_for_delegreturn(rqstp, inode))
 			break;
 	}
-=======
-	if (size_change) {
-		/*
-		 * RFC5661, Section 18.30.4:
-		 *   Changing the size of a file with SETATTR indirectly
-		 *   changes the time_modify and change attributes.
-		 *
-		 * (and similar for the older RFCs)
-		 */
-		struct iattr size_attr = {
-			.ia_valid	= ATTR_SIZE | ATTR_CTIME | ATTR_MTIME,
-			.ia_size	= iap->ia_size,
-		};
-
-		host_err = -EFBIG;
-		if (iap->ia_size < 0)
-			goto out_unlock;
-
-		host_err = notify_change(&init_user_ns, dentry, &size_attr, NULL);
-		if (host_err)
-			goto out_unlock;
-		iap->ia_valid &= ~ATTR_SIZE;
-
-		/*
-		 * Avoid the additional setattr call below if the only other
-		 * attribute that the client sends is the mtime, as we update
-		 * it as part of the size change above.
-		 */
-		if ((iap->ia_valid & ~ATTR_MTIME) == 0)
-			goto out_unlock;
-	}
-
-	if (iap->ia_valid) {
-		iap->ia_valid |= ATTR_CTIME;
-		host_err = notify_change(&init_user_ns, dentry, iap, NULL);
-	}
-
-out_unlock:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (attr->na_seclabel && attr->na_seclabel->len)
 		attr->na_labelerr = security_inode_setsecctx(dentry,
 			attr->na_seclabel->data, attr->na_seclabel->len);
@@ -1176,10 +1133,7 @@ out:
  * nfsd_commit - Commit pending writes to stable storage
  * @rqstp: RPC request being processed
  * @fhp: NFS filehandle
-<<<<<<< HEAD
  * @nf: target file
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @offset: raw offset from beginning of file
  * @count: raw count of bytes to sync
  * @verf: filled in with the server's current write verifier
@@ -1196,7 +1150,6 @@ out:
  *   An nfsstat value in network byte order.
  */
 __be32
-<<<<<<< HEAD
 nfsd_commit(struct svc_rqst *rqstp, struct svc_fh *fhp, struct nfsd_file *nf,
 	    u64 offset, u32 count, __be32 *verf)
 {
@@ -1220,37 +1173,6 @@ nfsd_commit(struct svc_rqst *rqstp, struct svc_fh *fhp, struct nfsd_file *nf,
 			end = offset + count - 1;
 	}
 
-=======
-nfsd_commit(struct svc_rqst *rqstp, struct svc_fh *fhp, u64 offset,
-	    u32 count, __be32 *verf)
-{
-	u64			maxbytes;
-	loff_t			start, end;
-	struct nfsd_net		*nn;
-	struct nfsd_file	*nf;
-	__be32			err;
-
-	err = nfsd_file_acquire(rqstp, fhp,
-			NFSD_MAY_WRITE|NFSD_MAY_NOT_BREAK_LEASE, &nf);
-	if (err)
-		goto out;
-
-	/*
-	 * Convert the client-provided (offset, count) range to a
-	 * (start, end) range. If the client-provided range falls
-	 * outside the maximum file size of the underlying FS,
-	 * clamp the sync range appropriately.
-	 */
-	start = 0;
-	end = LLONG_MAX;
-	maxbytes = (u64)fhp->fh_dentry->d_sb->s_maxbytes;
-	if (offset < maxbytes) {
-		start = offset;
-		if (count && (offset + count - 1 < maxbytes))
-			end = offset + count - 1;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nn = net_generic(nf->nf_net, nfsd_net_id);
 	if (EX_ISSYNC(fhp->fh_export)) {
 		errseq_t since = READ_ONCE(nf->nf_file->f_wb_err);
@@ -1351,11 +1273,7 @@ nfsd_check_ignore_resizing(struct iattr *iap)
 /* The parent directory should already be locked: */
 __be32
 nfsd_create_locked(struct svc_rqst *rqstp, struct svc_fh *fhp,
-<<<<<<< HEAD
 		   struct nfsd_attrs *attrs,
-=======
-		   char *fname, int flen, struct nfsd_attrs *attrs,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		   int type, dev_t rdev, struct svc_fh *resfhp)
 {
 	struct dentry	*dentry, *dchild;
@@ -1482,12 +1400,7 @@ nfsd_create(struct svc_rqst *rqstp, struct svc_fh *fhp,
 	if (err)
 		goto out_unlock;
 	fh_fill_pre_attrs(fhp);
-<<<<<<< HEAD
 	err = nfsd_create_locked(rqstp, fhp, attrs, type, rdev, resfhp);
-=======
-	err = nfsd_create_locked(rqstp, fhp, fname, flen, attrs, type,
-				 rdev, resfhp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fh_fill_post_attrs(fhp);
 out_unlock:
 	inode_unlock(dentry->d_inode);

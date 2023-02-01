@@ -9,18 +9,13 @@
  * by the Free Software Foundation, incorporated herein by reference.
  */
 
-<<<<<<< HEAD
 #include <net/pkt_cls.h>
 #include "tc.h"
 #include "tc_bindings.h"
-=======
-#include "tc.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "mae.h"
 #include "ef100_rep.h"
 #include "efx.h"
 
-<<<<<<< HEAD
 #define EFX_EFV_PF	NULL
 /* Look up the representor information (efv) for a device.
  * May return NULL for the PF (us), or an error pointer for a device that
@@ -68,8 +63,6 @@ static const struct rhashtable_params efx_tc_match_action_ht_params = {
 	.head_offset	= offsetof(struct efx_tc_flow_rule, linkage),
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void efx_tc_free_action_set(struct efx_nic *efx,
 				   struct efx_tc_action_set *act, bool in_hw)
 {
@@ -114,7 +107,6 @@ static void efx_tc_delete_rule(struct efx_nic *efx, struct efx_tc_flow_rule *rul
 	rule->fw_id = MC_CMD_MAE_ACTION_RULE_INSERT_OUT_ACTION_RULE_ID_NULL;
 }
 
-<<<<<<< HEAD
 static void efx_tc_flow_free(void *ptr, void *arg)
 {
 	struct efx_tc_flow_rule *rule = ptr;
@@ -442,8 +434,6 @@ int efx_tc_flower(struct efx_nic *efx, struct net_device *net_dev,
 	return rc;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int efx_tc_configure_default_rule(struct efx_nic *efx, u32 ing_port,
 					 u32 eg_port, struct efx_tc_flow_rule *rule)
 {
@@ -587,7 +577,6 @@ int efx_init_tc(struct efx_nic *efx)
 {
 	int rc;
 
-<<<<<<< HEAD
 	rc = efx_mae_get_caps(efx, efx->tc->caps);
 	if (rc)
 		return rc;
@@ -605,15 +594,12 @@ int efx_init_tc(struct efx_nic *efx)
 			  efx->tc->caps->action_prios, EFX_TC_PRIO__NUM);
 		return -EIO;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = efx_tc_configure_default_rule_pf(efx);
 	if (rc)
 		return rc;
 	rc = efx_tc_configure_default_rule_wire(efx);
 	if (rc)
 		return rc;
-<<<<<<< HEAD
 	rc = efx_tc_configure_rep_mport(efx);
 	if (rc)
 		return rc;
@@ -622,9 +608,6 @@ int efx_init_tc(struct efx_nic *efx)
 	if (rc)
 		return rc;
 	return 0;
-=======
-	return efx_tc_configure_rep_mport(efx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void efx_fini_tc(struct efx_nic *efx)
@@ -632,34 +615,24 @@ void efx_fini_tc(struct efx_nic *efx)
 	/* We can get called even if efx_init_struct_tc() failed */
 	if (!efx->tc)
 		return;
-<<<<<<< HEAD
 	if (efx->tc->up)
 		flow_indr_dev_unregister(efx_tc_indr_setup_cb, efx, efx_tc_block_unbind);
 	efx_tc_deconfigure_rep_mport(efx);
 	efx_tc_deconfigure_default_rule(efx, &efx->tc->dflt.pf);
 	efx_tc_deconfigure_default_rule(efx, &efx->tc->dflt.wire);
 	efx->tc->up = false;
-=======
-	efx_tc_deconfigure_rep_mport(efx);
-	efx_tc_deconfigure_default_rule(efx, &efx->tc->dflt.pf);
-	efx_tc_deconfigure_default_rule(efx, &efx->tc->dflt.wire);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int efx_init_struct_tc(struct efx_nic *efx)
 {
-<<<<<<< HEAD
 	int rc;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (efx->type->is_vf)
 		return 0;
 
 	efx->tc = kzalloc(sizeof(*efx->tc), GFP_KERNEL);
 	if (!efx->tc)
 		return -ENOMEM;
-<<<<<<< HEAD
 	efx->tc->caps = kzalloc(sizeof(struct mae_caps), GFP_KERNEL);
 	if (!efx->tc->caps) {
 		rc = -ENOMEM;
@@ -671,9 +644,6 @@ int efx_init_struct_tc(struct efx_nic *efx)
 	rc = rhashtable_init(&efx->tc->match_action_ht, &efx_tc_match_action_ht_params);
 	if (rc < 0)
 		goto fail_match_action_ht;
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	efx->tc->reps_filter_uc = -1;
 	efx->tc->reps_filter_mc = -1;
 	INIT_LIST_HEAD(&efx->tc->dflt.pf.acts.list);
@@ -681,7 +651,6 @@ int efx_init_struct_tc(struct efx_nic *efx)
 	INIT_LIST_HEAD(&efx->tc->dflt.wire.acts.list);
 	efx->tc->dflt.wire.fw_id = MC_CMD_MAE_ACTION_RULE_INSERT_OUT_ACTION_RULE_ID_NULL;
 	return 0;
-<<<<<<< HEAD
 fail_match_action_ht:
 	mutex_destroy(&efx->tc->mutex);
 	kfree(efx->tc->caps);
@@ -689,8 +658,6 @@ fail_alloc_caps:
 	kfree(efx->tc);
 	efx->tc = NULL;
 	return rc;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void efx_fini_struct_tc(struct efx_nic *efx)
@@ -698,22 +665,16 @@ void efx_fini_struct_tc(struct efx_nic *efx)
 	if (!efx->tc)
 		return;
 
-<<<<<<< HEAD
 	mutex_lock(&efx->tc->mutex);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	EFX_WARN_ON_PARANOID(efx->tc->dflt.pf.fw_id !=
 			     MC_CMD_MAE_ACTION_RULE_INSERT_OUT_ACTION_RULE_ID_NULL);
 	EFX_WARN_ON_PARANOID(efx->tc->dflt.wire.fw_id !=
 			     MC_CMD_MAE_ACTION_RULE_INSERT_OUT_ACTION_RULE_ID_NULL);
-<<<<<<< HEAD
 	rhashtable_free_and_destroy(&efx->tc->match_action_ht, efx_tc_flow_free,
 				    efx);
 	mutex_unlock(&efx->tc->mutex);
 	mutex_destroy(&efx->tc->mutex);
 	kfree(efx->tc->caps);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(efx->tc);
 	efx->tc = NULL;
 }

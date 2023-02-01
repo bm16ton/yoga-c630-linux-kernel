@@ -461,11 +461,8 @@ struct irq_remap_table {
 /* Interrupt remapping feature used? */
 extern bool amd_iommu_irq_remap;
 
-<<<<<<< HEAD
 extern const struct iommu_ops amd_iommu_ops;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* IVRS indicates that pre-boot remapping was enabled */
 extern bool amdr_ivrs_remap_support;
 

@@ -194,12 +194,8 @@ int hl_build_hwmon_channel_info(struct hl_device *hdev, struct cpucp_sensor *sen
 		curr_arr[sensors_by_type_next_index[type]++] = flags;
 	}
 
-<<<<<<< HEAD
 	channels_info = kcalloc(num_active_sensor_types + 1, sizeof(struct hwmon_channel_info *),
 				GFP_KERNEL);
-=======
-	channels_info = kcalloc(num_active_sensor_types + 1, sizeof(*channels_info), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!channels_info) {
 		rc = -ENOMEM;
 		goto channels_info_array_err;

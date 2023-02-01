@@ -356,11 +356,7 @@ static const struct qcom_cc_desc lpass_audio_hm_sc7180_desc = {
 	.num_gdscs = ARRAY_SIZE(lpass_audio_hm_sc7180_gdscs),
 };
 
-<<<<<<< HEAD
 static int lpass_setup_runtime_pm(struct platform_device *pdev)
-=======
-static int lpass_create_pm_clks(struct platform_device *pdev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 

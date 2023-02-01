@@ -192,15 +192,8 @@ static int amdgpu_cs_pass1(struct amdgpu_cs_parser *p,
 	int ret;
 	int i;
 
-<<<<<<< HEAD
 	chunk_array = kvmalloc_array(cs->in.num_chunks, sizeof(uint64_t),
 				     GFP_KERNEL);
-=======
-	if (cs->in.num_chunks == 0)
-		return -EINVAL;
-
-	chunk_array = kvmalloc_array(cs->in.num_chunks, sizeof(uint64_t), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!chunk_array)
 		return -ENOMEM;
 
@@ -318,11 +311,7 @@ static int amdgpu_cs_pass1(struct amdgpu_cs_parser *p,
 	}
 
 	if (p->uf_entry.tv.bo)
-<<<<<<< HEAD
 		p->gang_leader->uf_addr = uf_offset;
-=======
-		p->job->uf_addr = uf_offset;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kvfree(chunk_array);
 
 	/* Use this opportunity to fill in task info for the vm */
@@ -342,7 +331,6 @@ free_chunk:
 	kvfree(chunk_array);
 
 	return ret;
-<<<<<<< HEAD
 }
 
 static int amdgpu_cs_p2_ib(struct amdgpu_cs_parser *p,
@@ -634,8 +622,6 @@ static int amdgpu_cs_pass2(struct amdgpu_cs_parser *p)
 	}
 
 	return 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Convert microseconds to bytes. */
@@ -873,10 +859,7 @@ static int amdgpu_cs_parser_bos(struct amdgpu_cs_parser *p,
 	struct amdgpu_vm *vm = &fpriv->vm;
 	struct amdgpu_bo_list_entry *e;
 	struct list_head duplicates;
-<<<<<<< HEAD
 	unsigned int i;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int r;
 
 	INIT_LIST_HEAD(&p->validated);
@@ -958,19 +941,6 @@ static int amdgpu_cs_parser_bos(struct amdgpu_cs_parser *p,
 		struct amdgpu_bo *bo = ttm_to_amdgpu_bo(e->tv.bo);
 
 		e->bo_va = amdgpu_vm_bo_find(vm, bo);
-<<<<<<< HEAD
-=======
-	}
-
-	/* Move fence waiting after getting reservation lock of
-	 * PD root. Then there is no need on a ctx mutex lock.
-	 */
-	r = amdgpu_ctx_wait_prev_fence(p->ctx, p->entity);
-	if (unlikely(r != 0)) {
-		if (r != -ERESTARTSYS)
-			DRM_ERROR("amdgpu_ctx_wait_prev_fence failed.\n");
-		goto error_validate;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	amdgpu_cs_get_threshold_for_moves(p->adev, &p->bytes_moved_threshold,
@@ -995,7 +965,6 @@ static int amdgpu_cs_parser_bos(struct amdgpu_cs_parser *p,
 
 	if (p->uf_entry.tv.bo) {
 		struct amdgpu_bo *uf = ttm_to_amdgpu_bo(p->uf_entry.tv.bo);
-<<<<<<< HEAD
 
 		r = amdgpu_ttm_alloc_gart(&uf->tbo);
 		if (r)
@@ -1012,47 +981,9 @@ static int amdgpu_cs_parser_bos(struct amdgpu_cs_parser *p,
 					 p->bo_list->gws_obj,
 					 p->bo_list->oa_obj);
 	return 0;
-=======
-
-		r = amdgpu_ttm_alloc_gart(&uf->tbo);
-		if (r)
-			goto error_validate;
-
-		p->job->uf_addr += amdgpu_bo_gpu_offset(uf);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	amdgpu_cs_report_moved_bytes(p->adev, p->bytes_moved,
-				     p->bytes_moved_vis);
-	amdgpu_job_set_resources(p->job, p->bo_list->gds_obj,
-				 p->bo_list->gws_obj, p->bo_list->oa_obj);
-	return 0;
 
 error_validate:
 	ttm_eu_backoff_reservation(&p->ticket, &p->validated);
-<<<<<<< HEAD
-=======
-
-out_free_user_pages:
-	amdgpu_bo_list_for_each_userptr_entry(e, p->bo_list) {
-		struct amdgpu_bo *bo = ttm_to_amdgpu_bo(e->tv.bo);
-
-		if (!e->user_pages)
-			continue;
-		amdgpu_ttm_tt_get_user_pages_done(bo->tbo.ttm, e->range);
-		kvfree(e->user_pages);
-		e->user_pages = NULL;
-		e->range = NULL;
-	}
-	return r;
-}
-
-static int amdgpu_cs_sync_rings(struct amdgpu_cs_parser *p)
-{
-	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
-	struct amdgpu_bo_list_entry *e;
-	int r;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out_free_user_pages:
 	amdgpu_bo_list_for_each_userptr_entry(e, p->bo_list) {
@@ -1069,55 +1000,15 @@ out_free_user_pages:
 	return r;
 }
 
-<<<<<<< HEAD
 static void trace_amdgpu_cs_ibs(struct amdgpu_cs_parser *p)
 {
 	int i, j;
-=======
-/**
- * amdgpu_cs_parser_fini() - clean parser states
- * @parser:	parser structure holding parsing context.
- * @error:	error number
- * @backoff:	indicator to backoff the reservation
- *
- * If error is set then unvalidate buffer, otherwise just free memory
- * used by parsing context.
- **/
-static void amdgpu_cs_parser_fini(struct amdgpu_cs_parser *parser, int error,
-				  bool backoff)
-{
-	unsigned i;
-
-	if (error && backoff) {
-		ttm_eu_backoff_reservation(&parser->ticket,
-					   &parser->validated);
-		mutex_unlock(&parser->bo_list->bo_list_mutex);
-	}
-
-	for (i = 0; i < parser->num_post_deps; i++) {
-		drm_syncobj_put(parser->post_deps[i].syncobj);
-		kfree(parser->post_deps[i].chain);
-	}
-	kfree(parser->post_deps);
-
-	dma_fence_put(parser->fence);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!trace_amdgpu_cs_enabled())
 		return;
 
-<<<<<<< HEAD
 	for (i = 0; i < p->gang_size; ++i) {
 		struct amdgpu_job *job = p->jobs[i];
-=======
-	for (i = 0; i < parser->nchunks; i++)
-		kvfree(parser->chunks[i].kdata);
-	kvfree(parser->chunks);
-	if (parser->job)
-		amdgpu_job_free(parser->job);
-	if (parser->uf_entry.tv.bo) {
-		struct amdgpu_bo *uf = ttm_to_amdgpu_bo(parser->uf_entry.tv.bo);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		for (j = 0; j < job->num_ibs; ++j)
 			trace_amdgpu_cs(p, job, &job->ibs[j]);
@@ -1132,108 +1023,8 @@ static int amdgpu_cs_patch_ibs(struct amdgpu_cs_parser *p,
 	int r;
 
 	/* Only for UVD/VCE VM emulation */
-<<<<<<< HEAD
 	if (!ring->funcs->parse_cs && !ring->funcs->patch_cs_in_place)
 		return 0;
-=======
-	if (ring->funcs->parse_cs || ring->funcs->patch_cs_in_place) {
-		unsigned i, j;
-
-		for (i = 0, j = 0; i < p->nchunks && j < p->job->num_ibs; i++) {
-			struct drm_amdgpu_cs_chunk_ib *chunk_ib;
-			struct amdgpu_bo_va_mapping *m;
-			struct amdgpu_bo *aobj = NULL;
-			struct amdgpu_cs_chunk *chunk;
-			uint64_t offset, va_start;
-			struct amdgpu_ib *ib;
-			uint8_t *kptr;
-
-			chunk = &p->chunks[i];
-			ib = &p->job->ibs[j];
-			chunk_ib = chunk->kdata;
-
-			if (chunk->chunk_id != AMDGPU_CHUNK_ID_IB)
-				continue;
-
-			va_start = chunk_ib->va_start & AMDGPU_GMC_HOLE_MASK;
-			r = amdgpu_cs_find_mapping(p, va_start, &aobj, &m);
-			if (r) {
-				DRM_ERROR("IB va_start is invalid\n");
-				return r;
-			}
-
-			if ((va_start + chunk_ib->ib_bytes) >
-			    (m->last + 1) * AMDGPU_GPU_PAGE_SIZE) {
-				DRM_ERROR("IB va_start+ib_bytes is invalid\n");
-				return -EINVAL;
-			}
-
-			/* the IB should be reserved at this point */
-			r = amdgpu_bo_kmap(aobj, (void **)&kptr);
-			if (r) {
-				return r;
-			}
-
-			offset = m->start * AMDGPU_GPU_PAGE_SIZE;
-			kptr += va_start - offset;
-
-			if (ring->funcs->parse_cs) {
-				memcpy(ib->ptr, kptr, chunk_ib->ib_bytes);
-				amdgpu_bo_kunmap(aobj);
-
-				r = amdgpu_ring_parse_cs(ring, p, p->job, ib);
-				if (r)
-					return r;
-			} else {
-				ib->ptr = (uint32_t *)kptr;
-				r = amdgpu_ring_patch_cs_in_place(ring, p, p->job, ib);
-				amdgpu_bo_kunmap(aobj);
-				if (r)
-					return r;
-			}
-
-			j++;
-		}
-	}
-
-	if (!p->job->vm)
-		return amdgpu_cs_sync_rings(p);
-
-
-	r = amdgpu_vm_clear_freed(adev, vm, NULL);
-	if (r)
-		return r;
-
-	r = amdgpu_vm_bo_update(adev, fpriv->prt_va, false);
-	if (r)
-		return r;
-
-	r = amdgpu_sync_fence(&p->job->sync, fpriv->prt_va->last_pt_update);
-	if (r)
-		return r;
-
-	if (amdgpu_mcbp || amdgpu_sriov_vf(adev)) {
-		bo_va = fpriv->csa_va;
-		BUG_ON(!bo_va);
-		r = amdgpu_vm_bo_update(adev, bo_va, false);
-		if (r)
-			return r;
-
-		r = amdgpu_sync_fence(&p->job->sync, bo_va->last_pt_update);
-		if (r)
-			return r;
-	}
-
-	amdgpu_bo_list_for_each_entry(e, p->bo_list) {
-		/* ignore duplicates */
-		bo = ttm_to_amdgpu_bo(e->tv.bo);
-		if (!bo)
-			continue;
-
-		bo_va = e->bo_va;
-		if (bo_va == NULL)
-			continue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < job->num_ibs; ++i) {
 		struct amdgpu_ib *ib = &job->ibs[i];
@@ -1242,83 +1033,11 @@ static int amdgpu_cs_patch_ibs(struct amdgpu_cs_parser *p,
 		uint64_t va_start;
 		uint8_t *kptr;
 
-<<<<<<< HEAD
 		va_start = ib->gpu_addr & AMDGPU_GMC_HOLE_MASK;
 		r = amdgpu_cs_find_mapping(p, va_start, &aobj, &m);
 		if (r) {
 			DRM_ERROR("IB va_start is invalid\n");
 			return r;
-=======
-		r = amdgpu_sync_fence(&p->job->sync, bo_va->last_pt_update);
-		if (r)
-			return r;
-	}
-
-	r = amdgpu_vm_handle_moved(adev, vm);
-	if (r)
-		return r;
-
-	r = amdgpu_vm_update_pdes(adev, vm, false);
-	if (r)
-		return r;
-
-	r = amdgpu_sync_fence(&p->job->sync, vm->last_update);
-	if (r)
-		return r;
-
-	p->job->vm_pd_addr = amdgpu_gmc_pd_addr(vm->root.bo);
-
-	if (amdgpu_vm_debug) {
-		/* Invalidate all BOs to test for userspace bugs */
-		amdgpu_bo_list_for_each_entry(e, p->bo_list) {
-			struct amdgpu_bo *bo = ttm_to_amdgpu_bo(e->tv.bo);
-
-			/* ignore duplicates */
-			if (!bo)
-				continue;
-
-			amdgpu_vm_bo_invalidate(adev, bo, false);
-		}
-	}
-
-	return amdgpu_cs_sync_rings(p);
-}
-
-static int amdgpu_cs_ib_fill(struct amdgpu_device *adev,
-			     struct amdgpu_cs_parser *parser)
-{
-	struct amdgpu_fpriv *fpriv = parser->filp->driver_priv;
-	struct amdgpu_vm *vm = &fpriv->vm;
-	int r, ce_preempt = 0, de_preempt = 0;
-	struct amdgpu_ring *ring;
-	int i, j;
-
-	for (i = 0, j = 0; i < parser->nchunks && j < parser->job->num_ibs; i++) {
-		struct amdgpu_cs_chunk *chunk;
-		struct amdgpu_ib *ib;
-		struct drm_amdgpu_cs_chunk_ib *chunk_ib;
-		struct drm_sched_entity *entity;
-
-		chunk = &parser->chunks[i];
-		ib = &parser->job->ibs[j];
-		chunk_ib = (struct drm_amdgpu_cs_chunk_ib *)chunk->kdata;
-
-		if (chunk->chunk_id != AMDGPU_CHUNK_ID_IB)
-			continue;
-
-		if (chunk_ib->ip_type == AMDGPU_HW_IP_GFX &&
-		    (amdgpu_mcbp || amdgpu_sriov_vf(adev))) {
-			if (chunk_ib->flags & AMDGPU_IB_FLAG_PREEMPT) {
-				if (chunk_ib->flags & AMDGPU_IB_FLAG_CE)
-					ce_preempt++;
-				else
-					de_preempt++;
-			}
-
-			/* each GFX command submit allows 0 or 1 IB preemptible for CE & DE */
-			if (ce_preempt > 1 || de_preempt > 1)
-				return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if ((va_start + ib->length_dw * 4) >
@@ -1333,41 +1052,7 @@ static int amdgpu_cs_ib_fill(struct amdgpu_device *adev,
 			return r;
 		}
 
-<<<<<<< HEAD
 		kptr += va_start - (m->start * AMDGPU_GPU_PAGE_SIZE);
-=======
-		ib->gpu_addr = chunk_ib->va_start;
-		ib->length_dw = chunk_ib->ib_bytes / 4;
-		ib->flags = chunk_ib->flags;
-
-		j++;
-	}
-
-	/* MM engine doesn't support user fences */
-	ring = to_amdgpu_ring(parser->entity->rq->sched);
-	if (parser->job->uf_addr && ring->funcs->no_user_fence)
-		return -EINVAL;
-
-	return 0;
-}
-
-static int amdgpu_cs_process_fence_dep(struct amdgpu_cs_parser *p,
-				       struct amdgpu_cs_chunk *chunk)
-{
-	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
-	unsigned num_deps;
-	int i, r;
-	struct drm_amdgpu_cs_chunk_dep *deps;
-
-	deps = (struct drm_amdgpu_cs_chunk_dep *)chunk->kdata;
-	num_deps = chunk->length_dw * 4 /
-		sizeof(struct drm_amdgpu_cs_chunk_dep);
-
-	for (i = 0; i < num_deps; ++i) {
-		struct amdgpu_ctx *ctx;
-		struct drm_sched_entity *entity;
-		struct dma_fence *fence;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (ring->funcs->parse_cs) {
 			memcpy(ib->ptr, kptr, ib->length_dw * 4);
@@ -1482,26 +1167,11 @@ static int amdgpu_cs_vm_handling(struct amdgpu_cs_parser *p)
 		amdgpu_bo_list_for_each_entry(e, p->bo_list) {
 			struct amdgpu_bo *bo = ttm_to_amdgpu_bo(e->tv.bo);
 
-<<<<<<< HEAD
 			/* ignore duplicates */
 			if (!bo)
 				continue;
 
 			amdgpu_vm_bo_invalidate(adev, bo, false);
-=======
-		dep->chain = NULL;
-		if (syncobj_deps[i].point) {
-			dep->chain = dma_fence_chain_alloc();
-			if (!dep->chain)
-				return -ENOMEM;
-		}
-
-		dep->syncobj = drm_syncobj_find(p->filp,
-						syncobj_deps[i].handle);
-		if (!dep->syncobj) {
-			dma_fence_chain_free(dep->chain);
-			return -EINVAL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -1516,18 +1186,10 @@ static int amdgpu_cs_sync_rings(struct amdgpu_cs_parser *p)
 	unsigned int i;
 	int r;
 
-<<<<<<< HEAD
 	list_for_each_entry(e, &p->validated, tv.head) {
 		struct amdgpu_bo *bo = ttm_to_amdgpu_bo(e->tv.bo);
 		struct dma_resv *resv = bo->tbo.base.resv;
 		enum amdgpu_sync_mode sync_mode;
-=======
-	/* TODO: Investigate why we still need the context lock */
-	mutex_unlock(&p->ctx->lock);
-
-	for (i = 0; i < p->nchunks; ++i) {
-		struct amdgpu_cs_chunk *chunk;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		sync_mode = amdgpu_bo_explicit_sync(bo) ?
 			AMDGPU_SYNC_EXPLICIT : AMDGPU_SYNC_NE_OWNER;
@@ -1537,7 +1199,6 @@ static int amdgpu_cs_sync_rings(struct amdgpu_cs_parser *p)
 			return r;
 	}
 
-<<<<<<< HEAD
 	for (i = 0; i < p->gang_size; ++i) {
 		if (p->jobs[i] == leader)
 			continue;
@@ -1550,40 +1211,6 @@ static int amdgpu_cs_sync_rings(struct amdgpu_cs_parser *p)
 	r = amdgpu_ctx_wait_prev_fence(p->ctx, p->entities[p->gang_leader_idx]);
 	if (r && r != -ERESTARTSYS)
 		DRM_ERROR("amdgpu_ctx_wait_prev_fence failed.\n");
-=======
-		switch (chunk->chunk_id) {
-		case AMDGPU_CHUNK_ID_DEPENDENCIES:
-		case AMDGPU_CHUNK_ID_SCHEDULED_DEPENDENCIES:
-			r = amdgpu_cs_process_fence_dep(p, chunk);
-			if (r)
-				goto out;
-			break;
-		case AMDGPU_CHUNK_ID_SYNCOBJ_IN:
-			r = amdgpu_cs_process_syncobj_in_dep(p, chunk);
-			if (r)
-				goto out;
-			break;
-		case AMDGPU_CHUNK_ID_SYNCOBJ_OUT:
-			r = amdgpu_cs_process_syncobj_out_dep(p, chunk);
-			if (r)
-				goto out;
-			break;
-		case AMDGPU_CHUNK_ID_SYNCOBJ_TIMELINE_WAIT:
-			r = amdgpu_cs_process_syncobj_timeline_in_dep(p, chunk);
-			if (r)
-				goto out;
-			break;
-		case AMDGPU_CHUNK_ID_SYNCOBJ_TIMELINE_SIGNAL:
-			r = amdgpu_cs_process_syncobj_timeline_out_dep(p, chunk);
-			if (r)
-				goto out;
-			break;
-		}
-	}
-
-out:
-	mutex_lock(&p->ctx->lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return r;
 }
 
@@ -1634,8 +1261,6 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 			amdgpu_job_set_gang_leader(p->jobs[i], leader);
 	}
 
-	drm_sched_job_arm(&job->base);
-
 	/* No memory allocation is allowed while holding the notifier lock.
 	 * The lock is held until amdgpu_cs_submit is finished and fence is
 	 * added to BOs.
@@ -1674,12 +1299,8 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 		e->tv.num_shared = 0;
 	}
 
-<<<<<<< HEAD
 	seq = amdgpu_ctx_add_fence(p->ctx, p->entities[p->gang_leader_idx],
 				   p->fence);
-=======
-	seq = amdgpu_ctx_add_fence(p->ctx, entity, p->fence);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	amdgpu_cs_post_dependencies(p);
 
 	if ((leader->preamble_status & AMDGPU_PREAMBLE_IB_PRESENT) &&
@@ -1692,7 +1313,6 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 	leader->uf_sequence = seq;
 
 	amdgpu_vm_bo_trace_cs(&fpriv->vm, &p->ticket);
-<<<<<<< HEAD
 	for (i = 0; i < p->gang_size; ++i) {
 		amdgpu_job_free_resources(p->jobs[i]);
 		trace_amdgpu_cs_ioctl(p->jobs[i]);
@@ -1702,19 +1322,6 @@ static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 
 	amdgpu_vm_move_to_lru_tail(p->adev, &fpriv->vm);
 	ttm_eu_fence_buffer_objects(&p->ticket, &p->validated, p->fence);
-=======
-	drm_sched_entity_push_job(&job->base);
-
-	amdgpu_vm_move_to_lru_tail(p->adev, &fpriv->vm);
-
-	/* Make sure all BOs are remembered as writers */
-	amdgpu_bo_list_for_each_entry(e, p->bo_list)
-		e->tv.num_shared = 0;
-
-	ttm_eu_fence_buffer_objects(&p->ticket, &p->validated, p->fence);
-	mutex_unlock(&p->adev->notifier_lock);
-	mutex_unlock(&p->bo_list->bo_list_mutex);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_unlock(&p->adev->notifier_lock);
 	mutex_unlock(&p->bo_list->bo_list_mutex);

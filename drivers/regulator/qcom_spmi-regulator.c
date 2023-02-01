@@ -169,7 +169,6 @@ enum spmi_regulator_subtype {
 	SPMI_REGULATOR_SUBTYPE_HFS430		= 0x0a,
 	SPMI_REGULATOR_SUBTYPE_HT_P150		= 0x35,
 	SPMI_REGULATOR_SUBTYPE_HT_P600		= 0x3d,
-<<<<<<< HEAD
 	SPMI_REGULATOR_SUBTYPE_HFSMPS_510	= 0x0a,
 	SPMI_REGULATOR_SUBTYPE_FTSMPS_510	= 0x0b,
 	SPMI_REGULATOR_SUBTYPE_LV_P150_510	= 0x71,
@@ -181,8 +180,6 @@ enum spmi_regulator_subtype {
 	SPMI_REGULATOR_SUBTYPE_MV_P50_510	= 0x7a,
 	SPMI_REGULATOR_SUBTYPE_MV_P150_510	= 0x7b,
 	SPMI_REGULATOR_SUBTYPE_MV_P600_510	= 0x7d,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum spmi_common_regulator_registers {
@@ -591,7 +588,6 @@ static struct spmi_voltage_range ht_p600_ranges[] = {
 	SPMI_VOLTAGE_RANGE(0, 1704000, 1704000, 1896000, 1896000, 8000),
 };
 
-<<<<<<< HEAD
 static struct spmi_voltage_range nldo_510_ranges[] = {
 	SPMI_VOLTAGE_RANGE(0, 320000, 320000, 1304000, 1304000, 8000),
 };
@@ -600,8 +596,6 @@ static struct spmi_voltage_range ftsmps510_ranges[] = {
 	SPMI_VOLTAGE_RANGE(0, 300000, 300000, 1372000, 1372000, 4000),
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static DEFINE_SPMI_SET_POINTS(pldo);
 static DEFINE_SPMI_SET_POINTS(nldo1);
 static DEFINE_SPMI_SET_POINTS(nldo2);
@@ -624,11 +618,8 @@ static DEFINE_SPMI_SET_POINTS(ht_nldo);
 static DEFINE_SPMI_SET_POINTS(hfs430);
 static DEFINE_SPMI_SET_POINTS(ht_p150);
 static DEFINE_SPMI_SET_POINTS(ht_p600);
-<<<<<<< HEAD
 static DEFINE_SPMI_SET_POINTS(nldo_510);
 static DEFINE_SPMI_SET_POINTS(ftsmps510);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline int spmi_vreg_read(struct spmi_regulator *vreg, u16 addr, u8 *buf,
 				 int len)
@@ -2165,44 +2156,6 @@ static const struct spmi_regulator_data pm8226_regulators[] = {
 	{ }
 };
 
-static const struct spmi_regulator_data pm8226_regulators[] = {
-	{ "s1", 0x1400, "vdd_s1", },
-	{ "s2", 0x1700, "vdd_s2", },
-	{ "s3", 0x1a00, "vdd_s3", },
-	{ "s4", 0x1d00, "vdd_s4", },
-	{ "s5", 0x2000, "vdd_s5", },
-	{ "l1", 0x4000, "vdd_l1_l2_l4_l5", },
-	{ "l2", 0x4100, "vdd_l1_l2_l4_l5", },
-	{ "l3", 0x4200, "vdd_l3_l24_l26", },
-	{ "l4", 0x4300, "vdd_l1_l2_l4_l5", },
-	{ "l5", 0x4400, "vdd_l1_l2_l4_l5", },
-	{ "l6", 0x4500, "vdd_l6_l7_l8_l9_l27", },
-	{ "l7", 0x4600, "vdd_l6_l7_l8_l9_l27", },
-	{ "l8", 0x4700, "vdd_l6_l7_l8_l9_l27", },
-	{ "l9", 0x4800, "vdd_l6_l7_l8_l9_l27", },
-	{ "l10", 0x4900, "vdd_l10_l11_l13", },
-	{ "l11", 0x4a00, "vdd_l10_l11_l13", },
-	{ "l12", 0x4b00, "vdd_l12_l14", },
-	{ "l13", 0x4c00, "vdd_l10_l11_l13", },
-	{ "l14", 0x4d00, "vdd_l12_l14", },
-	{ "l15", 0x4e00, "vdd_l15_l16_l17_l18", },
-	{ "l16", 0x4f00, "vdd_l15_l16_l17_l18", },
-	{ "l17", 0x5000, "vdd_l15_l16_l17_l18", },
-	{ "l18", 0x5100, "vdd_l15_l16_l17_l18", },
-	{ "l19", 0x5200, "vdd_l19_l20_l21_l22_l23_l28", },
-	{ "l20", 0x5300, "vdd_l19_l20_l21_l22_l23_l28", },
-	{ "l21", 0x5400, "vdd_l19_l20_l21_l22_l23_l28", },
-	{ "l22", 0x5500, "vdd_l19_l20_l21_l22_l23_l28", },
-	{ "l23", 0x5600, "vdd_l19_l20_l21_l22_l23_l28", },
-	{ "l24", 0x5700, "vdd_l3_l24_l26", },
-	{ "l25", 0x5800, "vdd_l25", },
-	{ "l26", 0x5900, "vdd_l3_l24_l26", },
-	{ "l27", 0x5a00, "vdd_l6_l7_l8_l9_l27", },
-	{ "l28", 0x5b00, "vdd_l19_l20_l21_l22_l23_l28", },
-	{ "lvs1", 0x8000, "vdd_lvs1", },
-	{ }
-};
-
 static const struct spmi_regulator_data pm8841_regulators[] = {
 	{ "s1", 0x1400, "vdd_s1", },
 	{ "s2", 0x1700, "vdd_s2", NULL, 0x1c08 },
@@ -2391,28 +2344,6 @@ static const struct spmi_regulator_data pmp8074_regulators[] = {
 	{ }
 };
 
-static const struct spmi_regulator_data pmp8074_regulators[] = {
-	{ "s1", 0x1400, "vdd_s1"},
-	{ "s2", 0x1700, "vdd_s2"},
-	{ "s3", 0x1a00, "vdd_s3"},
-	{ "s4", 0x1d00, "vdd_s4"},
-	{ "s5", 0x2000, "vdd_s5"},
-	{ "l1", 0x4000, "vdd_l1_l2"},
-	{ "l2", 0x4100, "vdd_l1_l2"},
-	{ "l3", 0x4200, "vdd_l3_l8"},
-	{ "l4", 0x4300, "vdd_l4"},
-	{ "l5", 0x4400, "vdd_l5_l6_l15"},
-	{ "l6", 0x4500, "vdd_l5_l6_l15"},
-	{ "l7", 0x4600, "vdd_l7"},
-	{ "l8", 0x4700, "vdd_l3_l8"},
-	{ "l9", 0x4800, "vdd_l9"},
-	/* l10 is currently unsupported HT_P50 */
-	{ "l11", 0x4a00, "vdd_l10_l11_l12_l13"},
-	{ "l12", 0x4b00, "vdd_l10_l11_l12_l13"},
-	{ "l13", 0x4c00, "vdd_l10_l11_l12_l13"},
-	{ }
-};
-
 static const struct spmi_regulator_data pms405_regulators[] = {
 	{ "s3", 0x1a00, "vdd_s3"},
 	{ }
@@ -2431,11 +2362,6 @@ static const struct of_device_id qcom_spmi_regulator_match[] = {
 	{ .compatible = "qcom,pm8950-regulators", .data = &pm8950_regulators },
 	{ .compatible = "qcom,pm8994-regulators", .data = &pm8994_regulators },
 	{ .compatible = "qcom,pmi8994-regulators", .data = &pmi8994_regulators },
-<<<<<<< HEAD
-=======
-	{ .compatible = "qcom,pm660-regulators", .data = &pm660_regulators },
-	{ .compatible = "qcom,pm660l-regulators", .data = &pm660l_regulators },
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ .compatible = "qcom,pmp8074-regulators", .data = &pmp8074_regulators },
 	{ .compatible = "qcom,pms405-regulators", .data = &pms405_regulators },
 	{ }

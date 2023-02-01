@@ -295,75 +295,45 @@ static_assert(sizeof(struct flexcan_regs) ==  0x4 * 18 + 0xfb8);
 static const struct flexcan_devtype_data fsl_mcf5441x_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_BROKEN_PERR_STATE |
 		FLEXCAN_QUIRK_NR_IRQ_3 | FLEXCAN_QUIRK_NR_MB_16 |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_FIFO,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_FIFO,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_p1010_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_BROKEN_WERR_STATE |
 		FLEXCAN_QUIRK_BROKEN_PERR_STATE |
 		FLEXCAN_QUIRK_DEFAULT_BIG_ENDIAN |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_FIFO,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_FIFO,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_imx25_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_BROKEN_WERR_STATE |
 		FLEXCAN_QUIRK_BROKEN_PERR_STATE |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_FIFO,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_FIFO,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_imx28_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_BROKEN_PERR_STATE |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_FIFO,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_FIFO,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_imx6q_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
 		FLEXCAN_QUIRK_USE_RX_MAILBOX | FLEXCAN_QUIRK_BROKEN_PERR_STATE |
 		FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_imx8qm_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
 		FLEXCAN_QUIRK_USE_RX_MAILBOX | FLEXCAN_QUIRK_BROKEN_PERR_STATE |
 		FLEXCAN_QUIRK_SUPPORT_FD | FLEXCAN_QUIRK_SETUP_STOP_MODE_SCFW |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct flexcan_devtype_data fsl_imx8mp_devtype_data = {
@@ -371,38 +341,23 @@ static struct flexcan_devtype_data fsl_imx8mp_devtype_data = {
 		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
 		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR |
 		FLEXCAN_QUIRK_SUPPORT_FD | FLEXCAN_QUIRK_SUPPORT_ECC |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_vf610_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
 		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
 		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_SUPPORT_ECC |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_ls1021a_r2_devtype_data = {
 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
 		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_USE_RX_MAILBOX |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct flexcan_devtype_data fsl_lx2160a_r1_devtype_data = {
@@ -410,13 +365,8 @@ static const struct flexcan_devtype_data fsl_lx2160a_r1_devtype_data = {
 		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_BROKEN_PERR_STATE |
 		FLEXCAN_QUIRK_USE_RX_MAILBOX | FLEXCAN_QUIRK_SUPPORT_FD |
 		FLEXCAN_QUIRK_SUPPORT_ECC |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct can_bittiming_const flexcan_bittiming_const = {
@@ -991,14 +941,6 @@ static struct sk_buff *flexcan_mailbox_read(struct can_rx_offload *offload,
 	u32 reg_ctrl, reg_id, reg_iflag1;
 	int i;
 
-<<<<<<< HEAD
-=======
-	if (unlikely(drop)) {
-		skb = ERR_PTR(-ENOBUFS);
-		goto mark_as_read;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mb = flexcan_get_mb(priv, n);
 
 	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_USE_RX_MAILBOX) {
@@ -1027,14 +969,11 @@ static struct sk_buff *flexcan_mailbox_read(struct can_rx_offload *offload,
 		reg_ctrl = priv->read(&mb->can_ctrl);
 	}
 
-<<<<<<< HEAD
 	if (unlikely(drop)) {
 		skb = ERR_PTR(-ENOBUFS);
 		goto mark_as_read;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (reg_ctrl & FLEXCAN_MB_CNT_EDL)
 		skb = alloc_canfd_skb(offload->dev, &cfd);
 	else
@@ -2146,35 +2085,20 @@ static int flexcan_probe(struct platform_device *pdev)
 	if ((devtype_data->quirks & FLEXCAN_QUIRK_SUPPORT_FD) &&
 	    !((devtype_data->quirks &
 	       (FLEXCAN_QUIRK_USE_RX_MAILBOX |
-<<<<<<< HEAD
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR |
 		FLEXCAN_QUIRK_SUPPORT_RX_FIFO)) ==
 	      (FLEXCAN_QUIRK_USE_RX_MAILBOX |
 	       FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 	       FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR))) {
-=======
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-		FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR |
-		FLEXCAN_QUIRK_SUPPPORT_RX_FIFO)) ==
-	      (FLEXCAN_QUIRK_USE_RX_MAILBOX |
-	       FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-	       FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR))) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(&pdev->dev, "CAN-FD mode doesn't work in RX-FIFO mode!\n");
 		return -EINVAL;
 	}
 
 	if ((devtype_data->quirks &
-<<<<<<< HEAD
 	     (FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
 	      FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR)) ==
 	    FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR) {
-=======
-	     (FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX |
-	      FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR)) ==
-	    FLEXCAN_QUIRK_SUPPPORT_RX_MAILBOX_RTR) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(&pdev->dev,
 			"Quirks (0x%08x) inconsistent: RX_MAILBOX_RX supported but not RX_MAILBOX\n",
 			devtype_data->quirks);
@@ -2253,12 +2177,7 @@ static int flexcan_probe(struct platform_device *pdev)
 
 	err = flexcan_setup_stop_mode(pdev);
 	if (err < 0) {
-<<<<<<< HEAD
 		dev_err_probe(&pdev->dev, err, "setup stop mode failed\n");
-=======
-		if (err != -EPROBE_DEFER)
-			dev_err(&pdev->dev, "setup stop mode failed\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto failed_setup_stop_mode;
 	}
 

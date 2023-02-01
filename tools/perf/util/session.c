@@ -1185,11 +1185,7 @@ static void branch_stack__printf(struct perf_sample *sample, bool callstack)
 				e->flags.abort ? "A" : " ",
 				e->flags.in_tx ? "T" : " ",
 				(unsigned)e->flags.reserved,
-<<<<<<< HEAD
 				get_branch_type(e));
-=======
-				e->flags.type ? branch_type_name(e->flags.type) : "");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			if (i == 0) {
 				printf("..... %2"PRIu64": %016" PRIx64 "\n"

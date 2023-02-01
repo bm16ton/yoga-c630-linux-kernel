@@ -61,7 +61,6 @@ mlxsw_only_on_spectrum()
 
 	return 1
 }
-<<<<<<< HEAD
 
 mlxsw_max_descriptors_get()
 {
@@ -76,5 +75,3 @@ mlxsw_max_descriptors_get()
 	   return 1 ;;
 	esac
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -175,10 +175,7 @@ obj-$(CONFIG_USB4)		+= thunderbolt/
 obj-$(CONFIG_CORESIGHT)		+= hwtracing/coresight/
 obj-y				+= hwtracing/intel_th/
 obj-$(CONFIG_STM)		+= hwtracing/stm/
-<<<<<<< HEAD
 obj-$(CONFIG_HISI_PTT)		+= hwtracing/ptt/
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 obj-y				+= android/
 obj-$(CONFIG_NVMEM)		+= nvmem/
 obj-$(CONFIG_FPGA)		+= fpga/

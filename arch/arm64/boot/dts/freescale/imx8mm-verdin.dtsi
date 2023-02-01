@@ -53,7 +53,6 @@
 		};
 	};
 
-<<<<<<< HEAD
 	hdmi_connector: hdmi-connector {
 		compatible = "hdmi-connector";
 		ddc-i2c-bus = <&i2c2>;
@@ -69,8 +68,6 @@
 		status = "disabled";
 	};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Carrier Board Supplies */
 	reg_1p8v: regulator-1p8v {
 		compatible = "regulator-fixed";
@@ -385,13 +382,8 @@
 				nxp,dvs-standby-voltage = <850000>;
 				regulator-always-on;
 				regulator-boot-on;
-<<<<<<< HEAD
 				regulator-max-microvolt = <1050000>;
 				regulator-min-microvolt = <805000>;
-=======
-				regulator-max-microvolt = <950000>;
-				regulator-min-microvolt = <850000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				regulator-name = "On-module +VDD_ARM (BUCK2)";
 				regulator-ramp-delay = <3125>;
 			};
@@ -399,13 +391,8 @@
 			reg_vdd_dram: BUCK3 {
 				regulator-always-on;
 				regulator-boot-on;
-<<<<<<< HEAD
 				regulator-max-microvolt = <1000000>;
 				regulator-min-microvolt = <805000>;
-=======
-				regulator-max-microvolt = <950000>;
-				regulator-min-microvolt = <850000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				regulator-name = "On-module +VDD_GPU_VPU_DDR (BUCK3)";
 			};
 
@@ -444,11 +431,7 @@
 			reg_vdd_snvs: LDO2 {
 				regulator-always-on;
 				regulator-boot-on;
-<<<<<<< HEAD
 				regulator-max-microvolt = <800000>;
-=======
-				regulator-max-microvolt = <900000>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				regulator-min-microvolt = <800000>;
 				regulator-name = "On-module +V0.8_SNVS (LDO2)";
 			};
@@ -593,13 +576,8 @@
 		status = "disabled";
 	};
 
-<<<<<<< HEAD
 	lvds_ti_sn65dsi84: bridge@2c {
 		compatible = "ti,sn65dsi84";
-=======
-	lvds_ti_sn65dsi83: bridge@2c {
-		compatible = "ti,sn65dsi83";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Verdin GPIO_9_DSI (SN65DSI84 IRQ, SODIMM 17, unused) */
 		/* Verdin GPIO_10_DSI (SODIMM 21) */
 		enable-gpios = <&gpio3 3 GPIO_ACTIVE_HIGH>;

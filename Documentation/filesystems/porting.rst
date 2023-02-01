@@ -922,7 +922,6 @@ is provided - file_open_root_mnt().  In-tree users adjusted.
 no_llseek is gone; don't set .llseek to that - just leave it NULL instead.
 Checks for "does that file have llseek(2), or should it fail with ESPIPE"
 should be done by looking at FMODE_LSEEK in file->f_mode.
-<<<<<<< HEAD
 
 ---
 
@@ -944,5 +943,3 @@ file pointer instead of struct dentry pointer.  d_tmpfile() is similarly
 changed to simplify callers.  The passed file is in a non-open state and on
 success must be opened before returning (e.g. by calling
 finish_open_simple()).
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -1466,7 +1466,6 @@ out_no_maps:
 
 	return len < PAGE_SIZE ? len : -EINVAL;
 }
-<<<<<<< HEAD
 
 static ssize_t xps_cpus_show(struct netdev_queue *queue, char *buf)
 {
@@ -1491,32 +1490,6 @@ static ssize_t xps_cpus_show(struct netdev_queue *queue, char *buf)
 		return -EINVAL;
 	}
 
-=======
-
-static ssize_t xps_cpus_show(struct netdev_queue *queue, char *buf)
-{
-	struct net_device *dev = queue->dev;
-	unsigned int index;
-	int len, tc;
-
-	if (!netif_is_multiqueue(dev))
-		return -ENOENT;
-
-	index = get_netdev_queue_index(queue);
-
-	if (!rtnl_trylock())
-		return restart_syscall();
-
-	/* If queue belongs to subordinate dev use its map */
-	dev = netdev_get_tx_queue(dev, index)->sb_dev ? : dev;
-
-	tc = netdev_txq_to_tc(dev, index);
-	if (tc < 0) {
-		rtnl_unlock();
-		return -EINVAL;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Make sure the subordinate device can't be freed */
 	get_device(&dev->dev);
 	rtnl_unlock();

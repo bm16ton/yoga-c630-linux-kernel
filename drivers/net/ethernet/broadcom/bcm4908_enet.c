@@ -720,11 +720,8 @@ static int bcm4908_enet_probe(struct platform_device *pdev)
 
 	SET_NETDEV_DEV(netdev, &pdev->dev);
 	err = of_get_ethdev_address(dev->of_node, netdev);
-<<<<<<< HEAD
 	if (err == -EPROBE_DEFER)
 		goto err_dma_free;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		eth_hw_addr_random(netdev);
 	netdev->netdev_ops = &bcm4908_enet_netdev_ops;
@@ -732,11 +729,7 @@ static int bcm4908_enet_probe(struct platform_device *pdev)
 	netdev->mtu = ETH_DATA_LEN;
 	netdev->max_mtu = ENET_MTU_MAX;
 	netif_napi_add_tx(netdev, &enet->tx_ring.napi, bcm4908_enet_poll_tx);
-<<<<<<< HEAD
 	netif_napi_add(netdev, &enet->rx_ring.napi, bcm4908_enet_poll_rx);
-=======
-	netif_napi_add(netdev, &enet->rx_ring.napi, bcm4908_enet_poll_rx, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = register_netdev(netdev);
 	if (err)

@@ -17,10 +17,7 @@
 #include <linux/fwnode.h>
 #include <linux/list.h>
 #include <linux/media.h>
-<<<<<<< HEAD
 #include <linux/minmax.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/types.h>
 
 /* Enums used internally at the media controller to represent graphs */
@@ -977,7 +974,6 @@ media_entity_remote_source_pad_unique(const struct media_entity *entity)
 }
 
 /**
-<<<<<<< HEAD
  * media_pad_is_streaming - Test if a pad is part of a streaming pipeline
  * @pad: The pad
  *
@@ -990,8 +986,6 @@ static inline bool media_pad_is_streaming(const struct media_pad *pad)
 }
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * media_entity_is_streaming - Test if an entity is part of a streaming pipeline
  * @entity: The entity
  *
@@ -1000,7 +994,6 @@ static inline bool media_pad_is_streaming(const struct media_pad *pad)
  */
 static inline bool media_entity_is_streaming(const struct media_entity *entity)
 {
-<<<<<<< HEAD
 	struct media_pad *pad;
 
 	media_entity_for_each_pad(entity, pad) {
@@ -1043,10 +1036,6 @@ struct media_pipeline *media_entity_pipeline(struct media_entity *entity);
  * not part of any pipeline.
  */
 struct media_pipeline *media_pad_pipeline(struct media_pad *pad);
-=======
-	return entity->pipe;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * media_entity_get_fwnode_pad - Get pad number from fwnode

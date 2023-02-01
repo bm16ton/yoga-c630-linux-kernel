@@ -233,7 +233,6 @@ static void shm_rcu_free(struct rcu_head *head)
 							shm_perm);
 	security_shm_free(&shp->shm_perm);
 	kfree(shp);
-<<<<<<< HEAD
 }
 
 /*
@@ -271,45 +270,6 @@ static inline void shm_clist_rm(struct shmid_kernel *shp)
 
 static inline void shm_rmid(struct shmid_kernel *s)
 {
-=======
-}
-
-/*
- * It has to be called with shp locked.
- * It must be called before ipc_rmid()
- */
-static inline void shm_clist_rm(struct shmid_kernel *shp)
-{
-	struct task_struct *creator;
-
-	/* ensure that shm_creator does not disappear */
-	rcu_read_lock();
-
-	/*
-	 * A concurrent exit_shm may do a list_del_init() as well.
-	 * Just do nothing if exit_shm already did the work
-	 */
-	if (!list_empty(&shp->shm_clist)) {
-		/*
-		 * shp->shm_creator is guaranteed to be valid *only*
-		 * if shp->shm_clist is not empty.
-		 */
-		creator = shp->shm_creator;
-
-		task_lock(creator);
-		/*
-		 * list_del_init() is a nop if the entry was already removed
-		 * from the list.
-		 */
-		list_del_init(&shp->shm_clist);
-		task_unlock(creator);
-	}
-	rcu_read_unlock();
-}
-
-static inline void shm_rmid(struct shmid_kernel *s)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	shm_clist_rm(s);
 	ipc_rmid(&shm_ids(s->ns), &s->shm_perm);
 }

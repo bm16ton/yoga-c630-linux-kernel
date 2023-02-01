@@ -253,11 +253,7 @@
 		};
 
 		tcsr: syscon@1937000 {
-<<<<<<< HEAD
 			compatible = "qcom,tcsr-ipq6018", "syscon";
-=======
-			compatible = "syscon";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			reg = <0x0 0x01937000 0x0 0x21000>;
 		};
 

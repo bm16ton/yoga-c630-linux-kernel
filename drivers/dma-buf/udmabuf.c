@@ -213,11 +213,7 @@ static long udmabuf_create(struct miscdevice *device,
 		memfd = fget(list[i].memfd);
 		if (!memfd)
 			goto err;
-<<<<<<< HEAD
 		mapping = memfd->f_mapping;
-=======
-		mapping = file_inode(memfd)->i_mapping;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!shmem_mapping(mapping) && !is_file_hugepages(memfd))
 			goto err;
 		seals = memfd_fcntl(memfd, F_GET_SEALS, 0);

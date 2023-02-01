@@ -45,13 +45,6 @@ static inline unsigned int arch_slab_minalign(void)
 #define arch_slab_minalign() arch_slab_minalign()
 #endif
 
-<<<<<<< HEAD
-=======
-#define CTR_CACHE_MINLINE_MASK	\
-	(0xf << CTR_EL0_DMINLINE_SHIFT | \
-	 CTR_EL0_IMINLINE_MASK << CTR_EL0_IMINLINE_SHIFT)
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CTR_L1IP(ctr)		SYS_FIELD_GET(CTR_EL0, L1Ip, ctr)
 
 #define ICACHEF_ALIASING	0

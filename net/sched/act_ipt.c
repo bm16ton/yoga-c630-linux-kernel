@@ -203,13 +203,8 @@ static int tcf_ipt_init(struct net *net, struct nlattr *nla,
 			struct tcf_proto *tp,
 			u32 flags, struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	return __tcf_ipt_init(net, act_ipt_ops.net_id, nla, est,
 			      a, &act_ipt_ops, tp, flags);
-=======
-	return __tcf_ipt_init(net, ipt_net_id, nla, est, a, &act_ipt_ops,
-			      tp, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int tcf_xt_init(struct net *net, struct nlattr *nla,
@@ -217,13 +212,8 @@ static int tcf_xt_init(struct net *net, struct nlattr *nla,
 		       struct tcf_proto *tp,
 		       u32 flags, struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	return __tcf_ipt_init(net, act_xt_ops.net_id, nla, est,
 			      a, &act_xt_ops, tp, flags);
-=======
-	return __tcf_ipt_init(net, xt_net_id, nla, est, a, &act_xt_ops,
-			      tp, flags);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int tcf_ipt_act(struct sk_buff *skb, const struct tc_action *a,

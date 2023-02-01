@@ -25,13 +25,9 @@ select:
           - rockchip,rk3368-gmac
           - rockchip,rk3399-gmac
           - rockchip,rk3568-gmac
-<<<<<<< HEAD
           - rockchip,rk3588-gmac
           - rockchip,rv1108-gmac
           - rockchip,rv1126-gmac
-=======
-          - rockchip,rv1108-gmac
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   required:
     - compatible
 
@@ -53,17 +49,11 @@ properties:
               - rockchip,rk3368-gmac
               - rockchip,rk3399-gmac
               - rockchip,rv1108-gmac
-<<<<<<< HEAD
               - rockchip,rv1126-gmac
       - items:
           - enum:
               - rockchip,rk3568-gmac
               - rockchip,rk3588-gmac
-=======
-      - items:
-          - enum:
-              - rockchip,rk3568-gmac
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - const: snps,dwmac-4.20a
 
   clocks:
@@ -95,14 +85,11 @@ properties:
     description: The phandle of the syscon node for the general register file.
     $ref: /schemas/types.yaml#/definitions/phandle
 
-<<<<<<< HEAD
   rockchip,php-grf:
     description:
       The phandle of the syscon node for the peripheral general register file.
     $ref: /schemas/types.yaml#/definitions/phandle
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   tx_delay:
     description: Delay value for TXD timing. Range value is 0~0x7F, 0x30 as default.
     $ref: /schemas/types.yaml#/definitions/uint32

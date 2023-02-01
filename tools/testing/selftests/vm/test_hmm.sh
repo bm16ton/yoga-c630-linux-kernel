@@ -51,18 +51,6 @@ load_driver()
 			"spm_addr_dev0 and spm_addr_dev1"
 			usage
 		fi
-<<<<<<< HEAD
-=======
-	fi
-	if [ $? == 0 ]; then
-		major=$(awk "\$2==\"HMM_DMIRROR\" {print \$1}" /proc/devices)
-		mknod /dev/hmm_dmirror0 c $major 0
-		mknod /dev/hmm_dmirror1 c $major 1
-		if [ $# -eq 2 ]; then
-			mknod /dev/hmm_dmirror2 c $major 2
-			mknod /dev/hmm_dmirror3 c $major 3
-		fi
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fi
 }
 

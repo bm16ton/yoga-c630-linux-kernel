@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
-<<<<<<< HEAD
  * Copyright (C) 2021-2022 Intel Corporation
-=======
- * Copyright (C) 2021 Intel Corporation
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <uapi/linux/if_ether.h>
@@ -341,7 +337,6 @@ rx_handler_result_t iwl_mei_rx_filter(struct sk_buff *orig_skb,
 	if (!*pass_to_csme)
 		return RX_HANDLER_PASS;
 
-<<<<<<< HEAD
 	if (ret == RX_HANDLER_PASS) {
 		skb = skb_copy(orig_skb, GFP_ATOMIC);
 
@@ -350,12 +345,6 @@ rx_handler_result_t iwl_mei_rx_filter(struct sk_buff *orig_skb,
 	} else {
 		skb = orig_skb;
 	}
-=======
-	if (ret == RX_HANDLER_PASS)
-		skb = skb_copy(orig_skb, GFP_ATOMIC);
-	else
-		skb = orig_skb;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* CSME wants the MAC header as well, push it back */
 	skb_push(skb, skb->data - skb_mac_header(skb));

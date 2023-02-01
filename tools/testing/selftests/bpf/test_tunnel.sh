@@ -45,10 +45,7 @@
 # 5) Tunnel protocol handler, ex: vxlan_rcv, decap the packet
 # 6) Forward the packet to the overlay tnl dev
 
-<<<<<<< HEAD
 BPF_FILE="test_tunnel_kern.bpf.o"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 BPF_PIN_TUNNEL_DIR="/sys/fs/bpf/tc/tunnel"
 PING_ARG="-c 3 -w 10 -q"
 ret=0
@@ -549,11 +546,7 @@ test_xfrm_tunnel()
 	> /sys/kernel/debug/tracing/trace
 	setup_xfrm_tunnel
 	mkdir -p ${BPF_PIN_TUNNEL_DIR}
-<<<<<<< HEAD
 	bpftool prog loadall ${BPF_FILE} ${BPF_PIN_TUNNEL_DIR}
-=======
-	bpftool prog loadall ./test_tunnel_kern.o ${BPF_PIN_TUNNEL_DIR}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tc qdisc add dev veth1 clsact
 	tc filter add dev veth1 proto ip ingress bpf da object-pinned \
 		${BPF_PIN_TUNNEL_DIR}/xfrm_get_state
@@ -580,11 +573,7 @@ attach_bpf()
 	SET=$2
 	GET=$3
 	mkdir -p ${BPF_PIN_TUNNEL_DIR}
-<<<<<<< HEAD
 	bpftool prog loadall ${BPF_FILE} ${BPF_PIN_TUNNEL_DIR}/
-=======
-	bpftool prog loadall ./test_tunnel_kern.o ${BPF_PIN_TUNNEL_DIR}/
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tc qdisc add dev $DEV clsact
 	tc filter add dev $DEV egress bpf da object-pinned ${BPF_PIN_TUNNEL_DIR}/$SET
 	tc filter add dev $DEV ingress bpf da object-pinned ${BPF_PIN_TUNNEL_DIR}/$GET

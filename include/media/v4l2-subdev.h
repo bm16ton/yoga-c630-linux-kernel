@@ -383,24 +383,6 @@ enum v4l2_mbus_frame_desc_type {
 };
 
 /**
- * enum v4l2_mbus_frame_desc_type - media bus frame description type
- *
- * @V4L2_MBUS_FRAME_DESC_TYPE_UNDEFINED:
- *	Undefined frame desc type. Drivers should not use this, it is
- *	for backwards compatibility.
- * @V4L2_MBUS_FRAME_DESC_TYPE_PARALLEL:
- *	Parallel media bus.
- * @V4L2_MBUS_FRAME_DESC_TYPE_CSI2:
- *	CSI-2 media bus. Frame desc parameters must be set in
- *	&struct v4l2_mbus_frame_desc_entry->csi2.
- */
-enum v4l2_mbus_frame_desc_type {
-	V4L2_MBUS_FRAME_DESC_TYPE_UNDEFINED = 0,
-	V4L2_MBUS_FRAME_DESC_TYPE_PARALLEL,
-	V4L2_MBUS_FRAME_DESC_TYPE_CSI2,
-};
-
-/**
  * struct v4l2_mbus_frame_desc - media bus data frame description
  * @type: type of the bus (enum v4l2_mbus_frame_desc_type)
  * @entry: frame descriptors array

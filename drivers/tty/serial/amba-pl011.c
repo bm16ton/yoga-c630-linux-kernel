@@ -1482,10 +1482,6 @@ static bool pl011_tx_chars(struct uart_amba_port *uap, bool from_irq)
 		return false;
 	}
 
-	if ((uap->port.rs485.flags & SER_RS485_ENABLED) &&
-	    !uap->rs485_tx_started)
-		pl011_rs485_tx_start(uap);
-
 	/* If we are using DMA mode, try to send some characters. */
 	if (pl011_dma_tx_irq(uap))
 		return true;
@@ -1835,7 +1831,6 @@ static void pl011_enable_interrupts(struct uart_amba_port *uap)
 static void pl011_unthrottle_rx(struct uart_port *port)
 {
 	struct uart_amba_port *uap = container_of(port, struct uart_amba_port, port);
-<<<<<<< HEAD
 	unsigned long flags;
 
 	spin_lock_irqsave(&uap->port.lock, flags);
@@ -1847,10 +1842,6 @@ static void pl011_unthrottle_rx(struct uart_port *port)
 	pl011_write(uap->im, uap, REG_IMSC);
 
 	spin_unlock_irqrestore(&uap->port.lock, flags);
-=======
-
-	pl011_enable_interrupts(uap);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int pl011_startup(struct uart_port *port)

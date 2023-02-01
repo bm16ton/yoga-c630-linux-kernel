@@ -143,12 +143,7 @@ failure:
 	 * This unhashes the socket and releases the local port, if necessary.
 	 */
 	dccp_set_state(sk, DCCP_CLOSED);
-<<<<<<< HEAD
 	inet_bhash2_reset_saddr(sk);
-=======
-	if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK))
-		inet_reset_saddr(sk);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ip_rt_put(rt);
 	sk->sk_route_caps = 0;
 	inet->inet_dport = 0;

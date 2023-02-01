@@ -40,66 +40,19 @@ static void vfio_ccw_dma_unmap(struct vfio_device *vdev, u64 iova, u64 length)
 	/* Drivers MUST unpin pages in response to an invalidation. */
 	if (!cp_iova_pinned(&private->cp, iova, length))
 		return;
-<<<<<<< HEAD
-
-	vfio_ccw_mdev_reset(private);
-=======
 
 	vfio_ccw_mdev_reset(private);
 }
 
-static ssize_t name_show(struct mdev_type *mtype,
-			 struct mdev_type_attribute *attr, char *buf)
-{
-	return sprintf(buf, "I/O subchannel (Non-QDIO)\n");
-}
-static MDEV_TYPE_ATTR_RO(name);
-
-static ssize_t device_api_show(struct mdev_type *mtype,
-			       struct mdev_type_attribute *attr, char *buf)
-{
-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_CCW_STRING);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-}
-
-<<<<<<< HEAD
 static int vfio_ccw_mdev_init_dev(struct vfio_device *vdev)
 {
 	struct vfio_ccw_private *private =
 		container_of(vdev, struct vfio_ccw_private, vdev);
-=======
-static ssize_t available_instances_show(struct mdev_type *mtype,
-					struct mdev_type_attribute *attr,
-					char *buf)
-{
-	struct vfio_ccw_private *private =
-		dev_get_drvdata(mtype_get_parent_dev(mtype));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	init_completion(&private->release_comp);
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-static struct attribute *mdev_types_attrs[] = {
-	&mdev_type_attr_name.attr,
-	&mdev_type_attr_device_api.attr,
-	&mdev_type_attr_available_instances.attr,
-	NULL,
-};
-
-static struct attribute_group mdev_type_group = {
-	.name  = "io",
-	.attrs = mdev_types_attrs,
-};
-
-static struct attribute_group *mdev_type_groups[] = {
-	&mdev_type_group,
-	NULL,
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
 {
 	struct vfio_ccw_private *private = dev_get_drvdata(mdev->dev.parent);
@@ -108,18 +61,9 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
 	if (private->state == VFIO_CCW_STATE_NOT_OPER)
 		return -ENODEV;
 
-<<<<<<< HEAD
 	ret = vfio_init_device(&private->vdev, &mdev->dev, &vfio_ccw_dev_ops);
 	if (ret)
 		return ret;
-=======
-	if (atomic_dec_if_positive(&private->avail) < 0)
-		return -EPERM;
-
-	memset(&private->vdev, 0, sizeof(private->vdev));
-	vfio_init_group_dev(&private->vdev, &mdev->dev,
-			    &vfio_ccw_dev_ops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: create\n",
 			   private->sch->schid.cssid,
@@ -128,7 +72,6 @@ static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
 
 	ret = vfio_register_emulated_iommu_dev(&private->vdev);
 	if (ret)
-<<<<<<< HEAD
 		goto err_put_vdev;
 	dev_set_drvdata(&mdev->dev, private);
 	return 0;
@@ -159,22 +102,6 @@ static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
 {
 	struct vfio_ccw_private *private = dev_get_drvdata(mdev->dev.parent);
 
-=======
-		goto err_atomic;
-	dev_set_drvdata(&mdev->dev, private);
-	return 0;
-
-err_atomic:
-	vfio_uninit_group_dev(&private->vdev);
-	atomic_inc(&private->avail);
-	return ret;
-}
-
-static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
-{
-	struct vfio_ccw_private *private = dev_get_drvdata(mdev->dev.parent);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: remove\n",
 			   private->sch->schid.cssid,
 			   private->sch->schid.ssid,
@@ -182,7 +109,6 @@ static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
 
 	vfio_unregister_group_dev(&private->vdev);
 
-<<<<<<< HEAD
 	vfio_put_device(&private->vdev);
 	/*
 	 * Wait for all active references on mdev are released so it
@@ -193,10 +119,6 @@ static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
 	 * cycle.
 	 */
 	wait_for_completion(&private->release_comp);
-=======
-	vfio_uninit_group_dev(&private->vdev);
-	atomic_inc(&private->avail);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
@@ -657,11 +579,8 @@ static void vfio_ccw_mdev_request(struct vfio_device *vdev, unsigned int count)
 }
 
 static const struct vfio_device_ops vfio_ccw_dev_ops = {
-<<<<<<< HEAD
 	.init = vfio_ccw_mdev_init_dev,
 	.release = vfio_ccw_mdev_release_dev,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.open_device = vfio_ccw_mdev_open_device,
 	.close_device = vfio_ccw_mdev_close_device,
 	.read = vfio_ccw_mdev_read,
@@ -672,11 +591,8 @@ static const struct vfio_device_ops vfio_ccw_dev_ops = {
 };
 
 struct mdev_driver vfio_ccw_mdev_driver = {
-<<<<<<< HEAD
 	.device_api = VFIO_DEVICE_API_CCW_STRING,
 	.max_instances = 1,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.driver = {
 		.name = "vfio_ccw_mdev",
 		.owner = THIS_MODULE,
@@ -684,8 +600,4 @@ struct mdev_driver vfio_ccw_mdev_driver = {
 	},
 	.probe = vfio_ccw_mdev_probe,
 	.remove = vfio_ccw_mdev_remove,
-<<<<<<< HEAD
-=======
-	.supported_type_groups  = mdev_type_groups,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

@@ -24,38 +24,18 @@ enum psi_task_count {
 	 * distinguish between regular running (i.e. productive)
 	 * threads and memstall ones.
 	 */
-<<<<<<< HEAD
 	NR_MEMSTALL_RUNNING,
 	NR_PSI_TASK_COUNTS = 4,
-=======
-	NR_ONCPU,
-	/*
-	 * For IO and CPU stalls the presence of running/oncpu tasks
-	 * in the domain means a partial rather than a full stall.
-	 * For memory it's not so simple because of page reclaimers:
-	 * they are running/oncpu while representing a stall. To tell
-	 * whether a domain has productivity left or not, we need to
-	 * distinguish between regular running (i.e. productive)
-	 * threads and memstall ones.
-	 */
-	NR_MEMSTALL_RUNNING,
-	NR_PSI_TASK_COUNTS = 5,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Task state bitmasks */
 #define TSK_IOWAIT	(1 << NR_IOWAIT)
 #define TSK_MEMSTALL	(1 << NR_MEMSTALL)
 #define TSK_RUNNING	(1 << NR_RUNNING)
-<<<<<<< HEAD
 #define TSK_MEMSTALL_RUNNING	(1 << NR_MEMSTALL_RUNNING)
 
 /* Only one task can be scheduled, no corresponding task count */
 #define TSK_ONCPU	(1 << NR_PSI_TASK_COUNTS)
-=======
-#define TSK_ONCPU	(1 << NR_ONCPU)
-#define TSK_MEMSTALL_RUNNING	(1 << NR_MEMSTALL_RUNNING)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Resources that workloads could be stalled on */
 enum psi_res {
@@ -81,18 +61,12 @@ enum psi_states {
 	PSI_MEM_FULL,
 	PSI_CPU_SOME,
 	PSI_CPU_FULL,
-<<<<<<< HEAD
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
 	PSI_IRQ_FULL,
 #endif
 	/* Only per-CPU, to weigh the CPU in the global average: */
 	PSI_NONIDLE,
 	NR_PSI_STATES,
-=======
-	/* Only per-CPU, to weigh the CPU in the global average: */
-	PSI_NONIDLE,
-	NR_PSI_STATES = 7,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Use one bit in the state mask to track TSK_ONCPU */

@@ -28,17 +28,9 @@ struct hsr_frame_info {
 	bool is_from_san;
 };
 
-#ifdef CONFIG_LOCKDEP
-int lockdep_hsr_is_held(spinlock_t *lock);
-#else
-#define lockdep_hsr_is_held(lock)	1
-#endif
-
-u32 hsr_mac_hash(struct hsr_priv *hsr, const unsigned char *addr);
-struct hsr_node *hsr_node_get_first(struct hlist_head *head, spinlock_t *lock);
 void hsr_del_self_node(struct hsr_priv *hsr);
-void hsr_del_nodes(struct hlist_head *node_db);
-struct hsr_node *hsr_get_node(struct hsr_port *port, struct hlist_head *node_db,
+void hsr_del_nodes(struct list_head *node_db);
+struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
 			      struct sk_buff *skb, bool is_sup,
 			      enum hsr_port_type rx_port);
 void hsr_handle_sup_frame(struct hsr_frame_info *frame);
@@ -76,13 +68,9 @@ void prp_handle_san_frame(bool san, enum hsr_port_type port,
 void prp_update_san_info(struct hsr_node *node, bool is_sup);
 
 struct hsr_node {
-<<<<<<< HEAD
 	struct list_head	mac_list;
 	/* Protect R/W access to seq_out */
 	spinlock_t		seq_out_lock;
-=======
-	struct hlist_node	mac_list;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned char		macaddress_A[ETH_ALEN];
 	unsigned char		macaddress_B[ETH_ALEN];
 	/* Local slave through which AddrB frames are received from this node */

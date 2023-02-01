@@ -86,11 +86,7 @@ def ascii(text):
 #	 store system values and test parameters
 class SystemValues:
 	title = 'SleepGraph'
-<<<<<<< HEAD
 	version = '5.10'
-=======
-	version = '5.9'
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ansi = False
 	rs = 0
 	display = ''
@@ -129,10 +125,7 @@ class SystemValues:
 	epath = '/sys/kernel/debug/tracing/events/power/'
 	pmdpath = '/sys/power/pm_debug_messages'
 	s0ixpath = '/sys/module/intel_pmc_core/parameters/warn_on_s0ix_failures'
-<<<<<<< HEAD
 	s0ixres = '/sys/devices/system/cpu/cpuidle/low_power_idle_system_residency_us'
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	acpipath='/sys/module/acpi/parameters/debug_level'
 	traceevents = [
 		'suspend_resume',
@@ -1205,17 +1198,6 @@ class SystemValues:
 		out = ascii(fp.read()).strip()
 		fp.close()
 		return out
-<<<<<<< HEAD
-=======
-	def wifiRepair(self):
-		out = self.netfixon('wifi')
-		if not out or 'error' in out.lower():
-			return ''
-		m = re.match('WIFI \S* ONLINE (?P<action>\S*)', out)
-		if not m:
-			return 'dead'
-		return m.group('action')
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	def wifiDetails(self, dev):
 		try:
 			info = open('/sys/class/net/%s/device/uevent' % dev, 'r').read().strip()
@@ -1245,11 +1227,6 @@ class SystemValues:
 				return '%s reconnected %.2f' % \
 					(self.wifiDetails(dev), max(0, time.time() - start))
 			time.sleep(0.01)
-		if self.netfix:
-			res = self.wifiRepair()
-			if res:
-				timeout = max(0, time.time() - start)
-				return '%s %s %d' % (self.wifiDetails(dev), res, timeout)
 		return '%s timeout %d' % (self.wifiDetails(dev), timeout)
 	def errorSummary(self, errinfo, msg):
 		found = False
@@ -5473,20 +5450,7 @@ def executeSuspend(quiet=False):
 		call('sync', shell=True)
 	sv.dlog('read dmesg')
 	sv.initdmesg()
-<<<<<<< HEAD
 	sv.dlog('cmdinfo before')
-=======
-	# start ftrace
-	if sv.useftrace:
-		if not quiet:
-			pprint('START TRACING')
-		sv.dlog('start ftrace tracing')
-		sv.fsetVal('1', 'tracing_on')
-		if sv.useprocmon:
-			sv.dlog('start the process monitor')
-			pm.start()
-	sv.dlog('run the cmdinfo list before')
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sv.cmdinfo(True)
 	sv.start(pm)
 	# execute however many s/r runs requested
@@ -5563,7 +5527,6 @@ def executeSuspend(quiet=False):
 			sv.fsetVal('WAIT END', 'trace_marker')
 		# return from suspend
 		pprint('RESUME COMPLETE')
-<<<<<<< HEAD
 		if(count < sv.execcount):
 			sv.fsetVal(datetime.now().strftime(sv.tmend), 'trace_marker')
 		elif(not sv.wifitrace):
@@ -5577,18 +5540,6 @@ def executeSuspend(quiet=False):
 			sv.stop(pm)
 		if sv.netfix:
 			tdata['netfix'] = sv.netfixon()
-=======
-		sv.fsetVal(datetime.now().strftime(sv.tmend), 'trace_marker')
-		if sv.wifi and wifi:
-			tdata['wifi'] = sv.pollWifi(wifi)
-			sv.dlog('wifi check, %s' % tdata['wifi'])
-			if sv.netfix:
-				netfixout = sv.netfixon('wired')
-		elif sv.netfix:
-			netfixout = sv.netfixon()
-		if sv.netfix and netfixout:
-			tdata['netfix'] = netfixout
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			sv.dlog('netfix, %s' % tdata['netfix'])
 		if(sv.suspendmode == 'mem' or sv.suspendmode == 'command'):
 			sv.dlog('read the ACPI FPDT')
@@ -5596,15 +5547,6 @@ def executeSuspend(quiet=False):
 		testdata.append(tdata)
 	sv.dlog('cmdinfo after')
 	cmdafter = sv.cmdinfo(False)
-<<<<<<< HEAD
-=======
-	# stop ftrace
-	if sv.useftrace:
-		if sv.useprocmon:
-			sv.dlog('stop the process monitor')
-			pm.stop()
-		sv.fsetVal('0', 'tracing_on')
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	# grab a copy of the dmesg output
 	if not quiet:
 		pprint('CAPTURING DMESG')
@@ -6749,10 +6691,7 @@ def printHelp():
 	'   -skiphtml    Run the test and capture the trace logs, but skip the timeline (default: disabled)\n'\
 	'   -result fn   Export a results table to a text file for parsing.\n'\
 	'   -wifi        If a wifi connection is available, check that it reconnects after resume.\n'\
-<<<<<<< HEAD
 	'   -wifitrace   Trace kernel execution through wifi reconnect.\n'\
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	'   -netfix      Use netfix to reset the network in the event it fails to resume.\n'\
 	'  [testprep]\n'\
 	'   -sync        Sync the filesystems before starting the test\n'\
@@ -6880,11 +6819,8 @@ if __name__ == '__main__':
 			sysvals.sync = True
 		elif(arg == '-wifi'):
 			sysvals.wifi = True
-<<<<<<< HEAD
 		elif(arg == '-wifitrace'):
 			sysvals.wifitrace = True
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		elif(arg == '-netfix'):
 			sysvals.netfix = True
 		elif(arg == '-gzip'):

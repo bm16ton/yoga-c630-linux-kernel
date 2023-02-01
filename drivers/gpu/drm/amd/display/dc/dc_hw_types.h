@@ -913,7 +913,6 @@ struct dc_crtc_timing {
 	 * from dc_crtc_timing to BIOS command table.
 	 */
 	uint32_t pix_clk_100hz;
-	uint32_t min_refresh_in_uhz;
 
 	uint32_t min_refresh_in_uhz;
 

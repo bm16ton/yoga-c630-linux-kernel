@@ -16,10 +16,7 @@ properties:
       - ti,j721e-wiz-16g
       - ti,j721e-wiz-10g
       - ti,am64-wiz-10g
-<<<<<<< HEAD
       - ti,j7200-wiz-10g
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   power-domains:
     maxItems: 1
@@ -86,18 +83,12 @@ properties:
 
   refclk-dig:
     type: object
-<<<<<<< HEAD
     additionalProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     description: |
       WIZ node should have subnode for refclk_dig to select the reference
       clock source for the reference clock used in the PHY and PMA digital
       logic.
-<<<<<<< HEAD
     deprecated: true
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     properties:
       clocks:
         minItems: 2
@@ -120,14 +111,11 @@ properties:
       - assigned-clocks
       - assigned-clock-parents
 
-<<<<<<< HEAD
   ti,scm:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
       phandle to System Control Module for syscon regmap access.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 patternProperties:
   "^pll[0|1]-refclk$":
     type: object

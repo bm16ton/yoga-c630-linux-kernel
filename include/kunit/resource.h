@@ -301,25 +301,6 @@ typedef bool (*kunit_resource_match_t)(struct kunit *test,
 				       void *match_data);
 
 /**
-<<<<<<< HEAD
-=======
- * kunit_resource_instance_match() - Match a resource with the same instance.
- * @test: Test case to which the resource belongs.
- * @res: The resource.
- * @match_data: The resource pointer to match against.
- *
- * An instance of kunit_resource_match_t that matches a resource whose
- * allocation matches @match_data.
- */
-static inline bool kunit_resource_instance_match(struct kunit *test,
-						 struct kunit_resource *res,
-						 void *match_data)
-{
-	return res->data == match_data;
-}
-
-/**
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * kunit_resource_name_match() - Match a resource with the same name.
  * @test: Test case to which the resource belongs.
  * @res: The resource.

@@ -104,10 +104,6 @@ static const struct snd_soc_component_driver test_component = {
 	.name = "sound-soc-topology-test",
 	.probe = d_probe,
 	.remove = d_remove,
-<<<<<<< HEAD
-=======
-	.non_legacy_dai_naming = 1,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* ===== TOPOLOGY TEMPLATES ================================================= */
@@ -241,10 +237,6 @@ static int d_probe_null_comp(struct snd_soc_component *component)
 static const struct snd_soc_component_driver test_component_null_comp = {
 	.name = "sound-soc-topology-test",
 	.probe = d_probe_null_comp,
-<<<<<<< HEAD
-=======
-	.non_legacy_dai_naming = 1,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void snd_soc_tplg_test_load_with_null_comp(struct kunit *test)
@@ -277,13 +269,7 @@ static void snd_soc_tplg_test_load_with_null_comp(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snd_soc_unregister_component(test_dev);
 }
 
@@ -325,12 +311,7 @@ static void snd_soc_tplg_test_load_with_null_ops(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	snd_soc_unregister_component(test_dev);
 }
@@ -360,10 +341,6 @@ static int d_probe_null_fw(struct snd_soc_component *component)
 static const struct snd_soc_component_driver test_component_null_fw = {
 	.name = "sound-soc-topology-test",
 	.probe = d_probe_null_fw,
-<<<<<<< HEAD
-=======
-	.non_legacy_dai_naming = 1,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void snd_soc_tplg_test_load_with_null_fw(struct kunit *test)
@@ -396,12 +373,7 @@ static void snd_soc_tplg_test_load_with_null_fw(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	snd_soc_unregister_component(test_dev);
 }
@@ -449,12 +421,7 @@ static void snd_soc_tplg_test_load_empty_tplg(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	snd_soc_unregister_component(test_dev);
 }
@@ -509,12 +476,7 @@ static void snd_soc_tplg_test_load_empty_tplg_bad_magic(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	snd_soc_unregister_component(test_dev);
 }
@@ -569,12 +531,7 @@ static void snd_soc_tplg_test_load_empty_tplg_bad_abi(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	snd_soc_unregister_component(test_dev);
 }
@@ -629,12 +586,7 @@ static void snd_soc_tplg_test_load_empty_tplg_bad_size(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, ret);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	snd_soc_unregister_component(test_dev);
 }
@@ -692,12 +644,7 @@ static void snd_soc_tplg_test_load_empty_tplg_bad_payload_size(struct kunit *tes
 	/* cleanup */
 	snd_soc_unregister_component(test_dev);
 
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 // TEST CASE
@@ -745,12 +692,7 @@ static void snd_soc_tplg_test_load_pcm_tplg(struct kunit *test)
 	snd_soc_unregister_component(test_dev);
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 // TEST CASE
@@ -802,12 +744,7 @@ static void snd_soc_tplg_test_load_pcm_tplg_reload_comp(struct kunit *test)
 	}
 
 	/* cleanup */
-<<<<<<< HEAD
 	snd_soc_unregister_card(&kunit_comp->card);
-=======
-	ret = snd_soc_unregister_card(&kunit_comp->card);
-	KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 // TEST CASE
@@ -855,12 +792,7 @@ static void snd_soc_tplg_test_load_pcm_tplg_reload_card(struct kunit *test)
 		if (ret != 0 && ret != -EPROBE_DEFER)
 			KUNIT_FAIL(test, "Failed to register card");
 
-<<<<<<< HEAD
 		snd_soc_unregister_card(&kunit_comp->card);
-=======
-		ret = snd_soc_unregister_card(&kunit_comp->card);
-		KUNIT_EXPECT_EQ(test, 0, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* cleanup */

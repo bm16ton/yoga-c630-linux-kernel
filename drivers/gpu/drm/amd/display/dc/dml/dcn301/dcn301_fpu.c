@@ -322,10 +322,7 @@ static void calculate_wm_set_for_vlevel(int vlevel,
 
 void dcn301_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_params)
 {
-<<<<<<< HEAD
 	struct _vcs_dpi_voltage_scaling_st *s = dc->scratch.update_bw_bounding_box.clock_limits;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dcn301_resource_pool *pool = TO_DCN301_RES_POOL(dc->res_pool);
 	struct clk_limit_table *clk_table = &bw_params->clk_table;
 	unsigned int i, closest_clk_lvl;
@@ -333,12 +330,7 @@ void dcn301_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_param
 
 	dc_assert_fp_enabled();
 
-<<<<<<< HEAD
 	memcpy(s, dcn3_01_soc.clock_limits, sizeof(dcn3_01_soc.clock_limits));
-=======
-	memcpy(&dcn3_01_soc._clock_tmp, &dcn3_01_soc.clock_limits,
-	       sizeof(dcn3_01_soc.clock_limits));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Default clock levels are used for diags, which may lead to overclocking. */
 	if (!IS_DIAG_DC(dc->ctx->dce_environment)) {
@@ -356,7 +348,6 @@ void dcn301_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_param
 				}
 			}
 
-<<<<<<< HEAD
 			s[i].state = i;
 			s[i].dcfclk_mhz = clk_table->entries[i].dcfclk_mhz;
 			s[i].fabricclk_mhz = clk_table->entries[i].fclk_mhz;
@@ -372,27 +363,11 @@ void dcn301_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_param
 			s[i].phyclk_d18_mhz =
 				dcn3_01_soc.clock_limits[closest_clk_lvl].phyclk_d18_mhz;
 			s[i].phyclk_mhz = dcn3_01_soc.clock_limits[closest_clk_lvl].phyclk_mhz;
-=======
-			dcn3_01_soc._clock_tmp[i].state = i;
-			dcn3_01_soc._clock_tmp[i].dcfclk_mhz = clk_table->entries[i].dcfclk_mhz;
-			dcn3_01_soc._clock_tmp[i].fabricclk_mhz = clk_table->entries[i].fclk_mhz;
-			dcn3_01_soc._clock_tmp[i].socclk_mhz = clk_table->entries[i].socclk_mhz;
-			dcn3_01_soc._clock_tmp[i].dram_speed_mts = clk_table->entries[i].memclk_mhz * 2;
-
-			dcn3_01_soc._clock_tmp[i].dispclk_mhz = dcn3_01_soc.clock_limits[closest_clk_lvl].dispclk_mhz;
-			dcn3_01_soc._clock_tmp[i].dppclk_mhz = dcn3_01_soc.clock_limits[closest_clk_lvl].dppclk_mhz;
-			dcn3_01_soc._clock_tmp[i].dram_bw_per_chan_gbps = dcn3_01_soc.clock_limits[closest_clk_lvl].dram_bw_per_chan_gbps;
-			dcn3_01_soc._clock_tmp[i].dscclk_mhz = dcn3_01_soc.clock_limits[closest_clk_lvl].dscclk_mhz;
-			dcn3_01_soc._clock_tmp[i].dtbclk_mhz = dcn3_01_soc.clock_limits[closest_clk_lvl].dtbclk_mhz;
-			dcn3_01_soc._clock_tmp[i].phyclk_d18_mhz = dcn3_01_soc.clock_limits[closest_clk_lvl].phyclk_d18_mhz;
-			dcn3_01_soc._clock_tmp[i].phyclk_mhz = dcn3_01_soc.clock_limits[closest_clk_lvl].phyclk_mhz;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (clk_table->num_entries) {
 			dcn3_01_soc.num_states = clk_table->num_entries;
 			/* duplicate last level */
-<<<<<<< HEAD
 			s[dcn3_01_soc.num_states] =
 				dcn3_01_soc.clock_limits[dcn3_01_soc.num_states - 1];
 			s[dcn3_01_soc.num_states].state = dcn3_01_soc.num_states;
@@ -400,27 +375,15 @@ void dcn301_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_param
 	}
 
 	memcpy(dcn3_01_soc.clock_limits, s, sizeof(dcn3_01_soc.clock_limits));
-=======
-			dcn3_01_soc._clock_tmp[dcn3_01_soc.num_states] = dcn3_01_soc.clock_limits[dcn3_01_soc.num_states - 1];
-			dcn3_01_soc._clock_tmp[dcn3_01_soc.num_states].state = dcn3_01_soc.num_states;
-		}
-	}
-
-	memcpy(&dcn3_01_soc.clock_limits, &dcn3_01_soc._clock_tmp,
-	       sizeof(dcn3_01_soc.clock_limits));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dcn3_01_soc.dispclk_dppclk_vco_speed_mhz = dc->clk_mgr->dentist_vco_freq_khz / 1000.0;
 	dc->dml.soc.dispclk_dppclk_vco_speed_mhz = dc->clk_mgr->dentist_vco_freq_khz / 1000.0;
 
-<<<<<<< HEAD
 	if ((int)(dcn3_01_soc.dram_clock_change_latency_us * 1000)
 				!= dc->debug.dram_clock_change_latency_ns
 			&& dc->debug.dram_clock_change_latency_ns) {
 		dcn3_01_soc.dram_clock_change_latency_us = dc->debug.dram_clock_change_latency_ns / 1000.0;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dml_init_instance(&dc->dml, &dcn3_01_soc, &dcn3_01_ip, DML_PROJECT_DCN30);
 }
 

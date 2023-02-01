@@ -17,12 +17,9 @@
 
 #include "fsl_sai.h"
 
-<<<<<<< HEAD
 #define IMX_CARD_MCLK_22P5792MHZ  22579200
 #define IMX_CARD_MCLK_24P576MHZ   24576000
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum codec_type {
 	CODEC_DUMMY = 0,
 	CODEC_AK5558 = 1,
@@ -121,11 +118,7 @@ struct imx_card_data {
 	struct snd_soc_card card;
 	int num_dapm_routes;
 	u32 asrc_rate;
-<<<<<<< HEAD
 	snd_pcm_format_t asrc_format;
-=======
-	u32 asrc_format;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct imx_akcodec_fs_mul ak4458_fs_mul[] = {
@@ -327,11 +320,7 @@ static int imx_aif_hw_params(struct snd_pcm_substream *substream,
 		}
 	}
 
-<<<<<<< HEAD
 	ret = snd_soc_dai_set_fmt(cpu_dai, snd_soc_daifmt_clock_provider_flipped(fmt));
-=======
-	ret = snd_soc_dai_set_fmt(cpu_dai, fmt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret && ret != -ENOTSUPP) {
 		dev_err(dev, "failed to set cpu dai fmt: %d\n", ret);
 		return ret;
@@ -367,7 +356,6 @@ static int imx_aif_hw_params(struct snd_pcm_substream *substream,
 		mclk_freq = akcodec_get_mclk_rate(substream, params, slots, slot_width);
 	else
 		mclk_freq = params_rate(params) * slots * slot_width;
-<<<<<<< HEAD
 
 	if (format_is_dsd(params)) {
 		/* Use the maximum freq from DSD512 (512*44100 = 22579200) */
@@ -376,11 +364,6 @@ static int imx_aif_hw_params(struct snd_pcm_substream *substream,
 		else
 			mclk_freq = IMX_CARD_MCLK_24P576MHZ;
 	}
-=======
-	/* Use the maximum freq from DSD512 (512*44100 = 22579200) */
-	if (format_is_dsd(params))
-		mclk_freq = 22579200;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = snd_soc_dai_set_sysclk(cpu_dai, link_data->cpu_sysclk_id, mclk_freq,
 				     SND_SOC_CLOCK_OUT);
@@ -491,11 +474,7 @@ static int be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 
 	mask = hw_param_mask(params, SNDRV_PCM_HW_PARAM_FORMAT);
 	snd_mask_none(mask);
-<<<<<<< HEAD
 	snd_mask_set(mask, (__force unsigned int)data->asrc_format);
-=======
-	snd_mask_set(mask, data->asrc_format);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -514,10 +493,7 @@ static int imx_card_parse_of(struct imx_card_data *data)
 	struct dai_link_data *link_data;
 	struct of_phandle_args args;
 	int ret, num_links;
-<<<<<<< HEAD
 	u32 asrc_fmt = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 width;
 
 	ret = snd_soc_of_parse_card_name(card, "model");
@@ -664,12 +640,8 @@ static int imx_card_parse_of(struct imx_card_data *data)
 				goto err;
 			}
 
-<<<<<<< HEAD
 			ret = of_property_read_u32(args.np, "fsl,asrc-format", &asrc_fmt);
 			data->asrc_format = (__force snd_pcm_format_t)asrc_fmt;
-=======
-			ret = of_property_read_u32(args.np, "fsl,asrc-format", &data->asrc_format);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (ret) {
 				/* Fallback to old binding; translate to asrc_format */
 				ret = of_property_read_u32(args.np, "fsl,asrc-width", &width);
@@ -726,13 +698,10 @@ static int imx_card_parse_of(struct imx_card_data *data)
 		of_node_put(cpu);
 		of_node_put(codec);
 		of_node_put(platform);
-<<<<<<< HEAD
 
 		cpu = NULL;
 		codec = NULL;
 		platform = NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;

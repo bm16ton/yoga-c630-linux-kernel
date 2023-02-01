@@ -441,7 +441,6 @@ int hci_inquiry(void __user *arg)
 	 * 255 entries
 	 */
 	max_rsp = (ir.num_rsp == 0) ? 255 : ir.num_rsp;
-<<<<<<< HEAD
 
 	/* cache_dump can't sleep. Therefore we allocate temp buffer and then
 	 * copy it to the user space.
@@ -477,43 +476,6 @@ static int hci_dev_do_open(struct hci_dev *hdev)
 {
 	int ret = 0;
 
-=======
-
-	/* cache_dump can't sleep. Therefore we allocate temp buffer and then
-	 * copy it to the user space.
-	 */
-	buf = kmalloc_array(max_rsp, sizeof(struct inquiry_info), GFP_KERNEL);
-	if (!buf) {
-		err = -ENOMEM;
-		goto done;
-	}
-
-	hci_dev_lock(hdev);
-	ir.num_rsp = inquiry_cache_dump(hdev, max_rsp, buf);
-	hci_dev_unlock(hdev);
-
-	BT_DBG("num_rsp %d", ir.num_rsp);
-
-	if (!copy_to_user(ptr, &ir, sizeof(ir))) {
-		ptr += sizeof(ir);
-		if (copy_to_user(ptr, buf, sizeof(struct inquiry_info) *
-				 ir.num_rsp))
-			err = -EFAULT;
-	} else
-		err = -EFAULT;
-
-	kfree(buf);
-
-done:
-	hci_dev_put(hdev);
-	return err;
-}
-
-static int hci_dev_do_open(struct hci_dev *hdev)
-{
-	int ret = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	BT_DBG("%s %p", hdev->name, hdev);
 
 	hci_req_sync_lock(hdev);
@@ -1753,12 +1715,8 @@ struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
 				      u32 flags, u16 adv_data_len, u8 *adv_data,
 				      u16 scan_rsp_len, u8 *scan_rsp_data,
 				      u16 timeout, u16 duration, s8 tx_power,
-<<<<<<< HEAD
 				      u32 min_interval, u32 max_interval,
 				      u8 mesh_handle)
-=======
-				      u32 min_interval, u32 max_interval)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct adv_info *adv;
 
@@ -1769,11 +1727,7 @@ struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
 		memset(adv->per_adv_data, 0, sizeof(adv->per_adv_data));
 	} else {
 		if (hdev->adv_instance_cnt >= hdev->le_num_of_adv_sets ||
-<<<<<<< HEAD
 		    instance < 1 || instance > hdev->le_num_of_adv_sets + 1)
-=======
-		    instance < 1 || instance > hdev->le_num_of_adv_sets)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return ERR_PTR(-EOVERFLOW);
 
 		adv = kzalloc(sizeof(*adv), GFP_KERNEL);
@@ -1790,7 +1744,6 @@ struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
 	adv->min_interval = min_interval;
 	adv->max_interval = max_interval;
 	adv->tx_power = tx_power;
-<<<<<<< HEAD
 	/* Defining a mesh_handle changes the timing units to ms,
 	 * rather than seconds, and ties the instance to the requested
 	 * mesh_tx queue.
@@ -1800,12 +1753,6 @@ struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
 	hci_set_adv_instance_data(hdev, instance, adv_data_len, adv_data,
 				  scan_rsp_len, scan_rsp_data);
 
-=======
-
-	hci_set_adv_instance_data(hdev, instance, adv_data_len, adv_data,
-				  scan_rsp_len, scan_rsp_data);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	adv->timeout = timeout;
 	adv->remaining_time = timeout;
 
@@ -1830,11 +1777,7 @@ struct adv_info *hci_add_per_instance(struct hci_dev *hdev, u8 instance,
 
 	adv = hci_add_adv_instance(hdev, instance, flags, 0, NULL, 0, NULL,
 				   0, 0, HCI_ADV_TX_POWER_NO_PREFERENCE,
-<<<<<<< HEAD
 				   min_interval, max_interval, 0);
-=======
-				   min_interval, max_interval);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(adv))
 		return adv;
 
@@ -2484,7 +2427,6 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
 {
 	struct hci_dev *hdev;
 	unsigned int alloc_size;
-<<<<<<< HEAD
 
 	alloc_size = sizeof(*hdev);
 	if (sizeof_priv) {
@@ -2492,15 +2434,6 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
 		alloc_size += sizeof_priv;
 	}
 
-=======
-
-	alloc_size = sizeof(*hdev);
-	if (sizeof_priv) {
-		/* Fixme: May need ALIGN-ment? */
-		alloc_size += sizeof_priv;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hdev = kzalloc(alloc_size, GFP_KERNEL);
 	if (!hdev)
 		return NULL;
@@ -2727,11 +2660,7 @@ int hci_register_dev(struct hci_dev *hdev)
 
 	error = hci_register_suspend_notifier(hdev);
 	if (error)
-<<<<<<< HEAD
 		BT_WARN("register suspend notifier failed error:%d\n", error);
-=======
-		goto err_wqueue;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	queue_work(hdev->req_workqueue, &hdev->power_on);
 
@@ -2830,7 +2759,6 @@ void hci_release_dev(struct hci_dev *hdev)
 	kfree(hdev);
 }
 EXPORT_SYMBOL(hci_release_dev);
-<<<<<<< HEAD
 
 int hci_register_suspend_notifier(struct hci_dev *hdev)
 {
@@ -2842,18 +2770,6 @@ int hci_register_suspend_notifier(struct hci_dev *hdev)
 		ret = register_pm_notifier(&hdev->suspend_notifier);
 	}
 
-=======
-
-int hci_register_suspend_notifier(struct hci_dev *hdev)
-{
-	int ret = 0;
-
-	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
-		hdev->suspend_notifier.notifier_call = hci_suspend_notifier;
-		ret = register_pm_notifier(&hdev->suspend_notifier);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -2861,16 +2777,11 @@ int hci_unregister_suspend_notifier(struct hci_dev *hdev)
 {
 	int ret = 0;
 
-<<<<<<< HEAD
 	if (hdev->suspend_notifier.notifier_call) {
 		ret = unregister_pm_notifier(&hdev->suspend_notifier);
 		if (!ret)
 			hdev->suspend_notifier.notifier_call = NULL;
 	}
-=======
-	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks))
-		ret = unregister_pm_notifier(&hdev->suspend_notifier);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -3160,7 +3071,6 @@ void *hci_recv_event_data(struct hci_dev *hdev, __u8 event)
 {
 	struct hci_event_hdr *hdr;
 	int offset;
-<<<<<<< HEAD
 
 	if (!hdev->recv_event)
 		return NULL;
@@ -3173,20 +3083,6 @@ void *hci_recv_event_data(struct hci_dev *hdev, __u8 event)
 		if (hdr->evt == HCI_EV_LE_META) {
 			struct hci_ev_le_meta *ev;
 
-=======
-
-	if (!hdev->recv_event)
-		return NULL;
-
-	hdr = (void *)hdev->recv_event->data;
-	offset = sizeof(*hdr);
-
-	if (hdr->evt != event) {
-		/* In case of LE metaevent check the subevent match */
-		if (hdr->evt == HCI_EV_LE_META) {
-			struct hci_ev_le_meta *ev;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ev = (void *)hdev->recv_event->data + offset;
 			offset += sizeof(*ev);
 			if (ev->subevent == event)
@@ -3194,17 +3090,10 @@ void *hci_recv_event_data(struct hci_dev *hdev, __u8 event)
 		}
 		return NULL;
 	}
-<<<<<<< HEAD
 
 found:
 	bt_dev_dbg(hdev, "event 0x%2.2x", event);
 
-=======
-
-found:
-	bt_dev_dbg(hdev, "event 0x%2.2x", event);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return hdev->recv_event->data + offset;
 }
 

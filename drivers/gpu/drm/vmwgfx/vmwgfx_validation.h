@@ -34,8 +34,6 @@
 
 #include <drm/ttm/ttm_execbuf_util.h>
 
-#include "vmwgfx_hashtab.h"
-
 #define VMW_RES_DIRTY_NONE 0
 #define VMW_RES_DIRTY_SET BIT(0)
 #define VMW_RES_DIRTY_CLEAR BIT(1)
@@ -60,11 +58,7 @@
  * @total_mem: Amount of reserved memory.
  */
 struct vmw_validation_context {
-<<<<<<< HEAD
 	struct vmw_sw_context *sw_context;
-=======
-	struct vmwgfx_open_hash *ht;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct list_head resource_list;
 	struct list_head resource_ctx_list;
 	struct list_head bo_list;
@@ -120,22 +114,6 @@ vmw_validation_has_bos(struct vmw_validation_context *ctx)
 }
 
 /**
-<<<<<<< HEAD
-=======
- * vmw_validation_set_ht - Register a hash table for duplicate finding
- * @ctx: The validation context
- * @ht: Pointer to a hash table to use for duplicate finding
- * This function is intended to be used if the hash table wasn't
- * available at validation context declaration time
- */
-static inline void vmw_validation_set_ht(struct vmw_validation_context *ctx,
-					 struct vmwgfx_open_hash *ht)
-{
-	ctx->ht = ht;
-}
-
-/**
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * vmw_validation_bo_reserve - Reserve buffer objects registered with a
  * validation context
  * @ctx: The validation context

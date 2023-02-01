@@ -52,13 +52,6 @@ config FPGA_MGR_ALTERA_CVP
 	  FPGA manager driver support for Arria-V, Cyclone-V, Stratix-V,
 	  Arria 10 and Stratix10 Altera FPGAs using the CvP interface over PCIe.
 
-config FPGA_MGR_FTDI_FIFO_FPP
-	tristate "Altera FPP over FT232H FIFO"
-	depends on USB_FT232H_INTF
-	help
-	  FPGA manager driver support for Altera fast passive parallel
-	  interface (FPP) over FT232H FT245 FIFO.
-
 config FPGA_MGR_ZYNQ_FPGA
 	tristate "Xilinx Zynq FPGA"
 	depends on ARCH_ZYNQ || COMPILE_TEST

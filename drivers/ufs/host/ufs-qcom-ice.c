@@ -118,10 +118,6 @@ int ufs_qcom_ice_init(struct ufs_qcom_host *host)
 	host->ice_mmio = devm_ioremap_resource(dev, res);
 	if (IS_ERR(host->ice_mmio)) {
 		err = PTR_ERR(host->ice_mmio);
-<<<<<<< HEAD
-=======
-		dev_err(dev, "Failed to map ICE registers; err=%d\n", err);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return err;
 	}
 

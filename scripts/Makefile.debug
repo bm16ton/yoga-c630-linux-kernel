@@ -1,5 +1,4 @@
 DEBUG_CFLAGS	:=
-<<<<<<< HEAD
 DEBUG_RUSTFLAGS	:=
 
 debug-flags-y	:= -g
@@ -26,30 +25,6 @@ DEBUG_CFLAGS	+= -femit-struct-debug-baseonly
 endif
 else
 DEBUG_RUSTFLAGS	+= -Cdebuginfo=2
-=======
-
-ifdef CONFIG_DEBUG_INFO_SPLIT
-DEBUG_CFLAGS	+= -gsplit-dwarf
-else
-DEBUG_CFLAGS	+= -g
-endif
-
-ifndef CONFIG_AS_IS_LLVM
-KBUILD_AFLAGS	+= -Wa,-gdwarf-2
-endif
-
-ifndef CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
-dwarf-version-$(CONFIG_DEBUG_INFO_DWARF4) := 4
-dwarf-version-$(CONFIG_DEBUG_INFO_DWARF5) := 5
-DEBUG_CFLAGS	+= -gdwarf-$(dwarf-version-y)
-endif
-
-ifdef CONFIG_DEBUG_INFO_REDUCED
-DEBUG_CFLAGS	+= -fno-var-tracking
-ifdef CONFIG_CC_IS_GCC
-DEBUG_CFLAGS	+= -femit-struct-debug-baseonly
-endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endif
 
 ifdef CONFIG_DEBUG_INFO_COMPRESSED
@@ -58,13 +33,8 @@ KBUILD_AFLAGS	+= -gz=zlib
 KBUILD_LDFLAGS	+= --compress-debug-sections=zlib
 endif
 
-<<<<<<< HEAD
 KBUILD_CFLAGS	+= $(DEBUG_CFLAGS)
 export DEBUG_CFLAGS
 
 KBUILD_RUSTFLAGS += $(DEBUG_RUSTFLAGS)
 export DEBUG_RUSTFLAGS
-=======
-KBUILD_CFLAGS += $(DEBUG_CFLAGS)
-export DEBUG_CFLAGS
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

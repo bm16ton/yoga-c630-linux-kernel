@@ -227,7 +227,6 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
 	}
 
 	calc_len = smb2_calc_size(buf);
-<<<<<<< HEAD
 
 	/* For SMB2_IOCTL, OutputOffset and OutputLength are optional, so might
 	 * be 0, and not a real miscalculation */
@@ -237,17 +236,6 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
 	if (command == SMB2_NEGOTIATE_HE)
 		calc_len += get_neg_ctxt_len(shdr, len, calc_len);
 
-=======
-
-	/* For SMB2_IOCTL, OutputOffset and OutputLength are optional, so might
-	 * be 0, and not a real miscalculation */
-	if (command == SMB2_IOCTL_HE && calc_len == 0)
-		return 0;
-
-	if (command == SMB2_NEGOTIATE_HE)
-		calc_len += get_neg_ctxt_len(shdr, len, calc_len);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (len != calc_len) {
 		/* create failed on symlink */
 		if (command == SMB2_CREATE_HE &&
@@ -264,11 +252,7 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
 		 * Some windows servers (win2016) will pad also the final
 		 * PDU in a compound to 8 bytes.
 		 */
-<<<<<<< HEAD
 		if (ALIGN(calc_len, 8) == len)
-=======
-		if (((calc_len + 7) & ~7) == len)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 0;
 
 		/*
@@ -631,11 +615,7 @@ static bool
 smb2_is_valid_lease_break(char *buffer, struct TCP_Server_Info *server)
 {
 	struct smb2_lease_break *rsp = (struct smb2_lease_break *)buffer;
-<<<<<<< HEAD
 	struct TCP_Server_Info *pserver;
-=======
-	struct TCP_Server_Info *server;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct cifs_ses *ses;
 	struct cifs_tcon *tcon;
 	struct cifs_pending_open *open;
@@ -647,7 +627,6 @@ smb2_is_valid_lease_break(char *buffer, struct TCP_Server_Info *server)
 
 	/* look up tcon based on tid & uid */
 	spin_lock(&cifs_tcp_ses_lock);
-<<<<<<< HEAD
 	list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
 		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
 			spin_lock(&tcon->open_file_lock);
@@ -667,35 +646,6 @@ smb2_is_valid_lease_break(char *buffer, struct TCP_Server_Info *server)
 				tlink = cifs_get_tlink(open->tlink);
 				memcpy(lease_key, open->lease_key,
 				       SMB2_LEASE_KEY_SIZE);
-=======
-	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-				spin_lock(&tcon->open_file_lock);
-				cifs_stats_inc(
-				    &tcon->stats.cifs_stats.num_oplock_brks);
-				if (smb2_tcon_has_lease(tcon, rsp)) {
-					spin_unlock(&tcon->open_file_lock);
-					spin_unlock(&cifs_tcp_ses_lock);
-					return true;
-				}
-				open = smb2_tcon_find_pending_open_lease(tcon,
-									 rsp);
-				if (open) {
-					__u8 lease_key[SMB2_LEASE_KEY_SIZE];
-					struct tcon_link *tlink;
-
-					tlink = cifs_get_tlink(open->tlink);
-					memcpy(lease_key, open->lease_key,
-					       SMB2_LEASE_KEY_SIZE);
-					spin_unlock(&tcon->open_file_lock);
-					spin_unlock(&cifs_tcp_ses_lock);
-					smb2_queue_pending_open_break(tlink,
-								      lease_key,
-								      rsp->NewLeaseState);
-					return true;
-				}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				spin_unlock(&tcon->open_file_lock);
 				spin_unlock(&cifs_tcp_ses_lock);
 				smb2_queue_pending_open_break(tlink,
@@ -705,16 +655,9 @@ smb2_is_valid_lease_break(char *buffer, struct TCP_Server_Info *server)
 			}
 			spin_unlock(&tcon->open_file_lock);
 
-<<<<<<< HEAD
 			if (cached_dir_lease_break(tcon, rsp->LeaseKey)) {
 				spin_unlock(&cifs_tcp_ses_lock);
 				return true;
-=======
-				if (cached_dir_lease_break(tcon, rsp->LeaseKey)) {
-					spin_unlock(&cifs_tcp_ses_lock);
-					return true;
-				}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 		}
 	}
@@ -936,13 +879,8 @@ smb311_update_preauth_hash(struct cifs_ses *ses, struct TCP_Server_Info *server,
 			   struct kvec *iov, int nvec)
 {
 	int i, rc;
-<<<<<<< HEAD
 	struct smb2_hdr *hdr;
 	struct shash_desc *sha512 = NULL;
-=======
-	struct sdesc *d;
-	struct smb2_hdr *hdr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hdr = (struct smb2_hdr *)iov[0].iov_base;
 	/* neg prot are always taken */

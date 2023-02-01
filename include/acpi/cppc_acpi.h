@@ -174,13 +174,10 @@ static inline int cppc_get_perf_caps(int cpu, struct cppc_perf_caps *caps)
 {
 	return -ENOTSUPP;
 }
-<<<<<<< HEAD
 static inline bool cppc_perf_ctrs_in_pcc(void)
 {
 	return false;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool acpi_cpc_valid(void)
 {
 	return false;

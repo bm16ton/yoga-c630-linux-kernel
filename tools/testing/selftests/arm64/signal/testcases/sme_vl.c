@@ -34,11 +34,7 @@ static int sme_vl(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 	struct za_context *za;
 
 	/* Get a signal context which should have a ZA frame in it */
-<<<<<<< HEAD
 	if (!get_current_context(td, &sf.uc, sizeof(sf.uc)))
-=======
-	if (!get_current_context(td, &sf.uc))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 1;
 
 	resv_sz = GET_SF_RESV_SIZE(sf);

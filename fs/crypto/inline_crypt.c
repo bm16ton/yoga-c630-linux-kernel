@@ -70,7 +70,6 @@ static unsigned int fscrypt_get_dun_bytes(const struct fscrypt_info *ci)
  * helpful for debugging problems where the "wrong" implementation is used.
  */
 static void fscrypt_log_blk_crypto_impl(struct fscrypt_mode *mode,
-<<<<<<< HEAD
 					struct block_device **devs,
 					unsigned int num_devs,
 					const struct blk_crypto_config *cfg)
@@ -82,17 +81,6 @@ static void fscrypt_log_blk_crypto_impl(struct fscrypt_mode *mode,
 
 		if (!IS_ENABLED(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK) ||
 		    __blk_crypto_cfg_supported(q->crypto_profile, cfg)) {
-=======
-					struct request_queue **devs,
-					int num_devs,
-					const struct blk_crypto_config *cfg)
-{
-	int i;
-
-	for (i = 0; i < num_devs; i++) {
-		if (!IS_ENABLED(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK) ||
-		    __blk_crypto_cfg_supported(devs[i]->crypto_profile, cfg)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (!xchg(&mode->logged_blk_crypto_native, 1))
 				pr_info("fscrypt: %s using blk-crypto (native)\n",
 					mode->friendly_name);
@@ -408,21 +396,13 @@ bool fscrypt_mergeable_bio_bh(struct bio *bio,
 EXPORT_SYMBOL_GPL(fscrypt_mergeable_bio_bh);
 
 /**
-<<<<<<< HEAD
  * fscrypt_dio_supported() - check whether DIO (direct I/O) is supported on an
  *			     inode, as far as encryption is concerned
  * @inode: the inode in question
-=======
- * fscrypt_dio_supported() - check whether a DIO (direct I/O) request is
- *			     supported as far as encryption is concerned
- * @iocb: the file and position the I/O is targeting
- * @iter: the I/O data segment(s)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Return: %true if there are no encryption constraints that prevent DIO from
  *	   being supported; %false if DIO is unsupported.  (Note that in the
  *	   %true case, the filesystem might have other, non-encryption-related
-<<<<<<< HEAD
  *	   constraints that prevent DIO from actually being supported.  Also, on
  *	   encrypted files the filesystem is still responsible for only allowing
  *	   DIO when requests are filesystem-block-aligned.)
@@ -430,20 +410,11 @@ EXPORT_SYMBOL_GPL(fscrypt_mergeable_bio_bh);
 bool fscrypt_dio_supported(struct inode *inode)
 {
 	int err;
-=======
- *	   constraints that prevent DIO from actually being supported.)
- */
-bool fscrypt_dio_supported(struct kiocb *iocb, struct iov_iter *iter)
-{
-	const struct inode *inode = file_inode(iocb->ki_filp);
-	const unsigned int blocksize = i_blocksize(inode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* If the file is unencrypted, no veto from us. */
 	if (!fscrypt_needs_contents_encryption(inode))
 		return true;
 
-<<<<<<< HEAD
 	/*
 	 * We only support DIO with inline crypto, not fs-layer crypto.
 	 *
@@ -464,29 +435,6 @@ bool fscrypt_dio_supported(struct kiocb *iocb, struct iov_iter *iter)
 		return false;
 	}
 	return fscrypt_inode_uses_inline_crypto(inode);
-=======
-	/* We only support DIO with inline crypto, not fs-layer crypto. */
-	if (!fscrypt_inode_uses_inline_crypto(inode))
-		return false;
-
-	/*
-	 * Since the granularity of encryption is filesystem blocks, the file
-	 * position and total I/O length must be aligned to the filesystem block
-	 * size -- not just to the block device's logical block size as is
-	 * traditionally the case for DIO on many filesystems.
-	 *
-	 * We require that the user-provided memory buffers be filesystem block
-	 * aligned too.  It is simpler to have a single alignment value required
-	 * for all properties of the I/O, as is normally the case for DIO.
-	 * Also, allowing less aligned buffers would imply that data units could
-	 * cross bvecs, which would greatly complicate the I/O stack, which
-	 * assumes that bios can be split at any bvec boundary.
-	 */
-	if (!IS_ALIGNED(iocb->ki_pos | iov_iter_alignment(iter), blocksize))
-		return false;
-
-	return true;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(fscrypt_dio_supported);
 

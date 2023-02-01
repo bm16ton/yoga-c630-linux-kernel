@@ -2847,10 +2847,7 @@ static int marvell_probe(struct phy_device *phydev)
 
 static int m88e1510_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
 {
-<<<<<<< HEAD
 	DECLARE_PHY_INTERFACE_MASK(interfaces);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct phy_device *phydev = upstream;
 	phy_interface_t interface;
 	struct device *dev;
@@ -2862,11 +2859,7 @@ static int m88e1510_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
 
 	dev = &phydev->mdio.dev;
 
-<<<<<<< HEAD
 	sfp_parse_support(phydev->sfp_bus, id, supported, interfaces);
-=======
-	sfp_parse_support(phydev->sfp_bus, id, supported);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	interface = sfp_select_interface(phydev->sfp_bus, supported);
 
 	dev_info(dev, "%s SFP module inserted\n", phy_modes(interface));

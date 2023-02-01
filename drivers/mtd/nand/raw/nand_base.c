@@ -3827,11 +3827,8 @@ static int nand_read_oob(struct mtd_info *mtd, loff_t from,
 		return -ENOTSUPP;
 
 	nand_get_device(chip);
-<<<<<<< HEAD
 
 	old_stats = mtd->ecc_stats;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!ops->datbuf)
 		ret = nand_do_read_oob(chip, from, ops);
@@ -5342,18 +5339,10 @@ static int of_get_nand_secure_regions(struct nand_chip *chip)
 int rawnand_dt_parse_gpio_cs(struct device *dev, struct gpio_desc ***cs_array,
 			     unsigned int *ncs_array)
 {
-<<<<<<< HEAD
 	struct gpio_desc **descs;
 	int ndescs, i;
 
 	ndescs = gpiod_count(dev, "cs");
-=======
-	struct device_node *np = dev->of_node;
-	struct gpio_desc **descs;
-	int ndescs, i;
-
-	ndescs = of_gpio_named_count(np, "cs-gpios");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ndescs < 0) {
 		dev_dbg(dev, "No valid cs-gpios property\n");
 		return 0;

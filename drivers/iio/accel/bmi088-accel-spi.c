@@ -80,11 +80,7 @@ MODULE_DEVICE_TABLE(spi, bmi088_accel_id);
 static struct spi_driver bmi088_accel_driver = {
 	.driver = {
 		.name	= "bmi088_accel_spi",
-<<<<<<< HEAD
 		.pm	= pm_ptr(&bmi088_accel_pm_ops),
-=======
-		.pm	= &bmi088_accel_pm_ops,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.of_match_table = bmi088_of_match,
 	},
 	.probe		= bmi088_accel_probe,

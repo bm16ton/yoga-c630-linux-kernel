@@ -105,7 +105,6 @@ static inline bool is_write_fault(unsigned int fsr)
 	return (fsr & FSR_WRITE) && !(fsr & FSR_CM);
 }
 
-<<<<<<< HEAD
 static inline bool is_translation_fault(unsigned int fsr)
 {
 	int fs = fsr_fs(fsr);
@@ -119,8 +118,6 @@ static inline bool is_translation_fault(unsigned int fsr)
 	return false;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void die_kernel_fault(const char *msg, struct mm_struct *mm,
 			     unsigned long addr, unsigned int fsr,
 			     struct pt_regs *regs)
@@ -156,12 +153,8 @@ __do_kernel_fault(struct mm_struct *mm, unsigned long addr, unsigned int fsr,
 	if (addr < PAGE_SIZE) {
 		msg = "NULL pointer dereference";
 	} else {
-<<<<<<< HEAD
 		if (is_translation_fault(fsr) &&
 		    kfence_handle_page_fault(addr, is_write_fault(fsr), regs))
-=======
-		if (kfence_handle_page_fault(addr, is_write_fault(fsr), regs))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return;
 
 		msg = "paging request";
@@ -229,11 +222,7 @@ static inline bool is_permission_fault(unsigned int fsr)
 {
 	int fs = fsr_fs(fsr);
 #ifdef CONFIG_ARM_LPAE
-<<<<<<< HEAD
 	if ((fs & FS_MMU_NOLL_MASK) == FS_PERM_NOLL)
-=======
-	if ((fs & FS_PERM_NOLL_MASK) == FS_PERM_NOLL)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return true;
 #else
 	if (fs == FS_L1_PERM || fs == FS_L2_PERM)

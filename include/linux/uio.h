@@ -298,11 +298,7 @@ iov_iter_npages_cap(struct iov_iter *i, int maxpages, size_t max_bytes)
 		shorted = iov_iter_count(i) - max_bytes;
 		iov_iter_truncate(i, max_bytes);
 	}
-<<<<<<< HEAD
 	npages = iov_iter_npages(i, maxpages);
-=======
-	npages = iov_iter_npages(i, INT_MAX);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (shorted)
 		iov_iter_reexpand(i, iov_iter_count(i) + shorted);
 

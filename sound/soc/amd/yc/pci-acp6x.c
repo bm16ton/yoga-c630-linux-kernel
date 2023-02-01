@@ -154,7 +154,6 @@ static int snd_acp6x_probe(struct pci_dev *pci,
 
 	irqflags = IRQF_SHARED;
 	/* Yellow Carp device check */
-<<<<<<< HEAD
 	switch (pci->revision) {
 	case 0x60:
 	case 0x6f:
@@ -163,11 +162,6 @@ static int snd_acp6x_probe(struct pci_dev *pci,
 		dev_dbg(&pci->dev, "acp6x pci device not found\n");
 		return -ENODEV;
 	}
-=======
-	if (pci->revision != 0x60)
-		return -ENODEV;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (pci_enable_device(pci)) {
 		dev_err(&pci->dev, "pci_enable_device failed\n");
 		return -ENODEV;

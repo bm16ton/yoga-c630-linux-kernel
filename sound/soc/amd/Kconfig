@@ -117,7 +117,6 @@ config SND_AMD_ACP_CONFIG
 	 driver modules to use
 
 source "sound/soc/amd/acp/Kconfig"
-<<<<<<< HEAD
 
 config SND_SOC_AMD_RPL_ACP6x
         tristate "AMD Audio Coprocessor-v6.2 RPL support"
@@ -149,5 +148,3 @@ config SND_SOC_AMD_PS_MACH
           DMIC can be connected directly to ACP IP.
           Say m if you have such a device.
           If unsure select "N".
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

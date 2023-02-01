@@ -144,11 +144,7 @@ static int xt_rateest_tg_checkentry(const struct xt_tgchk_param *par)
 		goto err1;
 
 	gnet_stats_basic_sync_init(&est->bstats);
-<<<<<<< HEAD
 	strscpy(est->name, info->name, sizeof(est->name));
-=======
-	strlcpy(est->name, info->name, sizeof(est->name));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_lock_init(&est->lock);
 	est->refcnt		= 1;
 	est->params.interval	= info->interval;

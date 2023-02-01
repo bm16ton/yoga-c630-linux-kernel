@@ -40,12 +40,7 @@
 
 static irqreturn_t hdlcd_irq(int irq, void *arg)
 {
-<<<<<<< HEAD
 	struct hdlcd_drm_private *hdlcd = arg;
-=======
-	struct drm_device *drm = arg;
-	struct hdlcd_drm_private *hdlcd = drm->dev_private;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long irq_status;
 
 	irq_status = hdlcd_read(hdlcd, HDLCD_REG_INT_STATUS);
@@ -73,7 +68,6 @@ static irqreturn_t hdlcd_irq(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
-<<<<<<< HEAD
 static int hdlcd_irq_install(struct hdlcd_drm_private *hdlcd)
 {
 	int ret;
@@ -90,72 +84,16 @@ static int hdlcd_irq_install(struct hdlcd_drm_private *hdlcd)
 	/* enable debug interrupts */
 	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, HDLCD_DEBUG_INT_MASK);
 #endif
-=======
-static void hdlcd_irq_preinstall(struct drm_device *drm)
-{
-	struct hdlcd_drm_private *hdlcd = drm->dev_private;
-	/* Ensure interrupts are disabled */
-	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, 0);
-	hdlcd_write(hdlcd, HDLCD_REG_INT_CLEAR, ~0);
-}
-
-static void hdlcd_irq_postinstall(struct drm_device *drm)
-{
-#ifdef CONFIG_DEBUG_FS
-	struct hdlcd_drm_private *hdlcd = drm->dev_private;
-	unsigned long irq_mask = hdlcd_read(hdlcd, HDLCD_REG_INT_MASK);
-
-	/* enable debug interrupts */
-	irq_mask |= HDLCD_DEBUG_INT_MASK;
-
-	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, irq_mask);
-#endif
-}
-
-static int hdlcd_irq_install(struct drm_device *drm, int irq)
-{
-	int ret;
-
-	if (irq == IRQ_NOTCONNECTED)
-		return -ENOTCONN;
-
-	hdlcd_irq_preinstall(drm);
-
-	ret = request_irq(irq, hdlcd_irq, 0, drm->driver->name, drm);
-	if (ret)
-		return ret;
-
-	hdlcd_irq_postinstall(drm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
-<<<<<<< HEAD
 static void hdlcd_irq_uninstall(struct hdlcd_drm_private *hdlcd)
 {
 	/* disable all the interrupts that we might have enabled */
 	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, 0);
 
 	free_irq(hdlcd->irq, hdlcd);
-=======
-static void hdlcd_irq_uninstall(struct drm_device *drm)
-{
-	struct hdlcd_drm_private *hdlcd = drm->dev_private;
-	/* disable all the interrupts that we might have enabled */
-	unsigned long irq_mask = hdlcd_read(hdlcd, HDLCD_REG_INT_MASK);
-
-#ifdef CONFIG_DEBUG_FS
-	/* disable debug interrupts */
-	irq_mask &= ~HDLCD_DEBUG_INT_MASK;
-#endif
-
-	/* disable vsync interrupts */
-	irq_mask &= ~HDLCD_INTERRUPT_VSYNC;
-	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, irq_mask);
-
-	free_irq(hdlcd->irq, drm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int hdlcd_load(struct drm_device *drm, unsigned long flags)
@@ -215,11 +153,7 @@ static int hdlcd_load(struct drm_device *drm, unsigned long flags)
 		goto irq_fail;
 	hdlcd->irq = ret;
 
-<<<<<<< HEAD
 	ret = hdlcd_irq_install(hdlcd);
-=======
-	ret = hdlcd_irq_install(drm, hdlcd->irq);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		DRM_ERROR("failed to install IRQ handler\n");
 		goto irq_fail;
@@ -295,11 +229,7 @@ DEFINE_DRM_GEM_DMA_FOPS(fops);
 
 static const struct drm_driver hdlcd_driver = {
 	.driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
-<<<<<<< HEAD
 	DRM_GEM_DMA_DRIVER_OPS,
-=======
-	DRM_GEM_CMA_DRIVER_OPS,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_DEBUG_FS
 	.debugfs_init = hdlcd_debugfs_init,
 #endif
@@ -384,11 +314,7 @@ err_pm_active:
 err_unload:
 	of_node_put(hdlcd->crtc.port);
 	hdlcd->crtc.port = NULL;
-<<<<<<< HEAD
 	hdlcd_irq_uninstall(hdlcd);
-=======
-	hdlcd_irq_uninstall(drm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	of_reserved_mem_device_release(drm->dev);
 err_free:
 	drm_mode_config_cleanup(drm);
@@ -410,11 +336,7 @@ static void hdlcd_drm_unbind(struct device *dev)
 	hdlcd->crtc.port = NULL;
 	pm_runtime_get_sync(dev);
 	drm_atomic_helper_shutdown(drm);
-<<<<<<< HEAD
 	hdlcd_irq_uninstall(hdlcd);
-=======
-	hdlcd_irq_uninstall(drm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pm_runtime_put(dev);
 	if (pm_runtime_enabled(dev))
 		pm_runtime_disable(dev);

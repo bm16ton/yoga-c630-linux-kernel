@@ -161,7 +161,6 @@ struct fscrypt_operations {
 				      int *ino_bits_ret, int *lblk_bits_ret);
 
 	/*
-<<<<<<< HEAD
 	 * Return an array of pointers to the block devices to which the
 	 * filesystem may write encrypted file contents, NULL if the filesystem
 	 * only has a single such block device, or an ERR_PTR() on error.
@@ -169,31 +168,14 @@ struct fscrypt_operations {
 	 * On successful non-NULL return, *num_devs is set to the number of
 	 * devices in the returned array.  The caller must free the returned
 	 * array using kfree().
-=======
-	 * Return the number of block devices to which the filesystem may write
-	 * encrypted file contents.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *
 	 * If the filesystem can use multiple block devices (other than block
 	 * devices that aren't used for encrypted file contents, such as
 	 * external journal devices), and wants to support inline encryption,
 	 * then it must implement this function.  Otherwise it's not needed.
 	 */
-<<<<<<< HEAD
 	struct block_device **(*get_devices)(struct super_block *sb,
 					     unsigned int *num_devs);
-=======
-	int (*get_num_devices)(struct super_block *sb);
-
-	/*
-	 * If ->get_num_devices() returns a value greater than 1, then this
-	 * function is called to get the array of request_queues that the
-	 * filesystem is using -- one per block device.  (There may be duplicate
-	 * entries in this array, as block devices can share a request_queue.)
-	 */
-	void (*get_devices)(struct super_block *sb,
-			    struct request_queue **devs);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct fscrypt_info *fscrypt_get_info(const struct inode *inode)
@@ -310,11 +292,6 @@ int fscrypt_parse_test_dummy_encryption(const struct fs_parameter *param,
 				    struct fscrypt_dummy_policy *dummy_policy);
 bool fscrypt_dummy_policies_equal(const struct fscrypt_dummy_policy *p1,
 				  const struct fscrypt_dummy_policy *p2);
-<<<<<<< HEAD
-=======
-int fscrypt_set_test_dummy_encryption(struct super_block *sb, const char *arg,
-				struct fscrypt_dummy_policy *dummy_policy);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void fscrypt_show_test_dummy_encryption(struct seq_file *seq, char sep,
 					struct super_block *sb);
 static inline bool
@@ -787,11 +764,7 @@ bool fscrypt_mergeable_bio(struct bio *bio, const struct inode *inode,
 bool fscrypt_mergeable_bio_bh(struct bio *bio,
 			      const struct buffer_head *next_bh);
 
-<<<<<<< HEAD
 bool fscrypt_dio_supported(struct inode *inode);
-=======
-bool fscrypt_dio_supported(struct kiocb *iocb, struct iov_iter *iter);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 u64 fscrypt_limit_io_blocks(const struct inode *inode, u64 lblk, u64 nr_blocks);
 
@@ -824,16 +797,8 @@ static inline bool fscrypt_mergeable_bio_bh(struct bio *bio,
 	return true;
 }
 
-<<<<<<< HEAD
 static inline bool fscrypt_dio_supported(struct inode *inode)
 {
-=======
-static inline bool fscrypt_dio_supported(struct kiocb *iocb,
-					 struct iov_iter *iter)
-{
-	const struct inode *inode = file_inode(iocb->ki_filp);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return !fscrypt_needs_contents_encryption(inode);
 }
 

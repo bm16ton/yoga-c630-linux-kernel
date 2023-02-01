@@ -50,11 +50,8 @@ ieee80211_update_from_he_6ghz_capa(const struct ieee80211_he_6ghz_capa *he_6ghz_
 		break;
 	}
 
-<<<<<<< HEAD
 	ieee80211_sta_recalc_aggregates(&sta->sta);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	link_sta->pub->he_6ghz_capa = *he_6ghz_capa;
 }
 

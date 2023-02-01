@@ -1206,10 +1206,7 @@ static void storvsc_on_channel_callback(void *context)
 	struct hv_device *device;
 	struct storvsc_device *stor_device;
 	struct Scsi_Host *shost;
-<<<<<<< HEAD
 	unsigned long time_limit = jiffies + msecs_to_jiffies(CALLBACK_TIMEOUT);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (channel->primary_channel != NULL)
 		device = channel->primary_channel->device_obj;
@@ -1221,7 +1218,6 @@ static void storvsc_on_channel_callback(void *context)
 		return;
 
 	shost = stor_device->host;
-<<<<<<< HEAD
 
 	foreach_vmbus_pkt(desc, channel) {
 		struct vstor_packet *packet = hv_pkt_data(desc);
@@ -1236,17 +1232,6 @@ static void storvsc_on_channel_callback(void *context)
 			return;
 		}
 
-=======
-
-	foreach_vmbus_pkt(desc, channel) {
-		struct vstor_packet *packet = hv_pkt_data(desc);
-		struct storvsc_cmd_request *request = NULL;
-		u32 pktlen = hv_pkt_datalen(desc);
-		u64 rqst_id = desc->trans_id;
-		u32 minlen = rqst_id ? sizeof(struct vstor_packet) :
-			sizeof(enum vstor_packet_operation);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (pktlen < minlen) {
 			dev_err(&device->device,
 				"Invalid pkt: id=%llu, len=%u, minlen=%u\n",

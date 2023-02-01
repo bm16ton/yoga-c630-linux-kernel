@@ -253,11 +253,7 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
 			cpu_flags = HMM_PFN_VALID;
 			if (is_writable_device_private_entry(entry))
 				cpu_flags |= HMM_PFN_WRITE;
-<<<<<<< HEAD
 			*hmm_pfn = swp_offset_pfn(entry) | cpu_flags;
-=======
-			*hmm_pfn = swp_offset(entry) | cpu_flags;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 0;
 		}
 

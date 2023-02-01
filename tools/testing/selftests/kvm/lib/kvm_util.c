@@ -29,8 +29,6 @@ int open_path_or_exit(const char *path, int flags)
 	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)", path, errno);
 
 	return fd;
-<<<<<<< HEAD
-=======
 }
 
 /*
@@ -50,33 +48,8 @@ static int _open_kvm_dev_path_or_exit(int flags)
 int open_kvm_dev_path_or_exit(void)
 {
 	return _open_kvm_dev_path_or_exit(O_RDONLY);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
-/*
- * Open KVM_DEV_PATH if available, otherwise exit the entire program.
- *
- * Input Args:
- *   flags - The flags to pass when opening KVM_DEV_PATH.
- *
- * Return:
- *   The opened file descriptor of /dev/kvm.
- */
-<<<<<<< HEAD
-static int _open_kvm_dev_path_or_exit(int flags)
-=======
-unsigned int kvm_check_cap(long cap)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	return open_path_or_exit(KVM_DEV_PATH, flags);
-}
-
-int open_kvm_dev_path_or_exit(void)
-{
-	return _open_kvm_dev_path_or_exit(O_RDONLY);
-}
-
-<<<<<<< HEAD
 static bool get_module_param_bool(const char *module_name, const char *param)
 {
 	const int path_size = 128;
@@ -89,15 +62,9 @@ static bool get_module_param_bool(const char *module_name, const char *param)
 		     module_name, param);
 	TEST_ASSERT(r < path_size,
 		    "Failed to construct sysfs path in %d bytes.", path_size);
-=======
-	kvm_fd = open_kvm_dev_path_or_exit();
-	ret = __kvm_ioctl(kvm_fd, KVM_CHECK_EXTENSION, (void *)cap);
-	TEST_ASSERT(ret >= 0, KVM_IOCTL_ERROR(KVM_CHECK_EXTENSION, ret));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	fd = open_path_or_exit(path, O_RDONLY);
 
-<<<<<<< HEAD
 	r = read(fd, &value, 1);
 	TEST_ASSERT(r == 1, "read(%s) failed", path);
 
@@ -198,54 +165,6 @@ const char *vm_guest_mode_string(uint32_t i)
 	return strings[i];
 }
 
-=======
-	return (unsigned int)ret;
-}
-
-void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size)
-{
-	vm_enable_cap(vm, KVM_CAP_DIRTY_LOG_RING, ring_size);
-	vm->dirty_ring_size = ring_size;
-}
-
-static void vm_open(struct kvm_vm *vm)
-{
-	vm->kvm_fd = _open_kvm_dev_path_or_exit(O_RDWR);
-
-	TEST_REQUIRE(kvm_has_cap(KVM_CAP_IMMEDIATE_EXIT));
-
-	vm->fd = __kvm_ioctl(vm->kvm_fd, KVM_CREATE_VM, (void *)vm->type);
-	TEST_ASSERT(vm->fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, vm->fd));
-}
-
-const char *vm_guest_mode_string(uint32_t i)
-{
-	static const char * const strings[] = {
-		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
-		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
-		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
-		[VM_MODE_P48V48_16K]	= "PA-bits:48,  VA-bits:48, 16K pages",
-		[VM_MODE_P48V48_64K]	= "PA-bits:48,  VA-bits:48, 64K pages",
-		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
-		[VM_MODE_P40V48_16K]	= "PA-bits:40,  VA-bits:48, 16K pages",
-		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
-		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
-		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
-		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
-		[VM_MODE_P36V48_4K]	= "PA-bits:36,  VA-bits:48,  4K pages",
-		[VM_MODE_P36V48_16K]	= "PA-bits:36,  VA-bits:48, 16K pages",
-		[VM_MODE_P36V48_64K]	= "PA-bits:36,  VA-bits:48, 64K pages",
-		[VM_MODE_P36V47_16K]	= "PA-bits:36,  VA-bits:47, 16K pages",
-	};
-	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
-		       "Missing new mode strings?");
-
-	TEST_ASSERT(i < NUM_VM_MODES, "Guest mode ID %d too big", i);
-
-	return strings[i];
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct vm_guest_mode_params vm_guest_mode_params[] = {
 	[VM_MODE_P52V48_4K]	= { 52, 48,  0x1000, 12 },
 	[VM_MODE_P52V48_64K]	= { 52, 48, 0x10000, 16 },
@@ -409,7 +328,6 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
 
 	return vm_adjust_num_guest_pages(mode, nr_pages);
 }
-<<<<<<< HEAD
 
 struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
 			   uint64_t nr_extra_pages)
@@ -420,18 +338,6 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
 
 	vm = ____vm_create(mode, nr_pages);
 
-=======
-
-struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-			   uint64_t nr_extra_pages)
-{
-	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
-						 nr_extra_pages);
-	struct kvm_vm *vm;
-
-	vm = ____vm_create(mode, nr_pages);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kvm_vm_elf_load(vm, program_invocation_name);
 
 #ifdef __x86_64__
@@ -1478,19 +1384,11 @@ void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa)
 vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva)
 {
 	struct rb_node *node;
-<<<<<<< HEAD
 
 	for (node = vm->regions.hva_tree.rb_node; node; ) {
 		struct userspace_mem_region *region =
 			container_of(node, struct userspace_mem_region, hva_node);
 
-=======
-
-	for (node = vm->regions.hva_tree.rb_node; node; ) {
-		struct userspace_mem_region *region =
-			container_of(node, struct userspace_mem_region, hva_node);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (hva >= region->host_mem) {
 			if (hva <= (region->host_mem
 				+ region->region.memory_size - 1))
@@ -1534,7 +1432,6 @@ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
 	region = userspace_mem_region_find(vm, gpa, gpa);
 	if (!region)
 		return NULL;
-<<<<<<< HEAD
 
 	if (!region->host_alias)
 		return NULL;
@@ -1548,21 +1445,6 @@ void vm_create_irqchip(struct kvm_vm *vm)
 {
 	vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
 
-=======
-
-	if (!region->host_alias)
-		return NULL;
-
-	offset = gpa - region->region.guest_phys_addr;
-	return (void *) ((uintptr_t) region->host_alias + offset);
-}
-
-/* Create an interrupt controller chip for the specified VM. */
-void vm_create_irqchip(struct kvm_vm *vm)
-{
-	vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vm->has_irqchip = true;
 }
 
@@ -1748,7 +1630,6 @@ struct kvm_irq_routing *kvm_gsi_routing_create(void)
 
 	return routing;
 }
-<<<<<<< HEAD
 
 void kvm_gsi_routing_irqchip_add(struct kvm_irq_routing *routing,
 		uint32_t gsi, uint32_t pin)
@@ -1758,17 +1639,6 @@ void kvm_gsi_routing_irqchip_add(struct kvm_irq_routing *routing,
 	assert(routing);
 	assert(routing->nr < KVM_MAX_IRQ_ROUTES);
 
-=======
-
-void kvm_gsi_routing_irqchip_add(struct kvm_irq_routing *routing,
-		uint32_t gsi, uint32_t pin)
-{
-	int i;
-
-	assert(routing);
-	assert(routing->nr < KVM_MAX_IRQ_ROUTES);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	i = routing->nr;
 	routing->entries[i].gsi = gsi;
 	routing->entries[i].type = KVM_IRQ_ROUTING_IRQCHIP;

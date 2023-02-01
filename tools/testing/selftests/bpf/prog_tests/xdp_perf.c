@@ -3,11 +3,7 @@
 
 void test_xdp_perf(void)
 {
-<<<<<<< HEAD
 	const char *file = "./xdp_dummy.bpf.o";
-=======
-	const char *file = "./xdp_dummy.o";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_object *obj;
 	char in[128], out[128];
 	int err, prog_fd;

@@ -178,19 +178,11 @@ struct bdb_general_features {
 	u8 rsvd11:2; /* finish byte */
 
 	/* bits 6 */
-<<<<<<< HEAD
 	u8 tc_hpd_retry_timeout:7;				/* 242+ */
 	u8 rsvd12:1;
 
 	/* bits 7 */
 	u8 afc_startup_config:2;				/* 249+ */
-=======
-	u8 tc_hpd_retry_timeout:7; /* 242 */
-	u8 rsvd12:1;
-
-	/* bits 7 */
-	u8 afc_startup_config:2;/* 249 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 rsvd13:6;
 } __packed;
 
@@ -205,7 +197,6 @@ struct bdb_general_features {
 #define GPIO_PIN_ADD_DDC_I2C	0x06 /* "ADDCARD DDC/I2C GPIO pins" */
 
 /* Device handle */
-<<<<<<< HEAD
 #define DEVICE_HANDLE_CRT	0x0001
 #define DEVICE_HANDLE_EFP1	0x0004
 #define DEVICE_HANDLE_EFP2	0x0040
@@ -215,8 +206,6 @@ struct bdb_general_features {
 #define DEVICE_HANDLE_EFP6	0x0001 /* 217+ */
 #define DEVICE_HANDLE_EFP7	0x0100 /* 217+ */
 #define DEVICE_HANDLE_EFP8	0x0200 /* 217+ */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define DEVICE_HANDLE_LFP1	0x0008
 #define DEVICE_HANDLE_LFP2	0x0080
 
@@ -313,7 +302,6 @@ struct bdb_general_features {
 #define DVO_PORT_HDMIE		12				/* 193+ */
 #define DVO_PORT_DPF		13				/* N/A */
 #define DVO_PORT_HDMIF		14				/* N/A */
-<<<<<<< HEAD
 #define DVO_PORT_DPG		15				/* 217+ */
 #define DVO_PORT_HDMIG		16				/* 217+ */
 #define DVO_PORT_DPH		17				/* 217+ */
@@ -331,25 +319,6 @@ struct bdb_general_features {
 #define HDMI_MAX_DATA_RATE_594		3			/* 249+ */
 #define HDMI_MAX_DATA_RATE_340		4			/* 249+ */
 #define HDMI_MAX_DATA_RATE_300		5			/* 249+ */
-=======
-#define DVO_PORT_DPG		15				/* 217 */
-#define DVO_PORT_HDMIG		16				/* 217 */
-#define DVO_PORT_DPH		17				/* 217 */
-#define DVO_PORT_HDMIH		18				/* 217 */
-#define DVO_PORT_DPI		19				/* 217 */
-#define DVO_PORT_HDMII		20				/* 217 */
-#define DVO_PORT_MIPIA		21				/* 171 */
-#define DVO_PORT_MIPIB		22				/* 171 */
-#define DVO_PORT_MIPIC		23				/* 171 */
-#define DVO_PORT_MIPID		24				/* 171 */
-
-#define HDMI_MAX_DATA_RATE_PLATFORM	0			/* 204 */
-#define HDMI_MAX_DATA_RATE_297		1			/* 204 */
-#define HDMI_MAX_DATA_RATE_165		2			/* 204 */
-#define HDMI_MAX_DATA_RATE_594		3			/* 249 */
-#define HDMI_MAX_DATA_RATE_340		4			/* 249 */
-#define HDMI_MAX_DATA_RATE_300		5			/* 249 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define LEGACY_CHILD_DEVICE_CONFIG_SIZE		33
 
@@ -506,7 +475,6 @@ struct child_device_config {
 
 	u16 extended_type;
 	u8 dvo_function;
-<<<<<<< HEAD
 	u8 dp_usb_type_c:1;					/* 195+ */
 	u8 tbt:1;						/* 209+ */
 	u8 flags2_reserved:2;					/* 195+ */
@@ -517,18 +485,6 @@ struct child_device_config {
 	u8 hdmi_iboost_level:4;					/* 196+ */
 	u8 dp_max_link_rate:3;					/* 216+ */
 	u8 dp_max_link_rate_reserved:5;				/* 216+ */
-=======
-	u8 dp_usb_type_c:1;					/* 195 */
-	u8 tbt:1;						/* 209 */
-	u8 flags2_reserved:2;					/* 195 */
-	u8 dp_port_trace_length:4;				/* 209 */
-	u8 dp_gpio_index;					/* 195 */
-	u16 dp_gpio_pin_num;					/* 195 */
-	u8 dp_iboost_level:4;					/* 196 */
-	u8 hdmi_iboost_level:4;					/* 196 */
-	u8 dp_max_link_rate:3;					/* 216/230 GLK+ */
-	u8 dp_max_link_rate_reserved:5;				/* 216/230 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 struct bdb_general_definitions {
@@ -637,7 +593,6 @@ struct bdb_driver_features {
 	u16 legacy_crt_max_y;
 	u8 legacy_crt_max_refresh;
 
-<<<<<<< HEAD
 	/* Extended Driver Bits 2 */
 	u8 hdmi_termination:1;
 	u8 cea861d_hdmi_support:1;
@@ -662,25 +617,6 @@ struct bdb_driver_features {
 	u16 dmrrs_enabled:1;					/* 174-227 */
 	u16 adt_enabled:1;					/* ???-228 */
 	u16 hpd_wake:1;						/* 201-240 */
-=======
-	u8 hdmi_termination;
-	u8 custom_vbt_version;
-	/* Driver features data block */
-	u16 rmpm_enabled:1;
-	u16 s2ddt_enabled:1;
-	u16 dpst_enabled:1;
-	u16 bltclt_enabled:1;
-	u16 adb_enabled:1;
-	u16 drrs_enabled:1;
-	u16 grs_enabled:1;
-	u16 gpmt_enabled:1;
-	u16 tbt_enabled:1;
-	u16 psr_enabled:1;
-	u16 ips_enabled:1;
-	u16 reserved3:1;
-	u16 dmrrs_enabled:1;
-	u16 reserved4:2;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 pc_feature_valid:1;
 } __packed;
 
@@ -800,7 +736,6 @@ struct bdb_edp {
 	u32 sdrrs_msa_timing_delay;
 
 	/* ith bit indicates enabled/disabled for (i+1)th panel */
-<<<<<<< HEAD
 	u16 edp_s3d_feature;					/* 162+ */
 	u16 edp_t3_optimization;				/* 165+ */
 	u64 edp_vswing_preemph;					/* 173+ */
@@ -813,20 +748,6 @@ struct bdb_edp {
 	struct edp_apical_params apical_params[16];		/* 203+ */
 	u16 edp_fast_link_training_rate[16];			/* 224+ */
 	u16 edp_max_port_link_rate[16];				/* 244+ */
-=======
-	u16 edp_s3d_feature;					/* 162 */
-	u16 edp_t3_optimization;				/* 165 */
-	u64 edp_vswing_preemph;					/* 173 */
-	u16 fast_link_training;					/* 182 */
-	u16 dpcd_600h_write_required;				/* 185 */
-	struct edp_pwm_delays pwm_delays[16];			/* 186 */
-	u16 full_link_params_provided;				/* 199 */
-	struct edp_full_link_params full_link_params[16];	/* 199 */
-	u16 apical_enable;					/* 203 */
-	struct edp_apical_params apical_params[16];		/* 203 */
-	u16 edp_fast_link_training_rate[16];			/* 224 */
-	u16 edp_max_port_link_rate[16];				/* 244 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 /*
@@ -858,15 +779,9 @@ struct bdb_lvds_options {
 	/* LVDS backlight control type bits stored here */
 	u32 blt_control_type_bits;				/* ???-240 */
 
-<<<<<<< HEAD
 	u16 lcdvcc_s0_enable;					/* 200+ */
 	u32 rotation;						/* 228+ */
 	u32 position;						/* 240+ */
-=======
-	u16 lcdvcc_s0_enable;					/* 200 */
-	u32 rotation;						/* 228 */
-	u32 position;						/* 240 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 /*
@@ -887,11 +802,7 @@ struct lvds_lfp_data_ptr {
 struct bdb_lvds_lfp_data_ptrs {
 	u8 lvds_entries;
 	struct lvds_lfp_data_ptr ptr[16];
-<<<<<<< HEAD
 	struct lvds_lfp_data_ptr_table panel_name;		/* (156-163?)+ */
-=======
-	struct lvds_lfp_data_ptr_table panel_name; /* 156-163? */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 /*
@@ -943,7 +854,6 @@ struct lvds_lfp_panel_name {
 } __packed;
 
 struct lvds_lfp_black_border {
-<<<<<<< HEAD
 	u8 top;		/* 227+ */
 	u8 bottom;	/* 227+ */
 	u8 left;	/* 238+ */
@@ -958,22 +868,6 @@ struct bdb_lvds_lfp_data_tail {
 	struct lvds_lfp_black_border black_border[16];		/* 227+ */
 	u16 dual_lfp_port_sync_enable;				/* 231+ */
 	u16 gpu_dithering_for_banding_artifacts;		/* 245+ */
-=======
-	u8 top; /* 227 */
-	u8 bottom; /* 227 */
-	u8 left; /* 238 */
-	u8 right; /* 238 */
-} __packed;
-
-struct bdb_lvds_lfp_data_tail {
-	struct lvds_lfp_panel_name panel_name[16]; /* 156-163? */
-	u16 scaling_enable; /* 187 */
-	u8 seamless_drrs_min_refresh_rate[16]; /* 188 */
-	u8 pixel_overlap_count[16]; /* 208 */
-	struct lvds_lfp_black_border black_border[16]; /* 227 */
-	u16 dual_lfp_port_sync_enable; /* 231 */
-	u16 gpu_dithering_for_banding_artifacts; /* 245 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 /*
@@ -1026,13 +920,8 @@ struct lfp_power_features {
 	u8 reserved1:1;
 	u8 power_conservation_pref:3;
 	u8 reserved2:1;
-<<<<<<< HEAD
 	u8 lace_enabled_status:1;					/* 210+ */
 	u8 lace_support:1;						/* 210+ */
-=======
-	u8 lace_enabled_status:1;
-	u8 lace_support:1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 als_enable:1;
 } __packed;
 
@@ -1052,7 +941,6 @@ struct aggressiveness_profile2_entry {
 } __packed;
 
 struct bdb_lfp_power {
-<<<<<<< HEAD
 	struct lfp_power_features features;				/* ???-227 */
 	struct als_data_entry als[5];
 	u8 lace_aggressiveness_profile:3;				/* 210-227 */
@@ -1071,26 +959,6 @@ struct bdb_lfp_power {
 	u16 elp;							/* 247+ */
 	u16 opst;							/* 247+ */
 	struct aggressiveness_profile2_entry aggressiveness2[16];	/* 247+ */
-=======
-	struct lfp_power_features features;
-	struct als_data_entry als[5];
-	u8 lace_aggressiveness_profile:3;
-	u8 reserved1:5;
-	u16 dpst;
-	u16 psr;
-	u16 drrs;
-	u16 lace_support;
-	u16 adt;
-	u16 dmrrs;
-	u16 adb;
-	u16 lace_enabled_status;
-	struct aggressiveness_profile_entry aggressiveness[16];
-	u16 hobl; /* 232+ */
-	u16 vrr_feature_enabled; /* 233+ */
-	u16 elp; /* 247+ */
-	u16 opst; /* 247+ */
-	struct aggressiveness_profile2_entry aggressiveness2[16]; /* 247+ */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 /*
@@ -1100,17 +968,10 @@ struct bdb_lfp_power {
 #define MAX_MIPI_CONFIGURATIONS	6
 
 struct bdb_mipi_config {
-<<<<<<< HEAD
 	struct mipi_config config[MAX_MIPI_CONFIGURATIONS];		/* 175+ */
 	struct mipi_pps_data pps[MAX_MIPI_CONFIGURATIONS];		/* 177+ */
 	struct edp_pwm_delays pwm_delays[MAX_MIPI_CONFIGURATIONS];	/* 186+ */
 	u8 pmic_i2c_bus_number[MAX_MIPI_CONFIGURATIONS];		/* 190+ */
-=======
-	struct mipi_config config[MAX_MIPI_CONFIGURATIONS]; /* 175 */
-	struct mipi_pps_data pps[MAX_MIPI_CONFIGURATIONS]; /* 177 */
-	struct edp_pwm_delays pwm_delays[MAX_MIPI_CONFIGURATIONS]; /* 186 */
-	u8 pmic_i2c_bus_number[MAX_MIPI_CONFIGURATIONS]; /* 190 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 /*

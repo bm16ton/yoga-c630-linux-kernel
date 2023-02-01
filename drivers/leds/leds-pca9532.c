@@ -551,11 +551,6 @@ static void pca9532_remove(struct i2c_client *client)
 	struct pca9532_data *data = i2c_get_clientdata(client);
 
 	pca9532_destroy_devices(data, data->chip_info->num_leds);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 module_i2c_driver(pca9532_driver);

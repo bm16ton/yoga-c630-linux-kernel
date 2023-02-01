@@ -34,11 +34,8 @@
 
 #include <trace/events/thp.h>
 
-<<<<<<< HEAD
 #include <mm/mmu_decl.h>
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned int mmu_base_pid;
 unsigned long radix_mem_block_size __ro_after_init;
 
@@ -904,7 +901,6 @@ void __meminit radix__vmemmap_remove_mapping(unsigned long start, unsigned long 
 #endif
 #endif
 
-<<<<<<< HEAD
 #if defined(CONFIG_DEBUG_PAGEALLOC) || defined(CONFIG_KFENCE)
 void radix__kernel_map_pages(struct page *page, int numpages, int enable)
 {
@@ -916,12 +912,6 @@ void radix__kernel_map_pages(struct page *page, int numpages, int enable)
 		set_memory_p(addr, numpages);
 	else
 		set_memory_np(addr, numpages);
-=======
-#ifdef CONFIG_DEBUG_PAGEALLOC
-void radix__kernel_map_pages(struct page *page, int numpages, int enable)
-{
-	pr_warn_once("DEBUG_PAGEALLOC not supported in radix mode\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 

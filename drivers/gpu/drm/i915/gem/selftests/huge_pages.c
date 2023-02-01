@@ -1390,11 +1390,7 @@ out_put:
 static int igt_ppgtt_sanity_check(void *arg)
 {
 	struct drm_i915_private *i915 = arg;
-<<<<<<< HEAD
 	unsigned int supported = RUNTIME_INFO(i915)->page_sizes;
-=======
-	unsigned int supported = INTEL_INFO(i915)->page_sizes;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct {
 		igt_create_fn fn;
 		unsigned int flags;

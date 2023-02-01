@@ -97,11 +97,7 @@ else
 fi
 
 # Attach BPF program
-<<<<<<< HEAD
 ./flow_dissector_load -p $BPF_FILE -s _dissect
-=======
-./flow_dissector_load -p bpf_flow.o -s _dissect
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # Setup
 tc qdisc add dev lo ingress

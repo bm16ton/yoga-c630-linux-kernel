@@ -32,13 +32,8 @@ int mr_check_range(struct rxe_mr *mr, u64 iova, size_t length)
 
 	case IB_MR_TYPE_USER:
 	case IB_MR_TYPE_MEM_REG:
-<<<<<<< HEAD
 		if (iova < mr->ibmr.iova || length > mr->ibmr.length ||
 		    iova > mr->ibmr.iova + mr->ibmr.length - length)
-=======
-		if (iova < mr->iova || length > mr->length ||
-		    iova > mr->iova + mr->length - length)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return -EFAULT;
 		return 0;
 
@@ -128,7 +123,6 @@ int rxe_mr_init_user(struct rxe_dev *rxe, u64 start, u64 length, u64 iova,
 	int			num_buf;
 	void			*vaddr;
 	int err;
-	int i;
 
 	umem = ib_umem_get(&rxe->ib_dev, start, length, access);
 	if (IS_ERR(umem)) {
@@ -169,11 +163,7 @@ int rxe_mr_init_user(struct rxe_dev *rxe, u64 start, u64 length, u64 iova,
 				pr_warn("%s: Unable to get virtual address\n",
 						__func__);
 				err = -ENOMEM;
-<<<<<<< HEAD
 				goto err_release_umem;
-=======
-				goto err_cleanup_map;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			buf->addr = (uintptr_t)vaddr;
 			buf->size = PAGE_SIZE;
@@ -191,13 +181,6 @@ int rxe_mr_init_user(struct rxe_dev *rxe, u64 start, u64 length, u64 iova,
 
 	return 0;
 
-<<<<<<< HEAD
-=======
-err_cleanup_map:
-	for (i = 0; i < mr->num_map; i++)
-		kfree(mr->map[i]);
-	kfree(mr->map);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_release_umem:
 	ib_umem_release(umem);
 err_out:
@@ -611,11 +594,7 @@ int rxe_reg_fast_mr(struct rxe_qp *qp, struct rxe_send_wqe *wqe)
 	mr->access = access;
 	mr->lkey = key;
 	mr->rkey = (access & IB_ACCESS_REMOTE) ? key : 0;
-<<<<<<< HEAD
 	mr->ibmr.iova = wqe->wr.wr.reg.mr->iova;
-=======
-	mr->iova = wqe->wr.wr.reg.mr->iova;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mr->state = RXE_MR_STATE_VALID;
 
 	return 0;

@@ -5,11 +5,7 @@
  * devices typically have a bunch of things hardcoded, rather than specified
  * in their DSDT.
  *
-<<<<<<< HEAD
  * Copyright (C) 2021-2022 Hans de Goede <hdegoede@redhat.com>
-=======
- * Copyright (C) 2021 Hans de Goede <hdegoede@redhat.com>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -269,7 +265,6 @@ static struct gpiod_lookup_table int3496_gpo2_pin22_gpios = {
 	},
 };
 
-<<<<<<< HEAD
 /*
  * Advantech MICA-071
  * This is a standard Windows tablet, but it has an extra "quick launch" button
@@ -320,8 +315,6 @@ static const struct x86_dev_info advantech_mica_071_info __initconst = {
 	.init = advantech_mica_071_init,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Asus ME176C and TF103C tablets shared data */
 static struct gpio_keys_button asus_me176c_tf103c_lid = {
 	.code = SW_LID,
@@ -1044,7 +1037,6 @@ static void lenovo_yoga_tab2_830_1050_exit(void)
 	}
 }
 
-<<<<<<< HEAD
 /* Lenovo Yoga Tab 3 Pro YT3-X90F */
 
 /*
@@ -1251,8 +1243,6 @@ static const struct x86_dev_info medion_lifetab_s10346_info __initconst = {
 	.gpiod_lookup_tables = medion_lifetab_s10346_gpios,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Nextbook Ares 8 tablets have an Android factory img with everything hardcoded */
 static const char * const nextbook_ares8_accel_mount_matrix[] = {
 	"0", "-1", "0",
@@ -1446,7 +1436,6 @@ static const struct x86_dev_info xiaomi_mipad2_info __initconst = {
 
 static const struct dmi_system_id x86_android_tablet_ids[] __initconst = {
 	{
-<<<<<<< HEAD
 		/* Advantech MICA-071 */
 		.matches = {
 			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "Advantech"),
@@ -1455,8 +1444,6 @@ static const struct dmi_system_id x86_android_tablet_ids[] __initconst = {
 		.driver_data = (void *)&advantech_mica_071_info,
 	},
 	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Asus MeMO Pad 7 ME176C */
 		.matches = {
 			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
@@ -1523,7 +1510,6 @@ static const struct dmi_system_id x86_android_tablet_ids[] __initconst = {
 		.driver_data = (void *)&lenovo_yoga_tab2_830_1050_info,
 	},
 	{
-<<<<<<< HEAD
 		/* Lenovo Yoga Tab 3 Pro YT3-X90F */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corporation"),
@@ -1543,8 +1529,6 @@ static const struct dmi_system_id x86_android_tablet_ids[] __initconst = {
 		.driver_data = (void *)&medion_lifetab_s10346_info,
 	},
 	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Nextbook Ares 8 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Insyde"),

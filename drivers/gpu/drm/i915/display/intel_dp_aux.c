@@ -150,10 +150,7 @@ static u32 skl_get_aux_send_ctl(struct intel_dp *intel_dp,
 				u32 unused)
 {
 	struct intel_digital_port *dig_port = dp_to_dig_port(intel_dp);
-<<<<<<< HEAD
 	struct drm_i915_private *i915 =	to_i915(dig_port->base.base.dev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 ret;
 
 	/*
@@ -695,14 +692,10 @@ void intel_dp_aux_init(struct intel_dp *intel_dp)
 	struct intel_encoder *encoder = &dig_port->base;
 	enum aux_ch aux_ch = dig_port->aux_ch;
 
-<<<<<<< HEAD
 	if (DISPLAY_VER(dev_priv) >= 14) {
 		intel_dp->aux_ch_ctl_reg = xelpdp_aux_ctl_reg;
 		intel_dp->aux_ch_data_reg = xelpdp_aux_data_reg;
 	} else if (DISPLAY_VER(dev_priv) >= 12) {
-=======
-	if (DISPLAY_VER(dev_priv) >= 12) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		intel_dp->aux_ch_ctl_reg = tgl_aux_ctl_reg;
 		intel_dp->aux_ch_data_reg = tgl_aux_data_reg;
 	} else if (DISPLAY_VER(dev_priv) >= 9) {

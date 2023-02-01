@@ -353,90 +353,11 @@ out_budg:
 }
 
 static struct inode *create_whiteout(struct inode *dir, struct dentry *dentry)
-<<<<<<< HEAD
-=======
 {
 	int err;
 	umode_t mode = S_IFCHR | WHITEOUT_MODE;
 	struct inode *inode;
 	struct ubifs_info *c = dir->i_sb->s_fs_info;
-	struct fscrypt_name nm;
-
-	/*
-	 * Create an inode('nlink = 1') for whiteout without updating journal,
-	 * let ubifs_jnl_rename() store it on flash to complete rename whiteout
-	 * atomically.
-	 */
-
-	dbg_gen("dent '%pd', mode %#hx in dir ino %lu",
-		dentry, mode, dir->i_ino);
-
-	err = fscrypt_setup_filename(dir, &dentry->d_name, 0, &nm);
-	if (err)
-		return ERR_PTR(err);
-
-	inode = ubifs_new_inode(c, dir, mode);
-	if (IS_ERR(inode)) {
-		err = PTR_ERR(inode);
-		goto out_free;
-	}
-
-	init_special_inode(inode, inode->i_mode, WHITEOUT_DEV);
-	ubifs_assert(c, inode->i_op == &ubifs_file_inode_operations);
-
-	err = ubifs_init_security(dir, inode, &dentry->d_name);
-	if (err)
-		goto out_inode;
-
-	/* The dir size is updated by do_rename. */
-	insert_inode_hash(inode);
-
-	return inode;
-
-out_inode:
-	make_bad_inode(inode);
-	iput(inode);
-out_free:
-	fscrypt_free_filename(&nm);
-	ubifs_err(c, "cannot create whiteout file, error %d", err);
-	return ERR_PTR(err);
-}
-
-/**
- * lock_2_inodes - a wrapper for locking two UBIFS inodes.
- * @inode1: first inode
- * @inode2: second inode
- *
- * We do not implement any tricks to guarantee strict lock ordering, because
- * VFS has already done it for us on the @i_mutex. So this is just a simple
- * wrapper function.
- */
-static void lock_2_inodes(struct inode *inode1, struct inode *inode2)
-{
-	mutex_lock_nested(&ubifs_inode(inode1)->ui_mutex, WB_MUTEX_1);
-	mutex_lock_nested(&ubifs_inode(inode2)->ui_mutex, WB_MUTEX_2);
-}
-
-/**
- * unlock_2_inodes - a wrapper for unlocking two UBIFS inodes.
- * @inode1: first inode
- * @inode2: second inode
- */
-static void unlock_2_inodes(struct inode *inode1, struct inode *inode2)
-{
-	mutex_unlock(&ubifs_inode(inode2)->ui_mutex);
-	mutex_unlock(&ubifs_inode(inode1)->ui_mutex);
-}
-
-static int ubifs_tmpfile(struct user_namespace *mnt_userns, struct inode *dir,
-			 struct dentry *dentry, umode_t mode)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-{
-	int err;
-	umode_t mode = S_IFCHR | WHITEOUT_MODE;
-	struct inode *inode;
-	struct ubifs_info *c = dir->i_sb->s_fs_info;
-<<<<<<< HEAD
 	struct fscrypt_name nm;
 
 	/*
@@ -511,8 +432,6 @@ static int ubifs_tmpfile(struct user_namespace *mnt_userns, struct inode *dir,
 	struct dentry *dentry = file->f_path.dentry;
 	struct inode *inode;
 	struct ubifs_info *c = dir->i_sb->s_fs_info;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ubifs_budget_req req = { .new_ino = 1, .new_dent = 1,
 					.dirtied_ino = 1};
 	struct ubifs_budget_req ino_req = { .dirtied_ino = 1 };
@@ -560,11 +479,7 @@ static int ubifs_tmpfile(struct user_namespace *mnt_userns, struct inode *dir,
 
 	mutex_lock(&ui->ui_mutex);
 	insert_inode_hash(inode);
-<<<<<<< HEAD
 	d_tmpfile(file, inode);
-=======
-	d_tmpfile(dentry, inode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ubifs_assert(c, ui->dirty);
 
 	instantiated = 1;
@@ -1396,15 +1311,9 @@ static int do_rename(struct inode *old_dir, struct dentry *old_dentry,
 	 * Budget request settings:
 	 *   req: deletion direntry, new direntry, removing the old inode,
 	 *   and changing old and new parent directory inodes.
-<<<<<<< HEAD
 	 *
 	 *   wht_req: new whiteout inode for RENAME_WHITEOUT.
 	 *
-=======
-	 *
-	 *   wht_req: new whiteout inode for RENAME_WHITEOUT.
-	 *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *   ino_req: marks the target inode as dirty and does not write it.
 	 */
 

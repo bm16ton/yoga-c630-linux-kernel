@@ -516,13 +516,9 @@ void intel_dram_detect(struct drm_i915_private *i915)
 	 */
 	dram_info->wm_lv_0_adjust_needed = !IS_GEN9_LP(i915);
 
-<<<<<<< HEAD
 	if (DISPLAY_VER(i915) >= 14)
 		ret = xelpdp_get_dram_info(i915);
 	else if (GRAPHICS_VER(i915) >= 12)
-=======
-	if (GRAPHICS_VER(i915) >= 12)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = gen12_get_dram_info(i915);
 	else if (GRAPHICS_VER(i915) >= 11)
 		ret = gen11_get_dram_info(i915);

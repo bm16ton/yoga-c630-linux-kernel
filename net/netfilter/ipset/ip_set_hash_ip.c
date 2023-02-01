@@ -147,7 +147,6 @@ hash_ip4_uadt(struct ip_set *set, struct nlattr *tb[],
 
 	hosts = h->netmask == 32 ? 1 : 2 << (32 - h->netmask - 1);
 
-<<<<<<< HEAD
 	if (retried)
 		ip = ntohl(h->next.ip);
 	for (; ip <= ip_to; i++) {
@@ -156,16 +155,6 @@ hash_ip4_uadt(struct ip_set *set, struct nlattr *tb[],
 			hash_ip4_data_next(&h->next, &e);
 			return -ERANGE;
 		}
-=======
-	/* 64bit division is not allowed on 32bit */
-	if (((u64)ip_to - ip + 1) >> (32 - h->netmask) > IPSET_MAX_RANGE)
-		return -ERANGE;
-
-	if (retried)
-		ip = ntohl(h->next.ip);
-	for (; ip <= ip_to;) {
-		e.ip = htonl(ip);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = adtfn(set, &e, &ext, &ext, flags);
 		if (ret && !ip_set_eexist(ret, flags))
 			return ret;

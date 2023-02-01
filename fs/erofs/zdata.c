@@ -488,12 +488,8 @@ static int z_erofs_register_pcluster(struct z_erofs_decompress_frontend *fe)
 	struct erofs_workgroup *grp;
 	int err;
 
-<<<<<<< HEAD
 	if (!(map->m_flags & EROFS_MAP_ENCODED) ||
 	    (!ztailpacking && !(map->m_pa >> PAGE_SHIFT))) {
-=======
-	if (!(map->m_flags & EROFS_MAP_ENCODED)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DBG_BUGON(1);
 		return -EFSCORRUPTED;
 	}
@@ -615,19 +611,11 @@ void erofs_workgroup_free_rcu(struct erofs_workgroup *grp)
 
 	call_rcu(&pcl->rcu, z_erofs_rcu_callback);
 }
-<<<<<<< HEAD
 
 static bool z_erofs_collector_end(struct z_erofs_decompress_frontend *fe)
 {
 	struct z_erofs_pcluster *pcl = fe->pcl;
 
-=======
-
-static bool z_erofs_collector_end(struct z_erofs_decompress_frontend *fe)
-{
-	struct z_erofs_pcluster *pcl = fe->pcl;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!pcl)
 		return false;
 
@@ -734,12 +722,8 @@ repeat:
 		/* didn't get a valid pcluster previously (very rare) */
 	}
 
-<<<<<<< HEAD
 	if (!(map->m_flags & EROFS_MAP_MAPPED) ||
 	    map->m_flags & EROFS_MAP_FRAGMENT)
-=======
-	if (!(map->m_flags & EROFS_MAP_MAPPED))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto hitted;
 
 	err = z_erofs_collector_begin(fe);
@@ -833,21 +817,13 @@ retry:
 	++spiltted;
 	if (fe->pcl->pageofs_out != (map->m_la & ~PAGE_MASK))
 		fe->pcl->multibases = true;
-<<<<<<< HEAD
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (fe->pcl->length < offset + end - map->m_la) {
 		fe->pcl->length = offset + end - map->m_la;
 		fe->pcl->pageofs_out = map->m_la & ~PAGE_MASK;
 	}
 	if ((map->m_flags & EROFS_MAP_FULL_MAPPED) &&
-<<<<<<< HEAD
 	    !(map->m_flags & EROFS_MAP_PARTIAL_REF) &&
 	    fe->pcl->length == map->m_llen)
-=======
-	     fe->pcl->length == map->m_llen)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		fe->pcl->partial = false;
 next_part:
 	/* shorten the remaining extent to update progress */
@@ -1499,14 +1475,11 @@ submit_bio_retry:
 				bio = NULL;
 			}
 
-<<<<<<< HEAD
 			if (unlikely(PageWorkingset(page)) && !memstall) {
 				psi_memstall_enter(&pflags);
 				memstall = 1;
 			}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (!bio) {
 				bio = bio_alloc(mdev.m_bdev, BIO_MAX_VECS,
 						REQ_OP_READ, GFP_NOIO);

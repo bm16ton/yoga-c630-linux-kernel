@@ -9,15 +9,12 @@
 #include <linux/filter.h>
 #include <linux/btf_ids.h>
 #include "mmap_unlock_work.h"
-<<<<<<< HEAD
 
 static const char * const iter_task_type_names[] = {
 	"ALL",
 	"TID",
 	"PID",
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct bpf_iter_seq_task_common {
 	struct pid_namespace *ns;

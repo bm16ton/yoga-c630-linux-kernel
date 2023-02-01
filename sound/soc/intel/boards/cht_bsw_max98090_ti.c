@@ -264,12 +264,7 @@ static int cht_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 		return ret;
 	}
 
-<<<<<<< HEAD
 	fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF | SND_SOC_DAIFMT_BP_FP;
-=======
-	fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF
-				| SND_SOC_DAIFMT_CBC_CFC;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = snd_soc_dai_set_fmt(asoc_rtd_to_cpu(rtd, 0), fmt);
 	if (ret < 0) {
@@ -563,13 +558,8 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 	}
 
 	/* override platform name, if required */
-<<<<<<< HEAD
 	snd_soc_card_cht.dev = dev;
 	mach = dev->platform_data;
-=======
-	snd_soc_card_cht.dev = &pdev->dev;
-	mach = pdev->dev.platform_data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	platform_name = mach->mach_params.platform;
 
 	ret_val = snd_soc_fixup_dai_links_platform_name(&snd_soc_card_cht,
@@ -608,11 +598,7 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 		}
 	}
 
-<<<<<<< HEAD
 	sof_parent = snd_soc_acpi_sof_parent(dev);
-=======
-	sof_parent = snd_soc_acpi_sof_parent(&pdev->dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* set card and driver name */
 	if (sof_parent) {
@@ -627,11 +613,7 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 	if (sof_parent)
 		dev->driver->pm = &snd_soc_pm_ops;
 
-<<<<<<< HEAD
 	ret_val = devm_snd_soc_register_card(dev, &snd_soc_card_cht);
-=======
-	ret_val = devm_snd_soc_register_card(&pdev->dev, &snd_soc_card_cht);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret_val) {
 		dev_err(dev,
 			"snd_soc_register_card failed %d\n", ret_val);

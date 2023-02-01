@@ -1026,19 +1026,11 @@ static irqreturn_t phy_interrupt(int irq, void *phy_dat)
 		disable_irq_nosync(irq);
 		return IRQ_HANDLED;
 	}
-<<<<<<< HEAD
 
 	mutex_lock(&phydev->lock);
 	ret = drv->handle_interrupt(phydev);
 	mutex_unlock(&phydev->lock);
 
-=======
-
-	mutex_lock(&phydev->lock);
-	ret = drv->handle_interrupt(phydev);
-	mutex_unlock(&phydev->lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 

@@ -1507,6 +1507,7 @@ static int qcom_slim_ngd_probe(struct platform_device *pdev)
 	}
 
 	INIT_WORK(&ctrl->m_work, qcom_slim_ngd_master_worker);
+	INIT_WORK(&ctrl->ngd_up_work, qcom_slim_ngd_up_worker);
 	ctrl->mwq = create_singlethread_workqueue("ngd_master");
 	if (!ctrl->mwq) {
 		dev_err(&pdev->dev, "Failed to start master worker\n");
@@ -1550,11 +1551,6 @@ static int qcom_slim_ngd_ctrl_probe(struct platform_device *pdev)
 			       IRQF_TRIGGER_HIGH, "slim-ngd", ctrl);
 	if (ret)
 		return dev_err_probe(&pdev->dev, ret, "request IRQ failed\n");
-<<<<<<< HEAD
-=======
-
-	INIT_WORK(&ctrl->ngd_up_work, qcom_slim_ngd_up_worker);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ctrl->nb.notifier_call = qcom_slim_ngd_ssr_notify;
 	ctrl->notifier = qcom_register_ssr_notifier("lpass", &ctrl->nb);

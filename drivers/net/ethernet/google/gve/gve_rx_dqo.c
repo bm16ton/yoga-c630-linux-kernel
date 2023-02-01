@@ -157,11 +157,7 @@ static int gve_alloc_page_dqo(struct gve_priv *priv,
 	int err;
 
 	err = gve_alloc_page(priv, &priv->pdev->dev, &buf_state->page_info.page,
-<<<<<<< HEAD
 			     &buf_state->addr, DMA_FROM_DEVICE, GFP_ATOMIC);
-=======
-			     &buf_state->addr, DMA_FROM_DEVICE, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 

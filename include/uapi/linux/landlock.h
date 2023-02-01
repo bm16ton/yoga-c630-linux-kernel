@@ -26,11 +26,7 @@ struct landlock_ruleset_attr {
 	 * Landlock filesystem access rights that are not part of
 	 * handled_access_fs are allowed.  This is needed for backward
 	 * compatibility reasons.  One exception is the
-<<<<<<< HEAD
 	 * %LANDLOCK_ACCESS_FS_REFER access right, which is always implicitly
-=======
-	 * LANDLOCK_ACCESS_FS_REFER access right, which is always implicitly
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * handled, but must still be explicitly handled to add new rules with
 	 * this access right.
 	 */
@@ -132,19 +128,11 @@ struct landlock_path_beneath_attr {
  *   hierarchy must also always have the same or a superset of restrictions of
  *   the source hierarchy.  If it is not the case, or if the domain doesn't
  *   handle this access right, such actions are denied by default with errno
-<<<<<<< HEAD
  *   set to ``EXDEV``.  Linking also requires a ``LANDLOCK_ACCESS_FS_MAKE_*``
  *   access right on the destination directory, and renaming also requires a
  *   ``LANDLOCK_ACCESS_FS_REMOVE_*`` access right on the source's (file or
  *   directory) parent.  Otherwise, such actions are denied with errno set to
  *   ``EACCES``.  The ``EACCES`` errno prevails over ``EXDEV`` to let user space
-=======
- *   set to EXDEV.  Linking also requires a LANDLOCK_ACCESS_FS_MAKE_* access
- *   right on the destination directory, and renaming also requires a
- *   LANDLOCK_ACCESS_FS_REMOVE_* access right on the source's (file or
- *   directory) parent.  Otherwise, such actions are denied with errno set to
- *   EACCES.  The EACCES errno prevails over EXDEV to let user space
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *   efficiently deal with an unrecoverable error.
  *
  * .. warning::

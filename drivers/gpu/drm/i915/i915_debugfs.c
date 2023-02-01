@@ -66,12 +66,7 @@ static int i915_capabilities(struct seq_file *m, void *data)
 
 	seq_printf(m, "pch: %d\n", INTEL_PCH_TYPE(i915));
 
-<<<<<<< HEAD
 	intel_device_info_print(INTEL_INFO(i915), RUNTIME_INFO(i915), &p);
-=======
-	intel_device_info_print_static(INTEL_INFO(i915), &p);
-	intel_device_info_print_runtime(RUNTIME_INFO(i915), &p);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	i915_print_iommu_status(i915, &p);
 	intel_gt_info_print(&to_gt(i915)->info, &p);
 	intel_driver_caps_print(&i915->caps, &p);
@@ -192,13 +187,8 @@ i915_debugfs_describe_obj(struct seq_file *m, struct drm_i915_gem_object *obj)
 			   stringify_page_sizes(vma->resource->page_sizes_gtt,
 						NULL, 0));
 		if (i915_vma_is_ggtt(vma) || i915_vma_is_dpt(vma)) {
-<<<<<<< HEAD
 			switch (vma->gtt_view.type) {
 			case I915_GTT_VIEW_NORMAL:
-=======
-			switch (vma->ggtt_view.type) {
-			case I915_GGTT_VIEW_NORMAL:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				seq_puts(m, ", normal");
 				break;
 
@@ -208,7 +198,6 @@ i915_debugfs_describe_obj(struct seq_file *m, struct drm_i915_gem_object *obj)
 					   vma->gtt_view.partial.size << PAGE_SHIFT);
 				break;
 
-<<<<<<< HEAD
 			case I915_GTT_VIEW_ROTATED:
 				seq_printf(m, ", rotated [(%ux%u, src_stride=%u, dst_stride=%u, offset=%u), (%ux%u, src_stride=%u, dst_stride=%u, offset=%u)]",
 					   vma->gtt_view.rotated.plane[0].width,
@@ -235,34 +224,6 @@ i915_debugfs_describe_obj(struct seq_file *m, struct drm_i915_gem_object *obj)
 					   vma->gtt_view.remapped.plane[1].src_stride,
 					   vma->gtt_view.remapped.plane[1].dst_stride,
 					   vma->gtt_view.remapped.plane[1].offset);
-=======
-			case I915_GGTT_VIEW_ROTATED:
-				seq_printf(m, ", rotated [(%ux%u, src_stride=%u, dst_stride=%u, offset=%u), (%ux%u, src_stride=%u, dst_stride=%u, offset=%u)]",
-					   vma->ggtt_view.rotated.plane[0].width,
-					   vma->ggtt_view.rotated.plane[0].height,
-					   vma->ggtt_view.rotated.plane[0].src_stride,
-					   vma->ggtt_view.rotated.plane[0].dst_stride,
-					   vma->ggtt_view.rotated.plane[0].offset,
-					   vma->ggtt_view.rotated.plane[1].width,
-					   vma->ggtt_view.rotated.plane[1].height,
-					   vma->ggtt_view.rotated.plane[1].src_stride,
-					   vma->ggtt_view.rotated.plane[1].dst_stride,
-					   vma->ggtt_view.rotated.plane[1].offset);
-				break;
-
-			case I915_GGTT_VIEW_REMAPPED:
-				seq_printf(m, ", remapped [(%ux%u, src_stride=%u, dst_stride=%u, offset=%u), (%ux%u, src_stride=%u, dst_stride=%u, offset=%u)]",
-					   vma->ggtt_view.remapped.plane[0].width,
-					   vma->ggtt_view.remapped.plane[0].height,
-					   vma->ggtt_view.remapped.plane[0].src_stride,
-					   vma->ggtt_view.remapped.plane[0].dst_stride,
-					   vma->ggtt_view.remapped.plane[0].offset,
-					   vma->ggtt_view.remapped.plane[1].width,
-					   vma->ggtt_view.remapped.plane[1].height,
-					   vma->ggtt_view.remapped.plane[1].src_stride,
-					   vma->ggtt_view.remapped.plane[1].dst_stride,
-					   vma->ggtt_view.remapped.plane[1].offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				break;
 
 			default:
@@ -531,11 +492,7 @@ static int i915_runtime_pm_status(struct seq_file *m, void *unused)
 		seq_puts(m, "Runtime power management not supported\n");
 
 	seq_printf(m, "Runtime power status: %s\n",
-<<<<<<< HEAD
 		   str_enabled_disabled(!dev_priv->display.power.domains.init_wakeref));
-=======
-		   str_enabled_disabled(!dev_priv->power_domains.init_wakeref));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	seq_printf(m, "GPU idle: %s\n", str_yes_no(!to_gt(dev_priv)->awake));
 	seq_printf(m, "IRQs disabled: %s\n",

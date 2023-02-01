@@ -6,7 +6,6 @@
  */
 
 /dts-v1/;
-<<<<<<< HEAD
 
 /*
  * DIP-Switch SW1 setting
@@ -20,9 +19,6 @@
 
 #include "r9a07g043.dtsi"
 #include "rzg2ul-smarc-som.dtsi"
-=======
-#include "r9a07g043.dtsi"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "rzg2ul-smarc.dtsi"
 
 / {

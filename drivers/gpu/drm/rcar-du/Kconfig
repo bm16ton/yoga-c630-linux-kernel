@@ -5,11 +5,7 @@ config DRM_RCAR_DU
 	depends on ARM || ARM64
 	depends on ARCH_RENESAS || COMPILE_TEST
 	select DRM_KMS_HELPER
-<<<<<<< HEAD
 	select DRM_GEM_DMA_HELPER
-=======
-	select DRM_GEM_CMA_HELPER
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select VIDEOMODE_HELPERS
 	help
 	  Choose this option if you have an R-Car chipset.
@@ -45,7 +41,6 @@ config DRM_RCAR_LVDS
 	depends on DRM_RCAR_USE_LVDS
 	select DRM_KMS_HELPER
 	select DRM_PANEL
-<<<<<<< HEAD
 
 config DRM_RCAR_USE_MIPI_DSI
 	bool "R-Car DU MIPI DSI Encoder Support"
@@ -58,17 +53,6 @@ config DRM_RCAR_MIPI_DSI
 	def_tristate DRM_RCAR_DU
 	depends on DRM_RCAR_USE_MIPI_DSI
 	select DRM_MIPI_DSI
-=======
-	select OF_FLATTREE
-	select OF_OVERLAY
-
-config DRM_RCAR_MIPI_DSI
-	tristate "R-Car DU MIPI DSI Encoder Support"
-	depends on DRM && DRM_BRIDGE && OF
-	select DRM_MIPI_DSI
-	help
-	  Enable support for the R-Car Display Unit embedded MIPI DSI encoders.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config DRM_RCAR_VSP
 	bool "R-Car DU VSP Compositor Support" if ARM

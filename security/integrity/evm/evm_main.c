@@ -457,7 +457,6 @@ static int evm_xattr_acl_change(struct user_namespace *mnt_userns,
 	int rc;
 
 	/*
-<<<<<<< HEAD
 	 * An earlier comment here mentioned that the idmappings for
 	 * ACL_{GROUP,USER} don't matter since EVM is only interested in the
 	 * mode stored as part of POSIX ACLs. Nonetheless, if it must translate
@@ -473,12 +472,6 @@ static int evm_xattr_acl_change(struct user_namespace *mnt_userns,
 	 */
 	acl = vfs_set_acl_prepare(mnt_userns, i_user_ns(inode),
 				  xattr_value, xattr_value_len);
-=======
-	 * user_ns is not relevant here, ACL_USER/ACL_GROUP don't have impact
-	 * on the inode mode (see posix_acl_equiv_mode()).
-	 */
-	acl = posix_acl_from_xattr(&init_user_ns, xattr_value, xattr_value_len);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR_OR_NULL(acl))
 		return 1;
 

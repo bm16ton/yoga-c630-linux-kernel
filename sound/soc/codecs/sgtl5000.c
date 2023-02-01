@@ -1808,11 +1808,6 @@ static void sgtl5000_i2c_shutdown(struct i2c_client *client)
 	sgtl5000_i2c_remove(client);
 }
 
-static void sgtl5000_i2c_shutdown(struct i2c_client *client)
-{
-	sgtl5000_i2c_remove(client);
-}
-
 static const struct i2c_device_id sgtl5000_id[] = {
 	{"sgtl5000", 0},
 	{},

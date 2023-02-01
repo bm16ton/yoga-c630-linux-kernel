@@ -68,12 +68,9 @@ config DAMON_DBGFS
 
 	  If unsure, say N.
 
-<<<<<<< HEAD
 	  This will be removed after >5.15.y LTS kernel is released, so users
 	  should move to the sysfs interface (DAMON_SYSFS).
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config DAMON_DBGFS_KUNIT_TEST
 	bool "Test for damon debugfs interface" if !KUNIT_ALL_TESTS
 	depends on DAMON_DBGFS && KUNIT=y

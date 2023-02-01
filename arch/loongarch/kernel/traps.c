@@ -10,10 +10,7 @@
 #include <linux/entry-common.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
-<<<<<<< HEAD
 #include <linux/kexec.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/module.h>
 #include <linux/extable.h>
 #include <linux/mm.h>
@@ -250,12 +247,9 @@ void __noreturn die(const char *str, struct pt_regs *regs)
 
 	oops_exit();
 
-<<<<<<< HEAD
 	if (regs && kexec_should_crash(current))
 		crash_kexec(regs);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (in_interrupt())
 		panic("Fatal exception in interrupt");
 
@@ -384,7 +378,6 @@ asmlinkage void noinstr do_ale(struct pt_regs *regs)
 	irqentry_exit(regs, state);
 }
 
-<<<<<<< HEAD
 #ifdef CONFIG_GENERIC_BUG
 int is_valid_bugaddr(unsigned long addr)
 {
@@ -408,8 +401,6 @@ static void bug_handler(struct pt_regs *regs)
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 asmlinkage void noinstr do_bp(struct pt_regs *regs)
 {
 	bool user = user_mode(regs);
@@ -463,12 +454,7 @@ asmlinkage void noinstr do_bp(struct pt_regs *regs)
 
 	switch (bcode) {
 	case BRK_BUG:
-<<<<<<< HEAD
 		bug_handler(regs);
-=======
-		die_if_kernel("Kernel bug detected", regs);
-		force_sig(SIGTRAP);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case BRK_DIVZERO:
 		die_if_kernel("Break instruction in kernel code", regs);
@@ -501,17 +487,9 @@ asmlinkage void noinstr do_watch(struct pt_regs *regs)
 
 asmlinkage void noinstr do_ri(struct pt_regs *regs)
 {
-<<<<<<< HEAD
 	int status = SIGILL;
 	unsigned int opcode = 0;
 	unsigned int __user *era = (unsigned int __user *)exception_era(regs);
-=======
-	int status = -1;
-	unsigned int opcode = 0;
-	unsigned int __user *era = (unsigned int __user *)exception_era(regs);
-	unsigned long old_era = regs->csr_era;
-	unsigned long old_ra = regs->regs[1];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	irqentry_state_t state = irqentry_enter(regs);
 
 	local_irq_enable();
@@ -523,28 +501,12 @@ asmlinkage void noinstr do_ri(struct pt_regs *regs)
 
 	die_if_kernel("Reserved instruction in kernel code", regs);
 
-<<<<<<< HEAD
-=======
-	compute_return_era(regs);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(get_user(opcode, era) < 0)) {
 		status = SIGSEGV;
 		current->thread.error_code = 1;
 	}
 
-<<<<<<< HEAD
 	force_sig(status);
-=======
-	if (status < 0)
-		status = SIGILL;
-
-	if (unlikely(status > 0)) {
-		regs->csr_era = old_era;		/* Undo skip-over.  */
-		regs->regs[1] = old_ra;
-		force_sig(status);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	local_irq_disable();
@@ -684,12 +646,6 @@ asmlinkage void noinstr do_vint(struct pt_regs *regs, unsigned long sp)
 	irqentry_exit(regs, state);
 }
 
-<<<<<<< HEAD
-=======
-extern void tlb_init(int cpu);
-extern void cache_error_setup(void);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned long eentry;
 unsigned long tlbrentry;
 

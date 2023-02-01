@@ -42,14 +42,10 @@ void __init kasan_init_sw_tags(void)
 	for_each_possible_cpu(cpu)
 		per_cpu(prng_state, cpu) = (u32)get_cycles();
 
-<<<<<<< HEAD
 	kasan_init_tags();
 
 	pr_info("KernelAddressSanitizer initialized (sw-tags, stacktrace=%s)\n",
 		kasan_stack_collection_enabled() ? "on" : "off");
-=======
-	pr_info("KernelAddressSanitizer initialized (sw-tags)\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -130,17 +126,10 @@ bool kasan_byte_accessible(const void *addr)
 	u8 tag = get_tag(addr);
 	void *untagged_addr = kasan_reset_tag(addr);
 	u8 shadow_byte;
-<<<<<<< HEAD
 
 	if (untagged_addr < kasan_shadow_to_mem((void *)KASAN_SHADOW_START))
 		return false;
 
-=======
-
-	if (untagged_addr < kasan_shadow_to_mem((void *)KASAN_SHADOW_START))
-		return false;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	shadow_byte = READ_ONCE(*(u8 *)kasan_mem_to_shadow(untagged_addr));
 	return tag == KASAN_TAG_KERNEL || tag == shadow_byte;
 }

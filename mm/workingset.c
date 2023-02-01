@@ -359,21 +359,15 @@ void *workingset_eviction(struct folio *folio, struct mem_cgroup *target_memcg)
 	VM_BUG_ON_FOLIO(folio_test_lru(folio), folio);
 	VM_BUG_ON_FOLIO(folio_ref_count(folio), folio);
 	VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
-<<<<<<< HEAD
 
 	if (lru_gen_enabled())
 		return lru_gen_eviction(folio);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	lruvec = mem_cgroup_lruvec(target_memcg, pgdat);
 	/* XXX: target_memcg can be NULL, go through lruvec */
 	memcgid = mem_cgroup_id(lruvec_memcg(lruvec));
 	eviction = atomic_long_read(&lruvec->nonresident_age);
-<<<<<<< HEAD
 	eviction >>= bucket_order;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	workingset_age_nonresident(lruvec, folio_nr_pages(folio));
 	return pack_shadow(memcgid, pgdat, eviction,
 				folio_test_workingset(folio));
@@ -403,14 +397,11 @@ void workingset_refault(struct folio *folio, void *shadow)
 	bool workingset;
 	int memcgid;
 	long nr;
-<<<<<<< HEAD
 
 	if (lru_gen_enabled()) {
 		lru_gen_refault(folio, shadow);
 		return;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	unpack_shadow(shadow, &memcgid, &pgdat, &eviction, &workingset);
 	eviction <<= bucket_order;

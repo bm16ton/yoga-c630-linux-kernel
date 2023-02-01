@@ -15,7 +15,6 @@ description:
 
 properties:
   compatible:
-<<<<<<< HEAD
     items:
       - enum:
           - qcom,msm8998-tcsr
@@ -37,25 +36,6 @@ properties:
           - qcom,tcsr-msm8974
           - qcom,tcsr-msm8996
       - const: syscon
-=======
-    oneOf:
-      - items:
-          - enum:
-              - qcom,tcsr-apq8064
-              - qcom,tcsr-apq8084
-              - qcom,tcsr-ipq8064
-              - qcom,tcsr-mdm9615
-              - qcom,tcsr-msm8660
-              - qcom,tcsr-msm8916
-              - qcom,tcsr-msm8953
-              - qcom,tcsr-msm8960
-              - qcom,tcsr-msm8974
-          - const: syscon
-      - items:
-          - const: qcom,tcsr-ipq6018
-          - const: syscon
-          - const: simple-mfd
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   reg:
     maxItems: 1

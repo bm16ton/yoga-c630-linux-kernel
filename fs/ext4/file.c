@@ -36,7 +36,6 @@
 #include "acl.h"
 #include "truncate.h"
 
-<<<<<<< HEAD
 /*
  * Returns %true if the given DIO request should be attempted with DIO, or
  * %false if it should fall back to buffered I/O.
@@ -59,19 +58,6 @@ static bool ext4_should_use_dio(struct kiocb *iocb, struct iov_iter *iter)
 	u32 dio_align = ext4_dio_alignment(inode);
 
 	if (dio_align == 0)
-=======
-static bool ext4_dio_supported(struct kiocb *iocb, struct iov_iter *iter)
-{
-	struct inode *inode = file_inode(iocb->ki_filp);
-
-	if (!fscrypt_dio_supported(iocb, iter))
-		return false;
-	if (fsverity_active(inode))
-		return false;
-	if (ext4_should_journal_data(inode))
-		return false;
-	if (ext4_has_inline_data(inode))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 
 	if (dio_align == 1)
@@ -92,11 +78,7 @@ static ssize_t ext4_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
 		inode_lock_shared(inode);
 	}
 
-<<<<<<< HEAD
 	if (!ext4_should_use_dio(iocb, to)) {
-=======
-	if (!ext4_dio_supported(iocb, to)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		inode_unlock_shared(inode);
 		/*
 		 * Fallback to buffered I/O if the operation being performed on
@@ -544,11 +526,7 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	}
 
 	/* Fallback to buffered I/O if the inode does not support direct I/O. */
-<<<<<<< HEAD
 	if (!ext4_should_use_dio(iocb, from)) {
-=======
-	if (!ext4_dio_supported(iocb, from)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ilock_shared)
 			inode_unlock_shared(inode);
 		else

@@ -205,7 +205,6 @@ static void vt6655_mac_read_ether_addr(void __iomem *iobase, u8 *mac_addr)
 	iowrite8(0, iobase + MAC_REG_PAGE1SEL);
 }
 
-<<<<<<< HEAD
 static void vt6655_mac_dma_ctl(void __iomem *iobase, u8 reg_index)
 {
 	u32 reg_value;
@@ -255,8 +254,6 @@ static void vt6655_mac_dis_barker_preamble_md(void __iomem *iobase)
 	vt6655_mac_clear_bits(iobase, ENCFG_BARKERPREAM);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Initialisation of MAC & BBP registers
  */
@@ -403,19 +400,11 @@ static void device_init_registers(struct vnt_private *priv)
 	}
 
 	if (priv->local_id > REV_ID_VT3253_B1) {
-<<<<<<< HEAD
 		VT6655_MAC_SELECT_PAGE1(priv->port_offset);
 
 		iowrite8(MSRCTL1_TXPWR | MSRCTL1_CSAPAREN, priv->port_offset + MAC_REG_MSRCTL + 1);
 
 		VT6655_MAC_SELECT_PAGE0(priv->port_offset);
-=======
-		MACvSelectPage1(priv->port_offset);
-
-		iowrite8(MSRCTL1_TXPWR | MSRCTL1_CSAPAREN, priv->port_offset + MAC_REG_MSRCTL + 1);
-
-		MACvSelectPage0(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* use relative tx timeout and 802.11i D4 */
@@ -480,13 +469,8 @@ static void device_init_registers(struct vnt_private *priv)
 		vt6655_mac_reg_bits_on(priv->port_offset, MAC_REG_RCR, RCR_WPAERR);
 
 	/* Turn On Rx DMA */
-<<<<<<< HEAD
 	vt6655_mac_dma_ctl(priv->port_offset, MAC_REG_RXDMACTL0);
 	vt6655_mac_dma_ctl(priv->port_offset, MAC_REG_RXDMACTL1);
-=======
-	MACvReceive0(priv->port_offset);
-	MACvReceive1(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* start the adapter */
 	iowrite8(HOSTCR_MACEN | HOSTCR_RXON | HOSTCR_TXON, priv->port_offset + MAC_REG_HOSTCR);
@@ -1199,13 +1183,8 @@ static void vnt_interrupt_process(struct vnt_private *priv)
 
 		isr = ioread32(priv->port_offset + MAC_REG_ISR);
 
-<<<<<<< HEAD
 		vt6655_mac_dma_ctl(priv->port_offset, MAC_REG_RXDMACTL0);
 		vt6655_mac_dma_ctl(priv->port_offset, MAC_REG_RXDMACTL1);
-=======
-		MACvReceive0(priv->port_offset);
-		MACvReceive1(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (max_count > priv->opts.int_works)
 			break;
@@ -1287,15 +1266,9 @@ static int vnt_tx_packet(struct vnt_private *priv, struct sk_buff *skb)
 	wmb(); /* second memory barrier */
 
 	if (head_td->td_info->flags & TD_FLAGS_NETIF_SKB)
-<<<<<<< HEAD
 		vt6655_mac_dma_ctl(priv->port_offset, MAC_REG_AC0DMACTL);
 	else
 		vt6655_mac_dma_ctl(priv->port_offset, MAC_REG_TXDMACTL0);
-=======
-		MACvTransmitAC0(priv->port_offset);
-	else
-		MACvTransmit0(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	priv->iTDUsed[dma_idx]++;
 
@@ -1515,32 +1488,19 @@ static void vnt_bss_info_changed(struct ieee80211_hw *hw,
 
 	if (changed & BSS_CHANGED_ERP_PREAMBLE) {
 		if (conf->use_short_preamble) {
-<<<<<<< HEAD
 			vt6655_mac_en_barker_preamble_md(priv->port_offset);
 			priv->preamble_type = true;
 		} else {
 			vt6655_mac_dis_barker_preamble_md(priv->port_offset);
-=======
-			MACvEnableBarkerPreambleMd(priv->port_offset);
-			priv->preamble_type = true;
-		} else {
-			MACvDisableBarkerPreambleMd(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			priv->preamble_type = false;
 		}
 	}
 
 	if (changed & BSS_CHANGED_ERP_CTS_PROT) {
 		if (conf->use_cts_prot)
-<<<<<<< HEAD
 			vt6655_mac_en_protect_md(priv->port_offset);
 		else
 			vt6655_mac_dis_protect_md(priv->port_offset);
-=======
-			MACvEnableProtectMD(priv->port_offset);
-		else
-			MACvDisableProtectMD(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (changed & BSS_CHANGED_ERP_SLOT) {
@@ -1626,35 +1586,21 @@ static void vnt_configure(struct ieee80211_hw *hw,
 			spin_lock_irqsave(&priv->lock, flags);
 
 			if (priv->mc_list_count > 2) {
-<<<<<<< HEAD
 				VT6655_MAC_SELECT_PAGE1(priv->port_offset);
-=======
-				MACvSelectPage1(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 				iowrite32(0xffffffff, priv->port_offset + MAC_REG_MAR0);
 				iowrite32(0xffffffff, priv->port_offset + MAC_REG_MAR0 + 4);
 
-<<<<<<< HEAD
 				VT6655_MAC_SELECT_PAGE0(priv->port_offset);
 			} else {
 				VT6655_MAC_SELECT_PAGE1(priv->port_offset);
-=======
-				MACvSelectPage0(priv->port_offset);
-			} else {
-				MACvSelectPage1(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 				multicast =  le64_to_cpu(multicast);
 				iowrite32((u32)multicast, priv->port_offset +  MAC_REG_MAR0);
 				iowrite32((u32)(multicast >> 32),
 					  priv->port_offset + MAC_REG_MAR0 + 4);
 
-<<<<<<< HEAD
 				VT6655_MAC_SELECT_PAGE0(priv->port_offset);
-=======
-				MACvSelectPage0(priv->port_offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 
 			spin_unlock_irqrestore(&priv->lock, flags);

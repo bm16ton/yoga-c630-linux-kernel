@@ -190,10 +190,7 @@ struct sparx5_port {
 	u8 ptp_cmd;
 	u16 ts_id;
 	struct sk_buff_head tx_skbs;
-<<<<<<< HEAD
 	bool is_mrouter;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum sparx5_core_clockfreq {
@@ -219,7 +216,6 @@ struct sparx5_skb_cb {
 	unsigned long jiffies;
 };
 
-<<<<<<< HEAD
 struct sparx5_mdb_entry {
 	struct list_head list;
 	DECLARE_BITMAP(port_mask, SPX5_PORTS);
@@ -229,8 +225,6 @@ struct sparx5_mdb_entry {
 	u16 pgid_idx;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define SPARX5_PTP_TIMEOUT		msecs_to_jiffies(10)
 #define SPARX5_SKB_CB(skb) \
 	((struct sparx5_skb_cb *)((skb)->cb))
@@ -272,13 +266,10 @@ struct sparx5 {
 	struct list_head mact_entries;
 	/* mac table list (mact_entries) mutex */
 	struct mutex mact_lock;
-<<<<<<< HEAD
 	/* SW MDB table */
 	struct list_head mdb_entries;
 	/* mdb list mutex */
 	struct mutex mdb_lock;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct delayed_work mact_work;
 	struct workqueue_struct *mact_queue;
 	/* Board specifics */
@@ -314,11 +305,7 @@ struct frame_info {
 void sparx5_xtr_flush(struct sparx5 *sparx5, u8 grp);
 void sparx5_ifh_parse(u32 *ifh, struct frame_info *info);
 irqreturn_t sparx5_xtr_handler(int irq, void *_priv);
-<<<<<<< HEAD
 netdev_tx_t sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev);
-=======
-int sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int sparx5_manual_injection_mode(struct sparx5 *sparx5);
 void sparx5_port_inj_timer_setup(struct sparx5_port *port);
 
@@ -334,13 +321,8 @@ int sparx5_mact_learn(struct sparx5 *sparx5, int port,
 		      const unsigned char mac[ETH_ALEN], u16 vid);
 bool sparx5_mact_getnext(struct sparx5 *sparx5,
 			 unsigned char mac[ETH_ALEN], u16 *vid, u32 *pcfg2);
-<<<<<<< HEAD
 int sparx5_mact_find(struct sparx5 *sparx5,
 		     const unsigned char mac[ETH_ALEN], u16 vid, u32 *pcfg2);
-=======
-bool sparx5_mact_find(struct sparx5 *sparx5,
-		      const unsigned char mac[ETH_ALEN], u16 vid, u32 *pcfg2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int sparx5_mact_forget(struct sparx5 *sparx5,
 		       const unsigned char mac[ETH_ALEN], u16 vid);
 int sparx5_add_mact_entry(struct sparx5 *sparx5,
@@ -357,10 +339,7 @@ void sparx5_mact_init(struct sparx5 *sparx5);
 
 /* sparx5_vlan.c */
 void sparx5_pgid_update_mask(struct sparx5_port *port, int pgid, bool enable);
-<<<<<<< HEAD
 void sparx5_pgid_clear(struct sparx5 *spx5, int pgid);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void sparx5_pgid_read_mask(struct sparx5 *sparx5, int pgid, u32 portmask[3]);
 void sparx5_update_fwd(struct sparx5 *sparx5);
 void sparx5_vlan_init(struct sparx5 *sparx5);

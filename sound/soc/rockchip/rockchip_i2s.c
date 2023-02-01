@@ -55,12 +55,9 @@ struct rk_i2s_dev {
 	const struct rk_i2s_pins *pins;
 	unsigned int bclk_ratio;
 	spinlock_t lock; /* tx/rx lock */
-<<<<<<< HEAD
 	struct pinctrl *pinctrl;
 	struct pinctrl_state *bclk_on;
 	struct pinctrl_state *bclk_off;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int i2s_pinctrl_select_bclk_on(struct rk_i2s_dev *i2s)
@@ -175,16 +172,12 @@ static int rockchip_snd_txctrl(struct rk_i2s_dev *i2s, int on)
 				dev_warn(i2s->dev, "fail to clear: %d\n", ret);
 		}
 	}
-<<<<<<< HEAD
 end:
 	spin_unlock(&i2s->lock);
 	if (ret < 0)
 		dev_err(i2s->dev, "lrclk update failed\n");
 
 	return ret;
-=======
-	spin_unlock(&i2s->lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int rockchip_snd_rxctrl(struct rk_i2s_dev *i2s, int on)
@@ -237,16 +230,12 @@ static int rockchip_snd_rxctrl(struct rk_i2s_dev *i2s, int on)
 				dev_warn(i2s->dev, "fail to clear: %d\n", ret);
 		}
 	}
-<<<<<<< HEAD
 end:
 	spin_unlock(&i2s->lock);
 	if (ret < 0)
 		dev_err(i2s->dev, "lrclk update failed\n");
 
 	return ret;
-=======
-	spin_unlock(&i2s->lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int rockchip_i2s_set_fmt(struct snd_soc_dai *cpu_dai,
@@ -804,7 +793,6 @@ static int rockchip_i2s_probe(struct platform_device *pdev)
 	}
 
 	i2s->bclk_ratio = 64;
-<<<<<<< HEAD
 	i2s->pinctrl = devm_pinctrl_get(&pdev->dev);
 	if (!IS_ERR(i2s->pinctrl)) {
 		i2s->bclk_on = pinctrl_lookup_state(i2s->pinctrl, "bclk_on");
@@ -821,8 +809,6 @@ static int rockchip_i2s_probe(struct platform_device *pdev)
 	}
 
 	i2s_pinctrl_select_bclk_off(i2s);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev_set_drvdata(&pdev->dev, i2s);
 

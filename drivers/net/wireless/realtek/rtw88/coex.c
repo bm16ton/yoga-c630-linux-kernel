@@ -806,11 +806,7 @@ static void rtw_coex_update_bt_link_info(struct rtw_dev *rtwdev)
 
 static void rtw_coex_update_wl_ch_info(struct rtw_dev *rtwdev, u8 type)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_efuse *efuse = &rtwdev->efuse;
 	struct rtw_coex_dm *coex_dm = &rtwdev->coex.dm;
 	struct rtw_coex_stat *coex_stat = &rtwdev->coex.stat;
@@ -1857,18 +1853,11 @@ static void rtw_coex_action_bt_inquiry(struct rtw_dev *rtwdev)
 
 static void rtw_coex_action_bt_game_hid(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_coex *coex = &rtwdev->coex;
 	struct rtw_coex_stat *coex_stat = &coex->stat;
 	struct rtw_efuse *efuse = &rtwdev->efuse;
 	struct rtw_coex_dm *coex_dm = &coex->dm;
-<<<<<<< HEAD
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 table_case, tdma_case;
 
 	rtw_dbg(rtwdev, RTW_DBG_COEX, "[BTCoex], %s()\n", __func__);
@@ -2327,15 +2316,9 @@ static void rtw_coex_action_bt_a2dp_pan_hid(struct rtw_dev *rtwdev)
 
 static void rtw_coex_action_wl_under5g(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
 	struct rtw_coex *coex = &rtwdev->coex;
 	struct rtw_efuse *efuse = &rtwdev->efuse;
-=======
-	struct rtw_coex *coex = &rtwdev->coex;
-	struct rtw_efuse *efuse = &rtwdev->efuse;
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_coex_stat *coex_stat = &coex->stat;
 	u8 table_case, tdma_case;
 
@@ -2392,10 +2375,6 @@ static void rtw_coex_action_wl_native_lps(struct rtw_dev *rtwdev)
 	const struct rtw_chip_info *chip = rtwdev->chip;
 	struct rtw_coex *coex = &rtwdev->coex;
 	struct rtw_efuse *efuse = &rtwdev->efuse;
-<<<<<<< HEAD
-=======
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_coex_stat *coex_stat = &coex->stat;
 	u8 table_case, tdma_case;
 
@@ -2551,7 +2530,6 @@ static void rtw_coex_run_coex(struct rtw_dev *rtwdev, u8 reason)
 {
 	const struct rtw_chip_info *chip = rtwdev->chip;
 	struct rtw_coex *coex = &rtwdev->coex;
-	struct rtw_chip_info *chip = rtwdev->chip;
 	struct rtw_coex_dm *coex_dm = &coex->dm;
 	struct rtw_coex_stat *coex_stat = &coex->stat;
 	bool rf4ce_en = false;
@@ -3292,13 +3270,8 @@ static const u8 coex_bt_hidinfo_xb[] = {0x58, 0x62, 0x6f};
 
 void rtw_coex_bt_hid_info_notify(struct rtw_dev *rtwdev, u8 *buf, u8 length)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
 	struct rtw_coex *coex = &rtwdev->coex;
-=======
-	struct rtw_coex *coex = &rtwdev->coex;
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_coex_stat *coex_stat = &coex->stat;
 	struct rtw_coex_hid *hidinfo;
 	struct rtw_coex_hid_info_a *hida;
@@ -3387,13 +3360,8 @@ void rtw_coex_bt_hid_info_notify(struct rtw_dev *rtwdev, u8 *buf, u8 length)
 
 void rtw_coex_query_bt_hid_list(struct rtw_dev *rtwdev)
 {
-<<<<<<< HEAD
 	const struct rtw_chip_info *chip = rtwdev->chip;
 	struct rtw_coex *coex = &rtwdev->coex;
-=======
-	struct rtw_coex *coex = &rtwdev->coex;
-	struct rtw_chip_info *chip = rtwdev->chip;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtw_coex_stat *coex_stat = &coex->stat;
 	struct rtw_coex_hid *hidinfo;
 	u8 i, handle;

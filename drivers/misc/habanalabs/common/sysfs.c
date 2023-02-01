@@ -37,7 +37,6 @@ static ssize_t clk_max_freq_mhz_store(struct device *dev, struct device_attribut
 		count = -ENODEV;
 		goto fail;
 	}
-<<<<<<< HEAD
 
 	rc = kstrtoull(buf, 0, &value);
 	if (rc) {
@@ -49,19 +48,6 @@ static ssize_t clk_max_freq_mhz_store(struct device *dev, struct device_attribut
 
 	hl_fw_set_frequency(hdev, hdev->asic_prop.clk_pll_index, hdev->asic_prop.max_freq_value);
 
-=======
-
-	rc = kstrtoull(buf, 0, &value);
-	if (rc) {
-		count = -EINVAL;
-		goto fail;
-	}
-
-	hdev->asic_prop.max_freq_value = value * 1000 * 1000;
-
-	hl_fw_set_frequency(hdev, hdev->asic_prop.clk_pll_index, hdev->asic_prop.max_freq_value);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 fail:
 	return count;
 }
@@ -415,10 +401,7 @@ static DEVICE_ATTR_RO(status);
 static DEVICE_ATTR_RO(thermal_ver);
 static DEVICE_ATTR_RO(uboot_ver);
 static DEVICE_ATTR_RO(fw_os_ver);
-<<<<<<< HEAD
 static DEVICE_ATTR_RO(security_enabled);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct bin_attribute bin_attr_eeprom = {
 	.attr = {.name = "eeprom", .mode = (0444)},
@@ -443,10 +426,7 @@ static struct attribute *hl_dev_attrs[] = {
 	&dev_attr_thermal_ver.attr,
 	&dev_attr_uboot_ver.attr,
 	&dev_attr_fw_os_ver.attr,
-<<<<<<< HEAD
 	&dev_attr_security_enabled.attr,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	NULL,
 };
 
@@ -467,7 +447,6 @@ static const struct attribute_group *hl_dev_attr_groups[] = {
 	&hl_dev_attr_group,
 	&hl_dev_clks_attr_group,
 	&hl_dev_vrm_attr_group,
-<<<<<<< HEAD
 	NULL,
 };
 
@@ -477,17 +456,6 @@ static struct attribute *hl_dev_inference_attrs[] = {
 	NULL,
 };
 
-=======
-	NULL,
-};
-
-static struct attribute *hl_dev_inference_attrs[] = {
-	&dev_attr_soft_reset.attr,
-	&dev_attr_soft_reset_cnt.attr,
-	NULL,
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct attribute_group hl_dev_inference_attr_group = {
 	.attrs = hl_dev_inference_attrs,
 };

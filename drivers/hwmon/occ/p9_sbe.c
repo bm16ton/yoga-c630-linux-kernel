@@ -7,10 +7,7 @@
 #include <linux/fsi-occ.h>
 #include <linux/mm.h>
 #include <linux/module.h>
-<<<<<<< HEAD
 #include <linux/mod_devicetable.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/mutex.h>
 #include <linux/platform_device.h>
 #include <linux/string.h>

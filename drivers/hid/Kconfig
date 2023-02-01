@@ -120,10 +120,6 @@ config HID_ACRUX_FF
 
 config HID_APPLE
 	tristate "Apple {i,Power,Mac}Books"
-<<<<<<< HEAD
-=======
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on LEDS_CLASS
 	depends on NEW_LEDS
 	default !EXPERT
@@ -253,10 +249,6 @@ config HID_PRODIKEYS
 
 config HID_CMEDIA
 	tristate "CMedia audio chips"
-<<<<<<< HEAD
-=======
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	Support for CMedia CM6533 HID audio jack controls
         and HS100B mute buttons.
@@ -410,10 +402,6 @@ config HID_VIVALDI
 	tristate "Vivaldi Keyboard"
 	select HID_VIVALDI_COMMON
 	select INPUT_VIVALDIFMAP
-<<<<<<< HEAD
-=======
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Say Y here if you want to enable support for Vivaldi keyboards.
 
@@ -466,7 +454,6 @@ config HID_VIEWSONIC
 	help
 	  Support for ViewSonic/Signotec PD1011 signature pad.
 
-<<<<<<< HEAD
 config HID_VRC2
 	tristate "VRC-2 Car Controller"
 	depends on HID
@@ -479,11 +466,6 @@ config HID_VRC2
 
 config HID_XIAOMI
 	tristate "Xiaomi"
-=======
-config HID_XIAOMI
-	tristate "Xiaomi"
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Adds support for side buttons of Xiaomi Mi Dual Mode Wireless
 	  Mouse Silent Edition.
@@ -759,10 +741,6 @@ config HID_MULTITOUCH
 
 config HID_NINTENDO
 	tristate "Nintendo Joy-Con and Pro Controller support"
-<<<<<<< HEAD
-=======
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on NEW_LEDS
 	depends on LEDS_CLASS
 	select POWER_SUPPLY
@@ -915,10 +893,6 @@ config HID_PLANTRONICS
 
 config HID_PLAYSTATION
 	tristate "PlayStation HID Driver"
-<<<<<<< HEAD
-=======
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on LEDS_CLASS_MULTICOLOR
 	select CRC32
 	select POWER_SUPPLY
@@ -935,7 +909,6 @@ config PLAYSTATION_FF
 	  Say Y here if you would like to enable force feedback support for
 	  PlayStation game controllers.
 
-<<<<<<< HEAD
 config HID_PXRC
        tristate "PhoenixRC HID Flight Controller"
        depends on HID
@@ -947,11 +920,6 @@ config HID_PXRC
 
 config HID_RAZER
 	tristate "Razer non-fully HID-compliant devices"
-=======
-config HID_RAZER
-	tristate "Razer non-fully HID-compliant devices"
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	Support for Razer devices that are not fully compliant with the
 	HID standard.
@@ -996,10 +964,6 @@ config HID_SAMSUNG
 
 config HID_SEMITEK
 	tristate "Semitek USB keyboards"
-<<<<<<< HEAD
-=======
-	depends on HID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	Support for Semitek USB keyboards that are not fully compliant
 	with the HID standard.
@@ -1297,11 +1261,7 @@ config HID_MCP2221
 	will be called hid-mcp2221.ko.
 
 config HID_KUNIT_TEST
-<<<<<<< HEAD
 	tristate "KUnit tests for HID" if !KUNIT_ALL_TESTS
-=======
-	bool "KUnit tests for HID" if !KUNIT_ALL_TESTS
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on KUNIT=y
 	depends on HID_UCLOGIC
 	default KUNIT_ALL_TESTS

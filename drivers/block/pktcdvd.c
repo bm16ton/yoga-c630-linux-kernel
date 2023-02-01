@@ -246,7 +246,6 @@ static ssize_t congestion_off_show(struct device *dev,
 	spin_unlock(&pd->lock);
 	return n;
 }
-<<<<<<< HEAD
 
 static ssize_t congestion_off_store(struct device *dev,
 				    struct device_attribute *attr,
@@ -255,16 +254,6 @@ static ssize_t congestion_off_store(struct device *dev,
 	struct pktcdvd_device *pd = dev_get_drvdata(dev);
 	int val;
 
-=======
-
-static ssize_t congestion_off_store(struct device *dev,
-				    struct device_attribute *attr,
-				    const char *buf, size_t len)
-{
-	struct pktcdvd_device *pd = dev_get_drvdata(dev);
-	int val;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (sscanf(buf, "%d", &val) == 1) {
 		spin_lock(&pd->lock);
 		pd->write_congestion_off = val;
@@ -2411,11 +2400,8 @@ static void pkt_submit_bio(struct bio *bio)
 	struct bio *split;
 
 	bio = bio_split_to_limits(bio);
-<<<<<<< HEAD
 	if (!bio)
 		return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pkt_dbg(2, pd, "start = %6llx stop = %6llx\n",
 		(unsigned long long)bio->bi_iter.bi_sector,

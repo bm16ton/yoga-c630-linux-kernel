@@ -21,11 +21,8 @@ struct bcm63xx_pinctrl_soc {
 	unsigned int ngpios;
 };
 
-<<<<<<< HEAD
 #define BCM_PIN_GROUP(n)	PINCTRL_PINGROUP(#n, n##_pins, ARRAY_SIZE(n##_pins))
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct bcm63xx_pinctrl {
 	struct device *dev;
 	struct regmap *regs;

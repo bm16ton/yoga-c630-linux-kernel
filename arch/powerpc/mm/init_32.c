@@ -82,22 +82,6 @@ void __init MMU_init(void)
 	if (ppc_md.progress)
 		ppc_md.progress("MMU:enter", 0x111);
 
-<<<<<<< HEAD
-=======
-	/*
-	 * Reserve gigantic pages for hugetlb.  This MUST occur before
-	 * lowmem_end_addr is initialized below.
-	 */
-	if (memblock.memory.cnt > 1) {
-#ifndef CONFIG_WII
-		memblock_enforce_memory_limit(memblock.memory.regions[0].size);
-		pr_warn("Only using first contiguous memory region\n");
-#else
-		wii_memory_fixups();
-#endif
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	total_lowmem = total_memory = memblock_end_of_DRAM() - memstart_addr;
 	lowmem_end_addr = memstart_addr + total_lowmem;
 

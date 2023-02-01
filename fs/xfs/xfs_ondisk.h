@@ -134,7 +134,6 @@ xfs_check_ondisk_structs(void)
 	XFS_CHECK_STRUCT_SIZE(struct xfs_trans_header,		16);
 	XFS_CHECK_STRUCT_SIZE(struct xfs_attri_log_format,	40);
 	XFS_CHECK_STRUCT_SIZE(struct xfs_attrd_log_format,	16);
-<<<<<<< HEAD
 	XFS_CHECK_STRUCT_SIZE(struct xfs_bui_log_format,	16);
 	XFS_CHECK_STRUCT_SIZE(struct xfs_bud_log_format,	16);
 	XFS_CHECK_STRUCT_SIZE(struct xfs_cui_log_format,	16);
@@ -150,8 +149,6 @@ xfs_check_ondisk_structs(void)
 	XFS_CHECK_OFFSET(struct xfs_efi_log_format, efi_extents,	16);
 	XFS_CHECK_OFFSET(struct xfs_efi_log_format_32, efi_extents,	16);
 	XFS_CHECK_OFFSET(struct xfs_efi_log_format_64, efi_extents,	16);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The v5 superblock format extended several v4 header structures with

@@ -20,12 +20,8 @@ void can_flush_echo_skb(struct net_device *dev);
 int can_put_echo_skb(struct sk_buff *skb, struct net_device *dev,
 		     unsigned int idx, unsigned int frame_len);
 struct sk_buff *__can_get_echo_skb(struct net_device *dev, unsigned int idx,
-<<<<<<< HEAD
 				   unsigned int *len_ptr,
 				   unsigned int *frame_len_ptr);
-=======
-				   u8 *len_ptr, unsigned int *frame_len_ptr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned int __must_check can_get_echo_skb(struct net_device *dev,
 					   unsigned int idx,
 					   unsigned int *frame_len_ptr);
@@ -105,7 +101,6 @@ static inline struct sk_buff *can_create_echo_skb(struct sk_buff *skb)
 	return nskb;
 }
 
-<<<<<<< HEAD
 static inline bool can_is_can_skb(const struct sk_buff *skb)
 {
 	struct can_frame *cf = (struct can_frame *)skb->data;
@@ -150,9 +145,6 @@ static inline unsigned int can_skb_get_len_val(struct sk_buff *skb)
 
 /* get needed data length inside CAN frame for all frame types (RTR aware) */
 static inline unsigned int can_skb_get_data_len(struct sk_buff *skb)
-=======
-static inline bool can_is_canfd_skb(const struct sk_buff *skb)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned int len = can_skb_get_len_val(skb);
 	const struct can_frame *cf = (struct can_frame *)skb->data;

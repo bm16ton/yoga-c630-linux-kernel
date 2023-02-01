@@ -6,7 +6,6 @@
 
 #include <asm/msr-index.h>
 
-<<<<<<< HEAD
 /* IBS_OP_DATA2 DataSrc */
 #define IBS_DATA_SRC_LOC_CACHE			 2
 #define IBS_DATA_SRC_DRAM			 3
@@ -23,8 +22,6 @@
 #define IBS_DATA_SRC_EXT_EXT_MEM		 8
 #define IBS_DATA_SRC_EXT_PEER_AGENT_MEM		12
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * IBS Hardware MSRs
  */

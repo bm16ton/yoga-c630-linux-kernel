@@ -250,16 +250,4 @@ bool pcie_ptm_enabled(struct pci_dev *dev)
 
 	return dev->ptm_enabled;
 }
-<<<<<<< HEAD
-=======
-EXPORT_SYMBOL(pci_enable_ptm);
-
-bool pcie_ptm_enabled(struct pci_dev *dev)
-{
-	if (!dev)
-		return false;
-
-	return dev->ptm_enabled;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EXPORT_SYMBOL(pcie_ptm_enabled);

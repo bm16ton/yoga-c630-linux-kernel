@@ -1301,7 +1301,6 @@ static bool offload_pre_check(struct flow_cls_offload *flow)
 {
 	struct flow_rule *rule = flow_cls_offload_flow_rule(flow);
 	struct flow_dissector *dissector = rule->match.dissector;
-<<<<<<< HEAD
 	struct flow_match_ct ct;
 
 	if (dissector->used_keys & BIT(FLOW_DISSECTOR_KEY_CT)) {
@@ -1310,11 +1309,6 @@ static bool offload_pre_check(struct flow_cls_offload *flow)
 		if (memchr_inv(ct.key, 0, sizeof(*ct.key)))
 			return false;
 	}
-=======
-
-	if (dissector->used_keys & BIT(FLOW_DISSECTOR_KEY_CT))
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (flow->common.chain_index)
 		return false;

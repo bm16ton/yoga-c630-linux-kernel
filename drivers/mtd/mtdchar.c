@@ -684,7 +684,6 @@ static int mtdchar_write_ioctl(struct mtd_info *mtd,
 
 	kvfree(datbuf);
 	kvfree(oobbuf);
-<<<<<<< HEAD
 
 	return ret;
 }
@@ -816,8 +815,6 @@ out:
 
 	kvfree(datbuf);
 	kvfree(oobbuf);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }

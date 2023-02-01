@@ -456,22 +456,12 @@ int wil_if_add(struct wil6210_priv *wil)
 	init_dummy_netdev(&wil->napi_ndev);
 	if (wil->use_enhanced_dma_hw) {
 		netif_napi_add(&wil->napi_ndev, &wil->napi_rx,
-<<<<<<< HEAD
 			       wil6210_netdev_poll_rx_edma);
-=======
-			       wil6210_netdev_poll_rx_edma,
-			       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		netif_napi_add_tx(&wil->napi_ndev,
 				  &wil->napi_tx, wil6210_netdev_poll_tx_edma);
 	} else {
 		netif_napi_add(&wil->napi_ndev, &wil->napi_rx,
-<<<<<<< HEAD
 			       wil6210_netdev_poll_rx);
-=======
-			       wil6210_netdev_poll_rx,
-			       NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		netif_napi_add_tx(&wil->napi_ndev,
 				  &wil->napi_tx, wil6210_netdev_poll_tx);
 	}

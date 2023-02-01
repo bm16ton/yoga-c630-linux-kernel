@@ -1333,11 +1333,6 @@ static void update_curr_dl(struct rq *rq)
 
 	schedstat_set(curr->stats.exec_max,
 		      max(curr->stats.exec_max, delta_exec));
-<<<<<<< HEAD
-=======
-
-	trace_sched_stat_runtime(curr, delta_exec, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	trace_sched_stat_runtime(curr, delta_exec, 0);
 
@@ -1645,8 +1640,6 @@ static void
 enqueue_dl_entity(struct sched_dl_entity *dl_se, int flags)
 {
 	WARN_ON_ONCE(on_dl_rq(dl_se));
-
-	update_stats_enqueue_dl(dl_rq_of_se(dl_se), dl_se, flags);
 
 	update_stats_enqueue_dl(dl_rq_of_se(dl_se), dl_se, flags);
 
@@ -2029,11 +2022,7 @@ static struct task_struct *pick_task_dl(struct rq *rq)
 		return NULL;
 
 	dl_se = pick_next_dl_entity(dl_rq);
-<<<<<<< HEAD
 	WARN_ON_ONCE(!dl_se);
-=======
-	BUG_ON(!dl_se);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	p = dl_task_of(dl_se);
 
 	return p;

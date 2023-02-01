@@ -54,10 +54,6 @@
 #define HNS_ROCE_V2_AEQE_VEC_NUM		1
 #define HNS_ROCE_V2_ABNORMAL_VEC_NUM		1
 #define HNS_ROCE_V2_MAX_MTPT_NUM		0x100000
-<<<<<<< HEAD
-=======
-#define HNS_ROCE_V2_MAX_MTT_SEGS		0x1000000
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define HNS_ROCE_V2_MAX_SRQWQE_SEGS		0x1000000
 #define HNS_ROCE_V2_MAX_IDX_SEGS		0x1000000
 #define HNS_ROCE_V2_MAX_PD_NUM			0x1000000
@@ -274,14 +270,11 @@ enum hns_roce_cmd_return_status {
 	CMD_INVALID,
 	CMD_ROH_CHECK_FAIL,
 	CMD_OTHER_ERR = 0xff
-<<<<<<< HEAD
 };
 
 struct hns_roce_cmd_errcode {
 	enum hns_roce_cmd_return_status return_status;
 	int errno;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum hns_roce_sgid_type {
@@ -1339,15 +1332,9 @@ struct hns_roce_link_table {
 #define HNS_ROCE_EXT_LLM_MIN_PAGES(que_num) ((que_num) * 4 + 2)
 
 struct hns_roce_v2_free_mr {
-<<<<<<< HEAD
 	struct hns_roce_qp *rsv_qp[HNS_ROCE_FREE_MR_USED_QP_NUM];
 	struct hns_roce_cq *rsv_cq;
 	struct hns_roce_pd *rsv_pd;
-=======
-	struct ib_qp *rsv_qp[HNS_ROCE_FREE_MR_USED_QP_NUM];
-	struct ib_cq *rsv_cq;
-	struct ib_pd *rsv_pd;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mutex mutex;
 };
 

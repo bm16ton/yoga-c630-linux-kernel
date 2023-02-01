@@ -387,31 +387,19 @@
 			#interrupt-cells = <2>;
 
 			sdc2_off_state: sdc2-off-state {
-<<<<<<< HEAD
 				clk-pins {
-=======
-				clk {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pins = "sdc2_clk";
 					drive-strength = <2>;
 					bias-disable;
 				};
 
-<<<<<<< HEAD
 				cmd-pins {
-=======
-				cmd {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pins = "sdc2_cmd";
 					drive-strength = <2>;
 					bias-pull-up;
 				};
 
-<<<<<<< HEAD
 				data-pins {
-=======
-				data {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pins = "sdc2_data";
 					drive-strength = <2>;
 					bias-pull-up;
@@ -425,21 +413,13 @@
 					bias-disable;
 				};
 
-<<<<<<< HEAD
 				cmd-pins-pins {
-=======
-				cmd {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pins = "sdc2_cmd";
 					drive-strength = <10>;
 					bias-pull-up;
 				};
 
-<<<<<<< HEAD
 				data-pins {
-=======
-				data {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pins = "sdc2_data";
 					drive-strength = <10>;
 					bias-pull-up;
@@ -478,11 +458,7 @@
 		sdhc_1: mmc@4744000 {
 			compatible = "qcom,sm6125-sdhci", "qcom,sdhci-msm-v5";
 			reg = <0x04744000 0x1000>, <0x04745000 0x1000>;
-<<<<<<< HEAD
 			reg-names = "hc", "cqhci";
-=======
-			reg-names = "hc", "core";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			interrupts = <GIC_SPI 348 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 352 IRQ_TYPE_LEVEL_HIGH>;

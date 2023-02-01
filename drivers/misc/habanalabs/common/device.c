@@ -13,11 +13,8 @@
 #include <linux/pci.h>
 #include <linux/hwmon.h>
 
-<<<<<<< HEAD
 #include <trace/events/habanalabs.h>
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define HL_RESET_DELAY_USEC		10000	/* 10ms */
 
 enum dma_alloc_type {
@@ -31,14 +28,9 @@ enum dma_alloc_type {
 /*
  * hl_set_dram_bar- sets the bar to allow later access to address
  *
-<<<<<<< HEAD
  * @hdev: pointer to habanalabs device structure.
  * @addr: the address the caller wants to access.
  * @region: the PCI region.
-=======
- * @hdev: pointer to habanalabs device structure
- * @addr: the address the caller wants to access.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * @return: the old BAR base address on success, U64_MAX for failure.
  *	    The caller should set it back to the old address after use.
@@ -48,7 +40,6 @@ enum dma_alloc_type {
  * This function can be called also if the bar doesn't need to be set,
  * in that case it just won't change the base.
  */
-<<<<<<< HEAD
 static u64 hl_set_dram_bar(struct hl_device *hdev, u64 addr, struct pci_mem_region *region)
 {
 	struct asic_fixed_properties *prop = &hdev->asic_prop;
@@ -69,40 +60,19 @@ static u64 hl_set_dram_bar(struct hl_device *hdev, u64 addr, struct pci_mem_regi
 	return old_base;
 }
 
-=======
-static uint64_t hl_set_dram_bar(struct hl_device *hdev, u64 addr)
-{
-	struct asic_fixed_properties *prop = &hdev->asic_prop;
-	u64 bar_base_addr;
-
-	bar_base_addr = addr & ~(prop->dram_pci_bar_size - 0x1ull);
-
-	return hdev->asic_funcs->set_dram_bar_base(hdev, bar_base_addr);
-}
-
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int hl_access_sram_dram_region(struct hl_device *hdev, u64 addr, u64 *val,
 	enum debugfs_access_type acc_type, enum pci_region region_type)
 {
 	struct pci_mem_region *region = &hdev->pci_mem_region[region_type];
-<<<<<<< HEAD
 	void __iomem *acc_addr;
 	u64 old_base = 0, rc;
 
 	if (region_type == PCI_REGION_DRAM) {
 		old_base = hl_set_dram_bar(hdev, addr, region);
-=======
-	u64 old_base = 0, rc;
-
-	if (region_type == PCI_REGION_DRAM) {
-		old_base = hl_set_dram_bar(hdev, addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (old_base == U64_MAX)
 			return -EIO;
 	}
 
-<<<<<<< HEAD
 	acc_addr = hdev->pcie_bar[region->bar_id] + addr - region->region_base +
 			region->offset_in_bar;
 	switch (acc_type) {
@@ -123,41 +93,11 @@ static int hl_access_sram_dram_region(struct hl_device *hdev, u64 addr, u64 *val
 		break;
 	case DEBUGFS_WRITE64:
 		writeq(*val, acc_addr);
-=======
-	switch (acc_type) {
-	case DEBUGFS_READ8:
-		*val = readb(hdev->pcie_bar[region->bar_id] +
-			addr - region->region_base + region->offset_in_bar);
-		break;
-	case DEBUGFS_WRITE8:
-		writeb(*val, hdev->pcie_bar[region->bar_id] +
-			addr - region->region_base + region->offset_in_bar);
-		break;
-	case DEBUGFS_READ32:
-		*val = readl(hdev->pcie_bar[region->bar_id] +
-			addr - region->region_base + region->offset_in_bar);
-		break;
-	case DEBUGFS_WRITE32:
-		writel(*val, hdev->pcie_bar[region->bar_id] +
-			addr - region->region_base + region->offset_in_bar);
-		break;
-	case DEBUGFS_READ64:
-		*val = readq(hdev->pcie_bar[region->bar_id] +
-			addr - region->region_base + region->offset_in_bar);
-		break;
-	case DEBUGFS_WRITE64:
-		writeq(*val, hdev->pcie_bar[region->bar_id] +
-			addr - region->region_base + region->offset_in_bar);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 
 	if (region_type == PCI_REGION_DRAM) {
-<<<<<<< HEAD
 		rc = hl_set_dram_bar(hdev, old_base, region);
-=======
-		rc = hl_set_dram_bar(hdev, old_base);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (rc == U64_MAX)
 			return -EIO;
 	}
@@ -166,16 +106,10 @@ static int hl_access_sram_dram_region(struct hl_device *hdev, u64 addr, u64 *val
 }
 
 static void *hl_dma_alloc_common(struct hl_device *hdev, size_t size, dma_addr_t *dma_handle,
-<<<<<<< HEAD
 					gfp_t flag, enum dma_alloc_type alloc_type,
 					const char *caller)
 {
 	void *ptr = NULL;
-=======
-		gfp_t flag, enum dma_alloc_type alloc_type)
-{
-	void *ptr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (alloc_type) {
 	case DMA_ALLOC_COHERENT:
@@ -189,23 +123,16 @@ static void *hl_dma_alloc_common(struct hl_device *hdev, size_t size, dma_addr_t
 		break;
 	}
 
-<<<<<<< HEAD
 	if (trace_habanalabs_dma_alloc_enabled() && !ZERO_OR_NULL_PTR(ptr))
 		trace_habanalabs_dma_alloc(hdev->dev, (u64) (uintptr_t) ptr, *dma_handle, size,
 						caller);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ptr;
 }
 
 static void hl_asic_dma_free_common(struct hl_device *hdev, size_t size, void *cpu_addr,
-<<<<<<< HEAD
 					dma_addr_t dma_handle, enum dma_alloc_type alloc_type,
 					const char *caller)
-=======
-					dma_addr_t dma_handle, enum dma_alloc_type alloc_type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	switch (alloc_type) {
 	case DMA_ALLOC_COHERENT:
@@ -218,7 +145,6 @@ static void hl_asic_dma_free_common(struct hl_device *hdev, size_t size, void *c
 		hdev->asic_funcs->asic_dma_pool_free(hdev, cpu_addr, dma_handle);
 		break;
 	}
-<<<<<<< HEAD
 
 	trace_habanalabs_dma_free(hdev->dev, (u64) (uintptr_t) cpu_addr, dma_handle, size, caller);
 }
@@ -257,41 +183,6 @@ void hl_asic_dma_pool_free_caller(struct hl_device *hdev, void *vaddr, dma_addr_
 					const char *caller)
 {
 	hl_asic_dma_free_common(hdev, 0, vaddr, dma_addr, DMA_ALLOC_POOL, caller);
-=======
-}
-
-void *hl_asic_dma_alloc_coherent(struct hl_device *hdev, size_t size, dma_addr_t *dma_handle,
-					gfp_t flag)
-{
-	return hl_dma_alloc_common(hdev, size, dma_handle, flag, DMA_ALLOC_COHERENT);
-}
-
-void hl_asic_dma_free_coherent(struct hl_device *hdev, size_t size, void *cpu_addr,
-					dma_addr_t dma_handle)
-{
-	hl_asic_dma_free_common(hdev, size, cpu_addr, dma_handle, DMA_ALLOC_COHERENT);
-}
-
-void *hl_cpu_accessible_dma_pool_alloc(struct hl_device *hdev, size_t size, dma_addr_t *dma_handle)
-{
-	return hl_dma_alloc_common(hdev, size, dma_handle, 0, DMA_ALLOC_CPU_ACCESSIBLE);
-}
-
-void hl_cpu_accessible_dma_pool_free(struct hl_device *hdev, size_t size, void *vaddr)
-{
-	hl_asic_dma_free_common(hdev, size, vaddr, 0, DMA_ALLOC_CPU_ACCESSIBLE);
-}
-
-void *hl_asic_dma_pool_zalloc(struct hl_device *hdev, size_t size, gfp_t mem_flags,
-					dma_addr_t *dma_handle)
-{
-	return hl_dma_alloc_common(hdev, size, dma_handle, mem_flags, DMA_ALLOC_POOL);
-}
-
-void hl_asic_dma_pool_free(struct hl_device *hdev, void *vaddr, dma_addr_t dma_addr)
-{
-	hl_asic_dma_free_common(hdev, 0, vaddr, dma_addr, DMA_ALLOC_POOL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int hl_dma_map_sgtable(struct hl_device *hdev, struct sg_table *sgt, enum dma_data_direction dir)
@@ -395,7 +286,6 @@ int hl_access_dev_mem(struct hl_device *hdev, enum pci_region region_type,
 
 	return 0;
 }
-<<<<<<< HEAD
 
 void hl_engine_data_sprintf(struct engines_data *e, const char *fmt, ...)
 {
@@ -420,8 +310,6 @@ void hl_engine_data_sprintf(struct engines_data *e, const char *fmt, ...)
 	 */
 	e->actual_size += str_size;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum hl_device_status hl_device_status(struct hl_device *hdev)
 {
@@ -579,19 +467,11 @@ static int hl_device_release(struct inode *inode, struct file *filp)
 	hl_mem_mgr_fini(&hpriv->mem_mgr);
 
 	hdev->compute_ctx_in_release = 1;
-<<<<<<< HEAD
 
 	if (!hl_hpriv_put(hpriv))
 		dev_notice(hdev->dev,
 			"User process closed FD but device still in use\n");
 
-=======
-
-	if (!hl_hpriv_put(hpriv))
-		dev_notice(hdev->dev,
-			"User process closed FD but device still in use\n");
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hdev->last_open_session_duration_jif =
 		jiffies - hdev->last_successful_open_jif;
 
@@ -839,11 +719,7 @@ static int device_early_init(struct hl_device *hdev)
 
 	if (hdev->asic_prop.completion_queues_count) {
 		hdev->cq_wq = kcalloc(hdev->asic_prop.completion_queues_count,
-<<<<<<< HEAD
 				sizeof(struct workqueue_struct *),
-=======
-				sizeof(*hdev->cq_wq),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				GFP_KERNEL);
 		if (!hdev->cq_wq) {
 			rc = -ENOMEM;
@@ -971,15 +847,9 @@ static void device_early_fini(struct hl_device *hdev)
 
 	mutex_destroy(&hdev->fpriv_list_lock);
 	mutex_destroy(&hdev->fpriv_ctrl_list_lock);
-<<<<<<< HEAD
 
 	mutex_destroy(&hdev->clk_throttling.lock);
 
-=======
-
-	mutex_destroy(&hdev->clk_throttling.lock);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hl_mem_mgr_fini(&hdev->kernel_mem_mgr);
 
 	kfree(hdev->hl_chip_info);
@@ -1267,13 +1137,9 @@ int hl_device_resume(struct hl_device *hdev)
 	/* 'in_reset' was set to true during suspend, now we must clear it in order
 	 * for hard reset to be performed
 	 */
-<<<<<<< HEAD
 	spin_lock(&hdev->reset_info.lock);
 	hdev->reset_info.in_reset = 0;
 	spin_unlock(&hdev->reset_info.lock);
-=======
-	hdev->reset_info.in_reset = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rc = hl_device_reset(hdev, HL_DRV_RESET_HARD);
 	if (rc) {
@@ -1490,7 +1356,6 @@ int hl_device_reset(struct hl_device *hdev, u32 flags)
 
 	if (!hard_reset && !hdev->asic_prop.supports_compute_reset) {
 		hard_instead_soft = true;
-<<<<<<< HEAD
 		hard_reset = true;
 	}
 
@@ -1511,28 +1376,6 @@ int hl_device_reset(struct hl_device *hdev, u32 flags)
 		hard_reset = true;
 	}
 
-=======
-		hard_reset = true;
-	}
-
-	if (hdev->reset_upon_device_release && (flags & HL_DRV_RESET_DEV_RELEASE)) {
-		if (hard_reset) {
-			dev_crit(hdev->dev,
-				"Aborting reset because hard-reset is mutually exclusive with reset-on-device-release\n");
-			return -EINVAL;
-		}
-
-		reset_upon_device_release = true;
-
-		goto do_reset;
-	}
-
-	if (!hard_reset && !hdev->asic_prop.allow_inference_soft_reset) {
-		hard_instead_soft = true;
-		hard_reset = true;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (hard_instead_soft)
 		dev_dbg(hdev->dev, "Doing hard-reset instead of compute reset\n");
 
@@ -1768,11 +1611,7 @@ kill_processes:
 		if (!hdev->asic_prop.fw_security_enabled)
 			hl_fw_set_max_power(hdev);
 	} else {
-<<<<<<< HEAD
 		rc = hdev->asic_funcs->compute_reset_late_init(hdev);
-=======
-		rc = hdev->asic_funcs->non_hard_reset_late_init(hdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (rc) {
 			if (reset_upon_device_release)
 				dev_err(hdev->dev,
@@ -1788,17 +1627,10 @@ kill_processes:
 		dev_err(hdev->dev, "scrub mem failed from device reset (%d)\n", rc);
 		return rc;
 	}
-<<<<<<< HEAD
 
 	spin_lock(&hdev->reset_info.lock);
 	hdev->reset_info.in_compute_reset = 0;
 
-=======
-
-	spin_lock(&hdev->reset_info.lock);
-	hdev->reset_info.in_compute_reset = 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Schedule hard reset only if requested and if not already in hard reset.
 	 * We keep 'in_reset' enabled, so no other reset can go in during the hard
 	 * reset schedule
@@ -2031,11 +1863,7 @@ int hl_device_init(struct hl_device *hdev, struct class *hclass)
 	}
 
 	hdev->shadow_cs_queue = kcalloc(hdev->asic_prop.max_pending_cs,
-<<<<<<< HEAD
 					sizeof(struct hl_cs *), GFP_KERNEL);
-=======
-					sizeof(*hdev->shadow_cs_queue), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!hdev->shadow_cs_queue) {
 		rc = -ENOMEM;
 		goto cq_fini;
@@ -2067,15 +1895,9 @@ int hl_device_init(struct hl_device *hdev, struct class *hclass)
 	}
 
 	hdev->is_compute_ctx_active = false;
-<<<<<<< HEAD
 
 	hdev->asic_funcs->state_dump_init(hdev);
 
-=======
-
-	hdev->asic_funcs->state_dump_init(hdev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hdev->memory_scrub_val = MEM_SCRUB_DEFAULT_VAL;
 	hl_debugfs_add_device(hdev);
 

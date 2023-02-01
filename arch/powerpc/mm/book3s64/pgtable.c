@@ -553,7 +553,6 @@ EXPORT_SYMBOL_GPL(memremap_compat_align);
 
 pgprot_t vm_get_page_prot(unsigned long vm_flags)
 {
-<<<<<<< HEAD
 	unsigned long prot;
 
 	/* Radix supports execute-only, but protection_map maps X -> RX */
@@ -563,10 +562,6 @@ pgprot_t vm_get_page_prot(unsigned long vm_flags)
 		prot = pgprot_val(protection_map[vm_flags &
 						 (VM_ACCESS_FLAGS | VM_SHARED)]);
 	}
-=======
-	unsigned long prot = pgprot_val(protection_map[vm_flags &
-					(VM_READ|VM_WRITE|VM_EXEC|VM_SHARED)]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (vm_flags & VM_SAO)
 		prot |= _PAGE_SAO;

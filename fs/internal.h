@@ -63,11 +63,7 @@ extern int vfs_path_lookup(struct dentry *, struct vfsmount *,
 			   const char *, unsigned int, struct path *);
 int do_rmdir(int dfd, struct filename *name);
 int do_unlinkat(int dfd, struct filename *name);
-<<<<<<< HEAD
 int may_linkat(struct user_namespace *mnt_userns, const struct path *link);
-=======
-int may_linkat(struct user_namespace *mnt_userns, struct path *link);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int do_renameat2(int olddfd, struct filename *oldname, int newdfd,
 		 struct filename *newname, unsigned int flags);
 int do_mkdirat(int dfd, struct filename *name, umode_t mode);
@@ -236,8 +232,5 @@ ssize_t do_getxattr(struct user_namespace *mnt_userns,
 int setxattr_copy(const char __user *name, struct xattr_ctx *ctx);
 int do_setxattr(struct user_namespace *mnt_userns, struct dentry *dentry,
 		struct xattr_ctx *ctx);
-<<<<<<< HEAD
 
 ssize_t __kernel_write_iter(struct file *file, struct iov_iter *from, loff_t *pos);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

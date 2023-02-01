@@ -1470,7 +1470,6 @@ static int imsttfb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	struct imstt_par *par;
 	struct fb_info *info;
 	struct device_node *dp;
-<<<<<<< HEAD
 	int ret;
 
 	ret = aperture_remove_conflicting_pci_devices(pdev, "imsttfb");
@@ -1478,10 +1477,6 @@ static int imsttfb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		return ret;
 	ret = -ENOMEM;
 
-=======
-	int ret = -ENOMEM;
-	
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dp = pci_device_to_OF_node(pdev);
 	if(dp)
 		printk(KERN_INFO "%s: OF name %pOFn\n",__func__, dp);

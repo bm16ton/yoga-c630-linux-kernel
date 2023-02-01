@@ -585,11 +585,7 @@ static int meson_spicc_pow2_set_rate(struct clk_hw *hw, unsigned long rate,
 	return clk_divider_ops.set_rate(hw, rate, parent_rate);
 }
 
-<<<<<<< HEAD
 static const struct clk_ops meson_spicc_pow2_clk_ops = {
-=======
-const struct clk_ops meson_spicc_pow2_clk_ops = {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.recalc_rate = meson_spicc_pow2_recalc_rate,
 	.determine_rate = meson_spicc_pow2_determine_rate,
 	.set_rate = meson_spicc_pow2_set_rate,

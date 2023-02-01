@@ -313,12 +313,9 @@ static void vc4_txp_connector_atomic_commit(struct drm_connector *conn,
 		 * hardware will force the output padding to be 0xff.
 		 */
 		ctrl |= TXP_ALPHA_INVERT;
-<<<<<<< HEAD
 
 	if (!drm_dev_enter(drm, &idx))
 		return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	gem = drm_fb_dma_get_gem_obj(fb, 0);
 	TXP_WRITE(TXP_DST_PTR, gem->dma_addr + fb->offsets[0]);

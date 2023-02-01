@@ -21,10 +21,7 @@
 #include <linux/bitops.h>
 #include <linux/mutex.h>
 #include <linux/compat.h>
-<<<<<<< HEAD
 #include <linux/termios_internal.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "tty.h"
 
 #include <asm/io.h>

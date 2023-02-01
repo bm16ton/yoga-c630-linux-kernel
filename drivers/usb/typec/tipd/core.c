@@ -814,31 +814,19 @@ static int tps6598x_probe(struct i2c_client *client)
 
 	ret = devm_tps6598_psy_register(tps);
 	if (ret)
-<<<<<<< HEAD
 		goto err_role_put;
-=======
-		return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	tps->port = typec_register_port(&client->dev, &typec_cap);
 	if (IS_ERR(tps->port)) {
 		ret = PTR_ERR(tps->port);
 		goto err_role_put;
 	}
-<<<<<<< HEAD
-=======
-	fwnode_handle_put(fwnode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (status & TPS_STATUS_PLUG_PRESENT) {
 		ret = tps6598x_read16(tps, TPS_REG_POWER_STATUS, &tps->pwr_status);
 		if (ret < 0) {
 			dev_err(tps->dev, "failed to read power status: %d\n", ret);
-<<<<<<< HEAD
 			goto err_unregister_port;
-=======
-			goto err_role_put;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		ret = tps6598x_connect(tps, status);
 		if (ret)
@@ -851,7 +839,6 @@ static int tps6598x_probe(struct i2c_client *client)
 					dev_name(&client->dev), tps);
 	if (ret) {
 		tps6598x_disconnect(tps, 0);
-<<<<<<< HEAD
 		goto err_unregister_port;
 	}
 
@@ -862,16 +849,6 @@ static int tps6598x_probe(struct i2c_client *client)
 
 err_unregister_port:
 	typec_unregister_port(tps->port);
-=======
-		typec_unregister_port(tps->port);
-		goto err_role_put;
-	}
-
-	i2c_set_clientdata(client, tps);
-
-	return 0;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_role_put:
 	usb_role_switch_put(tps->role_sw);
 err_fwnode_put:
@@ -881,22 +858,13 @@ err_clear_mask:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void tps6598x_remove(struct i2c_client *client)
-=======
-static int tps6598x_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct tps6598x *tps = i2c_get_clientdata(client);
 
 	tps6598x_disconnect(tps, 0);
 	typec_unregister_port(tps->port);
 	usb_role_switch_put(tps->role_sw);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id tps6598x_of_match[] = {

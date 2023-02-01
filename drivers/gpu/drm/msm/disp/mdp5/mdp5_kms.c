@@ -559,11 +559,8 @@ static int mdp5_kms_init(struct drm_device *dev)
 	int irq, i, ret;
 
 	ret = mdp5_init(to_platform_device(dev->dev), dev);
-<<<<<<< HEAD
 	if (ret)
 		return ret;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* priv->kms would have been populated by the MDP5 driver */
 	kms = priv->kms;

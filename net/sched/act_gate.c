@@ -628,55 +628,6 @@ static int tcf_gate_offload_act_setup(struct tc_action *act, void *entry_data,
 	return 0;
 }
 
-static void tcf_gate_entry_destructor(void *priv)
-{
-	struct action_gate_entry *oe = priv;
-
-	kfree(oe);
-}
-
-static int tcf_gate_get_entries(struct flow_action_entry *entry,
-				const struct tc_action *act)
-{
-	entry->gate.entries = tcf_gate_get_list(act);
-
-	if (!entry->gate.entries)
-		return -EINVAL;
-
-	entry->destructor = tcf_gate_entry_destructor;
-	entry->destructor_priv = entry->gate.entries;
-
-	return 0;
-}
-
-static int tcf_gate_offload_act_setup(struct tc_action *act, void *entry_data,
-				      u32 *index_inc, bool bind,
-				      struct netlink_ext_ack *extack)
-{
-	int err;
-
-	if (bind) {
-		struct flow_action_entry *entry = entry_data;
-
-		entry->id = FLOW_ACTION_GATE;
-		entry->gate.prio = tcf_gate_prio(act);
-		entry->gate.basetime = tcf_gate_basetime(act);
-		entry->gate.cycletime = tcf_gate_cycletime(act);
-		entry->gate.cycletimeext = tcf_gate_cycletimeext(act);
-		entry->gate.num_entries = tcf_gate_num_entries(act);
-		err = tcf_gate_get_entries(entry, act);
-		if (err)
-			return err;
-		*index_inc = 1;
-	} else {
-		struct flow_offload_action *fl_action = entry_data;
-
-		fl_action->id = FLOW_ACTION_GATE;
-	}
-
-	return 0;
-}
-
 static struct tc_action_ops act_gate_ops = {
 	.kind		=	"gate",
 	.id		=	TCA_ID_GATE,
@@ -687,10 +638,6 @@ static struct tc_action_ops act_gate_ops = {
 	.cleanup	=	tcf_gate_cleanup,
 	.stats_update	=	tcf_gate_stats_update,
 	.get_fill_size	=	tcf_gate_get_fill_size,
-<<<<<<< HEAD
-=======
-	.lookup		=	tcf_gate_search,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.offload_act_setup =	tcf_gate_offload_act_setup,
 	.size		=	sizeof(struct tcf_gate),
 };

@@ -123,11 +123,7 @@ build_path_from_dentry_optional_prefix(struct dentry *direntry, void *page,
 	}
 	if (dfsplen) {
 		s -= dfsplen;
-<<<<<<< HEAD
 		memcpy(s, tcon->tree_name, dfsplen);
-=======
-		memcpy(s, tcon->treeName, dfsplen);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) {
 			int i;
 			for (i = 0; i < dfsplen; i++) {
@@ -180,10 +176,6 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
 	struct cifs_tcon *tcon = tlink_tcon(tlink);
 	const char *full_path;
 	void *page = alloc_dentry_path();
-<<<<<<< HEAD
-=======
-	FILE_ALL_INFO *buf = NULL;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct inode *newinode = NULL;
 	int disposition;
 	struct TCP_Server_Info *server = tcon->ses->server;
@@ -401,10 +393,6 @@ cifs_create_set_dentry:
 	d_add(direntry, newinode);
 
 out:
-<<<<<<< HEAD
-=======
-	kfree(buf);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	free_dentry_path(page);
 	return rc;
 
@@ -430,9 +418,6 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
 	__u32 oplock;
 	struct cifsFileInfo *file_info;
 	struct cifs_open_info_data buf = {};
-
-	if (unlikely(cifs_forced_shutdown(CIFS_SB(inode->i_sb))))
-		return -EIO;
 
 	if (unlikely(cifs_forced_shutdown(CIFS_SB(inode->i_sb))))
 		return -EIO;

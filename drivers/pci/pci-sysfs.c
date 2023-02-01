@@ -1379,7 +1379,6 @@ static const struct attribute_group pci_dev_reset_attr_group = {
 	.is_visible = pci_dev_reset_attr_is_visible,
 };
 
-<<<<<<< HEAD
 #define pci_dev_resource_resize_attr(n)					\
 static ssize_t resource##n##_resize_show(struct device *dev,		\
 					 struct device_attribute *attr,	\
@@ -1486,8 +1485,6 @@ static const struct attribute_group pci_dev_resource_resize_group = {
 	.is_visible = resource_resize_is_visible,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int __must_check pci_create_sysfs_dev_files(struct pci_dev *pdev)
 {
 	if (!sysfs_initialized)
@@ -1609,10 +1606,7 @@ const struct attribute_group *pci_dev_groups[] = {
 #ifdef CONFIG_ACPI
 	&pci_dev_acpi_attr_group,
 #endif
-<<<<<<< HEAD
 	&pci_dev_resource_resize_group,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	NULL,
 };
 

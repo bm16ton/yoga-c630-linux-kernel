@@ -1142,12 +1142,8 @@ static void iort_iommu_msi_get_resv_regions(struct device *dev,
 			struct iommu_resv_region *region;
 
 			region = iommu_alloc_resv_region(base + SZ_64K, SZ_64K,
-<<<<<<< HEAD
 							 prot, IOMMU_RESV_MSI,
 							 GFP_KERNEL);
-=======
-							 prot, IOMMU_RESV_MSI);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (region)
 				list_add_tail(&region->list, head);
 		}

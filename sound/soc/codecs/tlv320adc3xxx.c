@@ -1429,11 +1429,7 @@ err_unprepare_mclk:
 	return ret;
 }
 
-<<<<<<< HEAD
 static void __exit adc3xxx_i2c_remove(struct i2c_client *client)
-=======
-static int __exit adc3xxx_i2c_remove(struct i2c_client *client)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct adc3xxx *adc3xxx = i2c_get_clientdata(client);
 
@@ -1441,10 +1437,6 @@ static int __exit adc3xxx_i2c_remove(struct i2c_client *client)
 		clk_disable_unprepare(adc3xxx->mclk);
 	adc3xxx_free_gpio(adc3xxx);
 	snd_soc_unregister_component(&client->dev);
-<<<<<<< HEAD
-=======
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id tlv320adc3xxx_of_match[] = {

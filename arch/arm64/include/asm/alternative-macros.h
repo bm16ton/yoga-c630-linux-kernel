@@ -15,13 +15,10 @@
 #define ARM64_CB_SHIFT	15
 #define ARM64_CB_BIT	BIT(ARM64_CB_SHIFT)
 
-<<<<<<< HEAD
 #if ARM64_NCAPS >= ARM64_CB_BIT
 #error "cpucaps have overflown ARM64_CB_BIT"
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifndef __ASSEMBLY__
 
 #include <linux/stringify.h>

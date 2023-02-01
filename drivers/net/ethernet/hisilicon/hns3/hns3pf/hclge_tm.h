@@ -265,9 +265,6 @@ int hclge_tm_get_pg_shaper(struct hclge_dev *hdev, u8 pg_id,
 			   struct hclge_tm_shaper_para *para);
 int hclge_tm_get_port_shaper(struct hclge_dev *hdev,
 			     struct hclge_tm_shaper_para *para);
-<<<<<<< HEAD
 int hclge_up_to_tc_map(struct hclge_dev *hdev);
 int hclge_dscp_to_tc_map(struct hclge_dev *hdev);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

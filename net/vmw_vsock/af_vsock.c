@@ -2095,11 +2095,6 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
 	const struct vsock_transport *transport;
 	int err;
 
-<<<<<<< HEAD
-=======
-	DEFINE_WAIT(wait);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sk = sock->sk;
 	vsk = vsock_sk(sk);
 	err = 0;
@@ -2192,10 +2187,7 @@ static const struct proto_ops vsock_stream_ops = {
 	.recvmsg = vsock_connectible_recvmsg,
 	.mmap = sock_no_mmap,
 	.sendpage = sock_no_sendpage,
-<<<<<<< HEAD
 	.set_rcvlowat = vsock_set_rcvlowat,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct proto_ops vsock_seqpacket_ops = {

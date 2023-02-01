@@ -126,13 +126,10 @@ static void init_mqd(struct mqd_manager *mm, void **mqd,
 	m->compute_static_thread_mgmt_se1 = 0xFFFFFFFF;
 	m->compute_static_thread_mgmt_se2 = 0xFFFFFFFF;
 	m->compute_static_thread_mgmt_se3 = 0xFFFFFFFF;
-<<<<<<< HEAD
 	m->compute_static_thread_mgmt_se4 = 0xFFFFFFFF;
 	m->compute_static_thread_mgmt_se5 = 0xFFFFFFFF;
 	m->compute_static_thread_mgmt_se6 = 0xFFFFFFFF;
 	m->compute_static_thread_mgmt_se7 = 0xFFFFFFFF;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	m->cp_hqd_persistent_state = CP_HQD_PERSISTENT_STATE__PRELOAD_REQ_MASK |
 			0x55 << CP_HQD_PERSISTENT_STATE__PRELOAD_SIZE__SHIFT;
@@ -184,17 +181,6 @@ static int load_mqd(struct mqd_manager *mm, void *mqd,
 	return r;
 }
 
-<<<<<<< HEAD
-=======
-static int hiq_load_mqd_kiq(struct mqd_manager *mm, void *mqd,
-			    uint32_t pipe_id, uint32_t queue_id,
-			    struct queue_properties *p, struct mm_struct *mms)
-{
-	return mm->dev->kfd2kgd->hiq_mqd_load(mm->dev->adev, mqd, pipe_id,
-					      queue_id, p->doorbell_off);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void update_mqd(struct mqd_manager *mm, void *mqd,
 		       struct queue_properties *q,
 		       struct mqd_update_info *minfo)
@@ -266,34 +252,6 @@ static uint32_t read_doorbell_id(void *mqd)
 	return m->queue_doorbell_id0;
 }
 
-<<<<<<< HEAD
-=======
-static int destroy_mqd(struct mqd_manager *mm, void *mqd,
-		       enum kfd_preempt_type type,
-		       unsigned int timeout, uint32_t pipe_id,
-		       uint32_t queue_id)
-{
-	return mm->dev->kfd2kgd->hqd_destroy
-		(mm->dev->adev, mqd, type, timeout,
-		 pipe_id, queue_id);
-}
-
-static void free_mqd(struct mqd_manager *mm, void *mqd,
-			struct kfd_mem_obj *mqd_mem_obj)
-{
-	kfd_gtt_sa_free(mm->dev, mqd_mem_obj);
-}
-
-static bool is_occupied(struct mqd_manager *mm, void *mqd,
-			uint64_t queue_address,	uint32_t pipe_id,
-			uint32_t queue_id)
-{
-	return mm->dev->kfd2kgd->hqd_is_occupied(
-		mm->dev->adev, queue_address,
-		pipe_id, queue_id);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int get_wave_state(struct mqd_manager *mm, void *mqd,
 			  void __user *ctl_stack,
 			  u32 *ctl_stack_used_size,
@@ -362,18 +320,6 @@ static void init_mqd_sdma(struct mqd_manager *mm, void **mqd,
 	mm->update_mqd(mm, m, q, NULL);
 }
 
-<<<<<<< HEAD
-=======
-static int load_mqd_sdma(struct mqd_manager *mm, void *mqd,
-		uint32_t pipe_id, uint32_t queue_id,
-		struct queue_properties *p, struct mm_struct *mms)
-{
-	return mm->dev->kfd2kgd->hqd_sdma_load(mm->dev->adev, mqd,
-					       (uint32_t __user *)p->write_ptr,
-					       mms);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define SDMA_RLC_DUMMY_DEFAULT 0xf
 
 static void update_mqd_sdma(struct mqd_manager *mm, void *mqd,
@@ -406,28 +352,6 @@ static void update_mqd_sdma(struct mqd_manager *mm, void *mqd,
 	q->is_active = QUEUE_IS_ACTIVE(*q);
 }
 
-<<<<<<< HEAD
-=======
-/*
- *  * preempt type here is ignored because there is only one way
- *  * to preempt sdma queue
- */
-static int destroy_mqd_sdma(struct mqd_manager *mm, void *mqd,
-		enum kfd_preempt_type type,
-		unsigned int timeout, uint32_t pipe_id,
-		uint32_t queue_id)
-{
-	return mm->dev->kfd2kgd->hqd_sdma_destroy(mm->dev->adev, mqd, timeout);
-}
-
-static bool is_occupied_sdma(struct mqd_manager *mm, void *mqd,
-		uint64_t queue_address, uint32_t pipe_id,
-		uint32_t queue_id)
-{
-	return mm->dev->kfd2kgd->hqd_sdma_is_occupied(mm->dev->adev, mqd);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if defined(CONFIG_DEBUG_FS)
 
 static int debugfs_show_mqd(struct seq_file *m, void *data)
@@ -465,19 +389,11 @@ struct mqd_manager *mqd_manager_init_v11(enum KFD_MQD_TYPE type,
 		pr_debug("%s@%i\n", __func__, __LINE__);
 		mqd->allocate_mqd = allocate_mqd;
 		mqd->init_mqd = init_mqd;
-<<<<<<< HEAD
 		mqd->free_mqd = kfd_free_mqd_cp;
 		mqd->load_mqd = load_mqd;
 		mqd->update_mqd = update_mqd;
 		mqd->destroy_mqd = kfd_destroy_mqd_cp;
 		mqd->is_occupied = kfd_is_occupied_cp;
-=======
-		mqd->free_mqd = free_mqd;
-		mqd->load_mqd = load_mqd;
-		mqd->update_mqd = update_mqd;
-		mqd->destroy_mqd = destroy_mqd;
-		mqd->is_occupied = is_occupied;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mqd->mqd_size = sizeof(struct v11_compute_mqd);
 		mqd->get_wave_state = get_wave_state;
 #if defined(CONFIG_DEBUG_FS)
@@ -490,17 +406,10 @@ struct mqd_manager *mqd_manager_init_v11(enum KFD_MQD_TYPE type,
 		mqd->allocate_mqd = allocate_hiq_mqd;
 		mqd->init_mqd = init_mqd_hiq;
 		mqd->free_mqd = free_mqd_hiq_sdma;
-<<<<<<< HEAD
 		mqd->load_mqd = kfd_hiq_load_mqd_kiq;
 		mqd->update_mqd = update_mqd;
 		mqd->destroy_mqd = kfd_destroy_mqd_cp;
 		mqd->is_occupied = kfd_is_occupied_cp;
-=======
-		mqd->load_mqd = hiq_load_mqd_kiq;
-		mqd->update_mqd = update_mqd;
-		mqd->destroy_mqd = destroy_mqd;
-		mqd->is_occupied = is_occupied;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mqd->mqd_size = sizeof(struct v11_compute_mqd);
 #if defined(CONFIG_DEBUG_FS)
 		mqd->debugfs_show_mqd = debugfs_show_mqd;
@@ -511,19 +420,11 @@ struct mqd_manager *mqd_manager_init_v11(enum KFD_MQD_TYPE type,
 	case KFD_MQD_TYPE_DIQ:
 		mqd->allocate_mqd = allocate_mqd;
 		mqd->init_mqd = init_mqd_hiq;
-<<<<<<< HEAD
 		mqd->free_mqd = kfd_free_mqd_cp;
 		mqd->load_mqd = load_mqd;
 		mqd->update_mqd = update_mqd;
 		mqd->destroy_mqd = kfd_destroy_mqd_cp;
 		mqd->is_occupied = kfd_is_occupied_cp;
-=======
-		mqd->free_mqd = free_mqd;
-		mqd->load_mqd = load_mqd;
-		mqd->update_mqd = update_mqd;
-		mqd->destroy_mqd = destroy_mqd;
-		mqd->is_occupied = is_occupied;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mqd->mqd_size = sizeof(struct v11_compute_mqd);
 #if defined(CONFIG_DEBUG_FS)
 		mqd->debugfs_show_mqd = debugfs_show_mqd;
@@ -534,17 +435,10 @@ struct mqd_manager *mqd_manager_init_v11(enum KFD_MQD_TYPE type,
 		mqd->allocate_mqd = allocate_sdma_mqd;
 		mqd->init_mqd = init_mqd_sdma;
 		mqd->free_mqd = free_mqd_hiq_sdma;
-<<<<<<< HEAD
 		mqd->load_mqd = kfd_load_mqd_sdma;
 		mqd->update_mqd = update_mqd_sdma;
 		mqd->destroy_mqd = kfd_destroy_mqd_sdma;
 		mqd->is_occupied = kfd_is_occupied_sdma;
-=======
-		mqd->load_mqd = load_mqd_sdma;
-		mqd->update_mqd = update_mqd_sdma;
-		mqd->destroy_mqd = destroy_mqd_sdma;
-		mqd->is_occupied = is_occupied_sdma;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mqd->mqd_size = sizeof(struct v11_sdma_mqd);
 #if defined(CONFIG_DEBUG_FS)
 		mqd->debugfs_show_mqd = debugfs_show_mqd_sdma;

@@ -2552,11 +2552,8 @@ xlog_recover_process_intents(
 	for (lip = xfs_trans_ail_cursor_first(ailp, &cur, 0);
 	     lip != NULL;
 	     lip = xfs_trans_ail_cursor_next(ailp, &cur)) {
-<<<<<<< HEAD
 		const struct xfs_item_ops	*ops;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!xlog_item_is_intent(lip))
 			break;
 

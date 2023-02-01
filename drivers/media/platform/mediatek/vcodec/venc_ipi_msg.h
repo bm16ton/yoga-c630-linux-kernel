@@ -101,7 +101,6 @@ struct venc_ap_ipi_msg_enc_ext {
 };
 
 /**
-<<<<<<< HEAD
  * struct venc_ap_ipi_msg_enc_ext_34 - AP to SCP extended enc cmd structure
  * @msg_id:		message id (AP_IPIMSG_XXX_ENC_ENCODE)
  * @vpu_inst_addr:	VPU encoder instance addr
@@ -126,8 +125,6 @@ struct venc_ap_ipi_msg_enc_ext_34 {
 };
 
 /**
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * struct venc_ap_ipi_msg_deinit - AP to VPU deinit cmd structure
  * @msg_id:	message id (AP_IPIMSG_XXX_ENC_DEINIT)
  * @vpu_inst_addr:	VPU encoder instance addr

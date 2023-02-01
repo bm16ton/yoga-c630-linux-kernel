@@ -17,11 +17,7 @@ int z_erofs_fill_inode(struct inode *inode)
 	struct erofs_sb_info *sbi = EROFS_SB(inode->i_sb);
 
 	if (!erofs_sb_has_big_pcluster(sbi) &&
-<<<<<<< HEAD
 	    !erofs_sb_has_ztailpacking(sbi) && !erofs_sb_has_fragments(sbi) &&
-=======
-	    !erofs_sb_has_ztailpacking(sbi) &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    vi->datalayout == EROFS_INODE_FLAT_COMPRESSION_LEGACY) {
 		vi->z_advise = 0;
 		vi->z_algorithmtype[0] = 0;
@@ -59,13 +55,6 @@ static int z_erofs_fill_inode_lazy(struct inode *inode)
 	if (test_bit(EROFS_I_Z_INITED_BIT, &vi->flags))
 		goto out_unlock;
 
-<<<<<<< HEAD
-=======
-	DBG_BUGON(!erofs_sb_has_big_pcluster(EROFS_SB(sb)) &&
-		  !erofs_sb_has_ztailpacking(EROFS_SB(sb)) &&
-		  vi->datalayout == EROFS_INODE_FLAT_COMPRESSION_LEGACY);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pos = ALIGN(iloc(EROFS_SB(sb), vi->nid) + vi->inode_isize +
 		    vi->xattr_isize, 8);
 	kaddr = erofs_read_metabuf(&buf, sb, erofs_blknr(pos), EROFS_KMAP);
@@ -114,7 +103,6 @@ static int z_erofs_fill_inode_lazy(struct inode *inode)
 			  vi->nid);
 		err = -EFSCORRUPTED;
 		goto out_put_metabuf;
-<<<<<<< HEAD
 	}
 
 	if (vi->z_advise & Z_EROFS_ADVISE_INLINE_PCLUSTER) {
@@ -139,16 +127,10 @@ static int z_erofs_fill_inode_lazy(struct inode *inode)
 
 	if (vi->z_advise & Z_EROFS_ADVISE_FRAGMENT_PCLUSTER &&
 	    !(h->h_clusterbits >> Z_EROFS_FRAGMENT_INODE_BIT)) {
-=======
-	}
-
-	if (vi->z_advise & Z_EROFS_ADVISE_INLINE_PCLUSTER) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct erofs_map_blocks map = {
 			.buf = __EROFS_BUF_INITIALIZER
 		};
 
-<<<<<<< HEAD
 		vi->z_fragmentoff = le32_to_cpu(h->h_fragmentoff);
 		err = z_erofs_do_map_blocks(inode, &map,
 					    EROFS_GET_BLOCKS_FINDTAIL);
@@ -157,22 +139,6 @@ static int z_erofs_fill_inode_lazy(struct inode *inode)
 			goto out_put_metabuf;
 	}
 done:
-=======
-		vi->z_idata_size = le16_to_cpu(h->h_idata_size);
-		err = z_erofs_do_map_blocks(inode, &map,
-					    EROFS_GET_BLOCKS_FINDTAIL);
-		erofs_put_metabuf(&map.buf);
-
-		if (!map.m_plen ||
-		    erofs_blkoff(map.m_pa) + map.m_plen > EROFS_BLKSIZ) {
-			erofs_err(sb, "invalid tail-packing pclustersize %llu",
-				  map.m_plen);
-			err = -EFSCORRUPTED;
-		}
-		if (err < 0)
-			goto out_put_metabuf;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* paired with smp_mb() at the beginning of the function */
 	smp_mb();
 	set_bit(EROFS_I_Z_INITED_BIT, &vi->flags);
@@ -195,26 +161,9 @@ struct z_erofs_maprecorder {
 	u16 delta[2];
 	erofs_blk_t pblk, compressedblks;
 	erofs_off_t nextpackoff;
-<<<<<<< HEAD
 	bool partialref;
 };
 
-=======
-};
-
-static int z_erofs_reload_indexes(struct z_erofs_maprecorder *m,
-				  erofs_blk_t eblk)
-{
-	struct super_block *const sb = m->inode->i_sb;
-
-	m->kaddr = erofs_read_metabuf(&m->map->buf, sb, eblk,
-				      EROFS_KMAP_ATOMIC);
-	if (IS_ERR(m->kaddr))
-		return PTR_ERR(m->kaddr);
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int legacy_load_cluster_from_disk(struct z_erofs_maprecorder *m,
 					 unsigned long lcn)
 {
@@ -259,11 +208,8 @@ static int legacy_load_cluster_from_disk(struct z_erofs_maprecorder *m,
 	case Z_EROFS_VLE_CLUSTER_TYPE_PLAIN:
 	case Z_EROFS_VLE_CLUSTER_TYPE_HEAD1:
 	case Z_EROFS_VLE_CLUSTER_TYPE_HEAD2:
-<<<<<<< HEAD
 		if (advise & Z_EROFS_VLE_DI_PARTIAL_REF)
 			m->partialref = true;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		m->clusterofs = le16_to_cpu(di->di_clusterofs);
 		m->pblk = le32_to_cpu(di->di_u.blkaddr);
 		break;
@@ -469,16 +415,10 @@ static int compacted_load_cluster_from_disk(struct z_erofs_maprecorder *m,
 	amortizedshift = 2;
 out:
 	pos += lcn * (1 << amortizedshift);
-<<<<<<< HEAD
 	m->kaddr = erofs_read_metabuf(&m->map->buf, inode->i_sb,
 				      erofs_blknr(pos), EROFS_KMAP_ATOMIC);
 	if (IS_ERR(m->kaddr))
 		return PTR_ERR(m->kaddr);
-=======
-	err = z_erofs_reload_indexes(m, erofs_blknr(pos));
-	if (err)
-		return err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return unpack_compacted_index(m, amortizedshift, pos, lookahead);
 }
 
@@ -667,10 +607,7 @@ static int z_erofs_do_map_blocks(struct inode *inode,
 {
 	struct erofs_inode *const vi = EROFS_I(inode);
 	bool ztailpacking = vi->z_advise & Z_EROFS_ADVISE_INLINE_PCLUSTER;
-<<<<<<< HEAD
 	bool fragment = vi->z_advise & Z_EROFS_ADVISE_FRAGMENT_PCLUSTER;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct z_erofs_maprecorder m = {
 		.inode = inode,
 		.map = map,
@@ -740,7 +677,6 @@ static int z_erofs_do_map_blocks(struct inode *inode,
 		map->m_flags |= EROFS_MAP_PARTIAL_REF;
 	map->m_llen = end - map->m_la;
 
-<<<<<<< HEAD
 	if (flags & EROFS_GET_BLOCKS_FINDTAIL) {
 		vi->z_tailextent_headlcn = m.lcn;
 		/* for non-compact indexes, fragmentoff is 64 bits */
@@ -748,48 +684,18 @@ static int z_erofs_do_map_blocks(struct inode *inode,
 		    vi->datalayout == EROFS_INODE_FLAT_COMPRESSION_LEGACY)
 			vi->z_fragmentoff |= (u64)m.pblk << 32;
 	}
-=======
-	if (flags & EROFS_GET_BLOCKS_FINDTAIL)
-		vi->z_tailextent_headlcn = m.lcn;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ztailpacking && m.lcn == vi->z_tailextent_headlcn) {
 		map->m_flags |= EROFS_MAP_META;
 		map->m_pa = vi->z_idataoff;
 		map->m_plen = vi->z_idata_size;
-<<<<<<< HEAD
 	} else if (fragment && m.lcn == vi->z_tailextent_headlcn) {
 		map->m_flags |= EROFS_MAP_FRAGMENT;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		map->m_pa = blknr_to_addr(m.pblk);
 		err = z_erofs_get_extent_compressedlen(&m, initial_lcn);
 		if (err)
-<<<<<<< HEAD
 			goto unmap_out;
 	}
-=======
-			goto out;
-	}
-
-	if (m.headtype == Z_EROFS_VLE_CLUSTER_TYPE_PLAIN)
-		map->m_algorithmformat = Z_EROFS_COMPRESSION_SHIFTED;
-	else if (m.headtype == Z_EROFS_VLE_CLUSTER_TYPE_HEAD2)
-		map->m_algorithmformat = vi->z_algorithmtype[1];
-	else
-		map->m_algorithmformat = vi->z_algorithmtype[0];
-
-	if ((flags & EROFS_GET_BLOCKS_FIEMAP) ||
-	    ((flags & EROFS_GET_BLOCKS_READMORE) &&
-	     map->m_algorithmformat == Z_EROFS_COMPRESSION_LZMA &&
-	     map->m_llen >= EROFS_BLKSIZ)) {
-		err = z_erofs_get_extent_decompressedlen(&m);
-		if (!err)
-			map->m_flags |= EROFS_MAP_FULL_MAPPED;
-	}
-unmap_out:
-	erofs_unmap_metabuf(&m.map->buf);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (m.headtype == Z_EROFS_VLE_CLUSTER_TYPE_PLAIN) {
 		if (map->m_llen > map->m_plen) {
@@ -826,20 +732,10 @@ unmap_out:
 	return err;
 }
 
-<<<<<<< HEAD
 int z_erofs_map_blocks_iter(struct inode *inode, struct erofs_map_blocks *map,
 			    int flags)
 {
 	struct erofs_inode *const vi = EROFS_I(inode);
-=======
-	return err;
-}
-
-int z_erofs_map_blocks_iter(struct inode *inode,
-			    struct erofs_map_blocks *map,
-			    int flags)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err = 0;
 
 	trace_z_erofs_map_blocks_iter_enter(inode, map, flags);
@@ -856,7 +752,6 @@ int z_erofs_map_blocks_iter(struct inode *inode,
 	if (err)
 		goto out;
 
-<<<<<<< HEAD
 	if ((vi->z_advise & Z_EROFS_ADVISE_FRAGMENT_PCLUSTER) &&
 	    !vi->z_tailextent_headlcn) {
 		map->m_la = 0;
@@ -866,8 +761,6 @@ int z_erofs_map_blocks_iter(struct inode *inode,
 		goto out;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = z_erofs_do_map_blocks(inode, map, flags);
 out:
 	trace_z_erofs_map_blocks_iter_exit(inode, map, flags, err);
@@ -894,12 +787,8 @@ static int z_erofs_iomap_begin_report(struct inode *inode, loff_t offset,
 	iomap->length = map.m_llen;
 	if (map.m_flags & EROFS_MAP_MAPPED) {
 		iomap->type = IOMAP_MAPPED;
-<<<<<<< HEAD
 		iomap->addr = map.m_flags & EROFS_MAP_FRAGMENT ?
 			      IOMAP_NULL_ADDR : map.m_pa;
-=======
-		iomap->addr = map.m_pa;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		iomap->type = IOMAP_HOLE;
 		iomap->addr = IOMAP_NULL_ADDR;

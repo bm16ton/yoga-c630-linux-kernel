@@ -107,11 +107,7 @@ static int prestera_span_put(struct prestera_switch *sw, u8 span_id)
 
 	entry = prestera_span_entry_find_by_id(sw->span, span_id);
 	if (!entry)
-<<<<<<< HEAD
 		return -ENOENT;
-=======
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!refcount_dec_and_test(&entry->ref_count))
 		return 0;
@@ -124,14 +120,9 @@ static int prestera_span_put(struct prestera_switch *sw, u8 span_id)
 	return 0;
 }
 
-<<<<<<< HEAD
 int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
 			   struct prestera_port *to_port,
 			   bool ingress)
-=======
-static int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
-				  struct prestera_port *to_port)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct prestera_switch *sw = binding->port->sw;
 	u8 span_id;
@@ -145,11 +136,7 @@ static int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
 	if (err)
 		return err;
 
-<<<<<<< HEAD
 	err = prestera_hw_span_bind(binding->port, span_id, ingress);
-=======
-	err = prestera_hw_span_bind(binding->port, span_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err) {
 		prestera_span_put(sw, span_id);
 		return err;
@@ -159,7 +146,6 @@ static int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
 	return 0;
 }
 
-<<<<<<< HEAD
 int prestera_span_rule_del(struct prestera_flow_block_binding *binding,
 			   bool ingress)
 {
@@ -169,13 +155,6 @@ int prestera_span_rule_del(struct prestera_flow_block_binding *binding,
 		return -ENOENT;
 
 	err = prestera_hw_span_unbind(binding->port, ingress);
-=======
-static int prestera_span_rule_del(struct prestera_flow_block_binding *binding)
-{
-	int err;
-
-	err = prestera_hw_span_unbind(binding->port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -187,63 +166,6 @@ static int prestera_span_rule_del(struct prestera_flow_block_binding *binding)
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-int prestera_span_replace(struct prestera_flow_block *block,
-			  struct tc_cls_matchall_offload *f)
-{
-	struct prestera_flow_block_binding *binding;
-	__be16 protocol = f->common.protocol;
-	struct flow_action_entry *act;
-	struct prestera_port *port;
-	int err;
-
-	if (!flow_offload_has_one_action(&f->rule->action)) {
-		NL_SET_ERR_MSG(f->common.extack,
-			       "Only singular actions are supported");
-		return -EOPNOTSUPP;
-	}
-
-	act = &f->rule->action.entries[0];
-
-	if (!prestera_netdev_check(act->dev)) {
-		NL_SET_ERR_MSG(f->common.extack,
-			       "Only Marvell Prestera port is supported");
-		return -EINVAL;
-	}
-	if (!tc_cls_can_offload_and_chain0(act->dev, &f->common))
-		return -EOPNOTSUPP;
-	if (act->id != FLOW_ACTION_MIRRED)
-		return -EOPNOTSUPP;
-	if (protocol != htons(ETH_P_ALL))
-		return -EOPNOTSUPP;
-
-	port = netdev_priv(act->dev);
-
-	list_for_each_entry(binding, &block->binding_list, list) {
-		err = prestera_span_rule_add(binding, port);
-		if (err)
-			goto rollback;
-	}
-
-	return 0;
-
-rollback:
-	list_for_each_entry_continue_reverse(binding,
-					     &block->binding_list, list)
-		prestera_span_rule_del(binding);
-	return err;
-}
-
-void prestera_span_destroy(struct prestera_flow_block *block)
-{
-	struct prestera_flow_block_binding *binding;
-
-	list_for_each_entry(binding, &block->binding_list, list)
-		prestera_span_rule_del(binding);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int prestera_span_init(struct prestera_switch *sw)
 {
 	struct prestera_span *span;

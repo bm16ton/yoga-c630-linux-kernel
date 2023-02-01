@@ -1295,12 +1295,8 @@ irqreturn_t mei_me_irq_thread_handler(int irq, void *dev_id)
 
 	/* check if ME wants a reset */
 	if (!mei_hw_is_ready(dev) && dev->dev_state != MEI_DEV_RESETTING) {
-<<<<<<< HEAD
 		dev_warn(dev->dev, "FW not ready: resetting: dev_state = %d pxp = %d\n",
 			 dev->dev_state, dev->pxp_mode);
-=======
-		dev_warn(dev->dev, "FW not ready: resetting.\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (dev->dev_state == MEI_DEV_POWERING_DOWN ||
 		    dev->dev_state == MEI_DEV_POWER_DOWN)
 			mei_cl_all_disconnect(dev);
@@ -1371,7 +1367,6 @@ end:
 	return IRQ_HANDLED;
 }
 EXPORT_SYMBOL_GPL(mei_me_irq_thread_handler);
-<<<<<<< HEAD
 
 #define MEI_POLLING_TIMEOUT_ACTIVE 100
 #define MEI_POLLING_TIMEOUT_IDLE   500
@@ -1432,8 +1427,6 @@ int mei_me_polling_thread(void *_dev)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(mei_me_polling_thread);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct mei_hw_ops mei_me_hw_ops = {
 

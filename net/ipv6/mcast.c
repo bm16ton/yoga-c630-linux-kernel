@@ -612,12 +612,7 @@ int ip6_mc_msfget(struct sock *sk, struct group_filter *gsf,
 
 	copycount = count < gsf->gf_numsrc ? count : gsf->gf_numsrc;
 	gsf->gf_numsrc = count;
-<<<<<<< HEAD
 	for (i = 0; i < copycount; i++) {
-=======
-
-	for (i = 0; i < copycount; i++, p++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct sockaddr_in6 *psin6;
 		struct sockaddr_storage ss;
 
@@ -1103,7 +1098,6 @@ static void mld_dad_stop_work(struct inet6_dev *idev)
 }
 
 static void mld_query_stop_work(struct inet6_dev *idev)
-<<<<<<< HEAD
 {
 	spin_lock_bh(&idev->mc_query_lock);
 	if (cancel_delayed_work(&idev->mc_query_work))
@@ -1113,17 +1107,6 @@ static void mld_query_stop_work(struct inet6_dev *idev)
 
 static void mld_report_stop_work(struct inet6_dev *idev)
 {
-=======
-{
-	spin_lock_bh(&idev->mc_query_lock);
-	if (cancel_delayed_work(&idev->mc_query_work))
-		__in6_dev_put(idev);
-	spin_unlock_bh(&idev->mc_query_lock);
-}
-
-static void mld_report_stop_work(struct inet6_dev *idev)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (cancel_delayed_work_sync(&idev->mc_report_work))
 		__in6_dev_put(idev);
 }

@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
 /*
-<<<<<<< HEAD
  * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All rights reserved.
-=======
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All rights reserved.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <linux/dma-buf.h>
@@ -1148,10 +1144,7 @@ int efa_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
 	params.dma_addr = cq->dma_addr;
 	params.entry_size_in_bytes = cmd.cq_entry_size;
 	params.num_sub_cqs = cmd.num_sub_cqs;
-<<<<<<< HEAD
 	params.set_src_addr = set_src_addr;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (cmd.flags & EFA_CREATE_CQ_WITH_COMPLETION_CHANNEL) {
 		cq->eq = efa_vec2eq(dev, attr->comp_vector);
 		params.eqn = cq->eq->eeq.eqn;

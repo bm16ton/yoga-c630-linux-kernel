@@ -82,11 +82,6 @@ bool pci_reset_supported(struct pci_dev *dev)
 	return dev->reset_methods[0] != 0;
 }
 
-bool pci_reset_supported(struct pci_dev *dev)
-{
-	return dev->reset_methods[0] != 0;
-}
-
 #ifdef CONFIG_PCI_DOMAINS
 int pci_domains_supported = 1;
 #endif
@@ -2761,30 +2756,12 @@ int pci_finish_runtime_suspend(struct pci_dev *dev)
 	if (target_state == PCI_POWER_ERROR)
 		return -EIO;
 
-<<<<<<< HEAD
-=======
-	/*
-	 * There are systems (for example, Intel mobile chips since Coffee
-	 * Lake) where the power drawn while suspended can be significantly
-	 * reduced by disabling PTM on PCIe root ports as this allows the
-	 * port to enter a lower-power PM state and the SoC to reach a
-	 * lower-power idle state as a whole.
-	 */
-	if (pci_pcie_type(dev) == PCI_EXP_TYPE_ROOT_PORT)
-		pci_disable_ptm(dev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__pci_enable_wake(dev, target_state, pci_dev_run_wake(dev));
 
 	error = pci_set_power_state(dev, target_state);
 
 	if (error)
 		pci_enable_wake(dev, target_state, false);
-<<<<<<< HEAD
-=======
-		pci_restore_ptm_state(dev);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return error;
 }

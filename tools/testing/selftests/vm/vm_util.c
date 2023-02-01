@@ -42,15 +42,9 @@ void clear_softdirty(void)
 		ksft_exit_fail_msg("writing clear_refs failed\n");
 }
 
-<<<<<<< HEAD
 bool check_for_pattern(FILE *fp, const char *pattern, char *buf, size_t len)
 {
 	while (fgets(buf, len, fp)) {
-=======
-static bool check_for_pattern(FILE *fp, const char *pattern, char *buf)
-{
-	while (fgets(buf, MAX_LINE_LENGTH, fp) != NULL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!strncmp(buf, pattern, strlen(pattern)))
 			return true;
 	}
@@ -78,16 +72,10 @@ uint64_t read_pmd_pagesize(void)
 	return strtoul(buf, NULL, 10);
 }
 
-<<<<<<< HEAD
 bool __check_huge(void *addr, char *pattern, int nr_hpages,
 		  uint64_t hpage_size)
 {
 	uint64_t thp = -1;
-=======
-uint64_t check_huge(void *addr)
-{
-	uint64_t thp = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 	FILE *fp;
 	char buffer[MAX_LINE_LENGTH];
@@ -102,7 +90,6 @@ uint64_t check_huge(void *addr)
 	if (!fp)
 		ksft_exit_fail_msg("%s: Failed to open file %s\n", __func__, SMAP_FILE_PATH);
 
-<<<<<<< HEAD
 	if (!check_for_pattern(fp, addr_pattern, buffer, sizeof(buffer)))
 		goto err_out;
 
@@ -116,24 +103,10 @@ uint64_t check_huge(void *addr)
 	snprintf(addr_pattern, MAX_LINE_LENGTH, "%s%%9ld kB", pattern);
 
 	if (sscanf(buffer, addr_pattern, &thp) != 1)
-=======
-	if (!check_for_pattern(fp, addr_pattern, buffer))
-		goto err_out;
-
-	/*
-	 * Fetch the AnonHugePages: in the same block and check the number of
-	 * hugepages.
-	 */
-	if (!check_for_pattern(fp, "AnonHugePages:", buffer))
-		goto err_out;
-
-	if (sscanf(buffer, "AnonHugePages:%10ld kB", &thp) != 1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ksft_exit_fail_msg("Reading smap error\n");
 
 err_out:
 	fclose(fp);
-<<<<<<< HEAD
 	return thp == (nr_hpages * (hpage_size >> 10));
 }
 
@@ -150,7 +123,4 @@ bool check_huge_file(void *addr, int nr_hpages, uint64_t hpage_size)
 bool check_huge_shmem(void *addr, int nr_hpages, uint64_t hpage_size)
 {
 	return __check_huge(addr, "ShmemPmdMapped:", nr_hpages, hpage_size);
-=======
-	return thp;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

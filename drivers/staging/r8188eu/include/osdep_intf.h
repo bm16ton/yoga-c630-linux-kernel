@@ -39,12 +39,9 @@ The protection mechanism is through the pending queue.
 	u8 bio_timer_cancel;
 };
 
-<<<<<<< HEAD
 int netdev_open(struct net_device *pnetdev);
 int netdev_close(struct net_device *pnetdev);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 u8 rtw_init_drv_sw(struct adapter *padapter);
 u8 rtw_free_drv_sw(struct adapter *padapter);
 u8 rtw_reset_drv_sw(struct adapter *padapter);

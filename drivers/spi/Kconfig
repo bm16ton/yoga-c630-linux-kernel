@@ -601,7 +601,6 @@ config SPI_MICROCHIP_CORE
 	  PolarFire SoC.
 	  If built as a module, it will be called spi-microchip-core.
 
-<<<<<<< HEAD
 config SPI_MICROCHIP_CORE_QSPI
 	tristate "Microchip FPGA QSPI controllers"
 	depends on SPI_MASTER
@@ -611,8 +610,6 @@ config SPI_MICROCHIP_CORE_QSPI
 	  PolarFire SoC.
 	  If built as a module, it will be called spi-microchip-core-qspi.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config SPI_MT65XX
 	tristate "MediaTek SPI controller"
 	depends on ARCH_MEDIATEK || COMPILE_TEST

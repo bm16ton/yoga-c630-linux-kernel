@@ -75,77 +75,45 @@ static void scale_test(const char *file,
 
 void test_verif_scale1()
 {
-<<<<<<< HEAD
 	scale_test("test_verif_scale1.bpf.o", BPF_PROG_TYPE_SCHED_CLS, false);
-=======
-	scale_test("test_verif_scale1.o", BPF_PROG_TYPE_SCHED_CLS, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale2()
 {
-<<<<<<< HEAD
 	scale_test("test_verif_scale2.bpf.o", BPF_PROG_TYPE_SCHED_CLS, false);
-=======
-	scale_test("test_verif_scale2.o", BPF_PROG_TYPE_SCHED_CLS, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale3()
 {
-<<<<<<< HEAD
 	scale_test("test_verif_scale3.bpf.o", BPF_PROG_TYPE_SCHED_CLS, false);
-=======
-	scale_test("test_verif_scale3.o", BPF_PROG_TYPE_SCHED_CLS, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf_global()
 {
-<<<<<<< HEAD
 	scale_test("pyperf_global.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf_global.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf_subprogs()
 {
-<<<<<<< HEAD
 	scale_test("pyperf_subprogs.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf_subprogs.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf50()
 {
 	/* full unroll by llvm */
-<<<<<<< HEAD
 	scale_test("pyperf50.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf50.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf100()
 {
 	/* full unroll by llvm */
-<<<<<<< HEAD
 	scale_test("pyperf100.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf100.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf180()
 {
 	/* full unroll by llvm */
-<<<<<<< HEAD
 	scale_test("pyperf180.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf180.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf600()
@@ -156,21 +124,13 @@ void test_verif_scale_pyperf600()
 	 * 16k insns in loop body.
 	 * Total of 5 such loops. Total program size ~82k insns.
 	 */
-<<<<<<< HEAD
 	scale_test("pyperf600.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf600.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf600_bpf_loop(void)
 {
 	/* use the bpf_loop helper*/
-<<<<<<< HEAD
 	scale_test("pyperf600_bpf_loop.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf600_bpf_loop.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_pyperf600_nounroll()
@@ -181,65 +141,37 @@ void test_verif_scale_pyperf600_nounroll()
 	 * ~110 insns in loop body.
 	 * Total of 5 such loops. Total program size ~1500 insns.
 	 */
-<<<<<<< HEAD
 	scale_test("pyperf600_nounroll.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("pyperf600_nounroll.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_loop1()
 {
-<<<<<<< HEAD
 	scale_test("loop1.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("loop1.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_loop2()
 {
-<<<<<<< HEAD
 	scale_test("loop2.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("loop2.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_loop3_fail()
 {
-<<<<<<< HEAD
 	scale_test("loop3.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, true /* fails */);
-=======
-	scale_test("loop3.o", BPF_PROG_TYPE_RAW_TRACEPOINT, true /* fails */);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_loop4()
 {
-<<<<<<< HEAD
 	scale_test("loop4.bpf.o", BPF_PROG_TYPE_SCHED_CLS, false);
-=======
-	scale_test("loop4.o", BPF_PROG_TYPE_SCHED_CLS, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_loop5()
 {
-<<<<<<< HEAD
 	scale_test("loop5.bpf.o", BPF_PROG_TYPE_SCHED_CLS, false);
-=======
-	scale_test("loop5.o", BPF_PROG_TYPE_SCHED_CLS, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_loop6()
 {
-<<<<<<< HEAD
 	scale_test("loop6.bpf.o", BPF_PROG_TYPE_KPROBE, false);
-=======
-	scale_test("loop6.o", BPF_PROG_TYPE_KPROBE, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_strobemeta()
@@ -248,94 +180,54 @@ void test_verif_scale_strobemeta()
 	 * Total program size 20.8k insn.
 	 * ~350k processed_insns
 	 */
-<<<<<<< HEAD
 	scale_test("strobemeta.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("strobemeta.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_strobemeta_bpf_loop(void)
 {
 	/* use the bpf_loop helper*/
-<<<<<<< HEAD
 	scale_test("strobemeta_bpf_loop.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("strobemeta_bpf_loop.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_strobemeta_nounroll1()
 {
 	/* no unroll, tiny loops */
-<<<<<<< HEAD
 	scale_test("strobemeta_nounroll1.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("strobemeta_nounroll1.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_strobemeta_nounroll2()
 {
 	/* no unroll, tiny loops */
-<<<<<<< HEAD
 	scale_test("strobemeta_nounroll2.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("strobemeta_nounroll2.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_strobemeta_subprogs()
 {
 	/* non-inlined subprogs */
-<<<<<<< HEAD
 	scale_test("strobemeta_subprogs.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
-=======
-	scale_test("strobemeta_subprogs.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_sysctl_loop1()
 {
-<<<<<<< HEAD
 	scale_test("test_sysctl_loop1.bpf.o", BPF_PROG_TYPE_CGROUP_SYSCTL, false);
-=======
-	scale_test("test_sysctl_loop1.o", BPF_PROG_TYPE_CGROUP_SYSCTL, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_sysctl_loop2()
 {
-<<<<<<< HEAD
 	scale_test("test_sysctl_loop2.bpf.o", BPF_PROG_TYPE_CGROUP_SYSCTL, false);
-=======
-	scale_test("test_sysctl_loop2.o", BPF_PROG_TYPE_CGROUP_SYSCTL, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_xdp_loop()
 {
-<<<<<<< HEAD
 	scale_test("test_xdp_loop.bpf.o", BPF_PROG_TYPE_XDP, false);
-=======
-	scale_test("test_xdp_loop.o", BPF_PROG_TYPE_XDP, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_scale_seg6_loop()
 {
-<<<<<<< HEAD
 	scale_test("test_seg6_loop.bpf.o", BPF_PROG_TYPE_LWT_SEG6LOCAL, false);
-=======
-	scale_test("test_seg6_loop.o", BPF_PROG_TYPE_LWT_SEG6LOCAL, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void test_verif_twfw()
 {
-<<<<<<< HEAD
 	scale_test("twfw.bpf.o", BPF_PROG_TYPE_CGROUP_SKB, false);
-=======
-	scale_test("twfw.o", BPF_PROG_TYPE_CGROUP_SKB, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

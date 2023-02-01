@@ -1678,11 +1678,7 @@
 				<GIC_SPI 278 IRQ_TYPE_LEVEL_LOW>;
 			interrupt-names = "job", "mmu", "gpu";
 
-<<<<<<< HEAD
 			clocks = <&mfgcfg CLK_MFG_BG3D>;
-=======
-			clocks = <&topckgen CLK_TOP_MFGPLL_CK>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			power-domains =
 				<&spm MT8183_POWER_DOMAIN_MFG_CORE0>,
@@ -1898,7 +1894,6 @@
 				 <&mmsys CLK_MM_GALS_COMM1>;
 			clock-names = "apb", "smi", "gals0", "gals1";
 			power-domains = <&spm MT8183_POWER_DOMAIN_DISP>;
-<<<<<<< HEAD
 		};
 
 		mdp3-ccorr@1401c000 {
@@ -1908,8 +1903,6 @@
 			mediatek,gce-events = <CMDQ_EVENT_MDP_CCORR_SOF>,
 					      <CMDQ_EVENT_MDP_CCORR_EOF>;
 			clocks = <&mmsys CLK_MM_MDP_CCORR>;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		imgsys: syscon@15020000 {

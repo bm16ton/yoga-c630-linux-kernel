@@ -183,17 +183,10 @@ static void byt_i2c_setup(struct lpss_private_data *pdata)
 	acpi_handle handle = pdata->adev->handle;
 	unsigned long long shared_host = 0;
 	acpi_status status;
-<<<<<<< HEAD
 	u64 uid;
 
 	/* Expected to always be successfull, but better safe then sorry */
 	if (!acpi_dev_uid_to_integer(pdata->adev, &uid) && uid) {
-=======
-	long uid = 0;
-
-	/* Expected to always be true, but better safe then sorry */
-	if (uid_str && !kstrtol(uid_str, 10, &uid) && uid) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Detect I2C bus shared with PUNIT and ignore its d3 status */
 		status = acpi_evaluate_integer(handle, "_SEM", NULL, &shared_host);
 		if (ACPI_SUCCESS(status) && shared_host)
@@ -398,16 +391,6 @@ static const struct acpi_device_id acpi_lpss_device_ids[] = {
 
 #ifdef CONFIG_X86_INTEL_LPSS
 
-<<<<<<< HEAD
-=======
-static int is_memory(struct acpi_resource *res, void *not_used)
-{
-	struct resource r;
-
-	return !acpi_dev_resource_memory(res, &r);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* LPSS main clock device. */
 static struct platform_device *lpss_clk_dev;
 

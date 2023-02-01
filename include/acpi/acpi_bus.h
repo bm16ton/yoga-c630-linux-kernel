@@ -366,10 +366,6 @@ struct acpi_device {
 	int device_type;
 	acpi_handle handle;		/* no handle for fixed hardware */
 	struct fwnode_handle fwnode;
-<<<<<<< HEAD
-=======
-	struct acpi_device *parent;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct list_head wakeup_list;
 	struct list_head del_list;
 	struct acpi_device_status status;
@@ -524,10 +520,6 @@ extern int unregister_acpi_notifier(struct notifier_block *);
  * External Functions
  */
 
-<<<<<<< HEAD
-=======
-struct acpi_device *acpi_fetch_acpi_dev(acpi_handle handle);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 acpi_status acpi_bus_get_status_handle(acpi_handle handle,
 				       unsigned long long *sta);
 int acpi_bus_get_status(struct acpi_device *device);
@@ -628,12 +620,7 @@ enum dev_dma_attr acpi_get_dma_attr(struct acpi_device *adev);
 int acpi_iommu_fwspec_init(struct device *dev, u32 id,
 			   struct fwnode_handle *fwnode,
 			   const struct iommu_ops *ops);
-<<<<<<< HEAD
 int acpi_dma_get_range(struct device *dev, const struct bus_dma_region **map);
-=======
-int acpi_dma_get_range(struct device *dev, u64 *dma_addr, u64 *offset,
-		       u64 *size);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int acpi_dma_configure_id(struct device *dev, enum dev_dma_attr attr,
 			   const u32 *input_id);
 static inline int acpi_dma_configure(struct device *dev,
@@ -770,9 +757,6 @@ struct acpi_device *acpi_dev_get_next_consumer_dev(struct acpi_device *supplier,
 	     consumer;							\
 	     consumer = acpi_dev_get_next_consumer_dev(supplier, consumer))
 
-void acpi_dev_clear_dependencies(struct acpi_device *supplier);
-bool acpi_dev_ready_for_enumeration(const struct acpi_device *device);
-struct acpi_device *acpi_dev_get_first_consumer_dev(struct acpi_device *supplier);
 struct acpi_device *
 acpi_dev_get_next_match_dev(struct acpi_device *adev, const char *hid, const char *uid, s64 hrv);
 struct acpi_device *
@@ -803,16 +787,10 @@ static inline void acpi_dev_put(struct acpi_device *adev)
 		put_device(&adev->dev);
 }
 
-<<<<<<< HEAD
 struct acpi_device *acpi_fetch_acpi_dev(acpi_handle handle);
 struct acpi_device *acpi_get_acpi_dev(acpi_handle handle);
 
 static inline void acpi_put_acpi_dev(struct acpi_device *adev)
-=======
-struct acpi_device *acpi_bus_get_acpi_device(acpi_handle handle);
-
-static inline void acpi_bus_put_acpi_device(struct acpi_device *adev)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	acpi_dev_put(adev);
 }

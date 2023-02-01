@@ -77,17 +77,10 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
 	    hsr_sup_tag->tlv.HSR_TLV_type != HSR_TLV_LIFE_CHECK &&
 	    hsr_sup_tag->tlv.HSR_TLV_type != PRP_TLV_LIFE_CHECK_DD &&
 	    hsr_sup_tag->tlv.HSR_TLV_type != PRP_TLV_LIFE_CHECK_DA)
-<<<<<<< HEAD
 		return false;
 	if (hsr_sup_tag->tlv.HSR_TLV_length != 12 &&
 	    hsr_sup_tag->tlv.HSR_TLV_length != sizeof(struct hsr_sup_payload))
 		return false;
-=======
-		return false;
-	if (hsr_sup_tag->tlv.HSR_TLV_length != 12 &&
-	    hsr_sup_tag->tlv.HSR_TLV_length != sizeof(struct hsr_sup_payload))
-		return false;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Get next tlv */
 	total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tag->tlv.HSR_TLV_length;
@@ -576,23 +569,20 @@ static int fill_frame_info(struct hsr_frame_info *frame,
 	struct ethhdr *ethhdr;
 	__be16 proto;
 	int ret;
-	u32 hash;
 
 	/* Check if skb contains ethhdr */
 	if (skb->mac_len < sizeof(struct ethhdr))
 		return -EINVAL;
 
 	memset(frame, 0, sizeof(*frame));
-
-	ethhdr = (struct ethhdr *)skb_mac_header(skb);
-	hash = hsr_mac_hash(port->hsr, ethhdr->h_source);
 	frame->is_supervision = is_supervision_frame(port->hsr, skb);
-	frame->node_src = hsr_get_node(port, &hsr->node_db[hash], skb,
+	frame->node_src = hsr_get_node(port, &hsr->node_db, skb,
 				       frame->is_supervision,
 				       port->type);
 	if (!frame->node_src)
 		return -1; /* Unknown node and !is_supervision, or no mem */
 
+	ethhdr = (struct ethhdr *)skb_mac_header(skb);
 	frame->is_vlan = false;
 	proto = ethhdr->h_proto;
 

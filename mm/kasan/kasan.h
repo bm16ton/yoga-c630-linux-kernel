@@ -8,63 +8,24 @@
 #include <linux/kfence.h>
 #include <linux/stackdepot.h>
 
-<<<<<<< HEAD
 #if defined(CONFIG_KASAN_SW_TAGS) || defined(CONFIG_KASAN_HW_TAGS)
 
 #include <linux/static_key.h>
 
 DECLARE_STATIC_KEY_TRUE(kasan_flag_stacktrace);
 
-=======
-#ifdef CONFIG_KASAN_HW_TAGS
-
-#include <linux/static_key.h>
-#include "../slab.h"
-
-DECLARE_STATIC_KEY_TRUE(kasan_flag_vmalloc);
-DECLARE_STATIC_KEY_TRUE(kasan_flag_stacktrace);
-
-enum kasan_mode {
-	KASAN_MODE_SYNC,
-	KASAN_MODE_ASYNC,
-	KASAN_MODE_ASYMM,
-};
-
-extern enum kasan_mode kasan_mode __ro_after_init;
-
-static inline bool kasan_vmalloc_enabled(void)
-{
-	return static_branch_likely(&kasan_flag_vmalloc);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool kasan_stack_collection_enabled(void)
 {
 	return static_branch_unlikely(&kasan_flag_stacktrace);
 }
 
-<<<<<<< HEAD
 #else /* CONFIG_KASAN_SW_TAGS || CONFIG_KASAN_HW_TAGS */
-=======
-static inline bool kasan_async_fault_possible(void)
-{
-	return kasan_mode == KASAN_MODE_ASYNC || kasan_mode == KASAN_MODE_ASYMM;
-}
-
-static inline bool kasan_sync_fault_possible(void)
-{
-	return kasan_mode == KASAN_MODE_SYNC || kasan_mode == KASAN_MODE_ASYMM;
-}
-
-#else
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline bool kasan_stack_collection_enabled(void)
 {
 	return true;
 }
 
-<<<<<<< HEAD
 #endif /* CONFIG_KASAN_SW_TAGS || CONFIG_KASAN_HW_TAGS */
 
 #ifdef CONFIG_KASAN_HW_TAGS
@@ -98,8 +59,6 @@ static inline bool kasan_sync_fault_possible(void)
 
 #else /* CONFIG_KASAN_HW_TAGS */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool kasan_async_fault_possible(void)
 {
 	return false;
@@ -110,7 +69,6 @@ static inline bool kasan_sync_fault_possible(void)
 	return true;
 }
 
-<<<<<<< HEAD
 #endif /* CONFIG_KASAN_HW_TAGS */
 
 #ifdef CONFIG_KASAN_GENERIC
@@ -136,9 +94,6 @@ static inline bool kasan_requires_meta(void)
 }
 
 #endif /* CONFIG_KASAN_GENERIC */
-=======
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
 #define KASAN_GRANULE_SIZE	(1UL << KASAN_SHADOW_SCALE_SHIFT)
@@ -200,7 +155,6 @@ static inline bool kasan_requires_meta(void)
 #define META_MEM_BYTES_PER_ROW (META_BYTES_PER_ROW * KASAN_GRANULE_SIZE)
 #define META_ROWS_AROUND_ADDR 2
 
-<<<<<<< HEAD
 #define KASAN_STACK_DEPTH 64
 
 struct kasan_track {
@@ -208,8 +162,6 @@ struct kasan_track {
 	depot_stack_handle_t stack;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum kasan_report_type {
 	KASAN_REPORT_ACCESS,
 	KASAN_REPORT_INVALID_FREE,
@@ -217,15 +169,9 @@ enum kasan_report_type {
 };
 
 struct kasan_report_info {
-<<<<<<< HEAD
 	/* Filled in by kasan_report_*(). */
 	enum kasan_report_type type;
 	void *access_addr;
-=======
-	enum kasan_report_type type;
-	void *access_addr;
-	void *first_bad_addr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	size_t access_size;
 	bool is_write;
 	unsigned long ip;
@@ -264,7 +210,6 @@ struct kasan_global {
 #endif
 };
 
-<<<<<<< HEAD
 /* Structures for keeping alloc and free meta. */
 
 #ifdef CONFIG_KASAN_GENERIC
@@ -273,35 +218,6 @@ struct kasan_alloc_meta {
 	struct kasan_track alloc_track;
 	/* Free track is stored in kasan_free_meta. */
 	depot_stack_handle_t aux_stack[2];
-=======
-/* Structures for keeping alloc and free tracks. */
-
-#define KASAN_STACK_DEPTH 64
-
-struct kasan_track {
-	u32 pid;
-	depot_stack_handle_t stack;
-};
-
-#if defined(CONFIG_KASAN_TAGS_IDENTIFY) && defined(CONFIG_KASAN_SW_TAGS)
-#define KASAN_NR_FREE_STACKS 5
-#else
-#define KASAN_NR_FREE_STACKS 1
-#endif
-
-struct kasan_alloc_meta {
-	struct kasan_track alloc_track;
-	/* Generic mode stores free track in kasan_free_meta. */
-#ifdef CONFIG_KASAN_GENERIC
-	depot_stack_handle_t aux_stack[2];
-#else
-	struct kasan_track free_track[KASAN_NR_FREE_STACKS];
-#endif
-#ifdef CONFIG_KASAN_TAGS_IDENTIFY
-	u8 free_pointer_tag[KASAN_NR_FREE_STACKS];
-	u8 free_track_idx;
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct qlist_node {
@@ -320,15 +236,10 @@ struct qlist_node {
  * After that, slab allocator stores the freelist pointer in the object.
  */
 struct kasan_free_meta {
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_KASAN_GENERIC
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct qlist_node quarantine_link;
 	struct kasan_track free_track;
 };
 
-<<<<<<< HEAD
 #endif /* CONFIG_KASAN_GENERIC */
 
 #if defined(CONFIG_KASAN_SW_TAGS) || defined(CONFIG_KASAN_HW_TAGS)
@@ -350,24 +261,12 @@ struct kasan_stack_ring {
 
 #endif /* CONFIG_KASAN_SW_TAGS || CONFIG_KASAN_HW_TAGS */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if IS_ENABLED(CONFIG_KASAN_KUNIT_TEST)
 /* Used in KUnit-compatible KASAN tests. */
 struct kunit_kasan_status {
 	bool report_found;
 	bool sync_fault;
 };
-<<<<<<< HEAD
-=======
-#endif
-
-struct kasan_alloc_meta *kasan_get_alloc_meta(struct kmem_cache *cache,
-						const void *object);
-#ifdef CONFIG_KASAN_GENERIC
-struct kasan_free_meta *kasan_get_free_meta(struct kmem_cache *cache,
-						const void *object);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #if defined(CONFIG_KASAN_GENERIC) || defined(CONFIG_KASAN_SW_TAGS)
@@ -414,13 +313,6 @@ void kasan_print_tags(u8 addr_tag, const void *addr);
 static inline void kasan_print_tags(u8 addr_tag, const void *addr) { }
 #endif
 
-<<<<<<< HEAD
-=======
-void *kasan_find_first_bad_addr(void *addr, size_t size);
-const char *kasan_get_bug_type(struct kasan_report_info *info);
-void kasan_metadata_fetch_row(char *buffer, void *row);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if defined(CONFIG_KASAN_STACK)
 void kasan_print_address_stack_frame(const void *addr);
 #else
@@ -436,7 +328,6 @@ static inline void kasan_print_aux_stacks(struct kmem_cache *cache, const void *
 bool kasan_report(unsigned long addr, size_t size,
 		bool is_write, unsigned long ip);
 void kasan_report_invalid_free(void *object, unsigned long ip, enum kasan_report_type type);
-<<<<<<< HEAD
 
 struct slab *kasan_addr_to_slab(const void *addr);
 
@@ -451,11 +342,6 @@ struct kasan_free_meta *kasan_get_free_meta(struct kmem_cache *cache,
 static inline void kasan_init_cache_meta(struct kmem_cache *cache, unsigned int *size) { }
 static inline void kasan_init_object_meta(struct kmem_cache *cache, const void *object) { }
 #endif
-=======
-
-struct page *kasan_addr_to_page(const void *addr);
-struct slab *kasan_addr_to_slab(const void *addr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 depot_stack_handle_t kasan_save_stack(gfp_t flags, bool can_alloc);
 void kasan_set_track(struct kasan_track *track, gfp_t flags);

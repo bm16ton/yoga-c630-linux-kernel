@@ -321,24 +321,6 @@ struct dl_bw {
 	u64			total_bw;
 };
 
-<<<<<<< HEAD
-=======
-/*
- * Verify the fitness of task @p to run on @cpu taking into account the
- * CPU original capacity and the runtime/deadline ratio of the task.
- *
- * The function will return true if the CPU original capacity of the
- * @cpu scaled by SCHED_CAPACITY_SCALE >= runtime/deadline ratio of the
- * task and false otherwise.
- */
-static inline bool dl_task_fits_capacity(struct task_struct *p, int cpu)
-{
-	unsigned long cap = arch_scale_cpu_capacity(cpu);
-
-	return cap_scale(p->dl.dl_deadline, cap) >= p->dl.dl_runtime;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern void init_dl_bw(struct dl_bw *dl_b);
 extern int  sched_dl_global_validate(void);
 extern void sched_dl_do_global(void);
@@ -1060,11 +1042,7 @@ struct rq {
 	unsigned long		cpu_capacity;
 	unsigned long		cpu_capacity_orig;
 
-<<<<<<< HEAD
 	struct balance_callback *balance_callback;
-=======
-	struct callback_head	*balance_callback;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	unsigned char		nohz_idle_balance;
 	unsigned char		idle_balance;
@@ -1437,7 +1415,6 @@ static inline struct cfs_rq *cfs_rq_of(struct sched_entity *se)
 {
 	return se->cfs_rq;
 }
-<<<<<<< HEAD
 
 /* runqueue "owned" by this group */
 static inline struct cfs_rq *group_cfs_rq(struct sched_entity *grp)
@@ -1457,27 +1434,6 @@ static inline struct cfs_rq *task_cfs_rq(struct task_struct *p)
 	return &task_rq(p)->cfs;
 }
 
-=======
-
-/* runqueue "owned" by this group */
-static inline struct cfs_rq *group_cfs_rq(struct sched_entity *grp)
-{
-	return grp->my_q;
-}
-
-#else
-
-static inline struct task_struct *task_of(struct sched_entity *se)
-{
-	return container_of(se, struct task_struct, se);
-}
-
-static inline struct cfs_rq *task_cfs_rq(struct task_struct *p)
-{
-	return &task_rq(p)->cfs;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct cfs_rq *cfs_rq_of(struct sched_entity *se)
 {
 	struct task_struct *p = task_of(se);
@@ -1930,7 +1886,6 @@ extern int sched_update_scaling(void);
 extern void __sched_core_account_forceidle(struct rq *rq);
 
 static inline void sched_core_account_forceidle(struct rq *rq)
-<<<<<<< HEAD
 {
 	if (schedstat_enabled())
 		__sched_core_account_forceidle(rq);
@@ -1948,25 +1903,6 @@ static inline void sched_core_tick(struct rq *rq)
 
 static inline void sched_core_account_forceidle(struct rq *rq) {}
 
-=======
-{
-	if (schedstat_enabled())
-		__sched_core_account_forceidle(rq);
-}
-
-extern void __sched_core_tick(struct rq *rq);
-
-static inline void sched_core_tick(struct rq *rq)
-{
-	if (sched_core_enabled(rq) && schedstat_enabled())
-		__sched_core_tick(rq);
-}
-
-#else
-
-static inline void sched_core_account_forceidle(struct rq *rq) {}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void sched_core_tick(struct rq *rq) {}
 
 #endif /* CONFIG_SCHED_CORE && CONFIG_SCHEDSTATS */
@@ -2516,10 +2452,7 @@ extern unsigned int sysctl_numa_balancing_scan_delay;
 extern unsigned int sysctl_numa_balancing_scan_period_min;
 extern unsigned int sysctl_numa_balancing_scan_period_max;
 extern unsigned int sysctl_numa_balancing_scan_size;
-<<<<<<< HEAD
 extern unsigned int sysctl_numa_balancing_hot_threshold;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #ifdef CONFIG_SCHED_HRTICK
@@ -2607,7 +2540,6 @@ static inline void double_rq_clock_clear_update(struct rq *rq1, struct rq *rq2)
 {
 	rq1->clock_update_flags &= (RQCF_REQ_SKIP|RQCF_ACT_SKIP);
 	/* rq1 == rq2 for !CONFIG_SMP, so just clear RQCF_UPDATED once. */
-<<<<<<< HEAD
 #ifdef CONFIG_SMP
 	rq2->clock_update_flags &= (RQCF_REQ_SKIP|RQCF_ACT_SKIP);
 #endif
@@ -2618,18 +2550,6 @@ static inline void double_rq_clock_clear_update(struct rq *rq1, struct rq *rq2) 
 
 #ifdef CONFIG_SMP
 
-=======
-#ifdef CONFIG_SMP
-	rq2->clock_update_flags &= (RQCF_REQ_SKIP|RQCF_ACT_SKIP);
-#endif
-}
-#else
-static inline void double_rq_clock_clear_update(struct rq *rq1, struct rq *rq2) {}
-#endif
-
-#ifdef CONFIG_SMP
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool rq_order_less(struct rq *rq1, struct rq *rq2)
 {
 #ifdef CONFIG_SCHED_CORE
@@ -2696,7 +2616,6 @@ static inline int _double_lock_balance(struct rq *this_rq, struct rq *busiest)
 	    likely(raw_spin_rq_trylock(busiest))) {
 		double_rq_clock_clear_update(this_rq, busiest);
 		return 0;
-<<<<<<< HEAD
 	}
 
 	if (rq_order_less(this_rq, busiest)) {
@@ -2705,16 +2624,6 @@ static inline int _double_lock_balance(struct rq *this_rq, struct rq *busiest)
 		return 0;
 	}
 
-=======
-	}
-
-	if (rq_order_less(this_rq, busiest)) {
-		raw_spin_rq_lock_nested(busiest, SINGLE_DEPTH_NESTING);
-		double_rq_clock_clear_update(this_rq, busiest);
-		return 0;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	raw_spin_rq_unlock(this_rq);
 	double_rq_lock(this_rq, busiest);
 
@@ -2801,13 +2710,8 @@ static inline void double_rq_lock(struct rq *rq1, struct rq *rq2)
 	__acquires(rq1->lock)
 	__acquires(rq2->lock)
 {
-<<<<<<< HEAD
 	WARN_ON_ONCE(!irqs_disabled());
 	WARN_ON_ONCE(rq1 != rq2);
-=======
-	BUG_ON(!irqs_disabled());
-	BUG_ON(rq1 != rq2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	raw_spin_rq_lock(rq1);
 	__acquire(rq2->lock);	/* Fake it out ;) */
 	double_rq_clock_clear_update(rq1, rq2);
@@ -2823,11 +2727,7 @@ static inline void double_rq_unlock(struct rq *rq1, struct rq *rq2)
 	__releases(rq1->lock)
 	__releases(rq2->lock)
 {
-<<<<<<< HEAD
 	WARN_ON_ONCE(rq1 != rq2);
-=======
-	BUG_ON(rq1 != rq2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	raw_spin_rq_unlock(rq1);
 	__release(rq2->lock);
 }
@@ -2997,7 +2897,6 @@ unsigned long effective_cpu_util(int cpu, unsigned long util_cfs,
 				 enum cpu_util_type type,
 				 struct task_struct *p);
 
-<<<<<<< HEAD
 /*
  * Verify the fitness of task @p to run on @cpu taking into account the
  * CPU original capacity and the runtime/deadline ratio of the task.
@@ -3013,8 +2912,6 @@ static inline bool dl_task_fits_capacity(struct task_struct *p, int cpu)
 	return cap >= p->dl.dl_density >> (BW_SHIFT - SCHED_CAPACITY_SHIFT);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline unsigned long cpu_bw_dl(struct rq *rq)
 {
 	return (rq->dl.running_bw * SCHED_CAPACITY_SCALE) >> BW_SHIFT;
@@ -3202,7 +3099,6 @@ static inline bool uclamp_is_used(void)
 {
 	return false;
 }
-<<<<<<< HEAD
 
 static inline unsigned long uclamp_rq_get(struct rq *rq,
 					  enum uclamp_id clamp_id)
@@ -3222,8 +3118,6 @@ static inline bool uclamp_rq_is_idle(struct rq *rq)
 {
 	return false;
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_UCLAMP_TASK */
 
 #ifdef CONFIG_HAVE_SCHED_AVG_IRQ
@@ -3324,7 +3218,6 @@ extern int sched_dynamic_mode(const char *str);
 extern void sched_dynamic_update(int mode);
 #endif
 
-<<<<<<< HEAD
 static inline void update_current_exec_runtime(struct task_struct *curr,
 						u64 now, u64 delta_exec)
 {
@@ -3335,6 +3228,4 @@ static inline void update_current_exec_runtime(struct task_struct *curr,
 	cgroup_account_cputime(curr, delta_exec);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _KERNEL_SCHED_SCHED_H */

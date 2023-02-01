@@ -544,13 +544,6 @@ static int mark_block_group_to_copy(struct btrfs_fs_info *fs_info,
 		cache = btrfs_lookup_block_group(fs_info, chunk_offset);
 		if (!cache)
 			continue;
-<<<<<<< HEAD
-=======
-
-		spin_lock(&cache->lock);
-		cache->to_copy = 1;
-		spin_unlock(&cache->lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		set_bit(BLOCK_GROUP_FLAG_TO_COPY, &cache->runtime_flags);
 		btrfs_put_block_group(cache);

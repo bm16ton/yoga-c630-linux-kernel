@@ -178,7 +178,6 @@
 #define RK3399_TXRX_BASEDIR		BIT(5)
 #define RK3399_TXRX_SRC_SEL_ISP0	BIT(4)
 #define RK3399_TXRX_TURNREQUEST		GENMASK(3, 0)
-<<<<<<< HEAD
 
 #define RK3568_GRF_VO_CON2		0x0368
 #define RK3568_DSI0_SKEWCALHS		(0x1f << 11)
@@ -196,8 +195,6 @@
 #define RK3568_DSI1_FORCETXSTOPMODE	(0xf << 4)
 #define RK3568_DSI1_TURNDISABLE		BIT(2)
 #define RK3568_DSI1_FORCERXMODE		BIT(0)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define HIWORD_UPDATE(val, mask)	(val | (mask) << 16)
 
@@ -1224,11 +1221,7 @@ static int dw_mipi_dsi_dphy_power_on(struct phy *phy)
 		return i;
 	}
 
-<<<<<<< HEAD
 	ret = pm_runtime_resume_and_get(dsi->dev);
-=======
-	ret = pm_runtime_get_sync(dsi->dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		DRM_DEV_ERROR(dsi->dev, "failed to enable device: %d\n", ret);
 		return ret;
@@ -1643,7 +1636,6 @@ static const struct rockchip_dw_dsi_chip_data rk3399_chip_data[] = {
 		.dphy_rx_init = rk3399_dphy_tx1rx1_init,
 		.dphy_rx_power_on = rk3399_dphy_tx1rx1_power_on,
 		.dphy_rx_power_off = rk3399_dphy_tx1rx1_power_off,
-<<<<<<< HEAD
 	},
 	{ /* sentinel */ }
 };
@@ -1666,8 +1658,6 @@ static const struct rockchip_dw_dsi_chip_data rk3568_chip_data[] = {
 					  RK3568_DSI1_TURNDISABLE |
 					  RK3568_DSI1_FORCERXMODE),
 		.max_data_lanes = 4,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{ /* sentinel */ }
 };

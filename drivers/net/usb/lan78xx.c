@@ -4374,11 +4374,7 @@ static int lan78xx_probe(struct usb_interface *intf,
 
 	netif_set_tso_max_size(netdev, LAN78XX_TSO_SIZE(dev));
 
-<<<<<<< HEAD
 	netif_napi_add(netdev, &dev->napi, lan78xx_poll);
-=======
-	netif_napi_add(netdev, &dev->napi, lan78xx_poll, NAPI_POLL_WEIGHT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	INIT_DELAYED_WORK(&dev->wq, lan78xx_delayedwork);
 	init_usb_anchor(&dev->deferred);

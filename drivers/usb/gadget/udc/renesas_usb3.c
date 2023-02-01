@@ -2755,12 +2755,9 @@ static const struct of_device_id usb3_of_match[] = {
 		.compatible = "renesas,r8a77990-usb3-peri",
 		.data = &renesas_usb3_priv_r8a77990,
 	}, {
-<<<<<<< HEAD
 		.compatible = "renesas,rzv2m-usb3-peri",
 		.data = &renesas_usb3_priv_rzv2m,
 	}, {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.compatible = "renesas,rcar-gen3-usb3-peri",
 		.data = &renesas_usb3_priv_gen3,
 	},

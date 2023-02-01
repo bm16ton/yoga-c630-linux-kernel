@@ -22,7 +22,6 @@ description:
 
 properties:
   compatible:
-<<<<<<< HEAD
     oneOf:
       - items:
           - enum:
@@ -35,14 +34,6 @@ properties:
           - const: riscv,clint0
         deprecated: true
         description: For the QEMU virt machine only
-=======
-    items:
-      - enum:
-          - sifive,fu540-c000-clint
-          - starfive,jh7100-clint
-          - canaan,k210-clint
-      - const: sifive,clint0
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     description:
       Should be "<vendor>,<chip>-clint" and "sifive,clint<version>".

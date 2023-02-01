@@ -8,14 +8,11 @@
 #include <sound/soc-acpi.h>
 #include <sound/soc-acpi-intel-match.h>
 
-<<<<<<< HEAD
 static const struct snd_soc_acpi_codecs essx_83x6 = {
 	.num_codecs = 3,
 	.codecs = { "ESSX8316", "ESSX8326", "ESSX8336"},
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct snd_soc_acpi_endpoint single_endpoint = {
 	.num = 0,
 	.aggregated = 0,
@@ -145,7 +142,6 @@ static const struct snd_soc_acpi_adr_device rt1316_2_single_adr[] = {
 	}
 };
 
-<<<<<<< HEAD
 static const struct snd_soc_acpi_adr_device rt1316_3_single_adr[] = {
 	{
 		.adr = 0x000330025D131601ull,
@@ -155,8 +151,6 @@ static const struct snd_soc_acpi_adr_device rt1316_3_single_adr[] = {
 	}
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct snd_soc_acpi_adr_device rt714_0_adr[] = {
 	{
 		.adr = 0x000030025D071401ull,
@@ -346,7 +340,6 @@ static const struct snd_soc_acpi_link_adr adl_sdw_rt1316_link2_rt714_link0[] = {
 	{}
 };
 
-<<<<<<< HEAD
 static const struct snd_soc_acpi_link_adr adl_sdw_rt711_link0_rt1316_link3[] = {
 	{
 		.mask = BIT(0),
@@ -361,8 +354,6 @@ static const struct snd_soc_acpi_link_adr adl_sdw_rt711_link0_rt1316_link3[] = {
 	{}
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct snd_soc_acpi_adr_device mx8373_2_adr[] = {
 	{
 		.adr = 0x000223019F837300ull,
@@ -439,14 +430,11 @@ static const struct snd_soc_acpi_codecs adl_rt5682_rt5682s_hp = {
 	.codecs = {"10EC5682", "RTL5682"},
 };
 
-<<<<<<< HEAD
 static const struct snd_soc_acpi_codecs adl_rt1015p_amp = {
 	.num_codecs = 1,
 	.codecs = {"RTL1015"}
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct snd_soc_acpi_codecs adl_rt1019p_amp = {
 	.num_codecs = 1,
 	.codecs = {"RTL1019"}
@@ -457,14 +445,11 @@ static const struct snd_soc_acpi_codecs adl_max98390_amp = {
 	.codecs = {"MX98390"}
 };
 
-<<<<<<< HEAD
 static const struct snd_soc_acpi_codecs adl_lt6911_hdmi = {
 	.num_codecs = 1,
 	.codecs = {"INTC10B0"}
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct snd_soc_acpi_mach snd_soc_acpi_intel_adl_machines[] = {
 	{
 		.comp_ids = &adl_rt5682_rt5682s_hp,
@@ -489,29 +474,20 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_adl_machines[] = {
 	},
 	{
 		.id = "10508825",
-<<<<<<< HEAD
 		.drv_name = "adl_rt1019p_8825",
-=======
-		.drv_name = "adl_rt1019p_nau8825",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.machine_quirk = snd_soc_acpi_codec_list,
 		.quirk_data = &adl_rt1019p_amp,
 		.sof_tplg_filename = "sof-adl-rt1019-nau8825.tplg",
 	},
 	{
 		.id = "10508825",
-<<<<<<< HEAD
 		.drv_name = "adl_max98373_8825",
-=======
-		.drv_name = "adl_max98373_nau8825",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.machine_quirk = snd_soc_acpi_codec_list,
 		.quirk_data = &adl_max98373_amp,
 		.sof_tplg_filename = "sof-adl-max98373-nau8825.tplg",
 	},
 	{
 		.id = "10508825",
-<<<<<<< HEAD
 		.drv_name = "adl_mx98360a_8825",
 		.machine_quirk = snd_soc_acpi_codec_list,
 		.quirk_data = &adl_max98360a_amp,
@@ -530,12 +506,6 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_adl_machines[] = {
 		.machine_quirk = snd_soc_acpi_codec_list,
 		.quirk_data = &adl_rt1015p_amp,
 		.sof_tplg_filename = "sof-adl-rt1015-nau8825.tplg",
-=======
-		.drv_name = "adl_mx98360a_nau8825",
-		.machine_quirk = snd_soc_acpi_codec_list,
-		.quirk_data = &adl_max98360a_amp,
-		.sof_tplg_filename = "sof-adl-mx98360a-nau8825.tplg",
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.id = "10508825",
@@ -554,7 +524,6 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_adl_machines[] = {
 		.drv_name = "adl_rt5682",
 		.sof_tplg_filename = "sof-adl-rt5682.tplg",
 	},
-<<<<<<< HEAD
 	{
 		.id = "10134242",
 		.drv_name = "adl_mx98360a_cs4242",
@@ -562,15 +531,12 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_adl_machines[] = {
 		.quirk_data = &adl_max98360a_amp,
 		.sof_tplg_filename = "sof-adl-max98360a-cs42l42.tplg",
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* place amp-only boards in the end of table */
 	{
 		.id = "CSC3541",
 		.drv_name = "adl_cs35l41",
 		.sof_tplg_filename = "sof-adl-cs35l41.tplg",
 	},
-<<<<<<< HEAD
 	{
 		.comp_ids = &essx_83x6,
 		.drv_name = "adl_es83x6_c1_h02",
@@ -586,8 +552,6 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_adl_machines[] = {
 					SND_SOC_ACPI_TPLG_INTEL_SSP_MSB |
 					SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{},
 };
 EXPORT_SYMBOL_GPL(snd_soc_acpi_intel_adl_machines);
@@ -643,15 +607,12 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_adl_sdw_machines[] = {
 		.sof_tplg_filename = "sof-adl-rt1316-l2-mono-rt714-l0.tplg",
 	},
 	{
-<<<<<<< HEAD
 		.link_mask = 0x9, /* 2 active links required */
 		.links = adl_sdw_rt711_link0_rt1316_link3,
 		.drv_name = "sof_sdw",
 		.sof_tplg_filename = "sof-adl-rt711-l0-rt1316-l3.tplg",
 	},
 	{
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.link_mask = 0x1, /* link0 required */
 		.links = adl_rvp,
 		.drv_name = "sof_sdw",

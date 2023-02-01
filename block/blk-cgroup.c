@@ -33,10 +33,7 @@
 #include "blk-cgroup.h"
 #include "blk-ioprio.h"
 #include "blk-throttle.h"
-<<<<<<< HEAD
 #include "blk-rq-qos.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * blkcg_pol_mutex protects blkcg_policy[] and policy [de]activation.
@@ -229,17 +226,10 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
 	if (!blkg->iostat_cpu)
 		goto err_free;
 
-<<<<<<< HEAD
 	if (!blk_get_queue(disk->queue))
 		goto err_free;
 
 	blkg->q = disk->queue;
-=======
-	if (!blk_get_queue(q))
-		goto err_free;
-
-	blkg->q = q;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INIT_LIST_HEAD(&blkg->q_node);
 	spin_lock_init(&blkg->async_bio_lock);
 	bio_list_init(&blkg->async_bios);
@@ -284,11 +274,7 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
 	struct blkcg_gq *blkg;
 	int i, ret;
 
-<<<<<<< HEAD
 	lockdep_assert_held(&disk->queue->queue_lock);
-=======
-	lockdep_assert_held(&q->queue_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* request_queue is dying, do not create/recreate a blkg */
 	if (blk_queue_dying(disk->queue)) {
@@ -672,11 +658,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
 	disk = bdev->bd_disk;
 	q = disk->queue;
 
-<<<<<<< HEAD
-=======
-	q = bdev_get_queue(bdev);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * blkcg_deactivate_policy() requires queue to be frozen, we can grab
 	 * q_usage_counter to prevent concurrent with blkcg_deactivate_policy().
@@ -898,12 +879,7 @@ static void blkcg_fill_root_iostats(void)
 	class_dev_iter_init(&iter, &block_class, NULL, &disk_type);
 	while ((dev = class_dev_iter_next(&iter))) {
 		struct block_device *bdev = dev_to_bdev(dev);
-<<<<<<< HEAD
 		struct blkcg_gq *blkg = bdev->bd_disk->queue->root_blkg;
-=======
-		struct blkcg_gq *blkg =
-			blk_queue_root_blkg(bdev_get_queue(bdev));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct blkg_iostat tmp;
 		int cpu;
 		unsigned long flags;
@@ -1251,11 +1227,7 @@ int blkcg_init_disk(struct gendisk *disk)
 
 	INIT_LIST_HEAD(&q->blkg_list);
 
-<<<<<<< HEAD
 	new_blkg = blkg_alloc(&blkcg_root, disk, GFP_KERNEL);
-=======
-	new_blkg = blkg_alloc(&blkcg_root, q, GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!new_blkg)
 		return -ENOMEM;
 
@@ -1273,7 +1245,6 @@ int blkcg_init_disk(struct gendisk *disk)
 	if (preloaded)
 		radix_tree_preload_end();
 
-<<<<<<< HEAD
 	ret = blk_ioprio_init(disk);
 	if (ret)
 		goto err_destroy_all;
@@ -1285,22 +1256,6 @@ int blkcg_init_disk(struct gendisk *disk)
 	ret = blk_iolatency_init(disk);
 	if (ret)
 		goto err_throtl_exit;
-=======
-	ret = blk_ioprio_init(q);
-	if (ret)
-		goto err_destroy_all;
-
-	ret = blk_throtl_init(q);
-	if (ret)
-		goto err_destroy_all;
-
-	ret = blk_iolatency_init(q);
-	if (ret) {
-		blk_throtl_exit(q);
-		blk_ioprio_exit(q);
-		goto err_destroy_all;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 
@@ -1318,24 +1273,11 @@ err_unlock:
 	return PTR_ERR(blkg);
 }
 
-<<<<<<< HEAD
 void blkcg_exit_disk(struct gendisk *disk)
 {
 	blkg_destroy_all(disk);
 	rq_qos_exit(disk->queue);
 	blk_throtl_exit(disk);
-=======
-/**
- * blkcg_exit_queue - exit and release blkcg part of request_queue
- * @q: request_queue being released
- *
- * Called from blk_exit_queue().  Responsible for exiting blkcg part.
- */
-void blkcg_exit_queue(struct request_queue *q)
-{
-	blkg_destroy_all(q);
-	blk_throtl_exit(q);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void blkcg_bind(struct cgroup_subsys_state *root_css)
@@ -1912,12 +1854,7 @@ static inline struct blkcg_gq *blkg_tryget_closest(struct bio *bio,
 	struct blkcg_gq *blkg, *ret_blkg = NULL;
 
 	rcu_read_lock();
-<<<<<<< HEAD
 	blkg = blkg_lookup_create(css_to_blkcg(css), bio->bi_bdev->bd_disk);
-=======
-	blkg = blkg_lookup_create(css_to_blkcg(css),
-				  bdev_get_queue(bio->bi_bdev));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (blkg) {
 		if (blkg_tryget(blkg)) {
 			ret_blkg = blkg;

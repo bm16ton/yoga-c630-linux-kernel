@@ -116,16 +116,10 @@ static int meson_encoder_cvbs_get_modes(struct drm_bridge *bridge,
 	return i;
 }
 
-<<<<<<< HEAD
 static enum drm_mode_status
 meson_encoder_cvbs_mode_valid(struct drm_bridge *bridge,
 			      const struct drm_display_info *display_info,
 			      const struct drm_display_mode *mode)
-=======
-static int meson_encoder_cvbs_mode_valid(struct drm_bridge *bridge,
-					const struct drm_display_info *display_info,
-					const struct drm_display_mode *mode)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (meson_cvbs_get_mode(mode))
 		return MODE_OK;

@@ -278,10 +278,6 @@ static int do_get_hw_stats(struct ib_device *ibdev,
 	const struct mlx5_ib_counters *cnts = get_counters(dev, port_num - 1);
 	struct mlx5_core_dev *mdev;
 	int ret, num_counters;
-<<<<<<< HEAD
-=======
-	u32 mdev_port_num;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!stats)
 		return -EINVAL;

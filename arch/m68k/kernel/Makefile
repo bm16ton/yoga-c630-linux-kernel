@@ -3,19 +3,6 @@
 # Makefile for the linux kernel.
 #
 
-<<<<<<< HEAD
-=======
-extra-$(CONFIG_AMIGA)	:= head.o
-extra-$(CONFIG_ATARI)	:= head.o
-extra-$(CONFIG_MAC)	:= head.o
-extra-$(CONFIG_APOLLO)	:= head.o
-extra-$(CONFIG_VME)	:= head.o
-extra-$(CONFIG_HP300)	:= head.o
-extra-$(CONFIG_Q40)	:= head.o
-extra-$(CONFIG_SUN3X)	:= head.o
-extra-$(CONFIG_VIRT)	:= head.o
-extra-$(CONFIG_SUN3)	:= sun3-head.o
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extra-y			+= vmlinux.lds
 
 obj-$(CONFIG_AMIGA)	:= head.o

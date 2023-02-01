@@ -47,7 +47,6 @@ static void free_bitmap(struct btrfs_free_space_ctl *ctl,
 static void bitmap_clear_bits(struct btrfs_free_space_ctl *ctl,
 			      struct btrfs_free_space *info, u64 offset,
 			      u64 bytes, bool update_stats);
-<<<<<<< HEAD
 
 static void __btrfs_remove_free_space_cache(struct btrfs_free_space_ctl *ctl)
 {
@@ -66,8 +65,6 @@ static void __btrfs_remove_free_space_cache(struct btrfs_free_space_ctl *ctl)
 		cond_resched_lock(&ctl->tree_lock);
 	}
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct inode *__lookup_free_space_inode(struct btrfs_root *root,
 					       struct btrfs_path *path,
@@ -351,13 +348,8 @@ int btrfs_truncate_free_space_cache(struct btrfs_trans_handle *trans,
 	btrfs_i_size_write(inode, 0);
 	truncate_pagecache(vfs_inode, 0);
 
-<<<<<<< HEAD
 	lock_extent(&inode->io_tree, 0, (u64)-1, &cached_state);
 	btrfs_drop_extent_map_range(inode, 0, (u64)-1, false);
-=======
-	lock_extent_bits(&inode->io_tree, 0, (u64)-1, &cached_state);
-	btrfs_drop_extent_cache(inode, 0, (u64)-1, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * We skip the throttling logic for free space cache inodes, so we don't
@@ -368,11 +360,7 @@ int btrfs_truncate_free_space_cache(struct btrfs_trans_handle *trans,
 	inode_sub_bytes(&inode->vfs_inode, control.sub_bytes);
 	btrfs_inode_safe_disk_i_size_write(inode, control.last_size);
 
-<<<<<<< HEAD
 	unlock_extent(&inode->io_tree, 0, (u64)-1, &cached_state);
-=======
-	unlock_extent_cached(&inode->io_tree, 0, (u64)-1, &cached_state);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto fail;
 
@@ -2912,12 +2900,8 @@ void btrfs_dump_free_space(struct btrfs_block_group *block_group,
 	if (btrfs_is_zoned(fs_info)) {
 		btrfs_info(fs_info, "free space %llu active %d",
 			   block_group->zone_capacity - block_group->alloc_offset,
-<<<<<<< HEAD
 			   test_bit(BLOCK_GROUP_FLAG_ZONE_IS_ACTIVE,
 				    &block_group->runtime_flags));
-=======
-			   block_group->zone_is_active);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 	}
 
@@ -3021,37 +3005,6 @@ static void __btrfs_return_cluster_to_free_space(
 	btrfs_put_block_group(block_group);
 }
 
-<<<<<<< HEAD
-=======
-static void __btrfs_remove_free_space_cache_locked(
-				struct btrfs_free_space_ctl *ctl)
-{
-	struct btrfs_free_space *info;
-	struct rb_node *node;
-
-	while ((node = rb_last(&ctl->free_space_offset)) != NULL) {
-		info = rb_entry(node, struct btrfs_free_space, offset_index);
-		if (!info->bitmap) {
-			unlink_free_space(ctl, info, true);
-			kmem_cache_free(btrfs_free_space_cachep, info);
-		} else {
-			free_bitmap(ctl, info);
-		}
-
-		cond_resched_lock(&ctl->tree_lock);
-	}
-}
-
-void __btrfs_remove_free_space_cache(struct btrfs_free_space_ctl *ctl)
-{
-	spin_lock(&ctl->tree_lock);
-	__btrfs_remove_free_space_cache_locked(ctl);
-	if (ctl->block_group)
-		btrfs_discard_update_discardable(ctl->block_group);
-	spin_unlock(&ctl->tree_lock);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void btrfs_remove_free_space_cache(struct btrfs_block_group *block_group)
 {
 	struct btrfs_free_space_ctl *ctl = block_group->free_space_ctl;

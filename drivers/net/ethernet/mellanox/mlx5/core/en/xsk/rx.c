@@ -233,11 +233,7 @@ struct sk_buff *mlx5e_xsk_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq,
 						    u32 head_offset,
 						    u32 page_idx)
 {
-<<<<<<< HEAD
 	struct xdp_buff *xdp = wi->alloc_units[page_idx].xsk;
-=======
-	struct xdp_buff *xdp = wi->umr.dma_info[page_idx].xsk;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_prog *prog;
 
 	/* Check packet size. Note LRO doesn't use linear SKB */
@@ -253,12 +249,7 @@ struct sk_buff *mlx5e_xsk_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq,
 	 */
 	WARN_ON_ONCE(head_offset);
 
-<<<<<<< HEAD
 	xsk_buff_set_size(xdp, cqe_bcnt);
-=======
-	xdp->data_end = xdp->data + cqe_bcnt;
-	xdp_set_data_meta_invalid(xdp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	xsk_buff_dma_sync_for_cpu(xdp, rq->xsk_pool);
 	net_prefetch(xdp->data);
 
@@ -287,22 +278,14 @@ struct sk_buff *mlx5e_xsk_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq,
 	/* XDP_PASS: copy the data from the UMEM to a new SKB and reuse the
 	 * frame. On SKB allocation failure, NULL is returned.
 	 */
-<<<<<<< HEAD
 	return mlx5e_xsk_construct_skb(rq, xdp);
-=======
-	return mlx5e_xsk_construct_skb(rq, xdp->data, xdp->data_end - xdp->data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 struct sk_buff *mlx5e_xsk_skb_from_cqe_linear(struct mlx5e_rq *rq,
 					      struct mlx5e_wqe_frag_info *wi,
 					      u32 cqe_bcnt)
 {
-<<<<<<< HEAD
 	struct xdp_buff *xdp = wi->au->xsk;
-=======
-	struct xdp_buff *xdp = wi->di->xsk;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_prog *prog;
 
 	/* wi->offset is not used in this function, because xdp->data and the
@@ -324,9 +307,5 @@ struct sk_buff *mlx5e_xsk_skb_from_cqe_linear(struct mlx5e_rq *rq,
 	 * will be handled by mlx5e_free_rx_wqe.
 	 * On SKB allocation failure, NULL is returned.
 	 */
-<<<<<<< HEAD
 	return mlx5e_xsk_construct_skb(rq, xdp);
-=======
-	return mlx5e_xsk_construct_skb(rq, xdp->data, xdp->data_end - xdp->data);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

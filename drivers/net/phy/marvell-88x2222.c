@@ -478,10 +478,7 @@ static int mv2222_config_init(struct phy_device *phydev)
 
 static int mv2222_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
 {
-<<<<<<< HEAD
 	DECLARE_PHY_INTERFACE_MASK(interfaces);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct phy_device *phydev = upstream;
 	phy_interface_t sfp_interface;
 	struct mv2222_data *priv;
@@ -493,11 +490,7 @@ static int mv2222_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
 	priv = (struct mv2222_data *)phydev->priv;
 	dev = &phydev->mdio.dev;
 
-<<<<<<< HEAD
 	sfp_parse_support(phydev->sfp_bus, id, sfp_supported, interfaces);
-=======
-	sfp_parse_support(phydev->sfp_bus, id, sfp_supported);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phydev->port = sfp_parse_port(phydev->sfp_bus, id, sfp_supported);
 	sfp_interface = sfp_select_interface(phydev->sfp_bus, sfp_supported);
 

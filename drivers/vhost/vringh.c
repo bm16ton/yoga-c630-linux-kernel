@@ -1106,8 +1106,6 @@ static int iotlb_translate(const struct vringh *vrh,
 
 	spin_lock(vrh->iotlb_lock);
 
-	spin_lock(vrh->iotlb_lock);
-
 	while (len > s) {
 		u64 size, pa, pfn;
 

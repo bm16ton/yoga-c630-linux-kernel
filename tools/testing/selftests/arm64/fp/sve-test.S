@@ -310,7 +310,6 @@ function irritator_handler
 	// And FFR
 	wrffr	p15.b
 #endif
-<<<<<<< HEAD
 
 	ret
 endfunction
@@ -320,8 +319,6 @@ function tickle_handler
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret
 endfunction
@@ -382,7 +379,6 @@ endfunction
 .globl _start
 function _start
 _start:
-<<<<<<< HEAD
 	mov	x23, #0		// Irritation signal count
 
 	mov	w0, #SIGINT
@@ -407,8 +403,6 @@ _start:
 	orr	w2, w2, #SA_NODEFER
 	bl	setsignal
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef SSVE
 	puts	"Streaming mode "
 	smstart_sm
@@ -443,10 +437,6 @@ _start:
 	puts	"PID:\t"
 	mov	x0, x20
 	bl	putdecn
-
-#ifdef SSVE
-	smstart_sm		// syscalls will have exited streaming mode
-#endif
 
 #ifdef SSVE
 	smstart_sm		// syscalls will have exited streaming mode

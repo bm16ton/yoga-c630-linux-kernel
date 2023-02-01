@@ -44,11 +44,7 @@ static int tcf_csum_init(struct net *net, struct nlattr *nla,
 			 struct tcf_proto *tp,
 			 u32 flags, struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_csum_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, csum_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = flags & TCA_ACT_FLAGS_BIND;
 	struct tcf_csum_params *params_new;
 	struct nlattr *tb[TCA_CSUM_MAX + 1];
@@ -679,25 +675,6 @@ static void tcf_csum_cleanup(struct tc_action *a)
 static size_t tcf_csum_get_fill_size(const struct tc_action *act)
 {
 	return nla_total_size(sizeof(struct tc_csum));
-}
-
-static int tcf_csum_offload_act_setup(struct tc_action *act, void *entry_data,
-				      u32 *index_inc, bool bind,
-				      struct netlink_ext_ack *extack)
-{
-	if (bind) {
-		struct flow_action_entry *entry = entry_data;
-
-		entry->id = FLOW_ACTION_CSUM;
-		entry->csum_flags = tcf_csum_update_flags(act);
-		*index_inc = 1;
-	} else {
-		struct flow_offload_action *fl_action = entry_data;
-
-		fl_action->id = FLOW_ACTION_CSUM;
-	}
-
-	return 0;
 }
 
 static int tcf_csum_offload_act_setup(struct tc_action *act, void *entry_data,

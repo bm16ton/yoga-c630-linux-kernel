@@ -521,7 +521,6 @@ TRACE_EVENT(io_uring_req_failed,
 		__field( int,			error		)
 
 		__string( op_str, io_uring_get_opcode(sqe->opcode) )
-<<<<<<< HEAD
 	),
 
 	TP_fast_assign(
@@ -674,148 +673,15 @@ TRACE_EVENT(io_uring_local_work_run,
 		__field(void *,		ctx	)
 		__field(int,		count	)
 		__field(unsigned int,	loops	)
-=======
-	),
-
-	TP_fast_assign(
-		__entry->ctx		= req->ctx;
-		__entry->req		= req;
-		__entry->user_data	= sqe->user_data;
-		__entry->opcode		= sqe->opcode;
-		__entry->flags		= sqe->flags;
-		__entry->ioprio		= sqe->ioprio;
-		__entry->off		= sqe->off;
-		__entry->addr		= sqe->addr;
-		__entry->len		= sqe->len;
-		__entry->op_flags	= sqe->poll32_events;
-		__entry->buf_index	= sqe->buf_index;
-		__entry->personality	= sqe->personality;
-		__entry->file_index	= sqe->file_index;
-		__entry->pad1		= sqe->__pad2[0];
-		__entry->addr3		= sqe->addr3;
-		__entry->error		= error;
-
-		__assign_str(op_str, io_uring_get_opcode(sqe->opcode));
-	),
-
-	TP_printk("ring %p, req %p, user_data 0x%llx, "
-		  "opcode %s, flags 0x%x, prio=%d, off=%llu, addr=%llu, "
-		  "len=%u, rw_flags=0x%x, buf_index=%d, "
-		  "personality=%d, file_index=%d, pad=0x%llx, addr3=%llx, "
-		  "error=%d",
-		  __entry->ctx, __entry->req, __entry->user_data,
-		  __get_str(op_str),
-		  __entry->flags, __entry->ioprio,
-		  (unsigned long long)__entry->off,
-		  (unsigned long long) __entry->addr, __entry->len,
-		  __entry->op_flags,
-		  __entry->buf_index, __entry->personality, __entry->file_index,
-		  (unsigned long long) __entry->pad1,
-		  (unsigned long long) __entry->addr3, __entry->error)
-);
-
-
-/*
- * io_uring_cqe_overflow - a CQE overflowed
- *
- * @ctx:		pointer to a ring context structure
- * @user_data:		user data associated with the request
- * @res:		CQE result
- * @cflags:		CQE flags
- * @ocqe:		pointer to the overflow cqe (if available)
- *
- */
-TRACE_EVENT(io_uring_cqe_overflow,
-
-	TP_PROTO(void *ctx, unsigned long long user_data, s32 res, u32 cflags,
-		 void *ocqe),
-
-	TP_ARGS(ctx, user_data, res, cflags, ocqe),
-
-	TP_STRUCT__entry (
-		__field(  void *,		ctx		)
-		__field(  unsigned long long,	user_data	)
-		__field(  s32,			res		)
-		__field(  u32,			cflags		)
-		__field(  void *,		ocqe		)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	),
 
 	TP_fast_assign(
 		__entry->ctx		= ctx;
-<<<<<<< HEAD
 		__entry->count		= count;
 		__entry->loops		= loops;
 	),
 
 	TP_printk("ring %p, count %d, loops %u", __entry->ctx, __entry->count, __entry->loops)
-=======
-		__entry->user_data	= user_data;
-		__entry->res		= res;
-		__entry->cflags		= cflags;
-		__entry->ocqe		= ocqe;
-	),
-
-	TP_printk("ring %p, user_data 0x%llx, res %d, cflags 0x%x, "
-		  "overflow_cqe %p",
-		  __entry->ctx, __entry->user_data, __entry->res,
-		  __entry->cflags, __entry->ocqe)
-);
-
-/*
- * io_uring_task_work_run - ran task work
- *
- * @tctx:		pointer to a io_uring_task
- * @count:		how many functions it ran
- * @loops:		how many loops it ran
- *
- */
-TRACE_EVENT(io_uring_task_work_run,
-
-	TP_PROTO(void *tctx, unsigned int count, unsigned int loops),
-
-	TP_ARGS(tctx, count, loops),
-
-	TP_STRUCT__entry (
-		__field(  void *,		tctx		)
-		__field(  unsigned int,		count		)
-		__field(  unsigned int,		loops		)
-	),
-
-	TP_fast_assign(
-		__entry->tctx		= tctx;
-		__entry->count		= count;
-		__entry->loops		= loops;
-	),
-
-	TP_printk("tctx %p, count %u, loops %u",
-		 __entry->tctx, __entry->count, __entry->loops)
-);
-
-TRACE_EVENT(io_uring_short_write,
-
-	TP_PROTO(void *ctx, u64 fpos, u64 wanted, u64 got),
-
-	TP_ARGS(ctx, fpos, wanted, got),
-
-	TP_STRUCT__entry(
-		__field(void *,	ctx)
-		__field(u64,	fpos)
-		__field(u64,	wanted)
-		__field(u64,	got)
-	),
-
-	TP_fast_assign(
-		__entry->ctx	= ctx;
-		__entry->fpos	= fpos;
-		__entry->wanted	= wanted;
-		__entry->got	= got;
-	),
-
-	TP_printk("ring %p, fpos %lld, wanted %lld, got %lld",
-			  __entry->ctx, __entry->fpos,
-			  __entry->wanted, __entry->got)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 );
 
 #endif /* _TRACE_IO_URING_H */

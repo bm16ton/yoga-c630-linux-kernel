@@ -24,7 +24,6 @@ TRACE_EVENT(ufs_mtk_event,
 		__entry->data = data;
 	),
 
-<<<<<<< HEAD
 	TP_printk("ufs: event=%u data=%u",
 		  __entry->type, __entry->data)
 );
@@ -51,11 +50,6 @@ TRACE_EVENT(ufs_mtk_clk_scale,
 		  __entry->clk_rate)
 );
 
-=======
-	TP_printk("ufs:event=%u data=%u",
-		  __entry->type, __entry->data)
-	);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #undef TRACE_INCLUDE_PATH

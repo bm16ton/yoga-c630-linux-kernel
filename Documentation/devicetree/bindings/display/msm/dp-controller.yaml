@@ -25,10 +25,7 @@ properties:
       - qcom,sm8350-dp
 
   reg:
-<<<<<<< HEAD
     minItems: 4
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     items:
       - description: ahb register block
       - description: aux register block
@@ -75,7 +72,6 @@ properties:
   operating-points-v2:
     maxItems: 1
 
-<<<<<<< HEAD
   opp-table: true
 
   power-domains:
@@ -98,16 +94,6 @@ properties:
     deprecated: true
   vdda-1p2-supply:
     deprecated: true
-=======
-  power-domains:
-    maxItems: 1
-
-  "#sound-dai-cells":
-    const: 0
-
-  vdda-0p9-supply: true
-  vdda-1p2-supply: true
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
@@ -128,7 +114,6 @@ required:
   - clock-names
   - phys
   - phy-names
-<<<<<<< HEAD
   - power-domains
   - ports
 
@@ -156,12 +141,6 @@ allOf:
       required:
         - "#sound-dai-cells"
 
-=======
-  - "#sound-dai-cells"
-  - power-domains
-  - ports
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 additionalProperties: false
 
 examples:
@@ -200,12 +179,6 @@ examples:
 
         power-domains = <&rpmhpd SC7180_CX>;
 
-<<<<<<< HEAD
-=======
-        vdda-0p9-supply = <&vdda_usb_ss_dp_core>;
-        vdda-1p2-supply = <&vdda_usb_ss_dp_1p2>;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         ports {
             #address-cells = <1>;
             #size-cells = <0>;

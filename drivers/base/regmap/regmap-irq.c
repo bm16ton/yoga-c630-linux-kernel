@@ -797,7 +797,6 @@ int regmap_add_irq_chip_fwnode(struct fwnode_handle *fwnode,
 			goto err_alloc;
 	}
 
-<<<<<<< HEAD
 	/*
 	 * Use num_config_regs if defined, otherwise fall back to num_type_reg
 	 * to maintain backward compatibility.
@@ -807,20 +806,11 @@ int regmap_add_irq_chip_fwnode(struct fwnode_handle *fwnode,
 	num_regs = chip->type_in_mask ? chip->num_regs : num_type_reg;
 	if (num_regs) {
 		d->type_buf_def = kcalloc(num_regs,
-=======
-	num_type_reg = chip->type_in_mask ? chip->num_regs : chip->num_type_reg;
-	if (num_type_reg) {
-		d->type_buf_def = kcalloc(num_type_reg,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					  sizeof(*d->type_buf_def), GFP_KERNEL);
 		if (!d->type_buf_def)
 			goto err_alloc;
 
-<<<<<<< HEAD
 		d->type_buf = kcalloc(num_regs, sizeof(*d->type_buf),
-=======
-		d->type_buf = kcalloc(num_type_reg, sizeof(*d->type_buf),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				      GFP_KERNEL);
 		if (!d->type_buf)
 			goto err_alloc;

@@ -109,7 +109,6 @@ struct tls_descs {
  */
 static DEFINE_PER_CPU(struct tls_descs, shadow_tls_desc);
 
-<<<<<<< HEAD
 static __read_mostly bool xen_msr_safe = IS_ENABLED(CONFIG_XEN_PV_MSR_SAFE);
 
 static int __init parse_xen_msr_safe(char *str)
@@ -120,17 +119,11 @@ static int __init parse_xen_msr_safe(char *str)
 }
 early_param("xen_msr_safe", parse_xen_msr_safe);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void __init xen_pv_init_platform(void)
 {
 	/* PV guests can't operate virtio devices without grants. */
 	if (IS_ENABLED(CONFIG_XEN_VIRTIO))
-<<<<<<< HEAD
 		virtio_set_mem_acc_cb(xen_virtio_restricted_mem_acc);
-=======
-		virtio_set_mem_acc_cb(virtio_require_restricted_mem_acc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	populate_extra_pte(fix_to_virt(FIX_PARAVIRT_BOOTMAP));
 
@@ -1066,7 +1059,6 @@ static const struct pv_info xen_info __initconst = {
 static const typeof(pv_ops) xen_cpu_ops __initconst = {
 	.cpu = {
 		.cpuid = xen_cpuid,
-<<<<<<< HEAD
 
 		.set_debugreg = xen_set_debugreg,
 		.get_debugreg = xen_get_debugreg,
@@ -1098,39 +1090,6 @@ static const typeof(pv_ops) xen_cpu_ops __initconst = {
 
 		.store_tr = xen_store_tr,
 
-=======
-
-		.set_debugreg = xen_set_debugreg,
-		.get_debugreg = xen_get_debugreg,
-
-		.read_cr0 = xen_read_cr0,
-		.write_cr0 = xen_write_cr0,
-
-		.write_cr4 = xen_write_cr4,
-
-		.wbinvd = native_wbinvd,
-
-		.read_msr = xen_read_msr,
-		.write_msr = xen_write_msr,
-
-		.read_msr_safe = xen_read_msr_safe,
-		.write_msr_safe = xen_write_msr_safe,
-
-		.read_pmc = xen_read_pmc,
-
-		.load_tr_desc = paravirt_nop,
-		.set_ldt = xen_set_ldt,
-		.load_gdt = xen_load_gdt,
-		.load_idt = xen_load_idt,
-		.load_tls = xen_load_tls,
-		.load_gs_index = xen_load_gs_index,
-
-		.alloc_ldt = xen_alloc_ldt,
-		.free_ldt = xen_free_ldt,
-
-		.store_tr = xen_store_tr,
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.write_ldt_entry = xen_write_ldt_entry,
 		.write_gdt_entry = xen_write_gdt_entry,
 		.write_idt_entry = xen_write_idt_entry,

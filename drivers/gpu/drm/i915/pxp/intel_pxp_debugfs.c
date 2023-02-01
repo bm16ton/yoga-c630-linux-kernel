@@ -47,15 +47,9 @@ static int pxp_terminate_set(void *data, u64 val)
 		return -ENODEV;
 
 	/* simulate a termination interrupt */
-<<<<<<< HEAD
 	spin_lock_irq(gt->irq_lock);
 	intel_pxp_irq_handler(pxp, GEN12_DISPLAY_PXP_STATE_TERMINATED_INTERRUPT);
 	spin_unlock_irq(gt->irq_lock);
-=======
-	spin_lock_irq(&gt->irq_lock);
-	intel_pxp_irq_handler(pxp, GEN12_DISPLAY_PXP_STATE_TERMINATED_INTERRUPT);
-	spin_unlock_irq(&gt->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!wait_for_completion_timeout(&pxp->termination,
 					 msecs_to_jiffies(100)))

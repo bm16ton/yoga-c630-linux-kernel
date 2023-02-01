@@ -124,7 +124,6 @@ depth format), bit-depth reduction/dithering would kick in. In OPP, we would
 also apply a regamma function to introduce the gamma removed earlier back.
 Eventually, we output data in integer format at DIO.
 
-<<<<<<< HEAD
 AMD Hardware Pipeline
 ---------------------
 
@@ -184,8 +183,6 @@ that the pipe configuration can vary a lot according to the display
 configuration, and it is the DML's responsibility to set up all required
 configuration parameters for multiple scenarios supported by our hardware.
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Global Sync
 -----------
 

@@ -34,11 +34,7 @@ int acp_sof_trace_release(struct snd_sof_dev *sdev)
 }
 EXPORT_SYMBOL_NS(acp_sof_trace_release, SND_SOC_SOF_AMD_COMMON);
 
-<<<<<<< HEAD
 int acp_sof_trace_init(struct snd_sof_dev *sdev, struct snd_dma_buffer *dmab,
-=======
-int acp_sof_trace_init(struct snd_sof_dev *sdev,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		       struct sof_ipc_dma_trace_params_ext *dtrace_params)
 {
 	struct acp_dsp_stream *stream;
@@ -50,11 +46,7 @@ int acp_sof_trace_init(struct snd_sof_dev *sdev,
 	if (!stream)
 		return -ENODEV;
 
-<<<<<<< HEAD
 	stream->dmab = dmab;
-=======
-	stream->dmab = &sdev->dmatb;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	stream->num_pages = NUM_PAGES;
 
 	ret = acp_dsp_stream_config(sdev, stream);

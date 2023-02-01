@@ -39,10 +39,7 @@
 #include <scsi/scsi_host.h>
 #include <scsi/scsi_tcq.h>
 #include <uapi/scsi/scsi_bsg_mpi3mr.h>
-<<<<<<< HEAD
 #include <scsi/scsi_transport_sas.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "mpi/mpi30_transport.h"
 #include "mpi/mpi30_cnfg.h"
@@ -59,13 +56,8 @@ extern struct list_head mrioc_list;
 extern int prot_mask;
 extern atomic64_t event_counter;
 
-<<<<<<< HEAD
 #define MPI3MR_DRIVER_VERSION	"8.2.0.3.0"
 #define MPI3MR_DRIVER_RELDATE	"08-September-2022"
-=======
-#define MPI3MR_DRIVER_VERSION	"8.0.0.69.0"
-#define MPI3MR_DRIVER_RELDATE	"16-March-2022"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define MPI3MR_DRIVER_NAME	"mpi3mr"
 #define MPI3MR_DRIVER_LICENSE	"GPL"
@@ -106,17 +98,11 @@ extern atomic64_t event_counter;
 #define MPI3MR_HOSTTAG_PEL_ABORT	3
 #define MPI3MR_HOSTTAG_PEL_WAIT		4
 #define MPI3MR_HOSTTAG_BLK_TMS		5
-<<<<<<< HEAD
 #define MPI3MR_HOSTTAG_CFG_CMDS		6
 #define MPI3MR_HOSTTAG_TRANSPORT_CMDS	7
 
 #define MPI3MR_NUM_DEVRMCMD		16
 #define MPI3MR_HOSTTAG_DEVRMCMD_MIN	(MPI3MR_HOSTTAG_TRANSPORT_CMDS + 1)
-=======
-
-#define MPI3MR_NUM_DEVRMCMD		16
-#define MPI3MR_HOSTTAG_DEVRMCMD_MIN	(MPI3MR_HOSTTAG_BLK_TMS + 1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MPI3MR_HOSTTAG_DEVRMCMD_MAX	(MPI3MR_HOSTTAG_DEVRMCMD_MIN + \
 						MPI3MR_NUM_DEVRMCMD - 1)
 
@@ -132,10 +118,7 @@ extern atomic64_t event_counter;
 /* command/controller interaction timeout definitions in seconds */
 #define MPI3MR_INTADMCMD_TIMEOUT		60
 #define MPI3MR_PORTENABLE_TIMEOUT		300
-<<<<<<< HEAD
 #define MPI3MR_PORTENABLE_POLL_INTERVAL		5
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MPI3MR_ABORTTM_TIMEOUT			60
 #define MPI3MR_RESETTM_TIMEOUT			60
 #define MPI3MR_RESET_HOST_IOWAIT_TIMEOUT	5
@@ -147,13 +130,10 @@ extern atomic64_t event_counter;
 
 #define MPI3MR_WATCHDOG_INTERVAL		1000 /* in milli seconds */
 
-<<<<<<< HEAD
 #define MPI3MR_DEFAULT_CFG_PAGE_SZ		1024 /* in bytes */
 
 #define MPI3MR_RESET_TOPOLOGY_SETTLE_TIME	10
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MPI3MR_SCMD_TIMEOUT    (60 * HZ)
 #define MPI3MR_EH_SCMD_TIMEOUT (60 * HZ)
 
@@ -302,11 +282,8 @@ enum mpi3mr_reset_reason {
 	MPI3MR_RESET_FROM_SYSFS = 23,
 	MPI3MR_RESET_FROM_SYSFS_TIMEOUT = 24,
 	MPI3MR_RESET_FROM_FIRMWARE = 27,
-<<<<<<< HEAD
 	MPI3MR_RESET_FROM_CFG_REQ_TIMEOUT = 29,
 	MPI3MR_RESET_FROM_SAS_TRANSPORT_TIMEOUT = 30,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Queue type definitions */
@@ -454,20 +431,14 @@ struct op_reply_qinfo {
  * struct mpi3mr_intr_info -  Interrupt cookie information
  *
  * @mrioc: Adapter instance reference
-<<<<<<< HEAD
  * @os_irq: irq number
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @msix_index: MSIx index
  * @op_reply_q: Associated operational reply queue
  * @name: Dev name for the irq claiming device
  */
 struct mpi3mr_intr_info {
 	struct mpi3mr_ioc *mrioc;
-<<<<<<< HEAD
 	int os_irq;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 msix_index;
 	struct op_reply_qinfo *op_reply_q;
 	char name[MPI3MR_NAME_LENGTH];
@@ -498,7 +469,6 @@ struct mpi3mr_throttle_group_info {
 	atomic_t pend_large_data_sz;
 };
 
-<<<<<<< HEAD
 /* HBA port flags */
 #define MPI3MR_HBA_PORT_FLAG_DIRTY	0x01
 
@@ -607,14 +577,11 @@ struct mpi3mr_enclosure_node {
 	struct mpi3_enclosure_page0 pg0;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * struct tgt_dev_sas_sata - SAS/SATA device specific
  * information cached from firmware given data
  *
  * @sas_address: World wide unique SAS address
-<<<<<<< HEAD
  * @sas_address_parent: Sas address of parent expander or host
  * @dev_info: Device information bits
  * @phy_id: Phy identifier provided in device page 0
@@ -634,13 +601,6 @@ struct tgt_dev_sas_sata {
 	u8 pend_sas_rphy_add;
 	struct mpi3mr_hba_port *hba_port;
 	struct sas_rphy *rphy;
-=======
- * @dev_info: Device information bits
- */
-struct tgt_dev_sas_sata {
-	u64 sas_address;
-	u16 dev_info;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -705,7 +665,6 @@ union _form_spec_inf {
  * @slot: Slot number
  * @encl_handle: FW enclosure handle
  * @perst_id: FW assigned Persistent ID
-<<<<<<< HEAD
  * @devpg0_flag: Device Page0 flag
  * @dev_type: SAS/SATA/PCIE device type
  * @is_hidden: Should be exposed to upper layers or not
@@ -716,14 +675,6 @@ union _form_spec_inf {
  * @q_depth: Device specific Queue Depth
  * @wwid: World wide ID
  * @enclosure_logical_id: Enclosure logical identifier
-=======
- * @dev_type: SAS/SATA/PCIE device type
- * @is_hidden: Should be exposed to upper layers or not
- * @host_exposed: Already exposed to host or not
- * @io_throttle_enabled: I/O throttling needed or not
- * @q_depth: Device specific Queue Depth
- * @wwid: World wide ID
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @dev_spec: Device type specific information
  * @ref_count: Reference count
  */
@@ -735,7 +686,6 @@ struct mpi3mr_tgt_dev {
 	u16 slot;
 	u16 encl_handle;
 	u16 perst_id;
-<<<<<<< HEAD
 	u16 devpg0_flag;
 	u8 dev_type;
 	u8 is_hidden;
@@ -746,14 +696,6 @@ struct mpi3mr_tgt_dev {
 	u16 q_depth;
 	u64 wwid;
 	u64 enclosure_logical_id;
-=======
-	u8 dev_type;
-	u8 is_hidden;
-	u8 host_exposed;
-	u8 io_throttle_enabled;
-	u16 q_depth;
-	u64 wwid;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	union _form_spec_inf dev_spec;
 	struct kref ref_count;
 };
@@ -879,7 +821,6 @@ struct mpi3mr_drv_cmd {
 	    struct mpi3mr_drv_cmd *drv_cmd);
 };
 
-<<<<<<< HEAD
 /**
  * struct dma_memory_desc - memory descriptor structure to store
  * virtual address, dma address and size for any generic dma
@@ -895,8 +836,6 @@ struct dma_memory_desc {
 	dma_addr_t dma_addr;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * struct chain_element - memory descriptor structure to store
@@ -974,10 +913,7 @@ struct scmd_priv {
  * @num_op_reply_q: Number of operational reply queues
  * @op_reply_qinfo: Operational reply queue info pointer
  * @init_cmds: Command tracker for initialization commands
-<<<<<<< HEAD
  * @cfg_cmds: Command tracker for configuration requests
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @facts: Cached IOC facts data
  * @op_reply_desc_sz: Operational reply descriptor size
  * @num_reply_bufs: Number of reply buffers allocated
@@ -1014,10 +950,7 @@ struct scmd_priv {
  * @scan_started: Async scan started
  * @scan_failed: Asycn scan failed
  * @stop_drv_processing: Stop all command processing
-<<<<<<< HEAD
  * @device_refresh_on: Don't process the events until devices are refreshed
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @max_host_ios: Maximum host I/O count
  * @chain_buf_count: Chain buffer count
  * @chain_buf_pool: Chain buffer pool
@@ -1080,7 +1013,6 @@ struct scmd_priv {
  * @io_throttle_low: I/O size to stop throttle in 512b blocks
  * @num_io_throttle_group: Maximum number of throttle groups
  * @throttle_groups: Pointer to throttle group info structures
-<<<<<<< HEAD
  * @cfg_page: Default memory for configuration pages
  * @cfg_page_dma: Configuration page DMA address
  * @cfg_page_sz: Default configuration page memory size
@@ -1092,8 +1024,6 @@ struct scmd_priv {
  * @sas_node_lock: Lock to protect SAS node list
  * @hba_port_table_list: List of HBA Ports
  * @enclosure_list: List of Enclosure objects
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct mpi3mr_ioc {
 	struct list_head list;
@@ -1144,10 +1074,7 @@ struct mpi3mr_ioc {
 	struct op_reply_qinfo *op_reply_qinfo;
 
 	struct mpi3mr_drv_cmd init_cmds;
-<<<<<<< HEAD
 	struct mpi3mr_drv_cmd cfg_cmds;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mpi3mr_ioc_facts facts;
 	u16 op_reply_desc_sz;
 
@@ -1192,10 +1119,7 @@ struct mpi3mr_ioc {
 	u8 scan_started;
 	u16 scan_failed;
 	u8 stop_drv_processing;
-<<<<<<< HEAD
 	u8 device_refresh_on;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	u16 max_host_ios;
 	spinlock_t tgtdev_lock;
@@ -1273,7 +1197,6 @@ struct mpi3mr_ioc {
 	u32 io_throttle_low;
 	u16 num_io_throttle_group;
 	struct mpi3mr_throttle_group_info *throttle_groups;
-<<<<<<< HEAD
 
 	void *cfg_page;
 	dma_addr_t cfg_page_dma;
@@ -1287,8 +1210,6 @@ struct mpi3mr_ioc {
 	spinlock_t sas_node_lock;
 	struct list_head hba_port_table_list;
 	struct list_head enclosure_list;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -1413,7 +1334,6 @@ int mpi3mr_pel_get_seqnum_post(struct mpi3mr_ioc *mrioc,
 	struct mpi3mr_drv_cmd *drv_cmd);
 void mpi3mr_app_save_logdata(struct mpi3mr_ioc *mrioc, char *event_data,
 	u16 event_data_size);
-<<<<<<< HEAD
 struct mpi3mr_enclosure_node *mpi3mr_enclosure_find_by_handle(
 	struct mpi3mr_ioc *mrioc, u16 handle);
 extern const struct attribute_group *mpi3mr_host_groups[];
@@ -1477,8 +1397,4 @@ void mpi3mr_add_event_wait_for_device_refresh(struct mpi3mr_ioc *mrioc);
 void mpi3mr_flush_drv_cmds(struct mpi3mr_ioc *mrioc);
 void mpi3mr_flush_cmds_for_unrecovered_controller(struct mpi3mr_ioc *mrioc);
 void mpi3mr_free_enclosure_list(struct mpi3mr_ioc *mrioc);
-=======
-extern const struct attribute_group *mpi3mr_host_groups[];
-extern const struct attribute_group *mpi3mr_dev_groups[];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /*MPI3MR_H_INCLUDED*/

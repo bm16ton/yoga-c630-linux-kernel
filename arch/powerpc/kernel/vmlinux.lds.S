@@ -187,19 +187,6 @@ SECTIONS
 	}
 #endif
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_PPC64
-	SOFT_MASK_TABLE(8)
-	RESTART_TABLE(8)
-
-	.opd : AT(ADDR(.opd) - LOAD_OFFSET) {
-		__start_opd = .;
-		KEEP(*(.opd))
-		__end_opd = .;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	. = ALIGN(8);
 	__stf_entry_barrier_fixup : AT(ADDR(__stf_entry_barrier_fixup) - LOAD_OFFSET) {
 		__start___stf_entry_barrier_fixup = .;
@@ -378,36 +365,9 @@ SECTIONS
 		*(.data.rel*)
 #ifdef CONFIG_PPC32
 		*(SDATA_MAIN)
-<<<<<<< HEAD
 #endif
 	}
 
-=======
-		*(.sdata2)
-		*(.got.plt) *(.got)
-		*(.plt)
-		*(.branch_lt)
-	}
-#else
-	.data : AT(ADDR(.data) - LOAD_OFFSET) {
-		DATA_DATA
-		*(.data.rel*)
-		*(.toc1)
-		*(.branch_lt)
-	}
-
-	.got : AT(ADDR(.got) - LOAD_OFFSET) ALIGN(256) {
-		*(.got)
-#ifndef CONFIG_RELOCATABLE
-		__prom_init_toc_start = .;
-		arch/powerpc/kernel/prom_init.o*(.toc)
-		__prom_init_toc_end = .;
-#endif
-		*(.toc)
-	}
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* The initial task and kernel stack */
 	INIT_TASK_DATA_SECTION(THREAD_ALIGN)
 

@@ -319,11 +319,7 @@ int efx_probe_interrupts(struct efx_nic *efx)
 		efx->n_channels = 1 + (efx_separate_tx_channels ? 1 : 0);
 		efx->n_rx_channels = 1;
 		efx->n_tx_channels = 1;
-<<<<<<< HEAD
 		efx->tx_channel_offset = efx_separate_tx_channels ? 1 : 0;
-=======
-		efx->tx_channel_offset = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		efx->n_xdp_channels = 0;
 		efx->xdp_channel_offset = efx->n_channels;
 		efx->legacy_irq = efx->pci_dev->irq;
@@ -1317,11 +1313,7 @@ void efx_init_napi_channel(struct efx_channel *channel)
 	struct efx_nic *efx = channel->efx;
 
 	channel->napi_dev = efx->net_dev;
-<<<<<<< HEAD
 	netif_napi_add(channel->napi_dev, &channel->napi_str, efx_poll);
-=======
-	netif_napi_add(channel->napi_dev, &channel->napi_str, efx_poll, 64);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void efx_init_napi(struct efx_nic *efx)

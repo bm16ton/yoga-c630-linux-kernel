@@ -68,10 +68,7 @@ export BITS
 #    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53383
 #
 KBUILD_CFLAGS += -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx
-<<<<<<< HEAD
 KBUILD_RUSTFLAGS += -Ctarget-feature=-sse,-sse2,-sse3,-ssse3,-sse4.1,-sse4.2,-avx,-avx2
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 ifeq ($(CONFIG_X86_KERNEL_IBT),y)
 #

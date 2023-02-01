@@ -1257,21 +1257,13 @@ int disasm_line__scnprintf(struct disasm_line *dl, char *bf, size_t size, bool r
 
 void annotation__init(struct annotation *notes)
 {
-<<<<<<< HEAD
 	mutex_init(&notes->lock);
-=======
-	pthread_mutex_init(&notes->lock, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void annotation__exit(struct annotation *notes)
 {
 	annotated_source__delete(notes->src);
-<<<<<<< HEAD
 	mutex_destroy(&notes->lock);
-=======
-	pthread_mutex_destroy(&notes->lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void annotation_line__add(struct annotation_line *al, struct list_head *head)
@@ -1705,10 +1697,7 @@ fallback:
 		 */
 		__symbol__join_symfs(filename, filename_size, dso->long_name);
 
-<<<<<<< HEAD
 		mutex_lock(&dso->lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (access(filename, R_OK) && errno == ENOENT && dso->nsinfo) {
 			char *new_name = filename_with_chroot(dso->nsinfo->pid,
 							      filename);
@@ -1717,10 +1706,7 @@ fallback:
 				free(new_name);
 			}
 		}
-<<<<<<< HEAD
 		mutex_unlock(&dso->lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	free(build_id_path);
@@ -2851,19 +2837,11 @@ int symbol__tty_annotate2(struct map_symbol *ms, struct evsel *evsel,
 	struct hists *hists = evsel__hists(evsel);
 	char buf[1024];
 	int err;
-<<<<<<< HEAD
 
 	err = symbol__annotate2(ms, evsel, opts, NULL);
 	if (err) {
 		char msg[BUFSIZ];
 
-=======
-
-	err = symbol__annotate2(ms, evsel, opts, NULL);
-	if (err) {
-		char msg[BUFSIZ];
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dso->annotate_warned = true;
 		symbol__strerror_disassemble(ms, err, msg, sizeof(msg));
 		ui__error("Couldn't annotate %s:\n%s", sym->name, msg);
@@ -2893,19 +2871,11 @@ int symbol__tty_annotate(struct map_symbol *ms, struct evsel *evsel,
 	struct symbol *sym = ms->sym;
 	struct rb_root source_line = RB_ROOT;
 	int err;
-<<<<<<< HEAD
 
 	err = symbol__annotate(ms, evsel, opts, NULL);
 	if (err) {
 		char msg[BUFSIZ];
 
-=======
-
-	err = symbol__annotate(ms, evsel, opts, NULL);
-	if (err) {
-		char msg[BUFSIZ];
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dso->annotate_warned = true;
 		symbol__strerror_disassemble(ms, err, msg, sizeof(msg));
 		ui__error("Couldn't annotate %s:\n%s", sym->name, msg);

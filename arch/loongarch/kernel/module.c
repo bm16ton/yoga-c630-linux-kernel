@@ -18,19 +18,6 @@
 #include <linux/string.h>
 #include <linux/kernel.h>
 
-<<<<<<< HEAD
-=======
-static inline bool signed_imm_check(long val, unsigned int bit)
-{
-	return -(1L << (bit - 1)) <= val && val < (1L << (bit - 1));
-}
-
-static inline bool unsigned_imm_check(unsigned long val, unsigned int bit)
-{
-	return val < (1UL << bit);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int rela_stack_push(s64 stack_value, s64 *rela_stack, size_t *rela_stack_top)
 {
 	if (*rela_stack_top >= RELA_STACK_DEPTH)
@@ -284,7 +271,6 @@ static int apply_r_larch_add_sub(struct module *mod, u32 *location, Elf_Addr v,
 	}
 }
 
-<<<<<<< HEAD
 static int apply_r_larch_b26(struct module *mod, u32 *location, Elf_Addr v,
 			s64 *rela_stack, size_t *rela_stack_top, unsigned int type)
 {
@@ -375,8 +361,6 @@ static int apply_r_larch_got_pc(struct module *mod, u32 *location, Elf_Addr v,
 	return apply_r_larch_pcala(mod, location, got, rela_stack, rela_stack_top, type);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * reloc_handlers_rela() - Apply a particular relocation to a module
  * @mod: the module to apply the reloc to
@@ -392,11 +376,7 @@ typedef int (*reloc_rela_handler)(struct module *mod, u32 *location, Elf_Addr v,
 
 /* The handlers for known reloc types */
 static reloc_rela_handler reloc_rela_handlers[] = {
-<<<<<<< HEAD
 	[R_LARCH_NONE ... R_LARCH_RELAX]		     = apply_r_larch_error,
-=======
-	[R_LARCH_NONE ... R_LARCH_SUB64]		     = apply_r_larch_error,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	[R_LARCH_NONE]					     = apply_r_larch_none,
 	[R_LARCH_32]					     = apply_r_larch_32,
@@ -410,12 +390,9 @@ static reloc_rela_handler reloc_rela_handlers[] = {
 	[R_LARCH_SOP_SUB ... R_LARCH_SOP_IF_ELSE] 	     = apply_r_larch_sop,
 	[R_LARCH_SOP_POP_32_S_10_5 ... R_LARCH_SOP_POP_32_U] = apply_r_larch_sop_imm_field,
 	[R_LARCH_ADD32 ... R_LARCH_SUB64]		     = apply_r_larch_add_sub,
-<<<<<<< HEAD
 	[R_LARCH_B26]					     = apply_r_larch_b26,
 	[R_LARCH_PCALA_HI20...R_LARCH_PCALA64_HI12]	     = apply_r_larch_pcala,
 	[R_LARCH_GOT_PC_HI20...R_LARCH_GOT_PC_LO12]	     = apply_r_larch_got_pc,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,

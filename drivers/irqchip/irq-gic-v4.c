@@ -94,11 +94,7 @@ bool gic_cpuif_has_vsgi(void)
 {
 	unsigned long fld, reg = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
 
-<<<<<<< HEAD
 	fld = cpuid_feature_extract_unsigned_field(reg, ID_AA64PFR0_EL1_GIC_SHIFT);
-=======
-	fld = cpuid_feature_extract_unsigned_field(reg, ID_AA64PFR0_GIC_SHIFT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return fld >= 0x3;
 }

@@ -755,11 +755,7 @@ static void set_clock_mux(struct uart_port *up, struct brcmuart_priv *priv,
 
 static void brcmstb_set_termios(struct uart_port *up,
 				struct ktermios *termios,
-<<<<<<< HEAD
 				const struct ktermios *old)
-=======
-				struct ktermios *old)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct uart_8250_port *p8250 = up_to_u8250p(up);
 	struct brcmuart_priv *priv = up->private_data;
@@ -1216,7 +1212,6 @@ static struct platform_driver brcmuart_platform_driver = {
 
 static int __init brcmuart_init(void)
 {
-<<<<<<< HEAD
 	int ret;
 
 	brcmuart_debugfs_root = debugfs_create_dir(
@@ -1228,11 +1223,6 @@ static int __init brcmuart_init(void)
 	}
 
 	return 0;
-=======
-	brcmuart_debugfs_root = debugfs_create_dir(
-		brcmuart_platform_driver.driver.name, NULL);
-	return platform_driver_register(&brcmuart_platform_driver);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 module_init(brcmuart_init);
 

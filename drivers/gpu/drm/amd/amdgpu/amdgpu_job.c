@@ -83,10 +83,7 @@ static enum drm_gpu_sched_stat amdgpu_job_timedout(struct drm_sched_job *s_job)
 	}
 
 exit:
-<<<<<<< HEAD
 	adev->job_hang = false;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_dev_exit(idx);
 	return DRM_GPU_SCHED_STAT_NOMINAL;
 }
@@ -107,10 +104,6 @@ int amdgpu_job_alloc(struct amdgpu_device *adev, unsigned num_ibs,
 	 */
 	(*job)->base.sched = &adev->rings[0]->sched;
 	(*job)->vm = vm;
-<<<<<<< HEAD
-=======
-	(*job)->num_ibs = num_ibs;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	amdgpu_sync_create(&(*job)->sync);
 	amdgpu_sync_create(&(*job)->sched_sync);
@@ -161,7 +154,6 @@ void amdgpu_job_free_resources(struct amdgpu_job *job)
 	struct dma_fence *f;
 	unsigned i;
 
-<<<<<<< HEAD
 	/* Check if any fences where initialized */
 	if (job->base.s_fence && job->base.s_fence->finished.ops)
 		f = &job->base.s_fence->finished;
@@ -170,10 +162,6 @@ void amdgpu_job_free_resources(struct amdgpu_job *job)
 	else
 		f = NULL;
 
-=======
-	/* use sched fence if available */
-	f = job->base.s_fence ? &job->base.s_fence->finished :  &job->hw_fence;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < job->num_ibs; ++i)
 		amdgpu_ib_free(ring->adev, &job->ibs[i], f);
 }
@@ -187,7 +175,6 @@ static void amdgpu_job_free_cb(struct drm_sched_job *s_job)
 	amdgpu_sync_free(&job->sync);
 	amdgpu_sync_free(&job->sched_sync);
 
-<<<<<<< HEAD
 	/* only put the hw fence if has embedded fence */
 	if (!job->hw_fence.ops)
 		kfree(job);
@@ -209,9 +196,6 @@ void amdgpu_job_set_gang_leader(struct amdgpu_job *job,
 	if (job != leader)
 		dma_fence_get(fence);
 	job->gang_submit = fence;
-=======
-	dma_fence_put(&job->hw_fence);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void amdgpu_job_free(struct amdgpu_job *job)
@@ -219,11 +203,8 @@ void amdgpu_job_free(struct amdgpu_job *job)
 	amdgpu_job_free_resources(job);
 	amdgpu_sync_free(&job->sync);
 	amdgpu_sync_free(&job->sched_sync);
-<<<<<<< HEAD
 	if (job->gang_submit != &job->base.s_fence->scheduled)
 		dma_fence_put(job->gang_submit);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!job->hw_fence.ops)
 		kfree(job);

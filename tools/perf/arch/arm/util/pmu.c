@@ -10,10 +10,7 @@
 #include <linux/string.h>
 
 #include "arm-spe.h"
-<<<<<<< HEAD
 #include "hisi-ptt.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../../../util/pmu.h"
 
 struct perf_event_attr

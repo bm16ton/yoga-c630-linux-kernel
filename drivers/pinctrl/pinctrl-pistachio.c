@@ -1372,7 +1372,6 @@ static int pistachio_gpio_register(struct pistachio_pinctrl *pctl)
 			goto err;
 		}
 
-<<<<<<< HEAD
 		ret = fwnode_irq_get(child, 0);
 		if (ret < 0) {
 			fwnode_handle_put(child);
@@ -1382,12 +1381,6 @@ static int pistachio_gpio_register(struct pistachio_pinctrl *pctl)
 		if (!ret) {
 			fwnode_handle_put(child);
 			dev_err(pctl->dev, "No IRQ for bank %u\n", i);
-=======
-		irq = irq_of_parse_and_map(child, 0);
-		if (!irq) {
-			dev_err(pctl->dev, "No IRQ for bank %u\n", i);
-			of_node_put(child);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = -EINVAL;
 			goto err;
 		}

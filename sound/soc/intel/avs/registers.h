@@ -14,10 +14,7 @@
 #define AZX_PGCTL_LSRMD_MASK		BIT(4)
 #define AZX_CGCTL_MISCBDCGE_MASK	BIT(6)
 #define AZX_VS_EM2_L1SEN		BIT(13)
-<<<<<<< HEAD
 #define AZX_VS_EM2_DUM			BIT(23)
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Intel HD Audio General DSP Registers */
 #define AVS_ADSP_GEN_BASE		0x0
@@ -51,15 +48,12 @@
 #define SKL_ADSP_HIPCIE_DONE		BIT(30)
 #define SKL_ADSP_HIPCT_BUSY		BIT(31)
 
-<<<<<<< HEAD
 /* Intel HD Audio SRAM windows base addresses */
 #define SKL_ADSP_SRAM_BASE_OFFSET	0x8000
 #define SKL_ADSP_SRAM_WINDOW_SIZE	0x2000
 #define APL_ADSP_SRAM_BASE_OFFSET	0x80000
 #define APL_ADSP_SRAM_WINDOW_SIZE	0x20000
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Constants used when accessing SRAM, space shared with firmware */
 #define AVS_FW_REG_BASE(adev)		((adev)->spec->sram_base_offset)
 #define AVS_FW_REG_STATUS(adev)		(AVS_FW_REG_BASE(adev) + 0x0)
@@ -71,10 +65,7 @@
 #define AVS_UPLINK_WINDOW		AVS_FW_REGS_WINDOW
 /* HOST -> DSP communication window */
 #define AVS_DOWNLINK_WINDOW		1
-<<<<<<< HEAD
 #define AVS_DEBUG_WINDOW		2
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* registry I/O helpers */
 #define avs_sram_offset(adev, window_idx) \

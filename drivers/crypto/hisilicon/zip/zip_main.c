@@ -59,23 +59,11 @@
 #define HZIP_CORE_INT_RAS_CE_ENB	0x301160
 #define HZIP_CORE_INT_RAS_NFE_ENB	0x301164
 #define HZIP_CORE_INT_RAS_FE_ENB        0x301168
-<<<<<<< HEAD
 #define HZIP_CORE_INT_RAS_FE_ENB_MASK	0x0
 #define HZIP_OOO_SHUTDOWN_SEL		0x30120C
 #define HZIP_SRAM_ECC_ERR_NUM_SHIFT	16
 #define HZIP_SRAM_ECC_ERR_ADDR_SHIFT	24
 #define HZIP_CORE_INT_MASK_ALL		GENMASK(12, 0)
-=======
-#define HZIP_OOO_SHUTDOWN_SEL		0x30120C
-#define HZIP_CORE_INT_RAS_NFE_ENABLE	0x1FFE
-#define HZIP_SRAM_ECC_ERR_NUM_SHIFT	16
-#define HZIP_SRAM_ECC_ERR_ADDR_SHIFT	24
-#define HZIP_CORE_INT_MASK_ALL		GENMASK(12, 0)
-#define HZIP_COMP_CORE_NUM		2
-#define HZIP_DECOMP_CORE_NUM		6
-#define HZIP_CORE_NUM			(HZIP_COMP_CORE_NUM + \
-					 HZIP_DECOMP_CORE_NUM)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define HZIP_SQE_SIZE			128
 #define HZIP_PF_DEF_Q_NUM		64
 #define HZIP_PF_DEF_Q_BASE		0
@@ -415,7 +403,6 @@ int zip_create_qps(struct hisi_qp **qps, int qp_num, int node)
 	return hisi_qm_alloc_qps_node(&zip_devices, qp_num, 0, node, qps);
 }
 
-<<<<<<< HEAD
 bool hisi_zip_alg_support(struct hisi_qm *qm, u32 alg)
 {
 	u32 cap_val;
@@ -456,18 +443,12 @@ static int hisi_zip_set_qm_algs(struct hisi_qm *qm)
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void hisi_zip_open_sva_prefetch(struct hisi_qm *qm)
 {
 	u32 val;
 	int ret;
 
-<<<<<<< HEAD
 	if (!test_bit(QM_SUPPORT_SVA_PREFETCH, &qm->caps))
-=======
-	if (qm->ver < QM_HW_V3)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	/* Enable prefetch */
@@ -487,11 +468,7 @@ static void hisi_zip_close_sva_prefetch(struct hisi_qm *qm)
 	u32 val;
 	int ret;
 
-<<<<<<< HEAD
 	if (!test_bit(QM_SUPPORT_SVA_PREFETCH, &qm->caps))
-=======
-	if (qm->ver < QM_HW_V3)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	val = readl_relaxed(qm->io_base + HZIP_PREFETCH_CFG);
@@ -579,7 +556,6 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
 }
 
 static void hisi_zip_master_ooo_ctrl(struct hisi_qm *qm, bool enable)
-<<<<<<< HEAD
 {
 	u32 val1, val2;
 
@@ -602,28 +578,7 @@ static void hisi_zip_master_ooo_ctrl(struct hisi_qm *qm, bool enable)
 static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
 {
 	u32 nfe, ce;
-=======
-{
-	u32 val1, val2;
 
-	val1 = readl(qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
-	if (enable) {
-		val1 |= HZIP_AXI_SHUTDOWN_ENABLE;
-		val2 = HZIP_CORE_INT_RAS_NFE_ENABLE;
-	} else {
-		val1 &= ~HZIP_AXI_SHUTDOWN_ENABLE;
-		val2 = 0x0;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-
-	if (qm->ver > QM_HW_V2)
-		writel(val2, qm->io_base + HZIP_OOO_SHUTDOWN_SEL);
-
-	writel(val1, qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
-}
-
-static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
-{
 	if (qm->ver == QM_HW_V1) {
 		writel(HZIP_CORE_INT_MASK_ALL,
 		       qm->io_base + HZIP_CORE_INT_MASK_REG);
@@ -644,29 +599,19 @@ static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
 
 	hisi_zip_master_ooo_ctrl(qm, true);
 
-	/* enable ZIP block master OOO when nfe occurs on Kunpeng930 */
-	hisi_zip_master_ooo_ctrl(qm, true);
-
 	/* enable ZIP hw error interrupts */
 	writel(0, qm->io_base + HZIP_CORE_INT_MASK_REG);
 }
 
 static void hisi_zip_hw_error_disable(struct hisi_qm *qm)
 {
-<<<<<<< HEAD
 	u32 nfe, ce;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* disable ZIP hw error interrupts */
 	nfe = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_NFE_MASK_CAP, qm->cap_ver);
 	ce = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_CE_MASK_CAP, qm->cap_ver);
 	writel(ce | nfe | HZIP_CORE_INT_RAS_FE_ENB_MASK, qm->io_base + HZIP_CORE_INT_MASK_REG);
 
-<<<<<<< HEAD
-=======
-	/* disable ZIP block master OOO when nfe occurs on Kunpeng930 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hisi_zip_master_ooo_ctrl(qm, false);
 }
 
@@ -752,10 +697,6 @@ static ssize_t hisi_zip_ctrl_debug_write(struct file *filp,
 
 	tbuf[len] = '\0';
 	ret = kstrtoul(tbuf, 0, &val);
-	if (ret)
-		return ret;
-
-	ret = hisi_qm_get_dfx_access(qm);
 	if (ret)
 		return ret;
 
@@ -850,11 +791,7 @@ static int hisi_zip_core_debug_init(struct hisi_qm *qm)
 
 		tmp_d = debugfs_create_dir(buf, qm->debug.debug_root);
 		debugfs_create_file("regs", 0444, tmp_d, regset,
-<<<<<<< HEAD
 				    &hisi_zip_regs_fops);
-=======
-				     &hisi_zip_regs_fops);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -974,7 +911,6 @@ static int hisi_zip_show_last_regs_init(struct hisi_qm *qm)
 	int com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
 	struct qm_debug *debug = &qm->debug;
 	void __iomem *io_base;
-<<<<<<< HEAD
 	u32 zip_core_num;
 	int i, j, idx;
 
@@ -982,12 +918,6 @@ static int hisi_zip_show_last_regs_init(struct hisi_qm *qm)
 
 	debug->last_words = kcalloc(core_dfx_regs_num * zip_core_num + com_dfx_regs_num,
 				    sizeof(unsigned int), GFP_KERNEL);
-=======
-	int i, j, idx;
-
-	debug->last_words = kcalloc(core_dfx_regs_num * HZIP_CORE_NUM +
-			com_dfx_regs_num, sizeof(unsigned int), GFP_KERNEL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!debug->last_words)
 		return -ENOMEM;
 
@@ -996,11 +926,7 @@ static int hisi_zip_show_last_regs_init(struct hisi_qm *qm)
 		debug->last_words[i] = readl_relaxed(io_base);
 	}
 
-<<<<<<< HEAD
 	for (i = 0; i < zip_core_num; i++) {
-=======
-	for (i = 0; i < HZIP_CORE_NUM; i++) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		io_base = qm->io_base + core_offsets[i];
 		for (j = 0; j < core_dfx_regs_num; j++) {
 			idx = com_dfx_regs_num + i * core_dfx_regs_num + j;
@@ -1027,10 +953,7 @@ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
 {
 	int core_dfx_regs_num =  ARRAY_SIZE(hzip_dump_dfx_regs);
 	int com_dfx_regs_num = ARRAY_SIZE(hzip_com_dfx_regs);
-<<<<<<< HEAD
 	u32 zip_core_num, zip_comp_core_num;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct qm_debug *debug = &qm->debug;
 	char buf[HZIP_BUF_SIZE];
 	void __iomem *base;
@@ -1044,7 +967,6 @@ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
 		val = readl_relaxed(qm->io_base + hzip_com_dfx_regs[i].offset);
 		if (debug->last_words[i] != val)
 			pci_info(qm->pdev, "com_dfx: %s \t= 0x%08x => 0x%08x\n",
-<<<<<<< HEAD
 				 hzip_com_dfx_regs[i].name, debug->last_words[i], val);
 	}
 
@@ -1057,17 +979,6 @@ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
 		else
 			scnprintf(buf, sizeof(buf), "Decomp_core-%d",
 				  i - zip_comp_core_num);
-=======
-				hzip_com_dfx_regs[i].name, debug->last_words[i], val);
-	}
-
-	for (i = 0; i < HZIP_CORE_NUM; i++) {
-		if (i < HZIP_COMP_CORE_NUM)
-			scnprintf(buf, sizeof(buf), "Comp_core-%d", i);
-		else
-			scnprintf(buf, sizeof(buf), "Decomp_core-%d",
-				  i - HZIP_COMP_CORE_NUM);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		base = qm->io_base + core_offsets[i];
 
 		pci_info(qm->pdev, "==>%s:\n", buf);
@@ -1077,12 +988,8 @@ static void hisi_zip_show_last_dfx_regs(struct hisi_qm *qm)
 			val = readl_relaxed(base + hzip_dump_dfx_regs[j].offset);
 			if (debug->last_words[idx] != val)
 				pci_info(qm->pdev, "%s \t= 0x%08x => 0x%08x\n",
-<<<<<<< HEAD
 					 hzip_dump_dfx_regs[j].name,
 					 debug->last_words[idx], val);
-=======
-					hzip_dump_dfx_regs[j].name, debug->last_words[idx], val);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 }
@@ -1155,7 +1062,6 @@ static void hisi_zip_err_info_init(struct hisi_qm *qm)
 {
 	struct hisi_qm_err_info *err_info = &qm->err_info;
 
-<<<<<<< HEAD
 	err_info->fe = HZIP_CORE_INT_RAS_FE_ENB_MASK;
 	err_info->ce = hisi_qm_get_hw_info(qm, zip_basic_cap_info, ZIP_QM_CE_MASK_CAP, qm->cap_ver);
 	err_info->nfe = hisi_qm_get_hw_info(qm, zip_basic_cap_info,
@@ -1171,18 +1077,6 @@ static void hisi_zip_err_info_init(struct hisi_qm *qm)
 						       ZIP_RESET_MASK_CAP, qm->cap_ver);
 	err_info->msi_wr_port = HZIP_WR_PORT;
 	err_info->acpi_rst = "ZRST";
-=======
-	err_info->ce = QM_BASE_CE;
-	err_info->fe = 0;
-	err_info->ecc_2bits_mask = HZIP_CORE_INT_STATUS_M_ECC;
-	err_info->dev_ce_mask = HZIP_CORE_INT_RAS_CE_ENABLE;
-	err_info->msi_wr_port = HZIP_WR_PORT;
-	err_info->acpi_rst = "ZRST";
-	err_info->nfe = QM_BASE_NFE | QM_ACC_WB_NOT_READY_TIMEOUT;
-
-	if (qm->ver >= QM_HW_V3)
-		err_info->nfe |= QM_ACC_DO_TASK_TIMEOUT;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct hisi_qm_err_ini hisi_zip_err_ini = {
@@ -1215,14 +1109,10 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
 	qm->err_ini = &hisi_zip_err_ini;
 	qm->err_ini->err_info_init(qm);
 
-<<<<<<< HEAD
 	ret = hisi_zip_set_user_domain_and_cache(qm);
 	if (ret)
 		return ret;
 
-=======
-	hisi_zip_set_user_domain_and_cache(qm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hisi_zip_open_sva_prefetch(qm);
 	hisi_qm_dev_err_init(qm);
 	hisi_zip_debug_regs_clear(qm);
@@ -1236,15 +1126,10 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
 
 static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
 {
+	int ret;
+
 	qm->pdev = pdev;
 	qm->ver = pdev->revision;
-<<<<<<< HEAD
-=======
-	if (pdev->revision >= QM_HW_V3)
-		qm->algs = "zlib\ngzip\ndeflate\nlz77_zstd";
-	else
-		qm->algs = "zlib\ngzip";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qm->mode = uacce_mode;
 	qm->sqe_size = HZIP_SQE_SIZE;
 	qm->dev_name = hisi_zip_name;
@@ -1268,7 +1153,6 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
 		qm->qp_num = HZIP_QUEUE_NUM_V1 - HZIP_PF_DEF_Q_NUM;
 	}
 
-<<<<<<< HEAD
 	ret = hisi_qm_init(qm);
 	if (ret) {
 		pci_err(qm->pdev, "Failed to init zip qm configures!\n");
@@ -1282,9 +1166,6 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
 	}
 
 	return ret;
-=======
-	return hisi_qm_init(qm);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void hisi_zip_qm_uninit(struct hisi_qm *qm)

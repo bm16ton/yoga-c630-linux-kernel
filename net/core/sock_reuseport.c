@@ -37,7 +37,6 @@ void reuseport_has_conns_set(struct sock *sk)
 }
 EXPORT_SYMBOL(reuseport_has_conns_set);
 
-<<<<<<< HEAD
 static void __reuseport_get_incoming_cpu(struct sock_reuseport *reuse)
 {
 	/* Paired with READ_ONCE() in reuseport_select_sock_by_hash(). */
@@ -102,8 +101,6 @@ out:
 	spin_unlock_bh(&reuseport_lock);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int reuseport_sock_index(struct sock *sk,
 				const struct sock_reuseport *reuse,
 				bool closed)
@@ -131,10 +128,7 @@ static void __reuseport_add_sock(struct sock *sk,
 	/* paired with smp_rmb() in reuseport_(select|migrate)_sock() */
 	smp_wmb();
 	reuse->num_socks++;
-<<<<<<< HEAD
 	reuseport_get_incoming_cpu(sk, reuse);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool __reuseport_detach_sock(struct sock *sk,
@@ -147,10 +141,7 @@ static bool __reuseport_detach_sock(struct sock *sk,
 
 	reuse->socks[i] = reuse->socks[reuse->num_socks - 1];
 	reuse->num_socks--;
-<<<<<<< HEAD
 	reuseport_put_incoming_cpu(sk, reuse);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return true;
 }
@@ -161,10 +152,7 @@ static void __reuseport_add_closed_sock(struct sock *sk,
 	reuse->socks[reuse->max_socks - reuse->num_closed_socks - 1] = sk;
 	/* paired with READ_ONCE() in inet_csk_bind_conflict() */
 	WRITE_ONCE(reuse->num_closed_socks, reuse->num_closed_socks + 1);
-<<<<<<< HEAD
 	reuseport_get_incoming_cpu(sk, reuse);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static bool __reuseport_detach_closed_sock(struct sock *sk,
@@ -178,10 +166,7 @@ static bool __reuseport_detach_closed_sock(struct sock *sk,
 	reuse->socks[i] = reuse->socks[reuse->max_socks - reuse->num_closed_socks];
 	/* paired with READ_ONCE() in inet_csk_bind_conflict() */
 	WRITE_ONCE(reuse->num_closed_socks, reuse->num_closed_socks - 1);
-<<<<<<< HEAD
 	reuseport_put_incoming_cpu(sk, reuse);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return true;
 }
@@ -249,10 +234,7 @@ int reuseport_alloc(struct sock *sk, bool bind_inany)
 	reuse->bind_inany = bind_inany;
 	reuse->socks[0] = sk;
 	reuse->num_socks = 1;
-<<<<<<< HEAD
 	reuseport_get_incoming_cpu(sk, reuse);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rcu_assign_pointer(sk->sk_reuseport_cb, reuse);
 
 out:
@@ -546,7 +528,6 @@ static struct sock *run_bpf_filter(struct sock_reuseport *reuse, u16 socks,
 static struct sock *reuseport_select_sock_by_hash(struct sock_reuseport *reuse,
 						  u32 hash, u16 num_socks)
 {
-<<<<<<< HEAD
 	struct sock *first_valid_sk = NULL;
 	int i, j;
 
@@ -573,20 +554,6 @@ static struct sock *reuseport_select_sock_by_hash(struct sock_reuseport *reuse,
 	} while (i != j);
 
 	return first_valid_sk;
-=======
-	int i, j;
-
-	i = j = reciprocal_scale(hash, num_socks);
-	while (reuse->socks[i]->sk_state == TCP_ESTABLISHED) {
-		i++;
-		if (i >= num_socks)
-			i = 0;
-		if (i == j)
-			return NULL;
-	}
-
-	return reuse->socks[i];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

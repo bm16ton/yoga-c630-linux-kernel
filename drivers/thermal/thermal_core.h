@@ -112,11 +112,8 @@ int thermal_build_list_of_policies(char *buf);
 
 /* Helpers */
 void thermal_zone_set_trips(struct thermal_zone_device *tz);
-<<<<<<< HEAD
 void __thermal_zone_set_trips(struct thermal_zone_device *tz);
 int __thermal_zone_get_temp(struct thermal_zone_device *tz, int *temp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* sysfs I/F */
 int thermal_zone_create_device_groups(struct thermal_zone_device *, int);

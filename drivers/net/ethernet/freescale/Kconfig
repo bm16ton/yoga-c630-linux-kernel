@@ -28,10 +28,7 @@ config FEC
 	depends on PTP_1588_CLOCK_OPTIONAL
 	select CRC32
 	select PHYLIB
-<<<<<<< HEAD
 	select PAGE_POOL
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	imply NET_SELFTESTS
 	help
 	  Say Y here if you want to use the built-in 10/100 Fast ethernet

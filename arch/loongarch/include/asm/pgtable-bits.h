@@ -83,16 +83,11 @@
 				 _PAGE_GLOBAL | _PAGE_KERN |  _CACHE_SUC)
 #define PAGE_KERNEL_WUC __pgprot(_PAGE_PRESENT | __READABLE | __WRITEABLE | \
 				 _PAGE_GLOBAL | _PAGE_KERN |  _CACHE_WUC)
-<<<<<<< HEAD
 
 #ifndef __ASSEMBLY__
 
 #define _PAGE_IOREMAP		pgprot_val(PAGE_KERNEL_SUC)
 
-=======
-#ifndef __ASSEMBLY__
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define pgprot_noncached pgprot_noncached
 
 static inline pgprot_t pgprot_noncached(pgprot_t _prot)

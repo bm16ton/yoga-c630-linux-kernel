@@ -5375,10 +5375,7 @@ const struct rtw_chip_info rtw8822c_hw_spec = {
 	.wowlan_stub = &rtw_wowlan_stub_8822c,
 	.max_sched_scan_ssids = 4,
 #endif
-<<<<<<< HEAD
 	.max_scan_ie_len = (RTW_PROBE_PG_CNT - 1) * TX_PAGE_SIZE,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.coex_para_ver = 0x22020720,
 	.bt_desired_ver = 0x20,
 	.scbd_support = true,

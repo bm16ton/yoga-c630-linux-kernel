@@ -62,10 +62,6 @@
 #define STM32_DMA_SCR_MSIZE_MASK	GENMASK(14, 13)
 #define STM32_DMA_SCR_PSIZE_MASK	GENMASK(12, 11)
 #define STM32_DMA_SCR_DIR_MASK		GENMASK(7, 6)
-<<<<<<< HEAD
-=======
-#define STM32_DMA_SCR_DIR(n)		((n & 0x3) << 6)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define STM32_DMA_SCR_TRBUFF		BIT(20) /* Bufferable transfer for USART/UART */
 #define STM32_DMA_SCR_CT		BIT(19) /* Target in double buffer */
 #define STM32_DMA_SCR_DBM		BIT(18) /* Double Buffer Mode */
@@ -143,14 +139,8 @@
 /* DMA Features */
 #define STM32_DMA_THRESHOLD_FTR_MASK	GENMASK(1, 0)
 #define STM32_DMA_DIRECT_MODE_MASK	BIT(2)
-<<<<<<< HEAD
 #define STM32_DMA_ALT_ACK_MODE_MASK	BIT(4)
 #define STM32_DMA_MDMA_STREAM_ID_MASK	GENMASK(19, 16)
-=======
-#define STM32_DMA_DIRECT_MODE_GET(n)	(((n) & STM32_DMA_DIRECT_MODE_MASK) >> 2)
-#define STM32_DMA_ALT_ACK_MODE_MASK	BIT(4)
-#define STM32_DMA_ALT_ACK_MODE_GET(n)	(((n) & STM32_DMA_ALT_ACK_MODE_MASK) >> 4)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum stm32_dma_width {
 	STM32_DMA_BYTE,
@@ -231,11 +221,8 @@ struct stm32_dma_chan {
 	u32 mem_burst;
 	u32 mem_width;
 	enum dma_status status;
-<<<<<<< HEAD
 	bool trig_mdma;
 	struct stm32_dma_mdma_config mdma_config;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct stm32_dma_device {
@@ -684,7 +671,6 @@ static void stm32_dma_handle_chan_paused(struct stm32_dma_chan *chan)
 	if (chan->desc && chan->desc->cyclic) {
 		dma_scr &= ~(STM32_DMA_SCR_DBM | STM32_DMA_SCR_CIRC);
 		stm32_dma_write(dmadev, STM32_DMA_SCR(chan->id), dma_scr);
-<<<<<<< HEAD
 	}
 
 	chan->chan_reg.dma_sndtr = stm32_dma_read(dmadev, STM32_DMA_SNDTR(chan->id));
@@ -748,81 +734,13 @@ static void stm32_dma_post_resume_reconfigure(struct stm32_dma_chan *chan)
 
 static void stm32_dma_handle_chan_done(struct stm32_dma_chan *chan, u32 scr)
 {
-=======
-	}
-
-	chan->chan_reg.dma_sndtr = stm32_dma_read(dmadev, STM32_DMA_SNDTR(chan->id));
-
-	chan->status = DMA_PAUSED;
-
-	dev_dbg(chan2dev(chan), "vchan %pK: paused\n", &chan->vchan);
-}
-
-static void stm32_dma_post_resume_reconfigure(struct stm32_dma_chan *chan)
-{
-	struct stm32_dma_device *dmadev = stm32_dma_get_dev(chan);
-	struct stm32_dma_sg_req *sg_req;
-	u32 dma_scr, status, id;
-
-	id = chan->id;
-	dma_scr = stm32_dma_read(dmadev, STM32_DMA_SCR(id));
-
-	/* Clear interrupt status if it is there */
-	status = stm32_dma_irq_status(chan);
-	if (status)
-		stm32_dma_irq_clear(chan, status);
-
-	if (!chan->next_sg)
-		sg_req = &chan->desc->sg_req[chan->desc->num_sgs - 1];
-	else
-		sg_req = &chan->desc->sg_req[chan->next_sg - 1];
-
-	/* Reconfigure NDTR with the initial value */
-	stm32_dma_write(dmadev, STM32_DMA_SNDTR(chan->id), sg_req->chan_reg.dma_sndtr);
-
-	/* Restore SPAR */
-	stm32_dma_write(dmadev, STM32_DMA_SPAR(id), sg_req->chan_reg.dma_spar);
-
-	/* Restore SM0AR/SM1AR whatever DBM/CT as they may have been modified */
-	stm32_dma_write(dmadev, STM32_DMA_SM0AR(id), sg_req->chan_reg.dma_sm0ar);
-	stm32_dma_write(dmadev, STM32_DMA_SM1AR(id), sg_req->chan_reg.dma_sm1ar);
-
-	/* Reactivate CIRC/DBM if needed */
-	if (chan->chan_reg.dma_scr & STM32_DMA_SCR_DBM) {
-		dma_scr |= STM32_DMA_SCR_DBM;
-		/* Restore CT */
-		if (chan->chan_reg.dma_scr & STM32_DMA_SCR_CT)
-			dma_scr &= ~STM32_DMA_SCR_CT;
-		else
-			dma_scr |= STM32_DMA_SCR_CT;
-	} else if (chan->chan_reg.dma_scr & STM32_DMA_SCR_CIRC) {
-		dma_scr |= STM32_DMA_SCR_CIRC;
-	}
-	stm32_dma_write(dmadev, STM32_DMA_SCR(chan->id), dma_scr);
-
-	stm32_dma_configure_next_sg(chan);
-
-	stm32_dma_dump_reg(chan);
-
-	dma_scr |= STM32_DMA_SCR_EN;
-	stm32_dma_write(dmadev, STM32_DMA_SCR(chan->id), dma_scr);
-
-	dev_dbg(chan2dev(chan), "vchan %pK: reconfigured after pause/resume\n", &chan->vchan);
-}
-
-static void stm32_dma_handle_chan_done(struct stm32_dma_chan *chan, u32 scr)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!chan->desc)
 		return;
 
 	if (chan->desc->cyclic) {
 		vchan_cyclic_callback(&chan->desc->vdesc);
-<<<<<<< HEAD
 		if (chan->trig_mdma)
 			return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		stm32_dma_sg_inc(chan);
 		/* cyclic while CIRC/DBM disable => post resume reconfiguration needed */
 		if (!(scr & (STM32_DMA_SCR_CIRC | STM32_DMA_SCR_DBM)))
@@ -955,12 +873,8 @@ static int stm32_dma_resume(struct dma_chan *c)
 		sg_req = &chan->desc->sg_req[chan->next_sg - 1];
 
 	ndtr = sg_req->chan_reg.dma_sndtr;
-<<<<<<< HEAD
 	offset = (ndtr - chan_reg.dma_sndtr);
 	offset <<= FIELD_GET(STM32_DMA_SCR_PSIZE_MASK, chan_reg.dma_scr);
-=======
-	offset = (ndtr - chan_reg.dma_sndtr) << STM32_DMA_SCR_PSIZE_GET(chan_reg.dma_scr);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spar = sg_req->chan_reg.dma_spar;
 	sm0ar = sg_req->chan_reg.dma_sm0ar;
 	sm1ar = sg_req->chan_reg.dma_sm1ar;
@@ -1596,14 +1510,9 @@ static void stm32_dma_set_config(struct stm32_dma_chan *chan,
 	chan->threshold = FIELD_GET(STM32_DMA_THRESHOLD_FTR_MASK, cfg->features);
 	if (FIELD_GET(STM32_DMA_DIRECT_MODE_MASK, cfg->features))
 		chan->threshold = STM32_DMA_FIFO_THRESHOLD_NONE;
-<<<<<<< HEAD
 	if (FIELD_GET(STM32_DMA_ALT_ACK_MODE_MASK, cfg->features))
 		chan->chan_reg.dma_scr |= STM32_DMA_SCR_TRBUFF;
 	chan->mdma_config.stream_id = FIELD_GET(STM32_DMA_MDMA_STREAM_ID_MASK, cfg->features);
-=======
-	if (STM32_DMA_ALT_ACK_MODE_GET(cfg->features))
-		chan->chan_reg.dma_scr |= STM32_DMA_SCR_TRBUFF;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct dma_chan *stm32_dma_of_xlate(struct of_phandle_args *dma_spec,

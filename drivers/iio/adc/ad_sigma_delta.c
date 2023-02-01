@@ -496,7 +496,6 @@ static irqreturn_t ad_sd_trigger_handler(int irq, void *p)
 			 * Desync occurred during continuous sampling of multiple channels.
 			 * Drop this incomplete sample and start from first channel again.
 			 */
-<<<<<<< HEAD
 
 			sigma_delta->current_slot = 0;
 			goto irq_handled;
@@ -514,25 +513,6 @@ static irqreturn_t ad_sd_trigger_handler(int irq, void *p)
 						   pf->timestamp);
 	}
 
-=======
-
-			sigma_delta->current_slot = 0;
-			goto irq_handled;
-		}
-	}
-
-	sample_size = indio_dev->channels[0].scan_type.storagebits / 8;
-	sample_pos = sample_size * sigma_delta->current_slot;
-	memcpy(&sigma_delta->samples_buf[sample_pos], data, sample_size);
-	sigma_delta->current_slot++;
-
-	if (sigma_delta->current_slot == sigma_delta->active_slots) {
-		sigma_delta->current_slot = 0;
-		iio_push_to_buffers_with_timestamp(indio_dev, sigma_delta->samples_buf,
-						   pf->timestamp);
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 irq_handled:
 	iio_trigger_notify_done(indio_dev->trig);
 	sigma_delta->irq_dis = false;
@@ -638,7 +618,6 @@ int devm_ad_sd_setup_buffer_and_trigger(struct device *dev, struct iio_dev *indi
 					  sizeof(*sigma_delta->slots), GFP_KERNEL);
 	if (!sigma_delta->slots)
 		return -ENOMEM;
-<<<<<<< HEAD
 
 	ret = devm_iio_triggered_buffer_setup(dev, indio_dev,
 					      &iio_pollfunc_store_time,
@@ -647,16 +626,6 @@ int devm_ad_sd_setup_buffer_and_trigger(struct device *dev, struct iio_dev *indi
 	if (ret)
 		return ret;
 
-=======
-
-	ret = devm_iio_triggered_buffer_setup(dev, indio_dev,
-					      &iio_pollfunc_store_time,
-					      &ad_sd_trigger_handler,
-					      &ad_sd_buffer_setup_ops);
-	if (ret)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return devm_ad_sd_probe_trigger(dev, indio_dev);
 }
 EXPORT_SYMBOL_NS_GPL(devm_ad_sd_setup_buffer_and_trigger, IIO_AD_SIGMA_DELTA);

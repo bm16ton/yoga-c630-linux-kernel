@@ -562,21 +562,12 @@ nfsd4_open(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 	case NFS4_OPEN_CLAIM_NULL:
 		status = do_open_lookup(rqstp, cstate, open, &resfh);
 		if (status)
-<<<<<<< HEAD
 			goto out;
 		break;
 	case NFS4_OPEN_CLAIM_PREVIOUS:
 		status = nfs4_check_open_reclaim(cstate->clp);
 		if (status)
 			goto out;
-=======
-			goto out;
-		break;
-	case NFS4_OPEN_CLAIM_PREVIOUS:
-		status = nfs4_check_open_reclaim(cstate->clp);
-		if (status)
-			goto out;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		open->op_openowner->oo_flags |= NFS4_OO_CONFIRMED;
 		reclaim = true;
 		fallthrough;
@@ -946,7 +937,7 @@ nfsd4_read(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 	 * the client wants us to do more in this compound:
 	 */
 	if (!nfsd4_last_compound_op(rqstp))
-		__clear_bit(RQ_SPLICE_OK, &rqstp->rq_flags);
+		clear_bit(RQ_SPLICE_OK, &rqstp->rq_flags);
 
 	/* check stateid */
 	status = nfs4_preprocess_stateid_op(rqstp, cstate, &cstate->current_fh,
@@ -1151,11 +1142,8 @@ nfsd4_setattr(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
 				0, (time64_t)0);
 	if (!status)
 		status = nfserrno(attrs.na_labelerr);
-<<<<<<< HEAD
 	if (!status)
 		status = nfserrno(attrs.na_aclerr);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	nfsd_attrs_free(&attrs);
 	fh_drop_write(&cstate->current_fh);
@@ -1358,11 +1346,7 @@ try_again:
 		return 0;
 	}
 	if (work) {
-<<<<<<< HEAD
 		strscpy(work->nsui_ipaddr, ipaddr, sizeof(work->nsui_ipaddr) - 1);
-=======
-		strlcpy(work->nsui_ipaddr, ipaddr, sizeof(work->nsui_ipaddr) - 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		refcount_set(&work->nsui_refcnt, 2);
 		work->nsui_busy = true;
 		list_add_tail(&work->nsui_list, &nn->nfsd_ssc_mount_list);
@@ -1659,10 +1643,7 @@ static ssize_t _nfsd_copy_file_range(struct nfsd4_copy *copy,
 	u64 src_pos = copy->cp_src_pos;
 	u64 dst_pos = copy->cp_dst_pos;
 	int status;
-<<<<<<< HEAD
 	loff_t end;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* See RFC 7862 p.67: */
 	if (bytes_total == 0)
@@ -1682,13 +1663,8 @@ static ssize_t _nfsd_copy_file_range(struct nfsd4_copy *copy,
 	/* for a non-zero asynchronous copy do a commit of data */
 	if (nfsd4_copy_is_async(copy) && copy->cp_res.wr_bytes_written > 0) {
 		since = READ_ONCE(dst->f_wb_err);
-<<<<<<< HEAD
 		end = copy->cp_dst_pos + copy->cp_res.wr_bytes_written - 1;
 		status = vfs_fsync_range(dst, copy->cp_dst_pos, end, 0);
-=======
-		status = vfs_fsync_range(dst, copy->cp_dst_pos,
-					 copy->cp_res.wr_bytes_written, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!status)
 			status = filemap_check_wb_err(dst->f_mapping, since);
 		if (!status)
@@ -1788,7 +1764,6 @@ static int nfsd4_do_async_copy(void *data)
 		filp = nfs42_ssc_open(copy->ss_mnt, &copy->c_fh,
 				      &copy->stateid);
 		if (IS_ERR(filp)) {
-<<<<<<< HEAD
 			switch (PTR_ERR(filp)) {
 			case -EBADF:
 				nfserr = nfserr_wrong_type;
@@ -1797,10 +1772,6 @@ static int nfsd4_do_async_copy(void *data)
 				nfserr = nfserr_offload_denied;
 			}
 			/* ss_mnt will be unmounted by the laundromat */
-=======
-			nfserr = nfserr_offload_denied;
-			nfsd4_interssc_disconnect(copy->ss_mnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto do_callback;
 		}
 		nfserr = nfsd4_do_copy(copy, filp, copy->nf_dst->nf_file,
@@ -1881,15 +1852,10 @@ out_err:
 	if (async_copy)
 		cleanup_async_copy(async_copy);
 	status = nfserrno(-ENOMEM);
-<<<<<<< HEAD
 	/*
 	 * source's vfsmount of inter-copy will be unmounted
 	 * by the laundromat
 	 */
-=======
-	if (nfsd4_ssc_is_inter(copy))
-		nfsd4_interssc_disconnect(copy->ss_mnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	goto out;
 }
 
@@ -2658,12 +2624,11 @@ nfsd4_proc_compound(struct svc_rqst *rqstp)
 	cstate->minorversion = args->minorversion;
 	fh_init(current_fh, NFS4_FHSIZE);
 	fh_init(save_fh, NFS4_FHSIZE);
-
 	/*
 	 * Don't use the deferral mechanism for NFSv4; compounds make it
 	 * too hard to avoid non-idempotency problems.
 	 */
-	__clear_bit(RQ_USEDEFERRAL, &rqstp->rq_flags);
+	clear_bit(RQ_USEDEFERRAL, &rqstp->rq_flags);
 
 	/*
 	 * According to RFC3010, this takes precedence over all other errors.
@@ -2683,11 +2648,7 @@ nfsd4_proc_compound(struct svc_rqst *rqstp)
 
 	rqstp->rq_lease_breaker = (void **)&cstate->clp;
 
-<<<<<<< HEAD
 	trace_nfsd_compound(rqstp, args->tag, args->taglen, args->client_opcnt);
-=======
-	trace_nfsd_compound(rqstp, args->client_opcnt);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (!status && resp->opcnt < args->opcnt) {
 		op = &args->ops[resp->opcnt++];
 
@@ -2789,7 +2750,7 @@ encode_op:
 out:
 	cstate->status = status;
 	/* Reset deferral mechanism for RPC deferrals */
-	__set_bit(RQ_USEDEFERRAL, &rqstp->rq_flags);
+	set_bit(RQ_USEDEFERRAL, &rqstp->rq_flags);
 	return rpc_success;
 }
 

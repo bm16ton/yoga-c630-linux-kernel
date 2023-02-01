@@ -12,7 +12,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-<<<<<<< HEAD
 #include <asm/bitsperlong.h>
 #include <endian.h>
 #include <linux/user_events.h>
@@ -23,19 +22,11 @@
 #define endian_swap(x) htole32(x)
 #endif
 
-=======
-#include <linux/user_events.h>
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Assumes debugfs is mounted */
 const char *data_file = "/sys/kernel/debug/tracing/user_events_data";
 const char *status_file = "/sys/kernel/debug/tracing/user_events_status";
 
-<<<<<<< HEAD
 static int event_status(long **status)
-=======
-static int event_status(char **status)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int fd = open(status_file, O_RDONLY);
 
@@ -50,12 +41,8 @@ static int event_status(char **status)
 	return 0;
 }
 
-<<<<<<< HEAD
 static int event_reg(int fd, const char *command, long *index, long *mask,
 		     int *write)
-=======
-static int event_reg(int fd, const char *command, int *status, int *write)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct user_reg reg = {0};
 
@@ -65,12 +52,8 @@ static int event_reg(int fd, const char *command, int *status, int *write)
 	if (ioctl(fd, DIAG_IOCSREG, &reg) == -1)
 		return -1;
 
-<<<<<<< HEAD
 	*index = reg.status_bit / __BITS_PER_LONG;
 	*mask = endian_swap(1L << (reg.status_bit % __BITS_PER_LONG));
-=======
-	*status = reg.status_index;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*write = reg.write_index;
 
 	return 0;
@@ -78,14 +61,9 @@ static int event_reg(int fd, const char *command, int *status, int *write)
 
 int main(int argc, char **argv)
 {
-<<<<<<< HEAD
 	int data_fd, write;
 	long index, mask;
 	long *status_page;
-=======
-	int data_fd, status, write;
-	char *status_page;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct iovec io[2];
 	__u32 count = 0;
 
@@ -94,11 +72,7 @@ int main(int argc, char **argv)
 
 	data_fd = open(data_file, O_RDWR);
 
-<<<<<<< HEAD
 	if (event_reg(data_fd, "test u32 count", &index, &mask, &write) == -1)
-=======
-	if (event_reg(data_fd, "test u32 count", &status, &write) == -1)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return errno;
 
 	/* Setup iovec */
@@ -112,11 +86,7 @@ ask:
 	getchar();
 
 	/* Check if anyone is listening */
-<<<<<<< HEAD
 	if (status_page[index] & mask) {
-=======
-	if (status_page[status]) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Yep, trace out our data */
 		writev(data_fd, (const struct iovec *)io, 2);
 

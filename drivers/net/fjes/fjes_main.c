@@ -38,33 +38,6 @@ static const struct acpi_device_id fjes_acpi_ids[] = {
 };
 MODULE_DEVICE_TABLE(acpi, fjes_acpi_ids);
 
-<<<<<<< HEAD
-=======
-static struct acpi_driver fjes_acpi_driver = {
-	.name = DRV_NAME,
-	.class = DRV_NAME,
-	.owner = THIS_MODULE,
-	.ids = fjes_acpi_ids,
-	.ops = {
-		.add = fjes_acpi_add,
-		.remove = fjes_acpi_remove,
-	},
-};
-
-static struct platform_driver fjes_driver = {
-	.driver = {
-		.name = DRV_NAME,
-	},
-	.probe = fjes_probe,
-	.remove = fjes_remove,
-};
-
-static struct resource fjes_resource[] = {
-	DEFINE_RES_MEM(0, 1),
-	DEFINE_RES_IRQ(0)
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool is_extended_socket_device(struct acpi_device *device)
 {
 	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL};
@@ -1082,96 +1055,7 @@ static int fjes_poll(struct napi_struct *napi, int budget)
 
 static int fjes_sw_init(struct fjes_adapter *adapter)
 {
-<<<<<<< HEAD
 	struct net_device *netdev = adapter->netdev;
-=======
-	struct fjes_adapter *adapter;
-	struct net_device *netdev;
-	struct resource *res;
-	struct fjes_hw *hw;
-	u8 addr[ETH_ALEN];
-	int err;
-
-	err = -ENOMEM;
-	netdev = alloc_netdev_mq(sizeof(struct fjes_adapter), "es%d",
-				 NET_NAME_UNKNOWN, fjes_netdev_setup,
-				 FJES_MAX_QUEUES);
-
-	if (!netdev)
-		goto err_out;
-
-	SET_NETDEV_DEV(netdev, &plat_dev->dev);
-
-	dev_set_drvdata(&plat_dev->dev, netdev);
-	adapter = netdev_priv(netdev);
-	adapter->netdev = netdev;
-	adapter->plat_dev = plat_dev;
-	hw = &adapter->hw;
-	hw->back = adapter;
-
-	/* setup the private structure */
-	err = fjes_sw_init(adapter);
-	if (err)
-		goto err_free_netdev;
-
-	INIT_WORK(&adapter->force_close_task, fjes_force_close_task);
-	adapter->force_reset = false;
-	adapter->open_guard = false;
-
-	adapter->txrx_wq = alloc_workqueue(DRV_NAME "/txrx", WQ_MEM_RECLAIM, 0);
-	if (unlikely(!adapter->txrx_wq)) {
-		err = -ENOMEM;
-		goto err_free_netdev;
-	}
-
-	adapter->control_wq = alloc_workqueue(DRV_NAME "/control",
-					      WQ_MEM_RECLAIM, 0);
-	if (unlikely(!adapter->control_wq)) {
-		err = -ENOMEM;
-		goto err_free_txrx_wq;
-	}
-
-	INIT_WORK(&adapter->tx_stall_task, fjes_tx_stall_task);
-	INIT_WORK(&adapter->raise_intr_rxdata_task,
-		  fjes_raise_intr_rxdata_task);
-	INIT_WORK(&adapter->unshare_watch_task, fjes_watch_unshare_task);
-	adapter->unshare_watch_bitmask = 0;
-
-	INIT_DELAYED_WORK(&adapter->interrupt_watch_task, fjes_irq_watch_task);
-	adapter->interrupt_watch_enable = false;
-
-	res = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
-	if (!res) {
-		err = -EINVAL;
-		goto err_free_control_wq;
-	}
-	hw->hw_res.start = res->start;
-	hw->hw_res.size = resource_size(res);
-	hw->hw_res.irq = platform_get_irq(plat_dev, 0);
-	if (hw->hw_res.irq < 0) {
-		err = hw->hw_res.irq;
-		goto err_free_control_wq;
-	}
-
-	err = fjes_hw_init(&adapter->hw);
-	if (err)
-		goto err_free_control_wq;
-
-	/* setup MAC address (02:00:00:00:00:[epid])*/
-	addr[0] = 2;
-	addr[1] = 0;
-	addr[2] = 0;
-	addr[3] = 0;
-	addr[4] = 0;
-	addr[5] = hw->my_epid; /* EPID */
-	eth_hw_addr_set(netdev, addr);
-
-	err = register_netdev(netdev);
-	if (err)
-		goto err_hw_exit;
-
-	netif_carrier_off(netdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	netif_napi_add(netdev, &adapter->napi, fjes_poll);
 

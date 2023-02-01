@@ -324,7 +324,6 @@ static inline bool lazy_irq_pending_nocheck(void)
 
 bool power_pmu_wants_prompt_pmi(void);
 
-<<<<<<< HEAD
 /*
  * This is called by asynchronous interrupts to check whether to
  * conditionally re-enable hard interrupts after having cleared
@@ -367,50 +366,6 @@ static inline void do_hard_irq_enable(void)
 		WARN_ON(get_paca()->irq_happened & PACA_IRQ_MUST_HARD_MASK);
 		WARN_ON(mfmsr() & MSR_EE);
 	}
-=======
-/*
- * This is called by asynchronous interrupts to check whether to
- * conditionally re-enable hard interrupts after having cleared
- * the source of the interrupt. They are kept disabled if there
- * is a different soft-masked interrupt pending that requires hard
- * masking.
- */
-static inline bool should_hard_irq_enable(void)
-{
-	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG)) {
-		WARN_ON(irq_soft_mask_return() == IRQS_ENABLED);
-		WARN_ON(mfmsr() & MSR_EE);
-	}
-
-	if (!IS_ENABLED(CONFIG_PERF_EVENTS))
-		return false;
-	/*
-	 * If the PMU is not running, there is not much reason to enable
-	 * MSR[EE] in irq handlers because any interrupts would just be
-	 * soft-masked.
-	 *
-	 * TODO: Add test for 64e
-	 */
-	if (IS_ENABLED(CONFIG_PPC_BOOK3S_64) && !power_pmu_wants_prompt_pmi())
-		return false;
-
-	if (get_paca()->irq_happened & PACA_IRQ_MUST_HARD_MASK)
-		return false;
-
-	return true;
-}
-
-/*
- * Do the hard enabling, only call this if should_hard_irq_enable is true.
- */
-static inline void do_hard_irq_enable(void)
-{
-	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG)) {
-		WARN_ON(irq_soft_mask_return() == IRQS_ENABLED);
-		WARN_ON(get_paca()->irq_happened & PACA_IRQ_MUST_HARD_MASK);
-		WARN_ON(mfmsr() & MSR_EE);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * This allows PMI interrupts (and watchdog soft-NMIs) through.
 	 * There is no other reason to enable this way.

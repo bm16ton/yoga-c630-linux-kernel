@@ -17,18 +17,6 @@
 #define IMX_SSI_DMABUF_SIZE	(64 * 1024)
 
 #define IMX_DEFAULT_DMABUF_SIZE	(64 * 1024)
-<<<<<<< HEAD
-=======
-
-static inline void
-imx_pcm_dma_params_init_data(struct imx_dma_data *dma_data,
-	int dma, enum sdma_peripheral_type peripheral_type)
-{
-	dma_data->dma_request = dma;
-	dma_data->priority = DMA_PRIO_HIGH;
-	dma_data->peripheral_type = peripheral_type;
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct imx_pcm_fiq_params {
 	int irq;

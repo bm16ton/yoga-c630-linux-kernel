@@ -723,14 +723,8 @@ qtnf_disconnect(struct wiphy *wiphy, struct net_device *dev,
 		return -EFAULT;
 	}
 
-<<<<<<< HEAD
 	if (vif->wdev.iftype != NL80211_IFTYPE_STATION)
 		return -EOPNOTSUPP;
-=======
-	if (vif->wdev.iftype != NL80211_IFTYPE_STATION) {
-		return -EOPNOTSUPP;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = qtnf_cmd_send_disconnect(vif, reason_code);
 	if (ret)
@@ -756,7 +750,6 @@ qtnf_dump_survey(struct wiphy *wiphy, struct net_device *dev,
 	const struct cfg80211_chan_def *chandef = wdev_chandef(wdev, 0);
 	struct ieee80211_channel *chan;
 	int ret;
-
 
 	sband = wiphy->bands[NL80211_BAND_2GHZ];
 	if (sband && idx >= sband->n_channels) {

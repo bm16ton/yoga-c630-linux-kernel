@@ -1171,7 +1171,6 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 	/* From now on, we cannot access info->control */
 	iwl_mvm_skb_prepare_status(skb, dev_cmd);
 
-<<<<<<< HEAD
 	/*
 	 * The IV is introduced by the HW for new tx api, and it is not present
 	 * in the skb, hence, don't tell iwl_mvm_mei_tx_copy_to_csme about the
@@ -1181,11 +1180,6 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 		iwl_mvm_mei_tx_copy_to_csme(mvm, skb,
 					    info->control.hw_key &&
 					    !iwl_mvm_has_new_tx_api(mvm) ?
-=======
-	if (ieee80211_is_data(fc))
-		iwl_mvm_mei_tx_copy_to_csme(mvm, skb,
-					    info->control.hw_key ?
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					    info->control.hw_key->iv_len : 0);
 
 	if (iwl_trans_tx(mvm->trans, skb, dev_cmd, txq_id))
@@ -1394,7 +1388,6 @@ void iwl_mvm_hwrate_to_tx_rate(u32 rate_n_flags,
 	if (rate_n_flags & RATE_MCS_SGI_MSK)
 		r->flags |= IEEE80211_TX_RC_SHORT_GI;
 	if (format ==  RATE_MCS_HT_MSK) {
-<<<<<<< HEAD
 		r->flags |= IEEE80211_TX_RC_MCS;
 		r->idx = rate;
 	} else if (format ==  RATE_MCS_VHT_MSK) {
@@ -1427,40 +1420,6 @@ void iwl_mvm_hwrate_to_tx_rate_v1(u32 rate_n_flags,
 		r->flags |= IEEE80211_TX_RC_SHORT_GI;
 	if (rate_n_flags & RATE_MCS_HT_MSK_V1) {
 		r->flags |= IEEE80211_TX_RC_MCS;
-=======
-		r->flags |= IEEE80211_TX_RC_MCS;
-		r->idx = rate;
-	} else if (format ==  RATE_MCS_VHT_MSK) {
-		ieee80211_rate_set_vht(r, rate,
-				       ((rate_n_flags & RATE_MCS_NSS_MSK) >>
-					RATE_MCS_NSS_POS) + 1);
-		r->flags |= IEEE80211_TX_RC_VHT_MCS;
-	} else if (format == RATE_MCS_HE_MSK) {
-		/* mac80211 cannot do this without ieee80211_tx_status_ext()
-		 * but it only matters for radiotap */
-		r->idx = 0;
-	} else {
-		r->idx = iwl_mvm_legacy_hw_idx_to_mac80211_idx(rate_n_flags,
-							       band);
-	}
-}
-
-void iwl_mvm_hwrate_to_tx_rate_v1(u32 rate_n_flags,
-				  enum nl80211_band band,
-				  struct ieee80211_tx_rate *r)
-{
-	if (rate_n_flags & RATE_HT_MCS_GF_MSK)
-		r->flags |= IEEE80211_TX_RC_GREEN_FIELD;
-
-	r->flags |=
-		iwl_mvm_get_hwrate_chan_width(rate_n_flags &
-					      RATE_MCS_CHAN_WIDTH_MSK_V1);
-
-	if (rate_n_flags & RATE_MCS_SGI_MSK_V1)
-		r->flags |= IEEE80211_TX_RC_SHORT_GI;
-	if (rate_n_flags & RATE_MCS_HT_MSK_V1) {
-		r->flags |= IEEE80211_TX_RC_MCS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		r->idx = rate_n_flags & RATE_HT_MCS_INDEX_MSK_V1;
 	} else if (rate_n_flags & RATE_MCS_VHT_MSK_V1) {
 		ieee80211_rate_set_vht(

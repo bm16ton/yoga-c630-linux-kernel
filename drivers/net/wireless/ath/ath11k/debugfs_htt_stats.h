@@ -1897,11 +1897,7 @@ struct htt_phy_counters_tlv {
 	u32 phytx_abort_cnt;
 	/* number of times rx abort initiated by phy */
 	u32 phyrx_abort_cnt;
-<<<<<<< HEAD
 	/* number of rx deferred count initiated by phy */
-=======
-	/* number of rx defered count initiated by phy */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 phyrx_defer_abort_cnt;
 	/* number of sizing events generated at LSTF */
 	u32 rx_gain_adj_lstf_event_cnt;

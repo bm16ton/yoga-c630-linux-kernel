@@ -94,7 +94,6 @@ static u16 bcm_sf2_reg_led_base(struct bcm_sf2_priv *priv, int port)
 	return REG_SWITCH_STATUS;
 }
 
-<<<<<<< HEAD
 static u32 bcm_sf2_port_override_offset(struct bcm_sf2_priv *priv, int port)
 {
 	switch (priv->type) {
@@ -113,8 +112,6 @@ static u32 bcm_sf2_port_override_offset(struct bcm_sf2_priv *priv, int port)
 	return REG_SWITCH_STATUS;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Return the number of active ports, not counting the IMP (CPU) port */
 static unsigned int bcm_sf2_num_active_ports(struct dsa_switch *ds)
 {
@@ -817,16 +814,6 @@ static void bcm_sf2_sw_mac_link_down(struct dsa_switch *ds, int port,
 
 	if (priv->wol_ports_mask & BIT(port))
 		return;
-<<<<<<< HEAD
-=======
-
-	if (port != core_readl(priv, CORE_IMP0_PRT_ID)) {
-		if (priv->type == BCM4908_DEVICE_ID ||
-		    priv->type == BCM7445_DEVICE_ID)
-			offset = CORE_STS_OVERRIDE_GMIIP_PORT(port);
-		else
-			offset = CORE_STS_OVERRIDE_GMIIP2_PORT(port);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	offset = bcm_sf2_port_override_offset(priv, port);
 	reg = core_readl(priv, offset);
@@ -867,7 +854,6 @@ static void bcm_sf2_sw_mac_link_up(struct dsa_switch *ds, int port,
 		reg_writel(priv, reg, reg_rgmii_ctrl);
 	}
 
-<<<<<<< HEAD
 	reg = LINK_STS;
 	if (port == 8) {
 		if (priv->type == BCM4908_DEVICE_ID)
@@ -875,14 +861,6 @@ static void bcm_sf2_sw_mac_link_up(struct dsa_switch *ds, int port,
 		reg |= MII_SW_OR;
 	} else {
 		reg |= SW_OVERRIDE;
-=======
-		if (tx_pause)
-			reg |= TXFLOW_CNTL;
-		if (rx_pause)
-			reg |= RXFLOW_CNTL;
-
-		core_writel(priv, reg, offset);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	switch (speed) {
@@ -1572,8 +1550,6 @@ static int bcm_sf2_sw_remove(struct platform_device *pdev)
 	clk_disable_unprepare(priv->clk);
 	if (priv->type == BCM7278_DEVICE_ID)
 		reset_control_assert(priv->rcdev);
-
-	platform_set_drvdata(pdev, NULL);
 
 	return 0;
 }

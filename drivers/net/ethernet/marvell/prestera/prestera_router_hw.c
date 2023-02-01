@@ -8,7 +8,6 @@
 #include "prestera_router_hw.h"
 #include "prestera_acl.h"
 
-<<<<<<< HEAD
 /*                                Nexthop is pointed
  *                                to port (not rif)
  *                                +-------+
@@ -19,12 +18,6 @@
  *   +------->|vr|<-+   +>|nh_grp|
  *   |        +--+  |   | +------+
  *   |              |   |
-=======
-/*            +--+
- *   +------->|vr|<-+
- *   |        +--+  |
- *   |              |
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * +-+-------+   +--+---+-+
  * |rif_entry|   |fib_node|
  * +---------+   +--------+
@@ -36,11 +29,8 @@
 
 #define PRESTERA_NHGR_UNUSED (0)
 #define PRESTERA_NHGR_DROP (0xFFFFFFFF)
-<<<<<<< HEAD
 /* Need to merge it with router_manager */
 #define PRESTERA_NH_ACTIVE_JIFFER_FILTER 3000 /* ms */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct rhashtable_params __prestera_fib_ht_params = {
 	.key_offset  = offsetof(struct prestera_fib_node, key),
@@ -49,7 +39,6 @@ static const struct rhashtable_params __prestera_fib_ht_params = {
 	.automatic_shrinking = true,
 };
 
-<<<<<<< HEAD
 static const struct rhashtable_params __prestera_nh_neigh_ht_params = {
 	.key_offset  = offsetof(struct prestera_nh_neigh, key),
 	.key_len     = sizeof(struct prestera_nh_neigh_key),
@@ -75,13 +64,10 @@ static bool prestera_nh_neigh_key_is_valid(struct prestera_nh_neigh_key *key)
 	return memchr_inv(key, 0, sizeof(*key)) ? true : false;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int prestera_router_hw_init(struct prestera_switch *sw)
 {
 	int err;
 
-<<<<<<< HEAD
 	err = rhashtable_init(&sw->router->nh_neigh_ht,
 			      &__prestera_nh_neigh_ht_params);
 	if (err)
@@ -92,8 +78,6 @@ int prestera_router_hw_init(struct prestera_switch *sw)
 	if (err)
 		goto err_nexthop_grp_ht_init;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = rhashtable_init(&sw->router->fib_ht,
 			      &__prestera_fib_ht_params);
 	if (err)
@@ -102,7 +86,6 @@ int prestera_router_hw_init(struct prestera_switch *sw)
 	INIT_LIST_HEAD(&sw->router->vr_list);
 	INIT_LIST_HEAD(&sw->router->rif_entry_list);
 
-<<<<<<< HEAD
 	return 0;
 
 err_fib_ht_init:
@@ -110,15 +93,11 @@ err_fib_ht_init:
 err_nexthop_grp_ht_init:
 	rhashtable_destroy(&sw->router->nh_neigh_ht);
 err_nh_neigh_ht_init:
-=======
-err_fib_ht_init:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
 void prestera_router_hw_fini(struct prestera_switch *sw)
 {
-<<<<<<< HEAD
 	rhashtable_free_and_destroy(&sw->router->fib_ht,
 				    prestera_fib_node_destroy_ht_cb, sw);
 	WARN_ON(!list_empty(&sw->router->vr_list));
@@ -126,11 +105,6 @@ void prestera_router_hw_fini(struct prestera_switch *sw)
 	rhashtable_destroy(&sw->router->fib_ht);
 	rhashtable_destroy(&sw->router->nexthop_group_ht);
 	rhashtable_destroy(&sw->router->nh_neigh_ht);
-=======
-	WARN_ON(!list_empty(&sw->router->vr_list));
-	WARN_ON(!list_empty(&sw->router->rif_entry_list));
-	rhashtable_destroy(&sw->router->fib_ht);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct prestera_vr *__prestera_vr_find(struct prestera_switch *sw,
@@ -311,7 +285,6 @@ err_kzalloc:
 	return NULL;
 }
 
-<<<<<<< HEAD
 static void __prestera_nh_neigh_destroy(struct prestera_switch *sw,
 					struct prestera_nh_neigh *neigh)
 {
@@ -592,8 +565,6 @@ prestera_nexthop_group_util_hw_state(struct prestera_switch *sw,
 	return false;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct prestera_fib_node *
 prestera_fib_node_find(struct prestera_switch *sw, struct prestera_fib_key *key)
 {
@@ -613,12 +584,9 @@ static void __prestera_fib_node_destruct(struct prestera_switch *sw,
 	prestera_hw_lpm_del(sw, vr->hw_vr_id, fib_node->key.addr.u.ipv4,
 			    fib_node->key.prefix_len);
 	switch (fib_node->info.type) {
-<<<<<<< HEAD
 	case PRESTERA_FIB_TYPE_UC_NH:
 		prestera_nexthop_group_put(sw, fib_node->info.nh_grp);
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case PRESTERA_FIB_TYPE_TRAP:
 		break;
 	case PRESTERA_FIB_TYPE_DROP:
@@ -640,7 +608,6 @@ void prestera_fib_node_destroy(struct prestera_switch *sw,
 	kfree(fib_node);
 }
 
-<<<<<<< HEAD
 static void prestera_fib_node_destroy_ht_cb(void *ptr, void *arg)
 {
 	struct prestera_fib_node *node = ptr;
@@ -655,12 +622,6 @@ prestera_fib_node_create(struct prestera_switch *sw,
 			 struct prestera_fib_key *key,
 			 enum prestera_fib_type fib_type,
 			 struct prestera_nexthop_group_key *nh_grp_key)
-=======
-struct prestera_fib_node *
-prestera_fib_node_create(struct prestera_switch *sw,
-			 struct prestera_fib_key *key,
-			 enum prestera_fib_type fib_type)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct prestera_fib_node *fib_node;
 	u32 grp_id;
@@ -687,7 +648,6 @@ prestera_fib_node_create(struct prestera_switch *sw,
 	case PRESTERA_FIB_TYPE_DROP:
 		grp_id = PRESTERA_NHGR_DROP;
 		break;
-<<<<<<< HEAD
 	case PRESTERA_FIB_TYPE_UC_NH:
 		fib_node->info.nh_grp = prestera_nexthop_group_get(sw,
 								   nh_grp_key);
@@ -696,8 +656,6 @@ prestera_fib_node_create(struct prestera_switch *sw,
 
 		grp_id = fib_node->info.nh_grp->grp_id;
 		break;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		pr_err("Unsupported fib_type %d", fib_type);
 		goto err_nh_grp_get;
@@ -719,11 +677,8 @@ err_ht_insert:
 	prestera_hw_lpm_del(sw, vr->hw_vr_id, key->addr.u.ipv4,
 			    key->prefix_len);
 err_lpm_add:
-<<<<<<< HEAD
 	if (fib_type == PRESTERA_FIB_TYPE_UC_NH)
 		prestera_nexthop_group_put(sw, fib_node->info.nh_grp);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_nh_grp_get:
 	prestera_vr_put(sw, vr);
 err_vr_get:

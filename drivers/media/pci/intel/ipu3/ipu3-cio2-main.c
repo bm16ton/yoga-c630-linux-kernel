@@ -1030,11 +1030,7 @@ static void cio2_vb2_stop_streaming(struct vb2_queue *vq)
 	cio2_hw_exit(cio2, q);
 	synchronize_irq(cio2->pci_dev->irq);
 	cio2_vb2_return_all_buffers(q, VB2_BUF_STATE_ERROR);
-<<<<<<< HEAD
 	video_device_pipeline_stop(&q->vdev);
-=======
-	media_pipeline_stop(&q->vdev.entity);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pm_runtime_put(dev);
 	cio2->streaming = false;
 }

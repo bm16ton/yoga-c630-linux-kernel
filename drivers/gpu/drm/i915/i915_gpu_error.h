@@ -166,10 +166,6 @@ struct intel_gt_coredump {
 	u32 derrmr;
 	u32 sfc_done[I915_MAX_SFC]; /* gen12 */
 
-	/* Display related */
-	u32 derrmr;
-	u32 sfc_done[I915_MAX_SFC]; /* gen12 */
-
 	u32 nfence;
 	u64 fence[I915_MAX_NUM_FENCES];
 
@@ -178,7 +174,6 @@ struct intel_gt_coredump {
 	struct intel_uc_coredump {
 		struct intel_uc_fw guc_fw;
 		struct intel_uc_fw huc_fw;
-<<<<<<< HEAD
 		struct guc_info {
 			struct intel_ctb_coredump ctb[2];
 			struct i915_vma_coredump *vma_ctb;
@@ -187,10 +182,6 @@ struct intel_gt_coredump {
 			u16 last_fence;
 			bool is_guc_capture;
 		} guc;
-=======
-		struct i915_vma_coredump *guc_log;
-		bool is_guc_capture;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} *uc;
 
 	struct intel_gt_coredump *next;

@@ -567,11 +567,7 @@ EXPORT_SYMBOL(bio_alloc_bioset);
  * be reused by calling bio_uninit() before calling bio_init() again.
  *
  * Note that unlike bio_alloc() or bio_alloc_bioset() allocations from this
-<<<<<<< HEAD
  * function are not backed by a mempool can fail.  Do not use this function
-=======
- * function are not backed by a mempool can can fail.  Do not use this function
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * for allocations in the file system I/O path.
  *
  * Returns: Pointer to new bio on success, NULL on failure.
@@ -788,17 +784,10 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
  * @bio_src: bio to clone from
  * @gfp: allocation priority
  * @bs: bio_set to allocate from
-<<<<<<< HEAD
  *
  * Allocate a new bio that is a clone of @bio_src. The caller owns the returned
  * bio, but not the actual data it points to.
  *
-=======
- *
- * Allocate a new bio that is a clone of @bio_src. The caller owns the returned
- * bio, but not the actual data it points to.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * The caller must ensure that the return bio is not freed before @bio_src.
  */
 struct bio *bio_alloc_clone(struct block_device *bdev, struct bio *bio_src,
@@ -1757,12 +1746,8 @@ static int __init init_bio(void)
 	cpuhp_setup_state_multi(CPUHP_BIO_DEAD, "block/bio:dead", NULL,
 					bio_cpu_dead);
 
-<<<<<<< HEAD
 	if (bioset_init(&fs_bio_set, BIO_POOL_SIZE, 0,
 			BIOSET_NEED_BVECS | BIOSET_PERCPU_CACHE))
-=======
-	if (bioset_init(&fs_bio_set, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		panic("bio: can't allocate bios\n");
 
 	if (bioset_integrity_create(&fs_bio_set, BIO_POOL_SIZE))

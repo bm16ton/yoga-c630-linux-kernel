@@ -106,10 +106,7 @@ static bool test_intel(int idx, void *data)
 	case INTEL_FAM6_ALDERLAKE_N:
 	case INTEL_FAM6_RAPTORLAKE:
 	case INTEL_FAM6_RAPTORLAKE_P:
-<<<<<<< HEAD
 	case INTEL_FAM6_RAPTORLAKE_S:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (idx == PERF_MSR_SMI || idx == PERF_MSR_PPERF)
 			return true;
 		break;

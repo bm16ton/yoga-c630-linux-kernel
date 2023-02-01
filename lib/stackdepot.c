@@ -396,7 +396,6 @@ EXPORT_SYMBOL_GPL(stack_depot_fetch);
  * @extra_bits:		Flags to store in unused bits of depot_stack_handle_t
  * @alloc_flags:	Allocation gfp flags
  * @can_alloc:		Allocate stack slabs (increased chance of failure if false)
-<<<<<<< HEAD
  *
  * Saves a stack trace from @entries array of size @nr_entries. If @can_alloc is
  * %true, is allowed to replenish the stack slab pool in case no space is left
@@ -409,16 +408,6 @@ EXPORT_SYMBOL_GPL(stack_depot_fetch);
  * Additional opaque flags can be passed in @extra_bits, stored in the unused
  * bits of the stack handle, and retrieved using stack_depot_get_extra_bits()
  * without calling stack_depot_fetch().
-=======
- *
- * Saves a stack trace from @entries array of size @nr_entries. If @can_alloc is
- * %true, is allowed to replenish the stack slab pool in case no space is left
- * (allocates using GFP flags of @alloc_flags). If @can_alloc is %false, avoids
- * any allocations and will fail if no space is left to store the stack trace.
- *
- * If the stack trace in @entries is from an interrupt, only the portion up to
- * interrupt entry is saved.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Context: Any context, but setting @can_alloc to %false is required if
  *          alloc_pages() cannot be used from the current context. Currently
@@ -429,10 +418,7 @@ EXPORT_SYMBOL_GPL(stack_depot_fetch);
  */
 depot_stack_handle_t __stack_depot_save(unsigned long *entries,
 					unsigned int nr_entries,
-<<<<<<< HEAD
 					unsigned int extra_bits,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					gfp_t alloc_flags, bool can_alloc)
 {
 	struct stack_record *found = NULL, **bucket;
@@ -522,13 +508,9 @@ exit:
 	if (found)
 		retval.handle = found->handle.handle;
 fast_exit:
-<<<<<<< HEAD
 	retval.extra = extra_bits;
 
 	return retval.handle;
-=======
-	return retval;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(__stack_depot_save);
 
@@ -548,10 +530,6 @@ depot_stack_handle_t stack_depot_save(unsigned long *entries,
 				      unsigned int nr_entries,
 				      gfp_t alloc_flags)
 {
-<<<<<<< HEAD
 	return __stack_depot_save(entries, nr_entries, 0, alloc_flags, true);
-=======
-	return __stack_depot_save(entries, nr_entries, alloc_flags, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(stack_depot_save);

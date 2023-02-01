@@ -1916,10 +1916,7 @@ lpfc_issue_cmf_sync_wqe(struct lpfc_hba *phba, u32 ms, u64 total)
 	unsigned long iflags;
 	u32 ret_val;
 	u32 atot, wtot, max;
-<<<<<<< HEAD
 	u16 warn_sync_period = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* First address any alarm / warning activity */
 	atot = atomic_xchg(&phba->cgn_sync_alarm_cnt, 0);
@@ -1974,20 +1971,14 @@ lpfc_issue_cmf_sync_wqe(struct lpfc_hba *phba, u32 ms, u64 total)
 				lpfc_acqe_cgn_frequency;
 			bf_set(cmf_sync_wsigmax, &wqe->cmf_sync, max);
 			bf_set(cmf_sync_wsigcnt, &wqe->cmf_sync, wtot);
-<<<<<<< HEAD
 			warn_sync_period = lpfc_acqe_cgn_frequency;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			/* We hit a FPIN warning condition */
 			bf_set(cmf_sync_wfpinmax, &wqe->cmf_sync, 1);
 			bf_set(cmf_sync_wfpincnt, &wqe->cmf_sync, 1);
-<<<<<<< HEAD
 			if (phba->cgn_fpin_frequency != LPFC_FPIN_INIT_FREQ)
 				warn_sync_period =
 				LPFC_MSECS_TO_SECS(phba->cgn_fpin_frequency);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -2003,10 +1994,7 @@ initpath:
 	bf_set(cmf_sync_reqtag, &wqe->cmf_sync, sync_buf->iotag);
 
 	bf_set(cmf_sync_qosd, &wqe->cmf_sync, 1);
-<<<<<<< HEAD
 	bf_set(cmf_sync_period, &wqe->cmf_sync, warn_sync_period);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bf_set(cmf_sync_cmd_type, &wqe->cmf_sync, CMF_SYNC_COMMAND);
 	bf_set(cmf_sync_wqec, &wqe->cmf_sync, 1);
@@ -2868,6 +2856,7 @@ void
 lpfc_sli_def_mbox_cmpl(struct lpfc_hba *phba, LPFC_MBOXQ_t *pmb)
 {
 	struct lpfc_vport  *vport = pmb->vport;
+	struct lpfc_dmabuf *mp;
 	struct lpfc_nodelist *ndlp;
 	struct Scsi_Host *shost;
 	uint16_t rpi, vpi;
@@ -6844,7 +6833,6 @@ lpfc_set_features(struct lpfc_hba *phba, LPFC_MBOXQ_t *mbox,
 		bf_set(lpfc_mbx_set_feature_mi, &mbox->u.mqe.un.set_feature,
 		       phba->sli4_hba.pc_sli4_params.mi_ver);
 		break;
-<<<<<<< HEAD
 	case LPFC_SET_LD_SIGNAL:
 		mbox->u.mqe.un.set_feature.feature = LPFC_SET_LD_SIGNAL;
 		mbox->u.mqe.un.set_feature.param_len = 16;
@@ -6852,10 +6840,6 @@ lpfc_set_features(struct lpfc_hba *phba, LPFC_MBOXQ_t *mbox,
 		       &mbox->u.mqe.un.set_feature, LPFC_QUERY_LDS_OP);
 		break;
 	case LPFC_SET_ENABLE_CMF:
-=======
-	case LPFC_SET_ENABLE_CMF:
-		bf_set(lpfc_mbx_set_feature_dd, &mbox->u.mqe.un.set_feature, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mbox->u.mqe.un.set_feature.feature = LPFC_SET_ENABLE_CMF;
 		mbox->u.mqe.un.set_feature.param_len = 4;
 		bf_set(lpfc_mbx_set_feature_cmf,
@@ -7851,7 +7835,6 @@ lpfc_post_rq_buffer(struct lpfc_hba *phba, struct lpfc_queue *hrq,
 }
 
 static void
-<<<<<<< HEAD
 lpfc_mbx_cmpl_read_lds_params(struct lpfc_hba *phba, LPFC_MBOXQ_t *pmb)
 {
 	union lpfc_sli4_cfg_shdr *shdr;
@@ -7908,8 +7891,6 @@ lpfc_read_lds_params(struct lpfc_hba *phba)
 }
 
 static void
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 lpfc_mbx_cmpl_cgn_set_ftrs(struct lpfc_hba *phba, LPFC_MBOXQ_t *pmb)
 {
 	struct lpfc_vport *vport = pmb->vport;
@@ -8169,17 +8150,10 @@ u32 lpfc_rx_monitor_report(struct lpfc_hba *phba,
 					"IO_cnt", "Info", "BWutil(ms)");
 	}
 
-<<<<<<< HEAD
 	/* Needs to be _irq because record is called from timer interrupt
 	 * context
 	 */
 	spin_lock_irq(ring_lock);
-=======
-	/* Needs to be _bh because record is called from timer interrupt
-	 * context
-	 */
-	spin_lock_bh(ring_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (*head_idx != *tail_idx) {
 		entry = &ring[*head_idx];
 
@@ -8223,11 +8197,7 @@ u32 lpfc_rx_monitor_report(struct lpfc_hba *phba,
 		if (cnt >= max_read_entries)
 			break;
 	}
-<<<<<<< HEAD
 	spin_unlock_irq(ring_lock);
-=======
-	spin_unlock_bh(ring_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return cnt;
 }
@@ -10605,19 +10575,10 @@ static int
 __lpfc_sli_issue_fcp_io_s4(struct lpfc_hba *phba, uint32_t ring_number,
 			   struct lpfc_iocbq *piocb, uint32_t flag)
 {
-<<<<<<< HEAD
 	struct lpfc_io_buf *lpfc_cmd = piocb->io_buf;
 
 	lpfc_prep_embed_io(phba, lpfc_cmd);
 	return lpfc_sli4_issue_wqe(phba, lpfc_cmd->hdwq, piocb);
-=======
-	int rc;
-	struct lpfc_io_buf *lpfc_cmd = piocb->io_buf;
-
-	lpfc_prep_embed_io(phba, lpfc_cmd);
-	rc = lpfc_sli4_issue_wqe(phba, lpfc_cmd->hdwq, piocb);
-	return rc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void

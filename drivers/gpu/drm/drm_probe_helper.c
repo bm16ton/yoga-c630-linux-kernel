@@ -995,7 +995,6 @@ bool drm_helper_hpd_irq_event(struct drm_device *dev)
 				drm_connector_get(connector);
 				first_changed_connector = connector;
 			}
-<<<<<<< HEAD
 
 			changed++;
 		}
@@ -1069,14 +1068,8 @@ int drm_connector_helper_get_modes_from_ddc(struct drm_connector *connector)
 	if (edid) {
 		count = drm_add_edid_modes(connector, edid);
 		kfree(edid);
-=======
-
-			changed++;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
-<<<<<<< HEAD
 	return count;
 }
 EXPORT_SYMBOL(drm_connector_helper_get_modes_from_ddc);
@@ -1105,15 +1098,6 @@ int drm_connector_helper_get_modes_fixed(struct drm_connector *connector,
 			DRM_MODE_ARG(fixed_mode));
 		return 0;
 	}
-=======
-	if (changed == 1)
-		drm_kms_helper_connector_hotplug_event(first_changed_connector);
-	else if (changed > 0)
-		drm_kms_helper_hotplug_event(dev);
-
-	if (first_changed_connector)
-		drm_connector_put(first_changed_connector);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (mode->name[0] == '\0')
 		drm_mode_set_name(mode);
@@ -1128,47 +1112,7 @@ int drm_connector_helper_get_modes_fixed(struct drm_connector *connector,
 
 	return 1;
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL(drm_connector_helper_get_modes_fixed);
-=======
-EXPORT_SYMBOL(drm_helper_hpd_irq_event);
-
-/**
- * drm_connector_helper_get_modes_from_ddc - Updates the connector's EDID
- *                                           property from the connector's
- *                                           DDC channel
- * @connector: The connector
- *
- * Returns:
- * The number of detected display modes.
- *
- * Uses a connector's DDC channel to retrieve EDID data and update the
- * connector's EDID property and display modes. Drivers can use this
- * function to implement struct &drm_connector_helper_funcs.get_modes
- * for connectors with a DDC channel.
- */
-int drm_connector_helper_get_modes_from_ddc(struct drm_connector *connector)
-{
-	struct edid *edid;
-	int count = 0;
-
-	if (!connector->ddc)
-		return 0;
-
-	edid = drm_get_edid(connector, connector->ddc);
-
-	// clears property if EDID is NULL
-	drm_connector_update_edid_property(connector, edid);
-
-	if (edid) {
-		count = drm_add_edid_modes(connector, edid);
-		kfree(edid);
-	}
-
-	return count;
-}
-EXPORT_SYMBOL(drm_connector_helper_get_modes_from_ddc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * drm_connector_helper_get_modes - Read EDID and update connector.

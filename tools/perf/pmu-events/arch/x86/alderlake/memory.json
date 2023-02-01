@@ -83,7 +83,6 @@
         "Unit": "cpu_atom"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Counts demand data reads that were not supplied by the L3 cache.",
         "Counter": "0,1,2,3,4,5",
         "EventCode": "0xB7",
@@ -95,8 +94,6 @@
         "Unit": "cpu_atom"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Counts demand reads for ownership (RFO) and software prefetches for exclusive ownership (PREFETCHW) that were not supplied by the L3 cache.",
         "Counter": "0,1,2,3,4,5",
         "EventCode": "0xB7",
@@ -108,7 +105,6 @@
         "Unit": "cpu_atom"
     },
     {
-<<<<<<< HEAD
         "BriefDescription": "Counts demand reads for ownership (RFO) and software prefetches for exclusive ownership (PREFETCHW) that were not supplied by the L3 cache.",
         "Counter": "0,1,2,3,4,5",
         "EventCode": "0xB7",
@@ -120,8 +116,6 @@
         "Unit": "cpu_atom"
     },
     {
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "Execution stalls while L3 cache miss demand load is outstanding.",
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3",

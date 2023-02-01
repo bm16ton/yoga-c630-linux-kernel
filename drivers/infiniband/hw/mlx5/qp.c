@@ -1188,7 +1188,6 @@ static int get_ts_format(struct mlx5_ib_dev *dev, struct mlx5_ib_cq *cq,
 		if (!rt_sup) {
 			mlx5_ib_dbg(dev,
 				    "Real time TS format is not supported\n");
-<<<<<<< HEAD
 			return -EOPNOTSUPP;
 		}
 		return MLX5_TIMESTAMP_FORMAT_REAL_TIME;
@@ -1201,20 +1200,6 @@ static int get_ts_format(struct mlx5_ib_dev *dev, struct mlx5_ib_cq *cq,
 		}
 		return MLX5_TIMESTAMP_FORMAT_FREE_RUNNING;
 	}
-=======
-			return -EOPNOTSUPP;
-		}
-		return MLX5_TIMESTAMP_FORMAT_REAL_TIME;
-	}
-	if (cq->create_flags & IB_UVERBS_CQ_FLAGS_TIMESTAMP_COMPLETION) {
-		if (!fr_sup) {
-			mlx5_ib_dbg(dev,
-				    "Free running TS format is not supported\n");
-			return -EOPNOTSUPP;
-		}
-		return MLX5_TIMESTAMP_FORMAT_FREE_RUNNING;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return fr_sup ? MLX5_TIMESTAMP_FORMAT_FREE_RUNNING :
 			MLX5_TIMESTAMP_FORMAT_DEFAULT;
 }

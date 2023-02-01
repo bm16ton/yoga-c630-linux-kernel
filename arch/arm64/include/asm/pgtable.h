@@ -682,11 +682,7 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
 #define pud_leaf(pud)		(pud_present(pud) && !pud_table(pud))
 #define pud_valid(pud)		pte_valid(pud_pte(pud))
 #define pud_user(pud)		pte_user(pud_pte(pud))
-<<<<<<< HEAD
 #define pud_user_exec(pud)	pte_user_exec(pud_pte(pud))
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline void set_pud(pud_t *pudp, pud_t pud)
 {
@@ -867,20 +863,12 @@ static inline bool pte_user_accessible_page(pte_t pte)
 
 static inline bool pmd_user_accessible_page(pmd_t pmd)
 {
-<<<<<<< HEAD
 	return pmd_leaf(pmd) && !pmd_present_invalid(pmd) && (pmd_user(pmd) || pmd_user_exec(pmd));
-=======
-	return pmd_leaf(pmd) && (pmd_user(pmd) || pmd_user_exec(pmd));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool pud_user_accessible_page(pud_t pud)
 {
-<<<<<<< HEAD
 	return pud_leaf(pud) && (pud_user(pud) || pud_user_exec(pud));
-=======
-	return pud_leaf(pud) && pud_user(pud);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 
@@ -1094,30 +1082,13 @@ static inline void update_mmu_cache(struct vm_area_struct *vma,
  * page after fork() + CoW for pfn mappings. We don't always have a
  * hardware-managed access flag on arm64.
  */
-<<<<<<< HEAD
 #define arch_has_hw_pte_young		cpu_has_hw_af
-=======
-static inline bool arch_faults_on_old_pte(void)
-{
-	/* The register read below requires a stable CPU to make any sense */
-	cant_migrate();
-
-	return !cpu_has_hw_af();
-}
-#define arch_faults_on_old_pte		arch_faults_on_old_pte
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Experimentally, it's cheap to set the access flag in hardware and we
  * benefit from prefaulting mappings as 'old' to start with.
  */
 #define arch_wants_old_prefaulted_pte	cpu_has_hw_af
-
-static inline bool pud_sect_supported(void)
-{
-	return PAGE_SIZE == SZ_4K;
-}
-
 
 static inline bool pud_sect_supported(void)
 {

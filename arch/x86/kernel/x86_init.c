@@ -146,11 +146,8 @@ struct x86_platform_ops x86_platform __ro_after_init = {
 	.get_nmi_reason			= default_get_nmi_reason,
 	.save_sched_clock_state		= tsc_save_sched_clock_state,
 	.restore_sched_clock_state	= tsc_restore_sched_clock_state,
-<<<<<<< HEAD
 	.realmode_reserve		= reserve_real_mode,
 	.realmode_init			= init_real_mode,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.hyper.pin_vcpu			= x86_op_int_noop,
 
 	.guest = {

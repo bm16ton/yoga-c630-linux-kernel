@@ -4,11 +4,7 @@
 $id: http://devicetree.org/schemas/pinctrl/mediatek,mt7622-pinctrl.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-<<<<<<< HEAD
 title: Mediatek MT7622 Pin Controller
-=======
-title: Mediatek MT7622 Pin Controller Device Tree Bindings
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 maintainers:
   - Sean Wang <sean.wang@kernel.org>

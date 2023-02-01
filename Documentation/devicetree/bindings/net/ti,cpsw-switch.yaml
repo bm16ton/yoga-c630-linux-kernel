@@ -91,10 +91,7 @@ properties:
         description: CPSW external ports
 
         $ref: ethernet-controller.yaml#
-<<<<<<< HEAD
         unevaluatedProperties: false
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
         properties:
           reg:

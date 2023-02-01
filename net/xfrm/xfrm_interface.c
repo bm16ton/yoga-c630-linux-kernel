@@ -777,7 +777,6 @@ static int xfrmi_newlink(struct net *src_net, struct net_device *dev,
 	int err;
 
 	xfrmi_netlink_parms(data, &p);
-<<<<<<< HEAD
 	if (p.collect_md) {
 		struct xfrmi_net *xfrmn = net_generic(net, xfrmi_net_id);
 
@@ -799,16 +798,6 @@ static int xfrmi_newlink(struct net *src_net, struct net_device *dev,
 		if (xi)
 			return -EEXIST;
 	}
-=======
-	if (!p.if_id) {
-		NL_SET_ERR_MSG(extack, "if_id must be non zero");
-		return -EINVAL;
-	}
-
-	xi = xfrmi_locate(net, &p);
-	if (xi)
-		return -EEXIST;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	xi = netdev_priv(dev);
 	xi->p = p;
@@ -838,14 +827,11 @@ static int xfrmi_changelink(struct net_device *dev, struct nlattr *tb[],
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	if (p.collect_md) {
 		NL_SET_ERR_MSG(extack, "collect_md can't be changed");
 		return -EINVAL;
 	}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	xi = xfrmi_locate(net, &p);
 	if (!xi) {
 		xi = netdev_priv(dev);

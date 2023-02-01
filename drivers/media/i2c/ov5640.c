@@ -1654,7 +1654,6 @@ static int ov5640_set_timings(struct ov5640_dev *sensor,
 
 	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_HS,
 				 analog_crop->left);
-<<<<<<< HEAD
 	if (ret < 0)
 		return ret;
 
@@ -1689,42 +1688,6 @@ static int ov5640_set_timings(struct ov5640_dev *sensor,
 	if (ret < 0)
 		return ret;
 
-=======
-	if (ret < 0)
-		return ret;
-
-	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_VS,
-				 analog_crop->top);
-	if (ret < 0)
-		return ret;
-
-	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_HW,
-				 analog_crop->left + analog_crop->width - 1);
-	if (ret < 0)
-		return ret;
-
-	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_VH,
-				 analog_crop->top + analog_crop->height - 1);
-	if (ret < 0)
-		return ret;
-
-	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_HOFFS, crop->left);
-	if (ret < 0)
-		return ret;
-
-	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_VOFFS, crop->top);
-	if (ret < 0)
-		return ret;
-
-	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_DVPHO, mode->width);
-	if (ret < 0)
-		return ret;
-
-	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_DVPVO, mode->height);
-	if (ret < 0)
-		return ret;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ov5640_write_reg16(sensor, OV5640_REG_TIMING_HTS, timings->htot);
 	if (ret < 0)
 		return ret;
@@ -3854,12 +3817,8 @@ static int ov5640_probe(struct i2c_client *client)
 	sensor->current_mode =
 		&ov5640_mode_data[OV5640_MODE_VGA_640_480];
 	sensor->last_mode = sensor->current_mode;
-<<<<<<< HEAD
 	sensor->current_link_freq =
 		ov5640_csi2_link_freqs[OV5640_DEFAULT_LINK_FREQ];
-=======
-	sensor->current_link_freq = OV5640_DEFAULT_LINK_FREQ;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	sensor->ae_target = 52;
 
@@ -3941,11 +3900,7 @@ static int ov5640_probe(struct i2c_client *client)
 	pm_runtime_get_noresume(dev);
 	pm_runtime_enable(dev);
 
-<<<<<<< HEAD
 	ret = ov5640_check_chip_id(sensor);
-=======
-	ret = v4l2_async_register_subdev_sensor(&sensor->sd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto err_pm_runtime;
 

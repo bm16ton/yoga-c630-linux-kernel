@@ -27,7 +27,6 @@
 static unsigned long efi_nr_tables;
 static unsigned long efi_config_table;
 
-<<<<<<< HEAD
 static unsigned long __initdata boot_memmap = EFI_INVALID_TABLE_ADDR;
 
 static efi_system_table_t *efi_systab;
@@ -35,10 +34,6 @@ static efi_config_table_type_t arch_tables[] __initdata = {
 	{LINUX_EFI_BOOT_MEMMAP_GUID,	&boot_memmap,	"MEMMAP" },
 	{},
 };
-=======
-static efi_system_table_t *efi_systab;
-static efi_config_table_type_t arch_tables[] __initdata = {{},};
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void __init efi_runtime_init(void)
 {
@@ -61,10 +56,7 @@ void __init efi_init(void)
 {
 	int size;
 	void *config_tables;
-<<<<<<< HEAD
 	struct efi_boot_memmap *tbl;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!efi_system_table)
 		return;
@@ -75,11 +67,8 @@ void __init efi_init(void)
 		return;
 	}
 
-<<<<<<< HEAD
 	efi_systab_report_header(&efi_systab->hdr, efi_systab->fw_vendor);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_bit(EFI_64BIT, &efi.flags);
 	efi_nr_tables	 = efi_systab->nr_tables;
 	efi_config_table = (unsigned long)efi_systab->tables;
@@ -88,7 +77,6 @@ void __init efi_init(void)
 	config_tables = early_memremap(efi_config_table, efi_nr_tables * size);
 	efi_config_parse_tables(config_tables, efi_systab->nr_tables, arch_tables);
 	early_memunmap(config_tables, efi_nr_tables * size);
-<<<<<<< HEAD
 
 	set_bit(EFI_CONFIG_TABLES, &efi.flags);
 
@@ -112,6 +100,4 @@ void __init efi_init(void)
 
 		early_memunmap(tbl, sizeof(*tbl));
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

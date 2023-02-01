@@ -123,11 +123,7 @@ alternative_cb_end
 	tbnz	\tmp2, #TIF_SSBD, .L__asm_ssbd_skip\@
 	mov	w0, #ARM_SMCCC_ARCH_WORKAROUND_2
 	mov	w1, #\state
-<<<<<<< HEAD
 alternative_cb	ARM64_ALWAYS_SYSTEM, smccc_patch_fw_mitigation_conduit
-=======
-alternative_cb	smccc_patch_fw_mitigation_conduit
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nop					// Patched to SMC/HVC #0
 alternative_cb_end
 .L__asm_ssbd_skip\@:
@@ -179,11 +175,7 @@ alternative_else_nop_endif
 
 	.macro mte_set_kernel_gcr, tmp, tmp2
 #ifdef CONFIG_KASAN_HW_TAGS
-<<<<<<< HEAD
 alternative_cb	ARM64_ALWAYS_SYSTEM, kasan_hw_tags_enable
-=======
-alternative_cb	kasan_hw_tags_enable
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	b	1f
 alternative_cb_end
 	mov	\tmp, KERNEL_GCR_EL1
@@ -194,11 +186,7 @@ alternative_cb_end
 
 	.macro mte_set_user_gcr, tsk, tmp, tmp2
 #ifdef CONFIG_KASAN_HW_TAGS
-<<<<<<< HEAD
 alternative_cb	ARM64_ALWAYS_SYSTEM, kasan_hw_tags_enable
-=======
-alternative_cb	kasan_hw_tags_enable
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	b	1f
 alternative_cb_end
 	ldr	\tmp, [\tsk, #THREAD_MTE_CTRL]

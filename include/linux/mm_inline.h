@@ -74,14 +74,6 @@ static __always_inline void __folio_clear_lru_flags(struct folio *folio)
 
 	__folio_clear_active(folio);
 	__folio_clear_unevictable(folio);
-<<<<<<< HEAD
-=======
-}
-
-static __always_inline void __clear_page_lru_flags(struct page *page)
-{
-	__folio_clear_lru_flags(page_folio(page));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -107,7 +99,6 @@ static __always_inline enum lru_list folio_lru_list(struct folio *folio)
 	return lru;
 }
 
-<<<<<<< HEAD
 #ifdef CONFIG_LRU_GEN
 
 #ifdef CONFIG_LRU_GEN_ENABLED
@@ -318,19 +309,14 @@ static inline bool lru_gen_del_folio(struct lruvec *lruvec, struct folio *folio,
 
 #endif /* CONFIG_LRU_GEN */
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static __always_inline
 void lruvec_add_folio(struct lruvec *lruvec, struct folio *folio)
 {
 	enum lru_list lru = folio_lru_list(folio);
 
-<<<<<<< HEAD
 	if (lru_gen_add_folio(lruvec, folio, false))
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	update_lru_size(lruvec, lru, folio_zonenum(folio),
 			folio_nr_pages(folio));
 	if (lru != LRU_UNEVICTABLE)
@@ -347,12 +333,9 @@ static __always_inline
 void lruvec_add_folio_tail(struct lruvec *lruvec, struct folio *folio)
 {
 	enum lru_list lru = folio_lru_list(folio);
-<<<<<<< HEAD
 
 	if (lru_gen_add_folio(lruvec, folio, true))
 		return;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	update_lru_size(lruvec, lru, folio_zonenum(folio),
 			folio_nr_pages(folio));
@@ -363,22 +346,11 @@ void lruvec_add_folio_tail(struct lruvec *lruvec, struct folio *folio)
 static __always_inline
 void lruvec_del_folio(struct lruvec *lruvec, struct folio *folio)
 {
-<<<<<<< HEAD
 	enum lru_list lru = folio_lru_list(folio);
 
 	if (lru_gen_del_folio(lruvec, folio, false))
 		return;
 
-=======
-	lruvec_add_folio_tail(lruvec, page_folio(page));
-}
-
-static __always_inline
-void lruvec_del_folio(struct lruvec *lruvec, struct folio *folio)
-{
-	enum lru_list lru = folio_lru_list(folio);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (lru != LRU_UNEVICTABLE)
 		list_del(&folio->lru);
 	update_lru_size(lruvec, lru, folio_zonenum(folio),
@@ -424,7 +396,6 @@ struct anon_vma_name *anon_vma_name_reuse(struct anon_vma_name *anon_name)
 
 	}
 	return anon_vma_name_alloc(anon_name->name);
-<<<<<<< HEAD
 }
 
 static inline void dup_anon_vma_name(struct vm_area_struct *orig_vma,
@@ -540,123 +511,6 @@ static inline void dec_tlb_flush_pending(struct mm_struct *mm)
 	atomic_dec(&mm->tlb_flush_pending);
 }
 
-=======
-}
-
-static inline void dup_anon_vma_name(struct vm_area_struct *orig_vma,
-				     struct vm_area_struct *new_vma)
-{
-	struct anon_vma_name *anon_name = anon_vma_name(orig_vma);
-
-	if (anon_name)
-		new_vma->anon_name = anon_vma_name_reuse(anon_name);
-}
-
-static inline void free_anon_vma_name(struct vm_area_struct *vma)
-{
-	/*
-	 * Not using anon_vma_name because it generates a warning if mmap_lock
-	 * is not held, which might be the case here.
-	 */
-	if (!vma->vm_file)
-		anon_vma_name_put(vma->anon_name);
-}
-
-static inline bool anon_vma_name_eq(struct anon_vma_name *anon_name1,
-				    struct anon_vma_name *anon_name2)
-{
-	if (anon_name1 == anon_name2)
-		return true;
-
-	return anon_name1 && anon_name2 &&
-		!strcmp(anon_name1->name, anon_name2->name);
-}
-
-#else /* CONFIG_ANON_VMA_NAME */
-static inline struct anon_vma_name *anon_vma_name(struct vm_area_struct *vma)
-{
-	return NULL;
-}
-
-static inline struct anon_vma_name *anon_vma_name_alloc(const char *name)
-{
-	return NULL;
-}
-
-static inline void anon_vma_name_get(struct anon_vma_name *anon_name) {}
-static inline void anon_vma_name_put(struct anon_vma_name *anon_name) {}
-static inline void dup_anon_vma_name(struct vm_area_struct *orig_vma,
-				     struct vm_area_struct *new_vma) {}
-static inline void free_anon_vma_name(struct vm_area_struct *vma) {}
-
-static inline bool anon_vma_name_eq(struct anon_vma_name *anon_name1,
-				    struct anon_vma_name *anon_name2)
-{
-	return true;
-}
-
-#endif  /* CONFIG_ANON_VMA_NAME */
-
-static inline void init_tlb_flush_pending(struct mm_struct *mm)
-{
-	atomic_set(&mm->tlb_flush_pending, 0);
-}
-
-static inline void inc_tlb_flush_pending(struct mm_struct *mm)
-{
-	atomic_inc(&mm->tlb_flush_pending);
-	/*
-	 * The only time this value is relevant is when there are indeed pages
-	 * to flush. And we'll only flush pages after changing them, which
-	 * requires the PTL.
-	 *
-	 * So the ordering here is:
-	 *
-	 *	atomic_inc(&mm->tlb_flush_pending);
-	 *	spin_lock(&ptl);
-	 *	...
-	 *	set_pte_at();
-	 *	spin_unlock(&ptl);
-	 *
-	 *				spin_lock(&ptl)
-	 *				mm_tlb_flush_pending();
-	 *				....
-	 *				spin_unlock(&ptl);
-	 *
-	 *	flush_tlb_range();
-	 *	atomic_dec(&mm->tlb_flush_pending);
-	 *
-	 * Where the increment if constrained by the PTL unlock, it thus
-	 * ensures that the increment is visible if the PTE modification is
-	 * visible. After all, if there is no PTE modification, nobody cares
-	 * about TLB flushes either.
-	 *
-	 * This very much relies on users (mm_tlb_flush_pending() and
-	 * mm_tlb_flush_nested()) only caring about _specific_ PTEs (and
-	 * therefore specific PTLs), because with SPLIT_PTE_PTLOCKS and RCpc
-	 * locks (PPC) the unlock of one doesn't order against the lock of
-	 * another PTL.
-	 *
-	 * The decrement is ordered by the flush_tlb_range(), such that
-	 * mm_tlb_flush_pending() will not return false unless all flushes have
-	 * completed.
-	 */
-}
-
-static inline void dec_tlb_flush_pending(struct mm_struct *mm)
-{
-	/*
-	 * See inc_tlb_flush_pending().
-	 *
-	 * This cannot be smp_mb__before_atomic() because smp_mb() simply does
-	 * not order against TLB invalidate completion, which is what we need.
-	 *
-	 * Therefore we must rely on tlb_flush_*() to guarantee order.
-	 */
-	atomic_dec(&mm->tlb_flush_pending);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool mm_tlb_flush_pending(struct mm_struct *mm)
 {
 	/*

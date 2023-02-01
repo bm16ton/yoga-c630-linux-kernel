@@ -9,36 +9,25 @@
 #include <linux/errno.h>
 #include <linux/export.h>
 #include <linux/io.h>
-<<<<<<< HEAD
 #include <linux/iopoll.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/slab.h>
 
 #include "clk.h"
 
-<<<<<<< HEAD
 #define TIMEOUT_US	500U
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CCM_DIV_SHIFT	0
 #define CCM_DIV_WIDTH	8
 #define CCM_MUX_SHIFT	8
 #define CCM_MUX_MASK	3
 #define CCM_OFF_SHIFT	24
-<<<<<<< HEAD
 #define CCM_BUSY_SHIFT	28
 
 #define STAT_OFFSET	0x4
-=======
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define AUTHEN_OFFSET	0x30
 #define TZ_NS_SHIFT	9
 #define TZ_NS_MASK	BIT(9)
 
-<<<<<<< HEAD
 #define WHITE_LIST_SHIFT	16
 
 static int imx93_clk_composite_wait_ready(struct clk_hw *hw, void __iomem *reg)
@@ -194,10 +183,6 @@ static const struct clk_ops imx93_clk_composite_mux_ops = {
 
 struct clk_hw *imx93_clk_composite_flags(const char *name, const char * const *parent_names,
 					 int num_parents, void __iomem *reg, u32 domain_id,
-=======
-struct clk_hw *imx93_clk_composite_flags(const char *name, const char * const *parent_names,
-					 int num_parents, void __iomem *reg,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 unsigned long flags)
 {
 	struct clk_hw *hw = ERR_PTR(-ENOMEM), *mux_hw;
@@ -206,10 +191,7 @@ struct clk_hw *imx93_clk_composite_flags(const char *name, const char * const *p
 	struct clk_gate *gate = NULL;
 	struct clk_mux *mux = NULL;
 	bool clk_ro = false;
-<<<<<<< HEAD
 	u32 authen;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mux = kzalloc(sizeof(*mux), GFP_KERNEL);
 	if (!mux)
@@ -232,12 +214,8 @@ struct clk_hw *imx93_clk_composite_flags(const char *name, const char * const *p
 	div->lock = &imx_ccm_lock;
 	div->flags = CLK_DIVIDER_ROUND_CLOSEST;
 
-<<<<<<< HEAD
 	authen = readl(reg + AUTHEN_OFFSET);
 	if (!(authen & TZ_NS_MASK) || !(authen & BIT(WHITE_LIST_SHIFT + domain_id)))
-=======
-	if (!(readl(reg + AUTHEN_OFFSET) & TZ_NS_MASK))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		clk_ro = true;
 
 	if (clk_ro) {
@@ -256,16 +234,10 @@ struct clk_hw *imx93_clk_composite_flags(const char *name, const char * const *p
 		gate->flags = CLK_GATE_SET_TO_DISABLE;
 
 		hw = clk_hw_register_composite(NULL, name, parent_names, num_parents,
-<<<<<<< HEAD
 					       mux_hw, &imx93_clk_composite_mux_ops, div_hw,
 					       &imx93_clk_composite_divider_ops, gate_hw,
 					       &imx93_clk_composite_gate_ops,
 					       flags | CLK_SET_RATE_NO_REPARENT);
-=======
-					       mux_hw, &clk_mux_ops, div_hw,
-					       &clk_divider_ops, gate_hw,
-					       &clk_gate_ops, flags | CLK_SET_RATE_NO_REPARENT);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (IS_ERR(hw))

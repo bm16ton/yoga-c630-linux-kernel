@@ -19,19 +19,11 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_atomic_uapi.h>
 #include <drm/drm_blend.h>
-<<<<<<< HEAD
 #include <drm/drm_drv.h>
 #include <drm/drm_fb_dma_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
-=======
-#include <drm/drm_fb_cma_helper.h>
-#include <drm/drm_fourcc.h>
-#include <drm/drm_framebuffer.h>
-#include <drm/drm_gem_atomic_helper.h>
-#include <drm/drm_plane_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "uapi/drm/vc4_drm.h"
 
@@ -348,11 +340,7 @@ static int vc4_plane_setup_clipping_and_scaling(struct drm_plane_state *state)
 {
 	struct vc4_plane_state *vc4_state = to_vc4_plane_state(state);
 	struct drm_framebuffer *fb = state->fb;
-<<<<<<< HEAD
 	struct drm_gem_dma_object *bo = drm_fb_dma_get_gem_obj(fb, 0);
-=======
-	struct drm_gem_cma_object *bo = drm_fb_cma_get_gem_obj(fb, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int num_planes = fb->format->num_planes;
 	struct drm_crtc_state *crtc_state;
 	u32 h_subsample = fb->format->hsub;
@@ -372,11 +360,7 @@ static int vc4_plane_setup_clipping_and_scaling(struct drm_plane_state *state)
 		return ret;
 
 	for (i = 0; i < num_planes; i++)
-<<<<<<< HEAD
 		vc4_state->offsets[i] = bo->dma_addr + fb->offsets[i];
-=======
-		vc4_state->offsets[i] = bo->paddr + fb->offsets[i];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * We don't support subpixel source positioning for scaling,
@@ -1303,12 +1287,9 @@ static void vc4_plane_atomic_async_update(struct drm_plane *plane,
 	struct vc4_plane_state *vc4_state, *new_vc4_state;
 	int idx;
 
-<<<<<<< HEAD
 	if (!drm_dev_enter(plane->dev, &idx))
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	swap(plane->state->fb, new_plane_state->fb);
 	plane->state->crtc_x = new_plane_state->crtc_x;
 	plane->state->crtc_y = new_plane_state->crtc_y;
@@ -1532,18 +1513,10 @@ struct drm_plane *vc4_plane_init(struct drm_device *dev,
 				 uint32_t possible_crtcs)
 {
 	struct vc4_dev *vc4 = to_vc4_dev(dev);
-<<<<<<< HEAD
 	struct drm_plane *plane;
 	struct vc4_plane *vc4_plane;
 	u32 formats[ARRAY_SIZE(hvs_formats)];
 	int num_formats = 0;
-=======
-	struct drm_plane *plane = NULL;
-	struct vc4_plane *vc4_plane;
-	u32 formats[ARRAY_SIZE(hvs_formats)];
-	int num_formats = 0;
-	int ret = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned i;
 	static const uint64_t modifiers[] = {
 		DRM_FORMAT_MOD_BROADCOM_VC4_T_TILED,
@@ -1554,14 +1527,6 @@ struct drm_plane *vc4_plane_init(struct drm_device *dev,
 		DRM_FORMAT_MOD_INVALID
 	};
 
-<<<<<<< HEAD
-=======
-	vc4_plane = devm_kzalloc(dev->dev, sizeof(*vc4_plane),
-				 GFP_KERNEL);
-	if (!vc4_plane)
-		return ERR_PTR(-ENOMEM);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < ARRAY_SIZE(hvs_formats); i++) {
 		if (!hvs_formats[i].hvs5_only || vc4->is_vc5) {
 			formats[num_formats] = hvs_formats[i].drm;
@@ -1577,15 +1542,6 @@ struct drm_plane *vc4_plane_init(struct drm_device *dev,
 	if (IS_ERR(vc4_plane))
 		return ERR_CAST(vc4_plane);
 	plane = &vc4_plane->base;
-<<<<<<< HEAD
-=======
-	ret = drm_universal_plane_init(dev, plane, 0,
-				       &vc4_plane_funcs,
-				       formats, num_formats,
-				       modifiers, type, NULL);
-	if (ret)
-		return ERR_PTR(ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (vc4->is_vc5)
 		drm_plane_helper_add(plane, &vc5_plane_helper_funcs);

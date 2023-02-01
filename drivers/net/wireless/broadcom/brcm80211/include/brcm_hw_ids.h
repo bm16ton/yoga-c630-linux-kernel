@@ -54,13 +54,9 @@
 #define BRCM_CC_4378_CHIP_ID		0x4378
 #define CY_CC_4373_CHIP_ID		0x4373
 #define CY_CC_43012_CHIP_ID		43012
-<<<<<<< HEAD
 #define CY_CC_43439_CHIP_ID		43439
 #define CY_CC_43752_CHIP_ID		43752
 #define CY_CC_89459_CHIP_ID		0x4355
-=======
-#define CY_CC_43752_CHIP_ID		43752
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* USB Device IDs */
 #define BRCM_USB_43143_DEVICE_ID	0xbd1e

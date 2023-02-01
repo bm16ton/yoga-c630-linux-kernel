@@ -51,15 +51,12 @@ properties:
     description: A phandle to the PCIe power up reset line.
     maxItems: 1
 
-<<<<<<< HEAD
   clocks:
     maxItems: 1
 
   clock-names:
     const: pcie_aux
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   pwren-gpios:
     description: Should specify the GPIO for controlling the PCI bus device power on.
     maxItems: 1
@@ -75,10 +72,7 @@ required:
   - interrupt-map-mask
   - interrupt-map
   - clocks
-<<<<<<< HEAD
   - clock-names
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - resets
   - pwren-gpios
   - reset-gpios
@@ -117,10 +111,7 @@ examples:
                             <0x0 0x0 0x0 0x2 &plic0 58>,
                             <0x0 0x0 0x0 0x3 &plic0 59>,
                             <0x0 0x0 0x0 0x4 &plic0 60>;
-<<<<<<< HEAD
             clock-names = "pcie_aux";
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             clocks = <&prci FU740_PRCI_CLK_PCIE_AUX>;
             resets = <&prci 4>;
             pwren-gpios = <&gpio 5 0>;

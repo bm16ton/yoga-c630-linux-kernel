@@ -25,10 +25,6 @@ properties:
       enables 3-wire RTD connection. Else 2-wire or 4-wire RTD connection.
     type: boolean
 
-<<<<<<< HEAD
-=======
-  spi-max-frequency: true
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   spi-cpha: true
 
 required:
@@ -36,14 +32,10 @@ required:
   - reg
   - spi-cpha
 
-<<<<<<< HEAD
 allOf:
   - $ref: /schemas/spi/spi-peripheral-props.yaml#
 
 unevaluatedProperties: false
-=======
-additionalProperties: false
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

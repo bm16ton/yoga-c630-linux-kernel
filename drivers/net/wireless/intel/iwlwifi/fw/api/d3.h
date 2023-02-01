@@ -1,10 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
 /*
-<<<<<<< HEAD
  * Copyright (C) 2012-2014, 2018-2022 Intel Corporation
-=======
- * Copyright (C) 2012-2014, 2018-2021 Intel Corporation
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Copyright (C) 2013-2014 Intel Mobile Communications GmbH
  * Copyright (C) 2015-2017 Intel Deutschland GmbH
  */
@@ -762,7 +758,6 @@ struct iwl_wowlan_status_v12 {
 	__le32 wakeup_reasons;
 	__le32 num_of_gtk_rekeys;
 	__le32 transmitted_ndps;
-<<<<<<< HEAD
 	__le32 received_beacons;
 	__le32 wake_packet_length;
 	__le32 wake_packet_bufsize;
@@ -800,13 +795,10 @@ struct iwl_wowlan_info_notif {
 	__le32 wakeup_reasons;
 	__le32 num_of_gtk_rekeys;
 	__le32 transmitted_ndps;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__le32 received_beacons;
 	__le32 wake_packet_length;
 	__le32 wake_packet_bufsize;
 	u8 tid_tear_down;
-<<<<<<< HEAD
 	u8 station_id;
 	u8 reserved2[2];
 } __packed; /* WOWLAN_INFO_NTFY_API_S_VER_1 */
@@ -832,11 +824,6 @@ struct iwl_wowlan_wake_pkt_notif {
 struct iwl_mvm_d3_end_notif {
 	__le32 flags;
 } __packed;
-=======
-	u8 reserved[3];
-	u8 wake_packet[]; /* can be truncated from _length to _bufsize */
-} __packed; /* WOWLAN_STATUSES_RSP_API_S_VER_12 */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* TODO: NetDetect API */
 

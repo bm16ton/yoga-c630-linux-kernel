@@ -116,10 +116,6 @@ static inline bool need_extra_context(struct mm_struct *mm, unsigned long ea)
 }
 #endif
 
-<<<<<<< HEAD
-=======
-extern void switch_cop(struct mm_struct *next);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int use_cop(unsigned long acop, struct mm_struct *mm);
 extern void drop_cop(unsigned long acop, struct mm_struct *mm);
 

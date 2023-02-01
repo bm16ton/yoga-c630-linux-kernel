@@ -18,12 +18,6 @@ properties:
       - qcom,q6afe-dais
       - qcom,q6apm-lpass-dais
 
-<<<<<<< HEAD
-=======
-  reg:
-    maxItems: 1
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#sound-dai-cells':
     const: 1
 
@@ -148,10 +142,6 @@ patternProperties:
 
 required:
   - compatible
-<<<<<<< HEAD
-=======
-  - reg
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - "#sound-dai-cells"
   - "#address-cells"
   - "#size-cells"
@@ -163,7 +153,6 @@ examples:
     #include <dt-bindings/soc/qcom,apr.h>
     #include <dt-bindings/sound/qcom,q6afe.h>
     apr {
-<<<<<<< HEAD
         compatible = "qcom,apr-v2";
         #address-cells = <1>;
         #size-cells = <0>;
@@ -187,28 +176,6 @@ examples:
             };
         };
     };
-=======
-        #address-cells = <1>;
-        #size-cells = <0>;
-        apr-service@4 {
-            reg = <APR_SVC_AFE>;
-            #address-cells = <1>;
-            #size-cells = <0>;
-            q6afedai@1 {
-              compatible = "qcom,q6afe-dais";
-              reg = <1>;
-              #address-cells = <1>;
-              #size-cells = <0>;
-              #sound-dai-cells = <1>;
-
-              dai@22 {
-                reg = <QUATERNARY_MI2S_RX>;
-                qcom,sd-lines = <0 1 2 3>;
-              };
-            };
-        };
-      };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - |
     #include <dt-bindings/soc/qcom,gpr.h>
     gpr {
@@ -216,7 +183,6 @@ examples:
         #address-cells = <1>;
         #size-cells = <0>;
         qcom,domain = <GPR_DOMAIN_ID_ADSP>;
-<<<<<<< HEAD
 
         service@1 {
             compatible = "qcom,q6apm";
@@ -235,24 +201,3 @@ examples:
             };
         };
     };
-=======
-        service@1 {
-            compatible = "qcom,q6apm";
-            reg = <GPR_APM_MODULE_IID>;
-            #address-cells = <1>;
-            #size-cells = <0>;
-            q6apmdai@1 {
-              compatible = "qcom,q6apm-lpass-dais";
-              reg = <1>;
-              #address-cells = <1>;
-              #size-cells = <0>;
-              #sound-dai-cells = <1>;
-
-              dai@22 {
-                reg = <QUATERNARY_MI2S_RX>;
-                qcom,sd-lines = <0 1 2 3>;
-              };
-            };
-        };
-      };
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

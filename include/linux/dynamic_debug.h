@@ -130,13 +130,8 @@ struct ddebug_class_param {
 
 #if defined(CONFIG_DYNAMIC_DEBUG_CORE)
 
-<<<<<<< HEAD
 int ddebug_add_module(struct _ddebug_info *dyndbg, const char *modname);
 
-=======
-int ddebug_add_module(struct _ddebug *tab, unsigned int n,
-				const char *modname);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int ddebug_remove_module(const char *mod_name);
 extern __printf(2, 3)
 void __dynamic_pr_debug(struct _ddebug *descriptor, const char *fmt, ...);
@@ -342,15 +337,12 @@ static inline int ddebug_dyndbg_module_param_cb(char *param, char *val,
 				rowsize, groupsize, buf, len, ascii);	\
 	} while (0)
 
-<<<<<<< HEAD
 struct kernel_param;
 static inline int param_set_dyndbg_classes(const char *instr, const struct kernel_param *kp)
 { return 0; }
 static inline int param_get_dyndbg_classes(char *buffer, const struct kernel_param *kp)
 { return 0; }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* !CONFIG_DYNAMIC_DEBUG_CORE */
 
 extern const struct kernel_param_ops param_ops_dyndbg_classes;

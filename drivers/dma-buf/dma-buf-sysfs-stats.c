@@ -168,21 +168,11 @@ void dma_buf_uninit_sysfs_statistics(void)
 	kset_unregister(dma_buf_stats_kset);
 }
 
-<<<<<<< HEAD
 int dma_buf_stats_setup(struct dma_buf *dmabuf, struct file *file)
-=======
-int dma_buf_stats_setup(struct dma_buf *dmabuf)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dma_buf_sysfs_entry *sysfs_entry;
 	int ret;
 
-<<<<<<< HEAD
-=======
-	if (!dmabuf || !dmabuf->file)
-		return -EINVAL;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!dmabuf->exp_name) {
 		pr_err("exporter name must not be empty if stats needed\n");
 		return -EINVAL;
@@ -199,11 +189,7 @@ int dma_buf_stats_setup(struct dma_buf *dmabuf)
 
 	/* create the directory for buffer stats */
 	ret = kobject_init_and_add(&sysfs_entry->kobj, &dma_buf_ktype, NULL,
-<<<<<<< HEAD
 				   "%lu", file_inode(file)->i_ino);
-=======
-				   "%lu", file_inode(dmabuf->file)->i_ino);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto err_sysfs_dmabuf;
 

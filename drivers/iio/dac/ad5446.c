@@ -530,7 +530,6 @@ static int ad5622_write(struct ad5446_state *st, unsigned val)
 	struct i2c_client *client = to_i2c_client(st->dev);
 	__be16 data = cpu_to_be16(val);
 	int ret;
-<<<<<<< HEAD
 
 	ret = i2c_master_send(client, (char *)&data, sizeof(data));
 	if (ret < 0)
@@ -538,15 +537,6 @@ static int ad5622_write(struct ad5446_state *st, unsigned val)
 	if (ret != sizeof(data))
 		return -EIO;
 
-=======
-
-	ret = i2c_master_send(client, (char *)&data, sizeof(data));
-	if (ret < 0)
-		return ret;
-	if (ret != sizeof(data))
-		return -EIO;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -588,11 +578,6 @@ static int ad5446_i2c_probe(struct i2c_client *i2c,
 static void ad5446_i2c_remove(struct i2c_client *i2c)
 {
 	ad5446_remove(&i2c->dev);
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id ad5446_i2c_ids[] = {

@@ -302,8 +302,6 @@ int ip4ip6erspan_get_tunnel(struct __sk_buff *skb)
 
 SEC("tc")
 int vxlan_set_tunnel_dst(struct __sk_buff *skb)
-<<<<<<< HEAD
-=======
 {
 	int ret;
 	struct bpf_tunnel_key key;
@@ -343,7 +341,6 @@ int vxlan_set_tunnel_dst(struct __sk_buff *skb)
 
 SEC("tc")
 int vxlan_set_tunnel_src(struct __sk_buff *skb)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 	struct bpf_tunnel_key key;
@@ -358,48 +355,6 @@ int vxlan_set_tunnel_src(struct __sk_buff *skb)
 	}
 
 	__builtin_memset(&key, 0x0, sizeof(key));
-<<<<<<< HEAD
-	key.local_ipv4 = 0xac100164; /* 172.16.1.100 */
-	key.remote_ipv4 = *local_ip;
-	key.tunnel_id = 2;
-	key.tunnel_tos = 0;
-	key.tunnel_ttl = 64;
-
-	ret = bpf_skb_set_tunnel_key(skb, &key, sizeof(key),
-				     BPF_F_ZERO_CSUM_TX);
-	if (ret < 0) {
-		log_err(ret);
-		return TC_ACT_SHOT;
-	}
-
-	md.gbp = 0x800FF; /* Set VXLAN Group Policy extension */
-	ret = bpf_skb_set_tunnel_opt(skb, &md, sizeof(md));
-	if (ret < 0) {
-		log_err(ret);
-		return TC_ACT_SHOT;
-	}
-
-	return TC_ACT_OK;
-}
-
-SEC("tc")
-int vxlan_set_tunnel_src(struct __sk_buff *skb)
-{
-	int ret;
-	struct bpf_tunnel_key key;
-	struct vxlan_metadata md;
-	__u32 index = 0;
-	__u32 *local_ip = NULL;
-
-	local_ip = bpf_map_lookup_elem(&local_ip_map, &index);
-	if (!local_ip) {
-		log_err(ret);
-		return TC_ACT_SHOT;
-	}
-
-	__builtin_memset(&key, 0x0, sizeof(key));
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	key.local_ipv4 = *local_ip;
 	key.remote_ipv4 = 0xac100164; /* 172.16.1.100 */
 	key.tunnel_id = 2;
@@ -442,7 +397,6 @@ int vxlan_get_tunnel_src(struct __sk_buff *skb)
 	ret = bpf_skb_get_tunnel_opt(skb, &md, sizeof(md));
 	if (ret < 0) {
 		log_err(ret);
-<<<<<<< HEAD
 		return TC_ACT_SHOT;
 	}
 
@@ -496,18 +450,6 @@ int veth_set_outer_dst(struct __sk_buff *skb)
 	}
 	if (udph->dest != bpf_htons(VXLAN_UDP_PORT))
 		return TC_ACT_OK;
-=======
-		return TC_ACT_SHOT;
-	}
-
-	if (key.local_ipv4 != ASSIGNED_ADDR_VETH1 || md.gbp != 0x800FF) {
-		bpf_printk("vxlan key %d local ip 0x%x remote ip 0x%x gbp 0x%x\n",
-			   key.tunnel_id, key.local_ipv4,
-			   key.remote_ipv4, md.gbp);
-		log_err(ret);
-		return TC_ACT_SHOT;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (iph->daddr != assigned_ip) {
 		csum = bpf_csum_diff(&iph->daddr, sizeof(__u32), &assigned_ip,
@@ -528,64 +470,6 @@ int veth_set_outer_dst(struct __sk_buff *skb)
 }
 
 SEC("tc")
-<<<<<<< HEAD
-=======
-int veth_set_outer_dst(struct __sk_buff *skb)
-{
-	struct ethhdr *eth = (struct ethhdr *)(long)skb->data;
-	__u32 assigned_ip = bpf_htonl(ASSIGNED_ADDR_VETH1);
-	void *data_end = (void *)(long)skb->data_end;
-	struct udphdr *udph;
-	struct iphdr *iph;
-	__u32 index = 0;
-	int ret = 0;
-	int shrink;
-	__s64 csum;
-
-	if ((void *)eth + sizeof(*eth) > data_end) {
-		log_err(ret);
-		return TC_ACT_SHOT;
-	}
-
-	if (eth->h_proto != bpf_htons(ETH_P_IP))
-		return TC_ACT_OK;
-
-	iph = (struct iphdr *)(eth + 1);
-	if ((void *)iph + sizeof(*iph) > data_end) {
-		log_err(ret);
-		return TC_ACT_SHOT;
-	}
-	if (iph->protocol != IPPROTO_UDP)
-		return TC_ACT_OK;
-
-	udph = (struct udphdr *)(iph + 1);
-	if ((void *)udph + sizeof(*udph) > data_end) {
-		log_err(ret);
-		return TC_ACT_SHOT;
-	}
-	if (udph->dest != bpf_htons(VXLAN_UDP_PORT))
-		return TC_ACT_OK;
-
-	if (iph->daddr != assigned_ip) {
-		csum = bpf_csum_diff(&iph->daddr, sizeof(__u32), &assigned_ip,
-				     sizeof(__u32), 0);
-		if (bpf_skb_store_bytes(skb, ETH_HLEN + offsetof(struct iphdr, daddr),
-					&assigned_ip, sizeof(__u32), 0) < 0) {
-			log_err(ret);
-			return TC_ACT_SHOT;
-		}
-		if (bpf_l3_csum_replace(skb, ETH_HLEN + offsetof(struct iphdr, check),
-					0, csum, 0) < 0) {
-			log_err(ret);
-			return TC_ACT_SHOT;
-		}
-		bpf_skb_change_type(skb, PACKET_HOST);
-	}
-	return TC_ACT_OK;
-}
-
-SEC("tc")
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int ip6vxlan_set_tunnel_dst(struct __sk_buff *skb)
 {
 	struct bpf_tunnel_key key;
@@ -668,7 +552,6 @@ int ip6vxlan_get_tunnel_src(struct __sk_buff *skb)
 		return TC_ACT_SHOT;
 	}
 
-<<<<<<< HEAD
 	if (bpf_ntohl(key.local_ipv6[3]) != *local_ip ||
 	    !(key.tunnel_flags & TUNNEL_KEY) ||
 	    !(key.tunnel_flags & TUNNEL_CSUM)) {
@@ -676,12 +559,6 @@ int ip6vxlan_get_tunnel_src(struct __sk_buff *skb)
 			   key.tunnel_id, bpf_ntohl(key.local_ipv6[3]),
 			   bpf_ntohl(key.remote_ipv6[3]), key.tunnel_label,
 			   bpf_ntohs(key.tunnel_flags));
-=======
-	if (bpf_ntohl(key.local_ipv6[3]) != *local_ip) {
-		bpf_printk("ip6vxlan key %d local ip6 ::%x remote ip6 ::%x label 0x%x\n",
-			   key.tunnel_id, bpf_ntohl(key.local_ipv6[3]),
-			   bpf_ntohl(key.remote_ipv6[3]), key.tunnel_label);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		bpf_printk("local_ip 0x%x\n", *local_ip);
 		log_err(ret);
 		return TC_ACT_SHOT;

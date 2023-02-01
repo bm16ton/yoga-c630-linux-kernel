@@ -331,18 +331,9 @@ xchk_refcountbt_rec(
 	struct xchk_btree	*bs,
 	const union xfs_btree_rec *rec)
 {
-<<<<<<< HEAD
 	struct xfs_refcount_irec irec;
 	xfs_agblock_t		*cow_blocks = bs->private;
 	struct xfs_perag	*pag = bs->cur->bc_ag.pag;
-=======
-	xfs_agblock_t		*cow_blocks = bs->private;
-	struct xfs_perag	*pag = bs->cur->bc_ag.pag;
-	xfs_agblock_t		bno;
-	xfs_extlen_t		len;
-	xfs_nlink_t		refcount;
-	bool			has_cowflag;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	xfs_refcount_btrec_to_irec(rec, &irec);
 
@@ -354,14 +345,7 @@ xchk_refcountbt_rec(
 		(*cow_blocks) += irec.rc_blockcount;
 
 	/* Check the extent. */
-<<<<<<< HEAD
 	if (!xfs_verify_agbext(pag, irec.rc_startblock, irec.rc_blockcount))
-=======
-	bno &= ~XFS_REFC_COW_START;
-	if (bno + len <= bno ||
-	    !xfs_verify_agbno(pag, bno) ||
-	    !xfs_verify_agbno(pag, bno + len - 1))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		xchk_btree_set_corrupt(bs->sc, bs->cur, 0);
 
 	if (irec.rc_refcount == 0)

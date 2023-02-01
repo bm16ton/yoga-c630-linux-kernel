@@ -470,11 +470,7 @@ static void gen9_sseu_info_init(struct intel_gt *gt)
 
 	if (IS_GEN9_LP(i915)) {
 #define IS_SS_DISABLED(ss)	(!(sseu->subslice_mask.hsw[0] & BIT(ss)))
-<<<<<<< HEAD
 		RUNTIME_INFO(i915)->has_pooled_eu = hweight8(sseu->subslice_mask.hsw[0]) == 3;
-=======
-		info->has_pooled_eu = hweight8(sseu->subslice_mask.hsw[0]) == 3;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		sseu->min_eu_in_pool = 0;
 		if (HAS_POOLED_EU(i915)) {

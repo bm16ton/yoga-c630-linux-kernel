@@ -49,11 +49,7 @@
 /* note: we begin tracing dlm_lock_start() only if ls and lkb are found */
 TRACE_EVENT(dlm_lock_start,
 
-<<<<<<< HEAD
 	TP_PROTO(struct dlm_ls *ls, struct dlm_lkb *lkb, const void *name,
-=======
-	TP_PROTO(struct dlm_ls *ls, struct dlm_lkb *lkb, void *name,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 unsigned int namelen, int mode, __u32 flags),
 
 	TP_ARGS(ls, lkb, name, namelen, mode, flags),
@@ -95,18 +91,11 @@ TRACE_EVENT(dlm_lock_start,
 
 TRACE_EVENT(dlm_lock_end,
 
-<<<<<<< HEAD
 	TP_PROTO(struct dlm_ls *ls, struct dlm_lkb *lkb, const void *name,
 		 unsigned int namelen, int mode, __u32 flags, int error,
 		 bool kernel_lock),
 
 	TP_ARGS(ls, lkb, name, namelen, mode, flags, error, kernel_lock),
-=======
-	TP_PROTO(struct dlm_ls *ls, struct dlm_lkb *lkb, void *name,
-		 unsigned int namelen, int mode, __u32 flags, int error),
-
-	TP_ARGS(ls, lkb, name, namelen, mode, flags, error),
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	TP_STRUCT__entry(
 		__field(__u32, ls_id)
@@ -125,10 +114,7 @@ TRACE_EVENT(dlm_lock_end,
 		__entry->lkb_id = lkb->lkb_id;
 		__entry->mode = mode;
 		__entry->flags = flags;
-<<<<<<< HEAD
 		__entry->error = error;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		r = lkb->lkb_resource;
 		if (r)
@@ -138,7 +124,6 @@ TRACE_EVENT(dlm_lock_end,
 			memcpy(__get_dynamic_array(res_name), name,
 			       __get_dynamic_array_len(res_name));
 
-<<<<<<< HEAD
 		if (kernel_lock) {
 			/* return value will be zeroed in those cases by dlm_lock()
 			 * we do it here again to not introduce more overhead if
@@ -147,16 +132,6 @@ TRACE_EVENT(dlm_lock_end,
 			if (error == -EAGAIN || error == -EDEADLK)
 				__entry->error = 0;
 		}
-=======
-		/* return value will be zeroed in those cases by dlm_lock()
-		 * we do it here again to not introduce more overhead if
-		 * trace isn't running and error reflects the return value.
-		 */
-		if (error == -EAGAIN || error == -EDEADLK)
-			__entry->error = 0;
-		else
-			__entry->error = error;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	),
 

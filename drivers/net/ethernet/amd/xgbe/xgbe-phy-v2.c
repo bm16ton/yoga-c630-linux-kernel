@@ -238,11 +238,6 @@ enum xgbe_sfp_speed {
 #define XGBE_SFP_BASE_BR			12
 #define XGBE_SFP_BASE_BR_1GBE_MIN		0x0a
 #define XGBE_SFP_BASE_BR_10GBE_MIN		0x64
-<<<<<<< HEAD
-=======
-#define XGBE_SFP_BASE_BR_10GBE_MAX		0x68
-#define XGBE_MOLEX_SFP_BASE_BR_10GBE_MAX	0x78
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define XGBE_SFP_BASE_CU_CABLE_LEN		18
 
@@ -839,14 +834,6 @@ static bool xgbe_phy_sfp_bit_rate(struct xgbe_sfp_eeprom *sfp_eeprom,
 		break;
 	case XGBE_SFP_SPEED_10000:
 		min = XGBE_SFP_BASE_BR_10GBE_MIN;
-<<<<<<< HEAD
-=======
-		if (memcmp(&sfp_eeprom->base[XGBE_SFP_BASE_VENDOR_NAME],
-			   XGBE_MOLEX_VENDOR, XGBE_SFP_BASE_VENDOR_NAME_LEN) == 0)
-			max = XGBE_MOLEX_SFP_BASE_BR_10GBE_MAX;
-		else
-			max = XGBE_SFP_BASE_BR_10GBE_MAX;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		return false;
@@ -1164,11 +1151,7 @@ static void xgbe_phy_sfp_parse_eeprom(struct xgbe_prv_data *pdata)
 	}
 
 	/* Determine the type of SFP */
-<<<<<<< HEAD
 	if (phy_data->sfp_cable != XGBE_SFP_CABLE_FIBER &&
-=======
-	if (phy_data->sfp_cable == XGBE_SFP_CABLE_PASSIVE &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    xgbe_phy_sfp_bit_rate(sfp_eeprom, XGBE_SFP_SPEED_10000))
 		phy_data->sfp_base = XGBE_SFP_BASE_10000_CR;
 	else if (sfp_base[XGBE_SFP_BASE_10GBE_CC] & XGBE_SFP_BASE_10GBE_CC_SR)
@@ -1996,13 +1979,10 @@ static void xgbe_phy_rx_reset(struct xgbe_prv_data *pdata)
 
 static void xgbe_phy_pll_ctrl(struct xgbe_prv_data *pdata, bool enable)
 {
-<<<<<<< HEAD
 	/* PLL_CTRL feature needs to be enabled for fixed PHY modes (Non-Autoneg) only */
 	if (pdata->phy.autoneg != AUTONEG_DISABLE)
 		return;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	XMDIO_WRITE_BITS(pdata, MDIO_MMD_PMAPMD, MDIO_VEND2_PMA_MISC_CTRL0,
 			 XGBE_PMA_PLL_CTRL_MASK,
 			 enable ? XGBE_PMA_PLL_CTRL_ENABLE
@@ -2053,15 +2033,10 @@ static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
 	xgbe_phy_rx_reset(pdata);
 
 reenable_pll:
-<<<<<<< HEAD
 	/* Enable PLL re-initialization, not needed for PHY Power Off and RRC cmds */
 	if (cmd != XGBE_MB_CMD_POWER_OFF &&
 	    cmd != XGBE_MB_CMD_RRC)
 		xgbe_phy_pll_ctrl(pdata, true);
-=======
-	/* Enable PLL re-initialization */
-	xgbe_phy_pll_ctrl(pdata, true);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void xgbe_phy_rrc(struct xgbe_prv_data *pdata)

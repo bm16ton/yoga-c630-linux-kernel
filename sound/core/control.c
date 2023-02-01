@@ -1261,10 +1261,6 @@ static int snd_ctl_elem_read_user(struct snd_card *card,
 	if (IS_ERR(control))
 		return PTR_ERR(control);
 
-<<<<<<< HEAD
-=======
-	down_read(&card->controls_rwsem);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	result = snd_ctl_elem_read(card, control);
 	if (result < 0)
 		goto error;

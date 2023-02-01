@@ -61,13 +61,8 @@ static inline unsigned int __xchg_small(volatile void *ptr, unsigned int val,
 	return (old32 & mask) >> shift;
 }
 
-<<<<<<< HEAD
 static __always_inline unsigned long
 __xchg(volatile void *ptr, unsigned long x, int size)
-=======
-static inline unsigned long __xchg(volatile void *ptr, unsigned long x,
-				   int size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	switch (size) {
 	case 1:
@@ -164,13 +159,8 @@ static inline unsigned int __cmpxchg_small(volatile void *ptr, unsigned int old,
 	return (old32 & mask) >> shift;
 }
 
-<<<<<<< HEAD
 static __always_inline unsigned long
 __cmpxchg(volatile void *ptr, unsigned long old, unsigned long new, unsigned int size)
-=======
-static inline unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
-				      unsigned long new, unsigned int size)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	switch (size) {
 	case 1:

@@ -1463,14 +1463,11 @@ read_block_for_search(struct btrfs_root *root, struct btrfs_path *p,
 			return 0;
 		}
 
-<<<<<<< HEAD
 		if (p->nowait) {
 			free_extent_buffer(tmp);
 			return -EAGAIN;
 		}
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (unlock_up)
 			btrfs_unlock_up_safe(p, level + 1);
 
@@ -1491,11 +1488,8 @@ read_block_for_search(struct btrfs_root *root, struct btrfs_path *p,
 			ret = -EAGAIN;
 
 		goto out;
-<<<<<<< HEAD
 	} else if (p->nowait) {
 		return -EAGAIN;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (unlock_up) {
@@ -1635,7 +1629,6 @@ static struct extent_buffer *btrfs_search_slot_get_root(struct btrfs_root *root,
 	if (p->search_commit_root) {
 		b = root->commit_root;
 		atomic_inc(&b->refs);
-<<<<<<< HEAD
 		level = btrfs_header_level(b);
 		/*
 		 * Ensure that all callers have set skip_locking when
@@ -1671,8 +1664,6 @@ static struct extent_buffer *btrfs_search_slot_get_root(struct btrfs_root *root,
 		} else {
 			b = btrfs_read_lock_root_node(root);
 		}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		level = btrfs_header_level(b);
 		if (level > write_lock_level)
 			goto out;
@@ -1862,226 +1853,6 @@ static int search_leaf(struct btrfs_trans_handle *trans,
 			return ret;
 	}
 
-<<<<<<< HEAD
-	if (ins_len > 0) {
-=======
-	/* We try very hard to do read locks on the root */
-	root_lock = BTRFS_READ_LOCK;
-
-	/*
-	 * If the level is set to maximum, we can skip trying to get the read
-	 * lock.
-	 */
-	if (write_lock_level < BTRFS_MAX_LEVEL) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-		/*
-		 * Item key already exists. In this case, if we are allowed to
-		 * insert the item (for example, in dir_item case, item key
-		 * collision is allowed), it will be merged with the original
-		 * item. Only the item size grows, no new btrfs item will be
-		 * added. If search_for_extension is not set, ins_len already
-		 * accounts the size btrfs_item, deduct it here so leaf space
-		 * check will be correct.
-		 */
-		if (ret == 0 && !path->search_for_extension) {
-			ASSERT(ins_len >= sizeof(struct btrfs_item));
-			ins_len -= sizeof(struct btrfs_item);
-		}
-
-		ASSERT(leaf_free_space >= 0);
-
-		if (leaf_free_space < ins_len) {
-			int err;
-
-			err = split_leaf(trans, root, key, path, ins_len,
-					 (ret == 0));
-			ASSERT(err <= 0);
-			if (WARN_ON(err > 0))
-				err = -EUCLEAN;
-			if (err)
-				ret = err;
-		}
-	}
-
-<<<<<<< HEAD
-	return ret;
-}
-
-=======
-out:
-	/*
-	 * The root may have failed to write out at some point, and thus is no
-	 * longer valid, return an error in this case.
-	 */
-	if (!extent_buffer_uptodate(b)) {
-		if (root_lock)
-			btrfs_tree_unlock_rw(b, root_lock);
-		free_extent_buffer(b);
-		return ERR_PTR(-EIO);
-	}
-
-	p->nodes[level] = b;
-	if (!p->skip_locking)
-		p->locks[level] = root_lock;
-	/*
-	 * Callers are responsible for dropping b's references.
-	 */
-	return b;
-}
-
-/*
- * Replace the extent buffer at the lowest level of the path with a cloned
- * version. The purpose is to be able to use it safely, after releasing the
- * commit root semaphore, even if relocation is happening in parallel, the
- * transaction used for relocation is committed and the extent buffer is
- * reallocated in the next transaction.
- *
- * This is used in a context where the caller does not prevent transaction
- * commits from happening, either by holding a transaction handle or holding
- * some lock, while it's doing searches through a commit root.
- * At the moment it's only used for send operations.
- */
-static int finish_need_commit_sem_search(struct btrfs_path *path)
-{
-	const int i = path->lowest_level;
-	const int slot = path->slots[i];
-	struct extent_buffer *lowest = path->nodes[i];
-	struct extent_buffer *clone;
-
-	ASSERT(path->need_commit_sem);
-
-	if (!lowest)
-		return 0;
-
-	lockdep_assert_held_read(&lowest->fs_info->commit_root_sem);
-
-	clone = btrfs_clone_extent_buffer(lowest);
-	if (!clone)
-		return -ENOMEM;
-
-	btrfs_release_path(path);
-	path->nodes[i] = clone;
-	path->slots[i] = slot;
-
-	return 0;
-}
-
-static inline int search_for_key_slot(struct extent_buffer *eb,
-				      int search_low_slot,
-				      const struct btrfs_key *key,
-				      int prev_cmp,
-				      int *slot)
-{
-	/*
-	 * If a previous call to btrfs_bin_search() on a parent node returned an
-	 * exact match (prev_cmp == 0), we can safely assume the target key will
-	 * always be at slot 0 on lower levels, since each key pointer
-	 * (struct btrfs_key_ptr) refers to the lowest key accessible from the
-	 * subtree it points to. Thus we can skip searching lower levels.
-	 */
-	if (prev_cmp == 0) {
-		*slot = 0;
-		return 0;
-	}
-
-	return generic_bin_search(eb, search_low_slot, key, slot);
-}
-
-static int search_leaf(struct btrfs_trans_handle *trans,
-		       struct btrfs_root *root,
-		       const struct btrfs_key *key,
-		       struct btrfs_path *path,
-		       int ins_len,
-		       int prev_cmp)
-{
-	struct extent_buffer *leaf = path->nodes[0];
-	int leaf_free_space = -1;
-	int search_low_slot = 0;
-	int ret;
-	bool do_bin_search = true;
-
-	/*
-	 * If we are doing an insertion, the leaf has enough free space and the
-	 * destination slot for the key is not slot 0, then we can unlock our
-	 * write lock on the parent, and any other upper nodes, before doing the
-	 * binary search on the leaf (with search_for_key_slot()), allowing other
-	 * tasks to lock the parent and any other upper nodes.
-	 */
-	if (ins_len > 0) {
-		/*
-		 * Cache the leaf free space, since we will need it later and it
-		 * will not change until then.
-		 */
-		leaf_free_space = btrfs_leaf_free_space(leaf);
-
-		/*
-		 * !path->locks[1] means we have a single node tree, the leaf is
-		 * the root of the tree.
-		 */
-		if (path->locks[1] && leaf_free_space >= ins_len) {
-			struct btrfs_disk_key first_key;
-
-			ASSERT(btrfs_header_nritems(leaf) > 0);
-			btrfs_item_key(leaf, &first_key, 0);
-
-			/*
-			 * Doing the extra comparison with the first key is cheap,
-			 * taking into account that the first key is very likely
-			 * already in a cache line because it immediately follows
-			 * the extent buffer's header and we have recently accessed
-			 * the header's level field.
-			 */
-			ret = comp_keys(&first_key, key);
-			if (ret < 0) {
-				/*
-				 * The first key is smaller than the key we want
-				 * to insert, so we are safe to unlock all upper
-				 * nodes and we have to do the binary search.
-				 *
-				 * We do use btrfs_unlock_up_safe() and not
-				 * unlock_up() because the later does not unlock
-				 * nodes with a slot of 0 - we can safely unlock
-				 * any node even if its slot is 0 since in this
-				 * case the key does not end up at slot 0 of the
-				 * leaf and there's no need to split the leaf.
-				 */
-				btrfs_unlock_up_safe(path, 1);
-				search_low_slot = 1;
-			} else {
-				/*
-				 * The first key is >= then the key we want to
-				 * insert, so we can skip the binary search as
-				 * the target key will be at slot 0.
-				 *
-				 * We can not unlock upper nodes when the key is
-				 * less than the first key, because we will need
-				 * to update the key at slot 0 of the parent node
-				 * and possibly of other upper nodes too.
-				 * If the key matches the first key, then we can
-				 * unlock all the upper nodes, using
-				 * btrfs_unlock_up_safe() instead of unlock_up()
-				 * as stated above.
-				 */
-				if (ret == 0)
-					btrfs_unlock_up_safe(path, 1);
-				/*
-				 * ret is already 0 or 1, matching the result of
-				 * a btrfs_bin_search() call, so there is no need
-				 * to adjust it.
-				 */
-				do_bin_search = false;
-				path->slots[0] = 0;
-			}
-		}
-	}
-
-	if (do_bin_search) {
-		ret = search_for_key_slot(leaf, search_low_slot, key,
-					  prev_cmp, &path->slots[0]);
-		if (ret < 0)
-			return ret;
-	}
-
 	if (ins_len > 0) {
 		/*
 		 * Item key already exists. In this case, if we are allowed to
@@ -2115,7 +1886,6 @@ static int search_leaf(struct btrfs_trans_handle *trans,
 	return ret;
 }
 
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * btrfs_search_slot - look for a key in a tree and perform necessary
  * modifications to preserve tree invariants.
@@ -2202,16 +1972,12 @@ int btrfs_search_slot(struct btrfs_trans_handle *trans, struct btrfs_root *root,
 
 	if (p->need_commit_sem) {
 		ASSERT(p->search_commit_root);
-<<<<<<< HEAD
 		if (p->nowait) {
 			if (!down_read_trylock(&fs_info->commit_root_sem))
 				return -EAGAIN;
 		} else {
 			down_read(&fs_info->commit_root_sem);
 		}
-=======
-		down_read(&fs_info->commit_root_sem);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 again:
@@ -4922,7 +4688,6 @@ again:
 		if (path->need_commit_sem) {
 			path->need_commit_sem = 0;
 			need_commit_sem = true;
-<<<<<<< HEAD
 			if (path->nowait) {
 				if (!down_read_trylock(&fs_info->commit_root_sem)) {
 					ret = -EAGAIN;
@@ -4931,9 +4696,6 @@ again:
 			} else {
 				down_read(&fs_info->commit_root_sem);
 			}
-=======
-			down_read(&fs_info->commit_root_sem);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		ret = btrfs_search_slot(NULL, root, &key, path, 0, 0);
 	}

@@ -154,15 +154,9 @@ static int guc_action_control_ctb(struct intel_guc *guc, u32 control)
 		FIELD_PREP(HOST2GUC_CONTROL_CTB_REQUEST_MSG_1_CONTROL, control),
 	};
 	int ret;
-<<<<<<< HEAD
 
 	GEM_BUG_ON(control != GUC_CTB_CONTROL_DISABLE && control != GUC_CTB_CONTROL_ENABLE);
 
-=======
-
-	GEM_BUG_ON(control != GUC_CTB_CONTROL_DISABLE && control != GUC_CTB_CONTROL_ENABLE);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* CT control must go over MMIO */
 	ret = intel_guc_send_mmio(guc, request, ARRAY_SIZE(request), NULL, 0);
 
@@ -461,10 +455,7 @@ corrupted:
 
 /**
  * wait_for_ct_request_update - Wait for CT request state update.
-<<<<<<< HEAD
  * @ct:		pointer to CT
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @req:	pointer to pending request
  * @status:	placeholder for status
  *
@@ -477,11 +468,7 @@ corrupted:
  * *	0 response received (status is valid)
  * *	-ETIMEDOUT no response within hardcoded timeout
  */
-<<<<<<< HEAD
 static int wait_for_ct_request_update(struct intel_guc_ct *ct, struct ct_request *req, u32 *status)
-=======
-static int wait_for_ct_request_update(struct ct_request *req, u32 *status)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err;
 	bool ct_enabled;
@@ -496,12 +483,8 @@ static int wait_for_ct_request_update(struct ct_request *req, u32 *status)
 #define GUC_CTB_RESPONSE_TIMEOUT_SHORT_MS 10
 #define GUC_CTB_RESPONSE_TIMEOUT_LONG_MS 1000
 #define done \
-<<<<<<< HEAD
 	(!(ct_enabled = intel_guc_ct_enabled(ct)) || \
 	 FIELD_GET(GUC_HXG_MSG_0_ORIGIN, READ_ONCE(req->status)) == \
-=======
-	(FIELD_GET(GUC_HXG_MSG_0_ORIGIN, READ_ONCE(req->status)) == \
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 GUC_HXG_ORIGIN_GUC)
 	err = wait_for_us(done, GUC_CTB_RESPONSE_TIMEOUT_SHORT_MS);
 	if (err)
@@ -725,7 +708,6 @@ retry:
 
 	intel_guc_notify(ct_to_guc(ct));
 
-<<<<<<< HEAD
 	err = wait_for_ct_request_update(ct, &request, status);
 	g2h_release_space(ct, GUC_CTB_HXG_MSG_MAX_LEN);
 	if (unlikely(err)) {
@@ -748,23 +730,6 @@ retry:
 		goto unlink;
 	}
 
-=======
-	err = wait_for_ct_request_update(&request, status);
-	g2h_release_space(ct, GUC_CTB_HXG_MSG_MAX_LEN);
-	if (unlikely(err)) {
-		CT_ERROR(ct, "No response for request %#x (fence %u)\n",
-			 action[0], request.fence);
-		goto unlink;
-	}
-
-	if (FIELD_GET(GUC_HXG_MSG_0_TYPE, *status) == GUC_HXG_TYPE_NO_RESPONSE_RETRY) {
-		CT_DEBUG(ct, "retrying request %#x (%u)\n", *action,
-			 FIELD_GET(GUC_HXG_RETRY_MSG_0_REASON, *status));
-		send_again = true;
-		goto unlink;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (FIELD_GET(GUC_HXG_MSG_0_TYPE, *status) != GUC_HXG_TYPE_RESPONSE_SUCCESS) {
 		err = -EIO;
 		goto unlink;
@@ -818,14 +783,9 @@ int intel_guc_ct_send(struct intel_guc_ct *ct, const u32 *action, u32 len,
 
 	ret = ct_send(ct, action, len, response_buf, response_buf_size, &status);
 	if (unlikely(ret < 0)) {
-<<<<<<< HEAD
 		if (ret != -ENODEV)
 			CT_ERROR(ct, "Sending action %#x failed (%pe) status=%#X\n",
 				 action[0], ERR_PTR(ret), status);
-=======
-		CT_ERROR(ct, "Sending action %#x failed (%pe) status=%#X\n",
-			 action[0], ERR_PTR(ret), status);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (unlikely(ret)) {
 		CT_DEBUG(ct, "send action %#x returned %d (%#x)\n",
 			 action[0], ret, ret);
@@ -869,7 +829,6 @@ static int ct_read(struct intel_guc_ct *ct, struct ct_incoming_msg **msg)
 	if (unlikely(ctb->broken))
 		return -EPIPE;
 
-<<<<<<< HEAD
 	if (unlikely(desc->status)) {
 		u32 status = desc->status;
 
@@ -887,11 +846,6 @@ static int ct_read(struct intel_guc_ct *ct, struct ct_incoming_msg **msg)
 			goto corrupted;
 	}
 
-=======
-	if (unlikely(desc->status))
-		goto corrupted;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	GEM_BUG_ON(head > size);
 
 #ifdef CONFIG_DRM_I915_DEBUG_GUC
@@ -1022,17 +976,10 @@ static int ct_handle_response(struct intel_guc_ct *ct, struct ct_incoming_msg *r
 		err = -ENOKEY;
 	}
 	spin_unlock_irqrestore(&ct->requests.lock, flags);
-<<<<<<< HEAD
 
 	if (unlikely(err))
 		return err;
 
-=======
-
-	if (unlikely(err))
-		return err;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ct_free_msg(response);
 	return 0;
 }

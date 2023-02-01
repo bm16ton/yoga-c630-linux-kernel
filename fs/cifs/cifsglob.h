@@ -1136,10 +1136,7 @@ struct cifs_fattr {
 	struct timespec64 cf_mtime;
 	struct timespec64 cf_ctime;
 	u32             cf_cifstag;
-<<<<<<< HEAD
 	char            *cf_symlink_target;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*
@@ -1235,11 +1232,7 @@ struct cifs_tcon {
 	struct fscache_volume *fscache;	/* cookie for share */
 #endif
 	struct list_head pending_opens;	/* list of incomplete opens */
-<<<<<<< HEAD
 	struct cached_fids *cfids;
-=======
-	struct cached_fid *cfid; /* Cached root fid */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* BB add field for back pointer to sb struct(s)? */
 #ifdef CONFIG_CIFS_DFS_UPCALL
 	struct list_head ulist; /* cache update list */
@@ -1406,10 +1399,7 @@ struct cifsFileInfo {
 	struct work_struct put; /* work for the final part of _put */
 	struct delayed_work deferred;
 	bool deferred_close_scheduled; /* Flag to indicate close is scheduled */
-<<<<<<< HEAD
 	char *symlink_target;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct cifs_io_parms {
@@ -1568,10 +1558,7 @@ struct cifsInodeInfo {
 	struct list_head deferred_closes; /* list of deferred closes */
 	spinlock_t deferred_lock; /* protection on deferred list */
 	bool lease_granted; /* Flag to indicate whether lease or oplock is granted. */
-<<<<<<< HEAD
 	char *symlink_target;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct cifsInodeInfo *
@@ -1896,7 +1883,6 @@ require use of the stronger protocol */
  * Here are all the locks (spinlock, mutex, semaphore) in cifs.ko, arranged according
  * to the locking order. i.e. if two locks are to be held together, the lock that
  * appears higher in this list needs to be taken before the other.
-<<<<<<< HEAD
  *
  * If you hold a lock that is lower in this list, and you need to take a higher lock
  * (or if you think that one of the functions that you're calling may need to), first
@@ -1915,26 +1901,6 @@ require use of the stronger protocol */
  * debug. Also, any new lock that you introduce, please add to this list in the correct
  * order.
  *
-=======
- *
- * If you hold a lock that is lower in this list, and you need to take a higher lock
- * (or if you think that one of the functions that you're calling may need to), first
- * drop the lock you hold, pick up the higher lock, then the lower one. This will
- * ensure that locks are picked up only in one direction in the below table
- * (top to bottom).
- *
- * Also, if you expect a function to be called with a lock held, explicitly document
- * this in the comments on top of your function definition.
- *
- * And also, try to keep the critical sections (lock hold time) to be as minimal as
- * possible. Blocking / calling other functions with a lock held always increase
- * the risk of a possible deadlock.
- *
- * Following this rule will avoid unnecessary deadlocks, which can get really hard to
- * debug. Also, any new lock that you introduce, please add to this list in the correct
- * order.
- *
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Please populate this list whenever you introduce new locks in your changes. Or in
  * case I've missed some existing locks. Please ensure that it's added in the list
  * based on the locking order expected.
@@ -2161,7 +2127,6 @@ static inline size_t ntlmssp_workstation_name_size(const struct cifs_ses *ses)
 	return sizeof(ses->workstation_name);
 }
 
-<<<<<<< HEAD
 static inline void move_cifs_info_to_smb2(struct smb2_file_all_info *dst, const FILE_ALL_INFO *src)
 {
 	memcpy(dst, src, (size_t)((u8 *)&src->AccessFlags - (u8 *)src));
@@ -2172,6 +2137,4 @@ static inline void move_cifs_info_to_smb2(struct smb2_file_all_info *dst, const 
 	dst->FileNameLength = src->FileNameLength;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif	/* _CIFS_GLOB_H */

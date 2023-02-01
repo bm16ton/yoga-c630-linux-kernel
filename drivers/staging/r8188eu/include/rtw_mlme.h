@@ -5,10 +5,6 @@
 #define __RTW_MLME_H_
 
 #include "osdep_service.h"
-<<<<<<< HEAD
-=======
-#include "mlme_osdep.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "drv_types.h"
 #include "wlan_bssdef.h"
 
@@ -67,20 +63,6 @@ enum rt_scan_type {
 	SCAN_MIX,
 };
 
-<<<<<<< HEAD
-=======
-enum SCAN_RESULT_TYPE {
-	SCAN_RESULT_P2P_ONLY = 0,	/* Will return all the P2P devices. */
-	SCAN_RESULT_ALL = 1,		/* Will return all the scanned device,
-					 * include AP. */
-	SCAN_RESULT_WFD_TYPE = 2	/* Will just return the correct WFD
-					 * device. */
-					/* If this device is Miracast sink
-					 * device, it will just return all the
-					 * Miracast source devices. */
-};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
 there are several "locks" in mlme_priv,
 since mlme_priv is a shared resource between many threads,
@@ -439,11 +421,6 @@ void indicate_wx_scan_complete_event(struct adapter *padapter);
 void rtw_indicate_wx_assoc_event(struct adapter *padapter);
 void rtw_indicate_wx_disassoc_event(struct adapter *padapter);
 int event_thread(void *context);
-<<<<<<< HEAD
-=======
-void rtw_join_timeout_handler (struct timer_list *t);
-void _rtw_scan_timeout_handler (struct timer_list *t);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtw_free_network_queue(struct adapter *adapter, u8 isfreeall);
 int rtw_init_mlme_priv(struct adapter *adapter);
 void rtw_free_mlme_priv (struct mlme_priv *pmlmepriv);
@@ -546,11 +523,7 @@ struct wlan_network *rtw_get_oldest_wlan_network(struct __queue *scanned_queue);
 void rtw_free_assoc_resources(struct adapter *adapter, int lock_scanned_queue);
 void rtw_indicate_disconnect(struct adapter *adapter);
 void rtw_indicate_connect(struct adapter *adapter);
-<<<<<<< HEAD
 void rtw_indicate_scan_done(struct adapter *padapter);
-=======
-void rtw_indicate_scan_done( struct adapter *padapter, bool aborted);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int rtw_restruct_sec_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie,
 			uint in_len);
@@ -564,13 +537,6 @@ void _rtw_join_timeout_handler(struct adapter *adapter);
 void rtw_scan_timeout_handler(struct adapter *adapter);
 
  void rtw_dynamic_check_timer_handlder(struct adapter *adapter);
-<<<<<<< HEAD
-=======
-#define rtw_is_scan_deny(adapter) false
-#define rtw_clear_scan_deny(adapter) do {} while (0)
-#define rtw_set_scan_deny_timer_hdl(adapter) do {} while (0)
-#define rtw_set_scan_deny(adapter, ms) do {} while (0)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv);
 

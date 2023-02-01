@@ -2172,19 +2172,11 @@ static int mtk_dai_etdm_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		return -EINVAL;
 	}
 
-<<<<<<< HEAD
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
 	case SND_SOC_DAIFMT_BC_FC:
 		etdm_data->slave_mode = true;
 		break;
 	case SND_SOC_DAIFMT_BP_FP:
-=======
-	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
-	case SND_SOC_DAIFMT_CBM_CFM:
-		etdm_data->slave_mode = true;
-		break;
-	case SND_SOC_DAIFMT_CBS_CFS:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		etdm_data->slave_mode = false;
 		break;
 	default:

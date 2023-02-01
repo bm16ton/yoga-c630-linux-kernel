@@ -36,19 +36,11 @@ properties:
     items:
       - description: LPASS qdsp6ss register
       - description: LPASS top-cc register
-<<<<<<< HEAD
-=======
-      - description: LPASS cc register
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   reg-names:
     items:
       - const: qdsp6ss
       - const: top_cc
-<<<<<<< HEAD
-=======
-      - const: cc
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 required:
   - compatible
@@ -65,13 +57,8 @@ examples:
     #include <dt-bindings/clock/qcom,lpass-sc7280.h>
     clock-controller@3000000 {
       compatible = "qcom,sc7280-lpasscc";
-<<<<<<< HEAD
       reg = <0x03000000 0x40>, <0x03c04000 0x4>;
       reg-names = "qdsp6ss", "top_cc";
-=======
-      reg = <0x03000000 0x40>, <0x03c04000 0x4>, <0x03389000 0x24>;
-      reg-names = "qdsp6ss", "top_cc", "cc";
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       clocks = <&gcc GCC_CFG_NOC_LPASS_CLK>;
       clock-names = "iface";
       #clock-cells = <1>;

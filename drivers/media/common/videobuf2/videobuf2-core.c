@@ -819,10 +819,7 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
 	 */
 	mutex_lock(&q->mmap_lock);
 	q->memory = memory;
-<<<<<<< HEAD
 	mutex_unlock(&q->mmap_lock);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_queue_coherency(q, non_coherent_mem);
 
 	/*
@@ -927,10 +924,7 @@ int vb2_core_create_bufs(struct vb2_queue *q, enum vb2_memory memory,
 	unsigned int num_planes = 0, num_buffers, allocated_buffers;
 	unsigned plane_sizes[VB2_MAX_PLANES] = { };
 	bool non_coherent_mem = flags & V4L2_MEMORY_FLAG_NON_COHERENT;
-<<<<<<< HEAD
 	bool no_previous_buffers = !q->num_buffers;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (q->num_buffers == VB2_MAX_FRAME) {

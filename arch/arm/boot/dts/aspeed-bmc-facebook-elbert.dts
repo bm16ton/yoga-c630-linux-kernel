@@ -183,7 +183,6 @@
 &i2c11 {
 	status = "okay";
 };
-<<<<<<< HEAD
 
 /*
  * BMC's "mac3" controller is connected to BCM53134P's IMP_RGMII port
@@ -202,5 +201,3 @@
 		full-duplex;
 	};
 };
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

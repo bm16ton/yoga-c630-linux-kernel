@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
-<<<<<<< HEAD
  * Copyright (c) 2014-2022, NVIDIA CORPORATION.  All rights reserved.
-=======
- * Copyright (c) 2014-2020, NVIDIA CORPORATION.  All rights reserved.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <linux/delay.h>
@@ -1298,29 +1294,6 @@ static __maybe_unused int tegra_xusb_padctl_resume_noirq(struct device *dev)
 	return 0;
 }
 
-<<<<<<< HEAD
-=======
-static __maybe_unused int tegra_xusb_padctl_suspend_noirq(struct device *dev)
-{
-	struct tegra_xusb_padctl *padctl = dev_get_drvdata(dev);
-
-	if (padctl->soc && padctl->soc->ops && padctl->soc->ops->suspend_noirq)
-		return padctl->soc->ops->suspend_noirq(padctl);
-
-	return 0;
-}
-
-static __maybe_unused int tegra_xusb_padctl_resume_noirq(struct device *dev)
-{
-	struct tegra_xusb_padctl *padctl = dev_get_drvdata(dev);
-
-	if (padctl->soc && padctl->soc->ops && padctl->soc->ops->resume_noirq)
-		return padctl->soc->ops->resume_noirq(padctl);
-
-	return 0;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct dev_pm_ops tegra_xusb_padctl_pm_ops = {
 	SET_NOIRQ_SYSTEM_SLEEP_PM_OPS(tegra_xusb_padctl_suspend_noirq,
 				      tegra_xusb_padctl_resume_noirq)

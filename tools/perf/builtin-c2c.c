@@ -696,19 +696,12 @@ static uint64_t get_load_cache_hits(struct c2c_stats *stats)
 	       stats->lcl_hitm;
 }
 
-<<<<<<< HEAD
 static uint64_t get_stores(struct c2c_stats *stats)
 {
 	return stats->st_l1hit +
 	       stats->st_l1miss +
 	       stats->st_na;
 }
-=======
-	total    = ldcnt +
-		   stats->st_l1hit +
-		   stats->st_l1miss +
-		   stats->st_na;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static uint64_t total_records(struct c2c_stats *stats)
 {

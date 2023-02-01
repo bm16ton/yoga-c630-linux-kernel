@@ -52,12 +52,6 @@ static unsigned int num_devices = 1;
 static size_t huge_class_size;
 
 static const struct block_device_operations zram_devops;
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_ZRAM_WRITEBACK
-static const struct block_device_operations zram_wb_devops;
-#endif
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void zram_free_page(struct zram *zram, size_t index);
 static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
@@ -332,13 +326,8 @@ static ssize_t idle_store(struct device *dev,
 
 	if (!sysfs_streq(buf, "all")) {
 		/*
-<<<<<<< HEAD
 		 * If it did not parse as 'all' try to treat it as an integer
 		 * when we have memory tracking enabled.
-=======
-		 * If it did not parse as 'all' try to treat it as an integer when
-		 * we have memory tracking enabled.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 */
 		u64 age_sec;
 
@@ -353,14 +342,10 @@ static ssize_t idle_store(struct device *dev,
 	if (!init_done(zram))
 		goto out_unlock;
 
-<<<<<<< HEAD
 	/*
 	 * A cutoff_time of 0 marks everything as idle, this is the
 	 * "all" behavior.
 	 */
-=======
-	/* A cutoff_time of 0 marks everything as idle, this is the "all" behavior */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mark_idle(zram, cutoff_time);
 	rv = len;
 
@@ -1417,7 +1402,6 @@ compress_again:
 		handle = zs_malloc(zram->mem_pool, comp_len,
 				GFP_NOIO | __GFP_HIGHMEM |
 				__GFP_MOVABLE);
-<<<<<<< HEAD
 		if (IS_ERR((void *)handle))
 			return PTR_ERR((void *)handle);
 
@@ -1431,11 +1415,6 @@ compress_again:
 		 * of the zstrm variable below occurs correctly.
 		 */
 		zstrm = zcomp_stream_get(zram->comp);
-=======
-		if (!IS_ERR((void *)handle))
-			goto compress_again;
-		return PTR_ERR((void *)handle);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	alloced_pages = zs_get_total_pages(zram->mem_pool);
@@ -1866,18 +1845,6 @@ static const struct block_device_operations zram_devops = {
 	.owner = THIS_MODULE
 };
 
-<<<<<<< HEAD
-=======
-#ifdef CONFIG_ZRAM_WRITEBACK
-static const struct block_device_operations zram_wb_devops = {
-	.open = zram_open,
-	.submit_bio = zram_submit_bio,
-	.swap_slot_free_notify = zram_slot_free_notify,
-	.owner = THIS_MODULE
-};
-#endif
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static DEVICE_ATTR_WO(compact);
 static DEVICE_ATTR_RW(disksize);
 static DEVICE_ATTR_RO(initstate);

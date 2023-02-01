@@ -87,11 +87,7 @@
 };
 
 &sdc2_off_state {
-<<<<<<< HEAD
 	sd-cd-pins {
-=======
-	sd-cd {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio98";
 		drive-strength = <2>;
 		bias-disable;
@@ -99,11 +95,7 @@
 };
 
 &sdc2_on_state {
-<<<<<<< HEAD
 	sd-cd-pins {
-=======
-	sd-cd {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio98";
 		drive-strength = <2>;
 		bias-pull-up;

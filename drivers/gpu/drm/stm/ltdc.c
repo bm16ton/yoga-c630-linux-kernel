@@ -28,19 +28,11 @@
 #include <drm/drm_bridge.h>
 #include <drm/drm_device.h>
 #include <drm/drm_edid.h>
-<<<<<<< HEAD
 #include <drm/drm_fb_dma_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
 #include <drm/drm_gem_dma_helper.h>
-=======
-#include <drm/drm_fb_cma_helper.h>
-#include <drm/drm_fourcc.h>
-#include <drm/drm_framebuffer.h>
-#include <drm/drm_gem_atomic_helper.h>
-#include <drm/drm_gem_cma_helper.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_of.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_simple_kms_helper.h>
@@ -1354,11 +1346,7 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 	}
 
 	/* Sets the FB address */
-<<<<<<< HEAD
 	paddr = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 0);
-=======
-	paddr = (u32)drm_fb_cma_get_gem_addr(fb, newstate, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (newstate->rotation & DRM_MODE_REFLECT_X)
 		paddr += (fb->format->cpp[0] * (x1 - x0 + 1)) - 1;
@@ -1392,11 +1380,7 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 			case DRM_FORMAT_NV12:
 			case DRM_FORMAT_NV21:
 			/* Configure the auxiliary frame buffer address 0 */
-<<<<<<< HEAD
 			paddr1 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 1);
-=======
-			paddr1 = (u32)drm_fb_cma_get_gem_addr(fb, newstate, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			if (newstate->rotation & DRM_MODE_REFLECT_X)
 				paddr1 += ((fb->format->cpp[1] * (x1 - x0 + 1)) >> 1) - 1;
@@ -1408,13 +1392,8 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 			break;
 			case DRM_FORMAT_YUV420:
 			/* Configure the auxiliary frame buffer address 0 & 1 */
-<<<<<<< HEAD
 			paddr1 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 1);
 			paddr2 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 2);
-=======
-			paddr1 = (u32)drm_fb_cma_get_gem_addr(fb, newstate, 1);
-			paddr2 = (u32)drm_fb_cma_get_gem_addr(fb, newstate, 2);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			if (newstate->rotation & DRM_MODE_REFLECT_X) {
 				paddr1 += ((fb->format->cpp[1] * (x1 - x0 + 1)) >> 1) - 1;
@@ -1431,13 +1410,8 @@ static void ltdc_plane_atomic_update(struct drm_plane *plane,
 			break;
 			case DRM_FORMAT_YVU420:
 			/* Configure the auxiliary frame buffer address 0 & 1 */
-<<<<<<< HEAD
 			paddr1 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 2);
 			paddr2 = (u32)drm_fb_dma_get_gem_addr(fb, newstate, 1);
-=======
-			paddr1 = (u32)drm_fb_cma_get_gem_addr(fb, newstate, 2);
-			paddr2 = (u32)drm_fb_cma_get_gem_addr(fb, newstate, 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			if (newstate->rotation & DRM_MODE_REFLECT_X) {
 				paddr1 += ((fb->format->cpp[1] * (x1 - x0 + 1)) >> 1) - 1;

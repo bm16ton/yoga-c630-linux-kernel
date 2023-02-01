@@ -217,11 +217,7 @@ static void rps_reset_interrupts(struct intel_rps *rps)
 {
 	struct intel_gt *gt = rps_to_gt(rps);
 
-<<<<<<< HEAD
 	spin_lock_irq(gt->irq_lock);
-=======
-	spin_lock_irq(&gt->irq_lock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (GRAPHICS_VER(gt->i915) >= 11)
 		gen11_rps_reset_interrupts(rps);
 	else
@@ -1111,16 +1107,12 @@ void gen6_rps_get_freq_caps(struct intel_rps *rps, struct intel_rps_freq_caps *c
 		caps->min_freq = (rp_state_cap >>  0) & 0xff;
 	} else {
 		caps->rp0_freq = (rp_state_cap >>  0) & 0xff;
-<<<<<<< HEAD
 		if (GRAPHICS_VER(i915) >= 10)
 			caps->rp1_freq = REG_FIELD_GET(RPE_MASK,
 						       intel_uncore_read(to_gt(i915)->uncore,
 						       GEN10_FREQ_INFO_REC));
 		else
 			caps->rp1_freq = (rp_state_cap >>  8) & 0xff;
-=======
-		caps->rp1_freq = (rp_state_cap >>  8) & 0xff;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		caps->min_freq = (rp_state_cap >> 16) & 0xff;
 	}
 

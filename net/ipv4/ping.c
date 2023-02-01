@@ -143,11 +143,7 @@ next_port:
 
 fail:
 	spin_unlock(&ping_table.lock);
-<<<<<<< HEAD
 	return -EADDRINUSE;
-=======
-	return 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(ping_get_port);
 
@@ -201,11 +197,7 @@ static struct sock *ping_lookup(struct net *net, struct sk_buff *skb, u16 ident)
 		return NULL;
 	}
 
-<<<<<<< HEAD
 	ping_portaddr_for_each_entry_rcu(sk, hnode, hslot) {
-=======
-	ping_portaddr_for_each_entry(sk, hnode, hslot) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		isk = inet_sk(sk);
 
 		pr_debug("iterate\n");
@@ -630,27 +622,9 @@ int ping_getfrag(void *from, char *to,
 {
 	struct pingfakehdr *pfh = from;
 
-<<<<<<< HEAD
 	if (!csum_and_copy_from_iter_full(to, fraglen, &pfh->wcheck,
 					  &pfh->msg->msg_iter))
 		return -EFAULT;
-=======
-	if (offset == 0) {
-		fraglen -= sizeof(struct icmphdr);
-		if (fraglen < 0)
-			BUG();
-		if (!csum_and_copy_from_iter_full(to + sizeof(struct icmphdr),
-			    fraglen, &pfh->wcheck,
-			    &pfh->msg->msg_iter))
-			return -EFAULT;
-	} else if (offset < sizeof(struct icmphdr)) {
-			BUG();
-	} else {
-		if (!csum_and_copy_from_iter_full(to, fraglen, &pfh->wcheck,
-					    &pfh->msg->msg_iter))
-			return -EFAULT;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if IS_ENABLED(CONFIG_IPV6)
 	/* For IPv6, checksum each skb as we go along, as expected by

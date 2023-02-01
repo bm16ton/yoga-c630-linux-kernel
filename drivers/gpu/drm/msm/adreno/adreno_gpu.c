@@ -233,7 +233,6 @@ adreno_iommu_create_address_space(struct msm_gpu *gpu,
 }
 
 u64 adreno_private_address_space_size(struct msm_gpu *gpu)
-<<<<<<< HEAD
 {
 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
 
@@ -251,25 +250,6 @@ int adreno_get_param(struct msm_gpu *gpu, struct msm_file_private *ctx,
 {
 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
 
-=======
-{
-	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
-
-	if (address_space_size)
-		return address_space_size;
-
-	if (adreno_gpu->info->address_space_size)
-		return adreno_gpu->info->address_space_size;
-
-	return SZ_4G;
-}
-
-int adreno_get_param(struct msm_gpu *gpu, struct msm_file_private *ctx,
-		     uint32_t param, uint64_t *value, uint32_t *len)
-{
-	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* No pointer params yet */
 	if (*len != 0)
 		return -EINVAL;
@@ -749,16 +729,12 @@ static char *adreno_gpu_ascii85_encode(u32 *src, size_t len)
 	return buf;
 }
 
-<<<<<<< HEAD
 /* len is expected to be in bytes
  *
  * WARNING: *ptr should be allocated with kvmalloc or friends.  It can be free'd
  * with kvfree() and replaced with a newly kvmalloc'd buffer on the first call
  * when the unencoded raw data is encoded
  */
-=======
-/* len is expected to be in bytes */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void adreno_show_object(struct drm_printer *p, void **ptr, int len,
 		bool *encoded)
 {

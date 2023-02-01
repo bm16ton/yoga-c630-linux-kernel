@@ -128,7 +128,6 @@ extern "C" {
 /* 8 bpp Red (direct relationship between channel value and brightness) */
 #define DRM_FORMAT_R8		fourcc_code('R', '8', ' ', ' ') /* [7:0] R */
 
-<<<<<<< HEAD
 /* 10 bpp Red (direct relationship between channel value and brightness) */
 #define DRM_FORMAT_R10		fourcc_code('R', '1', '0', ' ') /* [15:0] x:R 6:10 little endian */
 
@@ -136,15 +135,6 @@ extern "C" {
 #define DRM_FORMAT_R12		fourcc_code('R', '1', '2', ' ') /* [15:0] x:R 4:12 little endian */
 
 /* 16 bpp Red (direct relationship between channel value and brightness) */
-=======
-/* 10 bpp Red */
-#define DRM_FORMAT_R10		fourcc_code('R', '1', '0', ' ') /* [15:0] x:R 6:10 little endian */
-
-/* 12 bpp Red */
-#define DRM_FORMAT_R12		fourcc_code('R', '1', '2', ' ') /* [15:0] x:R 4:12 little endian */
-
-/* 16 bpp Red */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define DRM_FORMAT_R16		fourcc_code('R', '1', '6', ' ') /* [15:0] R little endian */
 
 /* 16 bpp RG */

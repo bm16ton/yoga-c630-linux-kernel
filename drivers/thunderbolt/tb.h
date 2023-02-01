@@ -22,14 +22,6 @@
 #define NVM_MIN_SIZE		SZ_32K
 #define NVM_MAX_SIZE		SZ_512K
 #define NVM_DATA_DWORDS		16
-<<<<<<< HEAD
-=======
-
-/* Intel specific NVM offsets */
-#define NVM_DEVID		0x05
-#define NVM_VERSION		0x08
-#define NVM_FLASH_SIZE		0x45
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * struct tb_nvm - Structure holding NVM information
@@ -67,12 +59,6 @@ struct tb_nvm {
 	bool authenticating;
 	bool flushed;
 	const struct tb_nvm_vendor_ops *vops;
-};
-
-enum tb_nvm_write_ops {
-	WRITE_AND_AUTHENTICATE = 1,
-	WRITE_ONLY = 2,
-	AUTHENTICATE_ONLY = 3,
 };
 
 enum tb_nvm_write_ops {
@@ -129,13 +115,8 @@ struct tb_switch_tmu {
 enum tb_clx {
 	TB_CLX_DISABLE,
 	/* CL0s and CL1 are enabled and supported together */
-<<<<<<< HEAD
 	TB_CL1 = BIT(0),
 	TB_CL2 = BIT(1),
-=======
-	TB_CL1,
-	TB_CL2,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -300,22 +281,16 @@ struct tb_port {
  * @can_offline: Does the port have necessary platform support to moved
  *		 it into offline mode and back
  * @offline: The port is currently in offline mode
-<<<<<<< HEAD
  * @margining: Pointer to margining structure if enabled
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct usb4_port {
 	struct device dev;
 	struct tb_port *port;
 	bool can_offline;
 	bool offline;
-<<<<<<< HEAD
 #ifdef CONFIG_USB4_DEBUGFS_MARGINING
 	struct tb_margining *margining;
 #endif
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -790,11 +765,8 @@ int tb_nvm_write_data(unsigned int address, const void *buf, size_t size,
 		      unsigned int retries, write_block_fn write_next_block,
 		      void *write_block_data);
 
-<<<<<<< HEAD
 int tb_switch_nvm_read(struct tb_switch *sw, unsigned int address, void *buf,
 		       size_t size);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct tb_switch *tb_switch_alloc(struct tb *tb, struct device *parent,
 				  u64 route);
 struct tb_switch *tb_switch_alloc_safe_mode(struct tb *tb,
@@ -990,7 +962,6 @@ static inline bool tb_switch_tmu_is_enabled(const struct tb_switch *sw,
 	return sw->tmu.rate == sw->tmu.rate_request &&
 	       sw->tmu.unidirectional == unidirectional;
 }
-<<<<<<< HEAD
 
 static inline const char *tb_switch_clx_name(enum tb_clx clx)
 {
@@ -1029,46 +1000,6 @@ static inline bool tb_switch_is_clx_supported(const struct tb_switch *sw)
 	return tb_switch_is_usb4(sw) || tb_switch_is_titan_ridge(sw);
 }
 
-=======
-
-static inline const char *tb_switch_clx_name(enum tb_clx clx)
-{
-	switch (clx) {
-	/* CL0s and CL1 are enabled and supported together */
-	case TB_CL1:
-		return "CL0s/CL1";
-	default:
-		return "unknown";
-	}
-}
-
-int tb_switch_enable_clx(struct tb_switch *sw, enum tb_clx clx);
-int tb_switch_disable_clx(struct tb_switch *sw, enum tb_clx clx);
-
-/**
- * tb_switch_is_clx_enabled() - Checks if the CLx is enabled
- * @sw: Router to check for the CLx
- * @clx: The CLx state to check for
- *
- * Checks if the specified CLx is enabled on the router upstream link.
- * Not applicable for a host router.
- */
-static inline bool tb_switch_is_clx_enabled(const struct tb_switch *sw,
-					    enum tb_clx clx)
-{
-	return sw->clx == clx;
-}
-
-/**
- * tb_switch_is_clx_supported() - Is CLx supported on this type of router
- * @sw: The router to check CLx support for
- */
-static inline bool tb_switch_is_clx_supported(const struct tb_switch *sw)
-{
-	return tb_switch_is_usb4(sw) || tb_switch_is_titan_ridge(sw);
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int tb_switch_mask_clx_objections(struct tb_switch *sw);
 
 int tb_switch_pcie_l1_enable(struct tb_switch *sw);
@@ -1116,10 +1047,7 @@ void tb_port_lane_bonding_disable(struct tb_port *port);
 int tb_port_wait_for_link_width(struct tb_port *port, int width,
 				int timeout_msec);
 int tb_port_update_credits(struct tb_port *port);
-<<<<<<< HEAD
 bool tb_port_is_clx_enabled(struct tb_port *port, enum tb_clx clx);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int tb_switch_find_vse_cap(struct tb_switch *sw, enum tb_switch_vse_cap vsec);
 int tb_switch_find_cap(struct tb_switch *sw, enum tb_switch_cap cap);
@@ -1217,7 +1145,6 @@ void tb_xdomain_remove(struct tb_xdomain *xd);
 struct tb_xdomain *tb_xdomain_find_by_link_depth(struct tb *tb, u8 link,
 						 u8 depth);
 
-<<<<<<< HEAD
 static inline struct tb_switch *tb_xdomain_parent(struct tb_xdomain *xd)
 {
 	return tb_to_switch(xd->dev.parent);
@@ -1225,8 +1152,6 @@ static inline struct tb_switch *tb_xdomain_parent(struct tb_xdomain *xd)
 
 int tb_retimer_nvm_read(struct tb_retimer *rt, unsigned int address, void *buf,
 			size_t size);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int tb_retimer_scan(struct tb_port *port, bool add);
 void tb_retimer_remove_all(struct tb_port *port);
 
@@ -1278,7 +1203,6 @@ int usb4_port_router_offline(struct tb_port *port);
 int usb4_port_router_online(struct tb_port *port);
 int usb4_port_enumerate_retimers(struct tb_port *port);
 bool usb4_port_clx_supported(struct tb_port *port);
-<<<<<<< HEAD
 int usb4_port_margining_caps(struct tb_port *port, u32 *caps);
 int usb4_port_hw_margin(struct tb_port *port, unsigned int lanes,
 			unsigned int ber_level, bool timing, bool right_high,
@@ -1286,8 +1210,6 @@ int usb4_port_hw_margin(struct tb_port *port, unsigned int lanes,
 int usb4_port_sw_margin(struct tb_port *port, unsigned int lanes, bool timing,
 			bool right_high, u32 counter);
 int usb4_port_sw_margin_errors(struct tb_port *port, u32 *errors);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int usb4_port_retimer_set_inbound_sbtx(struct tb_port *port, u8 index);
 int usb4_port_retimer_read(struct tb_port *port, u8 index, u8 reg, void *buf,

@@ -97,12 +97,9 @@ static int __cmd_record(int argc, const char **argv, struct perf_mem *mem)
 	else
 		rec_argc = argc + 9 * perf_pmu__hybrid_pmu_num();
 
-<<<<<<< HEAD
 	if (mem->cpu_list)
 		rec_argc += 2;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rec_argv = calloc(rec_argc + 1, sizeof(char *));
 	if (!rec_argv)
 		return -1;

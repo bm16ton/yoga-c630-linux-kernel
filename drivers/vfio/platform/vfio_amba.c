@@ -61,7 +61,6 @@ static int vfio_amba_init_dev(struct vfio_device *core_vdev)
 	ret = vfio_platform_init_common(vdev);
 	if (ret)
 		kfree(vdev->name);
-<<<<<<< HEAD
 	return ret;
 }
 
@@ -87,28 +86,14 @@ static int vfio_amba_probe(struct amba_device *adev, const struct amba_id *id)
 out_put_vdev:
 	vfio_put_device(&vdev->vdev);
 	return ret;
-=======
-		kfree(vdev);
-		return ret;
-	}
-
-	dev_set_drvdata(&adev->dev, vdev);
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void vfio_amba_release_dev(struct vfio_device *core_vdev)
 {
-<<<<<<< HEAD
 	struct vfio_platform_device *vdev =
 		container_of(core_vdev, struct vfio_platform_device, vdev);
 
 	vfio_platform_release_common(vdev);
-=======
-	struct vfio_platform_device *vdev = dev_get_drvdata(&adev->dev);
-
-	vfio_platform_remove_common(vdev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(vdev->name);
 	vfio_free_device(core_vdev);
 }

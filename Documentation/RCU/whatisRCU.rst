@@ -917,7 +917,6 @@ which an RCU reference is held include:
 The understanding that RCU provides a reference that only prevents a
 change of type is particularly visible with objects allocated from a
 slab cache marked ``SLAB_TYPESAFE_BY_RCU``.  RCU operations may yield a
-<<<<<<< HEAD
 reference to an object from such a cache that has been concurrently freed
 and the memory reallocated to a completely different object, though of
 the same type.  In this case RCU doesn't even protect the identity of the
@@ -930,15 +929,6 @@ unfortunately any spinlock in a ``SLAB_TYPESAFE_BY_RCU`` object must be
 initialized after each and every call to kmem_cache_alloc(), which renders
 reference-free spinlock acquisition completely unsafe.  Therefore, when
 using ``SLAB_TYPESAFE_BY_RCU``, make proper use of a reference counter.
-=======
-reference to an object from such a cache that has been concurrently
-freed and the memory reallocated to a completely different object,
-though of the same type.  In this case RCU doesn't even protect the
-identity of the object from changing, only its type.  So the object
-found may not be the one expected, but it will be one where it is safe
-to take a reference or spinlock and then confirm that the identity
-matches the expectations.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 With traditional reference counting -- such as that implemented by the
 kref library in Linux -- there is typically code that runs when the last

@@ -96,33 +96,19 @@ static void tls_device_queue_ctx_destruction(struct tls_context *ctx)
 		spin_unlock_irqrestore(&tls_device_lock, flags);
 		return;
 	}
-<<<<<<< HEAD
 
 	list_del(&ctx->list); /* Remove from tls_device_list / tls_device_down_list */
 
-=======
-
-	list_del(&ctx->list); /* Remove from tls_device_list / tls_device_down_list */
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Safe, because this is the destroy flow, refcount is 0, so
 	 * tls_device_down can't store this field in parallel.
 	 */
 	netdev = rcu_dereference_protected(ctx->netdev,
 					   !refcount_read(&ctx->refcount));
-<<<<<<< HEAD
 
 	async_cleanup = netdev && ctx->tx_conf == TLS_HW;
 	if (async_cleanup) {
 		struct tls_offload_context_tx *offload_ctx = tls_offload_ctx_tx(ctx);
 
-=======
-
-	async_cleanup = netdev && ctx->tx_conf == TLS_HW;
-	if (async_cleanup) {
-		struct tls_offload_context_tx *offload_ctx = tls_offload_ctx_tx(ctx);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* queue_work inside the spinlock
 		 * to make sure tls_device_down waits for that work.
 		 */
@@ -916,22 +902,16 @@ static void tls_device_core_ctrl_rx_resync(struct tls_context *tls_ctx,
 }
 
 static int
-<<<<<<< HEAD
 tls_device_reencrypt(struct sock *sk, struct tls_context *tls_ctx)
 {
 	struct tls_sw_context_rx *sw_ctx = tls_sw_ctx_rx(tls_ctx);
 	const struct tls_cipher_size_desc *cipher_sz;
-=======
-tls_device_reencrypt(struct sock *sk, struct tls_sw_context_rx *sw_ctx)
-{
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err, offset, copy, data_len, pos;
 	struct sk_buff *skb, *skb_iter;
 	struct scatterlist sg[1];
 	struct strp_msg *rxm;
 	char *orig_buf, *buf;
 
-<<<<<<< HEAD
 	switch (tls_ctx->crypto_recv.info.cipher_type) {
 	case TLS_CIPHER_AES_GCM_128:
 	case TLS_CIPHER_AES_GCM_256:
@@ -944,11 +924,6 @@ tls_device_reencrypt(struct sock *sk, struct tls_sw_context_rx *sw_ctx)
 	rxm = strp_msg(tls_strp_msg(sw_ctx));
 	orig_buf = kmalloc(rxm->full_len + TLS_HEADER_SIZE + cipher_sz->iv,
 			   sk->sk_allocation);
-=======
-	rxm = strp_msg(tls_strp_msg(sw_ctx));
-	orig_buf = kmalloc(rxm->full_len + TLS_HEADER_SIZE +
-			   TLS_CIPHER_AES_GCM_128_IV_SIZE, sk->sk_allocation);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!orig_buf)
 		return -ENOMEM;
 	buf = orig_buf;
@@ -1058,11 +1033,7 @@ int tls_device_decrypted(struct sock *sk, struct tls_context *tls_ctx)
 		 * likely have initial fragments decrypted, and final ones not
 		 * decrypted. We need to reencrypt that single SKB.
 		 */
-<<<<<<< HEAD
 		return tls_device_reencrypt(sk, tls_ctx);
-=======
-		return tls_device_reencrypt(sk, sw_ctx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Return immediately if the record is either entirely plaintext or
@@ -1079,11 +1050,7 @@ int tls_device_decrypted(struct sock *sk, struct tls_context *tls_ctx)
 	}
 
 	ctx->resync_nh_reset = 1;
-<<<<<<< HEAD
 	return tls_device_reencrypt(sk, tls_ctx);
-=======
-	return tls_device_reencrypt(sk, sw_ctx);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void tls_device_attach(struct tls_context *ctx, struct sock *sk,

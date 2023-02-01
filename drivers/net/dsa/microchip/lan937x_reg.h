@@ -62,15 +62,12 @@
 #define SW_FAST_AGING			BIT(1)
 #define SW_LINK_AUTO_AGING		BIT(0)
 
-<<<<<<< HEAD
 #define REG_SW_AGE_PERIOD__1		0x0313
 #define SW_AGE_PERIOD_7_0_M		GENMASK(7, 0)
 
 #define REG_SW_AGE_PERIOD__2		0x0320
 #define SW_AGE_PERIOD_19_8_M		GENMASK(19, 8)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define REG_SW_MAC_CTRL_0		0x0330
 #define SW_NEW_BACKOFF			BIT(7)
 #define SW_PAUSE_UNH_MODE		BIT(1)
@@ -127,7 +124,6 @@
 /* Port Registers */
 
 /* 0 - Operation */
-<<<<<<< HEAD
 #define REG_PORT_INT_STATUS		0x001B
 #define REG_PORT_INT_MASK		0x001F
 
@@ -140,8 +136,6 @@
 
 #define PORT_SRC_PHY_INT		1
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define REG_PORT_CTRL_0			0x0020
 
 #define PORT_MAC_LOOPBACK		BIT(7)

@@ -1609,25 +1609,18 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
 	struct create_posix_rsp *buf;
 	struct inode *inode = file_inode(fp->filp);
 	struct user_namespace *user_ns = file_mnt_user_ns(fp->filp);
-<<<<<<< HEAD
 	vfsuid_t vfsuid = i_uid_into_vfsuid(user_ns, inode);
 	vfsgid_t vfsgid = i_gid_into_vfsgid(user_ns, inode);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	buf = (struct create_posix_rsp *)cc;
 	memset(buf, 0, sizeof(struct create_posix_rsp));
 	buf->ccontext.DataOffset = cpu_to_le16(offsetof
 			(struct create_posix_rsp, nlink));
-<<<<<<< HEAD
 	/*
 	 * DataLength = nlink(4) + reparse_tag(4) + mode(4) +
 	 * domain sid(28) + unix group sid(16).
 	 */
 	buf->ccontext.DataLength = cpu_to_le32(56);
-=======
-	buf->ccontext.DataLength = cpu_to_le32(52);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	buf->ccontext.NameOffset = cpu_to_le16(offsetof
 			(struct create_posix_rsp, Name));
 	buf->ccontext.NameLength = cpu_to_le16(POSIX_CTXT_DATA_LEN);
@@ -1651,7 +1644,6 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
 
 	buf->nlink = cpu_to_le32(inode->i_nlink);
 	buf->reparse_tag = cpu_to_le32(fp->volatile_id);
-<<<<<<< HEAD
 	buf->mode = cpu_to_le32(inode->i_mode & 0777);
 	/*
 	 * SidBuffer(44) contain two sids(Domain sid(28), UNIX group sid(16)).
@@ -1664,15 +1656,6 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
 		  SIDOWNER, (struct smb_sid *)&buf->SidBuffer[0]);
 	id_to_sid(from_kgid_munged(&init_user_ns, vfsgid_into_kgid(vfsgid)),
 		  SIDUNIX_GROUP, (struct smb_sid *)&buf->SidBuffer[28]);
-=======
-	buf->mode = cpu_to_le32(inode->i_mode);
-	id_to_sid(from_kuid_munged(&init_user_ns,
-				   i_uid_into_mnt(user_ns, inode)),
-		  SIDNFS_USER, (struct smb_sid *)&buf->SidBuffer[0]);
-	id_to_sid(from_kgid_munged(&init_user_ns,
-				   i_gid_into_mnt(user_ns, inode)),
-		  SIDNFS_GROUP, (struct smb_sid *)&buf->SidBuffer[20]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

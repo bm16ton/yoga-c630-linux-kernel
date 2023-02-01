@@ -138,10 +138,7 @@ struct sockmap_options {
 	bool data_test;
 	bool drop_expected;
 	bool check_recved_len;
-<<<<<<< HEAD
 	bool tx_wait_mem;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int iov_count;
 	int iov_length;
 	int rate;

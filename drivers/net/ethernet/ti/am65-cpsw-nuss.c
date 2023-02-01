@@ -596,13 +596,6 @@ static int am65_cpsw_nuss_ndo_slave_open(struct net_device *ndev)
 	if (ret)
 		goto error_cleanup;
 
-<<<<<<< HEAD
-=======
-	ret = phylink_of_phy_connect(port->slave.phylink, port->slave.phy_node, 0);
-	if (ret)
-		goto error_cleanup;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* restore vlan configurations */
 	vlan_for_each(ndev, cpsw_restore_vlans, port);
 
@@ -1417,7 +1410,6 @@ static const struct net_device_ops am65_cpsw_nuss_netdev_ops = {
 static void am65_cpsw_nuss_mac_config(struct phylink_config *config, unsigned int mode,
 				      const struct phylink_link_state *state)
 {
-<<<<<<< HEAD
 	struct am65_cpsw_slave_data *slave = container_of(config, struct am65_cpsw_slave_data,
 							  phylink_config);
 	struct am65_cpsw_port *port = container_of(slave, struct am65_cpsw_port, slave);
@@ -1426,9 +1418,6 @@ static void am65_cpsw_nuss_mac_config(struct phylink_config *config, unsigned in
 	if (common->pdata.extra_modes & BIT(state->interface))
 		writel(AM65_CPSW_SGMII_CONTROL_MR_AN_ENABLE,
 		       port->sgmii_base + AM65_CPSW_SGMII_CONTROL_REG);
-=======
-	/* Currently not used */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void am65_cpsw_nuss_mac_link_down(struct phylink_config *config, unsigned int mode,
@@ -1469,11 +1458,7 @@ static void am65_cpsw_nuss_mac_link_up(struct phylink_config *config, struct phy
 
 	if (speed == SPEED_1000)
 		mac_control |= CPSW_SL_CTL_GIG;
-<<<<<<< HEAD
 	if (speed == SPEED_10 && phy_interface_mode_is_rgmii(interface))
-=======
-	if (speed == SPEED_10 && interface == PHY_INTERFACE_MODE_RGMII)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Can be used with in band mode only */
 		mac_control |= CPSW_SL_CTL_EXT_EN;
 	if (speed == SPEED_100 && interface == PHY_INTERFACE_MODE_RMII)
@@ -1911,13 +1896,10 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
 			goto of_node_put;
 		}
 
-<<<<<<< HEAD
 		ret = phy_set_mode_ext(port->slave.ifphy, PHY_MODE_ETHERNET, port->slave.phy_if);
 		if (ret)
 			goto of_node_put;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = of_get_mac_address(port_np, port->slave.mac_addr);
 		if (ret) {
 			am65_cpsw_am654_get_efuse_macid(port_np,
@@ -2013,7 +1995,6 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
 	port->slave.phylink_config.type = PHYLINK_NETDEV;
 	port->slave.phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000FD;
 
-<<<<<<< HEAD
 	if (phy_interface_mode_is_rgmii(port->slave.phy_if)) {
 		phy_interface_set_rgmii(port->slave.phylink_config.supported_interfaces);
 	} else if (port->slave.phy_if == PHY_INTERFACE_MODE_RMII) {
@@ -2026,9 +2007,6 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
 		dev_err(dev, "selected phy-mode is not supported\n");
 		return -EOPNOTSUPP;
 	}
-=======
-	phy_interface_set_rgmii(port->slave.phylink_config.supported_interfaces);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	phylink = phylink_create(&port->slave.phylink_config,
 				 of_node_to_fwnode(port->slave.phy_node),

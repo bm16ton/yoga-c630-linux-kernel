@@ -39,24 +39,11 @@ properties:
           any others.
       - minItems: 1
         items:
-<<<<<<< HEAD
           enum:
             - eventq      # Event Queue not empty
             - gerror      # Global Error activated
             - cmdq-sync   # CMD_SYNC complete
             - priq        # PRI Queue not empty
-=======
-          - enum:
-              - eventq     # Event Queue not empty
-              - gerror     # Global Error activated
-          - const: gerror
-          - enum:
-              - cmdq-sync  # CMD_SYNC complete
-              - priq       # PRI Queue not empty
-          - enum:
-              - cmdq-sync
-              - priq
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   '#iommu-cells':
     const: 1

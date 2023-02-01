@@ -15,17 +15,13 @@ config SND_SOC_SOF_MTK_COMMON
 	tristate
 	select SND_SOC_SOF_OF_DEV
 	select SND_SOC_SOF
-<<<<<<< HEAD
 	select SND_SOC_SOF_IPC3
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select SND_SOC_SOF_XTENSA
 	select SND_SOC_SOF_COMPRESS
 	help
 	  This option is not user-selectable but automagically handled by
 	  'select' statements at a higher level
 
-<<<<<<< HEAD
 config SND_SOC_SOF_MT8186
 	tristate "SOF support for MT8186 audio DSP"
 	select SND_SOC_SOF_MTK_COMMON
@@ -40,11 +36,6 @@ config SND_SOC_SOF_MT8195
 	tristate "SOF support for MT8195 audio DSP"
 	select SND_SOC_SOF_MTK_COMMON
 	depends on MTK_ADSP_IPC
-=======
-config SND_SOC_SOF_MT8195
-	tristate "SOF support for MT8195 audio DSP"
-	select SND_SOC_SOF_MTK_COMMON
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  This adds support for Sound Open Firmware for Mediatek platforms
 	  using the mt8195 processors.

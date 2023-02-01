@@ -15,12 +15,6 @@ description: |
   This is a part of device tree bindings for Samsung S3C/S5P/Exynos SoC pin
   controller.
 
-<<<<<<< HEAD
-=======
-  Pin group settings (like drive strength, pull up/down) are available as
-  macros in include/dt-bindings/pinctrl/samsung.h.
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   All the pin controller nodes should be represented in the aliases node using
   the following format 'pinctrl{n}' where n is a unique number for the alias.
 
@@ -100,12 +94,9 @@ patternProperties:
         additionalProperties: false
 
   "^(initial|sleep)-state$":
-<<<<<<< HEAD
     type: object
     additionalProperties: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     patternProperties:
       "^(pin-[a-z0-9-]+|[a-z0-9-]+-pin)$":
         $ref: samsung,pinctrl-pins-cfg.yaml
@@ -147,11 +138,6 @@ additionalProperties: false
 
 examples:
   - |
-<<<<<<< HEAD
-=======
-    #include <dt-bindings/pinctrl/samsung.h>
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     pinctrl@7f008000 {
         compatible = "samsung,s3c64xx-pinctrl";
         reg = <0x7f008000 0x1000>;
@@ -178,13 +164,8 @@ examples:
 
         uart0-data-pins {
             samsung,pins = "gpa-0", "gpa-1";
-<<<<<<< HEAD
             samsung,pin-function = <2>;
             samsung,pin-pud = <0>;
-=======
-            samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-            samsung,pin-pud = <S3C64XX_PIN_PULL_NONE>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         };
 
         // ...
@@ -192,10 +173,6 @@ examples:
 
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-<<<<<<< HEAD
-=======
-    #include <dt-bindings/pinctrl/samsung.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     pinctrl@11400000 {
         compatible = "samsung,exynos4210-pinctrl";
@@ -217,15 +194,9 @@ examples:
 
         uart0-data-pins {
             samsung,pins = "gpa0-0", "gpa0-1";
-<<<<<<< HEAD
             samsung,pin-function = <2>;
             samsung,pin-pud = <0>;
             samsung,pin-drv = <0>;
-=======
-            samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-            samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
-            samsung,pin-drv = <EXYNOS4_PIN_DRV_LV1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         };
 
         // ...
@@ -233,24 +204,14 @@ examples:
         sleep0: sleep-state {
             gpa0-0-pin {
                 samsung,pins = "gpa0-0";
-<<<<<<< HEAD
                 samsung,pin-con-pdn = <2>;
                 samsung,pin-pud-pdn = <0>;
-=======
-                samsung,pin-con-pdn = <EXYNOS_PIN_PDN_INPUT>;
-                samsung,pin-pud-pdn = <EXYNOS_PIN_PULL_NONE>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             };
 
             gpa0-1-pin {
                 samsung,pins = "gpa0-1";
-<<<<<<< HEAD
                 samsung,pin-con-pdn = <0>;
                 samsung,pin-pud-pdn = <0>;
-=======
-                samsung,pin-con-pdn = <EXYNOS_PIN_PDN_OUT0>;
-                samsung,pin-pud-pdn = <EXYNOS_PIN_PULL_NONE>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             };
 
             // ...
@@ -259,10 +220,6 @@ examples:
 
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-<<<<<<< HEAD
-=======
-    #include <dt-bindings/pinctrl/samsung.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     pinctrl@11000000 {
         compatible = "samsung,exynos4210-pinctrl";
@@ -311,44 +268,26 @@ examples:
 
         sd0-clk-pins {
             samsung,pins = "gpk0-0";
-<<<<<<< HEAD
             samsung,pin-function = <2>;
             samsung,pin-pud = <0>;
             samsung,pin-drv = <3>;
-=======
-            samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-            samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
-            samsung,pin-drv = <EXYNOS4_PIN_DRV_LV4>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         };
 
         sd4-bus-width8-pins {
             part-1-pins {
                 samsung,pins = "gpk0-3", "gpk0-4",
                                "gpk0-5", "gpk0-6";
-<<<<<<< HEAD
                 samsung,pin-function = <3>;
                 samsung,pin-pud = <3>;
                 samsung,pin-drv = <3>;
-=======
-                samsung,pin-function = <EXYNOS_PIN_FUNC_3>;
-                samsung,pin-pud = <EXYNOS_PIN_PULL_UP>;
-                samsung,pin-drv = <EXYNOS4_PIN_DRV_LV4>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             };
 
             part-2-pins {
                 samsung,pins = "gpk1-3", "gpk1-4",
                                "gpk1-5", "gpk1-6";
-<<<<<<< HEAD
                 samsung,pin-function = <4>;
                 samsung,pin-pud = <3>;
                 samsung,pin-drv = <3>;
-=======
-                samsung,pin-function = <EXYNOS_PIN_FUNC_4>;
-                samsung,pin-pud = <EXYNOS_PIN_PULL_UP>;
-                samsung,pin-drv = <EXYNOS4_PIN_DRV_LV4>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             };
         };
 
@@ -356,25 +295,15 @@ examples:
 
         otg-gp-pins {
             samsung,pins = "gpx3-3";
-<<<<<<< HEAD
             samsung,pin-function = <1>;
             samsung,pin-pud = <0>;
             samsung,pin-drv = <0>;
-=======
-            samsung,pin-function = <EXYNOS_PIN_FUNC_OUTPUT>;
-            samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
-            samsung,pin-drv = <EXYNOS4_PIN_DRV_LV1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             samsung,pin-val = <0>;
         };
     };
 
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-<<<<<<< HEAD
-=======
-    #include <dt-bindings/pinctrl/samsung.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     pinctrl@10580000 {
         compatible = "samsung,exynos5433-pinctrl";
@@ -418,15 +347,9 @@ examples:
         initial_alive: initial-state {
             gpa0-0-pin {
                 samsung,pins = "gpa0-0";
-<<<<<<< HEAD
                 samsung,pin-function = <0>;
                 samsung,pin-pud = <1>;
                 samsung,pin-drv = <0>;
-=======
-                samsung,pin-function = <EXYNOS_PIN_FUNC_INPUT>;
-                samsung,pin-pud = <EXYNOS_PIN_PULL_DOWN>;
-                samsung,pin-drv = <EXYNOS5433_PIN_DRV_FAST_SR1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             };
 
             // ...
@@ -435,10 +358,6 @@ examples:
 
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-<<<<<<< HEAD
-=======
-    #include <dt-bindings/pinctrl/samsung.h>
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     pinctrl@114b0000 {
         compatible = "samsung,exynos5433-pinctrl";
@@ -459,15 +378,9 @@ examples:
         i2s0-bus-pins {
             samsung,pins = "gpz0-0", "gpz0-1", "gpz0-2", "gpz0-3",
                            "gpz0-4", "gpz0-5", "gpz0-6";
-<<<<<<< HEAD
             samsung,pin-function = <2>;
             samsung,pin-pud = <0>;
             samsung,pin-drv = <0>;
-=======
-            samsung,pin-function = <EXYNOS_PIN_FUNC_2>;
-            samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
-            samsung,pin-drv = <EXYNOS5433_PIN_DRV_FAST_SR1>;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         };
 
         // ...

@@ -129,13 +129,9 @@ struct snd_usb_endpoint {
 					   in a stream */
 	bool implicit_fb_sync;		/* syncs with implicit feedback */
 	bool lowlatency_playback;	/* low-latency playback mode */
-<<<<<<< HEAD
 	bool need_setup;		/* (re-)need for hw_params? */
 	bool need_prepare;		/* (re-)need for prepare? */
 	bool fixed_rate;		/* skip rate setup */
-=======
-	bool need_setup;		/* (re-)need for configure? */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* for hw constraints */
 	const struct audioformat *cur_audiofmt;

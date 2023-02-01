@@ -158,12 +158,8 @@ config WERROR
 	default COMPILE_TEST
 	help
 	  A kernel build should not cause any compiler warnings, and this
-<<<<<<< HEAD
 	  enables the '-Werror' (for C) and '-Dwarnings' (for Rust) flags
 	  to enforce that rule by default.
-=======
-	  enables the '-Werror' flag to enforce that rule by default.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	  However, if you have a new (or very old) compiler with odd and
 	  unusual warnings, or you have some architecture with problems,
@@ -896,25 +892,17 @@ config CC_IMPLICIT_FALLTHROUGH
 	default "-Wimplicit-fallthrough=5" if CC_IS_GCC && $(cc-option,-Wimplicit-fallthrough=5)
 	default "-Wimplicit-fallthrough" if CC_IS_CLANG && $(cc-option,-Wunreachable-code-fallthrough)
 
-<<<<<<< HEAD
 # Currently, disable gcc-11,12 array-bounds globally.
 # We may want to target only particular configurations some day.
 config GCC11_NO_ARRAY_BOUNDS
 	def_bool y
 
-=======
-# Currently, disable gcc-12 array-bounds globally.
-# We may want to target only particular configurations some day.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config GCC12_NO_ARRAY_BOUNDS
 	def_bool y
 
 config CC_NO_ARRAY_BOUNDS
 	bool
-<<<<<<< HEAD
 	default y if CC_IS_GCC && GCC_VERSION >= 110000 && GCC_VERSION < 120000 && GCC11_NO_ARRAY_BOUNDS
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default y if CC_IS_GCC && GCC_VERSION >= 120000 && GCC_VERSION < 130000 && GCC12_NO_ARRAY_BOUNDS
 
 #

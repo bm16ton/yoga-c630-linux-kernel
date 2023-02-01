@@ -50,10 +50,7 @@
 #include <linux/memory.h>
 #include <linux/random.h>
 #include <linux/sched/sysctl.h>
-<<<<<<< HEAD
 #include <linux/memory-tiers.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <asm/tlbflush.h>
 
@@ -202,11 +199,7 @@ static bool remove_migration_pte(struct folio *folio,
 #endif
 
 		folio_get(folio);
-<<<<<<< HEAD
 		pte = mk_pte(new, READ_ONCE(vma->vm_page_prot));
-=======
-		pte = pte_mkold(mk_pte(new, READ_ONCE(vma->vm_page_prot)));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (pte_swp_soft_dirty(*pvmw.pte))
 			pte = pte_mksoft_dirty(pte);
 
@@ -214,13 +207,10 @@ static bool remove_migration_pte(struct folio *folio,
 		 * Recheck VMA as permissions can change since migration started
 		 */
 		entry = pte_to_swp_entry(*pvmw.pte);
-<<<<<<< HEAD
 		if (!is_migration_entry_young(entry))
 			pte = pte_mkold(pte);
 		if (folio_test_dirty(folio) && is_migration_entry_dirty(entry))
 			pte = pte_mkdirty(pte);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (is_writable_migration_entry(entry))
 			pte = maybe_mkwrite(pte, vma);
 		else if (pte_swp_uffd_wp(*pvmw.pte))
@@ -575,7 +565,6 @@ void folio_migrate_flags(struct folio *newfolio, struct folio *folio)
 	 * future migrations of this same page.
 	 */
 	cpupid = page_cpupid_xchg_last(&folio->page, -1);
-<<<<<<< HEAD
 	/*
 	 * For memory tiering mode, when migrate between slow and fast
 	 * memory node, reset cpupid, because that is used to record
@@ -588,8 +577,6 @@ void folio_migrate_flags(struct folio *newfolio, struct folio *folio)
 		if (f_toptier != t_toptier)
 			cpupid = -1;
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	page_cpupid_xchg_last(&newfolio->page, cpupid);
 
 	folio_migrate_ksm(newfolio, folio);
@@ -638,35 +625,14 @@ EXPORT_SYMBOL(folio_migrate_copy);
  *                    Migration functions
  ***********************************************************/
 
-<<<<<<< HEAD
 int migrate_folio_extra(struct address_space *mapping, struct folio *dst,
 		struct folio *src, enum migrate_mode mode, int extra_count)
-=======
-/**
- * migrate_folio() - Simple folio migration.
- * @mapping: The address_space containing the folio.
- * @dst: The folio to migrate the data to.
- * @src: The folio containing the current data.
- * @mode: How to migrate the page.
- *
- * Common logic to directly migrate a single LRU folio suitable for
- * folios that do not use PagePrivate/PagePrivate2.
- *
- * Folios are locked upon entry and exit.
- */
-int migrate_folio(struct address_space *mapping, struct folio *dst,
-		struct folio *src, enum migrate_mode mode)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int rc;
 
 	BUG_ON(folio_test_writeback(src));	/* Writeback must be complete */
 
-<<<<<<< HEAD
 	rc = folio_migrate_mapping(mapping, dst, src, extra_count);
-=======
-	rc = folio_migrate_mapping(mapping, dst, src, 0);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (rc != MIGRATEPAGE_SUCCESS)
 		return rc;
@@ -677,7 +643,6 @@ int migrate_folio(struct address_space *mapping, struct folio *dst,
 		folio_migrate_flags(dst, src);
 	return MIGRATEPAGE_SUCCESS;
 }
-<<<<<<< HEAD
 
 /**
  * migrate_folio() - Simple folio migration.
@@ -696,8 +661,6 @@ int migrate_folio(struct address_space *mapping, struct folio *dst,
 {
 	return migrate_folio_extra(mapping, dst, src, mode, 0);
 }
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EXPORT_SYMBOL(migrate_folio);
 
 #ifdef CONFIG_BLOCK
@@ -1039,8 +1002,6 @@ out:
 static int __unmap_and_move(struct folio *src, struct folio *dst,
 				int force, enum migrate_mode mode)
 {
-	struct folio *folio = page_folio(page);
-	struct folio *dst = page_folio(newpage);
 	int rc = -EAGAIN;
 	bool page_was_mapped = false;
 	struct anon_vma *anon_vma = NULL;
@@ -1090,13 +1051,8 @@ static int __unmap_and_move(struct folio *src, struct folio *dst,
 	}
 
 	/*
-<<<<<<< HEAD
 	 * By try_to_migrate(), src->mapcount goes down to 0 here. In this case,
 	 * we cannot notice that anon_vma is freed while we migrate a page.
-=======
-	 * By try_to_migrate(), page->mapcount goes down to 0 here. In this case,
-	 * we cannot notice that anon_vma is freed while we migrates a page.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * This get_anon_vma() delays freeing anon_vma pointer until the end
 	 * of migration. File cache pages are no problem because of page_lock()
 	 * File Caches may use write_page() or lock_page() in migration, then,
@@ -1123,11 +1079,7 @@ static int __unmap_and_move(struct folio *src, struct folio *dst,
 		goto out_unlock;
 
 	if (unlikely(!is_lru)) {
-<<<<<<< HEAD
 		rc = move_to_new_folio(dst, src, mode);
-=======
-		rc = move_to_new_folio(dst, folio, mode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_unlock_both;
 	}
 
@@ -1143,21 +1095,13 @@ static int __unmap_and_move(struct folio *src, struct folio *dst,
 	 * invisible to the vm, so the page can not be migrated.  So try to
 	 * free the metadata, so the page can be freed.
 	 */
-<<<<<<< HEAD
 	if (!src->mapping) {
 		if (folio_test_private(src)) {
 			try_to_free_buffers(src);
-=======
-	if (!page->mapping) {
-		VM_BUG_ON_PAGE(PageAnon(page), page);
-		if (page_has_private(page)) {
-			try_to_free_buffers(folio);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto out_unlock_both;
 		}
 	} else if (folio_mapped(src)) {
 		/* Establish migration ptes */
-<<<<<<< HEAD
 		VM_BUG_ON_FOLIO(folio_test_anon(src) &&
 			       !folio_test_ksm(src) && !anon_vma, src);
 		try_to_migrate(src, 0);
@@ -1171,44 +1115,20 @@ static int __unmap_and_move(struct folio *src, struct folio *dst,
 	 * When successful, push dst to LRU immediately: so that if it
 	 * turns out to be an mlocked page, remove_migration_ptes() will
 	 * automatically build up the correct dst->mlock_count for it.
-=======
-		VM_BUG_ON_PAGE(PageAnon(page) && !PageKsm(page) && !anon_vma,
-				page);
-		try_to_migrate(folio, 0);
-		page_was_mapped = true;
-	}
-
-	if (!page_mapped(page))
-		rc = move_to_new_folio(dst, folio, mode);
-
-	/*
-	 * When successful, push newpage to LRU immediately: so that if it
-	 * turns out to be an mlocked page, remove_migration_ptes() will
-	 * automatically build up the correct newpage->mlock_count for it.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *
 	 * We would like to do something similar for the old page, when
 	 * unsuccessful, and other cases when a page has been temporarily
 	 * isolated from the unevictable LRU: but this case is the easiest.
 	 */
 	if (rc == MIGRATEPAGE_SUCCESS) {
-<<<<<<< HEAD
 		folio_add_lru(dst);
-=======
-		lru_cache_add(newpage);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (page_was_mapped)
 			lru_add_drain();
 	}
 
 	if (page_was_mapped)
-<<<<<<< HEAD
 		remove_migration_ptes(src,
 			rc == MIGRATEPAGE_SUCCESS ? dst : src, false);
-=======
-		remove_migration_ptes(folio,
-			rc == MIGRATEPAGE_SUCCESS ? dst : folio, false);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out_unlock_both:
 	folio_unlock(dst);
@@ -1219,20 +1139,12 @@ out_unlock:
 	folio_unlock(src);
 out:
 	/*
-<<<<<<< HEAD
 	 * If migration is successful, decrease refcount of dst,
-=======
-	 * If migration is successful, decrease refcount of the newpage,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * which will not free the page because new page owner increased
 	 * refcounter.
 	 */
 	if (rc == MIGRATEPAGE_SUCCESS)
-<<<<<<< HEAD
 		folio_put(dst);
-=======
-		put_page(newpage);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return rc;
 }
@@ -1269,11 +1181,7 @@ static int unmap_and_move(new_page_t get_new_page,
 	dst = page_folio(newpage);
 
 	newpage->private = 0;
-<<<<<<< HEAD
 	rc = __unmap_and_move(src, dst, force, mode);
-=======
-	rc = __unmap_and_move(page, newpage, force, mode);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (rc == MIGRATEPAGE_SUCCESS)
 		set_page_owner_migrate_reason(newpage, reason);
 
@@ -1401,11 +1309,7 @@ static int unmap_and_move_huge_page(new_page_t get_new_page,
 	if (unlikely(!folio_trylock(dst)))
 		goto put_anon;
 
-<<<<<<< HEAD
 	if (folio_mapped(src)) {
-=======
-	if (page_mapped(hpage)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		enum ttu_flags ttu = 0;
 
 		if (!folio_test_anon(src)) {
@@ -1429,11 +1333,7 @@ static int unmap_and_move_huge_page(new_page_t get_new_page,
 			i_mmap_unlock_write(mapping);
 	}
 
-<<<<<<< HEAD
 	if (!folio_mapped(src))
-=======
-	if (!page_mapped(hpage))
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rc = move_to_new_folio(dst, src, mode);
 
 	if (page_was_mapped)
@@ -1458,11 +1358,7 @@ out:
 	if (rc == MIGRATEPAGE_SUCCESS)
 		putback_active_hugepage(hpage);
 	else if (rc != -EAGAIN)
-<<<<<<< HEAD
 		list_move_tail(&src->lru, ret);
-=======
-		list_move_tail(&hpage->lru, ret);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * If migration was not successful and there's a freeing callback, use
@@ -1523,10 +1419,7 @@ int migrate_pages(struct list_head *from, new_page_t get_new_page,
 	int thp_retry = 1;
 	int nr_failed = 0;
 	int nr_failed_pages = 0;
-<<<<<<< HEAD
 	int nr_retry_pages = 0;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int nr_succeeded = 0;
 	int nr_thp_succeeded = 0;
 	int nr_thp_failed = 0;
@@ -1593,11 +1486,7 @@ thp_subpage_migration:
 				/* THP migration is unsupported */
 				if (is_thp) {
 					nr_thp_failed++;
-<<<<<<< HEAD
 					if (!try_split_thp(page, &thp_split_pages)) {
-=======
-					if (!try_split_thp(page, &page2, &thp_split_pages)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						nr_thp_split++;
 						break;
 					}
@@ -1607,27 +1496,17 @@ thp_subpage_migration:
 				}
 
 				nr_failed_pages += nr_subpages;
-<<<<<<< HEAD
 				list_move_tail(&page->lru, &ret_pages);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				break;
 			case -ENOMEM:
 				/*
 				 * When memory is low, don't bother to try to migrate
 				 * other pages, just exit.
-				 * THP NUMA faulting doesn't split THP to retry.
 				 */
-<<<<<<< HEAD
 				if (is_thp) {
 					nr_thp_failed++;
 					/* THP NUMA faulting doesn't split THP to retry. */
 					if (!nosplit && !try_split_thp(page, &thp_split_pages)) {
-=======
-				if (is_thp && !nosplit) {
-					nr_thp_failed++;
-					if (!try_split_thp(page, &page2, &thp_split_pages)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						nr_thp_split++;
 						break;
 					}
@@ -1635,11 +1514,7 @@ thp_subpage_migration:
 					nr_failed++;
 				}
 
-<<<<<<< HEAD
 				nr_failed_pages += nr_subpages + nr_retry_pages;
-=======
-				nr_failed_pages += nr_subpages;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				/*
 				 * There might be some subpages of fail-to-migrate THPs
 				 * left in thp_split_pages list. Move them back to migration
@@ -1647,23 +1522,15 @@ thp_subpage_migration:
 				 * the caller otherwise the page refcnt will be leaked.
 				 */
 				list_splice_init(&thp_split_pages, from);
-<<<<<<< HEAD
 				/* nr_failed isn't updated for not used */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				nr_thp_failed += thp_retry;
 				goto out;
 			case -EAGAIN:
 				if (is_thp)
 					thp_retry++;
-<<<<<<< HEAD
 				else if (!no_subpage_counting)
 					retry++;
 				nr_retry_pages += nr_subpages;
-=======
-				else
-					retry++;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				break;
 			case MIGRATEPAGE_SUCCESS:
 				nr_succeeded += nr_subpages;
@@ -1689,10 +1556,7 @@ thp_subpage_migration:
 	}
 	nr_failed += retry;
 	nr_thp_failed += thp_retry;
-<<<<<<< HEAD
 	nr_failed_pages += nr_retry_pages;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Try to migrate subpages of fail-to-migrate THPs, no nr_failed
 	 * counting in this round, since all subpages of a THP is counted
@@ -1839,7 +1703,7 @@ static int add_page_for_migration(struct mm_struct *mm, unsigned long addr,
 		goto out;
 
 	err = -ENOENT;
-	if (!page || is_zone_device_page(page))
+	if (!page)
 		goto out;
 
 	if (is_zone_device_page(page))
@@ -2036,17 +1900,12 @@ static void do_pages_stat_array(struct mm_struct *mm, unsigned long nr_pages,
 			foll_flags |= FOLL_GET;
 
 		/* FOLL_DUMP to ignore special (like zero) pages */
-<<<<<<< HEAD
 		page = follow_page(vma, addr, foll_flags);
-=======
-		page = follow_page(vma, addr, FOLL_GET | FOLL_DUMP);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		err = PTR_ERR(page);
 		if (IS_ERR(page))
 			goto set_status;
 
-<<<<<<< HEAD
 		err = -ENOENT;
 		if (!page)
 			goto set_status;
@@ -2056,14 +1915,6 @@ static void do_pages_stat_array(struct mm_struct *mm, unsigned long nr_pages,
 
 		if (foll_flags & FOLL_GET)
 			put_page(page);
-=======
-		if (page && !is_zone_device_page(page)) {
-			err = page_to_nid(page);
-			put_page(page);
-		} else {
-			err = -ENOENT;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 set_status:
 		*status = err;
 
@@ -2365,459 +2216,4 @@ out:
 	return 0;
 }
 #endif /* CONFIG_NUMA_BALANCING */
-<<<<<<< HEAD
-=======
-
-/*
- * node_demotion[] example:
- *
- * Consider a system with two sockets.  Each socket has
- * three classes of memory attached: fast, medium and slow.
- * Each memory class is placed in its own NUMA node.  The
- * CPUs are placed in the node with the "fast" memory.  The
- * 6 NUMA nodes (0-5) might be split among the sockets like
- * this:
- *
- *	Socket A: 0, 1, 2
- *	Socket B: 3, 4, 5
- *
- * When Node 0 fills up, its memory should be migrated to
- * Node 1.  When Node 1 fills up, it should be migrated to
- * Node 2.  The migration path start on the nodes with the
- * processors (since allocations default to this node) and
- * fast memory, progress through medium and end with the
- * slow memory:
- *
- *	0 -> 1 -> 2 -> stop
- *	3 -> 4 -> 5 -> stop
- *
- * This is represented in the node_demotion[] like this:
- *
- *	{  nr=1, nodes[0]=1 }, // Node 0 migrates to 1
- *	{  nr=1, nodes[0]=2 }, // Node 1 migrates to 2
- *	{  nr=0, nodes[0]=-1 }, // Node 2 does not migrate
- *	{  nr=1, nodes[0]=4 }, // Node 3 migrates to 4
- *	{  nr=1, nodes[0]=5 }, // Node 4 migrates to 5
- *	{  nr=0, nodes[0]=-1 }, // Node 5 does not migrate
- *
- * Moreover some systems may have multiple slow memory nodes.
- * Suppose a system has one socket with 3 memory nodes, node 0
- * is fast memory type, and node 1/2 both are slow memory
- * type, and the distance between fast memory node and slow
- * memory node is same. So the migration path should be:
- *
- *	0 -> 1/2 -> stop
- *
- * This is represented in the node_demotion[] like this:
- *	{ nr=2, {nodes[0]=1, nodes[1]=2} }, // Node 0 migrates to node 1 and node 2
- *	{ nr=0, nodes[0]=-1, }, // Node 1 dose not migrate
- *	{ nr=0, nodes[0]=-1, }, // Node 2 does not migrate
- */
-
-/*
- * Writes to this array occur without locking.  Cycles are
- * not allowed: Node X demotes to Y which demotes to X...
- *
- * If multiple reads are performed, a single rcu_read_lock()
- * must be held over all reads to ensure that no cycles are
- * observed.
- */
-#define DEFAULT_DEMOTION_TARGET_NODES 15
-
-#if MAX_NUMNODES < DEFAULT_DEMOTION_TARGET_NODES
-#define DEMOTION_TARGET_NODES	(MAX_NUMNODES - 1)
-#else
-#define DEMOTION_TARGET_NODES	DEFAULT_DEMOTION_TARGET_NODES
-#endif
-
-struct demotion_nodes {
-	unsigned short nr;
-	short nodes[DEMOTION_TARGET_NODES];
-};
-
-static struct demotion_nodes *node_demotion __read_mostly;
-
-/**
- * next_demotion_node() - Get the next node in the demotion path
- * @node: The starting node to lookup the next node
- *
- * Return: node id for next memory node in the demotion path hierarchy
- * from @node; NUMA_NO_NODE if @node is terminal.  This does not keep
- * @node online or guarantee that it *continues* to be the next demotion
- * target.
- */
-int next_demotion_node(int node)
-{
-	struct demotion_nodes *nd;
-	unsigned short target_nr, index;
-	int target;
-
-	if (!node_demotion)
-		return NUMA_NO_NODE;
-
-	nd = &node_demotion[node];
-
-	/*
-	 * node_demotion[] is updated without excluding this
-	 * function from running.  RCU doesn't provide any
-	 * compiler barriers, so the READ_ONCE() is required
-	 * to avoid compiler reordering or read merging.
-	 *
-	 * Make sure to use RCU over entire code blocks if
-	 * node_demotion[] reads need to be consistent.
-	 */
-	rcu_read_lock();
-	target_nr = READ_ONCE(nd->nr);
-
-	switch (target_nr) {
-	case 0:
-		target = NUMA_NO_NODE;
-		goto out;
-	case 1:
-		index = 0;
-		break;
-	default:
-		/*
-		 * If there are multiple target nodes, just select one
-		 * target node randomly.
-		 *
-		 * In addition, we can also use round-robin to select
-		 * target node, but we should introduce another variable
-		 * for node_demotion[] to record last selected target node,
-		 * that may cause cache ping-pong due to the changing of
-		 * last target node. Or introducing per-cpu data to avoid
-		 * caching issue, which seems more complicated. So selecting
-		 * target node randomly seems better until now.
-		 */
-		index = get_random_int() % target_nr;
-		break;
-	}
-
-	target = READ_ONCE(nd->nodes[index]);
-
-out:
-	rcu_read_unlock();
-	return target;
-}
-
-/* Disable reclaim-based migration. */
-static void __disable_all_migrate_targets(void)
-{
-	int node, i;
-
-	if (!node_demotion)
-		return;
-
-	for_each_online_node(node) {
-		node_demotion[node].nr = 0;
-		for (i = 0; i < DEMOTION_TARGET_NODES; i++)
-			node_demotion[node].nodes[i] = NUMA_NO_NODE;
-	}
-}
-
-static void disable_all_migrate_targets(void)
-{
-	__disable_all_migrate_targets();
-
-	/*
-	 * Ensure that the "disable" is visible across the system.
-	 * Readers will see either a combination of before+disable
-	 * state or disable+after.  They will never see before and
-	 * after state together.
-	 *
-	 * The before+after state together might have cycles and
-	 * could cause readers to do things like loop until this
-	 * function finishes.  This ensures they can only see a
-	 * single "bad" read and would, for instance, only loop
-	 * once.
-	 */
-	synchronize_rcu();
-}
-
-/*
- * Find an automatic demotion target for 'node'.
- * Failing here is OK.  It might just indicate
- * being at the end of a chain.
- */
-static int establish_migrate_target(int node, nodemask_t *used,
-				    int best_distance)
-{
-	int migration_target, index, val;
-	struct demotion_nodes *nd;
-
-	if (!node_demotion)
-		return NUMA_NO_NODE;
-
-	nd = &node_demotion[node];
-
-	migration_target = find_next_best_node(node, used);
-	if (migration_target == NUMA_NO_NODE)
-		return NUMA_NO_NODE;
-
-	/*
-	 * If the node has been set a migration target node before,
-	 * which means it's the best distance between them. Still
-	 * check if this node can be demoted to other target nodes
-	 * if they have a same best distance.
-	 */
-	if (best_distance != -1) {
-		val = node_distance(node, migration_target);
-		if (val > best_distance)
-			goto out_clear;
-	}
-
-	index = nd->nr;
-	if (WARN_ONCE(index >= DEMOTION_TARGET_NODES,
-		      "Exceeds maximum demotion target nodes\n"))
-		goto out_clear;
-
-	nd->nodes[index] = migration_target;
-	nd->nr++;
-
-	return migration_target;
-out_clear:
-	node_clear(migration_target, *used);
-	return NUMA_NO_NODE;
-}
-
-/*
- * When memory fills up on a node, memory contents can be
- * automatically migrated to another node instead of
- * discarded at reclaim.
- *
- * Establish a "migration path" which will start at nodes
- * with CPUs and will follow the priorities used to build the
- * page allocator zonelists.
- *
- * The difference here is that cycles must be avoided.  If
- * node0 migrates to node1, then neither node1, nor anything
- * node1 migrates to can migrate to node0. Also one node can
- * be migrated to multiple nodes if the target nodes all have
- * a same best-distance against the source node.
- *
- * This function can run simultaneously with readers of
- * node_demotion[].  However, it can not run simultaneously
- * with itself.  Exclusion is provided by memory hotplug events
- * being single-threaded.
- */
-static void __set_migration_target_nodes(void)
-{
-	nodemask_t next_pass;
-	nodemask_t this_pass;
-	nodemask_t used_targets = NODE_MASK_NONE;
-	int node, best_distance;
-
-	/*
-	 * Avoid any oddities like cycles that could occur
-	 * from changes in the topology.  This will leave
-	 * a momentary gap when migration is disabled.
-	 */
-	disable_all_migrate_targets();
-
-	/*
-	 * Allocations go close to CPUs, first.  Assume that
-	 * the migration path starts at the nodes with CPUs.
-	 */
-	next_pass = node_states[N_CPU];
-again:
-	this_pass = next_pass;
-	next_pass = NODE_MASK_NONE;
-	/*
-	 * To avoid cycles in the migration "graph", ensure
-	 * that migration sources are not future targets by
-	 * setting them in 'used_targets'.  Do this only
-	 * once per pass so that multiple source nodes can
-	 * share a target node.
-	 *
-	 * 'used_targets' will become unavailable in future
-	 * passes.  This limits some opportunities for
-	 * multiple source nodes to share a destination.
-	 */
-	nodes_or(used_targets, used_targets, this_pass);
-
-	for_each_node_mask(node, this_pass) {
-		best_distance = -1;
-
-		/*
-		 * Try to set up the migration path for the node, and the target
-		 * migration nodes can be multiple, so doing a loop to find all
-		 * the target nodes if they all have a best node distance.
-		 */
-		do {
-			int target_node =
-				establish_migrate_target(node, &used_targets,
-							 best_distance);
-
-			if (target_node == NUMA_NO_NODE)
-				break;
-
-			if (best_distance == -1)
-				best_distance = node_distance(node, target_node);
-
-			/*
-			 * Visit targets from this pass in the next pass.
-			 * Eventually, every node will have been part of
-			 * a pass, and will become set in 'used_targets'.
-			 */
-			node_set(target_node, next_pass);
-		} while (1);
-	}
-	/*
-	 * 'next_pass' contains nodes which became migration
-	 * targets in this pass.  Make additional passes until
-	 * no more migrations targets are available.
-	 */
-	if (!nodes_empty(next_pass))
-		goto again;
-}
-
-/*
- * For callers that do not hold get_online_mems() already.
- */
-void set_migration_target_nodes(void)
-{
-	get_online_mems();
-	__set_migration_target_nodes();
-	put_online_mems();
-}
-
-/*
- * This leaves migrate-on-reclaim transiently disabled between
- * the MEM_GOING_OFFLINE and MEM_OFFLINE events.  This runs
- * whether reclaim-based migration is enabled or not, which
- * ensures that the user can turn reclaim-based migration at
- * any time without needing to recalculate migration targets.
- *
- * These callbacks already hold get_online_mems().  That is why
- * __set_migration_target_nodes() can be used as opposed to
- * set_migration_target_nodes().
- */
-#ifdef CONFIG_MEMORY_HOTPLUG
-static int __meminit migrate_on_reclaim_callback(struct notifier_block *self,
-						 unsigned long action, void *_arg)
-{
-	struct memory_notify *arg = _arg;
-
-	/*
-	 * Only update the node migration order when a node is
-	 * changing status, like online->offline.  This avoids
-	 * the overhead of synchronize_rcu() in most cases.
-	 */
-	if (arg->status_change_nid < 0)
-		return notifier_from_errno(0);
-
-	switch (action) {
-	case MEM_GOING_OFFLINE:
-		/*
-		 * Make sure there are not transient states where
-		 * an offline node is a migration target.  This
-		 * will leave migration disabled until the offline
-		 * completes and the MEM_OFFLINE case below runs.
-		 */
-		disable_all_migrate_targets();
-		break;
-	case MEM_OFFLINE:
-	case MEM_ONLINE:
-		/*
-		 * Recalculate the target nodes once the node
-		 * reaches its final state (online or offline).
-		 */
-		__set_migration_target_nodes();
-		break;
-	case MEM_CANCEL_OFFLINE:
-		/*
-		 * MEM_GOING_OFFLINE disabled all the migration
-		 * targets.  Reenable them.
-		 */
-		__set_migration_target_nodes();
-		break;
-	case MEM_GOING_ONLINE:
-	case MEM_CANCEL_ONLINE:
-		break;
-	}
-
-	return notifier_from_errno(0);
-}
-#endif
-
-void __init migrate_on_reclaim_init(void)
-{
-	node_demotion = kcalloc(nr_node_ids,
-				sizeof(struct demotion_nodes),
-				GFP_KERNEL);
-	WARN_ON(!node_demotion);
-#ifdef CONFIG_MEMORY_HOTPLUG
-	hotplug_memory_notifier(migrate_on_reclaim_callback, 100);
-#endif
-	/*
-	 * At this point, all numa nodes with memory/CPus have their state
-	 * properly set, so we can build the demotion order now.
-	 * Let us hold the cpu_hotplug lock just, as we could possibily have
-	 * CPU hotplug events during boot.
-	 */
-	cpus_read_lock();
-	set_migration_target_nodes();
-	cpus_read_unlock();
-}
-
-bool numa_demotion_enabled = false;
-
-#ifdef CONFIG_SYSFS
-static ssize_t numa_demotion_enabled_show(struct kobject *kobj,
-					  struct kobj_attribute *attr, char *buf)
-{
-	return sysfs_emit(buf, "%s\n",
-			  numa_demotion_enabled ? "true" : "false");
-}
-
-static ssize_t numa_demotion_enabled_store(struct kobject *kobj,
-					   struct kobj_attribute *attr,
-					   const char *buf, size_t count)
-{
-	ssize_t ret;
-
-	ret = kstrtobool(buf, &numa_demotion_enabled);
-	if (ret)
-		return ret;
-
-	return count;
-}
-
-static struct kobj_attribute numa_demotion_enabled_attr =
-	__ATTR(demotion_enabled, 0644, numa_demotion_enabled_show,
-	       numa_demotion_enabled_store);
-
-static struct attribute *numa_attrs[] = {
-	&numa_demotion_enabled_attr.attr,
-	NULL,
-};
-
-static const struct attribute_group numa_attr_group = {
-	.attrs = numa_attrs,
-};
-
-static int __init numa_init_sysfs(void)
-{
-	int err;
-	struct kobject *numa_kobj;
-
-	numa_kobj = kobject_create_and_add("numa", mm_kobj);
-	if (!numa_kobj) {
-		pr_err("failed to create numa kobject\n");
-		return -ENOMEM;
-	}
-	err = sysfs_create_group(numa_kobj, &numa_attr_group);
-	if (err) {
-		pr_err("failed to register numa group\n");
-		goto delete_obj;
-	}
-	return 0;
-
-delete_obj:
-	kobject_put(numa_kobj);
-	return err;
-}
-subsys_initcall(numa_init_sysfs);
-#endif /* CONFIG_SYSFS */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_NUMA */

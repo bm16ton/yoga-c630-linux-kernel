@@ -184,11 +184,8 @@ void mtk_clk_unregister_dividers(const struct mtk_clk_divider *mcds, int num,
 				 struct clk_hw_onecell_data *clk_data);
 
 struct clk_hw_onecell_data *mtk_alloc_clk_data(unsigned int clk_num);
-<<<<<<< HEAD
 struct clk_hw_onecell_data *mtk_devm_alloc_clk_data(struct device *dev,
 						    unsigned int clk_num);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void mtk_free_clk_data(struct clk_hw_onecell_data *clk_data);
 
 struct clk_hw *mtk_clk_register_ref2usb_tx(const char *name,

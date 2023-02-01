@@ -281,11 +281,7 @@ struct rpc_clnt *nfs4_negotiate_security(struct rpc_clnt *, struct inode *,
 int nfs4_submount(struct fs_context *, struct nfs_server *);
 int nfs4_replace_transport(struct nfs_server *server,
 				const struct nfs4_fs_locations *locations);
-<<<<<<< HEAD
 size_t nfs_parse_server_name(char *string, size_t len, struct sockaddr_storage *ss,
-=======
-size_t nfs_parse_server_name(char *string, size_t len, struct sockaddr *sa,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			     size_t salen, struct net *net, int port);
 /* nfs4proc.c */
 extern int nfs4_handle_exception(struct nfs_server *, int, struct nfs4_exception *);

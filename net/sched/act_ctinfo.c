@@ -156,11 +156,7 @@ static int tcf_ctinfo_init(struct net *net, struct nlattr *nla,
 			   struct tcf_proto *tp, u32 flags,
 			   struct netlink_ext_ack *extack)
 {
-<<<<<<< HEAD
 	struct tc_action_net *tn = net_generic(net, act_ctinfo_ops.net_id);
-=======
-	struct tc_action_net *tn = net_generic(net, ctinfo_net_id);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bind = flags & TCA_ACT_FLAGS_BIND;
 	u32 dscpmask = 0, dscpstatemask, index;
 	struct nlattr *tb[TCA_CTINFO_MAX + 1];

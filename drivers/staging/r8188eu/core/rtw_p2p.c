@@ -1883,25 +1883,14 @@ void init_wifidirect_info(struct adapter *padapter, enum P2P_ROLE role)
 
 int rtw_p2p_enable(struct adapter *padapter, enum P2P_ROLE role)
 {
-<<<<<<< HEAD
 	int ret;
-=======
-	int ret = _SUCCESS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct wifidirect_info *pwdinfo = &padapter->wdinfo;
 
 	if (role == P2P_ROLE_DEVICE || role == P2P_ROLE_CLIENT || role == P2P_ROLE_GO) {
 		/* leave IPS/Autosuspend */
-<<<<<<< HEAD
 		ret = rtw_pwr_wakeup(padapter);
 		if (ret)
 			return ret;
-=======
-		if (rtw_pwr_wakeup(padapter)) {
-			ret = _FAIL;
-			goto exit;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*	Added by Albert 2011/03/22 */
 		/*	In the P2P mode, the driver should not support the b mode. */
@@ -1912,16 +1901,9 @@ int rtw_p2p_enable(struct adapter *padapter, enum P2P_ROLE role)
 		init_wifidirect_info(padapter, role);
 
 	} else if (role == P2P_ROLE_DISABLE) {
-<<<<<<< HEAD
 		ret = rtw_pwr_wakeup(padapter);
 		if (ret)
 			return ret;
-=======
-		if (rtw_pwr_wakeup(padapter)) {
-			ret = _FAIL;
-			goto exit;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Disable P2P function */
 		if (!rtw_p2p_chk_state(pwdinfo, P2P_STATE_NONE)) {
@@ -1939,10 +1921,5 @@ int rtw_p2p_enable(struct adapter *padapter, enum P2P_ROLE role)
 		update_tx_basic_rate(padapter, padapter->registrypriv.wireless_mode);
 	}
 
-<<<<<<< HEAD
 	return 0;
-=======
-exit:
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

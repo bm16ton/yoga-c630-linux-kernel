@@ -50,12 +50,9 @@ struct ap_matrix_dev {
 	struct mutex mdevs_lock; /* serializes access to each ap_matrix_mdev */
 	struct ap_driver  *vfio_ap_drv;
 	struct mutex guests_lock; /* serializes access to each KVM guest */
-<<<<<<< HEAD
 	struct mdev_parent parent;
 	struct mdev_type mdev_type;
 	struct mdev_type *mdev_types[1];
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 extern struct ap_matrix_dev *matrix_dev;

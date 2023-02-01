@@ -206,7 +206,6 @@ enum lan966x_target {
 #define HSIO_HW_CFG_QSGMII_ENA_GET(x)\
 	FIELD_GET(HSIO_HW_CFG_QSGMII_ENA, x)
 
-<<<<<<< HEAD
 /*      HSIO:HW_CFGSTAT:RGMII_CFG */
 #define HSIO_RGMII_CFG(r)         __REG(TARGET_HSIO, 0, 1, 104, 0, 1, 52, 20, r, 2, 4)
 
@@ -249,6 +248,4 @@ enum lan966x_target {
 #define HSIO_DLL_CFG_DLL_RST_GET(x)\
 	FIELD_GET(HSIO_DLL_CFG_DLL_RST, x)
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _LAN966X_HSIO_REGS_H_ */

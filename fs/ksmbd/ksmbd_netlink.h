@@ -163,12 +163,8 @@ struct ksmbd_share_config_response {
 	__u16	force_directory_mode;
 	__u16	force_uid;
 	__u16	force_gid;
-<<<<<<< HEAD
 	__s8	share_name[KSMBD_REQ_MAX_SHARE_NAME];
 	__u32	reserved[112];		/* Reserved room */
-=======
-	__u32	reserved[128];		/* Reserved room */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__u32	veto_list_sz;
 	__s8	____payload[];
 };

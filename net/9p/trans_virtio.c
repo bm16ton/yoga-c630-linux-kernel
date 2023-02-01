@@ -532,16 +532,10 @@ req_retry_pinned:
 	spin_unlock_irqrestore(&chan->lock, flags);
 	kicked = 1;
 	p9_debug(P9_DEBUG_TRANS, "virtio request kicked\n");
-<<<<<<< HEAD
 	err = wait_event_killable(req->wq,
 			          READ_ONCE(req->status) >= REQ_STATUS_RCVD);
 	// RERROR needs reply (== error string) in static data
 	if (READ_ONCE(req->status) == REQ_STATUS_RCVD &&
-=======
-	err = wait_event_killable(req->wq, req->status >= REQ_STATUS_RCVD);
-	// RERROR needs reply (== error string) in static data
-	if (req->status == REQ_STATUS_RCVD &&
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    unlikely(req->rc.sdata[4] == P9_RERROR))
 		handle_rerror(req, in_hdr_len, offs, in_pages);
 

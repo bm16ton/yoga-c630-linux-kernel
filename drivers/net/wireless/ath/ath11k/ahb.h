@@ -32,14 +32,11 @@ struct ath11k_ahb {
 		u32 ce_size;
 		bool use_tz;
 	} fw;
-<<<<<<< HEAD
 	struct {
 		unsigned short seq_no;
 		unsigned int smem_bit;
 		struct qcom_smem_state *smem_state;
 	} smp2p_info;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct ath11k_ahb *ath11k_ahb_priv(struct ath11k_base *ab)

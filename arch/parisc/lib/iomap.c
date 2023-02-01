@@ -358,30 +358,7 @@ u64 ioread64be(const void __iomem *addr)
 		return iomap_ops[ADDR_TO_REGION(addr)]->read64be(addr);
 	return *((u64 *)addr);
 }
-<<<<<<< HEAD
 #endif
-=======
-
-u64 ioread64_lo_hi(const void __iomem *addr)
-{
-	u32 low, high;
-
-	low = ioread32(addr);
-	high = ioread32(addr + sizeof(u32));
-
-	return low + ((u64)high << 32);
-}
-
-u64 ioread64_hi_lo(const void __iomem *addr)
-{
-	u32 low, high;
-
-	high = ioread32(addr + sizeof(u32));
-	low = ioread32(addr);
-
-	return low + ((u64)high << 32);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void iowrite8(u8 datum, void __iomem *addr)
 {
@@ -446,22 +423,7 @@ void iowrite64be(u64 datum, void __iomem *addr)
 		*((u64 *)addr) = datum;
 	}
 }
-<<<<<<< HEAD
 #endif
-=======
-
-void iowrite64_lo_hi(u64 val, void __iomem *addr)
-{
-	iowrite32(val, addr);
-	iowrite32(val >> 32, addr + sizeof(u32));
-}
-
-void iowrite64_hi_lo(u64 val, void __iomem *addr)
-{
-	iowrite32(val >> 32, addr + sizeof(u32));
-	iowrite32(val, addr);
-}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Repeating interfaces */
 
@@ -569,12 +531,7 @@ EXPORT_SYMBOL(ioread32be);
 #ifdef CONFIG_64BIT
 EXPORT_SYMBOL(ioread64);
 EXPORT_SYMBOL(ioread64be);
-<<<<<<< HEAD
 #endif
-=======
-EXPORT_SYMBOL(ioread64_lo_hi);
-EXPORT_SYMBOL(ioread64_hi_lo);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EXPORT_SYMBOL(iowrite8);
 EXPORT_SYMBOL(iowrite16);
 EXPORT_SYMBOL(iowrite16be);
@@ -583,12 +540,7 @@ EXPORT_SYMBOL(iowrite32be);
 #ifdef CONFIG_64BIT
 EXPORT_SYMBOL(iowrite64);
 EXPORT_SYMBOL(iowrite64be);
-<<<<<<< HEAD
 #endif
-=======
-EXPORT_SYMBOL(iowrite64_lo_hi);
-EXPORT_SYMBOL(iowrite64_hi_lo);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 EXPORT_SYMBOL(ioread8_rep);
 EXPORT_SYMBOL(ioread16_rep);
 EXPORT_SYMBOL(ioread32_rep);

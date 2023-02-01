@@ -74,7 +74,6 @@ struct gsi_trans_pool {
 
 struct gsi_trans_info {
 	atomic_t tre_avail;		/* TREs available for allocation */
-<<<<<<< HEAD
 
 	u16 free_id;			/* first free trans in array */
 	u16 allocated_id;		/* first allocated transaction */
@@ -87,20 +86,6 @@ struct gsi_trans_info {
 
 	struct gsi_trans_pool sg_pool;	/* scatterlist pool */
 	struct gsi_trans_pool cmd_pool;	/* command payload DMA pool */
-=======
-	struct gsi_trans_pool pool;	/* transaction pool */
-	struct gsi_trans **map;		/* TRE -> transaction map */
-
-	struct gsi_trans_pool sg_pool;	/* scatterlist pool */
-	struct gsi_trans_pool cmd_pool;	/* command payload DMA pool */
-
-	spinlock_t spinlock;		/* protects updates to the lists */
-	struct list_head alloc;		/* allocated, not committed */
-	struct list_head committed;	/* committed, awaiting doorbell */
-	struct list_head pending;	/* pending, awaiting completion */
-	struct list_head complete;	/* completed, awaiting poll */
-	struct list_head polled;	/* returned by gsi_channel_poll_one() */
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Hardware values signifying the state of a channel */

@@ -808,11 +808,7 @@ static void opt3001_remove(struct i2c_client *client)
 	if (ret < 0) {
 		dev_err(opt->dev, "failed to read register %02x\n",
 				OPT3001_CONFIGURATION);
-<<<<<<< HEAD
 		return;
-=======
-		return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	reg = ret;

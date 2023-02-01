@@ -39,10 +39,7 @@
 #include <linux/string.h>
 #include <linux/zalloc.h>
 #include <linux/hash.h>
-<<<<<<< HEAD
 #include <ctype.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <errno.h>
 #include <signal.h>
 #include <inttypes.h>
@@ -128,10 +125,7 @@ struct perf_inject {
 	char			event_copy[PERF_SAMPLE_MAX_SIZE];
 	struct perf_file_section secs[HEADER_FEAT_BITS];
 	struct guest_session	guest_session;
-<<<<<<< HEAD
 	struct strlist		*known_build_ids;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct event_entry {
@@ -442,15 +436,10 @@ static struct dso *findnew_dso(int pid, int tid, const char *filename,
 	}
 
 	if (dso) {
-<<<<<<< HEAD
 		mutex_lock(&dso->lock);
 		nsinfo__put(dso->nsinfo);
 		dso->nsinfo = nsi;
 		mutex_unlock(&dso->lock);
-=======
-		nsinfo__put(dso->nsinfo);
-		dso->nsinfo = nsi;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else
 		nsinfo__put(nsi);
 
@@ -913,7 +902,6 @@ static int host_peek_vm_comms_cb(struct perf_session *session __maybe_unused,
 		 event->comm.tid, event->comm.comm, vcpu);
 	if (vcpu > INT_MAX) {
 		pr_err("Invalid VCPU %u\n", vcpu);
-<<<<<<< HEAD
 		return -EINVAL;
 	}
 	guest_vcpu = guest_session__vcpu(gs, vcpu);
@@ -923,17 +911,6 @@ static int host_peek_vm_comms_cb(struct perf_session *session __maybe_unused,
 		pr_err("Fatal error: Two threads found with the same VCPU\n");
 		return -EINVAL;
 	}
-=======
-		return -EINVAL;
-	}
-	guest_vcpu = guest_session__vcpu(gs, vcpu);
-	if (!guest_vcpu)
-		return -ENOMEM;
-	if (guest_vcpu->tid && guest_vcpu->tid != event->comm.tid) {
-		pr_err("Fatal error: Two threads found with the same VCPU\n");
-		return -EINVAL;
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	guest_vcpu->tid = event->comm.tid;
 
 	return guest_session__map_tid(gs, event->comm.tid, vcpu);
@@ -2210,22 +2187,16 @@ int cmd_inject(int argc, const char **argv)
 	};
 	int ret;
 	bool repipe = true;
-<<<<<<< HEAD
 	const char *known_build_ids = NULL;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct option options[] = {
 		OPT_BOOLEAN('b', "build-ids", &inject.build_ids,
 			    "Inject build-ids into the output stream"),
 		OPT_BOOLEAN(0, "buildid-all", &inject.build_id_all,
 			    "Inject build-ids of all DSOs into the output stream"),
-<<<<<<< HEAD
 		OPT_STRING(0, "known-build-ids", &known_build_ids,
 			   "buildid path [,buildid path...]",
 			   "build-ids to use for given paths"),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		OPT_STRING('i', "input", &inject.input_name, "file",
 			   "input file name"),
 		OPT_STRING('o', "output", &inject.output.path, "file",

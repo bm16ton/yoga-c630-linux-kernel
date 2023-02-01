@@ -2262,7 +2262,6 @@ xlog_write_full(
 	uint32_t		*data_cnt)
 {
 	int			index;
-<<<<<<< HEAD
 
 	ASSERT(*log_offset + *len <= iclog->ic_size ||
 		iclog->ic_state == XLOG_STATE_WANT_SYNC);
@@ -2275,20 +2274,6 @@ xlog_write_full(
 		struct xfs_log_iovec	*reg = &lv->lv_iovecp[index];
 		struct xlog_op_header	*ophdr = reg->i_addr;
 
-=======
-
-	ASSERT(*log_offset + *len <= iclog->ic_size ||
-		iclog->ic_state == XLOG_STATE_WANT_SYNC);
-
-	/*
-	 * Ordered log vectors have no regions to write so this
-	 * loop will naturally skip them.
-	 */
-	for (index = 0; index < lv->lv_niovecs; index++) {
-		struct xfs_log_iovec	*reg = &lv->lv_iovecp[index];
-		struct xlog_op_header	*ophdr = reg->i_addr;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ophdr->oh_tid = cpu_to_be32(ticket->t_tid);
 		xlog_write_iovec(iclog, log_offset, reg->i_addr,
 				reg->i_len, len, record_cnt, data_cnt);
@@ -2347,7 +2332,6 @@ xlog_write_partial(
 	int			index = 0;
 	uint32_t		rlen;
 	int			error;
-<<<<<<< HEAD
 
 	/* walk the logvec, copying until we run out of space in the iclog */
 	for (index = 0; index < lv->lv_niovecs; index++) {
@@ -2385,45 +2369,6 @@ xlog_write_partial(
 		xlog_write_iovec(iclog, log_offset, reg->i_addr,
 				rlen, len, record_cnt, data_cnt);
 
-=======
-
-	/* walk the logvec, copying until we run out of space in the iclog */
-	for (index = 0; index < lv->lv_niovecs; index++) {
-		struct xfs_log_iovec	*reg = &lv->lv_iovecp[index];
-		uint32_t		reg_offset = 0;
-
-		/*
-		 * The first region of a continuation must have a non-zero
-		 * length otherwise log recovery will just skip over it and
-		 * start recovering from the next opheader it finds. Because we
-		 * mark the next opheader as a continuation, recovery will then
-		 * incorrectly add the continuation to the previous region and
-		 * that breaks stuff.
-		 *
-		 * Hence if there isn't space for region data after the
-		 * opheader, then we need to start afresh with a new iclog.
-		 */
-		if (iclog->ic_size - *log_offset <=
-					sizeof(struct xlog_op_header)) {
-			error = xlog_write_get_more_iclog_space(ticket,
-					&iclog, log_offset, *len, record_cnt,
-					data_cnt);
-			if (error)
-				return error;
-		}
-
-		ophdr = reg->i_addr;
-		rlen = min_t(uint32_t, reg->i_len, iclog->ic_size - *log_offset);
-
-		ophdr->oh_tid = cpu_to_be32(ticket->t_tid);
-		ophdr->oh_len = cpu_to_be32(rlen - sizeof(struct xlog_op_header));
-		if (rlen != reg->i_len)
-			ophdr->oh_flags |= XLOG_CONTINUE_TRANS;
-
-		xlog_write_iovec(iclog, log_offset, reg->i_addr,
-				rlen, len, record_cnt, data_cnt);
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* If we wrote the whole region, move to the next. */
 		if (rlen == reg->i_len)
 			continue;
@@ -3599,11 +3544,7 @@ xlog_ticket_alloc(
 	tic->t_curr_res		= unit_res;
 	tic->t_cnt		= cnt;
 	tic->t_ocnt		= cnt;
-<<<<<<< HEAD
 	tic->t_tid		= get_random_u32();
-=======
-	tic->t_tid		= prandom_u32();
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (permanent)
 		tic->t_flags |= XLOG_TIC_PERM_RESERV;
 

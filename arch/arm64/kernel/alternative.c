@@ -139,12 +139,8 @@ static void clean_dcache_range_nopatch(u64 start, u64 end)
 	} while (cur += d_size, cur < end);
 }
 
-<<<<<<< HEAD
 static void __apply_alternatives(const struct alt_region *region,
 				 bool is_module,
-=======
-static void __nocfi __apply_alternatives(struct alt_region *region, bool is_module,
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 unsigned long *feature_mask)
 {
 	struct alt_instr *alt;

@@ -145,14 +145,11 @@ static const char *thread_spec_tags[THREAD_SPEC__MAX] = {
 	"undefined", "cpu", "core", "package", "numa", "user"
 };
 
-<<<<<<< HEAD
 struct pollfd_index_map {
 	int evlist_pollfd_index;
 	int thread_pollfd_index;
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct record {
 	struct perf_tool	tool;
 	struct record_opts	opts;
@@ -181,12 +178,9 @@ struct record {
 	int			nr_threads;
 	struct thread_mask	*thread_masks;
 	struct record_thread	*thread_data;
-<<<<<<< HEAD
 	struct pollfd_index_map	*index_map;
 	size_t			index_map_sz;
 	size_t			index_map_cnt;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static volatile int done;
@@ -1096,7 +1090,6 @@ static void record__free_thread_data(struct record *rec)
 	zfree(&rec->thread_data);
 }
 
-<<<<<<< HEAD
 static int record__map_thread_evlist_pollfd_indexes(struct record *rec,
 						    int evlist_pollfd_index,
 						    int thread_pollfd_index)
@@ -1161,8 +1154,6 @@ static int record__dup_non_perf_events(struct record *rec,
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int record__alloc_thread_data(struct record *rec, struct evlist *evlist)
 {
 	int t, ret;
@@ -1210,27 +1201,12 @@ static int record__alloc_thread_data(struct record *rec, struct evlist *evlist)
 				 thread_data[t].pipes.msg[0]);
 		} else {
 			thread_data[t].tid = gettid();
-<<<<<<< HEAD
 
 			ret = record__dup_non_perf_events(rec, evlist, &thread_data[t]);
 			if (ret < 0)
 				goto out_free;
 
 			thread_data[t].ctlfd_pos = -1; /* Not used */
-=======
-			if (evlist->ctl_fd.pos == -1)
-				continue;
-			ret = fdarray__dup_entry_from(&thread_data[t].pollfd, evlist->ctl_fd.pos,
-						      &evlist->core.pollfd);
-			if (ret < 0) {
-				pr_err("Failed to duplicate descriptor in main thread pollfd\n");
-				goto out_free;
-			}
-			thread_data[t].ctlfd_pos = ret;
-			pr_debug2("thread_data[%p]: pollfd[%d] <- ctl_fd=%d\n",
-				 thread_data, thread_data[t].ctlfd_pos,
-				 evlist->core.pollfd.entries[evlist->ctl_fd.pos].fd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -2094,15 +2070,6 @@ static int record__synthesize(struct record *rec, bool tail)
 
 	if (rec->opts.synth & PERF_SYNTH_TASK) {
 		bool needs_mmap = rec->opts.synth & PERF_SYNTH_MMAP;
-<<<<<<< HEAD
-=======
-
-		err = __machine__synthesize_threads(machine, tool, &opts->target,
-						    rec->evlist->core.threads,
-						    f, needs_mmap, opts->sample_address,
-						    rec->opts.nr_threads_synthesize);
-	}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		err = __machine__synthesize_threads(machine, tool, &opts->target,
 						    rec->evlist->core.threads,
@@ -2212,171 +2179,11 @@ static void hit_auxtrace_snapshot_trigger(struct record *rec)
 }
 
 static void record__uniquify_name(struct record *rec)
-<<<<<<< HEAD
 {
 	struct evsel *pos;
 	struct evlist *evlist = rec->evlist;
 	char *new_name;
 	int ret;
-
-	if (!perf_pmu__has_hybrid())
-		return;
-
-	evlist__for_each_entry(evlist, pos) {
-		if (!evsel__is_hybrid(pos))
-			continue;
-
-		if (strchr(pos->name, '/'))
-			continue;
-
-		ret = asprintf(&new_name, "%s/%s/",
-			       pos->pmu_name, pos->name);
-		if (ret) {
-			free(pos->name);
-			pos->name = new_name;
-		}
-	}
-}
-
-static int record__terminate_thread(struct record_thread *thread_data)
-{
-	int err;
-	enum thread_msg ack = THREAD_MSG__UNDEFINED;
-	pid_t tid = thread_data->tid;
-
-	close(thread_data->pipes.msg[1]);
-	thread_data->pipes.msg[1] = -1;
-	err = read(thread_data->pipes.ack[0], &ack, sizeof(ack));
-	if (err > 0)
-		pr_debug2("threads[%d]: sent %s\n", tid, thread_msg_tags[ack]);
-	else
-		pr_warning("threads[%d]: failed to receive termination notification from %d\n",
-			   thread->tid, tid);
-
-	return 0;
-}
-
-static int record__start_threads(struct record *rec)
-{
-	int t, tt, err, ret = 0, nr_threads = rec->nr_threads;
-	struct record_thread *thread_data = rec->thread_data;
-	sigset_t full, mask;
-	pthread_t handle;
-	pthread_attr_t attrs;
-
-	thread = &thread_data[0];
-
-	if (!record__threads_enabled(rec))
-		return 0;
-
-	sigfillset(&full);
-	if (sigprocmask(SIG_SETMASK, &full, &mask)) {
-		pr_err("Failed to block signals on threads start: %s\n", strerror(errno));
-		return -1;
-	}
-
-	pthread_attr_init(&attrs);
-	pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-
-	for (t = 1; t < nr_threads; t++) {
-		enum thread_msg msg = THREAD_MSG__UNDEFINED;
-
-#ifdef HAVE_PTHREAD_ATTR_SETAFFINITY_NP
-		pthread_attr_setaffinity_np(&attrs,
-					    MMAP_CPU_MASK_BYTES(&(thread_data[t].mask->affinity)),
-					    (cpu_set_t *)(thread_data[t].mask->affinity.bits));
-#endif
-		if (pthread_create(&handle, &attrs, record__thread, &thread_data[t])) {
-			for (tt = 1; tt < t; tt++)
-				record__terminate_thread(&thread_data[t]);
-			pr_err("Failed to start threads: %s\n", strerror(errno));
-			ret = -1;
-			goto out_err;
-		}
-
-		err = read(thread_data[t].pipes.ack[0], &msg, sizeof(msg));
-		if (err > 0)
-			pr_debug2("threads[%d]: sent %s\n", rec->thread_data[t].tid,
-				  thread_msg_tags[msg]);
-		else
-			pr_warning("threads[%d]: failed to receive start notification from %d\n",
-				   thread->tid, rec->thread_data[t].tid);
-	}
-
-	sched_setaffinity(0, MMAP_CPU_MASK_BYTES(&thread->mask->affinity),
-			(cpu_set_t *)thread->mask->affinity.bits);
-
-	pr_debug("threads[%d]: started on cpu%d\n", thread->tid, sched_getcpu());
-
-out_err:
-	pthread_attr_destroy(&attrs);
-
-	if (sigprocmask(SIG_SETMASK, &mask, NULL)) {
-		pr_err("Failed to unblock signals on threads start: %s\n", strerror(errno));
-		ret = -1;
-	}
-
-	return ret;
-}
-
-static int record__stop_threads(struct record *rec)
-{
-	int t;
-	struct record_thread *thread_data = rec->thread_data;
-
-	for (t = 1; t < rec->nr_threads; t++)
-		record__terminate_thread(&thread_data[t]);
-
-	for (t = 0; t < rec->nr_threads; t++) {
-		rec->samples += thread_data[t].samples;
-		if (!record__threads_enabled(rec))
-			continue;
-		rec->session->bytes_transferred += thread_data[t].bytes_transferred;
-		rec->session->bytes_compressed += thread_data[t].bytes_compressed;
-		pr_debug("threads[%d]: samples=%lld, wakes=%ld, ", thread_data[t].tid,
-			 thread_data[t].samples, thread_data[t].waking);
-		if (thread_data[t].bytes_transferred && thread_data[t].bytes_compressed)
-			pr_debug("transferred=%" PRIu64 ", compressed=%" PRIu64 "\n",
-				 thread_data[t].bytes_transferred, thread_data[t].bytes_compressed);
-		else
-			pr_debug("written=%" PRIu64 "\n", thread_data[t].bytes_written);
-	}
-
-	return 0;
-}
-
-static unsigned long record__waking(struct record *rec)
-{
-	int t;
-	unsigned long waking = 0;
-	struct record_thread *thread_data = rec->thread_data;
-
-	for (t = 0; t < rec->nr_threads; t++)
-		waking += thread_data[t].waking;
-
-	return waking;
-}
-
-static int __cmd_record(struct record *rec, int argc, const char **argv)
-{
-	int err;
-	int status = 0;
-	const bool forks = argc > 0;
-	struct perf_tool *tool = &rec->tool;
-	struct record_opts *opts = &rec->opts;
-	struct perf_data *data = &rec->data;
-	struct perf_session *session;
-	bool disabled = false, draining = false;
-	int fd;
-	float ratio = 0;
-	enum evlist_ctl_cmd cmd = EVLIST_CTL_CMD_UNSUPPORTED;
-=======
-{
-	struct evsel *pos;
-	struct evlist *evlist = rec->evlist;
-	char *new_name;
-	int ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!perf_pmu__has_hybrid())
 		return;
@@ -2632,11 +2439,8 @@ static int __cmd_record(struct record *rec, int argc, const char **argv)
 
 	record__uniquify_name(rec);
 
-<<<<<<< HEAD
 	/* Debug message used by test scripts */
 	pr_debug3("perf record opening and mmapping events\n");
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (record__open(rec) != 0) {
 		err = -1;
 		goto out_free_threads;
@@ -2887,14 +2691,9 @@ static int __cmd_record(struct record *rec, int argc, const char **argv)
 					    record__thread_munmap_filtered, NULL) == 0)
 				draining = true;
 
-<<<<<<< HEAD
 			err = record__update_evlist_pollfd_from_thread(rec, rec->evlist, thread);
 			if (err)
 				goto out_child;
-=======
-			evlist__ctlfd_update(rec->evlist,
-				&thread->pollfd.entries[thread->ctlfd_pos]);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (evlist__ctlfd_process(rec->evlist, &cmd) > 0) {
@@ -2997,10 +2796,7 @@ out_free_threads:
 	if (rec->off_cpu)
 		rec->bytes_written += off_cpu_write(rec->session);
 
-<<<<<<< HEAD
 	record__read_lost_samples(rec);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	record__synthesize(rec, true);
 	/* this will be recalculated during process_buildids() */
 	rec->samples = 0;
@@ -3754,11 +3550,8 @@ static int record__mmap_cpu_mask_init(struct mmap_cpu_mask *mask, struct perf_cp
 		return 0;
 
 	perf_cpu_map__for_each_cpu(cpu, idx, cpus) {
-<<<<<<< HEAD
 		if (cpu.cpu == -1)
 			continue;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Return ENODEV is input cpu is greater than max cpu */
 		if ((unsigned long)cpu.cpu > mask->nbits)
 			return -ENODEV;

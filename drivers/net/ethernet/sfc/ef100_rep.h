@@ -66,8 +66,5 @@ void efx_ef100_rep_rx_packet(struct efx_rep *efv, struct efx_rx_buffer *rx_buf);
  * Caller must hold rcu_read_lock().
  */
 struct efx_rep *efx_ef100_find_rep_by_mport(struct efx_nic *efx, u16 mport);
-<<<<<<< HEAD
 extern const struct net_device_ops efx_ef100_rep_netdev_ops;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* EF100_REP_H */

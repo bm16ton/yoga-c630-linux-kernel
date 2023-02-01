@@ -73,11 +73,7 @@ void *counter_priv(const struct counter_device *const counter)
 
 	return &ch->privdata;
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_NS_GPL(counter_priv, COUNTER);
-=======
-EXPORT_SYMBOL_GPL(counter_priv);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * counter_alloc - allocate a counter_device
@@ -137,21 +133,13 @@ err_ida_alloc:
 
 	return NULL;
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_NS_GPL(counter_alloc, COUNTER);
-=======
-EXPORT_SYMBOL_GPL(counter_alloc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void counter_put(struct counter_device *counter)
 {
 	put_device(&counter->dev);
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_NS_GPL(counter_put, COUNTER);
-=======
-EXPORT_SYMBOL_GPL(counter_put);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * counter_add - complete registration of a counter
@@ -178,11 +166,7 @@ int counter_add(struct counter_device *counter)
 	/* implies device_add(dev) */
 	return cdev_device_add(&counter->chrdev, dev);
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_NS_GPL(counter_add, COUNTER);
-=======
-EXPORT_SYMBOL_GPL(counter_add);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * counter_unregister - unregister Counter from the system
@@ -204,11 +188,7 @@ void counter_unregister(struct counter_device *const counter)
 
 	mutex_unlock(&counter->ops_exist_lock);
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_NS_GPL(counter_unregister, COUNTER);
-=======
-EXPORT_SYMBOL_GPL(counter_unregister);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void devm_counter_release(void *counter)
 {
@@ -243,11 +223,7 @@ struct counter_device *devm_counter_alloc(struct device *dev, size_t sizeof_priv
 
 	return counter;
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_NS_GPL(devm_counter_alloc, COUNTER);
-=======
-EXPORT_SYMBOL_GPL(devm_counter_alloc);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * devm_counter_add - complete registration of a counter
@@ -268,11 +244,7 @@ int devm_counter_add(struct device *dev,
 
 	return devm_add_action_or_reset(dev, devm_counter_release, counter);
 }
-<<<<<<< HEAD
 EXPORT_SYMBOL_NS_GPL(devm_counter_add, COUNTER);
-=======
-EXPORT_SYMBOL_GPL(devm_counter_add);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define COUNTER_DEV_MAX 256
 

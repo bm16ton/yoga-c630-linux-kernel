@@ -83,7 +83,6 @@ static __always_inline u64 __arch_get_hw_counter(s32 clock_mode,
 	 * If FEAT_ECV is available, use the self-synchronizing counter.
 	 * Otherwise the isb is required to prevent that the counter value
 	 * is speculated.
-<<<<<<< HEAD
 	*/
 	asm volatile(
 	ALTERNATIVE("isb\n"
@@ -95,11 +94,6 @@ static __always_inline u64 __arch_get_hw_counter(s32 clock_mode,
 	:
 	: "memory");
 
-=======
-	 */
-	isb();
-	asm volatile("mrs %0, cntvct_el0" : "=r" (res) :: "memory");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	arch_counter_enforce_ordering(res);
 
 	return res;

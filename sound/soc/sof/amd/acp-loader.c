@@ -30,16 +30,10 @@
 int acp_dsp_block_read(struct snd_sof_dev *sdev, enum snd_sof_fw_blk_type blk_type,
 		       u32 offset, void *dest, size_t size)
 {
-<<<<<<< HEAD
 	const struct sof_amd_acp_desc *desc = get_chip_info(sdev->pdata);
 	switch (blk_type) {
 	case SOF_FW_BLK_TYPE_SRAM:
 		offset = offset - desc->sram_pte_offset;
-=======
-	switch (blk_type) {
-	case SOF_FW_BLK_TYPE_SRAM:
-		offset = offset - ACP_SCRATCH_MEMORY_ADDRESS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		memcpy_from_scratch(sdev, offset, dest, size);
 		break;
 	default:
@@ -56,10 +50,7 @@ int acp_dsp_block_write(struct snd_sof_dev *sdev, enum snd_sof_fw_blk_type blk_t
 {
 	struct snd_sof_pdata *plat_data = sdev->pdata;
 	struct pci_dev *pci = to_pci_dev(sdev->dev);
-<<<<<<< HEAD
 	const struct sof_amd_acp_desc *desc = get_chip_info(sdev->pdata);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct acp_dev_data *adata;
 	void *dest;
 	u32 dma_size, page_count;
@@ -95,11 +86,7 @@ int acp_dsp_block_write(struct snd_sof_dev *sdev, enum snd_sof_fw_blk_type blk_t
 		adata->fw_data_bin_size = size + offset;
 		break;
 	case SOF_FW_BLK_TYPE_SRAM:
-<<<<<<< HEAD
 		offset = offset - desc->sram_pte_offset;
-=======
-		offset = offset - ACP_SCRATCH_MEMORY_ADDRESS;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		memcpy_to_scratch(sdev, offset, src, size);
 		return 0;
 	default:
@@ -120,22 +107,13 @@ EXPORT_SYMBOL_NS(acp_get_bar_index, SND_SOC_SOF_AMD_COMMON);
 
 static void configure_pte_for_fw_loading(int type, int num_pages, struct acp_dev_data *adata)
 {
-<<<<<<< HEAD
 	struct snd_sof_dev *sdev = adata->dev;
 	const struct sof_amd_acp_desc *desc = get_chip_info(sdev->pdata);
-=======
-	struct snd_sof_dev *sdev;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int low, high;
 	dma_addr_t addr;
 	u16 page_idx;
 	u32 offset;
 
-<<<<<<< HEAD
-=======
-	sdev = adata->dev;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (type) {
 	case FW_BIN:
 		offset = FW_BIN_PTE_OFFSET;
@@ -152,11 +130,7 @@ static void configure_pte_for_fw_loading(int type, int num_pages, struct acp_dev
 
 	/* Group Enable */
 	snd_sof_dsp_write(sdev, ACP_DSP_BAR, ACPAXI2AXI_ATU_BASE_ADDR_GRP_1,
-<<<<<<< HEAD
 			  desc->sram_pte_offset | BIT(31));
-=======
-			  ACP_SRAM_PTE_OFFSET | BIT(31));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snd_sof_dsp_write(sdev, ACP_DSP_BAR, ACPAXI2AXI_ATU_PAGE_SIZE_GRP_1,
 			  PAGE_SIZE_4K_ENABLE);
 
@@ -224,25 +198,19 @@ EXPORT_SYMBOL_NS(acp_dsp_pre_fw_run, SND_SOC_SOF_AMD_COMMON);
 
 int acp_sof_dsp_run(struct snd_sof_dev *sdev)
 {
-<<<<<<< HEAD
 	const struct sof_amd_acp_desc *desc = get_chip_info(sdev->pdata);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int val;
 
 	snd_sof_dsp_write(sdev, ACP_DSP_BAR, ACP_DSP0_RUNSTALL, ACP_DSP_RUN);
 	val = snd_sof_dsp_read(sdev, ACP_DSP_BAR, ACP_DSP0_RUNSTALL);
 	dev_dbg(sdev->dev, "ACP_DSP0_RUNSTALL : 0x%0x\n", val);
 
-<<<<<<< HEAD
 	/* Some platforms won't support fusion DSP,keep offset zero for no support */
 	if (desc->fusion_dsp_offset) {
 		snd_sof_dsp_write(sdev, ACP_DSP_BAR, desc->fusion_dsp_offset, ACP_DSP_RUN);
 		val = snd_sof_dsp_read(sdev, ACP_DSP_BAR, desc->fusion_dsp_offset);
 		dev_dbg(sdev->dev, "ACP_DSP0_FUSION_RUNSTALL : 0x%0x\n", val);
 	}
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 EXPORT_SYMBOL_NS(acp_sof_dsp_run, SND_SOC_SOF_AMD_COMMON);

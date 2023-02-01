@@ -89,14 +89,7 @@ static int req_to_user(struct v4l2_ext_control *c,
 /* Helper function: copy the initial control value back to the caller */
 static int def_to_user(struct v4l2_ext_control *c, struct v4l2_ctrl *ctrl)
 {
-<<<<<<< HEAD
 	ctrl->type_ops->init(ctrl, 0, ctrl->p_new);
-=======
-	int idx;
-
-	for (idx = 0; idx < ctrl->elems; idx++)
-		ctrl->type_ops->init(ctrl, idx, ctrl->p_new);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ptr_to_user(c, ctrl, ctrl->p_new);
 }
@@ -109,13 +102,8 @@ static int user_to_new(struct v4l2_ext_control *c, struct v4l2_ctrl *ctrl)
 
 	ctrl->is_new = 0;
 	if (ctrl->is_dyn_array &&
-<<<<<<< HEAD
 	    c->size > ctrl->p_array_alloc_elems * ctrl->elem_size) {
 		void *old = ctrl->p_array;
-=======
-	    c->size > ctrl->p_dyn_alloc_elems * ctrl->elem_size) {
-		void *old = ctrl->p_dyn;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		void *tmp = kvzalloc(2 * c->size, GFP_KERNEL);
 
 		if (!tmp)
@@ -124,22 +112,13 @@ static int user_to_new(struct v4l2_ext_control *c, struct v4l2_ctrl *ctrl)
 		memcpy(tmp + c->size, ctrl->p_cur.p, ctrl->elems * ctrl->elem_size);
 		ctrl->p_new.p = tmp;
 		ctrl->p_cur.p = tmp + c->size;
-<<<<<<< HEAD
 		ctrl->p_array = tmp;
 		ctrl->p_array_alloc_elems = c->size / ctrl->elem_size;
-=======
-		ctrl->p_dyn = tmp;
-		ctrl->p_dyn_alloc_elems = c->size / ctrl->elem_size;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kvfree(old);
 	}
 
 	if (ctrl->is_ptr && !ctrl->is_string) {
 		unsigned int elems = c->size / ctrl->elem_size;
-<<<<<<< HEAD
-=======
-		unsigned int idx;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (copy_from_user(ctrl->p_new.p, c->ptr, c->size))
 			return -EFAULT;
@@ -147,12 +126,7 @@ static int user_to_new(struct v4l2_ext_control *c, struct v4l2_ctrl *ctrl)
 		if (ctrl->is_dyn_array)
 			ctrl->new_elems = elems;
 		else if (ctrl->is_array)
-<<<<<<< HEAD
 			ctrl->type_ops->init(ctrl, elems, ctrl->p_new);
-=======
-			for (idx = elems; idx < ctrl->elems; idx++)
-				ctrl->type_ops->init(ctrl, idx, ctrl->p_new);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 
@@ -176,10 +150,7 @@ static int user_to_new(struct v4l2_ext_control *c, struct v4l2_ctrl *ctrl)
 			 * then return an error.
 			 */
 			if (strlen(ctrl->p_new.p_char) == ctrl->maximum && last)
-<<<<<<< HEAD
 			ctrl->is_new = 1;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				return -ERANGE;
 		}
 		return ret;
@@ -492,11 +463,7 @@ int v4l2_g_ext_ctrls_common(struct v4l2_ctrl_handler *hdl,
 
 			if (is_default)
 				ret = def_to_user(cs->controls + idx, ref->ctrl);
-<<<<<<< HEAD
 			else if (is_request && ref->p_req_array_enomem)
-=======
-			else if (is_request && ref->p_req_dyn_enomem)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				ret = -ENOMEM;
 			else if (is_request && ref->p_req_valid)
 				ret = req_to_user(cs->controls + idx, ref);
@@ -528,16 +495,7 @@ EXPORT_SYMBOL(v4l2_g_ext_ctrls);
 /* Validate a new control */
 static int validate_new(const struct v4l2_ctrl *ctrl, union v4l2_ctrl_ptr p_new)
 {
-<<<<<<< HEAD
 	return ctrl->type_ops->validate(ctrl, p_new);
-=======
-	unsigned int idx;
-	int err = 0;
-
-	for (idx = 0; !err && idx < ctrl->new_elems; idx++)
-		err = ctrl->type_ops->validate(ctrl, idx, p_new);
-	return err;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Validate controls. */
@@ -1022,7 +980,6 @@ int __v4l2_ctrl_modify_range(struct v4l2_ctrl *ctrl,
 }
 EXPORT_SYMBOL(__v4l2_ctrl_modify_range);
 
-<<<<<<< HEAD
 int __v4l2_ctrl_modify_dimensions(struct v4l2_ctrl *ctrl,
 				  u32 dims[V4L2_CTRL_MAX_DIMS])
 {
@@ -1059,8 +1016,6 @@ int __v4l2_ctrl_modify_dimensions(struct v4l2_ctrl *ctrl,
 }
 EXPORT_SYMBOL(__v4l2_ctrl_modify_dimensions);
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Implement VIDIOC_QUERY_EXT_CTRL */
 int v4l2_query_ext_ctrl(struct v4l2_ctrl_handler *hdl, struct v4l2_query_ext_ctrl *qc)
 {

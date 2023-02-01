@@ -102,7 +102,6 @@ enum field_op_id {
 	FIELD_OP_UNARY_MINUS,
 	FIELD_OP_DIV,
 	FIELD_OP_MULT,
-<<<<<<< HEAD
 };
 
 enum hist_field_fn {
@@ -135,8 +134,6 @@ enum hist_field_fn {
 	HIST_FIELD_FN_DIV_NOT_POWER2,
 	HIST_FIELD_FN_DIV_MULT_SHIFT,
 	HIST_FIELD_FN_EXECNAME,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*
@@ -167,13 +164,6 @@ struct hist_field {
 	unsigned int			size;
 	unsigned int			offset;
 	unsigned int                    is_signed;
-<<<<<<< HEAD
-=======
-	unsigned long			buckets;
-	const char			*type;
-	struct hist_field		*operands[HIST_FIELD_OPERANDS_MAX];
-	struct hist_trigger_data	*hist_data;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Variable fields contain variable-specific info in var.
@@ -213,15 +203,6 @@ static u64 hist_fn_call(struct hist_field *hist_field,
 			struct trace_buffer *buffer,
 			struct ring_buffer_event *rbe,
 			void *event);
-
-static u64 hist_field_const(struct hist_field *field,
-			   struct tracing_map_elt *elt,
-			   struct trace_buffer *buffer,
-			   struct ring_buffer_event *rbe,
-			   void *event)
-{
-	return field->constant;
-}
 
 static u64 hist_field_const(struct hist_field *field,
 			   struct tracing_map_elt *elt,
@@ -298,11 +279,7 @@ static u64 hist_field_log2(struct hist_field *hist_field,
 {
 	struct hist_field *operand = hist_field->operands[0];
 
-<<<<<<< HEAD
 	u64 val = hist_fn_call(operand, elt, buffer, rbe, event);
-=======
-	u64 val = operand->fn(operand, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return (u64) ilog2(roundup_pow_of_two(val));
 }
@@ -316,11 +293,7 @@ static u64 hist_field_bucket(struct hist_field *hist_field,
 	struct hist_field *operand = hist_field->operands[0];
 	unsigned long buckets = hist_field->buckets;
 
-<<<<<<< HEAD
 	u64 val = hist_fn_call(operand, elt, buffer, rbe, event);
-=======
-	u64 val = operand->fn(operand, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (WARN_ON_ONCE(!buckets))
 		return val;
@@ -341,13 +314,8 @@ static u64 hist_field_plus(struct hist_field *hist_field,
 	struct hist_field *operand1 = hist_field->operands[0];
 	struct hist_field *operand2 = hist_field->operands[1];
 
-<<<<<<< HEAD
 	u64 val1 = hist_fn_call(operand1, elt, buffer, rbe, event);
 	u64 val2 = hist_fn_call(operand2, elt, buffer, rbe, event);
-=======
-	u64 val1 = operand1->fn(operand1, elt, buffer, rbe, event);
-	u64 val2 = operand2->fn(operand2, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return val1 + val2;
 }
@@ -361,13 +329,8 @@ static u64 hist_field_minus(struct hist_field *hist_field,
 	struct hist_field *operand1 = hist_field->operands[0];
 	struct hist_field *operand2 = hist_field->operands[1];
 
-<<<<<<< HEAD
 	u64 val1 = hist_fn_call(operand1, elt, buffer, rbe, event);
 	u64 val2 = hist_fn_call(operand2, elt, buffer, rbe, event);
-=======
-	u64 val1 = operand1->fn(operand1, elt, buffer, rbe, event);
-	u64 val2 = operand2->fn(operand2, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return val1 - val2;
 }
@@ -381,13 +344,8 @@ static u64 hist_field_div(struct hist_field *hist_field,
 	struct hist_field *operand1 = hist_field->operands[0];
 	struct hist_field *operand2 = hist_field->operands[1];
 
-<<<<<<< HEAD
 	u64 val1 = hist_fn_call(operand1, elt, buffer, rbe, event);
 	u64 val2 = hist_fn_call(operand2, elt, buffer, rbe, event);
-=======
-	u64 val1 = operand1->fn(operand1, elt, buffer, rbe, event);
-	u64 val2 = operand2->fn(operand2, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Return -1 for the undefined case */
 	if (!val2)
@@ -409,11 +367,7 @@ static u64 div_by_power_of_two(struct hist_field *hist_field,
 	struct hist_field *operand1 = hist_field->operands[0];
 	struct hist_field *operand2 = hist_field->operands[1];
 
-<<<<<<< HEAD
 	u64 val1 = hist_fn_call(operand1, elt, buffer, rbe, event);
-=======
-	u64 val1 = operand1->fn(operand1, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return val1 >> __ffs64(operand2->constant);
 }
@@ -427,11 +381,7 @@ static u64 div_by_not_power_of_two(struct hist_field *hist_field,
 	struct hist_field *operand1 = hist_field->operands[0];
 	struct hist_field *operand2 = hist_field->operands[1];
 
-<<<<<<< HEAD
 	u64 val1 = hist_fn_call(operand1, elt, buffer, rbe, event);
-=======
-	u64 val1 = operand1->fn(operand1, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return div64_u64(val1, operand2->constant);
 }
@@ -445,11 +395,7 @@ static u64 div_by_mult_and_shift(struct hist_field *hist_field,
 	struct hist_field *operand1 = hist_field->operands[0];
 	struct hist_field *operand2 = hist_field->operands[1];
 
-<<<<<<< HEAD
 	u64 val1 = hist_fn_call(operand1, elt, buffer, rbe, event);
-=======
-	u64 val1 = operand1->fn(operand1, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * If the divisor is a constant, do a multiplication and shift instead.
@@ -483,13 +429,8 @@ static u64 hist_field_mult(struct hist_field *hist_field,
 	struct hist_field *operand1 = hist_field->operands[0];
 	struct hist_field *operand2 = hist_field->operands[1];
 
-<<<<<<< HEAD
 	u64 val1 = hist_fn_call(operand1, elt, buffer, rbe, event);
 	u64 val2 = hist_fn_call(operand2, elt, buffer, rbe, event);
-=======
-	u64 val1 = operand1->fn(operand1, elt, buffer, rbe, event);
-	u64 val2 = operand2->fn(operand2, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return val1 * val2;
 }
@@ -502,11 +443,7 @@ static u64 hist_field_unary_minus(struct hist_field *hist_field,
 {
 	struct hist_field *operand = hist_field->operands[0];
 
-<<<<<<< HEAD
 	s64 sval = (s64)hist_fn_call(operand, elt, buffer, rbe, event);
-=======
-	s64 sval = (s64)operand->fn(operand, elt, buffer, rbe, event);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 val = (u64)-sval;
 
 	return val;
@@ -749,16 +686,11 @@ struct snapshot_context {
  * Returns the specific division function to use if the divisor
  * is constant. This avoids extra branches when the trigger is hit.
  */
-<<<<<<< HEAD
 static enum hist_field_fn hist_field_get_div_fn(struct hist_field *divisor)
-=======
-static hist_field_fn_t hist_field_get_div_fn(struct hist_field *divisor)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u64 div = divisor->constant;
 
 	if (!(div & (div - 1)))
-<<<<<<< HEAD
 		return HIST_FIELD_FN_DIV_POWER2;
 
 	/* If the divisor is too large, do a regular division */
@@ -767,16 +699,6 @@ static hist_field_fn_t hist_field_get_div_fn(struct hist_field *divisor)
 
 	divisor->div_multiplier = div64_u64((u64)(1 << HIST_DIV_SHIFT), div);
 	return HIST_FIELD_FN_DIV_MULT_SHIFT;
-=======
-		return div_by_power_of_two;
-
-	/* If the divisor is too large, do a regular division */
-	if (div > (1 << HIST_DIV_SHIFT))
-		return div_by_not_power_of_two;
-
-	divisor->div_multiplier = div64_u64((u64)(1 << HIST_DIV_SHIFT), div);
-	return div_by_mult_and_shift;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void track_data_free(struct track_data *track_data)
@@ -2037,13 +1959,6 @@ static struct hist_field *create_hist_field(struct hist_trigger_data *hist_data,
 	if (flags & HIST_FIELD_FL_CONST) {
 		hist_field->fn_num = HIST_FIELD_FN_CONST;
 		hist_field->size = sizeof(u64);
-		hist_field->type = "u64";
-		goto out;
-	}
-
-	if (flags & HIST_FIELD_FL_CONST) {
-		hist_field->fn = hist_field_const;
-		hist_field->size = sizeof(u64);
 		hist_field->type = kstrdup("u64", GFP_KERNEL);
 		if (!hist_field->type)
 			goto free;
@@ -2057,13 +1972,8 @@ static struct hist_field *create_hist_field(struct hist_trigger_data *hist_data,
 
 	if (flags & (HIST_FIELD_FL_LOG2 | HIST_FIELD_FL_BUCKET)) {
 		unsigned long fl = flags & ~(HIST_FIELD_FL_LOG2 | HIST_FIELD_FL_BUCKET);
-<<<<<<< HEAD
 		hist_field->fn_num = flags & HIST_FIELD_FL_LOG2 ? HIST_FIELD_FN_LOG2 :
 			HIST_FIELD_FN_BUCKET;
-=======
-		hist_field->fn = flags & HIST_FIELD_FL_LOG2 ? hist_field_log2 :
-			hist_field_bucket;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hist_field->operands[0] = create_hist_field(hist_data, field, fl, NULL);
 		hist_field->size = hist_field->operands[0]->size;
 		hist_field->type = kstrdup_const(hist_field->operands[0]->type, GFP_KERNEL);
@@ -2100,21 +2010,12 @@ static struct hist_field *create_hist_field(struct hist_trigger_data *hist_data,
 			goto free;
 
 		if (field->filter_type == FILTER_STATIC_STRING) {
-<<<<<<< HEAD
 			hist_field->fn_num = HIST_FIELD_FN_STRING;
 			hist_field->size = field->size;
 		} else if (field->filter_type == FILTER_DYN_STRING) {
 			hist_field->fn_num = HIST_FIELD_FN_DYNSTRING;
 		} else if (field->filter_type == FILTER_RDYN_STRING)
 			hist_field->fn_num = HIST_FIELD_FN_RELDYNSTRING;
-=======
-			hist_field->fn = hist_field_string;
-			hist_field->size = field->size;
-		} else if (field->filter_type == FILTER_DYN_STRING) {
-			hist_field->fn = hist_field_dynstring;
-		} else if (field->filter_type == FILTER_RDYN_STRING)
-			hist_field->fn = hist_field_reldynstring;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		else
 			hist_field->fn_num = HIST_FIELD_FN_PSTRING;
 	} else {
@@ -2719,11 +2620,7 @@ static struct hist_field *parse_expr(struct hist_trigger_data *hist_data,
 	unsigned long operand_flags, operand2_flags;
 	int field_op, ret = -EINVAL;
 	char *sep, *operand1_str;
-<<<<<<< HEAD
 	enum hist_field_fn op_fn;
-=======
-	hist_field_fn_t op_fn;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool combine_consts;
 
 	if (*n_subexprs > 3) {
@@ -2778,7 +2675,6 @@ static struct hist_field *parse_expr(struct hist_trigger_data *hist_data,
 		hist_err(file->tr, HIST_ERR_INVALID_STR_OPERAND, errpos(str));
 		ret = -EINVAL;
 		goto free_operands;
-<<<<<<< HEAD
 	}
 
 	switch (field_op) {
@@ -2799,28 +2695,6 @@ static struct hist_field *parse_expr(struct hist_trigger_data *hist_data,
 		goto free_operands;
 	}
 
-=======
-	}
-
-	switch (field_op) {
-	case FIELD_OP_MINUS:
-		op_fn = hist_field_minus;
-		break;
-	case FIELD_OP_PLUS:
-		op_fn = hist_field_plus;
-		break;
-	case FIELD_OP_DIV:
-		op_fn = hist_field_div;
-		break;
-	case FIELD_OP_MULT:
-		op_fn = hist_field_mult;
-		break;
-	default:
-		ret = -EINVAL;
-		goto free_operands;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = check_expr_operands(file->tr, operand1, operand2, &var1, &var2);
 	if (ret)
 		goto free_operands;
@@ -2870,23 +2744,16 @@ static struct hist_field *parse_expr(struct hist_trigger_data *hist_data,
 		op_fn = hist_field_get_div_fn(operand2);
 	}
 
-<<<<<<< HEAD
 	expr->fn_num = op_fn;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (combine_consts) {
 		if (var1)
 			expr->operands[0] = var1;
 		if (var2)
 			expr->operands[1] = var2;
 
-<<<<<<< HEAD
 		expr->constant = hist_fn_call(expr, NULL, NULL, NULL, NULL);
 		expr->fn_num = HIST_FIELD_FN_CONST;
-=======
-		expr->constant = op_fn(expr, NULL, NULL, NULL, NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		expr->operands[0] = NULL;
 		expr->operands[1] = NULL;
@@ -2900,11 +2767,6 @@ static struct hist_field *parse_expr(struct hist_trigger_data *hist_data,
 
 		expr->name = expr_str(expr, 0);
 	} else {
-<<<<<<< HEAD
-=======
-		expr->fn = op_fn;
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* The operand sizes should be the same, so just pick one */
 		expr->size = operand1->size;
 		expr->is_signed = operand1->is_signed;
@@ -3229,11 +3091,7 @@ static inline void __update_field_vars(struct tracing_map_elt *elt,
 		struct hist_field *var = field_var->var;
 		struct hist_field *val = field_var->val;
 
-<<<<<<< HEAD
 		var_val = hist_fn_call(val, elt, buffer, rbe, rec);
-=======
-		var_val = val->fn(val, elt, buffer, rbe, rec);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		var_idx = var->var.idx;
 
 		if (val->flags & HIST_FIELD_FL_STRING) {
@@ -4359,7 +4217,6 @@ static u64 hist_field_execname(struct hist_field *hist_field,
 	return (u64)(unsigned long)(elt_data->comm);
 }
 
-<<<<<<< HEAD
 static u64 hist_fn_call(struct hist_field *hist_field,
 			struct tracing_map_elt *elt,
 			struct trace_buffer *buffer,
@@ -4428,8 +4285,6 @@ static u64 hist_fn_call(struct hist_field *hist_field,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Convert a var that points to common_pid.execname to a string */
 static void update_var_execname(struct hist_field *hist_field)
 {
@@ -4441,11 +4296,7 @@ static void update_var_execname(struct hist_field *hist_field)
 	kfree_const(hist_field->type);
 	hist_field->type = "char[]";
 
-<<<<<<< HEAD
 	hist_field->fn_num = HIST_FIELD_FN_EXECNAME;
-=======
-	hist_field->fn = hist_field_execname;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int create_var_field(struct hist_trigger_data *hist_data,
@@ -5204,11 +5055,7 @@ static void hist_trigger_elt_update(struct hist_trigger_data *hist_data,
 
 	for_each_hist_val_field(i, hist_data) {
 		hist_field = hist_data->fields[i];
-<<<<<<< HEAD
 		hist_val = hist_fn_call(hist_field, elt, buffer, rbe, rec);
-=======
-		hist_val = hist_field->fn(hist_field, elt, buffer, rbe, rec);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (hist_field->flags & HIST_FIELD_FL_VAR) {
 			var_idx = hist_field->var.idx;
 
@@ -5239,11 +5086,7 @@ static void hist_trigger_elt_update(struct hist_trigger_data *hist_data,
 	for_each_hist_key_field(i, hist_data) {
 		hist_field = hist_data->fields[i];
 		if (hist_field->flags & HIST_FIELD_FL_VAR) {
-<<<<<<< HEAD
 			hist_val = hist_fn_call(hist_field, elt, buffer, rbe, rec);
-=======
-			hist_val = hist_field->fn(hist_field, elt, buffer, rbe, rec);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			var_idx = hist_field->var.idx;
 			tracing_map_set_var(elt, var_idx, hist_val);
 		}
@@ -5321,11 +5164,7 @@ static void event_hist_trigger(struct event_trigger_data *data,
 					 HIST_STACKTRACE_SKIP);
 			key = entries;
 		} else {
-<<<<<<< HEAD
 			field_contents = hist_fn_call(key_field, elt, buffer, rbe, rec);
-=======
-			field_contents = key_field->fn(key_field, elt, buffer, rbe, rec);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (key_field->flags & HIST_FIELD_FL_STRING) {
 				key = (void *)(unsigned long)field_contents;
 				use_compound_key = true;

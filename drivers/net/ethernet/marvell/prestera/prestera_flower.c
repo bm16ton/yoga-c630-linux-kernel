@@ -5,10 +5,7 @@
 #include "prestera_acl.h"
 #include "prestera_flow.h"
 #include "prestera_flower.h"
-<<<<<<< HEAD
 #include "prestera_matchall.h"
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct prestera_flower_template {
 	struct prestera_acl_ruleset *ruleset;
@@ -364,7 +361,6 @@ static int prestera_flower_parse(struct prestera_flow_block *block,
 					     f->common.extack);
 }
 
-<<<<<<< HEAD
 static int prestera_flower_prio_check(struct prestera_flow_block *block,
 				      struct flow_cls_offload *f)
 {
@@ -408,8 +404,6 @@ int prestera_flower_prio_get(struct prestera_flow_block *block, u32 chain_index,
 	return 0;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int prestera_flower_replace(struct prestera_flow_block *block,
 			    struct flow_cls_offload *f)
 {
@@ -418,13 +412,10 @@ int prestera_flower_replace(struct prestera_flow_block *block,
 	struct prestera_acl_rule *rule;
 	int err;
 
-<<<<<<< HEAD
 	err = prestera_flower_prio_check(block, f);
 	if (err)
 		return err;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ruleset = prestera_acl_ruleset_get(acl, block, f->common.chain_index);
 	if (IS_ERR(ruleset))
 		return PTR_ERR(ruleset);

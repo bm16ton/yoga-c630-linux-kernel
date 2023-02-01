@@ -343,11 +343,7 @@ repeat:
 	get_swap_pages(1, &entry, 1);
 out:
 	if (mem_cgroup_try_charge_swap(folio, entry)) {
-<<<<<<< HEAD
 		put_swap_folio(folio, entry);
-=======
-		put_swap_page(&folio->page, entry);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		entry.val = 0;
 	}
 	return entry;

@@ -292,11 +292,7 @@ static int imx_audmux_probe(struct platform_device *pdev)
 		audmux_clk = NULL;
 	}
 
-<<<<<<< HEAD
 	audmux_type = (uintptr_t)of_device_get_match_data(&pdev->dev);
-=======
-	audmux_type = (enum imx_audmux_type)of_device_get_match_data(&pdev->dev);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (audmux_type) {
 	case IMX31_AUDMUX:

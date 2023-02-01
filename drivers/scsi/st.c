@@ -533,10 +533,7 @@ static enum rq_end_io_ret st_scsi_execute_end(struct request *req,
 
 	blk_rq_unmap_user(tmp);
 	blk_mq_free_request(req);
-<<<<<<< HEAD
 	return RQ_END_IO_NONE;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int st_scsi_execute(struct st_request *SRpnt, const unsigned char *cmd,

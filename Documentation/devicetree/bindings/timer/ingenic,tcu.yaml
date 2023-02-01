@@ -114,11 +114,8 @@ patternProperties:
   "^watchdog@[a-f0-9]+$":
     type: object
     $ref: /schemas/watchdog/watchdog.yaml#
-<<<<<<< HEAD
     unevaluatedProperties: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     properties:
       compatible:
         oneOf:
@@ -151,11 +148,8 @@ patternProperties:
   "^pwm@[a-f0-9]+$":
     type: object
     $ref: /schemas/pwm/pwm.yaml#
-<<<<<<< HEAD
     unevaluatedProperties: false
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     properties:
       compatible:
         oneOf:
@@ -204,17 +198,10 @@ patternProperties:
           - enum:
               - ingenic,jz4725b-ost
               - ingenic,jz4760b-ost
-<<<<<<< HEAD
           - items:
               - const: ingenic,jz4760-ost
               - const: ingenic,jz4725b-ost
           - items:
-=======
-          - items:
-              - const: ingenic,jz4760-ost
-              - const: ingenic,jz4725b-ost
-          - items:
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - enum:
                   - ingenic,jz4780-ost
                   - ingenic,jz4770-ost

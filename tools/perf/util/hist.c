@@ -215,10 +215,7 @@ void hists__calc_col_len(struct hists *hists, struct hist_entry *h)
 	hists__new_col_len(hists, HISTC_GLOBAL_INS_LAT, 13);
 	hists__new_col_len(hists, HISTC_LOCAL_P_STAGE_CYC, 13);
 	hists__new_col_len(hists, HISTC_GLOBAL_P_STAGE_CYC, 13);
-<<<<<<< HEAD
 	hists__new_col_len(hists, HISTC_ADDR, BITS_PER_LONG / 4 + 2);
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (symbol_conf.nanosecs)
 		hists__new_col_len(hists, HISTC_TIME, 16);
@@ -2687,7 +2684,6 @@ size_t evlist__fprintf_nr_events(struct evlist *evlist, FILE *fp,
 	evlist__for_each_entry(evlist, pos) {
 		struct hists *hists = evsel__hists(pos);
 
-<<<<<<< HEAD
 		if (skip_empty && !hists->stats.nr_samples && !hists->stats.nr_lost_samples)
 			continue;
 
@@ -2698,14 +2694,6 @@ size_t evlist__fprintf_nr_events(struct evlist *evlist, FILE *fp,
 		if (hists->stats.nr_lost_samples)
 			ret += fprintf(fp, "%16s events: %10d\n",
 				       "LOST_SAMPLES", hists->stats.nr_lost_samples);
-=======
-		if (skip_empty && !hists->stats.nr_samples)
-			continue;
-
-		ret += fprintf(fp, "%s stats:\n", evsel__name(pos));
-		ret += fprintf(fp, "%16s events: %10d\n",
-			       "SAMPLE", hists->stats.nr_samples);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return ret;

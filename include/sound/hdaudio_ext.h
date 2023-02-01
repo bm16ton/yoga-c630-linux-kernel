@@ -77,18 +77,9 @@ struct hdac_ext_stream {
 #define stream_to_hdac_ext_stream(s) \
 	container_of(s, struct hdac_ext_stream, hstream)
 
-<<<<<<< HEAD
 int snd_hdac_ext_stream_init_all(struct hdac_bus *bus, int start_idx,
 				 int num_stream, int dir);
 void snd_hdac_ext_stream_free_all(struct hdac_bus *bus);
-=======
-void snd_hdac_ext_stream_init(struct hdac_bus *bus,
-			      struct hdac_ext_stream *hext_stream, int idx,
-			      int direction, int tag);
-int snd_hdac_ext_stream_init_all(struct hdac_bus *bus, int start_idx,
-				 int num_stream, int dir);
-void snd_hdac_stream_free_all(struct hdac_bus *bus);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void snd_hdac_link_free_all(struct hdac_bus *bus);
 struct hdac_ext_stream *snd_hdac_ext_stream_assign(struct hdac_bus *bus,
 					   struct snd_pcm_substream *substream,
@@ -191,15 +182,6 @@ void snd_hdac_ext_bus_link_power(struct hdac_device *codec, bool enable);
 #define snd_hdac_adsp_readq_poll(chip, reg, val, cond, delay_us, timeout_us) \
 	readq_poll_timeout((chip)->dsp_ba + (reg), val, cond, \
 			   delay_us, timeout_us)
-<<<<<<< HEAD
-=======
-#define snd_hdac_stream_readb_poll(strm, reg, val, cond, delay_us, timeout_us) \
-	readb_poll_timeout((strm)->sd_addr + AZX_REG_ ## reg, val, cond, \
-			   delay_us, timeout_us)
-#define snd_hdac_stream_readl_poll(strm, reg, val, cond, delay_us, timeout_us) \
-	readl_poll_timeout((strm)->sd_addr + AZX_REG_ ## reg, val, cond, \
-			   delay_us, timeout_us)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct hdac_ext_device;
 

@@ -57,22 +57,6 @@ required hardware setup.
 
 Once a mapping has been established, it can be retrieved or used via a
 variety of methods:
-<<<<<<< HEAD
-=======
-
-- irq_resolve_mapping() returns a pointer to the irq_desc structure
-  for a given domain and hwirq number, and NULL if there was no
-  mapping.
-- irq_find_mapping() returns a Linux IRQ number for a given domain and
-  hwirq number, and 0 if there was no mapping
-- irq_linear_revmap() is now identical to irq_find_mapping(), and is
-  deprecated
-- generic_handle_domain_irq() handles an interrupt described by a
-  domain and a hwirq number
-
-Note that irq domain lookups must happen in contexts that are
-compatible with a RCU read-side critical section.
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 - irq_resolve_mapping() returns a pointer to the irq_desc structure
   for a given domain and hwirq number, and NULL if there was no

@@ -2388,11 +2388,7 @@ static int lan743x_tx_open(struct lan743x_tx *tx)
 							 (tx->channel_number));
 	netif_napi_add_tx_weight(adapter->netdev,
 				 &tx->napi, lan743x_tx_napi_poll,
-<<<<<<< HEAD
 				 NAPI_POLL_WEIGHT);
-=======
-				 tx->ring_size - 1);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	napi_enable(&tx->napi);
 
 	data = 0;
@@ -3358,15 +3354,10 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
 						 PCI11X1X_USED_TX_CHANNELS,
 						 LAN743X_USED_RX_CHANNELS);
 	} else {
-<<<<<<< HEAD
 		netdev = devm_alloc_etherdev_mqs(&pdev->dev,
 						 sizeof(struct lan743x_adapter),
 						 LAN743X_USED_TX_CHANNELS,
 						 LAN743X_USED_RX_CHANNELS);
-=======
-		netdev = devm_alloc_etherdev(&pdev->dev,
-					     sizeof(struct lan743x_adapter));
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!netdev)

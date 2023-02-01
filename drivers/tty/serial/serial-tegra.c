@@ -1280,10 +1280,6 @@ static void tegra_uart_set_termios(struct uart_port *u,
 	unsigned long flags;
 	unsigned int lcr;
 	unsigned char char_bits;
-<<<<<<< HEAD
-=======
-	int symb_bit = 1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct clk *parent_clk = clk_get_parent(tup->uart_clk);
 	unsigned long parent_clk_rate = clk_get_rate(parent_clk);
 	int max_divider = (tup->cdata->support_clk_src_div) ? 0x7FFF : 0xFFFF;
@@ -1322,10 +1318,6 @@ static void tegra_uart_set_termios(struct uart_port *u,
 	}
 
 	char_bits = tty_get_char_size(termios->c_cflag);
-<<<<<<< HEAD
-=======
-	symb_bit += char_bits;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lcr &= ~UART_LCR_WLEN8;
 	lcr |= UART_LCR_WLEN(char_bits);
 

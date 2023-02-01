@@ -336,51 +336,9 @@ void __init_or_module noinline apply_alternatives(struct alt_instr *start,
 
 next:
 		optimize_nops(instr, a->instrlen);
-<<<<<<< HEAD
-=======
 	}
 }
 
-#if defined(CONFIG_RETPOLINE) && defined(CONFIG_OBJTOOL)
-
-/*
- * CALL/JMP *%\reg
- */
-static int emit_indirect(int op, int reg, u8 *bytes)
-{
-	int i = 0;
-	u8 modrm;
-
-	switch (op) {
-	case CALL_INSN_OPCODE:
-		modrm = 0x10; /* Reg = 2; CALL r/m */
-		break;
-
-	case JMP32_INSN_OPCODE:
-		modrm = 0x20; /* Reg = 4; JMP r/m */
-		break;
-
-	default:
-		WARN_ON_ONCE(1);
-		return -1;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
-	}
-
-	if (reg >= 8) {
-		bytes[i++] = 0x41; /* REX.B prefix */
-		reg -= 8;
-	}
-
-	modrm |= 0xc0; /* Mod = 3 */
-	modrm += reg;
-
-	bytes[i++] = 0xff; /* opcode */
-	bytes[i++] = modrm;
-
-	return i;
-}
-
-<<<<<<< HEAD
 #if defined(CONFIG_RETPOLINE) && defined(CONFIG_OBJTOOL)
 
 /*
@@ -419,8 +377,6 @@ static int emit_indirect(int op, int reg, u8 *bytes)
 	return i;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Rewrite the compiler generated retpoline thunk calls.
  *
@@ -497,7 +453,6 @@ static int patch_retpoline(void *addr, struct insn *insn, u8 *bytes)
 		return ret;
 	i += ret;
 
-<<<<<<< HEAD
 	/*
 	 * The compiler is supposed to EMIT an INT3 after every unconditional
 	 * JMP instruction due to AMD BTC. However, if the compiler is too old
@@ -507,8 +462,6 @@ static int patch_retpoline(void *addr, struct insn *insn, u8 *bytes)
 	if (op == JMP32_INSN_OPCODE && i < insn->length)
 		bytes[i++] = INT3_INSN_OPCODE;
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (; i < insn->length;)
 		bytes[i++] = BYTES_NOP1;
 
@@ -1380,12 +1333,7 @@ static struct bp_patching_desc bp_desc;
 static __always_inline
 struct bp_patching_desc *try_get_desc(void)
 {
-<<<<<<< HEAD
 	struct bp_patching_desc *desc = &bp_desc;
-=======
-	/* rcu_dereference */
-	struct bp_patching_desc *desc = __READ_ONCE(*descp);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!arch_atomic_inc_not_zero(&desc->refs))
 		return NULL;

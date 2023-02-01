@@ -185,19 +185,11 @@ static const struct iio_event_spec ads1015_events[] = {
 	.address = _addr,					\
 	.channel = _chan,					\
 	.info_mask_separate = BIT(IIO_CHAN_INFO_RAW) |		\
-<<<<<<< HEAD
 				BIT(IIO_CHAN_INFO_SCALE) |	\
 				BIT(IIO_CHAN_INFO_SAMP_FREQ),	\
 	.info_mask_shared_by_all_available =			\
 				BIT(IIO_CHAN_INFO_SCALE) |	\
 				BIT(IIO_CHAN_INFO_SAMP_FREQ),	\
-=======
-				BIT(IIO_CHAN_INFO_SCALE) |	\
-				BIT(IIO_CHAN_INFO_SAMP_FREQ),	\
-	.info_mask_shared_by_all_available =			\
-				BIT(IIO_CHAN_INFO_SCALE) |	\
-				BIT(IIO_CHAN_INFO_SAMP_FREQ),	\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.scan_index = _addr,					\
 	.scan_type = {						\
 		.sign = 's',					\
@@ -1118,11 +1110,6 @@ static void ads1015_remove(struct i2c_client *client)
 	if (ret)
 		dev_warn(&client->dev, "Failed to power down (%pe)\n",
 			 ERR_PTR(ret));
-<<<<<<< HEAD
-=======
-
-	return 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_PM

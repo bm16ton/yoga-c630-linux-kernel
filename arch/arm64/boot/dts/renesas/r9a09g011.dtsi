@@ -48,11 +48,7 @@
 		#size-cells = <2>;
 		ranges;
 
-<<<<<<< HEAD
 		gic: interrupt-controller@82010000 {
-=======
-		gic: interrupt-controller@82000000 {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "arm,gic-400";
 			#interrupt-cells = <3>;
 			#address-cells = <0>;
@@ -127,7 +123,6 @@
 			#power-domain-cells = <0>;
 		};
 
-<<<<<<< HEAD
 		i2c0: i2c@a4030000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -156,8 +151,6 @@
 			status = "disabled";
 		};
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		uart0: serial@a4040000 {
 			compatible = "renesas,r9a09g011-uart", "renesas,em-uart";
 			reg = <0 0xa4040000 0 0x80>;
@@ -167,7 +160,6 @@
 			clock-names = "sclk", "pclk";
 			status = "disabled";
 		};
-<<<<<<< HEAD
 
 		pinctrl: pinctrl@b6250000 {
 			compatible = "renesas,r9a09g011-pinctrl";
@@ -218,8 +210,6 @@
 			power-domains = <&cpg>;
 			resets = <&cpg R9A09G011_PFC_PRESETN>;
 		};
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	timer {

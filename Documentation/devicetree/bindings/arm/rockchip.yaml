@@ -161,10 +161,7 @@ properties:
               - friendlyarm,nanopi-m4b
               - friendlyarm,nanopi-neo4
               - friendlyarm,nanopi-r4s
-<<<<<<< HEAD
               - friendlyarm,nanopi-r4s-enterprise
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - const: rockchip,rk3399
 
       - description: GeekBuying GeekBox
@@ -538,14 +535,11 @@ properties:
           - const: pine64,pinenote
           - const: rockchip,rk3566
 
-<<<<<<< HEAD
       - description: Pine64 PinePhonePro
         items:
           - const: pine64,pinephone-pro
           - const: rockchip,rk3399
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - description: Pine64 Rock64
         items:
           - const: pine64,rock64

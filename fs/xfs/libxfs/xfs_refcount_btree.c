@@ -188,14 +188,9 @@ xfs_refcountbt_key_diff(
 	struct xfs_btree_cur		*cur,
 	const union xfs_btree_key	*key)
 {
-<<<<<<< HEAD
 	const struct xfs_refcount_key	*kp = &key->refc;
 	const struct xfs_refcount_irec	*irec = &cur->bc_rec.rc;
 	uint32_t			start;
-=======
-	struct xfs_refcount_irec	*rec = &cur->bc_rec.rc;
-	const struct xfs_refcount_key	*kp = &key->refc;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	start = xfs_refcount_encode_startblock(irec->rc_startblock,
 			irec->rc_domain);

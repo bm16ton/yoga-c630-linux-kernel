@@ -587,7 +587,6 @@
 					clocks = <&syscon ASPEED_CLK_GATE_LCLK>;
 					kcs_chan = <1>;
 					status = "disabled";
-<<<<<<< HEAD
 				};
 
 				kcs2: kcs@28 {
@@ -598,18 +597,6 @@
 					status = "disabled";
 				};
 
-=======
-				};
-
-				kcs2: kcs@28 {
-					compatible = "aspeed,ast2500-kcs-bmc-v2";
-					reg = <0x28 0x1>, <0x34 0x1>, <0x40 0x1>;
-					interrupts = <GIC_SPI 139 IRQ_TYPE_LEVEL_HIGH>;
-					clocks = <&syscon ASPEED_CLK_GATE_LCLK>;
-					status = "disabled";
-				};
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				kcs3: kcs@2c {
 					compatible = "aspeed,ast2500-kcs-bmc-v2";
 					reg = <0x2c 0x1>, <0x38 0x1>, <0x44 0x1>;

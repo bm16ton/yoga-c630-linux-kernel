@@ -79,11 +79,7 @@ mtk_ppe_debugfs_foe_show(struct seq_file *m, void *private, bool bind)
 	int i;
 
 	for (i = 0; i < MTK_PPE_ENTRIES; i++) {
-<<<<<<< HEAD
 		struct mtk_foe_entry *entry = mtk_foe_get_entry(ppe, i);
-=======
-		struct mtk_foe_entry *entry = &ppe->foe_table[i];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct mtk_foe_mac_info *l2;
 		struct mtk_flow_addr_info ai = {};
 		unsigned char h_source[ETH_ALEN];
@@ -166,7 +162,6 @@ mtk_ppe_debugfs_foe_show(struct seq_file *m, void *private, bool bind)
 }
 
 static int
-<<<<<<< HEAD
 mtk_ppe_debugfs_foe_all_show(struct seq_file *m, void *private)
 {
 	return mtk_ppe_debugfs_foe_show(m, private, false);
@@ -189,54 +184,6 @@ int mtk_ppe_debugfs_init(struct mtk_ppe *ppe, int index)
 	root = debugfs_create_dir(ppe->dirname, NULL);
 	debugfs_create_file("entries", S_IRUGO, root, ppe, &mtk_ppe_debugfs_foe_all_fops);
 	debugfs_create_file("bind", S_IRUGO, root, ppe, &mtk_ppe_debugfs_foe_bind_fops);
-=======
-mtk_ppe_debugfs_foe_show_all(struct seq_file *m, void *private)
-{
-	return mtk_ppe_debugfs_foe_show(m, private, false);
-}
-
-static int
-mtk_ppe_debugfs_foe_show_bind(struct seq_file *m, void *private)
-{
-	return mtk_ppe_debugfs_foe_show(m, private, true);
-}
-
-static int
-mtk_ppe_debugfs_foe_open_all(struct inode *inode, struct file *file)
-{
-	return single_open(file, mtk_ppe_debugfs_foe_show_all,
-			   inode->i_private);
-}
-
-static int
-mtk_ppe_debugfs_foe_open_bind(struct inode *inode, struct file *file)
-{
-	return single_open(file, mtk_ppe_debugfs_foe_show_bind,
-			   inode->i_private);
-}
-
-int mtk_ppe_debugfs_init(struct mtk_ppe *ppe)
-{
-	static const struct file_operations fops_all = {
-		.open = mtk_ppe_debugfs_foe_open_all,
-		.read = seq_read,
-		.llseek = seq_lseek,
-		.release = single_release,
-	};
-
-	static const struct file_operations fops_bind = {
-		.open = mtk_ppe_debugfs_foe_open_bind,
-		.read = seq_read,
-		.llseek = seq_lseek,
-		.release = single_release,
-	};
-
-	struct dentry *root;
-
-	root = debugfs_create_dir("mtk_ppe", NULL);
-	debugfs_create_file("entries", S_IRUGO, root, ppe, &fops_all);
-	debugfs_create_file("bind", S_IRUGO, root, ppe, &fops_bind);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

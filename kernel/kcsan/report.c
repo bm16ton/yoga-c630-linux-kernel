@@ -492,12 +492,7 @@ static void print_report(enum kcsan_value_change value_change,
 	dump_stack_print_info(KERN_DEFAULT);
 	pr_err("==================================================================\n");
 
-<<<<<<< HEAD
 	check_panic_on_warn("KCSAN");
-=======
-	if (panic_on_warn)
-		panic("panic_on_warn set ...\n");
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void release_report(unsigned long *flags, struct other_info *other_info)

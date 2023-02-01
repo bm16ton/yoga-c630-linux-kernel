@@ -23,8 +23,5 @@ dtb-$(CONFIG_ARCH_K3) += k3-am642-evm.dtb
 dtb-$(CONFIG_ARCH_K3) += k3-am642-sk.dtb
 
 dtb-$(CONFIG_ARCH_K3) += k3-am625-sk.dtb
-<<<<<<< HEAD
 
 dtb-$(CONFIG_ARCH_K3) += k3-am62a7-sk.dtb
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

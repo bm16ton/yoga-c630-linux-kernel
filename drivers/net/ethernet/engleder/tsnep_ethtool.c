@@ -250,7 +250,6 @@ static int tsnep_ethtool_get_sset_count(struct net_device *netdev, int sset)
 	}
 }
 
-<<<<<<< HEAD
 static int tsnep_ethtool_get_rxnfc(struct net_device *dev,
 				   struct ethtool_rxnfc *cmd, u32 *rule_locs)
 {
@@ -289,8 +288,6 @@ static int tsnep_ethtool_set_rxnfc(struct net_device *dev,
 	}
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tsnep_ethtool_get_ts_info(struct net_device *dev,
 				     struct ethtool_ts_info *info)
 {
@@ -328,11 +325,8 @@ const struct ethtool_ops tsnep_ethtool_ops = {
 	.get_strings = tsnep_ethtool_get_strings,
 	.get_ethtool_stats = tsnep_ethtool_get_ethtool_stats,
 	.get_sset_count = tsnep_ethtool_get_sset_count,
-<<<<<<< HEAD
 	.get_rxnfc = tsnep_ethtool_get_rxnfc,
 	.set_rxnfc = tsnep_ethtool_set_rxnfc,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_ts_info = tsnep_ethtool_get_ts_info,
 	.get_link_ksettings = phy_ethtool_get_link_ksettings,
 	.set_link_ksettings = phy_ethtool_set_link_ksettings,

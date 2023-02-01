@@ -106,11 +106,7 @@ struct drm_gem_dma_object *
 vc4_use_bo(struct vc4_exec_info *exec, uint32_t hindex)
 {
 	struct vc4_dev *vc4 = exec->dev;
-<<<<<<< HEAD
 	struct drm_gem_dma_object *obj;
-=======
-	struct drm_gem_cma_object *obj;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vc4_bo *bo;
 
 	if (WARN_ON_ONCE(vc4->is_vc5))

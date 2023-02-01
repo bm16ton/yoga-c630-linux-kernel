@@ -6,11 +6,6 @@
 #include <linux/ieee80211.h>
 #include "../include/osdep_service.h"
 #include "../include/drv_types.h"
-<<<<<<< HEAD
-=======
-#include "../include/recv_osdep.h"
-#include "../include/mlme_osdep.h"
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../include/usb_ops.h"
 #include "../include/wifi.h"
 #include "../include/rtl8188e_recv.h"
@@ -40,7 +35,6 @@ void _rtw_init_sta_recv_priv(struct sta_recv_priv *psta_recvpriv)
 
 }
 
-<<<<<<< HEAD
 static int rtl8188eu_init_recv_priv(struct adapter *padapter)
 {
 	struct recv_priv *precvpriv = &padapter->recvpriv;
@@ -104,8 +98,6 @@ exit:
 	return res;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int _rtw_init_recv_priv(struct recv_priv *precvpriv, struct adapter *padapter)
 {
 	int i;
@@ -160,7 +152,6 @@ exit:
 	return res;
 }
 
-<<<<<<< HEAD
 static void rtl8188eu_free_recv_priv(struct adapter *padapter)
 {
 	int i;
@@ -181,8 +172,6 @@ static void rtl8188eu_free_recv_priv(struct adapter *padapter)
 	skb_queue_purge(&precvpriv->free_recv_skb_queue);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void _rtw_free_recv_priv(struct recv_priv *precvpriv)
 {
 	struct adapter	*padapter = precvpriv->adapter;
@@ -336,7 +325,6 @@ u32 rtw_free_uc_swdec_pending_queue(struct adapter *adapter)
 	return cnt;
 }
 
-<<<<<<< HEAD
 static void rtw_handle_tkip_mic_err(struct adapter *padapter, u8 bgroup)
 {
 	union iwreq_data wrqu;
@@ -373,8 +361,6 @@ static void rtw_handle_tkip_mic_err(struct adapter *padapter, u8 bgroup)
 			    &wrqu, (char *)&ev);
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int recvframe_chkmic(struct adapter *adapter,  struct recv_frame *precvframe)
 {
 	int	i, res = _SUCCESS;
@@ -1425,10 +1411,6 @@ static int amsdu_to_msdu(struct adapter *padapter, struct recv_frame *prframe)
 	u8	nr_subframes, i;
 	unsigned char *pdata;
 	struct rx_pkt_attrib *pattrib;
-<<<<<<< HEAD
-=======
-	unsigned char *data_ptr;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sk_buff *sub_skb, *subframes[MAX_SUBFRAME_COUNT];
 
 	struct recv_priv *precvpriv = &padapter->recvpriv;
@@ -1463,12 +1445,7 @@ static int amsdu_to_msdu(struct adapter *padapter, struct recv_frame *prframe)
 		sub_skb = dev_alloc_skb(nSubframe_Length + 12);
 		if (sub_skb) {
 			skb_reserve(sub_skb, 12);
-<<<<<<< HEAD
 			skb_put_data(sub_skb, pdata, nSubframe_Length);
-=======
-			data_ptr = (u8 *)skb_put(sub_skb, nSubframe_Length);
-			memcpy(data_ptr, pdata, nSubframe_Length);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			sub_skb = skb_clone(prframe->pkt, GFP_ATOMIC);
 			if (sub_skb) {
@@ -1598,7 +1575,6 @@ static bool enqueue_reorder_recvframe(struct recv_reorder_ctrl *preorder_ctrl, s
 	return true;
 }
 
-<<<<<<< HEAD
 static int rtw_recv_indicatepkt(struct adapter *padapter, struct recv_frame *precv_frame)
 {
 	struct recv_priv *precvpriv;
@@ -1678,8 +1654,6 @@ _recv_indicatepkt_drop:
 	return _FAIL;
 }
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool recv_indicatepkts_in_order(struct adapter *padapter, struct recv_reorder_ctrl *preorder_ctrl, int bforced)
 {
 	struct list_head *phead, *plist;

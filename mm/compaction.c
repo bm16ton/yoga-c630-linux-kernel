@@ -52,11 +52,6 @@ static inline void count_compact_events(enum vm_event_item item, long delta)
 
 #define block_start_pfn(pfn, order)	round_down(pfn, 1UL << (order))
 #define block_end_pfn(pfn, order)	ALIGN((pfn) + 1, 1UL << (order))
-<<<<<<< HEAD
-=======
-#define pageblock_start_pfn(pfn)	block_start_pfn(pfn, pageblock_order)
-#define pageblock_end_pfn(pfn)		block_end_pfn(pfn, pageblock_order)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Page order with-respect-to which proactive compaction
@@ -889,11 +884,7 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
 		 * COMPACT_CLUSTER_MAX at a time so the second call must
 		 * not falsely conclude that the block should be skipped.
 		 */
-<<<<<<< HEAD
 		if (!valid_page && pageblock_aligned(low_pfn)) {
-=======
-		if (!valid_page && IS_ALIGNED(low_pfn, pageblock_nr_pages)) {
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (!isolation_suitable(cc, page)) {
 				low_pfn = end_pfn;
 				page = NULL;
@@ -1983,7 +1974,6 @@ static inline bool is_via_compact_memory(int order)
  */
 static bool kswapd_is_running(pg_data_t *pgdat)
 {
-<<<<<<< HEAD
 	bool running;
 
 	pgdat_kswapd_lock(pgdat);
@@ -1991,9 +1981,6 @@ static bool kswapd_is_running(pg_data_t *pgdat)
 	pgdat_kswapd_unlock(pgdat);
 
 	return running;
-=======
-	return pgdat->kswapd && task_is_running(pgdat->kswapd);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

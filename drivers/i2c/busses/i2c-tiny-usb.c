@@ -223,7 +223,6 @@ static int i2c_gpio_probe(struct usb_interface *interface)
 //	int ifnum = intf->cur_altsetting->desc.bInterfaceNumber;
 	int inf;
 	inf = interface->cur_altsetting->desc.bInterfaceNumber;
-<<<<<<< HEAD
 	if (intfnum) {
 		if(inf == intfnum) {
 			return 0;
@@ -233,13 +232,6 @@ static int i2c_gpio_probe(struct usb_interface *interface)
 		dev_info(&interface->dev, "Ignoring Interface\n");
 		return -ENODEV;
 		}
-=======
-
-	if (inf <= 3 && inf >= 1) {
-		dev_info(&interface->dev, "Ignoring Interface\n");
-		return -ENODEV;
-		}
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

@@ -732,11 +732,7 @@ static int set_default_key(struct wiphy *wiphy, struct net_device *netdev,
 }
 
 static int set_default_mgmt_key(struct wiphy *wiphy, struct net_device *netdev,
-<<<<<<< HEAD
 				int link_id, u8 key_index)
-=======
-				u8 key_index)
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct wilc_vif *vif = netdev_priv(netdev);
 
@@ -1022,20 +1018,11 @@ bool wilc_wfi_mgmt_frame_rx(struct wilc_vif *vif, u8 *buff, u32 size)
 {
 	struct wilc *wl = vif->wilc;
 	struct wilc_priv *priv = &vif->priv;
-<<<<<<< HEAD
 	int freq;
 
 	freq = ieee80211_channel_to_frequency(wl->op_ch, NL80211_BAND_2GHZ);
 
 	return cfg80211_rx_mgmt(&priv->wdev, freq, 0, buff, size, 0);
-=======
-	int freq, ret;
-
-	freq = ieee80211_channel_to_frequency(wl->op_ch, NL80211_BAND_2GHZ);
-	ret = cfg80211_rx_mgmt(&priv->wdev, freq, 0, buff, size, 0);
-
-	return ret;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void wilc_wfi_p2p_rx(struct wilc_vif *vif, u8 *buff, u32 size)

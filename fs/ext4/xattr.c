@@ -2045,11 +2045,7 @@ inserted:
 				}
 				BHDR(new_bh)->h_refcount = cpu_to_le32(ref);
 				if (ref == EXT4_XATTR_REFCOUNT_MAX)
-<<<<<<< HEAD
 					clear_bit(MBE_REUSABLE_B, &ce->e_flags);
-=======
-					ce->e_reusable = 0;
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				ea_bdebug(new_bh, "reusing; refcount now=%d",
 					  ref);
 				ext4_xattr_block_csum_set(inode, new_bh);

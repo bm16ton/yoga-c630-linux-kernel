@@ -37,11 +37,8 @@ description: |
       For PM6150, smps1 - smps5, ldo1 - ldo19
       For PM6150L, smps1 - smps8, ldo1 - ldo11, bob
       For PM6350, smps1 - smps5, ldo1 - ldo22
-<<<<<<< HEAD
       For PM660, smps1 - smps6, ldo1 - ldo3, ldo5 - ldo19
       For PM660L, smps1 - smps3, smps5, ldo1 - ldo8, bob
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       For PM7325, smps1 - smps8, ldo1 - ldo19
       For PM8005, smps1 - smps4
       For PM8009, smps1 - smps2, ldo1 - ldo7
@@ -62,11 +59,8 @@ properties:
       - qcom,pm6150-rpmh-regulators
       - qcom,pm6150l-rpmh-regulators
       - qcom,pm6350-rpmh-regulators
-<<<<<<< HEAD
       - qcom,pm660-rpmh-regulators
       - qcom,pm660l-rpmh-regulators
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - qcom,pm7325-rpmh-regulators
       - qcom,pm8005-rpmh-regulators
       - qcom,pm8009-rpmh-regulators
@@ -109,22 +103,16 @@ properties:
     type: object
     $ref: "regulator.yaml#"
     description: BOB regulator node.
-<<<<<<< HEAD
     dependencies:
       regulator-allow-set-load: ["regulator-allowed-modes"]
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 patternProperties:
   "^(smps|ldo|lvs)[0-9]+$":
     type: object
     $ref: "regulator.yaml#"
     description: smps/ldo regulator nodes(s).
-<<<<<<< HEAD
     dependencies:
       regulator-allow-set-load: ["regulator-allowed-modes"]
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 required:
   - compatible
@@ -168,7 +156,6 @@ allOf:
       properties:
         compatible:
           enum:
-<<<<<<< HEAD
             - qcom,pm660-rpmh-regulators
     then:
       properties:
@@ -201,8 +188,6 @@ allOf:
       properties:
         compatible:
           enum:
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             - qcom,pm7325-rpmh-regulators
     then:
       properties:

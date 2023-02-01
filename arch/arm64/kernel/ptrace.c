@@ -121,11 +121,7 @@ static bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 {
 	return ((addr & ~(THREAD_SIZE - 1))  ==
 		(kernel_stack_pointer(regs) & ~(THREAD_SIZE - 1))) ||
-<<<<<<< HEAD
 		on_irq_stack(addr, sizeof(unsigned long));
-=======
-		on_irq_stack(addr, sizeof(unsigned long), NULL);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -1368,11 +1364,7 @@ enum aarch64_regset {
 #ifdef CONFIG_ARM64_SVE
 	REGSET_SVE,
 #endif
-<<<<<<< HEAD
 #ifdef CONFIG_ARM64_SME
-=======
-#ifdef CONFIG_ARM64_SVE
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	REGSET_SSVE,
 	REGSET_ZA,
 #endif

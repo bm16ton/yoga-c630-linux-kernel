@@ -1222,10 +1222,7 @@ static const struct mtk_eint_hw mt8186_eint_hw = {
 	.ports     = 7,
 	.ap_num    = 217,
 	.db_cnt    = 32,
-<<<<<<< HEAD
 	.db_time   = debounce_time_mt6765,
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct mtk_pin_soc mt8186_data = {

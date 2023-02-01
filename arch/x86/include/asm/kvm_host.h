@@ -501,16 +501,12 @@ struct kvm_pmc {
 	bool intr;
 };
 
-<<<<<<< HEAD
 /* More counters may conflict with other existing Architectural MSRs */
 #define KVM_INTEL_PMC_MAX_GENERIC	8
 #define MSR_ARCH_PERFMON_PERFCTR_MAX	(MSR_ARCH_PERFMON_PERFCTR0 + KVM_INTEL_PMC_MAX_GENERIC - 1)
 #define MSR_ARCH_PERFMON_EVENTSEL_MAX	(MSR_ARCH_PERFMON_EVENTSEL0 + KVM_INTEL_PMC_MAX_GENERIC - 1)
 #define KVM_PMC_MAX_FIXED	3
 #define KVM_AMD_PMC_MAX_GENERIC	6
-=======
-#define KVM_PMC_MAX_FIXED	3
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct kvm_pmu {
 	unsigned nr_arch_gp_counters;
 	unsigned nr_arch_fixed_counters;
@@ -525,11 +521,7 @@ struct kvm_pmu {
 	u64 reserved_bits;
 	u64 raw_event_mask;
 	u8 version;
-<<<<<<< HEAD
 	struct kvm_pmc gp_counters[KVM_INTEL_PMC_MAX_GENERIC];
-=======
-	struct kvm_pmc gp_counters[INTEL_PMC_MAX_GENERIC];
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
 	struct irq_work irq_work;
 	DECLARE_BITMAP(reprogram_pmi, X86_PMC_IDX_MAX);
@@ -628,11 +620,8 @@ struct kvm_vcpu_hv {
 		u32 enlightenments_eax; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EAX */
 		u32 enlightenments_ebx; /* HYPERV_CPUID_ENLIGHTMENT_INFO.EBX */
 		u32 syndbg_cap_eax; /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
-<<<<<<< HEAD
 		u32 nested_eax; /* HYPERV_CPUID_NESTED_FEATURES.EAX */
 		u32 nested_ebx; /* HYPERV_CPUID_NESTED_FEATURES.EBX */
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} cpuid_cache;
 };
 
@@ -655,7 +644,6 @@ struct kvm_vcpu_xen {
 	struct hrtimer timer;
 	int poll_evtchn;
 	struct timer_list poll_timer;
-<<<<<<< HEAD
 };
 
 struct kvm_queued_exception {
@@ -666,8 +654,6 @@ struct kvm_queued_exception {
 	u32 error_code;
 	unsigned long payload;
 	bool has_payload;
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct kvm_vcpu_arch {
@@ -760,6 +746,7 @@ struct kvm_vcpu_arch {
 	struct fpu_guest guest_fpu;
 
 	u64 xcr0;
+	u64 guest_supported_xcr0;
 
 	struct kvm_pio_request pio;
 	void *pio_data;
@@ -1298,13 +1285,8 @@ struct kvm_arch {
 	bool tdp_mmu_enabled;
 
 	/*
-<<<<<<< HEAD
 	 * List of kvm_mmu_page structs being used as roots.
 	 * All kvm_mmu_page structs in the list should have
-=======
-	 * List of struct kvm_mmu_pages being used as roots.
-	 * All struct kvm_mmu_pages in the list should have
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * tdp_mmu_page set.
 	 *
 	 * For reads, this list is protected by:
@@ -1323,13 +1305,8 @@ struct kvm_arch {
 	struct list_head tdp_mmu_roots;
 
 	/*
-<<<<<<< HEAD
 	 * List of kvm_mmu_page structs not being used as roots.
 	 * All kvm_mmu_page structs in the list should have
-=======
-	 * List of struct kvmp_mmu_pages not being used as roots.
-	 * All struct kvm_mmu_pages in the list should have
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * tdp_mmu_page set and a tdp_mmu_root_count of 0.
 	 */
 	struct list_head tdp_mmu_pages;
@@ -1559,11 +1536,7 @@ struct kvm_x86_ops {
 				unsigned char *hypercall_addr);
 	void (*inject_irq)(struct kvm_vcpu *vcpu, bool reinjected);
 	void (*inject_nmi)(struct kvm_vcpu *vcpu);
-<<<<<<< HEAD
 	void (*inject_exception)(struct kvm_vcpu *vcpu);
-=======
-	void (*queue_exception)(struct kvm_vcpu *vcpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*cancel_injection)(struct kvm_vcpu *vcpu);
 	int (*interrupt_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
 	int (*nmi_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
@@ -1673,17 +1646,10 @@ struct kvm_x86_ops {
 
 struct kvm_x86_nested_ops {
 	void (*leave_nested)(struct kvm_vcpu *vcpu);
-<<<<<<< HEAD
 	bool (*is_exception_vmexit)(struct kvm_vcpu *vcpu, u8 vector,
 				    u32 error_code);
 	int (*check_events)(struct kvm_vcpu *vcpu);
 	bool (*has_events)(struct kvm_vcpu *vcpu);
-=======
-	int (*check_events)(struct kvm_vcpu *vcpu);
-	bool (*handle_page_fault_workaround)(struct kvm_vcpu *vcpu,
-					     struct x86_exception *fault);
-	bool (*hv_timer_pending)(struct kvm_vcpu *vcpu);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*triple_fault)(struct kvm_vcpu *vcpu);
 	int (*get_state)(struct kvm_vcpu *vcpu,
 			 struct kvm_nested_state __user *user_kvm_nested_state,

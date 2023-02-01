@@ -33,12 +33,9 @@ properties:
       Handle to the cpu this ETE is bound to.
     $ref: /schemas/types.yaml#/definitions/phandle
 
-<<<<<<< HEAD
   power-domains:
     maxItems: 1
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   out-ports:
     description: |
       Output connections from the ETE to legacy CoreSight trace bus.

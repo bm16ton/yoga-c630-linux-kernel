@@ -28,7 +28,6 @@ Since getting a picture requires multiple processing steps,
 this means that unlike in fixed pipelines the soft pipelines
 on the ISP can do multiple processing steps in a single pipeline
 element (in a single binary).
-<<<<<<< HEAD
 
 ###
 
@@ -48,5 +47,3 @@ Other members of camera_mipi_info which are set by some drivers are:
  the ov5693 driver (and used by the atomisp core)
 -raw_bayer_order, adjusted by the ov2680 driver when flipping since
  flipping can change the bayer order
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

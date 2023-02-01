@@ -140,25 +140,6 @@ void machine_shutdown(void)
 #endif
 }
 
-<<<<<<< HEAD
-=======
-/* Override the weak function in kernel/panic.c */
-void crash_smp_send_stop(void)
-{
-	static int cpus_stopped;
-
-	/*
-	 * This function can be called twice in panic path, but obviously
-	 * we execute this only once.
-	 */
-	if (cpus_stopped)
-		return;
-
-	smp_send_stop();
-	cpus_stopped = 1;
-}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void machine_kexec_mask_interrupts(void)
 {
 	unsigned int i;
@@ -233,14 +214,11 @@ machine_kexec(struct kimage *image)
 	void *control_code_buffer = page_address(image->control_code_page);
 	riscv_kexec_method kexec_method = NULL;
 
-<<<<<<< HEAD
 #ifdef CONFIG_SMP
 	WARN(smp_crash_stop_failed(),
 		"Some CPUs may be stale, kdump will be unreliable.\n");
 #endif
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (image->type != KEXEC_TYPE_CRASH)
 		kexec_method = control_code_buffer;
 	else

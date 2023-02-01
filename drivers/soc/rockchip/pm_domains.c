@@ -31,10 +31,7 @@
 #include <dt-bindings/power/rk3368-power.h>
 #include <dt-bindings/power/rk3399-power.h>
 #include <dt-bindings/power/rk3568-power.h>
-<<<<<<< HEAD
 #include <dt-bindings/power/rk3588-power.h>
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct rockchip_domain_info {
 	const char *name;
@@ -110,7 +107,6 @@ struct rockchip_pmu {
 }
 
 #define DOMAIN_M(_name, pwr, status, req, idle, ack, wakeup)	\
-<<<<<<< HEAD
 {							\
 	.name = _name,				\
 	.pwr_w_mask = (pwr) << 16,			\
@@ -127,10 +123,6 @@ struct rockchip_pmu {
 {							\
 	.name = _name,					\
 	.pwr_offset = p_offset,				\
-=======
-{							\
-	.name = _name,				\
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.pwr_w_mask = (pwr) << 16,			\
 	.pwr_mask = (pwr),				\
 	.status_mask = (status),			\
@@ -155,7 +147,6 @@ struct rockchip_pmu {
 
 #define DOMAIN_PX30(name, pwr, status, req, wakeup)		\
 	DOMAIN_M(name, pwr, status, req, (req) << 16, req, wakeup)
-<<<<<<< HEAD
 
 #define DOMAIN_RV1126(name, pwr, req, idle, wakeup)		\
 	DOMAIN_M(name, pwr, pwr, req, idle, idle, wakeup)
@@ -280,126 +271,6 @@ EXPORT_SYMBOL_GPL(rockchip_pmu_unblock);
 
 #define DOMAIN_RK3588(name, p_offset, pwr, status, r_status, r_offset, req, idle, wakeup)	\
 	DOMAIN_M_O_R(name, p_offset, pwr, status, r_status, r_offset, req, idle, idle, wakeup)
-=======
-
-#define DOMAIN_RK3288(name, pwr, status, req, wakeup)		\
-	DOMAIN(name, pwr, status, req, req, (req) << 16, wakeup)
-
-#define DOMAIN_RK3328(name, pwr, status, req, wakeup)		\
-	DOMAIN_M(name, pwr, pwr, req, (req) << 10, req, wakeup)
-
-#define DOMAIN_RK3368(name, pwr, status, req, wakeup)		\
-	DOMAIN(name, pwr, status, req, (req) << 16, req, wakeup)
-
-#define DOMAIN_RK3399(name, pwr, status, req, wakeup)		\
-	DOMAIN(name, pwr, status, req, req, req, wakeup)
-
-#define DOMAIN_RK3568(name, pwr, req, wakeup)		\
-	DOMAIN_M(name, pwr, pwr, req, req, req, wakeup)
-
-/*
- * Dynamic Memory Controller may need to coordinate with us -- see
- * rockchip_pmu_block().
- *
- * dmc_pmu_mutex protects registration-time races, so DMC driver doesn't try to
- * block() while we're initializing the PMU.
- */
-static DEFINE_MUTEX(dmc_pmu_mutex);
-static struct rockchip_pmu *dmc_pmu;
-
-/*
- * Block PMU transitions and make sure they don't interfere with ARM Trusted
- * Firmware operations. There are two conflicts, noted in the comments below.
- *
- * Caller must unblock PMU transitions via rockchip_pmu_unblock().
- */
-int rockchip_pmu_block(void)
-{
-	struct rockchip_pmu *pmu;
-	struct generic_pm_domain *genpd;
-	struct rockchip_pm_domain *pd;
-	int i, ret;
-
-	mutex_lock(&dmc_pmu_mutex);
-
-	/* No PMU (yet)? Then we just block rockchip_pmu_probe(). */
-	if (!dmc_pmu)
-		return 0;
-	pmu = dmc_pmu;
-
-	/*
-	 * mutex blocks all idle transitions: we can't touch the
-	 * PMU_BUS_IDLE_REQ (our ".idle_offset") register while ARM Trusted
-	 * Firmware might be using it.
-	 */
-	mutex_lock(&pmu->mutex);
-
-	/*
-	 * Power domain clocks: Per Rockchip, we *must* keep certain clocks
-	 * enabled for the duration of power-domain transitions. Most
-	 * transitions are handled by this driver, but some cases (in
-	 * particular, DRAM DVFS / memory-controller idle) must be handled by
-	 * firmware. Firmware can handle most clock management via a special
-	 * "ungate" register (PMU_CRU_GATEDIS_CON0), but unfortunately, this
-	 * doesn't handle PLLs. We can assist this transition by doing the
-	 * clock management on behalf of firmware.
-	 */
-	for (i = 0; i < pmu->genpd_data.num_domains; i++) {
-		genpd = pmu->genpd_data.domains[i];
-		if (genpd) {
-			pd = to_rockchip_pd(genpd);
-			ret = clk_bulk_enable(pd->num_clks, pd->clks);
-			if (ret < 0) {
-				dev_err(pmu->dev,
-					"failed to enable clks for domain '%s': %d\n",
-					genpd->name, ret);
-				goto err;
-			}
-		}
-	}
-
-	return 0;
-
-err:
-	for (i = i - 1; i >= 0; i--) {
-		genpd = pmu->genpd_data.domains[i];
-		if (genpd) {
-			pd = to_rockchip_pd(genpd);
-			clk_bulk_disable(pd->num_clks, pd->clks);
-		}
-	}
-	mutex_unlock(&pmu->mutex);
-	mutex_unlock(&dmc_pmu_mutex);
-
-	return ret;
-}
-EXPORT_SYMBOL_GPL(rockchip_pmu_block);
-
-/* Unblock PMU transitions. */
-void rockchip_pmu_unblock(void)
-{
-	struct rockchip_pmu *pmu;
-	struct generic_pm_domain *genpd;
-	struct rockchip_pm_domain *pd;
-	int i;
-
-	if (dmc_pmu) {
-		pmu = dmc_pmu;
-		for (i = 0; i < pmu->genpd_data.num_domains; i++) {
-			genpd = pmu->genpd_data.domains[i];
-			if (genpd) {
-				pd = to_rockchip_pd(genpd);
-				clk_bulk_disable(pd->num_clks, pd->clks);
-			}
-		}
-
-		mutex_unlock(&pmu->mutex);
-	}
-
-	mutex_unlock(&dmc_pmu_mutex);
-}
-EXPORT_SYMBOL_GPL(rockchip_pmu_unblock);
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static bool rockchip_pmu_domain_is_idle(struct rockchip_pm_domain *pd)
 {
@@ -763,17 +634,6 @@ static int rockchip_pm_add_one_domain(struct rockchip_pmu *pmu,
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	error = rockchip_pd_power(pd, true);
-	if (error) {
-		dev_err(pmu->dev,
-			"failed to power on domain '%pOFn': %d\n",
-			node, error);
-		goto err_unprepare_clocks;
-	}
-
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (pd->info->name)
 		pd->genpd.name = pd->info->name;
 	else
@@ -1024,7 +884,6 @@ static const struct rockchip_domain_info px30_pm_domains[] = {
 	[PX30_PD_VO]		= DOMAIN_PX30("vo",       BIT(13), BIT(13), BIT(7),  false),
 	[PX30_PD_VI]		= DOMAIN_PX30("vi",       BIT(14), BIT(14), BIT(8),  false),
 	[PX30_PD_GPU]		= DOMAIN_PX30("gpu",      BIT(15), BIT(15), BIT(2),  false),
-<<<<<<< HEAD
 };
 
 static const struct rockchip_domain_info rv1126_pm_domains[] = {
@@ -1035,8 +894,6 @@ static const struct rockchip_domain_info rv1126_pm_domains[] = {
 	[RV1126_PD_NVM]		= DOMAIN_RV1126("nvm", BIT(7), BIT(11), BIT(11),  false),
 	[RV1126_PD_SDIO]	= DOMAIN_RV1126("sdio", BIT(8), BIT(13), BIT(13),  false),
 	[RV1126_PD_USB]		= DOMAIN_RV1126("usb", BIT(9), BIT(15), BIT(15),  false),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct rockchip_domain_info rk3036_pm_domains[] = {
@@ -1164,7 +1021,6 @@ static const struct rockchip_domain_info rk3568_pm_domains[] = {
 	[RK3568_PD_RKVDEC]	= DOMAIN_RK3568("vdec", BIT(4), BIT(8),  false),
 	[RK3568_PD_RKVENC]	= DOMAIN_RK3568("venc", BIT(3), BIT(7),  false),
 	[RK3568_PD_PIPE]	= DOMAIN_RK3568("pipe", BIT(8), BIT(11), false),
-<<<<<<< HEAD
 };
 
 static const struct rockchip_domain_info rk3588_pm_domains[] = {
@@ -1197,8 +1053,6 @@ static const struct rockchip_domain_info rk3588_pm_domains[] = {
 	[RK3588_PD_SDIO]	= DOMAIN_RK3588("sdio",    0x4, BIT(10), 0,       BIT(24), 0x4, BIT(3),  BIT(19), false),
 	[RK3588_PD_USB]		= DOMAIN_RK3588("usb",     0x4, BIT(11), 0,       BIT(25), 0x4, BIT(4),  BIT(20), true),
 	[RK3588_PD_SDMMC]	= DOMAIN_RK3588("sdmmc",   0x4, BIT(13), 0,       BIT(26), 0x0, 0,       0,       false),
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct rockchip_pmu_info px30_pmu = {
@@ -1347,7 +1201,6 @@ static const struct rockchip_pmu_info rk3568_pmu = {
 	.domain_info = rk3568_pm_domains,
 };
 
-<<<<<<< HEAD
 static const struct rockchip_pmu_info rk3588_pmu = {
 	.pwr_offset = 0x14c,
 	.status_offset = 0x180,
@@ -1371,8 +1224,6 @@ static const struct rockchip_pmu_info rv1126_pmu = {
 	.domain_info = rv1126_pm_domains,
 };
 
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct of_device_id rockchip_pm_domain_dt_match[] = {
 	{
 		.compatible = "rockchip,px30-power-controller",
@@ -1422,7 +1273,6 @@ static const struct of_device_id rockchip_pm_domain_dt_match[] = {
 		.compatible = "rockchip,rk3568-power-controller",
 		.data = (void *)&rk3568_pmu,
 	},
-<<<<<<< HEAD
 	{
 		.compatible = "rockchip,rk3588-power-controller",
 		.data = (void *)&rk3588_pmu,
@@ -1431,8 +1281,6 @@ static const struct of_device_id rockchip_pm_domain_dt_match[] = {
 		.compatible = "rockchip,rv1126-power-controller",
 		.data = (void *)&rv1126_pmu,
 	},
-=======
->>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ /* sentinel */ },
 };
 
